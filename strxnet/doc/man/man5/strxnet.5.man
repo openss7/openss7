@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strxnet.5.man,v 0.9.2.1 2006/12/31 13:58:16 brian Exp $
+.\" @(#) $Id: strxnet.5.man,v 0.9.2.2 2007/01/03 10:11:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/31 13:58:16 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/03 10:11:50 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strxnet.5.man,v $
+.\" Revision 0.9.2.2  2007/01/03 10:11:50  brian
+.\" - documentation updates for release
+.\"
 .\" Revision 0.9.2.1  2006/12/31 13:58:16  brian
 .\" - added package manual page
 .\"
@@ -126,14 +129,52 @@ protocol based on the trasnport layer of the OSI reference model.
 The package builds and installs the following
 .I STREAMS
 modules (as kernel modules):
-.IP \(em \w'\(em\(em'u
-.BR timod (4)
-.IP \(em
-.BR tirdwr (4)
+.IP \(en \w'\(en\(em'u
+.B streams_timod.ko
+module
+.RI \(lq timod \(rq.
+.PD 0
+.IP \(en
+.B streams_tirdwr.ko
+module
+.RI \(lq tirdwr \(rq.
+.PD
+.PP
+The following are
+.I STREAMS
+modules installed by the
+.B @PACKAGE@
+package:
 .TP
 .BR tirdwr (4)
+The
+.BR tirdwr (4)
+module is a module that can be pushed over a Stream conforming to the
+Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+that provides a
+.BR read (2s)
+.BR write (2s)
+interface to the transport provider.
+See
+.BR tirdwr (4)
+for more information.
 .TP
 .BR timod (4)
+The
+.BR timod (4)
+module is a module that cooperates with the
+.BR xti (3)
+library and is pushed by the library over a Stream conforming to the
+Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+that provides XTI/TLI library access to the trasnport provider.
 .PP
 The
 .B @PACKAGE_TITLE@
@@ -163,310 +204,439 @@ for a number of years.
 .PP
 .HP
 .BR strxnet (5)\ \- \ 
+@PACKAGE_TITLE@ package.
 .PD 0
 .HP
 .BR strxnet_mknod (8)\ \- \ 
+create or remove
+.I STREAMS
+XNET device nodes.
 .PD
-
+.\"
+.SS "XTI Modules"
+.PP
+.HP
+.BR timod (4)\ \- \ 
+a
+.I STREAMS
+XTI/TLI compatibility interface.
+.PD 0
+.HP
+.BR tirdwr (4)\ \- \ 
+a
+.I STREAMS
+XTI/TLI read write compatiblity module.
+.PD
+.\"
 .SS "XTI/TLI Library"
 .PP
 .HP
 .BR libxnet (3)\ \- \ 
+XNS 5.2 XTI/TLI Library (libxnet).
 .PD 0
 .HP
 .BR xnet (3)\ \- \ 
+XNS 5.2 XTI/TLI Library (libxnet).
 .HP
 .BR xti (3)\ \- \ 
+XNS 5.2 XTI/TLI Library (libxnet).
 .HP
 .BR netbuf (3)\ \- \ 
+the XTI/TLI netbuf structure.
 .HP
 .BR t_accept (3)\ \- \ 
+accept a connection request.
 .HP
 .BR t_addleaf (3)\ \- \ 
+add a point to a point-to-multipoint connection.
 .HP
 .BR t_alloc (3)\ \- \ 
+allocate a library structure.
 .HP
 .BR t_bind (3)\ \- \ 
+bind to a transport endpoint.
 .HP
 .BR t_close (3)\ \- \ 
+close a transport endpoint.
 .HP
 .BR t_connect (3)\ \- \ 
+establish a transport connection.
 .HP
 .BR t_errlist (3)\ \- \ 
+describe an XTI/TLI library error.
 .HP
 .BR t_errno (3)\ \- \ 
+TLI error number.
 .HP
 .BR t_error (3)\ \- \ 
+print an error message.
 .HP
 .BR t_errstr (3)\ \- \ 
+describe an XTI/TLI library error.
 .HP
 .BR t_free (3)\ \- \ 
+free an XTI/TLI library structure.
 .HP
 .BR t_getinfo (3)\ \- \ 
+get protocol information.
 .HP
 .BR t_getprotaddr (3)\ \- \ 
+get protocol addresses.
 .HP
 .BR t_getstate (3)\ \- \ 
+get interface state.
 .HP
 .BR t_listen (3)\ \- \ 
+listen for a transport connection request.
 .HP
 .BR t_look (3)\ \- \ 
+look for a transport event.
 .HP
 .BR t_nerr (3)\ \- \ 
+describe an XTI/TLI library error.
 .HP
 .BR t_open (3)\ \- \ 
+open a transport endpoint.
 .HP
 .BR t_optmgmt (3)\ \- \ 
+manage transport options.
 .HP
 .BR t_rcv (3)\ \- \ 
+receive transport data.
 .HP
 .BR t_rcvconnect (3)\ \- \ 
+receive connection request confirmation.
 .HP
 .BR t_rcvdis (3)\ \- \ 
+receive abortive disconnect.
 .HP
 .BR t_rcvleafchange (3)\ \- \ 
+receive addition of point to point-to-multipoint connection.
 .HP
 .BR t_rcvopt (3)\ \- \ 
+receive unit data.
 .HP
 .BR t_rcvrel (3)\ \- \ 
+acknowledge orderly release request.
 .HP
 .BR t_rcvreldata (3)\ \- \ 
+acknowledge orderly release request with data.
 .HP
 .BR t_rcvudata (3)\ \- \ 
+receive unit data.
 .HP
 .BR t_rcvuderr (3)\ \- \ 
+receive unit data error.
 .HP
 .BR t_rcvv (3)\ \- \ 
+receive data and scatter.
 .HP
 .BR t_rcvvopt (3)\ \- \ 
+receive data with options and scatter.
 .HP
 .BR t_rcvvudata (3)\ \- \ 
+receive unit data and scatter.
 .HP
 .BR t_removeleaf (3)\ \- \ 
+remove a point from a point-to-multipoint connection.
 .HP
 .BR t_snd (3)\ \- \ 
+send transport data.
 .HP
 .BR t_snddis (3)\ \- \ 
+send abortive disconnect.
 .HP
 .BR t_sndopt (3)\ \- \ 
+send transport data with options.
 .HP
 .BR t_sndrel (3)\ \- \ 
+send orderly release.
 .HP
 .BR t_sndreldata (3)\ \- \ 
+send orderly release with data.
 .HP
 .BR t_sndudata (3)\ \- \ 
+send unit data.
 .HP
 .BR t_sndv (3)\ \- \ 
+gather and send data.
 .HP
 .BR t_sndvopt (3)\ \- \ 
+gather and send data with options.
 .HP
 .BR t_sndvudata (3)\ \- \ 
+gather and send unit data.
 .HP
 .BR t_strerror (3)\ \- \ 
+describe an XTI/TLI library error.
 .HP
 .BR t_sync (3)\ \- \ 
+synchronize XTI/TLI library with TLI provider.
 .HP
 .BR t_sysconf (3)\ \- \ 
+configure XTI/TLI library parameters.
 .HP
 .BR t_unbind (3)\ \- \ 
-.HP
-.BR timod (4)\ \- \ 
-.HP
-.BR tirdwr (4)\ \- \ 
-.HP
-.BR test-timod (8)\ \- \ 
-.HP
-.BR test-tirdwr (8)\ \- \ 
-.HP
-.BR test-xnet (8)\ \- \ 
-.HP
-.BR test-xnet_thr (8)\ \- \ 
+unbind a transport endpoint.
 .PD
-
-.SS "Sockets Library"
-.PP
-.HP
-.BR libsocket (3)\ \- \ 
-.PD 0
-.HP
-.BR accept (3)\ \- \ 
-.HP
-.BR bind (3)\ \- \ 
-.HP
-.BR connect (3)\ \- \ 
-.HP
-.BR getpeername (3)\ \- \ 
-.HP
-.BR getsockname (3)\ \- \ 
-.HP
-.BR getsockopt (3)\ \- \ 
-.HP
-.BR listen (3)\ \- \ 
-.HP
-.BR recv (3)\ \- \ 
-.HP
-.BR recvfrom (3)\ \- \ 
-.HP
-.BR recvmsg (3)\ \- \ 
-.HP
-.BR send (3)\ \- \ 
-.HP
-.BR sendmsg (3)\ \- \ 
-.HP
-.BR sendto (3)\ \- \ 
-.HP
-.BR setsockopt (3)\ \- \ 
-.HP
-.BR shutdown (3)\ \- \ 
-.HP
-.BR socket (3)\ \- \ 
-.HP
-.BR socketpair (3)\ \- \ 
-.HP
-.BR sockets (3)\ \- \ 
-.HP
-.BR sockmod (4)\ \- \ 
-.HP
-.BR socksys (4)\ \- \ 
-.HP
-.BR protosw (5)\ \- \ 
-.PD
-
-.SS "NSL Library"
-.PP
-.HP
-.BR libxnsl (3)\ \- \ 
-.PD 0
-.HP
-.BR xnsl (3)\ \- \ 
-.HP
-.BR endnetconfig (3)\ \- \ 
-.HP
-.BR endnetpath (3)\ \- \ 
-.HP
-.BR freenetconfigent (3)\ \- \ 
-.HP
-.BR getnetconfig (3)\ \- \ 
-.HP
-.BR getnetconfigent (3)\ \- \ 
-.HP
-.BR getnetpath (3)\ \- \ 
-.HP
-.BR inetaddr (3)\ \- \ 
-.HP
-.BR nc_perror (3)\ \- \ 
-.HP
-.BR nc_sperror (3)\ \- \ 
-.HP
-.BR netconfig (3)\ \- \ 
-.HP
-.BR netdir (3)\ \- \ 
-.HP
-.BR netdir_free (3)\ \- \ 
-.HP
-.BR netdir_getbyaddr (3)\ \- \ 
-.HP
-.BR netdir_getbyname (3)\ \- \ 
-.HP
-.BR netdir_options (3)\ \- \ 
-.HP
-.BR netdir_perror (3)\ \- \ 
-.HP
-.BR netdir_sperror (3)\ \- \ 
-.HP
-.BR netpath (3)\ \- \ 
-.HP
-.BR setnetconfig (3)\ \- \ 
-.HP
-.BR setnetpath (3)\ \- \ 
-.HP
-.BR taddr2uaddr (3)\ \- \ 
-.HP
-.BR uaddr2taddr (3)\ \- \ 
-.HP
-.BR netconfig (5)\ \- \ 
-.HP
-.BR netdir (5)\ \- \ 
-.HP
-.BR test-xnsl (8)\ \- \ 
-.HP
-.BR test-xnsl_thr (8)\ \- \ 
-.PD
-
+.\"
+.\".SS "Sockets Library"
+.\".PP
+.\".HP
+.\".BR libsocket (3)\ \- \ 
+.\".PD 0
+.\".HP
+.\".BR accept (3)\ \- \ 
+.\".HP
+.\".BR bind (3)\ \- \ 
+.\".HP
+.\".BR connect (3)\ \- \ 
+.\".HP
+.\".BR getpeername (3)\ \- \ 
+.\".HP
+.\".BR getsockname (3)\ \- \ 
+.\".HP
+.\".BR getsockopt (3)\ \- \ 
+.\".HP
+.\".BR listen (3)\ \- \ 
+.\".HP
+.\".BR recv (3)\ \- \ 
+.\".HP
+.\".BR recvfrom (3)\ \- \ 
+.\".HP
+.\".BR recvmsg (3)\ \- \ 
+.\".HP
+.\".BR send (3)\ \- \ 
+.\".HP
+.\".BR sendmsg (3)\ \- \ 
+.\".HP
+.\".BR sendto (3)\ \- \ 
+.\".HP
+.\".BR setsockopt (3)\ \- \ 
+.\".HP
+.\".BR shutdown (3)\ \- \ 
+.\".HP
+.\".BR socket (3)\ \- \ 
+.\".HP
+.\".BR socketpair (3)\ \- \ 
+.\".HP
+.\".BR sockets (3)\ \- \ 
+.\".HP
+.\".BR sockmod (4)\ \- \ 
+.\".HP
+.\".BR socksys (4)\ \- \ 
+.\".HP
+.\".BR protosw (5)\ \- \ 
+.\".PD
+.\"
+.\".SS "NSL Library"
+.\".PP
+.\".HP
+.\".BR libxnsl (3)\ \- \ 
+.\".PD 0
+.\".HP
+.\".BR xnsl (3)\ \- \ 
+.\".HP
+.\".BR endnetconfig (3)\ \- \ 
+.\".HP
+.\".BR endnetpath (3)\ \- \ 
+.\".HP
+.\".BR freenetconfigent (3)\ \- \ 
+.\".HP
+.\".BR getnetconfig (3)\ \- \ 
+.\".HP
+.\".BR getnetconfigent (3)\ \- \ 
+.\".HP
+.\".BR getnetpath (3)\ \- \ 
+.\".HP
+.\".BR inetaddr (3)\ \- \ 
+.\".HP
+.\".BR nc_perror (3)\ \- \ 
+.\".HP
+.\".BR nc_sperror (3)\ \- \ 
+.\".HP
+.\".BR netconfig (3)\ \- \ 
+.\".HP
+.\".BR netdir (3)\ \- \ 
+.\".HP
+.\".BR netdir_free (3)\ \- \ 
+.\".HP
+.\".BR netdir_getbyaddr (3)\ \- \ 
+.\".HP
+.\".BR netdir_getbyname (3)\ \- \ 
+.\".HP
+.\".BR netdir_options (3)\ \- \ 
+.\".HP
+.\".BR netdir_perror (3)\ \- \ 
+.\".HP
+.\".BR netdir_sperror (3)\ \- \ 
+.\".HP
+.\".BR netpath (3)\ \- \ 
+.\".HP
+.\".BR setnetconfig (3)\ \- \ 
+.\".HP
+.\".BR setnetpath (3)\ \- \ 
+.\".HP
+.\".BR taddr2uaddr (3)\ \- \ 
+.\".HP
+.\".BR uaddr2taddr (3)\ \- \ 
+.\".HP
+.\".BR netconfig (5)\ \- \ 
+.\".HP
+.\".BR netdir (5)\ \- \ 
+.\".HP
+.\".BR test-xnsl (8)\ \- \ 
+.\".HP
+.\".BR test-xnsl_thr (8)\ \- \ 
+.\".PD
+.\"
 .SS "TPI Interface"
 .PP
 .HP
 .BR tpi (7)\ \- \ 
+Transport Provider Interface
 .PD 0
 .HP
 .BR T_ADDR_ACK (7)\ \- \ 
+protocol address acknowledgement.
 .HP
 .BR T_ADDR_REQ (7)\ \- \ 
+get protocol address request.
 .HP
 .BR T_BIND_ACK (7)\ \- \ 
+bind protocol address acknowledgement.
 .HP
 .BR T_BIND_REQ (7)\ \- \ 
+bind protocol address request.
 .HP
 .BR T_CAPABILITY_ACK (7)\ \- \ 
+protocol capability acknowledgement.
 .HP
 .BR T_CAPABILITY_REQ (7)\ \- \ 
+protocol capability acknowledgement.
 .HP
 .BR T_CONN_CON (7)\ \- \ 
+connection confirm.
 .HP
 .BR T_CONN_IND (7)\ \- \ 
+connect indication.
 .HP
 .BR T_CONN_REQ (7)\ \- \ 
+connect request.
 .HP
 .BR T_CONN_RES (7)\ \- \ 
+connection response.
 .HP
 .BR T_DATA_IND (7)\ \- \ 
+data indication.
 .HP
 .BR T_DATA_REQ (7)\ \- \ 
+data request.
 .HP
 .BR T_DISCON_IND (7)\ \- \ 
+disconnect indication.
 .HP
 .BR T_DISCON_REQ (7)\ \- \ 
+disconnect request.
 .HP
 .BR T_ERROR_ACK (7)\ \- \ 
+error acknowledgement.
 .HP
 .BR T_EXDATA_IND (7)\ \- \ 
+expedited data indication.
 .HP
 .BR T_EXDATA_REQ (7)\ \- \ 
+expedited data request.
 .HP
 .BR T_INFO_ACK (7)\ \- \ 
+protocol information acknowledgement.
 .HP
 .BR T_INFO_REQ (7)\ \- \ 
+get transport protocol parameter sizes.
 .HP
 .BR T_OK_ACK (7)\ \- \ 
+success acknowledgement.
 .HP
 .BR T_OPTDATA_IND (7)\ \- \ 
+data indication with options.
 .HP
 .BR T_OPTDATA_REQ (7)\ \- \ 
+data request with options.
 .HP
 .BR T_OPTMGMT_ACK (7)\ \- \ 
+options management acknowledgement.
 .HP
 .BR T_OPTMGMT_REQ (7)\ \- \ 
+options management.
 .HP
 .BR T_ORDREL_IND (7)\ \- \ 
+orderly release indication.
 .HP
 .BR T_ORDREL_REQ (7)\ \- \ 
+orderly release request.
 .HP
 .BR T_UDERROR_IND (7)\ \- \ 
+unit data error indication.
 .HP
 .BR T_UNBIND_REQ (7)\ \- \ 
+unbind protocol address request.
 .HP
 .BR T_UNITDATA_IND (7)\ \- \ 
+unit data indication.
 .HP
 .BR T_UNITDATA_REQ (7)\ \- \ 
+unit data request.
+.PD
+.PP
+In addition to these manual pages, the
+.B @PACKAGE_TITLE@
+package installs an
+.I Installation and Reference Manual
+as well as a reprint of the
+.I UNIX International
+Transport Provider Interface specification.
+.\"
+.SS "Test Programs"
+.HP
+.BR test-timod (8)\ \- \ 
+a test suite executable for the
+.BR timod (4)
+.I STREAMS
+module.
+.PD 0
+.HP
+.BR test-tirdwr (8)\ \- \ 
+a test suite executable for the
+.BR tirdwr (4)
+.I STREAMS
+module.
+.HP
+.BR test-xnet (8)\ \- \ 
+a test suite executable for the
+.BR xnet (3)
+.I STREAMS
+library.
+.HP
+.BR test-xnet_thr (8)\ \- \ 
+a test suite executable for the
+.BR xnet (3)
+.I STREAMS
+library.
 .PD
 .\"
 .\"
 .SH MODULES
 .PP
 .TP
-.B tirdwr (4)
+.BR tirdwr (4)
+a
+.I STREAMS
+XTI/TLI read write compatibility module.
 .TP
-.B timod (4)
+.BR timod (4)
+a
+.I STREAMS
+XTI/TLI compatibility interface.
 .\"
 .\"
 .SH PREREQUISITES
@@ -504,6 +674,55 @@ will no longer support this package for
 .IR LiS :
 please upgrade to
 .BR "Linux Fast-STREAMS" .
+.PP
+.I Production
+releases are releases that have received exhaustive testing within the project
+and validated on specific distributions and architectures.
+.I Production
+release packages do not ship with known defects.  Please rememaber that there
+is
+.B NO WARRANTY
+on public release packages.
+.PP
+.I Production
+packages ship containing a list of validated distributions and architectures.
+Full regression testing of any maintenance changes is performed.  Suitability
+of software in this category for production use on the specified target
+distributions and architectures is at the discretion of the user.  It should
+not be necessary to perform validation tests on the set of supported target
+systems before considering production use.
+.PP
+.B @PACKAGE_TITLE@
+could possibly contain unknown defects.  This is a
+.I production
+release.  Nevertheless, some remaining unknown defects could possibly be
+harmful.  Validation testing has been performed by the
+.I OpenSS7 Project
+and external entities on this software for the set of systems listed in the
+release notes.  Nevertheless, the software might still fail to configure or
+compile on other systems.  The
+.I OpenSS7 Project
+recommends that you validate this software for your target system before using
+this software.  Use at your own risk.  Remember that there is
+.BR "NO WARRANTY" .
+(See the section
+.RI \(lq "NO WARRANTY" \(rq
+under the
+.RI \(lq "GNU General Public License" \(rq,
+in the manual.)
+.PP
+This software is
+.I production
+software.  As such, it is stable on validated systems but might still crash
+your kernel in unique circumstances.  Installation of the software on a
+non-validated distribution might mangle your header files or Linux
+distribution in such a way as to make it unusable and rebooting the system
+might not repair the problem.  You possibly lose all the data on your system.
+Because this software stands a chance of crashing your kernel, the resulting
+unstable system could possibly destroy computer hardware or peripherals making
+them unusable.  You might void the warranty on any system on which you run
+this software.
+.B YOU HAVE BEEN WARNED.
 .\"
 .\"
 .SH BUGS
@@ -521,10 +740,312 @@ package had no known bugs.  Problems can be reported to
 Please, however, use the included
 .B send-pr
 script for generating actionable problem reports.
+.PP
+With the exception of packages not originally created by the
+.IR "OpenSS7 Project" ,
+the
+.I OpenSS7 Project
+software does not ship with known bugs in any release stage except
+.RI \(lq "pre-alpha" \(rq.
+.B @PACKAGE_TITLE@
+had no known bugs at the time of release.
+.\"
+.SS "Problem Report Guidelines"
+.PP
+Problem reports in the following categories should include a log file as
+indicated in the table below:
+.TP
+.B ./configure
+A problem with the configuration process occurs that causes the
+.B ./configure
+command to fail.  The problem report must include the
+.I config.log
+file that was generated by
+.BR configure .
+.TP
+.B make compile.log
+A problem with the build process occurs that causes the
+.BR make (1)
+command to fail.
+Perform
+.B make clean
+and then
+.B make compile.log
+and attach the
+.I config.log
+and
+.I compile.log
+files to the problem report.
+.TP
+.B sudo make install.log
+A problem occurs with
+.B sudo make install
+that causes it to fail.
+Perform
+.B sudo make uninstall
+and
+.B sudo make install.log
+and
+attach the
+.IR config.log ", " compile.log ", " check.log ", and " install.log
+files to the problem report.
+.TP
+.RB [ sudo "] " "make installcheck.log"
+A problem occurs with the
+.B make installcheck
+target that causes the test suite to fail.  Attach the resulting
+.IR tests/testsuite.log " and " installcheck.log
+file to the problem report.  There is no need to attach the other files as
+they are included in
+.IR tests/testsuite.log .
+.TP
+.RB [ sudo "] " "make uninstall.log"
+A problem occurs with the
+.B make uninstall
+target that causes the test suite to fail.  Perform
+.B sudo make uninstall.log
+and attach the
+.IR config.log ", " compile.log ", " check.log ", " install.log ", " installcheck.log ", " tests/testsuite.log " and " uninstall.log
+file to the problem report.
+.TP
+.RB [ sudo "] " "make remove.log"
+A problem occurs with the
+.B make remove
+target that causes the test suite to fail.  Perform
+.B sudo make remove.log
+and attach the
+.IR config.log ", " compile.log ", " check.log ", " install.log ", " installcheck.log ", " tests/testsuite.log " and " remove.log
+file to the problem report.
+.PP
+For other problems that occur during the use of the
+.B @PACKAGE_TITLE@
+package, please write a test case for the test suite that recreates the
+problem if one does not yet exist and provide a test program patch with the
+problem report.  Also include whatever log files are generated by the kernel
+.RB ( cmn_err "(9), or " strlog (9)),
+or by the
+.BR strerr "(8) or " strace (1)
+facilities
+.RB ( strlog (9)).
+.SS "Generating Problem Reports"
+.PP
+.I The OpenSS7 Project
+uses the
+.B GNU GNATS
+system for problem
+reporting.  Although the
+.B send-pr
+tool from the
+.B GNU GNATS
+package can be used for bug reporting to the project's
+.B GNATS
+database using electronic mail, it is not always convenient to download and
+install the
+.B GNATS
+system to gain access to the
+.B send-pr
+tool.
+.PP
+Therefore, the
+.B @PACKAGE_TITLE@
+package provides the
+.B send-pr
+shell script that can be used for problem reporting.  The
+.B send-pr
+shell script can invoked directly and is a work-alike for the
+.B GNU send-pr
+tool.
+.PP
+The
+.B send-pr
+tool takes the same flags and can be used in the same fashion, however,
+whereas
+.B send-pr
+is an interactive tool
+.RB ( send-pr
+launches the user's
+.I EDITOR
+to edit the problem report before submitting it),
+.B send-pr
+is also able to perform batch processing.  Whereas
+.B send-pr
+takes its field information from local databases or from using the
+.B query-pr
+C-language program to query a remote database, the
+.B send-pr
+tool has the field database internal to the tool.
+.PP
+Problem reports can be generate using
+.BR make (1),
+see
+.RI \(lq "Problem Report Targets" \(rq,
+in the manual.  An example of how simple it is to generate a problem report is
+illustrated in
+.RI \(lq "Example 1" \(rq,
+below.
+.PP
+.RS
+.nf
+\fC\s-1\
+% make pr
+SEND-PR:
+SEND-PR: send-pr:  send-pr was invoked to generate an external report.  An
+SEND-PR: automated problem report has been created in the file named
+SEND-PR: 'problem.pr' in the current directory.  This problem report can
+SEND-PR: be sent to bugs@openss7.org by calling this script as
+SEND-PR: '/home/brian/os7/scripts/send-pr --file="problem.pr"'.
+SEND-PR:
+SEND-PR: It is possible to edit some of the fields before sending on the
+SEND-PR: problem report.  Please remember that there is NO WARRANTY.  See
+SEND-PR: the file 'COPYING' in the top level directory.
+SEND-PR:
+SEND-PR: Please do not send confidential information to the bug report
+SEND-PR: address.  Inspect the file 'problem.pr' for confidential
+SEND-PR: information before mailing.
+SEND-PR:
+% vim problem.pr  # <--- follow instructions at head of file
+% make send-pr
+\s+1\fP
+.fi
+.ce 1
+\fBExample 1:\fI Invoking Problem Report Generation\fP
+.RE
+.PP
+Using the
+.B make pr
+target to generate a problem report has the advantages that it will assemble
+any available
+.I *.log
+files in the build directory and attach them to the problem report.
+.\"
+.SS "Automatic Problem Reports"
+.PP
+The
+.B @PACKAGE_TITLE@
+package also provides a feature for automatic problem report generation that
+meets the problem report submission guidelines detailed in the preceding
+sections.
+.PP
+Whenever a logging makefile target (see
+.RI \(lq "Logging Targets" \(rq,
+in the manual) is invoked, if the primary target fails, the
+.B send-pr
+shell script is invoked to automatically generate a problem report file
+suitable for the corresponding target (as described above under see
+.RI \(lq "Problem Report Guidelines" \(rq,
+in the manual).  An example is shown in
+.RI \(lq "Example 2" \(rq,
+below.
+.PP
+.RS
+.nf
+\fC\s-1\
+% make compile.log
+...
+...
+make[5]: *** [libXNSdrvs_a-ip.o] Error 1
+make[5]: Leaving directory `/u6/buildel4/strxns'
+make[4]: *** [all-recursive] Error 1
+make[4]: Leaving directory `/u6/buildel4/strxns'
+make[3]: *** [all] Error 2
+make[3]: Leaving directory `/u6/buildel4/strxns'
+make[2]: *** [all-recursive] Error 1
+make[2]: Leaving directory `/u6/buildel4'
+make[1]: *** [all] Error 2
+make[1]: Leaving directory `/u6/buildel4'
+SEND-PR:
+SEND-PR: send-pr:  Make target compile.log failed in the compile stage.  An
+SEND-PR: automated problem report has been created in the file named
+SEND-PR: 'problem.pr' in the current directory.  This problem report can
+SEND-PR: be sent to bugs@openss7.org by calling 'make send-pr'.
+SEND-PR:
+SEND-PR: It is possible to edit some of the fields before sending on the
+SEND-PR: problem report.  Please remember that there is NO WARRANTY.  See
+SEND-PR: the file 'COPYING' in the top level directory.
+SEND-PR:
+SEND-PR: Please do not send confidential information to the bug report
+SEND-PR: address.  Inspect the file 'problem.pr' for confidential
+SEND-PR: information before mailing.
+SEND-PR:
+% vim problem.pr  # <--- follow instructions at head of file
+% make send-pr
+\s+1\fP
+.fi
+.ce 1
+\fBExample 2:\fI Problem Report from Failed Logging Target\fR
+.RE
+.\"
+.SS "Stand Alone Problem Reports"
+.PP
+The
+.B @PACKAGE_TITLE@
+package installs the
+.B send-pr
+script and its configuration file
+.I send-pr.config
+in
+.I /usr/libexec/streams
+along with the validation
+.BR testsuite ,
+see
+.RI \(lq "Test Suites" \(rq,
+in the manual.  As with the
+.BR testsuite ,
+this allows the
+.B send-pr
+script to be used for problem report generation on an installed system that
+does not have a build directory.
+.PP
+An example of invoking the package
+.B testsuite
+and then generating a problem report for failed cases is shown in
+.RI \(lq "Example 3" \(rq,
+below.
+.PP
+.RS
+.nf
+\fC\s-1\
+% [sudo] /usr/libexec/streams/testsuite
+% # test cases failed...
+% /usr/libexec/streams/send-pr
+SEND-PR:
+SEND-PR: send-pr:  send-pr was invoked to generate an external report.  An
+SEND-PR: automated problem report has been created in the file named
+SEND-PR: 'problem.pr' in the current directory.  This problem report can
+SEND-PR: be sent to bugs@openss7.org by calling this script as
+SEND-PR: '/usr/libexec/streams/send-pr --file problem.pr'.
+SEND-PR:
+SEND-PR: It is possible to edit some of the fields before sending on the
+SEND-PR: problem report.  Please remember that there is NO WARRANTY.  See
+SEND-PR: the file 'COPYING' in the top level directory.
+SEND-PR:
+SEND-PR: Please do not send confidential information to the bug report
+SEND-PR: address.  Inspect the file 'problem.pr' for confidential
+SEND-PR: information before mailing.
+SEND-PR:
+% vim problem.pr  # <--- follow instructions at head of file
+% /usr/libexec/streams/send-pr --file problem.pr
+\s-1\fP
+.fi
+.ce 1
+\fBExample 3:\fI Invoking \fBsend-pr\fI Directly\fR
+.RE
+.PP
+The advantage of the approach shown in the example is that the
+`send-pr' script is capable of collecting the `testsuite.log' file and
+the failed test cases and debugging scripts from the `testsuite.dir'
+directory and including them in the problem report, as well as all
+package pertinent information from the installed `send-pr.config'.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR xti (3),
+.BR xnet (3),
+.BR timod (4),
+.BR tirdwr (4),
+.BR tpi (7),
+.BR strxnet_mknod (8).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -541,9 +1062,47 @@ and
 .IR UnixWare \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.B @PACKAGE_TITLE@
+provides compatibility with all implementations of the XTI library in
+accordance with XNS 5.2
+.[
+xns
+.]
+specifications.
 .IP \(em
+The
+.BR tirdwr (4)
+module is compatibile with specifications for the module as implemented by
+.I SVR 4
+and implementations based on
+.IR "SVR 4" .
+Portable applications may use the interface to the
+.BR tirdwr (4)
+module directly.
 .IP \(em
+The
+.BR timod (4)
+module is designed to operated with the XTI/TLI library implementation
+provided in this package but might provide some compatibility with other
+implementations of the
+.BR timod (4)
+module.
+Portable applications will not rely on any particular behavior of the
+.BR timod (4)
+module and will only use XTI/TLI library functions for accessing the trasnport
+provider.
 .IP \(em
+The
+.BR tpi (7)
+interface is compatible with all implementations of the TPI interface in
+accordance with TPI.
+.[
+tpi revision 2.0.0
+.]
+Portable applications may use the interface to the
+Transport Provider Interface,
+.BR tpi (7),
+directly.
 .\"
 .\"
 .SH CONFORMANCE
@@ -557,11 +1116,22 @@ tpi revision 2.0.0
 xns 5.2
 .]
 .IR UNIX95 .
+Conformance is tested using the
+.BR test-timod (8),
+.BR test-tirdwr (8),
+.BR test-xnet "(8) and "
+.BR test-xnet_thr (8),
+test case executables and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
 .\"
 .\"
 .SH HISTORY
 .PP
-The OpenSS7 XTI/TLI library originally started out as part of the
+The
+.B @PACKAGE_TITLE@
+originally started out as part of the
 .BR strinet (5)
 package and was originally written for
 .IR LiS .
@@ -585,6 +1155,18 @@ What remains in the
 package is the XTI/TLI library, header files, and cooperating
 .I STREAMS
 modules, also TPI interface header files and documentation.
+.PP
+The
+.B @PACKAGE_TITLE@
+package is a stable, production grade release.
+.\"
+.\"
+.SH "FUTURE DIRECTIONS"
+.PP
+The XTI/TLI library is a stable production release and is largely in
+maintenance mode.  No additional development is planned.  See the
+.RI \(lq TODO \(rq
+file in the release for detailed information.
 .\"
 .\"
 .[

@@ -1,3 +1,140 @@
+
+@cite{@value{PACKAGE_TITLE}} installs the following kernel modules in the
+@file{/lib/modules/@value{_kversion}/@value{PACKAGE}/} subdirectory:@footnote{The kernel version
+@samp{@value{_kversion}} is just an example.}
+
+@table @file
+
+@item streams_tirdwr.ko
+Contains the @manref{tirdwr(4)} @dfn{STREAMS} module.
+
+@item streams_timod.ko
+Contains the @manref{timod(4)} @dfn{STREAMS} module.
+
+@end table
+
+@cite{@value{PACKAGE_TITLE}} installs the following header files in the
+@file{/usr/include/@value{PACKAGE}/} subdirectory:
+
+@multitable @columnfractions .35 .35
+
+@item @file{tihdr.h} @tab @file{sys/tihdr.h}
+@item @file{timod.h} @tab @file{sys/timod.h}
+@item @file{tirdwr.h} @tab @file{sys/tirdwr.h}
+@item @file{tiuser.h} @tab @file{sys/tiuser.h}
+@item @file{ticlts.h} @tab @file{sys/ticlts.h}
+@item @file{ticots.h} @tab @file{sys/ticots.h}
+@item @file{ticotsord.h} @tab @file{sys/ticotsord.h}
+@item @file{xti.h} @tab @file{sys/xti.h}
+@item @file{xti_inet.h} @tab @file{sys/xti_inet.h}
+@item @tab @file{sys/tli.h}
+@item @file{sys/strxnet/config.h} @tab @file{sys/tpi.h}
+@item @file{sys/strxnet/version.h}@tab @file{sys/xti_local.h}
+@item @tab @file{sys/xti_xti.h}
+@item @tab @file{sys/xti_ip.h}
+@item @tab @file{sys/xti_udp.h}
+@item @tab @file{sys/xti_tcp.h}
+@item @tab @file{sys/xti_sctp.h}
+@item @tab @file{sys/xti_osi.h}
+@item @tab @file{sys/xti_mosi.h}
+@item @tab @file{sys/xti_atm.h}
+
+@end multitable
+
+The @cite{@value{PACKAGE_TITLE}} package installs the following internationalization catalogues in
+the @file{/usr/share/locale/} subdirectory:
+
+@multitable @columnfractions 1.0
+
+@item @file{de/LC_MESSAGES/strxnet.mo}
+
+@end multitable
+
+The @cite{@value{PACKAGE_TITLE}} package installs the following manual pages in the
+@file{/usr/share/man/} subdirectory:
+
+@multitable @columnfractions .30 .30 .40
+
+@item strxnet.macros @tab man3/t_accept.3 @tab man7/T_ADDR_ACK.7
+@item strxnet.refs @tab man3/t_addleaf.3 @tab man7/T_ADDR_REQ.7
+@item @tab man3/t_alloc.3 @tab man7/T_BIND_ACK.7
+@item man4/timod.4 @tab man3/t_bind.3 @tab man7/T_BIND_REQ.7
+@item man4/tirdwr.4 @tab man3/t_close.3 @tab man7/T_CAPABILITY_ACK.7
+@item @tab man3/t_connect.3 @tab man7/T_CAPABILITY_REQ.7
+@item man5/strxnet.5 @tab man3/t_errlist.3 @tab man7/T_CONN_CON.7
+@item @tab man3/t_errno.3 @tab man7/T_CONN_IND.7
+@item man8/strxnet_mknod.8 @tab man3/t_error.3 @tab man7/T_CONN_REQ.7
+@item man8/test-timod.8 @tab man3/t_errstr.3 @tab man7/T_CONN_RES.7
+@item man8/test-tirdwr.8 @tab man3/t_free.3 @tab man7/T_DATA_IND.7
+@item man8/test-xnet.8 @tab man3/t_getinfo.3 @tab man7/T_DATA_REQ.7
+@item man8/test-xnet_thr.8 @tab man3/t_getprotaddr.3 @tab man7/T_DISCON_IND.7
+@item @tab man3/t_getstate.3 @tab man7/T_DISCON_REQ.7
+@item @tab man3/t_listen.3 @tab man7/T_ERROR_ACK.7
+@item @tab man3/t_look.3 @tab man7/T_EXDATA_IND.7
+@item @tab man3/t_nerr.3 @tab man7/T_EXDATA_REQ.7
+@item @tab man3/t_open.3 @tab man7/T_INFO_ACK.7
+@item @tab man3/t_optmgmt.3 @tab man7/T_INFO_REQ.7
+@item @tab man3/t_rcv.3 @tab man7/T_OK_ACK.7
+@item @tab man3/t_rcvconnect.3 @tab man7/T_OPTDATA_IND.7
+@item @tab man3/t_rcvdis.3 @tab man7/T_OPTDATA_REQ.7
+@item @tab man3/t_rcvleafchange.3 @tab man7/T_OPTMGMT_ACK.7
+@item @tab man3/t_rcvopt.3 @tab man7/T_OPTMGMT_REQ.7
+@item @tab man3/t_rcvrel.3 @tab man7/T_ORDREL_IND.7
+@item @tab man3/t_rcvreldata.3 @tab man7/T_ORDREL_REQ.7
+@item @tab man3/t_rcvudata.3 @tab man7/T_UDERROR_IND.7
+@item @tab man3/t_rcvuderr.3 @tab man7/T_UNBIND_REQ.7
+@item @tab man3/t_rcvv.3 @tab man7/T_UNITDATA_IND.7
+@item @tab man3/t_rcvvopt.3 @tab man7/T_UNITDATA_REQ.7
+@item @tab man3/t_rcvvudata.3 @tab man7/T_addr_ack.7
+@item @tab man3/t_removeleaf.3 @tab man7/T_addr_req.7
+@item @tab man3/t_snd.3 @tab man7/T_bind_ack.7
+@item @tab man3/t_snddis.3 @tab man7/T_bind_req.7
+@item @tab man3/t_sndopt.3 @tab man7/T_capability_ack.7
+@item @tab man3/t_sndrel.3 @tab man7/T_capability_req.7
+@item @tab man3/t_sndreldata.3 @tab man7/T_conn_con.7
+@item @tab man3/t_sndudata.3 @tab man7/T_conn_ind.7
+@item @tab man3/t_sndv.3 @tab man7/T_conn_req.7
+@item @tab man3/t_sndvopt.3 @tab man7/T_conn_res.7
+@item @tab man3/t_sndvudata.3 @tab man7/T_data_ind.7
+@item @tab man3/t_strerror.3 @tab man7/T_data_req.7
+@item @tab man3/t_sync.3 @tab man7/T_discon_ind.7
+@item @tab man3/t_sysconf.3 @tab man7/T_discon_req.7
+@item @tab man3/t_unbind.3 @tab man7/T_error_ack.7
+@item @tab man3/xnet.3 @tab man7/T_exdata_ind.7
+@item @tab man3/xti.3 @tab man7/T_exdata_req.7
+@item @tab @tab man7/T_info_ack.7
+@item @tab @tab man7/T_info_req.7
+@item @tab @tab man7/T_ok_ack.7
+@item @tab @tab man7/T_optdata_ind.7
+@item @tab @tab man7/T_optdata_req.7
+@item @tab @tab man7/T_optmgmt_ack.7
+@item @tab @tab man7/T_optmgmt_req.7
+@item @tab @tab man7/T_ordrel_ind.7
+@item @tab @tab man7/T_ordrel_req.7
+@item @tab @tab man7/T_uderror_ind.7
+@item @tab @tab man7/T_unbind_req.7
+@item @tab @tab man7/T_unitdata_ind.7
+@item @tab @tab man7/T_unitdata_req.7
+@item @tab @tab man7/tpi.7
+
+@end multitable
+
+The following info manual segments are installed in the @file{/usr/share/info/} subdirectory:
+
+@table @file
+
+@item strxnet.info
+@itemx strxnet.info-1
+@itemx strxnet.info-2
+This manual in info format.
+
+@item libxnet.info
+An incomplete info manual for the @file{libxnet} library.  See the manual pages,
+@manref{libxnet(3)}, instead.
+
+@end table
+
+
 @ignore
 /usr
 /usr/include

@@ -1,29 +1,44 @@
-OpenSS7 XTI/TLI Networking -- read me first file.  2006-12-29
-$Id: README,v 0.9.2.18 2006/12/31 13:59:55 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+OpenSS7 XTI/TLI Networking -- read me first file.  2007-01-02
+$Id: README,v 0.9.2.19 2007/01/03 10:11:48 brian Exp $
+Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
  OpenSS7 XTI/TLI Networking
 ===========================
 
-The `OpenSS7 XTI/TLI Networking' package contains header files and a
-number of modules and drivers and the associated documentation that
-were formerly contained in the `OpenSS7 Linux STREAMS (LiS)' releases.
-When development started on `Linux Fast-STREAMS' in 2003, these modules
-were removed from the `LiS' distribution and separated so that they
-could build against both the `LiS' and `Linux Fast-STREAMS' packages
-from the same baseline code.
+The `OpenSS7 XTI/TLI Networking' package for `Linux Fast-STREAMS' is an
+implementation of the X/Open Trasnport Interface or SVID Transport
+Layer Interface library in accordance with SUSv2 and XNS 5.2 standards.
+It consists of user-space libraries (`libxnet') and a set of
+cooperating "STREAMS" modules (`timod(4)' and `tirdwr(4)').  The
+"STREAMS" module, `timod(4)', is pushed on any Stream implementing the
+Transport Provider Interface (TPI) Revision 1.5 or 2.0.0 service
+interface and provides XTI/TLI library access to the transport
+provider.  Definitions for the Transport Provider Interface (TPI)
+Revision 2.0.0 are also provided by header files included in the
+package.
+
+This `OpenSS7 Project' release is another separate release of the
+`OpenSS7 XTI/TLI Networking' that were formerly part of the `strinet'
+package.  These networking modules provide TPI and XTI/TLI library, as
+well as providing TPI and XTI header files.  The package contains all
+the necessary manual pages and other documentation, including a reprint
+of the TPI 1.5 specification, for XTI components.  The package is
+packaged as an OpenSS7 style autoconf tarball.  This release is a
+stable, production grade release for `Linux Fast-STREAMS' and is part
+of the OpenSS7 Master Package (`openss7-0.9.2.D').
 
 The package contains the following standard `Open Systems Interconnect
 (OSI)' conforming header files:
 
-     - `<sys/tiusr.h>' `Transport Provider Interface Version 2.0.0' user
-     - `<sys/tihdr.h>' `Transport Provider Interface Version 2.0.0'
-     kernel
-     - `<sys/ticots.h>' `TPI COTS'
-     - `<sys/ticots_ord.h>' `TPI COTS w/ Orderly Release'
-     - `<sys/ticlts.h>' `TPI CLTS'
+     - `<sys/tiusr.h>'         `TPI Version 2.0.0' user
+     - `<sys/tihdr.h>'         `TPI Version 2.0.0' kernel
+     - `<sys/ticots.h>'        `TPI COTS'
+     - `<sys/ticots_ord.h>'    `TPI COTS w/ Orderly Release'
+     - `<sys/ticlts.h>'        `TPI CLTS'
+     - `<xti.h>'               `XTI/TLI Library'
+     - `<xti_inet.h>'          `XTI/TLI Library'
 
 Note that the `Data Link Provider Interface (DLPI)' and `Network
 Provider Interface' are contained in the `strxns-0.9.2.4' package.
@@ -35,12 +50,17 @@ and drivers:
      - `streams_tirdwr.ko' module "tirdwr"
 
 `timod(4)'
+     a "STREAMS" XTI/TLI compatibility interface.
 
 `tirdwr(4)'
+     a "STREAMS" XTI/TLI read write compatibility module.
 
-The package builds and installs the following shared object libraries:
+The package builds and installs the following shared object and static
+libraries:
 
-`xti(3)'
+`libxnet(3)'
+     `XNS 5.2' XTI/TLI Library (`libxnet')
+
 
 The `OpenSS7 XTI/TLI Networking' package includes kernel modules, `SVR
 4.2' "STREAMS" drivers, modules, libraries, utilities, test programs,
@@ -56,7 +76,7 @@ well.
  Release
 --------
 
-This is the `strxnet-0.9.2.9' package, released 2006-12-29.  This
+This is the `strxnet-0.9.2.9' package, released 2007-01-02.  This
 `0.9.2.9' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -315,7 +335,7 @@ in the release directory for more information on filing a proper
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.

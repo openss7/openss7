@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strxnet.texi,v 0.9.2.27 2006/10/02 11:32:23 brian Exp $
+% @(#) $Id: strxnet.texi,v 0.9.2.28 2007/01/03 10:11:51 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2007  OpenSS7 Corporation <www.openss7.com>
 % Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/10/02 11:32:23 $ by $Author: brian $
+% Last Modified $Date: 2007/01/03 10:11:51 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -82,7 +82,7 @@ This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -128,7 +128,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2006  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2001-2007  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -219,6 +219,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Introduction::		Introduction to the package
 * Objective::			Objective of the package
 * Reference::			Contents of the package
+* Development::			Developing with the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
@@ -256,12 +257,19 @@ Reference
 * Modules::			Modules included in the package
 * Libraries::			Libraries included in the package
 * Utilities::			Utilities included in the package
-* Development::			Development against the package
+
+Development
+
+* Development Header Files::	Header Files in the package
+* Static and Shared Libraries::	Libraries in the package
+* Kernel Module Development::	Kernel development with the package
+* Manual Pages::		Manual Pages in the package
 
 Conformance
 
-* STREAMS Compatibility::	Compatibility with other STREAMS packages
-* Porting::			Porting to this STREAMS package
+* TPI Compatibility::		Compatibility to Transport Provider Interface
+* XTI Compatibility::		Compatibility to X/Open Transport Interface
+* TLI Compatibility::		Compatibility to Transport Layer Interface
 
 Releases
 
@@ -331,13 +339,15 @@ Indices
 @cindex manual notice
 @cindex licensing
 
+@ignore
 Note that previous releases of the @samp{@value{PACKAGE_TARNAME}} package were intended to provide
-additional support to GCOM release of LiS and were released primarily in Tar Ball format.  As of
-@value{PACKAGE_TARNAME}-0.9.2-5 this is no longer the case.  @value{PACKAGE_TARNAME}-0.9.2-5 and
-subsequent releases are intended to be loaded on top of an OpenSS7 release of LiS or Linux
-Fast-STREAMS.  If you wish to use these packages over a GCOM release of LiS, you will now need to
-also download and install the @samp{strxns} package from Tar Ball.
+additional support to GCOM release of @cite{LiS} and were released primarily in Tar Ball format.  As
+of @value{PACKAGE_TARNAME}-0.9.2-5 this is no longer the case.  @value{PACKAGE_TARNAME}-0.9.2-5 and
+subsequent releases are intended to be loaded on top of an OpenSS7 release of @cite{LiS} or Linux
+Fast-STREAMS.  If you wish to use these packages over a GCOM release of @cite{LiS}, you will now
+need to also download and install the @samp{strxns} package from Tar Ball.
 
+@end ignore
 This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
 License}).  Please note, however, that there are different licensing terms for the manual pages and
 some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
@@ -410,6 +420,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strxnet.texi,v $
+Revision 0.9.2.28  2007/01/03 10:11:51  brian
+- documentation updates for release
+
 Revision 0.9.2.27  2006/10/02 11:32:23  brian
 - changes to get master builds working for RPM and DEB
 - added outside licenses to package documentation
@@ -628,10 +641,10 @@ schedule of the @cite{@value{PACKAGE_TITLE}} package.
 @cindex licensing
 
 Note that previous releases of the @samp{@value{PACKAGE_TARNAME}} package were intended to provide
-additional support to GCOM release of LiS and were released primarily in Tar Ball format.  As of
+additional support to GCOM release of @cite{LiS} and were released primarily in Tar Ball format.  As of
 @value{PACKAGE_TARNAME}-0.9.2-5 this is no longer the case.  @value{PACKAGE_TARNAME}-0.9.2-5 and
-subsequent releases are intended to be loaded on top of an OpenSS7 release of LiS or Linux
-Fast-STREAMS.  If you wish to use these packages over a GCOM release of LiS, you will now need to
+subsequent releases are intended to be loaded on top of an OpenSS7 release of @cite{LiS} or Linux
+Fast-STREAMS.  If you wish to use these packages over a GCOM release of @cite{LiS}, you will now need to
 also download and install the @samp{strxns} package from Tar Ball.
 
 This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
@@ -654,9 +667,11 @@ the @cite{@value{PACKAGE_TITLE}} package.
 The @value{PACKAGE_TITLE} package is
 an X/Open Transport Interface (XTI/TLI) package for Linux
 that can be used with
-@cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}
+@cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}.
+@ignore
 or
 @cite{Linux STREAMS}@footnote{@xref{Top, Linux STREAMS (LiS), About This Manual, LiS, Linux STREAMS (LiS) Reference Manual}.}.
+@end ignore
 It includes development tools, header files and manual pages for
 
 @itemize
@@ -695,6 +710,7 @@ This manual is organized (loosely) into several sections as follows:
   Introduction::		This introduction
 * Objective::			Objective of the package
 * Reference::			Contents of the package
+* Development::			Developing with the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
@@ -709,6 +725,8 @@ This manual is organized (loosely) into several sections as follows:
 @tab Objective of the package
 @item @ref{Reference}.
 @tab Contents of the package
+@item @ref{Development}.
+@tab Developing with the package
 @item @ref{Conformance}.
 @tab Conformance of the package
 @item @ref{Releases}.
@@ -727,6 +745,8 @@ This manual is organized (loosely) into several sections as follows:
 @tab Objective of the package
 @item @cite{Reference}.
 @tab Contents of the package
+@item @cite{Development}.
+@tab Developing with the package
 @item @cite{Conformance}.
 @tab Conformance of the package
 @item @cite{Releases}.
@@ -752,6 +772,39 @@ This manual uses @cite{texinfo} typographic conventions.
 @chapter Objective
 @cindex objective
 
+The @cite{@value{PACKAGE_TITLE}} package is intended to provide compatibility with @cite{UNIX System
+V Release 4} networking components based on the Transport Provider Interface and the XTI/TLI
+interface described in X/Open Networking Services, in a single add-on package to @cite{Linux
+Fast-STREAMS}.  One purpose in achieving this compatibility is the porting of legacy applications
+from @cite{UNIX} to @cite{Linux} using the capabilities of @dfn{STREAMS} and @cite{Linux
+Fast-STREAMS}.
+
+Both the Transport Provider Interface and the XTI/TLI library APIs are designed to be transport
+provider neutral.  Both the service primitive interface and function call interface are designed to
+be transport provider independent to as large a degree as possible.  Therefore, this
+@cite{@value{PACKAGE_TITLE}} package does not provide any transport providers of its own.  It merely
+provides the Transport Provider Interface and the XTI/TLI library interface and applies them in a
+transport independent fashion to a wide range of specific transport protocols.
+
+For transport providers based on the Internet Protocol suite, the
+@file{strinet-@value{VERSION_STRINET}} package, @manref{strinet(5)}, provides TPI and XTI/TLI
+compatible transport providers; the @file{strsctp-@value{VERSION_STRSCTP}} package,
+@manref{strsctp(5)}, provides a TPI and XTI compatible implementation of the Stream Control
+Transmission Protocol (SCTP) for @cite{Linux Fast-STREAMS}.  The
+@file{striso-@value{VERSION_STRISO}} package, @manref{striso(5)}, provides TPI and XTI compliant
+transport providers for OSI/ISO protocols.
+
+At the time that the @cite{@value{PACKAGE_TITLE}} was being developed there existed an XTI
+implementation written by Ole Husgaard, but the tirdwr and timod modules were deeply flawed and the
+library itself was not thread-safe and did not support all functions and capabilities of XTI.
+Therefore, the @cite{@value{PACKAGE_TITLE}} @dfn{STREAMS} modules and library were written from the
+start to be thread-safe and fully compliant with the XTI/TLI specifications in XNS
+5.2.@footnote{@cite{The Open Group} making the specifications available for individual download
+helped.}
+
+The result is a stable, production grade, 64-bit clean XTI/TLI library implementation for
+@cite{Linux Fast-STREAMS}.
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -765,7 +818,6 @@ This manual uses @cite{texinfo} typographic conventions.
 * Modules::			Modules included in the package
 * Libraries::			Libraries included in the package
 * Utilities::			Utilities included in the package
-* Development::			Development against the package
 @end menu
 
 @c ----------------------------------------------------------------------------
@@ -784,6 +836,9 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Drivers
 @cindex drivers
 
+The @cite{@value{PACKAGE_TITLE}} package does not provide any @dfn{STREAMS} drivers: only
+@dfn{STREAMS} modules.
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -791,14 +846,24 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Modules
 @cindex modules
 
+The @cite{@value{PACKAGE_TITLE}} package provides the following @dfn{STREAMS} modules:
+
 @subsection Transport Interface Module
 
 @subsubheading Licensing
+
+The @manref{timod(4)} module is licensed under the @cite{GPL Version 2} (@pxrefman{GNU Generic
+Public License}).
+Other licensing terms are available from @email{sales@@openss7.com, OpenSS7 Corporation}.
 
 
 @subsection Transport Interface Read-Write Module
 
 @subsubheading Licensing
+
+The @manref{tirdwr(4)} module is licensed under the @cite{GPL Version 2} (@pxrefman{GNU Generic
+Public License}).
+Other licensing terms are available from @email{sales@@openss7.com, OpenSS7 Corporation}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -807,6 +872,119 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Libraries
 @cindex libraries
 
+During the installation process of @cite{@value{PACKAGE_TITLE}} a subroutine library is build and
+installed.  For 64-bit systems that support 32-bit compatibility, two version of each library are
+build and installed: one 64-bit native library and one 32-bit compatibility library.  64-bit native
+libraries are installed to the @file{/usr/lib64} subdirectory.  32-bit native and 32-bit
+compatibility libraries are installed to the @file{/usr/lib} subdirectory.
+
+@table @file
+
+@item libxnet.so.0.0.0
+@itemx libxnet.so.0
+@itemx libxnet.so
+Provides a shared object library for use by @dfn{XTI/TLI} applications programs.
+
+@item libxnet.a
+Provides a static library for use by @dfn{XTI/TLI} applications programs.
+
+@item libxnet.la
+Provides the @command{libtool} definitions for the libraries.
+
+@end table
+
+@subsection libxnet Library Routines
+
+The following routines are present in the @file{libxnet} libraries.  The routines in these libraries
+are standard @dfn{XTI/TLI} interface library calls documented in XNS 5.2.@footnote{XNS Issue 5.2
+Draft 2.0, @i{Technical Standard: Network Services (XNS)}, 1999, Open Group, Open Group Publication.
+[ISBN 1-85912-241-8].}  Refer to the associated manual pages for detailed information on these
+routines.
+
+@multitable @columnfractions .35 .65
+
+@item @manref{t_accept(3)} -- @tab accept a connection request.
+@item @manref{t_addleaf(3)} -- @tab add a point to a point-to-multipoint connection.
+@item @manref{t_alloc(3)} -- @tab allocate a library structure.
+@item @manref{t_bind(3)} -- @tab bind to a transport endpoint.
+@item @manref{t_close(3)} -- @tab close a transport endpoint.
+@item @manref{t_connect(3)} -- @tab establish a transport connection.
+@item @manref{t_errlist(3)} -- @tab describe an XTI/TLI library error.
+@item @manref{t_errno(3)} -- @tab TLI error number.
+@item @manref{t_error(3)} -- @tab print an error message.
+@item @manref{t_errstr(3)} -- @tab describe an XTI/TLI library error.
+@item @manref{t_free(3)} -- @tab free an XTI/TLI library structure.
+@item @manref{t_getinfo(3)} -- @tab get protocol information.
+@item @manref{t_getprotaddr(3)} -- @tab get protocol addresses.
+@item @manref{t_getstate(3)} -- @tab get interface state.
+@item @manref{t_listen(3)} -- @tab listen for a transport connection request.
+@item @manref{t_look(3)} -- @tab look for a transport event.
+@item @manref{t_nerr(3)} -- @tab describe an XTI/TLI library error.
+@item @manref{t_open(3)} -- @tab open a transport endpoint.
+@item @manref{t_optmgmt(3)} -- @tab manage transport options.
+@item @manref{t_rcv(3)} -- @tab receive transport data.
+@item @manref{t_rcvconnect(3)} -- @tab receive connection request confirmation.
+@item @manref{t_rcvdis(3)} -- @tab receive abortive disconnect.
+@item @manref{t_rcvleafchange(3)} -- @tab receive addition of point to point-to-multipoint connection.
+@item @manref{t_rcvopt(3)} -- @tab receive unit data.
+@item @manref{t_rcvrel(3)} -- @tab acknowledge orderly release request.
+@item @manref{t_rcvreldata(3)} -- @tab acknowledge orderly release request with data.
+@item @manref{t_rcvudata(3)} -- @tab receive unit data.
+@item @manref{t_rcvuderr(3)} -- @tab receive unit data error.
+@item @manref{t_rcvv(3)} -- @tab receive data and scatter.
+@item @manref{t_rcvvopt(3)} -- @tab receive data with options and scatter.
+@item @manref{t_rcvvudata(3)} -- @tab receive unit data and scatter.
+@item @manref{t_removeleaf(3)} -- @tab remove a point from a point-to-multipoint connection.
+@item @manref{t_snd(3)} -- @tab send transport data.
+@item @manref{t_snddis(3)} -- @tab send abortive disconnect.
+@item @manref{t_sndopt(3)} -- @tab send transport data with options.
+@item @manref{t_sndrel(3)} -- @tab send orderly release.
+@item @manref{t_sndreldata(3)} -- @tab send orderly release with data.
+@item @manref{t_sndudata(3)} -- @tab send unit data.
+@item @manref{t_sndv(3)} -- @tab gather and send data.
+@item @manref{t_sndvopt(3)} -- @tab gather and send data with options.
+@item @manref{t_sndvudata(3)} -- @tab gather and send unit data.
+@item @manref{t_strerror(3)} -- @tab describe an XTI/TLI library error.
+@item @manref{t_sync(3)} -- @tab synchronize XTI/TLI library with TLI provider.
+@item @manref{t_sysconf(3)} -- @tab configure XTI/TLI library parameters.
+@item @manref{t_unbind(3)} -- @tab unbind a transport endpoint.
+
+@end multitable
+
+@subsection Using the Library
+
+The use the @cite{@value{PACKAGE_TITLE}} libraries, include the file @file{xti.h} in the application
+program source code.  On the compiler command line, add the option
+@samp{-I/usr/include/@value{PACKAGE}} to include the version of @file{xti.h} that is distributed
+with @cite{@value{PACKAGE_TITLE}}.
+
+When linking the application program, or performing final @command{gcc} to build an executable,
+include one of the following option on the @command{gcc} or @command{ld} command line:
+
+@table @samp
+
+@item /usr/lib/libxnet.a
+@itemx -lstreams -static
+Links against the static version of the library.
+
+@item -lstreams
+@itemx -lstreams -shared
+Links against the shared object version of the library.
+
+@item /usr/lib/libxnet.la
+Used with @command{libtool} to link additional convenience libraries against the shared or static
+version of the library.
+
+@end table
+
+Failure to link the executable runtime path for @file{libxnet} will result in linker-loader errors
+specifying undefined symbols.  See @refman{Development}, for more information.
+
+@subsubheading Licensing
+
+The @manref{libxnet(3)} library is licensed under the @cite{LGPL Version 2.1} (@pxrefman{GNU Lesser
+Public License}).
+Other licensing terms are available from @email{sales@@openss7.com, OpenSS7 Corporation}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -814,6 +992,96 @@ This manual uses @cite{texinfo} typographic conventions.
 @node Utilities
 @section Utilities
 @cindex utilities
+
+@subsection Init Scripts
+
+Following are System V Init Scripts that are installed by the package:
+
+@table @asis
+
+@item @manpage{@value{PACKAGE}(8)} (@file{/etc/init.d/@value{PACKAGE}})
+@pgindex @value{PACKAGE}
+@pgindex /etc/init.d/@value{PACKAGE}
+@itemx @manpage{@value{PACKAGE}.sh(8)} (@file{/etc/init.d/@value{PACKAGE}.sh})
+@pgindex @value{PACKAGE}.sh
+@pgindex /etc/init.d/@value{PACKAGE}.sh
+
+System V Init Script for the @dfn{XNET} Subsystem.
+The @manpage{@value{PACKAGE}(8)} init script provides the ability to initialize, configure and mount the
+@dfn{XNS} subsystem, @manpage{strxnet(5)}.
+The @manpage{@value{PACKAGE}(8)} script provides the RedHat-style init script, whereas the
+@manpage{@value{PACKAGE}.sh(8)} script provides the Debian-style init script.
+
+See @manref{@value{PACKAGE}(8)} for more information.
+
+@end table
+
+@subsection Administrative Utilities
+
+Following are user utilities for manipulating @dfn{XNET}:
+
+The @cite{@value{PACKAGE_TITLE}} package does not yet contain any adminstrative utilities.
+Eventually an @manpage{xtitrace(8)} facility will be provided.
+
+@subsection Performance Test Programs
+
+Following are performance test programs:
+
+The @cite{@value{PACKAGE_TITLE}} package does not yet contain any performance programs.  For
+performance testing of various transport providers, see the @file{netperf-@value{VERSION_NETPERF}}
+package.
+
+@subsection Conformance Test Programs
+
+Following are conformance and validation test programs included in the package:
+
+@table @asis
+
+@item @manref{test-timod(8)} (@file{/usr/libexec/@value{PACKAGE}/test-timod})
+The @manpage{test-timod(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the @manref{timod(4)} @dfn{STREAMS} module.
+
+@item @manref{test-tirdwr(8)} (@file{/usr/libexec/@value{PACKAGE}/test-tirdwr})
+The @manpage{test-tirdwr(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the @manref{tirdwr(4)} @dfn{STREAMS} module.
+
+@item @manref{test-xnet(8)} (@file{/usr/libexec/@value{PACKAGE}/test-xnet})
+The @manpage{test-xnet(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the @manref{xnet(3)} library.  This test program is single-threaded.
+
+@item @manref{test-xnet_thr(8)} (@file{/usr/libexec/@value{PACKAGE}/test-xnet_thr})
+The @manpage{test-xnet(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the @manref{xnet(3)} library.  This test program is multiple-threaded.
+
+@item @file{/usr/libexec/@value{PACKAGE}/testsuite}
+@itemx @file{/usr/libexec/@value{PACKAGE}/atlocal}
+The OpenSS7 Project style @command{autotest} test suite.  This test suite can be run stand-alone as
+described under @refman{Running Test Suites}.  The @file{atlocal} file provides localized
+definitions for the test suite.
+
+@end table
+
+For the proper way to execute these validation test programs in a conformance and validation test
+suite, see @refman{Running Test Suites}.
+
+@subsection Problem Report Scripts
+
+The @cite{@value{PACKAGE_TITLE}} package installs customized problem reporting scripts for reporting
+problems associated with test suite execution and other difficulties.  This problem reporting script
+is installed in the @file{/usr/libexec/@value{PACKAGE}/} subdirectory as follows:
+
+@table @asis
+
+@item @file{/usr/libexec/@value{PACKAGE}/send-pr}
+@itemx @file{/usr/libexec/@value{PACKAGE}/send-pr.config}
+This is the problem reporting script tailored for the @file{@value{PACKAGE}-@value{VERSION}}
+package.  The @file{send-pr} file is the script proper and the @file{send-pr.config} file contains
+localized configuration information.
+
+@end table
+
+For more information on the use of the problem reporting scripts, see @refman{Generating Problem
+Reports}.
 
 @c @subsection @command{test-xnet}
 
@@ -825,8 +1093,473 @@ This manual uses @cite{texinfo} typographic conventions.
 @c ----------------------------------------------------------------------------
 
 @node Development
-@section Development
+@chapter Development
 @cindex developing
+
+@cite{@value{PACKAGE_TITLE}} provides all of the header files, shared object and static libraries,
+manual pages and documentation necessary for the development of both user space applications
+programs and kernel space @dfn{STREAMS} modules and drivers based on the package.  The sections that
+follow describe these development facilities.
+
+@menu
+* Development Header Files::
+* Static and Shared Libraries::
+* Kernel Module Development::
+* Manual Pages::
+@end menu
+
+@node Development Header Files::
+@section Header Files
+
+Header files are installed, typically, in the @file{/usr/include/@value{PACKAGE}/} subdirectory.  To
+use the header files from the package, @samp{-I/usr/include/@value{PACKAGE}} must be included in the
+@command{gcc} command line as a preprocessor option.
+
+In general, @samp{-I} include preprocessor directives on the @command{gcc} command line should be
+ordered in the reverse order of the dependencies between packages.  So, for example, if the include
+files from all add-on packages are required, the order of these directives would be:
+@samp{-I/usr/include/@value{PACKAGE}}
+@samp{-I/usr/include/strxns}
+@samp{-I/usr/include/strcompat}
+@samp{-I/usr/include/streams}.
+
+Following are the user visible header files provided by the @file{@value{PACKAGE}-@value{VERSION}}
+package in the directory @file{/usr/include/@value{PACKAGE}}:
+
+@table @file
+
+@item sys/strxnet/config.h
+@pgindex sys/strxnet/config.h
+@pgindex /usr/include/strxnet/sys/strxnet/config.h
+Configuration defines for the package.
+
+@item sys/strxnet/version.h
+@pgindex sys/strxnet/version.h
+@pgindex /usr/include/strxnet/sys/strxnet/version.h
+Module versions for the package (on 2.4 systems).
+
+@item tihdr.h
+@pgindex tihdr.h
+@pgindex /usr/include/strxnet/tihdr.h
+@itemx sys/tihdr.h
+@pgindex sys/tihdr.h
+@pgindex /usr/include/strxnet/sys/tihdr.h
+Primary header file defining the Transport Provider Interface for use by kernel space programs.
+This file is normally included directly by kernel modules implementing the Transport Provider
+Interface.
+See @manref{tpi(7)} for more information.
+
+@item tiuser.h
+@pgindex tiuser.h
+@pgindex /usr/include/strxnet/tiuser.h
+@itemx sys/tiuser.h
+@pgindex sys/tiuser.h
+@pgindex /usr/include/strxnet/sys/tiuser.h
+Primary header file defining the Transport Provider Interface for use by user space programs.
+This file is normally included directly by applications programs directly using the Transport
+Provider Interface.
+See @manref{tpi(7)} for more information.
+
+@item timod.h
+@pgindex timod.h
+@pgindex /usr/include/strxnet/timod.h
+@itemx sys/timod.h
+@pgindex sys/timod.h
+@pgindex /usr/include/strxnet/sys/timod.h
+Header file defining the input-output control interface to the @manpage{timod(4)} @dfn{STREAMS} module.
+THis file is normally only included by the XTI/TLI library.
+See @manref{timod(4)} for more information.
+
+@item tirdwr.h
+@pgindex tirdwr.h
+@pgindex /usr/include/strxnet/tirdwr.h
+@itemx sys/tirdwr.h
+@pgindex sys/tirdwr.h
+@pgindex /usr/include/strxnet/sys/tirdwr.h
+Header file defining the input-output control interface to the @manpage{tirdwr(4)} @dfn{STREAMS} module.
+This header file is normaly only included by the XTI/TLI library.
+See @manref{tirdwr(4)} for more information.
+
+@item sys/tli.h
+@pgindex sys/tli.h
+@pgindex /usr/include/strxnet/sys/tli.h
+Header file defining the TLI library interface.
+This header file is included by applications programs wishing to use the TLI library interface.
+See @manref{tli(3)} for more information.
+
+@item sys/tpi.h
+@pgindex sys/tpi.h
+@pgindex /usr/include/strxnet/sys/tpi.h
+Header file defining the Transport Provider Interface.
+This head file is normally included by kernel modules implementing the Transport Provider Interface.
+See @manref{tpi(7)} for more information.
+
+@item ticlts.h
+@pgindex ticlts.h
+@pgindex /usr/include/strxnet/ticlts.h
+@itemx sys/ticlts.h
+@pgindex sys/ticlts.h
+@pgindex /usr/include/strxnet/sys/ticlts.h
+Header file providing Transport Provider Interface definitions for the connectionless transport
+interface.
+This header file is not used.
+
+@item ticots.h
+@pgindex ticots.h
+@pgindex /usr/include/strxnet/ticots.h
+@itemx sys/ticots.h
+@pgindex sys/ticots.h
+@pgindex /usr/include/strxnet/sys/ticots.h
+Header file providing Transport Provider Interface definitions for the connection-oriented transport
+interface.
+This header file is not used.
+
+@item ticotsord.h
+@pgindex ticotsord.h
+@pgindex /usr/include/strxnet/ticotsord.h
+@itemx sys/ticotsord.h
+@pgindex sys/ticotsord.h
+@pgindex /usr/include/strxnet/sys/ticotsord.h
+Header file providing Transport Provider Interface definitions for the connection-oriented with
+orderly release transport interface.
+This header file is not used.
+
+@item xti.h
+@pgindex xti.h
+@pgindex /usr/include/strxnet/xti.h
+@itemx xti_inet.h
+@pgindex xti_inet.h
+@pgindex /usr/include/strxnet/xti_inet.h
+@itemx sys/xti.h
+@pgindex sys/xti.h
+@pgindex /usr/include/strxnet/sys/xti.h
+Primary header files defining the XTI library interface.
+This header file is normally included by applications programs wishing to use the XTI library
+interface.
+See @manref{xti(3)} for more information.
+
+@item sys/xti_local.h
+@pgindex sys/xti_local.h
+@pgindex /usr/include/strxnet/sys/xti_local.h
+System specific header file for the Local XTI library interface.
+This header file is normally included by @file{xti.h} and does not need to be directly included by
+the applications program.
+See @manref{xti(3)} for more information.
+
+@item sys/xti_xti.h
+@pgindex sys/xti_xti.h
+@pgindex /usr/include/strxnet/sys/xti_xti.h
+System specific header file for the Generic XTI library interface.
+This header file is normally included by @file{xti.h} and does not need to be directly included by
+the applications program.
+See @manref{xti(3)} for more information.
+
+@item sys/xti_inet.h
+@pgindex sys/xti_inet.h
+@pgindex /usr/include/strxnet/sys/xti_inet.h
+System specific header file for the Internet Protocol Suite XTI library interface.
+This header file is normally included by @file{xti.h} and does not need to be directly included by
+the applications program.
+See @manref{xti(3)} for more information.
+
+@item sys/xti_ip.h
+@pgindex sys/xti_ip.h
+@pgindex /usr/include/strxnet/sys/xti_ip.h
+System specific header file for the Internet Protocol XTI library interface.
+This header file is normally included by @file{xti.h} and does not need to be directly included by
+the applications program.
+See @manref{xti(3)} for more information.
+
+@item sys/xti_udp.h
+@pgindex sys/xti_udp.h
+@pgindex /usr/include/strxnet/sys/xti_udp.h
+System specific header file for the User Datagram Protocol XTI library interface.
+This header file is normally included by @file{xti.h} and does not need to be directly included by
+the applications program.
+See @manref{xti(3)} for more information.
+
+@item sys/xti_tcp.h
+@pgindex sys/xti_tcp.h
+@pgindex /usr/include/strxnet/sys/xti_tcp.h
+System specific header file for the Transmission Control Protocol XTI library interface.
+This header file is normally included by @file{xti.h} and does not need to be directly included by
+the applications program.
+See @manref{xti(3)} for more information.
+
+@item sys/xti_sctp.h
+@pgindex sys/xti_sctp.h
+@pgindex /usr/include/strxnet/sys/xti_sctp.h
+System specific header file for the Stream Control Transmission Protocol XTI library interface.
+This header file is normally included by @file{xti.h} and does not need to be directly included by
+the applications program.
+See @manref{xti(3)} for more information.
+
+@item sys/xti_osi.h
+@pgindex sys/xti_osi.h
+@pgindex /usr/include/strxnet/sys/xti_osi.h
+System specific header file for the OSI/ISO XTI library interface.
+This header file is normally included by @file{xti.h} and does not need to be directly included by
+the applications program.
+See @manref{xti(3)} for more information.
+
+@item sys/xti_mosi.h
+@pgindex sys/xti_mosi.h
+@pgindex /usr/include/strxnet/sys/xti_mosi.h
+System specific header file for the Minimal OSI XTI library interface.
+This header file is normally included by @file{xti.h} and does not need to be directly included by
+the applications program.
+See @manref{xti(3)} for more information.
+
+@item sys/xti_atm.h
+@pgindex sys/xti_atm.h
+@pgindex /usr/include/strxnet/sys/xti_atm.h
+System specific header file for the Asynchronous Transfer Mode XTI library interface.
+This header file is normally included by @file{xti.h} and does not need to be directly included by
+the applications program.
+See @manref{xti(3)} for more information.
+
+@end table
+
+@subsection User Space Programs
+
+Typical include files for interacting with Transport providers from user space include the
+@file{tli.h}, @file{xti.h}, or @cite{tiuser.h} header files.  Additional header files for
+interacting with specific drivers or modules may also be required.  The @cite{tli.h} header file 
+is used for interacting with the old TLI library.  The @cite{xti.h} header file is for interacting
+with the newer XTI library.  The @cite{tiuser.h} header file is for directly passing TPI service
+primitives to and from the Transport provider using @manpage{getpmsg(2)} and @manpage{putpmsg(2s)}.
+
+@subsection Kernel Space Drivers and Modules
+
+Typeical include files for writing @dfn{STREAMS} module and drivers implementing transport providers
+in kernels space include @cite{tihdr.h} or @cite{tpi.h}.  Both header files provide access to
+definitions for the TPI interface and additional XTI definitions for use by @dfn{STREAMS} drivers
+and modules.  Additional header files for interacting with specific drivers or modules may also be
+required.
+
+Aside from including these header files, the general procedures for compiling @dfn{STREAMS} modules
+and drivers also apply to @dfn{STREAMS} modules and drivers written to the Trasnport Provider
+Interface.  Examples can be found in the @file{strinet-@value{VERSION_STRINET}},
+@file{strsctp-@value{VERSION_STRSCTP}} and @file{striso-@value{VERSION_STRISO}} packages that
+implement a number of transport providers.
+
+@node Static and Shared Libraries
+@section Libraries
+
+Shared or static version of the @cite{libxnet} library must be liked when using the
+@file{@value{PACKAGE}-@value{VERSION}} package.  The library must either be specified on the
+@command{gcc} command line as a shared library (e.g. @samp{-lxnet}) or as a static library (e.g.
+@samp{/usr/lib/libxnet.a}).
+
+If the shared object library is linked, include the following options on the @command{gcc} command
+line:
+
+@table @samp
+
+@item -lxnet
+Link to the @file{/usr/lib/libxnet.so} shared library.
+
+@end table
+
+If the static library is linked, include the following options on the @command{gcc} command line:
+
+@table @samp
+
+@item /usr/lib/libxnet.a
+Link to the @file{/usr/lib/libxnet.a} static library.
+
+@end table
+
+@node Kernel Module Development
+@section Kernel Modules
+
+Developing TPI kernel modules is similar to user space programs with regard to header files.
+@file{/usr/include/strxnet} should be placed as an include directory to search on the @command{gcc}
+command line.  The rules for compiling @cite{Linux} kernel modules and the rules for compiling
+@dfn{STREAMS} modules and drivers should be followed.  In particular, several important intricacies
+should be considered:
+
+@itemize @bullet
+
+@item The @command{gcc} compiler used to compile the kernel modules must be the same version of
+compiler that was used to compile the kernel and @dfn{STREAMS} base package.
+
+@item The @command{gcc} command line must have the same compile flags that were used to compile the
+kernel and @dfn{STREAMS} base package.  @command{kbuild} can be used to accomplish this.
+
+@item The @command{gcc} command line must define several important kernel defines including
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.  Again, @command{kbuild}
+can be used to accomplish this.
+
+@item The @command{gcc} command line must include several important files directly on the command
+line, such as, @samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-autoconf.h} and
+@samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-modversions.h}.@footnote{The
+kernel version, @samp{@value{_kversion}}, is just an example.  For the running kernel, use the
+output of @samp{uname -r}.}
+
+@end itemize
+
+@node Manual Pages
+@section Manual Pages
+
+The @file{@value{PACKAGE}-@value{VERSION}} package installs a number of manual pages in the
+@file{/usr/share/man} directory as follows:
+
+The following manual pages are installed in Section 3 of the manual (in the subdirectory
+@file{/usr/share/man/man3}):
+
+@multitable @columnfractions .35 .65
+
+@item @manref{t_accept(3)} -- @tab accept a connection request.
+@item @manref{t_addleaf(3)} -- @tab add a point to a point-to-multipoint connection.
+@item @manref{t_alloc(3)} -- @tab allocate a library structure.
+@item @manref{t_bind(3)} -- @tab bind to a transport endpoint.
+@item @manref{t_close(3)} -- @tab close a transport endpoint.
+@item @manref{t_connect(3)} -- @tab establish a transport connection.
+@item @manref{t_errlist(3)} -- @tab describe an XTI/TLI library error.
+@item @manref{t_errno(3)} -- @tab TLI error number.
+@item @manref{t_error(3)} -- @tab print an error message.
+@item @manref{t_errstr(3)} -- @tab describe an XTI/TLI library error.
+@item @manref{t_free(3)} -- @tab free an XTI/TLI library structure.
+@item @manref{t_getinfo(3)} -- @tab get protocol information.
+@item @manref{t_getprotaddr(3)} -- @tab get protocol addresses.
+@item @manref{t_getstate(3)} -- @tab get interface state.
+@item @manref{t_listen(3)} -- @tab listen for a transport connection request.
+@item @manref{t_look(3)} -- @tab look for a transport event.
+@item @manref{t_nerr(3)} -- @tab describe an XTI/TLI library error.
+@item @manref{t_open(3)} -- @tab open a transport endpoint.
+@item @manref{t_optmgmt(3)} -- @tab manage transport options.
+@item @manref{t_rcv(3)} -- @tab receive transport data.
+@item @manref{t_rcvconnect(3)} -- @tab receive connection request confirmation.
+@item @manref{t_rcvdis(3)} -- @tab receive abortive disconnect.
+@item @manref{t_rcvleafchange(3)} -- @tab receive addition of point to point-to-multipoint connection.
+@item @manref{t_rcvopt(3)} -- @tab receive unit data.
+@item @manref{t_rcvrel(3)} -- @tab acknowledge orderly release request.
+@item @manref{t_rcvreldata(3)} -- @tab acknowledge orderly release request with data.
+@item @manref{t_rcvudata(3)} -- @tab receive unit data.
+@item @manref{t_rcvuderr(3)} -- @tab receive unit data error.
+@item @manref{t_rcvv(3)} -- @tab receive data and scatter.
+@item @manref{t_rcvvopt(3)} -- @tab receive data with options and scatter.
+@item @manref{t_rcvvudata(3)} -- @tab receive unit data and scatter.
+@item @manref{t_removeleaf(3)} -- @tab remove a point from a point-to-multipoint connection.
+@item @manref{t_snd(3)} -- @tab send transport data.
+@item @manref{t_snddis(3)} -- @tab send abortive disconnect.
+@item @manref{t_sndopt(3)} -- @tab send transport data with options.
+@item @manref{t_sndrel(3)} -- @tab send orderly release.
+@item @manref{t_sndreldata(3)} -- @tab send orderly release with data.
+@item @manref{t_sndudata(3)} -- @tab send unit data.
+@item @manref{t_sndv(3)} -- @tab gather and send data.
+@item @manref{t_sndvopt(3)} -- @tab gather and send data with options.
+@item @manref{t_sndvudata(3)} -- @tab gather and send unit data.
+@item @manref{t_strerror(3)} -- @tab describe an XTI/TLI library error.
+@item @manref{t_sync(3)} -- @tab synchronize XTI/TLI library with TLI provider.
+@item @manref{t_sysconf(3)} -- @tab configure XTI/TLI library parameters.
+@item @manref{t_unbind(3)} -- @tab unbind a transport endpoint.
+@item @manref{xnet(3)} -- @tab @cite{XNS 5.2} XTI/TLI Library (@file{libxnet})
+@item @manref{xti(3)} -- @tab @cite{XNS 5.2} XTI/TLI Library (@file{libxnet})
+
+@end multitable
+
+The following manual pages are installed in Section 4 of the manual (in the subdirectory
+@file{/usr/share/man/man4}):
+
+@multitable @columnfractions .35 .65
+
+@item @manref{timod(4)} -- @tab a @dfn{STREAMS} XTI/TLI compatibility interface.
+@item @manref{tirdwr(4)} -- @tab a @dfn{STREAMS} XTI/TLI read write compatibility module.
+
+@end multitable
+
+The following manual pages are installed in Section 5 of the manual (in the subdirectory
+@file{/usr/share/man/man5}):
+
+@multitable @columnfractions .35 .65
+
+@item @manref{strxnet(5)} -- @tab @value{PACKAGE_TITLE} package.
+
+@end multitable
+
+The following manual pages are installed in Section 7 of the manual (in the subdirectory
+@file{/usr/share/man/man7}):
+
+@multitable @columnfractions .35 .65
+
+@item @manref{tpi(7)} -- @tab Transport Provider Interface
+@item @manref{T_ADDR_ACK(7)} -- @tab protocol address acknowledgement.
+@item @manref{T_ADDR_REQ(7)} -- @tab get protocol address request.
+@item @manref{T_BIND_ACK(7)} -- @tab bind protocol address acknowledgement.
+@item @manref{T_BIND_REQ(7)} -- @tab bind protocol address request.
+@item @manref{T_CAPABILITY_ACK(7)} -- @tab protocol capability acknowledgement.
+@item @manref{T_CAPABILITY_REQ(7)} -- @tab protocol capability acknowledgement.
+@item @manref{T_CONN_CON(7)} -- @tab connection confirm.
+@item @manref{T_CONN_IND(7)} -- @tab connect indication.
+@item @manref{T_CONN_REQ(7)} -- @tab connect request.
+@item @manref{T_CONN_RES(7)} -- @tab connection response.
+@item @manref{T_DATA_IND(7)} -- @tab data indication.
+@item @manref{T_DATA_REQ(7)} -- @tab data request.
+@item @manref{T_DISCON_IND(7)} -- @tab disconnect indication.
+@item @manref{T_DISCON_REQ(7)} -- @tab disconnect request.
+@item @manref{T_ERROR_ACK(7)} -- @tab error acknowledgement.
+@item @manref{T_EXDATA_IND(7)} -- @tab expedited data indication.
+@item @manref{T_EXDATA_REQ(7)} -- @tab expedited data request.
+@item @manref{T_INFO_ACK(7)} -- @tab protocol information acknowledgement.
+@item @manref{T_INFO_REQ(7)} -- @tab get transport protocol parameter sizes.
+@item @manref{T_OK_ACK(7)} -- @tab success acknowledgement.
+@item @manref{T_OPTDATA_IND(7)} -- @tab data indication with options.
+@item @manref{T_OPTDATA_REQ(7)} -- @tab data request with options.
+@item @manref{T_OPTMGMT_ACK(7)} -- @tab options management acknowledgement.
+@item @manref{T_OPTMGMT_REQ(7)} -- @tab options management.
+@item @manref{T_ORDREL_IND(7)} -- @tab orderly release indication.
+@item @manref{T_ORDREL_REQ(7)} -- @tab orderly release request.
+@item @manref{T_UDERROR_IND(7)} -- @tab unit data error indication.
+@item @manref{T_UNBIND_REQ(7)} -- @tab unbind protocol address request.
+@item @manref{T_UNITDATA_IND(7)} -- @tab unit data indication.
+@item @manref{T_UNITDATA_REQ(7)} -- @tab unit data request.
+@item @manref{T_addr_ack(7)} -- @tab protocol address acknowledgement.
+@item @manref{T_addr_req(7)} -- @tab get protocol address request.
+@item @manref{T_bind_ack(7)} -- @tab bind protocol address acknowledgement.
+@item @manref{T_bind_req(7)} -- @tab bind protocol address request.
+@item @manref{T_capability_ack(7)} -- @tab protocol capability acknowledgement.
+@item @manref{T_capability_req(7)} -- @tab protocol capability acknowledgement.
+@item @manref{T_conn_con(7)} -- @tab connection confirm.
+@item @manref{T_conn_ind(7)} -- @tab connect indication.
+@item @manref{T_conn_req(7)} -- @tab connect request.
+@item @manref{T_conn_res(7)} -- @tab connection response.
+@item @manref{T_data_ind(7)} -- @tab data indication.
+@item @manref{T_data_req(7)} -- @tab data request.
+@item @manref{T_discon_ind(7)} -- @tab disconnect indication.
+@item @manref{T_discon_req(7)} -- @tab disconnect request.
+@item @manref{T_error_ack(7)} -- @tab error acknowledgement.
+@item @manref{T_exdata_ind(7)} -- @tab expedited data indication.
+@item @manref{T_exdata_req(7)} -- @tab expedited data request.
+@item @manref{T_info_ack(7)} -- @tab protocol information acknowledgement.
+@item @manref{T_info_req(7)} -- @tab get transport protocol parameter sizes.
+@item @manref{T_ok_ack(7)} -- @tab success acknowledgement.
+@item @manref{T_optdata_ind(7)} -- @tab data indication with options.
+@item @manref{T_optdata_req(7)} -- @tab data request with options.
+@item @manref{T_optmgmt_ack(7)} -- @tab options management acknowledgement.
+@item @manref{T_optmgmt_req(7)} -- @tab options management.
+@item @manref{T_ordrel_ind(7)} -- @tab orderly release indication.
+@item @manref{T_ordrel_req(7)} -- @tab orderly release request.
+@item @manref{T_uderror_ind(7)} -- @tab unit data error indication.
+@item @manref{T_unbind_req(7)} -- @tab unbind protocol address request.
+@item @manref{T_unitdata_ind(7)} -- @tab unit data indication.
+@item @manref{T_unitdata_req(7)} -- @tab unit data request.
+
+@end multitable
+
+The following manual pages are installed in Section 8 of the manual (in the subdirectory
+@file{/usr/share/man/man8}):
+
+@multitable @columnfractions .35 .65
+
+@item @manref{strxnet_mknod(8)} -- @tab create or remove @dfn{STREAMS} XNET device nodes.
+@item @manref{test-timod(8)} -- @tab a test suite executable for the @manpage{timod(4)} @dfn{STREAMS} module.
+@item @manref{test-tirdwr(8)} -- @tab a test suite executable for the @manpage{tirdwr(4)} @dfn{STREAMS} module.
+@item @manref{test-xnet(8)} -- @tab a test suite executable for the @manpage{xnet(3)} @dfn{STREAMS} library.
+@item @manref{test-xnet_thr(8)} -- @tab a test suite executable for the @manpage{xnet(3)} @dfn{STREAMS} library.
+
+@end multitable
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -834,6 +1567,49 @@ This manual uses @cite{texinfo} typographic conventions.
 @node Conformance
 @chapter Conformance
 @cindex conformance
+
+@menu
+* TPI Compatibility::		Compatibility to Transport Provider Interface
+* XTI Compatibility::		Compatibility to X/Open Transport Interface
+* TLI Compatibility::		Compatibility to Transport Layer Interface
+@end menu
+
+The @cite{@value{PACKAGE_TITLE}} package is compliant to a number of standards specifications as
+follows:
+
+@node TPI Compatibility
+@section TPI Compatibility
+
+The Transport Provider Interface provided by the @cite{@value{PACKAGE_TITLE}} package is compliant
+with XPG3, XPG4, and the Transport Provider Interface (TPI) Revision 1.5 (from UNIX International)
+and Transport Provider Interface (TPI) Revision 2.0.0. (from The Open Group).
+
+Conformance of the @manref{tirdwr(4)} read write cooperating module mentioned in the TPI
+specification is tested for compliance with the @manref{test-tirdwr(8)} test case executable and the
+@command{autotest} test suite.
+See @refman{Conformance Test Programs}, for more information.
+
+@node XTI Compatibility
+@section XTI Compatibility
+
+The X/Open Transport Interface provided by the @cite{@value{PACKAGE_TITLE}} package is compliant
+with XPG3, XPG4, and the X/Open Transport Interface present in X/Open Networking Services Release
+4.2 (XNS 4.2) and X/Open Networking Services Release 5.2 (XNS 5.2), part of the standards necessary
+for UNIX '95 branding.
+
+Conformance of the package to the XTI specification is tested using the @manref{test-xnet(8)} and
+@manref{test-xnet_thr(8)} test case executables and the @command{autotest} test suite.  Both
+native and 32-bit compatibility modes over 64-bit native kernels are tested by these test suites.
+Also, the @manref{test-timod(8)} test case executable, and the @command{autotest} test suite, test
+the XTI library cooperating module, @manref{timod(4)} for compliance.
+See @refman{Conformance Test Programs}, for more information.
+
+@node TLI Compatibility
+@section TLI Compatibility
+
+The X/Open Transport Interface is not compatible with the older AT&T UNIX System Laboratories
+Transport Layer Interface (TLI) in a number of respects where the TLI differs from the XTI.
+Nevertheless, the older TLI declarations are also provided in the @file{tiuser.h} header file.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

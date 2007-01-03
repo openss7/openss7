@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.3 2006/10/05 12:22:03 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.4 2007/01/03 10:11:51 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,13 +53,29 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/05 12:22:03 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/03 10:11:51 $ by $Author: brian $
 @c
 @c =========================================================================
 
 Things to do:
 
 @itemize @bullet
+
+@item
+The texinfo manual, @file{libxnet.info}, is incomplete.  For the time being the manual pages,
+starting with @manref{libxnet(3)}, are the definitive documentation.  It would be nice to also
+provide these library manual pages as a printable manual, however, the project has not yet found the
+time to complete this manual.
+
+@emph{*todo*}
+
+@item
+There is an XTITRACE option the was associated wtih the XTI library that provided the abilty to
+record trace information to a temporary file and then display or print it with an xtitrace
+user program.  This capability is not yet implemented in this XTI library and remains to be done.
+
+@emph{*todo*}
+
 @item
 Need to remove the following functions:
 
@@ -117,5 +133,6 @@ Actually this was already done a long time ago.  See manual pages:
 @end multitable
 
 Perhaps what needs to be done is to test them?
+
 @end itemize
 
