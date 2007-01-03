@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strinet.texi,v 0.9.2.21 2006/09/18 01:07:06 brian Exp $
+% @(#) $Id: strinet.texi,v 0.9.2.22 2007/01/03 12:30:26 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2007  OpenSS7 Corporation <www.openss7.com>
 % Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/09/18 01:07:06 $ by $Author: brian $
+% Last Modified $Date: 2007/01/03 12:30:26 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -82,7 +82,7 @@ This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -128,7 +128,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2006  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2001-2007  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -219,6 +219,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Introduction::		Introduction to the package
 * Objective::			Objective of the package
 * Reference::			Contents of the package
+* Development::			Developing with the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
@@ -256,12 +257,19 @@ Reference
 * Modules::			Modules included in the package
 * Libraries::			Libraries included in the package
 * Utilities::			Utilities included in the package
-* Development::			Development against the package
+
+Development
+
+* Development Header Files::	Header Files in the package
+* Static and Shared Libraries::	Libraries in the package
+* Kernel Module Development::	Kernel development with the package
+* Manual Pages::		Manual Pages in the package
 
 Conformance
 
-* STREAMS Compatibility::	Compatibility with other STREAMS packages
-* Porting::			Porting to this STREAMS package
+* TPI Compatibility::		Compatibility to Transport Provider Interface
+* XTI Compatibility::		Compatibility to X/Open Transport Interface
+* TLI Compatibility::		Compatibility to Transport Layer Interface
 
 Releases
 
@@ -403,6 +411,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strinet.texi,v $
+Revision 0.9.2.22  2007/01/03 12:30:26  brian
+- documentation updates for release
+
 Revision 0.9.2.21  2006/09/18 01:07:06  brian
 - updated manuals and release texi docs
 
@@ -604,9 +615,11 @@ the @cite{@value{PACKAGE_TITLE}} package.
 The @value{PACKAGE_TITLE} package is
 an X/Open Transport Interface (XTI/TLI) package for Linux
 that can be used with
-@cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}
+@cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}.
+@ignore
 or
 @cite{Linux STREAMS}@footnote{@xref{Top, Linux STREAMS (LiS), About This Manual, LiS, Linux STREAMS (LiS) Reference Manual}.}.
+@end ignore
 It includes development tools, header files and manual pages for
 @value{PACKAGE_TITLE}.
 
@@ -621,6 +634,7 @@ This manual is organized (loosely) into several sections as follows:
   Introduction::		This introduction
 * Objective::			Objective of the package
 * Reference::			Contents of the package
+* Development::			Developing with the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
@@ -635,6 +649,8 @@ This manual is organized (loosely) into several sections as follows:
 @tab Objective of the package
 @item @ref{Reference}.
 @tab Contents of the package
+@item @ref{Development}.
+@tab Developing with the package
 @item @ref{Conformance}.
 @tab Conformance of the package
 @item @ref{Releases}.
@@ -653,6 +669,8 @@ This manual is organized (loosely) into several sections as follows:
 @tab Objective of the package
 @item @cite{Reference}.
 @tab Contents of the package
+@item @cite{Development}.
+@tab Developing with the package
 @item @cite{Conformance}.
 @tab Conformance of the package
 @item @cite{Releases}.
@@ -678,6 +696,38 @@ This manual uses @cite{texinfo} typographic conventions.
 @chapter Objective
 @cindex objective
 
+The @cite{@value{PACKAGE_TITLE}} package is intended to provide compatibility with @cite{UNIX System
+V Release 4} networking components based on the Transport Provider Interface and the XTI/TLI
+interface described in X/Open Networking Services, in a single add-on package to @cite{Linux
+Fast-STREAMS}.  One purpose in achieving this compatibility is the porting of legacy applications
+from @cite{UNIX} to @cite{Linux} using the capabilities of @dfn{STREAMS} and @cite{Linux
+Fast-STREAMS}.
+
+Another objective of providing Transport Provider Interface Streams for @cite{Linux Fast-STREAMS}
+was to permit @manpage{sctp(4)}, @manpage{tcp(4)}, @manpage{udp(4)} and @manpage{rawip(4)} Streams
+to be opened, linked under multiplexing drivers, and to have @dfn{STREAMS} modules pushed over them.
+The purpose was to provide access to the Internet Protocol suite to @dfn{STREAMS} modules and
+drivers written for the @file{strss7-@value{VERSION_STRSS7}} @file{sigtran-@value{VERSION_SIGTRAN}}
+and @file{strvoip-@value{VERSION_STRVOIP}} packages under the @cite{OpenSS7 Project}, as well as to
+provide ISO over TCP capabilities for the @file{striso-@value{VERSION_STRISO}} package.
+
+The intial approach to implementing INET drivers was to provide an in-kernel @dfn{STREAMS} over
+@dfn{Socket} approach.  Under this approach, the @dfn{STREAMS} @manpage{inet(4)} driver converts
+between TPI primitives received from the Stream head and in-kernel calls to an internally opened
+socket of the appropriate type.  While this provided an adequate mechanism for providing Internet
+Protocol @dfn{STREAMS} presenting the TPI service interface, it is rather inefficient.
+
+The second approach that is available in this release is a complete @dfn{STREAMS} implementation of
+the @manpage{udp(4)} and @manpage{rawip(4)} drivers, as well as the start of a skeleton for a fully
+@dfn{STREAMS}-based @manpage{tcp(4)} driver.  Performance tests using the
+@file{netperf-@value{VERSION_NETPERF}} package shows that these second generation implementations of
+@manpage{udp(4)} and @manpage{rawip(4)} compete for peformance with @cite{Linux} native sockets.
+The ablity to link these Streams underneath multiplexing drivers or pushed beneath modules for
+protocols such as @manref{rtp(4)} is very beneficial.
+
+The result is stable, production grade, 64-bit clean TPI implementations of Internet Protocols for
+@cite{Linux Fast-STREAMS} that can be used by other @dfn{STREAMS} modules and drivers.
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -691,7 +741,6 @@ This manual uses @cite{texinfo} typographic conventions.
 * Modules::			Modules included in the package
 * Libraries::			Libraries included in the package
 * Utilities::			Utilities included in the package
-* Development::			Development against the package
 @end menu
 
 @c ----------------------------------------------------------------------------
@@ -710,6 +759,31 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Drivers
 @cindex drivers
 
+The @cite{@value{PACKAGE_TITLE}} package provides the following @dfn{STREAMS} drivers:
+
+@table @asis
+
+@item @manref{inet(4)} (@file{streams_inet.ko})
+This is the first generation INET driver.  It provides TPI devices for @manref{tcp(4)},
+@manref{udp(4)} and @manref{rawip(4)}.  This driver uses an XTI over Sockets approach.
+
+@item @manref{udp2(4)} (@file{streams_udp.ko})
+This is the second generation @manpage{udp(4)} driver.  It provides a complete @dfn{STREAMS}
+implementation of @manpage{udp(4)} and exhibits much higher performance that the first generation
+@manpage{inet(4)} driver.
+
+@item @manref{rawip2(4)} (@file{streams_rawip.ko})
+This is the second generation @manpage{rawip(4)} driver.  It provides a complete @dfn{STREAMS}
+implementation of @manpage{rawip(4)} and exhibits much higher performance that the first generation
+@manpage{inet(4)} driver.
+
+@item @manref{tcp2(4)} (@file{streams_tcp.ko})
+This is a skeleton for a second generation @manpage{tcp(4)} driver. It will eventually provide a
+complete @dfn{STREAMS} implementation of @manpage{tcp(4)} and will exhibit much higher performance
+than the first generation @manpage{inet(4)} driver.
+
+@end table
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -717,6 +791,9 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Modules
 @cindex modules
 
+The @cite{@value{PACKAGE_TITLE}} package provides the following @dfn{STREAMS} modules:
+
+The @cite{@value{PACKAGE_TITLE}} package does not currently provide any @dfn{STREAMS} modules.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -725,6 +802,9 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Libraries
 @cindex libraries
 
+The @cite{@value{PACKAGE_TITLE}} package provides the following shared object and static libraries:
+
+The @cite{@value{PACKAGE_TITLE}} package does not currently provide any libraries.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -733,12 +813,403 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Utilities
 @cindex utilities
 
+@subsection Init Scripts
+
+Following are System V Init Scripts that are installed by the package:
+
+@table @asis
+
+@item @manpage{@value{PACKAGE}(8)} (@file{/etc/init.d/@value{PACKAGE}})
+@pgindex @value{PACKAGE}
+@pgindex /etc/init.d/@value{PACKAGE}
+@itemx @manpage{@value{PACKAGE}.sh(8)} (@file{/etc/init.d/@value{PACKAGE}.sh})
+@pgindex @value{PACKAGE}.sh
+@pgindex /etc/init.d/@value{PACKAGE}.sh
+
+System V Init Script for the @dfn{INET} Subsystem.
+The @manpage{@value{PACKAGE}(8)} init script provides the ability to initialize, configure and mount the
+@dfn{XNS} subsystem, @manpage{strxnet(5)}.
+The @manpage{@value{PACKAGE}(8)} script provides the RedHat-style init script, whereas the
+@manpage{@value{PACKAGE}.sh(8)} script provides the Debian-style init script.
+
+See @manref{@value{PACKAGE}(8)} for more information.
+
+@end table
+
+@subsection Administrative Utilities
+
+Following are user utilities for manipulating @dfn{INET}:
+
+@table @asis
+
+@item @manpage{@value{PACKAGE}_mknod(8)} (@file{/usr/sbin/@value{PACKAGE}_mknod})
+@pgindex strinet_mknod
+@pgindex /usr/sbin/strinet_mknod
+
+Make special device nodes for @dfn{INET}.
+@manpage{strinet_mknod(8)} is a @cite{@value{PACKAGE_TITLE}} specific adminstrative utility.
+
+The @manpage{strinet_mknod(8)} C-language program can be used to make (or remove) the special
+device nodes under the @file{/dev} directory required by @command{@value{PACKAGE}-@value{VERSION}}
+package modules and drivers.  @manpage{strinet_mknod(8)} is invoked by the System V startup script,
+@file{/etc/init.d/@value{PACKAGE}}.
+
+See @manref{strinet_mknod(8)} for more information.
+
+@item @manpage{inet_mkdev(8)} (@file{/usr/sbin/inet_mkdev})
+
+Make special @cite{iBCS} device nodes for @dfn{INET}.
+@manpage{inet_mkdev(8)} is a @cite{@value{PACKAGE_TITLE}} specific adminstrative utility.
+
+The @manpage{inet_mkdev(8)} script can be used to make the special @cite{iBCS} device nodes under
+the @file{/dev} directory required by @command{@value{PACKAGE}-@value{VERSION}} package drivers.
+@manpage{inet_mkdev(8)} is invoked by the System V startup script,
+@file{/etc/init.d/@value{PACKAGE}}.
+
+@item @manpage{inet_rmdev(8)} (@file{/usr/sbin/inet_rmdev})
+
+Remove special @cite{iBCS} device nodes for @dfn{INET}.
+@manpage{inet_rmdev(8)} is a @cite{@value{PACKAGE_TITLE}} specific adminstrative utility.
+
+The @manpage{inet_rmdev(8)} script can be used to remove the special @cite{iBCS} device nodes under
+the @file{/dev} directory used by @command{@value{PACKAGE}-@value{VERSION}} package drivers.
+@manpage{inet_rmdev(8)} is invoked by the System V shutdown script,
+@file{/etc/init.d/@value{PACKAGE}}.
+
+@end table
+
+@subsection Performance Test Programs
+
+Following are performance test programs:
+
+The @cite{@value{PACKAGE_TITLE}} package does not yet contain any performance programs.  For
+performance testing of various transport providers, see the @file{netperf-@value{VERSION_NETPERF}}
+package.
+
+@subsection Conformance Test Programs
+
+Following are conformance and validation test programs included in the package:
+
+@table @asis
+
+@item @manref{test-inet_tcp(8)} (@file{/usr/libexec/@value{PACKAGE}/test-inet_tcp})
+The @manpage{test-inet_tcp(8)} C-language program is a conformance and validation test program, in
+the OpenSS7 Project style, for the @manref{tcp(4)} and @manref{tcp2(4)} @dfn{STREAMS} drivers.
+This validation test case executable is used for both the first generation and second generation
+drivers.
+
+@item @manref{test-inet_udp(8)} (@file{/usr/libexec/@value{PACKAGE}/test-inet_udp})
+The @manpage{test-inet_udp(8)} C-language program is a conformance and validation test program, in
+the OpenSS7 Project style, for the @manref{udp(4)} and @manref{udp2(4)} @dfn{STREAMS} drivers.
+This validation test case executable is used for both the first generation and second generation
+drivers.
+
+@item @manref{test-inet_raw(8)} (@file{/usr/libexec/@value{PACKAGE}/test-inet_raw})
+The @manpage{test-inet_raw(8)} C-language program is a conformance and validation test program, in
+the OpenSS7 Project style, for the @manref{rawip(4)} and @manref{rawip2(4)} @dfn{STREAMS} drivers.
+This validation test case executable is used for both the first generation and second generation
+drivers.
+
+@item @file{/usr/libexec/@value{PACKAGE}/testsuite}
+@itemx @file{/usr/libexec/@value{PACKAGE}/atlocal}
+The OpenSS7 Project style @command{autotest} test suite.  This test suite can be run stand-alone as
+described under @refman{Running Test Suites}.  The @file{atlocal} file provides localized
+definitions for the test suite.
+
+@end table
+
+For the proper way to execute these validation test programs in a conformance and validation test
+suite, see @refman{Running Test Suites}.
+
+@subsection Problem Report Scripts
+
+The @cite{@value{PACKAGE_TITLE}} package installs customized problem reporting scripts for reporting
+problems associated with test suite execution and other difficulties.  This problem reporting script
+is installed in the @file{/usr/libexec/@value{PACKAGE}/} subdirectory as follows:
+
+@table @asis
+
+@item @file{/usr/libexec/@value{PACKAGE}/send-pr}
+@itemx @file{/usr/libexec/@value{PACKAGE}/send-pr.config}
+This is the problem reporting script tailored for the @file{@value{PACKAGE}-@value{VERSION}}
+package.  The @file{send-pr} file is the script proper and the @file{send-pr.config} file contains
+localized configuration information.
+
+@end table
+
+For more information on the use of the problem reporting scripts, see @refman{Generating Problem
+Reports}.
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
 @node Development
-@section Development
+@chapter Development
 @cindex developing
+
+@cite{@value{PACKAGE_TITLE}} provides all of the header files, shared object and static libraries,
+manual pages and documentation necessary for the development of both user space applications
+programs and kernel space @dfn{STREAMS} modules and drivers based on the package.  The sections that
+follow describe these development facilities.
+
+@menu
+* Development Header Files::
+* Static and Shared Libraries::
+* Kernel Module Development::
+* Manual Pages::
+@end menu
+
+@node Development Header Files::
+@section Header Files
+
+Header files are installed, typically, in the @file{/usr/include/@value{PACKAGE}/} subdirectory.  To
+use the header files from the package, @samp{-I/usr/include/@value{PACKAGE}} must be included in the
+@command{gcc} command line as a preprocessor option.
+
+In general, @samp{-I} include preprocessor directives on the @command{gcc} command line should be
+ordered in the reverse order of the dependencies between packages.  So, for example, if the include
+files from all add-on packages are required, the order of these directives would be:
+@samp{-I/usr/include/@value{PACKAGE}}
+@samp{-I/usr/include/strxns}
+@samp{-I/usr/include/strcompat}
+@samp{-I/usr/include/streams}.
+
+Following are the user visible header files provided by the @file{@value{PACKAGE}-@value{VERSION}}
+package in the directory @file{/usr/include/@value{PACKAGE}}:
+
+@table @file
+
+@item sys/strinet/config.h
+@pgindex sys/strinet/config.h
+@pgindex /usr/include/strinet/sys/strinet/config.h
+Configuration defines for the package.
+
+@item sys/strinet/version.h
+@pgindex sys/strinet/version.h
+@pgindex /usr/include/strinet/sys/strinet/version.h
+Module versions for the package (on 2.4 systems).
+
+@item ticlts.h
+@pgindex ticlts.h
+@pgindex /usr/include/strinet/ticlts.h
+@itemx sys/ticlts.h
+@pgindex sys/ticlts.h
+@pgindex /usr/include/strinet/sys/ticlts.h
+Header file providing Transport Provider Interface definitions for the connectionless transport
+interface.
+
+@item ticots.h
+@pgindex ticots.h
+@pgindex /usr/include/strinet/ticots.h
+@itemx sys/ticots.h
+@pgindex sys/ticots.h
+@pgindex /usr/include/strinet/sys/ticots.h
+Header file providing Transport Provider Interface definitions for the connection-oriented transport
+interface.
+
+@item ticotsord.h
+@pgindex ticotsord.h
+@pgindex /usr/include/strinet/ticotsord.h
+@itemx sys/ticotsord.h
+@pgindex sys/ticotsord.h
+@pgindex /usr/include/strinet/sys/ticotsord.h
+Header file providing Transport Provider Interface definitions for the connection-oriented with
+orderly release transport interface.
+
+@item xti.h
+@pgindex xti.h
+@pgindex /usr/include/strinet/xti.h
+@itemx xti_inet.h
+@pgindex xti_inet.h
+@pgindex /usr/include/strinet/xti_inet.h
+@itemx sys/xti_inet.h
+@pgindex sys/xti_inet.h
+@pgindex /usr/include/strinet/sys/xti_inet.h
+Primary header files defining the XTI library interface.
+This header file is normally included by applications programs wishing to use the XTI library
+interface.
+See @manref{xti(3)} for more information.
+
+@item sys/xti_ip.h
+@pgindex sys/xti_ip.h
+@pgindex /usr/include/strinet/sys/xti_ip.h
+System specific header file for the Internet Protocol XTI library interface.
+This header file is normally included by @file{xti.h} and does not need to be directly included by
+the applications program.
+See @manref{xti(3)} for more information.
+
+@item sys/xti_udp.h
+@pgindex sys/xti_udp.h
+@pgindex /usr/include/strinet/sys/xti_udp.h
+System specific header file for the User Datagram Protocol XTI library interface.
+This header file is normally included by @file{xti.h} and does not need to be directly included by
+the applications program.
+See @manref{xti(3)} for more information.
+
+@item sys/xti_tcp.h
+@pgindex sys/xti_tcp.h
+@pgindex /usr/include/strinet/sys/xti_tcp.h
+System specific header file for the Transmission Control Protocol XTI library interface.
+This header file is normally included by @file{xti.h} and does not need to be directly included by
+the applications program.
+See @manref{xti(3)} for more information.
+
+@end table
+
+@subsection User Space Programs
+
+Typical include files for interacting with Transport providers from user space include the
+@file{xti.h} header file.  Additional header files for interacting with specific drivers or modules
+may also be required.  The @cite{xti.h} header file is for interacting with the XTI library.
+
+@subsection Kernel Space Drivers and Modules
+
+Typeical include files for writing @dfn{STREAMS} module and drivers implementing transport providers
+in kernels space include @cite{xti.h} and @cite{xti_inet.h}.  The header files provide access to
+definitions for the TPI interface and additional XTI definitions for use by @dfn{STREAMS} drivers
+and modules.  Additional header files for interacting with specific drivers or modules may also be
+required.
+
+Aside from including this header files, the general procedures for compiling @dfn{STREAMS} modules
+and drivers also apply to @dfn{STREAMS} modules and drivers written to the Transport Provider
+Interface.
+
+@node Static and Shared Libraries
+@section Libraries
+
+Shared or static version of the @cite{libxnet} library may be linked when using the
+@file{@value{PACKAGE}-@value{VERSION}} package.@footnote{Note that the @file{libxnet} library is
+now provided by the @file{strxnet-@value{VERSION_STRXNET}} package.} The library may either be
+specified on the @command{gcc} command line as a shared library (e.g. @samp{-lxnet}) or as a static
+library (e.g.  @samp{/usr/lib/libxnet.a}).
+
+If the shared object library is linked, include the following options on the @command{gcc} command
+line:
+
+@table @samp
+
+@item -lxnet
+Link to the @file{/usr/lib/libxnet.so} shared library.
+
+@end table
+
+If the static library is linked, include the following options on the @command{gcc} command line:
+
+@table @samp
+
+@item /usr/lib/libxnet.a
+Link to the @file{/usr/lib/libxnet.a} static library.
+
+@end table
+
+@node Kernel Module Development
+@section Kernel Modules
+
+Developing TPI kernel modules is similar to user space programs with regard to header files.
+@file{/usr/include/strxnet} should be placed as an include directory to search on the @command{gcc}
+command line.  The rules for compiling @cite{Linux} kernel modules and the rules for compiling
+@dfn{STREAMS} modules and drivers should be followed.  In particular, several important intricacies
+should be considered:
+
+@itemize @bullet
+
+@item The @command{gcc} compiler used to compile the kernel modules must be the same version of
+compiler that was used to compile the kernel and @dfn{STREAMS} base package.
+
+@item The @command{gcc} command line must have the same compile flags that were used to compile the
+kernel and @dfn{STREAMS} base package.  @command{kbuild} can be used to accomplish this.
+
+@item The @command{gcc} command line must define several important kernel defines including
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.  Again, @command{kbuild}
+can be used to accomplish this.
+
+@item The @command{gcc} command line must include several important files directly on the command
+line, such as, @samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-autoconf.h} and
+@samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-modversions.h}.@footnote{The
+kernel version, @samp{@value{_kversion}}, is just an example.  For the running kernel, use the
+output of @samp{uname -r}.}
+
+@end itemize
+
+@node Manual Pages
+@section Manual Pages
+
+The @file{@value{PACKAGE}-@value{VERSION}} package installs a number of manual pages in the
+@file{/usr/share/man} directory as follows:
+
+The following manual pages are installed in Section 3 of the manual (in the subdirectory
+@file{/usr/share/man/man3}):
+
+@multitable @columnfractions .30 .70
+
+@item @manref{xti_ip(3)} -- @tab X/Open Transport Interface - Corrigendum for Internet Protocol (IP) Conformance.
+@item @manref{xti_udp(3)} -- @tab X/Open Transport Interface - Corrigendum for User Datagram Protocol (UDP) Conformance.
+@item @manref{xti_tcp(3)} -- @tab X/Open Transport Interface - Corrigendum for Transmission Control Protocol (TCP) Conformance.
+@item @manref{t_kpalive(3)} -- @tab X/Open Transport Interface - Corrigendum for Transmission Control Protocol (TCP) Conformance.
+@item @manref{t_tcp_info(3)} -- @tab X/Open Transport Interface - Corrigendum for Transmission Control Protocol (TCP) Conformance.
+
+@end multitable
+
+The following manual pages are installed in Section 4 of the manual (in the subdirectory
+@file{/usr/share/man/man4}):
+
+@multitable @columnfractions .30 .70
+
+@item @manref{arp(4)} -- @tab User Datagram Protocol Stream.
+@item @manref{egp(4)} -- @tab Raw Internet Protocol Stream.
+@item @manref{ggp(4)} -- @tab Raw Internet Protocol Stream.
+@item @manref{icmp(4)} -- @tab Raw Internet Protocol Stream.
+@item @manref{idp(4)} -- @tab Raw Internet Protocol Stream.
+@item @manref{inet(4)} -- @tab OpenSS7 INET Devices.
+@item @manref{INET(4)} -- @tab OpenSS7 INET Devices.
+@item @manref{ip(4)} -- @tab Raw Internet Protocol Stream.
+@item @manref{ipip(4)} -- @tab Raw Internet Protocol Stream.
+@item @manref{pup(4)} -- @tab Raw Internet Protocol Stream.
+@item @manref{rawip(4)} -- @tab Raw Internet Protocol Stream.
+@item @manref{rawip2(4)} -- @tab Raw Internet Protocol Stream.
+@item @manref{rip(4)} -- @tab User Datagram Protocol Stream.
+@item @manref{tcp(4)} -- @tab Transmission Control Protocol (TCP).
+@item @manref{tcp2(4)} -- @tab Transmission Control Protocol (TCP).
+@item @manref{ticlts(4)} -- @tab connectionless loopback transport provider.
+@item @manref{ticots(4)} -- @tab connection oriented loopback provider.
+@item @manref{ticots_ord(4)} -- @tab connection oriented orderly release loopback provider.
+@item @manref{ticotsord(4)} -- @tab connection oriented orderly release loopback provider.
+@item @manref{udp(4)} -- @tab User Datagram Protocol Stream.
+@item @manref{udp2(4)} -- @tab User Datagram Protocol Stream.
+
+@end multitable
+
+The following manual pages are installed in Section 5 of the manual (in the subdirectory
+@file{/usr/share/man/man5}):
+
+@multitable @columnfractions .30 .70
+
+@item @manref{strinet(5)} -- @tab @value{PACKAGE_TITLE} package.
+
+@end multitable
+
+The following manual pages are installed in Section 7 of the manual (in the subdirectory
+@file{/usr/share/man/man7}):
+
+@multitable @columnfractions .30 .70
+
+@item @manref{tpi_ip(7)} -- @tab Transport Provider Interface (TPI) - Internet Protocol (IP) Corrigendum.
+@item @manref{tpi_udp(7)} -- @tab Transport Provider Interface (TPI) - User Datagram Protocol (UDP) Corrigendum.
+@item @manref{tpi_tcp(7)} -- @tab Transport Provider Interface (TPI) - Transmission Control Protocol (TCP) Corrigendum.
+
+@end multitable
+
+The following manual pages are installed in Section 8 of the manual (in the subdirectory
+@file{/usr/share/man/man8}):
+
+@multitable @columnfractions .30 .70
+
+@item @manref{strinet_mknod(8)} -- @tab create or remove @dfn{STREAMS} @dfn{INET} device nodes.
+@item @manref{test-inet_raw(8)} -- @tab a test suite executable for the @manpage{rawip(4)} @dfn{STREAMS} driver.
+@item @manref{test-inet_tcp(8)} -- @tab a test suite executable for the @manpage{tcp(4)} @dfn{STREAMS} driver.
+@item @manref{test-inet_udp(8)} -- @tab a test suite executable for the @manpage{udp(4)} @dfn{STREAMS} driver.
+
+@end multitable
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -746,6 +1217,48 @@ This manual uses @cite{texinfo} typographic conventions.
 @node Conformance
 @chapter Conformance
 @cindex conformance
+
+@menu
+* TPI Compatibility::		Compatibility to Transport Provider Interface
+* XTI Compatibility::		Compatibility to X/Open Transport Interface
+* TLI Compatibility::		Compatibility to Transport Layer Interface
+@end menu
+
+The @cite{@value{PACKAGE_TITLE}} package is compliant to a number of standards specifications as
+follows:
+
+@node TPI Compatibility
+@section TPI Compatibility
+
+The Transport Provider Interface provided by the @cite{@value{PACKAGE_TITLE}} package is compliant
+with XPG3, XPG4, and the Transport Provider Interface (TPI) Revision 1.5 (from UNIX International)
+and Transport Provider Interface (TPI) Revision 2.0.0. (from The Open Group).
+
+Conformance of the @manpage{inet(4)}, @manpage{udp(4)}, @manpage{tcp(4)} and @manpage{rawip(4)}
+drivers to the TPI specification is tested for compliance with the @manpage{test-inet_raw(8)},
+@manpage{test-inet_tcp(8)} and @manpage{test-inet_udp(8)} test case executables and the
+@command{autotest} test suite.
+See @refman{Conformance Test Programs}, for more information.
+
+@node XTI Compatibility
+@section XTI Compatibility
+
+The X/Open Transport Interface provided by the @cite{@value{PACKAGE_TITLE}} package is compliant
+with XPG3, XPG4, and the X/Open Transport Interface present in X/Open Networking Services Release
+4.2 (XNS 4.2) and X/Open Networking Services Release 5.2 (XNS 5.2), part of the standards necessary
+for UNIX '95 branding.
+
+Conformance of the package to the XTI specification is not tested.  Only the @cite{XTI/TLI Library}
+from the @file{strxnet-@value{VERSION_STRXNET}} package is tested to the XTI specification.
+Provided that the INET drivers meet the TPI specification, they should automatically meet the XTI
+specification.
+
+@node TLI Compatibility
+@section TLI Compatibility
+
+The X/Open Transport Interface is not compatible with the older AT&T UNIX System Laboratories
+Transport Layer Interface (TLI) in a number of respects where the TLI differs from the XTI.
+Nevertheless, the older TLI declarations are also provided in the @file{tiuser.h} header file.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -773,6 +1286,7 @@ This manual uses @cite{texinfo} typographic conventions.
 @cindex troubleshooting
 
 @include texi/testsuite.texi
+
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

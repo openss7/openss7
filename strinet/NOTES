@@ -1,5 +1,5 @@
 OpenSS7 STREAMS INET Driver -- design notes.  2006-04-18
-Copyright (c) 2001-2006  OpenSS7 Corporation.  <http://www.openss7.com/>
+Copyright (c) 2001-2007  OpenSS7 Corporation.  <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
@@ -61,7 +61,7 @@ socket-based UDP to answer the perennial question (which is faster?).
 
 =========================================================================
 
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 
 All Rights Reserved.

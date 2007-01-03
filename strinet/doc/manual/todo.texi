@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.3 2006/10/10 10:42:57 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.4 2007/01/03 12:30:27 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,13 +53,21 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/10 10:42:57 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/03 12:30:27 $ by $Author: brian $
 @c
 @c =========================================================================
 
 Things to do:
 
 @itemize @minus
+@item
+Loopback devices (ticlts, ticots, ticotsord) are currently implemented in the @manpage{inet(4)}
+driver using UNIX domain sockets and the XTI over sockets approach.  It should be straightforward to
+implement these loopback devices directly in @dfn{STREAMS} without involving sockets.  These second
+generation loopback drivers need to be written yet.
+
+@emph{*todo*}
+
 @item
 Implement pseudo-connection oriented modes in INET(4) driver as well as udp2(4) and rawip2(4)
 drivers.  Document use of pseudo-connection oriented modes for UDP and RAWIP.  Pseudo-connection
@@ -69,10 +77,14 @@ connection oriented service.  This makes conversion from the Sockets API to XTI 
 Note that this is also very applicable to MTP (quasi-associated signalling such as ISUP) and
 SCCP protocol class 0 and 1 and TCAP.
 
+@emph{*todo*}
+
 @item
 It might be worth retrying the netperf(1) performance test on the second generation UDP driver with
 this pseudo-connection oriented mode in place.  You see, the netperf tests for UDP sockets performs
 a connect(3).
+
+@emph{*todo*}
 
 @item
 Implement pseudo-connectionless modes in INET(4) driver as well as sctp(4) drivers.  Document use of
@@ -86,8 +98,14 @@ translation between the sockets API and XTI API for sctp.
 
 Note that this is also very applicable to SCCP protocol classes 2 and 3 and BSSAP.
 
+@emph{*todo*}
+
 @item
-Convert inet driver to use os7 common functions.
+Convert inet driver to use os7 common functions.  In fact, it might be a better idea to convert the
+driver to use MPS common functions instead as we are now trying to move away from os7 common
+functions.
+
+@emph{*todo*}
 
 @item
 Pure STREAMS RAW and UDP implementation.  A higher performance RAW and UDP implementation supporting
@@ -107,6 +125,7 @@ access to IP (primarily for SCTP conformance testing).  RTP drivers should be ba
 Connectionless testing using netperf competes well with connection-oriented sockets.  Need to still
 modify netperf to use (pseudo-)connection-oriented UDP for better comparison.
 
+@emph{*todo*}
 
 @item
 32bit compatibility testing.

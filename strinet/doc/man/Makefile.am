@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/07 22:12:47 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/01/03 12:30:24 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/07 22:12:47 $ by $Author: brian $
+# Last Modified $Date: 2007/01/03 12:30:24 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.15  2007/01/03 12:30:24  brian
+# - documentation updates for release
+#
 # Revision 0.9.2.14  2006/05/07 22:12:47  brian
 # - updated for NPI-IP driver
 #
@@ -98,6 +101,7 @@ man_MANS = \
 	man4/ticotsord.4 \
 	man4/udp.4 \
 	man4/udp2.4 \
+	man5/strinet.5 \
 	man7/tpi_ip.7 \
 	man7/tpi_udp.7 \
 	man7/tpi_tcp.7 \
@@ -161,6 +165,7 @@ dist_noinst_MANS = \
 	man4/ticotsord.4.man \
 	man4/udp.4.man \
 	man4/udp2.4.man \
+	man5/strinet.5.man \
 	man7/tpi_ip.7.man \
 	man7/tpi_udp.7.man \
 	man7/tpi_tcp.7.man \
