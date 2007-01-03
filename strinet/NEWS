@@ -1,5 +1,5 @@
 OpenSS7 INET Networking -- history of user visible changes.  2007-01-02
-$Id: NEWS,v 0.9.2.30 2007/01/03 12:30:20 brian Exp $
+$Id: NEWS,v 0.9.2.31 2007/01/03 14:54:39 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -10,8 +10,13 @@ OpenSS7 INET Networking package.
  Major changes for release strinet-0.9.2.4
 ------------------------------------------
 
-This release is a maintenance release.  It provides the following
-enhancements and fixes:
+This release is both a maintenance release and a feature release.  The
+major new feature added is a fully "STREAMS" based implementation of
+the `rawip(4)' and `udp(4)' drivers.  This release is a stable
+production release for `Linux Fast-STREAMS'.  Support for `LiS' is
+deprecated as of this release.
+
+The release provides the following enhancements and fixes:
 
    * Support for most recent 2.6.18 kernels (including Fedora Core 5
      with inode diet patchset).

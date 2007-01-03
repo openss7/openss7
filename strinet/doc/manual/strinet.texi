@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strinet.texi,v 0.9.2.22 2007/01/03 12:30:26 brian Exp $
+% @(#) $Id: strinet.texi,v 0.9.2.23 2007/01/03 14:54:41 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/01/03 12:30:26 $ by $Author: brian $
+% Last Modified $Date: 2007/01/03 14:54:41 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -411,6 +411,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strinet.texi,v $
+Revision 0.9.2.23  2007/01/03 14:54:41  brian
+- documentation updates for release
+
 Revision 0.9.2.22  2007/01/03 12:30:26  brian
 - documentation updates for release
 
@@ -828,7 +831,7 @@ Following are System V Init Scripts that are installed by the package:
 
 System V Init Script for the @dfn{INET} Subsystem.
 The @manpage{@value{PACKAGE}(8)} init script provides the ability to initialize, configure and mount the
-@dfn{XNS} subsystem, @manpage{strxnet(5)}.
+@dfn{INET} subsystem, @manpage{strxnet(5)}.
 The @manpage{@value{PACKAGE}(8)} script provides the RedHat-style init script, whereas the
 @manpage{@value{PACKAGE}.sh(8)} script provides the Debian-style init script.
 
