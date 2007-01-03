@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=78 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.5 2006/12/31 11:35:06 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.6 2007/01/03 14:53:55 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/12/31 11:35:06 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/03 14:53:55 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -63,7 +63,7 @@ Things to do:
 @item
 Testing.  This package is completely untested.
 
-This remains to be done.
+@emph{*todo*}
 
 @item
 Create a library @manref{libtty(3)} to hold the library functions for use with
@@ -76,61 +76,70 @@ this package:
 @item @tab @manref{unlockpt(3)}
 @end multitable
 
-This remains to be done.
+@emph{*todo*}
 
 @item
 Create an @manref{ldterm(4)} @cite{Line Discipline for Terminals}
 @dfn{STREAMS} module.  This item remains to be done.  Al that is in place
 right now is a skeleton module.
 
+@emph{*todo*}
+
 @item
 Create a @manref{ttcompat(4)} @cite{TTY Compatibility} @dfn{STREAMS} module.
 
-@emph{*done*}
-
+@table @emph
+@item *done*
 Created a @manref{ttcompat(4)} module.  This module compiles and installs and
 is fully documented, but is completely untested.
+@end table
 
 @item
 Create a @manref{pckt(4)} @cite{Packet Mode} @dfn{STREAMS} module.
 
-@emph{*done*}
-
+@table @emph
+@item *done*
 Created a @manref{pckt(4)} module.  This module compiles and installs and is
 fully documented, but is completely untested.
+@end table
 
 @item
 Create a @manref{ptem(4)} @cite{Pseudo-Terminal Emulation} @dfn{STREAMS}
 module.
 
-@emph{*done*}
-
+@table @emph
+@item *done*
 Created a @manref{ptem(4)} module.  This module compiles and installs and is
 fully documented,  but is completely untested.
+@end table
 
 @item
 Create a @manref{pty(4)} @cite{Pseudo-Terminal} @dfn{STREAMS} driver.  This
 driver will provide both slave (@manref{pts(4)}) and master (@manref{ptm(4)})
 @dfn{STREAMS} devices.
 
-@emph{*done*}
-
+@table @emph
+@item *done*
 Created @manref{ptm(4)} and @manref{pts(4)} driver.  This driver compiles and
 installs and is fully documented, but is completely untested.
+@end table
 
 @item
 Move already written code from the @file{stacks} or @file{strss7} directories
 into the @file{src} directory.
 
-@emph{*done*}
+@table @emph
+@item *done*
+@end table
 
 @item
 Create a skeleton directory and manual and place @command{@value{PACKAGE}} as
 a subpackage in the @cite{OpenSS7 Master Package}.
 
-@emph{*done*}
-
+@table @emph
+@item *done*
 You are reading it.
+@end table
 @end itemize
 
 The @command{@value{PACKAGE}} package is currently incomplete.

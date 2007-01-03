@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strtty.texi,v 0.9.2.8 2006/12/31 13:52:30 brian Exp $
+% @(#) $Id: strtty.texi,v 0.9.2.9 2007/01/03 14:53:53 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2007  OpenSS7 Corporation <www.openss7.com>
 % Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/12/31 13:52:30 $ by $Author: brian $
+% Last Modified $Date: 2007/01/03 14:53:53 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -82,7 +82,7 @@ This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -128,7 +128,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2006  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2001-2007  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -412,6 +412,9 @@ package.
 @smallexample
 
 $Log: strtty.texi,v $
+Revision 0.9.2.9  2007/01/03 14:53:53  brian
+- documentation updates for release
+
 Revision 0.9.2.8  2006/12/31 13:52:30  brian
 - updated documentation for release
 
@@ -1086,8 +1089,28 @@ maybe even @samp{--include
 @node Manual Pages
 @subsection Manual Pages
 
-The @command{@value{PACKAGE}-@value{VERSION}} package installs a number of manual pages.  The number
-of manual pages installed totals several hundred manual pages.
+The @command{@value{PACKAGE}-@value{VERSION}} package installs the following manual pages in the
+@file{/@-usr/@-share/@-man/} subdirectory:
+
+@multitable @columnfractions .30 .70
+
+@item @manref{grantpt(3tty)} -- @tab grant access to a slave pseudo-terminal device.
+@item @manref{ptsname(3tty)} -- @tab get name of the slave pseudo-terminal device.
+@item @manref{unlockpt(3tty)} -- @tab unlock a slave pseudo-terminal device.
+@item @manref{ldterm(4)} -- @tab Line Discipline for Terminals.
+@item @manref{pckt(4)} -- @tab Packet Mode module.
+@item @manref{ptc(4)} -- @tab Pseudo-Terminal Master and Slave drivers.
+@item @manref{ptem(4)} -- @tab Pseudo-Terminal Emulation module.
+@item @manref{ptm(4)} -- @tab Pseudo-Terminal Master and Slave drivers.
+@item @manref{ptmx(4tty)} -- @tab Pseudo-Terminal Master and Slave drivers.
+@item @manref{pts(4tty)} -- @tab Pseudo-Terminal Master and Slave drivers.
+@item @manref{pty(4)} -- @tab Pseudo-Terminal Master and Slave drivers.
+@item @manref{ttcompat(4)} -- @tab TTY Compatibility module.
+@item @manref{strtty(5)} -- @tab @cite{@value{PACKAGE_TITLE}} package.
+@item @manref{strtty_mknod(8)} -- @tab create or remove Terminal device nodes.
+@item @manref{test-tty(8)} -- @tab a test suite executable for @manpage{strtty(5)}.
+
+@end multitable
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
