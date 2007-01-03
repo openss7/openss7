@@ -1,17 +1,34 @@
-OpenSS7 STREAMS Compatibility -- read me first file.  2006-12-29
-$Id: README,v 0.9.2.16 2006/12/31 13:31:45 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+OpenSS7 STREAMS Compatibility -- read me first file.  2007-01-02
+$Id: README,v 0.9.2.17 2007/01/03 14:57:14 brian Exp $
+Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
  OpenSS7 STREAMS Compatibility
 ==============================
 
-The `OpenSS7 STREAMS Compatibility' package includes kernel modules,
-`SVR 4.2' "STREAMS" drivers, modules, libraries, utilities, test
-programs, daemons, and development environment for the development and
-execution of "STREAMS" modules and drivers ported from other operating
-system environments to `Linux Fast-STREAMS'.
+The `OpenSS7 STREAMS Compatibility' package provides the ability for
+`Linux Fast-STREAMS' to exhibit source level compatibility with a wide
+range of `UNIX' "STREAMS" implementations.  Also, it provides `LiS'
+source, and some 2.18.0 binary, compatibility for `Linux Fast-STREAMS'.
+The objective of the package is to provide source level compatibility
+with a wide range of `UNIX' "STREAMS" implementations permitting
+drivers and modules to port easily to `Linux Fast-STREAMS' from any
+other "STREAMS" implementation, making it possible to release drivers
+and modules from a single `UNIX' code base with minimal localisms for
+`Linux'.
+
+This is the fourth separate `OpenSS7 Project' release of the
+`OpenSS7 STREAMS Compatibility' package that was formerly present in
+the `Linux Fast-STREAMS' `streams-0.7a.2' release package.  These
+compatibility modules provide source level compatibility with AIX,
+HPUX, OSF/1, MacOT, Mentat, SUX, Solaris, SUPER/UX, IRIX, LiS,
+UnixWare, UXP/V and SVR 4.2 STREAMS.  The package contains all the
+necessary manual pages and other documentation in an autoconf tarball.
+
+This release is a stable, production grade release for `Linux
+Fast-STREAMS' and is part of the OpenSS7 Master Package
+(`openss7-0.9.2.D').
 
 The package currently includes the following "STREAMS" kernel modules
 and drivers:(1)
@@ -47,46 +64,6 @@ the following "STREAMS" implementations:
      * `Linux Fast-STREAMS 0.9.2'
      * `Mac(R) OS 9 Open Transport'
 
-`os7compat(4)'
-     `OpenSS7 variants'
-
-`svr3compat(4)'
-     `UNIX(R) System V Release 3.2'
-
-`svr4compat(4)'
-     `UNIX(R) System V Release 4.2'
-
-`mpscompat(4)'
-     `MPS(R) Mentat Portable Streams'
-
-`suncompat(4)'
-     `Solaris(R) 9/SunOS(R) 5.9'
-
-`uw7compat(4)'
-     `UnixWare(R) 7.1.3'
-
-`osfcompat(4)'
-     `Digital(R) UNIX (OSF/1.2)'
-
-`aixcompat(4)'
-     `AIX(R) 5L Version 5.1 Portable STREAMS Environment'
-
-`hpuxcompat(4)'
-     `HP-UX(R) 11.0i v2 STREAMS/UX'
-
-`irixcompat(4)'
-     `IRIX(R) 6.5.17'
-
-`liscompat(4)'
-     `Linux STREAMS 2.18.0'
-
-`lfscompat(4)'
-     `Linux Fast-STREAMS 0.9.2'
-
-`maccompat(4)'
-     `Mac(R) OS 9 Open Transport'
-
-
 These compatibility modules compile as kernel modules and will be
 demand loaded into the kernel when used by a specific "STREAMS" module
 or driver.  The compatibility modules ease porting of "STREAMS" modules
@@ -100,7 +77,7 @@ well.
  Release
 --------
 
-This is the `strcompat-0.9.2.4' package, released 2006-12-29.  This
+This is the `strcompat-0.9.2.4' package, released 2007-01-02.  This
 `0.9.2.4' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -355,7 +332,7 @@ in the release directory for more information on filing a proper
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.

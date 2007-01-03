@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.2 2006/10/05 12:15:50 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.3 2007/01/03 14:57:18 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,23 +53,30 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/05 12:15:50 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/03 14:57:18 $ by $Author: brian $
 @c
 @c =========================================================================
 
 Things to do:
 
 @itemize @minus
+
 @item
 Work in streams_interrupt() and STREAMS_TIMEOUT() from IRIX into irixcompat.c.
+
+@emph{*todo*}
 
 @item
 Hey, here's an idea for testing Solaris compatibility: take an OpenSolaris source file for a STREAMS
 driver and compile and test it under Linux with no (or minimal) source code modifications!
 
+@emph{*todo*}
+
 @item
 Write test programs and test suites.  There are really not any test programs or test suites
 available for the OpenSS7 STREAMS Compatibility Modules package as of strcompat-0.9.2.2.
+
+@emph{*todo*}
 
 @item
 Not all compatibility functionality is implemented.  There are a large number of Sun DDI functions
@@ -78,6 +85,11 @@ mechanism is not yet fully implemented and neither is that for AIX.  Also, there
 SVR 4.2 compatible functions that are not directly STREAMS related but are part of the DDI/DKI and
 should be implemented to provide abstraction from Linux internals as well as the ability to link
 binary modules.
+
+@table @emph
+@item *moved*
+(Note that the ability to link binary modules has been moved to is own @file{strbcm} package.)
+@end table
 
 @item
 Linking of binary modules is not yet supported.  This is the place (strcompat) where binary modules
@@ -90,8 +102,20 @@ even be binary compatible with user programs written for 32bit architectures run
 architectures).  For fairly restricted use modules and drivers, a single binary object could run on
 both LiS and LfS.
 
+@table @emph
+@item *moved*
+(Note that the ability to link binary modules has been moved to is own @file{strbcm} package.)
+@end table
+
 @item
 Documentation.  The documentation is trailing a bit.  I have thousands of manual pages written,
 however, some are sparse or incomplete.  Also, the manual and the STREAMS Porting Guide needs a
 bunch of work.
+
+@table @emph
+@item *todo*
+Did a bunch of work on the manual, however, there is still a lot of work on a STREAMS Porting Guide
+to be done.
+@end table
+
 @end itemize

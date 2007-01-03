@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.9 2006/12/29 12:18:28 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.10 2007/01/03 14:57:17 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/12/29 12:18:28 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/03 14:57:17 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -77,7 +77,16 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
+This release is primarily a maintenance release.  Some functionality of the
+package has been tested by its use in other packages and some defects
+corrected.
+This release is a stable production release for @cite{Linux Fast-STREAMS}.
+Support for @cite{LiS} is deprecated as of this release.
+
+The release provides the following enhancements and fixes:
+
 @itemize
+
 @item
 Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode
 diet patchset).
