@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strxns.5.man,v 0.9.2.1 2006/12/31 13:56:11 brian Exp $
+.\" @(#) $Id: strxns.5.man,v 0.9.2.2 2007/01/03 14:50:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/31 13:56:11 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/03 14:50:44 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strxns.5.man,v $
+.\" Revision 0.9.2.2  2007/01/03 14:50:44  brian
+.\" - documentation updates for release
+.\"
 .\" Revision 0.9.2.1  2006/12/31 13:56:11  brian
 .\" - added package manual page
 .\"
@@ -162,66 +165,120 @@ The
 package contains the following manual pages:
 .HP
 .BR XNS (4)\ \-\ 
+OpenSS7 X/Open Networking Services (XNS).
 .PD 0
 .HP
 .BR eth (4)\ \-\ 
+Ethernet data link.
 .HP
 .BR hdlc (4)\ \-\ 
+High-Level Data Link Control.
 .HP
 .BR hdlc_ioctl (4)\ \-\ 
+common IO controls for HDLC devices.
 .HP
 .BR ip2xinet (4)\ \-\ 
+IP
+.I STREAMS
+driver.
 .HP
 .BR ip (4)\ \-\ 
+Internet Protocol.
 .HP
 .BR ipcl (4)\ \-\ 
+.I STREAMS
+Internet Protocol (IP) Driver.
 .HP
 .BR ipco (4)\ \-\ 
+.I STREAMS
+Internet Protocol (IP) Driver.
 .HP
 .BR ip_strm (4)\ \-\ 
+IP
+.I STREAMS
+module.
 .HP
 .BR ip_strm_mod (4)\ \-\ 
+IP
+.I STREAMS
+module.
 .HP
 .BR ip_strms (4)\ \-\ 
+IP
+.I STREAMS
+module.
 .HP
 .BR ip_strms_mod (4)\ \-\ 
+IP
+.I STREAMS
+module.
 .HP
 .BR ip_to_dlpi (4)\ \-\ 
+IP
+.I STREAMS
+driver.
 .HP
 .BR lapb (4)\ \-\ 
+X.25 Link Access Protocol (Balanced).
 .HP
 .BR ldl (4)\ \-\ 
+Linux Data Link (LDL) driver.
 .HP
 .BR link-driver (4)\ \-\ 
+Linux Data Link (LDL) driver.
 .HP
 .BR np (4)\ \-\ 
+.I STREAMS
+Network Provider (NP) driver.
 .HP
 .BR npi_ip (4)\ \-\ 
+.I STREAMS
+NPI Internet Protocol (NPI-IP)
+driver.
 .HP
 .BR np_ip (4)\ \-\ 
+.I STREAMS
+Internet Protocol (IP)
+driver.
 .PD
 .PP
 .HP
 .BR strxns (5)\ \-\ 
+@PACKAGE_TITLE@ package.
 .PP
 .HP
 .BR dlpi_eth (7)\ \-\ 
+Data Link Provider Interface.
 .PD 0
 .HP
 .BR npi_ip (7)\ \-\ 
+Network Provider Interface (NPI) \- Internet Protocol (IP) Corrigendum.
 .PD
 .PP
 .HP
 .BR ldlconfig (8)\ \-\ 
+Linux data link configuration.
 .PD 0
 .HP
 .BR ldltest (8)\ \-\ 
+Linux data link test program.
 .HP
 .BR strxns_mknod (8)\ \-\ 
+create or remove
+.I STREAMS
+XNS device nodes.
 .HP
 .BR test-ip (8)\ \-\ 
+a test suite executable for the
+.BR ip (4)
+.I STREAMS
+driver.
 .HP
 .BR test-np_ip (8)\ \-\ 
+a test suite executable for the
+.BR np_ip (4)
+.I STREAMS
+driver.
 .PD
 .\"
 .SS "CDI Manual Pages"
@@ -232,55 +289,81 @@ package, document the
 .IR "Communications Device Interface (CDI)" :
 .HP
 .BR cdi (7)\ \-\ 
+Communications Device Interface
 .PD 0
 .HP
 .BR CD_ABORT_OUTPUT_REQ (7)\ \-\ 
+abort output.
 .HP
 .BR CD_ALLOW_INPUT_REQ (7)\ \-\ 
+allow input.
 .HP
 .BR CD_ATTACH_REQ (7)\ \-\ 
+attach to a physical point of attachment.
 .HP
 .BR CD_BAD_FRAME_IND (7)\ \-\ 
+frame with error.
 .HP
 .BR CD_DETACH_REQ (7)\ \-\ 
+detach from a physical point of attachment.
 .HP
 .BR CD_DISABLE_CON (7)\ \-\ 
+disable confirmation.
 .HP
 .BR CD_DISABLE_REQ (7)\ \-\ 
+disable a device.
 .HP
 .BR CD_ENABLE_CON (7)\ \-\ 
+enable confirmation.
 .HP
 .BR CD_ENABLE_REQ (7)\ \-\ 
+prepare a device.
 .HP
 .BR CD_ERROR_ACK (7)\ \-\ 
+error acknowledgement.
 .HP
 .BR CD_ERROR_IND (7)\ \-\ 
+error indication.
 .HP
 .BR CD_HALT_INPUT_REQ (7)\ \-\ 
+halt input.
 .HP
 .BR CD_INFO_ACK (7)\ \-\ 
+information acknowledgement.
 .HP
 .BR CD_INFO_REQ (7)\ \-\ 
+information request.
 .HP
 .BR CD_MODEM_SIG_IND (7)\ \-\ 
+report modem signals.
 .HP
 .BR CD_MODEM_SIG_POLL (7)\ \-\ 
+request a
+.BR CD_MODEM_SIG_IND (7).
 .HP
 .BR CD_MODEM_SIG_REQ (7)\ \-\ 
+assert modem signals.
 .HP
 .BR CD_MUX_NAME_REQ (7)\ \-\ 
+get mux name.
 .HP
 .BR CD_OK_ACK (7)\ \-\ 
+success acknowledgement.
 .HP
 .BR CD_READ_REQ (7)\ \-\ 
+wait for input request.
 .HP
 .BR CD_UNITDATA_ACK (7)\ \-\ 
+data send acknowledgement.
 .HP
 .BR CD_UNITDATA_IND (7)\ \-\ 
+data receive indication.
 .HP
 .BR CD_UNITDATA_REQ (7)\ \-\ 
+data send request.
 .HP
 .BR CD_WRITE_READ_REQ (7)\ \-\ 
+write/read request.
 .PD
 .PP
 The package also include a texinfo version manual.
@@ -296,117 +379,236 @@ dlpi revision 2.0.0
 .]
 .HP
 .BR dlpi (7)\ \-\ 
+Data Link Provider Interface
 .PD 0
 .HP
 .BR DL_ATTACH_REQ (7)\ \-\ 
+request the DLS provider associate a physical point of attachment (PPA) with a
+Stream.
 .HP
 .BR DL_BIND_ACK (7)\ \-\ 
+report the successful bind of a DLSAP to a Stream.
 .HP
 .BR DL_BIND_REQ (7)\ \-\ 
+request the DLS provider bind a DLSAP to a Stream.
 .HP
 .BR DL_CONNECT_CON (7)\ \-\ 
+inform the local DLS user that the requested data link connection has been
+established.
 .HP
 .BR DL_CONNECT_IND (7)\ \-\ 
+convey to the local DLS user that a remote (calling) DLS user wishes to
+establish a data link connection.
 .HP
 .BR DL_CONNECT_REQ (7)\ \-\ 
+request the DLS provider establish a data link connection with a remote DLS
+user.
 .HP
 .BR DL_CONNECT_RES (7)\ \-\ 
+direct the DLS provider to accept a connect request from a remote (calling)
+DLS user on a designated Stream.
 .HP
 .BR DL_DATA_ACK_IND (7)\ \-\ 
+convey one DLSDU from the DLS Provider to the DLS User.
 .HP
 .BR DL_DATA_ACK_REQ (7)\ \-\ 
+request passed to the Data Link Provider to request that a DLSDU be sent to a
+peer DLS User using acknowledged connectionless mode data unit transmission
+procedures.
 .HP
 .BR DL_DATA_ACK_STATUS_IND (7)\ \-\ 
+convey the result of the previous associated
+.BR DL_DATA_ACK_REQ (7)
+from the DLS Provider to the DLS User.
 .HP
 .BR DL_DATA_IND (7)\ \-\ 
+convey a DLSDU from the DLS provider to the DLS user.
 .HP
 .BR DL_DATA_REQ (7)\ \-\ 
+convey a complete DLSDU from the DLS user to the DLS provider for transmission
+over the data link connection.
 .HP
 .BR DL_DETACH_REQ (7)\ \-\ 
+for style 2 DLS providers, request the DLS provider detach a physical point of
+attachment (PPA) from a Stream.
 .HP
 .BR DL_DISABMULTI_REQ (7)\ \-\ 
+request the DSL provider to disable specific multicast addresses on a per
+Stream basis.
 .HP
 .BR DL_DISCONNECT_IND (7)\ \-\ 
+inform the DLS user that the data link connectin on this Stream has been
+disconnected.
 .HP
 .BR DL_DISCONNECT_REQ (7)\ \-\ 
+request the DLS provider to disconnect an active data link connection or one
+that was in the process of activation, either outgoing or incoming, as a
+results of an earlier
+.BR DL_CONNECT_IND (7)
+or
+.BR DL_CONNECT_REQ (7).
 .HP
 .BR DL_ENABMULTI_REQ (7)\ \-\ 
+request the DLS provider to enable specific multicast addresses on a per
+Stream basis.
 .HP
 .BR DL_ERROR_ACK (7)\ \-\ 
+inform the DLS user that a previously issued request or response was invalid.
 .HP
 .BR DL_GET_STATISTICS_ACK (7)\ \-\ 
+return statistics in response to the
+.BR DL_GET_STATISTICS_REQ (7).
 .HP
 .BR DL_GET_STATISTICS_REQ (7)\ \-\ 
+directs the DLS provider to return statistics.
 .HP
 .BR DL_INFO_ACK (7)\ \-\ 
+this message is sent in response to
+.BR DL_INFO_REQ (7);
+it conveys information about the DLPI Stream to the DLS user.
 .HP
 .BR DL_INFO_REQ (7)\ \-\ 
+request information of the DLS provider about the DLPI Stream.
 .HP
 .BR DL_OK_ACK (7)\ \-\ 
+acknowledges to the DLS user that a previously issued request primitive was
+successfully received.
 .HP
 .BR DL_PHYS_ADDR_ACK (7)\ \-\ 
+return the value for the physical address to the link user in response to a
+.BR DL_PHYS_ADDR_REQ (7).
 .HP
 .BR DL_PHYS_ADDR_REQ (7)\ \-\ 
+request the DLS provider to return either the default (factory) or the current
+value of the physical address associated with the Stream depending upon the
+value of the address type selected in the request.
 .HP
 .BR DL_PROMISCOFF_REQ (7)\ \-\ 
+request the DLS Provider to disable promiscuous mode on a per Stream basis,
+either at the physical level or at the SAP level.
 .HP
 .BR DL_PROMISCON_REQ (7)\ \-\ 
+request the DLS Provider to enable promiscuous mode on a per Stream basis,
+either at the physical level or at the SAP level.
 .HP
 .BR DL_REPLY_IND (7)\ \-\ 
+service indication primitive for the acknowledged connectionless-mode data
+unit exchange service.
 .HP
 .BR DL_REPLY_REQ (7)\ \-\ 
+pass to the DLS Provider by the DLS User to request that a DLSDU be returned
+from a peer DLS Provider or that DLSDUs be exchanged between stations using
+acknowledged connectionless mode data unit exchange procedures.
 .HP
 .BR DL_REPLY_STATUS_IND (7)\ \-\ 
+this indication primitive is passed from the DLS Provider to the DLS User to
+indicate the success or failure of the previous associated acknowledged
+connectionless mode data unit exhcange request.
 .HP
 .BR DL_REPLY_UPDATE_REQ (7)\ \-\ 
+convey a DLSDU to the DLS Provider from the DLS User to be held by the DLS
+Provider and sent out at a later time when requested to do so by the peer DLS
+Provider.
 .HP
 .BR DL_REPLY_UPDATE_STATUS_IND (7)\ \-\ 
+the service confirmation primitive for the reply data unit preparation
+service.
 .HP
 .BR DL_RESET_CON (7)\ \-\ 
+inform the rest-initiating DLS user that the reset has completed.
 .HP
 .BR DL_RESET_IND (7)\ \-\ 
+inform the DLS user that either the remote DLS user is resynchronizing the
+data link connection, or the DLS provider is reporting loss of data for which
+it cannot recover.
 .HP
 .BR DL_RESET_REQ (7)\ \-\ 
+request that the DLS provider initiate the resynchronization of a data link
+connection.
 .HP
 .BR DL_RESET_RES (7)\ \-\ 
+direct the DLS provider to complete resynchronizing the data link connection.
 .HP
 .BR DL_SET_PHYS_ADDR_REQ (7)\ \-\ 
+sets the physical address value for Streams for that provider for a particular
+PPA.
 .HP
 .BR DL_SUBS_BIND_ACK (7)\ \-\ 
+report the successful bind of a subsequent DLSAP to a Stream, and return the
+bound DLSAP address to the DLS user.
+to a
+.BR DL_SUBS_BIND_REQ (7).
 .HP
 .BR DL_SUBS_BIND_REQ (7)\ \-\ 
+request the DLS provider bind a subsequent DLSAP to the Stream.
 .HP
 .BR DL_SUBS_UNBIND_REQ (7)\ \-\ 
+request the DLS Provider to unbind the DLSAP that had been bound by a previous
+.BR DL_SUBS_BIND_REQ (7)
+from this Stream.
 .HP
 .BR DL_TEST_CON (7)\ \-\ 
+convery the TEST response DLSDU from the DLS Provider to the DLS User in
+response to a
+.BR DL_TEST_REQ (7).
 .HP
 .BR DL_TEST_IND (7)\ \-\ 
+convery the TEST response/indication DLSDU frm the DLS Provider to the DLS
+User.
 .HP
 .BR DL_TEST_REQ (7)\ \-\ 
+convey one TEST command DLSDU from the DLS User to the DLS Provider for
+transmission to a peer DLS Provider.
 .HP
 .BR DL_TEST_RES (7)\ \-\ 
+convey the TEST response DLSDU from the DLS User to the DLS Provider in
+response to a
+.BR DL_TEST_IND (7).
 .HP
 .BR DL_TOKEN_ACK (7)\ \-\ 
+message sent in response to
+.BR DL_TOKEN_REQ (7);
+it conveys the connection response token assigned to the Stream.
 .HP
 .BR DL_TOKEN_REQ (7)\ \-\ 
+request that a connection response token be assigned to the Stream and
+returned to the DLS user.
 .HP
 .BR DL_UDERROR_IND (7)\ \-\ 
+inform the DLS user that a previously sent
+.BR DL_UNITDATA_REQ (7)
+produced an error or could not be delivered.
 .HP
 .BR DL_UDQOS_REQ (7)\ \-\ 
+request the DLS provider to apply the specified quality of service paramter
+values to subsequent data unit transmissions.
 .HP
 .BR DL_UNBIND_REQ (7)\ \-\ 
+request the DLS provider to unbind the DLSAP that had been bound by a previous
+.BR DL_BIND_REQ (7)
+from this Stream.
 .HP
 .BR DL_UNITDATA_IND (7)\ \-\ 
+convey one DLSDU from the DLS provider to the DLS user.
 .HP
 .BR DL_UNITDATA_REQ (7)\ \-\ 
+convey one DLSDU from the DLS user to the DLS provider for transmission to a
+peer DLS user.
 .HP
 .BR DL_XID_CON (7)\ \-\ 
+convey an XID DLSDU from the DLS Provider to the DLS User in response to a
+.BR DL_XID_REQ (7).
 .HP
 .BR DL_XID_IND (7)\ \-\ 
+convey an XID DLSDU from the DLS Provider to the DLS User.
 .HP
 .BR DL_XID_REQ (7)\ \-\ 
+convey one XID DLSDU from the DLS User to the DLS Provider for transmission to
+a peer DLS User.
 .HP
 .BR DL_XID_RES (7)\ \-\ 
+convey an XID DLSDU from the DLS User to the DSL Provider in response to a
+.BR DL_XID_IND (7).
 .PD
 .PP
 The package also include a texinfo version of the original PostScript manual.
@@ -422,65 +624,93 @@ npi revision 2.0.0
 .]
 .HP
 .BR npi (7)\ \-\ 
+Network Provider Interface
 .PD 0
 .HP
 .BR N_BIND_ACK (7)\ \-\ 
+bind protocol address acknowledgement.
 .HP
 .BR N_BIND_REQ (7)\ \-\ 
+bind protocol address request.
 .HP
 .BR N_CONN_CON (7)\ \-\ 
+network connection confirm.
 .HP
 .BR N_CONN_IND (7)\ \-\ 
+network connection indication.
 .HP
 .BR N_CONN_REQ (7)\ \-\ 
+network connection request.
 .HP
 .BR N_CONN_RES (7)\ \-\ 
+network connection response.
 .HP
 .BR N_DATACK_IND (7)\ \-\ 
+data acknowlegement indication.
 .HP
 .BR N_DATACK_REQ (7)\ \-\ 
+data acknowledgment request.
 .HP
 .BR N_DATA_IND (7)\ \-\ 
+normal data transfer indication.
 .HP
 .BR N_DATA_REQ (7)\ \-\ 
+normal data transfer request.
 .HP
 .BR N_DISCON_IND (7)\ \-\ 
+disconnect indication.
 .HP
 .BR N_DISCON_REQ (7)\ \-\ 
+disconnect request.
 .HP
 .BR N_ERROR_ACK (7)\ \-\ 
+error acknowlegement.
 .HP
 .BR N_EXDATA_IND (7)\ \-\ 
+expedited data transfer indication.
 .HP
 .BR N_EXDATA_REQ (7)\ \-\ 
+expedited data transfer request.
 .HP
 .BR N_INFO_ACK (7)\ \-\ 
+network information acknowledgement.
 .HP
 .BR N_INFO_REQ (7)\ \-\ 
+network information request.
 .HP
 .BR N_OK_ACK (7)\ \-\ 
+successful receipt acknowlegdement.
 .HP
 .BR N_OPTMGMT_REQ (7)\ \-\ 
+network options management request.
 .HP
 .BR N_RESET_CON (7)\ \-\ 
+reset confirmation.
 .HP
 .BR N_RESET_IND (7)\ \-\ 
+reset indication.
 .HP
 .BR N_RESET_REQ (7)\ \-\ 
+reset request.
 .HP
 .BR N_RESET_RES (7)\ \-\ 
-.HP
-.BR N_TOKEN_ACK (7)\ \-\ 
-.HP
-.BR N_TOKEN_REQ (7)\ \-\ 
+reset response.
+.\".HP
+.\".BR N_TOKEN_ACK (7)\ \-\ 
+.\".HP
+.\".BR N_TOKEN_REQ (7)\ \-\ 
 .HP
 .BR N_UDERROR_IND (7)\ \-\ 
+unitdata error indication.
 .HP
 .BR N_UNBIND_REQ (7)\ \-\ 
+unbind protocol address request.
 .HP
 .BR N_UNITDATA_IND (7)\ \-\ 
+unit data indication.
 .HP
 .BR N_UNITDATA_REQ (7)\ \-\ 
+unit data request.
 .PD
 .PP
 The package also include a texinfo version of the original PostScript manual.

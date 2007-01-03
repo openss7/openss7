@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.4 2006/12/31 13:57:44 brian Exp $
+@c @(#) $Id: tree.texi,v 0.9.2.5 2007/01/03 14:50:45 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/12/31 13:57:44 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/03 14:50:45 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: tree.texi,v $
+@c Revision 0.9.2.5  2007/01/03 14:50:45  brian
+@c - documentation updates for release
+@c
 @c Revision 0.9.2.4  2006/12/31 13:57:44  brian
 @c - updated documentation for release
 @c
