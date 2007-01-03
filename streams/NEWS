@@ -1,6 +1,6 @@
-Linux Fast-STREAMS -- history of user visible changes.  2006-12-29
-$Id: NEWS,v 0.9.2.38 2006/12/31 13:26:30 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Linux Fast-STREAMS -- history of user visible changes.  2007-01-02
+$Id: NEWS,v 0.9.2.39 2007/01/03 14:55:56 brian Exp $
+Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
@@ -9,6 +9,9 @@ The sections that follow provide information on OpenSS7 releases of the
 
  Major changes for release streams-0.9.2.1
 ------------------------------------------
+
+   * The release is now considered _production_ grade by the `OpenSS7
+     Project'.
 
    * Testing of, and a few bug corrections to, the strlog() feature.
      Trace and error logging working well.
@@ -283,7 +286,7 @@ This was an internal alpha test release and was not released publicly.
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.

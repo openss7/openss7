@@ -1,3 +1,13 @@
+2007-01-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: documentation updates for release
+	* NEWS: documentation updates for release
+	* README: documentation updates for release
+	* README-LiS: documentation updates for release
+	* README-cvs: documentation updates for release
+	* THANKS: documentation updates for release
+	* doc/man/man5/streams.5.man: documentation updates for release
+
 2007-01-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: set --enable-streams-bcm to default to disabled.
