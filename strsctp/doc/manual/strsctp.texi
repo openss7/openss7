@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strsctp.texi,v 0.9.2.23 2006/10/19 12:52:09 brian Exp $
+% @(#) $Id: strsctp.texi,v 0.9.2.24 2007/01/03 14:18:06 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2007  OpenSS7 Corporation <www.openss7.com>
 % Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/10/19 12:52:09 $ by $Author: brian $
+% Last Modified $Date: 2007/01/03 14:18:06 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -82,7 +82,7 @@ This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -128,7 +128,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2006  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2001-2007  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -219,6 +219,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Introduction::		Introduction to the package
 * Objective::			Objective of the package
 * Reference::			Contents of the package
+* Development::			Developing with the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
@@ -256,12 +257,21 @@ Reference
 * Modules::			Modules included in the package
 * Libraries::			Libraries included in the package
 * Utilities::			Utilities included in the package
-* Development::			Development against the package
+
+Development
+
+* Development Header Files::	Header Files in the package
+* Static and Shared Libraries::	Libraries in the package
+* Kernel Module Development::	Kernel development with the package
+* Manual Pages::		Manual Pages in the package
 
 Conformance
 
-* STREAMS Compatibility::	Compatibility with other STREAMS packages
-* Porting::			Porting to this STREAMS package
+* NPI Interface Conformance::	    Conformance to the NPI.
+* TPI Interface Conformance::	    Conformance to the TPI.
+* XTI Interface Conformance::	    Conformance to the XTI.
+* IETF Conformance::		    Conformance to IETF
+* ETSI Conformance::		    Conformance to ETSI
 
 Releases
 
@@ -403,6 +413,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strsctp.texi,v $
+Revision 0.9.2.24  2007/01/03 14:18:06  brian
+- updated documentation for release
+
 Revision 0.9.2.23  2006/10/19 12:52:09  brian
 - added ETSI TS 102 144 PICS
 
@@ -621,9 +634,11 @@ the @cite{@value{PACKAGE_TITLE}} package.
 The @value{PACKAGE_TITLE} package is
 an implementation of the Stream Transmission Control Protocol (SCTP) for Linux as described in RFC 2960 and subsequent RFCs,
 that can be used with
-@cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}
+@cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}.
+@ignore
 or
 @cite{Linux STREAMS}@footnote{@xref{Top, Linux STREAMS (LiS), About This Manual, LiS, Linux STREAMS (LiS) Reference Manual}.}.
+@end ignore
 It includes development tools, header files and manual pages for
 @value{PACKAGE_TITLE}.
 
@@ -638,6 +653,7 @@ This manual is organized (loosely) into several sections as follows:
   Introduction::		This introduction
 * Objective::			Objective of the package
 * Reference::			Contents of the package
+* Development::			Developing with the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
@@ -652,6 +668,8 @@ This manual is organized (loosely) into several sections as follows:
 @tab Objective of the package
 @item @ref{Reference}.
 @tab Contents of the package
+@item @ref{Development}.
+@tab Developing with the package
 @item @ref{Conformance}.
 @tab Conformance of the package
 @item @ref{Releases}.
@@ -670,6 +688,8 @@ This manual is organized (loosely) into several sections as follows:
 @tab Objective of the package
 @item @cite{Reference}.
 @tab Contents of the package
+@item @cite{Development}.
+@tab Developing with the package
 @item @cite{Conformance}.
 @tab Conformance of the package
 @item @cite{Releases}.
@@ -708,7 +728,6 @@ This manual uses @cite{texinfo} typographic conventions.
 * Modules::			Modules included in the package
 * Libraries::			Libraries included in the package
 * Utilities::			Utilities included in the package
-* Development::			Development against the package
 @end menu
 
 @c ----------------------------------------------------------------------------
@@ -727,8 +746,7 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Drivers
 @cindex drivers
 
-The @samp{@value{PACKAGE_TARNAME}} package
-builds and installs the following @cite{STREAMS} drivers:
+The @cite{@value{PACKAGE_TITLE}} package provides the following @dfn{STREAMS} drivers:
 
 @table @file
 @item streams-sctp
@@ -737,7 +755,6 @@ This is the primary @cite{STREAMS} psuedo-device driver that implements the Stre
 Tramission Protocol (SCTP) described in RFC 2960 and RFC 4460.
 @end table
 
-
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -745,8 +762,7 @@ Tramission Protocol (SCTP) described in RFC 2960 and RFC 4460.
 @section Modules
 @cindex modules
 
-The @samp{@value{PACKAGE_TARNAME}} package
-builds and installs the following @cite{STREAMS} modules:
+The @cite{@value{PACKAGE_TITLE}} package provides the following @dfn{STREAMS} modules:
 
 @table @file
 @item streams-tpiperf
@@ -754,7 +770,7 @@ builds and installs the following @cite{STREAMS} modules:
 This @cite{STREAMS} module is primarily for performance testing of the TPI interface of the
 @file{streams-sctp} driver.@footnote{Because this modules does not depend upon SCTP and can be used
 for performance testing of any TPI driver, this module will later be moved into the @samp{strxnet}
-package and may no longer be present in the current version of @samp{@value{PACKAGE_TARNAME}}.}
+package and may no longer be present in the current version of @samp{@value{PACKAGE}}.}
 @end table
 
 @c ----------------------------------------------------------------------------
@@ -764,6 +780,9 @@ package and may no longer be present in the current version of @samp{@value{PACK
 @section Libraries
 @cindex libraries
 
+The @cite{@value{PACKAGE_TITLE}} package provides the following shared object and static libraries:
+
+The @cite{@value{PACKAGE_TITLE}} package does not currently provide any libraries.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -772,55 +791,95 @@ package and may no longer be present in the current version of @samp{@value{PACK
 @section Utilities
 @cindex utilities
 
-The @samp{@value{PACKAGE_TARNAME}} package
+@subsection Init Scripts
+
+Following are System V Init Scripts that are installed by the package:
+
+@table @asis
+
+@item @manpage{@value{PACKAGE}(8)} (@file{/etc/init.d/@value{PACKAGE}})
+@pgindex @value{PACKAGE}
+@pgindex /etc/init.d/@value{PACKAGE}
+@itemx @manpage{@value{PACKAGE}.sh(8)} (@file{/etc/init.d/@value{PACKAGE}.sh})
+@pgindex @value{PACKAGE}.sh
+@pgindex /etc/init.d/@value{PACKAGE}.sh
+
+System V Init Script for the @dfn{SCTP} Subsystem.
+The @manpage{@value{PACKAGE}(8)} init script provides the ability to initialize, configure and mount the
+@dfn{SCTP} subsystem, @manpage{strxnet(5)}.
+The @manpage{@value{PACKAGE}(8)} script provides the RedHat-style init script, whereas the
+@manpage{@value{PACKAGE}.sh(8)} script provides the Debian-style init script.
+
+See @manref{@value{PACKAGE}(8)} for more information.
+
+@end table
+
+@subsection Administrative Utilities
+
+Following are user utilities for manipulating @dfn{INET}:
+
+The @cite{@value{PACKAGE_TITLE}} package
 builds and installs the following utilities:
 
 @table @command
-@item @value{PACKAGE_TARNAME}_mknod
+@item @value{PACKAGE}_mknod
 This is a C-language program that can be used by startup scripts to create device nodes for the
-@samp{@value{PACKAGE_TARNAME}} package.  This utility is normally installed in the @file{/usr/sbin}
+@samp{@value{PACKAGE}} package.  This utility is normally installed in the @file{/usr/sbin}
 directory.
-See @manref{@value{PACKAGE_TARNAME}_mknod(8)} for more information.
-@item @value{PACKAGE_TARNAME}
+See @manref{@value{PACKAGE}_mknod(8)} for more information.
+@item @value{PACKAGE}
 This is a @cite{RedHat}-style System V init script that is installed and used to start and stop the
-@samp{@value{PACKAGE_TARNAME}} package.  Starting consists of creating SCTP device nodes using
-@command{@value{PACKAGE_TARNAME}_mknod} and installing the @file{streams-sctp} and
+@samp{@value{PACKAGE}} package.  Starting consists of creating SCTP device nodes using
+@command{@value{PACKAGE}_mknod} and installing the @file{streams-sctp} and
 @file{streams-tpiperf} modules in the running kernel.  This init script is normally installed in the
 @file{/etc/init.d} directory.
-@item @value{PACKAGE_TARNAME}.sh
+@item @value{PACKAGE}.sh
 This is a @cite{Debian}-style System V init script that is installed and used to start and stop the
-@samp{@value{PACKAGE_TARNAME}} package in a similar fashion to the @command{@value{PACKAGE_TARNAME}}
+@samp{@value{PACKAGE}} package in a similar fashion to the @command{@value{PACKAGE}}
 script, but in the @cite{Debian} style.  This init script is normally installed in the
 @file{/etc/rc.d/init.d} directory.
 @end table
 
-The @samp{@value{PACKAGE_TARNAME}} package
+@subsection Performance Test Programs
+
+Following are performance test programs:
+
+The @cite{@value{PACKAGE_TITLE}} package does not yet contain any performance programs.  For
+performance testing of various transport providers, see the @file{netperf-@value{VERSION_NETPERF}}
+package.
+
+@subsection Conformance Test Programs
+
+Following are conformance and validation test programs included in the package:
+
+
+The @cite{@value{PACKAGE_TITLE}} package
 builds and installs the following test programs:
 
 @table @command
 @item test-etsi_n
 @pgindex test-etsi_n
-This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE}}.
 For more information on the @command{test-etsi_n} test program, see @manref{test-etsi_n(8)}.
 @item test-etsi_t
 @pgindex test-etsi_t
-This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE}}.
 For more information on the @command{test-etsi_t} test program, see @manref{test-etsi_t(8)}.
 @item test-sctp
 @pgindex test-sctp
-This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE}}.
 For more information on the @command{test-sctp} test program, see @manref{test-sctp(8)}.
 @item test-sctp_n
 @pgindex test-sctp_n
-This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE}}.
 For more information on the @command{test-sctp_n} test program, see @manref{test-sctp_n(8)}.
 @item test-sctp_n2
 @pgindex test-sctp_n2
-This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE}}.
 For more information on the @command{test-sctp_n2} test program, see @manref{test-sctp_n2(8)}.
 @item test-sctp_t
 @pgindex test-sctp_t
-This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE}}.
 For more information on the @command{test-sctp_t} test program, see @manref{test-sctp_t(8)}.
 @item test-interop
 @pgindex test-interop
@@ -830,33 +889,155 @@ against other implementations.  This test program was used in the 2006 SCTP Inte
 University of British Columbia in July/August 2006.  This program is provided for historical
 purposes.
 
-This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE}}.
 For more information on the @command{test-interop} test program, see @manref{test-interop(8)}.
 @item testsuite
 @pgindex testsuite
 When executed, this @command{bash} script executes test cases from the above test programs to form a
 complete testsuite of the SCTP implementation.
 
-This test script normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+This test script normally installs in directory @file{/usr/libexec/@value{PACKAGE}}.
 @item test-sctp_nc
 @pgindex test-sctp_nc
-This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE}}.
 For more information on the @command{test-sctp_nc} test program, see @manref{test-sctp_nc(8)}.
 @item test-sctp_ns
 @pgindex test-sctp_ns
-This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE_TARNAME}}.
+This test program normally installs in directory @file{/usr/libexec/@value{PACKAGE}}.
 For more information on the @command{test-sctp_ns} test program, see @manref{test-sctp_ns(8)}.
 @end table
+
+For more information on the use of the problem reporting scripts, see @refman{Generating Problem
+Reports}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
 @node Development
-@section Development
+@chapter Development
 @cindex developing
+
+@cite{@value{PACKAGE_TITLE}} provides all of the header files, shared object and static libraries,
+manual pages and documentation necessary for the development of both user space applications
+programs and kernel space @dfn{STREAMS} modules and drivers based on the package.  The sections that
+follow describe these development facilities.
+
+@menu
+* Development Header Files::
+* Static and Shared Libraries::
+* Kernel Module Development::
+* Manual Pages::
+@end menu
+
+@node Development Header Files::
+@section Header Files
+
+Header files are installed, typically, in the @file{/usr/include/@value{PACKAGE}/} subdirectory.  To
+use the header files from the package, @samp{-I/usr/include/@value{PACKAGE}} must be included in the
+@command{gcc} command line as a preprocessor option.
+
+In general, @samp{-I} include preprocessor directives on the @command{gcc} command line should be
+ordered in the reverse order of the dependencies between packages.  So, for example, if the include
+files from all add-on packages are required, the order of these directives would be:
+@samp{-I/usr/include/@value{PACKAGE}}
+@samp{-I/usr/include/strxns}
+@samp{-I/usr/include/strcompat}
+@samp{-I/usr/include/streams}.
+
+Following are the user visible header files provided by the @file{@value{PACKAGE}-@value{VERSION}}
+package in the directory @file{/usr/include/@value{PACKAGE}}:
+
+@table @file
+
+
+@end table
+
+@subsection User Space Programs
+
+Typical include files for interacting with Transport providers from user space include the
+@file{xti.h} header file.  Additional header files for interacting with specific drivers or modules
+may also be required.  The @cite{xti.h} header file is for interacting with the XTI library.
+
+@subsection Kernel Space Drivers and Modules
+
+Typeical include files for writing @dfn{STREAMS} module and drivers implementing transport providers
+in kernels space include @cite{xti.h} and @cite{xti_sctp.h}.  The header files provide access to
+definitions for the TPI interface and additional XTI definitions for use by @dfn{STREAMS} drivers
+and modules.  Additional header files for interacting with specific drivers or modules may also be
+required.
+
+Aside from including this header files, the general procedures for compiling @dfn{STREAMS} modules
+and drivers also apply to @dfn{STREAMS} modules and drivers written to the Transport Provider
+Interface.
+
+@node Static and Shared Libraries
+@section Libraries
+
+Shared or static version of the @cite{libxnet} library may be linked when using the
+@file{@value{PACKAGE}-@value{VERSION}} package.@footnote{Note that the @file{libxnet} library is
+now provided by the @file{strxnet-@value{VERSION_STRXNET}} package.} The library may either be
+specified on the @command{gcc} command line as a shared library (e.g. @samp{-lxnet}) or as a static
+library (e.g.  @samp{/usr/lib/libxnet.a}).
+
+If the shared object library is linked, include the following options on the @command{gcc} command
+line:
+
+@table @samp
+
+@item -lxnet
+Link to the @file{/usr/lib/libxnet.so} shared library.
+
+@end table
+
+If the static library is linked, include the following options on the @command{gcc} command line:
+
+@table @samp
+
+@item /usr/lib/libxnet.a
+Link to the @file{/usr/lib/libxnet.a} static library.
+
+@end table
+
+@node Kernel Module Development
+@section Kernel Modules
+
+Developing TPI kernel modules is similar to user space programs with regard to header files.
+@file{/usr/include/strxnet} should be placed as an include directory to search on the @command{gcc}
+command line.  The rules for compiling @cite{Linux} kernel modules and the rules for compiling
+@dfn{STREAMS} modules and drivers should be followed.  In particular, several important intricacies
+should be considered:
+
+@itemize @bullet
+
+@item The @command{gcc} compiler used to compile the kernel modules must be the same version of
+compiler that was used to compile the kernel and @dfn{STREAMS} base package.
+
+@item The @command{gcc} command line must have the same compile flags that were used to compile the
+kernel and @dfn{STREAMS} base package.  @command{kbuild} can be used to accomplish this.
+
+@item The @command{gcc} command line must define several important kernel defines including
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.  Again, @command{kbuild}
+can be used to accomplish this.
+
+@item The @command{gcc} command line must include several important files directly on the command
+line, such as, @samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-autoconf.h} and
+@samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-modversions.h}.@footnote{The
+kernel version, @samp{@value{_kversion}}, is just an example.  For the running kernel, use the
+output of @samp{uname -r}.}
+
+@end itemize
+
+@node Manual Pages
+@section Manual Pages
 
 To assist in the development of user programs and @cite{STREAMS} driver or modules using the Stream
 Control Tramsmission Control (SCTP) protocol module, the following manual pages are provided:
+
+The @file{@value{PACKAGE}-@value{VERSION}} package installs a number of manual pages in the
+@file{/usr/share/man} directory as follows:
+
+The following manual pages are installed in Section 3 of the manual (in the subdirectory
+@file{/usr/share/man/man3}):
 
 @table @manref
 @item npi_sctp(7)
@@ -1141,6 +1322,7 @@ Supports the complete range of IP MTU sizes.
 @cindex troubleshooting
 
 @include texi/testsuite.texi
+
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

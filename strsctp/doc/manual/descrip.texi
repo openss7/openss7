@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.2 2006/10/05 12:19:50 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.3 2007/01/03 14:18:06 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,14 +53,44 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/05 12:19:50 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/03 14:18:06 $ by $Author: brian $
 @c
 @c =========================================================================
+
+@cite{@value{PACKAGE_TITLE}} (@file{@value{PACKAGE}}) is an @cite{OpenSS7 Project} implementation of
+Stream Control Transmission Protocol (SCTP - RFC 2960) for @cite{Linux Fast-STREAMS}.  It is based
+on the same protocol engine core as the OpenSS7 Linux Native (Sockets) version of OpenSS7 SCTP.
+
+This release is another separate release of the @cite{@value{PACKAGE_TITLE}} package that was
+formerly present in the @file{strss7} package.  The networking driver (@file{streams_sctp.ko}) is
+provided, as well as NPI, TPI and XTI header files for SCTP operation.  The package contains the
+necessary manual pages and other documentation for SCTP components in a separate autoconf tarball.
+This release is a stable, production grade release for @cite{Linux Fast-STREAMS} and is part of the
+OpenSS7 Master Package (@file{openss7-@value{VERSION_OPENSS7}}).
+
+The package currently includes the following @dfn{STREAMS} kernel modules and drivers:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @file{streams_sctp.ko} @file{/dev/sctp_n} @file{/dev/sctp_t}
+@item @tab @minus{} @file{streams_tpiperf.ko} @dfn{tpiperf}
+@end multitable
+
+@table @manref
+@item sctp(4)
+The @manpage{sctp(4)} @dfn{STREAMS} driver is the primary @dfn{STREAMS} pseudo-device driver that
+implements the Stream Control Transmission Protocol (SCTP) described in RFC 2960 and RFC 4460.
+
+@item tpiperf(4)
+The @manpage{tpiperf(4)} @dfn{STREAMS} module contians the TPI performance test module.  This
+@dfn{STREAMS} module is primarily for performance testing of the TPI interface of the
+@manpage{sctp(4)} driver.
+
+@end table
 
 The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR 4.2} @dfn{STREAMS}
 drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
 development and execution of @cite{Stream Control Transmission Protocol (SCTP)} protocol stack
-components and applications for the @cite{Linux (Fast-)STREAMS} environment.
+components and applications for the @cite{Linux Fast-STREAMS} environment.
 	
 This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targeted
 at @cite{ix86}, @cite{x86_64}, @cite{ppc} and @cite{ppc64} architectures, but should build and

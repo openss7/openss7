@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.30 2006/10/21 11:42:21 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.31 2007/01/03 14:18:06 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/21 11:42:21 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/03 14:18:06 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -326,6 +326,7 @@ WARNED.}
 @end ignore
 
 @c This is the defect notice for gammar release software
+@ignore
 @dfn{@value{PACKAGE_TITLE}} could possibly contain unknown defects.  This is a @dfn{gamma} release.
 Some remaining unknown defects could possibly be harmful.  Validation testing has been performed by
 the @cite{OpenSS7 Project} on this software for a set of systems and external validation testing has
@@ -343,9 +344,9 @@ loose all the data on your system.  Because this software stands a chance of cra
 the resulting unstable system could possibly destroy computer hardware or peripherals making them
 unusable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
 WARNED.}
+@end ignore
 
 @c This is the defect notice for production release software
-@ignore
 @dfn{@value{PACKAGE_TITLE}} could possibly contain unknown defects.  This is a @dfn{production}
 release.  Nevertheless, some remaining unknown defects could possibly be harmful.  Validation
 testing has been performed by the @cite{OpenSS7 Project} and external entities on this software for
@@ -363,7 +364,6 @@ problem.  You can possibly loose all the data on your system.  Because this soft
 of crashing your kernel, the resulting unstable system could possibly destroy computer hardware or
 peripherals making them unusable.  You might void the warranty on any system on which you run this
 software.  YOU HAVE BEEN WARNED.}
-@end ignore
 
 @c This is the defect notice for unstable release software
 @ignore

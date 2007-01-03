@@ -1,17 +1,49 @@
-OpenSS7 STREAMS SCTP -- read me first file.  2006-12-29
-$Id: README,v 0.9.2.18 2006/12/31 13:49:52 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+OpenSS7 STREAMS SCTP -- read me first file.  2007-01-02
+$Id: README,v 0.9.2.19 2007/01/03 14:18:05 brian Exp $
+Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
  OpenSS7 STREAMS SCTP
 =====================
 
+`OpenSS7 STREAMS SCTP' (`strsctp') is an `OpenSS7 Project'
+implementation of Stream Control Transmission Protocol (SCTP - RFC
+2960) for `Linux Fast-STREAMS'.  It is based on the same protocol
+engine core as the OpenSS7 Linux Native (Sockets) version of OpenSS7
+SCTP.
+
+This release is another separate release of the `OpenSS7 STREAMS SCTP'
+package that was formerly present in the `strss7' package.  The
+networking driver (`streams_sctp.ko') is provided, as well as NPI, TPI
+and XTI header files for SCTP operation.  The package contains the
+necessary manual pages and other documentation for SCTP components in a
+separate autoconf tarball.  This release is a stable, production grade
+release for `Linux Fast-STREAMS' and is part of the OpenSS7 Master
+Package (`openss7-0.9.2.D').
+
+The package currently includes the following "STREAMS" kernel modules
+and drivers:
+
+     - `streams_sctp.ko' `/dev/sctp_n' `/dev/sctp_t'
+     - `streams_tpiperf.ko' "tpiperf"
+
+`sctp(4)'
+     The `sctp(4)' "STREAMS" driver is the primary "STREAMS"
+     pseudo-device driver that implements the Stream Control
+     Transmission Protocol (SCTP) described in RFC 2960 and RFC 4460.
+
+`tpiperf(4)'
+     The `tpiperf(4)' "STREAMS" module contians the TPI performance
+     test module.  This "STREAMS" module is primarily for performance
+     testing of the TPI interface of the `sctp(4)' driver.
+
+
 The `OpenSS7 STREAMS SCTP' package includes kernel modules, `SVR 4.2'
 "STREAMS" drivers, modules, libraries, utilities, test programs,
 daemons, and development environment for the development and execution
 of `Stream Control Transmission Protocol (SCTP)' protocol stack
-components and applications for the `Linux (Fast-)STREAMS' environment.
+components and applications for the `Linux Fast-STREAMS' environment.
 
 This distribution is only currently applicable to `Linux' 2.4 and 2.6
 kernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'
@@ -21,7 +53,7 @@ well.
  Release
 --------
 
-This is the `strsctp-0.9.2.6' package, released 2006-12-29.  This
+This is the `strsctp-0.9.2.6' package, released 2007-01-02.  This
 `0.9.2.6' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -283,7 +315,7 @@ in the release directory for more information on filing a proper
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.

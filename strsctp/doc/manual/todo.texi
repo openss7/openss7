@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.3 2006/10/16 00:14:37 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.4 2007/01/03 14:18:06 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,21 +53,23 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/16 00:14:37 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/03 14:18:06 $ by $Author: brian $
 @c
 @c =========================================================================
 
 Things to do:
 
-@itemize @bullet
+@itemize @minus
 @item
 The strsctp package is quite stable and mature as of strsctp-0.9.2.2 and most of the things that
 remain to be done are rigorous conformance and performance testing.
-@end itemize
 
-@itemize @minus
+@emph{*todo*}
+
 @item
 Move the tpiperf(4) module to the strxnet package and rename it tiperf(4).
+
+@emph{*todo*}
 
 @item
 Implement pseudo-connectionless modes in sctp(4) driver.  Document use of pseudo-connectionless
@@ -83,11 +85,19 @@ Note that this is also very applicable to SCTP protocol classes 2 and 3 and BSSA
 Perhaps the first proper step for this is to rewrite t_sndudata(3), t_sndvudate(3), t_rcvudata(3),
 and t_rcvvudata(3) handle T_OPTDATA_REQ(7) and T_OPTDATA_IND(7) primitives when in T_COTS mode.
 
+@emph{*todo*}
+
 @item
-Work recent SCTP I-G changes into the code.
+Work recent SCTP I-G changes into the code.  Many of the I-G changes over the years have been
+implemented int the code, however, some of the more recent changes that made it into RFC 4460 have
+not yet been added.  This is an ongoing process.
+
+@emph{*todo*}
 
 @item
 Writing new IP-packet-level conformance test suites.
+
+@emph{*todo*}
 
 @item
 It would also be an idea to make the STREAMS SCTP Driver able to be pushed as a module over a
@@ -97,12 +107,18 @@ possible to closely control the timing of arriving packets on a STREAMS-based pi
 is such a good idea, I think that I will proceed along the Ferry-Clip lines for testing first and
 only perform the IP packet-level testing later.
 
+@emph{*todo*}
+
 @item
 Retest performance using the OpenSS7 Modified Netperf package.
+
+@emph{*todo*}
 
 @item
 Perform profiling and use the hot text techniques from Linux Fast-STREAMS to make the package run
 even faster.
+
+@emph{*todo*}
 @end itemize
 
 @itemize @bullet
@@ -110,27 +126,34 @@ even faster.
 SCTP Interoperability testing.  Take the STREAMS package to the SCTP Interop tests at UBC and
 perform interoperability testing.
 
-@emph{*Complete*}
+@table @emph
+@item *done*
   
 Tested perfect against all functional implementations present.  Passed 720 Mbps compiled with no
 optimizations and debugging assertions turned on.  Still have to go through the logs and collect
 warnings and investigate them.  Still have to complete optimized performance testing.
+@end table
 
 @item
 Testing and Validation using existing test suites.
 
-@emph{*Complete*}
+@table @emph
+@item *done*
 
 Full regression performed.
+@end table
 
 @item
 Complete documentation.  Particularly the npi_sctp(7) and tpi_sctp(7) manual pages.  The xti_sctp
 manual page is fairly complete but needs updating in several places where there are gaps.
 
-@emph{*Complete*}
+@table @emph
+@item *done*
 
 npi_sctp(7) manual page heavily updated and now complete.
 tpi_sctp(7) close to complete, a few options undocumented.
 xti_sctp(3) quite complete, a few options undocumented in a few sections.
+@end table
+
 @end itemize
 
