@@ -1,3 +1,15 @@
+2007-01-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man5/strxns.5.man: documentation updates for release
+	* doc/manual/releases.texi: documentation updates for release
+
+	* src/include/cdiapi.h: added GCOM api files
+	* src/include/dlpiapi.h: added GCOM api files
+	* src/include/npiapi.h: added GCOM api files
+	* src/lib/cdiapi.c: added GCOM api files
+	* src/lib/dlpiapi.c: added GCOM api files
+	* src/lib/npiapi.c: added GCOM api files
+
 2007-01-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: documentation updates for release
