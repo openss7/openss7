@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/22 07:17:33 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/01/05 02:53:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/22 07:17:33 $ by $Author: brian $
+# Last Modified $Date: 2007/01/05 02:53:56 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.5  2007/01/05 02:53:56  brian
+# - updated documentation for release
+#
 # Revision 0.9.2.4  2006/12/22 07:17:33  brian
 # - updated documentation for release (make check target)
 #
@@ -300,7 +303,28 @@ man_MANS = \
 	man7/MX_optmgmt_req.7 \
 	man7/MX_optmgmt_req_t.7 \
 	man8/test-chan.8 \
-	man8/strchan_mknod.8
+	man8/strchan_mknod.8 \
+	man9/zaptel.9 \
+	man9/zt_alarm_notify.9 \
+	man9/zt_dtmf_tone.9 \
+	man9/zt_dynamic_receive.9 \
+	man9/zt_dynamic_register.9 \
+	man9/zt_dynamic_unregister.9 \
+	man9/zt_ec_chunk.9 \
+	man9/zt_ec_span.9 \
+	man9/zt_hooksig.9 \
+	man9/zt_init_tone_state.9 \
+	man9/zt_lboname.9 \
+	man9/zt_qevent_lock.9 \
+	man9/zt_qevent_nolock.9 \
+	man9/zt_rbsbits.9 \
+	man9/zt_receive.9 \
+	man9/zt_register.9 \
+	man9/zt_set_dynamic_ioctl.9 \
+	man9/zt_tone_nextsample.9 \
+	man9/zt_transmit.9 \
+	man9/zt_txtone_nextsample.9 \
+	man9/zt_unregister.9
 
 dist_noinst_MANS = \
 	man4/cd.4.man \
@@ -531,8 +555,28 @@ dist_noinst_MANS = \
 	man7/MX_optmgmt_req.7.man \
 	man7/MX_optmgmt_req_t.7.man \
 	man8/test-chan.8.man \
-	man8/strchan_mknod.8.man
-
+	man8/strchan_mknod.8.man \
+	man9/zaptel.9.man \
+	man9/zt_alarm_notify.9.man \
+	man9/zt_dtmf_tone.9.man \
+	man9/zt_dynamic_receive.9.man \
+	man9/zt_dynamic_register.9.man \
+	man9/zt_dynamic_unregister.9.man \
+	man9/zt_ec_chunk.9.man \
+	man9/zt_ec_span.9.man \
+	man9/zt_hooksig.9.man \
+	man9/zt_init_tone_state.9.man \
+	man9/zt_lboname.9.man \
+	man9/zt_qevent_lock.9.man \
+	man9/zt_qevent_nolock.9.man \
+	man9/zt_rbsbits.9.man \
+	man9/zt_receive.9.man \
+	man9/zt_register.9.man \
+	man9/zt_set_dynamic_ioctl.9.man \
+	man9/zt_tone_nextsample.9.man \
+	man9/zt_transmit.9.man \
+	man9/zt_txtone_nextsample.9.man \
+	man9/zt_unregister.9.man
 
 MANS_UNUSED = \
 	man4/ch.4 \
