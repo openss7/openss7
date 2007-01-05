@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strsctp.5.man,v 0.9.2.1 2006/10/14 06:21:37 brian Exp $
+.\" @(#) $Id: strsctp.5.man,v 0.9.2.2 2007/01/05 06:24:55 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/14 06:21:37 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/05 06:24:55 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strsctp.5.man,v $
+.\" Revision 0.9.2.2  2007/01/05 06:24:55  brian
+.\" - doc updates
+.\"
 .\" Revision 0.9.2.1  2006/10/14 06:21:37  brian
 .\" - updated manual pages for release
 .\"
@@ -77,11 +80,7 @@ sort-adjacent-labels
 .so strsctp.macros
 .\"
 .\"
-.\"
-.\"
 .TH @PACKAGE_UCNAME@ 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
-.\"
-.\"
 .SH NAME
 .B @PACKAGE@
 \- the @PACKAGE_TITLE@ package
@@ -90,19 +89,45 @@ sort-adjacent-labels
 .SH OVERVIEW
 .PP
 This is the
-.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@ - @VERSION@ )
 package for
 .BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
+.PP
+OpenSS7
+.I STREAMS
+add-on packages are separate add-on packages to the
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+release that provide additional functionality and protocol support not traditionally found on UNIX
+systems, or which have traditionally fallen into the domain of value-add system software, or, in
+this case, where the functionality was optional or differently handled in a number of implementations.  The
+.B @PACKAGE_TITLE@
+package is one of several optional add-on packages that provide enhanced
+.I STREAMS
+support beyond that provided by the base
+.I STREAMS
+package.  This package provides support for Stream Control Transmision Protocol based on the
+.IR "Transport Provider Interface (TPI)" ,
+.BR tpi (7),
+not provided by the base
+.I STREAMS
+package.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 The
 .B @PACKAGE_TITLE@
-package providers
+package provides
 .IR STREAMS (9)
-modules and drivers, libraries, programs, init scripts, and daemons that
-implement and provide the Stream Control Transmission Protocol (SCTP).
+modules and drivers, libraries, programs, initialization scripts, and daemons that
+implement and provide
+the Stream Control Transmission Protocol (SCTP).
 .[
 rfc2960
 .]
@@ -110,9 +135,9 @@ rfc2960
 rfc4460
 .]
 .PP
-The package builds an installs the following
+The package currently provides the following
 .IR STREAMS (9)
-kernel modules and drivers:
+modules and drivers:
 .PP
 .TS
 tab(:);
@@ -177,12 +202,16 @@ This library is incomplete.
 The
 .B @PACKAGE_TITLE@
 package includes kernel modules,
-.I SVR 4.2 STEAMS
+.I SVR 4.2
+.[
+svr42
+.]
+.I STREAMS
 drivers, modules, libraries, utilities, test programs, daemons, and
-development environments for the development and execution of
+development environment for the development and execution of
 .B @PACKAGE_TITLE@
 protocol stack components and applications for the
-.I SVR 4.2 STEAMS
+.B Linux Fast-STREAMS
 environment.
 .PP
 This distribution is only currently applicable to
@@ -190,12 +219,18 @@ This distribution is only currently applicable to
 2.4 and 2.6 kernels and was targeted at
 .IR ix86 ", " x86_64 ", " ppc " and " ppc64
 architectures, but should build and install for other architectures as well.
+.PP
+This package is complete and has been in production use for both
+.I LiS
+and
+.I Linux Fast-STREAMS
+for a number of years.
 .\"
 .\"
 .SH "PACKAGE CONTENTS"
 .PP
 The
-.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@ - @VERSION@ )
 package contains the following manual pages:
 .PP
 .TS
@@ -355,6 +390,132 @@ The
 module kernel module.
 .\"
 .\"
+.SH PREREQUISITES
+.PP
+The
+.B @PACKAGE@
+package requires the following packages to be installed:
+.TP
+.BR streams (5)
+The
+.B Linux Fast-STREAMS
+base package.
+.TP
+.BR strcompat (5)
+The
+.B Linux Fast-STREAMS
+compatibility modules package.
+.TP
+.BR strxns (5)
+The
+.B Linux Fast-STREAMS
+X/Open Networking Services package.
+.TP
+.BR strxnet (5)
+The
+.B Linux Fast-STREAMS
+XTI/TLI Library package.
+.TP
+.BR strnsl (5)
+The
+.B Linux Fast-STREAMS
+Network Selection Library package.
+.TP
+.BR strsock (5)
+The
+.B Linux Fast-STREAMS
+Sockets Library package.
+.\"
+.\"
+.SH NOTICES
+.PP
+Although previous release of the
+.B @PACKAGE@
+package were tested with
+.IR LiS ,
+.I LiS
+is now deprecated and this release
+.RB ( @VERSION@ )
+of
+.B @PACKAGE@
+has not been tested with
+.IR LiS .
+.I The OpenSS7 Project
+will no longer support this package for
+.IR LiS :
+please upgrade to
+.BR "Linux Fast-STREAMS" .
+.PP
+.I Production
+releases are releases that have received exhaustive testing within the project
+and validated on specific distributions and architectures.
+.I Production
+release packages do not ship with known defects.  Please rememaber that there
+is
+.B NO WARRANTY
+on public release packages.
+.PP
+.I Production
+packages ship containing a list of validated distributions and architectures.
+Full regression testing of any maintenance changes is performed.  Suitability
+of software in this category for production use on the specified target
+distributions and architectures is at the discretion of the user.  It should
+not be necessary to perform validation tests on the set of supported target
+systems before considering production use.
+.PP
+.B @PACKAGE_TITLE@
+could possibly contain unknown defects.  This is a
+.I production
+release.  Nevertheless, some remaining unknown defects could possibly be
+harmful.  Validation testing has been performed by the
+.I OpenSS7 Project
+and external entities on this software for the set of systems listed in the
+release notes.  Nevertheless, the software might still fail to configure or
+compile on other systems.  The
+.I OpenSS7 Project
+recommends that you validate this software for your target system before using
+this software.  Use at your own risk.  Remember that there is
+.BR "NO WARRANTY" .
+(See the section
+.RI \(lq "NO WARRANTY" \(rq
+under the
+.RI \(lq "GNU General Public License" \(rq,
+in the manual.)
+.PP
+This software is
+.I production
+software.  As such, it is stable on validated systems but might still crash
+your kernel in unique circumstances.  Installation of the software on a
+non-validated distribution might mangle your header files or Linux
+distribution in such a way as to make it unusable and rebooting the system
+might not repair the problem.  You possibly lose all the data on your system.
+Because this software stands a chance of crashing your kernel, the resulting
+unstable system could possibly destroy computer hardware or peripherals making
+them unusable.  You might void the warranty on any system on which you run
+this software.
+.B YOU HAVE BEEN WARNED.
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B @PACKAGE@
+package has been tested with a wide array of production
+.B Linux
+distributions, kernels, and target architectures, and is considered production grade by
+.IR "The OpenSS7 Project" .
+At the time of release, the
+.B @PACKAGE@
+package had no known bugs.  Problems can be reported to
+.RB < bugs@openss7.org >.
+Please, however, use the included
+.B send-pr
+script for generating actionable problem reports.
+Please see the file
+.RI \(lq PROBLEMS \(rq
+in the release for problem reporting guidelines.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR sctp (4),
@@ -404,11 +565,25 @@ xns
 .]
 To date\(emasside from the protocol specification\(emthere is no standard for the
 interface or implementation of SCTP.
+Conformance is tested using the
+.BR test-sctp (8),
+.BR test-etsi_n (8),
+.BR test-etsi_t (8),
+.BR test-interop (8),
+.BR test-sctp_n2 (8),
+.BR test-sctp_n "(8) and "
+.BR test-sctp_t (8),
+test case executables and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
 .\"
 .\"
 .SH HISTORY
 .PP
+The
 .B @PACKAGE_TITLE@
+package
 is one of the original kernel implementations of SCTP.
 .PP
 The
@@ -418,9 +593,23 @@ version of SCTP was separated from the
 package to become the
 .BR strsctp (5)
 package in the 0.8.2 releases.
+.PP
+The
+.B @PACKAGE_TITLE@
+package is a stable, production grade release.
+.\"
+.\"
+.SH "FUTURE DIRECTIONS"
+.PP
+The SCTP package is a stable production release and is largely in
+maintenance mode.  There are, nevertheless, several items remaining to be
+done.  See the
+.RI \(lq TODO \(rq
+file in the release for detailed information on further development.
 .\"
 .\"
 .[
 $LIST$
 .]
+.\"
 .TI

@@ -1,3 +1,10 @@
+2007-01-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man5/strsctp.5.man: doc updates
+	* doc/manual/releases.texi: doc updates
+	* doc/manual/strsctp.texi: doc updates
+	* doc/manual/tree.texi: doc updates
+
 2007-01-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated documentation for release

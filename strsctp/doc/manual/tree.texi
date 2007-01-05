@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.5 2007/01/03 14:18:06 brian Exp $
+@c @(#) $Id: tree.texi,v 0.9.2.6 2007/01/05 06:25:06 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,29 +53,32 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/03 14:18:06 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/05 06:25:06 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: tree.texi,v $
+@c Revision 0.9.2.6  2007/01/05 06:25:06  brian
+@c - doc updates
+@c
 @c Revision 0.9.2.5  2007/01/03 14:18:06  brian
 @c - updated documentation for release
 @c
 @c =========================================================================
 
 @cite{@value{PACKAGE_TITLE}} places the following kernel module files in the kernel modules
-directory @file{/@-lib/@-modules/@-@value{_kversion}/@-}:@footnote{The kernel version
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-}:@footnote{The kernel version
 @samp{@value{_kversion}} is just an example.}
 
 @table @file
 
-@item modules.strsctp
+@item modules.@value{PACKAGE}
 
 @end table
 
-@cite{@value{PACKAGE_TITLE}} installs the following kernel modules in the
-@file{/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE}/@-} subdirectory:@footnote{The kernel
-version @samp{@value{_kversion}} is just an example.}
+@cite{@value{PACKAGE_TITLE}} installs the following kernel modules in the kernel modules directory,
+@file{/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE}/@-}:@footnote{The kernel version
+@samp{@value{_kversion}} is just an example.}
 
 @table @file
 
@@ -87,8 +90,8 @@ This kernel module contains the Transport Provider Interface (TPI) performance t
 
 @end table
 
-@cite{@value{PACKAGE_TITLE}} installs the following header files in the
-@file{/@-usr/@-include/@-@value{PACKAGE}/@-} subdirectory:
+@cite{@value{PACKAGE_TITLE}} installs the following header files in the system include directory,
+@file{/@-usr/@-include/@-@value{PACKAGE}/@-}:
 
 @table @header
 
@@ -104,55 +107,67 @@ Protocol (SCTP).
 This file contains X/Open Transport Interface/Transport Layer Interface (XTI/TLI) definitions for
 Stream Control Transmission Protocol (SCTP).
 
-@item sys/strsctp/version.h
+@item sys/@value{PACKAGE}/version.h
 This file contains kernel and system tailoring information for the @samp{@value{PACKAGE_TITLE}}
 kernel modules.
 
-@item 2.4.20-28.7/i686/sys/strsctp/modversions.h
+@item @value{_kversion}/i686/sys/@value{PACKAGE}/modversions.h
 This file contains module and symbol version information for the @samp{@value{PACKAGE_TITLE}} kernel
 modules.  This file is only applicable to @cite{Linux} kernels in the 2.4 series.
-@footnote{The kernel version 2.4.20-28.7 is just for example.}
+@footnote{The kernel version @value{_kversion} is just for example.}
 
 @end table
 
-@cite{@value{PACKAGE_TITLE}} installs the following configuration files in the
-@file{/@-etc/@-} directory:
+@cite{@value{PACKAGE_TITLE}} installs the following configuration files in the system configuration
+directory, @file{/@-etc/@-}:
 
 @table @file
 
-@item strsctp.conf
+@item @value{PACKAGE}.conf
 This file provided configuration information for any system controls affected by the
 @samp{@value{PACKAGE_NAME}} package.
 
-@item sysconfig/@-strsctp
+@item sysconfig/@-@value{PACKAGE}
 THis file provides system configuration information used by init scripts for the
 @samp{@value{PACKAGE_NAME}} package.  Some options of init script execution can be controlled by
 this file.
 
-@item rc.d/@-init.d/@-strsctp
+@item rc.d/@-init.d/@-@value{PACKAGE}
 This file provides the System V init script for the @samp{@value{PACKAGE_NAME}} package.
 @footnote{This file is really only applicable to RedHat-style init scripts.  An equivalent file,
-@file{strsctp.sh} is provided for Debian-style init scripts.}
+@file{@value{PACKAGE}.sh} is provided for Debian-style init scripts.}
 
-@item modutils/@-strsctp
-This file provides module definitions and demand loading aliases for the @samp{@value{PACKAGE_NAME}}
+@item modutils/@-@value{PACKAGE}
+This file provides module definitions and demand loading aliases for the @file{@value{PACKAGE}}
 package.  This file is really only applicable to older 2.4 kernels.
+
+@item netconfig.d/@value{PACKAGE}
+This file provides the @manpage{netconfig(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{netconfig(5)} definitions are used the the @file{strnsl} package and the @file{libxnsl}
+library.
+
+@item sock2path.d/@value{PACKAGE}
+This file provides the @manpage{sock2path(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{sock2path(5)} definitions are used the the @file{strsock} package and the @file{libsocket}
+library.
 
 @end table
 
-@cite{@value{PACKAGE_TITLE}} installs the following utility programs in the
-@file{/@-usr/@-sbin/@-} subdirectory:
+@cite{@value{PACKAGE_TITLE}} installs the following utility programs in the system binary directory,
+@file{/@-usr/@-sbin/@-}:
 
 @table @file
 
-@item strsctp_mknod
+@item @value{PACKAGE}_mknod
 This utility can be used by init scripts or administrative users to create or remove device nodes in
-the @file{/dev} directory for the Stream Control Transmission Protocol (SCTP) driver.
+the @file{/dev} directory for @cite{@value{PACKAGE_TITLE}} drivers.
 
 @end table
 
-@cite{@value{PACKAGE_TITLE}} places the following test programs in the
-@file{/@-usr/@-lib@-exec/@-} subdirectory:
+@cite{@value{PACKAGE_TITLE}} places the following test programs in the system libexec directory
+@file{/@-usr/@-lib@-exec/@-}:
 
 @table @file
 
@@ -219,47 +234,50 @@ Test programs are normally invoked on a test case by test case basis by the vali
 @item testsuite
 @itemx atlocal
 The @command{testsuite} stand-alone shell script invokes test cases in the test programs above as
-compiled into a comprehensive regression, troubleshooting and validation test suite for the Stream
-Control Transmission Protocol (SCTP) driver.  The @file{atlocal} file provides localized definitions
-used by the @command{testsuite} program.
+compiled into a comprehensive regression, troubleshooting and validation test suite for the
+@cite{@value{PACKAGE_TITLE}} drivers.  The @file{atlocal} file provides localized definitions used
+by the @command{testsuite} program.
 For more information on test suites, @xref{Test Suites}, and, in particular, @xref{Running Test
 Suites}.
 
 @item send-pr
 @itemx send-pr.config
 The @command{send-pr} stand-alone shell script can be used for the automatic generate of problem
-reports for the @dfn{@value{PACKAGE_TITLE}} package.  The @file{send-pr.config} file provides
+reports for the @cite{@value{PACKAGE_TITLE}} package.  The @file{send-pr.config} file provides
 localized definitions used by the @command{send-pr} program.
 For more information on problem reports, @xref{Problem Reports}, and, in particular, @xref{Stand
 Alone Problem Reports}.
 
 @end table
 
-@dfn{@value{PACKAGE_TITLE}} places the following info files in the system
-info directory @file{/@-usr/@-share/@-info/@-}:
+@cite{@value{PACKAGE_TITLE}} places the following info files in the system info directory,
+@file{/@-usr/@-share/@-info/@-}:
 
 @table @file
 
-@item strsctp.info
-This file contains this manual in @dfn{GNU info} format.
+@item @value{PACKAGE}.info
+@itemx @value{PACKAGE}.info-1
+@itemx @value{PACKAGE}.info-2
+These files contains this manual in @dfn{GNU info} format.
+
 @end table
 
-@dfn{@value{PACKAGE_TITLE}} places the following manpage macro and reference
-database files in the system man directory @file{/@-usr/@-share/@-man/@-}:
+@cite{@value{PACKAGE_TITLE}} places the following manpage macro and reference database files in the
+system man directory, @file{/@-usr/@-share/@-man/@-}:
 
 @table @file
 
-@item strsctp.macros
+@item @value{PACKAGE}.macros
 This file contains manual page macro definitions included by the manual pages included in the
 package.
 
-@item strsctp.refs
+@item @value{PACKAGE}.refs
 This file contains a reference database referenced by the manual pages included in the package.
 
 @end table
 
-@dfn{@value{PACKAGE_TITLE}} places the following manual pages in the
-system man directory @file{/@-usr/@-share/@-man/@-man3/@-}:
+@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man3/@-}:
 
 @table @file
 
@@ -267,10 +285,11 @@ system man directory @file{/@-usr/@-share/@-man/@-man3/@-}:
 Documentation of the SCTP specific options and primitive formats for the X/Open Transport
 Interface/Transport Layer Interface (XTI/TLI) for the Stream Control Transmission Protocol (SCTP)
 driver.
+
 @end table
 
-@dfn{@value{PACKAGE_TITLE}} places the following manual pages in the
-system man directory @file{/@-usr/@-share/@-man/@-man4/@-}:
+@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man4/@-}:
 
 @table @file
 
@@ -288,8 +307,17 @@ Transmission Protocol (SCTP) driver and is a good staring point when referencing
 
 @end table
 
-@dfn{@value{PACKAGE_TITLE}} places the following manual pages in the
-system man directory @file{/@-usr/@-share/@-man/@-man7/@-}:
+@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man5/@-}:
+
+@table @file
+
+@item @value{PACKAGE}.5
+
+@end table
+
+@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man7/@-}:
 
 @table @file
 
@@ -300,10 +328,11 @@ Documentation of the SCTP specific options and primitive formats for the Network
 @item tpi_sctp.7.gz
 Documentation of the SCTP specific options and primitive formats for the Transport Provider Interface
 (TPI) for the Stream Control Transmission Protocol (SCTP) driver.
+
 @end table
 
-@dfn{@value{PACKAGE_TITLE}} places the following manual pages in the
-system man directory @file{/@-usr/@-share/@-man/@-man8/@-}:
+@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man8/@-}:
 
 @table @file
 
@@ -356,11 +385,21 @@ does not delve into the test cases themselves.  Descriptions of the test cases c
 the @samp{--list} option to @command{test-etsi_t}.  See the program source for detailed information on
 specific test cases.
 
-@item strsctp_mknod.8.gz
-Documentation for the @command{strsctp_mknod} utility program.
+@item @value{PACKAGE}_mknod.8.gz
+Documentation for the @manpage{@value{PACKAGE}_mknod(8)} utility program.
 
 @end table
 
+@ignore
+@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man9/@-}:
+
+@table @file
+
+
+@end table
+
+@end ignore
 @ignore
 /usr
 /usr/include
