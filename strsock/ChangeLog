@@ -1,3 +1,13 @@
+2007-01-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: documentation updates for release
+	* NEWS: documentation updates for release
+	* README: documentation updates for release
+	* README-cvs: documentation updates for release
+	* THANKS: documentation updates for release
+	* doc/man/man5/strsock.5.man: documentation updates for release
+	* doc/manual/releases.texi: documentation updates for release
+
 2006-12-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated documentation for release
