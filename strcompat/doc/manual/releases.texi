@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.21 2006/12/29 12:18:28 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.22 2007/01/05 06:11:05 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/12/29 12:18:28 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/05 06:11:05 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -284,7 +284,7 @@ License}.}
 @b{This software is @i{pre-alpha} software.  As such, it will crash your kernel.  Installation of
 the software will irreparably mangle your header files or Linux distribution in such a way as to
 make it unusable.  Crashes will lock your system and rebooting the system will not repair the
-problem.  You will loose all the data on your system.  Because this software will crash your kernel,
+problem.  You will lose all the data on your system.  Because this software will crash your kernel,
 the resulting unstable system can destroy computer hardware or peripherals making them unusable.
 You will void the warranty on any system on which you run this software.  YOU HAVE BEEN WARNED.}
 @end ignore
@@ -301,7 +301,7 @@ WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU General Public
 @b{This software is @i{alpha} software.  As such, it can likely crash your kernel.  Installation of
 the software can irreparably mangle your header files or Linux distribution in such a way as to make
 it unusable.  Crashes could lock your system and rebooting the system might not repair the problem.
-You can possibly loose all the data on your system.  Because this software can crash your kernel,
+You can possibly lose all the data on your system.  Because this software can crash your kernel,
 the resulting unstable system could destroy computer hardware or peripherals making them unusable.
 You could void the warranty on any system on which you run this software.  YOU HAVE BEEN WARNED.}
 @end ignore
@@ -319,7 +319,7 @@ General Public License}.}
 @b{This software is @i{beta} software.  As such, it might crash your kernel.  Installation of the
 software might mangle your header files or Linux distribution in such a way as to make it unusable.
 Crashes could lock your system and rebooting the system might not repair the problem.  You can
-possibly loose all the data on your system.  Because this software might crash your kernel, the
+possibly lose all the data on your system.  Because this software might crash your kernel, the
 resulting unstable system could possibly destroy computer hardware or peripherals making them
 unusable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
 WARNED.}
@@ -340,7 +340,7 @@ License}.}
 kernel under some conditions.  Installation of the software on a non-validated distribution might
 mangle your header files or Linux distribution in such a way as to make it unusable.  Crashes could
 possibly lock your system and rebooting the system might not repair the problem.  You can possibly
-loose all the data on your system.  Because this software stands a chance of crashing your kernel,
+lose all the data on your system.  Because this software stands a chance of crashing your kernel,
 the resulting unstable system could possibly destroy computer hardware or peripherals making them
 unusable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
 WARNED.}
@@ -360,7 +360,7 @@ License}.}
 still crash your kernel in unique circumstances.  Installation of the software on a non-validated
 distribution might mangle your header files or Linux distribution in such a way as to make it
 unusable.  Crashes could possibly lock your system and rebooting the system might not repair the
-problem.  You can possibly loose all the data on your system.  Because this software stands a chance
+problem.  You can possibly lose all the data on your system.  Because this software stands a chance
 of crashing your kernel, the resulting unstable system could possibly destroy computer hardware or
 peripherals making them unusable.  You might void the warranty on any system on which you run this
 software.  YOU HAVE BEEN WARNED.}
@@ -377,7 +377,7 @@ software}.  Use at your own risk.  Remember that there is @b{NO WARRANTY}.@footn
 @b{This software is @i{unstable} software.  As such, it will lock or crash your kernel.
 Installation of the software will irreparably mangle your header files or Linux distribution in such
 a way as to make it unusable.  Crashes will lock your system and rebooting the system will not
-repair the problem.  You will loose all the data on your system.  Because this software has tested
+repair the problem.  You will lose all the data on your system.  Because this software has tested
 unstable in a number of test cases, simply running the validation test cases can cause locks or
 crashes.  Because this software will lock or crash your kernel, the resulting unstable system can
 destroy computer hardware or You will void the warranty on any system on which you run this
