@@ -1,3 +1,24 @@
+2007-01-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: doc updates for release
+	* NEWS: doc updates for release
+	* NOTES: doc updates for release
+	* README: doc updates for release
+	* README-LiS: doc updates for release
+	* README-cvs: doc updates for release
+	* THANKS: doc updates for release
+	* doc/man/man5/striso.5.man: doc updates for release
+	* doc/manual/bugs.texi: doc updates for release
+	* doc/manual/configure.texi: doc updates for release
+	* doc/manual/descrip.texi: doc updates for release
+	* doc/manual/news.texi: doc updates for release
+	* doc/manual/prerequisites.texi: doc updates for release
+	* doc/manual/releases.texi: doc updates for release
+	* doc/manual/rpm.texi: doc updates for release
+	* doc/manual/striso.texi: doc updates for release
+	* doc/manual/todo.texi: doc updates for release
+	* doc/manual/tree.texi: doc updates for release
+
 2006-12-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated documentation for release

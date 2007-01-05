@@ -1,15 +1,24 @@
-OpenSS7 ISO Stack -- read me first file.  2006-12-29
-$Id: README,v 0.9.2.12 2006/12/31 13:45:29 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+OpenSS7 ISO Stack -- read me first file.  2007-01-02
+$Id: README,v 0.9.2.13 2007/01/05 06:26:18 brian Exp $
+Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
  OpenSS7 ISO Stack
 ==================
 
-The `OpenSS7 ISO Stack' package contains header files and a number of
-modules and drivers and the associated documentation not contained in
-the `OpenSS7 Linux STREAMS (LiS)' releases.
+`OpenSS7 ISO Stack' (`striso') is a `OpenSS7 Project' implementation of
+various Open Systems Interconnect (OSI) International Standards
+Organization (ISO) networking components for `Linux Fast-STREAMS'.
+
+This release is the first separate release of the `OpenSS7 ISO Stack'
+package.  Some of the components in this package were formerly present
+in the `strss7' package.  Various networking drivers are provided as
+well as CDI, DLPI, NPI, TPI and XTI header files for ISO/OSI operation.
+The package contains the necessary manual pages and other
+documentation for ISO/OSI componentsin a separate autoconf tarball.
+This release is a pre-alpha release, and is an optional part of the
+OpenSS7 Master Package (`openss7-0.9.2.D').
 
 The package uses the following standard `Open Systems Interconnect
 (OSI)' conforming header files from the `strxns' package:
@@ -68,10 +77,14 @@ kernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'
 architectures, but should build and install for other architectures as
 well.
 
+This package is currently incomplete.  It is being released as a
+reference point for the community.  If you are interested in completion
+of this package, contact <info@openss7.com>.
+
  Release
 --------
 
-This is the `striso-0.9.2.1' package, released 2006-12-29.  This
+This is the `striso-0.9.2.1' package, released 2007-01-02.  This
 `0.9.2.1' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -349,7 +362,7 @@ in the release directory for more information on filing a proper
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.

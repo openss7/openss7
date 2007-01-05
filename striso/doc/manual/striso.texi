@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: striso.texi,v 0.9.2.9 2006/09/18 01:07:09 brian Exp $
+% @(#) $Id: striso.texi,v 0.9.2.10 2007/01/05 06:26:20 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2007  OpenSS7 Corporation <www.openss7.com>
 % Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/09/18 01:07:09 $ by $Author: brian $
+% Last Modified $Date: 2007/01/05 06:26:20 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -82,7 +82,7 @@ This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -128,7 +128,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2006  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2001-2007  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -219,6 +219,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Introduction::		Introduction to the package
 * Objective::			Objective of the package
 * Reference::			Contents of the package
+* Development::			Developing with the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
@@ -256,12 +257,20 @@ Reference
 * Modules::			Modules included in the package
 * Libraries::			Libraries included in the package
 * Utilities::			Utilities included in the package
-* Development::			Development against the package
+
+Development
+
+* Development Header Files::	Header Files in the package
+* Static and Shared Libraries::	Libraries in the package
+* Kernel Module Development::	Kernel development with the package
+* Manual Pages::		Manual Pages in the package
 
 Conformance
 
-* STREAMS Compatibility::	Compatibility with other STREAMS packages
-* Porting::			Porting to this STREAMS package
+* NPI Interface Conformance::	    Conformance to the NPI.
+* TPI Interface Conformance::	    Conformance to the TPI.
+* XTI Interface Conformance::	    Conformance to the XTI.
+* IETF Conformance::		    Conformance to IETF
 
 Releases
 
@@ -403,6 +412,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: striso.texi,v $
+Revision 0.9.2.10  2007/01/05 06:26:20  brian
+- doc updates for release
+
 Revision 0.9.2.9  2006/09/18 01:07:09  brian
 - updated manuals and release texi docs
 
@@ -563,42 +575,15 @@ This manual documents the design, implementation, installation, operation and fu
 the @cite{@value{PACKAGE_TITLE}} package.
 
 The @value{PACKAGE_TITLE} package is
-a STREAMS ISO Networking (ISO)
-package for Linux that can be used with
-@cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}
+a STREAMS ISO Networking (ISO) package for Linux
+that can be used with
+@cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}.
+@ignore
 or
 @cite{Linux STREAMS}@footnote{@xref{Top, Linux STREAMS (LiS), About This Manual, LiS, Linux STREAMS (LiS) Reference Manual}.}.
+@end ignore
 It includes development tools, header files and manual pages for
-
-@itemize
-@item @cite{Communications Device Interface (CDI)},
-@item @cite{Data Link Provider Interface (DLPI)} and
-@item @cite{Network Provider Interface (NPI)}.
-@end itemize
-
-@noindent
-In addition, it provides STREAMS drivers and modules for DLPI including:
-
-@itemize
-@item Linux IP to DLPI Driver (@file{streams-ldl.o}),
-@item DLPI to Linux IP Driver (@file{streams-ip_to_dlpi.o}), and
-@item DLPI to Linux IP Module (@file{streams-ip_strm_mod.o}).
-@end itemize
-
-@noindent
-The @value{PACKAGE_TITLE} package is essential to the development and support of
-STREAMS ISO networking
-modules and drivers and provides a fundamental set of
-X/Open
-header files and manual pages for such development.
-
-The @value{PACKAGE_TITLE} does @emph{not} provide the
-X/Open Transport Interface (XTI), Transport
-Provider Interface (TPI) or Transport Layer Interface (TLI) components.  See the OpenSS7
-@command{strxnet}@footnote{@xref{Top, OpenSS7 XTI/TLI, About This Manual, strxnet, OpenSS7 XTI/TLI Library Reference Manual}.}
-and
-@command{strinet}@footnote{@xref{Top, OpenSS7 INET, About This Manual, strinet, OpenSS7 INET Reference Manual}.}
-packages.
+@value{PACKAGE_TITLE}.
 
 @node Organization
 @section Organization of this Manual
@@ -611,6 +596,7 @@ This manual is organized (loosely) into several sections as follows:
   Introduction::		This introduction
 * Objective::			Objective of the package
 * Reference::			Contents of the package
+* Development::			Developing with the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
@@ -625,6 +611,8 @@ This manual is organized (loosely) into several sections as follows:
 @tab Objective of the package
 @item @ref{Reference}.
 @tab Contents of the package
+@item @ref{Development}.
+@tab Developing with the package
 @item @ref{Conformance}.
 @tab Conformance of the package
 @item @ref{Releases}.
@@ -643,6 +631,8 @@ This manual is organized (loosely) into several sections as follows:
 @tab Objective of the package
 @item @cite{Reference}.
 @tab Contents of the package
+@item @cite{Development}.
+@tab Developing with the package
 @item @cite{Conformance}.
 @tab Conformance of the package
 @item @cite{Releases}.
@@ -681,7 +671,6 @@ This manual uses @cite{texinfo} typographic conventions.
 * Modules::			Modules included in the package
 * Libraries::			Libraries included in the package
 * Utilities::			Utilities included in the package
-* Development::			Development against the package
 @end menu
 
 @c ----------------------------------------------------------------------------
@@ -700,31 +689,20 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Drivers
 @cindex drivers
 
-@subsection Linux IP to DLPI Driver (ldl)
+The @cite{@value{PACKAGE_TITLE}} package provides the following @dfn{STREAMS} drivers:
 
-The LDL driver sits atop any existing Linux IP interface driver and presents a
-DLPI interface to the STREAMS drivers above.  This allows any STREAMS driver
-that communicates downstream using DLPI to utilize the services of existing
-Linux drivers for Ethernet, Token Ring, etc.
+@table @asis
 
-@subsubheading Licensing
+@item @manref{clns(4)} (@file{streams_clns.ko})
+Contains the @manpage{clns(4)} driver.
 
-The LDL driver and the @command{ldltest} and @command{ldlconfig} programs were
-originally written by Ole Husgaard and is licensed under the GNU General
-Public License, @xrefman{GNU General Public License}.  This OpenSS7 release of the LDL driver also
-includes Hewlett-Packard proposed patches.
-An OpenSS7 GPL header has been added to the source code files to make this
-clear.
+@item @manref{lapb(4)} (@file{streams_x25-lapb.ko})
+Contains the @manpage{lapb(4)} driver.
 
-@subsection DLPI to Linux IP Driver (ip_to_dlpi)
+@item @manref{plp(4)} (@file{streams_x25-plp.ko})
+Contains the @manpage{plp(4)} driver.
 
-@subsubheading Licensing
-
-The ip_to_dlpi driver was originally written by @cite{The Software Group
-Limited} and in licensed under the GNU Lesser General Public License @xrefman{LGPL}.
-Nevertheless, this OpenSS7 release of the @file{ip_to_dlpi} driver is released
-under the GNU General Public License @xrefman{GNU General Public License}.
-An OpenSS7 GPL header has been added to the source code to make this clear.
+@end table
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -733,20 +711,29 @@ An OpenSS7 GPL header has been added to the source code to make this clear.
 @section Modules
 @cindex modules
 
-@subsection DLPI to Linux IP Module (ip_strm_mod)
+The @cite{@value{PACKAGE_TITLE}} package provides the following @dfn{STREAMS} modules:
 
-@subsubheading Licensing
+@table @asis
 
-The @file{ip_strm_mod} module was originally written by Mikel L. Mathews and is licensed under the
-GNU Lesser General Public License @xrefman{LGPL}.  However, this OpenSS7 release is distributed under
-the GNU General Public License @xrefman{GNU General Public License}.  An OpenSS7 GPL header has been added to the source code
-to make this clear.
+@item @manref{cmot(4)} (@file{streams_cmot.ko})
+Contains the @manpage{cmot(4)} module.
 
-LiS includes two adapter drivers to assist in interfacing STREAMS drivers to the Linux Kernel's
-TCP/IP protocols.  One driver, @dfn{ip_strm_mod} acts as an IP interface driver.  It fits below IP
-using standard @manref{ifconfig(8)} procedures.  It, in turn, communicates downstream with any STREAMS driver using
-the DLPI protocol in a fashion similar to the manner in which IP on Unix systems interfaces to lower
-interface drivers.  This allows a DLPI STREAMS driver to act as an interface driver to Linux TCP/IP.
+@item @manref{isot(4)} (@file{streams_isot.ko})
+Contains the @manpage{isot(4)} module.
+
+@item @manref{itot(4)} (@file{streams_itot.ko})
+Contains the @manpage{itot(4)} module.
+
+@item @manref{lpp(4)} (@file{streams_lpp.ko})
+Contains the @manpage{lpp(4)} module.
+
+@item @manref{tcpns(4)} (@file{streams_tcpns.ko})
+Contains the @manpage{tcpns(4)} module.
+
+@item @manref{xot(4)} (@file{streams_xot.ko})
+Contains the @manpage{xot(4)} module.
+
+@end table
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -755,6 +742,9 @@ interface drivers.  This allows a DLPI STREAMS driver to act as an interface dri
 @section Libraries
 @cindex libraries
 
+The @cite{@value{PACKAGE_TITLE}} package provides the following shared object and static libraries:
+
+The @cite{@value{PACKAGE_TITLE}} package does not currently provide any libraries.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -763,22 +753,224 @@ interface drivers.  This allows a DLPI STREAMS driver to act as an interface dri
 @section Utilities
 @cindex utilities
 
-@subsection @command{ldltest}
+@subsection Init Scripts
 
-Note that @command{ldltest} is mainatined as a manual page,
-@manref{ldltest(8)}.
+Following are System V Init Scripts that are installed by the package:
 
-@subsection @command{ldlconfig}
+@table @asis
 
-Note that @command{ldlconfig} is mainatined as a manual page,
-@manref{ldlconfig(8)}.
+@item @manpage{@value{PACKAGE}(8)} (@file{/etc/init.d/@value{PACKAGE}})
+@pgindex @value{PACKAGE}
+@pgindex /etc/init.d/@value{PACKAGE}
+@itemx @manpage{@value{PACKAGE}.sh(8)} (@file{/etc/init.d/@value{PACKAGE}.sh})
+@pgindex @value{PACKAGE}.sh
+@pgindex /etc/init.d/@value{PACKAGE}.sh
+
+System V Init Script for the @dfn{ISO} Subsystem.
+The @manpage{@value{PACKAGE}(8)} init script provides the ability to initialize, configure and mount the
+@dfn{ISO} subsystem, @manpage{strxnet(5)}.
+The @manpage{@value{PACKAGE}(8)} script provides the RedHat-style init script, whereas the
+@manpage{@value{PACKAGE}.sh(8)} script provides the Debian-style init script.
+
+See @manref{@value{PACKAGE}(8)} for more information.
+
+@end table
+
+@subsection Administrative Utilities
+
+Following are user utilities for manipulating @dfn{INET}:
+
+The @cite{@value{PACKAGE_TITLE}} package
+builds and installs the following utilities:
+
+@table @command
+
+@item @value{PACKAGE}_mknod
+This is a C-language program that can be used by startup scripts to create device nodes for the
+@samp{@value{PACKAGE}} package.  This utility is normally installed in the @file{/usr/sbin}
+directory.
+See @manref{@value{PACKAGE}_mknod(8)} for more information.
+
+@item @value{PACKAGE}
+This is a @cite{RedHat}-style System V init script that is installed and used to start and stop the
+@samp{@value{PACKAGE}} package.  Starting consists of creating ISO/OSI device nodes using
+@command{@value{PACKAGE}_mknod} and installing the @file{streams-sctp} and
+@file{streams-tpiperf} modules in the running kernel.  This init script is normally installed in the
+@file{/etc/init.d} directory.
+
+@item @value{PACKAGE}.sh
+This is a @cite{Debian}-style System V init script that is installed and used to start and stop the
+@samp{@value{PACKAGE}} package in a similar fashion to the @command{@value{PACKAGE}}
+script, but in the @cite{Debian} style.  This init script is normally installed in the
+@file{/etc/rc.d/init.d} directory.
+
+@end table
+
+@subsection Performance Test Programs
+
+Following are performance test programs:
+
+The @cite{@value{PACKAGE_TITLE}} package does not yet contain any performance programs.  For
+performance testing of various transport providers, see the @file{netperf-@value{VERSION_NETPERF}}
+package.
+
+@subsection Conformance Test Programs
+
+Following are conformance and validation test programs included in the package:
+
+
+The @cite{@value{PACKAGE_TITLE}} package
+builds and installs the following test programs:
+
+@table @command
+
+
+@end table
+
+For more information on the use of the problem reporting scripts, see @refman{Generating Problem
+Reports}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
 @node Development
-@section Development
+@chapter Development
 @cindex developing
+
+@cite{@value{PACKAGE_TITLE}} provides all of the header files, shared object and static libraries,
+manual pages and documentation necessary for the development of both user space applications
+programs and kernel space @dfn{STREAMS} modules and drivers based on the package.  The sections that
+follow describe these development facilities.
+
+@menu
+* Development Header Files::
+* Static and Shared Libraries::
+* Kernel Module Development::
+* Manual Pages::
+@end menu
+
+@node Development Header Files::
+@section Header Files
+
+Header files are installed, typically, in the @file{/usr/include/@value{PACKAGE}/} subdirectory.  To
+use the header files from the package, @samp{-I/usr/include/@value{PACKAGE}} must be included in the
+@command{gcc} command line as a preprocessor option.
+
+In general, @samp{-I} include preprocessor directives on the @command{gcc} command line should be
+ordered in the reverse order of the dependencies between packages.  So, for example, if the include
+files from all add-on packages are required, the order of these directives would be:
+@samp{-I/usr/include/@value{PACKAGE}}
+@samp{-I/usr/include/strxns}
+@samp{-I/usr/include/strcompat}
+@samp{-I/usr/include/streams}.
+
+Following are the user visible header files provided by the @file{@value{PACKAGE}-@value{VERSION}}
+package in the directory @file{/usr/include/@value{PACKAGE}}:
+
+@table @file
+
+
+@end table
+
+@subsection User Space Programs
+
+Typical include files for interacting with Transport providers from user space include the
+@file{xti.h} header file.  Additional header files for interacting with specific drivers or modules
+may also be required.  The @cite{xti.h} header file is for interacting with the XTI library.
+
+@subsection Kernel Space Drivers and Modules
+
+Typeical include files for writing @dfn{STREAMS} module and drivers implementing transport providers
+in kernels space include @cite{xti.h} and @cite{xti_sctp.h}.  The header files provide access to
+definitions for the TPI interface and additional XTI definitions for use by @dfn{STREAMS} drivers
+and modules.  Additional header files for interacting with specific drivers or modules may also be
+required.
+
+Aside from including this header files, the general procedures for compiling @dfn{STREAMS} modules
+and drivers also apply to @dfn{STREAMS} modules and drivers written to the Transport Provider
+Interface.
+
+@node Static and Shared Libraries
+@section Libraries
+
+Shared or static version of the @cite{libxnet} library may be linked when using the
+@file{@value{PACKAGE}-@value{VERSION}} package.@footnote{Note that the @file{libxnet} library is
+now provided by the @file{strxnet-@value{VERSION_STRXNET}} package.} The library may either be
+specified on the @command{gcc} command line as a shared library (e.g. @samp{-lxnet}) or as a static
+library (e.g.  @samp{/usr/lib/libxnet.a}).
+
+If the shared object library is linked, include the following options on the @command{gcc} command
+line:
+
+@table @samp
+
+@item -lxnet
+Link to the @file{/usr/lib/libxnet.so} shared library.
+
+@end table
+
+If the static library is linked, include the following options on the @command{gcc} command line:
+
+@table @samp
+
+@item /usr/lib/libxnet.a
+Link to the @file{/usr/lib/libxnet.a} static library.
+
+@end table
+
+@node Kernel Module Development
+@section Kernel Modules
+
+Developing TPI kernel modules is similar to user space programs with regard to header files.
+@file{/usr/include/strxnet} should be placed as an include directory to search on the @command{gcc}
+command line.  The rules for compiling @cite{Linux} kernel modules and the rules for compiling
+@dfn{STREAMS} modules and drivers should be followed.  In particular, several important intricacies
+should be considered:
+
+@itemize @bullet
+
+@item The @command{gcc} compiler used to compile the kernel modules must be the same version of
+compiler that was used to compile the kernel and @dfn{STREAMS} base package.
+
+@item The @command{gcc} command line must have the same compile flags that were used to compile the
+kernel and @dfn{STREAMS} base package.  @command{kbuild} can be used to accomplish this.
+
+@item The @command{gcc} command line must define several important kernel defines including
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.  Again, @command{kbuild}
+can be used to accomplish this.
+
+@item The @command{gcc} command line must include several important files directly on the command
+line, such as, @samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-autoconf.h} and
+@samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-modversions.h}.@footnote{The
+kernel version, @samp{@value{_kversion}}, is just an example.  For the running kernel, use the
+output of @samp{uname -r}.}
+
+@end itemize
+
+@node Manual Pages
+@section Manual Pages
+
+To assist in the development of user programs and @cite{STREAMS} driver or modules using the
+@cite{@value{PACKAGE_TITLE}} protocol module, the following manual pages are provided:
+
+The @file{@value{PACKAGE}-@value{VERSION}} package installs a number of manual pages in the
+@file{/usr/share/man} directory as follows:
+
+The following manual pages are installed in Section 3 of the manual (in the subdirectory
+@file{/usr/share/man/man3}):
+
+@table @manref
+
+
+@end table
+
+To assist in the development of user programs and @cite{STREAMS} driver or modules using the
+@cite{@value{PACKAGE_TITLE}} protocol module, the following header files are provided:
+
+@table @header
+
+
+@end table
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -786,6 +978,58 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 @node Conformance
 @chapter Conformance
 @cindex conformance
+
+Although @cite{OpenSS7 Project} software is of high quality, and untested behaviour is often correct
+behaviour, the principle of the @cite{OpenSS7 Project} is to test all functional requirements
+against the behaviour of the package in a repeatable validation test suite that can be used to
+perform regression, target architecture validation and trouble shooting, (@pxrefman{Maturity}, and
+@pxrefman{Test Suites}).
+
+@menu
+* NPI Interface Conformance::	    Conformance to the NPI.
+* TPI Interface Conformance::	    Conformance to the TPI.
+* XTI Interface Conformance::	    Conformance to the XTI.
+* IETF Conformance::		    Conformance to IETF
+@end menu
+
+@node NPI Interface Conformance
+@section NPI Interface Conformance
+@cindex NPI interface conformance
+
+The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{Network Provider Interface (NPI)
+Revision 2.0.0} as released by @cite{UNIX International}.  A copy of the original document is
+available from @uref{http://www.openss7.org/docs/npi.pdf, The OpenSS7 Project Website}.
+A reprint of the document specifying this version of the protocol is available as part of the
+@samp{strxns} package available online in @uref{http://www.openss7.org/specs/npi.pdf, PDF format},
+or also in simple @uref{http://www.openss7.org/specs/npi.html, HTML format}.
+
+@node TPI Interface Conformance
+@section TPI Interface Conformance
+@cindex TPI interface conformance
+
+The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{Transport Provider Interface (TPI)
+Revision 2.0.0} as released by @cite{UNIX International}.  A copy of the original document is
+available from @uref{http://www.openss7.org/docs/tpi.pdf, The OpenSS7 Project Website}.
+A reprint of the document specifying this version of the protocol is available as part of the
+@samp{strxnet} package available online in @uref{http://www.openss7.org/specs/tpi.pdf, PDF format},
+or also in simple @uref{http://www.openss7.org/specs/tpi.html, HTML format}.
+
+@node XTI Interface Conformance
+@section XTI Interface Conformance
+@cindex XTI interface conformance
+
+The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{X/Open Transport Interface/Transport
+Layer Interface (XTI/TLI) X/Open Networking Services (XNS) Revision 5.2} as released by @cite{The
+OpenGroup}.  A copy of the original document is available from @uref{http://www.opengroup.org/, The
+OpenGroup website}.
+Reprints of the document are not available from The OpenSS7 Project website due to copyright
+restrictions.  Similar information is available in the manual pages that accompany the
+@samp{strxnet} package.  These can be viewed online starting at
+@uref{http://www.openss7.org/man2html?3+xti, XTI/TLI manpage}.
+
+@node IETF Conformance
+@section IETF Conformance
+@cindex IETF conformance
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -813,6 +1057,7 @@ Note that @command{ldlconfig} is mainatined as a manual page,
 @cindex troubleshooting
 
 @include texi/testsuite.texi
+
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

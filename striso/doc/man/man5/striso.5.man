@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: striso.5.man,v 0.9.2.1 2006/10/12 13:06:23 brian Exp $
+.\" @(#) $Id: striso.5.man,v 0.9.2.2 2007/01/05 06:26:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/12 13:06:23 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/05 06:26:19 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: striso.5.man,v $
+.\" Revision 0.9.2.2  2007/01/05 06:26:19  brian
+.\" - doc updates for release
+.\"
 .\" Revision 0.9.2.1  2006/10/12 13:06:23  brian
 .\" - added package manual page
 .\"
@@ -88,12 +91,33 @@ sort-adjacent-labels
 .SH OVERVIEW
 .PP
 This is the
-.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@ - @VERSION@ )
 package for
 .BR "Linux Fast-STREAMS" .
 .[
 lfs
 .]
+.PP
+OpenSS7
+.I STREAMS
+add-on packages are separate add-on packages to the
+.B Linux Fast-STREAMS
+.[
+lfs
+.]
+release that provide additional functionality and protocol support not traditionally found on UNIX
+systems, or which have traditionally fallen into the domain of value-add system software, or, in
+this case, where the functionality was optional or differently handled in a number of implementations.  The
+.B @PACKAGE_TITLE@
+package is one of several optional add-on packages that provide enhanced
+.I STREAMS
+support beyond that provided by the base
+.I STREAMS
+packages.  This package provides support for
+network protocols,
+not provided by the base
+.I STREAMS
+package.
 .\"
 .\"
 .SH DESCRIPTION
@@ -102,7 +126,7 @@ The
 .B @PACKAGE_TITLE@
 package provides
 .I STREAMS
-modules and drivers, libraries, programs, init scripts, and daemons that
+modules and drivers, libraries, programs, initialization scripts, and daemons that
 implement
 .IR "Open Systems Interconnect"
 .[
@@ -110,48 +134,48 @@ x200
 .]
 data links, networks, transport and applications.
 .PP
-This package builds and installs the following
+The package currently provides the following
 .I STREAMS
-kernel modules and drivers:
+modules and drivers:
 .ad l
-.IP \- \w'\-\(em'u
+.IP \(en \w'\(en\(em'u
 .BR streams_clns.ko " multiplexing driver
 .IR /dev/clns ", " /dev/clnp ", " /dev/clns_cm
 .PD 0
-.IP \-
+.IP \(en
 .BR streams_cons.ko " multiplexing driver
 .IR /dev/cons ", " /dev/cons_cm
-.IP \-
+.IP \(en
 .BR streams_tp.ko " multiplexing driver
 .IR /dev/otpi ", " /dev/otk6 ", " /dev/tp0 ", " /dev/tp1 ", " /dev/tp2 ", " /dev/tp3 ", " /dev/tp4
-.IP \-
+.IP \(en
 .BR streams_lapb.ko " driver
 .IR /dev/lapb
-.IP \-
+.IP \(en
 .BR streams_xol.ko " driver
 .IR /dev/xol
-.IP \-
+.IP \(en
 .BR streams_plp.ko " multiplexing driver
 .IR /dev/plp ", " /dev/plp_cm
-.IP \-
+.IP \(en
 .BR streams_iso_ip.ko " module
-.IP \-
+.IP \(en
 .BR streams_iso_udp.ko " module
-.IP \-
+.IP \(en
 .BR streams_cmot.ko " module
-.IP \-
+.IP \(en
 .BR streams_isos.ko " module
-.IP \-
+.IP \(en
 .BR streams_itos.ko " module
-.IP \-
+.IP \(en
 .BR streams_itot.ko " module
-.IP \-
+.IP \(en
 .BR streams_isot.ko " module
-.IP \-
+.IP \(en
 .BR streams_lpp.ko " module
-.IP \-
+.IP \(en
 .BR streams_xos.ko " module
-.IP \-
+.IP \(en
 .BR streams_xot.ko " module
 .ad b
 .PD
@@ -398,12 +422,16 @@ This library is incomplete.
 .PP
 The
 .B @PACKAGE_TITLE@
-package includes kernel moduels,
-.I SVR 4.2 STREAMS
+package includes kernel modules,
+.I "SVR 4.2"
+.[
+svr42
+.]
+.I STREAMS
 drivers, modules, libraries, utilities, test programs, daemons, and
 development environment for the development and execution of
 .B @PACKAGE_TITLE@
-protoocl stack components and applications for the
+protocol stack components and applications for the
 .I Linux Fast-STREAMS
 environment.
 .PP
@@ -413,17 +441,18 @@ This distribution is only currently applicable to
 .IR ix86 ", " x86_64 ", " ppc " and " ppc64
 architectures, but should build and install for other architectures as well.
 .PP
-This package is currently incomplete.  It is being released as a reference
-oint for the community.  If you are interested in completion of this package,
-contact
-.RB < info@openss7.org >.
+This package is currently incomplete.
+It is being released as a reference oint for the community.  If you are interested in completion of
+this package, contact
+.RB < info@openss7.com >.
 .\"
 .\"
 .SH "PACKAGE CONTENTS"
 .PP
 The
-.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ ) package contains the following
-manual pages:
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@ - @VERSION@ )
+package contains the following manual pages:
+.\"
 .HP
 .BR getmyclnsnsap (3)\ \-\ \c
 get the CLNS NSAP for the local host.
@@ -717,6 +746,111 @@ x25
 data link device.
 .\"
 .\"
+.SH PREREQUISITES
+.PP
+The
+.B @PACKAGE@
+package requires the following packages to be installed:
+.TP
+.BR streams (5)
+The
+.B Linux Fast-STREAMS
+base package.
+.TP
+.BR strcompat (5)
+The
+.B Linux Fast-STREAMS
+compatibility modules package.
+.TP
+.BR strxns (5)
+The
+.B Linux Fast-STREAMS
+X/Open Networking Services package.
+.TP
+.BR strxnet (5)
+The
+.B Linux Fast-STREAMS
+XTI/TLI Library package.
+.TP
+.BR strnsl (5)
+The
+.B Linux Fast-STREAMS
+Network Selection Library package.
+.TP
+.BR strsock (5)
+The
+.B Linux Fast-STREAMS
+Sockets Library package.
+.\"
+.\"
+.SH NOTICES
+.PP
+Although previous release of the
+.B @PACKAGE@
+package were tested with
+.IR LiS ,
+.I LiS
+is now deprecated and this release
+.RB ( @VERSION@ )
+of
+.B @PACKAGE@
+has not been tested with
+.IR LiS .
+.I The OpenSS7 Project
+will no longer support this package for
+.IR LiS :
+please upgrade to
+.BR "Linux Fast-STREAMS" .
+.PP
+The
+.B @PACKAGE_TITLE@
+package has known and unknown defects.  This is a
+.I pre-alpha
+release.  Some defects might be harmful.  No validation testing whatsoever has been performed by the
+.I OpenSS7 Project
+on this software.  The software might not even configure or compile.  The
+.I OpenSS7 Project
+recommends that you do not use this software. Use at your own risk.  Remember that there is
+.BR "NO WARRANTY" .
+(See the section
+.RI \(lq "NO WARRANTY" \(rq
+under the
+.RI \(lq "GNU General Public License" \(rq,
+in the manual.)
+.PP
+This software is
+.I pre-alpha
+software.  As such, it will crash your kernel.  Installation of the software will irreparably mangle
+your header files or Linux distribution in such a way as to make it unusable.  Crashes will lock
+your system and rebooting the system will not repair the problem.  You will lose all the data on
+your system.  Because this software will crash your kernel, the resulting unstable system can
+destroy computer hardware or peripherals making them unusable.  You will void the warranty on any
+system on which you run this software.
+.BR "YOU HAVE BEEN WARNED" .
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B @PACKAGE@
+package is compatible with a wide array of production
+.B Linux
+distributions, kernels, and target architectures, but is considered
+.I pre-alpha
+grade by
+.IR "The OpenSS7 Project" .
+At the time of release, the
+.B @PACKAGE@
+package had no known bugs.  Problems or development requests can be reported to
+.RB < bugs@openss7.org >.
+Please, however, use the included
+.B send-pr
+script for generating actionable problem reports or development requests.
+Please see the file
+.RI \(lq PROBLEMS \(rq
+in the release for problem reporting guidelines.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR getmyclnsnsap (3),
@@ -765,7 +899,121 @@ data link device.
 .IR STREAMS (9).
 .\"
 .\"
+.SH COMPATIBILITY
+.PP
+The
+.B @PACKAGE@
+package is compatible with
+.I SVR 4.2
+and systems based on
+.I SVR 4.2
+such as
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B @PACKAGE_TITLE@
+provides compatibility with all implementations of the ISO/OSI Protocol suite
+using the
+Data Link Provider Interface Revision 2.0.0,
+.[
+dlpi revision 2.0.0
+.]
+Network Provider Interface Revision 2.0.0,
+.[
+npi revision 2.0.0
+.]
+and
+Transport Provider Interface Revision 1.5 or 2.0.0
+specifications.
+.[
+tpi revision 2.0.0
+.]
+.IP \(em
+These drivers are designed to operate with the XTI/TLI library implementation
+provided by the
+.BR strxnet (5)
+package and is thus compatible with most XTI library implementations as well.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR DLPI ,
+.[
+dlpi revision 2.0.0
+.]
+.IR NPI ,
+.[
+npi revision 2.0.0
+.]
+.IR TPI ,
+.[
+tpi revision 2.0.0
+.]
+.IR "XNS 5.2" ,
+.[
+xns 5.2
+.]
+.IR UNIX95 .
+Conformance is tested using the
+.BR test-iso (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+The contents of the
+.B @PACKAGE@
+package were formerly part of the
+.BR strss7 (5)
+package.  As of
+.BR "@PACAKGE@-@VERSION@" ,
+the ISO/OSI components were moved out of the
+.BR strss7 (5)
+package into this
+.BR striso (5)
+package.  This package now contains all of the ISO/OSI protocol components released by
+.IR "The OpenSS7 Project" ,
+along with associated documentation.
+.PP
+In the initial releases of the
+.BR striso (5)
+package, only ISO/OSI modules and drivers that have been fully revalidated on
+.B Linux Fast-STREAMS
+were initially released.  The remaining components present on the CVS archive and formerly part of the commercial
+.BR sstrss7 (5)
+releases, will be publicly released in releases subsequent to
+.B @PACKAGE@-@VERSION@
+as they are revalidated.
+.\"
+.\"
+.SH STATUS
+.PP
+The
+.B @PACKAGE_TITLE@
+package is
+.I production
+grade on
+.B Linux Fast-STREAMS
+for the modules and drivers included in the public release.  Not all OpenSS7
+Project ISO/OSI modules and drivers have been included in the release
+distribution.  The OpenSS7 project is in the process of revalidating all
+project modules and drivers for use on
+.BR "Linux Fast-STREAMS" .
+As a result, additional release components will be strapped into the package
+and once full validation test suites are developed and run against each
+component.
+.PP
+In particular, the following modules and drivers are currently missing from
+the public release:
+.\"
+.\"
 .[
 $LIST$
 .]
+.\"
 .TI

@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.2 2006/12/31 13:45:43 brian Exp $
+@c @(#) $Id: tree.texi,v 0.9.2.3 2007/01/05 06:26:20 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -53,330 +53,265 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/12/31 13:45:43 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/05 06:26:20 $ by $Author: brian $
+@c
+@c =========================================================================
+@c
+@c $Log: tree.texi,v $
+@c Revision 0.9.2.3  2007/01/05 06:26:20  brian
+@c - doc updates for release
 @c
 @c =========================================================================
 
-@dfn{@value{PACKAGE_UCNAME}} places the following kernel modules files in the kernel
-modules directory @file{lib/modules/2.4.20-28.7/}:
+@cite{@value{PACKAGE_TITLE}} places the following kernel module files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-}:@footnote{The kernel version
+@samp{@value{_kversion}} is just an example.}
 
 @table @file
-@item modules.striso
+
+@item modules.@value{PACKAGE}
+
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following kernel modules files in the kernel
-modules directory @file{lib/modules/2.4.20-28.7/striso/}:
+@cite{@value{PACKAGE_TITLE}} installs the following kernel modules in the kernel modules directory,
+@file{/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE}/@-}:@footnote{The kernel version
+@samp{@value{_kversion}} is just an example.}
 
 @table @file
-@item streams-ip_strm_mod.o
-This kernel module contains the IP to STREAMS module.
-@item streams-ip_to_dlpi.o
-This kernel module contains the IP to DLPI module.
-@item streams-ldl.o
-This kernle module contains the Linux DL module.
+
+@item streams_cmot.ko
+This kernel module contains the @dfn{STREAMS} @manref{cmot(4)} module.
+
+@item streams_isot.ko
+This kernel module contains the @dfn{STREAMS} @manref{isot(4)} module.
+
+@item streams_itot.ko
+This kernel module contains the @dfn{STREAMS} @manref{itot(4)} module.
+
+@item streams_lpp.ko
+This kernel module contains the @dfn{STREAMS} @manref{lpp(4)} module.
+
+@item streams_tcpns.ko
+This kernel module contains the @dfn{STREAMS} @manref{tcpns(4)} module.
+
+@item streams_xot.ko
+This kernel module contains the @dfn{STREAMS} @manref{xot(4)} module.
+
+@item streams_clns.ko
+This kernel module contains the @dfn{STREAMS} @manref{clns(4)} driver.
+
+@item streams_x25-lapb.ko
+This kernel module contains the @dfn{STREAMS} @manref{lapb(4)} driver.
+
+@item streams_x25-plp.ko
+This kernel module contains the @dfn{STREAMS} @manref{plp(4)} driver.
+
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following header files in the system include
-directory @file{usr/include/striso/}:
+@cite{@value{PACKAGE_TITLE}} installs the following header files in the system include directory,
+@file{/@-usr/@-include/@-@value{PACKAGE}/@-}:
+
+@table @header
+
+@item xti.h
+
+@item xti_osi.h
+@itemx sys/xti_osi.h
+
+@item xti_mosi.h
+@itemx sys/xti_mosi.h
+
+@item sys/@value{PACKAGE}/config.h
+
+@item sys/@value{PACKAGE}/version.h
+This file contains kernel and system tailoring information for the @samp{@value{PACKAGE_TITLE}}
+kernel modules.
+
+@item @value{_kversion}/i686/sys/@value{PACKAGE}/modversions.h
+This file contains module and symbol version information for the @samp{@value{PACKAGE_TITLE}} kernel
+modules.  This file is only applicable to @cite{Linux} kernels in the 2.4 series.
+@footnote{The kernel version @value{_kversion} is just for example.}
+
+@end table
+
+@cite{@value{PACKAGE_TITLE}} installs the following configuration files in the system configuration
+directory, @file{/@-etc/@-}:
 
 @table @file
-@item sys/cdi.h
-This file contains the CDI header file.
-@item sys/dlpi.h
-This file contains the DLPI header file.
-@item sys/ldl.h
-This file contains the Linux DL header file.
-@item sys/npi.h
-This file contains the NPI header file.
+
+@item @value{PACKAGE}.conf
+This file provided configuration information for any system controls affected by the
+@samp{@value{PACKAGE_NAME}} package.
+
+@item sysconfig/@-@value{PACKAGE}
+THis file provides system configuration information used by init scripts for the
+@samp{@value{PACKAGE_NAME}} package.  Some options of init script execution can be controlled by
+this file.
+
+@item rc.d/@-init.d/@-@value{PACKAGE}
+This file provides the System V init script for the @samp{@value{PACKAGE_NAME}} package.
+@footnote{This file is really only applicable to RedHat-style init scripts.  An equivalent file,
+@file{@value{PACKAGE}.sh} is provided for Debian-style init scripts.}
+
+@item modutils/@-@value{PACKAGE}
+This file provides module definitions and demand loading aliases for the @file{@value{PACKAGE}}
+package.  This file is really only applicable to older 2.4 kernels.
+
+@item netconfig.d/@value{PACKAGE}
+This file provides the @manpage{netconfig(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{netconfig(5)} definitions are used the the @file{strnsl} package and the @file{libxnsl}
+library.
+
+@item sock2path.d/@value{PACKAGE}
+This file provides the @manpage{sock2path(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{sock2path(5)} definitions are used the the @file{strsock} package and the @file{libsocket}
+library.
+
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following test programs in the system libexec
-directory @file{usr/libexec/}:
+@cite{@value{PACKAGE_TITLE}} installs the following utility programs in the system binary directory,
+@file{/@-usr/@-sbin/@-}:
 
 @table @file
-@item ldltest
-This binary contins a test program for the Linux DL driver.
+
+@item @value{PACKAGE}_mknod
+This utility can be used by init scripts or administrative users to create or remove device nodes in
+the @file{/dev} directory for @cite{@value{PACKAGE_TITLE}} drivers.
+
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following utility programs in the system
-binary directory @file{usr/sbin/}:
+@cite{@value{PACKAGE_TITLE}} places the following test programs in the system libexec directory
+@file{/@-usr/@-lib@-exec/@-}:
 
 @table @file
-@item ldlconfig
-This binary contains a configuration utility for the Linux DL driver.
-@item striso_mknod
-This binary conatins a script for making device nodes for the
-@dfn{@value{PACKAGE_UCNAME}} package.
+
+@item testsuite
+@itemx atlocal
+The @command{testsuite} stand-alone shell script invokes test cases in the test programs above as
+compiled into a comprehensive regression, troubleshooting and validation test suite for the
+@cite{@value{PACKAGE_TITLE}} drivers.  The @file{atlocal} file provides localized definitions used
+by the @command{testsuite} program.
+For more information on test suites, @xref{Test Suites}, and, in particular, @xref{Running Test
+Suites}.
+
+@item send-pr
+@itemx send-pr.config
+The @command{send-pr} stand-alone shell script can be used for the automatic generate of problem
+reports for the @cite{@value{PACKAGE_TITLE}} package.  The @file{send-pr.config} file provides
+localized definitions used by the @command{send-pr} program.
+For more information on problem reports, @xref{Problem Reports}, and, in particular, @xref{Stand
+Alone Problem Reports}.
+
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following info files in the system info
-directory @file{usr/share/info/}:
+@cite{@value{PACKAGE_TITLE}} places the following info files in the system info directory,
+@file{/@-usr/@-share/@-info/@-}:
 
 @table @file
-@item striso.info
-@itemx striso.info-1
-@itemx striso.info-2
-@itemx striso.info-3
-@itemx striso.info-4
-These files contain this manual in info format.
+
+@item @value{PACKAGE}.info
+@itemx @value{PACKAGE}.info-1
+@itemx @value{PACKAGE}.info-2
+These files contains this manual in @dfn{GNU info} format.
+
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following manpage macro and reference
-database files in the system man directory @file{usr/share/man/}:
+@cite{@value{PACKAGE_TITLE}} places the following manpage macro and reference database files in the
+system man directory, @file{/@-usr/@-share/@-man/@-}:
 
 @table @file
-@item striso.macros
-This file contain manual page macro definitions included by the manual pages
-included in the package.
-@item striso.refs
-This file contains a reference database referenced by the manual pages
-included in the package.
+
+@item @value{PACKAGE}.macros
+This file contains manual page macro definitions included by the manual pages included in the
+package.
+
+@item @value{PACKAGE}.refs
+This file contains a reference database referenced by the manual pages included in the package.
+
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following CDI manual pages in the system man
-directory @file{usr/share/man/man7/}:
+@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man3/@-}:
 
-@noindent
-@file{CD_ABORT_OUTPUT_REQ.7},
-@file{CD_ALLOW_INPUT_REQ.7},
-@file{CD_ATTACH_REQ.7},
-@file{CD_BAD_FRAME_IND.7},
-@file{CD_DETACH_REQ.7},
-@file{CD_DISABLE_CON.7},
-@file{CD_DISABLE_REQ.7},
-@file{CD_ENABLE_CON.7},
-@file{CD_ENABLE_REQ.7},
-@file{CD_ERROR_ACK.7},
-@file{CD_ERROR_IND.7},
-@file{CD_HALT_INPUT_REQ.7},
-@file{CD_INFO_ACK.7},
-@file{CD_INFO_REQ.7},
-@file{CD_MODEM_SIG_IND.7},
-@file{CD_MODEM_SIG_POLL.7},
-@file{CD_MODEM_SIG_REQ.7},
-@file{CD_MUX_NAME_REQ.7},
-@file{CD_OK_ACK.7},
-@file{CD_READ_REQ.7},
-@file{CD_UNITDATA_ACK.7},
-@file{CD_UNITDATA_IND.7},
-@file{CD_UNITDATA_REQ.7},
-@file{CD_WRITE_READ_REQ.7},
-@file{cd_abort_output_req_t.7},
-@file{cd_allow_input_req_t.7},
-@file{cd_attach_req_t.7},
-@file{cd_bad_frame_ind_t.7},
-@file{cd_detach_req_t.7},
-@file{cd_disable_con_t.7},
-@file{cd_disable_req_t.7},
-@file{cd_enable_con_t.7},
-@file{cd_enable_req_t.7},
-@file{cd_error_ack_t.7},
-@file{cd_error_ind_t.7},
-@file{cd_halt_input_req_t.7},
-@file{cd_info_ack_t.7},
-@file{cd_modem_sig_ind_t.7},
-@file{cd_modem_sig_poll_t.7},
-@file{cd_modem_sig_req_t.7},
-@file{cd_mux_name_req_t.7},
-@file{cd_ok_ack_t.7},
-@file{cd_read_req_t.7},
-@file{cd_unitdata_ack_t.7},
-@file{cd_unitdata_ind_t.7},
-@file{cd_unitdata_req_t.7},
-@file{cd_write_read_req_t.7},
-@file{cdi.7}
-@display
-@noindent
-These are CDI manual pages.
-@end display
+@table @file
 
-@dfn{@value{PACKAGE_UCNAME}} places the following DLPI manual pages in the system man
-directory @file{usr/share/man/man7/}:
 
-@noindent
-@file{DL_ATTACH_REQ.7},
-@file{DL_BIND_ACK.7},
-@file{DL_BIND_REQ.7},
-@file{DL_CONNECT_CON.7},
-@file{DL_CONNECT_IND.7},
-@file{DL_CONNECT_REQ.7},
-@file{DL_CONNECT_RES.7},
-@file{DL_DATA_ACK_IND.7},
-@file{DL_DATA_ACK_REQ.7},
-@file{DL_DATA_ACK_STATUS_IND.7},
-@file{DL_DATA_IND.7},
-@file{DL_DATA_REQ.7},
-@file{DL_DETACH_REQ.7},
-@file{DL_DISABMULTI_REQ.7},
-@file{DL_DISCONNECT_IND.7},
-@file{DL_DISCONNECT_REQ.7},
-@file{DL_ENABMULTI_REQ.7},
-@file{DL_ERROR_ACK.7},
-@file{DL_GET_STATISTICS_ACK.7},
-@file{DL_GET_STATISTICS_REQ.7},
-@file{DL_INFO_ACK.7},
-@file{DL_INFO_REQ.7},
-@file{DL_OK_ACK.7},
-@file{DL_PHYS_ADDR_ACK.7},
-@file{DL_PHYS_ADDR_REQ.7},
-@file{DL_PROMISCOFF_REQ.7},
-@file{DL_PROMISCON_REQ.7},
-@file{DL_REPLY_IND.7},
-@file{DL_REPLY_REQ.7},
-@file{DL_REPLY_STATUS_IND.7},
-@file{DL_REPLY_UPDATE_REQ.7},
-@file{DL_REPLY_UPDATE_STATUS_IND.7},
-@file{DL_RESET_CON.7},
-@file{DL_RESET_IND.7},
-@file{DL_RESET_REQ.7},
-@file{DL_RESET_RES.7},
-@file{DL_SET_PHYS_ADDR_REQ.7},
-@file{DL_SUBS_BIND_ACK.7},
-@file{DL_SUBS_BIND_REQ.7},
-@file{DL_SUBS_UNBIND_REQ.7},
-@file{DL_TEST_CON.7},
-@file{DL_TEST_IND.7},
-@file{DL_TEST_REQ.7},
-@file{DL_TEST_RES.7},
-@file{DL_TOKEN_ACK.7},
-@file{DL_TOKEN_REQ.7},
-@file{DL_UDERROR_IND.7},
-@file{DL_UDQOS_REQ.7},
-@file{DL_UNBIND_REQ.7},
-@file{DL_UNITDATA_IND.7},
-@file{DL_UNITDATA_REQ.7},
-@file{DL_XID_CON.7},
-@file{DL_XID_IND.7},
-@file{DL_XID_REQ.7},
-@file{DL_XID_RES.7},
-@file{dl_attach_req_t.7},
-@file{dl_bind_ack_t.7},
-@file{dl_bind_req_t.7},
-@file{dl_connect_con_t.7},
-@file{dl_connect_ind_t.7},
-@file{dl_connect_req_t.7},
-@file{dl_connect_res_t.7},
-@file{dl_data_ack_ind_t.7},
-@file{dl_data_ack_req_t.7},
-@file{dl_data_ack_status_ind_t.7},
-@file{dl_detach_req_t.7},
-@file{dl_disabmulti_req_t.7},
-@file{dl_disconnect_ind_t.7},
-@file{dl_disconnect_req_t.7},
-@file{dl_enabmulti_req_t.7},
-@file{dl_error_ack_t.7},
-@file{dl_get_statistics_ack_t.7},
-@file{dl_get_statistics_req_t.7},
-@file{dl_info_ack_t.7},
-@file{dl_info_req_t.7},
-@file{dl_ok_ack_t.7},
-@file{dl_phys_addr_ack_t.7},
-@file{dl_phys_addr_req_t.7},
-@file{dl_promiscoff_req_t.7},
-@file{dl_promiscon_req_t.7},
-@file{dl_reply_ind_t.7},
-@file{dl_reply_req_t.7},
-@file{dl_reply_status_ind_t.7},
-@file{dl_reply_update_req_t.7},
-@file{dl_reply_update_status_ind_t.7},
-@file{dl_reset_con_t.7},
-@file{dl_reset_ind_t.7},
-@file{dl_reset_req_t.7},
-@file{dl_reset_res_t.7},
-@file{dl_set_phys_addr_req_t.7},
-@file{dl_subs_bind_ack_t.7},
-@file{dl_subs_bind_req_t.7},
-@file{dl_subs_unbind_req_t.7},
-@file{dl_test_con_t.7},
-@file{dl_test_ind_t.7},
-@file{dl_test_req_t.7},
-@file{dl_test_res_t.7},
-@file{dl_token_ack_t.7},
-@file{dl_token_req_t.7},
-@file{dl_uderror_ind_t.7},
-@file{dl_udqos_req_t.7},
-@file{dl_unbind_req_t.7},
-@file{dl_unitdata_ind_t.7},
-@file{dl_unitdata_req_t.7},
-@file{dl_xid_con_t.7},
-@file{dl_xid_ind_t.7},
-@file{dl_xid_req_t.7},
-@file{dl_xid_res_t.7},
-@file{dlpi.7},
-@file{dlpi_eth.7}
-@display
-@noindent
-These are DLPI manual pages.
-@end display
+@end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following NPI manual pages in the system man
-directory @file{usr/share/man/man7/}:
+@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man4/@-}:
 
-@noindent
-@file{N_BIND_ACK.7},
-@file{N_BIND_REQ.7},
-@file{N_CONN_CON.7},
-@file{N_CONN_IND.7},
-@file{N_CONN_REQ.7},
-@file{N_CONN_RES.7},
-@file{N_DATACK_IND.7},
-@file{N_DATACK_REQ.7},
-@file{N_DATA_IND.7},
-@file{N_DATA_REQ.7},
-@file{N_DISCON_IND.7},
-@file{N_DISCON_REQ.7},
-@file{N_ERROR_ACK.7},
-@file{N_EXDATA_IND.7},
-@file{N_EXDATA_REQ.7},
-@file{N_INFO_ACK.7},
-@file{N_INFO_REQ.7},
-@file{N_OK_ACK.7},
-@file{N_OPTMGMT_REQ.7},
-@file{N_RESET_CON.7},
-@file{N_RESET_IND.7},
-@file{N_RESET_REQ.7},
-@file{N_RESET_RES.7},
-@file{N_TOKEN_ACK.7},
-@file{N_TOKEN_REQ.7},
-@file{N_UDERROR_IND.7},
-@file{N_UNBIND_REQ.7},
-@file{N_UNITDATA_IND.7},
-@file{N_UNITDATA_REQ.7}
-@file{N_bind_ack_t.7},
-@file{N_bind_req_t.7},
-@file{N_conn_con_t.7},
-@file{N_conn_ind_t.7},
-@file{N_conn_req_t.7},
-@file{N_conn_res_t.7},
-@file{N_data_ind_t.7},
-@file{N_data_req_t.7},
-@file{N_datack_ind_t.7},
-@file{N_datack_req_t.7},
-@file{N_discon_ind_t.7},
-@file{N_discon_req_t.7},
-@file{N_error_ack_t.7},
-@file{N_exdata_ind_t.7},
-@file{N_exdata_req_t.7},
-@file{N_info_ack_t.7},
-@file{N_info_req_t.7},
-@file{N_ok_ack_t.7},
-@file{N_optmgmt_req_t.7},
-@file{N_reset_con_t.7},
-@file{N_reset_ind_t.7},
-@file{N_reset_req_t.7},
-@file{N_reset_res_t.7},
-@file{N_token_ack_t.7},
-@file{N_token_req_t.7},
-@file{N_uderror_ind_t.7},
-@file{N_unbind_req_t.7},
-@file{N_unitdata_ind_t.7},
-@file{N_unitdata_req_t.7},
-@file{npi.7}
-@display
-@noindent
-These are NPI manual pages.
-@end display
+@table @file
 
+@item clns.4
+@item cmot.4
+@item iso-ip.4
+@item isos.4
+@item isot.4
+@item iso-lan.4
+@item iso-udp.4
+@item itos.4
+@item itot.4
+@item lapb.4
+@item lpp.4
+@item ns-tcp.4
+@item plp.4
+@item tcpns.4
+@item tp0.4
+@item tp1.4
+@item tp2.4
+@item tp3.4
+@item tp4.4
+@item tp.4
+@item x25-lapb.4
+@item x25-plp.4
+@item x25_lapb.4
+@item x25_plp.4
+@item xol.4
+@item xot.4
+
+@end table
+
+@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man5/@-}:
+
+@table @file
+
+@item @value{PACKAGE}.5
+
+@end table
+
+@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man7/@-}:
+
+@table @file
+
+@item npi_osi.7
+
+@end table
+
+@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man8/@-}:
+
+@table @file
+
+@item @value{PACKAGE}_mknod.8.gz
+Documentation for the @manpage{@value{PACKAGE}_mknod(8)} utility program.
+
+@end table
+
+@ignore
+@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man9/@-}:
+
+@table @file
+
+
+@end table
+
+@end ignore
 @ignore
 /usr
 /usr/include
