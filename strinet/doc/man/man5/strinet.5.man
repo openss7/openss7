@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strinet.5.man,v 0.9.2.3 2007/01/03 14:54:40 brian Exp $
+.\" @(#) $Id: strinet.5.man,v 0.9.2.4 2007/01/05 06:23:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/01/03 14:54:40 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/05 06:23:53 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strinet.5.man,v $
+.\" Revision 0.9.2.4  2007/01/05 06:23:53  brian
+.\" - doc updates
+.\"
 .\" Revision 0.9.2.3  2007/01/03 14:54:40  brian
 .\" - documentation updates for release
 .\"
@@ -83,10 +86,10 @@ sort-adjacent-labels
 .so strinet.macros
 .\"
 .\"
-.TH STRINET 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.TH @PACKAGE_UCNAME@ 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
 .SH NAME
 .B @PACKAGE@
-\- @PACKAGE_TITLE@ package
+\- the @PACKAGE_TITLE@ package
 .\"
 .\"
 .SH OVERVIEW
@@ -102,22 +105,24 @@ lfs
 OpenSS7
 .I STREAMS
 add-on packages are separate add-on packages to the
-.B "Linux Fast-STREAMS"
+.B Linux Fast-STREAMS
 .[
 lfs
 .]
 release that provide additional functionality and protocol support not traditionally found on UNIX
-systems, or which have tranditionally fallen into the domain of valud-add system software, or, in
-this case, where functionality was optional or differently handled in a number of implementations.
-The
+systems, or which have traditionally fallen into the domain of value-add system software, or, in
+this case, where the functionality was optional or differently handled in a number of implementations.  The
 .B @PACKAGE_TITLE@
-package is one of the several optional add-on packages that provide enhanced network protocol
+package is one of several optional add-on packages that provide enhanced
+.I STREAMS
 support beyond that provided by the base
 .I STREAMS
 package.  This package provides support for Internet Protocols based on the
 .IR "Transport Provider Interface (TPI)" ,
 .BR tpi (7),
-not provided by the base package.
+not provided by the base
+.I STREAMS
+package.
 .\"
 .\"
 .SH DESCRIPTION
@@ -125,13 +130,19 @@ not provided by the base package.
 The
 .B @PACKAGE_TITLE@
 package provides
-.I STREAMS
-modules and drivers, libraries, programs, init scripts, and daemons that implement networking
-protocols based on the transport layer of the OSI reference model.
+.IR STREAMS (9)
+modules and drivers, libraries, programs, initialization scripts, and daemons that
+implement and provide
+networking protocols based on the transport layer of the OSI
+reference model.
+.[
+x200
+.]
 .PP
-The package builds and installs the following
-.I STREAMS
-modules (as kernel modules):
+The package currently provides the following
+.IR STREAMS (9)
+modules and drivers:
+.ad l
 .IP \(en \w'\(en\(em'u
 .B streams_inet.ko
 driver
@@ -145,6 +156,7 @@ driver
 .IP \(en
 .B streams_udp.ko
 driver
+.ad b
 .PD
 .PP
 The following are
@@ -201,12 +213,16 @@ using
 The
 .B @PACKAGE_TITLE@
 package includes kernel modules,
-.I SVR 4.2 STREAMS
-driver, modules, libraries, utilities, test programs, daemons, and development environment for the
-development and execution of
+.I SVR 4.2
+.[
+svr42
+.]
+.I STREAMS
+drivers, modules, libraries, utilities, test programs, daemons, and
+development environment for the development and execution of
 .B @PACKAGE_TITLE@
 protocol stack components and applications for the
-.I SVR 4.2 STREAMS
+.B Linux Fast-STREAMS
 environment.
 .PP
 This distribution is only currently applicable to
@@ -364,7 +380,7 @@ package installs an
 .IR "Installation and Reference Manual" .
 .\"
 .\"
-.SH DRIVERS
+.SH DEVICES
 .PP
 .TP
 .BR inet (4)
@@ -394,17 +410,27 @@ base package.
 .BR strcompat (5)
 The
 .B Linux Fast-STREAMS
-compatiblity modules package.
+compatibility modules package.
 .TP
 .BR strxns (5)
 The
 .B Linux Fast-STREAMS
-XNS Networking package.
+X/Open Networking Services package.
 .TP
 .BR strxnet (5)
 The
 .B Linux Fast-STREAMS
-XTI/TLI Networking package
+XTI/TLI Library package.
+.TP
+.BR strnsl (5)
+The
+.B Linux Fast-STREAMS
+Network Selection Library package.
+.TP
+.BR strsock (5)
+The
+.B Linux Fast-STREAMS
+Sockets Library package.
 .\"
 .\"
 .SH NOTICES
@@ -557,6 +583,7 @@ test suite.
 .PP
 The
 .B @PACKAGE_TITLE@
+package
 was originally written for
 .IR LiS ,
 and contained the XTI/TLI library and
@@ -602,4 +629,5 @@ file in the release for detailed information on further development.
 .[
 $LIST$
 .]
+.\"
 .TI
