@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strnsl.5.man,v 0.9.2.1 2006/12/31 13:46:25 brian Exp $
+.\" @(#) $Id: strnsl.5.man,v 0.9.2.2 2007/01/05 06:19:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/31 13:46:25 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/05 06:19:31 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strnsl.5.man,v $
+.\" Revision 0.9.2.2  2007/01/05 06:19:31  brian
+.\" - documentation updates for release
+.\"
 .\" Revision 0.9.2.1  2006/12/31 13:46:25  brian
 .\" - added package manual page
 .\"
@@ -124,8 +127,11 @@ not provided by the base package.
 .PP
 The
 .B @PACKAGE_TITLE@
-package provides lirbaries, programs, init scripts, and daemons that implement name services for the
-XTI/TLI library.
+package provides
+libraries, programs, init scripts, and daemons that
+implement the
+name-to-address translation and network selection services
+for the NSL library.
 .PP
 The package builds and installs the following
 .I STREAMS
@@ -147,73 +153,119 @@ This distribution is only currently applicable to
 architectures, but should build and install for other architectures as well.
 .PP
 This package is complete but has been largely untested.
+It is being released as a reference point for the community.  If you are interested in completion of
+this package, contact
+.RB < info@openss7.com >.
 .\"
 .\"
 .SH "PACKAGE CONTENTS"
 .PP
+The
+.B @PACKAGE@
+package installs the following manual pages:
 .HP
 .BR libxnsl (3)\ \-\ 
+XNS 5.2 Network Services Library (NSL)
+.RB ( libxnsl )
 .PD 0
 .HP
 .BR xnsl (3)\ \-\ 
+XNS 5.2 Network Services Library (NSL)
+.RB ( libxnsl )
 .HP
 .BR endnetconfig (3)\ \-\ 
+unbind from the network selection database.
 .HP
 .BR endnetpath (3)\ \-\ 
+unbind from the NETPATH database.
 .HP
 .BR freenetconfigent (3)\ \-\ 
+free a network selection database entry.
 .HP
 .BR getnetconfig (3)\ \-\ 
+get an entry from the network selection database.
 .HP
 .BR getnetconfigent (3)\ \-\ 
+get an entry from the network selection database by network id.
 .HP
 .BR getnetpath (3)\ \-\ 
+get entry from NETPATH database.
 .HP
 .BR inetaddr (3)\ \-\ 
+transport name-to-address translation shared object for INET.
 .HP
 .BR nc_perror (3)\ \-\ 
+print a network selection error message.
 .HP
 .BR nc_sperror (3)\ \-\ 
+obtain a network selection error message.
 .HP
 .BR _nderror (3)\ \-\ 
+network selection error number.
 .HP
 .BR netbuf (3)\ \-\ 
+the XTI/TLI netbuf structure.
 .HP
 .BR netconfig (3)\ \-\ 
+Network Configuration database subroutines.
 .HP
 .BR netdir (3)\ \-\ 
+Network Directory service subroutines.
 .HP
 .BR netdir_free (3)\ \-\ 
+free network selection database data structures.
 .HP
 .BR netdir_getbyaddr (3)\ \-\ 
+lookup host and service names in directory service by address.
 .HP
 .BR netdir_getbyname (3)\ \-\ 
+lookup address in directory service by name.
 .HP
 .BR netdir_options (3)\ \-\ 
+perform options management on a transport endpoint.
 .HP
 .BR netdir_perror (3)\ \-\ 
+print a network directory error message.
 .HP
 .BR netdir_sperror (3)\ \-\ 
+provide a network directory error string.
 .HP
 .BR netpath (3)\ \-\ 
+Network Configuration path subroutines.
 .HP
 .BR setnetconfig (3)\ \-\ 
+bind to or rewind the network selection database.
 .HP
 .BR setnetpath (3)\ \-\ 
+bind to or rewind NETPATH database.
 .HP
 .BR taddr2uaddr (3)\ \-\ 
+convert a transport address to a universal address.
 .HP
 .BR uaddr2taddr (3)\ \-\ 
+convert a universal address to a transport address.
 .HP
 .BR netconfig (5)\ \-\ 
+network configuration database.
 .HP
 .BR netdir (5)\ \-\ 
+transport name-to-address translation shared objects.
 .HP
 .BR strnsl (5)\ \-\ 
+.B @PACKAGE_TITLE@
+package.
 .HP
 .BR test-xnsl (8)\ \-\ 
+a test suite executable for the
+.BR xnsl (3)
+.I STREAMS
+library.
 .HP
 .BR test-xnsl_thr (8)\ \-\ 
+a test suite executable for the
+.BR xnsl (3)
+.I STREAMS
+library.
 .PD
 .\"
 .\"
@@ -253,9 +305,9 @@ Sockets library.
 .\"
 .SH NOTICES
 .PP
-Although previous releases of
+Although previous releases of the
 .B @PACKAGE@
-was compatible with
+were compatible with
 .IR LiS ,
 .I LiS
 is now deprecated and this release
@@ -269,23 +321,64 @@ will not support this package for
 .IR LiS :
 please upgrade to
 .BR "Linux Fast-STREAMS" .
+.PP
+.I Pre-alpha
+releases are releases that have received no testing whatsoever.  Code in the release is not even
+known to configure or compile.  The purpose of a pre-alpha release is to make code and documenation
+available for insepection only, and to solicit comments on the design approach or other
+characteristics of the software package.
+.PP
+.I Pre-alpha
+release packages ship containing warnings recommending that the user not even execute the contained
+code.
+.PP
+The
+.B @PACKAGE_TITLE@
+package has known and unknown defects.  This is a
+.I pre-alpha
+release.  Some defects might be harmful.  No validation testing whatsoever has been performed by the
+.I OpenSS7 Project
+on this software.  The software might not even configure or compile.  The
+.I OpenSS7 Project
+recommends that you do not use this software. Use at your own risk.  Remember that there is
+.BR "NO WARRANTY" .
+(See the section
+.RI \(lq "NO WARRANTY" \(rq
+under the
+.RI \(lq "GNU General Public License" \(rq,
+in the manual.)
+.PP
+This software is
+.I pre-alpha
+software.  As such, it will crash your kernel.  Installation of the software will irreparably mangle
+your header files or Linux distribution in such a way as to make it unusable.  Crashes will lock
+your system and rebooting the system will not repair the problem.  You will lose all the data on
+your system.  Because this software will crash your kernel, the resulting unstable system can
+destroy computer hardware or peripherals making them unusable.  You will void the warranty on any
+system on which you run this software.
+.BR "YOU HAVE BEEN WARNED" .
 .\"
 .\"
 .SH BUGS
 .PP
 The
 .B @PACKAGE@
-package is compataible with a wide array of production
+package is compatible with a wide array of production
 .B Linux
-distributions, kernels, and target architectures, but is considered alpha grade by
+distributions, kernels, and target architectures, but is considered
+.I pre-alpha
+grade by
 .IR "The OpenSS7 Project" .
 At the time of release, the
 .B @PACKAGE@
-package had no known bugs.  Problems can be reported to
+package had no known bugs.  Problems or development requests can be reported to
 .RB < bugs@openss7.org >.
 Please, however, use the included
 .B send-pr
-script for generating actionable problem reports.
+script for generating actionable problem reports or development requests.
+Please see the file
+.RI \(lq PROBLEMS \(rq
+in the release for problem reporting guidelines.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -325,17 +418,93 @@ script for generating actionable problem reports.
 .\"
 .SH COMPATIBILITY
 .PP
+The
+.B @PACKAGE@
+package is compatible with
+.I "SVR 4.2"
+and systems based on
+.IR "SVR 4.2" ,
+such as
+.IR Solaris \(rg
+and
+.IR AIX \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The
+.B libnsl
+or
+.B libnls
+library is present in
+.I SVR 4.2
+UNIX systems.  The Name to Address mapping and Network Configuration services
+present in this package is present in
+.B libnsl
+on most
+.I SVR 4.2
+based UNIX systems.
+.B Linux
+also has a
+.B libnsl
+library; however, it is missing the Name to Address mapping and Network
+Configuration services provided in this package.  These services appear in
+most branded UNIX systems, but derived from Sun Microsystem's TI-RPC package.
+.IP ""
+The majority of the other components of Sun's TI-RPC package are present in
+.B glibc2
+under
+.BR Linux .
+However, the
+.B rpcbind
+service is missing
+.RB ( glibc2
+uses
+.B portmap
+instead of
+.BR rpcbind ),
+and must of the trasnport independent portion of the TI-RPC has been strapped
+out (only IP protocols are provided and the Transport Independent RPC
+functions are not implemented).
+.IP \(em
+The Name to Address translation and Network Configuration services provided by
+.B @PACKAGE@
+are compatible with those from Sun's TI-RPC package and present in most
+branded UNIX offerings.
+.IP \(em
+Because
+.B Linux
+already has a
+.BR libnsl
+library (which, unfortunately is missing these major components), the library
+under
+.B Linux Fast-STREAMS
+has been renamed to
+.BR libxnsl .
+.PP
+For additional compatibility information, see
+.BR libxnsl (3).
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+POSIX did not standardize on these functions.  The library was build to be
+compatible with Sun's TI-RPC.
 .\"
 .\"
 .SH HISTORY
 .PP
+When work on the
+.B @PACKAGE@
+package initially began, it was made part of the
+.B strxnet (5)
+release package.  However, it was never publicly released as part of that
+package.  Primarily due to licensing restrictions, the Name to Address mapping
+functions and Network Configuration functions were moved to this separate
+package and pulicly released as
+.BR "@PACKAGE@-0.9.2.1" .
 .\"
 .\"
 .[
 $LIST$
 .]
+.\"
 .TI

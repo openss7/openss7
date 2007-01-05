@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-xnsl.8.man,v 0.9.2.2 2006/09/26 00:51:23 brian Exp $
+.\" @(#) $Id: test-xnsl.8.man,v 0.9.2.3 2007/01/05 06:19:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/26 00:51:23 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/05 06:19:32 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-xnsl.8.man,v $
+.\" Revision 0.9.2.3  2007/01/05 06:19:32  brian
+.\" - documentation updates for release
+.\"
 .\" Revision 0.9.2.2  2006/09/26 00:51:23  brian
 .\" - corrected macro file name, reordered includes
 .\"
@@ -83,67 +86,67 @@ sort-adjacent-labels
 .so strnsl.macros
 .\"
 .\"
-.TH TEST-XNET 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.TH TEST-XNSL 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
 .\"
 .\"
 .SH NAME
-.B test-xnet, test-xnet_thr
-\- a test suite executable for the xnet(3) STREAMS library
+.B test-xnsl, test-xnsl_thr
+\- a test suite executable for the xnsl(3) STREAMS library
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .HP 12
-\fBtest-xnet\fR [\fIoptions\fR]
+\fBtest-xnsl\fR [\fIoptions\fR]
 [{\fB-o\fR|\fB--onetest\fR} [\fITESTCASE\fR]]
 [{\fB-t\fR|\fB--tests\fR} [\fIRANGE\fR]]
 .PD 0
 .HP 12
-\fBtest-xnet\fR [\fIoptions\fR]
+\fBtest-xnsl\fR [\fIoptions\fR]
 {\fB-l\fR|\fB--list\fR} [\fIRANGE\fR]
 .HP 12
-\fBtest-xnet\fR {\fB-h\fR|\fB--help\fR}
+\fBtest-xnsl\fR {\fB-h\fR|\fB--help\fR}
 .HP 12
-\fBtest-xnet\fR {\fB-V\fR|\fB--version\fR}
+\fBtest-xnsl\fR {\fB-V\fR|\fB--version\fR}
 .HP 12
-\fBtest-xnet\fR {\fB-C\fR|\fB--copying\fR}
+\fBtest-xnsl\fR {\fB-C\fR|\fB--copying\fR}
 .PD
 .HP 12
-\fBtest-xnet_thr\fR [\fIoptions\fR]
+\fBtest-xnsl_thr\fR [\fIoptions\fR]
 [{\fB-o\fR|\fB--onetest\fR} [\fITESTCASE\fR]]
 [{\fB-t\fR|\fB--tests\fR} [\fIRANGE\fR]]
 .PD 0
 .HP 12
-\fBtest-xnet_thr\fR [\fIoptions\fR]
+\fBtest-xnsl_thr\fR [\fIoptions\fR]
 {\fB-l\fR|\fB--list\fR} [\fIRANGE\fR]
 .HP 12
-\fBtest-xnet_thr\fR {\fB-h\fR|\fB--help\fR}
+\fBtest-xnsl_thr\fR {\fB-h\fR|\fB--help\fR}
 .HP 12
-\fBtest-xnet_thr\fR {\fB-V\fR|\fB--version\fR}
+\fBtest-xnsl_thr\fR {\fB-V\fR|\fB--version\fR}
 .HP 12
-\fBtest-xnet_thr\fR {\fB-C\fR|\fB--copying\fR}
+\fBtest-xnsl_thr\fR {\fB-C\fR|\fB--copying\fR}
 .PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.BR test-xnet " and " test-xnet_thr
+.BR test-xnsl " and " test-xnsl_thr
 are test suite executables for the
-.BR xnet (3)
+.BR xnsl (3)
 .I STREAMS
 library.
 The purpose of the
-.BR test-xnet " and " test-xnet_thr
+.BR test-xnsl " and " test-xnsl_thr
 test suite executables are to provide a means for development, diagnostic, regression and validation
 testing of the
-.BR xnet (3)
+.BR xnsl (3)
 library.
 The only difference between
-.BR test-xnet " and " test-xnet_thr
+.BR test-xnsl " and " test-xnsl_thr
 is that
-.B test-xnet
+.B test-xnsl
 is compiled unthreaded, and
-.BR test-xnet_thr
+.BR test-xnsl_thr
 is compiled threaded (i.e. with the
 .BR pthreads (3)
 library linked).
@@ -152,9 +155,9 @@ The
 package also provides an
 .B autotest
 based test suite that uses the
-.B test-xnet
+.B test-xnsl
 and
-.B test-xnet_thr
+.B test-xnsl_thr
 test case executables to invoke test cases.  This test suite can be used for development, diagnostic,
 regression or validation testing.
 See the
@@ -166,9 +169,9 @@ test suite.
 .\"
 .SH OPTIONS
 .PP
-.BR test-xnet " and " test-xnet_thr
+.BR test-xnsl " and " test-xnsl_thr
 options fall into several categories as detailed in the subsections below.  If
-.BR test-xnet " and " test-xnet_thr
+.BR test-xnsl " and " test-xnsl_thr
 are executed without any options, they will execute all available test cases and report the progress
 and results of each test case.
 .SS Command Options
@@ -309,7 +312,7 @@ setting.
 .SH DIAGNOSTICS
 .PP
 When
-.BR test-xnet " or " test-xnet_thr
+.BR test-xnsl " or " test-xnsl_thr
 fails, they print a diagnostic message to
 .I stderr
 and exit with a non-zero return code.
@@ -357,7 +360,7 @@ condition.
 .\"
 .SH NOTICES
 .PP
-.BR test-xnet " and " test-xnet_thr
+.BR test-xnsl " and " test-xnsl_thr
 are normally invoked from the
 .B @PACKAGE@-@VERSION@
 test suite.
@@ -365,26 +368,26 @@ test suite.
 .\"
 .SH EXAMPLES
 .TP
-\f(CB\)test-xnet\f(CR\) --list 0.1\fR
+\f(CB\)test-xnsl\f(CR\) --list 0.1\fR
 Generates a list of all test cases
 provided by the
-.B test-xnet
+.B test-xnsl
 executable
 with numbers starting with the initial substring of
 .BR 0.1 .
 .TP
-\f(CB\)test-xnet_thr\f(CR\) -vv --list\fR
+\f(CB\)test-xnsl_thr\f(CR\) -vv --list\fR
 Generates a verbose listing of all test cases
 provided by the
-.B test-xnet_thr
+.B test-xnsl_thr
 executable.
 .TP
-\f(CB\)test-xnet\f(CR\) --verbose=5 --onetest 0.1\fR
+\f(CB\)test-xnsl\f(CR\) --verbose=5 --onetest 0.1\fR
 Verbosely executes test case
 .BR 0.1 ,
 and provides a diagnostic return code.
 .TP
-\f(CB\)test-xnet\f(CR\) --fast --quiet --exit\fR
+\f(CB\)test-xnsl\f(CR\) --fast --quiet --exit\fR
 Executes all test cases with a timer scaling factor of
 .B 50
 with normal output suppressed and exiting on the first failed or inconclusive test case result.
@@ -398,34 +401,34 @@ with normal output suppressed and exiting on the first failed or inconclusive te
 .SH FILES
 .PP
 .TP
-.B /usr/libexec/@PACKAGE@/test-xnet
+.B /usr/libexec/@PACKAGE@/test-xnsl
 contains the
-.B test-xnet
+.B test-xnsl
 command.
 .TP
-.B /usr/libexec/@PACKAGE@/test-xnet_thr
+.B /usr/libexec/@PACKAGE@/test-xnsl_thr
 contains the
-.B test-xnet_thr
+.B test-xnsl_thr
 command.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
 .BR timod (4),
-.BR xnet (3),
+.BR xnsl (3),
 .IR "@PACKAGE_TITLE@ Installation and Reference Manual" .
 .\"
 .\"
 .SH BUGS
 .PP
-.BR test-xnet " and " test-xnet_thr
+.BR test-xnsl " and " test-xnsl_thr
 have no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
 The
-.BR test-xnet " and " test-xnet_thr
+.BR test-xnsl " and " test-xnsl_thr
 test suites, when run using
 .BR autotest ,
 are compatible with the POSIX 1003.3 conformance test methodology, with the following mapping of test
@@ -437,7 +440,7 @@ tab(:);
 lb|lb|lb
 l|l|l.
 _
-POSIX 1003.3:test-xnet\fR[\fB_thr\fR]:autotest
+POSIX 1003.3:test-xnsl\fR[\fB_thr\fR]:autotest
 _
 PASS:PASS(0):PASS
 FAIL:FAIL(1):FAIL
@@ -452,17 +455,17 @@ _
 .\"
 .SH CONFORMANCE
 .PP
-.BR test-xnet " and " test-xnet_thr
+.BR test-xnsl " and " test-xnsl_thr
 test conformance of the
-.BR xnet (3)
+.BR xnsl (3)
 library to the specifications listed on the
-.BR xnet (3)
+.BR xnsl (3)
 manual page.
 .\"
 .\"
 .SH HISTORY
 .PP
-.BR test-xnet " and " test-xnet_thr
+.BR test-xnsl " and " test-xnsl_thr
 are provided with the
 .I @PACKAGE_TITLE@
 package.

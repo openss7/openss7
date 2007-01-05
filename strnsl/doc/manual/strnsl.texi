@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strnsl.texi,v 0.9.2.2 2006/10/02 11:31:53 brian Exp $
+% @(#) $Id: strnsl.texi,v 0.9.2.3 2007/01/05 06:19:33 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2007  OpenSS7 Corporation <www.openss7.com>
 % Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/10/02 11:31:53 $ by $Author: brian $
+% Last Modified $Date: 2007/01/05 06:19:33 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -82,7 +82,7 @@ This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -128,7 +128,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2006  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2001-2007  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -219,6 +219,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Introduction::		Introduction to the package
 * Objective::			Objective of the package
 * Reference::			Contents of the package
+* Development::			Developing with the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
@@ -256,12 +257,19 @@ Reference
 * Modules::			Modules included in the package
 * Libraries::			Libraries included in the package
 * Utilities::			Utilities included in the package
-* Development::			Development against the package
+
+Development
+
+* Development Header Files::	Header Files in the package
+* Static and Shared Libraries::	Libraries in the package
+* Kernel Module Development::	Kernel development with the package
+* Manual Pages::		Manual Pages in the package
 
 Conformance
 
-* STREAMS Compatibility::	Compatibility with other STREAMS packages
-* Porting::			Porting to this STREAMS package
+* TPI Compatibility::		Compatibility to Transport Provider Interface
+* XTI Compatibility::		Compatibility to X/Open Transport Interface
+* TLI Compatibility::		Compatibility to Transport Layer Interface
 
 Releases
 
@@ -331,13 +339,15 @@ Indices
 @cindex manual notice
 @cindex licensing
 
+@ignore
 Note that previous releases of the @samp{@value{PACKAGE_TARNAME}} package were intended to provide
-additional support to GCOM release of LiS and were released primarily in Tar Ball format.  As of
-@value{PACKAGE_TARNAME}-0.9.2-5 this is no longer the case.  @value{PACKAGE_TARNAME}-0.9.2-5 and
-subsequent releases are intended to be loaded on top of an OpenSS7 release of LiS or Linux
-Fast-STREAMS.  If you wish to use these packages over a GCOM release of LiS, you will now need to
-also download and install the @samp{strxns} package from Tar Ball.
+additional support to GCOM release of @cite{LiS} and were released primarily in Tar Ball format.  As
+of @value{PACKAGE_TARNAME}-0.9.2-5 this is no longer the case.  @value{PACKAGE_TARNAME}-0.9.2-5 and
+subsequent releases are intended to be loaded on top of an OpenSS7 release of @cite{LiS} or Linux
+Fast-STREAMS.  If you wish to use these packages over a GCOM release of @cite{LiS}, you will now
+need to also download and install the @samp{strxns} package from Tar Ball.
 
+@end ignore
 This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
 License}).  Please note, however, that there are different licensing terms for the manual pages and
 some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
@@ -410,6 +420,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strnsl.texi,v $
+Revision 0.9.2.3  2007/01/05 06:19:33  brian
+- documentation updates for release
+
 Revision 0.9.2.2  2006/10/02 11:31:53  brian
 - changes to get master builds working for RPM and DEB
 - added outside licenses to package documentation
@@ -551,10 +564,10 @@ schedule of the @cite{@value{PACKAGE_TITLE}} package.
 @cindex licensing
 
 Note that previous releases of the @samp{@value{PACKAGE_TARNAME}} package were intended to provide
-additional support to GCOM release of LiS and were released primarily in Tar Ball format.  As of
+additional support to GCOM release of @cite{LiS} and were released primarily in Tar Ball format.  As of
 @value{PACKAGE_TARNAME}-0.9.2-5 this is no longer the case.  @value{PACKAGE_TARNAME}-0.9.2-5 and
-subsequent releases are intended to be loaded on top of an OpenSS7 release of LiS or Linux
-Fast-STREAMS.  If you wish to use these packages over a GCOM release of LiS, you will now need to
+subsequent releases are intended to be loaded on top of an OpenSS7 release of @cite{LiS} or Linux
+Fast-STREAMS.  If you wish to use these packages over a GCOM release of @cite{LiS}, you will now need to
 also download and install the @samp{strxns} package from Tar Ball.
 
 This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
@@ -577,9 +590,11 @@ the @cite{@value{PACKAGE_TITLE}} package.
 The @value{PACKAGE_TITLE} package is
 an X/Open Transport Interface (XTI/TLI) package for Linux
 that can be used with
-@cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}
+@cite{Linux Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}.
+@ignore
 or
 @cite{Linux STREAMS}@footnote{@xref{Top, Linux STREAMS (LiS), About This Manual, LiS, Linux STREAMS (LiS) Reference Manual}.}.
+@end ignore
 It includes development tools, header files and manual pages for
 
 @itemize
@@ -618,6 +633,7 @@ This manual is organized (loosely) into several sections as follows:
   Introduction::		This introduction
 * Objective::			Objective of the package
 * Reference::			Contents of the package
+* Development::			Developing with the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
 * Installation::		Installation of the package
@@ -632,6 +648,8 @@ This manual is organized (loosely) into several sections as follows:
 @tab Objective of the package
 @item @ref{Reference}.
 @tab Contents of the package
+@item @ref{Development}.
+@tab Developing with the package
 @item @ref{Conformance}.
 @tab Conformance of the package
 @item @ref{Releases}.
@@ -650,6 +668,8 @@ This manual is organized (loosely) into several sections as follows:
 @tab Objective of the package
 @item @cite{Reference}.
 @tab Contents of the package
+@item @cite{Development}.
+@tab Developing with the package
 @item @cite{Conformance}.
 @tab Conformance of the package
 @item @cite{Releases}.
@@ -688,7 +708,6 @@ This manual uses @cite{texinfo} typographic conventions.
 * Modules::			Modules included in the package
 * Libraries::			Libraries included in the package
 * Utilities::			Utilities included in the package
-* Development::			Development against the package
 @end menu
 
 @c ----------------------------------------------------------------------------
@@ -707,6 +726,8 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Drivers
 @cindex drivers
 
+The @cite{@value{PACKAGE_TITLE}} package does not provide any @dfn{STREAMS} drivers or modules.
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -714,14 +735,7 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Modules
 @cindex modules
 
-@subsection Transport Interface Module
-
-@subsubheading Licensing
-
-
-@subsection Transport Interface Read-Write Module
-
-@subsubheading Licensing
+The @cite{@value{PACKAGE_TITLE}} package does not provide any @dfn{STREAMS} drivers or modules.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -738,6 +752,67 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Utilities
 @cindex utilities
 
+@subsection Init Scripts
+
+Following are System V Init Scripts that are installed by the package:
+
+@table @asis
+
+
+@end table
+
+@subsection Administrative Utilities
+
+Following are user utilities for manipulating @dfn{ISO}:
+
+The @cite{@value{PACKAGE_TITLE}} package does not yet contain any adminstrative utilities.
+Eventually an @manpage{xtitrace(8)} facility will be provided.
+
+@subsection Performance Test Programs
+
+Following are performance test programs:
+
+The @cite{@value{PACKAGE_TITLE}} package does not yet contain any performance programs.  For
+performance testing of various transport providers, see the @file{netperf-@value{VERSION_NETPERF}}
+package.
+
+@subsection Conformance Test Programs
+
+Following are conformance and validation test programs included in the package:
+
+@table @asis
+
+
+@item @file{/usr/libexec/@value{PACKAGE}/testsuite}
+@itemx @file{/usr/libexec/@value{PACKAGE}/atlocal}
+The OpenSS7 Project style @command{autotest} test suite.  This test suite can be run stand-alone as
+described under @refman{Running Test Suites}.  The @file{atlocal} file provides localized
+definitions for the test suite.
+
+@end table
+
+For the proper way to execute these validation test programs in a conformance and validation test
+suite, see @refman{Running Test Suites}.
+
+@subsection Problem Report Scripts
+
+The @cite{@value{PACKAGE_TITLE}} package installs customized problem reporting scripts for reporting
+problems associated with test suite execution and other difficulties.  This problem reporting script
+is installed in the @file{/usr/libexec/@value{PACKAGE}/} subdirectory as follows:
+
+@table @asis
+
+@item @file{/usr/libexec/@value{PACKAGE}/send-pr}
+@itemx @file{/usr/libexec/@value{PACKAGE}/send-pr.config}
+This is the problem reporting script tailored for the @file{@value{PACKAGE}-@value{VERSION}}
+package.  The @file{send-pr} file is the script proper and the @file{send-pr.config} file contains
+localized configuration information.
+
+@end table
+
+For more information on the use of the problem reporting scripts, see @refman{Generating Problem
+Reports}.
+
 @c @subsection @command{test-xnet}
 
 @c Note that @command{test-xnet} is maintained as a manual page,
@@ -748,7 +823,7 @@ This manual uses @cite{texinfo} typographic conventions.
 @c ----------------------------------------------------------------------------
 
 @node Development
-@section Development
+@chapter Development
 @cindex developing
 
 @c ----------------------------------------------------------------------------
