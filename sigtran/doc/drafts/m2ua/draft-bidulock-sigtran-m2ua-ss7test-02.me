@@ -1,0 +1,1613 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: draft-bidulock-sigtran-m2ua-ss7test-02.me,v 0.9.2.5 2006/06/27 09:41:12 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2003  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.5 $) modified $Date: 2006/06/27 09:41:12 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.ds version Version\ 0.2
+.ds date June\ 18,\ 2006
+.ds expiry December\ 2006
+.so ../draft3.me
+.bp
+.bp
+.sz \n(tp
+.he 'Internet-Draft'M2UA-SS7TEST'\\\\*[date]'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+.bl 1
+;;\*[date]
+Expires in \*[expiry];;
+.bl 1
+.TE
+.(l C
+.sz \n(tp
+\fB\
+SS7 MTP2-User Adaptation Layer (M2UA)
+SS7 Test Specifications
+M2UA-SS7TEST
+<draft-bidulock-sigtran-m2ua-ss7test-02.\*(|x> 
+.)l
+.rr |x
+.ne 4
+.\"
+.\"
+.#S 2006 \*[expiry] a
+.\"
+.\"
+.uh Abstract
+.pp
+This Internet-Draft provides information for the Internet community on
+the implementation of test cases for testing the \fISS7 MTP2-User Adaptation
+Layer\fR
+.[
+RFC 3331
+%Z 1
+.]
+Signalling Gateway (SG) based on the conformance test specifications for SS7
+MTP Level 2.
+.[
+q780
+%Z 1
+.]
+.[
+q781
+%Z 1
+.]
+.[
+m2pa-test-07
+%Z 1
+.]
+.\"
+.\"
+.sh 1 Introduction
+.pp
+This draft provides details for implementation of testing of \fISS7 MTP-User
+Adaptation Layer\fR
+.[
+RFC 3331
+.]
+Signalling Gateways (SG) based on the test specifications for SS7 MTP Level 2.
+.[
+q780
+.]
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+The general aspects for SS7 protocol testing
+.[
+q780
+.]
+.[
+m2pa-test-07
+.]
+describes the requirement for an
+\fIMTP Level 3 Simulator\fR
+in the test environment for SS7 MTP Level 2 testing.
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+This 
+\fIMTP Level 3 Simulator\fR
+is responsible for issuing and accepting request and indication primitives as
+well as sending and receiving signalling messages.
+.[
+q780
+.]
+.[
+m2pa-test-07
+.]
+.pp
+This memo describes how the
+\fIMTP Level 3 Simulator\fR
+would use SS7 MTP2-User Adaptation Layer
+messages to test a Signalling Gateway implementation of.
+.[
+RFC 3331
+.]
+.\"
+.\"
+.sh 2 Scope
+.pp
+Although the SS7 MTP Level 2 test cases
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+are applicable in entirety to SS7 signalling links implemented at the M2UA
+Signalling Gateway, this memo details the mapping of M2UA messages to SS7
+Message Transfer Part (MTP) Signalling Link
+.[
+q703
+%Z 1
+.]
+.[
+m2pa-rfc
+%Z 1
+.]
+signals used in the SS7 MTP Level 2 tests.
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+.\"
+.\"
+.sh 2 Abbreviations
+.lp
+.ix +\n(iiu
+.TS
+tab(:);
+li1c0lssss.
+ANSI:\(em:American National Standards Institute.
+ASP:\(em:Application Server Process.
+BSNT:\(em:Backward Sequence Number Transmitted.
+CPT:\(em:Compatibility Test.
+ETSI:\(em:European Telecommunications Standards Institute.
+FSNC:\(em:Forward Sequence Number Confirmed.
+I-D:\(em:Internet-Draft.
+IETF:\(em:Internet Engineering Task Force.
+IOT:\(em:Interoperability Test.
+IPSP:\(em:IP Signalling Point.
+ITU:\(em:International Telecommunications Union.
+IUT:\(em:Implementation Under Test.
+M2PA:\(em:SS7 MTP2-User Peer-to-Peer Adaptation Layer.
+M2UA:\(em:SS7 MTP2-User Adaptation Layer.
+MTP2:\(em:MTP Level 2.
+MTP:\(em:Message Transfer Part.
+PT:\(em:Protocol Tester.
+RFC:\(em:Request For Comments.
+RTB:\(em:Retransmission Buffer.
+SCTP:\(em:Stream Control Transmission Protocol.
+SG:\(em:Signalling Gateway.
+SGP:\(em:Signalling Gateway Process.
+SP:\(em:Signalling Point.
+SS7:\(em:Signalling System No. 7.
+TC:\(em:Test Case.
+TS:\(em:Test Suite.
+VAT:\(em:Validation Test.
+.TE
+.\"
+.\"
+.sh 2 Terminology
+.pp
+.lp
+\fICompatibility Test (CPT)\fR\(em
+.ix +\n(iiu
+A test where multiple implementations are tested in interaction with each
+other to test for compatibility between implementations.
+.lp
+\fIImplementation Under Test (IUT)\fR\(em
+.ix +\n(iiu
+An implementation being tested (the object of testing) as part of a
+validation, compatibility or interoperability test within the test
+environment.
+.lp
+\fIInteroperability Test (IOT)\fR\(em
+.ix +\n(iiu
+A test where multiple implementations are tested in interaction with each
+other to test for interoperability between implementations.
+.lp
+\fIM2UA Monitor\fR\(em
+.ix +\n(iiu
+A device or function used to monitor, capture, record and analyze the exchange
+of M2UA messages across and IP network between implementations or protocol
+testers.  This device function may be integrated with a protocol tester.
+.lp
+\fIMTP Level 3 Simulator\fR\(em
+.ix +\n(iiu
+A device or function used to simulate the SS7 MTP Level 3
+.[
+q704
+%Z 2
+.]
+to SS7 MTP Level 2
+.[
+q703
+.]
+.[
+m2pa-rfc
+.]
+implementation.  This device or function may be integrated within the \fITest
+Environment\fR.  This device or function is normally required for SS7 MTP
+Level 2 Test Specifications
+.[
+q781
+.]
+.[
+m2pa-rfc
+.]
+validation, compatibility or interoperability tests.
+.lp
+\fIProtocol Tester (PT)\fR\(em
+.ix +\n(iiu
+A device or function used to generate normal or abnormal messages and test
+sequences for the purpose of validation testing.
+.lp
+\fISignalling Link\fR\(em
+.ix +\n(iiu
+A signalling link, SS7
+.[
+q703
+.]
+or M2PA,
+.[
+m2pa-rfc
+.]
+used to carry SS7 MTP Level 2 signalling between IUT and PT.
+.lp
+\fITest Case\fR\(em
+.ix +\n(iiu
+A particular sequence of messages and patters that make up a single
+validation, compatibility or interoperability test.
+.lp
+\fITest Environment\fR\(em
+.ix +\n(iiu
+The environment that contains the testing device and functiosn necessary and
+sufficient for executing a test suite.
+.lp
+\fITest Suite\fR\(em
+.ix +\n(iiu
+A collection of test cases meant to acheive a specific objective of
+validation, compatibility or interoperability testing.
+.lp
+\fIValidation Test (VAT)\fR\(em
+.ix +\n(iiu
+A test where a single implementation is tested in interaction with a protocol
+tester to test for validation of the implementation to a technical
+specification.
+.\"
+.\"
+.sh 2 Conventions
+.#C
+.\"
+.\"
+.\"
+.\"
+.ds mappingsection \\fI\\*(sc4\\fR
+.\"
+.\"
+.#e
+.sh 1 "Test Environment"
+.pp
+The test environment for SS7 MTP Level 2
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+testing is described in the General Aspects of SS7 testing.
+.[
+q780
+.]
+.[
+m2pa-test-07
+.]
+There are two types of testing that are accomodated as follows:
+.lp
+\fBValidation Testing\fR \(em
+.ix +\n(iiu
+consists of validating a single Implementation Under Test (IUT).  This is
+performed by connecting the IUT to a Protocol Tester (PT) within the test
+enviroment.
+.ba +\n(iiu
+.lp
+Validation testing is more extensive that compatibility testing.  This is
+because it is possible, with the use of the Protocol Tester (PT), to generate
+messages and patterns, that cannot normally be generated from an
+implementation, to test the response of the Implementation Under Test (IUT) to
+abnormal conditions.
+.ba -\n(iiu
+.lp
+\fBCompatibility Testing\fR \(em
+.ix +\n(iiu
+consists of testing the compatiability of one Implementation Under Test (IUT)
+with another.  This is performed by connecting the IUTs together within the
+test environment.
+.ba +\n(iiu
+.lp
+Compatibility testing is less extensive than validation testing.  This is
+because it is not normally possible to generate non-compliant test patterns
+with an implementation that conforms to validation testing.  However,
+compatibility tests are better at testing the interoperability of two
+implementations.
+.ba -\n(iiu
+.lp
+\fBInteroperability Testing\fR \(em
+.ix +\n(iiu
+consists of testing the interoperability of one Implementation Under Test
+(IUT) with another.  This is performed by connecting the IUT together within
+the test environment.
+.ba +\n(iiu
+.lp
+Interoperability testing is more extensive than compatibility testing and less
+extensive than validation testing.  Where compatibility testing assumes
+that the IUT have passed validation testing, interoperability testing makes no
+such assumption.  In addition, the test environment is expected to have more
+control over the IUT in interoperability testing than in compatibility
+testing.  It may be possible to generate some message and command or response
+sequences that would not normally by possible with an IUT during compatibility
+testing.
+.lp
+The objectives of interoperability testing are often different than
+compatibility testing.  The object of compatibility testing is to assure that
+an implementation that passes validation testing is, in other respects not
+tested by validation testing, compatible with other such implementations.  The
+object of interoperability testing is to show that there exist implementations
+with which each of the IUT being tested can indeed function.
+.lp
+Although they have different objectives, the test environment configuration
+for interoperability testing is the same as that for compatibility testing.
+.ba -\n(iiu
+.sh 2 "Test Configurations"
+.pp
+This section details the Validation and Compatibility test configurations used
+for testing M2UA SG and ASP for SS7 MTP Level 2 conformance.
+.\"
+.\"
+.sh 3 "Validation Test Configuration"
+.pp
+Validation testing consists of validating a single Implementation Under Test
+(IUT) for SS7 MTP Level 2 conformance.  Several test configurations can be
+used with M2UA Signalling Gateways (SG) and Application Server Processes
+(ASP) as follows:
+.sh 4 "SS7 Validation Test Configuration"
+.(z M
+.ie '\*(.T'ps' \{\
+.so ss7test-00.fig1.pic
+.\}
+.el \{\
+.(c
+.nf
+\fC\s-3\
+ _____________________________________________________________\ 
+|                                                             |
+| TEST ENVIRONMENT                                            |
+|                                    MTP Level 3 Simulator    |
+|       ___________                      _____|_____          |
+|      |           |                    |           |         |
+|      |    PT     |____________________|    IUT    |         |
+|      |   SP B    |  |  Signalling     |   SP A    |         |
+|      |___________|  |     Link        |___________|         |
+|         SS7 PT      |                    M2UA SG            |
+|                     |                                       |
+|                 ____|____                                   |
+|                |         |                                  |
+|                |  Link   |                                  |
+|                | Monitor |                                  |
+|                |_________|                                  |
+|                                                             |
+|_____________________________________________________________|
+.)c
+.\}
+.#f "Validation Test Configuration #1"
+.)z
+.pp
+\fI\*(&f\n(&p\fR illustrates the Validation Test configuration.
+As described in the SS7 Test Specification,
+.[
+q780
+.]
+.[
+m2pa-test-07
+.]
+the SS7 Level 2 validation testing environment consists of the following
+components:
+.np
+The \fIImplementation Under Test (IUT)\fR that is being validated a position
+\(lqSP A\(rq.
+.np
+The \fIMTP Level 3 Simulator\fR attached to the IUT at position \(lqSP A\(rq.
+.np
+The \fIProtocol Tester (PT)\fR performing validation tests at position
+\(lqSP B\(rq.
+.np
+A \fISignalling Link\fR
+.[ [
+q703
+.] or\ 
+.[
+m2pa-rfc
+.]]
+between the PT at position \(lqSP B\(rq and the IUT at position \(lqSP A\(rq.
+.np
+A \fILink Monitor\fR monitoring the message exchange accross the Signalling
+Link.
+.[ [
+q703
+.] or\ 
+.[
+m2pa-rfc
+.]]
+This function \fBMAY\fR be integrated with the Protocol Tester or the Test
+Environment.
+.pp
+For this configuration, the interface between the Implementation Under Test
+(IUT) and the \fIMTP Level 3 Simulator\fR is that described in the SS7 Test
+Specification.
+.[
+q780
+.]
+.[
+m2pa-test-07
+.]
+This is the normal configuration for SS7 MTP Level 2 testing
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+and is not modified by this memo.  Normal SS7 MTP Level 2 testing \fBSHOULD\fR
+be performed on the M2UA SG before performing validation, compatibility or
+interoperability tests in the other configurations described in this memo.
+.sh 4 "SG Validation Test Configuration"
+.(z M
+.ie '\*(.T'ps' \{\
+.so ss7test-00.fig2.pic
+.\}
+.el \{\
+.(c
+.nf
+\fC\s-3\
+ _____________________________________________________________\ 
+|                                                             |
+| TEST ENVIRONMENT                                            |
+|                                    MTP Level 3 Simulator    |
+|                                             |               |
+|                                       M2UA  |  SCTP         |
+|                                             |  Association  |
+|       ___________                      _____|_____          |
+|      |           |                    |           |         |
+|      |    PT     |____________________|    IUT    |         |
+|      |   SP B    |  |  Signalling     |   SP A    |         |
+|      |___________|  |     Link        |___________|         |
+|         SS7 PT      |                    M2UA SG            |
+|                     |                                       |
+|                 ____|____                                   |
+|                |         |                                  |
+|                |  Link   |                                  |
+|                | Monitor |                                  |
+|                |_________|                                  |
+|                                                             |
+|_____________________________________________________________|
+.)c
+.\}
+.#f "Validation Test Configuration #2"
+.)z
+.pp
+\fI\*(&f\n(&p\fR illustrates the Validation Test configuration.
+As described in the SS7 Test Specification,
+.[
+q780
+.]
+.[
+m2pa-test-07
+.]
+the SS7 Level 2 validation testing environment consists of the following
+components:
+.np
+The \fIImplementation Under Test (IUT)\fR that is being validated at position
+\(lqSP A\(rq.
+.np
+An \fIMTP Level 3 Simulator\fR attached to the IUT at position
+\(lqSP A\(rq.
+.np
+The \fIProtocol Tester (PT)\fR performing validation tests at position
+\(lqSP B\(rq.
+.np
+A \fISignalling Link\fR
+.[ [
+q703
+.] or\ 
+.[
+m2pa-rfc
+.]]
+between the PT at position \(lqSP B\(rq and the IUT at position \(lqSP A\(rq.
+.np
+A \fILink Monitor\fR monitoring the message exchange accross the Signalling
+Link.
+.[ [
+q703
+.] or\ 
+.[
+m2pa-rfc
+.]]
+This function \fBMAY\fR be integrated with the Protocol Tester or the Test
+Environment.
+.pp
+In addition, this memo specifies the interface between the Implementation
+Under Test (IUT) and the MTP Level 3 Simulator
+.[
+q780
+.]
+.[
+m2pa-test-07
+.]
+within the test environment.
+.pp
+The \fIMTP Level 3 Simulator\fR \fBSHALL\fR be attached to the IUT a position
+\(lqSP A\(rq using an M2UA SCTP Association.  The \fIMTP Level 3 Simulator\fR
+\fBSHALL\fR inject and collect M2UA messages to and from the IUT during the
+performance of SS7 MTP Level 2 testing.
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+The \fIMTP Level 3 Simulator\fR \fBSHALL\fR inject and collect the M2UA
+messages as decribed in
+\*[mappingsection]
+of this document.
+.\"
+.\"
+.sh 4 "SG-ASP Validation Test Configuration"
+.(z M
+.ie '\*(.T'ps' \{\
+.so ss7test-00.fig3.pic
+.\}
+.el \{\
+.(c
+.nf
+\fC\s-3\
+ _____________________________________________________________\ 
+|                                                             |
+| TEST ENVIRONMENT                                            |
+|                                    MTP Level 3 Simulator    |
+|                                        _____|_____          |
+|                                       |           |         |
+|                                       |    IUT    | M2UA    |
+|                                       |   SP A    | ASP     |
+|                                       |___________|         |
+|                                             |               |
+|                                       M2UA  |  SCTP         |
+|                                             |  Association  |
+|       ___________                      _____|_____          |
+|      |           |                    |           |         |
+|      |    PT     |____________________|    IUT    |         |
+|      |   SP B    |  |  Signalling     |   SP A    |         |
+|      |___________|  |     Link        |___________|         |
+|         Protocol    |                    M2UA SG            |
+|          Tester     |                                       |
+|                 ____|____                                   |
+|                |         |                                  |
+|                |  Link   |                                  |
+|                | Monitor |                                  |
+|                |_________|                                  |
+|                                                             |
+|_____________________________________________________________|
+.)c
+.\}
+.#f "Validation Test Configuration #3"
+.)z
+.pp
+\fI\*(&f\n(&p\fR illustrates a Validation Test Configuration that includes an
+ASP in the validation tests.  In this case the \fIMTP Level 3 Simulator\fR is
+connected at the ASP rather than directly to the SG.
+In this configuration, the combination of ASP and SG form the Implementation
+Under Test (IUT).
+.pp
+For this configuration the interface between the \fIMTP Level 3 Simulator\fR
+and the M2UA ASP is the same as for normal SS7 MTP Level 2 Testing.
+.[
+q780
+.]
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+The test envirnoment \fBSHOULD\fR include monitoring of the M2UA SCTP
+Association to ensure the mapping between SS7 MTP Level 2
+.[
+q703
+.]
+.[
+m2pa-rfc
+.]
+signals, SS7 MTP Level 2 Test Specification
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+commands, and SS7 MTP2-User Adaptation Layer
+.[
+RFC 3331
+.]
+messages as described in
+\*[mappingsection].
+.\"
+.\"
+.sh 3 "Compatibility Test Configurations"
+.pp
+Compatibility testing consists of testing two Implementations Under Test (IUT)
+for compatibility with each other.  Several test configurations can be used
+with M2UA Signalling Gateways (SG) and Application Server Processes (ASP) as
+follows:
+.sh 4 "SS7 Compatibility Test Configuration"
+.(z M
+.ie '\*(.T'ps' \{\
+.so ss7test-00.fig4.pic
+.\}
+.el \{\
+.(c
+.nf
+\fC\s-3\
+ _____________________________________________________________\ 
+|                                                             |
+| TEST ENVIRONMENT                                            |
+|                                                             |
+|   MTP Level 3 Simulator            MTP Level 3 Simulator    |
+|       _____|_____                      _____|_____          |
+|      |           |                    |           |         |
+|      |    IUT    |____________________|    IUT    |         |
+|      |   SP B    |  |  Signalling     |   SP A    |         |
+|      |___________|  |     Link        |___________|         |
+|         M2UA SG     |                    M2UA SG            |
+|                     |                                       |
+|                 ____|____                                   |
+|                |         |                                  |
+|                |  Link   |                                  |
+|                | Monitor |                                  |
+|                |_________|                                  |
+|                                                             |
+|_____________________________________________________________|
+.)c
+.\}
+.#f "Compatibility Test Configuration #1"
+.)z
+.pp
+\fI\*(&f\n(&p\fR illustrates the Compatibility Test configuration.
+As described in the SS7 Test Specification,
+.[
+q780
+.]
+.[
+m2pa-test-07
+.]
+The SS7 Level 2 compatibility testing environment consists of the following
+components:
+.np
+One \fIImpementation Under Test (IUT)\fR for compatibility testing at position
+\(lqSP A\(rq.
+.np
+An \fIMTP Level 3 Simulator\fR attached to the IUT at position
+\(lqSP A\(rq.
+.np
+Another \fIImpementation Under Test (IUT)\fR for compatibility testing at position
+\(lqSP B\(rq.
+.np
+Another \fIMTP Level 3 Simulator\fR attached to the IUT at position
+\(lqSP B\(rq.
+.np
+A \fISignalling Link\fR
+.[ [
+q703
+.] or\ 
+.[
+m2pa-rfc
+.]]
+between IUT at position \(lqSP A\(rq and IUT at position \(lqSP B\(rq.
+.np
+A \fILink Monitor\fR monitoring the message exchange accross the Signalling
+Link.
+.[ [
+q703
+.] or\ 
+.[
+m2pa-rfc
+.]]
+.pp
+For this configuration, the interface between each Implementation Under
+Test (IUT) and the \fIMTP Level 3 Simulator\fR is that described in the SS7
+Test Specifications.
+.[
+q780
+.]
+.[
+m2pa-test-07
+.]
+This is the normal configuration for SS7 MTP Level 2 testing
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+and is not modified by this memo.  Normal SS7 MTP Level 2 testing \fBSHOULD\fR
+be peformed on the M2UA SG before performing compatibility tests in the other
+configurations described in this memo.
+.sh 4 "SG Compatibility Test Configuration"
+.(z M
+.ie '\*(.T'ps' \{\
+.so ss7test-00.fig5.pic
+.\}
+.el \{\
+.(c
+.nf
+\fC\s-3\
+ _____________________________________________________________\ 
+|                                                             |
+| TEST ENVIRONMENT                                            |
+|                                                             |
+|   MTP Level 3 Simulator            MTP Level 3 Simulator    |
+|            |                                |               |
+|      M2UA  |  SCTP                    M2UA  |  SCTP         |
+|            |  Association                   |  Association  |
+|       _____|_____                      _____|_____          |
+|      |           |                    |           |         |
+|      |    IUT    |____________________|    IUT    |         |
+|      |   SP B    |  |  Signalling     |   SP A    |         |
+|      |___________|  |     Link        |___________|         |
+|         M2UA SG     |                    M2UA SG            |
+|                     |                                       |
+|                 ____|____                                   |
+|                |         |                                  |
+|                |  Link   |                                  |
+|                | Monitor |                                  |
+|                |_________|                                  |
+|                                                             |
+|_____________________________________________________________|
+.)c
+.\}
+.#f "Compatibility Test Configuration #2"
+.)z
+.pp
+\fI\*(&f\n(&p\fR illustrates the Compatibility Test configuration.
+As described in the SS7 Test Specification,
+.[
+q780
+.]
+.[
+m2pa-test-07
+.]
+The SS7 Level 2 compatibility testing environment consists of the following
+components:
+.np
+One \fIImpementation Under Test (IUT)\fR for compatibility testing at position
+\(lqSP A\(rq.
+.np
+An \fIMTP Level 3 Simulator\fR attached to the IUT at position
+\(lqSP A\(rq.
+.np
+Another \fIImpementation Under Test (IUT)\fR for compatibility testing at position
+\(lqSP B\(rq.
+.np
+Another \fIMTP Level 3 Simulator\fR attached to the IUT at position
+\(lqSP B\(rq.
+.np
+A \fISignalling Link\fR
+.[ [
+q703
+.] or\ 
+.[
+m2pa-rfc
+.]]
+between IUT at position \(lqSP A\(rq and IUT at position \(lqSP B\(rq.
+.np
+A \fILink Monitor\fR monitoring the message exchange accross the Signalling
+Link.
+.[ [
+q703
+.] or\ 
+.[
+m2pa-rfc
+.]]
+.pp
+In addition, this memo specifies the interface between the Implementation
+Under Test (IUT) and the MTP Level 3 Simulator
+.[
+q780
+.]
+.[
+m2pa-test-07
+.]
+within the test environment.
+.pp
+The \fIMTP Level 3 Simulators\fR \fBSHALL\fR be attached to the IUT at
+position \(lqSP A\(rq and the IUT at position \(lqSP B\(rq using an M2UA SCTP
+Association.  The \fIMTP Level 3 Simulator\fR \fBSHALL\fR inject and collect M2UA
+messages to and from the IUT during the performance of SS7 MTP Level 2 testing.
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+The \fIMTP Level 3 Simulator\fR \fBSHALL\fR inject and collect the M2UA
+messages as decribed in
+\*[mappingsection]
+of this document.
+.\"
+.\"
+.sh 4 "SG-ASP Compatibility Test Configuration"
+.(z M
+.ie '\*(.T'ps' \{\
+.so ss7test-00.fig6.pic
+.\}
+.el \{\
+.(c
+.nf
+\fC\s-3\
+ _____________________________________________________________\ 
+|                                                             |
+| TEST ENVIRONMENT                                            |
+|                                                             |
+|   MTP Level 3 Simulator            MTP Level 3 Simulator    |
+|       _____|_____                      _____|_____          |
+|      |           |                    |           |         |
+|      |    IUT    | M2UA               |    IUT    | M2UA    |
+|      |   SP A    | ASP                |   SP B    | ASP     |
+|      |___________|                    |___________|         |
+|            |                                |               |
+|      M2UA  |  SCTP                    M2UA  |  SCTP         |
+|            |  Association                   |  Association  |
+|       _____|_____                      _____|_____          |
+|      |           |                    |           |         |
+|      |    IUT    |____________________|    IUT    |         |
+|      |   SP A    |  |  Signalling     |   SP B    |         |
+|      |___________|  |     Link        |___________|         |
+|         M2UA SG     |                    M2UA SG            |
+|                     |                                       |
+|                 ____|____                                   |
+|                |         |                                  |
+|                |  Link   |                                  |
+|                | Monitor |                                  |
+|                |_________|                                  |
+|                                                             |
+|_____________________________________________________________|
+.)c
+.\}
+.#f "Compatibility Test Configuration #3"
+.)z
+.pp
+\fI\*(&f\n(&p\fR illustrates a Compatibility Test Configuration that includes
+an ASP in the compatibility tests.  In this case the \fIMTP Level 3
+Simulator\fR is connected at the ASP rather than directly to the SGs.  IN
+this configuration, the combination of each ASP and SG form the two
+Implementations Under Test (IUT).
+.pp
+For this configuration, the interface between the \fIMTP Level 3 Simulator\fR
+and the M2UA ASP is the same as for normal SS7 MTP Level 2 Testing.
+.[
+q780
+.]
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+The test environment \fBSHOULD\fR include monitoring of the M2UA SCTP
+Association to ensure the mapping between SS7 MTP Level 2
+.[
+q703
+.]
+.[
+m2pa-rfc
+.]
+signals, SS7 MTP Level 2 Test Specification
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+commands, and SS7 MTP2-User Adaptation Layer
+.[
+RFC 3331
+.]
+messages as described in
+\*[mappingsection].
+.\"
+.\"
+.sh 2 "Testing Methodologies"
+.sh 3 "Test Sequence"
+.pp
+Testing of a particular M2UA SG implementation \fBSHOULD\fR be performed in
+the following order.
+.np
+\fBValidation Test Configuration #1\fR \(em
+validation tests
+.[ [
+q781
+.] or\ 
+.[
+m2pa-test-07
+.]]
+directly.
+.np
+\fBValidation Test Configuration #2\fR \(em
+validation tests
+.[ [
+q781
+.] or\ 
+.[
+m2pa-test-07
+.]]
+with M2UA interface between SG and \fIMTP Level 3 Simulator\fR.
+.np
+\fBCompatibility Test Configuration #1\fR \(em
+compatibility tests
+.[ [
+q781
+.] or\ 
+.[
+m2pa-test-07
+.]]
+directly.
+.np
+\fBCompatibility Test Configuration #2\fR \(em
+compatibility tests
+.[ [
+q781
+.] or\ 
+.[
+m2pa-test-07
+.]]
+with M2UA interface between SG and \fIMTP Level 3 Simulator\fR.
+.nr parareg \n($p
+.pp
+Testing of a particular M2UA ASP implementation against an SG implementation
+(already tested per above) \fBSHOULD\fR be performed in the following order:
+.nr $p \n[parareg]
+.np
+\fBValidation Test Configuration #3\fR \(em
+validation tests
+.[ [
+q781
+.] or\ 
+.[
+m2pa-test-07
+.]]
+directly, with SG/ASP interaction within the IUT.
+.np
+\fBCompatibility Test Configuration #3\fR \(em
+compatibility tests
+.[ [
+q781
+.] or\ 
+.[
+m2pa-test-07
+.]]
+directly, with SG/ASP interaction within the IUT.
+.nr parareg \n($p
+.pp
+In addtion, validation testing of the M2UA protocol between ASP and SG
+\fBSHOULD\fR be performed independent of SS7 MTP Level 2 validation testing in
+accordance with a validation test suite for M2UA\*#.
+.(d
+.ip \*#
+At the time of writing this memo, there did not exist an IETF validation test
+suite specification for the M2UA protocol.  The author of this memo is working
+on the development of such a specification.
+.)d
+Also, compatibility testing of the M2UA protocol between ASP and SG
+\fBSHOULD\fR be performed independent of SS7 MTP Level 2 compatibility testing
+in accordance with a compatibility test suite for M2UA\*#.
+.(d
+.ip \*#
+At the timer of writing this memo, there did not exist an IETF compatibility
+test suite specificaiton for the M2UA protocol.  There does exist, however,
+several M2UA Interop test plans that come close to such a specification.  The
+author of this memo is also working on the development of such a
+specification.
+.)d
+.pp
+The normal methodology for testing SS7 MTP Level 2
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+is to perform validation testing on an IUT before performing compatibility
+testing.  The tests presented in
+.[ [
+q781
+.] and\ 
+.[
+m2pa-test-07
+.]]
+test the functionality of the MTP
+Level 2 state machines; however, they do not adequately test the L2 to L3
+interface.
+.pp
+To complete validation and compatibility testing of M2UA, the validation and
+compatibility tests presented in the SS7 MTP Level 3 Test Specification
+.[
+q782
+%Z 2
+.]
+\fBSHOULD\fR
+be performed with the M2UA ASP in the test environment to assure that the M2UA
+IUT has properly implemented the L2 to L3 interface.
+The test environment for executing
+.[
+q782
+.]
+tests are outside the scope of this document.
+.nr $p \n[parareg]
+.np
+\fBMTP Level 3 Validation Tests\fR \(em
+validation tests
+.[
+q781
+.]
+performed with SG/ASP interaction within the IUT.
+.np
+\fBMTP Level 3 Compatibility Tests\fR \(em
+compatibility tests
+.[
+q781
+.]
+performed with SG/ASP interaction within the IUT.
+.\"
+.\"
+.#e
+.sh 1 "Tests"
+.pp
+This section details the validation and compatibility tests to be performed.
+.sh 2 "Test Cases"
+.pp
+In each test configuration, the applicable Validation tests or Compatibility
+tests of the SS7 MTP Level 2 Test Specification,
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+or other applicatble SS7 MTP Level 2 test specification,
+\fBSHALL\fR be performed.
+.\"
+.\"
+.#e
+.sh 1 "Mapping of Signals"
+.pp
+The mapping of SS7 MTP Level 2
+.[
+q703
+.]
+.[
+m2pa-rfc
+.]
+signals, SS7 MTP Level 2 Test
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+commands, and SS7 MTP2-User Adaptation Layer
+.[
+RFC 3331
+.]
+messages are listed in \fI\*(&t\n(&a\fR.
+Each
+.[
+q703
+.]
+.[
+m2pa-rfc
+.]
+signal \fBSHALL\fR be mapped onto a
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+command or indication and onto a
+.[
+RFC 3331
+.]
+message.
+When the SS7 MTP Level 2
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+test case calls for a given
+.[
+q703
+.]
+.[
+m2pa-rfc
+.]
+signal or
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+command or indication, the corresponding
+.[
+RFC 3331
+.]
+message \fBSHALL\fR be injected or collected by the \fIMTP Level 3 Simulator\fR.
+.\"
+.\"
+.sp
+.#t "Mapping of Q.703 Signals, Q.781 Commands and M2UA Messages"
+.TS H
+center tab(;);
+lblblblb
+lb|lb|lb|lb
+l|li|l|l.
+M2UA;M2UA;Q.703;Q.781
+Message;Parameter;Signal;Notation
+_
+.TH
+ESTABLISH;;Start;:start
+Request;;;
+_
+ESTABLISH;;In Service;\fI<1>\fR
+Confirm;;;
+_
+RELEASE;;Stop;:stop
+Request;;;
+_
+RELEASE;;\fI<5>\fR;\fI<5>\fR
+Confirm;;;
+_
+RELEASE;;Link;\fI<2>\fR
+Indication;;Failure;
+_
+STATE;STATUS_LPO_SET;Local;:set LPO
+Request;;Processor;
+;;Outage;
+;_;_;_
+;STATUS_LPO_CLR;Local;:clear LPO
+;;Processor;
+;;Recovered;
+;_;_;_
+;STATUS_EMER_SET;Emergency;:set EM
+;_;_;_
+;STATUS_EMER_CLR;Emergency;:clear EM
+;;Ceases;
+;_;_;_
+;STATUS_FLUSH_BUFFERS;Flush;\fI<3>\fR
+;;Buffers;
+;_;_;_
+;STATUS_CONTINUE;Continue;\fI<3>\fR
+;_;_;_
+;STATUS_CLEAR_RTB;Clear;\fI<3>\fR
+;;RTB;
+;_;_;_
+;STATUS_CONG_ACCEPT;Congestion;\fI<4>\fR
+;;Accept;
+;_;_;_
+;STATUS_CONG_DISCARD;Congestion;:make
+;;Discard;congestion
+;;;state
+;_;_;_
+;STATUS_CONG_CLEAR;No;:clear
+;;Congestion;congestion
+;;;state
+_
+STATE;;\fI<5>\fR;\fI<5>\fR
+Confirm;;;
+_
+STATE;EVENT_RPO_ENTER;Remote;\fI<9>\fR
+Indication;;Processor;
+;;Outage;
+;_;_;_
+;EVENT_RPO_EXIT;Remote;\fI<9>\fR
+;;Processor;
+;;Recovered;
+_
+DATA;ACTION_RTRV_BSN;Retrieve;\fI<7>\fR
+RETRIEVAL;;BSNT;
+Request;_;_;_
+;ACTION_RTRV_MSGS;Retrieval;\fI<7>\fR
+;;Request;
+;;and FSNC;
+_
+DATA;ACTION_RTRV_MSGS;Retrieved;\fI<7>\fR
+RETRIEVAL;;Message;
+Confirm;_;_;_
+;ACTION_RTRV_BSN;BSNT;\fI<7>\fR
+_
+DATA;;Retrieval;\fI<7>\fR
+RETRIEVAL;;Complete;
+COMPLETE;;;
+Indication;;;
+_
+CONGESTION;;\fI<6>\fR;\fI<6>\fR
+Indication;;;
+_
+DATA;;\fI<5>\fR;\fI<5>\fR
+Acknowledge;;;
+_
+DATA;;Message;\fI<8>\fR
+Request;;for;
+;;Transmission;
+_
+DATA;;Received;
+Indication;;Message;
+_
+\fI<10>\fR;;Power On;:power ON
+_
+\fI<10>\fR;;\(em;:tx break
+_
+.TE
+.\"
+.\"
+.lp
+\fBNotes for \fI\*(&t\n(&b\fB:
+.nr ii 0.5i
+.ip <1>
+MTP Level 2 Test Specifications
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+do not provide a notation for "In Service" indication; however, in a number
+of test cases it is necessary to establish that the link is in the "In
+Service" state.  The \fBESTABLISH Confirm\fR
+.[
+rfc 3331
+.]
+message sent by the SG can be used to confirm that the link has acheived the
+"In Service" state.
+.ip <2>
+MTP Level 2 Test Specifications
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+do not provide a notation for "Link Failure" indication; however, in a
+number of test cases it is necessary to establish that the link has failed.
+The \fBRELEASE Indication\fR
+.[
+rfc 3331
+.]
+message sent by the SG can be used to confirm that the link has failed.
+.ip <3>
+MTP Level 2 Test Specifications
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+do not provide a notation for "Flush Buffers," "Clear RTB," "Continue," or
+"Resume."  However, use of these primitives is necessary in some test cases
+(e.g. test case 4.1,
+.[
+q781
+.]
+test case 3.4.1
+.[ [
+m2pa-test-07
+.]]).
+The \fBSTATE Request\fR
+.[
+rfc 3331
+.]
+message with the
+\fISTATUS_FLUSH_BUFFERS\fR,
+\fISTATUS_CLEAR_RTB\fR
+or
+\fISTATUS_CONTINUE\fR
+state values \fBSHOULD\fR be used to perform these functions.
+.ip <4>
+MTP Level 2 Test Specifications
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+do not require the use of this request.
+.ip <5>
+There are no SS7 MTP Level 2
+.[
+q703
+.]
+.[
+m2pa-rfc
+.]
+signals
+or SS7 MTP Level 2 Test
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+actions that correspond to these
+.[
+RFC 3331
+.]
+messages; however, these messages are required by the
+.[
+RFC 3331
+.]
+specifications and it \fBSHOULD\fR be verified that the SG issues these
+messages to the test enviroment under the appropriate conditions during
+testing.
+.ip <6>
+Although SS7 MTP Level 2
+.[
+q703
+.]
+.[
+m2pa-rfc
+.]
+provides signals to SS7 MTP Level 3
+.[
+q704
+.]
+indicating congesiton onset and abatement that use these
+.[
+RFC 3331
+.]
+messages, SS7 MTP Level 2 Tests
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+do not perform congestion testing that would generate these indications to the
+test environment.
+.ip <7>
+MTP Level 2 Test Specifications
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+do not test retrieval.  Retrieval tests are performed by SS7 MTP Level 3
+testing.
+.[
+q782
+.]
+.ip <8>
+MTP Level 2 Test Specifications
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+do not have a notation for signalling messages (other than indicating that
+an MSU is sent or received); however, signalling messages are exchanged
+between L2 and L3 as a normal course of most of the SS7 MTP Level 2
+tests.
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+.ip <9>
+MTP Level 2 Test Specifications
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+do not provide a notation for "Remote Processor Outage" or "Remote Processor
+Recovered" indications.  These indications are not required in SS7 MTP Level 2
+tests;
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+however, these indications \fBSHOULD\fR be delivered to the test environment
+on entry and exit from the "Remote Processour Outage" state.
+.ip <10>
+MTP Level 2 Test Specifications
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+defines these signals, and these signals are required
+within the test environment;
+.[
+q780
+.]
+.[
+m2pa-test-07
+.]
+however, these signals are outside the scope of the SS7 MTP2-User Adaptation
+Layer
+.[
+RFC 3331
+.]
+protocol and \fBSHOULD\fR be generated by other means.
+.ba +\n(iiu
+.lp
+Note that it is possible that some implementations
+might use the \fBREGISTRATION Request\fR or \fBASP-ACTIVE\fR
+.[
+RFC 3331
+.]
+messages for powering on the signalling link.
+.ba -\n(iiu
+.pp
+All of the applicable validation or compatibility tests of the SS7 MTP Level 2
+Test Specification
+.[
+q781
+.]
+.[
+m2pa-test-07
+.]
+\fBSHALL\fR be performed in this fashion with the mapping presented in
+\fI\*(&t\n(&b\fR.  For other SS7 Conformance Test Specifications, a similar
+mapping and the test configurations presented \fBSHOULD\fR be used.
+.\"
+.\"
+.#e
+.sh 1 Examples
+.\"
+.\"
+.\"
+.\"
+.uh "Security Considerations"
+.pp
+There are no security considerations for this draft.
+.uh "IANA Considerations"
+.pp
+There are no IANA considerations for this draft.
+.\"
+.\"
+.#e
+.(b M
+.#v
+.sh 1 "Change History" 0
+.pp
+This section provides historical information on the changes made to this
+draft.  This section will be removed from the document when the document is
+finalized.
+.sh 2 "Changes from Version 0.2 to Version 0.3" 0 3
+.np
+Updated version numbers and resubmitted.
+.sh 2 "Changes from Version 0.1 to Version 0.2" 0 2
+.np
+Updated first and last page to IETF boiler plate.
+.pp
+Updated dates, versions and references.
+.sh 2 "Changes from Version 0.0 to Version 0.1" 0 1
+.pp
+Updated dates and references.
+.sh 2 "Version 0.0" 0 0
+.pp
+This is the first version of this document.
+.sh 3 "Change Log" 0 0 0
+.lp
+.(l I
+.nf
+\fC\s-2
+$Log: draft-bidulock-sigtran-m2ua-ss7test-02.me,v $
+Revision 0.9.2.5  2006/06/27 09:41:12  brian
+- rereleased drafts
+
+Revision 0.9.2.4  2006/06/18 20:53:33  brian
+- preparing for draft rerelease
+
+Revision 0.9.2.3  2005/10/17 11:53:44  brian
+- updated drafts for republication
+
+Revision 0.9.2.2  2005/05/14 08:33:15  brian
+- copyright header correction
+
+Revision 0.9.2.1  2004/08/21 10:14:37  brian
+- Force checkin on branch.
+
+Revision 0.9  2004/02/17 09:44:31  brian
+- Baseline for documentation.
+
+Revision 0.8.2.3  2003/07/28 13:10:34  brian
+Reformatting.
+
+Revision 0.8.2.2  2003/07/27 08:15:27  brian
+Checking in changes.
+
+Revision 0.8.2.1  2003/07/26 23:19:03  brian
+Minor corrections to table.
+
+Revision 0.8  2003/07/26 19:10:57  brian
+Added new drafts.
+.)l
+.)b
+.\"
+.\"
+.#E
+.(b M
+.#v
+.[
+$LIST$
+.]
+.)b
+.(b M
+.#v
+.\".uh "Acknowledgments"
+.\".pp
+.\"The authors would like to thank
+.\"for their valuable comments and suggestions.
+.#A
+.bl 3
+.lp
+This draft expires \*[expiry].
+.)b
+.#T 2006

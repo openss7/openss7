@@ -1,0 +1,181 @@
+
+Internet Draft        SS7 MTP3 Gateway Architecture         October 2000
+
+
+
+Network Working Group                               Brian F. G. Bidulock
+INTERNET-DRAFT                                   Inet Technologies, Inc.
+
+Expires in six months                                       October 2000
+
+
+
+                     SS7 MTP3 Gateway Architecture
+                  <draft-bidulock-sigtran-m3gw-00.txt>
+
+
+
+
+Status of this Memo
+
+   This document is an Internet-Draft and is in  full  conformance  with
+   all  provisions of Section 10 or RFC 2026.  Internet-Drafts are work-
+   ing documents of the Inetnet Engineering Task Force (IETF),  its  ar-
+   eas,  and  its  working groups.  Note that other groups may also dis-
+   tribute working documents as Internet-Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and  may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference  mate-
+   rial or to cite them other than as 'work in progress'.
+
+   The   list   of   current   Internet-Drafts   can   be   accessed  at
+   http://www.ietf.org/ietf/1id-abstracts.txt
+
+   The list of Internet-Draft Shadow  Directories  can  be  accessed  at
+   http://www.ietf.org/shadow.html
+
+   To  learn  the current status of any Internet-Draft, please check the
+   Directories  on  ftp.is.co.za   (Africa),   nic.nordu.net   (Europe),
+   munnari.oz.au   (Pacific  Rim),  ftp.ietf.org  (US  East  Coast),  or
+   ftp.isi.edu (US West Coast).
+
+Abstract
+
+   This Internet Draft defines an interworking architecture and function
+   for  providing  seamless and transparent interworking between the SS7
+   newtork and and IP network at SS7 Level 3  (MTP  -  Message  Transfer
+   Part)  for  providing  IP host-based MTP User Parts within an IP net-
+   work.  This architecture permits IP hosts performing an MTP User Part
+   function  to  appears  as though they are normal SEPs (Signalling End
+   Points) or STPs (Signalling Transfer Points) withing the SS7 network,
+   while acting normally within the IP domain.  The gateway function de-
+   scribed here is an  SG  (Signalling  Gateway)  interworking  function
+   which provides this capability at the boundary of the SS7 and IP net-
+   works.  This specifiction is independent  of  IP  transport,  however
+   candidates are UDP, TCP, RDP, RUDP, and SCTP.
+
+
+
+Bidulock                       Version 0.0                        Page 1
+
+Internet Draft        SS7 MTP3 Gateway Architecture         October 2000
+
+
+
+1.  Introduction
+
+1.1.  Scope
+
+   A need has been identified for providing seamless and transparent in-
+   terworking between SS7 and IP networks for the  purposes  of  placing
+   application  in  the  IP  domain  which service the SS7 domain.  This
+   would permit IP host applications whcih are located in the IP  domain
+   to  provide  services into an SS7 network as though they we a part of
+   that SS7 network.  The intention of this MTP3 Gateway Architecture is
+   as follows:
+
+    + permit  the application to only be concerned with IP related rout-
+      ing and tasks.
+    + Gateways) acting as SEPs (Signalling End  Points)  or  STPs  (Sig-
+      nalling  Transfer  Points)  to remain conformant to SS7 specifica-
+      tions without compromising the IP network philosophy.
+
+1.2.  Terminology
+
+   Signalling Gateway (SG)
+
+   Signalling End Point (SEP)
+      An SEP (Signalling End Point) is  an  SS7  SP  (Signalling  Point)
+      which  originates  and terminates MTP (Message Transfer Part) User
+      traffic.
+
+   Signalling Transfer Point (STP)
+      An STP (Signalling Transfer Point) is an SS7 SP (Signalling Point)
+      which  can forward or relay SS7 MTP messages which are destined to
+      an SS7 SP (Signalling Point) which is distant or remote  from  the
+      point in question.
+
+1.3.  Abbreviations
+
+   SS7
+      Signalling System No. 7
+
+   MTP
+      Message Transfer Part
+
+   SCCP
+      Signalling Connection Control Part
+
+   ISDN
+      Integrated Services Digital Network
+
+   ISUP
+      ISDN (Integrated Services Digital Network) User Part
+
+
+
+
+
+Bidulock                       Version 0.0                        Page 2
+
+Internet Draft        SS7 MTP3 Gateway Architecture         October 2000
+
+
+
+1.4.  M3GW Overview
+
+1.4.1.  M3GW Architecture
+
+
+                             TABLE OF CONTENTS
+    Status of this Memo ...........................................    1
+    Abstract ......................................................    1
+   1 Introduction .................................................    2
+   1.1 Scope ......................................................    2
+   1.2 Terminology ................................................    2
+   1.3 Abbreviations ..............................................    2
+   1.4 M3GW Overview ..............................................    3
+   1.4.1 M3GW Architecture ........................................    3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Bidulock                       Version 0.0                        Page 3
+

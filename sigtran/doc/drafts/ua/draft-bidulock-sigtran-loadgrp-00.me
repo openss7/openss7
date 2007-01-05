@@ -1,0 +1,1465 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: draft-bidulock-sigtran-loadgrp-00.me,v 0.9.2.2 2005/05/14 08:33:18 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2002  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.2 $) modified $Date: 2005/05/14 08:33:18 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.R1
+abbreviate A
+label L
+no-default-database
+no-accumulate
+database ../idrefs
+annotate X lp
+move-punctuation
+discard YZ
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+search-truncate 10
+separate-label-second-parts ""
+abbreviate-label-ranges "..."
+bracket-label " [" "]" ", "
+# sort A+
+# reverse A
+.R2
+.de $0
+.if \\$3>0 \{\
+.if \\$3<4 \{\
+.(x 0
+.#v
+.ie '\\$2'' \\$1
+.el \\$2 \\$1
+.\"'
+.)x
+.\}
+.\}
+..
+.if '\*(.T'ascii' \{\
+.\"'
+.fo 'B. Bidulock'Version 0.0'FORMFEED[Page %]'
+.ds |x txt
+.ds #n <\\**>
+.m1 1 \" top margin above header
+.m2 1 \" top margin below header
+.m3 1 \" btm margin above footer
+.m4 0 \" btm margin below footer
+.pl 9.8i
+.ll 7.2i
+.lt 7.2i
+.nr PL 9.8i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad l
+.hy 0
+.ta 3
+.ba 0
+.po 0
+.nr so 0
+.nr ii 6n
+.nr pi 4n
+.nr po 3n
+.nr bi 2n
+.nr qi 4n
+.nr ps 1v
+.de #v
+.ad l
+.hy 0
+..
+.\}
+.if '\*(.T'ps' \{\
+.\"'
+.fo 'B. Bidulock'Version 0.0'Page %'
+.ds |x ps
+.ds #n \\**
+.m1 0.25i \" top margin above header
+.m2 0.25i \" top margin below header
+.m3 0.25i \" btm margin above footer
+.m4 0.25i \" btm margin below footer
+.pl 11.0i
+.ll 7.2i
+.lt 7.2i
+.nr PL 11.0i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad b
+.hy 6
+.ta 3
+.ba 0
+.po 0.75i
+.nr so 0
+.nr ii 0.5i
+.nr pi 0.5i
+.nr po 0.25i
+.nr bi 0.5i
+.nr hi 0.5i
+.nr qi 0.5i
+.nr pp 10
+.nr qp 9
+.nr fp 8
+.nr gp 8
+.nr sp 12
+.nr tp 10
+.de #v
+.ad b
+.hy 6
+..
+.\}
+.dn &a
+.dn &b
+.dn &n
+.dn &p
+.nr &a 1
+.nr &b 0
+.nr &n 1
+.nr &p 0
+.ds &f Figure\ 
+.ds &t Table\ 
+\".de $1
+.\".ds &f Figure \\n($1-
+.\".nr &n 1
+.\".nr &p 0
+.\"..
+.\".de $2
+.\".ds &f Figure \\n($1.\\n($2-
+.\".nr &n 1
+.\".nr &p 0
+.\"..
+.\".de $3
+.\".ds &f Figure \\n($1.\\n($2.\\n($3-
+.\".nr &n 1
+.\".nr &p 0
+.\"..
+.de #f
+.(l C F
+\fI\\*(&f\\n(&n.\fR  \\$1
+.(x 2
+.#v
+\\*(&f\\n(&n \\$1
+.)x
+.)l
+.nr &p \\n(&n
+.nr &n +1
+..
+.de #t
+.ce 1
+\fI\\*(&t\\n(&a.\fR \\$1
+.(x 3
+.#v
+\\*(&t\\n(&a \\$1
+.)x
+.nr &b \\n(&a
+.nr &a +1
+..
+.de #e
+.if \\n($d>1 \{\
+.uh "Endnotes for Section \\\\n($1"
+.pd
+.\}
+..
+.ds a \a
+.bp
+.he 'Internet Draft'UA Load Grouping'January 10, 2002'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+.bl 2
+Expires in six months;;January 10, 2002
+.bl 2
+.TE
+.(l C
+\fB\
+Load Grouping Extension
+for
+Signalling User Adaptation Layers
+<draft-bidulock-sigtran-loadgrp-00.\*(|x>
+
+.)l
+.rr |x
+.ne 4
+.uh "Status of this Memo"
+.lp
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents
+of the Inetnet Engineering Task Force (IETF), its areas, and its working
+groups.  Note that other groups may also distribute working documents as
+Internet-Drafts.
+.lp
+Internet-Drafts are draft documents valid for a maximum of six months and may
+be updated, replaced, or obsoleted by other documents at any time.  It is
+inappropriate to use Internet-Drafts as reference material or to cite them
+other than as 'work in progress'.
+.lp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+.lp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html
+.lp
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
+Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
+(Pacific Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
+.uh "Abstract"
+.lp
+This Internet-Draft describes an extension parameter and procedure to the
+Signalling User Adaptation Protocols,
+.[
+RFC 3057
+.]
+.[
+dua-00
+.]
+.[
+v5ua-01
+.]
+.[
+m2ua-11
+.]
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+based on the Stream Transmission Control Protocol (SCTP)
+.[
+rfc 2960
+.]
+which permits an Application Server Processes (ASP) to indicate its placement
+within a Load Group and permits an Signalling Gateway (SG) to distribute
+traffic over Load Groups under Application Server Process (ASP) control.
+.lp
+The described procedure provides for Override, Loadshare and Broadcast traffic
+mode operation within a Load Group consisting of one or more Application
+Server Processes (ASPs) resulting a mixture of traffic modes within an
+Application Server (AS).  The parameters and procedures described here
+supplement the \fI\)UA Load Selection\fR
+.[
+loadsel-00
+.]
+extension parameters and procedures for improvide distribution of traffic over
+ASPs and Signalling Gateway Processes (SGPs).
+.sh 1 "Introduction"
+.sh 2 "Scope"
+.lp
+This Internet-Draft provides the \fI\)Load Distribution\fR parameter and
+associated procedures in extension to the parmeters and procedures of the
+Signalling User Adaptation Layers (UAs),
+.[
+RFC 3057
+.]
+.[
+dua-00
+.]
+.[
+v5ua-01
+.]
+.[
+m2ua-11
+.]
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+and the \fI\)Load Selection\fR
+.[
+loadsel-00
+.]
+extension, for the purpose of permitting Application Server Process control
+over grouping of ASPs into Application Servers as part of the procedures of
+these UA protocols.
+.lp
+This \fI\)Load Grouping\fR extension is intended to be compatible with UA
+implementations not supporting this extension.
+.sh 2 "Terminology"
+.lp
+This extension supplements the terminology used in the UA documents
+[IUA...TUA] and the \fI\)Load Selection\fR extension by adding the following
+terms:
+.lp
+\fI\)Load Distribution (LD)\fR \-
+.ix +\n(iiu
+a \fI\)Traffic Mode Type\fR which is applicable within a \fI\)Load Group\fR.
+.lp
+\fI\)Load Group (LG)\fR \-
+.ix +\n(iiu
+a group of ASPs that share the same traffic distribution within an Application
+Server.  An ASP is permitted to belong to more than one \fI\)Load Group\fR for
+a given AS.
+.lp
+\fI\)Load Selection (LS)\fR \-
+.ix +\n(iiu
+an identifier that uniquely identifies a \fI\)Load Group\fR within an
+Application Server.  This identifier is only guaranteed unique within the
+scope of an Application Server and must be combined with a \fI\)Routing
+Context\fR or (set of) \fI\)Interface Identifier(s)\fR to uniquely define a
+\fI\)Load Group\fR at a Signalling Gateway.
+.lp
+\fI\)Signalling User Adaptation Layer (UA)\fR \-
+.ix +\n(iiu
+one or more of the Stream Control Transmission Protocol (SCTP)
+.[
+rfc 2960
+.]
+Signalling User Adatapation Layers.
+.[
+RFC 3057
+.]
+.[
+dua-00
+.]
+.[
+v5ua-01
+.]
+.[
+m2ua-11
+.]
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+.sh 2 "Overview"
+.lp
+Existing UA procedures with regard to traffic distribution and ASP traffic
+management provide a mechanism to select the algorithm for coordinating state
+and distributing traffic over a number of Application Server Processes (ASPs)
+serving an Application Server.  These existing procedures provide only
+simplified distribution approaches which are not ammeniable to large scale
+systems that need to adapt to dynamic traffic loading or need live
+reconfiguration for maintenance purposes.
+.lp
+This extension to the Signalling User Adaptation Layers
+.[
+RFC 3057
+.]
+.[
+dua-00
+.]
+.[
+v5ua-01
+.]
+.[
+m2ua-11
+.]
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+permits close control over the grouping of Application Server Processes
+serving an Application Server that provides the following capability not
+existing in the current scheme:
+
+.ip "Grouping of ASPs into Load Groups"
+Under the existing approach, each Application Server Process acts
+independently with respect to an Application Server.  This approach does not
+provide for the grouping of ASPs into workgroups, not does it provide
+coordintaed control of the role of groups of ASPs serving an ASP.  As a
+result, the existing scheme does not scale well in this regard.
+
+This extension draft provides for the grouping of ASPs into load groups with a
+traffic distribution mode (Load Distribution) within the load group that is
+independent of the Application Sever traffic mode.
+.sh 3 "Existing Traffic Distribution"
+.(z
+.(c
+.nf
+.sz -2
+\fC\
+                                    ____
+           Traffic                 /....\\
+           Mode Type          ____|__....|
+ _______                     |       |...|
+|       |------------------->|  ASP  |...|
+|  SGP  |-----\\              |_______|...|
+|_______|----\\ \\              ____|__....|
+         \\--\\ \\ \\            |       |...|
+             \\ \\ \\---------->|  ASP  |...|
+ _______      \\ \\            |_______|...|
+|       |      \\ \\                |......| Application
+|  SGP  |       \\ \\               |......| Server
+|_______|        \\ \\              |......|
+                  \\ \\             |......|
+                   \\ \\        ____|__....|
+                    \\ \\      |       |...|
+                     \\ \\---->|  ASP  |...|
+                      \\      |_______|...|
+                       \\      ____|__....|
+                        \\    |       |...|
+                         \\-->|  ASP  |...|
+                             |_______|...|
+                                  |......|
+                                   \\____/
+.sz +2
+.)c
+.#f "Existing Traffic Distribution"
+.)z
+.lp
+\fI\*(&f\n(&p\fR illustrates the existing traffic distribution algorithm that
+is used across the Signalling User Adaptation Layers.
+.lp
+When an SGP distributes a Signalling User Adaptation Layer message towards the
+Application Server based on the Routing (Link) Key, it selects an ASP that is
+active for the AS according to a Traffic Mode Type that is associated with the
+AS.  The Traffic Mode Type describes three general distribution algorithms:
+Override, Loadshare and Broadcast.
+.lp
+The detailed actions taken for these distribution algorithms are described in
+Section 4 of the Signalling User Adaptation Layer specifications;
+.[
+RFC 3057
+.]
+.[
+dua-00
+.]
+.[
+v5ua-01
+.]
+.[
+m2ua-11
+.]
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+however, they can be summarized as follows:
+.lp
+.b "Traffic Mode Type Override:\-\ "
+.ix +\n(iiu
+When distributing messages to an Override Application Server, the SGP selects
+the ASP which is active for the Application Server.  In an Override
+Application Server, at most one ASP can be active for the AS at any given point
+in time.  The active ASP for the AS is selected.
+.lp
+.b "Traffic Mode Type Loadshare:\-\ "
+.ix +\n(iiu
+When distributing messages to a Loadshare Application Server, the SGP selects
+one of the ASPs that are active for the Application Server using an
+implementation dependent loadsharing algorithm based on some unspecified
+aspect of the traffic or static configuration data.
+.lp
+.b "Traffic Mode Type Broadcast:\-\ "
+.ix +\n(iiu
+When distributing messages to a Broadcast Application Server, the SGP sends a
+copy of the message to each of the ASPs that are active for the Application
+Server.  (The ASPs themselves decide which, if any, of the ASPs will process
+the message.)
+.lp
+In general, for the Signalling User Adapatation Layers, the Traffic Mode Type
+is a characteristic of the Application Server, and an Application Server can
+only have associated with it only one Traffic Mode Type, and thus, only one
+traffic distribution algorithm can be used across the ASPs that are serving a
+given Application Server.
+.lp
+This extension document enhances the traffic distribution algorithms of the
+existing Signalling User Adaptation Layers by introducing an additional level
+of distribution.
+.sh 3 "Extended Traffic Distribution"
+.(z
+.(c
+.nf
+.sz -2
+\fC\
+                             ____    ____
+           Traffic    Load  /....\\  /....\\
+           Mode Type  Group|...___||__....|
+ _______                   |..|       |...|
+|       |---+---------------->|  ASP  |...|
+|  SGP  |    \\             |..|_______|...|
+|_______|-\\   \\            |...___||__....|
+           \\   \\           |..|       |...|
+            \\   \\------------>|  ASP  |...|
+ _______    |              |..|_______|...|
+|       |   |              |......||......| Application
+|  SGP  |   |               \\____/ |......| Server
+|_______|   |                ____  |......|
+            |         Load  /....\\ |......|
+            |         Group|...___||__....|
+            |              |..|       |...|
+            +---------------->|  ASP  |...|
+             \\             |..|_______|...|
+              \\            |...___||__....|
+               \\           |..|       |...|
+                \\------------>|  ASP  |...|
+                           |..|_______|...|
+                           |......||......|
+                            \\____/  \\____/
+.sz +2
+.)c
+.#f "Load Group Traffic Distribution"
+.)z
+.lp
+\fI\*(&f\n(&p\fR illustrates the extended traffic distribution algorithms that
+are used across the Signalling User Adaptation Layers as a result of the
+messages and procedures in this extension.
+.lp
+This extension introduces the concept of a \fI\)Load Group\fR.  A \fI\)Load
+Group\fR is a logical grouping of Application Server Processes (ASPs) into
+traffic groups serving an Application Server.
+Signalling Gateway Processes (SGPs) distribute traffic first over \fI\)Load
+Groups\fR and then distribute traffic within the \fI\)Load Group\fR.  Each
+\fI\)Load Group\fR describes and is identified by a \fI\)Load Selection\fR
+.[
+loadsel-00
+.]
+within the Application Server.  The \fI\)Load Selection\fR identifies the
+traffic flows that will be distributed to an associated \fI\)Load Group\fR
+within an Application Server.
+.lp
+When an SGP distributes a Signalling User Adaptation Layer message towards an
+Application Server based on the Routing (Link) Key, it first selects an
+\fI\)Load Group\fR that is active for the Application Server according a
+traffic distribtuion algorithm determined by the \fI\)Load Distribution\fR
+that is associated with the Application Server and the \fI\)Load Selection\fR
+position of the \fI\)Load Group\fR within the AS.
+.lp
+The Traffic Mode Type continues to describe three general distribution
+algorithms: Override, Loadshare and Broadcast.  The change in the behavior of
+the SGP when selecting an ASP for traffic distribution introduced by this
+extension is that the SGP also takes into account the concept of a \fI\)Load
+Group\fR as identified within an AS by its \fI\)Load Selection\fR.
+.lp
+The extended procedures can be summarized as follows:
+.lp
+.b "Traffic Mode Type Override:\-\ "
+.ix +\n(iiu
+When distributing messages to an Override Application Server, the SGP first
+selects the \fI\)Load Group\fR that is active for the Application Server.  In
+an Override Application Server, at most one \fI\)Load Group\fR can be active
+for the AS at any given point in time.  The active \fI\)Load Group\fR for the
+AS is selected.
+.lp
+.b "Traffic Mode Type Loadshare:\-\ "
+.ix +\n(iiu
+When distributing messages to a Loadshare Application Server, the SGP selects
+one of the \fI\)Load Groups\fR that are active for the Application Server
+using an implementation dependent loadsharing algorithm based on the \fI\)Load
+Selection\fR
+.[
+loadsel-00
+.]
+associated with the \fI\)Load Group\fR.
+.lp
+.b "Traffic Mode Type Broadcast:\-\ "
+.ix +\n(iiu
+When distrbuting messages to a Broadcast Application Server, the SGP sends a
+copy of the message to each of the \fI\)Load Groups\fR that are active for the
+Application Server.  (The \fI\)Load Groups\fR themselves decide which, if any,
+of the \fI\)Load Groups\fR will process the message.)
+.lp
+After selecting an \fI\)Load Group\fR according to the \fI\)Traffic Mode
+Type\fR for the Application Server, the SGP then selects an ASP within the
+\fI\)Load Group\fR based on the \fI\)Load Distribution\fR that is associated
+with the \fI\)Load Group\fR.  The \fI\)Load Distribution\fR describes the same
+three general distribution algorithms that are provided in the \fI\)Traffic Mode
+Type:\fR Override, Loadshare and Broadcast.  When selecting an active ASP
+within a \fI\)Load Group\fR, the procedures that the SGP will follow can be
+summarized as follows:
+.lp
+.b "Load Distribution Override:\-\ "
+.ix +\n(iiu
+When distributing messages within an Override Load Group, the SGP selects the
+ASP which is active for the Load Group.  In an Override Load Group, at most
+one ASP can be active for the \fI\)Load Group\fR at any given point in time.
+The active ASP for the \fI\)Load Group\fR is selected.
+.lp
+.b "Load Distribution Loadshare:\-\ "
+.ix +\n(iiu
+When distributing messages within a Loadshare Load Group, the SGP selects one
+of the ASPs that are active for the Load Group using an implementation
+dependent loadsharing algorithm based on some unspecified aspect of the
+traffic or static configuration data.
+.lp
+.b "Load Distribution Broadcast:\-\ "
+.ix +\n(iiu
+When distributing messages within a Broadcast Load Group, the SGP sends a copy
+of the message to each of the ASPs that are active for the Load Group.  (The
+ASPs themselves decide which, if any, of the APSs will process the message.)
+.lp
+The result of this extension is that two levels of traffic distribution are
+provided for, permitting more flexible membership of ASPs serving Application
+Servers, and provides the Application Server Process with more control over
+the traffic patterns for which it is active.
+.sh 2 "Sample Configurations"
+.lp
+Although this extension does not restrict either Traffic Mode Type or Load
+Distribution to a static assignment, there are, for example, six (6)
+combinations of static Traffic Mode Type and Load Distribution assignment
+under this scheme.  Not all of these combinations provide for interesting or
+useful configurations as follows:
+.(b L
+.#t "Sample Configurations"
+.TS
+box center tab(:);
+cb1|cb1|cb1|lb
+cb|cb|cb|lb
+cb|cb|cb|lb
+n|l|l|lw(3.8i).
+:Traffic:Load:
+Mode:Mode:Distri-:Description
+:Type:bution:
+=
+1:Override:Loadshare:T{
+.#v
+This mode permits a loadshare group of ASPs to override another loadshare
+group of ASPs.
+T}
+_::_:_
+2::Broadcast:T{
+.#v
+This mode allows "mirrored" ASPs to override each other.
+T}
+_
+3:Loadshare:Override:T{
+.#v
+This mode allows ASPs to override each other within a traffic slot of a
+loadshare group.
+T}
+_::_:_
+4::Broadcast:T{
+.#v
+This mode permits "striping" and "mirroring" with loadsharing under ASP
+control.
+T}
+_
+5:Broadcast:Override:T{
+.#v
+This mode permits a joining ASP to knock another ASP out of a Broadcast slot
+for an Application Server.
+T}
+_::_:_
+6::Loadshare:T{
+.#v
+This mode permits "mirroring" and "striping" including automatic loadsharing
+within a mirror image.
+T}
+.TE
+.)b
+.sh 1 "Conventions"
+.lp
+The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
+\fB\)SHALL NOT, \fB\)SHOULD\fR, \fB\)SHOULD NOT\fR, \fB\)RECOMMENDED\fR,
+\fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
+in this document, are to be interpreted as described in.
+.[
+key words
+.]
+.sh 1 "Protocol Elements"
+.lp
+The following subsections describe the parameters which are added by this
+extension, their format and the message in which they are used.
+.sh 2 "Parameters"
+.lp
+This extension adds one new parameter: the \fI\)Load Distribution\fR
+parameter.
+.sh 3 "Load Distribution"
+.lp
+The \fI\)Load Distribution\fR parameter is used in the \fI\)REQ REQ\fR, \fI\)REQ
+RSP\fR, \fI\)ASPAC\fR and \fI\)ASPAC ACK\fR messages.  It is used in
+conjunction with the \fI\)Traffic Mode Type\fR parameter
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+and \fI\)Load Selection\fR parameter
+.[
+loadsel-00
+.]
+to further refine the traffic distribution algorithm for an ASP in a \fI\)Load
+Group\fR serving an Application Server.  The \fI\)Load Selection\fR parameter
+identifies the \fI\)Load Group\fR for which the ASP is registering, activating
+or deactivating and the \fI\)Load Distribution\fR parameter identifies the
+traffic distribution that is to be used within the \fI\)Load Group\fR.
+.lp
+The \fI\)Load Distribution\fR parameter is formatted as follows:
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Tag = 0xXXXX          |          Length = 8         |
++---------------------------------+-----------------------------+
+|                        Load Distribution                      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.(q
+.#v
+\fB\)EDITOR'S NOTE:\-\fR\  The parameter tag values shown as \f(CB\)0xXXXX\fR
+above will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)q
+.lp
+The \fI\)Load Distribution\fR parameter contains the following fields:
+.ip "Load Distribution field: n x 32-bits (unsigned integer)" 2
+
+THe \fI\)Load Distribution\fR has the same purpose for the \fI\)Load Group\fR
+that the \fI\)Traffic Mode Type\fR has for the Application Server: it
+identifies the traffic distribution algorithm to be used within the \fI\)Load
+Group\fR.  Valid values for \fI\)Load Distribution\fR are as follows:
+.ix +4
+.TS
+tab(:);
+nl.
+1:Override
+2:Loadshare
+3:Broadcast
+.TE
+.sh 2 "Messages"
+.ds #u \*#
+.lp
+This extension adds the \fI\)Load Distribtution\fR parameter as an
+\fB\)OPTIONAL\fR parameter to be used in conjunction with the common
+\fI\)Traffic Mode Type\fR in the following messages: \*#
+.(d
+.ip \*#
+For a detailed description of these messages, see Section 3 of
+M3UA, SUA and TUA.
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+.)d
+.ix +4
+.TS
+tab(:);
+lil.
+REG REQ:Registration Request message
+ASPAC:ASP Active message
+ASPAC ACK:ASP Active Ack message
+.TE
+.sh 3 "Registration Request (REG REQ)"
+.lp
+This extension supplements the \fI\)Registration Request (REG REQ)\fR message
+by permitting the following optional parameters to be included in the
+\fI\)Routing Key\fR
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+parameter or \fI\)Link Key\fR
+.[
+rfc 3057
+.]
+.[
+dua-00
+.]
+.[
+v5ua-01
+.]
+.[
+m2ua-11
+.]
+parameter within the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Subparameters
+_
+Load Distribution:Optional:
+.TE
+.ix -4
+.lp
+The \fI\)Load Distribution\fR parameter is used in the Routing (Link) Key to
+further refine the traffic distribution to be received by the registering ASP.
+.lp
+The format of the resulting \fI\)Routing Key\fR or \fI\)Link Key\fR parameter
+is as follows:
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                     Local-RK(LK)-Identifier                   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                  Traffic Mode Type (optional)                 |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Load Selection (optional)                  |
+\f(CB\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                  Load Distribution (optional)                 |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+\f(CR\
+\\                                                               \\
+/                          Routing Context                      /
+\\                                or                             \\
+/                       Interface Identifier(s)                 /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.lp
+No other changes to the \fI\)REG REQ\fR message, \fI\)Routing Key\fR or
+\fI\)Link Key\fR parameters format are provided by this extension\*(#u.
+.lp
+When an ASP wishes to register within a \fI\)Load Group\fR associated with an
+Application Server, it includes the \fI\)Load Selection\fR parameter
+and \fI\)Load Distribution\fR in the \fI\)Routing (Link) Key\fR for that
+Application Server in the \fI\)REG REQ\fR message.
+.lp
+The \fI\)Load Distribtuion\fR parameter indicates the traffic distribution
+method to be used within the \fI\)Load Group\fR as identified by the Load
+Selection.
+.sh 3 "Registration Response (REG RSP)"
+.lp
+This extension adds the following \fI\)Registration Status\fR values to the
+\fI)Registration Status\fR field in the \fB\)REG RSP\fR message:
+.ix +4
+.TS
+tab(:);
+nl.
+0xZZ:Error - Unsupported/Invalid Load Distribution
+.TE
+.ix -4
+.(q
+.#v
+\fB\)EDITOR'S NOTE:- \fR The \fI\)Registration Status\fR value shown as
+\f(CR\)0xZZ\fR) above will be assigned by IANA as a value of the UA-specific
+\fI\)Registration Status\fR parameter for each SIGTRAN UA and may change its
+value in further versions of this document.
+.)q
+.sh 3 "ASP Active (ASPAC)"
+.lp
+This extension supplements the \fB\)ASPAC\fR message by permitting the
+following optional parameters to be included in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+Load Distribution:Optional:
+.TE
+.ix -4
+.lp
+The format of the resulting \fI\)ASPAC\fR message is as follows:
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Tag = 0x000b          |          Length = 8         |
++---------------------------------+-----------------------------+
+|                         Traffic Mode Type                     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Tag = 0x001d          |          Length = 8         |
++---------------------------------+-----------------------------+
+\\                                                               \\
+/                         Load Selection(s)                     /
+\\                                                               \\
+\f(CB\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Tag = 0xXXXX          |          Length = 8         |
++---------------------------------+-----------------------------+
+|                         Load Distribution                     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+\f(CR\
+\\                                                               \\
+/                          Routing Context                      /
+\\                                or                             \\
+/                       Interface Identifier(s)                 /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Tag = 0x0004          |          Length             |
++---------------------------------+-----------------------------+
+\\                                                               \\
+/                            Info String                        /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.(q
+.#v
+\fB\)EDITOR'S NOTE:\-\fR\  The parameter tag values shown as \f(CB\)0xXXXX\fR
+above will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)q
+.lp
+No other changes to the \fB\)ASPAC\fR message format are provided by this
+extension\*(#u.
+.lp
+When an ASP wishes to activate only within a \fI\)Load Group\fR associated
+with an Application Server, it includes the \fI\)Load Selection\fR
+and \fI\)Load Distribtuion\fR parameters in the \fB\)ASPAC\fR message.
+.lp
+The \fI\)Load Distribtuion\fR parameter indicates the traffic distribution
+method to be used within the \fI\)Load Group\fR as identified by the Load
+Selection.
+.sh 3 "ASP Active Ack (ASPAC ACK)"
+.lp
+This extension supplements the ASPAC ACK message by permitting the following
+optional parameters to be included in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+Load Distribution:Optional:
+.TE
+.ix -4
+.lp
+The format of the resulting \fI\)ASPAC ACK\fR message is as follows:
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Tag = 0x000b          |          Length = 8         |
++---------------------------------+-----------------------------+
+|                         Traffic Mode Type                     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Tag = 0x001d          |          Length = 8         |
++---------------------------------+-----------------------------+
+\\                                                               \\
+/                         Load Selection(s)                     /
+\\                                                               \\
+\f(CB\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Tag = 0xXXXX          |          Length = 8         |
++---------------------------------+-----------------------------+
+|                         Load Distribtuion                     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+\f(CR\
+\\                                                               \\
+/                          Routing Context                      /
+\\                                or                             \\
+/                       Interface Identifier(s)                 /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Tag = 0x0004          |          Length             |
++---------------------------------+-----------------------------+
+\\                                                               \\
+/                            Info String                        /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.(q
+.#v
+\fB\)EDITOR'S NOTE:\-\fR\  The parameter tag values shown as \f(CB\)0xXXXX\fR
+above will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)q
+.lp
+No other changes to the \fB\)ASPAC ACK\fR message format are provided by this
+extension\*(#u.
+.lp
+When an ASP has requested activation within a \fI\)Load Group\fR or the SG
+otherwise activates the ASP within a \fI\)Load Group\fR the SG responds with
+an \fB\)ASPAC ACK\fR message including the \fI\)Load Selection\fR that
+identifies the \fI\)Load Group\fR and optionally includes the \fI\)Load
+Distribution\fR for the \fI\)Load Group\fR in which the ASP has been
+activated.  If the ASP included the \fI\)Load Distribution\fR parameter in the
+\fB\)ASPAC\fR message, the SG \fB\)MUST\fR include the \fI\)Load
+Distribution\fR parameter in the response \fB\)ASPAC ACK\fR message.
+.lp
+The \fI\)Load Distribtuion\fR parameter indicates the traffic distribution
+method to be used within the \fI\)Load Group\fR as identified by the Load
+Selection.
+.lp
+.sh 3 "Error (ERR)"
+.lp
+This extension supplements the \fB\)Error (ERR)\fR message by adding the
+following values to the common mandatory \fI\)Error Code\fR parameter in the
+\fB\)ERR\fR message:
+.ix +4
+.TS
+tab(:);
+nl.
+0xYY:Invalid/Unsupported Load Distribution
+.TE
+.ix -4
+.(q
+.#v
+\fB\)EDITOR'S NOTE:- \fR The \fI\)Error Code\fR value shown throughout this
+document as \f(CR\)0xYY\fR) will be assigned by IANA as a value of the common
+\fI\)Error Code\fR parameter for SIGTRAN UAs and may change its value in
+further versions of this document.
+.)q
+.lp
+This new error code is interpreted as follows:
+.lp
+The \fI\)"Invalid/Unsupported Load Distribution"\fR error
+.ix +4
+would be sent by an SGP if an ASP sends an ASP Active with an invalid or
+unsupported Load Distribution.  An example would be a case in which
+the SGP did not support override within a \fI\)Load Group\fR.
+.lp
+No other changes to the \fB\)ERR\fR message or \fI\)Error Code\fR parameter
+values are provided by this extension.  See Section 4 for extension
+procedures associated with the \fB\)ERR\fR message.
+.sh 1 "Procedures"
+.lp
+This \fI\)Load Grouping\fR extension provides for an additional level of
+control over the traffic distribution patterns within an Application Server.
+This extension provides the \fI\)Load Distribution\fR parameter which may be
+optionally included in the \fB\)REG REQ\fR, \fB\)ASPAC\fR and \fB\)ASPAC
+ACK\fR messages.  In addition, it supplements the ASP State Maintenance and
+ASP Traffic Maintenance procedures.
+.sh 2 "ASP State Maintenance"
+.lp
+In addition to the SGP mainting the state of each remote ASP in each
+Application Server that the ASP is configured to receive traffic, under this
+extension, the SGP \fB\)MAY\fR also maintain the state of each remote ASP in
+each \fI\)Load Group\fR within an Application server that the ASP is
+configured to receive traffic.  The \fI\)Load Group\fR state is maintained
+separate from the ASP and AS states.
+.sh 3 "Load Group State"
+.lp
+The state of the \fI\)Load Group\fR is maintained in the Signalling User
+Adaptation Layer on the SGPs.  The state of the \fI\)Load Group\fR changes due
+ASP state transitions.  The possible states of a \fI\)Load Group\fR are:
+.ip "\fB\)LG-DOWN\fR:" 16
+The \fI\)Load Group\fR is unavaialble.  This state implies that all related
+ASPs are in the \fB\)ASP-DOWN\fR state for this \fI\)Load Group\fR.
+Initially, the \fI\)Load Group\fR will be in this state.
+.ip "\fB\)LG-INACTIVE\fR:" 16
+The \fI\)Load Group\fR is available but no application traffic is active (i.e,
+one or more related ASPs are in the \fB\)ASP-INACTIVE\fR state, but none are
+in the \fB\)ASP-ACTIVE\fR state within the \fI\)Load Group\fR).
+.ip "\fB\)LG-ACTIVE\fR:" 16
+The \fI\)Load Group\fR is available and application traffic is active.  This
+state implies that at least one ASP is in the \fB\)ASP-ACTIVE\fR state within
+the \fI\)Load Group\fR.
+.sh 3 "Application Server State"
+.lp
+Where ASPs are configured to operation within \fI\)Load Groups\fR under this
+extension, the Application Server state is interpreted as provided in the
+Signalling User Adaptation Layer specifications.
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+.sh 2 "ASP Traffic Maintenance"
+.sh 3 "ASP Active Procedures"
+.lp
+This \fI\)Load Grouping\fR extension supplements the ASP Active Procedures as
+follows:
+.lp
+When an ASP sends an \fB\)ASPAC\fR message to activate the ASP within an
+Application Server, the ASP \fB\)MAY\fR choose to activate within a \fI\)Load
+Group\fR for the specified AS by including the \fI\)Load Selection\fR
+parameter in the \fB)ASPAC\fR message.
+.lp
+When an SGP receives an \fB\)ASPAC\fR message with a \fI\)Load Selection\fR
+parameter in the message, or where the SGP is otherwise configured to activate
+the ASP in a configured \fI\)Load Group\fR, when the SGP moves the ASP to the
+ASP-ACTIVE state for the AS, it also moves the ASP to the ASP-ACTIVE state for
+the \fI\)Load Group\fR identified by the \fI\)Load Selector\fR field in the
+\fI\)Load Selection\fR parameter.  In either case, if the activation is
+successful, the SGP includes the \fI\)Load Selection\fR parameter in the
+\fB\)ASPAC ACK\fR message.
+.lp
+If the \fI\)Load Selector\fR in the \fB\)ASPAC\fR message is invalid, the SGP
+responds with ERR("Error - Invalid Load Selector").  If the \fI\)Load
+Selection\fR parameter is not present in the \fB\)ASPAC\fR message and the SGP
+is configured to require one, or the \fI\)Load Selector\fR field is not valid
+or unconfigured for the Application Server, the SGP responsds with ERR("Error
+- Unsupported/Unconfigured/Missing Load Selector").  If the \fI\)Load
+Selection\fR parameter contains an invalid or unsupported \fI\)Load
+Distribution\fR value, or the \fI\)Load Selection\fR parameter is missing but
+the SGP cannot determine the distribution applicable to the \fI\)Load Group\fR
+without one, the SGP response with ERR("Error - Invalid/Unsupported/Missing
+Load Distribution").
+.lp
+There are three modes of Application Server traffic handling in the SGP at the
+Application Server level and three modes of AS traffic handling at the Load
+Group level: Override, Loadshare and Broadcast.  When included, the
+\fI\)Traffic Mode Type\fR parameter in the \fB\)ASPAC\fR message indicates the
+traffic handling mode to be used in a particular Application Server between
+Load Groups.  When included, the \fI\)Load Distribution\fR field in the
+\fI\)Load Selection\fR parameter indicates the traffic handling mode to be
+used between ASPs within a Load Group.
+.lp
+In the case of an Override mode AS, reception of an ASP Active message at an
+SGP may move a \fI\)Load Group\fR to the LG-ACTIVE state.  When an LG moves
+to the LG-ACTIVE state in an Override mode AS, this causes the (re)direction
+of all traffic for the AS to the active Load Group.
+Distribution of traffic within the Load Group is determine on the basis of the
+Load Distribution mode of the Load Group.
+Any previously active Load Group is now considered to be in state LG-INACTIVE
+and \fB\)SHOULD\fR no longer receive traffic from the SGP within the AS.
+The SGP then \fB\)MUST\fR send a Notify message ("Alternate ASP Active") and
+include the \fI\)Load Selection\fR parameter in the Notify message indicating
+the \fI\)Load Group\fR that has become active.
+.lp
+In the case of a Loadshare mode AS, the reception of an ASP Active message at
+an SGP that moves a \fI\)Load Group\fR to the LG-ACTIVE state causes the
+direction of specific traffic flows associated with the \fI\)Load Selector\fR
+to the \fI\)Load Group\fR.  The assignment of traffic flows to \fB\)Load
+Selector\fR values is implementation depenedent, but could be based on
+specific information in the protocol data message.
+.lp
+In the case of a Broadcast mode AS, reception of an ASP Active message at an
+SGP that results in moving a \fI\)Load Group\fR to the LG-ACTIVE state within
+the AS causes the direction of traffic to the newly active \fI\)Load Group\fR
+in addition to all the other LGs that are currently active for the AS.  The
+algorithm at the SGP for broadcasting traffic within an AS to all the active
+ASPs is a simple broadcast algorithm, where every message is sent to each of
+the active Load Groups.
+.sh 3 "ASP Inactive Procedures"
+.lp
+This \fI\)Load Grouping\fR extension supplements the ASP Active procedures of
+the UAs as follows:
+.lp
+When an ASP wishes to withdraw from a specific \fI\)Load Group\fR within an
+Application Server, the ASP sends an ASP Inactive message to the SGP with a
+\fI\)Load Selection\fR parameter included in the message.  In the case where
+the ASP does not include the \fI\)Load Selection\fR parameter in the ASP
+Inactive message, the SGP must know via configuration data which Load Groups
+the ASP is a member.  Upon receiving an ASP Inactive message with included
+or implied \fI\)Load Selection(s)\fR, the SGP moves the ASP to the
+ASP-INACTIVE state in each of the Load Groups indicated.
+.lp
+.lp
+.lp
+
+
+
+
+.sh 2 "Registration"
+.lp
+UAs permit Application Server Processes to register for the Routing Context
+(Interface Identifier) associated with a Routing Key (Link Key).  This draft
+extends the registration procedure to also permit the Application Server
+Process to register for a \fI\)Load Group\fR identifier in addition to the
+Routing Contex/Interface Id.  This is performed using a \fI\)Load Group\fR which
+has the same form as the Routing Key, but has some additional fields which are
+only applicable to Loadsharing.
+.lp
+In addition to the normal registration procedures of the UAs, the following
+additional error conditions can occur:
+.ip "\fI""Error - Invalid Load Group""\fR"
+This error \fB\)MUST\fR be sent in an \fI\)Error (ERR)\fR message if the SG
+determines that the Load Group is invalid.
+.ip "\fI""Error - Unsupported/Unconfigured Load Group""\fR"
+This error \fB\)MUST\fR be sent in an \fI\)Error (ERR)\fR message whenever the
+SG determines that the Load Group provided in a \fI\)REG REQ\fR message has
+not be configured and the SG does not support dynamic allocation of Load
+Selectors for the specified Key, and \fB\)MUST\fR be sent in an \fI\)Error
+(ERR)\fR message whenever the SG determines that the Load Group provided in
+a \fI\)REG REQ\fR message is not supported by the SG.
+.ip "\fI""Error - Invalid/Unsupported/Missing Load Distribution""\fR"
+This error \fB\)MUST\fR be sent in an \fI\)Error (ERR)\fR message whenever the
+SG determines that the Load Distribution associated wtih a Load Group is
+invalid, is not supported by the SG, or is required to determine the Load
+Distribution algorithm of the \fI\)Load Group\fR but is missing from
+the Load Group in the \fI\)REG REQ\fR message.
+.sh 2 "ASP Activation"
+.lp
+When activating, this draft extends the UA activation procedures by permitting
+an optional \fI\)Load Selection\fR parameter to be included in the ASP Active
+(ASPAC) and ASP Active Ack (ASPAC ACK) messages.  The \fI\)Load Selection\fR
+parameter is used to indicate for which \fI\)Load Group\fR the
+concerned Application Server is becoming active.
+.lp
+Whenever the SG is unable to activate the ASP within the selected Application
+Server \fI\)Load Group\fR, the SG \fB\)MUST\fR reply with an
+\fI\)Error (ERR)\fR message containing one of the errors defined in the UA
+documents\*(#u, or one of the following additional errors:
+.ip "\fI""Error - Invalid Load Group Identifier""\fR"
+.sh 2 "ASP Deactivation"
+.lp
+When deactivating, this draft extends the UA activation procedures by
+permitting an optional \fI\)Load Selection\fR parameter to be included in the
+ASP Inactive (ASPIA) and ASP Inactive Ack (ASPIA ACK) message.  The \fI\)Load
+Selection\fR parameter is used to indicate for which traffic in the \fI\)Load
+Group\fR the concerned Application Server is becoming inactive.
+.sh 2 "ASP Failure"
+.lp
+When an ASP fails that was supporting load-sharing application servers, the
+NTFY("ASP Failure")
+.sh 2 "ASP Override"
+.sh 2 "Notification"
+.lp
+When the SGP or IPSP notifies its UA peer with a NTFY messages which concerns
+an ASP, it \fB\)MUST\fR include the \fI\)Load Group\fR (if available)
+along with the ASP Identifier in the message.  The NTFY messages to which this
+applies are:
+.ip "\fI\)NTFY(""ASP Failure"") \-\fR"
+When the SGP or IPSP notifies the active and inactive ASPs in an AS that it
+has detected the failure of an ASP or the failure of an association to an ASP
+(i.e. SCTP Communication Lost Indication), it \fB\)MUST\fR include the
+\fI\)Load Group\fR (if available) with the ASP Identifier in the message.
+When the Routing Context(s)/Interface Identifier(s) associated with the
+Application Servers cannot be implied at the ASP from static configuration
+data, the Routing Context/Interface Identifier(s) \fB\)MUST\fR also be placed
+in the NTFY("ASP Failure") message.  The notifying SGP or IPSP \fB\)MAY\fR
+also place the \fI\)Load Selection\fR parameter into the NTFY("ASP Failure")
+message to indicate the traffic which was applicable to the load selection at
+the time of the failure.
+
+The purpose of this procedure is to inform the active and inactive ASPs, not
+only of the ASP failure, but of the identity of the ASP and the load selection
+for which the failed ASP was responsible.
+.ip "\fI\)NTFY(""Alternate ASP Active in AS"") \-\fR"
+When the SGP or IPSP notifies the previously active ASP in a override AS that
+an alternate ASP has become active using the NTFY("Alternate ASP Active in
+AS") message, it \fB\)MUST\fR include the \fI\)Load Group\fR (if
+available) with the ASP Identifier in the message.
+.lp
+The purpose of this procedure is to inform the previously active ASP, not only
+of the that another ASP has taken over the traffic for which the notified ASP
+was previously responsible, but to also indicate the identify of the
+overriding ASP and the load selection that was overridden.
+.sh 1 "Security"
+.sh 1 "IANA Considerations"
+.lp
+This extension adds the following parameter tag value (described in Section 3)
+to the Common Parameter numbering space for the UAs.
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+.ix +4
+.TS
+tab(:);
+nl.
+0xXXXX:Load Distribution
+.TE
+.ix -4
+.(q
+.#v
+\fB\)EDITOR'S NOTE:\-\fR\  The \fI\)Load Distribution\fR parameter tag value
+shown throughout this document as \f(CB\)0xXXXX\fR will be assigned by IANA
+within the common parameter range of the SIGTRAN UAs and may change its value
+in further versions of this document.
+.)q
+.lp
+This extension adds the following value to the \fI\)Error Code\fR parameter of
+the UAs.
+.ix +4
+.TS
+tab(:);
+nl.
+0xYY:Invalid/Unsupported Load Distribution
+.TE
+.ix -4
+.(q
+.#v
+\fB\)EDITOR'S NOTE:- \fR The \fI\)Error Code\fR value shown as \f(CR\)0xYY\fR)
+above will be assigned by IANA as a value of the common \fI\)Error Code\fR
+parameter for SIGTRAN UAs and may change its value in further versions of this
+document.
+.)q
+.lp
+This extension adds the following value to the \fI\)Registration Status\fR
+field of the \fI\)Registration Result\fR parameter for the UAs.
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+.ix +4
+.TS
+tab(:);
+nl.
+0xZZ:Error - Invalid/Unsupported Load Distribution
+.TE
+.ix -4
+.(q
+.#v
+\fB\)EDITOR'S NOTE:- \fR The \fI\)Registration Status\fR value shown as
+\f(CR\)0xZZ\fR) above will be assigned by IANA as a value of each UA-specific
+\fI\)Registration Status\fR parameter for each SIGTRAN UA and may change its
+value in further versions of this document.
+.)q
+.sh 1 "Acknowledgements"
+.lp
+The authors would like to thank
+Ken Morneault,
+Barry Nagelberg,
+Benjamin J. Wilson,
+Jacques Rajchgod,
+Greg Sidebottom
+and
+Gery Verwimp
+for their valuable comments and suggestions.
+.sh 1 "Author's Addresses"
+.lp
+.TS
+expand tab(;);
+lr.
+Brian Bidulock;Phone: +1-972-839-4489
+OpenSS7 Corporation;Email: bidulock@openss7.org
+4701 Preston Park Boulevard;
+Suite 424;
+Plano, TX  75093;
+USA;
+.TE
+.bl 3
+.lp
+This draft expires July, 2002.
+.bp
+.nr ii 0.5i
+.uh "Endnotes"
+.pd
+.de ]<
+.uh "References"
+.rm (f )f
+..
+.[
+$LIST$
+.]
+.bp
+.ce 1
+.uh "List of Tables"
+.(l I
+.xp 3
+.)l
+.ce 1
+.uh "List of Illustrations"
+.(l I
+.xp 2
+.)l
+.ce 1
+.uh "Table of Contents"
+.(l I
+.xp 0
+.)l
+.bp
+.uh "Copyright Statement"
+.lp
+\fBCopyright \(co The Internet Society (2002).  All Rights Reserved.\fR
+.lp
+This document and translations of it may be copied and furnished to others,
+and derivative works that comment on or otherwise explain it or assist in its
+implementation may be prepared, copied, published and distributed, in whole or
+in part, without restriction of any kind, provided that the above copyright
+notice and this paragraph are included on all such copies and derivative
+works.  However, this document itself may not be modified in any way, such as
+by removing the copyright notice or references to the Internet Society or
+other Internet organizations, except as needed for the purpose of developing
+Internet standards in which case the procedure for copyrights defined in the
+Internet Standards process must be followed, or as required to translate into
+languages other than English.
+.lp
+The limited permission granted above are perpetual and will not be revoked by
+the Internet Society or its successors or assigns.
+.lp
+This document and the information contained herein is provided on an "AS IS"
+basis and \fB\)THE INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK FORCE
+DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY
+WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS
+OR ANY IMPLIED WARRANTIES OF MECHANTABILITY OR FITNESS FOR A PARTICULAR
+PURPOSE.

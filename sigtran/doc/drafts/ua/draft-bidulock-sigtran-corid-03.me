@@ -1,0 +1,2899 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: draft-bidulock-sigtran-corid-03.me,v 0.9.2.2 2005/05/14 08:33:18 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2003  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.2 $) modified $Date: 2005/05/14 08:33:18 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.ds version Version\ 0.3
+.ds date February\ 21,\ 2004
+.ds expiry August\ 2004
+.nr levels 0
+.so ../draft.me
+.bp
+.he 'Internet Draft'UA CORID'\\\\*[date]'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+.bl 1
+;;\*[date]
+Expires in \*[expiry];;
+.bl 1
+.TE
+.(l C
+\fB\
+Correlation Id and Hearbeat Procedures (CORID)
+Supporting Lossless Fail-Over between SCTP Associations
+for
+Signalling User Adaptation Layers
+<draft-bidulock-sigtran-corid-03.\*(|x>
+.)l
+.rr |x
+.ne 4
+.uh "Status of this Memo"
+.pp
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents
+of the Internet Engineering Task Force (IETF), its areas, and its working
+groups.  Note that other groups may also distribute working documents as
+Internet-Drafts.
+.pp
+Internet-Drafts are draft documents valid for a maximum of six months and may
+be updated, replaced, or obsoleted by other documents at any time.  It is
+inappropriate to use Internet-Drafts as reference material or to cite them
+other than as 'work in progress'.
+.pp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+.pp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html
+.pp
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
+Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
+(Pacific Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
+.uh "Copyright"
+.pp
+Copyright \(co The Internet Society (2003).  All Rights Reserved.
+.uh "Abstract"
+.pp
+This Internet-Draft describes Correlation Id and Heartbeat procedures to
+support lossless fail-over between
+SCTP
+.[
+rfc 2960
+%Z 1
+.]
+associations for SS7
+.[
+q700
+%Z 2
+.]
+Signalling User Adaptation Protocols
+.[
+m2ua-rfc
+%Z 1
+.]
+.[
+m3ua-rfc
+%Z 1
+.]
+.[
+sua-16
+%Z 1
+.]
+.[
+isua-02
+%Z 1
+.]
+.[
+tua-03
+%Z 2
+.]
+supporting the concept of a \fI\)Routing Context\fR or \fI\)Interface
+Identifier\fR.  These procedures permit lossless fail-over between Application
+Server Processes (ASPs) at a Signalling Gateway (SG) and fail-over between
+Signalling Gateway Processes (SGPs) and Signalling Gateways (SGs) at an
+Application Server Process (ASP).  Lossless fail-over permits these fail-overs
+to occur without loss or duplication of UA-User messages.
+.uh "Contents"
+.pp
+A complete table of contents, list of illustrations and change history appears
+at the end of this document.
+.sh 1 "Introduction"
+.sh 2 "Scope"
+.pp
+This Internet-Draft describes Correlation Id and Heartbeat (CORID) procedures to
+support lossless fail-over between
+SCTP
+.[
+rfc 2960
+.]
+associations for SS7
+.[
+q700
+.]
+Signalling User Adaptation Protocols
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+above MTP3
+.[
+q704
+%Z 2
+.]
+supporting the concept of a \fI\)Routing Context\fR or \fI\)Interface
+Identifier\fR.  These procedures permit lossless fail-over between Application
+Server Processes (ASPs) at a Signalling Gateway (SG) and fail-over between
+Signalling Gateway Processes (SGPs) and Signalling Gateways (SGs) at an
+Application Server Process (ASP).  Lossless fail-over permits these fail-overs
+to occur without loss or duplication of UA-User messages.
+.pp
+UA implementations with \fI\)CORID\fR are intended to be compatible with UA
+implementations not supporting this configuration; however, the full benefits
+acheived by the \fI\)CORID\fR procedures will not be realized unless
+implementations at both endpoints implement \fI\)CORID\fR.
+.sh 2 "Abbreviations"
+.lp
+.ix +\n(iiu
+.TS
+tab(:);
+li1c0lssss.
+AS:\(em:Application Server.
+ASP:\(em:Application Server Process.
+CORID:\(em:Correlation Id Extension
+IANA:\(em:Internet Assigned Numbers Authority
+I-D:\(em:Internet-Draft
+IETF:\(em:Internet Engineering Task Force
+IP:\(em:Internet Protocol.
+IPSP:\(em:IP Signalling Point.
+SCCP:\(em:Signalling Connection Control Part.
+SCTP:\(em:Stream Control Transmission Protocol.
+SG:\(em:Signalling Gateway.
+SGP:\(em:Signalling Gateway Process.
+SIGTRAN:\(em:IETF Signalling Transport WG
+SPP:\(em:Signalling Peer Process.
+SS7:\(em:Signalling System No. 7.
+SUA:\(em:SS7 SCCP-User Adpatation Layer.
+TCAP:\(em:Transaction Capabilities Application Part.
+TUA:\(em:SS7 TCAP-User Adaptation Layer.
+UA:\(em:User Adaptation Layer.
+WG:\(em:Working Group
+.TE
+.sh 2 "Terminology"
+.pp
+\fI\)CORID\fR supplements the terminology used in the UA
+documents
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+by adding the following terms:
+.lp
+\fI\)Changeback\fR \-
+.ix +\n(iiu
+the MTP3
+.[
+q704
+.]
+procedure for redirecting signalling traffic back to a primary linkset from an
+alternate linkset.
+.lp
+\fI\)Changeover\fR \-
+.ix +\n(iiu
+the MTP3
+.[
+q704
+.]
+procedure for diverting signalling traffic from a failed primary linkset to an
+alternate linkset.
+.lp
+\fI\)Lossless Fail-Over\fR \-
+.ix +\n(iiu
+is mechanism for fail-over between SCTP
+.[
+rfc 2960
+.]
+associations (i.e, between ASPs, IPSPs, SGPs or SGs) that provides for the
+elminitation of duplication or loss of UA-User messages between SG and AS.
+.lp
+\fI\)Message Duplication\fR \-
+.ix +\n(iiu
+a situation where multiple copies of a UA-User message arrives at a Signalling
+Endpoint.
+.lp
+\fI\)Message Loss\fR \-
+.ix +\n(iiu
+a situation where instances of a UA-User message is lost in transit between
+Signalling Endpoints.
+.lp
+\fI\)Message Mis-sequencing\fR \-
+.ix +\n(iiu
+a situation where UA-User messages that are intended to arrive in sequence,
+arrive at a terminating Signalling Endpoint in an order other than the order
+in which the messages were transmitted at the originating Signalling Endpoint.
+.lp
+\fI\)Signalling Endpoint (SEP)\fR \-
+.ix +\n(iiu
+in this document, a \fI\)Signalling Enpoint\fR is an SS7 SEP
+.[
+q700
+.]
+or an Application Server.
+.lp
+\fI\)Signalling Peer Process (SPP)\fR \-
+.ix +\n(iiu
+refers to an ASP, SGP or IPSP.
+.lp
+\fI\)Signalling User Adaptation Layer (UA)\fR \-
+.ix +\n(iiu
+one or more of the Stream Control Transmission Protocol (SCTP)
+.[
+rfc 2960
+.]
+SS7 Signalling User Adaptation Layers
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+supporting the \fI\)Correlation Id\fR parameter and the \fI\)BEAT\fR message.
+.lp
+\fI\)Time-controlled Changeover\fR \-
+.ix +\n(iiu
+the MTP3
+.[
+q704
+.]
+procedure for diverting signalling traffic from a failed primary linkset to an
+alternate linkset where sequence number information cannot be exchanged
+between signalling points or where it is undesirable to use the normal
+changeover procedures.
+.sh 2 "Overview"
+.pp
+The existing UA
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+procedures do not include procedures to avoid loss or duplication of messages
+when a UA peer must fail-over between SCTP
+.[
+rfc 2960
+.]
+associations between diverse Application Server Processes (ASPs), Signalling
+Gateway Processes (SGPs), Signalling Gateways (SGs), and IP Signalling
+Processes (IPSPs).
+.pp
+\fI\)CORID\fR provides procedures to eliminate message loss, duplication or
+mis-sequencing under all failure, deactivation, recovery and activation
+scenarios.
+\fI\)CORID\fR provides the following capabilities that are
+not provided for in the existing UA specifications:
+.bu
+Support for elimintating mis-sequencing of UA-User messages at signalling
+endpoints (Application Servers or SS7 SEPs) when diverting messages between
+ASPs, SGPs, SGs, or IPSPs by supporting \fI\)BEAT\fR procedures analogous to
+the MTP3
+.[
+q704
+.]
+Changeback procedure.
+
+.bu
+Support for eliminating duplication of UA-User messages at signalling
+endpoints (Application Servers or SS7 SEPs) or SS7 endpoints across fail-over
+between ASPs, SGPs, SGs, or IPSPs.
+
+.bu
+Support for elimination of message loss of UA-User messages between Signalling
+Gateways (SGs) and Application Servers (ASs) across fail-over between ASPs,
+SGPs, SGs, or IPSPs.
+.sh 3 "Configuration"
+.pp
+For carrier-class operation, the SS7 Signalling User Adaptation Layers
+recommend that Signalling Gateways and Application Servers be configured such
+that there is no single point of failure within the SG/AS architecture or in
+the intervening network.  The SS7 UAs also recommend that no Application
+Server be configured for less than two (2) Application Server Processes.
+.pp
+All of the UAs describe an override, loadsharing and broadcast traffic mode.
+The UA protocols place no restrictions on the distribution algorithm which is
+used for distributing traffic over multiple Signalling Processes.
+Additional traffic distribution proposals have been put forward for Load Selection
+.[
+loadsel-03
+%Z 2
+.]
+and Load Grouping
+.[
+loadgrp-03
+%Z 2
+.]
+.pp
+Fail-over between Application Server Processes (ASPs) and Signalling Gateway
+Processes (SGPs) is not detailed in the UA protocols,
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+but it is clear that when an SCTP association fails and the ASP transitions to
+the ASP-DOWN state from the perspective of the SGP peer, the traffic which the
+associated ASP was previously responsible needs to be diverted to an
+alternate ASP (if available) in the same Application Server pool.
+.sh 3 "Conditions at Fail-Over"
+.pp
+The details of this diversion of traffic is not specified, however, a
+dichotomy exists when such fail-over occurs as a result of the loss of an SCTP
+association between these Signalling Peer Processes (SPPs).  When an SPP loses its
+SCTP association with another SPP, and diverts traffic towards another SPP,
+there exists the possibility that messages previously destined to the peer SPP
+exist in several categories, as follows:
+.ip "Category (1) \-" 15
+Queued in the sending SPP process,
+.ip "Category (2) \-" 15
+queued for transmission, but not yet transmitted by the transport provider
+(SCTP),
+.ip "Category (3) \-" 15
+queued for retransmission, but not yet acknowledged by the peer transport
+provider (SCTP), and,
+.ip "Category (4) \-" 15
+acknowledged by the peer transport provider (SCTP) and deleted from the
+sending transport provider's (SCTP's) retransmission queue.
+.lp
+.(b L
+.ie '\*(.T'ps' \{\
+.so corid-03.fig1.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+   Signalling   |    Stream Control               |        
+   Peer              Transmission Protocol                 
+   Process      |    (RFC 2960)                   |       
+                                   First Transmission     
+                |               +-----------------|------------->
+  ___ _ _         ___ _ _       | ___ _ _                 
+     | | | __   |    | | | __   |    | | | __     |       
+     | | |/  \\       | | |/  \\  |    | | |/  \\ Retransmission
+---->| | |    |-|--->| | |    |-+--->| | |    |---|------------->
+     | | |\\__/       | | |\\__/       | | |\\__/            
+  ___|_|_|      | ___|_|_|      | ___|_|_|        |       
+                                                           
+  Category (1)  | Category (2)  | Category (3)    | Category (4)
+  ------------    ------------    ------------      ------------
+   Queued in    |  Queued for   |  Queued for     | Acked and
+   Signalling      Transmission    Acknowledgment   Deleted
+   Peer Process |               |                 |        
+.sz +2
+.)c
+.\}
+.#f "Buffer Categories at SCTP Association Failure"
+.)b
+.pp
+These categories are illustrated in \fI\*(&f\n(&p\fR.
+Note that to retransmit categories (2) and (3) (and perhaps categories (1)) on
+another link requires sent data acknowledgment or buffer retrieval capability
+by the underlying transport provider.
+.pp
+As there is no SPP peer-to-peer acknowledgement, for messages in Categories (3)
+and (4), the message might or might not have been delivered to the peer SPP.
+Therefore, at the time of failure of an SCTP association between two
+Signalling Peer Processes (SPPs), it is not possible for either SPP to
+determine which of the messages in categories (3) and (4) above (transmitted,
+but not yet acknowledged; transmitted and acknowledged) were successfully
+received by the peer before failure.  Without information concerning which
+messages in this category were successfully received by the peer, the SPP
+either risks message loss or message duplication when it diverts traffic from
+the failed association.
+.sh 3 "Sources of Message Loss and Duplication"
+.pp
+If the messages from category (3) or (4) are retransmitted on an alternate
+association, the SPP diverting the traffic risks message duplication.  This is
+because some messages of the category might possibly have been successfully
+received by the peer before fail-over.
+.pp
+If the messages from category (3) and (4) are discarded before diverting
+messages from categories (1) and (2) and then new traffic on an alternate
+association, the SPP risks message loss.  This is because some of the messages
+in category (3) and (4) might possibly have \fInot\fR been received by the
+peer SPP before the association failed.
+.pp
+This is the dychotomy: regardless of the nature of a policy concerning the
+disposition of messages at an SPP experiencing failure to its peer, without
+information concerning messages successfully received by the peer, the SPP
+risks message loss or duplication.
+.pp
+It should be possible to induce such a system to demonstrate message loss or
+duplication.
+.pp
+Because SS7 performance requirements
+.[
+ss7perf
+%Z 2
+.]
+have more stringent requirements against duplication of messages than loss of
+messages, the only policy is to discard messages in category (3).
+.pp
+To avoid loss of messages to meet SS7 performance requirements
+.[
+ss7perf
+.]
+in consideration of this dichotomy, implementation cost may be driven higher than
+would be the case if a procedure were established to exchange information
+between the Signalling Processes on either side of a failed association.
+.pp
+This Internet-Draft provides Correlation Id and Heartbeat procedures
+for fail-over for the SS7 signalling UAs which will remove the possibility of
+message loss or duplication in the event that an SCTP association failure
+while communication between the Application Server and Signalling Gateway is
+still possible.
+.sh 3 "Conditions at Recovery"
+.lp
+.(b L
+.ie '\*(.T'ps' \{\
+.so corid-03.fig2.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+Signalling                          Application
+Gateway               (X)           Server
+.sp
+/----------\\__________/____________/----------\\
+|          |_________  /  _________|          |
+|   SGP1   |...      \\   /      ...|   ASP1   |
+|          |_____     \\ /     _____|          |
+\\----------/     \\     X     /     \\----------/
+                  \\   / \\   /
+/----------\\_______\\_/   \\_/_______/----------\\
+|          |________\\_____/________|          |
+|   SGP2   |...      \\   /      ...|   ASP2   |
+|          |________  \\ /  ________|          |
+\\----------/        \\  X  /        \\----------/
+                     \\/ \\/
+     .               /\\ /\\  SCTP         .
+     .              /  X  \\ Associations .
+     .             /  / \\  \\             .
+                  /  /   \\  \\
+/----------\\_____/  /     \\  \\_____/----------\\
+|          |_______/       \\_______|          |
+|   SGPn   |...                 ...|   ASPn   |
+|          |_______________________|          |
+\\----------/                       \\----------/
+.sz +2
+.)c
+.\}
+.#f "Example (A) Configuration of ASPs and SGPs"
+.)b
+.pp
+\fI\*(&f\n(&p\fR illustrates an example (A) configuration of ASPs and SGPs.
+In this example, the ASP and SGP are interconnected with a full-mesh
+arrangement of SCTP Associations.  Each ASP is interconnected to each SGP by
+an association.
+.pp
+When a failure of the SCTP assocation occurs, it is, for example, between
+`SGP1' and `ASP1' as indicated by the (X) in the \fI\*(&f\n(&p\fR.  When a
+recovery occurs, it is also the SCTP association between `SGP1' and `ASP1'
+that recovers.
+.pp
+The normal procedure for dealing with such a failure\*#
+.(d
+.#v
+.ip \*#
+As described in the UA documents.
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+.)d
+is for SGP1 to mark ASP1 in the ASP-DOWN state and to redirect traffic over
+the remaining ASPs in the Application Server\*#.
+.(d
+.#v
+.ip \*#
+For illustration purposes only, all ASPs in \fI\*(&f\n(&p\fR are members of
+the one Application Server which is represented at all of the SGPs.
+.)d
+.ds #u \*#
+.pp
+When the SCTP association between ASP1 and SGP1 recovers and ASP1 succesfully
+activates for the AS using the ASP Active Procedures\*#,
+.(d
+.#v
+.ip \*#
+See Section 4.3.4.3 of the specific UA document.
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+.)d
+once ASP1 has entered the ASP-ACTIVE state for the AS, message mis-sequencing
+can occur if traffic is immediately applied on the newly active association.
+.pp
+The UA procedures\*(#u provide no detail concerning the restarting of traffic
+to recovering ASPs in the AS.
+.sh 3 "Sources of Message Mis-Sequencing"
+.pp
+Because the SGPs can be experiencing different loads or other local factors,
+each SGP may differ.  Therefore, restoring a traffic flow to a newly active
+SGP, without first ensuring that messages are purged through the old path
+before the diversion, can result in message mis-sequencing.  This is example
+(C) illustrated in \fI\*(&f\n(&n\fR.
+.lp
+.(b L
+.ie '\*(.T'ps' \{\
+.so corid-03.fig3.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+    _____
+   /     \\      SGPx
+  |       |________________
+  |       |        ______  |
+  |       |    __ |X|X|    |
+  |       |___/  \\|X|X|____|_____
+  |       |   \\__/|X|X|    |     |
+  |       |       |X|X|__  |     |            ASP1
+  |       |________________|    \\|       _______________
+  |       |                    ( \\      |       _____   |
+  |  NIF  |                    (  \\     |   __ | | |    |
+  |       |                    (   \\____|__/  \\| | |____|___
+  |       |     SGP1                    |  \\__/| | |    |
+  |       |________________      |      |      |_|_|_   |
+  |       |        ______  |     |      |_______________|
+  |       |    __ | | |    |     |
+  |       |___/  \\| | |____|_____|
+  |       |   \\__/| | |    |
+  |       |       |_|_|__  |
+  |       |________________|
+  |       |
+   \\_____/
+.fi
+.sz +2
+.)c
+.\}
+.#f "Example (C) Restoration of a Traffic Flow"
+.)b
+.pp
+Before switching traffic back to SGP1 from SGPx, SGPx is queueing traffic
+from ASP1 to the SS7 network.
+(This queueing could either be within the SGP or as a result of queueing
+within the transport protocol.)
+.[
+rfc 2960
+.]
+If the traffic flow from ASP1 is switched rapidly to SGP1, a race condition
+exists between messages in SGPx's queue and messages in SGP1's queue.  A rapid
+switch can result in mis-sequencing.
+.pp
+As SGPx and SGP1 do not necessarily have to belong to the same SG (and
+because there exists queuing within the transport protocol itself), close
+queue synchornization between SGPx and SGP1 cannot be expected.
+.pp
+\fI\)CORID\fR provides both a time-controlled and a Heartbeat procedure for
+restoration of traffic to avoid mis-sequencing during restoration.
+.sh 2 "Functional Areas"
+.pp
+The \fI\)CORID\fR procedures to avoid message loss, duplication and
+mis-sequencing under these types of scenarios requires protocol parameters
+that provide a clear identification of the independent traffic flows involved.
+Then, procedures are required to control the fail-over and restoration of the
+identified traffic flows to avoid message loss.
+.pp
+The SS7 MTP3
+.[
+q704
+.]
+provide an excellent example of the types of procedures that can be applied to
+the problem of switching traffic flows across redundant processes\*#.
+.(d
+.#v
+.ip \*#
+See, for example, Clause 5 "Changeover", Clause 6 "Changeback", Clause 7
+"Forced Rerouting" and Clause 8 "Controlled Rereouting" of the MTP3
+specifications.
+.[
+q704
+.]
+.)d
+.sh 3 "Identification of Traffic Flows"
+.pp
+Traffic flows between Server Processes in the UAs are managed on the basis of
+the Application Server to which the traffic flows correspond.  Traffic flows
+from SG to AS are identified by the \fI\)Routing Key\fR or \fI\)Routing
+Context\fR to which they correspond\*#.
+.(d
+.#v
+.ip \*#
+This is true for all User Adaptation layers with the exception of M2UA.
+.[
+m2ua-rfc
+.]
+In M2UA, the Application Server and traffic flows are identified by an
+equivalent of the \fI\)Routing Key\fR: the \fI\)Link Key\fR, and the
+equivalent of the \fI\)Routing Context\fR: the \fI\)Interface Identifier\fR.
+An Application Server may also represent multiple \fI\)Interface
+Identifiers\fR.
+.)d
+.pp
+An Application Server Process can be active and handling traffic for any
+number or combination of traffic flows.  That is, the ASP can be actively
+handling traffic for any number of Application Servers.
+When an SCTP
+.[
+rfc 2960
+.]
+association fails, it is necessary to identify both the sequence of the last
+message succesfully received and processed by the Signalling Process, as well
+as the traffic flow within which that sequence applies.
+.pp
+Therefore, this document identifies a message in a traffic flow by the
+\fI\)Routing Context\fR, \fI\)Traffic Flow Id\fR\) and the correlation
+(sequence) number within that flow as identified by the \fI\)Correlation
+Identifier\fR.  The \fI\)Correlation Identifier\fR is a combination of
+\fI\)Traffic Flow Id\fR and \fI\)Correlation Number\fR which is applied to all
+divertable traffic.
+.pp
+(For details on the assignment of \fI\)Traffic Flow Identifiers\fR and Correlation
+numbers, see Section 4.1.2 "Correlation".)
+.sh 4 "SGP Starting New SGP-to-ASP Traffic"
+.pp
+When traffic is originally started for a traffic flow, the first divertable
+message in the traffic flow is assigned a \fI\)Correlation Number\fR of one (1) by the
+sending Signalling Process.  Subsequent divertable messages within the routing
+context are given the \fI\)Correlation Id\fR number of two (2), three (3), and so on.
+.pp
+Because SCTP is a sequenced reliable transport,
+.[
+rfc 2960
+.]
+it is only necessary to communicate this \fI\)Correlation Id\fR number between SPP
+peers for the intial message which is sent to the peer.  Each Signalling
+Peer Process \fB\)MUST\fR be capable of counting the messages which have been
+sent or received on the SCTP association, and assigning each subsequent
+message the next sequential \fI\)Correlation Id\fR number.
+.sh 4 "SPP Diverting peer SPP Traffic"
+.pp
+Should, for example,  the association fail between the SGP and the ASP, the
+SGP will recover any buffers from categories (1), (2), (3) and (4), and
+immediately restart traffic, in sequence, on another active ASP within the AS.
+When the SGP restarts traffic on this alternate ASP, if the messages belong to
+Category (4) or (3) (i.e, they were transmitted on but not acknowledged by the
+underlying transport, or transmitted and acknowledged), the SGP will label the
+initial message sent with the \fI\)Correlation Id\fR of the message at the time that
+it was originally sent.  When the SGP sends tmessages from Category (2), (1)
+and newly arriving traffic, the SGP will not tag the messages with a
+\fI\)Correlation Id\fR, but instead will label them internally with the next
+sequential \fI\)Correlation Numbers\fR for the traffic flow.
+.pp
+Thus, the alternate Signalling Peer Process which is receiving diverted
+traffic will be able to distinguish the problematic Category (3) and (4)
+messages from those which follow.  When an tagged message is received, the
+Signalling Peer Process is now aware that the messages were previously sent to
+the normal SPP to which the SCTP association was lost.  When an untagged
+message arrives, the receiving Signalling Peer Process is aware that this and
+subsequent messages within the traffic flow represent previously unsent
+traffic.
+.pp
+(Detailed procedures for the tagging of messages are described in Section
+4.1.3 and 4.1.5.2.1; for diversion, Sections 4.2.2, 4.2.3 and 4.1.6.)
+.sh 4 "SPP Receiving Diverted Traffic"
+.pp
+At the Signalling Process receiving the diverted traffic for the \fI\)Routing
+Context\fR, three actions are possible (or, combinations of the three):
+.np 1
+Ignore the \fI\)Correlation Id\fR and process the messages blind at the risk
+that message duplication will occur,
+.np
+discard all messages tagged with a \fI\)Correlation Id\fR at the risk of increased
+message loss, or,
+.np
+perform the procedures described in Section 4.1.5.2.2 minimizing the message
+duplication and loss resulting from the diversion.
+.pp
+Only by performing the procedures described in Section 4.1.5.2.2 will message
+duplication and loss be minimized.
+.sh 4 "SPP Restoring Traffic"
+.pp
+Should, for example, the association recover between the SGP and ASP, the ASP
+will need to rebalance the load across the available SGPs and the newly
+available SGP.  As discussed, if the ASP switches traffic immediately, message
+mis-sequencing can occur.  Two procedures are provided by \fI\)CORID\fR for
+restoring traffic without message mis-sequencing: a Heartbeat procedure and a
+timer procedure.
+.pp
+The Heartbeat procedure withholds divertable traffic from the SGP currently
+active for each traffic flow and sends a \fI\)BEAT\fR message on each flow.
+Once the \fI\)BEAT ACK\fR is received by the ASP, the ASP is assured that
+there is no divertable traffic pending on the SGP and the traffic flow can be
+switched to the recovered SGP.  The Heartbeat procedure is applicable to
+recovery between SGPs in the same SG as well as SGPs in different SGs.
+.pp
+The Timer procedure witholds divertable traffic from the SGP currently active
+for the traffic flow and waits until a timer expires.  Once the timer expires,
+the ASP is resonably assured that there is no traffic pending on the SGP and
+the traffic flow can be switched to the recovered SGP.  The Timer procedure is
+applicable to recovery between SGPs where the SGPs do not support
+\fI\)CORID\fR.
+.pp
+Restoration of traffic is described in detail in Sections 4.2.3 and 4.1.6.
+.sh 2 "Sample Configurations"
+.lp
+.(z M
+.ie '\*(.T'ps' \{\
+.so corid-03.fig4.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+                 |                                                
+   SS7                           IP                               
+   Network       |               Network                          
+             _________________                ________     _____  
+            |    |    ________|        ______|        |   /     \\ 
+            |        |        |_______|  ____|  ASP1  |  |       |
+ B/D-Links  |    |   |  SGP1  |________  |   |________|  |       |
+ ___________| STP SG1|________|        | |    ________   |       |
+           /|    |   |        |__   o  | | __|        |  |  AS1  |
+          / |        |  SGP2  |__   o  | | __|  ASP2  |  |       |
+   \\     /  |    |   |________|     o  | |   |________|  |       |
+    \\   /   |_________________|        | |    ________   |       |
+     \\ / C-   |                     o  | | __|        |   \\_____/
+      X  Links|  |                  o  | | __|  ASP3  |    _____  
+     / \\     _|_______________      o  | |   |________|   /     \\
+    /   \\   |    |    ________|        | |    ________   |       |
+   /     \\  |        |        |__   o  | | __|        |  |       |
+          \\ |    |   |  SGP3  |__   o  | | __|  ASP4  |  |       |
+ __________\\| STP SG2|________|     o  | |   |________|  |  AS2  |
+            |    |   |        |________|_|    ________   |       |
+            |        |  SGP4  |_______ |_____|        |  |       |
+            |    |   |________|       |______|  ASP5  |  |       |
+            |_________________| SCTP         |________|   \\_____/
+                 |              Associations                      
+                                                                  
+                 |                                                
+.fi
+.sz +2
+.)c
+.\}
+.#f "Example (C) Sample Multiple-SG Configuration"
+.)z
+.pp
+A typical Example (C) configuration (multiple Signalling Gateways) is
+illustrated in \fI\)\*(&f\n(&p\fR.  In this configuration a number of
+Application Server Processes (ASPs) serving a number of Application Servers
+(ASs) are connected to two Signalling Gateways (SGs).  The SGs appear as mated
+SS7 Signalling Transfer Points (STPs)
+.[
+q705
+%Z 2
+.]
+to the SS7 Network.  Traffic originating at Signalling Endpoints (SEP) in the
+SS7 network and directed toward SEP in the IP network (i.e., Application
+Servers) is loadshared over the STPs by the Signalling Link Selection (SLS)
+.[
+q704
+.]
+value associated with each message.  Traffic originating at the SEP in the IP
+network (i.e, AS) is loadshared over the SGs in the same fashion.
+.#e
+.sh 1 "Conventions"
+.pp
+The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
+\fB\)SHALL NOT, \fB\)SHOULD\fR, \fB\)SHOULD NOT\fR, \fB\)RECOMMENDED\fR,
+\fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
+in this document, are to be interpreted as described in.
+.[
+key words
+%Z 1
+.]
+.#e
+.sh 1 "Protocol Elements"
+The following protcol element definitions are provided by \fI\)CORID\fR in
+extension to the existing protocol element definitions for the UAs.
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+.sh 2 "Parameters"
+.pp
+The following subsections describe the parameters used for \fI\)CORID\fR,
+their format and the message in which they are used.
+.sh 3 "Correlation Id"
+.pp
+The \fI\)Correlation Id\fR parameter is used in the \fI\)BEAT\fR, \fI\)BEAT
+ACK\fR, \fI\)ASPAC\fR, \fI\)ASPAC ACK\fR, and UA-User data messages.  It is
+used here to identify data messages sent to a peer SPP.
+.lp
+The \fI\)Correlation Id\fR parameter is formatted as follows:
+.(b L
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0x0019          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                      Correlation Id #1                        |
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+|                      Correlation Id #2                        |
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+\\                               .                               \\
+/                               .                               /
+\\                               .                               \\
+/                                                               /
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+|                      Correlation Id #n                        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.lp
+The \fI\)Correlation Id\fR parameter contains one or more of the following
+field:
+.ip "\fB\)Correlation Id field: 8-bytes\fR" 2
+.ip "" 2
+The \fI\)Correlation Id\fR field is formatted as follows:
+.ba +2
+.(b L
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                      Correlation Number                       |
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+|                       Traffic Flow Id                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.ip "\fB\)Correlation Number field: 32-bits (unsigned integer)\fR" 2
+.ip "" 2
+The \fI\)Correlation Number\fR field identifies a particular message within a
+traffic flow.  When the \fI\)Correlation Id\fR parameter is included in the
+\fI\)BEAT (ACK)\fR or \fI\)ASPAC (ACK)\fR message, this field identifies the
+last sent message for the indicated traffic flow.  When the \fI\)Correlation
+Id\fR parameter is included a UA-User data message, this field identifies the
+\fI\)Correlation Number\fR of the message in which it is contained.
+.ip "\fB\)Traffic Flow Id field: 32-bits (unsigned integer)\fR" 2
+.ip "" 2
+The \fI\)Traffic Flow Id\fR field identifies a particular indepdently
+sequenced traffic flow to which the \fI\)Correlation Number\fR field value
+applies.
+The \fI\)Traffic Flow Id\fR field identifies a traffic flow associated with an
+Application Server.  When used for tagging messages or in the \fI\)BEAT
+(ACK)\fR or \fI\)ASPAC (ACK)\fR message for a Loadshare AS Load Selection
+.[
+loadsel-03
+.]
+or Loadshare Load Group,
+.[
+loadgrp-03
+.]
+the \fI\)Traffic Flow Id\fR field \fB\)MUST\fR identify traffic flow
+(\fI\)Load Selection\fR) within an Application Server.
+.ip "" 2
+For an Override or Broadcast AS (or Load Group), the Traffic Flow Id is not
+required and \fB\)SHOULD\fR be coded zero (0).  In this case, the
+\fI\)Correlation Id\fR parameter \fB\)SHOULD\fR only contain one
+\fI\)Correlation Id\fR field.
+.ip "" 2
+For details on \fI\)Traffic Flow Id\fR assignment, see Section 4.1.2.2.
+.ba -2
+.pp
+When the \fI\)Correlation Id\fR parameter is included in the \fI\)BEAT\fR,
+\fI\)BEAT ACK\fR, \fI\)ASPAC\fR, \fI\)ASPAC ACK\fR, and UA-User data messages,
+only one \fI\)Routing Context\fR (or \fI\)Interface Identifier\fR)
+representing a single Application Server \fB\)MUST\fR be associated (specified
+or implied) with the message.
+.sh 2 "Messages"
+.sh 3 "ASP Active (ASPAC)"
+.pp
+\fI\)CORID\fR supplements the \fI\)ASPAC\fR mesage by permitting the following
+optional parameters to be included in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+Correlation Id:Mandatory:
+.TE
+.lp
+The format of the resulting \fI\)ASPAC\fR message is as follows:
+.(b L
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0x000b          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                         Traffic Mode Type                     |
++-------------------------------+-------------------------------+
+|         Tag = 0x0006          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                         Routing Context                       |
++-------------------------------+-------------------------------+
+|         Tag = 0x0001          |           Length=8            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                 Interface Identifier (integer)                |
++-------------------------------+-------------------------------+
+|         Tag = 0x0003          |             Length            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                   Interface Identifier (text)                 /
+\\                                                               \\
+\f(CB\
++-------------------------------+-------------------------------+
+|         Tag = 0x0019          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                         Correlation Id                        /
+\\                                                               \\
++-------------------------------+-------------------------------+
+\f(CR\
+|         Tag = 0x0004          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                           Info String                         /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.pp
+The \fI\)Correlation Id\fR parameter is used by the ASP in the \fI\)ASPAC\fR
+message to indicate the correlation identifier for the first UA-User message
+to be transmitted in each traffic flow from the Application Server being
+activated to the Signalling Gateway.  The Application Servers for which the
+\fI\)Correlation Id\fR apply is either indicated in the \fI\)ASPAC\fR message
+by providing the associated \fI\)Routing Contexts\fR (or \fI\)Interface
+Identifiers\fR), or, if there is no \fI\)Routing Context\fR (or \fI\)Interface
+Identifier\fR) parameter in the message, the associated Application Servers
+are implied by the SGP and ASP configuration data.
+.pp
+When the \fI\)Correlation Id\fR parameter is present in the \fI\)ASPAC\fR
+message, the message \fB\)SHOULD\fR only contain one \fI\)Routing Context\fR
+(or \fI\)Interface Identifier\fR) in the \fI\)Routing Context\fR (or
+\fI\)Interface Identifier\fR) parameter.  When the \fI\)Correlation Id\fR
+parameter is not present, but required by the SGP, the value of the
+\fI\)Correlation Id\fR is assumed to be zero (0).
+.pp
+The \fI\)ASPAC\fR message \fB\)MAY\fR contain additional extension parameters
+provided for by other extensions.
+.pp
+No other changes to the \fI\)ASPAC\fR message format are provided by this
+extension.
+.sh 3 "ASP Active Acknowledgement (ASPAC ACK)"
+.pp
+\fI\)CORID\fR supplements the \fI\)ASPAC ACK\fR mesage by permitting the
+following optional parameters to be included in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+Correlation Id:Mandatory:
+.TE
+.lp
+The format of the resulting \fI\)ASPAC ACK\fR message is as follows:
+.(b L
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0x000b          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                         Traffic Mode Type                     |
++-------------------------------+-------------------------------+
+|         Tag = 0x0006          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                         Routing Context                       |
++-------------------------------+-------------------------------+
+|         Tag = 0x0001          |           Length=8            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                 Interface Identifier (integer)                |
++-------------------------------+-------------------------------+
+|         Tag = 0x0003          |             Length            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                   Interface Identifier (text)                 /
+\\                                                               \\
+\f(CB\
++-------------------------------+-------------------------------+
+|         Tag = 0x0019          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                         Correlation Id                        /
+\\                                                               \\
++-------------------------------+-------------------------------+
+\f(CR\
+|         Tag = 0x0004          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                           Info String                         /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.pp
+The \fI\)Correlation Id\fR parameter is used by the SGP in the \fI\)ASPAC
+ACK\fR message to indicate the correlation identifier for the first UA-User
+message to be transmitted from the Signalling Gateway to the Application
+Server being activated for each traffic flow.  The Application Servers for
+which the \fI\)Correlation Id\fR apply is either indicated in the \fI\)ASPAC
+ACK\fR message by providing the associated \fI\)Routing Contexts\fR (or
+\fI\)Interface Identitifiers\fR), or, if there is no \fI\)Routing Context\fR
+or \fI\)Interface Identifier\fR parameter in the message, the associated
+Application Servers are implied by the SGP and ASP configuration data.
+.pp
+When the \fI\)Correlation Id\fR parameter is present in the \fI\)ASPAC ACK\fR
+message, the message \fB\)SHOULD\fR only contain one \fI\)Routing Context\fR
+(\fI\)Interface Identifier\fR) in the \fI\)Routing Context\fR (\fI\)Interface
+Identifier\fR) parameter.  When the \fI\)Correlation Id\fR parameter is not
+present, but required by the ASP, the value of the \fI\)Correlation Id\fR is assumed
+to be zero (0).
+.pp
+The \fI\)ASPAC ACK\fR message \fB\)MAY\fR contain additional extension
+parameters provided for by other extensions.
+.pp
+No other changes to the \fI\)ASPAC ACK\fR message format are provided by this
+extension.
+.sh 3 "Heartbeat (BEAT)"
+.pp
+\fI\)CORID\fR supplements the \fI\)BEAT\fR message by permitting the following
+optional parameters to tbe indicated in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+Routing Context:Conditional:*1
+Interface Identifier:Conditional:*2
+Correlation Id:Conditional:
+.TE
+.ba +4
+.ip "Note 1:" 8
+The \fI\)Routing Context\fR parameter is only included in those UAs that
+support \fI\)Routing Context\fR.
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+.ip "Note 2:" 8
+The \fI\)Interface Identifier\fR parameter is only included in those UAs that
+support \fI\)Interface Identifier\fR.
+.[
+m2ua-rfc
+.]
+.ba -4
+.lp
+The format of the resulting \fI\)BEAT\fR message is as follows:
+.(b L
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+\f(CB\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0x0006          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                         Routing Context                       |
++-------------------------------+-------------------------------+
+|         Tag = 0x0001          |           Length=8            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                 Interface Identifier (integer)                |
++-------------------------------+-------------------------------+
+|         Tag = 0x0003          |             Length            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                   Interface Identifier (text)                 /
+\\                                                               \\
++-------------------------------+-------------------------------+
+|         Tag = 0x0019          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                         Correlation Id                        /
+\\                                                               \\
++-------------------------------+-------------------------------+
+\f(CR\
+|         Tag = 0x0009          |              Length           |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                         Heartbeat Data                        /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.pp
+The \fI\)Routing Context\fR parameter is used by the SPP in the \fI\)BEAT\fR
+message to indicate the Application Server for which the message applies when
+the \fI\)CORID\fR heatbeat procedures are used.  The Application Servers for
+which the \fI\)BEAT\fR message apply is either indicated in the \fI\)BEAT\fR
+message by providing the associated \fI\)Routing Contexts\fR (or
+\fI\)Interface Identifier\fR), or, if there is no \fI\)Routing Context\fR (or
+\fI\)Interface Identifier\fR) paraemter in the message, the associated
+Application Servers are implied by the SPP configuration data.
+.pp
+When the \fI\)Routing Context\fR (or \fI\)Interface Identifier\fR) is present
+in the \fI\)BEAT\fR message, the message \fB\)SHOULD\fR only contain one
+\fI\)Routing Context\fR (\fI\)Interface Identifier\fR) in the \fI\)Routing
+Context\fR (\fI\)Interface Identifier\fR) parameter.  When the \fI\)Routing
+Context\fR (\fI\)Interface Identifier\fR) is not present in the \fI\)BEAT\fR
+message, but required by the SPP, the \fI\)BEAT\fR message is assumed to be a
+normal \fI\)BEAT\fR message not supporting the procedures of \fI\)CORID\fR an
+a normal \fI\)BEAT ACK\fR response \fB\)MUST\fR be generated.
+.pp
+The \fI\)Correlation Id\fR parameter is used by the SPP in the \fI\)BEAT\fR
+message to indicate the correlation identifier for the last UA-User message
+that was transmitted to the peer SPP for each traffic flow for the given SCTP
+stream upon which the \fB\)BEAT\fR message is sent.  The Application Servers
+fro which the \fI\)Correlation Id\fR applies is either indicated in the
+\fI\)BEAT\fR message by providing the associated \fI\)Routing Context\fR
+(\fI\)Interface Identifier\fR), or, if there is no \fI\)Routing Context\fR
+(or \fI\)Interface Identifier\fR) parameter in the message, the associated
+Application Servers are implied by the SPP configuration data.
+.pp
+When the \fI\)Correlation Id\fR parameter is present in the \fI\)BEAT\fR
+message, the message \fB\)SHOULD\fR only contain one \fI\)Routing Context\fR
+(\fI\)Interface Identifier\fR) in the \fI\)Routing Context\fR (\fI\)Interface
+Identifier\fR) parameter.  When the \fI\)Correlation Id\fR parameter is not
+present, but required by the SPP, the value of the \fI\)Correlation Id\fR is
+assumed to be zero (0) for all affected traffic flows.
+.pp
+The \fI\)BEAT\fR mesage \fB\)MAY\fR contain additional extension parameters
+provided for by other extensions.
+.pp
+No other changes to the \fI\)BEAT\fR message format are provided by this
+extension.
+.sh 3 "Heartbeat Acknowledgement (BEAT ACK)"
+.pp
+\fI\)CORID\fR supplements the \fI\)BEAT ACK\fR message by permitting the following
+optional parameters to tbe indicated in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+Routing Context:Conditional:*1
+Interface Identifier:Conditional:*2
+Correlation Id:Conditional:
+.TE
+.ba +4
+.ip "Note 1:" 8
+The \fI\)Routing Context\fR parameter is only included in those UAs that
+support \fI\)Routing Context\fR.
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+.ip "Note 2:" 8
+The \fI\)Interface Identifier\fR parameter is only included in those UAs that
+support \fI\)Interface Identifier\fR.
+.[
+m2ua-rfc
+.]
+.ba -4
+.lp
+The format of the resulting \fI\)BEAT ACK\fR message is as follows:
+.(b L
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+\f(CB\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0x0006          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                         Routing Context                       |
++-------------------------------+-------------------------------+
+|         Tag = 0x0001          |           Length=8            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                 Interface Identifier (integer)                |
++-------------------------------+-------------------------------+
+|         Tag = 0x0003          |             Length            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                   Interface Identifier (text)                 /
+\\                                                               \\
++-------------------------------+-------------------------------+
+|         Tag = 0x0019          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                         Correlation Id                        /
+\\                                                               \\
++-------------------------------+-------------------------------+
+\f(CR\
+|         Tag = 0x0009          |              Length           |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                         Heartbeat Data                        /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.pp
+The \fI\)Routing Context\fR parameter is used by the SPP in the \fI\)BEAT
+ACK\fR message to indicate the Application Server for which the message
+applies when the \fI\)CORID\fR heatbeat procedures are used.  The Application
+Servers for which the \fI\)BEAT ACK\fR message apply is either indicated in
+the \fI\)BEAT ACK\fR message by providing the associated \fI\)Routing
+Contexts\fR (or \fI\)Interface Identifier\fR), or, if there is no \fI\)Routing
+Context\fR (or \fI\)Interface Identifier\fR) paraemter in the message, the
+associated Application Servers are implied by the SPP configuration data.
+.pp
+When the \fI\)Routing Context\fR (or \fI\)Interface Identifier\fR) is present
+in the \fI\)BEAT ACK\fR message, the message \fB\)SHOULD\fR only contain one
+\fI\)Routing Context\fR (\fI\)Interface Identifier\fR) in the \fI\)Routing
+Context\fR (\fI\)Interface Identifier\fR) parameter.  When the \fI\)Routing
+Context\fR (\fI\)Interface Identifier\fR) is not present in the \fI\)BEAT\fR
+message, but required by the SPP, the \fI\)BEAT\fR message is assumed to be a
+normal \fI\)BEAT\fR message not supporting the procedures of \fI\)CORID\fR an
+a normal \fI\)BEAT ACK\fR response \fB\)MUST\fR be generated.
+.pp
+The \fI\)Correlation Id\fR parameter is used by the SPP in the \fI\)BEAT ACK\fR
+message if it appeared in the \fI\)BEAT\fR message.  In this case, the
+\fI\)Correlation Id\fR parameter that the SPP places in the \fI\)BEAT ACK\fR
+message \fB\)MUST\fR be the same as that in the corrsponding received
+\fI\)BEAT\fR message.
+.pp
+When the \fI\)Correlation Id\fR parameter is present in the \fI\)BEAT ACK\fR
+message, the message \fB\)SHOULD\fR only contain one \fI\)Routing Context\fR
+(\fI\)Interface Identifier\fR) in the \fI\)Routing Context\fR (\fI\)Interface
+Identifier\fR) parameter.
+.pp
+The \fI\)BEAT ACK\fR mesage \fB\)MAY\fR contain additional extension parameters
+provided for by other extensions.
+.pp
+No other changes to the \fI\)BEAT ACK\fR message format are provided by this
+extension.
+.#e
+.sh 1 "Procedures"
+.af $p i
+.pp
+\fI\)CORID\fR provides the following procedures in extension to the procedures
+of the UAs.
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+.sh 2 "Traffic Handling"
+.pp
+In some circumstances, the SPP must treat traffic differently than normal in
+fitting with the \fI\)CORID\fR procedures.  This traffic handling is described
+in the sections below:
+.sh 3 "Classification"
+.pp
+Divertable messages are any UA-User messages destined for an Application
+Server.  Divertable messages are UA-User data and some management (non-ASP
+management) messages that have an explicit or implied \fI\)Routing Context\fR
+(\fI\)Interface Identifier\fR) and have strict requirements preventing loss,
+duplication or mis-sequencing.  All SSNM messages containing an explicit or
+implied \fI\)Routing Context\fR \fB\)SHALL\fR be classified as divertable,
+with the exception of \fI\)DAUD\fR which \fB\)SHOULD\fR be classified as
+divertable between ASPs or SGPs belonging to the same SG, and \fB\)SHOULD\fR
+be classified as non-divertable between SGs.  UA-User messages that qualify as
+divertable messages in addition to SSNM are listed in \fI\)\*(&t\n(&a\fR.
+Although some messages in some message classes might be considered as
+non-divertable, all messages in the message classes listed in
+\fI\)\*(&t\n(&a\fR \fB\)SHALL\fR be treated as divertable.
+.lp
+.(b C
+.#t "Divertable Messages by UA"
+.TS
+center box tab(:);
+lb|lb|lb|lb
+l|l|l|l.
+ UA:Class:Msg:Notes
+_
+ M2UA:MAUP:Data
+::Data Ack
+_
+ M3UA:Transfer:DATA
+_
+:CL:CLDT:Note 1
+::CLDR:
+:_:_:_
+:CO:CORE
+ SUA::COAK
+::CODT
+::RESRE
+::RESCO
+::RELRE
+_
+:TCM:TUNI:
+::TQRY:Note 2
+::TCNV:
+::TRSP:
+::_:_
+::TUAB
+::TPAB
+ TUA::TNOT
+:_:_:_
+:CHM:CINV:Note 3
+::CRES:
+::_:_
+::CERR:
+::CREJ:
+::CCAN:
+_
+:SSNM:DUNA:
+::DAVA:Note 4
+ All::SCON:
+::DUPU:
+::_:_
+::DAUD:Note 5
+.TE
+.TS
+center tab(|);
+lblss.
+Note 1:|T{
+.#v
+All those marked "Return on Error".
+T}
+Note 2:|T{
+.#v
+All those without components or marked "Return on Error".
+T}
+Note 3:|T{
+.#v
+All those in operation class 1, 2 or 3.
+T}
+Note 4:|T{
+.#v
+All those with implied \fI\)Routing Context\fR or containing explicit \fI\)Routing Context\fR parameters in the message.
+T}
+Note 5:|T{
+.#v
+See Section 4.1.1.
+T}
+.TE
+.)b
+.sh 3 "Correlation"
+.pp
+Each independent traffic flow for a given Application Server as identified by
+a \fI\)Routing Context\fR (\fI\)Interface Identifier\fR) \fB\)MUST\fR be
+correlated using a \fI\)Correlation Id\fR.  The \fI\)Correlation Id\fR
+consists of a \fI\)Correlation Number\fR and a traffic flow identifier.  The
+\fI\)Correlation Number\fR is used to number each message within the given traffic
+flow.
+.sh 4 "Assignment of Correlation Ids"
+.pp
+To accomodate all combinations of traffic modes at AS and SG, divertable
+messages are correlated by independent traffic flow.  That is, each sent
+divertable message is labelled with a traffic flow identifier and a
+\fI\)Correlation Number\fR for the AS that is incremented for each message sent for
+the traffic flow.  In the same fashion, each received divertable message is
+labelled with the identity of the traffic flow on which it was received and a
+\fI\)Correlation Number\fR for the AS that is incremented for each message received on
+that traffic flow.
+.pp
+An SPP maintains two correlation counters for each traffic flow for each AS:
+for each traffic flow, one counter tracks the \fI\)Correlation Number\fR of messages
+sent to the AS and the other tracks the \fI\)Correlation Number\fR of messages
+received from the AS.  Before traffic is started for an AS on a traffic flow,
+these counters are set to zero (0).  The first divertable message for the AS
+on the flow \fB\)MUST\fR then be assigned a coorrelation number of one (1);
+and subsequent divertable messages, the \fI\)Correlation Number\fR of two (2), three
+(3), and so forth.
+.pp
+Whenever traffic is started for the AS (using the ASP Active Procedures), the
+correlation counters \fB\)SHALL\fR be synchronized by exchanging correlation
+numbers and traffic flow identifiers in the \fI\)Correlation Id\fR parameter
+in the \fI\)ASPAC\fR and \fI\)ASPAC ACK\fR messages.  For new traffic, the
+\fI\)Correlation Number\fR \fB\)MUST\fR zero (0); for restarting traffic, it is
+\fB\)SHOULD\fR be the \fI\)Correlation Number\fR of the last message transferred.
+(See Section 4.2.3.)
+.sh 4 "Assignment of Traffic Flow Ids"
+.pp
+\fI\)Traffic Flow Ids\fR \fB\)SHALL\fR identify a switchable traffic flow
+within an Application Server.  The \fI\)Traffic Flow Id\fR value \fB\)SHALL\fR
+be assigned by the sending SPP\*#.
+.(d
+.ip \*#
+That is, the \fI\)Traffic Flow Id\fR will be assigned by the SPP
+\fB\)sending\fR the message.  \fI\)Traffic Flow Ids\fR are only used to
+determine whether messages belong to the same traffic flow, therefore, the
+\fI\)Traffic Flow Id\fR need only uniquely identify a traffic flow within an
+Application Server at the sending SPP.
+.)d
+.pp
+\fI\)Traffic Flow Ids\fR assigned by an SPP and \fB\)MUST\fR be communicated
+to the peer SPP in an \fI\)ASPAC\fR or \fI\)ASPAC ACK\fR message.
+.pp
+For traffic distributions that do not loadshare (i.e, Override and Broadcast),
+the \fI\)Traffic Flow Id\fR field is not required and \fB\)MAY\fR be set to
+zero (0).  In this case, the \fI\)Correlation Id\fR parameter in the
+\fI\)BEAT\fR, \fI\)BEAT ACK\fR, \fI\)ASPAC\fR or \fI\)ASPAC ACK\fR message
+\fB\)SHOULD\fR only contain one \fI\)Correlation Id\fR field (see Section
+3.1.1).
+.pp
+Following are rules for the assignment of \fI\)Traffic
+Flow Ids\fR at an SPP:
+.np
+If an SPP belongs to a regular Override or Broadcast AS, no \fI\)Traffic Flow
+Id\fR need be assigned or included by the SPP in the \fI\)Correlation Id\fR
+parameter.
+.np
+If an SPP belongs to a regular Loadshare AS, a \fI\)Traffic Flow Id\fR is
+assigned and included in the \fI\)Correlation Id\fR parameter.  The
+\fI\)Traffic Flow Id\fR Id assigned \fB\)MUST\fR unambiguously identify the
+traffic flow within the AS.
+.np
+If an SPP belongs to a Load Selector,
+.[
+loadsel-03
+.]
+a \fI\)Traffic Flow Id\fR is assigned and included in the \fI\)Correlation
+Id\fR parameter regardless of the \fI\)Traffic Mode Type\fR of the AS.  The
+\fI\)Traffic Flow Id\fR assigned \fB\)MUST\fR unambiguously identify the the
+Load Selection within the AS.\*#
+.(d
+.ip \*#
+\fB\)IMPLEMENTATION NOTE:\-\fR  A simple way to assign the \fI\)Traffic Flow
+Id\fR when performing Load Selection
+.[
+loadsel-03
+.]
+is to simply assign the same value to the \fI\)Traffic Flow Id\fR as is
+assigned to the \fI\)Load Selector\fR.
+.)d
+.np
+If an SPP belongs to a Load Group,
+.[
+loadgrp-03
+.]
+a \fI\)Traffic Flow Id\fR is assigned and included in the \fI\)Correlation
+Id\fR for a Loadshare AS or Load Group.  An assigned \fI\)Traffic Flow Id\fR
+\fB\)MUST\fR unambiguously identify the Load Selection within the AS.  For a
+non-loadshare AS and Load Group, no \fI\)Traffic Flow Id\fR need be assigned
+or included in the \fI\)Correlation Id\fR parameter.\*#
+.(d
+.ip \*#
+\fB\)IMPLEMENTATION NOTE:\-\fR  A simple way to assign the \fI\)Traffic Flow
+Id\fR when performing Load Grouping
+.[
+loadgrp-03
+.]
+is to simply assign the same value to the \fI\)Traffic Flow Id\fR as is
+assigned to the \fI\)Load Selector\fR or \fI\)Load Group Identifier\fR.
+.)d
+.sh 3 "Tagging"
+.pp
+Each sent or received message for an AS is labelled when it is first sent or
+received.  The message is labelled with the traffic flow id associated with
+the SPP to or from which the message was sent or received, and the correlation
+number assigned within the traffic flow (see Section 4.1.2.1).
+.pp
+Tagged messages contain a \fI\)Correlation Id\fR parameter: an untagged
+message is tagged by adding a \fI\)Correlation Id\fR parameter to the message.
+When a message is tagged, it \fB\)SHALL\fR be tagged with the same values of
+the traffic flow id (if required) and \fI\)Correlation Number\fR with which it was
+originally labelled.
+.pp
+Although each message is labelled with a traffic flow id and correlation
+number, the message is not necessarily tagged with the \fI\)Correlation Id\fR
+parameter when the message is sent.  Messages for an AS that are sent for the
+first time \fB\)MUST NOT\fR be tagged.  Messages retransmitted \fB\)MUST\fR be
+tagged.
+.sh 3 "Buffering"
+.pp
+To support \fI\)CORID\fR and SPP will have to, under some circumstances,
+buffer messages.  When divering traffic, the SPP requires buffers to hold
+unsent messages awaiting diversion; when sending traffic, the SPP requires
+buffers to hold local copies of sent messages in the event of failure.
+.sh 4 "SPP witholding unsent messages"
+.pp
+\fI\)CORID\fR procedures require that an SPP at times withhold AS traffic.  To
+perform this, the SPP allocates a diversion buffer and places in the buffer
+all subsequent messages that would otherwise be sent to the SPP for the AS.
+.sh 4 "Local copies of sent messages"
+.pp
+To reduce loss of messages, an SPP \fB\)SHOULD\fR buffer messages until it can
+be assured that the peer SPP has received and processed the message.  When a
+message is sent to an SPP supporting \fI\)CORID\fR a local copy of the message
+\fB\)MUST\fR be kept until it is discarded in accordance with a \fI\)CORID\fR
+procedure.\*#
+.(d
+.#v
+.ip \*#
+\fB\)IMPLEMENTATION NOTE:\-\fR  A simple way to meet the requirements for
+keeping local copies of messages is to keep a local copy of all messages sent
+to an SPP supporting \fI\)CORID\fR until a fixed buffer allocation is
+exceeded, or until the local copy lifetime expires.  T(lifetime) and buffer
+capacity can then be adjusted to ensure that local copies of messages are not
+discarded too early resulting in message loss during fail-over.
+.)d
+.np
+A local copy \fB\)SHOULD NOT\fR be discarded when it is acknowledged by the
+peer SCTP.
+.np
+a local copy \fB\)SHOULD NOT\fR be discarded until the sending SPP is
+confident that the peer SPP has received and processed the message.
+.np
+To ensure that stale messages do not propagate through the system, an SPP
+\fB\)SHOULD NOT\fR keep local copies of sent messages for longer than a
+maximum lifetime T(lifetime).  Any local coppies of sent messages that are older
+(measured from the moment at which they were sent to the peer SPP) than
+T(lifetime) \fB\)SHOULD\fR be discarded.
+.sh 3 "Message Handling"
+.pp
+The SPP supporting \fI\)CORID\fR handles tagged and untagged messages
+differently.
+.sh 4 "Untagged Messages"
+.pp
+Under some circumstances, an SPP will send or receive untagged messages.
+Untagged messages (see Section 4.1.3) are messages which do not contain a
+\fI\)Correlation Id\fR parameter.
+.sh 5 "SPP sending untagged messages"
+.pp
+An SPP sends untagged messages to a peer SPP whenever the message is being
+sent for an Application Server for the first time.  All divertable messages
+which have been transmitted for the first time \fB\)MUST NOT\fR be sent
+tagged.
+.pp
+Local copies of untagged messages awaiting acknowledgement or expiry are
+labelled with the \fI\)Routing Context\fR (\fI\)Interface Identifier\fR) for
+the Application Server to which they were sent, the traffic flow id of the SPP
+to which they were sent, and the \fI\)Correlation Number\fR of the message.  The
+\fI\)Correlation Number\fR with which a message is labelled \fB\)MUST\fR be the next
+sequential \fI\)Correlation Number\fR for the AS and traffic flow.  These labels can
+be used later to tag a message that is marked for diversion.
+.sh 5 "SPP receiving untagged messages"
+.pp
+When an SPP receives an untagged message, it associates with the message the
+next sequential \fI\)Correlation Number\fR for the \fI\)Routing Context\fR
+(\fI\)Interface Identifier\fR) and traffic flow id for which the message was
+received.  Untagged messages are received in order and \fB\)MAY\fR be
+processed when received.  The SPP \fB\)SHOULD\fR keep track of the
+\fI\)Correlation Id\fRs that have been processed for the AS.
+.sh 4 "Tagged Messages"
+.pp
+Under some circumstances, an SPP will send or receive tagged messages.
+Tagged messages (see Section 4.1.3) are messages which contain a
+\fI\)Correlation Id\fR parameter.
+.sh 5 "SPP sending tagged messages"
+.pp
+An SPP sends tagged traffic whenever it sends traffic that is marked for
+diversion.  That is, whenever an SPP sends divertable messages to an SPP other
+than the original SPP for which those messages were labelled, the SPP
+\fB\)MUST\fR tag the message with the \fI\)Correlation Id\fR parameter that
+contains the labelled traffic flow id (if required) and \fI\)Correlation
+Number\fR.
+.pp
+In addition, when a ASP becomes active for a Broadcast AS, an SGP \fB\)MUST\fR
+tag the first message in each traffic flow towards the ASP to allow the ASP to
+synchronize its entry into the Broadcast AS.
+.sh 5 "SPP receiving tagged messages"
+.pp
+The handling of tagged messages is the mechanism that provides for the
+reduction of message loss, duplication and mis-sequencing.  An SPP receiving
+divertable messages containing a \fI\)Correlation Id\fR parameter
+\fB\)SHALL\fR perform the following actions:
+.np
+The SPP determines (by implementation-dependent means \*#)
+.(d
+.#v
+.ip \*#
+\fB\)IMPLEMENTATION NOTE:\-\fR  Determining which messages have already been
+processed for the AS may require some ASP-to-ASP or SGP-to-SGP synchronization
+that is outside the scope of the UA documents
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+and also outside the scope of this document.
+.ip ""
+If the received traffic flow id matches that of the SPP on which the message
+was received, this might be a simple matter of comparing the correlation
+number of the message to the \fI\)Correlation Number\fR of the last message processed
+for the Application Server.
+.)d
+whether the message has already been processed for the AS.
+.np
+If the message has not already been processed for the AS, it is processed as normal.
+.np
+If the message has already been processed for the AS, it is discarded.
+.np
+If, as a result of some failure, the SPP cannot determine with any certainly
+whether the tagged message has been processed  for the AS, or not, the SPP
+\fB\)MUST\fR discard the message\*#.
+.(d
+.#v
+.ip \*#
+\fB\)IMPLEMENTATION NOTE:\-\fR  The reason for discarding tagged messages at
+the receiver for which it cannot be determined with any certainty whether the
+message was processed for the AS or not is because, for SS7, message loss is
+preferrable to message duplication.
+.[
+q706
+.]
+.)d
+.sh 4 "Heartbeat Messages"
+.pp
+Under some circumstances, an SPP will send or receive \fI\)BEAT\fR messages
+with the intention of pushing the messages on the stream on which the
+\fI\)BEAT\fR message is sent.
+.sh 5 "SPP sending BEAT messages"
+.pp
+An SPP sends \fI\)BEAT\fR messages whenever it witholds traffic to or from an
+AS in preparation for diversion.  That is, whenever an SPP withholds
+divertable messages, the SPP \fB\)MUST\fR send a \fI\)BEAT\fR message with an
+implied Application Server or explicit \fI\)Routing Context\fR (\fI\)Interface
+Identifier\fR) plus the \fI\)Correlation Id\fR parameter with the \fI\)Traffic
+Flow Ids\fR for a particularl stream, on each stream used by the AS for which
+traffic is being diverted.
+.sh 5 "SPP receiving BEAT messages"
+.pp
+The handling of \fI\)BEAT\fR messages is the mechanism that provide for the
+reduction of message loss, duplication and mis-sequencing during diversion
+between active SPP.  An SPP receiving a \fI\)BEAT\fR message containing an
+explicit or implied \fI\)Routing Context\fR (\fI\)Interface Identifier\fR) and
+\fI\)Correlation Id\fR parameter on a stream other than stream zero (0)
+\fB\)SHALL\fR perform the following actions:
+.np
+The SPP will wait until any internal queue of messages for the Application
+Server indicated by the \fI\)Routing Context\fR (\fI\)Interface Identifier\fR)
+and the traffic flows indicated by the \fI\)Correlation Id\fR parameter in the
+\fI\)BEAT\fR message have drained.
+.np
+If the SGP can determine the traffic flows in the SS7 network which require
+changeback, the SPP \fB\)MAY\fR then initiate a changeback procedure
+.[
+q704
+.]
+to the SS7 network and await completion of the changeback procedure.
+.np
+Once internal message queues for the Application server have drained (i.e. all
+messages for the indicated Application Server have been processed), and any
+changeback procedure to the SS7 network has completed at an SGP, the SPP will
+respond with a \fI\)BEAT ACK\fR message which contains the \fI\)Routing
+Context\fR\) (\fI\)Interface Identifier\fR) parameter, the \fI\)Correlation
+Id\fR parameter unchanged, and the opqaue information contained in the
+\fI\)Heatbeat Data\fR parameter of the \fI\)BEAT\fR message.  (This \fI\)BEAT
+ACK\fR message may be sent on any stream.)
+.sh 3 "Diversion"
+.pp
+When an SPP supporting \fI\)CORID\fR wishes to reroute traffic from one SPP or
+AS to another, it performs a diversion.
+.sh 4 "SPP diverting traffic from a failed, deactivated or overridden peer SPP"
+.pp
+When diverting traffic due to a failed, deactivated or overridden peer SPP,
+the diverting SPP will be in one of the following situations:
+.np
+no alternate SPP exists,
+.np
+an alternate SPP exists in the same AS or SG,
+.np
+an alternate SPP exists in a different AS or SG.
+.sh 5 "Alternate SPP in same AS or SG, or No Alternate SPP"
+.pp
+When an SPP diverts AS traffic away from a failed, deactivated or overridden
+peer SPP to an alternate peer SPP in the same AS or SG, the SPP \fB\)SHALL\fR
+perform the following actions:
+.np
+The SPP tags (see Section 4.1.3) each untagged message that is marked for
+diversion.
+.np
+If an alternate SPP is available (active for the AS), the SPP sends the
+messages marked for divertion to the alternate SPP.
+.np
+If no alternate SPP exists (the AS is AS-PENDING), the SPP buffers the marked
+messages in a buffer used for buffering messages while the AS is in the
+AS-PENDING state.
+.np
+The SPP then diverts AS traffic, beginning with traffic withheld for the AS,
+to the alternate SPP or AS-PENDING buffer.
+.pp
+This procedure corresponds to the Sequenced Changeover procedure used by the
+SS7 MTP.
+.[
+q704
+.]
+.sh 5 "Alternate SPP in different AS or SG"
+.pp
+When an SPP diverts AS traffic away from a failed or deactivated peer SPP to
+an alternate peer SPP in a different AS or SG, the SPP \fB\)SHALL\fR perform the following
+actions:
+.np
+The SPP starts timer T(divert) and continues buffering AS traffic until the
+timer expires.
+.np
+When T(divert) expires, and the failed or deactivated SPP has not recovered,
+the SPP continues with the following actions:
+.np
+The SPP discards all tagged messages and messages marked for diversion.
+.np
+The SPP starts AS traffic, beginning with the contents of the diversion
+buffer, to the alternate SPP.\*#
+.(d
+.#v
+.ip \*#
+\fB\)IMPLEMENTATION NOTE:\-\fR  When restarting traffic with the contents of
+the diversion buffer, it might be necessary to reassign \fI\)Routing
+Context\fR (\fI\)Interface Identifier\fR) values within the messages if the
+\fI\)Routing Context\fR (\fI\)Interface Identifier\fR) values were assigned
+before buffering, and if the \fI\)Routing Context\fR (\fI\)Interface
+Identifier\fR) values associated with the AS traffic for the alternate SPP are
+different than the \fI\)Routing Context\fR (\fI\)Interface Identifier\fR)
+values associated with the same AS traffic for the failed SPP.
+.)d
+.pp
+This procedure corresponds to the Time-Controlled Changeover procedure used by
+the SS7 MTP.
+.[
+q704
+.]
+.sh 4 "SPP diverting traffic from an active peer SPP"
+.pp
+When an SPP wishes to divert AS traffic away from an active peer SPP, the SPP
+\fB\)SHALL\fR perform the following actions:
+.np
+The SPP witholds and buffers AS traffic for the SPP from which the traffic
+is being diverted.
+.np
+The SPP sends a \fI\)BEAT\fR message with the associated \fI\)Routing
+Context\fR (\fI\)Interface Identifier\fR) and the \fI\)Traffic Flow Ids\fR
+being diverted in the \fI\)Correlation Id\fR parameter, plus a unique
+identifier\*# in the \fI\)Heartbeat Data\fR parameter on each SCTP stream on
+which the traffic being withheld for diversion was previously sent.
+The \fI\)Correlation Id\fR parameter \fB\)SHOULD\fR only contain the
+\fI\)Traffic Flow Ids\fR that correspond to traffic flows on the SCTP stream
+upon which the particular \fI\)BEAT\fR message is sent.  If the Application
+Server is not implied by the SCTP association, the \fI\)BEAT\fR message must
+also contain the \fI\)Routing Context\fR (\fI\)Interface Identifier\fR)
+coresponding to the Application Server.
+.(d
+.#v
+.ip \*#
+\fB\)IMPLEMENTATION NOTE:\-\fR  Although the unique identifier placed in the
+\fI\)Heartbeat Data\fR is implementation dependent, a useful identifier would
+be the tuple formed by the \fI\)Routing Context\fR (\fI\)Interface
+Identifier\fR), \fI\)Correlation Id\fR corresponding to the last message(s) sent
+to the SPP from which the included traffic flows are to be diverted.
+.)d
+.np
+The SPP starts a timer T(restore).
+.np
+If the SPP receives the \fI\)BEAT ACK\fR message(s) for the concerned
+Application Server that contain the unique identifier(s) in the
+\fI\)Heartbeat Data\fR parameter before timer T(restore) expires, the SPP
+diverts the traffic, beginning with the withheld traffic, to the target SPP
+and cancels the T(restore) timer.
+.np
+If the timer T(restore) expires, the diverting SPP diverts traffic, beginning
+with the withheld traffic, to the target SPP.
+.np
+If an SPP receives a \fI\)BEAT ACK\fR message(s) for the concerned Application
+Server containing a unique identifier for which the timer T(restore) has
+already expired, the SPP ignores the message.
+.pp
+The purpose of this \fI\)BEAT\fR procedure is to avoid mis-sequencing by
+ensuring that all messages sent for the AS to the old SPP have been processed
+before messages are sent to the new SPP.  This avoids races between (and
+possible mis-sequencing of) messages sent on the old SPP and messages sent on
+the new SPP.
+.pp
+This procedure corresponds to the Changeback procedure used by the SS7 MTP.
+.[
+q704
+.]
+.sh 2 "ASP Management Procedures"
+.pp
+\fI\)CORID\fR extends the ASP Management procedures of the UAs with the
+following procedures:
+.sh 3 "ASP Down Procedures"
+.pp
+\fI\)CORID\fR extends the ASP Down procedures of the UAs as follows:
+.sh 4 "SPP detecting loss of SCTP association"
+.pp
+When an SPP receives an SCTP COMMUNICATION LOST or RESTART indication and
+there are Application Servers active for the association, the SPP
+\fB\)SHALL\fR perform the
+following actions with regard to active AS traffic for the association:
+.np
+The SPP witholds AS traffic for the peer SPP in a diversion buffer.
+.np
+The SPP marks for diversion all local copies of AS messages already sent to
+the peer SPP.
+.np
+The SPP then \fB\)SHALL\fR perform the actions described in Section 4.1.6.1.
+.sh 4 "ASP sending ASPDN"
+.pp
+An ASP \fB\)MUST NOT\fR send an \fI\)ASPDN\fR message until it has completed
+the ASP Inactive Procedures with the intended SGP for every AS.
+.sh 4 "SGP or IPSP receiving ASPDN"
+.pp
+An SGP or IPSP, upon rreceiving an \fI\)ASPDN\fR message from an ASP-ACTIVE
+ASP, \fB\)MUST\fR perform the ASP Inactive Procedures with regard to
+\fI\)CORID\fR (see Section 4.2.2.2) for every AS for which the ASP is
+ASP-ACTIVE and then complete the \fI\)ASPDN\fR procedures.
+.sh 4 "ASP receiving ASPDN ACK"
+.pp
+An SGP or IPSP, upon receiving an unsolicited \fI\)ASPDN ACK\fR message from
+an active SGP, \fB\)MUST\fR perform the ASP Inactive Procedures with regard to
+\fI\)CORID\fR (see Section 4.2.2.3) for every AS for which the ASP is
+ASP-ACTIVE and then complete the \fI\)ASPDN ACK\fR procedures.
+.sh 3 "ASP Inactive Procedures"
+.pp
+\fI\)CORID\fR extends the ASP Inactive procedures of the UAs as follows:
+.sh 4 "ASP sending ASPIA"
+.pp
+When an ASP wishes to deactivate an Application Server with an SGP, the ASP
+\fB\)SHALL\fR perform the following actions for traffic pertaining to the AS:
+.np
+The ASP withholds sending AS traffic to the SGP or IPSP.
+.np
+The ASP stops processing AS traffic recevied from the SGP or IPSP.  Any
+messages received for the Application Server after the last processed message
+\fB\)MAY\fR be discarded.
+.np
+The ASP starts a T(divert) timer.
+.ds #u \*#
+.np
+The ASP \fB\)SHALL\fR perform the applicable UA ASP Inactive Procedures\*(#u.
+.(d
+.#v
+.ip \*#
+For the "ASP Inactive Procedures", see Section 4.3.4.4 of the specific UA
+document.
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+.)d
+.sh 4 "SGP receiving ASPIA or sending ASPIA ACK"
+.pp
+An SGP receiving an \fI\)ASPIA\fR message for an AS, or wishing to send an
+unsolicited \fI\)ASPIA ACK\fR to deactivate an AS, \fB\)SHALL\fR perform the following
+actions for the traffic pertaining to each AS for which deactivation is
+performed:
+.np
+The SGP withholds sending AS traffic to the ASP.
+.np
+The SGP stops processing AS traffic received from the ASP.  Any messages
+received for the AS at the SGP after receiving the \fI\)ASPIA\fR message
+\fB\)MUST\fR be discarded.
+.np
+The SGP marks for diversion all local copies of AS messages sent to the ASP.
+.np
+The SGP then \fB\)SHALL\fR perform the actions described in Section 4.1.6.1.
+.np
+The ASP \fB\)SHALL\fR perform the applicable UA ASP Inactive Procedures\*(#u.
+.sh 4 "ASP receiving ASPIA ACK"
+.pp
+Upon receiving an \fI\)ASPIA ACK\fR message the ASP \fB\)SHALL\fR perform the
+following actions for the traffic pertaining to the AS identified by the
+\fI\)Routing Context\fR (\fI\)Interface Identifier\fR) in the received
+\fI\)ASPIA ACK\fR message or implied by the SCTP association on which the
+\fI\)ASPIA ACK\fR message was received:
+.np
+The T(divert) timer is cancelled (if running).
+.np
+The ASP marks for diversion any local copies of AS messages sent to the SGP.
+.np
+The ASP then \fB\)SHALL\fR perform the actions described in Section 4.1.6.1.
+.np
+The ASP \fB\)SHALL\fR perform the applicable UA ASP Inactive Procedures\*(#u.
+.sh 4 "T(divert) timer expiry"
+.pp
+If the T(divert) timer expires before receiving an \fI\)ASPIA ACK\fR for the
+AS, the ASP \fB\)SHALL\fR perform the actions described in Section 4.2.2.3.
+.sh 3 "ASP Active Procedures"
+.pp
+\fI\)CORID\fR extends the ASP Active procedures of the UAs as follows:
+.sh 4 "ASP sending ASPAC"
+.pp
+When an ASP wishes to activate an Application Server for an SGP, the ASP
+\fB\)SHALL\fR perform the following actions for traffic pertaining to the AS:
+.np
+The ASP determines the \fI\)Correlation Number\fR of the last message sent to
+this SGP for the AS for each traffic flow.
+.np
+If the ASP has not sent a message to the SGP for the traffic flow, the
+\fI\)Correlation Number\fR zero (0) is used.
+.np
+If the ASP has sent messages to the SGP for the traffic flow, but cannot
+determine the \fI\)Correlation Number\fR of the last message sent due to local failure,
+the \fI\)Correlation Number\fR zero (0) is used.
+.np
+The ASP includes the \fI\)Correlation Number\fR(s) determined above in the
+\fI\)Correlation Id\fR parameter in the \fI\)ASPAC\fR message used to active
+the AS.  (See Section 3.1.1.)
+.ds #w \*#
+.np
+The ASP \fB\)SHALL\fR perform the applicable UA ASP Active Procedures\*(#w.
+.(d
+.#v
+.ip \*#
+For the "ASP Active Procedures", see Section 4.3.4.3 of the specific UA
+document.
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+.)d
+.sh 4 "SGP receiving ASPAC"
+.pp
+When an SGP receives an \fI\)ASPAC\fR message for an Application Server, the
+SGP \fB\)SHALL\fR perform the following actions with regard to traffic for the
+AS:
+.np
+The SGP sets the \fI\)Correlation Number\fR of the next received message from the ASP for
+each traffic flow to the value, contained in the \fI\)Correlation Id\fR
+parameter in the \fI\)ASPAC ACK\fR message, plus one (1).
+.np
+The SGP determines the \fI\)Correlation Number\fR of the last message sent to
+this ASP for each traffic flow.
+.np
+If the SGP has not sent a message to the ASP for a traffic flow, the
+\fI\)Correlation Number\fR zero (0) is used.
+.np
+If the SGP has sent messages to the ASP for a traffic flow, but cannot
+determine the \fI\)Correlation Number\fR of the last message sent due to local failure,
+the \fI\)Correlation Number\fR zero (0) is used.
+.np
+The SGP includes the \fI\)Correlation Number\fR(s) determined above in the
+\fI\)Correlation Id\fR parameter in the \fI\)ASPAC ACK\fR message used to
+acknowledge activation of the AS.  (See Section 3.1.1.)
+.np
+The SGP \fB\)SHALL\fR perform the applicable UA ASP Active Procedures\*(#w, including the
+sending of \fI\)ASPIA ACK\fR.
+.np
+The SGP then \fB\)SHALL\fR perform the actions described in Section 4.1.6.2.
+.sh 4 "ASP receiving ASPAC ACK"
+.pp
+When an ASP receives an expected \fI\)ASPAC ACK\fR message for an Application
+Server, the ASP \fB\)SHALL\fR perform the following actions with regard to AS
+traffic:
+.np
+The ASP sets the \fI\)Correlation Number\fR of the next received message from the SGP for
+each traffic flow to the value, contained in the \fI\)Correlation Id\fR
+parameter in the \fI\)ASPAC ACK\fR message, plus one (1).
+.np
+The ASP \fB\)SHALL\fR perform the applicable UA ASP Active Procedures\*(#w.
+.np
+The ASP then \fB\)SHALL\fR perform the actions described in Section 4.1.6.2.
+.pp
+If an ASP receives an unexpected \fI\)ASPAC ACK\fR (i.e, one for which no
+ASPAC was sent and the ASP is already in the ASP-ACTIVE state for the AS),
+then the ASP \fB\)SHALL\fR ignore the message for the purposes of
+\fI\)CORID\fR.  The ASP \fB\)SHALL\fR, however, perform the applicable UA ASP
+Active Procedures\*(#w.
+.sh 2 "Interworking Procedures"
+.pp
+Because the \fI\)CORID\fR procedures provided here rely upon close
+synchronization of \fI\)Correlation Number\fR between SPP, if one of the SPP does
+not support these \fI\)CORID\fR procedures, neither SPP is able to
+take advantage of the full benefits of the procedures.  The SPP supporting
+\fI\)CORID\fR \fB\)MAY\fR fall back to the interworking procedures provided in
+this section, or to procedures based on the original (non-\fI\)CORID\fR) UA
+procedures.
+.pp
+A peer SPP that does not support the \fI\)CORID\fR procedures can either be
+identified by local configuration information, the ASP Extenstions
+.[
+aspext-03
+%Z 1
+.]
+procedure, or at ASP Activation time.  The lack of support for \fI\)CORID\fR
+can be determined at ASP Activation time when the peer SPP does not place a
+\fI\)Correlation Id\fR parameter (as it \fB\)MUST\fR if both peers support
+\fI\)CORID\fR) in the \fI\)ASPAC (ACK)\fR message.
+.pp
+When interworking to an SPP that does not support \fI\)CORID\fR, the SPP
+supporting \fI\)CORID\fR \fB\)SHALL\fR perform all of the procedures as though the peer
+SPP supported \fI\)CORID\fR with the following exceptions:
+.np
+The SPP \fB\)MUST NOT\fR send messages marked for diversion and tagged to the
+peer SPP not supporting \fI\)CORID\fR.  All such messages \fB\)MAY\fR be
+discarded.
+.np
+When diverting traffic between a failed, deactivated or overriden peer SPP and
+an alternate peer SPP not supporting \fI\)CORID\fR, the actions described in
+Section 4.1.6.1.2 \fB\)MUST\fR always be used instead of the procedures in
+Section 4.1.6.1.1, except when there is no alternate SPP.
+.np
+When diverting traffic from an active peer SPP not supporting \fI\)CORID\fR,
+the actions described in Section 4.1.6.2 \fB\)SHALL\fR be followed with the
+exception of Section 4.1.6.2(ii), (iv) and (vi), which \fB\)MUST NOT\fR be
+performed.
+.np
+The SPP \fB\)MUST NOT\fR place a \fI\)Correlation Id\fR parameter in the
+\fI\)ASPAC\fR or \fI\)ASPAC ACK\fR.  So, the actions described in Sections
+4.2.3.1(i)-(iv), 4.2.3.2(i)-(v) and 4.2.3.3(i)-(ii) do not apply.
+.np
+The SPP \fB\)MUST NOT\fR place a \fI\)Routing Context\fR (\fI\)Interface
+Identifier\fR) paramete rin the \fI\)BEAT\fR or \fI\)BEAT ACK\fR.  So, the
+actions described in Sections 4.1.6.2(ii), (iv), and (vi) do not apply.
+.#e
+.sh 1 "Examples"
+.af $p 1
+.sh 2 "Example Configuration"
+.sh 2 "Initialization"
+.pp
+\fI\*(&f\n(&n\fR illustrates the initialization sequence that is used for all
+of the examples .
+.lp
+.(b L
+.ie '\*(.T'ps' \{\
+.so corid-03.fig5.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+    SGP1  SGP2                          ASP1 ASP2 ASP3 ASP4    AS1
+     :     :                             :    :    :    :       :
+(1)  :<----:-Establish Association------>:    :    :    :       :
+     :<----:-ASPUP-----------------------:    :    :    :       :
+     :-----:-ASPUP ACK------------------>:    :    :    :       :
+     :     :                             :    :    :    :       :
+(2)  :<----:-Establish Association-------:--->:    :    :       :
+     :<----:-ASPUP-----------------------:----:    :    :       :
+     :-----:-ASPUP ACK-------------------:--->:    :    :       :
+     :     :                             :    :    :    :       :
+(3)  :<----:-Establish Association-------:----:--->:    :       :
+     :<----:-ASPUP-----------------------:----:----:    :       :
+     :-----:-ASPUP ACK-------------------:----:--->:    :       :
+     :     :                             :    :    :    :       :
+(4)  :<----:-Establish Association-------:----:----:--->:       :
+     :<----:-ASPUP-----------------------:----:----:----:       :
+     :-----:-ASPUP ACK-------------------:----:----:--->:       :
+     :     :                             :    :    :    :       :
+(5)  :     : (Same message exchange for SGP2) :    :    :       :
+     :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "Initialization for Examples"
+.)b
+.pp
+The sequence of events in the exmaple illustrated in \fI\*(&f\n(&p\fR is as
+follows:
+.np
+ASP1 establishes an SCTP association to SGP1 and sends an \fI\)ASUP\fR
+message.  SGP1 responds with an \fI\)ASPUP ACK\fR.
+.np
+ASP2 establishes an SCTP association to SGP1 and sends an \fI\)ASUP\fR
+message.  SGP1 responds with an \fI\)ASPUP ACK\fR.
+.np
+ASP3 establishes an SCTP association to SGP1 and sends an \fI\)ASUP\fR
+message.  SGP1 responds with an \fI\)ASPUP ACK\fR.
+.np
+ASP4 establishes an SCTP association to SGP1 and sends an \fI\)ASUP\fR
+message.  SGP1 responds with an \fI\)ASPUP ACK\fR.
+.np
+ASP1 establishes an SCTP association to SGP2 and sends an \fI\)ASUP\fR
+message.  SGP2 responds with an \fI\)ASPUP ACK\fR.
+ASP2 establishes an SCTP association to SGP2 and sends an \fI\)ASUP\fR
+message.  SGP2 responds with an \fI\)ASPUP ACK\fR.
+ASP3 establishes an SCTP association to SGP2 and sends an \fI\)ASUP\fR
+message.  SGP2 responds with an \fI\)ASPUP ACK\fR.
+ASP4 establishes an SCTP association to SGP2 and sends an \fI\)ASUP\fR
+message.  SGP2 responds with an \fI\)ASPUP ACK\fR.
+.sh 2 "Starting Traffic"
+.pp
+These are examples of starting traffic.
+.sh 3 "Initial Startup"
+.pp
+\fI\*(&f\n(&n\fR illustrates
+an example of an ASP joining a Loadshare Application Server.
+.lp
+.(b L
+.ie '\*(.T'pdf' \{\
+.so corid-03.fig6.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+    SGP1  SGP2                          ASP1 ASP2 ASP3 ASP4    AS1
+     :     :                             :    :    :    :       :
+(1)  :<----:--ASPAC (RC1)----------------:    :    :    :       :
+     :     :                             :    :    :    :       :
+(2)  :-----:--ASPAC ACK (RC1)----------->:    :    :    :       :
+     :     :                             :    :    :    :       :
+     :<====:==DATA=======================:    :    :    :       :
+     :     :                             :    :    :    :       :
+(3)  :-----:--NTFY (RC1,AS-ACTIVE)------>:    :    :    :       :
+     :-----:--NTFY (RC1,AS-ACTIVE)-------:--->:    :    :       :
+     :-----:--NTFY (RC1,AS-ACTIVE)-------:----:--->:    :       :
+     :-----:--NTFY (RC1,AS-ACTIVE)-------:----:----:--->:       :
+     :     :                             :    :    :    :       :
+     :=====:=DATA=======================>:    :    :    :       :
+     :     :                             :    :    :    :       :
+(4)  :     :<-ASPAC (RC1)----------------:    :    :    :       :
+     :     :                             :    :    :    :       :
+(5)  :     :--ASPAC ACK (RC1)----------->:    :    :    :       :
+     :     :                             :    :    :    :       :
+     :     :<=DATA=======================:    :    :    :       :
+     :     :                             :    :    :    :       :
+(6)  :     :--NTFY (RC1,AS-ACTIVE)------>:    :    :    :       :
+     :     :--NTFY (RC1,AS-ACTIVE)-------:--->:    :    :       :
+     :     :--NTFY (RC1,AS-ACTIVE)-------:----:--->:    :       :
+     :     :--NTFY (RC1,AS-ACTIVE)-------:----:----:--->:       :
+     :     :                             :    :    :    :       :
+     :     :==DATA======================>:    :    :    :       :
+     :     :                             :    :    :    :       :
+     :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "Example \- Initial Startup"
+.)b
+.pp
+The sequence of events in the exmaple illustrated in \fI\*(&f\n(&p\fR is as
+follows:
+.np
+ASP1 sends an ASPAC message to SGP1 contining the \fI\)Routing Context\fR
+(\fI\)Interface Identifier\fR) corresponding to AS1 (RC1 or IID1).  Because
+ASP1 has never sent traffic to SGP1 for AS1, the initial value of all
+\fI\)Correlation Numbers\fR for each traffic flow activated is zero (0) and
+the \fI\)Correlation Id\fR parameter need not be included in the \fI\)ASPAC\fR
+message.  (See Section 4.2.3.1.)
+.np
+SGP1 sends an ASPAC ACK message to SGP1 in response.   Because SGP1 has never
+send traffic to ASP1 for AS1, the initial value of all \fI\)Corrleation
+Numbers\fR for each traffic flow activated is zero (0) and the
+\fI\)Corredlation Id\fR parameter need not be included in the \fI\)ASPAC\fR
+message.  (See Section 4.2.3.2.)
+.ip "" \n(ni
+Test.
+.np
+.np
+.np
+.np
+.np
+.sh 3 "Joining a Broadcast"
+.pp
+\fI\*(&f\n(&n\fR illustrates
+an example of an ASP joining a Broadcast Application Server.
+.lp
+.(b L
+.ie '\*(.T'pdf' \{\
+.so corid-03.fig7.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+    SGP1  SGP2                          ASP1 ASP2 ASP3 ASP4    AS1
+     :     :                             :    :    :    :       :
+(1)  :<----:-Establish Association------>:    :    :    :       :
+     :<----:-ASPUP-----------------------:    :    :    :       :
+     :-----:-ASPUP ACK------------------>:    :    :    :       :
+     :     :                             :    :    :    :       :
+(2)  :<----:-Establish Association-------:--->:    :    :       :
+     :<----:-ASPUP-----------------------:----:    :    :       :
+     :-----:-ASPUP ACK-------------------:--->:    :    :       :
+     :     :                             :    :    :    :       :
+(3)  :<----:-Establish Association-------:----:--->:    :       :
+     :<----:-ASPUP-----------------------:----:----:    :       :
+     :-----:-ASPUP ACK-------------------:----:--->:    :       :
+     :     :                             :    :    :    :       :
+(4)  :<----:-Establish Association-------:----:----:--->:       :
+     :<----:-ASPUP-----------------------:----:----:----:       :
+     :-----:-ASPUP ACK-------------------:----:----:--->:       :
+     :     :                             :    :    :    :       :
+     :     : (Same message exchange for SGP2) :    :    :       :
+     :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "Example \- Joining a Broadcast AS"
+.)b
+.pp
+The sequence of events in the exmaple illustrated in \fI\*(&f\n(&p\fR is as
+follows:
+.np
+.np
+.np
+.np
+.np
+.np
+.np
+.sh 2 "Fail-Over, Deactivation and Blocking"
+.pp
+These are examples of fail-over, deactivation and blocking.
+.sh 3 "Association Recovery \- Loadshare"
+.pp
+\fI\*(&f\n(&n\fR illustrates
+an example of SCTP association recovery in a Loadshare Application Server.
+.lp
+.(b L
+.ie '\*(.T'pdf' \{\
+.so corid-03.fig8.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+    SGP1  SGP2                          ASP1 ASP2 ASP3 ASP4    AS1
+     :     :                             :    :    :    :       :
+(1)  :<----:-Establish Association------>:    :    :    :       :
+     :<----:-ASPUP-----------------------:    :    :    :       :
+     :-----:-ASPUP ACK------------------>:    :    :    :       :
+     :     :                             :    :    :    :       :
+(2)  :<----:-Establish Association-------:--->:    :    :       :
+     :<----:-ASPUP-----------------------:----:    :    :       :
+     :-----:-ASPUP ACK-------------------:--->:    :    :       :
+     :     :                             :    :    :    :       :
+(3)  :<----:-Establish Association-------:----:--->:    :       :
+     :<----:-ASPUP-----------------------:----:----:    :       :
+     :-----:-ASPUP ACK-------------------:----:--->:    :       :
+     :     :                             :    :    :    :       :
+(4)  :<----:-Establish Association-------:----:----:--->:       :
+     :<----:-ASPUP-----------------------:----:----:----:       :
+     :-----:-ASPUP ACK-------------------:----:----:--->:       :
+     :     :                             :    :    :    :       :
+     :     : (Same message exchange for SGP2) :    :    :       :
+     :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "Example \- Association Recovery"
+.)b
+.pp
+The sequence of events in the exmaple illustrated in \fI\*(&f\n(&p\fR is as
+follows:
+.np
+.np
+.np
+.np
+.np
+.np
+.np
+.sh 3 "Assocation Failure \- Override"
+.pp
+\fI\*(&f\n(&n\fR illustrates
+an example of SCTP association failure in an Override Application Server.
+.lp
+.(b L
+.ie '\*(.T'pdf' \{\
+.so corid-03.fig9.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+    SGP1  SGP2                          ASP1 ASP2 ASP3 ASP4    AS1
+     :     :                             :    :    :    :       :
+(1)  :<----:-Establish Association------>:    :    :    :       :
+     :<----:-ASPUP-----------------------:    :    :    :       :
+     :-----:-ASPUP ACK------------------>:    :    :    :       :
+     :     :                             :    :    :    :       :
+(2)  :<----:-Establish Association-------:--->:    :    :       :
+     :<----:-ASPUP-----------------------:----:    :    :       :
+     :-----:-ASPUP ACK-------------------:--->:    :    :       :
+     :     :                             :    :    :    :       :
+(3)  :<----:-Establish Association-------:----:--->:    :       :
+     :<----:-ASPUP-----------------------:----:----:    :       :
+     :-----:-ASPUP ACK-------------------:----:--->:    :       :
+     :     :                             :    :    :    :       :
+(4)  :<----:-Establish Association-------:----:----:--->:       :
+     :<----:-ASPUP-----------------------:----:----:----:       :
+     :-----:-ASPUP ACK-------------------:----:----:--->:       :
+     :     :                             :    :    :    :       :
+     :     : (Same message exchange for SGP2) :    :    :       :
+     :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "Example \- Assocation Failure"
+.)b
+.pp
+The sequence of events in the exmaple illustrated in \fI\*(&f\n(&p\fR is as
+follows:
+.np
+.np
+.np
+.np
+.np
+.np
+.np
+.sh 3 "Deactivation \- Loadshare"
+.pp
+This is an example of deactivation of an ASP in a Loadshare Application
+Server.
+.sh 3 "Management Blocking \- Override"
+.pp
+\fI\*(&f\n(&n\fR illustrates
+an example of management blocking of an SGP in an Override Application Server.
+.lp
+.(b L
+.ie '\*(.T'pdf' \{\
+.so corid-03.fig10.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+    SGP1  SGP2                          ASP1 ASP2 ASP3 ASP4    AS1
+     :     :                             :    :    :    :       :
+(1)  :<----:-Establish Association------>:    :    :    :       :
+     :<----:-ASPUP-----------------------:    :    :    :       :
+     :-----:-ASPUP ACK------------------>:    :    :    :       :
+     :     :                             :    :    :    :       :
+(2)  :<----:-Establish Association-------:--->:    :    :       :
+     :<----:-ASPUP-----------------------:----:    :    :       :
+     :-----:-ASPUP ACK-------------------:--->:    :    :       :
+     :     :                             :    :    :    :       :
+(3)  :<----:-Establish Association-------:----:--->:    :       :
+     :<----:-ASPUP-----------------------:----:----:    :       :
+     :-----:-ASPUP ACK-------------------:----:--->:    :       :
+     :     :                             :    :    :    :       :
+(4)  :<----:-Establish Association-------:----:----:--->:       :
+     :<----:-ASPUP-----------------------:----:----:----:       :
+     :-----:-ASPUP ACK-------------------:----:----:--->:       :
+     :     :                             :    :    :    :       :
+     :     : (Same message exchange for SGP2) :    :    :       :
+     :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "Example \- Deactivation"
+.)b
+.pp
+The sequence of events in the exmaple illustrated in \fI\*(&f\n(&p\fR is as
+follows:
+.np
+.np
+.np
+.np
+.np
+.np
+.np
+.sh 2 "Recovery"
+.pp
+These are examples of recovery.
+.sh 3 "Association Recovery \- Loadshare"
+.pp
+\fI\*(&f\n(&n\fR illustrates
+an example of the recovery of an ASP in a Loadshare Application Server.
+.lp
+.(b L
+.ie '\*(.T'pdf' \{\
+.so corid-03.fig11.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+    SGP1  SGP2                          ASP1 ASP2 ASP3 ASP4    AS1
+     :     :                             :    :    :    :       :
+(1)  :<----:-Establish Association------>:    :    :    :       :
+     :<----:-ASPUP-----------------------:    :    :    :       :
+     :-----:-ASPUP ACK------------------>:    :    :    :       :
+     :     :                             :    :    :    :       :
+(2)  :<----:-Establish Association-------:--->:    :    :       :
+     :<----:-ASPUP-----------------------:----:    :    :       :
+     :-----:-ASPUP ACK-------------------:--->:    :    :       :
+     :     :                             :    :    :    :       :
+(3)  :<----:-Establish Association-------:----:--->:    :       :
+     :<----:-ASPUP-----------------------:----:----:    :       :
+     :-----:-ASPUP ACK-------------------:----:--->:    :       :
+     :     :                             :    :    :    :       :
+(4)  :<----:-Establish Association-------:----:----:--->:       :
+     :<----:-ASPUP-----------------------:----:----:----:       :
+     :-----:-ASPUP ACK-------------------:----:----:--->:       :
+     :     :                             :    :    :    :       :
+     :     : (Same message exchange for SGP2) :    :    :       :
+     :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "Example \- Association Recovery"
+.)b
+.pp
+The sequence of events in the exmaple illustrated in \fI\*(&f\n(&p\fR is as
+follows:
+.np
+.np
+.np
+.np
+.np
+.np
+.np
+.sh 3 "AS-Pending Recovery"
+.pp
+\fI\*(&f\n(&n\fR illustrates
+an example of the recovery of an ASP for an AS in the AS-PENDING state.
+.lp
+.(b L
+.ie '\*(.T'pdf' \{\
+.so corid-03.fig12.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+    SGP1  SGP2                          ASP1 ASP2 ASP3 ASP4    AS1
+     :     :                             :    :    :    :       :
+(1)  :<----:-Establish Association------>:    :    :    :       :
+     :<----:-ASPUP-----------------------:    :    :    :       :
+     :-----:-ASPUP ACK------------------>:    :    :    :       :
+     :     :                             :    :    :    :       :
+(2)  :<----:-Establish Association-------:--->:    :    :       :
+     :<----:-ASPUP-----------------------:----:    :    :       :
+     :-----:-ASPUP ACK-------------------:--->:    :    :       :
+     :     :                             :    :    :    :       :
+(3)  :<----:-Establish Association-------:----:--->:    :       :
+     :<----:-ASPUP-----------------------:----:----:    :       :
+     :-----:-ASPUP ACK-------------------:----:--->:    :       :
+     :     :                             :    :    :    :       :
+(4)  :<----:-Establish Association-------:----:----:--->:       :
+     :<----:-ASPUP-----------------------:----:----:----:       :
+     :-----:-ASPUP ACK-------------------:----:----:--->:       :
+     :     :                             :    :    :    :       :
+     :     : (Same message exchange for SGP2) :    :    :       :
+     :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "Example \- AS-PENDING Recovery"
+.)b
+.pp
+The sequence of events in the exmaple illustrated in \fI\*(&f\n(&p\fR is as
+follows:
+.np
+.np
+.np
+.np
+.np
+.np
+.np
+.sh 2 "Interworking"
+.pp
+These are examples of interworking between nodes not supporting \fI\)CORID\fR
+with nodes supporting \fI\)CORID\fR.
+.sh 3 "ASP does not Support CORID"
+.pp
+\fI\*(&f\n(&n\fR illustrates
+an example where the ASP does not support \fI\)CORID\fR, but the SGP does.
+.lp
+.(b L
+.ie '\*(.T'pdf' \{\
+.so corid-03.fig13.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+    SGP1  SGP2                          ASP1 ASP2 ASP3 ASP4    AS1
+     :     :                             :    :    :    :       :
+(1)  :<----:-Establish Association------>:    :    :    :       :
+     :<----:-ASPUP-----------------------:    :    :    :       :
+     :-----:-ASPUP ACK------------------>:    :    :    :       :
+     :     :                             :    :    :    :       :
+(2)  :<----:-Establish Association-------:--->:    :    :       :
+     :<----:-ASPUP-----------------------:----:    :    :       :
+     :-----:-ASPUP ACK-------------------:--->:    :    :       :
+     :     :                             :    :    :    :       :
+(3)  :<----:-Establish Association-------:----:--->:    :       :
+     :<----:-ASPUP-----------------------:----:----:    :       :
+     :-----:-ASPUP ACK-------------------:----:--->:    :       :
+     :     :                             :    :    :    :       :
+(4)  :<----:-Establish Association-------:----:----:--->:       :
+     :<----:-ASPUP-----------------------:----:----:----:       :
+     :-----:-ASPUP ACK-------------------:----:----:--->:       :
+     :     :                             :    :    :    :       :
+     :     : (Same message exchange for SGP2) :    :    :       :
+     :     :                             :    :    :    :       :
+.fi
+.sz +2
+.)c
+.\}
+.#f "Example \- Interworking"
+.)b
+.pp
+The sequence of events in the exmaple illustrated in \fI\*(&f\n(&p\fR is as
+follows:
+.np
+.np
+.np
+.np
+.np
+.np
+.np
+.#e
+.sh 1 "Security"
+.pp
+\fI\)CORID\fR does not introduce any new security risks or
+considerations that are not already inherent in the UA
+.[
+m2ua-rfc
+.]
+.[
+m3ua-rfc
+.]
+.[
+sua-16
+.]
+.[
+isua-02
+.]
+.[
+tua-03
+.]
+Please see the SIGTRAN Secuirty document
+.[
+sigsec-03
+%Z 1
+.]
+for security considerations and recommendations that are applicable to each of
+these UAs.
+.#e
+.sh 1 "IANA Considerations"
+.pp
+\fI\)CORID\fR redefines the format of the \fI\)Correlation Id\fR parameter for
+M2UA, M3UA, SUA and TUA.  \fI\)CORID\fR also redifines the \fI\)ASPAC\fR and
+\fI\)ASPAC ACK\fR messages to include the \fI\)Correlation Id\fR parameter as
+a mandatory parameter of those messages.
+.#e
+.sh 1 "Timers"
+.lp
+Following are the \fB\)RECOMMENDED\fR timer values:
+.ix +4
+.TS
+tab(:);
+ll.
+T(divert):0.5-2 seconds
+T(restore):0.5-2 seconds
+T(lifetime):implementation dependent
+.TE
+.\"
+.\"
+.#e
+.(b M
+.#v
+.sh 1 "Revision History" 0
+.pp
+This section provides historical information on the changes made to this
+draft.  This section will be removed from the document when the document is
+finalized.
+.sh 2 "Changes from Version 0.2 to Version 0.3" 0 3
+.bu
+updated references, version number and dates.
+.sh 2 "Changes from Version 0.1 to Version 0.2" 0 2
+.bu
+added list of abbreviations.
+.bu
+moved change history.
+.bu
+updated version numbers and dates.
+.bu
+updated references.
+.bu
+split reference sections.
+.bu
+updated security section.
+.bu
+moved notes to end of document.
+.sh 2 "Changes from Version 0.0 to Version 0.1" 0 1
+.bu
+added change history,
+.bu
+updated version numbers and dates,
+.bu
+updated acknowledgements,
+.bu
+corrected section reference typos,
+.bu
+added postscript diagrams,
+.bu
+changed most SSNM messages to divertable,
+.bu
+updated interworking to perform timed diversion on recovery,
+.bu
+update \fI\)Traffic Flow Id\fR to be a simple unique identifier, no longer
+containing a stream identifier,
+.bu
+updated author's address.
+.sh 2 "Version 0.0" 0 0
+.pp
+The initial version of this document.
+.sh 3 "Change Log" 0 0 0
+.lp
+.(l I
+.nf
+\fC\s-3\
+$Log: draft-bidulock-sigtran-corid-03.me,v $
+Revision 0.9.2.2  2005/05/14 08:33:18  brian
+- copyright header correction
+
+Revision 0.9.2.1  2004/03/16 05:10:40  brian
+- Added drafts and figures.
+
+Revision 0.8.2.2  2003/08/01 12:23:15  brian
+Added abbreviations, updated format.
+
+.)l
+.)b
+.\"
+.\"
+.#E
+.(b M
+.#v
+.[
+$LIST$
+.]
+.)b
+.(b M
+.#v
+.uh "Acknowledgments"
+.pp
+The authors would like to thank
+Tolga Asveren,
+Ken Morneault,
+Greg Sidebottom,
+John Loughney,
+Sandeep Mahajan,
+Barry Nagelberg,
+and
+Nitin Vairagare
+for their valuable comments and suggestions.
+.uh "Author's Addresses"
+.lp
+.TS
+expand tab(;);
+lr.
+Brian Bidulock;Phone: +1-780-490-1141
+OpenSS7 Corporation;Email: bidulock@openss7.org
+1469 Jeffreys Crescent;URL: http//www.openss7.org/
+Edmonton, AB  T6L 6T1;
+Canada;
+.TE
+.bl 3
+.lp
+This draft expires \*[expiry].
+.)b
+.#T 2003

@@ -1,0 +1,1769 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: draft-bidulock-sigtran-aspcong-00.me,v 0.9.2.3 2006/07/11 23:03:44 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2003  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.3 $) modified $Date: 2006/07/11 23:03:44 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.ds version Version\ 0.0
+.ds date July\ 11,\ 2006
+.ds expiry January\ 2007
+.nr levels 0
+.so ../draft3.me
+.bp
+.he 'Internet Draft'UA ASPCONG'\\\\*[date]'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+.bl 1
+;;\*[date]
+Expires in \*[expiry];;
+.bl 1
+.TE
+.(l C
+\fB\
+ASP Congestion (ASPCONG)
+for
+Signalling User Adaptation Layers
+<draft-bidulock-sigtran-aspcong-00.\*(|x>
+.)l
+.rr |x
+.ne 4
+.#S 2006 \*[expiry]
+.uh "Abstract"
+.pp
+This memo describes \fI\)ASP Congestion (ASPCONG)\fR that provides the
+ability for an Application Server Process (ASP) to indicate congestion
+to a Signalling Gateway (SG) for the SS7 Signalling User Adaptation
+Layers.
+.[
+m2ua
+%Z 1
+.]
+.[
+m3ua
+%Z 1
+.]
+.[
+sua
+%Z 1
+.]
+.[
+isua
+%Z 2
+.]
+.[
+tua
+%Z 2
+.]
+Extension parameters and procedures are added by this memo in extension
+to those of the User Adaptation layers to provide for ASP congestion.
+.sh 1 "Introduction"
+.sh 2 "Scope"
+.pp
+This Internet-Draft describes \fI\)ASP Congestion (ASPCONG)\fR
+procedures to support the management of congestion and flow control
+between a Signalling Gateway (SG) and an Application Server (AS) across
+SCTP
+.[
+rfc 2960
+%Z 1
+.]
+associations for SS7
+.[
+q700
+%Z 1
+.]
+Signalling User Adaptation Protocols
+.[
+m2ua
+%Z 1
+.]
+.[
+m3ua
+%Z 1
+.]
+.[
+sua
+%Z 1
+.]
+.[
+isua
+%Z 1
+.]
+.[
+tua
+%Z 1
+.]
+supporting the concept of a \fI\)Routing Context\fR or \fI\)Interface
+Identifier\fR.  These procedures permit the coordination of \fI\)ASP
+Congestion\fR on traffic directed at an Application Server (AS) via an
+Application Server Process (ASP) from a Signalling Gateway Process
+(SGP) and supports the coordination of \fI\)AS Congestion\fR into a
+coordinated network view at a Signalling Gateway (SG) toward the SS7
+network.
+.pp
+UA implementations utilizing \fI\)ASPCONG\fR are intended to be
+compatible with UA implementations not support the configuration;
+however, the full benefits achieved by the \fI\)ASPCONG\fR procedures
+will not be realized unless implementations at both endpoints implement
+\fI\)ASPCONG\fR.
+.sh 2 "Abbreviations"
+.lp
+.ix +\n(iiu
+.TS
+tab(:);
+li1c1lssss.
+AS:\(em:Application Server.
+ASP:\(em:Application Server Process.
+CORID:\(em:Correlation Id Extension
+IANA:\(em:Internet Assigned Numbers Authority
+I-D:\(em:Internet-Draft
+IETF:\(em:Internet Engineering Task Force
+IP:\(em:Internet Protocol.
+IPSP:\(em:IP Signalling Point.
+LIF:\(em:Local Interworking Function.
+NIF:\(em:Nodal Interworking Function.
+SCCP:\(em:Signalling Connection Control Part.
+SCTP:\(em:Stream Control Transmission Protocol.
+SG:\(em:Signalling Gateway.
+SGP:\(em:Signalling Gateway Process.
+SIGTRAN:\(em:IETF Signalling Transport WG
+SPP:\(em:Signalling Peer Process.
+SS7:\(em:Signalling System No. 7.
+SUA:\(em:SS7 SCCP-User Adaptation Layer.
+TCAP:\(em:Transaction Capabilities Application Part.
+TUA:\(em:SS7 TCAP-User Adaptation Layer.
+UA:\(em:User Adaptation Layer.
+WG:\(em:Working Group
+.TE
+.sh 2 "Terminology"
+.pp
+\fI\)ASPCONG\fR supplements the terminology used in the UA
+documents
+.[
+m2ua
+.]
+.[
+m3ua
+.]
+.[
+sua
+.]
+.[
+isua
+.]
+.[
+tua
+.]
+by adding the following terms:
+.lp
+\fI\)Accepted Rate\fR \-
+.ix +\n(iiu
+the rate in number of messages (or message octets) per unit time that
+are removed from a buffer used to queue messages from one functional
+unit to another.
+.lp
+\fI\)Offered Rate\fR \-
+.ix +\n(iiu
+the rate in number of messages (or message octets) per unit time that
+are placed into a buffer used to queue messages from one functional unit
+to another.
+.lp
+\fI\)Buffer Occupancy\fR \-
+.ix +\n(iiu
+refers to the degree of fill experienced a buffer used to queue messages
+from one functional unit to another.  If the \fI\)Offered Rate\fR
+exceeds the \fI\)Accepted Rate\fR, \fI\)Buffer Occupancy\fR will, by
+definition, be increasing; the \fI\)Offered Rate\fR is less than the
+\fI\)Accepted Rate\fR, \fI\)Buffer Occupancy\fR decreases; when equal,
+the \fI\)Buffer Occupancy\fR does not change.
+.lp
+\fI\)Local Interworking Function (LIF)\fR \-
+.ix +\n(iiu
+refers to the function that converts between the lower-layer interface
+of the UA protocol layer at the ASP and the upper-layer SS7 protocol
+interface to an Application Server (AS) at served by the ASP.
+.lp
+\fI\)Nodal Interworking Function (NIF)\fR \-
+.ix +\n(iiu
+refers to the function that converts between the upper-layer interface of
+an SS7 protocol stack at an SGP and the UA protocol layer at the SGP.
+.lp
+\fI\)Signalling Endpoint (SEP)\fR \-
+.ix +\n(iiu
+in this document, a \fI\)Signalling Endpoint\fR is an SS7 SEP
+.[
+q700
+%Z 1
+.]
+or an Application Server.
+.lp
+\fI\)Signalling Peer Process (SPP)\fR \-
+.ix +\n(iiu
+refers to an ASP, SGP or IPSP.
+.lp
+\fI\)Signalling User Adaptation Layer (UA)\fR \-
+.ix +\n(iiu
+one or more of the Stream Control Transmission Protocol (SCTP)
+.[
+rfc 2960
+%Z 1
+.]
+SS7 Signalling User Adaptation Layers
+.[
+m2ua
+.]
+.[
+m3ua
+.]
+.[
+sua
+.]
+.[
+isua
+.]
+.[
+tua
+.]
+supporting the \fI\)Correlation Id\fR parameter and the \fI\)BEAT\fR message.
+.sh 2 "Overview"
+.pp
+There are a number of possible mechanisms that can be used to determine
+congestion toward SS7-Users at an SGP and at an ASP that permit the SG
+to correlate congestion and present it toward the SS7 network on a basis
+that followed applicable SS7 standards.  This document provides protocol
+elements within the SS7 User Adaptation Layers (UAs) to assist in the
+detection of congestion toward SS7 Users at an ASP and that communicate
+the detection to an SGP for use by the SG in presenting a network view
+of SS7-User congestion toward the SS7 network.
+.sh 3 "ASP Congestion"
+.pp
+\fI\)ASP Congestion\fR is defined as the situation where an Application
+Server at an ASP is not accepting signalling messaging traffic at the
+rate at which it is being offered by an SGP.  \fI\)ASP Congestion\fR
+only includes the congestion experienced by signalling messaging traffic
+that is directed from a given SGP toward a specific Application Server,
+via a specific ASP.  As such, \fI\)ASP Congestion\fR can be identified
+by the 3-tuple of the SGP, AS and ASP.  Because there is a 1:1:1
+relationship between an RK, and AS, and an RC (or IID), and since there
+is no more than one SCTP Association for any given SGP-ASP relation,
+\fI\)ASP Congestion\fR relates to traffic with a specific RC (or IID) on
+a given SCTP association.
+.pp
+\fI\)ASP Congestion\fR does not include congestion in signalling
+messaging traffic flow from the ASP toward the SGP.
+.sh 4 "Points of Detection"
+.pp
+\fI\)ASP Congestion\fR can occur at an SGP within the Nodal
+Interworking Function (NIF), at an SGP within the UA layer at the SGP,
+within the IP network for a given SCTP association, or at an ASP within
+the UA layer at the ASP.  Congestion or flow control above the UA layer
+at the ASP, or within an SS7 protocol stack at the SGP are not included
+under the term \fI\)ASP Congestion\fR.
+.sh 4 "Models for Detection"
+.pp
+Methods for detection of \fI\)ASP Congestion\fR at the various detection
+points are, of course, implementation specific.  That is, the method of
+detection cannot be specified without knowledge of the actual
+implementation at the detection point.  Nevertheless, models for
+detection are here presented.
+.sh 5 "Detection at the SGP"
+.pp
+At the SGP, the flow of traffic between the SS7 protocol stack and the UA
+protocol layer at the SGP can be viewed as traversing a \fI\)Nodal
+Interworking Function (NIF)\fR that resides between the SS7 protocol
+stack and the UA protocol layer.  The interface (if one exists) between
+the NIF and the UA Protocol Layer can be modelled as a set of message queues,
+one for each SGP-ASP-AS traffic flow.  Detection of \fI\)ASP
+Congestion\fR at the interface between the NIF and the UA protocol layer
+at the SGP could then be modelled as detecting the buffer occupancy of a
+specific message queue (corresponding to a specific SGP-ASP-AS traffic
+flow) across the interface.
+Any number of congestion levels could be effected by establishing a set
+of congestion onset and abatement thresholds.
+.pp
+In this document when reference is made to detecting \fI\)ASP
+Congestion\fR within the NIF at an SGP, it is this model for detection
+that is being cited.
+.pp
+In a similar way, at the SGP, the flow of traffic between the UA
+protocol layer and the SCTP association between SGP and ASP, can be
+viewed as traversing the SCTP transport endpoint functions corresponding
+to the transmit side of the SCTP association at the SGP.  Detection of
+\fI\)ASP Congestion\fR at the interface between the UA protocol layer
+and SCTP at the SGP could then be modelled as detecting buffer occupancy
+of a specific message queue (corresponding to a specific SGP-ASP-AS
+traffic flow) across the interface.  Again, any number of congestion
+levels could be effected by establishing a set of congestion onset and
+abatement thresholds.
+.pp
+In this document when reference is made to detecting \fI\)ASP
+Congestion\fR at the SCTP send buffer, it is this model for detection
+that is being cited.
+.pp
+Congestion below the interface between the SS7 stack and the NIF (e.g.
+congestion within the SS7 stack proper), is not considered part of
+\fI\)ASP Congestion\fR, but is considered as congestion within the SS7
+Provider layer for the corresponding UA.
+.sh 5 "Detection at the ASP"
+.pp
+At the ASP, the flow of traffic between the SCTP association from an
+SGP and the UA protocol layer at the ASP, can be viewed as traversing
+the SCTP transport endpoint functions corresponding to the receive side
+of the SCTP association at the ASP.  Detection of \fI\)ASP Congestion\fR
+at the interface between SCTP and the UA protocol layer at the ASP could
+then be modelled as detecting buffer occupancy of a specific message
+queue (corresponding to a specific SGP-ASP-AS traffic flow) across the
+interface.
+Any number of congestion levels could be effected by establishing a set
+of congestion onset and abatement thresholds.
+.pp
+In this document when reference is made to detecting \fI\)ASP
+Congestion\fR at the SCTP receive buffer, it is this model for detection
+that is being cited.
+.pp
+In yet a similar way, at the ASP, the flow of traffic between the UA
+protocol layer and the Application Server can be viewed as traversing a
+\fI\)Local Interworking Function (LIF)\fR that resides between the UA
+protocol layer and the upper-layer SS7 protocol stack.  The interface
+(if one exists) between the LIF and the Application Server can be
+modelled as a set of message queues, one for each SGP-ASP-AS traffic
+flow.  Detection of \fI\)ASP Congestion\fR at the interface between the
+LIF and the AS at the ASP could then be modelled as detecting the buffer
+occupancy of a specific message queue (corresponding to a specific
+SGP-ASP-AS traffic flow) across the interface.
+Also, any number of congestion levels could be effected by establishing a set
+of congestion onset and abatement thresholds.
+.pp
+In this document when reference is made to detecting \fI\)ASP
+Congestion\fR within the LIF at an ASP, it is this model for detection
+that is being cited.
+.pp
+Congestion beyond the interface between the UA protocol layer and the
+Application Server (e.g. congestion within the Application Server
+function itself), is not considered as part of \fI\)ASP Congestion\fR,
+but is considered as congestion within the SS7 User layer for the
+corresponding UA.
+.sh 2 "Sample Configurations"
+.pp
+\fI\)(This section will include some diagrams indicating the placement
+of NIF and LIF functions, the location of SCTP send and receive buffers
+in relation to the UA protocol layer, the SS7 stack and the Application
+Server at both the SGP and the ASP.)
+.sh 2 "ASP Congestion Management"
+.pp
+\fI\)ASP Congestion\fR management is performed at both the SG and the
+ASP.  For proper interworking, protocol elements are used between the
+ASP and the SGP, and a set of procedures are provided for the management
+of \fI\)ASP Congestion\fR.
+.sh 3 "ASP Congestion Management at an ASP"
+.pp
+\fI\)ASP Congestion\fR can be detected at an ASP (as described in section
+"\fI\)Detection at the ASP\fR") at the SCTP receive buffer or within the
+LIF.  Whenever an ASP detects a change in congestion toward an AS
+(\fI\)ASP Congestion\fR), and the ASP is in the ASP-ACTIVE state with the
+sending SGP for the corresponding Application Server, it sends an
+\fI\)ASP Status\fR message to the sending SGP with the level of
+congestion indicated in the \fI\)ASP Congestion\fR parameter contained
+in the message.
+.pp
+While detecting \fI\)ASP Congestion\fR and sending \fI\)ASP Status\fR
+messages indicating congestion to the SGP, the ASP \fB\)SHOULD NOT\fR
+discard messages with a priority or importance beneath that of the
+indicated congestion level.  It should be left to the SG to determine
+which messages should subsequently be discarded as part of whatever
+procedures are necessary toward the SS7 network.
+.pp
+Whenever an ASP receives a \fI\)NTFY ("AS-CONGESTED")\fR message from an
+SG indicating that an AS served by the ASP is congested, it is not
+compelled to take any action.  Each ASP that receives the message
+\fB\)SHOULD\fR, however, determine whether it can bring additional
+resources to bear that will relieve the congestion of the Application
+Server.\*#
+.(d
+.ip \*#
+\fB\)IMPLEMENTATION NOTE:\-\fR  Actions taken by an ASP in response to a
+\fI\)NTFY ("AS-CONGESTED")\fR message might include, for example, an ASP
+in the \fB\)ASP-INACTIVE\fR state for a \fI\)Load Sharing\fR AS moving
+itself to the \fB\)ASP-ACTIVE\fR state for the AS using the
+\fI\)ASPAC\fR message; or it might include an already active ASP
+bringing additional redundant AS processors on-line to service the
+overload.
+.)d
+.sh 3 "ASP Congestion Management at an SGP"
+.pp
+\fI\)ASP Congestion\fR can be detected at an SGP (as described in section
+"\fI\)Detection at the SGP\fR") within the NIF or at the SCTP send
+buffer.  Also, an SGP can use receipt of an \fI\)ASPSTAT\fR message as
+indication of \fI\)ASP Congestion\fR detected at the ASP.
+.pp
+Each SGP maintains an ASP state for each AS at each ASP that the SGP
+serves.  In addition to the activation state of an ASP within an AS,
+\fI\)ASPCONG\fR requires that each SGP maintain a congestion level
+associated with each ASP within each AS.
+.pp
+Also, each SG maintains an overall AS state for each AS served by the
+SG.  In addition to the activate state of an AS, \fI\)ASPCONG\fR
+requires that each SG maintain a congestion level associated with each
+AS served by the SG.
+.pp
+The SG uses the activation state of individual ASPs within AS served by
+the SG to determine the overall AS state in accordance with the UA state
+machine (which is similar if not identical for all UAs discussed here).
+\fI\)ASPCONG\fR adds the requirement that the SG determine the overall
+AS congestion status by considering each ASP congestion status within
+the AS.  This is performed in accordance with the state machine
+procedures of Section 4.
+.pp
+The SG uses the activation state of AS server by the SG to present a
+coordinated network view of the activation served AS toward the SS7
+network using standard SS7 procedures.  \fI\)ASPCONG\fR requires that
+each SG also present a coordinated network view of the congestion status
+of served AS toward the SS7 network, also using standard SS7 procedures.
+.pp
+Whenever an SG determines that the overall congestion status of an
+Application Server has changed, it notifies all ASPs in the
+\fB\)AS-ACTIVE\fR or \fB\)AS-INACTIVE\fR state for the AS using a
+\fI\)NTFY ("AS-CONGESTION")\fR message that contains the \fI\)ASP
+Congestion\fR parameter indicating the new congestion \fI\)Level\fR for
+the AS.
+Note that the change in AS congestion status determined by an SG could
+result either from detection of \fI\)ASP Congestion\fR local to the SGP,
+or from receipt of an \fI\)ASPSTAT\fR message from an ASP indicating
+\fI\)ASP Congestion\fR.
+.pp
+Once the SG has indicated AS congestion to an AS, it
+\fB\)MAY\fR discard messages and provide protocol congestion
+indications toward the SS7 network in accordance with relevant SS7
+standards\*#,
+.(d
+.ip \*#
+\fB\)IMPLEMENTATION NOTE:\-\fR  Note that one way to effect indications
+of congestion under proper conditions toward the SS7 network using an
+existing SS7 protocol stack and user interface implementation that does
+not include a mechanism for requesting congestion downward across the
+SS7/SS7-User interface, is to cease accepting messages for the affected
+traffic flow from the SS7/SS7-User interface.  This could trigger the
+SS7-Provider's own congestion procedures in an appropriate manner.
+.)d
+but, regardless of the actions taken by the SG toward the SS7 network,
+the SG \fB\)SHOULD\fR cease passing traffic toward the congested AS at
+a priority or importance level lower than the congestion level.
+.(d
+.ip \*#
+\fB\)IMPLEMENTATION NOTE:\-\fR  Note that it is \fB\)NOT RECOMMENDED\fR
+that an SG redistribute traffic within a \fI\)Load Share\fR AS.  Doing so
+could cause congestive oscillation between the various ASPs that are
+active within the Load Share AS.
+Based on \fI\)ASP Congestion\fR detected within the SCTP receive buffer
+or LIF at an ASP, it might be tempting to have an SG decide to
+redistribute the transmission of traffic over the ASPs in a Load Share
+AS, however, this is \fB\)NOT RECOMMENDED\fR: oscillations could occur
+as a result of this action between the ASPs in a Load Share AS.
+Based on \fI\)ASP Congestion\fR detected within the NIF or SCTP send
+buffer at an SGP, it might also be tempting to have an SG decide to
+redistribute the transmission of traffic from the SGP that make up the
+SG, however, this is \fB\)NOT RECOMMENDED\fR for the same reason
+(oscillation could occur between the SGP).
+Any redistribution of traffic with a Load Share AS, or within an
+Active-Standby AS should result for the activation or deactivate of an
+ASP within the AS, and then, the procedures of
+.[
+corid
+%Z 1
+.]
+\fB\)SHOULD\fR be followed to avoid message loss, duplication or
+mis-sequencing.
+.)d
+.sh 2 "Issues"
+.pp
+Although the mechanism presented in this document provides some
+essential protocol capabilities to the SS7 User Adaptation Layers (UAs)
+for use in detecting and reporting SS7 User congestion from an ASP to an
+SGP, a number of issues associated with this approach remain:
+.np
+The UA protocols were designed to permit a Nodal Interworking Function
+(NIF) to be placed over an existing SS7 protocol layer provider and,
+using only the primitives and interface to the SS7-Provider that is
+available to a normal SS7-User as described by the SS7 standards,
+provide the functions necessary to implement a Signalling Gateway (SG)
+in the back-haul SG/ASP configuration.
+
+The \fI\)ASPSTAT\fR message would remove this ability.
+
+Because the UAs permitted an SG to be implemented over an existing SS7
+protocol stack, details of the NIF, and details of the interfaces
+between the SS7-Provider and the NIF were avoided.
+
+The \fI\)ASPSTAT\fR message would require both a description of the NIF
+as well as details of the additional capabilities required of an SS7
+provider a the interface between the NIF and the SS7 provider.
+.np
+Typically, within an SS7 provider implementation, congestion toward an
+SS7-User is determined within the SS7 provider protocol layer using
+implementation dependent means.  Nevertheless, each SS7 protocol layer
+provides specific congestion onset and abatement thresholds that are
+managed within the SS7 protocol layer.
+
+Use of the \fI\)ASPSTAT\fP would require that the management of onset
+and abatement thresholds span multiple devices, multiple queues and
+buffers, and also span the SCTP transport carrying traffic.  This would
+make the task of managing onset and abatement thresholds problematic for
+SS7 network operators.
+
+A mechanism where the management of onset and abatement thresholds are
+contained within the SG if not within the SS7 provider layer is far more
+preferable than the arrangement required by the \fI\)ASPSTAT\fP
+message.
+.np
+The UAs have an existing optional mechanism for communicating SS7 User
+congestion to the SG.  For 
+.[
+m3ua
+.]
+.[
+sua
+.]
+.[
+tua
+.]
+.[
+isua
+.]
+that mechanism is the use of the \fB\)SCON\fR message in the ASP to SG
+direction.
+For
+.[
+m2ua
+.]
+it is the use of the \fB\)Status Request\fR message.
+
+Adoption of \fI\)ASPSTAT\fR message would likely require the removal of
+that mechanism so that it does not conflict with the \fI\)ASPSTAT\fR
+mechanism.
+.np
+Use of the \fI\)ASP Status\fR procedures at the SG for redistribution of
+traffic within an AS can be dangerous.  Without proper knowledge about
+the load characteristics of the ASPs serving an AS, an SG could provoke
+rapid oscillations in load distribution across the ASP pool.
+
+Although some techniques could be used at the SG to mitigate this
+(e.g. providing a long duration between switch-overs), all of the UAs
+follow the principle that traffic decisions are best made by the ASPs
+rather than at the SG.
+
+In fitting with this principle, use of the \fI\)Notify\fR procedures
+in conjunction with the
+.[
+loadsel
+%Z 1
+.]
+or
+.[
+loadgrp
+%Z 1
+.]
+approach to ASP management of load sharing selection and grouping would
+allow the ASPs to activate an alternate load selection and grouping in
+response to congestion that could not be afforded by redistribution at
+the SG.
+.sh 2 Conclusions
+.pp
+The following conclusions have been reached regarding the mechanisms
+described in this document.
+.np
+Giving considerations to the issues with the \fI\)ASPSTAT\fR message
+described in the previous section, use of the \fI\)ASPSTAT\fR message at
+the SGP and SG should be completely \fB\)OPTIONAL\fR.  This permits an
+implementation that uses an existing SS7 protocol stack implementation
+to use other mechanisms local to the SG for effecting proper SS7 User
+congestion controls.
+.np
+Considering that an existing SS7 protocol stack implementation can give
+indications about SS7 User congestion to SS7 management at the node
+using a management interface, it is likely possible to implement the
+\fI\)NTFY (AS-CONGESTED)\fR procedures at the SG without having to
+describe the NIF and the NIF/SS7-Provider interface in detail.
+Therefore, the \fI\)Notify\fR procedures should be \fB\)RECOMMENDED\fR.
+These procedures afford notification of ASPs that in the ASP-INACTIVE
+state for an AS of the congestion status of the AS a effected by the SG,
+and permit the ASPs serving the AS to take actions with regard to
+traffic in the AS (e.g. bringing an ASP from the ASP-INACTIVE state to
+the ASP-ACTIVE state to relieve the congestion).  Note that the
+\fI\)Notify\fR procedures do not compel an ASP to take action, but the
+procedure provides additional information that can enable effective ASP
+management at the ASP pool.
+.np
+Danger of suboptimal load balancing at the SG resulting from
+redistribution of traffic from the SG toward an AS and the ensuing
+message loss and mis-sequencing is justification for making load
+redistribution in response to AS congestion at the SG \fB\)NOT
+RECOMMENDED\fR.  If performed at all, load redistribution \fB\)SHOULD\fR
+be performed using
+.[
+loadsel
+.]
+and
+.[
+loadgrp
+.]
+in conjunction with
+.[
+corid
+.]
+(to minimize message loss and mis-sequencing) by the ASPs in response to
+the \fI\)Notify\fR procedures outlined in this document, and the SG
+\fB\)SHOULD NOT\fR perform load redistribution on its own.
+.np
+.[
+corid
+.]
+provides some adjustments to the \fB\)HEARTBEAT\fR mechanism that can be
+used effectively by the SG to determine congestion toward the SS7 User
+at the ASP, while retaining the management of congestion onset and
+abatement levels on the SG.  In particular,\ 
+.[
+corid
+.]
+provides that a \fB\)HEARTBEAT\fR sent within an Application Server
+traffic flow \fB\)MUST\fR not be responded to by the ASP until the
+messages in the traffic flow before it have be accepted by the SS7 User
+(Application Server) at the ASP.  This mechanism can be used
+periodically by the SG to determine the amount of outstanding signalling
+messages toward the SS7 User and apply SG managed thresholds.  The
+\fB\)HEARTBEAT\fR mechanism from
+.[
+corid
+.]
+\fB\)SHOULD\fR be used instead of the \fI\)ASPSTAT\fR mechanism
+described here.
+.#e
+.sh 1 "Conventions"
+.#C
+.#e
+.sh 1 "Protocol Elements"
+.pp
+The following protocol element definitions are provided by
+\fI\)ASPCONG\fR in extension to the existing protocol element
+definitions for the UAs.
+.[
+m2ua
+.]
+.[
+m3ua
+.]
+.[
+sua
+.]
+.[
+isua
+.]
+.[
+tua
+.]
+.sh 2 "Parameters"
+.pp
+The following subsections describe the parameters used for
+\fI\)APSCONG\fR, their format and the message in which they are used.
+.sh 3 "ASP Congestion Level"
+.pp
+The \fI\)ASP Congestion Level\fR parameter is used in the
+\fI\)ASPSTAT\fR message.  It is used in the \fI\)ASPSTAT\fR message to
+identify the level of congestion currently experienced by the ASP.
+.lp
+The \fI\)ASP Congestion\fR parameter is formatted as follows:
+.(b L
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0xXXXX          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                         ASP Congestion                        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.lp
+The \fI\)ASP Congestion\fR parameter contains the following field:
+.ip "\fB\)ASP Congestion field: 4 bytes\fR" 2
+.ip "" 2
+The \fI\)ASP Congestion\fR field is formatted as follows:
+.ba +2
+.(b L
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       Reserved                          |Level|
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.ip "\fB\)Reserved field: 29-bits\fR" 2
+.ip ""
+The \fI\)Reserved\fR field is reserved, \fB\)MUST\fR be ignored by the
+receiving SG, and \fB\)SHOULD\fR be coded zero by the sending ASP.
+.ip "\fB\)Level field: 3-bits (unsigned integer)\fR" 2
+.ip ""
+The \fI\)Level\fR field is used by the sending ASP to indicate the
+current congestion level at the ASP for the indicated AS.  This field
+can take on values from \fB\)0\fR through \fB\)7\fR (inclusive) and is
+used to indicated the current congestion level of the AS.  The value
+\fB\)0\fR always indicates \(lqno congestion\(rq.
+.ba +4
+.lp
+For,
+.[
+m2ua
+.]
+the values of the \fI\)Level\fR field are interpreted
+in accordance with
+.[
+q703
+%Z 1
+.]
+.[
+t1.111
+%Z 1
+.]
+as follows:
+.ix +4
+.(b L
+.TS
+tab(:);
+n0c0n1l.
+0:::no congestion
+1:::congestion-accept
+2:::congestion-discard
+3:\-:7:reserved
+.TE
+.)b
+.lp
+For,
+.[
+m3ua
+.]
+the values of the \fI\)Level\fR field are interpreted
+in accordance with
+.[
+q704
+%Z 1
+.]
+.[
+t1.111
+.]
+as follows:
+.ix +4
+.TS
+tab(:);
+n0c0n1l.
+0:::no congestion
+1:::congestion level 1
+2:::congestion level 2
+3:::congestion level 3
+4:\-:7:reserved
+.TE
+.lp
+For,
+.[
+sua
+.]
+.[
+tua
+.]
+the values of the \fI\)Level\fR field are interpreted
+in accordance with
+.[
+q714
+%Z 1
+.]
+.[
+t1.112
+%Z 1
+.]
+.[
+q774
+%Z 1
+.]
+.[
+t1.114
+%Z 1
+.]
+as follows:
+.ix +4
+.TS
+tab(:);
+n0c0n1l.
+0:::no congestion
+1:::restricted importance level 1
+2:::restricted importance level 2
+3:::restricted importance level 3
+4:::restricted importance level 4
+5:::restricted importance level 5
+6:::restricted importance level 6
+7:::restricted importance level 7
+.TE
+.lp
+For,
+.[
+isua
+.]
+the values of the \fI\)Level\fR field are interpreted
+in accordance with
+.[
+q764
+%Z 1
+.]
+.[
+t1.113
+%Z 1
+.]
+as follows:
+.ix +4
+.TS
+tab(:);
+n0c0n1l.
+0:::no congestion
+1:::automatic congestion level 1
+2:::automatic congestion level 2
+3:::automatic congestion level 3
+4:\-:7:reserved
+.TE
+.ix -4
+Note that some switches use only two levels of ACL, others use three.
+.ba -4
+.ba -2
+.sh 3 "Status"
+.pp
+\fI\)ASPCONG\fR extends the \fI\)Status\fR parameter used in the
+\fB\)NTFY\fR message as follows:
+.lp
+If the \fI\)Status Type\fR is \fB\)AS_STATE_CHANGE\fR, then the
+\fI\)Status ID\fR (16 bit unsigned integer) values are:
+.ix +4
+.TS
+tab(;);
+nl.
+1;reserved
+2;Application Server Inactive (AS-Inactive)
+3;Application Server Active (AS-Active)
+4;Application Server Pending (AS-Pending)
+5;Application Server Congested (AS-Congested)
+.TE
+.ix -4
+These notifications are sent from an SGP to an ASP upon a change in
+status of a particular Application Server.  The value reflects the new
+state of the Application Server.
+.\"
+.\"
+.sh 2 "Messages"
+.lp
+\fI\)ASPCONG\fR adds two messages (\fI\)ASPSTAT\fR and \fI\)ASPSTAT
+QRY\fR) to the \fB\)ASPTM\fR class of messages as follows:
+.ip "" 4
+.TS
+tab(;);
+lsss
+n1c1n2l.
+Application Server Process Traffic Maintenance (ASPTM) Messages
+0;;;Reserved
+1;;;ASP Active (ASPAC)
+2;;;ASP Inactive (ASPIA)
+3;;;ASP Active Ack (ASPAC ACK)
+4;;;ASP Inactive Ack (ASPIA ACK)
+5;;;ASP Status (ASPSTAT)
+6;;;ASP Status Query (ASPSTST QRY)
+7;-;127;Reserved by the IETF
+128;-;255;Reserved for IETF-Defined Message Class Extensions
+.TE
+.lp
+\fI\)ASPCONG\fR also modifies the \fB\)ACTIVE\fR and \fB\)NTFY\fR
+messages as follows:
+.sh 3 "ASP Active (ACTIVE)"
+.pp
+The \fB\)ASPAC\fR message is sent by an ASP to indicate to an SGP that
+it is Active and ready to process signalling traffic for a particular
+Application Server.
+.lp
+The format of the \fB\)ACTIVE\fR message is as follows:
+.(b L
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0x000B          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                       Traffic Mode Type                       |
++-------------------------------+-------------------------------+
+|         Tag = 0x0006          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                         Routing Context                       |
++-------------------------------+-------------------------------+
+|         Tag = 0x0001          |           Length=8            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                 Interface Identifier (integer)                |
++-------------------------------+-------------------------------+
+|         Tag = 0x0003          |             Length            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                   Interface Identifier (text)                 /
+\\                                                               \\
++-------------------------------+-------------------------------+
+|         Tag = 0xXXXX          |           Length=8            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                         ASP Congestion                        |
++-------------------------------+-------------------------------+
+|         Tag = 0x0110          |           Length=8            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                           TID Label                           |
++-------------------------------+-------------------------------+
+|         Tag = 0x010F          |           Length=8            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                           DRN Label                           |
++-------------------------------+-------------------------------+
+|         Tag = 0x0004          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                           Info String                         /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.lp
+The \fI\)ACTIVE\fR message can contain the following parameters:
+.ix +4
+.TS
+tab(:);
+lbw(2.5i)ss
+lilc.
+Parameters
+_
+Traffic Mode Type:Optional:
+Routing Context:Optional:*1
+Interface Identifier (integer):Optional:*2
+Interface Identifier (text):Optional:*2
+ASP Congestion:Mandatory:*3
+TID Label:Optional:
+DRN Label:Optional:
+Info String:Optional:
+.TE
+.ip "Note 1:" 8
+The \fI\)Routing Context\fR parameter is only optionally included in
+UA protocols that support it,
+.[
+m3ua
+.]
+.[
+sua
+.]
+.[
+isua
+.]
+.[
+tua
+.]
+and indicates the Application Server to which the message applies.  If
+there is only one Application Server provisioned for a given SCTP
+association, then the \fI\)Routing Context\fR field is optional.
+Otherwise, the \fI\)Routing Context\fR field is mandatory.
+.ip "Note 2:" 8
+The \fI\)Interface Identifier\fR parameter is only optionally included
+in UA protocols that support it.
+.[
+m2ua
+.]
+.ip "Note 3:" 8
+The \fI\)ASP Congestion\fR parameter is included in the \fI\)ASPAC\fR
+message to indicate to the SGP that the congestion sub-state in which
+ASP is activating.  In this case, the \fI\)ASP Congestion\fR parameter
+contains the congestion level currently experienced by the ASP.  If the
+ASP is not activating in a congested state, the \fI\)Level\fR field of
+the \fI\)ASP Congestion\fR parameter \fB\)MUST\fR contain zero (0),
+indicating "no congestion".
+.sh 3 "Notify (NTFY)"
+.pp
+\fI\)ASPCONG\fR extends the \fI\)Notify\fR message as follows:
+.lp
+The \fI\)Notify\fR message is used to provide an autonomous indication
+of UA events at an SGP/IPSP to an ASP/IPSP.
+.lp
+The \fI\)NTFY\fR message is formatted as follows:
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                     1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0x000D          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                           Status                              |
++-------------------------------+-------------------------------+
+|         Tag = 0x0011          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                        ASP Identifier                         |
++-------------------------------+-------------------------------
+|         Tag = 0x0006          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                       Routing Context                         /
+\\                                                               \\
++-------------------------------+-------------------------------+
+|         Tag = 0x0001          |           Length=8            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                 Interface Identifier (integer)                |
++-------------------------------+-------------------------------+
+|         Tag = 0x0003          |             Length            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                   Interface Identifier (text)                 /
+\\                                                               \\
++-------------------------------+-------------------------------+
+|         Tag = 0xXXXX          |           Length=8            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                         ASP Congestion                        |
++-------------------------------+-------------------------------+
+|         Tag = 0x0004          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                          Info String                          /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.lp
+The \fI\)NTFY\fR message can contain the following parameters:
+.ix +4
+.TS
+tab(:);
+lbw(2.5i)ss
+lilcb.
+Parameters
+_
+Status:Mandatory
+ASP Identifier:Conditional:*1
+Routing Context:Conditional:*2 *3
+Interface Identifier (integer):Conditional:*4
+Interface Identifier (text):Conditional:*4
+ASP Congestion:Conditional:*5
+Info String:Optional
+.TE
+.ip "\fBNote 1\fR:" 8
+ASP Identifier \fB\)MUST\fR be used where the IPSP/SGP cannot identify
+the ASP by pre-configured address/port number information (e.g, where an
+ASP is resident on a Host using dynamic address/port number assignment)
+and the Status parameter is set to "Alternate ASP Active" or "ASP
+Failure".
+.ip "\fBNote 2\fR:" 8
+When an ASP is registered or configured for multiple AS with an SG, to
+identify the Application Server, the \fI\)Routing Context\fR associated
+with the AS whose state is being notified \fB\)MUST\fR be placed in the
+\fI\)NTFY\fR message when the \fI\)Status\fR parameter is set to
+"\fB\)AS_State_Change\fR".
+.ip "\fBNote 3\fR:" 8
+The \fI\)Routing Context\fR parameter is only optionally included in
+UA protocols that support it,
+.[
+m3ua
+.]
+.[
+sua
+.]
+.[
+isua
+.]
+.[
+tua
+.]
+and indicates the Application Server to which the message applies.  If
+there is only one Application Server provisioned for a given SCTP
+association, then the \fI\)Routing Context\fR field is optional.
+Otherwise, the \fI\)Routing Context\fR field is mandatory.
+.ip "\fBNote 4\fR:" 8
+The \fI\)Interface Identifier\fR parameter is only optionally included
+in UA protocols that support it.
+.[
+m2ua
+.]
+.ip "\fBNote 5\fR:" 8
+The \fI\)ASP Congestion\fR parameter \fB\)MUST\fR be included in the
+\fI\)NTFY\fR message when the \fI\)Status\fR parameter is set to
+"\fB\)AS_State_Change\fR" and the \fI\)Status ID\fR  field is set to
+"\fB\)ASP-Congested\fR".  The \fI\)ASP Congestion\fR parameter contains
+the level of congestion being experienced by the Application Server, as
+determined by the SGP.
+.sh 3 "ASP Status (ASPSTAT)"
+.pp
+The \fI\)ASP Status\fR message is used by an ASP to report the
+congestion status toward a local Application Server at the ASP, to an SGP.
+It may also be used by an IPSP to report the congestion status toward a
+local Application server at the IPSP to a remote IPSP.
+.lp
+The format of the \fI\)ASPSTAT\fR message is as follows:
+.(b L
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0x0006          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                         Routing Context                       |
++-------------------------------+-------------------------------+
+|         Tag = 0x0001          |           Length=8            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                 Interface Identifier (integer)                |
++-------------------------------+-------------------------------+
+|         Tag = 0x0003          |             Length            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                   Interface Identifier (text)                 /
+\\                                                               \\
++-------------------------------+-------------------------------+
+|         Tag = 0xXXXX          |           Length=8            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                         ASP Congestion                        |
++-------------------------------+-------------------------------+
+|         Tag = 0x0004          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                           Info String                         /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+.lp
+The \fI\)ASPSTAT\fR message can contain the following parameters:
+.ix +4
+.TS
+tab(:);
+lbw(2.5i)ss
+lilcb.
+Parameters
+_
+Routing Context:Conditional:*1
+Interface Identifier (integer):Conditional:*2
+Interface Identifier (text):Conditional:*2
+ASP Congestion:Mandatory:*3
+Info String:Optional
+.TE
+.ip "\fBNote 1\fR:" 8
+The \fI\)Routing Context\fR parameter is only optionally included in
+UA protocols that support it,
+.[
+m3ua
+.]
+.[
+sua
+.]
+.[
+isua
+.]
+.[
+tua
+.]
+and indicates the Application Server to which the message applies.  If
+there is only one Application Server provisioned for a given SCTP
+association, then the \fI\)Routing Context\fR field is optional.
+Otherwise, the \fI\)Routing Context\fR field is mandatory.
+.ip "\fBNote 2\fR:" 8
+The \fI\)Interface Identifier\fR parameter is only optionally included
+in UA protocols that support it.
+.[
+m2ua
+.]
+.ip "\fBNote 3\fR:" 8
+The \fI\)ASP Congestion\fR parameter is used by the ASP in the
+\fI\)ASPSTAT\fR message to indicate the current congestion level of the
+Application Server (AS) indicated by the \fI\)Routing Context\fR (or
+\fI\)Interface Identifier\fR) associated with the AS.
+.pp
+The \fI\)ASPSTAT\fR message \fB\)MAY\fR contain additional extension
+parameters provided for by other extensions.
+.\"
+.\"
+.sh 3 "ASP Status Query (ASPSTAT QRY)"
+.pp
+The \fI\)ASP Status Query\fR message is used by an SGP to query an ASP
+concerning the congestion status toward an Application Server at the ASP.
+It may also be used by an IPSP to query the congestion status toward an
+Application Server at a remote IPSP.
+.lp
+The format of the \fI\)ASPSTAT QRY\fR message is as follows:
+.(b L
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0x0006          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                         Routing Context                       |
++-------------------------------+-------------------------------+
+|         Tag = 0x0001          |           Length=8            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                 Interface Identifier (integer)                |
++-------------------------------+-------------------------------+
+|         Tag = 0x0003          |             Length            |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                   Interface Identifier (text)                 /
+\\                                                               \\
++-------------------------------+-------------------------------+
+|         Tag = 0x0004          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                           Info String                         /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.sz +2
+.)c
+.)b
+The \fI\)ASPSTAT QRY\fR message can contain the following parameters:
+.ix +4
+.TS
+tab(:);
+lbw(2.5i)ss
+lilcb.
+Parameters
+_
+Routing Context:Conditional:*1 *2
+Interface Identifier (integer):Conditional:*3
+Interface Identifier (text):Conditional:*3
+Info String:Optional
+.TE
+.ip "\fBNote 1\fR:" 8
+The \fI\)Routing Context\fR (or \fI\)Interface Identifier\fR) is used by
+the Signalling Gateway (SG) to indicate to the ASP for which Application
+Server (AS) the current congestion status is requested.
+.ip "\fBNote 2\fR:" 8
+The \fI\)Routing Context\fR parameter is only optionally included in
+UA protocols that support it,
+.[
+m3ua
+.]
+.[
+sua
+.]
+.[
+isua
+.]
+.[
+tua
+.]
+and indicates the Application Server to which the message applies.  If
+there is only one Application Server provisioned for a given SCTP
+association, then the \fI\)Routing Context\fR field is optional.
+Otherwise, the \fI\)Routing Context\fR field is mandatory.
+.ip "\fBNote 3\fR:" 8
+The \fI\)Interface Identifier\fR parameter is only optionally included
+in UA protocols that support it.
+.[
+m2ua
+.]
+.pp
+The \fI\)ASPSTAT QRY\fR message \fB\)MAY\fR contain additional extension
+parameters provided for by other extensions.
+.#e
+.sh 1 "Procedures"
+.pp
+\fI\)ASPCONG\fR provides the following procedures in extension to the
+procedures of the UAs.
+.[
+m2ua
+.]
+.[
+m3ua
+.]
+.[
+sua
+.]
+.[
+isua
+.]
+.[
+tua
+.]
+.sh 2 "AS and ASP State Maintenance"
+.pp
+\fI\)ASPCONG\fR introduces the concept of a congested state, both for
+Application Server Processes (ASPs) and Applications Servers (ASs).
+These congestion states can be viewed as sub-states of the
+\fB\)ASP-ACTIVE\fR and \fB\)AS-ACTIVE\fR states, respectively.
+.\"
+.sh 3 "ASP State"
+.pp
+\fI\)ASPCONG\fR adds the following ASP state definition to the state
+transitions for an Application Server Process:
+.ip "\fB\)ASP-CONGESTED(\fIn\fB)\fR:\-" \w'ASP-CONGESTED(n):\-\(em'u
+This state is a sub-state of the \fB\)ASP-ACTIVE\fR state.  Whenever an
+ASP is in the \fB\)ASP-ACTIVE\fR state, it may also be in one of the
+\fB\)ASP-CONGESTED(\fIn\fB)\fR sub-states, where \fI"n"\fP is the
+congestion level associated with the ASP in the AS.
+.pp
+Any existing procedure that causes an \fI\)Application Server Process\fR to
+leave the \fB\)ASP-ACTIVE\fR states also applies to any congested
+\fB\)ASP-CONGESTED\fR sub-states.
+Any existing procedure that causes an \fI\)Application Server Process\fR to
+enter the \fB\)ASP-ACTIVE\fR state, enters the state as
+\(lquncongested\(rq,
+unless an \fI\)ASP Congestion\fR parameter is associated with the
+procedure, in which case the \fB\)ASP-CONGESTED(\fIn\fB)\fR state is
+entered, where \fI"n"\fR is the congestion level associated with the
+\fI\)ASP Congestion\fR parameter.  (Note that the \fI\)ASP Active\fR
+message can now contains an \fI\)ASP Congestion\fR parameter.)
+.\"
+.sh 3 "AS State"
+.ip "\fB\)AS-CONGESTED(\fIn\fB)\fR:\-" \w'AS-CONGESTED(n):\-\(em'u
+This state is a sub-state of the \fB\)AS-ACTIVE\fR state.  Whenever an
+AS is in the \fB\)AS-ACTIVE\fR state, it may also be in one of the
+\fB\)AS-CONGESTED(\fIn\fB)\fR sub-states, where \fI"n"\fR is the
+congestion level associated with the AS.
+.pp
+Any existing procedure that causes an \fI\)Application Server\fR to
+leave the \fB\)AS-ACTIVE\fR states also applies to any congested
+\fB\)AS-CONGESTED\fR sub-states.
+Any existing procedure that causes an \fI\)Application Server\fR to
+enter the \fB\)AS-ACTIVE\fR state, enters the state as
+\(lquncongested\(rq,
+unless an \fI\)ASP Congestion\fR parameter is associated with the
+procedure, in which case the \fB\)AS-CONGESTED(\fIn\fB)\fR state is
+entered, where \fI"n"\fR is derived by the SG from the congestion level
+associated with the \fI\)ASP Congestion\fR parameter.  (Note that the
+\fI\)ASP Active\fR message can now contains an \fI\)ASP Congestion\fR
+parameter.)
+.\"
+.sh 3 "ASP Up Procedures"
+.pp
+ASP Up procedures are not modified by \fI\)ASPCONG\fR with the exception
+that when an ASP moves to the \fB\)ASP-INACTIVE\fR state for an
+Application Server from the \fB\)ASP-DOWN\fR state, the SGP
+\fB\)SHOULD\fR send notifications to the newly inactive ASP that it
+would have otherwise received if it were previously in the
+\fB\)ASP-INACTIVE\fR state for the AS.  This can now also include the
+\fI\)NTFY (AS-CONGESTED)\fR notification.
+.\"
+.sh 3 "ASP Down Procedures"
+.pp
+When an ASP moves to the ASP-DOWN state and is deactivated for all
+Application Servers served by the ASP at an SGP, the previous congestion
+status associated with the ASP for the Application Servers will be
+disregarded and removed from consideration for the calculation of the
+overall AS congestion status for the corresponding Application Servers.
+.\"
+.sh 3 "ASP Active Procedures"
+.pp
+\fI\)ASPCONG\fR enhances the ASP Active Procedures of the UAs as
+follows:
+.pp
+When an ASP sends an \fI\)ASP Active\fR message to an SGP to activate itself
+for a given Application Server, the ASP includes the \fI\)ASP
+Congestion\fR parameter in the message if the ASP is activating for the
+AS in an already congested state.  It is not necessary to include an
+\fI\)ASP Congestion\fR parameter if the ASP is not congested at the time
+of activation.
+.pp
+Upon receiving an \fI\)ASP Active\fR message containing an \fI\)ASP
+Congestion\fR parameter, and the SGP is moving the ASP to the ASP-ACTIVE
+state for the AS, the SGP will also mark the ASP a congested at the
+congestion \fI\)Level\fR indicated in the \fI\)ASP Congestion\fR
+parameter.  The SGP will also take appropriate actions with regard to
+AS congestion in the same manner as if the SGP had received an \fI\)ASP
+Status\fR message for the congestion level immediately following the
+\fI\)ASP Active\fR message.
+.\"
+.sh 3 "ASP Inactive Procedures"
+.pp
+When an ASP is deactivated for an Application Server at an SGP, the
+previous congestion status associated with the ASP for the Application
+Server will be disregarded and removed from consideration for the
+calculation of the overall AS congestion status for the corresponding
+Application Server.
+.\"
+.sh 3 "ASP Status Procedures"
+.pp
+Whenever an ASP in the \fB\)ASP-ACTIVE\fR state for an Application
+Server, determines that it is experiencing congestion toward the
+Application Server (see \fI"Detection of ASP Congestion at the ASP"\fP),
+and that the level of congestion toward the Application Server has
+changed since the last status sent to the SGP, the ASP \fB\)MAY\fR
+send the SGP an \fI\)ASP Status\fR message reporting the change in
+detected congestion level.
+.pp
+The receipt of the \fI\)ASP Status\fR message is not acknowledged by the
+SGP.
+.pp
+The \fI\)ASP Status\fR message is sent by the ASP in the same SCTP
+stream as other ASPTM and signalling messages related to the Application
+Server (i.e, the same \fI\)Routing Context\fR (or \fI\)Interface
+Identifier\fR) to SCTP stream mapping that is performed for the
+signalling messages causing the congestion.) \fI\)ASP Status\fR messages
+are sent ordered within the SCTP stream.  \fI\)ASP Status\fR messages
+are not sent on SCTP Stream 0.
+.pp
+Whenever an SGP receives an \fI\)ASP Status\fR message from an ASP in
+the \fB\)ASP-ACTIVE\fR state for an Application Server, the SGP
+\fB\)MAY\fR consider the congestion level reported in the \fI\)ASP
+Congestion\fR parameter contained in the message when determining the
+congestion level of the ASP within the AS (i.e. ASP-CONGESTED sub-state)
+as well as when determining the overall AS congestion level (i.e.
+AS-CONGESTED sub-state) and when considering indication of congestion
+and invocation of congestion related procedures toward the SS7 network.
+.pp
+If an SGP should receive an \fI\)ASP Status\fR message for an ASP that
+is not in the \fB\)ASP-ACTIVE\fR state at an AS, an \fI\)ERR("Unexpected
+Message")\fR should be returned and the \fI\)ASP Status\fR message
+discarded.
+.\"
+.sh 3 "ASP Status Query Procedures"
+.pp
+At any time that an ASP is in the \fB\)ASP-ACTIVE\fR state at an SGP for
+an Application Server, the SGP \fB\)MAY\fR send an \fI\)ASP Status
+Query\fR message to the ASP requesting the current congestion status for
+the ASP toward the Application Server.
+.pp
+\fI\)ASP Status Query\fR messages can be sent unordered on the SCTP
+association, and \fB\)MAY\fR be sent on SCTP Stream 0.
+.pp
+Whenever an ASP receives an \fI\)ASP Status Query\fR message from an SGP
+for an Application Server, and the ASP is in the \fB\)ASP-ACTIVE\fR or
+\fB\)ASP-INACTIVE\fR state for the Application Server, the ASP
+\fB\)MUST\fR respond with an \fI\)ASP Status\fR message indicating the
+current congestion level toward the Application Server.  The
+\fI\)Routing Context\fR (or \fI\)Interface Identifier\fR) contained in
+the \fI\)ASP Status\fR message must be the same as appeared in the
+received \fI\)ASP Status Query\fR message, and the \fI\)ASP
+Congestion\fR parameter contained in the \fI\)ASP Status\fR message
+\fB\)MUST\fR reflect the current congestion level toward the Application
+Server associated with the \fI\)Routing Context\fR (or \fI\)Interface
+Identifier\fR).
+.pp
+If the ASP receives an \fI\)ASP Status Query\fR message and the ASP is
+not in the \fI\)ASP-ACTIVE\fR or \fI\)ASP-INACTIVE\fR state for
+Application Server indicated in the Message, it \fB\)SHOULD\fR return an
+\fI\)ERR("Unexpected Message")\fR and take steps to move the SGP state
+to the current state of the ASP (e.g. by sending, for example, \fI\)ASP
+Down\fR).
+.pp
+Using this procedure, the SGP can query the \fI\)ASP Congestion\fR
+status of an Application Server from an ASP.
+.\"
+.sh 3 "Notify Procedures"
+.pp
+A \fI\)Notify (NTFY)\fR message reflecting a change in the AS state
+\fB\)MUST\fR be sent to all ASPs in the AS, except those in the
+\fB\)ASP-DOWN\fR state, with appropriate \fI\)Status\fR information, any
+\fI\)ASP Identifier\fR of the failed ASP, and the \fI\)ASP Congestion\fR
+parameter when ("AS-CONGESTED") is indicated.  At the ASP, Layer
+Management is informed with an \fB\)M-NOTIFY\fR indication primitive.
+The \fI\)Notify (NTFY)\fR message must be sent whether the AS state
+change was a result of an ASP failure or reception of an \fI\)ASP State
+Management (ASPSM)\fR or \fI\)ASP Traffic Management (ASPTM)\fR message.
+In the second case, the \fI\)Notify (NTFY)\fR message \fB\)MUST\fR be
+sent after any ASP State or Traffic Management related acknowledgements
+messages (e.g, ASP Up Ack, ASP Down Ack, ASP Active Ack, or ASP Inactive
+Ack).
+.pp
+Whenever a \fI\)Notify (NTFY)\fR ("AS-PENDING") message is sent by an
+SGP that now has no ASPs active to service the traffic, or where a
+\fI\)Notify NTFY\fR ("Insufficient ASP resources active in AS") message
+\fB\)MUST\fR be sent in the Load-share or Broadcast mode, the
+\fI\)Notify (NTFY)\fR message does not explicitly compel the ASP(s)
+receiving the message to become active.  The ASPs remain in control of
+what (and when) traffic action is taken.
+.PP
+Whenever a \fI\)Notify (NTFY)\fR ("AS-CONGESTED") message is sent by an
+SGP that is experiencing AS congestion, the \fI\)Notify (NTFY)\fR
+message does not explicitly compel the ASP(s) receiving the message,
+whether in the \fB\)ASP-ACTIVE\fR or \fB\)ASP-INACTIVE\fR state for the
+Application Server, to take any action: again, the ASPs remain in
+control of what (and when) traffic action is taken.
+.pp
+Whenever a \fI\)Notify (NTYF)\fR message does not contain a \fI\)Routing
+Context\fR (or \fI\)Interface Identifier\fR) parameter, the receiver
+must know, via configuration data, of which Application Servers the ASP
+is a member and take the appropriate action in each AS.
+.\"
+.#e
+.\"
+.sh 1 "Examples"
+.pp
+\fI\)(This section will include some examples and message sequence
+charts indicating the use of each new protocol element and procedure.)
+.#e
+.\"
+.sh 1 "Security"
+.pp
+.i ASPCONG
+does not introduce any new security risks or considerations that are not
+already inherent in the UAs.
+.[
+m2ua
+.]
+.[
+m3ua
+.]
+.[
+sua
+.]
+.[
+isua
+.]
+.[
+tua
+.]
+Please see the SIGTRAN Security document
+.[
+sigsec
+%Z 1
+.]
+for security consideration and recommendations that are applicable to
+each of the UAs.
+.#e
+.sh 2 "Interworking Procedures"
+.pp
+Because the \fI\)ASPCONG\fR procedures provided here rely upon
+cooperation between ASP and SGP, if either the ASP or the SGP does not
+support these \fI\)ASPCONG\fR procedures, neither the ASP nor the SGP is
+able to take advantage of the full benefits of the procedures.  The ASP
+or SGP supporting \fI\)ASPCONG\fR \fB\)MAY\fR fall back to the
+interworking procedures provided in this section, or to procedures based
+on the original (non-\fI\)ASPCONG\fR) UA procedures.
+.pp
+A peer ASP or SGP that does not support the \fI\)ASPCONG\fR procedures
+can either be identified by local configuration information, the ASP
+Extensions
+.[
+aspext
+.]
+procedure, or at ASP Activation time.  The lack of support for
+\fI\)ASPCONG\fR can be determined at ASP Activation time when the peer
+ASP or SGP does not place a \fI\)ASP Congestion\fR parameter (as it
+\fB\)MUST\fR if both peers support \fI\)ASPCONG\fR) in the \fI\)ASPAC\fR
+message.
+.pp
+When interwokring to an ASP or SGP that does not support
+\fI\)ASPCONG\fR, the SGP or ASP supporting \fI\)ASPCONG\fR \fB\)SHALL\fR
+perform all of the local procedures as though the peer SGP or ASP
+supported \fI\)ASPCONG\fR with the following exceptions:
+.np i
+The ASP \fB\)MUST NOT\fR send \fI\)ASP Status\fR messages, either
+autonomously or in response to a received \fI\)ASP Status Query\fR
+message.
+.np
+The SGP \fB\)MUST NOT\fR send \fI\)ASP Status Query\fR messages.
+.np
+The ASP \fB\)MUST NOT\fR send \fI\)ASP Congestion\fR parameters in
+\fI\)ASP Active\fR messages after having received an
+\fI\)ERR("Unrecognized Parameter")\fR in response to an initial
+well-formed \fI\)ASP Active\fR message containing an \fI\)ASP
+Congestion\fR parameter.
+.np
+The SGP \fB\)MUST NOT\fR send \fI\)ASP Congestion\fR parameters or
+\fI\)NTFY ("AS-CONGESTED")\fR messages after having received an
+\fI\)ERR("Invalid Parameter")\fR or \fI\)ERR("Unrecognized
+Parameter")\fR in response to an initial well-formed \fI\)NTFY
+(AS-CONGESTED)\fR message.
+.pp
+The ASP and SGP \fB\)MAY\fR continue performing local \fI\)ASP
+Congestion\fR detection and the SGP \fB\)MAY\fR continue taking \fI\)ASP
+Congestion\fR into consideration when determining actions with regard to
+congestion toward the SS7 network.
+.\"
+.sh 1 "IANA Considerations"
+.pp
+.i ASPCONG
+redefines the format of the \fI\)Status ID\fR field of the
+\fI\)Status\fR parmeter contained in the \fI\)Notify\fR message in the
+.[
+m2ua
+.]
+.[
+m3ua-rfc
+%Z 1
+.]
+and
+.[
+sua
+.]
+registries.
+.pp
+.i ASPCONG
+defines a new \fI\)ASP Congestion\fR parameter in the
+.[
+m2ua
+.]
+.[
+m3ua-rfc
+.]
+and
+.[
+sua
+.]
+registries.
+.pp
+.i ASPCONG
+redefines the parameters accepted in the \fI\)ASP Active\fR message to
+include the new conditional \fI\)ASP Congestion\fR parameter in the
+.[
+m2ua
+.]
+.[
+m3ua-rfc
+.]
+and
+.[
+sua
+.]
+registries.
+.i ASPCONG
+redefines the parameters accepted in the \fI\)Notify\fR message to
+include the new conditioanl \fI\)ASP Congestion\fR parameter in the
+.[
+m2ua
+.]
+.[
+m3ua-rfc
+.]
+and
+.[
+sua
+.]
+registries.
+.pp
+.i ASPCONG
+defines two new messages in the \fI\)ASP Traffic Management\fR messge
+class, the \fI\)ASP Status\fR and \fI\)ASP Status Query\fR messages, in
+the
+.[
+m2ua
+.]
+.[
+m3ua-rfc
+.]
+and
+.[
+sua
+.]
+registries.
+.#e
+.\"
+.\"
+.(b M
+.#v
+.sh 1 "Change History" 0
+.pp
+This section provides historical information on the changes made to this
+draft.  This section will be removed from the document when the document is
+finalized.
+.sh 2 "Version 0.0" 0 0
+.lp
+The initial version of this document.
+.sh 3 "Change Log" 0 0 0
+.lp
+.(l I
+.nf
+\fC\s-3\
+$Log: draft-bidulock-sigtran-aspcong-00.me,v $
+Revision 0.9.2.3  2006/07/11 23:03:44  brian
+- another attempt at submitting version 0
+
+Revision 0.9.2.2  2006/06/27 09:41:15  brian
+- rereleased drafts
+
+Revision 0.9.2.1  2005/10/17 11:53:45  brian
+- updated drafts for republication
+.)l
+.)b
+.\"
+.\"
+.#E
+.(b M
+.#v
+.[
+$LIST$
+.]
+.)b
+.\"
+.\"
+.(b M
+.#v
+.uh "Acknowledgements"
+.pp
+The authors would like to thank
+Lincoln Haresign,
+and
+Tolga Averson
+for their valuable comments and suggestions.
+.#A
+.bl 3
+.lp
+This draft expires \*[expiry].
+.)b
+.#T 2006

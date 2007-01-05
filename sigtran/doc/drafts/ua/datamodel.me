@@ -1,0 +1,2098 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: datamodel.me,v 0.9.2.2 2005/05/14 08:33:17 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2001  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.2 $) modified $Date: 2005/05/14 08:33:17 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.R1
+abbreviate A
+label L
+no-default-database
+no-accumulate
+database ../idrefs
+annotate X pp
+move-punctuation
+discard YZ
+join-authors ", " ", " ", "
+et-al " et all" 1 2
+# reverse A
+.R2
+.if '\*(.T'ascii' \{\
+.\"'
+.ds #n <\\**>
+.m1 1
+.m2 1
+.m3 1
+.m4 0
+.pl 11.0i
+.\" .po 4
+.ll 7.6i
+.lt 7.6i
+.\" .nr LL 7.6i
+.\" .nr LT 7.6i
+.ad b
+.hy 6
+.ta 3
+.ba 0
+.po 0
+.nr so 0
+.nr si 0
+.nr ii \w'\0(000)\0'u
+.nr pi 4n
+.nr po 0
+.nr bi 4n
+.\}
+.if '\*(.T'ps' \{\
+.\"'
+.ds #n \\**
+.m1 0.25i \" top margin above header
+.m2 0.25i \" top margin below header
+.m3 0.25i \" btm margin above footer
+.m4 0.25i \" btm margin below footer
+.pl 11.0i
+.ll 7.2i
+.lt 7.2i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad b
+.hy 6
+.ta 3
+.ba 0
+.po 0.75i
+.nr so 0
+.nr si 0
+.nr ii \w'\0(000)\0'u
+.nr pi 0.24i
+.nr po 0
+.nr bs 1v
+.nr bi 0.5i
+.nr hi 0.5i
+.nr pp 10
+.nr fp 8
+.nr gp 9
+.nr sp 11
+.nr tp 9
+.\}
+.dn &n
+.dn &p
+.nr &n 1
+.nr &p 0
+.ds &f Figure\ 
+.de #f
+.(l C F
+\fI\\*(&f\\n(&n.\fR  \\$1
+.(x 2
+\\*(&f\\n(&n \\$1
+.)x \\n(ch-\\n%
+.)l
+.nr &p \\n(&n
+.nr &n +1
+..
+.de #e
+.if \\n($d>1 \{\
+.uh "Endnotes for Chapter \\\\n(ch"
+.pd
+.\}
+..
+.ds a \a
+.tp
+.(l C
+.uh "SIGTRAN UA Data Model"
+.)l
+.(z
+.(l C
+Published by:
+OpenSS7 Corporation
+Suite #424
+4701 Preston Park Boulevard
+Plano, TX 75093
+.)l
+.lp
+Copyright \(co 2001, OpenSS7 Corporation
+.lp
+Permission to use, copy, modify, and distribute this documentation for any
+purpose and without fee is hereby granted, provided that the above copyright
+notice appears in all copies and that both the copyright notice and this
+permission notice appear in supporting documentation, and that the name
+OpenSS7 Corporation not be used in advertising or publicity pertaining to
+distribution of the software without specific, written permission.  OpenSS7
+Corporation makes no representation about the suitability of this
+documentation for any purpose.  It is provided "as is" without express or
+implied warranty.
+.lp
+OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION
+INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.  IN NO EVENT
+SHALL OPENSS& CORPORATION BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS.
+WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS DOCUMENTATION.
+.ce 1
+.uh "NOTICE"
+.lp
+OpenSS7 Corporation is making this documentation available as a reference
+point for the industry.  While OpenSS7 Corporation believes that these
+interfaces are well defined in this release of the document, minor changes may
+be made prior to products conforming to the interfaces being made available.
+.ce 1
+.uh "TRADEMARKS"
+.lp
+UNIX \(rg is a trademark.
+.)z
+.pn 1
+.++ AB 'SIGTRAN\ Data\ Model'Abstract'OpenSS7\ Corp'
+.fo '$Revision: 0.9.2.2 $'Page \\\\n%'\\\\*(td'
+.+c Abstract
+.lp
+This document provides a description and documentation of the OpenSS7 SIGTRAN
+Data Model that is used in the OpenSS7 SIGTRAN stack.  It provides a general
+purpose data model that permits a single device to represent multiple
+Signalling Gateway Processes (SGPs) and multiple Application Server Processes
+(ASPs) in a single implementation.
+.pn 1
+.++ P 'SIGTRAN\ Data\ Model'Preface'OpenSS7\ Corp'
+.+c Preface
+.uh "Abstract"
+.lp
+This document specifies a Signalling Link Manager for the SS7 Signalling Links
+supporting the OpenSS7 Signalling Link Interface.  It provides abstraction
+from device-specific Physical Point of Attachment addresses and provides a
+single Signalling Link Identifier management domain for the identification,
+allocation and activation of signalling links.
+.uh "Intent"
+.lp
+This document is intended to provide information for writers of OpenSS7
+Signalling Link Interface drivers as well as writers of OpenSS7 Signalling
+Link Users.  It also provides documentation for the Signalling Link Manager
+and the Signalling Link Management Daemon.
+.uh "Target Audience"
+.lp
+The target audience is developers and users of the OpenSS7 SS7 stack.
+.uh "Disclaimer"
+.lp
+Although the author has attempted to ensure that the information in this
+document is complete and correct, neither the Author nor OpenSS7 Corporation
+will take any responsibility in it.
+.uh "Revision History"
+.lp
+Take care that you are working with a current version of this document: you
+will not be informed of updates.  For a current version, please see the source
+documentation at http://www.openss7.org/.
+.lp
+.(l I
+$Log: datamodel.me,v $
+Revision 0.9.2.2  2005/05/14 08:33:17  brian
+- copyright header correction
+
+Revision 0.9.2.1  2004/03/16 05:10:38  brian
+- Added drafts and figures.
+
+Revision 0.8.2.1  2003/02/23 00:52:29  brian
+Some idref and bullet changes.
+
+Revision 0.8  2002/04/02 08:10:53  brian
+Started Linux 2.4 development branch.
+
+Revision 0.7.8.1  2002/01/11 00:57:10  brian
+Checkin.
+
+Revision 0.7  2001/12/20 21:14:09  brian
+Working on datamodel document.
+
+Revision 0.7.8.1  2001/12/11 13:14:59  brian
+Branched for new development.
+
+Revision 0.7.6.1  2001/12/11 11:06:00  brian
+Corrected PS output.
+
+Revision 0.7  2001/12/11 03:22:53  brian
+Added doc files.
+
+.)l
+.de $0
+.if \\$3>0 \{\
+.if \\$3<4 \{\
+.(x 0
+.ie '\\$2'' \\$1
+.el \\$2 \\$1
+.\"'
+.)x \\n(ch-\\n%
+.\}
+.\}
+..
+.de $C
+.ds &f Figure \\$2-
+.ds &c \\n(ch
+.nr &n 1
+.nr &p 0
+.nr % 1
+.nr $1 \\n(ch
+.nr $2 0
+.nr $3 0
+.nr $4 0
+.nr $5 0
+.(x 0
+\\$2 \\$3
+.)x \\n(ch-\\n%
+..
+.fo '$Revision: 0.9.2.2 $'Page \\\\*(&c-\\\\n%'\\\\*(td'
+.pn 1
+.++ C 'SIGTRAN\ Data\ Models''OpenSS7\ Corporation'
+.+c Introduction
+.sh 2 "Overview"
+.lp
+Here is a reference.
+.[
+m2pa-03
+.]
+.lp
+This is a footnote\**.
+.(f
+\** This is a footnote.
+.)f
+.lp
+This is an endnote\*#.
+.(d
+.ip \*#
+This is an endnote.
+.)d 4
+This is another endnote\*#.
+.(d
+.ip \*#
+This is an endnote.
+.)d 4
+.sh 2 "Document Organization"
+.sh 2 "Terminology"
+.ip "\fI\}Signalling Gateway Process (SGP)\fR\}"
+A signalling gateway process is a process instance acting as a transport
+endpoint and provides the functions of a signalling gateway.
+.ip "\fI\}Application Server Process (ASP)\fR\}"
+An application server process is a process instance acting as a transport
+endpoint that obtains services from a remote process of a signalling gateway
+and provides those services to a local instance of an application server.
+.ip "\fI\}\fR\}"
+.ip "\fI\}\fR\}"
+.ip "\fI\}\fR\}"
+.ip "\fI\}\fR\}"
+.ip "\fI\}\fR\}"
+.lp
+.#e
+.pn 1
+.+c "Data Model"
+.(b
+.sh 2 "Overview"
+.ie '\*(.T'ps' \{\
+.so datamodel.fig1.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -1
+\fC\)\
+      |               |               |               |
+   ___|___         ___|___         ___|___         ___|___
+  |       |       |       |       |       |       |       |
+  | SS7-U |       | XPort |       | XPort |       | SS7-U |
+  |_______|       |_______|       |_______|       |_______|
+      :               |               |               :
+      :            ___|___         ___|___            :
+      :           |       |       |       |           :
+      :           |  ASP  |       |  ASP  |           :
+      :           |_______|       |_______|           :
+      :             : |               | :             :
+      :  ...........: |______   ______| :...........  :
+      : :                    | |                    : :
+   ___:_:_                 __|_|__                 _:_:___
+  |       |               |       |               |       |
+  |  AS   |...............|  SP   |...............|  AS   |
+  |_______|               |_______|               |_______|
+      ::::                   | |                   ::::
+      ::::            _______| |_______            ::::
+      ::::           |                 |           ::::
+      ::::        ___|___           ___|___        ::::
+      ::::       |       |         |       |       ::::
+      ::::.......|  SG   |         |  SG   |.......::::
+      :::        |_______|         |_______|        :::
+      :::.......    | |               | |    .......:::
+      ::       :  __| |__           __| |__  :       ::
+      ::.......:.|...... |         | ......|.:.......::
+      :       _:_|___ _:_|___   ___|_:_ ___|_:_       :
+      :      |       |       | |       |       |      :
+      :      |  SGP  |  SGP  | |  SGP  |  SGP  |      :
+      :      |_______|_______| |_______|_______|      :
+      :          |       |         |       |          :
+   ___:___    ___|___ ___|___   ___|___ ___|___    ___:___
+  |       |  |       |       | |       |       |  |       |
+  | SS7-P |  | XPort | XPort | | XPort | XPort |  | SS7-P |
+  |_______|  |_______|_______| |_______|_______|  |_______|
+      |          |       |         |       |          |
+      |          |       |         |       |          |
+.sz +1
+.)c
+.\}
+.#f "Overview"
+.)b
+.lp
+\fI\*(&f\n(&p\fR illustrates the general data model for SIGTRAN protocols.
+The main characteristics of the model are as follows:
+.ip "SS7-U"
+Each SS7 User is an opened STREAM.  SS7 Users are direct users of an
+Application Server (AS).  Although an Application Server is not necessarily 
+associated with a local SS7 User, each local SS7 User is associated with one
+and only one Application Server (AS).
+.ip "SS7-P"
+Each SS7 Provider is a linked STREAM.  SS7 Providers are direct providers of
+services to an Application Server (AS).  Although an Application Server is not
+necessarily associated with a local SS7 Provider, each local SS7 Provider is
+associated with one and only one Application Server.
+.ip "XPort"
+Each transport endpoint is a linked STREAM and is connected to either an ASP
+or an SGP.  On the local end of the STREAM is a transport data structure which
+contains information about the linked stream.
+.ip "SGP"
+Each transport endpoint connected to an SGP is represented by an SGP
+data structure.  This data structure acts as a proxy for the connected SGP.
+.ip "ASP"
+Each transport endpoint connected to an ASP is represented by an ASP
+data structure.  This data structure acts as a proxy for the connected ASP.
+.ip "SP"
+Each local Signalling Process (SP) has an SP data structure.  This permits a
+single host to represent multiple ASP or SGP.  Each local Signalling Process
+(SP) is either an ASP or an SGP or both (an SPP), but there is only one SP
+data structure per Signalling Process.
+.ip "SG"
+A group of transport endpoints connected to SGP that make up the same
+Signalling Gateway (SG) is represented by an SG structure.
+.ip "AS"
+An application server (AS) is an instance of a route (link) key and an AS data
+structure is associated with each route (link) key.  Application Servers (AS)
+can provide service locally to an SS7 User (SS7-U) or provide service remotely
+to a number of ASP; or obtain service locally from an SS7 Provider (SS7-P) or
+obtain service remotely from a number of SGP.
+.sh 3 "XPort to ASP/SGP Relationship"
+.lp
+There is a direct relationship between transport endpoint structures and ASP
+or SGP structures.
+.lp
+A transport endpoint can be associated either with ASP structures or with SGP
+structures (but not both).\**
+.(f
+\** There is also the concept of an SPP which acts as both ASP and SGP or IPSP
+in the SIGTRAN model, but this has not yet been implemented.
+.)f
+This is because the process at the remote end of the transport connection is
+either an ASP or an SGP but not both.  A transport endpoint can be associated
+with more than one ASP or SGP structure, but, only one ASP or SGP structure
+can be associated with a transport endpoint for a given protocol level.  So,
+for example, a given transport endpoint might be associated with 5 ASPs, one
+for M2UA, one for M3UA, one for ISUA, one for SUA and one for TUA.
+.lp
+There is a one-to-many relationship between a transport endpoint and ASP (SGP).\**
+.(f
+\** Current implementation provides only for a one-to-one relationship.  This
+is not a serious limitation, because multiplexing multiple UAs over a single
+SCTP association using Payload Protocol Identifier is not common.
+.)f
+.\".sh 3 "SS7 to ASP/SGP Relationship"
+.\".lp
+.\"An SS7 User can be associated with an single ASP data structure.  An SS7
+.\"Provider can be associated with a single SGP data structure.  The reason that
+.\"an SS7 User (Provider) can only be associated with one ASP (SGP), is because
+.\"an SS7 User (Provider) only supports a single protocol level.  Aside from
+.\"that, the relationship between SS7 Users (Providers) and ASP (SGP) is similar
+.\"to the case of the transport endpoint.
+.\".lp
+.\"There is a one-to-one relationship between an SS7 User (Provider) and
+.\"an ASP (SGP).
+.sh 3 "SG to SGP Relationship"
+.lp
+An SG data structure can be associated with more than one SGP data structure;
+however, the associated SG data structures must be for the same protocol level
+as the SG with which they are associated.  An SGP can only be associated with
+one and only one SG data structure.
+.lp
+The SG represents the remote SG instance which is providing the SGPs
+represented by the associated SGP data structures.
+.lp
+There is a one-to-many relationship between SG and SGP.
+.sh 3 "SP to ASP Relationship"
+.lp
+An SP data structure can be associated with more than one ASP data structure;
+however, the associated ASP data structure must be for the same protocol level
+as the SP with which they are associated.  An ASP can only be associated with
+one and only one SP data structure.
+.lp
+The SP represents a local SGP instance which is serving the ASPs represented
+by the associated ASP data structures.
+.lp
+There is a one-to-many relationship between SP and ASP.
+.sh 3 "SP to SG Relationship"
+.lp
+The SP represents a local ASP instance which is obtaining service from the SGs
+represented by the associated SG data structures.  An SP can be associated with
+more than one SG, and an SG can be associated with more than one SP.  The
+relationship contains the ASP Identifier that is used by the SP when
+communicating with the associated SG.
+.lp
+There is a many-to-many relationship between SP and SG.
+.(b
+.sh 3 "AS Relationships"
+.sh 4 "AS to ASP Relationship"
+.ie '\*(.T'ps' \{\
+.so datamodel.fig2.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -1
+\fC\)\
+      _______  _______  _______      _______                
+     |       ||       ||       |    |       |               
+     | XPort || XPort || XPort |    | SS7-U |               
+     |_______||_______||_______|    |_______|               
+      ___|___  ___|___  ___|___         |                   
+     |       ||       ||       |        |                   
+/--->|  ASP  ||  ASP  ||  ASP  |        |                   
+|    |_______||_______||_______|        |                   
+|        ^^       ^^       ^^           |                   
+|        ||       ||____   ||           |                   
+|        ||_____  |__   |  ||_          |                   
+|        |_____ |_   |  |  |  |         |                   
+|              |  |  |  |  |  |      ___|___                
+|             _v  | _v  | _v  |     |       |               
+|          <-|gp|<-|gp|<-|gp|<----->|  AS   |               
+|            |__| ||__| ||__| |     |_______|               
+|              \\  |  \\  |  \\  |         ^                   
+|               \\ |   \\ |   \\ |      ___|___                
+|                \\v    \\v    \\v     |       |               
+|             <-|gp|<-|gp|<-|gp|<-->|  AS   |               
+|               |__|  |__|  |__|    |_______|               
+|                                       ^                   
+|              _______                  |                   
+|             |       |                 |                   
+\\-------------|  SP   |-----------------/                  
+              |_______|                                     
+.sz +1
+.)c
+.\}
+.#f "AS to ASP Relationship"
+.)b
+.lp
+\fI\*(&f\n(&p\fR illustrates the AS to ASP relationship.
+.lp
+An AS structure is related to an ASP structure in that the AS structure
+represents the AS at the remote ASP (or local SS7 User) that is being served
+by the local SGP (SP).
+.lp
+The AS structure contains the state of the AS at the local SGP (down, pending,
+inactive, activating, deactivating, active).
+.lp
+The GP (graph) structures between the AS and ASP structures contain the state
+of the AS for the given remote ASP (down, inactive, activating, deactivating,
+active).
+.lp
+The ASP structure contains the state of the remote ASP at the local SGP (down,
+coming up, going down, up).
+.lp
+There is a many-to-many relationship between AS and ASP.
+.(b
+.sh 4 "AS to SGP Relationship"
+.ie '\*(.T'ps' \{\
+.so datamodel.fig3.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -1
+\fC\)\
+               _______                                      
+              |       |                                     
+/-------------|  SG   |-----------------\\                   
+|             |_______|                 |                   
+|                                       |                   
+|                                    ___v___                
+|                __    __    __     |       |               
+|             <-|gp|<-|gp|<-|gp|<-->|  AS   |               
+|               |__|  |__|  |__|    |_______|               
+|                /^    /^    /^         |                   
+|               / |   / |   / |      ___v___                
+|             _/  | _/  | _/  |     |       |               
+|          <-|gp|<-|gp|<-|gp|<----->|  AS   |               
+|            |__| ||__| ||__| |     |_______|               
+|              ^ _|  ^  |  ^  |         |                   
+|         _____||  __|  |  | _|         |                   
+|        | _____| | ____|  ||           |                   
+|        ||       ||       ||           |                   
+|     ___vv__  ___vv__  ___vv__         |                   
+|    |       ||       ||       |        |                   
+\\--->|  SGP  ||  SGP  ||  SGP  |        |                   
+     |_______||_______||_______|        |                   
+      ___|___  ___|___  ___|___      ___|___                
+     |       ||       ||       |    |       |               
+     | XPort || XPort || XPort |    | SS7-P |               
+     |_______||_______||_______|    |_______|               
+                                                            
+.sz +1
+.)c
+.\}
+.#f "AS to SGP Relationship"
+.)b
+.lp
+\fI\*(&f\n(&p\fR illustrates the AS to SGP relationship.
+.lp
+An AS structure is related to an SGP structure in that the AS structure
+represents the AS at the local ASP (SP) that is being served by the SGP (or
+local SS7 Provider).
+.lp
+The AS structure contains the state of the AS at the local ASP (down,
+inactive, activating, deactivating, active).
+.lp
+The GP (graph)s structures between the AS and SGP structures contain the state
+of the AS for the given remote SGP (down, inactive, activating, deactivating,
+active).
+.lp
+The SGP structure contains the state of the remote SGP at the local ASP (down,
+coming up, going down, up).
+.lp
+There is a many-to-many relationship between AS and SGP.
+.(b
+.sh 4 "AS to SP Relationship"
+.ie '\*(.T'ps' \{\
+.so datamodel.fig2.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -1
+\fC\)\
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+.sz +1
+.)c
+.\}
+.#f "AS to SP Relationship"
+.)b
+.lp
+\fI\*(&f\n(&p\fR illustrates the AS to SP relationship.
+.lp
+An AS structure is related to an SP structure in that the AS structure
+represents the AS that is being served by the local SGP (SP).
+\fB\)FIXME: more description here....\fR\)
+.lp
+An AS can be associated with one and only one SP; however, and SP can be
+associated with more than one AS.  It can be viewed that an SP has a list of
+all the AS with which it is associated.
+.lp
+There is a one-to-many relationship between SP and AS.
+.(b
+.sh 4 "AS to SG Relationship"
+.ie '\*(.T'ps' \{\
+.so datamodel.fig3.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -1
+\fC\)\
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+.sz +1
+.)c
+.\}
+.#f "AS to SG Relationship"
+.)b
+.lp
+\fI\*(&f\n(&p\fR illustrates the AS to SG relationship.
+.lp
+An AS structure is related to an SG structure in that the AS structure
+represents the AS at the local ASP (SP) that is being served by the SG.  It
+contains the Routing Context (RC) or Interface Identifier (IID) that is used
+by the AS for the associated SG.  Where the AS is served by multiple SGs, the
+relationship also contains the routing tables that describe the accessibility
+of SS7 destinations via the associated SG.
+.lp
+There is a many-to-many relationship between SG and AS.
+.#e
+.pn 1
+.+c "Data Structure Life-Cycle"
+.sh 2 "Creation"
+.lp
+This section discusses the creation of UA data structures.
+.sh 3 "Boot-Time Configuration"
+.lp
+.sh 3 "Layer Management Configuration"
+.lp
+.sh 4 "Static Configuration"
+.lp
+Static configuration is performed by Layer Management in advance of any
+run-time event.
+.lp
+The Layer Manger has the following commands at its disposal.
+.sh 5 "GET/ADD/CHA/DEL an SP"
+.lp
+An SP data structure is examined, added, changed or deleted using the
+UA_IOCGCONFIG, UA_IOCSCONFIG, UA_IOCTCONFIG and UA_IOCCCONFIG controls using
+the object type UA_OBJ_TYPE_SP.
+.lp
+The argument to the control is a SP configuration structure as follows:
+.(b
+.nf
+.sz -1
+\fC\
+typedef struct ua_config {
+        ulong type;     /* object type */
+        ulong id;       /* object id */
+        ulong cmd;      /* object command */
+        /* followed by object-specific config structure */
+} ua_config_t;
+
+typedef struct ua_conf_sp {
+        struct spid;    /* paired signalling process identifier */
+        ulong cost;     /* cost */
+        ulong tmode;    /* traffic mode */
+} ua_conf_sp_t;
+.sz +1
+.)b
+.lp
+The configuration structure contains the following fields:
+.ba +\n(biu
+.ip "\fI\)type\fR"
+The object type.  For SP objects, the type is always UA_OBJ_TYPE_SP.
+.ip "\fI\)id\fR"
+The identifier for the object.  The identifier is returned from the UA_ADD
+command and is provided to the UA_CHA and UA_DEL commands.  The caller may
+select a unique identifier of its own when performing the UA_ADD command.
+Otherwise, the caller sets this value to zero(0) and the driver will assign a
+unique identifier and return it in the return argument from the UA_ADD
+command.
+.ip "\fI\)cmd\fR"
+The command can be one of the following:
+.ba +\n(iiu
+.ip "UA_ADD" 12
+This command requests the UA driver to create the specified object and return
+any driver-selected identifiers.
+.ip "UA_CHA" 12
+This command requests the UA driver to change the cost or traffic handling mode
+associated with the specified SP structure.
+.ip "UA_DEL" 12
+This command request the UA driver to delete the specified object.
+.ba -\n(iiu
+.ip "\fI\)spid\fR"
+This is the identifier of the UA_OBJ_TYPE_SG object with which this SP is to
+be associated.  This identifier can be coded zero to indicate that no existing
+SG objects are associated with this SP object.
+.ip "\fI\)cost\fR"
+The cost of the SP to the associated SGs.  Where AS-Ps have multiple AS-Us to
+which they provide service, this cost value helps the driver to determine
+which AS-U will be used to reach the SS7 User.  This is the default cost that
+will be assigned to an AS-U when it is dynamically created.
+.ip "\fI\)tmode\fR"
+When routing messages from the AS-U to remote ASPs, the traffic handling mode
+of the AS-U is used to determine which of a number of active ASPs will be
+selected to receive the traffic.  This is the default traffic handling mode
+that will be assigned to an AS-U when it is dynamically created.
+.ba -\n(biu
+.lp
+SP data structures do not have to be associated with any other data structure
+at creation.
+When an SP data structures are created management blocked for enabling and
+activation.  This means that no AS-U or ASP later associated with the SP will
+have an enabling or activation procedure initiated on them until the SP is
+unblocked.
+.lp
+Deleting an SP data structure without force (UA_IOCSCONFIG) requires that all
+associated data structures have been previously deleted.  Deleting an SP data
+structure with force (UA_IOCCCONFIG) will delete all other data structures
+associated with the SP data structure being deleted.
+.sh 5 "GET/ADD/CHA/DEL an SG"
+.lp
+An SG data structure is examined, added, changed or deleted using the
+UA_IOCGCONFIG, UA_IOCSCONFIG, UA_IOCTCONFIG and UA_IOCCCONFIG controls using
+the object type UA_OBJ_TYPE_SG.
+.lp
+The argument to the control is a SP configuration structure as follows:
+.(b
+.nf
+.sz -1
+\fC\
+typedef struct ua_config {
+        ulong type;     /* object type */
+        ulong id;       /* object id */
+        ulong cmd;      /* object command */
+        /* followed by object-specific config structure */
+} ua_config_t;
+
+typedef struct ua_conf_sp {
+        struct spid;    /* paired signalling process identifier */
+        ulong cost;     /* cost */
+        ulong tmode;    /* traffic mode */
+} ua_conf_sp_t;
+.sz +1
+.)b
+.lp
+SG data structures must be associated with an existing SP data structure at
+creation time.
+SG data structures are created management blocked for enabling and activation.
+This means that no AS-P or SGP later associated with the SG will have an
+enabling or activation procedure initiated on them until the SG is unblocked.
+.lp
+Deleting an SG data structure without force (UA_IOCSCONFIG) requires that all
+associated data structures (other than the SP data structure) have been
+previously deleted.  Deleting an SG data structure with force (UA_IOCCCONFIG)
+will delete all other data structures associated with the SG data structure
+(except the SP data structure).
+.sh 5 "GET/ADD/CHA/DEL an ASP"
+.lp
+An ASP data structure is examined, added, changed or deleted using the
+UA_IOCGCONFIG, UA_IOCSCONFIG, UA_IOCTCONFIG and UA_IOCCCONFIG controls using
+the object type UA_OBJ_TYPE_ASP.
+.lp
+The argument to the control is a SPP configuration structure as follows:
+.(b
+.nf
+.sz -1
+\fC\
+typedef struct ua_config {
+        ulong type;     /* object type */
+        ulong id;       /* object id */
+        ulong cmd;      /* object command */
+        /* followed by object-specific config structure */
+} ua_config_t;
+
+typedef struct ua_conf_spp {
+        struct spid;    /* signalling process identifier */
+        ulong aspid;    /* ASP Id */
+        ulong cost;     /* cost */
+} ua_conf_spp_t;
+.sz +1
+.)b
+.lp
+ASP data structures must be associated with an existing SP data
+structure at creation time.
+When an ASN data structure is created it is created in the ASP_DOWN
+state and is management blocked for enabling.  This means that no automatic
+procedure will be initiated on the ASP to move it from the ASP_DOWN
+state until it is unblocked.  Also, any receive ASPUP messages will be refused
+due to management blocking.
+.lp
+Deleting an ASP data structure without force (UA_IOCSCONFIG) requires
+that all associated data structure (other than the SP data structure)
+have been previously deleted.  Deleting an ASP data structure with
+force (UA_IOCCCONFIG) will delete all other data structures associated with
+the ASP data structure (except the SP data structure).
+.sh 5 "GET/ADD/CHA/DEL an SGP"
+.lp
+An SGP data structure is examined, added, changed or deleted using the
+UA_IOCGCONFIG, UA_IOCSCONFIG, UA_IOCTCONFIG and UA_IOCCCONFIG controls using
+the object type UA_OBJ_TYPE_SGP.
+.lp
+The argument to the control is a SPP configuration structure as follows:
+.(b
+.nf
+.sz -1
+\fC\
+typedef struct ua_config {
+        ulong type;     /* object type */
+        ulong id;       /* object id */
+        ulong cmd;      /* object command */
+        /* followed by object-specific config structure */
+} ua_config_t;
+
+typedef struct ua_conf_spp {
+        struct spid;    /* signalling process identifier */
+        ulong aspid;    /* ASP Id */
+        ulong cost;     /* cost */
+} ua_conf_spp_t;
+.sz +1
+.)b
+.lp
+SGP data structures must be associated with an existing SG data
+structure at creation time.
+When an ASN or SGP data structure is created it is created in the ASP_DOWN
+state and is management blocked for enabling.  This means that no automatic
+procedure will be initiated on the SGP to move it from the ASP_DOWN
+state until it is unblocked.
+.lp
+Deleting an SGP data structure without force (UA_IOCSCONFIG) requires
+that all associated data structure (other than the SG data structure)
+have been previously deleted.  Deleting an SGP data structure with
+force (UA_IOCCCONFIG) will delete all other data structures associated with
+the SGP data structure (except the SG data structure).
+.sh 5 "GET/ADD/CHA/DEL an AS"
+.lp
+An AS data structure is examined, added, changed or deleted using the
+UA_IOCGCONFIG, UA_IOCSCONFIG, UA_IOCTCONFIG and UA_IOCCCONFIG controls using
+the object type UA_OBJ_TYPE_AS_U or UA_OBJ_TYPE_AS_P.
+.lp
+The argument to the control is a AS configuration structure as follows:
+.(b
+.nf
+.sz -1
+\fC\
+typedef struct ua_config {
+        ulong type;     /* object type */
+        ulong id;       /* object id */
+        ulong cmd;      /* object command */
+        /* followed by object-specific config structure */
+} ua_config_t;
+
+typedef struct ua_conf_as {
+        ulong spid;                             /* signalling process identifier */
+        ulong iid;                              /* interface id */
+        struct sl_addr add;                     /* signalling link address */
+} ua_conf_as_t;
+.sz +1
+.)b
+.lp
+AS-U data structures must be associated with an existing SP data structure at
+creation time.  AS-P data structures must be associated with an existing SG
+data structure at creation time.
+When an AS data structure is created it is created in the AS_DOWN state and
+is management blocked for activation.
+This means that no automatic procedure will be initiated on the AS-U or AS-P
+to move it from the AS_DOWN state until it is unblocked.
+.sh 4 "Dynamic Configuration"
+.lp
+Dynamic configuration is performed in response to UA driver run-time events.
+.sh 5 "SS7 User Streams"
+.lp
+When an SS7 User stream is opened, an SS7-U data structure is allocated for the
+stream.  This data structure contains information about the stream including
+the device number.
+.lp
+After being opened, and whenever the stream is in an unbound (unattached)
+state, an SS7-U structure is not associated with an AS-U.
+.lp
+When an SS7 User stream is bound or attached, an AS data structure might be
+associate with the SS7 User stream.  The list of existing AS data structures
+is searched for a match on the route (link) key based on the information from
+the bind (attach).
+Only the AS-U data structures associated with the Signalling Process (SP)
+indicated in the protocol address of the bind (attach) request are searched.
+.lp
+If an AS-U data structure exists whose Routing Key (Link Key) information
+matches the requested protocol address, the AS data structure will be
+associated with the SS7-U structure.  However, if the AS data structure was
+already associated with an SS7 User, then the bind (attach) request fails with
+an error indicating that the protocol address is already bound (attached).
+.lp
+If no AS data structure exists for the SP data structure indicated by the
+protocol address in the bind (attach) request, and the SP does not support
+dynamic registration, the request will fail with an error indicating that
+there is no such protocol address.
+.lp
+If no AS data structure exists for the SP data structure indicated by the
+protocol address in the bind (attach) request, and the SP supports dynamic
+registration, a registration indication will be given to Layer Management
+identifying the SP for the request and the protocol address used in the
+request and a response timer is started.  Layer Management is expected to
+issue a registration response that contains the SP data structure identifier
+and either indicates failure, or the identifier of the AS-U data structure
+which has been added to satisfy the request.  If the response timer expires
+before an response is forthcoming from Layer Management, the bind (attach)
+request will be refused.
+.lp
+When an SS7 User connectionless stream is bound, or an SS7 User
+connection-oriented stream is connected, or an SS7 User link is enabled, the
+UA driver attempts to activate the AS-U.  This results in the activation of
+the AS-P and the subsequent activation with local SS7-P or remote subtending
+SGP in each SG.
+.lp
+Should all of the active or inactive SS7 Providers and SGP supporting an SS7
+User stream fail, an M_HANGUP will be delivered to the application on the
+stream.  The application must close and reopen the stream or otherwise reset
+the stream to make it available again for use.
+.sh 5 "SS7 Provider Streams"
+.lp
+SS7 Provider streams are I_LINK or I_PLINK'ed under the UA multiplexing
+driver in the newly opened state.
+.bu
+For M2UA, the SS7 provider stream is an SL (Signalling Link) stream.
+newly opened state.
+.bu
+For M3UA, the SS7 provider stream is an MTP (Message Transfer Part) stream,
+either connectionless or connection oriented.
+.bu
+For SUA, the SS7 provider stream is an SCCP (Signalling Connection Control
+Part) stream.
+.bu
+For TUA, the SS7 provider stream is a TR/TC (Transaction Handing or Component
+Handling) stream.
+.bu
+For ISUA, the SS7 provider stream is an ISUP (ISDN Uer Part) CC (Call Control)
+stream.
+.lp
+After an SS7 Provider stream is linked, it needs to be associated with an AS-P
+data structure by Layer Management.  Layer Management must create an AS data
+structure (if one does not yet exist) using the UA_ADD command to the
+UA_IOCSCONFIG control for object type UA_OBJ_TYPE_AS_P, and associate it with
+the linked SS7 Provider stream using the UA_ADD command to the UA_IOCSCONFIG
+control for object type UA_OBJ_TYPE_SS7_P.
+.lp
+Whenever an SS7 Provider stream is associated with an AS-P,\**
+.(f
+\** An SS7 Provider stream is associated with an AS-P by Layer Management
+issuing the UA_IOCSCONFIG or UA_IOCCCONFIG control with the UA_ADD command on
+a UA_OBJ_TYPE_SS7_P object type.
+.)f
+the SS7 Provider is considered to be ASP_UP for the AS-P.  This moves the AS-P
+that has no associated SGP and is otherwise in the AS_DOWN state to the
+AS_INACTIVE state.
+.lp
+Whenever an SS7 Provider stream is disassociated with an AS-P,\**
+.(f
+\** An SS7 Provider stream is disassociated with an AS-P by Layer Management
+issuing the UA_IOCSCONFIG or UA_IOCCCONFIG control with the UA_DEL command on
+the UA_OBJ_TYPE_SS7_P object type.
+.)f
+the SS7 Provider is considered to be ASP_DOWN for the AS-P.  This moves the
+AS-P that has no associated SGP to the AS_DOWN state.
+.lp
+Whenever an AS-U is activated and the corresponding AS-P needs to be
+activated, the SS7 Provider stream will be bound, connected, attached or
+enabled.
+.lp
+If an SS7 provider stream should receive an M_ERROR or M_HANGUP from below
+indicating that a fatal error has occurred on the stream, the SS7-P will be
+moved to the ASP_DOWN state for the AS-P and management will be informed.  It
+is the responsibility of management to then unlink, close, reopen and relink,
+or otherwise reset the stream.
+.sh 5 "Transport Streams"
+.lp
+Transport streams are I_LINK or I_PLINK'ed under the UA multiplexing driver in
+the connected state.
+.lp
+After a transport stream is linked, it needs to be associated with an ASP or
+SGP structure by Layer Management.  Layer management must create an ASP or SGP
+structure (if one does not yet exist) using the UA_ADD command to the
+UA_IOCSCONFIG control for object type UA_OBJ_TYPE_ASP or UA_OBJ_TYPE_SGP, and
+associate it with the linked Transport stream using the UA_ADD command to the
+UA_IOCSCONFIG control for object type UA_OBJ_TYPE_XP_SCTP, UA_OBJ_TYPE_XP_TCP
+or UA_OBJ_TYPE_XP_SSCOP.
+.lp
+.sh 5 "SGP Transport Streams"
+.lp
+When an SGP Transport stream is linked, it needs to be associated with an SGP
+data structure by Layer Management.  Layer Management must create an SGP
+data structure (if one does not yet exist) and associate it with the linked
+Transport stream.  The Layer Manager must also associate the SGP data structure
+with an SG data structure.
+.lp
+After the transport stream is associated with an SGP and SG data structure,
+Layer Management needs to initiate initiate the ASP Up procedure.  LM
+initiates the ASP Up procedure by issuing the UA_IOCCMGMT control using the
+UA_ASP_UP command and the UA_OBJ_TYPE_SS7_P object type and identifier.
+.lp
+After successful completion of the ASP Up procedures, the UA driver will check
+whether there are any AS configured for the SGP and SG in question that are
+ACTIVE or PENDING.  If there are active or pending AS, the UA driver will
+attempt to activate each such AS, where appropriate according to the traffic
+mode of the AS, for the newly available SGP.
+.lp
+Should the SGP transport stream receive an M_ERROR or M_HANGUP, the SGP
+failure will be reported to management.  It is the responsibility of
+management to unlink the SGP transport stream, close, reopen and relink the
+stream.
+.lp
+Should the SGP transport stream abort (receive a T_DISCON_IND) then the SGP
+failure will be reported to management.  In this case, it is the
+responsibility of management to unlink, reconnect, and relink the stream.
+This may also be accomplished using the UA_IOCCPASS controls to pass IOCTL
+controls to the linked stream.  The ASP Up procedure will also have to be
+reinvoked on the stream.
+.lp
+Should the SGP transport stream receive an unsolicited ASP Down Ack indicating
+that the SGP has gone down, the driver will make one attempt to invoke the ASP
+Up procedure, and if the attempt fails, will inform management that the ASP is
+in the ASP Down state due to SGP failure.
+.sh 5 "ASP Transport Streams"
+.lp
+When an ASP Transport stream is linked, it needs to be associated with an ASP
+data structure by Layer Management.  Layer Management must create an ASP data
+structure (if one does not yet exist) and associate it with the linked
+Transport stream.  The layer manager may alternately associate the ASP data
+structure with an SP data structure.
+.lp
+After the transport stream is associated with an ASP or SP data structure, the
+UA driver will permit the ASP Up procedures to occur.  Until this point, an
+ASP Up received on the transport stream will be queued.
+.lp
+In the case where an ASP transport stream is associated with an ASP
+data structure, the ASP Up procedure need not supply an ASP Id parameter,
+unless the ASP data structure does not contain an ASP Id.
+.lp
+In the case where an ASP transport stream is associated with an SP
+data structure, the ASP Up procedure must contain an ASP Id parameter.  The
+ASP Id parameter received in the ASPUP request message will be used to:
+.af $p i
+.np
+Identify an existing ASP data structure with the corresponding ASP Id.
+.np
+Create a new ASP data structure with the corresponding ASP Id.
+The new ASP data structure is created, the ASP data structure
+will support the full set of AS provided by the SP.
+.lp
+After the transport stream has successfully completed the ASP Up procedures,
+the receipt of a REG REQ message will cause the UA driver to attempt to
+register the given route (link) key.  Registration of the route (link) key
+will be performed by scanning the list of AS-U associated with the SP
+receiving the REG REQ.  If an AS-U exists for the routing (link) key, the
+Interface Identifier or Routing Context associated with the existing AS-U will
+be returned in the REG RESP message.
+.lp
+If an AS-U does not exist for the routing (link) key and the SP supports
+dynamic registration, an AS-U structure will be created.  In addition, AS-P
+structures for the SG providing service to the SP will also be created.  This
+could trigger additional REG REQ messages to the SGP supporting the newly
+formed AS-P.  Only once one of the  AS-P have been successfully registered
+will the REG RESP message be sent to the registering ASP.
+.lp
+AS-U created in this fashion will be marked for dynamic registration so that
+when the last ASP de-registers for the AS, the AS-U and associated AS-P can be
+deregistered and deleted.
+.lp
+As a result of a successful REG REQ, the ASP data structure will be associated
+with an AS data structure representing the registered route (link) key.
+.lp
+The addition of or configuration of a new AS data structure may trigger the UA
+to generate further REG REQ messages to SGP (maybe peers) that are supporting
+the AS.  The UA driver may wait for the responses from these subsequent REG
+REQ messages before replying to the initial REG REQ message.
+.lp
+After the transport stream is successfully configured or registered, the
+receipt of an ASPAC REQ message will cause the UA driver to attempt to
+activate the AS.  If the AS is pending already active for a different ASP, the
+activation immediately succeeds.  If the AS is inactive, the necessary steps
+to activate the AS are taken by the driver.  This could include:
+.af $p i
+.np
+Binding, connecting, attaching and enabling SS7 provider streams to provide
+service for the AS.
+.np
+Activating the AS to remote SGP.
+.lp
+Only once the AS has been successfully activated will the ASPAC Ack be returned
+to the requesting remote ASP.  Otherwise, the ASPIA Ack or MGMT ERR is
+returned instead.  Management is informed of failures to activate remote ASPs
+for a given AS, so that management may take corrective action if the failure
+is due to misconfiguration of the system.
+.lp
+Should the ASP transport stream receive an M_ERROR or M_HANGUP, the SGP
+failure will be reported to management.  It is the responsibility of management
+to unlink the ASP transport stream, close, reopened and relink the stream.
+.lp
+Should the ASP transport stream abort (receive a T_DISCON_IND) then the ASP
+failure will be reported to other ASPs using the AS with a MGMT NTFY message,
+and management will be informed.  In this case, it is the responsibility of
+management to unlink the stream and await a new connection indication from the
+ASP.
+.lp
+Should the transport stream receive an ASPDN Request indicating that the ASP
+wishes to go down, the driver will information management and place the ASP in
+the ASP_DOWN state for all associated AS.  The driver will await a new ASP Up
+Request to reestablish the ASP.  No failure notification is given to ASP
+peers.
+.sh 2 "Destruction"
+.lp
+This section discusses the destruction of UA data structures.
+.lp
+.sh 2 "ASP Up and ASP Down Procedures"
+.lp
+Enabling and disabling of ASPs can be performed automatically in some
+circumstances, or under the control of Layer Management.  ASPs may also be
+management blocked from being enabled or disabled automatically.
+.sh 3 "Management Enabling and Disabling"
+.lp
+Layer management can enable or disable a local or remote ASP at any time using
+the UA_ASPUP or UA_ASPDN command to the UA_IOCCMGMT control using one of the
+following object types and identifiers:
+.ip "UA_OBJ_TYPE_SS7_U"
+Only the UA_ASPDN command is valid for this object type.  This will result in
+the sending of M_HANGUP to the specified local SS7-U stream.
+.ip "UA_OBJ_TYPE_ASP"
+Only the UA_ASPDN command is valid for this object type.  This will result in
+the sending of an unsolicited ASPDN Ack to the remote ASP.
+.ip "UA_OBJ_TYPE_SP"
+The UA_ASPDN command will result in sending an unsolicited ASPDN Ack to all
+remote ASPs and a M_HANGUP to all local SS7-Us.  Subtending local SS7-Ps will
+be deactivated, and remote SGPs will be sent the ASPDN Request to initiate the
+ASP Down procedures with the remote SGP.
+.ip ""
+The UA_ASPUP command will result in subtending remote SGPs not in the ASP_UP
+or ASP_WACK_ASPUP state being sent the ASPUP Request to enable the local ASP.
+.ip "UA_OBJ_TYPE_SG"
+The UA_ASPDN command will invoke the ASP Down procedure for all SGP subtending
+the specified SG.  This may also result in taking down the local ASP and
+sending unsolicited ASPDN Ack to remote ASPs should the SG be the only SG
+servicing the remote ASPs.
+.ip ""
+The UA_ASPUP command will invoke the ASP Up procedure for all SGP subtending
+the specified SG.
+.ip "UA_OBJ_TYPE_SGP"
+The UA_ASPDN command will invoke the ASP Down procedure for the specified
+remote SGP.  This may also result in taking down the local ASP and sending
+unsolicited ASPDN Ack or M_HANGUP to remote ASPs or local SS7-Us should the
+SGP be the only means of servicing the local ASP.
+.ip ""
+The UA_ASPUP command will result in the remote SGP not in the ASP_UP or
+ASP_WACK_ASPUP state being sent the ASPUP Request to initiate the ASP Up
+procedures with the remote SGP.
+.sh 4 "Automatic Blocking of Enabling"
+In some circumstances the driver must be automatically blocked from attempts to
+re-enable or re-disable an ASP.  This occurs when the first automatic attempt
+to successfully complete the ASP Up procedure fails.  The driver will inform
+management of the failure to enable the ASP and will block the ASP from
+further attempts at enabling.
+.sh 3 "Automatic Enabling and Disabling"
+.lp
+.sh 4 "Management Blocking of Enabling"
+Management can block a local ASP from attempts by the driver to automatically
+enable or re-enable the local ASP to all remote SG.  This is performed using the
+UA_IOCCMGMT control with the UA_ASPUP_BLOCKING command and the UA_OBJ_TYPE_SP object
+type and identifier.
+.lp
+Management can also block a local ASP from attempts by the driver to automatically
+enable or re-enable the local ASP to a specific remote SG or remote SGP.  This
+is performed using the UA_IOCMGMT control with the UA_ASPUP_BLOCKING command and the
+UA_OBJ_TYPE_SG or UA_OBJ_TYPE_SGP object type and identifier.
+.lp
+Management may also block a remote ASP from enabling or re-enabling the remote
+ASP to the local SGP.  This is performed using the UA_IOCCMGMT control with
+the UA_ASPUP_BLOCKING command and the UA_OBJ_TYPE_ASP object type and identifier.
+.sh 2 "ASP Registration and Deregistration Procedures"
+.lp
+Registration and deregistration can be performed automatically in some
+circumstances, or under the control of Layer Management.
+.sh 3 "Management Activation an Deactivation"
+.sh 4 "Automatic Blocking of Activation"
+.sh 3 "Automatic Activation and Deactivation"
+.sh 4 "Management Blocking of Activation"
+Management can block a local AS-U from attempts by the driver to automatically
+activated or re-activate the local AS to all local SS7-P or remote SG.  This
+is performed using the UA_IOCCMGMT control with the UA_ASPAC_BLOCKING command and the
+UA_OBJ_TYPE_AS_U object type and identifier.
+This also serves to block the AS-U from attempts by remote ASP to activate for
+the AS-U to the local SGP.
+.lp
+Management can block a local ASP from attempts by the driver to automatically
+activate or re-activate the local AS-U to a specific local SS7-P or remote SG
+or SGP.
+This is performed using the UA_IOCCMGNT control with the UA_ASPAC_BLOCKING
+command and the UA_OBJ_TYPE_SS7_P, UA_OBJ_TYPE_SG or UA_OBJ_TYPE_SGP object type and
+identifier.
+This also serves to block the AS-U from attempts by remote ASP to active fro
+the AS-U to the local SGP, when a resource necessary to activate is blocked.
+.lp
+Blocking has no effect on the current state of the object.  For example, to
+prepare to take an AS-U out of service would require performing the
+UA_ASPAC_BLOCKING management control on the AS-U and then performing a
+UA_ASP_INACTIVE management control to deactivate the AS-U.
+.sh 3 "Management Registration and Deregistration"
+.sh 3 "Automatic Registration and Deregistration"
+.sh 2 "ASP Active and ASP Inactive Procedures"
+.#e
+.pn 1
+.+c Data Structures
+.lp
+This chapter describes the individual data structures that make up the UA
+driver configuration database.
+.sh 2 "SP Data Structure"
+.lp
+The SP data structure is as follows:
+.(b
+.nf
+.sz -1
+\fC\
+typedef struct sp {
+        HEAD_DECLARATION (sp);                  /* head declaration */
+        ulong cost;                             /* cost */
+        ulong tmode;                            /* traffic mode */
+        SLIST_COUNT (np);                       /* NP (SP graph) */
+        SLIST_HEAD (as);                        /* AS list */
+        SLIST_COUNT (spp);                      /* ASP list */
+        m2ua_timers_sp_t timers;                /* timers */
+        m2ua_opt_conf_sp_t config;              /* configuration */
+} sp_t;
+.sz +1
+.)b
+.sh 3 "Per-AS Information"
+.sh 3 "Per-SG Information"
+.sh 3 "Per-XP-ASP Information"
+.sh 2 "SG Data Structure"
+.lp
+The SG data structure is shown below
+.(b
+.nf
+.sz -1
+\fC\
+typedef struct sp {
+        HEAD_DECLARATION (sp);                  /* head declaration */
+        ulong cost;                             /* cost */
+        ulong tmode;                            /* traffic mode */
+        SLIST_COUNT (np);                       /* NP (SP graph) */
+        SLIST_HEAD (as);                        /* AS list */
+        SLIST_COUNT (spp);                      /* ASP list */
+        m2ua_timers_sp_t timers;                /* timers */
+        m2ua_opt_conf_sp_t config;              /* configuration */
+} sp_t;
+.sz +1
+.)b
+.lp
+The fields of this data structure are as follows:
+.(l
+.ip "\fI\)next, prev\fR"
+Linkage into master list of SP/SG data structures.
+.ip "\fI\)refcnt\fR"
+Structure reference count.
+.ip "\fI\)lock\fR"
+Structure lock.
+.ip "\fI\)id\fR"
+Identifier which uniquely identifies the SG data structure within the UA
+multiplexing driver.
+This identifier is used by Layer Management to identify the SG.
+.ip "\fI\)state\fR"
+Run-time state of the SG data structure.  The SG data structure can be in one
+of the following states:
+.ba +\n(iiu
+.ip "ASP_DOWN" 28
+All of the SGP in the SG are in the down state to the current SP.
+.ip "ASP_WACK_ASPUP" 28
+All of the SGP in the SG are in the down state to the current SP, but the SP
+is activating for one or more of the SGP in the SG.
+.ip "ASP_WACK_ASPDN" 28
+All of the SGP in the SG are in the down state, are coming up or going down,
+but the SP is going down for at least one SGP.
+.ip "ASP_UP" 28
+All of the SGP in the SG are in the down state, are coming up or going down,
+or are in the up state, but at least one SGP in the SG is in the up state.
+.ba -\n(iiu
+.ip "\fI\)flags\fR"
+Run-time flags associated with the SG data structure.
+.ip "\fI\)type\fR"
+The type of the SG data structure is always UA_OBJ_TYPE_SG.
+.ip "\fI\)cost\fR"
+The cost of this SG amoung other SGs supporting the SP.  SG data
+structures of the same lesser numerical cost will be used before SGs of
+higher numerical cost.
+.ip "\fI\)tmode\fR"
+The default traffic mode of the SG.  This is the traffic handling mode for
+distributing traffic over the SGP that make up the SG.  The traffic handling
+mode for the SG may be one of the following:
+.ba +\n(iiu
+.ip "UA_TMODE_OVERRIDE" 28
+In the over-ride traffic mode, traffic will only be sent to one SGP within the
+SG at a time.
+.ip "UA_TMODE_LOADSHARE" 28
+In the load-share traffic mode, traffic will be distributed over the
+available (active) SGP according to a load sharing scheme.  Typically, SLS
+(Signalling Link Selection) value is used for load sharing.
+.ip "UA_TMODE_BROADCAST" 28
+In the broadcast traffic mode, traffic will be sent to each of the available
+(active) SGP within the SG.
+.ba -\n(iiu
+.ip ""
+This is only the default traffic mode that will be inherited when new AS-P are
+created associated with this SG.  The traffic mode of the AS-P determines how
+traffic associated with the AS will be distributed over SGP within the SG.
+.ip "\fI\)aspid\fR"
+The default ASP Identifier of the SP within this SG.  This is the ASP
+Identifier for identifying the associated ASP (SP) to the SG.  This is only
+the default ASP Identifier that will be inherited when new SGP are created
+and associated with this SG.  The ASP Identifier in the SGP structure is the
+precise identifier that will be provided to the SGP in the ASPUP Request.
+.ip "\fI\)np.list, np.numb, np.u.c.down, np.u.c.wack_aspup, np.u.c.wack_aspdn, np.u.c.up\fR"
+This is a graph (headed by \fI\)np.list\fR and containing \fI\)np.numb\fR
+nodes) that contains the list of SP data structures associated with this SG
+data structure.  The counts (\fI\)np.u.c.down\fR \fI\)np.u.c.wack_aspup\fR,
+\fI\)np.u.c.wack_aspdn\fR and \fI\)np.u.c.up\fR) indicate the number of
+elements in the graph (SP structures) that are in the respective states:
+ASP_DOWN, ASP_WACK_ASPUP, ASP_WACK_ASPDN and ASP_UP.
+.ip "\fI\)as.list, as.numb\fR"
+This is a list of the AS-P structures and the number of AS-P structures
+associated with this SG.
+.ip "\fI\)spp.list, spp.numb, spp.u.c.down, spp.u.c.wack_aspup, spp.u.c.wack_aspdn, spp.u.c.up\fR"
+This is a list of the SGP structures and the number of SGP structures
+associated with this SG and the number of SGP in each state for the SG.
+.ip "\fI\)timers\fR"
+Run-timer timers associated with the SG.
+.ip "\fI\)config\fR"
+Configuration options for the SG.
+.sh 3 "SG Data Structure Relationships"
+.lp
+The relationship between the SG data structure and other UA data structures is
+illustrated in \fI\*(&f\n(&n\fR.
+.lp
+.(b M
+.ie '\*(.T'ps' \{\"'
+.so datamodel.fig5.pic
+.\}
+.el \{
+.(c
+.nf
+.sz -1
+\fC\)\
+ _______  _______  _______
+|       ||       ||       |
+|  SP   ||  SP   ||  SP   |
+|_______||_______||_______|   _______
+    :        :        :      |       |
+    :....... : .......:  ....|  AS   |
+           : : :         :   |_______|
+          _:_:_:_        :    _______
+         |       |.......:   |       |
+         |  SG   |...........|  AS   |
+         |_______|........   |_______|
+           | | |         :    _______
+     ______| | |______   :...|       |
+    |        |        |      |  AS   |
+ ___|___  ___|___  ___|___   |_______|
+|       ||       ||       |
+|  SGP  ||  SGP  ||  SGP  |
+|_______||_______||_______|
+.sz +1
+.)c
+.\}
+.#f "SG Data Structure Relationships"
+.)b
+.sh 4 "Per-AS Information"
+.sh 4 "Per-SP Information"
+.sh 4 "Per-XP Information"
+.sh 2 "XP Data Structure"
+.lp
+The XP data structure is as follows:
+.(b I
+\fC\
+typedef struct xp {
+} xp_t;
+.)b
+.sh 3 "XP-ASP Data Structure"
+.sh 4 "Per-AS Information"
+.sh 4 "Per-SP Information"
+.sh 3 "XP-SGP Data Structure"
+.sh 4 "Per-AS Information"
+.sh 4 "Per-SG Information"
+.sh 2 "DP Data Structure"
+.lp
+The DP data structure is as follows:
+.(b I
+\fC\
+typedef struct xp {
+} xp_t;
+.)b
+.sh 3 "Per-AS Information"
+.sh 2 "LP Data Structure"
+.lp
+The LP data structure is as follows:
+.(b I
+\fC\
+typedef struct lp {
+} lp_t;
+.)b
+.sh 3 "LP-ASP Data Structure"
+.sh 4 "Per-XP-ASP Information"
+.sh 3 "LP-SGP Data Structure"
+.sh 4 "Per-XP-SGP Information"
+.sh 3 "LP-SS7 Data Structure"
+.sh 4 "Per-AS Information"
+.sh 2 "AS Data Structure"
+.lp
+The AS data structure is as follows:
+.(b
+.nf
+.sz -1
+\fC\
+typedef struct as {
+        HEAD_DECLARATION (as);                  /* head delcaration */
+        uint32_t rc;                            /* Routing Context */
+        struct mtp_addr add;                    /* MTP address */
+        SLIST_HEAD (sl);                        /* SL for this AS */
+        SLIST_COUNT (ap);                       /* AP (AS graph) list */
+        SLIST_LINKAGE (sp, as, sp);             /* SP linkage */
+        SLIST_COUNT (gp);                       /* GP (SPP graph) list */
+        m2ua_timers_as_t timers;                /* timers */
+        m2ua_opt_conf_as_t config;              /* configuration */
+} as_t;
+.sz +1
+.)b
+.lp
+The fields of this data structure are as follows:
+.ip "\fI\)next, prev\fR"
+Linkage into master list of AS data structures.
+.ip "\fI\)refcnt\fR"
+Structure reference count.
+.ip "\fI\)lock\fR"
+Structure lock.
+.ip "\fI\)id\fR"
+Identifier which uniquely identifies the AS data structure within the UA
+multiplexing driver.
+This identifier is used by Layer Management to identify the AS.
+.ip "\fI\)state\fR"
+Run-time state of the AS data structure.  The AS data structure can be in one
+of the following states.
+.ba +\n(iiu
+.ip "AS_DOWN" 28
+All of the ASPs or SGPs associated with the AS are in the ASP_DOWN
+state.
+.ip "AS_INACTIVE" 28
+At least one of the ASPs or SGPs associated with the AS is in the ASP_UP or
+ASP_WACK_ASPDN state.
+.ip "AS_WACK_ASPAC" 28
+At least one of the ASPs or SGPs associated with the AS is in the
+ASP_UP or ASP_WACK_ASPDN state.  At least one of the ASPs or
+SGPs is activating for the AS.  None of the ASPs or SGPs is in the
+AS_ACTIVE or AS_WACK_ASPIA states.
+.ip "AS_WACK_ASPIA" 28
+At least one of the ASPs or SGPs associated with the AS is in the
+ASP_UP or ASP_WACK_ASPDN state.  At least one of the ASPs or
+SGPs is deactivating for the AS.  None of the ASPs or SGPs is in the
+AS_ACTIVE state.
+.ip "AS_ACTIVE" 28
+At least one of the ASPs or SGPs associated with the AS is in the
+ASP_UP or ASP_WACK_ASPDN state.  At least one of the ASPs or
+SGPs is in the AS_ACTIVE state.
+.ba -\n(iiu
+.ip "\fI\)flags\fR"
+Run-time flags associated with the AS.  The following flags are defined for
+the AS:
+.ba +\n(iiu
+.ip "AS_PENDING" 28
+When set, indicates that the AS is inactive (in the AS_DOWN or
+AS_INACTIVE or AS_WACK_ASPAC state), but the associated
+providers (local SS7-P or remote SGP) have not yet been deactivateed pending the
+arrival of a new activation request from the local SS7-U or remote ASPs.
+.ip "AS_ACTIVE" 28
+When set, this flag indicates that the AS is in the AS_WACK_ASPIA or
+AS_ACTIVE states; i.e, that the AS is actively processing traffic.
+.ip "" 28
+When clear, this flag indicates that the AS is in the AS_DOWN,
+AS_INACTIVE or AS_WACK_ASPAC states.  This flag will be clear
+when the AS_PENDING flag is set.
+.ba -\n(iiu
+.ip "\fI\)type\fR"
+The type of the AS data structure is one of the following:
+.ba +\n(iiu
+.ip "UA_OBJ_TYPE_AS_U" 28
+The object is an AS-U data structure.
+.ip "UA_OBJ_TYPE_AS_P" 28
+The object is an AS-P data structure.
+.ba -\n(iiu
+.ip "\fI\)iid or rc\fR"
+The Interface Identifier or Routing Context for the AS.
+.ip "\fI\)add\fR"
+The address (Routing Key or Link Key) associated with the AS.
+.ip "\fI\)ss7.list, ss7.numb\fR"
+The list and number of corresponding SS7 Users or Providers associated with
+the AS-U or AS-P.
+.ip "\fI\)ap.list, ap.numb, ap.u.c.down, ap.u.c.inactive, ap.u.c.wack_aspac, ap.u.c.wack_aspia, ap.u.c.active\fR"
+The list and number of AP (graph) nodes and the counts of the node states for
+the various states.  The graph contains the relationship between the AS and
+the AS of the other type.  That is, the relationship between AS-U and AS-P.
+The node also contains the state of the AS-U to the AS-P.
+.ip "\fI\)sp.sp, sp.next, sp.prev\fR"
+The linkage of the AS-U to the SP or the AS-P to the SG.
+.ip "\fI\)gp.list, gp.numb, gp.u.c.down, gp.u.c.inactive, gp.u.c.wack_aspac, gp.u.c.wack_aspia, gp.u.c.active\fR"
+The list and number of GP (graph) nodes and the counts of the node states for
+the various states.  The graph contains the relationship between the AS-U and
+ASPs using the AS, or AS-P and SGPs providing the AS, including the state of
+the ASP (or SGP) for the AS.
+.ip "\fI\)timers\fR"
+Run-time timers for the AS.
+.ip "\fI\)config\fR"
+Optional configuration for the  AS.
+.ip "\fI\)\fR"
+.sh 3 "Per-AS Information"
+.lp
+Per-AS information is contained in the AP graph node.  The AP graph node
+structure is as follows:
+.(b
+.nf
+.sz -1
+\fC\
+typedef struct ap {
+        ulong state;                            /* state of this AS-U for this AS-P */
+        SLIST_LINKAGE (as, ap, u);              /* AS-U linkage */
+        SLIST_LINKAGE (as, ap, p);              /* AS-P linkage */
+} ap_t;
+.sz +1
+.)b
+.lp
+This data structure contains the following fields:
+.ip "\fI\)state\fR"
+.ip "\fI\)u.as, u.next, u.prev\fR"
+.ip "\fI\)p.as, p.next, p.prev\fR"
+.sh 3 "Per-ASP/SGP Information"
+.lp
+Per-ASP/SGP information is contained in the GP graph node.  The GP graph node
+structure is as follows:
+.(b
+.nf
+.sz -1
+\fC\
+typedef struct gp {
+        ulong state;                            /* AS state for this SPP */
+        uint32_t iid;                           /* AS iid for this SPP */
+        SLIST_LINKAGE (as, gp, as);             /* AS linkage */
+        SLIST_LINKAGE (spp, gp, spp);           /* SPP linkage */
+} gp_t;
+.sz +1
+.)b
+.lp
+This data structure contains the following fields:
+.ip "\fI\)state\fR"
+Run-time state of the ASP or SGP for the AS.
+.ip "\fI\)iid or rc\fR"
+The Interface Identifier or Routing context used by the ASP or SGP to refer to
+the AS.
+.ip "\fI\)as.as, as.next, as.prev\fR"
+the continuing list of AS that are served by or for the same SPP expressed as
+graph nodes.
+.ip "\fI\)spp.spp, spp.next, spp.prev\fR"
+The continuing list of ASPs or SGPs that belong to the same AS expressed as
+graph nodes.
+.lp
+.lp
+.#e
+.pn 1
+.+c Examples
+.(b
+.sh 2 "ASP Examples"
+.sh 3 "Simple ASP Example"
+.ie '\*(.T'ps' \{\
+.\"'
+.so datamodel.figx4.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -1
+\fC\)\
+    |
+ ___v___
+|       |
+| SS7-U |
+|_______|
+    |
+    |
+    |
+ ___v___         _______
+|       |       |       |
+|  AS   |.......|  SP   |
+|_______|       |_______|
+   : :          ___| |___
+   : :      ___v___   ___v___
+   : :     |       | |       |
+   : :.....|  SG   |.|  SG   |
+   :       |_______| |_______|
+   :           |         |
+   :        ___v___   ___v___
+   :       |       | |       |
+   :.......|  SGP  |.|  SGP  |
+           |_______| |_______|
+               |         |
+            ___v___   ___v___
+           |       | |       |
+           | XPort | | XPort |
+           |_______| |_______|
+               |         |
+               v         v
+.sz +1
+.)c
+.\}
+.#f "Simple ASP Example"
+.)b
+.lp
+\fI\*(&f\n(&p\fR illustrates a simple ASP example.  In the example, a local
+SS7 User is obtaining services from two Signalling Gateways.
+.lp
+When the SS7 User STREAM is opened, and bound, a registration request is
+issued locally and either responded to by the Layer Manager or sent to the SGP
+associated with the configured SG and an AS Structure is created.
+.lp
+Per-AS structures for the SP, SG, and SGP data structures are created.  The UA
+driver attempts to move the AS to the registered state for all configured SG
+and to the active state for all configured SGP.  To complete this, it performs
+whatever registrations and activations are necessary on behalf of the AS.
+.lp
+When active, data traffic from the SS7 User is distributed over the available
+SG and SGP according to traffic mode and load sharing algorithms.
+.lp
+Data traffic received at the SGP XPort has the SGP selected on the basis of
+protocol payload identifier.  The SGP then looks up the AS structure based on
+the RC/IID in the data message.  The AS then passes the received data directly
+to the SS7 User.
+.(b
+.sh 2 "SG Examples"
+.sh 3 "Simple SGP Example"
+.ie '\*(.T'ps' \{\
+.\"'
+.so datamodel.figx5.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -1
+\fC\)\
+    |         |
+ ___v___   ___v___
+|       | |       |
+| XPort | | XPort |
+|_______| |_______|
+    |         |
+ ___v___   ___v___
+|       | |       |
+|  ASP  | |  ASP  |.......
+|_______| |_______|      :
+    |___   ___|          :
+        | |              :
+      __v_v__          __:____
+     |       |        |       |
+     |  SP   |........|  AS   |
+     |_______|        |_______|
+                          :
+                          :
+                          :
+                          :
+                       ___:___
+                      |       |
+                      | SS7-P |
+                      |_______|
+.sz +1
+.)c
+.\}
+.#f "Simple SGP Example"
+.)b
+.lp
+\fI\*(&f\n(&p\fR illustrates a simple SGP example.  In the example, a local
+SS7 Provider is providing services to two remote ASPs.
+.lp
+When an ASP goes up and registers for the Application Server (AS), the UA
+driver uses an existing static configuration or requests the Layer Manager to
+configure the Application Server for use.  Either a copy of the per-AS
+structures for ASP and SP already exist, or these copies are created when the
+Layer manager configures the AS for service.  The UA driver marks the
+Application Server as registered.
+.lp
+When an ASP goes active for the Application Server (AS), the UA driver
+activates the SS7 Provider (if it is not already active) and moves the
+AS to the active state.
+.(b
+.sh 3 "Multiple peer SGP Example"
+.ie '\*(.T'ps' \{\
+.\"'
+.so datamodel.figx1.pic
+.\}
+.el \{\
+.\"'
+.(c
+.nf
+.sz -1
+\fC\)\
+                         _____     _____
+    |         |         |     |   |     |         |         |
+ ___v___   ___v___   ___v___  |   |  ___v___   ___v___   ___v___
+|       | |       | |       | |   | |       | |       | |       |
+| XPort | | XPort | | XPort | |   | | XPort | | XPort | | XPort |
+|_______| |_______| |_______| |   | |_______| |_______| |_______|
+    |         |         |     |   |     |         |         |
+ ___v___   ___v___   ___v___  |   |  ___v___   ___v___   ___v___
+|       | |       | |       | |   | |       | |       | |       |
+|  ASP  |.|  ASP  |.|  ASP  | |   | |  ASP  |.|  ASP  |.|  ASP  |
+|_______| |_______| |_______| |   | |_______| |_______| |_______|
+  : |________ | ________|     |   |     |________ | ________| :
+  :          |||              |   |              |||          :
+ _:_____   __vvv__   _______  |   |  _______   __vvv__   _____:_
+|       | |       | |       | |   | |       | |       | |       |
+|  AS   |.|  SP   |.|  AS   | |   | |  AS   |.|  SP   |.|  AS   |
+|_______| |_______| |_______| |   | |_______| |_______| |_______|
+    :         |        ::     |   |     ::        |         :
+    :      ___v___     ::     |   |     ::     ___v___      :
+    :     |       |    ::     |   |     ::    |       |     :
+    :     |  SG   |....::     |   |     ::....|  SG   |     :
+    :     |_______|     :     |   |     :     |_______|     :
+    :         |         :     |   |     :         |         :
+    :      ___v___      :     |   |     :      ___v___      :
+    :     |       |     :     |   |     :     |       |     :
+    :     |  SGP  |.....:     |   |     :.....|  SGP  |     :
+    :     |_______|           |   |           |_______|     :
+    :         |               \\   /               |         :
+ ___v___   ___v___             \\ /             ___v___   ___v___
+|       | |       |             X             |       | |       |
+| SS7-P | | XPort |            / \\            | XPort | | SS7-P |
+|_______| |_______|           /   \\           |_______| |_______|
+    |         |              /     \\              |         |
+    v         v_____________/       \\_____________v         v
+.sz +1
+.)c
+.\}
+.#f "Multiple peer SGP Example"
+.)b
+.(b
+.sh 2 "Combined Examples"
+.sh 3 "Simple Combined Example"
+.ie '\*(.T'ps' \{\
+.\"'
+.so datamodel.figx6.pic
+.\}
+.el \{\
+.\"'
+.(c
+.nf
+.sz -1
+\fC\)\
+    |           |         |
+ ___v___     ___v___   ___v___
+|       |   |       | |       |
+| SS7-U |   | XPort | | XPort |
+|_______|   |_______| |_______|
+    :           |         |
+    :        ___v___   ___v___
+    :       |       | |       |
+    :       |  ASP  |.|  ASP  |........
+    :       |_______| |_______|       :
+    :           |___   ___|           :
+    :               | |               :
+ ___:___          __v_v__          ___:___
+|       |        |       |        |       |
+|  AS   |........|  SP   |........|  AS   |
+|_______|        |_______|        |_______|
+   : :           ___| |___            :
+   : :          |         |           :
+   : :       ___v___   ___v___        :
+   : :      |       | |       |       :
+   : :......|  SG   |.|  SG   |       :
+   :        |_______| |_______|       :
+   :            |         |           :
+   :         ___v___   ___v___        :
+   :        |       | |       |       :
+   :........|  SGP  |.|  SGP  |       :
+            |_______| |_______|       :
+                |         |           :
+             ___v___   ___v___     ___:___
+            |       | |       |   |       |
+            | XPort | | XPort |   | SS7-P |
+            |_______| |_______|   |_______|
+                |         |           |
+                v         v           v
+.sz +1
+.)c
+.\}
+.#f "Simple Combined Example"
+.)b
+.lp
+\fI\*(&f\n(&p\fR illustrates a simple Combined example.
+.(b
+.sh 3 "Simple Pass-Through Example"
+.ie '\*(.T'ps' \{\
+.\"'
+.so datamodel.figx2.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -1
+\fC\)\
+    |
+ ___v___
+|       |
+| SS7-U |
+|_______|
+    :
+    :
+    :
+    :
+    :
+    :
+    :
+    :
+ ___v___          _______
+|       |        |       |
+|  AS   |........|  SP   |
+|_______|        |_______|
+    :
+    :
+    :
+    :
+    :
+    :
+    :
+    :
+ ___v___
+|       |
+| SS7-P |
+|_______|
+    |
+    v
+.sz +1
+.)c
+.\}
+.#f "Simple Pass-Through Example"
+.)b
+.lp
+\fI\*(&f\n(&p\fR illustrates a simple combined pass-through example.  In this
+example the SP is acting as both ASP and SG.  This is the OpenSS7 stack
+stand-alone mode where no peer redundant processors are defined.
+.lp
+Data and control primitives from the SS7 User (SS7-U) are channelled through
+the associated Application Server (AS) directly to the SS7 Provider (SS7-P).
+Data and control primitives from the SS7 Provider are passed directly to the
+SS7 User through that Application Server (AS) in the same fashion.
+.(b
+.sh 3 "Pass-Through with Redundant Processor"
+.ie '\*(.T'ps' \{\
+.so datamodel.figx3.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -1
+\fC\)\
+                         _____     _____
+    |         |         |     |   |     |         |         |
+ ___v___   ___v___   ___v___  |   |  ___v___   ___v___   ___v___
+|       | |       | |       | |   | |       | |       | |       |
+| SS7-U | | XPort | | XPort | |   | | XPort | | XPort | | SS7-U |
+|_______| |_______| |_______| |   | |_______| |_______| |_______|
+    :         |         |     |   |     |         |         :
+    :      ___v___   ___v___  |   |  ___v___   ___v___      :
+    :     |       | |       | |   | |       | |       |     :
+    :.....|  ASP  |.|  ASP  | |   | |  ASP  |.|  ASP  |     :
+    ::    |_______| |_______| |   | |_______| |_______|     :
+    ::        | ________|     |   |     |________ |         :
+    ::        ||              |   |              ||         :
+ ___::__   ___vv__            |   |            __vv___   ___:___
+|       | |       |           |   |           |       | |       |
+|  AS   |.|  SP   |           |   |           |  SP   |.|  AS   |
+|_______| |_______|           |   |           |_______| |_______|
+    :::       |               |   |               |       :::
+    :::    ___v___            |   |            ___v___    :::
+    :::   |       |           |   |           |       |   :::
+    :::...|  SG   |           |   |           |  SG   |...:::
+    ::    |_______|           |   |           |_______|    ::
+    ::        |               |   |               |        ::
+    ::     ___v___            |   |            ___v___     ::
+    ::    |       |           |   |           |       |    ::
+    ::....|  SGP  |           |   |           |  SGP  |....::
+    :     |_______|           |   |           |_______|     :
+    :         |               \\   /               |         :
+ ___v___   ___v___             \\ /             ___v___   ___v___
+|       | |       |             X             |       | |       |
+| SS7-P | | XPort |            / \\            | XPort | | SS7-P |
+|_______| |_______|           /   \\           |_______| |_______|
+    |         |              /     \\              |         |
+    v         v_____________/       \\_____________v         v
+.sz +1
+.)c
+.\}
+.#f "Pass-Through with Redundant Processor"
+.)b
+.lp
+\fI\*(&f\n(&p\fR illustrates a pass-through with redundant processor example.
+In this example, the SG is acting as both ASP and SGP.  This is the OpenSS7
+stack redundant configuration where a peer redundant processor is defined.
+.lp
+Data and control primitives are normally passed directly between the SS7 User
+and the local SS7 Provider on each processor.
+.(b C
+.sh 3 "Shared Redundant Processor"
+.ie '\*(.T'ps' \{\
+.so datamodel.figx7.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -1
+\fC\)\
+ SLC 0  SLC 1  SLC 2  SLC 3                   SLC 0  SLC 1  SLC 2  SLC 3 
+   |      |      |      |       ___   ___       |      |      |      |   
+ __|__  __|__  __|__  __|__  __|__ | | __|__  __|__  __|__  __|__  __|__ 
+|     ||     ||     ||     ||     || ||     ||     ||     ||     ||     |
+|SS7-U||SS7-U||SS7-U||SS7-U||XPort|| ||XPort||SS7-U||SS7-U||SS7-U||SS7-U|
+|_____||_____||_____||_____||_____|| ||_____||_____||_____||_____||_____|
+   |      |      |      |      |   | |   |      |      |      |      |   
+   |      |      |      |    __|__ | | __|__    |      |      |      |   
+   | _____|______|______|___|     || ||     |___|______|______|_____ |   
+   ||     | _____|______|___| ASP || || ASP |___|______|_____ |     ||   
+   ||     ||     |      |   |_____|| ||_____|   |      |     ||     ||   
+   ||     ||     |      |      |   | |   |      |      |     ||     ||   
+ __||_  __||_  __|__  __|__  __|__ | | __|__  __|__  __|__  _||__  _||__ 
+|     ||     ||     ||     ||     || ||     ||     ||     ||     ||     |
+|AS-U ||AS-U ||AS-U ||AS-U || SP  || || SP  ||AS-U ||AS-U ||AS-U ||AS-U |
+|_____||_____||_____||_____||_____|| ||_____||_____||_____||_____||_____|
+   |      |      |      |      |    X    |      |      |      |      |   
+ __|__  __|__  __|__  __|__  __|__ | | __|__  __|__  __|__  __|__  __|__ 
+|     ||     ||     ||     ||     || ||     ||     ||     ||     ||     |
+|AS-P ||AS-P ||AS-P ||AS-P || SG  || || SG  ||AS-P ||AS-P ||AS-P ||AS-P |
+|_____||_____||_____||_____||_____|| ||_____||_____||_____||_____||_____|
+   |      |      |      |      |   | |   |      |      |      |      |   
+   |      |      |      |    __|__ | | __|__    |      |      |      |   
+   |      |      |      |___|     || ||     |___|      |      |      |   
+   |      |      |__________| SGP || || SGP |__________|      |      |   
+   |      |                 |_____|| ||_____|                 |      |   
+   |      |                    |   | |   |                    |      |   
+ __|__  __|__                __|__ | | __|__                __|__  __|__ 
+|     ||     |              |     || ||     |              |     ||     |
+|SS7-P||SS7-P|              |XPort|| ||XPort|              |SS7-P||SS7-P|
+|_____||_____|              |_____|| ||_____|              |_____||_____|
+   |      |                    |___| |___|                    |      |   
+   |      |                                                   |      |   
+ SLC 0  SLC 1                                               SLC 2  SLC 3 
+.sz +1
+.)c
+.\}
+.#f "Shared Redundant Processor"
+.)b
+.lp
+\fI\*(&f\n(&p\fR illustrates a shared redundant processor example.
+In this example, each processor is acting as both ASP and SGP.  Processor #1
+passes through SLC 0 and SLC 1.  Processor #2 passes through SLC 2 and SLC 3.
+However, Processor #1 also provides remote access to SLC 0 and SLC 1 to
+Processor #2, and Processor #2 also provides remote access to SLC 2 and SLC 3
+to Processor #1.  This means that all four signalling links (SLC 0 through
+SLC 3) are available to both processors.
+.lp
+The following points are notable:
+.af $p 1
+.np
+Only two transport connections are required regardless of the number of
+signalling links supported.
+.np
+Should the local ULP process fail, its local SS7-U streams will be closed, however,
+the other processor will begin handling traffic for local SS7-P streams and an
+outage will not occur.  This makes it possible to upgrade, for example, MTP
+Level 3 processes on the one processor without disrupting service.
+.#e
+.pn 1
+.++ A "'SIGTRAN Data Models''OpenSS7 Corporation'"
+.+c "An\ Appendix"
+.af $1 A
+.nr $1 1
+.sh 2 "Test Header"
+.(z C
+.(c
+.nf
+.sz -1
+\fC\)\
+
+.sz +1
+.)c
+.#f "Overview"
+.)z
+.#e
+.pn 1
+.++ B 'SIGTRAN\ Data\ Model''OpenSS7\ Corp'
+.fo '$Revision: 0.9.2.2 $'Page \\\\n%'\\\\*(td'
+.af % I
+.de ]<
+.nr % 1
+.+c References
+.rm (f )f
+..
+.[
+$LIST$
+.]
+.+c "List\ of\ Illustrations"
+.(l
+.xp 2
+.)l
+.+c "Table\ of\ Contents"
+.(l
+.xp 0
+.)l

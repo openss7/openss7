@@ -1,0 +1,2178 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: draft-bidulock-sigtran-loadsel-00.me,v 0.9.2.2 2005/05/14 08:33:19 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2002  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.2 $) modified $Date: 2005/05/14 08:33:19 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.R1
+abbreviate A
+label L
+no-default-database
+no-accumulate
+database ../idrefs
+annotate X lp
+move-punctuation
+discard YZ
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+search-truncate 10
+separate-label-second-parts ""
+bracket-label " [" "]" ", "
+# abbreviate-label-ranges "..."
+# sort A+
+# reverse A
+.R2
+.de $0
+.if \\$3>0 \{\
+.if \\$3<4 \{\
+.(x 0
+.#v
+.ie '\\$2'' \\$1
+.el \\$2 \\$1
+.\"'
+.)x
+.\}
+.\}
+..
+.if '\*(.T'ascii' \{\
+.\"'
+.fo 'B. Bidulock'Version 0.0'FORMFEED[Page %]'
+.ds |x txt
+.ds #n <\\**>
+.m1 1 \" top margin above header
+.m2 1 \" top margin below header
+.m3 1 \" btm margin above footer
+.m4 0 \" btm margin below footer
+.pl 9.8i
+.ll 7.2i
+.lt 7.2i
+.nr PL 9.8i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad l
+.hy 0
+.ta 3
+.ba 0
+.po 0
+.nr so 0
+.nr ii 6n
+.nr pi 4n
+.nr po 3n
+.nr bi 2n
+.nr qi 4n
+.nr ps 1v
+.de #v
+.ad l
+.hy 0
+..
+.\}
+.if '\*(.T'ps' \{\
+.\"'
+.fo 'B. Bidulock'Version 0.0'Page %'
+.ds |x ps
+.ds #n \\**
+.m1 0.25i \" top margin above header
+.m2 0.25i \" top margin below header
+.m3 0.25i \" btm margin above footer
+.m4 0.25i \" btm margin below footer
+.pl 11.0i
+.ll 7.2i
+.lt 7.2i
+.nr PL 11.0i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad b
+.hy 6
+.ta 3
+.ba 0
+.po 0.75i
+.nr so 0
+.nr ii 0.5i
+.nr pi 0.5i
+.nr po 0.25i
+.nr bi 0.5i
+.nr hi 0.5i
+.nr qi 0.5i
+.nr pp 10
+.nr qp 9
+.nr fp 8
+.nr gp 8
+.nr sp 12
+.nr tp 10
+.de #v
+.ad b
+.hy 6
+..
+.\}
+.dn &a
+.dn &b
+.dn &n
+.dn &p
+.nr &a 1
+.nr &b 0
+.nr &n 1
+.nr &p 0
+.ds &f Figure\ 
+.ds &t Table\ 
+\".de $1
+.\".ds &f Figure \\n($1-
+.\".nr &n 1
+.\".nr &p 0
+.\"..
+.\".de $2
+.\".ds &f Figure \\n($1.\\n($2-
+.\".nr &n 1
+.\".nr &p 0
+.\"..
+.\".de $3
+.\".ds &f Figure \\n($1.\\n($2.\\n($3-
+.\".nr &n 1
+.\".nr &p 0
+.\"..
+.de #f
+.(l C F
+\fI\\*(&f\\n(&n.\fR  \\$1
+.(x 2
+.#v
+\\*(&f\\n(&n \\$1
+.)x
+.)l
+.nr &p \\n(&n
+.nr &n +1
+..
+.de #t
+.ce 1
+\fI\\*(&t\\n(&a.\fR \\$1
+.(x 3
+.#v
+\\*(&t\\n(&a \\$1
+.)x
+.nr &b \\n(&a
+.nr &a +1
+..
+.de #e
+.if \\n($d>1 \{\
+.uh "Endnotes for Section \\\\n($1"
+.pd
+.\}
+..
+.ds a \a
+.bp
+.he 'Internet Draft'UA Load Selection'January 10, 2002'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+.bl 2
+Expires in six months;;January 10, 2002
+.bl 2
+.TE
+.(l C
+\fB\
+Load Selection
+for
+Signalling User Adaptation Layers
+<draft-bidulock-sigtran-loadsel-00.\*(|x>
+
+.)l
+.rr |x
+.ne 4
+.uh "Status of this Memo"
+.lp
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents
+of the Internet Engineering Task Force (IETF), its areas, and its working
+groups.  Note that other groups may also distribute working documents as
+Internet-Drafts.
+.lp
+Internet-Drafts are draft documents valid for a maximum of six months and may
+be updated, replaced, or obsoleted by other documents at any time.  It is
+inappropriate to use Internet-Drafts as reference material or to cite them
+other than as 'work in progress'.
+.lp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+.lp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html
+.lp
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
+Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
+(Pacific Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
+.uh "Abstract"
+.lp
+This Internet-Draft describes \fB\)Load Selection\fR for Signalling User
+Adaptation Protocols,
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+which permits an Application Server Processes (ASP) to indicate its placement
+within an Application Server and permits an Signalling Gateway (SG) to
+distribute traffic over ASPs in Application Servers under Application Server
+Process (ASP) control.
+.sh 1 "Introduction"
+.sh 2 "Scope"
+.lp
+This Internet-Draft provides parameters and associated procedures in extension
+to the parameters and procedures of the Signalling User Adaptation Layers
+(UAs),
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+for the purpose of permitting Application Server Process control over
+placement of ASPs within Application Servers (or Load Groups
+.[ [
+loadgrp-00
+.]])
+as part of the normal procedures
+of these UA protocols.
+.lp
+UA implementations supporting \fB\)Load Selection\fR are intended to be
+compatible with UA implementations not supporting \fB\)Load Selection\fR.
+.sh 2 "Terminology"
+.lp
+Load Selection supplements the terminology used in the UA documents
+[M2UA...TUA] by adding the following terms:
+.lp
+\fI\)Load Selector (LS)\fR \-
+.ix +\n(iiu
+an identifier that uniquely identifies a partition of traffic flow within an
+Application Server.  This identifier is only guaranteed unique within the
+scope of an Application Server and \fB\)MAY\fR need to be combined with a
+\fI\)Routing Context\fR to uniquely define a traffic flow at a Signalling
+Gateway.
+.lp
+\fI\)Signalling User Adaptation Layer (UA)\fR \-
+.ix +\n(iiu
+one or more of the Stream Control Transmission Protocol (SCTP)
+.[
+rfc 2960
+.]
+SS7 Signalling User Adaptation Layers
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+supporting the concept of a \fI\)Routing Context\fR.
+.sh 2 "Overview"
+.lp
+UA procedures with regard to traffic distribution and ASP traffic management
+provide a mechanism to select the algorithm for coordinating state and
+distributing traffic over a number of Application Server Processes (ASPs)
+serving an Application Server (AS).  These existing procedures provide only
+simplified distribution approaches which are not amenable in the following
+situations:
+.bu
+Connection- or Transaction-Oriented traffic flows which group the messages
+corresponding to a connection or a transaction.
+.bu
+Large scale systems that need to adapt to dynamic traffic loading.
+.bu
+Systems that need dynamic reconfiguration under ASP control for maintenance or
+fail-over purposes.
+.lp
+\fB\)Load Selection\fR for the Signalling User Adaptation Layers
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+permits close control over the placement and grouping of Application Server
+Processes serving an Application Server that provides for load selection
+placement within an Application Server: a capability not present in the
+existing scheme.
+.lp
+Under existing UA traffic distribution, there is no mechanism which permits an
+Application Server Process (ASP) to indicate which of a number of ASPs it
+wishes to override in an Override AS.  There is also no mechanism which
+permits an ASP to indicate which traffic flows it wishes to process within a
+Load-share or Broadcast AS.
+.lp
+\fB\)Load Selection\fR provides the ability for the ASP itself to control its
+placement within an AS, be informed of the failure of ASPs serving other load
+selections within the AS, and chose to activate itself to receive additional
+load selections within the AS.  \fB\)Load Selection\fR also permits grouping of ASPs
+within a load selection.
+.sh 3 "Non-Load Selection Traffic Distribution"
+.(z
+.(c
+.nf
+.sz -2
+\fC\
+                                    ____
+           Traffic                 /....\\
+           Mode Type          ____|__....|
+                             |       |...|
+ _______ /------------------>|  ASP  |...|
+|       |---\\                |_______|...|
+|  SGP  |--\\ \\                ____|__....|
+|_______|-\\ \\ \\              |       |...|
+         \\ \\ \\ \\------------>|  ASP  |...|
+ _______  \\ \\ \\              |_______|...|
+|       |  \\ \\ \\              ____|__....| Application
+|  SGP  |   \\ \\ \\            |       |...| Server
+|_______|    \\ \\ \\---------->|  ASP  |...|
+              \\ \\            |_______|...|
+               \\ \\            ____|__....|
+                \\ \\          |       |...|
+                 \\ \\-------->|  ASP  |...|
+                  \\          |_______|...|
+                   \\          ____|__....|
+                    \\        |       |...|
+                     \\------>|  ASP  |...|
+                             |_______|...|
+                                  |......|
+                                   \\____/
+.fi
+.sz +2
+.)c
+.#f "Non-Load Selection Traffic Distribution"
+.)z
+.lp
+\fI\*(&f\n(&p\fR illustrates the existing traffic distribution algorithm that
+is used across the Signalling User Adaptation Layers.
+.lp
+When an SGP distributes a Signalling User Adaptation Layer message toward the
+Application Server based on the Routing Key, it selects an ASP that is
+active for the AS according to a Traffic Mode Type that is associated with the
+AS.  The Traffic Mode Type describes three general distribution algorithms:
+Override, Load-share and Broadcast.
+.lp
+The detailed actions taken for these distribution algorithms are described in
+Section 4 of the Signalling User Adaptation Layer specifications;
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+however, they can be summarized as follows:
+.lp
+.b "Override:\-\ "
+.ix +\n(iiu
+When distributing messages to an Override Application Server, the SGP selects
+the ASP which is active for the Application Server.  In an Override
+Application Server, at most one ASP can be active for the AS at any given point
+in time.  The active ASP for the AS is selected.
+
+A major limitation of the Override AS that is relieved by \fB\)Load
+Selection\fR is that only one ASP can be active within an Application Sever.
+This does not work when the number of ASPs required to service an AS is
+greater than one.
+.lp
+.b "Load-share:\-\ "
+.ix +\n(iiu
+When distributing messages to a Load-share Application Server, the SGP selects
+one of the ASPs that are active for the Application Server using an
+implementation dependent load-sharing algorithm based on some unspecified
+aspect of the traffic or static configuration data.
+
+A major limitation of the Load-share AS is that each ASP in the
+Application Server must be capable of handling any (and all) traffic within
+the Load-share AS.  Under the current approach an SGP does not distinguish
+between ASPs in a Load-share AS and, aside from perhaps attempting to equally
+distribute traffic load over the available ASPs, it is not possible for the
+ASPs to control which traffic flows it receives.  This causes management
+difficulties when the number of ASPs required to service an AS is large, but
+the number of spare ASPs is small.
+.lp
+.b "Broadcast:\-\ "
+.ix +\n(iiu
+When distributing messages to a Broadcast Application Server, the SGP sends a
+copy of the message to each of the ASPs that are active for the Application
+Server.  The ASPs themselves decide which, if any, of the ASPs will process
+the message.
+
+A major limitation of the Broadcast AS is that each ASP receives each
+message.  This does not scale well when the number of ASPs needed to service
+an AS is large.
+.lp
+\fB\)Load Selection\fR enhances the traffic distribution algorithms of the
+existing Signalling User Adaptation Layers by providing ASP control over its
+placement within an AS by load selection.
+.sh 3 "Load Selection Traffic Distribution"
+.(z
+.(c
+.nf
+.sz -2
+\fC\
+        Traffic        Load         ____
+        Mode Type      Selection   /....\\
+                              ____|__....|
+                       LS1   |       |...|
+ _______ /------------------>|  ASP  |...|
+|       |---\\                |_______|...|
+|  SGP  |--\\ \\                ____|__....|
+|_______|-\\ \\ \\        LS2   |       |...|
+           \\ \\ \\------------>|  ASP  |...|
+ _______    \\ \\              |_______|...|
+|       |    \\ \\              ____|__....| Application
+|  SGP  |     \\ \\      LS3   |       |...| Server
+|_______|      \\ \\---------->|  ASP  |...|
+                \\            |_______|...|
+                 \\            ____|__....|
+                  \\          |       |...|
+                   \\-------->|  ASP  |...|
+                   |         |_______|...|
+                   |   LS4    ____|__....|
+                   |         |       |...|
+                   \\-------->|  ASP  |...|
+                             |_______|...|
+                                  |......|
+                                   \\____/
+.fi
+.sz +2
+.)c
+.#f "Load Selection Traffic Distribution"
+.)z
+.lp
+\fI\*(&f\n(&p\fR illustrates the \fB\)Load Selection\fR traffic distribution
+algorithms that are used across the Signalling User Adaptation Layers as a
+result of the \fB\)Load Selection\fR messages and procedures.
+.lp
+\fB\)Load Selection\fR introduces the concept of a \fI\)Load Selector\fR.  A
+\fI\)Load Selector\fR is an identifier that is used to identify a traffic
+flow within (or across) Application Server(s).  Signalling Gateway Processes
+(SGPs) distribute traffic first over \fI\)Load Selector\fR and then
+distribute traffic within the \fI\)Load Selector\fR.  Each \fI\)Load
+Selector\fR describes and is identified by an identifier within the
+Application Server.  The \fI\)Load Selector\fR identifies the traffic flows
+that will be distributed to ASPs associated with the \fI\)Load Selector\fR
+within an Application Server.
+.lp
+When an SGP distributes a Signalling User Adaptation Layer message toward an
+Application Server based on the Routing Key, it first derives a
+\fI\)Load Selector\fR according to a UA-specific, AS-specific and
+implementation-dependent load selection algorithm.  This load selection
+algorithm is configured at the SGP and may consist, for example, of the
+Signalling Link Selection (SLS)
+.[
+q704
+.]
+value contained in the message for distribution.
+.lp
+Once the SGP has determined \fI\)Load Selector\fR to which the message
+corresponds, an ASP that is active for \fI\)Load Selector\fR within the AS
+is selected.  When multiple ASPs are active for the same \fI\)Load Selection\fR
+within an AS, the SGP uses the traffic handling mode based on the \fI\)Traffic
+Mode Type\fR associated with the Application Server to choose the ASP within
+the load selection.\*#
+.(d
+.ip \*#
+Another draft: \fI\)UA Load Grouping\fR,
+.[
+loadgrp-00
+.]
+provides for selection of \fI\)Load Distribution\fR methods within a \fI\)Load
+Selector\fR.  The draft
+.[
+loadgrp-00
+.]
+refers to a group of ASPs
+within the same traffic load selection as a \fI\)Load Group\fR and associates
+a \fI\)Load Distribution\fR with the load group that can be: Override,
+Load-share or Broadcast.  \fB\)Load Selection\fR is applicable both to the normal
+\fI\)Traffic Mode Type\fR of an AS, as well as to the \fI\)Load
+Distribution\fR within a \fI\)Load Group\fR.
+.)d
+.lp
+Under \fB\)Load Selection\fR, the \fI\)Traffic Mode Type\fR continues to
+describe three general distribution algorithms: Override, Load-share and
+Broadcast.  The change in the behavior of the SGP when selecting an ASP for
+traffic distribution introduced by \fB\)Load Selection\fR is that the SGP also
+takes into account the concept of a \fI\)Load Selector\fR.  The \fB\)Load
+Selection\fR procedures are summarized as follows:
+.lp
+.b "Override:\-\ "
+.ix +\n(iiu
+When distributing messages to an Override Application Server, the SGP first
+determines the \fI\)Load Selector\fR associated with the message.  The SGP
+then distributes the message to the ASP that is active for the \fI\)Load
+Selector\fR within the AS.  In an Override Application Server, at
+most one ASP can be active for the AS within a \fI\)Load Selector\fR at any
+given point in time.  The active ASP associated with the \fI\)Load
+Selector\fR for the AS is used.
+.lp
+.b "Load-share:\-\ "
+.ix +\n(iiu
+When distributing messages to a Load-share Application Server, the SGP
+first determines the \fI\)Load Selector\fR associated with the message.  The
+SGP then selects one of the active ASPs associated with the \fI\)Load
+Selector\fR within the AS using an implementation dependent load-sharing
+algorithm based on some unspecified aspect of the traffic or static
+configuration data.
+.lp
+.b "Broadcast:\-\ "
+.ix +\n(iiu
+When distributing messages to a Broadcast Application Server, the SGP
+first determines the \fI\)Load Selector\fR associated with the message.  The
+SGP then selects all of the active ASPs associated with the \fI\)Load
+Selector\fR within the AS and sends a copy of the message to each ASP.  (The
+ASPs themselves decide which ASP(s) will process the message.)
+.lp
+The result of this extension is that Application Server Processes have control
+over their placement within an Application Server and can control the traffic
+that they receive by registering and activating for specific \fI\)Load
+Selectors\fR within the AS.
+.sh 2 "Sample Configurations"
+.sh 1 "Conventions"
+.lp
+The keywords \fB\)MUST\fR, \fB\)MUST NOT\fR, \fB\)REQUIRED\fR, \fB\)SHALL\fR,
+\fB\)SHALL NOT, \fB\)SHOULD\fR, \fB\)SHOULD NOT\fR, \fB\)RECOMMENDED\fR,
+\fB\)NOT RECOMMENDED\fR, \fB\)MAY\fR, and \fB\)OPTIONAL\fR, when they appear
+in this document, are to be interpreted as described in.
+.[
+key words
+.]
+.sh 1 "Protocol Elements"
+.lp
+The following subsections describe the parameters which are added by this
+extension, their format and the message in which they are used.
+.sh 2 "Parameters"
+.lp
+\fB\)Load Selection\fR adds one new parameter: the \fI\)Load Selector\fR parameter.
+.sh 3 "Load Selector"
+.lp
+The \fI\)Load Selector\fR parameter is used in the \fI\)ASPAC\fR, \fI\)ASPAC
+ACK\fR, \fI\)ASPIA\fR, \fI\)ASPIA ACK\fR, and \fI\)NTFY\fR messages.  It is
+used to identify the placement of the ASP within an Application Server.  It
+identifies the \fI\)Load Selector\fR for which the ASP is registering,
+activating or deactivating, or when the SG is indicating or notifying of an
+ASP state change.
+.lp
+The \fI\)Load Selector\fR parameter is formatted as follows:
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Tag = 0xXXXX        |            Length = 8         |
++-------------------------------+-------------------------------+
+|                        Load Selector  1                       |
++---------------------------------------------------------------+
+\\                                                               \\
+/                              ...                              /
+\\                                                               \\
++---------------------------------+-----------------------------+
+|                        Load Selector  n                       |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.fi
+.sz +2
+.)c
+.)b
+.(q
+.#v
+\fB\)EDITOR'S NOTE:- \fR The parameter tag values shown as \f(CR\)0xXXXX\fR)
+above will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)q
+.lp
+The \fI\)Load Selector\fR parameter contains the following fields:
+.ip "\fB\)Load Selector field: n x 32-bits (unsigned integer)\fR" 2
+
+When the Load Selection is included in the REG REQ messages, it SHOULD be
+stored in association with the Application Server indicated by the
+Routing Context/Interface Identifier to be provided in the REG RSP message.
+
+The Load Selection forms part of the Routing (or Link) Key and an attribute of
+the Application Server as indicated by the Routing Context/Interface
+Identifier.
+
+The \fI\)Load Selector\fR field is an identifier, that \fB\)MUST\fR be unique
+within an Application Server and \fB\)MAY\fR be unique within an
+administrative domain, that identifies the placement or \fI\)Load Selection\fR
+of an ASP within an AS.  This identifier in conjunction with any Application
+Server identifier (i.e, Routing Context) identifies
+the traffic flow for which an ASP is registering, activating or deactivating,
+or for which an SG is providing notification of an ASP or AS state change.
+.lp
+When the \fI\)Load Selector\fR parameter is included in the \fB\)ASPAC\fR,
+\fB\)ASPAC ACK\fR, \fB\)ASPIA\fR, \fB\)ASPIA ACK\fR or \fB\)NTFY\fR message,
+one Routing Context representing a single Application Server \fB\)SHOULD\fR be
+associated (specified or implied) with the message.
+.sh 2 "Messages"
+.ds #u \*#
+.lp
+\fB\)Load Selection\fR adds the \fI\)Load Selector\fR parameter as an \fB\)OPTIONAL\fR
+parameter to be used in conjunction with the common \fI\)Traffic Mode Type\fR
+in the following messages: \*#
+.(d
+.ip \*#
+For a detailed description of these messages, see Section 3 of
+the M3UA, SUA or TUA specifications cited under "References".
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+.)d
+.ix +4
+.TS
+tab(:);
+lil.
+ASPAC:ASP Active message
+ASPAC ACK:ASP Active Ack message
+ASPIA:ASP Inactive message
+ASPIA ACK:ASP Inactive Ack message
+NTFY:Notify message
+.TE
+.sh 3 "ASP Active (ASPAC)"
+.lp
+\fB\)Load Selection\fR supplements the \fB\)ASPAC\fR message by permitting the
+following optional parameters to be included in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+Load Selector:Optional:
+.TE
+.ix -4
+.lp
+The format of the resulting \fI\)ASPAC\fR message is as follows: \*(#u
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Tag = 0x000b          |          Length = 8         |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+|                         Traffic Mode Type                     |
+\f(CB\
++---------------------------------+-----------------------------+
+|           Tag = 0xXXXX          |          Length             |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+\\                                                               \\
+/                           Load Selector                       /
+\\                                                               \\
++---------------------------------+-----------------------------+
+\f(CR\
+|           Tag = 0x0006          |          Length = 8         |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+\\                                                               \\
+/                          Routing Context                      /
+\\                                                               \\
++---------------------------------+-----------------------------+
+|           Tag = 0x0004          |          Length             |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+\\                                                               \\
+/                            Info String                        /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.fi
+.sz +2
+.)c
+.)b
+.(q
+.#v
+\fB\)EDITOR'S NOTE:- \fR The parameter tag values shown as \f(CR\)0xXXXX\fR)
+above will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)q
+.lp
+No other changes to the \fB\)ASPAC\fR message format are provided by this
+extension.
+.lp
+The \fI\)Load Selector\fR parameter is used by the ASP in the \fB\)ASPAC\fR
+message to indicate the range of traffic for which the ASP is activating.  The
+Application Servers for which the \fI\)Load Selectors\fR apply is either
+indicated in the \fB\)ASPAC\fR message by providing the associated
+\fI\)Routing Contexts\fR or, if there is no \fI\)Routing Context\fR parameter
+in the message, the associated Application Servers are implied by SGP and ASP configuration data.
+(See Section 4.1.5 \- "ASP Active Procedures".)
+.sh 3 "ASP Active Ack (ASPAC ACK)"
+.lp
+\fB\)Load Selection\fR supplements the ASPAC ACK message by permitting the following
+optional parameters to be included in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+Load Selector:Optional:
+.TE
+.ix -4
+.lp
+The format of the resulting \fI\)ASPAC ACK\fR message is as follows: \*(#u
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Tag = 0x000b          |          Length = 8         |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+|                         Traffic Mode Type                     |
+\f(CB\
++---------------------------------+-----------------------------+
+|           Tag = 0xXXXX          |          Length             |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+\\                                                               \\
+/                           Load Selector                       /
+\\                                                               \\
++---------------------------------+-----------------------------+
+\f(CR\
+|           Tag = 0x0006          |          Length = 8         |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+\\                                                               \\
+/                          Routing Context                      /
+\\                                                               \\
++---------------------------------+-----------------------------+
+|           Tag = 0x0004          |          Length             |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+\\                                                               \\
+/                            Info String                        /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.fi
+.sz +2
+.)c
+.)b
+.(q
+.#v
+\fB\)EDITOR'S NOTE:- \fR The parameter tag values shown as \f(CR\)0xXXXX\fR)
+above will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)q
+.lp
+No other changes to the \fB\)ASPAC ACK\fR message format are provided by this
+extension.
+.lp
+The \fI\)Load Selector\fR parameter is used by the SGP in the \fB\)ASPAC ACK\fR
+message to indicate the range of traffic for which the SGP has activated the
+ASP.  The Application Servers for which the \fI\)Load Selectors\fR apply is
+either indicated in the \fB\)ASPAC\fR message by providing the associated
+\fI\)Routing Contexts\fR or, if there is no \fI\)Routing Context\fR parameter
+in the message, the associated Application Servers are implied by SGP and ASP configuration data.
+(See Section 4.1.5 \- "ASP Active Procedures".)
+.sh 3 "ASP Inactive (ASPIA)"
+.lp
+\fB\)Load Selection\fR supplements the \fB\)ASP Inactive (ASPIA)\fR message by
+permitting the following parameters to be included in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+Load Selector:Optional:
+.TE
+.ix -4
+.lp
+The format of the resulting \fI\)ASPIA\fR message is as follows: \*(#u
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+\f(CB\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Tag = 0xXXXX          |          Length             |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+\\                                                               \\
+/                           Load Selector                       /
+\\                                                               \\
++---------------------------------+-----------------------------+
+\f(CR\
+|           Tag = 0x0006          |          Length = 8         |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+\\                                                               \\
+/                          Routing Context                      /
+\\                                                               \\
++---------------------------------+-----------------------------+
+|           Tag = 0x0004          |          Length             |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+\\                                                               \\
+/                            Info String                        /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.fi
+.sz +2
+.)c
+.)b
+.(q
+.#v
+\fB\)EDITOR'S NOTE:- \fR The parameter tag values shown as \f(CR\)0xXXXX\fR)
+above will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)q
+.lp
+No other changes to the \fB\)ASPIA\fR message format are provided by this
+extension.
+.lp
+The \fI\)Load Selector\fR parameter is used by the ASP in the \fB\)ASPIA\fR
+message to indicate the range of traffic for which the ASP is deactivating.  The
+Application Servers for which the \fI\)Load Selectors\fR apply is either
+indicated in the \fB\)ASPAC\fR message by providing the associated
+\fI\)Routing Contexts\fR or, if there is no \fI\)Routing Context\fR parameter
+in the message, the associated Application Servers are implied by SGP and ASP configuration data.
+(See Section 4.1.6 \- "ASP Inactive Procedures".)
+.sh 3 "ASP Inactive Ack (ASPIA ACK)"
+.lp
+\fB\)Load Selection\fR supplements the \fB\)ASP Inactive Ack (ASPIA ACK)\fR message by
+permitting the following parameters to be included in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+Load Selector:Optional:
+.TE
+.ix -4
+.lp
+The format of the resulting \fI\)ASPIA ACK\fR message is as follows: \*(#u
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+\f(CB\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Tag = 0xXXXX          |          Length             |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+\\                                                               \\
+/                           Load Selector                       /
+\\                                                               \\
++---------------------------------+-----------------------------+
+\f(CR\
+|           Tag = 0x0006          |          Length = 8         |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+\\                                                               \\
+/                          Routing Context                      /
+\\                                                               \\
++---------------------------------+-----------------------------+
+|           Tag = 0x0004          |          Length             |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+\\                                                               \\
+/                            Info String                        /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.fi
+.sz +2
+.)c
+.)b
+.(q
+.#v
+\fB\)EDITOR'S NOTE:- \fR The parameter tag values shown as \f(CR\)0xXXXX\fR)
+above will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)q
+.lp
+No other changes to the \fB\)ASPIA ACK\fR message format are provided by this
+extension.
+.lp
+The \fI\)Load Selector\fR parameter is used by the SGP in the \fB\)ASPIA ACK\fR
+message to indicate the range of traffic for which the SGP has deactivated the
+ASP.  The Application Servers for which the \fI\)Load Selectors\fR apply is
+either indicated in the \fB\)ASPAC\fR message by providing the associated
+\fI\)Routing Contexts\fR or, if there is no \fI\)Routing Context\fR parameter
+in the message, the associated Application Servers are implied by SGP and ASP configuration data.
+(See Section 4.1.6 \- "ASP Inactive Procedures".)
+.sh 3 "Error (ERR)"
+.lp
+\fB\)Load Selection\fR supplements the \fB\)Error (ERR)\fR message by adding the
+following values to the common mandatory \fI\)Error Code\fR parameter in the
+\fB\)ERR\fR message:
+.ix +4
+.TS
+tab(:);
+nl.
+0xYY:Invalid Load Selector
+.TE
+.ix -4
+.(q
+.#v
+\fB\)EDITOR'S NOTE:- \fR The \fI\)Error Code\fR value shown as \f(CR\)0xYY\fR)
+above will be assigned by IANA as a value of the common \fI\)Error Code\fR
+parameter for SIGTRAN UAs and may change its value in further versions of this
+document.
+.)q
+.lp
+These new error codes are interpreted as follows: \*(#u
+.lp
+The \fI\)"Invalid Load Selector"\fR error
+.ix +4
+would be sent in an \fB\)ERR\fR message if the SG determines that one or more
+\fI\)Load Selectors\fR in the \fI\)Load Selector\fR parameter provided by
+the ASP is invalid, is not configured, or cannot be supported.
+.lp
+No other changes to the \fB\)ERR\fR message or \fI\)Error Code\fR parameter
+format are provided by this extension.  See Section 4 for extension procedures
+associated with the \fB\)ERR\fR message.
+.sh 3 "Notify (NTFY)"
+.lp
+\fB\)Load Selector\fR supplements the \fB\)Notify (NTFY)\fR message by permitting the
+following parameters to be included in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+Load Selector:Optional:
+.TE
+.ix -4
+.lp
+The format of the resulting \fI\)NTFY\fR message is as follows: \*(#u
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Tag = 0x000d          |          Length = 8         |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+|           Status Type           |     Status Information      |
++---------------------------------+-----------------------------+
+|           Tag = 0x0012          |          Length = 8         |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+|                          ASP Identifier                       |
+\f(CB\
++---------------------------------+-----------------------------+
+|           Tag = 0xXXXX          |          Length             |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+\\                                                               \\
+/                           Load Selector                       /
+\\                                                               \\
++---------------------------------+-----------------------------+
+\f(CR\
+|           Tag = 0x0006          |          Length = 8         |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+\\                                                               \\
+/                          Routing Context                      /
+\\                                                               \\
++---------------------------------+-----------------------------+
+|           Tag = 0x0004          |          Length             |
++- - - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - -+
+\\                                                               \\
+/                            Info String                        /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.fi
+.sz +2
+.)c
+.)b
+.(q
+.#v
+\fB\)EDITOR'S NOTE:- \fR The parameter tag values shown as \f(CR\)0xXXXX\fR)
+above will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)q
+.lp
+No other changes to the \fB\)NTFY\fR message format are provided by this
+extension.
+.lp
+The \fI\)Load Selector\fR parameter is used by the SGP in the \fB\)NTFY\fR
+message to indicate the traffic load positions which led to or have
+contributed to the change in state of an associated Application Server when
+sending a NTFY message that indicates and Application Server state change.
+The Application Servers for which the \fI\)Load Selectors\fR apply is either
+indicated in the \fI\)NTFY\fR message by providing the associated \fI\)Routing
+Contexts\fR or, if there is not \fI\)Routing Context\fR parameter in the
+message, the associated Application Servers are implied by SGP and ASP
+configuration data.
+(See Section 4.1.7 \- "Notification Procedures".)
+.sh 1 "Procedures"
+.rs #u
+.ds #u \*#
+.(d
+.ip \*#
+For a detailed description of these procedures, see Section 4 of the M3UA, SUA
+and TUA specifications cited under "References".
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+.)d
+.lp
+\fB\)Load Selection\fR provides for an additional level of
+control over the traffic distribution patterns within an Application
+Server.  \fB\)Load Selection\fR provides the \fI\)Load Selector\fR parameter which
+may be optionally included in the \fB\)ASPAC\fR, \fB\)ASPAC ACK\fR,
+\fB\)ASPIA\fR, \fB\)ASPIA ACK\fR and \fB\)NTFY\fR messages.  In addition, it
+provides procedures for use of the \fI\)Load Selector\fR parameter in
+association with these messages.
+.sh 2 "AS and ASP State Maintenance"
+.lp
+In addition to the SGP maintaining the state of each remote ASP in each
+Application Server that the ASP is configured to receive traffic, under
+\fB\)Load Selection\fR, SGP \fB\)MAY\fR also maintain the state of each remote
+ASP in each \fI\)Load Selector\fR within an Application server that the ASP is
+configured to receive traffic.  Aside from the procedures described in Section
+4.1.7 "Notification Procedures", no management procedures are provided by
+\fB\)Load Selection\fR for maintaining the state of a \fI\)Load Selector\fR
+within an Application Server.  The \fI\)Load Selector\fR state is maintained
+separate from the ASP and AS states.
+.sh 3 "ASP State"
+.lp
+\fB\)Load Selection\fR uses the existing UA
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+definitions and procedures with regard to ASP State.
+.sh 3 "AS State"
+.lp
+The state of the Application Server is maintained in the Signalling User
+Adaptation Layer on the SGPs.  The state of the Application Server changes due
+to ASP state transitions.  The possible states of an Application Server
+using \fB\)Load Selection\fR are:
+.ip "\fB\)AS-DOWN\fR:" 16
+The Application Server is unavailable.  This state implies that all related
+ASPs are in the ASP-DOWN state for this AS.  Initially, the AS will be in this
+state.  An Application Server is in the AS-DOWN state when it is removed from
+a configuration.
+.ip "\fB\)AS-INACTIVE\fR:" 16
+The Application Server is available but no application traffic is active (i.e,
+one or more related ASPs are in the ASP-INACTIVE state, but there is no ASP in
+the ASP-ACTIVE state).  The recovery timer T(r) is not running or has expired.
+.ip "\fB\)AS-ACTIVE\fR:" 16
+The Application Server is available and application traffic is active.  This
+state implies that there is at least one ASP in the ASP-ACTIVE state within
+the AS.
+.ip "\fB\)AS-PENDING\fR:" 16
+An active ASP has transition to ASP-INACTIVE or ASP-DOWN and it was the last
+remaining active ASP for a \fI\)Load Selector\fR in the AS.  A recovery timer
+T(r) \fB\)SHOULD\fR be started and all incoming signalling messages
+\fB\)SHOULD\fR be queue by the SGP for each of the \fI\)Load Selectors\fR for
+which there is no ASP in the ASP-ACTIVE state.  If an ASP becomes ASP-ACTIVE
+for each \fI\)Load Selector\fR in the AS before T(r) expires, the AS is moved
+to the AS-ACTIVE state and all the queued messages for the \fI\)Load
+Selector\fR will be sent to the newly active ASPs on each \fI\)Load
+Selector\fR.
+.sh 3 "ASP Up Procedures"
+.lp
+When an SGP receives an ASP Up messages from an ASP and the ASP is configured
+at the SGP in one or more \fI\)Load Selectors\fR associated with one or more
+Application Servers, if the ASP is not already in the ASP-INACTIVE state for
+the associated Application Servers, the SGP moves the ASP into the
+ASP-INACTIVE state for the configured \fI\)Load Selectors\fR within the
+associated Application Servers.  In any event, the SGP responds with an ASP
+Up Ack message.
+.lp
+If the ASP transition to the ASP-INACTIVE state within these \fI\)Load
+Selectors\fR results in a state change in the associated Application Servers,
+the SGP moves the Application Server to the AS-INACTIVE state.  If the ASP
+transition to the ASP-INACTIVE state for the given \fI\)Load Selectors\fR
+within an associated Application Server results in a change in state of the AS
+(or the \fI\)Load Selectors\fR associated with the AS), the SGP also follows
+the "Notification Procedures" (described in Section 4.1.7) for the Application
+Server.
+.lp
+Otherwise, the "ASP Up Procedures" described by the UAs \*(#u apply also to
+\fB\)Load Selection\fR.
+.sh 3 "ASP Down Procedures"
+.lp
+When an SGP receives an ASP Down messages from an ASP and the ASP is
+configured at the SGP in one or more \fI\)Load Selectors\fR associated with
+one or more Application Servers, if the ASP is not already in the ASP-DOWN
+state for the associated Application Servers, the SGP moves the ASP to the
+ASP-DOWN state for the configured \fI\)Load Selectors\fR within the associated
+Application Servers.  In any event, the SGP responds with an ASP Down Ack.
+.lp
+If the ASP transition to the ASP-DOWN state within these \fI\)Load
+Selectors\fR results in a state change in the associated Application Servers,
+the SGP moves the Application Server to the AS-DOWN state.
+.lp
+Otherwise, the "ASP Down Procedures" described by the UAs \*(#u apply also to
+\fB\)Load Selection\fR.
+.sh 3 "ASP Active Procedures"
+.lp
+When an ASP wishes to activate for a set of \fI\)Load Selectors\fR associated
+with an Application Server, it includes the \fI\)Load Selector\fR parameter in
+the \fB\)ASPAC\fR message.
+.lp
+When an SGP receives and \fB\)ASPAC\fR message requesting activation for a set
+of \fI\)Load Selectors\fR within an AS or the SG otherwise activates the ASP
+for a set of \fI\)Load Selectors\fR within an AS, the SG sends an
+\fB\)ASPAC ACK\fR message including the \fI\)Load Selectors\fR for which the
+ASP has been activated.
+If the SGP is responding to an ASP that included \fI\)Load Selectors\fR in the
+\fB\)ASPAC\fR message, the SG \fB\)MUST\fR include the \fI\)Load Selectors\fR
+in the response \fB\)ASPAC ACK\fR message.
+.lp
+If the \fB\)Load Selectors\fR included in an \fB\)ASPAC\fR message contains
+invalid information or indicates an unsupported \fB\)Load Selector\fR, or a
+\fB\)Load Selector\fR parameter required by the SGP is missing, the SGP
+replies to the \fB\)ASPAC\fR message with an
+\fB\)ERR\fR("Invalid/Unsupported/Missing Load Selector") message and takes no
+further action with regard to AS or ASP state.
+.lp
+The Application Servers associated with the \fI\)Load Selectors\fR is
+indicated in the \fB\)ASPAC (ACK)\fR message by \fI\)Routing Context\fR or,
+when the \fI\)Routing Context\fR parameter is missing from the \fB\)ASPAC
+(ACK)\fR message, is implied by ASP and SGP configuration data.
+When the \fI\)Load Selector\fR parameter is included in the \fB\)ASPAC
+(ACK)\fR message, the \fI\)Routing Context\fR parameter or implicit
+configuration data \fB\)SHOULD\fR be associated with a single Application
+Server.
+.lp
+If the ASP transition to the ASP-ACTIVE state for the given \fI\)Load
+Selectors\fR within an associated Application Server results in a change in
+state of the AS (or the \fI\)Load Selectors\fR associated with the AS), the
+SGP follows the "Notification Procedures" (described in Section 4.1.7) for the
+Application Server.
+.lp
+Otherwise, the "ASP Active Procedures" described by the UAs \*(#u apply also
+to \fB\)Load Selection\fR.
+.sh 3 "ASP Inactive Procedures"
+.lp
+When an ASP wishes to deactivate for a set of \fI\)Load Selectors\fR associated
+with an Application Server, it includes the \fI\)Load Selector\fR parameter in
+the \fB\)ASPIA\fR message.
+.lp
+When an SGP receives an \fB\)ASPIA\fR message requesting deactivation for a set
+of \fI\)Load Selectors\fR within an AS or the SG otherwise deactivates the ASP
+for a set of \fI\)Load Selectors\fR within an AS, the SG sends an
+\fB\)ASPIA ACK\fR message including the \fI\)Load Selectors\fR for which the
+ASP has been deactivated.
+If the SGP is responding to an ASP that included \fI\)Load Selectors\fR in the
+\fB\)ASPIA\fR message, the SG \fB\)MUST\fR include the \fI\)Load Selectors\fR
+in the response \fB\)ASPIA ACK\fR message.
+.lp
+If the SGP receives an \fB\)ASPIA\fR message from an ASP that is active for
+a set of \fB\)Load Selectors\fR associated with the Application Server for
+which the ASP is requesting deactivation, and the \fB\)Load Selector\fR
+parameter is not present in the \fB\)ASPIA\fR message, the SGP will interpret
+this as a request to deactivate the ASP for all the \fI\)Load Selectors\fR
+associated with the Application Server for which the ASP is active.
+.lp
+If the \fB\)Load Selectors\fR included in an \fB\)ASPAC\fR message contains
+invalid information or indicates an unsupported \fB\)Load Selector\fR,
+the SGP replies to the \fB\)ASPAC\fR message with an
+\fB\)ERR\fR("Invalid/Unsupported/Missing Load Selector") message and takes no
+further action with regard to AS or ASP state.
+.lp
+The Application Servers associated with the \fI\)Load Selectors\fR is
+indicated in the \fB\)ASPIA (ACK)\fR message by \fI\)Routing Context\fR or,
+when the \fI\)Routing Context\fR parameter is missing from the \fB\)ASPIA
+(ACK)\fR message, is implied by ASP and SGP configuration data.
+When the \fI\)Load Selector\fR parameter is included in the \fB\)ASPIA
+(ACK)\fR message, the \fI\)Routing Context\fR parameter or implicit
+configuration data \fB\)SHOULD\fR be associated with a single Application
+Server.
+.lp
+If the ASP transition to the ASP-INACTIVE state for the given \fI\)Load
+Selectors\fR within an associated Application Server results in a change in
+state of the AS (or the \fI\)Load Selectors\fR associated with the AS), the
+SGP follows the "Notification Procedures" (described in Section 4.1.7) for the
+Application Server.
+.lp
+Otherwise, the "ASP Inactive Procedures" described by the UAs \*(#u apply also
+to \fB\)Load Selection\fR.
+.sh 3 "Notify Procedures"
+.sh 4 "AS State Change"
+.lp
+When an ASP makes a state transition and is configured for a set of \fI\)Load
+Selectors\fR in one or more Application Servers, the ASP state transition may
+result in a change to the state of the associated Application Servers, or
+\fI\)Load Selectors\fR within those AS, at the SGP.  When a recovery timer
+T(r) expires, the associated Application Server will transition from the
+AS-PENDING state to the AS-INACTIVE state.
+.lp
+Whenever an AS changes state, or the condition of the AS \fI\)Load
+Selectors\fR perpetuating the current AS state changes, the SGP \fB\)MUST\fR
+notify all ASPs not in the ASP-DOWN state configured for the Application
+Server by sending a \fB\)Notify (NTFY)\fR message to each indicating the state
+of the Application Server in the \fI\)Status Information\fR field of the
+\fI\)Status\fR parameter in the \fB\)NTFY\fR message.
+.lp
+When an Application Server is configured for \fB\)Load Selection\fR, the SGP
+\fB\)MUST\fR also include a list of \fI\)Load Selectors\fR for which the
+Application Server is configured that caused the AS state change or is
+perpetuating the AS state.
+.lp
+The SGP includes the \fI\)Routing Context\fR that identifies the Application
+Server for which the \fB\)NTFY\fR message is being sent.  If, however, the ASP
+is not configured for more than one Application Sever, the \fI\)Routing
+Context\fR \fB\)MAY\fR be excluded from the message as it is implied by
+configuration data.
+.lp
+Otherwise, the "Notification Procedures" described by the UAs \*(#u apply also
+to \fB\)Load Selection\fR.
+.lp
+Examples are given in Section 5.
+.(d
+.ip \*#
+\fB\)EXAMPLE:-\fR
+An ASP (e.g, ASP-1) moving to state ASP-INACTIVE within a \fI\)Load
+Selector\fR (e.g, LS-1) results in the state of the AS moving to AS-PENDING.
+The SGP sends NTFY("Application Server Pending") with "LS-1" in the \fI\)Load
+Selector\fR parameter in the Notify message.  If immediately after (and before
+T(r) expires) another ASP (e.g, ASP-2) moves to state ASP-INACTIVE within
+another \fI\)Load Selector\fR (e.g, LS-2) resulting the state of the AS being
+"held" in the AS-PENDING state, the SGP sends NTFY("Application Server
+Pending") again, but this time includes both "LS-1" and "LS-2" in the
+\fI\)Load Selector\fR parameter in the Notify message.
+
+\fB\)EXAMPLE:-\fR
+When all ASPs are inactive for a \fI\)Load Selector\fR within an Override AS,
+the AS will transition to the AS-PENDING state.  The SGP will send a
+NTFY("Application Server Pending") message to all ASPs configured for the
+Application Server that are not in the ASP-DOWN state.  This message should
+include in the \fI\)Load Selector\fR parameter the \fI\)Load Selectors\fR in
+which there is no ASP in the ASP-ACTIVE state for the AS.
+.)d
+.sh 4 "ASP Override"
+.lp
+Whenever an ASP becomes active for a \fI\)Load Selector\fR in an Override
+Application Server, the \fI\)Load Selector\fR \fB\)MUST\fR be placed in a
+\fI\)NTFY\fR message with a \fI\)Status Information\fR indicating "Alternate
+ASP active in AS", along with the \fI\)Routing Context\fR for the associated
+AS and any \fI\)ASP Identifier\fR associated with the ASP for which the
+notification is being given.
+.lp
+Otherwise, the "Notification Procedures" described by the UAs \*(#u apply also
+to \fB\)Load Selection\fR.
+.sh 3 "Registration Procedures"
+.lp
+There is no specific registration procedure for \fB\)Load Selection\fR.  It
+can be conceived that the \fB\)REG REQ\fR and \fB\)REG RSP\fR message could be
+used with extensions to the Routing Key that would permit the SGP to return
+both a \fI\)Routing Context\fR and a \fI\)Load Selector\fR associated with a
+given Routing Key.  Such a Routing Key could include load selection key fields
+such a Signalling Link Selection (SLS)
+.[
+q704
+.]
+for M3UA,
+.[
+m3ua-10
+.]
+Destination Local Reference (DLR)
+.[
+q713
+.]
+for SUA,
+.[
+sua-09
+.]
+and Destination Transaction Id
+.[
+q773
+.]
+for TUA.
+.[
+tua-01
+.]
+A registration procedure is not currently described for \fB\)Load
+Selection\fR; however, a registration procedure may be added to later
+revisions of this draft.
+.lp
+Otherwise, the "Registration Procedures" described by the UAs \*(#u apply also to
+\fB\)Load Selection\fR.
+.sh 2 "Interworking Procedures"
+.lp
+\fB\)Load Selection\fR supports the ASP Extension procedures described in
+ASPEXT
+.[
+aspext-00
+.]
+and defines the following \fI\)ASP Extension\fR value:
+.ix +4
+.TS
+tab(:);
+nl.
+1:Load Selection Extension
+.[
+loadsel-00
+.]
+.TE
+.lp
+The following procedres may be used where the \fB\)ASPEXT\fR procedures are
+not used:
+.lp
+Whenever an ASP receives an \fB\)ASPIA ACK\fR not containing a \fI\)Load
+Selector\fR parameter in response to an \fB\)ASPAC\fR containing the
+parameter, the ASP will assume that the the SGP or IPSP does not support
+\fB\)Load Selection\fR and \fB\)MUST\fR fall back to the non-Load Selection UA
+procedures.
+.sh 1 "Examples"
+.lp
+\fI\*(&f\n(&n\fR illustrates the example configuration that is used for all
+the examples in this section.  The example configuration consist of:
+.bu
+Two SGs (SG1 and SG2) acting as STPs in the SS7 network and consisting (for
+example) of a single SGP.  Each SG is connected to each of the ASPs in the
+example configuration.
+
+.bu
+Four ASPs (ASP1, ASP2, ASP3 and ASP4).  Each ASP is connected to both of the
+SGs in the example configuration.
+.bu
+Three Load Selectors (LS1 and LS2) associated with the Application Server.
+The traffic that corresponds to each Load Selectors is different in each
+example.
+.lp
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+                      SCTP
+                      Associations  ________      _________
+           _________   ............|        |    /         \\
+          |         |..:    .......|  ASP1  |   |    AS1    |
+          |         |.....  :      |________|   |           |
+  ________|   SG1   |....:  :                   | ......... |
+         /|         |...::  :       ________    | :       : |
+  \\     / |_________|  :::..:......|        |   | :  LS1  : |
+   \\   /       |       ::   :......|  ASP2  |   | :.......: |
+    \\ /        |       ::   ::     |________|   |           |
+     X         |       ::   ::                  |           |
+    / \\        |       ::   ::      ________    |           |
+   /   \\   ____|____   ::...::.....|        |   |           |
+  /     \\ |         |..:....::.....|  ASP3  |   | ......... |
+  _______\\|         |..:.....::    |________|   | :       : |
+          |   SG2   |..:......:                 | :  LS2  : |
+          |         |..:.....       ________    | :.......: |
+          |_________|  :....:......|        |   |           |
+                            :......|  ASP4  |   |           |
+                                   |________|    \\_________/
+.fi
+.sz +2
+.)c
+.#f "Example Configuration"
+.)b
+.sh 3 "Initialization"
+.lp
+\fI\*(&f\n(&n\fR illustrates the common initialization procedure use for all
+of the examples.  Each ASP establishes an SCTP Association with SG1 and sends
+and ASP Up message to which it receives and ASP Up response.  The ASPs are not
+statically configured to serve specific AS or LS within the AS, so no Notify
+messages are received.  The same sequence of messages are also exchanged with
+SG2.
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+SG1   SG2                           ASP1  ASP2  ASP3  ASP4      AS1
+ :     :                             :     :     :     :         :
+ :<----:-Establish Association------>:     :     :     :         :
+ :<----:-ASPUP-----------------------:     :     :     :         :
+ :-----:-ASPUP ACK------------------>:     :     :     :         :
+ :     :                             :     :     :     :         :
+ :<----:-Establish Association-------:---->:     :     :         :
+ :<----:-ASPUP-----------------------:-----:     :     :         :
+ :-----:-ASPUP ACK-------------------:---->:     :     :         :
+ :     :                             :     :     :     :         :
+ :<----:-Establish Association-------:-----:---->:     :         :
+ :<----:-ASPUP-----------------------:-----:-----:     :         :
+ :-----:-ASPUP ACK-------------------:-----:---->:     :         :
+ :     :                             :     :     :     :         :
+ :<----:-Establish Association-------:-----:-----:---->:         :
+ :<----:-ASPUP-----------------------:-----:-----:-----:         :
+ :-----:-ASPUP ACK-------------------:-----:-----:---->:         :
+ :     :                             :     :     :     :         :
+ :     : (Same message exchange for SG2)   :     :     :         :
+ :     :                             :     :     :     :         :
+.fi
+.sz +2
+.)c
+.#f "Example \- Initialization"
+.)b
+.sh 2 "M3UA with Override AS and Load Selection based on CIC"
+.lp
+This example is for an M3UA configuration with the Application Server (AS1)
+configured with a Traffic Mode Type of Override.  The Application Server (AS1)
+has associated with it a Routing Key (RK1) that consists of a Destination
+Point Code that corresponds to the AS1 (MGC1) point code (PC1), an Originating
+Point Code that corresponds to a remote MGC2 point code (PC2), and the SI
+value for ISUP (SI=5).  The Load Selectors (LS1 and LS2) correspond to
+two sets of CIC values which correspond to two different trunk groups
+between MGC1 and MGC2 (TG1 and TG2).
+.sh 3 "Activation"
+.lp
+\fI\*(&f\n(&n\fR illustrates activation of the ASPs for Load Selectors within
+the Override Application Server.  The sequence of events is as follows:
+.np
+ASP1 sends an ASP Active message to SG1 identifying Load Selector LS1 within
+Application Server AS1/RC1 and receives an acknowledgment and a notification.
+Data is transferred between the SG and ASP1 for Load Selection LS1 within AS1. 
+.np
+ASP2 sends an ASP Active message to SG1 identifying Load Selector LS2 within
+Application Server AS1/RC1 and receives an acknowledgment and a notification.
+ASP1 also receives notification that AS1/RC1 is active for LS2.  Data is
+transferred between the SG and ASP2 for Load Selection LS2 within AS1. 
+.np
+ASP3 sends an ASP Inactive message to SG1 identifying Load Selector LS1 within
+Application Server AS1/RC1 and receives an acknowledgment and a notification.
+.np
+ASP4 sends an ASP Inactive message to SG1 identifying Load Selector LS1 and
+LS2 within Application Server AS1/RC1 and receives an acknowledgment and a
+notification.
+.np
+The same exchange is repeated for SG2.
+.lp
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+SG1   SG2                           ASP1  ASP2  ASP3  ASP4      AS1
+ :     :                             :     :     :     :         :
+ :<----:-ASPAC(LS1/RC1)--------------:     :     :     :         :
+ :-----:-ASPAC ACK(LS1/RC1)--------->:     :     :     :         :
+ :-----:-NTFY(AS_Act)(LS1/RC1)------>:     :     :     :  (LS1)  :
+ :     :                             :     :     :     :         :
+ :<----:-DATA----------------------->:<----:-----:-----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-ASPAC(LS2/RC1)--------------:-----:     :     :         :
+ :-----:-ASPAC ACK(LS2/RC1)----------:---->:     :     :         :
+ :-----:-NTFY(AS_Act)(LS1,LS2/RC1)-->:     :     :     :         :
+ :-----:-NTFY(AS_Act)(LS1,LS2/RC1)---:---->:     :     :  (LS2)  :
+ :     :                             :     :     :     :         :
+ :<----:-DATA------------------------:---->:<----:-----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-ASPIA(LS1/RC1)--------------:-----:-----:     :         :
+ :-----:-ASPIA ACK(LS1/RC1)----------:-----:---->:     :         :
+ :-----:-NTFY(AS_Act)(LS1,LS2/RC1)---:-----:---->:     :         :
+ :     :                             :     :     :     :         :
+ :<----:-ASPIA(LS1,LS2/RC1)----------:-----:-----:-----:         :
+ :-----:-ASPIA ACK(LS1,LS2/RC1)------:-----:-----:---->:         :
+ :-----:-NTFY(AS_Act)(LS1,LS2/RC1)---:-----:-----:---->:         :
+ :     :                             :     :     :     :         :
+ :     : (Same message exchange for SG2)   :     :     :         :
+ :     :                             :     :     :     :         :
+.fi
+.sz +2
+.)c
+.#f "M3UA Example \- Activation"
+.)b
+.sh 3 "Failure of ASP1"
+.lp
+\fI\*(&f\n(&n\fR illustrates the failure of ASP1.
+The sequence of events is as follows:
+.np
+Data for LS1 within AS1 is exchanged between SG1 and ASP1.  Data for LS2
+within AS1 is exchanged between SG1 and ASP2.
+.np
+Communication is lost between SG1 and ASP1.  ASP2, ASP3, and ASP4 are notified
+of the failure of ASP1 and the change of state of AS1 to AS-PENDING for LS1.
+Data for LS2 in AS1 is unaffected.
+.np
+ASP4 (spare) responds to the AS-PENDING notification and activates for LS1 in
+AS1/RC1.  ASP2, ASP3 and ASP4 receive an AS-ACTIVE notification.  Data for LS1
+in AS1 is now exchanged with ASP4.
+.lp
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+SG1   SG2                           ASP1  ASP2  ASP3  ASP4      AS1
+ :     :                             :     :     :     :         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA----------------------->:<----:-----:-----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-COMM LOST----------XXXX-----:     :     :     :         :
+ :-----:-NTFY(ASP Fail)(ASP1)--------:---->:     :     :         :
+ :-----:-NTFY(ASP Fail)(ASP1)--------:-----:---->:     :         :
+ :-----:-NTFY(ASP Fail)(ASP1)--------:-----:-----:---->:         :
+ :-----:-NTFY(AS_Pending)(LS1/RC1)---:---->:     :     :         :
+ :-----:-NTFY(AS_Pending)(LS1/RC1)---:-----:---->:     :         :
+ :-----:-NTFY(AS_Pending)(LS1/RC1)---:-----:-----:---->:         :
+ :     :                             :     :     :     :         :
+ :<----:-ASPAC(LS1/RC1)--------------:-----:-----:-----:         :
+ :-----:-ASPAC ACK(LS1/RC1)----------:-----:-----:---->:         :
+ :-----:-NTFY(AS_Active)(LS1,LS2/RC1):---->:     :     :         :
+ :-----:-NTFY(AS_Active)(LS1,LS2/RC1):-----:---->:     :         :
+ :-----:-NTFY(AS_Active)(LS1,LS2/RC1):-----:-----:---->:         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA------------------------:-----:-----:---->:<------->:
+ :     :                             :     :     :     :         :
+.fi
+.sz +2
+.)c
+.#f "M3UA Example \- Failure of ASP1"
+.)b
+.sh 3 "Sparing"
+.lp
+\fI\*(&f\n(&n\fR illustrates a sparing situation where one ASP takes over
+traffic from another so that the original ASP can be taken out of service.
+The sequence of events is as follows:
+.np
+Data for LS1 in AS1 is exchange between SG1 and ASP1.
+.np
+ASP4 (spare) activates for LS1 in AS1 and receives and acknowledgment.  ASP4
+has overridden ASP1 and a notification is sent to ASP1 that indicates that
+ASP4 in now the "Alternate ASP Active for AS".
+.np
+Data for LS1 in AS1 is now being exchanged between SG1 and ASP4.
+.np
+ASP1 can now be taken down and out of service.
+.lp
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+SG1   SG2                           ASP1  ASP2  ASP3  ASP4      AS1
+ :     :                             :     :     :     :         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA----------------------->:<----:-----:-----:-------->:
+ :<----:-DATA----------------------->:<----:-----:-----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-ASPAC(LS1/RC1)--------------:-----:-----:-----:         :
+ :-----:-ASPAC ACK(LS1/RC1)----------:-----:-----:---->:         :
+ :-----:-NTFY(Alt ASP)(ASP4)-------->:     :     :     :         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA------------------------:-----:-----:---->:<------->:
+ :<----:-DATA------------------------:-----:-----:---->:<------->:
+ :     :                             :     :     :     :         :
+.fi
+.sz +2
+.)c
+.#f "M3UA Example \- Sparing"
+.)b
+.sh 2 "SUA with Load-share AS and Load Selection based on GT"
+.lp
+This example is for an SUA configuration with the Application Server (AS1)
+configured with a Traffic Mode Type of Load-share.  The Application Server
+(AS1) has associated with it (RK1) that consists of Destination Point Code
+and Subsystem Number that corresponds to the AS1 (HLR1) point code (PC1).  The
+Load Selectors (LS1 and LS2) correspond to two sets of Global Titles which
+correspond to Mobile and GSTN numbering.
+.sh 3 "Activation"
+.lp
+\fI\*(&f\n(&n\fR illustrates activation of the ASPs for Load Selectors within
+the Load-share Application Server.  The sequence of events is as follows:
+.np
+ASP1 sends an ASP Active message to SG1 identifying Load Selector LS1 within
+Application Server AS1/RC1 and receives an acknowledgment and a notification.
+Data is transferred between the SG and ASP1 for Load Selection LS1 within AS1. 
+.np
+ASP2 sends an ASP Active message to SG1 identifying Load Selector LS2 within
+Application Server AS1/RC1 and receives an acknowledgment and a notification.
+ASP1 also receives notification that AS1/RC1 is active for LS2.  Data is
+transferred between the SG and ASP2 for Load Selection LS2 within AS1. 
+.np
+ASP3 sends an ASP Active message to SG1 identifying Load Selector LS1 within
+Application Server AS1/RC1 and receives an acknowledgment and a notification.
+Data is load-shared between the SG and ASP1 and ASP3 for Load Selection LS1
+within AS1. 
+.np
+ASP4 sends an ASP Inactive message to SG1 identifying Load Selector LS1 and
+LS2 within Application Server AS1/RC1 and receives an acknowledgment and a
+notification.
+.np
+The same exchange is repeated for SG2.
+.lp
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+SG1   SG2                           ASP1  ASP2  ASP3  ASP4      AS1
+ :     :                             :     :     :     :         :
+ :<----:-ASPAC(LS1/RC1)--------------:     :     :     :         :
+ :-----:-ASPAC ACK(LS1/RC1)--------->:     :     :     :         :
+ :-----:-NTFY(AS_Act)(LS1/RC1)------>:     :     :     :         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA----------------------->:<----:-----:-----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-ASPAC(LS2/RC1)--------------:-----:     :     :         :
+ :-----:-ASPAC ACK(LS2/RC1)----------:---->:     :     :         :
+ :-----:-NTFY(AS_Act)(LS1,LS2/RC1)-->:     :     :     :         :
+ :-----:-NTFY(AS_Act)(LS1,LS2/RC1)---:---->:     :     :         :
+ :     :                             :     :     :     :  (LS2)  :
+ :<----:-DATA------------------------:---->:<----:-----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-ASPAC(LS1/RC1)--------------:-----:-----:     :         :
+ :-----:-ASPAC ACK(LS1/RC1)----------:-----:---->:     :         :
+ :-----:-NTFY(AS_Act)(LS1,LS2/RC1)---:-----:---->:     :         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA----------------------->:<----:-----:-----:-------->:
+ :<----:-DATA------------------------:-----:---->:<----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-ASPIA(LS1,LS2/RC1)----------:-----:-----:-----:         :
+ :-----:-ASPIA ACK(LS1,LS2/RC1)------:-----:-----:---->:         :
+ :-----:-NTFY(AS_Act)(LS1,LS2/RC1)---:-----:-----:---->:         :
+ :     :                             :     :     :     :         :
+ :     : (Same message exchange for SG2)   :     :     :         :
+ :     :                             :     :     :     :         :
+.fi
+.sz +2
+.)c
+.#f "SUA Example \- Activation"
+.)b
+.sh 3 "Failure of ASP1 and ASP2"
+.lp
+\fI\*(&f\n(&n\fR illustrates the failure of ASP1 followed by the failure of
+ASP2.  The sequence of events is as follows:
+.np
+Data for LS1 within AS1 is load-shared between ASP1 and ASP3.  Data for LS2
+within AS1 is exchanged with ASP2.
+.np
+Communication is lost between SG1 and ASP1.  ASP2, ASP3, and ASP4 are notified of
+the failure of ASP1.  Data for LS1 in AS1 is directed toward ASP3 only.  Data
+for LS2 in AS1 is unaffected.
+.np
+Communication is lost between SG1 and ASP2.  ASP3 and ASP4 are notified of the
+failure of ASP1 as well of the AS1 state change to AS-PENDING.  Data for LS2
+is queued at the SG.
+.np
+ASP4 (spare) responds to the AS-PENDING notification and activates for LS2 in
+AS1/RC1.  ASP3 and ASP4 receive an AS-ACTIVE notification.  Data for LS2
+in AS1 is now exchanged with ASP4.
+.lp
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+SG1   SG2                           ASP1  ASP2  ASP3  ASP4      AS1
+ :     :                             :     :     :     :         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA----------------------->:<----:-----:-----:-------->:
+ :<----:-DATA------------------------:-----:---->:<----:-------->:
+ :     :                             :     :     :     :  (LS2)  :
+ :<----:-DATA------------------------:---->:<----:-----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-COMM LOST----------XXXX-----:     :     :     :         :
+ :-----:-NTFY(ASP Fail)(ASP1)--------:---->:     :     :         :
+ :-----:-NTFY(ASP Fail)(ASP1)--------:-----:---->:     :         :
+ :-----:-NTFY(ASP Fail)(ASP1)--------:-----:-----:---->:         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA------------------------:-----:---->:<----:-------->:
+ :<----:-DATA------------------------:-----:---->:<----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-COMM LOST----------XXXX-----:-----:     :     :         :
+ :-----:-NTFY(ASP Fail)(ASP2)--------:-----:---->:     :         :
+ :-----:-NTFY(ASP Fail)(ASP2)--------:-----:-----:---->:         :
+ :-----:-NTFY(AS_Pending)(LS2/RC1)---:-----:---->:     :         :
+ :-----:-NTFY(AS_Pending)(LS2/RC1)---:-----:-----:---->:         :
+ :     :                             :     :     :     :         :
+ :<----:-ASPAC(LS2/RC1)--------------:-----:-----:-----:         :
+ :-----:-ASPAC ACK(LS2/RC1)----------:-----:-----:---->:         :
+ :-----:-NTFY(AS_Active)(LS2/RC1)----:-----:---->:     :         :
+ :-----:-NTFY(AS_Active)(LS2/RC1)----:-----:-----:---->:         :
+ :     :                             :     :     :     :  (LS2)  :
+ :<----:-DATA------------------------:-----:-----:---->:<------->:
+ :     :                             :     :     :     :         :
+.fi
+.sz +2
+.)c
+.#f "SUA Example \- Failure of ASP1 and ASP2"
+.)b
+.sh 3 "Sparing"
+.lp
+\fI\*(&f\n(&n\fR illustrates a sparing situation where one ASP takes over
+traffic from another so that the original ASP can be taken out of service.
+The sequence of events is as follows:
+.np
+Data for LS1 in AS1 is load-shared between SG1 and ASP1 and ASP3.
+.np
+ASP4 (spare) activates for LS1 in AS1 and receives and acknowledgment.
+Data for LS1 in AS1 is now being load-shared between SG1 and ASP1, ASP3 and
+ASP4.
+.np
+ASP1 deactivates for LS1 in AS1 and receives and acknowledgment but no
+notification.
+.np
+Data or LS1 in AS1 is now load-shared between SG1 and ASP3 and ASP4.
+.np
+ASP1 can now be taken down and out of service.
+.lp
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+SG1   SG2                           ASP1  ASP2  ASP3  ASP4      AS1
+ :     :                             :     :     :     :         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA----------------------->:<----:-----:-----:-------->:
+ :<----:-DATA------------------------:-----:---->:<----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-ASPAC(LS1/RC1)--------------:-----:-----:-----:         :
+ :-----:-ASPAC ACK(LS1/RC1)----------:-----:-----:---->:         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA----------------------->:<----:-----:-----:-------->:
+ :<----:-DATA------------------------:-----:---->:<----:-------->:
+ :<----:-DATA------------------------:-----:-----:---->:<------->:
+ :     :                             :     :     :     :         :
+ :<----:-ASPIA(LS1/RC1)--------------:     :     :     :         :
+ :-----:-ASPIA ACK(LS1/RC1)--------->:     :     :     :         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA------------------------:-----:---->:<----:-------->:
+ :<----:-DATA------------------------:-----:-----:---->:<------->:
+ :     :                             :     :     :     :         :
+.fi
+.sz +2
+.)c
+.#f "SUA Example \- Sparing"
+.)b
+.sh 2 "TUA with Broadcast AS and Load Selection based on DID"
+.lp
+This example is for an TUA configuration with the Application Server (AS1)
+configured with a Traffic Mode Type of Broadcast.  The Application Server
+(AS1) has associated with it (RK1) that consists of Destination Point Code
+and Subsystem Number that corresponds to the AS1 (HLR1) point code (PC1).  The
+Load Selectors (LS1 and LS2) correspond to two sets of Dialog Ids which
+correspond to even and odd Dialog Ids.
+.sh 3 "Activation"
+.lp
+\fI\*(&f\n(&n\fR illustrates activation of the ASPs for Load Selectors within
+the Broadcast Application Server.  The sequence of events is as follows:
+.np
+ASP1 sends an ASP Active message to SG1 identifying Load Selector LS1 within
+Application Server AS1/RC1 and receives an acknowledgment and a notification.
+Data is transferred between the SG and ASP1 for Load Selection LS1 within AS1. 
+The initial Data Messages for LS1 within AS1 are tagged with a Correlation Id.
+.np
+ASP2 sends an ASP Active message to SG1 identifying Load Selector LS2 within
+Application Server AS1/RC1 and receives an acknowledgment and a notification.
+ASP1 also receives notification that AS1/RC1 is active for LS2.  Data is
+transferred between the SG and ASP2 for Load Selection LS2 within AS1. 
+The initial Data Messages for LS2 within AS1 are tagged with a Correlation Id.
+.np
+ASP3 sends an ASP Active message to SG1 identifying Load Selector LS1 within
+Application Server AS1/RC1 and receives an acknowledgment and a notification.
+Data is broadcast the SG and ASP1 and ASP3 for Load Selection LS1 within AS1.
+The initial Data Messages for LS1 within AS1 are tagged with a Correlation Id.
+.np
+ASP4 sends an ASP Inactive message to SG1 identifying Load Selector LS1 and
+LS2 within Application Server AS1/RC1 and receives an acknowledgment and a
+notification.
+.np
+The same exchange is repeated for SG2.
+.lp
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+SG1   SG2                           ASP1  ASP2  ASP3  ASP4      AS1
+ :     :                             :     :     :     :         :
+ :<----:-ASPAC(LS1/RC1)--------------:     :     :     :         :
+ :-----:-ASPAC ACK(LS1/RC1)--------->:     :     :     :         :
+ :-----:-NTFY(AS_Act)(LS1/RC1)------>:     :     :     :         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA-(CorrId)-------------->:<----:-----:-----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-ASPAC(LS2/RC1)--------------:-----:     :     :         :
+ :-----:-ASPAC ACK(LS2/RC1)----------:---->:     :     :         :
+ :-----:-NTFY(AS_Act)(LS1,LS2/RC1)-->:     :     :     :         :
+ :-----:-NTFY(AS_Act)(LS1,LS2/RC1)---:---->:     :     :         :
+ :     :                             :     :     :     :  (LS2)  :
+ :<----:-DATA-(CorrId)---------------:---->:<----:-----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-ASPAC(LS1/RC1)--------------:-----:-----:     :         :
+ :-----:-ASPAC ACK(LS1/RC1)----------:-----:---->:     :         :
+ :-----:-NTFY(AS_Act)(LS1,LS2/RC1)---:-----:---->:     :         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA-(CorrId)---------------:-----:---->:<----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-ASPIA(LS1,LS2/RC1)----------:-----:-----:-----:         :
+ :-----:-ASPIA ACK(LS1,LS2/RC1)------:-----:-----:---->:         :
+ :-----:-NTFY(AS_Act)(LS1,LS2/RC1)---:-----:-----:---->:         :
+ :     :                             :     :     :     :         :
+ :     : (Same message exchange for SG2)   :     :     :         :
+ :     :                             :     :     :     :         :
+.fi
+.sz +2
+.)c
+.#f "TUA Example \- Activation"
+.)b
+.sh 3 "Failure of ASP1 and ASP2"
+.lp
+\fI\*(&f\n(&n\fR illustrates the failure of ASP1 followed by the failure of
+ASP2.  The sequence of events is as follows:
+.np
+Data for LS1 within AS1 is broadcast to ASP1 and ASP3.  Data for LS2
+within AS1 is exchanged with ASP2.
+.np
+Communication is lost between SG1 and ASP1.  ASP2, ASP3, and ASP4 are notified of
+the failure of ASP1.  Data for LS1 in AS1 is directed toward ASP3 only.  Data
+for LS2 in AS1 is unaffected.
+.np
+Communication is lost between SG1 and ASP2.  ASP3 and ASP4 are notified of the
+failure of ASP1 as well of the AS1 state change to AS-PENDING.  Data for LS2
+is queued at the SG.
+.np
+ASP4 (spare) responds to the AS-PENDING notification and activates for LS2 in
+AS1/RC1.  ASP3 and ASP4 receive an AS-ACTIVE notification.  Data for LS2
+in AS1 is now exchanged with ASP4.  Initial DATA messages for LS2 in AS1 are
+tagged with a Correlation Id.
+.lp
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+SG1   SG2                           ASP1  ASP2  ASP3  ASP4      AS1
+ :     :                             :     :     :     :         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA----------------------->:<----:---->:<----:-------->:
+ :<----:-DATA----------------------->:<----:---->:<----:-------->:
+ :     :                             :     :     :     :  (LS2)  :
+ :<----:-DATA------------------------:---->:<----:-----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-COMM LOST----------XXXX-----:     :     :     :         :
+ :-----:-NTFY(ASP Fail)(ASP1)--------:---->:     :     :         :
+ :-----:-NTFY(ASP Fail)(ASP1)--------:-----:---->:     :         :
+ :-----:-NTFY(ASP Fail)(ASP1)--------:-----:-----:---->:         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA------------------------:-----:---->:<----:-------->:
+ :<----:-DATA------------------------:-----:---->:<----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-COMM LOST----------XXXX-----:-----:     :     :         :
+ :-----:-NTFY(ASP Fail)(ASP2)--------:-----:---->:     :         :
+ :-----:-NTFY(ASP Fail)(ASP2)--------:-----:-----:---->:         :
+ :-----:-NTFY(AS_Pending)(LS2/RC1)---:-----:---->:     :         :
+ :-----:-NTFY(AS_Pending)(LS2/RC1)---:-----:-----:---->:         :
+ :     :                             :     :     :     :         :
+ :<----:-ASPAC(LS2/RC1)--------------:-----:-----:-----:         :
+ :-----:-ASPAC ACK(LS2/RC1)----------:-----:-----:---->:         :
+ :-----:-NTFY(AS_Active)(LS2/RC1)----:-----:---->:     :         :
+ :-----:-NTFY(AS_Active)(LS2/RC1)----:-----:-----:---->:         :
+ :     :                             :     :     :     :  (LS2)  :
+ :<----:-DATA-(CorrId)---------------:-----:-----:---->:<------->:
+ :     :                             :     :     :     :         :
+.fi
+.sz +2
+.)c
+.#f "TUA Example \- Failure of ASP1"
+.)b
+.sh 3 "Sparing"
+.lp
+\fI\*(&f\n(&n\fR illustrates a sparing situation where one ASP takes over
+traffic from another so that the original ASP can be taken out of service.
+The sequence of events is as follows:
+.np
+Data for LS1 in AS1 is broadcast from SG1 to ASP1 and ASP3.
+.np
+ASP4 (spare) activates for LS1 in AS1 and receives and acknowledgment.
+Data for LS1 in AS1 is now being broadcast from SG1 to ASP1, ASP3 and
+ASP4.  Initial data for LS1 in AS1 is tagged with a Correlation Id.
+.np
+ASP1 deactivates for LS1 in AS1 and receives and acknowledgment but no
+notification.
+.np
+Data or LS1 in AS1 is now broadcast from SG1 to ASP3 and ASP4.
+.np
+ASP1 can now be taken down and out of service.
+.lp
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+SG1   SG2                           ASP1  ASP2  ASP3  ASP4      AS1
+ :     :                             :     :     :     :         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA----------------------->:<----:-----:-----:-------->:
+ :<----:-DATA------------------------:-----:---->:<----:-------->:
+ :     :                             :     :     :     :         :
+ :<----:-ASPAC(LS1/RC1)--------------:-----:-----:-----:         :
+ :-----:-ASPAC ACK(LS1/RC1)----------:-----:-----:---->:         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA----------------------->:<----:-----:-----:-------->:
+ :<----:-DATA------------------------:-----:---->:<----:-------->:
+ :<----:-DATA-(CorrId)---------------:-----:-----:---->:<------->:
+ :     :                             :     :     :     :         :
+ :<----:-ASPIA(LS1/RC1)--------------:     :     :     :         :
+ :-----:-ASPIA ACK(LS1/RC1)--------->:     :     :     :         :
+ :     :                             :     :     :     :  (LS1)  :
+ :<----:-DATA------------------------:-----:---->:<----:-------->:
+ :<----:-DATA------------------------:-----:-----:---->:<------->:
+ :     :                             :     :     :     :         :
+.fi
+.sz +2
+.)c
+.#f "TUA Example \- Sparing"
+.)b
+.sh 1 "Security"
+.lp
+\fB\)Load Selection\fR does not introduce any new security risks or
+considerations that are not already inherent in the UA
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+Please see the "Security" sections of M3UA, SUA and TUA
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+for security considerations and recommendations that are applicable to each of
+these UAs.
+.sh 1 "IANA Considerations"
+.lp
+\fB\)Load Selection\fR
+adds the following parameter tag value (described in Section 3) to the Common
+Parameter numbering range for M3UA, SUA and TUA.
+.[
+m3ua-10
+.]
+.[
+sua-09
+.]
+.[
+tua-01
+.]
+.ix +4
+.TS
+tab(:);
+nl.
+0xXXXX:Load Selector
+.TE
+.ix -4
+.(q
+.#v
+\fB\)EDITOR'S NOTE:- \fR The \fI\)Load Selector\fR tag value shown throughout
+this document as \f(CR\)0xXXXX\fR) will be assigned by IANA within the common
+parameter range of the SIGTRAN UAs and may change its value in further
+versions of this document.
+.)q
+.lp
+\fB\)Load Selection\fR
+adds the following value to the \fI\)Error Code\fR parameter (described in
+Section 3 and 4) for M3UA, SUA and TUA.
+.[
+m3ua-10
+.]
+.[
+rfc 2960
+.]
+association fails, it is necessary to identify both the sequence of the last
+message succesfully received and processed by the Signalling Process, as well
+as the traffic flow within which that sequence applies.
+.pp
+Therefore, this document identifies the traffic flow by the Routing Context<4>
+.(f
+.ip <4> 5
+Interface Identifier in M2UA.
+.)f
+and the sequence within that flow as identified by the Correlation Identifier.
+The Correlation Identifier is a sequence number which is applied to all
+divertable traffic within a traffic flow as identified by a Routing Context.
+.sh 2 "Procedures"
+.sh 3 "SGP Starting New SGP-to-ASP Traffic"
+.pp
+When traffic is orignally started for a traffic flow (i.e, within a Routing
+Context) the first divertable message in the traffic flow is assigned a
+Correlation Id number of zero (0) by the sending Signalling Process.
+Subsequent divertable messages within the routing context are given the
+Correlation Id number of one (1), two (2), and so on.
+.pp
+Because SCTP is a sequenced reliable transport,
+.[
+rfc 2960
+.]
+.ix +4
+.TS
+tab(:);
+nl.
+0xYY:Invalid Load Selector
+.TE
+.ix -4
+.(q
+.#v
+\fB\)EDITOR'S NOTE:- \fR The \fI\)Error Code\fR value shown throughout this
+document as \f(CR\)0xYY\fR) will be assigned by IANA as a value of the common
+\fI\)Error Code\fR parameter for SIGTRAN UAs and may change its value in
+further versions of this document.
+.)q
+.uh "Acknowledgments"
+.lp
+The authors would like to thank
+Ken Morneault,
+Barry Nagelberg,
+Benjamin J. Wilson,
+Jacques Rajchgod,
+Greg Sidebottom
+and
+Gery Verwimp
+for their valuable comments and suggestions.
+.nr ii 0.5i
+.uh "Notes"
+.pd
+.de ]<
+.uh "References"
+.rm (f )f
+..
+.[
+$LIST$
+.]
+.(b
+.uh "Author's Addresses"
+.lp
+.TS
+expand tab(;);
+lr.
+Brian Bidulock;Phone: +1-972-839-4489
+OpenSS7 Corporation;Email: bidulock@openss7.org
+4701 Preston Park Boulevard;URL: http://www.openss7.org/
+Suite 424;
+Plano, TX  75093;
+USA;
+.TE
+.bl 3
+.lp
+This draft expires July, 2002.
+.)b
+.bp
+.\".ce 1
+.\".uh "List of Tables"
+.\".(l I
+.\".xp 3
+.\".)l
+.(b I
+.ce 1
+.uh "List of Illustrations"
+.lp
+.xp 2
+.)b
+.(b I
+.ce 1
+.uh "Table of Contents"
+.lp
+.xp 0
+.)b
+.bp
+.uh "Copyright Statement"
+.lp
+\fBCopyright \(co The Internet Society (2002).  All Rights Reserved.\fR
+.lp
+This document and translations of it may be copied and furnished to others,
+and derivative works that comment on or otherwise explain it or assist in its
+implementation may be prepared, copied, published and distributed, in whole or
+in part, without restriction of any kind, provided that the above copyright
+notice and this paragraph are included on all such copies and derivative
+works.  However, this document itself may not be modified in any way, such as
+by removing the copyright notice or references to the Internet Society or
+other Internet organizations, except as needed for the purpose of developing
+Internet standards in which case the procedure for copyrights defined in the
+Internet Standards process must be followed, or as required to translate into
+languages other than English.
+.lp
+The limited permission granted above are perpetual and will not be revoked by
+the Internet Society or its successors or assigns.
+.lp
+This document and the information contained herein is provided on an "AS IS"
+basis and \fB\)THE INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK FORCE
+DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY
+WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS
+OR ANY IMPLIED WARRANTIES OF MECHANTABILITY OR FITNESS FOR A PARTICULAR
+PURPOSE.

@@ -1,0 +1,1503 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: draft-bidulock-tsvwg-sctptpi-00.me,v 0.9.2.2 2005/05/14 08:33:15 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.2 $) modified $Date: 2005/05/14 08:33:15 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.R1
+abbreviate A
+label L
+no-default-database
+no-accumulate
+database ../idrefs
+annotate X lp
+move-punctuation
+discard YZ
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+search-truncate 10
+separate-label-second-parts ""
+bracket-label " [" "]" ", "
+# abbreviate-label-ranges "..."
+# sort A+
+# reverse A
+.R2
+.de $0
+.\".if \\$3>0 \{\
+.if \\$3<4 \{\
+.(x 0
+.ie '\\$2'' \\$1
+.el \\$2 \\$1
+.\"'
+.)x
+.\}
+.\".\}
+..
+.if '\*(.T'ascii' \{\
+.fo 'B. Bidulock'Version 0.0'FORMFEED[Page %]'
+.ds |x txt
+.ds #n <\\**>
+.m1 1 \" top margin above header
+.m2 1 \" top margin below header
+.m3 1 \" btm margin above footer
+.m4 0 \" btm margin below footer
+.pl 9.8i
+.ll 7.2i
+.lt 7.2i
+.nr PL 9.8i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad l
+.hy 0
+.ta 3
+.ba 0
+.po 0
+.nr so 0
+.nr ii 6n
+.\".nr pi 4n
+.nr pi 0
+.nr po 3n
+.nr bi 2n
+.nr qi 4n
+.nr ps 1v
+.de #v
+.ad l
+.hy 0
+..
+.\}
+.if '\*(.T'ps' \{\
+.fo 'B. Bidulock'Version 0.0'Page %'
+.ds |x ps
+.ds #n \\**
+.m1 0.25i \" top margin above header
+.m2 0.25i \" top margin below header
+.m3 0.25i \" btm margin above footer
+.m4 0.25i \" btm margin below footer
+.pl 11.0i
+.ll 7.2i
+.lt 7.2i
+.nr PL 11.0i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad b
+.hy 6
+.ta 3
+.ba 0
+.po 0.75i
+.nr so 0
+.nr ii 0.5i
+.\".nr pi 0.5i
+.nr pi 0
+.nr po 0.25i
+.nr bi 0.5i
+.nr hi 0.5i
+.nr qi 0.5i
+.nr pp 10
+.nr qp 9
+.nr fp 8
+.nr gp 8
+.nr sp 12
+.nr tp 10
+.de #v
+.ad b
+.hy 6
+..
+.\}
+.dn &a
+.dn &b
+.dn &n
+.dn &p
+.nr &a 1
+.nr &b 0
+.nr &n 1
+.nr &p 0
+.ds &f Figure\ 
+.ds &t Table\ 
+\".de $1
+.\".ds &f Figure \\n($1-
+.\".nr &n 1
+.\".nr &p 0
+.\"..
+.\".de $2
+.\".ds &f Figure \\n($1.\\n($2-
+.\".nr &n 1
+.\".nr &p 0
+.\"..
+.\".de $3
+.\".ds &f Figure \\n($1.\\n($2.\\n($3-
+.\".nr &n 1
+.\".nr &p 0
+.\"..
+.de #f
+.(l C F
+.#v
+\fI\\*(&f\\n(&n.\fR  \\$1
+.(x 2
+.#v
+\\*(&f\\n(&n \\$1
+.)x
+.)l
+.nr &p \\n(&n
+.nr &n +1
+..
+.de #t
+.(l C F
+.#v
+\fI\\*(&t\\n(&a.\fR \\$1
+.(x 3
+.#v
+\\*(&t\\n(&a \\$1
+.)x
+.)l
+.nr &b \\n(&a
+.nr &a +1
+..
+.de #e
+.if \\n($d>1 \{\
+.uh "End Notes for Section \\\\n($1"
+.pd
+.\}
+..
+.ds a \a
+.bp
+.he 'Internet Draft'SCTP-TPI'May 2001'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+.bl 2
+Expires in six months;;May 2001
+.bl 2
+.TE
+.(l C
+\fB\
+Stream Control Transmission Protocol (SCTP)
+Transport Provider Interface (TPI)
+SCTP-TPI
+<draft-bidulock-sctpstreams-sigtran-00.\*(|x>
+
+.)l
+.rr |x
+.ne 4
+.uh "Status of this Memo"
+.pp
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents
+of the Inetnet Engineering Task Force (IETF), its areas, and its working
+groups.  Note that other groups may also distribute working documents as
+Internet-Drafts.
+.pp
+Internet-Drafts are draft documents valid for a maximum of six months and may
+be updated, replaced, or obsoleted by other documents at any time.  It is
+inappropriate to use Internet-Drafts as reference material or to cite them
+other than as 'work in progress'.
+.pp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+.pp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html
+.pp
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
+Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
+(Pacific Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
+.uh "Abstract"
+.pp
+This Internet Draft provides a specification mapping the Stream Control
+Transmission Protocol RFC 2960
+.[
+RFC 2960
+.]
+into a SVR 4.2 STREAMS provider interface.
+The benefit of this specification includes compatibility to UNIX International
+TLI (Transport Layer Interface),
+.[
+tpi
+.]
+TPI (Transport Provider Interface),
+.[
+TPI
+.]
+and XOpen/XPG4 XTI (XOpen Transport
+Interface)
+.[
+xti
+.]
+for maximum compatibility with OSI and IP transport provider
+applications based on SVR 4.2 STREAMS.  In addition, this specification
+provides access to the features of SCTP which extend beyond those of existing
+transport level interfaces.
+.(b M
+.#t "Mapping of ISO IS8072 and RFC 2960 to Kernel-level Transport Service Primitives"
+.TS H
+center box tab(:);
+cb|cb|cb
+cb|cb|cb
+l|l|l.
+Transport:Stream:IS 8072 Transport
+Primitives:Msg Type:Primitives
+=
+.TH
+T_CONN_REQ:M_PROTO:T-CONNECT request
+T_CONN_IND:M_PROTO:T-CONNECT indication
+T_CONN_RES:M_PROTO:T-CONNECT response
+T_CONN_CON:M_PROTO:T-CONNECT confirm
+T_DATA_REQ:M_PROTO:T-DATA request
+T_DATA_IND:M_PROTO:T-DATA indication
+T_EXDATA_REQ:M_PROTO:T-EXPEDITED-DATA request
+T_EXDATA_IND:M_PROTO:T-EXPEDITED-DATA indication
+T_DISCON_REQ:M_PROTO:T-DISCONNECT request
+T_DISCON_IND:M_PROTO:T-DISCONNECT indication
+T_UNITDATA_REQ:M_PROTO:T-UNITDATA request
+T_UNITDATA_IND:M_PROTO:T-UNITDATA indication
+T_ORDREL_REQ:M_PROTO:not defined in ISO
+T_ORDREL_IND:M_PROTO:not defined in ISO
+T_BIND_REQ:M_PROTO:not defined in ISO
+T_BIND_ACK:M_PCPROTO:not defined in ISO
+T_UNBIND_REQ:M_PROTO:not defined in ISO
+T_OK_ACK:M_PCPROTO:not defined in ISO
+T_ERROR_ACK:M_PCPROTO:not defined in ISO
+T_INFO_REQ:M_PCPROTO:not defined in ISO
+T_INFO_ACK:M_PCPROTO:not defined in ISO
+T_UDERROR_IND:M_PROTO:not defined in ISO
+T_OPTMGMT_REQ:M_PROTO:not defined in ISO
+T_OPTMGMT_ACK:M_PCPROTO:not defined in ISO
+T_ADDR_REQ:M_PROTO:not defined in ISO
+T_ADDR_ACK:M_PCPROTO:not defined in ISO
+T_OPTDATA_REQ:M_PROTO:not defined in ISO
+T_OPTDATA_IND:M_PROTO:not defined in ISO
+.TE
+.)b
+
+.sh 1 "Introduction"
+.pp
+In contrast with the RFC 2126 (ITOT)
+.[
+RFC 2126
+.]
+which uses TCP to provide ISO Network Service in support of ISO Transport
+Service, this specification takes the approach of using the Open Group ISO
+Transport Provider Interface
+.[
+TPI
+.]
+as an interface to the RFC 2960 Stream Control Transmission Protocol (SCTP).
+.[
+RFC 2960
+.]
+This permits applications which are written to the XPG4/XTI
+.[
+xti
+.]
+library which interfaces to the TPI
+.[
+TPI
+.]
+and socket compatibility libraries to be used without much modification for
+use with a SCTP Transport Provider which conforms to the SCTP-TPI.
+.pp
+This document provides an SCTP-specific implementation of the Transport
+Provider Interface and provides details concerning address formats, options
+and option formats, and specific IOCTLs and error handling around the
+framework provided for in the TPI.
+.[
+TPI
+.]
+.pp
+This document describes the specification of an SCTP Transport Provider which
+uses the Open Group STREAMS Transport Provider Interface as an interface to
+Stream Control Transmission Protocol features and functions.  Because of the
+need to select the SCTP stream upon which data is transmitted or received, it
+is necessary to use Version 2, Draft 2 of the Transport Provider Interface
+.[
+TPI
+.]
+as a basis for the specification, as this version incudes the
+\fBT_OPTDATA_REQ\fR and \fBT_OPTDATA_IND\fR primitives which are necessary for
+the selection of SCTP stream identifier, payload protocol identifier, and
+other SCTP-specific options.  It is possible to use a subset of this
+specification which is compatible with the TLI
+.[
+TLI
+.]
+or older versions of the TPI,
+.[
+tpi
+.]
+however, selection of SCTP stream for transmission becomes awkward and
+distinguishing streams upon reception may be impossible.
+.pp
+The TPI specification
+.[
+TPI
+.]
+leaves a number of implementation- and provider-specific details to be
+described by a particular implementation or provider.  This document details
+the SCTP provider-specific details which are necessary for access to SCTP
+features and functions.  In addition, it proposes some common
+implementation-specific managment features and functions necessary to support
+the global SCTP options as well as provide access to the SCTP-MIB.
+
+.sh 1 "SCTP Provider-Specific Details"
+.sh 2 "SCTP Transport Addresses"
+.pp
+The SCTP Transport Address is used in the following primitives:
+.(b M
+.#t "Transport Primitives which use the SCTP Transport Address"
+.TS H
+center box tab(:);
+cb|cbs
+cb|cbs
+l|cs
+l|ll.
+Transport:Parameter
+Primitives:Fields
+=
+.TH
+T_INFO_ACK:ADDR_size
+T_ADDR_ACK:LOCADDR_length,:LOCADDR_offset
+:REMADDR_length,:REMADDR_offset
+T_BIND_REQ:ADDR_length,:ADDR_offset
+T_BIND_ACK:ADDR_length,:ADDR_offset
+T_CONN_REQ:DEST_length,:DEST_offset
+T_CONN_CON:RES_length,:RES_offset
+T_CONN_IND:SRC_length,:SRC_offset
+.TE
+.)b
+.pp
+The format of the SCTP address is as follows:
+.(l
+.nf
+.sz -1
+\fC\
+struct sctp_addr {
+        uint16_t    port;
+        uint32_t    addr[0];
+};
+.sz +1
+.fi
+.)l
+.ba +4
+.pp
+Where
+.ip "\fIport\fR"
+is the 16-bit local or peer SCTP port number.
+.ip "\fIaddr[]\fR"
+is a list of 0 or more 32-bit IPv4 network addresses.
+.ba -4
+.pp
+The SCTP Transport Address is interpreted by the SCTP Transport Provider in
+the designated primitives and according to the rules described as follows:
+.ip "\fIT_INFO_ACK\fR"
+This primitive indicates the maximum size of a protocol address in the
+\fIADDR_size\fR field of the primitive.  SCTP providers should set this field
+to accomodate a number of network addresses in the \fIaddr\fR list in support
+of multihomed hosts.  SCTP providers which do not support multihoming should
+set this size to 6 for IPv4 providers.
+.ip "\fIT_ADDR_ACK\fR"
+This primitive indicates the locally bound protocol address and the remote
+connected protocol address in the \fILOCADDR_length\fR, \fILOCADDR_offset\fR,
+\fIREMADDR_length\fR, and \fIREMADDR_offset\fR, respectively.
+The following rules define the SCTP provider-specific interpretation of the
+transport address:
+.ba +3
+.pp
+.np
+The \fILOCADDR\fR is the locally bound \fIport\fR and \fIaddr\fR list and is
+the same as is indicated in the \fBT_BIND_ACK\fR primitive.
+For rules concerning the SCTP provider-specific interpretation of this
+address, see the rules for the \fBT_BIND_ACK\fR primitive below.
+.np
+The \fIREMADDR\fR
+is the remote connected protocol address and is the same as is returned in the
+\fBT_CONN_IND\fR or the \fBT_CONN_CON\fR primitive.
+For rules concerning the SCTP provider-specific interpretation of these
+addresses, see the rules for \fBT_CONN_IND\fR and \fBT_CONN_CON\fR below.
+.ba -3
+.ip "\fIT_BIND_REQ\fR"
+This primitive provides the protocol address to which the user is requesting
+that the STREAM be bound in the \fIADDR_length\fR and \fIADDR_offset\fR
+fields.
+The following rules define the SCTP provider-specific interpretation of the
+transport address:
+.ip "\fIT_BIND_ACK\fR"
+This primitive indicates the protocol address to which the STREAM has been bound
+by the provider in the \fIADDR_length\fR and \fIADDR_offset\fR fields.
+The following rules define the SCTP provider-specific interpretation of the
+transport address:
+.ba +3
+.pp
+.np
+The \fBT_BIND_ACK\fR primitive always returns a non-zero \fIADDR_length\fR in
+the primitive.
+.np
+If the \fIport\fR field of the address is zero, then the
+STREAM is bound as a "default listener" on the returned network addresses.
+.np
+If the \fIport\fR number is non-zero then the port number specified is that to
+which the stream was bound.
+.np
+If the \fIaddr\fR list is empty, then the STREAM is bound to any and all network
+addresses which are available to the SCTP provider.
+.np
+If the \fIaddr\fR list is not emply, then the STREAM is bound to only those
+network addresses which are present in the list.
+.ba -3
+.ip
+The bound protocol address has provider-specific meaning to the SCTP Transport
+Provider.  When the STREAM is bound as a "listener" (i.e. \fICONIND_number\fR
+is non-zero), it will accept incoming \fBINIT\fR messages sent to the
+specified port number on any of the listed network addresses (or if there is
+no list, any network address).  When the STREAM response to an SCTP \fBINIT\fR
+chunk with an SCTP \fBINIT-ACK\fR chunk, the list of bound network addresses
+will be placed in the address list in the SCTP \fBINIT-ACK\fR chunk.
+
+When the STREAM is bound with \fICONIND_number\fR set to zero, a subsequent
+\fBT_CONN_REQ\fR primitive will launch an SCTP \fBINIT\fR chunk with the list of
+bound network addresses in the address list in the SCTP \fBINIT\fR chunk.
+
+.ip "\fIT_CONN_REQ\fR"
+This primitive provides the destination protocol address to which the user is
+requesting that the STREAM be connected in the \fIDEST_length\fR and
+\fIDEST_offset\fR fields.
+The following rules define the SCTP provider-specific interpretation of the
+transport address:
+.ba +3
+.pp
+.np
+The \fBT_CONN_REQ\fR primitive must always be issued by the user with a
+non-zero \fIADDR_length\fR field, and the protocol address must contain at
+least one network address in the address list.
+.np
+If the \fIport\fR field in the transport address is zero, the SCTP provider
+will attempt to select a port.
+.np
+If the protocol address \fIaddr\fR list has more than one network address in
+the list, only the first network address will be used as the destination of
+the SCTP \fBINIT\fR chunk which wil be issued to attempt the connection.
+.np
+Additional destination network addresses in the \fIaddr\fR list may be used as
+eligible destination network addresses once the association is formed later
+and in conjunction with the network addresses which are returned by the peer
+in the SCTP \fBINIT-ACK\fR chunk.
+.ba -3
+.ip "\fIT_CONN_CON\fR"
+This primitive indicates the protocol address of the peer endpoint
+which is connected to the STREAM in the \fIRES_length\fR and \fIRES_offset\fR
+fields.
+The following rules define the SCTP provider-specific interpretation of the
+transport address:
+.ba +3
+.pp
+.np
+The \fBT_CONN_CON\fR primitive is always issued by the provider with a
+non-zero \fIRES_length\fR field, and the protocol address will contain at
+least one network address in the address list.
+.np
+The first network address in the \fIaddr\fR list is the network address of the
+peer endpoint which responded with an SCTP \fBINIT-ACK\fR chunk and a
+subsequent \fBCOOKIE-ACK\fR chunk confirming the connection.
+.np
+The remaining network addresses (if any) are addresses which were provided in
+the SCTP \fBINIT-ACK\fR chunk.  These are the alternative network addresses to
+which the local host may send SCTP packets belonging to the association.
+.ba -3
+.ip "\fIT_CONN_IND\fR"
+This primitive indicates the protocol address of the peer endpoint
+which is attempting to connect to the STREAM in the \fISRC_length\fR and
+\fISRC_offset\fR fields.
+The following rules define the SCTP provider-specific interpretation of the
+transport address:
+.ba +3
+.pp
+.np
+The \fBT_CONN_IND\fR primitive is always issued by the provider with a
+non-zero \fISRC_length\fR field, and the protocol address will contain at
+least one network address in the address list.
+.np
+The first network address in the \fIaddr\fR list is the network address of the
+peer endpoint which initiated an SCTP \fBINIT\fR chunk and responded with an
+SCTP \fBCOOKIE-ECHO\fR chunk.
+.np
+The remaining network addresses (if any) are addresses which were provided in
+the SCTP \fBINIT\fR chunk and echoed in the cookie in the \fBCOOKIE-ECHO\fR
+chunk.  These are the alternative network addresses to which the local host
+may send SCTP packets belonging to the association.
+.ba -3
+
+.sh 2 "SCTP Options"
+.pp
+The SCTP Provider Options are used in the following primitives:
+.(b M
+.#t "Transport Primitives which use the SCTP Transport Options"
+.TS H
+center box tab(:);
+cb|cbs
+cb|cbs
+l|cs
+l|ll.
+Transport:Parameter
+Primitives:Fields
+=
+.TH
+T_INFO_ACK:OPT_size
+T_OPTMGMT_REQ:OPT_length,:OPT_offset
+T_OPTMGMT_ACK:OPT_length,:OPT_offset
+T_CONN_REQ:OPT_length,:OPT_offset
+T_CONN_CON:OPT_length,:OPT_offset
+T_CONN_IND:OPT_length,:OPT_offset
+T_CONN_RES:OPT_length,:OPT_offset
+T_OPTDATA_REQ:OPT_length,:OPT_offset
+T_OPTDATA_IND:OPT_length,:OPT_offset
+.TE
+.)b
+.pp
+The general format of the Transport Option is as follows:
+.(l
+.nf
+.sz -1
+\fC\
+struct t_opthdr {
+        t_uscalar_t len;    /* Option length, incl. header  */
+        t_uscalar_t level;  /* Option level                 */
+        t_uscalar_t name;   /* Option name                  */
+        t_uscalar_t status; /* Negotiation result           */
+        /* followed by option data */
+};
+.sz +1
+.fi
+.)l
+
+.ip "\fIT_SCTP_NODELAY\fR"
+This option is formatted as a single \fIt_uscalar_t\fR boolean flag.
+.ip
+Turns the Nagle algorithm off.  This means that packets are always sent as
+soon as possible and no unnecessary delays are introduced, at the cost of more
+packets in the network.  Expects a \fIt_uscalar_t\fR boolean flag.
+.ip
+This parallels the \fIT_TCP_NODELAY\fR option for compatibility with \fBTCP\fR.
+\fIT_SCTP_NODELAY\fR and \fITCP_NODELAY\fR can be used interchangeably.
+This setting applies to the entire SCTP association.
+.ip
+This option has meaning in \fBT_OPTMGMT_REQ\fR and \fBT_OPTMGMT_ACK\fR
+primitives.
+.ip "\fIT_SCTP_MAXSEG\fR"
+This option is formatted as a single \fIt_uscalar_t\fR which contains the
+maximum segment size in bytes.
+.ip
+This option has meaning in \fBT_OPTMGMT_REQ\fR and \fBT_OPTMGMT_ACK\fR
+primitives.
+.ip "\fIT_SCTP_RECVSID\fR"
+This option is formatted as a single \fIt_uscalar_t\fR boolean flag.
+.ip
+This option has meaning in \fBT_OPTMGMT_REQ\fR and \fBT_OPTMGMT_ACK\fR
+primitives.
+.ip "\fIT_SCTP_RECVPPI\fR"
+This option is formatted as a single \fIt_uscalar_t\fR boolean flag.
+.ip
+This option has meaning in \fBT_OPTMGMT_REQ\fR and \fBT_OPTMGMT_ACK\fR
+primitives.
+.ip "\fIT_SCTP_RECVSSN\fR"
+This option is formatted as a single \fIt_uscalar_t\fR boolean flag.
+.ip
+This option has meaning in \fBT_OPTMGMT_REQ\fR and \fBT_OPTMGMT_ACK\fR
+primitives.
+.ip "\fIT_SCTP_HB\fR"
+This option has meaning in \fBT_OPTMGMT_REQ\fR and \fBT_OPTMGMT_ACK\fR
+primitives.
+.ip "\fIT_SCTP_RTO\fR"
+This option has meaning in \fBT_OPTMGMT_REQ\fR and \fBT_OPTMGMT_ACK\fR
+primitives.
+.ip "\fIT_SCTP_SID\fR"
+This option is formatted as a single \fIt_uscalar_t\fR which contains the
+stream id significant to 16-bits.
+.ip
+This option has meaning in \fBT_OPTDATA_REQ\fR, \fBT_OPTDATA_IND\fR,
+\fBT_OPTMGMT_REQ\fR, and \fBT_OPTMGMT_ACK\fR primitives.
+.ip "\fIT_SCTP_PPI\fR"
+This option is formatted as a single \fIt_uscalar_t\fR which contains the
+Payload Protocol Identifier significant to 32-bits.
+.ip
+This option has meaning in \fBT_OPTDATA_REQ\fR, \fBT_OPTDATA_IND\fR,
+\fBT_OPTMGMT_REQ\fR, and \fBT_OPTMGMT_ACK\fR primitives.
+.ip "\fIT_SCTP_SSN\fR"
+This option is formatted as a single \fIt_uscalar_t\fR which contains the
+stream sequence number significant to 16-bits.
+.ip
+This option has meaning in \fBT_OPTDATA_REQ\fR, \fBT_OPTDATA_IND\fR,
+\fBT_OPTMGMT_REQ\fR, and \fBT_OPTMGMT_ACK\fR primitives.
+.ip "\fIT_SCTP_CORK\fR"
+This option is formatted as a single \fIt_uscalar_t\fR boolean flag.
+.ip
+If enabled, the provider will not send out partial TSDUs.  All queued
+partial TSDUs are sent when the option is cleared again.  This is useful for
+prepending headers or for throughput optimization.  This option cannot be
+combined with \fBT_SCTP_NODELAY\fR.
+.ip
+This parallels \fITCP_CORK\fR for compatibility with \fBTCP\fR.
+\fIT_SCTP_CORK\fR and \fITCP_CORK\fR can be used interchangeably.  For
+\fBT_OPTDATA_REQ\fR, this setting applies to the default or specified SCTP
+stream as set by the \fIT_SCTP_SID\fR option.
+.ip
+This option has meaning in \fBT_OPTDATA_REQ\fR primitives.
+.ip "\fIT_SCTP_STREAMS\fR"
+This option is formated as follows:
+.(l
+.nf
+.sz -1
+\fC\
+struct sctp_opt_streams {
+        uint16_t    i_streams;
+        uint16_t    o_streams;
+};
+.sz +1
+.fi
+.)l
+.ba +4
+Where
+.ip "\fIi_streams\fR"
+indicates the maximum or actual number of inbound SCPT streams.
+.ip "\fIo_streams\fR"
+indicates the requested or actual number of outbound SCTP streams.
+.ba -4
+.ip
+This option has meaning in \fBT_CONN_REQ\fR, \fBT_CONN_CON\fR,
+\fBT_CONN_IND\fR, \fBT_OPTMGMT_REQ\fR, and \fBT_OPTMGMT_ACK\fR primitives.
+
+.sh 2 "SCTP Errors"
+
+.sh 1 "SCTP Implementation-Specific Details"
+.sh 2 "SCTP IOCTLs"
+
+.pp
+A number of SCTP Transport Provider IO Controls (IOCTLs) are included in the
+OpenSS7 implementation of the SCTP Transport Provider to permit the portable
+control of system-wide parameters and statistics.  These IOCTLs are as
+follows:
+.(l
+.)l
+
+
+.sh 1 "SCTP Transport Provider Interface"
+.sh 2 "STREAM Management"
+.sh 3 "Capabilities"
+.sh 4 "T_INFO_REQ, T_INFO_ACK"
+.pp
+The TPI specifies that the Transport Provider reply to a \fBT_INFO_REQ\fR
+primitive with a \fBT_INFO_ACK\fR primitive.  Although there are a number of
+alternatives in the responding \fBT_INFO_ACK\fR primitive, the SCTP Transport
+Provider will respond with a smaller set of responses as defined here.  The
+\fBT_INFO_ACK\fR primitive will have values populated as follows:
+.ba +4
+.ip "\fIPRIM_type\fR"
+This indicates the primitive type and is always set to \fBT_INFO_ACK\fR.
+.ip "\fITSDU_size\fR"
+The size of the TSDU (Transport Service Data Unit) should be set to -1 to
+indicate that the provider supports the concept of a TSDU and that there is no
+limit on the maximum size of a TSDU.
+.ip "\fIETSDU_size\fR"
+The size of the ETSDU (Expedited Transport Service Data Unit) should be set to
+-1 to indicate that the provider support the concept of a ETSDU and that there
+is no limit on the maximum size of a ETSDU.
+.ip "\fICDATA_size\fR"
+The size of CDATA (Connection Data) should be set to -1 to indicate that the
+provider supports the transfer of data with connect primitives and that there
+is no limit on the maximum amount of data sent with the connect primitives.
+.ip "\fIDDATA_size\fR"
+The size of DDATA (Disconnect Data) should be set to -1 to indicate that the
+provider supports the transfer of data with disconnect primitives and that
+there is no limit on the maximum amount of data sent with the disconnect
+primitives.  (Note: this only really has practical use with orderly release
+primitives \fBT_ORDREL_REQ\fR and \fBT_ORDREL_IND\fR.)
+.ip "\fIADDR_size\fR"
+If the provider has a restriction on the maximum number of IP addresses which
+can be provided in an SCTP endpoint address, this size should be set to
+reflect that value.  Otherwise, this value should be set to -1 to indicate
+that there is no limit on the number of IP addresses which are provided with
+any primitive.
+.ip "\fIOPT_size\fR"
+If the provider has a restriction on the maximum number of options which can
+be provided in an operation, this size should be set to reflect that value.
+Otherwise, this value should be set to -1 to indicate that there is no limit
+on the number of options which are provided with any primitive.
+.ip "\fITIDU_size\fR"
+This should be set to the system-tunable system limit on the maximum size of a
+STREAMS message.  It might be possible to set this value to the current
+maximum size of the data in a DATA chunk which will currently fit within the
+path MTU, however, the provider cannot reject TIDUs which are larger than this
+dynamic value but which are smaller than the value first advertized when the
+STREAM was opened.
+.ip "\fISERV_type\fR"
+This field should be set to \fBT_COTS_ORD\fR to indicate that the SCTP
+provider is connection oriented with orderly release support.
+.ip "\fICURRENT_state\fR"
+This field should be set to the TPI provider state.
+.ip "\fIPROVIDER_flag\fR"
+This field should NOT have \fBSENDZERO\fR set (because SCTP does not support
+the sending of zero-length TSDUs in general) and should have \fBXPG4_1\fR set
+to indicate support for XPG4 semantics (\fBT_ADDR_REQ\fR and
+\fBT_ADDR_ACK\fR).
+.ba -4
+
+.sh 3 "Binding and Listening"
+.pp
+Once a STREAM is opened the provider places the STREAM in the \fBTS_UNBND\fR
+state and the STREAM is available for binding with the \fBT_BIND_REQ\fR
+primitive and will be placed in the \fBTS_BIND\fR state.  A STREAM which is in
+the \fBTS_BIND\fR state may be unbound again using the \fBT_UNBIND_REQ\fR
+primitive and returned to the \fBTS_UNBND\fR state.  Unlike BSD sockets, this
+permits a STREAM to be reused for another connection without closing and
+reopening another STREAM.
+.sh 4 "T_BIND_REQ, T_BIND_ACK"
+.pp
+STREAMS must be bound to a local protocol address before they can become
+involved in a connection and used for data transfer.  The semantics for
+binding and unbinding STREAMS are identical to those provided in the Transport
+Provider Interface.  The only specifics of the SCTP implementation lie in the
+format and interpretation of the transport address.  The \fBT_BIND_REQ\fR
+primtive provides an opaque protocol address as indicated by \fIADDR_length\fR
+and \fIADDR_offset\fR which in the SCTP implementation has the following
+format:
+.(l
+.sz -1
+\fC\
+typedef struct sctp_addr {
+        uint16_t    port;
+        uint32_t    addr[0];
+} sctp_addr_t;
+.sz +1
+.)l
+Where
+.ba +4
+.ip "\fIport\fR"
+indicates the 16-bit (host order) port number to which to bind; and,
+.ip "\fIaddr\fR"
+indicates an array of 32-bit IPv4 addresses (host order) to which to bind.
+.ba -4
+.pp
+The transport address will be interpreted according to the following rules by
+the SCTP Transport Provider:
+.np
+If the transport address is not provided (i.e. \fIADDR_length\fR is zero), the
+SCTP provider will assign an available port number from the range of port
+numbers available to SCTP and will bind the STREAM to any and all IPv4
+addresses which are available to the SCTP Transport Provider.
+.np
+If the transport address is provided, but does not contain any IPv4 addresses,
+the SCTP Transport Provider will bind the STREAM to any and all IPv4 addresses
+which are available to the SCTP Transport Provider.
+.np
+If the transport address is provided with the \fIport\fR set to zero, and the
+\fICONIND_number\fR is also set to zero, the SCTP TP will assign a port
+number.
+.np
+If the transport address is provided with the \fIport\fR set to zero, and the
+\fICONIND_number\fR is non-zero, the SCTP TP will treat the STREAM as a
+"default listener."  This \fIdefault listener\fR will receive indications for
+any port number on the bound IPv4 addresses which are not otherwise bound.
+
+One and only one STREAM may be bound as a \fIdefault listener\fR to any given
+IPv4 address.  If the STREAM is bound as a \fIdefault listener\fR and no IPv4
+addresses are provided in the transport address, the STREAM will receive all
+SCTP messages to which no other STREAM is bound.
+.np
+All valid IPv4 addresses may be bound to a SCTP Transport Provider STREAM.
+This includes \fIbroadcast\fR and \fImulticast\fR addresses; however, to bind
+to a \fIbroadcast\fR or \fImulticast\fR address may require that the STREAM
+was opened with sufficient access permissions to allow binding of these
+addresses.  \fIBroadcast\fR and \fImulticast\fR addresses will only be used by
+the SCTP Transport Provider for establishment of an SCTP association (INIT
+chunks) and will not be used for normal transmission or retransmission of
+chunks.
+.pp
+Other than the above rules, the TPI semantics of the \fBT_BIND_REQ\fR and
+\fBT_BIND_ACK\fR primitives are preserved, particularly with regards to the
+treatment of the \fICONIND_number\fR field.
+
+Considering the SCTP Transport Provider interpretation of the transport
+address, the following errors may be returned in a \fBT_ERROR_ACK\fR primitive
+in response to a problematic \fBT_BIND_REQ\fR primitive:
+.ba +4
+.ip "\fBTACCES\fR"
+This indicates that the user did not have proper permissions for the use of
+the requested address.  This includes the following reasons:
+.ba +4
+.np
+The user attempted to bind to a port number within the UNIX protected port
+number range (1-1024) and did not have sufficient priviledge.
+.np
+The user attempted to bind to a \fIbroadcast\fR or \fImulticast\fR address and
+did not have sufficient priviledge.
+.np
+The user attempted to bind a \fIdefault listener\fR (i.e. to bind to port 0)
+and did not have sufficient priviledge.
+.ba -4
+.ip "\fBTADDRBUSY\fR"
+This indicates that the requested address was in use.  This includes the
+following reasons:
+.ba +4
+.pp
+.np
+The SCTP TP only permits one STREAM to be a "listener" (i.e. with a non-zero
+\fICONIND_number\fR) for a given port number IPv4 address combination.
+
+The
+\fBT_BIND_REQ\fR will be rejected it the user attempts to bind a second STREAM
+with a non-zero \fICONIND_number\fR to the same port number and IPv4 address
+combination to which another STREAM is already bound with a non-zero
+\fICONIND_number\fR.
+.np
+The SCTP TP only permits one STREAM to be a "default listener" (i.e. listening
+on all ports) for a given IPv4 address.
+
+The \fBT_BIND_REQ\fR will be rejected if the user attempts to bind a second
+"default listener" with a zero \fIport\fR number and a non-zero
+\fICONIND_number\fR to the same IPv4 address to which another STREAM is
+already bound with a zero \fIport\fR number and a non-zero
+\fICONIND_number\fR.
+.ba -4
+.ip "\fBTBADADDR\fR"
+This indicates that the protocol address was in an incorrect format or the
+address contained invalid information.  It is not intended to indicate
+protocol errors.  This may include the following reasons:
+.ba +4
+.pp
+.np
+The size of the address as given by \fIADDR_length\fR is not the size of the
+\fBsctp_addr\fR structure plus a positive integer number of 4-byte IPv4
+addresses.
+.np
+The format of the \fBsctp_addr\fR structure is correct, but one or more of the
+IPv4 addresses provided are not valid IPv4 addresses (e.g. 0.1.1.1 or 0.0.0.0).
+
+(Note: the SCTP TP does not permit binding to address 0.0.0.0)
+.ba -4
+.ip "\fBTNOADDR\fR"
+This indicates that the transport provider could not allocate an address.
+This may include the following reasons:
+.ba +4
+.pp
+.np
+The user has requested that the SCTP Transport Provider provide a transport
+address with \fICONIND_number\fR equal to zero, and the SCTP TP is unable to
+assign a port number because all the port numbers within the assignable range
+are in use.
+.ba -4
+.ip "\fBTOUTSTATE\fR"
+The primitive would place the transport interface out of state.
+.ip "\fBTSYSERR\fR"
+A system error occurred and the UNIX system error is indicated in the
+primitive.  This may include the following errors:
+.ba +4
+.ip "\fBENOMEM\fR"
+There was insufficient memory resources to complete the operation.
+.ip "\fBEFAULT\fR"
+A recoverable internal software error has occured.
+.ba -4
+.ba -4
+
+.sh 4 "T_UNBIND_REQ"
+.pp
+STREAMS which are in the \fBTS_IDLE\fR state (i.e. those which are not
+currently involved in an SCTP association) can be unbound at any time using
+the \fBT_UNBIND_REQ\fR primitive.  As provided for the TPI specification, this
+primitive permits the unbinding, or reversal of the bind operation.
+.pp
+There are no SCTP Transport Provider specifics concerning this primitive.
+.sh 3 "Options Management"
+.sh 4 "T_OPTMGMT_REQ, T_OPTMGMT_ACK"
+
+.sh 2 "STREAM Connection"
+.sh 3 "Client"
+.sh 4 "T_CONN_REQ, T_CONN_CON, T_DISCON_IND"
+.sh 3 "Server"
+.sh 4 "T_CONN_IND, T_CONN_REQ, T_DISCON_REQ"
+
+.sh 2 "STREAM Data Transfer"
+.sh 3 "Sending Data"
+.sh 4 "T_DATA_REQ, T_EXDATA_REQ, T_OPTDATA_REQ"
+.sh 3 "Receiving Data"
+.sh 4 "T_DATA_IND, T_EXDATA_IND, T_OPTDATA_IND"
+
+.sh 2 "STREAM Release"
+.sh 3 "Disconnection"
+.sh 4 "T_DISCON_REQ, T_DISCON_IND"
+.sh 3 "Orderly Release"
+.sh 4 "T_ORDREL_REQ, T_ORDREL_IND"
+
+.sh 1 "Mapping of SCTP states to TPI states"
+
+.(b M
+.#t "Mapping of SCTP States to TPI States"
+.TS H
+center box tab(:);
+cb|cb|cb
+c|l|l.
+No.:TPI State:SCTP State
+=
+.TH
+0:TS_UNBND:SCTP_CLOSED
+1:TS_WACK_BREQ:SCTP_CLOSED
+2:TS_WACK_UREQ:SCTP_CLOSED or SCTP_LISTEN
+3:TS_IDLE:SCTP_CLOSED or SCTP_LISTEN
+4:TS_WACK_OPTREQ:SCTP_CLOSED or SCTP_LISTEN
+5:TS_WACK_CREQ:SCTP_COOKIE_WAIT
+::SCTP_COOKIE_ECHOED
+6:TS_WCON_CREQ:SCTP_COOKIE_WAIT
+::SCTP_COOKIE_ECHOED
+7:TS_WRES_CIND:SCTP_LISTEN
+8:TS_WACK_CRES:SCTP_ESTABLISHED
+9:TS_DATA_XFER:SCTP_ESTABLISHED
+10:TS_WIND_ORDREL:SCTP_SHUTDOWN_PENDING
+::SCTP_SHUTDOWN_SENT
+11:TS_WREQ_ORDREL:SCTP_SHUTDOWN_RECEIVED
+12:TS_WACK_DREQ6:SCTP_CLOSED or SCTP_LISTEN
+13:TS_WACK_DREQ7:SCTP_LISTEN
+14:TS_WACK_DREQ9:SCTP_ESTABLISHED
+15:TS_WACK_DREQ10:SCTP_SHUTDOWN_PENDING
+::SCTP_SHUTDOWN_SENT
+16:TS_WACK_DREQ11:SCTP_SHUTDOWN_RECEIVED
+17:TS_NOSTATES:SCTP_UNREACHABLE
+.TE
+.)b
+
+.sh 1 "Use of XTI with SCTP protocol"
+.sh 2 "Introduction"
+.pp
+This section describes the protocol-specific information that is relevant for
+SCTP transport providers.  It also defines data structures and constants
+required for SCTP transport providers which are exposed through the
+<xti_sctp.h> header file.
+.sh 2 "Protocol Features"
+.ip "\fIT_MORE Flag and TSDUs\fR"
+The notion of TSDU is supported by SCTP transport provider, so the T_MORE flag
+is interpreted correctly by the SCTP transport provider.
+.ip "\fIExpedited Data\fR"
+SCTP does not have a notion of expedited data in a sense comparable to ISO
+expedited data.  SCTP defines an out-of-order delivery mechanism which can
+be implemented similar to TCP's urgent mechanism, by which DATA chunks which
+are marked for out-of-order delivery could be transmitted in advance of normal
+in-order deliver DATA chunks on a given stream.  See the SCTP Draft Standard
+for more detailed information.
+.ip "\fIOrderly Release\fR"
+The orderly release functions \fBt_sndrel()\fR and \fBt_rcvrel()\fR which were
+defined to support the orderly release facility of TCP will also be used for
+the orderly release facility of SCTP.  The specification states that only
+established connections may be closed with orderly release: that is, on an
+endpoint in T_DATAXFER or T_INREL state.
+.ip "\fIAbortive Release\fR"
+Functions \fBt_sdnddis()\fR and \fBt_rcvdis()\fR may be used to perform
+abortive release over SCTP transport.  However, their use is not recommended
+as the abortive release primitive (ABORT chunk) is not transmitted reliably by
+the SCTP protocol.
+.ip "\fIConnection Establishment\fR"
+Unlike TCP, SCTP partially allows the possibility of refusing a connection
+indication.  This is peformed by sending an ABORT chunk instead of a
+COOKIE-ACK chunk in response to a COOKIE-ECHO.  Therfore, unlike TCP,
+\fBt_listen()\fR and \fBt_accept()\fR have similar semantics to that for ISO
+providers.
+.ip "\fIConnection Release\fR"
+After a connection has been released, the local address(es) bound to the
+endpoint may be qualified with the local IP address (rather than having a
+wildcard IP address).  Also, the port number itself may have been changed
+during the \fBt_accept()\fR processing.  If the endpoint is not being reused
+immediately then it is recommended that it should be unbound or closed so that
+other users can successfully bind to the address.
+
+.sh 2 "Options"
+.pp
+Options are formatted according to the structure \fBt_opthdr\fR as described
+in \fIThe Use of Options in XTI\fR.
+.[
+xti
+.]
+A transport provider compliant to this specification supports none, all or any
+subset of the options defined in \fISCTP-Level Options\fR and
+\fIIP-Level Options\fR.
+.[
+xti
+.]
+An implementation may restrict the use of any of these options by offering
+them only in privileged or read-only mode.
+
+.sh 3 "IP-Level Options"
+.pp
+The protocol level is \fBT_INET_IP\fR.  For this level, 
+\fI\*(&t\n(&a, IP-Level Options\fR
+shows the options that are defined.
+.(b M
+.#t "IP-Level Options"
+.TS H
+center box tab(:);
+cb|cb|cb
+cb|cb|cb
+l|l|c.
+:Type of Option:Legal
+Option Name:Value:Option Value
+=
+T_IP_OPTIONS:struct t_ip_options:(See text)
+T_IP_TOS:t_uscalar_t:(See text)
+T_IP_TTL:t_uscalar_t:(See text)
+T_IP_REUSEADDR:t_scalar_t:T_YES/T_NO
+T_IP_DONTROUTE:t_scalar_t:T_YES/T_NO
+T_IP_BROADCAST:t_scalar_t:T_YES/T_NO
+.TH
+.TE
+.)b
+.sh 3 "SCTP-Level Options"
+.pp
+The protocol level is \fBT_INET_SCTP\fR.  For this level,
+\fI\*(&t\n(&a, SCTP-Level Options\fR
+shows the options that are defined.
+.(b M
+.#t "SCTP-Level Options"
+.TS H
+center box tab(:);
+cb|cb|cb
+cb|cb|cb
+l|l|c.
+:Type of Option:Legal
+Option Name:Value:Option Value
+=
+.TH
+T_SCTP_NODELAY:t_scalar_t:T_YES/T_NO
+T_SCTP_CORK:t_scalar_t:T_YES/T_NO
+T_SCTP_PPI:t_uscalar_t:(see text)
+T_SCTP_SID:t_uscalar_t:(see text)
+T_SCTP_SSN:t_uscalar_t:(see text)
+T_SCTP_TSN:t_uscalar_t:(see text)
+T_SCTP_RECVOPT:t_scalar_t:T_YES/T_NO
+T_SCTP_COOKIE_LIFE:t_uscalar_t:milliseconds
+T_SCTP_SACK_DELAY:t_uscalar_t:milliseconds
+T_SCTP_PATH_MAX_RETRANS
+T_SCTP_ASSOC_MAX_RETRANS
+T_SCTP_MAX_INIT_RETRIES
+T_SCTP_HEARTBEAT_ITVL:t_uscalar_t:milliseconds
+T_SCTP_RTO_INITIAL:t_uscalar_t:milliseconds
+T_SCTP_RTO_MIN:t_uscalar_t:milliseconds
+T_SCTP_RTO_MAX:t_uscalar_t:milliseconds
+T_SCTP_OSTREAMS
+T_SCTP_ISTREAMS
+T_SCTP_COOKIE_INC:t_uscalar_t:milliseconds
+T_SCTP_THROTTLE_ITVL:t_uscalar_t:milliseconds
+T_SCTP_MAC_TYPE:t_scalar_t:(See text)
+T_SCTP_HB:struct t_sctp_hb:(see text)
+T_SCTP_RTO:struct t_sctp_rto:(see text)
+T_SCTP_MAXSEG:t_uscalar_t:bytes
+T_SCTP_STATUS:struct t_sctp_dest_status:(see text)
+:struct t_sctp_status:(see text)
+T_SCTP_DEBUG:t_uscalar_t:(see text)
+.TE
+.)b
+.pp
+These options do \fBnot\fR have end-to-end significance.  The may be
+negotiated in all XTI states except \fBT_UNBIND\fR and \fRT_UNINIT\fR.  They
+are read-only in state \fBT_UNBND\fR.  See \fIThe Use of Options in XTI\fR
+.[
+xti
+.]
+for the differences between options that have end-to-end significance and
+those that do not.
+.ip "\fI\)T_SCTP_NODELAY\fR\)"
+This option is formatted as a single \fI\)t_uscalar_t\fR\) boolean flag that
+can take on values \fI\)T_NO\fR\) or \fI\)T_YES\fR\).
+.ip "\fI\)T_SCTP_CORK\fR\)"
+This option is formatted as a single \fI\)t_uscalar_t\fR\) boolean flag that
+can take on values \fI\)T_NO\fR\) or \fI\)T_YES\fR\).
+.ip "\fI\)T_SCTP_PPI\fR\)"
+This option is formatted as a single \fI\)t_uscalar_t\fR\) that contains
+the \fIPayload Protocol Identifier\fR for the transmitted or received data.
+.ip "\fI\)T_SCTP_SID\fR\)"
+This option is formatted as a single \fI\)t_uscalar_t\fR\) that contains
+the \fIStream Identifier\fR for the transmitted or received data.
+.ip "\fI\)T_SCTP_SSN\fR\)"
+This option is formatted as a single \fI\)t_uscalar_t\fR\) that contains
+the \fIStream Sequence Number\fR for the received data.
+.ip "\fI\)T_SCTP_TSN\fR\)"
+This option is formatted as a single \fI\)t_uscalar_t\fR\) that contains
+the \fITransmit Sequence Number\fR for the received data.
+.ip "\fI\)T_SCTP_RECVOPT\fR\)"
+This option is formatted as a single \fI\)t_uscalar_t\fR\) boolean flag that
+can take on values \fI\)T_NO\fR\) or \fI\)T_YES\fR\).
+.ip "\fI\)T_SCTP_COOKIE_LIFE\fR\)"
+This option is formatted as a single \fI\)t_uscalar_t\fR\) time duration in milliseconds that contains
+the cookie life for a cookie transmitted in an INIT-ACK chunk.
+Valid values are from zero (0) to INT_MAX.
+.ip "\fI\)T_SCTP_SACK_DELAY\fR\)"
+This option is formatted as a single \fI\)t_uscalar_t\fR\) time duration in milliseconds that contains
+the maximum amount of time that the endpoint will withold an acknowledgement
+for received data.
+Valid values are from zero (0) to INT_MAX.
+.ip "\fI\)T_SCTP_PATH_MAX_RETRANS\fR\)"
+.ip "\fI\)T_SCTP_ASSOC_MAX_RETRANS"
+.ip "\fI\)T_SCTP_MAX_INIT_RETRIES\fR\)"
+.ip "\fI\)T_SCTP_HEARTBEAT_ITVL\fR\)"
+This option is formatted as a single \fI\)t_uscalar_t\fR\) time duration in milliseconds that contains
+the amount of time that a destination can remain idle before a heartbeat
+message is sent to that destination.
+Valid values are from zero (0) to INT_MAX.
+.ip "\fI\)T_SCTP_RTO_INITIAL\fR\)"
+This option is formatted as a single \fI\)t_uscalar_t\fR\) time duration in milliseconds that contains
+the initial value of the destination retransmission timer when an association
+is started.
+Valid values are from zero (0) to INT_MAX.
+.ip "\fI\)T_SCTP_RTO_MIN\fR\)"
+This option is formatted as a single \fI\)t_uscalar_t\fR\) time duration in milliseconds that contains
+the minimum value that a destination retransmission timer can assume.
+Valid values are from zero (0) to INT_MAX.
+.ip "\fI\)T_SCTP_RTO_MAX\fR\)"
+This option is formatted as a single \fI\)t_uscalar_t\fR\) time duration in milliseconds that contains
+the maximum value that a destination retransmission timer can assume.
+Valid values are from zero (0) to INT_MAX.
+.ip "\fI\)T_SCTP_OSTREAMS\fR\)"
+.ip "\fI\)T_SCTP_ISTREAMS\fR\)"
+.ip "\fI\)T_SCTP_COOKIE_INC\fR\)"
+This option is formatted as a single \fI\)t_uscalar_t\fR\) time duration in milliseconds that contains
+the amount of time that will be added to the cookie lifetime if a peer
+endpoint requests more time to return cookies.
+Valid values are from zero (0) to INT_MAX.
+.ip "\fI\)T_SCTP_THROTTLE_ITVL\fR\)"
+This option is formatted as a single \fI\)t_uscalar_t\fR\) time duration in milliseconds that contains
+the interval within which only one INIT attempt will be honored with an
+INIT-ACK.
+Valid values are from zero (0) to INT_MAX.
+.ip "\fI\)T_SCTP_MAC_TYPE\fR\)"
+.ip "\fI\)T_SCTP_HB\fR\)"
+.ip "\fI\)T_SCTP_RTO\fR\)"
+.ip "\fI\)T_SCTP_MAXSEG\fR\)"
+.ip "\fI\)T_SCTP_STATUS\fR\)"
+.ip "\fI\)T_SCTP_DEBUG\fR\)"
+.sh 3 "Absolute Requirements"
+.pp
+A request for T_SCTP_NODELAY and a request to activate T_SCTP_KEEPALIVE is an
+absolute requirement.  T_SCTP_MAXSEG is a read-only option.
+.sh 3 "Further Remarks"
+.ip "\fIT_SCTP_KEEPALIVE\fR"
+If this option is set, the heartbeat mechanism of SCTP is activated on all
+destination addresses to monitor idle destination addresses which may no
+longer be reachable.  If a destination has been idle for the last heartbeat
+timeout interval, a HEARTBEAT chunk is sent to check if the destination is
+still alive or broken.
+
+HEARTBEAT chunks are an explicit feature of SCTP, and this practice is part of
+the SCTP Standard.  The option value consists of a structure \fBt_sctp_hb\fR
+declared as:
+.(l
+.nf
+.sz -1
+\fC\
+typedef struct sctp_hb
+    struct sctp_addr hb_dest;  /* destination address      */
+    t_scalar_t       hb_onoff; /* activation flag          */
+    t_scalar_t       hb_itvl;  /* interval in milliseconds */
+} t_sctp_hb_t;
+.sz +1
+.fi
+.)l
+.ip
+Legal values for the field \fIhb_dest\fR is a valid IP address which indicates
+the destination addresses of the SCTP association for which the heartbeat
+parameters are to be set.
+.ip
+Legal values for the field \fIhb_onoff\fR are:
+.ba +8
+.ip "\fBT_NO\fR" 8
+switch the heartbeat for destination \fIhb_dest\fR off
+.ip "\fBT_YES\fR" 8
+activate the heartbeat for destination \fIhb_dest\fR
+.ba -8
+.ip
+The field \fIhb_itvl\fR determines the frequency of HEARTBEAT chunks being
+sent, in milliseconds.  The transport user can request the default value by
+setting the field to \fBT_UNSPEC\fR.  The default is implementation-dependent,
+but at least 60 seconds (see the referenced RFC 2960).  Legal values for this
+field are \fBT_UNSPEC\fR and all positive numbers.
+
+The timeout value is not an absolute requirement.  The implementation may pose
+upper and lower limits to this value.  Requests that fall short of the lower
+limit may be negotiated to the lower limit.
+
+The use of this option might be restricted to priviledged users.
+.ip "\fIT_SCTP_MAXSEG\fR"
+This option is read-only.  It is used to retrieve the maximum SCTP segment
+size.
+.ip "\fIT_SCTP_NODELAY\fR"
+Under some circumstances, SCTP sends data as soon as iti is presented.  When
+outstanding data has not yet been acknowledged, it gathers small amounts of
+output to be sent in a single packet once an acknowledgement is received.  For
+a small number of clients, such as window systems (for example, MIT X Window
+System) that send a stream of mouse events which receive no replies, this
+packetization may cause significant delays.  T_SCTP_NODELAY is used to defeat
+this algorithm.  Legal option values are \fBT_YES\fR ("don't delay") and
+\fBT_NO\fR ("delay").
+.ip "\fIT_SCTP_RTO\fR"
+
+.sh 2 "Functions"
+.ip "\fBt_accept\fR()"
+Issuing a \fBt_accept\fR() assigns an already established connection to
+\fIresfd\fR.  Since user data may be exchanged during the connection
+establishment phase, \fIcall->udata.len\fR can be larger than 0.
+
+When (\fIresfd != fd\fR), the function \fBt_accept\fR() is recommended to be
+called with \fIresfd\fR in \fBT_UNBND\fR state, though an endpoint which is
+bound to any local address (in \fBT_IDLE\fR) state) can also be used.
+
+After \fBt_accept\fR() completes, the endpoint \fIresfd\fR will represent a
+connected SCTP endpoint whose complete binding essentially has both local and
+remote address components.
+
+If file descriptor \fIresfd\fR was unbound before calling \fBt_accept\fR(),
+after the call completes its local address binding would be to the same
+protocol address bound to \fIfd\fR.  If file descriptor \fIresfd\fR was bound
+to a local address before calling \fBt_accept\fR(), that local address binding
+is dissolved and the local address part of the binding after \fBt_accept\fR()
+completes would become the same as the address bound to \fIfd\fR.
+
+If options with end-to-end significance (T_IP_OPTIONS, T_IP_TOS) are to be
+sent with the connection confirmation, the values of these options must be set
+with \fBt_optmgmt\fR() before the T_LISTEN event occurs.  When the transport
+user detects a T_LISTEN, SCTP has already established the connection.
+Association-related options passed with \fBt_accept\fR() become effective at
+once, but since the connection is already established, they are transmitted
+with subsequent IP datagrams sent out in the T_DATAXFER state.
+.ip "\fBt_bind\fR()"
+The \fIaddr\fR field of the \fBt_bind\fR structure represents the local
+socket; that is, an address which specifically includes a port identifier.
+
+Some implementations treat port number 0 as a request to bind to any unused
+port.  Other than that value, a port number part of the binding is specific.
+The IP address part of the binding can represent a single IP address or a list
+of IP addresses or a wildcard binding to an address that could represent
+multiple IP addresses that are legal for the host.
+.ip "\fBt_close\fR()"
+The \fBt_close\fR() call will result in a \fBclose\fR call on the descriptor
+of this XTI communication endpoint.  If there are no other descriptors in this
+process or any other process which reference this communication endpoint, the
+\fBclose\fR() call will perform an orderly connection termination according to
+the rules of a SCTP SHUTDOWN call on this connection endpoint as specified in
+standard RFC 2960.
+.[
+RFC 2960
+.]
+If the XTI_LINGER options is supported and is used to enable the \fIlinger\fR
+option, the linger time will affect the time an implementation lingers in the
+execution of \fBt_close\fR() or \fBclose\fR().  A linger time of 0 specified
+with the XTI_LINGER option may cause an abortive release of a SCTP connection,
+resulting in lost data.
+.ip "\fBt_connect\fR()"
+The \fIsndcall->addr\fR struct specifies the remote socket.  In the present
+version, the returned address set in \fIrcvcall->addr\fR will have the same
+value.  Since user data can be exchanged during the connection establishment
+phase, \fIsndcall->udata.len\fR can be set to non-zero.
+
+Note that the likely the peer SCTP, and not the peer transport user, will
+confirm the connection.
+.ip "\fBt_listen\fR()"
+Upon successful return, \fBt_lister\fR() indicates an connection indication
+and not an existing connection.  Since user data may be exchanged during the
+connection establishment phase, \fIsndcall->udata.len\fR may be non-zero
+before the call to \fBlisten\fR().  The \fIcall->addr\fR structure contains
+the remote calling socket.
+.ip "\fBt_open\fR()"
+\fBt_open\fR() is called as the first step in the initialization of a
+transport endpoint.  This function returns various default characteristics of
+the underlying transport protocol by setting fields in the \fIt_info\fR
+structure.  The following should be the values returned by the call to
+\fBt_open\fR() and \fBt_getinfo\fR() with the indicated transport provider.
+.pp
+.(b M
+.#t "t_info parameters"
+.TS H
+center box tab(:);
+cb|cb|cb
+l|c|c.
+Parameters:Before call:After call
+=
+.TH
+name:x:/
+oflag:x:/
+info->addr:/:x
+info->options:/:x
+info->tsdu:/:T_INFINITE
+info->etsdu:/:T_INFINITE
+info->connect:/:x
+info->discon:/:0
+info->servtype:/:T_COTS_ORD
+info->flags:/:0
+.TE
+.ce 1
+`x' equals T_INVALID (-2) or an integral number greater than zero
+.)b
+.ip "\fBt_rcv\fR()"
+The T_MORE flag should not be ignored if normal data is delivered.
+Out-of-order data chunks are received with the T_EXPEDITED flag set.  If the
+buffer supplied by the user is too small to hold all the data, the T_MORE
+flag will be set, indicating that more data still remains to be read.
+.ip "\fBt_rcvconnect\fR()"
+Since user data can be exchanged during the connection establishment phase,
+\fIcall->udata.maxlen\fR can be set to non-zero before the call to this
+function.  On return, the \fIcall->addr\fR structure contains the address of
+the remote calling endpoint.
+.ip "\fBt_rcvdis\fR()"
+Since data may not be sent with a disconnect, the \fIdiscon->udata\fR
+structure will not be meaningful.
+.ip "\fBt_snd\fR()"
+The T_MORE flag should be used.  If \fBt_snd\fR() is called with the
+T_EXPEDITED flag set, the data will be sent out-of-order on the specified SCTP
+stream id.
+.ip "\fBt_snddis\fR()"
+Sincde data may not be sent with a disconnect, \fIcall->udata.len\fR must be
+set to zero.
+.ip "\fBt_sndudata\fR()"
+Be aware that the maximum size of a connectionless-mode TSDU varies among
+implementations.
+
+
+
+
+
+
+
+
+
+
+
+.uh "Security Considerations"
+.pp
+There are no security considerations for this draft.
+
+.uh "Acknowledgements"
+.\".pp
+.\"The authors would like to thank
+.\"for their valuable comments and suggestions.
+.nr ii 0.5i
+.if \n($d>1 \{\
+.uh "End Notes"
+.pd
+.\}
+.de ]<
+.rm (f )f
+..
+.uh "References"
+.[
+$LIST$
+.]
+.(b
+.uh "Author's Addresses"
+.lp
+.TS
+expand tab(;);
+lr.
+Brian Bidulock;Phone: +1-972-839-4489
+OpenSS7 Corporation;Email: bidulock@openss7.org
+4701 Preston Park Boulevard;URL: http//www.openss7.org/
+Suite 424;
+Plano, TX  75093;
+USA;
+.TE
+.bl 3
+.lp
+This Internet draft expires July, 2002.
+.)b
+.bp
+.(b M
+.ce 1
+.uh "List of Illustrations"
+.(c
+.lp
+.#v
+.xp 2
+.)c
+.)b
+.(b M
+.ce 1
+.uh "List of Tables"
+.(c
+.lp
+.#v
+.xp 3
+.)c
+.)b
+.(b M
+.ce 1
+.uh "Table of Contents"
+.(c
+.lp
+.#v
+.xp 0
+.)c
+.)b
+.bp
+.uh "Copyright Statement"
+.lp
+\fBCopyright \(co The Internet Society (2002).  All Rights Reserved.\fR
+.pp
+This document and translations of it may be copied and furnished to others,
+and derivative works that comment on or otherwise explain it or assist in its
+implementation may be prepared, copied, published and distributed, in whole or
+in part, without restriction of any kind, provided that the above copyright
+notice and this paragraph are included on all such copies and derivative
+works.  However, this document itself may not be modified in any way, such as
+by removing the copyright notice or references to the Internet Society or
+other Internet organizations, except as needed for the purpose of developing
+Internet standards in which case the procedure for copyrights defined in the
+Internet Standards process must be followed, or as required to translate into
+languages other than English.
+.pp
+The limited permission granted above are perpetual and will not be revoked by
+the Internet Society or its successors or assigns.
+.pp
+This document and the information contained herein is provided on an "AS IS"
+basis and \fB\)THE INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK FORCE
+DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY
+WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS
+OR ANY IMPLIED WARRANTIES OF MECHANTABILITY OR FITNESS FOR A PARTICULAR
+PURPOSE.

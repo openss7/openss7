@@ -1,0 +1,707 @@
+.pl 10.0i
+.po 0
+.ll 7.2i
+.lt 7.2i
+.nr LL 7.2i
+.nr LT 7.2i
+.fo 'Bidulock'Version 0.0'FORMFEED[Page %]'
+.he 'Internet Draft'Informational'April 2000'
+.hy 6
+.ad b
+.%".na
+.nf
+Network Working Group                                     Brian Bidulock
+INTERNET-DRAFT                                    Inet Technologies, Inc
+.fi
+.sp  2
+Expires in six months                                         April 2000
+.sp  2
+.ce 3
+Simple Control Transport Protocol (SCTP)
+Performance Analysis
+<draft-bidulock-sigtran-sctpcongestion-00.txt>
+.sp 2
+.fi
+.ne 4
+.uh "Status of this Memo"
+.lp
+.na
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 or RFC 2026.  Internet-Drafts are working documents
+of the Inetnet Engineering Task Force (IETF), its areas, and its working
+groups.  Note that other groups may also distribute working documents as
+Internet-Drafts.
+.lp
+Internet-Drafts are draft documents valid for a maximum of six months and
+may be updated, replaced, or obsoleted by other documents at any time.  It
+is inappropriate to use Internet-Drafts as reference material or to cite
+them other than as 'work in progress'.
+.lp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+.lp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html
+.lp
+To learn the current status of any Internet-Draft, please check the
+'1id-abstracts.txt' listing contained in the Internet-Drafts Shadow
+Directories on ftp.is.co.za (Africa), nic.nordu.net (Europe), munnari.oz.au
+(Pacific Rim), ftp.ietf.org (US East Coast), or ftp.isi.edu (US West Coast).
+.uh "Abstract"
+.lp
+This Internet Draft provides an analysis of SCTP performance for use by
+SS7 M2UA and M3UA.  This performance is compared with that of the SS7
+network according to ITU-T and ANSI specifications.  Conclusions are
+drawn regarding the suitability of SCTP for interconnection to the
+SS7 network.  In addition, this Internet Draft studies the performance
+of SSCOP MCE (ITU-T Q.2111) over UDP/IP and compares its performance
+to that of SCTP.  The suitability of SCTP vs. SSCOP MCE is compared.
+.sh 1 "Introduction"
+.lp
+This document performs an analysis of SCTP with the transport of
+SS7 signaling in mind.  The performance of SCTP is compared to the
+requirements for SS7 Level 2 and SS7 Level 3 as provided by ITU-T, ANSI and
+ETSI.  The purpose of this analysis is to determine the suitability of SCTP
+for use for transporting SS7 signaling.
+.lp
+In addition, this document performs an analysis of SSCOP MCE with the
+transport of SS7 signaling in mind.  The performance of SSCOP MCE is
+compared to the requirements for SS7 Level 2 and SS7 Level 3 as provided by
+ITU-T, ANSI and ETSI.  In addition, SSCOP MCE is also compated with SCTP.
+.sh 2 "Scope"
+.lp
+This document is restricted to the analysis of SCTP and SSCOP MCE in
+comparison to SS7 over restricted and engineered networks.  The suitability
+of any of the three protocols (SS7, SCTP, SSCOP MCE) for carriage over the
+public Internet is not considered.
+.lp
+For the purposes of analysis, restricted network configurations are
+considered only.  Also, for the purpose of analysis, the simplifying
+assumptions made in 1.4 are applied.  The network configurations and
+assumptions which are made are chosen to closely simulate a reasonable
+configuration for signaling at a distance.
+.sh 2 "Terminology"
+.lp
+Normal Queueing Theory terminology is applied.  Where appropriate the
+terminology of SS7, SCTP or SSCOP MCE is used, but only as applied to that
+protocol from which the terminology applies.  For terminology associated
+with these three protocols, see their specifications documents [1], [2] and
+[3].
+.sh 2 "Assumptions"
+.lp
+The following simplifying assumptions are made:
+.np 1
+We assume that processor delays are short an much smaller that queueing or
+transport delays.  This assumption derives from the understanding that
+processor power can always be increased with respect to load to satisfy this
+condition.
+.np
+We assume transmission delays and bit error rates for multi-mode fibre for
+long haul connections.
+.np
+For protocols which amalgamate multiple packets into one datagram, we assume
+that such amalgamation is not performed.
+.np
+For protocols which must segment messages over a certain size, we assume
+that messages are not segmented.
+.np
+Poisson distributed inter-arrival times between messages is assumed.  This
+assumption is the basis for SS7 performance analysis and will also be used
+for SCTP and SSCOP MCE analysis for common comparison.
+.sh 2 "Architecture"
+.lp
+The architectures considered are illstrated in the figures following.
+Each figure is referred to by the analysis sections and are labelled for
+reference.
+.(z
+.in 4
+.nf
++----------------------------------------------------------------+
+|                                                                |
+|   +----------+                                  +----------+   |
+|   |          |                                  |          |   |
+|   |     +----|                                  |----+     |   |
+|   |     | A  |----------------------------------|  C |     |   |
+|   |     +----|                                  |----+     |   |
+|   |          |                                  |          |   |
+|   |  Node 1  |                                  |  Node 2  |   |
+|   |          |                                  |          |   |
+|   +----------+                                  +----------+   |
+|                                                                |
++----------------------------------------------------------------+
+|                                                                |
+|         Figure 1.1 - Simplex Point-to-Point Connection         |
+|                                                                |
++----------------------------------------------------------------+
+.fi
+.)z
+.(z
+.in 4
+.nf
++----------------------------------------------------------------+
+|                                                                |
+|   +----------+                                  +----------+   |
+|   |          |                                  |          |   |
+|   |     +----|                                  |----+     |   |
+|   |     | A  |----------------------------------|  C |     |   |
+|   |     +----|                                  |----+     |   |
+|   |          |                                  |          |   |
+|   |     +----|                                  |----+     |   |
+|   |     | B  |----------------------------------|  D |     |   |
+|   |     +----|                                  |----+     |   |
+|   |          |                                  |          |   |
+|   |  Node 1  |                                  |  Node 2  |   |
+|   |          |                                  |          |   |
+|   +----------+                                  +----------+   |
+|                                                                |
++----------------------------------------------------------------+
+|                                                                |
+|         Figure 1.2 - Duplex Point-to-Point Connection          |
+|                                                                |
++----------------------------------------------------------------+
+.fi
+.)z
+.(z
+.in 4
+.nf
++----------------------------------------------------------------+
+|                                                                |
+|                IEEE 802.3            IEEE 802.3                |
+|   +----------+ ==========            ========== +----------+   |
+|   |          |   |    |                |    |   |          |   |
+|   |     +----|   |  +---+            +---+  |   |----+     |   |
+|   |     | A  |---+  | R |------------| R |  +---|  C |     |   |
+|   |     +----|      +---+            +---+      |----+     |   |
+|   |          |                                  |          |   |
+|   |  Node 1  |                                  |  Node 2  |   |
+|   |          |                                  |          |   |
+|   +----------+                                  +----------+   |
+|                                                                |
++----------------------------------------------------------------+
+|                                                                |
+|            Figure 1.3 - Simplex LAN/WAN Connection             |
+|                                                                |
++----------------------------------------------------------------+
+.fi
+.)z
+.(z
+.in 4
+.nf
++----------------------------------------------------------------+
+|                                                                |
+|                IEEE 802.3            IEEE 802.3                |
+|   +----------+ ==========            ========== +----------+   |
+|   |          |   |    |                |    |   |          |   |
+|   |     +----|   |  +---+            +---+  |   |----+     |   |
+|   |     | A  |---+  | R |------------| R |  +---|  C |     |   |
+|   |     +----|      +---+            +---+      |----+     |   |
+|   |          |                                  |          |   |
+|   |     +----|      +---+            +---+      |----+     |   |
+|   |     | B  |---+  | R |------------| R |  +---|  D |     |   |
+|   |     +----|   |  +---+            +---+  |   |----+     |   |
+|   |          |   |    |                |    |   |          |   |
+|   |  Node 1  | ==========            ========== |  Node 2  |   |
+|   |          | IEEE 802.3            IEEE 802.3 |          |   |
+|   +----------+                                  +----------+   |
+|                                                                |
++----------------------------------------------------------------+
+|                                                                |
+|             Figure 1.4 - Duplex LAN/WAN Connection             |
+|                                                                |
++----------------------------------------------------------------+
+.fi
+.)z
+.uh "Simplex Point-to-Point Connection"
+.lp
+Figure 1.1 illustrates a simplex point-to-point connection.  In this
+configuration it is assumed that the IP stack on each node queues
+packets to a driver which places them directly on the media connecting
+the two nodes.  This media is considered to be a simple connection with
+no queueing, just transport delay.  This simulates a point-to-point
+link connection directly attached to each node.
+.uh "Duplex Point-to-Point Connection"
+.lp
+Figure 1.2 illustrates a duplex point-to-point connection. This architecture
+could be extended to the point where the number of connections is N>=1.
+This is the situation where each node has 'N' interfaces with 'N'
+point-to-point connections.
+.uh "Simplex LAN/WAN Connection"
+.lp
+Figure 1.3 illustrates a simplex LAN/WAN configuration.  Each interface on
+each node is connected to its own LAN interface.  The example LAN used is
+IEEE 802.3 (Ethernet).  Each router (R) is connected both to a LAN and to a
+Point-to-Point connection.  Point-to-Point connections are extended to
+connect the routers together.
+.lp
+Several additional simplifying assumptions are made for this (and the
+following) configuration:
+.np 1
+It is assumed that ARP table entries are manually configured for each
+interface and router, and that no broadcasts or ARP queuries are required to
+establish the MAC address associated with the destination IP address of each
+interface in the system.
+.np
+Routing tables for each interface and router is assumed to be statically
+configured.  No routing protocols are broadcast.
+.np
+Router to router connections are Point-to-Point links which are extended
+over a distance.
+.np
+Each IEEE 802.3 (Ethernet) LAN is assumed to be a 10baseT connection to an
+Ethernet HUB.  All connection distances between the interface cards, hubs,
+and routers adjacent to each node are considered to be short distances.
+.np
+It is assumed that no other traffic (other than the traffic under
+consideration) is present on any LAN or any router.  Thus, the ARP
+and RIP assumptions.
+.np
+Routers are assumed to be OSPF (Open Shortest Path First) FQ (Fair Queueing)
+routers with per-destination queues.
+.uh "Duplex LAN/WAN Connection"
+.lp
+Figure 1.4 illustrates a duplex LAN/WAN configuration.  Each interface on
+each node is connected to its own LAN interface to an IEEE 802.3 Ethernet
+LAN over 10baseT running at 10Mbps.  Each router is connected on the one
+side to a LAN and on the other side to a point-to-point link to one of the
+other routers.
+.lp
+All of the assumptions for the simplex LAN/WAN case are considered
+assumptions in this configuration as well.
+.sh 1 "Consideration and Background"
+.sh 2 "Considerations"
+.sh 3 "SS7"
+.lp
+SS7 considerations (and the complete analysis) is provided in [4].  Similar
+considerations provided for links in SS7 will be assumed for PPP links in
+the configurations analyzed here for the sake of comparison.
+.sh 3 "PPP Link"
+.lp
+Similar considerations as are applied for SS7 links in [4] are considered
+here for PPP links.  Regardless of the validity of assumptions made for SS7
+links in [4], the same assumptions will be made here for the sake of
+comparison.
+.sh 3 "Ethernet 802.3"
+.lp
+Ethernet analysis is based on [5].  Assumptions and proofs will not be
+presented here, please refer to [5] for more details.  The results of the
+Ethernet analysis presented in the cited works will be incorporated into
+this analysis without modification.
+.sh 3 "Router"
+.lp
+Routers are assumed to be OSPF (Open Shortest Path First) FQ (Fair Queueing)
+routers.  The analysis of the queueing characteristics of routers of this
+type are presented in [6] and will be recreated here.  The results of the
+router analysis presented in the cited works will be incorporated into this
+analysis without modification.  Nevetheless, the following are some of the
+simplifying assumptions normally taken for routers:
+.np 1
+It is assumed that outgoing interfaces are chosed on metrics which indicate
+the hop distance from the router to the destination.  An available route
+with the lowest metric is chosen.  If there are two or more routes which
+lead to the same destination and which have the same metric, one of the
+routes will be determinately chosen.
+.np
+Although it is available, it is assumed that no load sharing exists in the
+selection of routes with the same metric.
+.np
+The return address on the datagram is not taken into consideration when
+routing messages.
+.sh 3 "IP Stack"
+.lp
+Considerations for IP stack queueing and work times are based on the 4.4BSD
+implementation.  Although other implementations exist, this model is used
+to yeild representative results.  Several simplifying assumptions are made
+concerning the 4.4BSD IP stack as follows:
+.np 1
+Processor work times are considered to be short with respect to emission and
+propagation times.  To show that this assumption is workable, consider that
+a significant amount of processor power can be applied for low levels of
+traffic to allow the assumption to hold.  This is not necessarily an
+cost-effective situation, but one which is easier to study.
+.np
+Delays from the indication of the ability to output information onto
+the interface to the actual output of data is assumed to be negligible.
+This assumes that processors have asynchronous interrupts and that interrupt
+service routines are sufficiently quick to permit the output of back-to-back
+frames on the interface without significantly loading the main processor.
+This is a reasonable assumption for modern computer architectures and
+operating system software.
+.np
+A buffer exists behind the input to the IP level.  This buffer holds
+messages which are waiting for transmission to the interface.  This buffer
+is limited in size.
+.np
+It is assumed that there are no network configuration or routing table
+changes which would require additional delays in the background.
+.sh 3 "SCTP"
+.lp
+For M2UA SCTP behaviour, we are concerned with SS7 performance
+over SCTP.  For this analysis it is sufficient that a stream within
+an SCTP association be analyized in comparison to a SS7 link (at
+the same loaing points) in the simplest case.  For M3UA, additional
+analysis will provide the effects of mixing SS7 SLS (link) traffic
+into multiple streams within a single SCTP association.  It will also
+be considered what the effects of "changeover" between streams within
+the SCTP association will be, and what the effects of changeover
+between streams in different associations will be.
+.sh 3 "SSCOP-MCE"
+.lp
+.sh 2 "Background Information"
+.lp
+Some background information is in order before we begin the analysis of SCTP
+and SSCOP-MCE.  This background information and baseline analysis is
+necessary to understand the effects of various network configurations.
+.sh 3 "Link"
+.lp
+Links can be graded into a number of error rates as illustrated in Table
+2.1.
+.(z
+.nf
+                   Table 2.1 - Bit Error Rates
+    +-------------------+-----------------+------------+---------+
+    | Type of Transport |  Bit Error Rate | Speed      | EM/8    |
+    +-------------------+-----------------+------------+---------+
+    | Satellite Links   |  1 x 10^-3      |            |         |
+    | PCM Channel       |  1 x 10^-6      | 64k bps    | 125us   |
+    | PCM Link          |  1 x 10^-6      | 1.544M bps |         |
+    | Ethernet LAN      |  1 x 10^-9      | 10M bps    | 800ns   |
+    | SONET span        |  1 x 10^-10     | 675M bps   |         |
+    +-------------------+-----------------+------------+---------+
+.fi
+.)z
+.lp
+Links are modeled as a queue where the service time is dependent upon the
+link's bit rate and the length of the packet for transmission.  This length
+of time is called the "emission time" for the packet.  The emission time is
+simply the the packet length in bits divided by the transmission speed in
+bits per second.
+.sh 3 "Router"
+.sh 3 "Ethernet"
+.lp
+Ethernet links are specialized forms of links.  They do not simply have the
+emission times associated with communications links: there is the
+possibility of CDMA collisions which adds further delay (and HOL blocking)
+to some packets.
+.lp
+Other LAN protocols (e.g., 802.4 Token Bus, or 802.5 Token Ring) or switched
+LAN technologies may also be considered.
+.sh 3 "IP Stack"
+.lp
+IP stacks based on the BSD socket implementations (or even SVR4 streams) use a
+software interrupt procedure for moving message buffers from the upper layers
+down to the device driver and finally on to the media.  This mechanism is not
+normally asynchronous or event driven, but works on the basis of setting a
+software interrupt which is examined on a quantum basis in operating systems
+which include pre-emtive scheduling.  Non-pre-emptive scheduled operating
+systems may use a task window (for time-triggered real-time systems) or
+execution of a system event loop (for run-to-completion systems) to emulate
+an interrupt in the operating system.
+.lp
+These approaches to moving the messsage buffers down the IP protocol stack
+include some queueing associated with the software interrupt.  These queueing
+effects should be considered in the analysis of all protocols using the
+IP stack.
+.lp
+The IP stack must also be considered to introduce queueing delays when
+broadcast based protocols are used for address resolution (e.g., ARP) and routing
+(e.g., RIP).  In this document it is assumed that these effects can be
+avoided (e.g., through manual ARP entries and ICMP redirects).
+.lp
+Other considerations of the IP stack include the fact that the IP stack
+performs routing.
+.sh 1 "SCTP Analysis"
+.lp
+This section proceeds with the SCTP analysis.  To be able to simplify the
+task of the analysis, initially, the following assumptions are made:
+.bu
+Only one association is considered.
+.bu
+Only one stream is considered in the association.
+.uh Definitions
+.sp
+.nf
+    F  - Frequency (bps) of the Transmission Medium
+    Pe - Probability of Error
+    Pl - Probability of Message Loss
+.fi
+.sh 2 "Probability of Message Loss"
+.lp
+Message loss has several contributing factors.  Unfortunately, SCTP has no
+mechanism for distinguish between message loss due to any specific
+factor.  There is no indication given by the lower layer to SCTP or by the
+SCTP peer as to what the cause of the loss might be.  SCTP procedures do no
+distinguish between loss types.
+.lp
+Factors contributing to message loss are as follows:
+.bu
+Loss due to bit errors.
+.bu
+Loss within the IP stack.
+.bu
+Loss within network routers.
+.bu
+Loss due to excessive delay.
+.lp
+SCTP has two mechanisms which compete when a message is lost.
+Messages which are detected as lost through the receipt of four
+successive SACK reports, are retransmitted.  Messages which have not
+been acknowledged within the message's time-to-live as determined by
+the ULP are considered lost.  Messages cannot be retransmitted more
+than 'Path.retrans.max' to any given destination.  Messages cannot
+be retransmitted more than 'retrans.max' on an association.
+.sh 3 "Loss due to Bit Errors"
+.lp
+Bit errors have several effects on SCTP.  SCTP has a 32-bit Adler Checksum
+which is used to protect SCTP datagrams against bit errors.  The SCTP header
+is not separately protected, the entire datagram is protected by one
+checksum.  The result of detection of a bit error with the Adler-32 Checksum
+is the discard of the datagram.
+.lp
+The actual number of packets discarded from the detection of bit errors
+is dependent on a number of factors:
+.bu
+The probability of a bit error (Pe).
+.bu
+The size of the packets transmitted (l).
+.bu
+The packet load (L).
+.bu
+The probability of detecting a bit error (Pd).
+.lp
+The response of SCTP to received datagrams with checksum errors (detected
+bit errors) will be to silently discard the datagram at the receiver.  One
+of three things will occur in response to this silent discard:
+.np 1
+Another datagram will arrive at the receiver which will cause a SACK Gap
+Report to be issued for the lost datagram.
+.np
+The sender's RTO (receive time out) will expire and the chunks in the
+discarded datagram will be retransmitted.
+.np
+The sender's lifetime for the packet will expire and the association will be
+lost.
+.lp
+The silent discard behaviour of datagrams with detected bit errors means
+that bit error rates may be translated into datagram loss rates.  The
+datagram loss rate contributed by the bit error rate can be added to the
+other datagram loss rates to arrive at a final loss rate.  Analysis can then
+be calculated on the basis of this combined loss rate.
+.sh 3 "Loss within the IP stack."
+.lp
+Most losses associated with IP stack implementations include buffer overruns
+and ARP queries.  These two factors are considered below:
+.ip "Buffer Overruns" 5
+Buffer overruns result when the protocol layer above IP generates IP
+datagrams faster than the IP layer can post these datagrams to the device
+driver; or, the device driver receives datagrams faster that it can place
+these datagrams on the media.  If these differences are significant and last
+for a sufficient period of time, input buffer chains to either the IP level
+or the device driver will result in the loss of a packet.  Packets lost to
+the IP level due to lack of input buffer space, SCTP will be notified by
+the IP layer; however, if the overrun buffer is between the IP layer and the
+device driver, datagram loss will not be reported.
+.ip "ARP Losses" 5
+Some IP stack implementations discard the packet which is queued for
+transmission which causes an ARP cache miss.  This would result in packet
+loss at some ARP cache miss rate.  ARP cache misses are due either to cache
+entry expiry, or initial cache entry establishment.  Because this analysis
+assumes that ARP cache misses can be removed by manually or statically
+allocating IP to MAC address mappings, these losses are not considered here.
+.sh 2 "Queueing Effects of Retransmission"
+.sh 3 "Retransmission with Multiple Paths"
+.sh 3 "The Cost of Retransmission"
+.sh 2 "Effects of the Path"
+.sh 3 "The Effects of RTT on Delay"
+.uh "Backward Error Correction"
+.uh "Forward Error Correction"
+.sh 3 "The Effects of Throughput Limitation on Delay"
+.uh "Path Queueing"
+.lp
+Path queueing is an effect where the path has a limited throughput
+capability and attempts at feeding higher packet rates at the path will
+result in the internal queueing of packets along the path.  This is a
+congestive condition which results in packets being delayed longer than they
+would under lesser load conditions.
+.lp
+Any given path can be modelled as a series of queues.  The delay along a
+link is normally a determinate and scalar delay.  The delay through a router
+or interface is a queueing delay.
+.lp
+A characteristic of the path which can be used to determine whether delays
+are due to congestion or whether delays are due to link delays is the RTT.
+When paths a not congested, they experience low RTT values.  When paths are
+congested they experience higher RTTs.  A mechanism which can be used to
+determine whether paths or congested or not is by comparing the minimum
+theoretical or experienced RTT to the current measured RTT.
+.lp
+A hypothetical situation is illustrated in Figure 1 below.  Although the
+actual curve of round trip times to congestion levels is not known, there
+are several things which can be said:
+.bu
+Because paths are modeled as a directed graph of queues connected by
+determinate scalar delay links, it can be said that the RTT to Congestion
+function is monotonically increasing.
+.bu
+Because paths have queues with a finite number of servers, it can be said
+that the RTT to congestion function is asymptotically increasing at the
+maximum throughput of the path.
+.bu
+When paths are experiencing no congestion, the RTT will be at a minimum.
+The RTT minimum is the y-axis intercept of the RTT/Congestion curve.
+.bu
+When the current
+measured RTT is higher than the minimum RTT, then the path is experiencing
+some congestion.
+.bu
+When the current measured RTT is higher than twice the acceptable transfer
+time, the path is experiencing excessive congestion.
+.(z
+.in 4
+.nf
++----------------------------------------------------------------+
+|                                                                |
+|    |                                 |         |               |
+|    |                                          |                |
+|    |                                 |       / |               |
+|    |                                         |                 |
+|    | Twice                Acceptable |       | | Maximum       |
+|    | Acceptable           Congestion        /    Throughput    |
+|    | Transfer Timer                  |      |  |               |
+|  R |    |                                  /                   |
+|  T |    |                            |   _/    |               |
+|  T |    v                             __/                      |
+| - -|- - - - 2 x ATT - - - - - - _____/- - - - -|- - - - - -    |
+|    |                  _________/                               |
+|    | ________________/               |         |               |
+|    |/                                                          |
+| - -+- - - - RTT Mininmum  - - - - - -|- - - - -|- - - - - -    |
+|    |                                                           |
+|    |                                 |         |               |
+|    |                                                           |
+|    |                                 |         |               |
+| ---+--------------------------------------------------------   |
+|    |                     Congestion  |         |               |
+|    |                                                           |
+|                                                                |
++----------------------------------------------------------------+
+|                                                                |
+|                  Figure 1 - RTT vs. Congestion                 |
+|                                                                |
++----------------------------------------------------------------+
+.fi
+.)z
+.lp
+Congestion on a path may be caused either by the traffic which is being
+applied to the path with RTT measured, or other traffic along a portion of
+the same path which is either being applied from the same endpoint or
+applied from other endpoints.  Congestion may also occur from failure of
+component associated with queues along the path.
+.uh "Path Loss"
+.sh 3 "The Effects of Noise on Delay"
+.uh "Path Loss"
+.sh 2 "Congestion"
+.sh 3 "Traffic Offerred vs. Traffic Transferred"
+.lp
+Regardless of the precise nature of an IP network configuration between two
+points, some things may be said about congestion.  There are a limited number
+of types of systems which are used to make up an IP network, and a limited
+range of characteristics which these systems exhibit under load.
+.lp
+Figure 2 illustrates load curves for three systems as follows:
+.np 1
+The first system corresponds to a wire.  It has a fixed linear
+relationship between the traffic offered and the traffic transfered: all
+of the traffic offered is transferred.
+.np
+The second system corresponds to a 
+.np
+The third system corresponds to a CDMA medium.  The characteristic of
+CDMA is that collisions increase with traffic load and impede the
+ability of the system to transfer data.  Therefore, this is a good
+system to model CMDA access media such as ethernet.
+.(z
+.in 4
+.nf
++----------------------------------------------------------------+
+|  Load                                 (1)                      |
+|  Transferred                         _/                        |
+|    |                               _/                          |
+|    |                             _/           Asymptote        |
+| - -|- - - - - - - - - - - - - -_/ - - - __- - - - - - - - - (2)|
+|    |                         _/      __/  \\_          ______/  |
+|    |                       _/     __/       \\_ ______/         |
+|    |                     _/    __/        ____/_               |
+|    |                   _/   __/      ____/      \\__            |
+|    |                 _/  __/     ___/              \\___        |
+|    |               _/ __/    ___/                      \\___(3) |
+|    |             _/__/   ___/                                  |
+| - -|- - - - - -_/_/ -___/ - - - - - - - - - - - - - - - - -    |
+|    |         _/_/___/                         Asymptote        |
+|    |       _/_/_/                                              |
+|    |     _//_/                                                 |
+|    |   _/_/                                                    |
+|    | _/                                                        |
+|    |/                                                          |
+| ---+--------------------------------------------------------   |
+|    |                                                  Load     |
+|    |                                                  Offered  |
+|                                                                |
++----------------------------------------------------------------+
+|                                                                |
+|           Figure 2 - Load Curves for Various Systems           |
+|                                                                |
++----------------------------------------------------------------+
+.fi
+.)z
+.sh 3 "Traffic Offerred vs. Delay"
+.sh 2 "A Model for Delay"
+.sh 2 "Transmission and Retransmission Procedures"
+.sh 2 "Congestion/Flow Control Procedures"
+.sh 1 "Procotol Elements"
+.sh 1 "Procedures"
+.sh 2 "Transmission and Retransmission Procedures"
+.sh 2 "Congestion/Flow Control Procedures"
+.sh 1 "Examples"
+.uh "Security Considerations"
+.lp
+This congestion procedures relies on the mechanisms of Simple Control
+Transport Protocol (SCTP) to provide security.
+.sh 1 Acknowledgements
+.sh 1 References
+.ip " [1]" 5
+Simple Control Transmission Protocol, draft-ietf-sigtran-sctp-07.txt,
+February 2000
+.ip " [2]" 5
+Distributed Systems, 2nd Edition, Sape Mullender Ed., Addison-Wesley, 1993,
+ISBN 0-201-62427-3
+.ip " [3]" 5
+.ip " [4]" 5
+.ip " [5]" 5
+.ip " [6]" 5
+.ip " [7]" 5
+.ip " [8]" 5
+.ip " [9]" 5
+.ip "[10]" 5
+.ip "[11]" 5
+.ip "[12]" 5
+.ip "[13]" 5
+.ip "[14]" 5
+.ip "[15]" 5
+.ip "[16]" 5
+.ip "[17]" 5
+.ip "[18]" 5
+.ip "[19]" 5
+.sh 1 "Author's  Addresses"
+.(d
+.nf
+Brian F. G. Bidulock                                Tel: +1-972-578-3959
+Inet Technologies, Inc.                   EMail: brian.bidulock@inet.com
+1255 W 15th Street                                                      
+Plano, TX 7507                                                          
+USA                                                                     
+.fi
+.)d
+.pd
+.sp 2
+.lp
+This Internet Draft expires October 2000.
