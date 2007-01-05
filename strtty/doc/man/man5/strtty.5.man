@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strtty.5.man,v 0.9.2.5 2006/12/31 11:20:18 brian Exp $
+.\" @(#) $Id: strtty.5.man,v 0.9.2.6 2007/01/05 06:17:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/31 11:20:18 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/05 06:17:06 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strtty.5.man,v $
+.\" Revision 0.9.2.6  2007/01/05 06:17:06  brian
+.\" - documentation updates for release
+.\"
 .\" Revision 0.9.2.5  2006/12/31 11:20:18  brian
 .\" - documentation updates for release
 .\"
@@ -103,7 +106,7 @@ sort-adjacent-labels
 This is the
 .BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
 package for
-.B "Linux Fast-STREAMS" .
+.BR "Linux Fast-STREAMS" .
 .PP
 OpenSS7
 .I STREAMS
@@ -116,7 +119,7 @@ release that provide additional functionality and protocol support not tradition
 systems, or which have traditionally fallen into the domain of value-add system software, or, in
 this case, where the functionality was optional for a number of implementations.  The
 .B @PACKAGE_TITLE@
-package is one of several optional add-on packages tha provide enhanced
+package is one of several optional add-on packages that provides enhanced
 .I STREAMS
 support beyond that provided by the base
 .I STREAMS
@@ -133,7 +136,7 @@ The
 .B @PACKAGE_TITLE@
 package provides
 .I STREAMS
-modules and drivers, libraries, programs, init scripts, and daemons that
+modules and drivers, libraries, programs, initialization scripts, and daemons that
 implement the classical
 .IR "SVR 4.2 Terminal Subsystem" .
 .[
@@ -267,6 +270,9 @@ The
 .B @PACKAGE_TITLE@
 package includes kernel modules,
 .I "SVR 4.2"
+.[
+svr42
+.]
 .I STREAMS
 drivers, modules, libraries, utilities, test programs, daemons, and
 development environment for the development and execution of
@@ -282,9 +288,9 @@ This distribution is only currently applicable to
 .IR ix86 ", " x86_64 ", " ppc " and " ppc64
 architectures, but should build and install for other architectures as well.
 .PP
-This package is currently incomplete.  It is being released as a reference
-point for the community.  If you are interested in completion of this package,
-contact
+This package is currently incomplete.
+It is being released as a reference point for the community.  If you are interested in completion of
+this package, contact
 .RB < info@openss7.com >.
 .\"
 .\"
@@ -413,45 +419,53 @@ package is comatible with
 .BR "Linux Fast-STREAMS" ,
 which always contained full terminal support in the Stream head.
 .PP
+The
 .B @PACKAGE_TITLE@
-has known and unknown defects.  This is a
+package has known and unknown defects.  This is a
 .I pre-alpha
-release.  Some defects might be harmful.  No validation testing whatsoever has
-been performed by the
+release.  Some defects might be harmful.  No validation testing whatsoever has been performed by the
 .I OpenSS7 Project
 on this software.  The software might not even configure or compile.  The
 .I OpenSS7 Project
-recommends that you do not use this software. Use at your own risk.  Remember
-that there is
+recommends that you do not use this software. Use at your own risk.  Remember that there is
 .BR "NO WARRANTY" .
+(See the section
+.RI \(lq "NO WARRANTY" \(rq
+under the
+.RI \(lq "GNU General Public License" \(rq,
+in the manual.)
 .PP
 This software is
 .I pre-alpha
-software.  As such, it will crash your kernel.  Installation of the software
-will irreparably mangle your header files or Linux distribution in such a way
-as to make it unusable.  Crashes will lock your system and rebooting the
-system will not repair the problem.  You will loose all the data on your
-system.  Because this software will crash your kernel, the resulting unstable
-system can destroy computer hardware or peripherals making them unusable.  You
-will void the warranty on any system on which you run this software.
-.B YOU HAVE BEEN WARNED.
+software.  As such, it will crash your kernel.  Installation of the software will irreparably mangle
+your header files or Linux distribution in such a way as to make it unusable.  Crashes will lock
+your system and rebooting the system will not repair the problem.  You will lose all the data on
+your system.  Because this software will crash your kernel, the resulting unstable system can
+destroy computer hardware or peripherals making them unusable.  You will void the warranty on any
+system on which you run this software.
+.BR "YOU HAVE BEEN WARNED" .
 .\"
 .\"
 .SH BUGS
 .PP
 The
 .B @PACKAGE@
-package has been tested with a wide array of production
+package is compatible with a wide array of production
 .B Linux
-distributions, kernels, and target architectures, and is considered
-.I alpha
+distributions, kernels, and target architectures, but is considered
+.I pre-alpha
 grade by
 .IR "The OpenSS7 Project" .
-Problems or develoment requests can be reported to
+At the time of release, the
+.B @PACKAGE@
+package had no known bugs.  Problems or development requests can be reported to
 .RB < bugs@openss7.org >.
 Please, however, use the included
 .B send-pr
 script for generating actionable problem reports or development requests.
+Please see the file
+.RI \(lq PROBLEMS \(rq
+in the release for problem reporting guidelines.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -480,12 +494,12 @@ The
 package is compatible with
 .I "SVR 4.2"
 and systems based on
-.I "SVR 4.2"
+.IR "SVR 4.2" ,
 such as
 .IR Solaris \(rg
 and
 .IR UnixWare \(rg,
-with the following portablility considerations:
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 An attempt was made to make each of the modules and drivers contained in this
 package as compatible as possible with all documented implementations of the
@@ -556,7 +570,7 @@ was released with
 .PP
 The
 .B @PACKAGE@
-package as first publicly released (version
+package was first publicly released (version
 .BR 0.9.2.1 )
 at the end of 2006.
 .\"
@@ -564,4 +578,5 @@ at the end of 2006.
 .[
 $LIST$
 .]
+.\"
 .TI

@@ -1,3 +1,10 @@
+2007-01-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man5/strtty.5.man: documentation updates for release
+	* doc/manual/descrip.texi: documentation updates for release
+	* doc/manual/releases.texi: documentation updates for release
+	* doc/manual/todo.texi: documentation updates for release
+
 2007-01-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: documentation updates for release

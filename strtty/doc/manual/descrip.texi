@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.7 2006/12/31 11:20:19 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.8 2007/01/05 06:17:07 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,16 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/12/31 11:20:19 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/05 06:17:07 $ by $Author: brian $
 @c
 @c =========================================================================
 
-The @cite{@value{PACKAGE_TITLE}} package provides @dfn{STREAMS} modules and
-drivers, libraries, programs, init scripts, and daemons that implement the
-classical @cite{SVR 4} Terminal Subsystem.
+The @cite{@value{PACKAGE_TITLE}} package provides @dfn{STREAMS} modules and drivers, libraries,
+programs, init scripts, and daemons that implement the classical @cite{SVR 4} Terminal Subsystem.
 
-The package builds and installs the following @dfn{STREAMS} kernel modules and
-drivers:
+The package builds and installs the following @dfn{STREAMS} kernel modules and drivers:
 
 @multitable @columnfractions .05 .95
 @item @tab @minus{} @file{streams_pty.ko} driver @dfn{/dev/ptmx} @dfn{/dev/pts/0}
@@ -74,41 +72,37 @@ drivers:
 
 @table @manref
 @item pty(4)
-The @manpage{pty(4)} driver is a Pseudo-Terminal Driver that provides the
-classical @cite{UNIX@registeredsymbol{}} master and slave pseudo-terminals.
+The @manpage{pty(4)} driver is a Pseudo-Terminal Driver that provides the classical
+@cite{UNIX@registeredsymbol{}} master and slave pseudo-terminals.
 
 This driver is complete but untested.
 
 @item ptem(4)
-The @manpage{ptem(4)} module is a Pseudo-Terminal Emulation Module that
-provide hardware terminal emulation for the slave side of a Pseudo-Terminal
-provided by the @manpage{pty(4)} driver.  This module is pushed over the slave
-side of a pseudo-terminal before pusing @manpage{ldterm(4)}.
+The @manpage{ptem(4)} module is a Pseudo-Terminal Emulation Module that provide hardware terminal
+emulation for the slave side of a Pseudo-Terminal provided by the @manpage{pty(4)} driver.  This
+module is pushed over the slave side of a pseudo-terminal before pusing @manpage{ldterm(4)}.
 
 This module is complete but untested.
 
 @item pckt(4)
 The @manpage{pckt(4)} module is a Packet Module.  This is the classical
-@cite{UNIX@registeredsymbol{}} packetization module that is pushed over the
-master side of a pseudo-terminal to allow the master to view the detailed
-state of the pseudo-terminal.
+@cite{UNIX@registeredsymbol{}} packetization module that is pushed over the master side of a
+pseudo-terminal to allow the master to view the detailed state of the pseudo-terminal.
 
 This module is complete but untested.
 
 @item ldterm(4)
-The @manpage{ldterm(4)} module is a Line Discipline Terminal Module.  This is
-the classical @cite{UNIX@registeredsymbol{}} line discipline module for
-terminals.  This module is pushed last on the slave side of a psuedo-terminal,
-after @manpage{ptem(4)} and provides the @cite{POSIX} terminal interface to
-the user.
+The @manpage{ldterm(4)} module is a Line Discipline Terminal Module.  This is the classical
+@cite{UNIX@registeredsymbol{}} line discipline module for terminals.  This module is pushed last on
+the slave side of a psuedo-terminal, after @manpage{ptem(4)} and provides the @cite{POSIX} terminal
+interface to the user.
 
 This module is incomplete.
 
 @item ttcompat(4)
-The @manpage{ttcompat(4)} module is a TTY Compatibility Module.  This is a
-module that provides @cite{UNIX@registeredsymbol{} Version 7} and @cite{4BSD}
-compatible terminal interfaces.  These interfaces are no longer in use and
-this module has only marginal value.
+The @manpage{ttcompat(4)} module is a TTY Compatibility Module.  This is a module that provides
+@cite{UNIX@registeredsymbol{} Version 7} and @cite{4BSD} compatible terminal interfaces.  These
+interfaces are no longer in use and this module has only marginal value.
 
 This module is complete but untested.
 
@@ -133,18 +127,15 @@ This library is incomplete.
 
 @end table
 
-The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR
-4.2} @dfn{STREAMS} drivers, modules, libraries, utilities, test programs,
-daemons, and development environment for the development and execution of
-@cite{@value{PACKAGE_TITLE}} components and applications for the @cite{SVR
-4.2} @dfn{STREAMS} environment.
+The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR 4.2} @dfn{STREAMS}
+drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
+development and execution of @cite{@value{PACKAGE_TITLE}} components and applications for the
+@cite{SVR 4.2} @dfn{STREAMS} environment.
 
-This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6
-kernels and was targeted at @samp{ix86}, @samp{x86_64}, @samp{ppc} and
-@samp{ppc64} architectures, but should build and install for other
-architectures as well.
+This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targeted
+at @samp{ix86}, @samp{x86_64}, @samp{ppc} and @samp{ppc64} architectures, but should build and
+install for other architectures as well.
 
-This package is currently incomplete.  It is being released as a reference
-point for the community.  If you are interested in completion of this package,
-contact @email{info@@openss7.com}.
+This package is currently incomplete.  It is being released as a reference point for the community.
+If you are interested in completion of this package, contact @email{info@@openss7.com}.
 
