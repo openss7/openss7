@@ -5,7 +5,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
@@ -247,6 +247,41 @@ EXTRA_KERNEL_MODULES		+=
 endif
 ## PKG_BUILD_ARCH
 endif
+
+EXTRA_DOCS			+= \
+				doc/drafts/isua/draft-bidulock-sigtran-isua-03.txt \
+				doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-ig-00.txt \
+				doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-mib-00.txt \
+				doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-07.txt \
+				doc/drafts/m2pa/draft-george-sigtran-m2pa-interop-01.txt \
+				doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-02.txt \
+				doc/drafts/m3pa/draft-averson-sigtran-m3pa-00.txt \
+				doc/drafts/m3pa/draft-bidulock-sigtran-m3pa-01.txt \
+				doc/drafts/m3ua/draft-bidulock-sigtran-m3gw-00.txt \
+				doc/drafts/m3ua/draft-bidulock-sigtran-m3peer-01.txt \
+				doc/drafts/m3ua/draft-bidulock-sigtran-m3ua-test-00.txt \
+				doc/drafts/sctp/draft-bidulock-sigtran-gapalg-00.txt \
+				doc/drafts/sctp/draft-bidulock-sigtran-sctpcongestion-00.txt \
+				doc/drafts/sctp/draft-bidulock-sigtran-sctptli-00.txt \
+				doc/drafts/sctp/draft-bidulock-tsvwg-sctpnpi-00.txt \
+				doc/drafts/sctp/draft-bidulock-tsvwg-sctptpi-00.txt \
+				doc/drafts/sua/draft-bidulock-sigtran-suaco-00.txt \
+				doc/drafts/sua/draft-bidulock-sigtran-sua-test-00.txt \
+				doc/drafts/tua/draft-bidulock-sigtran-tua-04.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-as-00.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-aspcong-00.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-aspext-04.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-corid-04.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-datamodel-00.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-loadgrp-04.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-loadsel-04.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-multisg-04.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-mutilsg-00.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-regext-04.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-sessid-04.txt \
+				doc/drafts/ua/draft-bidulock-sigtran-sginfo-05.txt
+
+EXTRA_DIST			+= $(EXTRA_DOCS)
 
 EXTRA_TEX			+= \
 				scripts/texinfo.cnf \

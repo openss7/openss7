@@ -79,11 +79,16 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This release is both a maintenance release and a feature release.
-The major new feature added is a fully @dfn{STREAMS} based implementation of
-the @manpage{np_ip(4)} driver.
-This release is a stable production release for @cite{Linux Fast-STREAMS}.
-Support for @cite{LiS} is deprecated as of this release.
+This is the OpenSS7 Project's fourth separate release from the OpenSS7 Project of the
+@cite{@value{PACKAGE_TITLE}} package, formerly part of the (now deprecated) Linux STREAMS (LiS)
+package.  These networking modules provide DLPI, NPI and Linux IP drivers, as well as providing CDI,
+DLPI and NPI header files.  The package contains all the necessary manual pages and other
+documentation for XNS components in a separate autoconf tarball.
+
+This release is both a maintenance release and a feature release.  The major new feature added is a
+fully @dfn{STREAMS} based implementation of the @manpage{np_ip(4)} driver.  This release is a stable
+production release for @cite{Linux Fast-STREAMS}.  Support for @cite{LiS} is deprecated as of this
+release.
 
 The release provides the following enhancements and fixes:
 

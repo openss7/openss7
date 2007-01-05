@@ -1334,7 +1334,7 @@ primitives to and from the Transport provider using @manpage{getpmsg(2)} and @ma
 
 @subsection Kernel Space Drivers and Modules
 
-Typeical include files for writing @dfn{STREAMS} module and drivers implementing transport providers
+Typical include files for writing @dfn{STREAMS} module and drivers implementing transport providers
 in kernels space include @cite{tihdr.h} or @cite{tpi.h}.  Both header files provide access to
 definitions for the TPI interface and additional XTI definitions for use by @dfn{STREAMS} drivers
 and modules.  Additional header files for interacting with specific drivers or modules may also be

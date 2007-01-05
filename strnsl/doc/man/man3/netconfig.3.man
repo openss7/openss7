@@ -267,7 +267,7 @@ subroutines, as well as
 .BR netpath (3)
 subroutines.
 .TP
-.B nc_perror ()
+.BR nc_perror ()
 prints a diagnostic message to standard error with the string provided in the
 .I msg
 argument used as a prefix followed by a colon.  Diagnostic messages printed to
@@ -277,7 +277,7 @@ standard error are followed with a NEWLINE.
 is similar to
 .BR nc_perror (),
 but, instead of printing the message to standard error, only a pointer to the
-diagnostic message string is returned.  The allows the caller to subsequently
+diagnostic message string is returned.  This allows the caller to subsequently
 format and store a message according to the caller's specifications.
 .\"
 .\"

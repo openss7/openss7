@@ -1,4 +1,4 @@
-OpenSS7 STREAMS Network Services Library -- read me first file.  2007-01-02
+OpenSS7 STREAMS Network Services Library -- read me first file.  2006-12-29
 $Id: README,v 0.9.2.7 2007/01/05 06:19:30 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,46 +7,63 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS Network Services Library
 =========================================
 
+`UNIX' has traditionally provided three components of the Network
+Services Library, `libnsl', two of which are associated with the X/Open
+Transport Interface/Transport Layer Interface (XTI/TLI), `libxnet', the
+Trasnport Provider Interface (TPI), and "STREAMS" network pseudo-device
+drivers.  Two components provide the TI (Transport Independent)
+interface, whereas the other provides the TS (Transport Sockets)
+interface.  The TI components provide the Transport Independent RPC
+services (TI-RPC) pioneered by Sun Microsystems and subsequently
+standardized by the IETF.
+
+`GNU/Linux' `glibc' provides (amoungst other things) the RPC interface
+library and the TS-RPC and BSD 4.3 sockets address translation
+facilities in `libc', and provides NIS capabilities in `libnsl'.
+"STREAMS" related components that are not currently part of the `Linux'
+Network Services Library (`libnsl') are:
+
+  1. Network Selection, consisting of:
+
+        * Network Configuration database access, `netconfig(3)', and,
+
+        * Network Path access, `netpath(3)'.
+
+  2. Name-to-Address Translation, `netdir(3)'.
+
+These are often referred to as the Network Selection facility of the
+Network Services Library.  The `OpenSS7 STREAMS Network Services
+Library' package provides a library, renamed `libxnsl', that provides
+the missing Network Selection and Name-to-Address mapping facilities
+designed to work with `xti(3)'.
+
 The `OpenSS7 STREAMS Network Services Library' package contains header
-files and a number of modules and drivers and the associated
-documentation that were formerly contained in the `OpenSS7 Linux STREAMS
-(LiS)' releases.  When development started on `Linux Fast-STREAMS' in
-2003, these modules were removed from the `LiS' distribution and
-separated so that they could build against both the `LiS' and `Linux
-Fast-STREAMS' packages from the same baseline code.
+files and the associated documentation that were originally contained
+in the `strxnet' package.  This library was quickly removed from the
+`strxnet' distribution and placed in its own add-on package.
 
-The package contains the following standard `Open Systems Interconnect
-(OSI)' conforming header files:
+The package contains the following standard `SVR 4.2' conforming header
+files:
 
-     - `<sys/tiusr.h>' `Transport Provider Interface Version 2.0.0' user
-     - `<sys/tihdr.h>' `Transport Provider Interface Version 2.0.0'
-     kernel
-     - `<sys/ticots.h>' `TPI COTS'
-     - `<sys/ticots_ord.h>' `TPI COTS w/ Orderly Release'
-     - `<sys/ticlts.h>' `TPI CLTS'
+     - `<netconfig.h>' `Network Configuration'
+     - `<sys/netconfig.h>' `Network Configuration'
+     - `<netdir.h>' `Network Directory'
 
-Note that the `Data Link Provider Interface (DLPI)' and `Network
-Provider Interface' are contained in the `strxns-0.9.2.4' package.
-
-The package builds and installs the following "STREAMS" kernel modules
-and drivers:
-
-     - `streams_timod.ko' module "timod"
-     - `streams_tirdwr.ko' module "tirdwr"
-
-`timod(4)'
-
-`tirdwr(4)'
+Note that the `XTI/TLI Library' and `Transport Provider Interface'
+header files are contained in the `strxnet-0.9.2.9' package.
 
 The package builds and installs the following shared object libraries:
 
-`xti(3)'
+`xnsl(3)'
+     This is the `X/Open Network Services Library' that contains the
+     Network Selection facility for the Network Services Library.
 
-The `OpenSS7 STREAMS Network Services Library' package includes kernel
-modules, `SVR 4.2' "STREAMS" drivers, modules, libraries, utilities,
-test programs, daemons, and development environment for the development
-and execution of `X/Open Networking (XNET)' protocol stack components
-and applications for the `SVR 4.2' "STREAMS" environment.
+
+The `OpenSS7 STREAMS Network Services Library' package includes `SVR
+4.2' "STREAMS" libraries, utilities, test programs, daemons, and
+development environment for the development and execution of
+`OpenSS7 STREAMS Network Services Library' applications for the `SVR
+4.2' "STREAMS" environment.
 
 This distribution is only currently applicable to `Linux' 2.4 and 2.6
 kernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'
@@ -56,7 +73,7 @@ well.
  Release
 --------
 
-This is the `strnsl-0.9.2.1' package, released 2007-01-02.  This
+This is the `strnsl-0.9.2.1' package, released 2006-12-29.  This
 `0.9.2.1' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:

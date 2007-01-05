@@ -60,6 +60,12 @@
 The @cite{@value{PACKAGE_TITLE}} package provides @dfn{STREAMS} modules and drivers, libraries,
 programs, init scripts, and daemons that implement the classical @cite{SVR 4} Terminal Subsystem.
 
+The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR 4.2} @dfn{STREAMS}
+drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
+development and execution of @cite{@value{PACKAGE_TITLE}} components and applications for the
+@cite{SVR 4.2} @dfn{STREAMS} environment.  It provides true @dfn{STREAMS}-based Pseudo-Terminals for
+@cite{Linux}.
+
 The package builds and installs the following @dfn{STREAMS} kernel modules and drivers:
 
 @multitable @columnfractions .05 .95

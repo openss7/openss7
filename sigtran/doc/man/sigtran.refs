@@ -1458,6 +1458,42 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-00.txt
 
+%K m2ua-ss7test-00
+%L M2UATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Adaptation Layer (M2UA) SS7 Test Specifications
+%R draft-bidulock-sigtran-m2ua-ss7test-00.txt
+%D July 26, 2003
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2ua-ss7test-00.txt
+
+%K m2ua-ss7test-01
+%L M2UATEST01
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Adaptation Layer (M2UA) SS7 Test Specifications
+%R draft-bidulock-sigtran-m2ua-ss7test-01.txt
+%D February 14, 2004
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2ua-ss7test-01.txt
+
+%K m2ua-ss7test-02
+%L M2UATEST02
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Adaptation Layer (M2UA) SS7 Test Specifications
+%R draft-bidulock-sigtran-m2ua-ss7test-02.txt
+%D June 18, 2006
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2ua-ss7test-02.txt
+
 %K q700
 %L Q.700
 %A ITU

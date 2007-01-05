@@ -1,3 +1,191 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id$
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date$ by $Author$
+@c
+@c =========================================================================
+@c
+@c $Log$
+@c =========================================================================
+
+@ignore
+The @cite{@value{PACKAGE_TITLE}} package installs the following kernel modules in the
+@file{/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE}/@-} subdirectory:@footnote{The kernel version
+@samp{@value{_kversion}} is just an example.}
+
+@table @file
+
+@item streams_tirdwr.ko
+Contains the @manref{tirdwr(4)} @dfn{STREAMS} module.
+
+@item streams_timod.ko
+Contains the @manref{timod(4)} @dfn{STREAMS} module.
+
+@end table
+@end ignore
+
+The @cite{@value{PACKAGE_TITLE}} package installs the following header files in the system include directory,
+@file{/@-usr/@-include/@-@value{PACKAGE}/@-}:
+
+@multitable @columnfractions .35 .35
+
+@item sys/strnsl/config.h @tab sys/netconfig.h
+@item sys/strnsl/version.h @tab netdir.h
+@item @tab netconfig.h
+
+@end multitable
+
+@ignore
+The @cite{@value{PACKAGE_TITLE}} package installs the following internationalization catalogues in
+the @file{/@-usr/@-share/@-locale/@-} subdirectory:
+
+@multitable @columnfractions 1.0
+
+@item @file{de/LC_MESSAGES/strnsl.mo}
+
+@end multitable
+
+@end ignore
+The @cite{@value{PACKAGE_TITLE}} package installs the following manual pages in the system man
+directory, @file{/@-usr/@-share/@-man/@-}:
+
+@multitable @columnfractions .30 .70
+
+@item strnsl.macros @tab man3/endnetconfig.3
+@item strnsl.refs @tab man3/endnetpath.3
+@item @tab man3/freenetconfigent.3
+@item man5/strnsl.5 @tab man3/getnetconfig.3
+@item man5/netconfig.5 @tab man3/getnetconfigent.3
+@item man5/netdir.5 @tab man3/getnetpath.3
+@item @tab man3/libxnsl.3
+@item man8/test-xnsl.8 @tab man3/nc_perror.3
+@item man8/test-xnsl_thr.8 @tab man3/nc_sperror.3
+@item @tab man3/_nderror.3
+@item @tab man3/netbuf.3
+@item @tab man3/netconfig.3
+@item @tab man3/netdir.3
+@item @tab man3/netdir_free.3
+@item @tab man3/netdir_getbyaddr.3
+@item @tab man3/netdir_getbyname.3
+@item @tab man3/netdir_options.3
+@item @tab man3/netdir_perror.3
+@item @tab man3/netdir_sperror.3
+@item @tab man3/netpath.3
+@item @tab man3/setnetconfig.3
+@item @tab man3/setnetpath.3
+@item @tab man3/taddr2uaddr.3
+@item @tab man3/uaddr2taddr.3
+@item @tab man3/xnsl.3
+@item @tab man3/inetaddr.3
+
+@end multitable
+
+The @cite{@value{PACKAGE_TITLE}} package places the following test programs in the system
+libexec directory @file{/@-usr/@-lib@-exec/@-@value{PACKAGE}/@-}:
+
+@table @file
+
+@item test-xnsl
+This binary from a C-language program contains a test program for the @manpage{libxnsl(3)} library.
+For more information on @command{test-xnsl}, see the corresponding manual page:
+@manref{test-xnsl(8)}.
+Test programs are normally invoked on a test case by test case basis by the validation test suite,
+@command{testsuite}, described below.
+
+@item test-xnsl_thr
+This binary from a C-language program contains a test program for the @manpage{libxnsl(3)} library.
+For more information on @command{test-xnsl_thr}, see the corresponding manual page:
+@manref{test-xnsl_thr(8)}.
+Test programs are normally invoked on a test case by test case basis by the validation test suite,
+@command{testsuite}, described below.
+
+@item testsuite
+@itemx atlocal
+The @command{testsuite} stand-alone shell script invokes test cases in the test programs above as
+compiled into a comprehensive regression, troubleshooting and validation test suite for the
+@cite{@value{PACKAGE_TITLE}} package.  The @file{atlocal} file provides localized definitions use by
+the @command{testsuite} shell program.
+For more information on test suites, @xref{Test Suites}, and, in particular, @xref{Running Test
+Suites}.
+
+@item send-pr
+@itemx send-pr.config
+The @command{send-pr} stand-alone shell script can be used for the automatic generation of problem
+reports for the @cite{@value{PACKAGE_TITLE}} package.  The @file{send-pr.config} file provides
+localized definitions used by the @command{send-pr} shell program.
+For more information on problem reports, @xref{Problem Reports}, and, in particular, @xref{Stand
+Alone Problem Reports}.
+
+@end table
+
+The @cite{@value{PACKAGE_TITLE}} package places the following info files in the system info directory,
+@file{/@-user/@-share/@-info/@-}:
+
+@table @file
+
+@item strnsl.info
+@itemx strnsl.info-1
+@itemx strnsl.info-2
+These files contain this manual in @dfn{GNU info} format.
+
+@item libxnsl.info
+An incomplete info manual for the @file{libxnsl} library.  See the manual pages,
+@manref{libxnsl(3)}, instead.
+
+@end table
+
 @ignore
 /usr
 /usr/include

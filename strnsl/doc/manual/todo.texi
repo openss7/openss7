@@ -61,63 +61,44 @@ Things to do:
 
 @itemize @bullet
 @item
-Need to remove the following functions:
-
-@multitable {t_rcvopt(3) and}
-@item @manref{t_sndopt(3)},
-@item @manref{t_sndvopt(3)},
-@item @manref{t_rcvopt(3)} and
-@item @manref{t_rcvvopt(3)},
-@end multitable
-
-as they are non-standard and non-portable.  Instead use the following functions:
-
-@multitable {t_rcvudata(3) and}
-@item @manref{t_sndudata(3)},
-@item @manref{t_sndvudata(3)},
-@item @manref{t_rcvudata(3)} and
-@item @manref{t_rcvvudata(3)}.
-@end multitable
-
-because they have precisely the same argument templates as the other.  These functions are described
-in the OpenGroup documentation as inapplicable to connection-oriented transports, however, we could
-relieve that restriction for SCTP.  The characteristics to check is if T_CLTS, okay, T_COTS or
-T_COTS_ORD, only okay if the tsdu_size is not T_INVALID (as it is for TCP).  (It would be okay to be
-T_INFINITE as it is for SCTP.)
-
-@emph{*todo*}
-
-They may have already been removed.
-Verify this.
-They certainly have to be implemented this way yet.
-
-@item
-The XTI/TLI library is now largely in maintenance mode.  Not much special development is planned.
-@end itemize
-
-@itemize @minus
-@item
-Full ATM Support.  This is an item where the XTI implementation is lacking.  When we provide full
-TPI ATM support under the strss7 package, then this item will be investigated.
+The package still needs to be internationalized.
 
 @emph{*todo*}
 
 @item
-Addition of a (unfortunately non-standard) send with options commands for SCTP.
+This implementation of the Network Selection facility and Name-to-Address mapping allows direct use
+of TI-RPC for Linux.  The primary benefit of this is the ability to use TI-RPC code directly without
+significant and thus support upper level services such as NFS Version 4.  Another amazing
+possibility is to not only immediately run NFS Version 4, but also to run it over SCTP.  A todo item
+is to take the TI-RPC 2.8 release and port it to Linux Fast-STREAMS.  This might best be approached
+with a separate strrpc package, or addressed directly by this package.
 
-@table @emph
-@item *done*
+@emph{*todo*}
 
-Actually this was already done a long time ago.  See manual pages:
+@item
+One of the primary purposes of providing this package for the OpenSS7 Project was to provide access
+to the network configuration database and name-to-address translation functions for the purpose of
+using primarily the name-to-address translation functions for SS7 and other telephony related
+protocols, not for the purposes of supporting TI-RPC, but a way of providing common mechanisms.
+Fortunately, most of the definitions are part of the trasnport provider implementation.
 
-@multitable {t_rcvopt(3) and}
-@item @manref{t_sndopt(3)},
-@item @manref{t_sndvopt(3)},
-@item @manref{t_rcvopt(3)} and
-@item @manref{t_rcvvopt(3)}.
-@end multitable
+Provide a mechanism for implementations of transport protocols to add their definitions into the
+@manref{netconfig(5)} database files.
 
-Perhaps what needs to be done is to test them?
-@end table
+@emph{*todo*}
+
+@item
+The texinfo manual, @file{libxnsl.texi}, is incomplete.  For the time being, the manual pages,
+starting with @manref{libxnsl(3)}, are the definitive documentation.  It would be nice to also
+provide these library manual pages as a printable manual, however, the project has not yet found the
+time to complete this manual.
+
+@emph{*todo*}
+
+@item
+This package is largely untested.  A conformance test suite and some test cases need to be written.
+
+@emph{*todo*}
+
 @end itemize
 

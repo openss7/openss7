@@ -201,7 +201,7 @@ execute the contained code.
 @node Alpha Releases
 @subsection Alpha Releases
 
-@dfn{Alpha} release are releases that have received little to no testing, or that have been tested
+@dfn{Alpha} releases are releases that have received little to no testing, or that have been tested
 and contains known bugs or defects that make the package unsuitable even for testing.  The purpose
 for an @dfn{alpha} release are the same as for the pre-alpha release, with the additional purpose
 that it is an earily release of partially functional code that has problems that an external
@@ -227,7 +227,7 @@ user of the software.
 @node Gamma Releases
 @subsection Gamma Releases
 
-@dfn{Gamma} release are releases that have received exhaustive testing within the project, but
+@dfn{Gamma} releases are releases that have received exhaustive testing within the project, but
 external testing has been minimal.  @dfn{Gamma} release packages do not ship with known defects.  As
 exhaustive internal testing has been performed, unknown defects should be few.  Please remember that
 there is NO WARRANTY on public release packages.
@@ -291,13 +291,13 @@ License}.}
 @b{This software is @i{pre-alpha} software.  As such, it will crash your kernel.  Installation of
 the software will irreparably mangle your header files or Linux distribution in such a way as to
 make it unusable.  Crashes will lock your system and rebooting the system will not repair the
-problem.  You will loose all the data on your system.  Because this software will crash your kernel,
+problem.  You will lose all the data on your system.  Because this software will crash your kernel,
 the resulting unstable system can destroy computer hardware or peripherals making them unusable.
 You will void the warranty on any system on which you run this software.  YOU HAVE BEEN WARNED.}
 
 @c This is the defect notice for alpha release software
 @ignore
-@dfn{@value{PACKAGE_TITLE}} has unknown defects.  This is a @dfn{alpha} release.  Some defects could
+@dfn{@value{PACKAGE_TITLE}} has unknown defects.  This is an @dfn{alpha} release.  Some defects could
 be harmful.  No validation testing whatsoever has been performed by the @cite{OpenSS7 Project} on
 this software.  The software might fail to configure or compile on some systems.  The @cite{OpenSS7
 Project} recommends that you @b{do not use this software for purposes other than develoment or
@@ -307,7 +307,7 @@ WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU General Public
 @b{This software is @i{alpha} software.  As such, it can likely crash your kernel.  Installation of
 the software can irreparably mangle your header files or Linux distribution in such a way as to make
 it unusable.  Crashes could lock your system and rebooting the system might not repair the problem.
-You can possibly loose all the data on your system.  Because this software can crash your kernel,
+You can possibly lose all the data on your system.  Because this software can crash your kernel,
 the resulting unstable system could destroy computer hardware or peripherals making them unusable.
 You could void the warranty on any system on which you run this software.  YOU HAVE BEEN WARNED.}
 @end ignore
@@ -325,7 +325,7 @@ General Public License}.}
 @b{This software is @i{beta} software.  As such, it might crash your kernel.  Installation of the
 software might mangle your header files or Linux distribution in such a way as to make it unusable.
 Crashes could lock your system and rebooting the system might not repair the problem.  You can
-possibly loose all the data on your system.  Because this software might crash your kernel, the
+possibly lose all the data on your system.  Because this software might crash your kernel, the
 resulting unstable system could possibly destroy computer hardware or peripherals making them
 unusable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
 WARNED.}
@@ -346,7 +346,7 @@ License}.}
 kernel under some conditions.  Installation of the software on a non-validated distribution might
 mangle your header files or Linux distribution in such a way as to make it unusable.  Crashes could
 possibly lock your system and rebooting the system might not repair the problem.  You can possibly
-loose all the data on your system.  Because this software stands a chance of crashing your kernel,
+lose all the data on your system.  Because this software stands a chance of crashing your kernel,
 the resulting unstable system could possibly destroy computer hardware or peripherals making them
 unusable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
 WARNED.}
@@ -367,7 +367,7 @@ License}.}
 still crash your kernel in unique circumstances.  Installation of the software on a non-validated
 distribution might mangle your header files or Linux distribution in such a way as to make it
 unusable.  Crashes could possibly lock your system and rebooting the system might not repair the
-problem.  You can possibly loose all the data on your system.  Because this software stands a chance
+problem.  You can possibly lose all the data on your system.  Because this software stands a chance
 of crashing your kernel, the resulting unstable system could possibly destroy computer hardware or
 peripherals making them unusable.  You might void the warranty on any system on which you run this
 software.  YOU HAVE BEEN WARNED.}
@@ -385,7 +385,7 @@ software}.  Use at your own risk.  Remember that there is @b{NO WARRANTY}.@footn
 @b{This software is @i{unstable} software.  As such, it will lock or crash your kernel.
 Installation of the software will irreparably mangle your header files or Linux distribution in such
 a way as to make it unusable.  Crashes will lock your system and rebooting the system will not
-repair the problem.  You will loose all the data on your system.  Because this software has tested
+repair the problem.  You will lose all the data on your system.  Because this software has tested
 unstable in a number of test cases, simply running the validation test cases can cause locks or
 crashes.  Because this software will lock or crash your kernel, the resulting unstable system can
 destroy computer hardware or You will void the warranty on any system on which you run this

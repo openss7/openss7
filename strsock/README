@@ -1,4 +1,4 @@
-OpenSS7 STREAMS Sockets -- read me first file.  2007-01-02
+OpenSS7 STREAMS Sockets -- read me first file.  2006-12-29
 $Id: README,v 0.9.2.13 2007/01/05 06:21:15 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -85,7 +85,7 @@ well.
  Release
 --------
 
-This is the `strsock-0.9.2.1' package, released 2007-01-02.  This
+This is the `strsock-0.9.2.1' package, released 2006-12-29.  This
 `0.9.2.1' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:

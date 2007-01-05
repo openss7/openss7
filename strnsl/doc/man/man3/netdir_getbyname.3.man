@@ -178,7 +178,7 @@ structure,
 .IR service ,
 that contains the host and service name tuple (the structure is described below).
 .BR netdir_getbyname ()
-returns into the pointer referened by
+returns into the pointer referenced by
 .I addrs
 a pointer to a
 .B nd_addrlist
@@ -189,7 +189,7 @@ Once the
 .B nd_addrlist
 structure and the
 .BR netbuf (3)
-structures that it contrains are no longer required, they are freed by passing a pointer to the
+structures that it contains are no longer required, they are freed by passing a pointer to the
 structure to
 .BR netdir_free (3)
 with a
@@ -265,7 +265,7 @@ the service name.
 .\"
 .\"
 .PP
-Upon successful return, the pointer referenced by
+Upon successful return, the pointer referenced by the
 .I addrs
 pointer, points to an allocated
 .B nd_addrlist
@@ -317,7 +317,7 @@ and described in
 .\"
 .SH USAGE
 .PP
-Procedure for usage of the
+The procedure for use of the
 .BR netdir_getbyname ()
 subroutine is to first acquire a pointer to a
 .BR netconfig (3)
@@ -328,7 +328,7 @@ database using a function such as
 .BR getnetconfigent (3)
 or
 .BR getnetpath (3).
-Then a host and service name tuple is place in a
+Then a host and service name tuple is placed in a
 .B nd_hostserv
 structure and passed to the
 .BR netdir_getbyname ()
@@ -554,7 +554,7 @@ or
 .\"
 .SH NOTICES
 .PP
-Note that wen the
+Note that when the
 .I h_serv
 member of the
 .B nd_hostserv

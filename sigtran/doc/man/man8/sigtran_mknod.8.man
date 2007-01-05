@@ -5,7 +5,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -80,12 +80,12 @@ sort-adjacent-labels
 .so sigtran.macros
 .\"
 .\"
-.TH STRSS7_MKNOD 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.TH SIGTRAN_MKNOD 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
 .\"
 .\"
 .SH NAME
 .B sigtran_mknod
-\- create or remove \fISTRSS7\fR device nodes
+\- create or remove \fISIGTRAN\fR device nodes
 .\"
 .\"
 .SH SYNOPSIS

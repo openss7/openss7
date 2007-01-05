@@ -695,6 +695,51 @@ This manual uses @cite{texinfo} typographic conventions.
 @chapter Objective
 @cindex objective
 
+@cite{UNIX@registeredsymbol{}} has traditionally provided three components of the Network Services
+Library, @file{libnsl}, two of which are associated with the X/Open Transport Interface/Transport
+Layer Interface (XTI/TLI), @manref{xti(3)}, the Transport Provider Interface (TPI), @manref{tpi(7)},
+and @dfn{STREAMS} network pseudo-device drivers.  Two components provide the TI (Transport
+Independent) interface, whereas the other provides the TS (Transport Sockets) interface.  The TI
+components provide the Transport Independent RPC services (TI-RPC) pioneered by Sun Microsystems and
+standardized by the IETF.
+
+@cite{GNU/Linux glicb} provides (amoungst other things) the RPC Interface Library and the TS-RPC and
+BSD 4.3 socket address translation facilities in @file{libc}, and provides NIS capabilities in
+@file{libnsl}.
+
+@dfn{STREAMS}-related components that are not currently part of the @cite{Linux} Network Services
+Library (@file{libnsl}) are:
+
+@enumerate
+
+@item Network Selection, consisting of:
+
+@itemize @bullet
+
+@item Network Configuration database access, @manref{netconfig(3)},
+
+@item Network Path access, @manref{netpath(3)}.
+
+@end itemize
+
+@item Name-to-Address Translation, @manref{netdir(3)}.
+
+@end enumerate
+
+These are often collectively referred to as the Network Selection facility of the Network Services
+Library.
+
+The @cite{@value{PACKAGE_TITLE}} package provides a library, renamed @file{libxnsl}, that provides
+the missing Network Selection and Name-to-Address mapping facilities designed to work with
+@manref{xti(3)} from the @manref{strxnet(5)} package.
+
+The objective for providing this library and missing capabilities was to provide a mechanism whereby
+the @manref{strsock(5)} package and the @file{libsockets} library could set socket options
+independent of transport provider.  As a secondary objective, this package could support a full port
+of the TIRPCSRC 2.8 transport-independent RPC source to @cite{Linux} and also provide the
+@command{rpcbind} service missing from @cite{Linux}.  This would also permit additional source such
+as NFS 4 to be rapidly ported to @cite{Linux}.
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -763,7 +808,7 @@ Following are System V Init Scripts that are installed by the package:
 
 @subsection Administrative Utilities
 
-Following are user utilities for manipulating @dfn{ISO}:
+Following are user utilities for manipulating @dfn{NSL}:
 
 The @cite{@value{PACKAGE_TITLE}} package does not yet contain any adminstrative utilities.
 Eventually an @manpage{xtitrace(8)} facility will be provided.
@@ -825,6 +870,129 @@ Reports}.
 @node Development
 @chapter Development
 @cindex developing
+
+@cite{@value{PACKAGE_TITLE}} provides all of the header files, shared object and static libraries,
+manual pages and documentation necessary for the development of both user space applications
+programs and kernel space @dfn{STREAMS} modules and drivers based on the package.  The sections that
+follow describe these development facilities.
+
+@menu
+* Development Header Files::
+* Static and Shared Libraries::
+* Manual Pages::
+@end menu
+
+@node Development Header Files::
+@section Header Files
+
+Header files are installed, typically, in the @file{/usr/include/@value{PACKAGE}/} subdirectory.  To
+use the header files from the package, @samp{-I/usr/include/@value{PACKAGE}} must be included in the
+@command{gcc} command line as a preprocessor option.
+
+In general, @samp{-I} include preprocessor directives on the @command{gcc} command line should be
+ordered in the reverse order of the dependencies between packages.  So, for example, if the include
+files from all add-on packages are required, the order of these directives would be:
+@samp{-I/usr/include/@value{PACKAGE}}
+@samp{-I/usr/include/strxns}
+@samp{-I/usr/include/strcompat}
+@samp{-I/usr/include/streams}.
+
+Following are the user visible header files provided by the @file{@value{PACKAGE}-@value{VERSION}}
+package in the directory @file{/usr/include/@value{PACKAGE}}:
+
+@table @file
+
+@item sys/strnsl/config.h
+@pgindex sys/strnsl/config.h
+@pgindex /usr/include/strnsl/sys/strnsl/config.h
+Configuration defines for the package.
+
+@item sys/strnsl/version.h
+@pgindex sys/strnsl/version.h
+@pgindex /usr/include/strnsl/sys/strnsl/version.h
+Module versions for the package (on 2.4 systems).
+
+@item netconfig.h
+@pgindex netconfig.h
+@pgindex /usr/include/strnsl/netconfig.h
+@itemx sys/netconfig.h
+@pgindex sys/netconfig.h
+@pgindex /usr/include/strnsl/sys/netconfig.h
+Definitions for the network configuration database.
+
+@item netdir.h
+@pgindex netdir.h
+@pgindex /usr/include/strnsl/netdir.h
+Definitions for the name-to-address translation facilities.
+
+@end table
+
+@subsection User Space Programs
+
+Typical include files for interacting with Transport providers from user space include the
+@file{netconfig.h} or @cite{netdir.h} header files.  Additional header files for
+interacting with specific drivers or modules may also be required.  The @cite{netconfig.h} header file 
+is used for interacting with the Network Configuration database.  The @cite{netdir.h} header file is for interacting
+with the Name-to-Address translation services.
+
+@node Static and Shared Libraries
+@section Libraries
+
+Shared or static version of the @cite{libxnsl} library must be linked when using the
+@file{@value{PACKAGE}-@value{VERSION}} package.  The library must either be specified on the
+@command{gcc} command line as a shared library (e.g. @samp{-lxnsl}) or as a static library (e.g.
+@samp{/usr/lib/libxnsl.a}).
+
+If the shared object library is linked, include the following options on the @command{gcc} command
+line:
+
+@table @samp
+
+@item -lxnsl
+Link to the @file{/usr/lib/libxnsl.so} shared library.
+
+@end table
+
+If the static library is linked, include the following options on the @command{gcc} command line:
+
+@table @samp
+
+@item /usr/lib/libxnsl.a
+Link to the @file{/usr/lib/libxnsl.a} static library.
+
+@end table
+
+@node Manual Pages
+@section Manual Pages
+
+The @file{@value{PACKAGE}-@value{VERSION}} package installs a number of manual pages in the
+@file{/usr/share/man} directory as follows:
+
+The following manual pages are installed in Section 3 of the manual (in the subdirectory
+@file{/usr/share/man/man3}):
+
+@multitable @columnfractions .35 .65
+
+
+@end multitable
+
+The following manual pages are installed in Section 5 of the manual (in the subdirectory
+@file{/usr/share/man/man5}):
+
+@multitable @columnfractions .35 .65
+
+@item @manref{strnsl(5)} -- @tab @value{PACKAGE_TITLE} package.
+
+@end multitable
+
+The following manual pages are installed in Section 8 of the manual (in the subdirectory
+@file{/usr/share/man/man8}):
+
+@multitable @columnfractions .35 .65
+
+@item @manref{test-xnsl(8)} -- @tab a test suite executable for the @manpage{xnsl(3)} @dfn{STREAMS} library.
+
+@end multitable
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

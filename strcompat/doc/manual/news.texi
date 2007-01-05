@@ -77,9 +77,16 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
+This is the fourth separate @cite{OpenSS7 Project} release of the
+@cite{@value{PACKAGE_TITLE}} package that was formerly present in the
+@cite{Linux Fast-STREAMS} @file{streams-0.7a.2} release package.  This release
+is a stable, production grade release for @cite{Linux Fast-STREAMS} and is part
+of the OpenSS7 Master Package (@file{openss7-@value{VERSION_OPENSS7}}).  It
+deprecates previous releases.  Please upgrade before reporting bugs on previous
+releases.
+
 This release is primarily a maintenance release.  Some functionality of the
-package has been tested by its use in other packages and some defects
-corrected.
+package has been tested by its use in other packages and some defects corrected.
 This release is a stable production release for @cite{Linux Fast-STREAMS}.
 Support for @cite{LiS} is deprecated as of this release.
 

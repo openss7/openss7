@@ -57,32 +57,33 @@
 @c
 @c =========================================================================
 
-The @cite{@value{PACKAGE_TITLE}} package provides the ability for @cite{Linux Fast-STREAMS} to
-exhibit source level compatibility with a wide range of @cite{UNIX} @dfn{STREAMS} implementations.
-Also, it provides @cite{LiS} source, and some 2.18.0 binary, compatibility for @cite{Linux
-Fast-STREAMS}.  The objective of the package is to provide source level compatibility with a wide
-range of @cite{UNIX} @dfn{STREAMS} implementations permitting drivers and modules to port easily to
-@cite{Linux Fast-STREAMS} from any other @dfn{STREAMS} implementation, making it possible to release
-drivers and modules from a single @cite{UNIX} code base with minimal localisms for @cite{Linux}.
+The @cite{@value{PACKAGE_TITLE}} package provides the ability for @cite{Linux
+Fast-STREAMS} to exhibit source level compatibility with a wide range of
+@cite{UNIX} @dfn{STREAMS} implementations.  Also, it provides @cite{LiS} source,
+and some 2.18.0 binary, compatibility for @cite{Linux Fast-STREAMS}.  The
+objective of the package is to provide source level compatibility with a wide
+range of @cite{UNIX} @dfn{STREAMS} implementations permitting drivers and
+modules to port easily to @cite{Linux Fast-STREAMS} from any other @dfn{STREAMS}
+implementation, making it possible to release drivers and modules from a single
+@cite{UNIX} code base with minimal localisms for @cite{Linux}.
 
-This is the fourth separate @cite{OpenSS7 Project} release of the @cite{@value{PACKAGE_TITLE}}
-package that was formerly present in the @cite{Linux Fast-STREAMS} @file{streams-0.7a.2} release
-package.  These compatibility modules provide source level compatibility with AIX, HPUX, OSF/1,
-MacOT, Mentat, SUX, Solaris, SUPER/UX, IRIX, LiS, UnixWare, UXP/V and SVR 4.2 STREAMS.  The package
-contains all the necessary manual pages and other documentation in an autoconf tarball.
-
-This release is a stable, production grade release for @cite{Linux Fast-STREAMS} and is part of the
-OpenSS7 Master Package (@file{openss7-@value{VERSION_OPENSS7}}).
+These compatibility modules provide source level compatibility with @cite{AIX},
+@cite{HPUX}, @cite{OSF/1}, @cite{MacOT}, @cite{Mentat}, @cite{SUX},
+@cite{Solaris}, @cite{SUPER/UX}, @cite{IRIX}, @cite{LiS}, @cite{UnixWare},
+@cite{UXP/V} and @cite{SVR 4.2} STREAMS.  The package contains all the necessary
+manual pages and other documentation in an autoconf tarball.
 
 @ignore
-The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR 4.2} @dfn{STREAMS}
-drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
-development and execution of @dfn{STREAMS} modules and drivers ported from other operating system
-environments to @cite{Linux Fast-STREAMS}.
+The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR 4.2}
+@dfn{STREAMS} drivers, modules, libraries, utilities, test programs, daemons,
+and development environment for the development and execution of @dfn{STREAMS}
+modules and drivers ported from other operating system environments to
+@cite{Linux Fast-STREAMS}.
 
 @end ignore
-The package currently includes the following @dfn{STREAMS} kernel modules and drivers:@footnote{Note
-that these are kernel modules and are @emph{not} @dfn{STREAMS} modules.}
+The package currently includes the following @dfn{STREAMS} kernel modules and
+drivers:@footnote{Note that these are kernel modules and are @emph{not}
+@dfn{STREAMS} modules.}
 
 @multitable @columnfractions .05 .95
 @item @tab @minus{} @file{streams_os7compat.ko} @file{kernel}
@@ -100,8 +101,8 @@ that these are kernel modules and are @emph{not} @dfn{STREAMS} modules.}
 @item @tab @minus{} @file{streams_maccompat.ko} @file{kernel}
 @end multitable
 
-The @cite{@value{PACKAGE_TITLE}} package provides compatibility with the following @dfn{STREAMS}
-implementations:
+The @cite{@value{PACKAGE_TITLE}} package provides compatibility with the
+following @dfn{STREAMS} implementations:
 
 @multitable @columnfractions .05 .95
 @item @tab @bullet{} @cite{OpenSS7 variants}
@@ -163,11 +164,13 @@ implementations:
 @end table
 
 @end ignore
-These compatibility modules compile as kernel modules and will be demand loaded into the kernel when
-used by a specific @dfn{STREAMS} module or driver.  The compatibility modules ease porting of
-@dfn{STREAMS} modules and drivers from other Operating Systems to @cite{Linux}.
+These compatibility modules compile as kernel modules and will be demand loaded
+into the kernel when used by a specific @dfn{STREAMS} module or driver.  The
+compatibility modules ease porting of @dfn{STREAMS} modules and drivers from
+other Operating Systems to @cite{Linux}.
 
-This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targeted
-at @code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64} architectures, but should build and
-install for other architectures as well.
+This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6
+kernels and was targeted at @code{ix86}, @code{x86_64}, @code{ppc} and
+@code{ppc64} architectures, but should build and install for other architectures
+as well.
 

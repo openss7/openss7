@@ -57,50 +57,62 @@
 @c
 @c =========================================================================
 
-The @cite{@value{PACKAGE_TITLE}} package contains header files and a number of modules and drivers
-and the associated documentation that were formerly contained in the @cite{OpenSS7 Linux STREAMS
-(LiS)} releases.  When development started on @cite{Linux Fast-STREAMS} in 2003, these modules were
-removed from the @cite{LiS} distribution and separated so that they could build against both the
-@cite{LiS} and @cite{Linux Fast-STREAMS} packages from the same baseline code.
+@cite{UNIX} has traditionally provided three components of the Network Services Library,
+@file{libnsl}, two of which are associated with the X/Open Transport Interface/Transport Layer
+Interface (XTI/TLI), @file{libxnet}, the Trasnport Provider Interface (TPI), and @dfn{STREAMS}
+network pseudo-device drivers.  Two components provide the TI (Transport Independent) interface,
+whereas the other provides the TS (Transport Sockets) interface.  The TI components provide the
+Transport Independent RPC services (TI-RPC) pioneered by Sun Microsystems and subsequently
+standardized by the IETF.
 
-The package contains the following standard @cite{Open Systems Interconnect (OSI)} conforming header
-files:
+@cite{GNU/Linux} @file{glibc} provides (amoungst other things) the RPC interface library and the
+TS-RPC and BSD 4.3 sockets address translation facilities in @file{libc}, and provides NIS
+capabilities in @file{libnsl}.  @dfn{STREAMS} related components that are not currently part of the
+@cite{Linux} Network Services Library (@file{libnsl}) are:
+
+@enumerate
+@item Network Selection, consisting of:
+
+@itemize @bullet
+@item Network Configuration database access, @manref{netconfig(3)}, and,
+@item Network Path access, @manref{netpath(3)}.
+@end itemize
+
+@item Name-to-Address Translation, @manref{netdir(3)}.
+@end enumerate
+
+These are often referred to as the Network Selection facility of the Network Services Library.
+The @cite{@value{PACKAGE_TITLE}} package provides a library, renamed @file{libxnsl}, that provides
+the missing Network Selection and Name-to-Address mapping facilities designed to work with
+@manref{xti(3)}.
+
+The @cite{@value{PACKAGE_TITLE}} package contains header files and the associated documentation that
+were originally contained in the @file{strxnet} package.  This library was quickly removed from the
+@file{strxnet} distribution and placed in its own add-on package.
+
+The package contains the following standard @cite{SVR 4.2} conforming header files:
 
 @multitable @columnfractions .05 .95
-@item @tab @minus{} @file{<sys/tiusr.h>} @cite{Transport Provider Interface Version 2.0.0} user
-@item @tab @minus{} @file{<sys/tihdr.h>} @cite{Transport Provider Interface Version 2.0.0} kernel
-@item @tab @minus{} @file{<sys/ticots.h>} @cite{TPI COTS}
-@item @tab @minus{} @file{<sys/ticots_ord.h>} @cite{TPI COTS w/ Orderly Release}
-@item @tab @minus{} @file{<sys/ticlts.h>} @cite{TPI CLTS}
+@item @tab @minus{} @file{<netconfig.h>} @cite{Network Configuration}
+@item @tab @minus{} @file{<sys/netconfig.h>} @cite{Network Configuration}
+@item @tab @minus{} @file{<netdir.h>} @cite{Network Directory}
 @end multitable
 
-Note that the @cite{Data Link Provider Interface (DLPI)} and @cite{Network Provider Interface} are
-contained in the @samp{strxns-@value{VERSION_STRXNS}} package.
-
-The package builds and installs the following @dfn{STREAMS} kernel modules and drivers:
-
-@multitable @columnfractions .05 .95
-@item @tab @minus{} @file{streams_timod.ko} module @dfn{timod}
-@item @tab @minus{} @file{streams_tirdwr.ko} module @dfn{tirdwr}
-@end multitable
-
-@table @manref
-@item timod(4)
-
-@item tirdwr(4)
-@end table
+Note that the @cite{XTI/TLI Library} and @cite{Transport Provider Interface} header files are
+contained in the @samp{strxnet-@value{VERSION_STRXNET}} package.
 
 The package builds and installs the following shared object libraries:
 
 @table @manref
-@item xti(3)
+@item xnsl(3)
+This is the @cite{X/Open Network Services Library} that contains the Network Selection facility for
+the Network Services Library.
 
 @end table
 
-The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR 4.2} @dfn{STREAMS}
-drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
-development and execution of @cite{X/Open Networking (XNET)} protocol stack components and
-applications for the @cite{SVR 4.2} @dfn{STREAMS} environment.
+The @cite{@value{PACKAGE_TITLE}} package includes @cite{SVR 4.2} @dfn{STREAMS} libraries, utilities,
+test programs, daemons, and development environment for the development and execution of
+@cite{@value{PACKAGE_TITLE}} applications for the @cite{SVR 4.2} @dfn{STREAMS} environment.
 
 This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targeted
 at @code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64} architectures, but should build and

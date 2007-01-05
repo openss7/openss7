@@ -5,7 +5,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -91,17 +91,29 @@ This is the
 .BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
 package for
 .BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
+.PP
+.BR "Linux Fast-STREAMS" ,
+.BR streams (5),
+consists of a base package that provides basic
+.I SVR 4.2 STREAMS
+capabilities for
+.B Linux
+and a number of separate add-on packages.
 .PP
 OpenSS7
 .I STREAMS
-add-on packages are separate add-on packages to the
-.B Linux Fast-STREAMS
-release that provide additional functionality and protocol support not traditionally found on
-UNIX systems, or which have traditionally fallen into the domain of value add system software.
+add-on packages provide additional functionality and protocol support not traditionally found on
+UNIX systems, or which have traditionally fallen into the domain of value-add system software, or,
+in this case, where functionality was optional or differently handled in a number of
+implementations.
+.PP
 The
 .B @PACKAGE_TITLE@
-package is one of several packages that provides support for Signalling System Number 7 and is part
-of the thrust of the
+package is one of the several optional add-on packages that provide support for Signalling System
+Number 7 and is part of the thrust of the
 .IR "OpenSS7 Project" .
 .[
 %T The OpenSS7 Project
@@ -123,8 +135,40 @@ Signalling Transport subsystem
 The package builds and installs the following
 .I STREAMS
 modules and drivers (as kernel modules):
-.IP \(em \w'\(em\(em'u
-.IP \(em
+.IP \(en \w'\(en\(em'u
+.B streams_m2pa_sl.ko
+.PD 0
+.IP \(en
+.B streams_m2ua_as.ko
+module
+.RI \(lq m2ua-as \(rq
+.IP \(en
+.B streams_m3ua_as.ko
+module
+.RI \(lq m3ua-as \(rq
+.IP \(en
+.B streams_sdl_sctp.ko
+module
+.RI \(lq sdl-sctp \(rq
+.IP \(en
+.B streams_sdt_sctp.ko
+module
+.RI \(lq sdt-sctp \(rq
+.IP \(en
+.B streams_sdt_tpi.ko
+module
+.RI \(lq sdt-tpi \(rq
+.IP \(en
+.B streams_sl_tpi.ko
+module
+.RI \(lq sl-tpi \(rq
+.PD
+.PP
+The following are
+.I STREAMS
+modules installed by the
+.B @PACKAGE@
+package:
 .TP
 .BR m2pa_sl (4)
 .TP
@@ -170,6 +214,207 @@ package, not all components have been released publicly.
 The
 .BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
 package contains the following manual pages:
+.HP
+.BR sigtran (5)\ \-\ 
+.B @PACKAGE_TITLE@
+package.
+.PD 0
+.HP
+.BR sigtran_mknod (8)\ \-\ 
+create or remove
+.I STREAMS
+SIGTRAN device nodes.
+.PD
+.\"
+.HP
+.BR bua (4)\ \-\ 
+SS7 BICC User Adaptation Layer (BUA)
+.PD 0
+.HP
+.BR bua_ioctl (4)\ \-\ 
+SS7 BICC User Adaptation Layer (BUA) \- IO Controls
+.HP
+.BR dl_dua (4)\ \-\ 
+.HP
+.BR dl_gr303ua (4)\ \-\ 
+.HP
+.BR dl_iua (4)\ \-\ 
+.HP
+.BR dl_v5ua (4)\ \-\ 
+.HP
+.BR dua (4)\ \-\ 
+DPNSS/DASS User Adaptation Layer (DUA).
+.HP
+.BR dua_ioctl (4)\ \-\ 
+DPNSS/DASS User Adaptation Layer (DUA) \- IO Controls.
+.HP
+.BR gr303ua (4)\ \-\ 
+GR-303 User Adaptation Layer (GR303UA).
+.HP
+.BR gr303ua_ioctl (4)\ \-\ 
+GR-303 User Adaptation Layer (GR303UA) \- IO Controls.
+.HP
+.BR isua (4)\ \-\ 
+SS7 ISUP User Adapttion Layer (ISUA).
+.HP
+.BR isua_ioctl (4)\ \-\ 
+SS7 ISUP User Adapttion Layer (ISUA) \- IO Controls.
+.HP
+.BR iua (4)\ \-\ 
+ISDN Q.921 User Adaptation Layer (IUA).
+.HP
+.BR iua_ioctl (4)\ \-\ 
+ISDN Q.921 User Adaptation Layer (IUA) \- IO Controls.
+.HP
+.BR m2ua (4)\ \-\ 
+SS7 MTP2 User Adaptation Layer (M2UA).
+.HP
+.BR m2ua_as (4)\ \-\ 
+SS7 MTP2 User Adaptation Layer (M2UA).
+.HP
+.BR m2ua_ioctl (4)\ \-\ 
+SS7 MTP2 User Adaptation Layer (M2UA) \- IO Controls.
+.HP
+.BR m3pa (4)\ \-\ 
+.HP
+.BR m3tp (4)\ \-\ 
+.HP
+.BR m3ua (4)\ \-\ 
+SS7 MTP3 User Adaptation Layer (M3UA).
+.HP
+.BR m3ua_as (4)\ \-\ 
+SS7 MTP3 User Adaptation Layer (M3UA).
+.HP
+.BR m3ua_ioctl (4)\ \-\ 
+SS7 MTP3 User Adaptation Layer (M3UA) \- IO Controls
+.HP
+.BR SIGTRAN (4)\ \-\ 
+OpenSS7 Signalling Transprot (SIGTRAN) Devices
+.HP
+.BR sua (4)\ \-\ 
+SS7 SCCP User Adaptation Layer (SUA)
+.HP
+.BR sua-gtt (4)\ \-\ 
+SS7 SCCP User Adaptation Layer (SUA)
+.HP
+.BR sua_ioctl (4)\ \-\ 
+SS7 SCCP User Adaptation Layer (SUA) \- IO Controls
+.HP
+.BR sua-mgmt (4)\ \-\ 
+SS7 SCCP User Adaptation Layer (SUA)
+.HP
+.BR sua-npi (4)\ \-\ 
+SS7 SCCP User Adaptation Layer (SUA)
+.HP
+.BR sua-sccpi (4)\ \-\ 
+SS7 SCCP User Adaptation Layer (SUA)
+.HP
+.BR sua-tpi (4)\ \-\ 
+SS7 SCCP User Adaptation Layer (SUA)
+.HP
+.BR tali (4)\ \-\ 
+Tekelec's Adaptation Layer Interface (TALI)
+.HP
+.BR tali_ioctl (4)\ \-\ 
+Tekelec's Adaptation Layer Interface (TALI) \- IO Controls
+.HP
+.BR tali-isup (4)\ \-\ 
+Tekelec's Adaptation Layer Interface (TALI)
+.HP
+.BR tali-mtp (4)\ \-\ 
+Tekelec's Adaptation Layer Interface (TALI)
+.HP
+.BR tali-sccp (4)\ \-\ 
+Tekelec's Adaptation Layer Interface (TALI)
+.HP
+.BR tua (4)\ \-\ 
+SS7 TCAP User Adaptation Layer (TUA)
+.HP
+.BR tua_ioctl (4)\ \-\ 
+SS7 TCAP User Adaptation Layer (TUA) \- IO Controls
+.HP
+.BR ua_ioctl (4)\ \-\ 
+SIGTRAN User Adaptation Layer \- IO Controls
+.HP
+.BR v5ua (4)\ \-\ 
+V5.2 User Adaptation Layer (V5UA)
+.HP
+.BR v5ua_ioctl (4)\ \-\ 
+V5.2 User Adaptation Layer (V5UA) \- IO Controls
+.HP
+.BR m2pa (4)\ \-\ 
+SS7 MTP2 Peer-to-perr User Adaptation Layer (M2PA)
+.HP
+.BR m2pa_sl (4)\ \-\ 
+SS7 MTP2 Peer-to-perr User Adaptation Layer (M2PA)
+.HP
+.BR m2tp (4)\ \-\ 
+.HP
+.BR sdl_sctp (4)\ \-\ 
+.HP
+.BR sdt_sctp (4)\ \-\ 
+.HP
+.BR sdt_tpi (4)\ \-\ 
+.HP
+.BR sl_sctp (4)\ \-\ 
+.HP
+.BR sl_tpi (4)\ \-\ 
+.PD
+.\"
+.HP
+.BR dlpi_dua (7)\ \-\ 
+.PD 0
+.HP
+.BR dlpi_gr303ua (7)\ \-\ 
+.HP
+.BR dlpi_iua (7)\ \-\ 
+.HP
+.BR dlpli_gr303ua (7)\ \-\ 
+.PD
+.\"
+.HP
+.BR bua (8)\ \-\ 
+.PD 0
+.HP
+.BR isua (8)\ \-\ 
+.HP
+.BR iua (8)\ \-\ 
+.HP
+.BR m2pa (8)\ \-\ 
+.HP
+.BR m2tp (8)\ \-\ 
+.HP
+.BR m2ua (8)\ \-\ 
+.HP
+.BR m3tp (8)\ \-\ 
+.HP
+.BR m3ua (8)\ \-\ 
+.HP
+.BR sigtran (8)\ \-\ 
+.HP
+.BR sua (8)\ \-\ 
+.HP
+.BR tua (8)\ \-\ 
+.HP
+.BR uaconfd (8)\ \-\ 
+.HP
+.BR sigtran_mknod (8)\ \-\ 
+create or remove
+.I SIGTRAN
+device nodes.
+.HP
+.BR test-m2pa (8)\ \-\ 
+test suite executable for
+.BR m2pa (4)
+.I STREAMS
+module.
+.HP
+.BR test-sigtran (8)\ \-\ 
+test suite executable for
+.BR SIGTRAN (4)
+.I STREAMS
+modules and drivers.
+.PD
 .\"
 .\"
 .SH MODULES
@@ -180,19 +425,22 @@ package provides the following
 .I STREAMS
 modules:
 .HP
-\fBm2pa_sl\fR(4)\ \-\ 
+.BR m2pa_sl (4)\ \-\ 
+SS7 MTP2 Peer-to-perr User Adaptation Layer (M2PA).
 .HP
-\fBm2ua_as\fR(4)\ \-\ 
+.BR m2ua_as (4)\ \-\ 
+SS7 MTP2 User Adaptation Layer (M2UA).
 .HP
-\fBm3ua_as\fR(4)\ \-\ 
+.BR m3ua_as (4)\ \-\ 
+SS7 MTP3 User Adaptation Layer (M3UA).
 .HP
-\fBsdl_sctp\fR(4)\ \-\ 
+.BR sdl_sctp (4)\ \-\ 
 .HP
-\fBsdt_sctp\fR(4)\ \-\ 
+.BR sdt_sctp (4)\ \-\ 
 .HP
-\fBsdt_tpi\fR(4)\ \-\ 
+.BR sdt_tpi (4)\ \-\ 
 .HP
-\fBsl_tpi\fR(4)\ \-\ 
+.BR sl_tpi (4)\ \-\ 
 .\"
 .\"
 .SH DEVICES
@@ -204,8 +452,347 @@ package provides the following
 devices:
 .\"
 .\"
+.SH PREREQUISITES
+.PP
+The
+.B @PACKAGE@
+package requires the following packages to be installed:
+.TP
+.BR streams (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR "Linux Fast-STREAMS" ,
+.BR streams (5),
+development environment and run-time necessary for all package components.
+.TP
+.BR strcompat (5)
+The
+.B @PACKAGE@
+package requires the avilability of the
+.BR strcompat (5)
+development environment and run-time necessary for most of the package
+components.  Most
+.B @PACKAGE@
+components use the helper functions from the OpenSS7 Compatibility Module or
+the Mentat Portable STREAMS Compatibility Module.
+.TP
+.BR strxns (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strxns (5)
+development environment and run-time necessary for some package components.
+Some package components use the
+.BR cdi (7),
+.BR dlpi (7),
+or
+.BR npi (7)
+definitions available in this package.
+.TP
+.BR strxnet (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strxnet (5)
+development environment and run-time necessary for some package components.
+Some package components use the
+.BR tpi (7)
+definitions available in the package.
+.TP
+.BR strnsl (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strnsl (5)
+development environment and run-time necessary for some package components.
+Some package components provide
+.BR netconfig (5)
+definitions.
+.TP
+.BR strsock (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strsock (5)
+development environment and run-time necessary for some package components.
+Some package components provide
+.BR sock2path (5)
+definitions.
+.TP
+.BR strinet (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strinet (5)
+development environment and run-time necessary for some package components.
+Some package components use the
+.BR tcp (4),
+or
+.BR udp (4)
+protocol drivers from the
+.BR strinet (5)
+package.
+.TP
+.BR strsctp (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strsctp (5)
+deveopment environment and run-time necessary for all SIGTRAN components.
+(All SIGTRAN components use SCTP.)
+.[
+rfc2960
+.]
+.TP
+.BR striso (5)
+The
+.B @PACKAGE@
+package requires the avialability of the
+.BR striso (5)
+development environment and run-time necessary for some package components.
+Also, the
+.BR striso (5)
+package provides components upon which the
+.BR strisdn (5)
+package depend.
+.TP
+.BR strisdn (5)
+The
+.B @PACKAGE@
+package requires the avialability of the
+.BR strisdn (5)
+development environment for definitions necessary for the ISDN-related SIGTRAN
+components.
+.TP
+.BR strss7 (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strss7 (5)
+development environment for definitions necessary for the SS7-related SIGTRAN
+components.
+.PP
+The easiest way to satisfy all of the package depenedencies for the
+.B @PACKAGE_TITLE@
+package is to obtain it as part of the
+.IR "OpenSS7 Master Package" ,
+.BR openss7 (5).
+.\"
+.\"
+.SH NOTICES
+.PP
+Although previous releases of the
+.B @PACKAGE@
+package were tested with
+.IR LiS ,
+.I LiS
+is now deprecated and this release
+.RB ( @VERSION@ )
+of
+.B @PACKAGE@
+has not been tested with
+.IR LiS .
+.I The OpenSS7 Project
+will no longer support this package for
+.IR LiS :
+please upgrade to
+.BR "Linux Fast-STREAMS" .
+.PP
+.I Production
+releases are releases that have received exhaustive testing within the project
+and validated on specific distributions and architectures.
+.I Production
+release packages do not ship with known defects.  Please remember that there
+is
+.B NO WARRANTY
+on public release packages.
+.PP
+.I Production
+packages ship containing a list of validated distributions and architectures.
+Full regression testing of any maintenance changes is performed.  Suitability
+of software in this category for production use on the specified target
+distributions and architecturs is at the discretion of the user.  It should
+not be necessary to perform validation tests on the set of supported target
+systems before considering production use.
+.PP
+.B @PACKAGE_TITLE@
+could possibly contain unknown defects.  This is a
+.I production
+release.  Nevertheless, some remaining unknown defects could possibly be
+harmful.  Validation testing has been performed by the
+.I OpenSS7 Project
+and external entities on this software for the set of systems listed in the
+release notes.  Nevertheless, the software might still fail to configure or
+compile on other systems.  The
+.I OpenSS7 Project
+recommends that you validate this software for your target system before using
+this software.  Use at your own risk.  Remember that there is
+.BR "NO WARRANTY" .
+(See the section
+.RI \(lq "NO WARRANTY" \(rq
+under the
+.RI \(lq "GNU General Public License" ,
+in the manual.)
+.PP
+This software is
+.I production
+software.  As such, it is stable on validated systems but might still crash
+your kernel in unique circumstances.  Installation of the software on a
+non-validated distribution might mangel your header files or Linux
+distribution in such a way as to make it unusable and rebooting the system
+might not repair the problem.  You could possibly lose all the data on your
+system.  Because this software stands a chance of crashing your kernel, the
+resulting unstable system could possibly destroy computer hardware or
+peripherals making them unusable.  You might void the warranty on any system
+on which you run this fotware.
+.BR "YOU HAVE BEEN WARNED" .
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B @PACKAGE@
+package has been tested with a wide array of production
+.B Linux
+distributions, kernels, and target architectures, and is considered production
+grade by
+.IR "The OpenSS7 Project" .
+At the time of release, the
+.B @PACKAGE@
+package had no known bugs.  Problems can be reported to
+.RB < bugs@openss7.org >.
+Please, however, use the included
+.B send-pr
+script for generating actionable problem reports.  Please see the file
+.RI \(lq PROBLEMS \(rq
+in the release for problem reporting guidelines.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
+.BR SIGTRAN (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+Application programming interfaces for SIGTRAN and other SS7 over IP modules
+and drivers have not been standardized by a formal standards body.  For the
+most part, SS7 implementations have used proprietary interfaces for accessing
+the various protocol layers of the SS7 stack.
+.PP
+The
+.I OpenSS7 Project
+also uses project-specific interfaces at a number of layers where a standard
+is lacking.  Nevertheless, standard service interfaces are used a number of
+layers in the ISDN components and even in the upper level SS7 components.
+These standardized service interfaces are based on the
+Communications Device Interface (CDI),
+.BR cdi (7),
+the Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+and the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.PP
+.I OpenSS7 Project
+SIGTRAN components use the same interfaces as are provided for use by SS7/ISDN
+components at the same protocol level.  This makes
+.I OpenSS7 Project
+SIGTRAN and SS7 over IP components automatically compatible with OpenSS7 SS7
+and ISDN components.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+In general, there are few conformance specifications to which to test SIGTRAN
+components.  Nevertheless, a few exist as follows:
+.IP \(bu \w'\(bu\(em'u
+Conformance of the
+.BR m2pa_sl (4)
+module to M2PA-TEST
+.[
+m2pa-test-06
+.]
+is validated using the
+.BR test-m2pa (8)
+test case executable and
+.B autotest
+conformance test suite.
+.IP \(bu
+Conformance of the
+.BR m2ua_as (4)
+module to M2UA-TEST
+.[
+m2ua-ss7test-02
+.]
+is validated using the
+.BR test-m2ua_as (8)
+test case executable and
+.B autotest
+conformance test suite.
+.PP
+For additional description of conformance and validation test suites and the
+standards to which the tests are performed, see the manual page for the
+appropriate protocol driver or module.
+.\"
+.\"
+.SH HISTORY
+.PP
+The contents of the
+.B @PACKAGE@
+package were formerly part of the
+.BR strss7 (5)
+package.  As of
+.BR "@PACAKGE@-@VERSION@" ,
+the SIGTRAN components were moved out of the
+.BR strss7 (5)
+package into this
+.BR sigtran (5)
+package.  This package now contains all of the SIGTRAN and SS7 over IP components released by
+.IR "The OpenSS7 Project" ,
+along with associated documentation.
+.PP
+In the initial releases of the
+.BR sigtran (5)
+package, only SIGTRAN modules and drivers that have been fully revalidated on
+.B Linux Fast-STREAMS
+were initially released.  The remaining components present on the CVS archive and formerly part of the commercial
+.BR sstrss7 (5)
+releases, will be publicly released in releases subsequent to
+.B @PACKAGE@-@VERSION@
+as they are revalidated.
+.\"
+.\"
+.SH STATUS
+.PP
+The
+.B @PACKAGE_TITLE@
+package is
+.I production
+grade on
+.B Linux Fast-STREAMS
+for the modules and drivers included in the public release.  Not all OpenSS7
+Project SIGTRAN modules and drivers have been included in the release
+distribution.  The OpenSS7 project is in the process of revalidating all
+project modules and drivers for use on
+.BR "Linux Fast-STREAMS" .
+As a result, additional release components will be strapped into the package
+and once full validation test suites are developed and run against each
+component.
+.PP
+In particular, the following modules and drivers are currently missing from
+the public release:
 .\"
 .\"
 .[

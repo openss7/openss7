@@ -83,11 +83,13 @@ The sections that follow provide information on OpenSS7 releases of the
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-@itemize
-@item
-The release is now considered @emph{production} grade by the @cite{OpenSS7
-Project}.
+This release is primarily a maintenance release.  No significant defect
+corrections or development has been applied.
+This release is a stable production release of @cite{Linux Fast-STREAMS}.
 
+The release provides the following enhancements and fixes:
+
+@itemize
 @item
 Testing of, and a few bug corrections to, the strlog() feature.  Trace and
 error logging working well.

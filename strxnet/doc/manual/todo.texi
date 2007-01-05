@@ -62,7 +62,7 @@ Things to do:
 @itemize @bullet
 
 @item
-The texinfo manual, @file{libxnet.info}, is incomplete.  For the time being the manual pages,
+The texinfo manual, @file{libxnet.texi}, is incomplete.  For the time being, the manual pages,
 starting with @manref{libxnet(3)}, are the definitive documentation.  It would be nice to also
 provide these library manual pages as a printable manual, however, the project has not yet found the
 time to complete this manual.

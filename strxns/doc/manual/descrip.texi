@@ -57,6 +57,13 @@
 @c
 @c =========================================================================
 
+The @cite{@value{PACKAGE_TITLE}} package is an implementation of X/Open Network Services (XNS 5.2)
+for Linux Fast-STREAMS and provides OSI conforming CDI, DLPI and NPI header files as well as several
+DLPI and NPI modules and drivers that convert between Linux Native IP interface and the STREAMS DLPI
+and NPI interface.  One allows DLPI drivers to be added to Linux as IP interfaces, another provides
+DLPI access to native Linux IP interfaces, and a thrid provides NPI access to the Linux IP
+subsystem.
+
 The @cite{@value{PACKAGE_TITLE}} package contains header files and a number of modules and drivers
 and the associated documentation that were formerly contained in the @cite{OpenSS7 Linux STREAMS
 (LiS)} releases.  When development started on @cite{Linux Fast-STREAMS} in 2003, these modules were

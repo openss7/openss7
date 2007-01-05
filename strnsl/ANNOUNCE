@@ -1,0 +1,140 @@
+From bidulock@openss7.org Fri Jan  5 06:13:22 2007
+Date: Fri,  5 Jan 2007 06:13:09 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@gsyc.escet.urjc.es>
+Subject: strnsl 0.9.2.1 Released - Network Services Library for Linux Fast-STREAMS
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+Status: O
+Content-Length: 3061
+Lines: 70
+
+strnsl-0.9.2.1 was released under GPLv2 on January 8, 2007.
+
+`UNIX' has traditionally provided three components of the Network
+Services Library, `libnsl', two of which are associated with the X/Open
+Transport Interface/Transport Layer Interface (XTI/TLI), `libxnet', the
+Trasnport Provider Interface (TPI), and "STREAMS" network pseudo-device
+drivers.  Two components provide the TI (Transport Independent)
+interface, whereas the other provides the TS (Transport Sockets)
+interface.  The TI components provide the Transport Independent RPC
+services (TI-RPC) pioneered by Sun Microsystems and subsequently
+standardized by the IETF.
+
+`GNU/Linux' `glibc' provides (amoungst other things) the RPC interface
+library and the TS-RPC and BSD 4.3 sockets address translation
+facilities in `libc', and provides NIS capabilities in `libnsl'.
+"STREAMS" related components that are not currently part of the `Linux'
+Network Services Library (`libnsl') are:
+
+  1. Network Selection, consisting of:
+
+        * Network Configuration database access, `netconfig(3)', and,
+        * Network Path access, `netpath(3)'.
+
+  2. Name-to-Address Translation, `netdir(3)'.
+
+These are often referred to as the Network Selection facility of the
+Network Services Library.  The `OpenSS7 STREAMS Network Services
+Library' package provides a library, renamed `libxnsl', that provides
+the missing Network Selection and Name-to-Address mapping facilities
+designed to work with `xti(3)'.
+
+The `OpenSS7 STREAMS Network Services Library' package contains header
+files and the associated documentation that were originally contained
+in the `strxnet' package.  This library was quickly removed from the
+`strxnet' distribution and placed in its own add-on package.  The package
+contains all the necessary manual pages and other documentation in an
+autoconf tarball.
+
+Initial autoconf/RPM packaging of the `strnsl' release.
+
+   - Support for most recent 2.6.18 kernels (including Fedora Core 5
+     with inode diet patchset).
+
+  This is the initial public alpha test release of the package.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds rpms for a wide range of Linux 2.4 and 2.6 RPM-based
+distributions, and can be used on production kernels without patching or
+recompiling the kernel.
+
+This package is released under the 'GNU Public License Version 2'.  The
+release is available as an autoconf/RPM tarball, SRPM and set of binary
+RPMs.  See the download page <http://www.openss7.org/download.html> for
+the autoconf tarballs and SRPMs.  See the strnsl package page at
+<http://www.openss7.org/strnsl_pkg.html> for tarballs, SRPMs and
+binary RPMs.
+
+See <http://www.openss7.org/codefiles/strnsl-0.9.2.1/ChangeLog> and
+<http://www.openss7.org/codefiles/strnsl-0.9.2.1/NEWS> in the release
+for more information.  Also, see the strnsl.pdf manual in the release
+(also in html <http://www.openss7.org/strnsl_manual.html>).
+
+For the news release, see <http://www.openss7.org/rel20070108_5.html>
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+
+
+
+From bidulock@openss7.org Fri Jan  5 06:13:51 2007
+Date: Fri,  5 Jan 2007 06:14:00 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@execpc.com>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+Status: O
+Content-Length: 1390
+Lines: 39
+
+Begin4
+Title:			strnsl
+Version:		0.9.2.1
+Entered-date:		2007-01-08
+Description:		OpenSS7 STREAMS Network Services Library.
+			OpenSS7 STREAMS Network Services Library for Linux
+			Fast-STREAMS.
+			The strnsl package includes kernel modules, SVR 4.2
+			STREAMS drivers, modules, libraries, utilities, test
+			programs, daemons, and development environment for the
+			development and execution of STREAMS modules and
+			drivers.
+			This package provides the ability to build and install
+			STREAMS modules distributed in binary form.
+			This distribution is currently applicable to 2.4 and 2.6
+			kernels and was targetted at ix86, x86_64, pcc and ppc64
+			architectures, but should build and install for other
+			architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		STREAMS, SVR 4.2 MP, LiS, LfS
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			2M strnsl-0.9.2.1.tar.gz
+			1M strnsl-0.9.2.1.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			2M strnsl-0.9.2.1-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4 or 2.6,
+			streams 0:0.9.2.1-1 SVR 4.2 STREAMS,
+			strcompat 0:0.9.2.4-1,
+			strxns 0:0.9.2.4-1,
+			strxnet 0:0.9.2.9-1.
+Copying-policy:		GPL
+End
+
+
+

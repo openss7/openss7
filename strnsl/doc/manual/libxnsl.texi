@@ -5,7 +5,7 @@
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2007  OpenSS7 Corporation <www.openss7.com>
 % Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
@@ -61,7 +61,7 @@
 \input texinfo
 @setfilename libxnsl.info
 @include texi/args.texi
-@set MANUAL_TITLE OpenSS7 XNS/XTI Library
+@set MANUAL_TITLE OpenSS7 XNS Library
 @set MANUAL_TYPE Reference Manual
 @settitle @value{MANUAL_TITLE}
 
@@ -73,7 +73,7 @@
 @defindex op
 
 @include texi/args.texi
-@set MANUAL_TITLE OpenSS7 XNS/XTI Library
+@set MANUAL_TITLE OpenSS7 XNS Library
 @set MANUAL_TYPE Reference Manual
 
 @comment The following copyright information goes at the head of each .info file.
@@ -84,7 +84,7 @@ This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2005  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -110,7 +110,7 @@ another language, under the above conditions for modified versions.
 @end ifinfo
 
 @include texi/args.texi
-@set MANUAL_TITLE OpenSS7 XNS/XTI Library
+@set MANUAL_TITLE OpenSS7 XNS Library
 @set MANUAL_TYPE Reference Manual
 
 @ignore
@@ -130,7 +130,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2005  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2001-2007  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -201,901 +201,1879 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Variable Index::
 * File Index::
 
- --- The Detailed Node Listing ---
-
-Acknowledgements
-
-* Sponsors::                    Sponsors of the XTI Library
-* Contributors::                People who contributed to development of the XTI Library
-
-Reference
-
-* Overview::                    An overview of XTI Functions and Header Files
-* XTI Function Reference::      Reference manual of XTI Functions
-* XTI Header File Reference::   Reference manual of XTI Header Files
-
-XTI Function Reference
-
-* t_accept::                    Accept a connection request.
-* t_addleaf::                   Add a leaf to a point-multipoint connection.
-* t_alloc::                     Allocate an XTI library structure.
-* t_bind::                      Bind a transport endpoint to a transport address.
-* t_close::                     Close a transport endpoint.
-* t_connect::                   Connect a transport endpoint to a transport address.
-* t_errno::                     Report XTI library errors.
-* t_error::                     Generate an XTI error message.
-* t_free::                      Free an XTI library structure.
-* t_getinfo::                   Get protocol-specific transport endpoint information.
-* t_getprotaddr::               Get local and remote transport addresses.
-* t_getstate::                  Get the state of the transport endpoint.
-* t_listen::                    Listen for connection requests.
-* t_look::                      Retrieve an asynchronous event.
-* t_open::                      Open a transport endpoint.
-* t_optmgmt::                   Perform options management for a transport endpoint.
-* t_rcv::                       Receive data on a connection-oriented transport endpoint.
-* t_rcvconnect::                Receive connection confirmation.
-* t_rcvdis::                    Receive disconnect indication.
-* t_rcvleafchange::             Receive a leaf change on a point-multipoint connection.
-* t_rcvrel::                    Receive an orderly release indication.
-* t_rcvreldata::                Receive an orderly release indication with user data.
-* t_rcvudata::                  Receive a unit data indication.
-* t_rcvuderr::                  Receive a unit data error indication.
-* t_rcvv::                      Receive data a place in gather buffers.
-* t_rcvvudata::                 Receive a unit data indication an place in gather buffers.
-* t_removeleaf::                Remove a leaf from a point-to-multipoint connection.
-* t_snd::                       Send data.
-* t_snddis::                    Send disconnect request.
-* t_sndrel::                    Send an orderly release request.
-* t_sndreldata::                Send an orderly release request with data.
-* t_sndudata::                  Send a unit data.
-* t_sndv::                      Send data from non-contiguous buffers.
-* t_sndvudata::                 Send a unit data from non-contiguous buffers.
-* t_strerror::                  Provide a descriptive string for an XTI error.
-* t_sync::                      Synchronize the XTI library to a new file descriptor.
-* t_sysconf::                   Examine XTI library system configuration parameters.
-* t_unbind::                    Unbind a transport endpoint from a transport adddress.
-
-XTI Header File Reference
-
-* xti::                         XTI Library header file.
-* xti_ip::                      Internet Protocol header file.
-* xti_mtp::                     SS7 Message Transfer Part header file.
-* xti_sccp::                    SS7 Signalling Connection Control Part header file.
-* xti_sctp::                    Stream Control Transmission Protocol header file.
-* xti_ss7::                     SS7 header file.
-* xti_sscop::                   Service Specific Connection Oriented Protocol header file.
-* xti_tcap::                    SS7 Transaction Capabilities Application Part header file.
-* xti_tcp::                     Transmission Control Protocol header file.
-* xti_udp::                     User Datagram Protocol header file.
 @end menu
+
+@c  --- The Detailed Node Listing ---
+@c 
+@c Acknowledgements
+@c 
+@c * Sponsors::                    Sponsors of the XNS Library
+@c * Contributors::                People who contributed to development of the XNS Library
+@c 
+@c Reference
+@c 
+@c * Overview::                    An overview of XNS Functions and Header Files
+@c * XNS Function Reference::      Reference manual of XNS Functions
+@c * XNS Header File Reference::   Reference manual of XNS Header Files
+@c 
+@c XNS Function Reference
+@c 
+@c * getnetconfig::		Get network configuration database entry.
+@c 
+@c XNS Header File Reference
+@c 
+@c * netconfig::			Network Configuration header file.
 
 @c --------------------------------------------------------------------------
 
-@ifnottex
-@node Acknowledgements, Introduction, Top, Top
-@end ifnottex
+@node Acknowledgements
 @unnumbered Acknowledgements
 @cindex credits
 
+@raisesections
 @include texi/funding.texi
+@lowersections
 
-@ignore
-@menu
-* Sponsors::                    Sponsors of the XTI Library
-* Contributors::                People who contributed to development of the XTI Library
-@end menu
-
-@node Sponsors,  ,  , Acknowledgements
-@unnumberedsec Sponsors of the OpenSS7 XTI Library
-@cindex sponsors
-
-Funding for completion of the OpenSS7 XTI Library was provided by:
-
-HOB International.
-
-Additional funding for The OpenSS7 Project was provided by:
-
-@node Contributors,  ,  , Acknowledgements
-@unnumberedsec Contributors to the OpenSS7 XTI Library
-@cindex contributors
-
-The primary contributor to the OpenSS7 XTI Library is Brian F. G. Bidulock.
-
-@end ignore
-
-@node Introduction, Reference, Acknowledgements, Top
-@chapter Introduction to the XTI Library
+@node Introduction
+@chapter Introduction to the XNS Library
 @cindex introduction
 
-This manual documents how to run, install and port the OpenSS7 XTI Library,
+This manual documents how to run, install and port the OpenSS7 XNS Library,
 and how to report bugs.
 
 
-@node Reference, Conformance, Introduction, Top
+@node Reference
 @chapter Reference
 @cpindex reference
 
 @menu
-* Overview::                    An overview of XTI Functions and Header Files
-* XTI Function Reference::      Reference manual of XTI Functions
-* XTI Header File Reference::   Reference manual of XTI Header Files
-
-XTI Function Reference
-
-* t_accept::                    Accept a connection request.
-* t_addleaf::                   Add a leaf to a point-multipoint connection.
-* t_alloc::                     Allocate an XTI library structure.
-* t_bind::                      Bind a transport endpoint to a transport address.
-* t_close::                     Close a transport endpoint.
-* t_connect::                   Connect a transport endpoint to a transport address.
-* t_errno::                     Report XTI library errors.
-* t_error::                     Generate an XTI error message.
-* t_free::                      Free an XTI library structure.
-* t_getinfo::                   Get protocol-specific transport endpoint information.
-* t_getprotaddr::               Get local and remote transport addresses.
-* t_getstate::                  Get the state of the transport endpoint.
-* t_listen::                    Listen for connection requests.
-* t_look::                      Retrieve an asynchronous event.
-* t_open::                      Open a transport endpoint.
-* t_optmgmt::                   Perform options management for a transport endpoint.
-* t_rcv::                       Receive data on a connection-oriented transport endpoint.
-* t_rcvconnect::                Receive connection confirmation.
-* t_rcvdis::                    Receive disconnect indication.
-* t_rcvleafchange::             Receive a leaf change on a point-multipoint connection.
-* t_rcvrel::                    Receive an orderly release indication.
-* t_rcvreldata::                Receive an orderly release indication with user data.
-* t_rcvudata::                  Receive a unit data indication.
-* t_rcvuderr::                  Receive a unit data error indication.
-* t_rcvv::                      Receive data a place in gather buffers.
-* t_rcvvudata::                 Receive a unit data indication an place in gather buffers.
-* t_removeleaf::                Remove a leaf from a point-to-multipoint connection.
-* t_snd::                       Send data.
-* t_snddis::                    Send disconnect request.
-* t_sndrel::                    Send an orderly release request.
-* t_sndreldata::                Send an orderly release request with data.
-* t_sndudata::                  Send a unit data.
-* t_sndv::                      Send data from non-contiguous buffers.
-* t_sndvudata::                 Send a unit data from non-contiguous buffers.
-* t_strerror::                  Provide a descriptive string for an XTI error.
-* t_sync::                      Synchronize the XTI library to a new file descriptor.
-* t_sysconf::                   Examine XTI library system configuration parameters.
-* t_unbind::                    Unbind a transport endpoint from a transport adddress.
-
-XTI Header File Reference
-
-* xti::                         XTI Library header file.
-* xti_ip::                      Internet Protocol header file.
-* xti_mtp::                     SS7 Message Transfer Part header file.
-* xti_sccp::                    SS7 Signalling Connection Control Part header file.
-* xti_sctp::                    Stream Control Transmission Protocol header file.
-* xti_ss7::                     SS7 header file.
-* xti_sscop::                   Service Specific Connection Oriented Protocol header file.
-* xti_tcap::                    SS7 Transaction Capabilities Application Part header file.
-* xti_tcp::                     Transmission Control Protocol header file.
-* xti_udp::                     User Datagram Protocol header file.
-
+* Overview::                    An overview of XNS Functions and Header Files
+* XNS Function Reference::      Reference manual of XNS Functions
+* XNS Header File Reference::   Reference manual of XNS Header Files
 @end menu
 
-@node Overview,  ,  , Reference
+@node Overview
 @section Overview
 @cpindex overview
 
-@node XTI Function Reference,  ,  , Reference
-@section XTI Function Reference
+@node XNS Function Reference
+@section XNS Function Reference
 @cpindex functions
 
+@menu
+* Network Configuration::	Network configuration functions.
+* Network Path::		Network path functions.
+* Network Directory::		Network directory functions.
+@end menu
+
 @page
-@node t_accept,  ,  , Reference
-@unnumberedsubsec t_accept
-@fnindex t_accept
+@node Network Configuration
+@subsection Network Configuration
 
-@subsubheading NAME
+@menu
+* setnetconfig::		bind to or rewind netconfig database.
+* getnetconfig::		get next entry from netconfig database.
+* endnetconfig::		unbind from netconfig database.
+* getnetconfigent::		get netconfig database entry by network id.
+* freenetconfigent::		free netconfig database entry.
+* nc_perror::			print netconfig database error to standard error.
+* nc_sperror::			retrieve netconfig database error string.
+@end menu
 
-@strong{t_accept} - accept a connection request
+@subsubheading Name
 
-@subsubheading SYNOPSIS
+@strong{netconfig} - network configuration database subroutines
+
+@subsubheading Synopsis
 @example
-#include <xti.h>
+#include <netconfig.h>
 
-int t_accept(int @var{fd}, int @var{resfd}, struct t_call *@var{call});
+void *setnetconfig(void);
+struct netconfig *getnetconfig(void *@var{handle});
+int endnetconfig(void *@var{handle});
+struct netconfig *getnetconfigent(const char *@var{netid});
+void freenetconfigent(struct netconfig *@var{netconfig});
+void nc_perror(const char *@var{msg});
+char *nc_sperror(void);
 @end example
 
-@subsubheading ARGUMENTS
-@table @var
-@item fd
-the transport endpoint upon which a connection indication was received.
+@subsubheading Arguments
 
-@item resfd
-the transport endpoint upon which to accept the connection.
+@vtable @var
+@item handle
+an opaque pointer returned by @manpage{setnetconfig(3)} to be used as an
+argument to calls to @manpage{getnetconfig(3)}.
 
-@item call
-a pointer to a t_call structure containing information about the responding
-endpoint and any data to be transferred in response.
-@end table
+@item netid
+A network identifier string.  This should match one of the network identifier
+strings from the @manpage{netconfig(5)} file.
 
-@subsubheading DESCRIPTION
-The @var{fd} argument is an integer file descriptor specifying the stream upon
-which a previous connection indication was received with t_listen(3), and for
-which the connection indication is to now be accepted.
+@item netconfig
+A pointer to a @type{netconfig} structure returned from
+@manpage{getnetconfigenet()} to be freed by @manpage{freenetconfigent(3)}.
 
-The @var{resfd} argument is an integer file descriptor specifying the stream
-upon which to accept the transport connection. @var{resfd} can be the same as
-@var{fd} or different. When @var{resfd} is different from @var{fd}, the caller
-specifies that the connection is to be accepted on the stream associated with
-@var{resfd}. When @var{resfd} is different from @var{fd}, the stream
-associated with @var{resfd} must be an XTI/TLI[1..3] stream on the same
-transport provider that is either in the @code{T_UNBND} state, or is in the
-@code{T_IDLE} state and bound to the same address as the responding address.
+@item msg
+A short messages string to prefix to the error message printed to standard
+error by the @manpage{nc_perror(3)} subroutine.
 
-@vindex T_IDLE
-@vindex T_UNBND
-
-The @var{call} argument is a pointer to a t_call structure, specifying the
-responding address, @var{addr}, the response options, @var{opt}, and any response user
-data, @var{udata}. format­ ted as follows:
-
-@example
-struct t_call @{
-        struct netbuf addr;             /* address */
-        struct netbuf opt;              /* options */
-        struct netbuf udata;            /* data */
-        int sequence;                   /* identification */
-@};
-@end example
-
-The @var{addr}, @var{opt} and @var{udata} members of the t_call structure are netbuf(3)
-structures, each formatted as follows:
-
-@example
-struct netbuf @{
-        unsigned int maxlen;            /* max length */
-        unsigned int len;               /* current length */
-        char *buf;                      /* data */
-@};
-@end example
-
-@table @var
-@item addr
-A netbuf(3) structure that specifies the responding address. The responding
-address is the address accepting the connection.
-@code{@var{call}->addr.maxlen} is set to zero (0) by the caller and ignored by
-the provider.  @code{@var{call}->addr.len} is set to the length of the
-responding address.  If the length of the responding address is zero (0) then
-the destination address of the connection indication is used as the responding
-address.  @code{@var{call}->addr}.  @var{buf} points to the responding
-address.
-
-@item opt
-A netbuf(3) structure that specifies the responding options. The responding
-options can be both end-to-end and local transport options.
-@code{@var{call}->opt.maxlen} is set to zero (0) by the caller and is ignored
-by the provider.  @code{@var{call}->opt.len} is set to the length of the
-options. If the length of the responding options is zero (0) no options are
-specified.  @code{@var{call}->opt.buf} points to the options.
-
-@item udata
-A netbuf(3) structure that specifies the data to send with the connection
-response. @code{@var{call}->udata.maxlen} is set to zero (0) by the caller and
-is ignored by the provider. @code{@var{call}->udata.len} is set to the length
-of the data. If the length of the data is zero (0) no data is included in the
-response message.  @code{@var{call}->udata.buf} points to the data.
-
-@item sequence
-specifies a sequence number of the connection indication that is to be
-accepted. This value was returned by a previous @var{call} to t_lis­ ten(3).
-@end table
-
-@subsubheading CAVEATS
-t_accept() is only valid in state @code{T_INCON} with an out­ standing number
-of connection indications greater than zero (0).
-
-@vindex T_INCON
-
-t_accept() is only valid for transport service providers of service type
-@code{T_COTS} or @code{T_COTS_ORD}.
-
-@vindex T_COTS
-@vindex T_COTS_ORD
-
-@subsubheading RETURN VALUE
-Upon success, t_accept() returns zero (0). Upon failure, t_accept() returns -1
-and sets t_errno(3) to an appropriate error number.
-
-@subsubheading ERRORS
-When t_accept() fails, it returns -1 and sets t_errno(3) to an appropriate
-error number as follows:
-
-@vtable @error
-@item TACCES
-The caller did not have sufficient permissions to accept a connection on the
-@var{resfd} file descriptor, or did not have sufficient permissions to use the
-responding address specified in @code{@var{call}->addr}.  
-
-@item TBADADDR
-The address specified was of an invalid format or contained invalid
-information. This error is returned from the transport service provider.
-
-@item TBADDATA
-The amount of data specified for the @var{call} and underlying transport
-service provider was invalid (i.e. was outside the protocol limits). See
-t_getinfo(3) and t_open(3) for more information.
-
-@item TBADF
-The @var{fd} or @var{resfd} file descriptor was invalid.
-
-@item TBADOPT
-The options specified were of an invalid for­ mat or contained invalid
-information. This error is returned from the transport service provider.  See
-t_optmgmt(3) for more information on option formats.
-
-@item TBADSEQ
-The sequence number provided was invalid, or is not associated with an
-outstanding connec­ tion indication.
-
-@item TINDOUT
-The file descriptor @var{resfd} has outstanding connection indications.
-
-@item TLOOK
-An asynchronous event occured before the @var{call} could complete. See
-t_look(3) for more information.
-
-@item TNOTSUPPORT
-The @var{call} requires the use of a TLI primitive not supported by the
-underlying transport provider.
-
-@item TOUTSTATE
-The @var{call} was issued with the interface in an incorrect state.
-
-@item TPROTO
-A protocol error occured between the XTI library and the underlying transport
-provider.
-
-@item TPROVMISMATCH
-The transport provider associated with @var{resfd} is not the same as the
-transport provider associated with @var{fd}.
-
-@item TRESADDR
-The file descriptor @var{resfd} was bound to a different address than the
-responding address.
-
-@item TRESQLEN
-The file descriptor @var{resfd} is listening (i.e. it was bound with a
-@var{qlen} > 0).
-
-@vindex qlen
-
-@item TSYSERR
-A Linux system error occurred and the Linux error number is set in errno(3).
 @end vtable
 
-@subsubheading SEE ALSO
-netbuf(3), t_listen(3).
+@subsubheading Description
 
-@subsubheading CONFORMING TO
-XTI/TLI[4], TPI[5], XPG5, XNS 5.2[6], SUSv2[7].
-
-@subsubheading REFERENCES
-
-Trademarks mentioned are the property of their owners.
-
-@subsubheading VERSIONS
-OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.1 $); $Date: 2006/09/25 12:30:52 $.
-
-@subsubheading AUTHOR
-@format
-@flushleft
-Brian F. G. Bidulock @email{bidulock@@openss7.org}
-The OpenSS7 Project @uref{http://www.openss7.org/}
-@end flushleft
-@end format
-
-@subsubheading COPYRIGHT
-@format
-@flushleft
-Copyright @copyright{} 1997-2004 @uref{http://www.openss7.com/, OpenSS7 Corporation}.
-All Rights Reserved.
-(See roff source for permission notice.)
-@end flushleft
-@end format
-
-@subsubheading TRADEMARKS
-@format
-@flushleft
-Linux® is a registered trademark of Linus Torvalds
-UNIX® is a registered trademark of The Open Group.
-OpenSS7tm is a trademark of OpenSS7 Corporation.
-Other trademarks are the property of their respective owners.
-@end flushleft
-@end format
-
-
-@page
-@node t_addleaf,  ,  , Reference
-@subsection t_addleaf
-@fnindex t_addleaf
-
-@subsubheading NAME
-@emph{t_addleaf} - add a point to a point to multipoint connection
-
-@subsubheading SYNOPSIS
-@example
-#include <@file{xti.h}>
-
-int t_addleaf(int @var{fd}, int @var{leafid}, struct netbuf *@var{addr});
-@end example
-
-@subsubheading ARGUMENTS
-@table @var
-@item fd
-the transport endpoint to which to add a leaf.
-
-@item leafid
-the identifier for the leaf.
-
-@item addr
-a pointer to a netbuf(3) structure containing the address of the leaf.
-@end table
-
-@subsubheading DESCRIPTION
-Requests that an endpoint be added to a point to multipoint connection.
-
-@var{fd} is the file descriptor of the local transport endpoint.
-
-@var{leafid}  is  a transport user assigned integer value which will be used
-to identify the point added to the point to multipoint connection in
-subsequent interactions with the transport user.
-
-@var{addr} is a netbuf(3) structure specifying on call the address of the
-local point being  added  to  the point  to multipoint connection.  No
-information is returned in @var{addr}.  @samp{@var{addr}->maxlen} is ignored
-by the call.  @samp{@var{addr}->len} is the length of the address.  If
-@samp{@var{addr}->len} is zero, it indicates that no  address  is provided.
-@samp{@var{addr}->buf} is a pointer to the user buffer containing the address.
-
-@subsubheading CAVEATS
-@emph{t_addleaf()} is only valid in the @dfn{T_DATAXFER} state.
-
-@emph{t_addleaf()}  is  only valid for transport service providers of service
-type @dfn{T_COTS} or @dfn{T_COTS_ORD} that support point to multipoint
-connection management.
-
-In synchronous mode, @emph{t_addleaf()} blocks until a leaf  change
-confirmation  is  received.   In  asynchronous  mode where no leaf change
-confirmation is immediately avaialble, @emph{t_addleaf()} fails, returns -1
-and sets t_errno(3) to @error{TNODATA}.
-
-@subsubheading RETURN VALUE
-Upon success, @emph{t_addleaf()} returns zero (0) and confirms the addition of
-the requested  leaf.   Upon failure, @emph{t_addleaf()} returns -1 and sets
-t_errno(3) to an appropriate error number.
-
-@subsubheading ERRORS
-When @emph{t_addleaf()} fails, it returns -1 and sets t_errno(3) to an
-appropriate error number as follows:
-
-@table @error
-@item TBADF
-@var{fd} is invalid.
-
-@item TADDRBUSY
-address specificed was already in use by another transport endpoint.
-
-@item TBADADDR
-address specified was of an invalid format or contained invalid information.
-
-@item TLOOK
-asynchronous  event  occured  before the call could complete.  See
-@ref{t_look}, for more information.
-
-@item TNOADDR
-address was not specified and the transport provider could not assign one.
-
-@item TNODATA
-attempt was made to read the add leaf confirmation but no add  leaf
-confirmation  was available.
-
-@item TNOTSUPPORT
-call  requires  the use of a TLI primitive not supported by the underlying
-transport provider.
-
-@item TOUTSTATE
-call was issued with the interface in an incorrect state.
-
-@item TPROTO
-protocol error occured between the XTI library and the underlying transport
-provider.
-
-@item TSYSERR
-Linux system error occured and the Linux error number is set in errno(3).
-@end table
-
-@subsubheading SEE ALSO
-netbuf(3), t_rcvleafchange(3), t_removeleaf(3).
-
-@subsubheading CONFORMING TO
-XTI/TLI[1], TPI[2], XPG5, XNS 5.2[3], SUSv2[4].
-
-@subsubheading REFERENCES
+@cite{UNIX} has traditionally provided three components of the Network
+Services Library, @file{libnsl}, that are associated with the Trasnport
+Provider Interface (TPI), @manpage{tpi(7)}, @dfn{STREAMS} network
+pseudo-device drivers, and that are not currently part of the @cite{Linux}
+Network Services Library.  These components are:
 
 @enumerate
-@item
-XOpen Transport Interface, n.d., XPG, X Programmer's Group.  <http://www.open-
-group.org/onlinepubs/>
-
-@item
-Transport Provider Interface (TPI) Specification, Draft 2, 1999, (Parsippany,
-New Jersey), Open Group, Open Group Publication.
-<http://www.opengroup.org/onlinepubs/>
-
-@item
-Technical Standard: Network Services (XNS), 1999, Open Group, Open Group
-Publication. [ISBN 1-85912-241-8] <http://www.opengroup.org/onlinepubs/>
-
-@item
-Single UNIX Specification, Open Group, Open Group Publication.
-<http://www.open- group.org/onlinepubs/>
-
+@item Network Configuration database access, @manpage{netconfig(3)},
+@item Netowrk Path access, @manpage{netpath(3)}, and,
+@item Network Directory and address mapping, @manpage{netdir(3)}.
 @end enumerate
 
-@*
-Trademarks mentioned are the property of their owners.
+These are often collectively refered to as the Network Selection facility of
+the Network Services Library.
 
-@subsubheading VERSIONS
-@format
-@flushleft
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.1 $); $Date: 2006/09/25 12:30:52 $.
-@end flushleft
-@end format
+@manpage{setnetconfig(3)}, @manpage{getnetconfig(3)},
+@manpage{endnetconfig(3)}, @manpage{getnetconfigent(3)},
+@manpage{freenetconfigent(3)}, @manpage{nc_perror(3)} and
+@manpage{nc_sperror(3)}, provide a set of Network Configuration database
+access subroutines for accessing the Network Configuration database.
 
-@subsubheading AUTHOR
-@format
-@flushleft
-Brian F. G. Bidulock <bidulock@@openss7.org>
-The OpenSS7 Project http://www.openss7.org/
-@end flushleft
-@end format
+@manpage{setnetconfig(3)}, @manpage{getnetconfig(3)} and
+@manpage{endnetconfig(3)} provide a mechanism to sequentially access each
+entry in the Network Configuration database.
 
-@subsubheading COPYRIGHT
-@format
-@flushleft
-Copyright (C) 1997-2004 OpenSS7 Corporation.
-All Rights Reserved.
-(See roff source for permission notice.)
-@end flushleft
-@end format
+@table @manpage
 
-@subsubheading TRADEMARKS
-@format
-@flushleft
-OpenSS7tm  is a trademark of OpenSS7 Corporation.
-Linux@registeredsymbol{}  is a registered trademark of Linus Torvalds.
-UNIX@registeredsymbol{}  is a registered trademark of The Open Group.
-Solaris@registeredsymbol{}  is a registered trademark of Sun Microsystems.
-Other trademarks are the property of their respective owners.
-@end flushleft
-@end format
+@item setnetconfig(3)
+Returns a pointer to an opaque data structure used as a handle to the
+@manpage{getnetconfig(3)} subroutine.  @manpage{setnetconfig(3)} is used to
+initialize client access to the database entries and set the access point to
+the first entry.
+
+@item getnetconfig(3)
+When called successively with the @var{handle} returned by the call to
+@manpage{setnetconfig(3)}, returns each Network Configuration database entry
+starting with the first.  When no additional entries remain that have not
+already been retrieved since the call to @manpage{setnetconfig(3)},
+@manpage{getnetconfig(3)} returns a @var{NULL} pointer to indicate that the
+end of the database has been reached.
+
+@item endnetconfig(3)
+Releases client access to the database and frees for reuse any resources that
+were held by @manpage{setnetconfig(3)} for use by @manpage{getnetconfig(3)}.
+@manpage{endnetconfig(3)} must only be called with a @var{handle} returned
+from a previous and corresponding call to @manpage{setnetconfig(3)}.
+@manpage{endnetconfig(3)} must be called for each call to
+@manpage{setnetconfig(3)} with the corresponding @var{handle} pointer as the
+argument.
+
+@end table
+
+@manpage{getnetconfigent(3)} and
+@manpage{freenetconfigent(3)} provide a mechanism to access Network
+Configuration database entries by network identification name strings.
+
+@table @manpage
+@item getnetconfigent(3)
+Returns a pointer to the @type{netconfig} struture corresponding to the
+network configuration entry with the same network identification name as that
+supplied in the @var{netid} argument.
+
+@item freenetconfigent(3)
+Frees the network configuration entry returned as a pointer to a
+@type{netconfig} structure, from a previous call to
+@manpage{getnetconfigent(3)}.  @manpage{freenetconfigent(3)} must be called
+for each call to @manpage{getnetconfigent(3)} with the corresponding
+@var{netconfig} pointer as the argument.
+
+@end table
+
+@manpage{nc_perror(3)} and @manpage{nc_sperror(3)} provide a mechanism for
+providing diagnostic messages upon failure.  These subroutines can be used
+both for these @manpage{netconfig(3)} subroutines, as well as the
+@manpage{netpath(3)} subroutines.
+
+@table @manpage
+@item nc_perror(3)
+Prints a diagnostic message to standard error with the string provided in the
+@var{msg} argument used as a prefix followed by a colon.  Diagnostic messages
+printed to standard error are followed by a NEWLINE.
+
+@item nc_sperror(3)
+Similar to @manpage{nc_perror(3)}, but, instead of printing the message to
+standard error, only a pointer to the diagnostic message string is returned.
+This allows the caller to subsequently format and store a message according to
+the caller's specifications.
+
+@end table
+
+@subsubheading File Format
+
+The format of the @file{/etc/netconfig} Network Configuration database file is
+as described in @manpage{netconfig(5)}.
+
+@subsubheading Database Structure
+
+The @type{netconfig} structure is defined in @file{netconfig.h} as follows:
+@smallexample
+struct netconfig @{
+    char *nc_netid;      /* network id string */
+    ulong nc_semantics;  /* service interface semantics */
+    ulong nc_flag;       /* flags */
+    char *nc_protofmly;  /* protocol family string */
+    char *nc_proto;      /* protocol name string */
+    char *nc_device;     /* STREAMS device path */
+    ulong nc_nlookups;   /* num. of name-to-address libs */
+    char **nc_lookups;   /* name-to-address libraries */
+    ulong nc_unused[9];  /* reserved for future use */
+@};
+@end smallexample
+
+Where the members of the @type{netconfig} structure are as follows:
+
+@table @member
+@item nc_netid
+The network identifier string defined by the system administrator and unique
+to each entry in the network configuration database file.
+
+@item nc_semantics
+The semantics describing the service interface of the associated @dfn{STREAMS}
+transport service provider.  @member{nc_semantics} can take on one of the
+following values:
+
+@table @var
+@item NC_TPI_CLTS
+Transport Provider interface, @manpage{tpi(7)}, Connectionless Transport
+Service.
+
+@item NC_TPI_COTS
+Transport Provider interface, @manpage{tpi(7)}, Connection-Oriented Transport
+Service.
+
+@item NC_TPI_COTS_ORD
+Transport Provider interface, @manpage{tpi(7)}, Connection-Oriented Transport
+Service with Orderly Release.
+
+@item NC_TPI_RAW
+Transport Provider interface, @manpage{tpi(7)}, Raw Transport Service.
+
+@end table
+
+@item nc_flag
+Flags associated with the transport entry.  @member{nc_flag} can take on one of
+the following values:
+
+@table @var
+@item NC_NOFLAG
+No option flag is indicated.
+
+@item NC_VISIBLE
+The visible option flag is indicated.  This means that the network transport
+provider is visible to @manpage{getpath(3)} when the @env{NETPATH} environment
+variable is not set.
+
+@item NC_BROADCAST
+The broadcast option flag is indicated.  This means that the network transport
+provider supports broadcast addresses, and in particular, the
+@var{HOST_BROADCAST} universal address described in
+@manpage{netdir_getbyname(3)}.
+
+@item NC_MULTICAST
+The multicast option flag is indicated.  This means that the network transport
+provider supports multicast addresses, and in particular, the
+@var{HOST_ALLNODES} and @var{HOST_RPCNODES} universal addresses described in
+@manpage{netdir_getbyname(3)}.
+
+@end table
+
+@item nc_protofmly
+The protocol family string assigned by the system adminstrator.
+
+@item nc_proto
+The protocol string assigned by the system administrator.
+
+@item nc_device
+The device path to a @dfn{STREAMS} @manpage{clone(4)} device that provides
+access to the associated transport provider.
+
+@item nc_nlookups
+The number of name to address translation libraries.
+
+@item nc_lookups
+An array of address translation libraries.  The number of strings contained in
+this array is specified with the @member{nc_nlookups} field.
+
+@item nc_unused
+Unused bytes reserved for future expansion.
+
+@end table
+
+@subsubheading Caveats
+
+@manpage{nc_perror(3)} and @manpage{nc_sperror(3)} must be called immediately
+after the failed network configuration subroutine fails.  Otherwise, the error
+condition may be lost.
+
+@subsubheading Return Value
+
+Upon successful completion, @manpage{setnetconfig(3)} returns an opaque
+pointer for use in the @manpage{getnetconfig(3)} call.  Otherwise,
+@var{NULL} is returned and @manpage{nc_error(3)} is set to indicate the error.
+
+Upon successful completion, @manpage{endnetconfig(3)} returns @samp{0}.  Otherwise,
+@samp{-1} is returned and @manpage{nc_error(3)} is set to indicate the error.
+A diagnostic string can be printed to standard error or accesed using the
+@manpage{nc_perror(3)} or @manpage{nc_sperror(3)} subroutines.
+
+Upon successful completion, @manpage{nc_sperror(3)} returns a pointer to a
+string describing the error condition.  (Note that this subroutine can also be
+used for @manpage{netpath(3)} subroutines.) Otherwise, @var{NULL} is returned.
+
+Upon successful completion, @manpage{getnetconfig(3)} and
+@manpage{getnetconfigent(3)} return a pointer to a @type{netconfig} structure.
+Otherwise, they return @var{NULL} to indicate failure.
+
+@subsubheading Error Handling
+
+When an error occurs, an error message can be printed to standard error or
+retrieved using @manpage{nc_perror(3)} or @manpage{nc_sperror(3)}.
+
+@subsubheading Errors
+
+The @manpage{setnetconfig(3)} subroutine will fail, and return a @var{NULL}
+pointer, if: an error was encountered opening the Network Configuration
+database, @file{/etc/netconfig}, see @manpage{netconfig(5)}.
+
+The @manpage{getnetconfig(3)} subroutine will fail, and return a @var{NULL}
+pointer, if: no entries exist in the Network Configuration database; or, the
+last entry in the Network Configuration database has been read with a previous
+call to @manpage{getnetconfig(3)} and there are no more entries in the Network
+Configuration database.
+
+The @manpage{endnetconfig(3)} subroutine will fail if: the passed in
+@var{handle} argument is invalid; or, @manpage{endnetconfig(3)} has already
+been called for the @var{handle} argument.
+
+The passed in @var{handle} argument is only invalid when there is not a
+subsequent, corresponding call to @manpage{setnetconfig(3)}.
+
+The @manpage{getnetconfigent(3)} subroutine will fail, and return a @var{NULL}
+pointer, if: the Network Configuration database does not exist; or, no entries
+exist in the Network Configuration database for the passed in @var{netid}
+string.
+
+The @manpage{freenetconfigent(3)} subroutine will fail silently if: passed a
+@var{NULL} or invalid pointer; or, pass a pointer that was previously passed
+to @manpage{freenetconfigent(3)}.
+
+The @manpage{nc_perror(3)} subroutine will fail silently if: standard error is
+closed; or, @var{msg} is an invalid pointer.
+
+The @manpage{nc_sperror(3)} subroutine will fail, and return a @var{NULL}
+pointer, if: no error exists.
+
+The following errors can be returned:
+
+@vtable @error
+@item NC_NOERROR
+"@i{no error}" @*
+The last network selection function called was successful or no network
+selection function has yet been called.
+
+@item NC_NOMEM
+"@i{out of memory}" @*
+There was not sufficient memory for the last network selection function called
+to complete.
+
+@item NC_NOSET
+"@i{routine called before calling setnetpath() or setnetconfig()}" @*
+The last call to @manpage{endnetconfig(3)} or @manpage{getnetconfig(3)} was
+called (incorrectly) before calling @manpage{setnetconfig(3)}.
+
+@item NC_OPENFAIL
+"@i{cannot open /etc/netconfig}" @*
+The last call to a network selection function, @manpage{setnetconfig(3)},
+could not open the @file{/etc/netconfig} file.
+
+@item NC_BADLINE
+"@i{error in /etc/netconfig : field %d of line %d}" @*
+The last call to a network selection function detected a syntax error in the
+@file{/etc/netconfig} file at field %d of line %d.
+
+@item NC_NOTFOUND
+"@i{netid not found in /etc/netconfig}" @*
+The @var{netid} argument to the last call to @manpage{getnetconfigent(3)} was
+not found in @file{/etc/netconfig}.
+
+@item NC_NOMOREENTRIES
+"@i{no more entries in /etc/netconfig}" @*
+The last call to a network selection function, @manpage{getnetpath(3)},
+exhausted the entries in the @file{/etc/netconfig} file.
+
+@item (unknown)
+"@i{unknown error}" @*
+An internal error occured in the @manpage{libxnsl(3)} library.
+@end vtable
+
+An error string associated with the error number can be obtained using
+@manpage{nc_sperror(3)} or printed to standard error with
+@manpage{nc_perror(3)}.
+
+@subsubheading Files
+
+@table @file
+
+@item /etc/netconfig
+The Network Configuration database file.  See @manref{netconfig(5)}.
+
+@item /usr/lib/libxnsl.so
+The X/Open Network Services Library shared object library.
+
+@item /usr/lib/libxnsl.a
+The X/Open Network Services Library static library.
+
+@end table
+
+@subsubheading See Also
+
+@manref{netconfig(5)},
+@manref{netpath(3)},
+@manref{netdir(3)},
+@refman{netdir_getbyname},
+@cite{RFC 1833}.
+
+@subsubheading Bugs
+
+@manpage{setnetconfig(3)},
+@manpage{getnetconfig(3)},
+@manpage{endnetconfig(3)},
+@manpage{getnetconfigent(3)},
+@manpage{freenetconfigent(3)},
+@manpage{nc_perror(3)} and
+@manpage{nc_sperror(3)},
+have no known bugs.
+
+@subsubheading Compatibility
+
+These network configuration subroutines are compatible with @cite{SVR 4.2},
+and systems based on @cite{SVR 4.2}, including @cite{AIX}, @cite{HP-UX},
+@cite{Solaris} and @cite{UnixWare}, with the following compatibility
+considerations:
+
+@itemize --
+
+@item @cite{Solaris} and @cite{UnixWare} describe the @manpage{nc_sperror(3)}
+subroutine as returning a pointer to thread-specific data and that the buffer
+could change at any point.  While the error value is saved as thread-specific
+data, this implementation of @manpage{nc_sperror(3)} will return a pointer to
+a shared read-only string that is valid for the duration of the calling
+process.
+
+@item @cite{@value{PACKAGE_TITLE}} stores the error condition in
+@manpage{nc_error(3)}.
+
+@item Diagnostic messages are not documented and are incompatible.
+
+@item Binary compatibility would only be coincidental.
+
+@item On @cite{UNIX} systems, these utility subroutines are normally part of
+the Network Services Library, @file{libnsl}; however, @cite{Linux} already has
+a library of that name (which unfortunately is missing these components), and,
+therefore, @cite{@value{PACKAGE_TITLE}} renames the library to
+@manpage{libxnsl(3)}.
+
+@end itemize
+
+See @manref{libxnsl(3)} for additional compatiblity information.
+
+@subsubheading Conforming To
+
+@cite{SVR 4.2}.
+
+@subsubheading History
+
+The network selection subroutines first appeared in @cite{SVR 4.2}.  These
+subroutines are related to the @cite{UNIX} @dfn{STREAMS} implementation of
+network transport providers.
 
 @page
-@node t_alloc,  ,  , Reference
-@subsection t_alloc
-@fnindex t_alloc
+@node setnetconfig
+@unnumberedsubsubsec setnetconfig
+@fnindex setnetconfig
+
+@subsubheading Name
+
+@strong{setnetconfig} - bind to or rewind the network selection database
+
+@subsubheading Synopsis
+@example
+#include <netconfig.h>
+
+void *setnetconfig(void);
+@end example
+
+@subsubheading Arguments
+
+None.
+
+@subsubheading Description
+
+@cite{UNIX} has traditionally provided three components of the Network
+Services Library, @file{libnsl}, that are associated with Transport Provider
+Interface (TPI), @manpage{tpi(7)}, @dfn{STREAMS} network pseudo-device
+drivers, and that are not currently part of the @cite{Linux} Network Services
+Library.  These components are:
+
+@enumerate
+@item Netwock Configuration database access, @manref{netconfig(3)},
+@item Network Patch access, @manref{netpath(3)}, and,
+@item Name-to-Address Translation, @manref{netdir(3)}.
+@end enumerate
+
+The first two are often referred to as the Network Selection facility of the
+Network Services Library.
+
+The @manpage{netconfig(3)} component (of which @command{setnetconfig()} is a
+member) consists of an interface that provides a set of Network Configuration
+database access subroutines for accessing the Network Configuration database
+contained in @file{/etc/netconfig}, @manref{netconfig(5)}, file:
+@manpage{setnetconfig(3)}, @manpage{getnetconfig(3)},
+@manpage{endnetconfig(3)}, @manpage{getnetconfigent(3)},
+@manpage{freenetconfigent(3)}, @manpage{nc_perror(3)} and
+@manpage{nc_sperror(3)}.
+
+Of these, @manpage{setnetconfig(3)}, @manpage{getnetconfig(3)},
+@manpage{endnetconfig(3)}, provide a mechanism to sequentially access each
+entry in the Network Configuration database.
+
+@manpage{setnetconfig(3)} returns a pointer to an oqaque datastructure used as
+a handle to the @manpage{getnetconfig(3)} subroutine.
+@manpage{setnetconfig(3)} is used to initialize client access to the database
+entries and set the access point to the first entry.
+
+@manpage{nc_perror(3)} and @manpage{nc_sperror(3)} provide a mechanism for
+providing diagnostic messages upon failure.  These subroutines can be used for
+this @strong{setnetconfig} subrouting, as well as the @manpage{netpath(3)}
+subroutines.
+
+@subsubheading File Format
+
+The format of the @file{/etc/netconfig} Network Configuration database file is
+as described in @manref{netconfig(5)}.
+
+@subsubheading Caveats
+
+@manpage{nc_perror(3)} and @manpage{nc_sperror(3)} must be called immediately
+after the failed network configuration subroutine fails.  Otherwise, the error
+condition may be lost.
+
+@subsubheading Return Value
+
+Upon successful completion, @manpage{setnetconfig(3)} returns an opaque
+pointer for use in the @manpage{getnetconfig(3)} call.  Otherwise, @var{NULL}
+is returned and @manpage{nc_error(3)} is set to indicate the error.
+
+@subsubheading Errors
+
+When @manpage{setnetconfig(3)} failes, it returns @var{NULL} and sets
+@manpage{nc_error(3)} to one of the following error numbers:
+
+@vtable @error
+@item NC_NOERROR
+"@i{no error}" @*
+The last network selection function called was successful or no network
+selection function has yet been called.
+
+@item NC_NOMEM
+"@i{out of memory}" @*
+There was not sufficient memory for the last network selection function called
+to complete.
+
+@item NC_NOSET
+"@i{routine called before calling setnetpath() or setnetconfig()}" @*
+The last call to @manpage{endnetconfig(3)} or @manpage{getnetconfig(3)} was
+called (incorrectly) before calling @manpage{setnetconfig(3)}.
+
+@item NC_OPENFAIL
+"@i{cannot open /etc/netconfig}" @*
+The last call to a network selection function, @manpage{setnetconfig(3)},
+could not open the @file{/etc/netconfig} file.
+
+@item NC_BADLINE
+"@i{error in /etc/netconfig : field %d of line %d}" @*
+The last call to a network selection function detected a syntax error in the
+@file{/etc/netconfig} file at field %d of line %d.
+
+@item NC_NOTFOUND
+"@i{netid not found in /etc/netconfig}" @*
+The @var{netid} argument to the last call to @manpage{getnetconfigent(3)} was
+not found in @file{/etc/netconfig}.
+
+@item NC_NOMOREENTRIES
+"@i{no more entries in /etc/netconfig}" @*
+The last call to a network selection function, @manpage{getnetpath(3)},
+exhausted the entries in the @file{/etc/netconfig} file.
+
+@item (unknown)
+"@i{unknown error}" @*
+An internal error occured in the @manpage{libxnsl(3)} library.
+@end vtable
+
+An error string associated with the error number can be obtained using
+@manpage{nc_sperror(3)} or printed to standard error with
+@manpage{nc_perror(3)}.
+
+@subsubheading Files
+
+@table @file
+
+@item /etc/netconfig
+The Network Configuration database file.  See @manref{netconfig(5)}.
+
+@item /usr/lib/libxnsl.so
+The X/Open Network Services Library shared object library.
+
+@item /usr/lib/libxnsl.a
+The X/Open Network Services Library static library.
+
+@end table
+
+@subsubheading Environment
+
+@table @env
+@item NETPATH
+This environment variable contains the network path.
+
+@end table
+
+
+@subsubheading See Also
+
+@refman{getnetconfig},
+@refman{endnetconfig},
+@manref{netconfig(5)},
+@manref{netpath(3)},
+@refman{nc_perror},
+@refman{nc_sperror},
+@manref{netdir(3)},
+@cite{RFC 1833}.
+
+@subsubheading Bugs
+
+@manpage{setnetconfig(3)} has no known bugs.
+
+@subsubheading Compatibility
+
+@manpage{setnetconfig(3)} is compatible with @cite{SVR 4.2} and systems based
+on @cite{SVR 4.2}, including @cite{AIX}, @cite{HP-UX}, @cite{Solaris} and
+@cite{UnixWare}, with the following compatibility considerations:
+
+@itemize --
+
+@item
+The @cite{Solaris} TIRPCSRC Version 2.8 version of @manpage{getnetconfig(3)}
+is not thread-safe.  This @cite{@value{PACKAGE_TITLE}} implementation is
+thread-safe.
+
+@item
+@cite{@value{PACKAGE_TITLE}} stores the error conditions in
+@manpage{nc_error(3)}.
+
+@item
+Diagnostic message strings are not documented and are incompatible.
+
+@item
+Binary compatibility would only be coincidental.
+
+@item
+On @cite{UNIX} systems, these utility subroutines are normally part of the
+Network Services Library, @file{libnsl}; however, @cite{Linux} already has a
+library of that name (which unfortunately is missing these components), and,
+therefore, @cite{@value{PACKAGE_TITLE}} renames the library to @file{libxnsl}.
+
+@end itemize
+
+See @manref{libxnsl(3)} for additional compatibility information.
+
+@subsubheading Conforming To
+
+@cite{SVR 4.2}.
+
+@subsubheading History
+
+The Network Selection subroutines furst appeared in @cite{SVR 4.2}.  These
+subroutines are related to the @cite{UNIX} @dfn{STREAMS} implementation of
+network transport providers.
 
 @page
-@node t_bind,  ,  , Reference
-@subsection t_bind
-@fnindex t_bind
+@node getnetconfig
+@unnumberedsubsubsec getnetconfig
+@fnindex getnetconfig
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_close,  ,  , Reference
-@subsection t_close
-@fnindex t_close
+@node endnetconfig
+@unnumberedsubsubsec endnetconfig
+@fnindex endnetconfig
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_connect,  ,  , Reference
-@subsection t_connect
-@fnindex t_connect
+@node getnetconfigent
+@unnumberedsubsubsec getnetconfigent
+@fnindex getnetconfigent
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_errno,  ,  , Reference
-@subsection t_errno
-@fnindex t_errno
+@node freenetconfigent
+@unnumberedsubsubsec freenetconfigent
+@fnindex freenetconfigent
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_error,  ,  , Reference
-@subsection t_error
-@fnindex t_error
+@node nc_perror
+@unnumberedsubsubsec nc_perror
+@fnindex nc_perror
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_free,  ,  , Reference
-@subsection t_free
-@fnindex t_free
+@node nc_sperror
+@unnumberedsubsubsec nc_sperror
+@fnindex nc_sperror
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_getinfo,  ,  , Reference
-@subsection t_getinfo
-@fnindex t_getinfo
+@node Network Path
+@subsection Network Path
+
+@menu
+* setnetpath::			bind to or rewind @var{NETPATH} filtered netconfig database.
+* getnetpath::			get next entry from @var{NETPATH} filtered netconfig database.
+* endnetpath::			unbind from @var{NETPATH} filtered netconfig database.
+@end menu
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_getprotaddr,  ,  , Reference
-@subsection t_geprotaddr
-@fnindex t_geprotaddr
+@node setnetpath
+@unnumberedsubsubsec setnetpath
+@fnindex setnetpath
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_getstate,  ,  , Reference
-@subsection t_getstate
-@fnindex t_getstate
+@node getnetpath
+@unnumberedsubsubsec getnetpath
+@fnindex getnetpath
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_listen,  ,  , Reference
-@subsection t_listen
-@fnindex t_listen
+@node endnetpath
+@unnumberedsubsubsec endnetpath
+@fnindex endnetpath
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_look,  ,  , Reference
-@subsection t_look
-@fnindex t_look
+@node Network Directory
+@subsection Network Directory
+
+@menu
+* netdir_getbyname::		lookup address by host and service name.
+* netdir_getbyaddr::		lookup host and service names by address.
+* netdir_options::		set or clear transport provider options.
+* taddr2uaddr::			convert trasnport address to universal address.
+* uaddr2taddr::			convert universal address to transport address.
+* netdir_free::			free netdir datastructure.
+* netdir_perror::		print netdir error to standard error.
+* netdir_sperror::		retreive netdir error string.
+@end menu
+
+@subsubheading Name
+
+@strong{netdir} - Network Directory service subroutines
+
+@subsubheading Synopsis
+@example
+#include <netconfig.h>
+
+int netdir_getbyname(struct netconfig *@var{config},
+    struct nd_hostserv *@var{service}, struct nd_addrlist **@var{addrs});
+
+int netdir_getbyaddr(struct netconfig *@var{config},
+    struct nd_hostservlist **@var{services}, struct netbuf *@var{addr});
+
+int netdir_options(struct netconfig *@var{config},
+    int @var{option}, int @var{fd}, char *@var{point_to_args});
+
+char *taddr2uaddr(struct netconfig *@var{config},
+    struct netbuf *@var{addr});
+
+struct netbuf *uaddr2taddr(struct netconfig *@var{config},
+    struct netbuf *@var{addr});
+
+void netdir_free(void *@var{ptr}, int @var{struct_type});
+
+void netdir_perror(char *@var{msg});
+
+char *netdir_sperror(void);
+@end example
+
+@subsubheading Arguments
+
+@table @var
+@item config
+A pointer to a @type{netconfig} structure describing the network transport
+provider returned by @manpage{getnetconfig(3)} or @manpage{getnetpath(3)}.
+
+@item service
+A pointer to a @type{nd_hostserv} structure describing the name of a host
+service.
+
+@item services
+A pointer to a @type{nd_hostservlist} structure array describing the name(s)
+of a host service.
+
+@item addr
+A pointer to a @type{netbuf} structure containing a transport or universal
+address.
+
+@item option
+The name of a universal network option.  It can have values as follows:
+
+The following are @cite{Solaris} TI-RPC 2.3 options:
+
+@table @var
+@item ND_SET_BROADCAST
+Permit use of broadcast address on trasnport endpoint.
+
+@item ND_SET_RESERVED_PORT
+Bind to a reserved port on transport endpoint.
+
+@item ND_CHECK_RESERVED_PORT
+Check if port in address is reserved.
+
+@item ND_MERGEADDR
+Merge underspecified server address with client address.
+
+@item ND_JOIN_MULTICAST
+Join a multicast group.
+
+@item ND_LEAVE_MULTICAST
+Leave a multicast group.
+
+@end table
+
+The following are @cite{UnixWare} extensions:
+
+@table @var
+@item ND_CLEAR_BROADCAST
+Prohibit use of broadcast address on transport endpoint.
+
+@item ND_SET_REUSEADDR
+Permit reuse of local addresses for transport endpoint.
+
+@item ND_CLEAR_REUSEADDR
+Prohibit reuse of local addresses for tansport endpoint.
+
+@end table
+
+The following are @cite{OpenSS7} extensions:
+
+@table @var
+@item ND_SET_DONTROUTE
+Do not route packets from transport endpoint.
+
+@item ND_CLEAR_DONTROUTE
+Route packets from trasnport endpoint.
+
+@item ND_SET_KEEPALIVE
+Set keepalive on transport endpoint.
+
+@item ND_CLEAR_KEEPALIVE
+Clear keepalive on transport endpoint.
+
+@item ND_SET_PRIORITY
+Set priority of transport endpoint.
+
+@end table
+
+@item fd
+A file descriptor associated with a transport endpoint of the type associated
+with the @var{config} @type{netconfig} structure.
+
+@item point_to_args
+A pointer to the argument values associated with @var{option}.
+
+@item ptr
+A pointer to a structure to free.
+
+@item struct_type
+The structure type to free.  This argument can have values:
+
+@table @var
+@item ND_ADDR
+@type{netbuf} structure.
+
+@item ND_ADDRLIST
+@type{nd_addrlist} structure.
+
+@item ND_HOSTSERV
+@type{nd_hostserv} structure.
+
+@item ND_HOSTSERVLIST
+@type{nd_hostservlist} structure.
+
+@end table
+
+@item msg
+A pointer to a string to prefix to the printed error message (followed by a
+colon).
+
+@end table
+
+@subsubheading Description
+
+@cite{UNIX} has traditionally provided three components of the Network
+Services Library, @file{libnsl}, that are associated with Transport Provider
+Interface, @manpage{tpi(7)}, @dfn{STREAMS} network pseudo-evice drivers, and
+that are not currently part of the @cite{Linux} Network Services Library.
+These components are:
+
+@enumerate
+@item Network Configuration database access, @manpage{netconfig(3)},
+@item Network Directory and address mapping, @manpage{netdir(3)}, and
+@item Network Path access, @manpage{netpath(3)}.
+@end enumerate
+
+These are often referred to collectively as the Network Selection facility of
+the Network Services Library.
+
+@subsubheading Database Format
+
+The @type{netconfig} structure is defined in @manpage{netconfig(3)} and
+@manpage{netconfig(5)}.
+
+@subsubheading Structure Format
+
+The @type{netbuf} structure is defined in @file{xti.h} and is structured as
+follows:
+
+@smallexample
+struct netbuf @{
+    unsigned int maxlen;
+    unsigned int len;
+    char *buf;
+@};
+@end smallexample
+
+@table @asis
+@item @member{maxlen}
+the maximum length of the supplied buffer, @member{buf}.
+@item @member{len}
+the length of the filled buffer, @member{buf}.
+@item @member{buf}
+a pointer to the buffer.
+@end table
+
+The @type{nd_addrlist} structure is defined in @file{netconfig.h} and is
+structured as follows:
+
+@smallexample
+struct nd_addrlist @{
+    int n_cnt;               /* number of addresses */
+    struct netbuf *n_addrs;  /* the addresses (array) */
+@};
+@end smallexample
+
+@table @asis
+@item @member{n_cnt}
+the number of addresses in the list.
+@item @member{n_addrs}
+a pointer to an array of @type{netbuf} structures forming the address list.
+@end table
+
+The @type{nd_hostserv} structure is defined in @file{netconfig.h} and is
+structured as follows:
+
+@smallexample
+struct nd_hostserv @{
+    char *h_name;  /* host name */
+    char *h_serv;  /* service name */
+@};
+@end smallexample
+
+@table @asis
+@item @member{h_name}
+the host (machine) name.
+
+The following special host names are defined in @file{netdir.h}:
+
+@table @var
+@item HOST_SELF
+Local host name.
+@item HOST_ANY
+Any host name.
+@item HOST_BROADCAST
+All addresses accessible by transport.
+@item HOST_SELF_CONNECT
+Address for onnecting to the local host.
+@item HOST_SELF_BIND
+Bind to one's self.
+@item HOST_ALLNODES
+All nodes (broadcast or rpcbind broadcast).
+@item HOST_RPCNODES
+All RPC nodes (multicast or rpcbind multicast).
+@end table
+
+@item @member{h_serv}
+the service name.
+@end table
+
+The @type{nd_hostservlist} structure is defined in @file{netconfig.h} and is
+structured as follows:
+
+@smallexample
+struct nd_hostservlist @{
+    int *h_cnt;  /* number of hostservs found */
+    struct hostserv *h_hostservs;
+@};
+@end smallexample
+
+@table @member
+@item h_cnt
+the number of services in the list.
+
+@item h_hostservs
+a pointer to an array of @type{nd_hostserv} structures forming the service
+list.
+
+@end table
+
+@subsubheading Caveats
+
+@manpage{netdir_perror(3)} and @manpage{netdir_sperror(3)} must be called
+immediately after the failed network configuration subroutine fails.
+Otherwise, the error condition may be lost.
+
+@subsubheading Return Value
+
+Upon successful completion, @manpage{netdir_getbyname(3)},
+@manpage{netdir_getbyaddr(3)} and @manpage{netdir_options(3)} return @samp{0}.
+Otherwise, @samp{-1} is returned and @manpage{_nderror} is set to indicate the
+error.
+
+@subsubheading Errors
+
+A name-to-address mapping function will fail if:
+
+@table @error
+@item ND_TRY_AGAIN
+"@i{n2a: non-authoritative host not found}" @*
+The host was not found, however, a name-to-address mapping function suffered a temporary failure
+(such as a timeout).
+
+@item ND_NO_RECOVERY
+"@i{n2a: non-recoverable error}" @*
+The last name-to-address translation function suffered an unrecoverable error in one of its lookup
+libraries.
+
+@item ND_NO_DATA
+"@i{n2a: no data record of requested type}" @*
+The last name-to-address translation function could find no data of the requested type in one of its
+lookup libraries.
+
+@item ND_NO_ADDRESS
+"@i{n2a: no data record of requested type}" @*
+The last name-to-address translation function could find no address of the requested type in one of
+its lookup libraries.
+
+@item ND_BADARG
+"@i{n2a: bad arguments passed to routine}" @*
+The last name-to-address translation function was passed a bad argument.
+
+@item ND_NOMEM
+"@i{n2a: memory allocation failed}" @*
+The last name-to-address translation function could not allocate memory necessary to complete the
+operation.
+
+@item ND_OK
+"@i{n2a: successful completion}" @*
+The last name-to-address translation function completed successfully, or there was no previous
+name-to-address translation function called.
+
+@item ND_NOHOST
+"@i{n2a: hostname not found}" @*
+The last name-to-address translation function, @manpage{netdir_getbyname(3)},
+could not find, or does not support, the specified host name.
+
+@item ND_NOSERV
+"@i{n2a: service name not found}" @*
+The last name-to-address translation function, @manpage{netdir_getbyname(3)},
+could not find, or does not support, the specified service name.
+
+@item ND_NOSYM
+"@i{n2a: symbol missing in shared object : %s}" @*
+One of the required symbols, see @manpage{netdir(5)}, was missing from a
+shared object specified in the @member{nc_lookup} member of the
+@manpage{netconfig(5)} structure referenced by a @var{config} argument.
+@samp{%s} is replaced with the last @manpage{dlerror(3)} string.
+
+@item ND_OPEN
+"@i{n2a: could not open shared object : %s}" @*
+One of the shared objects specified in the @member{nc_lookup} member of the
+@manpage{netconfig(5)} structure referenced by a @var{config} argument could
+not be opened.  @samp{%s} is replaced with the last @manpage{dlerror(3)}
+string.
+
+@item ND_ACCESS
+"@i{n2a: access denied for shared object}" @*
+One of the shared objects specified in the @member{nc_lookup} member of the
+@manpage{netconfig(5)} structure referenced by a @var{config} argument could
+not be opened due to access permission.
+
+@item ND_UKNWN
+"@i{n2a: attempt to free unknown object}" @*
+@manpage{netdir_free(3)} was called with an unknown @var{struct_type} argument
+value.
+
+@item ND_NOCTRL
+"@i{n2a: unknown option passed}" @*
+@manpage{netdir_options(3)} was passed an unknown @var{option} argument value.
+
+@item ND_FAILCTRL
+"@i{n2a: control operation failed}" @*
+The @manpage{netdir_options(3)} control operation failed.
+
+@item ND_SYSTEM
+"@i{n2a: system error}" @*
+During the last name-to-address translation function, a system error occurred.
+The @cite{Linux} system error is in @manpage{errno(3)}.
+The @manpage{xti(3)} error in @manpage{t_errno(3)} might also provide some
+insight into the error.
+
+@item ND_NOCONVERT
+"@i{n2a: conversion not possible}" @*
+During the last name-to-address translation function it was discovered that character string
+conversion was not possible.
+
+@item other
+"@i{n2a: unknown error %d}" @*
+An internal error occured in the @manpage{libxnsl(3)} library or a loaded
+shared object.  @samp{%d} is the decimal number of the error number that was
+contained in @manpage{_nderror}.
+
+@end table
+
+An error message corresponding to the @manpage{_nderror} value can be
+retrieved using @manpage{netdir_sperror(3)} or printed to standard error using
+@manpage{netdir_perror(3)}.
+
+@subsubheading Files
+
+@table @file
+@item /etc/netconfig
+The Network Configuration database file.  See @manref{netconfig(5)}.
+
+@item /usr/lib/libxnsl.so
+The X/Open Network Services Library shared object library.
+
+@item /usr/lib/libxnsl.a
+The X/Open Network Services Library static library.
+
+@end table
+
+@subsubheading See Also
+
+@manref{netconfig(5)},
+@manref{netconfig(3)},
+@manref{netpath(3)},
+@cite{RFC 1833}.
+
+@subsubheading Compatibility
+
+These network configuration subroutines are compatible with @cite{SVR 4.2} and
+systems based on @cite{SVR 4.2}, including @cite{AIX}, @cite{Solaris} and
+@cite{UnixWare}, with the following compatibility considerations:
+
+@itemize --
+@item
+@cite{Solaris} and @cite{UnixWare} describe the @manpage{nc_sperror(3)}
+subrouting as returning a pointer to thread-specific data and that the buffer
+could change at any point.  While the error value is saved as thread-specific
+data, this implementation of @manpage{nc_sperror(3)} returns a pointer to a
+shared read-only string that is valid for the duration of the calling process.
+
+@item
+@cite{Solaris} does not document the @var{ND_CLEAR_BROADCAST},
+@cite{ND_SET_REUSEADDR} nor @cite{ND_CLEAR_REUSEADDR} options to
+@manpage{netdir_options(3)}.  @cite{UnixWare} does.
+
+@item
+@cite{UnixWare} documents that @manpage{_nderror} contains the cause of
+failure and that @manpage{t_errno(3)} may provide some additional insights
+into why a call failed.
+
+@cite{@value{PACKAGE_TITLE}} stores the error condition in @manpage{_nderror}.
+
+@item
+Diagnostic message strings are not documented and are incompatible.
+
+@item
+Binary compatibility would only be coincidental.
+
+@item
+On @cite{UNIX} systems, these utility subroutines are normally part of the
+Network Services Library, @file{libnsl}; however, @cite{Linux} already has a
+library of that name (which unfortunately is missing these components), and,
+therefore, @cite{@value{PACKAGE_TITLE}} renames the library to
+@manpage{libxnsl(3)}.
+
+@end itemize
+
+See @manref{libxnsl(3)} for additional compatibility information.
+
+@subsubheading Conforming To
+
+@cite{SVR 4.2}.
+
+@subsubheading History
+
+The network configuration subroutines first appeared in @cite{SVR 4.2}.  These
+subroutines are related to the @cite{UNIX} @dfn{STREAMS} implementation of
+network transport providers.
 
 @page
-@node t_open,  ,  , Reference
-@subsection t_open
-@fnindex t_open
+@node netdir_getbyname
+@unnumberedsubsubsec netdir_getbyname
+@fnindex netdir_getbyname
+
+@subsubheading Name
+
+@strong{netdir_getbyname}, @strong{_netdir_getbyname} - lookup address in directory service by name
+
+@subsubheading Synopsis
+@example
+#include <netdir.h>
+
+int netdir_getbyname(struct netconfig *@var{config},
+    struct nd_hostserv *@var{service}, struct nd_addrlist **@var{addrs});
+
+struct nd_addrlist *_netdir_getbyname(struct netconfig *@var{config},
+    struct nd_hostserv *@var{service});
+@end example
+
+@subsubheading Arguments
+
+@table @var
+
+@item config
+A pointer to a @type{netconfig} structure describing the network trasnport
+provider returned by @manpage{getnetconfig(3)} or @manpage{getnetpath(3)}.
+
+@item service
+A pointer to a @type{nd_hostserv} structure describing the name of a host
+service.
+
+@item addrs
+A pointer to a @type{nd_addrlist} array describing the returned transport
+address(es).
+
+@end table
+
+@subsubheading Description
+
+@cite{UNIX} has traditionally provided three components of the Network
+Services Library, @file{libnsl}, that are associated with Transport Provider
+Interface, @manpage{tpi(7)}, @dfn{STREAMS} network pseudo-evice drivers, and
+that are not currently part of the @cite{Linux} Network Services Library.
+These components are:
+
+@enumerate
+@item Network Configuration database access, @manpage{netconfig(3)},
+@item Network Directory and address mapping, @manpage{netdir(3)}, and
+@item Network Path access, @manpage{netpath(3)}.
+@end enumerate
+
+These are often referred to collectively as the Network Selection facility of
+the Network Services Library.
+
+@manpage{netdir_getbyname(3)} provides a forward directory name service for
+the network trasnport protocol specified with a pointer to a @type{netconfig}
+structure, @var{config}.  The @var{config} pointer is acquired using the
+@manpage{getnetconfig(3)}, @manpage{getnetconfigent(3)} or
+@manpage{getnetpath(3)} subroutines and describes a particular transport
+protocol from the @manpage{netconfig(5)} network configuration database.  The
+host and service name tupe to forward lookup is specified as a pointer to a
+@type{hd_hostserv} structure, @var{service}, that contains the host and
+service name tuple (the structure is described below).
+@manpage{netdir_getbyname(3)} returns into the pointer referenced by
+@var{addrs} a pointer to a @type{nd_addrlist} structure that contains the
+addresses associated with the name, @var{service}.
+
+Once the @type{nd_addrlist} structure and the @manpage{netbuf(3)} structures
+that it contains are no longer required, they are freed by passing a pointer
+to the structure to @manpage{netdir_free(3)} with a @var{struct_type} argument
+of @var{ND_ADDRLIST}.
+
+@subsubheading Structure Format
+
+The @type{netconfig} structure is defined in @file{netconfig.h} and described
+in @manpage{netconfig(3)} and @manpage{netconfig(5)}.
+
+The @type{nd_hostserv} structure is defined in @file{netconfig.h} and is
+structured as follows:
+
+@smallexample
+struct nd_hostserv @{
+    char *h_name;  /* host name */
+    char *h_serv;  /* service name */
+@};
+@end smallexample
+
+@table @asis
+@item @member{h_name}
+the host (machine) name.
+
+The following special host names are defined in @file{netdir.h}:
+
+@table @var
+@item HOST_SELF
+Local host name.
+@item HOST_ANY
+Any host name.
+@item HOST_BROADCAST
+All addresses accessible by transport.
+@item HOST_SELF_CONNECT
+Address for onnecting to the local host.
+@item HOST_SELF_BIND
+Bind to one's self.
+@item HOST_ALLNODES
+All nodes (broadcast or rpcbind broadcast).
+@item HOST_RPCNODES
+All RPC nodes (multicast or rpcbind multicast).
+@end table
+
+@item @member{h_serv}
+the service name.
+@end table
+
+Upon successful return, the pointer referenced by the @var{addrs} pointer,
+points to an allocated @type{nd_addrlist} structure containing the addresses
+associated with the specified host and service name, @var{service}.  The
+@type{nd_addrlist} structure is defined in @file{netconfig.h} and is
+structured as follows:
+
+@smallexample
+struct nd_addrlist @{
+    int n_cnt;               /* number of addresses */
+    struct netbuf *n_addrs;  /* the addresses (array) */
+@};
+@end smallexample
+
+@table @asis
+@item @member{n_cnt}
+the number of addresses in the list.
+@item @member{n_addrs}
+a pointer to an array of @type{netbuf} structures forming the address list.
+@end table
+
+Each address in the list pointed to by the @member{n_addrs} member of the
+@type{nd_addrlist} structure is formatted as a @manpage{netbuf(3)} structure.
+The @type{netbuf} structure is defined in @file{xti.h} and described in
+@manpage{netbuf(3)}.
+
+@subsubheading Usage
+
+The procedure for use of the @manpage{netdir_getbyname(3)} subroutine is to
+first acquire a pointer to a @type{netconfig} structure representing the entry
+in the @manpage{netconfig(5)} database using a function such as
+@manpage{getnetconfig(3)}, @manpage{getnetconfigent(3)} or
+@manpage{getnetpath(3)}.  Then a host and service name tuple is placed in a
+@type{nd_hostserv} structure and passed to the @manpage{netdir_getbyname(3)}
+function.  The returned @type{nd_addrlist} structure pointer contains the
+address associated with the name.  Once the @type{nd_addrlist} structure is no
+longer required, it is freed with @manpage{netdir_free(3)} with a
+@var{struct_type} of @var{ND_ADDRLIST}.
+
+For Internet Protocols transports, (that is, when @var{config} points to a
+@type{netconfig} structure corresponding to an Internet Protocol Version 4 or
+Version 6 network), @manpage{netdir_getbyname(3)} is roughly equivalent to
+@manpage{gethostbyname(3)} or @manpage{getipnodebyname(3)}; however,
+@manpage{netdir_getbyname(3)} is more general and applies to networks other
+than @samp{inet} or @samp{inet6}.  Also, @manpage{gethostbyname(3)} and
+@manpage{getipnodebyname(3)} do not accept a service name, nor return a port
+number.
+
+@subsubheading Return Value
+
+Upon successful completion, @manpage{netdir_getbyname(3)} returns zero
+(@samp{0}) and places a pointer to an allocated @type{nd_addrlist} structure
+in the pointer referenced by the @var{addrs} argument.  Otherwise, minus one
+(@samp{-1}) is returned and @manpage{_nderror(3)} is set to indicate the
+error.
+
+@subsubheading Errors
+
+When @manpage{netdir_getbyname()} fails, it returned minus one (@samp{-1}) and
+sets @manpage{_nderror(3)} to one of the following error codes:
+
+@table @error
+@item ND_TRY_AGAIN
+"@i{n2a: non-authoritative host not found}" @*
+The host was not found, however, a name-to-address mapping function suffered a temporary failure
+(such as a timeout).
+
+@item ND_NO_RECOVERY
+"@i{n2a: non-recoverable error}" @*
+The last name-to-address translation function suffered an unrecoverable error in one of its lookup
+libraries.
+
+@item ND_NO_DATA
+"@i{n2a: no data record of requested type}" @*
+The last name-to-address translation function could find no data of the requested type in one of its
+lookup libraries.
+
+@item ND_NO_ADDRESS
+"@i{n2a: no data record of requested type}" @*
+The last name-to-address translation function could find no address of the requested type in one of
+its lookup libraries.
+
+@item ND_BADARG
+"@i{n2a: bad arguments passed to routine}" @*
+The last name-to-address translation function was passed a bad argument.
+
+@item ND_NOMEM
+"@i{n2a: memory allocation failed}" @*
+The last name-to-address translation function could not allocate memory necessary to complete the
+operation.
+
+@item ND_NOHOST
+"@i{n2a: hostname not found}" @*
+The last name-to-address translation function, @manpage{netdir_getbyname(3)},
+could not find, or does not support, the specified host name.
+
+@item ND_NOSERV
+"@i{n2a: service name not found}" @*
+The last name-to-address translation function, @manpage{netdir_getbyname(3)},
+could not find, or does not support, the specified service name.
+
+@item ND_NOSYM
+"@i{n2a: symbol missing in shared object : %s}" @*
+One of the required symbols, see @manpage{netdir(5)}, was missing from a
+shared object specified in the @member{nc_lookup} member of the
+@manpage{netconfig(5)} structure referenced by a @var{config} argument.
+@samp{%s} is replaced with the last @manpage{dlerror(3)} string.
+
+@item ND_OPEN
+"@i{n2a: could not open shared object : %s}" @*
+One of the shared objects specified in the @member{nc_lookup} member of the
+@manpage{netconfig(5)} structure referenced by a @var{config} argument could
+not be opened.  @samp{%s} is replaced with the last @manpage{dlerror(3)}
+string.
+
+@item ND_ACCESS
+"@i{n2a: access denied for shared object}" @*
+One of the shared objects specified in the @member{nc_lookup} member of the
+@manpage{netconfig(5)} structure referenced by a @var{config} argument could
+not be opened due to access permission.
+
+@item ND_SYSTEM
+"@i{n2a: system error}" @*
+During the last name-to-address translation function, a system error occurred.
+The @cite{Linux} system error is in @manpage{errno(3)}.
+The @manpage{xti(3)} error in @manpage{t_errno(3)} might also provide some
+insight into the error.
+
+@item other
+"@i{n2a: unknown error %d}" @*
+An internal error occured in the @manpage{libxnsl(3)} library or a loaded
+shared object.  @samp{%d} is the decimal number of the error number that was
+contained in @manpage{_nderror}.
+
+@end table
+
+When an error occurs, an error message can be printed to standard error or
+retrieved using @manpage{netdir_perror(3)} or @manpage{netdir_sperror(3)}.
+
+@subsubheading Caveats
+
+Note that when the @member{h_serv} member of the @type{nd_hostserv} structure
+is specified as @samp{NULL}, @manpage{netdir_getbyname(3)} will attempt to
+formulate and return host-based addresses only.
+
+@manpage{netdir_perror(3)} and @manpage{netdir_sperror(3)} must be called
+immediately after the failed network configuration subroutine fails.
+Otherwise, the error condition in @manpage{_nderror(3)} may be lost.
+
+The poinoter returned to the pointer referenced by the @var{addrs} argument
+must eventually be released by passing it to @manpage{netdir_free(3)} with a
+@var{struct_type} argument of @var{ND_ADDRLIST}.
+
+@subsubheading Implementation
+
+Name to address lookup libraries that will have their
+@manpage{_netdir_getbyname(3)} dynamic symbols called to perform the lookup
+will be searched in the order that they appear in the @member{nc_lookups}
+member of the specified @type{netconfig} structure, @var{config}.  If
+@var{config} specifies an @samp{inet} or @samp{inet6} network, and the number
+of lookup libraries, @member{nc_lookups}, is zero, the standard BSD inet
+lookup functions will be used.
+
+@manpage{_netdir_getbyname} is the symbol provided by shared object lookup
+libraries to implement @manpage{netdir_getbyname(3)}.  If the library does not
+implement @manpage{_netdir_getbyname}, @manpage{netdir_getbyname(3)} will
+fail, return minus one (@samp{-1}) and set @manpage{_nderror(3)} to
+@error{ND_NOSYM}.
+
+@subsubheading Files
+
+@table @file
+@item /etc/netconfig
+The Network Configuration database file.  See @manref{netconfig(5)}.
+
+@item /usr/lib/libxnsl.so
+The X/Open Network Services Library shared object library.
+
+@item /usr/lib/libxnsl.a
+The X/Open Network Services Library static library.
+
+@end table
+
+@subsubheading See Also
+
+@manref{netdir(3)},
+@manref{netconfig(5)},
+@manref{netconfig(3)},
+@manref{netpath(3)},
+@cite{RFC 1833}.
+
+@subsubheading
+
+@manpage{netdir_getbyname} has no known bugs.
+
+@subsubheading Compatibility
+
+@manpage{netdir_getbyname(3)} is compatible with @cite{SVR 4.2} and systems
+based on @cite{SVR 4.2}, including @cite{AIX}, @cite{HP-UX}, @cite{Solaris}
+and @cite{UnixWare}, with the following compatibility considerations:
+
+@itemize --
+@item @cite{UnixWare} documents that @manpage{_nderror(3)} contains the cause
+of failure and that @manpage{t_errno(3)} may provide some additional insights
+into why a call failed.
+
+@cite{@value{PACKAGE_TITLE}} stores the error condition in @manpage{_nderror(3)}.
+
+@item Diagnostic message strings are not documented and are incompatible.
+
+@item Binary compatibility would only be coincidental.
+
+@item On @cite{UNIX} systems, these utility subroutines are normally part of
+the Network Services Library, @file{libnsl}; however, @cite{Linux} already has
+a library of that name (which unfortunately is missing these components), and,
+therefore, @cite{@value{PACKAGE_TITLE}} renames the library to
+@manpage{libxnsl(3)}.  This means that both the @samp{-lnsl} and @samp{-lxnsl}
+flags must be provided on the @command{gcc} command line.
+@end itemize
+
+See @manref{libxnsl(3)} for additional compatibility information.
+
+@subsubheading Conforming To
+
+@cite{SVR 4.2}.
+
+@subsubheading History
+
+The network configuration subroutines first appeared in @cite{SVR 4.2}.  These
+subroutines are related to the @cite{UNIX} @dfn{STREAMS} implementation of
+network transport providers.
 
 @page
-@node t_optmgmt,  ,  , Reference
-@subsection t_optmgmt
-@fnindex t_optmgmt
+@node netdir_getbyaddr
+@unnumberedsubsubsec netdir_getbyaddr
+@fnindex netdir_getbyaddr
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_rcv,  ,  , Reference
-@subsection t_rcv
-@fnindex t_rcv
+@node netdir_options
+@unnumberedsubsubsec netdir_options
+@fnindex netdir_options
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_rcvconnect,  ,  , Reference
-@subsection t_rcvconnect
-@fnindex t_rcvconnect
+@node taddr2uaddr
+@unnumberedsubsubsec taddr2uaddr
+@fnindex taddr2uaddr
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_rcvdis,  ,  , Reference
-@subsection t_rcvdis
-@fnindex t_rcvdis
+@node uaddr2taddr
+@unnumberedsubsubsec uaddr2taddr
+@fnindex uaddr2taddr
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_rcvleafchange,  ,  , Reference
-@subsection t_rcvleafchange
-@fnindex t_rcvleafchange
+@node netdir_free
+@unnumberedsubsubsec netdir_free
+@fnindex netdir_free
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_rcvrel,  ,  , Reference
-@subsection t_rcvrel
-@fnindex t_rcvrel
+@node netdir_perror
+@unnumberedsubsubsec netdir_perror
+@fnindex netdir_perror
+
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
 @page
-@node t_rcvreldata,  ,  , Reference
-@subsection t_rcvreldata
-@fnindex t_rcvreldata
+@node netdir_sperror
+@unnumberedsubsubsec netdir_sperror
+@fnindex netdir_sperror
 
-@page
-@node t_rcvudata,  ,  , Reference
-@subsection t_rcvudata
-@fnindex t_rcvudata
+@subsubheading Name
+@subsubheading Synopsis
+@subsubheading Arguments
+@subsubheading Description
+@subsubheading Caveats
+@subsubheading Return Value
+@subsubheading Errors
+@subsubheading See Also
+@subsubheading Conforming To
 
-@page
-@node t_rcvuderr,  ,  , Reference
-@subsection t_rcvuderr
-@fnindex t_rcvuderr
-
-@page
-@node t_rcvv,  ,  , Reference
-@subsection t_rcvv
-@fnindex t_rcvv
-
-@page
-@node t_rcvvudata,  ,  , Reference
-@subsection t_rcvvudata
-@fnindex t_rcvvudata
-
-@page
-@node t_removeleaf,  ,  , Reference
-@subsection t_removeleaf
-@fnindex t_removeleaf
-
-@page
-@node t_snd,  ,  , Reference
-@subsection t_snd
-@fnindex t_snd
-
-@page
-@node t_snddis,  ,  , Reference
-@subsection t_snddis
-@fnindex t_snddis
-
-@page
-@node t_sndrel,  ,  , Reference
-@subsection t_sndrel
-@fnindex t_sndrel
-
-@page
-@node t_sndreldata,  ,  , Reference
-@subsection t_sndreldata
-@fnindex t_sndreldata
-
-@page
-@node t_sndudata,  ,  , Reference
-@subsection t_sndudata
-@fnindex t_sndudata
-
-@page
-@node t_sndv,  ,  , Reference
-@subsection t_sndv
-@fnindex t_sndv
-
-@page
-@node t_sndvudata,  ,  , Reference
-@subsection t_sndvudata
-@fnindex t_sndvudata
-
-@page
-@node t_strerror,  ,  , Reference
-@subsection t_strerror
-@fnindex t_strerror
-
-@page
-@node t_sync,  ,  , Reference
-@subsection t_sync
-@fnindex t_sync
-
-@page
-@node t_sysconf,  ,  , Reference
-@subsection t_sysconf
-@fnindex t_sysconf
-
-@page
-@node t_unbind,  ,  , Reference
-@subsection t_unbind
-@fnindex t_unbind
-
-
-@page
-@node XTI Header File Reference,  ,  , Reference
-@section XTI Header File Reference
+@node XNS Header File Reference
+@section XNS Header File Reference
 
 @cpindex header files
 
-@page
-@node xti,  ,  , Reference
-@subsection xti
-@pgindex xti
-
-@cpindex header files, xti
-@cpindex xti header file
+@menu
+* netconfig.h::			Network Configuration header file.
+@end menu
 
 @page
-@node xti_ip,  ,  , Reference
-@subsection xti_ip
-@pgindex xti_ip
+@node netconfig.h
+@unnumberedsubsec netconfig.h
+@pgindex netconfig
 
-@cpindex header files, xti ip
-@cpindex xti ip header file
-@cpindex ip, xti header file
-
-@page
-@node xti_mtp,  ,  , Reference
-@subsection xti_mtp
-@pgindex xti_mtp
+@cpindex header files, netconfig
+@cpindex netconfig header file
 
 @page
-@node xti_sccp,  ,  , Reference
-@subsection xti_sccp
-@pgindex xti_sccp
-
-@page
-@node xti_sctp,  ,  , Reference
-@subsection xti_sctp
-@pgindex xti_sctp
-
-@page
-@node xti_ss7,  ,  , Reference
-@subsection xti_ss7
-@pgindex xti_ss7
-
-@page
-@node xti_sscop,  ,  , Reference
-@subsection xti_sccop
-@pgindex xti_sccop
-
-@page
-@node xti_tcap,  ,  , Reference
-@subsection xti_tcap
-@pgindex xti_tcap
-
-@page
-@node xti_tcp,  ,  , Reference
-@subsection xti_tcp
-@pgindex xti_tcp
-
-@page
-@node xti_udp,  ,  , Reference
-@subsection xti_udp
-@pgindex xti_udp
-
-
-
-
-@page
-@node Conformance, Multi-Threading, Reference, Top
+@node Conformance
 @chapter Conformance
 @cindex conformance
 
-This section lists the standards conformance of the OpenSS7 XTI Library.
+This section lists the standards conformance of the OpenSS7 XNS Library.
 
 
 
 
-@node Multi-Threading, Error Handling, Conformance, Top
+@node Multi-Threading
 @chapter Multi-Threading
 @cindex thread safety
 
 
-@node Error Handling, Installation, Multi-Threading, Top
+@node Error Handling
 @chapter Error Handling
 @cindex error handling
 
-This chapter describes error handling in the XTI Library.
+This chapter describes error handling in the XNS Library.
 
 
 
-@node Installation, Bugs, Error Handling, Top
+@node Installation
 @chapter Installation
 @cindex installation
 
-This chapter describes configuration, compilation and installation of the XTI
+This chapter describes configuration, compilation and installation of the XNS
 library.
 
 
 
-@node Bugs, Public License, Installation, Top
+@node Bugs
 @chapter Bugs
 @cindex bugs
 
 This is a description of the known bugs, installation troubles, known causes of
 trouble, troubleshooting.
 
-@node Public License, Documentation License, Bugs, Top
+@node Public License
 @appendix Public License
 @include texi/lesser.texi
 
-@node Documentation License, Concept Index, Public License, Top
+@node Documentation License
 @appendix Dcoumentation License
 @include texi/fdl.texi
 
 @page
-@node Concept Index, Type Index, Documentation License, Top
+@node Concept Index
 @appendix Indices
 @appendixsec Concept Index
 
 @printindex cp
 
 @page
-@node Type Index, Function Index, Concept Index, Top
+@node Type Index
 @appendixsec Type Index
 
 @printindex tp
 
 @page
-@node Function Index, Variable Index, Type Index, Top
+@node Function Index
 @appendixsec Function and Macro Index
 
 @printindex fn
 
 @page
-@node Variable Index, File Index, Function Index, Top
+@node Variable Index
 @appendixsec Variable and Constant Macro Index
 
 @printindex vr
 
 @page
-@node File Index, , Variable Index, Top
+@node File Index
 @appendixsec Program and File Index
 
 @printindex pg

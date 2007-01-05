@@ -118,9 +118,12 @@ The
 package is one of the several optional add-on packages that provide enhanced network service support
 beyond that provided by the base
 .I STREAMS
-package.  This package provides support for library functions termed the
+package.  This package provides support for
+library functions termed the
 .I Network Services Library
-not provided by the base package.
+not provided by the base
+.I STREAMS
+package.
 .\"
 .\"
 .SH DESCRIPTION
@@ -271,16 +274,27 @@ library.
 .\"
 .SH MODULES
 .PP
-None.
+The
+.B @PACKAGE@
+package does not provide
+.I STREAMS
+modules.
 .\"
 .\"
 .SH DEVICES
 .PP
-None.
+The
+.B @PACKAGE@
+package does not provide
+.I STREAMS
+drivers.
 .\"
 .\"
 .SH PREREQUISITES
 .PP
+The
+.B @PACKAGE@
+package request the following packages to be installed:
 .TP
 .BR streams (5)
 The
@@ -290,7 +304,7 @@ base package.
 .BR strcompat (5)
 The
 .B Linux Fast-STREAMS
-compatiblity modules.
+compatibility modules package.
 .TP
 .BR strxnet (5)
 The
@@ -322,25 +336,31 @@ will not support this package for
 please upgrade to
 .BR "Linux Fast-STREAMS" .
 .PP
-.I Pre-alpha
-releases are releases that have received no testing whatsoever.  Code in the release is not even
-known to configure or compile.  The purpose of a pre-alpha release is to make code and documenation
-available for insepection only, and to solicit comments on the design approach or other
-characteristics of the software package.
+.I Alpha
+release are releases that have received little to no testing, or that have been tested
+and contains known bugs or defects that make the package unsuitable even for testing.  The purpose
+for an
+.I alpha
+release are the same as for the
+.I pre-alpha
+release, with the additional purpose that it is an earily release of partially functional code that
+has problems that an external developer might be willing to fix themselves and contribute back to
+the project.
 .PP
-.I Pre-alpha
-release packages ship containing warnings recommending that the user not even execute the contained
-code.
+.I Alpha
+release packages ship containing warnings that executing the code can crash machines and might
+possibly do damage to systems upon which it is executed.
 .PP
 The
 .B @PACKAGE_TITLE@
-package has known and unknown defects.  This is a
-.I pre-alpha
-release.  Some defects might be harmful.  No validation testing whatsoever has been performed by the
+package has unknown defects.  This is an
+.I alpha
+release.  Some defects could be harmful.  No validation testing whatsoever has been performed by the
 .I OpenSS7 Project
-on this software.  The software might not even configure or compile.  The
+on this software.  The software might fail to configure or compile on some systems.  The
 .I OpenSS7 Project
-recommends that you do not use this software. Use at your own risk.  Remember that there is
+recommends that you do not use this software for purposes other than develoment or evaluation, and
+then only with great care.  Use at your own risk.  Remember that there is
 .BR "NO WARRANTY" .
 (See the section
 .RI \(lq "NO WARRANTY" \(rq
@@ -349,13 +369,13 @@ under the
 in the manual.)
 .PP
 This software is
-.I pre-alpha
-software.  As such, it will crash your kernel.  Installation of the software will irreparably mangle
-your header files or Linux distribution in such a way as to make it unusable.  Crashes will lock
-your system and rebooting the system will not repair the problem.  You will lose all the data on
-your system.  Because this software will crash your kernel, the resulting unstable system can
-destroy computer hardware or peripherals making them unusable.  You will void the warranty on any
-system on which you run this software.
+.I alpha
+software.  As such, it can likely crash your kernel.  Installation of the software can irreparably
+mangle your header files or Linux distribution in such a way as to make it unusable.  Crashes could
+lock your system and rebooting the system might not repair the problem.  You can possibly lose all
+the data on your system.  Because this software can crash your kernel, the resulting unstable system
+could destroy computer hardware or peripherals making them unusable.  You could void the warranty on
+any system on which you run this software.
 .BR "YOU HAVE BEEN WARNED" .
 .\"
 .\"
@@ -366,7 +386,7 @@ The
 package is compatible with a wide array of production
 .B Linux
 distributions, kernels, and target architectures, but is considered
-.I pre-alpha
+.I alpha
 grade by
 .IR "The OpenSS7 Project" .
 At the time of release, the

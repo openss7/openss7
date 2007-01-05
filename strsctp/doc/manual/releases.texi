@@ -193,7 +193,7 @@ execute the contained code.
 @node Alpha Releases
 @subsection Alpha Releases
 
-@dfn{Alpha} release are releases that have received little to no testing, or that have been tested
+@dfn{Alpha} releases are releases that have received little to no testing, or that have been tested
 and contains known bugs or defects that make the package unsuitable even for testing.  The purpose
 for an @dfn{alpha} release are the same as for the pre-alpha release, with the additional purpose
 that it is an earily release of partially functional code that has problems that an external
@@ -219,7 +219,7 @@ user of the software.
 @node Gamma Releases
 @subsection Gamma Releases
 
-@dfn{Gamma} release are releases that have received exhaustive testing within the project, but
+@dfn{Gamma} releases are releases that have received exhaustive testing within the project, but
 external testing has been minimal.  @dfn{Gamma} release packages do not ship with known defects.  As
 exhaustive internal testing has been performed, unknown defects should be few.  Please remember that
 there is NO WARRANTY on public release packages.
@@ -291,7 +291,7 @@ You will void the warranty on any system on which you run this software.  YOU HA
 
 @c This is the defect notice for alpha release software
 @ignore
-@dfn{@value{PACKAGE_TITLE}} has unknown defects.  This is a @dfn{alpha} release.  Some defects could
+@dfn{@value{PACKAGE_TITLE}} has unknown defects.  This is an @dfn{alpha} release.  Some defects could
 be harmful.  No validation testing whatsoever has been performed by the @cite{OpenSS7 Project} on
 this software.  The software might fail to configure or compile on some systems.  The @cite{OpenSS7
 Project} recommends that you @b{do not use this software for purposes other than develoment or

@@ -167,7 +167,7 @@ the @file{/dev} directory for @cite{@value{PACKAGE_TITLE}} drivers.
 @end table
 
 @cite{@value{PACKAGE_TITLE}} places the following test programs in the system libexec directory
-@file{/@-usr/@-lib@-exec/@-}:
+@file{/@-usr/@-lib@-exec/@-@value{PACKAGE}/@-}:
 
 @table @file
 
@@ -242,7 +242,7 @@ Suites}.
 
 @item send-pr
 @itemx send-pr.config
-The @command{send-pr} stand-alone shell script can be used for the automatic generate of problem
+The @command{send-pr} stand-alone shell script can be used for the automatic generation of problem
 reports for the @cite{@value{PACKAGE_TITLE}} package.  The @file{send-pr.config} file provides
 localized definitions used by the @command{send-pr} program.
 For more information on problem reports, @xref{Problem Reports}, and, in particular, @xref{Stand
