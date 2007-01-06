@@ -1196,3 +1196,13 @@ TODO
 *.bak
 *.info-*
 *.old
+sigtran/doc/drafts/.cvsignore
+sigtran/doc/drafts/isua/.cvsignore
+sigtran/doc/drafts/m2pa/.cvsignore
+sigtran/doc/drafts/m2ua/.cvsignore
+sigtran/doc/drafts/m3pa/.cvsignore
+sigtran/doc/drafts/m3ua/.cvsignore
+sigtran/doc/drafts/sctp/.cvsignore
+sigtran/doc/drafts/sua/.cvsignore
+sigtran/doc/drafts/tua/.cvsignore
+sigtran/doc/drafts/ua/.cvsignore
