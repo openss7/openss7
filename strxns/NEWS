@@ -19,32 +19,31 @@ pages and other documentation for XNS components in a separate autoconf
 tarball.
 
 This release is both a maintenance release and a feature release.  The
-major new feature added is a fully "STREAMS" based implementation of
-the `np_ip(4)' driver.  This release is a stable production release for
-`Linux Fast-STREAMS'.  Support for `LiS' is deprecated as of this
-release.
+major new feature added is a fully "STREAMS" based implementation of the `np_ip(4)'
+driver.  This release is a stable production release for `Linux
+Fast-STREAMS'.  Support for `LiS' is deprecated as of this release.
 
 The release provides the following enhancements and fixes:
 
-   * Support for most recent 2.6.18 kernels (including Fedora Core 5
+   - Support for most recent 2.6.18 kernels (including Fedora Core 5
      with inode diet patchset).
 
-   * Now builds 32-bit compatibility libraries and tests them against
+   - Now builds 32-bit compatibility libraries and tests them against
      64-bit kernel modules and drivers.  The `make installcheck' target
      will now automatically test both 64-bit native and 32-bit
      compatibility versions, one after the other, on 64-bit platforms.
 
-   * Added versioning of all library symbols.
+   - Added versioning of all library symbols.
 
-   * Many documentation updates for all OpenSS7 packages.  Automated
+   - Many documentation updates for all OpenSS7 packages.  Automated
      release file generation making for vastly improved and timely text
      documentation present in the release directory.
 
-   * Dropped support for `LiS'.
+   - Dropped support for `LiS'.
 
-   * Updated `init' scripts for proper addition and removal of modules.
+   - Updated `init' scripts for proper addition and removal of modules.
 
-   * Start assigning majors at major device number 231 instead of major
+   - Start assigning majors at major device number 231 instead of major
      device number 230.  Assign major device number 230 explicitly to
      the clone device.  Package will now support extended ranges of
      minor devices on 2.6 kernels under `Linux Fast-STREAMS' only.
@@ -52,58 +51,80 @@ The release provides the following enhancements and fixes:
      permitting 2^16 addressable minor devices per major device number
      on 2.6 kernels: `LiS' cannot support this change.
 
-   * Better detection of SUSE distributions, release numbers and SLES
+   - Better detection of SUSE distributions, release numbers and SLES
      distributions: support for additional `SuSE' distributions on
      `ix86' as well as `x86_64'.  Added distribution support includes
      `SLES 9', `SLES 9 SP2', `SLES 9 SP3', `SLES 10', `SuSE 10.1'.
 
-   * Improved compiler flag generation and optimizations for recent
+   - Improved compiler flag generation and optimizations for recent
      `gcc' compilers and some idiosyncratic behaviour for some
      distributions (primarily SUSE).
 
-   * Optimized compilation is now available also for user level
+   - Optimized compilation is now available also for user level
      programs in addition to kernel programs.  Added new
      `--with-optimize' option to `configure' to accomplish this.
 
-   * Added `--disable-devel' `configure' option to suppress building
+   - Added `--disable-devel' `configure' option to suppress building
      and installing development environment.  This feature is for
      embedded or pure runtime targets that do not need the development
      environment (static libraries, manual pages, documentation).
 
-   * Added `send-pr' script for automatic problem report generation.
+   - Added `send-pr' script for automatic problem report generation.
 
-   * The package will now build doxygen(1) html documentation with the
+   - The package will now build doxygen(1) html documentation with the
      'doxy' make target.  See 'make help' or README-make in the
      distribution for more information.
+
+_This is a public stable production release of the package: it
+deprecates previous releases.  Please upgrade to the current release
+before reporting bugs._
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM-based or dpkg-based distributions, and can be used on production
+kernels without patching or recompiling the kernel.
+
+This package is publicly released under the *Note GNU General Public
+License:: Version 2.  The release is available as an `autoconf'
+tarball, SRPM, DSC, and set of binary RPMs or DEBs.  See the download
+page (http://www.openss7.org/download.html) for the `autoconf'
+tarballs, SRPMs and DSCs.  See the strxns package page
+(http://www.openss7.org/strxns_pkg.html) for tarballs, SRPMs, DSCs and
+binary RPMs or DEBs.
+
+See `http://www.openss7.org/codefiles/strxns-0.9.2.4/ChangeLog' and
+`http://www.openss7.org/codefiles/strxns-0.9.2.4/NEWS' in the release
+for more information.  Also, see the `strxns.pdf' manual in the release
+(also in html `http://www.openss7.org/strxns_manual.html').
 
  Major changes for release strxns-0.9.2.3.rc3
 ---------------------------------------------
 
-   * The package will now build doxygen(1) html documentation with the
+   - The package will now build doxygen(1) html documentation with the
      'doxy' make target.  See 'make help' or README-make in the
      distribution for more information.
 
-   * Now builds 32-bit compatibility libraries and tests them against
+   - Now builds 32-bit compatibility libraries and tests them against
      64-bit kernel modules and drivers.  The `make installcheck' target
      will now automatically test both 64-bit native and 32-bit
      compatibility versions, one after the other, on 64-bit platforms.
 
-   * Automated release file generation making for vastly improved and
+   - Automated release file generation making for vastly improved and
      timely text documentation present in the release directory.
 
-   * Dropped support for `LiS'.
+   - Dropped support for `LiS'.
 
-   * Package will now support extended ranges of minor devices on 2.6
+   - Package will now support extended ranges of minor devices on 2.6
      kernels under `Linux Fast-STREAMS' only.
 
-   * This release candidate provides support for additional SuSE
+   - This release candidate provides support for additional SuSE
      distributions on ix86 as well as x86_64.  Added distribution
      support includes SLES 9, SLES 9 SP2, SLES 9 SP3, SLES 10, SuSE
      10.1.
 
-   * Added `--enable-devel' `configure' option for embedded targets.
+   - Added `--enable-devel' `configure' option for embedded targets.
 
-   * Added `send-pr' script for automatic problem report generation.
+   - Added `send-pr' script for automatic problem report generation.
 
 This was an internal alpha release.
 
@@ -114,26 +135,26 @@ This release is primarily to support additional compilers (gcc 4.0.2),
 architectures (x86_64, SMP, 32-bit compatibility), recent Linux
 distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels (2.6.15).
 
-   * Changes necessary for __LP64__ compatible builds.  Changes to
+   - Changes necessary for __LP64__ compatible builds.  Changes to
      support 32-bit ioctl compatibility for __LP64__ architectures.
      Binary compatibility should not have been disrupted.  At the same
      time as the ioctl32 changes, TRANSPARENT ioctl support for most of
      the IO controls for the ldl(4) driver has been added.
 
-   * Changes to satisfy gcc 4.0.2 compiler.
+   - Changes to satisfy gcc 4.0.2 compiler.
 
-   * Corrections for and testing of 64-bit clean compile and test runs
+   - Corrections for and testing of 64-bit clean compile and test runs
      on x86_64 architecture.  Some bug corrections resulting from gcc
      4.0.2 compiler warnings.
 
-   * Corrected build flags for Gentoo and 2.6.15 kernels as reported on
+   - Corrected build flags for Gentoo and 2.6.15 kernels as reported on
      mailing list.
 
-   * Initial corrections for and testing of SMP operation on Intel 630
+   - Initial corrections for and testing of SMP operation on Intel 630
      Hyper-Threaded SMP on x86_64.  This package should now run well on
      N-way Xeons even with Hyper-Threading enabled.
 
-   * Corrections and validation of 32-bit compatibility over 64-bit on
+   - Corrections and validation of 32-bit compatibility over 64-bit on
      x86_64.  Should apply well to other 64-bit architectures as well.
 
 This is a public beta test release of the package.

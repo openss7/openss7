@@ -7,6 +7,8 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS SCTP
 =====================
 
+Package strsctp-0.9.2.6 was released under GPLv2 2006-12-29.
+
 `OpenSS7 STREAMS SCTP' (`strsctp') is an `OpenSS7 Project'
 implementation of Stream Control Transmission Protocol (SCTP - RFC
 2960) for `Linux Fast-STREAMS'.  It is based on the same protocol

@@ -18,44 +18,44 @@ This release is largely a maintenance release that provides support for
 more distributions an architectures as well as tracking feature updates
 on related packages:
 
-   * Updates to permit use with `strinet-0.9.2.4' second generation
+   - Updates to permit use with `strinet-0.9.2.4' second generation
      "UDP" driver, `strsctp-0.9.2.6' "STREAMS" SCTP driver,
      `sctp-0.2.24' "Sockets" SCTP driver.
 
-   * Added `send-pr' scripts for automatic problem report generation.
+   - Added `send-pr' scripts for automatic problem report generation.
      (Please do not report bugs on LiS.)
 
-   * Added `--disable-devel' `configure' option to suppress building
+   - Added `--disable-devel' `configure' option to suppress building
      and installing development environment.  This feature is for
      embedded or pure runtime targets that do not need the development
      environment (static libraries, manual pages, documentation).
 
-   * Improved compiler flag generation and optimizations for recent
+   - Improved compiler flag generation and optimizations for recent
      `gcc' compilers and some idiosyncratic behaviour for some
      distributions (primarily SUSE).  Optimized compilation is now
      available also for user level programs in addition to kernel
      programs.  Added new `--with-optimize' option to `configure' to
      accomplish this.
 
-   * Better detection of SUSE distributions, release numbers and SLES
+   - Better detection of SUSE distributions, release numbers and SLES
      distributions: support for additional `SuSE' distributions on
      `ix86' as well as `x86_64'.  Added distribution support includes
      `SLES 9', `SLES 9 SP2', `SLES 9 SP3', `SLES 10', `SuSE 10.1'.
 
-   * Many documentation updates for all OpenSS7 packages.  Automated
+   - Many documentation updates for all OpenSS7 packages.  Automated
      release file generation making for vastly improved and timely text
      documentation present in the release directory.
 
-   * Now builds 32-bit compatibility libraries and tests them against
+   - Now builds 32-bit compatibility libraries and tests them against
      64-bit kernel modules and drivers.  The `make installcheck' target
      will now automatically test both 64-bit native and 32-bit
      compatibility versions, one after the other, on 64-bit platforms.
 
-   * Includes results of performance testing of the new second
+   - Includes results of performance testing of the new second
      generation UDP driver (implemented completely in STREAMS instead
      of using an internal socket).
 
-   * Includes workup of benchmark scripts for SCTP, TCP and UDP.  Added
+   - Includes workup of benchmark scripts for SCTP, TCP and UDP.  Added
      a scls_show option to perform `scls -c' (see `scls(1)') to show
      "STREAMS" module and driver statistics between test sample points
      when verbosity is set to 2 and XTI is being used.  This assists
@@ -64,7 +64,27 @@ on related packages:
      "UDP2" testing of the `strinet' package and will come in handy for
      the "SCTP" testing.
 
-This release was released publicly.
+_This is a public stable production release of the package: it
+deprecates previous releases.  Please upgrade to the current release
+before reporting bugs._
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM-based or dpkg-based distributions, and can be used on production
+kernels without patching or recompiling the kernel.
+
+This package is publicly released under the *Note GNU General Public
+License:: Version 2.  The release is available as an `autoconf'
+tarball, SRPM, DSC, and set of binary RPMs or DEBs.  See the download
+page (http://www.openss7.org/download.html) for the `autoconf'
+tarballs, SRPMs and DSCs.  See the netperf package page
+(http://www.openss7.org/netperf_pkg.html) for tarballs, SRPMs, DSCs and
+binary RPMs or DEBs.
+
+See `http://www.openss7.org/codefiles/netperf-2.3.4/ChangeLog' and
+`http://www.openss7.org/codefiles/netperf-2.3.4/NEWS' in the release
+for more information.  Also, see the `netperf.pdf' manual in the
+release (also in html `http://www.openss7.org/netperf_manual.html').
 
  Major changes for release netperf-2.3.4.rc3
 --------------------------------------------
@@ -72,21 +92,21 @@ This release was released publicly.
 Third release candidate.  This is a "maintenance" release candidate.
 This release candidate includes:
 
-   * Automated release file generation making for vastly improved and
+   - Automated release file generation making for vastly improved and
      timely text documentation present in the release directory.
 
-   * Many documentation updates (for all OpenSS7 packages).
+   - Many documentation updates (for all OpenSS7 packages).
 
-   * Includes the changes made to the `strsctp' drivers at the `2006
+   - Includes the changes made to the `strsctp' drivers at the `2006
      SCTP Interop' at the `University of British Columbia'.  This
      version was interoperability tested with all implementations
      present.
 
-   * Provides support for additional `SuSE' distributions on `ix86' as
+   - Provides support for additional `SuSE' distributions on `ix86' as
      well as `x86_64'.  Added distribution support includes `SLES 9',
      `SLES 9 SP2', `SLES 9 SP3', `SLES 10', `SuSE 10.1'.
 
-   * Includes workup of benchmark scripts for SCTP, TCP and UDP.  Added
+   - Includes workup of benchmark scripts for SCTP, TCP and UDP.  Added
      a scls_show option to perform `scls -c' (see `scls(1)') to show
      "STREAMS" module and driver statistics between test sample points
      when verbosity is set to 2 and XTI is being used.  This assists
@@ -105,11 +125,11 @@ sponsors of the OpenSS7 Project.
 Second release candidate.  This is a "maintenance" release candidate.
 This release candidate includes:
 
-   * Includes results of performance testing of the new second
+   - Includes results of performance testing of the new second
      generation UDP driver (implemented completely in STREAMS instead
      of using an internal socket).
 
-   * Includes support for SuSE 10.1.
+   - Includes support for SuSE 10.1.
 
 This was an internal alpha test release candidate and was not released
 publicly.  This release was only available to subscribers to and
@@ -121,9 +141,9 @@ sponsors of the OpenSS7 Project.
 First release candidate for Mark Fugate.  This is a "maintenance"
 release candidate.  This release candidate includes:
 
-   * Added `--enable-devel' configure option for embedded targets.
+   - Added `--enable-devel' configure option for embedded targets.
 
-   * Added `send-pr' script for automatic problem report generation.
+   - Added `send-pr' script for automatic problem report generation.
 
 This was an internal alpha test release candidate and was not released
 publicly.  This release was only available to subscribers to and

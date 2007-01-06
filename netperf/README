@@ -7,6 +7,8 @@ See the end for copying conditions (for this file).
  OpenSS7 NETPERF Utility
 ========================
 
+Package netperf-2.3.4 was released under GPLv2 2006-12-29.
+
 `Netperf' is a general purpose tool for benchmarking bandwidth and
 performance of the `Internet Protocol' suite.  The `OpenSS7 Modified
 OpenSS7 NETPERF Utility' package is an OpenSS7 Project

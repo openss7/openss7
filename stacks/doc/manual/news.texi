@@ -94,7 +94,7 @@ X400P-SS7 driver with support for the Varion V401P (Tormenta III) cards.  Also, 
 release that has ISDN, SIGTRAN and VoIP components moved to separate packages (but will still build
 all components).
 
-@itemize
+@itemize -
 @item
 The X400P-SS7 driver has been upgraded to support the Varion V401P (Tormenta III) card.  This driver
 passes all validation test suites and is production grade.  The driver still supports the older
@@ -155,6 +155,25 @@ development environment (static libraries, manual pages, documentation).
 Added @command{send-pr} script for automatic problem report generation.
 @end itemize
 
+@emph{This is a public beta release of the package: it deprecates previous releases.  Please upgrade
+to the current release before reporting bugs.  Please see @file{README-alpha} in the release, or
+@refman{Maturity}.}
+
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 RPM-based or dpkg-based distributions, and can be used on
+production kernels without patching or recompiling the kernel.
+
+This package is publicly released under the @xref{GNU General Public License} Version 2.  The
+release is available as an @command{autoconf} tarball, SRPM, DSC, and set of binary RPMs or DEBs.
+See the @uref{http://www.openss7.org/download.html, download page} for the @command{autoconf}
+tarballs, SRPMs and DSCs.  See the @uref{http://www.openss7.org/@value{PACKAGE}_pkg.html,
+@value{PACKAGE} package page} for tarballs, SRPMs, DSCs and binary RPMs or DEBs.
+
+See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog} and
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS} in the release for more
+information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the release (also in html
+@uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
+
 @c ----------------------------------------------------------------------------
 
 @node Release @value{PACKAGE}-0.9a-4
@@ -165,7 +184,7 @@ This release is primarily to support additional compilers (gcc 4.0.2),
 architectures (x86_64, SMP, 32-bit compatibility), recent Linux distributions
 (EL4, SuSE 10, LE2006, OpenSuSE) and kernels (2.6.15).
 
-@itemize
+@itemize -
 @item
 Changes necessary for __LP64__ compatible builds.  Changes to support 32-bit
 ioctl compatibility for __LP64__ architectures.  Binary compatibility should

@@ -82,23 +82,26 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This @cite{OpenSS7 Project} release is another separate release of the @cite{@value{PACKAGE_TITLE}}
-package whose components were formerly part of the @file{strinet} package.  These networking modules
-provide TPI and XTI/TLI library, as well as providing TPI and XTI header files.  The package
-contains all the necessary manual pages and other documentation, including a reprint of the TPI 1.5
-specification, for XTI components.  The package is packaged as an OpenSS7 style autoconf tarball.
+This @cite{OpenSS7 Project} release is another separate release of the
+@cite{@value{PACKAGE_TITLE}} package whose components were formerly part of
+the @file{strinet} package.  These networking modules provide TPI and XTI/TLI
+library, as well as providing TPI and XTI header files.  The package contains
+all the necessary manual pages and other documentation, including a reprint of
+the TPI 1.5 specification, for XTI components.  The package is packaged as an
+OpenSS7 style autoconf tarball.
 
-This release is a stable, production grade release for @cite{Linux Fast-STREAMS} and is part of the
-OpenSS7 Master Package (@file{openss7-@value{VERSION_OPENSS7}}).
+This release is a stable, production grade release for @cite{Linux
+Fast-STREAMS} and is part of the OpenSS7 Master Package
+(@file{openss7-@value{VERSION_OPENSS7}}).
 
 This release is primarily a maintenance release.  No significant defect
-corrections or development has been applied.
-This release is a stable production release for @cite{Linux Fast-STREAMS}.
-Support for @cite{LiS} is deprecated as of this release.
+corrections or development has been applied.  This release is a stable
+production release for @cite{Linux Fast-STREAMS}.  Support for @cite{LiS} is
+deprecated as of this release.
 
 The release provides the following enhancements and fixes:
 
-@itemize
+@itemize -
 @item
 Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode
 diet patchset).
@@ -182,7 +185,7 @@ kernel using Linux Fast-STREAMS.  Changes included to handle __LP64__ kernels.
 Corrected build flags for Gentoo and 2.6.15 kernels as reported on mailing list.
 Corrects one bug from inspection.
 
-@itemize
+@itemize -
 @item
 Changes necessary for __LP64__ compatible builds.  Changes to support 32-bit
 ioctl compatibility for __LP64__ architectures.  Binary compatibility should not
@@ -209,7 +212,28 @@ Corrections and validation of 32-bit compatibility over 64-bit on x86_64.
 Should apply well to other 64-bit architectures as well.
 @end itemize
 
-This is a public gamma release of the package.
+@emph{This is a public stable production release of the package: it
+deprecates previous releases.  Please upgrade to the current release before
+reporting bugs.}
+
+As with other OpenSS7 releases, this release configures, compiles, installs
+and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6 RPM-based or
+dpkg-based distributions, and can be used on production kernels without
+patching or recompiling the kernel.
+
+This package is publicly released under the @xref{GNU General Public License}
+Version 2.  The release is available as an @command{autoconf} tarball, SRPM,
+DSC, and set of binary RPMs or DEBs.  See the
+@uref{http://www.openss7.org/download.html, download page} for the
+@command{autoconf} tarballs, SRPMs and DSCs.  See the
+@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html, @value{PACKAGE} package page} for
+tarballs, SRPMs, DSCs and binary RPMs or DEBs.
+
+See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog}
+and @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS} in the
+release for more information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the
+release (also in html @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
+
 
 @c ----------------------------------------------------------------------------
 

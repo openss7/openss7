@@ -78,21 +78,22 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @cindex release @value{PACKAGE}-@value{VERSION}
 
 This is the fourth separate @cite{OpenSS7 Project} release of the
-@cite{@value{PACKAGE_TITLE}} package that was formerly present in the
-@cite{Linux Fast-STREAMS} @file{streams-0.7a.2} release package.  This release
-is a stable, production grade release for @cite{Linux Fast-STREAMS} and is part
-of the OpenSS7 Master Package (@file{openss7-@value{VERSION_OPENSS7}}).  It
-deprecates previous releases.  Please upgrade before reporting bugs on previous
-releases.
+@cite{@value{PACKAGE_TITLE}} package.  The package was originally present in
+the @cite{Linux Fast-STREAMS} @file{streams-0.7a.2} release package, but has
+been separated for four releases.
+
+This release is a stable, production grade release for @cite{Linux
+Fast-STREAMS} and is part of the OpenSS7 Master Package
+(@file{openss7-@value{VERSION_OPENSS7}}).  It deprecates previous releases.
+Please upgrade before reporting bugs on previous releases.
 
 This release is primarily a maintenance release.  Some functionality of the
 package has been tested by its use in other packages and some defects corrected.
-This release is a stable production release for @cite{Linux Fast-STREAMS}.
 Support for @cite{LiS} is deprecated as of this release.
 
 The release provides the following enhancements and fixes:
 
-@itemize
+@itemize -
 
 @item
 Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode
@@ -149,6 +150,28 @@ manual pages, documentation).
 Added @command{send-pr} script for automatic problem report generation.
 @end itemize
 
+@emph{This is a public stable production release of the package: it deprecates
+previous releases.  Please upgrade to the current release before reporting
+bugs.}
+
+As with other OpenSS7 releases, this release configures, compiles, installs
+and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6 RPM-based or
+dpkg-based distributions, and can be used on production kernels without
+patching or recompiling the kernel.
+
+This package is publicly released under the @xref{GNU General Public License}
+Version 2.  The release is available as an @command{autoconf} tarball, SRPM,
+DSC, and set of binary RPMs or DEBs.  See the
+@uref{http://www.openss7.org/download.html, download page} for the
+@command{autoconf} tarballs, SRPMs and DSCs.  See the
+@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html, @value{PACKAGE} package page} for
+tarballs, SRPMs, DSCs and binary RPMs or DEBs.
+
+See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog}
+and @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS} in the
+release for more information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the
+release (also in html @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
+
 @c ----------------------------------------------------------------------------
 
 @node Release strcompat-0.9.2.3
@@ -159,7 +182,7 @@ This release is primarily to support additional compilers (gcc 4.0.2),
 architectures (x86_64, SMP, 32-bit compatibility), recent Linux distributions
 (EL4, SuSE 10, LE2006, OpenSuSE) and kernels (2.6.15).
 
-@itemize
+@itemize -
 @item
 Corrections for and testing of 64-bit clean compile and test runs on x86_64
 architecture.  Some bug corrections resulting from gcc 4.0.2 compiler

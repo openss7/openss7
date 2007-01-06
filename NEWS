@@ -1,4 +1,4 @@
-OpenSS7 Master Package -- history of user visible changes.  2007-01-02
+OpenSS7 Master Package -- history of user visible changes.  2006-12-29
 $Id: NEWS,v 0.9.2.27 2006/12/31 14:09:03 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -10,29 +10,49 @@ OpenSS7 Master Package package.
  Major changes for release openss7-0.9.2.D
 ------------------------------------------
 
-   * Support for most recent 2.6.18 kernels (including Fedora Core 5
+This is the fourth public release of the OpenSS7 Master Package.  The
+sub-packages have been reorganized for this release.  See `README' in
+the release for a sub-package listing.  Aside from sub-package
+reorganization, the major difference from previous release is that this
+release no longer contains `LiS'.  Too many of the sub-packages will
+not even build against `LiS' because of its Stream head deficiencies.
+
+Most of the sub-packages in the release are production grade for `Linux
+Fast-STREAMS'.  All existing validation test suites run clean on
+supported distributions and architectures.  The packages build better
+Debian/Ubuntu .deb files.
+
+It is unlikely that the `OpenSS7 Master Package' will be released as
+frequently as before.  Sub-packages will be released more often.  To
+rebuild the master package with a new sub-package release, simply
+replace the directory to which the sub-package belongs with the
+unpacked sub-package release and then rebuild the master package.
+
+Following are the major changes since the last release candidate:
+
+   - Support for most recent 2.6.18 kernels (including Fedora Core 5
      with inode diet patchset).
 
-   * Added `strnsl-0.9.2.1' package.
+   - Added `strnsl-0.9.2.1' package.
 
  Major changes for release openss7-0.9.2.D.rc3
 ----------------------------------------------
 
 Third release candidate.
 
-   * The package will now build doxygen(1) html documentation with the
+   - The package will now build doxygen(1) html documentation with the
      'doxy' make target.  See 'make help' or README-make in the
      distribution for more information.
 
-   * Now builds 32-bit compatibility libraries and tests them against
+   - Now builds 32-bit compatibility libraries and tests them against
      64-bit kernel modules and drivers.  The `make installcheck' target
      will now automatically test both 64-bit native and 32-bit
      compatibility versions, one after the other, on 64-bit platforms.
 
-   * Added complete documentation and `Installation and Reference
+   - Added complete documentation and `Installation and Reference
      Manual' for the `OpenSS7 Master Package' (this manual).
 
-   * Added the following subpackages to the master build (and release):
+   - Added the following sub-packages to the master build (and release):
 
          - `strbcm-0.9.2.2'
          - `striso-0.9.2.1'
@@ -40,20 +60,20 @@ Third release candidate.
          - `strtty-0.9.2.1'
          - `strutil-0.9.2.4'
 
-   * Automated release file generation making for vastly improved and
+   - Automated release file generation making for vastly improved and
      timely text documentation present in the release directory.
 
-   * Dropped support for `LiS'.
+   - Dropped support for `LiS'.
 
-   * Subpackages will now support extended ranges of minor devices on
+   - Sub-packages will now support extended ranges of minor devices on
      2.6 kernels under `Linux Fast-STREAMS' only.
 
-   * This release candidate provides support for additional SuSE
+   - This release candidate provides support for additional SuSE
      distributions on ix86 as well as x86_64.  Added distribution
      support includes SLES 9, SLES 9 SP2, SLES 9 SP3, SLES 10, SuSE
      10.1.
 
-   * This release candidate includes the changes made to the strsctp
+   - This release candidate includes the changes made to the strsctp
      drivers at the 2006 SCTP Interop at the University of British
      Columbia.  This version was interoperability tested with all
      implementations present.
@@ -78,11 +98,11 @@ This was an subscriber release.
 
 First release candidate.
 
-   * Release candidate for Mark Fugate.
+   - Release candidate for Mark Fugate.
 
-   * Added -enable-devel configure option for embedded targets.
+   - Added -enable-devel configure option for embedded targets.
 
-   * Added send-pr script for automatic problem report generation.
+   - Added send-pr script for automatic problem report generation.
 
 This was an subscriber release.
 

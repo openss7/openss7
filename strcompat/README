@@ -7,6 +7,8 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS Compatibility
 ==============================
 
+Package strcompat-0.9.2.4 was released under GPLv2 2006-12-29.
+
 The `OpenSS7 STREAMS Compatibility' package provides the ability for
 `Linux Fast-STREAMS' to exhibit source level compatibility with a wide
 range of `UNIX' "STREAMS" implementations.  Also, it provides `LiS'

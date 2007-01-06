@@ -59,6 +59,8 @@
 
 @unnumberedsec @value{PACKAGE_TITLE}
 
+Package @value{PACKAGE}-@value{VERSION} was released under GPLv2 @value{PACKAGE_DATE}.
+
 @include descrip.texi
 
 @unnumberedsubsec Release

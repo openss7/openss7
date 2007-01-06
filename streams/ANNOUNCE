@@ -142,7 +142,7 @@ Organization: The OpenSS7 Project <http://www.openss7.org/>
 Dsn-Notification-To: <bidulock@openss7.org>
 Return-Receipt-To: <bidulock@openss7.org>
 
-streams-0.9.2.1 was release under GPLv2 on January 8, 2007.
+streams-0.9.2.1 was released under GPLv2 on January 8, 2007.
 
 The OpenSS7 Linux Fast-STREAMS package is a High-Performance STREAMS
 framework for Linux that is compatible with SVR 4.2 MP STREAMS and a

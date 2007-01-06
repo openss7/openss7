@@ -83,18 +83,37 @@ Package (as of @file{openss7-0.9.2.D}).
 This release is the initial public release.
 
 @ignore
-@itemize
+@itemize -
 @item
 Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode
 diet patchset).
 @end itemize
 @end ignore
 
-@emph{This is the initial public alpha release of the package.
-Please see @file{README-alpha} in the release or @refman{Maturity}.}
+@emph{This is the initial public alpha release of the package.  Please see
+@file{README-alpha} in the release or @refman{Maturity}.}
 
-This package is currently incomplete.  It is being released as a reference point for the community.
-If you are interested in completion of this package, contact @email{info@@openss7.com}.
+This package is currently incomplete.  It is being released as a reference
+point for the community.  If you are interested in completion of this package,
+contact @email{info@@openss7.com}.
+
+As with other OpenSS7 releases, this release configures, compiles, installs
+and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6 RPM-based or
+dpkg-based distributions, and can be used on production kernels without
+patching or recompiling the kernel.
+
+This package is publicly released under the @xref{GNU General Public License}
+Version 2.  The release is available as an @command{autoconf} tarball, SRPM,
+DSC, and set of binary RPMs or DEBs.  See the
+@uref{http://www.openss7.org/download.html, download page} for the
+@command{autoconf} tarballs, SRPMs and DSCs.  See the
+@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html, @value{PACKAGE} package page} for
+tarballs, SRPMs, DSCs and binary RPMs or DEBs.
+
+See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog}
+and @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS} in the
+release for more information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the
+release (also in html @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
 
 @c ----------------------------------------------------------------------------
 
@@ -104,7 +123,7 @@ If you are interested in completion of this package, contact @email{info@@openss
 
 Third release candidate.
 
-@itemize
+@itemize -
 @item
 Now builds 32-bit compatibility libraries and tests them against 64-bit kernel
 modules and drivers.  The @samp{make installcheck} target will now automatically
@@ -172,7 +191,7 @@ This was an internal alpha test release and was not released publicly.
 
 Second release candidate.
 
-@itemize
+@itemize -
 @item
 Added @samp{--enable-devel} @command{configure} option for embedded targets.
 
@@ -188,7 +207,7 @@ This was an internal alpha test release and was not released publicly.
 
 First release candidate.
 
-@itemize
+@itemize -
 @item
 Initial package skeleton including @cite{Installation and Reference Manual}
 and all necessary files and directories.

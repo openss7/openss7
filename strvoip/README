@@ -7,6 +7,8 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS VOIP
 =====================
 
+Package strvoip-0.9.2.1 was released under GPLv2 2006-12-29.
+
 The `OpenSS7 STREAMS VOIP' package includes kernel modules, `SVR 4.2'
 "STREAMS" drivers, modules, libraries, utilities, test programs,
 daemons, and development environment for the development and execution

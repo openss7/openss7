@@ -83,7 +83,27 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-@itemize
+This is the fourth public release of the @value{PACKAGE_TITLE}.  The
+sub-packages have been reorganized for this release.  See @file{README} in the
+release for a sub-package listing.  Aside from sub-package reorganization, the
+major difference from previous release is that this release no longer contains
+@cite{LiS}.  Too many of the sub-packages will not even build against
+@cite{LiS} because of its Stream head deficiencies.
+
+Most of the sub-packages in the release are production grade for @cite{Linux
+Fast-STREAMS}.  All existing validation test suites run clean on supported
+distributions and architectures.  The packages build better Debian/Ubuntu .deb
+files.
+
+It is unlikely that the @cite{@value{PACKAGE_TITLE}} will be released as
+frequently as before.  Sub-packages will be released more often.  To rebuild
+the master package with a new sub-package release, simply replace the
+directory to which the sub-package belongs with the unpacked sub-package
+release and then rebuild the master package.
+
+Following are the major changes since the last release candidate:
+
+@itemize -
 @item
 Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode
 diet patchset).
@@ -99,7 +119,7 @@ diet patchset).
 
 Third release candidate.
 
-@itemize
+@itemize -
 @item
 The package will now build doxygen(1) html documentation with the 'doxy' make
 target.  See 'make help' or README-make in the distribution for more
@@ -116,7 +136,7 @@ Added complete documentation and @cite{Installation and Reference Manual} for
 the @cite{@value{PACKAGE_TITLE}} (this manual).
 
 @item
-Added the following subpackages to the master build (and release):
+Added the following sub-packages to the master build (and release):
 
 @multitable @columnfractions .05 .95
 @item @tab -- @file{strbcm-@value{VERSION_STRBCM}}
@@ -134,7 +154,7 @@ documentation present in the release directory.
 Dropped support for @cite{LiS}.
 
 @item
-Subpackages will now support extended ranges of minor devices on 2.6 kernels
+Sub-packages will now support extended ranges of minor devices on 2.6 kernels
 under @cite{Linux Fast-STREAMS} only.
 
 @item
@@ -170,7 +190,7 @@ This was an subscriber release.
 
 First release candidate.
 
-@itemize @bullet
+@itemize -
 @item Release candidate for Mark Fugate.
 @item Added --enable-devel configure option for embedded targets.
 @item Added send-pr script for automatic problem report generation.

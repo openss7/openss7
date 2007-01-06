@@ -78,10 +78,22 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
+This is the twenty-fourth release of the Linux Native (Sockets) SCTP from the
+OpenSS7 Project.  This release, as with other releases, on builds and installs
+on 2.4 kernels.  This package is not as important to the OpenSS7 Project as
+the STREAMS version of SCTP, which provides the basis for all of the SIGTRAN
+components for the OpenSS7 stacks.  Also, the STREAMS version runs on both 2.4
+and 2.6 kernels.
+
+This is a stable production release: it deprecates previous releases.  Please
+upgrade to the current release before reporting bugs.
+
 This is primarily a maintenance release correcting reported bugs, but also
 includes the latest packaging improvements.
 
-@itemize
+Following are highlights of some of the changes since the last release:
+
+@itemize -
 @item
 Support for (configure but not build on) most recent 2.6.18 kernels (including
 Fedora Core 5 with inode diet patchset).
@@ -134,6 +146,31 @@ Fixed glaring error in @code{sctp_init} preventing kernel module from loading.
 Added init scripts and system control configuration data.
 Removed old preload approach to kernel module loading.
 @end itemize
+
+@emph{This is a public stable production release of the package: it deprecates
+previous releases.  Please upgrade to the current release before reporting
+bugs.}
+
+As with other OpenSS7 releases, this release configures, compiles, installs
+and builds RPMs and DEBs for a wide range of Linux 2.4 RPM-based or dpkg-based
+distributions, and can be used on production kernels without patching or
+recompiling the kernel.
+
+This package is publicly released under the @xref{GNU General Public License}
+Version 2.  The release is available as an @command{autoconf} tarball, SRPM,
+DSC, and set of binary RPMs or DEBs.  See the
+@uref{http://www.openss7.org/download.html, download page} for the
+@command{autoconf} tarballs, SRPMs and DSCs.  See the
+@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html, @value{PACKAGE} package
+page} for tarballs, SRPMs, DSCs and binary RPMs or DEBs.
+
+See
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog}
+and
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS}
+in the release for more information.  Also, see the @file{@value{PACKAGE}.pdf}
+manual in the release (also in
+@uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
 
 @c ----------------------------------------------------------------------------
 

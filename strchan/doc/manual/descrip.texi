@@ -81,7 +81,8 @@ pseudo-isochronous channels such as those provided by RTP.
 Included are hardware device drivers and pseudo-device drivers that provide implementations of
 specific channels.  A pseudo-device driver is planned to link into the @cite{Linux} OSS (Open Sound
 System) and ALS (Advanced Linux Sound).  Specific E1/T1 cards such as the V401P are supported by
-this package.
+this package.  Also included is an experimental driver that operates also as a Zaptel driver for the
+purpose of OpenSS7/Asterisk integration (but see also the @file{NOTES} file in the release).
 
 This package also supports data channel protocols for data communication over isochronous channels
 such as HDLC and SS7 DAEDR/DAEDT/AERM/SUERM.  Upper layer link protocols, such as LAPB, LAPF, LAPM

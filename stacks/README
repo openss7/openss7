@@ -7,6 +7,8 @@ See the end for copying conditions (for this file).
  OpenSS7 SS7 Stack
 ==================
 
+Package strss7-0.9a.5 was released under GPLv2 2006-12-29.
+
 The `OpenSS7 SS7 Stack' package includes a wide array of kernel
 modules, `SVR 4.2' "STREAMS" drivers, modules, libraries, utilities,
 test programs, daemons, and development environment for the development

@@ -89,7 +89,7 @@ This release is largely a maintenance release that provides support for more
 distributions an architectures as well as tracking feature updates on related
 packages:
 
-@itemize
+@itemize -
 @item
 Updates to permit use with @command{strinet-@value{VERSION_STRINET}} second
 generation @dfn{UDP} driver, @command{strsctp-@value{VERSION_STRSCTP}}
@@ -145,7 +145,28 @@ the counts accumulated to put and service routine throughout the
 package and will come in handy for the @dfn{SCTP} testing.
 @end itemize
 
-This release was released publicly.
+@emph{This is a public stable production release of the package: it
+deprecates previous releases.  Please upgrade to the current release before
+reporting bugs.}
+
+As with other OpenSS7 releases, this release configures, compiles, installs
+and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6 RPM-based or
+dpkg-based distributions, and can be used on production kernels without
+patching or recompiling the kernel.
+
+This package is publicly released under the @xref{GNU General Public License}
+Version 2.  The release is available as an @command{autoconf} tarball, SRPM,
+DSC, and set of binary RPMs or DEBs.  See the
+@uref{http://www.openss7.org/download.html, download page} for the
+@command{autoconf} tarballs, SRPMs and DSCs.  See the
+@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html, @value{PACKAGE} package page} for
+tarballs, SRPMs, DSCs and binary RPMs or DEBs.
+
+See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog}
+and @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS} in the
+release for more information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the
+release (also in html @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
+
 
 @c ----------------------------------------------------------------------------
 
@@ -157,7 +178,7 @@ Third release candidate.
 This is a @dfn{maintenance} release candidate.
 This release candidate includes:
 
-@itemize
+@itemize -
 @item
 Automated release file generation making for vastly improved and timely text
 documentation present in the release directory.
@@ -200,7 +221,7 @@ Second release candidate.
 This is a @dfn{maintenance} release candidate.
 This release candidate includes:
 
-@itemize
+@itemize -
 @item
 Includes results of performance testing of the new second generation UDP
 driver (implemented completely in STREAMS instead of using an internal
@@ -224,7 +245,7 @@ First release candidate for Mark Fugate.
 This is a @dfn{maintenance} release candidate.
 This release candidate includes:
 
-@itemize
+@itemize -
 @item
 Added @option{--enable-devel} configure option for embedded targets.
 

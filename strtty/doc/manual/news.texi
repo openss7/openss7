@@ -75,15 +75,16 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @cindex release @value{PACKAGE}-@value{VERSION}
 
 This is the first separate release from @cite{The OpenSS7 Project} of the
-@cite{@value{PACKAGE_TITLE}} package.  This package provides @file{pts} and @file{ptm}
-pseudo-terminal drivers, as well as an @file{ldterm} module.  Additional modules are the
-@file{ptem}, @file{ttcompat} and @file{pckt} modules.  The package contains all the necessary manual
-pages and other documentation for terminal and pseudo-terminal components in a separate autoconf
-tarball.
+@cite{@value{PACKAGE_TITLE}} package.  This package provides @file{pts} and
+@file{ptm} pseudo-terminal drivers, as well as an @file{ldterm} module.
+Additional modules are the @file{ptem}, @file{ttcompat} and @file{pckt}
+modules.  The package contains all the necessary manual pages and other
+documentation for terminal and pseudo-terminal components in a separate
+autoconf tarball.
 
 This release is the initial public release.
 
-@itemize
+@itemize -
 @item
 In this inital release, the package already supports a wide range of production distributions as it
 uses the same build environment as other OpenSS7 Project packages.
@@ -92,10 +93,31 @@ uses the same build environment as other OpenSS7 Project packages.
 Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode diet patchset).
 @end itemize
 
-@quotation
-This is the inital public alpha release of the package.  This package is currently incomplete.  It
-is being released as a reference point for the community.  If you are interested in completion of
-this package, contact @email{info@@openss7.com}.
-@end quotation
+@emph{This is the initial public alpha release of the package.  Please see
+@file{README-alpha} in the release, or @refman{Maturity}.}
+
+This is the inital public alpha release of the package.  This package is
+currently incomplete.  It is being released as a reference point for the
+community.  If you are interested in completion of this package, contact
+@email{info@@openss7.com}.
+
+As with other OpenSS7 releases, this release configures, compiles, installs
+and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6 RPM-based or
+dpkg-based distributions, and can be used on production kernels without
+patching or recompiling the kernel.
+
+This package is publicly released under the @xref{GNU General Public License}
+Version 2.  The release is available as an @command{autoconf} tarball, SRPM,
+DSC, and set of binary RPMs or DEBs.  See the
+@uref{http://www.openss7.org/download.html, download page} for the
+@command{autoconf} tarballs, SRPMs and DSCs.  See the
+@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html, @value{PACKAGE} package page} for
+tarballs, SRPMs, DSCs and binary RPMs or DEBs.
+
+See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog}
+and @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS} in the
+release for more information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the
+release (also in html @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
+
 
 @c ----------------------------------------------------------------------------

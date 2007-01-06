@@ -115,9 +115,12 @@ for LiS was to demonstrate its sad lack of ability to sustain any form of
 64-bit native and then 32-bit compatibility tests to demonstrate LiS' dismal
 failure in this regard.
 
+Do not use this release.  Port to Linux Fast-STREAMS.  Do not report bugs on
+this release.  (Yup, there are lots of 'em, but that's LiS.)
+
 Major features since the last public release are as follows:
 
-@itemize
+@itemize -
 @item
 Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode
 diet patchset).
@@ -172,6 +175,27 @@ target.  See 'make help' or README-make in the distribution for more
 information.
 @end itemize
 
+@emph{This is an unstable release: do not report bugs for this release.
+Please see @file{README-alpha} in the release or @refman{Maturity}.}
+
+As with other OpenSS7 releases, this release configures, compiles, installs
+and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6 RPM-based or
+dpkg-based distributions, and can be used on production kernels without
+patching or recompiling the kernel.
+
+This package is publicly released under the @xref{GNU General Public License}
+Version 2.  The release is available as an @command{autoconf} tarball, SRPM,
+DSC, and set of binary RPMs or DEBs.  See the
+@uref{http://www.openss7.org/download.html, download page} for the
+@command{autoconf} tarballs, SRPMs and DSCs.  See the
+@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html, @value{PACKAGE} package page} for
+tarballs, SRPMs, DSCs and binary RPMs or DEBs.
+
+See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog}
+and @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS} in the
+release for more information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the
+release (also in html @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
+
 @c ----------------------------------------------------------------------------
 
 @node Release @value{PACKAGE}-2.18.4.rc3
@@ -184,7 +208,7 @@ Third release candidiate.
 The purpose of this release is to demonstrate the inability of the @value{PACKAGE}
 package to properly support 32-bit compatibility on 64-bit architectures.
 
-@itemize
+@itemize -
 @item
 Minor bug fixes to STREAMS library.  isastream(3) and fattach(3) must not
 contain an asynchronous thread cancellation point, but they could.  Added
@@ -279,7 +303,7 @@ This release was only available to subscribers to and sponsors of the
 
 Second release candidate.
 
-@itemize
+@itemize -
 @item
 Added @samp{--enable-devel} @command{configure} option for embedded targets.
 
@@ -299,7 +323,7 @@ This release was only available to subscribers to and sponsors of the
 
 First release candidate.
 
-@itemize
+@itemize -
 @end itemize
 
 This was an internal alpha test release candidate and was not released publicly.
@@ -499,7 +523,7 @@ statements.
 Added HP patches.  There are a couple of questionable components in the HP
 patches that I reversed.  They include;
 
-@itemize @bullet
+@itemize -
 @item
 modification of @code{lis_msgsize} to @code{lis_msgdsize}.  This would change
 the calculation of queue counts.  Queue counts aren't @code{M_DATA} counts,
@@ -777,7 +801,7 @@ to configure for older or newer kernels.
 
 Following are the new features of the OpenSS7 release of LiS:
 
-@itemize @bullet
+@itemize -
 @item
 adds configuration using the GNU tools, autoconf, automake and autotest.
 

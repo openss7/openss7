@@ -7,6 +7,8 @@ See the end for copying conditions (for this file).
  OpenSS7 XTI/TLI Networking
 ===========================
 
+Package strxnet-0.9.2.9 was released under GPLv2 2006-12-29.
+
 The `OpenSS7 XTI/TLI Networking' package for `Linux Fast-STREAMS' is an
 implementation of the X/Open Trasnport Interface or SVID Transport
 Layer Interface library in accordance with SUSv2 and XNS 5.2 standards.
