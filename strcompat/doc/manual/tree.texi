@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.3 2007/01/03 14:57:18 brian Exp $
+@c @(#) $Id$
 @c
 @c =========================================================================
 @c
-@c Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -16,7 +16,7 @@
 @c Permission is granted to copy and distribute modified versions of this
 @c manual under the conditions for verbatim copying, provided that the
 @c entire resulting derived work is distributed under the terms of a
-@c permission notice identical to this one
+@c permission notice identical to this one.
 @c 
 @c Since the Linux kernel and libraries are constantly changing, this
 @c manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -53,593 +53,375 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/03 14:57:18 $ by $Author: brian $
+@c Last Modified $Date$ by $Author$
 @c
 @c =========================================================================
+@c
+@c $Log$
+@c =========================================================================
 
-@ignore
-@dfn{@value{PACKAGE_UCNAME}} places the following kernel modules files in the kernel
-modules directory @file{lib/modules/2.4.20-28.7/}:
+@cite{@value{PACKAGE_UCNAME}} creates the following kernel modules files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-}:@footnote{The kernel version
+@samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is expected.}
 
 @table @file
-@item modules.strxns
+@item modules.@value{PACKAGE_LCNAME}
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following kernel modules files in the kernel
-modules directory @file{lib/modules/2.4.20-28.7/strxns/}:
+@cite{@value{PACKAGE_UCNAME}} installs the following kernel module files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE}/@-}:@footnote{The kernel
+version @samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is
+expected.}
 
 @table @file
-@item streams-ip_strm_mod.o
-This kernel module contains the IP to STREAMS module.
-@item streams-ip_to_dlpi.o
-This kernel module contains the IP to DLPI module.
-@item streams-ldl.o
-This kernle module contains the Linux DL module.
+@item streams_os7compat.ko
+@cite{OpenSS7} compatibility module.
+@item streams_svr3compat.ko
+@cite{SVR 3} compatibility module.
+@item streams_svr4compat.ko
+@cite{SVR 4.2 MP} compatibility module.
+@item streams_mpscompat.ko
+@cite{MPS} compatibility module.
+@item streams_suncompat.ko
+@cite{Solaris} compatibility module.
+@item streams_uw7compat.ko
+@cite{UnixWare} compatibility module.
+@item streams_osfcompat.ko
+@cite{OSF/1} compatibility module.
+@item streams_aixcompat.ko
+@cite{AIX} compatibility module.
+@item streams_hpuxcompat.ko
+@cite{HP-UX} compatibility module.
+@item streams_irixcompat.ko
+@cite{IRIX} compatibility module.
+@item streams_liscompat.ko
+@cite{LiS} compatibility module.
+@item streams_maccompat.ko
+@cite{Mac OT} compatibility module.
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following header files in the system include
-directory @file{usr/include/strxns/}:
+@cite{@value{PACKAGE_UCNAME}} installs the following header files in the system include directory,
+@file{/@-usr/@-include/@-@value{PACKAGE}/@-}:
 
-@table @file
-@item sys/cdi.h
-This file contains the CDI header file.
-@item sys/dlpi.h
-This file contains the DLPI header file.
-@item sys/ldl.h
-This file contains the Linux DL header file.
-@item sys/npi.h
-This file contains the NPI header file.
-@end table
-
-@dfn{@value{PACKAGE_UCNAME}} places the following test programs in the system libexec
-directory @file{usr/libexec/}:
-
-@table @file
-@item ldltest
-This binary contins a test program for the Linux DL driver.
-@end table
-
-@dfn{@value{PACKAGE_UCNAME}} places the following utility programs in the system
-binary directory @file{usr/sbin/}:
-
-@table @file
-@item ldlconfig
-This binary contains a configuration utility for the Linux DL driver.
-@item strxns_mknod
-This binary conatins a script for making device nodes for the
-@dfn{@value{PACKAGE_UCNAME}} package.
-@end table
-
-@dfn{@value{PACKAGE_UCNAME}} places the following info files in the system info
-directory @file{usr/share/info/}:
-
-@table @file
-@item strxns.info
-@itemx strxns.info-1
-@itemx strxns.info-2
-@itemx strxns.info-3
-@itemx strxns.info-4
-These files contain this manual in info format.
-@end table
-
-@dfn{@value{PACKAGE_UCNAME}} places the following manpage macro and reference
-database files in the system man directory @file{usr/share/man/}:
-
-@table @file
-@item strxns.macros
-This file contain manual page macro definitions included by the manual pages
-included in the package.
-@item strxns.refs
-This file contains a reference database referenced by the manual pages
-included in the package.
-@end table
-
-@dfn{@value{PACKAGE_UCNAME}} places the following CDI manual pages in the system man
-directory @file{usr/share/man/man7/}:
-
-@noindent
-@file{CD_ABORT_OUTPUT_REQ.7},
-@file{CD_ALLOW_INPUT_REQ.7},
-@file{CD_ATTACH_REQ.7},
-@file{CD_BAD_FRAME_IND.7},
-@file{CD_DETACH_REQ.7},
-@file{CD_DISABLE_CON.7},
-@file{CD_DISABLE_REQ.7},
-@file{CD_ENABLE_CON.7},
-@file{CD_ENABLE_REQ.7},
-@file{CD_ERROR_ACK.7},
-@file{CD_ERROR_IND.7},
-@file{CD_HALT_INPUT_REQ.7},
-@file{CD_INFO_ACK.7},
-@file{CD_INFO_REQ.7},
-@file{CD_MODEM_SIG_IND.7},
-@file{CD_MODEM_SIG_POLL.7},
-@file{CD_MODEM_SIG_REQ.7},
-@file{CD_MUX_NAME_REQ.7},
-@file{CD_OK_ACK.7},
-@file{CD_READ_REQ.7},
-@file{CD_UNITDATA_ACK.7},
-@file{CD_UNITDATA_IND.7},
-@file{CD_UNITDATA_REQ.7},
-@file{CD_WRITE_READ_REQ.7},
-@file{cd_abort_output_req_t.7},
-@file{cd_allow_input_req_t.7},
-@file{cd_attach_req_t.7},
-@file{cd_bad_frame_ind_t.7},
-@file{cd_detach_req_t.7},
-@file{cd_disable_con_t.7},
-@file{cd_disable_req_t.7},
-@file{cd_enable_con_t.7},
-@file{cd_enable_req_t.7},
-@file{cd_error_ack_t.7},
-@file{cd_error_ind_t.7},
-@file{cd_halt_input_req_t.7},
-@file{cd_info_ack_t.7},
-@file{cd_modem_sig_ind_t.7},
-@file{cd_modem_sig_poll_t.7},
-@file{cd_modem_sig_req_t.7},
-@file{cd_mux_name_req_t.7},
-@file{cd_ok_ack_t.7},
-@file{cd_read_req_t.7},
-@file{cd_unitdata_ack_t.7},
-@file{cd_unitdata_ind_t.7},
-@file{cd_unitdata_req_t.7},
-@file{cd_write_read_req_t.7},
-@file{cdi.7}
-@display
-@noindent
-These are CDI manual pages.
-@end display
-
-@dfn{@value{PACKAGE_UCNAME}} places the following DLPI manual pages in the system man
-directory @file{usr/share/man/man7/}:
-
-@noindent
-@file{DL_ATTACH_REQ.7},
-@file{DL_BIND_ACK.7},
-@file{DL_BIND_REQ.7},
-@file{DL_CONNECT_CON.7},
-@file{DL_CONNECT_IND.7},
-@file{DL_CONNECT_REQ.7},
-@file{DL_CONNECT_RES.7},
-@file{DL_DATA_ACK_IND.7},
-@file{DL_DATA_ACK_REQ.7},
-@file{DL_DATA_ACK_STATUS_IND.7},
-@file{DL_DATA_IND.7},
-@file{DL_DATA_REQ.7},
-@file{DL_DETACH_REQ.7},
-@file{DL_DISABMULTI_REQ.7},
-@file{DL_DISCONNECT_IND.7},
-@file{DL_DISCONNECT_REQ.7},
-@file{DL_ENABMULTI_REQ.7},
-@file{DL_ERROR_ACK.7},
-@file{DL_GET_STATISTICS_ACK.7},
-@file{DL_GET_STATISTICS_REQ.7},
-@file{DL_INFO_ACK.7},
-@file{DL_INFO_REQ.7},
-@file{DL_OK_ACK.7},
-@file{DL_PHYS_ADDR_ACK.7},
-@file{DL_PHYS_ADDR_REQ.7},
-@file{DL_PROMISCOFF_REQ.7},
-@file{DL_PROMISCON_REQ.7},
-@file{DL_REPLY_IND.7},
-@file{DL_REPLY_REQ.7},
-@file{DL_REPLY_STATUS_IND.7},
-@file{DL_REPLY_UPDATE_REQ.7},
-@file{DL_REPLY_UPDATE_STATUS_IND.7},
-@file{DL_RESET_CON.7},
-@file{DL_RESET_IND.7},
-@file{DL_RESET_REQ.7},
-@file{DL_RESET_RES.7},
-@file{DL_SET_PHYS_ADDR_REQ.7},
-@file{DL_SUBS_BIND_ACK.7},
-@file{DL_SUBS_BIND_REQ.7},
-@file{DL_SUBS_UNBIND_REQ.7},
-@file{DL_TEST_CON.7},
-@file{DL_TEST_IND.7},
-@file{DL_TEST_REQ.7},
-@file{DL_TEST_RES.7},
-@file{DL_TOKEN_ACK.7},
-@file{DL_TOKEN_REQ.7},
-@file{DL_UDERROR_IND.7},
-@file{DL_UDQOS_REQ.7},
-@file{DL_UNBIND_REQ.7},
-@file{DL_UNITDATA_IND.7},
-@file{DL_UNITDATA_REQ.7},
-@file{DL_XID_CON.7},
-@file{DL_XID_IND.7},
-@file{DL_XID_REQ.7},
-@file{DL_XID_RES.7},
-@file{dl_attach_req_t.7},
-@file{dl_bind_ack_t.7},
-@file{dl_bind_req_t.7},
-@file{dl_connect_con_t.7},
-@file{dl_connect_ind_t.7},
-@file{dl_connect_req_t.7},
-@file{dl_connect_res_t.7},
-@file{dl_data_ack_ind_t.7},
-@file{dl_data_ack_req_t.7},
-@file{dl_data_ack_status_ind_t.7},
-@file{dl_detach_req_t.7},
-@file{dl_disabmulti_req_t.7},
-@file{dl_disconnect_ind_t.7},
-@file{dl_disconnect_req_t.7},
-@file{dl_enabmulti_req_t.7},
-@file{dl_error_ack_t.7},
-@file{dl_get_statistics_ack_t.7},
-@file{dl_get_statistics_req_t.7},
-@file{dl_info_ack_t.7},
-@file{dl_info_req_t.7},
-@file{dl_ok_ack_t.7},
-@file{dl_phys_addr_ack_t.7},
-@file{dl_phys_addr_req_t.7},
-@file{dl_promiscoff_req_t.7},
-@file{dl_promiscon_req_t.7},
-@file{dl_reply_ind_t.7},
-@file{dl_reply_req_t.7},
-@file{dl_reply_status_ind_t.7},
-@file{dl_reply_update_req_t.7},
-@file{dl_reply_update_status_ind_t.7},
-@file{dl_reset_con_t.7},
-@file{dl_reset_ind_t.7},
-@file{dl_reset_req_t.7},
-@file{dl_reset_res_t.7},
-@file{dl_set_phys_addr_req_t.7},
-@file{dl_subs_bind_ack_t.7},
-@file{dl_subs_bind_req_t.7},
-@file{dl_subs_unbind_req_t.7},
-@file{dl_test_con_t.7},
-@file{dl_test_ind_t.7},
-@file{dl_test_req_t.7},
-@file{dl_test_res_t.7},
-@file{dl_token_ack_t.7},
-@file{dl_token_req_t.7},
-@file{dl_uderror_ind_t.7},
-@file{dl_udqos_req_t.7},
-@file{dl_unbind_req_t.7},
-@file{dl_unitdata_ind_t.7},
-@file{dl_unitdata_req_t.7},
-@file{dl_xid_con_t.7},
-@file{dl_xid_ind_t.7},
-@file{dl_xid_req_t.7},
-@file{dl_xid_res_t.7},
-@file{dlpi.7},
-@file{dlpi_eth.7}
-@display
-@noindent
-These are DLPI manual pages.
-@end display
-
-@dfn{@value{PACKAGE_UCNAME}} places the following NPI manual pages in the system man
-directory @file{usr/share/man/man7/}:
-
-@noindent
-@file{N_BIND_ACK.7},
-@file{N_BIND_REQ.7},
-@file{N_CONN_CON.7},
-@file{N_CONN_IND.7},
-@file{N_CONN_REQ.7},
-@file{N_CONN_RES.7},
-@file{N_DATACK_IND.7},
-@file{N_DATACK_REQ.7},
-@file{N_DATA_IND.7},
-@file{N_DATA_REQ.7},
-@file{N_DISCON_IND.7},
-@file{N_DISCON_REQ.7},
-@file{N_ERROR_ACK.7},
-@file{N_EXDATA_IND.7},
-@file{N_EXDATA_REQ.7},
-@file{N_INFO_ACK.7},
-@file{N_INFO_REQ.7},
-@file{N_OK_ACK.7},
-@file{N_OPTMGMT_REQ.7},
-@file{N_RESET_CON.7},
-@file{N_RESET_IND.7},
-@file{N_RESET_REQ.7},
-@file{N_RESET_RES.7},
-@file{N_TOKEN_ACK.7},
-@file{N_TOKEN_REQ.7},
-@file{N_UDERROR_IND.7},
-@file{N_UNBIND_REQ.7},
-@file{N_UNITDATA_IND.7},
-@file{N_UNITDATA_REQ.7}
-@file{N_bind_ack_t.7},
-@file{N_bind_req_t.7},
-@file{N_conn_con_t.7},
-@file{N_conn_ind_t.7},
-@file{N_conn_req_t.7},
-@file{N_conn_res_t.7},
-@file{N_data_ind_t.7},
-@file{N_data_req_t.7},
-@file{N_datack_ind_t.7},
-@file{N_datack_req_t.7},
-@file{N_discon_ind_t.7},
-@file{N_discon_req_t.7},
-@file{N_error_ack_t.7},
-@file{N_exdata_ind_t.7},
-@file{N_exdata_req_t.7},
-@file{N_info_ack_t.7},
-@file{N_info_req_t.7},
-@file{N_ok_ack_t.7},
-@file{N_optmgmt_req_t.7},
-@file{N_reset_con_t.7},
-@file{N_reset_ind_t.7},
-@file{N_reset_req_t.7},
-@file{N_reset_res_t.7},
-@file{N_token_ack_t.7},
-@file{N_token_req_t.7},
-@file{N_uderror_ind_t.7},
-@file{N_unbind_req_t.7},
-@file{N_unitdata_ind_t.7},
-@file{N_unitdata_req_t.7},
-@file{npi.7}
-@display
-@noindent
-These are NPI manual pages.
-@end display
-
-@end ignore
-
-@subsection Header Files
-
-@cite{@value{PACKAGE_TITLE}} installs the following header files in the
-@file{/usr/include/@value{PACKAGE}/} subdirectory:
-
-@table @file
-
+@table @header
 @item sys/strcompat/config.h
 Contains configuration defines for the @file{strcompat} package.
-
 @item sys/strcompat/version.h
 Contains module versions (on 2.4 kernels) for the @file{strcompat} package.
-
 @item sys/os7/allocb.h
 Contains declarations of OpenSS7 buffer allocation helper functions.
-
 @item sys/os7/bufpool.h
 Contains declarations of OpenSS7 buffer pool helper functions.
-
 @item sys/os7/bufq.h
 Contains declarations of OpenSS7 private buffer queue helper functions.
-
 @item sys/os7/compat.h
 Contains declarations of OpenSS7 compatibility defines and includes.  This is the only header file
 that needs to be included for a @dfn{STREAMS} module or driver that needs to be compatibile with
 both @cite{LiS} and @cite{Linux Fast-STREAMS}.
-
 @item sys/os7/debug.h
 Contains declarations of OpenSS7 debugging macros.
-
 @item sys/os7/lock.h
 Contains declarations of OpenSS7 queue locking helper functions.
-
 @item sys/os7/priv.h
 Contains declarations of OpenSS7 queue private structure helper functions.
-
 @item sys/os7/queue.h
 Contains declarations of OpenSS7 queue put and service procedure helper functions.
-
 @item sys/os7/timer.h
 Contains declarations of OpenSS7 timer helper functions.
-
 @item sys/os7/ddi.h
 Contains declarations of OpenSS7 additional helper functions.
-
 @item sys/os7/strconf.h
 Contains declarations of OpenSS7 @dfn{STREAMS} configuration helper functions.
-
 @item sys/os7/stream.h
 Contains declarations of OpenSS7 @dfn{STREAMS} helper functions.
-
 @item sys/stream.h
 Contains a main header file providing @dfn{STREAMS} utility function declarations.  Depending on
 defines when including this file, this file may include @file{stream.h} files for specific
 implementations.
-
 @item sys/strconf.h
 Contains a main header file providing @dfn{STREAMS} configuration function declarations.  Depending
 on defines when including this file, this file may include @file{stream.h} files for specific
 implementations.
-
 @item sys/ddi.h
 Contains a main header file providing @dfn{STREAMS} DDI/DKI function declarations.  Depending on
 defines when including this file, this file may include @file{stream.h} files for specific
 implementations.
-
-
 @item sys/aix/stream.h
 Contains declarations of @dfn{STREAMS} functions unique to @cite{AIX}.
-
 @item sys/aix/strconf.h
 Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{AIX}.
-
 @item sys/aix/ddi.h
 Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{AIX}.
-
 @item sys/hpux/stream.h
 Contains declarations of @dfn{STREAMS} functions unique to @cite{HP-UX}.
-
 @item sys/hpux/strconf.h
 Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{HP-UX}.
-
 @item sys/hpux/ddi.h
 Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{HP-UX}.
-
-
 @item sys/irix/stream.h
 Contains declarations of @dfn{STREAMS} functions unique to @cite{IRIX}.
-
 @item sys/irix/strconf.h
 Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{IRIX}.
-
 @item sys/irix/ddi.h
 Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{IRIX}.
-
-
 @item sys/lis/stream.h
 Contains declarations of @dfn{STREAMS} functions unique to @cite{LiS}.
-
 @item sys/lis/strconf.h
 Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{LiS}.
-
 @item sys/lis/ddi.h
 Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{LiS}.
-
-
 @item sys/mac/stream.h
 Contains declarations of @dfn{STREAMS} functions unique to @cite{Mac OT}.
-
 @item sys/mac/strconf.h
 Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{Mac OT}.
-
 @item sys/mac/ddi.h
 Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{Mac OT}.
-
-
 @item sys/mps/stream.h
 Contains declarations of @dfn{STREAMS} functions unique to @cite{MPS}.
-
 @item sys/mps/strconf.h
 Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{MPS}.
-
 @item sys/mps/ddi.h
 Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{MPS}.
-
-
 @item sys/osf/stream.h
 Contains declarations of @dfn{STREAMS} functions unique to @cite{OSF/1}.
-
 @item sys/osf/strconf.h
 Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{OSF/1}.
-
 @item sys/osf/ddi.h
 Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{OSF/1}.
-
-
 @item sys/sun/stream.h
 Contains declarations of @dfn{STREAMS} functions unique to @cite{Solaris}.
-
 @item sys/sun/strconf.h
 Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{Solaris}.
-
 @item sys/sun/ddi.h
 Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{Solaris}.
-
-
 @item sys/sun/strsun.h
 Contains specific declarations for @cite{Solaris} helper functions.
-
 @item sys/sunddi.h
 Main header file used to include @cite{Solaris} DDI/DKI function declarations.
-
 @item sys/strsun.h
 Main header file used to include @cite{Solaris} @cite{Solaris} function declarations.
-
 @item sys/svr3/stream.h
 Contains declarations of @dfn{STREAMS} functions unique to @cite{SVR 3}.
-
 @item sys/svr3/strconf.h
 Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{SVR 3}.
-
 @item sys/svr3/ddi.h
 Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{SVR 3}.
-
-
 @item sys/svr4/stream.h
 Contains declarations of @dfn{STREAMS} functions unique to @cite{SVR 4.2 MP}.
-
 @item sys/svr4/strconf.h
 Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{SVR 4.2 MP}.
-
 @item sys/svr4/ddi.h
 Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{SVR 4.2 MP}.
-
-
 @item sys/uw7/stream.h
 Contains declarations of @dfn{STREAMS} functions unique to @cite{UnixWare}.
-
 @item sys/uw7/strconf.h
 Contains declarations of @dfn{STREAMS} configuration functions unique to @cite{UnixWare}.
-
 @item sys/uw7/ddi.h
 Contains declarations of @dfn{STREAMS} DDI/DKI functions unique to @cite{UnixWare}.
-
 @end table
 
-@subsection Maintenance Programs
-
-@cite{@value{PACKAGE_TITLE}} places the following test programs in the system libexec directory
-@file{usr/libexec/@value{PACKAGE}/}:
+@cite{@value{PACKAGE_UCNAME}} installs the following test programs in the system libexec directory,
+@file{/@-usr/@-libexec/@-@value{PACKAGE}/@-}:@footnote{Note that on some systems,
+@file{/usr/libexec} does not exist, and @file{/usr/lib} is used instead.}
 
 @table @file
-
 @item send-pr
-problem report generation script.
-
-@item send-pr.config
-problem report generation script configuration.
-
+@itemx send-pr.config
+The @command{send-pr} stand-alone shell script can be used for the automatic generation of problem
+reports for the @cite{@value{PACKAGE_TITLE}} package.  The @file{send-pr.config} file provides
+localized definitions used by the @command{send-pr} program.
+For more information on problem reports, @xref{Problem Reports}, and, in particular, @xref{Stand
+Alone Problem Reports}.
 @item testsuite
-@command{autotest} test suite.
-
-@item atlocal
-configuration for the @command{autotest} test suite.
-
+@itemx atlocal
+The @command{testsuite} stand-alone shell script invokes test cases in the test programs above as
+compiled into a comprehensive regression, troubleshooting and validation test suite for the
+@cite{@value{PACKAGE_TITLE}} drivers.  The @file{atlocal} file provides localized definitions used
+by the @command{testsuite} program.
+For more information on test suites, @xref{Test Suites}, and, in particular, @xref{Running Test
+Suites}.
 @end table
 
-@subsection Manual Pages
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following utility programs in the system binary
+directory, @file{/@-usr/@-sbin/@-}:
 
-@cite{@value{PACKAGE_TITLE}} installs the following manual pages in the @file{/usr/share/man}
-subdirectory:
+@table @file
+@item @value{PACKAGE}_mknod
+This utility can be used by init scripts or administrative users to create or remove device nodes in
+the @file{/dev} directory for @cite{@value{PACKAGE_TITLE}} drivers.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following user programs in the user binary
+directory, @file{/@-usr/@-bin/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following static and shared object libraries in the
+system library directory, @file{/@-usr/@-lib/@-} (32-bit libraries) and @file{/@-usr/@-lib64/@-}
+(64-bit libraries):
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following internationalization catalogues in
+the internationalization directory, @file{/@-usr/@-share/@-locale/}:
+
+@table @file
+@item de/LC_MESSAGES/@value{PACKAGE}.mo
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following init scripts in the system init directory,
+@file{/@-etc/@-rc.d/@-init.d/@-} (non-Debian) or @file{/@-etc/@-init.d/@-} (Debian):
+
+@table @file
+@item @value{PACKAGE}
+This is the name of the system init script on non-Debian based systems.
+@item @value{PACKAGE}.sh
+This is the name of the system init script on Debian based systems.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration files in the configuration
+directory, @file{/@-etc/@-}:
+
+@table @file
+@item @value{PACKAGE}.conf
+This file provided configuration information for any system controls affected by the
+@samp{@value{PACKAGE_NAME}} package.
+@item modutils/@-@value{PACKAGE}
+This file provides module definitions and demand loading aliases for the @file{@value{PACKAGE}}
+package.  This file is really only applicable to older 2.4 kernels.
+@ignore
+@item netconfig.d/@value{PACKAGE}
+This file provides the @manpage{netconfig(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{netconfig(5)} definitions are used by the @file{strnsl} package and the @file{libxnsl}
+library.
+@item sock2path.d/@value{PACKAGE}
+This file provides the @manpage{sock2path(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{sock2path(5)} definitions are used by the @file{strsock} package and the @file{libsocket}
+library.
+@end ignore
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration file in the system
+configuration directory, @file{/@-etc/@-sysconfig/@-} (non-Debian) or @file{/@-etc/@-default/@-}
+(Debian):
+
+@table @file
+@item @value{PACKAGE}
+This file provides system configuration information used by init scripts for the
+@samp{@value{PACKAGE_NAME}} package.  Some options of init script execution can be controlled by
+this file.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following info files in the system info directory,
+@file{/@-usr/@-share/@-info/@-}:
+
+@table @file
+@item @value{PACKAGE}.info
+@itemx @value{PACKAGE}.info-1
+@itemx @value{PACKAGE}.info-2
+These files contain this manual in @cite{GNU info} format.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manpage macros and reference database files in
+the system man directory, @file{/@-usr/@-share/@-man/@-}:@footnote{Note that macro and reference
+databse files are not installed if the package is configured for cooked manpages.}
+
+@table @file
+@item @value{PACKAGE}.macros
+This file contains manual page macro definitions included by the manual pages included in the
+package.
+@item @value{PACKAGE}.refs
+This file contains a reference database referenced by the manual pages included in the package.
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man1/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man2/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man3/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man4/@-}:
+
+@table @file
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man5/@-}:
+
+@table @file
+@item @value{PACKAGE}.5
+manual page for the @manpage{@value{PACKAGE}(5)} package.
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man7/@-}:
+
+@table @file
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man8/@-}:
+
+@table @file
+@item @value{PACKAGE}_mknod.8
+Documentation for the @manpage{@value{PACKAGE}_mknod(8)} utility program.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man9/@-}:
 
 The @cite{@value{PACKAGE_TITLE}} package installs several hundred manual pages that are too many to
 list here.  Following are just the primary manual pages.  Begin with any of these manual pages to
 obtain references to the remaining pages.
 
 @table @file
-
-@item man5/strcompat.5
-@manref{strcompat(5)}
-
-@item man8/strcompat_mknod.8
-@manref{strcompat_mknod(8)}
-
 @item man9/os7compat.9
 @manref{os7compat(9)}
-
 @item man9/svr3compat.9
 @manref{svr3compat(9)}
-
 @item man9/svr4compat.9
 @manref{svr4compat(9)}
-
 @item man9/mpscompat.9
 @manref{mpscompat(9)}
-
 @item man9/suncompat.9
 @manref{suncompat(9)}
-
 @item man9/uw7compat.9
 @manref{uw7compat(9)}
-
 @item man9/osfcompat.9
 @manref{osfcompat(9)}
-
 @item man9/aixcompat.9
 @manref{aixcompat(9)}
-
 @item man9/hpuxcompat.9
 @manref{hpuxcompat(9)}
-
 @item man9/irixcompat.9
 @manref{irixcompat(9)}
-
 @item man9/liscompat.9
 @manref{liscompat(9)}
-
 @item man9/maccompat.9
 @manref{maccompat(9)}
-
 @end table
 
 @ignore
@@ -2450,95 +2232,6 @@ obtain references to the remaining pages.
 
 @end table
 @end ignore
-
-@cite{@value{PACKAGE_TITLE}} installs the following manuals in the @file{/usr/share/info} subdirectory:
-
-@table @file
-
-@item strcompat.info
-@command{info} version of this file.
-
-@item strcompat.info-1
-@command{info} version of this file.
-
-@item strcompat.info-2
-@command{info} version of this file.
-
-@end table
-
-@cite{@value{PACKAGE_TITLE}} places the following init scripts in the system
-init directory @file{etc/rc.d/init.d/} (non-Debian) or @file{etc/init.d/}
-(Debian):
-
-@table @file
-
-@item @value{PACKAGE}
-This is the name of the system init script on non-Debian based systems.
-@item @value{PACKAGE}.sh
-This is the name of the system init script on Debian based systems.
-@end table
-
-@cite{@value{PACKAGE_TITLE}} places the following system configuration files
-in the system configuration directory @file{etc/sysconfig/} (non-Debian) or
-@file{etc/default/} (Debian):
-
-@table @file
-@item @value{PACKAGE}
-System configuration defaults.
-@end table
-
-@cite{@value{PACKAGE_TITLE}} places the following system configuration files
-in the configuration directory @file{etc/}:
-
-@table @file
-@item @value{PACKAGE}.conf
-Configuration values.
-
-@end table
-
-The @cite{@value{PACKAGE_TITLE}} package installs the following kernel modules in the
-@file{/lib/modules/@value{_kversion}/@value{PACKAGE}/} subdirectory:@footnote{The kernel version,
-@value{_kversion}, here is just an example.}
-
-@table @file
-
-@item streams_os7compat.ko
-@cite{OpenSS7} compatibility module.
-
-@item streams_svr3compat.ko
-@cite{SVR 3} compatibility module.
-
-@item streams_svr4compat.ko
-@cite{SVR 4.2 MP} compatibility module.
-
-@item streams_mpscompat.ko
-@cite{MPS} compatibility module.
-
-@item streams_suncompat.ko
-@cite{Solaris} compatibility module.
-
-@item streams_uw7compat.ko
-@cite{UnixWare} compatibility module.
-
-@item streams_osfcompat.ko
-@cite{OSF/1} compatibility module.
-
-@item streams_aixcompat.ko
-@cite{AIX} compatibility module.
-
-@item streams_hpuxcompat.ko
-@cite{HP-UX} compatibility module.
-
-@item streams_irixcompat.ko
-@cite{IRIX} compatibility module.
-
-@item streams_liscompat.ko
-@cite{LiS} compatibility module.
-
-@item streams_maccompat.ko
-@cite{Mac OT} compatibility module.
-
-@end table
 
 @ignore
 /usr

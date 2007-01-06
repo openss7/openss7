@@ -11,15 +11,15 @@ See the end for copying conditions (for this file).
 implementation of Stream Control Transmission Protocol (SCTP - RFC
 2960) for `Linux Fast-STREAMS'.  It is based on the same protocol
 engine core as the OpenSS7 Linux Native (Sockets) version of OpenSS7
-SCTP.
+SCTP.  The package provides a STREAMS SCTP driver for use with SIGTRAN
+components of the OpenSS7 stack.
 
-This release is another separate release of the `OpenSS7 STREAMS SCTP'
+This package is a separate release of the `OpenSS7 STREAMS SCTP'
 package that was formerly present in the `strss7' package.  The
-networking driver (`streams_sctp.ko') is provided, as well as NPI, TPI
-and XTI header files for SCTP operation.  The package contains the
-necessary manual pages and other documentation for SCTP components in a
-separate autoconf tarball.  This release is a stable, production grade
-release for `Linux Fast-STREAMS' and is part of the OpenSS7 Master
+networking driver, `sctp(4)', is provided, as well as NPI, TPI and XTI
+header files for SCTP operation.  The package contains the necessary
+manual pages and other documentation for SCTP components in a separate
+autoconf tarball.  This release is also part of the OpenSS7 Master
 Package (`openss7-0.9.2.D').
 
 The package currently includes the following "STREAMS" kernel modules

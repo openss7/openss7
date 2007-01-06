@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.4 2006/12/31 13:26:37 brian Exp $
+@c @(#) $Id$
 @c
 @c =========================================================================
 @c
-@c Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -16,7 +16,7 @@
 @c Permission is granted to copy and distribute modified versions of this
 @c manual under the conditions for verbatim copying, provided that the
 @c entire resulting derived work is distributed under the terms of a
-@c permission notice identical to this one
+@c permission notice identical to this one.
 @c 
 @c Since the Linux kernel and libraries are constantly changing, this
 @c manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -53,9 +53,782 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/12/31 13:26:37 $ by $Author: brian $
+@c Last Modified $Date$ by $Author$
 @c
 @c =========================================================================
+@c
+@c $Log$
+@c =========================================================================
+
+@cite{@value{PACKAGE_UCNAME}} creates the following kernel modules files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-}:@footnote{The kernel version
+@samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is expected.}
+
+@table @file
+@item modules.@value{PACKAGE_LCNAME}
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following kernel module files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE}/@-}:@footnote{The kernel
+version @samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is
+expected.}
+
+@table @file
+@item specfs.ko
+@item streams.ko
+@item streams_fifo.ko
+@item streams_sad.ko
+@item streams_nsdev.ko
+@item streams_echo.ko
+@item streams_mux.ko
+@item streams_nuls.ko
+@item streams_pipe.ko
+@item streams_log.ko
+@item streams_loop.ko
+@item streams_sfx.ko
+@item streams_spx.ko
+@item streams_bufmod.ko
+@item streams_nullmod.ko
+@item streams_pipemod.ko
+@item streams_connld.ko
+@item streams_sc.ko
+@item streams_testmod.ko
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following header files in the system include directory,
+@file{/@-usr/@-include/@-@value{PACKAGE}/@-}:
+
+@table @header
+@item sys/streams/config.h
+@item sys/streams/version.h
+@item sys/streams/cmn_err.h
+@item sys/streams/ddi.h
+@item sys/streams/debug.h
+@item sys/streams/dki.h
+@item sys/streams/kmem.h
+@item sys/streams/strconf.h
+@item sys/streams/strdebug.h
+@item sys/streams/stream.h
+@item sys/streams/strlog.h
+@item sys/streams/stropts.h
+@item sys/streams/stropts32.h
+@item sys/streams/strsubr.h
+@item sys/streams/log.h
+@item sys/streams/loop.h
+@item sys/streams/sad.h
+@item sys/streams/sc.h
+@item sys/streams/testmod.h
+@item sys/cmn_err.h
+@item sys/ddi.h
+@item sys/debug.h
+@item sys/dki.h
+@item sys/kmem.h
+@item sys/strconf.h
+@item sys/strdebug.h
+@item sys/stream.h
+@item sys/strlog.h
+@item sys/stropts.h
+@item sys/stropts32.h
+@item sys/strsubr.h
+@item sys/log.h
+@item sys/loop.h
+@item sys/sad.h
+@item sys/sc.h
+@item sys/testmod.h
+@item strlog.h
+@item stropts.h
+@item log.h
+@item loop.h
+@item sad.h
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following test programs in the system libexec directory,
+@file{/@-usr/@-libexec/@-@value{PACKAGE}/@-}:@footnote{Note that on some systems,
+@file{/usr/libexec} does not exist, and @file{/usr/lib} is used instead.}
+
+@table @file
+@item send-pr
+@itemx send-pr.config
+The @command{send-pr} stand-alone shell script can be used for the automatic generation of problem
+reports for the @cite{@value{PACKAGE_TITLE}} package.  The @file{send-pr.config} file provides
+localized definitions used by the @command{send-pr} program.
+For more information on problem reports, @xref{Problem Reports}, and, in particular, @xref{Stand
+Alone Problem Reports}.
+@item testlog
+@item test-streams
+test case exectutable.
+@item test-clone
+test case exectutable.
+@item test-connld
+test case exectutable.
+@item test-echo
+test case exectutable.
+@item test-fifo
+test case exectutable.
+@item test-log
+test case exectutable.
+@item test-loop
+test case exectutable.
+@item test-nsdev
+test case exectutable.
+@item test-mux
+test case exectutable.
+@item test-nuls
+test case exectutable.
+@item test-pipe
+test case exectutable.
+@item perftest
+@item perftestn
+@item test-pipemod
+test case exectutable.
+@item test-sad
+test case exectutable.
+@item test-sc
+test case exectutable.
+@item testsuite
+@itemx atlocal
+The @command{testsuite} stand-alone shell script invokes test cases in the test programs above as
+compiled into a comprehensive regression, troubleshooting and validation test suite for the
+@cite{@value{PACKAGE_TITLE}} drivers.  The @file{atlocal} file provides localized definitions used
+by the @command{testsuite} program.
+For more information on test suites, @xref{Test Suites}, and, in particular, @xref{Running Test
+Suites}.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following utility programs in the system binary
+directory, @file{/@-usr/@-sbin/@-}:
+
+@table @file
+@item strclean
+@item strload
+@item strsetup
+@item @value{PACKAGE}_mknod
+This utility can be used by init scripts or administrative users to create or remove device nodes in
+the @file{/dev} directory for @cite{@value{PACKAGE_TITLE}} drivers.
+@item autopush
+@item strace
+@item strerr
+@item scls
+@item strinfo
+@item fattach
+@item fdetach
+@item insf
+@item strvf
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following user programs in the user binary
+directory, @file{/@-usr/@-bin/@-}:
+
+@table @file
+@item strchg
+@item strconf
+@item strreset
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following static and shared object libraries in the
+system library directory, @file{/@-usr/@-lib/@-} (32-bit libraries) and @file{/@-usr/@-lib64/@-}
+(64-bit libraries):
+
+@table @file
+@item libstreams.so.0.0.1
+@itemx libstreams.so.0
+@itemx libstreams.so
+@item libstreams.a
+@item libstreams.la
+@item libLiS.so.0.0.1
+@itemx libLiS.so.0
+@itemx libLiS.so
+@item libLiS.a
+@item libLiS.la
+@item libpLiS.so.0.0.1
+@itemx libpLiS.so.0
+@itemx libpLiS.so
+@item libpLiS.a
+@item libpLiS.la
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following internationalization catalogues in
+the internationalization directory, @file{/@-usr/@-share/@-locale/}:
+
+@table @file
+@item de/LC_MESSAGES/@value{PACKAGE}.mo
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following init scripts in the system init directory,
+@file{/@-etc/@-rc.d/@-init.d/@-} (non-Debian) or @file{/@-etc/@-init.d/@-} (Debian):
+
+@table @file
+@item specfs
+@itemx specfs.sh
+@item @value{PACKAGE}
+This is the name of the system init script on non-Debian based systems.
+@item @value{PACKAGE}.sh
+This is the name of the system init script on Debian based systems.
+@item strace
+@itemx strace.sh
+@item strerr
+@itemx strerr.sh
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration files in the configuration
+directory, @file{/@-etc/@-}:
+
+@table @file
+@item @value{PACKAGE}.conf
+This file provided configuration information for any system controls affected by the
+@samp{@value{PACKAGE_NAME}} package.
+@item strsetup.conf
+@item strload.conf
+@item modutils/@-@value{PACKAGE}
+This file provides module definitions and demand loading aliases for the @file{@value{PACKAGE}}
+package.  This file is really only applicable to older 2.4 kernels.
+@ignore
+@item netconfig.d/@value{PACKAGE}
+This file provides the @manpage{netconfig(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{netconfig(5)} definitions are used by the @file{strnsl} package and the @file{libxnsl}
+library.
+@item sock2path.d/@value{PACKAGE}
+This file provides the @manpage{sock2path(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{sock2path(5)} definitions are used by the @file{strsock} package and the @file{libsocket}
+library.
+@end ignore
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration file in the system
+configuration directory, @file{/@-etc/@-sysconfig/@-} (non-Debian) or @file{/@-etc/@-default/@-}
+(Debian):
+
+@table @file
+@item specfs
+@item @value{PACKAGE}
+This file provides system configuration information used by init scripts for the
+@samp{@value{PACKAGE_NAME}} package.  Some options of init script execution can be controlled by
+this file.
+@item strace
+@item strerr
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following info files in the system info directory,
+@file{/@-usr/@-share/@-info/@-}:
+
+@table @file
+@item @value{PACKAGE_UCNAME}.info
+@itemx @value{PACKAGE_UCNAME}.info-1
+@itemx @value{PACKAGE_UCNAME}.info-2
+These files contain this manual in @cite{GNU info} format.
+@item porting.info
+@item STREAMS_FAQ.info
+@item SPG2.info
+@itemx SPG2.info-1
+@itemx SPG2.info-2
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manpage macros and reference database files in
+the system man directory, @file{/@-usr/@-share/@-man/@-}:@footnote{Note that macro and reference
+databse files are not installed if the package is configured for cooked manpages.}
+
+@table @file
+@item @value{PACKAGE}.macros
+This file contains manual page macro definitions included by the manual pages included in the
+package.
+@item @value{PACKAGE}.refs
+This file contains a reference database referenced by the manual pages included in the package.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man1/@-}:
+
+@table @file
+@item strchg.1
+@item strconf.1
+@item strreset.1
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man2/@-}:
+
+@table @file
+@item fattach.2
+@item fdetach.2
+@item getmsg.2
+@item getpmsg.2s
+@item isastream.2
+@item pipe.2s
+@item putmsg.2
+@item putpmsg.2s
+@item poll.2s
+@item read.2s
+@item readv.2s
+@item write.2s
+@item writev.2s
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man3/@-}:
+
+@table @file
+@item fattach.3
+@item fdetach.3
+@item isastream.3
+@item libstreams.3
+@item libLiS.3
+@item libpLiS.3
+@item streams.3
+@item LiS.3
+@item pLiS.3
+@item pipe.3
+@item pstrlog.3
+@item strlog.3
+@item vstrlog.3
+@item s_pipe.3
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man4/@-}:
+
+@table @file
+@item sth.4
+@item s_fifo.4
+@item clone.4
+@item echo.4
+@item fifo.4s
+@item conslog.4
+@item log.4
+@item strlog.4
+@item loop.4
+@item loop_clone.4
+@item sloop.4
+@item mux.4
+@item nsdev.4
+@item nuls.4
+@item pipe.4
+@item sad.4
+@item sfx.4
+@item spx.4
+@item connld.4
+@item nullmod.4
+@item bufmod.4
+@item pipemod.4
+@item sc.4
+@item testmod.4
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man5/@-}:
+
+@table @file
+@item @value{PACKAGE}.5
+manual page for the @manpage{@value{PACKAGE}(5)} package.
+@item autopush.5
+@item specfs.5
+@item strapush.5
+@item strioctl.5
+@item strsetup.conf.5
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man7/@-}:
+
+@table @file
+@item streamio.7
+@item I_ANCHOR.7
+@item I_ATMARK.7
+@item I_CANPUT.7
+@item I_CKBAND.7
+@item I_FATTACH.7
+@item I_FDETACH.7
+@item I_FDINSERT.7
+@item I_FIND.7
+@item I_FLUSH.7
+@item I_FLUSHBAND.7
+@item I_GERROPT.7
+@item I_GETBAND.7
+@item I_GETCLTIME.7
+@item I_GETPMSG.7
+@item I_GETSIG.7
+@item I_EGETSIG.7
+@item I_GRDOPT.7
+@item I_GWROPT.7
+@item I_ISASTREAM.7
+@item I_LINK.7
+@item I_LIST.7
+@item I_LOOK.7
+@item I_NREAD.7
+@item I_PEEK.7
+@item I_PIPE.7
+@item I_PLINK.7
+@item I_POP.7
+@item I_PUNLINK.7
+@item I_PUSH.7
+@item I_PUTPMSG.7
+@item I_RECVFD.7
+@item I_SENDFD.7
+@item I_SERROPT.7
+@item I_SETCLTIME.7
+@item I_SETSIG.7
+@item I_ESETSIG.7
+@item I_SRDOPT.7
+@item I_STR.7
+@item I_SWROPT.7
+@item I_UNLINK.7
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man8/@-}:
+
+@table @file
+@item @value{PACKAGE}_mknod.8
+Documentation for the @manpage{@value{PACKAGE}_mknod(8)} utility program.
+@item test-streams.8
+@item perftest.8
+@item perftestn.8
+@item testlog.8
+@item specfs.sh.8
+@item streams.sh.8
+@item specfs.8
+@item streams.8
+@item test-clone.8
+@item test-echo.8
+@item test-fifo.8
+@item test-log.8
+@item strace.8
+@item strerr.8
+@item strclean.8
+@item test-loop.8
+@item test-mux.8
+@item test-nsdev.8
+@item test-nuls.8
+@item test-pipe.8
+@item fattach.8
+@item fdetach.8
+@item test-sad.8
+@item autopush.8
+@item test-connld.8
+@item test-pipemod.8
+@item test-sc.8
+@item scls.8
+@item strinfo.8
+@item insf.8
+@item strload.8
+@item strsetup.8
+@item strvf.8
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man9/@-}:
+
+@table @file
+@item LfS.9
+@item OTHERQ.9
+@item RD.9
+@item SAMESTR.9
+@item STREAMS.9
+@item WR.9
+@item M_BACKDONE.9
+@item M_BACKWASH.9
+@item M_BREAK.9
+@item M_COPYIN.9
+@item M_COPYOUT.9
+@item M_CTL.9
+@item M_DATA.9
+@item M_DELAY.9
+@item M_DONTPLAY.9
+@item M_ERROR.9
+@item M_EVENT.9
+@item M_FLUSH.9
+@item M_HANGUP.9
+@item M_HPDATA.9
+@item M_IOCACK.9
+@item M_IOCDATA.9
+@item M_IOCNAK.9
+@item M_IOCTL.9
+@item M_LETSPLAY.9
+@item M_NOTIFY.9
+@item M_PASSFP.9
+@item M_PCCTL.9
+@item M_PCEVENT.9
+@item M_PCPROTO.9
+@item M_PCRSE.9
+@item M_PCSETOPTS.9
+@item M_PCSIG.9
+@item M_PROTO.9
+@item M_READ.9
+@item M_RSE.9
+@item M_SETOPTS.9
+@item M_SIG.9
+@item M_START.9
+@item M_STARTI.9
+@item M_STOP.9
+@item M_STOPI.9
+@item M_TRAIL.9
+@item M_UNHANGUP.9
+@item QNORM.9
+@item QPCTL.9
+@item adjmsg.9
+@item allocb.9
+@item alloclk.9
+@item allocq.9
+@item allocstr.9
+@item appq.9
+@item apush_get.9
+@item apush_set.9
+@item apush_vml.9
+@item autopush.9
+@item autopush_add.9
+@item autopush_del.9
+@item autopush_find.9
+@item autopush_search.9
+@item autopush_vml.9
+@item backq.9
+@item bcanget.9
+@item bcanput.9
+@item bcanputnext.9
+@item bcid_t.9
+@item bcmp.9
+@item bcopy.9
+@item bufcall.9
+@item bufcall_id_t.9
+@item bzero.9
+@item canenable.9
+@item canget.9
+@item canput.9
+@item canputnext.9
+@item cdev_count.9
+@item cdev_find.9
+@item cdev_match.9
+@item cdev_minor.9
+@item cdev_str.9
+@item cdevsw.9
+@item cdevsw_list.9
+@item cdevsw_lock.9
+@item cdrv_get.9
+@item cdrv_put.9
+@item cmaj_add.9
+@item cmaj_del.9
+@item cmaj_get.9
+@item cmin_add.9
+@item cmin_count.9
+@item cmin_del.9
+@item cmin_find.9
+@item cmin_get.9
+@item cmin_ini.9
+@item cmin_rel.9
+@item cmn_err.9
+@item copyb.9
+@item copyin.9
+@item copymsg.9
+@item copyout.9
+@item copyreq.9
+@item copyresp.9
+@item cred_t.9
+@item ctlmsg.9
+@item datab.9
+@item datamsg.9
+@item dblk_t.9
+@item delay.9
+@item devnode.9
+@item dev_t.9
+@item do_fattach.9
+@item do_fdetach.9
+@item do_spipe.9
+@item drv_getparm.9
+@item drv_hztomsec.9
+@item drv_hztousec.9
+@item drv_msectohz.9
+@item drv_priv.9
+@item drv_usectohz.9
+@item drv_usecwait.9
+@item dupb.9
+@item dupmsg.9
+@item enableok.9
+@item enableq.9
+@item esballoc.9
+@item esbbcall.9
+@item flushband.9
+@item flushq.9
+@item fmod_add.9
+@item fmod_count.9
+@item fmod_del.9
+@item fmod_find.9
+@item fmod_get.9
+@item fmod_put.9
+@item fmod_str.9
+@item fmodsw.9
+@item fmodsw_list.9
+@item fmodsw_lock.9
+@item freeb.9
+@item freelk.9
+@item freemsg.9
+@item freeq.9
+@item freestr.9
+@item freezestr.9
+@item frtn_t.9
+@item getadmin.9
+@item getmajor.9
+@item getmid.9
+@item getminor.9
+@item getq.9
+@item insq.9
+@item iocblk.9
+@item isdatablk.9
+@item isdatamsg.9
+@item kmem_alloc.9
+@item kmem_alloc_node.9
+@item kmem_free.9
+@item kmem_zalloc.9
+@item kmem_zalloc_node.9
+@item linkb.9
+@item linkblk.9
+@item linkmsg.9
+@item major_t.9
+@item makedevice.9
+@item max.9
+@item mblk_t.9
+@item min.9
+@item minor_t.9
+@item modID_t.9
+@item module_info.9
+@item module_stat.9
+@item module_stat_t.9
+@item msgb.9
+@item msgdsize.9
+@item msgpullup.9
+@item msgsize.9
+@item noenable.9
+@item pcmsg.9
+@item pullupmsg.9
+@item put.9
+@item putbq.9
+@item putctl.9
+@item putctl1.9
+@item putctl2.9
+@item putnext.9
+@item putnextctl.9
+@item putnextctl1.9
+@item putnextctl2.9
+@item putq.9
+@item qattach.9
+@item qbackenable.9
+@item qband.9
+@item qband_t.9
+@item qclose.9
+@item qcountstrm.9
+@item qdelete.9
+@item qdetach.9
+@item qenable.9
+@item qfields.9
+@item qfields_t.9
+@item qi_putp_t.9
+@item qi_qadmin_t.9
+@item qi_qclose_t.9
+@item qi_qopen_t.9
+@item qi_srvp_t.9
+@item qi_putp.9
+@item qi_qadmin.9
+@item qi_qclose.9
+@item qinit.9
+@item qi_qopen.9
+@item qi_srvp.9
+@item qinsert.9
+@item qopen.9
+@item qprocsoff.9
+@item qprocson.9
+@item qready.9
+@item qreply.9
+@item qscan.9
+@item qsize.9
+@item queue.9
+@item queue_t.9
+@item register_clone.9
+@item register_cmajor.9
+@item register_ioctl32.9
+@item register_strdev.9
+@item register_strdrv.9
+@item register_strmod.9
+@item register_strnod.9
+@item register_strlog.9
+@item rmvb.9
+@item rmvq.9
+@item runqueues.9
+@item sd_get.9
+@item sd_put.9
+@item sdev_add.9
+@item sdev_del.9
+@item sdev_get.9
+@item sdev_ini.9
+@item sdev_put.9
+@item sdev_rel.9
+@item sealloc.9
+@item sefree.9
+@item setq.9
+@item setsq.9
+@item setqsched.9
+@item skballoc.9
+@item spec_open.9
+@item spec_reparent.9
+@item specfs_mount.9
+@item specfs_umount.9
+@item streamtab.9
+@item streamtab_t.9
+@item strgetpmsg.9
+@item strlog.9
+@item str_close.9
+@item str_open.9
+@item strm_f_ops.9
+@item stroptions.9
+@item strputpmsg.9
+@item strqget.9
+@item strqset.9
+@item strrput.9
+@item strthread.9
+@item strthreads.9
+@item strwput.9
+@item strwsrv.9
+@item sysctl_str_nstrpush.9
+@item sysctl_str_strctlsz.9
+@item sysctl_str_strmsgsz.9
+@item testb.9
+@item timeout.9
+@item timeout_id_t.9
+@item timo_fcn_t.9
+@item toid_t.9
+@item unbufcall.9
+@item unfreezestr.9
+@item unlinkb.9
+@item unlinkmsg.9
+@item unregister_clone.9
+@item unregister_cmajor.9
+@item unregister_ioctl32.9
+@item unregister_strdev.9
+@item unregister_strdrv.9
+@item unregister_strmod.9
+@item unregister_strnod.9
+@item untimeout.9
+@item unweldq.9
+@item vcmn_err.9
+@item vstrlog.9
+@item vstrlog_t.9
+@item weld_arg_t.9
+@item weld_fcn_t.9
+@item weldq.9
+@item xmsgsize.9
+@item bcangetany.9
+@item bcanputany.9
+@item bcanputnextany.9
+@item strioctl.9
+@item strpoll.9
+@item strread.9
+@item strsendpage.9
+@item strwrite.9
+@item DDI.9
+@item Intro.9
+@item mp-streams.9
+@item SPG.9
+@end table
 
 @ignore
 /usr

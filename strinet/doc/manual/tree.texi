@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.5 2007/01/03 14:54:41 brian Exp $
+@c @(#) $Id$
 @c
 @c =========================================================================
 @c
@@ -16,7 +16,7 @@
 @c Permission is granted to copy and distribute modified versions of this
 @c manual under the conditions for verbatim copying, provided that the
 @c entire resulting derived work is distributed under the terms of a
-@c permission notice identical to this one
+@c permission notice identical to this one.
 @c 
 @c Since the Linux kernel and libraries are constantly changing, this
 @c manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/03 14:54:41 $ by $Author: brian $
+@c Last Modified $Date$ by $Author$
 @c
 @c =========================================================================
 @c
@@ -66,133 +66,261 @@
 @c
 @c =========================================================================
 
-@cite{@value{PACKAGE_TITLE}} places the following kernel module files in the kernel modules
-directory @file{/@-lib/@-modules/@-@value{_kversion}/@-}:@footnote{The kernel version
-@samp{@value{_kversion}} is just an example.}
+@cite{@value{PACKAGE_UCNAME}} creates the following kernel modules files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-}:@footnote{The kernel version
+@samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is expected.}
 
 @table @file
-
-@item modules.strinet
-
+@item modules.@value{PACKAGE_LCNAME}
 @end table
 
-@cite{@value{PACKAGE_TITLE}} installs the following kernel modules in the
-@file{/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE}/@-} subdirectory:@footnote{The kernel
-version @samp{@value{_kversion}} is just an example.}
+@cite{@value{PACKAGE_UCNAME}} installs the following kernel module files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE}/@-}:@footnote{The kernel
+version @samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is
+expected.}
 
 @table @file
-
 @item streams_inet.ko
 Contains the @manref{inet(4)} @dfn{STREAMS} driver.
-
 @item streams_udp.ko
 Contains the @manref{udp(4)} @dfn{STREAMS} driver.
-
 @item streams_rawip.ko
 Contains the @manref{rawip(4)} @dfn{STREAMS} driver.
-
 @item streams_tcp.ko
 Contains the @manref{tcp(4)} @dfn{STREAMS} driver.
-
 @end table
 
-@cite{@value{PACKAGE_TITLE}} installs the following header files in the
-@file{/@-usr/@-include/@-@value{PACKAGE}/@-} subdirectory:
+@cite{@value{PACKAGE_UCNAME}} installs the following header files in the system include directory,
+@file{/@-usr/@-include/@-@value{PACKAGE}/@-}:
 
 @multitable @columnfractions .35 .35
-
-@item @file{xti.h} @tab
-@item @file{xti_inet.h} @tab @file{sys/xti_inet.h}
-@item @tab @file{sys/xti_ip.h}
-@item @tab @file{sys/xti_udp.h}
-@item @tab @file{sys/xti_tcp.h}
-@item @file{ticlts.h} @tab @file{sys/ticlts.h}
-@item @file{ticots.h} @tab @file{sys/ticots.h}
-@item @file{ticotsord.h} @tab @file{sys/ticotsord.h}
-@item @file{sys/strinet/config.h} @tab
-@item @file{sys/strinet/version.h} @tab
-
+@item @header{xti.h} @tab
+@item @header{xti_inet.h} @tab @header{sys/xti_inet.h}
+@item @tab @header{sys/xti_ip.h}
+@item @tab @header{sys/xti_udp.h}
+@item @tab @header{sys/xti_tcp.h}
+@item @header{ticlts.h} @tab @header{sys/ticlts.h}
+@item @header{ticots.h} @tab @header{sys/ticots.h}
+@item @header{ticotsord.h} @tab @header{sys/ticotsord.h}
+@item @header{sys/strinet/config.h} @tab
+@item @header{sys/strinet/version.h} @tab
 @end multitable
 
-The @cite{@value{PACKAGE_TITLE}} package installs the following manual pages in the
-@file{/usr/share/man/} subdirectory:
-
-@multitable @columnfractions .35 .35
-
-@item @file{man3/xti_ip.3} @tab @file{man4/arp.4}
-@item @file{man3/xti_udp.3} @tab @file{man4/egp.4}
-@item @file{man3/xti_tcp.3} @tab @file{man4/ggp.4}
-@item @file{man3/t_kpalive.3} @tab @file{man4/icmp.4}
-@item @file{man3/t_tcp_info.3} @tab @file{man4/idp.4}
-@item @tab @file{man4/inet.4}
-@item @file{man7/tpi_ip.7} @tab @file{man4/INET.4}
-@item @file{man7/tpi_udp.7} @tab @file{man4/ip.4}
-@item @file{man7/tpi_tcp.7} @tab @file{man4/ipip.4}
-@item @tab @file{man4/pup.4}
-@item @file{man8/strinet_mknod.8} @tab @file{man4/rawip.4}
-@item @file{man8/test-inet_raw.8} @tab @file{man4/rawip2.4}
-@item @file{man8/test-inet_tcp.8} @tab @file{man4/rip.4}
-@item @file{man8/test-inet_udp.8} @tab @file{man4/tcp.4}
-@item @tab @file{man4/tcp2.4}
-@item @file{strinet.macros} @tab @file{man4/ticlts.4}
-@item @file{strinet.refs} @tab @file{man4/ticots.4}
-@item @tab @file{man4/ticots_ord.4}
-@item @tab @file{man4/ticotsord.4}
-@item @tab @file{man4/udp.4}
-@item @tab @file{man4/udp2.4}
-
-@end multitable
-
-The following info manual segments are installed in the @file{/usr/share/info/} subdirectory:
+@cite{@value{PACKAGE_UCNAME}} installs the following test programs in the system libexec directory,
+@file{/@-usr/@-libexec/@-@value{PACKAGE}/@-}:@footnote{Note that on some systems,
+@file{/usr/libexec} does not exist, and @file{/usr/lib} is used instead.}
 
 @table @file
-
-@item strinet.info
-@itemx strinet.info-1
-@itemx strinet.info-2
-This manual in info format.
-
+@item send-pr
+@itemx send-pr.config
+The @command{send-pr} stand-alone shell script can be used for the automatic generation of problem
+reports for the @cite{@value{PACKAGE_TITLE}} package.  The @file{send-pr.config} file provides
+localized definitions used by the @command{send-pr} program.
+For more information on problem reports, @xref{Problem Reports}, and, in particular, @xref{Stand
+Alone Problem Reports}.
+@item test-inet_raw
+test case exectutable.
+@item test-inet_udp
+test case exectutable.
+@item test-inet_tcp
+test case exectutable.
+@item testsuite
+@itemx atlocal
+The @command{testsuite} stand-alone shell script invokes test cases in the test programs above as
+compiled into a comprehensive regression, troubleshooting and validation test suite for the
+@cite{@value{PACKAGE_TITLE}} drivers.  The @file{atlocal} file provides localized definitions used
+by the @command{testsuite} program.
+For more information on test suites, @xref{Test Suites}, and, in particular, @xref{Running Test
+Suites}.
 @end table
 
-The following adminsitrative utilities are installed in the @file{/usr/sbin/}
-subdirectory:
+@cite{@value{PACKAGE_UCNAME}} installs the following utility programs in the system binary
+directory, @file{/@-usr/@-sbin/@-}:
 
 @table @file
-
+@item @value{PACKAGE}_mknod
+This utility can be used by init scripts or administrative users to create or remove device nodes in
+the @file{/dev} directory for @cite{@value{PACKAGE_TITLE}} drivers.
 @item inet_mkdev
-@manref{inet_mkdev(8)} script for creating @dfn{iBCS} devices.
-
+@manpage{inet_mkdev(8)} script for creating @dfn{iBCS} devices.
 @item inet_rmdev
-@manref{inet_mkdev(8)} script for removing @dfn{iBCS} devices.
-
-@item strinet_mknod
-@manref{strinet_mknod(8)} script for creating and removing @file{@value{PACKAGE}}
-devices.
-
+@manpage{inet_mkdev(8)} script for removing @dfn{iBCS} devices.
 @end table
 
-The following configuration files are installed in the @file{/etc} directory:
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following user programs in the user binary
+directory, @file{/@-usr/@-bin/@-}:
 
 @table @file
-
-@item strinet.conf
-System V init script configuration file for @file{@value{PACKAGE}}.
-
-@item default/strinet
-@itemx sysconfig/strinet
-Default configuration file for @file{@value{PACKAGE}}.
-
-@item init.d/strinet
-@itemx init.d/strinet.sh
-System V init script for @file{@value{PACKAGE}}.
-
-@item netconfig.d/strinet
-@manref{netconfig(5)} file for the @manpage{inet(4)} driver.
-
-@item sock2path.d/strinet
-@manref{sock2path(5)} file for the @manpage{inet(4)} driver.
-
 @end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following static and shared object libraries in the
+system library directory, @file{/@-usr/@-lib/@-} (32-bit libraries) and @file{/@-usr/@-lib64/@-}
+(64-bit libraries):
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following internationalization catalogues in
+the internationalization directory, @file{/@-usr/@-share/@-locale/}:
+
+@table @file
+@item de/LC_MESSAGES/@value{PACKAGE}.mo
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following init scripts in the system init directory,
+@file{/@-etc/@-rc.d/@-init.d/@-} (non-Debian) or @file{/@-etc/@-init.d/@-} (Debian):
+
+@table @file
+@item @value{PACKAGE}
+This is the name of the system init script on non-Debian based systems.
+@item @value{PACKAGE}.sh
+This is the name of the system init script on Debian based systems.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration files in the configuration
+directory, @file{/@-etc/@-}:
+
+@table @file
+@item @value{PACKAGE}.conf
+This file provided configuration information for any system controls affected by the
+@samp{@value{PACKAGE_NAME}} package.
+@item modutils/@-@value{PACKAGE}
+This file provides module definitions and demand loading aliases for the @file{@value{PACKAGE}}
+package.  This file is really only applicable to older 2.4 kernels.
+@item netconfig.d/@value{PACKAGE}
+This file provides the @manpage{netconfig(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{netconfig(5)} definitions are used by the @file{strnsl} package and the @file{libxnsl}
+library.
+@item sock2path.d/@value{PACKAGE}
+This file provides the @manpage{sock2path(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{sock2path(5)} definitions are used by the @file{strsock} package and the @file{libsocket}
+library.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration file in the system
+configuration directory, @file{/@-etc/@-sysconfig/@-} (non-Debian) or @file{/@-etc/@-default/@-}
+(Debian):
+
+@table @file
+@item @value{PACKAGE}
+This file provides system configuration information used by init scripts for the
+@samp{@value{PACKAGE_NAME}} package.  Some options of init script execution can be controlled by
+this file.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following info files in the system info directory,
+@file{/@-usr/@-share/@-info/@-}:
+
+@table @file
+@item @value{PACKAGE_UCNAME}.info
+@itemx @value{PACKAGE_UCNAME}.info-1
+@itemx @value{PACKAGE_UCNAME}.info-2
+These files contain this manual in @cite{GNU info} format.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manpage macros and reference database files in
+the system man directory, @file{/@-usr/@-share/@-man/@-}:@footnote{Note that macro and reference
+databse files are not installed if the package is configured for cooked manpages.}
+
+@table @file
+@item @value{PACKAGE}.macros
+This file contains manual page macro definitions included by the manual pages included in the
+package.
+@item @value{PACKAGE}.refs
+This file contains a reference database referenced by the manual pages included in the package.
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man1/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man2/@-}:
+
+@table @file
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man3/@-}:
+
+@table @file
+@item xti_ip.3
+@item xti_udp.3
+@item xti_tcp.3
+@item t_kpalive.3
+@item t_tcp_info.3
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man4/@-}:
+
+@table @file
+@item arp.4
+@item egp.4
+@item ggp.4
+@item icmp.4
+@item idp.4
+@item inet.4
+@item INET.4
+@item ip.4
+@item ipip.4
+@item pup.4
+@item rawip.4
+@item rawip2.4
+@item rip.4
+@item tcp.4
+@item tcp2.4
+@item ticlts.4
+@item ticots.4
+@item ticots_ord.4
+@item ticotsord.4
+@item udp.4
+@item udp2.4
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man5/@-}:
+
+@table @file
+@item @value{PACKAGE}.5
+manual page for the @manpage{@value{PACKAGE}(5)} package.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man7/@-}:
+
+@table @file
+@item tpi_ip.7
+@item tpi_udp.7
+@item tpi_tcp.7
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man8/@-}:
+
+@table @file
+@item @value{PACKAGE}_mknod.8
+Documentation for the @manpage{@value{PACKAGE}_mknod(8)} utility program.
+@item test-inet_raw.8
+@item test-inet_tcp.8
+@item test-inet_udp.8
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man9/@-}:
+
+@table @file
+@end table
+@end ignore
 
 @ignore
 /usr

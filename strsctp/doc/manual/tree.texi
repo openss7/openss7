@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.6 2007/01/05 06:25:06 brian Exp $
+@c @(#) $Id$
 @c
 @c =========================================================================
 @c
@@ -16,7 +16,7 @@
 @c Permission is granted to copy and distribute modified versions of this
 @c manual under the conditions for verbatim copying, provided that the
 @c entire resulting derived work is distributed under the terms of a
-@c permission notice identical to this one
+@c permission notice identical to this one.
 @c 
 @c Since the Linux kernel and libraries are constantly changing, this
 @c manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/05 06:25:06 $ by $Author: brian $
+@c Last Modified $Date$ by $Author$
 @c
 @c =========================================================================
 @c
@@ -66,117 +66,65 @@
 @c
 @c =========================================================================
 
-@cite{@value{PACKAGE_TITLE}} places the following kernel module files in the kernel modules
+@cite{@value{PACKAGE_UCNAME}} creates the following kernel modules files in the kernel modules
 directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-}:@footnote{The kernel version
-@samp{@value{_kversion}} is just an example.}
+@samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is expected.}
 
 @table @file
-
-@item modules.@value{PACKAGE}
-
+@item modules.@value{PACKAGE_LCNAME}
 @end table
 
-@cite{@value{PACKAGE_TITLE}} installs the following kernel modules in the kernel modules directory,
-@file{/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE}/@-}:@footnote{The kernel version
-@samp{@value{_kversion}} is just an example.}
+@cite{@value{PACKAGE_UCNAME}} installs the following kernel module files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE}/@-}:@footnote{The kernel
+version @samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is
+expected.}
 
 @table @file
-
 @item streams_sctp.ko
 This kernel module contains the Stream Control Transmission Protocol (SCTP) driver.
-
 @item streams_tpiperf.ko
 This kernel module contains the Transport Provider Interface (TPI) performance test module.
-
 @end table
 
-@cite{@value{PACKAGE_TITLE}} installs the following header files in the system include directory,
+@cite{@value{PACKAGE_UCNAME}} installs the following header files in the system include directory,
 @file{/@-usr/@-include/@-@value{PACKAGE}/@-}:
 
 @table @header
-
 @item sys/npi_sctp.h
 This file contains Network Provider Interface (NPI) definitions for Stream Control Transmission
 Protocol (SCTP).
-
 @item sys/tpi_sctp.h
 This file contains Transport Provider Interface (TPI) definitions for Stream Control Transmission
 Protocol (SCTP).
-
 @item sys/xti_sctp.h
 This file contains X/Open Transport Interface/Transport Layer Interface (XTI/TLI) definitions for
 Stream Control Transmission Protocol (SCTP).
-
 @item sys/@value{PACKAGE}/version.h
 This file contains kernel and system tailoring information for the @samp{@value{PACKAGE_TITLE}}
 kernel modules.
-
 @item @value{_kversion}/i686/sys/@value{PACKAGE}/modversions.h
 This file contains module and symbol version information for the @samp{@value{PACKAGE_TITLE}} kernel
 modules.  This file is only applicable to @cite{Linux} kernels in the 2.4 series.
 @footnote{The kernel version @value{_kversion} is just for example.}
-
 @end table
 
-@cite{@value{PACKAGE_TITLE}} installs the following configuration files in the system configuration
-directory, @file{/@-etc/@-}:
+@cite{@value{PACKAGE_UCNAME}} installs the following test programs in the system libexec directory,
+@file{/@-usr/@-libexec/@-@value{PACKAGE}/@-}:@footnote{Note that on some systems,
+@file{/usr/libexec} does not exist, and @file{/usr/lib} is used instead.}
 
 @table @file
-
-@item @value{PACKAGE}.conf
-This file provided configuration information for any system controls affected by the
-@samp{@value{PACKAGE_NAME}} package.
-
-@item sysconfig/@-@value{PACKAGE}
-THis file provides system configuration information used by init scripts for the
-@samp{@value{PACKAGE_NAME}} package.  Some options of init script execution can be controlled by
-this file.
-
-@item rc.d/@-init.d/@-@value{PACKAGE}
-This file provides the System V init script for the @samp{@value{PACKAGE_NAME}} package.
-@footnote{This file is really only applicable to RedHat-style init scripts.  An equivalent file,
-@file{@value{PACKAGE}.sh} is provided for Debian-style init scripts.}
-
-@item modutils/@-@value{PACKAGE}
-This file provides module definitions and demand loading aliases for the @file{@value{PACKAGE}}
-package.  This file is really only applicable to older 2.4 kernels.
-
-@item netconfig.d/@value{PACKAGE}
-This file provides the @manpage{netconfig(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
-drivers.
-@manpage{netconfig(5)} definitions are used the the @file{strnsl} package and the @file{libxnsl}
-library.
-
-@item sock2path.d/@value{PACKAGE}
-This file provides the @manpage{sock2path(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
-drivers.
-@manpage{sock2path(5)} definitions are used the the @file{strsock} package and the @file{libsocket}
-library.
-
-@end table
-
-@cite{@value{PACKAGE_TITLE}} installs the following utility programs in the system binary directory,
-@file{/@-usr/@-sbin/@-}:
-
-@table @file
-
-@item @value{PACKAGE}_mknod
-This utility can be used by init scripts or administrative users to create or remove device nodes in
-the @file{/dev} directory for @cite{@value{PACKAGE_TITLE}} drivers.
-
-@end table
-
-@cite{@value{PACKAGE_TITLE}} places the following test programs in the system libexec directory
-@file{/@-usr/@-lib@-exec/@-@value{PACKAGE}/@-}:
-
-@table @file
-
+@item send-pr
+@itemx send-pr.config
+The @command{send-pr} stand-alone shell script can be used for the automatic generation of problem
+reports for the @cite{@value{PACKAGE_TITLE}} package.  The @file{send-pr.config} file provides
+localized definitions used by the @command{send-pr} program.
+For more information on problem reports, @xref{Problem Reports}, and, in particular, @xref{Stand
+Alone Problem Reports}.
 @item test-sctp
 This binary from a C-language program contains a test program for the SCTP driver.
 For more information on @command{test-sctp} see the corresponding manual page: @manref{test-sctp(8)}.
 Test programs are normally invoked on a test case by test case basis by the validation test suite,
 @command{testsuite}.
-
 @item test-sctp_n
 This binary from a C-language program contains a test program for the SCTP driver.
 This particular test program tests the historical Network Provider Interface (NPI) to the Stream
@@ -184,7 +132,6 @@ Control Transmission Protocol (SCTP) driver: @file{streams-sctp}.
 For more information on @command{test-sctp_n} see the corresponding manual page: @manref{test-sctp_n(8)}.
 Test programs are normally invoked on a test case by test case basis by the validation test suite,
 @command{testsuite}.
-
 @item test-sctp_n2
 This binary from a C-language program contains a test program for the SCTP driver.
 This particular test program tests the neo-classical Network Provider Interface (NPI) to the Stream
@@ -192,19 +139,16 @@ Control Transmission Protocol (SCTP) driver: @file{streams-sctp}.
 For more information on @command{test-sctp_n2} see the corresponding manual page: @manref{test-sctp_n2(8)}.
 Test programs are normally invoked on a test case by test case basis by the validation test suite,
 @command{testsuite}.
-
 @item test-sctp_nc
 This binary from a C-language program contains a test program for the SCTP driver.
 For more information on @command{test-sctp_nc} see the corresponding manual page: @manref{test-sctp_nc(8)}.
 Test programs are normally invoked on a test case by test case basis by the validation test suite,
 @command{testsuite}.
-
 @item test-sctp_ns
 This binary from a C-language program contains a test program for the SCTP driver.
 For more information on @command{test-sctp_ns} see the corresponding manual page: @manref{test-sctp_ns(8)}.
 Test programs are normally invoked on a test case by test case basis by the validation test suite,
 @command{testsuite}.
-
 @item test-sctp_t
 This binary from a C-language program contains a test program for the SCTP driver.
 This particular test program tests the neo-classical Transport Provider Interface (TPI) to the Stream
@@ -212,25 +156,21 @@ Control Transmission Protocol (SCTP) driver: @file{streams-sctp}.
 For more information on @command{test-sctp_t} see the corresponding manual page: @manref{test-sctp_t(8)}.
 Test programs are normally invoked on a test case by test case basis by the validation test suite,
 @command{testsuite}.
-
 @item test-etsi_n
 This binary from a C-language program contains a test program for the SCTP driver.
 For more information on @command{test-etsi_n} see the corresponding manual page: @manref{test-etsi_n(8)}.
 Test programs are normally invoked on a test case by test case basis by the validation test suite,
 @command{testsuite}.
-
 @item test-etsi_t
 This binary from a C-language program contains a test program for the SCTP driver.
 For more information on @command{test-etsi_t} see the corresponding manual page: @manref{test-etsi_t(8)}.
 Test programs are normally invoked on a test case by test case basis by the validation test suite,
 @command{testsuite}.
-
 @item test-interop
 This binary from a C-language program contains a test program for the SCTP driver.
 For more information on @command{test-interop} see the corresponding manual page: @manref{test-interop(8)}.
 Test programs are normally invoked on a test case by test case basis by the validation test suite,
 @command{testsuite}.
-
 @item testsuite
 @itemx atlocal
 The @command{testsuite} stand-alone shell script invokes test cases in the test programs above as
@@ -239,167 +179,222 @@ compiled into a comprehensive regression, troubleshooting and validation test su
 by the @command{testsuite} program.
 For more information on test suites, @xref{Test Suites}, and, in particular, @xref{Running Test
 Suites}.
-
-@item send-pr
-@itemx send-pr.config
-The @command{send-pr} stand-alone shell script can be used for the automatic generation of problem
-reports for the @cite{@value{PACKAGE_TITLE}} package.  The @file{send-pr.config} file provides
-localized definitions used by the @command{send-pr} program.
-For more information on problem reports, @xref{Problem Reports}, and, in particular, @xref{Stand
-Alone Problem Reports}.
-
 @end table
 
-@cite{@value{PACKAGE_TITLE}} places the following info files in the system info directory,
+@cite{@value{PACKAGE_UCNAME}} installs the following utility programs in the system binary
+directory, @file{/@-usr/@-sbin/@-}:
+
+@table @file
+@item @value{PACKAGE}_mknod
+This utility can be used by init scripts or administrative users to create or remove device nodes in
+the @file{/dev} directory for @cite{@value{PACKAGE_TITLE}} drivers.
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following user programs in the user binary
+directory, @file{/@-usr/@-bin/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following static and shared object libraries in the
+system library directory, @file{/@-usr/@-lib/@-} (32-bit libraries) and @file{/@-usr/@-lib64/@-}
+(64-bit libraries):
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following internationalization catalogues in
+the internationalization directory, @file{/@-usr/@-share/@-locale/}:
+
+@table @file
+@item de/LC_MESSAGES/@value{PACKAGE}.mo
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following init scripts in the system init directory,
+@file{/@-etc/@-rc.d/@-init.d/@-} (non-Debian) or @file{/@-etc/@-init.d/@-} (Debian):
+
+@table @file
+@item @value{PACKAGE}
+This is the name of the system init script on non-Debian based systems.
+@item @value{PACKAGE}.sh
+This is the name of the system init script on Debian based systems.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration files in the configuration
+directory, @file{/@-etc/@-}:
+
+@table @file
+@item @value{PACKAGE}.conf
+This file provided configuration information for any system controls affected by the
+@samp{@value{PACKAGE_NAME}} package.
+@item modutils/@-@value{PACKAGE}
+This file provides module definitions and demand loading aliases for the @file{@value{PACKAGE}}
+package.  This file is really only applicable to older 2.4 kernels.
+@item netconfig.d/@value{PACKAGE}
+This file provides the @manpage{netconfig(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{netconfig(5)} definitions are used by the @file{strnsl} package and the @file{libxnsl}
+library.
+@item sock2path.d/@value{PACKAGE}
+This file provides the @manpage{sock2path(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{sock2path(5)} definitions are used by the @file{strsock} package and the @file{libsocket}
+library.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration file in the system
+configuration directory, @file{/@-etc/@-sysconfig/@-} (non-Debian) or @file{/@-etc/@-default/@-}
+(Debian):
+
+@table @file
+@item @value{PACKAGE}
+This file provides system configuration information used by init scripts for the
+@samp{@value{PACKAGE_NAME}} package.  Some options of init script execution can be controlled by
+this file.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following info files in the system info directory,
 @file{/@-usr/@-share/@-info/@-}:
 
 @table @file
-
 @item @value{PACKAGE}.info
 @itemx @value{PACKAGE}.info-1
 @itemx @value{PACKAGE}.info-2
-These files contains this manual in @dfn{GNU info} format.
+These files contain this manual in @cite{GNU info} format.
 
 @end table
 
-@cite{@value{PACKAGE_TITLE}} places the following manpage macro and reference database files in the
-system man directory, @file{/@-usr/@-share/@-man/@-}:
+@cite{@value{PACKAGE_UCNAME}} installs the following manpage macros and reference database files in
+the system man directory, @file{/@-usr/@-share/@-man/@-}:@footnote{Note that macro and reference
+databse files are not installed if the package is configured for cooked manpages.}
 
 @table @file
-
 @item @value{PACKAGE}.macros
 This file contains manual page macro definitions included by the manual pages included in the
 package.
-
 @item @value{PACKAGE}.refs
 This file contains a reference database referenced by the manual pages included in the package.
-
 @end table
 
-@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man1/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man2/@-}:
+
+@table @file
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
 @file{/@-usr/@-share/@-man/@-man3/@-}:
 
 @table @file
-
 @item xti_sctp.3.gz
 Documentation of the SCTP specific options and primitive formats for the X/Open Transport
 Interface/Transport Layer Interface (XTI/TLI) for the Stream Control Transmission Protocol (SCTP)
 driver.
-
 @end table
 
-@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
 @file{/@-usr/@-share/@-man/@-man4/@-}:
 
 @table @file
-
 @item sctp.4.gz
 This manual page provides an overview of the Stream Control Transmission Protocol (SCTP) driver and
 is a good starting point when referencing the manual pages.
-
 @item sctp_n.4.gz
 This manual page provides an overview of the Network Provider Interface (NPI) and the Stream Control
 Transmission Protocol (SCTP) driver and is a good staring point when referencing the manual pages.
-
 @item sctp_t.4.gz
 This manual page provides an overview of the Trasnport Provider Interface (TPI) and the Stream Control
 Transmission Protocol (SCTP) driver and is a good staring point when referencing the manual pages.
-
 @end table
 
-@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
 @file{/@-usr/@-share/@-man/@-man5/@-}:
 
 @table @file
-
 @item @value{PACKAGE}.5
-
+manual page for the @manpage{@value{PACKAGE}(5)} package.
 @end table
 
-@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
 @file{/@-usr/@-share/@-man/@-man7/@-}:
 
 @table @file
-
 @item npi_sctp.7.gz
 Documentation of the SCTP specific options and primitive formats for the Network Provider Interface
 (NPI) for the Stream Control Transmission Protocol (SCTP) driver.
-
 @item tpi_sctp.7.gz
 Documentation of the SCTP specific options and primitive formats for the Transport Provider Interface
 (TPI) for the Stream Control Transmission Protocol (SCTP) driver.
-
 @end table
 
-@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
 @file{/@-usr/@-share/@-man/@-man8/@-}:
 
 @table @file
-
-@item test-sctp.8.gz
+@item @value{PACKAGE}_mknod.8
+Documentation for the @manpage{@value{PACKAGE}_mknod(8)} utility program.
+@item test-sctp.8
 Documentation for the @command{test-sctp} test program.
 This manual pages documents all of the options a operation of the @command{test-sctp} program but
 does not delve into the test cases themselves.  Descriptions of the test cases can be printed using
 the @samp{--list} option to @command{test-sctp}.  See the program source for detailed information on
 specific test cases.
-
-@item test-sctp_n.8.gz
+@item test-sctp_n.8
 Documentation for the @command{test-sctp_n} test program.
 This manual pages documents all of the options a operation of the @command{test-sctp_n} program but
 does not delve into the test cases themselves.  Descriptions of the test cases can be printed using
 the @samp{--list} option to @command{test-sctp_n}.  See the program source for detailed information on
 specific test cases.
-
-@item test-sctp_nc.8.gz
+@item test-sctp_nc.8
 Documentation for the @command{test-sctp_nc} test program.
 This manual pages documents all of the options a operation of the @command{test-sctp_nc} program but
 does not delve into the test cases themselves.  Descriptions of the test cases can be printed using
 the @samp{--list} option to @command{test-sctp_nc}.  See the program source for detailed information on
 specific test cases.
-
-@item test-sctp_ns.8.gz
+@item test-sctp_ns.8
 Documentation for the @command{test-sctp_ns} test program.
 This manual pages documents all of the options a operation of the @command{test-sctp_ns} program but
 does not delve into the test cases themselves.  Descriptions of the test cases can be printed using
 the @samp{--list} option to @command{test-sctp_ns}.  See the program source for detailed information on
 specific test cases.
-
-@item test-sctp_t.8.gz
+@item test-sctp_t.8
 Documentation for the @command{test-sctp_t} test program.
 This manual pages documents all of the options a operation of the @command{test-sctp_t} program but
 does not delve into the test cases themselves.  Descriptions of the test cases can be printed using
 the @samp{--list} option to @command{test-sctp_t}.  See the program source for detailed information on
 specific test cases.
-
-@item test-etsi_n.8.gz
+@item test-etsi_n.8
 Documentation for the @command{test-etsi_n} test program.
 This manual pages documents all of the options a operation of the @command{test-etsi_n} program but
 does not delve into the test cases themselves.  Descriptions of the test cases can be printed using
 the @samp{--list} option to @command{test-etsi_n}.  See the program source for detailed information on
 specific test cases.
-
-@item test-etsi_t.8.gz
+@item test-etsi_t.8
 Documentation for the @command{test-etsi_t} test program.
 This manual pages documents all of the options a operation of the @command{test-etsi_t} program but
 does not delve into the test cases themselves.  Descriptions of the test cases can be printed using
 the @samp{--list} option to @command{test-etsi_t}.  See the program source for detailed information on
 specific test cases.
-
-@item @value{PACKAGE}_mknod.8.gz
-Documentation for the @manpage{@value{PACKAGE}_mknod(8)} utility program.
-
 @end table
 
 @ignore
-@cite{@value{PACKAGE_TITLE}} places the following manual pages in the system man directory,
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
 @file{/@-usr/@-share/@-man/@-man9/@-}:
 
 @table @file
-
-
 @end table
-
 @end ignore
+
 @ignore
 /usr
 /usr/include

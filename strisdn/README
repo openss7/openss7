@@ -7,6 +7,21 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS ISDN
 =====================
 
+`OpenSS7 STREAMS ISDN' (strisdn) is an `OpenSS7 Project' implementation
+of a number of ISDN related components, including Q.920, Q.921, Q.931,
+GR-303, V5.2, DPNSS/DASS.  The package includes kernel modules, `SVR
+4.2' "STREAMS" drivers, modules, libraries, utilities, test programs,
+daemons, and development environment for the development and execution
+of `OpenSS7 STREAMS ISDN' applications for the `SVR 4.2' "STREAMS"
+environment.
+
+This release is the first separate release of the `OpenSS7 STREAMS
+ISDN' package.  Some of the components in this package were formerly
+present in the `strss7' package.  Various networking drivers are
+provided as well as CDI, DLPI, NPI, TPI and CCI header files for ISDN
+operation.  The package contains the necessary manual pages and other
+documentation for ISDN components in a separate autoconf tarball.
+
 The `OpenSS7 STREAMS ISDN' package includes kernel modules, `SVR 4.2'
 "STREAMS" drivers, modules, libraries, utilities, test programs,
 daemons, and development environment for the development and execution
@@ -14,7 +29,7 @@ of `OpenSS7 STREAMS ISDN' applications for the `SVR 4.2' "STREAMS"
 environment.
 
 This distribution is only currently applicable to `Linux' 2.4 and 2.6
-keernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'
+kernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'
 architectures, but should build and install for other architectures as
 well.
 

@@ -178,11 +178,11 @@ unsupported.}
 @cite{OpenSS7 STREAMS XNS},
 @uref{http://www.openss7.org/tarballs/strxns-@value{VERSION_STRXNS}.tar.bz2, strxns-@value{VERSION_STRXNS}}.
 
-@ignore
 @item
 @cite{OpenSS7 STREAMS XTI/TLI},
 @uref{http://www.openss7.org/tarballs/strxnet-@value{VERSION_STRXNET}.tar.bz2, strxnet-@value{VERSION_STRXNET}}.
 
+@ignore
 @item
 @cite{OpenSS7 STREAM Network Services Library},
 @uref{http://www.openss7.org/tarballs/strnsl-@value{VERSION_STRNSL}.tar.bz2, strnsl-@value{VERSION_STRNSL}}.

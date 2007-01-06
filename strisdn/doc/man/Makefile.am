@@ -404,6 +404,7 @@ MANS_UNUSED = \
 
 man_MANS = \
 	$(MANS_UNUSED) \
+	man5/strisdn.5 \
 	man8/strisdn_mknod.8 \
 	man8/test-isdn.8
 
@@ -431,6 +432,7 @@ dist_noinst_MANS = \
 	man4/v52.4.man \
 	man4/v5.4.man \
 	man4/v5_ioctl.4.man \
+	man5/strisdn.5.man \
 	man7/capi.7.man \
 	man7/CC_ADDR_ACK.7.man \
 	man7/CC_addr_ack.7.man \

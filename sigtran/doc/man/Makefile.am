@@ -133,6 +133,7 @@ man_MANS = \
 	man4/sdt_tpi.4 \
 	man4/sl_sctp.4 \
 	man4/sl_tpi.4 \
+	man5/sigtran.5 \
 	man7/dlpi_dua.7 \
 	man7/dlpi_gr303ua.7 \
 	man7/dlpi_iua.7 \
@@ -190,6 +191,7 @@ dist_noinst_MANS = \
 	man4/ua_ioctl.4.man \
 	man4/v5ua.4.man \
 	man4/v5ua_ioctl.4.man \
+	man5/sigtran.5.man \
 	man7/dlpi_dua.7.man \
 	man7/dlpi_gr303ua.7.man \
 	man7/dlpi_iua.7.man \

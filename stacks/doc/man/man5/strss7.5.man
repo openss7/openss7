@@ -1,0 +1,524 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH @PACKAGE_UCNAME@ 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.SH NAME
+.B @PACKAGE@
+\- @PACKAGE_TITLE@ package
+.\"
+.\"
+.SH OVERVIEW
+.PP
+This is the
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+package for
+.BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
+.PP
+.BR "Linux Fast-STREAMS" ,
+.BR streams (5),
+consists of a base package that provides basic
+.I SVR 4.2 STREAMS
+capabilities for
+.B Linux
+and a number of separate add-on packages.
+.PP
+OpenSS7
+.I STREAMS
+add-on packages provide additional functionality and protocol support not traditionally found on
+UNIX systems, or which have traditionally fallen into the domain of value-add system software, or,
+in this case, where functionality was optional or differently handled in a number of
+implementations.
+.PP
+The
+.B @PACKAGE_TITLE@
+package is one of the several optional add-on packages that provide support for SS7 and is
+part of the thrust of the
+.IR "OpenSS7 Project" .
+.[
+%T The OpenSS7 Project
+%O http://www.openss7.org
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B @PACKAGE_TITLE@
+package provides
+.I STREAMS
+modules and drivers, libraries, programs, init scripts, and daemons that
+implement the
+.I STREAMS
+SS7 subsystem.
+.PP
+The package builds and installs the following
+.I STREAMS
+modules and drivers (as kernel modules):
+.IP \(en \w'\(en\(em'u
+.B streams_x400p.ko
+.PP
+The following are
+.I STREAMS
+modules installed by the
+.B @PACKAGE@
+package:
+.PP
+The
+.B @PACKAGE_TITLE@
+package includes kernel modules,
+.I SVR 4.2 STREAMS
+drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
+development and execution of
+.B @PACKAGE_TITLE@
+protocol stack components and applications for the
+.I SVR 4.2 STREAMS
+environment.
+.PP
+This distribution is only currently applicable to
+.B Linux
+2.4 and 2.6 kernels and was targeted at
+.IR ix86 ", " x86_64 ", " ppc " and " ppc64
+architectures, but should build and install for other architectures as well.
+.PP
+This package represents SS7 components that were previously part of the
+.BR strss7 (5)
+package, but which were isolated into this package at the end of 2006.  Although this manual page
+documents all commercial components in the
+.BR strss7 (5)
+package, not all components have been released publicly.
+.\"
+.\"
+.SH "PACKAGE CONTENTS"
+.PP
+The
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@ - @VERSION@ )
+package contains the following manual pages:
+.HP
+.BR @PACKAGE@ (5)\ \-\ 
+.B @PACKAGE_TITLE@
+package.
+.PD 0
+.HP
+.BR @PACKAGE@_mknod (8)\ \-\ 
+create or remove
+.I STREAMS
+SS7 device nodes.
+.PD
+.\"
+.PP
+.\"
+.\"
+.SH MODULES
+.PP
+The
+.B @PACKAGE@
+package provides the following
+.I STREAMS
+modules:
+.\"
+.\"
+.SH DEVICES
+.PP
+The
+.B @PACKAGE@
+package provides the following
+.I STREAMS
+devices:
+.\"
+.\"
+.SH PREREQUISITES
+.PP
+The
+.B @PACKAGE@
+package requires the following packages to be installed:
+.TP
+.BR streams (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR "Linux Fast-STREAMS" ,
+.BR streams (5),
+development environment and run-time necessary for all package components.
+.TP
+.BR strcompat (5)
+The
+.B @PACKAGE@
+package requires the avilability of the
+.BR strcompat (5)
+development environment and run-time necessary for most of the package
+components.  Most
+.B @PACKAGE@
+components use the helper functions from the OpenSS7 Compatibility Module or
+the Mentat Portable STREAMS Compatibility Module.
+.TP
+.BR strxns (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strxns (5)
+development environment and run-time necessary for some package components.
+Some package components use the
+.BR cdi (7),
+.BR dlpi (7),
+or
+.BR npi (7)
+definitions available in this package.
+.TP
+.BR strxnet (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strxnet (5)
+development environment and run-time necessary for some package components.
+Some package components use the
+.BR tpi (7)
+definitions available in the package.
+.TP
+.BR strnsl (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strnsl (5)
+development environment and run-time necessary for some package components.
+Some package components provide
+.BR netconfig (5)
+definitions.
+.TP
+.BR strsock (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strsock (5)
+development environment and run-time necessary for some package components.
+Some package components provide
+.BR sock2path (5)
+definitions.
+.TP
+.BR strinet (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strinet (5)
+development environment and run-time necessary for some package components.
+Some package components use the
+.BR tcp (4),
+or
+.BR udp (4)
+protocol drivers from the
+.BR strinet (5)
+package.
+.TP
+.BR strsctp (5)
+The
+.B @PACKAGE@
+package requires the availability of the
+.BR strsctp (5)
+deveopment environment and run-time necessary for all SIGTRAN components.
+(All SIGTRAN components use SCTP.)
+.[
+rfc2960
+.]
+.TP
+.BR striso (5)
+The
+.B @PACKAGE@
+package requires the avialability of the
+.BR striso (5)
+development environment and run-time necessary for some package components.
+Also, the
+.BR striso (5)
+package provides components upon which the
+.BR strisdn (5)
+package depend.
+.TP
+.BR strisdn (5)
+The
+.B @PACKAGE@
+package requires the avialability of the
+.BR strisdn (5)
+development environment for definitions necessary for the ISDN-related SIGTRAN
+components.
+.PP
+The easiest way to satisfy all of the package dependencies for the
+.B @PACKAGE_TITLE@
+package is to obtain it as part of the
+.IR "OpenSS7 Master Package" ,
+.BR openss7 (5).
+.\"
+.\"
+.SH NOTICES
+.PP
+Although previous releases of the
+.B @PACKAGE@
+package were tested with
+.IR LiS ,
+.I LiS
+is now deprecated and this release
+.RB ( @VERSION@ )
+of
+.B @PACKAGE@
+has not been tested with
+.IR LiS .
+.I The OpenSS7 Project
+will no longer support this package for
+.IR LiS :
+please upgrade to
+.BR "Linux Fast-STREAMS" .
+.PP
+.I Production
+releases are releases that have received exhaustive testing within the project
+and validated on specific distributions and architectures.
+.I Production
+release packages do not ship with known defects.  Please remember that there
+is
+.B NO WARRANTY
+on public release packages.
+.PP
+.I Production
+packages ship containing a list of validated distributions and architectures.
+Full regression testing of any maintenance changes is performed.  Suitability
+of software in this category for production use on the specified target
+distributions and architecturs is at the discretion of the user.  It should
+not be necessary to perform validation tests on the set of supported target
+systems before considering production use.
+.PP
+.B @PACKAGE_TITLE@
+could possibly contain unknown defects.  This is a
+.I production
+release.  Nevertheless, some remaining unknown defects could possibly be
+harmful.  Validation testing has been performed by the
+.I OpenSS7 Project
+and external entities on this software for the set of systems listed in the
+release notes.  Nevertheless, the software might still fail to configure or
+compile on other systems.  The
+.I OpenSS7 Project
+recommends that you validate this software for your target system before using
+this software.  Use at your own risk.  Remember that there is
+.BR "NO WARRANTY" .
+(See the section
+.RI \(lq "NO WARRANTY" \(rq
+under the
+.RI \(lq "GNU General Public License" ,
+in the manual.)
+.PP
+This software is
+.I production
+software.  As such, it is stable on validated systems but might still crash
+your kernel in unique circumstances.  Installation of the software on a
+non-validated distribution might mangel your header files or Linux
+distribution in such a way as to make it unusable and rebooting the system
+might not repair the problem.  You could possibly lose all the data on your
+system.  Because this software stands a chance of crashing your kernel, the
+resulting unstable system could possibly destroy computer hardware or
+peripherals making them unusable.  You might void the warranty on any system
+on which you run this fotware.
+.BR "YOU HAVE BEEN WARNED" .
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B @PACKAGE@
+package has been tested with a wide array of production
+.B Linux
+distributions, kernels, and target architectures, and is considered production
+grade by
+.IR "The OpenSS7 Project" .
+At the time of release, the
+.B @PACKAGE@
+package had no known bugs.  Problems can be reported to
+.RB < bugs@openss7.org >.
+Please, however, use the included
+.B send-pr
+script for generating actionable problem reports.  Please see the file
+.RI \(lq PROBLEMS \(rq
+in the release for problem reporting guidelines.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR SS7 (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+Application programming interfaces for SS7 and other modules
+and drivers have not been standardized by a formal standards body.  For the
+most part, SS7 implementations have used proprietary interfaces for accessing
+the various protocol layers of the SS7 stack.
+.PP
+The
+.I OpenSS7 Project
+also uses project-specific (but open) interfaces at a number of layers where a standard
+is lacking.  Nevertheless, standard service interfaces are used for a number of
+layers in the SS7 components and even in the upper level SS7 components.
+These standardized service interfaces are based on the
+Communications Device Interface (CDI),
+.BR cdi (7),
+the Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+and the Call Control Interface (CCI),
+.BR cci (7).
+.PP
+.I OpenSS7 Project
+SS7 components use the same interfaces as are provided for use by SS7/ISDN
+components at the same protocol level.  This makes
+.I OpenSS7 Project
+SS7 components automatically compatible with OpenSS7 SS7
+and ISDN components.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+In general, there are few conformance specifications to which to test SS7
+components.  Nevertheless, a few exist as follows:
+.IP \(bu \w'\(bu\(em'u
+.IP \(bu
+.PP
+For additional description of conformance and validation test suites and the
+standards to which the tests are performed, see the manual page for the
+appropriate protocol driver or module.
+.\"
+.\"
+.SH HISTORY
+.PP
+The contents of the
+.BR strchan "(5), " striso "(5), " strisdn "(5), " sigtran "(5) and " strvoip (5)
+packages were formerly part of the
+.BR strss7 (5)
+package.  As of
+.BR "@PACKAGE@-@VERSION@" ,
+these components were moved out of the
+.BR strss7 (5)
+package into their
+own
+packages.  This package now contains all of the SS7 components released by
+.IR "The OpenSS7 Project" ,
+along with associated documentation.
+.PP
+In the initial release of the
+.BR strss7 (5)
+package, only SS7 modules and drivers that have been fully revalidated on
+.B Linux Fast-STREAMS
+were initially released.  The remaining components present on the CVS archive and formerly part of the commercial
+.BR strss7 (5)
+releases, will be publicly released in releases subsequent to
+.B @PACKAGE@-@VERSION@
+as they are revalidated.
+.\"
+.\"
+.SH STATUS
+.PP
+The
+.B @PACKAGE_TITLE@
+package is
+.I production
+grade on
+.B Linux Fast-STREAMS
+for the modules and drivers included in the public release.  Not all OpenSS7
+project SS7 modules and drivers have been included in the release
+distribution.  The OpenSS7 Project is in the process of revalidating all
+package modules and drivers for use on
+.BR "Linux Fast-STREAMS" .
+As a result, additional release components will be strapped into the package
+once full validation test suites are developed and run against each
+component.
+.PP
+In particular, the following modules and drivers are currently missing from
+the public release:
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

@@ -111,6 +111,7 @@ man_MANS = \
 	man4/sipt.4 \
 	man4/sipt_ioctl.4 \
 	man4/VOIP.4 \
+	man5/strvoip.5 \
 	man7/bicci.7 \
 	man7/cci_bicc.7 \
 	man7/cci_h225.7 \
@@ -140,6 +141,7 @@ dist_noinst_MANS = \
 	man4/sipt.4.man \
 	man4/sipt_ioctl.4.man \
 	man4/VOIP.4.man \
+	man5/strvoip.5.man \
 	man7/bicci.7.man \
 	man7/cci_bicc.7.man \
 	man7/cci_h225.7.man \

@@ -78,11 +78,18 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This release is both a maintenance release and a feature release.
-The major new feature added is a fully @dfn{STREAMS} based implementation of
-the @manpage{rawip(4)} and @manpage{udp(4)} drivers.
-This release is a stable production release for @cite{Linux Fast-STREAMS}.
-Support for @cite{LiS} is deprecated as of this release.
+This @cite{OpenSS7 Project} release is another separate add-on package release of the
+@cite{@value{PACKAGE_TITLE}} package that was formerly present in the (now deprecated) @cite{LiS}
+package.  The networking drivers are provided, as well as the TPI and XTI header files for INET and
+loopback operation.  The package contains all the necessary manual pakges and other documentation
+for INET components in a spearate autoconf tarball.  This release is a stable, production grade
+release for @cite{Linux Fast-STREAMS} and is part of the OpenSS7 Master Package
+(@file{openss7-@value{VERSION_OPENSS7}}).
+
+This release is both a maintenance release and a feature release.  The major new feature added is a
+fully @dfn{STREAMS} based implementation of the @manpage{rawip(4)} and @manpage{udp(4)} drivers.
+This release is a stable production release for @cite{Linux Fast-STREAMS}.  Support for @cite{LiS}
+is deprecated as of this release.
 
 The release provides the following enhancements and fixes:
 

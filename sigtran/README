@@ -19,8 +19,9 @@ architectures, but should build and install for other architectures as
 well.
 
 This package contains modules and drivers formerly only part of the
-Commercial releases of the strss7 package.  These are commercial grade
-implementations that have only recently been released as open source.
+Commercial releases of the `strss7' package.  These are commercial
+grade implementations that have only recently been released as open
+source.
 
 The public release currently contains the following "STREAMS" drivers
 and modules:

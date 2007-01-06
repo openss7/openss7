@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.3 2006/12/31 13:32:57 brian Exp $
+@c @(#) $Id$
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -53,94 +53,257 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/12/31 13:32:57 $ by $Author: brian $
+@c Last Modified $Date$ by $Author$
 @c
 @c =========================================================================
+@c
+@c $Log$
+@c =========================================================================
 
-@dfn{@value{PACKAGE_UCNAME}} places the following kernel modules files in the kernel
-modules directory @file{lib/modules/2.4.20-28.7/}:
-
-@table @file
-@item modules.strxns
-@end table
-
-@dfn{@value{PACKAGE_UCNAME}} places the following kernel modules files in the kernel
-modules directory @file{lib/modules/2.4.20-28.7/strxns/}:
+@ignore
+@cite{@value{PACKAGE_UCNAME}} creates the following kernel modules files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-}:@footnote{The kernel version
+@samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is expected.}
 
 @table @file
-@item streams-ip_strm_mod.o
-This kernel module contains the IP to STREAMS module.
-@item streams-ip_to_dlpi.o
-This kernel module contains the IP to DLPI module.
-@item streams-ldl.o
-This kernel module contains the Linux DL module.
+@item modules.@value{PACKAGE_LCNAME}
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following header files in the system include
-directory @file{/@-usr/@-include/@-strxns/@-}:
+@cite{@value{PACKAGE_UCNAME}} installs the following kernel module files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE}/@-}:@footnote{The kernel
+version @samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is
+expected.}
 
 @table @file
-@item sys/cdi.h
-This file contains the CDI header file.
-@item sys/dlpi.h
-This file contains the DLPI header file.
-@item sys/ldl.h
-This file contains the Linux DL header file.
-@item sys/npi.h
-This file contains the NPI header file.
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following test programs in the system lib@-exec
-directory @file{/@-usr/@-lib@-exec/@-}:
+@cite{@value{PACKAGE_UCNAME}} installs the following header files in the system include directory,
+@file{/@-usr/@-include/@-@value{PACKAGE}/@-}:
+
+@table @header
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following test programs in the system libexec directory,
+@file{/@-usr/@-libexec/@-@value{PACKAGE}/@-}:@footnote{Note that on some systems,
+@file{/usr/libexec} does not exist, and @file{/usr/lib} is used instead.}
 
 @table @file
-@item ldltest
-This binary contins a test program for the Linux DL driver.
+@item send-pr
+@itemx send-pr.config
+The @command{send-pr} stand-alone shell script can be used for the automatic generation of problem
+reports for the @cite{@value{PACKAGE_TITLE}} package.  The @file{send-pr.config} file provides
+localized definitions used by the @command{send-pr} program.
+For more information on problem reports, @xref{Problem Reports}, and, in particular, @xref{Stand
+Alone Problem Reports}.
+@item testsuite
+@itemx atlocal
+The @command{testsuite} stand-alone shell script invokes test cases in the test programs above as
+compiled into a comprehensive regression, troubleshooting and validation test suite for the
+@cite{@value{PACKAGE_TITLE}} drivers.  The @file{atlocal} file provides localized definitions used
+by the @command{testsuite} program.
+For more information on test suites, @xref{Test Suites}, and, in particular, @xref{Running Test
+Suites}.
 @end table
+@end ignore
 
-@dfn{@value{PACKAGE_UCNAME}} places the following utility programs in the system
-binary directory @file{/@-usr/@-sbin/@-}:
+@cite{@value{PACKAGE_UCNAME}} installs the following utility programs in the system binary
+directory, @file{/@-usr/@-sbin/@-}:
 
 @table @file
-@item ldlconfig
-This binary contains a configuration utility for the Linux DL driver.
-@item strxns_mknod
-This binary conatins a script for making device nodes for the
-@dfn{@value{PACKAGE_UCNAME}} package.
+@item sctp_stream_script
+@item tcp_stream_script
+@item udp_stream_script
+@item sctp_rr_script
+@item tcp_rr_script
+@item udp_rr_script
+@item sctp_range_script
+@item tcp_range_script
+@item snapshot_script
+@item arr_script
+@item packet_byte_script
+@item netserver
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following info files in the system info
-directory @file{/@-usr/@-share/@-info/@-}:
+@cite{@value{PACKAGE_UCNAME}} installs the following user programs in the user binary
+directory, @file{/@-usr/@-bin/@-}:
 
 @table @file
-@item strxns.info
-@itemx strxns.info-1
-@itemx strxns.info-2
-@itemx strxns.info-3
-@itemx strxns.info-4
-These files contain this manual in info format.
+@item netperf
+@item netperf_arr
+@item netperf_packet_byte
+@item netperf_sctp_range
+@item netperf_sctp_rr
+@item netperf_sctp_stream
+@item netperf_snapshot
+@item netperf_tcp_range
+@item netperf_tcp_rr
+@item netperf_tcp_stream
+@item netperf_udp_range
+@item netperf_udp_rr
+@item netperf_udp_stream
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following manpage macro and reference
-database files in the system man directory @file{/@-usr/@-share/@-man/@-}:
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following static and shared object libraries in the
+system library directory, @file{/@-usr/@-lib/@-} (32-bit libraries) and @file{/@-usr/@-lib64/@-}
+(64-bit libraries):
 
 @table @file
-@item strxns.macros
-This file contain manual page macro definitions included by the manual pages
-included in the package.
-@item strxns.refs
-This file contains a reference database referenced by the manual pages
-included in the package.
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following CDI manual pages in the system man
-directory @file{/@-usr/@-share/@-man/@-man7/@-}:
+@cite{@value{PACKAGE_UCNAME}} installs the following internationalization catalogues in
+the internationalization directory, @file{/@-usr/@-share/@-locale/}:
 
-@dfn{@value{PACKAGE_UCNAME}} places the following DLPI manual pages in the system man
-directory @file{/@-usr/@-share/@-man/@-man7/@-}:
+@table @file
+@item de/LC_MESSAGES/@value{PACKAGE}.mo
+@end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following NPI manual pages in the system man
-directory @file{/@-usr/@-share/@-man/@-man7/@-}:
+@cite{@value{PACKAGE_UCNAME}} installs the following init scripts in the system init directory,
+@file{/@-etc/@-rc.d/@-init.d/@-} (non-Debian) or @file{/@-etc/@-init.d/@-} (Debian):
+
+@table @file
+@item @value{PACKAGE}
+This is the name of the system init script on non-Debian based systems.
+@item @value{PACKAGE}.sh
+This is the name of the system init script on Debian based systems.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration files in the configuration
+directory, @file{/@-etc/@-}:
+
+@table @file
+@item @value{PACKAGE}.conf
+This file provided configuration information for any system controls affected by the
+@samp{@value{PACKAGE_NAME}} package.
+@item modutils/@-@value{PACKAGE}
+This file provides module definitions and demand loading aliases for the @file{@value{PACKAGE}}
+package.  This file is really only applicable to older 2.4 kernels.
+@item netconfig.d/@value{PACKAGE}
+This file provides the @manpage{netconfig(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{netconfig(5)} definitions are used by the @file{strnsl} package and the @file{libxnsl}
+library.
+@item sock2path.d/@value{PACKAGE}
+This file provides the @manpage{sock2path(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{sock2path(5)} definitions are used by the @file{strsock} package and the @file{libsocket}
+library.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration file in the system
+configuration directory, @file{/@-etc/@-sysconfig/@-} (non-Debian) or @file{/@-etc/@-default/@-}
+(Debian):
+
+@table @file
+@item @value{PACKAGE}
+This file provides system configuration information used by init scripts for the
+@samp{@value{PACKAGE_NAME}} package.  Some options of init script execution can be controlled by
+this file.
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following info files in the system info directory,
+@file{/@-usr/@-share/@-info/@-}:
+
+@table @file
+@item @value{PACKAGE}.info
+@itemx @value{PACKAGE}.info-1
+@itemx @value{PACKAGE}.info-2
+These files contain this manual in @cite{GNU info} format.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manpage macros and reference database files in
+the system man directory, @file{/@-usr/@-share/@-man/@-}:@footnote{Note that macro and reference
+databse files are not installed if the package is configured for cooked manpages.}
+
+@table @file
+@item @value{PACKAGE}.macros
+This file contains manual page macro definitions included by the manual pages included in the
+package.
+@item @value{PACKAGE}.refs
+This file contains a reference database referenced by the manual pages included in the package.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man1/@-}:
+
+@table @file
+@item netperf.1
+@item netperf_arr.1
+@item netperf_packet_byte.1
+@item netperf_sctp_range.1
+@item netperf_sctp_rr.1
+@item netperf_sctp_stream.1
+@item netperf_snapshot.1
+@item netperf_tcp_range.1
+@item netperf_tcp_rr.1
+@item netperf_tcp_stream.1
+@item netperf_udp_range.1
+@item netperf_udp_rr.1
+@item netperf_udp_stream.1
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man2/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man3/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man4/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man5/@-}:
+
+@table @file
+@item @value{PACKAGE}.5
+manual page for the @manpage{@value{PACKAGE}(5)} package.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man7/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man8/@-}:
+
+@table @file
+@ignore
+@item @value{PACKAGE}_mknod.8
+Documentation for the @manpage{@value{PACKAGE}_mknod(8)} utility program.
+@end ignore
+@item sctp_range_script.8
+@item sctp_rr_script.8
+@item sctp_stream_script.8
+@item tcp_range_script.8
+@item tcp_rr_script.8
+@item tcp_stream_script.8
+@item udp_rr_script.8
+@item udp_stream_script.8
+@item snapshot_script.8
+@item arr_script.8
+@item packet_byte_script.8
+@item netserver.8
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man9/@-}:
+
+@table @file
+@end table
+@end ignore
 
 @ignore
 /usr

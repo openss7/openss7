@@ -79,8 +79,8 @@ at @samp{ix86}, @samp{x86_64}, @samp{ppc} and @samp{ppc64} architectures, but sh
 install for other architectures as well.
 
 This package contains modules and drivers formerly only part of the Commercial releases of the
-strss7 package.  These are commercial grade implementations that have only recently been released as
-open source.
+@file{strss7} package.  These are commercial grade implementations that have only recently been
+released as open source.
 
 The public release currently contains the following @dfn{STREAMS} drivers and modules:
 

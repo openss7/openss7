@@ -200,6 +200,7 @@ ss7_man_MANS = \
 	man4/x400p-ss7-lm.4 \
 	man4/x400p-ss7-sdl.4 \
 	man4/ss7_undoc.4 \
+	man5/strss7.5 \
 	man7/cci_bssap.7 \
 	man7/cci_capi.7 \
 	man7/cci_dass.7 \
@@ -1717,6 +1718,7 @@ ss7_dist_noinst_MANS = \
 	man4/x400p-ss7-lm.4.man \
 	man4/x400p-ss7-sdl.4.man \
 	man4/ss7_undoc.4.man \
+	man5/strss7.5.man \
 	man7/cci_bssap.7.man \
 	man7/cci_idlc.7.man \
 	man7/cci_isup.7.man \

@@ -10,7 +10,17 @@ OpenSS7 STREAMS Sockets package.
  Major changes for release strsock-0.9.2.1
 ------------------------------------------
 
-Initial autoconf/RPM packaging of the `strsock' release.
+This `OpenSS7 Project' release is the first separate release of the
+`OpenSS7 STREAMS Sockets' package whose components were formerly part
+of the `strss7', `strxnet' and `streams' packages.  These networking
+modules provide the Sockets library.  The package contains all the
+necessary manual pages and other doumentation.  The package is packaged
+as an OpenSS7 style autoconf tarball.
+
+This is the initial alpha release for `Linux Fast-STREAMS' and is part
+of the OpenSS7 Master Package (`openss7-0.9.2.D').
+
+This release is the initial public release.
 
    * Support for most recent 2.6.18 kernels (including Fedora Core 5
      with inode diet patchset).

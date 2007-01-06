@@ -25,7 +25,16 @@ documentation for SS7/SIGTRAN/ISDN/VoIP components in a separate
 autoconf tarball.
 
 This release is primarily to support recent compilers, kernels and
-distributions.
+distributions, and to upgrade the X400P-SS7 driver with support for the
+Varion V401P (Tormenta III) cards.  Also, this is the first release
+that has ISDN, SIGTRAN and VoIP components moved to separate packages
+(but will still build all components).
+
+   * The X400P-SS7 driver has been upgraded to support the Varion V401P
+     (Tormenta III) card.  This driver passes all validation test
+     suites and is production grade.  The driver still supports the
+     older cards.  Also, an `autoconf' style validation test suite was
+     added and the `test-x400p' test case executable upgraded.
 
    * Support for most recent 2.6.18 kernels (including Fedora Core 5
      with inode diet patchset).

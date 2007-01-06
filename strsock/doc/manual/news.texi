@@ -74,7 +74,16 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.
+This @cite{OpenSS7 Project} release is the first separate release of the @cite{@value{PACKAGE_TITLE}}
+package whose components were formerly part of the @file{strss7}, @file{strxnet} and @file{streams}
+packages.  These networking modules provide the Sockets library.  The package contains all the
+necessary manual pages and other doumentation.  The package is packaged as an OpenSS7 style autoconf
+tarball.
+
+This is the initial alpha release for @cite{Linux Fast-STREAMS} and is part of the OpenSS7 Master
+Package (@file{openss7-@value{VERSION_OPENSS7}}).
+
+This release is the initial public release.
 
 @itemize
 @item

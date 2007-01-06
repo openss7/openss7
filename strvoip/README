@@ -14,7 +14,7 @@ of `OpenSS7 STREAMS VOIP' applications for the `SVR 4.2' "STREAMS"
 environment.
 
 This distribution is only currently applicable to `Linux' 2.4 and 2.6
-keernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'
+kernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'
 architectures, but should build and install for other architectures as
 well.
 

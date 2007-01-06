@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.3 2006/12/31 13:39:35 brian Exp $
+@c @(#) $Id$
 @c
 @c =========================================================================
 @c
-@c Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -16,7 +16,7 @@
 @c Permission is granted to copy and distribute modified versions of this
 @c manual under the conditions for verbatim copying, provided that the
 @c entire resulting derived work is distributed under the terms of a
-@c permission notice identical to this one
+@c permission notice identical to this one.
 @c 
 @c Since the Linux kernel and libraries are constantly changing, this
 @c manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -53,9 +53,687 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/12/31 13:39:35 $ by $Author: brian $
+@c Last Modified $Date$ by $Author$
 @c
 @c =========================================================================
+@c
+@c $Log$
+@c =========================================================================
+
+@cite{@value{PACKAGE_UCNAME}} creates the following kernel modules files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-}:@footnote{The kernel version
+@samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is expected.}
+
+@table @file
+@item modules.@value{PACKAGE_LCNAME}
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following kernel module files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE}/@-}:@footnote{The kernel
+version @samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is
+expected.}
+
+@table @file
+@item streams_sdl.ko
+@item streams_sdlm.ko
+@item streams_spm.ko
+@item streams_sdt.ko
+@item streams_sl.ko
+@item streams_sl_mux.ko
+@item streams_sm_mod.ko
+@item streams_slpmod.ko
+@item streams_x400p-ss7.ko
+@item streams_x100p-ss7.ko
+@item streams_sl_x400p.ko
+@item streams_sl_x100p.ko
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following header files in the system include directory,
+@file{/@-usr/@-include/@-@value{PACKAGE}/@-}:
+
+@table @header
+@item sys/strss7/config.h
+@item sys/strss7/version.h
+@item sys/dlpi_mtp2.h
+@item sys/npi_mtp.h
+@item sys/npi_sccp.h
+@item sys/npi_ss7.h
+@item sys/tpi_mtp.h
+@item sys/tpi_sccp.h
+@item sys/tpi_sl.h
+@item sys/tpi_ss7.h
+@item sys/tpi_tcap.h
+@item sys/xti_mtp.h
+@item sys/xti_sccp.h
+@item sys/xti_sl.h
+@item sys/xti_ss7.h
+@item sys/xti_tcap.h
+@item ss7/cci.h
+@item ss7/devi.h
+@item ss7/devi_ioctl.h
+@item ss7/isupi.h
+@item ss7/isupi_ioctl.h
+@item ss7/lki.h
+@item ss7/lki_ioctl.h
+@item ss7/lmi.h
+@item ss7/lmi_ioctl.h
+@item ss7/mtp2_ioctl.h
+@item ss7/mtp3b.h
+@item ss7/mtp.h
+@item ss7/mtpi.h
+@item ss7/mtpi_ioctl.h
+@item ss7/mtp_ioctl.h
+@item ss7/sccp.h
+@item ss7/sccpi.h
+@item ss7/sccpi_ioctl.h
+@item ss7/sccp_ioctl.h
+@item ss7/sdli.h
+@item ss7/sdli_ioctl.h
+@item ss7/sdti.h
+@item ss7/sdti_ioctl.h
+@item ss7/sl.h
+@item ss7/sli.h
+@item ss7/sli_ioctl.h
+@item ss7/slmi.h
+@item ss7/slsi.h
+@item ss7/slsi_ioctl.h
+@item ss7/smi.h
+@item ss7/smi_ioctl.h
+@item ss7/tcap.h
+@item ss7/tcapi.h
+@item ss7/tcap_ioctl.h
+@item ss7/tc.h
+@item ss7/tr.h
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following test programs in the system libexec directory,
+@file{/@-usr/@-libexec/@-@value{PACKAGE}/@-}:@footnote{Note that on some systems,
+@file{/usr/libexec} does not exist, and @file{/usr/lib} is used instead.}
+
+@table @file
+@item send-pr
+@itemx send-pr.config
+The @command{send-pr} stand-alone shell script can be used for the automatic generation of problem
+reports for the @cite{@value{PACKAGE_TITLE}} package.  The @file{send-pr.config} file provides
+localized definitions used by the @command{send-pr} program.
+For more information on problem reports, @xref{Problem Reports}, and, in particular, @xref{Stand
+Alone Problem Reports}.
+@item test-q781
+@item test-tcpc
+@item test-tcps
+@item test-udpc
+@item test-udps
+@item test-x100p
+@item test-x400p
+@item testsuite
+@itemx atlocal
+The @command{testsuite} stand-alone shell script invokes test cases in the test programs above as
+compiled into a comprehensive regression, troubleshooting and validation test suite for the
+@cite{@value{PACKAGE_TITLE}} drivers.  The @file{atlocal} file provides localized definitions used
+by the @command{testsuite} program.
+For more information on test suites, @xref{Test Suites}, and, in particular, @xref{Running Test
+Suites}.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following utility programs in the system binary
+directory, @file{/@-usr/@-sbin/@-}:
+
+@table @file
+@item @value{PACKAGE}_mknod
+This utility can be used by init scripts or administrative users to create or remove device nodes in
+the @file{/dev} directory for @cite{@value{PACKAGE_TITLE}} drivers.
+@item sdlconfig
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following user programs in the user binary
+directory, @file{/@-usr/@-bin/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following static and shared object libraries in the
+system library directory, @file{/@-usr/@-lib/@-} (32-bit libraries) and @file{/@-usr/@-lib64/@-}
+(64-bit libraries):
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following internationalization catalogues in
+the internationalization directory, @file{/@-usr/@-share/@-locale/}:
+
+@table @file
+@item de/LC_MESSAGES/@value{PACKAGE}.mo
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following init scripts in the system init directory,
+@file{/@-etc/@-rc.d/@-init.d/@-} (non-Debian) or @file{/@-etc/@-init.d/@-} (Debian):
+
+@table @file
+@item @value{PACKAGE}
+This is the name of the system init script on non-Debian based systems.
+@item @value{PACKAGE}.sh
+This is the name of the system init script on Debian based systems.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration files in the configuration
+directory, @file{/@-etc/@-}:
+
+@table @file
+@item @value{PACKAGE}.conf
+This file provided configuration information for any system controls affected by the
+@samp{@value{PACKAGE_NAME}} package.
+@item modutils/@-@value{PACKAGE}
+This file provides module definitions and demand loading aliases for the @file{@value{PACKAGE}}
+package.  This file is really only applicable to older 2.4 kernels.
+@ignore
+@item netconfig.d/@value{PACKAGE}
+This file provides the @manpage{netconfig(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{netconfig(5)} definitions are used by the @file{strnsl} package and the @file{libxnsl}
+library.
+@item sock2path.d/@value{PACKAGE}
+This file provides the @manpage{sock2path(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{sock2path(5)} definitions are used by the @file{strsock} package and the @file{libsocket}
+library.
+@end ignore
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration file in the system
+configuration directory, @file{/@-etc/@-sysconfig/@-} (non-Debian) or @file{/@-etc/@-default/@-}
+(Debian):
+
+@table @file
+@item @value{PACKAGE}
+This file provides system configuration information used by init scripts for the
+@samp{@value{PACKAGE_NAME}} package.  Some options of init script execution can be controlled by
+this file.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following info files in the system info directory,
+@file{/@-usr/@-share/@-info/@-}:
+
+@table @file
+@item @value{PACKAGE}.info
+@itemx @value{PACKAGE}.info-1
+@itemx @value{PACKAGE}.info-2
+These files contain this manual in @cite{GNU info} format.
+@item libxnet.info
+@item cci.info
+@itemx cci.info-1
+@itemx cci.info-2
+@itemx cci.info-3
+@item tri.info
+@item tci.info
+@item mapi.info
+@itemx mapi.info-1
+@itemx mapi.info-2
+@item lab.info
+@item hlr.info
+@item voip.info
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manpage macros and reference database files in
+the system man directory, @file{/@-usr/@-share/@-man/@-}:@footnote{Note that macro and reference
+databse files are not installed if the package is configured for cooked manpages.}
+
+@table @file
+@item @value{PACKAGE}.macros
+This file contains manual page macro definitions included by the manual pages included in the
+package.
+@item @value{PACKAGE}.refs
+This file contains a reference database referenced by the manual pages included in the package.
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man1/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man2/@-}:
+
+@table @file
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man3/@-}:
+
+@table @file
+@item cframe.3
+@item xti_mtp.3
+@item xti_sccp.3
+@item xti_ss7.3
+@item xti_sscop.3
+@item xti_tcap.3
+@item ss7_undoc.3
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man4/@-}:
+
+@table @file
+@item acb56.4
+@item bssap.4
+@item bssap_ioctl.4
+@item ch-sdl.4
+@item ch_x400p.4
+@item cpc388.4
+@item dl.4
+@item dlb.4
+@item dl_gsma.4
+@item dl_ioctl.4
+@item fr.4
+@item gsma.4
+@item hdlc.4
+@item hdlc_ioctl.4
+@item isup.4
+@item isup_ioctl.4
+@item lm.4
+@item lmi_ioctl.4
+@item mtp.4
+@item mtp_ioctl.4
+@item mtp-mgmt.4
+@item mtp-min.4
+@item mtp-mtpi.4
+@item mtp-npi.4
+@item mtp_tpi.4
+@item mtp-tpi.4
+@item mx_sdl.4
+@item mx_x400p.4
+@item OpenSS7.4
+@item pca200e.4
+@item sccp.4
+@item sccp-gtt.4
+@item sccp_ioctl.4
+@item sccp-mgmt.4
+@item sccp-npi.4
+@item sccp-sccpi.4
+@item sccp-tpi.4
+@item sdl.4
+@item sdl-acb56.4
+@item sdl_eth.4
+@item sdl_ioctl.4
+@item sdlm.4
+@item sdlm-lm.4
+@item sdl-mux.4
+@item sdl_rtp.4
+@item sdl_x400p.4
+@item sdt.4
+@item sdt-acb56.4
+@item sdt_ioctl.4
+@item sdt_x400p.4
+@item sl.4
+@item sl-acb56.4
+@item sl_ioctl.4
+@item slm.4
+@item sl_mux.4
+@item sl_x100p.4
+@item sl_x400p.4
+@item slpmod.4
+@item sm_mod.4
+@item spm.4
+@item SS7.4
+@item ss7-sdl-acb0.4
+@item ss7-sdl-acb1.4
+@item ss7-sdl-acb2.4
+@item ss7-sdl-acb3.4
+@item ss7-sdt-acb0.4
+@item ss7-sdt-acb1.4
+@item ss7-sdt-acb2.4
+@item ss7-sdt-acb3.4
+@item ss7-sl-acb0.4
+@item ss7-sl-acb1.4
+@item ss7-sl-acb2.4
+@item ss7-sl-acb3.4
+@item sscop.4
+@item sscop_ioctl.4
+@item sscop_mce.4
+@item tcap.4
+@item tcap_ioctl.4
+@item tcap-mgmt.4
+@item tcap-tci.4
+@item tcap-tpi.4
+@item tcap-tri.4
+@item x100p.4
+@item x100p-ch.4
+@item x100p-mx.4
+@item x100p-sdl.4
+@item x100p-sdt.4
+@item x100p-sl.4
+@item x100p_ss7.4
+@item x100p-ss7.4
+@item x100p-ss7-lm.4
+@item x100p-ss7-sdl.4
+@item x400p.4
+@item x400p-ch.4
+@item x400p_mx.4
+@item x400p-sdl.4
+@item x400p-sdt.4
+@item x400p-sl.4
+@item x400p_ss7.4
+@item x400p-ss7.4
+@item x400p-ss7-lm.4
+@item x400p-ss7-sdl.4
+@item ss7_undoc.4
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man5/@-}:
+
+@table @file
+@item @value{PACKAGE}.5
+manual page for the @manpage{@value{PACKAGE}(5)} package.
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man7/@-}:
+
+@table @file
+@item cci_bssap.7
+@item cci_capi.7
+@item cci_dass.7
+@item cci_gr303.7
+@item cci_idlc.7
+@item cci_isdn.7
+@item cci_isup.7
+@item cdi_hdlc.7
+@item devi.7
+@item isupi.7
+@item isup_socket.7
+@item lmi.7
+@item mtp.7
+@item MTP_ADDR_ACK.7
+@item MTP_ADDR_REQ.7
+@item MTP_BIND_ACK.7
+@item MTP_BIND_REQ.7
+@item MTP_CONN_REQ.7
+@item MTP_DISCON_REQ.7
+@item MTP_ERROR_ACK.7
+@item mtpi.7
+@item MTP_INFO_ACK.7
+@item MTP_INFO_REQ.7
+@item mtp_npi.7
+@item MTP_OK_ACK.7
+@item MTP_OPTMGMT_ACK.7
+@item MTP_OPTMGMT_REQ.7
+@item MTP_PAUSE_IND.7
+@item MTP_RESTART_BEGINS_IND.7
+@item MTP_RESTART_COMPLETE_IND.7
+@item MTP_RESUME_IND.7
+@item mtp_socket.7
+@item MTP_STATUS_IND.7
+@item mtp_tpi.7
+@item MTP_TRANSFER_IND.7
+@item MTP_TRANSFER_REQ.7
+@item MTP_UNBIND_REQ.7
+@item npi_mtp.7
+@item npi_sccp.7
+@item npi_sscop.7
+@item rudp.7
+@item saal_sscop.7
+@item sccpi.7
+@item sccp_socket.7
+@item sdli_2.7
+@item sdli.7
+@item sdti.7
+@item sli.7
+@item slsi.7
+@item smi.7
+@item ss7.7
+@item ss7_undoc.7
+@item sscop.7
+@item sscopi.7
+@item tcapi.7
+@item tcap_socket.7
+@item tci.7
+@item tci_itut.7
+@item tci_ansi.7
+@item tci_etsi.7
+@item TC_ABORT_IND.7
+@item TC_ABORT_REQ.7
+@item TC_BEGIN_CON.7
+@item TC_BEGIN_IND.7
+@item TC_BEGIN_REQ.7
+@item TC_BEGIN_RES.7
+@item TC_BIND_ACK.7
+@item TC_BIND_REQ.7
+@item TC_CANCEL_IND.7
+@item TC_CANCEL_REQ.7
+@item TC_CONT_IND.7
+@item TC_CONT_REQ.7
+@item TC_END_IND.7
+@item TC_END_REQ.7
+@item TC_ERROR_ACK.7
+@item TC_ERROR_IND.7
+@item TC_ERROR_REQ.7
+@item TC_INFO_ACK.7
+@item TC_INFO_REQ.7
+@item TC_INVOKE_IND.7
+@item TC_INVOKE_REQ.7
+@item TC_NOTICE_IND.7
+@item TC_OK_ACK.7
+@item TC_OPTMGMT_ACK.7
+@item TC_OPTMGMT_REQ.7
+@item TC_REJECT_IND.7
+@item TC_REJECT_REQ.7
+@item TC_RESULT_IND.7
+@item TC_RESULT_REQ.7
+@item TC_UNBIND_REQ.7
+@item TC_UNI_IND.7
+@item TC_UNI_REQ.7
+@item TC_abort_ind.7
+@item TC_abort_ind_t.7
+@item TC_abort_req.7
+@item TC_abort_req_t.7
+@item TC_begin_con.7
+@item TC_begin_con_t.7
+@item TC_begin_ind.7
+@item TC_begin_ind_t.7
+@item TC_begin_req.7
+@item TC_begin_req_t.7
+@item TC_begin_res.7
+@item TC_begin_res_t.7
+@item TC_bind_ack.7
+@item TC_bind_ack_t.7
+@item TC_bind_req.7
+@item TC_bind_req_t.7
+@item TC_cancel_ind.7
+@item TC_cancel_ind_t.7
+@item TC_cancel_req.7
+@item TC_cancel_req_t.7
+@item TC_cont_ind.7
+@item TC_cont_ind_t.7
+@item TC_cont_req.7
+@item TC_cont_req_t.7
+@item TC_end_ind.7
+@item TC_end_ind_t.7
+@item TC_end_req.7
+@item TC_end_req_t.7
+@item TC_error_ack.7
+@item TC_error_ack_t.7
+@item TC_error_ind.7
+@item TC_error_ind_t.7
+@item TC_error_req.7
+@item TC_error_req_t.7
+@item TC_info_ack.7
+@item TC_info_ack_t.7
+@item TC_info_req.7
+@item TC_info_req_t.7
+@item TC_invoke_ind.7
+@item TC_invoke_ind_t.7
+@item TC_invoke_req.7
+@item TC_invoke_req_t.7
+@item TC_notice_ind.7
+@item TC_notice_ind_t.7
+@item TC_ok_ack.7
+@item TC_ok_ack_t.7
+@item TC_optmgmt_ack.7
+@item TC_optmgmt_ack_t.7
+@item TC_optmgmt_req.7
+@item TC_optmgmt_req_t.7
+@item TC_reject_ind.7
+@item TC_reject_ind_t.7
+@item TC_reject_req.7
+@item TC_reject_req_t.7
+@item TC_result_ind.7
+@item TC_result_ind_t.7
+@item TC_result_req.7
+@item TC_result_req_t.7
+@item TC_unbind_req.7
+@item TC_unbind_req_t.7
+@item TC_uni_ind.7
+@item TC_uni_ind_t.7
+@item TC_uni_req.7
+@item TC_uni_req_t.7
+@item tpi_mtp.7
+@item tpi_sccp.7
+@item tpi_ss7.7
+@item tpi_sscop.7
+@item tpi_tcap.7
+@item tri.7
+@item tri_itut.7
+@item tri_ansi.7
+@item tri_etsi.7
+@item TR_ABORT_IND.7
+@item TR_ABORT_REQ.7
+@item TR_ADDR_ACK.7
+@item TR_ADDR_REQ.7
+@item TR_BEGIN_CON.7
+@item TR_BEGIN_IND.7
+@item TR_BEGIN_REQ.7
+@item TR_BEGIN_RES.7
+@item TR_BIND_ACK.7
+@item TR_BIND_REQ.7
+@item TR_CONT_IND.7
+@item TR_CONT_REQ.7
+@item TR_END_IND.7
+@item TR_END_REQ.7
+@item TR_ERROR_ACK.7
+@item TR_INFO_ACK.7
+@item TR_INFO_REQ.7
+@item TR_NOTICE_IND.7
+@item TR_OK_ACK.7
+@item TR_OPTMGMT_ACK.7
+@item TR_OPTMGMT_REQ.7
+@item TR_UNBIND_REQ.7
+@item TR_UNI_IND.7
+@item TR_UNI_REQ.7
+@item TR_abort_ind.7
+@item TR_abort_ind_t.7
+@item TR_abort_req.7
+@item TR_abort_req_t.7
+@item TR_addr_ack.7
+@item TR_addr_ack_t.7
+@item TR_addr_req.7
+@item TR_addr_req_t.7
+@item TR_begin_con.7
+@item TR_begin_con_t.7
+@item TR_begin_ind.7
+@item TR_begin_ind_t.7
+@item TR_begin_req.7
+@item TR_begin_req_t.7
+@item TR_begin_res.7
+@item TR_begin_res_t.7
+@item TR_bind_ack.7
+@item TR_bind_ack_t.7
+@item TR_bind_req.7
+@item TR_bind_req_t.7
+@item TR_cont_ind.7
+@item TR_cont_ind_t.7
+@item TR_cont_req.7
+@item TR_cont_req_t.7
+@item TR_end_ind.7
+@item TR_end_ind_t.7
+@item TR_end_req.7
+@item TR_end_req_t.7
+@item TR_error_ack.7
+@item TR_error_ack_t.7
+@item TR_info_ack.7
+@item TR_info_ack_t.7
+@item TR_info_req.7
+@item TR_info_req_t.7
+@item TR_notice_ind.7
+@item TR_notice_ind_t.7
+@item TR_ok_ack.7
+@item TR_ok_ack_t.7
+@item TR_optmgmt_ack.7
+@item TR_optmgmt_ack_t.7
+@item TR_optmgmt_req.7
+@item TR_optmgmt_req_t.7
+@item TR_unbind_req.7
+@item TR_unbind_req_t.7
+@item TR_uni_ind.7
+@item TR_uni_ind_t.7
+@item TR_uni_req.7
+@item TR_uni_req_t.7
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man8/@-}:
+
+@table @file
+@item @value{PACKAGE}_mknod.8
+Documentation for the @manpage{@value{PACKAGE}_mknod(8)} utility program.
+@item cpc388.8
+@item isup.8
+@item mtp.8
+@item sccp.8
+@item sdl.8
+@item sdlconfig.8
+@item sdt.8
+@item sl.8
+@item sls.8
+@item soip.8
+@item ss7.8
+@item ss7confd.8
+@item ss7d.8
+@item tcap.8
+@item test-q781.8
+@item test-q781-pipe.8
+@item test-q784.8
+@item test-tcpc.8
+@item test-tcps.8
+@item test-udpc.8
+@item test-udps.8
+@item test-x100p.8
+@item test-x400p.8
+@item test-x400p-cap2.8
+@item test-x400p-cap.8
+@item test-x400p-hsl.8
+@item test-x400p-perf.8
+@item test-x400p-sdl.8
+@item test-x400p-sdt2.8
+@item test-x400p-sdt.8
+@item test-x400p-sl.8
+@item ss7_undoc.8
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man9/@-}:
+
+@table @file
+@item mtp_n_uderror_ind.9
+@item mtp_n_unitdata_ind.9
+@item mtp_n_unitdata_req.9
+@item sccp_n_uderror_ind.9
+@item sccp_n_unitdata_ind.9
+@item sccp_n_unitdata_req.9
+@item sctp_datack_ind.9
+@item sctp_datack_req.9
+@item sctp_data_ind.9
+@item sctp_data_req.9
+@item sctp_exdata_ind.9
+@item sctp_exdata_req.9
+@item ss7_undoc.9
+@end table
 
 @ignore
 /usr

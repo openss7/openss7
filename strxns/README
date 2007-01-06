@@ -16,14 +16,6 @@ added to Linux as IP interfaces, another provides DLPI access to native
 Linux IP interfaces, and a thrid provides NPI access to the Linux IP
 subsystem.
 
-The `OpenSS7 XNS Networking' package contains header files and a number
-of modules and drivers and the associated documentation that were
-formerly contained in the `OpenSS7 Linux STREAMS (LiS)' releases.  When
-development started on `Linux Fast-STREAMS' in 2003, these modules were
-removed from the `LiS' distribution and separated so that they could
-build against both the `LiS' and `Linux Fast-STREAMS' packages from the
-same baseline code.
-
 The package contains the following standard `Open Systems Interconnect
 (OSI)' conforming header files:
 

@@ -77,11 +77,9 @@ sort-adjacent-labels
 .so sigtran.macros
 .\"
 .\"
-.TH SIGTRAN 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
-.\"
-.\"
+.TH @PACKAGE_UCNAME@ 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
 .SH NAME
-.B sigtran
+.B @PACKAGE@
 \- @PACKAGE_TITLE@ package
 .\"
 .\"
@@ -130,7 +128,7 @@ package provides
 modules and drivers, libraries, programs, init scripts, and daemons that
 implement the
 .I STREAMS
-Signalling Transport subsystem
+Signalling Transport subsystem.
 .PP
 The package builds and installs the following
 .I STREAMS
@@ -186,7 +184,7 @@ package:
 .PP
 The
 .B @PACKAGE_TITLE@
-package includes kernel module,
+package includes kernel modules,
 .I SVR 4.2 STREAMS
 drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
 development and execution of
@@ -212,7 +210,7 @@ package, not all components have been released publicly.
 .SH "PACKAGE CONTENTS"
 .PP
 The
-.BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
+.BR "@PACKAGE_TITLE@ " ( @PACKAGE@ - @VERSION@ )
 package contains the following manual pages:
 .HP
 .BR sigtran (5)\ \-\ 
@@ -573,7 +571,7 @@ package requires the availability of the
 development environment for definitions necessary for the SS7-related SIGTRAN
 components.
 .PP
-The easiest way to satisfy all of the package depenedencies for the
+The easiest way to satisfy all of the package dependencies for the
 .B @PACKAGE_TITLE@
 package is to obtain it as part of the
 .IR "OpenSS7 Master Package" ,
@@ -683,8 +681,8 @@ the various protocol layers of the SS7 stack.
 .PP
 The
 .I OpenSS7 Project
-also uses project-specific interfaces at a number of layers where a standard
-is lacking.  Nevertheless, standard service interfaces are used a number of
+also uses project-specific (but open) interfaces at a number of layers where a standard
+is lacking.  Nevertheless, standard service interfaces are used for a number of
 layers in the ISDN components and even in the upper level SS7 components.
 These standardized service interfaces are based on the
 Communications Device Interface (CDI),
@@ -699,11 +697,13 @@ the Network Provider Interface (NPI),
 npi revision 2.0.0
 .]
 .BR npi (7),
-and the Transport Provider Interface (TPI),
+the Transport Provider Interface (TPI),
 .[
 tpi revision 2.0.0
 .]
-.BR tpi (7).
+.BR tpi (7),
+and the Call Control Interface (CCI),
+.BR cci (7).
 .PP
 .I OpenSS7 Project
 SIGTRAN components use the same interfaces as are provided for use by SS7/ISDN
@@ -754,7 +754,7 @@ The contents of the
 package were formerly part of the
 .BR strss7 (5)
 package.  As of
-.BR "@PACAKGE@-@VERSION@" ,
+.BR "@PACKAGE@-@VERSION@" ,
 the SIGTRAN components were moved out of the
 .BR strss7 (5)
 package into this
@@ -763,12 +763,12 @@ package.  This package now contains all of the SIGTRAN and SS7 over IP component
 .IR "The OpenSS7 Project" ,
 along with associated documentation.
 .PP
-In the initial releases of the
+In the initial release of the
 .BR sigtran (5)
 package, only SIGTRAN modules and drivers that have been fully revalidated on
 .B Linux Fast-STREAMS
 were initially released.  The remaining components present on the CVS archive and formerly part of the commercial
-.BR sstrss7 (5)
+.BR strss7 (5)
 releases, will be publicly released in releases subsequent to
 .B @PACKAGE@-@VERSION@
 as they are revalidated.
@@ -784,11 +784,11 @@ grade on
 .B Linux Fast-STREAMS
 for the modules and drivers included in the public release.  Not all OpenSS7
 Project SIGTRAN modules and drivers have been included in the release
-distribution.  The OpenSS7 project is in the process of revalidating all
-project modules and drivers for use on
+distribution.  The OpenSS7 Project is in the process of revalidating all
+package modules and drivers for use on
 .BR "Linux Fast-STREAMS" .
 As a result, additional release components will be strapped into the package
-and once full validation test suites are developed and run against each
+once full validation test suites are developed and run against each
 component.
 .PP
 In particular, the following modules and drivers are currently missing from

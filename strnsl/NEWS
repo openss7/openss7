@@ -10,10 +10,17 @@ OpenSS7 STREAMS Network Services Library package.
  Major changes for release strnsl-0.9.2.1
 -----------------------------------------
 
-Initial autoconf/RPM packaging of the `strnsl' release.
+This is the first separate release from `The OpenSS7 Project' of the
+`OpenSS7 STREAMS Network Services Library' package.  This package
+provides the `libxnsl' library providing the Network Selection Facility
+for the Network Services Library.  The package contains all the
+necessary manual pages and other documentation.  The package is
+packaged as an OpenSS7 style autoconf tarball.
 
-   * Support for most recent 2.6.18 kernels (including Fedora Core 5
-     with inode diet patchset).
+This is the initial alpha release for `Linux Fast-STREAMS' and is part
+of the OpenSS7 Master Package (`openss7-0.9.2.D').
+
+This release is the initial public release.
 
 -----
 

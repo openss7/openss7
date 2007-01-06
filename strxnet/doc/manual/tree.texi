@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.4 2007/01/03 12:33:12 brian Exp $
+@c @(#) $Id$
 @c
 @c =========================================================================
 @c
@@ -16,7 +16,7 @@
 @c Permission is granted to copy and distribute modified versions of this
 @c manual under the conditions for verbatim copying, provided that the
 @c entire resulting derived work is distributed under the terms of a
-@c permission notice identical to this one
+@c permission notice identical to this one.
 @c 
 @c Since the Linux kernel and libraries are constantly changing, this
 @c manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/03 12:33:12 $ by $Author: brian $
+@c Last Modified $Date$ by $Author$
 @c
 @c =========================================================================
 @c
@@ -63,141 +63,359 @@
 @c
 @c =========================================================================
 
-@cite{@value{PACKAGE_TITLE}} installs the following kernel modules in the
-@file{/lib/modules/@value{_kversion}/@value{PACKAGE}/} subdirectory:@footnote{The kernel version
-@samp{@value{_kversion}} is just an example.}
+@cite{@value{PACKAGE_UCNAME}} creates the following kernel modules files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-}:@footnote{The kernel version
+@samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is expected.}
 
 @table @file
-
-@item streams_tirdwr.ko
-Contains the @manref{tirdwr(4)} @dfn{STREAMS} module.
-
-@item streams_timod.ko
-Contains the @manref{timod(4)} @dfn{STREAMS} module.
-
+@item modules.@value{PACKAGE_LCNAME}
 @end table
 
-@cite{@value{PACKAGE_TITLE}} installs the following header files in the
-@file{/usr/include/@value{PACKAGE}/} subdirectory:
-
-@multitable @columnfractions .35 .35
-
-@item @file{tihdr.h} @tab @file{sys/tihdr.h}
-@item @file{timod.h} @tab @file{sys/timod.h}
-@item @file{tirdwr.h} @tab @file{sys/tirdwr.h}
-@item @file{tiuser.h} @tab @file{sys/tiuser.h}
-@item @file{ticlts.h} @tab @file{sys/ticlts.h}
-@item @file{ticots.h} @tab @file{sys/ticots.h}
-@item @file{ticotsord.h} @tab @file{sys/ticotsord.h}
-@item @file{xti.h} @tab @file{sys/xti.h}
-@item @file{xti_inet.h} @tab @file{sys/xti_inet.h}
-@item @tab @file{sys/tli.h}
-@item @file{sys/strxnet/config.h} @tab @file{sys/tpi.h}
-@item @file{sys/strxnet/version.h}@tab @file{sys/xti_local.h}
-@item @tab @file{sys/xti_xti.h}
-@item @tab @file{sys/xti_ip.h}
-@item @tab @file{sys/xti_udp.h}
-@item @tab @file{sys/xti_tcp.h}
-@item @tab @file{sys/xti_sctp.h}
-@item @tab @file{sys/xti_osi.h}
-@item @tab @file{sys/xti_mosi.h}
-@item @tab @file{sys/xti_atm.h}
-
-@end multitable
-
-The @cite{@value{PACKAGE_TITLE}} package installs the following internationalization catalogues in
-the @file{/usr/share/locale/} subdirectory:
-
-@multitable @columnfractions 1.0
-
-@item @file{de/LC_MESSAGES/strxnet.mo}
-
-@end multitable
-
-The @cite{@value{PACKAGE_TITLE}} package installs the following manual pages in the
-@file{/usr/share/man/} subdirectory:
-
-@multitable @columnfractions .30 .30 .40
-
-@item strxnet.macros @tab man3/t_accept.3 @tab man7/T_ADDR_ACK.7
-@item strxnet.refs @tab man3/t_addleaf.3 @tab man7/T_ADDR_REQ.7
-@item @tab man3/t_alloc.3 @tab man7/T_BIND_ACK.7
-@item man4/timod.4 @tab man3/t_bind.3 @tab man7/T_BIND_REQ.7
-@item man4/tirdwr.4 @tab man3/t_close.3 @tab man7/T_CAPABILITY_ACK.7
-@item @tab man3/t_connect.3 @tab man7/T_CAPABILITY_REQ.7
-@item man5/strxnet.5 @tab man3/t_errlist.3 @tab man7/T_CONN_CON.7
-@item @tab man3/t_errno.3 @tab man7/T_CONN_IND.7
-@item man8/strxnet_mknod.8 @tab man3/t_error.3 @tab man7/T_CONN_REQ.7
-@item man8/test-timod.8 @tab man3/t_errstr.3 @tab man7/T_CONN_RES.7
-@item man8/test-tirdwr.8 @tab man3/t_free.3 @tab man7/T_DATA_IND.7
-@item man8/test-xnet.8 @tab man3/t_getinfo.3 @tab man7/T_DATA_REQ.7
-@item man8/test-xnet_thr.8 @tab man3/t_getprotaddr.3 @tab man7/T_DISCON_IND.7
-@item @tab man3/t_getstate.3 @tab man7/T_DISCON_REQ.7
-@item @tab man3/t_listen.3 @tab man7/T_ERROR_ACK.7
-@item @tab man3/t_look.3 @tab man7/T_EXDATA_IND.7
-@item @tab man3/t_nerr.3 @tab man7/T_EXDATA_REQ.7
-@item @tab man3/t_open.3 @tab man7/T_INFO_ACK.7
-@item @tab man3/t_optmgmt.3 @tab man7/T_INFO_REQ.7
-@item @tab man3/t_rcv.3 @tab man7/T_OK_ACK.7
-@item @tab man3/t_rcvconnect.3 @tab man7/T_OPTDATA_IND.7
-@item @tab man3/t_rcvdis.3 @tab man7/T_OPTDATA_REQ.7
-@item @tab man3/t_rcvleafchange.3 @tab man7/T_OPTMGMT_ACK.7
-@item @tab man3/t_rcvopt.3 @tab man7/T_OPTMGMT_REQ.7
-@item @tab man3/t_rcvrel.3 @tab man7/T_ORDREL_IND.7
-@item @tab man3/t_rcvreldata.3 @tab man7/T_ORDREL_REQ.7
-@item @tab man3/t_rcvudata.3 @tab man7/T_UDERROR_IND.7
-@item @tab man3/t_rcvuderr.3 @tab man7/T_UNBIND_REQ.7
-@item @tab man3/t_rcvv.3 @tab man7/T_UNITDATA_IND.7
-@item @tab man3/t_rcvvopt.3 @tab man7/T_UNITDATA_REQ.7
-@item @tab man3/t_rcvvudata.3 @tab man7/T_addr_ack.7
-@item @tab man3/t_removeleaf.3 @tab man7/T_addr_req.7
-@item @tab man3/t_snd.3 @tab man7/T_bind_ack.7
-@item @tab man3/t_snddis.3 @tab man7/T_bind_req.7
-@item @tab man3/t_sndopt.3 @tab man7/T_capability_ack.7
-@item @tab man3/t_sndrel.3 @tab man7/T_capability_req.7
-@item @tab man3/t_sndreldata.3 @tab man7/T_conn_con.7
-@item @tab man3/t_sndudata.3 @tab man7/T_conn_ind.7
-@item @tab man3/t_sndv.3 @tab man7/T_conn_req.7
-@item @tab man3/t_sndvopt.3 @tab man7/T_conn_res.7
-@item @tab man3/t_sndvudata.3 @tab man7/T_data_ind.7
-@item @tab man3/t_strerror.3 @tab man7/T_data_req.7
-@item @tab man3/t_sync.3 @tab man7/T_discon_ind.7
-@item @tab man3/t_sysconf.3 @tab man7/T_discon_req.7
-@item @tab man3/t_unbind.3 @tab man7/T_error_ack.7
-@item @tab man3/xnet.3 @tab man7/T_exdata_ind.7
-@item @tab man3/xti.3 @tab man7/T_exdata_req.7
-@item @tab @tab man7/T_info_ack.7
-@item @tab @tab man7/T_info_req.7
-@item @tab @tab man7/T_ok_ack.7
-@item @tab @tab man7/T_optdata_ind.7
-@item @tab @tab man7/T_optdata_req.7
-@item @tab @tab man7/T_optmgmt_ack.7
-@item @tab @tab man7/T_optmgmt_req.7
-@item @tab @tab man7/T_ordrel_ind.7
-@item @tab @tab man7/T_ordrel_req.7
-@item @tab @tab man7/T_uderror_ind.7
-@item @tab @tab man7/T_unbind_req.7
-@item @tab @tab man7/T_unitdata_ind.7
-@item @tab @tab man7/T_unitdata_req.7
-@item @tab @tab man7/tpi.7
-
-@end multitable
-
-The following info manual segments are installed in the @file{/usr/share/info/} subdirectory:
+@cite{@value{PACKAGE_UCNAME}} installs the following kernel module files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE}/@-}:@footnote{The kernel
+version @samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is
+expected.}
 
 @table @file
+@item streams_tirdwr.ko
+Contains the @manref{tirdwr(4)} @dfn{STREAMS} module.
+@item streams_timod.ko
+Contains the @manref{timod(4)} @dfn{STREAMS} module.
+@end table
 
-@item strxnet.info
-@itemx strxnet.info-1
-@itemx strxnet.info-2
-This manual in info format.
+@cite{@value{PACKAGE_UCNAME}} installs the following header files in the system include directory,
+@file{/@-usr/@-include/@-@value{PACKAGE}/@-}:
 
+@multitable @columnfractions .35 .35
+@item @header{tihdr.h} @tab @header{sys/tihdr.h}
+@item @header{timod.h} @tab @header{sys/timod.h}
+@item @header{tirdwr.h} @tab @header{sys/tirdwr.h}
+@item @header{tiuser.h} @tab @header{sys/tiuser.h}
+@item @header{ticlts.h} @tab @header{sys/ticlts.h}
+@item @header{ticots.h} @tab @header{sys/ticots.h}
+@item @header{ticotsord.h} @tab @header{sys/ticotsord.h}
+@item @header{xti.h} @tab @header{sys/xti.h}
+@item @header{xti_inet.h} @tab @header{sys/xti_inet.h}
+@item @tab @header{sys/tli.h}
+@item @header{sys/strxnet/config.h} @tab @header{sys/tpi.h}
+@item @header{sys/strxnet/version.h}@tab @header{sys/xti_local.h}
+@item @tab @header{sys/xti_xti.h}
+@item @tab @header{sys/xti_ip.h}
+@item @tab @header{sys/xti_udp.h}
+@item @tab @header{sys/xti_tcp.h}
+@item @tab @header{sys/xti_sctp.h}
+@item @tab @header{sys/xti_osi.h}
+@item @tab @header{sys/xti_mosi.h}
+@item @tab @header{sys/xti_atm.h}
+@end multitable
+
+@cite{@value{PACKAGE_UCNAME}} installs the following test programs in the system libexec directory,
+@file{/@-usr/@-libexec/@-@value{PACKAGE}/@-}:@footnote{Note that on some systems,
+@file{/usr/libexec} does not exist, and @file{/usr/lib} is used instead.}
+
+@table @file
+@item send-pr
+@itemx send-pr.config
+The @command{send-pr} stand-alone shell script can be used for the automatic generation of problem
+reports for the @cite{@value{PACKAGE_TITLE}} package.  The @file{send-pr.config} file provides
+localized definitions used by the @command{send-pr} program.
+For more information on problem reports, @xref{Problem Reports}, and, in particular, @xref{Stand
+Alone Problem Reports}.
+@item test-tirdwr
+test case exectutable.
+@item test-timod
+test case exectutable.
+@item test-xnet
+test case exectutable.
+@item test-xnet_thr
+test case exectutable.
+@item testsuite
+@itemx atlocal
+The @command{testsuite} stand-alone shell script invokes test cases in the test programs above as
+compiled into a comprehensive regression, troubleshooting and validation test suite for the
+@cite{@value{PACKAGE_TITLE}} drivers.  The @file{atlocal} file provides localized definitions used
+by the @command{testsuite} program.
+For more information on test suites, @xref{Test Suites}, and, in particular, @xref{Running Test
+Suites}.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following utility programs in the system binary
+directory, @file{/@-usr/@-sbin/@-}:
+
+@table @file
+@item @value{PACKAGE}_mknod
+This utility can be used by init scripts or administrative users to create or remove device nodes in
+the @file{/dev} directory for @cite{@value{PACKAGE_TITLE}} drivers.
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following user programs in the user binary
+directory, @file{/@-usr/@-bin/@-}:
+
+@table @file
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following static and shared object libraries in the
+system library directory, @file{/@-usr/@-lib/@-} (32-bit libraries) and @file{/@-usr/@-lib64/@-}
+(64-bit libraries):
+
+@table @file
+@item libxnet.so.0.0.0
+@itemx libxnet.so.0
+@itemx libxnet.so
+@item libxnet.a
+@item libxnet.la
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following internationalization catalogues in
+the internationalization directory, @file{/@-usr/@-share/@-locale/}:
+
+@table @file
+@item de/LC_MESSAGES/@value{PACKAGE}.mo
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following init scripts in the system init directory,
+@file{/@-etc/@-rc.d/@-init.d/@-} (non-Debian) or @file{/@-etc/@-init.d/@-} (Debian):
+
+@table @file
+@item @value{PACKAGE}
+This is the name of the system init script on non-Debian based systems.
+@item @value{PACKAGE}.sh
+This is the name of the system init script on Debian based systems.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration files in the configuration
+directory, @file{/@-etc/@-}:
+
+@table @file
+@item @value{PACKAGE}.conf
+This file provided configuration information for any system controls affected by the
+@samp{@value{PACKAGE_NAME}} package.
+@item modutils/@-@value{PACKAGE}
+This file provides module definitions and demand loading aliases for the @file{@value{PACKAGE}}
+package.  This file is really only applicable to older 2.4 kernels.
+@ignore
+@item netconfig.d/@value{PACKAGE}
+This file provides the @manpage{netconfig(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{netconfig(5)} definitions are used by the @file{strnsl} package and the @file{libxnsl}
+library.
+@item sock2path.d/@value{PACKAGE}
+This file provides the @manpage{sock2path(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{sock2path(5)} definitions are used by the @file{strsock} package and the @file{libsocket}
+library.
+@end ignore
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration file in the system
+configuration directory, @file{/@-etc/@-sysconfig/@-} (non-Debian) or @file{/@-etc/@-default/@-}
+(Debian):
+
+@table @file
+@item @value{PACKAGE}
+This file provides system configuration information used by init scripts for the
+@samp{@value{PACKAGE_NAME}} package.  Some options of init script execution can be controlled by
+this file.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following info files in the system info directory,
+@file{/@-usr/@-share/@-info/@-}:
+
+@table @file
+@item @value{PACKAGE}.info
+@itemx @value{PACKAGE}.info-1
+@itemx @value{PACKAGE}.info-2
+These files contain this manual in @cite{GNU info} format.
 @item libxnet.info
 An incomplete info manual for the @file{libxnet} library.  See the manual pages,
 @manref{libxnet(3)}, instead.
-
+@item tpi.info
+@item tpi_tcap.info
 @end table
 
+@cite{@value{PACKAGE_UCNAME}} installs the following manpage macros and reference database files in
+the system man directory, @file{/@-usr/@-share/@-man/@-}:@footnote{Note that macro and reference
+databse files are not installed if the package is configured for cooked manpages.}
+
+@table @file
+@item @value{PACKAGE}.macros
+This file contains manual page macro definitions included by the manual pages included in the
+package.
+@item @value{PACKAGE}.refs
+This file contains a reference database referenced by the manual pages included in the package.
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man1/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man2/@-}:
+
+@table @file
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man3/@-}:
+
+@table @file
+@item t_accept.3
+@item t_addleaf.3
+@item t_alloc.3
+@item t_bind.3
+@item t_close.3
+@item t_connect.3
+@item t_errlist.3
+@item t_errno.3
+@item t_error.3
+@item t_errstr.3
+@item t_free.3
+@item t_getinfo.3
+@item t_getprotaddr.3
+@item t_getstate.3
+@item t_listen.3
+@item t_look.3
+@item t_nerr.3
+@item t_open.3
+@item t_optmgmt.3
+@item t_rcv.3
+@item t_rcvconnect.3
+@item t_rcvdis.3
+@item t_rcvleafchange.3
+@item t_rcvopt.3
+@item t_rcvrel.3
+@item t_rcvreldata.3
+@item t_rcvudata.3
+@item t_rcvuderr.3
+@item t_rcvv.3
+@item t_rcvvopt.3
+@item t_rcvvudata.3
+@item t_removeleaf.3
+@item t_snd.3
+@item t_snddis.3
+@item t_sndopt.3
+@item t_sndrel.3
+@item t_sndreldata.3
+@item t_sndudata.3
+@item t_sndv.3
+@item t_sndvopt.3
+@item t_sndvudata.3
+@item t_strerror.3
+@item t_sync.3
+@item t_sysconf.3
+@item t_unbind.3
+@item xnet.3
+@item xti.3
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man4/@-}:
+
+@table @file
+@item timod.4
+@item tirdwr.4
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man5/@-}:
+
+@table @file
+@item @value{PACKAGE}.5
+manual page for the @manpage{@value{PACKAGE}(5)} package.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man7/@-}:
+
+@table @file
+@item T_ADDR_ACK.7
+@item T_addr_ack.7
+@item T_ADDR_REQ.7
+@item T_addr_req.7
+@item T_BIND_ACK.7
+@item T_bind_ack.7
+@item T_BIND_REQ.7
+@item T_bind_req.7
+@item T_CAPABILITY_ACK.7
+@item T_capability_ack.7
+@item T_CAPABILITY_REQ.7
+@item T_capability_req.7
+@item T_CONN_CON.7
+@item T_conn_con.7
+@item T_CONN_IND.7
+@item T_conn_ind.7
+@item T_CONN_REQ.7
+@item T_conn_req.7
+@item T_CONN_RES.7
+@item T_conn_res.7
+@item T_DATA_IND.7
+@item T_data_ind.7
+@item T_DATA_REQ.7
+@item T_data_req.7
+@item T_DISCON_IND.7
+@item T_discon_ind.7
+@item T_DISCON_REQ.7
+@item T_discon_req.7
+@item T_ERROR_ACK.7
+@item T_error_ack.7
+@item T_EXDATA_IND.7
+@item T_exdata_ind.7
+@item T_EXDATA_REQ.7
+@item T_exdata_req.7
+@item T_INFO_ACK.7
+@item T_info_ack.7
+@item T_INFO_REQ.7
+@item T_info_req.7
+@item T_OK_ACK.7
+@item T_ok_ack.7
+@item T_OPTDATA_IND.7
+@item T_optdata_ind.7
+@item T_OPTDATA_REQ.7
+@item T_optdata_req.7
+@item T_OPTMGMT_ACK.7
+@item T_optmgmt_ack.7
+@item T_OPTMGMT_REQ.7
+@item T_optmgmt_req.7
+@item T_ORDREL_IND.7
+@item T_ordrel_ind.7
+@item T_ORDREL_REQ.7
+@item T_ordrel_req.7
+@item tpi.7
+@item T_UDERROR_IND.7
+@item T_uderror_ind.7
+@item T_UNBIND_REQ.7
+@item T_unbind_req.7
+@item T_UNITDATA_IND.7
+@item T_unitdata_ind.7
+@item T_UNITDATA_REQ.7
+@item T_unitdata_req.7
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man8/@-}:
+
+@table @file
+@item @value{PACKAGE}_mknod.8
+Documentation for the @manpage{@value{PACKAGE}_mknod(8)} utility program.
+@item test-timod.8
+@item test-tirdwr.8
+@item test-xnet.8
+@item test-xnet_thr.8
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man9/@-}:
+
+@table @file
+@end table
+@end ignore
 
 @ignore
 /usr

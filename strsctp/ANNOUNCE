@@ -136,3 +136,169 @@ Copying-policy:		GPL
 End
 
 
+From bidulock@openss7.org Mon Jan  8 00:00:00 2007
+Date: Mon,  8 Jan 2007 00:00:00 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@openss7.org>
+Subject: strsctp 0.9.2.6 Released - STREAMS SCTP for Linux Fast-STREAMS and SIGTRAN
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+strsctp-0.9.2.6 was released under GPLv2 on January 8, 2007.
+
+OpenSS7 STREAMS SCTP (strsctp) is an OpenSS7 Project implementation of
+Stream Control Transmission Protocol (SCTP - RFC 2960) for Linux
+Fast-STREAMS.  It is based on the same protocol engine core as the
+OpenSS7 Linux Native (Sockets) version of OpenSS7 SCTP.  The package
+provides a STREAMS SCTP driver for use with SIGTRAN components of the
+OpenSS7 stack.
+
+This package is a separate release of the OpenSS7 STREAMS SCTP package
+that was formerly present in the strss7 package.  The networking driver,
+sctp(4), is provided, as well as NPI, TPI and XTI header files for SCTP
+operation.  The package contains the necessary manual pages and other
+documentation for SCTP components in a separate autoconf tarball.  This
+release is also part of the OpenSS7 Master Package (openss7-0.9.2.D).
+
+This release is primarily a maintenance release.  No significant defect
+corrections or development has been applied, however, significant
+testing has been performed.  This release is a stable production release
+for Linux Fast-STREAMS.  Support for LiS is deprecated as of this
+release.
+
+The release provides the following enhancements and fixes:
+
+   - Support for most recent 2.6.18 kernels (including Fedora Core 5
+     with inode diet patchset).
+
+   - This release was tested at the 10th SCTP Interop in Vancouver,
+     Canada, at the beginning of August, 2006.  This implementation
+     showed well and interoperated successfully with all implementations
+     present.  Interoperability testing was performed using Linux
+     Fast-STREAMS on the latest, at the time, Fedora Core 5 kernel
+     (2.6.18) and Ubuntu 6.06 Server (2.6.15).
+
+   - Now builds 32-bit compatibility libraries and tests them against
+     64-bit kernel modules and drivers.  The make installcheck target
+     will now automatically test both 64-bit native and 32-bit
+     compatibility versions, one after the other, on 64-bit platforms.
+
+   - Added versioning of all library symbols.
+
+   - Many documentation updates for all OpenSS7 packages.  Automated
+     release file generation making for vastly improved and timely text
+     documentation present in the release directory.
+
+   - Dropped support for LiS.
+
+   - Updated init scripts for proper addition and removal of modules.
+
+   - Start assigning majors at major device number 231 instead of major
+     device number 230.  Assign major device number 230 explicitly to
+     the clone device.  Package will now support extended ranges of
+     minor devices on 2.6 kernels under Linux Fast-STREAMS only.
+     strsctp now supports expanded addressable minor device numbers,
+     permitting 2^16 addressable minor devices per major device number
+     on 2.6 kernels: LiS cannot support this change.
+
+   - Better detection of SUSE distributions, release numbers and SLES
+     distributions: support for additional SuSE distributions on ix86 as
+     well as x86_64.  Added distribution support includes SLES 9, SLES 9
+     SP2, SLES 9 SP3, SLES 10, SuSE 10.1.
+
+   - Improved compiler flag generation and optimizations for recent gcc
+     compilers and some idiosyncratic behaviour for some distributions
+     (primarily SUSE).
+
+   - Optimized compilation is now available also for user level programs
+     in addition to kernel programs.  Added new --with-optimize option
+     to configure to accomplish this.
+
+   - Added --disable-devel configure option to suppress building and
+     installing development environment.  This feature is for embedded
+     or pure runtime targets that do not need the development
+     environment (static libraries, manual pages, documentation).
+
+   - Added send-pr script for automatic problem report generation.
+
+ This is a public production release of the package.  This release
+ deprecates previous releases.  Please upgrade before reporting bugs on
+ previous releases.
+ 
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds rpms for a wide range of Linux 2.4 and 2.6 RPM-based
+distributions, and can be used on production kernels without patching or
+recompiling the kernel.
+
+This package is released under the 'GNU Public License Version 2'.  The
+release is available as an autoconf/RPM tarball, SRPM and set of binary
+RPMs.  See the download page <http://www.openss7.org/download.html> for
+the autoconf tarballs and SRPMs.  See the strsctp package page at
+<http://www.openss7.org/strsctp_pkg.html> for tarballs, SRPMs and binary
+RPMs.
+
+See <http://www.openss7.org/codefiles/strsctp-0.9.2.6/ChangeLog> and
+<http://www.openss7.org/codefiles/strsctp-0.9.2.6/NEWS> in the release
+for more information.  Also, see the strsctp.pdf manual in the release
+(also in html <http://www.openss7.org/strsctp_manual.html>).
+
+For the news release, see <http://www.openss7.org/rel20070108_9.html>
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+
+From bidulock@openss7.org Mon Jan  8 00:00:00 2007
+Date: Mon,  8 Jan 2007 00:00:00 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@execpc.com>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:			strsctp
+Version:		0.9.2.6
+Entered-date:		2007-01-08
+Description:		OpenSS7 STREAMS SCTP.
+			OpenSS7 STREAMS SCTP (Stream Control Transmission
+			Protocol) for Linux Fast-STREAMS.
+			The strsctp package includes kernel modules, SVR 4.2
+			STREAMS drivers, modules, libraries, utilities, test
+			programs, daemons, and development environment for the
+			development and execution of Stream Control Transmission
+			Protocol (SCTP) protocol stack components and
+			applications for the Linux Fast-STREAMS environment.
+			This distribution is applicable to 2.4 and 2.6 kernels
+			and was targetted at ix86, x86_64, ppc and ppc64
+			architectures, but should build and install for other
+			architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		SCTP, TPI, NPI
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			3M strsctp-0.9.2.6.tar.gz
+			2M strsctp-0.9.2.6.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			2M strsctp-0.9.2.6-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4 or 2.6,
+			streams 0:0.9.2.1-1 SVR 4.2 STREAMS,
+			strcompat 0:0.9.2.4-1,
+			strxns 0:0.9.2.4-1,
+			strxnet 0:0.9.2.9-1.
+Copying-policy:		GPL
+End
+
+

@@ -91,15 +91,35 @@ The sections that follow provide information on OpenSS7 releases of the @*
 
 Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.
 
-This is the initial open source release of the SIGTRAN package.  This release
-contains modules and drivers formerly only available with Commercial releases
-of the strss7 package and which are only recently available as open source
-with the release of this package.
+This is the initial open source release of the @cite{@value{PACKAGE_TITLE}} package.  This release
+contains modules and drivers formerly only available with Commercial releases of the @file{strss7}
+package and which are only recently available as open source with the release of this package.
 
+With OpenSS7 Master Package release @file{openss-0.9.2.D}, the SIGTRAN components were separated
+from the @file{strss7} package and placed in this separate package.  Not all of the SIGTRAM
+components previously part of the @file{strss7} package have been strapped into this release.
+Components will be revalidated against @cite{Linux Fast-STREAMS} on a module-by-module and
+driver-by-driver basis.  See @file{TODO} in the release, or @refman{Schedule} for information about
+the release schedule.
+
+In this initial release the major component first available is M2PA.  @manpage{m2pa_sl(4)} is a
+pushable @dfn{STREAMS} module that pushed over a @manpage{sctp_n(4)} SCTP driver Stream to form an
+M2PA signalling link providing the Signalling Link service interface (@manpage{sli(7)}).  A complete
+test suite that tests to @file{draft-bidulock-sigtran-m2pa-07.txt} is included in the release.
+The historical SS7 over IP implementations are provided, but without conformance test suites.  The
+release also contains simplified AS modules for M2UA (@manpage{m2ua_as(4)}), M3UA
+(@manpage{m3ua_as(4)}) that as yet do not have a conformance test suite.
+
+Subsequent releases in 1Q 2007 will include the additional full M3UA, SUA and TUA multiplexing
+drivers with conformance test suites.  The objective is to have these components publicly available
+before the SIGTRAN Interoperability test even in April 2007.
+
+@ignore
 @itemize
 @item
 Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode
 diet patchset).
 @end itemize
+@end ignore
 
 @c ----------------------------------------------------------------------------

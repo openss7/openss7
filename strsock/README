@@ -32,7 +32,7 @@ drivers:
      traditional `SVR 4.2' socket module and socket system support.
 
      It does so by recognizing input-output controls from three sets:
-     `sockmod(4)' input-output controls; `socksys(4)' input-output
+      `sockmod(4)' input-output controls; `socksys(4)' input-output
      controls, and even `socket(7)' system calls.
 
    * `socksys(4)' The `socksys(4)' driver, when opened, provides a
@@ -40,7 +40,7 @@ drivers:
      for traditional `SVR 4.2' socket module and socket system support.
 
      It does so by recognizing input-output controls from three sets:
-     `sockmod(4)' input-output controls; `socksys(4)' input-output
+      `sockmod(4)' input-output controls; `socksys(4)' input-output
      controls, and even `socket(7)' system calls.
 
 The package currently provides the following "STREAMS" libraries:

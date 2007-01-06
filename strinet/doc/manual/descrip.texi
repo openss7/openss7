@@ -1,4 +1,4 @@
-@c -*- texinfo -*- vim: ft=texinfo nocin nosi
+@c -*- texinfo -*- vim: ft=texinfo nocin nosi tw=100
 @c =========================================================================
 @c
 @c @(#) $Id: descrip.texi,v 0.9.2.5 2007/01/03 14:54:41 brian Exp $
@@ -63,14 +63,6 @@ over @dfn{Sockets} approach.  This permits modules to be pushed on UDP or TCP St
 of the XTI/TLI library with Internet Protocols on Linux.  The package now also includes direct
 @dfn{STREAMS} implementations of RAW IP and UDP, and will include direct implementations of TI
 loopback devices and TCP in the future.
-
-This @cite{OpenSS7 Project} release is another separate add-on package release of the
-@cite{@value{PACKAGE_TITLE}} package that was formerly present in the (now deprecated) @cite{LiS}
-package.  The networking drivers are provided, as well as the TPI and XTI header files for INET
-and loopback operation.  The package contains all the necessary manual pakges and other
-documentation for INET components in a spearate autoconf tarball.
-This release is a stable, production grade release for @cite{Linux Fast-STREAMS} and is part of the
-OpenSS7 Master Package (@file{openss7-@value{VERSION_OPENSS7}}).
 
 @ignore
 The @cite{@value{PACKAGE_TITLE}} package contains header files and a number of modules and drivers

@@ -1,0 +1,97 @@
+% # vim: ft=mason sw=4
+<%flags>
+    inherit	=> 'whatsnew.html'
+    package	=> 'strxnet'
+    date	=> 'Jan 8, 2007'
+    rel		=> '0.9.2.9 Release 1'
+    file	=> 'strxnet-0.9.2.9'
+    approved	=> 'Approved for Immediate Release'
+    where	=> 'Edmonton, Alberta'
+    headline	=> 'strxnet 0.9.2.9 Released'
+</%flags><%attr>
+revision	=> '$Id: rel20070108_5.html,v 1.1.2.1 2006/03/16 11:01:25 brian Exp $'
+    label	=> 'Jan 8, 2007'
+    heading	=> 'strxnet 0.9.2.9 Released'
+</%attr><%method description>
+This OpenSS7 Project release is another separate release of the OpenSS7 XTI/TLI Networking that were
+formerly part of the strinet package.  These networking modules provide TPI and XTI/TLI library, as
+well as providing TPI and XTI header files.  The package contains all the necessary manual pages and
+other documentation, including a reprint of the TPI 1.5 specification, for XTI components.  The
+package is packaged as an OpenSS7 style autoconf tarball.
+</p><p style="margin-bottom:0in">
+This release is a stable, production grade release for Linux Fast-STREAMS and is part of the OpenSS7
+Master Package (openss7-0.9.2.D).
+</p><p style="margin-bottom:0in">
+This release is primarily a maintenance release.  No significant defect corrections or development
+has been applied.  This release is a stable production release for Linux Fast-STREAMS.  Support for
+LiS is deprecated as of this release.
+</p><p style="margin-bottom:0in">
+The release provides the following enhancements and fixes:
+</p><ul style="margin-bottom:0in">
+<li>Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode diet patchset).</li>
+<li>Added Network Services Library containing network selection facility as well as name-to-address
+mapping functions ala ONC RPC.  This library has subsequently been moved to the `strnxsl'
+package.</li>
+<li>Now builds 32-bit compatibility libraries and tests them against 64-bit kernel modules and
+drivers.  The `make installcheck' target will now automatically test both 64-bit native and 32-bit
+compatibility versions, one after the other, on 64-bit platforms.</li>
+<li>Added versioning of all library symbols.</li>
+<li>Many documentation updates for all OpenSS7 packages.  Automated release file generation making
+for vastly improved and timely text documentation present in the release directory.</li>
+<li>Dropped support for LiS.</li>
+<li>Updated init scripts for proper addition and removal of modules.</li>
+<li>Start assigning majors at major device number 231 instead of major device number 230.  Assign
+major device number 230 explicitly to the clone device.  Package will now support extended ranges of
+minor devices on 2.6 kernels under Linux Fast-STREAMS only.  `strxnet' now supports expanded
+addressable minor device numbers, permitting 2^16 addressable minor devices per major device number
+on 2.6 kernels: LiS cannot support this change.</li>
+<li>Better detection of SUSE distributions, release numbers and SLES distributions: support for
+additional SuSE distributions on ix86 as well as x86_64.  Added distribution support includes SLES
+9, SLES 9 SP2, SLES 9 SP3, SLES 10, SuSE 10.1.</li>
+<li>Improved compiler flag generation and optimizations for recent gcc compilers and some
+idiosyncratic behaviour for some distributions (primarily SUSE).</li>
+<li>Optimized compilation is now available also for user level programs in addition to kernel
+programs.  Added new --with-optimize option to configure to accomplish this.</li>
+<li>Added --disable-devel configure option to suppress building and installing development
+environment.  This feature is for embedded or pure runtime targets that do not need the development
+environment (static libraries, manual pages, documentation).</li>
+<li>Added send-pr script for automatic problem report generation.</li>
+<li>The package will now build doxygen(1) html documentation with the 'doxy' make target.  See 'make
+help' or README-make in the distribution for more information.</li>
+</ul><p style="margin-bottom:0in">
+<em>This is a public production release of the package: it deprecates previous releases.  Please
+    upgrade before reporting problems with previous releases.</em>
+</%method><%method abstract>
+OpenSS7 today announced Release 0.9.2.9 of the STREAMS X/Open Transport Interface (XTI/TLI) <em>strxnet</em> package.
+</%method><%method news>
+<& SELF:abstract &>
+The OpenSS7 XTI/TLI Networking package for Linux Fast-STREAMS is an implementation of the X/Open
+Trasnport Interface or SVID Transport Layer Interface library in accordance with SUSv2 and XNS 5.2
+standards.  It consists of user-space libraries (libxnet) and a set of cooperating STREAMS modules
+(<a href="man/man2html?4+timod">timod(4)</a> and <a href="man/man2html?4+tirdwr">tirdwr(4)</a>).
+The STREAMS module, timod(4), is pushed on any Stream implementing the Transport Provider Interface
+(TPI) Revision 1.5 or 2.0.0 service interface and provides XTI/TLI library access to the transport
+provider.  Definitions for the Transport Provider Interface (TPI) Revision 2.0.0 are also provided
+by header files included in the package.
+</p><p style="margin-bottom:0in">
+<& SELF:description &>
+</p><p style="margin-bottom:0in">
+As with other OpenSS7 releases, this release configures, compiles, installs and builds rpms for a
+wide range of Linux 2.4 and 2.6 RPM-based distributions,
+and can be used on production kernels without patching or recompiling the kernel.
+</p><p style="margin-bottom:0in">
+This package is publicly released under the
+<a href="license_gpl.html">GNU Public License Version 2</a>.<bdo />
+The release is available as an autoconf/RPM tarball, SRPM, and set of binary RPMs.
+See the <a href="download.html">downloads page</a> for the autoconf tarballs and SRPMs.
+See the <a href="strxnet_pkg.html"><em>strxnet</em> package page</a> for tarballs, SRPMS and binary
+RPMS.
+</p><p style="margin-bottom:0in">
+See <a href="codefiles/strxnet-0.9.2.9/ChangeLog">ChangeLog</a> and
+<a href="codefiles/strxnet-0.9.2.9/NEWS">NEWS</a> in the release for
+more information. Also, see the
+<a href="codefiles/strxnet-0.9.2.9/doc/manual/strxnet.pdf">strxnet.pdf</a>
+manual in the release (also in html <a href="strxnet_manual.html">here</a>).<bdo/>
+</%method><%method body>
+<& SELF:newsitem, comp => $m->base_comp &>
+</%method>

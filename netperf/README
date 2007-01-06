@@ -1,4 +1,4 @@
-OpenSS7 NETPERF Utility -- read me first file.  2007-01-02
+OpenSS7 NETPERF Utility -- read me first file.  2006-12-29
 $Id: README,v 1.1.1.17 2006/12/31 13:32:56 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -52,7 +52,7 @@ responsibility in it.
  Release
 --------
 
-This is the `netperf-2.3.4' package, released 2007-01-02.  This `2.3.4'
+This is the `netperf-2.3.4' package, released 2006-12-29.  This `2.3.4'
 release, and the latest version, can be obtained from the download area
 (http://www.openss7.org/download.html) of The OpenSS7 Project website
 using a command such as:

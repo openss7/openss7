@@ -13,7 +13,12 @@ test programs, daemons, and development environment for the development
 and execution of `Signalling System Number 7 (SS7)', `Signalling
 Transport (SIGTRAN)', `Integrated Services Digital Network (ISDN)' and
 `Voice over IP (VoIP)' protocol stack components and applications for
-the `Linux (Fast-)STREAMS' environment.
+the `Linux Fast-STREAMS' environment.
+
+However, the current package has had ISDN components moved to the
+`strisdn' package, SIGTRAN components moved to the `sigtran' package,
+and VoIP components moved to the `strvoip' package.  Only SS7
+components remain in the `strss7' package.
 
 This distribution is only currently applicable to `Linux' 2.4 and 2.6
 kernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'

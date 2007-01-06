@@ -42,26 +42,26 @@ and drivers:
      - `streams_cd_daed.ko' module "cd_daed"
 
 `ch(4)'
-     The `ch(4)' multiplexing pseudo-device driver is a fully functional
-     channel device capable of channelized, fractional or full-span
-     E1/T1/J1 statistically multiplexed channels.  Streams opened on
-     this device driver support delivery of the raw octet streams
-     associated with the multiplexed channel.
+     The `ch(4)' multiplexing pseudo-device driver is a fully
+     functional channel device capable of channelized, fractional or
+     full-span E1/T1/J1 statistically multiplexed channels.  Streams
+     opened on this device driver support delivery of the raw octet
+     streams associated with the multiplexed channel.
 
 `mx(4)'
-     The `mx(4)' multiplexing pseudo-device driver is a fully functional
-     matrix swithing device capable of switching, performing rate
-     adaption, echo cancellation, digital padding, conferencing, tones,
-     announcements, detection of tones, detection of speech, continuity
-     tests, progress tones, A-law/mu-law conversion,
+     The `mx(4)' multiplexing pseudo-device driver is a fully
+     functional matrix swithing device capable of switching, performing
+     rate adaption, echo cancellation, digital padding, conferencing,
+     tones, announcements, detection of tones, detection of speech,
+     continuity tests, progress tones, A-law/mu-law conversion,
      decompression/compression, comb filtering, and other functions of
      a digital switching matrix.
 
 `mg(4)'
-     The `mg(4)' multiplexing pseudo-device driver is a fully functional
-     media gateway device capable of providing conversion between
-     Circuit Switched Network connections (via the `mx(4)' driver) and
-     Ephemeral RTP streams (via the `rtp(4)' module and `udp(4)'
+     The `mg(4)' multiplexing pseudo-device driver is a fully
+     functional media gateway device capable of providing conversion
+     between Circuit Switched Network connections (via the `mx(4)'
+     driver) and Ephemeral RTP streams (via the `rtp(4)' module and `udp(4)'
      driver).  This device also supports Media Gateway Control Protocol
      communications of several forms over `tcp(4)' and `sctp(4)'.
 
@@ -100,7 +100,7 @@ of `OpenSS7 STREAMS Channels' applications for the `SVR 4.2' "STREAMS"
 environment.
 
 This distribution is only currently applicable to `Linux' 2.4 and 2.6
-keernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'
+kernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'
 architectures, but should build and install for other architectures as
 well.
 

@@ -19,18 +19,6 @@ provider.  Definitions for the Transport Provider Interface (TPI)
 Revision 2.0.0 are also provided by header files included in the
 package.
 
-This `OpenSS7 Project' release is another separate release of the
-`OpenSS7 XTI/TLI Networking' that were formerly part of the `strinet'
-package.  These networking modules provide TPI and XTI/TLI library, as
-well as providing TPI and XTI header files.  The package contains all
-the necessary manual pages and other documentation, including a reprint
-of the TPI 1.5 specification, for XTI components.  The package is
-packaged as an OpenSS7 style autoconf tarball.
-
-This release is a stable, production grade release for `Linux
-Fast-STREAMS' and is part of the OpenSS7 Master Package
-(`openss7-0.9.2.D').
-
 The package contains the following standard `Open Systems Interconnect
 (OSI)' conforming header files:
 

@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.2 2006/12/31 13:44:28 brian Exp $
+@c @(#) $Id$
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -16,7 +16,7 @@
 @c Permission is granted to copy and distribute modified versions of this
 @c manual under the conditions for verbatim copying, provided that the
 @c entire resulting derived work is distributed under the terms of a
-@c permission notice identical to this one
+@c permission notice identical to this one.
 @c 
 @c Since the Linux kernel and libraries are constantly changing, this
 @c manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/12/31 13:44:28 $ by $Author: brian $
+@c Last Modified $Date$ by $Author$
 @c
 @c =========================================================================
 @c
@@ -66,65 +66,553 @@
 @c
 @c =========================================================================
 
+@cite{@value{PACKAGE_UCNAME}} creates the following kernel modules files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-}:@footnote{The kernel version
+@samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is expected.}
+
+@table @file
+@item modules.@value{PACKAGE_LCNAME}
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following kernel module files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE}/@-}:@footnote{The kernel
+version @samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is
+expected.}
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following header files in the system include directory,
+@file{/@-usr/@-include/@-@value{PACKAGE}/@-}:
+
+@table @header
+@item sys/strisdn/config.h
+@item sys/strisdn/version.h
+@item sys/capi.h
+@item sys/capi_ioctl.h
+@item sys/cci.h
+@item sys/dlpi_gr303.h
+@item sys/dlpi_isdn.h
+@item sys/dlpi_lapd.h
+@item sys/dlpi_v52.h
+@item sys/dua_ioctl.h
+@item sys/gr303_ioctl.h
+@item sys/isdni.h
+@item sys/isdni_ioctl.h
+@item sys/lapd_ioctl.h
+@item sys/lapf_ioctl.h
+@item sys/ph.h
+@item sys/q920.h
+@item sys/v52_ioctl.h
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following test programs in the system libexec directory,
+@file{/@-usr/@-libexec/@-@value{PACKAGE}/@-}:@footnote{Note that on some systems,
+@file{/usr/libexec} does not exist, and @file{/usr/lib} is used instead.}
+
+@table @file
+@item send-pr
+@itemx send-pr.config
+The @command{send-pr} stand-alone shell script can be used for the automatic generation of problem
+reports for the @cite{@value{PACKAGE_TITLE}} package.  The @file{send-pr.config} file provides
+localized definitions used by the @command{send-pr} program.
+For more information on problem reports, @xref{Problem Reports}, and, in particular, @xref{Stand
+Alone Problem Reports}.
+@item test-isdn
+test case executable.
+@item testsuite
+@itemx atlocal
+The @command{testsuite} stand-alone shell script invokes test cases in the test programs above as
+compiled into a comprehensive regression, troubleshooting and validation test suite for the
+@cite{@value{PACKAGE_TITLE}} drivers.  The @file{atlocal} file provides localized definitions used
+by the @command{testsuite} program.
+For more information on test suites, @xref{Test Suites}, and, in particular, @xref{Running Test
+Suites}.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following utility programs in the system binary
+directory, @file{/@-usr/@-sbin/@-}:
+
+@table @file
+@item @value{PACKAGE}_mknod
+This utility can be used by init scripts or administrative users to create or remove device nodes in
+the @file{/dev} directory for @cite{@value{PACKAGE_TITLE}} drivers.
+@end table
+
 @ignore
-@dfn{@value{PACKAGE_UCNAME}} places the following kernel modules files in the kernel modules
-directory @file{lib/modules/@value{_kversion}/}:
-
-@table @file
-@item modules.@value{PACKAGE}
-@end table
-
-@dfn{@value{PACKAGE_UCNAME}} places the following kernel modules files in the kernel modules
-directory @file{lib/modules/@value{_kversion}/@value{PACKAGE}/}:
+@cite{@value{PACKAGE_UCNAME}} installs the following user programs in the user binary
+directory, @file{/@-usr/@-bin/@-}:
 
 @table @file
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following header files in the system include directory
-@file{usr/include/@value{PACKAGE}/}:
+@cite{@value{PACKAGE_UCNAME}} installs the following static and shared object libraries in the
+system library directory, @file{/@-usr/@-lib/@-} (32-bit libraries) and @file{/@-usr/@-lib64/@-}
+(64-bit libraries):
 
 @table @file
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following test programs in the system libexec directory
-@file{usr/libexec/}:
+@cite{@value{PACKAGE_UCNAME}} installs the following internationalization catalogues in
+the internationalization directory, @file{/@-usr/@-share/@-locale/}:
 
 @table @file
+@item de/LC_MESSAGES/@value{PACKAGE}.mo
 @end table
+@end ignore
 
-@dfn{@value{PACKAGE_UCNAME}} places the following utility programs in the system binary directory
-@file{usr/sbin/}:
+@cite{@value{PACKAGE_UCNAME}} installs the following init scripts in the system init directory,
+@file{/@-etc/@-rc.d/@-init.d/@-} (non-Debian) or @file{/@-etc/@-init.d/@-} (Debian):
 
 @table @file
-@item strtty_mknod
-This binary conatins a script for making device nodes for the @dfn{@value{PACKAGE_UCNAME}} package.
+@item @value{PACKAGE}
+This is the name of the system init script on non-Debian based systems.
+@item @value{PACKAGE}.sh
+This is the name of the system init script on Debian based systems.
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following info files in the system info directory
-@file{usr/share/info/}:
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration files in the configuration
+directory, @file{/@-etc/@-}:
+
+@table @file
+@item @value{PACKAGE}.conf
+This file provided configuration information for any system controls affected by the
+@samp{@value{PACKAGE_NAME}} package.
+@item modutils/@-@value{PACKAGE}
+This file provides module definitions and demand loading aliases for the @file{@value{PACKAGE}}
+package.  This file is really only applicable to older 2.4 kernels.
+@ignore
+@item netconfig.d/@value{PACKAGE}
+This file provides the @manpage{netconfig(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{netconfig(5)} definitions are used by the @file{strnsl} package and the @file{libxnsl}
+library.
+@item sock2path.d/@value{PACKAGE}
+This file provides the @manpage{sock2path(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{sock2path(5)} definitions are used by the @file{strsock} package and the @file{libsocket}
+library.
+@end ignore
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration file in the system
+configuration directory, @file{/@-etc/@-sysconfig/@-} (non-Debian) or @file{/@-etc/@-default/@-}
+(Debian):
+
+@table @file
+@item @value{PACKAGE}
+This file provides system configuration information used by init scripts for the
+@samp{@value{PACKAGE_NAME}} package.  Some options of init script execution can be controlled by
+this file.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following info files in the system info directory,
+@file{/@-usr/@-share/@-info/@-}:
 
 @table @file
 @item @value{PACKAGE}.info
 @itemx @value{PACKAGE}.info-1
-@itemx @value{PACKAGE}.info-2
-@itemx @value{PACKAGE}.info-3
-@itemx @value{PACKAGE}.info-4
-These files contain this manual in info format.
+These files contain this manual in @cite{GNU info} format.
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following manpage macro and reference database files in the
-system man directory @file{usr/share/man/}:
+@cite{@value{PACKAGE_UCNAME}} installs the following manpage macros and reference database files in
+the system man directory, @file{/@-usr/@-share/@-man/@-}:@footnote{Note that macro and reference
+databse files are not installed if the package is configured for cooked manpages.}
 
 @table @file
 @item @value{PACKAGE}.macros
-This file contain manual page macro definitions included by the manual pages included in the
+This file contains manual page macro definitions included by the manual pages included in the
 package.
 @item @value{PACKAGE}.refs
 This file contains a reference database referenced by the manual pages included in the package.
 @end table
 
-@dfn{@value{PACKAGE_UCNAME}} places the following manual pages in the system man directory
-@file{usr/share/man/}:
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man1/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man2/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man3/@-}:
+
+@table @file
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man4/@-}:
+
+@table @file
+@item capi.4
+@item capi_ioctl.4
+@item dass.4
+@item dl_gr303.4
+@item dl_lapd.4
+@item dl_lapf.4
+@item dl_v52.4
+@item dpnss.4
+@item gr303.4
+@item gr303_ioctl.4
+@item idlc.4
+@item idp.4
+@item ISDN.4
+@item isdn.4
+@item isdn_undoc.4
+@item lapd.4
+@item lapf.4
+@item q921.4
+@item q922.4
+@item q931.4
+@item v52.4
+@item v5.4
+@item v5_ioctl.4
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man5/@-}:
+
+@table @file
+@item @value{PACKAGE}.5
+manual page for the @manpage{@value{PACKAGE}(5)} package.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man7/@-}:
+
+@table @file
+@item capi.7
+@item CC_ADDR_ACK.7
+@item CC_addr_ack.7
+@item CC_addr_ack_t.7
+@item CC_ADDR_REQ.7
+@item CC_addr_req.7
+@item CC_addr_req_t.7
+@item CC_ALERTING_IND.7
+@item CC_alerting_ind.7
+@item CC_alerting_ind_t.7
+@item CC_ALERTING_REQ.7
+@item CC_alerting_req.7
+@item CC_alerting_req_t.7
+@item CC_BIND_ACK.7
+@item CC_bind_ack.7
+@item CC_bind_ack_t.7
+@item CC_BIND_REQ.7
+@item CC_bind_req.7
+@item CC_bind_req_t.7
+@item CC_BLOCKING_CON.7
+@item CC_blocking_con.7
+@item CC_blocking_con_t.7
+@item CC_BLOCKING_IND.7
+@item CC_blocking_ind.7
+@item CC_blocking_ind_t.7
+@item CC_BLOCKING_REQ.7
+@item CC_blocking_req.7
+@item CC_blocking_req_t.7
+@item CC_BLOCKING_RES.7
+@item CC_blocking_res.7
+@item CC_blocking_res_t.7
+@item CC_CALL_FAILURE_IND.7
+@item CC_call_failure_ind.7
+@item CC_call_failure_ind_t.7
+@item CC_CALL_REATTEMPT_IND.7
+@item CC_call_reattempt_ind.7
+@item CC_call_reattempt_ind_t.7
+@item CC_CONNECT_IND.7
+@item CC_connect_ind.7
+@item CC_connect_ind_t.7
+@item CC_CONNECT_REQ.7
+@item CC_connect_req.7
+@item CC_connect_req_t.7
+@item CC_CONT_CHECK_IND.7
+@item CC_cont_check_ind.7
+@item CC_cont_check_ind_t.7
+@item CC_CONT_CHECK_REQ.7
+@item CC_cont_check_req.7
+@item CC_cont_check_req_t.7
+@item CC_CONT_REPORT_IND.7
+@item CC_cont_report_ind.7
+@item CC_cont_report_ind_t.7
+@item CC_CONT_REPORT_REQ.7
+@item CC_cont_report_req.7
+@item CC_cont_report_req_t.7
+@item CC_CONT_TEST_IND.7
+@item CC_cont_test_ind.7
+@item CC_cont_test_ind_t.7
+@item CC_CONT_TEST_REQ.7
+@item CC_cont_test_req.7
+@item CC_cont_test_req_t.7
+@item CC_DATALINK_FAILURE_IND.7
+@item CC_datalink_failure_ind.7
+@item CC_datalink_failure_ind_t.7
+@item CC_DISCONNECT_IND.7
+@item CC_disconnect_ind.7
+@item CC_disconnect_ind_t.7
+@item CC_DISCONNECT_REQ.7
+@item CC_disconnect_req.7
+@item CC_disconnect_req_t.7
+@item CC_ERROR_ACK.7
+@item CC_error_ack.7
+@item CC_error_ack_t.7
+@item CC_ERROR_IND.7
+@item CC_error_ind.7
+@item CC_error_ind_t.7
+@item CC_FACILITY_IND.7
+@item CC_facility_ind.7
+@item CC_FACILITY_REQ.7
+@item CC_facility_req.7
+@item CC_FORWXFER_IND.7
+@item CC_forwxfer_ind.7
+@item CC_forwxfer_ind_t.7
+@item CC_FORWXFER_REQ.7
+@item CC_forwxfer_req.7
+@item CC_forwxfer_req_t.7
+@item CC_HOLD_CON.7
+@item CC_hold_con.7
+@item CC_HOLD_IND.7
+@item CC_hold_ind.7
+@item CC_HOLD_REQ.7
+@item CC_hold_req.7
+@item CC_HOLD_RES.7
+@item CC_hold_res.7
+@item cci.7
+@item CC_IBI_IND.7
+@item CC_ibi_ind.7
+@item CC_ibi_ind_t.7
+@item CC_IBI_REQ.7
+@item CC_ibi_req.7
+@item CC_ibi_req_t.7
+@item cci_capi.7
+@item cci_dass.7
+@item cci_gr303.7
+@item cci_idlc.7
+@item cci_isdn.7
+@item CC_INFO_ACK.7
+@item CC_info_ack.7
+@item CC_info_ack_t.7
+@item CC_INFO_REQ.7
+@item CC_info_req.7
+@item CC_info_req_t.7
+@item CC_INFORMATION_IND.7
+@item CC_information_ind.7
+@item CC_information_ind_t.7
+@item CC_INFORMATION_REQ.7
+@item CC_information_req.7
+@item CC_information_req_t.7
+@item CC_INFO_TIMEOUT_IND.7
+@item CC_info_timeout_ind.7
+@item CC_info_timeout_ind_t.7
+@item CC_MAINT_IND.7
+@item CC_maint_ind.7
+@item CC_maint_ind_t.7
+@item CC_MORE_INFO_IND.7
+@item CC_more_info_ind.7
+@item CC_more_info_ind_t.7
+@item CC_MORE_INFO_REQ.7
+@item CC_more_info_req.7
+@item CC_more_info_req_t.7
+@item CC_NOTIFY_IND.7
+@item CC_notify_ind.7
+@item CC_notify_ind_t.7
+@item CC_NOTIFY_REQ.7
+@item CC_notify_req.7
+@item CC_notify_req_t.7
+@item CC_OK_ACK.7
+@item CC_ok_ack.7
+@item CC_ok_ack_t.7
+@item CC_OPTMGMT_ACK.7
+@item CC_optmgmt_ack.7
+@item CC_optmgmt_ack_t.7
+@item CC_OPTMGMT_REQ.7
+@item CC_optmgmt_req.7
+@item CC_optmgmt_req_t.7
+@item CC_PROCEEDING_IND.7
+@item CC_proceeding_ind.7
+@item CC_proceeding_ind_t.7
+@item CC_PROCEEDING_REQ.7
+@item CC_proceeding_req.7
+@item CC_proceeding_req_t.7
+@item CC_PROGRESS_IND.7
+@item CC_QUERY_CON.7
+@item CC_progress_ind.7
+@item CC_progress_ind_t.7
+@item CC_PROGRESS_REQ.7
+@item CC_progress_req.7
+@item CC_progress_req_t.7
+@item CC_query_con.7
+@item CC_query_con_t.7
+@item CC_QUERY_IND.7
+@item CC_query_ind.7
+@item CC_query_ind_t.7
+@item CC_QUERY_REQ.7
+@item CC_query_req.7
+@item CC_query_req_t.7
+@item CC_QUERY_RES.7
+@item CC_query_res.7
+@item CC_query_res_t.7
+@item CC_REGISTER_IND.7
+@item CC_register_ind.7
+@item CC_REGISTER_REQ.7
+@item CC_register_req.7
+@item CC_REJECT_IND.7
+@item CC_reject_ind.7
+@item CC_reject_ind_t.7
+@item CC_REJECT_REQ.7
+@item CC_reject_req.7
+@item CC_reject_req_t.7
+@item CC_RELEASE_CON.7
+@item CC_release_con.7
+@item CC_release_con_t.7
+@item CC_RELEASE_IND.7
+@item CC_release_ind.7
+@item CC_release_ind_t.7
+@item CC_RELEASE_REQ.7
+@item CC_release_req.7
+@item CC_release_req_t.7
+@item CC_RELEASE_RES.7
+@item CC_release_res.7
+@item CC_release_res_t.7
+@item CC_RESET_CON.7
+@item CC_reset_con.7
+@item CC_reset_con_t.7
+@item CC_RESET_IND.7
+@item CC_reset_ind.7
+@item CC_reset_ind_t.7
+@item CC_RESET_REQ.7
+@item CC_reset_req.7
+@item CC_reset_req_t.7
+@item CC_RESET_RES.7
+@item CC_reset_res.7
+@item CC_reset_res_t.7
+@item CC_RESTART_CON.7
+@item CC_restart_con.7
+@item CC_restart_con_t.7
+@item CC_RESTART_REQ.7
+@item CC_restart_req.7
+@item CC_restart_req_t.7
+@item CC_RESUME_CON.7
+@item CC_resume_con.7
+@item CC_resume_con_t.7
+@item CC_RESUME_IND.7
+@item CC_resume_ind.7
+@item CC_resume_ind_t.7
+@item CC_RESUME_REJECT_IND.7
+@item CC_resume_reject_ind.7
+@item CC_resume_reject_ind_t.7
+@item CC_RESUME_REJECT_REQ.7
+@item CC_resume_reject_req.7
+@item CC_resume_reject_req_t.7
+@item CC_RESUME_REQ.7
+@item CC_resume_req.7
+@item CC_resume_req_t.7
+@item CC_RESUME_RES.7
+@item CC_resume_res.7
+@item CC_resume_res_t.7
+@item CC_RETRIEVE_CON.7
+@item CC_retrieve_con.7
+@item CC_RETRIEVE_IND.7
+@item CC_retrieve_ind.7
+@item CC_RETRIEVE_REQ.7
+@item CC_retrieve_req.7
+@item CC_RETRIEVE_RES.7
+@item CC_retrieve_res.7
+@item CC_SETUP_COMPLETE_IND.7
+@item CC_setup_complete_ind.7
+@item CC_setup_complete_ind_t.7
+@item CC_SETUP_COMPLETE_REQ.7
+@item CC_setup_complete_req.7
+@item CC_setup_complete_req_t.7
+@item CC_SETUP_CON.7
+@item CC_setup_con.7
+@item CC_setup_con_t.7
+@item CC_SETUP_IND.7
+@item CC_setup_ind.7
+@item CC_setup_ind_t.7
+@item CC_SETUP_REQ.7
+@item CC_setup_req.7
+@item CC_setup_req_t.7
+@item CC_SETUP_RES.7
+@item CC_setup_res.7
+@item CC_setup_res_t.7
+@item CC_START_RESET_IND.7
+@item CC_start_reset_ind.7
+@item CC_start_reset_ind_t.7
+@item CC_STATUS_IND.7
+@item CC_status_ind.7
+@item CC_status_ind_t.7
+@item CC_STOP_IND.7
+@item CC_stop_ind.7
+@item CC_stop_ind_t.7
+@item CC_STOP_REQ.7
+@item CC_stop_req.7
+@item CC_stop_req_t.7
+@item CC_SUSPEND_CON.7
+@item CC_suspend_con.7
+@item CC_suspend_con_t.7
+@item CC_SUSPEND_IND.7
+@item CC_suspend_ind.7
+@item CC_suspend_ind_t.7
+@item CC_SUSPEND_REJECT_IND.7
+@item CC_suspend_reject_ind.7
+@item CC_suspend_reject_ind_t.7
+@item CC_SUSPEND_REJECT_REQ.7
+@item CC_suspend_reject_req.7
+@item CC_suspend_reject_req_t.7
+@item CC_SUSPEND_REQ.7
+@item CC_suspend_req.7
+@item CC_suspend_req_t.7
+@item CC_SUSPEND_RES.7
+@item CC_suspend_res.7
+@item CC_suspend_res_t.7
+@item CC_UNBIND_REQ.7
+@item CC_unbind_req.7
+@item CC_unbind_req_t.7
+@item CC_UNBLOCKING_CON.7
+@item CC_unblocking_con.7
+@item CC_unblocking_con_t.7
+@item CC_UNBLOCKING_IND.7
+@item CC_unblocking_ind.7
+@item CC_unblocking_ind_t.7
+@item CC_UNBLOCKING_REQ.7
+@item CC_unblocking_req.7
+@item CC_unblocking_req_t.7
+@item CC_UNBLOCKING_RES.7
+@item CC_unblocking_res.7
+@item CC_unblocking_res_t.7
+@item dlpi_dass.7
+@item dlpi_gr303.7
+@item dlpi_lapd.7
+@item dlpi_lapf.7
+@item isdn_undoc.7
+@item isdni.7
+@item npi_q933.7
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man8/@-}:
+
+@table @file
+@item @value{PACKAGE}_mknod.8
+Documentation for the @manpage{@value{PACKAGE}_mknod(8)} utility program.
+@item isdn.8
+@item isdn_undoc.8
+@item isdnconfd.8
+@item test-isdn.8
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man9/@-}:
+
+@table @file
+@end table
 @end ignore
 
 @ignore

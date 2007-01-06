@@ -1,0 +1,80 @@
+% # vim: ft=mason sw=4
+<%flags>
+    inherit	=> 'whatsnew.html'
+    package	=> 'strnsl'
+    date	=> 'Jan 8, 2007'
+    rel		=> '0.9.2.1 Release 1'
+    file	=> 'strnsl-0.9.2.1'
+    approved	=> 'Approved for Immediate Release'
+    where	=> 'Edmonton, Alberta'
+    headline	=> 'strnsl 0.9.2.1 Released'
+</%flags><%attr>
+    revision	=> '$Id: rel20070108_6.html,v 1.1.2.1 2006/03/16 11:01:25 brian Exp $'
+    label	=> 'Jan 8, 2007'
+    heading	=> 'strnsl 0.9.2.1 Released'
+</%attr><%method description>
+This is the first separate release from `The OpenSS7 Project' of the `OpenSS7 STREAMS Network
+Services Library' package.  This package provides the `libxnsl' library providing the Network
+Selection Facility for the Network Services Library.  The package contains all the necessary manual
+pages and other documentation.  The package is packaged as an OpenSS7 style autoconf tarball.
+</p><p style="margin-bottom:0in">
+This release is the initial public release.
+</p><ul style="margin-bottom:0in">
+<li>Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode diet patchset).</li>
+</ul><p style="margin-bottom:0in">
+<em>This is the inital public alpha release of the package.  This package is currently incomplete.
+    It is being released as a reference point for the community.  If you are interested in
+    completion of this package, contact <a href="mailto:info@openss7.com">info@openss7.com</a>.</em>
+</%method><%method abstract>
+OpenSS7 today announced Release 0.9.2.1 of the STREAMS Network Services Library (NSL) <em>strnsl</em> package.
+</%method><%method news>
+<& SELF:abstract &>
+`UNIX' has traditionally provided three components of the Network Services Library, `libnsl', two of
+which are associated with the X/Open Transport Interface/Transport Layer Interface (XTI/TLI),
+`libxnet', the Trasnport Provider Interface (TPI), and "STREAMS" network pseudo-device drivers.  Two
+components provide the TI (Transport Independent) interface, whereas the other provides the TS
+(Transport Sockets) interface.  The TI components provide the Transport Independent RPC services
+(TI-RPC) pioneered by Sun Microsystems and subsequently standardized by the IETF.
+</p><p style="margin-bottom:0in">
+`GNU/Linux' `glibc' provides (amoungst other things) the RPC interface library and the TS-RPC and
+BSD 4.3 sockets address translation facilities in `libc', and provides NIS capabilities in `libnsl'.
+"STREAMS" related components that are not currently part of the `Linux' Network Services Library
+(`libnsl') are:
+</p><ol style="margin-bottom:0in">
+<li>Network Selection, consisting of:</li>
+<ul style="margin-bottom:0in">
+    <li>Network Configuration database access, <a href="man/man2html?3+netconfig">netconfig(3)</a>, and,</li>
+    <li>Network Path access, <a href="man/man2html?3+netpath">netpath(3)</a>.</li>
+</ul>
+<li>Name-to-Address Translation, <a href="man/man2html?3+netdir">netdir(3)</a>.</li>
+</ol><p style="margin-bottom:0in">
+These are often referred to as the Network Selection facility of the Network Services Library.  The
+`OpenSS7 STREAMS Network Services Library' package provides a library, renamed `libxnsl', that
+provides the missing Network Selection and Name-to-Address mapping facilities designed to work with
+<a href="man/man2html?3+xti">xti(3)</a>.
+</p><p style="margin-bottom:0in">
+The `OpenSS7 STREAMS Network Services Library' package contains header files and the associated
+documentation that were originally contained in the `strxnet' package.  This library was quickly
+removed from the `strxnet' distribution and placed in its own add-on package.
+</p><p style="margin-bottom:0in">
+<& SELF:description &>
+</p><p style="margin-bottom:0in">
+As with other OpenSS7 releases, this release configures, compiles, installs and builds rpms for a
+wide range of Linux 2.4 and 2.6 RPM-based distributions,
+and can be used on production kernels without patching or recompiling the kernel.
+</p><p style="margin-bottom:0in">
+This package is publicly released under the
+<a href="license_gpl.html">GNU Public License Version 2</a>.<bdo />
+The release is available as an autoconf/RPM tarball, SRPM, and set of binary RPMs.
+See the <a href="download.html">downloads page</a> for the autoconf tarballs and SRPMs.
+See the <a href="strnsl_pkg.html"><em>strnsl</em> package page</a> for tarballs, SRPMS and binary
+RPMS.
+</p><p style="margin-bottom:0in">
+See <a href="codefiles/strnsl-0.9.2.1/ChangeLog">ChangeLog</a> and
+<a href="codefiles/strnsl-0.9.2.1/NEWS">NEWS</a> in the release for
+more information. Also, see the
+<a href="codefiles/strnsl-0.9.2.1/doc/manual/strnsl.pdf">strnsl.pdf</a>
+manual in the release (also in html <a href="strnsl_manual.html">here</a>).<bdo/>
+</%method><%method body>
+<& SELF:newsitem, comp => $m->base_comp &>
+</%method>
