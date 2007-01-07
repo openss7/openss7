@@ -81,7 +81,6 @@ MANS_UNUSED = \
 	man4/gr303.4 \
 	man4/gr303_ioctl.4 \
 	man4/idlc.4 \
-	man4/idp.4 \
 	man4/ISDN.4 \
 	man4/isdn.4 \
 	man4/isdn_undoc.4 \
@@ -420,7 +419,6 @@ dist_noinst_MANS = \
 	man4/gr303.4.man \
 	man4/gr303_ioctl.4.man \
 	man4/idlc.4.man \
-	man4/idp.4.man \
 	man4/ISDN.4.man \
 	man4/isdn.4.man \
 	man4/isdn_undoc.4.man \

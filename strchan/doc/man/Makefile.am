@@ -91,8 +91,6 @@ man_MANS = \
 	man4/mxi_ioctl.4 \
 	man4/mx_sdl.4 \
 	man4/v401p.4 \
-	man4/x100p.4 \
-	man4/x400p.4 \
 	man5/strchan.5 \
 	man7/CH_ATTACH_REQ.7 \
 	man7/CH_attach_req.7 \
@@ -343,8 +341,6 @@ dist_noinst_MANS = \
 	man4/mxi_ioctl.4.man \
 	man4/mx_sdl.4.man \
 	man4/v401p.4.man \
-	man4/x100p.4.man \
-	man4/x400p.4.man \
 	man5/strchan.5.man \
 	man7/CH_ATTACH_REQ.7.man \
 	man7/CH_attach_req.7.man \
@@ -585,9 +581,28 @@ MANS_UNUSED = \
 	man4/mx_ioctl.4 \
 	man4/mx_sdl.4 \
 	man4/v401p.4 \
-	man4/x100p.4 \
-	man4/x400p.4 \
-	man5/strchan.5
+	man5/strchan.5 \
+	man9/zaptel.9 \
+	man9/zt_alarm_notify.9 \
+	man9/zt_dtmf_tone.9 \
+	man9/zt_dynamic_receive.9 \
+	man9/zt_dynamic_register.9 \
+	man9/zt_dynamic_unregister.9 \
+	man9/zt_ec_chunk.9 \
+	man9/zt_ec_span.9 \
+	man9/zt_hooksig.9 \
+	man9/zt_init_tone_state.9 \
+	man9/zt_lboname.9 \
+	man9/zt_qevent_lock.9 \
+	man9/zt_qevent_nolock.9 \
+	man9/zt_rbsbits.9 \
+	man9/zt_receive.9 \
+	man9/zt_register.9 \
+	man9/zt_set_dynamic_ioctl.9 \
+	man9/zt_tone_nextsample.9 \
+	man9/zt_transmit.9 \
+	man9/zt_txtone_nextsample.9 \
+	man9/zt_unregister.9
 
 ## PKG_BUILD_INDEP
 endif

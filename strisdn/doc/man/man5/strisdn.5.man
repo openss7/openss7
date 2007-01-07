@@ -131,13 +131,137 @@ The package builds and installs the following
 .I STREAMS
 modules and drivers (as kernel modules):
 .IP \(en \w'\(en\(em'u
+.B streams_lapd.ko
+driver
+.IR /dev/lapd .
+.PD 0
+.IP \(en
 .B streams_isdn.ko
+driver
+.IR /dev/isdn .
+.PD
 .PP
 The following are
 .I STREAMS
 modules installed by the
 .B @PACKAGE@
 package:
+.TP
+.BR lapd (4)
+The
+.BR lapd (4)
+driver is a multiplexing pseudo-device driver that links
+.BR hdlc (4)
+Streams beneath it.  It uses the Communications Device Interface (CDI),
+.BR cdi (7),
+at its lower multiplex boundary and the Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+at its upper multiplex boundary.
+.TP
+.BR isdn (4)
+The
+.BR isdn (4)
+driver is a multiplexing pseudo-device driver that links
+.BR lapd (4)
+or
+.BR iua (4)
+Streams beneath it.  It uses the Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+at its lower multiplex boundary and the Call Control Interface (CCI),
+.BR cci (7),
+at its upper multiplex boundary.
+.TP
+.BR capi (4)
+The
+.BR capi (4)
+driver is an implementation of the Common ISDN API (CAPI), Version 2.0.
+.[
+capi20
+.]
+This driver provides
+.I STREAMS
+access
+(both
+.IR STREAMS -based
+CAPI as well as the
+Call Control Interface (CCI),
+.BR cci (7))
+to
+.B Linux
+CAPI devices as well as providing Linux CAPI access to
+.BR isdn (4),
+.BR dass (4)
+and
+.BR dpnss (4)
+devices.
+.IP ""
+This driver is currently incomplete.
+.TP
+.BR dass (4)
+The
+.BR dass (4)
+driver is a DASS
+.[
+dass2
+.]
+version of the
+.BR isdn (4)
+driver.
+.IP ""
+This driver is currently incomplete.
+.TP
+.BR dpnss (4)
+The
+.BR dpnss (4)
+driver is a DPNSS
+.[
+dpnss1
+.]
+version of the
+.BR isdn (4)
+driver.
+.IP ""
+This driver is currently incomplete.
+.TP
+.BR gr303 (4)
+.IP ""
+This driver is currently incomplete.
+.TP
+.BR v52 (4)
+.IP ""
+This driver is currently incomplete.
+.TP
+.BR idlc (4)
+.IP ""
+This driver is currently incomplete.
+.TP
+.BR lapf (4)
+.PP
+The
+.B @PACKAGE@
+package also provides the following service interface definitions:
+.TP
+.BR cci (7)
+The
+Call Control Interface (CCI),
+.BR cci (7),
+is a call control interface for use by ISDN, ISUP, H.323, SIPT and BICC,
+developed by the OpenSS7 Project.  Because
+.BR strisdn (5)
+is the first add-on package in the dependency chain to require the Call
+Control Interface, it also provides the interface.  This interface is also
+used by the
+.BR strss7 (5),
+.BR sigtran (5)
+and
+.BR strvoip (5)
+add-on packages.
 .PP
 The
 .B @PACKAGE_TITLE@
@@ -182,6 +306,450 @@ VOIP device nodes.
 .PD
 .\"
 .PP
+.HP
+.BR capi (4)\ \-\ 
+Common ISDN API (CAPI) Device Driver.
+.PD 0
+.HP
+.BR capi_ioctl (4)\ \-\ 
+COMMON-ISDN-API (CAPI) - IO Controls.
+.HP
+.BR dass (4)\ \-\ 
+OpenSS7 ISDN Devices.
+.HP
+.BR dl_gr303 (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR dl_lapd (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR dl_lapf (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR dl_v52 (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR dpnss (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR gr303 (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR gr303_ioctl (4)\ \-\ 
+common IO controls for GR.303 devices.
+.HP
+.BR idlc (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR ISDN (4)\ \-\ 
+OpenSS7 ISDN Devices.
+.HP
+.BR isdn (4)\ \-\ 
+Integrated Services Digital Network (ISDN) Driver.
+.HP
+.BR isdn_undoc (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR lapd (4)\ \-\ 
+Link Access Procedure\(ewD-Channel (LAPD) Driver.
+.HP
+.BR lapf (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR q921 (4)\ \-\ 
+Link Access Procedure\(ewD-Channel (LAPD) Driver.
+.HP
+.BR q922 (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR q931 (4)\ \-\ 
+Integrated Services Digital Network (ISDN) Driver.
+.HP
+.BR v52 (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR v5 (4)\ \-\ 
+undocumented ISDN modules and devices.
+.HP
+.BR v5_ioctl (4)\ \-\ 
+common IO controls for V5.2 devices.
+.PD
+
+.HP
+.BR capi (7)\ \-\ 
+Linux CAPI 2.0 Interface.
+.PD 0
+.HP
+.BR cci (7)\ \-\ 
+Call Control Interface.
+.HP
+.BR cci_capi (7)\ \-\ 
+Call Control Interface\(emCorrigendum for Q.931/Q.932 Conformance
+.HP
+.BR cci_dass (7)\ \-\ 
+Call Control Interface\(emCorrigendum for Q.931/Q.932 Conformance
+.HP
+.BR cci_gr303 (7)\ \-\ 
+Call Control Interface\(emCorrigendum for Q.931/Q.932 Conformance
+.HP
+.BR cci_idlc (7)\ \-\ 
+Call Control Interface\(emCorrigendum for Q.931/Q.932 Conformance
+.HP
+.BR cci_isdn (7)\ \-\ 
+Call Control Interface\(emCorrigendum for Q.931/Q.932 Conformance
+.PD
+
+.HP
+.BR CC_ADDR_ACK (7)\ \-\ 
+provide call control address information.
+.PD 0
+.HP
+.BR CC_ADDR_REQ (7)\ \-\ 
+request call control address information.
+.HP
+.BR CC_ALERTING_IND (7)\ \-\ 
+called CCS User alerted indication.
+.HP
+.BR CC_ALERTING_REQ (7)\ \-\ 
+called CCS user alerted request.
+.HP
+.BR CC_BIND_ACK (7)\ \-\ 
+bind protocol address acknowledgement.
+.HP
+.BR CC_BIND_REQ (7)\ \-\ 
+bind protocol address request.
+.HP
+.BR CC_BLOCKING_CON (7)\ \-\ 
+circuit management blocking confirmation.
+.HP
+.BR CC_BLOCKING_IND (7)\ \-\ 
+circuit management blocking indication.
+.HP
+.BR CC_BLOCKING_REQ (7)\ \-\ 
+circuit management blocking request.
+.HP
+.BR CC_BLOCKING_RES (7)\ \-\ 
+circuit management blocking response.
+.HP
+.BR CC_CALL_FAILURE_IND (7)\ \-\ 
+call failure indication.
+.HP
+.BR CC_CALL_REATTEMPT_IND (7)\ \-\ 
+call reattempt indication.
+.HP
+.BR CC_CONNECT_IND (7)\ \-\ 
+connection indication.
+.HP
+.BR CC_CONNECT_REQ (7)\ \-\ 
+connection request.
+.HP
+.BR CC_CONT_CHECK_IND (7)\ \-\ 
+continuity check indication.
+.HP
+.BR CC_CONT_CHECK_REQ (7)\ \-\ 
+continuity check request.
+.HP
+.BR CC_CONT_REPORT_IND (7)\ \-\ 
+continuity report indication.
+.HP
+.BR CC_CONT_REPORT_REQ (7)\ \-\ 
+continuity report request.
+.HP
+.BR CC_CONT_TEST_IND (7)\ \-\ 
+continuity test indication.
+.HP
+.BR CC_CONT_TEST_REQ (7)\ \-\ 
+continuity test request.
+.HP
+.BR CC_DATALINK_FAILURE_IND (7)\ \-\ 
+datalink failure indication.
+.HP
+.BR CC_DISCONNECT_IND (7)\ \-\ 
+disconnect indication.
+.HP
+.BR CC_DISCONNECT_REQ (7)\ \-\ 
+disconnect request.
+.HP
+.BR CC_ERROR_ACK (7)\ \-\ 
+error acknowledgement.
+.HP
+.BR CC_ERROR_IND (7)\ \-\ 
+error indication.
+.HP
+.BR CC_FACILITY_IND (7)\ \-\ 
+facility indication.
+.HP
+.BR CC_FACILITY_REQ (7)\ \-\ 
+facility request.
+.HP
+.BR CC_FORWXFER_IND (7)\ \-\ 
+forward transfer indication.
+.HP
+.BR CC_FORWXFER_REQ (7)\ \-\ 
+forward transfer request.
+.HP
+.BR CC_HOLD_CON (7)\ \-\ 
+hold confirm.
+.HP
+.BR CC_HOLD_IND (7)\ \-\ 
+hold indication.
+.HP
+.BR CC_HOLD_REQ (7)\ \-\ 
+hold request.
+.HP
+.BR CC_HOLD_RES (7)\ \-\ 
+hold response.
+.HP
+.BR CC_IBI_IND (7)\ \-\ 
+in-band information indication.
+.HP
+.BR CC_IBI_REQ (7)\ \-\ 
+in-band information request.
+.HP
+.BR CC_INFO_ACK (7)\ \-\ 
+information acknowledgement.
+.HP
+.BR CC_INFO_REQ (7)\ \-\ 
+information request.
+.HP
+.BR CC_INFORMATION_IND (7)\ \-\ 
+information indication.
+.HP
+.BR CC_INFORMATION_REQ (7)\ \-\ 
+information request.
+.HP
+.BR CC_INFO_TIMEOUT_IND (7)\ \-\ 
+information timeout indication.
+.HP
+.BR CC_MAINT_IND (7)\ \-\ 
+maintenance indication.
+.HP
+.BR CC_MORE_INFO_IND (7)\ \-\ 
+more information indication.
+.HP
+.BR CC_MORE_INFO_REQ (7)\ \-\ 
+more information request.
+.HP
+.BR CC_NOTIFY_IND (7)\ \-\ 
+call control notification indication.
+.HP
+.BR CC_NOTIFY_REQ (7)\ \-\ 
+call control notification request.
+.HP
+.BR CC_OK_ACK (7)\ \-\ 
+successful receipt acknowledgement.
+.HP
+.BR CC_OPTMGMT_ACK (7)\ \-\ 
+options management acknowledgement.
+.HP
+.BR CC_OPTMGMT_REQ (7)\ \-\ 
+options management request.
+.HP
+.BR CC_PROCEEDING_IND (7)\ \-\ 
+call proceeding indication.
+.HP
+.BR CC_PROCEEDING_REQ (7)\ \-\ 
+call proceeding request.
+.HP
+.BR CC_PROGRESS_IND (7)\ \-\ 
+call progress indication.
+.HP
+.BR CC_QUERY_CON (7)\ \-\ 
+circuit query confirmation.
+.HP
+.BR CC_PROGRESS_REQ (7)\ \-\ 
+call progress request.
+.HP
+.BR CC_QUERY_IND (7)\ \-\ 
+circuit query indication.
+.HP
+.BR CC_QUERY_REQ (7)\ \-\ 
+circuit query request.
+.HP
+.BR CC_QUERY_RES (7)\ \-\ 
+circuit query response.
+.HP
+.BR CC_REGISTER_IND (7)\ \-\ 
+registration indication.
+.HP
+.BR CC_REGISTER_REQ (7)\ \-\ 
+registration request.
+.HP
+.BR CC_REJECT_IND (7)\ \-\ 
+call reject indication.
+.HP
+.BR CC_REJECT_REQ (7)\ \-\ 
+call reject request.
+.HP
+.BR CC_RELEASE_CON (7)\ \-\ 
+call release confirmation.
+.HP
+.BR CC_RELEASE_IND (7)\ \-\ 
+call release indication.
+.HP
+.BR CC_RELEASE_REQ (7)\ \-\ 
+call release request.
+.HP
+.BR CC_RELEASE_RES (7)\ \-\ 
+call release response.
+.HP
+.BR CC_RESET_CON (7)\ \-\ 
+circuit reset confirmation.
+.HP
+.BR CC_RESET_IND (7)\ \-\ 
+circuit reset indication.
+.HP
+.BR CC_RESET_REQ (7)\ \-\ 
+circuit reset request.
+.HP
+.BR CC_RESET_RES (7)\ \-\ 
+circuit reset response.
+.HP
+.BR CC_RESTART_CON (7)\ \-\ 
+interface restart confirmation.
+.HP
+.BR CC_RESTART_REQ (7)\ \-\ 
+interface restart request.
+.HP
+.BR CC_RESUME_CON (7)\ \-\ 
+call resume confirmation.
+.HP
+.BR CC_RESUME_IND (7)\ \-\ 
+call resume indication.
+.HP
+.BR CC_RESUME_REJECT_IND (7)\ \-\ 
+call resume reject indication.
+.HP
+.BR CC_RESUME_REJECT_REQ (7)\ \-\ 
+call resume reject request..
+.HP
+.BR CC_RESUME_REQ (7)\ \-\ 
+call resume request.
+.HP
+.BR CC_RESUME_RES (7)\ \-\ 
+call resume response.
+.HP
+.BR CC_RETRIEVE_CON (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR CC_RETRIEVE_IND (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR CC_RETRIEVE_REQ (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR CC_RETRIEVE_RES (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR CC_SETUP_COMPLETE_IND (7)\ \-\ 
+call setup complete indication.
+.HP
+.BR CC_SETUP_COMPLETE_REQ (7)\ \-\ 
+call setup complete request.
+.HP
+.BR CC_SETUP_CON (7)\ \-\ 
+call setup confirmation.
+.HP
+.BR CC_SETUP_IND (7)\ \-\ 
+call setup indication.
+.HP
+.BR CC_SETUP_REQ (7)\ \-\ 
+call setup request.
+.HP
+.BR CC_SETUP_RES (7)\ \-\ 
+call setup response.
+.HP
+.BR CC_START_RESET_IND (7)\ \-\ 
+call control start reset indication.
+.HP
+.BR CC_STATUS_IND (7)\ \-\ 
+call control status indication.
+.HP
+.BR CC_STOP_IND (7)\ \-\ 
+call control stop indication.
+.HP
+.BR CC_STOP_REQ (7)\ \-\ 
+call control stop request.
+.HP
+.BR CC_SUSPEND_CON (7)\ \-\ 
+call suspend confirmation.
+.HP
+.BR CC_SUSPEND_IND (7)\ \-\ 
+call suspend indication.
+.HP
+.BR CC_SUSPEND_REJECT_IND (7)\ \-\ 
+call suspend reject indication.
+.HP
+.BR CC_SUSPEND_REJECT_REQ (7)\ \-\ 
+call suspend reject request.
+.HP
+.BR CC_SUSPEND_REQ (7)\ \-\ 
+call suspend request.
+.HP
+.BR CC_SUSPEND_RES (7)\ \-\ 
+call suspend response.
+.HP
+.BR CC_UNBIND_REQ (7)\ \-\ 
+unbind protocol address request.
+.HP
+.BR CC_UNBLOCKING_CON (7)\ \-\ 
+circuit unblocking confirmation.
+.HP
+.BR CC_UNBLOCKING_IND (7)\ \-\ 
+circuit unblocking indication.
+.HP
+.BR CC_UNBLOCKING_REQ (7)\ \-\ 
+circuit unblocking request.
+.HP
+.BR CC_UNBLOCKING_RES (7)\ \-\ 
+circuit unblocking response.
+.PD
+
+.HP
+.BR dlpi_dass (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.PD 0
+.HP
+.BR dlpi_gr303 (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR dlpi_lapd (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR dlpi_lapf (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR isdn_undoc (7)\ \-\ 
+undocumented ISDN protocols and interfaces.
+.HP
+.BR isdni (7)\ \-\ 
+Call Control Interface\(emCorrigendum for Q.931/Q.932 Conformance
+.HP
+.BR npi_q933 (7)\ \-\ 
+.PD
+
+.HP
+.BR isdn (8)\ \-\ 
+undocumented commands.
+.PD 0
+.HP
+.BR isdn_undoc (8)\ \-\ 
+undocumented commands.
+.HP
+.BR isdnconfd (8)\ \-\ 
+undocumented commands.
+.HP
+.BR strisdn_mknod (8)\ \-\ 
+create or remove
+.I STREAMS
+ISDN device nodes.
+.HP
+.BR test-isdn (8)\ \-\ 
+test suite executable for
+.BR ch (4)
+.I STREAMS
+module.
+.PD
 .\"
 .\"
 .SH MODULES

@@ -163,7 +163,7 @@ As with other OpenSS7 releases, this release configures, compiles, installs and 
 for a wide range of Linux 2.4 and 2.6 RPM-based or dpkg-based distributions, and can be used on
 production kernels without patching or recompiling the kernel.
 
-This package is publicly released under the @xref{GNU General Public License} Version 2.  The
+This package is publicly released under the @cite{GNU General Public License Version 2}.  The
 release is available as an @command{autoconf} tarball, SRPM, DSC, and set of binary RPMs or DEBs.
 See the @uref{http://www.openss7.org/download.html, download page} for the @command{autoconf}
 tarballs, SRPMs and DSCs.  See the @uref{http://www.openss7.org/@value{PACKAGE}_pkg.html,

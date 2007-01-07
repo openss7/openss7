@@ -138,10 +138,10 @@ drivers, modules, libraries, utilities, test programs, daemons, and development 
 development and execution of @cite{@value{PACKAGE_TITLE}} components and applications for the
 @cite{SVR 4.2} @dfn{STREAMS} environment.
 
-This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targeted
-at @samp{ix86}, @samp{x86_64}, @samp{ppc} and @samp{ppc64} architectures, but should build and
-install for other architectures as well.
-
 This package is currently incomplete.  It is being released as a reference point for the community.
 If you are interested in completion of this package, contact @email{info@@openss7.com}.
+
+This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targeted
+at @code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64} architectures, but should build and
+install for other architectures as well.
 

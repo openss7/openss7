@@ -123,7 +123,6 @@ ss7_man_MANS = \
 	man4/mtp-npi.4 \
 	man4/mtp_tpi.4 \
 	man4/mtp-tpi.4 \
-	man4/mx_sdl.4 \
 	man4/mx_x400p.4 \
 	man4/OpenSS7.4 \
 	man4/pca200e.4 \
@@ -202,11 +201,6 @@ ss7_man_MANS = \
 	man4/ss7_undoc.4 \
 	man5/strss7.5 \
 	man7/cci_bssap.7 \
-	man7/cci_capi.7 \
-	man7/cci_dass.7 \
-	man7/cci_gr303.7 \
-	man7/cci_idlc.7 \
-	man7/cci_isdn.7 \
 	man7/cci_isup.7 \
 	man7/cdi_hdlc.7 \
 	man7/devi.7 \
@@ -942,7 +936,6 @@ isdn_man_MANS = \
 	man4/gr303.4 \
 	man4/gr303_ioctl.4 \
 	man4/idlc.4 \
-	man4/idp.4 \
 	man4/ISDN.4 \
 	man4/isdn.4 \
 	man4/isdn_ioctl.4 \
@@ -1615,7 +1608,6 @@ ss7_dist_noinst_MANS = \
 	man4/mtp-tpi.4.man \
 	man4/mx.4.man \
 	man4/mx_ioctl.4.man \
-	man4/mx_sdl.4.man \
 	man4/mx_x400p.4.man \
 	man4/OpenSS7.4.man \
 	man4/pca200e.4.man \
@@ -2469,7 +2461,6 @@ isdn_dist_noinst_MANS = \
 	man4/gr303.4.man \
 	man4/gr303_ioctl.4.man \
 	man4/idlc.4.man \
-	man4/idp.4.man \
 	man4/ISDN.4.man \
 	man4/isdn.4.man \
 	man4/isdn_ioctl.4.man \

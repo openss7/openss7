@@ -81,8 +81,6 @@ sort-adjacent-labels
 .\"
 .\"
 .TH ISDN 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
-.\"
-.\"
 .SH NAME
 .B isdn, q931
 \- Integrated Services Digital Network (ISDN) Driver
@@ -106,13 +104,22 @@ sort-adjacent-labels
 .B ISDN
 is an implementation of the Integrated Services Digital Network (ISDN) Layer 3
 as defined in ITU-T Recommendation Q.931.
+.[
+q.931
+.]
 .B ISDN
 provides call control of telephone calls over the ISDN.
 .B ISDN
-uses the services of the Q.921 Data Link (see
-.BR dl (4))
-or ISDN Q.931 User Adaptation Layer (see
-.BR iua (4))
+uses the services of the Q.921 Data Link,
+.[
+q921e
+.]
+.BR dl (4),
+or ISDN Q.921 User Adaptation Layer,
+.[
+iuarfc
+.]
+.BR iua (4),
 to transfer packets.
 .\"
 .\"
@@ -140,6 +147,17 @@ See also,
 .\"
 .\"
 .PP
+.BR dl (4)
+and
+.BR iua (4)
+Streams provide a Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+service interface to the
+.B ISDN
+user.
 .B ISDN
 provides the stream types listed below.  To select a stream type, the
 .I device
@@ -174,6 +192,16 @@ does not provide a
 .BR sockets (3)
 interface.  This is because the special needs of call control are divorced
 from the sockets paradigm.
+.PP
+Note that the
+ISDN Q.921 User Adaptation Layer (IUA),
+.[
+iuarfc
+.]
+.BR iua (4),
+is now provided by the
+.BR sigtran (5)
+package.
 .\"
 .\"
 .SH IOCTLS
@@ -222,7 +250,7 @@ interface is specific to the
 .BR OpenSS7
 ISDN stack.  This is Version 2 of the interface.
 .PP
-CCI interfaces are consisten with CCI Revision 0.8.2.
+CCI interfaces are consistent with CCI Revision 0.8.2.
 .\"
 .\"
 .XX

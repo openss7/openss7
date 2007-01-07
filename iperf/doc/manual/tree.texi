@@ -127,14 +127,12 @@ system library directory, @file{/@-usr/@-lib/@-} (32-bit libraries) and @file{/@
 @table @file
 @end table
 
-@ignore
 @cite{@value{PACKAGE_UCNAME}} installs the following internationalization catalogues in
 the internationalization directory, @file{/@-usr/@-share/@-locale/}:
 
 @table @file
 @item de/LC_MESSAGES/@value{PACKAGE}.mo
 @end table
-@end ignore
 
 @cite{@value{PACKAGE_UCNAME}} installs the following init scripts in the system init directory,
 @file{/@-etc/@-rc.d/@-init.d/@-} (non-Debian) or @file{/@-etc/@-init.d/@-} (Debian):
@@ -156,7 +154,6 @@ This file provided configuration information for any system controls affected by
 @item modutils/@-@value{PACKAGE}
 This file provides module definitions and demand loading aliases for the @file{@value{PACKAGE}}
 package.  This file is really only applicable to older 2.4 kernels.
-@ignore
 @item netconfig.d/@value{PACKAGE}
 This file provides the @manpage{netconfig(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
 drivers.
@@ -167,7 +164,6 @@ This file provides the @manpage{sock2path(5)} definitions for the @cite{@value{P
 drivers.
 @manpage{sock2path(5)} definitions are used by the @file{strsock} package and the @file{libsocket}
 library.
-@end ignore
 @end table
 
 @cite{@value{PACKAGE_UCNAME}} installs the following system configuration file in the system

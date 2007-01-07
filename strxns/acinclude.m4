@@ -860,7 +860,7 @@ AC_DEFUN([_XNS_CONFIG], [dnl
 AC_DEFUN([_XNS_STRCONF], [dnl
     strconf_cv_stem='lis.conf'
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=220
+    strconf_cv_majbase=222
     strconf_cv_midbase=50
     if test ${streams_cv_package:-LfS} = LfS ; then
 	if test ${linux_cv_minorbits:-8} -gt 8 ; then

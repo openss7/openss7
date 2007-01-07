@@ -5,7 +5,7 @@
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -16,7 +16,7 @@
 @c Permission is granted to copy and distribute modified versions of this
 @c manual under the conditions for verbatim copying, provided that the
 @c entire resulting derived work is distributed under the terms of a
-@c permission notice identical to this one
+@c permission notice identical to this one.
 @c 
 @c Since the Linux kernel and libraries are constantly changing, this
 @c manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -83,7 +83,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @c ----------------------------------------------------------------------------
 
 @node Release @value{PACKAGE}-@value{VERSION}
-@unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
+@unnumberedsubsec Initial release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
 Initial autoconf/RPM packaging of the @command{@value{PACKAGE}} release.
@@ -126,8 +126,8 @@ and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6 RPM-based or
 dpkg-based distributions, and can be used on production kernels without
 patching or recompiling the kernel.
 
-This package is publicly released under the @xref{GNU General Public License}
-Version 2.  The release is available as an @command{autoconf} tarball, SRPM,
+This package is publicly released under the @cite{GNU General Public License
+Version 2}.  The release is available as an @command{autoconf} tarball, SRPM,
 DSC, and set of binary RPMs or DEBs.  See the
 @uref{http://www.openss7.org/download.html, download page} for the
 @command{autoconf} tarballs, SRPMs and DSCs.  See the

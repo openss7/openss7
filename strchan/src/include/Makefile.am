@@ -71,8 +71,8 @@ nobase_pkginclude_HEADERS = \
 	sys/mgi.h \
 	sys/mgi_ioctl.h \
 	sys/mxi.h \
-	sys/mxi_ioctl.h \
-	sys/zapata.h
+	sys/mxi_ioctl.h
+#	sys/zapata.h
 
 
 nobase_nodist_pkginclude_HEADERS = \

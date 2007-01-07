@@ -68,3 +68,8 @@ the implementation see the @file{man/sctp.7} Linux manual page and look at the t
 @emph{Warning}: This is prerelease code.  It is Beta but rather stable.  Nevertheless, it is
 possible it will crash or lock your machine in some situations.  Please remember that there is
 @emph{NO WARRANTY} with this code and take appropriate precautions when attempting to run it.
+
+This distribution is only currently applicable to @cite{Linux} 2.4 kernels and was targeted
+at @code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64} architectures, but should build and
+install for other architectures as well.
+

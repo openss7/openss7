@@ -1,4 +1,4 @@
-OpenSS7 STREAMS Channels -- read me first file.  2006-12-29
+OpenSS7 STREAMS Channels -- read me first file.  2007-01-02
 $Id: README,v 0.9.2.6 2007/01/05 02:53:54 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS Channels
 =========================
 
-Package strchan-0.9.2.1 was released under GPLv2 2006-12-29.
+Package strchan-0.9.2.1 was released under GPLv2 2007-01-02.
 
 The `OpenSS7 STREAMS Channels' package provides "STREAMS" modules and
 drivers, libraries, programs, init scripts, and daemons that implement
@@ -117,7 +117,7 @@ contact <info@openss7.com>.
  Release
 --------
 
-This is the `strchan-0.9.2.1' package, released 2006-12-29.  This
+This is the `strchan-0.9.2.1' package, released 2007-01-02.  This
 `0.9.2.1' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:

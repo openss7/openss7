@@ -231,7 +231,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-STRTTY],
 			       [include STRTTY in master pack @<:@detected@:>@]),
 		[with_STRTTY="$withval"],
-		[with_STRTTY="${with_ALL:-no}"])
+		[with_STRTTY='yes'])
     if test ! -d "$srcdir/strtty" ; then
 	with_STRTTY='no'
     fi
@@ -255,7 +255,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--without-STRNSL],
 			       [do not include STRNSL in master pack @<:@included@:>@]),
 		[with_STRNSL="$withval"],
-		[with_STRNSL="${with_ALL:-no}"])
+		[with_STRNSL='yes'])
     if test ! -d "$srcdir/strnsl" ; then
 	with_STRNSL='no'
     fi
@@ -263,7 +263,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--without-STRSOCK],
 			       [do not include STRSOCK in master pack @<:@included@:>@]),
 		[with_STRSOCK="$withval"],
-		[with_STRSOCK="${with_ALL:-no}"])
+		[with_STRSOCK='yes'])
     if test ! -d "$srcdir/strsock" ; then
 	with_STRSOCK='no'
     fi
@@ -287,7 +287,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--without-STRCHAN],
 			       [do not include STRCHAN in master pack @<:@included@:>@]),
 		[with_STRCHAN="$withval"],
-		[with_STRCHAN="${with_ALL:-no}"])
+		[with_STRCHAN='yes'])
     if test ! -d "$srcdir/strchan" ; then
 	with_STRCHAN='no'
     fi
@@ -295,7 +295,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-STRISO],
 			       [include STRISO in master pack @<:@detected@:>@]),
 		[with_STRISO="$withval"],
-		[with_STRISO="${with_ALL:-no}"])
+		[with_STRISO='yes'])
     if test ! -d "$srcdir/striso" ; then
 	with_STRISO='no'
     fi
@@ -311,7 +311,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--without-STRISDN],
 			       [do not include STRISDN in master pack @<:@included@:>@]),
 		[with_STRISDN="$withval"],
-		[with_STRISDN="${with_ALL:-no}"])
+		[with_STRISDN='yes'])
     if test ! -d "$srcdir/strisdn" ; then
 	with_STRISDN='no'
     fi
@@ -327,7 +327,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--without-SIGTRAN],
 			       [do not include SIGTRAN in master pack @<:@included@:>@]),
 		[with_SIGTRAN="$withval"],
-		[with_SIGTRAN="${with_ALL:-no}"])
+		[with_SIGTRAN='yes'])
     if test ! -d "$srcdir/sigtran" ; then
 	with_SIGTRAN='no'
     fi
@@ -335,7 +335,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--without-STRVOIP],
 			       [do not include STRVOIP in master pack @<:@included@:>@]),
 		[with_STRVOIP="$withval"],
-		[with_STRVOIP="${with_ALL:-no}"])
+		[with_STRVOIP='yes'])
     if test ! -d "$srcdir/strvoip" ; then
 	with_STRVOIP='no'
     fi

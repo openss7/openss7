@@ -91,3 +91,8 @@ the major failings that it is:
 @item broken 32-bit over 64-bit compatibility;
 @item no @manpage{strlog(9)} @dfn{STREAMS} logger;
 @end itemize
+
+This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targeted
+at @code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64} architectures, but should build and
+install for other architectures as well.
+

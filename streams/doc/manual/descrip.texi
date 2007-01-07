@@ -69,12 +69,10 @@ development and execution of @dfn{STREAMS} modules and drivers under @cite{@valu
 It is completely documented with over four hundred (435) manual pages, and three (3) major print
 set manuals.
 
-This release is applicable to @cite{Linux} 2.4 and 2.6 kernels and was targeted at @code{ix86},
-@code{x86_64}, @code{ppc} and @code{ppc64} architectures, but should build and install for other
-architectures as well.  The package configures, compiles, installs and builds @file{rpm}s or
-@file{deb}s for a wide range of Linux @manpage{rpm(1)}- or @manpage{dpkg(1)}-based distributions,
-and can be used on production kernels without patching, recompiling or tainting the kernel.  Its
-small run-time footprint makes the release suitable for embedded targets.
+The package configures, compiles, installs and builds @file{rpm}s or @file{deb}s for a wide range of
+Linux @manpage{rpm(1)}- or @manpage{dpkg(1)}-based distributions, and can be used on production
+kernels without patching, recompiling or tainting the kernel.  Its small run-time footprint makes
+the release suitable for embedded targets.
 
 @ignore
 This package is released under the @cite{GNU Public License Version 2}; however, commercial

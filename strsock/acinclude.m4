@@ -235,7 +235,7 @@ AC_DEFUN([_SOCK_OUTPUT], [dnl
 AC_DEFUN([_SOCK_STRCONF], [dnl
     strconf_cv_stem='Config'
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=219
+    strconf_cv_majbase=221
     strconf_cv_midbase=80
     if test ${streams_cv_package:-LfS} = LfS ; then
 	if test ${linux_cv_minorbits:-8} -gt 8 ; then

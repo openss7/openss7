@@ -74,10 +74,6 @@ drivers, modules, libraries, utilities, test programs, daemons, and development 
 development and execution of @cite{@value{PACKAGE_TITLE}} applications for the @cite{SVR 4.2}
 @dfn{STREAMS} environment.
 
-This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targeted
-at @samp{ix86}, @samp{x86_64}, @samp{ppc} and @samp{ppc64} architectures, but should build and
-install for other architectures as well.
-
 This package contains modules and drivers formerly only part of the Commercial releases of the
 @file{strss7} package.  These are commercial grade implementations that have only recently been
 released as open source.
@@ -103,3 +99,8 @@ The public release currently contains the following @dfn{STREAMS} drivers and mo
 @item sdt_tpi(4)
 @item sl_tpi(4)
 @end table
+
+This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targeted
+at @code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64} architectures, but should build and
+install for other architectures as well.
+

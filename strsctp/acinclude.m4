@@ -1122,7 +1122,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
 AC_DEFUN([_SCTP_STRCONF], [dnl
     strconf_cv_stem='lis.conf'
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=217
+    strconf_cv_majbase=215
     strconf_cv_midbase=100
     if test ${streams_cv_package:-LfS} = LfS ; then
 	if test ${linux_cv_minorbits:-8} -gt 8 ; then

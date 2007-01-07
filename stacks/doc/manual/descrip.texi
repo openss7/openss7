@@ -69,6 +69,6 @@ components moved to the @file{sigtran} package, and VoIP components moved to the
 package.  Only SS7 components remain in the @file{strss7} package.
 
 This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targeted
-at @samp{ix86}, @samp{x86_64}, @samp{ppc} and @samp{ppc64} architectures, but should build and
+at @code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64} architectures, but should build and
 install for other architectures as well.
 

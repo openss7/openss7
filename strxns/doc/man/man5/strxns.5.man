@@ -134,10 +134,84 @@ protocol based on the lowest three layers of the OSI reference model.
 The package builds and installs the following
 .I STREAMS
 kernel modules and drivers:
-.IP \(em \w'\(em\(em'u
-.IP \(em
+.IP \(en \w'\(en\(em'u
+.B streams_ip_strm_mod.ko
+module
+.RI \(lq ip_strms \(rq
+.PD 0
+.IP \(en
+.B streams_ip_to_dlpi.ko
+driver
+.I /dev/ip2xinet
+.IP \(en
+.B streams_ldl.ko
+driver
+.I /dev/ldl
+.IP \(en
+.B streams_np_ip.ko
+driver
+.I /dev/np_ip
+.PD
+.TP
+.BR ip_strm_mod (4)
+The
+.BR ip_strm_mod (4)
+module can be pushed on a stream that implements the Data Link Provider
+Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+service interface.  It provides an interface between the DLPI driver below and
+the
+.B Linux
+IP module above.
+.TP
+.BR ip_to_dlpi (4)
+The
+.BR ip_to_dlpi (4)
+driver is an IP
+.I STREAMS
+driver.  It accepts Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+Streams linked beneath it and presents Ethernet interfaces to the
+.B Linux
+TCP/IP subsystem.
 .TP
 .BR ldl (4)
+The
+.BR ldl (4)
+driver provides an interface between
+.I STREAMS
+drivers and
+.B Linux
+network drivers.  It presents Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+Streams that access
+.B Linux
+network interfaces.
+.TP
+.BR np_ip (4)
+The
+.BR np_ip (4)
+driver provides an interface between
+.I STREAMS
+drivers an the
+.B Linux
+IP subsystem.  It presents Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+Streams that provide access to the
+.B Linux
+IP subsystem.
 .PP
 The
 .B @PACKAGE_TITLE@
@@ -826,11 +900,65 @@ and
 .IR UnixWare \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+All of the drivers and modules in this package provide access to data links or
+network interfaces using the Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+or Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+and are compatible with
+.I SVR 4.2
+implementations based on these standard
+.I STREAMS
+service interfaces.
 .IP \(em
+The
+.BR ldl (4)
+driver provides access to
+.B Linux
+network devices presenting the
+Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
 .IP \(em
+The
+.BR ip_to_dlpi (4)
+driver and the
+.BR ip_strm_mod (4)
+module provide access to
+.I STREAMS
+IP interfaces conforming to to the
+Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+from the
+.B Linux
+IP subsystem.
+The driver uses an
+.IR I_LINK (7)
+approach, whereas the module provides an
+.IR I_PUSH (7)
+approach.
 .IP \(em
-.IP \(em
-.IP \(em
+The
+.BR np_ip (4)
+driver is compatible with implementation of the IP subsystem that conform to
+the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
+.PP
+See the individual driver or module documentation for additional compatibility
+information.
 .\"
 .\"
 .SH CONFORMANCE

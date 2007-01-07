@@ -1,4 +1,4 @@
-OpenSS7 STREAMS Network Services Library -- history of user visible changes.  2006-12-29
+OpenSS7 STREAMS Network Services Library -- history of user visible changes.  2007-01-02
 $Id: NEWS,v 0.9.2.7 2007/01/05 06:19:30 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -31,11 +31,11 @@ installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
 RPM-based or dpkg-based distributions, and can be used on production
 kernels without patching or recompiling the kernel.
 
-This package is publicly released under the *Note GNU General Public
-License:: Version 2.  The release is available as an `autoconf'
-tarball, SRPM, DSC, and set of binary RPMs or DEBs.  See the download
-page (http://www.openss7.org/download.html) for the `autoconf'
-tarballs, SRPMs and DSCs.  See the strnsl package page
+This package is publicly released under the `GNU General Public License
+Version 2'.  The release is available as an `autoconf' tarball, SRPM,
+DSC, and set of binary RPMs or DEBs.  See the download page
+(http://www.openss7.org/download.html) for the `autoconf' tarballs,
+SRPMs and DSCs.  See the strnsl package page
 (http://www.openss7.org/strnsl_pkg.html) for tarballs, SRPMs, DSCs and
 binary RPMs or DEBs.
 

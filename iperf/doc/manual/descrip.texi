@@ -92,4 +92,7 @@ Please note that this modified version of the @dfn{Iperf} package is not endorse
 @cite{University of Illinois} or @cite{DAST} in any way and that neither the original copyright
 holders nor @uref{http://www.openss7.com/, OpenSS7 Corporation} will take any responsibility in it.
 
+This distribution is only currently applicable to @cite{Linux} 2.4 kernels and was targeted
+at @code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64} architectures, but should build and
+install for other architectures as well.
 

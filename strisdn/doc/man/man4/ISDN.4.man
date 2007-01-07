@@ -207,8 +207,7 @@ for GR-303-CORE management,
 .\"
 .TP
 .BR dl (4)
-.I Q.921 (LAPD), Q.922 (LAPF), X.25 (LAPB)
-\fR\
+.I Q.921 (LAPD), Q.922 (LAPF), X.25 (LAPB),
 .[
 q921
 .]
@@ -241,6 +240,12 @@ modules:
 .TP
 .BR hdlc (4)
 .I ISO 3309/4335 High-Level Data Link Control (HDLC)
+.[
+iso/iec 3309:1988
+.]
+.[
+iso/iec 4335:1988
+.]
 Communications Device Interface,
 .BR cdi (7),
 module, that can be pushed over a stream that conforms to the Channel
@@ -294,8 +299,23 @@ device can be used to switch bearer channels, see
 .BR mx (4).
 .\"
 .\"
-.\".SH NOTICES
+.SH NOTICES
 .PP
+The
+.BR hdlc (4)
+device is now provided by the
+.BR striso (5)
+package.
+.BR lapb (4)
+and
+.BR lapf (4)
+are also provided by the
+.BR striso (5)
+package.
+.BR lapd (4)
+is still provided by the
+.BR strisdn (5)
+package.
 .\"
 .\"
 .\".SH BUGS
