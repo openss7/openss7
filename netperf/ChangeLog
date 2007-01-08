@@ -1,5 +1,13 @@
 2007-01-08  Brian Bidulock  <bidulock@openss7.org>
 
+	* AUTHORS: updated for release
+	* NEWS: updated for release
+	* README: updated for release
+	* README-cvs: updated for release
+	* THANKS: updated for release
+	* manual/descrip.texi: updated for release
+	* manual/news.texi: updated for release
+	* manual/tree.texi: updated for release
 	* rel20070108_7.html: added release file
 	* ANNOUNCE: updated for release
 

@@ -1,6 +1,6 @@
-OpenSS7 Linux Native SCTP -- history of user visible changes.  2006-12-29
-$Id: NEWS,v 0.9.2.27 2006/12/31 13:34:18 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+OpenSS7 Linux Native SCTP -- history of user visible changes.  2007-01-07
+$Id: NEWS,v 0.9.2.28 2007/01/08 16:22:58 brian Exp $
+Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
@@ -10,48 +10,82 @@ OpenSS7 Linux Native SCTP package.
  Major changes for release sctp-0.2.24
 --------------------------------------
 
+This is the twenty-fourth release of the Linux Native (Sockets) SCTP
+from the OpenSS7 Project.  This release, as with other releases, on
+builds and installs on 2.4 kernels.  This package is not as important
+to the OpenSS7 Project as the STREAMS version of SCTP, which provides
+the basis for all of the SIGTRAN components for the OpenSS7 stacks.
+Also, the STREAMS version runs on both 2.4 and 2.6 kernels.
+
+This is a stable production release: it deprecates previous releases.
+Please upgrade to the current release before reporting bugs.
+
 This is primarily a maintenance release correcting reported bugs, but
 also includes the latest packaging improvements.
 
-   * Support for (configure but not build on) most recent 2.6.18
+Following are highlights of some of the changes since the last release:
+
+   - Support for (configure but not build on) most recent 2.6.18
      kernels (including Fedora Core 5 with inode diet patchset).
 
-   * Added `send-pr' scripts for automatic problem report generation.
+   - Added `send-pr' scripts for automatic problem report generation.
 
-   * Now builds 32-bit compatibility libraries and tests them against
+   - Now builds 32-bit compatibility libraries and tests them against
      64-bit kernel modules and drivers.  The `make installcheck' target
      will now automatically test both 64-bit native and 32-bit
      compatibility versions, one after the other, on 64-bit platforms.
 
-   * Improved compiler flag generation and optimizations for recent
+   - Improved compiler flag generation and optimizations for recent
      `gcc' compilers and some idiosyncratic behaviour for some
      distributions (primarily SUSE).
 
-   * Optimized compilation is now available also for user level
+   - Optimized compilation is now available also for user level
      programs in addition to kernel programs.  Added new
      `--with-optimize' option to `configure' to accomplish this.
 
-   * Better detection of SUSE distributions, release numbers and SLES
+   - Better detection of SUSE distributions, release numbers and SLES
      distributions: support for additional `SuSE' distributions on
      `ix86' as well as `x86_64'.  Added distribution support includes
      `SLES 9', `SLES 9 SP2', `SLES 9 SP3', `SLES 10', `SuSE 10.1'.
 
-   * Many documentation updates for all OpenSS7 packages.  Automated
+   - Many documentation updates for all OpenSS7 packages.  Automated
      release file generation making for vastly improved and timely text
      documentation present in the release directory.
 
-   * Added `--disable-devel' `configure' option to suppress building
+   - Added `--disable-devel' `configure' option to suppress building
      and installing development environment.  This feature is for
      embedded or pure runtime targets that do not need the development
      environment (static libraries, manual pages, documentation).
 
-   * Added `send-pr' script for automatic problem report generation.
+   - Added `send-pr' script for automatic problem report generation.
 
-   * Fixed problems with unresolved symbols on some systems.  Fixed
+   - Fixed problems with unresolved symbols on some systems.  Fixed
      glaring error in `sctp_init' preventing kernel module from loading.
 
-   * Added init scripts and system control configuration data.  Removed
+   - Added init scripts and system control configuration data.  Removed
      old preload approach to kernel module loading.
+
+_This is a public stable production release of the package: it
+deprecates previous releases.  Please upgrade to the current release
+before reporting bugs._
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4
+RPM-based or dpkg-based distributions, and can be used on production
+kernels without patching or recompiling the kernel.
+
+This package is publicly released under the `GNU General Public License
+Version 2'.  The release is available as an `autoconf' tarball, SRPM,
+DSC, and set of binary RPMs or DEBs.  See the download page
+(http://www.openss7.org/download.html) for the `autoconf' tarballs,
+SRPMs and DSCs.  See the sctp package page
+(http://www.openss7.org/sctp_pkg.html) for tarballs, SRPMs, DSCs and
+binary RPMs or DEBs.
+
+See `http://www.openss7.org/codefiles/sctp-0.2.24/ChangeLog' and
+`http://www.openss7.org/codefiles/sctp-0.2.24/NEWS' in the release for
+more information.  Also, see the `sctp.pdf' manual in the release (also
+in `http://www.openss7.org/sctp_manual.html').
 
  Major changes for release sctp-0.2.23
 --------------------------------------

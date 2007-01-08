@@ -1,5 +1,21 @@
 2007-01-08  Brian Bidulock  <bidulock@openss7.org>
 
+	* AUTHORS: updated for release
+	* Makefile.am: updated for release
+	* NEWS: updated for release
+	* README: updated for release
+	* README-cvs: updated for release
+	* THANKS: updated for release
+	* sigtran.spec.in: updated for release
+	* doc/man/Makefile.am: updated for release
+	* doc/man/sigtran.refs: updated for release
+	* doc/man/man5/sigtran.5.man: updated for release
+	* doc/man/man8/sigtran_mknod.8.man: updated for release
+	* doc/manual/descrip.texi: updated for release
+	* doc/manual/news.texi: updated for release
+	* doc/manual/releases.texi: updated for release
+	* doc/manual/tree.texi: updated for release
+
 	* rel20070108_4.html: added release file
 	* ANNOUNCE: updated for release
 

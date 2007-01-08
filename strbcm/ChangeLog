@@ -1,5 +1,10 @@
 2007-01-08  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/descrip.texi: updated for release
+	* doc/manual/news.texi: updated for release
+	* doc/manual/releases.texi: updated for release
+	* doc/manual/tree.texi: updated for release
+
 	* rel20070108_I.html: added release file
 
 2006-12-31  Brian Bidulock  <bidulock@openss7.org>
