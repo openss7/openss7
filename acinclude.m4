@@ -176,168 +176,486 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 			       [do not include SCTP in master pack @<:@detected@:>@]),
 		[with_SCTP="$withval"],
 		[with_SCTP=''])
-    if test ! -d "$srcdir/sctp" ; then
+    AC_CACHE_CHECK([for sub-package sctp],[os7_cv_sctp_dir],[dnl
+	    os7_cv_sctp_dir=''
+	    for dir in "$srcdir/sctp-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_sctp_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/sctp" ; then
+		os7_cv_sctp_dir="sctp"
+	    fi
+	])
+    if test :"${os7_cv_sctp_dir:-no}" = :no ; then
 	with_SCTP='no'
+    else
+	if test :"${os7_cv_sctp_dir:-no}" != :sctp ; then
+	    ( cd $srcdir ; rm -f sctp ; ln -sf $os7_cv_sctp_dir sctp )
+	fi
     fi
     AC_ARG_WITH([IPERF],
 		AS_HELP_STRING([--without-IPERF],
 			       [do not include IPERF in master pack @<:@detected@:>@]),
 		[with_IPERF="$withval"],
 		[with_IPERF=''])
-    if test ! -d "$srcdir/iperf" ; then
+    AC_CACHE_CHECK([for sub-package iperf],[os7_cv_iperf_dir],[dnl
+	    os7_cv_iperf_dir=''
+	    for dir in "$srcdir/iperf-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_iperf_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/iperf" ; then
+		os7_cv_iperf_dir="iperf"
+	    fi
+	])
+    if test :"${os7_cv_iperf_dir:-no}" = :no ; then
 	with_IPERF='no'
+    else
+	if test :"${os7_cv_iperf_dir:-no}" != :iperf ; then
+	    ( cd $srcdir ; rm -f iperf ; ln -sf $os7_cv_iperf_dir iperf )
+	fi
     fi
     AC_ARG_WITH([LIS],
 		AS_HELP_STRING([--with-LIS],
 			       [include LIS in master pack @<:@detected@:>@]),
 		[with_LIS="$withval"],
 		[with_LIS='no'])
-    if test ! -d "$srcdir/LiS" ; then
+    AC_CACHE_CHECK([for sub-package LiS],[os7_cv_LiS_dir],[dnl
+	    os7_cv_LiS_dir=''
+	    for dir in "$srcdir/LiS-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_LiS_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/LiS" ; then
+		os7_cv_LiS_dir="LiS"
+	    fi
+	])
+    if test :"${os7_cv_LiS_dir:-no}" = :no ; then
 	with_LIS='no'
+    else
+	if test :"${os7_cv_LiS_dir:-no}" != :LiS ; then
+	    ( cd $srcdir ; rm -f LiS ; ln -sf $os7_cv_LiS_dir LiS )
+	fi
     fi
     AC_ARG_WITH([STREAMS],
 		AS_HELP_STRING([--without-STREAMS],
 			       [do not include STREAMS in master pack @<:@included@:>@]),
 		[with_STREAMS="$withval"],
 		[with_STREAMS='yes'])
-    if test ! -d "$srcdir/streams" ; then
+    AC_CACHE_CHECK([for sub-package streams],[os7_cv_streams_dir],[dnl
+	    os7_cv_streams_dir=''
+	    for dir in "$srcdir/streams-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_streams_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/streams" ; then
+		os7_cv_streams_dir="streams"
+	    fi
+	])
+    if test :"${os7_cv_streams_dir:-no}" = :no ; then
 	with_STREAMS='no'
+    else
+	if test :"${os7_cv_streams_dir:-no}" != :streams ; then
+	    ( cd $srcdir ; rm -f streams ; ln -sf $os7_cv_streams_dir streams )
+	fi
     fi
     AC_ARG_WITH([STRCOMPAT],
 		AS_HELP_STRING([--without-STRCOMPAT],
 			       [do not include STRCOMPAT in master pack @<:@included@:>@]),
 		[with_STRCOMPAT="$withval"],
 		[with_STRCOMPAT='yes'])
-    if test ! -d "$srcdir/strcompat" ; then
+    AC_CACHE_CHECK([for sub-package strcompat],[os7_cv_strcompat_dir],[dnl
+	    os7_cv_strcompat_dir=''
+	    for dir in "$srcdir/strcompat-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_strcompat_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/strcompat" ; then
+		os7_cv_strcompat_dir="strcompat"
+	    fi
+	])
+    if test :"${os7_cv_strcompat_dir:-no}" = :no ; then
 	with_STRCOMPAT='no'
+    else
+	if test :"${os7_cv_strcompat_dir:-no}" != :strcompat ; then
+	    ( cd $srcdir ; rm -f strcompat ; ln -sf $os7_cv_strcompat_dir strcompat )
+	fi
     fi
     AC_ARG_WITH([STRUTIL],
 		AS_HELP_STRING([--with-STRUTIL],
 			       [include STRUTIL in master pack @<:@detected@:>@]),
 		[with_STRUTIL="$withval"],
 		[with_STRUTIL='no'])
-    if test ! -d "$srcdir/strutil" ; then
+    AC_CACHE_CHECK([for sub-package strutil],[os7_cv_strutil_dir],[dnl
+	    os7_cv_strutil_dir=''
+	    for dir in "$srcdir/strutil-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_strutil_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/strutil" ; then
+		os7_cv_strutil_dir="strutil"
+	    fi
+	])
+    if test :"${os7_cv_strutil_dir:-no}" = :no ; then
 	with_STRUTIL='no'
+    else
+	if test :"${os7_cv_strutil_dir:-no}" != :strutil ; then
+	    ( cd $srcdir ; rm -f strutil ; ln -sf $os7_cv_strutil_dir strutil )
+	fi
     fi
     AC_ARG_WITH([STRBCM],
 		AS_HELP_STRING([--with-STRBCM],
 			       [include STRBCM in master pack @<:@detected@:>@]),
 		[with_STRBCM="$withval"],
 		[with_STRBCM='no'])
-    if test ! -d "$srcdir/strbcm" ; then
+    AC_CACHE_CHECK([for sub-package strbcm],[os7_cv_strbcm_dir],[dnl
+	    os7_cv_strbcm_dir=''
+	    for dir in "$srcdir/strbcm-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_strbcm_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/strbcm" ; then
+		os7_cv_strbcm_dir="strbcm"
+	    fi
+	])
+    if test :"${os7_cv_strbcm_dir:-no}" = :no ; then
 	with_STRBCM='no'
+    else
+	if test :"${os7_cv_strbcm_dir:-no}" != :strbcm ; then
+	    ( cd $srcdir ; rm -f strbcm ; ln -sf $os7_cv_strbcm_dir strbcm )
+	fi
     fi
     AC_ARG_WITH([STRTTY],
 		AS_HELP_STRING([--with-STRTTY],
 			       [include STRTTY in master pack @<:@detected@:>@]),
 		[with_STRTTY="$withval"],
 		[with_STRTTY='yes'])
-    if test ! -d "$srcdir/strtty" ; then
+    AC_CACHE_CHECK([for sub-package strtty],[os7_cv_strtty_dir],[dnl
+	    os7_cv_strtty_dir=''
+	    for dir in "$srcdir/strtty-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_strtty_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/strtty" ; then
+		os7_cv_strtty_dir="strtty"
+	    fi
+	])
+    if test :"${os7_cv_strtty_dir:-no}" = :no ; then
 	with_STRTTY='no'
+    else
+	if test :"${os7_cv_strtty_dir:-no}" != :strtty ; then
+	    ( cd $srcdir ; rm -f strtty ; ln -sf $os7_cv_strtty_dir strtty )
+	fi
     fi
     AC_ARG_WITH([STRXNS],
 		AS_HELP_STRING([--without-STRXNS],
 			       [do not include STRXNS in master pack @<:@included@:>@]),
 		[with_STRXNS="$withval"],
 		[with_STRXNS='yes'])
-    if test ! -d "$srcdir/strxns" ; then
+    AC_CACHE_CHECK([for sub-package strxns],[os7_cv_strxns_dir],[dnl
+	    os7_cv_strxns_dir=''
+	    for dir in "$srcdir/strxns-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_strxns_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/strxns" ; then
+		os7_cv_strxns_dir="strxns"
+	    fi
+	])
+    if test :"${os7_cv_strxns_dir:-no}" = :no ; then
 	with_STRXNS='no'
+    else
+	if test :"${os7_cv_strxns_dir:-no}" != :strxns ; then
+	    ( cd $srcdir ; rm -f strxns ; ln -sf $os7_cv_strxns_dir strxns )
+	fi
     fi
     AC_ARG_WITH([STRXNET],
 		AS_HELP_STRING([--without-STRXNET],
 			       [do not include STRXNET in master pack @<:@included@:>@]),
 		[with_STRXNET="$withval"],
 		[with_STRXNET='yes'])
-    if test ! -d "$srcdir/strxnet" ; then
+    AC_CACHE_CHECK([for sub-package strxnet],[os7_cv_strxnet_dir],[dnl
+	    os7_cv_strxnet_dir=''
+	    for dir in "$srcdir/strxnet-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_strxnet_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/strxnet" ; then
+		os7_cv_strxnet_dir="strxnet"
+	    fi
+	])
+    if test :"${os7_cv_strxnet_dir:-no}" = :no ; then
 	with_STRXNET='no'
+    else
+	if test :"${os7_cv_strxnet_dir:-no}" != :strxnet ; then
+	    ( cd $srcdir ; rm -f strxnet ; ln -sf $os7_cv_strxnet_dir strxnet )
+	fi
     fi
     AC_ARG_WITH([STRNSL],
 		AS_HELP_STRING([--without-STRNSL],
 			       [do not include STRNSL in master pack @<:@included@:>@]),
 		[with_STRNSL="$withval"],
 		[with_STRNSL='yes'])
-    if test ! -d "$srcdir/strnsl" ; then
+    AC_CACHE_CHECK([for sub-package strnsl],[os7_cv_strnsl_dir],[dnl
+	    os7_cv_strnsl_dir=''
+	    for dir in "$srcdir/strnsl-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_strnsl_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/strnsl" ; then
+		os7_cv_strnsl_dir="strnsl"
+	    fi
+	])
+    if test :"${os7_cv_strnsl_dir:-no}" = :no ; then
 	with_STRNSL='no'
+    else
+	if test :"${os7_cv_strnsl_dir:-no}" != :strnsl ; then
+	    ( cd $srcdir ; rm -f strnsl ; ln -sf $os7_cv_strnsl_dir strnsl )
+	fi
     fi
     AC_ARG_WITH([STRSOCK],
 		AS_HELP_STRING([--without-STRSOCK],
 			       [do not include STRSOCK in master pack @<:@included@:>@]),
 		[with_STRSOCK="$withval"],
 		[with_STRSOCK='yes'])
-    if test ! -d "$srcdir/strsock" ; then
+    AC_CACHE_CHECK([for sub-package strsock],[os7_cv_strsock_dir],[dnl
+	    os7_cv_strsock_dir=''
+	    for dir in "$srcdir/strsock-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_strsock_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/strsock" ; then
+		os7_cv_strsock_dir="strsock"
+	    fi
+	])
+    if test :"${os7_cv_strsock_dir:-no}" = :no ; then
 	with_STRSOCK='no'
+    else
+	if test :"${os7_cv_strsock_dir:-no}" != :strsock ; then
+	    ( cd $srcdir ; rm -f strsock ; ln -sf $os7_cv_strsock_dir strsock )
+	fi
     fi
     AC_ARG_WITH([STRINET],
 		AS_HELP_STRING([--without-STRINET],
 			       [do not include STRINET in master pack @<:@included@:>@]),
 		[with_STRINET="$withval"],
 		[with_STRINET='yes'])
-    if test ! -d "$srcdir/strinet" ; then
+    AC_CACHE_CHECK([for sub-package strinet],[os7_cv_strinet_dir],[dnl
+	    os7_cv_strinet_dir=''
+	    for dir in "$srcdir/strinet-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_strinet_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/strinet" ; then
+		os7_cv_strinet_dir="strinet"
+	    fi
+	])
+    if test :"${os7_cv_strinet_dir:-no}" = :no ; then
 	with_STRINET='no'
+    else
+	if test :"${os7_cv_strinet_dir:-no}" != :strinet ; then
+	    ( cd $srcdir ; rm -f strinet ; ln -sf $os7_cv_strinet_dir strinet )
+	fi
     fi
     AC_ARG_WITH([STRSCTP],
 		AS_HELP_STRING([--without-STRSCTP],
 			       [do not include STRSCTP in master pack @<:@included@:>@]),
 		[with_STRSCTP="$withval"],
 		[with_STRSCTP='yes'])
-    if test ! -d "$srcdir/strsctp" ; then
+    AC_CACHE_CHECK([for sub-package strsctp],[os7_cv_strsctp_dir],[dnl
+	    os7_cv_strsctp_dir=''
+	    for dir in "$srcdir/strsctp-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_strsctp_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/strsctp" ; then
+		os7_cv_strsctp_dir="strsctp"
+	    fi
+	])
+    if test :"${os7_cv_sctp_dir:-no}" = :no ; then
 	with_STRSCTP='no'
+    else
+	if test :"${os7_cv_strsctp_dir:-no}" != :strsctp ; then
+	    ( cd $srcdir ; rm -f strsctp ; ln -sf $os7_cv_strsctp_dir strsctp )
+	fi
     fi
     AC_ARG_WITH([STRCHAN],
 		AS_HELP_STRING([--without-STRCHAN],
 			       [do not include STRCHAN in master pack @<:@included@:>@]),
 		[with_STRCHAN="$withval"],
 		[with_STRCHAN='yes'])
-    if test ! -d "$srcdir/strchan" ; then
+    AC_CACHE_CHECK([for sub-package strchan],[os7_cv_strchan_dir],[dnl
+	    os7_cv_strchan_dir=''
+	    for dir in "$srcdir/strchan-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_strchan_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/strchan" ; then
+		os7_cv_strchan_dir="strchan"
+	    fi
+	])
+    if test :"${os7_cv_strchan_dir:-no}" = :no ; then
 	with_STRCHAN='no'
+    else
+	if test :"${os7_cv_strchan_dir:-no}" != :strchan ; then
+	    ( cd $srcdir ; rm -f strchan ; ln -sf $os7_cv_strchan_dir strchan )
+	fi
     fi
     AC_ARG_WITH([STRISO],
 		AS_HELP_STRING([--with-STRISO],
 			       [include STRISO in master pack @<:@detected@:>@]),
 		[with_STRISO="$withval"],
 		[with_STRISO='yes'])
-    if test ! -d "$srcdir/striso" ; then
+    AC_CACHE_CHECK([for sub-package striso],[os7_cv_striso_dir],[dnl
+	    os7_cv_striso_dir=''
+	    for dir in "$srcdir/striso-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_striso_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/striso" ; then
+		os7_cv_striso_dir="striso"
+	    fi
+	])
+    if test :"${os7_cv_striso_dir:-no}" = :no ; then
 	with_STRISO='no'
+    else
+	if test :"${os7_cv_striso_dir:-no}" != :striso ; then
+	    ( cd $srcdir ; rm -f striso ; ln -sf $os7_cv_striso_dir striso )
+	fi
     fi
     AC_ARG_WITH([NETPERF],
 		AS_HELP_STRING([--without-NETPERF],
 			       [do not include NETPERF in master pack @<:@included@:>@]),
 		[with_NETPERF="$withval"],
 		[with_NETPERF='yes'])
-    if test ! -d "$srcdir/netperf" ; then
+    AC_CACHE_CHECK([for sub-package netperf],[os7_cv_netperf_dir],[dnl
+	    os7_cv_netperf_dir=''
+	    for dir in "$srcdir/netperf-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_netperf_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/netperf" ; then
+		os7_cv_netperf_dir="netperf"
+	    fi
+	])
+    if test :"${os7_cv_netperf_dir:-no}" = :no ; then
 	with_NETPERF='no'
+    else
+	if test :"${os7_cv_netperf_dir:-no}" != :netperf ; then
+	    ( cd $srcdir ; rm -f netperf ; ln -sf $os7_cv_netperf_dir netperf )
+	fi
     fi
     AC_ARG_WITH([STRISDN],
 		AS_HELP_STRING([--without-STRISDN],
 			       [do not include STRISDN in master pack @<:@included@:>@]),
 		[with_STRISDN="$withval"],
 		[with_STRISDN='yes'])
-    if test ! -d "$srcdir/strisdn" ; then
+    AC_CACHE_CHECK([for sub-package strisdn],[os7_cv_strisdn_dir],[dnl
+	    os7_cv_strisdn_dir=''
+	    for dir in "$srcdir/strisdn-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_strisdn_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/strisdn" ; then
+		os7_cv_strisdn_dir="strisdn"
+	    fi
+	])
+    if test :"${os7_cv_strisdn_dir:-no}" = :no ; then
 	with_STRISDN='no'
+    else
+	if test :"${os7_cv_strisdn_dir:-no}" != :strisdn ; then
+	    ( cd $srcdir ; rm -f strisdn ; ln -sf $os7_cv_strisdn_dir strisdn )
+	fi
     fi
     AC_ARG_WITH([STACKS],
 		AS_HELP_STRING([--without-STACKS],
 			       [do not include STACKS in master pack @<:@included@:>@]),
 		[with_STACKS="$withval"],
 		[with_STACKS='yes'])
-    if test ! -d "$srcdir/stacks" ; then
+    AC_CACHE_CHECK([for sub-package strss7],[os7_cv_strss7_dir],[dnl
+	    os7_cv_strss7_dir=''
+	    if test -d "$srcdir/stacks" ; then
+		os7_cv_strss7_dir="stacks"
+	    fi
+	    for dir in "$srcdir/strss7-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_strss7_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/strss7" ; then
+		os7_cv_strss7_dir="strss7"
+	    fi
+	])
+    if test :"${os7_cv_strss7_dir:-no}" = :no ; then
 	with_STACKS='no'
+    else
+	if test :"${os7_cv_strss7_dir:-no}" != :stacks ; then
+	    ( cd $srcdir ; rm -f stacks ; ln -sf $os7_cv_strss7_dir stacks )
+	fi
     fi
     AC_ARG_WITH([SIGTRAN],
 		AS_HELP_STRING([--without-SIGTRAN],
 			       [do not include SIGTRAN in master pack @<:@included@:>@]),
 		[with_SIGTRAN="$withval"],
 		[with_SIGTRAN='yes'])
-    if test ! -d "$srcdir/sigtran" ; then
+    AC_CACHE_CHECK([for sub-package sigtran],[os7_cv_sigtran_dir],[dnl
+	    os7_cv_sigtran_dir=''
+	    for dir in "$srcdir/sigtran-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_sigtran_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/sigtran" ; then
+		os7_cv_sigtran_dir="sigtran"
+	    fi
+	])
+    if test :"${os7_cv_sigtran_dir:-no}" = :no ; then
 	with_SIGTRAN='no'
+    else
+	if test :"${os7_cv_sigtran_dir:-no}" != :sigtran ; then
+	    ( cd $srcdir ; rm -f sigtran ; ln -sf $os7_cv_sigtran_dir sigtran )
+	fi
     fi
     AC_ARG_WITH([STRVOIP],
 		AS_HELP_STRING([--without-STRVOIP],
 			       [do not include STRVOIP in master pack @<:@included@:>@]),
 		[with_STRVOIP="$withval"],
 		[with_STRVOIP='yes'])
-    if test ! -d "$srcdir/strvoip" ; then
+    AC_CACHE_CHECK([for sub-package strvoip],[os7_cv_strvoip_dir],[dnl
+	    os7_cv_strvoip_dir=''
+	    for dir in "$srcdir/strvoip-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_strvoip_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/strvoip" ; then
+		os7_cv_strvoip_dir="strvoip"
+	    fi
+	])
+    if test :"${os7_cv_strvoip_dir:-no}" = :no ; then
 	with_STRVOIP='no'
+    else
+	if test :"${os7_cv_strvoip_dir:-no}" != :strvoip ; then
+	    ( cd $srcdir ; rm -f strvoip ; ln -sf $os7_cv_strvoip_dir strvoip )
+	fi
     fi
 ])# _OS7_OPTIONS
 # =============================================================================

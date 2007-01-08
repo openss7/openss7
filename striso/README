@@ -77,10 +77,6 @@ kernels and was targeted at `ix86', `x86_64', `ppc' and `ppc64'
 architectures, but should build and install for other architectures as
 well.
 
-This package is currently incomplete.  It is being released as a
-reference point for the community.  If you are interested in completion
-of this package, contact <info@openss7.com>.
-
  Release
 --------
 

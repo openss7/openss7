@@ -1,4 +1,4 @@
-OpenSS7 XTI/TLI Networking -- read me first file.  2007-01-02
+OpenSS7 XTI/TLI Networking -- read me first file.  2006-12-29
 $Id: README,v 0.9.2.20 2007/01/03 14:52:38 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 XTI/TLI Networking
 ===========================
 
-Package strxnet-0.9.2.9 was released under GPLv2 2007-01-02.
+Package strxnet-0.9.2.9 was released under GPLv2 2006-12-29.
 
 The `OpenSS7 XTI/TLI Networking' package for `Linux Fast-STREAMS' is an
 implementation of the X/Open Trasnport Interface or SVID Transport
@@ -68,7 +68,7 @@ well.
  Release
 --------
 
-This is the `strxnet-0.9.2.9' package, released 2007-01-02.  This
+This is the `strxnet-0.9.2.9' package, released 2006-12-29.  This
 `0.9.2.9' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
