@@ -5,6 +5,12 @@
 	* am/man.am: got manual pages building and installing separately
 	* am/openss7.am: got manual pages building and installing separately
 
+	* doc/manual/descrip.texi: updated documentation for release
+	* doc/manual/news.texi: updated documentation for release
+	* doc/manual/openss7.texi: updated documentation for release
+	* doc/manual/tree.texi: updated documentation for release
+	* doc/manual/texi/quick.texi: updated documentation for release
+
 2006-12-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated documentation for release
