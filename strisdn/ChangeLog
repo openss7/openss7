@@ -1,5 +1,6 @@
 2007-01-08  Brian Bidulock  <bidulock@openss7.org>
 
+	* rel20070108_6.html: added release file
 	* ANNOUNCE: updated for release
 	* doc/man/man5/strisdn.5.man: added package manpage
 

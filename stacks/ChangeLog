@@ -1,5 +1,6 @@
 2007-01-08  Brian Bidulock  <bidulock@openss7.org>
 
+	* rel20070108_5.html: added release file
 	* ANNOUNCE: updated for release
 	* doc/man/man5/strss7.5.man: added package manpage
 
