@@ -1,11 +1,11 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: help.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/22 09:54:44 $
+# @(#) $RCSfile: help.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/01/08 09:37:10 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/03/22 09:54:44 $ by $Author: brian $
+## Last Modified $Date: 2007/01/08 09:37:10 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: help.am,v $
+## Revision 0.9.2.13  2007/01/08 09:37:10  brian
+## - got manual pages building and instaling separately
+##
 ## Revision 0.9.2.12  2006/03/22 09:54:44  brian
 ## - spelling
 ##
