@@ -1,126 +1,5 @@
-From bidulock@openss7.org Thu Mar 30 17:33:50 MST 2006
-Date: Thu, 30 Mar 2006 17:33:57 -0700
-From: "Brian F. G. Bidulock" <bidulock@openss7.org>
-To: "Linux Announce" <cola@stump.algebra.com>
-Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
-    "OpenSS7 List" <openss7@openss7.org>,
-    "LiS" <linux-streams@gsyc.escet.urjc.es>
-Subject: strinet 0.9.2.3 Released - XTI Library for Linux Fast-STREAMS
-Reply-To: bidulock@openss7.org
-Organization: The OpenSS7 Project <http://www.openss7.org/>
-Dsn-Notification-To: <bidulock@openss7.org>
-Return-Receipt-To: <bidulock@openss7.org>
-
-strinet-0.9.2.4 was released under GPLv2 on March 30, 2006.
-
-STREAMS INET is an implementation of Internet Protocol for Linux
-Fast-STREAMS directly over the Linux NET4 Sockets implementation, using
-a STREAMS over Sockets approach.  This permits modules to be pushed on
-UDP or TCP Streams and allows use of the XTI/TLI library with Internet
-Protocols on Linux.
-
-This OpenSS7 Project release is another separate release of the OpenSS7
-STREAMS INET driver that was formerly present in the (now deprecated)
-Linux STREAMS (LiS) package.  The networking driver (streams-inet) is
-provided, as well as the TPI and XTI header files for INET operation.
-The package contains all the necessary manual pages and other
-documentation for INET components in a separate autoconf tarball.
-
-This release is primarily to support additional compilers (gcc 4.0.2),
-architectures (x86_64, SMP, 32-bit compatibility), recent Linux
-distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels (2.6.15).
-
-This release is a maintenance release.  It provides the following
-enhancements and fixes:
-
-  - Added --enable-devel configure option for embedded targets.
-
-  - Added send-pr script for automatic problem report generation.
-
-  - Fixed buffer leak in ss_sock_sendmsg reported by John Wenker.
-
-  - Significant rewrite of the ss_sock_sendmsg function.
-
-  - Loader optimizations for streams-inet driver.
-
- This is a public gamma release of the package: it deprecates previous
- packages.  Please upgrade before reporting problems with previous
- packages.
-
-As with other OpenSS7 releases, this release configures, compiles,
-installs and builds rpms for a wide range of Linux 2.4 and 2.6 RPM-based
-distributions, and can be used on production kernels without patching or
-recompiling the kernel.
-
-This package is released under the 'GNU Public License Version 2'.  The
-release is available as an autoconf/RPM tarball, SRPM and set of binary
-RPMs.  See the download page <http://www.openss7.org/download.html> for
-the autoconf tarballs and SRPMs.  See the strinet package page at
-<http://www.openss7.org/strinet_pkg.html> for tarballs, SRPMs and binary
-RPMs.
-
-See <http://www.openss7.org/codefiles/strinet-0.9.2.4/ChangeLog> and
-<http://www.openss7.org/codefiles/strinet-0.9.2.4/NEWS> in the release
-for more information.  Also, see the strinet.pdf manual in the release
-(also in html <http://www.openss7.org/strinet_manual.html>).
-
-For the news release, see <http://www.openss7.org/rel20060330_1.html>
-
---
-Brian F. G. Bidulock
-bidulock@openss7.org
-http://www.openss7.org/
-
-From bidulock@openss7.org Thu Mar 30 17:33:50 MST 2006
-Date: Thu, 30 Mar 2006 17:33:57 -0700
-From: "Brian F. G. Bidulock" <bidulock@openss7.org>
-To: "Linux Software Map" <LSM@execpc.com>
-Subject: add
-Reply-To: bidulock@openss7.org
-Organization: The OpenSS7 Project <http://www.openss7.org/>
-Dsn-Notification-To: <bidulock@openss7.org>
-Return-Receipt-To: <bidulock@openss7.org>
-
-Begin4
-Title:			strinet
-Version:		0.9.2.4
-Entered-date:		2006-03-30
-Description:		OpenSS7 INET Networking
-			OpenSS7 STREAMS INET (Internet Protocol) Driver for
-			Linux Fast-STREAMS.
-			The strinet package includes kernel modules, SVR 4.2
-			STREAMS drivers, modules, libraries, utilities, test
-			programs, daemons, and development environment for the
-			development and execution of Internet Protocols (INET)
-			protocol stack components and applications for the
-			Linux Fast-STREAMS STREAMS environment.
-			This distribution is applicable to 2.4 and 2.6 kernels
-			and was targeted at ix86, x86_64, ppc64 and ppc
-			architectures, but should build and install for other
-			architectures as well.
-			Supports a wide range of new and old Linux distributions.
-			Bug-Reports: Report bugs to bugs@openss7.org
-Keywords:		XNS, INET, TPI
-Author:			bidulock@openss7.org (Brian Bidulock)
-Maintained-by:		bidulock@openss7.org (Brian Bidulock)
-Primary-site:		http://www.openss7.org/ tarballs/
-			2M strinet-0.9.2.4.tar.gz
-			2M strinet-0.9.2.4.tar.bz2
-Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
-			2M strinet-0.9.2.4-1.src.rpm
-Original-site:		
-Platforms:		Linux
-			Requires: Linux kernel 2.4 or 2.6,
-			LiS-2.18.3 or streams-0.7a.5 SVR 4.2 STREAMS,
-			strcompat-0.9.2.3,
-			strxns-0.9.2.3,
-			strxnet-0.9.2.8
-Copying-policy:		GPL
-End
-
-
-From bidulock@openss7.org Mon Jan  8 00:00:00 2007
-Date: Mon,  8 Jan 2007 00:00:00 -0700
+From bidulock@openss7.org Mon Jan  8 21:36:54 2007
+Date: Mon,  8 Jan 2007 21:37:04 -0700
 From: "Brian F. G. Bidulock" <bidulock@openss7.org>
 To: "Linux Announce" <cola@stump.algebra.com>
 Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
@@ -132,7 +11,7 @@ Organization: The OpenSS7 Project <http://www.openss7.org/>
 Dsn-Notification-To: <bidulock@openss7.org>
 Return-Receipt-To: <bidulock@openss7.org>
 
-strinet-0.9.2.4 was released under GPLv2 on March 30, 2006.
+Package strinet-0.9.2.4 was released under GPLv2 2007-01-08.
 
 The OpenSS7 INET Networking package is an implementation of the Internet
 Protocol suite for Linux Fast-STREAMS directly over Linux NET4 Sockets
@@ -141,6 +20,45 @@ modules to be pushed on UDP or TCP Streams and allows use of the XTI/TLI
 library with Internet Protocols on Linux.  The package now also includes
 direct STREAMS implementations of RAW IP and UDP, and will include
 direct implementations of TI loopback devices and TCP in the future.
+
+The package currently includes the following STREAMS kernel modules and
+drivers:
+
+     - streams_inet.ko /dev/ip others
+     - streams_udp.ko /dev/udp2
+     - streams_rawip.ko /dev/rawip2
+     - streams_tcp.ko /dev/tcp2
+
+inet(4)
+     The inet(4) driver is a classical STREAMS over Sockets approach.
+     Transport Provider Interface, tpi(7), Streams are interworked into
+     a socket opened within the driver.  This approach has some serious
+     disadvantages, one of them being speed.
+
+udp2(4)
+     The udp2(4) driver is a second-generation STREAMS UPD driver.  This
+     driver is mostly a STREAMS implementation and only relies on the
+     Linux IP layer for operation.  No socket is opened internal to the
+     kernel.  This driver performs much faster than the STREAMS over
+     Sockets approach and rivals the native Sockets implemented under
+     Linux in terms of performance.  This driver is well tested with the
+     test-udp test case executable.
+
+rawip2(4)
+     The rawip2(4) driver is a second-generation STREAMS raw IP driver.
+     It is similar to the second-generation UDP driver.  This driver is
+     well tested with the test-rawip test case executable.
+
+tcp2(4)
+     The tcp2(4) driver is a placeholder for a second-generation STREAMS
+     TCP driver.
+
+
+The OpenSS7 INET Networking package includes kernel modules, SVR 4.2
+STREAMS drivers, modules, libraries, utilities, test programs, daemons,
+and development environment for the development and execution of
+Internet Protocols (INET) protocol stack components and applications for
+the Linux Fast-STREAMS environment.
 
 This OpenSS7 Project release is another separate add-on package release
 of the OpenSS7 INET Networking package that was formerly present in the
@@ -183,7 +101,7 @@ The release provides the following enhancements and fixes:
      device number 230.  Assign major device number 230 explicitly to
      the clone device.  Package will now support extended ranges of
      minor devices on 2.6 kernels under Linux Fast-STREAMS only.
-     strinet now supports expanded addressable minor device numbers,
+     `strinet' now supports expanded addressable minor device numbers,
      permitting 2^16 addressable minor devices per major device number
      on 2.6 kernels: LiS cannot support this change.
 
@@ -197,42 +115,46 @@ The release provides the following enhancements and fixes:
      (primarily SUSE).
 
    - Optimized compilation is now available also for user level programs
-     in addition to kernel programs.  Added new --with-optimize option
-     to configure to accomplish this.
+     in addition to kernel programs.  Added new `--with-optimize' option
+     to `configure' to accomplish this.
 
-   - Added --disable-devel configure option to suppress building and
+   - Added `--disable-devel' `configure' option to suppress building and
      installing development environment.  This feature is for embedded
      or pure runtime targets that do not need the development
      environment (static libraries, manual pages, documentation).
 
-   - Added send-pr script for automatic problem report generation.
+   - Added `send-pr' script for automatic problem report generation.
+
+_This is a public stable production grade release of the package: it
+deprecates previous releases.  Please upgrade to the current release
+before reporting bugs._
 
 As with other OpenSS7 releases, this release configures, compiles,
-installs and builds rpms for a wide range of Linux 2.4 and 2.6 RPM-based
-distributions, and can be used on production kernels without patching or
-recompiling the kernel.
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM- and DPKG-based distributions, and can be used on production kernels
+without patching or recompiling the kernel.
 
-This package is released under the 'GNU Public License Version 2'.  The
-release is available as an autoconf/RPM tarball, SRPM and set of binary
-RPMs.  See the download page <http://www.openss7.org/download.html> for
-the autoconf tarballs and SRPMs.  See the strinet package page at
-<http://www.openss7.org/strinet_pkg.html> for tarballs, SRPMs and binary
-RPMs.
+This package is publicly released under the `GNU General Public License
+Version 2'.  The release is available as an autoconf tarball, SRPM, DSC,
+and set of binary RPMs and DEBs.  See the downloads page
+(http://www.openss7.org/download.html) for the autoconf tarballs, SRPMs
+and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see the
+strinet package page (http://www.openss7.org/strinet_pkg.html).
 
-See <http://www.openss7.org/codefiles/strinet-0.9.2.4/ChangeLog> and
-<http://www.openss7.org/codefiles/strinet-0.9.2.4/NEWS> in the release
-for more information.  Also, see the strinet.pdf manual in the release
-(also in html <http://www.openss7.org/strinet_manual.html>).
+See http://www.openss7.org/codefiles/strinet-0.9.2.4/ChangeLog and
+http://www.openss7.org/codefiles/strinet-0.9.2.4/NEWS in the release for
+more information.  Also, see the `strinet.pdf' manual in the release
+(also in html http://www.openss7.org/strinet_manual.html).
 
-For the news release, see <http://www.openss7.org/rel20070108_5.html>
+For the news release, see `http://www.openss7.org/rel20070108_B.html'.
 
 --
 Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
-From bidulock@openss7.org Mon Jan  8 00:00:00 2007
-Date: Mon,  8 Jan 2007 00:00:00 -0700
+From bidulock@openss7.org Mon Jan  8 21:36:54 2007
+Date: Mon,  8 Jan 2007 21:37:04 -0700
 From: "Brian F. G. Bidulock" <bidulock@openss7.org>
 To: "Linux Software Map" <LSM@execpc.com>
 Subject: add

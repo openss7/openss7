@@ -1,5 +1,5 @@
 OpenSS7 STREAMS VOIP -- history of user visible changes.  2007-01-07
-$Id: NEWS,v 0.9.2.5 2007/01/08 16:24:34 brian Exp $
+$Id: NEWS,v 0.9.2.6 2007/01/09 11:25:58 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -46,19 +46,20 @@ reporting bugs.  Please see `README-alpha' in the release, or
 
 As with other OpenSS7 releases, this release configures, compiles,
 installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
-RPM-based or dpkg-based distributions, and can be used on production
+RPM- and DPKG-based distributions, and can be used on production
 kernels without patching or recompiling the kernel.
 
 This package is publicly released under the `GNU General Public License
 Version 2'.  The release is available as an `autoconf' tarball, SRPM,
-DSC, and set of binary RPMs or DEBs.  See the download page
+DSC, and set of binary RPMs and DEBs.  See the downloads page
 (http://www.openss7.org/download.html) for the `autoconf' tarballs,
-SRPMs and DSCs.  See the strvoip package page
-(http://www.openss7.org/strvoip_pkg.html) for tarballs, SRPMs, DSCs and
-binary RPMs or DEBs.
+SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
+see the strvoip package page (http://www.openss7.org/strvoip_pkg.html).
 
 See `http://www.openss7.org/codefiles/strvoip-0.9.2.1/ChangeLog' and
 `http://www.openss7.org/codefiles/strvoip-0.9.2.1/NEWS' in the release
 for more information.  Also, see the `strvoip.pdf' manual in the
 release (also in html `http://www.openss7.org/strvoip_manual.html').
+
+For the news release, see `http://www.openss7.org/rel20070108_3.html'.
 

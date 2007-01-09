@@ -1,63 +1,136 @@
-From bidulock@openss7.org Wed Mar 15 13:45:30 2006
-Date: Wed, 23 Aug 2006 03:23:21 -0600
+From bidulock@openss7.org Mon Jan  8 21:36:54 2007
+Date: Mon,  8 Jan 2007 21:37:04 -0700
 From: "Brian F. G. Bidulock" <bidulock@openss7.org>
 To: "Linux Announce" <cola@stump.algebra.com>
 Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
     "OpenSS7 List" <openss7@openss7.org>,
-    "LiS" <linux-streams@gsyc.escet.urjc.es>
+    "LiS" <linux-streams@openss7.org>
 Subject: striso 0.9.2.1 Released - STREAMS ISO Networking for Linux
 Reply-To: bidulock@openss7.org
 Organization: The OpenSS7 Project <http://www.openss7.org/>
 Dsn-Notification-To: <bidulock@openss7.org>
 Return-Receipt-To: <bidulock@openss7.org>
 
-striso-0.9.2.1 was released under GPLv2 on August 23, 2006.
+Package striso-0.9.2.1 was released under GPLv2 2007-01-08.
 
-STREAMS ISO is an implementation of the International Organization for
-Standardization Open Systems Interconnect protocols for Linux
-Fast-STREAMS and provides OSI conforming modules and drivers for Data
-Link, Network Services, Transport Services, ACSE, ROSE and CMISE.  In
-addition, it contains modules and drivers for providing ISOT, ITOT, XOT,
-LPP and CMOT.
+OpenSS7 ISO Stack (striso) is an OpenSS7 Project implementation of
+various Open Systems Interconnect (OSI) International Standards
+Organization (ISO) networking components for Linux Fast-STREAMS.
 
-This is the OpenSS7 Project's first release from the OpenSS7 Project of
-the OpenSS7 STREAMS ISO modules.  This package was never part of the
-deprecated Linux STREAMS LiS-2.18.0 package.  These networking modules
-provide all manner of ISO OSI and X.25 drivers and modules.  The package
-contains all the necessary manual pages and other documentation for ISO
-components in an autoconf tarball.
+This release is the first separate release of the OpenSS7 ISO Stack
+package.  Some of the components in this package were formerly present
+in the `strss7' package.  Various networking drivers are provided as
+well as CDI, DLPI, NPI, TPI and XTI header files for ISO/OSI operation.
+The package contains the necessary manual pages and other documentation
+for ISO/OSI components in a separate autoconf tarball.
 
- This is the initial public alpha release of the package.
+The package uses the following standard Open Systems Interconnect (OSI)
+conforming header files from the `strxns' package:
+
+     - <sys/cdi.h> Communications Device Interface
+     - <sys/dlpi.h> Data Link Provider Interface Version 2.0.0
+     - <sys/npi.h> Network Provider Interface Version 2.0.0
+
+The package uses the following standard Open Systems Interconnect (OSI)
+conforming header files from the `strxnet' package:
+
+     - <sys/tihdr.h> Transport Provider Interface Version 2.0.0
+
+The package currently includes the following STREAMS kernel modules and
+drivers:
+
+     - streams_x223.ko    /dev/cons
+     - streams_x233.ko    /dev/clns
+     - streams_x224.ko    /dev/tp0 /dev/tp4
+     - streams_X234.ko    /dev/clts
+     - streams_isot.ko    module /dev/isot
+     - streams_lpp.ko     module /dev/lpp
+     - streams_cmot.ko    module /dev/cmot
+     - streams_itot.ko    module
+     - streams_itos.ko    module
+
+   * x223(4) driver provides CONS and CLNS services in accordance
+     with the ISO/OSI Network Protocol X.223;
+
+   * x224(4) driver provides OSI Transport Protocol services in
+     accordance with the ISO/OSI Transport Protocol X.224;
+
+   * isot(4) driver and module provides ISO Transport over TCP/IP
+     as specified in RFC 1006/STD 35;
+
+   * lpp(4) driver and module provides ISO Transport over TCP/IP as
+     specified in RFC 1085;
+
+   * cmot(4) driver and modules provides ISO Common Management
+     Information Protocol (CMIP) over TCP/IP as specified in RFC 1095;
+
+   * itot(4) module provides ISO Transport over TCP as specified in
+     RFC 2126; and,
+
+   * itos(4) module provides ISO Transport over SCTP.
+
+The OpenSS7 ISO Stack package includes kernel modules, SVR 4.2 STREAMS
+drivers, modules, libraries, utilities, test programs, daemons, and
+development environment for the development and execution of X/Open
+Network Services (ISO) protocol stack components and applications for
+the SVR 4.2 STREAMS environment.
+
+This is the initial open source release of the OpenSS7 ISO Stack
+package.  This release contains modules and drivers formerly only
+available with Commercial releases of the `strss7' package and which are
+only recently available as open source with the release of this package.
+
+With OpenSS7 Master Package release openss7-0.9.2.D, the ISO/OSI
+components were separated from the `strss7' package and placed in this
+package.  Not all of the ISO/OSI components previously part of the
+`strss7' package have been strapped into this release.  Components will
+be re-validated against Linux Fast-STREAMS on a module-by-module and
+driver-by-driver basis.  See TODO in the release, or `Schedule', in the
+manual, for information about the release schedule.
+
+In this initial release, the major component first available is LAPB.
+lapb(4) is a pushable STREAMS module that is pushed over a cdi(4) HDLC
+channel to form an X.25 data link providing the Data Link Provider
+Interface, dlpi(7).  A complete test suite will be available in a
+further release.
+
+Subsequent releases in 1Q 2007 will include the additional full ISO/OSI
+X.25< CONS, CLNS, and TP0 through TP4, drivers with conformance test
+suites.
+
+_This is the initial public alpha release of the package.  Please see
+README-alpha in the release or `Maturity', in the manual._
+
+This package is currently incomplete.  It is being released as a
+reference point for the community.  If you are interested in completion
+of this package, contact <info@openss7.com>.
 
 As with other OpenSS7 releases, this release configures, compiles,
-installs and builds rpms for a wide range of Linux 2.4 and 2.6 RPM-based
-distributions, and can be used on production kernels without patching or
-recompiling the kernel.
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM- and DPKG-based distributions, and can be used on production kernels
+without patching or recompiling the kernel.
 
-This package is released under the 'GNU Public License Version 2'.
-Commercial licensing of the package can be obtained by contacting
-sales@openss7.com.
+This package is publicly released under the `GNU General Public License
+Version 2'.  The release is available as an autoconf tarball, SRPM, DSC,
+and set of binary RPMs and DEBs.  See the downloads page
+(http://www.openss7.org/download.html) for the autoconf tarballs, SRPMs
+and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see the
+striso package page (http://www.openss7.org/striso_pkg.html).
 
-The release is available as an autoconf/RPM tarball, SRPM and set of
-binary RPMs.  See the download page <http://www.openss7.org/download.html>
-for the autoconf tarballs and SRPMs.  See the striso package page at
-<http://www.openss7.org/striso_pkg.html> for tarballs, SRPMs and binary
-RPMs.
+See http://www.openss7.org/codefiles/striso-0.9.2.1/ChangeLog and
+http://www.openss7.org/codefiles/striso-0.9.2.1/NEWS in the release for
+more information.  Also, see the `striso.pdf' manual in the release
+(also in html http://www.openss7.org/striso_manual.html).
 
-See <http://www.openss7.org/codefiles/striso-0.9.2.1/ChangeLog> and
-<http://www.openss7.org/codefiles/striso-0.9.2.1/NEWS> in the release
-for more information.  Also, see the striso.pdf manual in the release
-(also in html <http://www.openss7.org/striso_manual.html>).
-
-For the news release, see <http://www.openss7.org/rel20060315_6.html>
+For the news release, see `http://www.openss7.org/rel20070108_8.html'.
 
 --
 Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
-From bidulock@openss7.org Wed Mar 15 13:45:30 2006
-Date: Wed, 23 Aug 2006 03:23:21 -0600
+From bidulock@openss7.org Mon Jan  8 21:36:54 2007
+Date: Mon,  8 Jan 2007 21:37:04 -0700
 From: "Brian F. G. Bidulock" <bidulock@openss7.org>
 To: "Linux Software Map" <LSM@execpc.com>
 Subject: add
@@ -69,37 +142,36 @@ Return-Receipt-To: <bidulock@openss7.org>
 Begin4
 Title:			striso
 Version:		0.9.2.1
-Entered-date:		2006-08-23
-Description:		OpenSS7 ISO Networking.
-			ISO/OSI and X.25 for Linux Fast-STREAMS.
+Entered-date:		2007-01-08
+Description:		OpenSS7 ISO Stack.
+			OpenSS7 ISO Networking (ISO) for Linux Fast-STREAMS.
 			The striso package includes kernel modules, SVR 4.2
 			STREAMS drivers, modules, libraries, utilities, test
 			programs, daemons, and development environment for the
-			development and execution of ISO/OSI Network Services
+			development and execution of OpenSS7 ISO Networking
 			(ISO) protocol stack components and applications for the
 			SVR 4.2 STREAMS environment.
 			This distribution is currently applicable to Linux 2.4
-			and 2.6 kernels and was targeted at ix86, x86_64, ppc
+			and 2.6 kernels and was targetted at ix86, x86_64, ppc
 			and ppc64 architectures, but should build and install
 			for other architectures as well.
 			Supports a wide range of new and old Linux distributions.
 			Bug-Reports: Report bugs to bugs@openss7.org
-Keywords:		XNS, CDI, DLPI, NPI, DL
+Keywords:		ISO, XNS, CDI, DLPI, NPI, DL
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ tarballs/
-			3.7M striso-0.9.2.1.tar.gz
-			3.3M striso-0.9.2.1.tar.bz2
+			2M striso-0.9.2.1.tar.gz
+			1M striso-0.9.2.1.tar.bz2
 Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
-			3.3M striso-0.9.2.1-1.src.rpm
+			1M striso-0.9.2.1-1.src.rpm
 Original-site:		
 Platforms:		Linux
 			Requires: Linux kernel 2.4 or 2.6,
-			LiS-2.18.3 or streams-0.7a.5 SVR 4.2 STREAMS,
-			strcompat-0.9.2.3
-			strxns-0.9.2.3
-			strxnet-0.9.2.8
-			strinet-0.9.2.3
+			streams 0:0.9.2.1-1 SVR 4.2 STREAMS,
+			strcompat 0:0.9.2.4-1,
+			strxns 0:0.9.2.4-1,
+			strxnet 0:0.9.2.9-1.
 Copying-policy:		GPL
 End
 

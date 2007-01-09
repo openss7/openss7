@@ -1,5 +1,5 @@
-From bidulock@openss7.org Mon Jan  8 00:00:00 2007
-Date: Mon,  8 Jan 2007 00:00:00 -0700
+From bidulock@openss7.org Mon Jan  8 21:36:54 2007
+Date: Mon,  8 Jan 2007 21:37:04 -0700
 From: "Brian F. G. Bidulock" <bidulock@openss7.org>
 To: "Linux Announce" <cola@stump.algebra.com>
 Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
@@ -11,7 +11,7 @@ Organization: The OpenSS7 Project <http://www.openss7.org/>
 Dsn-Notification-To: <bidulock@openss7.org>
 Return-Receipt-To: <bidulock@openss7.org>
 
-strtty-0.9.2.1 was released under GPLv2 on January 8, 2007.
+Package strtty-0.9.2.1 was released under GPLv2 2007-01-07.
 
 The OpenSS7 STREAMS Terminals package provides STREAMS modules and
 drivers, libraries, programs, init scripts, and daemons that implement
@@ -22,6 +22,79 @@ STREAMS drivers, modules, libraries, utilities, test programs, daemons,
 and development environment for the development and execution of OpenSS7
 STREAMS Terminals components and applications for the SVR 4.2 STREAMS
 environment.  It provides true STREAMS-based Pseudo-Terminals for Linux.
+
+The package builds and installs the following STREAMS kernel modules and
+drivers:
+
+     - `streams_pty.ko' driver "/dev/ptmx" "/dev/pts/0"
+     - `streams_ptem.ko' module "ptem"
+     - `streams_pckt.ko' module "pckt"
+     - `streams_ldterm.ko' module "ldterm"
+     - `streams_ttcompat.ko' module "ttcompat"
+
+pty(4)
+     The pty(4) driver is a Pseudo-Terminal Driver that provides the
+     classical UNIX(R) master and slave pseudo-terminals.
+
+     This driver is complete but untested.
+
+ptem(4)
+     The ptem(4) module is a Pseudo-Terminal Emulation Module that
+     provide hardware terminal emulation for the slave side of a
+     Pseudo-Terminal provided by the pty(4) driver.  This module is
+     pushed over the slave side of a pseudo-terminal before pusing
+     ldterm(4).
+
+     This module is complete but untested.
+
+pckt(4)
+     The pckt(4) module is a Packet Module.  This is the classical
+     UNIX(R) packetization module that is pushed over the master side of
+     a pseudo-terminal to allow the master to view the detailed state of
+     the pseudo-terminal.
+
+     This module is complete but untested.
+
+ldterm(4)
+     The ldterm(4) module is a Line Discipline Terminal Module.  This is
+     the classical UNIX(R) line discipline module for terminals.  This
+     module is pushed last on the slave side of a psuedo-terminal, after
+     ptem(4) and provides the POSIX terminal interface to the user.
+
+     This module is incomplete.
+
+ttcompat(4)
+     The ttcompat(4) module is a TTY Compatibility Module.  This is a
+     module that provides UNIX(R) Version 7 and 4BSD compatible terminal
+     interfaces.  These interfaces are no longer in use and this module
+     has only marginal value.
+
+     This module is complete but untested.
+
+
+The package builds and installs the following shared object libraries:
+
+libtty(3)
+     The libtty(3) library provides replacements for POSIX terminal
+     handling functions that are not properly implemented in glibc.
+     These functions are:
+
+     openpt(3tty)    - open a master pseudo-terminal
+     ptsname(3tty)   - obtain name for slave device
+     grantpt(3tty)   - grant access to the slave device
+     unlockpt(3tty)  - unlock the pseudo-terminal
+
+     This library is incomplete.
+
+The OpenSS7 STREAMS Terminals package includes kernel modules, SVR 4.2
+STREAMS drivers, modules, libraries, utilities, test programs, daemons,
+and development environment for the development and execution of OpenSS7
+STREAMS Terminals components and applications for the SVR 4.2 STREAMS
+environment.
+
+This package is currently incomplete.  It is being released as a
+reference point for the community.  If you are interested in completion
+of this package, contact <info@openss7.com>.
 
 This is the first separate release from The OpenSS7 Project of the
 OpenSS7 STREAMS Terminals package.  This package provides pts and ptm
@@ -39,37 +112,40 @@ This release is the initial public release.
    - Support for most recent 2.6.18 kernels (including Fedora Core 5
      with inode diet patchset).
 
-  This is the inital public alpha release of the package.  This
-  package is currently incomplete.  It is being released as a
-  reference point for the community.  If you are interested in
-  completion of this package, contact <info@openss7.com>.
+_This is the initial public alpha release of the package.  Please see
+README-alpha in the release, or `Maturity', in the manual._
+
+This is the inital public alpha release of the package.  This package is
+currently incomplete.  It is being released as a reference point for the
+community.  If you are interested in completion of this package, contact
+<info@openss7.com>.
 
 As with other OpenSS7 releases, this release configures, compiles,
-installs and builds rpms for a wide range of Linux 2.4 and 2.6 RPM-based
-distributions, and can be used on production kernels without patching or
-recompiling the kernel.
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM- and DPKG-based distributions, and can be used on production kernels
+without patching or recompiling the kernel.
 
-This package is released under the 'GNU Public License Version 2'.  The
-release is available as an autoconf/RPM tarball, SRPM and set of binary
-RPMs.  See the download page <http://www.openss7.org/download.html> for
-the autoconf tarballs and SRPMs.  See the strtty package page at
-<http://www.openss7.org/strtty_pkg.html> for tarballs, SRPMs and binary
-RPMs.
+This package is publicly released under the `GNU General Public License
+Version 2'.  The release is available as an autoconf tarball, SRPM, DSC,
+and set of binary RPMs and DEBs.  See the downloads page
+(http://www.openss7.org/download.html) for the autoconf tarballs, SRPMs
+and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see the
+strtty package page (http://www.openss7.org/strtty_pkg.html).
 
-See <http://www.openss7.org/codefiles/strtty-0.9.2.1/ChangeLog> and
-<http://www.openss7.org/codefiles/strtty-0.9.2.1/NEWS> in the release
-for more information.  Also, see the strtty.pdf manual in the release
-(also in html <http://www.openss7.org/strtty_manual.html>).
+See http://www.openss7.org/codefiles/strtty-0.9.2.1/ChangeLog and
+http://www.openss7.org/codefiles/strtty-0.9.2.1/NEWS in the release for
+more information.  Also, see the `strtty.pdf' manual in the release
+(also in html http://www.openss7.org/strtty_manual.html).
 
-For the news release, see <http://www.openss7.org/rel20070108_3.html>
+For the news release, see `http://www.openss7.org/rel20070108_G.html'.
 
 --
 Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
-From bidulock@openss7.org Mon Jan  8 00:00:00 2007
-Date: Mon,  8 Jan 2007 00:00:00 -0700
+From bidulock@openss7.org Mon Jan  8 21:36:54 2007
+Date: Mon,  8 Jan 2007 21:37:04 -0700
 From: "Brian F. G. Bidulock" <bidulock@openss7.org>
 To: "Linux Software Map" <LSM@execpc.com>
 Subject: add

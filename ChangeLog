@@ -1,3 +1,15 @@
+2007-01-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* ANNOUNCE: final post-release updates
+	* AUTHORS: final post-release updates
+	* NEWS: final post-release updates
+	* README: final post-release updates
+	* README-cvs: final post-release updates
+	* THANKS: final post-release updates
+	* openss7.lsm.in: final post-release updates
+	* rel20070108_L.html: final post-release updates
+	* doc/manual/news.texi: final post-release updates
+
 2007-01-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated for release

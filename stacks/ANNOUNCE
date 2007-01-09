@@ -1,137 +1,5 @@
-From bidulock@openss7.org Wed Mar 15 13:45:30 2006
-Date: Wed, 15 Mar 2006 13:22:35 -0700
-From: "Brian F. G. Bidulock" <bidulock@openss7.org>
-To: "Linux Announce" <cola@stump.algebra.com>
-Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
-    "OpenSS7 List" <openss7@openss7.org>,
-    "LiS" <linux-streams@gsyc.escet.urjc.es>
-Subject: strss7 0.9a.4 Released - SS7/SIGTRAN/ISDN/VoIP stack for Linux Fast-STREAMS
-Reply-To: bidulock@openss7.org
-Organization: The OpenSS7 Project <http://www.openss7.org/>
-Dsn-Notification-To: <bidulock@openss7.org>
-Return-Receipt-To: <bidulock@openss7.org>
-
-strss7-0.9a.4 was released under GPLv2 on March 15, 2006.
-
-The STREAMS SS7/SIGTRAN/ISDN/VoIP package contains a wide array of SS7,
-SIGTRAN, ISDN and VoIP drivers and components for Linux Fast-STREAMS.
-This is the public release package which has most of the components
-removed.  Subscriber and sponsors of the OpenSS7 Project have access to
-the full array of components.
-
-This is the fourth release of the OpenSS7 SS7/SIGTRAN/ISDN/VoIP strss7
-package that contains SS7 (Signalling System No. 7), SIGTRAN (SIGnalling
-TRANsport), ISDN (Integrated Services Digital Network) and VoIP (Voice
-over Internet Protocol) signalling stack components for Linux
-Fast-STREAMS.  The package contains the necessary header files, manual
-pages and other documentation for SS7/SIGTRAN/ISDN/VoIP components in a
-separate autoconf tarball.
-
-This release is primarily to support additional compilers (gcc 4.0.2),
-architectures (x86_64, SMP, 32-bit compatibility), recent Linux
-distributions (EL4, SuSE 10, LE2006, OpenSuSE) and kernels (2.6.15).
-
- - Changes necessary for __LP64__ compatible builds.  Changes to support
-   32-bit ioctl compatibility for __LP64__ architectures.  Binary
-   compatibility should not have been disrupted.  At the same time as
-   the ioctl32 changes, TRANSPARENT ioctl support for most of the IO
-   controls for the ldl(4) driver has been added.
-
- - Changes to satisfy gcc 4.0.2 compiler.
-
- - Corrections for and testing of 64-bit clean compile and test runs on
-   x86_64 architecture.  Some bug corrections resulting from gcc 4.0.2
-   compiler warnings.
-
- - Corrected build flags for Gentoo and 2.6.15 kernels as reported on
-   mailing list.
-
- - Initial corrections for and testing of SMP operation on Intel 630
-   Hyper-Threaded SMP on x86_64.  This package should now run well on
-   N-way Xeons even with Hyper-Threading enabled.
-
- - Corrections and validation of 32-bit compatibility over 64-bit on
-   x86_64.  Should apply well to other 64-bit architectures as well.
-
- This is a public alpha release of the package.
- 
- Please see README-alpha in the release, or
- <http://www.openss7.org/codefiles/strss7-0.9a.4/README-alpha>.
-
-As with other OpenSS7 releases, this release configures, compiles,
-installs and builds rpms for a wide range of Linux 2.4 and 2.6 RPM-based
-distributions, and can be used on production kernels without patching or
-recompiling the kernel.
-
-This package is released under the 'GNU Public License Version 2'.  The
-release is available as an autoconf/RPM tarball, SRPM and set of binary
-RPMs.  See the download page <http://www.openss7.org/download.html> for
-the autoconf tarballs and SRPMs.  See the strss7 package page at
-<http://www.openss7.org/strss7_pkg.html> for tarballs, SRPMs and binary
-RPMs.
-
-See <http://www.openss7.org/codefiles/strss7-0.9a.4/ChangeLog> and
-<http://www.openss7.org/codefiles/strss7-0.9a.4/NEWS> in the release for
-more information.  Also, see the strss7.pdf manual in the release (also
-in html <http://www.openss7.org/strss7_manual.html>).
-
-For the news release, see <http://www.openss7.org/rel20060315_B.html>
-
---
-Brian F. G. Bidulock
-bidulock@openss7.org
-http://www.openss7.org/
-
-From bidulock@openss7.org Wed Mar 15 13:45:30 2006
-Date: Wed, 15 Mar 2006 13:22:35 -0700
-From: "Brian F. G. Bidulock" <bidulock@openss7.org>
-To: "Linux Software Map" <LSM@execpc.com>
-Subject: add
-Reply-To: bidulock@openss7.org
-Organization: The OpenSS7 Project <http://www.openss7.org/>
-Dsn-Notification-To: <bidulock@openss7.org>
-Return-Receipt-To: <bidulock@openss7.org>
-
-Begin4
-Title:			strss7
-Version:		0.9a.4
-Entered-date:		2006-03-15
-Description:		OpenSS7 SS7 Stack.
-			The strss7 package includes kernel modules, SVR 4.2
-			STREAMS drivers, modules, libraries, utilities, test
-			programs, daemons, and development environment for the
-			development and execution of Signalling System Number 7
-			(SS7) protocol stack components and applications for the
-			Linux Fast-STREAMS environment.
-			This distribution is currently applicable to 2.4 and 2.6
-			kernels and was targeted at ix86, x86_64, ppc and ppc64
-			architectures, but should build and install for other
-			architectures as well.
-			Supports a wide range of new and old Linux distributions.
-			Bug-Reports: Report bugs to bugs@openss7.org
-Keywords:		SS7 SIGTRAN ISDN H323 VoIP
-Author:			bidulock@openss7.org (Brian Bidulock)
-Maintained-by:		bidulock@openss7.org (Brian Bidulock)
-Primary-site:		http://www.openss7.org/ tarballs/
-			15M strss7-0.9a.4.tar.gz
-			13M strss7-0.9a.4.tar.bz2
-Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
-			13M strss7-0.9a.4-1.src.rpm
-Original-site:		
-Platforms:		Linux
-			Requires: Linux kernel 2.4 or 2.6,
-			LiS-2.18.3 or streams-0.7a.5 SVR 4.2 STREAMS,
-			strcompat-0.9.2.3,
-			strxns-0.9.2.3,
-			strxnet-0.9.2.8,
-			strinet-0.9.2.3,
-			strsctp-0.9.2.5
-Copying-policy:		GPL
-End
-
-
-From bidulock@openss7.org Mon Jan  8 00:00:00 2007
-Date: Mon,  8 Jan 2007 00:00:00 -0700
+From bidulock@openss7.org Mon Jan  8 21:36:54 2007
+Date: Mon,  8 Jan 2007 21:37:04 -0700
 From: "Brian F. G. Bidulock" <bidulock@openss7.org>
 To: "Linux Announce" <cola@stump.algebra.com>
 Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
@@ -143,7 +11,7 @@ Organization: The OpenSS7 Project <http://www.openss7.org/>
 Dsn-Notification-To: <bidulock@openss7.org>
 Return-Receipt-To: <bidulock@openss7.org>
 
-strss7-0.9a.5 was released under GPLv2 on January 8, 2007.
+Package strss7-0.9a.5 was released under GPLv2 2007-01-08.
 
 The OpenSS7 SS7 Stack package includes a wide array of kernel modules,
 SVR 4.2 STREAMS drivers, modules, libraries, utilities, test programs,
@@ -181,8 +49,8 @@ will still build all components).
    - The X400P-SS7 driver has been upgraded to support the Varion V401P
      (Tormenta III) card.  This driver passes all validation test suites
      and is production grade.  The driver still supports the older
-     cards.  Also, an `autoconf' style validation test suite was added
-     and the `test-x400p' test case executable upgraded.
+     cards.  Also, an autoconf style validation test suite was added and
+     the `test-x400p' test case executable upgraded.
 
    - Support for most recent 2.6.18 kernels (including Fedora Core 5
      with inode diet patchset).
@@ -217,50 +85,49 @@ will still build all components).
      (primarily SUSE).
 
    - Optimized compilation is now available also for user level programs
-     in addition to kernel programs.  Added new --with-optimize option
-     to configure to accomplish this.
+     in addition to kernel programs.  Added new `--with-optimize' option
+     to `configure' to accomplish this.
 
    - Automated release file generation making for vastly improved and
      timely text documentation present in the release directory.
 
-   - Added --disable-devel configure option to suppress building and
+   - Added `--disable-devel' `configure' option to suppress building and
      installing development environment.  This feature is for embedded
      or pure runtime targets that do not need the development
      environment (static libraries, manual pages, documentation).
 
-   - Added send-pr script for automatic problem report generation.
+   - Added `send-pr' script for automatic problem report generation.
 
- This is a public alpha release of the package.
- 
- Please see README-alpha in the release, or
- <http://www.openss7.org/codefiles/strss7-0.9a.5/README-alpha>.
+_This is a public beta release of the package: it deprecates previous
+releases.  Please upgrade to the current release before reporting bugs.
+Please see README-alpha in the release, or `Maturity', in the manual._
 
 As with other OpenSS7 releases, this release configures, compiles,
-installs and builds rpms for a wide range of Linux 2.4 and 2.6 RPM-based
-distributions, and can be used on production kernels without patching or
-recompiling the kernel.
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM- and DPKG-based distributions, and can be used on production kernels
+without patching or recompiling the kernel.
 
-This package is released under the 'GNU Public License Version 2'.  The
-release is available as an autoconf/RPM tarball, SRPM and set of binary
-RPMs.  See the download page <http://www.openss7.org/download.html> for
-the autoconf tarballs and SRPMs.  See the strss7 package page at
-<http://www.openss7.org/strss7_pkg.html> for tarballs, SRPMs and binary
-RPMs.
+This package is publicly released under the `GNU General Public License
+Version 2'.  The release is available as an autoconf tarball, SRPM, DSC,
+and set of binary RPMs and DEBs.  See the downloads page
+(http://www.openss7.org/download.html) for the autoconf tarballs, SRPMs
+and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see the
+strss7 package page (http://www.openss7.org/strss7_pkg.html).
 
-See <http://www.openss7.org/codefiles/strss7-0.9a.5/ChangeLog> and
-<http://www.openss7.org/codefiles/strss7-0.9a.5/NEWS> in the release for
-more information.  Also, see the strss7.pdf manual in the release (also
-in html <http://www.openss7.org/strss7_manual.html>).
+See http://www.openss7.org/codefiles/strss7-0.9a.5/ChangeLog and
+http://www.openss7.org/codefiles/strss7-0.9a.5/NEWS in the release for
+more information.  Also, see the `strss7.pdf' manual in the release
+(also in html http://www.openss7.org/strss7_manual.html).
 
-For the news release, see <http://www.openss7.org/rel20070108_E.html>
+For the news release, see `http://www.openss7.org/rel20070108_5.html'.
 
 --
 Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
-From bidulock@openss7.org Mon Jan  8 00:00:00 2007
-Date: Mon,  8 Jan 2007 00:00:00 -0700
+From bidulock@openss7.org Mon Jan  8 21:36:54 2007
+Date: Mon,  8 Jan 2007 21:37:04 -0700
 From: "Brian F. G. Bidulock" <bidulock@openss7.org>
 To: "Linux Software Map" <LSM@execpc.com>
 Subject: add

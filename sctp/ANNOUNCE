@@ -1,5 +1,5 @@
-From bidulock@openss7.org Tue Mar 28 21:37:29 MST 2006
-Date: Tue, 28 Mar 2006 21:37:14 -0700
+From bidulock@openss7.org Mon Jan  8 21:36:54 2007
+Date: Mon,  8 Jan 2007 21:37:04 -0700
 From: "Brian F. G. Bidulock" <bidulock@openss7.org>
 To: "Linux Announce" <cola@stump.algebra.com>
 Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
@@ -10,64 +10,112 @@ Organization: The OpenSS7 Project <http://www.openss7.org/>
 Dsn-Notification-To: <bidulock@openss7.org>
 Return-Receipt-To: <bidulock@openss7.org>
 
-sctp 0.2.24 was released under GPLv2 on March 28, 2006.
+Package sctp-0.2.24 was released under GPLv2 2007-01-08.
 
-This is a release of the OpenSS7 Linux Native (Sockets) implementation
-of SCTP (Stream Control Transmission Protocol), previously only
-available as a Kernel patch.  This package contains the necessary
-manual pages, header files, and configures and installs against almost
-any 2.4 kernel, even production kernels, without patching.
+The OpenSS7 Linux Native SCTP package is the OpenSS7 Linux Native
+(Sockets) Kernel implementation of Stream Control Transmission Protocol
+(SCTP).
+
+sctp-0.2.24 is the 0.2.24 version of a Linux Kernel native
+implementation of RFC 2960 Stream Control Transmission Protocol.  For
+information on using the implementation see the man/sctp.7 Linux manual
+page and look at the test programs in sctp-0.2.24/test/.
+
+_Warning_: This is prerelease code.  It is Beta but rather stable.
+Nevertheless, it is possible it will crash or lock your machine in some
+situations.  Please remember that there is _NO WARRANTY_ with this code
+and take appropriate precautions when attempting to run it.
+
+This distribution is only currently applicable to Linux 2.4 kernels and
+was targeted at ix86, x86_64, ppc and ppc64 architectures, but should
+build and install for other architectures as well.
+
+This is the twenty-fourth release of the Linux Native (Sockets) SCTP
+from the OpenSS7 Project.  This release, as with other releases, on
+builds and installs on 2.4 kernels.  This package is not as important to
+the OpenSS7 Project as the STREAMS version of SCTP, which provides the
+basis for all of the SIGTRAN components for the OpenSS7 stacks.  Also,
+the STREAMS version runs on both 2.4 and 2.6 kernels.
+
+This is a stable production release: it deprecates previous releases.
+Please upgrade to the current release before reporting bugs.
 
 This is primarily a maintenance release correcting reported bugs, but
-also includes the latest packaging improvements:
+also includes the latest packaging improvements.
 
-- Added --enable-devel configure option for embedded targets.
+Following are highlights of some of the changes since the last release:
 
-- Added send-pr script for automatic problem report generation.
+   - Support for (configure but not build on) most recent 2.6.18 kernels
+     (including Fedora Core 5 with inode diet patchset).
 
-- Fixed problems with unresolved symbols on some systems.
+   - Added `send-pr' scripts for automatic problem report generation.
 
-- Fixed glaring error in sctp_init preventing kernel module from
-  loading.
+   - Now builds 32-bit compatibility libraries and tests them against
+     64-bit kernel modules and drivers.  The `make installcheck' target
+     will now automatically test both 64-bit native and 32-bit
+     compatibility versions, one after the other, on 64-bit platforms.
 
-- Added init scripts and system control configuration data.
+   - Improved compiler flag generation and optimizations for recent gcc
+     compilers and some idiosyncratic behaviour for some distributions
+     (primarily SUSE).
 
-- Removed old preload approach to kernel module loading.
+   - Optimized compilation is now available also for user level programs
+     in addition to kernel programs.  Added new `--with-optimize' option
+     to `configure' to accomplish this.
 
- This is a public alpha release of the package.
+   - Better detection of SUSE distributions, release numbers and SLES
+     distributions: support for additional SuSE distributions on ix86 as
+     well as x86_64.  Added distribution support includes SLES 9, SLES 9
+     SP2, SLES 9 SP3, SLES 10, SuSE 10.1.
 
- Please see README-alpha in the release, or
- <http://www.openss7.org/codefiles/sctp-0.2.24/README-alpha>.
- 
- This release deprecates previous releases as well as the older
- linux-sctp kernel patches.
+   - Many documentation updates for all OpenSS7 packages.  Automated
+     release file generation making for vastly improved and timely text
+     documentation present in the release directory.
+
+   - Added --disable-devel' `configure' option to suppress building and
+     installing development environment.  This feature is for embedded
+     or pure runtime targets that do not need the development
+     environment (static libraries, manual pages, documentation).
+
+   - Added `send-pr' script for automatic problem report generation.
+
+   - Fixed problems with unresolved symbols on some systems.  Fixed
+     glaring error in sctp_init preventing kernel module from loading.
+
+   - Added init scripts and system control configuration data.  Removed
+     old preload approach to kernel module loading.
+
+
+_This is a public stable production grade release of the package: it
+deprecates previous releases.  Please upgrade to the current release
+before reporting bugs._
 
 As with other OpenSS7 releases, this release configures, compiles,
-installs and builds rpms for a wide range of Linux 2.4 RPM-based
-distributions, and can be used on production kernels without patching or
-recompiling the kernel.
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM- and DPKG-based distributions, and can be used on production kernels
+without patching or recompiling the kernel.
 
-This package is released under the 'GNU Public License Version 2'.  The
-release is available as an autoconf/RPM tarball, SRPM and set of binary
-RPMs.  See the download page <http://www.openss7.org/download.html> for
-the autoconf tarballs and SRPMs.  See the sctp package page at
-<http://www.openss7.org/sctp_pkg.html> for tarballs, SRPMs and binary
-RPMs.
+This package is publicly released under the `GNU General Public License
+Version 2'.  The release is available as an autoconf tarball, SRPM, DSC,
+and set of binary RPMs and DEBs.  See the downloads page
+(http://www.openss7.org/download.html) for the autoconf tarballs, SRPMs
+and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see the
+sctp package page (http://www.openss7.org/sctp_pkg.html).
 
-See <http://www.openss7.org/codefiles/sctp-0.2.24/ChangeLog> and
-<http://www.openss7.org/codefiles/sctp-0.2.24/NEWS> in the release for
-more information.  Also, see the sctp.pdf manual in the release (also
-in html <http://www.openss7.org/sctp_manual.html>).
+See http://www.openss7.org/codefiles/sctp-0.2.24/ChangeLog and
+http://www.openss7.org/codefiles/sctp-0.2.24/NEWS in the release for
+more information.  Also, see the `sctp.pdf' manual in the release (also
+in html http://www.openss7.org/sctp_manual.html).
 
-For the news release, see <http://www.openss7.org/rel20060328_1.html>
+For the news release, see `http://www.openss7.org/rel20070108_2.html'.
 
 --
 Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
-From bidulock@openss7.org Tue Mar 28 21:37:29 MST 2006
-Date: Tue, 28 Mar 2006 21:37:14 -0700
+From bidulock@openss7.org Mon Jan  8 21:36:54 2007
+Date: Mon,  8 Jan 2007 21:37:04 -0700
 From: "Brian F. G. Bidulock" <bidulock@openss7.org>
 To: "Linux Software Map" <LSM@execpc.com>
 Subject: add
@@ -79,7 +127,7 @@ Return-Receipt-To: <bidulock@openss7.org>
 Begin4
 Title:			sctp
 Version:		0.2.24
-Entered-date:		2006-03-28
+Entered-date:		2007-01-08
 Description:		OpenSS7 Linux Native SCTP.
 			OpenSS7 Linux Native SCTP (Stream Control Transmission
 			Protocol).
