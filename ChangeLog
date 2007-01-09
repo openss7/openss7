@@ -1,5 +1,9 @@
 2007-01-09  Brian Bidulock  <bidulock@openss7.org>
 
+	* .pkgrelease: bumped release number for next release
+	* doc/manual/news.texi: bumped release number for next release
+	* scripts/texi/versions.texi: bumped release number for next release
+
 	* ANNOUNCE: final post-release updates
 	* AUTHORS: final post-release updates
 	* NEWS: final post-release updates
