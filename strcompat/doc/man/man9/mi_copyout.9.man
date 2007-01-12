@@ -187,6 +187,29 @@ will close the input output control operation as though
 .BR mi_copy_done (9)
 was called like:
 \fBmi_copy_done\fR(\fIq\fR, \fImp\fR, \fIcp->cp_rval\fR).
+.PP
+When
+.BR mi_copy_done ()
+is called for a non-transparent
+.IR I_STR (7)
+operation, the input-output control operation is completed and an
+.BR M_IOCACK (9)
+message issued upstream.  If a copyout operation was previously specified with
+a call to
+.BR mi_copyout_alloc (9),
+an implicit copyout operation is included by setting the
+.I ioc_count
+member of the
+.BR iocblk (9)
+structure to the size of the copyout operation.
+.PP
+If it is desired that the return value returned on an
+.IR I_STR (7)
+operation be other than zero, the
+.BR mi_copy_set_rval (9)
+utility can be used to set the return value before
+.BR mi_copyout (9)
+is called.
 .\"
 .\"
 .SH USAGE

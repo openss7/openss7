@@ -675,9 +675,26 @@ EXPORT_SYMBOL_NOVERS(mi_reallocb);
 
 #define MI_COPY_STATE(_mp)		MI_COPY_CASE(MI_COPY_DIRECTION(_mp), MI_COPY_COUNT(_mp))
 
-/*
- *  MI_COPY_DONE
- *  -------------------------------------------------------------------------
+/**
+ * mi_copy_done: - complete an input-output control operation
+ * @q: write queue upon which message was received
+ * @mp: the M_IOCTL/M_IOCDATA message
+ * @err: non-zero error to return, or zero for success
+ *
+ * mi_copy_done() is used to complete an input-output control operation where there is no data to be
+ * copied out (neither implicit nor explicit).
+ *
+ * Almost all versions of LiS have a pretty nasty bug with regard to M_IOCDATA.  According to SVR 4
+ * STREAMS Programmer's Guide and all major UNIX implementations of STREAMS, when M_IOCDATA returns
+ * an error (cp_rval != NULL), the module or driver is supposed to clean up and abort the M_IOCTL.
+ * The Stream head has already returned an error to the user and does not expect an M_IOCACK or
+ * M_IOCNAK.  LiS makes the error of sleeping again and expecting a negative acknowledgement, so,
+ * for LiS (and not Linux Fast-STREAMS) we return an M_IOCNAK with what will be the ultimate error
+ * code.  Modules and drivers ported to LiS that don't know about this will hang until timeout or
+ * signal (SIGKILL, SIGTERM), possibly indefinitely when an M_IOCDATA error is sent.  Even if LiS is
+ * fixed, this code will still work, it will just send an extraneous M_IOCNAK to the Stream head
+ * that will be discarded because no M_IOCTL will be in progress anymore.
+ *
  */
 void
 mi_copy_done(queue_t *q, mblk_t *mp, int err)
@@ -694,19 +711,7 @@ mi_copy_done(queue_t *q, mblk_t *mp, int err)
 		if (ioc->copyresp.cp_private)
 			freemsg(xchg(&ioc->copyresp.cp_private, NULL));
 #ifdef LIS
-		/* Almost all versions of LiS have a pretty nasty bug with regard to M_IOCDATA.
-		   According to SVR 4 STREAMS Programmer's Guide and all major UNIX implementations 
-		   of STREAMS, when M_IOCDATA returns an error (cp_rval != NULL), the module or
-		   driver is supposed to clean up and abort the M_IOCTL.  The Stream head has
-		   already returned an error to the user and does not expect an M_IOCACK or
-		   M_IOCNAK.  LiS makes the error of sleeping again and expecting a negative
-		   acknowledgement, so, for LiS (and not Linux Fast-STREAMS) we return an M_IOCNAK
-		   with what will be the ultimate error code.  Modules and drivers ported to LiS
-		   that don't know about this will hang until timeout or signal (SIGKILL, SIGTERM), 
-		   possibly indefinitely when an M_IOCDATA error is sent.  Even if LiS is fixed,
-		   this code will still work, it will just send an extraneous M_IOCNAK to the
-		   Stream head that will be discarded because no M_IOCTL will be in progress
-		   anymore.  */
+		/* LiS bug, see above. */
 		break;
 #else
 		if (ioc->copyresp.cp_rval == (caddr_t) 0)
@@ -727,14 +732,18 @@ mi_copy_done(queue_t *q, mblk_t *mp, int err)
 	mp->b_datap->db_type = err ? M_IOCNAK : M_IOCACK;
 	ioc->iocblk.ioc_error = (err < 0) ? -err : err;
 	ioc->iocblk.ioc_rval = err ? -1 : ioc->iocblk.ioc_rval;
+	ioc->iocblk.ioc_count = 0;
 	qreply(q, mp);
 }
 
 EXPORT_SYMBOL_NOVERS(mi_copy_done);	/* mps/ddi.h */
 
-/*
- *  MI_COPYIN
- *  -------------------------------------------------------------------------
+/**
+ * mi_copyin: - perform explicit or implicit copyin() operation
+ * @q: write queue on which message was received
+ * @mp: the M_IOCTL or M_IOCDATA message
+ * @uaddr: NULL for first copyin operation, or user address for subsequent operation
+ * @len: length of data to copy in
  */
 void
 mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
@@ -769,6 +778,7 @@ mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 				mip = (typeof(mip)) bp->b_rptr;
 				mp->b_datap->db_type = M_IOCDATA;
 				ioc->copyresp.cp_private = bp;
+				mip->mi_uaddr = NULL;
 				mip->mi_cnt = 1;
 				mip->mi_dir = MI_COPY_IN;
 				putq(q, mp);
@@ -802,9 +812,12 @@ mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 
 EXPORT_SYMBOL_NOVERS(mi_copyin);	/* mps/ddi.h */
 
-/*
- *  MI_COPYIN_N
- *  -------------------------------------------------------------------------
+/**
+ * mi_copyin_n: - perform subsequent copyin operation
+ * @q: write queue on which message was received
+ * @mp: the M_IOCDATA message
+ * @offset: offset into original memory extent
+ * @len: length of data to copy in
  */
 void
 mi_copyin_n(queue_t *q, mblk_t *mp, size_t offset, size_t len)
@@ -837,9 +850,13 @@ mi_copyin_n(queue_t *q, mblk_t *mp, size_t offset, size_t len)
 
 EXPORT_SYMBOL_NOVERS(mi_copyin_n);	/* mps/ddi.h */
 
-/*
- *  MI_COPYOUT_ALLOC
- *  -------------------------------------------------------------------------
+/**
+ * mi_copyout_alloc: - allocate a message block for a copyout operation
+ * @q: write queue on which messagew as received
+ * @mp: the M_IOCTL or M_IOCDATA message
+ * @uaddr: explicit user address (or NULL for implicit address) to copy out to
+ * @len: length of data to copy out
+ * @free_on_error: when non-zero close input-output operation automatically on error
  */
 mblk_t *
 mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free_on_error)
@@ -888,9 +905,10 @@ mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free_on_
 
 EXPORT_SYMBOL_NOVERS(mi_copyout_alloc);	/* mps/ddi.h */
 
-/*
- *  MI_COPYOUT
- *  -------------------------------------------------------------------------
+/**
+ * mi_copyout: - perform a pending copyout operation and possible close input-output control
+ * @q: write queue on which message was received
+ * @mp: the M_IOCTL or M_IOCDATA message
  */
 void
 mi_copyout(queue_t *q, mblk_t *mp)
@@ -921,9 +939,19 @@ mi_copyout(queue_t *q, mblk_t *mp)
 
 EXPORT_SYMBOL_NOVERS(mi_copyout);	/* mps/ddi.h */
 
-/*
- *  MI_COPY_STATE
- *  -------------------------------------------------------------------------
+/**
+ * mi_copy_state: - determine the state of an input-output control operation
+ * @q: write queue on which message was received
+ * @mp: the M_IOCDATA message
+ * @mpp: message pointer to set do copied in data
+ *
+ * mi_copy_state() is only used on M_IOCDATA messages.  It checks the return code from the previous
+ * copyin or copyout operation and returns an M_IOCNAK or aborts if an error occurred.  If data was
+ * copied in, mpp is set to point to the data block containing the data.  The user must not free
+ * this data block: it remains attached to the M_IOCDATA message.  If data was copied out, the
+ * pointer pointed to by mpp is untouched.  The function returns -1 if an error occurred (in which
+ * case the passed in message block is used to pass an M_IOCNAK upstream).  If no error occured, it
+ * returns the state of the input-output control operation.
  */
 int
 mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp)
@@ -962,6 +990,15 @@ EXPORT_SYMBOL_NOVERS(mi_copy_state);	/* mps/ddi.h */
 /*
  *  MI_COPY_SET_RVAL
  *  -------------------------------------------------------------------------
+ */
+/**
+ * mi_copy_set_rval: - set the input-output control operation return value
+ * @mp: the M_IOCTL or M_IOCDATA message
+ * @rval: the return value to set
+ *
+ * mi_copy_set_rval() is used to set the return value to something other than zero before the last
+ * function in the input-output control operation is called.  The last functions called would be
+ * either mi_copyout() or mi_copy_done().
  */
 void
 mi_copy_set_rval(mblk_t *mp, int rval)
