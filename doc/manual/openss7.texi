@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 0.9.2.11 2006/12/29 12:17:54 brian Exp $
+% @(#) $Id: openss7.texi,v 0.9.2.12 2007/01/08 11:10:06 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/12/29 12:17:54 $ by $Author: brian $
+% Last Modified $Date: 2007/01/08 11:10:06 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -402,6 +402,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: openss7.texi,v $
+Revision 0.9.2.12  2007/01/08 11:10:06  brian
+- updated documentation for release
+
 Revision 0.9.2.11  2006/12/29 12:17:54  brian
 - old rpms hate nested ifs, release updates
 
@@ -939,7 +942,6 @@ distribution.
 See the installation and reference manual in the @file{strcompat/doc} directory for more information on
 this sub-package.
 
-@ignore
 @node strutil
 @subsection strutil-@value{VERSION_STRUTIL}
 
@@ -964,7 +966,6 @@ distribution.
 See the installation and reference manual in the @file{strutil/doc} directory for more information on
 this sub-package.
 
-@end ignore
 @node strbcm
 @subsection strbcm-@value{VERSION_STRBCM}
 
@@ -1398,110 +1399,61 @@ the coordinated build and installation of the contained sub-packages.
 
 @dfn{STREAMS} drivers contained in sub-packages consist of the following:
 
-@table @file
+@multitable @columnfractions .35 .65
+@item @file{streams_clone.ko}
+@tab For more information, see @manref{clone(4)}.
+@item @file{streams_echo.ko}
+@tab For more information, see @manref{echo(4)}.
+@item @file{streams_fifo.ko}
+@tab For more information, see @manref{fifo(4)}.
+@item @file{streams_log.ko}
+@tab For more information, see @manref{log(4)}.
+@item @file{streams_loop.ko}
+@tab For more information, see @manref{loop(4)}.
+@item @file{streams_mux.ko}
+@tab For more information, see @manref{mux(4)}.
+@item @file{streams_nsdev.ko}
+@tab For more information, see @manref{nsdev(4)}.
+@item @file{streams_nuls.ko}
+@tab For more information, see @manref{nuls(4)}.
+@item @file{streams_pipe.ko}
+@tab For more information, see @manref{pipe(4)}.
+@item @file{streams_sad.ko}
+@tab For more information, see @manref{sad(4)}.
+@item @file{streams_sfx.ko}
+@tab For more information, see @manref{sfx(4)}.
+@item @file{streams_spx.ko}
+@tab For more information, see @manref{spx(4)}.
 
-@item clone
+@item @file{streams_ip_to_dlpi.ko}
+@tab For more information, see @manref{ip_to_dlpi(4)}.
+@item @file{streams_ldl.ko}
+@tab For more information, see @manref{ldl(4)}.
+@item @file{streams_np_ip.ko}
+@tab For more information, see @manref{np_ip(4)}.
 
-See @manref{clone(4)} for more information.
+@item @file{streams_inet.ko}
+@tab For more information, see @manref{inet(4)}.
+@item @file{streams_rawip.ko}
+@tab For more information, see @manref{rawip(4)}.
+@item @file{streams_tcp.ko}
+@tab For more information, see @manref{tcp(4)}.
+@item @file{streams_udp.ko}
+@tab For more information, see @manref{udp(4)}.
 
-@item echo
+@item @file{streams_sctp.ko}
+@tab For more information, see @manref{sctp(4)}.
 
-See @manref{echo(4)} for more information.
+@item @file{streams_sdlm.ko}
+@tab For more information, see @manref{sdlm(4)}.
+@item @file{streams_sl_mux.ko}
+@tab For more information, see @manref{sl_mux(4)}.
+@item @file{streams_x100p-ss7.ko}
+@tab For more information, see @manref{x100p-ss7(4)}.
+@item @file{streams_x400p-ss7.ko}
+@tab For more information, see @manref{x400p-ss7(4)}.
 
-@item fifo
-
-See @manref{fifo(4)} for more information.
-
-@item log
-
-See @manref{log(4)} for more information.
-
-@item loop
-
-See @manref{loop(4)} for more information.
-
-@item mux
-
-See @manref{mux(4)} for more information.
-
-@item nsdev
-
-See @manref{nsdev(4)} for more information.
-
-@item nuls
-
-See @manref{nuls(4)} for more information.
-
-@item pipe
-
-See @manref{pipe(4)} for more information.
-
-@item sad
-
-See @manref{sad(4)} for more information.
-
-@item sfx
-
-See @manref{sfx(4)} for more information.
-
-@item spx
-
-See @manref{spx(4)} for more information.
-
-
-@item ip_to_dlpi
-
-See @manref{ip_to_dlpi(4)} for more information.
-
-@item ldl
-
-See @manref{ldl(4)} for more information.
-
-@item np_ip
-
-See @manref{np_ip(4)} for more information.
-
-
-@item inet
-
-See @manref{inet(4)} for more information.
-
-@item rawip
-
-See @manref{rawip(4)} for more information.
-
-@item tcp
-
-See @manref{tcp(4)} for more information.
-
-@item udp
-
-See @manref{udp(4)} for more information.
-
-
-@item sctp
-
-See @manref{sctp(4)} for more information.
-
-
-@item sdlm
-
-See @manref{sdlm(4)} for more information.
-
-@item sl_mux
-
-See @manref{sl_mux(4)} for more information.
-
-@item x100p-ss7
-
-See @manref{x100p-ss7(4)} for more information.
-
-@item x400p-ss7
-
-See @manref{x400p-ss7(4)} for more information.
-
-
-@end table
+@end multitable
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -1515,94 +1467,54 @@ the coordinated build and installation of the contained sub-packages.
 
 @dfn{STREAMS} modules contained in sub-packages consist of the following:
 
-@table @file
+@multitable @columnfractions .35 .65
 
-@item sth
+@item @file{streams_sth.ko}
+@tab For more information, see @manref{sth(4)}.
+@item @file{streams_bufmod.ko}
+@tab For more information, see @manref{bufmod(4)}.
+@item @file{streams_connld.ko}
+@tab For more information, see @manref{connld(4)}.
+@item @file{streams_nullmod.ko}
+@tab For more information, see @manref{nullmod(4)}.
+@item @file{streams_pipemod.ko}
+@tab For more information, see @manref{pipemod(4)}.
+@item @file{streams_sc.ko}
+@tab For more information, see @manref{sc(4)}.
+@item @file{streams_testmod.ko}
+@tab For more information, see @manref{testmod(4)}.
 
-See @manref{sth(4)} for more information.
+@item @file{streams_ip_strm_mod.ko}
+@tab For more information, see @manref{ip_strm_mod(4)}.
 
-@item bufmod
+@item @file{streams_timod.ko}
+@tab For more information, see @manref{timod(4)}.
+@item @file{streams_tirdwr.ko}
+@tab For more information, see @manref{tirdwr(4)}.
 
-See @manref{bufmod(4)} for more information.
+@item @file{streams_tpiperf.ko}
+@tab For more information, see @manref{tpiperf(4)}.
 
-@item connld
+@item @file{streams_m2pa_sl.ko}
+@tab For more information, see @manref{m2pa_sl(4)}.
+@item @file{streams_sdl.ko}
+@tab For more information, see @manref{sdl(4)}.
+@item @file{streams_sdl_sctp.ko}
+@tab For more information, see @manref{sdl_sctp(4)}.
+@item @file{streams_sdt.ko}
+@tab For more information, see @manref{sdt(4)}.
+@item @file{streams_sdt_sctp.ko}
+@tab For more information, see @manref{sdt_sctp(4)}.
+@item @file{streams_sl.ko}
+@tab For more information, see @manref{sl(4)}.
+@item @file{streams_sl_tpi.ko}
+@tab For more information, see @manref{sl_tpi(4)}.
+@item @file{streams_sm_mod.ko}
+@tab For more information, see @manref{sm_mod(4)}.
+@item @file{streams_spm.ko}
+@tab For more information, see @manref{spm(4)}.
 
-See @manref{connld(4)} for more information.
-
-@item nullmod
-
-See @manref{nullmod(4)} for more information.
-
-@item pipemod
-
-See @manref{pipemod(4)} for more information.
-
-@item sc
-
-See @manref{sc(4)} for more information.
-
-@item testmod
-
-See @manref{testmod(4)} for more information.
-
-
-@item ip_strm_mod
-
-See @manref{ip_strm_mod(4)} for more information.
-
-
-@item timod
-
-See @manref{timod(4)} for more information.
-
-@item tirdwr
-
-See @manref{tirdwr(4)} for more information.
-
-
-@item tpiperf
-
-See @manref{tpiperf(4)} for more information.
-
-
-@item m2pa_sl
-
-See @manref{m2pa_sl(4)} for more information.
-
-@item sdl
-
-See @manref{sdl(4)} for more information.
-
-@item sdl_sctp
-
-See @manref{sdl_sctp(4)} for more information.
-
-@item sdt
-
-See @manref{sdt(4)} for more information.
-
-@item sdt_sctp
-
-See @manref{sdt_sctp(4)} for more information.
-
-@item sl
-
-See @manref{sl(4)} for more information.
-
-@item sl_tpi
-
-See @manref{sl_tpi(4)} for more information.
-
-@item sm_mod
-
-See @manref{sm_mod(4)} for more information.
-
-@item spm
-
-See @manref{spm(4)} for more information.
-
-
-@end table
+@end multitable
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -1623,43 +1535,64 @@ See @manref{spm(4)} for more information.
 * LiS Libraries::
 @end menu
 
-The @value{PACKAGE_TITLE} does not install any drivers of its own and is simply a master package for
+The @value{PACKAGE_TITLE} does not install any libraries of its own and is simply a master package for
 the coordinated build and installation of the contained sub-packages.
+
+During the installation process of the sub-packages, subroutine libraries are built and installed on
+the system.  For 64-bit systems that support 32-bit compatibility, two version of each library are
+built and installed: one 64-bit native library and one 32-bit compatibility library.  64-bit native
+libraries are installed to the @file{/@-usr/@-lib@-64/@-} subdirectory; 32-bit native and 32-bit
+compatiblity libraries are installed to the @file{/@-usr/@-lib/@-} subdirectory.
 
 Libraries contained in sub-packages consist of the following:
 
 @table @file
 
-@item libstreams.so
+@item libstreams
 
 This is a @dfn{STREAMS} library installed by the @command{streams-@value{VERSION_STREAMS}} package
 providing usable @manref{getmsg(2)}, @manref{getpmsg(2)}, @manref{putmsg(2)}, @manref{putpmsg(2)}
 and @manref{isastream(2)} system call emulation.
 
-@item libxnet.so
+@item libtty
+
+This is a @dfn{TTY} library installed by the @command{strtty-@value{VERSION_STRTTY}} package
+providing a set of Pseudo-Terminal device functions described in Section 3 of the manual pages,
+starting with @manref{tty(3)}.
+
+@item libxnet
 
 This is an @dfn{XTI/TLI} library installed by the @command{strxnet-@value{VERSION_STRXNET}} package
 providing a set of XTI/TLI functions described in Section 3 of the manual pages, starting with
 @manref{xti(3)}.
 
-@item libxnsl.so
+@item libxnsl
 
 This is an @dfn{NSL} library installed by the @command{strnsl-@value{VERSION_STRNSL}} package
 providing a set of NSL functions described in Section 3 of the manual pages, starting with
 @manref{nsl(3)}.
 
-@item libsocket.so
+@item libsocket
 
 This ia a @dfn{Sockets} library installed by the @command{strsock-@value{VERSION_STRSOCK}} package
 providing a set of Socket functions described in Section 3 of the manual pages, starting with
 @manref{libsocket(3)}.
 
-@item libLiS.so
-@itemx libpLiS.so
+@item libsockpath
 
-These are @dfn{STREAMS} libraries installed be the @command{LiS-@value{VERSION_LIS}} package
+This ia a @dfn{Sockets} library installed by the @command{strsock-@value{VERSION_STRSOCK}} package
+providing a set of Socket functions described in Section 3 of the manual pages, starting with
+@manref{libsockpath(3)}.
+
+@item libLiS
+@itemx libpLiS
+
+These are @dfn{STREAMS} libraries installed by the @command{LiS-@value{VERSION_LIS}} package
 providing usable @manref{getmsg(2)}, @manref{getpmsg(2)}, @manref{putmsg(2)}, @manref{putpmsg(2)}
 and @manref{isastream(2)} system call emulation.
+
+These libraries are also installed by the @command{streams-@value{VERSION_STREAMS}} package for
+compatibilty with LiS.
 
 @end table
 
@@ -1669,32 +1602,252 @@ and @manref{isastream(2)} system call emulation.
 @node streams Libraries
 @subsection streams
 
-@subsubsection libstreams
+@subsubsection libstreams Library Routines
+
+The following subroutines are present in the @file{libstreams} libraries.  The routines in these
+libraries are standard @dfn{STREAMS} interface system calls documented in the
+@cite{UNIX@registeredsymbol{} System V Release 4.2 Programmer's Manual -- STREAMS}.  Refer to the
+associated manual pages for detailed information on these subroutines.
+
+@multitable @columnfractions .25 .75
+@item @manpage{fattach(2)} --
+@tab Name a @dfn{STREAMS} special file.
+For more information, see @manref{fattach(2)}.
+@item @manpage{fdetach(2)} --
+@tab Unname a @dfn{STREAMS} special file.
+For more information, see @manref{fdetach(2)}.
+@item @manpage{getmsg(2)} --
+@tab Get next message off a Stream.
+For more information, see @manref{getmsg(2)}.
+@item @manpage{getpmsg(2s)} --
+@tab Get next message off a Stream.
+For more information, see @manref{getpmsg(2s)}.
+@item @manpage{isastream(2)} --
+@tab Test for a @dfn{STREAMS} special file.
+For more information, see @manref{isastream(2)}.
+@item @manpage{pipe(2s)} --
+@tab Create a @dfn{STREAMS} pipe.
+For more information, see @manref{pipe(2s)}.
+@item @manpage{putmsg(2)} --
+@tab Put a message to a @dfn{STREAMS} special device.
+For more information, see @manref{putmsg(2)}.
+@item @manpage{putpmsg(2s)} --
+@tab Put a band message to a @dfn{STREAMS} special device.
+For more information, see @manref{putpmsg(2s)}.
+@item @manpage{pstrlog(3)} --
+@tab Print a @dfn{STREAMS} log buffer.
+For more information, see @manref{pstrlog(3)}.
+@item @manpage{strlog(3)} --
+@tab Print a @dfn{STREAMS} log buffer.
+For more information, see @manref{strlog(3)}.
+@item @manpage{vstrlog(3)} --
+@tab Print a @dfn{STREAMS} log buffer.
+For more information, see @manref{vstrlog(3)}.
+@end multitable
+
+@subsubsection libLiS Library Routines
+
+For more information on this compatibility library, see @xref{LiS Libraries}.
+
+@subsubsection libpLiS Library Routines
+
+For more information on this compatibility library, see @xref{LiS Libraries}.
 
 @node strtty Libraries
 @subsection strtty
 
-@subsubsection libtty
+@subsubsection libtty Library Routines
+
+The following subroutines are present in the @file{libtty} libraries.  The routines in these
+libraries are standard @dfn{STREAMS} interface system calls documented in the
+@cite{UNIX@registeredsymbol{} System V Release 4.2 Programmer's Manual -- STREAMS}.  Refer to the
+associated manual pages for detailed information on these subroutines.
+
+@multitable @columnfractions .25 .75
+@item @manpage{openpt(3tty)} --
+@tab Open a master pseudo-terminal.
+For more information, see @manref{openpt(3tty)}.
+@item @manpage{ptsname(3tty)} --
+@tab Obtain name for slave device.
+For more information, see @manref{ptsname(3tty)}.
+@item @manpage{grantpt(3tty)} --
+@tab Grant access to slave device.
+For more information, see @manref{granpt(3tty)}.
+@item @manpage{unlockpt(3tty)} --
+@tab Unlock the pseudo-terminal.
+For more information, see @manref{unlockpt(3tty)}.
+@end multitable
 
 @node strxnet Libraries
 @subsection strxnet
 
-@subsubsection libxnet
+@subsubsection libxnet Library Routines
 
 @node strnsl Libraries
 @subsection strnsl
 
-@subsubsection libxnsl
+@subsubsection libxnsl Library Routines
+
+The following subroutines are present in the @file{libxnsl} libraries.  The routines in these
+libraries are standard @dfn{STREAMS} interface system calls documented in the
+@cite{UNIX@registeredsymbol{} System V Release 4.2 Programmer's Manual -- STREAMS}.  Refer to the
+associated manual pages for detailed information on these subroutines.
+
+@multitable @columnfractions .25 .75
+@item @manpage{endnetconfig(3)} --
+@tab Unbind from the network selection database.
+For more information, see @manref{endnetconfig(3)}.
+@item @manpage{endnetpath(3)} --
+@tab Unbind from the @env{NETPATH} database.
+For more information, see @manref{endnetpath(3)}.
+@item @manpage{freenetconfigent(3)} --
+@tab Free a network selection database entry.
+For more information, see @manref{freenetconfigent(3)}.
+@item @manpage{getnetconfig(3)} --
+@tab get an entry from the network selection database.
+For more information, see @manref{getnetconfig(3)}.
+@item @manpage{getnetconfigent(3)} --
+@tab get an entry from the network selection database by network id.
+For more information, see @manref{getnetconfigent(3)}.
+@item @manpage{getnetpath(3)} --
+@tab get entry from @env{NETPATH} database.
+For more information, see @manref{getnetpath(3)}.
+@item @manpage{nc_perror(3)} --
+@tab Print a network selection error message.
+For more information, see @manref{nc_perror(3)}.
+@item @manpage{nc_sperror(3)} --
+@tab Obtain a network selection error message.
+For more information, see @manref{nc_sperror(3)}.
+@item @manpage{_nderror(3)} --
+@tab Network selection error number.
+For more information, see @manref{_nderror(3)}.
+@item @manpage{netdir_free(3)} --
+@tab Free network selection database data structures.
+For more information, see @manref{netdir_free(3)}.
+@item @manpage{netdir_getbyaddr(3)} --
+@tab Look up host and service names in directory service by address.
+For more information, see @manref{netdir_getbyaddr(3)}.
+@item @manpage{netdir_getbyname(3)} --
+@tab Look up address in directory service by name.
+For more information, see @manref{netdir_getbyname(3)}.
+@item @manpage{netdir_options(3)} --
+@tab Perform options management on a trasnport endpoint.
+For more information, see @manref{netdir_options(3)}.
+@item @manpage{netdir_perror(3)} --
+@tab Print network directory error message.
+For more information, see @manref{netdir_perror(3)}.
+@item @manpage{netdir_sperror(3)} --
+@tab Obtain network directory error message.
+For more information, see @manref{netdir_sperror(3)}.
+@item @manpage{setnetconfig(3)} --
+@tab Bind to or rewind the network selection database.
+For more information, see @manref{setnetconfig(3)}.
+@item @manpage{setnetpath(3)} --
+@tab Bind to or rewind the @env{NETPATH} database.
+For more information, see @manref{setnetpath(3)}.
+@item @manpage{taddr2uaddr(3)} --
+@tab Convert a transport address to a universal address.
+For more information, see @manref{taddr2uaddr(3)}.
+@item @manpage{uaddr2taddr(3)} --
+@tab Convert a universal address to a transport address.
+For more information, see @manref{uaddr2taddr(3)}.
+@end multitable
 
 @node strsock Libraries
 @subsection strsock
 
-@subsubsection libsocket
+@subsubsection libsocket Library Routines
+
+The following subroutines are present in the @file{libsocket} libraries.  The routines in these
+libraries are standard @dfn{STREAMS} interface system calls documented in the
+@cite{UNIX@registeredsymbol{} System V Release 4.2 Programmer's Manual -- STREAMS}.  Refer to the
+associated manual pages for detailed information on these subroutines.
+
+@multitable @columnfractions .25 .75
+
+@subsubsection libsockpath Library Routines
+@item @manpage{accept(3)} --
+@tab Accept a transport connection.
+For more information, see @manref{accept(3)}.
+@item @manpage{bind(3)} --
+@tab Bind a transport endpoint.
+For more information, see @manref{bind(3)}.
+@item @manpage{connect(3)} --
+@tab Establish a transport connection.
+For more information, see @manref{connect(3)}.
+@item @manpage{getpeername(3)} --
+@tab Get name of remote transport endpoint.
+For more information, see @manref{getpeername(3)}.
+@item @manpage{getsockname(3)} --
+@tab Get name of local transport endpoint.
+For more information, see @manref{getsockname(3)}.
+@item @manpage{getsockopt(3)} --
+@tab Get a socket option.
+For more information, see @manref{getsockopt(3)}.
+@item @manpage{listen(3)} --
+@tab Listen for connections on a transport endpoint.
+For more information, see @manref{listen(3)}.
+@item @manpage{recv(3)} --
+@tab Receive data on a transport endpoint.
+For more information, see @manref{recv(3)}.
+@item @manpage{recvfrom(3)} --
+@tab Receive data from a transport endpoint.
+For more information, see @manref{recvfrom(3)}.
+@item @manpage{recvmsg(3)} --
+@tab Receive a message on a transport endpoint.
+For more information, see @manref{recvmsg(3)}.
+@item @manpage{send(3)} --
+@tab Send data on a transport endpoint.
+For more information, see @manref{send(3)}.
+@item @manpage{sendmsg(3)} --
+@tab Send a message on a trasnport endpoint.
+For more information, see @manref{sendmsg(3)}.
+@item @manpage{sendto(3)} --
+@tab Send data to a transport endpoint.
+For more information, see @manref{sendto(3)}.
+@item @manpage{setsockopt(3)} --
+@tab Set a socket option.
+For more information, see @manref{setsockopt(3)}.
+@item @manpage{shutdown(3)} --
+@tab Shut down a transport connection.
+For more information, see @manref{shutdown(3)}.
+@item @manpage{socket(3)} --
+@tab Create a socket.
+For more information, see @manref{socket(3)}.
+@item @manpage{socketpair(3)} --
+@tab Create a connected pair of sockets.
+For more information, see @manref{socketpair(3)}.
+@end multitable
+
+The following subroutines are present in the @file{libsockpath} libraries.  The routines in these
+libraries are standard @dfn{STREAMS} interface system calls documented in the
+@cite{UNIX@registeredsymbol{} System V Release 4.2 Programmer's Manual -- STREAMS}.  Refer to the
+associated manual pages for detailed information on these subroutines.
+
+@multitable @columnfractions .25 .75
+@item @manpage{setsockpath(3)} --
+@tab Access the sock2path database.
+For more information, see @manref{setsockpath(3)}.
+@item @manpage{getsockpath(3)} --
+@tab Get next sock2path database entry.
+For more information, see @manref{getsockpath(3)}.
+@item @manpage{endsockpath(3)} --
+@tab Close sock2path database.
+For more information, see @manref{endsockpath(3)}.
+@item @manpage{getsockpathent(3)} --
+@tab Get a sock2path database entry.
+For more information, see @manref{getsockpathent(3)}.
+@item @manpage{freesockpathent(3)} --
+@tab Free a sock2path database entry.
+For more information, see @manref{freesockpathent(3)}.
+@end multitable
 
 @node striso Libraries
 @subsection striso
 
-@subsubsection libiso
+@subsubsection libiso Library Routines
+
+In the future the @file{libiso} libraries will provide the SunLink X.25 interface routines.
 
 @node netperf Libraries
 @subsection netperf
@@ -1702,8 +1855,74 @@ and @manref{isastream(2)} system call emulation.
 @node LiS Libraries
 @subsection LiS
 
-@subsubsection libLiS
-@subsubsection libpLiS
+@subsubsection libLiS Library Routines
+
+The following subroutines are present in the @file{libLiS} libraries.  The routines in these
+libraries are standard @dfn{STREAMS} interface system calls documented in the
+@cite{UNIX@registeredsymbol{} System V Release 4.2 Programmer's Manual -- STREAMS}.  Refer to the
+associated manual pages for detailed information on these subroutines.
+
+See also @xref{streams Libraries}.
+
+@multitable @columnfractions .25 .75
+@item @manpage{fattach(2)} --
+@tab Name a @dfn{STREAMS} special file.
+For more information, see @manref{fattach(2)}.
+@item @manpage{fdetach(2)} --
+@tab Unname a @dfn{STREAMS} special file.
+For more information, see @manref{fdetach(2)}.
+@item @manpage{getmsg(2)} --
+@tab Get next message off a Stream.
+For more information, see @manref{getmsg(2)}.
+@item @manpage{getpmsg(2s)} --
+@tab Get next message off a Stream.
+For more information, see @manref{getpmsg(2s)}.
+@item @manpage{isastream(2)} --
+@tab Test for a @dfn{STREAMS} special file.
+For more information, see @manref{isastream(2)}.
+@item @manpage{pipe(2s)} --
+@tab Create a @dfn{STREAMS} pipe.
+For more information, see @manref{pipe(2s)}.
+@item @manpage{putmsg(2)} --
+@tab Put a message to a @dfn{STREAMS} special device.
+For more information, see @manref{putmsg(2)}.
+@item @manpage{putpmsg(2s)} --
+@tab Put a band message to a @dfn{STREAMS} special device.
+For more information, see @manref{putpmsg(2s)}.
+@end multitable
+
+@subsubsection libpLiS Library Routines
+
+The following subroutines are present in the @file{libpLiS} libraries.  The routines in these
+libraries are standard @dfn{STREAMS} interface system calls documented in the
+@cite{UNIX@registeredsymbol{} System V Release 4.2 Programmer's Manual -- STREAMS}.  Refer to the
+associated manual pages for detailed information on these subroutines.
+
+See also @xref{streams Libraries}.
+
+@multitable @columnfractions .25 .75
+@item @manpage{fattach(2)} --
+@tab Name a @dfn{STREAMS} special file.
+For more information, see @manref{fattach(2)}.
+@item @manpage{fdetach(2)} --
+@tab Unname a @dfn{STREAMS} special file.
+For more information, see @manref{fdetach(2)}.
+@item @manpage{getmsg(2)} --
+@tab Get next message off a Stream.
+For more information, see @manref{getmsg(2)}.
+@item @manpage{getpmsg(2s)} --
+@tab Get next message off a Stream.
+For more information, see @manref{getpmsg(2s)}.
+@item @manpage{isastream(2)} --
+@tab Test for a @dfn{STREAMS} special file.
+For more information, see @manref{isastream(2)}.
+@item @manpage{putmsg(2)} --
+@tab Put a message to a @dfn{STREAMS} special device.
+For more information, see @manref{putmsg(2)}.
+@item @manpage{putpmsg(2s)} --
+@tab Put a band message to a @dfn{STREAMS} special device.
+For more information, see @manref{putpmsg(2s)}.
+@end multitable
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -1740,8 +1959,8 @@ shared libraries, and kernel modules in a structured manner.
 Header files are installed, typically, in the @file{/@-usr/@-include/@-@var{name}/} subdirectory,
 where @var{name} is the name of the package.@footnote{That is, where @emph{name} is one of
 @file{sctp}, @file{iperf}, @file{streams}, @file{strcompat}, @file{strutil}, @file{strxns},
-@file{strxnet}, @file{strnsl}, @file{strinet}, @file{strtty}, @file{striso}, @file{strchan}, @file{strsctp}, @file{netperf}, or
-@file{LiS}.} To use the header files from one of the packages,
+@file{strxnet}, @file{strnsl}, @file{strinet}, @file{strtty}, @file{striso}, @file{strchan},
+@file{strsctp}, @file{netperf}, or @file{LiS}.} To use the header files from one of the packages,
 @samp{-I/@-usr/@-include/@-@var{name}/} must be included as a @command{gcc} compile option.  This is
 true regardless of whether user space or kernel programs are being compiled.
 
@@ -1754,6 +1973,7 @@ add-on packages are required, the order of these directives should be:
 @item @samp{-I/usr/include/sigtran}
 @item @samp{-I/usr/include/strss7}
 @item @samp{-I/usr/include/strisdn}
+@item @samp{-I/usr/include/striso}
 @item @samp{-I/usr/include/strchan}
 @item @samp{-I/usr/include/strsctp}
 @item @samp{-I/usr/include/strinet}
@@ -1794,8 +2014,18 @@ add-on packages:
 @node sctp Header Files
 @subsubsection sctp
 
+The @command{sctp-@value{VERSION_SCTP}} add-on package provides the following user-visible header
+files in @file{/usr/include}:
+
+@multitable @columnfractions .25 .74
+@item @file{netinet/sctp.h}
+@tab primary header file for @manref{sctp(7)}.
+@end multitable
+
 @node iperf Header Files
 @subsubsection iperf
+
+The @command{iperf-@value{VERSION_IPERF}} add-on package installs no header files.
 
 @node streams Header Files
 @subsubsection streams
@@ -1880,11 +2110,41 @@ command line ahead of @samp{-I/usr/include/streams}.
 @node strutil Header Files
 @subsubsection strutil
 
+The @command{strutil-@value{VERSION_STRUTIL}} add-on package was deprecated with LiS and this
+section has been deleted.
+
 @node strbcm Header Files
 @subsubsection strbcm
 
+The @command{strbcm-@value{VERSION_STRBCM}} add-on package was deprecated with LiS and this
+section has been deleted.
+
 @node strtty Header Files
 @subsubsection strtty
+
+The @command{strtty-@value{VERSION_STRTTY}} add-on package provides the following user-visible
+header files in @file{/@-usr/@-in@-clude/@-str@-tty/@-}:
+
+@multitable @columnfractions .25 .75
+@item @file{sys/ttydev.h}
+@tab replacement for the standard @cite{SVR 4} header file.
+@item @file{sys/ttyio.h}
+@tab replacement for the standard @cite{SVR 4} header file.
+@item @file{sys/strtty.h}
+@tab replacement for the standard @cite{SVR 4} header file.
+@item @file{sys/pty.h}
+@tab See @manref{pty(4)} for more information.
+@item @file{ttychars.h}, @file{sys/ttychars.h}
+@tab replacement for the standard @cite{SVR 4} header file.
+@item @file{ttcompat.h}
+@tab See @manref{ttcompat(4)} for more information.
+@item @file{sgtty.h}, @file{sys/sgtty.h}
+@tab replacement for the standard @cite{SVR 4} header file.
+@item @file{termios.h}, @file{sys/termios.h}
+@tab replacement for the standard @cite{SVR 4} header file.
+@item @file{termio.h}, @file{sys/termio.h}
+@tab replacement for the standard @cite{SVR 4} header file.
+@end multitable
 
 @node strxns Header Files
 @subsubsection strxns
@@ -1978,8 +2238,29 @@ header files in @file{/usr/include/strxnet}:
 The @command{strnsl-@value{VERSION_STRNSL}} add-on package provides the following user-visible
 header files in @file{/usr/include/strnsl}:
 
+@multitable @columnfractions .25 .75
+@item @file{netdir.h}
+@tab primary header file for the Name-to-Address translation facility.
+@item @file{netconfig.h}, @file{sys/netconfig.h}
+@tab primary header file for the Network Selection facility.
+@end multitable
+
 @node strsock Header Files
 @subsubsection strsock
+
+The @command{strsock-@value{VERSION_STRSOCK}} add-on package provides the following user-visible
+header files in @file{/usr/include/strsock}:
+
+@multitable @columnfractions .25 .75
+@item @file{sockio.h}, @file{sys/sockio.h}
+@tab primary header files defining input-output controls for sockets.
+@item @file{sockmod.h}, @file{sys/sockmod.h}
+@tab primary header files defining input-output controls for the @manpage{sockmod(4)} cooperating module.
+@item @file{sockdb.h}, @file{sys/sockpath.h}, @file{sys/socklib.h}
+@tab primary header files for the @manpage{sock2path(5)} database.
+@item @file{socksys.h}, @file{sys/socksys.h} 
+@tab primary header files defining input-output controls for the @manpage{socksys(4)} driver.
+@end multitable
 
 @node strinet Header Files
 @subsubsection strinet
@@ -2050,14 +2331,67 @@ header files in @file{/usr/include/strchan}:
 @node striso Header Files
 @subsubsection striso
 
+@multitable @columnfractions .25 .75
+@item @file{xti.h}
+@tab header file for the @cite{X/Open Transport Interface (XTI)}.
+@item @file{xti_osi.h}, @file{sys/xti_osi.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Open Systems Interconnect (OSI)} specifics.
+@item @file{xti_mosi.h}, @file{sys/xti_mosi.h}
+@tab system specific header file for the @cite{X/Open Transport Interface (XTI)},
+@cite{Minimal OSI (mOSI)} specifics.
+@end multitable
+
 @node netperf Header Files
 @subsubsection netperf
+
+The @command{netperf-@value{VERSION_NETPERF}} add-on pacakge does not provide any user-visible
+header files.
 
 @node strisdn Header Files
 @subsubsection strisdn
 
 The @command{strisdn-@value{VERSION_STRISDN}} add-on package provides the following user-visible
 header files in @file{/usr/include/strisdn}:
+
+@multitable @columnfractions .25 .75
+@item @file{sys/capi.h}
+@tab header file for @cite{ISDN Common API (CAPI)}.
+@item @file{sys/capi_ioctl.h}
+@tab header file for @cite{ISDN Common API (CAPI)} input-output controls.
+@item @file{sys/cci.h}
+@tab header file for @cite{Call Control Interface (CCI)}.
+@item @file{sys/dlpi_gr303.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{GR-303} specifics.
+@item @file{sys/dlpi_isdn.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{ISDN} specifics.
+@item @file{sys/dlpi_lapd.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{Link Access Protocol (D-Channel)} specifics.
+@item @file{sys/dlpi_v52.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{V5.2} specifics.
+@item @file{sys/dua_ioctl.h}
+@tab header file for the @manref{dua(4)} driver, input-output controls.
+@item @file{sys/gr303_ioctl.h}
+@tab header file for the @manref{gr303(4)} driver, input-output controls.
+@item @file{sys/isdni.h}
+@tab header file for @cite{Integrated Services Digital Network Interface (ISDNI)}.
+@item @file{sys/isdni_ioctl.h}
+@tab header file for @cite{Integrated Services Digital Network Interface (ISDNI)}, input-output controls.
+@item @file{sys/lapd_ioctl.h}
+@tab header file for the @manref{labd(4)} driver, input-output controls.
+@item @file{sys/lapf_ioctl.h}
+@tab header file for the @manref{labf(4)} driver, input-output controls.
+@item @file{sys/ph.h}
+@tab header file for @cite{Physical Interface (PH)}.
+@item @file{sys/q920.h}
+@tab header file for the @manref{q920(4)} driver.
+@item @file{sys/v52_ioctl.h}
+@tab header file for the @manref{v52(4)} driver, input-output controls.
+@end multitable
 
 @node strss7 Header Files
 @subsubsection strss7
@@ -2441,36 +2775,98 @@ header files in @file{/usr/include/strss7}:
 The @command{sigtran-@value{VERSION_SIGTRAN}} add-on package provides the following user-visible
 header files in @file{/usr/include/sigtran}:
 
+@multitable @columnfractions .25 .75
+@item @file{sys/dlpi_dua.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{DASS/DPNSS User Adaptation Layer} specifics.
+@item @file{sys/dlpi_gr303ua.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{GR-303 User Adaptation Layer} specifics.
+@item @file{sys/dlpi_iua.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{ISDN User Adaptation Layer} specifics.
+@item @file{sys/dlpi_m2ua.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{MTP2 User Adaptation Layer} specifics.
+@item @file{sys/dlpi_v5ua.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{V5.2 User Adaptation Layer} specifics.
+@item @file{sys/dua_ioctl.h}
+@tab header file for the @manref{dua(4)} driver, input-output controls.
+@item @file{sys/gr303ua_ioctl.h}
+@tab header file for the @manref{gr303ua(4)} driver, input-output controls.
+@item @file{sys/iua_ioctl.h}
+@tab header file for the @manref{iua(4)} driver, input-output controls.
+@item @file{sys/m2pa_ioctl.h}
+@tab header file for the @manref{m2pa(4)} driver, input-output controls.
+@item @file{sys/m2ua_ioctl.h}
+@tab header file for the @manref{m2ua(4)} driver, input-output controls.
+@item @file{sys/m3ua.h}
+@tab header file for the @manref{m3ua(4)} driver.
+@item @file{sys/m3ua_ioctl.h}
+@tab header file for the @manref{m3ua(4)} driver, input-output controls.
+@item @file{sys/ua_ioctl.h}
+@tab header file for @cite{User Adaptation Layer Management (UA-LM)}.
+@item @file{sys/ua_lm.h}
+@tab header file for @cite{User Adaptation Layer Management (UA-LM)}.
+@item @file{sys/ua_lm_ioctl.h}
+@tab header file for @cite{User Adaptation Layer Management (UA-LM)}, input-output controls.
+@item @file{sys/v5ua_ioctl.h}
+@tab header file for the @manref{v5ua(4)} driver, input-output controls.
+@end multitable
+
 @node strvoip Header Files
 @subsubsection strvoip
 
 The @command{strvoip-@value{VERSION_STRVOIP}} add-on package provides the following user-visible
 header files in @file{/usr/include/strvoip}:
 
+@multitable @columnfractions .25 .75
+@item @file{sys/dlpi_h225.h}
+@tab system specific header file for the @cite{Data Link Provider Interface (DLPI)},
+@cite{H.225} specifics.
+@item @file{sys/h225.h}
+@tab header file for the @manref{h225(4)} driver.
+@item @file{sys/h225_ioctl.h}
+@tab header file for the @manref{h225(4)} driver, input-output controls.
+@end multitable
+
 @node LiS Header Files
 @subsubsection LiS
+
+The @command{strvoip-@value{VERSION_LIS}} package provides user-visible header files in
+@file{/@-usr/@-in@-clude/@-LiS/@-}.  The mess of header files provided by LiS is convoluted and
+overly complex and will not be outlined here.  LiS is deprecated.  Please do not use it.
 
 @node Shared and Static Libraries
 @subsection Libraries
 
-Shared or static libraries must be linked when using the @command{streams-@value{VERSION_STREAMS}}
-(@file{libstreams}), @command{strxnet-@value{VERSION_STRXNET}} (@file{libxnet}),
+Shared or static libraries must be linked when using the
+@command{streams-@value{VERSION_STREAMS}} (@file{libstreams}),
+@command{strtty-@value{VERSION_STRTTY}} (@file{libtty}),
+@command{strxnet-@value{VERSION_STRXNET}} (@file{libxnet}),
 @command{strnsl-@value{VERSION_STRNSL}} (@file{libxnsl}),
-@command{strsock-@value{VERSION_STRSOCK}} (@file{libsocket}) or @command{LiS-@value{VERSION_LIS}}
-packages (@file{libLiS} or @file{libpLiS}).  These libraries must either be specified on the
-@command{gcc} command line as shared libraries (e.g. @samp{-lstreams -lxnet -lsocket}) or as static
-libraries (e.g. @samp{/@-usr/@-lib/@-libstreams.a /@-usr/@-lib/@-libxnet.a
-/@-usr/@-lib/@-libsocket.a}).
+@command{strsock-@value{VERSION_STRSOCK}} (@file{libsocket} and @file{libsockpath}) or
+@command{LiS-@value{VERSION_LIS}} packages (@file{libLiS} or @file{libpLiS}).
+These libraries must either be specified on the @command{gcc} command line as shared libraries (e.g.
+@samp{-lstreams -lxnet -lsocket}) or as static libraries (e.g. @samp{/@-usr/@-lib/@-libstreams.a
+/@-usr/@-lib/@-libxnet.a /@-usr/@-lib/@-libsocket.a}).
 
 If all shared libraries are linked, include the following options on the @command{gcc} command line:
 
 @multitable @columnfractions .30 .70
 @item @samp{-lstreams}
 @tab Link to the @file{/usr/lib/libstreams.so} shared library.
+@item @samp{-ltty}
+@tab Link to the @file{/usr/lib/libtty.so} shared library.
 @item @samp{-lxnet}
 @tab Link to the @file{/usr/lib/libxnet.so} shared library.
+@item @samp{-lxnsl}
+@tab Link to the @file{/usr/lib/libxnsl.so} shared library.
 @item @samp{-lsocket}
 @tab Link to the @file{/usr/lib/libsocket.so} shared library.
+@item @samp{-lsockpath}
+@tab Link to the @file{/usr/lib/libsockpath.so} shared library.
 @item @samp{-lLiS}
 @tab Link to the @file{/usr/lib/libLiS.so} shared library.
 @item @samp{-lpLiS}
@@ -2482,10 +2878,16 @@ If all static libraries are linked, include the following options on the @comman
 @multitable @columnfractions .30 .70
 @item @file{/usr/lib/libstreams.a}
 @tab Link with the @file{/usr/lib/libstreams.a} static library.
+@item @file{/usr/lib/libtty.a}
+@tab Link with the @file{/usr/lib/libtty.a} static library.
 @item @file{/usr/lib/libxnet.a}
 @tab Link with the @file{/usr/lib/libxnet.a} static library.
+@item @file{/usr/lib/libxnsl.a}
+@tab Link with the @file{/usr/lib/libxnsl.a} static library.
 @item @file{/usr/lib/libsocket.a}
 @tab Link with the @file{/usr/lib/libsocket.a} static library.
+@item @file{/usr/lib/libsockpath.a}
+@tab Link with the @file{/usr/lib/libsockpath.a} static library.
 @item @file{/usr/lib/libLiS.a}
 @tab Link with the @file{/usr/lib/libLiS.a} static library.
 @item @file{/usr/lib/libpLiS.a}

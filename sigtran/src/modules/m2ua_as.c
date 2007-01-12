@@ -789,7 +789,7 @@ struct ua_parm {
  *  false; otherwise true, and sets the parameter values if parm is non-NULL.
  */
 static bool
-ua_dec_parm(struct sl *sl, queue_t *q, mblk_t *mp, struct ua_parm *parm, uint32_t tag)
+ua_dec_parm(mblk_t *mp, struct ua_parm *parm, uint32_t tag)
 {
 	uint32_t *wp;
 	bool rtn = false;
@@ -1210,7 +1210,7 @@ sl_link_congested_ind(struct sl *sl, queue_t *q, mblk_t *msg, sl_ulong cong, sl_
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->sl_primitive = SL_LINK_CONGESTED_IND;
-			p->sl_timestamp = jiffies;
+			p->sl_timestamp = drv_hztomsec(jiffies);
 			p->sl_cong_status = cong;
 			p->sl_disc_status = disc;
 			mp->b_wptr += sizeof(*p);
@@ -1246,7 +1246,7 @@ sl_link_congestion_ceased_ind(struct sl *sl, queue_t *q, mblk_t *msg, sl_ulong c
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->sl_primitive = SL_LINK_CONGESTION_CEASED_IND;
-			p->sl_timestamp = jiffies;
+			p->sl_timestamp = drv_hztomsec(jiffies);
 			p->sl_cong_status = cong;
 			p->sl_disc_status = disc;
 			mp->b_wptr += sizeof(*p);
@@ -1418,7 +1418,7 @@ sl_out_of_service_ind(struct sl *sl, queue_t *q, mblk_t *msg, sl_ulong reason)
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_OUT_OF_SERVICE_IND;
-		p->sl_timestamp = jiffies;
+		p->sl_timestamp = drv_hztomsec(jiffies);
 		p->sl_reason = reason;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
@@ -1446,7 +1446,7 @@ sl_remote_processor_outage_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->sl_primitive = SL_REMOTE_PROCESSOR_OUTAGE_IND;
-			p->sl_timestamp = jiffies;
+			p->sl_timestamp = drv_hztomsec(jiffies);
 			mp->b_wptr += sizeof(*p);
 			freemsg(msg);
 			printd(("%s: %p: <- SL_PROCESSOR_OUTAGE_IND\n", MOD_NAME, sl));
@@ -1476,7 +1476,7 @@ sl_remote_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->sl_primitive = SL_REMOTE_PROCESSOR_RECOVERED_IND;
-			p->sl_timestamp = jiffies;
+			p->sl_timestamp = drv_hztomsec(jiffies);
 			mp->b_wptr += sizeof(*p);
 			freemsg(msg);
 			printd(("%s: %p: <- SL_REMOTE_PROCESSOR_RECOVERED_IND\n", MOD_NAME, sl));
@@ -1972,7 +1972,7 @@ sl_send_asps_aspup_req(struct sl *sl, queue_t *q, mblk_t *msg, uint32_t *aspid, 
 	if (likely((mp = sl_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
-		p[0] = UA_ASPS_ASPDN_REQ;
+		p[0] = UA_ASPS_ASPUP_REQ;
 		p[1] = htonl(mlen);
 		p += 2;
 		if (aspid) {
@@ -2310,9 +2310,10 @@ sl_send_maup_data2(struct sl *sl, queue_t *q, mblk_t *msg, uint32_t iid, mblk_t 
 		p[1] = htonl(mlen + dlen);
 		p[2] = UA_PARM_IID;
 		p[3] = htonl(iid);
-		p[4] = UA_PHDR(M2UA_PARM_DATA2, dlen);
-		p[5] = pri;
-		mp->b_wptr = (unsigned char *) &p[6];
+		p[4] = UA_PHDR(M2UA_PARM_DATA2, dlen + 1);
+		p += 5;
+		*(unsigned char *)p = pri;
+		mp->b_wptr = (unsigned char *) p + 1;
 
 		mp->b_cont = dp->b_cont;
 		if (unlikely((err = n_data_req(sl, q, msg, 0, iid, mp))))
@@ -2943,7 +2944,7 @@ sl_recv_maup_state_con(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm status = { { NULL, }, };
 
-	if (ua_dec_parm(sl, q, mp, &status, M2UA_PARM_STATE_REQUEST)) {
+	if (ua_dec_parm(mp, &status, M2UA_PARM_STATE_REQUEST)) {
 		switch (status.val) {
 		case M2UA_STATUS_LPO_SET:	/* (0x00) */
 			return sl_recv_status_lpo_set(sl, q, mp);
@@ -3033,7 +3034,7 @@ sl_recv_maup_state_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm event = { { NULL, }, };
 
-	if (ua_dec_parm(sl, q, mp, &event, M2UA_PARM_STATE_EVENT)) {
+	if (ua_dec_parm(mp, &event, M2UA_PARM_STATE_EVENT)) {
 		switch (event.val) {
 		case M2UA_EVENT_RPO_ENTER:
 			return sl_recv_event_rpo_enter(sl, q, mp);
@@ -3061,10 +3062,10 @@ sl_recv_maup_retr_con(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm action, bsnt;
 
-	if (ua_dec_parm(sl, q, mp, &action, M2UA_PARM_ACTION))
+	if (ua_dec_parm(mp, &action, M2UA_PARM_ACTION))
 		switch (action.val) {
 		case M2UA_ACTION_RTRV_BSN:
-			if (ua_dec_parm(sl, q, mp, &bsnt, M2UA_PARM_SEQNO))
+			if (ua_dec_parm(mp, &bsnt, M2UA_PARM_SEQNO))
 				return sl_bsnt_ind(sl, q, mp, bsnt.val);
 			return (-EINVAL);
 		case M2UA_ACTION_RTRV_MSGS:
@@ -3126,8 +3127,8 @@ sl_recv_maup_cong_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm cong, disc;
 
-	if (ua_dec_parm(sl, q, mp, &cong, M2UA_PARM_CONG_STATUS) &&
-	    ua_dec_parm(sl, q, mp, &disc, M2UA_PARM_DISC_STATUS)) {
+	if (ua_dec_parm(mp, &cong, M2UA_PARM_CONG_STATUS) &&
+	    ua_dec_parm(mp, &disc, M2UA_PARM_DISC_STATUS)) {
 		if (cong.val > sl->cong || disc.val > sl->disc)
 			return sl_link_congested_ind(sl, q, mp, cong.val, disc.val);
 		return sl_link_congestion_ceased_ind(sl, q, mp, cong.val, disc.val);
@@ -3250,7 +3251,7 @@ sl_recv_msg_slow(struct sl *sl, queue_t *q, mblk_t *mp)
 
 	if (mp->b_wptr < mp->b_rptr + 2 * sizeof(*p))
 		goto error;
-	if (mp->b_wptr < mp->b_wptr + ntohl(p[1]))
+	if (mp->b_wptr < mp->b_rptr + ntohl(p[1]))
 		goto error;
 	switch (UA_MSG_CLAS(p[0])) {
 	case UA_CLASS_MGMT:

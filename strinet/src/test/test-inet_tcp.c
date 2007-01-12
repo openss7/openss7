@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/12/18 07:53:48 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/01/08 16:23:54 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 07:53:48 $ by $Author: brian $
+ Last Modified $Date: 2007/01/08 16:23:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.48  2007/01/08 16:23:54  brian
+ - final updates for release
+
  Revision 0.9.2.47  2006/12/18 07:53:48  brian
  - resolve device numbering
 
@@ -238,9 +241,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/12/18 07:53:48 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/01/08 16:23:54 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/12/18 07:53:48 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/01/08 16:23:54 $";
 
 /*
  *  Simple test program for INET streams.
@@ -321,7 +324,7 @@ static const char *lstdname = "XNS 5.2/TPI Rev 2";
 static const char *sstdname = "XNS/TPI";
 static const char *shortname = "INET/TCP";
 #ifdef LFS
-static char devname[256] = "/dev/streams/clone/tcp";
+static char devname[256] = "/dev/streams/inet/tcp";
 #else
 static char devname[256] = "/dev/tcp";
 #endif

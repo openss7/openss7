@@ -3,13 +3,13 @@
     inherit	=> 'whatsnew.html'
     package	=> 'strxns'
     date	=> 'Jan 8, 2007'
-    rel		=> '0.9.2.4 Release 1'
+    rel		=> '0.9.2 Release 4'
     file	=> 'strxns-0.9.2.4'
     approved	=> 'Approved for Immediate Release'
     where	=> 'Edmonton, Alberta'
     headline	=> 'strxns 0.9.2.4 Released'
 </%flags><%attr>
-    revision	=> '$Id: rel20070108_4.html,v 1.1.2.1 2006/03/16 11:01:25 brian Exp $'
+    revision	=> '$Id: rel20070108_F.html,v 0.9.2.1 2007/01/08 16:00:49 brian Exp $'
     label	=> 'Jan 8, 2007'
     heading	=> 'strxns 0.9.2.4 Released'
 </%attr><%method description>
@@ -26,10 +26,13 @@ this release.
 </p><p style="margin-bottom:0in">
 The release provides the following enhancements and fixes:
 </p><ul style="margin-bottom:0in">
+<li>Additional features supported in all packages (see master package release notes).</li>
+<!--
+<li>Better support for Ubuntu and recent gcc compilers, including debian script corrections.</li>
 <li>Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode diet patchset).</li>
-<li>Now builds 32-bit compatibility libraries and tests them against 64-bit kernel modules and
-drivers.  The <tt>make installcheck</tt> target will now automatically test both 64-bit native and 32-bit
-compatibility versions, one after the other, on 64-bit platforms.</li>
+<li>Now builds 32-bit compatibility libraries, as well, and tests them against 64-bit kernel modules
+and drivers.  The <em>make installcheck</em> target will now automatically test both 64-bit native
+and 32-bit compatibility versions, one after the other, on 64-bit platforms.</li>
 <li>Added versioning of all library symbols.</li>
 <li>Many documentation updates for all OpenSS7 packages.  Automated release file generation making
 for vastly improved and timely text documentation present in the release directory.</li>
@@ -37,26 +40,28 @@ for vastly improved and timely text documentation present in the release directo
 <li>Updated init scripts for proper addition and removal of modules.</li>
 <li>Start assigning majors at major device number 231 instead of major device number 230.  Assign
 major device number 230 explicitly to the clone device.  Package will now support extended ranges of
-minor devices on 2.6 kernels under Linux Fast-STREAMS only.  <em>strxns</em> now supports expanded
+minor devices on 2.6 kernels under Linux Fast-STREAMS only.  <b>streams</b> now supports expanded
 addressable minor device numbers, permitting 2^16 addressable minor devices per major device number
 on 2.6 kernels: <i>LiS</i> cannot support this change.</li>
 <li>Better detection of SUSE distributions, release numbers and SLES distributions: support for
 additional SuSE distributions on ix86 as well as x86_64.  Added distribution support includes
 SLES 9, SLES 9 SP2, SLES 9 SP3, SLES 10, SuSE 10.1.</li>
-<li>Improved compiler flag generation and optimizations for recent <tt>gcc</tt> compilers and
-some idiosyncratic behaviour for some distributions (primarily SUSE).</li>
+<li>Improved compiler flag generation and optimizations for recent gcc compilers and some
+idiosyncratic behaviour for some distributions (primarily SUSE).</li>
 <li>Optimized compilation is now available also for user level programs in addition to kernel
-programs.  Added new <tt>--with-optimize</tt> option to <tt>configure</tt> to accomplish this.</li>
-<li>Added <tt>--disable-devel</tt> configure option to suppress building and installing development
+programs.  Added new - -with-optimize option to `configure' to accomplish this.</li>
+<li>Added - -disable-devel configure option to suppress building and installing development
 environment.  This feature is for embedded or pure runtime targets that do not need the development
 environment (static libraries, manual pages, documentation).</li>
-<li>Added <tt>send-pr</tt> script for automatic problem report generation.</li>
-<li>The package will now build <a href="man/man2html?1+doxygen">doxygen(1)</a> html documentation
-with the <tt>doxy</tt> make target.  See <tt>make help</tt> or README-make in the distribution for
-more information.</li>
+<li>Added send-pr script for automatic problem report generation.</li>
+<li>Each package will now build <a href="man/man2html?1+doxygen">doxygen(1)</a> html documentation
+with the doxy make target.  See <em>make help</em> or README-make in the distribution for more
+information.</li>
+-->
 </ul><p style="margin-bottom:0in">
-<em>This is a public production release of the package: it deprecates previous releases.  Please
-    upgrade before reporting problems with previous releases.</em>
+<em>This is a public stable production grade release of the package: it deprecates previous
+    releases.  Please upgrade to the current release before reporting bugs.</em>
+</p><p style="margin-bottom:0in">
 </%method><%method abstract>
 OpenSS7 today announced Release 0.9.2.4 of the STREAMS X/Open Networking Services (XNS) <em>strxns</em> package.
 </%method><%method news>
@@ -67,24 +72,26 @@ DLPI and NPI modules and drivers that convert between Linux Native IP interface 
 and NPI interface.  One allows DLPI drivers to be added to Linux as IP interfaces, another provides
 DLPI access to native Linux IP interfaces, and a thrid provides NPI access to the Linux IP
 subsystem.
+</p><p style="margin-bottom:0in">
 <& SELF:description &>
 </p><p style="margin-bottom:0in">
-As with other OpenSS7 releases, this release configures, compiles, installs and builds rpms for a
-wide range of Linux 2.4 and 2.6 RPM-based distributions,
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based distributions,
 and can be used on production kernels without patching or recompiling the kernel.
 </p><p style="margin-bottom:0in">
 This package is publicly released under the
-<a href="license_gpl.html">GNU Public License Version 2</a>.<bdo />
-The release is available as an autoconf/RPM tarball, SRPM, and set of binary RPMs.
-See the <a href="download.html">downloads page</a> for the autoconf tarballs and SRPMs.
-See the <a href="strxns_pkg.html"><em>strxns</em> package page</a> for tarballs, SRPMS and binary
-RPMS.
+<a href="license_gpl.html">GNU Public License Version 2</a>.<bdo/>
+The release is available as an autoconf tarball, SRPM, DSC, and set of binary RPMs and DEBs.
+See the <a href="download.html">downloads page</a> for the autoconf tarballs, SRPMs and DSCs.
+See the <a href="strxns_pkg.html"><em>strxns</em> package page</a> for tarballs, SRPMs, DSCs, and
+binary RPMs and DEBs.
 </p><p style="margin-bottom:0in">
 See <a href="codefiles/strxns-0.9.2.4/ChangeLog">ChangeLog</a> and
 <a href="codefiles/strxns-0.9.2.4/NEWS">NEWS</a> in the release for
-more information. Also, see the
+more information.  Also, see the
 <a href="codefiles/strxns-0.9.2.4/doc/manual/strxns.pdf">strxns.pdf</a>
 manual in the release (also in html <a href="strxns_manual.html">here</a>).<bdo/>
+</p>
 </%method><%method body>
 <& SELF:newsitem, comp => $m->base_comp &>
 </%method>

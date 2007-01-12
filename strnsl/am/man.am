@@ -1,11 +1,11 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/01/06 23:28:19 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/01/08 09:37:10 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
@@ -46,11 +46,35 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/01/06 23:28:19 $ by $Author: brian $
+## Last Modified $Date: 2007/01/08 09:37:10 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: man.am,v $
+## Revision 0.9.2.59  2007/01/08 09:37:10  brian
+## - got manual pages building and instaling separately
+##
+## Revision 0.9.2.58  2007/01/08 09:13:03  brian
+## - really install manpages
+##
+## Revision 0.9.2.57  2007/01/08 09:01:59  brian
+## - try to get manpages rigth again
+##
+## Revision 0.9.2.56  2007/01/08 08:55:17  brian
+## - try to get manpages installing separately
+##
+## Revision 0.9.2.55  2007/01/08 08:52:26  brian
+## - try to get manpages installing separately
+##
+## Revision 0.9.2.54  2007/01/08 08:37:05  brian
+## - get manpages building on their own
+##
+## Revision 0.9.2.53  2007/01/08 08:30:50  brian
+## - move outside conditionals
+##
+## Revision 0.9.2.52  2007/01/08 08:28:47  brian
+## - added automake target for manpages
+##
 ## Revision 0.9.2.51  2007/01/06 23:28:19  brian
 ## - perambulations for netperf and its shallow man structure
 ##
@@ -298,13 +322,13 @@ all-manpages: $(man_MANS) $(man1_MANS) $(man2_MANS) $(man3_MANS) $(man4_MANS) \
 ##
 # This is handled by automake.
 ##
-install-manpages:
+install-manpages: install-man
 	@$(ECHO) "Making $@ in `pwd`"
 
 ##
 # This is handled by automake.
 ##
-uninstall-manpages:
+uninstall-manpages: uninstall-man
 	@$(ECHO) "Making $@ in `pwd`"
 
 clean-manpages:
@@ -611,6 +635,13 @@ POST_INSTALL_AM		+= post-manpages
 # that cannot build from packages.
 ##
 POST_UNINSTALL_AM	+= postun-manpages
+
+MANS_AM			+= all-manmacros all-manpages
+
+INSTALL_MANS_AM		+= install-manmacros install-manpages post-manpages
+
+UNINSTALL_MANS_AM	+= uninstall-manpages uninstall-manmacros postun-manpages
+
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS

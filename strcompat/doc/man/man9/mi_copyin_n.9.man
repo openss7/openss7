@@ -193,18 +193,6 @@ is only used in conjunction with the other mi_copy helper functions:
 .BR mi_copy_set_rval (9)
 and
 .BR mi_copy_state (9).
-.PP
-.BR mi_copyin_n ()
-is used for
-.B TRANSPARENT
-input output controls where the size of the data passed by the user is not known until the initial
-portion of the passed in data is copied in.
-For
-.RB non- TRANSPARENT
-.RI ( I_STR )
-input output controls, this is not a problem, because the length of the passed in data is provided
-directly by the user (see
-.BR streamio (7)).
 .\"
 .\"
 .SH RETURN
@@ -371,12 +359,9 @@ must also have been compiled with
 or
 .B CONFIG_STREAMS_COMPAT_MAC_MODULE
 defined.
-.\"
-.\"
-.SH IMPLEMENTATION
 .PP
 .B mi_copyin_n ()
-is implemented by directly manipulating the
+is directly manipulates
 .BR iocblk (9),
 .BR copyreq (9)
 and
@@ -394,6 +379,90 @@ Because of this, it is important that once one of these helper functions is used
 sequence, that the remaining help functions be used also, instead of directly manipulating the
 structures.  Messages and their contained structures should be passed to the helper functions
 without being manipulated in any way by the caller.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR mi_copyin_n ()
+is used for both
+.IR I_STR (7)
+and
+.B TRANSPARENT
+input output controls where the size of the data passed by the user is not known until the initial
+portion of the passed in data is copied in.
+For
+.RB non- TRANSPARENT
+.RI ( I_STR (7))
+input output controls, this is not a problem, because the length of the passed in data is provided
+directly by the user (see
+.BR streamio (7)).
+Nevertheless,
+.BR mi_copyin_n ()
+is intended to remove differences between
+.B TRANSPARENT
+and
+.IR I_STR (7)
+input-output controls.
+.IR I_STR (7)
+input-output controls implicitly copy an entire buffer area on input;
+.B TRANSPARENT
+input-output controls must explicitly copy each portion.
+.IR I_STR (7)
+input-output controls do not provide a user address to the driver;
+.B TRANPARENT
+input-output controls do.
+For the
+.BR copyin (9)
+operation, the differences between the two are avoided by only referring to an
+offset from the beginning of the original data buffer.
+.PP
+The sequence of events for a
+.B TRANSPARENT
+input-output contorl are as follows:
+.BR mi_copyin (9)
+is called on the original
+.BR M_IOCTL (9)
+message to copy in a portion of the user buffer.  This results in an
+.BR M_COPYIN (9)
+message being issued upstream and the return of an
+.BR M_IOCDATA (9)
+message downstream.
+Additional memory extents from the user buffer are then copied in with calls
+to
+.BR mi_copyin_n ().
+Each call to
+.BR mi_copyin_n ()
+generates another
+.BR M_COPYIN (9)
+message upstream and results in another
+.BR M_IOCDATA (9)
+message being returned downstream.
+.PP
+The sequence of events for an
+.IR I_STR (7)
+input-output control are as follows:
+.BR mi_copyin (9)
+is called on the original
+.BR M_IOCTL (9)
+message to copy in a portion of the user buffer.  This is copied from the
+message block attached to the input-output control message that contains the
+implicit
+.BR copyin (9)
+of the entire user buffer.  The
+.BR mi_copyin (9)
+function simulates the
+.B TRANSPARENT
+situation by placing an appropriate
+.BR M_IOCDATA (9)
+message block on the write queue containing the information.
+Subsequent calls to
+.BR mi_copyin_n ()
+are used to copy additional memory extents from the buffer containing the
+implicit copy in from the original
+.BR M_IOCTL (9)
+message block.  Additional
+.BR M_IOCDATA (9)
+messages are simulated and placed on the write queue.
 .\"
 .\"
 .SH "SEE ALSO"

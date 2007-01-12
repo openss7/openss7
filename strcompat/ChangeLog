@@ -1,3 +1,28 @@
+2007-01-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgrelease: bumped version number for next release
+	* doc/manual/news.texi: bumped version number for next release
+	* scripts/texi/versions.texi: bumped version number for next release
+
+	* ANNOUNCE: final post-release updates
+	* NEWS: final post-release updates
+	* doc/manual/news.texi: final post-release updates
+
+2007-01-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updated for release
+	* NEWS: updated for release
+	* README: updated for release
+	* README-cvs: updated for release
+	* THANKS: updated for release
+	* doc/manual/descrip.texi: updated for release
+	* doc/manual/news.texi: updated for release
+	* doc/manual/releases.texi: updated for release
+	* doc/manual/tree.texi: updated for release
+
+	* rel20070108_J.html: added release file
+	* ANNOUNCE: updated for release
+
 2007-01-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/releases.texi: spelling

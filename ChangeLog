@@ -1,3 +1,44 @@
+2007-01-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgrelease: bumped release number for next release
+	* doc/manual/news.texi: bumped release number for next release
+	* scripts/texi/versions.texi: bumped release number for next release
+
+	* ANNOUNCE: final post-release updates
+	* AUTHORS: final post-release updates
+	* NEWS: final post-release updates
+	* README: final post-release updates
+	* README-cvs: final post-release updates
+	* THANKS: final post-release updates
+	* openss7.lsm.in: final post-release updates
+	* rel20070108_L.html: final post-release updates
+	* doc/manual/news.texi: final post-release updates
+
+2007-01-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updated for release
+	* NEWS: updated for release
+	* README: updated for release
+	* README-cvs: updated for release
+	* THANKS: updated for release
+	* doc/manual/descrip.texi: updated for release
+	* acinclude.m4:
+	  - check for replaced package directories
+	  - build manual pages separately
+
+	* rel20070108_L.html: added release file
+
+	* Makefile.am: got manual pages building and installing separately
+	* am/help.am: got manual pages building and installing separately
+	* am/man.am: got manual pages building and installing separately
+	* am/openss7.am: got manual pages building and installing separately
+
+	* doc/manual/descrip.texi: updated documentation for release
+	* doc/manual/news.texi: updated documentation for release
+	* doc/manual/openss7.texi: updated documentation for release
+	* doc/manual/tree.texi: updated documentation for release
+	* doc/manual/texi/quick.texi: updated documentation for release
+
 2006-12-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated documentation for release

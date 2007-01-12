@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strnsl.texi,v 0.9.2.3 2007/01/05 06:19:33 brian Exp $
+% @(#) $Id: strnsl.texi,v 0.9.2.4 2007/01/08 16:24:22 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/01/05 06:19:33 $ by $Author: brian $
+% Last Modified $Date: 2007/01/08 16:24:22 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -420,6 +420,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strnsl.texi,v $
+Revision 0.9.2.4  2007/01/08 16:24:22  brian
+- final updates for release
+
 Revision 0.9.2.3  2007/01/05 06:19:33  brian
 - documentation updates for release
 

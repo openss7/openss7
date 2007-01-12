@@ -107,7 +107,7 @@ release.}
 @item SLES 9 SP3 (SLES9)
 @item SLES 10 (SLES10)
 @item Ubuntu 5.10 (ubu5.10)
-@item Ubuntu 6.06 LTS (ubu6.06)
+@item Ubuntu 6.03 LTS (ubu6.03)
 @item WhiteBox Enterprise Linux 3.0 (WBEL3)
 @item WhiteBox Enterprise Linux 4 (WBEL4)
 @end itemize

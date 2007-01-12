@@ -1,11 +1,11 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2006/09/18 11:52:05 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2007/01/08 09:37:10 $
 #
 #! -----------------------------------------------------------------------------
 #!
-#! Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+#! Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 #! Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #!
 #! All Rights Reserved.
@@ -46,11 +46,32 @@
 #!
 #! -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/09/18 11:52:05 $ by $Author: brian $
+## Last Modified $Date: 2007/01/08 09:37:10 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.106  2007/01/08 09:37:10  brian
+## - got manual pages building and instaling separately
+##
+## Revision 0.9.2.105  2007/01/08 09:33:27  brian
+## - added help for manual page targets
+##
+## Revision 0.9.2.104  2007/01/08 09:01:59  brian
+## - try to get manpages rigth again
+##
+## Revision 0.9.2.103  2007/01/08 08:55:17  brian
+## - try to get manpages installing separately
+##
+## Revision 0.9.2.102  2007/01/08 08:52:26  brian
+## - try to get manpages installing separately
+##
+## Revision 0.9.2.101  2007/01/08 08:37:05  brian
+## - get manpages building on their own
+##
+## Revision 0.9.2.100  2007/01/08 08:25:16  brian
+## - added man recursive target
+##
 ## Revision 0.9.2.99  2006/09/18 11:52:05  brian
 ## - try adding doxy target to common
 ##
@@ -124,6 +145,10 @@ PRE_UNINSTALL_AM	=
 POST_UNINSTALL_AM	=
 
 RETEST_AM		=
+
+MANS_AM			=
+INSTALL_MANS_AM		=
+UNINSTALL_MANS_AM	=
 
 ##
 # In case we only need the files version:
@@ -358,6 +383,48 @@ sgml-am:
 doxy:
 
 MY_PHONY	+= txt txt-am sgml sgml-am doxy
+
+#!
+#! Manual Page Targets
+#! -------------------
+#!
+#! The following targets are used to build, install and uninstall just the
+#! manual pages from the distribution.  These targets are good for creating a
+#! distribution of just the manual pages.  When building atop multiple
+#! packages, these targets recurse down through each package.
+#!
+#! mans:
+#!     Build all of the manual pages.  This involves performing parameter
+#!     substitutions on manual pages and optionally cooking the manual pages
+#!     if `--with-cooked-manpages' was requested during configuration.
+#!
+#! install-mans:
+#!     Installs the manual pages under DESTDIR.  Specify DESTDIR to place the
+#!     manual pages wherever you see fit.  If DESTDIR is not specified on the
+#!     command line, the manual pages will be installed in the normal
+#!     installation directory.
+#!
+#! uninstall-mans:
+#!     Uninstalls the manual pages from DESTDIR.  Specify DESTDIR to indicate
+#!     where to remove the manual pages from.  If DESTDIR is not specified on
+#!     the command line, the manual pages will be removed from the normal
+#!     installation directory.
+#!
+mans: mans-recursive
+
+mans-am: $(MANS_AM)
+
+install-mans: install-mans-recursive
+
+install-mans-am: $(INSTALL_MANS_AM)
+
+uninstall-mans: uninstall-mans-recursive
+
+uninstall-mans-am: $(UNINSTALL_MANS_AM)
+
+MY_PHONY	+= mans mans-am install-mans install-mans-am uninstall-mans uninstall-mans-am
+
+MY_RECURSIVE_TARGETS	+= mans-recursive install-mans-recursive uninstall-mans-recursive
 
 ##
 # Have the makefile regenerate libtool if necessary

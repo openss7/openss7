@@ -170,12 +170,12 @@ and
 .PP
 .BR mi_copy_done ()
 is responsible for cleaning up after a tranparent
+or
+.IR I_STR (7)
 .IR ioctl .
 .BR mi_copy_done ()
-is called to complete the last copy-out of a transparent
-.BR ioctl (2s)
-or for transparent or
-.I I_STR
+is called to complete a transparent
+.IR I_STR (7)
 .BR ioctl (2s)
 when nothing is being copied out.
 .\"
@@ -197,8 +197,20 @@ or
 procedure should provide a call to
 .BR mi_copy_done ()
 for any unexpected
+.BR M_IOCTL (9)
+or
 .BR M_IOCDATA (9)
-message.
+messages, with the
+.I err
+value of
+.RB [ EINVAL ].
+.PP
+To complete a transparent
+or
+.IR I_STR (7)
+input-output control operation where data is to be copied out,
+.BR mi_copyout (9)
+is used instead.
 .\"
 .\"
 .SH RETURN

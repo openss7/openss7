@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin fo+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2007/01/02 16:32:02 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2007/01/09 10:56:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/01/02 16:32:02 $ by $Author: brian $
+# Last Modified $Date: 2007/01/09 10:56:43 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.132  2007/01/09 10:56:43  brian
+# - typo
+#
 # Revision 0.9.2.131  2007/01/02 16:32:02  brian
 # - updates for release, disable streams-bcm by default
 #
@@ -1628,7 +1631,7 @@ AC_DEFUN([_LFS_STRCONF], [dnl
     else
 	strconf_cv_majbase=231
     fi
-    strcont_cv_midbase=5001
+    strconf_cv_midbase=5001
     strconf_cv_config='include/sys/config.h'
     strconf_cv_modconf='modconf.h'
     strconf_cv_drvconf='drvconf.mk'
