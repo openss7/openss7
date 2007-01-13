@@ -4892,7 +4892,7 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 			np->wq = l->l_qtop;
 			np->rq->q_ptr = np->wq->q_ptr = (void *) np;
 			np_unlock(np);
-			miocack(q, mp, 0, 0);
+			mi_copy_done(q, mp, 0);
 			return (0);
 		}
 		case I_PUNLINK:
@@ -4914,7 +4914,7 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 			np->rq = np->wq = NULL;
 			np->index = 0;
 			np_unlock(np);
-			miocack(q, mp, 0, 0);
+			mi_copy_done(q, mp, 0);
 			return (0);
 		}
 		}
@@ -5193,43 +5193,142 @@ sl_w_iocdata(queue_t *q, mblk_t *mp)
 	switch (mi_copy_state(q, mp, &dp)) {
 	case -1:
 		return (0);
+	default:
+		mi_copy_done(q, mp, EPROTO);
+		return (0);
 	case MI_COPY_CASE(MI_COPY_IN, 1):
 		switch (_IOC_TYPE(cp->cp_cmd)) {
 		case SL_IOC_MAGIC:
 			switch (_IOC_NR(cp->cp_cmd)) {
 			case SL_IOCSOPTIONS:
+				spin_lock_m2ua(sl);
+				sl->option = *(lmi_option_t *) dp->b_rptr;
+				spin_unlock_m2ua(sl);
+				mi_copy_done(q, mp, 0);
+				return (0);
 			case SL_IOCSCONFIG:
+			{
+				sl_config_t *arg = (typeof(arg)) dp->b_rptr;
+
+				arg->t1 = drv_msectohz(arg->t1);
+				arg->t2 = drv_msectohz(arg->t2);
+				arg->t2l = drv_msectohz(arg->t2l);
+				arg->t2h = drv_msectohz(arg->t2h);
+				arg->t3 = drv_msectohz(arg->t3);
+				arg->t4n = drv_msectohz(arg->t4n);
+				arg->t4e = drv_msectohz(arg->t4e);
+				arg->t5 = drv_msectohz(arg->t5);
+				arg->t6 = drv_msectohz(arg->t6);
+				arg->t7 = drv_msectohz(arg->t7);
+
+				spin_lock_m2ua(sl);
+				sl->sl.config = *arg;
+				spin_unlock_m2ua(sl);
+				mi_copy_done(q, mp, 0);
+				return (0);
+			}
 			case SL_IOCTCONFIG:
 			case SL_IOCCCONFIG:
+				mi_copy_done(q, mp, EOPNOTSUPP);
+				return (0);
 			case SL_IOCSSTATSP:
+				spin_lock_m2ua(sl);
+				sl->sl.statsp = *(sl_stats_t *) dp->b_rptr;
+				spin_unlock_m2ua(sl);
+				mi_copy_done(q, mp, 0);
+				return (0);
 			case SL_IOCSNOTIFY:
+				spin_lock_m2ua(sl);
+				sl->sl.notify.events |= ((sl_notify_t *) dp->b_rptr)->events;
+				spin_unlock_m2ua(sl);
+				mi_copy_done(q, mp, 0);
+				return (0);
 			case SL_IOCCNOTIFY:
+				spin_lock_m2ua(sl);
+				sl->sl.notify.events &= ~((sl_notify_t *) dp->b_rptr)->events;
+				spin_unlock_m2ua(sl);
+				mi_copy_done(q, mp, 0);
+				return (0);
 			}
 			break;
 		case SDT_IOC_MAGIC:
 			switch (_IOC_NR(cp->cp_cmd)) {
 			case SDT_IOCSOPTIONS:
+				spin_lock_m2ua(sl);
+				sl->option = *(lmi_option_t *) dp->b_rptr;
+				spin_unlock_m2ua(sl);
+				mi_copy_done(q, mp, 0);
+				return (0);
 			case SDT_IOCSCONFIG:
+				spin_lock_m2ua(sl);
+				sl->sdt.config = *(sdt_config_t *) dp->b_rptr;
+				spin_unlock_m2ua(sl);
+				mi_copy_done(q, mp, 0);
+				return (0);
 			case SDT_IOCTCONFIG:
 			case SDT_IOCCCONFIG:
+				mi_copy_done(q, mp, EOPNOTSUPP);
+				return (0);
 			case SDT_IOCSSTATSP:
+				spin_lock_m2ua(sl);
+				sl->sdt.statsp = *(sdt_stats_t *) dp->b_rptr;
+				spin_unlock_m2ua(sl);
+				mi_copy_done(q, mp, 0);
+				return (0);
 			case SDT_IOCSNOTIFY:
+				spin_lock_m2ua(sl);
+				sl->sdt.notify.events |= ((sdt_notify_t *) dp->b_rptr)->events;
+				spin_unlock_m2ua(sl);
+				mi_copy_done(q, mp, 0);
+				return (0);
 			case SDT_IOCCNOTIFY:
+				spin_lock_m2ua(sl);
+				sl->sdt.notify.events &= ~((sdt_notify_t *) dp->b_rptr)->events;
+				spin_unlock_m2ua(sl);
+				mi_copy_done(q, mp, 0);
+				return (0);
 			}
 			break;
 		case SDL_IOC_MAGIC:
 			switch (_IOC_NR(cp->cp_cmd)) {
 			case SDL_IOCSOPTIONS:
+				spin_lock_m2ua(sl);
+				sl->option = *(lmi_option_t *) dp->b_rptr;
+				spin_unlock_m2ua(sl);
+				mi_copy_done(q, mp, 0);
+				return (0);
 			case SDL_IOCSCONFIG:
+				spin_lock_m2ua(sl);
+				sl->sdl.config = *(sdl_config_t *) dp->b_rptr;
+				spin_unlock_m2ua(sl);
+				mi_copy_done(q, mp, 0);
+				return (0);
 			case SDL_IOCTCONFIG:
 			case SDL_IOCCCONFIG:
+				mi_copy_done(q, mp, EOPNOTSUPP);
+				return (0);
 			case SDL_IOCSSTATSP:
+				spin_lock_m2ua(sl);
+				sl->sdl.statsp = *(sdl_stats_t *) dp->b_rptr;
+				spin_unlock_m2ua(sl);
+				mi_copy_done(q, mp, 0);
+				return (0);
 			case SDL_IOCSNOTIFY:
+				spin_lock_m2ua(sl);
+				sl->sdl.notify.events |= ((sdl_notify_t *) dp->b_rptr)->events;
+				spin_unlock_m2ua(sl);
+				mi_copy_done(q, mp, 0);
+				return (0);
 			case SDL_IOCCNOTIFY:
+				spin_lock_m2ua(sl);
+				sl->sdl.notify.events &= ~((sdl_notify_t *) dp->b_rptr)->events;
+				spin_unlock_m2ua(sl);
+				mi_copy_done(q, mp, 0);
+				return (0);
 			}
 			break;
 		}
-		mi_copy_done(q, mp, EFAULT);
+		mi_copy_done(q, mp, EINVAL);
 		return (0);
 	case MI_COPY_CASE(MI_COPY_OUT, 1):
 		mi_copy_done(q, mp, 0);
