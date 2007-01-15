@@ -1,0 +1,361 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: sl-mux.4.man,v 0.9.2.1 2007/01/15 11:33:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/01/15 11:33:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: sl-mux.4.man,v $
+.\" Revision 0.9.2.1  2007/01/15 11:33:54  brian
+.\" - added new and old signalling link utilities
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH SL-MUX 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B sl-mux
+\- Signalling Link Multiplexer
+.\"
+.\"
+.SH SYNOPSIS
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/sli.h>
+.br
+.B #include <ss7/sli_ioctl.h>
+.br
+.B #include <ss7/sl_mux.h>
+.HP
+.BI "int " sl_stream " = open(" \fR/dev/sl\fP ", " \fRO_RDWR\fP );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B sl-mux
+is a Signalling Link multiplexing driver.  The purpose of the driver is to
+consolidate signalling link streams from a wide range of drivers and provide
+common naming, addressing and management procedures for signalling links.
+.PP
+.B sl-mux
+is used in conjunction with the Signalling Link configuration daemon,
+.BR slconfd (8).
+The configuration daemon is responsible for opening, configuring, and
+attaching Signalling Link streams from a number of drivers and linking them
+under the
+.B sl-mux
+multiplexing driver.  This makes signalling links from a number of drivers
+available for use through the single
+.B sl-mux
+multiplexing driver.
+The facilities provided by the
+.B sl-mux
+multiplexing driver are as follows:
+.\"
+.SS Addressing
+.PP
+The
+.B sl-mux
+provides a global addressing mechanism for addressing signalling links.  There
+are two addressing mechanisms provided by the driver:
+.TP
+.B Global PPA
+A Physical Point of Attachment addressing mechanism that is global to the
+host.  Each signalling link stream is assigned a 32-bit PPA that is unique to
+the host platform.  There is no restrictions on the internal form of the PPA,
+merely that it be unique for each signalling link.  The
+.BR slconf (5)
+configuration file provides a mechanism whereby the system administrator can
+assign arbitrary PPA addresses to signalling links from multiple drivers.
+.TP
+.B CLEI
+A Common Language Equiment Identifier (ascii string) addressing mechanism that
+is global across all platforms.  This is the Telcordia/Bellcore standard
+mechanism for naming equipment.  The driver does not impose a restriction on
+the CLEI string, only that the string be unique for each signalling link, and
+that the string be no longer than 32 characters in length.
+.PP
+The
+.B sl-mux
+driver permits Style II signalling link streams to be opened and attached to
+specific signalling links using either the PPA or CLEI as an address for
+attachment.  See
+.BR LMI_ATTACH_REQ (7).
+.PP
+Linking of signalling link streams beneath the multiplexing driver is
+performed by the Signalling Link configuration daemon,
+.BR slconfd (8).
+The daemon opens the administrative minor device,
+.IR /dev/sl-admin ,
+and then opens signalling link streams on various drivers according to the
+configuration specified in a configuration file,
+.RB slconf (5),
+attaches and configures the streams.  The daemon then links the SL streams
+under the
+.B sl-mux
+driver using the
+.IR I_PLINK (7)
+input-output control.  It then uses the
+.B SL_SETPPA
+input-output control to associate a global PPA and CLEI with the linked
+stream.  The daemon does this for each and every signalling link stream that
+is to be linked under the driver.
+.\"
+.SS Monitoring
+.PP
+The
+.B sl-mux
+driver provides the ability to monitor the service interface to each or any
+signalling link.  This is accomplished by opening a specialized minor device
+number on the driver,
+.IR /dev/sl-mon ,
+and attaching it using the
+.BR LMI_ATTACH_REQ (7)
+primitive to a specific signalling link by global PPA or CLEI.  The stream
+willi then deliver a copy of each and every primitive that is passed between
+an upper SL-user and the monitored signalling link, regardless of whether the
+primitive is an SL-user to SL-provider primitive, or an SL-provider to SL-user
+primitive.
+This provides the ability to monitor live signalling links that are in use by
+other modules or drivers, such as the
+.BR mtp (4),
+Message Transfer Part driver, independent of the use of those drivers.
+.PP
+A monitoring stream will also process signalling link input-output controls on
+the monitoring stream.  See
+.BR sl_ioctl (4)
+for a discussion of the available signalling link input-output controls.
+.PP
+Monitoring of signalling links is performed using the
+.BR slmon (8)
+utility.  The utility opens a
+.I /dev/sl-mon
+stream, and associates it with a specific signalling link using the
+.BR LMI_ATTACH_REQ (7)
+primitive.  Once attached, primitives that traverse the SL-user to SL-provider
+interface are delivered to the stream.  The monitor disassociates with the
+signalling link using the
+.BR LMI_DETACH_REQ (7)
+primitive, or by simply closing the stream.  The stream will also respond to
+SL input-output controls,
+.BR sli_ioctl (4),
+from the monitoring stream.  The monitoring process must have root privilege
+to open the
+.I /dev/sl-mon
+device.
+.\"
+.SS Configuration
+.PP
+The
+.B sl-mux
+driver provides the ability to perform configuration and administration of
+signalling links.  This is accomplished by opening a specialized minor device
+number of the driver,
+.IR /dev/sl-admin .
+Using modified
+.BR sl_ioctl (4)
+signalling link input-output controls, the adminstrative application can
+configure and query the configuration for each and any (or all) signalling
+links.  This interface is used by the the
+.BR slconfd (8)
+configuration utility to query and configure signalling links in accordance
+with the signalling link management model presented in Q.751-1.
+.[
+q751-1
+.]
+.\"
+.SS Statistics
+.PP
+The
+.B sl-mux
+driver provides the ability to collect statistics (operational measurements)
+for each and any signalling link.  This is accomplished by opening a
+specialized minor device number on the driver,
+.IR /dev/sl-stats .
+Using modified
+.BR sl_ioctl (4)
+signalling link input-output controls, the administrative application can
+collect statistics for each and any (or all) signalling links.  This interface
+is used by the
+.BR slstats (8)
+utility to collect and record operational measurements for signalling links in
+accordance with Q.751-1.
+.[
+q.751-1
+.]
+.\"
+.SS Events
+.PP
+The
+.B sl-mux
+driver provides the ability to collect event notifications (operational
+measurements) for each and any signalling link.  This is accomplished by
+opening a specialised minor device number on the driver,
+.IR /dev/sl-events .
+Using modified
+.BR sl_ioctl (4)
+signalling link input-output controls, the administrative application can
+collect event notifications for each and any (or all) signalling links.  This
+interface is used by the
+.BR slstats (8)
+utility to collect and record operational measurements for signalling links in
+accordance with Q.751-1.
+.[
+q751-1
+.]
+.\"
+.\"
+.SH NOTICES
+.PP
+It is not necessary to use the
+.B sl-mux
+driver to use signalling links.  The
+.B sl-mux
+driver and associated utilties are intended to provide standard management
+capabilities.
+.\"
+.\"
+.SH IOCTLS
+.PP
+See
+.BR sli_ioctl (4).
+.\"
+.\"
+.SH FILES
+.PP
+See
+.BR slconf (5).
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.I /dev/sl
+Device opened by SL-user
+.TP
+.I /dev/sl-mon
+Device opened by monitoring
+.TP
+.I /dev/sl-admin
+Device opened by the
+.BR slconfd (8)
+utility for configuration management of signlling links.
+.TP
+.I /dev/sl-stats
+Device opened by the
+.BR slstats (8)
+utility for operational measurements statistics collection for signalling links.
+.TP
+.I /dev/sl-events
+Device opened by the
+.BR slstats (8)
+utility for operational measurement event collection for signalling links.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sl (4),
+.BR sli (7),
+.BR slconfd (8),
+.BR slconf (5),
+.BR slstats (8).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B sl-mux
+driver is new for
+.BR strss7-0.9a.6 ,
+and is compatible with the OpenSS7 SLI Specification.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The
+.B sl-mux
+driver conforms to the SLI Specification, Revision
+.BR @PACKAGE_VERSION@ .
+The object model for configuration conforms to Q.751-1.
+.[
+q.751-1
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B sl-mux
+driver and associated utilities were first released in
+.BR strss7-0.9a.6 .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

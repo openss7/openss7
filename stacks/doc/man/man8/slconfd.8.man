@@ -1,0 +1,367 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: slconfd.8.man,v 0.9.2.1 2007/01/15 11:33:55 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/01/15 11:33:55 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: slconfd.8.man,v $
+.\" Revision 0.9.2.1  2007/01/15 11:33:55  brian
+.\" - added new and old signalling link utilities
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH SLCONFD 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.SH NAME
+.B slconfd
+\- Signalling Link Configuration Daemon
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBslconfd\fR [\fIoptions\fR]
+.PD 0
+.HP
+\fBslconfd\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBslconfd\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBslconfd\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B slconfd
+is a configuration daemon for the SL-MUX multiplexing driver,
+.BR sl-mux (4).
+Its purpose is to open Signalling Link streams on various drivers, attach them
+to specific PPAs, and link the SL streams under the SL-MUX multiplexing
+driver, configure each SL lower multiplex Stream, and then wait in the
+background listening for management events on a management stream.  Also, the
+daemon watches for updates to the configuration file and applies the updates
+as they occur.
+.PP
+The
+.B slconfd
+is intended to be run at system startup from a System V init script.  Once the
+configuration of the SL-MUX multiplexing driver is complete, applications
+programs can open, attach, enable and use Signalling Link streams opened on
+the driver.
+.PP
+The purpose of the SL-MUX driver is to provide a unified interface for
+accessing signalling links of a number of forms and from a number of various
+drivers.  Signalling links could correspond to device drivers, or could be
+M2UA signalling links or other implementations.  M2PA signalling links require
+some additional configuration before they can be used and will be linked under
+the SL-MUX by a separate M2PA configuration daemon.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+.BR -h ", " --help
+When this option is encountered, print usage information to
+.I stdout
+and exit.
+.TP
+.BR -V ", " --version
+When this option is encountered, print version information to
+.I stdout
+and exit.
+.TP
+.BR -C ", " --copying
+When this option is encountered, print copyright and copying information to
+.I stdout
+and exit.
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+When the
+.BR -f " or " --file
+.I filename
+option is specified, the supplied file contains SL configuration entries as
+follows:
+.IP \(bu \w'\(bu\(em'u
+Each line in the file contains one entry or comment per line.
+.IP \(bu
+Each entry consists of a number of fields delimited by whitespace (see
+.BR isspace (3)).
+.IP \(bu
+Any field that begins with an octothorpe,
+.RI ` # ',
+character is a comment that continues to the end of the line.
+.IP \(bu
+Any line containing only a comment (beginning with optional whitespace
+followed by an octothorpe,
+.RI ` # ',
+character) is ignored.
+.PP
+Each line containing an SL configuration specification entry consists of the
+following fields:
+.TP
+(1) \fIclei\fR
+A common language equipment identifier for the signalling link.
+.TP
+(2) \fIglobal-ppa\fR
+A global Physical Point of Appearance.  This PPA can be used by streams
+opening the SL-MUX to attach to this signalling link.
+.TP
+(3) \fIdevice-type\fR
+The device type defines the type of device that is providing the signalling
+link.  The device type can currently be one of:
+.BR x400 ", " m2pa " or " m2ua .
+The remaining fields are interpreted depending on the device type as follows:
+.RS
+.PP
+When field (3) is
+.BR x400 ,
+the remaining fields are interpreted as follows:
+.TP
+(3) \fBx400\fR
+.TP
+(4) \fIdevice\fR
+The device driver to open to obtain a serving signalling link.
+This is the filesystem path to the appropriate device node.
+.TP
+(5) \fIlocal-ppa\fR
+If the device above is a Style II device, the local Physical Point of
+Attachment to which to attach the signalling link before it is linked under
+the SL-MUX multiplexing driver.  If the device above is a Style I device, this
+field should be a single dash,
+.RI ` - '.
+.PP
+When field (3) is
+.BR m2ua ,
+the remaining fields are interpreted as follows:
+.TP
+(3) \fBm2ua\fR
+.TP
+(4) \fIdevice\fR
+The device driver to open to obtain a serving signalling link.  This is the
+filesystem path to the appropriate device node.
+.TP
+(5) \fIlocal-ppa\fR
+The local Physical Point of Attachment to which to attach the signalling link
+before it is linked under the SL-MUX multiplexing driver.  An m2ua device is
+always a Style II device.
+.PP
+When field (3) is
+.BR m2pa ,
+the remaining fields are interpreted as follows:
+.TP
+(3) \fBm2pa\fR
+.TP
+(4) \fIdevice\fR
+The device driver to open to obtain a serving transport provider.
+This is the filesystem path to the appropriate device node.
+.TP
+(5) \fImodules\fR
+A comma separated list of modules to pushed over the transport provider to
+effect a signalling link.
+.TP
+(6) \fIlocal-address\fR
+The local address to which to bind the transport provider.  This address can
+be a hostname and service name or a numbers and dots notation IP address and
+port number.
+.TP
+(7) \fIremote-address\fR
+The remote address to which to connect the trasnport provider.  This address
+can be a hostname and service name or a numbers and dots notation IP address
+and port number.
+.RE
+.PP
+.B slconfd
+opens the configuration file and reads the entries line by line.  Each entry
+is indepenendent of other entries.  For each entry,
+.B slconfd
+performs the following actions:
+.IP 1. \w'0.\(em'u
+The daemon opens the device specified in the
+.I device
+field.
+.IP 2.
+If the
+.I local-ppa
+field is other than a signle dash, the daemon inteprets the field as a integer
+number and uses the integer number in an
+.BR LMI_ATTACH_REQ (7)
+request to attach the opened Stream to the specific signalling link.
+.IP 3.
+The daemon links the signalling link under the SL-MUX multiplexing drivers
+using the
+.BR I_PLINK (7)
+input-output control.
+.IP 4.
+The daemon uses SL-MUX specific input-output controls to assign the
+.I global-ppa
+and
+.I clei
+to the linked singalling link.  Streams opened on the SL-MUX driver can then
+attach to this signalling link using the global PPA or the CLEI for the
+signalling link.
+.PP
+Once the
+.B slconfd
+has linked and configured all of the signalling link streams specified in the
+configuration file, it listens on the SL-MUX management stream for management
+information, taking appropriate actions.
+The daemon also watches the configuration file for changes and effects those
+changes when they occur.  Changes are effected by linking additional
+signalling links or unlinking existing signalling links to alter the
+configuration of the SL-MUX to match that of the altered configuration file.
+.\"
+.\"
+.SH SIGNALS
+.PP
+During its operation the
+.B slconfd
+daemon accepts a number of signals as follows:
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed on
+.IR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of diagnostic messages to
+.IR stderr .
+.\"
+.\"
+.SH NOTICES
+.PP
+Other programs may open and parse the configuration file to determine the
+global PPA associated with a given Common Lanuage Equipment Identifier.  The
+SL-MUX also supports a specialized input-output control that enables an
+application program to provide a Common Lanuage Equiment Identifier and have
+the driver translate that string to a global PPA.  The SL-MUX also supports
+using the CLEI as the PPA in a
+.BR LMI_ATTACH_REQ (7)
+primitive.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sl-mux (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B slconfd
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B slconfd
+is an OpenSS7-specific configuration command.  Because this command is used at
+startup and is transparent to the SL-User opening SL streams, compatibility is
+not an issue.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+System configuration programs are not subject to standardization.
+.B slconfd
+conforms to OpenSS7 specifications.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B slconfd
+first appeared in the OpenSS7
+.B strss7-0.9a.6
+package.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+

@@ -1,0 +1,382 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: slmon.8.man,v 0.9.2.1 2007/01/15 11:33:55 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/01/15 11:33:55 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: slmon.8.man,v $
+.\" Revision 0.9.2.1  2007/01/15 11:33:55  brian
+.\" - added new and old signalling link utilities
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH SLMON 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.SH NAME
+.B slmon
+\- Signalling Link Monitor
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBslmon\fR [\fIoptions\fR] {{\fB-p\fR|\fB--ppa\fR} \fIPPA\fR}|{{\fB-c\fR|\fB--clei\fR} \fICLEI\fR}
+.PD 0
+.HP
+\fBslmon\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBslmon\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBslmon\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B slmon
+is a monitoring utility for the SL-MUX multiplexing driver,
+.BR sl-mux (4).
+Its purpose is to provide the ability to monitor any signalling link interface configured in the
+host.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+.BR -p ", " --ppa " " \fIPPA\fP
+Specifies the Physical Point of Appearance,
+.IR PPA ,
+associated with the signalling link to be monitored.  The Physical Point of Appearance is a
+representation of the 32-bit number specifying the global PPA.  See
+.BR slconf (5)
+for more information on global PPA addressing.
+.TP
+.BR -c ", " --clei " " \fICLEI\fP
+Specifies the Common Language Equipment Identifier,
+.IR CLEI ,
+associated with the signalling link to be monitored.  The Common Language Equipment Identifier
+is an ASCII string representation specifying the CLEI.  See
+.BR slconf (5)
+for more information on CLEI addressing.
+.PP
+One of the
+.B -p
+or
+.B -c
+options must be specified.  Otherwise,
+.B slmon
+will print usage information and exit with an error return value.
+.TP
+.BR -f ", " --file " " \fIFILENAME\fP
+Specifies a file,
+.IR FILENAME ,
+to which the formatted monitoring information is to be written, instead of to standard output,
+.IR stdout .
+When a file name is specified with this option,
+.B slmon
+will close
+.IR stdin ", " stdout " and " stderr ,
+and place itself in the background as a deamon process.
+.TP
+.BR -h ", " --help
+When this option is encountered, print usage information to
+.I stdout
+and exit.
+.TP
+.BR -V ", " --version
+When this option is encountered, print version information to
+.I stdout
+and exit.
+.TP
+.BR -C ", " --copying
+When this option is encountered, print copyright and copying information to
+.I stdout
+and exit.
+.\"
+.\"
+.SH "OUTPUT FORMAT"
+.PP
+When
+.B slmon
+starts monitoring a signalling link, or reopens its output file, it outputs an informative header
+that provides information about the signalling link being monitored and its configuration.
+See
+.RI \(lq EXAMPLES ,\(rq
+below for an example of the informative header format.
+.PP
+This informative header is followed by a number of output lines.  Each output line corresponds to a
+single service primitive that has traversed the SL service interface.  Each service primitive output
+line starts with a common header that contains the following fields:
+.TP
+.RI < sequence >
+A sequence number.  Each service primitive that passes the SL service interface is given a
+monitonically increasing sequence number beginning with the number 1.  A missing sequence number
+indicates that there was insufficient resources available to capture the service primitive
+corresponding to the missing numbers.
+.TP
+.RI < timestamp >
+A timestamp indicating the system clock time at which the service primitive was captured.
+.TP
+.RI < primitive >
+The name of the service primitive that passed the interface.  This is one of the service primitives
+defined for the Local Management Interface,
+.BR lmi (7),
+or Signalling Link Interface,
+.BR sli (7),
+by name.
+.PP
+The remaining fields provide the parameters of the service primitive and any user data associated
+with the service primitive as a hexadecimal octet string.  Parameters are output with the parameter
+name, followed by an equal sign,
+.RI ` = ',
+with no intervening whitespace, and the value of the parameter as a number or hexadecimal octet
+string.
+See
+.RI \(lq EXAMPLES ,\(rq
+below for an example of the service primitive output format.
+.\"
+.\"
+.SH USAGE
+.PP
+.B slmon
+is invoked from the command line or a shell script to monitor signalling links.  The signalling link
+to monitor is specified using the
+.BR -p " or " -c
+options.  The
+.B -p
+option is used to specify the signalling link to monitor using the global PPA for the signalling
+link.  The
+.B -c
+option is used to specify the signalling link to monitor using the Common Language Equipment
+Identifier for the signalling link.
+.PP
+Once invoked,
+.B slmon
+begin printing formatted entries corresponding to SL service interface primitives to standard
+output,
+.IR stdout ,
+if the
+.B -f
+option is not specified, or to
+.I FILENAME
+if the
+.B -f
+option is specified.  When the
+.B -f
+option is specified,
+.B slmon
+also places itself in the background and closes standard input, output and error streams.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B slmon
+is implemented to use the
+.I /dev/sl-mon
+minor device provided by the
+.BR sl-mux (4)
+multiplexing driver.
+.B slmon
+opens a
+.I /dev/sl-mon
+stream and attaches the stream to a specific signalling link using the
+.BR LMI_ATTACH_REQ (7)
+primitive and the global PPA or CLEI of the desired signalling link.  Once attached,
+.B slmon
+collects copies of service interface primitives that are delivered to the stream.  Each primitive is
+formatted and printed either to standard output,
+.IR stdout ,
+or to a collection file specified with the
+.B --file
+option.
+.\"
+.\"
+.SH SIGNALS
+.PP
+When operating as a daemon process, the
+.BR slmon
+utility accepts a number of signals as follows:
+.TP
+.RI { SIGHUP }
+This signal causes the
+.B slmon
+utility in daemon mode to close and reopen the output file
+.IR FILENAME .
+This signal is used to rotate trace files.  The output file is first moved by another process, such
+as the log rotation utility, to another file name and then the
+.RI { SIGHUP }
+signal is sent to the daemon causing it to close the rotated file name an open a new file of name
+.I FILENAME
+to continue logging.
+.TP
+.RI { SIGUSR }
+This signal causes the
+.B slmon
+utility in daemon mode to reread configuration information for the signalling link using
+input-output controls and output the result to the log file.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1) indicates that an
+error occurred and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message is printed on
+.IR stderr .
+.PP
+The
+.B --quiet
+option suppresses printing of diagnostic messages to
+.BR stderr .
+.\"
+.\"
+.SH NOTICES
+.PP
+.B slmon
+has an impact on system performance, particularly when used to monitor signalling links that are
+carrying a high amount of traffic.  The
+.BR sl-mux (4)
+driver places a sequence number on each service primitive delivered to the
+.B slmon
+application.  When the system is congested and the
+.B slmon
+is unable to keep up with the number of service primitives delivered to it, messages will be
+dropped.  Dropped messages can be detected by the occurence of gaps in the sequence numbers
+associated with the primitives.  The most likely service primitives to be dropped are
+.BR SL_PDU_IND (7)
+or
+.BR SL_PDU_REQ (7)
+primitives.
+.PP
+.B slmon
+only monitors the Signalling Link service interface and the service primitives that traverse the
+interface.  It does not monitor state machine transitions, or timer events.  Tracing of state
+machine transitions and timer events is performed on a driver-by-driver basis.
+For tracing of state
+machin transitions and timer events, see the
+.BR strace (8)
+.IR STREAMS (9)
+utility and the particular driver's manual page.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.I /dev/sl-mon
+The
+.BR sl-mux (4)
+monitoring device.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.I /etc/sysconfig/slconf
+The
+.BR slconf (5)
+configuration file.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR slconf (5),
+.BR sl-mux (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B slmon
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B slmon
+utility was new for the OpenSS7
+.B strss7-0.9a.6
+package release.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
