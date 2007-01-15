@@ -1,3 +1,15 @@
+2007-01-15  Brian Bidulock  <bidulock@openss7.org>
+
+	- added new and old signalling link utilities and documentation
+	* doc/man/man4/sl-mux.4.man: new file
+	* doc/man/man8/slconfd.8.man: new file
+	* doc/man/man8/slmon.8.man: new file
+	* doc/man/man8/ss7capd.8.man: new file
+	* src/modules/sl-mux.c: new file
+	* src/util/slconfd.c: new file
+	* src/util/slmon.c: new file
+	* src/util/ss7capd.c: new file
+
 2007-01-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped version number for next release
