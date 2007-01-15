@@ -1,3 +1,10 @@
+2007-01-15  Brian Bidulock  <bidulock@openss7.org>
+
+	- added new m2ua-as mux files
+	* doc/man/man8/m2uaasd.8.man: new file
+	* src/drivers/m2ua_as.c: new file
+	* src/util/m2uaasd.c: new file
+
 2007-01-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped version number for next release

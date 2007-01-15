@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:58:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/01/15 11:58:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: m2ua_as.c,v $
+ Revision 0.9.2.1  2007/01/15 11:58:42  brian
+ - added new m2ua-as mux files
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:58:42 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:58:42 $";
 
 /*
  *  This is an M2UA multiplexing driver.  It is necessary to use a multiplexing driver because most
@@ -121,8 +124,10 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <linux/socket.h>
 #include <net/ip.h>
 
-#include <sys/npi.h>
-#include <sys/npi_sctp.h>	/* For talking to SCTP. */
+#include <sys/tpi.h>
+#include <sys/tpi_sctp.h>	/* For talking to SCTP. */
+
+#include <sys/dlpi.h>		/* For data link states. */
 
 #include <sys/lmi.h>
 #include <sys/lmi_ioctl.h>
@@ -147,7 +152,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 /* ========================== */
 
 #define M2UA_MUX_DESCRIP	"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_MUX_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define M2UA_MUX_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:58:42 $"
 #define M2UA_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -190,49 +195,85 @@ MODULE_ALIAS("streams-m2ua-mux");
  *  M2UA-MUX Private Structures
  *  ---------------------------
  *  Several structures are necessary.  We need one private structure for SL streams on the upper
- *  multiplex.  We need one private structure for the NP streams on the lower multiplex.  We also
+ *  multiplex.  We need one private structure for the TP streams on the lower multiplex.  We also
  *  need one private structure for the ASP which is associated with the minor device number of the
  *  clone minor that is used to open an AS stream.  Then we need some sort of mapping structure that
- *  maps SCTP associations to ASPs (NP Streams to ASP structures), and some sore of mapping
+ *  maps SCTP associations to ASPs (TP Streams to ASP structures), and some sore of mapping
  *  structure that maps AS Streams to ASPs (SL Streams to ASP structures).  So we need three primary
  *  data structures and two mapping structures for connecting the three into a directed graph.
  */
 
 struct sl;				/* upper multiplex structure (SL Stream) */
-struct np;				/* lower multiplex structure (NP Stream) */
+struct tp;				/* lower multiplex structure (TP Stream) */
 
 static rwlock_t mux_lock = RW_LOCK_UNLOCKED;
 
 struct sl {
 	struct sl *next;		/* list linkage */
 	struct sl **prev;		/* list linkage */
-	struct np *np;			/* the SG to which we belong */
+	struct tp *tp;			/* the SG to which we belong */
+
 	queue_t *rq;			/* RD queue */
 	queue_t *wq;			/* WR queue */
 	dev_t dev;
 	cred_t cred;
+
 	uint mid;			/* module id */
 	uint sid;			/* stream id */
-	uint state;			/* interface state */
+
+	uint state;			/* AS state */
+	uint l_state;			/* link state */
+
 	uint32_t ppa;
 	uint32_t iid;
-	uint16_t sid;			/* SCTP stream identifier for this AS */
+	uint16_t streamid;		/* SCTP stream identifier for this AS */
+
 	minor_t anum;			/* ASP number, minor device number that was opened. */
+
 	mblk_t *wack_aspac;		/* Timer waiting for ASPAC Ack */
 	mblk_t *wack_aspia;		/* Timer waiting for ASPIA Ack */
+
 	lmi_info_ack_t info;
+
+	struct lmi_option option;	/* protocol options */
+	struct {
+		struct sl_timers timers;	/* SL protocol timers */
+		struct sl_config config;	/* SL configuration options */
+		struct sl_statem statem;	/* SL state machine variables */
+		struct sl_notify notify;	/* SL notification options */
+		struct sl_stats stats;	/* SL statistics */
+		struct sl_stats stamp;	/* SL statistics timestamps */
+		struct sl_stats statsp;	/* SL statistics periods */
+	} sl;
+	struct {
+		struct sdt_timers timers;
+		struct sdt_config config;
+	} sdt;
+	struct {
+		struct sdl_timers timers;
+		struct sdl_config config;
+	} sdl;
 };
 
-struct np {
-	struct np *next;		/* list linkage */
-	struct np **prev;		/* list linkage */
+struct tp {
+	struct tp *next;		/* list linkage */
+	struct tp **prev;		/* list linkage */
 	struct sl *list;		/* list of SL structures associated with this SG */
+
+	spinlock_t lock;		/* lock: structure lock */
+	uint users;			/* lock: number of users */
+	queue_t *waitq;			/* lock: queue waiting for lock */
+	task_struct *owner;		/* lock: task owning lock */
+
 	queue_t *rq;			/* RD queue */
 	queue_t *wq;			/* WR queue */
+	int index;			/* multiplex index */
+	cred_t cred;			/* credentials */
+
 	uint mid;			/* module id */
 	uint sid;			/* stream id */
-	uint i_state;			/* interface state */
-	uint a_state;			/* ASP state */
+
+	uint state;			/* ASP state */
 	struct sockaddr loc;		/* local (bind) address */
 	struct sockaddr rem;		/* remove (conenct) address */
 	uint32_t ppi;			/* SCTP PPI to use */
@@ -241,7 +282,7 @@ struct np {
 	mblk_t *wack_aspdn;		/* Timer waiting for ASPDN Ack */
 	mblk_t *wack_aspac;		/* Timer waiting for ASPAC Ack */
 	mblk_t *wack_aspia;		/* Timer waiting for ASPIA Ack */
-	N_info_ack_t info;
+	struct T_info_ack info;
 };
 
 static struct module_info sl_minfo = {
@@ -286,80 +327,81 @@ enum {
 };
 
 const char *
-np_i_state_name(uint state)
+tp_i_state_name(uint state)
 {
 	switch (state) {
-	case NS_UNBND:
-		return ("NS_UNBND");
-	case NS_WACK_BREQ:
-		return ("NS_WACK_BREQ");
-	case NS_WACK_UREQ:
-		return ("NS_WACK_UREQ");
-	case NS_IDLE:
-		return ("NS_IDLE");
-	case NS_WACK_OPTREQ:
-		return ("NS_WACK_OPTREQ");
-	case NS_WACK_RRES:
-		return ("NS_WACK_RRES");
-	case NS_WCON_CREQ:
-		return ("NS_WCON_CREQ");
-	case NS_WRES_CIND:
-		return ("NS_WRES_CIND");
-	case NS_WACK_CRES:
-		return ("NS_WACK_CRES");
-	case NS_DATA_XFER:
-		return ("NS_DATA_XFER");
-	case NS_WCON_RREQ:
-		return ("NS_WCON_RREQ");
-	case NS_WRES_RIND:
-		return ("NS_WRES_RIND");
-	case NS_WACK_DREQ6:
-		return ("NS_WACK_DREQ6");
-	case NS_WACK_DREQ7:
-		return ("NS_WACK_DREQ7");
-	case NS_WACK_DREQ9:
-		return ("NS_WACK_DREQ9");
-	case NS_WACK_DREQ10:
-		return ("NS_WACK_DREQ10");
-	case NS_WACK_DREQ11:
-		return ("NS_WACK_DREQ11");
+	case TS_UNBND:
+		return ("TS_UNBND");
+	case TS_WACK_BREQ:
+		return ("TS_WACK_BREQ");
+	case TS_WACK_UREQ:
+		return ("TS_WACK_UREQ");
+	case TS_IDLE:
+		return ("TS_IDLE");
+	case TS_WACK_OPTREQ:
+		return ("TS_WACK_OPTREQ");
+	case TS_WACK_CREQ:
+		return ("TS_WACK_CREQ");
+	case TS_WCON_CREQ:
+		return ("TS_WCON_CREQ");
+	case TS_WRES_CIND:
+		return ("TS_WRES_CIND");
+	case TS_WACK_CRES:
+		return ("TS_WACK_CRES");
+	case TS_DATA_XFER:
+		return ("TS_DATA_XFER");
+	case TS_WIND_ORDREL:
+		return ("TS_WIND_ORDREL");
+	case TS_WREQ_ORDREL:
+		return ("TS_WREQ_ORDREL");
+	case TS_WACK_DREQ6:
+		return ("TS_WACK_DREQ6");
+	case TS_WACK_DREQ7:
+		return ("TS_WACK_DREQ7");
+	case TS_WACK_DREQ9:
+		return ("TS_WACK_DREQ9");
+	case TS_WACK_DREQ10:
+		return ("TS_WACK_DREQ10");
+	case TS_WACK_DREQ11:
+		return ("TS_WACK_DREQ11");
 	default:
 		return ("(unknown)");
 	}
 }
+
 static uint
-np_set_i_state(struct np *np, uint newstate)
+tp_set_i_state(struct tp *tp, uint newstate)
 {
-	uint oldstate = np->info.CURRENT_state;
+	uint oldstate = tp->info.CURRENT_state;
 
 	if (newstate != oldstate)
-		strlog(np->mid, np->sid, SLLOGST, SL_TRACE, "%s <- %s", np_i_state_name(newstate),
-		       np_i_state_name(oldstate));
-	return ((np->info.CURRENT_state = newstate));
+		strlog(tp->mid, tp->sid, SLLOGST, SL_TRACE, "%s <- %s", tp_i_state_name(newstate),
+		       tp_i_state_name(oldstate));
+	return ((tp->info.CURRENT_state = newstate));
 }
 static inline uint
-np_get_i_state(struct np *np)
+tp_get_i_state(struct tp *tp)
 {
-	return (np->info.CURRENT_state);
+	return (tp->info.CURRENT_state);
 }
 static inline uint
-np_get_i_statef(struct np *np)
+tp_get_i_statef(struct tp *tp)
 {
-	return ((1 << np_get_i_state(np)));
+	return ((1 << tp_get_i_state(tp)));
 }
 static inline uint
-np_chk_i_state(struct np *np, uint mask)
+tp_chk_i_state(struct tp *tp, uint mask)
 {
-	return (np_get_n_statef(np) & mask);
+	return (tp_get_n_statef(tp) & mask);
 }
 static inline uint
-np_not_i_state(struct np *np, uint mask)
+tp_not_i_state(struct tp *tp, uint mask)
 {
-	return (np_chk_i_state(np, ~mask));
+	return (tp_chk_i_state(tp, ~mask));
 }
 
 const char *
-np_u_state_name(uint state)
+tp_u_state_name(uint state)
 {
 	switch (state) {
 	case ASP_DOWN:
@@ -375,34 +417,34 @@ np_u_state_name(uint state)
 	}
 }
 static uint
-np_set_u_state(struct np *np, uint newstate)
+tp_set_u_state(struct tp *tp, uint newstate)
 {
-	uint oldstate = np->state;
+	uint oldstate = tp->state;
 
 	if (newstate != oldstate)
-		strlog(np->mid, np->sid, SLLOGST, SL_TRACE, "%s <- %s", np_u_state_name(newstate),
-		       np_u_state_name(oldstate));
-	return ((np->state = newstate));
+		strlog(tp->mid, tp->sid, SLLOGST, SL_TRACE, "%s <- %s", tp_u_state_name(newstate),
+		       tp_u_state_name(oldstate));
+	return ((tp->state = newstate));
 }
 static inline uint
-np_get_u_state(struct np *np)
+tp_get_u_state(struct tp *tp)
 {
-	return (np->state);
+	return (tp->state);
 }
 static inline uint
-np_get_u_statef(struct np *np)
+tp_get_u_statef(struct tp *tp)
 {
-	return ((1 << np_get_u_state(np)));
+	return ((1 << tp_get_u_state(tp)));
 }
 static inline uint
-np_chk_u_state(struct np *np, uint mask)
+tp_chk_u_state(struct tp *tp, uint mask)
 {
-	return (np_get_u_statef(np) & mask);
+	return (tp_get_u_statef(tp) & mask);
 }
 static inline uint
-np_not_u_state(struct np *np, uint mask)
+tp_not_u_state(struct tp *tp, uint mask)
 {
-	return (np_chk_u_state(np, ~mask));
+	return (tp_chk_u_state(tp, ~mask));
 }
 
 #define LMF_UNATTACHED		(1<<LMI_UNATTACHED)
@@ -612,37 +654,88 @@ sl_not_l_state(struct sl *sl, uint mask)
  *  =========================================
  */
 static void
-sl_init_priv(struct sl *sl, struct np *np, queue_t *q, dev_t *devp, int
-	     oflags, int sflag, cred_t *crp, mblk_t *t1, mblk_t *t2)
+sl_init_priv(struct sl *sl, struct tp *tp, queue_t *q, dev_t *devp, int
+	     oflags, int sflag, cred_t *crp, mblk_t *t1, mblk_t *t2, minor_t unit)
 {
 	/* initialize sl structure */
 	bzero(sl, sizeof(*sl));
-	if ((sl->sl_next = np->list))
+	if ((sl->sl_next = tp->list))
 		sp->next->prev = &sl->next;
-	sl->prev = &np->list;
-	np->list = sl;
-	sl->np = np;
+	sl->prev = &tp->list;
+	tp->list = sl;
+	sl->tp = tp;
+
 	sl->rq = RD(q);
 	sl->wq = WR(q);
 	sl->dev = *devp;
 	sl->cred = *crp;
+
 	sl->mid = q->q_info->qi_minfo->mi_idnum;
 	sl->sid = getminor(*devp);
+
 	sl->state = ASP_DOWN;
 	sl->l_state = DL_UNBOUND;
+
+	sl->ppa = 0;
+	sl->iid = 0;
+	sl->streamid = 0;
+	sl->anum = unit;
+
+	*(int *) t1->b_rptr = wack_aspac;
+	*(int *) t2->b_rptr = wack_aspia;
+	sl->wack_aspac = t1;
+	sl->wack_aspia = t2;
+
+	/* by default, assume it is a plain-jane ITU-T link */
+	sl->option.pvar = SS7_PVAR_ITUT_00;
+	sl->option.popt = 0;
+
 	sl->info.lmi_primitive = LMI_INFO_ACK;
 	sl->info.lmi_state = LMI_UNUSABLE;
 	sl->info.lmi_max_sdu = 272;
 	sl->info.lmi_min_sdu = 6;
 	sl->info.lmi_header_len = 12;
 	sl->info.lmi_ppa_style = LMI_STYLE2;
-	sl->ppa = 0;
-	sl->iid = 0;
-	sl->sid = 0;
-	*(int *) t1->b_rptr = wack_aspac;
-	*(int *) t2->b_rptr = wack_aspia;
-	sl->wack_aspac = t1;
-	sl->wack_aspia = t2;
+
+	sl->sl.config.t1 = FIXME;	/* Timer t1 duration (milliseconds) */
+	sl->sl.config.t2 = FIXME;	/* Timer t2 duration (milliseconds) */
+	sl->sl.config.t2l = FIXME;	/* Timer t2l duration (milliseconds) */
+	sl->sl.config.t2h = FIXME;	/* Timer t2h duration (milliseconds) */
+	sl->sl.config.t3 = FIXME;	/* Timer t3 duration (milliseconds) */
+	sl->sl.config.t4n = FIXME;	/* Timer t4n duration (milliseconds) */
+	sl->sl.config.t4e = FIXME;	/* Timer t4e duration (milliseconds) */
+	sl->sl.config.t5 = FIXME;	/* Timer t5 duration (milliseconds) */
+	sl->sl.config.t6 = FIXME;	/* Timer t6 duration (milliseconds) */
+	sl->sl.config.t7 = FIXME;	/* Timer t7 duration (milliseconds) */
+	sl->sl.config.rb_abate = FIXME;	/* RB cong abatement (#msgs) */
+	sl->sl.config.rb_accept = FIXME;	/* RB cong onset accept (#msgs) */
+	sl->sl.config.rb_discard = FIXME;	/* RB cong discard (#msgs) */
+	sl->sl.config.tb_abate_1 = FIXME;	/* lev 1 cong abate (#bytes) */
+	sl->sl.config.tb_onset_1 = FIXME;	/* lev 1 cong onset (#bytes) */
+	sl->sl.config.tb_discd_1 = FIXME;	/* lev 1 cong discard (#bytes) */
+	sl->sl.config.tb_abate_2 = FIXME;	/* lev 2 cong abate (#bytes) */
+	sl->sl.config.tb_onset_2 = FIXME;	/* lev 2 cong onset (#bytes) */
+	sl->sl.config.tb_discd_2 = FIXME;	/* lev 2 cong discard (#bytes) */
+	sl->sl.config.tb_abate_3 = FIXME;	/* lev 3 cong abate (#bytes) */
+	sl->sl.config.tb_onset_3 = FIXME;	/* lev 3 cong onset (#bytes) */
+	sl->sl.config.tb_discd_3 = FIXME;	/* lev 3 cong discard (#bytes) */
+	sl->sl.config.N1 = FIXME;	/* PCR/RTBmax messages (#msg) */
+	sl->sl.config.N2 = FIXME;	/* PCR/RTBmax octets (#bytes) */
+	sl->sl.config.M = FIXME;	/* IAC normal proving periods */
+
+	sl->sdt.config.t8 = FIXME;	/* T8 timeout (milliseconds) */
+	sl->sdt.config.Tin = FIXME;	/* AERM normal proving threshold */
+	sl->sdt.config.Tie = FIXME;	/* AERM emergency proving threshold */
+	sl->sdt.config.T = FIXME;	/* SUERM error threshold */
+	sl->sdt.config.D = FIXME;	/* SUERM error rate parameter */
+	sl->sdt.config.Te = FIXME;	/* EIM error threshold */
+	sl->sdt.config.De = FIXME;	/* EIM correct decrement */
+	sl->sdt.config.Ue = FIXME;	/* EIM error increment */
+	sl->sdt.config.N = FIXME;	/* octets per su in octet-counting mode */
+	sl->sdt.config.m = FIXME;	/* maximum SIF size */
+	sl->sdt.config.b = FIXME;	/* transmit block size */
+	sl->sdt.config.f = FIXME;	/* number of flags between frames */
+
 	return;
 }
 static void
@@ -652,48 +745,64 @@ sl_term_priv(struct sl *sl)
 		sp->next->prev = sl->prev;
 	sl->next = NULL;
 	sl->prev = &sl->next;
-	m2_asp_put(XCHG(&sl->np, NULL));
+	m2_asp_put(XCHG(&sl->tp, NULL));
 	mi_timer_free(XCHG(&sl->wack_aspac, NULL));
 	mi_timer_free(XCHG(&sl->wack_aspia, NULL));
 	return;
 }
 static void
-np_init_priv(struct np *np, queue_t *q, int unit, int index, cred_t *crp, mblk_t *t1, mblk_t *t2,
+tp_init_priv(struct tp *tp, queue_t *q, int unit, int index, cred_t *crp, mblk_t *t1, mblk_t *t2,
 	     mblk_t *t3, mblk_t *t4)
 {
-	bzero(np, sizeof(*np));
-	np->rq = q ? RD(q) : NULL;
-	np->wq = q ? WR(q) : NULL;
-	np->index = index;
-	np->cred = *crp;
-	np->mid = q->q_info->qi_minfo->mi_idnum;
-	np->sid = unit;
-	np->state = NS_UNBND;
-	np->info.PRIM_type = N_INFO_ACK;
-	np->info.NSDU_size = -1;
-	np->info.ENSDU_size = -1;
-	np->info.CDATA_size = -1;
-	np->info.DDATA_size = -1;
-	np->info.ADDR_size = sizeof(struct sockaddr);
-	np->info.ADDR_length = 0;
-	np->info.ADDR_offset = sizeof(np->info);
-	np->info.QOS_length = 0;
-	np->info.QOS_offset = sizeof(np->info) + np->info.ADDR_length;
-	np->info.QOS_range_length = 0;
-	np->info.QOS_range_offset = sizeof(np->info) + np->info.ADDR_length + np->info.QOS_length;
-	np->info.OPTIONS_flags = 0;
-	np->info.NIDU_size = -1;
-	np->info.SERV_type = N_CONS | N_CLNS;
-	np->info.CURRENT_state = -1;	/* until N_INFO_ACK received */
-	np->info.PROVIDER_type = N_SNICFP;
-	np->info.NODU_size = -1;
-	np->info.PROTOID_length = 0;
-	np->info.PROTOID_offset =
-	    sizeof(np->info) + np->info.ADDR_length + np->info.QOS_length + np->info.PROTOID_length;
-	np->info.NPI_version = N_CURRENT_VERSION;
+	bzero(tp, sizeof(*tp));
+
+	spin_lock_init(tp->lock);
+	tp->users = 0;
+	tp->waitq = NULL;
+	tp->owner = NULL;
+
+	tp->rq = q ? RD(q) : NULL;
+	tp->wq = q ? WR(q) : NULL;
+	tp->index = index;
+	tp->cred = *crp;
+
+	tp->mid = q->q_info->qi_minfo->mi_idnum;
+	tp->sid = unit;
+
+	tp->state = TS_UNBND;
+
+	bzero(&tp->loc, sizeof(tp->loc));
+	bzero(&tp->rem, sizeof(tp->rem));
+
+	tp->ppi = M2UA_PPI;
+	tp->aspid = 0;
+
+	*(int *) t1->b_rptr = wack_aspup;
+	*(int *) t2->b_rptr = wack_aspdn;
+	*(int *) t3->b_rptr = wack_aspac;
+	*(int *) t4->b_rptr = wack_aspia;
+
+	tp->wack_aspup = t1;
+	tp->wack_aspdn = t2;
+	tp->wack_aspac = t3;
+	tp->wack_aspia = t4;
+
+	tp->info.PRIM_type = T_INFO_ACK;
+	tp->info.TSDU_size = -1;
+	tp->info.ETSDU_size = -1;
+	tp->info.CDATA_size = -1;
+	tp->info.DDATA_size = -1;
+	tp->info.ADDR_size = sizeof(struct sockaddr);
+	tp->info.OPT_size = -1;
+	tp->info.TIDU_size = -1;
+	tp->info.SERV_type = T_COTS_ORD;
+	tp->info.CURRENT_state = -1;
+	tp->info.PROVIDER_flag = XPG4;
+
+	return;
 }
 static void
-np_term_priv(struct np *np)
+tp_term_priv(struct tp *tp)
 {
 }
 
@@ -703,8 +812,8 @@ np_term_priv(struct np *np)
  */
 
 /**
- * np_trylock: - try to lock an NP queue pair
- * @np: NP private structure
+ * tp_trylock: - try to lock an TP queue pair
+ * @tp: TP private structure
  * @q: active queue (read or write queue)
  *
  * Note that if we always run (at least initially) from a service procedure, there is no need to
@@ -716,49 +825,70 @@ np_term_priv(struct np *np)
  * queue, so if there are two waiting, the second one is reenabled immediately.
  */
 static inline bool
-np_trylock(struct np *np, queue_t *q)
+tp_trylock(struct tp *tp, queue_t *q)
 {
 	bool rtn = false;
 	pl_t pl;
 
-	pl = LOCK(&np->lock, plhigh);
-	if (np->users == 0 && (q->q_flag & QSVCBUSY)) {
+	pl = LOCK(&tp->lock, plhigh);
+	if (tp->users == 0 && (q->q_flag & QSVCBUSY)) {
 		rtn = true;
-		np->users = 1;
-		np->owner = current;
-	} else if (np->users != 0 && np->owner == current) {
+		tp->users = 1;
+		tp->owner = current;
+	} else if (tp->users != 0 && tp->owner == current) {
 		rtn = true;
-		np->users++;
-	} else if (!np->waitq) {
-		np->waitq = q;
-	} else if (np->waitq != q) {
+		tp->users++;
+	} else if (!tp->waitq) {
+		tp->waitq = q;
+	} else if (tp->waitq != q) {
 		qenable(q);
 	}
-	UNLOCK(&np->lock, pl);
+	UNLOCK(&tp->lock, pl);
 	return (rtn);
 }
 
 static inline void
-np_lock(struct np *np)
+tp_lock(struct tp *tp)
 {
-	while (!np_trylock(np, NULL)) ;
+	while (!tp_trylock(tp, NULL)) ;
 }
 
 /**
- * np_unlock: - unlock an NP queue pair
- * @np: NP private structure
+ * tp_unlock: - unlock an TP queue pair
+ * @tp: TP private structure
  */
 static inline void
-np_unlock(struct np *np)
+tp_unlock(struct tp *tp)
 {
 	pl_t pl;
 
-	pl = LOCK(&np->lock, plhigh);
-	if (--np->users == 0 && np->waitq) {
-		qenable(np->waitq);
-		np->waitq = NULL;
+	pl = LOCK(&tp->lock, plhigh);
+	if (--tp->users == 0 && tp->waitq) {
+		qenable(tp->waitq);
+		tp->waitq = NULL;
 	}
-	UNLOCK(&np->lock, pl);
+	UNLOCK(&tp->lock, pl);
+}
+
+/*
+ *  Buffer allocation
+ *  =================
+ */
+static mblk_t *
+sl_allocb(queue_t *q, size_t len, int priority)
+{
+	mblk_t *mp;
+
+	if (unlikely((mp = allocb(len, priority)) == NULL)) {
+		struct sl *sl = SL_PRIV(q);
+		bcid_t bid, *bidp = (q->q_flag & QREADR) ? &sl->rbid : &sl->wbid;
+
+		if ((bid = bufcall(len, priority, (void (*)(long)) &qenable, (long) q)))
+			unbufcall(xchg(bidp, bid));
+		else
+			qenable(q);
+	}
+	return (mp);
 }
 
 /*
@@ -1886,97 +2016,47 @@ sl_local_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 }
 
 /*
- * NS-User to NS-Provider primitives.
+ * TS-User to TS-Provider primitives.
  * ==================================
  */
 /**
- * n_conn_req - issued an N_CONN_REQ primitive
- * @np: NP private structure
+ * t_conn_req: - issue a T_CONN_REQ primitive
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
- * @dptr: destination address pointer
  * @dlen: destination address length
+ * @dptr: destination address pointer
+ * @olen: options length
+ * @optr: options pointer
+ * @dp: user data
  */
 static noinline fastcall int
-n_conn_req(struct np *np, queue_t *q, mblk_t *msg, caddr_t dptr, size_t dlen)
+t_conn_req(struct tp *tp, queue_t *q, mblk_t *msg, size_t dlen, caddr_t dptr, size_t olen,
+	   caddr_t optr, mblk_t *dp)
 {
-	N_qos_sel_conn_sctp_t *n;
-	N_conn_req_t *p;
+	struct T_conn_req *p;
 	mblk_t *mp;
 
-	if ((mp = np_allocb(q, sizeof(*p) + dlen + sizeof(*n), BPRI_MED))) {
-		if (canputnext(np->wq)) {
+	if (likely(!!(mp = sl_allocb(q, sizeof(*p) + dlen + olen, BPRI_MED)))) {
+		if (likely(bcanpuntext(tp->wq, 2))) {
 			DB_TYPE(mp) = M_PROTO;
+			mp->b_band = 2;
 			p = (typeof(p)) mp->b_wptr;
-			p->PRIM_type = N_CONN_REQ;
+			p->PRIM_type = T_CONN_REQ;
 			p->DEST_length = dlen;
 			p->DEST_offset = sizeof(*p);
-			p->CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
-			p->QOS_length = sizeof(*n);
-			p->QOS_offset = sizeof(*p) + dlen;
+			p->OPT_length = olen;
+			p->OPT_offset = sizeof(*p) + dlen;
 			mp->b_wptr += sizeof(*p);
 			bcopy(dptr, mp->b_wptr, dlen);
 			mp->b_wptr += dlen;
-			n = (typeof(n)) mp->b_wptr;
-			n->n_qos_type = N_QOS_SEL_CONN_SCTP;
-			n->i_streams = 2;	/* FIXME */
-			n->o_streams = 2;	/* FIXME */
-			mp->b_wptr += sizeof(*n);
-			np_set_i_state(np, NS_WCON_CREQ);
+			bcopy(optr, mp->b_wptr, olen);
+			mp->b_wptr += olen;
+			mp->b_cont = dp;
+			tp_set_i_state(tp, TS_WACK_CREQ);
 			freemsg(msg);
-			strlog(np->mid, np->sid, SLLOGTX, SL_TRACE, "N_CONN_REQ ->");
-			putnext(np->wq, mp);
-			return (0);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-	N_conn_req_t *p;
-}
-
-/**
- * n_conn_res - issued an N_CONN_RES primitive
- * @np: NP private structure
- * @q: active queue
- * @msg: message to free upon success
- * @rptr:  responding address pointer
- * @rlen:  responding address length
- * @token: accepting stream token
- * @seq: connection indication sequence number
- */
-static noinline fastcall int
-n_conn_res(struct np *np, queue_t *q, mblk_t *msg, caddr_t rptr, size_t rlen, np_ulong token,
-	   np_ulong seq)
-{
-	N_qos_sel_conn_sctp_t *n;
-	N_conn_res_t *p;
-	mblk_t *mp;
-
-	if ((mp = np_allocb(q, sizeof(*p) + rlen + sizeof(*n), BPRI_MED))) {
-		if (canputnext(np->wq)) {
-			DB_TYPE(mp) = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			p->PRIM_type = N_CONN_RES;
-			p->TOKEN_value = token;
-			p->RES_length = rlen;
-			p->RES_offset = sizeof(*p);
-			p->SEQ_number = seq;
-			p->CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
-			p->QOS_length = sizeof(*n);
-			p->QOS_offset = sizeof(*p) + rlen;
-			mp->b_wptr += sizeof(*p);
-			bcopy(rptr, mp->b_wptr, rlen);
-			mp->b_wptr += rlen;
-			n = (typeof(n)) mp->b_wptr;
-			n->n_qos_type = N_QOS_SEL_CONN_SCTP;
-			n->i_streams = 2;	/* FIXME */
-			n->o_streams = 2;	/* FIXME */
-			mp->b_wptr += sizeof(*n);
-			np_set_i_state(np, NS_DATA_XFER);
-			freemsg(msg);
-			strlog(np->mid, np->sid, SLLOGTX, SL_TRACE, "N_CONN_RES ->");
-			putnext(np->wq, mp);
+			strlog(tp->mid, tp->sid, SLLOGTX, SL_TRACE, "T_CONN_REQ ->");
+			putnext(tp->wq, mp);
 			return (0);
 		}
 		freeb(mp);
@@ -1986,53 +2066,92 @@ n_conn_res(struct np *np, queue_t *q, mblk_t *msg, caddr_t rptr, size_t rlen, np
 }
 
 /**
- * n_discon_req - issued an N_DISCON_REQ primitive
- * @np: NP private structure
+ * t_conn_res: - issue a T_CONN_RES primitive
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
- * @reason: reason for disconnect
- * @seq: connection indication sequence number
+ * @token: stream upon which to accept the connection
+ * @olen: options length
+ * @optr: options pointer
+ * @sequence: sequence number of connect indication
+ * @dp: user data
  */
 static noinline fastcall int
-n_discon_req(struct np *np, queue_t *q, mblk_t *msg, np_ulong reason, np_ulong seq)
+t_conn_res(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t token, size_t olen, caddr_t optr,
+	   t_scalar_t sequence, mblk_t *dp)
 {
-	N_discon_req_t *p;
+	struct T_conn_res *p;
 	mblk_t *mp;
 
-	if ((mp = np_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(np->wq)) {
+	if (likely(!!(mp = sl_allocb(q, sizeof(*p) + olen, BPRI_MED)))) {
+		if (likely(bcanputnext(tp->wq, 2))) {
 			DB_TYPE(mp) = M_PROTO;
+			mp->b_band = 2;
 			p = (typeof(p)) mp->b_wptr;
-			p->PRIM_type = N_DISCON_REQ;
-			p->DISCON_reason = reason;
-			p->RES_length = 0;
-			p->RES_offset = 0;
-			p->SEQ_number = seq;
+			p->PRIM_type = T_CONN_RES;
+			p->ACCEPTOR_id = token;
+			p->OPT_length = olen;
+			p->OPT_offset = sizeof(*p);
+			p->SEQ_number = sequence;
 			mp->b_wptr += sizeof(*p);
-			switch (np_get_i_state(np)) {
-			case NS_WCON_CREQ:
-				np_set_i_state(np, NS_WACK_DREQ6);
+			bcopy(optr, mp->b_wptr, olen);
+			mp->b_wptr += olen;
+			mp->b_cont = dp;
+			tp_set_i_state(tp, TS_WACK_CRES);
+			freemsg(msg);
+			strlog(tp->mid, tp->sid, SLLOGTX, SL_TRACE, "T_CONN_RES ->");
+			putnext(tp->wq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * t_discon_req: - issue a T_DISCON_REQ primitive
+ * @tp: TP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @sequence: sequence number of connect indication (or zero)
+ * @dp: user data
+ */
+static noinline fastcall int
+t_discon_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t sequence, mblk_t *dp)
+{
+	struct T_discon_req *p;
+	mblk_t *mp;
+
+	if (likely(!!(mp = sl_allocb(q, sizeof(*p), BPRI_MED)))) {
+		if (likely(bcanputnext(tp->wq, 2))) {
+			DB_TYPE(mp) = M_PROTO;
+			mp->b_band = 2;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = T_DISCON_REQ;
+			p->SEQ_number = sequence;
+			mp->b_wptr += sizeof(*p);
+			mp->b_cont = dp;
+			switch (tp_get_i_state(tp)) {
+			case TS_WCON_CREQ:
+				tp_set_i_state(tp, TS_WACK_DREQ6);
 				break;
-			case NS_WRES_CIND:
-				np_set_i_state(np, NS_WACK_DREQ7);
+			case TS_WRES_CIND:
+				tp_set_i_state(tp, TS_WACK_DREQ7);
 				break;
-			case NS_DATA_XFER:
-				np_set_i_state(np, NS_WACK_DREQ9);
+			case TS_DATA_XFER:
+				tp_set_i_state(tp, TS_WACK_DREQ9);
 				break;
-			case NS_WCON_RREQ:
-				np_set_i_state(np, NS_WACK_DREQ10);
+			case TS_WIND_ORDREL:
+				tp_set_i_state(tp, TS_WACK_DREQ10);
 				break;
-			case NS_WRES_RIND:
-				np_set_i_state(np, NS_WACK_DREQ11);
-				break;
-			default:
-				strlog(np->mid, np->sid, 0, SL_ERROR, "N_DISCON_REQ out of state");
-				np_set_i_state(np, NS_IDLE);
+			case TS_WREQ_ORDREL:
+				tp_set_i_state(tp, TS_WACK_DREQ11);
 				break;
 			}
 			freemsg(msg);
-			strlog(np->mid, np->sid, SLLOGTX, SL_TRACE, "N_DISCON_REQ ->");
-			putnext(np->wq, mp);
+			strlog(tp->mid, tp->sid, SLLOGTX, SL_TRACE, "T_DISCON_REQ ->");
+			putnext(tp->wq, mp);
 			return (0);
 		}
 		freeb(mp);
@@ -2042,40 +2161,30 @@ n_discon_req(struct np *np, queue_t *q, mblk_t *msg, np_ulong reason, np_ulong s
 }
 
 /**
- * n_data_req - issued an N_DATA_REQ primitive
- * @np: NP private structure
+ * t_data_req: - issue a T_DATA_REQ primitive
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
- * @flags: data transfer flags
- * @sid: SCTP stream id on which to send
- * @dp: user data to trasnfer
+ * @more: more flag
+ * @dp: user data
  */
-static inline fastcall __hot_out int
-n_data_req(struct np *np, queue_t *q, mblk_t *msg, np_ulong flags, np_ulong sid, mblk_t *dp)
+static noinline fastcall int
+t_data_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t more, mblk_t *dp)
 {
-	N_qos_sel_data_sctp_t *n;
-	N_data_req_t *p;
+	struct T_data_req *p;
 	mblk_t *mp;
 
-	if ((mp = np_allocb(q, sizeof(*p) + sizeof(*n), BPRI_MED))) {
-		if (canpuntext(np->wq)) {
+	if (likely(!!(mp = sl_allocb(q, sizeof(*p), BPRI_MED)))) {
+		if (likely(bcanputnext(tp->wq, 0))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
-			p->PRIM_type = N_DATA_REQ;
-			p->DATA_xfer_flags = flags;
+			p->PRIM_type = T_DATA_REQ;
+			p->MORE_flag = more;
 			mp->b_wptr += sizeof(*p);
-			n = (typeof(n)) mp->b_wptr;
-			n->n_qos_type = N_QOS_SEL_DATA_SCTP;
-			n->ppi = np->ppi ? np->ppi : M2UA_PPI;
-			n->sid = sid;
-			n->ssn = 0;
-			n->tsn = 0;
-			n->more = flags;
-			mp->b_wptr += sizeof(*n);
 			mp->b_cont = dp;
 			freemsg(msg);
-			strlog(np->mid, np->sid, SLLOGTX, SL_TRACE, "N_DATA_REQ ->");
-			putnext(np->wq, mp);
+			strlog(tp->mid, tp->sid, SLLOGTX, SL_TRACE, "T_DATA_REQ ->");
+			putnext(tp->wq, mp);
 			return (0);
 		}
 		freeb(mp);
@@ -2085,40 +2194,31 @@ n_data_req(struct np *np, queue_t *q, mblk_t *msg, np_ulong flags, np_ulong sid,
 }
 
 /**
- * n_exdata_req - issued an N_EXDATA_REQ primitive
- * @np: NP private structure
+ * t_exdata_req: - issue a T_EXDATA_REQ primitive
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
- * @flags: data transfer flags
- * @sid: SCTP stream id on which to send
- * @dp: user data to transfer
+ * @more: more flag
+ * @dp: user data
  */
 static noinline fastcall int
-n_exdata_req(struct np *np, queue_t *q, mblk_t *msg, np_ulong flags, np_ulong sid, mblk_t *dp)
+t_exdata_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t more, mblk_t *dp)
 {
-	N_qos_sel_data_sctp_t *n;
-	N_exdata_req_t *p;
+	struct T_exdata_req *p;
 	mblk_t *mp;
 
-	if ((mp = np_allocb(q, sizeof(*p) + sizeof(*n), BPRI_MED))) {
-		if (bcanputnext(np->wq, 1)) {
+	if (likely(!!(mp = sl_allocb(q, sizeof(*p), BPRI_MED)))) {
+		if (likely(bcanputnext(tp->wq, 1))) {
 			DB_TYPE(mp) = M_PROTO;
-			mp->b_band = 1;	/* expedite */
+			mp->b_band = 1;
 			p = (typeof(p)) mp->b_wptr;
-			p->PRIM_type = N_EXDATA_REQ;
+			p->PRIM_type = T_EXDATA_REQ;
+			p->MORE_flag = more;
 			mp->b_wptr += sizeof(*p);
-			n = (typeof(n)) mp->b_wptr;
-			n->n_qos_type = N_QOS_SEL_DATA_SCTP;
-			n->ppi = np->ppi ? np->ppi : M2UA_PPI;
-			n->sid = sid;
-			n->ssn = 0;
-			n->tsn = 0;
-			n->more = flags;
-			mp->b_wptr += sizeof(*n);
 			mp->b_cont = dp;
 			freemsg(msg);
-			strlog(np->mid, np->sid, SLLOGTX, SL_TRACE, "N_EXDATA_REQ ->");
-			putnext(np->wq, mp);
+			strlog(tp->mid, tp->sid, SLLOGTX, SL_TRACE, "T_EXDATA_REQ ->");
+			putnext(tp->wq, mp);
 			return (0);
 		}
 		freeb(mp);
@@ -2128,242 +2228,312 @@ n_exdata_req(struct np *np, queue_t *q, mblk_t *msg, np_ulong flags, np_ulong si
 }
 
 /**
- * n_info_req - issued an N_INFO_REQ primitive
- * @np: NP private structure
+ * t_info_req: - issue a T_INFO_REQ primitive
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  */
 static noinline fastcall int
-n_info_req(struct np *np, queue_t *q, mblk_t *msg)
+t_info_req(struct tp *tp, queue_t *q, mblk_t *msg)
 {
-	N_info_req_t *p;
+	struct T_info_req *p;
 	mblk_t *mp;
 
-	if ((mp = np_allocb(q, sizeof(*p), BPRI_MED))) {
+	if (likely(!!(mp = sl_allocb(q, sizeof(*p), BPRI_MED)))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = N_INFO_REQ;
+		p->PRIM_type = T_INFO_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		strlog(np->mid, np->sid, SLLOGTX, SL_TRACE, "N_INFO_REQ ->");
-		putnext(np->wq, mp);
+		strlog(tp->mid, tp->sid, SLLOGTX, SL_TRACE, "T_INFO_REQ ->");
+		putnext(tp->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
 
 /**
- * n_bind_req - issued an N_BIND_REQ primitive
- * @np: NP private structure
+ * t_bind_req: - issue a T_BIND_REQ primitive
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
- * @aptr: pointer to address to bind
- * @alen: length of bind address
+ * @alen: address length
+ * @aptr: address pointer
  */
 static noinline fastcall int
-n_bind_req(struct np *np, queue_t *q, mblk_t *msg, caddr_t aptr, size_t alen)
+t_bind_req(struct tp *tp, queue_t *q, mblk_t *msg, size_t alen, caddr_t aptr)
 {
-	N_bind_req_t *p;
+	struct T_bind_req *p;
 	mblk_t *mp;
 
-	if ((mp = np_allocb(q, sizeof(*p) + alen, BPRI_MED))) {
+	if (likely(!!(mp = sl_allocb(q, sizeof(*p) + alen, BPRI_MED)))) {
+		if (likely(canputnext(tp->wq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = T_BIND_REQ;
+			p->ADDR_length = alen;
+			p->ADDR_offset = sizeof(*p);
+			mp->b_wptr += sizeof(*p);
+			bcopy(aptr, mp->b_wptr, alen);
+			mp->b_wptr += alen;
+			tp_set_i_state(tp, TS_WACK_BREQ);
+			freemsg(msg);
+			strlog(tp->mid, tp->sid, SLLOGTX, SL_TRACE, "T_BIND_REQ ->");
+			putnext(tp->wq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * t_unbind_req: - issue a T_UNBIND_REQ primitive
+ * @tp: TP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static noinline fastcall int
+t_unbind_req(struct tp *tp, queue_t *q, mblk_t *msg)
+{
+	struct T_unbind_req *p;
+	mblk_t *mp;
+
+	if (likely(!!(mp = sl_allocb(q, sizeof(*p), BPRI_MED)))) {
+		if (likely(canputnext(tp->wq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = T_UNBIND_REQ;
+			mp->b_wptr += sizeof(*p);
+			tp_set_i_state(tp, TS_WACK_UREQ);
+			freemsg(msg);
+			strlog(tp->mid, tp->sid, SLLOGTX, SL_TRACE, "T_UNBIND_REQ ->");
+			putnext(tp->wq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * t_unitdata_req: - issue a T_UNITDATA_REQ primitive
+ * @tp: TP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @dlen: destination address length
+ * @dptr: destination address pointer
+ * @olen: options length
+ * @optr: options pointer
+ * @dp: user data
+ */
+static noinline fastcall int
+t_unitdata_req(struct tp *tp, queue_t *q, mblk_t *msg, size_t dlen, caddr_t dptr, size_t olen,
+	       caddr_t optr, mblk_t *dp)
+{
+	struct T_unitdata_req *p;
+	mblk_t *mp;
+
+	if (likely(!!(mp = sl_allocb(q, sizeof(*p) + dlen + olen, BPRI_MED)))) {
+		if (likely(bcanputnext(tp->wq, dp->b_band))) {
+			DB_TYPE(mp) = M_PROTO;
+			mp->b_band = dp->b_band;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = T_UNITDATA_REQ;
+			p->DEST_length = dlen;
+			p->DEST_offset = sizeof(*p);
+			p->OPT_length = olen;
+			p->OPT_offset = sizeof(*p) + dlen;
+			mp->b_wptr += sizeof(*p);
+			bcopy(dptr, mp->b_wptr, dlen);
+			mp->b_wptr += dlen;
+			bcopy(optr, mp->b_wptr, olen);
+			mp->b_wptr += olen;
+			mp->b_cont = dp;
+			freemsg(msg);
+			strlog(tp->mid, tp->sid, SLLOGTX, SL_TRACE, "T_UNITDATA_REQ ->");
+			putnext(tp->wq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * t_optmgmt_req: - issue a T_OPTMGMT_REQ primitive
+ * @tp: TP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @olen: options length
+ * @optr: options pointer
+ * @flags: management flags
+ */
+static noinline fastcall int
+t_optmgmt_req(struct tp *tp, queue_t *q, mblk_t *msg, size_t olen, caddr_t optr, t_scalar_t flags)
+{
+	struct T_optmgmt_req *p;
+	mblk_t *mp;
+
+	if (likely(!!(mp = sl_allocb(q, sizeof(*p) + olen, BPRI_MED)))) {
+		if (likely(canputnext(tp->wq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = T_OPTMGMT_REQ;
+			p->OPT_length = olen;
+			p->OPT_offset = sizeof(*p);
+			p->MGMT_flags = flags;
+			mp->b_wptr += sizeof(*p);
+			bcopy(optr, mp->b_wptr, olen);
+			mp->b_wptr += olen;
+			if (tp_get_i_state(tp) == TS_IDLE)
+				tp_set_i_state(tp, TS_WACK_OPTREQ);
+			freemsg(msg);
+			strlog(tp->mid, tp->sid, SLLOGTX, SL_TRACE, "T_OPTMGMT_REQ ->");
+			putnext(tp->wq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * t_ordrel_req: - issue a T_ORDREL_REQ primitive
+ * @tp: TP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @dp: user data
+ */
+static noinline fastcall int
+t_ordrel_req(struct tp *tp, queue_t *q, mblk_t *msg)
+{
+	struct T_ordrel_req *p;
+	mblk_t *mp;
+
+	if (likely(!!(mp = sl_allocb(q, sizeof(*p), BPRI_MED)))) {
+		if (likely(canputnext(tp->wq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = T_ORDREL_REQ;
+			mp->b_wptr += sizeof(*p);
+			mp->b_cont = dp;
+			tp_set_i_state(tp, TS_WIND_ORDREL);
+			freemsg(msg);
+			strlog(tp->mid, tp->sid, SLLOGTX, SL_TRACE, "T_ORDREL_REQ ->");
+			putnext(tp->wq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * t_optdata_req: - issue a T_OPTDATA_REQ primitive
+ * @tp: TP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @flag: data transfer flag
+ * @sid: stream id
+ * @dp: user data
+ */
+static noinline fastcall int
+t_optdata_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t flag, t_uscalar_t sid, mblk_t *dp)
+{
+	struct T_optdata_req *p;
+	mblk_t *mp;
+	struct t_opthdr *oh;
+
+	if (likely(!!(mp = sl_allocb(q, sizeof(*p) + sizeof(*oh) + sizeof(sid), BPRI_MED)))) {
+		if (likely(bcanputnext(tp->wq, dl->b_band))) {
+			DB_TYPE(mp) = M_PROTO;
+			mp->b_band = dp->b_band;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = T_OPTDATA_REQ;
+			p->DATA_flag = flag;
+			p->OPT_length = sizeof(*oh) + sizeof(sid);
+			p->OPT_offset = sizeof(*p);
+			mp->b_wptr += sizeof(*p);
+			oh = (typeof(oh)) mp->b_wptr;
+			oh->level = T_INET_SCTP;
+			oh->name = T_SCTP_SID;
+			oh->len = sizeof(sid);
+			mp->b_wptr += sizeof(*oh);
+			*(t_uscalar_t *) mp->b_wptr = sid;
+			mp->b_wptr += sizeof(sid);
+			mp->b_cont = dp;
+			freemsg(msg);
+			strlog(tp->mid, tp->sid, SLLOGTX, SL_TRACE, "T_OPTDATA_REQ ->");
+			putnext(tp->wq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * t_addr_req: - issue a T_ADDR_REQ primitive
+ * @tp: TP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static noinline fastcall int
+t_addr_req(struct tp *tp, queue_t *q, mblk_t *msg)
+{
+	struct T_addr_req *p;
+	mblk_t *mp;
+
+	if (likely(!!(mp = sl_allocb(q, sizeof(*p), BPRI_MED)))) {
+		if (likely(canputnext(tp->wq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = T_ADDR_REQ;
+			mp->b_wptr += sizeof(*p);
+			freemsg(msg);
+			strlog(tp->mid, tp->sid, SLLOGTX, SL_TRACE, "T_ADDR_REQ ->");
+			putnext(tp->wq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * t_capability_req: - issue a T_CAPABILITY_REQ primitive
+ * @tp: TP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @bits: flags
+ */
+static noinline fastcall int
+t_capability_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t bits)
+{
+	struct T_capability_req *p;
+	mblk_t *mp;
+
+	if (likely(!!(mp = sl_allocb(q, sizeof(*p), BPRI_MED)))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = N_BIND_REQ;
-		p->ADDR_length = alen;
-		p->ADDR_offset = sizeof(*p);
-		p->CONIND_number = 0;
-		p->BIND_flags = TOKEN_REQUEST;
-		p->PROTOID_offset = 0;
-		p->PROTOID_length = 0;
+		p->PRIM_type = T_CAPABILITY_REQ;
+		p->CAP_bits1 = bits;
 		mp->b_wptr += sizeof(*p);
-		bcopy(aptr, mp->b_wptr, alen);
-		mp->b_wptr += alen;
-		np_set_i_state(np, NS_WACK_BREQ);
 		freemsg(msg);
-		strlog(np->mid, np->sid, SLLOGTX, SL_TRACE, "N_BIND_REQ ->");
-		putnext(np->wq, mp);
+		strlog(tp->mid, tp->sid, SLLOGTX, SL_TRACE, "T_CAPABILITY_REQ ->");
+		putnext(tp->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
-
-/**
- * n_unbind_req - issued an N_UNBIND_REQ primitive
- * @np: NP private structure
- * @q: active queue
- * @msg: message to free upon success
- */
-static noinline fastcall int
-n_unbind_req(struct np *np, queue_t *q, mblk_t *msg)
-{
-	N_unbind_req_t *p;
-	mblk_t *mp;
-
-	if ((mp = np_allocb(q, sizeof(*p), BPRI_MED))) {
-		DB_TYPE(mp) = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = N_UNBIND_REQ;
-		mp->b_wptr += sizeof(*p);
-		np_set_i_state(np, NS_WACK_UREQ);
-		freemsg(msg);
-		strlog(np->mid, np->sid, SLLOGTX, SL_TRACE, "N_UNBIND_REQ ->");
-		putnext(np->wq, mp);
-		return (0);
-	}
-	return (-ENOBUFS);
-}
-
-#if 0
-/**
- * n_unitdata_req - issued an N_UNITDATA_REQ primitive
- * @np: NP private structure
- * @q: active queue
- * @msg: user data
- */
-static noinline fastcall int
-n_unitdata_req(struct np *np, queue_t *q, mblk_t *msg)
-{
-	N_unitdata_req_t *p;
-	mblk_t *mp;
-
-	if ((mp = np_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(np->wq)) {
-			DB_TYPE(mp) = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			p->PRIM_type = N_UNITDATA_REQ;
-			mp->b_wptr += sizeof(*p);
-			freemsg(msg);
-			strlog(np->mid, np->sid, SLLOGTX, SL_TRACE, "N_UNITDATA_REQ ->");
-			putnext(np->wq, mp);
-			return (0);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-#endif
-
-#if 0
-/**
- * n_optmgmt_req - issued an N_OPTMGMT_REQ primitive
- * @np: NP private structure
- * @q: active queue
- * @msg: message to free upon success
- */
-static noinline fastcall int
-n_optmgmt_req(struct np *np, queue_t *q, mblk_t *msg)
-{
-	N_optmgmt_req_t *p;
-	mblk_t *mp;
-
-	if ((mp = np_allocb(q, sizeof(*p), BPRI_MED))) {
-		DB_TYPE(mp) = M_PCPROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->PRIM_type = N_OPTMGMT_REQ;
-		mp->b_wptr += sizeof(*p);
-		freemsg(msg);
-		strlog(np->mid, np->sid, SLLOGTX, SL_TRACE, "N_OPTMGMT_REQ ->");
-		putnext(np->wq, mp);
-		return (0);
-	}
-	return (-ENOBUFS);
-}
-#endif
-
-#if 0
-/**
- * n_datack_req - issued an N_DATACK_REQ primitive
- * @np: NP private structure
- * @q: active queue
- * @msg: message to free upon success
- */
-static noinline fastcall int
-n_datack_req(struct np *np, queue_t *q, mblk_t *msg)
-{
-	N_datack_req_t *p;
-	mblk_t *mp;
-
-	if ((mp = np_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(np->wq)) {
-			DB_TYPE(mp) = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			p->PRIM_type = N_DATACK_REQ;
-			mp->b_wptr += sizeof(*p);
-			freemsg(msg);
-			strlog(np->mid, np->sid, SLLOGTX, SL_TRACE, "N_DATACK_REQ ->");
-			putnext(np->wq, mp);
-			return (0);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-#endif
-
-#if 0
-/**
- * n_reset_req - issued an N_RESET_REQ primitive
- * @np: NP private structure
- * @q: active queue
- * @msg: message to free upon success
- */
-static noinline fastcall int
-n_reset_req(struct np *np, queue_t *q, mblk_t *msg)
-{
-	N_reset_req_t *p;
-	mblk_t *mp;
-
-	if ((mp = np_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(np->wq)) {
-			DB_TYPE(mp) = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			p->PRIM_type = N_RESET_REQ;
-			mp->b_wptr += sizeof(*p);
-			freemsg(msg);
-			strlog(np->mid, np->sid, SLLOGTX, SL_TRACE, "N_RESET_REQ ->");
-			putnext(np->wq, mp);
-			return (0);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-#endif
-
-#if 0
-/**
- * n_reset_res - issued an N_RESET_RES primitive
- * @np: NP private structure
- * @q: active queue
- * @msg: message to free upon success
- */
-static noinline fastcall int
-n_reset_res(struct np *np, queue_t *q, mblk_t *msg)
-{
-	N_reset_res_t *p;
-	mblk_t *mp;
-
-	if ((mp = np_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canpuntext(np->wq)) {
-			DB_TYPE(mp) = M_PROTO;
-			p = (typeof(p)) mp->b_wptr;
-			p->PRIM_type = N_RESET_RES;
-			mp->b_wptr += sizeof(*p);
-			freemsg(msg);
-			strlog(np->mid, np->sid, SLLOGTX, SL_TRACE, "N_RESET_RES ->");
-			putnext(np->wq, mp);
-			return (0);
-		}
-		freeb(mp);
-		return (-EBUSY);
-	}
-	return (-ENOBUFS);
-}
-#endif
 
 /*
  *  M2UA-AS to M2UA-SG (Sent) M2UA Protocol Messages.
@@ -2371,8 +2541,8 @@ n_reset_res(struct np *np, queue_t *q, mblk_t *msg)
  */
 
 /**
- * np_send_mgmt_err: - send MGMT ERR message
- * @np: NP private structure
+ * tp_send_mgmt_err: - send MGMT ERR message
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  * @ecode: error code
@@ -2380,7 +2550,7 @@ n_reset_res(struct np *np, queue_t *q, mblk_t *msg)
  * @dlen: diagnostics length
  */
 static noinline fastcall __unlikely int
-np_send_mgmt_err(struct np *np, queue_t *q, mblk_t *msg, uint32_t ecode, caddr_t dptr, size_t dlen)
+tp_send_mgmt_err(struct tp *tp, queue_t *q, mblk_t *msg, uint32_t ecode, caddr_t dptr, size_t dlen)
 {
 	int err;
 	mblk_t *mp;
@@ -2388,7 +2558,7 @@ np_send_mgmt_err(struct np *np, queue_t *q, mblk_t *msg, uint32_t ecode, caddr_t
 	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_ECODE) + dlen ? UA_SIZE(UA_PARM_DIAG) +
 	    UA_PAD4(dlen) : 0;
 
-	if (likely((mp = np_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = sl_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_MGMT_ERR;
@@ -2401,8 +2571,9 @@ np_send_mgmt_err(struct np *np, queue_t *q, mblk_t *msg, uint32_t ecode, caddr_t
 			bcopy(dptr, p, dlen);
 		}
 		mp->b_wptr = (unsigned char *) p + UA_PAD4(dlen);
+
 		/* send unordered and expedited on management stream 0 */
-		if (unlikely((err = n_exdata_req(np, q, msg, 0, 0, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, T_ODF_EX, 0, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -2410,8 +2581,8 @@ np_send_mgmt_err(struct np *np, queue_t *q, mblk_t *msg, uint32_t ecode, caddr_t
 }
 
 /**
- * np_send_asps_aspup_req: - send ASP Up
- * @np: NP private structure
+ * tp_send_asps_aspup_req: - send ASP Up
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  * @aspid: ASP identifier if not NULL
@@ -2419,7 +2590,7 @@ np_send_mgmt_err(struct np *np, queue_t *q, mblk_t *msg, uint32_t ecode, caddr_t
  * @ilen: Info length
  */
 static fastcall int
-np_send_asps_aspup_req(struct np *np, queue_t *q, mblk_t *msg, uint32_t *aspid, caddr_t iptr,
+tp_send_asps_aspup_req(struct tp *tp, queue_t *q, mblk_t *msg, uint32_t *aspid, caddr_t iptr,
 		       size_t ilen)
 {
 	int err;
@@ -2428,7 +2599,7 @@ np_send_asps_aspup_req(struct np *np, queue_t *q, mblk_t *msg, uint32_t *aspid, 
 	    UA_MHDR_SIZE + aspid ? UA_SIZE(UA_PARM_ASPID) : 0 + ilen ? UA_PHDR_SIZE +
 	    UA_PAD4(ilen) : 0;
 
-	if (likely((mp = np_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = sl_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_ASPS_ASPUP_REQ;
@@ -2444,10 +2615,10 @@ np_send_asps_aspup_req(struct np *np, queue_t *q, mblk_t *msg, uint32_t *aspid, 
 			bcopy(iptr, p, ilen);
 		}
 		mp->b_wptr = (unsigned char *) p + UA_PAD4(ilen);
-		np_set_u_state(np, ASP_WACK_ASPUP);
-		mi_timer(np->aspup_ack, 2000);
+		tp_set_u_state(tp, ASP_WACK_ASPUP);
+		mi_timer(tp->aspup_ack, 2000);
 		/* send unordered and expedited on stream 0 */
-		if (unlikely((err = n_exdata_req(np, q, msg, 0, 0, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, T_ODF_EX, 0, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -2455,8 +2626,8 @@ np_send_asps_aspup_req(struct np *np, queue_t *q, mblk_t *msg, uint32_t *aspid, 
 }
 
 /**
- * np_send_asps_aspdn_req: = send ASP Down
- * @np: NP private structure
+ * tp_send_asps_aspdn_req: = send ASP Down
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  * @aspid: ASP identifier if not NULL
@@ -2464,7 +2635,7 @@ np_send_asps_aspup_req(struct np *np, queue_t *q, mblk_t *msg, uint32_t *aspid, 
  * @ilen: Info length
  */
 static fastcall int
-np_send_asps_aspdn_req(struct np *np, queue_t *q, mblk_t *msg, uint32_t *aspid, caddr_t iptr,
+tp_send_asps_aspdn_req(struct tp *tp, queue_t *q, mblk_t *msg, uint32_t *aspid, caddr_t iptr,
 		       size_t ilen)
 {
 	int err;
@@ -2473,7 +2644,7 @@ np_send_asps_aspdn_req(struct np *np, queue_t *q, mblk_t *msg, uint32_t *aspid, 
 	    UA_MHDR_SIZE + aspid ? UA_SIZE(UA_PARM_ASPID) : 0 + ilen ? UA_PHDR_SIZE +
 	    UA_PAD4(ilen) : 0;
 
-	if (likely((mp = np_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = sl_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_ASPS_ASPDN_REQ;
@@ -2489,10 +2660,10 @@ np_send_asps_aspdn_req(struct np *np, queue_t *q, mblk_t *msg, uint32_t *aspid, 
 			bcopy(iptr, p, ilen);
 		}
 		mp->b_wptr = (unsigned char *) p + UA_PAD4(ilen);
-		np_set_u_state(np, ASP_WACK_ASPDN);
-		mi_timer(np->aspdn_ack, 2000);
+		tp_set_u_state(tp, ASP_WACK_ASPDN);
+		mi_timer(tp->aspdn_ack, 2000);
 		/* send unordered and expedited on stream 0 */
-		if (unlikely((err = n_exdata_req(np, q, msg, 0, 0, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, T_ODF_EX, 0, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -2500,8 +2671,8 @@ np_send_asps_aspdn_req(struct np *np, queue_t *q, mblk_t *msg, uint32_t *aspid, 
 }
 
 /**
- * np_send_asps_hbeat_req: - send a BEAT message
- * @np: NP private structure
+ * tp_send_asps_hbeat_req: - send a BEAT message
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  * @hptr: heartbeat info pointer
@@ -2511,13 +2682,13 @@ np_send_asps_aspdn_req(struct np *np, queue_t *q, mblk_t *msg, uint32_t *aspid, 
  * therefore, sent on SCTP stream identifier 0 (management stream).
  */
 static fastcall int
-np_send_asps_hbeat_req(struct np *np, queue_t *q, mblk_t *msg, caddr_t hptr, size_t hlen)
+tp_send_asps_hbeat_req(struct tp *tp, queue_t *q, mblk_t *msg, caddr_t hptr, size_t hlen)
 {
 	int err;
 	mblk_t *mp;
 	size_t mlen = UA_MHDR_SIZE + (hlen ? UA_PHDR_SIZE + UA_PAD4(hlen) : 0);
 
-	if (likely((mp = np_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = sl_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_ASPS_HBEAT_REQ;
@@ -2528,9 +2699,9 @@ np_send_asps_hbeat_req(struct np *np, queue_t *q, mblk_t *msg, caddr_t hptr, siz
 			bcopy(hptr, p, hlen);
 		}
 		mp->b_wptr = (unsigned char *) p + UA_PAD4(hlen);
-		mi_timer(np->hbeat_tack, 2000);
+		mi_timer(tp->hbeat_tack, 2000);
 		/* send ordered on management stream 0 */
-		if (unlikely((err = n_data_req(np, q, msg, 0, 0, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, 0, 0, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -2568,7 +2739,7 @@ sl_send_asps_hbeat_req(struct sl *sl, queue_t *q, mblk_t *msg, caddr_t hptr, siz
 		mp->b_wptr = (unsigned char *) p + UA_PAD4(hlen);
 		mi_timer(sl->hbeat_tack, 2000);
 		/* send ordered on specified stream */
-		if (unlikely((err = n_data_req(sl->np, q, msg, 0, sl->iid, mp))))
+		if (unlikely((err = t_optdata_req(sl->tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -2621,7 +2792,7 @@ sl_send_aspt_aspac_req(struct sl *sl, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 		sl_set_u_state(sl, ASP_WACK_ASPAC);
 		mi_timer(sl->aspac_tack, 2000);
 		/* always sent on same stream as data */
-		if (unlikely((err = n_data_req(sl->np, q, msg, 0, sl->iid, mp))))
+		if (unlikely((err = t_optdata_req(sl->tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -2668,7 +2839,7 @@ sl_send_aspt_aspia_req(struct sl *sl, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 		sl_set_u_state(sl, ASP_WACK_ASPIA);
 		mi_timer(sl->aspia_tack, 2000);
 		/* always sent on same stream as data */
-		if (unlikely((err = n_data_req(sl->np, q, msg, 0, sl->iid, mp))))
+		if (unlikely((err = t_optdata_req(sl->tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -2710,7 +2881,7 @@ sl_send_rkmm_reg_req(struct sl *sl, queue_t *q, mblk_t *msg, uint32_t id, uint16
 		p += 9;
 		mp->b_wptr = (unsigned char *) p;
 
-		if (unlikely((err = n_exdata_req(sl->np, q, msg, 0, 0, mp))))
+		if (unlikely((err = t_optdata_req(sl->tp, q, msg, T_ODF_EX, 0, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -2740,7 +2911,7 @@ sl_send_rkmm_dereg_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p += 4;
 		mp->b_wptr = (unsigned char *) p;
 
-		if (unlikely((err = n_exdata_req(sl->np, q, msg, 0, 0, mp))))
+		if (unlikely((err = t_optdata_req(sl->tp, q, msg, T_ODF_EX, 0, mp))))
 			freeb(mp);
 		retrn(err);
 	}
@@ -2774,7 +2945,7 @@ sl_send_maup_data1(struct sl *sl, queue_t *q, mblk_t *msg, mblk_t *dp)
 		mp->b_wptr = (unsigned char *) p;
 
 		mp->b_cont = dp->b_cont;
-		if (unlikely((err = n_data_req(sl->np, q, msg, 0, sl->iid, mp))))
+		if (unlikely((err = t_optdata_req(sl->tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -2809,7 +2980,7 @@ sl_send_maup_data2(struct sl *sl, queue_t *q, mblk_t *msg, mblk_t *dp, uint8_t p
 		mp->b_wptr = (unsigned char *) p + 1;
 
 		mp->b_cont = dp->b_cont;
-		if (unlikely((err = n_data_req(sl->np, q, msg, 0, sl->iid, mp))))
+		if (unlikely((err = t_optdata_req(sl->tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -2841,7 +3012,7 @@ sl_send_maup_estab_req(struct sl *sl, queue_t *q, mblk_t *msg)
 
 		sl_set_l_state(sl, DL_OUTCON_PENDING);
 
-		if (unlikely((err = n_data_req(sl->np, q, msg, 0, sl->iid, mp))))
+		if (unlikely((err = t_optdata_req(sl->tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -2893,7 +3064,7 @@ sl_send_maup_rel_req(struct sl *sl, queue_t *q, mblk_t *msg)
 			break;
 		}
 
-		if (unlikely((err = n_data_req(sl->np, q, msg, 0, sl->iid, mp))))
+		if (unlikely((err = t_optdata_req(sl->tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -2927,7 +3098,7 @@ sl_send_maup_state_req(struct sl *sl, queue_t *q, mblk_t *msg, const uint32_t re
 		p += 6;
 		mp->b_wptr = (unsigned char *) p;
 
-		if (unlikely((err = n_data_req(sl->np, q, msg, 0, sl->iid, mp))))
+		if (unlikely((err = t_optdata_req(sl->tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -2969,7 +3140,7 @@ sl_send_maup_retr_req(struct sl *sl, queue_t *q, mblk_t *msg, uint32_t *fsnc)
 		}
 		mp->b_wptr = (unsigned char *) p;
 
-		if (unlikely((err = n_data_req(sl->np, q, msg, 0, sl->iid, mp))))
+		if (unlikely((err = t_optdata_req(sl->tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -3004,7 +3175,7 @@ sl_send_maup_data_ack(struct sl *sl, queue_t *q, mblk_t *msg, uint32_t corid)
 		p += 6;
 		mp->b_wptr = (unsigned char *) p;
 
-		if (unlikely((err = n_data_req(sl->np, q, msg, 0, sl->iid, mp))))
+		if (unlikely((err = t_optdata_req(sl->tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -3028,13 +3199,13 @@ sl_recv_mgmt_err(struct sl *sl, queue_t *q, mblk_t *mp)
 }
 
 /**
- * np_recv_mgmt_err: - receive MGMT ERR message
- * @np: NP private structure
+ * tp_recv_mgmt_err: - receive MGMT ERR message
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-np_recv_mgmt_err(struct np *np, queue_t *q, mblk_t *mp)
+tp_recv_mgmt_err(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 }
 
@@ -3050,24 +3221,24 @@ sl_recv_mgmt_ntfy(struct sl *sl, queue_t *q, mblk_t *mp)
 }
 
 /**
- * np_recv_mgmt_ntfy: - receive MGMT NTFY message
- * @np: NP private structure
+ * tp_recv_mgmt_ntfy: - receive MGMT NTFY message
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-np_recv_mgmt_ntfy(struct np *np, queue_t *q, mblk_t *mp)
+tp_recv_mgmt_ntfy(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 }
 
 /**
- * np_recv_asps_hbeat_req: - process BEAT Request
- * @np: NP private structure
+ * tp_recv_asps_hbeat_req: - process BEAT Request
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-np_recv_asps_hbeat_req(struct np *np, queue_t *q, mblk_t *mp)
+tp_recv_asps_hbeat_req(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm iid, hbeat;
 
@@ -3076,35 +3247,35 @@ np_recv_asps_hbeat_req(struct np *np, queue_t *q, mblk_t *mp)
 	if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &iid, UA_PARM_IID)) {
 		struct sl *sl;
 
-		for (sl = np->list; sl; sl = sl->next)
+		for (sl = tp->list; sl; sl = sl->next)
 			if (sl->iid == iid.val)
 				break;
 		if (sl != NULL)
 			return sl_send_asps_hbeat_ack(sl, q, mp, hbeat.cp, hbeat.len);
 	}
 	/* process as normal */
-	return np_send_asps_hbeat_ack(np, q, mp, hbeat.cp, hbeat.len);
+	return tp_send_asps_hbeat_ack(tp, q, mp, hbeat.cp, hbeat.len);
 }
 
 /**
- * np_recv_asps_aspup_ack: - process ASP Up Ack message
- * @np: NP private structure
+ * tp_recv_asps_aspup_ack: - process ASP Up Ack message
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-np_recv_asps_aspup_ack(struct np *np, queue_t *q, mblk_t *mp)
+tp_recv_asps_aspup_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 }
 
 /**
- * np_recv_asps_aspdn_ack: - process ASP Down Ack message
- * @np: NP private structure
+ * tp_recv_asps_aspdn_ack: - process ASP Down Ack message
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-np_recv_asps_aspdn_ack(struct np *np, queue_t *q, mblk_t *mp)
+tp_recv_asps_aspdn_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 }
 
@@ -3120,13 +3291,13 @@ sl_recv_asps_hbeat_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 }
 
 /**
- * np_recv_asps_hbeat_ack: - receive BEAT Ack message
- * @np: NP private structure
+ * tp_recv_asps_hbeat_ack: - receive BEAT Ack message
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-np_recv_asps_hbeat_ack(struct np *np, queue_t *q, mblk_t *mp)
+tp_recv_asps_hbeat_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 }
 
@@ -3142,13 +3313,13 @@ sl_recv_aspt_aspac_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 }
 
 /**
- * np_recv_apsac_ack: - receive ASPAC Ack message
- * @np: NP private structure
+ * tp_recv_apsac_ack: - receive ASPAC Ack message
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-np_recv_aspt_aspac_ack(struct sl *sl, queue_t *q, mblk_t *mp)
+tp_recv_aspt_aspac_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 }
 
@@ -3164,13 +3335,13 @@ sl_recv_aspt_aspia_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 }
 
 /**
- * np_recv_aspt_apia_ack: - receive ASPIA Ack message
- * @np: NP private structure
+ * tp_recv_aspt_apia_ack: - receive ASPIA Ack message
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-np_recv_aspt_aspia_ack(struct sl *sl, queue_t *q, mblk_t *mp)
+tp_recv_aspt_aspia_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 }
 
@@ -3656,25 +3827,25 @@ sl_recv_err(struct sl *sl, queue_t *q, mblk_t *mp, int err)
 }
 
 /**
- * np_recv_mgmt: - receive MGMT message
- * @np: NP private structure
+ * tp_recv_mgmt: - receive MGMT message
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-np_recv_mgmt(struct np *np, queue_t *q, mblk_t *mp)
+tp_recv_mgmt(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	register uint32_t *p = (typeof(p)) mp->b_rptr;
 	int err;
 
 	switch (UA_MSG_TYPE(p[0])) {
 	case UA_MGMT_ERR:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "ERR <-");
-		err = np_recv_mgmt_err(np, q, mp);
+		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "ERR <-");
+		err = tp_recv_mgmt_err(tp, q, mp);
 		break;
 	case UA_MGMT_NTFY:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "NTFY <-");
-		err = np_recv_mgmt_ntfy(np, q, mp);
+		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "NTFY <-");
+		err = tp_recv_mgmt_ntfy(tp, q, mp);
 		break;
 	default:
 		err = (-EOPNOTSUPP);
@@ -3685,32 +3856,32 @@ np_recv_mgmt(struct np *np, queue_t *q, mblk_t *mp)
 
 /**
  * snp_recv_asps: - receive ASPS message
- * @np: NP private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-np_recv_asps(struct np *np, queue_t *q, mblk_t *mp)
+tp_recv_asps(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	register uint32_t *p = (typeof(p)) mp->b_rptr;
 	int err;
 
 	switch (UA_MSG_TYPE(p[0])) {
 	case UA_ASPS_HBEAT_REQ:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "BEAT <-");
-		err = np_recv_asps_hbeat_req(np, q, mp);
+		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "BEAT <-");
+		err = tp_recv_asps_hbeat_req(tp, q, mp);
 		break;
 	case UA_ASPS_ASPUP_ACK:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "ASPUP Ack <-");
-		err = np_recv_asps_aspup_ack(np, q, mp);
+		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "ASPUP Ack <-");
+		err = tp_recv_asps_aspup_ack(tp, q, mp);
 		break;
 	case UA_ASPS_ASPDN_ACK:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "ASPDN Ack <-");
-		err = np_recv_asps_aspdn_ack(np, q, mp);
+		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "ASPDN Ack <-");
+		err = tp_recv_asps_aspdn_ack(tp, q, mp);
 		break;
 	case UA_ASPS_HBEAT_ACK:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "BEAT Ack <-");
-		err = np_recv_asps_hbeat_ack(np, q, mp);
+		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "BEAT Ack <-");
+		err = tp_recv_asps_hbeat_ack(tp, q, mp);
 		break;
 	default:
 		err = (-EOPNOTSUPP);
@@ -3720,8 +3891,8 @@ np_recv_asps(struct np *np, queue_t *q, mblk_t *mp)
 }
 
 /**
- * np_recv_aspt - receive ASPT message
- * @np: NP private structure
+ * tp_recv_aspt - receive ASPT message
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  *
@@ -3731,7 +3902,7 @@ np_recv_asps(struct np *np, queue_t *q, mblk_t *mp)
  * acknowledgement applies.
  */
 static int
-np_recv_aspt(struct np *np, queue_t *q, mblk_t *mp)
+tp_recv_aspt(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	register uint32_t *p = (typeof(p)) mp->b_rptr;
 	struct ua_parm iid = { {NULL,}, };
@@ -3740,7 +3911,7 @@ np_recv_aspt(struct np *np, queue_t *q, mblk_t *mp)
 	if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &status, UA_PARM_IID)) {
 		struct sl *sl;
 
-		for (sl = np->list; sl; sl = sl->next)
+		for (sl = tp->list; sl; sl = sl->next)
 			if (sl->iid == iid.val)
 				break;
 		if (sl == NULL)
@@ -3748,12 +3919,12 @@ np_recv_aspt(struct np *np, queue_t *q, mblk_t *mp)
 
 		switch (UA_MSG_TYPE(p[0])) {
 		case UA_ASPT_ASPAC_ACK:
-			strlog(np->mid, np->sdi, SLLOGRX, SL_TRACE, "ASPAC Ack <-");
-			err = np_recv_aspt_aspac_ack(np, q, mp);
+			strlog(tp->mid, tp->sdi, SLLOGRX, SL_TRACE, "ASPAC Ack <-");
+			err = tp_recv_aspt_aspac_ack(tp, q, mp);
 			break;
 		case UA_ASPT_ASPIA_ACK:
-			strlog(np->mid, np->sdi, SLLOGRX, SL_TRACE, "ASPIA Ack <-");
-			err = np_recv_aspt_aspia_ack(np, q, mp);
+			strlog(tp->mid, tp->sdi, SLLOGRX, SL_TRACE, "ASPIA Ack <-");
+			err = tp_recv_aspt_aspia_ack(tp, q, mp);
 			break;
 		default:
 			err = (-EOPNOTSUPP);
@@ -3765,13 +3936,13 @@ np_recv_aspt(struct np *np, queue_t *q, mblk_t *mp)
 }
 
 /**
- * np_recv_maup: - receive MAUP message
- * @np: NP private structure
+ * tp_recv_maup: - receive MAUP message
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-np_recv_maup(struct np *np, queue_t *q, mblk_t *mp)
+tp_recv_maup(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	register uint32_t *p = (typeof(p)) mp->b_rptr;
 	struct ua_parm iid = { {NULL,}, };
@@ -3780,7 +3951,7 @@ np_recv_maup(struct np *np, queue_t *q, mblk_t *mp)
 	if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &iid, UA_PARM_IID)) {
 		struct sl *sl;
 
-		for (sl = np->list; sl; sl = sl->next)
+		for (sl = tp->list; sl; sl = sl->next)
 			if (sl->iid == iid.val)
 				break;
 		if (sl == NULL)
@@ -3841,8 +4012,8 @@ np_recv_maup(struct np *np, queue_t *q, mblk_t *mp)
 }
 
 /**
- * np_recv_rkmm - receive RKMM message from SG
- * @np: NP private structure
+ * tp_recv_rkmm - receive RKMM message from SG
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: RKMM message
  *
@@ -3853,7 +4024,7 @@ np_recv_maup(struct np *np, queue_t *q, mblk_t *mp)
  * with the same request identifier.
  */
 static int
-np_recv_rkmm(struct np *np, queue_t *q, mblk_t *mp)
+tp_recv_rkmm(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	register uint32_t *p = (typeof(p)) mp->b_rptr;
 	struct sl *sl;
@@ -3861,7 +4032,7 @@ np_recv_rkmm(struct np *np, queue_t *q, mblk_t *mp)
 
 	/* FIXME: mesasge can contain multiple registration results (but probably won't) */
 	for (each_registration_result) {
-		for (sl = np->list; sl; sl = sl->next)
+		for (sl = tp->list; sl; sl = sl->next)
 			if (sl->id == request_id)
 				break;
 		if (sl == NULL)
@@ -3892,13 +4063,13 @@ np_recv_rkmm(struct np *np, queue_t *q, mblk_t *mp)
 }
 
 /**
- * np_recv_msg_slow: - receive message (slow path)
- * @np: NP private structure
+ * tp_recv_msg_slow: - receive message (slow path)
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static noinline fastcall int
-np_recv_msg_slow(struct np *np, queue_t *q, mblk_t *mp)
+tp_recv_msg_slow(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	register uint32_t *p = (typeof(p)) mp->b_rptr;
 	int err = -EMSGSIZE;
@@ -3909,19 +4080,19 @@ np_recv_msg_slow(struct np *np, queue_t *q, mblk_t *mp)
 		goto error;
 	switch (UA_MSG_CLAS(p[0])) {
 	case UA_CLASS_MGMT:
-		err = np_recv_mgmt(np, q, mp);
+		err = tp_recv_mgmt(tp, q, mp);
 		break;
 	case UA_CLASS_ASPS:
-		err = np_recv_asps(np, q, mp);
+		err = tp_recv_asps(tp, q, mp);
 		break;
 	case UA_CLASS_ASPT:
-		err = np_recv_aspt(np, q, mp);
+		err = tp_recv_aspt(tp, q, mp);
 		break;
 	case UA_CLASS_MAUP:
-		err = np_recv_maup(np, q, mp);
+		err = tp_recv_maup(tp, q, mp);
 		break;
 	case UA_CLASS_RKMM:
-		err = np_recv_rkmm(np, q, mp);
+		err = tp_recv_rkmm(tp, q, mp);
 		break;
 	default:
 		err = -ENOPROTOOPT;
@@ -3930,17 +4101,17 @@ np_recv_msg_slow(struct np *np, queue_t *q, mblk_t *mp)
 	if (err == 0)
 		return (0);
       error:
-	return np_recv_err(np, q, mp, err);
+	return tp_recv_err(tp, q, mp, err);
 }
 
 /**
- * np_recv_msg: - receive message (fast path)
- * @np: NP private structure
+ * tp_recv_msg: - receive message (fast path)
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message (just the M2UA part)
  */
 static inline fastcall int
-np_recv_msg(struct np *np, queue_t *q, mblk_t *mp)
+tp_recv_msg(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	uint32_t *p = (typeof(p)) mp->b_rptr;
 	int err;
@@ -3950,11 +4121,11 @@ np_recv_msg(struct np *np, queue_t *q, mblk_t *mp)
 		if (mp->b_wptr >= mp->b_rptr + ntohl(p[1]))
 			if (UA_MSG_CLAS(p[0]) = UA_CLASS_MAUP)
 				if (UA_MSG_TYPE(p[0]) == M2UA_MAUP_DATA) {
-					if ((err = np_recv_maup_data(np, q, mp)) == 0)
+					if ((err = tp_recv_maup_data(tp, q, mp)) == 0)
 						return (0);
-					return np_recv_err(np, q, mp, err);
+					return tp_recv_err(tp, q, mp, err);
 				}
-	return np_recv_msg_slow(np, q, mp);
+	return tp_recv_msg_slow(tp, q, mp);
 }
 
 /*
@@ -3996,14 +4167,14 @@ lmi_info_req(struct sl *sl, queue_t *q, mblk_t *mp)
  * Data Link Identifier), the later of which could simply by a CIC.  Also, an exended PPA can be
  * used, consisting of the 4 byte PPA just mentioned, followed by a sockaddr_storage structure
  * containing the local IP address(es) to which to bind.  When no local IP address(es) are specified
- * and the NS-Provider is unbound, the NS-Provider can be requested to assign IP address(es) to the
+ * and the TS-Provider is unbound, the TS-Provider can be requested to assign IP address(es) to the
  * connection.
  */
 static noinline fastcall int
 lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	lmi_attach_req_t *p = (typeof(p)) mp->b_rptr;
-	struct np *np;
+	struct tp *tp;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p) + sizeof(uint32_t))
 		goto tooshort;
@@ -4011,22 +4182,22 @@ lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto outstate;
 	/* FIXME: the first 4 bytes of the PPA should be an ASPID (set to zero when ASPID not
 	   required) and the remainder should be a sockaddr_storage structure, or just an ASPID, or
-	   nothing at all.  Also, if the NS-provider is already bound, complete the operation.  If
-	   that NS-privder is already connected, send an ASP Up request with the ASPID from the
+	   nothing at all.  Also, if the TS-provider is already bound, complete the operation.  If
+	   that TS-privder is already connected, send an ASP Up request with the ASPID from the
 	   attach request. */
-	if ((np = sl->np)) {
-		switch (np_get_i_state(np)) {
-		case NS_UNBND:
+	if ((tp = sl->tp)) {
+		switch (tp_get_i_state(tp)) {
+		case TS_UNBND:
 			sl_set_i_state(sl, LMI_ATTACH_PENDING);
 			sl->ppa = *(uint32_t *) &p->lmi_ppa[0];
-			return n_bind_req(np, q, mp, (caddr_t) &p->lmi_ppa[0],
+			return t_bind_req(tp, q, mp, (caddr_t) &p->lmi_ppa[0],
 					  mp->b_wptr - mp->b_rptr - sizeof(*p) - sizeof(uint32_t));
-		case NS_IDLE:
+		case TS_IDLE:
 			sl_set_i_state(sl, LMI_ATTACH_PENDING);
 			return lmi_ok_ack(sl, q, mp, LMI_ATTACH_REQ);
-		case NS_WCON_CREQ:
-		case NS_WACK_CRES:
-		case NS_DATA_XFER:
+		case TS_WCON_CREQ:
+		case TS_WACK_CRES:
+		case TS_DATA_XFER:
 			/* FIXME: send an ASP Up first. */
 			sl_set_i_state(sl, LMI_ATTACH_PENDING);
 			return lmi_ok_ack(sl, q, mp, LMI_ATTACH_REQ);
@@ -4051,14 +4222,14 @@ static noinline fastcall int
 lmi_detach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	lmi_detach_req_t *p = (typeof(p)) mp->b_rptr;
-	struct np *np = sl->np;
+	struct tp *tp = sl->tp;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto tooshort;
 	if (sl_get_i_state(sl) != LMI_DISABLED)
 		goto outstate;
 	sl_set_i_state(sl, LMI_DISABLE_PENDING);
-	switch (np_get_u_state(np)) {
+	switch (tp_get_u_state(tp)) {
 	case ASP_DOWN:
 	case ASP_WACK_ASPDN:
 	case ASP_WACK_ASPUP:
@@ -4113,17 +4284,17 @@ static noinline fastcall int
 lmi_enable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
-	struct np *np = sl->np;
+	struct tp *tp = sl->tp;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto tooshort;
 	if (sl_get_i_state(sl) != LMI_DISABLED)
 		goto outstate;
 	sl_set_i_state(sl, LMI_ENABLE_PENDING);
-	switch (np_get_u_state(np)) {
+	switch (tp_get_u_state(tp)) {
 	case ASP_DOWN:
-		np_set_u_state(np, ASP_WACK_ASPUP);
-		return np_send_asps_aspup_req(np, q, mp, &np->aspid, NULL, 0);
+		tp_set_u_state(tp, ASP_WACK_ASPUP);
+		return tp_send_asps_aspup_req(tp, q, mp, &tp->aspid, NULL, 0);
 	case ASP_WACK_ASPDN:
 	default:
 		goto unspec;
@@ -4168,7 +4339,7 @@ lmi_disable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (sl_get_i_state(sl) != LMI_ENABLED)
 		goto oustate;
 	sl_set_i_state(sl, LMI_DISABLE_PENDING);
-	switch (np_get_u_state(np)) {
+	switch (tp_get_u_state(tp)) {
 	case ASP_DOWN:
 	case ASP_WACK_ASPDN:
 	case ASP_WACK_ASPUP:
@@ -4227,7 +4398,7 @@ sl_pdu_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (sl_get_l_state(sl) != DL_DATAXFER)
 		goto outstate;
 	mp->b_cont = NULL;
-	if (data1) {
+	if ((sl->option.pvar & SS7_PVAR_MASK) != SS7_PVAR_JTTC) {
 		if ((err = sl_send_maup_data1(sl, q, mp, dp)) != 0)
 			mp->b_cont = dp;
 	} else {
@@ -4677,12 +4848,12 @@ sl_w_data(queue_t *q, mblk_t *mp)
 	uint8_t pri;
 	int err;
 
-	if (!np_trylock(np, q))
+	if (!tp_trylock(tp, q))
 		return (-EDEADLK);
 
 	if (sl_get_l_state(sl) != DL_DATAXFER)
 		goto outstate;
-	if (data1) {
+	if ((sl->option.pvar & SS7_PVAR_MASK) != SS7_PVAR_JTTC) {
 		err = sl_send_maup_data1(sl, q, NULL, mp);
 	} else {
 		pri = mp->b_rptr++;
@@ -4690,7 +4861,7 @@ sl_w_data(queue_t *q, mblk_t *mp)
 			mp->b_rptr--;
 	}
 
-	np_unlock(np);
+	tp_unlock(tp);
 	return (err);
 }
 
@@ -4712,13 +4883,13 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 		return (0);
 	}
 
-	if (!np_trylock(sl->np, q))
+	if (!tp_trylock(sl->tp, q))
 		return (-EDEADLK);
 
 	old_i_state = sl_get_i_state(sl);
 	old_u_state = sl_get_u_state(sl);
-	old_n_state = np_get_i_state(sl->np);
-	old_a_state = np_get_u_state(sl->np);
+	old_n_state = tp_get_i_state(sl->tp);
+	old_a_state = tp_get_u_state(sl->tp);
 
 	switch (*(uint32_t *) mp->b_rptr) {
 	case LMI_INFO_REQ:
@@ -4827,10 +4998,10 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 	if (rtn < 0) {
 		sl_set_i_state(sl, old_i_state);
 		sl_set_u_state(sl, old_u_state);
-		np_set_i_state(sl->np, old_n_state);
-		np_set_u_state(sl->np, old_a_state);
+		tp_set_i_state(sl->tp, old_n_state);
+		tp_set_u_state(sl->tp, old_a_state);
 	}
-	np_unlock(sl->np);
+	tp_unlock(sl->tp);
 	return (rtn);
 }
 
@@ -4857,7 +5028,7 @@ sl_w_ctl(queue_t *q, mblk_t *mp)
  * @q: active queue (upper write queue)
  * @mp: the message
  *
- * For I_(P)LINK and I_(P)UNLINK operations, the np structure was already allocated when the upper
+ * For I_(P)LINK and I_(P)UNLINK operations, the tp structure was already allocated when the upper
  * stream was opened on the multiplexing driver.  We simply attach or detach the linked queue pair
  * from the structure.  There are some other input-output controls for configuration that we need ot
  * handle later, but we just return EINVAL for any other input-output control for now.
@@ -4879,19 +5050,19 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 		case I_LINK:
 		{
 			struct linkblk *l;
-			struct np *np = sl->np;
+			struct tp *tp = sl->tp;
 
-			if (!mp->b_cont || np->wq != NULL)
+			if (!mp->b_cont || tp->wq != NULL)
 				break;
 
 			l = (typeof(l)) mp->b_cont->b_rptr;
 
-			np_lock(np);
-			np->index = l->l_index;
-			np->rq = RD(l->l_qtop);
-			np->wq = l->l_qtop;
-			np->rq->q_ptr = np->wq->q_ptr = (void *) np;
-			np_unlock(np);
+			tp_lock(tp);
+			tp->index = l->l_index;
+			tp->rq = RD(l->l_qtop);
+			tp->wq = l->l_qtop;
+			tp->rq->q_ptr = tp->wq->q_ptr = (void *) tp;
+			tp_unlock(tp);
 			mi_copy_done(q, mp, 0);
 			return (0);
 		}
@@ -4899,21 +5070,21 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 		case I_UNLINK:
 		{
 			struct linkblk *l;
-			struct np *np = sl->np;
+			struct tp *tp = sl->tp;
 
 			if (!mp->b_cont)
 				break;
 
 			l = (typeof(l)) mp->b_cont->b_rptr;
 
-			if (np->index != l->l_index)
+			if (tp->index != l->l_index)
 				break;
 
-			np_lock(np);
-			np->rq->q_ptr = np->wq->q_ptr = NULL;
-			np->rq = np->wq = NULL;
-			np->index = 0;
-			np_unlock(np);
+			tp_lock(tp);
+			tp->rq->q_ptr = tp->wq->q_ptr = NULL;
+			tp->rq = tp->wq = NULL;
+			tp->index = 0;
+			tp_unlock(tp);
 			mi_copy_done(q, mp, 0);
 			return (0);
 		}
@@ -4932,19 +5103,21 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 		case SL_IOC_MAGIC:
 			switch (_IOC_NR(ioc->ioc_cmd)) {
 			case _IOC_NR(SL_IOCGOPTIONS):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(lmi_option_t), 1))) {
+				if ((dp =
+				     mi_copyout_alloc(q, mp, NULL, sizeof(struct lmi_option), 1))) {
 					spin_lock_m2ua(sl);
-					*(lmi_option_t *)dp->b_rptr = sl->option;
+					*(struct lmi_option *) dp->b_rptr = sl->option;
 					spin_unlock_m2ua(sl);
 					mi_copyout(q, mp);
 				}
 				return (0);
 			case _IOC_NR(SL_IOCSOPTIONS):
-				mi_copyin(q, mp, NULL, sizeof(lmi_option_t));
+				mi_copyin(q, mp, NULL, sizeof(struct lmi_option));
 				return (0);
 			case _IOC_NR(SL_IOCGCONFIG):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(sl_config_t), 1))) {
-					sl_config_t *arg = (sl_config_t *)dp->b_rptr;
+				if ((dp =
+				     mi_copyout_alloc(q, mp, NULL, sizeof(struct sl_config), 1))) {
+					struct sl_config *arg = (struct sl_config *) dp->b_rptr;
 
 					spin_lock_m2ua(sl);
 					*arg = sl->sl.config;
@@ -4966,13 +5139,14 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 			case _IOC_NR(SL_IOCSCONFIG):
 			case _IOC_NR(SL_IOCTCONFIG):
 			case _IOC_NR(SL_IOCCCONFIG):
-				mi_copyin(q, mp, NULL, sizeof(sl_config_t));
+				mi_copyin(q, mp, NULL, sizeof(struct sl_config));
 				return (0);
 			case _IOC_NR(SL_IOCGSTATEM):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(sl_statem_t), 1))) {
+				if ((dp =
+				     mi_copyout_alloc(q, mp, NULL, sizeof(struct sl_statem), 1))) {
 					spin_lock_m2ua(sl);
 					sl_iocgstatem(sl, q, dp);
-					*(sl_statem_t *)dp->b_rptr = sl->sl.statem;
+					*(struct sl_statem *) dp->b_rptr = sl->sl.statem;
 					spin_unlock_m2ua(sl);
 					mi_copyout(q, mp);
 				}
@@ -4984,20 +5158,22 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 				mi_copy_done(q, mp, 0);
 				return (0);
 			case _IOC_NR(SL_IOCGSTATSP):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(sl_stats_t), 1))) {
+				if ((dp =
+				     mi_copyout_alloc(q, mp, NULL, sizeof(struct sl_stats), 1))) {
 					spin_lock_m2ua(sl);
-					*(sl_stats_t *)dp->b_rptr = sl->sl.statsp;
+					*(struct sl_stats *) dp->b_rptr = sl->sl.statsp;
 					spin_unlock_m2ua(sl);
 					mi_copyout(q, mp);
 				}
 				return (0);
 			case _IOC_NR(SL_IOCSSTATSP):
-				mi_copyin(q, mp, NULL, sizeof(sl_stats_t));
+				mi_copyin(q, mp, NULL, sizeof(struct sl_stats));
 				return (0);
 			case _IOC_NR(SL_IOCGSTATS):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(sl_stats_t), 1))) {
+				if ((dp =
+				     mi_copyout_alloc(q, mp, NULL, sizeof(struct sl_stats), 1))) {
 					spin_lock_m2ua(sl);
-					*(sl_stats_t *)dp->b_rptr = sl->sl.stats;
+					*(struct sl_stats *) dp->b_rptr = sl->sl.stats;
 					spin_unlock_m2ua(sl);
 					mi_copyout(q, mp);
 				}
@@ -5009,16 +5185,17 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 				mi_copy_done(q, mp, 0);
 				return (0);
 			case _IOC_NR(SL_IOCGNOTIFY):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(sl_notify_t), 1))) {
+				if ((dp =
+				     mi_copyout_alloc(q, mp, NULL, sizeof(struct sl_notify), 1))) {
 					spin_lock_m2ua(sl);
-					*(sl_notify_t *)dp->b_rptr = sl->sl.notify;
+					*(struct sl_notify *) dp->b_rptr = sl->sl.notify;
 					spin_unlock_m2ua(sl);
 					mi_copyout(q, mp);
 				}
 				return (0);
 			case _IOC_NR(SL_IOCSNOTIFY):
 			case _IOC_NR(SL_IOCCNOTIFY):
-				mi_copyin(q, mp, NULL, sizeof(sl_notify_t));
+				mi_copyin(q, mp, NULL, sizeof(struct sl_notify));
 				return (0);
 			default:
 				mi_copy_done(q, mp, EOPNOTSUPP);
@@ -5028,20 +5205,22 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 		case SDT_IOC_MAGIC:
 			switch (_IOC_NR(ioc->ioc_cmd)) {
 			case _IOC_NR(SDT_IOCGOPTIONS):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(lmi_option_t), 1))) {
+				if ((dp =
+				     mi_copyout_alloc(q, mp, NULL, sizeof(struct lmi_option), 1))) {
 					spin_lock_m2ua(sl);
-					*(lmi_option_t *)dp->b_rptr = sl->option;
+					*(struct lmi_option *) dp->b_rptr = sl->option;
 					spin_unlock_m2ua(sl);
 					mi_copyout(q, mp);
 				}
 				return (0);
 			case _IOC_NR(SDT_IOCSOPTIONS):
-				mi_copyin(q, mp, NULL, sizeof(lmi_option_t));
+				mi_copyin(q, mp, NULL, sizeof(struct lmi_option));
 				return (0);
 			case _IOC_NR(SDT_IOCGCONFIG):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(sdt_config_t), 1))) {
+				if ((dp =
+				     mi_copyout_alloc(q, mp, NULL, sizeof(struct sdt_config), 1))) {
 					spin_lock_m2ua(sl);
-					*(sdt_config_t *)dp->b_rptr = sl->sdt.config;
+					*(struct sdt_config *) dp->b_rptr = sl->sdt.config;
 					spin_unlock_m2ua(sl);
 					mi_copyout(q, mp);
 				}
@@ -5052,57 +5231,15 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 				mi_copyin(q, mp, NULL, sizeof(sdt_option_t));
 				return (0);
 			case _IOC_NR(SDT_IOCGSTATEM):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(sdt_statem_t), 1))) {
-					spin_lock_m2ua(sl);
-					*(sdt_statem_t *)dp->b_rptr = sl->sdt.statem;
-					spin_unlock_m2ua(sl);
-					mi_copyout(q, mp);
-				}
-				return (0);
 			case _IOC_NR(SDT_IOCCMRESET):
-				spin_lock_m2ua(sl);
-				bzero(&sl->sdt.statem, sizeof(sl->sdt.statem));
-				spin_unlock_m2ua(sl);
-				mi_copy_done(q, mp, 0);
-				return (0);
 			case _IOC_NR(SDT_IOCGSTATSP):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(sdt_stats_t), 1))) {
-					spin_lock_m2ua(sl);
-					*(sdt_stats_t *)dp->b_rptr = sl->sdt.statsp;
-					spin_unlock_m2ua(sl);
-					mi_copyout(q, mp);
-				}
-				return (0);
 			case _IOC_NR(SDT_IOCSSTATSP):
-				mi_copyin(q, mp, NULL, sizeof(sdt_stats_t));
-				return (0);
 			case _IOC_NR(SDT_IOCGSTATS):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(sl_stats_t), 1))) {
-					spin_lock_m2ua(sl);
-					*(sdt_stats_t *)dp->b_rptr = sl->sdt_stats;
-					spin_unlock_m2ua(sl);
-					mi_copyout(q, mp);
-				}
-				return (0);
 			case _IOC_NR(SDT_IOCCSTATS):
-				spin_lock_m2ua(sl);
-				bzero(&sl->sdt.stats, sizeof(sl->sdt.stats));
-				spin_unlock_m2ua(sl);
-				mi_copy_done(q, mp, 0);
-				return (0);
 			case _IOC_NR(SDT_IOCGNOTIFY):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(sdt_notify_t), 1))) {
-					spin_lock_m2ua(sl);
-					*(sdt_notify_t *)dp->b_rptr = sl->sdt.notify;
-					spin_unlock_m2ua(sl);
-					mi_copyout(q, mp);
-				}
-				return (0);
 			case _IOC_NR(SDT_IOCSNOTIFY):
 			case _IOC_NR(SDT_IOCCNOTIFY):
 			case _IOC_NR(SDT_IOCCABORT):
-				mi_copyin(q, mp, NULL, sizeof(sdt_notify_t));
-				return (0);
 			default:
 				mi_copy_done(q, mp, EOPNOTSUPP);
 				return (0);
@@ -5111,20 +5248,21 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 		case SDL_IOC_MAGIC:
 			switch (_IOC_NR(ioc->ioc_cmd)) {
 			case _IOC_NR(SDL_IOCGOPTIONS):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(lmi_option+t), 1))) {
+				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(lmi_option + t), 1))) {
 					spin_lock_m2ua(sl);
-					*(lmi_option_t *)dp->b_rptr = sl->option;
+					*(struct lmi_option *) dp->b_rptr = sl->option;
 					spin_unlock_m2ua(sl);
 					mi_copyout(q, mp);
 				}
 				return (0);
 			case _IOC_NR(SDL_IOCSOPTIONS):
-				mi_copyin(q, mp, NULL, sizeof(lmi_option_t));
+				mi_copyin(q, mp, NULL, sizeof(struct lmi_option));
 				return (0);
 			case _IOC_NR(SDL_IOCGCONFIG):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(sdl_config_t), 1))) {
+				if ((dp =
+				     mi_copyout_alloc(q, mp, NULL, sizeof(struct sdl_config), 1))) {
 					spin_lock_m2ua(sl);
-					*(sdl_config_t *)dp->b_rptr = sl->sdl.config;
+					*(struct sdl_config *) dp->b_rptr = sl->sdl.config;
 					spin_unlock_m2ua(sl);
 					mi_copyout(q, mp);
 				}
@@ -5132,34 +5270,12 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 			case _IOC_NR(SDL_IOCSCONFIG):
 			case _IOC_NR(SDL_IOCTCONFIG):
 			case _IOC_NR(SDL_IOCCCONFIG):
-				mi_copyin(q, mp, NULL, sizeof(sdl_config_t));
+				mi_copyin(q, mp, NULL, sizeof(struct sdl_config));
 				return (0);
 			case _IOC_NR(SDL_IOCGSTATEM):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(sdl_statem_t), 1))) {
-					spin_lock_m2ua(sl);
-					*(sdl_statem_t *)dp->b_rptr = sl->sdl.statem;
-					spin_unlock_m2ua(sl);
-					mi_copyout(q, mp);
-					return (0);
-				}
-				return (0);
 			case _IOC_NR(SDL_IOCCMRESET):
-				spin_lock_m2ua(sl);
-				bzero(&sl->sdt.statem, sizeof(sl->sdt.statem));
-				spin_unlock_m2ua(sl);
-				mi_copy_done(q, mp, 0);
-				return (0);
 			case _IOC_NR(SDL_IOCGSTATSP):
-				if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(sdl_stats_t), 1))) {
-					spin_lock_m2ua(sl);
-					*(sdl_stats_t *)dp->b_rptr = sl->sdl.statsp;
-					spin_unlock_m2ua(sl);
-					mi_copyout(q, mp);
-				}
-				return (0);
 			case _IOC_NR(SDL_IOCSSTATSP):
-				mi_copyin(q, mp, NULL, sizeof(sdl_stats_t));
-				return (0);
 			case _IOC_NR(SDL_IOCGSTATS):
 			case _IOC_NR(SDL_IOCCSTATS):
 			case _IOC_NR(SDL_IOCGNOTIFY):
@@ -5202,13 +5318,13 @@ sl_w_iocdata(queue_t *q, mblk_t *mp)
 			switch (_IOC_NR(cp->cp_cmd)) {
 			case SL_IOCSOPTIONS:
 				spin_lock_m2ua(sl);
-				sl->option = *(lmi_option_t *) dp->b_rptr;
+				sl->option = *(struct lmi_option *) dp->b_rptr;
 				spin_unlock_m2ua(sl);
 				mi_copy_done(q, mp, 0);
 				return (0);
 			case SL_IOCSCONFIG:
 			{
-				sl_config_t *arg = (typeof(arg)) dp->b_rptr;
+				struct sl_config *arg = (typeof(arg)) dp->b_rptr;
 
 				arg->t1 = drv_msectohz(arg->t1);
 				arg->t2 = drv_msectohz(arg->t2);
@@ -5229,23 +5345,24 @@ sl_w_iocdata(queue_t *q, mblk_t *mp)
 			}
 			case SL_IOCTCONFIG:
 			case SL_IOCCCONFIG:
+			default:
 				mi_copy_done(q, mp, EOPNOTSUPP);
 				return (0);
 			case SL_IOCSSTATSP:
 				spin_lock_m2ua(sl);
-				sl->sl.statsp = *(sl_stats_t *) dp->b_rptr;
+				sl->sl.statsp = *(struct sl_stats *) dp->b_rptr;
 				spin_unlock_m2ua(sl);
 				mi_copy_done(q, mp, 0);
 				return (0);
 			case SL_IOCSNOTIFY:
 				spin_lock_m2ua(sl);
-				sl->sl.notify.events |= ((sl_notify_t *) dp->b_rptr)->events;
+				sl->sl.notify.events |= ((struct sl_notify *) dp->b_rptr)->events;
 				spin_unlock_m2ua(sl);
 				mi_copy_done(q, mp, 0);
 				return (0);
 			case SL_IOCCNOTIFY:
 				spin_lock_m2ua(sl);
-				sl->sl.notify.events &= ~((sl_notify_t *) dp->b_rptr)->events;
+				sl->sl.notify.events &= ~((struct sl_notify *) dp->b_rptr)->events;
 				spin_unlock_m2ua(sl);
 				mi_copy_done(q, mp, 0);
 				return (0);
@@ -5255,37 +5372,23 @@ sl_w_iocdata(queue_t *q, mblk_t *mp)
 			switch (_IOC_NR(cp->cp_cmd)) {
 			case SDT_IOCSOPTIONS:
 				spin_lock_m2ua(sl);
-				sl->option = *(lmi_option_t *) dp->b_rptr;
+				sl->option = *(struct lmi_option *) dp->b_rptr;
 				spin_unlock_m2ua(sl);
 				mi_copy_done(q, mp, 0);
 				return (0);
 			case SDT_IOCSCONFIG:
 				spin_lock_m2ua(sl);
-				sl->sdt.config = *(sdt_config_t *) dp->b_rptr;
+				sl->sdt.config = *(struct sdt_config *) dp->b_rptr;
 				spin_unlock_m2ua(sl);
 				mi_copy_done(q, mp, 0);
 				return (0);
 			case SDT_IOCTCONFIG:
 			case SDT_IOCCCONFIG:
-				mi_copy_done(q, mp, EOPNOTSUPP);
-				return (0);
 			case SDT_IOCSSTATSP:
-				spin_lock_m2ua(sl);
-				sl->sdt.statsp = *(sdt_stats_t *) dp->b_rptr;
-				spin_unlock_m2ua(sl);
-				mi_copy_done(q, mp, 0);
-				return (0);
 			case SDT_IOCSNOTIFY:
-				spin_lock_m2ua(sl);
-				sl->sdt.notify.events |= ((sdt_notify_t *) dp->b_rptr)->events;
-				spin_unlock_m2ua(sl);
-				mi_copy_done(q, mp, 0);
-				return (0);
 			case SDT_IOCCNOTIFY:
-				spin_lock_m2ua(sl);
-				sl->sdt.notify.events &= ~((sdt_notify_t *) dp->b_rptr)->events;
-				spin_unlock_m2ua(sl);
-				mi_copy_done(q, mp, 0);
+			default:
+				mi_copy_done(q, mp, EOPNOTSUPP);
 				return (0);
 			}
 			break;
@@ -5293,37 +5396,23 @@ sl_w_iocdata(queue_t *q, mblk_t *mp)
 			switch (_IOC_NR(cp->cp_cmd)) {
 			case SDL_IOCSOPTIONS:
 				spin_lock_m2ua(sl);
-				sl->option = *(lmi_option_t *) dp->b_rptr;
+				sl->option = *(struct lmi_option *) dp->b_rptr;
 				spin_unlock_m2ua(sl);
 				mi_copy_done(q, mp, 0);
 				return (0);
 			case SDL_IOCSCONFIG:
 				spin_lock_m2ua(sl);
-				sl->sdl.config = *(sdl_config_t *) dp->b_rptr;
+				sl->sdl.config = *(struct sdl_config *) dp->b_rptr;
 				spin_unlock_m2ua(sl);
 				mi_copy_done(q, mp, 0);
 				return (0);
 			case SDL_IOCTCONFIG:
 			case SDL_IOCCCONFIG:
-				mi_copy_done(q, mp, EOPNOTSUPP);
-				return (0);
 			case SDL_IOCSSTATSP:
-				spin_lock_m2ua(sl);
-				sl->sdl.statsp = *(sdl_stats_t *) dp->b_rptr;
-				spin_unlock_m2ua(sl);
-				mi_copy_done(q, mp, 0);
-				return (0);
 			case SDL_IOCSNOTIFY:
-				spin_lock_m2ua(sl);
-				sl->sdl.notify.events |= ((sdl_notify_t *) dp->b_rptr)->events;
-				spin_unlock_m2ua(sl);
-				mi_copy_done(q, mp, 0);
-				return (0);
 			case SDL_IOCCNOTIFY:
-				spin_lock_m2ua(sl);
-				sl->sdl.notify.events &= ~((sdl_notify_t *) dp->b_rptr)->events;
-				spin_unlock_m2ua(sl);
-				mi_copy_done(q, mp, 0);
+			default:
+				mi_copy_done(q, mp, EOPNOTSUPP);
 				return (0);
 			}
 			break;
@@ -5349,7 +5438,7 @@ sl_w_sig(queue_t *q, mblk_t *mp)
 	struct sl *sl = SL_PRIV(q);
 	int rtn = 0;
 
-	if (!np_trylock(sl->np, q))
+	if (!tp_trylock(sl->tp, q))
 		return (-EDEADLK);
 
 	if (likely(mi_timer_valid(mp))) {
@@ -5370,7 +5459,7 @@ sl_w_sig(queue_t *q, mblk_t *mp)
 		}
 	}
 
-	np_unlock(sl->np);
+	tp_unlock(sl->tp);
 	return (rtn);
 }
 
@@ -5448,23 +5537,24 @@ sl_msg(queue_t *q, mblk_t *mp)
 }
 
 /*
- * NS-Provider to NS-User primitives.
+ * TS-Provider to TS-User primitives.
  * ==================================
  */
 
 /**
- * n_conn_ind - process N_CONN_IND primitive
- * @q: active queue (lower read queu)
+ * t_conn_ind: - process T_CONN_IND primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
  * @mp: primitive to process
  *
- * We basically allow the linked SCTP N-Provider Stream to be in any state whatsoever for maximum
- * compatibility with possible use cases.  The only time that we would get an N_CONN_IND on a Stream
+ * We basically allow the linked SCTP T-Provider Stream to be in any state whatsoever for maximum
+ * compatibility with possible use cases.  The only time that we would get an T_CONN_IND on a Stream
  * is if the Stream was bound as a listening Stream, in which case, we should complete the
  * connection by responding with the listening Stream as the accepting Stream and move the Stream to
  * the established state.  Also, we should save the connecting address(es) so that we can reconnect
  * the Stream at a later point.
  *
- * Because we move to the established state (NS_DATA_XFER) at the end of this procedure, we should
+ * Because we move to the established state (TS_DATA_XFER) at the end of this procedure, we should
  * also determine whether there are any signalling links that are in a pending state, either
  * LMI_ATTACH_PENDING or LMI_ENABLE_PENDING and complete their procedures.  If there are any
  * signalling links in the pending state going down or are in a state better than LMI_DISABLED, they
@@ -5472,19 +5562,19 @@ sl_msg(queue_t *q, mblk_t *mp)
  * links must be considered in the unregistered state.
  */
 static noinline fastcall int
-n_conn_ind(struct np *np, queue_t *q, mblk_t *mp)
+t_conn_ind(struct tp *tp, queue_t *q, mblk_t *mp)
 {
-	N_conn_ind_t *p = (typeof(p)) mp->b_rptr;
+	struct T_conn_ind *p = (typeof(p)) mp->b_rptr;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto fault;
-	if (np->i_state != NS_IDLE)
+	if (tp_get_i_state(tp) != TS_IDLE)
 		goto outstate;
       outstate:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_CONN_IND out of state");
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_CONN_IND out of state");
 	goto error;
       fault:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_CONN_IND too short");
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_CONN_IND too short");
 	goto error;
       error:
 	freemsg(mp);
@@ -5492,26 +5582,29 @@ n_conn_ind(struct np *np, queue_t *q, mblk_t *mp)
 }
 
 /**
- * n_conn_con - process N_CONN_CON primitive
- * @q: active queue (lower read queu)
+ * t_conn_con: - process T_CONN_CON primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
  * @mp: primitive to process
  *
  * The connection of an association is being confirmed.  This is either the original connection
  * confirmation or is a connection confirmation resutling from a reconnect.  In either case, we want
- * to issue an N_INFO_REQ to determine the local and remote addresses.
+ * to issue an T_ADDR_REQ to determine the local and remote addresses.
  */
 static noinline fastcall int
-n_conn_con(struct np *np, queue_t *q, mblk_t *mp)
+t_conn_con(struct tp *tp, queue_t *q, mblk_t *mp)
 {
-	N_conn_con_t *p = (typeof(p)) mp->b_rptr;
+	struct T_conn_con *p = (typeof(p)) mp->b_rptr;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto fault;
+	if (tp_get_i_state(tp) != TS_IDLE)
+		goto outstate;
       outstate:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_CONN_CON out of state");
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_CONN_CON out of state");
 	goto error;
       fault:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_CONN_CON too short");
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_CONN_CON too short");
 	goto error;
       error:
 	freemsg(mp);
@@ -5519,8 +5612,9 @@ n_conn_con(struct np *np, queue_t *q, mblk_t *mp)
 }
 
 /**
- * n_discon_ind - process N_DISCON_IND primitive
- * @q: active queue (lower read queu)
+ * t_discon_ind: - process T_DISCON_IND primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
  * @mp: primitive to process
  *
  * A disconnect indication corresponds to a disable indication for each of the enabled signalling
@@ -5531,17 +5625,17 @@ n_conn_con(struct np *np, queue_t *q, mblk_t *mp)
  * stored address in the connect request.
  */
 static noinline fastcall int
-n_discon_ind(struct np *np, queue_t *q, mblk_t *mp)
+t_discon_ind(struct tp *tp, queue_t *q, mblk_t *mp)
 {
-	N_discon_ind_t *p = (typeof(p)) mp->b_rptr;
+	struct T_discon_ind *p = (typeof(p)) mp->b_rptr;
 	struct sl *sl;
 	int err;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto fault;
-	if (np_get_i_state(np) != NS_DATA_XFER)
+	if (tp_get_i_state(tp) != TS_DATA_XFER)
 		goto outstate;
-	for (sl = np->list; sl; sl = sl->next) {
+	for (sl = tp->list; sl; sl = sl->next) {
 		int oldstate = sl_get_i_state(sl);
 
 		switch (oldstate) {
@@ -5561,15 +5655,15 @@ n_discon_ind(struct np *np, queue_t *q, mblk_t *mp)
 	}
 	if (err)
 		return (err);
-	np_set_i_state(np, NS_IDLE);
+	tp_set_i_state(tp, TS_IDLE);
 	/* XXX: we should attempt to reconnect the association. */
 	freemsg(mp);
 	return (0);
       outstate:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_DISCON_IND out of state");
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_DISCON_IND out of state");
 	goto error;
       fault:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_DISCON_IND too short");
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_DISCON_IND too short");
 	goto error;
       error:
 	freemsg(mp);
@@ -5577,30 +5671,33 @@ n_discon_ind(struct np *np, queue_t *q, mblk_t *mp)
 }
 
 /**
- * n_data_ind - process N_DATA_IND primitive
- * @q: active queue (lower read queu)
+ * t_data_ind: - process T_DATA_IND primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
  * @mp: primitive to process
  *
  * When we receive data on a Stream, we take the M2UA part and pass it for processing.  Note that we
  * should check the PPI to ensure that it is either the M2UA PPI or PPI zero.
  */
 static noinline fastcall int
-n_data_ind(struct np *np, queue_t *q, mblk_t *mp)
+t_data_ind(struct tp *tp, queue_t *q, mblk_t *mp)
 {
-	N_data_ind_t *p = (typeof(p)) mp->b_rptr;
+	struct T_data_ind *p = (typeof(p)) mp->b_rptr;
 	mblk_t *dp = mp->b_cont;
 	int err;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto fault;
-	if ((err = np_recv_msg(np, q, dp)) == 0)
+	if (tp_get_i_state(tp) != TS_DATA_XFER)
+		goto outstate;
+	if ((err = tp_recv_msg(tp, q, dp)) == 0)
 		freeb(mp);
 	return (err);
       outstate:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_DATA_IND out of state");
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_DATA_IND out of state");
 	goto error;
       fault:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_DATA_IND too short");
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_DATA_IND too short");
 	goto error;
       error:
 	freemsg(mp);
@@ -5608,30 +5705,33 @@ n_data_ind(struct np *np, queue_t *q, mblk_t *mp)
 }
 
 /**
- * n_exdata_ind - process N_EXDATA_IND primitive
- * @q: active queue (lower read queu)
+ * t_exdata_ind: - process T_EXDATA_IND primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
  * @mp: primitive to process
  *
  * When we receive data on a Stream, we take the M2UA part and pass it for processing.  Note that we
  * should check the PPI to ensure that it is either the M2UA PPI or PPI zero.
  */
 static noinline fastcall int
-n_exdata_ind(struct np *np, queue_t *q, mblk_t *mp)
+t_exdata_ind(struct tp *tp, queue_t *q, mblk_t *mp)
 {
-	N_exdata_ind_t *p = (typeof(p)) mp->b_rptr;
+	struct T_exdata_ind *p = (typeof(p)) mp->b_rptr;
 	mblk_t *dp = mp->b_cont;
 	int err;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto fault;
-	if ((err = np_recv_msg(np, q, dp)) == 0)
+	if (tp_get_i_state(tp) != TS_DATA_XFER)
+		goto outstate;
+	if ((err = tp_recv_msg(tp, q, dp)) == 0)
 		freeb(mp);
 	return (err);
       outstate:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_EXDATA_IND out of state");
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_EXDATA_IND out of state");
 	goto error;
       fault:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_EXDATA_IND too short");
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_EXDATA_IND too short");
 	goto error;
       error:
 	freemsg(mp);
@@ -5639,25 +5739,23 @@ n_exdata_ind(struct np *np, queue_t *q, mblk_t *mp)
 }
 
 /**
- * n_info_ack - process N_INFO_ACK primitive
- * @q: active queue (lower read queu)
+ * t_info_ack: - process T_INFO_ACK primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
  * @mp: primitive to process
  *
- * Whenever and N_INFO_ACK is returned we process and save the information from the acknowledgement.
+ * Whenever and T_INFO_ACK is returned we process and save the information from the acknowledgement.
  * Also, the state is changed to synchronize with the information acknowledgement.
  */
 static noinline fastcall int
-n_info_ack(struct np *np, queue_t *q, mblk_t *mp)
+t_info_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 {
-	N_info_ack_t *p = (typeof(p)) mp->b_rptr;
+	struct T_info_ack *p = (typeof(p)) mp->b_rptr;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto fault;
-      outstate:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_INFO_ACK out of state");
-	goto error;
       fault:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_INFO_ACK too short");
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_INFO_ACK too short");
 	goto error;
       error:
 	freemsg(mp);
@@ -5665,198 +5763,25 @@ n_info_ack(struct np *np, queue_t *q, mblk_t *mp)
 }
 
 /**
- * n_bind_ack - process N_BIND_ACK primitive
- * @q: active queue (lower read queu)
+ * t_bind_ack: - process T_BIND_ACK primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-n_bind_ack(struct np *np, queue_t *q, mblk_t *mp)
+t_bind_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 {
-	N_bind_ack_t *p = (typeof(p)) mp->b_rptr;
+	struct T_bind_ack *p = (typeof(p)) mp->b_rptr;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto fault;
-      outstate:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_BIND_ACK out of state");
-	goto error;
-      fault:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_BIND_ACK too short");
-	goto error;
-      error:
-	freemsg(mp);
-	return (0);
-}
-
-/**
- * n_error_ack - process N_ERROR_ACK primitive
- * @q: active queue (lower read queu)
- * @mp: primitive to process
- */
-static noinline fastcall int
-n_error_ack(struct np *np, queue_t *q, mblk_t *mp)
-{
-	N_error_ack_t *p = (typeof(p)) mp->b_rptr;
-
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto fault;
-      outstate:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_ERROR_ACK out of state");
-	goto error;
-      fault:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_ERROR_ACK too short");
-	goto error;
-      error:
-	freemsg(mp);
-	return (0);
-}
-
-/**
- * n_ok_ack - process N_OK_ACK primitive
- * @q: active queue (lower read queu)
- * @mp: primitive to process
- */
-static noinline fastcall int
-n_ok_ack(struct np *np, queue_t *q, mblk_t *mp)
-{
-	N_ok_ack_t *p = (typeof(p)) mp->b_rptr;
-
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto fault;
-      outstate:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_OK_ACK out of state");
-	goto error;
-      fault:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_OK_ACK too short");
-	goto error;
-      error:
-	freemsg(mp);
-	return (0);
-}
-
-/**
- * n_unitdata_ind - process N_UNITDATA_IND primitive
- * @q: active queue (lower read queu)
- * @mp: primitive to process
- */
-static noinline fastcall int
-n_unitdata_ind(struct np *np, queue_t *q, mblk_t *mp)
-{
-	N_unitdata_ind_t *p = (typeof(p)) mp->b_rptr;
-
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto fault;
-      outstate:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_UNITDATA_IND out of state");
-	goto error;
-      fault:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_UNITDATA_IND too short");
-	goto error;
-      error:
-	freemsg(mp);
-	return (0);
-}
-
-/**
- * n_uderror_ind - process N_UDERROR_IND primitive
- * @q: active queue (lower read queu)
- * @mp: primitive to process
- */
-static noinline fastcall int
-n_uderror_ind(struct np *np, queue_t *q, mblk_t *mp)
-{
-	N_uderror_ind_t *p = (typeof(p)) mp->b_rptr;
-
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto fault;
-      outstate:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_UDERROR_IND out of state");
-	goto error;
-      fault:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_UDERROR_IND too short");
-	goto error;
-      error:
-	freemsg(mp);
-	return (0);
-}
-
-/**
- * n_datack_ind - process N_DATACK_IND primitive
- * @q: active queue (lower read queu)
- * @mp: primitive to process
- */
-static noinline fastcall int
-n_datack_ind(struct np *np, queue_t *q, mblk_t *mp)
-{
-	N_datack_ind_t *p = (typeof(p)) mp->b_rptr;
-
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto fault;
-      outstate:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_DATACK_IND out of state");
-	goto error;
-      fault:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_DATAACK_IND too short");
-	goto error;
-      error:
-	freemsg(mp);
-	return (0);
-}
-
-/**
- * n_reset_ind - process N_RESET_IND primitive
- * @q: active queue (lower read queu)
- * @mp: primitive to process
- *
- * A reset indication from the SCTP NS-provider is an indication of SCTP restart.  This should be
- * considered as though an N_DISCON_IND was received followed by an N_CONN_CON.  The association is
- * still active but it is as though the association has been disconnected and then reconnected.
- */
-static noinline fastcall int
-n_reset_ind(struct np *np, queue_t *q, mblk_t *mp)
-{
-	N_reset_ind_t *p = (typeof(p)) mp->b_rptr;
-
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto fault;
-      outstate:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_RESET_IND out of state");
-	goto error;
-      fault:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_RESET_IND too short");
-	goto error;
-      error:
-	freemsg(mp);
-	return (0);
-}
-
-/**
- * n_reset_con - process N_RESET_CON primitive
- * @q: active queue (lower read queu)
- * @mp: primitive to process
- *
- * The only time that an N_RESET_REQ will be issued is if the state machine gets terribly out of
- * sync and the state of the association needs to be reset.  This is the same as disconnecting the
- * association and then reconnecting it form the established state to the established state.  This
- * confirmation indicates that the process is now complete.  Before issuing the N_RESET_REQ, the
- * state of all of the signalling links should have been reset.  All that is necessary here is that
- * the state of the association is properly set and that an ASPUP Req is issued.
- */
-static noinline fastcall int
-n_reset_con(struct np *np, queue_t *q, mblk_t *mp)
-{
-	N_reset_con_t *p = (typeof(p)) mp->b_rptr;
-
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto fault;
-	if (np_get_i_state(np) != NS_WCON_RREQ)
+	if (tp_get_i_state(tp) != TS_IDLE)
 		goto outstate;
-	np_set_i_state(np, NS_DATA_XFER);
-	return np_send_asps_aspup_req(np, q, mp, &np->aspid, NULL, 0);
       outstate:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_RESET_CON out of state");
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_BIND_ACK out of state");
 	goto error;
       fault:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "N_RESET_CON too short");
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_BIND_ACK too short");
 	goto error;
       error:
 	freemsg(mp);
@@ -5864,22 +5789,254 @@ n_reset_con(struct np *np, queue_t *q, mblk_t *mp)
 }
 
 /**
- * n_other_ind - process other primitive
- * @q: active queue (lower read queu)
+ * t_error_ack: - process T_ERROR_ACK primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-n_other_ind(struct np *np, queue_t *q, mblk_t *mp)
+t_error_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 {
-	uint32_t *p = (typeof(p)) mp->b_rptr;
+	struct T_error_ack *p = (typeof(p)) mp->b_rptr;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto fault;
+	if (tp_get_i_state(tp) != TS_IDLE)
+		goto outstate;
       outstate:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "unknown primitive out of state");
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_ERROR_ACK out of state");
 	goto error;
       fault:
-	strlog(np->mid, np->sid, 0, SL_ERROR, "unknown primitive too short");
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_ERROR_ACK too short");
+	goto error;
+      error:
+	freemsg(mp);
+	return (0);
+}
+
+/**
+ * t_ok_ack: - process T_OK_ACK primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
+ * @mp: primitive to process
+ */
+static noinline fastcall int
+t_ok_ack(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	struct T_ok_ack *p = (typeof(p)) mp->b_rptr;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto fault;
+	if (tp_get_i_state(tp) != TS_IDLE)
+		goto outstate;
+      outstate:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_OK_ACK out of state");
+	goto error;
+      fault:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_OK_ACK too short");
+	goto error;
+      error:
+	freemsg(mp);
+	return (0);
+}
+
+/**
+ * t_unitdata_ind: - process T_UNITDATA_IND primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
+ * @mp: primitive to process
+ */
+static noinline fastcall int
+t_unitdata_ind(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	struct T_unitdata_ind *p = (typeof(p)) mp->b_rptr;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto fault;
+	if (tp_get_i_state(tp) != TS_IDLE)
+		goto outstate;
+      outstate:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_UNITDATA_IND out of state");
+	goto error;
+      fault:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_UNITDATA_IND too short");
+	goto error;
+      error:
+	freemsg(mp);
+	return (0);
+}
+
+/**
+ * t_uderror_ind: - process T_UDERROR_IND primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
+ * @mp: primitive to process
+ */
+static noinline fastcall int
+t_uderror_ind(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	struct T_uderror_ind *p = (typeof(p)) mp->b_rptr;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto fault;
+	if (tp_get_i_state(tp) != TS_IDLE)
+		goto outstate;
+      outstate:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_UDERROR_IND out of state");
+	goto error;
+      fault:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_UDERROR_IND too short");
+	goto error;
+      error:
+	freemsg(mp);
+	return (0);
+}
+
+/**
+ * t_optmgmt_ack: - process T_OPTMGMT_ACK primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
+ * @mp: primitive to process
+ */
+static noinline fastcall int
+t_optmgmt_ack(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	struct T_optmgmt_ack *p = (typeof(p)) mp->b_rptr;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto fault;
+	if (tp_get_i_state(tp) != TS_IDLE)
+		goto outstate;
+      outstate:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_OPTMGMT_ACK out of state");
+	goto error;
+      fault:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_OPTMGMT_ACK too short");
+	goto error;
+      error:
+	freemsg(mp);
+	return (0);
+}
+
+/**
+ * t_ordrel_ind: - process T_ORDREL_IND primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
+ * @mp: primitive to process
+ */
+static noinline fastcall int
+t_ordrel_ind(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	struct T_ordrel_ind *p = (typeof(p)) mp->b_rptr;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto fault;
+	if (tp_get_i_state(tp) != TS_IDLE)
+		goto outstate;
+      outstate:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_ORDREL_IND out of state");
+	goto error;
+      fault:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_ORDREL_IND too short");
+	goto error;
+      error:
+	freemsg(mp);
+	return (0);
+}
+
+/**
+ * t_optdata_ind: - process T_OPTDATA_IND primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
+ * @mp: primitive to process
+ */
+static noinline fastcall int
+t_optdata_ind(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	struct T_optdata_ind *p = (typeof(p)) mp->b_rptr;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto fault;
+	if (tp_get_i_state(tp) != TS_IDLE)
+		goto outstate;
+      outstate:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_OPTDATA_IND out of state");
+	goto error;
+      fault:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_OPTDATA_IND too short");
+	goto error;
+      error:
+	freemsg(mp);
+	return (0);
+}
+
+/**
+ * t_addr_ack: - process T_ADDR_ACK primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
+ * @mp: primitive to process
+ */
+static noinline fastcall int
+t_addr_ack(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	struct T_addr_ack *p = (typeof(p)) mp->b_rptr;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto fault;
+	if (tp_get_i_state(tp) != TS_IDLE)
+		goto outstate;
+      outstate:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_ADDR_ACK out of state");
+	goto error;
+      fault:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_ADDR_ACK too short");
+	goto error;
+      error:
+	freemsg(mp);
+	return (0);
+}
+
+/**
+ * t_capability_ack: - process T_CAPABILITY_ACK primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
+ * @mp: primitive to process
+ */
+static noinline fastcall int
+t_capability_ack(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	struct T_capability_ack *p = (typeof(p)) mp->b_rptr;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto fault;
+	if (tp_get_i_state(tp) != TS_IDLE)
+		goto outstate;
+      outstate:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_CAPABILITY_ACK out of state");
+	goto error;
+      fault:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_CAPABILITY_ACK too short");
+	goto error;
+      error:
+	freemsg(mp);
+	return (0);
+}
+
+/**
+ * t_other_ind: - process unknown primitive
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
+ * @mp: primitive to process
+ */
+static noinline fastcall int
+t_other_ind(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	t_scalar_t *p = (typeof(p)) mp->b_rptr;
+
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto fault;
+      fault:
+	strlog(tp->mid, tp->sid, 0, SL_ERROR, "Primitive too short");
 	goto error;
       error:
 	freemsg(mp);
@@ -5887,250 +6044,244 @@ n_other_ind(struct np *np, queue_t *q, mblk_t *mp)
 }
 
 /*
- *  NS-User (APS) Timeouts.
+ *  TS-User (APS) Timeouts.
  *  =======================
  */
 static noinline fastcall int
-np_wack_aspup_timeout(struct np *np, queue_t *q, mblk_t *mp)
+tp_wack_aspup_timeout(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err = 0;
 
-	if (np_get_u_state(np) == ASP_WACK_ASPUP)
-		if ((err = np_send_asps_aspup_req(np, q, NULL, NULL, 0)) == 0)
+	if (tp_get_u_state(tp) == ASP_WACK_ASPUP)
+		if ((err = tp_send_asps_aspup_req(tp, q, NULL, NULL, 0)) == 0)
 			mi_timer(mp, 2000);
 	return (err);
 }
 static noinline fastcall int
-np_wack_aspdn_timeout(struct np *np, queue_t *q, mblk_t *mp)
+tp_wack_aspdn_timeout(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err = 0;
 
-	if (np_get_u_state(np) == ASP_WACK_ASPDN)
-		if ((err = np_send_asps_aspdn_req(np, q, NULL, NULL, 0)) == 0)
+	if (tp_get_u_state(tp) == ASP_WACK_ASPDN)
+		if ((err = tp_send_asps_aspdn_req(tp, q, NULL, NULL, 0)) == 0)
 			mi_timer(mp, 2000);
 	return (err);
 }
 static noinline fastcall int
-np_wack_aspia_timeout(struct np *np, queue_t *q, mblk_t *mp)
+tp_wack_aspia_timeout(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err = 0;
 
-	if (np_get_u_state(np) == ASP_WACK_ASPIA)
-		if ((err = np_send_aspt_aspia_req(np, q, NULL, NULL, 0)) == 0)
+	if (tp_get_u_state(tp) == ASP_WACK_ASPIA)
+		if ((err = tp_send_aspt_aspia_req(tp, q, NULL, NULL, 0)) == 0)
 			mi_timer(mp, 2000);
 	return (err);
 }
 static noinline fastcall int
-np_wack_aspac_timeout(struct np *np, queue_t *q, mblk_t *mp)
+tp_wack_aspac_timeout(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err = 0;
 
-	if (np_get_u_state(np) == ASP_WACK_ASPAC)
-		if ((err = np_send_aspt_aspac_req(np, q, NULL, NULL, 0)) == 0)
+	if (tp_get_u_state(tp) == ASP_WACK_ASPAC)
+		if ((err = tp_send_aspt_aspac_req(tp, q, NULL, NULL, 0)) == 0)
 			mi_timer(mp, 2000);
 	return (err);
 }
 
 /**
- * np_r_data - process lower read M_DATA message
+ * tp_r_data - process lower read M_DATA message
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static inline fastcall __hot_in int
-np_r_data(queue_t *q, mblk_t *mp)
+tp_r_data(queue_t *q, mblk_t *mp)
 {
 }
 
 /**
- * np_r_proto - process lower read M_PROTO/M_PCPROTO message
+ * tp_r_proto - process lower read M_PROTO/M_PCPROTO message
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static noinline fastcall __unlikely int
-np_r_proto(queue_t *q, mblk_t *mp)
+tp_r_proto(queue_t *q, mblk_t *mp)
 {
-	struct np *np = NP_PRIV(q);
+	struct tp *tp = TP_PRIV(q);
 	int old_i_state, old_u_state;
 	uint32_t prim;
 	int rtn = 0;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(uint32_t)) {
-		strlog(np->mid, np->sid, 0, SL_TRACE | SL_ERROR, "primitive too short <-");
+		strlog(tp->mid, tp->sid, 0, SL_TRACE | SL_ERROR, "primitive too short <-");
 		freemsg(mp);
 		return (0);
 	}
 	if (!pcmsg(DB_TYPE(mp)) && oldstate == -1) {
-		/* If we have not yet received a response to our N_INFO_REQ and this is not the
+		/* If we have not yet received a response to our T_INFO_REQ and this is not the
 		   response, wait for the response (one _is_ coming).  Of course, if this is a
 		   priority message it must be processed immediately anyway. */
 		return (-EAGAIN);
 	}
-	if (!np_trylock(np, q))
+	if (!tp_trylock(tp, q))
 		return (-EDEADLK);
 
-	old_i_state = np_get_i_state(np);
-	old_u_state = np_get_u_state(np);
+	old_i_state = tp_get_i_state(tp);
+	old_u_state = tp_get_u_state(tp);
 
 	switch (prim) {
-	case N_CONN_IND:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "N_CONN_IND <-");
-		rtn = n_conn_ind(np, q, mp);
+		case T_CONN_IND strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_CONN_IND <-");
+		rtn = t_conn_ind(tp, q, mp);
 		break;
-	case N_CONN_CON:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "N_CONN_CON <-");
-		rtn = n_conn_con(np, q, mp);
+		case T_CONN_CON strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_CONN_CON <-");
+		rtn = t_conn_ind(tp, q, mp);
 		break;
-	case N_DISCON_IND:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "N_DISCON_IND <-");
-		rtn = n_discon_ind(np, q, mp);
+		case T_DISCON_IND strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_DISCON_IND <-");
+		rtn = t_conn_ind(tp, q, mp);
 		break;
-	case N_DATA_IND:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "N_DATA_IND <-");
-		rtn = n_data_ind(np, q, mp);
+		case T_DATA_IND strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_DATA_IND <-");
+		rtn = t_conn_ind(tp, q, mp);
 		break;
-	case N_EXDATA_IND:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "N_EXDATA_IND <-");
-		rtn = n_exdata_ind(np, q, mp);
+		case T_EXDATA_IND strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_EXDATA_IND <-");
+		rtn = t_conn_ind(tp, q, mp);
 		break;
-	case N_INFO_ACK:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "N_INFO_ACK <-");
-		rtn = n_info_ack(np, q, mp);
+		case T_INFO_ACK strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_INFO_ACK <-");
+		rtn = t_conn_ind(tp, q, mp);
 		break;
-	case N_BIND_ACK:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "N_BIND_ACK <-");
-		rtn = n_bind_ack(np, q, mp);
+		case T_BIND_ACK strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_BIND_ACK <-");
+		rtn = t_conn_ind(tp, q, mp);
 		break;
-	case N_ERROR_ACK:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "N_ERROR_ACK <-");
-		rtn = n_error_ack(np, q, mp);
+		case T_ERROR_ACK strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_ERROR_ACK <-");
+		rtn = t_conn_ind(tp, q, mp);
 		break;
-	case N_OK_ACK:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "N_OK_ACK <-");
-		rtn = n_ok_ack(np, q, mp);
+		case T_OK_ACK strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_OK_ACK <-");
+		rtn = t_conn_ind(tp, q, mp);
 		break;
-	case N_UNITDATA_IND:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "N_UNITDATA_IND <-");
-		rtn = n_unitdata_ind(np, q, mp);
+		case T_UNITDATA_IND
+		    strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_UNITDATA_IND <-");
+		rtn = t_conn_ind(tp, q, mp);
 		break;
-	case N_UDERROR_IND:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "N_UDERROR_IND <-");
-		rtn = n_uderror_ind(np, q, mp);
+		case T_UDERROR_IND strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_UDERROR_IND <-");
+		rtn = t_conn_ind(tp, q, mp);
 		break;
-	case N_DATACK_IND:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "N_DATACK_IND <-");
-		rtn = n_datack_ind(np, q, mp);
+		case T_OPTMGMT_ACK strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_OPTMGMT_ACK <-");
+		rtn = t_conn_ind(tp, q, mp);
 		break;
-	case N_RESET_IND:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "N_RESET_IND <-");
-		rtn = n_reset_ind(np, q, mp);
+		case T_ORDREL_IND strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_ORDREL_IND <-");
+		rtn = t_conn_ind(tp, q, mp);
 		break;
-	case N_RESET_CON:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "N_RESET_CON <-");
-		rtn = n_reset_con(np, q, mp);
+		case T_OPTDATA_IND strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_OPTDATA_IND <-");
+		rtn = t_conn_ind(tp, q, mp);
+		break;
+		case T_ADDR_ACK strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_ADDR_ACK <-");
+		rtn = t_conn_ind(tp, q, mp);
+		break;
+		case T_CAPABILITY_ACK
+		    strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_CAPABILITY_ACK <-");
+		rtn = t_conn_ind(tp, q, mp);
 		break;
 	default:
-		strlog(np->mid, np->sid, SLLOGRX, SL_TRACE, "N_????_??? <-");
-		rtn = n_other_ind(np, q, mp);
+		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "N_????_??? <-");
+		rtn = t_other_ind(tp, q, mp);
 		break;
 	}
 	if (rtn < 0) {
-		np_set_i_state(np, old_i_state);
-		np_set_u_state(np, old_u_state);
+		tp_set_i_state(tp, old_i_state);
+		tp_set_u_state(tp, old_u_state);
 	}
-	np_unlock(np);
+	tp_unlock(tp);
 	return (rtn);
 }
 
 /**
- * np_r_sig - process lower read M_SIG/M_PCSIG message
+ * tp_r_sig - process lower read M_SIG/M_PCSIG message
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static noinline fastcall __unlikely int
-np_r_sig(queue_t *q, mblk_t *mp)
+tp_r_sig(queue_t *q, mblk_t *mp)
 {
-	struct np *np = NP_PRIV(q);
+	struct tp *tp = TP_PRIV(q);
 	int rtn = 0;
 
-	if (!np_trylock(np, q))
+	if (!tp_trylock(tp, q))
 		return (-EDEADLK);
 
 	if (likely(mi_timer_valid(mp))) {
 		switch (*(int *) mp->b_rptr) {
 		case wack_aspup:
-			strlog(np->mid, np->sid, SLLOGTO, SL_TRACE, "-> WACK ASPUP TIMEOUT <-");
-			rtn = np_wack_aspup_timeout(np, q, mp);
+			strlog(tp->mid, tp->sid, SLLOGTO, SL_TRACE, "-> WACK ASPUP TIMEOUT <-");
+			rtn = tp_wack_aspup_timeout(tp, q, mp);
 			break;
 		case wack_aspdn:
-			strlog(np->mid, np->sid, SLLOGTO, SL_TRACE, "-> WACK ASPDN TIMEOUT <-");
-			rtn = np_wack_aspdn_timeout(np, q, mp);
+			strlog(tp->mid, tp->sid, SLLOGTO, SL_TRACE, "-> WACK ASPDN TIMEOUT <-");
+			rtn = tp_wack_aspdn_timeout(tp, q, mp);
 			break;
 		case wack_aspia:
-			strlog(np->mid, np->sid, SLLOGTO, SL_TRACE, "-> WACK ASPIA TIMEOUT <-");
-			rtn = np_wack_aspia_timeout(np, q, mp);
+			strlog(tp->mid, tp->sid, SLLOGTO, SL_TRACE, "-> WACK ASPIA TIMEOUT <-");
+			rtn = tp_wack_aspia_timeout(tp, q, mp);
 			break;
 		case wack_aspac:
-			strlog(np->mid, np->sid, SLLOGTO, SL_TRACE, "-> WACK ASPAC TIMEOUT <-");
-			rtn = np_wack_aspac_timeout(np, q, mp);
+			strlog(tp->mid, tp->sid, SLLOGTO, SL_TRACE, "-> WACK ASPAC TIMEOUT <-");
+			rtn = tp_wack_aspac_timeout(tp, q, mp);
 			break;
 		default:
-			strlog(np->mid, np->sid, 0, SL_ERROR | SL_TRACE, "invalid timer %d",
+			strlog(tp->mid, tp->sid, 0, SL_ERROR | SL_TRACE, "invalid timer %d",
 			       *(int *) mp->b_rptr);
 			rtn = 0;
 			break;
 		}
 	}
-	np_unlock(np);
+	tp_unlock(tp);
 	return (rtn);
 }
 
 /**
- * np_r_ctl - process lower read M_CTL/M_PCCTL message
+ * tp_r_ctl - process lower read M_CTL/M_PCCTL message
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static noinline fastcall __unlikely int
-np_r_ctl(queue_t *q, mblk_t *mp)
+tp_r_ctl(queue_t *q, mblk_t *mp)
 {
 }
 
 /**
- * np_r_error - process lower read M_ERROR/M_HANGUP/M_UNHANGUP message
+ * tp_r_error - process lower read M_ERROR/M_HANGUP/M_UNHANGUP message
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static noinline fastcall __unlikely int
-np_r_error(queue_t *q, mblk_t *mp)
+tp_r_error(queue_t *q, mblk_t *mp)
 {
 }
 
 /**
- * np_r_iocack - process lower read M_IOCACK/M_IOCNAK message
+ * tp_r_iocack - process lower read M_IOCACK/M_IOCNAK message
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static noinline fastcall __unlikely int
-np_r_iocack(queue_t *q, mblk_t *mp)
+tp_r_iocack(queue_t *q, mblk_t *mp)
 {
 }
 
 /**
- * np_r_copy - process lower read M_COPYIN/M_COPYOUT message
+ * tp_r_copy - process lower read M_COPYIN/M_COPYOUT message
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static noinline fastcall __unlikely int
-np_r_copy(queue_t *q, mblk_t *mp)
+tp_r_copy(queue_t *q, mblk_t *mp)
 {
 }
 
 /**
- * np_r_flush - process lower read M_FLUSH message
+ * tp_r_flush - process lower read M_FLUSH message
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static noinline fastcall __unlikely int
-np_r_flush(queue_t *q, mblk_t *mp)
+tp_r_flush(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_rptr[0] & FLUSHR) {
 		if (mp->b_rptr[0] & FLUSHBAND)
@@ -6148,50 +6299,50 @@ np_r_flush(queue_t *q, mblk_t *mp)
 }
 
 /**
- * np_r_other - process lower read other message
+ * tp_r_other - process lower read other message
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static noinline fastcall __unlikely int
-np_r_other(queue_t *q, mblk_t *mp)
+tp_r_other(queue_t *q, mblk_t *mp)
 {
 	freemsg(mp);
 	return (0);
 }
 
 /**
- * np_msg - process an N-provider message
+ * tp_msg - process an N-provider message
  * @q: active queue (lower read queue)
  * @mp: message to process
  */
 static int
-np_msg(queue_t *q, mblk_t *mp)
+tp_msg(queue_t *q, mblk_t *mp)
 {
 	switch (DB_TYPE(mp)) {
 	case M_DATA:
-		return np_r_data(q, mp);
+		return tp_r_data(q, mp);
 	case M_PROTO:
 	case M_PCPROTO:
-		return np_r_proto(q, mp);
+		return tp_r_proto(q, mp);
 	case M_SIG:
 	case M_PCSIG:
-		return np_r_sig(q, mp);
+		return tp_r_sig(q, mp);
 	case M_CTL:
-		return np_r_ctl(q, mp);
+		return tp_r_ctl(q, mp);
 	case M_ERROR:
 	case M_HANGUP:
 	case M_UNHANGUP:
-		return np_r_error(q, mp);
+		return tp_r_error(q, mp);
 	case M_IOCACK:
 	case M_IOCNAK:
-		return np_r_iocack(q, mp);
+		return tp_r_iocack(q, mp);
 	case M_COPYIN:
 	case M_COPYOUT:
-		return np_r_copy(q, mp);
+		return tp_r_copy(q, mp);
 	case M_FLUSH:
-		return np_r_flush(q, mp);
+		return tp_r_flush(q, mp);
 	default:
-		return np_r_other(q, mp);
+		return tp_r_other(q, mp);
 	}
 }
 
@@ -6212,8 +6363,8 @@ sl_rsrv(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
 
-	if (sl->np)
-		qenable(sl->np->rq);
+	if (sl->tp)
+		qenable(sl->tp->rq);
 	return (0);
 }
 
@@ -6275,7 +6426,7 @@ sl_wput(queue_t *q, mblk_t *mp)
 }
 
 /**
- * np_rput - lower read put procedure
+ * tp_rput - lower read put procedure
  * @q: active queue (lower read queue)
  * @mp: message to put
  *
@@ -6286,27 +6437,27 @@ sl_wput(queue_t *q, mblk_t *mp)
  * been processed.
  */
 static streamscall
-np_rput(queue_t *q, mblk_t *mp)
+tp_rput(queue_t *q, mblk_t *mp)
 {
 	if ((!pcmsg(DB_TYPE(mp)) && (q->q_first || (q->q_flag & QSVCBUSY)))
-	    || np_msg(q, mp))
+	    || tp_msg(q, mp))
 		putq(q, mp);
 	return (0);
 }
 
 /**
- * np_rsrv - lower read service procedure
+ * tp_rsrv - lower read service procedure
  * @q: queue to service (lower read queue)
  *
  * This is a canonical draining service procedure.
  */
 static streamscall
-np_rsrv(queue_t *q)
+tp_rsrv(queue_t *q)
 {
 	mblk_t *mp;
 
 	while ((mp = getq(q))) {
-		if (np_msg(q, mp)) {
+		if (tp_msg(q, mp)) {
 			putbq(q, mp);
 			break;
 		}
@@ -6315,7 +6466,7 @@ np_rsrv(queue_t *q)
 }
 
 /**
- * np_wput - lower write put procedure
+ * tp_wput - lower write put procedure
  * @q: active queue (lower write queue)
  * @mp: message to put
  *
@@ -6324,7 +6475,7 @@ np_rsrv(queue_t *q)
  * following this one.
  */
 static streamscall
-np_wput(queue_t *q, mblk_t *mp)
+tp_wput(queue_t *q, mblk_t *mp)
 {
 	/* this is an error */
 	putnext(q, mp);
@@ -6332,7 +6483,7 @@ np_wput(queue_t *q, mblk_t *mp)
 }
 
 /**
- * np_wsrv - lower write service procedure.
+ * tp_wsrv - lower write service procedure.
  * @q: queue to service (lower write queue)
  *
  * This service procedure is simply to perform backenabling across the
@@ -6340,13 +6491,13 @@ np_wput(queue_t *q, mblk_t *mp)
  * feeding this lower write queue have their service procedures enabled.
  */
 static streamscall
-np_wsrv(queue_t *q)
+tp_wsrv(queue_t *q)
 {
 	struct sl *sl;
 	pl_t pl;
 
 	pl = RW_RDLOCK(&mux_lock, plstr);
-	for (sl = np->list; sl; sl = sl->next)
+	for (sl = tp->list; sl; sl = sl->next)
 		if (sl->wq)
 			qenable(sl->wq);
 	RW_UNLOCK(&mux_loc, pl);
@@ -6368,15 +6519,15 @@ static caddr_t sl_opens = NULL;		/* open list */
  *
  * When a Stream is opened on the driver it corresponds to an AS assocaited with a given ASP.  The
  * ASP is determined from the minor device number opened.  All minor devices corresponding to ASPs
- * are clone devices.  There is precisely one SCTP lower Stream for each ASP (for M2UA).  If an NP
+ * are clone devices.  There is precisely one SCTP lower Stream for each ASP (for M2UA).  If an TP
  * structure has not been allocated for the corresponding minor device number, we allocate one.
- * When an SCTP Stream is I_LINK'ed under the driver, it is associated with the NP structure.  An SL
+ * When an SCTP Stream is I_LINK'ed under the driver, it is associated with the TP structure.  An SL
  * structure is allocated and associated with each each upper Stream.
  *
  * This driver can also be pushed as a module.  When pushed as a module it is pushed over an SCTP
  * Stream.  When pushed as a module, there exists precisely one AS.  (It takes a multiplexing driver
  * to provide more than on AS for a given SCTP association.)  This is a simplified case.  We will
- * handle this one later, but instead of allocating an SL structure and an NP structure, they should
+ * handle this one later, but instead of allocating an SL structure and an TP structure, they should
  * be allocated together.
  */
 static streamscall int
@@ -6386,7 +6537,7 @@ sl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	minor_t cminor;
 	major_t cmajor;
 	struct sl *sl;
-	struct np *np;
+	struct tp *tp;
 	int err;
 
 	if (q->q_ptr != NULL)
@@ -6400,7 +6551,7 @@ sl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	if (cminor > NUM_AS)
 		return (ENXIO);
 
-	if (!(np = m2_get_asp(cminor)))
+	if (!(tp = m2_get_asp(cminor)))
 		return (ENXIO);
 
 	*devp = makedevice(cmajor, NUM_AS + 1);
@@ -6414,14 +6565,14 @@ sl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	}
 
 	if ((err = mi_open_comm(&sl_opens, q, devp, oflags, sflag, crp))) {
-		m2_put_asp(np);
+		m2_put_asp(tp);
 		mi_timer_free(t1);
 		mi_timer_free(t2);
 		return (err);
 	}
 	/* initialize sl structure */
 	sl = SL_PRIV(q);
-	sl_init_priv(sl, np, q, devip, oflags, sflag, crp, t1, t2);
+	sl_init_priv(sl, tp, q, devip, oflags, sflag, crp, t1, t2, cminor);
 	return (0);
 }
 
@@ -6449,7 +6600,7 @@ sl_qclose(queue_t *q, int oflags, cred_t *crp)
 
 static struct module_stat sl_mstat = __attribute__ ((aligned(SMP_CACHE_BYTES)));
 
-static struct module_info np_minfo = {
+static struct module_info tp_minfo = {
 	.mi_idnum = MOD_ID,
 	.mi_idname = MOD_NAME,
 	.mi_minpsz = STRMINPSZ,
@@ -6458,7 +6609,7 @@ static struct module_info np_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-static struct module_stat np_mstat = __attribute__ ((aligned(SMP_CACHE_BYTES)));
+static struct module_stat tp_mstat = __attribute__ ((aligned(SMP_CACHE_BYTES)));
 
 static struct qinit sl_rinit = {
 	.qi_putp = sl_rput,
@@ -6476,25 +6627,25 @@ static struct qinit sl_winit = {
 	.qi_mstat = &sl_mstat,
 };
 
-static struct qinit np_rinit = {
-	.qi_putp = np_rput,
-	.qi_srvp = np_rsrv,
-	.qi_minfo = &np_minfo,
-	.qi_mstat = &np_mstat,
+static struct qinit tp_rinit = {
+	.qi_putp = tp_rput,
+	.qi_srvp = tp_rsrv,
+	.qi_minfo = &tp_minfo,
+	.qi_mstat = &tp_mstat,
 };
 
-static struct qinit np_winit = {
-	.qi_putp = np_wput,
-	.qi_srvp = np_wsrv,
-	.qi_minfo = &np_minfo,
-	.qi_mstat = &np_mstat,
+static struct qinit tp_winit = {
+	.qi_putp = tp_wput,
+	.qi_srvp = tp_wsrv,
+	.qi_minfo = &tp_minfo,
+	.qi_mstat = &tp_mstat,
 };
 
 static struct streamtab m2ua_asinfo = {
 	.st_rdinit = &sl_rinit,
 	.st_wrinit = &sl_winit,
-	.st_muxrinit = &np_rinit,
-	.st_muxwinit = &np_winit,
+	.st_muxrinit = &tp_rinit,
+	.st_muxwinit = &tp_winit,
 };
 
 static struct cdevsw m2_cdev = {

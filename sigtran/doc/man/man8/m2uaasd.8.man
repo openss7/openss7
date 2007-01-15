@@ -1,0 +1,348 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: m2uaasd.8.man,v 0.9.2.1 2007/01/15 11:58:42 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/01/15 11:58:42 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: m2uaasd.8.man,v $
+.\" Revision 0.9.2.1  2007/01/15 11:58:42  brian
+.\" - added new m2ua-as mux files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database sigtran.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so sigtran.macros
+.\"
+.\"
+.TH M2UAASD 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.SH NAME
+.B m2uaasd
+\- M2UA-AS Configuration Daemon
+.\"
+.\"
+.PP
+.HP 12
+\fBm2uaasd\fR [\fIoptions\fR]
+.PD 0
+.HP
+\fBm2uaasd\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBm2uaasd\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBm2uaasd\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B m2uaasd
+is a configuration daemon for the M2UA-AS multiplexing driver,
+.BR m2ua_as (4).
+Its purpose is to open a configuration file, establish SCTP assocations between the local host and
+remote SG hosts, link the SCTP associations under the M2UA-AS multiplexing driver at the appropriate
+ASP positions, configure each ASP using input-output controls and then wait in the background
+listening for management events on a management stream.  Also, the daemon watches for updates to the
+configuration file and applies the updates as they occur.
+.PP
+The
+.B m2uaasd
+is intended to be run at system startup from a System V init script.  Once the configuration of the
+M2UA-AS multiplexing driver is complete, applications programs can open, attach, enable and use
+Signalling Link streams opened on each of the configured ASPs.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+.BR -h ", " --help
+When this option is encountered,
+print
+usage
+information to
+.I stdout
+and exit.
+.TP
+.BR -V ", " --version
+When this option is encountered,
+print
+version
+information to
+.I stdout
+and exit.
+.TP
+.BR -C ", " --copying
+When this option is encountered,
+print
+copyright and copying
+information to
+.I stdout
+and exit.
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+When the
+.BR -f " or " --file
+.I filename
+options is specified, the supplied file contains M2UA configuration entries as follows:
+.IP \(bu \w'\(bu\(em'u
+Each line in the file contains one entry or comment per line.
+.IP \(bu
+Each entry consists of a number of fields delimited by whitespace (see
+.RB isspace (3)).
+.IP \(bu
+Any field that begins with a
+.RI ` # '
+character is a comment that continues to the end of the line.
+.IP \(bu
+Any line containing only a comment (beginning with optional whitespace and a
+.RI ` # '
+character) is ignored.
+.PP
+Each line containing an M2UA configuration specification entry consists of the following fields:
+.TP
+(1) \fIcommand\fR
+.PP
+A Signalling Gateway entry is formatted as follows:
+.RS
+.TP
+(1) \fBsg\fR
+A command indicating that this is an SG entry.
+.TP
+(2) \fIindex\fR
+A unique index number assigned to the SG.
+.TP
+(3) \fIclei\fR
+A common language location identifier or common language equipment identifier for the SG.
+.TP
+(4) \fIoptions\fR
+A comma separate option string indicating the options associated with the SG.  Options include
+whether dynamic or static configuration is required or supported.
+.TP
+(5) \fIaddress\fR
+The (SCTP) transport address at which this SG can be reached.  This address can be a hostname or a
+numbers and dots IP address and port number.
+.RE
+.PP
+An Application Service Process entry is formatted as follows:
+.RS
+.TP
+(1) \fBasp\fR
+A command indicating that this is an ASP entry.
+.TP
+(2) \fIindex\fR
+A unique index number assigned to the ASP.  This index number is the minor device number on the
+M2UA-AS driver that will be opened to obtain an AS Stream associated with this ASP.
+.TP
+(3) \fIclei\fR
+A common language location identifier or common language equipment identifier for the ASP.
+.TP
+(4) \fIaspid\fR
+An ASP identifier.  When no ASP identifier is used (the SG can determine the ASP Id from the
+trasnport address with which the ASP is connecting), this field will contain a single dash,
+.RI ` - '.
+.TP
+(5) \fIsg\fR
+An SG index or SG CLEI identifying the SG serving this ASP.
+.TP
+(6) \fIaddress\fR
+The (SCTP) transport address to which this ASP will bind.  This address can be a hostname or a
+numbers and dots IP address and port number.
+.TP
+(7) \fIstreams\fR
+The number of outbound streams that the ASP will request when it connects.
+.RE
+.PP
+A Signalling Link profile entry is formatted as follows:
+.RS
+.TP
+(1) \fBsl\fR
+A command indicating that this is an SL profile entry.
+.TP
+(2) \fIprofile\fR
+A profile name uniquely identifying this profile and distinguishing it from all others.
+.TP
+(3) \fIpvar\fR
+The protocol variant.
+.TP
+(4) \fIpopt\fR
+Protocol options.
+.TP
+(5) \fIsif-min\fR
+The minimum size of the service information field in the SS7 SDU.
+.TP
+(6) \fIsif-max\fR
+The maximum size of the service information field in the SS7 SDU.
+.RE
+.PP
+An Application Server entry is formatted as follows:
+.RS
+.TP
+(1) \fBas\fR
+A command indicating that this is an AS entry.
+.TP
+(2) \fIasp\fR
+An ASP index or ASP CLEI identifying the ASP serving this AS.
+.TP
+(3) \fIppa\fR
+The physical point of appearance identifier for the AS.  This is the PPA address to which an SL
+stream will attach to attach to this application server.  This field is any 32-bit integer number.
+When dynamic registration is used, the high-order 16-bits corresponds to the SDTI and the low-order
+16-bits corresponds to the SDLI used in the link key for registration.  When static registration is
+used, this field can contain a single dash,
+.RI ` - ',
+to indicate that the IID is used as the PPA.
+.TP
+(4) \fIiid\fR
+The integer or text interface identifier for the the AS.  When the serving SG supports dynamic
+configuration, and this field is set to a single dash,
+.RI ` - ',
+dynamic registration will be used to determine the IID for the AS.  The SDLI and SDTI that are used
+to register the AS will be derived from the high- and low-order 16 bits of the PPA.
+.TP
+(5) \fItmode\fR
+The traffic mode for the application server.  Values can be:
+.BR override ", " loadshare " or " broadcast .
+This is the traffic mode for which the AS will activate.
+.TP
+(6) \fIprofile\fR
+The SL profile name that defines the SS7 characteristics of the SS7 link provided by this
+application server.
+.RE
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occurred and a diagnostic message is printed on
+.BR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed on
+.BR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of diagnostic messages to
+.BR stderr .
+.\"
+.\"
+.SH NOTICES
+.PP
+Note that while it is possible under the M2UA specifications to have one ASP being served by
+multiple SGs, the M2UA-AS driver treats this as multiple ASPs from the point of view of
+configuration.  However, because ASPs are logical entities, although the driver treats each ASP-SG
+relation to be a separate ASP, they can be viewed externally as the same entity.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR m2ua_as (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B m2uaasd
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B m2uaasd
+is an OpenSS7-specific configuration command.  Because this command is used at startup and is
+transparent to the SL-User opening M2UA-AS streams, compatibility is not an issue.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+System configuration programs are not subject to standardization.
+.B m2uaasd
+conforms to OpenSS7 specifications.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B m2uaasd
+first appeared in the OpenSS7
+.B sigtran-0.9.2.2
+package.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
