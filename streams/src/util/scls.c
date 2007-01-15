@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/25 06:39:15 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/01/15 12:16:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/25 06:39:15 $ by $Author: brian $
+ Last Modified $Date: 2007/01/15 12:16:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: scls.c,v $
+ Revision 0.9.2.23  2007/01/15 12:16:42  brian
+ - updated archive sizes, new development work
+
  Revision 0.9.2.22  2006/07/25 06:39:15  brian
  - expanded minor device numbers and optimization and locking corrections
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/25 06:39:15 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/01/15 12:16:42 $"
 
 static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/07/25 06:39:15 $";
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/01/15 12:16:42 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.
@@ -436,7 +439,7 @@ main(int argc, char *argv[])
 			else
 				command = CMN_COUNT;
 			break;
-		case 'D':	/* -D, --debug */
+		case 'D':	/* -D, --debug [level] */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {

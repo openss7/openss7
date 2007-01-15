@@ -1,3 +1,8 @@
+2007-01-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: handle unpacked tarballs
+	* scripts/texi/compat.texi: minor correction
+
 2007-01-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped release number for next release

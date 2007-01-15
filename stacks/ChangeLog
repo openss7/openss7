@@ -1,5 +1,8 @@
 2007-01-15  Brian Bidulock  <bidulock@openss7.org>
 
+	* strss7.lsm.in: archive size update
+	* po/de.po: sometimes I hate gnu gettext
+
 	- added new and old signalling link utilities and documentation
 	* doc/man/man4/sl-mux.4.man: new file
 	* doc/man/man8/slconfd.8.man: new file

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_copyout.9.man,v 0.9.2.8 2006/10/06 12:13:03 brian Exp $
+.\" @(#) $Id: mi_copyout.9.man,v 0.9.2.9 2007/01/15 12:16:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:13:03 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/15 12:16:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_copyout.9.man,v $
+.\" Revision 0.9.2.9  2007/01/15 12:16:34  brian
+.\" - updated archive sizes, new development work
+.\"
 .\" Revision 0.9.2.8  2006/10/06 12:13:03  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -143,11 +146,15 @@ DDI.
 .SH DESCRIPTION
 .PP
 .BR mi_copyout ()
-is one of a set of helper functions that support transparent input-output controls (see
+is one of a set of helper functions that supports both
+.B TRANSPARENT
+and
+.IR I_STR (7)
+input-output controls (see
 .BR ioctl (2s)
 and
-.BR streamio (9))
-that includes
+.BR streamio (7)).
+These helper functions include:
 .BR mi_copyin (9),
 .BR mi_copyout (9),
 .BR mi_copyout_alloc (9),
@@ -247,7 +254,7 @@ fails, it panics the kernel.
 .PP
 If
 .BR mi_copyout ()
-suffers an internal failure, it will close the input output control operation with a suitable error
+suffers an internal failure, it will close the input-output control operation with a suitable error
 code.  The error codes returned by
 .BR mi_copyout ()
 to the

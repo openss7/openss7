@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_copyin_n.9.man,v 0.9.2.5 2006/10/06 12:13:03 brian Exp $
+.\" @(#) $Id: mi_copyin_n.9.man,v 0.9.2.6 2007/01/15 12:16:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:13:03 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/15 12:16:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_copyin_n.9.man,v $
+.\" Revision 0.9.2.6  2007/01/15 12:16:34  brian
+.\" - updated archive sizes, new development work
+.\"
 .\" Revision 0.9.2.5  2006/10/06 12:13:03  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -148,11 +151,15 @@ DDI.
 .SH DESCRIPTION
 .PP
 .BR mi_copyin_n ()
-is one of a set of helper functions that support transparent input-output controls (see
+is one of a set of helper functions that supports both
+.B TRANSPARENT
+and
+.IR I_STR (7)
+input-output controls (see
 .BR ioctl (2s)
 and
-.BR streamio (9))
-that includes
+.BR streamio (7)).
+These helper functions include:
 .BR mi_copyin (9),
 .BR mi_copyout (9),
 .BR mi_copyout_alloc (9),
@@ -163,7 +170,9 @@ and
 .BR mi_copy_state (9).
 .PP
 .BR mi_copyin_n ()
-is used to copy data from a user-space to the kernel.  When a driver or module
+is used in close conjunction with
+.BR mi_copyin (9)
+to copy data from a user-space to the kernel.  When a driver or module
 .IR qi_putp (9)
 or
 .IR qi_srvp (9)
@@ -179,12 +188,33 @@ In the event that the entire length of the data to be copied in is not known whe
 operation is generated,
 .BR mi_copyin_n ()
 may be used to copyin additional portions of the original user memory extent.
+.PP
+Copying in each memory extent begins with a call to
+.BR mi_copyin (9).
+.BR mi_copyin (9)
+defines the
+.IR uaddr ,
+or base address of the memory extent and the length,
+.IR len ,
+of the first portion to copy in.
+.BR mi_copyin_n ()
+then copies in additional segments, each starting at
+.I uaddr
+plus the offset argument,
+.IR offset ,
+and each segment is of the length supplied to the
+.BR mi_copyin_n ()
+call in the
+.I len
+argument.
 .\"
 .\"
 .SH USAGE
 .PP
 .BR mi_copyin_n ()
-is only used in conjunction with the other mi_copy helper functions:
+is only used in conjunction with the other
+.I mi_copy
+helper functions:
 .BR mi_copyin (9),
 .BR mi_copyout (9),
 .BR mi_copyout_alloc (9),
@@ -193,6 +223,35 @@ is only used in conjunction with the other mi_copy helper functions:
 .BR mi_copy_set_rval (9)
 and
 .BR mi_copy_state (9).
+.PP
+.BR mi_copyin (9)
+must be called before any call to
+.BR mi_copyin_n ()
+for the same input-output control operation.
+A call to
+.BR mi_copyin_n ()
+specifies an offset and length for a memory extent contained within a buffer described in the
+preceding
+.BR mi_copyin (9)
+call.  As such, it is normally only used when it is not known what the complete length of the user
+buffer is until the inital portion of the buffer has been copied in.  For example, the initial
+portion of the buffer copied in with
+.BR mi_copyin (9),
+might contain an element that indicates the number of elements in an array following the initial
+portion.  After the intial portion has been copied with
+.BR mi_copyin (9),
+.BR mi_copyin_n ()
+can be called to copy in the remainder of the elements in the complex structure.
+.PP
+When the entire size of the input memory extent to be copied in from the user is known, a call to
+.BR mi_copyin (9)
+for each memory extent is used and there is no need for the
+.BR mi_copyin_n ()
+utility.
+Only when the memory extents need to be copied in variable sized segments, the sizes of which are
+not all known until some have been copied in, is the
+.BR mi_copyin_n ()
+uiltity useful.
 .\"
 .\"
 .SH RETURN
@@ -208,6 +267,54 @@ returns
 fails when passed invalid pointers.  When
 .BR mi_copyin_n ()
 fails, it panics the kernel.
+.PP
+If
+.BR mi_copyin_n ()
+suffers an internal failure, it will close the input-output control operation with a suitable error
+code.  The error codes returned by
+.BR mi_copyin_n ()
+to the
+.BR ioctl (2s)
+operation in
+.IR errno (3),
+are as follows:
+.TP \w'[\fBENOBUFS\fR]\ \ 'u
+.RB [ EPROTO ]
+.BR mi_copyin_n ()
+was called on an 
+.BR M_IOCTL (9)
+message block before calling
+.BR mi_copyin (9).
+.TP
+.RB [ EPROTO ]
+.BR mi_copyin_n ()
+was called for a message block other than an
+.BR M_IOCDATA (9)
+message block.
+.TP
+.RB [ EPROTO ]
+.BR mi_copyin_n ()
+was called for an
+.BR M_IOCDATA (9)
+message block that did not belong to an operation that was begun with
+.BR mi_copyin (9)
+or
+.BR mi_copyout (9).
+.TP
+.RB [ EPROTO ]
+.BR mi_copyout (9)
+was called before
+.BR mi_copyin_n ().
+.TP
+.RB [ EINVAL ]
+The amount of implicit data provided by the user on the call to an
+.IR I_STR (7)
+input-output control was insufficient to satisfy the
+.BR mi_copyin_n ()
+request.
+.TP
+.RB [ ENOSR ]
+A message block could not be allocated to satisfy the request.
 .\"
 .\"
 .SH EXAMPLE

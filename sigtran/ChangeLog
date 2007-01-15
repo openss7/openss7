@@ -1,5 +1,8 @@
 2007-01-15  Brian Bidulock  <bidulock@openss7.org>
 
+	* sigtran.lsm.in: archive size update
+	* src/modules/m2ua_as.c: working up new driver
+
 	- added new m2ua-as mux files
 	* doc/man/man8/m2uaasd.8.man: new file
 	* src/drivers/m2ua_as.c: new file
