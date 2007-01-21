@@ -71,8 +71,8 @@ char const ident[] =
  *  types of Style II Signalling Links.  A configuration daemon (slconfd) reads a signalling link
  *  configuration file (e.g. /etc/sysconfig/slconf) and uses the information contained in the file
  *  to open, attach and enable signalling link streams.  It then links these streams under this
- *  sl_mux multiplexing driver and assigns a SDLI/SDTI (signalling link identifier) to the link
- *  using an input output control with the lower multiplex id.
+ *  sl_mux multiplexing driver and assigns a SDLI/SDTI (signalling link identifier) (global PPA) to
+ *  the link using an input output control with the lower multiplex id.
  *
  *  Signalling link users can then either open specific minor device numbers (corresponding to the
  *  SDLI/SDTI) on the upper multiplex and obtain an enabled Style I signalling link stream, or can
@@ -83,6 +83,14 @@ char const ident[] =
  *  implementation, PPA addressing schemes nor local or remote addresses (e.g. for M2PA) and is
  *  presented with a uniform PPA scheme (SDLI/SDTI) and both service and input-output control
  *  interface.
+ *
+ *  A couple more things: the sl-mux also allows a CLEI (Common Lanuage Equipment Identifier) of up
+ *  to 32 characters to tbe associated with each link.
+ *
+ *  Monitoring: the sl-mon clone minor device can be opened and attached to a signalling link.  Once
+ *  attached, the Stream starts delivering encapsulated versions of the STREAMS messages passing
+ *  back and forth.  A utility, /usr/sbin/slmon, is provided to perform monitoring of links from the
+ *  comand line.
  */
 #include <sys/os7/compat.h>
 
