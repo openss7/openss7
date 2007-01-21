@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/01/15 12:16:38 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/01/21 20:22:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/15 12:16:38 $ by $Author: brian $
+ Last Modified $Date: 2007/01/21 20:22:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.35  2007/01/21 20:22:43  brian
+ - working up drivers
+
  Revision 0.9.2.34  2007/01/15 12:16:38  brian
  - updated archive sizes, new development work
 
@@ -157,10 +160,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/01/15 12:16:38 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/01/21 20:22:43 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/01/15 12:16:38 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/01/21 20:22:43 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -188,7 +191,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/01/15 12:16:38 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/01/21 20:22:43 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -572,6 +575,7 @@ struct mi_iocblk {
 	caddr_t mi_uaddr;		/* uaddr of last copyin operation, NULL for implicit */
 	short mi_dir;			/* direction of operation MI_COPY_IN or MI_COPY_OUT */
 	short mi_cnt;			/* operation count, starting from 1 for each direction */
+	int mi_rval;			/* return value */
 };
 
 /*
@@ -706,16 +710,22 @@ void
 mi_copy_done(queue_t *q, mblk_t *mp, int err)
 {
 	union ioctypes *ioc;
+	struct mi_iocblk *mi;
+	int rval;
 
 	assert(mp);
 	assert(q);
 	assert(mp->b_wptr >= mp->b_rptr + sizeof(*ioc));
 
 	ioc = (typeof(ioc)) mp->b_rptr;
+	rval = ioc->iocblk.ioc_rval;
 	switch (mp->b_datap->db_type) {
 	case M_IOCDATA:
-		if (ioc->copyresp.cp_private)
+		if (ioc->copyresp.cp_private) {
+			mi = (typeof(mi)) ioc->copyresp.cp_private->b_rptr;
+			rval = mi->mi_rval;
 			freemsg(XCHG(&ioc->copyresp.cp_private, NULL));
+		}
 #ifdef LIS
 		/* LiS bug, see above. */
 		break;
@@ -735,7 +745,7 @@ mi_copy_done(queue_t *q, mblk_t *mp, int err)
 	}
 	mp->b_datap->db_type = err ? M_IOCNAK : M_IOCACK;
 	ioc->iocblk.ioc_error = (err < 0) ? -err : err;
-	ioc->iocblk.ioc_rval = err ? -1 : ioc->iocblk.ioc_rval;
+	ioc->iocblk.ioc_rval = err ? -1 : rval;
 	ioc->iocblk.ioc_count = 0;
 	qreply(q, mp);
 }
@@ -806,6 +816,7 @@ mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 		mi->mi_uaddr = NULL;
 		mi->mi_cnt = 1;
 		mi->mi_dir = MI_COPY_IN;
+		mi->mi_rval = 0;
 		putq(q, mp);
 		/* There are two clues to the fact that an implicit copyin was performed to
 		   subsequent operations: mi->mi_uaddr == NULL and cp_private->b_cont != NULL while 
@@ -1083,8 +1094,22 @@ void
 mi_copy_set_rval(mblk_t *mp, int rval)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
+	struct mi_iocblk *mi;
+	mblk_t *bp;
 
-	ioc->iocblk.ioc_rval = rval;
+	switch (mp->b_datap->db_type) {
+	case M_IOCDATA:
+		if ((bp = ioc->copyresp.cp_private)) {
+			mi = (typeof(mi)) bp->b_rptr;
+			mi->mi_rval = rval;
+			break;
+		}
+		/* fall through */
+	case M_IOCTL:
+		ioc->iocblk.ioc_rval = rval;
+		break;
+	}
+	return;
 }
 
 EXPORT_SYMBOL_NOVERS(mi_copy_set_rval);

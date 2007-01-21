@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/01/08 16:23:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/01/21 20:22:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/01/08 16:23:08 $ by $Author: brian $
+# Last Modified $Date: 2007/01/21 20:22:37 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.38  2007/01/21 20:22:37  brian
+# - working up drivers
+#
 # Revision 0.9.2.37  2007/01/08 16:23:08  brian
 # - final updates for release
 #
@@ -444,6 +447,9 @@ ss7_man_MANS = \
 	man8/sdt.8 \
 	man8/sl.8 \
 	man8/sls.8 \
+	man8/slconfd.8 \
+	man8/ss7capd.8 \
+	man8/slmon.8 \
 	man8/soip.8 \
 	man8/ss7.8 \
 	man8/ss7confd.8 \
@@ -1969,6 +1975,9 @@ ss7_dist_noinst_MANS = \
 	man8/sigtran.8.man \
 	man8/sl.8.man \
 	man8/sls.8.man \
+	man8/slconfd.8.man \
+	man8/ss7capd.8.man \
+	man8/slmon.8.man \
 	man8/soip.8.man \
 	man8/ss7.8.man \
 	man8/ss7confd.8.man \

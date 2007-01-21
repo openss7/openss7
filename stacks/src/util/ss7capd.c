@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:33:57 $
+ @(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,22 +45,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/15 11:33:57 $ by $Author: brian $
+ Last Modified $Date: 2007/01/21 20:22:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ss7capd.c,v $
+ Revision 0.9.2.2  2007/01/21 20:22:41  brian
+ - working up drivers
+
  Revision 0.9.2.1  2007/01/15 11:33:57  brian
  - added new and old signalling link utilities
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:33:57 $"
+#ident "@(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $"
 
-static char const ident[] = "$RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:33:57 $";
+static char const ident[] =
+    "$RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $";
 
 #include <stropts.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
@@ -126,15 +131,15 @@ struct capconfig {
 	sdt_config_t sdt;
 } capconf;
 
-unsigned uint32_t iftype = SDL_TYPE_DS0A;
-unsigned uint32_t ifrate = 56000;
+uint32_t iftype = SDL_TYPE_DS0A;
+uint32_t ifrate = 56000;
 
 void
 version(int argc, char **argv)
 {
 	if (!output && !debug)
 		return;
-	fprintf(stderr, "\
+	fprintf(stdout, "\
 %2$s\n\
 Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 Distributed under GPL Version 2, included here by reference.\n\
@@ -169,7 +174,7 @@ Usage:\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
 Arguments:\n\
-    (none)
+    (none)\n\
 Options:\n\
   Command Options:\n\
     -c, --card card                     (default: %2$d)\n\
@@ -200,9 +205,9 @@ Options:\n\
   General Options:\n\
     -q, --quiet                         (default: off)\n\
         suppress output\n\
-    -D, --debug [LEVEL]                 (default: %7$s)\n\
+    -D, --debug [LEVEL]                 (default: %7$d)\n\
         increase or set debugging verbosity\n\
-    -v, --verbose [LEVEL]               (default: %8$s)\n\
+    -v, --verbose [LEVEL]               (default: %8$d)\n\
         increase or set verbosity of output\n\
     -h, --help\n\
         prints this usage information and exits\n\
@@ -402,13 +407,13 @@ ftimestamp(void)
 void
 output_header(void)
 {
-	unsigned char buf[128] = "";
+	char buf[128] = "";
 	struct utsname uts;
 
 	ftimestamp();
 	fprint_time(stdout);
 	fprintf(stdout,
-		" # SS7CAPD $Id: ss7capd.c,v 0.9.2.1 2007/01/15 11:33:57 brian Exp $ Output File Header\n");
+		" # SS7CAPD $Id: ss7capd.c,v 0.9.2.2 2007/01/21 20:22:41 brian Exp $ Output File Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine: %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,
@@ -492,7 +497,7 @@ stop_timer(void)
 }
 
 void
-print_data()
+print_data(void)
 {
 	static unsigned char hexchar[] = {
 		'0', '1', '2', '3', '4', '5', '6', '7',
@@ -1004,8 +1009,8 @@ show_sdl_config(void)
 	case SDL_CODING_B8ZS:
 		fprintf(stderr, " b8zs");
 		break;
-	case SDL_CODING_ESF:
-		fprintf(stderr, " esf");
+	case SDL_CODING_HDB3:
+		fprintf(stderr, " hdb3");
 		break;
 	case SDL_CODING_AAL1:
 		fprintf(stderr, " aal1");
@@ -1015,9 +1020,6 @@ show_sdl_config(void)
 		break;
 	case SDL_CODING_AAL5:
 		fprintf(stderr, " aal5");
-		break;
-	case SDL_CODING_HDB3:
-		fprintf(stderr, " hdb3");
 		break;
 	default:
 		fprintf(stderr, " [%u]", capconf.sdl.ifcoding);
@@ -1078,7 +1080,7 @@ show_sdl_config(void)
 }
 
 void
-show_sdt_config()
+show_sdt_config(void)
 {
 	fprintf(stderr, "\tt8: %u\n", capconf.sdt.t8);
 	fprintf(stderr, "\tTin: %u\n", capconf.sdt.Tin);
@@ -1318,6 +1320,7 @@ cap_start(void)
 			return CAP_FAILURE;
 		link_state = 5;
 	case 5:
+		break;
 	}
 	return CAP_SUCCESS;
 }
@@ -1373,7 +1376,11 @@ cap_enter(void)
 			/* parent exits */
 			exit(0);
 		}
-		chdir("/");	/* release current directory */
+		/* release current directory */
+		if (chdir("/") == -1) {
+			perror("ss7cap");
+			exit(2);
+		}
 		umask(0);	/* clear file creation mask */
 		/* rearrange file streams */
 		fclose(stdin);
@@ -1428,7 +1435,7 @@ ss7cap(void)
 int
 main(int argc, char **argv)
 {
-	int c;
+	int c, val;
 
 	while (1) {
 #if defined _GNU_SOURCE
@@ -1583,15 +1590,16 @@ main(int argc, char **argv)
 		      bad_nonopt:
 			if (output || debug) {
 				if (optind < argc) {
-					fprintf(stderr, "%s: illegal syntax -- '", argv[0]);
+					fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
 					while (optind < argc)
 						fprintf(stderr, "%s ", argv[optind++]);
-					fprintf(stderr, "'\n");
+					fprintf(stderr, "\n");
 				} else {
 					fprintf(stderr, "%s: missing option or argument", argv[0]);
 					fprintf(stderr, "\n");
 				}
 				fflush(stderr);
+				goto bad_usage;
 			      bad_usage:
 				usage(argc, argv);
 			}

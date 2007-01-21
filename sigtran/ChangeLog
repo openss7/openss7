@@ -1,3 +1,14 @@
+2007-01-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/iua-as.4.man: added manual page
+	* doc/man/man4/m2ua-as.4.man: added manual page
+	* doc/man/man8/iuaasconf.8.man: added manual page
+	* doc/man/man8/m2paconf.8.man: added manual page
+	* doc/man/man8/m2uaasconf.8.man: added manual page
+	* doc/man/man8/m2uaconf.8.man: added manual page
+
+	* src/drivers/m2ua_as.c: corrections
+
 2007-01-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* sigtran.lsm.in: archive size update

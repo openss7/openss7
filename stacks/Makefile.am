@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2006/12/29 05:51:03 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2007/01/21 20:22:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/29 05:51:03 $ by $Author: brian $
+# Last Modified $Date: 2007/01/21 20:22:35 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.83  2007/01/21 20:22:35  brian
+# - working up drivers
+#
 # Revision 0.9.2.82  2006/12/29 05:51:03  brian
 # - changes for successful master build
 #
@@ -192,7 +195,10 @@ pkglibexec_PROGRAMS		= \
 
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod \
-				  sdlconfig
+				  sdlconfig \
+				  slconfd \
+				  slmon \
+				  ss7capd
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
@@ -205,6 +211,24 @@ sdlconfig_LDADD			= $(STREAMS_LDADD)
 sdlconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
 sdlconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 sdlconfig_CFLAGS		= $(USER_CFLAGS)
+
+slconfd_SOURCES			= src/util/slconfd.c
+slconfd_LDADD			= $(STREAMS_LDADD)
+slconfd_LDFLAGS			= $(STREAMS_LDFLAGS)
+slconfd_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+slconfd_CFLAGS			= $(USER_CFLAGS)
+
+slmon_SOURCES			= src/util/slmon.c
+slmon_LDADD			= $(STREAMS_LDADD)
+slmon_LDFLAGS			= $(STREAMS_LDFLAGS)
+slmon_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+slmon_CFLAGS			= $(USER_CFLAGS)
+
+ss7capd_SOURCES			= src/util/ss7capd.c
+ss7capd_LDADD			= $(STREAMS_LDADD)
+ss7capd_LDFLAGS			= $(STREAMS_LDFLAGS)
+ss7capd_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+ss7capd_CFLAGS			= $(USER_CFLAGS)
 
 test_tcpc_SOURCES		= src/test/inet/test-tcpc.c
 test_tcpc_LDADD			= $(STREAMS_LDADD)
@@ -478,7 +502,10 @@ pkglibexec_PROGRAMS		= \
 
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod \
-				  sdlconfig
+				  sdlconfig \
+				  slconfd \
+				  slmon \
+				  ss7capd
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
@@ -491,6 +518,24 @@ sdlconfig_LDADD			= $(STREAMS_LDADD)
 sdlconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
 sdlconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 sdlconfig_CFLAGS		= $(USER_CFLAGS)
+
+slconfd_SOURCES			= src/util/slconfd.c
+slconfd_LDADD			= $(STREAMS_LDADD)
+slconfd_LDFLAGS			= $(STREAMS_LDFLAGS)
+slconfd_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+slconfd_CFLAGS			= $(USER_CFLAGS)
+
+slmon_SOURCES			= src/util/slmon.c
+slmon_LDADD			= $(STREAMS_LDADD)
+slmon_LDFLAGS			= $(STREAMS_LDFLAGS)
+slmon_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+slmon_CFLAGS			= $(USER_CFLAGS)
+
+ss7capd_SOURCES			= src/util/ss7capd.c
+ss7capd_LDADD			= $(STREAMS_LDADD)
+ss7capd_LDFLAGS			= $(STREAMS_LDFLAGS)
+ss7capd_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+ss7capd_CFLAGS			= $(USER_CFLAGS)
 
 test_tcpc_SOURCES		= src/test/inet/test-tcpc.c
 test_tcpc_LDADD			= $(STREAMS_LDADD)

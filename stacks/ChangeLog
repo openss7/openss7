@@ -1,3 +1,23 @@
+2007-01-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man5/sdlconf.5.man: added man page
+	* doc/man/man5/sdtconf.5.man: added man page
+	* doc/man/man5/slconf.5.man: added man page
+	* doc/man/man8/x400pconf.8.man: added man page
+	* src/include/ss7/sl_mux.h: added header for sl-mux driver
+	* src/modules/sl/slmux.c: added new sl-mux driver
+	* src/lib/slpcap/slpcap.c: added base for libpcap replacement
+
+	* Makefile.am: working up configuration programs
+	* doc/man/Makefile.am: working up configuration programs
+	* doc/man/man4/sl-mux.4.man: working up configuration programs
+	* doc/man/man8/slconfd.8.man: working up configuration programs
+	* doc/man/man8/slmon.8.man: working up configuration programs
+	* doc/manual/todo.texi: working up configuration programs
+	* src/util/slconfd.c: working up configuration programs
+	* src/util/slmon.c: working up configuration programs
+	* src/util/ss7capd.c: working up configuration programs
+
 2007-01-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* strss7.lsm.in: archive size update

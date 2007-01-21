@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: slmon.8.man,v 0.9.2.1 2007/01/15 11:33:55 brian Exp $
+.\" @(#) $Id: slmon.8.man,v 0.9.2.2 2007/01/21 20:22:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/01/15 11:33:55 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/21 20:22:39 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: slmon.8.man,v $
+.\" Revision 0.9.2.2  2007/01/21 20:22:39  brian
+.\" - working up drivers
+.\"
 .\" Revision 0.9.2.1  2007/01/15 11:33:55  brian
 .\" - added new and old signalling link utilities
 .\"
@@ -104,17 +107,51 @@ is a monitoring utility for the SL-MUX multiplexing driver,
 .BR sl-mux (4).
 Its purpose is to provide the ability to monitor any signalling link interface configured in the
 host.
+.PP
+.B slmon
+is a Signalling System No. 7 (SS7) capture daemon for performing SS7 signalling data collection on
+one or more OpenSS7 signalling links.
+.B slmon
+opens a specialized minor device,
+.IR /dev/sl-mon ,
+on the signalling link multiplexer,
+.BR sl-mux (4),
+attaches to the appropriate signalling links and begins output of each received SL service
+primitive,
+.BR sli (7),
+monitored on the signalling link.  The utility can be run in the foreground and print standard
+output and errors to standard out and error, or to an output and log file; or it can run in the
+background as a daemon process printing output and errors to a capture and log file.  The capture
+and log files can be specified by the user.
 .\"
 .\"
 .SH OPTIONS
 .PP
+When specified without any options, the
+.B slmon
+utility will generate usage information and exit with a non-zero exit status.  One of
+.BR -p " or " -c
+must be given to get the utility to capture primitives across a service interface.  The
+.B slmon
+utility accepts the following command line options:
+.\"
+.SS "Command Options"
+.PP
+The following command options determine the mode of the command and are mutually exclusive options:
+.TP
+.BR -m ", " --muxid " " \fIMUXID\fP
+Specifies the multiplexer identifier returned by the
+.IR I_LINK "(7) or " I_PLINK (7)
+input-output control operation that linked the lower multiplex stream.  See
+.BR sl-mux (4)
+for more information on multiplexer identifiers.
 .TP
 .BR -p ", " --ppa " " \fIPPA\fP
 Specifies the Physical Point of Appearance,
 .IR PPA ,
 associated with the signalling link to be monitored.  The Physical Point of Appearance is a
 representation of the 32-bit number specifying the global PPA.  See
-.BR slconf (5)
+.BR sl-mux "(4) and " slconf (5)
 for more information on global PPA addressing.
 .TP
 .BR -c ", " --clei " " \fICLEI\fP
@@ -122,27 +159,24 @@ Specifies the Common Language Equipment Identifier,
 .IR CLEI ,
 associated with the signalling link to be monitored.  The Common Language Equipment Identifier
 is an ASCII string representation specifying the CLEI.  See
-.BR slconf (5)
+.BR sl-mux "(4) and " slconf (5)
 for more information on CLEI addressing.
+.TP
+.BR -f ", " --cfgfile " " \fICFGFILE\fP
+Capture using the configuration data and devices listed in the file,
+.IR CFGFILE .
+The default configuration file is
+.RI \(lq /etc/sysconfig/ss7/slmon.conf \(rq.
+This option is currently not supported.
 .PP
 One of the
-.B -p
-or
-.B -c
+.BR -p ", " -c " or " -f
 options must be specified.  Otherwise,
 .B slmon
 will print usage information and exit with an error return value.
-.TP
-.BR -f ", " --file " " \fIFILENAME\fP
-Specifies a file,
-.IR FILENAME ,
-to which the formatted monitoring information is to be written, instead of to standard output,
-.IR stdout .
-When a file name is specified with this option,
-.B slmon
-will close
-.IR stdin ", " stdout " and " stderr ,
-and place itself in the background as a deamon process.
+.PP
+The following options are coding standard options for the OpenSS7 project that are supported by all
+command line utilities:
 .TP
 .BR -h ", " --help
 When this option is encountered, print usage information to
@@ -158,6 +192,146 @@ and exit.
 When this option is encountered, print copyright and copying information to
 .I stdout
 and exit.
+.\"
+.SS "General Options"
+.PP
+The following are general options controlling the output of the utility and can be applied to the
+command in any mode:
+.TP
+.BR -q ", "  --quiet
+Specifies that the caller is interested only in the return code and that normal output should be
+suppressed.  This option is equivalent to
+.BR --verbose = 0 .
+.TP
+.BR -D ", "  --debug " [" \fILEVEL\fP ]
+Increases or set the debugging level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the debugging level should be increased by one.  If the
+.I LEVEL
+argument is specified, the debugging level is set to that integer value.  This option can be
+repeated.  For example,
+.B -DDDDD
+is equivalent to
+.BR --debug = 5 .
+The default debugging level is zero
+.RB ( 0 ).
+.TP
+.BR -v ", " --verbose " [" \fILEVEL\fP ]
+Increases or set the output verbosity level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the output verbosity level should be increased by one.  If the
+.I LEVEL
+argument is specified, the output verbosity level is set to that integer value.  This option can be
+repeated.  For example,
+.B -vvvvv
+is equivalent to
+.BR --verbose = 5 .
+The default output verbosity level is one
+.RB ( 1 ).
+.\"
+.SS "Capture Options"
+.PP
+The following options are applicable to the capture mode:
+.TP
+.BR -e ", " --device " " \fIDEVNAME\fR
+Specifies the device name,
+.IR DEVNAME ,
+from which to capture.  The default device name is
+.RI \(lq /dev/sl-mon \(rq.
+.TP
+.BR -t ", " --text2pcap
+Specifes that the output format is to be generated as to be suitable as input to the
+.BR text2pcap (1)
+program.  The output format consists of a
+.BR od (1)
+.RI ( "od -t -x1" )
+formatted dump of each Signalling Link SDU.  Messages not containing SDUs are
+not output.
+.TP
+.BR -p ", " --provider
+Specifies that upstream messages (or SDUs) are to be output.
+This option is
+useful for use with the
+.B --text2pcap
+option.
+.TP
+.BR -u ", " --user
+Specifies that downstream messages (or SDUs) are to be output.
+This option is
+useful for use with the
+.B --text2pcap
+option.
+.PP
+When the
+.B -p
+option is specified and the
+.B -u
+option is not specified, then only upstream messages (or SDUs) are output.
+When the
+.B -u
+option is specified and the
+.B -p
+option is not specified, then only downstream messages (or SDUs) are output.
+If
+neither the
+.B -p
+or
+.B -u
+options are specified, it is as though both options were specified and both
+upstream and downstream messages (or SDUs) are output.
+.\"
+.SS "Daemon Options"
+.PP
+The following options are applicable to capturing in the daemon mode or to redirecting output and
+errors:
+.TP
+.BR -d ", " --daemon
+Specifies that the
+.B slmon
+utility is to run in the background as a daemon process.  When run as a daemon process, standard
+output will always be redirected to
+.I OUTFILE
+and standard error will always be redirected to
+.IR LOGFILE .
+The default is for the
+.B slmon
+utility to run in the foreground output sent to
+.I stdout
+and errors sent to
+.IR stderr .
+.TP
+.BR -O ", "  --outpdir " " \fIOUTPDIR\fR
+When run in the daemon mode, or when an output or log file is specified, specifies the directory,
+.IR OUTPDIR ,
+in which output and error files will be opened.  The default output directory if one is not
+specified with this option is
+.RI \(lq /var/tmp/slmon/ \(rq.
+.TP
+.BR -n ", " --lnkname " [" \fILNKNAME\fR ]
+When run in the daemon mode, or when an output or log file is specified, specifies the link name to
+use to generate default output and error file names.  The default link name to use is the string
+.RI \(lq slmon \(rq
+concatenated with the process identification number of the creating process.
+.TP
+.BR -o ", " --outfile " [" \fIOUTFILE\fR ]
+When run in daemon mode, or to redirect output to a file, this option specifies the output filename,
+.IR OUTFILE .
+Specifying this option, with or without an argument, or specifying the
+.B --daemon
+option, causes output to be sent to the specified or default output file.  The default output
+filename is the link name concatenated with a
+.RI \(lq .out \(rq
+suffix.
+.TP
+.BR -l ", " --logfile " [" \fILOGFILE\fR ]
+When run in daemon mode, or to redirect errors to a file, this option specifies the log filename,
+.IR LOGFILE .
+Specifying this option, with or without an argument, or specifying the
+.B --daemon
+option, causes errors to be sent to the specified or default log file.  The default log filename is
+the link name concatenated with a
+.RI \(lq .err \(rq
+suffix.
 .\"
 .\"
 .SH "OUTPUT FORMAT"
@@ -176,12 +350,26 @@ line starts with a common header that contains the following fields:
 .TP
 .RI < sequence >
 A sequence number.  Each service primitive that passes the SL service interface is given a
-monitonically increasing sequence number beginning with the number 1.  A missing sequence number
+monotonically increasing sequence number beginning with the number 1.  A missing sequence number
 indicates that there was insufficient resources available to capture the service primitive
 corresponding to the missing numbers.
 .TP
 .RI < timestamp >
-A timestamp indicating the system clock time at which the service primitive was captured.
+A timestamp indicating the system clock time at which the service primitive was captured.  The
+timestamp is formatted as:
+.IR SSSSSSSSSSSS . UUUUUU ,
+where the field consists of seconds
+.RI ( S )
+and microseconds
+.RI ( U )
+from the Epoch followed by a space.
+.TP
+.RI < direction >
+The direction in which the primitive was passed.  This is either
+.RB \(lq U-P \(rq
+to indicate that the primitive was passed from the SL-User to the SL-Provider, or
+.RB \(lq P-U \(rq
+to indicate that the primitive was passed from the SL-Provider to the SL-User.
 .TP
 .RI < primitive >
 The name of the service primitive that passed the interface.  This is one of the service primitives
@@ -200,6 +388,17 @@ string.
 See
 .RI \(lq EXAMPLES ,\(rq
 below for an example of the service primitive output format.
+.PP
+When the
+.B --text2pcap
+options is specified, the output format is different.  Output of comment lines
+(lines begining with `#') remains unchanged.  The only output lines not that
+are not comment lines become
+.BR od (1)
+.RI ( "od -t x1" )
+formatted dumps of the data portion of each SDL_PDU_REQ or SDL_PDU_IND primitive.  See
+.BR text2pcap (1)
+for more information on this format.
 .\"
 .\"
 .SH USAGE
@@ -207,7 +406,7 @@ below for an example of the service primitive output format.
 .B slmon
 is invoked from the command line or a shell script to monitor signalling links.  The signalling link
 to monitor is specified using the
-.BR -p " or " -c
+.BR -p ", " -c " or " -f
 options.  The
 .B -p
 option is used to specify the signalling link to monitor using the global PPA for the signalling
@@ -215,6 +414,9 @@ link.  The
 .B -c
 option is used to specify the signalling link to monitor using the Common Language Equipment
 Identifier for the signalling link.
+The
+.B -f
+option is used to specify the signalling link to monitor from a file.
 .PP
 Once invoked,
 .B slmon
@@ -222,13 +424,13 @@ begin printing formatted entries corresponding to SL service interface primitive
 output,
 .IR stdout ,
 if the
-.B -f
-option is not specified, or to
-.I FILENAME
+.BR -d " and " -o
+options are not specified, or to
+.I OUTFILE
 if the
-.B -f
+.BR -d " or " -o
 option is specified.  When the
-.B -f
+.B -d
 option is specified,
 .B slmon
 also places itself in the background and closes standard input, output and error streams.
@@ -253,33 +455,67 @@ collects copies of service interface primitives that are delivered to the stream
 formatted and printed either to standard output,
 .IR stdout ,
 or to a collection file specified with the
-.B --file
+.B --outfile
 option.
 .\"
 .\"
 .SH SIGNALS
 .PP
-When operating as a daemon process, the
-.BR slmon
-utility accepts a number of signals as follows:
+.B slmon
+recognizes and catches a number of signals, useful when operating in the daemon mode, as follows:
 .TP
 .RI { SIGHUP }
 This signal causes the
 .B slmon
-utility in daemon mode to close and reopen the output file
-.IR FILENAME .
-This signal is used to rotate trace files.  The output file is first moved by another process, such
-as the log rotation utility, to another file name and then the
+utility to close and reopen the output file
+.IR OUTFILE ,
+and the log file
+.IR LOGFILE .
+This signal is used to rotate files.  The output and log files are first moved by another process,
+such as the
+.BR logrotate (8)
+utility, to another file name and then the
 .RI { SIGHUP }
-signal is sent to the daemon causing it to close the rotated file name an open a new file of name
-.I FILENAME
-to continue logging.
+signal is sent to the daemon causing it to close the rotated file names and open new files of name
+.IR OUTFILE " and " LOGFILE
+to continue capture and logging.
+An example
+.BR logrotate (8)
+script is as follows:
+.sp
+.nf
+\fC\s-1\
+/usr/bin/killall -HUP slmon >/dev/null 2>/dev/null || true
+\s+1\fP
+.fi
 .TP
-.RI { SIGUSR }
+.RI { SIGTERM }
 This signal causes the
 .B slmon
-utility in daemon mode to reread configuration information for the signalling link using
-input-output controls and output the result to the log file.
+utility to flush and close its output and log files, gracefully close the signalling links being
+captured, and exit with a zero
+.RB ( 0 )
+exit status.
+.TP
+.RI { SIGARLM }
+The
+.B slmon
+utility uses this signal for timers and this signal should not be used by external processes.
+.TP
+.RI { SIGUSR1 }
+This signal causes the
+.B slmon
+utility in daemon mode to reread configuration information for the signalling link being captured
+using input-output controls, and output the result to the output file.  This signal should be sent
+when the signalling link is reconfigured.
+(The
+.BR sl-mux (4)
+driver will issue a
+.RI { SIGUSR1 }
+signal to the process holding open a
+.I /dev/sl-mon
+device attached to a signalling link that has just passed an input-output control reconfiguring the
+signalling link.)
 .\"
 .\"
 .SH DIAGNOSTICS
@@ -298,6 +534,10 @@ option suppresses printing of diagnostic messages to
 .\"
 .SH NOTICES
 .PP
+The
+.BR -f ", " --cfgile = \fICFGFILE\fR
+option is not yet implemented.
+.PP
 .B slmon
 has an impact on system performance, particularly when used to monitor signalling links that are
 carrying a high amount of traffic.  The
@@ -307,7 +547,7 @@ driver places a sequence number on each service primitive delivered to the
 application.  When the system is congested and the
 .B slmon
 is unable to keep up with the number of service primitives delivered to it, messages will be
-dropped.  Dropped messages can be detected by the occurence of gaps in the sequence numbers
+dropped.  Dropped messages can be detected by the occurrence of gaps in the sequence numbers
 associated with the primitives.  The most likely service primitives to be dropped are
 .BR SL_PDU_IND (7)
 or
@@ -319,7 +559,7 @@ only monitors the Signalling Link service interface and the service primitives t
 interface.  It does not monitor state machine transitions, or timer events.  Tracing of state
 machine transitions and timer events is performed on a driver-by-driver basis.
 For tracing of state
-machin transitions and timer events, see the
+machine transitions and timer events, see the
 .BR strace (8)
 .IR STREAMS (9)
 utility and the particular driver's manual page.
@@ -327,6 +567,40 @@ utility and the particular driver's manual page.
 .\"
 .SH EXAMPLES
 .PP
+Running
+.B slmon
+in the foreground on a signalling link by CLEI:
+.sp
+.nf
+\fC\s-1\
+#> slmon -c EDTNAB01CG1SL001
+\s+1\fP
+.fi
+.PP
+Running
+.B slmon
+as a daemon process logging to
+.IR mylink.out " and " mylink.err
+in the
+.I /var/log/slmon
+directory:
+.sp
+.nf
+\fC\s-1\
+#> slmon -d -c EDTNAB01CG1SL001 -n mylink
+\s+1\fP
+.fi
+.PP
+Sample output file format:
+.sp
+.nf
+\fC\s-3\
+\s+3\fP
+.fi
+.PP
+Note that FISUs and LSSUs are not included, only MSUs that are passed between SL-User and
+SL-Provider.  Also, the beginning of the message field starts with the SIO and represents only the
+MSU payload.
 .\"
 .\"
 .SH DEVICES
@@ -341,10 +615,29 @@ monitoring device.
 .SH FILES
 .PP
 .TP
-.I /etc/sysconfig/slconf
-The
-.BR slconf (5)
-configuration file.
+.I /var/sbin/slmon
+contains the
+.B slmon
+command.
+.TP
+.I /var/tmp/slmon
+The default capture output directory.
+.TP
+.IB /var/tmp/slmon/slmon $$ .out
+The default capture output file, where
+.B $$
+is the process identification number of the creating process.
+.TP
+.IB /var/tmp/slmon/slmon $$ .err
+The default capture log file, where
+.B $$
+is the process identification number of the creating process.
+.TP
+.I /etc/sysconfig/ss7/slconf.conf
+The default configuration file.
+.TP
+.I /var/log/messages
+The system log file.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -357,14 +650,30 @@ configuration file.
 .PP
 .B slmon
 has no known bugs.
+Report bugs to
+.RB < bugs@openss7.org >.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B slmon
+is backward compatible with previous versions of the utility.  The output format has not changed
+over the various versions of the utility.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+SS7
+monitoring is not subject to standardization.  The
+.B slmon
+utility conforms to the OpenSS7 Local Management Interface (LMI),
+.BR lmi (7),
+version
+.B 0.9.2
+and the Signalling Link Interface (SLI),
+.BR sli (7),
+version
+.BR 0.9.2 .
 .\"
 .\"
 .SH HISTORY

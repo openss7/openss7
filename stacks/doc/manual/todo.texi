@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.2 2006/10/05 12:14:45 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.3 2007/01/21 20:22:40 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/05 12:14:45 $ by $Author: brian $
+@c Last Modified $Date: 2007/01/21 20:22:40 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -80,5 +80,13 @@ Start retesting SS7 Stack components (MTP2, MTP3, SCCP, ISUP, TCAP) under Linux 
 @item
 Package a public release.  It has been way too long since a public release of this package.
 The package has almost a million lines of code in it, most of which the public has never seen!
+
+@item
+Complete the SL-MUX driver and utility programs.
+
+@item
+Complete the libslpcap library (@manpage{pcap(3)}) for live capture of SS7 link SDUs using
+@manpage{ethereal(1)} or @manpage{wireshark(1)}.
+
 @end itemize
 

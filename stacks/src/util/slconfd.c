@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slconfd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:33:57 $
+ @(#) $RCSfile: slconfd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/15 11:33:57 $ by $Author: brian $
+ Last Modified $Date: 2007/01/21 20:22:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slconfd.c,v $
+ Revision 0.9.2.2  2007/01/21 20:22:41  brian
+ - working up drivers
+
  Revision 0.9.2.1  2007/01/15 11:33:57  brian
  - added new and old signalling link utilities
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slconfd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:33:57 $"
+#ident "@(#) $RCSfile: slconfd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $"
 
-static char const ident[] = "$RCSfile: slconfd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:33:57 $";
+static char const ident[] = "$RCSfile: slconfd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $";
 
 /*
  *  This is a configuration daemon for the SL-MUX multiplexing driver.  Its purpose is to open
@@ -80,6 +83,156 @@ static char const ident[] = "$RCSfile: slconfd.c,v $ $Name:  $($Revision: 0.9.2.
  *  module would define its own syntax for the last fields in the configuration file entry (after
  *  the selector).  New selectors could then be defined.
  */
+
+#include <stropts.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/poll.h>
+#include <sys/time.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <getopt.h>
+#include <time.h>
+#include <signal.h>
+#include <syslog.h>
+#include <sys/utsname.h>
+
+#include <ss7/lmi.h>
+#include <ss7/lmi_ioctl.h>
+#include <ss7/sdli.h>
+#include <ss7/sdli_ioctl.h>
+#include <ss7/sdti.h>
+#include <ss7/sdti_ioctl.h>
+#include <ss7/sli.h>
+#include <ss7/sli_ioctl.h>
+
+int output = 1;
+int debug = 0;
+
+
+#define BUFSIZE 512
+
+char cbuf[BUFSIZE];
+char dbuf[BUFSIZE];
+
+struct strbuf ctrl = { sizeof(cbuf), 0, cbuf };
+struct strbuf data = { sizeof(dbuf), 0, dbuf };
+
+struct strioctl ctl;
+
+
+void
+copying(int argc, char *argv[])
+{
+	if (!output)
+		return;
+	fprintf(stdout, "\
+\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+\n\
+Unauthorized distribution or duplication is prohibited.\n\
+\n\
+This software and related documentation is protected by copyright and distribut-\n\
+ed under licenses restricting its use,  copying, distribution and decompilation.\n\
+No part of this software or related documentation may  be reproduced in any form\n\
+by any means without the prior  written  authorization of the  copyright holder,\n\
+and licensors, if any.\n\
+\n\
+The recipient of this document,  by its retention and use, warrants that the re-\n\
+cipient  will protect this  information and  keep it confidential,  and will not\n\
+disclose the information contained  in this document without the written permis-\n\
+sion of its owner.\n\
+\n\
+The author reserves the right to revise  this software and documentation for any\n\
+reason,  including but not limited to, conformity with standards  promulgated by\n\
+various agencies, utilization of advances in the state of the technical arts, or\n\
+the reflection of changes  in the design of any techniques, or procedures embod-\n\
+ied, described, or  referred to herein.   The author  is under no  obligation to\n\
+provide any feature listed herein.\n\
+\n\
+As an exception to the above,  this software may be  distributed  under the  GNU\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
+\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the license rights  granted\n\
+herein (the license  rights customarily  provided to non-Government  users).  If\n\
+the Software is supplied to any unit or agency of the Government other than DoD,\n\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
+regulations).\n\
+\n\
+");
+}
+
+void
+version(int argc, char *argv[])
+{
+	if (!output)
+		return;
+	fprintf(stdout, "\
+\n\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 2003-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
+\n\
+    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    incorporated here by reference.\n\
+\n\
+    See `%1$s --copying' for copying permission.\n\
+\n\
+", argv[0], ident);
+}
+
+void
+usage(int argc, char *argv[])
+{
+	if (!output)
+		return;
+	fprintf(stderr, "\
+Usage:\n\
+    %1$s [options] {{-p, --ppa} PPA | {-c, --clei} CLEI}\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
+", argv[0]);
+}
+
+void
+help(int argc, char *argv[])
+{
+	if (!output)
+		return;
+	fprintf(stdout, "\
+\n\
+Usage:\n\
+    %1$s [options] {{-p, --ppa} PPA | {-c, --clei} CLEI}\n\
+    %1$s {-h, --help}\n\
+    %1$s {-V, --version}\n\
+    %1$s {-C, --copying}\n\
+Arguments:\n\
+    (none)\n\
+General Options:\n\
+    -q, --quiet                                 (default: off)\n\
+        suppress output\n\
+    -v, --verbose                               (default: off)\n\
+        increase verbosity of output\n\
+", argv[0]);
+}
 
 int
 main(int argc, char **argv)

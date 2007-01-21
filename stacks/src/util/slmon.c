@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:33:57 $
+ @(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/15 11:33:57 $ by $Author: brian $
+ Last Modified $Date: 2007/01/21 20:22:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slmon.c,v $
+ Revision 0.9.2.2  2007/01/21 20:22:41  brian
+ - working up drivers
+
  Revision 0.9.2.1  2007/01/15 11:33:57  brian
  - added new and old signalling link utilities
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:33:57 $"
+#ident "@(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $"
 
-static char const ident[] = "$RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:33:57 $";
+static char const ident[] = "$RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $";
 
 /*
  * This is a signalling link monitoring utiltiy for the SL-MUX multiplexing driver.  It purpose is
@@ -86,6 +89,8 @@ static char const ident[] = "$RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.1 
 #include <signal.h>
 #include <syslog.h>
 #include <sys/utsname.h>
+#include <ctype.h>
+#include <stdint.h>
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -126,7 +131,7 @@ char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
 
 struct strbuf ctrl = { sizeof(cbuf), 0, cbuf };
-struct strbuf ctrl = { sizeof(dbuf), 0, dbuf };
+struct strbuf data = { sizeof(dbuf), 0, dbuf };
 
 struct strioctl ctl;
 
@@ -283,15 +288,15 @@ ftimestamp(void)
 void
 output_header(void)
 {
-	unsigned char buf[128] = "";
+	char buf[128] = "";
 	struct utsname uts;
 
 	ftimestamp();
 	fprint_time(stdout);
-	fprintf(stdout, " # SS7MON $Id: slmon.c,v 0.9.2.1 2007/01/15 11:33:57 brian Exp $ Output File Header\n");
+	fprintf(stdout, " # SS7MON $Id: slmon.c,v 0.9.2.2 2007/01/21 20:22:41 brian Exp $ Output File Header\n");
 	uname(&uts);
 	fprint_time(stdout);
-	fprint(stdout, " # machine %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,
+	fprintf(stdout, " # machine %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,
 	       uts.version, uts.machine);
 	fprint_time(stdout);
 	fprintf(stdout, " # device: %08x %s\n", ppa, clei);
@@ -345,13 +350,13 @@ hup_action(void)
 			syslog(LOG_ERR, "Could not reopen stderr file %s", errpath);
 		}
 	}
-	return (0);
+	return;
 }
 
 void
 alm_action(void)
 {
-	return (0);
+	return;
 }
 
 void
@@ -383,7 +388,7 @@ stop_timer(void)
 	return alm_block();
 }
 
-int
+void
 print_data(caddr_t ptr, size_t len)
 {
 	static unsigned char hexchar[] = {
@@ -419,7 +424,7 @@ decode_ctrl(void)
 
 	ftimestamp();
 	if (output > 2)
-		fprintf(stderr, "Got control message! %ld\n", prim);
+		fprintf(stderr, "Got control message! %d\n", prim);
 	fprint_time(stdout);
 	switch (prim) {
 	case LMI_INFO_REQ:
@@ -430,7 +435,7 @@ decode_ctrl(void)
 		fprintf(stdout, "{lmi_ppa=");
 		print_data((caddr_t) p->lmi.attach_req.lmi_ppa,
 			   ctrl.len - sizeof(p->lmi.attach_req));
-		fputc(stdout, '}');
+		fputc('}', stdout);
 		break;
 	case LMI_DETACH_REQ:
 		fprintf(stdout, "ctrl=LMI_DETACH_REQ");
@@ -440,7 +445,7 @@ decode_ctrl(void)
 		fprintf(stdout, "{lmi_rem");
 		print_data((caddr_t) p->lmi.enable_req.lmi_rem,
 			   ctrl.len - sizeof(p->lmi.enable_req));
-		fputc(stdout, '}');
+		fputc('}', stdout);
 		break;
 	case LMI_DISABLE_REQ:
 		fprintf(stdout, "ctrl=LMI_DISABLE_REQ");
@@ -499,7 +504,7 @@ decode_ctrl(void)
 		fprintf(stdout, ",lmi_ppa_addr=");
 		print_data((caddr_t) p->lmi.info_ack.lmi_ppa_addr,
 			   ctrl.len - sizeof(p->lmi.info_ack));
-		fputc(stdout, '}');
+		fputc('}', stdout);
 		break;
 	case LMI_OK_ACK:
 		fprintf(stdout, "ctrl=LMI_OK_ACK");
@@ -584,7 +589,7 @@ decode_ctrl(void)
 			fprintf(stdout, "[%u]", p->lmi.ok_ack.lmi_state);
 			break;
 		}
-		fputc(stdout, '}');
+		fputc('}', stdout);
 		break;
 	case LMI_ERROR_ACK:
 		fprintf(stdout, "ctrl=LMI_ERROR_ACK");
@@ -790,7 +795,7 @@ decode_ctrl(void)
 			fprintf(stdout, "[%u]", p->lmi.error_ack.lmi_state);
 			break;
 		}
-		fputc(stdout, '}');
+		fputc('}', stdout);
 		break;
 	case LMI_ENABLE_CON:
 		fprintf(stdout, "ctrl=LMI_ENABLE_CON");
@@ -824,7 +829,7 @@ decode_ctrl(void)
 			fprintf(stdout, "[%u]", p->lmi.enable_con.lmi_state);
 			break;
 		}
-		fputc(stdout, '}');
+		fputc('}', stdout);
 		break;
 	case LMI_DISABLE_CON:
 		fprintf(stdout, "ctrl=LMI_DISABLE_CON");
@@ -1015,7 +1020,7 @@ decode_ctrl(void)
 			fprintf(stdout, "[%u]", p->lmi.error_ind.lmi_state);
 			break;
 		}
-		fputc(stdout, '}');
+		fputc('}', stdout);
 		break;
 	case LMI_STATS_IND:
 		fprintf(stdout, "ctrl=LMI_STATS_IND");
@@ -1053,7 +1058,7 @@ decode_ctrl(void)
 		break;
 	case SL_RETRIEVAL_REQUEST_AND_FSNC_REQ:
 		fprintf(stdout, "ctrl=SL_RETRIEVAL_REQUEST_AND_FSNC_REQ");
-		fprintf(stdout, "{sl_fsnc=%u}", p->sl.retrieval_req_and_fsnc);
+		fprintf(stdout, "{sl_fsnc=%u}", p->sl.retrieval_req_and_fsnc.sl_fsnc);
 		break;
 	case SL_CLEAR_BUFFERS_REQ:
 		fprintf(stdout, "ctrl=SL_CLEAR_BUFFERS_REQ");
@@ -1209,7 +1214,7 @@ decode_ctrl(void)
 	default:
 		return (-1);
 	}
-	fputc(stdout, '\n');
+	fputc('\n', stdout);
 	return (prim);
 }
 
@@ -1241,7 +1246,7 @@ wait_event(int wait)
 			fprintf(stderr, "entering poll loop\n");
 		switch (poll(pfd, 1, wait)) {
 		case -1:
-			if (errno == EAGAIN || errno = EINTR || errno = ERESTART)
+			if (errno == EAGAIN || errno == EINTR || errno == ERESTART)
 				continue;
 			syslog(LOG_ERR, "%s: poll error", __FUNCTION__);
 			syslog(LOG_ERR, "%s: %m", __FUNCTION__);
@@ -1251,7 +1256,7 @@ wait_event(int wait)
 			return (0);
 		case 1:
 			if (pfd[0].revents & (POLLIN | POLLPRI)) {
-				int ret, flags = 0;
+				int flags = 0;
 
 				ctrl.maxlen = BUFSIZE;
 				ctrl.len = 0;
@@ -1318,6 +1323,13 @@ mon_open(void)
 }
 
 int
+mon_close(void)
+{
+	close(mon_fd);
+	return (0);
+}
+
+int
 mon_attach(void)
 {
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
@@ -1357,7 +1369,7 @@ mon_attach(void)
 			return (0);
 		case LMI_ERROR_ACK:
 			syslog(LOG_ERR, "%s: lmi_errno: %s", __FUNCTION__,
-			       strerrno(p->error_ack.lmi_errno));
+			       strerror(p->error_ack.lmi_errno));
 			syslog(LOG_ERR, "%s: lmi_reason: 0x%08x", __FUNCTION__,
 			       p->error_ack.lmi_reason);
 			syslog(LOG_ERR, "%s; lmi_error_primitive: %d", __FUNCTION__,
@@ -1400,7 +1412,7 @@ mon_detach(void)
 			return (0);
 		case LMI_ERROR_ACK:
 			syslog(LOG_ERR, "%s: lmi_errno: %s", __FUNCTION__,
-			       strerrno(p->error_ack.lmi_errno));
+			       strerror(p->error_ack.lmi_errno));
 			syslog(LOG_ERR, "%s: lmi_reason: 0x%08x", __FUNCTION__,
 			       p->error_ack.lmi_reason);
 			syslog(LOG_ERR, "%s; lmi_error_primitive: %d", __FUNCTION__,
@@ -1501,7 +1513,7 @@ show_sdt_config(void)
 	fprint_time(stdout);
 	fprintf(stdout, " # sdt config: b: %u\n", monconf.sdt.b);
 	fprint_time(stdout);
-	fprintf(stdout, " # sdt config: f: ", monconf.sdt.f);
+	fprintf(stdout, " # sdt config: f: ");
 	switch (monconf.sdt.f) {
 	case SDT_FLAGS_ONE:
 		fprintf(stdout, "one\n");
@@ -1538,8 +1550,8 @@ show_sdl_config(void)
 		fprintf(stdout, " rx");
 	if (monconf.sdl.ifflags & SDL_IF_TX_RUNNING)
 		fprintf(stdout, " tx");
-	fputc(stdout, '\n');
-	fprint_timer(stdout);
+	fputc('\n', stdout);
+	fprint_time(stdout);
 	fprintf(stdout, " # sdl config: iftype:");
 	switch (monconf.sdl.iftype) {
 	case SDL_TYPE_NONE:
@@ -1573,7 +1585,7 @@ show_sdl_config(void)
 		fprintf(stdout, " [%u]", monconf.sdl.iftype);
 		break;
 	}
-	fputc(stdout, '\n');
+	fputc('\n', stdout);
 
 	fprint_time(stdout);
 	fprintf(stdout, " # sdl config: ifrate:");
@@ -1597,7 +1609,7 @@ show_sdl_config(void)
 		fprintf(stdout, " %u", monconf.sdl.ifrate);
 		break;
 	}
-	fputc(stdout, '\n');
+	fputc('\n', stdout);
 	fprintf(stdout, " # sdl config: ifgtype:");
 	switch (monconf.sdl.ifgtype) {
 	case SDL_GTYPE_NONE:
@@ -1636,7 +1648,7 @@ show_sdl_config(void)
 	default:
 		fprintf(stdout, " [%u]", monconf.sdl.ifgtype);
 	}
-	fputc(stdout, '\n');
+	fputc('\n', stdout);
 
 	fprint_time(stdout);
 	fprintf(stdout, " # sdl config: ifgrate:");
@@ -1654,7 +1666,7 @@ show_sdl_config(void)
 		fprintf(stdout, " %u", monconf.sdl.ifgrate);
 		break;
 	}
-	fputc(stdout, '\n');
+	fputc('\n', stdout);
 
 	fprint_time(stdout);
 	fprintf(stdout, " # sdl config: ifmode:");
@@ -1702,7 +1714,7 @@ show_sdl_config(void)
 		fprintf(stdout, " [%u]", monconf.sdl.ifmode);
 		break;
 	}
-	fputc(stdout, '\n');
+	fputc('\n', stdout);
 
 	fprint_time(stdout);
 	fprintf(stdout, " # sdl config: ifgmode:");
@@ -1720,7 +1732,7 @@ show_sdl_config(void)
 		fprintf(stdout, " [%u]", monconf.sdl.ifgmode);
 		break;
 	}
-	fputc(stdout, '\n');
+	fputc('\n', stdout);
 
 	fprint_time(stdout);
 	fprintf(stdout, " # sdl config: ifgcrc:");
@@ -1744,7 +1756,7 @@ show_sdl_config(void)
 		fprintf(stdout, " [%u]", monconf.sdl.ifgcrc);
 		break;
 	}
-	fputc(stdout, '\n');
+	fputc('\n', stdout);
 
 	fprint_time(stdout);
 	fprintf(stdout, " # sdl config: ifclock:");
@@ -1783,7 +1795,7 @@ show_sdl_config(void)
 		fprintf(stdout, " [%u]", monconf.sdl.ifclock);
 		break;
 	}
-	fputc(stdout, '\n');
+	fputc('\n', stdout);
 
 	fprint_time(stdout);
 	fprintf(stdout, " # sdl config: ifcoding:");
@@ -1822,7 +1834,7 @@ show_sdl_config(void)
 		fprintf(stdout, " [%u]", monconf.sdl.ifcoding);
 		break;
 	}
-	fputc(stdout, '\n');
+	fputc('\n', stdout);
 
 	fprint_time(stdout);
 	fprintf(stdout, " # sdl config: ifframing:");
@@ -1836,20 +1848,17 @@ show_sdl_config(void)
 	case SDL_FRAMING_CAS:
 		fprintf(stdout, " cas");
 		break;
-	case SDL_FRAMING_SF:
-		fprintf(stdout, " sf");
+	case SDL_FRAMING_SF: /* SDL_FRAMING_D4 */
+		fprintf(stdout, " sf/d4");
 		break;
 	case SDL_FRAMING_ESF:
 		fprintf(stdout, " esf");
-		break;
-	case SDL_FRAMING_D4:
-		fprintf(stdout, " d4");
 		break;
 	default:
 		fprintf(stdout, " [%u]", monconf.sdl.ifframing);
 		break;
 	}
-	fputc(stdout, '\n');
+	fputc('\n', stdout);
 
 	fprint_time(stdout);
 	fprintf(stdout, " # sdl config: ifblksize: %u\n", monconf.sdl.ifblksize);
@@ -1866,7 +1875,7 @@ show_sdl_config(void)
 		fprintf(stdout, " cts");
 	if (monconf.sdl.ifleads & SDL_LEAD_DSR)
 		fprintf(stdout, " dsr");
-	fputc(stdout, '\n');
+	fputc('\n', stdout);
 
 	fprint_time(stdout);
 	fprintf(stdout, " # sdl config: ifbpv: %u\n", monconf.sdl.ifbpv);
@@ -1881,7 +1890,7 @@ show_sdl_config(void)
 		fprintf(stdout, " yel");
 	if (monconf.sdl.ifalarms & SDL_ALARM_REC)
 		fprintf(stdout, " rec");
-	fputc(stdout, '\n');
+	fputc('\n', stdout);
 
 	fprint_time(stdout);
 	fprintf(stdout, " # sdl config: ifrxlevel: %u\n", monconf.sdl.ifrxlevel);
@@ -1932,7 +1941,7 @@ show_sdl_config(void)
 		fprintf(stdout, " [%u]", monconf.sdl.iftxlevel);
 		break;
 	}
-	fputc(stdout, '\n');
+	fputc('\n', stdout);
 
 	fprint_time(stdout);
 	fprintf(stdout, " # sdl config: ifsync: %u\n", monconf.sdl.ifsync);
@@ -1941,7 +1950,7 @@ show_sdl_config(void)
 	fprintf(stdout, " # sdl config: ifsyncsrc:");
 	for (i = 0; i < SDL_SYNCS; i++)
 		fprintf(stdout, " %u", monconf.sdl.ifsyncsrc[i]);
-	fputc(stdout, '\n');
+	fputc('\n', stdout);
 }
 
 void
@@ -2022,8 +2031,9 @@ mon_start(void)
 			syslog(LOG_NOTICE, "getting configuration");
 		if (mon_config() != (0))
 			return (-1);
-		lin_state = 3;
+		link_state = 3;
 	case 3:
+		break;
 	}
 	return (0);
 }
@@ -2047,6 +2057,7 @@ mon_stop(void)
 			return (-1);
 		link_state = 0;
 	case 0:
+		break;
 	}
 	return (0);
 }
@@ -2073,7 +2084,11 @@ mon_enter(void)
 			/* parent exits */
 			exit(0);
 		}
-		chdir("/");	/* release current directory */
+		/* release current directory */
+		if (chdir("/") == -1) {
+			perror("chdir");
+			exit(2);
+		}
 		umask(0);	/* clear file creation mask */
 		/* rearrange file streams */
 		fclose(stdin);
@@ -2309,7 +2324,7 @@ main(int argc, char **argv)
 			strncpy(outfile, optarg, sizeof(outfile) - 1);
 			break;
 		case 'l':	/* -l, --logfile LOGFILE */
-			strncpy(logfile, optarg, sizeof(logfile) - 1);
+			strncpy(errfile, optarg, sizeof(errfile) - 1);
 			break;
 		case 'f':	/* -f, --cfgfile CFGFILE */
 			strncpy(cfgfile, optarg, sizeof(cfgfile) - 1);
@@ -2328,9 +2343,6 @@ main(int argc, char **argv)
 			if (ppa != 0)
 				goto bad_option;
 			strncpy(clei, optarg, sizeof(clei) - 1);
-			break;
-		case 'f':
-			strncpy(filename, optarg, sizeof(filename) - 1);
 			break;
 		case 'q':	/* -q, --quiet */
 			output -= output > 0 ? 1 : output;
