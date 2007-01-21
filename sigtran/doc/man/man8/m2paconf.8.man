@@ -1,0 +1,584 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
+.\"
+.\" @(#) $Id: m2paconf.8.man,v 0.9.2.1 2007/01/21 20:20:07 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/01/21 20:20:07 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: m2paconf.8.man,v $
+.\" Revision 0.9.2.1  2007/01/21 20:20:07  brian
+.\" - added documetation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database sigtran.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so sigtran.macros
+.\"
+.\"
+.TH M2PACONF 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.SH NAME
+.B m2paconf
+\- M2PA Configuration utility
+.\"
+.\"
+.SH SYNOPSIS
+.HP 12
+\fBm2paconf\fP [\fIoptions\fR] {\fB-g\fP|\fB--get\fP} \fIarguments\fP \fI...\fP
+.PD 0
+.HP
+\fBm2paconf\fP [\fIoptions\fR] {\fB-s\fP|\fB--set\fP} \fIarguments\fP \fI...\fP
+.HP
+\fBm2paconf\fP [\fIoptions\fR] {\fB-f\fP|\fB--file\fP} [\fIFILENAME\fP]
+.HP
+.BR m2paconf " {" -h ", " --help }
+.HP
+.BR m2paconf " {" -V ", " --version }
+.HP
+.BR m2paconf " {" -C ", " --copying }
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B m2paconf
+is a configuration utility for the M2PA-SL module,
+.BR m2pa_sl (4),
+and the SL-MUX multiplexing driver,
+.BR sl-mux (4).
+Its purpose is to form Signalling Link streams using the M2PA-SL module, connect the M2PA link,
+configure the link, and link the SL stream under the SL-MUX multiplexing driver, configure the lower
+SL stream, and then wait in the background watching for updates to the configuration file and apply
+updates as they occur.
+.PP
+The
+.B m2paconf
+utility is intended to be run at system startup from a System V initializatoin script.  Once the configuration
+of the M2PA-SL and SL-MUX driver is complete, applications programs can open, attach, enable and use
+Signalling Link streams opened on the driver.
+.PP
+The purpose of the SL-MUX driver is to provide a unified interface for accessing signalling links of
+a number of forms and from a number of various drivers.  Signalling links could correspond to a
+device driver, or could be M2UA signalling links, M2PA signalling links or other implementations.
+Each type of signalling link requires some additional configuration before they can be used and will
+be linked under the SL-MUX by a separate configuration utility.  The
+.B m2paconf
+utility is the utility used for the M2PA-SL module.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.SS "Command Options"
+.PP
+One of the following mutually exclusive command options must be specified.  If no command options
+are specified,
+.B m2paconf
+will act as though the
+.B -g
+option was specified and print the configuration for all M2PA PPAs.
+.TP
+[{\fB-g\fP|\fB--get\fP} [\fICLEI\fP|\fIPPA\fP] \fI...\fP]
+Get and display the configuration information associated with a specific set of CLEI or PPA, or get
+and display information for all PPAs (if no arguments are specified).  The information is displayed
+in the same format as contained in the
+.BR slconf (5)
+configuration file.
+This option can be used to obtain information about specific M2PA signalling links, as well as
+providing the ability to regenerate the
+.B m2pa
+entries in the
+.BR slconf (5)
+configuration file.
+.RS
+.PP
+Arguments consist of a whitespace separated list of one or more of the following arguments:
+.TP
+.I CLEI
+A Common Language Equipment Identifier (CLEI) specifying a signalling link for which to display
+information.
+.TP
+.I PPA
+A global Physical Point of Attachment (PPA) specifying a signalling link for which to display
+information.
+.PP
+If no arguments are supplied, the
+.B m2paconf
+utility will display information for all signalling links of type
+.BR m2pa .
+.RE
+.TP
+{\fB-r\fP|\fB--remove\fP} [\fICLEI\fP|\fIPPA\fP] \fI...\fP
+Remove signalling links from the SL-MUX multiplexer for a specific set of CLEI or PPA, or remove
+signalling links for all PPAs (if no arguments are specified).
+This option can be used by configuration scripts to remove specific M2PA signalling links from the SL-MUX driver.
+.RS
+.PP
+Arguments consist of a whitespace separated list of one or more of the following arguments:
+.TP
+.I CLEI
+A Common Language Equipment Identifier (CLEI) specifying a signalling link to remove.
+.TP
+.I PPA
+A global Physical Point of Attachment (PPA) specifying a signalling link to remove.
+.PP
+If no arguments are supplied, the
+.B m2paconf
+utility will remove all signalling links of type
+.BR m2pa .
+.RE
+.TP
+{\fB-a\fP|\fB--add\fP} \fICLEI\fP \fIPPA\fP \fIarguments\fP \fI...\fP
+Add signalling links to the SL-MUX multiplexer for a specific signalling link.  The format of the
+arguments are the same as for the
+.B sl
+entry in the
+.BR slconf (5)
+configuration file.
+This option can be used by configuration scripts to add specific M2PA signalling links to the SL-MUX driver.
+.RS
+.PP
+Arguments consist of the following fields separated by whitespace:
+.TP
+.I clei
+The Common Language Equipment Identifier (CLEI) to associate with the added signalling link.
+.TP
+.I ppa
+The global Physical Point of Attachment (PPA) to associated with the added signalling link.
+.TP
+.I ss7-profile
+Specifies the name of the SS7 profile to use, or the special value
+.BR default ,
+specifying the default SS7 profile for the signalling link.
+The named profile, if other than
+.BR default ,
+must exist in the
+.BR slconf (5)
+configuration file.
+.TP
+.I sl-profile
+Specifies the name of the Signalling Link profile to use, or the special value
+.BR default ,
+specifying the default SL profile for the signalling link.
+The named profile, if other than
+.BR default ,
+must exist in the
+.BR slconf (5)
+configuration file.
+.TP
+.I sdt-profile
+Specifies the name of the Signalling Data Terminal profile to use, or the special value
+.BR default ,
+specifying the default SDT profile for the signalling link.  For
+.B m2pa
+signalling links, this field is always set to
+.BR default .
+.TP
+.I sdl-profile
+Specifies the name of the Signalling Data Link profile to use, or the special value
+.BR default ,
+specifying the default SDL profile for the signalling link.  For
+.B m2pa
+signalling links, this field is always set to
+.BR default .
+.TP
+.I device-type
+Always
+.BR m2pa .
+.TP
+.I local-endpoint
+Specifies the host-name or IP address and port number to which the host will bind when forming the
+SCTP association for the M2PA signalling link.  If no port number is specified, the default M2PA
+reserved (well-known) port number is used.  If no IP address is specified, a wild card bind will be
+performed.
+.TP
+.I remote-endpoint
+Specifies the host-name or IP address and port number to which the host will connect when forming the
+SCTP association for the M2PA signalling link.  If no port number is specified, the default M2PA
+reserved (well-known) port number is used.
+.RE
+.TP
+{\fB-f\fP|\fB--file\fP} [\fIFILENAME\fP]
+Add, remove, and configure signalling links according to the signalling links configuration
+specified in the file,
+.IR FILENAME .
+If no
+.I FILENAME
+argument is specified, the default configuration file at
+.B /etc/sysconfig/slconfd
+is read.
+The file specified by
+.I FILENAME
+must be in
+.BR slconf (5)
+format, and on the
+.B m2pa
+.I device-type
+entries are processed by the
+.B m2paconf
+utility.
+.PP
+.TP
+{\fB-h\fP|\fB--help\fP|\fB-?\fP|\fB--?\fP}
+When this option is encountered, print usage information to
+.I stdout
+and exit.
+.TP
+{\fB-V\fP|\fB--version\fP}
+When this option is encountered, print version information to
+.I stdout
+and exit.
+.TP
+{\fB-C\fP|\fB--copying\fP}
+When this option is encountered, print copying information to
+.I stdout
+and exit.
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+The file format is as described in
+.BR slconf (5),
+with the additional fields defined for devices of type
+.BR m2pa .
+Signalling link specification line entries in the file consist of the following fields:
+.PP
+.B sl
+.RI < clei >
+.RI < global-ppa >
+.RI < profile >
+.RI < device-type >
+.RI < device >
+.RI < modules >
+.RI < m2pa-version >
+.RI < local-endpoint >
+.RI < remote-endpoint >
+.PP
+Where,
+.TP
+.B sl
+is the selector indicating that this is a signalling link definition entry.
+.TP
+.I clei
+is a Common Language Equipment Identifier (CLEI) to be associated with this signalling link.
+.TP
+.I global-ppa
+is a global Physical Point of Appearance (PPA) to be associated with this signalling link.
+.TP
+.I profile
+is a signalling link protocol parameters profile used to configure this signalling link.  The
+profile must either be the default entry,
+.BR default ,
+or must be defined in the
+.BR slconf (5)
+configuration file.
+.TP
+.I device-type
+Always
+.BR m2pa .
+.TP
+.I device
+is the device to open to create a signalling link Stream.  For
+M2PA the device is normally
+.RB \(lq /dev/sctp_n \(rq.
+.TP
+.I modules
+is the modules to push over the open device Stream necessary to create a signalling link Stream
+supporting the Signalling Link Interface (SLI),
+.BR sli (7).
+This field is a comma-separated list of module names, with no intervening whitespace.  Modules are
+pushed in the order in which they appear in the list.
+For M2PA, the module list normaly contains only the
+.RB \(lq m2pa_sl \(rq
+module.
+.TP
+.I m2pa-version
+is the protocol version for M2PA.  This field can be one of the following:
+.RS
+.TP \w'\fBdraft6.9\fR\(em'u
+.B draft3
+draft-ietf-sigtran-m2pa-03
+.[
+draft-ietf-sigtran-m2pa-03
+.]
+.PD 0
+.TP
+.B draft3.1
+draft-ietf-sigtran-m2pa-03
+with modifications
+.TP
+.B draft4
+draft-ietf-sigtran-m2pa-04
+.[
+draft-ietf-sigtran-m2pa-04
+.]
+.TP
+.B draft4.1
+draft-ietf-sigtran-m2pa-04
+with modifications
+.TP
+.B draft4.9
+draft-ietf-sigtran-m2pa-04
+with anticipated changes for 05.
+.TP
+.B draft5
+draft-ietf-sigtran-m2pa-05
+.[
+draft-ietf-sigtran-m2pa-05
+.]
+.TP
+.B draft5.1
+draft-ietf-sigtran-m2pa-05
+with modifications
+.TP
+.B draft6
+draft-ietf-sigtran-m2pa-06
+.[
+draft-ietf-sigtran-m2pa-06
+.]
+.TP
+.B draft6.1
+draft-ietf-sigtran-m2pa-06
+with modifications
+.TP
+.B draft6.9
+draft-ietf-sigtran-m2pa-06
+with anticipated changes for 07
+.TP
+.B draft7
+draft-ietf-sigtran-m2pa-07
+.[
+draft-ietf-sigtran-m2pa-07
+.]
+.TP
+.B draft9
+draft-ietf-sigtran-m2pa-09
+.[
+draft-ietf-sigtran-m2pa-09
+.]
+.TP
+.B draft10
+draft-ietf-sigtran-m2pa-10
+.[
+draft-ietf-sigtran-m2pa-10
+.]
+.TP
+.B draft11
+draft-ietf-sigtran-m2pa-11
+.[
+draft-ietf-sigtran-m2pa-11
+.]
+.TP
+.B rfc4165
+RFC 4165
+.[
+rfc4165
+.]
+.PD
+.RE
+.TP
+.I local-endpoint
+is the local SCTP endpoint.  This field can be a host-name and port number in the format:
+\fIhost-name\fR[\fB,\fIhost-name\fR][\fB:\fIport\fR]
+or the format:
+\fIip-address\fR[\fB,\fIip-address\fR][\fB:\fIservice\fR]
+or a mixture of IP addresses, host-names and port numbers or service names.
+A star,
+.RB ` * ',
+can be used in the place of host-names or IP addresses to indicate a wild card bind.  If the port
+number (or service name) is not specified, a dynamic port number will be assigned.  For the M2PA
+well-known port number, use
+.B m2pa
+as a service name.
+A universal address in numbers and dots notation (e.g.
+.BR 127.0.0.0.250 )
+can also be used.
+.TP
+.I remote-endpoint
+is the remote SCTP endpoint.  This field can be a host-name and port number in the format:
+\fIhost-name\fR[\fB,\fIhost-name\fR][\fB:\fIport\fR]
+or the format:
+\fIip-address\fR[\fB,\fIip-address\fR][\fB:\fIservice\fR]
+or a mixture of IP addresses, host-names and port numbers or service names.
+If the port number (or service name) is not specified, the M2PA well-known port number will be used
+as though
+.B m2pa
+was specified as a service name.
+A universal address in numbers and dots notation (e.g.
+.BR 127.0.0.1.250 )
+can also be used.
+.PP
+When the
+.B -f
+option is specified,
+.B m2paconf
+opens the configuration file,
+.IR FILENAME ,
+and reads the entries line by line.  Each entry is independent of other entries.  For each entry of
+.I device-type
+.BR m2pa ,
+.BR m2paconf
+performs the following actions:
+.IP 1. \w'0.\(em'u
+The utility opens the device specified in the
+.I device
+field (typically,
+.BR /dev/sctp_n )
+using the
+.BR open (2s)
+system call.
+The utility then pushes the modules specified in the
+.I modules
+field (typically,
+.BR m2pa_sl (4))
+using the
+.IR I_PUSH (7)
+input-output control.
+.IP 2.
+The utility configures the signalling link using signalling link input-output controls in accordance
+with the
+.I profile
+values, using
+.BR sli_ioctl (4)
+intput-output controls.
+.IP 3.
+The utility attaches the signalling link using the
+.I local-endpoint
+address converted to a
+.I sockaddr
+structure and placed in the
+.I lmi_ppa
+field of the
+.BR LMI_ATTACH_REQ (7)
+primitive.
+.IP 4.
+The utility enables the signalling link using the
+.I remote-endpoint
+address converted to a
+.I sockaddr
+structure and placed in the
+.I lmi_rem
+field of the
+.BR LMI_ENABLE_REQ (7)
+primitive.
+.IP 5.
+The utility links the resulting signalling link Stream under the SL-MUX multiplexing driver using
+the
+.IR I_PLINK (7)
+input-output control and closes the file descriptor for the Stream.
+.IP 6.
+The utility uses the SL-MUX specific input-output controls to assign the
+.IR clei ", " global-ppa " and " device-type
+values to the linked signalling link.  Streams opened on the SL-MUX driver can then attach to this
+signalling link using the global PPA or the CLEI for the signalling link.
+.PP
+Once the
+.B m2paconf
+utility has linked and configured all of the signalling link Streams specified on the command line,
+or in the configuration file, it watches the configuration file for changes and effects those
+changes when they occur.  Changes are effected by linking additional signalling links or unlinking
+existing signalling links to alter the configuration of the SL-MUX to match that of the altered
+configuration file.
+.\"
+.\"
+.SH SIGNALS
+.PP
+.TP
+.RI { SIGHUP }
+This signal causes the
+.B m2paconf
+utility to reread the configuration file.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

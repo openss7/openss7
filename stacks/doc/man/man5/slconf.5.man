@@ -1,0 +1,368 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: slconf.5.man,v 0.9.2.1 2007/01/21 20:20:08 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/01/21 20:20:08 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: slconf.5.man,v $
+.\" Revision 0.9.2.1  2007/01/21 20:20:08  brian
+.\" - added documetation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH SLCONF 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.SH NAME
+.B slconf
+\- Signalling Link Configuration
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B /etc/slconf
+.PP
+.B #include <sys/slconf.h>
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The signaling link configuration database file,
+.BR /etc/slconf ,
+is a system file that contains configuration information for signalling links and, specifically, the
+Signalling Link configuration daemon,
+.BR slconfd (8).
+.PP
+Each entry in the signalling link configuration database file can be represented by a
+.B slconfig
+structure, formatted as follows:
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+Entries consist of a number of fields separated by newlines.  Fields are separated by whitespace and
+occur in the order in which they are described below.  Whitespace can be embedded as blanks or
+tabs.  Backslashes may be embedded as backslashes.  Lines that begin with an octothorpe,
+.RI ` # ',
+in column 1 are treated as comments.  Each valid line in the file describes an available signalling
+link its associated configuration information.  Each entry contains the following fields:
+.PP
+\fBsl\fP <\fIclei\fP> <\fIglobal-ppa\fP> <\fIdevice-type\fP> \fI...\fP
+.PP
+Where,
+.TP
+.I clei
+A Common Language Equipment Identifier (CLEI) for the signalling link.  This CLEI can be used by
+streams opening the
+.BR sl-mux (4)
+driver to attach to this signalling link.
+.TP
+.I global-ppa
+A global Physical Point of Attachment (PPA) for the signalling link.  This PPA can be used by
+streams opening the
+.BR sl-mux (4)
+driver to attach to this signalling link.
+.TP
+.I device-type
+The device type defines the type of device that a is providing the signalling link.  The device type
+can, for example, be one of:
+.BR x400p ", " m2ua " or " m2pa .
+For additional information on X400P-SS7 configuration, see
+.BR x400pconf (5).
+For additional information on M2PA configuration, see
+.BR m2paconf (5).
+For additional information on M2UA configuration, see
+.BR m2uaconf (5).
+.TP
+.I ...
+The remaining fileds are interpreted depending on the device type.  The signalling link
+configuration daemon,
+.BR slconfd (8),
+that reads this file will attempt to open the shared object object derived from the name of the
+device type.  The
+.BR slconfd (8)
+program will attempt to open the shared object named
+\(lq\fB/usr/lib/ss7/\fIdevice-type\fB.so\fR\(rq,
+where
+.I device-type
+is the name of the device type from the
+.I device-type
+field.
+For example, for the
+.B x400p
+device type, the
+.BR slconfd (8)
+program will attempt to open
+.RB \(lq /usr/lib/ss7/x400p.so \(rq.
+.IP ""
+The shared object opened by
+.BR slconfd (8)
+provides access procedures for the daemon to open, attach and configure the signalling link.  The
+access procedures are passed the remainder of the configuration file entry and is parsed according
+to the specific device type.
+.PP
+\fBss7profile\fR <\fIname\fR> <\fIvariant\fR> <\fIoptions\fR>
+.PP
+Where,
+.TP
+.B ss7profile
+is an entry selector that indicates that this is an SS7 profile entry.  An SS7 profile is a
+collection of protocol variant and option information for SS7 entities that is commont to a number
+of SS7 entities.
+.TP
+.I name
+is an identifier for the SS7 profile.
+.TP
+.I variant
+specifies a protocol variant.  A protocol variant identifies a standard to which the SS7 entity must
+comply.
+.TP
+.I options
+specifies protocol options.  Protocol options are optional behaviours within a standard.  This is a
+comma separated list of the options which apply to the protocol variant.
+.PP
+\fBsdlprofile\fR <\fIname\fR> \fI...\fR
+.PP
+Where,
+.TP
+.B sdlprofile
+is an entry selector that indicates that this is a signalling data link profile entry.
+.TP
+.I name
+is an identifier for the signalling data link profile.
+.TP
+.I iftype
+specifies the interface type.  The interface type can be one of the following:
+.sp
+.RS
+.TP
+.B -
+the interface type is unspecified.  The default interface type for the signalling data link will be
+used.
+.PD 0
+.TP
+.B v35
+specifies a V.35 interface.
+.TP
+.B ds0
+specifies a DS0 interface.
+.TP
+.B ds0a
+specifies a DS0A interface.
+.TP
+.B e1
+specifies an (full span) E1 interface.
+.TP
+.B t1
+specifies a (full span) T1 interface.
+.TP
+.B j1
+specifies a (full span) J1 interface.
+.TP
+.B atm
+specifies an ATM (SSCOP) interface.
+.TP
+.B packet
+specifies a packet interface.
+.PD
+.RE
+.TP
+.I ifrate
+specifies the interface rate.  The interface rate can be one of the following:
+.sp
+.RS
+.TP
+.B -
+the interface rate is unspecified.  The default interface rate for the signalling data link will be
+used.
+.PD 0
+.TP
+.B ds0a
+specifies a DS0A interface rate (56000 bps).
+.TP
+.B ds0
+specifies a DS0 interface rate (64000 bps).
+.TP
+.B t1
+specifies a T1 interface rate (1544000 bps).
+.TP
+.B j1
+specifies a J1 interface rate (1544000 bps).
+.TP
+.B e1
+specifies an E1 interface rate (2048000 bps).
+.PD
+.RE
+.TP
+.I ifgtype
+specifies the interface group type.  The interface group type can be one of the following:
+.sp
+.RS
+.RE
+.TP
+.I ifgrate
+specifies the interface group rate.  The interface group rate can be one of the following:
+.sp
+.RS
+.RE
+.TP
+.I ifmode
+specifies the interface mode.  The interface mode can be one of the following:
+.sp
+.RS
+.RE
+.TP
+.I ifgmode
+specifies the interface group mode.  The interface group mode can be one of the following:
+.sp
+.RS
+.RE
+.TP
+.I ifgcrc
+specifies the interface group CRC.  The interface group CRC can be one of the following:
+.sp
+.RS
+.RE
+.TP
+.I ifclock
+specifies the interface clock.  The interface clock can be one of the following:
+.sp
+.RS
+.RE
+.TP
+.I ifcoding
+specifies the interface coding.  The interface coding can be one of the following:
+.sp
+.RS
+.RE
+.TP
+.I ifframing
+specifies the interface framing.  The interface framing can be one of the following:
+.sp
+.RS
+.RE
+.TP
+.I ifblksize
+specifies the interface block size.  The interface block size can be one of the following:
+.sp
+.RS
+.RE
+.TP
+.I ifrxlevel
+specifies the interface receiver level.  The interface receiver level can be one of the following:
+.sp
+.RS
+.RE
+.TP
+.I iftxlevel
+specifies the interface transmitter level.  The interface transmitter level can be one of the following:
+.sp
+.RS
+.RE
+.TP
+.I ifsyncsrc
+specifies the interface synchronization sources.  The interface synchronization sources is a comma
+separated list, with no intervening whitespace, specifying the synchronization sources in order of
+priority for the interface.  Each interface synchronization source can be one of the following:
+.sp
+.RS
+.RE
+.PP
+\fBsdtprofile\fR <\fIname\fR> \fI...\fR
+.PP
+Where,
+.TP
+.B sdtprofile
+is an entry selector that indicates that this is a signalling data terminal profile entry.
+.TP
+.I name
+is an identifier for the signalling data terminal profile.
+.PP
+\fBslprofile\fR <\fIname\fR> \fI...\fR
+.PP
+Where,
+.TP
+.B slprofile
+is an entry selector that indicates that this is a signalling link profile entry.  A signalling
+link profile is a collection of configuration information for signalling links that are common to a
+number of signalling links.
+.TP
+.I name
+is an identifier for the signalling link profile.
+
+.\"
+.\"
+.SH BUGS
+.PP
+Not done yet.
+.\"
+.[
+$LIST$
+.]
+.\"
+.TA

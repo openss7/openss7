@@ -1,0 +1,280 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: sdtconf.5.man,v 0.9.2.1 2007/01/21 20:20:08 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/01/21 20:20:08 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: sdtconf.5.man,v $
+.\" Revision 0.9.2.1  2007/01/21 20:20:08  brian
+.\" - added documetation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH SDTCONF 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.SH NAME
+.B sdtconf
+\- Signalling Data Terminal configuration file
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+none
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This manpage is under construction.
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+.PP
+Entries consist of a number of fields spearated by newlines.  Fields are separated by whitespace and
+occur in the order in which they are described below.  Whitespace can be embedded as blanks or tabs.
+Backslashes may be embedded as backslashes.  Lines that begin with an octothorpe,
+.RI ` # ',
+in column 1 are treated as comment lines.  Each valid line in the file describes either a signalling
+data terminal profile or a signalling data terminal, depending upon the initial field value.
+.PP
+As an option for specifying field values out of order, or skipping field values, the name of the
+field can be prefixed to the field entry with a equal sign,
+.RB ` = '.
+For example, the value for field
+.B Te
+can be written as:
+.RB \(lq Te=\fIvalue\fP \(rq.
+.PP
+Each entry contains the following fields:
+.PP
+.B profile
+.RI < name >
+.RI < t8 >
+.RI < Tin >
+.RI < Tie >
+.RI < T >
+.RI < D >
+.RI < Te >
+.RI < De >
+.RI < Ue >
+.RI < N >
+.RI < m >
+.RI < b >
+.RI < f >
+.PP
+Where,
+.TP
+.B profile
+is a selector that indicates that this is a signalling data terminal profile entry.
+.TP
+.I name
+is an identifier string used to identify this profile.
+.TP
+.I t8
+is the EIM T8 timer duration (in milliseconds)
+or a single dash (or missing field) indicating the default value or that the value is not applicable.
+This value is only applicable to signalling links that utilize the EIM (Errored Interval Monitor).
+.TP
+.I Tin
+is the AERM normal proving threshold (in number of SUs)
+or a single dash (or missing field) indicating the default value or that the value is not applicable.
+This value is only applicable to signalling links that utilize the AERM (Alignment Error Rate Monitor).
+.TP
+.I Tie
+is the AERM emergency proving threshold (in number of SUs)
+or a single dash (or missing field) indicating the default value or that the value is not applicable.
+This value is only applicable to signalling links that utilize the AERM (Alignment Error Rate Monitor).
+.TP
+.I T
+is the SUERM error threshold (in number of SUs)
+or a single dash (or missing field) indicating the default value or that the value is not applicable.
+This value is only applicable to signalling links that utilize the SUERM (Signal Unit Error Rate Monitor).
+.TP
+.I D
+is the SUERM error rate parameter (in number of SUs)
+or a single dash (or missing field) indicating the default value or that the value is not applicable.
+This value is only applicable to signalling links that utilize the SUERM (Signal Unit Error Rate Monitor).
+.TP
+.I Te
+is the EIM error threshold (in intervals)
+or a single dash (or missing field) indicating the default value or that the value is not applicable.
+This value is only applicable to signalling links that utilize the EIM (Errored Interval Monitor).
+.TP
+.I De
+is the EIM correct decrement (in intervals)
+or a single dash (or missing field) indicating the default value or that the value is not applicable.
+This value is only applicable to signalling links that utilize the EIM (Errored Interval Monitor).
+.TP
+.I Ue
+is the EIM error increment (in intervals)
+or a single dash (or missing field) indicating the default value or that the value is not applicable.
+This value is only applicable to signalling links that utilize the EIM (Errored Interval Monitor).
+.TP
+.I N
+is the number of octets per SU in octet-counting mode or a single dash (or missing field) indicating the default value.
+The default value is normally
+.B 16
+octets.  Octet counting mode is not applicable to all signalling terminals.
+.TP
+.I m
+is the maximum SIF size or a single dash (or missing field) indicating the default value.  The default value is
+dependent upon the interface rate and protocol options, but is normally
+.B 272
+octets.
+.TP
+.I b
+is the transmit block size.
+.TP
+.I f
+if the number of flags to be transmitted between frames.  It can have one of the following values:
+.sp
+.RS
+.TP
+.B one
+one flag is transmitted between frames.
+.PD 0
+.TP
+.B shared
+a shared flag is transmitted between frames.
+.TP
+.B two
+two flags are transmitted between frames.
+.TP
+.B three
+three flags are transmitted between frames.
+.TP
+.I n
+.I n
+flags are transmitted between frames.
+.TP
+.B -
+the default value is to be used, or the value is not applicable.
+.PD
+.PP
+The number of flags is only applicable to signalling links that use SS7-HDLC (DAED) for framing
+SDUs.  For example, ATM links and M2PA links do not frame SDUs with flags.
+.RE
+.PP
+.B sdt
+.RI < clei >
+.RI < global-ppa >
+.RI < sdti >
+.RI < profile >
+.RI < device-type >
+.I ...
+.PP
+Where,
+.TP
+.B sdt
+is a selector that indicates that this is a signalling data terminal entry.
+.TP
+.I clei
+is a Common Language Equipment Identifier (CLEI) for the signalling data terminal.  This value can be
+used to open the signalling data terminal using the
+.BR sl-mux (4)
+driver.
+.TP
+.I global-ppa
+is a global Physical Point of Attachment (PPA) for the signalling data termina.  This valud can be used
+to open the signalling data terminal using the
+.BR sl-mux (4)
+driver.
+.TP
+.I sdti
+is a Signalling Data Terminal Identifier (SDTI) for the signalling data termina.  This is interpreted as a
+16-bit integer number used to identify the signalling data terminal to remote peers.
+.TP
+.I profile
+is a profile name defined previously a
+.B profile
+entry with a
+.I name
+field corresponding to the value of this field.  It describes the configuration data for the
+signalling data terminal.
+.TP
+.I device-type
+is a device type.  This device type describes a shared object that can be opened by the
+configuration program to interpret the remaining fields in the entry and perform configuration
+actions with regard to the signalling data terminal.
+.TP
+.I ...
+are additional configuration fields specific to the device type specified in the
+.I device-type
+field.
+.\"
+.\"
+.SH BUGS
+.PP
+Not done yet.
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

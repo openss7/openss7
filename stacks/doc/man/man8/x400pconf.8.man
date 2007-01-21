@@ -1,0 +1,602 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
+.\"
+.\" @(#) $Id: x400pconf.8.man,v 0.9.2.1 2007/01/21 20:20:09 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/01/21 20:20:09 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: x400pconf.8.man,v $
+.\" Revision 0.9.2.1  2007/01/21 20:20:09  brian
+.\" - added documetation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH X400PCONF 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.SH NAME
+.B x400pconf
+\- X400P driver configuration utility
+.\"
+.\"
+.SH SYNOPSIS
+.HP 12
+\fBx400pconf\fP [\fIoptions\fR] [{\fB-g\fR|\fB--get\fR} [\fICLEI\fR|\fIPPA\fR] \fI...\fR]
+.PD 0
+.HP
+\fBx400pconf\fP [\fIoptions\fR] {\fB-r\fR|\fB--remove\fR} [\fICLEI\fR|\fIPPA\fR] \fI...\fR
+.HP
+\fBx400pconf\fP [\fIoptions\fR] {\fB-a\fR|\fB--add\fR} \fICLEI\fR \fIPPA\fR \fIarguments\fR
+.HP
+\fBx400pconf\fP [\fIoptions\fR] {\fB-f\fR|\fB--file\fR} [\fIFILENAME\fR]
+.HP
+\fBx400pconf\fP {\fB-h\fP|\fB--help\fP}
+.HP
+\fBx400pconf\fP {\fB-V\fP|\fB--version\fP}
+.HP
+\fBx400pconf\fP {\fB-C\fP|\fB--copying\fP}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B x400pconf
+is a configuration utility for the X400P-SS7 driver,
+.BR x400p-ss7 (4),
+and the SL-MUX multiplexing driver,
+.BR sl-mux (4).
+Its purpose is to open Signalling Link streams on the X400P-SS7 driver, attach them to specific
+PPAs, configure the link, and link the SL streams under the SL-MUX multiplexing driver, configure
+the lower SL stream, and then wait in the background watching for updates for the configuration file
+and apply updates as they occur.
+.PP
+The
+.B x400pconf
+is intended to be run at system startup from a System V initialization script.  Once the
+configuration of the X400P-SS7 and SL-MUX drivers is complete, applications programs can open,
+attach, enable and use Signalling Link streams opened on the driver.
+.PP
+The purpose of the SL-MUX driver is to provide a unified interface for accessing signalling links of
+a number of forms and from a number of various drivers.  Signalling links could correspond to device
+drivers, or could be M2UA signalling links or other implementations.  Each type of signalling link
+requires some additional configuration before they can be used and will be linked under the SL-MUX
+by a separate configuration utility.  The
+.B x400pconf
+utility is the utility used for the X400P-SS7 driver.
+.\"
+.\"
+.SH OPTIONS
+.PP
+The
+.B x400pconf
+utility accepts the following command-line options:
+.SS "Command Options"
+.PP
+On of the following mutually exclusive command options must be specified.  If no command options are
+specified,
+.B x400pconf
+will act as though the
+.B -g
+option was specified and print the configuration for all X400P-SS7 PPAs.
+.TP
+[{\fB-g\fR|\fB--get\fR} [\fICLEI\fR|\fIPPA\fR] \fI...\fR]
+Get and display the configuration information associated with a specific set of CLEI or PPA, or get
+and display information for all PPAs (if no arguments are specified).  The information is displayed
+in the same format as contained in the
+.BR slconf (5)
+configuration file.  This option can be used to obtain information about specific X400P-SS7
+signalling links, as well as providing the ability to regenerate the
+.B x400p
+entries in the
+.BR slconf (5)
+configuration file.
+.RS
+.PP
+Arguments consist of a whitespace separated list of zero or more of the following arguments:
+.TP
+.I CLEI
+A Common Language Equipment Identifier (CLEI) specifying a signalling link for which to display
+information.
+.TP
+.I PPA
+A global Physical Point of Appearance (PPA) specifying a signalling link for which to display
+information.
+.PP
+If no arguments are supplied, the
+.B x400pconf
+utility will display information for all signalling links of type
+.BR x400p .
+.RE
+.TP
+{\fB-r\fR|\fB--remove\fR} [\fICLEI\fR|\fIPPA\fR] \fI...\fR
+Remove signalling links from the SL-MUX multiplexer for a specific set of CLEI or PPA, or remove
+signalling links for all PPAs (if no argument are specified).  This option can be used by
+configuration scripts to remove specific X400P-SS7 signalling links from the SL-MUX driver.
+.RS
+.PP
+Arguments consist of a whitespace separated list of zero or more of the following arguments:
+.TP
+.I CLEI
+A Common Language Equipment Identifier (CLEI) specifying a signalling link to remove.
+.TP
+.I PPA
+A global Physical Point of Appearance (PPA) specifying a signalling link to remove.
+.RE
+.PP
+If no arguments are supplied, the
+.B x400pconf
+utility will remove all signalling links of type
+.BR x400p .
+.TP
+{\fB-a\fR|\fB--add\fR} \fICLEI\fR \fIPPA\fR \fIarguments\fR \fI...\fR
+Add signalling links to the SL-MUX multiplexer for a specific signalling link.  The format of the
+arguments are the same as for the
+.B sl
+entry in the
+.BR slconf (5)
+configuration file.  This option can be used by configuration scripts to add specific X400P-SS7
+signalling links to the SL-MUX driver.
+.RS
+.PP
+Arguments consist of the following fields separated by whitespace:
+.TP
+.I clei
+The Common Language Equipment Identifier (CLEI) to associate with the added signalling link.
+.TP
+.I global-ppa
+The global Physical Point of Attachment (PPA) to associate with the added signalling link.
+.TP
+.I profile
+Specifies the name of the signalling link profile to use, or the special value,
+.BR default ,
+specifying the default signalling link profile for the signalling link.  The named profile, if other
+than
+.BR default ,
+must exist in the
+.BR slconf (5)
+configuration file.
+.TP
+.I device-type
+Always
+.BR x400p .
+.TP
+.I device
+Specifies the device to open.  Typically
+.RB \(lq /dev/x400p-sl \(rq
+for the X400P-SS7 driver.
+.TP
+.I modules
+Specifies the modues to push.  Typicall
+null
+.RB ( - ).
+.TP
+.I card
+Specifies the logical card number associated with the signalling link.
+.TP
+.I span
+Specifies the logical span number associated with the signalling link.
+.TP
+.I slot
+Specifies the logical time slot number associated with the signalling link.
+.TP
+.I sdt-profile
+Specifies the signalling data terminal profile for the signalling link.  The signalling data
+terminal profile must exist in the
+.BR slconf (5)
+file, or be the special value,
+.RB \(lq default \(rq,
+indicating that the default values for the signalling link will be accepted.
+.TP
+.I sdl-profile
+Specifies the signalling data link profile for the signalling link.  The signalling data
+link profile must exist in the
+.BR slconf (5)
+file, or be the special value,
+.RB \(lq default \(rq,
+indicating that the default values for the signalling link will be accepted.
+.RE
+.TP
+{\fB-h\fR|\fB--help\fR|\fB-?\fR|\fB--?\fR}
+When this option is encountered, print usage information to
+.I stdout
+and exit.
+.TP
+{\fB-V\fR|\fB--version\fR}
+When this option is encountered, print version information to
+.I stdout
+and exit.
+.TP
+{\fB-C\fR|\fB--copying\fR}
+When this option is encountered, print copying information to
+.I stdout
+and exit.
+.TP
+{\fB-e\fR|\fB--device\fR} \fIDEVNAME\fR
+Specifies the device name,
+.IR DEVNAME ,
+to open to obtain a Stream on the SL-MUX multiplexing driver.  The default value is
+.RB \(lq /dev/sl-mux .\(rq
+.TP
+{\fB-d\fR|\fB--daemon\fR}
+Specifies that the
+.B x400pconf
+utility is to place itself in the background after reading the configuration file and monitor the
+configuration file for subsequent changes.
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+The file format is as described in
+.BR slconf (5),
+with the additional fields defined for devices of type
+.BR x400p .
+Signalling link specification line entries in the file consist of the following fields:
+.PP
+.B sl
+.RI < clei >
+.RI < global-ppa >
+.RI < profile >
+.RI < device-type >
+.RI < device >
+.RI < modules >
+.RI < card >
+.RI < span >
+.RI < slot >
+.RI < sdt-profile >
+.RI < sdl-profile >
+.PP
+Where,
+.TP
+.B sl
+is the selector indicating that this is a signalling link definition entry.
+.TP
+.I clei
+is a Common Language Equipment Identifier (CLEI) to be associated with this signalling link.
+The is the CLEI that can be used by users opening the SL-MUX driver to attach to this signalling
+link.
+.TP
+.I global-ppa
+is a global Physical Point of Appearance (PPA) to be associated with this signalling link.
+The is the PPA that can be used by users opening the SL-MUX driver to attach to this signalling
+link.
+.TP
+.I profile
+is a signalling link protocol parameters profile used to configure this signalling link.  The
+profile must either be the default entry,
+.BR default ,
+or must be defined in the
+.BR slconf (5)
+configuration file.
+It is also possible to place the parameter definitions in-line, enclosed in braces
+.RB ( {} ).
+.TP
+.I device-type
+Always
+.BR x400p .
+.TP
+.I device
+is the device to open to create a signalling link Stream.
+For the X400P-SS7 driver, the device is normally
+.RB \(lq /dev/x400p-ss7 \(rq.
+At a later date this might be the
+.RB \(lq /dev/x400p-ch \(rq
+device.
+.TP
+.I modules
+is the modules to push over the open device Stream necessary to create a signalling link Stream
+supporting the Signalling Link Interface (SLI),
+.BR sli (7).
+This field is a comma-separated list of module names, with no intervening whitespace.  Modules are
+pushed in the order in which they appear in the list.
+For the X400P-SS7 driver, the module is normally null as indicated by a single dash,
+.RB ` - '.
+At a later point this might be the
+.RB \(lq daed \(rq
+and
+.RB \(lq sl \(rq
+modules.
+.TP
+.I card
+is the logical card number of the X400P-SS7 card to which the signalling link belongs.  Logical card
+numbers start at zero
+.RB ( 0 )
+and span through
+.IR (n-1) ,
+where
+.I n
+is the number of physical cards present in the system.
+.TP
+.I span
+is the logical span number on the X400P-SS7 card.  Logical spans numbers start at one
+.RB ( 1 )
+and span through the number of spans supported by the card (i.e. four).
+.TP
+.I slot
+is the logical time slot number on the X400P-SS7 card.  Logical time slot zero
+.RB ( 0 )
+refers to the entire span.  Logical time slots one
+through twenty-four
+.RB ( 1 - 24 )
+refer to individual time slots in a T1 or J1 span.  Logical time slots one
+through thirty-one
+.RB ( 1 - 31 )
+refer to individual time slots in an E1 span.
+.TP
+.I sdt-profile
+is signalling data terminal parameters profile used to configure the signalling data terminal.  The
+profile must either be the default entry,
+.BR default ,
+or must be defined in the
+.BR slconf (5)
+configuration file.
+It is also possible to place the parameter definitions in-line, enclosed in braces
+.RB ( {} ).
+.TP
+.I sdl-profile
+is signalling data link parameters profile used to configure the signalling data link.  The
+profile must either be the default entry,
+.BR default ,
+or must be defined in the
+.BR slconf (5)
+configuration file.
+It is also possible to place the parameter definitions in-line, enclosed in braces
+.RB ( {} ).
+.PP
+When the
+.B -f
+option is specified,
+.B x400pconf
+opens the configuration file,
+.IR FILENAME ,
+and reads the entries line by line.  Each entry is independent of other entries.  For each entry of
+.I device-type
+.BR x400p ,
+.BR x400pconf
+performs the following actions:
+.IP 1. \w'0.\(em'u
+The utility opens the device specified in the
+.I device
+field (typically,
+.BR /dev/x400p-sl )
+using the
+.BR open (2s)
+system call.
+The utility then pushes the modules specified in the
+.I modules
+field (typically
+null)
+using the
+.IR I_PUSH (7)
+input-output control.
+.IP 2.
+The utility configures the signalling link using signalling link input-output controls in accordance
+with the
+.IR profile ", " sdt-profile " and " sdl-profile
+values, using
+.BR sli_ioctl (4),
+.BR sdti_ioctl (4)
+and
+.BR sdli_ioctl (4)
+intput-output controls.
+.IP 2.
+If the
+.I local-ppa
+field is other than a single dash, the utility interprets the field as an integer number and uses
+the integer number in an
+.BR LMI_ATTACH_REQ (7)
+request to attach the opened Stream to the specific signalling link.
+.IP 3.
+The utility configures the signalling link using signalling link input-output controls described in
+.BR sli_ioctl (4),
+to configure the signalling link.
+.IP 4.
+The utility links the resulting signalling link Stream under the SL-MUX multiplexing driver using
+the
+.IR I_PLINK (7)
+input-output control and closes the file descriptor for the Stream.
+.IP 5.
+The utility uses SL-MUX specific input-output controls to assign the
+.IR clei ", " global-ppa " and " device-type
+values to the linked signalling link.  Streams opened on the SL-MUX driver can then attach to this
+signalling link using the global PPA or the CLEI for the signalling link.
+.PP
+Once the
+.B x400pconf
+utility has linked and configured all of the signalling link Streams specified on the command line,
+or in the configuration file, it watches the configuration file for changes and effects those
+changes when they occur.  Changes are effected by linking additional signalling links or unlinking
+existing signalling links to alter the configuration of the SL-MUX to match that of the altered
+configuration file.
+.\"
+.\"
+.SH SIGNALS
+.PP
+.TP
+.RI { SIGHUP }
+This signal causes the
+.B x400pconf
+utility to reread the configuration file.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1) indicates that an
+error occured and a diagnostic messages is printed to
+.IR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message is printed on
+.IR stderr .
+.PP
+If
+.I stderr
+has already been redirected to a log file, the diagnostic message will appear in the log file.
+.PP
+The
+.B --quiet
+option suppresses printing of diagnostic messages to
+.IR stderr .
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.I /dev/x400p-sl
+The
+.BR x400p_sl (4)
+signalling link device.
+.TP
+.I /dev/sl
+The
+.BR sl-mux (4)
+signalling link device.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.I /usr/sbin/x400pconf
+Contains the
+.BR x400pconf
+command.
+.TP
+.I /etc/sysconfig/ss7/slconf.conf
+The default configuration file.
+.TP
+.I /var/log/messages
+The system log file.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR x400p_sl (4),
+.BR slconf (5),
+.BR slconfd (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B x400pconf
+has no known bugs.  Report problems to
+.RB < bugs@openss7.org >.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR x400pconf
+is backward compatible with previous versions of the utility.  The file format has not changed over
+the various version of the utility.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SS7 configuration is not subject to standardization.  The
+.BR x400pconf
+utility conforms to the OpenSS7 specifications:
+.IP \(bu \w'\(bu\(em'u
+.IR "Local Managment Interface (LMI)" ,
+.BR lmi (7),
+Revision
+.PD 0
+.BR 0.9.2 .
+.IP \(bu
+.IR "Signalling Data Link Interface (SDLI)" ,
+.BR sdli (7),
+Revision
+.BR 0.9.2 .
+.IP \(bu
+.IR "Signalling Data Terminal Interface (SDTI)" ,
+.BR sdti (7),
+Revision
+.BR 0.9.2 .
+.IP \(bu
+.IR "Signalling Link Interface (SLI)" ,
+.BR sli (7),
+Revision
+.BR 0.9.2 .
+.PD
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B x400pconf
+utility was new for the OpenSS7
+.B strss7-0.9a.6
+package release.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

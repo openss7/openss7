@@ -1,0 +1,316 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
+.\"
+.\" @(#) $Id: m2uaasconf.8.man,v 0.9.2.1 2007/01/21 20:20:07 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/01/21 20:20:07 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: m2uaasconf.8.man,v $
+.\" Revision 0.9.2.1  2007/01/21 20:20:07  brian
+.\" - added documetation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database sigtran.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so sigtran.macros
+.\"
+.\"
+.TH M2UAASCONF 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.SH NAME
+.B m2uaasconf
+\- M2UA-AS Driver Configuration Utility
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBm2uaasconf\fR [\fIoptions\fR] [{\fB-f\fR|\fB--file\fR} [\fIFILENAME\fR]]
+.PD 0
+.HP
+\fBm2uaasconf\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBm2uaasconf\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBm2uaasconf\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B m2uasconf
+is a configuration utility for the M2UA-AS multiplexing driver,
+.BR m2ua-as (4).
+Its purpose is to open SCTP Streams, link them under the M2UA-AS driver, and configure them using
+M2UA-AS driver input-output controls.
+.PP
+The
+.B m2uasconf
+utility is intended to be run at system startup from a System V init script, or when reconfiguration
+of the M2UA-AS driver is necessary.  Once configuration of the M2UA-AS multiplexing driver is
+complete, application programs (SL-Users) can open, attach, enable and use Signalling Link streams
+opened on the driver.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.SS "Command Options"
+.PP
+.PP
+The following command options are common to all OpenSS7 project command line utilities:
+.TP
+{\fB-h\fR|\fB--help\fR|\fB-H\fR|\fB-?\fR|\fB--?\fR}
+When this option is encountered, print usage information to
+.I stdout
+and exit.
+.TP
+{\fB-V\fR|\fB--version\fR}
+When this option is encountered, print version information to
+.I stdout
+and exit.
+.TP
+{\fB-C\fR|\fB--copying\fR}
+When this option is encountered, print copying information to
+.I stdout
+and exit.
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+When the
+{\fB-f\fP|\fB--file\fP}\ \fIFILENAME\fP
+option is specified, the supplied file contains M2UA-AS configuration entries as follows:
+.IP \(bu \w'\(bu\(em'u
+Each line in the file contains one entry or comment per line.
+.IP \(bu
+Each entry consists of a number of fields separated by whitespace.
+.IP \(bu
+Any field that begins with an octothorpe character,
+.RB ` # ',
+is a comment that continues to the end of the line.
+.IP \(bu
+Any line containing only a comment (beginning with optional whitespace followed by an octothorpe
+character,
+.RB ` # ')
+is ignored.
+.IP \(bu
+Blank lines are ignored.
+.PP
+Each line containing an M2UA-AS configuration entry consists of the following fields:
+.PP
+.RI < sgid >
+.RI < aspid >
+.RI < options >
+.RI < local-endpoint >
+.RI < remote-endpoint >
+.PP
+Where,
+.TP
+.I sgid
+is an SG identifier that is an integer number identifying an ASP-SG relation (i.e. SCTP
+association).
+.TP
+.I aspid
+is an ASP Identifier that will be used in the ASP Up request to the SG.  If this field is specified
+as zero
+.RB ( 0 ),
+or as a single dash,
+.RB ( - ),
+then no ASP Identifier will be used in the ASP Up request to the SG.
+.TP
+.I options
+is a list of comma-separated SG options, with no embedded whitespace.  The following options are
+defined:
+.RS
+.TP
+.B dynamic
+When included in the options, this keyword specifies that the SG requires dynamic configuration
+(registration).  If this option is not included, the SG requires static configuration (no
+registration).
+.RE
+.TP
+.I local-endpoint
+is the local endpoint address to which the SCTP association is bound to communicate with the remote
+SG.  This can take the form:
+{\fIhostname\fR|\fIipaddress\fR}[\fB,\fR{\fIhostname\fR|\fIipaddress\fR}][\fB:\fR{\fIport\fR|\fIservice\fR}].
+The special hostname consisting of a single star,
+.RB ( * ),
+can be used to indicate a wildcard address.  When the wildcard address is used, only one
+.IR hostname " or " ipaddress
+can occur in the address.  If the
+.IR port " or " service
+is not specified, then a dynamic port number will be allocated.  If the
+.I service
+is specified as
+.RB \(lq m2ua ,\(rq
+then the M2UA registered (well-known) port number will be used.
+.TP
+.I remote-endpoint
+is the remote endpoint address to which the SCTP association is connected to communicate with the
+remote SG.  This can take the form:
+{\fIhostname\fR|\fIipaddress\fR}[\fB,\fR{\fIhostname\fR|\fIipaddress\fR}][\fB:\fR{\fIport\fR|\fIservice\fR}].
+If the
+.IR port " or " service
+is not specified, the M2UA registered (well-known) port number will be used.
+.PP
+The
+.B m2uaasconf
+utility, reads this configuration file and performs the following steps for each entry in the file:
+.IP 1. \w'0.\(em'u
+The
+.B m2uaasconf
+utility opens an SCTP association by opening the
+.B /dev/sctp_t
+device, or the device specified with the
+.B -s
+option.
+.IP 2.
+The
+.B m2uaasconf
+utility opens a stream on the M2UA-AS driver using the
+.B /dev/m2ua-as
+device, or the device specified by the
+.B -e
+option, and links the SCTP stream under the M2UA-AS multiplexing driver using the
+.IR I_LINK "(7) or " I_PLINK (7)
+input-output control.
+The
+.B m2uaasconf
+utility can then close the file descriptor for the SCTP stream.
+.IP 3.
+The
+.B m2uaasconf
+utility uses the
+.B M2UA_AS_IOCSCONFIG
+input-output control to associated the lower multiplex SCTP stream with an ASP-SG relation.  The
+input-output control takes the information provided in the configuration file line entry, and the
+multiplexer identifier returned from the
+.IR I_LINK "(7) or " I_PLINK (7)
+input-output control operation.  The M2UA-AS driver, in response to the
+.B M2UA_AS_IOCSCONFIG
+input-output control, complets the ASP-SG relation information as part of the lower multiplex stream
+private structure.  The M2UA-AS driver also binds and connects the SCTP association and attempts to
+bring the ASP to the ASP Up state with the remote SG.
+.IP 4.
+Steps 1 thorugh 3, above, are repeated for each entry in the configuration file.
+.IP 5.
+The utility can also open and attach signalling links streams and link them under the SL-MUX
+multiplexing driver with a global PPA and CLEI.
+.\"
+.\"
+.SH SIGNALS
+.PP
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1) indicates that an
+error occured and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message is printed on
+.IR stderr .
+.PP
+The
+.B --quiet
+options suppresses the printing of diagnostic messages to
+.IR stderr .
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.B m2uaasconf
+has not known bugs.
+Report problems to
+.RI < bugs@openss7.org >.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR m2ua-as (4),
+.BR sl-mux (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B m2uaasconf
+is an OpenSS7-specific configuration command.  Because this command is used at startup and is
+transparent to the SL-User operaning SL streams, compatibility is not an issue.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

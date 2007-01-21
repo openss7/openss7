@@ -1,0 +1,294 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
+.\"
+.\" @(#) $Id: iua-as.4.man,v 0.9.2.1 2007/01/21 20:20:06 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/01/21 20:20:06 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: iua-as.4.man,v $
+.\" Revision 0.9.2.1  2007/01/21 20:20:06  brian
+.\" - added documetation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database sigtran.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so sigtran.macros
+.\"
+.\"
+.TH IUA-AS 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B iua-as
+\- ISDN Q.921 User Adaptation Layer (IUA) Application Server (AS)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The IUA-AS is a multiplexing driver that implements the ASP side of the IUA
+.[
+iuarfc
+.]
+protocol.
+Streams opened on the upper multiplex provide the
+.IR "Data Link Provider Interface (DLPI)",
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
+Streams linked under the lower multiplex provide the
+.IR "Transport Provider Interface (TPI)",
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+for SCTP,
+.BR sctp_t (4).
+.\"
+.SS Configuration
+.PP
+When the IUA-AS driver is configured, SCTP Streams are opened and linked under the multiplexing
+driver.  Each SCTP stream represents an association between a local ASP (Application Server Process)
+and a remote SG (Signalling Gateway).  Input-output controls are used to configure each lower
+multiplex Stream.  Once a lower multiplex Stream is configured, the IUA-AS driver attempts to form
+an SCTP association with the remote SG, and to bring IUA association to the ASP Up state.  Should
+the association be dropped, the ASP-SG relation is moved to the ASP Down state and the IUA-AS driver
+attempts to reconnect the association and bring it to the ASP Up state again and activate all active
+interfaces.
+.PP
+Once configured, DL Streams can be opened on the upper multiplex.  These DL Streams are not
+associated with an ASP-SG association until they are attached.  When the
+.BR DL_ATTACH_REQ (7)
+primitive is issued, the PPA contained in the request is composed of an SG identifier and an
+Interface Identifier.  This information is sufficient for the IUA-AS driver to determine the
+association for the interface.  When the
+.BR DL_BIND_REQ (7)
+primitive is issued, the assigned Interface Identifier is used to activate the interface with the
+remote SG, if the interface has not already been activated with the remote SG.
+.PP
+After the link has been attached with the
+.BR DL_ATTACH_REQ (7)
+primitive, it can be linked beneath the DL-MUX multiplexing device driver and assigned a CLEI and
+global PPA.
+.PP
+Configuration is performed using an IUA-AS driver configuration utility,
+.BR iuaasconf (8).
+This utility reads a configuration file used to define the objects necessary for configuration.  The
+configuration file contains entries that define ASP-SG relationships as follows:
+.TP
+.I sgid
+An integer number identifying the ASP-SG relation.
+.I aspid
+The ASPID that is used in communication with the SG.  This ASPID can be null (a single dash,
+.RB ( - ))
+indicating that no ASPID is to be used in communication with the SG.  This ASPID corresponds also to
+the value zero
+.RB ( 0 ).
+.TP
+.I streams
+The number of SCTP streams that will be requested to the SG.
+.TP
+.I local-endpoint
+The local endpoint address to which an SCTP association is bound to communicate with the remote SG.
+This can take the form:
+{\fIhostname\fR|\fIipaddress\fR}[\fB,\fR{\fIhostname\fR|\fIipaddress\fR}][\fB:\fR{\fIport\fR|\fIservice\fR}].
+The special hostname consisting of a single star,
+.RB ( * ),
+can be used to indicate a wildcard address.  If the
+.IR port " or " service
+is not specified, then a dynamic port number will be allocated.  If the service is specified as
+.BR iua ,
+then the IUA registered (well-known) port number will be used.
+.[
+iuarfc
+.]
+.TP
+.I remote-endpoint
+The remote endpoint address to which an SCTP association wil connect to communicate with the remote
+SG.  This can take the form:
+{\fIhostname\fR|\fIipaddress\fR}[\fB,\fR{\fIhostname\fR|\fIipaddress\fR}][\fB:\fR{\fIport\fR|\fIservice\fR}].
+If the
+.IR port " or " service
+is not specified, the IUA registered (well-known) port number will be used.
+.[
+iuarfc
+.]
+.TP
+.I options
+Contains a comma separated list of SG options, with no embedded whitespace.  The following options
+are defined: (there are currently no SG options for IUA).
+.PP
+The configuration utility reads this configuration file and performs the following steps for each
+entry in the file:
+.IP 1. \w'0.\(em'u
+The utility opens an SCTP association by opening the
+.B /dev/sctp_t
+device, or the device specified by the
+.B -s
+option.
+.IP 2.
+The utility opens a stream on the IUA-AS driver using the
+.B /dev/iua-as
+device, or the device specified by the
+.B -e
+option, and links the SCTP stream under the IUA-AS multiplexing driver using the
+.IR I_LINK "(7) or " I_PLINK (7)
+input-output control.  The utility can then close the file descriptor for the SCTP stream.
+.IP 3.
+The utility uses the
+.B IUA_AS_IOCSCONFIG
+input-output control to associate the lower multiplex SCTP stream with the ASP-SG relation.  The
+input-output control takes the information provided in the configuration file line entry, and the
+multiplexer identifier returned from the
+.IR I_LINK "(7) or " I_PLINK (7)
+input-output control operation.  The IUA-AS driver, in response to the
+.B IUA_AS_IOCSCONFIG
+input-output control, completes the ASP-SG relation information as part of the lower multiplex
+stream private structure.  The IUA-AS driver also binds and connects the SCTP association and
+attempts to bring the ASP to the ASP Up state with the remote SG.
+.IP 4.
+Steps 1 through 3, above, are repeated for each entry in the configuration file.
+.IP 5.
+The utility can also open and attach data link streams and link them under the DL-MUX multiplexing
+driver with a global PPA and CLEI.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The IAU-AS driver provider several input-output controls for configuring the driver as follows:
+.\"
+.SS IUA_AS_IOCSCONFIG
+.PP
+.\"
+.SS IUA_AS_IOCGCONFIG
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
