@@ -61,6 +61,8 @@
 ##	name	    prefix	major	n-minors    n-majors
 #driver	mg	    mg		*
 #driver	mx	    mx		*
+#driver	m2ua-as	    m2ua_as	*
+driver	m2ua-mux	    m2ua_mux	*
 
 ## Pushable module specifications
 ## -----------------------------------------------------------
@@ -71,6 +73,8 @@
 ##	type	name	    object name
 #objname	driver	mg	    mg
 #objname	driver	mx	    mx
+#objname	driver	m2ua-as	    m2ua_as
+objname	driver	m2ua-mux	    m2ua_mux
 
 
 ##
@@ -79,6 +83,8 @@
 ##		name
 #loadable	mg
 #loadable	mx
+#loadable	m2ua-as
+loadable	m2ua-mux
 
 ##   Node specifications
 ## -----------------------------------------------------------
@@ -87,5 +93,7 @@
 #node	/dev/mg-lm		c   0666    mg		1
 #node	/dev/mx			c   0666    mx		0
 #node	/dev/mx-lm		c   0666    mx		1
+#node	/dev/m2ua-as		c   0666    m2ua-as	0
+node	/dev/m2ua-mux		c   0666    m2ua-mux	0
 
 ## vim: ft=config comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

@@ -67,6 +67,7 @@ TESTSUITE_DEPS		+= \
 			local.at \
 			kernel.at \
 			$(TESTSUITE)-m2pa.at \
+			$(TESTSUITE)-m2ua_as.at \
 			$(TESTSUITE).at
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

@@ -242,6 +242,10 @@ extern mblk_t *mi_reallocb(mblk_t *mp, size_t size);
 /*
  *  M_IOTCL handling helper functions.
  */
+#define MI_COPY_IN			1
+#define MI_COPY_OUT			2
+#define MI_COPY_CASE(_dir, _cnt)	(((_cnt)<<2|_dir))
+
 extern void mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len);
 extern void mi_copyin_n(queue_t *q, mblk_t *mp, size_t offset, size_t len);
 extern void mi_copyout(queue_t *q, mblk_t *mp);
