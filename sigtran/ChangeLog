@@ -1,3 +1,23 @@
+2007-01-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/test-m2ua_as.8.man: added test suite for m2ua-as
+	* src/test/test-m2ua_as.c: added test suite for m2ua-as
+	* tests/testsuite-m2ua_as.at: added test suite for m2ua-as
+
+	* Makefile.am: added test program for m2ua-as
+	* doc/man/Makefile.am: added test program for m2ua-as
+	* doc/man/sigtran.refs: added ETSI references for m2ua-as
+	* doc/man/man4/m2ua-as.4.man: added man page for m2ua-as
+	* doc/man/man8/test-m2pa.8.man: updated
+	* lib32/Makefile.am: added test program for m2ua-as
+	* src/drivers/Config.in: added m2ua-as
+	* src/drivers/m2ua_as.c: added m2ua-as
+	* src/drivers/m3ua_as.c: added m3ua-as
+	* src/test/test-m2pa.c: updated
+	* src/test/test-sigtran.c: updated
+	* tests/Makefile.am: added test suite for m2ua-as
+	* tests/testsuite.at: added test suite for m2ua-as
+
 2007-01-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man4/iua-as.4.man: added manual page

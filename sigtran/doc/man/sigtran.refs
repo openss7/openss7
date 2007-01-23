@@ -4602,6 +4602,31 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2960.txt
 
+%K ETSISCTP
+%L TS 102 144
+%A ETSI
+%R ESTI TS 102 144-V1.1.1 (2003-05)
+%T Services and Protocols for Advanced Networks (SPAN) \(em MTP/SCCP/SSCOP and SIGTRAN (Transport of SS7 over IP) \(em Stream Control Transmission Protocol (SCTP)
+%D May 2003
+%O (Endorsement of RFC 2060 and RFC 3309, modified)
+%C Sophia Antipolis Cedex
+%G DTS/SPAN-130265
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
+%K ETSITESTSCTP
+%L TS 102 369
+%A ETSI
+%R ETSI TS 102 369-V1.1.1 (2004-11)
+%T Methods for Testing and Specification (MTS); Stream Control Transmission Protocol (SCTP); Test Suite Structure and Test Purposes (TSS&TP)
+%D November 2004
+%C Sophia Antipolis Cedex
+%G DTS/MTS-00086
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
 %K rfc2976
 %L RFC 2976
 %R RFC 2976
@@ -5041,6 +5066,31 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3331.txt
 
+%K ETSIM2UA
+%L TS 102 141
+%A ETSI
+%R ETSI TS 102 141-V1.1.1 (2003-05)
+%T Services and Protocols for Advanced Networks (SPAN) \(em MTP/SCCP/SSCOP and SIGTRAN (Transport of SS7 over IP) \(em Message transfer part 2 User Adaptation layer (M2UA)
+%D May 2003
+%O (Endorsement of RFC 3331 (2002), modified)
+%C Sophia Antipolis Cedex
+%G DTS/SPAN-130262
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
+%K ETSITESTM2UA
+%L TS 102 380
+%A ETSI
+%R ETSI TS 102 380-V1.1.1 (2004-12)
+%T Methods for Testing and Specification (MTS); Message Transfer Part 2 - User Adaptation Layer (M2UA); Test Suite Structure and Test Purposes (TSS&TP)
+%D December 2004
+%C Sophia Antipolis Cedex
+%G DTS/MTS-00093
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
 %K M3UA-RFC
 %L M3UA
 %A Greg Sidebottom
@@ -5052,6 +5102,31 @@ Part 1: Protocol Specification
 %D September 2002
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3332.txt
+
+%K ETSIM3UA
+%L TS 102 142
+%A ETSI
+%R ESTI TS 102 142-V1.1.1 (2003-05)
+%T Services and Protocols for Advanced Networks (SPAN) \(em MTP/SCCP/SSCOP and SIGTRAN (Transport of SS7 over IP) \(em Message transfer part 3 User Adaptation layer (M3UA)
+%D May 2003
+%O (Endorsement of RFC 3332 (2002), modified)
+%C Sophia Antipolis Cedex
+%G DTS/SPAN-130263
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
+%K ETSITESTM3UA
+%L TS 102 381
+%A ETSI
+%R ETSI TS 102 381-V1.1.1 (2004-12)
+%T Methods for Testing and Specification (MTS); Message Transfer Part 3 - User Adaptation Layer (IETF RFC 3332); Test Suite Structure and Test Purposes (TSS&TP)
+%D December 2004
+%C Sophia Antipolis Cedex
+%G DTS/MTS-00087
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
 
 %K rfc3361
 %L RFC 3361
@@ -5269,6 +5344,19 @@ Part 1: Protocol Specification
 %D  October 2004
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3868.txt
+
+%K ETSISUA
+%L TS 102 143
+%A ETSI
+%R ESTI TS 102 143-V1.1.1 (2003-05)
+%T Services and Protocols for Advanced Networks (SPAN) \(em MTP/SCCP/SSCOP and SIGTRAN (Transport of SS7 over IP) \(em Signalling connection control part User Adaptation layer (SUA)
+%D May 2003
+%O (Endorsement of SIGTRAN-SUA-14 (Decenber 2002), modified)
+%C Sophia Antipolis Cedex
+%G DTS/SPAN-130264
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
 
 %K SCTP-MIB
 %K rfc3873

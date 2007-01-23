@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-m2pa.8.man,v 0.9.2.3 2007/01/23 10:00:43 brian Exp $
+.\" @(#) $Id: test-m2ua_as.8.man,v 0.9.2.1 2007/01/23 09:59:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,22 +53,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/01/23 10:00:43 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/23 09:59:56 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: test-m2pa.8.man,v $
-.\" Revision 0.9.2.3  2007/01/23 10:00:43  brian
-.\" - added test program and m2ua-as updates
-.\"
-.\" Revision 0.9.2.2  2006/12/21 11:00:59  brian
-.\" - updated manual pages for release
-.\"
-.\" Revision 0.9.2.1  2006/10/17 11:55:40  brian
-.\" - copied files into new packages from strss7 package
-.\"
-.\" Revision 0.9.2.3  2006/04/05 09:43:24  brian
-.\" - moved .so line and updated headers
+.\" $Log: test-m2ua_as.8.man,v $
+.\" Revision 0.9.2.1  2007/01/23 09:59:56  brian
+.\" - added test program for m2ua-as
 .\"
 .\" =========================================================================
 .R1
@@ -86,52 +77,52 @@ sort-adjacent-labels
 .so sigtran.macros
 .\"
 .\"
-.TH TEST-M2PA 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.TH TEST-M2UA_AS 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
 .\"
 .\"
 .SH NAME
-.B test-m2pa
-\- test suite executable for \fBm2pa\fR(4) STREAMS module
+.B test-m2ua_as
+\- test suite executable for \fBm2ua-as\fR(4) STREAMS driver
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .HP 12
-\fBtest-m2pa\fR [\fIoptions\fR]
+\fBtest-m2ua_as\fR [\fIoptions\fR]
 [{\fB-o\fR|\fB--onetest\fR} [\fITESTCASE\fR]]
 [{\fB-t\fR|\fB--tests\fR} [\fIRANGE\fR]]
 .PD 0
 .HP 12
-\fBtest-m2pa\fR [\fIoptions\fR]
+\fBtest-m2ua_as\fR [\fIoptions\fR]
 {\fB-l\fR|\fB--list\fR} [\fIRANGE\fR]
 .HP 12
-\fBtest-m2pa\fR {\fB-h\fR|\fB--help\fR}
+\fBtest-m2ua_as\fR {\fB-h\fR|\fB--help\fR}
 .HP 12
-\fBtest-m2pa\fR {\fB-V\fR|\fB--version\fR}
+\fBtest-m2ua_as\fR {\fB-V\fR|\fB--version\fR}
 .HP 12
-\fBtest-m2pa\fR {\fB-C\fR|\fB--copying\fR}
+\fBtest-m2ua_as\fR {\fB-C\fR|\fB--copying\fR}
 .PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.B test-m2pa
+.B test-m2ua_as
 is a test suite executable for the
-.BR m2pa (4)
+.BR m2ua-as (4)
 .I STREAMS
-module.
+driver.
 The purpose of the
-.B test-m2pa
+.B test-m2ua_as
 test suite executable is to provide a means for development, diagnostic, regression and validation
 testing of the
-.BR m2pa (4)
-module.
+.BR m2ua-as (4)
+driver.
 The
 .I @PACKAGE_TITLE@
 package also provides an
 .B autotest
 based test suite that uses the
-.B test-m2pa
+.B test-m2ua_as
 test case executable to invoke test cases.  This test suite can be used for development, diagnostic,
 regression or validation testing.
 See the
@@ -143,9 +134,9 @@ test suite.
 .\"
 .SH OPTIONS
 .PP
-.B test-m2pa
+.B test-m2ua_as
 options fall into several categories as detailed in the subsections below.  If
-.B test-m2pa
+.B test-m2ua_as
 is executed without any options, it will execute all available test cases and report the progress
 and results of each test case.
 .SS Command Options
@@ -246,7 +237,14 @@ the manner in which test cases are executed or test case results reported.
 Specifies the device name to open for the tests.  The default device name if
 .I DEVICE
 is not specified is
-.BR /dev/streams/clone/sctp_n .
+.BR /dev/streams/clone/m2ua-as .
+.TP
+\fB-x\fR, \fB--transport\fR \fIDEVICE\fR
+Specifies the device name to open to obtain an SCTP transport stream for the tests.  The default
+device if
+.I DEVICE
+is not specified is
+.BR /dev/streams/clone/sctp_t .
 .TP
 \fB-w\fR, \fB--wait\fR
 Specifies that the client or server is to wait indefinitely.  Normally a test
@@ -324,18 +322,18 @@ is to execute both the client and server sides in a self-validation test.
 .TP
 \fB-u\fR, \fB--iut\fR
 Requests that test cases be executed to expect the IUT (Implementation Under
-Test) form the SCTP association.  The default if this option is not specified
-is for the PTU (Protocol Test Unit) to form the SCTP association.
+Test) listen for the SCTP association.  The default if this option is not specified
+is for the PTU (Protocol Test Unit) to listen for the SCTP association.
 .TP
 \fB-c\fR, \fB--client\fR
-Requests that the client side (PTU) of the test cases be executed (client mode).
+Requests that the client side (IUT) of the test cases be executed (client mode).
 The default if neither the \fB-c\fR or \fB-S\fR options are specified is to
 execute both the client and server side of the selected test cases.
 Specifying both \fB-S\fR and \fB-c\fR has the same effect as the default
 (specifying neither).
 .TP
 \fB-S\fR, \fB--server\fR
-Requests that the server side (IUT) of the test cases be executed (server mode).
+Requests that the server side (PTU) of the test cases be executed (server mode).
 The default if neither the \fB-c\fR or \fB-S\fR options are specified is to
 execute both the client and server side of the selected test cases.
 Specifying both \fB-S\fR and \fB-c\fR has the same effect as the default
@@ -393,12 +391,12 @@ The default if a host name is not specified is the IP addresses
 \fB127.0.0.1\fR, \fB127.0.0.2\fR and \fB127.0.0.3\fR.
 .SS Test Suite Specific Options
 .PP
-The following options are specific to execution of M2PA test cases.  These
+The following options are specific to execution of M2UA test cases.  These
 options determine the draft or RFC version to which the PTU should test and
 the IUT should execute.
 .TP
-\fB-D\fR, \fB--decl-std\fR [\fISTANDARD\fR]
-Specifies the declared SS7 standard to which the Signalling Link Interface
+\fB-F\fR, \fB--decl-std\fR [\fISTANDARD\fR]
+Specifies the declared SS7 standard in force to which the Signalling Link Interface
 and protocol state machines are expected to conform.  This is the SS7 standard
 to which the IUT will conform and to which the PTU will test.
 .I STANDARD
@@ -459,119 +457,46 @@ is not specified is
 .RE
 .TP
 \fB-D\fR, \fB--draft\fR [\fIDRAFT\fR]
-Specifies the M2PA draft or RFC to which the IUT should conform and to which
+Specifies the M2UA draft or RFC to which the IUT should conform and to which
 the PTU will test.
 .I DRAFT
 can be one of the following mnemonic values as a character string:
 .RS
-.TP \w'\fIM2PA_VERSION_DRAFT6_9\fR\(em'u
-.I M2PA_VERSION_DRAFT3
-draft-ietf-sigtran-m2pa-03.
-.[
-draft-ietf-sigtran-m2pa-03
-.]
-.PD 0
 .TP
-.I M2PA_VERSION_DRAFT3_1
-draft-ietf-sigtran-m2pa-03
+.I M2UA_VERSION_RFC3331
+rfc3331.
 .[
-draft-ietf-sigtran-m2pa-03
+rfc3331
 .]
-with corrections.
-.TP
-.I M2PA_VERSION_DRAFT4
-draft-ietf-sigtran-m2pa-04.
-.[
-draft-ietf-sigtran-m2pa-04
-.]
-.TP
-.I M2PA_VERSION_DRAFT4_1
-draft-ietf-sigtran-m2pa-04
-.[
-draft-ietf-sigtran-m2pa-04
-.]
-with corrections.
-.TP
-.I M2PA_VERSION_DRAFT4_9
-anticipated changes for draft-ietf-sigtran-m2pa-05.
-.[
-draft-ietf-sigtran-m2pa-05
-.]
-.TP
-.I M2PA_VERSION_DRAFT5
-draft-ietf-sigtran-m2pa-05.
-.[
-draft-ietf-sigtran-m2pa-05
-.]
-.TP
-.I M2PA_VERSION_DRAFT5_1
-draft-ietf-sigtran-m2pa-05
-.[
-draft-ietf-sigtran-m2pa-05
-.]
-with corrections.
-.TP
-.I M2PA_VERSION_DRAFT6
-draft-ietf-sigtran-m2pa-06.
-.[
-draft-ietf-sigtran-m2pa-06
-.]
-.TP
-.I M2PA_VERSION_DRAFT6_1
-draft-ietf-sigtran-m2pa-06
-.[
-draft-ietf-sigtran-m2pa-06
-.]
-with corrections.
-.TP
-.I M2PA_VERSION_DRAFT6_9
-anticipated changes for draft-ietf-sigtran-m2pa-07.
-.[
-draft-ietf-sigtran-m2pa-07
-.]
-.TP
-.I M2PA_VERSION_DRAFT7
-draft-ietf-sigtran-m2pa-07.
-.[
-draft-ietf-sigtran-m2pa-07
-.]
-.TP
-.I M2PA_VERSION_DRAFT9
-draft-ietf-sigtran-m2pa-09.
-.[
-draft-ietf-sigtran-m2pa-09
-.]
-.TP
-.I M2PA_VERSION_DRAFT10
-draft-ietf-sigtran-m2pa-10.
-.[
-draft-ietf-sigtran-m2pa-10
-.]
-.TP
-.I M2PA_VERSION_DRAFT11
-draft-ietf-sigtran-m2pa-11.
-.[
-draft-ietf-sigtran-m2pa-11
-.]
-.TP
-.I M2PA_VERSION_RFC4165
-rfc4165.
-.[
-rfc4165
-.]
-.PD
 .PP
 The default draft level when
 .I DRAFT
 is not specified is
-.BR M2PA_VERSION_RFC4165 .
+.BR M2UA_VERSION_RFC3331 .
 .RE
+.TP
+\fB-T\fR, \fB--iids\fR [\fIIID\fR[\fB,\fIIID\fR]\fR]
+Specify the numeric Interface Identifiers to be used by the IUT.  (Note that
+the PTU does not care what numeric interface identifiers are used.)  When not
+specified, the numeric Interface Identifiers default to one
+.RB ( 1 ") and two (" 2 ).
+.TP
+\fB-T\fR, \fB--text\fR [\fIIID\fR[\fB,\fIIID\fR]\fR]
+Specify the text Interface Identifiers to be used by the IUT.  (Note that
+the PTU does not care what text interface identifiers are used.)  When not
+specified, the text Interface Identifiers default to 
+.RB \(lq M2UATESTIID01 "\(rq and \(lq" M2UATESTIID02 \(rq.
+.TP
+\fB-A\fR, \fB--aspid\fR \fIASPID\fR
+Specify the ASP Identifier to be used by the IUT.  (Note that the PTU does not
+card what ASP Identifier is used.)  When not specified, the default is to not
+provide an ASP Identifier in the ASP Up message.
 .\"
 .\"
 .SH DIAGNOSTICS
 .PP
 When
-.B test-m2pa
+.B test-m2ua_as
 fails, it prints a diagnostic message to
 .I stderr
 and exits with a non-zero return code.
@@ -619,7 +544,7 @@ condition.
 .\"
 .SH NOTICES
 .PP
-.B test-m2pa
+.B test-m2ua_as
 is normally invoked from the
 .RI \(lq "@PACKAGE@-@VERSION@" \(rq
 test suite.
@@ -627,62 +552,71 @@ test suite.
 .\"
 .SH EXAMPLES
 .TP
-\f(CB\)test-m2pa\f(CR\) --list 0.1\fR
+\f(CB\)test-m2ua_as\f(CR\) --list 0.1\fR
 Generates a list of all test cases
 provided by the
-.B test-m2pa
+.B test-m2ua_as
 executable
 with numbers starting with the initial substring of
 .BR 0.1 .
 .TP
-\f(CB\)test-m2pa\f(CR\) -vv --list\fR
+\f(CB\)test-m2ua_as\f(CR\) -vv --list\fR
 Generates a verbose listing of all test cases
 provided by the
-.B test-m2pa
+.B test-m2ua_as
 executable.
 .TP
-\f(CB\)test-m2pa\f(CR\) --verbose=5 --onetest 0.1\fR
+\f(CB\)test-m2ua_as\f(CR\) --versbose=5 --onetest 0.1\fR
 Verbosely executes test case
 .BR 0.1 ,
 and provides a diagnostic return code.
 .TP
-\f(CB\)test-m2pa\f(CR\) --fast --quiet --exit\fR
+\f(CB\)test-m2ua_as\f(CR\) --fast --quiet --exit\fR
 Executes all test cases with a timer scaling factor of
 .B 50
 with normal output suppressed and exiting on the first failed or inconclusive test case result.
 .\"
 .\"
-.SH MODULES
+.SH DRIVERS
 .PP
-.BR m2pa (4).
+.BR m2ua-as (4).
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/streams/clone/sctp_t
+the default SCTP transport device (conforming to the TPI).
+.TP
+.B /dev/streams/clone/m2ua-as
+the default M2UA-AS device.
 .\"
 .\"
 .SH FILES
 .PP
 .TP
-.B /usr/libexec/@PACKAGE@/test-m2pa
+.B /usr/libexec/@PACKAGE@/test-m2ua_as
 contains the
-.B test-m2pa
+.B test-m2ua_as
 command.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR m2pa (4).
-.BR m2pa_sl (4),
+.BR m2ua-as (4),
 .IR "@PACKAGE_TITLE@ Installation and Reference Manual" .
 .\"
 .\"
 .SH BUGS
 .PP
-.B test-m2pa
+.B test-m2ua_as
 has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
 The
-.B test-m2pa
+.B test-m2ua_as
 test suite, when run using
 .BR autotest ,
 is compatible with the POSIX 1003.3 conformance test methodology, with the following mapping of test
@@ -694,7 +628,7 @@ tab(:);
 lb|lb|lb
 l|l|l.
 _
-POSIX 1003.3:test-m2pa:autotest
+POSIX 1003.3:test-m2ua_as:autotest
 _
 PASS:PASS(0):PASS
 FAIL:FAIL(1):FAIL
@@ -709,19 +643,35 @@ _
 .\"
 .SH CONFORMANCE
 .PP
-.B test-m2pa
+.B test-m2ua_as
 tests conformance of the
-.BR m2pa (4)
-module to the specifications listed on the
-.BR m2pa (4)
-and
-.BR m2pa_sl (4)
+.BR m2ua-as (4)
+driver to the specifications listed on the
+.BR m2ua-as (4)
 manual pages.
+.PP
+.B test-m2ua_as
+tests conformance of the
+.BR m2ua-as (4)
+driver to
+.IR "RFC 3331" ,
+.[
+rfc3331
+.]
+.IR "ETSI TS 102 141"
+.[
+etsim2ua
+.]
+and
+.IR "ETSI TS 102 380".
+.[
+etsitestm2ua
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
-.B test-m2pa
+.B test-m2ua_as
 is provided with the
 .RI \(lq "@PACKAGE_TITLE@" \(rq
 package.

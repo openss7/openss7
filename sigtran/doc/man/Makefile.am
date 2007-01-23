@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/01/08 16:23:02 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/01/23 10:00:40 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/01/08 16:23:02 $ by $Author: brian $
+## Last Modified $Date: 2007/01/23 10:00:40 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.5  2007/01/23 10:00:40  brian
+## - added test program and m2ua-as updates
+##
 ## Revision 0.9.2.4  2007/01/08 16:23:02  brian
 ## - final updates for release
 ##
@@ -89,6 +92,7 @@ MANS_UNUSED = \
 	man4/iua_ioctl.4 \
 	man4/m2ua.4 \
 	man4/m2ua_as.4 \
+	man4/m2ua-as.4 \
 	man4/m2ua_ioctl.4 \
 	man4/m3pa.4 \
 	man4/m3tp.4 \
@@ -143,6 +147,7 @@ man_MANS = \
 	man7/dlpli_gr303ua.7 \
 	man8/sigtran_mknod.8 \
 	man8/test-m2pa.8 \
+	man8/test-m2ua_as.8 \
 	man8/test-sigtran.8
 
 dist_noinst_MANS = \
@@ -165,6 +170,7 @@ dist_noinst_MANS = \
 	man4/m2tp.4.man \
 	man4/m2ua.4.man \
 	man4/m2ua_as.4.man \
+	man4/m2ua-as.4.man \
 	man4/m2ua_ioctl.4.man \
 	man4/m3pa.4.man \
 	man4/m3tp.4.man \
@@ -211,6 +217,7 @@ dist_noinst_MANS = \
 	man8/sigtran_mknod.8.man \
 	man8/sua.8.man \
 	man8/test-m2pa.8.man \
+	man8/test-m2ua_as.8.man \
 	man8/test-sigtran.8.man \
 	man8/tua.8.man \
 	man8/uaconfd.8.man

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/01/08 16:23:01 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/01/23 10:00:39 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/01/08 16:23:01 $ by $Author: brian $
+## Last Modified $Date: 2007/01/23 10:00:39 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.6  2007/01/23 10:00:39  brian
+## - added test program and m2ua-as updates
+##
 ## Revision 0.9.2.5  2007/01/08 16:23:01  brian
 ## - final updates for release
 ##
@@ -94,10 +97,12 @@ if RPM_BUILD_USER
 EXTRA_PROGRAMS			+= \
 				  @PACKAGE_TARNAME@_mknod \
 				  test-sigtran \
-				  test-m2pa
+				  test-m2pa \
+				  test-m2ua_as
 
 pkglibexec_PROGRAMS		= test-sigtran \
-				  test-m2pa
+				  test-m2pa \
+				  test-m2ua_as
 
 sbin_PROGRAMS			= @PACKAGE_TARNAME@_mknod
 
@@ -128,6 +133,13 @@ test_m2pa_LDADD			= $(STREAMS_LDADD)
 test_m2pa_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_m2pa_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_m2pa_CFLAGS		= $(USER_CFLAGS)
+
+test_m2ua_as_SOURCES		= src/test/test-m2ua_as.c
+test_m2ua_as_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+test_m2ua_as_LDADD		= $(STREAMS_LDADD)
+test_m2ua_as_LDFLAGS		= $(STREAMS_LDFLAGS)
+test_m2ua_as_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_m2ua_as_CFLAGS		= $(USER_CFLAGS)
 
 #xxxxxx_SOURCES			= src/xxxxxx.c
 #xxxxxx_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
 .\"
-.\" @(#) $Id: m2ua-as.4.man,v 0.9.2.1 2007/01/21 20:20:06 brian Exp $
+.\" @(#) $Id: m2ua-as.4.man,v 0.9.2.2 2007/01/23 10:00:42 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/01/21 20:20:06 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/23 10:00:42 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: m2ua-as.4.man,v $
+.\" Revision 0.9.2.2  2007/01/23 10:00:42  brian
+.\" - added test program and m2ua-as updates
+.\"
 .\" Revision 0.9.2.1  2007/01/21 20:20:06  brian
 .\" - added documetation
 .\"
@@ -324,19 +327,67 @@ configuration information.
 .PP
 .\"
 .\"
-.SH SYNOPSIS
+.SH BUGS
 .PP
 .\"
 .\"
-.SH SYNOPSIS
+.SH COMPATIBLITY
 .PP
 .\"
 .\"
-.SH SYNOPSIS
+.SH CONFORMANCE
 .PP
+.IR "RFC 3331" ,
+.[
+rfc3331
+.]
+.IR "ETSI TS 102 141" ,
+.[
+etsim2ua
+.]
+.IR "draft-bidulock-sigtran-m2ua-ss7test" ,
+.[
+draft-bidulock-sigtran-m2ua-ss7test-02
+.]
+.IR "ETSI TS 102 380" .
+.[
+etsitestm2ua
+.]
+.PP
+Conformance to
+.IR "ETSI TS 102 141"
+.[
+etsim2ua
+.]
+per tests specified by
+.IR "ETSI TS 102 380" ,
+.[
+etsitestm2ua
+.]
+is validated using the
+.BR test-m2ua_as (8)
+test case executable and the package
+.B autotest
+test suite.
+.PP
+Conformance to
+.IR "RFC 3331" ,
+.[
+rfc3331
+.]
+per tests specified by
+.IR "draft-bidulock-sigtran-m2ua-ss7test" ,
+.[
+draft-bidulock-sigtran-m2ua-ss7test-02
+.]
+is validated using the
+.BR test-m2ua (8)
+test case executable and the package
+.B autotest
+test suite.
 .\"
 .\"
-.SH SYNOPSIS
+.SH HISTORY
 .PP
 .\"
 .\"

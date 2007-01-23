@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/18 08:51:38 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/01/23 10:00:48 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 08:51:38 $ by $Author: brian $
+ Last Modified $Date: 2007/01/23 10:00:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.9  2007/01/23 10:00:48  brian
+ - added test program and m2ua-as updates
+
  Revision 0.9.2.8  2006/12/18 08:51:38  brian
  - corections from testing, resolve device numbering
 
@@ -108,12 +111,13 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/18 08:51:38 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/01/23 10:00:48 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/18 08:51:38 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/01/23 10:00:48 $";
 
 #define TEST_M2PA   1
 #define TEST_X400   0
+#define TEST_M2UA   0
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -148,12 +152,12 @@ static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.
 #include <getopt.h>
 #endif
 
-#if TEST_M2PA
+#if TEST_M2PA || TEST_M2UA
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#endif				/* TEST_M2PA */
+#endif				/* TEST_M2PA || TEST_M2UA */
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -167,10 +171,17 @@ static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.
 #include <ss7/sdti_ioctl.h>
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
-#if TEST_M2PA
+#if TEST_M2PA || TEST_M2UA
 #include <sys/npi.h>
 #include <sys/npi_sctp.h>
-#endif				/* TEST_M2PA */
+#endif				/* TEST_M2PA || TEST_M2UA */
+#if TEST_M2UA
+#include <xti.h>
+#include <tihdr.h>
+#include <timod.h>
+#include <xti_inet.h>
+#include <sys/xti_sctp.h>
+#endif				/* TEST_M2UA */
 
 #if __BYTE_ORDER == __BIG_ENDIAN
 #   define __constant_ntohl(x)	(x)
@@ -200,6 +211,7 @@ static const char *lpkgname = "SIGnalling TRANsport";
 static const char *lstdname = "draft-bidulock-sigtran-m2pa-test";
 static const char *sstdname = "Q.781";
 static const char *shortname = "M2PA";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/clone/sctp_n";
 #else
@@ -211,7 +223,7 @@ static int repeat_on_success = 0;
 static int repeat_on_failure = 0;
 static int exit_on_failure = 0;
 
-#if TEST_M2PA
+#if TEST_M2PA || TEST_M2UA
 static int client_port_specified = 0;
 static int server_port_specified = 0;
 static int client_host_specified = 0;
@@ -223,10 +235,21 @@ static int verbose = 1;
 static int client_exec = 0;		/* execute client side */
 static int server_exec = 0;		/* execute server side */
 
+#if TEST_M2UA
+static uint32_t aspid = 0;
+
+struct {
+	uint32_t num;
+	char text[32];
+} iids[2] = { {
+0,},};
+#endif				/* TEST_M2UA */
+
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
 static int show_fisus = 1;
+
 #if TEST_X400
 static int show_msus = 1;
 #endif
@@ -257,7 +280,24 @@ static int DISCON_reason = 0;
 static int CONN_flags = 0;
 static int ERROR_type = 0;
 static int RESERVED_field[2] = { 0, 0 };
-#endif
+#endif				/* TEST_M2PA */
+
+#if TEST_M2UA
+static int PRIM_type = 0;
+static int CONIND_number = 2;
+static int TOKEN_value = 0;
+static int SEQ_number = 1;
+static int SERV_type = T_COTS_ORD;
+static int CURRENT_state = TS_UNBND;
+struct T_info_ack_t last_info = { 0, };
+
+static int DATA_xfer_flags = 0;
+static int BIND_flags = 0;
+static int DISCONN_reason = 0;
+static int CONN_flags = 0;
+static int ERROR_type = 0;
+static int RESERVED_field[2] = { 0, 0 };
+#endif				/* TEST_M2UA */
 
 #define TEST_PROTOCOL 132
 
@@ -320,7 +360,7 @@ static int test_gflags = 0;		/* MSG_BAND | MSG_HIPRI */
 static int test_gband = 0;
 static int test_timout = 200;
 
-#if TEST_M2PA
+#if TEST_M2PA || TEST_M2UA
 static int test_bufsize = 256;
 static int test_nidu = 256;
 static int OPTMGMT_flags = 0;
@@ -359,7 +399,7 @@ int flags = 0;
 
 int dummy = 0;
 
-#if TEST_M2PA
+#if TEST_M2PA || TEST_M2UA
 #ifndef SCTP_VERSION_2
 #define SCTP_VERSION_2
 #endif
@@ -473,9 +513,7 @@ enum {
  *  -------------------------------------------------------------------------
  */
 
-#if TEST_X400
 static int ss7_pvar = SS7_PVAR_ITUT_00;
-#endif				/* TEST_X400 */
 
 struct test_stats {
 	sdl_stats_t sdl;
@@ -579,7 +617,7 @@ struct test_config {
 	{
 		.ifname = NULL,	/* */
 		    .ifflags = 0,	/* */
-#if TEST_X400
+#if TEST_X400 || TEST_M2UA
 		    .iftype = SDL_TYPE_DS0,	/* */
 		    .ifrate = 64000,	/* */
 		    .ifgtype = SDL_GTYPE_NONE,	/* */
@@ -649,7 +687,7 @@ struct test_config {
 } /* sl */ };
 
 struct test_config *config = &iutconf;
-struct test_stats  *stats = &iutstat;
+struct test_stats *stats = &iutstat;
 
 /*
  *  -------------------------------------------------------------------------
@@ -1351,6 +1389,80 @@ errno_string(long err)
 	}
 }
 
+#if TEST_M2UA
+char *
+terrno_string(t_uscalar_t terr, t_scalar_t uerr)
+{
+	switch (terr) {
+	case TBADADDR:
+		return ("[TBADADDR]");
+	case TBADOPT:
+		return ("[TBADOPT]");
+	case TACCES:
+		return ("[TACCES]");
+	case TBADF:
+		return ("[TBADF]");
+	case TNOADDR:
+		return ("[TNOADDR]");
+	case TOUTSTATE:
+		return ("[TOUTSTATE]");
+	case TBADSEQ:
+		return ("[TBADSEQ]");
+	case TSYSERR:
+		return errno_string(uerr);
+	case TLOOK:
+		return ("[TLOOK]");
+	case TBADDATA:
+		return ("[TBADDATA]");
+	case TBUFOVFLW:
+		return ("[TBUFOVFLW]");
+	case TFLOW:
+		return ("[TFLOW]");
+	case TNODATA:
+		return ("[TNODATA]");
+	case TNODIS:
+		return ("[TNODIS]");
+	case TNOUDERR:
+		return ("[TNOUDERR]");
+	case TBADFLAG:
+		return ("[TBADFLAG]");
+	case TNOREL:
+		return ("[TNOREL]");
+	case TNOTSUPPORT:
+		return ("[TNOTSUPPORT]");
+	case TSTATECHNG:
+		return ("[TSTATECHNG]");
+	case TNOSTRUCTYPE:
+		return ("[TNOSTRUCTYPE]");
+	case TBADNAME:
+		return ("[TBADNAME]");
+	case TBADQLEN:
+		return ("[TBADQLEN]");
+	case TADDRBUSY:
+		return ("[TADDRBUSY]");
+	case TINDOUT:
+		return ("[TINDOUT]");
+	case TPROVMISMATCH:
+		return ("[TPROVMISMATCH]");
+	case TRESQLEN:
+		return ("[TRESQLEN]");
+	case TRESADDR:
+		return ("[TRESADDR]");
+	case TQFULL:
+		return ("[TQFULL]");
+	case TPROTO:
+		return ("[TPROTO]");
+	default:
+	{
+		static char buf[32];
+
+		snprintf(buf, sizeof(buf), "[%lu]", (ulong) terr);
+		return buf;
+	}
+	}
+}
+#endif				/* TEST_M2UA */
+
 #if TEST_M2PA
 char *
 nerrno_string(ulong nerr, long uerr)
@@ -1726,6 +1838,70 @@ event_string(int child, int event)
 	case __TEST_ERROR_IND:
 		return ("!error ind");
 #endif				/* TEST_X400 */
+#if TEST_M2UA
+	case __TEST_CONN_REQ:
+		return ("T_CONN_REQ");
+	case __TEST_CONN_RES:
+		return ("T_CONN_RES");
+	case __TEST_DISCON_REQ:
+		return ("T_DISCON_REQ");
+	case __TEST_DATA_REQ:
+		return ("T_DATA_REQ");
+	case __TEST_EXDATA_REQ:
+		return ("T_EXDATA_REQ");
+	case __TEST_OPTDATA_REQ:
+		return ("T_OPTDATA_REQ");
+	case __TEST_INFO_REQ:
+		return ("T_INFO_REQ");
+	case __TEST_BIND_REQ:
+		return ("T_BIND_REQ");
+	case __TEST_UNBIND_REQ:
+		return ("T_UNBIND_REQ");
+	case __TEST_UNITDATA_REQ:
+		return ("T_UNITDATA_REQ");
+	case __TEST_OPTMGMT_REQ:
+		return ("T_OPTMGMT_REQ");
+	case __TEST_ORDREL_REQ:
+		return ("T_ORDREL_REQ");
+	case __TEST_CONN_IND:
+		return ("T_CONN_IND");
+	case __TEST_CONN_CON:
+		return ("T_CONN_CON");
+	case __TEST_DISCON_IND:
+		return ("T_DISCON_IND");
+	case __TEST_DATA_IND:
+		return ("T_DATA_IND");
+	case __TEST_EXDATA_IND:
+		return ("T_EXDATA_IND");
+	case __TEST_NRM_OPTDATA_IND:
+		return ("T_OPTDATA_IND");
+	case __TEST_EXP_OPTDATA_IND:
+		return ("T_OPTDATA_IND");
+	case __TEST_INFO_ACK:
+		return ("T_INFO_ACK");
+	case __TEST_BIND_ACK:
+		return ("T_BIND_ACK");
+	case __TEST_ERROR_ACK:
+		return ("T_ERROR_ACK");
+	case __TEST_OK_ACK:
+		return ("T_OK_ACK");
+	case __TEST_UNITDATA_IND:
+		return ("T_UNITDATA_IND");
+	case __TEST_UDERROR_IND:
+		return ("T_UDERROR_IND");
+	case __TEST_OPTMGMT_ACK:
+		return ("T_OPTMGMT_ACK");
+	case __TEST_ORDREL_IND:
+		return ("T_ORDREL_IND");
+	case __TEST_ADDR_REQ:
+		return ("T_ADDR_REQ");
+	case __TEST_ADDR_ACK:
+		return ("T_ADDR_ACK");
+	case __TEST_CAPABILITY_REQ:
+		return ("T_CAPABILITY_REQ");
+	case __TEST_CAPABILITY_ACK:
+		return ("T_CAPABILITY_ACK");
+#endif
 #if TEST_M2PA
 	case __TEST_CONN_REQ:
 		return ("N_CONN_REQ");
@@ -2146,6 +2322,66 @@ poll_events_string(short events)
 	return (string);
 }
 
+#if TEST_M2UA
+const char *
+service_type(t_uscalar_t type)
+{
+	switch (type) {
+	case T_CLTS:
+		return ("T_CLTS");
+	case T_COTS:
+		return ("T_COTS");
+	case T_COTS_ORD:
+		return ("T_COTS_ORD");
+	default:
+		return ("(unknown)");
+	}
+}
+
+const char *
+state_string(t_uscalar_t state)
+{
+	switch (state) {
+	case TS_UNBND:
+		return ("TS_UNBND");
+	case TS_WACK_BREQ:
+		return ("TS_WACK_BREQ");
+	case TS_WACK_UREQ:
+		return ("TS_WACK_UREQ");
+	case TS_IDLE:
+		return ("TS_IDLE");
+	case TS_WACK_OPTREQ:
+		return ("TS_WACK_OPTREQ");
+	case TS_WACK_CREQ:
+		return ("TS_WACK_CREQ");
+	case TS_WCON_CREQ:
+		return ("TS_WCON_CREQ");
+	case TS_WRES_CIND:
+		return ("TS_WRES_CIND");
+	case TS_WACK_CRES:
+		return ("TS_WACK_CRES");
+	case TS_DATA_XFER:
+		return ("TS_DATA_XFER");
+	case TS_WIND_ORDREL:
+		return ("TS_WIND_ORDREL");
+	case TS_WREQ_ORDREL:
+		return ("TS_WRES_ORDREL");
+	case TS_WACK_DREQ6:
+		return ("TS_WACK_DREQ6");
+	case TS_WACK_DREQ7:
+		return ("TS_WACK_DREQ7");
+	case TS_WACK_DREQ9:
+		return ("TS_WACK_DREQ9");
+	case TS_WACK_DREQ10:
+		return ("TS_WACK_DREQ10");
+	case TS_WACK_DREQ11:
+		return ("TS_WACK_DREQ11");
+	default:
+		return ("(unknown)");
+	}
+}
+#endif				/* TEST_M2UA */
+
 #if TEST_X400
 void print_string(int child, const char *string);
 void
@@ -2237,8 +2473,9 @@ print_sdt_stats(int child, sdt_stats_t * s)
 	if (s->carrier_lost)
 		print_string_val(child, "carrier_lost", s->carrier_lost);
 }
+
 void
-print_sl_stats(int child, sl_stats_t *s)
+print_sl_stats(int child, sl_stats_t * s)
 {
 	if (s->sl_dur_in_service)
 		print_string_val(child, "sl_dur_in_service", s->sl_dur_in_service);
@@ -2944,6 +3181,34 @@ parse_options(int fd, char *opt_ptr, size_t opt_len)
 }
 #endif
 
+#if TEST_M2UA
+char *
+mgmtflag_string(t_uscalar_t flag)
+{
+	switch (flag) {
+	case T_NEGOTIATE:
+		return ("T_NEGOTIATE");
+	case T_CHECK:
+		return ("T_CHECK");
+	case T_DEFAULT:
+		return ("T_DEFAULT");
+	case T_SUCCESS:
+		return ("T_SUCCESS");
+	case T_FAILURE:
+		return ("T_FAILURE");
+	case T_CURRENT:
+		return ("T_CURRENT");
+	case T_PARTSUCCESS:
+		return ("T_PARTSUCCESS");
+	case T_READONLY:
+		return ("T_READONLY");
+	case T_NOTSUPPORT:
+		return ("T_NOTSUPPORT");
+	}
+	return "(unknown flag)";
+}
+#endif				/* TEST_M2UA */
+#if TEST_M2PA
 const char *
 mgmtflag_string(np_ulong flag)
 {
@@ -2956,8 +3221,9 @@ mgmtflag_string(np_ulong flag)
 		return ("(unknown flags)");
 	}
 }
+#endif				/* TEST_M2PA */
 
-#if 0
+#if TEST_M2UA
 char *
 size_string(t_uscalar_t size)
 {
@@ -2975,6 +3241,185 @@ size_string(t_uscalar_t size)
 	return buf;
 }
 #endif
+
+#if TEST_M2UA
+const char *
+prim_string(t_uscalar_t prim)
+{
+	switch (prim) {
+	case T_CONN_REQ:
+		return ("T_CONN_REQ------");
+	case T_CONN_RES:
+		return ("T_CONN_RES------");
+	case T_DISCON_REQ:
+		return ("T_DISCON_REQ----");
+	case T_DATA_REQ:
+		return ("T_DATA_REQ------");
+	case T_EXDATA_REQ:
+		return ("T_EXDATA_REQ----");
+	case T_INFO_REQ:
+		return ("T_INFO_REQ------");
+	case T_BIND_REQ:
+		return ("T_BIND_REQ------");
+	case T_UNBIND_REQ:
+		return ("T_UNBIND_REQ----");
+	case T_UNITDATA_REQ:
+		return ("T_UNITDATA_REQ--");
+	case T_OPTMGMT_REQ:
+		return ("T_OPTMGMT_REQ---");
+	case T_ORDREL_REQ:
+		return ("T_ORDREL_REQ----");
+	case T_OPTDATA_REQ:
+		return ("T_OPTDATA_REQ---");
+	case T_ADDR_REQ:
+		return ("T_ADDR_REQ------");
+	case T_CAPABILITY_REQ:
+		return ("T_CAPABILITY_REQ");
+	case T_CONN_IND:
+		return ("T_CONN_IND------");
+	case T_CONN_CON:
+		return ("T_CONN_CON------");
+	case T_DISCON_IND:
+		return ("T_DISCON_IND----");
+	case T_DATA_IND:
+		return ("T_DATA_IND------");
+	case T_EXDATA_IND:
+		return ("T_EXDATA_IND----");
+	case T_INFO_ACK:
+		return ("T_INFO_ACK------");
+	case T_BIND_ACK:
+		return ("T_BIND_ACK------");
+	case T_ERROR_ACK:
+		return ("T_ERROR_ACK-----");
+	case T_OK_ACK:
+		return ("T_OK_ACK--------");
+	case T_UNITDATA_IND:
+		return ("T_UNITDATA_IND--");
+	case T_UDERROR_IND:
+		return ("T_UDERROR_IND---");
+	case T_OPTMGMT_ACK:
+		return ("T_OPTMGMT_ACK---");
+	case T_ORDREL_IND:
+		return ("T_ORDREL_IND----");
+	case T_OPTDATA_IND:
+		return ("T_OPTDATA_IND---");
+	case T_ADDR_ACK:
+		return ("T_ADDR_ACK------");
+	case T_CAPABILITY_ACK:
+		return ("T_CAPABILITY_ACK");
+	default:
+		return ("T_????_??? -----");
+	}
+}
+
+char *
+t_errno_string(t_scalar_t err, t_scalar_t syserr)
+{
+	switch (err) {
+	case 0:
+		return ("ok");
+	case TBADADDR:
+		return ("[TBADADDR]");
+	case TBADOPT:
+		return ("[TBADOPT]");
+	case TACCES:
+		return ("[TACCES]");
+	case TBADF:
+		return ("[TBADF]");
+	case TNOADDR:
+		return ("[TNOADDR]");
+	case TOUTSTATE:
+		return ("[TOUTSTATE]");
+	case TBADSEQ:
+		return ("[TBADSEQ]");
+	case TSYSERR:
+		return errno_string(syserr);
+	case TLOOK:
+		return ("[TLOOK]");
+	case TBADDATA:
+		return ("[TBADDATA]");
+	case TBUFOVFLW:
+		return ("[TBUFOVFLW]");
+	case TFLOW:
+		return ("[TFLOW]");
+	case TNODATA:
+		return ("[TNODATA]");
+	case TNODIS:
+		return ("[TNODIS]");
+	case TNOUDERR:
+		return ("[TNOUDERR]");
+	case TBADFLAG:
+		return ("[TBADFLAG]");
+	case TNOREL:
+		return ("[TNOREL]");
+	case TNOTSUPPORT:
+		return ("[TNOTSUPPORT]");
+	case TSTATECHNG:
+		return ("[TSTATECHNG]");
+	case TNOSTRUCTYPE:
+		return ("[TNOSTRUCTYPE]");
+	case TBADNAME:
+		return ("[TBADNAME]");
+	case TBADQLEN:
+		return ("[TBADQLEN]");
+	case TADDRBUSY:
+		return ("[TADDRBUSY]");
+	case TINDOUT:
+		return ("[TINDOUT]");
+	case TPROVMISMATCH:
+		return ("[TPROVMISMATCH]");
+	case TRESQLEN:
+		return ("[TRESQLEN]");
+	case TRESADDR:
+		return ("[TRESADDR]");
+	case TQFULL:
+		return ("[TQFULL]");
+	case TPROTO:
+		return ("[TPROTO]");
+	default:
+	{
+		static char buf[32];
+
+		snprintf(buf, sizeof(buf), "[%ld]", (long) err);
+		return buf;
+	}
+	}
+}
+
+char *
+t_look_string(int look)
+{
+	switch (look) {
+	case 0:
+		return ("(NO EVENT)");
+	case T_LISTEN:
+		return ("(T_LISTEN)");
+	case T_CONNECT:
+		return ("(T_CONNECT)");
+	case T_DATA:
+		return ("(T_DATA)");
+	case T_EXDATA:
+		return ("(T_EXDATA)");
+	case T_DISCONNECT:
+		return ("(T_DISCONNECT)");
+	case T_UDERR:
+		return ("(T_UDERR)");
+	case T_ORDREL:
+		return ("(T_ORDREL)");
+	case T_GODATA:
+		return ("(T_GODATA)");
+	case T_GOEXDATA:
+		return ("(T_GOEXDATA)");
+	default:
+	{
+		static char buf[32];
+
+		snprintf(buf, sizeof(buf), "(%d)", look);
+		return buf;
+	}
+	}
+}
+#endif				/* TEST_M2UA */
 
 const char *
 reset_reason_string(np_ulong RESET_reason)
@@ -4287,15 +4732,15 @@ print_mwaiting(int child, struct timespec *time)
 	}
 }
 
-#if TEST_M2PA
+#if TEST_M2PA || TEST_M2UA
 void
-print_mgmtflag(int child, np_ulong flag)
+print_mgmtflag(int child, uint flag)
 {
 	print_string(child, mgmtflag_string(flag));
 }
-#endif				/* TEST_M2PA */
+#endif				/* TEST_M2PA || TEST_M2UA */
 
-#if 0
+#if TEST_M2UA
 void
 print_opt_level(int child, struct t_opthdr *oh)
 {
@@ -4343,7 +4788,7 @@ print_opt_value(int child, struct t_opthdr *oh)
 	if (value)
 		print_string(child, value);
 }
-#endif
+#endif				/* TEST_M2UA */
 
 #if 0
 void
@@ -4429,7 +4874,7 @@ print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 
 #if TEST_M2PA
 void
-print_info(int child, N_info_ack_t *info)
+print_info(int child, N_info_ack_t * info)
 {
 	char buf[64];
 
@@ -5415,7 +5860,7 @@ union primitives {
 	union SL_primitives sl;
 #if TEST_M2PA
 	union N_primitives npi;
-#endif				/* TEST_M2PA */
+#endif					/* TEST_M2PA */
 };
 
 static int
@@ -7248,19 +7693,22 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			DATA_xfer_flags = p->npi.data_ind.DATA_xfer_flags;
 			print_rx_prim(child, prim_string(p->npi.type));
 			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->npi.data_ind)))->sid;
-			//print_options(child, cbuf, sizeof(p->npi.data_ind), sizeof(N_qos_sel_data_sctp_t));
+			// print_options(child, cbuf, sizeof(p->npi.data_ind),
+			// sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_EXDATA_IND:
 			event = __TEST_EXDATA_IND;
 			print_rx_prim(child, prim_string(p->npi.type));
 			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->npi.exdata_ind)))->sid;
-			//print_options(child, cbuf, sizeof(p->npi.exdata_ind), sizeof(N_qos_sel_data_sctp_t));
+			// print_options(child, cbuf, sizeof(p->npi.exdata_ind),
+			// sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_DATACK_IND:
 			event = __TEST_DATACK_IND;
 			print_rx_prim(child, prim_string(p->npi.type));
 			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->npi.datack_ind)))->sid;
-			//print_options(child, cbuf, sizeof(p->npi.datack_ind), sizeof(N_qos_sel_data_sctp_t));
+			// print_options(child, cbuf, sizeof(p->npi.datack_ind),
+			// sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_INFO_ACK:
 			event = __TEST_INFO_ACK;
@@ -8036,7 +8484,7 @@ static int
 postamble_stats(int child)
 {
 	int failed = 0;
-	
+
 	if (child != CHILD_PTU) {
 		state++;
 		if (do_signal(child, __TEST_SL_STATS))
@@ -11787,7 +12235,7 @@ test_1_23_ptu(int child)
 						goto failure;
 					if (!beg_time)
 						beg_time = milliseconds(child, t4e);
-					 print_less(child);
+					print_less(child);
 					continue;
 				case __EVENT_TIMEOUT:
 					print_more(child);
@@ -14004,7 +14452,7 @@ test_3_4_ptu(int child)
 			if (test_alignment_lpo_sut(child, 1, __STATUS_PROCESSOR_OUTAGE))
 				goto failure;
 			origin = state;
-			fib[child]^= 0x8000;
+			fib[child] ^= 0x8000;
 			if (do_signal(child, __TEST_BAD_ACK))
 				goto failure;
 			state++;
@@ -14498,9 +14946,8 @@ test_4_1a_11_ptu(int child)
 				}
 				goto failure;
 			}
-			/* (11) Send another data message to SP A and send a status "Ready" 
-			   message from SP B to SP A with the appropriate sequence numbers. 
-			 */
+			/* (11) Send another data message to SP A and send a status "Ready"
+			   message from SP B to SP A with the appropriate sequence numbers. */
 			if (do_signal(child, __TEST_DATA))
 				goto failure;
 			fsn[0] = bsn[1];
@@ -18232,7 +18679,7 @@ test_8_14_ptu(int child)
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT3:
 	case M2PA_VERSION_DRAFT3_1:
-		return __RESULT_NOTAPPL; /* can't do this */
+		return __RESULT_NOTAPPL;	/* can't do this */
 	}
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT9:
@@ -18300,7 +18747,7 @@ test_8_14_iut(int child)
 	switch (m2pa_version) {
 	case M2PA_VERSION_DRAFT3:
 	case M2PA_VERSION_DRAFT3_1:
-		return __RESULT_NOTAPPL; /* can't do this */
+		return __RESULT_NOTAPPL;	/* can't do this */
 	}
 	if (expect(child, INFINITE_WAIT, __EVENT_IUT_DATA))
 		goto failure;
@@ -18639,8 +19086,7 @@ test_9_3_ptu(int child)
 		goto inconclusive;
 	if (msu_len > 12)
 		msu_len = 12;
-	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n,
-	       msu_len);
+	printf("(N1=%ld, N2=%ld, n=%d, l=%d)\n", (long) config->sl.N1, (long) config->sl.N2, n, msu_len);
 	fflush(stdout);
 
 	for (;;) {
@@ -20904,7 +21350,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -20959,7 +21405,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -21000,10 +21446,10 @@ Arguments:\n\
 Options:\n\
     -u, --iut\n\
         IUT connects instead of PT.\n\
-    -D, --decl-std [STANDARD]\n\
+    -F, --decl-std [STANDARD]\n\
         specify the SS7 standard version to test.\n\
     -D, --draft [DRAFT]\n\
-        specify the M2PA draft version to test.\n\
+        specify the M2PA draft or RFC version to test.\n\
     -c, --client\n\
         execute client side (PTU) of test case only.\n\
     -S, --server\n\
@@ -21080,13 +21526,14 @@ main(int argc, char *argv[])
 	int range = 0;
 	struct test_case *t;
 	int tests_to_run = 0;
-#if TEST_M2PA
+
+#if TEST_M2PA || TEST_M2UA
 	char *hostc = "127.0.0.1,127.0.0.2,127.0.0.3";
 	char *hosts = "127.0.0.1,127.0.0.2,127.0.0.3";
 	char hostbufc[HOST_BUF_LEN];
 	char hostbufs[HOST_BUF_LEN];
 	struct hostent *haddr;
-#endif				/* TEST_M2PA */
+#endif				/* TEST_M2PA || TEST_M2UA */
 
 	for (t = tests; t->numb; t++) {
 		if (!t->result) {
@@ -21101,9 +21548,12 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"iids",	required_argument,	NULL, 'T'},
+			{"text",	required_argument,	NULL, 'T'},
+			{"aspid",	required_argument,	NULL, 'A'},
 			{"iut",		no_argument,		NULL, 'u'},
 			{"draft",	required_argument,	NULL, 'D'},
-			{"decl-std",	required_argument,	NULL, 'D'},
+			{"decl-std",	required_argument,	NULL, 'F'},
 			{"client",	no_argument,		NULL, 'c'},
 			{"server",	no_argument,		NULL, 'S'},
 			{"again",	no_argument,		NULL, 'a'},
@@ -21115,6 +21565,7 @@ main(int argc, char *argv[])
 			{"repeat",	no_argument,		NULL, 'r'},
 			{"repeat-fail",	no_argument,		NULL, 'R'},
 			{"device",	required_argument,	NULL, 'd'},
+			{"transport",	required_argument,	NULL, 'x'},
 			{"exit",	no_argument,		NULL, 'e'},
 			{"list",	optional_argument,	NULL, 'l'},
 			{"fast",	optional_argument,	NULL, 'f'},
@@ -21132,18 +21583,44 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "uD:cSawp:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
+		c = getopt_long(argc, argv, "T:A:uD:F:cSawp:P:i:I:rRd:x:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "uD:cSawp:P:i:I:rRd:el::f::so:t:mqvhVC?");
+		c = getopt(argc, argv, "T:A:uD:F:cSawp:P:i:I:rRd:x:el::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
-		case 'u':	/* --iut */
+#if TEST_M2UA
+		case 'T':	/* -T, --iids, --text IID[,IID] */
+		{
+			char *token = NULL;
+
+			if ((token = index(optarg, ','))) {
+				token[0] = '\0';
+				token++;
+			}
+			if (strtoul(optarg, NULL, 0) != 0)
+				iids[0].num = strtoul(optarg, NULL, 0);
+			else
+				iids[0].text = strncpy(iids[0].text, optarg, sizeof(iids[0].text));
+			if (token) {
+				if (strtoul(token, NULL, 0) != 0)
+					iids[1].num = strtoul(token, NULL, 0);
+				else
+					iids[1].text = strncpy(iids[1].text, token, sizeof(iids[1].text));
+				token--;
+				token[0] = ',';
+			}
+			break;
+		}
+		case 'A':	/* -A, --aspid ASPID */
+			aspid = strtoul(optarg, NULL, 0);
+			break;
+#endif				/* TEST_M2UA */
+		case 'u':	/* -u, --iut */
 			iut_connects = 1;
 			break;
-#if TEST_X400
-		case 'D':	/* --decl-std */
+		case 'F':	/* -F, --decl-std */
 			ss7_pvar = strtoul(optarg, NULL, 0);
 			switch (ss7_pvar) {
 			case SS7_PVAR_ITUT_88:
@@ -21197,9 +21674,8 @@ main(int argc, char *argv[])
 					goto bad_option;
 			}
 			break;
-#endif				/* TEST_X400 */
-#if TEST_M2PA
-		case 'D':	/* --draft */
+#if TEST_M2PA || TEST_M2UA
+		case 'D':	/* -D, --draft */
 			m2pa_version = strtoul(optarg, NULL, 0);
 			switch (m2pa_version) {
 			case M2PA_VERSION_DRAFT3:
@@ -21253,59 +21729,67 @@ main(int argc, char *argv[])
 					goto bad_option;
 			}
 			break;
-#endif				/* TEST_M2PA */
-		case 'c':	/* --client */
+#endif				/* TEST_M2PA || TEST_M2UA */
+		case 'c':	/* -c, --client */
 			client_exec = 1;
 			break;
-		case 'S':	/* --server */
+		case 'S':	/* -S, --server */
 			server_exec = 1;
 			break;
-		case 'a':	/* --again */
+		case 'a':	/* -a, --again */
 			repeat_verbose = 1;
 			break;
-		case 'w':	/* --wait */
+		case 'w':	/* -w, --wait */
 			test_duration = INFINITE_WAIT;
 			break;
-#if TEST_M2PA
-		case 'p':	/* --client-port */
+#if TEST_M2PA || TEST_M2UA
+		case 'p':	/* -p, --client-port [PORT] */
 			client_port_specified = 1;
 			ports[3] = atoi(optarg);
 			ports[0] = ports[3];
 			break;
-		case 'P':	/* --server-port */
+		case 'P':	/* -P, --server-port [PORT] */
 			server_port_specified = 1;
 			ports[3] = atoi(optarg);
 			ports[1] = ports[3];
 			ports[2] = ports[3] + 1;
 			break;
-		case 'i':	/* --client-host *//* client host */
+		case 'i':	/* -i, --client-host [HOSTNAME[,HOSTNAME]*] */
 			client_host_specified = 1;
 			strncpy(hostbufc, optarg, HOST_BUF_LEN);
 			hostc = hostbufc;
 			break;
-		case 'I':	/* --server-host *//* server host */
+		case 'I':	/* -I, --server-host [HOSTNAME[,HOSTNAME]*] */
 			server_host_specified = 1;
 			strncpy(hostbufs, optarg, HOST_BUF_LEN);
 			hosts = hostbufs;
 			break;
-#endif				/* TEST_M2PA */
-		case 'r':	/* --repeat */
+#endif				/* TEST_M2PA || TEST_M2UA */
+		case 'r':	/* -r, --repeat */
 			repeat_on_success = 1;
 			repeat_on_failure = 1;
 			break;
-		case 'R':	/* --repeat-fail */
+		case 'R':	/* -R, --repeat-fail */
 			repeat_on_failure = 1;
 			break;
-		case 'd':
+		case 'd':	/* -d, --device [DEVICE] */
 			if (optarg) {
 				snprintf(devname, sizeof(devname), "%s", optarg);
 				break;
 			}
 			goto bad_option;
-		case 'e':
+#if TEST_M2UA
+		case 'x':	/* -x, --transport [DEVICE] */
+			if (optarg) {
+				snprintf(xptname, sizeof(xptname), "%s", optarg);
+				break;
+			}
+			goto bad_option;
+#endif
+		case 'e':	/* -e, --exit */
 			exit_on_failure = 1;
 			break;
-		case 'l':
+		case 'l':	/* -l, --list [RANGE] */
 			if (optarg) {
 				l = strnlen(optarg, 16);
 				fprintf(stdout, "\n");
@@ -21358,17 +21842,17 @@ main(int argc, char *argv[])
 				exit(0);
 			}
 			break;
-		case 'f':
+		case 'f':	/* -f, --fast [SCALE] */
 			if (optarg)
 				timer_scale = atoi(optarg);
 			else
 				timer_scale = 50;
 			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", (long) timer_scale);
 			break;
-		case 's':
+		case 's':	/* -s, --summary */
 			summary = 1;
 			break;
-		case 'o':
+		case 'o':	/* -o, --onetest [TESTCASE] */
 			if (optarg) {
 				if (!range) {
 					for (t = tests; t->numb; t++)
@@ -21392,10 +21876,10 @@ main(int argc, char *argv[])
 				break;
 			}
 			goto bad_option;
-		case 'q':
+		case 'q':	/* -q, --quiet */
 			verbose = 0;
 			break;
-		case 'v':
+		case 'v':	/* -v, --verbose [LEVEL] */
 			if (optarg == NULL) {
 				verbose++;
 				break;
@@ -21404,7 +21888,7 @@ main(int argc, char *argv[])
 				goto bad_option;
 			verbose = val;
 			break;
-		case 't':
+		case 't':	/* -t, --tests [RANGE] */
 			l = strnlen(optarg, 16);
 			if (!range) {
 				for (t = tests; t->numb; t++)
@@ -21426,17 +21910,17 @@ main(int argc, char *argv[])
 				goto bad_option;
 			}
 			break;
-		case 'm':
+		case 'm':	/* -m, --messages */
 			show_msg = 1;
 			break;
 		case 'H':	/* -H */
-		case 'h':	/* -h, --help */
+		case 'h':	/* -h, --help, -?, --? */
 			help(argc, argv);
 			exit(0);
-		case 'V':
+		case 'V':	/* -V, --version */
 			version(argc, argv);
 			exit(0);
-		case 'C':
+		case 'C':	/* -C, --copying */
 			copying(argc, argv);
 			exit(0);
 		case '?':

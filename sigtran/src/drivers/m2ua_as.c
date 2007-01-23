@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:34 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/01/23 10:00:45 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/21 20:22:34 $ by $Author: brian $
+ Last Modified $Date: 2007/01/23 10:00:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 0.9.2.3  2007/01/23 10:00:45  brian
+ - added test program and m2ua-as updates
+
  Revision 0.9.2.2  2007/01/21 20:22:34  brian
  - working up drivers
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:34 $"
+#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/01/23 10:00:45 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:34 $";
+    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/01/23 10:00:45 $";
 
 /*
  *  This is an M2UA multiplexing driver.  It is necessary to use a multiplexing driver because most
@@ -171,7 +174,7 @@ static char const ident[] =
 /* ========================== */
 
 #define M2UA_MUX_DESCRIP	"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_MUX_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:34 $"
+#define M2UA_MUX_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/01/23 10:00:45 $"
 #define M2UA_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2214,7 +2217,6 @@ sl_local_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *msg)
  * TS-User to TS-Provider primitives.
  * ==================================
  */
-#if 0
 /**
  * t_conn_req: - issue a T_CONN_REQ primitive
  * @tp: TP private structure
@@ -2260,7 +2262,6 @@ t_conn_req(struct tp *tp, queue_t *q, mblk_t *msg, size_t dlen, caddr_t dptr, si
 	}
 	return (-ENOBUFS);
 }
-#endif
 
 /**
  * t_conn_res: - issue a T_CONN_RES primitive
@@ -2306,7 +2307,6 @@ t_conn_res(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t token, size_t olen
 	return (-ENOBUFS);
 }
 
-#if 0
 /**
  * t_discon_req: - issue a T_DISCON_REQ primitive
  * @tp: TP private structure
@@ -2315,7 +2315,7 @@ t_conn_res(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t token, size_t olen
  * @sequence: sequence number of connect indication (or zero)
  * @dp: user data
  */
-static noinline fastcall int
+static inline fastcall int
 t_discon_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t sequence, mblk_t *dp)
 {
 	struct T_discon_req *p;
@@ -2366,7 +2366,7 @@ t_discon_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t sequence, mblk_t
  * @more: more flag
  * @dp: user data
  */
-static noinline fastcall int
+static inline fastcall int
 t_data_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t more, mblk_t *dp)
 {
 	struct T_data_req *p;
@@ -2399,7 +2399,7 @@ t_data_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t more, mblk_t *dp)
  * @more: more flag
  * @dp: user data
  */
-static noinline fastcall int
+static inline fastcall int
 t_exdata_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t more, mblk_t *dp)
 {
 	struct T_exdata_req *p;
@@ -2431,7 +2431,7 @@ t_exdata_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t more, mblk_t *dp
  * @q: active queue
  * @msg: message to free upon success
  */
-static noinline fastcall int
+static inline fastcall int
 t_info_req(struct tp *tp, queue_t *q, mblk_t *msg)
 {
 	struct T_info_req *p;
@@ -2493,7 +2493,7 @@ t_bind_req(struct tp *tp, queue_t *q, mblk_t *msg, size_t alen, caddr_t aptr)
  * @q: active queue
  * @msg: message to free upon success
  */
-static noinline fastcall int
+static inline fastcall int
 t_unbind_req(struct tp *tp, queue_t *q, mblk_t *msg)
 {
 	struct T_unbind_req *p;
@@ -2528,7 +2528,7 @@ t_unbind_req(struct tp *tp, queue_t *q, mblk_t *msg)
  * @optr: options pointer
  * @dp: user data
  */
-static noinline fastcall int
+static inline fastcall int
 t_unitdata_req(struct tp *tp, queue_t *q, mblk_t *msg, size_t dlen, caddr_t dptr, size_t olen,
 	       caddr_t optr, mblk_t *dp)
 {
@@ -2571,7 +2571,7 @@ t_unitdata_req(struct tp *tp, queue_t *q, mblk_t *msg, size_t dlen, caddr_t dptr
  * @optr: options pointer
  * @flags: management flags
  */
-static noinline fastcall int
+static inline fastcall int
 t_optmgmt_req(struct tp *tp, queue_t *q, mblk_t *msg, size_t olen, caddr_t optr, t_scalar_t flags)
 {
 	struct T_optmgmt_req *p;
@@ -2600,7 +2600,6 @@ t_optmgmt_req(struct tp *tp, queue_t *q, mblk_t *msg, size_t olen, caddr_t optr,
 	}
 	return (-ENOBUFS);
 }
-#endif
 
 /**
  * t_ordrel_req: - issue a T_ORDREL_REQ primitive
@@ -2686,7 +2685,6 @@ t_optdata_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t flag, t_uscalar
 	return (-ENOBUFS);
 }
 
-#if 0
 /**
  * t_addr_req: - issue a T_ADDR_REQ primitive
  * @tp: TP private structure
@@ -2723,7 +2721,7 @@ t_addr_req(struct tp *tp, queue_t *q, mblk_t *msg)
  * @msg: message to free upon success
  * @bits: flags
  */
-static noinline fastcall int
+static inline fastcall int
 t_capability_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t bits)
 {
 	struct T_capability_req *p;
@@ -2742,7 +2740,6 @@ t_capability_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t bits)
 	}
 	return (-ENOBUFS);
 }
-#endif
 
 /*
  *  M2UA-AS to M2UA-SG (Sent) M2UA Protocol Messages.
@@ -2838,7 +2835,7 @@ tp_send_asps_aspup_req(struct tp *tp, queue_t *q, mblk_t *msg, uint32_t *aspid, 
 }
 
 /**
- * tp_send_asps_aspdn_req: = send ASP Down
+ * tp_send_asps_aspdn_req: - send ASP Down
  * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
@@ -3720,7 +3717,7 @@ sl_lookup(struct tp *tp, queue_t *q, mblk_t *mp, int *errp)
  * @q: active queue (lower read queue)
  * @mp: the message
  *
- * Error messages pertaning to an AS or AS state must contain an IID.
+ * Error messages pertaining to an AS or AS state must contain an IID.
  */
 static int
 sl_recv_mgmt_err(struct sl *sl, queue_t *q, mblk_t *mp)
@@ -3873,7 +3870,7 @@ tp_recv_mgmt_ntfy(struct tp *tp, queue_t *q, mblk_t *mp)
 	ecode = UA_ECODE_MISSING_PARAMETER;
 	goto error;
       error:
-	return tp_send_mgmt_err(sl->tp.tp, q, mp, ecode, mp->b_rptr, mp->b_wptr - mp->b_rptr);
+	return tp_send_mgmt_err(tp, q, mp, ecode, mp->b_rptr, mp->b_wptr - mp->b_rptr);
 }
 
 /**
@@ -4118,7 +4115,7 @@ tp_recv_aspt_aspac_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 	ecode = UA_ECODE_PROTOCOL_ERROR;
 	goto error;
       error:
-	return tp_send_mgmt_err(sl->tp.tp, q, mp, ecode, mp->b_rptr, mp->b_wptr - mp->b_rptr);
+	return tp_send_mgmt_err(tp, q, mp, ecode, mp->b_rptr, mp->b_wptr - mp->b_rptr);
 }
 
 /**
@@ -5160,11 +5157,8 @@ static int
 tp_recv_aspt(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	register uint32_t *p = (typeof(p)) mp->b_rptr;
-	struct sl *sl;
 	int err;
 
-	if (!(sl = sl_lookup(tp, q, mp, &err)) && err)
-		return (err);
 	switch (UA_MSG_TYPE(p[0])) {
 	case UA_ASPT_ASPAC_ACK:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "ASPAC Ack <-");
@@ -7234,7 +7228,6 @@ t_conn_ind(struct tp *tp, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-#if 0
 /**
  * t_conn_con: - process T_CONN_CON primitive
  * @tp: TP private structure
@@ -8135,7 +8128,6 @@ t_capability_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 	freemsg(mp);
 	return (0);
 }
-#endif
 
 /**
  * t_other_ind: - process unknown primitive
@@ -8266,63 +8258,63 @@ tp_r_proto(queue_t *q, mblk_t *mp)
 		break;
 	case T_CONN_CON:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_CONN_CON <-");
-		rtn = t_conn_ind(tp, q, mp);
+		rtn = t_conn_con(tp, q, mp);
 		break;
 	case T_DISCON_IND:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_DISCON_IND <-");
-		rtn = t_conn_ind(tp, q, mp);
+		rtn = t_discon_ind(tp, q, mp);
 		break;
 	case T_DATA_IND:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_DATA_IND <-");
-		rtn = t_conn_ind(tp, q, mp);
+		rtn = t_data_ind(tp, q, mp);
 		break;
 	case T_EXDATA_IND:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_EXDATA_IND <-");
-		rtn = t_conn_ind(tp, q, mp);
+		rtn = t_exdata_ind(tp, q, mp);
 		break;
 	case T_INFO_ACK:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_INFO_ACK <-");
-		rtn = t_conn_ind(tp, q, mp);
+		rtn = t_info_ack(tp, q, mp);
 		break;
 	case T_BIND_ACK:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_BIND_ACK <-");
-		rtn = t_conn_ind(tp, q, mp);
+		rtn = t_bind_ack(tp, q, mp);
 		break;
 	case T_ERROR_ACK:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_ERROR_ACK <-");
-		rtn = t_conn_ind(tp, q, mp);
+		rtn = t_error_ack(tp, q, mp);
 		break;
 	case T_OK_ACK:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_OK_ACK <-");
-		rtn = t_conn_ind(tp, q, mp);
+		rtn = t_ok_ack(tp, q, mp);
 		break;
 	case T_UNITDATA_IND:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_UNITDATA_IND <-");
-		rtn = t_conn_ind(tp, q, mp);
+		rtn = t_unitdata_ind(tp, q, mp);
 		break;
 	case T_UDERROR_IND:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_UDERROR_IND <-");
-		rtn = t_conn_ind(tp, q, mp);
+		rtn = t_uderror_ind(tp, q, mp);
 		break;
 	case T_OPTMGMT_ACK:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_OPTMGMT_ACK <-");
-		rtn = t_conn_ind(tp, q, mp);
+		rtn = t_optmgmt_ack(tp, q, mp);
 		break;
 	case T_ORDREL_IND:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_ORDREL_IND <-");
-		rtn = t_conn_ind(tp, q, mp);
+		rtn = t_ordrel_ind(tp, q, mp);
 		break;
 	case T_OPTDATA_IND:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_OPTDATA_IND <-");
-		rtn = t_conn_ind(tp, q, mp);
+		rtn = t_optdata_ind(tp, q, mp);
 		break;
 	case T_ADDR_ACK:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_ADDR_ACK <-");
-		rtn = t_conn_ind(tp, q, mp);
+		rtn = t_addr_ack(tp, q, mp);
 		break;
 	case T_CAPABILITY_ACK:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_CAPABILITY_ACK <-");
-		rtn = t_conn_ind(tp, q, mp);
+		rtn = t_capability_ack(tp, q, mp);
 		break;
 	default:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "N_????_??? <-");
@@ -8814,6 +8806,8 @@ static struct cdevsw m2_cdev = {
 	.d_name = MOD_NAME,
 	.d_str = &m2ua_asinfo,
 	.d_flag = D_MP,
+	.d_fop = NULL,
+	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,
 };
 
@@ -8851,5 +8845,9 @@ m2ua_asexit(void)
 	return;
 }
 
+/*
+ *  Linux Kernel Module Initialization
+ *  -------------------------------------------------------------------------
+ */
 module_init(m2ua_asinit);
 module_exit(m2ua_asexit);
