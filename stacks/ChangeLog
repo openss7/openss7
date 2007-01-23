@@ -1,3 +1,7 @@
+2007-01-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/test-x400p.8.man: updates
+
 2007-01-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man5/sdlconf.5.man: added man page
