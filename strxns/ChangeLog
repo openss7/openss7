@@ -1,3 +1,7 @@
+2007-01-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: ip_hooks.h should not be distributed
+
 2007-01-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped version number for next release

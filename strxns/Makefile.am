@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2006/10/03 13:53:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/01/25 20:47:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:53:48 $ by $Author: brian $
+# Last Modified $Date: 2007/01/25 20:47:24 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.57  2007/01/25 20:47:24  brian
+# - hooks.h files should not be distributed
+#
 # Revision 0.9.2.56  2006/10/03 13:53:48  brian
 # - changes to pass make check target
 # - added some package config.h files
@@ -216,7 +219,6 @@ libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
 				  src/drivers/debug.h \
-				  src/drivers/ip_hooks.h \
 				  src/drivers/ip_to_dlpi.c \
 				  src/drivers/ldl.c \
 				  src/drivers/np_ip.c
@@ -327,7 +329,6 @@ libXNSmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libXNSdrvs_a_SOURCES = \
 				  src/drivers/debug.h \
-				  src/drivers/ip_hooks.h \
 				  src/drivers/ip_to_dlpi.c \
 				  src/drivers/ldl.c \
 				  src/drivers/np_ip.c

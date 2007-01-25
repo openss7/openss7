@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2006/10/16 06:09:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/01/25 20:47:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 06:09:38 $ by $Author: brian $
+# Last Modified $Date: 2007/01/25 20:47:28 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.56  2007/01/25 20:47:28  brian
+# - hooks.h files should not be distributed
+#
 # Revision 0.9.2.55  2006/10/16 06:09:38  brian
 # - added netconfig and sock2path config files for packages
 #
@@ -283,8 +286,7 @@ sctp_source_FILES		= \
 				  src/drivers/sctp_t.h
 sctp2_source_FILES		= \
 				  src/drivers/sctp2.c \
-				  src/drivers/sctp_compat.h \
-				  src/drivers/sctp_hooks.h
+				  src/drivers/sctp_compat.h
 if WITH_HMAC_MD5
 ## WITH_HMAC_MD5
 sctp2_source_FILES		+= \
@@ -500,8 +502,7 @@ sctp_source_FILES		= \
 				  src/drivers/sctp_t.h
 sctp2_source_FILES		= \
 				  src/drivers/sctp2.c \
-				  src/drivers/sctp_compat.h \
-				  src/drivers/sctp_hooks.h
+				  src/drivers/sctp_compat.h
 if WITH_HMAC_MD5
 ## WITH_HMAC_MD5
 sctp2_source_FILES		+= \
@@ -544,7 +545,7 @@ if WITH_SCTP2
 nodist_libSCTPsctp_a_SOURCES	= $(sctp2_source_FILES)
 ## WITH_SCTP2
 endif
-libSCTPsctp_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+libSCTPsctp_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/sctp_hooks.h
 libSCTPsctp_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION)
 libSCTPsctp_a_CFLAGS		= $(KERNEL_CFLAGS)
 

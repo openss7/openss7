@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2006/10/16 06:09:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2007/01/25 20:47:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 06:09:35 $ by $Author: brian $
+# Last Modified $Date: 2007/01/25 20:47:26 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.69  2007/01/25 20:47:26  brian
+# - hooks.h files should not be distributed
+#
 # Revision 0.9.2.68  2006/10/16 06:09:35  brian
 # - added netconfig and sock2path config files for packages
 #
@@ -210,8 +213,7 @@ nodist_EXTRA_libINETmods_a_SOURCES = \
 				  src/drivers/inet.c \
 				  src/drivers/udp.c \
 				  src/drivers/rawip.c \
-				  src/drivers/tcp.c \
-				  src/drivers/udp_hooks.h
+				  src/drivers/tcp.c
 
 dist_EXTRA_libINETmods_a_SOURCES = \
 				  src/modules/cmot.c \
@@ -307,8 +309,7 @@ nodist_EXTRA_libINETmods_a_SOURCES	= \
 				  src/drivers/inet.c \
 				  src/drivers/udp.c \
 				  src/drivers/rawip.c \
-				  src/drivers/tcp.c \
-				  src/drivers/udp_hooks.h
+				  src/drivers/tcp.c
 
 dist_EXTRA_libINETmods_a_SOURCES = \
 				  src/modules/cmot.c \
