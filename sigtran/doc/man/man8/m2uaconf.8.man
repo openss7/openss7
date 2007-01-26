@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
 .\"
-.\" @(#) $Id: m2uaconf.8.man,v 0.9.2.1 2007/01/21 20:20:07 brian Exp $
+.\" @(#) $Id: m2uaconf.8.man,v 0.9.2.2 2007/01/26 21:54:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/01/21 20:20:07 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/26 21:54:31 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: m2uaconf.8.man,v $
+.\" Revision 0.9.2.2  2007/01/26 21:54:31  brian
+.\" - working up AS drivers and docs
+.\"
 .\" Revision 0.9.2.1  2007/01/21 20:20:07  brian
 .\" - added documetation
 .\"
@@ -237,14 +240,14 @@ for the M2UA-AS driver.
 Modules to push on the opened Stream to form the signalling link.  Typically null
 .RB ( - )
 for the M2UA-AS driver.
-.TP
-.I version
-Always
-.BR rfc3331
-specifying RFC 3331.
-.[
-rfc3331
-.]
+.\".TP
+.\".I version
+.\"Always
+.\".BR rfc3331
+.\"specifying RFC 3331.
+.\".[
+.\"rfc3331
+.\".]
 .TP
 .I sdli
 Specifies the Signalling Data Link Interface value (16-bit integer value) to be used to identify
@@ -257,6 +260,8 @@ the signalling data terminal to external entities.
 .I iid
 Specifies the interface identifier (either integer or text) to be used to identify the signalling
 link to the Signalling Gateway.
+If both integer and text Interface Identifiers are to be specified, this field is a comma separated
+list consisting of integer IID and text IID.
 .TP
 .I mode
 Specifies the traffic mode type for the application server.  This value can be one of the following

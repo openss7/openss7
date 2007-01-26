@@ -1,0 +1,1160 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
+.\"
+.\" @(#) $Id: m2ua_as_ioctl.4.man,v 0.9.2.1 2007/01/26 21:53:43 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/01/26 21:53:43 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: m2ua_as_ioctl.4.man,v $
+.\" Revision 0.9.2.1  2007/01/26 21:53:43  brian
+.\" - working up AS drivers and docs
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database sigtran.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so sigtran.macros
+.\"
+.\"
+.TH M2UA-AS-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B m2ua_as_ioctl
+\- IO controls for M2UA-AS devices
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/lmi_ioctl.h>
+.br
+.B #include <ss7/sli_ioctl.h>
+.br
+.B #include <ss7/m2ua_as_ioctl.h>
+.HP
+.BI "struct strioctl *" arg ;
+.HP
+.BI "int " m2ua_as_stream " = open(" \fR/dev/m2ua-as\fI ", " flags );
+.HP
+.BI "int " retval " = ioctl(" m2ua_as_stream ", " \fRI_STR\fI ", " arg );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B M2UA-AS-IOCTL
+is a definition of the managed object model for the
+.BR m2ua_as (4)
+driver using the IO controls defined in
+.BR lmi_ioctl (4).
+The
+.BR m2ua_as (4)
+driver is an implementation of the SS7 Message Transfer Part Level 2 (MTP2) protocol as defined in
+ITU-T Recommendation Q.703
+.[
+q703
+.]
+as defined for remote operation using the M2UA protocol defined in RFC 3331
+.[
+rfc3331
+.]
+and ETSI TS 102 141.
+.[
+ts 102 141
+.]
+.B M2UA-AS-IOCTL
+provides the definition of managed objects for the
+.BR m2ua_as (4)
+driver in accordance with the managed object model in ITU-T Recommendation Q.751.1,
+.[
+q751-1
+.]
+and the yet to be written M2UA-MIB.
+.PP
+.B M2UA
+is an implementation of the Signalling System No. 7 Message Transfer Part Level 2 (MTP2) defined in
+ITU-T Recommendation Q.703,
+.[
+q703
+.]
+ANSI T1.111.3
+.[
+t1.111
+.]
+and ETSI EN 300 008-1,
+.[
+en 300 008-1
+.]
+as defined for operation of IP networks in RFC 3331
+.[
+rfc3331
+.]
+and ETSI TS 102 141.
+.[
+ts 102 141
+.]
+.B M2UA-AS
+provides remote access to SS7 Signalling Links over an IP network using SCTP as defined in
+RFC 2960,
+.[
+rfc2960
+.]
+RFC 3309,
+.[
+rfc3309
+.]
+RFC 4460
+.[
+rfc4460
+.]
+and ETSI TS 102 144.
+.[
+ts 102 144
+.]
+.\"
+.SS Protocol Service Interface
+.PP
+.B M2UA-AS
+provides the following stream types:
+.TP
+.I /dev/m2ua-as
+This device provides the signalling link service interface using the SL-primitives of the Signalling
+Link Interface (SLI) described in
+.BR sli (7).
+.\"
+.SS Object Model
+.PP
+.B M2UA-AS
+provides for management of a number of managed objects.  These objects are of a number of types as
+follows:
+.TP
+.B M2UA_AS_OBJ_TYPE_DF
+The default object.  This object refers to the collection of system-wide defaults.
+.TP
+.B M2UA_AS_OBJ_TYPE_LM
+.TP
+.B M2UA_AS_OBJ_TYPE_SL
+A Signalling Link user object.  This object refers to an SL user object.  For example, an open
+.B M2UA-AS
+stream is an SL user object.  SL user objects are identified by their device numbers.
+.TP
+.B M2UA_AS_OBJ_TYPE_AS
+An Application Server.  This object refers to a local Application Server.  Application Servers are
+directly associated with an attached SL user object.  Application Servers are identified by the
+Physical Point of Attachment (PPA) used by the SL user to attach to the AS.
+.TP
+.B M2UA_AS_OBJ_TYPE_SP
+An Application Server Process.  This object refers to the local Application Server Process.  ASPs
+are directly associated with the SG that provides service and the AS that they serve.  Application
+Server Processes are identified by their SP identifier.  An SP identifier is an arbitrary integer
+used to locally identify the ASP.
+.TP
+.B M2UA_AS_OBJ_TYPE_SG
+A Signalling Gateway.  This object refers to a remote Signalling Gateway.  Signalling Gateways are
+directly associated with the Application Server Process objects that they serve.  Signalling
+Gateways are identified by their SG identifier.  An SG identifier is an arbitrary integer used to
+locally identify the SG.
+.TP
+.B M2UA_AS_OBJ_TYPE_XP
+A Transport Provider.  This object refers to an SCTP TPI stream that is linked under the
+.B M2UA-AS
+multiplexing driver.  SCTP transport provider streams support the Transport Provider Interface (TPI)
+a described in
+.BR tpi_sctp (7).
+Transport provider are identified by their multiplex index.  The multiplex index
+is an integer that was returned from the call to the
+.IR I_LINK "(7) or " I_PLINK (7)
+input-output control operation that linked the stream.
+.PP
+Not all conceivable arrangements of objects are possible.  A restricted binding between objects is
+provided for management simplicity.  Objects life-cycles are bound as follows:
+.IP \(em \w'\(em\(em'u
+Whenever the M2UA-AS driver is loaded, a Default object exists.
+.IP \(em
+When an upper Stream is opened on the M2UA-AS driver, a Signalling Link and Application Server
+object exists coincident with the Stream.  The Application Server object associated with an upper
+Stream is underspecified (it does not have a configured PPA).
+.IP \(em
+When a lower Stream is linked under the M2UA-AS driver, a Transport Provider, Signalling Gateway and
+Application Server Process object exists coincident with the Stream.
+.IP \(em
+An upper Stream (SL:AS) is associated with a lower Stream (SP:SG:XP) when the Stream is attached
+using the
+.BR LMI_ATTACH_REQ (7)
+primitive.  This primitive also includes the PPA that fully specifies the AS.  The AS can also be
+viewed as being created by the attach process.
+.IP \(em
+The upper Stream is disassociated with with a lower Stream when the Stream is detached using the
+.BR LMI_DETACH_REQ (7)
+primitive or when the upper Stream is closed.
+.IP \(em
+To reduce lock contention, a lower Stream cannot be unlinked while an upper Stream remains
+associated with it (attached to it).
+.PP
+The foregoing applies to upper Streams opened on the zero clone minor device and lower Streams
+permanently linked with the
+.IR I_PLINK (7)
+input-output control operation.  Two other situations are as follows:
+.IP 1. \w'0.\(em'u
+When a non-zero clone minor device is opened, the resulting upper Stream is immediately associated
+with a lower Stream by the number of the minor device.
+.IP 2.
+When a lower Stream is linked under the multiplexing driver using a temorary link provided by the
+.IR I_LINK (7)
+input-output control operation, the upper Stream is immediately associated with the lower Stream.
+Lower Streams linked in this fashion cannot be attached to by other upper Streams.
+.PP
+In both cases, a PPA address must still be specified using the
+.BR LMI_ATTACH_REQ (7)
+primitive, but the SG identifier does not have to be specified.
+
+.\"
+.SS Management Attributes
+.PP
+Each object has associated with it information in the following categories:
+.TP \w'\fIConfiguration\fR\(em'u
+.I Configuration
+All of the primary attributes necessary and sufficient for the creation of each object.
+.TP
+.I Options
+Options (not necessary for creation) for each object.
+.TP
+.I State
+The (dynamic) state of each object, including running timers.
+.TP
+.I Statistics
+Statistics associated with each object in accordance with ITU-T Recommendation Q.752
+.[
+q752
+.]
+or ANSI T1.116.1,
+.[
+t1.116.1
+.]
+and the yet to be written M2UA-MIB.
+.TP
+.I Events
+Events associated with each object.  This includes both management events in accordance with
+RFC 3331
+.[
+rfc3331
+.]
+and ETSI TS 102 141,
+.[
+ts 102 141
+.]
+and monitoring events in accordance with ITU-T Recommendation Q.752
+.[
+q752
+.]
+or ANSI T1.116.1.
+.[
+t1.116.1
+.]
+.TP
+.I Controls
+Management controls applicable to each object, in accordance with RFC 3331
+.[
+rfc3331
+.]
+and
+ETSI TS 102 141.
+.[
+ts 102 141
+.]
+.PP
+Each object has associated with it information in the following categories:
+.\"
+.\"
+.SH OPTIONS
+.PP
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_option {
+    lmi_ulong type;                     /* object type */
+    lmi_ulong id;                       /* object id */
+    /* followed by object-specific option structure */
+} m2ua_option_t;
+\s+1\fP
+.fi
+.TP
+.I type
+specifies the object type and can be one of the values described under
+.RI \(lq "Object Model" ,\(rq
+above.
+.TP
+.I id
+specifies the object identifier of type,
+.IR type ,
+as described above under
+.RI \(lq "Object Model" \(rq.
+.PP
+The following input-output controls use the
+.B m2ua_option
+structure:
+.TP
+.B M2UA_AS_IOCGOPTION
+.TP
+.B M2UA_AS_IOCSOPTION
+.\"
+.SS Default
+.PP
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_opt_conf_df {
+    struct lmi_option sl_proto;
+    struct lmi_option sp_proto;
+    struct lmi_option sg_proto;
+    lmi_ulong tack;
+    lmi_ulong tbeat;
+    lmi_ulong tidle;
+    lmi_ulong testab;
+    lmi_ulong ppi;
+    lmi_ushort istreams;
+    lmi_ushort ostreams;
+} m2ua_opt_conf_df_t;
+\s+1\fP
+.fi
+.TP 12
+.I sl_proto
+.TP
+.I sp_proto
+.RS
+.TP
+.I pvar
+Protocol version and variant.
+.TP
+.B M2UA_VERSION_NONE
+When specified, the ASP supports Version 1 of the M2UA protocol as specified in RFC 3331, but
+attempts to be as interoperable as possible with other variants.
+.PD 0
+.TP
+.B M2UA_VERSION_RFC3331
+When specified, the ASP supports Version 1 of the M2UA protocol as specified in RFC 3331.
+.[
+rfc3331
+.]
+.TP
+.B M2UA_VERSION_TS102141
+When specified, the ASP supports Version 1 of the M2UA protocol as specified in RFC 3331 and
+modified by ETSI TS 102 141.
+.[
+ts 102 141
+.]
+.PD
+.PP
+.TP
+.I popt
+Protocol options.
+.TP
+.B M2UA_SG_ASPEXT
+When specified, the ASP supports the ASP Extensions procedures and information elements described
+in ASPEXT.
+.[
+draft-bidulock-sigtran-aspext-04.txt
+.]
+.PD 0
+.TP
+.B M2UA_SG_SGINFO
+When specified, the ASP supports the SG Information procedures and information elements described in
+SGINFO.
+.[
+draft-bidulock-sigtran-sginfo-05.txt
+.]
+.TP
+.B M2UA_SG_LOADSEL
+When specified, the ASP supports the Load Selection procedures and information elements described in
+LOADSEL.
+.[
+draft-bidulock-sigtran-loadsel-04.txt
+.]
+.TP
+.B M2UA_SG_LOADGRP
+When specified, the ASP supports the Load Grouping procedures and information elements described in
+LOADGRP.
+.[
+draft-bidulock-sigtran-loadgrp-04.txt
+.]
+.TP
+.B M2UA_SG_CORID
+When specified, the ASP supports the Correlation Id and Heartbeat procedures and information
+elements described in CORID.
+.[
+draft-bidulock-sigtran-corid-04.txt
+.]
+.TP
+.B M2UA_SG_REGEXT
+When specified, the ASP supports the Registration Extension procedures and information elements
+described in REGEXT.
+.[
+draft-bidulock-sigtran-regext-04.txt
+.]
+.TP
+.B M2UA_SG_SESSID
+When specified, the ASP supports the Session Identification procedures and information elements
+described in SESSID.
+.[
+draft-bidulock-sigtran-sessid-04.txt
+.]
+.TP
+.B M2UA_SG_DYNAMIC
+When specified, the ASP supports the optional Dynamic Registration procedures and information
+elements described in RFC 3331.
+.[
+rfc3331
+.]
+Note that this option is prohibited by ETSI TS 102 141.
+.[
+ts 102 141
+.]
+.TP
+.B M2UA_SG_ASPCONG
+When specified, the ASP supports the Congestion procedures and information elements
+described in ASPCONG.
+.[
+draft-bidulock-sigtran-aspcong-00.txt
+.]
+.TP
+.B M2UA_SG_TEXTID
+When specified, the ASP supports the optional Text Interface Identifier procedures and information
+elements descriebd in RFC 3331.
+.[
+rfc3331
+.]
+Note that this option is prohibited by ETSI TS 102 141.
+.[
+ts 102 141
+.]
+.PD
+.RE
+.TP
+.I sg_proto
+This member provides defaults for the M2UA protocol variant and options supported by the remote SG.
+.RS
+.TP
+.I pvar
+Protocol version and variant.  The protocol version and variant can contain the same values as
+described for the ASP under
+.I sp_proto
+above, however, this version and variant applies to the remote SG.
+.TP
+.I popt
+Protocol options.  The protocol options can contain a bitwise OR of options flags.  The options flag
+are the same as are defined for the
+.I sp_proto
+above, however, these options apply to the remote SG.
+.RE
+.TP
+.I tack
+The default duration for the acknowledgement timer, in milliseconds.
+.TP
+.I tbeat
+The default duration for the heartbeat timer, in milliseconds.
+.TP
+.I tidle
+The default duration for the idle timer, in milliseconds.
+.TP
+.I testab
+The default duration for the establish request timer, in milliseconds.  This timer is only defined
+in ETSI TS 102 141.
+.[
+ts 102 141
+.]
+.TP
+.I ppi
+The default Payload Protocol Identifier to use in SCTP data chunks.
+.TP
+.I istreams
+The default maximum number if inbound streams.
+.TP
+.I ostreams
+The default minimum number if outbound streams.
+.\"
+.SS Transport Provider
+.PP
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_opt_conf_xp {
+    lmi_ulong ppi;
+    lmi_ushort istreams;
+    lmi_ushort ostreams;
+    lmi_ulong loc_len;
+    lmi_ulong rem_len;
+    struct sockaddr loc_add;
+    struct sockaddr rem_add;
+} m2ua_opt_conf_xp_t;
+\s+1\fP
+.fi
+.TP 12
+.I ppi
+.TP
+.I istreams
+.TP
+.I ostreams
+.TP
+.I loc_len
+.TP
+.I rem_len
+.TP
+.I loc_add
+.TP
+.I rem_add
+.\"
+.SS Signalling Gateway
+.PP
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_opt_conf_sg {
+    struct lmi_option options;
+} m2ua_opt_conf_sg_t;
+\s+1\fP
+.fi
+.TP 12
+.I options
+.\"
+.SS Application Server Process
+.PP
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_opt_conf_sp {
+    struct lmi_option options;
+    lmi_ulong aspid;
+    lmi_ulong tack;
+    lmi_ulong tbeat;
+    lmi_ulong tidle;
+} m2ua_opt_conf_sp_t;
+\s+1\fP
+.fi
+.TP 12
+.I options
+.TP
+.I aspid
+.TP
+.I tack
+.TP
+.I tbeat
+.TP
+.I tidle
+.\"
+.SS Application Server
+.PP
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_opt_conf_as {
+    lmi_ulong tack;
+    lmi_ulong tbeat;
+    lmi_ulong testab;
+} m2ua_opt_conf_as_t;
+\s+1\fP
+.fi
+.TP 12
+.I tack
+.TP
+.I tbeat
+.TP
+.I testab
+.\"
+.SS Signalling Link
+.PP
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_opt_conf_sl {
+    lmi_ulong t1;
+    lmi_ulong t2;
+    lmi_ulong t3;
+    lmi_ulong t4e;
+    lmi_ulong t4n;
+} m2ua_opt_conf_sl_t;
+\s+1\fP
+.fi
+.TP 12
+.I t1
+.TP
+.I t2
+.TP
+.I t3
+.TP
+.I t4e
+.TP
+.I t4n
+.\"
+.SS Layer Management
+.PP
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_opt_conf_lm {
+} m2ua_opt_conf_lm_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH CONFIGURATION
+.PP
+All objects must be configured using
+.BR streamio (7)
+input-output controls before they are usable.  The structures required to specify configuration are
+defined in the
+.RB < sys/m2ua_as_ioctl.h >
+header file and are as follows (in order of dependency).
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_config {
+    lmi_ulong type;                     /* object type */
+    lmi_ulong id;                       /* object id */
+    lmi_ulong cmd;                      /* object command */
+    /* followed by object-specific config structure */
+} m2ua_config_t;
+\s+1\fP
+.fi
+.TP 12
+.I type
+specifies the object type and can be one of the values described under
+.RI \(lq "Object Model" ,\(rq
+above.
+.TP
+.I id
+specifies the object identifier that identifies an object instance of the object type.  When the
+operation is
+.BR M2UA_ADD ,
+this field can be set to zero (0) and
+.BR m2ua_as (4)
+will select an implicit or new unique object identifier.  When the operation is
+.BR M2UA_GET ,
+this field can be set to zero (0) and
+.BR m2ua_as (4)
+will return all object configurations of a type that will fit into the supplied buffer.
+.TP
+.I cmd
+specifies the command.
+.I cmd
+can be one of:
+.RS
+.TP \w'\fBM2UA_MOD\fR\9em'u
+.B M2UA_GET
+Get the configuration of an object.  This command is only valid with input-output control
+.BR M2UA_AS_IOCGCONFIG .
+.TP
+.B M2UA_ADD
+Add an object.
+The object must not already exist or an error will result.
+This command is not valid with input-output control
+.BR M2UA_AS_IOCGCONFIG .
+.TP
+.B M2UA_CHA
+Change an object.
+The object must exist or an error will result.
+This command is not valid with input-output control
+.BR M2UA_AS_IOCGCONFIG .
+.TP
+.B M2UA_MOD
+Modify an object.
+If the object does not yet exist it will be created, otherwise the object will be modified.
+This command is not valid with input-output control
+.BR M2UA_AS_IOCGCONFIG .
+.TP
+.B M2UA_DEL
+Delete an object.
+The object must exist or an error will result.
+This command is not valid with input-output control
+.BR M2UA_AS_IOCGCONFIG .
+.RE
+.PP
+The following input-output controls use the
+.B m2ua_config
+structure:
+.TP \w'\fBM2UA_AS_IOCGCONFIG\fR\(em'u
+.B M2UA_AS_IOCGCONFIG
+.TP
+.B M2UA_AS_IOCSCONFIG
+.TP
+.B M2UA_AS_IOCTCONFIG
+.TP
+.B M2UA_AS_IOCCCONFIG
+.TP
+.B M2UA_AS_IOCLCONFIG
+.\"
+.SS Default
+.PP
+Although a configuration structure is defined for the default object, neither creation nor
+configuration of the default object is necessary.  The default object exists when the
+.BR m2ua_as (4)
+driver exists and it does not have to be added.
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_conf_df {
+} m2ua_conf_df_t;
+\s+1\fP
+.fi
+.\"
+.SS Transport Provider
+.PP
+Transport provider objects cannot be created
+.RB ( M2UA_ADD )
+or deleted
+.RB ( M2UA_DEL )
+using M2UA-AS input-output controls.  A transport provider object is created when a trasnport stream
+is linked under the multiplexing driver using an
+.IR I_LINK "(7) or " I_PLINK (7)
+input-output control operation.  The identifier for the transport is the multiplex index returned
+from the 
+.IR I_LINK "(7) or " I_PLINK (7)
+input-output control operation.
+Transport provider objects are destroyed whenever the associated transport stream is unlinked from
+the driver using an
+.IR I_UNLINK "(7) or " I_PUNLINK (7)
+input-output control operation.
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_conf_xp {
+        lmi_ulong sgid;                 /* SG identifier */
+} m2ua_conf_xp_t;
+\s+1\fP
+.fi
+.TP 12
+.I sgid
+.\"
+.SS Signalling Gateway
+.PP
+Although a configuration structure is defined for the Signalling Gateway object, the object does not
+need to be created.  An object is automatically created whenever a Transport Provider Stream is
+linked under the
+.BR m2ua_as
+multiplexing driver.  SG identifiers which are configured against a Transport Provider object, or
+implicitly available when linking a Transport Provider Stream, exist.  SG object instances cannot be
+added or deleted directly.
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_conf_sg {
+} m2ua_conf_sg_t;
+\s+1\fP
+.fi
+.\"
+.SS Application Server Process
+.PP
+Application Server Processes are neither added nor deleted on their own.  An object is automatically
+created whenever a Transport Provider Stream is linked under the
+.B m2ua_as
+multiplexing driver.  SP identifiers are identical to SG identifiers.  SP object instances cannot be
+added or deleted directly.
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_conf_sp {
+} m2ua_conf_sp_t;
+\s+1\fP
+.fi
+.\"
+.SS Application Server
+.PP
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_conf_as {
+    struct m2ua_ppa ppa;
+} m2ua_conf_as_t;
+\s+1\fP
+.fi
+.\"
+.SS Signalling Link
+.PP
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_conf_sl {
+} m2ua_conf_sl_t;
+\s+1\fP
+.fi
+.\"
+.SS Layer Management
+.PP
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_conf_lm {
+} m2ua_conf_lm_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH STATE
+.PP
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_statem {
+    lmi_ulong type;                     /* object type */
+    lmi_ulong id;                       /* object id */
+    lmi_ulong flags;                    /* object flags */
+    lmi_ulong state;                    /* object state */
+    /* followed by object-specific state structure */
+} m2ua_statem_t;
+\s+1\fP
+.fi
+.TP 12
+.I type
+specifies the object type and can be one of the values described under
+.RI \(lq "Object Model" ,\(rq
+above.
+.TP
+.I id
+specifies the object identifier of type,
+.IR type ,
+as described above under
+.RI \(lq "Object Model" \(rq.
+.TP
+.I flags
+returns the state flags associated with the object.  The interpretation of the
+.I flags
+are dependent upon the object type.
+.TP
+.I state
+returns the state associated with the object.  The interpretation of the
+.I state
+is dependent upon the object type.
+.PP
+The following input-output controls use the
+.B m2ua_statem
+structure:
+.TP
+.B M2UA_AS_IOCGSTATEM
+.TP
+.B M2UA_AS_IOCCMRESET
+.\"
+.SS Default
+.PP
+.\"
+.SS Transport Provider
+.PP
+.\"
+.SS Signalling Gateway
+.PP
+.\"
+.SS Application Server Process
+.PP
+.\"
+.SS Application Server
+.PP
+.\"
+.SS Signalling Link
+.PP
+.\"
+.SS Layer Management
+.PP
+.\"
+.\"
+.SH STATISTICS
+.PP
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_stats {
+    lmi_ulong type;                     /* object type */
+    lmi_ulong id;                       /* object id */
+    lmi_ulong header;                   /* object stats header */
+    /* followed by object-specific stats structure */
+} m2ua_stats_t;
+\s+1\fP
+.fi
+.TP 12
+.I type
+specifies the object type and can be one of the values described under
+.RI \(lq "Object Model" ,\(rq
+above.
+.TP
+.I id
+specifies the object identifier of type,
+.IR type ,
+as described above under
+.RI \(lq "Object Model" \(rq.
+.TP
+.I header
+returns the statistics header (timestamp) associated with the object.
+.PP
+The following input-output controls use the
+.B m2ua_stats
+structure:
+.TP
+.B M2UA_AS_IOCGSTATSP
+.TP
+.B M2UA_AS_IOCSSTATSP
+.TP
+.B M2UA_AS_IOCGSTATS
+.TP
+.B M2UA_AS_IOCCSTATS
+.\"
+.SS Default
+.PP
+.\"
+.SS Transport Provider
+.PP
+.\"
+.SS Signalling Gateway
+.PP
+.\"
+.SS Application Server Process
+.PP
+.\"
+.SS Application Server
+.PP
+.\"
+.SS Signalling Link
+.PP
+.\"
+.SS Layer Management
+.PP
+.\"
+.\"
+.SH EVENTS
+.PP
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_notify {
+    lmi_ulong type;                     /* object type */
+    lmi_ulong id;                       /* object id */
+    lmi_notify_t notify;                /* notifications */
+} m2ua_notify_t;
+\s+1\fP
+.fi
+.TP 12
+.I type
+specifies the object type and can be one of the values described under
+.RI \(lq "Object Model" ,\(rq
+above.
+.TP
+.I id
+specifies the object identifier of type,
+.IR type ,
+as described above under
+.RI \(lq "Object Model" \(rq.
+.TP
+.I notify
+specifies or returns the notifications for which the user Stream has registered.
+.PP
+The following input-output controls use the
+.B m2ua_notify
+structure:
+.TP
+.B M2UA_AS_IOCGNOTIFY
+.TP
+.B M2UA_AS_IOCSNOTIFY
+.TP
+.B M2UA_AS_IOCCNOTIFY
+.\"
+.SS Default
+.PP
+.\"
+.SS Transport Provider
+.PP
+.\"
+.SS Signalling Gateway
+.PP
+.\"
+.SS Application Server Process
+.PP
+.\"
+.SS Application Server
+.PP
+.\"
+.SS Signalling Link
+.PP
+.\"
+.SS Layer Management
+.PP
+.\"
+.\"
+.SH CONTROLS
+.PP
+.PP
+.nf
+\fC\s-1\
+typedef struct m2ua_mgmt {
+    lmi_ulong type;                     /* object type */
+    lmi_ulong id;                       /* object id */
+    lmi_ulong cmd;                      /* object command */
+} m2ua_mgmt_t;
+\s+1\fP
+.fi
+.TP 12
+.I type
+specifies the object type and can be one of the values described under
+.RI \(lq "Object Model" ,\(rq
+above.
+.TP
+.I id
+specifies the object identifier of type,
+.IR type ,
+as described above under
+.RI \(lq "Object Model" \(rq.
+.TP
+.I cmd
+specifies the management command, and can be one of the following values:
+.RS
+.TP
+.B M2UA_AS_MGMT_UP
+.TP
+.B M2UA_AS_MGMT_DOWN
+.TP
+.B M2UA_AS_MGMT_ACTIVATE
+.TP
+.B M2UA_AS_MGMT_DEACTIVATE
+.TP
+.B M2UA_AS_MGMT_UP_BLOCK
+.TP
+.B M2UA_AS_MGMT_UP_UNBLOCK
+.TP
+.B M2UA_AS_MGMT_ACT_BLOCK
+.TP
+.B M2UA_AS_MGMT_ACT_UNBLOCK
+.RE
+.PP
+The following input-output controls use the
+.B m2ua_mgmt
+structure:
+.TP
+.B M2UA_AS_IOCCMGMT
+.TP
+.B M2UA_AS_IOCCPASS
+.\"
+.SS Default
+.PP
+.\"
+.SS Transport Provider
+.PP
+.\"
+.SS Signalling Gateway
+.PP
+.\"
+.SS Application Server Process
+.PP
+.\"
+.SS Application Server
+.PP
+.\"
+.SS Signalling Link
+.PP
+.\"
+.SS Layer Management
+.PP
+.\"
+.\"
+.SH IOCTLS
+.PP
+All the Streams provided by the
+.BR m2ua_as (4)
+multiplexing driver support the set of management controls described here.  These controls, for the
+most part, require root privileges, and permit the management of M2UA configuration, routing, link
+devices, statistics and events.  This set of management controls are available on all Streams
+provided by the
+.BR m2ua_as (4)
+driver.
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

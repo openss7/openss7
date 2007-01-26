@@ -1,3 +1,26 @@
+2007-01-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/m2ua_as_ioctl.4.man: added
+	* doc/man/man4/m3ua-as.4.man: added
+	* src/include/sys/m2ua_as.h: added
+	* src/include/sys/m2ua_as_ioctl.h: added
+	* src/include/sys/m3ua_as.h: added
+	* doc/man/man8/test-m3ua_as.8.man: added
+
+	* doc/man/sigtran.refs: working up AS driver docs
+	* doc/man/man4/SIGTRAN.4.man: working up AS driver docs
+	* doc/man/man4/m2ua-as.4.man: working up AS driver docs
+	* doc/man/man4/m3ua.4.man: working up AS driver docs
+	* doc/man/man4/m3ua_as.4.man: working up AS driver docs
+	* doc/man/man4/m3ua_ioctl.4.man: working up AS driver docs
+	* doc/man/man8/m2uaasconf.8.man: working up AS driver docs
+	* doc/man/man8/m2uaconf.8.man: working up AS driver docs
+	* doc/man/man8/test-m2pa.8.man: working up AS driver docs
+	* src/drivers/m2ua_as.c: working up AS drivers
+	* src/include/sys/m3ua.h: working up AS drivers
+	* src/modules/m2pa_sl.c: updated (always use msec with mi_timer)
+
+
 2007-01-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man8/test-m2ua_as.8.man: added test suite for m2ua-as

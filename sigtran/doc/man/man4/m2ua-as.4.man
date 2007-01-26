@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
 .\"
-.\" @(#) $Id: m2ua-as.4.man,v 0.9.2.2 2007/01/23 10:00:42 brian Exp $
+.\" @(#) $Id: m2ua-as.4.man,v 0.9.2.3 2007/01/26 21:54:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/01/23 10:00:42 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/26 21:54:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: m2ua-as.4.man,v $
+.\" Revision 0.9.2.3  2007/01/26 21:54:30  brian
+.\" - working up AS drivers and docs
+.\"
 .\" Revision 0.9.2.2  2007/01/23 10:00:42  brian
 .\" - added test program and m2ua-as updates
 .\"
@@ -88,13 +91,35 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <stropts.h>
+.br
+.B #include <ss7/lmi.h>
+.br
+.B #include <ss7/lmi_ioctl.h>
+.br
+.B #include <ss7/sli.h>
+.br
+.B #include <ss7/sli_ioctl.h>
+.br
+.B #include <sys/m2ua_ioctl.h>
+.HP 12
+\fBint \fIm2ua_stream\fB = open(\fB\(lq\fI/dev/m2ua-sg1\fB\(rq, O_RDWR);
+.PD 0
+.HP
+\fBint \fIsctp_stream\fB = open(\fB\(lq\fI/dev/sctp_t\fB\(rq, O_RDWR);
+.HP
+\fBint \fImuxid\fB = ioctl(I_PLINK, (intptr_t) \fIsctp_stream\fB);
+.PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-The M2UA-AS is a multiplexing driver the implements the ASP side of the M2UA
+The M2UA-AS is a multiplexing driver that implements the ASP side of the M2UA
 .[
 rfc3331
+.]
+.[
+ts 102 141
 .]
 protocol.
 Streams opened on the upper multiplex provide the
@@ -106,7 +131,7 @@ Streams linked under the lower multiplex provide the SCTP transport interface,
 .SS Configuration
 .PP
 When the M2UA-AS driver is configured, SCTP Streams are opened and linked under the multiplexing
-driver.  Each SCTP stream represents an association between a local ASP and a remote Signalling
+driver.  Each SCTP Stream represents an association between a local ASP and a remote Signalling
 Gateway.  Input-output controls are used to configure each lower multiplex Stream.  Once a lower
 multiplex Stream is configured, the M2UA-AS driver attempts to form an SCTP association with the
 remote SG, and to bring the M2UA association into the ASP Up state.  Should the association be
@@ -133,7 +158,12 @@ configuration file used to define the objects necessary for configuration.  The 
 contains entries that define ASP-SG relationships as follows:
 .TP
 .I sgid
-An integer number identifying the ASP-SG relation.
+An integer number, assigned locally, from 1 to 4096, identifying the ASP-SG relation, or
+a Common Language Equipment Identifier used to globally identify the SG.
+When specified, the CLEI will be used in diagnostic text (e.g. INFO parameters) when referring to
+the SG.
+When both the integer and CLEI SG identifiers are specified, they are separated by a comma
+with no intervening whitespace.
 .TP
 .I aspid
 The ASPID that is used in communciation with the remote SG.  This ASPID can be null (a single dash,
@@ -141,9 +171,11 @@ The ASPID that is used in communciation with the remote SG.  This ASPID can be n
 indicating that no ASPID is to be used in communication with the remote SG.  This ASPID corresponds
 also to the value zero
 .RB ( 0 ).
-.TP
-.I streams
-The number of SCTP streams that will be requested to the SG.
+Also, a Common Language Equipment Identifier can be specified to globally identify the ASP.
+When specified, this CLEI will be used in diagnostic text (e.g. INFO parameters) when referring to
+the ASP.
+When both the integer and CLEI ASP identifiers are specified, they are separated by a comma
+with no intervening whitespace.
 .TP
 .I local-endpoint
 The local endpoint address to which an SCTP association is bound to communicate with the remote SG.
@@ -168,14 +200,48 @@ or the form:
 or combinations of hostnames and IP addresses and either port or service.  If the port or service is
 not specified, the M2UA well-known port number will be used.
 .TP
+.I streams
+The number of SCTP streams that will be requested to the SG.
+.TP
+.I version
+The version of the M2UA protocol supported by the SG.  This version can be a single dash
+.RB ( - ),
+indicating that the default should be used, or one of the following text strings:
+.RS
+.TP
+.B RFC3331
+The SG supports Version 1 of the M2UA protocol as specified in RFC 3331.
+.[
+rfc3331
+.]
+.TP
+.B TS102141
+The SG supports Version 1 of the M2UA protoocl as specified in RFC 3331
+.[
+rfc3331
+.]
+as modified by ETSI TS 102 141.
+.[
+ts 102 141
+.]
+.RE
+.TP
 .I options
-Contains a comma separated list of SG options, with no embedded whitespace.  The following options
-are defined:
+Contains a comma separated list of SG options, with no embedded whitespace.  Valid options can
+depend on the value of the
+.I version
+field.
+The following options are defined:
 .RS
 .TP
 .B dynamic
 When included in the options, this keyword specifies that the SG requires dynamic registration.  If
-this option is not included, the SG requires static registration.
+this option is not included, the SG requires static registration.  As it does not support dynamic
+registration, this option is not valid for ETSI TS 102 141
+.[
+ts 102 141
+.]
+operation.
 .RE
 .PP
 The configuration utility, reads this configuration file and performs the following steps for each
@@ -207,80 +273,196 @@ Up state with the remote SG.
 The steps 1 through 3 above are repeated for each entry in the configuration file.
 .IP 5.
 The utility can also open and attach signalling link Streams and link them under the SL-MUX
-multiplexing driver with a global PPA and CLEI.
+multiplexing driver with a global PPA and CLEI.  (Quite often the global PPA is merely a
+concatenation of the SDTI/SDLI values and the CLEI is simply the text IID.)
 .\"
 .SS Addressing
 .PP
 All M2UA-AS upper multiplex Streams (SL) are Style II links.  That is, they must be attached with an
 .BR LMI_ATTACH_REQ (7)
-primitive containing a PPA before they are enabled.  For M2UA-AS, the interpretation of the PPA
-depends upon whether the SG requires dynamic registration or not.  When the SG requires dynamic
-registration, the PPA is interpreted as an optional SGID and an SDLI and SDTI.  When the SG requires
-static configuration, the PPA is interpreted as an optional SGI and an IID.
+primitive containing a PPA before they are enabled.
+The M2UA PPA is specified using the
+.B m2ua_ppa
+structure, defined in the
+.RB < sys/m2ua_as.h >
+header file.  The
+.B m2ua_ppa
+structure is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct m2ua_ppa {
+    unsigned int sgid;
+    uint16_t sdti;
+    uint16_t sdli;
+    uint32_t iid;
+    char clei[M2UA_CLEI_MAX];
+    uint32_t tmode;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B m2ua_ppa
+structure contains the following members:
+.TP
+.I sgid
+Specifies the server process identifier that locally identifies the ASP-SG instance to which the
+interface identifiers and link keys apply.  Assignment and management of this index is a matter for
+configuration management.  This number can be a small integer and can correspond to a minor device
+number on the M2UA-AS driver.
+Specification of the
+.I sgid
+member is mandatory when a zero minor device number was opened.
+Specification of the
+.I sgid
+member is optional when a non-zero minor device number was opened, in which case the
+.I sgid
+is implied by the minor device opened.
+When not specified, the
+.I sgid
+member is set to zero (0).
+.TP
+.I sdti
+Specifies the Signalling Data Terminal Identifier to be used in a Link Key for registering the
+Application Server with the Signalling Gateway.  This member will only be used if the
+.I iid
+and
+.I clei
+members are not specified and if the SG supports dynamic registration.
+Specification of the
+.I sdti
+member is optional when the
+.I iid
+or
+.I clei
+members are specified and mandatory otherwise.
+When not specified, the
+.I sdti
+member may be set to zero (0).
+.TP
+.I sdli
+Specifies the Signalling Data Link Identifier to be used in a Link Key for registering the
+Application Server with the Signalling Gateway.  This member will only be used if the
+.I iid
+and
+.I clei
+members are not specified and if the SG supports dynamic registration.
+Specification of the
+.I sdli
+member is optional when the
+.I iid
+or
+.I clei
+members are specified and mandatory otherwise.
+When not specified, the
+.I sdli
+member may be set to zero (0).
+.TP
+.I iid
+Specifies the integer-based Interface Identifier to be used in communications between the
+Application Server and the Signalling Gateway that identifies the signalling link.
+Specification of the
+.I iid
+member is mandatory when the SG does not support text-based IIDs and also does not support dynamic
+registration.
+Specification of the
+.I iid
+member is optional when the
+.I clei
+member is specified (and the SG supports text IIDs), or when the
+.IR sdti " and " sdli
+members are specified (and the SG supports dynamic registration).
+When not specified, the
+.I iid
+member is set to zero (0).
+.TP
+.I clei
+Specifies the text-based Inteface Identifier to be used in communication between the Application
+Service and the Signalling Gateway that identifies the signalling link.
+Specification of the
+.I clei
+member is mandatory when text-based IIDs are to be used.
+Specification of the
+.I clei
+member is optional when the
+.I iid
+member is specified, or when the
+.IR sdti " and " sdli
+members are specified (and the SG supports dynamic registration).
+When not specified, the
+.I clei
+member is set to a null string (the first character in the field is the null character).
+.TP
+.I tmode
+Specifies the Traffic Mode Type for the Application Server.
+Specification of the
+.I tmode
+member is optional.  When not specified, the
+.I tmode
+member is set to a zero (0).  Otherwise,
+.I tmode
+can be one of the following values:
+.RS
+.TP
+.B UA_TMODE_NONE
+The traffic mode is unspecified or default.
+.PD 0
+.TP
+.B UA_TMODE_OVERRIDE
+The traffic mode is override.
+.TP
+.B UA_TMODE_LOADSHARE
+The traffic mode is loadshare.
+.TP
+.B UA_TMODE_BROADCAST
+The traffic mode is broadcast.
+.PD
+.PP
+Note that not all Signalling Gateways support all traffic modes.
+.RE
+.PP
+When an integer IID is specified in the PPA, the M2UA-AS driver will use static configuration and
+the integer IID supplied.  All other fields are ignored.  Otherwise, when a text-based IID (CLEI) is
+specified, the M2UA-AS driver will use static configuration and the CLEI supplied.  When neither IID
+nor CLEI are specified, the M2UA-AS driver will attempt to register the SDTI/SDLI values with the
+SG.
 .PP
 It is possible to use the minor device number opened on the M2UA-AS driver to imply the SGID;
 however, because the PPA is variable length for the SLI, it is quite possible to provide 64-bits or
 more of information (unlike the DLPI interface).  This saves creating many device nodes or using
 .BI /dev/streams/m2ua-as/ NNN
-minor device nodes.  Therefore, when the device is opened was minor device zero (0); and SGID must
-be specified in the PPA.  When the device opened  was minor device
+minor device nodes.  Therefore, when the device opened was minor device zero (0); an SGID must
+be specified in the PPA.  When the device opened was minor device
 .IR NNN ,
 where
 .I NNN
-is a number from 1 to 16367, the SGID does not need to be present in the PPA and the opened minor
+is a number from 1 to 4096, the SGID does not need to be present in the PPA and the opened minor
 device number is used as the SGID instead.
 .PP
-For OpenSS7 SGs, the SDLI/SDTI combination and the IID are the same numeric value.  When an ASP
-registers the Link Key containing an SDLI and SDTI, the IID returned to the registration request is
-simply the 16-bit SDLI and SDTI concatenated into a 32-bit IID.  Therefore, regardless of whether
-the SG requires dynamic registration or not, the PPA is formatted as a 32-bit SGID followed by a
-32-bit IID that can be interpreted as composed of a 16-bit SDLI concatenated with a 16-bit SDTI when
-the SG requires dynamic registration.
-.PP
-The driver also accepts text IIDs.  Text IIDs are of any length other than 4 or 8 bytes.  4 byte
-long PPAs are interpreted by the driver as an integer IID (or SDLI/SDTI) if the opened device was a
-non-zero minor device number.  8 byte long PPAs are interpreted as an integer SGID followed by an
-integer IID (or SDLI/SDTI).  When the opened device was a non-zero minor device, PPAs of length
-other than 4 are interpreted as a text IID.  The text IID must include the terminating null
-character if it is shorter than the PPA.  (This way the PPA can be made of arbitrary length,
-regardless of the length of the text identifier.)  When the opened device was the zero minor
-device, PPAs of length other than 8 are interpreted as a 4 byte integer SGID followed by a text IID
-(including the null terminating character if the text IID is shorter than the PPA).
-The driver allocates storage for 32 bytes of text IID.  Text IIDs longer than 32 bytes will be
-truncated to 32 bytes.
-.PP
-The form and interpretation of the address is summarized in the following table:
-.sp
-.RS
-.TS
-tab(:);
-lblblb
-l|l|l.
-PPA Length:Zero Minor:Non-Zero Minor
-_:_:_
-4 bytes:error:int IID
-5-7 bytes:int SGID, text IID:text IID
-8 bytes:int SGID, int IID:text IID
-9+ bytes:int SGID, text IID:text IID
-.TE
-.RE
+Note that for OpenSS7 SGs, the SDLI/SDTI combination and the integer IID are the same numeric value.
+When an ASP registers the Link Key containing an SDLI and SDTI, the IID returned to the registration
+request is simply the 16-bit SDLI and SDTI concatenated into a 32-bit IID.
 .PP
 The SGID is used directly to locate the lower multiplex Stream.  If there does not exist a lower
-multiplex stream with the requested SGID, the request will fail.  When the lower multiplex stream
-exists, the SL streams attached to the stream are searched to determine if another stream is already
-attached to the SDLI/SDTI or IID.  Only one stream can be attached to a given SDLI/SDTI or IID at a
-time.  The second request to attach to the same SDLI/SDTI or IID will fail.  When successful, and
-the lower SCTP stream is active (ASP Up), and the SG requires dynamic registration, dynamic
-registration will be performed on the SDLI/SDTI used as a Link Key.  If the lower stream is not ASP
-Up, or the regsitration fails, the attach request will fail.  If the SG does not require
-registration, the IID will be assigned to the attached stream and the attach operation will succeed.
-The SCTP association does not need to be in the ASP Up state at this point (it will when the
+multiplex Stream with the requested SGID, the request will fail.
+.\"When the lower multiplex Stream exists, the SL streams attached to the lower multiplex Stream are
+.\"searched to determine if another Stream is already attached to the SDLI/SDTI or IID.  Only one
+.\"Stream can be attached to a given SDLI/SDTI or IID at a time.  The second request to attach to the
+.\"same SDLI/SDTI or IID will fail.
+When successful, and the lower SCTP Stream is active (ASP Up), and the PPA requires dynamic
+registration, dynamic registration will be performed on the SDLI/SDTI used as a Link Key.  If the
+lower Stream is not ASP Up, or the regsitration fails, the attach request will fail.  If the PPA
+does not require registration, the IID will be assigned to the attached Stream and the attach
+operation will succeed.  The SCTP association does not need to be in the ASP Up state at this point
+(it will
+when the
 .BR LMI_ENABLE_REQ (7)
 appears).
 .PP
-When SL Streams opened on the upper multiplex of the M2UA-AS driver are attached, the form of the
-PPA depends upon whether the SG requires dynamic registration or not.  When the SG requires dynamic
-configuration, the PPA consists of the
+When SL Streams opened on the upper multiplex of the M2UA-AS driver are attached, the validity of
+the PPA depends upon whether the SG requires dynamic registration or not.  When the SG requires
+dynamic configuration, the PPA consists of the
 .I sgid
 and an tuple consisting of the Signalling Data Link Identifier (SDLI) and the Signalling Data
 Terminal Identifier (SDTI).  When the SG requires static configuration, the PPA consists of the
@@ -300,39 +482,600 @@ The M2UA-AS driver provides several input-output controls for configuring the dr
 .\"
 .SS M2UA_AS_IOCSCONFIG
 .PP
+This input-output control is responsible for setting information associated with a lower multiplex
+SCTP Stream.
+.I arg
+is a pointer to a
+.B m2ua_sg
+structure.  The
+.B m2ua_sg
+structure is defined in the
+.RB < sys/m2ua_ioctl.h >
+header file and is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+#define M2UA_CLEI_MAX 32
+
+struct m2ua_sg {
+    int m2_index;
+    unsigned int m2_sgid;
+    char m2_sg_clei[M2UA_CLEI_MAX];
+    unsigned int m2_aspid;
+    char m2_asp_clei[M2UA_CLEI_MAX];
+    struct sockaddr m2_loc_add;
+    socklen_t m2_loc_len;
+    struct sockaddr m2_rem_add;
+    socklen_t m2_rem_len;
+    unsigned int m2_ppi;
+    unsigned short m2_streams;
+    unsigned short m2_options;
+    unsigned int m2_version;
+};
+\s+1\fP
+.fi
+.TP
+.I m2_index
+This member is the lower multiplex index returned by the
+.IR I_LINK "(7) or " I_PLINK (7)
+input-output control operation that was used to link the lower Stream.  It specifies the lower
+multiplex SCTP Stream to configure.
+.TP
+.I m2_sgid
+This member specifies the SG identifier for the Stream.  The SG identifier is an integer number from
+1 to 4096 that locally identifies the SG.  This number also corresponds to the minor device number
+on the
+.B m2ua-as
+driver that can be opened to obtain an instance of an AS associated with this SG.  Which number
+corresponds to which remote SG is a local configuration matter.
+.TP
+.I m2_sg_clei
+This member specifies the SG Common Language Equipment Identifier for the Stream.  The SG CLEI is an
+ASCII string of up to
+.B M2UA_CLEI_MAX
+characters (typically 32).  Either the
+.I m2_sgid
+or
+.I m2_sg_clei
+or both are specified.  When the
+.I m2_sgid
+is not specified, it is set to zero (0); when the
+.I m2_sg_clei
+is not specified, it is set to a null string (the first character is the null character).  The SG
+CLEI is used as a convenience for identifying SGs as well as providing a human-friendly value to
+output in diagnostic messages.
+.TP
+.I m2_aspid
+This member specifies the ASP identifier that the ASP will use when sending ASP Up to the associated
+SG.  When set to zero (0), no ASP identiifer will be sent in the ASP Up to the associated SG (unless
+one is demanded).
+.TP
+.I m2_asp_clei
+This member specifies the ASP Common Language Equipment Identifier for the Stream.  The ASP CLEI is
+an ASCII string of up to
+.B M2UA_CLEI_MAX
+characters (typeically 32).  Both the
+.I m2_aspid
+and
+.I m2_asp_clei
+are optional.  When the
+.I m2_asp_clei
+is not specified, it is set to a null string (the first character is set to null).  The ASP CLEI is
+used as a convenience for identifying ASPs as well as providing a human-friendly value to output in
+diagnostic messages.
+.TP
+.I m2_loc_add
+Specifies the local endpoint address to which the SCTP association is bound to communicate with the
+remote SG.  This can be any address form that can be used by the
+.BR T_BIND_REQ (7)
+primitive for SCTP, see
+.BR tpi_sctp (7).
+.TP
+.I m2_loc_len
+Specifies the number of bytes in the
+.I m3_loc_add
+member that are significant.
+.TP
+.I m2_rem_add
+Specifies the remote endpoint address to which the SCTP associaiton will connect to communicate with
+the SG.  This can be any address form that can be used by the
+.BR T_CONN_REQ (7)
+primitive for SCTP, see
+.BR tpi_sctp (7).
+.TP
+.I m2_rem_len
+Specifies the number of bytes in the
+.I m3_rem_add
+member that are significant.
+.TP
+.I m2_ppi
+This member specifies the Payload Protocol Identifier (PPI) used in SCTP messages.  When set to zero
+(0), the IANA registered PPI for M2UA will be used.
+.TP
+.I m2_streams
+This member specifies the number of outbound SCTP data streams that the ASP will request when
+connecting to the remote SG.  The default value is 32.  When unspecified, it is set to zero (0).  It
+is invalid to form a connection with less that 2 outboung SCTP data stream (one for management
+messages and one for SL-User data).
+.TP
+.I m2_version
+Specifies the version of the M2UA protocol used by the SG.  When not specified, it is set to zero
+(0).  Otherise, the value can be one of the following values:
+.RS
+.TP
+.B M2UA_VERSION_RFC3331
+Specifies that the protocol should adhere strictly to Version 1 of the M2UA protocol as specified in
+RFC 3331.
+.[
+rfc3331
+.]
+.TP
+.B M2UA_VERSION_TS102141
+Specifies that the protocol should adhere strictly to Version 1 of the M2UA protocol as modified by
+ETSI TS 102 141.
+.[
+ts 102 141
+.]
+.RE
+.TP
+.I m2_options
+Specifies the SG option flags.  SG option flags are a logical OR of zero or more of the following
+flags:
+.RS
+.TP
+.B M2UA_SG_DYNAMIC
+This flag specifies that the SG requires dynamic registration.  If this flag is absent, it specifies
+that the SG requires static configuration.
+.RE
 .\"
 .SS M2UA_AS_IOCGCONFIG
 .PP
 This input-output control takes as an argument a pointer to a buffer area into which to place the
 configuration information.
 .\"
+.SS M2UA_AS_IOCLCONFIG
+.PP
+This input-output control lists SG Stream configurations.
+This input-output control takes as an argument a pointer to a buffer area into which to place the
+configuration information.
+.I arg
+is either a pointer to a
+.B m2ua_sg_list
+structure, or
+.BR NULL .
+The
+.B m2ua_sg_list
+structure is defined in the
+.RB < sys/m2ua_ioctl.h >
+header file and is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct m2ua_sg_list {
+    int m2_sg_num;
+    struct m2ua_sg m2_sg_list[0];
+};
+\s+1\fP
+.fi
+.PP
+The
+.B m2ua_sg_list
+structure contains the following members:
+.TP
+.I m2_sg_num
+This member contains the number of elements in the array of
+.B m2ua_sg
+structures in the
+.I m2_sg_list
+array member described below.  This member is not altered by a successful input-output control
+operation.
+.TP
+.I m2_sg_list
+This member is a list (array) of
+.B m2ua_sg
+structures.  The number of elements in the list is specified by the
+.I m2_sg_num
+member.  Elements in the list are overwritten by a successful input-output control operation.
+.PP
+This input-output control returns zero (0) or a positive number on success and minus one (-1) on
+failure.  When successful, the zero (0) or positive number returned is the current number of SG
+configurations with information available for retrieval.  When pass a
+.B NULL
+.I arg
+value, this return value can be used to size the
+.B m2ua_sg_list
+structure for a subsequent input-output control operation.  Note, however, that the number of
+SG configurations available for information retrieval may change, and the return value from a
+subsequent operation should be checked to ensure that complete information has been obtained.
+.PP
+Upon successful return with a
+.RB non- NULL
+.I arg
+value, the driver will have populated up to
+.I m2_sg_num
+elements in the list,
+.IR m2_sg_list ,
+with the SG configuration of available SG Streams in unspecified order.  If fewer elements were
+populated that were available, the return value from the input-output control operation will be less
+than
+.IR m2_sg_num ;
+if more elements were available, only
+.I m2_sg_num
+elements are written and the return value from the input-output control operation will be greater
+than
+.IR m2_sg_num .
 .\"
-.SH SYNOPSIS
+.SS M2UA_AS_IOCSKEY
+.PP
+This input-output control is used to add a Link Key to Interface Identifier mapping for static
+or dynamic configuration.
+.I arg
+is a pointer to a
+.BR m2ua_key
+structure.  The
+.BR m2ua_key
+structure is defined in the
+.RB < sys/m2ua_ioctl.h >
+header file and is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+#define M2UA_CLEI_MAX 32
+
+struct m2ua_key {
+    unsigned int m2_sgid;
+    char m2_sg_clei[M2UA_CLEI_MAX];
+    unsigned int m2_tmode;
+    unsigned int m2_iid;
+    char m2_iid_text[M2UA_CLEI_MAX];
+    unsigned short m2_sdti;
+    unsigned short m2_sdli;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B m2ua_key
+structure contains the following members:
+.TP
+.I m2_sgid
+This member identifies the SG to which the key applies.  The SG identifier is an integer number from
+1 to 4096 that identifies the SG locally.  This number also corresponds to the minor device number
+on the
+.B M2UA-AS
+driver that can be opened to obtain an instance of an AS associated with this SG.  When the
+input-output control is called from a Stream that was opened on a non-zero minor device number, the
+.I m2_sgid
+is implied, does not need to be specified, can be set to zero (0), and will be ignored by the
+driver (the SG identifier associated with the minor device number will be used instead).  Also, if
+the
+.I m2_sg_clei
+below is specified, the
+.I m2_sgid
+member can be set to zero (0) and the driver will use the
+.I m2_sg_clei
+to specify or identify the SG.
+.TP
+.I m2_sg_clei
+This member identifies the SG to which the key applies.  The SG CLEI is null-terminated ASCII string
+of up to
+.B M2UA_CLEI_MAX
+characters in length.  When unspecified, the
+.I m2_sg_clei
+member contains a null string (the first character is the null character).
+.TP
+.I m2_tmode
+This member contains the traffic mode the will be used in the ASP Active message in communications
+with this SG.  The
+.I m2_tmode
+member can contain one of the following values:
+.RS
+.TP
+.B M2UA_TMODE_NONE
+.PD 0
+No traffic mode parameter will be included in the ASP Active message, however, the ASP will still
+respond to \(lqAlternate ASP Active in AS\(rq NOTIFY messages.
+.TP
+.B M2UA_TMODE_OVERRIDE
+The traffic mode in the ASP Active message will be Override.
+.TP
+.B M2UA_TMODE_LOADSHARE
+The traffic mode in the ASP Active message will be Loadshare.
+.TP
+.B M2UA_TMODE_BROADCAST
+The traffic mode in the ASP Active message will be Broadcast.  Note that
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+does not support broadcast traffic mode, but
+RFC 3331,
+.[
+rfc3331
+.]
+does.
+.PD
+.RE
+.TP
+.I m2_iid
+This member contains the integer Interface Identifier value (32-bit integer) that will be used for
+this link key in communications with this SG.  When the SG requires dynamic registration, this
+member will be set to zero (0) when the link key is not registered and requires registration.
+.TP
+.I m2_iid_text
+This member contains the text Interface Identifier string (of up to
+.B M2UA_CLEI_MAX
+characters) that will be used for this link key in comunications with this SG.  Text interface
+identifiers are only specified when the SG supports text based Interface Identifiers; otherwise,
+this member contains a null string (the first character is the null character).
+.TP
+.I m2_sdti
+This member contains the Signalling Data Terminal Identifier forming this link key.  This identifier
+is used to match requested PPAs against this link key and will be used in the Link Key for dynamic
+registration with an SG requiring dynamic registration.
+.TP
+.I m2_sdli
+This member contains the Signalling Data Link Identifier forming this link key.  This identifier is
+used to match requested PPAs against this link key and will be used in the Link Key for dynamic
+registration with an SG requiring dynamic registration.
+.PP
+All keys are associated with a particular lower SCTP Stream.  Should the lower SCTP Stream be
+unlinked, all keys associated with that Stream will be removed from the key table.
+.\"
+.SS M2UA_AS_IOCCKEY
+.PP
+This input-output control removes a local Link Key to Interface Identifier mapping for a specified
+Link Key.
+.I arg
+is a pointer to a
+.B m2ua_key
+structure (defined above).
+.PP
+The
+.IR m2_sgid " or " m2_sg_clei
+members must be specified to locate the SG for which the link key will be deleted.  The remaining
+members of the
+.B m2ua_key
+structure identify the link key mapping to be deleted.  One of the
+.IR m2_iid "; " m2_iid_text "; or " m2_sdti " and " m2_sdli
+members must be specified and exist in the key table.
+.I m2_iid
+can be set to zero (0) to specify a link key that matches any integer IID value.
+.I m2_iid_text
+can be set to a null string to specify a link key that matches any text IID value.
+.IR m2_sdti " and " m2_sdli
+can be set to zero (0) to specify a link key that matches any link identifier values.
+These members identify a key that matches all of the specified values.
+.\"
+.SS M2UA_AS_IOCGKEY
+.PP
+This input-output control lists key mappings.
+.I arg
+is either a pointer to a
+.B m2ua_key_list
+structure or
+.BR NULL .
+The
+.B m2ua_key_list
+structure is defined in the
+.RB < sys/m2ua_ioctl.h >
+header file and is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct m2ua_key_list {
+    int m2_key_num;
+    struct m2ua_key m2_key_list[0];
+};
+\s+1\fP
+.fi
+.PP
+The
+.B m2ua_key_list
+structure contains the following members:
+.TP
+.I m2_key_num
+This member contains the number of elements in the array of
+.B m2ua_key
+structure in the
+.I m2_key_list
+member, described below.  This member is not altered by a successful input-output control operation.
+.TP
+.I m2_key_list
+This member is a variable sized array of
+.B m2ua_key
+structures.  The number of elements in the array is specified by the
+.I m2_key_num
+member.  Elements of the array are overwritten by a successful input-output control operation.
+.PP
+This input-output control returns a zero (0) or positive number on success and minus one (-1) on
+failure.  When successful, the zero (0) or positive number returned is the current number of keys
+with information available for retrieval.  When passed a
+.B NULL
+.I arg
+value, this return value can be used to size a buffer containing a
+.B m2ua_key_list
+structure for a subsequent input-output operation.  Note, however, that the number of keys available
+for information retrieval may change, and the return value from the subsequent operation should be
+checked to ensure that complete information has been obtained.
+.PP
+Upon successful return with a
+.RB non- NULL
+.I arg
+value, the driver will have populated up to
+.I m2_key_num
+elements in the array
+.I m2_key_list
+with the key information from available keys in unspecified order.  If fewer elements were populated
+than were available, the return value from the input-output control operation will be less than
+.IR m2_key_num .
+If elements were truncated due to insufficient space, the return value from the input-output control
+operation will be greater than
+.IR m2_key_num .
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B M2UA-AS
+driver only directly supports the ASP-side of the M2UA protocol.  For the SG-side of the protocol,
+see
+.BR m2ua-sg (4).
+For a peer to peer link protocol, see
+.BR m2pa_sl (4).
+.\"
+.\"
+.SH IMPLEMENTATION
 .PP
 .\"
 .\"
-.SH SYNOPSIS
+.SH DEVICES
 .PP
 .\"
 .\"
-.SH SYNOPSIS
+.SH FILES
 .PP
+.TP
+.RB < ss7/lmi.h >
+Header file that defines the
+.BR lmi (7)
+interface used by signalling link streams opened on the upper multiplex.
+.TP
+.RB < ss7/lmi_ioctl.h >
+Header file that defines the
+.BR lmi_ioctl (7)
+input-output controls used by signalling link streams opened on the upper multiplex.
+.TP
+.RB < ss7/sli.h >
+Header file that defines the
+.BR sli (7)
+interface used by signalling link streams opened on the upper multiplex.
+.TP
+.RB < ss7/sli_ioctl.h >
+Header file that defines the
+.BR sli_ioctl (7)
+input-output controls used by signalling link streams opened on the upper multiplex.
+.TP
+.RB < sys/m2ua_ioctl.h >
+Header file that defines the
+.BR m2ua (4)
+input-output controls used by control streams opened on the upper multiplex.
 .\"
 .\"
-.SH SYNOPSIS
-.PP
-.\"
-.\"
-.SH SYNOPSIS
+.SH "SEE ALSO"
 .PP
 .\"
 .\"
 .SH BUGS
 .PP
+The
+.B m2ua-as
+driver has no known bugs.  Report problems to
+.RB < bugs@openss7.org >.
+.PP
+The
+.B @PACKAGE@
+package has been tested with a wide array of production Linux distributions, kernels and target
+architectures, and is considered production grade by The OpenSS7 Project.  At the time of release,
+the
+.B @PACKAGE@
+package had no known bugs.  Problems can be reported to
+.RB < bugs@openss7.org >.
+Please, however, use the included
+.B send-pr
+script for generating actionable problem reports.  Please see the file \(lqPROBLEMS\(rq in the
+release for problem reporting guidelines.
 .\"
 .\"
 .SH COMPATIBLITY
 .PP
+.B M2UA-AS
+is compatible with implementations based on
+RFC 3331
+.[
+rfc3331
+.]
+and
+ETSI TS 102 141,
+.[
+ts 102 141
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+The
+.B M2UA-AS
+driver supports integer and text Interface Identifiers.  Due to the nature of the Signalling Link
+Interface that the driver presents, it does not support range Interface Identifiers.
+.IP ""
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+does not support text Interface Identifiers.  When the
+.I version
+is set to
+.BR TS102141 ,
+all text interface identifiers are ignored and treated as null.
+.IP \(em
+The
+.B M2UA-AS
+driver supports dynamic registration of Link Keys.
+.IP ""
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+does not permit use of dynamic registration.  Applications using the
+.B M2UA-AS
+driver in an ETSI TS 102 141 environment should not invoke the dynamic registration procedures and
+should configure the SG for appropriate operation using input-output controls.  Setting a
+.I version
+of
+.B TS102141
+suppresses the ability to request dynamic registration and causes the driver to return
+\(lqUnsupported Message Class\(rq to any RKMM class message received.  Because this also suppresses
+text interface identifiers, all Keys specified must have a non-zero integer IID value.
+.IP \(em
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+does not support the broadcast AS traffic mode.  When
+.I version
+is set to
+.BR TS102141 ,
+the Broadcast traffic mode is treated as an unsupported value.
+.IP \(em
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+requires that a timer be set on the Establish Request and the request retransmitted if an Establish
+Confirm or Release Indication MAUP message is not received before the timer expires.  The timer is
+set to T1+T2+T3+T4 of Q.703.
+.[
+q703
+.]
+This behaviour is only occurs when
+.I version
+is set to
+.BR TS102141 .
+.IP \(em
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+cannot support the
+.B SL_LOCAL_PROCESSOR_OUTAGE_REQ
+and
+.B SL_LOCAL_PROCESSOR_RECOVERED_REQ
+primitives.  These primitives generate an error when
+.I version
+is set to
+.BR TS102141 .
+.IP \(em
+.IP \(em
+.IP \(em
 .\"
 .\"
 .SH CONFORMANCE
@@ -343,7 +1086,7 @@ rfc3331
 .]
 .IR "ETSI TS 102 141" ,
 .[
-etsim2ua
+ts 102 141
 .]
 .IR "draft-bidulock-sigtran-m2ua-ss7test" ,
 .[
@@ -351,18 +1094,18 @@ draft-bidulock-sigtran-m2ua-ss7test-02
 .]
 .IR "ETSI TS 102 380" .
 .[
-etsitestm2ua
+ts 102 380
 .]
 .PP
 Conformance to
 .IR "ETSI TS 102 141"
 .[
-etsim2ua
+ts 102 141
 .]
 per tests specified by
 .IR "ETSI TS 102 380" ,
 .[
-etsitestm2ua
+ts 102 380
 .]
 is validated using the
 .BR test-m2ua_as (8)
@@ -389,6 +1132,9 @@ test suite.
 .\"
 .SH HISTORY
 .PP
+The
+.B M2UA-AS
+driver was intially released for @PACKAGE_TITLE@ @VERSION@.
 .\"
 .\"
 .[

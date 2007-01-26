@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
 .\"
-.\" @(#) $Id: m2uaasconf.8.man,v 0.9.2.1 2007/01/21 20:20:07 brian Exp $
+.\" @(#) $Id: m2uaasconf.8.man,v 0.9.2.2 2007/01/26 21:54:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/01/21 20:20:07 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/26 21:54:31 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: m2uaasconf.8.man,v $
+.\" Revision 0.9.2.2  2007/01/26 21:54:31  brian
+.\" - working up AS drivers and docs
+.\"
 .\" Revision 0.9.2.1  2007/01/21 20:20:07  brian
 .\" - added documetation
 .\"
@@ -86,8 +89,16 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .PP
 .HP 12
-\fBm2uaasconf\fR [\fIoptions\fR] [{\fB-f\fR|\fB--file\fR} [\fIFILENAME\fR]]
+\fBm2uaasconf\fR [\fIoptions\fR] [[{\fB-l\fR|\fB--list\fR}] [\fISGID\fR [\fI...\fR]]]
 .PD 0
+.HP
+\fBm2uaasconf\fR [\fIoptions\fR] {\fB-a\fR|\fB--add\fR} {[\fBsg\fR]|\fBkey\fR} \fISGID\fR \fIarguments\fR \fI...\fR
+.HP
+\fBm2uaasconf\fR [\fIoptions\fR] {\fB-c\fR|\fB--cha\fR} {[\fBsg\fR]|\fBkey\fR} \fISGID\fR \fIarguments\fR \fI...\fR
+.HP
+\fBm2uaasconf\fR [\fIoptions\fR] {\fB-d\fR|\fB--del\fR} {[\fBsg\fR]|\fBkey\fR} \fISGID\fR [\fIarguments\fR \fI...\fR]
+.HP
+\fBm2uaasconf\fR [\fIoptions\fR] {\fB-f\fR|\fB--file\fR} [\fIFILENAME\fR]
 .HP
 \fBm2uaasconf\fR {\fB-h\fR|\fB--help\fR}
 .HP
@@ -108,38 +119,131 @@ M2UA-AS driver input-output controls.
 The
 .B m2uasconf
 utility is intended to be run at system startup from a System V init script, or when reconfiguration
-of the M2UA-AS driver is necessary.  Once configuration of the M2UA-AS multiplexing driver is
-complete, application programs (SL-Users) can open, attach, enable and use Signalling Link streams
-opened on the driver.
+of the M2UA-AS driver is necessary.  The utility can also be used to display the configuration of
+the M2UA-AS driver at any time.  Once configuration of the M2UA-AS multiplexing driver is complete,
+application programs (SL-Users) can open, attach, enable and use Signalling Link streams opened on
+the driver.
 .\"
 .\"
 .SH OPTIONS
 .PP
+.B M2UAASCONF
+provides the following command-line options:
 .SS "Command Options"
 .PP
+One of the following mutually exclusive command options must be specified.  If no command options
+are specified,
+.B M2UAASCONF
+will behave as though the
+.B -l
+option was specified and list the full configuration for the M2UA-AS driver.
+.TP
+[[\fB-l\fR, \fB--list\fR] [\fISGID\fR [\fI...\fR]]]
+List the configuration information associated with a specified set of SGs, or list the configuration
+information fo all SGs (if no arguments are specified).  The information is displayed in the same
+format as contained in the
+.BR m2uaasconf (5)
+configuration file.  This option can be used to obtain information about specific M2UA-AS SGs, as
+well as providing the ability to regenerate the M2UA-AS entries in the
+.BR m2uaasconf (5)
+configuration file.
+.RS
+.PP
+Arguments consist of a whitespace separated list of SG identifiers.  Each SG identifier can consist
+of a number (specifying the local integer SG identifier) or an ASCII string (specifying the global
+SG Common Language Equipment Identifier).  When arguments are specified, the configuration
+associated with the SG identified by each argument is listed.  When no arguments are specified, the
+configuration for all SGs are listed.
+.PP
+The output format is one line per SG or Key entry and is consistent with the file format described
+under
+.RI \(lq "FILE FORMAT" \(rq,
+below.
+The
+.B -o
+option can be used to regenerate the configuration file.
+.RE
+.TP
+\fB-a\fR, \fB--add\fR {[\fBsg\fR]|\fBkey\fR} \fISGID\fR \fIarguments\fR \fI...\fR
+Add an SG or Key configuration entry.  The format of the arguments are the same as for the
+.B sg
+or
+.B key
+entry in the configuraion file.
+The argument format is consistent with the file format described under
+.RI \(lq "FILE FORMAT" \(rq,
+below.
+The entry must not overlap with an existing entry or an error will result.
+.TP
+\fB-c\fR, \fB--cha\fR {[\fBsg\fR]|\fBkey\fR} \fISGID\fR \fIarguments\fR \fI...\fR
+Change an SG or Key configuration entry.  The format of the arguments are the same as for the
+.B sg
+or
+.B key
+entry in the configuration file.
+The argument format is consistent with the file format described uder
+.RI \(lq "FILE FORMAT" \(rq,
+below.
+The entry must uniquely identify an existing entry to alter or an error will result.
+.TP
+\fB-d\fR, \fB--del\fR {[\fBsg\fR]|\fBkey\fR} \fISGID\fR [\fIarguments\fR \fI...\fR]
+Remove an SG or Key configuration entry.  The format of the arguments are the same as for the
+.B sg
+or
+.B key
+entry in the configuration file; however, only a sufficient number of arguments necessary to
+uniquely identify the entry are necessary.  Therefore, an SG entry can be deleted by specifying only
+the
+.IR sgid .
+Additional arguments are normally necessary to uniquely identify a Key entry for deletion.
+If the entry does not exist or cannot be uniquely identified, an error will result.
+.TP
+\fB-f\fR, \fB--file\fR [\fIFILENAME\fR]
+Create SG and Key configuration entries using the configuration file,
+.IR FILENAME ,
+or, if
+.I FILENAME
+is not specified, the default configuration file.  The default configuration file depends on the
+Linux distribution, but is normally
+.BR /etc/sysconf/m2uaasconf .
+Entries in the file are processed line by line and are added to the configuration as though the
+.B --add
+option were specified with the entry line fields as arguments.
+.RS
+.PP
+See
+.RI \(lq "FILE FORMAT" \(rq,
+below, for a description of the configuration file format.
+.RE
 .PP
 The following command options are common to all OpenSS7 project command line utilities:
 .TP
-{\fB-h\fR|\fB--help\fR|\fB-H\fR|\fB-?\fR|\fB--?\fR}
+\fB-h\fR, \fB--help\fR, \fB-H\fR, \fB-?\fR, \fB--?\fR
 When this option is encountered, print usage information to
 .I stdout
 and exit.
 .TP
-{\fB-V\fR|\fB--version\fR}
+\fB-V\fR, \fB--version\fR
 When this option is encountered, print version information to
 .I stdout
 and exit.
 .TP
-{\fB-C\fR|\fB--copying\fR}
+\fB-C\fR, \fB--copying\fR
 When this option is encountered, print copying information to
 .I stdout
 and exit.
+.\"
+.SS General Options
+.PP
+.TP
+\fB-q\fR, \fB--quiet\fR
+Specifies that the caller
 .\"
 .\"
 .SH "FILE FORMAT"
 .PP
 When the
-{\fB-f\fP|\fB--file\fP}\ \fIFILENAME\fP
+\fB-f\fP, \fB--file\fP [\fIFILENAME\fP]
 option is specified, the supplied file contains M2UA-AS configuration entries as follows:
 .IP \(bu \w'\(bu\(em'u
 Each line in the file contains one entry or comment per line.
@@ -157,38 +261,52 @@ is ignored.
 .IP \(bu
 Blank lines are ignored.
 .PP
-Each line containing an M2UA-AS configuration entry consists of the following fields:
+Each line containing an M2UA-AS configuration entry consists of either a
+.B sg
+entry or a
+.B key
+entry.
+An
+.B sg
+entry begins with the string
+.RB \(lq sg \(rq
+in the first field.
+A
+.B key
+entry begins with the string
+.RB \(lq key \(rq
+in the first field.
+.SS SG Configuration Entries
 .PP
+Each line containing an M2UA-AS SG configuration entry consists of the following fields:
+.ad l
+.HP \w'\fBsg\fR\ 'u
+.B sg
 .RI < sgid >
 .RI < aspid >
-.RI < options >
 .RI < local-endpoint >
 .RI < remote-endpoint >
+.RI < streams >
+.RI < version >
+.RI < options >
+.ad b
 .PP
 Where,
 .TP
 .I sgid
-is an SG identifier that is an integer number identifying an ASP-SG relation (i.e. SCTP
-association).
+is an SG identifier that is an integer number locally identifying an ASP-SG relation (i.e. SCTP
+association), or a Common Language Equipment Identifier used to globally identify the remote SG.
+When both an integer and CLEI SG identifier are specified, they are separated by a comma with no
+intervening withspace.
 .TP
 .I aspid
 is an ASP Identifier that will be used in the ASP Up request to the SG.  If this field is specified
-as zero
-.RB ( 0 ),
-or as a single dash,
+as a single dash,
 .RB ( - ),
 then no ASP Identifier will be used in the ASP Up request to the SG.
-.TP
-.I options
-is a list of comma-separated SG options, with no embedded whitespace.  The following options are
-defined:
-.RS
-.TP
-.B dynamic
-When included in the options, this keyword specifies that the SG requires dynamic configuration
-(registration).  If this option is not included, the SG requires static configuration (no
-registration).
-.RE
+This field may also contain a Common Language Equipment Identifier used to globally identify the
+ASP.  When both an integer and CLEI ASP identifier are specified, they are separated by a common
+with no intervening whitespace.
 .TP
 .I local-endpoint
 is the local endpoint address to which the SCTP association is bound to communicate with the remote
@@ -213,6 +331,71 @@ remote SG.  This can take the form:
 If the
 .IR port " or " service
 is not specified, the M2UA registered (well-known) port number will be used.
+.TP
+.I streams
+is the number of SCTP data streams that will be requested on connection with this SG.
+.TP
+.I version
+is the version of the M2UA protocol that is supported by this SG.  The field can be a single dash
+.RB ( - ),
+indicating that the default is to be used; otherwise, one of the following values.
+.RS
+.TP
+.B rfc3331
+the SG supports Version 1 of the M2UA protocol as specified in RFC 3331.
+.[
+rfc3331
+.]
+.TP
+.B ts102141
+the SG supports Version 1 of the M2UA protocol as specified in RFC 3331 and modified by ETSI TS 102
+141.
+.[
+ts 102 141
+.]
+.RE
+.TP
+.I options
+is a list of comma-separated SG options, with no embedded whitespace.  Which defined options are
+valid might depend upon the setting of
+.IR version ,
+above.  Options that are undefined or unsupported for a given
+.I version
+are ignored.  When no options are specified, this filed contains a single dash
+.RB ( - ).
+The following options are defined:
+.RS
+.TP
+.B dynamic
+When included in the options, this keyword specifies that the SG requires dynamic configuration
+(registration).  If this option is not included, the SG requires static configuration (no
+registration).
+.RE
+.SS Key Configuration Entries
+.PP
+Each line containing an M2UA-AS Key configuration entry consists of the following fields:
+.ad l
+.HP \w'\fBkey\fR\ 'u
+.B key
+.RI < sgid >
+.RI < iid >
+.RI < sdti >
+.RI < sdli >
+.RI < tmode >
+.ad b
+.PP
+Where,
+.TP
+.I sgid
+.TP
+.I iid
+.TP
+.I sdti
+.TP
+.I sdli
+.TP
+.I tmode
+.SS Procedures
 .PP
 The
 .B m2uaasconf
@@ -277,6 +460,71 @@ options suppresses the printing of diagnostic messages to
 .IR stderr .
 .\"
 .\"
+.SH EXAMPLES
+.PP
+Sample configuration file:
+.RS
+.PP
+.nf
+\fC\s-3\
+1,EDTNAB55M2SGP01 1,EDTNAB55M2ASP01 localhost localhost:m2ua 257 ts102141 -
+2,EDTNAB55M2SGP01 2,EDTNAB55M2ASP02 localhost localhost:m2ua 257 ts102141 -
+3,EDTNAB55M2SGP02   EDTNAB55M2ASP03 localhost localhost:1000  33 rfc3331  dynamic
+\s+3\fP
+.fi
+.RE
+.PP
+Set the configuration according to the configuration file:
+.RS
+.PP
+.nf
+\fC\s-1\
+#> m2uaasconf -f ./sampleconf
+\s+1\fP
+.fi
+.RE
+.PP
+Remove one entry:
+.RS
+.PP
+.nf
+\fC\s-1\
+#> m2uaasconf -d EDTNAB55M2SGP02
+\s+1\fP
+.fi
+.RE
+.PP
+Add the removed entry back:
+.RS
+.PP
+.nf
+\fC\s-1\
+#> m2uaasconf -a 3,EDTNAB55M2SGP02 EDTNAB55M2ASP03 localhost localhost:1000 33 rfc3331 dynamic
+\s+1\fP
+.fi
+.RE
+.PP
+List all entries:
+.RS
+.PP
+.nf
+\fC\s-1\
+#> m2uaasconf
+\s+1\fP
+.fi
+.RE
+.PP
+List one entry:
+.RS
+.PP
+.nf
+\fC\s-1\
+#> m2uaasconf 3
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
 .SH NOTICES
 .PP
 .\"
@@ -284,7 +532,7 @@ options suppresses the printing of diagnostic messages to
 .SH BUGS
 .PP
 .B m2uaasconf
-has not known bugs.
+has no known bugs.
 Report problems to
 .RI < bugs@openss7.org >.
 .\"
@@ -299,7 +547,7 @@ Report problems to
 .PP
 .B m2uaasconf
 is an OpenSS7-specific configuration command.  Because this command is used at startup and is
-transparent to the SL-User operaning SL streams, compatibility is not an issue.
+transparent to the SL-User opening SL streams, compatibility is not an issue.
 .\"
 .\"
 .SH CONFORMANCE

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua.h,v 0.9.2.3 2007/01/26 21:54:35 brian Exp $
+ @(#) $Id: m2ua_as_ioctl.h,v 0.9.2.1 2007/01/26 21:53:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,80 +45,41 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/26 21:54:35 $ by $Author: brian $
+ Last Modified $Date: 2007/01/26 21:53:51 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: m2ua_as_ioctl.h,v $
+ Revision 0.9.2.1  2007/01/26 21:53:51  brian
+ - working up AS drivers and docs
 
  *****************************************************************************/
 
-#ifndef __SS7_M3UA_H__
-#define __SS7_M3UA_H__
+#ifndef __SYS_M2UA_AS_IOCTL_H__
+#define __SYS_M2UA_AS_IOCTL_H__
 
-#ident "@(#) $RCSfile: m3ua.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: m2ua_as_ioctl.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
-/* This file can be processed by doxygen(1). */
+#define M2UA_AS_IOCL_MAGIC	('2' + 30)
 
-typedef unsigned long m3ua_ulong;
-typedef unsigned short m3ua_ushort;
-typedef unsigned char m3ua_uchar;
+#define M2UA_AS_OBJ_TYPE_LM	0	/* layer management */
+#define M2UA_AS_OBJ_TYPE_KEY	1
+#define	M2UA_AS_OBJ_TYPE_TP	2	/* SCTP Transport Provider */
+#define M2UA_AS_OBJ_TYPE_DF	3	/* defaults */
 
-typedef struct m3ua_phdr {
-	u16 tag;
-	u16 len;
-} m3ua_phdr_t;
+#define M2UA_AS_CLEI_MAX	32
 
-#define M_TAG_NETWORK_APPEARANCE	1
-#define	M_TAG_PROTOCOL_DATA		3
-#define M_TAG_INFO_STRING		4
-#define M_TAG_AFFECTED_DPC		5
-#define M_TAG_ROUTING_CONTEXT		6
-#define M_TAG_DIAGNOSTIC_INFORMATION	7
-#define M_TAG_HEARTBEAT_DATA		8
-#define M_TAG_UNAVAILABILITY_CAUSE	9
-#define M_TAG_REASON			10
-#define	M_TAG_TRAFFIC_MODE_TYPE		11
-#define M_TAG_ERROR_CODE		12
-#define	M_TAG_STATUS_TYPE		13
-#define M_TAG_CONGESTED_INDICATIONS	14
+/*
+ *  Signalling Gateway configuration
+ *  --------------------------------
+ */
+typedef struct m2ua_conf_tp {
+	uint32_t sgpid;			/* Signalling process identifier */
+	char sgp_clei[M2UA_AS_CLEI_MAX];	/* Signalling process CLEI */
+	uint32_t sgid;			/* Signalling Gateway identifier */
+	char sg_clei[M2UA_AS_CLEI_MAX];	/* Signalling Gateway CLEI */
+	int muxid;			/* lower multiplexing driver id */
+	struct sockaddr loc;
+} m2ua_conf_tp_t;
 
-typedef struct m3ua_msg {
-	u8 vers;
-	u8 res;
-	u16 type;
-	u32 len;
-	m3ua_phdr_t ph[0];
-} m3ua_msg_t;
-
-#define M_VERSION_REL1   1
-
-#define M_CLASS_MGMT	0x0000
-#define M_CLASS_XFER	0x0100
-#define	M_CLASS_SSNM	0x0200
-#define M_CLASS_ASPSM	0x0300
-#define M_CLASS_ASPTM	0x0400
-
-#define M_TYPE_ERR		(0|M_CLASS_MGMT
-
-#define M_TYPE_NTFY		(1|M_CLASS_XFER)
-#define M_TYPE_DATA		(1|M_CLASS_XFER)
-
-#define M_TYPE_DUNA		(1|M_CLASS_SSNM)
-#define M_TYPE_DAVA		(2|M_CLASS_SSNM)
-#define M_TYPE_DUAD		(3|M_CLASS_SSNM)
-#define M_TYPE_SCON		(4|M_CLASS_SSNM)
-#define M_TYPE_DUPU		(5|M_CLASS_SSNM)
-
-#define	M_TYPE_UP		(1|M_CLASS_ASPSM)
-#define	M_TYPE_DOWN		(2|M_CLASS_ASPSM)
-#define	M_TYPE_BEAT		(3|M_CLASS_ASPSM)
-#define	M_TYPE_UP_ACK		(4|M_CLASS_ASPSM)
-#define	M_TYPE_DOWN_ACK		(5|M_CLASS_ASPSM)
-#define	M_TYPE_BEAT_ACK		(6|M_CLASS_ASPSM)
-
-#define M_TYPE_ACTIVE		(1|M_CLASS_ASPTM)
-#define M_TYPE_INACTIVE		(2|M_CLASS_ASPTM)
-#define M_TYPE_ACTIVE_ACK	(3|M_CLASS_ASPTM)
-#define M_TYPE_INACTIVE_ACK	(4|M_CLASS_ASPTM)
-
-#define M_CLASS_MASK	0xff00
-#define	M_TYPE_MASK	0x00ff
-
-#endif				/* __SS7_M3UA_H__ */
+#endif				/* __SYS_M2UA_AS_IOCTL_H__ */

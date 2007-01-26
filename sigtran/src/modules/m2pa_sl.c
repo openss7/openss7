@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 08:51:36 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/01/26 21:54:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 08:51:36 $ by $Author: brian $
+ Last Modified $Date: 2007/01/26 21:54:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.8  2007/01/26 21:54:36  brian
+ - working up AS drivers and docs
+
  Revision 0.9.2.7  2006/12/18 08:51:36  brian
  - corections from testing, resolve device numbering
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 08:51:36 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/01/26 21:54:36 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 08:51:36 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/01/26 21:54:36 $";
 
 #define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
@@ -80,6 +83,9 @@ static char const ident[] =
 #undef _DEBUG
 
 #include <sys/os7/compat.h>
+
+#undef mi_timer
+#define mi_timer mi_timer_MAC
 
 #include <stdbool.h>
 
@@ -99,7 +105,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 08:51:36 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/01/26 21:54:36 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2141,8 +2147,8 @@ sl_stop_timer_t1(struct sl *sl)
 static noinline fastcall void
 sl_start_timer_t1(struct sl *sl)
 {
-	printd(("%s: %p: -> T1 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, sl->sl.config.t1, drv_hztomsec(sl->sl.config.t1), (uint) HZ));
-	mi_timer_MAC(sl->sl.timers.t1, sl->sl.config.t1);
+	printd(("%s: %p: -> T1 START <- (%u msec)\n", MOD_NAME, sl, sl->sl.config.t1));
+	mi_timer(sl->sl.timers.t1, sl->sl.config.t1);
 }
 static noinline fastcall void
 sl_stop_timer_t2(struct sl *sl)
@@ -2153,8 +2159,8 @@ sl_stop_timer_t2(struct sl *sl)
 static noinline fastcall void
 sl_start_timer_t2(struct sl *sl)
 {
-	printd(("%s: %p: -> T2 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, sl->sl.config.t2, drv_hztomsec(sl->sl.config.t2), (uint) HZ));
-	mi_timer_MAC(sl->sl.timers.t2, sl->sl.config.t2);
+	printd(("%s: %p: -> T2 START <- (%u msec)\n", MOD_NAME, sl, sl->sl.config.t2));
+	mi_timer(sl->sl.timers.t2, sl->sl.config.t2);
 }
 static noinline fastcall void
 sl_stop_timer_t3(struct sl *sl)
@@ -2165,8 +2171,8 @@ sl_stop_timer_t3(struct sl *sl)
 static noinline fastcall void
 sl_start_timer_t3(struct sl *sl)
 {
-	printd(("%s: %p: -> T3 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, sl->sl.config.t3, drv_hztomsec(sl->sl.config.t3), (uint) HZ));
-	mi_timer_MAC(sl->sl.timers.t3, sl->sl.config.t3);
+	printd(("%s: %p: -> T3 START <- (%u msec)\n", MOD_NAME, sl, sl->sl.config.t3));
+	mi_timer(sl->sl.timers.t3, sl->sl.config.t3);
 }
 static noinline fastcall void
 sl_stop_timer_t4(struct sl *sl)
@@ -2178,8 +2184,8 @@ static noinline fastcall void
 sl_start_timer_t4(struct sl *sl)
 {
 	sl_ulong t4v = (sl->flags & (MF_LOC_EMERG | MF_REM_EMERG)) ? sl->sl.config.t4e : sl->sl.config.t4n;
-	printd(("%s: %p: -> T4 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, t4v, drv_hztomsec(t4v), (uint) HZ));
-	mi_timer_MAC(sl->sl.timers.t4, t4v);
+	printd(("%s: %p: -> T4 START <- (%u msec)\n", MOD_NAME, sl, t4v));
+	mi_timer(sl->sl.timers.t4, t4v);
 }
 #if 0
 static noinline fastcall void
@@ -2191,8 +2197,8 @@ sl_stop_timer_t5(struct sl *sl)
 static noinline fastcall void
 sl_start_timer_t5(struct sl *sl)
 {
-	printd(("%s: %p: -> T5 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, sl->sl.config.t5, drv_hztomsec(sl->sl.config.t5), (uint) HZ));
-	mi_timer_MAC(sl->sl.timers.t5, sl->sl.config.t5);
+	printd(("%s: %p: -> T5 START <- (%u msec)\n", MOD_NAME, sl, sl->sl.config.t5));
+	mi_timer(sl->sl.timers.t5, sl->sl.config.t5);
 }
 #endif
 static noinline fastcall void
@@ -2204,8 +2210,8 @@ sl_stop_timer_t6(struct sl *sl)
 static noinline fastcall void
 sl_start_timer_t6(struct sl *sl)
 {
-	printd(("%s: %p: -> T6 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, sl->sl.config.t6, drv_hztomsec(sl->sl.config.t6), (uint) HZ));
-	mi_timer_MAC(sl->sl.timers.t6, sl->sl.config.t6);
+	printd(("%s: %p: -> T6 START <- (%u msec)\n", MOD_NAME, sl, sl->sl.config.t6));
+	mi_timer(sl->sl.timers.t6, sl->sl.config.t6);
 }
 static noinline fastcall void
 sl_stop_timer_t7(struct sl *sl)
@@ -2216,8 +2222,8 @@ sl_stop_timer_t7(struct sl *sl)
 static noinline fastcall void
 sl_start_timer_t7(struct sl *sl)
 {
-	printd(("%s: %p: -> T7 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, sl->sl.config.t7, drv_hztomsec(sl->sl.config.t7), (uint) HZ));
-	mi_timer_MAC(sl->sl.timers.t7, sl->sl.config.t7);
+	printd(("%s: %p: -> T7 START <- (%u msec)\n", MOD_NAME, sl, sl->sl.config.t7));
+	mi_timer(sl->sl.timers.t7, sl->sl.config.t7);
 }
 #if 0
 static noinline fastcall void
@@ -2229,8 +2235,8 @@ sl_stop_timer_t8(struct sl *sl)
 static noinline fastcall void
 sl_start_timer_t8(struct sl *sl)
 {
-	printd(("%s: %p: -> T8 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, sl->sdt.config.t8, drv_hztomsec(sl->sdt.config.t8), (uint) HZ));
-	mi_timer_MAC(sl->sdt.timers.t8, sl->sdt.config.t8);
+	printd(("%s: %p: -> T8 START <- (%u msec)\n", MOD_NAME, sl, sl->sdt.config.t8));
+	mi_timer(sl->sdt.timers.t8, sl->sdt.config.t8);
 }
 #endif
 static noinline fastcall void
@@ -2242,8 +2248,8 @@ sl_stop_timer_t9(struct sl *sl)
 static noinline fastcall void
 sl_start_timer_t9(struct sl *sl)
 {
-	printd(("%s: %p: -> T9 START <- (%u hz, %lu msec, HZ is %u)\n", MOD_NAME, sl, (uint) drv_msectohz(20), 20UL, (uint) HZ));
-	mi_timer_MAC(sl->sdl.timers.t9, drv_msectohz(20));
+	printd(("%s: %p: -> T9 START <- (%u msec)\n", MOD_NAME, sl, (uint) 20));
+	mi_timer(sl->sdl.timers.t9, 20);
 }
 
 STATIC inline fastcall __hot void
@@ -6448,19 +6454,6 @@ sl_iocgconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 			*arg = sl->sl.config;
 		}
 		spin_unlock_m2pa(sl);
-
-		/* convert ticks to milliseconds */
-		arg->t1 = drv_hztomsec(arg->t1);
-		arg->t2 = drv_hztomsec(arg->t2);
-		arg->t2l = drv_hztomsec(arg->t2l);
-		arg->t2h = drv_hztomsec(arg->t2h);
-		arg->t3 = drv_hztomsec(arg->t3);
-		arg->t4n = drv_hztomsec(arg->t4n);
-		arg->t4e = drv_hztomsec(arg->t4e);
-		arg->t5 = drv_hztomsec(arg->t5);
-		arg->t6 = drv_hztomsec(arg->t6);
-		arg->t7 = drv_hztomsec(arg->t7);
-
 		return (ret);
 	}
 	rare();
@@ -6472,46 +6465,6 @@ sl_iocsconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-
-#if 0
-		printd(("Timer T1  is %lu msecs\n", (ulong) arg->t1));
-		printd(("Timer T2  is %lu msecs\n", (ulong) arg->t2));
-		printd(("Timer T2L is %lu msecs\n", (ulong) arg->t2l));
-		printd(("Timer T2H is %lu msecs\n", (ulong) arg->t2h));
-		printd(("Timer T3  is %lu msecs\n", (ulong) arg->t3));
-		printd(("Timer T4n is %lu msecs\n", (ulong) arg->t4n));
-		printd(("Timer T4e is %lu msecs\n", (ulong) arg->t4e));
-		printd(("Timer T5  is %lu msecs\n", (ulong) arg->t5));
-		printd(("Timer T6  is %lu msecs\n", (ulong) arg->t6));
-		printd(("Timer T7  is %lu msecs\n", (ulong) arg->t7));
-
-		printd(("Clock HZ is %lu\n", (ulong) HZ));
-#endif
-
-		/* convert milliseconds to ticks */
-		arg->t1 = drv_msectohz(arg->t1);
-		arg->t2 = drv_msectohz(arg->t2);
-		arg->t2l = drv_msectohz(arg->t2l);
-		arg->t2h = drv_msectohz(arg->t2h);
-		arg->t3 = drv_msectohz(arg->t3);
-		arg->t4n = drv_msectohz(arg->t4n);
-		arg->t4e = drv_msectohz(arg->t4e);
-		arg->t5 = drv_msectohz(arg->t5);
-		arg->t6 = drv_msectohz(arg->t6);
-		arg->t7 = drv_msectohz(arg->t7);
-
-#if 0
-		printd(("Timer T1  is %lu ticks\n", (ulong) arg->t1));
-		printd(("Timer T2  is %lu ticks\n", (ulong) arg->t2));
-		printd(("Timer T2L is %lu ticks\n", (ulong) arg->t2l));
-		printd(("Timer T2H is %lu ticks\n", (ulong) arg->t2h));
-		printd(("Timer T3  is %lu ticks\n", (ulong) arg->t3));
-		printd(("Timer T4n is %lu ticks\n", (ulong) arg->t4n));
-		printd(("Timer T4e is %lu ticks\n", (ulong) arg->t4e));
-		printd(("Timer T5  is %lu ticks\n", (ulong) arg->t5));
-		printd(("Timer T6  is %lu ticks\n", (ulong) arg->t6));
-		printd(("Timer T7  is %lu ticks\n", (ulong) arg->t7));
-#endif
 
 		spin_lock_m2pa(sl);
 		{

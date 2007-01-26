@@ -1,0 +1,1029 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
+.\"
+.\" @(#) $Id: m3ua-as.4.man,v 0.9.2.1 2007/01/26 21:53:44 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/01/26 21:53:44 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: m3ua-as.4.man,v $
+.\" Revision 0.9.2.1  2007/01/26 21:53:44  brian
+.\" - working up AS drivers and docs
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database sigtran.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so sigtran.macros
+.\"
+.\"
+.TH M3UA-AS 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B m3ua-as
+\- SS7 MTP3 User Adaptation Layer (M3UA) Application Server (AS)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <stropts.h>
+.br
+.B #include <ss7/mtpi.h>
+.br
+.B #include <ss7/mtpi_ioctl.h>
+.br
+.B #include <sys/m3ua_ioct.h>
+.HP 12
+\fBint \fIm3ua_stream\fB = open(\fB\(lq\fI/dev/m3ua-sg1\fB\(rq, O_RDWR);
+.PD 0
+.HP
+\fBint \fIsctp_stream\fB = open(\fB\(lq\fI/dev/sctp_t\fB\(rq, O_RDWR);
+.HP
+\fBint \fImuxid\fB = ioctl(I_PLINK, (intptr_t) \fIsctp_stream\fB);
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The M3UA-AS is a multiplexing driver that implements the ASP side of the M3UA
+.[
+rfc3332
+.]
+.[
+ts 129 202
+.]
+.[
+ts 102 142
+.]
+.[
+rfc4666
+.]
+protocol.
+Streams opened on the upper multiplex provide the
+.IR "Message Transfer Part Interface (MTPI)" ,
+.BR mtpi (7).
+Streams linked under the lower multiplex provide the SCTP transport interface,
+.BR sctp_t (4).
+.\"
+.SS Configuration
+.PP
+When the M3UA-AS driver is configured, SCTP Streams are opened and linked under the multiplexing
+driver.  Each SCTP Stream represents an association between a local ASP and a remote Signalling
+Gateway Process (SGP) on the same Signalling Gateway (SG).  Input-output controls are used to
+configure each lower multiplex Stream.  Once a lower multiplex Stream is configured, the M3UA-AS
+driver attempts to form an SCTP association with the remote SGP, and to bring each M3UA association
+into the ASP Up state.  Should the association be dropped, the ASP-SGP relation is moved to the ASP
+Down state and the M3UA-AS driver attempts to reconnect the association and bring it to the ASP Up
+state and activate all active interfaces.
+.PP
+Once configured, MTP Streams can be opened on the upper multiplex.  These MTP Streams are not
+associated with an ASP-SGP association until they are bound or connected.  When the
+.BR MTP_BIND_REQ "(7) or " MTP_CONN_REQ (7)
+primitive is issued, the address contained in the request is composed of an SG identifier, and
+either an MTP address (if the SG supports dynamic configuration), or a Routing Context (if the SG
+supports static configuration).  This information is sufficient for the M3UA-AS driver to determine
+the association (set) and Routing Key that is to be used to register the interface (AS).  When the
+.BR MTP_BIND_REQ "(7) or " MTP_CONN_REQ (7)
+primitive is issued, the registered or assigned Routing Context is used to activate the interface
+with each SGP for the remote SG.
+.PP
+After the MTP-User has been bound or connected with
+.BR MTP_BIND_REQ "(7) or " MTP_CONN_REQ (7),
+it can be linked beneath an MTP-User multiplexing device driver (such as ISUP,
+.BR isup (4)).
+.PP
+Configuration is performed using an M3UA-AS driver configuration utility.  This utility reads a
+configuration file used to define the objects necessary for configuration.  The configuration file
+contains entries that define ASP-SG relationships as follows:
+.TP
+.I sgid
+An integer number identifying the ASP-SG relation.  This is a number from 1 to 4096.
+.TP
+.I aspid
+The ASPID that is used in communciation with each remote SGP in the SG.  This ASPID can be null (a
+single dash,
+.RB ` - ')
+indicating that no ASPID is to be used in communication with the remote SGP.  This ASPID corresponds
+also to the value zero
+.RB ( 0 ).
+.TP
+.I streams
+The number of SCTP streams that will be requested to each SGP in the SG.
+.TP
+.I local-endpoint
+The local endpoint address to which an SCTP association is bound to communicate with the remote SGP.
+This can take the form:
+\fIhostname\fR[\fB,\fIhostname\fR][\fB:\fIport\fR]
+or the form:
+\fIipaddress\fR[\fB,\fIipaddress\fR][\fB:\fIservice\fR]
+or combinations of hostnames and IP addresses and either port or service.  The special hostname
+consisting of a single star,
+.RB ` * ',
+can be used to indicate a wildcard address.  If the port or service is not specified, then a dynamic
+port will be allocated.  If the service is specified as
+.BR m3ua ,
+then the M3UA well-known port number will be used.
+.TP
+.I remote-endpoint
+The remote endpoint addess to which an SCTP association will connect to communicate with the remote
+SG.  This can take the form:
+\fIhostname\fR[\fB,\fIhostname\fR][\fB:\fIport\fR]
+or the form:
+\fIipaddress\fR[\fB,\fIipaddress\fR][\fB:\fIservice\fR]
+or combinations of hostnames and IP addresses and either port or service.  If the port or service is
+not specified, the M3UA well-known port number will be used.
+.TP
+.I options
+Contains a comma separated list of SG options, with no embedded whitespace.  The following options
+are defined:
+.RS
+.TP
+.B dynamic
+When included in the options, this keyword specifies that the SG requires dynamic registration.  If
+this option is not included, the SG requires static registration.
+.RE
+.PP
+The configuration utility, reads this configuration file and performs the following steps for each
+entry in the file:
+.IP 1. \w'0.\(em'u
+The utility opens an SCTP association by opening the
+.B /dev/sctp_t
+device.
+.IP 2.
+The utility opens a Stream on the M3UA-AS driver using the
+.B /dev/m3ua-as
+device and links the Stream for the SCTP association under the M3UA-AS multiplexing driver using the
+.IR I_LINK (7)
+or
+.IR I_PLINK (7)
+input-output control.
+.IP 3.
+The utility uses a single specialized M3UA-AS input-output control to associate the lower multiplex
+Stream with an SG (and local ASP).  The input-output control takes the information provided in the
+configuration file line entry, and the mulltiplexer identifier returned from the
+.IR I_LINK (7)
+or
+.IR I_PLINK (7)
+input-output control operation.  The M3UA-AS driver then creates a new ASP object if necessary and
+completes the SG object information as part of the lower multiplex Stream private structure.  The
+M3UA-AS driver also binds and connects the SCTP association and attempts to bring the ASP to the ASP
+Up state with the remote SG.
+.IP 4.
+The steps 1 through 3 above are repeated for each entry in the configuration file.
+.IP 5.
+The utility can also open and attach MTP Streams and link them under an MTP-User multiplexing
+driver.
+.\"
+.SS Addressing
+.PP
+All M3UA-AS upper multiplex Streams (MTP) are normal MTP Streams.  That is, they must be bound with
+an
+.BR MTP_BIND_REQ (7)
+primitive containing a local MTP address and optionally connected with a
+.BR MTP_CONN_REQ (7)
+primitive containing a remote MTP address.  For M3UA-AS, the interpretation of the MTP address
+depends upon whether the SG requires dynamic registration or not.  When the SG requires dynamic
+registration, the address is interpreted as an optional SGID and an MTP address.  When the SG
+requires static configuration, the address is interpreted as an optional SGID and an RC.
+.PP
+It is possible to use the minor device number opened on the M3UA-AS driver to imply the SGID;
+however, because the address is variable length for the MTPI, it is quite possible to provide
+64-bits or more of information.  This saves creating many device nodes or using
+.BI /dev/streams/m3ua-as/ NNN
+minor device nodes.  Therefore, when the device opened was minor device zero (0); an SGID must be
+specified in the address.  When the device opened was minor device
+.IR NNN ,
+where
+.I NNN
+is a number from 1 to 4096, the SGID does not need to be present in the address and the opened minor
+device number is used as the SGID instead.
+.PP
+The form and interpretation of the address is summarized in the following table:
+.sp
+.TS
+center tab(:);
+lblblb
+l|l|l.
+Address Length:Zero Minor:Non-Zero Minor
+_:_:_
+4 bytes:-:int RC
+8 bytes:int RC, int SGID:int RC, int SGID
+12 bytes:-:MTP address
+16 bytes:MTP address, int SGID:MTP address, int SGID
+.TE
+.PP
+The SGID is used directly to locate the lower multiplex Streams.  If there does not exist a lower
+multiplex Stream with the requested SGID, the request will fail.  When the lower multiplex Stream
+exists, the MTP streams attached to the Stream are searched to determine if another Stream is
+already attached to the MTP address or RC.  Only one Stream can be attached to a given MTP address
+or RC at a time.  The second request to attach to the same MTP address or RC will fail.  When
+successful, and at least a lower SCTP Stream is active (ASP Up), and the SG requires dynamic
+registration, dynamci registration will be performed on the MTP address used as a Routing Key.  If
+the lower Stream is not ASP Up, or the registration fails, the bind or connect request will fail.
+If the SG does not require registration, the RC will be assigned to the attached Stream and the bind
+or connect operation will succeed.
+.PP
+When MTP Streams opened on the upper multiplex of the M3UA-AS driver are bound or connected, the
+form of the MTP address depends upon whether the SG requires dynamic registration or not.  When the
+SG requires dynamic configuration, the MTP address consists of the
+.I sgid
+and a normal
+.B mtp_addr
+structure defining the MTP address.  When the SG requires static configuration, the MTP address can
+consist of the
+.I sgid
+and a routing context.  The M3UA-AS driver identifies the associations and routing context for which
+to activate and process messages for the interface using the
+.I sgid
+and the Routing Context that was either specified or was obtained by registering the routing key
+consisting of the MTP address specified.
+An additional, optional, traffic mode type, can also be specified as part of the address.
+.PP
+For complete transparency with the MTP interface used by normal MTP-Users, the M3UA-AS driver
+provides the ability to locally configure Routing Context values against MTP addresses by
+provisioning a local Routing Key (RK) to Routing Context (RC) mapping.  In this way, when an normal
+.B mtp_addr
+structure formatted MTP address is specified in a
+.BR MTP_BIND_REQ "(7) or " MTP_CONN_REQ (7)
+primitive, the M3UA-AS driver can locally translate the MTP address to a Routing Context without the
+MTP-User having to concern itself with Routing Contexts.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The M3UA-AS driver provides several input-output controls for configuring the driver as follows:
+.\"
+.SS M3UA_AS_IOCSCONFIG
+.PP
+This input-output control is responsible for setting information associated with lower multiplex
+SCTP associations.
+.I arg
+is a pointer to a
+.B m3ua_sgp
+structure.  The
+.B m3ua_sgp
+structure is defined in the
+.RB < sys/m3ua_ioctl.h >
+header file and is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+#define M3UA_CLEI_MAX 32
+
+struct m3ua_sgp {
+    int m3_index;
+    unsigned int m3_sgid;
+    char m3_sg_clei[M3UA_CLEI_MAX];
+    unsigned int m3_aspid;
+    char m3_asp_clei[M3UA_CLEI_MAX];
+    struct sockaddr m3_loc;
+    socklen_t m3_loc_len;
+    struct sockaddr m3_rem;
+    socklen_t m3_rem_len;
+    unsigned int m3_ppi;
+    unsigned short m3_streams;
+    unsigned short m3_options;
+    unsigned int m3_version;
+};
+
+#define M3UA_VERSION_NONE       0
+#define M3UA_VERSION_RFC3332    1
+#define M3UA_VERSION_TS129202   2
+#define M3UA_VERSION_TS102142   3
+#define M3UA_VERSION_RFC4666    4
+#define M3UA_VERSION_DEFAULT    M3UA_VERSION_RFC3331
+\s+1\fP
+.fi
+.PP
+The
+.B m3ua_sgp
+structure contains the following members:
+.TP
+.I m3_index
+This member is the lower multiplex index returned by the
+.IR I_LINK "(7) or " I_PLINK (7)
+input-output control operation that was used to link the lower Stream.  It specifies the lower
+multiplex SCTP Stream for which to configure addresses and options.
+.TP
+.I m3_sgid
+This member specifies the SG identifier for the Stream.  The SG identifier is a local cardinal
+number that identifies the SG.  This number also corresponds to the minor device number on the
+.B m3ua-as
+driver that can be opened to obtain an instance of an AS associated with this SG.  The number has a
+valid range from 1 to 4096.  Which number corresponds to which remote SG is a local configuration
+matter.
+.TP
+.I m3_sg_clei
+This member specifies the SG Common Language Equipment Identifier for the Stream.  The SG CLEI is an
+ascii string of up to
+.B M3UA_CLEI_MAX
+characters (typically 32).
+Either the
+.I m3_sgid
+or
+.I m3_sg_clei
+or both are specified.  When the
+.I m3_sgid
+is not specified, it is set to zero (0);
+when the
+.I m3_sg_clei
+is not specified, it is set to a null string.
+The SG CLEI is used as a convenience for identifying SGs as well as providing a human-friendly value
+to output in diagnostic messages.
+.TP
+.I m3_aspid
+This member specifies the ASP identifier that the ASP will use when sending ASP Up to the associated
+SGP.  When set to zero (0), no ASP identifier will be sent in the ASP Up to the associated SGP.
+.TP
+.I m3_asp_clei
+This member specifies the ASP Common Language Equipment Identifier for the Stream.  The ASP CLEI is
+an ascii string of up to
+.B M3UA_CLEI_MAX
+characters (typically 32).
+Both the
+.I m3_aspid
+and
+.I m3_asp_clei
+are optional.  When the
+.I m3_aspid
+is not specified, it is set to zero (0);
+when the
+.I m3_asp_clei
+is not specified, it is set to a null string.
+The ASP CLEI is used as a convenience for identifying ASPs as well as providing a human-friendly value
+to output in diagnostic messages.
+.TP
+.I m3_loc
+Specifies the local endpoint address to which the SCTP association is bound to communicate with the
+remote SGP.  This can be any address form that can be used by the
+.BR T_BIND_REQ (7)
+primitive for SCTP, see
+.BR tpi_sctp (7).
+.TP
+.I m3_loc_len
+Specifies the significant length of the
+.I m3_loc
+member.
+.TP
+.I m3_rem
+Specifies the remote endpoint address to which the SCTP association will connect to communicate with
+the remote SGP.  This can be any address form that can be used by the
+.BR T_CONN_REQ (7)
+primitive for SCTP, see
+.BR tpi_sctp (7).
+.TP
+.I m3_rem_len
+Specifies the significant length of the
+.I m3_rem
+member.
+.TP
+.I m2_ppi
+This member specifies the Payload Protocol Identifier (PPI) used in SCTP messages.  When set to zero
+(0), the IANA registered PPI for M3UA will be used.
+.TP
+.I m3_streams
+This member specifies the number of outbound SCTP data streams that the ASP will request when
+connecting to the associated SGP.  The default value is 32.  It is invalid to form a connection with
+less than 2 outbound SCTP data streams (one for management messages and one for MTP-User data).
+.TP
+.I m3_options
+Specifies SGP option flags.  SGP option flags are a logic OR of zero or more of the following flags:
+.RS
+.TP
+.B M3UA_SGP_DYNAMIC
+This flag specifies that the SGP requires dynamic registration.  If this flag is absent, it
+specifies that the SGP requires static configuration.
+.RE
+.TP
+.I m3_version
+Specifies the version of the M3UA protocol used by the SG.  When not specified, it is set to zero
+(0).  Otherise, the value can be one of the following values:
+.RS
+.TP
+.B M3UA_VERSION_RFC3332
+Specifies that the protocol should adhere strictly to Version 1 of the M3UA protocol as specified in
+RFC 3332.
+.[
+rfc3332
+.]
+.PD 0
+.TP
+.B M3UA_VERSION_TS129202
+Specifies that the protocol should adhere strictly to Version 1 of the M3UA protocol as modified by
+ETSI TS 129 202.
+.[
+ts 129 202
+.]
+.TP
+.B M3UA_VERSION_TS102142
+Specifies that the protocol should adhere strictly to Version 1 of the M3UA protocol as modified by
+ETSI TS 102 142.
+.[
+ts 102 142
+.]
+.TP
+.B M3UA_VERSION_RFC4666
+Specifies that the protocol should adhere strictly to Version 1 of the M3UA protocol as specified in
+RFC 4666.
+.[
+rfc4666
+.]
+.PD
+.RE
+.\"
+.SS M3UA_AS_IOCGCONFIG
+.PP
+This input-output control is responsible for retrieving information associated with a specific lower
+multiplex SCTP association.
+.I arg
+is a pointer to a
+.B m3ua_sgp
+structure.  The
+.B m3ua_sgp
+structure is defined in the
+.RB < sys/m3ua_ioctl.h >
+header file and is formatted as described above.
+.PP
+Information can be retrieved by specifying one of the
+.IR m3_index ", " m3_sgid " or " m3_sg_clei
+members as follows:
+.TP
+.I m3_index
+When retrieving by multiplexer identifier, the
+.I m3_index
+member is set to the non-zero multiplexer identifier that was returned from a
+.IR I_LINK "(7) or " I_PLINK (7)
+operation used to link the lower Stream.  When not retreiving by multiplexer identifier,
+.I m3_index
+will be set to zero (0).
+.TP
+.I m3_sgid
+When retreiving by SG identifier, the
+.I m3_sgid
+member is set to the non-zero SG identifier from 1 to 4096.  When not retrieving by SG identifier,
+.I m3_sgid
+will be set to zero (0).
+.TP
+.I m3_sg_clei
+When retrieving by SG CLEI, the
+.I m3_sg_clei
+member is set to the non-null ascii SG CLEI string.  When not retrieving by SG CLEI,
+.I m3_sg_clei
+will be set to a null string.
+.PP
+The driver locates the SGP configuration from the identifiers specified and returns all information
+associated with the SGP in the
+.B m3ua_sgp
+structure.
+.\"
+.SS M3UA_AS_IOCLCONFIG
+.PP
+This input-output control lists SGP Stream configurations.
+.I arg
+is either a pointer to a
+.B m3ua_sgp_list
+structure, or NULL.  The
+.B m3ua_sgp_list
+structure is defined in the
+.RB < sys/m3ua_ioctl.h >
+header file and is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct m3ua_sgp_list {
+    int m3_sgp_num;
+    struct m3ua_sgp m3_sgp_list[0];
+    /* followed by M3UA SGP configurations */
+};
+\s+1\fP
+.fi
+.PP
+The
+.B m3ua_sgp_list
+structure contains the following members:
+.TP
+.I m3_sgp_num
+This member contains the number of elements in the array of
+.B m3ua_sgp
+structures in the
+.I m3_sgp_list
+member below.  This member is not altered by a successful input-output control operation.
+.TP
+.I m3_sgp_array
+This member is an array of
+.B m3ua_sgp
+structures.  The number of elements in the array is specified by the
+.B m3_sgp_num
+member.  This member is not altered by a successful input-output control operation; however,
+elements of the array are altered by the input-output control operation, without examination.
+.PP
+This input-output control returns zero (0) or a postive number on success and minus one (-1) on
+failure.  When successful, the zero (0) or positive number returned is the current number of SGP
+configurations with information available for retrieval.  When passed a NULL
+.I arg
+value, this return value can be used to size the
+.B m3ua_sgp_list
+structure for a subsequent input-output operation.  Note, however, that the number of routing keys
+available for information retrieval may change, and the return value form a subsequent operation
+should be checked to ensure that complete information has been obtained.
+.PP
+Upon successful return with a non-NULL
+.I arg
+value, the driver will have populated up to
+.I m3_sgp_num
+elements in the array
+.I m3_sgp_list
+with the SGP configuration of available SGP Streams in arbitrary order.  If fewer elements were
+populated than were available, the return value from the input-output control operation will be
+less than
+.IR m3_sgp_num .
+.\"
+.SS M3UA_AS_IOCSROUTE
+.PP
+This input-output control takes as an argument a pointer to a buffer area into which to place the
+configuration information.
+.I arg
+is a pointer to a
+.B m3ua_key
+structure.  The
+.B m3ua_key
+structure is defined in the
+.RB < sys/m3ua_ioctl.h >
+header file and is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct m3ua_key {
+    unsigned int m3_sgid;
+    char m3_sg_clei[M3UA_CLEI_MAX];
+    unsigned int m3_tmode;
+    unsigned int m3_rc;
+    unsigned int m3_na;
+    unsigned int m3_loc_addrs;
+    unsigned int m3_rem_addrs;
+    struct mtp_addr m3_addrs[0];
+    /* followed by MTP addresses */
+};
+
+#define M3UA_AS_TMODE_NONE          0
+#define M3UA_AS_TMODE_OVERRIDE      1
+#define M3UA_AS_TMODE_LOADSHARE     2
+#define M3UA_AS_TMODE_BROADCAST     3
+\s+1\fP
+.fi
+.PP
+The
+.B m3ua_key
+structure contains the following members:
+.TP
+.I m3_sgid
+This member identifies the SG to which the routing key applies.  The SG identifier is a local
+cardinal number from 1 to 4096 that identifies the SG.  This number also corresponds to the minor
+device number on the
+.B m3ua-as
+driver that can be opened to obtain an instances of the AS associated with this SG.  When the
+input-output control is called on a Stream that was opened on a non-zero minor device number, the
+.I m3_sgid
+member does not need to specified, can be populated with zero (0), and will be ignored by the
+driver (the SG identifier associated with the minor device number will be used instead).
+Also, if the
+.I m3_sg_clei
+below is specified, the
+.I m3_sgid
+can be set to zero (0) and the driver will use the
+.I m3_sg_clei
+to locate the SG.
+.TP
+.I m3_sg_clei
+This member identifies the SG to which the routing key applies.  The SG CLEI is an ascii
+string of up to
+.B M3UA_CLEI_MAX
+characters.  When unspecified, the
+.I m3_sg_clei
+field contains a null string.
+.TP
+.I m3_tmode
+This member contains the traffic mode the will be used in the ASP Active message in communications
+with an SGP for this SG.  The
+.I m3_tmode
+member can contain one of the following values:
+.RS
+.TP
+.B M3UA_TMODE_NONE
+.PD 0
+No traffic mode parameter will be included in the ASP Active message, however, the ASP will still
+respond to \(lqAlternate ASP Active in AS\(rq NOTIFY messages.
+.TP
+.B M3UA_TMODE_OVERRIDE
+The traffic mode in the ASP Active message will be Override.
+.TP
+.B M3UA_TMODE_LOADSHARE
+The traffic mode in the ASP Active message will be Loadshare.
+.TP
+.B M3UA_TMODE_BROADCAST
+The traffic mode in the ASP Active message will be Broadcast.  Note that
+ETSI TS 102 142
+.[
+ts 102 142
+.]
+does not support broadcast traffic mode, but
+RFC 3332,
+.[
+rfc3332
+.]
+ETSI TS 129 202
+.[
+ts 129 202
+.]
+and
+RFC 4666
+.[
+rfc4666
+.]
+do.
+.PD
+.RE
+.TP
+.I m3_rc
+This member contains the Routing Context value (32-bit integer value) that will be used for this
+routing key in communications with an SGP for this SG.
+.TP
+.I m3_na
+This member contains the Network Appearance associated with the Routing Key.  If no network
+appearance values are maintained, the field can contain zero (0).  Assignment of network appearance
+numbers is a local matter.
+.TP
+.I m3_loc_addrs
+This member contains the number of local MTP addresses contained in the
+.I m3_addrs
+list described below.  This are the MTP addresses to which an MTP-User must bind using the
+.BR MTP_BIND_REQ (7)
+primtive to obtain this routing key.
+.TP
+.I m3_rem_addrs
+This member contains the number of remote MTP addresses contained in the
+.I m3_addrs
+list described below.  This is the MTP addresses to which an MTP-User must connect using the
+.BR MTP_CONN_REQ (7)
+primitive to obtain this routing key.  When the remote MTP address is not significant (the routing
+key corresponds to any remote address), this member will be set to zero (0).
+.TP
+.I m3_addrs
+This member is a variable length array of
+.B mtp_addr
+structures containing MTP addresses.  The first
+.I m3_loc_addrs
+addresses are local addresses.  The remaining
+.I m3_rem_addrs
+addresses are remote addresses.
+.\"
+.SS M3UA_AS_IOCCROUTE
+.PP
+This input-output control changes a local Routing Key to Routing Context mapping for a specified set
+of MTP addresses.
+.I arg
+is a pointer to a
+.B m3ua_key
+structure (defined above).
+.PP
+The
+.I m3_sgid
+or
+.I m3_sg_clei
+members must be specified to locate the SG for which the routing key entry will be changed.  The
+remaining members of the
+.B m3ua_key
+structure define the new routing key to routing context mapping.  Either the
+.I m3_rc
+value, or the routing key defined by the
+.IR m3_na ", " m3_loc " and " m3_rem
+members, must exist in the mapping table.
+.\"
+.SS M3UA_AS_IOCXROUTE
+.PP
+This input-output control removes a local Routing Key to Routing Context mapping for a specified set
+of MTP addresses.
+.I arg
+is a pointer to a
+.B m3ua_key
+structure (defined above).
+.PP
+The
+.I m3_sgid
+or
+.I m3_sg_clei
+members must be specified to locate the SG for which the routing key will be deleted.  The remaining
+members of the
+.B m3ua_key
+structure identify the routing key mapping to be deleted.  Either the
+.I m3_rc
+value, or the routing key defined by the
+.IR m3_na ", " m3_loc " and " m3_rem
+members, must exist in the mapping table.
+.I m3_rc
+can be set to zero (0) to specify a routing key that matches any RC value but which matches the
+.IR m3_na ", " m3_loc " and " m3_rem
+members.  When
+.I m3_rc
+is specified a non-zero, the RC value must exist in the table and the
+.IR m3_na ", " m3_loc " and " m3_rem
+members are ignored.
+.\"
+.SS M3UA_AS_IOCGROUTE
+.PP
+This input-output control lists local Routing Key to Routing Context mappings.
+.I arg
+is either a pointer to a
+.B m3ua_key_list
+structure, or
+.BR NULL .
+The
+.B m3ua_key_list
+structure is defined in the
+.RB < sys/m3ua_ioctl.h >
+header file and is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct m3ua_key_list {
+    int m3_key_num;
+    struct m3ua_key m3_key_list[0];
+    /* followed by M3UA keys */
+};
+\s+1\fP
+.fi
+.PP
+The
+.B m3ua_key_list
+structure contains the following members:
+.TP
+.I m3_key_num
+This member contains the number of elements in the array of
+.B m3ua_key
+structures in the
+.I m3_key_list
+member below.  This member is not altered by a successful input-output control operation.
+.TP
+.I m3_key_list
+This member is an array of
+.B m3ua_key
+structures.  The number of elements in the array is specified by the
+.I m3_key_num
+member.  This member is not altered by a successful input-output control oepration; however,
+elements of the array are altered by the input-output control operation, without examination.
+.PP
+The input-output control returns a zero (0) or positive number on success and minus one (-1) on
+failure.  When successful, the zero (0) or positive number returned is the current number of
+routing keys with information available for retrieval.  When passed a
+.B NULL
+.I arg
+value, this return value can be used to size the
+.B m3ua_key_list
+structure for a subsequent input-output operation.  Note, however, that the number of routing keys
+available for information retrieval may change, and the return value from the subsequent operation
+should be checked to ensure that complete information has been obtained.
+.PP
+Upon sucessful return with a non-NULL
+.I arg
+value, the driver will have populated up to
+.I m3_key_num
+elements in the array
+.I m3_key_list
+with the routing key and routing context context of available routing keys in arbitrary order.  If
+fewer elements were populated than were available, the return value from the input-output control
+oepration will be less than
+.IR m3_key_num .
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR m3ua (4),
+.BR SIGTRAN (4),
+.BR m3ua_ioctl (4).
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B m3ua-as
+driver has no known bugs.  Report problems to
+.RB < bugs@openss7.org >.
+.PP
+The
+.B @PACKAGE@
+package has been tested with a wide array of production Linux distributions, kernels and target
+architectures, and is considered production grade by The OpenSS7 Project.  At the time of release,
+the
+.B @PACKAGE@
+package had no known bugs.  Problems can be reported to
+.RB < bugs@openss7.org >.
+Please, however, use the included
+.B send-pr
+script for generating actionable problem reports.  Please see the file \(lqPROBLEMS\(rq in the
+release for problem reporting guidelines.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B M3UA-AS
+is compatible with implementations based on RFC 3332,
+.[
+rfc3332
+.]
+ETSI TS 129 202,
+.[
+ts 129 202
+.]
+ETSI TS 102 142,
+.[
+ts 102 142
+.]
+and
+RFC 4666,
+.[
+rfc4666
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+The
+.B M3UA-AS
+driver supports dynamic registration of Routing Keys.
+.IP ""
+ETSI TS 102 142
+.[
+ts 102 142
+.]
+does not permit use of dynamic registration.  Applications using the M3UA-AS driver in an ETSI TS
+102 142 environment should not invoke the dynamic registration procedures and should configure the
+SG for appropriate operation using input-output controls.  Setting a
+.I version
+of
+.B TS102142
+suppresses the ability to request dynamic registration and causes the driver to return
+\(lqUnsupported Message Class\(rq to any RKMM class message received.  All keys specified must have
+a non-zero RC value.
+.IP \(em
+ETSI TS 102 142
+.[
+ts 102 142
+.]
+does not suport the broadcast AS traffic mode.  When
+.I version
+is set to
+.BR TS102142 ,
+the Broadcast traffic mode is treated as an unsupported value.
+.IP \(em
+ETSI TS 102 142
+.[
+ts 102 142
+.]
+will not support routing keys of finer granularity than a point code.  This means that when
+.I version
+is set to
+.BR TS102142 ,
+the Service Indicator values in all MTP addresses will be ignored.
+.IP \(em
+.IP \(em
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "RFC 3332" ,
+.[
+rfc3332
+.]
+.IR "ETSI TS 129 202" ,
+.[
+ts 129 202
+.]
+.IR "ETSI TS 102 142" ,
+.[
+ts 102 142
+.]
+.IR "RFC 4666" ,
+.[
+rfc4666
+.]
+.IR "ETSI TS 102 381" .
+.[
+ts 102 381
+.]
+.PP
+Conformance to
+.IR "ETSI TS 102 142"
+.[
+ts 102 142
+.]
+per tests specified by
+.IR "ETSI TS 102 381"
+.[
+ts 102 381
+.]
+is validated using the
+.BR test-m3ua_as (8)
+test case executable and the package
+.B autotest
+test suite.
+.PP
+Conformance to
+.IR "RFC 3332"
+.[
+rfc3332
+.]
+and
+.IR "RFC 4666"
+.[
+rfc4666
+.]
+per tests specified by
+.IR "draft-anshoo-test-spec-m3ua-01" ,
+.[
+testm3ua
+.]
+is validated using the
+.BR test-m3ua (8)
+test case executable and the package
+.B autotest
+test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B M3UA-AS
+driver is new for
+@PACAKGE_TITLE@
+@VERSION@.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
