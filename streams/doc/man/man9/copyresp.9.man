@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: copyresp.9.man,v 0.9.2.9 2006/04/05 09:44:10 brian Exp $
+.\" @(#) $Id: copyresp.9.man,v 0.9.2.10 2007/01/27 09:23:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/27 09:23:50 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: copyresp.9.man,v $
+.\" Revision 0.9.2.10  2007/01/27 09:23:50  brian
+.\" - behavior and docs for IOC_NONE
+.\"
 .\" Revision 0.9.2.9  2006/04/05 09:44:10  brian
 .\" - moved .so line and updated headers
 .\"
@@ -110,6 +113,7 @@ struct copyresp {
 #define IOC_NONE   0x00000000 /* no indication */
 #define IOC_NATIVE 0x01000000 /* native ioctl request */
 #define IOC_ILP32  0x02000000 /* 32bit ioctl request */
+#define IOC_LP64   0x03000000 /* 64bit ioctl request */
 \s+1\fP
 .fi
 .\"
@@ -260,7 +264,8 @@ for an example.
 .BR datab (9),
 .BR queue (9),
 .IR qi_putp (9),
-.IR qi_srvp (9).
+.IR qi_srvp (9),
+.BR M_IOCDATA (9).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -303,6 +308,9 @@ uw7spg
 .[
 uxpspg
 .]
+See
+.BR M_IOCDATA (9)
+for more information on this flag.
 .IP ""
 Portable
 .I STREAMS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.91 2006/10/27 23:19:32 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.92 2007/01/27 09:23:52 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:32 $ by $Author: brian $
+ Last Modified $Date: 2007/01/27 09:23:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.92  2007/01/27 09:23:52  brian
+ - behavior and docs for IOC_NONE
+
  Revision 0.9.2.91  2006/10/27 23:19:32  brian
  - changes for 2.6.18 kernel
 
@@ -92,7 +95,7 @@
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.91 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.92 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -880,8 +883,15 @@ struct iocblk {
 #define IOC_NONE	0x00000000	/* no indication */
 #define IOC_NATIVE	0x01000000	/* native ioctl request */
 #define IOC_ILP32	0x02000000	/* 32bit ioctl request */
+#define IOC_LP64	0x03000000	/* 64bit ioctl request */
 
-#define IOC_CONVERT_FROM(__iocp) ((_iocp)->ioc_flag & IOC_ILP32)
+#ifdef __LP64__
+#define IOC_CONVERT_FROM(__iocp) \
+	(((_iocp)->ioc_flag == IOC_ILP32) ? IOC_ILP32 : IOC_NONE)
+#else
+#define IOC_CONVERT_FROM(__iocp) \
+	(IOC_NONE)
+#endif
 
 struct copyreq {
 	int cq_cmd;			/* command being performed */

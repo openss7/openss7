@@ -1,3 +1,14 @@
+2007-01-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/streams.refs: added references to all packages
+	* doc/man/man9/M_IOCDATA.9.man: correct IOC_NONE description
+	* doc/man/man9/M_IOCTL.9.man: correct IOC_NONE description
+	* doc/man/man9/copyresp.9.man: correct IOC_NONE description
+	* doc/man/man9/iocblk.9.man: correct IOC_NONE description
+	* include/sys/streams/stream.h: added IOC_LP64 and IOC_CONVERT_FROM
+	* src/modules/sth.c: ioc_flags IOC_NONE on forced I_UNLINK rather than
+	  IOC_NATIVE as forced I_UNLINK does not originate from the user
+
 2007-01-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* streams.lsm.in: updated archive sizes

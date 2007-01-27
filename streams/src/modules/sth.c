@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2006/10/29 13:11:44 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.173 $) $Date: 2007/01/27 09:23:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/29 13:11:44 $ by $Author: brian $
+ Last Modified $Date: 2007/01/27 09:23:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.173  2007/01/27 09:23:54  brian
+ - behavior and docs for IOC_NONE
+
  Revision 0.9.2.172  2006/10/29 13:11:44  brian
  - final changes for FC5 2.6.18 w/ inode diet
 
@@ -175,10 +178,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2006/10/29 13:11:44 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.173 $) $Date: 2007/01/27 09:23:54 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2006/10/29 13:11:44 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.173 $) $Date: 2007/01/27 09:23:54 $";
 
 //#define __NO_VERSION__
 
@@ -279,7 +282,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2006/10/29 13:11:44 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.173 $) $Date: 2007/01/27 09:23:54 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -3362,7 +3365,7 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 	ioc->iocblk.ioc_cmd = I_UNLINK;
 	ioc->iocblk.ioc_cr = crp;
 	ioc->iocblk.ioc_count = sizeof(*l);
-	ioc->iocblk.ioc_flag = (ulong) IOC_NATIVE;
+	ioc->iocblk.ioc_flag = (ulong) IOC_NONE;
 
 	while (!(db = allocb(sizeof(*lbp), BPRI_WAITOK))) ;
 
@@ -3414,7 +3417,7 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 		case M_COPYOUT:
 			swerr();
 			mb->b_datap->db_type = M_IOCDATA;
-			ioc->copyresp.cp_flag = (ulong) IOC_NATIVE;
+			ioc->copyresp.cp_flag = (ulong) IOC_NONE;
 			/* SVR 4 SPG says no response to M_IOCDATA with error */
 			ioc->copyresp.cp_rval = (caddr_t) 1;
 			_ctrace(strput(sd, mb));

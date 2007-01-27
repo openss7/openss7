@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: iocblk.9.man,v 0.9.2.13 2006/04/05 09:44:13 brian Exp $
+.\" @(#) $Id: iocblk.9.man,v 0.9.2.14 2007/01/27 09:23:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:13 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/27 09:23:50 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: iocblk.9.man,v $
+.\" Revision 0.9.2.14  2007/01/27 09:23:50  brian
+.\" - behavior and docs for IOC_NONE
+.\"
 .\" Revision 0.9.2.13  2006/04/05 09:44:13  brian
 .\" - moved .so line and updated headers
 .\"
@@ -103,7 +106,7 @@ struct iocblk {
     int ioc_error;      /* ioctl error code (for errno) */
     int ioc_rval;       /* system call return value */
     long ioc_filler[4]; /* reserved for future use */
-#define ioc_flag ioc_filler[1]; /* data model, IOC_NONE or IOC_ILP32 */
+#define ioc_flag ioc_filler[1]; /* data model, e.g. IOC_NATIVE or IOC_ILP32 */
 };
 
 #define ioc_uid         ioc_cr->cr_uid
@@ -279,14 +282,14 @@ data structures.
 The
 .I ioc_flag
 field is significant in the
-.B M_IOCTL (9)
-message.  It is set by the Stream head an indicates to the module or driver the C language model
-from which the
+.BR M_IOCTL (9)
+message.  When sent by the Stream head it indicates to the module or driver the C language model
+of the user from which the
 .BR ioctl (2s)
 operation originated.  For an
 .B ILP32
-kernel, this field will always be set to zero
-.RB ( 0 ", " IOC_NONE ).
+kernel, this field will always be set to one
+.RB ( 1 ", " IOC_NATIVE ).
 For an
 .B LP64
 kernel, this field will either be set to
@@ -301,6 +304,14 @@ to indicate that the
 .BR ioctl (2s)
 originated from a different C language model than the kernel
 .RB ( ILP32 ).
+For both ILP32 and LP64 kernels, the field set to
+.B IOC_NONE
+indicates that the
+.BR M_IOCTL (9)
+message did not originate from the user.  (An example is
+.IR I_UNLINK (7)
+input-output controls that results from dismantling of a multiplex during the closing of a control
+Stream.)
 .\".\"
 .\".SS M_COPYIN
 .\".PP
@@ -487,6 +498,9 @@ for an example.
 .BR queue (9),
 .IR qi_putp (9),
 .IR qi_srvp (9).
+.BR M_IOCTL (9),
+.BR M_IOCACK (9),
+.BR M_IOCNAK (9).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -534,8 +548,8 @@ uses the
 .I ioc_flag
 member to indicate whether the input output control that invoked the operation was native to the
 kernel
-.RB ( IOC_NATIVE ") or (" IOC_NONE )
-or was a 32-bit operation invoked on a kernel with 64-bit longs and pointers
+.RB ( IOC_NATIVE ") or (" IOC_LP64 )
+or was a 32-bit operation invoked on a kernel with 64-bit longs and pointers or not
 .RB ( IOC_ILP32 ).
 .B @PACKAGE_TITLE@
 supports this flag for compatibility with modules or drivers written for

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: M_IOCDATA.9.man,v 0.9.2.14 2006/04/05 09:44:03 brian Exp $
+.\" @(#) $Id: M_IOCDATA.9.man,v 0.9.2.15 2007/01/27 09:23:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:03 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/27 09:23:50 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: M_IOCDATA.9.man,v $
+.\" Revision 0.9.2.15  2007/01/27 09:23:50  brian
+.\" - behavior and docs for IOC_NONE
+.\"
 .\" Revision 0.9.2.14  2006/04/05 09:44:03  brian
 .\" - moved .so line and updated headers
 .\"
@@ -149,6 +152,7 @@ struct copyresp {
 #define IOC_NONE   0x00000000 /* no indication */
 #define IOC_NATIVE 0x01000000 /* native ioctl request */
 #define IOC_ILP32  0x02000000 /* 32bit ioctl request */
+#define IOC_LP64   0x03000000 /* 64bit ioctl request */
 \s+1\fP
 .fi
 .PP
@@ -211,11 +215,9 @@ field can have the values as follows:
 .TP \w'IOC_NATIVE\(em'u
 .B IOC_NONE
 indicates that the
-.BR copyin (9)
-or
-.BR copyout (9)
-operation was performed for a process with the same data model as the driver.
-No conversions are required on data copied in.
+.B M_IOCDATA
+message did not originate from the Stream head, but from an intermediate
+module or driver.  No conversions are required on data.
 .TP
 .B IOC_NATIVE
 indicates that the 
@@ -224,7 +226,7 @@ or
 .BR copyout (9)
 operation was performed for a process with the same data model as the driver (i.e.
 .BR LP64 ).
-No conversion are required on data copied in.
+No conversions are required on data copied in.
 .TP
 .B IOC_ILP32
 indicates that the 
@@ -234,6 +236,16 @@ or
 operation was performed for a process with a different data model (31- or 32-bit) from the kernel
 (i.e. ILP32 instead of LP64).
 Conversion is required on data copied in.
+.TP
+.B IOC_LP64
+indicates that the
+.BR copyin (9)
+or
+.BR copyout (9)
+operation was performed for a process with the same data model as the driver
+(i.e.
+.BR LP64 ).
+No conversions are required on data copied in.
 .PP
 If the message is in response to an
 .BR M_COPYIN (9)
