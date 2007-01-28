@@ -870,9 +870,8 @@ sl_not_s_state(struct sl *sl, uint mask)
  *  =========================================
  */
 static int
-sl_init_priv(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp, minor_t unit)
+sl_init_priv(struct sl *sl, queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp, minor_t unit)
 {
-	struct sl *sl = SL_PRIV(q);
 	mblk_t *t1 = NULL, *t2 = NULL;
 	int err;
 
@@ -888,50 +887,9 @@ sl_init_priv(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp, minor_
 		goto error;
 	}
 
-	if (unit == 0) {
-		/* When a zero minor device number was opened, the Stream is either a clone open or
-		   an attempt to open the master control Stream.  The difference is whether the
-		   sflag was DRVOPEN or CLONEOPEN. */
-		if (sflag == DRVOPEN) {
-			/* When the master control Stream is opened, another master control Stream
-			   must not yet exist.  If this is the only master control Stream then it
-			   is created. */
-			if (sl_ctrl != NULL) {
-				err = ENXIO;
-				goto error;
-			}
-			sl_ctrl = sl;
-		}
-		/* Both master control Streams and clone user Streams are disassociated with any
-		   specific SG.  Master control Streams are never associated with a specific SG.
-		   User Streams are associated with an SG using the sgid in the PPA to the
-		   LMI_ATTACH_REQ primtiive, or when an SCTP stream is temporarily linked under the
-		   driver using the I_LINK input-output control. */
-		sl->tp.tp = NULL;
-		sl->tp.next = NULL;
-		sl->tp.prev = &sl->tp.next;
-	} else {
-		struct tp *tp;
-
-		/* When a non-zero minor device number was opened, the Stream is automagically
-		   associated with the SG to which the minor device number corresponds.  It cannot
-		   be disassociated except when it is closed. */
-		for (tp = (struct tp *) mi_first_ptr(&tp_links); tp && tp->sg.id != unit;
-		     tp = (struct tp *) mi_next_ptr((caddr_t) tp)) ;
-		if (tp == NULL) {
-			err = ENXIO;
-			goto error;
-		}
-		if (tp->lm != NULL) {
-			/* For the time being there are locking issues with allowing a second upper
-			 * Stream on temporary links. */
-			err = ENXIO;
-			goto error;
-		}
-		if ((sl->tp.next = tp->sl.list))
-			sl->tp.next->tp.prev = &sl->tp.next;
-		sl->tp.prev = &(sl->tp.tp = tp)->sl.list;
-	}
+	sl->tp.next = NULL;
+	sl->tp.prev = &sl->tp.next;
+	sl->tp.tp = NULL;
 
 	sl->rq = RD(q);
 	sl->wq = WR(q);
@@ -1038,21 +996,26 @@ sl_init_priv(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp, minor_
 	return (err);
 }
 static void
-sl_term_priv(struct sl *sl)
+sl_init_link(struct sl *sl, struct tp *tp)
 {
-	struct tp *tp;
-
-	if ((tp = sl->tp.tp) != NULL) {
-		// while (!tp_trylock(tp, NULL)) ;
-
+	if ((sl->tp.next = tp->sl.list))
+		sl->tp.next->tp.prev = &sl->tp.next;
+	sl->tp.prev = &(sl->tp.tp = tp)->sl.list;
+}
+static void
+sl_term_unlink(struct sl *sl)
+{
+	if (sl->tp.tp) {
 		if ((*sl->tp.prev = sl->tp.next))
 			sl->tp.next->tp.prev = sl->tp.prev;
 		sl->tp.next = NULL;
 		sl->tp.prev = &sl->tp.next;
 		sl->tp.tp = NULL;
-
-		// tp_unlock(tp);
 	}
+}
+static void
+sl_term_priv(struct sl *sl)
+{
 	if (sl->wack_aspac)
 		mi_timer_free(XCHG(&sl->wack_aspac, NULL));
 	if (sl->wack_aspia)
@@ -1283,28 +1246,6 @@ static inline void
 tp_release(struct tp *tp)
 {
 	tp_unlock(tp);
-}
-static inline struct tp *
-tp_exclusive(queue_t *q, queue_t *aq)
-{
-	struct tp *tp;
-
-	write_lock(&sl_mux_lock);
-	if ((tp = TP_PRIV(q)) == NULL) {
-		write_unlock(&sl_mux_lock);
-		return (NULL);
-	}
-	if (!tp_trylock(tp, aq)) {
-		write_unlock(&sl_mux_lock);
-		return (NULL);
-	}
-	return (tp);
-}
-static inline void
-tp_shared(struct tp *tp)
-{
-	tp_unlock(tp);
-	write_unlock(&sl_mux_lock);
 }
 
 static inline bool
@@ -4750,13 +4691,14 @@ sl_lookup(struct tp *tp, queue_t *q, mblk_t *mp, int *errp)
 /**
  * sl_recv_mgmt_err: - receive MGMT ERR message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  *
  * Error messages pertaining to an AS or AS state must contain an IID.
  */
 static int
-sl_recv_mgmt_err(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_mgmt_err(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	/* FIXME */
 	freemsg(mp);
@@ -4775,7 +4717,7 @@ tp_recv_mgmt_err(struct tp *tp, queue_t *q, mblk_t *mp)
 	struct sl *sl;
 
 	if ((sl = sl_lookup(tp, q, mp, NULL)))
-		return sl_recv_mgmt_err(sl, q, mp);
+		return sl_recv_mgmt_err(sl, tp, q, mp);
 
 	/* FIXME: process as without IID */
 	freemsg(mp);
@@ -5021,7 +4963,6 @@ tp_recv_asps_aspdn_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 		tp_set_u_state(tp, ASP_DOWN);
 		mi_timer_stop(tp->wack_aspup);
 		mi_timer_stop(tp->wack_aspdn);
-		write_lock(&sl_mux_lock);
 		for (sl = tp->sl.list; sl; sl = sl->tp.next) {
 			sl_set_u_state(sl, ASP_DOWN);
 			mi_timer_cancel(sl->wack_aspac);
@@ -5031,11 +4972,6 @@ tp_recv_asps_aspdn_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 				/* ETSI TS 102 141 does not permit dynamic configuration. */
 				if ((err = lmi_error_ind(sl, q, mp, LMI_DISC, LMI_UNATTACHED)))
 					break;
-				if ((*sl->tp.prev = sl->tp.next))
-					sl->tp.next->tp.prev = sl->tp.prev;
-				sl->tp.tp = NULL;
-				sl->tp.next = NULL;
-				sl->tp.prev = &sl->tp.next;
 			} else {
 				switch (sl_get_i_state(sl)) {
 				case LMI_DETACH_PENDING:
@@ -5060,7 +4996,6 @@ tp_recv_asps_aspdn_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 				break;
 			}
 		}
-		write_unlock(&sl_mux_lock);
 		if (err)
 			return (err);
 		switch (tp_get_u_state(tp)) {
@@ -5097,6 +5032,7 @@ tp_recv_asps_aspdn_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_asps_hbeat_ack: - receive BEAT Ack message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  *
@@ -5104,7 +5040,7 @@ tp_recv_asps_aspdn_ack(struct tp *tp, queue_t *q, mblk_t *mp)
  * an IID.  This is not strictly to spec, but it is what the OpenSS7 stack does.
  */
 static int
-sl_recv_asps_hbeat_ack(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_asps_hbeat_ack(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	/* FIXME */
 	freemsg(mp);
@@ -5123,7 +5059,7 @@ tp_recv_asps_hbeat_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 	struct sl *sl;
 
 	if ((sl = sl_lookup(tp, q, mp, NULL)))
-		return sl_recv_asps_hbeat_ack(sl, q, mp);
+		return sl_recv_asps_hbeat_ack(sl, tp, q, mp);
 
 	/* If the message does not include an IID, then perhaps the IID is contained in the
 	   heartbeat data.  The OpenSS7 stack formats heatbeat data with TLVs in the same manner as
@@ -5215,6 +5151,7 @@ tp_recv_aspt_aspac_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_aspt_aspia_ack: - receive ASPIA Ack message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  *
@@ -5225,7 +5162,7 @@ tp_recv_aspt_aspac_ack(struct tp *tp, queue_t *q, mblk_t *mp)
  * ASP_INACTIVE state, the messge is ignored.
  */
 static int
-sl_recv_aspt_aspia_ack(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_aspt_aspia_ack(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	switch (sl_get_u_state(sl)) {
 	case ASP_INACTIVE:
@@ -5284,7 +5221,7 @@ tp_recv_aspt_aspia_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 	int err = 0;
 
 	if ((sl = sl_lookup(tp, q, mp, &err)))
-		return sl_recv_aspt_aspia_ack(sl, q, mp);
+		return sl_recv_aspt_aspia_ack(sl, tp, q, mp);
 
 	/* ASPIA Acks without IIDs are always unsolicited.  Also, ASPIA Acks without IIDS apply to
 	   all AS served. */
@@ -5758,11 +5695,12 @@ sl_recv_maup_state_con(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_event_rpo_enter: - receive RPO Enter message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_event_rpo_enter(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_event_rpo_enter(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	return sl_remote_processor_outage_ind(sl, q, mp);
 }
@@ -5770,11 +5708,12 @@ sl_recv_event_rpo_enter(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_event_rpo_exit: - receive RPO Exit message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_event_rpo_exit(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_event_rpo_exit(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	return sl_remote_processor_recovered_ind(sl, q, mp);
 }
@@ -5782,11 +5721,12 @@ sl_recv_event_rpo_exit(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_event_lpo_enter: - receive LPO Enter message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_event_lpo_enter(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_event_lpo_enter(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	return sl_local_processor_outage_ind(sl, q, mp);
 }
@@ -5794,11 +5734,12 @@ sl_recv_event_lpo_enter(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_event_lpo_exit: - receive LPO Exit message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_event_lpo_exit(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_event_lpo_exit(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	return sl_local_processor_recovered_ind(sl, q, mp);
 }
@@ -5831,13 +5772,13 @@ sl_recv_maup_state_ind(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 	if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &event, M2UA_PARM_STATE_EVENT)) {
 		switch (event.val) {
 		case M2UA_EVENT_RPO_ENTER:
-			return sl_recv_event_rpo_enter(sl, q, mp);
+			return sl_recv_event_rpo_enter(sl, tp, q, mp);
 		case M2UA_EVENT_RPO_EXIT:
-			return sl_recv_event_rpo_exit(sl, q, mp);
+			return sl_recv_event_rpo_exit(sl, tp, q, mp);
 		case M2UA_EVENT_LPO_ENTER:
-			return sl_recv_event_lpo_enter(sl, q, mp);
+			return sl_recv_event_lpo_enter(sl, tp, q, mp);
 		case M2UA_EVENT_LPO_EXIT:
-			return sl_recv_event_lpo_exit(sl, q, mp);
+			return sl_recv_event_lpo_exit(sl, tp, q, mp);
 		default:
 			return (-EOPNOTSUPP);
 		}
@@ -6034,11 +5975,12 @@ sl_recv_maup_data_ack(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_rkmm_reg_rsp: - receive REG Rsp message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_rkmm_reg_rsp(struct sl *sl, queue_t *q, mblk_t *mp, uint32_t status, uint32_t iid)
+sl_recv_rkmm_reg_rsp(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp, uint32_t status, uint32_t iid)
 {
 	int err, error = 0;
 
@@ -6085,11 +6027,12 @@ sl_recv_rkmm_reg_rsp(struct sl *sl, queue_t *q, mblk_t *mp, uint32_t status, uin
 /**
  * sl_recv_rkmm_dereg_rsp: - receive DEREG Rsp message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_rkmm_dereg_rsp(struct sl *sl, queue_t *q, mblk_t *mp, uint32_t status, uint32_t iid)
+sl_recv_rkmm_dereg_rsp(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp, uint32_t status, uint32_t iid)
 {
 	int err, error = 0;
 
@@ -6399,12 +6342,12 @@ tp_recv_rkmm(struct tp *tp, queue_t *q, mblk_t *mp)
 			/* FIXME: dig registration status and interface identifier out of the
 			   registration result */
 			strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "REG Rsp <-");
-			err = sl_recv_rkmm_reg_rsp(sl, q, mp, status, iid);
+			err = sl_recv_rkmm_reg_rsp(sl, tp, q, mp, status, iid);
 			break;
 		case UA_RKMM_DEREG_RSP:
 			/* FIXME: dig registration status out of the deregistration result */
 			strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "DEREG Rsp <-");
-			err = sl_recv_rkmm_dereg_rsp(sl, q, mp, status, iid);
+			err = sl_recv_rkmm_dereg_rsp(sl, tp, q, mp, status, iid);
 			break;
 		default:
 			err = (-EOPNOTSUPP);
@@ -6495,11 +6438,12 @@ tp_recv_msg(struct tp *tp, queue_t *q, mblk_t *mp)
 /**
  * lmi_info_req - process LMI_INFO_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-lmi_info_req(struct sl *sl, queue_t *q, mblk_t *mp)
+lmi_info_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	return lmi_info_ack(sl, q, mp);
 }
@@ -6562,14 +6506,14 @@ lmi_info_req(struct sl *sl, queue_t *q, mblk_t *mp)
  * link, the SL-User issues an LMI_ATTACH_REQ with a zero-length PPA.
  */
 static noinline fastcall int
-lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
+lmi_attach_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	lmi_attach_req_t *p = (typeof(p)) mp->b_rptr;
 	struct sl *sl2;
-	struct tp *tp;
 	uint32_t sgid, iid;
 	caddr_t ppa_ptr, iid_ptr;
 	size_t ppa_len, iid_len;
+	unsigned long flags;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto tooshort;
@@ -6611,22 +6555,22 @@ lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 				iid_len = 32;
 		}
 	}
-	write_lock(&sl_mux_lock);
+	write_lock_irqsave(&sl_mux_lock, flags);
 	for (tp = (struct tp *) mi_first_ptr(&tp_links); tp && tp->sg.id != sgid;
 	     tp = (struct tp *) mi_next_ptr((caddr_t) tp)) ;
 	if (tp == NULL) {
-		write_unlock(&sl_mux_lock);
+		write_unlock_irqrestore(&sl_mux_lock, flags);
 		goto badppa;
 	}
 	if (tp->sp.options.options.pvar != M2UA_VERSION_TS102141
 	    && (tp->sg.options.options.popt & M2UA_SG_DYNAMIC)) {
 		/* ETSI TS 102 141 does not permit dynamic configuration. */
 		if (iid_ptr != NULL) {
-			write_unlock(&sl_mux_lock);
+			write_unlock_irqrestore(&sl_mux_lock, flags);
 			goto badppa;
 		}
 		if (tp_get_u_state(tp) != ASP_UP) {
-			write_unlock(&sl_mux_lock);
+			write_unlock_irqrestore(&sl_mux_lock, flags);
 			goto enxio;
 		}
 		/* interpret iid as link key */
@@ -6638,7 +6582,7 @@ lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		if (tp->sp.options.options.pvar == M2UA_VERSION_TS102141
 		    || !(tp->sg.options.options.popt & M2UA_SG_TEXTIID)) {
 			/* ETSI TS 102 141 does not permit the use of text interface identifiers. */
-			write_unlock(&sl_mux_lock);
+			write_unlock_irqrestore(&sl_mux_lock, flags);
 			goto badppa;
 		}
 		for (sl2 = tp->sl.list; sl2; sl2 = sl2->tp.next)
@@ -6652,7 +6596,7 @@ lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	}
 	if (sl2) {
 		if (sl2 != sl) {
-			write_unlock(&sl_mux_lock);
+			write_unlock_irqrestore(&sl_mux_lock, flags);
 			goto ebusy;
 		}
 		/* already attached, probably from previous run that required buffers */
@@ -6679,7 +6623,7 @@ lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (tp->sp.options.options.pvar != M2UA_VERSION_TS102141
 	    && (tp->sg.options.options.popt & M2UA_SG_DYNAMIC)) {
 		/* ETSI TS 102 141 does not permit dynamic configuration. */
-		write_unlock(&sl_mux_lock);
+		write_unlock_irqrestore(&sl_mux_lock, flags);
 		sl_set_i_state(sl, LMI_ATTACH_PENDING);
 		sl_set_u_state(sl, ASP_WACK_ASPUP);
 		/* issue registation request */
@@ -6687,7 +6631,7 @@ lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		return sl_send_rkmm_reg_req(sl, tp, q, mp, sl->request_id, sl->as.config.ppa.sdti,
 					    sl->as.config.ppa.sdli);
 	} else {
-		write_unlock(&sl_mux_lock);
+		write_unlock_irqrestore(&sl_mux_lock, flags);
 		sl_set_i_state(sl, LMI_ATTACH_PENDING);
 		sl_set_u_state(sl, ASP_INACTIVE);
 		return lmi_ok_ack(sl, q, mp, LMI_ATTACH_REQ);
@@ -6761,16 +6705,14 @@ lmi_detach_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 		goto unspec;
 	}
 	if ((err = lmi_ok_ack(sl, q, mp, LMI_DETACH_REQ)) == 0) {
+		unsigned long flags;
+
 		/* Note that this sequence means that we alway have to take the tp lock before
 		   taking the sl mux lock. */
-		write_lock(&sl_mux_lock);
+		write_lock_irqsave(&sl_mux_lock, flags);
 		/* remove from tp list */
-		if ((*sl->tp.prev = sl->tp.next))
-			sl->tp.next->tp.prev = sl->tp.prev;
-		sl->tp.next = NULL;
-		sl->tp.prev = &sl->tp.next;
-		sl->tp.tp = NULL;
-		write_unlock(&sl_mux_lock);
+		sl_term_unlink(sl);
+		write_unlock_irqrestore(&sl_mux_lock, flags);
 	}
 	return (err);
       unspec:
@@ -6875,11 +6817,12 @@ lmi_disable_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 /**
  * lmi_optmgmt_req - process LMI_OPTMGMT_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-lmi_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *mp)
+lmi_optmgmt_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	/* FIXME */
 	freemsg(mp);
@@ -7574,11 +7517,9 @@ m2_dereg_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 static noinline fastcall int
 tpi_request(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
-	write_lock(&sl_mux_lock);
 	if (tp->lm == NULL || (tp->lm == sl)) {
 		if (tp->lm == NULL)
 			tp->lm = sl;
-		write_unlock(&sl_mux_lock);
 		if (pcmsg(DB_TYPE(mp)) || bcanputnext(tp->wq, mp->b_band)) {
 			/* need to do state tracking */
 			switch (*(t_scalar_t *) mp->b_rptr) {
@@ -7657,7 +7598,6 @@ tpi_request(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 	} else {
 		struct T_error_ack *p;
 
-		write_unlock(&sl_mux_lock);
 		freemsg(XCHG(&mp->b_cont, NULL));
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_rptr;
@@ -7757,23 +7697,25 @@ sl_i_link(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (!(rp = sl_allocb(q, sizeof(int), BPRI_MED)))
 		goto enobufs;
 
-	write_lock(&sl_mux_lock);
+	{
+		unsigned long flags;
 
-	if (sl->tp.tp != NULL) {
-		write_unlock(&sl_mux_lock);
-		goto ealready;
+		write_lock_irqsave(&sl_mux_lock, flags);
+
+		if (sl->tp.tp != NULL) {
+			write_unlock_irqrestore(&sl_mux_lock, flags);
+			goto ealready;
+		}
+
+		sl_init_link(sl, tp);
+
+		tp->lm = sl;
+
+		tp_init_priv(tp, l->l_qtop, 0, l->l_index, ioc->ioc_cr, t1, t2, t3, t4);
+		mi_attach(l->l_qtop, (caddr_t) tp);
+
+		write_unlock_irqrestore(&sl_mux_lock, flags);
 	}
-
-	if ((sl->tp.next = tp->sl.list))
-		sl->tp.next->tp.prev = &tp->sl.list;
-	*(sl->tp.prev = &(sl->tp.tp = tp)->sl.list) = sl;
-
-	tp->lm = sl;
-
-	tp_init_priv(tp, l->l_qtop, 0, l->l_index, ioc->ioc_cr, t1, t2, t3, t4);
-	mi_attach(l->l_qtop, (caddr_t) tp);
-
-	write_unlock(&sl_mux_lock);
 	mi_copy_done(q, mp, 0);
 
 	DB_TYPE(rp) = M_PCPROTO;
@@ -7836,11 +7778,11 @@ sl_i_unlink(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
 	struct linkblk *l = (typeof(l)) mp->b_cont->b_rptr;
-	struct tp *tp;
+	struct tp *tp = TP_PRIV(l->l_qtop);
 	struct sl *sl2;
 	int err;
 
-	if ((tp = tp_exclusive(l->l_qtop, q)) == NULL)
+	if (!tp_trylock(tp, q))
 		return (-EDEADLK);
 
 	for (sl2 = tp->sl.list; sl2; sl2 = sl2->tp.next) {
@@ -7850,31 +7792,30 @@ sl_i_unlink(struct sl *sl, queue_t *q, mblk_t *mp)
 			/* If the operation can be refused and another Stream is linked to the same
 			   SG, refuse to unlink it until those Streams are either closed or detached 
 			   and disassociated. */
-			tp_shared(tp);
+			tp_unlock(tp);
 			mi_copy_done(q, mp, EBUSY);
 			return (0);
 		}
 		if ((err = m_hangup(sl2, q, NULL))) {
-			tp_shared(tp);
+
+			tp_unlock(tp);
 			return (err);
 		}
 		sl_set_i_state(sl2, LMI_UNUSABLE);
-		if ((*sl2->tp.prev = sl2->tp.next))
-			sl2->tp.next->tp.prev = sl2->tp.prev;
-		sl2->tp.next = NULL;
-		sl2->tp.prev = &sl2->tp.next;
-		sl2->tp.tp = NULL;
+		sl_term_unlink(sl2);
 	}
 
-	mi_detach(l->l_qtop, (caddr_t) tp);
+	{
+		unsigned long flags;
 
-	if ((*sl->tp.prev = sl->tp.next))
-		sl->tp.next->tp.prev = sl->tp.prev;
-	sl->tp.next = NULL;
-	sl->tp.prev = &sl->tp.next;
-	sl->tp.tp = NULL;
+		write_lock_irqsave(&sl_mux_lock, flags);
+		mi_detach(l->l_qtop, (caddr_t) tp);
+		sl_term_unlink(sl);
+		mi_close_unlink(&tp_links, (caddr_t) tp);
+		write_unlock_irqrestore(&sl_mux_lock, flags);
+	}
 
-	tp_shared(tp);
+	tp_unlock(tp);
 
 	tp_term_priv(tp);
 	mi_close_free((caddr_t) tp);
@@ -7919,20 +7860,24 @@ sl_i_plink(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (!(rp = sl_allocb(q, sizeof(int), BPRI_MED)))
 		goto enobufs;
 
-	write_lock(&sl_mux_lock);
+	{
+		unsigned long flags;
 
-	dev = l->l_index;
-	if ((err = mi_open_link(&tp_links, (caddr_t) tp, &dev, 0, MODOPEN, ioc->ioc_cr))) {
-		write_unlock(&sl_mux_lock);
-		goto error;
+		write_lock_irqsave(&sl_mux_lock, flags);
+
+		dev = l->l_index;
+		if ((err = mi_open_link(&tp_links, (caddr_t) tp, &dev, 0, MODOPEN, ioc->ioc_cr))) {
+			write_unlock_irqrestore(&sl_mux_lock, flags);
+			goto error;
+		}
+		tp_init_priv(tp, l->l_qtop, 0, l->l_index, ioc->ioc_cr, t1, t2, t3, t4);
+		/* Sneaky trick.  If a non-zero minor device number was opened and on which the linking was 
+		   performed, then the SGID is implied by the minor device number that was opened. */
+		tp->sg.id = sl->as.config.ppa.sgid;
+		mi_attach(l->l_qtop, (caddr_t) tp);
+
+		write_unlock_irqrestore(&sl_mux_lock, flags);
 	}
-	tp_init_priv(tp, l->l_qtop, 0, l->l_index, ioc->ioc_cr, t1, t2, t3, t4);
-	/* Sneaky trick.  If a non-zero minor device number was opened and on which the linking was 
-	   performed, then the SGID is implied by the minor device number that was opened. */
-	tp->sg.id = sl->as.config.ppa.sgid;
-	mi_attach(l->l_qtop, (caddr_t) tp);
-
-	write_unlock(&sl_mux_lock);
 	mi_copy_done(q, mp, 0);
 
 	DB_TYPE(rp) = M_PCPROTO;
@@ -7985,25 +7930,32 @@ static noinline fastcall int
 sl_i_punlink(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	struct linkblk *l = (typeof(l)) mp->b_cont->b_rptr;
-	struct tp *tp;
+	struct tp *tp = TP_PRIV(l->l_qtop);
 
-	if ((tp = tp_exclusive(l->l_qtop, q)) == NULL)
+	if (!tp_trylock(tp, q))
 		return (-EDEADLK);
 
 	if (tp->sl.list != NULL) {
-		tp_shared(tp);
+		tp_unlock(tp);
 		mi_copy_done(q, mp, EBUSY);
 		return (0);
 	}
 
-	mi_detach(l->l_qtop, (caddr_t) tp);
-	mi_close_unlink(&tp_links, (caddr_t) tp);
+	{
+		unsigned long flags;
 
-	tp_shared(tp);
+		write_lock_irqsave(&sl_mux_lock, flags);
+		mi_detach(l->l_qtop, (caddr_t) tp);
+		mi_close_unlink(&tp_links, (caddr_t) tp);
+		write_unlock_irqrestore(&sl_mux_lock, flags);
+	}
+
+	tp_unlock(tp);
 
 	tp_term_priv(tp);
 	mi_close_free((caddr_t) tp);
 	mi_copy_done(q, mp, 0);
+
 	return (0);
 }
 
@@ -8081,11 +8033,11 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 		/* have not been attached yet */
 		switch (prim) {
 		case LMI_INFO_REQ:
-			return lmi_info_req(sl, q, mp);
+			return lmi_info_req(sl, NULL, q, mp);
 		case LMI_ATTACH_REQ:
-			return lmi_attach_req(sl, q, mp);
+			return lmi_attach_req(sl, NULL, q, mp);
 		case LMI_OPTMGMT_REQ:
-			return lmi_optmgmt_req(sl, q, mp);
+			return lmi_optmgmt_req(sl, NULL, q, mp);
 		default:
 			return lmi_error_ack(sl, q, mp, prim, LMI_OUTSTATE);
 		}
@@ -8105,11 +8057,11 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 	switch (*(uint32_t *) mp->b_rptr) {
 	case LMI_INFO_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> LMI_INFO_REQ");
-		rtn = lmi_info_req(sl, q, mp);
+		rtn = lmi_info_req(sl, tp, q, mp);
 		break;
 	case LMI_ATTACH_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> LMI_ATTACH_REQ");
-		rtn = lmi_attach_req(sl, q, mp);
+		rtn = lmi_attach_req(sl, tp, q, mp);
 		break;
 	case LMI_DETACH_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> LMI_DETACH_REQ");
@@ -8125,7 +8077,7 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 		break;
 	case LMI_OPTMGMT_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> LMI_OPTMGMT_REQ");
-		rtn = lmi_optmgmt_req(sl, q, mp);
+		rtn = lmi_optmgmt_req(sl, tp, q, mp);
 		break;
 	case SL_PDU_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_PDU_REQ");
@@ -9759,7 +9711,6 @@ t_discon_ind(struct tp *tp, queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
-	write_lock(&sl_mux_lock);
 	for (sl = tp->sl.list; sl; sl = sl->tp.next) {
 		if (tp->sp.options.options.pvar != M2UA_VERSION_TS102141
 		    && (tp->sg.options.options.popt & M2UA_SG_DYNAMIC)) {
@@ -9770,11 +9721,6 @@ t_discon_ind(struct tp *tp, queue_t *q, mblk_t *mp)
 			   registration is complicated for M2UA anyway. */
 			if ((err = lmi_error_ind(sl, q, mp, LMI_DISC, LMI_UNATTACHED)))
 				break;
-			if ((*sl->tp.prev = sl->tp.next))
-				sl->tp.next->tp.prev = sl->tp.prev;
-			sl->tp.tp = NULL;
-			sl->tp.next = NULL;
-			sl->tp.prev = &sl->tp.next;
 		} else {
 			/* When the SG requires static configuration, when the association is lost,
 			   the configuration is not lost, meaning that the SL-User merely needs to
@@ -9802,7 +9748,6 @@ t_discon_ind(struct tp *tp, queue_t *q, mblk_t *mp)
 		}
 		sl_set_u_state(sl, ASP_DOWN);
 	}
-	write_unlock(&sl_mux_lock);
 	if (err)
 		return (err);
 	tp_set_i_state(tp, TS_IDLE);
@@ -10366,7 +10311,6 @@ t_ordrel_ind(struct tp *tp, queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
-	write_lock(&sl_mux_lock);
 	for (sl = tp->sl.list; sl; sl = sl->tp.next) {
 		if (tp->sp.options.options.pvar != M2UA_VERSION_TS102141
 		    && (tp->sg.options.options.popt & M2UA_SG_DYNAMIC)) {
@@ -10377,11 +10321,6 @@ t_ordrel_ind(struct tp *tp, queue_t *q, mblk_t *mp)
 			   registration is complicated for M2UA anyway. */
 			if ((err = lmi_error_ind(sl, q, mp, LMI_DISC, LMI_UNATTACHED)))
 				break;
-			if ((*sl->tp.prev = sl->tp.next))
-				sl->tp.next->tp.prev = sl->tp.prev;
-			sl->tp.tp = NULL;
-			sl->tp.next = NULL;
-			sl->tp.prev = &sl->tp.next;
 		} else {
 			/* When the SG requires static configuration, when the association is lost,
 			   the configuration is not lost, meaning that the SL-User merely needs to
@@ -10409,7 +10348,6 @@ t_ordrel_ind(struct tp *tp, queue_t *q, mblk_t *mp)
 		}
 		sl_set_u_state(sl, ASP_DOWN);
 	}
-	write_unlock(&sl_mux_lock);
 	if (err)
 		return (err);
 	switch (tp_get_i_state(tp)) {
@@ -11227,8 +11165,10 @@ tp_wsrv(queue_t *q)
 static streamscall int
 sl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
+	unsigned long flags;
 	minor_t cminor;
 	major_t cmajor;
+	struct sl *sl;
 	int err;
 
 	if (q->q_ptr != NULL)
@@ -11245,20 +11185,66 @@ sl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	*devp = makedevice(cmajor, NUM_AS + 1);
 	/* start assigning minors at 4097 */
 
-	write_lock(&sl_mux_lock);
+	if ((sl = (struct sl *) mi_open_alloc_sleep(sizeof(*sl))) == NULL)
+		return (ENOMEM);
 
-	if ((err = mi_open_comm(&sl_opens, sizeof(struct sl), q, devp, oflags, CLONEOPEN, crp))) {
-		write_unlock(&sl_mux_lock);
-		return (err);
-	}
 	/* initialize sl structure */
-	if ((err = sl_init_priv(q, devp, oflags, sflag, crp, cminor))) {
-		mi_close_comm(&sl_opens, q);
-		write_unlock(&sl_mux_lock);
+	if ((err = sl_init_priv(sl, q, devp, oflags, sflag, crp, cminor))) {
+		mi_close_free((caddr_t) sl);
 		return (err);
 	}
-	write_unlock(&sl_mux_lock);
 
+	write_lock_irqsave(&sl_mux_lock, flags);
+
+	if (cminor == 0) {
+		/* When a zero minor device number was opened, the Stream is either a clone open or
+		   an attempt to open the master control Stream.  The difference is whether the
+		   sflag was DRVOPEN or CLONEOPEN. */
+		if (sflag == DRVOPEN) {
+			/* When the master control Stream is opened, another master control Stream
+			   must not yet exist.  If this is the only master control Stream then it
+			   is created. */
+			if (sl_ctrl != NULL) {
+				write_unlock_irqrestore(&sl_mux_lock, flags);
+				sl_term_priv(sl);
+				mi_close_free((caddr_t) sl);
+				return (ENXIO);
+			}
+			sl_ctrl = sl;
+		}
+		/* Both master control Streams and clone user Streams are disassociated with any
+		   specific SG.  Master control Streams are never associated with a specific SG.
+		   User Streams are associated with an SG using the sgid in the PPA to the
+		   LMI_ATTACH_REQ primtiive, or when an SCTP stream is temporarily linked under the
+		   driver using the I_LINK input-output control. */
+	} else {
+		struct tp *tp;
+
+		/* When a non-zero minor device number was opened, the Stream is automagically
+		   associated with the SG to which the minor device number corresponds.  It cannot
+		   be disassociated except when it is closed. */
+		for (tp = (struct tp *) mi_first_ptr(&tp_links); tp && tp->sg.id != cminor;
+		     tp = (struct tp *) mi_next_ptr((caddr_t) tp)) ;
+		if (tp == NULL) {
+			write_unlock_irqrestore(&sl_mux_lock, flags);
+			sl_term_priv(sl);
+			mi_close_free((caddr_t) sl);
+			return (ENXIO);
+		}
+		sl_init_link(sl, tp);
+	}
+
+	if ((err = mi_open_link(&sl_opens, (caddr_t) sl, devp, oflags, CLONEOPEN, crp))) {
+		sl_term_unlink(sl);
+		write_unlock_irqrestore(&sl_mux_lock, flags);
+		sl_term_priv(sl);
+		mi_close_free((caddr_t) sl);
+		return (err);
+	}
+
+	write_unlock_irqrestore(&sl_mux_lock, flags);
+
+	mi_attach(q, (caddr_t) sl);
 	qprocson(q);
 	return (0);
 }
@@ -11273,13 +11259,16 @@ static streamscall int
 sl_qclose(queue_t *q, int oflags, cred_t *crp)
 {
 	struct sl *sl = SL_PRIV(q);
+	unsigned long flags;
 
 	qprocsoff(q);
-	write_lock(&sl_mux_lock);
+	write_lock_irqsave(&sl_mux_lock, flags);
 	mi_detach(q, (caddr_t) sl);
+	sl_term_unlink(sl);
+	mi_close_unlink(&sl_opens, (caddr_t) sl);
+	write_unlock_irqrestore(&sl_mux_lock, flags);
 	sl_term_priv(sl);
-	mi_close_detached(&sl_opens, (caddr_t) sl);
-	write_unlock(&sl_mux_lock);
+	mi_close_free((caddr_t) sl);
 	return (0);
 }
 
