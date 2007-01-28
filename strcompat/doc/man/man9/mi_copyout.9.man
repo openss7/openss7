@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_copyout.9.man,v 0.9.2.9 2007/01/15 12:16:34 brian Exp $
+.\" @(#) $Id: mi_copyout.9.man,v 0.9.2.10 2007/01/28 01:00:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/01/15 12:16:34 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/28 01:00:59 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_copyout.9.man,v $
+.\" Revision 0.9.2.10  2007/01/28 01:00:59  brian
+.\" - updated references and manual pages
+.\"
 .\" Revision 0.9.2.9  2007/01/15 12:16:34  brian
 .\" - updated archive sizes, new development work
 .\"
@@ -196,7 +199,7 @@ was called like:
 \fBmi_copy_done\fR(\fIq\fR, \fImp\fR, \fIcp->cp_rval\fR).
 .PP
 When
-.BR mi_copy_done ()
+.BR mi_copyout ()
 is called for a non-transparent
 .IR I_STR (7)
 operation, the input-output control operation is completed and an

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
 .\"
-.\" @(#) $Id: m2ua-as.4.man,v 0.9.2.3 2007/01/26 21:54:30 brian Exp $
+.\" @(#) $Id: m2ua-as.4.man,v 0.9.2.4 2007/01/28 01:00:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/01/26 21:54:30 $ by $Author: brian $
+.\" Last Modified $Date: 2007/01/28 01:00:20 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: m2ua-as.4.man,v $
+.\" Revision 0.9.2.4  2007/01/28 01:00:20  brian
+.\" - updated references and manual pages
+.\"
 .\" Revision 0.9.2.3  2007/01/26 21:54:30  brian
 .\" - working up AS drivers and docs
 .\"
@@ -114,21 +117,123 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
-The M2UA-AS is a multiplexing driver that implements the ASP side of the M2UA
+.B M2UA-AS
+is an implementation of the SS7 MTP2 User Adaptation Layer (M2UA) protocol defined in RFC 3331
 .[
 rfc3331
 .]
+and
+ETSI TS 102 141.
 .[
 ts 102 141
 .]
-protocol.
-Streams opened on the upper multiplex provide the
-.IR "Signalling Link Interface (SLI)" ,
+.B M2UA
+provides a backhaul of services of the SS7 Signalling Link over an IP newtork using Stream Control
+Transmission Protocol,
+.BR sctp (4),
+as defined in RFC 2960,
+.[
+rfc2960
+.]
+RFC 3309,
+.[
+rfc3309
+.]
+RFC 4460,
+.[
+rfc4460
+.]
+and ETSI TS 102 144.
+.[
+ts 102 144
+.]
+.PP
+.B M2UA-AS
+is implementated as a
+.IR STREAMS (9)
+multiplexing driver.
+.BR sctp_t (4)
+Streams are opened and linked under the
+.B M2UA-AS
+driver using the
+.IR I_LINK "(7) or " I_PLINK (7)
+STREAMS input-output control commands.
+Once the SCTP Stream is linked, it can be configured using the
+.B M2UA-AS
+input-output control commands described in
+.BR m2ua_as_ioctl (4).
+Streams opened on the upper multiplex provide SS7 Signalling Link services in accordance with Q.703,
+.[
+q703
+.]
+ETSI EN 300 008-1,
+.[
+en 300 008-1
+.]
+and ANSI T1.111.3,
+.[
+ansi t1.111
+.]
+by providing the Signalling Link Interface (SLI), described in
 .BR sli (7).
-Streams linked under the lower multiplex provide the SCTP transport interface,
-.BR sctp_t (4).
+.PP
+.B M2UA-AS
+provides two types of control Streams: one for permanent links and another for temporary links; and
+one user Stream, as follows:
+.TP
+.IR /dev/m2ua-as-lm ", " /dev/streams/m2ua-as/lm
+A single permanent link control stream can be obtained by opening the
+.RI \(lq /dev/m2ua-as-lm \(rq
+minor device.  Lower Streams linked using the
+.IR I_PLINK (7)
+input-output control make this Stream their control Stream.  If the Stream is closed and reopened,
+the newly opened Stream becomes the control stream for all existing permanent links.  Although the
+control stream is a clone minor device, further opens of the clone minor device are refused when a
+Stream opened on the minor device is already open.  This restricts the number of open control
+Streams to one (1).
+.IP ""
+Lower Streams linked using this control Stream can be made available to other M2UA-AS users by
+configuring the lower Stream with M2UA-AS input-output controls.  (That is, by establishing a
+Signalling Gateway identifier with which other M2UA-AS users can attach to the lower stream.)
+Only this control Stream is permitted to configure or otherwise affect the linked Stream.
+.IP ""
+This control Stream provides the M2UA Layer Management service interface described in
+.BR m2ua_lm (7).
+.TP
+.IR /dev/m2ua-as ", " /dev/streams/clone/m2ua-as
+Multiple temporary link control streams can be obtained by opening the
+.RI \(lq /dev/m2ua-as \(rq
+minor device.  Lower Streams linked using the
+.IR I_LINK (7)
+input-output control make this Stream their control Stream.  If the Stream is closed, all linked
+Streams are unlinked as part of normal
+.IR STREAMS (9)
+behaviour.
+.IP ""
+Lower Streams linked using this control Stream can be made available to other M2UA-AS users with the
+same credentials as the control Stream.  This is made possible by assigining a Signalling Gateway
+identifier to the lower Stream with M2UA-AS input-output controls.
+Only this control Stream is permitted to configure or otherwise affect the linked Stream.
+.IP ""
+This control Stream provides the M2UA Layer Management service interface described in
+.BR m2ua_lm (7),
+the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+described in
+.BR tpi "(7) and " tpi_sctp (7),
+and the Local Management Interface (LMI) described in
+.BR lmi (7)
+and the Signalling Link Interface (SLI) described in
+.BR sli (7).
+The M2UA LM interface can only be used against lower Streams linked by this control Stream.  The TPI
+interface can be used to directly control SCTP Transport Providers linked by this control Stream.
+The LMI and SLI interfaces can be used to also behave as an SL-User as described below.
+.TP
+.IR /dev/m2ua-as ", " /dev/streams/clone/m2ua-as ", " /dev/streams/m2ua-as/\fBNNNN\fP
 .\"
-.SS Configuration
+.SH CONFIGURATION
 .PP
 When the M2UA-AS driver is configured, SCTP Streams are opened and linked under the multiplexing
 driver.  Each SCTP Stream represents an association between a local ASP and a remote Signalling
@@ -276,7 +381,7 @@ The utility can also open and attach signalling link Streams and link them under
 multiplexing driver with a global PPA and CLEI.  (Quite often the global PPA is merely a
 concatenation of the SDTI/SDLI values and the CLEI is simply the text IID.)
 .\"
-.SS Addressing
+.SH ADDRESSING
 .PP
 All M2UA-AS upper multiplex Streams (SL) are Style II links.  That is, they must be attached with an
 .BR LMI_ATTACH_REQ (7)
@@ -1074,8 +1179,23 @@ primitives.  These primitives generate an error when
 is set to
 .BR TS102141 .
 .IP \(em
+.B M2UA-AS
+supports, as an option, the ASP Extensions defined in ASPEXT.
+.[
+draft-bidulock-sigtran-aspext-04.txt
+.]
+See
+.BR m2ua_as_ioctl (4)
+for more information on enabling this extension.
 .IP \(em
-.IP \(em
+.B M2UA-AS
+supports, as an option, the SG Information extensions defined in SGINFO.
+.[
+draft-bidulock-sigtran-sginfo-05.txt
+.]
+See
+.BR m2ua_as_ioctl (4)
+for more information on enabling this extension.
 .\"
 .\"
 .SH CONFORMANCE

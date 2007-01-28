@@ -911,6 +911,50 @@ Part 1: Protocol Specification
 %I Telcordia Technologies, Inc
 %U http://www.telcordia.com/
 
+%K aspcong00
+%L ASPCONG00
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T ASP Congestion (ASPCONG) for Signalling User Adaptation Layers
+%R draft-bidulock-sigtran-aspcong-00.txt
+%D July 11, 2006
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-aspcong-00.txt
+
+%K sginfo-05
+%L SGINFO
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Signalling Gateway (SG) Information Support
+%R draft-bidulock-sigtran-sginfo-05.txt
+%D June 18, 2006
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-sginfo-01.txt
+
+%K sginfo-04
+%L SGINFO
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Signalling Gateway (SG) Information Support
+%R draft-bidulock-sigtran-sginfo-04.txt
+%D February 21, 2004
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-sginfo-01.txt
+
+%K sginfo-03
+%L SGINFO
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Signalling Gateway (SG) Information Support
+%R draft-bidulock-sigtran-sginfo-03.txt
+%D July 27, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-sginfo-01.txt
+
 %K sginfo-02
 %L SGINFO
 %A Brian Bidulock
@@ -944,7 +988,41 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-sginfo-00.txt
 
-%L ASPEXT
+%K aspext04
+%L ASPEXT04
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Application Server Process (ASP) Extension Framework
+%R draft-bidulock-sigtran-aspext-04.txt
+%D June 18, 2006
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-aspext-04.txt
+
+%K aspext03
+%L ASPEXT03
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Application Server Process (ASP) Extension Framework
+%R draft-bidulock-sigtran-aspext-03.txt
+%D February 24, 2004
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-aspext-03.txt
+
+%K aspext02
+%L ASPEXT02
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Application Server Process (ASP) Extension Framework
+%R draft-bidulock-sigtran-aspext-02.txt
+%D July 26, 2003
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-aspext-02.txt
+
+%K aspext01
+%L ASPEXT01
 %A Brian Bidulock
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T Application Server Process (ASP) Extension Framework
@@ -954,7 +1032,8 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-aspext-01.txt
 
-%L ASPEXT
+%K aspext00
+%L ASPEXT00
 %A Brian Bidulock
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T Application Server Process (ASP) Extension Framework
@@ -963,6 +1042,28 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-aspext-00.txt
+
+%K corid-04
+%L CORID
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Correlation Id and Heartbeat Procedures Supporting Lossless Fail-Over
+%R draft-bidulock-sigtran-corid-04.txt
+%D June 18, 2006
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-corid-04.txt
+
+%K corid-03
+%L CORID
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Correlation Id and Heartbeat Procedures Supporting Lossless Fail-Over
+%R draft-bidulock-sigtran-corid-03.txt
+%D February 21, 2004
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-corid-03.txt
 
 %K corid-02
 %L CORID
@@ -997,6 +1098,28 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-corid-00.txt
 
+%K sessid-04
+%L SESSID
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Session Identification for SS7 Signalling User Adaptation Layers
+%R draft-bidulock-sigtran-sessid-04.txt
+%D October 16, 2005
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-sessid-04.txt
+
+%K sessid-03
+%L SESSID
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Session Identification for SS7 Signalling User Adaptation Layers
+%R draft-bidulock-sigtran-sessid-03.txt
+%D February 21, 2004
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-sessid-03.txt
+
 %K sessid-02
 %L SESSID
 %A Brian Bidulock
@@ -1030,13 +1153,35 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-sessid-00.txt
 
+%K regext-04
+%L REGEXT
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Registration Extensions for SS7 Signalling User Adaptation Layers
+%R draft-bidulock-sigtran-regext-04.txt
+%D October 16, 2005
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-regext-04.txt
+
+%K regext-03
+%L REGEXT
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Registration Extensions for SS7 Signalling User Adaptation Layers
+%R draft-bidulock-sigtran-regext-03.txt
+%D June 18, 2006
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-regext-03.txt
+
 %K regext-02
 %L REGEXT
 %A Brian Bidulock
 %Q Internet Engineering Task Force \(em Signalling Transport Working Group
 %T Registration Extensions for SS7 Signalling User Adaptation Layers
 %R draft-bidulock-sigtran-regext-02.txt
-%D July 26 2003
+%D July 26, 2003
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-regext-02.txt
@@ -1062,6 +1207,28 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-regext-00.txt
+
+%K loadsel-04
+%L LOADSEL
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Load Selection Extension for Signalling User Adaptation Layers (LOADSEL)
+%R draft-bidulock-sigtran-loadsel-04.txt
+%D June 18, 2006
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-loadsel-04.txt
+
+%K loadsel-03
+%L LOADSEL
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Load Selection Extension for Signalling User Adaptation Layers (LOADSEL)
+%R draft-bidulock-sigtran-loadsel-03.txt
+%D February 21, 2004
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-loadsel-03.txt
 
 %K loadsel-02
 %L LOADSEL
@@ -1095,6 +1262,28 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-loadsel-00.txt
+
+%K loadgrp-04
+%L LOADGRP
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Load Grouping Extension for Signalling User Adaptation Layers (LOADGRP)
+%R draft-bidulock-sigtran-loadgrp-04.txt
+%D June 18, 2006
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-loadgrp-04.txt
+
+%K loadgrp-03
+%L LOADGRP
+%A Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Load Grouping Extension for Signalling User Adaptation Layers (LOADGRP)
+%R draft-bidulock-sigtran-loadgrp-03.txt
+%D February 21, 2004
+%O Work In Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-loadgrp-03.txt
 
 %K loadgrp-02
 %L LOADGRP
@@ -1156,6 +1345,70 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc4165.txt
+
+%K m2pa-13
+%L M2PA13
+%A Tom George
+%A Brian Bidulock
+%A Ram Dantu
+%A Hanns Juergen Schwarzbauer
+%A Ken Morneault
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-13.txt
+%D February 18, 2005
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-13.txt
+
+%K m2pa-12
+%L M2PA12
+%A Tom George
+%A Brian Bidulock
+%A Ram Dantu
+%A Hanns Juergen Schwarzbauer
+%A Ken Morneault
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-12.txt
+%D June 16, 2004
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-12.txt
+
+%K m2pa-11
+%L M2PA11
+%A Tom George
+%A Brian Bidulock
+%A Ram Dantu
+%A Hanns Juergen Schwarzbauer
+%A Ken Morneault
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-11.txt
+%D January 29, 2004
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-11.txt
+
+%K m2pa-10
+%L M2PA10
+%A Tom George
+%A Brian Bidulock
+%A Ram Dantu
+%A Hanns Juergen Schwarzbauer
+%A Ken Morneault
+%E Tom George
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer
+%R draft-ietf-sigtran-m2pa-10.txt
+%D October 16, 2003
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-10.txt
 
 %K m2pa-09
 %L M2PA09
@@ -1297,6 +1550,138 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %O Work In Progress.
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2pa-02.txt
+
+%K m2pa-test-07
+%L M2PATEST07
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-07.txt
+%D June 18, 2006
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-07.txt
+
+%K m2pa-test-06
+%L M2PATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-06.txt
+%D October 16, 2005
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-06.txt
+
+%K m2pa-test-05
+%L M2PATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-05.txt
+%D February 14, 2004
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-05.txt
+
+%K m2pa-test-04
+%L M2PATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-04.txt
+%D July 26, 2003
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-04.txt
+
+%K m2pa-test-03
+%L M2PATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-03.txt
+%D March 29, 2003
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-03.txt
+
+%K m2pa-test-02
+%L M2PATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-02.txt
+%D September 15, 2002
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-02.txt
+
+%K m2pa-test-01
+%L M2PATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-01.txt
+%D April, 2002
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-01.txt
+
+%K m2pa-test-00
+%L M2PATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Peer-to-Peer Adaptation Layer \(em Test Specifications
+%R draft-bidulock-sigtran-m2pa-test-00.txt
+%D December, 2001
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-test-00.txt
+
+%K m2ua-ss7test-00
+%L M2UATEST00
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Adaptation Layer (M2UA) SS7 Test Specifications
+%R draft-bidulock-sigtran-m2ua-ss7test-00.txt
+%D July 26, 2003
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2ua-ss7test-00.txt
+
+%K m2ua-ss7test-01
+%L M2UATEST01
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Adaptation Layer (M2UA) SS7 Test Specifications
+%R draft-bidulock-sigtran-m2ua-ss7test-01.txt
+%D February 14, 2004
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2ua-ss7test-01.txt
+
+%K m2ua-ss7test-02
+%L M2UATEST02
+%A Brian Bidulock
+%E Brian Bidulock
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T SS7 MTP2-User Adaptation Layer (M2UA) SS7 Test Specifications
+%R draft-bidulock-sigtran-m2ua-ss7test-02.txt
+%D June 18, 2006
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%O Work In Progress.
+%U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2ua-ss7test-02.txt
 
 %K q700
 %L Q.700
@@ -2441,6 +2826,15 @@ Part 1: Protocol Specification
 %T Information Processing Systems \(em Data Communications \(em Use of the X.25 Packet Level Protocol in Local Area Networks
 %D 1989
 %I International Organization for Standardization
+
+%K jtq703
+%L JT-Q\)703
+%A TTC
+%R TTC Standard JT-Q\)703
+%T Message Transfer Part \(em Signalling Link
+%D April 28, 1992
+%C Japan
+%I Telecommunication Technology Committee (TTC)
 
 %K jtq704
 %L JT-Q\)704
@@ -4397,6 +4791,31 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2960.txt
 
+%K ETSISCTP
+%L TS 102 144
+%A ETSI
+%R ESTI TS 102 144-V1.1.1 (2003-05)
+%T Services and Protocols for Advanced Networks (SPAN) \(em MTP/SCCP/SSCOP and SIGTRAN (Transport of SS7 over IP) \(em Stream Control Transmission Protocol (SCTP)
+%D May 2003
+%O (Endorsement of RFC 2060 and RFC 3309, modified)
+%C Sophia Antipolis Cedex
+%G DTS/SPAN-130265
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
+%K ETSITESTSCTP
+%L TS 102 369
+%A ETSI
+%R ETSI TS 102 369-V1.1.1 (2004-11)
+%T Methods for Testing and Specification (MTS); Stream Control Transmission Protocol (SCTP); Test Suite Structure and Test Purposes (TSS&TP)
+%D November 2004
+%C Sophia Antipolis Cedex
+%G DTS/MTS-00086
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
 %K rfc2976
 %L RFC 2976
 %R RFC 2976
@@ -4836,7 +5255,32 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3331.txt
 
-%K M3UA-RFC
+%K ETSIM2UA
+%L TS 102 141
+%A ETSI
+%R ETSI TS 102 141-V1.1.1 (2003-05)
+%T Services and Protocols for Advanced Networks (SPAN) \(em MTP/SCCP/SSCOP and SIGTRAN (Transport of SS7 over IP) \(em Message transfer part 2 User Adaptation layer (M2UA)
+%D May 2003
+%O (Endorsement of RFC 3331 (2002), modified)
+%C Sophia Antipolis Cedex
+%G DTS/SPAN-130262
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
+%K ETSITESTM2UA
+%L TS 102 380
+%A ETSI
+%R ETSI TS 102 380-V1.1.1 (2004-12)
+%T Methods for Testing and Specification (MTS); Message Transfer Part 2 - User Adaptation Layer (M2UA); Test Suite Structure and Test Purposes (TSS&TP)
+%D December 2004
+%C Sophia Antipolis Cedex
+%G DTS/MTS-00093
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
+%K RFC 3332
 %L M3UA
 %A Greg Sidebottom
 %A Ken Morneault
@@ -4847,6 +5291,67 @@ Part 1: Protocol Specification
 %D September 2002
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3332.txt
+
+%K TESTM3UA
+%L M3UA
+%R draft-anshoo-test-spec-m3ua-01.txt
+%A Anshoo Sharma
+%E Anshoo Sharma
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Test Specification for MTP3 User Adaptation
+%D May 2003
+%O Work in Progress.
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-anshoo-test-spec-m3ua-01.txt
+
+%K RFC 4666
+%L M3UA
+%A Ken Morneault
+%A Javier Pastor-Balbas, (eds)
+%Q Internet Engineering Task Force
+%T Signaling System 7 (SS7) Message Transfer Part 3 (MTP3) \(em User Adaptation Layer (M3UA)
+%R RFC 4666
+%D September 2006
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc4666.txt
+
+%K 3GPPM3UA
+%L TS 129 202
+%A ETSI
+%R ESTI TS 129 202-V6.0.0 (2004-12)
+%T Universal Mobile Telecommunications System (UMTS); Signalling System No. 7 (SS7) signalling transport in core network; Stage 3
+%D December 2004
+%O (3GPP TS 29.202 version 6.0.0 Release 6)
+%C Sophia Antipolis Cedex
+%G RTS/TSGN-0429292v600
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
+%K ETSIM3UA
+%L TS 102 142
+%A ETSI
+%R ESTI TS 102 142-V1.1.1 (2003-05)
+%T Services and Protocols for Advanced Networks (SPAN) \(em MTP/SCCP/SSCOP and SIGTRAN (Transport of SS7 over IP) \(em Message transfer part 3 User Adaptation layer (M3UA)
+%D May 2003
+%O (Endorsement of RFC 3332 (2002), modified)
+%C Sophia Antipolis Cedex
+%G DTS/SPAN-130263
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+
+%K ETSITESTM3UA
+%L TS 102 381
+%A ETSI
+%R ETSI TS 102 381-V1.1.1 (2004-12)
+%T Methods for Testing and Specification (MTS); Message Transfer Part 3 - User Adaptation Layer (IETF RFC 3332); Test Suite Structure and Test Purposes (TSS&TP)
+%D December 2004
+%C Sophia Antipolis Cedex
+%G DTS/MTS-00087
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
 
 %K rfc3361
 %L RFC 3361
@@ -5064,6 +5569,19 @@ Part 1: Protocol Specification
 %D  October 2004
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3868.txt
+
+%K ETSISUA
+%L TS 102 143
+%A ETSI
+%R ESTI TS 102 143-V1.1.1 (2003-05)
+%T Services and Protocols for Advanced Networks (SPAN) \(em MTP/SCCP/SSCOP and SIGTRAN (Transport of SS7 over IP) \(em Signalling connection control part User Adaptation layer (SUA)
+%D May 2003
+%O (Endorsement of SIGTRAN-SUA-14 (Decenber 2002), modified)
+%C Sophia Antipolis Cedex
+%G DTS/SPAN-130264
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
 
 %K SCTP-MIB
 %K rfc3873

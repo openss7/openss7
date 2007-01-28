@@ -1,3 +1,8 @@
+2007-01-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/m2ua-as.4.man: updated manual page
+	* doc/man/man4/m2ua_as.4.man: updated manual page
+
 2007-01-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man4/m2ua_as_ioctl.4.man: added

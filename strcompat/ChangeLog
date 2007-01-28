@@ -1,3 +1,8 @@
+2007-01-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strcompat.refs: updated references
+	* doc/man/man9/mi_copyout.9.man: updated manual page
+
 2007-01-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/kernel/mpscompat.c: some improvements to mi_copy_set_rval() it now

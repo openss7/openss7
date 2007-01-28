@@ -1,3 +1,7 @@
+2007-01-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strtty.refs: updated references
+
 2007-01-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* strtty.lsm.in: updated archive sizes
