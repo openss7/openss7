@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/01/26 21:54:33 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/01/28 01:09:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/26 21:54:33 $ by $Author: brian $
+ Last Modified $Date: 2007/01/28 01:09:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 0.9.2.5  2007/01/28 01:09:40  brian
+ - updated test programs and working up m2ua-as driver
+
  Revision 0.9.2.4  2007/01/26 21:54:33  brian
  - working up AS drivers and docs
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/01/26 21:54:33 $"
+#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/01/28 01:09:40 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/01/26 21:54:33 $";
+    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/01/28 01:09:40 $";
 
 /*
  *  This is an M2UA multiplexing driver.  It is necessary to use a multiplexing driver because most
@@ -163,9 +166,9 @@ static char const ident[] =
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
 
-#include <sys/ua_ioctl.h>
-//#include <sys/m2ua_ioctl.h>
-#include <sys/m2ua_as.h>
+//#include <sys/ua_ioctl.h>
+#include <sys/m2ua_lm.h>	/* M2UA Layer Management interface */
+#include <sys/m2ua_as_ioctl.h>	/* M2UA-AS input-output controls */
 
 #define SLLOGST	    1		/* log SL state transitions */
 #define SLLOGTO	    2		/* log SL timeouts */
@@ -177,7 +180,7 @@ static char const ident[] =
 /* ========================== */
 
 #define M2UA_MUX_DESCRIP	"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_MUX_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/01/26 21:54:33 $"
+#define M2UA_MUX_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/01/28 01:09:40 $"
 #define M2UA_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -325,6 +328,7 @@ struct tp {
 	struct {
 		struct sl *list;	/* list of SL structures associated with this SG */
 	} sl;
+	struct sl *lm;
 
 	spinlock_t lock;		/* lock: structure lock */
 	uint users;			/* lock: number of users */
@@ -433,10 +437,11 @@ struct {
 #define M2UA_SG_STATUS_CONG_ACCEPT	(1<<M2UA_STATUS_CONG_ACCEPT)
 #define M2UA_SG_STATUS_CONG_DISCARD	(1<<M2UA_STATUS_CONG_DISCARD)
 
+static struct sl *sl_ctrl = NULL;	/* master control stream */
 static caddr_t sl_opens = NULL;		/* open list */
 static caddr_t tp_links = NULL;		/* link list */
 
-/* this lock protects both sl_opens and tp_links lists */
+/* this lock protects sl_ctrl, sl_opens and tp_links lists */
 static rwlock_t sl_mux_lock = RW_LOCK_UNLOCKED;
 
 /* a request id for RKMM messages */
@@ -864,20 +869,75 @@ sl_not_s_state(struct sl *sl, uint mask)
  *  Structure Initialization and Termination.
  *  =========================================
  */
-static void
-sl_init_priv(struct sl *sl, queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp, mblk_t *t1,
-	     mblk_t *t2, uint32_t sgid)
+static int
+sl_init_priv(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp, minor_t unit)
 {
+	struct sl *sl = SL_PRIV(q);
+	mblk_t *t1 = NULL, *t2 = NULL;
+	int err;
+
 	/* initialize sl structure */
 	bzero(sl, sizeof(*sl));
-	sl->tp.tp = NULL;
-	sl->tp.next = NULL;
-	sl->tp.prev = &sl->tp.next;
+
+	if (!(t1 = mi_timer_alloc(WR(q), sizeof(int)))) {
+		err = ENOBUFS;
+		goto error;
+	}
+	if (!(t2 = mi_timer_alloc(WR(q), sizeof(int)))) {
+		err = ENOBUFS;
+		goto error;
+	}
+
+	if (unit == 0) {
+		/* When a zero minor device number was opened, the Stream is either a clone open or
+		   an attempt to open the master control Stream.  The difference is whether the
+		   sflag was DRVOPEN or CLONEOPEN. */
+		if (sflag == DRVOPEN) {
+			/* When the master control Stream is opened, another master control Stream
+			   must not yet exist.  If this is the only master control Stream then it
+			   is created. */
+			if (sl_ctrl != NULL) {
+				err = ENXIO;
+				goto error;
+			}
+			sl_ctrl = sl;
+		}
+		/* Both master control Streams and clone user Streams are disassociated with any
+		   specific SG.  Master control Streams are never associated with a specific SG.
+		   User Streams are associated with an SG using the sgid in the PPA to the
+		   LMI_ATTACH_REQ primtiive, or when an SCTP stream is temporarily linked under the
+		   driver using the I_LINK input-output control. */
+		sl->tp.tp = NULL;
+		sl->tp.next = NULL;
+		sl->tp.prev = &sl->tp.next;
+	} else {
+		struct tp *tp;
+
+		/* When a non-zero minor device number was opened, the Stream is automagically
+		   associated with the SG to which the minor device number corresponds.  It cannot
+		   be disassociated except when it is closed. */
+		for (tp = (struct tp *) mi_first_ptr(&tp_links); tp && tp->sg.id != unit;
+		     tp = (struct tp *) mi_next_ptr((caddr_t) tp)) ;
+		if (tp == NULL) {
+			err = ENXIO;
+			goto error;
+		}
+		if (tp->lm != NULL) {
+			/* For the time being there are locking issues with allowing a second upper
+			 * Stream on temporary links. */
+			err = ENXIO;
+			goto error;
+		}
+		if ((sl->tp.next = tp->sl.list))
+			sl->tp.next->tp.prev = &sl->tp.next;
+		sl->tp.prev = &(sl->tp.tp = tp)->sl.list;
+	}
 
 	sl->rq = RD(q);
 	sl->wq = WR(q);
 	sl->dev = *devp;
 	sl->cred = *crp;
+	sl->unit = unit;	/* this is the opened rather than the assigned minor number */
 
 	sl->mid = q->q_qinfo->qi_minfo->mi_idnum;
 	sl->sid = getminor(*devp);
@@ -888,7 +948,7 @@ sl_init_priv(struct sl *sl, queue_t *q, dev_t *devp, int oflags, int sflag, cred
 	sl->as.flags = 0;
 	sl->as.state = ASP_DOWN;
 
-	sl->as.config.ppa.sgid = sgid;
+	sl->as.config.ppa.sgid = unit;
 	sl->as.config.ppa.sdti = 0;
 	sl->as.config.ppa.sdli = 0;
 	sl->as.config.ppa.iid = 0;
@@ -969,7 +1029,13 @@ sl_init_priv(struct sl *sl, queue_t *q, dev_t *devp, int oflags, int sflag, cred
 	sl->sdt.config.f = FIXME;	/* number of flags between frames */
 #endif
 
-	return;
+	return (0);
+      error:
+	if (t1)
+		mi_timer_free(t1);
+	if (t2)
+		mi_timer_free(t2);
+	return (err);
 }
 static void
 sl_term_priv(struct sl *sl)
@@ -1194,6 +1260,53 @@ tp_unlock(struct tp *tp)
 	UNLOCK(&tp->lock, pl);
 }
 
+static inline struct tp *
+tp_acquire(queue_t *q)
+{
+	struct tp *tp;
+
+	read_lock(&sl_mux_lock);
+	if ((tp = TP_PRIV(q)) == NULL) {
+		/* Lower multiplex private structures can disappear between I_UNLINK/I_PUNLINK
+		   M_IOCTL and setq(9) back to the Stream head. */
+		read_unlock(&sl_mux_lock);
+		return (NULL);
+	}
+	if (!tp_trylock(tp, q)) {
+		read_unlock(&sl_mux_lock);
+		return (NULL);
+	}
+	read_unlock(&sl_mux_lock);
+	return (tp);
+}
+static inline void
+tp_release(struct tp *tp)
+{
+	tp_unlock(tp);
+}
+static inline struct tp *
+tp_exclusive(queue_t *q, queue_t *aq)
+{
+	struct tp *tp;
+
+	write_lock(&sl_mux_lock);
+	if ((tp = TP_PRIV(q)) == NULL) {
+		write_unlock(&sl_mux_lock);
+		return (NULL);
+	}
+	if (!tp_trylock(tp, aq)) {
+		write_unlock(&sl_mux_lock);
+		return (NULL);
+	}
+	return (tp);
+}
+static inline void
+tp_shared(struct tp *tp)
+{
+	tp_unlock(tp);
+	write_unlock(&sl_mux_lock);
+}
+
 static inline bool
 sl_trylock(struct sl *sl, queue_t *q)
 {
@@ -1205,6 +1318,28 @@ sl_unlock(struct sl *sl)
 {
 	/* for now */
 	return tp_unlock(sl->tp.tp);
+}
+
+static inline struct tp *
+sl_tp_acquire(struct sl *sl, queue_t *q)
+{
+	struct tp *tp;
+	read_lock(&sl_mux_lock);
+	if ((tp = sl->tp.tp) == NULL) {
+		read_unlock(&sl_mux_lock);
+		return (NULL);
+	}
+	if (!tp_trylock(tp, q)) {
+		read_unlock(&sl_mux_lock);
+		return (NULL);
+	}
+	read_unlock(&sl_mux_lock);
+	return (tp);
+}
+static inline void
+sl_tp_release(struct tp *tp)
+{
+	tp_unlock(tp);
 }
 
 
@@ -1532,7 +1667,6 @@ ua_dec_parm(uchar *beg, uchar *end, struct ua_parm *parm, uint32_t tag)
 
 }
 
-#if 0
 static noinline fastcall int
 m_hangup(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1547,7 +1681,6 @@ m_hangup(struct sl *sl, queue_t *q, mblk_t *msg)
 	}
 	return (-ENOBUFS);
 }
-#endif
 
 /*
  * M2UA to LM primitives.
@@ -1559,7 +1692,7 @@ m_hangup(struct sl *sl, queue_t *q, mblk_t *msg)
  * @sl: SL private structure
  * @q: active queue
  * @msg: message to free upon success
- * @index: multiplexer index
+ * @sgid: SG identifier
  * @rptr: responding address pointer
  * @rlen: responding address length
  * @optr: options pointer
@@ -1568,7 +1701,7 @@ m_hangup(struct sl *sl, queue_t *q, mblk_t *msg)
  * An establish confirmation is sent in response to a successful establish request.
  */
 static inline fastcall int
-m2_t_establish_con(struct sl *sl, queue_t *q, mblk_t *msg, int index, caddr_t rptr, size_t rlen,
+m2_t_establish_con(struct sl *sl, queue_t *q, mblk_t *msg, uint sgid, caddr_t rptr, size_t rlen,
 		   caddr_t optr, size_t olen)
 {
 	struct M2_t_establish_con *p;
@@ -1578,8 +1711,8 @@ m2_t_establish_con(struct sl *sl, queue_t *q, mblk_t *msg, int index, caddr_t rp
 		if (canputnext(sl->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
+			p->SG_id = sgid;
 			p->PRIM_type = M2_T_ESTABLISH_CON;
-			p->ASSOC_id = index;
 			p->RES_length = rlen;
 			p->RES_offset = sizeof(*p);
 			p->OPT_length = olen;
@@ -3801,6 +3934,7 @@ tp_send_asps_hbeat_req(struct tp *tp, queue_t *q, mblk_t *msg, caddr_t hptr, siz
 /**
  * sl_send_asps_hbeat_req: - send a BEAT message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  * @hptr: heartbeat info pointer
@@ -3810,7 +3944,7 @@ tp_send_asps_hbeat_req(struct tp *tp, queue_t *q, mblk_t *msg, caddr_t hptr, siz
  * sent on the same SCTP stream identifier as is data for the signalling link.
  */
 fastcall int
-sl_send_asps_hbeat_req(struct sl *sl, queue_t *q, mblk_t *msg, caddr_t hptr, size_t hlen)
+sl_send_asps_hbeat_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *msg, caddr_t hptr, size_t hlen)
 {
 	int err;
 	mblk_t *mp;
@@ -3850,7 +3984,7 @@ sl_send_asps_hbeat_req(struct sl *sl, queue_t *q, mblk_t *msg, caddr_t hptr, siz
 		/* send ordered on specified stream */
 
 		strlog(sl->mid, sl->sid, SLLOGTX, SL_TRACE, "ASPS BEAT Req ->");
-		if (unlikely((err = t_optdata_req(sl->tp.tp, q, msg, 0, sl->streamid, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -3899,6 +4033,7 @@ tp_send_asps_hbeat_ack(struct tp *tp, queue_t *q, mblk_t *msg, caddr_t hptr, siz
 /**
  * sl_send_asps_hbeat_ack: - send a BEAT Ack message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  * @hptr: heartbeat data pointer
@@ -3908,7 +4043,7 @@ tp_send_asps_hbeat_ack(struct tp *tp, queue_t *q, mblk_t *msg, caddr_t hptr, siz
  * sent on the same SCTP stream identifier as is used for data (MAUP) messages.
  */
 static fastcall int
-sl_send_asps_hbeat_ack(struct sl *sl, queue_t *q, mblk_t *msg, caddr_t hptr, size_t hlen)
+sl_send_asps_hbeat_ack(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *msg, caddr_t hptr, size_t hlen)
 {
 	int err;
 	mblk_t *mp;
@@ -3928,7 +4063,7 @@ sl_send_asps_hbeat_ack(struct sl *sl, queue_t *q, mblk_t *msg, caddr_t hptr, siz
 		/* send ordered on specified stream */
 
 		strlog(sl->mid, sl->sid, SLLOGTX, SL_TRACE, "ASPS BEAT Req ->");
-		if (unlikely((err = t_optdata_req(sl->tp.tp, q, msg, 0, sl->streamid, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -3938,6 +4073,7 @@ sl_send_asps_hbeat_ack(struct sl *sl, queue_t *q, mblk_t *msg, caddr_t hptr, siz
 /**
  * sl_send_aspt_aspac_req: - send an ASP Active Request
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  * @iptr: info pointer
@@ -3948,7 +4084,7 @@ sl_send_asps_hbeat_ack(struct sl *sl, queue_t *q, mblk_t *msg, caddr_t hptr, siz
  * (LMI_DISABLE_REQ).
  */
 static int
-sl_send_aspt_aspac_req(struct sl *sl, queue_t *q, mblk_t *msg, caddr_t iptr, size_t ilen)
+sl_send_aspt_aspac_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *msg, caddr_t iptr, size_t ilen)
 {
 	int err;
 	mblk_t *mp;
@@ -3995,7 +4131,7 @@ sl_send_aspt_aspac_req(struct sl *sl, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 
 		strlog(sl->mid, sl->sid, SLLOGTX, SL_TRACE, "ASPT ASPAC Req ->");
 		/* always sent on same stream as data */
-		if (unlikely((err = t_optdata_req(sl->tp.tp, q, msg, 0, sl->streamid, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -4075,7 +4211,7 @@ tp_send_aspt_aspia_req(struct tp *tp, queue_t *q, mblk_t *msg, uint32_t *iid, ca
  * (LMI_ENABLE_REQ).
  */
 static int
-sl_send_aspt_aspia_req(struct sl *sl, queue_t *q, mblk_t *msg, caddr_t iptr, size_t ilen)
+sl_send_aspt_aspia_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *msg, caddr_t iptr, size_t ilen)
 {
 	int err;
 	mblk_t *mp;
@@ -4116,7 +4252,7 @@ sl_send_aspt_aspia_req(struct sl *sl, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 
 		strlog(sl->mid, sl->sid, SLLOGTX, SL_TRACE, "ASPT ASPIA Req ->");
 		/* always sent on same stream as data */
-		if (unlikely((err = t_optdata_req(sl->tp.tp, q, msg, 0, sl->streamid, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -4126,6 +4262,7 @@ sl_send_aspt_aspia_req(struct sl *sl, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 /**
  * sl_send_rkmm_reg_req: - send REG REQ
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  * @id: request identifier
@@ -4136,7 +4273,7 @@ sl_send_aspt_aspia_req(struct sl *sl, queue_t *q, mblk_t *msg, caddr_t iptr, siz
  * controls) and the SG is a Style II SG (that is, it supports registration requests).
  */
 static int
-sl_send_rkmm_reg_req(struct sl *sl, queue_t *q, mblk_t *msg, uint32_t id, uint16_t sdti,
+sl_send_rkmm_reg_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *msg, uint32_t id, uint16_t sdti,
 		     uint16_t sdli)
 {
 	int err;
@@ -4159,7 +4296,7 @@ sl_send_rkmm_reg_req(struct sl *sl, queue_t *q, mblk_t *msg, uint32_t id, uint16
 		mp->b_wptr = (unsigned char *) p;
 
 		strlog(sl->mid, sl->sid, SLLOGTX, SL_TRACE, "RKMM REG Req ->");
-		if (unlikely((err = t_optdata_req(sl->tp.tp, q, msg, T_ODF_EX, 0, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, T_ODF_EX, 0, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -4169,11 +4306,12 @@ sl_send_rkmm_reg_req(struct sl *sl, queue_t *q, mblk_t *msg, uint32_t id, uint16
 /**
  * sl_send_rkmm_dereg_req: - send DEREG REQ
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  */
 static int
-sl_send_rkmm_dereg_req(struct sl *sl, queue_t *q, mblk_t *msg)
+sl_send_rkmm_dereg_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *msg)
 {
 	int err;
 	mblk_t *mp;
@@ -4201,7 +4339,7 @@ sl_send_rkmm_dereg_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		mp->b_wptr = (unsigned char *) p;
 
 		strlog(sl->mid, sl->sid, SLLOGTX, SL_TRACE, "RKMM DEREG Req ->");
-		if (unlikely((err = t_optdata_req(sl->tp.tp, q, msg, T_ODF_EX, 0, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, T_ODF_EX, 0, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -4211,12 +4349,13 @@ sl_send_rkmm_dereg_req(struct sl *sl, queue_t *q, mblk_t *msg)
 /**
  * sl_send_maup_data1: - send DATA1
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  * @dp: user data
  */
 static inline fastcall __hot_write int
-sl_send_maup_data1(struct sl *sl, queue_t *q, mblk_t *msg, mblk_t *dp)
+sl_send_maup_data1(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *msg, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -4247,7 +4386,7 @@ sl_send_maup_data1(struct sl *sl, queue_t *q, mblk_t *msg, mblk_t *dp)
 
 		mp->b_cont = dp->b_cont;
 		strlog(sl->mid, sl->sid, SLLOGDA, SL_TRACE, "MAUP DATA1 ->");
-		if (unlikely((err = t_optdata_req(sl->tp.tp, q, msg, 0, sl->streamid, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -4257,13 +4396,14 @@ sl_send_maup_data1(struct sl *sl, queue_t *q, mblk_t *msg, mblk_t *dp)
 /**
  * sl_send_maup_data2: - send DATA2
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  * @dp: user data
  * @pri: message priority (placed in first byte of message)
  */
 static inline fastcall __hot_write int
-sl_send_maup_data2(struct sl *sl, queue_t *q, mblk_t *msg, mblk_t *dp, uint8_t pri)
+sl_send_maup_data2(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *msg, mblk_t *dp, uint8_t pri)
 {
 	int err;
 	mblk_t *mp;
@@ -4295,7 +4435,7 @@ sl_send_maup_data2(struct sl *sl, queue_t *q, mblk_t *msg, mblk_t *dp, uint8_t p
 
 		mp->b_cont = dp->b_cont;
 		strlog(sl->mid, sl->sid, SLLOGDA, SL_TRACE, "MAUP DATA2 ->");
-		if (unlikely((err = t_optdata_req(sl->tp.tp, q, msg, 0, sl->streamid, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -4305,11 +4445,12 @@ sl_send_maup_data2(struct sl *sl, queue_t *q, mblk_t *msg, mblk_t *dp, uint8_t p
 /**
  * sl_send_maup_estab_req: - send MAUP Establish Request
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  */
 static int
-sl_send_maup_estab_req(struct sl *sl, queue_t *q, mblk_t *msg)
+sl_send_maup_estab_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *msg)
 {
 	int err;
 	mblk_t *mp;
@@ -4339,7 +4480,7 @@ sl_send_maup_estab_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		sl_set_l_state(sl, DL_OUTCON_PENDING);
 
 		strlog(sl->mid, sl->sid, SLLOGTX, SL_TRACE, "MAUP ESTAB Req ->");
-		if (unlikely((err = t_optdata_req(sl->tp.tp, q, msg, 0, sl->streamid, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -4349,11 +4490,12 @@ sl_send_maup_estab_req(struct sl *sl, queue_t *q, mblk_t *msg)
 /**
  * sl_send_maup_rel_req: - send MAUP Release Request
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  */
 static int
-sl_send_maup_rel_req(struct sl *sl, queue_t *q, mblk_t *msg)
+sl_send_maup_rel_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *msg)
 {
 	int err;
 	mblk_t *mp;
@@ -4403,7 +4545,7 @@ sl_send_maup_rel_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		}
 
 		strlog(sl->mid, sl->sid, SLLOGTX, SL_TRACE, "MAUP REL Req ->");
-		if (unlikely((err = t_optdata_req(sl->tp.tp, q, msg, 0, sl->streamid, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -4413,12 +4555,13 @@ sl_send_maup_rel_req(struct sl *sl, queue_t *q, mblk_t *msg)
 /**
  * sl_send_maup_state_req: - send MAUP State Request
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  * @request: state request
  */
 static int
-sl_send_maup_state_req(struct sl *sl, queue_t *q, mblk_t *msg, const uint32_t request)
+sl_send_maup_state_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *msg, const uint32_t request)
 {
 	int err;
 	mblk_t *mp;
@@ -4451,7 +4594,7 @@ sl_send_maup_state_req(struct sl *sl, queue_t *q, mblk_t *msg, const uint32_t re
 
 		sl->status.pending |= (1 << request);
 		strlog(sl->mid, sl->sid, SLLOGTX, SL_TRACE, "MAUP STATE Req ->");
-		if (unlikely((err = t_optdata_req(sl->tp.tp, q, msg, 0, sl->streamid, mp)))) {
+		if (unlikely((err = t_optdata_req(tp, q, msg, 0, sl->streamid, mp)))) {
 			freeb(mp);
 			sl->status.pending &= ~(1 << request);
 		}
@@ -4463,12 +4606,13 @@ sl_send_maup_state_req(struct sl *sl, queue_t *q, mblk_t *msg, const uint32_t re
 /**
  * sl_send_maup_retr_req: - send MAUP Retrieval Request
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  * @fsnc: optional FSNC value
  */
 static int
-sl_send_maup_retr_req(struct sl *sl, queue_t *q, mblk_t *msg, uint32_t *fsnc)
+sl_send_maup_retr_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *msg, uint32_t *fsnc)
 {
 	int err;
 	mblk_t *mp;
@@ -4506,7 +4650,7 @@ sl_send_maup_retr_req(struct sl *sl, queue_t *q, mblk_t *msg, uint32_t *fsnc)
 		mp->b_wptr = (unsigned char *) p;
 
 		strlog(sl->mid, sl->sid, SLLOGTX, SL_TRACE, "MAUP RETR Req ->");
-		if (unlikely((err = t_optdata_req(sl->tp.tp, q, msg, 0, sl->streamid, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -4517,12 +4661,13 @@ sl_send_maup_retr_req(struct sl *sl, queue_t *q, mblk_t *msg, uint32_t *fsnc)
 /**
  * sl_send_maup_data_ack: - send MAUP Data Ack
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue
  * @msg: message to free upon success
  * @corid: correlation id
  */
 static inline fastcall __hot_in int
-sl_send_maup_data_ack(struct sl *sl, queue_t *q, mblk_t *msg, uint32_t corid)
+sl_send_maup_data_ack(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *msg, uint32_t corid)
 {
 	int err;
 	mblk_t *mp;
@@ -4554,7 +4699,7 @@ sl_send_maup_data_ack(struct sl *sl, queue_t *q, mblk_t *msg, uint32_t corid)
 		mp->b_wptr = (unsigned char *) p;
 
 		strlog(sl->mid, sl->sid, SLLOGTX, SL_TRACE, "MAUP DATA Ack ->");
-		if (unlikely((err = t_optdata_req(sl->tp.tp, q, msg, 0, sl->streamid, mp))))
+		if (unlikely((err = t_optdata_req(tp, q, msg, 0, sl->streamid, mp))))
 			freeb(mp);
 		return (err);
 	}
@@ -4640,13 +4785,14 @@ tp_recv_mgmt_err(struct tp *tp, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_mgmt_ntfy: - receive MGMT NTFY message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  *
  * Notification messages pertaning to an AS or AS state change must contain an IID.
  */
 static int
-sl_recv_mgmt_ntfy(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_mgmt_ntfy(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm status;
 	int ecode;
@@ -4716,7 +4862,7 @@ sl_recv_mgmt_ntfy(struct sl *sl, queue_t *q, mblk_t *mp)
 	ecode = UA_ECODE_MISSING_PARAMETER;
 	goto error;
       error:
-	return tp_send_mgmt_err(sl->tp.tp, q, mp, ecode, mp->b_rptr, mp->b_wptr - mp->b_rptr);
+	return tp_send_mgmt_err(tp, q, mp, ecode, mp->b_rptr, mp->b_wptr - mp->b_rptr);
 }
 
 /**
@@ -4733,7 +4879,7 @@ tp_recv_mgmt_ntfy(struct tp *tp, queue_t *q, mblk_t *mp)
 	int ecode;
 
 	if ((sl = sl_lookup(tp, q, mp, NULL)))
-		return sl_recv_mgmt_ntfy(sl, q, mp);
+		return sl_recv_mgmt_ntfy(sl, tp, q, mp);
 
 	if (!ua_dec_parm(mp->b_rptr, mp->b_wptr, &status, UA_PARM_STATUS))
 		goto missing_parm;
@@ -4788,7 +4934,7 @@ tp_recv_asps_hbeat_req(struct tp *tp, queue_t *q, mblk_t *mp)
 		return (-EINVAL);
 
 	if ((sl = sl_lookup(tp, q, mp, NULL)))
-		return sl_send_asps_hbeat_ack(sl, q, mp, hbeat.cp, hbeat.len);
+		return sl_send_asps_hbeat_ack(sl, tp, q, mp, hbeat.cp, hbeat.len);
 
 	/* process as normal */
 	return tp_send_asps_hbeat_ack(tp, q, mp, hbeat.cp, hbeat.len);
@@ -4994,7 +5140,7 @@ tp_recv_asps_hbeat_ack(struct tp *tp, queue_t *q, mblk_t *mp)
  * @mp: the message
  */
 static int
-sl_recv_aspt_aspac_ack(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_aspt_aspac_ack(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm parm = { {NULL,}, };
 	int ecode;
@@ -5006,7 +5152,7 @@ sl_recv_aspt_aspac_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 	case ASP_WACK_ASPAC:
 		if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &parm, UA_PARM_TMODE))
 			sl->as.config.ppa.tmode = parm.val;
-		if (sl->tp.tp && (sl->tp.tp->sp.options.options.popt & M2UA_SG_SGINFO)) {
+		if (tp->sp.options.options.popt & M2UA_SG_SGINFO) {
 			if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &parm, UA_PARM_PROTO_LIMITS)) {
 				/* update the protocol limits information per
 				   draft-bidulock-sigtran-sginfo */
@@ -5036,7 +5182,7 @@ sl_recv_aspt_aspac_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 	ecode = UA_ECODE_UNEXPECTED_MESSAGE;
 	goto error;
       error:
-	return tp_send_mgmt_err(sl->tp.tp, q, mp, ecode, mp->b_rptr, mp->b_wptr - mp->b_rptr);
+	return tp_send_mgmt_err(tp, q, mp, ecode, mp->b_rptr, mp->b_wptr - mp->b_rptr);
 }
 
 /**
@@ -5052,7 +5198,7 @@ tp_recv_aspt_aspac_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 	int ecode;
 
 	if ((sl = sl_lookup(tp, q, mp, NULL)))
-		return sl_recv_aspt_aspac_ack(sl, q, mp);
+		return sl_recv_aspt_aspac_ack(sl, tp, q, mp);
 
 	mi_timer_stop(tp->wack_aspac);
 	goto protocol_error;
@@ -5173,6 +5319,7 @@ tp_recv_aspt_aspia_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_maup_estab_con: - receive ESTAB Con message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  *
@@ -5180,7 +5327,7 @@ tp_recv_aspt_aspia_ack(struct tp *tp, queue_t *q, mblk_t *mp)
  * for outstate, we should try to restore synchronization of link state.
  */
 static int
-sl_recv_maup_estab_con(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_maup_estab_con(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err;
 
@@ -5205,6 +5352,7 @@ sl_recv_maup_estab_con(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_maup_rel_con: - receive REL Con message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  *
@@ -5212,7 +5360,7 @@ sl_recv_maup_estab_con(struct sl *sl, queue_t *q, mblk_t *mp)
  * state.
  */
 static int
-sl_recv_maup_rel_con(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_maup_rel_con(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err;
 
@@ -5238,6 +5386,7 @@ sl_recv_maup_rel_con(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_maup_rel_ind: - receive REL Ind message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  *
@@ -5245,7 +5394,7 @@ sl_recv_maup_rel_con(struct sl *sl, queue_t *q, mblk_t *mp)
  * indication does not provide the reason for failure (release).
  */
 static int
-sl_recv_maup_rel_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_maup_rel_ind(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err;
 
@@ -5275,6 +5424,7 @@ sl_recv_maup_rel_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_status_lpo_set: - receive Status LPO Set message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  *
@@ -5282,7 +5432,7 @@ sl_recv_maup_rel_ind(struct sl *sl, queue_t *q, mblk_t *mp)
  * the appropriate state if necessary.
  */
 static int
-sl_recv_status_lpo_set(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_status_lpo_set(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	if (sl->status.pending & (1 << M2UA_STATUS_LPO_SET)) {
 		sl->status.pending &= ~(1 << M2UA_STATUS_LPO_SET);
@@ -5293,7 +5443,7 @@ sl_recv_status_lpo_set(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (sl->status.operate & (1 << M2UA_STATUS_LPO_SET))
 		goto discard;
 	if (!(sl->status.pending & (1 << M2UA_STATUS_LPO_CLEAR)))
-		return sl_send_maup_state_req(sl, q, mp, M2UA_STATUS_LPO_CLEAR);
+		return sl_send_maup_state_req(sl, tp, q, mp, M2UA_STATUS_LPO_CLEAR);
 	goto discard;
       discard:
 	freemsg(mp);
@@ -5303,6 +5453,7 @@ sl_recv_status_lpo_set(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_status_lpo_clear: - receive Status LPO Clear message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  *
@@ -5310,7 +5461,7 @@ sl_recv_status_lpo_set(struct sl *sl, queue_t *q, mblk_t *mp)
  * the appropriate state if necessary.
  */
 static int
-sl_recv_status_lpo_clear(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_status_lpo_clear(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	if (sl->status.pending & (1 << M2UA_STATUS_LPO_CLEAR)) {
 		sl->status.pending &= ~(1 << M2UA_STATUS_LPO_CLEAR);
@@ -5321,7 +5472,7 @@ sl_recv_status_lpo_clear(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (sl->status.operate & (1 << M2UA_STATUS_LPO_CLEAR))
 		goto discard;
 	if (!(sl->status.pending & (1 << M2UA_STATUS_LPO_SET)))
-		return sl_send_maup_state_req(sl, q, mp, M2UA_STATUS_LPO_SET);
+		return sl_send_maup_state_req(sl, tp, q, mp, M2UA_STATUS_LPO_SET);
 	goto discard;
       discard:
 	freemsg(mp);
@@ -5331,6 +5482,7 @@ sl_recv_status_lpo_clear(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_status_emer_set: - receive Status EMER Set message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  *
@@ -5338,7 +5490,7 @@ sl_recv_status_lpo_clear(struct sl *sl, queue_t *q, mblk_t *mp)
  * the appropriate state if necessary.
  */
 static int
-sl_recv_status_emer_set(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_status_emer_set(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	if (sl->status.pending & (1 << M2UA_STATUS_EMER_SET)) {
 		sl->status.pending &= ~(1 << M2UA_STATUS_EMER_SET);
@@ -5349,7 +5501,7 @@ sl_recv_status_emer_set(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (sl->status.operate & (1 << M2UA_STATUS_EMER_SET))
 		goto discard;
 	if (!(sl->status.pending & (1 << M2UA_STATUS_EMER_CLEAR)))
-		return sl_send_maup_state_req(sl, q, mp, M2UA_STATUS_EMER_CLEAR);
+		return sl_send_maup_state_req(sl, tp, q, mp, M2UA_STATUS_EMER_CLEAR);
 	goto discard;
       discard:
 	freemsg(mp);
@@ -5359,11 +5511,12 @@ sl_recv_status_emer_set(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_status_emer_clear: - receive Status EMER Clear message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_status_emer_clear(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_status_emer_clear(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	if (sl->status.pending & (1 << M2UA_STATUS_EMER_CLEAR)) {
 		sl->status.pending &= ~(1 << M2UA_STATUS_EMER_CLEAR);
@@ -5372,7 +5525,7 @@ sl_recv_status_emer_clear(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (!(sl->status.pending & (1 << M2UA_STATUS_AUDIT)))
 		strlog(sl->mid, sl->sid, 0, SL_TRACE, "Status EMER Clear confirmation unexpected");
 	if (!(sl->status.pending & (1 << M2UA_STATUS_EMER_SET)))
-		return sl_send_maup_state_req(sl, q, mp, M2UA_STATUS_EMER_SET);
+		return sl_send_maup_state_req(sl, tp, q, mp, M2UA_STATUS_EMER_SET);
 	goto discard;
       discard:
 	freemsg(mp);
@@ -5382,11 +5535,12 @@ sl_recv_status_emer_clear(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_status_flush_buffers: - receive Status Flush Buffers message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_status_flush_buffers(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_status_flush_buffers(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	if (sl->status.pending & (1 << M2UA_STATUS_FLUSH_BUFFERS)) {
 		// sl->status.pending &= ~(1<<M2UA_STATUS_FLUSH_BUFFERS);
@@ -5402,11 +5556,12 @@ sl_recv_status_flush_buffers(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_status_continue: - receive Status Continue message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_status_continue(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_status_continue(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	if (sl->status.pending & (1 << M2UA_STATUS_CONTINUE)) {
 		sl->status.pending &= ~(1 << M2UA_STATUS_CONTINUE);
@@ -5424,11 +5579,12 @@ sl_recv_status_continue(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_status_clear_rtb: - receive Status Clear RTB message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_status_clear_rtb(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_status_clear_rtb(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	if (sl->status.pending & (1 << M2UA_STATUS_CLEAR_RTB)) {
 		// sl->status.pending &= ~(1<<M2UA_STATUS_CLEAR_RTB);
@@ -5445,11 +5601,12 @@ sl_recv_status_clear_rtb(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_status_audit: - receive Status Audit message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_status_audit(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_status_audit(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	if (sl->status.pending & (1 << M2UA_STATUS_AUDIT)) {
 		sl->status.pending &= ~(1 << M2UA_STATUS_AUDIT);
@@ -5466,11 +5623,12 @@ sl_recv_status_audit(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_status_cong_clear: - receive Status CONG Clear message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_status_cong_clear(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_status_cong_clear(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	if (sl->status.pending & (1 << M2UA_STATUS_CONG_CLEAR)) {
 		sl->status.pending &= ~(1 << M2UA_STATUS_CONG_CLEAR);
@@ -5487,11 +5645,12 @@ sl_recv_status_cong_clear(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_status_cong_accept: - receive Status CONG Accept message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_status_cong_accept(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_status_cong_accept(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	if (sl->status.pending & (1 << M2UA_STATUS_CONG_ACCEPT)) {
 		sl->status.pending &= ~(1 << M2UA_STATUS_CONG_ACCEPT);
@@ -5508,11 +5667,12 @@ sl_recv_status_cong_accept(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_status_cong_discard: - receive Status CONG Discard message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_status_cong_discard(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_status_cong_discard(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	if (sl->status.pending & (1 << M2UA_STATUS_CONG_DISCARD)) {
 		sl->status.pending &= ~(1 << M2UA_STATUS_CONG_DISCARD);
@@ -5555,38 +5715,39 @@ enum {
 /**
  * sl_recv_maup_state_con: - receive State Con message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_maup_state_con(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_maup_state_con(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm status = { {NULL,}, };
 
 	if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &status, M2UA_PARM_STATE_REQUEST)) {
 		switch (status.val) {
 		case M2UA_STATUS_LPO_SET:
-			return sl_recv_status_lpo_set(sl, q, mp);
+			return sl_recv_status_lpo_set(sl, tp, q, mp);
 		case M2UA_STATUS_LPO_CLEAR:
-			return sl_recv_status_lpo_clear(sl, q, mp);
+			return sl_recv_status_lpo_clear(sl, tp, q, mp);
 		case M2UA_STATUS_EMER_SET:
-			return sl_recv_status_emer_set(sl, q, mp);
+			return sl_recv_status_emer_set(sl, tp, q, mp);
 		case M2UA_STATUS_EMER_CLEAR:
-			return sl_recv_status_emer_clear(sl, q, mp);
+			return sl_recv_status_emer_clear(sl, tp, q, mp);
 		case M2UA_STATUS_FLUSH_BUFFERS:
-			return sl_recv_status_flush_buffers(sl, q, mp);
+			return sl_recv_status_flush_buffers(sl, tp, q, mp);
 		case M2UA_STATUS_CONTINUE:
-			return sl_recv_status_continue(sl, q, mp);
+			return sl_recv_status_continue(sl, tp, q, mp);
 		case M2UA_STATUS_CLEAR_RTB:
-			return sl_recv_status_clear_rtb(sl, q, mp);
+			return sl_recv_status_clear_rtb(sl, tp, q, mp);
 		case M2UA_STATUS_AUDIT:
-			return sl_recv_status_audit(sl, q, mp);
+			return sl_recv_status_audit(sl, tp, q, mp);
 		case M2UA_STATUS_CONG_CLEAR:
-			return sl_recv_status_cong_clear(sl, q, mp);
+			return sl_recv_status_cong_clear(sl, tp, q, mp);
 		case M2UA_STATUS_CONG_ACCEPT:
-			return sl_recv_status_cong_accept(sl, q, mp);
+			return sl_recv_status_cong_accept(sl, tp, q, mp);
 		case M2UA_STATUS_CONG_DISCARD:
-			return sl_recv_status_cong_discard(sl, q, mp);
+			return sl_recv_status_cong_discard(sl, tp, q, mp);
 		default:
 			return (-EOPNOTSUPP);
 		}
@@ -5658,11 +5819,12 @@ enum {
 /**
  * sl_recv_maup_state_ind: - receive STATE Ind message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_maup_state_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_maup_state_ind(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm event = { {NULL,}, };
 
@@ -5686,11 +5848,12 @@ sl_recv_maup_state_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_maup_retr_con: - receive RETR Con message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_maup_retr_con(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_maup_retr_con(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm action, bsnt;
 
@@ -5714,11 +5877,12 @@ sl_recv_maup_retr_con(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_maup_retr_ind: - receive RETR Ind message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_maup_retr_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_maup_retr_ind(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm data;
 	unsigned char *b_rptr = mp->b_rptr;
@@ -5744,11 +5908,12 @@ sl_recv_maup_retr_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_maup_retr_comp_ind: - receive RETR COMP Ind message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_maup_retr_comp_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_maup_retr_comp_ind(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm data;
 	unsigned char *b_rptr = mp->b_rptr;
@@ -5774,11 +5939,12 @@ sl_recv_maup_retr_comp_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_recv_maup_cong_ind: - receive CONG Ind message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_maup_cong_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_maup_cong_ind(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm cong, disc;
 	int ecode;
@@ -5794,17 +5960,18 @@ sl_recv_maup_cong_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	ecode = UA_ECODE_MISSING_PARAMETER;
 	goto error;
       error:
-	return tp_send_mgmt_err(sl->tp.tp, q, mp, ecode, mp->b_rptr, mp->b_wptr - mp->b_rptr);
+	return tp_send_mgmt_err(tp, q, mp, ecode, mp->b_rptr, mp->b_wptr - mp->b_rptr);
 }
 
 /**
  * sl_recv_maup_data: - receive DATA message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static fastcall __hot_in int
-sl_recv_maup_data(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_maup_data(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	unsigned char *b_rptr = mp->b_rptr;
 	struct ua_parm data;
@@ -5829,7 +5996,7 @@ sl_recv_maup_data(struct sl *sl, queue_t *q, mblk_t *mp)
 	ecode = UA_ECODE_MISSING_PARAMETER;
 	goto error;
       error:
-	return tp_send_mgmt_err(sl->tp.tp, q, mp, ecode, mp->b_rptr, mp->b_wptr - mp->b_rptr);
+	return tp_send_mgmt_err(tp, q, mp, ecode, mp->b_rptr, mp->b_wptr - mp->b_rptr);
 }
 
 /**
@@ -5846,17 +6013,18 @@ tp_recv_maup_data(struct tp *tp, queue_t *q, mblk_t *mp)
 
 	if (!(sl = sl_lookup(tp, q, mp, &err)) && err)
 		return (err);
-	return sl_recv_maup_data(sl, q, mp);
+	return sl_recv_maup_data(sl, tp, q, mp);
 }
 
 /**
  * sl_recv_maup_data_ack: - receive DATA Ack message
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-sl_recv_maup_data_ack(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_maup_data_ack(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	/* ignore for now */
 	freemsg(mp);
@@ -6143,47 +6311,47 @@ tp_recv_maup(struct tp *tp, queue_t *q, mblk_t *mp)
 	switch (UA_MSG_TYPE(p[0])) {
 	case M2UA_MAUP_ESTAB_CON:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "ESTAB Con <-");
-		err = sl_recv_maup_estab_con(sl, q, mp);
+		err = sl_recv_maup_estab_con(sl, tp, q, mp);
 		break;
 	case M2UA_MAUP_REL_CON:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "REL Con <-");
-		err = sl_recv_maup_rel_con(sl, q, mp);
+		err = sl_recv_maup_rel_con(sl, tp, q, mp);
 		break;
 	case M2UA_MAUP_REL_IND:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "REL Ind <-");
-		err = sl_recv_maup_rel_ind(sl, q, mp);
+		err = sl_recv_maup_rel_ind(sl, tp, q, mp);
 		break;
 	case M2UA_MAUP_STATE_CON:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "STATE Con <-");
-		err = sl_recv_maup_state_con(sl, q, mp);
+		err = sl_recv_maup_state_con(sl, tp, q, mp);
 		break;
 	case M2UA_MAUP_STATE_IND:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "STATE Ind <-");
-		err = sl_recv_maup_state_ind(sl, q, mp);
+		err = sl_recv_maup_state_ind(sl, tp, q, mp);
 		break;
 	case M2UA_MAUP_RETR_CON:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "RETR Con <-");
-		err = sl_recv_maup_retr_con(sl, q, mp);
+		err = sl_recv_maup_retr_con(sl, tp, q, mp);
 		break;
 	case M2UA_MAUP_RETR_IND:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "RETR Ind <-");
-		err = sl_recv_maup_retr_ind(sl, q, mp);
+		err = sl_recv_maup_retr_ind(sl, tp, q, mp);
 		break;
 	case M2UA_MAUP_RETR_COMP_IND:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "RETR COMP Ind <-");
-		err = sl_recv_maup_retr_comp_ind(sl, q, mp);
+		err = sl_recv_maup_retr_comp_ind(sl, tp, q, mp);
 		break;
 	case M2UA_MAUP_CONG_IND:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "CONG Ind <-");
-		err = sl_recv_maup_cong_ind(sl, q, mp);
+		err = sl_recv_maup_cong_ind(sl, tp, q, mp);
 		break;
 	case M2UA_MAUP_DATA:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "DATA <-");
-		err = sl_recv_maup_data(sl, q, mp);
+		err = sl_recv_maup_data(sl, tp, q, mp);
 		break;
 	case M2UA_MAUP_DATA_ACK:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "DATA Ack <-");
-		err = sl_recv_maup_data_ack(sl, q, mp);
+		err = sl_recv_maup_data_ack(sl, tp, q, mp);
 		break;
 	default:
 		err = (-EOPNOTSUPP);
@@ -6339,6 +6507,7 @@ lmi_info_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * lmi_attach_req - process LMI_ATTACH_REQ primtive
  * @sl: SL private structure
+ * @tp: SL private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  *
@@ -6515,7 +6684,7 @@ lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		sl_set_u_state(sl, ASP_WACK_ASPUP);
 		/* issue registation request */
 		sl->request_id = atomic_inc_return(&sl_request_id);
-		return sl_send_rkmm_reg_req(sl, q, mp, sl->request_id, sl->as.config.ppa.sdti,
+		return sl_send_rkmm_reg_req(sl, tp, q, mp, sl->request_id, sl->as.config.ppa.sdti,
 					    sl->as.config.ppa.sdli);
 	} else {
 		write_unlock(&sl_mux_lock);
@@ -6538,14 +6707,14 @@ lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * lmi_detach_req - process LMI_DETACH_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-lmi_detach_req(struct sl *sl, queue_t *q, mblk_t *mp)
+lmi_detach_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	lmi_detach_req_t *p = (typeof(p)) mp->b_rptr;
-	struct tp *tp = sl->tp.tp;
 	int err;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -6573,7 +6742,7 @@ lmi_detach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 			/* ETSI TS 102 141 does not permit dynamic configuration. */
 			/* need to deregister */
 			sl_set_u_state(sl, ASP_WACK_ASPDN);
-			return sl_send_rkmm_dereg_req(sl, q, mp);
+			return sl_send_rkmm_dereg_req(sl, tp, q, mp);
 		}
 		break;
 	case ASP_WACK_ASPDN:
@@ -6616,6 +6785,7 @@ lmi_detach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * lmi_enable_req - process LMI_ENABLE_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  *
@@ -6630,10 +6800,9 @@ lmi_detach_req(struct sl *sl, queue_t *q, mblk_t *mp)
  * LMI_ENABLE_REQ.
  */
 static noinline fastcall int
-lmi_enable_req(struct sl *sl, queue_t *q, mblk_t *mp)
+lmi_enable_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
-	struct tp *tp = sl->tp.tp;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto tooshort;
@@ -6645,7 +6814,7 @@ lmi_enable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (sl_get_u_state(sl) != ASP_INACTIVE)
 		goto unspec;
 	sl_set_u_state(sl, ASP_WACK_ASPAC);
-	return sl_send_aspt_aspac_req(sl, q, mp, NULL, 0);
+	return sl_send_aspt_aspac_req(sl, tp, q, mp, NULL, 0);
       unspec:
 	return lmi_error_ack(sl, q, mp, LMI_ENABLE_REQ, LMI_UNSPEC);
       initfailed:
@@ -6659,11 +6828,12 @@ lmi_enable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * lmi_disable_req - process LMI_DISABLE_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-lmi_disable_req(struct sl *sl, queue_t *q, mblk_t *mp)
+lmi_disable_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	lmi_disable_req_t *p = (typeof(p)) mp->b_rptr;
 
@@ -6672,7 +6842,7 @@ lmi_disable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (sl_get_i_state(sl) != LMI_ENABLED)
 		goto outstate;
 	sl_set_i_state(sl, LMI_DISABLE_PENDING);
-	switch (tp_get_u_state(sl->tp.tp)) {
+	switch (tp_get_u_state(tp)) {
 	case ASP_DOWN:
 	case ASP_WACK_ASPDN:
 	case ASP_WACK_ASPUP:
@@ -6684,7 +6854,7 @@ lmi_disable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	switch (sl_get_u_state(sl)) {
 	case ASP_ACTIVE:
 		sl_set_u_state(sl, ASP_WACK_ASPIA);
-		return sl_send_aspt_aspia_req(sl, q, mp, NULL, 0);
+		return sl_send_aspt_aspia_req(sl, tp, q, mp, NULL, 0);
 	case ASP_WACK_ASPIA:
 		freemsg(mp);
 		return (0);
@@ -6719,11 +6889,12 @@ lmi_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_pdu_req - process SL_PDU_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static inline fastcall __hot_write int
-sl_pdu_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_pdu_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_pdu_req_t *p = (typeof(p)) mp->b_rptr;
 	mblk_t *dp = mp->b_cont;
@@ -6737,10 +6908,10 @@ sl_pdu_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto discard;
 	mp->b_cont = NULL;
 	if ((sl->sl.option.pvar & SS7_PVAR_MASK) != SS7_PVAR_JTTC) {
-		if ((err = sl_send_maup_data1(sl, q, mp, dp)) != 0)
+		if ((err = sl_send_maup_data1(sl, tp, q, mp, dp)) != 0)
 			mp->b_cont = dp;
 	} else {
-		if ((err = sl_send_maup_data2(sl, q, mp, dp, p->sl_mp)) != 0)
+		if ((err = sl_send_maup_data2(sl, tp, q, mp, dp, p->sl_mp)) != 0)
 			mp->b_cont = dp;
 	}
 	return (err);
@@ -6761,11 +6932,12 @@ sl_pdu_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_emergency_req - process SL_EMERGENCY_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-sl_emergency_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_emergency_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_emergency_req_t *p = (typeof(p)) mp->b_rptr;
 
@@ -6775,7 +6947,7 @@ sl_emergency_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (sl_get_u_state(sl) != ASP_ACTIVE)
 		goto outstate;
-	return sl_send_maup_state_req(sl, q, mp, M2UA_STATUS_EMER_SET);
+	return sl_send_maup_state_req(sl, tp, q, mp, M2UA_STATUS_EMER_SET);
       outstate:
 	return lmi_error_ack(sl, q, mp, SL_EMERGENCY_REQ, LMI_OUTSTATE);
       tooshort:
@@ -6785,11 +6957,12 @@ sl_emergency_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_emergency_ceases_req - process SL_EMERGENCY_CEASES_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-sl_emergency_ceases_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_emergency_ceases_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_emergency_ceases_req_t *p = (typeof(p)) mp->b_rptr;
 
@@ -6799,7 +6972,7 @@ sl_emergency_ceases_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (sl_get_u_state(sl) != ASP_ACTIVE)
 		goto outstate;
-	return sl_send_maup_state_req(sl, q, mp, M2UA_STATUS_EMER_CLEAR);
+	return sl_send_maup_state_req(sl, tp, q, mp, M2UA_STATUS_EMER_CLEAR);
       outstate:
 	return lmi_error_ack(sl, q, mp, SL_EMERGENCY_CEASES_REQ, LMI_OUTSTATE);
       tooshort:
@@ -6809,13 +6982,14 @@ sl_emergency_ceases_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_start_req - process SL_START_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  *
  * This primitive is only valid in state LS_INIT or LS_FAILED.  It is ignored in any other state.
  */
 static noinline fastcall int
-sl_start_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_start_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_start_req_t *p = (typeof(p)) mp->b_rptr;
 
@@ -6825,7 +6999,7 @@ sl_start_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (sl_get_u_state(sl) != ASP_ACTIVE)
 		return sl_local_processor_outage_ind(sl, q, mp);
-	return sl_send_maup_estab_req(sl, q, mp);
+	return sl_send_maup_estab_req(sl, tp, q, mp);
       outstate:
 	return lmi_error_ack(sl, q, mp, SL_START_REQ, LMI_OUTSTATE);
       tooshort:
@@ -6835,6 +7009,7 @@ sl_start_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_stop_req - process SL_STOP_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  *
@@ -6842,7 +7017,7 @@ sl_start_req(struct sl *sl, queue_t *q, mblk_t *mp)
  * any other state.
  */
 static noinline fastcall int
-sl_stop_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_stop_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_stop_req_t *p = (typeof(p)) mp->b_rptr;
 
@@ -6858,7 +7033,7 @@ sl_stop_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	default:
 		goto ignore;
 	}
-	return sl_send_maup_rel_req(sl, q, mp);
+	return sl_send_maup_rel_req(sl, tp, q, mp);
       ignore:
 	freemsg(mp);
 	return (0);
@@ -6871,13 +7046,14 @@ sl_stop_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_retrieve_bsnt_req - process SL_RETRIEVE_BSNT_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  *
  * This primitive is only really valid in state LS_FAILED, but is responded to in any state.
  */
 static noinline fastcall int
-sl_retrieve_bsnt_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_retrieve_bsnt_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_retrieve_bsnt_req_t *p = (typeof(p)) mp->b_rptr;
 
@@ -6887,7 +7063,7 @@ sl_retrieve_bsnt_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (sl_get_u_state(sl) != ASP_ACTIVE)
 		return sl_bsnt_not_retrievable_ind(sl, q, mp);
-	return sl_send_maup_retr_req(sl, q, mp, NULL);
+	return sl_send_maup_retr_req(sl, tp, q, mp, NULL);
       outstate:
 	return lmi_error_ack(sl, q, mp, SL_RETRIEVE_BSNT_REQ, LMI_OUTSTATE);
       tooshort:
@@ -6897,11 +7073,12 @@ sl_retrieve_bsnt_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_retrieval_request_and_fsnc_req - process SL_RETRIEVAL_REQUEST_AND_FSNC_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-sl_retreival_request_and_fsnc_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_retreival_request_and_fsnc_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_retrieval_req_and_fsnc_t *p = (typeof(p)) mp->b_rptr;
 	uint32_t fsnc;
@@ -6911,7 +7088,7 @@ sl_retreival_request_and_fsnc_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (sl_get_l_state(sl) != DL_IDLE)
 		goto outstate;
 	fsnc = p->sl_fsnc;
-	return sl_send_maup_retr_req(sl, q, mp, &fsnc);
+	return sl_send_maup_retr_req(sl, tp, q, mp, &fsnc);
       outstate:
 	return lmi_error_ack(sl, q, mp, SL_RETRIEVAL_REQUEST_AND_FSNC_REQ, LMI_OUTSTATE);
       tooshort:
@@ -6921,11 +7098,12 @@ sl_retreival_request_and_fsnc_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_clear_buffers_req - process SL_CLEAR_BUFFERS_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-sl_clear_buffers_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_clear_buffers_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_clear_buffers_req_t *p = (typeof(p)) mp->b_rptr;
 
@@ -6933,7 +7111,7 @@ sl_clear_buffers_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto tooshort;
 	if (sl_get_l_state(sl) != DL_DATAXFER)
 		goto outstate;
-	return sl_send_maup_state_req(sl, q, mp, M2UA_STATUS_FLUSH_BUFFERS);
+	return sl_send_maup_state_req(sl, tp, q, mp, M2UA_STATUS_FLUSH_BUFFERS);
       outstate:
 	return lmi_error_ack(sl, q, mp, SL_CLEAR_BUFFERS_REQ, LMI_OUTSTATE);
       tooshort:
@@ -6943,11 +7121,12 @@ sl_clear_buffers_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_clear_rtb_req - process SL_CLEAR_RTB_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-sl_clear_rtb_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_clear_rtb_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_clear_rtb_req_t *p = (typeof(p)) mp->b_rptr;
 
@@ -6955,7 +7134,7 @@ sl_clear_rtb_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto tooshort;
 	if (sl_get_l_state(sl) != DL_DATAXFER)
 		goto outstate;
-	return sl_send_maup_state_req(sl, q, mp, M2UA_STATUS_CLEAR_RTB);
+	return sl_send_maup_state_req(sl, tp, q, mp, M2UA_STATUS_CLEAR_RTB);
       outstate:
 	return lmi_error_ack(sl, q, mp, SL_CLEAR_RTB_REQ, LMI_OUTSTATE);
       tooshort:
@@ -6965,11 +7144,12 @@ sl_clear_rtb_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_continue_req - process SL_CONTINUE_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-sl_continue_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_continue_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_continue_req_t *p = (typeof(p)) mp->b_rptr;
 
@@ -6977,7 +7157,7 @@ sl_continue_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto tooshort;
 	if (sl_get_l_state(sl) != DL_DATAXFER)
 		goto outstate;
-	return sl_send_maup_state_req(sl, q, mp, M2UA_STATUS_CONTINUE);
+	return sl_send_maup_state_req(sl, tp, q, mp, M2UA_STATUS_CONTINUE);
       outstate:
 	return lmi_error_ack(sl, q, mp, SL_CONTINUE_REQ, LMI_OUTSTATE);
       tooshort:
@@ -6987,11 +7167,12 @@ sl_continue_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_local_processor_outage_req - process SL_LOCAL_PROCESSOR_OUTAGE_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-sl_local_processor_outage_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_local_processor_outage_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_local_proc_outage_req_t *p = (typeof(p)) mp->b_rptr;
 
@@ -7000,9 +7181,9 @@ sl_local_processor_outage_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (sl_get_l_state(sl) != DL_DATAXFER)
 		goto outstate;
 	/* ETSI TS 102 141 does not permit use of this primitive. */
-	if (sl->tp.tp->sp.options.options.pvar == M2UA_VERSION_TS102141)
+	if (tp->sp.options.options.pvar == M2UA_VERSION_TS102141)
 		goto notsupp;
-	return sl_send_maup_state_req(sl, q, mp, M2UA_STATUS_LPO_SET);
+	return sl_send_maup_state_req(sl, tp, q, mp, M2UA_STATUS_LPO_SET);
       notsupp:
 	return lmi_error_ack(sl, q, mp, SL_LOCAL_PROCESSOR_OUTAGE_REQ, LMI_NOTSUPP);
       outstate:
@@ -7014,11 +7195,12 @@ sl_local_processor_outage_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_resume_req - process SL_RESUME_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-sl_resume_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_resume_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_resume_req_t *p = (typeof(p)) mp->b_rptr;
 
@@ -7027,9 +7209,9 @@ sl_resume_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (sl_get_l_state(sl) != DL_DATAXFER)
 		goto outstate;
 	/* ETSI TS 102 141 does not permit use of this primitive. */
-	if (sl->tp.tp->sp.options.options.pvar == M2UA_VERSION_TS102141)
+	if (tp->sp.options.options.pvar == M2UA_VERSION_TS102141)
 		goto notsupp;
-	return sl_send_maup_state_req(sl, q, mp, M2UA_STATUS_LPO_CLEAR);
+	return sl_send_maup_state_req(sl, tp, q, mp, M2UA_STATUS_LPO_CLEAR);
       notsupp:
 	return lmi_error_ack(sl, q, mp, SL_RESUME_REQ, LMI_NOTSUPP);
       outstate:
@@ -7041,11 +7223,12 @@ sl_resume_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_congestion_discard_req - process SL_CONGESTION_DISCARD_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-sl_congestion_discard_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_congestion_discard_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_cong_discard_req_t *p = (typeof(p)) mp->b_rptr;
 
@@ -7053,7 +7236,7 @@ sl_congestion_discard_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto tooshort;
 	if (sl_get_l_state(sl) != DL_DATAXFER)
 		goto outstate;
-	return sl_send_maup_state_req(sl, q, mp, M2UA_STATUS_CONG_DISCARD);
+	return sl_send_maup_state_req(sl, tp, q, mp, M2UA_STATUS_CONG_DISCARD);
       outstate:
 	return lmi_error_ack(sl, q, mp, SL_CONGESTION_DISCARD_REQ, LMI_OUTSTATE);
       tooshort:
@@ -7063,11 +7246,12 @@ sl_congestion_discard_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_congestion_accept_req - process SL_CONGESTION_ACCEPT_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-sl_congestion_accept_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_congestion_accept_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_cong_accept_req_t *p = (typeof(p)) mp->b_rptr;
 
@@ -7075,7 +7259,7 @@ sl_congestion_accept_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto tooshort;
 	if (sl_get_l_state(sl) != DL_DATAXFER)
 		goto outstate;
-	return sl_send_maup_state_req(sl, q, mp, M2UA_STATUS_CONG_ACCEPT);
+	return sl_send_maup_state_req(sl, tp, q, mp, M2UA_STATUS_CONG_ACCEPT);
       outstate:
 	return lmi_error_ack(sl, q, mp, SL_CONGESTION_ACCEPT_REQ, LMI_OUTSTATE);
       tooshort:
@@ -7085,11 +7269,12 @@ sl_congestion_accept_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_no_congestion_req - process SL_NO_CONGESTION_REQ primtive
  * @sl: SL private structure
+ * @tp: SL private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-sl_no_congestion_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_no_congestion_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_no_cong_req_t *p = (typeof(p)) mp->b_rptr;
 
@@ -7097,7 +7282,7 @@ sl_no_congestion_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto tooshort;
 	if (sl_get_l_state(sl) != DL_DATAXFER)
 		goto outstate;
-	return sl_send_maup_state_req(sl, q, mp, M2UA_STATUS_CONG_CLEAR);
+	return sl_send_maup_state_req(sl, tp, q, mp, M2UA_STATUS_CONG_CLEAR);
       outstate:
 	return lmi_error_ack(sl, q, mp, SL_NO_CONGESTION_REQ, LMI_OUTSTATE);
       tooshort:
@@ -7107,11 +7292,12 @@ sl_no_congestion_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_power_on_req - process SL_POWER_ON_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-sl_power_on_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_power_on_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	sl_power_on_req_t *p = (typeof(p)) mp->b_rptr;
 
@@ -7119,7 +7305,7 @@ sl_power_on_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto tooshort;
 	if (sl_get_l_state(sl) != DL_UNBOUND)
 		goto outstate;
-	return sl_send_maup_state_req(sl, q, mp, M2UA_STATUS_AUDIT);
+	return sl_send_maup_state_req(sl, tp, q, mp, M2UA_STATUS_AUDIT);
       outstate:
 	return lmi_error_ack(sl, q, mp, SL_POWER_ON_REQ, LMI_OUTSTATE);
       tooshort:
@@ -7130,11 +7316,12 @@ sl_power_on_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_optmgmt_req - process SL_OPTMGMT_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-sl_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_optmgmt_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 }
 #endif
@@ -7143,11 +7330,12 @@ sl_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_notify_req - process SL_NOTIFY_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-sl_notify_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_notify_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 }
 #endif
@@ -7155,11 +7343,12 @@ sl_notify_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_other_req - process SL_OTHER_REQ primtive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-sl_other_req(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_other_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	uint32_t *p = (typeof(p)) mp->b_rptr;
 
@@ -7169,11 +7358,12 @@ sl_other_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * m2_t_establish_req: - process M2_T_ESTABLISH_REQ primitive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-m2_t_establish_req(struct sl *sl, queue_t *q, mblk_t *mp)
+m2_t_establish_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct M2_t_establish_req *p = (typeof(p)) mp->b_rptr;
 
@@ -7186,11 +7376,12 @@ m2_t_establish_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * m2_t_release_req: - process M2_T_RELEASE_REQ primitive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-m2_t_release_req(struct sl *sl, queue_t *q, mblk_t *mp)
+m2_t_release_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct M2_t_release_req *p = (typeof(p)) mp->b_rptr;
 
@@ -7203,11 +7394,12 @@ m2_t_release_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * m2_t_status_req: - process M2_T_STATUS_REQ primitive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-m2_t_status_req(struct sl *sl, queue_t *q, mblk_t *mp)
+m2_t_status_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct M2_t_status_req *p = (typeof(p)) mp->b_rptr;
 
@@ -7220,11 +7412,12 @@ m2_t_status_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * m2_asp_status_req: - process M2_ASP_STATUS_REQ primitive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-m2_asp_status_req(struct sl *sl, queue_t *q, mblk_t *mp)
+m2_asp_status_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct M2_asp_status_req *p = (typeof(p)) mp->b_rptr;
 
@@ -7237,11 +7430,12 @@ m2_asp_status_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * m2_as_status_req: - process M2_AS_STATUS_REQ primitive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-m2_as_status_req(struct sl *sl, queue_t *q, mblk_t *mp)
+m2_as_status_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct M2_as_status_req *p = (typeof(p)) mp->b_rptr;
 
@@ -7254,11 +7448,12 @@ m2_as_status_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * m2_asp_up_req: - process M2_ASP_UP_REQ primitive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-m2_asp_up_req(struct sl *sl, queue_t *q, mblk_t *mp)
+m2_asp_up_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct M2_asp_up_req *p = (typeof(p)) mp->b_rptr;
 
@@ -7271,11 +7466,12 @@ m2_asp_up_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * m2_asp_down_req: - process M2_ASP_DOWN_REQ primitive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-m2_asp_down_req(struct sl *sl, queue_t *q, mblk_t *mp)
+m2_asp_down_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct M2_asp_down_req *p = (typeof(p)) mp->b_rptr;
 
@@ -7288,11 +7484,12 @@ m2_asp_down_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * m2_asp_active_req: - process M2_ASP_ACTIVE_REQ primitive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-m2_asp_active_req(struct sl *sl, queue_t *q, mblk_t *mp)
+m2_asp_active_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct M2_asp_active_req *p = (typeof(p)) mp->b_rptr;
 
@@ -7305,11 +7502,12 @@ m2_asp_active_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * m2_asp_inactive_req: - process M2_ASP_INACTIVE_REQ primitive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-m2_asp_inactive_req(struct sl *sl, queue_t *q, mblk_t *mp)
+m2_asp_inactive_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct M2_asp_inactive_req *p = (typeof(p)) mp->b_rptr;
 
@@ -7322,11 +7520,12 @@ m2_asp_inactive_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * m2_reg_req: - process M2_REG_REQ primitive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-m2_reg_req(struct sl *sl, queue_t *q, mblk_t *mp)
+m2_reg_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct M2_reg_req *p = (typeof(p)) mp->b_rptr;
 
@@ -7339,11 +7538,12 @@ m2_reg_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * m2_dereg_req: - process M2_DEREG_REQ primitive
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: primitive to process
  */
 static noinline fastcall int
-m2_dereg_req(struct sl *sl, queue_t *q, mblk_t *mp)
+m2_dereg_req(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct M2_dereg_req *p = (typeof(p)) mp->b_rptr;
 
@@ -7353,6 +7553,124 @@ m2_dereg_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
+/**
+ * tpi_request: - process a TPI primitive
+ * @sl: SL private structure
+ * @tp: TP private structure
+ * @q: active queue (upper write queue)
+ * @mp: primitive to process
+ * 
+ * Just pass the message on to the lower link if it exists and pass the response back up.  Issuing a
+ * TPI primitive places the service interface into management mode.  In management mode, all TPI
+ * service primitives other than data transfer primitives will be passed to the management
+ * interface.  An exception might be orderly release indications, which will be passed as disconnect
+ * indications.
+ *
+ * Note that we should check permissions.  Check that the process which originally opened this
+ * streams is permitted to control the lower multiplex stream.  If the lower multiplex stream was
+ * I_LINK'ed (probably an SGID of zero), then it is alway permitted.  If the lower multiplex stream
+ * was I_PLINK'ed the credentials of the linker are checked against the credentials of the opener.
+ */
+static noinline fastcall int
+tpi_request(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	write_lock(&sl_mux_lock);
+	if (tp->lm == NULL || (tp->lm == sl)) {
+		if (tp->lm == NULL)
+			tp->lm = sl;
+		write_unlock(&sl_mux_lock);
+		if (pcmsg(DB_TYPE(mp)) || bcanputnext(tp->wq, mp->b_band)) {
+			/* need to do state tracking */
+			switch (*(t_scalar_t *) mp->b_rptr) {
+			case T_CONN_REQ:
+				if (tp_get_i_state(tp) == TS_IDLE)
+					tp_set_i_state(tp, TS_WACK_CREQ);
+				break;
+			case T_CONN_RES:
+				if (tp_get_i_state(tp) == TS_WRES_CIND)
+					tp_set_i_state(tp, TS_WACK_CRES);
+				break;
+			case T_DISCON_REQ:
+				switch (tp_get_i_state(tp)) {
+				case TS_WCON_CREQ:
+					tp_set_i_state(tp, TS_WACK_DREQ6);
+					break;
+				case TS_WRES_CIND:
+					tp_set_i_state(tp, TS_WACK_DREQ7);
+					break;
+				case TS_DATA_XFER:
+					tp_set_i_state(tp, TS_WACK_DREQ9);
+					break;
+				case TS_WIND_ORDREL:
+					tp_set_i_state(tp, TS_WACK_DREQ10);
+					break;
+				case TS_WREQ_ORDREL:
+					tp_set_i_state(tp, TS_WACK_DREQ11);
+					break;
+				default:
+					break;
+				}
+				break;
+			case T_DATA_REQ:
+				break;
+			case T_EXDATA_REQ:
+				break;
+			case T_INFO_REQ:
+				break;
+			case T_BIND_REQ:
+				if (tp_get_i_state(tp) == TS_UNBND)
+					tp_set_i_state(tp, TS_WACK_BREQ);
+				break;
+			case T_UNBIND_REQ:
+				if (tp_get_i_state(tp) == TS_IDLE)
+					tp_set_i_state(tp, TS_WACK_UREQ);
+				break;
+			case T_UNITDATA_REQ:
+				break;
+			case T_OPTMGMT_REQ:
+				if (tp_get_i_state(tp) == TS_IDLE)
+					tp_set_i_state(tp, TS_WACK_OPTREQ);
+				break;
+			case T_ORDREL_REQ:
+				switch (tp_get_i_state(tp)) {
+				case TS_DATA_XFER:
+					tp_set_i_state(tp, TS_WIND_ORDREL);
+					break;
+				case TS_WIND_ORDREL:
+					tp_set_i_state(tp, TS_IDLE);
+					break;
+				default:
+					break;
+				}
+				break;
+			case T_OPTDATA_REQ:
+				break;
+			case T_ADDR_REQ:
+				break;
+			case T_CAPABILITY_REQ:
+				break;
+			}
+			putnext(tp->wq, mp);
+			return (0);
+		}
+		return (-EBUSY);
+	} else {
+		struct T_error_ack *p;
+
+		write_unlock(&sl_mux_lock);
+		freemsg(XCHG(&mp->b_cont, NULL));
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_rptr;
+		p->ERROR_prim = p->PRIM_type;
+		p->PRIM_type = T_ERROR_ACK;
+		p->TLI_error = TSYSERR;
+		p->UNIX_error = ENOTCONN;
+		mp->b_wptr = mp->b_rptr + sizeof(*p);
+		putnext(sl->rq, mp);
+		return (0);
+	}
+}
+
 /*
  *  SL-Provider (AS) Timeouts.
  *  ==========================
@@ -7360,16 +7678,17 @@ m2_dereg_req(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_wack_aspac_timeout: - process timeout waiting for ASP Active Ack
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: the timeout message
  */
 static noinline fastcall int
-sl_wack_aspac_timeout(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_wack_aspac_timeout(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err = 0;
 
 	if (sl_get_u_state(sl) == ASP_WACK_ASPIA)
-		if ((err = sl_send_aspt_aspac_req(sl, q, NULL, NULL, 0)) == 0)
+		if ((err = sl_send_aspt_aspac_req(sl, tp, q, NULL, NULL, 0)) == 0)
 			if (sl->as.options.tack) {
 				strlog(sl->mid, sl->sid, SLLOGTE, SL_TRACE,
 				       "-> WACK ASPAC START <- (%u msec)", sl->as.options.tack);
@@ -7381,16 +7700,17 @@ sl_wack_aspac_timeout(struct sl *sl, queue_t *q, mblk_t *mp)
 /**
  * sl_wack_aspia_timeout: - process timeout waiting for ASP Inactive Ack
  * @sl: SL private structure
+ * @tp: TP private structure
  * @q: active queue (upper write queue)
  * @mp: the timeout message
  */
 static noinline fastcall int
-sl_wack_aspia_timeout(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_wack_aspia_timeout(struct sl *sl, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err = 0;
 
 	if (sl_get_u_state(sl) == ASP_WACK_ASPIA)
-		if ((err = sl_send_aspt_aspia_req(sl, q, NULL, NULL, 0)) == 0)
+		if ((err = sl_send_aspt_aspia_req(sl, tp, q, NULL, NULL, 0)) == 0)
 			if (sl->as.options.tack) {
 				strlog(sl->mid, sl->sid, SLLOGTE, SL_TRACE,
 				       "-> WACK ASPAC START <- (%u msec)", sl->as.options.tack);
@@ -7422,8 +7742,10 @@ sl_i_link(struct sl *sl, queue_t *q, mblk_t *mp)
 	struct tp *tp;
 	int err;
 
-	if ((tp = (struct tp *) mi_copyout_alloc(q, mp, NULL, sizeof(*tp), false)) == NULL)
+	if (!(tp = (struct tp *)mi_open_alloc(sizeof(*tp))))
 		goto enomem;
+	bzero(tp, sizeof(*tp));
+
 	if (!(t1 = mi_timer_alloc(l->l_qtop, sizeof(int))))
 		goto enobufs;
 	if (!(t2 = mi_timer_alloc(l->l_qtop, sizeof(int))))
@@ -7445,6 +7767,8 @@ sl_i_link(struct sl *sl, queue_t *q, mblk_t *mp)
 	if ((sl->tp.next = tp->sl.list))
 		sl->tp.next->tp.prev = &tp->sl.list;
 	*(sl->tp.prev = &(sl->tp.tp = tp)->sl.list) = sl;
+
+	tp->lm = sl;
 
 	tp_init_priv(tp, l->l_qtop, 0, l->l_index, ioc->ioc_cr, t1, t2, t3, t4);
 	mi_attach(l->l_qtop, (caddr_t) tp);
@@ -7496,20 +7820,50 @@ sl_i_link(struct sl *sl, queue_t *q, mblk_t *mp)
  * control Stream.  Not all I_UNLINK operations can be refused.  I_UNLINK operations that result
  * from tearing down of the multiplex due to closing of the control Stream cannot be refused.  In
  * general, there is no way to distinguish between an explicit unlink on the control Stream and an
- * implicit unlink resulting from the closing of the control Stream.
+ * implicit unlink resulting from the closing of the control Stream.  For Linux Fast-STREAMS and
+ * possibly Solaris there is: the ioc_flag member will have IOC_NONE for forced unlinks not
+ * originating from a user and IOC_NATIVE or IOC_ILP32 for I_UNLINK operations originating from the
+ * user.
+ *
+ * Note that the lower mulitplex driver put and service procedures must be prepared to be invoked
+ * event after the M_IOCACK for the I_UNLINK or I_PUNLINK ioctl has been returned.  This is because
+ * the setq(9) back to the Stream head is not performed until after the acknowledgement has been
+ * received.  The easiest way to accomplish this is to set q->q_ptr to NULL and have the put and
+ * service procedures for the lower multiplex check the private structure pointer for NULL.
  */
 static noinline fastcall int
 sl_i_unlink(struct sl *sl, queue_t *q, mblk_t *mp)
 {
+	struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
 	struct linkblk *l = (typeof(l)) mp->b_cont->b_rptr;
 	struct tp *tp;
+	struct sl *sl2;
+	int err;
 
-	write_lock(&sl_mux_lock);
+	if ((tp = tp_exclusive(l->l_qtop, q)) == NULL)
+		return (-EDEADLK);
 
-	if ((tp = sl->tp.tp) == NULL) {
-		write_unlock(&sl_mux_lock);
-		mi_copy_done(q, mp, EFAULT);
-		return (0);
+	for (sl2 = tp->sl.list; sl2; sl2 = sl2->tp.next) {
+		if (sl2 == sl)
+			continue;
+		if ((ioc->ioc_flag & IOC_MASK) != IOC_NONE) {
+			/* If the operation can be refused and another Stream is linked to the same
+			   SG, refuse to unlink it until those Streams are either closed or detached 
+			   and disassociated. */
+			tp_shared(tp);
+			mi_copy_done(q, mp, EBUSY);
+			return (0);
+		}
+		if ((err = m_hangup(sl2, q, NULL))) {
+			tp_shared(tp);
+			return (err);
+		}
+		sl_set_i_state(sl2, LMI_UNUSABLE);
+		if ((*sl2->tp.prev = sl2->tp.next))
+			sl2->tp.next->tp.prev = sl2->tp.prev;
+		sl2->tp.next = NULL;
+		sl2->tp.prev = &sl2->tp.next;
+		sl2->tp.tp = NULL;
 	}
 
 	mi_detach(l->l_qtop, (caddr_t) tp);
@@ -7520,7 +7874,7 @@ sl_i_unlink(struct sl *sl, queue_t *q, mblk_t *mp)
 	sl->tp.prev = &sl->tp.next;
 	sl->tp.tp = NULL;
 
-	write_unlock(&sl_mux_lock);
+	tp_shared(tp);
 
 	tp_term_priv(tp);
 	mi_close_free((caddr_t) tp);
@@ -7550,8 +7904,10 @@ sl_i_plink(struct sl *sl, queue_t *q, mblk_t *mp)
 	dev_t dev;
 	int err;
 
-	if ((tp = (struct tp *) mi_copyout_alloc(q, mp, NULL, sizeof(*tp), false)) == NULL)
+	if (!(tp = (struct tp *) mi_open_alloc(sizeof(*tp))))
 		goto enomem;
+	bzero(tp, sizeof(*tp));
+
 	if (!(t1 = mi_timer_alloc(l->l_qtop, sizeof(int))))
 		goto enobufs;
 	if (!(t2 = mi_timer_alloc(l->l_qtop, sizeof(int))))
@@ -7629,12 +7985,13 @@ static noinline fastcall int
 sl_i_punlink(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	struct linkblk *l = (typeof(l)) mp->b_cont->b_rptr;
-	struct tp *tp = TP_PRIV(l->l_qtop);
+	struct tp *tp;
 
-	write_lock(&sl_mux_lock);
+	if ((tp = tp_exclusive(l->l_qtop, q)) == NULL)
+		return (-EDEADLK);
 
 	if (tp->sl.list != NULL) {
-		write_unlock(&sl_mux_lock);
+		tp_shared(tp);
 		mi_copy_done(q, mp, EBUSY);
 		return (0);
 	}
@@ -7642,7 +7999,7 @@ sl_i_punlink(struct sl *sl, queue_t *q, mblk_t *mp)
 	mi_detach(l->l_qtop, (caddr_t) tp);
 	mi_close_unlink(&tp_links, (caddr_t) tp);
 
-	write_unlock(&sl_mux_lock);
+	tp_shared(tp);
 
 	tp_term_priv(tp);
 	mi_close_free((caddr_t) tp);
@@ -7673,25 +8030,23 @@ static inline fastcall __hot_write int
 sl_w_data(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl = SL_PRIV(q);
+	struct tp *tp;
 	uint8_t pri;
 	int err;
 
-	if (sl->tp.tp) {
-
-		if (!tp_trylock(sl->tp.tp, q))
-			return (-EDEADLK);
-
-		if (sl_get_l_state(sl) != DL_DATAXFER)
+	if ((tp = sl_tp_acquire(sl, q)) != NULL) {
+		if (sl_get_l_state(sl) != DL_DATAXFER) {
+			sl_tp_release(tp);
 			goto outstate;
+		}
 		if ((sl->sl.option.pvar & SS7_PVAR_MASK) != SS7_PVAR_JTTC) {
-			err = sl_send_maup_data1(sl, q, NULL, mp);
+			err = sl_send_maup_data1(sl, tp, q, NULL, mp);
 		} else {
 			pri = *mp->b_rptr++;
-			if ((err = sl_send_maup_data2(sl, q, NULL, mp, pri)) != 0)
+			if ((err = sl_send_maup_data2(sl, tp, q, NULL, mp, pri)) != 0)
 				mp->b_rptr--;
 		}
-
-		tp_unlock(sl->tp.tp);
+		sl_tp_release(tp);
 		return (err);
 	}
       outstate:
@@ -7708,6 +8063,7 @@ static noinline fastcall __unlikely int
 sl_w_proto(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl = SL_PRIV(q);
+	struct tp *tp;
 	int old_i_state, old_u_state, old_n_state, old_a_state;
 	uint32_t prim;
 	int rtn = 0;
@@ -7719,20 +8075,32 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 	}
 	prim = *(uint32_t *) mp->b_rptr;
 
-	if (sl->tp.tp == NULL) {
+	read_lock(&sl_mux_lock);
+	if ((tp = sl->tp.tp) == NULL) {
+		read_unlock(&sl_mux_lock);
 		/* have not been attached yet */
-		if (prim == LMI_ATTACH_REQ)
+		switch (prim) {
+		case LMI_INFO_REQ:
+			return lmi_info_req(sl, q, mp);
+		case LMI_ATTACH_REQ:
 			return lmi_attach_req(sl, q, mp);
-		return lmi_error_ack(sl, q, mp, prim, LMI_OUTSTATE);
+		case LMI_OPTMGMT_REQ:
+			return lmi_optmgmt_req(sl, q, mp);
+		default:
+			return lmi_error_ack(sl, q, mp, prim, LMI_OUTSTATE);
+		}
 	}
 
-	if (!tp_trylock(sl->tp.tp, q))
+	if (!tp_trylock(tp, q)) {
+		read_unlock(&sl_mux_lock);
 		return (-EDEADLK);
+	}
+	read_unlock(&sl_mux_lock);
 
 	old_i_state = sl_get_i_state(sl);
 	old_u_state = sl_get_u_state(sl);
-	old_n_state = tp_get_i_state(sl->tp.tp);
-	old_a_state = tp_get_u_state(sl->tp.tp);
+	old_n_state = tp_get_i_state(tp);
+	old_a_state = tp_get_u_state(tp);
 
 	switch (*(uint32_t *) mp->b_rptr) {
 	case LMI_INFO_REQ:
@@ -7745,15 +8113,15 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 		break;
 	case LMI_DETACH_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> LMI_DETACH_REQ");
-		rtn = lmi_detach_req(sl, q, mp);
+		rtn = lmi_detach_req(sl, tp, q, mp);
 		break;
 	case LMI_ENABLE_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> LMI_ENABLE_REQ");
-		rtn = lmi_enable_req(sl, q, mp);
+		rtn = lmi_enable_req(sl, tp, q, mp);
 		break;
 	case LMI_DISABLE_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> LMI_DISABLE_REQ");
-		rtn = lmi_disable_req(sl, q, mp);
+		rtn = lmi_disable_req(sl, tp, q, mp);
 		break;
 	case LMI_OPTMGMT_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> LMI_OPTMGMT_REQ");
@@ -7761,134 +8129,192 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 		break;
 	case SL_PDU_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_PDU_REQ");
-		rtn = sl_pdu_req(sl, q, mp);
+		rtn = sl_pdu_req(sl, tp, q, mp);
 		break;
 	case SL_EMERGENCY_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_EMERGENCY_REQ");
-		rtn = sl_emergency_req(sl, q, mp);
+		rtn = sl_emergency_req(sl, tp, q, mp);
 		break;
 	case SL_EMERGENCY_CEASES_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_EMERGENCY_CEASES_REQ");
-		rtn = sl_emergency_ceases_req(sl, q, mp);
+		rtn = sl_emergency_ceases_req(sl, tp, q, mp);
 		break;
 	case SL_START_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_START_REQ");
-		rtn = sl_start_req(sl, q, mp);
+		rtn = sl_start_req(sl, tp, q, mp);
 		break;
 	case SL_STOP_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_STOP_REQ");
-		rtn = sl_stop_req(sl, q, mp);
+		rtn = sl_stop_req(sl, tp, q, mp);
 		break;
 	case SL_RETRIEVE_BSNT_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_RETRIEVE_BSNT_REQ");
-		rtn = sl_retrieve_bsnt_req(sl, q, mp);
+		rtn = sl_retrieve_bsnt_req(sl, tp, q, mp);
 		break;
 	case SL_RETRIEVAL_REQUEST_AND_FSNC_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_RETRIEVAL_REQUEST_AND_FSNC_REQ");
-		rtn = sl_retreival_request_and_fsnc_req(sl, q, mp);
+		rtn = sl_retreival_request_and_fsnc_req(sl, tp, q, mp);
 		break;
 	case SL_CLEAR_BUFFERS_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_CLEAR_BUFFERS_REQ");
-		rtn = sl_clear_buffers_req(sl, q, mp);
+		rtn = sl_clear_buffers_req(sl, tp, q, mp);
 		break;
 	case SL_CLEAR_RTB_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_CLEAR_RTB_REQ");
-		rtn = sl_clear_rtb_req(sl, q, mp);
+		rtn = sl_clear_rtb_req(sl, tp, q, mp);
 		break;
 	case SL_CONTINUE_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_CONTINUE_REQ");
-		rtn = sl_continue_req(sl, q, mp);
+		rtn = sl_continue_req(sl, tp, q, mp);
 		break;
 	case SL_LOCAL_PROCESSOR_OUTAGE_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_LOCAL_PROCESSOR_OUTAGE_REQ");
-		rtn = sl_local_processor_outage_req(sl, q, mp);
+		rtn = sl_local_processor_outage_req(sl, tp, q, mp);
 		break;
 	case SL_RESUME_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_RESUME_REQ");
-		rtn = sl_resume_req(sl, q, mp);
+		rtn = sl_resume_req(sl, tp, q, mp);
 		break;
 	case SL_CONGESTION_DISCARD_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_CONGESTION_DISCARD_REQ");
-		rtn = sl_congestion_discard_req(sl, q, mp);
+		rtn = sl_congestion_discard_req(sl, tp, q, mp);
 		break;
 	case SL_CONGESTION_ACCEPT_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_CONGESTION_ACCEPT_REQ");
-		rtn = sl_congestion_accept_req(sl, q, mp);
+		rtn = sl_congestion_accept_req(sl, tp, q, mp);
 		break;
 	case SL_NO_CONGESTION_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_NO_CONGESTION_REQ");
-		rtn = sl_no_congestion_req(sl, q, mp);
+		rtn = sl_no_congestion_req(sl, tp, q, mp);
 		break;
 	case SL_POWER_ON_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_POWER_ON_REQ");
-		rtn = sl_power_on_req(sl, q, mp);
+		rtn = sl_power_on_req(sl, tp, q, mp);
 		break;
 #if 0
 	case SL_OPTMGMT_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_OPTMGMT_REQ");
-		rtn = sl_optmgmt_req(sl, q, mp);
+		rtn = sl_optmgmt_req(sl, tp, q, mp);
 		break;
 	case SL_NOTIFY_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_NOTIFY_REQ");
-		rtn = sl_notify_req(sl, q, mp);
+		rtn = sl_notify_req(sl, tp, q, mp);
 		break;
 #endif
+/* M2UA based management interface */
 	case M2_T_ESTABLISH_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> M2_T_ESTABLISH_REQ");
-		rtn = m2_t_establish_req(sl, q, mp);
+		rtn = m2_t_establish_req(sl, tp, q, mp);
 		break;
 	case M2_T_RELEASE_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> M2_T_RELEASE_REQ");
-		rtn = m2_t_release_req(sl, q, mp);
+		rtn = m2_t_release_req(sl, tp, q, mp);
 		break;
 	case M2_T_STATUS_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> M2_T_STATUS_REQ");
-		rtn = m2_t_status_req(sl, q, mp);
+		rtn = m2_t_status_req(sl, tp, q, mp);
 		break;
 	case M2_ASP_STATUS_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> M2_ASP_STATUS_REQ");
-		rtn = m2_asp_status_req(sl, q, mp);
+		rtn = m2_asp_status_req(sl, tp, q, mp);
 		break;
 	case M2_AS_STATUS_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> M2_AS_STATUS_REQ");
-		rtn = m2_as_status_req(sl, q, mp);
+		rtn = m2_as_status_req(sl, tp, q, mp);
 		break;
 	case M2_ASP_UP_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> M2_ASP_UP_REQ");
-		rtn = m2_asp_up_req(sl, q, mp);
+		rtn = m2_asp_up_req(sl, tp, q, mp);
 		break;
 	case M2_ASP_DOWN_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> M2_ASP_DOWN_REQ");
-		rtn = m2_asp_down_req(sl, q, mp);
+		rtn = m2_asp_down_req(sl, tp, q, mp);
 		break;
 	case M2_ASP_ACTIVE_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> M2_ASP_ACTIVE_REQ");
-		rtn = m2_asp_active_req(sl, q, mp);
+		rtn = m2_asp_active_req(sl, tp, q, mp);
 		break;
 	case M2_ASP_INACTIVE_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> M2_ASP_INACTIVE_REQ");
-		rtn = m2_asp_inactive_req(sl, q, mp);
+		rtn = m2_asp_inactive_req(sl, tp, q, mp);
 		break;
 	case M2_REG_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> M2_REG_REQ");
-		rtn = m2_reg_req(sl, q, mp);
+		rtn = m2_reg_req(sl, tp, q, mp);
 		break;
 	case M2_DEREG_REQ:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> M2_DEREG_REQ");
-		rtn = m2_dereg_req(sl, q, mp);
+		rtn = m2_dereg_req(sl, tp, q, mp);
+		break;
+/* TPI based SCTP management */
+	case T_CONN_REQ:
+		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> T_CONN_REQ");
+		rtn = tpi_request(sl, tp, q, mp);
+		break;
+	case T_CONN_RES:
+		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> T_CONN_RES");
+		rtn = tpi_request(sl, tp, q, mp);
+		break;
+	case T_DISCON_REQ:
+		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> T_DISCON_REQ");
+		rtn = tpi_request(sl, tp, q, mp);
+		break;
+	case T_DATA_REQ:
+		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> T_DATA_REQ");
+		rtn = tpi_request(sl, tp, q, mp);
+		break;
+	case T_EXDATA_REQ:
+		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> T_EXDATA_REQ");
+		rtn = tpi_request(sl, tp, q, mp);
+		break;
+	case T_INFO_REQ:
+		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> T_INFO_REQ");
+		rtn = tpi_request(sl, tp, q, mp);
+		break;
+	case T_BIND_REQ:
+		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> T_BIND_REQ");
+		rtn = tpi_request(sl, tp, q, mp);
+		break;
+	case T_UNBIND_REQ:
+		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> T_UNBIND_REQ");
+		rtn = tpi_request(sl, tp, q, mp);
+		break;
+	case T_UNITDATA_REQ:
+		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> T_UNITDATA_REQ");
+		rtn = tpi_request(sl, tp, q, mp);
+		break;
+	case T_OPTMGMT_REQ:
+		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> T_OPTMGMT_REQ");
+		rtn = tpi_request(sl, tp, q, mp);
+		break;
+	case T_ORDREL_REQ:
+		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> T_ORDREL_REQ");
+		rtn = tpi_request(sl, tp, q, mp);
+		break;
+	case T_OPTDATA_REQ:
+		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> T_OPTDATA_REQ");
+		rtn = tpi_request(sl, tp, q, mp);
+		break;
+	case T_ADDR_REQ:
+		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> T_ADDR_REQ");
+		rtn = tpi_request(sl, tp, q, mp);
+		break;
+	case T_CAPABILITY_REQ:
+		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> T_CAPABILITY_REQ");
+		rtn = tpi_request(sl, tp, q, mp);
 		break;
 	default:
 		strlog(sl->mid, sl->sid, SLLOGRX, SL_TRACE, "-> SL_????_???");
-		rtn = sl_other_req(sl, q, mp);
+		rtn = sl_other_req(sl, tp, q, mp);
 		break;
 	}
 	if (rtn < 0) {
 		sl_set_i_state(sl, old_i_state);
 		sl_set_u_state(sl, old_u_state);
-		tp_set_i_state(sl->tp.tp, old_n_state);
-		tp_set_u_state(sl->tp.tp, old_a_state);
+		tp_set_i_state(tp, old_n_state);
+		tp_set_u_state(tp, old_a_state);
 	}
-	tp_unlock(sl->tp.tp);
+	sl_tp_release(tp);
 	return (rtn);
 }
 
@@ -9089,20 +9515,21 @@ static noinline fastcall __unlikely int
 sl_w_sig(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl = SL_PRIV(q);
+	struct tp *tp;
 	int rtn = 0;
 
-	if (!tp_trylock(sl->tp.tp, q))
+	if (!(tp = sl_tp_acquire(sl, q)))
 		return (-EDEADLK);
 
 	if (likely(mi_timer_valid(mp))) {
 		switch (*(int *) mp->b_rptr) {
 		case wack_aspac:
 			strlog(sl->mid, sl->sid, SLLOGTO, SL_TRACE, "-> WACK ASPAC TIMEOUT <-");
-			rtn = sl_wack_aspac_timeout(sl, q, mp);
+			rtn = sl_wack_aspac_timeout(sl, tp, q, mp);
 			break;
 		case wack_aspia:
 			strlog(sl->mid, sl->sid, SLLOGTO, SL_TRACE, "-> WACK ASPIA TIMEOUT <-");
-			rtn = sl_wack_aspia_timeout(sl, q, mp);
+			rtn = sl_wack_aspia_timeout(sl, tp, q, mp);
 			break;
 		default:
 			strlog(sl->mid, sl->sid, 0, SL_ERROR, "invalid timer %d",
@@ -9112,7 +9539,7 @@ sl_w_sig(queue_t *q, mblk_t *mp)
 		}
 	}
 
-	tp_unlock(sl->tp.tp);
+	sl_tp_release(tp);
 	return (rtn);
 }
 
@@ -10313,21 +10740,19 @@ tp_r_data(queue_t *q, mblk_t *mp)
 static noinline fastcall __unlikely int
 tp_r_proto(queue_t *q, mblk_t *mp)
 {
-	struct tp *tp = TP_PRIV(q);
+	struct tp *tp;
 	int old_i_state, old_u_state;
-	uint32_t prim;
 	int rtn = 0;
+
+	if ((tp = tp_acquire(q)) == NULL)
+		return (-EDEADLK);
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(uint32_t)) {
 		strlog(tp->mid, tp->sid, 0, SL_ERROR, "primitive too short <-");
+		tp_release(tp);
 		freemsg(mp);
 		return (0);
 	}
-
-	prim = *(uint32_t *) mp->b_rptr;
-
-	if (!tp_trylock(tp, q))
-		return (-EDEADLK);
 
 	old_i_state = tp_get_i_state(tp);
 	old_u_state = tp_get_u_state(tp);
@@ -10336,11 +10761,11 @@ tp_r_proto(queue_t *q, mblk_t *mp)
 		/* If we have not yet received a response to our T_INFO_REQ and this is not the
 		   response, wait for the response (one _is_ coming).  Of course, if this is a
 		   priority message it must be processed immediately anyway. */
-		tp_unlock(tp);
+		tp_release(tp);
 		return (-EAGAIN);
 	}
 
-	switch (prim) {
+	switch (*(uint32_t *) mp->b_rptr) {
 	case T_CONN_IND:
 		strlog(tp->mid, tp->sid, SLLOGRX, SL_TRACE, "T_CONN_IND <-");
 		rtn = t_conn_ind(tp, q, mp);
@@ -10414,7 +10839,7 @@ tp_r_proto(queue_t *q, mblk_t *mp)
 		tp_set_i_state(tp, old_i_state);
 		tp_set_u_state(tp, old_u_state);
 	}
-	tp_unlock(tp);
+	tp_release(tp);
 	return (rtn);
 }
 
@@ -10426,10 +10851,10 @@ tp_r_proto(queue_t *q, mblk_t *mp)
 static noinline fastcall __unlikely int
 tp_r_sig(queue_t *q, mblk_t *mp)
 {
-	struct tp *tp = TP_PRIV(q);
+	struct tp *tp;
 	int rtn = 0;
 
-	if (!tp_trylock(tp, q))
+	if ((tp = tp_acquire(q)) == NULL)
 		return (-EDEADLK);
 
 	if (likely(mi_timer_valid(mp))) {
@@ -10457,7 +10882,8 @@ tp_r_sig(queue_t *q, mblk_t *mp)
 			break;
 		}
 	}
-	tp_unlock(tp);
+
+	tp_release(tp);
 	return (rtn);
 }
 
@@ -10606,9 +11032,12 @@ static streamscall int
 sl_rsrv(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
+	struct tp *tp;
 
-	if (sl->tp.tp)
-		qenable(sl->tp.tp->rq);
+	if ((tp = sl_tp_acquire(sl, q)) != NULL) {
+		qenable(tp->rq);
+		sl_tp_release(tp);
+	}
 	return (0);
 }
 
@@ -10733,14 +11162,15 @@ tp_wput(queue_t *q, mblk_t *mp)
 static streamscall int
 tp_wsrv(queue_t *q)
 {
-	struct tp *tp = TP_PRIV(q);
+	struct tp *tp;
 	struct sl *sl;
 
-	read_lock(&sl_mux_lock);
-	for (sl = tp->sl.list; sl; sl = sl->tp.next)
-		if (sl->wq)
-			qenable(sl->wq);
-	read_unlock(&sl_mux_lock);
+	if ((tp = tp_acquire(q)) != NULL) {
+		for (sl = tp->sl.list; sl; sl = sl->tp.next)
+			if (sl->wq)
+				qenable(sl->wq);
+		tp_release(tp);
+	}
 	return (0);
 }
 
@@ -10772,14 +11202,33 @@ tp_wsrv(queue_t *q)
  * to provide more than on AS for a given SCTP association.)  This is a simplified case.  We will
  * handle this one later, but instead of allocating an SL structure and an TP structure, they should
  * be allocated together.
+ *
+ * Okay, here's how the driver works:
+ *
+ * (cminor == 0) && (sflag == DRVOPEN)
+ *	When minor device number 0 is opened with DRVOPEN (non-clone), a control Stream is opened.
+ *	If a control Stream has already been opened, the open is refused.  The sflag is changed from
+ *	DRVOPEN to CLONEOPEN and a new minor device number above 4096 is assigned.  This uses the
+ *	autocloning features of Linux Fast-STREAMS.  This corresponds to the /dev/streams/m2ua-as/lm
+ *	minor device node.
+ *
+ * (cminor == 0) && (sflag == CLONEOPEN)
+ *	This is normal clone open using the clone(4) driver.  A disassociated user Stream is opened.
+ *	A new unique minor device number above 4096 is assigned.  This corresponds to the
+ *	/dev/streams/clone/m2ua-as clone device node.
+ *
+ * (1 <= cminor && cminor <= 4096)
+ *	This is normal non-clone open.  Where the minor device number is between 1 and 4096, a
+ *	associated user stream is opened.  If there is no lower stream to associate, the open fails.
+ *	A new minor device number above 4096 is assigned.  Ths uses the autocloning features of
+ *	Linux Fast-STREAMS.  This corresponds to the /dev/streams/m2ua-as/NNNN minor device node
+ *	where NNNN is the minor device number.
  */
 static streamscall int
 sl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
-	mblk_t *t1, *t2;
 	minor_t cminor;
 	major_t cmajor;
-	struct sl *sl;
 	int err;
 
 	if (q->q_ptr != NULL)
@@ -10794,26 +11243,23 @@ sl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 		return (ENXIO);
 
 	*devp = makedevice(cmajor, NUM_AS + 1);
-	sflag = CLONEOPEN;
-
-	if (!(t1 = mi_timer_alloc(WR(q), sizeof(int))))
-		return (ENOBUFS);
-	if (!(t2 = mi_timer_alloc(WR(q), sizeof(int)))) {
-		mi_timer_free(t1);
-		return (ENOBUFS);
-	}
+	/* start assigning minors at 4097 */
 
 	write_lock(&sl_mux_lock);
-	if ((err = mi_open_comm(&sl_opens, sizeof(*sl), q, devp, oflags, sflag, crp))) {
+
+	if ((err = mi_open_comm(&sl_opens, sizeof(struct sl), q, devp, oflags, CLONEOPEN, crp))) {
 		write_unlock(&sl_mux_lock);
-		mi_timer_free(t1);
-		mi_timer_free(t2);
 		return (err);
 	}
 	/* initialize sl structure */
-	sl = SL_PRIV(q);
-	sl_init_priv(sl, q, devp, oflags, sflag, crp, t1, t2, cminor);
+	if ((err = sl_init_priv(q, devp, oflags, sflag, crp, cminor))) {
+		mi_close_comm(&sl_opens, q);
+		write_unlock(&sl_mux_lock);
+		return (err);
+	}
 	write_unlock(&sl_mux_lock);
+
+	qprocson(q);
 	return (0);
 }
 

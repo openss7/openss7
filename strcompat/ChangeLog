@@ -1,5 +1,7 @@
 2007-01-28  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/include/sys/mps/stream.h: added missing MI_COPY_CASE
+
 	* doc/man/strcompat.refs: updated references
 	* doc/man/man9/mi_copyout.9.man: updated manual page
 

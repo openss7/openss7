@@ -1,5 +1,11 @@
 2007-01-28  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/test/test-inet_raw.c: updated test program
+	* src/test/test-inet_tcp.c: updated test program
+	* src/test/test-inet_udp.c: updated test program
+	* src/test/test-timod.c: updated test program
+	* tests/testsuite-timod.at: updated test program
+
 	* doc/man/strxnet.refs: updated references
 
 2007-01-15  Brian Bidulock  <bidulock@openss7.org>

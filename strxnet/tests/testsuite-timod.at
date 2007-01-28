@@ -1,11 +1,11 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-timod.at,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/10/30 06:51:06 $
+dnl @(#) $RCSfile: testsuite-timod.at,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/01/28 01:11:31 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/10/30 06:51:06 $ by $Author: brian $
+dnl Last Modified $Date: 2007/01/28 01:11:31 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-timod.at,v $
+dnl Revision 0.9.2.14  2007/01/28 01:11:31  brian
+dnl - updated test programs and working up m2ua-as driver
+dnl
 dnl Revision 0.9.2.13  2006/10/30 06:51:06  brian
 dnl - added ability to sync between test cases
 dnl
@@ -112,7 +115,7 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_timod() {
-    if test $at_verbose = echo ; then options='--verbose=5' ; else options='--verbose=3' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; else options='--again' ; fi
     if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi

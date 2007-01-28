@@ -1,5 +1,16 @@
 2007-01-28  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/test/test-inet_raw.c: updated test programs
+	* src/test/test-inet_sctp.c: updated test programs
+	* src/test/test-inet_tcp.c: updated test programs
+	* src/test/test-inet_udp.c: updated test programs
+	* tests/testsuite-inet_raw.at: updated test programs
+	* tests/testsuite-inet_raw2.at: updated test programs
+	* tests/testsuite-inet_sctp.at: updated test programs
+	* tests/testsuite-inet_tcp.at: updated test programs
+	* tests/testsuite-inet_udp.at: updated test programs
+	* tests/testsuite-inet_udp2.at: updated test programs
+
 	* doc/man/strinet.refs: updated references
 	* doc/man/man8/test-inet_raw.8.man: updated manpage
 	* doc/man/man8/test-inet_sctp.8.man: updated manpage

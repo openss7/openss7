@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.14 2006/12/19 11:47:57 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.15 2007/01/28 01:09:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/19 11:47:57 $ by $Author: brian $
+ Last Modified $Date: 2007/01/28 01:09:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.15  2007/01/28 01:09:56  brian
+ - updated test programs and working up m2ua-as driver
+
  Revision 0.9.2.14  2006/12/19 11:47:57  brian
  - better mi_bufcall implementation
 
@@ -97,7 +100,7 @@
 #ifndef __SYS_MPS_STREAM_H__
 #define __SYS_MPS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mps/stream.h directly, include sys/stream.h instead."

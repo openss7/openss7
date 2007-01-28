@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: lmi.h,v 0.9.2.6 2006/12/06 11:45:15 brian Exp $
+ @(#) $Id: lmi.h,v 0.9.2.7 2007/01/28 01:09:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,18 +45,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/06 11:45:15 $ by $Author: brian $
+ Last Modified $Date: 2007/01/28 01:09:50 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: lmi.h,v $
+ Revision 0.9.2.7  2007/01/28 01:09:50  brian
+ - updated test programs and working up m2ua-as driver
 
  *****************************************************************************/
 
 #ifndef __LMI_H__
 #define __LMI_H__
 
-#ident "@(#) $RCSfile: lmi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: lmi.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
-#define LMI_PROTO_BASE		  0L
+#define LMI_PROTO_BASE		  16L
 
 #define LMI_DSTR_FIRST		( 1L + LMI_PROTO_BASE )
 #define LMI_INFO_REQ		( 1L + LMI_PROTO_BASE )
