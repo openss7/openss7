@@ -1,0 +1,467 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
+.\"
+.\" @(#) $Id: ua_sg_ioctl.4.man,v 1.1.2.1 2007/02/03 03:05:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/02/03 03:05:10 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ua_sg_ioctl.4.man,v $
+.\" Revision 1.1.2.1  2007/02/03 03:05:10  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database sigtran.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so sigtran.macros
+.\"
+.\"
+.TH UA-SG-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B ua_sg_ioctl
+\- IO controls for SIGTRAN UA-SG devices
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/ua_sg_ioctl.h>
+.HP
+.BI "struct strioctl *" arg ;
+.HP
+.BI "int " ua_sg_stream " = open(" ua_sg_device ", " flags );
+.HP
+.BI "int " retval " = ioctl(" ua_sg_stream ", " \fRI_STR\fI ", " arg );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B UA-SG-IOCTL
+is a definition of the managed object model for the
+.BR SIGTRAN (4)
+UA-SG  drivers using the input-output control framework defined in
+.BR lmi_ioctl (4).
+.\"
+.SS "Layer Management Interface"
+.PP
+All
+.BR SIGTRAN (4)
+UA-SG drivers provide a master control Stream as well as local control Streams.  The master and
+local control Stream can use a layer management service primitive interface defined for managing
+.BR SIGTRAN (4)
+UA-SG driver described in
+.BR ua_as_lm (7).
+.\"
+.SS "Object Model"
+.PP
+.BR "Figure 1" ,
+below, illustrates the object model.
+The illustration is simpified in that the AS object has one ASP state for each associated SGP and
+one overall AS state, and the SGP object has on ASP state for each associated AS.  the AS-SGP
+relation is a many-to-many relation bound by the ASP-SG relation.
+.PP
+.ce 47
+\fC\s-1\
+     UA-SG Multiplexing Driver    \ 
+             ________   ________  \ 
+            |        | |        | \ 
+            |  Ctrl  | | Master | \ 
+            | Stream | | Stream | \ 
+            |________| |________| \ 
+  ______________|__________|____  \ 
+ |             _|__       _|__  | \ 
+ |            |    |     |    | | \ 
+ |           _| LM |     | LM | | \ 
+ |          | |____|     |____| | \ 
+ |  ____    |  ____             | \ 
+ | |    |__ | |    |__          | \ 
+ | | UP |  || | UP |  |         | \ 
+ | |____|  || |____|  |         | \ 
+ | |    |  || |    |  |         | \ 
+ | | AS |  || | AS |  |         | \ 
+ | |____|  || |____|  |         | \ 
+ |   | ____||___|     |         | \ 
+ |  _||_   |   ____   |   ____  | \ 
+ | |    |__|__|    |  |  |    | | \ 
+ | | SG |  |  | GP |  |  | DF | | \ 
+ | |____|  |  |____|  |  |____| | \ 
+ |     ____|___|| |___|____     | \ 
+ |  __|_   |   _|__   |   _|__  | \ 
+ | |    |  |  |    |  |  |    | | \ 
+ | | SP |  |  | SP |  |  | SP | | \ 
+ | |____|  |  |____|  |  |____| | \ 
+ | |    |  |  |    |  |  |    | | \ 
+ | | TP |  |  | TP |  |  | TP | | \ 
+ | |____|  |  |____|  |  |____| | \ 
+ |___|_____|____|_____|____|____| \ 
+  ___|____ | ___|____ | ___|____  \ 
+ |        |||        |||        | \ 
+ |  SCTP  |||  SCTP  |||  SCTP  | \ 
+ | Stream ||| Stream ||| Stream | \ 
+ |________|||________|||________| \ 
+        ___|____   ___|____       \ 
+       |        | |        |      \ 
+       |Provider| |Provider|      \ 
+       | Stream | | Stream |      \ 
+       |________| |________|      \ 
+\s+1\fP
+.PP
+.ce
+\fBFigure 1.\fR \- \fIAS Multiplexing Driver and Module Example\fR
+.PP
+UA-SG provides for management of a number of managed objects common to all
+.BR SIGTRAN (4)
+UA-SG protocol components as follows:
+.TP
+.B UA_SG_OBJ_TYPE_DF
+A Default (DF) object instance corresponds to the the collectin of system-wide default options for
+other objects, and is directly associated with a master control Stream (and LM object).  Only one
+instance of the DF object exists on a system for each UA-SG driver.
+.TP
+.B UA_SG_OBJ_TYPE_LM
+A Layer Management (LM) object instance corresponds to an instance of a local management interface
+provided by the UA-SG driver.  LM objects are directly associated with SG objects that
+they manage as well as the control Stream that implements the local management interface.
+.TP
+.B UA_SG_OBJ_TYPE_UP
+A User Part (UP) object instance corresponds to an instance of a local user-provider interface
+provided by the UA-SG driver.  UP objects are directly associated with the AS object that
+provides them service as well as the provider Stream that implements the user-provider interface.
+.TP
+.B UA_SG_OBJ_TYPE_AS
+An Application Server (AS) object instance corresponds to an instance of a local user-provider
+interface served by the UA-SG driver.  AS objects are associated with SG objects that
+provide them service as well as the UP object that represents particulars about the user-provider
+interface, and the provider Stream that implements the user-provider interface.
+.TP
+.B UA_SG_OBJ_TYPE_SG
+A Signalling Gateway (SG) object instance corresponds to an instance of a logical SG system known to
+the UA-SG driver.
+SG objects are associated with AS objects served by the SG, and associated with GP objects that
+belong to the SG and provide service to ASPs.
+Attributes of the SG object are attributes of the logical SG.
+.TP
+.B UA_SG_OBJ_TYPE_GP
+A Signalling Gateway Process (GP) object instance corresponds to an instance of a local SGP.
+GP objects are associated with SG objects that represent the logical SG to which the local SGP
+belongs, and associated with SP objects that represents the remote ASPs which are provided service
+by the local SGP.
+Attributes of the GP object are attributes of the local SGP.
+.TP
+.B UA_SG_OBJ_TYPE_SP
+An Application Server Process (SP) object instance corresponds to an instance of a remote ASP known
+to the UA-SG driver and is directly associated with an XP object and SCTP Transport
+Provider Stream.  Instance attributes of the SP object are known attributes of the remote ASP.
+.TP
+.B UA_SG_OBJ_TYPE_TP
+An SCTP Transport Provider (XP) object instance corresponds to an instance of an SCTP association
+used by the UA-SG driver.  It is associated with an SCTP Trasnport Provider Stream.
+.\"
+.SS Default (DF)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_df {
+} ua_conf_df_t;
+\s+1\fP
+.fi
+.PP
+No additional configuration elements are defined.
+.PP
+.B Identification:
+The single DF object has an object identifier of zero (0).
+.PP
+.B Life-cycle:
+Only one DF object exists on a system.  The object is created when the UA-SG driver kernel
+module loades and is destroyed when the kernel module is unloaded.
+.PP
+.B Access:
+Attributes of the DF object can only be changed by the master control Stream.
+Attributes of the DF object can be queried by any Stream.
+.\"
+.SS Layer Management (LM)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_lm {
+    uint sgid;         /* SG that this LM controls */
+} ua_conf_lm_t;
+\s+1\fP
+.fi
+.TP
+.I sgid
+Specifies the SG object with which this control Stream is associated.
+Specifying zero (0) on ADD/MOD will associate the control Stream with an newly created anonymous SG
+object.
+Specifying zero (0) on GET/CHA/MOD/DEL will select the already associated SG object.
+.PP
+.B Identification:
+An LM object is identified by the device number of the control Stream to which the object
+corresponds.
+.PP
+.B Life-cycle:
+Only one master control Stream exists on a system.  The master control Stream is created by opening
+a special minor device number on the UA-SG driver, and destroyed when the Stream is closed.
+Multiple local control Streams can exist on a system.  Local control Streams are normally created
+using the
+.IR I_LINK (7)
+input-output control, but may also be created by the master control Stream by creating an LM
+object.
+.PP
+.B Access:
+Attributes of the LM object can only be changed by the master control Stream or the local control
+Stream that corresponds to the LM object.
+Attributes of the LM object can be queried by the master control Stream or its corresponding local
+control Stream.
+.\"
+.SS User Part (UP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_up {
+} ua_conf_up_t;
+\s+1\fP
+.fi
+.PP
+No additional configuration elements are defined.
+.PP
+.B Identification:
+A UP object is identified by the multiplex identifier of the provider Stream to which the object corresponds.
+.PP
+.B Life-cycle:
+A UP object is created when a provider Stream is linked under the UA-SG driver.
+is destroyed when the provider Stream is unlinked.
+.PP
+.B Access:
+A UP object can be altered by the master control Stream or the local control Stream for the SGP to
+which the UP object corresponds.
+Attributes of the UP object can be queried by the master control Stream or its corresponding local
+control Stream.
+.\"
+.SS Application Server (AS)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_as {
+    uint sgid;         /* SG identifier */
+} ua_conf_as_t;
+\s+1\fP
+.fi
+.TP
+.I sgid
+Identifies the SG to which this AS is (to be) associated.
+When specified as zero (0) either an existing SG associated with the control Stream is specified, or
+a new anonymous SG will be created and the issuing Stream made is local control Stream.
+.PP
+.B Identification:
+AS objects are coincident with UP objects and provider Streams.  An AS object is identified by the
+multiplex identifier of the provider Stream to which the object corresponds.
+.PP
+.B Life-cycle:
+AS objects exist when an UP object exists, however, they are not necessarily fully specified
+(associated with an SG object).  AS objects are destroyed when the corresponding UP object is
+destroyed.
+.PP
+.B Access:
+An AS object can be altered by the master control Stream or the local control Stream for the SG to
+which the AS object corresponds.
+Attributes of the AS object can be queried by the master control Stream or its corresponding local
+control Stream.
+.\"
+.SS Signalling Gateway (SG)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_sg {
+    uint gpids[0];
+    uint asids[0];
+} ua_conf_sg_t;
+\s+1\fP
+.fi
+.TP
+.I spids
+On LIST enumerates the SP objects associated with the SG object by id, empty otherwise.
+.TP
+.I asids
+On LIST enumerates the AS objects associated with the SG object by id, empty otherwise.
+.PP
+.B Identification:
+Public SG objects are identified by their SG identifier.  The SG identifier is a small integer
+number that uniquely identifies the SG object within the system.  SG identifiers between 1 and
+.I NUM_SGS
+also correspond to minor device numbers on the UA-SG driver.  Anonymous SG objects can exist without
+an SG identifier, that is with a zero (0) identifier, when they are associated with a local control
+Stream.
+.PP
+.B Life-cycle:
+SG objects are created on demand when an LM or AS object is associated with them, when a GP object
+is associated with them, or explicitly using the management interface.  Anonymous SG objects are
+destroyed when the SG object is no longer associated with LM or AS objects, or GP objects.  Public
+SG objects are destroyed explicitly using the management interface or when the kernel module
+unloads.
+.PP
+.B Access:
+Attributes of SG objects can be altered by the master control Stream or the associated local control
+Stream.  Attributes of the SG object can be queried by the master control Stream or its
+corresponding local control Stream.
+.\"
+.SS Signalling Gateway Process (GP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_gp {
+    uint sgid;         /* SG to which this SGP belongs. */
+    uint position;     /* SG position for this SGP (small integer) */
+} ua_conf_gp_t;
+\s+1\fP
+.fi
+.PP
+.B Identification:
+GP objects are identified by their GP identifier.  The GP identifier is a unique number of no other
+significance.
+M2UA
+.[
+rfc3331
+.]
+.[
+ts 102 141
+.]
+does not support multiple SGP per SG serving the same AS.  The GP identifier will then, for
+convenience, be the same as the SG identifier.
+For other UAs where an SG does not support multiple local SGP, the GP identifier may, for
+convenience, also be set to the SG identifier.  Because of this, an attempt to create a GP object
+witha zero id (0) will result in the driver first attempting a GP identifier the same as the SG
+identifier with the GP position in the high order 16 bits, and chosing a unique value greater than
+NUM_SG otherwise.
+.PP
+.B Life-cycle:
+GP objects are created on demand when an SP object is associated with them, or explicitly using the
+management interface.  GP objects associated with anonymous SG objects are destroyed when SP objects
+are no longer associated with them.  Public GP objects are destroyed explicitly using the management
+interface or when the kernel module unloads.
+.PP
+.B Access:
+Attributes of GP objects can be altered by the master control Stream or the associated local control
+Stream.  Attributes of the GP object can be queried by the master control Stream or its
+corresponding local control Stream.
+.\"
+.SS Application Server Process (SP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_sp {
+    uint gpid;		/* SGP to which this ASP is connected */
+    uint aspid;		/* External ASP Identifier for ths ASP */
+} ua_conf_sp_t;
+\s+1\fP
+.fi
+.TP
+.I gpid
+.TP
+.I aspid
+.PP
+.B Identification:
+SP objects are coincident with XP objects.  SP objects are identified by the same identifier as the
+corresponding XP object.
+.PP
+.B Life-cycle:
+SP objects exist when an XP object exists, however, they are not necessarily fully specified
+(associated with an SG object).  SP objects are destroyed when the corresponding XP object is
+destroyed.
+.PP
+.B Access:
+An SP object can be altered by the control Stream to which the XP object corresponds, or by the SCTP
+transport provider Stream.
+Attributes of the SP object can be queried by the master control Stream or its corresponding local
+control Stream.
+.\"
+.SS SCTP Transport Provider (XP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_xp {
+} ua_conf_xp_t;
+\s+1\fP
+.fi
+.PP
+No additional configuration elements are defined.
+.PP
+.B Identification:
+An XP object is identified by the lower multiplex identifier of the linked SCTP transport
+Stream.
+.PP
+.B Life-cycle:
+An XP object is created when an SCTP transport Stream is linked under the UA-SG multiplexing driver.
+It is destroyed when unlinked from the UA-SG multiplexing driver.
+.PP
+.B Access:
+An XP object can be altered by the control Stream to which it corresponds.  The control Stream is
+the Stream that performed the
+.IR I_LINK (7)
+or
+.IR I_PLINK (7)
+input-output control operation.
+Attributes of the XP object can be queried by the master control Stream or its corresponding local
+control Stream.

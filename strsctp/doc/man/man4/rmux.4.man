@@ -1,0 +1,364 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
+.\"
+.\" @(#) $Id: rmux.4.man,v 1.1.2.1 2007/02/03 03:05:20 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/02/03 03:05:20 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: rmux.4.man,v $
+.\" Revision 1.1.2.1  2007/02/03 03:05:20  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strsctp.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strsctp.macros
+.\"
+.\"
+.TH RMUX 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B rmux
+\- Remote Multiplexing Driver for STREAMS
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B RMUX
+is a remote multiplexing driver using SCTP,
+.[
+rfc2960
+.]
+.[
+rfc3309
+.]
+.[
+rfc4460
+.]
+.BR sctp (4).
+Its purpose is to make remote
+.IR STREAMS (9)
+devices appear to be local STREAMS devices, permitting distribution of protocol stacks over multiple
+hosts in a fashion transparent to applications programs.  The
+.B RMUX
+driver uses SCTP,
+.BR sctp (4),
+as its transport protocol and a slim protocol to achieve transparency to the STREAMS user interface.
+.PP
+.B RMUX
+uses a single SCTP association to the remote host to provide access to all of the STREAMS devices on
+that host.
+.B RMUX
+is a multiplexing driver that links SCTP associations beneath it using a control Stream during the
+configuration process.  Device numbers on the upper mutiplex (both major and minor) are configured
+during the configuration process.
+.PP
+.B RMUX
+is cleaner than SIGTRAN for use within distributed OpenSS7 protocol stack systems.  Instead
+of being specific to a protocol layer service primitive interface,
+.B RMUX
+is general purpose and
+can be use to export the User-Provider interface for _any_ protocol module.
+.PP
+Non-STREAMS based systems that have SCTP can open and manage STREAMS devices as long as they use
+the
+.B RMUX
+protocol directly.
+.PP
+By chaining devices between hosts, it is possible to provide redundant paths to the same device.
+This accomplished by opening the device multiple times via multiple systems.
+.B RMUX
+can be configured to understand that multiple upper multiplex Streams are related in this fashion
+and can provide automatic failover from one path to another.  Because the acknowledged SCTP NPI
+service is used, each encapsulated message can be marked with an identifier and the ultimate
+receiving device can remove duplications.
+.\"
+.SS Open and Close
+.PP
+When a user opens a configured minor device number, the local
+.B RMUX
+driver blocks in the
+.BR qi_qopen (9)
+procedures and communicates with the remote host on a linked SCTP Stream.
+The remote
+.B RMUX driver has a
+daemon process on a control Stream that, upon an indication, opens the requested device,
+links it under the
+.B RMUX
+driver at the remote end and communicates a return status to the requesting end.  The requesting end
+wakes the sleeping
+.BR qi_qopen (9)
+process and returns the appropriate return value.
+.PP
+Subsequent opens of the local
+.B RMUX
+Stream that invoke the
+.BR qi_qopen (9)
+procedure of the local upper multiplex Stream are also communicated to the remote end and the remote
+.B RMUX
+driver mimics the Stream head open down the module stack and provides the appropriate return value.
+.PP
+When the user closes the driver,
+.B RMUX
+blocks the user in the
+.BR qi_qclose (9)
+procedure,
+communicates the close to the remote end.  The daemon at the remote end unlinks and closes the
+driver and communicates the close to the remote end.
+.PP
+Users cannot rely on the device numbering of opened Streams.
+.PP
+Messages passed to the Stream head that are absorbed by the Stream head (e.g.,
+.BR M_ERROR (9),
+.BR M_SIG "(9), " M_SETOPTS (9))
+on open may be lost for the remote system.  Using knowledge about the Linux Fast-STREAMS
+implementation it is possible to determine whether
+.BR M_HANGUP "(9) or " M_SETOPTS (9)
+as performed while linking.
+.\"
+.SS I_LINK and I_PLINK
+.PP
+Local users can also link both remote and local Streams under a remote multiplexing driver.  When
+linking a Stream, it is communicated to the remote
+.B RMUX
+during the linking process and the remote
+.B RMUX
+daemon opens a special minor device on its upper multiplex and links it under the remote driver.
+When linking a remote Stream on the same host, the corresponding Stream on the remote
+.B RMUX
+lower multiplex is unlinked and linked under the appropriate driver.  When linking a remote Stream
+on a different host is the same a linking a local Stream.
+.\"
+.SS I_PUSH and I_POP
+.PP
+Local users can push modules onto remote Streams; however, the module pushed is a local module.
+.PP
+Module pushing is problematic in that there may be module mismatches between the local and remote
+system.  Where closer control is required a workaround is to use the autopush mechanism on the
+remote system instead (have modules autopushed on opened drivers instead of explicitly pushed by the
+local user).  Another workaround is to use a specialized set of R_PUSH, R_POP, input-output controls
+that mirror the
+.IR I_PUSH "(7), " I_POP (7),
+input-output controls for STREAMS.  The problem with this later approach is that the user must be
+aware that an
+.B RMUX
+Stream is being used.  (Unless we provide a Stream head option to pass
+.BR I_PUSH "(7) and " I_POP (7)
+input-output
+controls down to the driver.  This later approach is probably best as it also allows remote Streams
+on to be linked under multiplexing drivers on the same host.)
+.PP
+The remote system will have to unlink the Stream, push or pop the module and then relink it.
+.\"
+.SS STREAMS Message Handling
+.PP
+All STREAMS messages are encapsulated and sent to the remote
+.BR RMUX .
+The multiple stream capability of SCTP is utilized fully.  When a remote Stream is established, an
+SID is assigned to each of queue band number for the Stream.  Normal priority messages (e.g,
+.BR M_PROTO (9))
+are sent using ordered delivery on the SID that corresponds to the queue band.  High
+priority messages (e.g,
+.BR M_PCPROTO (9))
+are sent using unordered (???) delivery on the SID that corresponds to high priority messages
+(likely SID 0).
+.PP
+Numbering, flags and structure layout.  It is likely that the same STREAMS implementation is
+necessary on both the sending and receiving system.  In particular, the remote driver must
+understand 32-bit and 64-bit flags for input-output controls.  Where incompatibilities exist, the
+module or driver must refrain from using those facilities.
+.PP
+Modules and drivers cannot have knowledge of, nor rely upon, duplicated message blocks, special
+alignment or "hidden" data in a message block between modules.  (Not much of an issue as they
+shouldn't anyway.)
+.\"
+.SS Queueing
+.PP
+Local Streams representing remote devices will always have service procedures.
+.PP
+Modules and drivers cannot have knowledge of, nor rely upon, the context in which messages are
+passed to neighbouring modules and drivers.
+.\"
+.SS Flow Control
+.PP
+Flow control along the Stream is accomplished using specialized
+.B RMUX
+messages that indicate the band for which flow control is effected.  The receiving
+.B RMUX
+driver places a specalized blocking message on the appropriate queue pair to establish backpressure.
+Additional
+.B RMUX
+message are used for backenabling and also indicate the band for which the backenable has occurred
+(resulting in the removal of the blocking message from the associated queue band).  In this way,
+STREAMS flow control operates transparently.
+.PP
+A better approach to flow control would be to leave messages on the local sending queue until they
+are acknowledged received by the remote end (using the acknowledged data service of the NPI
+interface to SCTP).  This is cleaner in that it does not require blocking messages.  It does still
+require a back-enable message, but without band number.
+.\"
+.SS Loss of Communications
+.PP
+All users must properly handle
+.BR M_ERROR "(9) and " M_HANGUP (9)
+messages.  If communication is lost to the remote
+.BR RMUX ,
+all corresponding local Streams will be hungup with
+.BR M_HANGUP (9).
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+.\"
+.SS R_OPEN_IND
+.PP
+.\"
+.SS R_OPEN_RES
+.PP
+.\"
+.SS R_CLOSE_IND
+.PP
+.\"
+.SS R_CLOSE_RES
+.PP
+.\"
+.SS R_POP_IND
+.PP
+.\"
+.SS R_POP_RES
+.PP
+.\"
+.SS R_PUSH_IND
+.PP
+.\"
+.SS R_PUSH_RES
+.PP
+.\"
+.SS R_OPEN_IND
+.PP
+.\"
+.SS R_OPEN_IND
+.PP
+.\"
+.SS R_OPEN_IND
+.PP
+.\"
+.SS R_OPEN_IND
+.PP
+.\"
+.SS R_OPEN_IND
+.PP
+.\"
+.SS R_OPEN_IND
+.PP
+.\"
+.SS R_OPEN_IND
+.PP
+.\"
+.SS R_OPEN_IND
+.PP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

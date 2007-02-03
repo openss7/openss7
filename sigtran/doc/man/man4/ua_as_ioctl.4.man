@@ -1,0 +1,1257 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
+.\"
+.\" @(#) $Id: ua_as_ioctl.4.man,v 1.1.2.1 2007/02/03 03:05:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/02/03 03:05:10 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ua_as_ioctl.4.man,v $
+.\" Revision 1.1.2.1  2007/02/03 03:05:10  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database sigtran.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so sigtran.macros
+.\"
+.\"
+.TH UA-AS-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B ua_as_ioctl
+\- IO controls for SIGTRAN UA-AS devices
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/ua_as_ioctl.h>
+.HP
+.BI "struct strioctl *" arg ;
+.HP
+.BI "int " ua_as_stream " = open(" ua_as_device ", " flags );
+.HP
+.BI "int " retval " = ioctl(" ua_as_stream ", " \fRI_STR\fI ", " arg );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B UA-AS-IOCTL
+is a definition of the managed object model for the
+.BR SIGTRAN (4)
+UA-AS  drivers using the input-output control framework defined in
+.BR lmi_ioctl (4).
+.\"
+.SS "Layer Management Interface"
+.PP
+All
+.BR SIGTRAN (4)
+UA-AS drivers provide a master control Stream as well as local control Streams.  The master and
+local control Stream can use a layer management service primitive interface defined for managing
+.BR SIGTRAN (4)
+UA-AS driver described in
+.BR ua_as_lm (7).
+.\"
+.SS "Object Model"
+.PP
+.BR "Figure 1" ,
+below, illustrates the object model.
+The illustration is simpified in that the AS object has one ASP state for each associated SGP and
+one overall AS state, and the SGP object has on ASP state for each associated AS.  the AS-SGP
+relation is a many-to-many relation bound by the ASP-SG relation.
+.PP
+.ce 39
+\fC\s-1\
+     UA-AS Multiplexing Driver    UA-AS Module\ 
+  ________   ________   ________    ________  \ 
+ |        | |        | |        |  |        | \ 
+ |  User  | |  User  | | Master |  |  User  | \ 
+ | Stream | | Stream | | Stream |  | Stream | \ 
+ |________| |________| |________|  |________| \ 
+  ___|__________|__________|_____   ___|____  \ 
+ |  _|__        |         _|__  |  |  _|__  | \ 
+ | |    |       |        |    | |  | |    | | \ 
+ | | LM |       |        | LM | |  | | LM | | \ 
+ | |____|      _|__      |____| |  | |____| | \ 
+ | |    |     |    |            |  | |    | | \ 
+ | | UP |     | UP |            |  | | DF | | \ 
+ | |____|     |____|            |  | |____| | \ 
+ | |    |     |    |            |  |  _|__  | \ 
+ | | AS |     | AS |            |  | |    | | \ 
+ | |____|     |____|            |  | | UP | | \ 
+ |   | _________|               |  | |____| | \ 
+ |  _||_                  ____  |  | |    | | \ 
+ | |    |                |    | |  | | AS | | \ 
+ | | SP |_______         | DF | |  | |____| | \ 
+ | |____|      _|__      |____| |  | |    | | \ 
+ |            |    |            |  | | SP | | \ 
+ |            | SG |            |  | |____| | \ 
+ |            |____|            |  | |    | | \ 
+ |     ________|| |________     |  | | SG | | \ 
+ |  __|_       _|__       _|__  |  | |____| | \ 
+ | |    |     |    |     |    | |  | |    | | \ 
+ | | GP |     | GP |     | GP | |  | | GP | | \ 
+ | |____|     |____|     |____| |  | |____| | \ 
+ | |    |     |    |     |    | |  | |    | | \ 
+ | | TP |     | TP |     | TP | |  | | TP | | \ 
+ | |____|     |____|     |____| |  | |____| | \ 
+ |___|__________|__________|____|  |___|____| \ 
+  ___|____   ___|____   ___|____    ___|____  \ 
+ |        | |        | |        |  |        | \ 
+ |  SCTP  | |  SCTP  | |  SCTP  |  |  SCTP  | \ 
+ | Stream | | Stream | | Stream |  | Stream | \ 
+ |________| |________| |________|  |________| \ 
+\s+1\fP
+.PP
+.ce
+\fBFigure 1.\fR \- \fIAS Multiplexing Driver and Module Example\fR
+.PP
+UA-AS provides for management of a number of managed objects common to all
+.BR SIGTRAN (4)
+UA-AS protocol components as follows:
+.TP
+.B UA_AS_OBJ_TYPE_DF
+A Default (DF) object instance corresponds to the the collectin of system-wide default options for
+other objects, and is directly associated with a master control Stream (and LM object).  Only one
+instance of the DF object exists on a system for each UA-AS module or driver.
+.TP
+.B UA_AS_OBJ_TYPE_LM
+A Layer Management (LM) object instance corresponds to an instance of a local management interface
+provided by the UA-AS module or driver.  LM objects are directly associated with SP objects that
+they manage as well as the control Stream that implements the local management interface.
+.TP
+.B UA_AS_OBJ_TYPE_UP
+A User Part (UP) object instance corresponds to an instance of a local user-provider interface
+provided by the UA-AS module or driver.  UP objects are directly associated with the AS object that
+provides them service as well as the user Stream that implements the user-provider interface.
+.TP
+.B UA_AS_OBJ_TYPE_AS
+An Application Server (AS) object instance corresponds to an instance of a local user-provider
+interface served by the UA-AS module or driver.  AS objects are associated with ASP objects that
+provide them service as well as the UP object that represents particulars about the user-provider
+interface, and the user Stream that implements the user-provider interface.
+.TP
+.B UA_AS_OBJ_TYPE_SP
+An Application Server Process (SP) object instance corresponds to an instance of a local ASP.  ASP
+objects are associated with AS objects served by the ASP, and associated with SG objects that
+provide service to the ASP.
+(Note that M2UA
+.[
+rfc3331
+.]
+.[
+ts 102 141
+.]
+does not support multiple SGs per ASP serving the same AS.)
+Attributes of the SP object are attributes of the local ASP.
+.TP
+.B UA_AS_OBJ_TYPE_SG
+A Signalling Gateway (SG) object instance corresponds to an instance of a remote SG system known to
+the UA-AS driver or module.  SG objects are associated with GP objects that represent the SGP
+contained by the SG, and associated with an SP object that represents the local ASP which is
+provided service by the remote SG.
+(Note that M2UA
+.[
+rfc3331
+.]
+.[
+ts 102 141
+.]
+does not support multiple SGPs per SG.)
+.TP
+.B UA_AS_OBJ_TYPE_GP
+A Signalling Gateway Process (GP) object instance corresponds to an instance of a remote SGP known
+to the UA-AS driver or module and is directly associated with an XP object and SCTP Transport
+Provider Stream.  Instance attributes of the GP object are known attributes of the remote SGP.
+.TP
+.B UA_AS_OBJ_TYPE_XP
+An SCTP Transport Provider (XP) object instance corresponds to an instance of an SCTP association
+used by the UA-AS driver or module.  It is associated with an SCTP Trasnport Provider Stream.
+.\"
+.SS "Management Attributes"
+.PP
+Each object has associated with it information in the following categories:
+.TP
+.I Configuration
+All of the primary attributes necessary and sufficient for the creation and linkage of each object.
+.TP
+.I Options
+Options (not necessary for creation) for each object.  All options have defaults that exist in the
+DF object.
+.TP
+.I State
+The (dynamic) state of each object.
+.TP
+.I Statistics
+Statistics associated with each object in accordance with an operational measurment model or MIB.
+.TP
+.I Events
+Events associated with each object in accordance with an operational measurement model or MIB.
+.TP
+.I Controls
+Management controls applicable to each object in accordance with a managed object model or MIB.
+.PP
+Thes categories are described in detail in the sections that follow:
+.\"
+.\"
+.SH CONFIGURATION
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_config {
+    uint type;         /* object type */
+    uint id;           /* object id */
+    union {
+        uint cmd;      /* object command */
+        uint count;    /* object count */
+        uint num;      /* number of sub-object oids in list */
+    };
+    /* followed by object-specific config structure and list */
+} ua_config_t;
+
+#define UA_GET  0
+#define UA_ADD  1
+#define UA_CHA  2
+#define UA_MOD  3
+#define UA_DEL  4
+
+#define UA_AS_IOCGCONFIG        ((UA_AS_IOC_MAGIC<<8)|002)      /* ua_config_t */
+#define UA_AS_IOCSCONFIG        ((UA_AS_IOC_MAGIC<<8)|003)      /* ua_config_t */
+#define UA_AS_IOCTCONFIG        ((UA_AS_IOC_MAGIC<<8)|004)      /* ua_config_t */
+#define UA_AS_IOCCCONFIG        ((UA_AS_IOC_MAGIC<<8)|005)      /* ua_config_t */
+#define UA_AS_IOCLCONFIG        ((UA_AS_IOC_MAGIC<<8)|021)      /* ua_config_t */
+\s+1\fP
+.fi
+.TP
+.I type
+.TP
+.I id
+.TP
+.I cmd
+.TP
+.I count
+.TP
+.I num
+.TP
+.B UA_AS_IOCGCONFIG
+.TP
+.B UA_AS_IOCSCONFIG
+.TP
+.B UA_AS_IOCTCONFIG
+.TP
+.B UA_AS_IOCCCONFIG
+.TP
+.B UA_AS_IOCLCONFIG
+.\"
+.SS Default (DF)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_df {
+} ua_conf_df_t;
+\s+1\fP
+.fi
+.PP
+No additional configuration elements are defined.
+.PP
+.B Identification:
+The single DF object has an object identifier of zero (0).
+.PP
+.B Life-cycle:
+Only one DF object exists on a system.  The object is created when the UA-AS module or driver kernel
+module loades and is destroyed when the kernel module is unloaded.
+.PP
+.B Access:
+Attributes of the DF object can only be changed by the master control Stream.
+Attributes of the DF object can be queried by any Stream.
+.\"
+.SS Layer Management (LM)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_lm {
+    uint spid;         /* ASP that this LM controls */
+} ua_conf_lm_t;
+\s+1\fP
+.fi
+.TP
+.I spid
+Specifies the SP object with which this control Stream is associated.
+Specifying zero (0) on ADD/MOD will associate the control Stream with an newly created anonymous SP
+object.
+Specifying zero (0) on GET/CHA/MOD/DEL will select the already associated SP object.
+.PP
+.B Identification:
+An LM object is identified by the device number of the control Stream to which the object
+corresponds.
+.PP
+.B Life-cycle:
+Only one master control Stream exists on a system.  The master control Stream is created by opening
+a special minor device number on the UA-AS driver, and destroyed when the Stream is closed.
+Multiple local control Streams can exist on a system.  Local control Streams are normally created
+using the
+.IR I_PUSH (7)
+or
+.IR I_LINK (7)
+input-output controls, but may also be created by the master control Stream by creating an LM
+object.
+.PP
+.B Access:
+Attributes of the LM object can only be changed by the master control Stream or the local control
+Stream that corresponds to the LM object.
+Attributes of the LM object can be queried by the master control Stream, its corresponding local
+control Stream, or corresponding user Streams.
+.\"
+.SS User Part (UP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_up {
+} ua_conf_up_t;
+\s+1\fP
+.fi
+.PP
+No additional configuration elements are defined.
+.PP
+.B Identification:
+A UP object is identified by the device number of the user Stream to which the object corresponds.
+.PP
+.B Life-cycle:
+A UP object is created when a user Stream is opened on the UA-AS driver or when the UA-AS module is
+pushed.  It is destroyed when the user Stream is closed or when the module is popped.
+.PP
+.B Access:
+A UP object can be altered by the master control Stream, the local control Stream for the ASP to
+which the UP object corresponds, or by the user Stream to which the UP object corresponds.
+Attributes of the UP object can be queried by the master control Stream, its corresponding local
+control Stream, or corresponding user Stream.
+.\"
+.SS Application Server (AS)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_as {
+    uint spid;         /* SP identifier */
+} ua_conf_as_t;
+\s+1\fP
+.fi
+.TP
+.I spid
+Identifies the SP to which this AS is (to be) associated.
+When specified as zero (0) either an existing SP associated with the control Stream is specified, or
+a new anonymous SP will be created and the issuing Stream made is local control Stream.
+.PP
+.B Identification:
+AS objects are coincident with UP objects and user Streams.  An AS object is identified by the
+device number of the user Stream to which the object corresponds.
+.PP
+.B Life-cycle:
+AS objects exist when an UP object exists, however, they are not necessarily fully specified
+(associated with an SP object).  AS objects are destroyed when the corresponding UP object is
+destroyed.
+.PP
+.B Access:
+An AS object can be altered by the master control Stream, the local control Stream for the ASP to
+which the AS object corresponds, or by the user Stream to which the AS object corresponds.
+Attributes of the AS object can be queried by the master control Stream, its corresponding local
+control Stream, or corresponding user Stream.
+.\"
+.SS Application Server Process (SP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_sp {
+    uint sgids[0];
+    uint asids[0];
+} ua_conf_sp_t;
+\s+1\fP
+.fi
+.TP
+.I sgids
+On LIST enumerates the SG objects associated with this SP object by id, empty otherwise.
+.TP
+.I asids
+On LIST enumerates the AS objects associated with this SP object by id, empty otherwise.
+.PP
+.B Identification:
+Public SP objects are identified by their SP identifier.  The SP identifier is a small integer
+number that uniquely identifies the SP object within the system.  SP identifiers between 1 and
+.I NUM_ASPS
+also correspond to minor device numbers on the UA-AS driver.  Anonymous SP objects can exist without
+an SP identifier, that is with a zero (0) identifier, when they are associated with a local control
+Stream.
+.PP
+.B Life-cycle:
+SP objects are created on demand when an LM or AS object is associated with them, when an SG object
+is associated with them, or explicitly using the management interface.  Anonymous SP objects are
+destroyed when no longer associated with LM or AS objects, or SG objects.  Public SP objects are
+destroyed explicitly using the management interface or when the kernel module unloads.
+.PP
+.B Access:
+Attributes of SP objects can be altered by the master control Stream or the associated local control
+Stream.
+Attributes of the SP object can be queried by the master control Stream, its corresponding local
+control Stream, or corresponding user Streams.
+.\"
+.SS Signalling Gateway (SG)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_sg {
+    uint spid;
+    uint position;    /* SG position for this ASP (small integer) */
+    uint gpids[0];
+} ua_conf_sg_t;
+\s+1\fP
+.fi
+.TP
+.I spid
+.TP
+.I gpids
+.PP
+.B Identification:
+SG objects are identified by their SG identifier.  The SG identifier is a unique number of no other
+significance.
+M2UA
+.[
+rfc3331
+.]
+.[
+ts 102 141
+.]
+does not support multiple SGs per ASP serving the same AS.  The SG identifier will then, for
+convenience, be the same as the SP identifier.
+For other UAs where an ASP does not support multiple SG, the SG identifier may, for convenience,
+also be set to the SP identifier.  Because of this, an attempt to create an SG object with a zero
+(0) id will result in the driver first attempting to allocated an SG identifier the same as the SP
+identifier with the SG position in the high order 16 bits, and chosing a unique value greater than
+NUM_ASP otherwise.
+.PP
+.B Life-cycle:
+SG objects are created on demand when a GP object is associated with them, or explicitly using the
+management interface.  SG objects associated with anonymous SP objects are destroyed when GP objects
+are no longer associated with them.  Anonymous SG objects are destroyed when the Public SG objects
+are destroyed explicitly using the management interface or when the kernel module unloads.
+.PP
+.B Access:
+Attributes of SG objects can be altered by the master control Stream or the associated local control
+Stream.
+Attributes of the SG object can be queried by the master control Stream, its corresponding local
+control Stream, or corresponding user Streams.
+.\"
+.SS Signalling Gateway Process (GP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_gp {
+    uint sgid;         /* SG to which this SGP belongs. */
+    uint position;     /* SG position for this SGP (small integer) */
+} ua_conf_gp_t;
+\s+1\fP
+.fi
+.TP
+.I sgid
+.TP
+.I position
+.PP
+.B Identification:
+GP objects are coincident with XP objects.  GP objects are identified by the same identifier as the
+corresponding XP object.
+.PP
+.B Life-cycle:
+GP objects exist when an XP object exists, however, they are not necessarily fully specified
+(associated with an SG object).  GP objects are destroyed when the corresponding XP object is
+destroyed.
+.PP
+.B Access:
+A GP object can be altered by the control Stream to which the XP object corresponds, or by the SCTP
+transport provider Stream.
+Attributes of the GP object can be queried by the master control Stream, its corresponding local
+control Stream, or corresponding user Streams.
+.\"
+.SS SCTP Transport Provider (XP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_conf_xp {
+} ua_conf_xp_t;
+\s+1\fP
+.fi
+.PP
+No additional configuration elements are defined.
+.PP
+.B Identification:
+An XP object is identified by the lower multiplex identifier of the linked or pushed SCTP transport
+Stream.  In the case of pushing, the XP object is anonymous and has a zero (0) identifier.
+.PP
+.B Life-cycle:
+An XP object is created when an SCTP transport Stream is linked under the UA-AS multiplexing driver
+or pushed beneath the UA-AS module.  It is destroyed when unlinked from the UA-AS multiplexing
+driver or the UA-AS module is popped.
+.PP
+.B Access:
+An XP object can be altered by the control Stream to which it corresponds.  The control Stream is
+the Stream that performed the
+.IR I_PUSH (7),
+.IR I_LINK (7)
+or
+.IR I_PLINK (7)
+input-output control operation.
+Attributes of the XP object can be queried by the master control Stream, its corresponding local
+control Stream, or corresponding user Streams.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_option {
+    uint type;
+    uint id;
+    /* followed by object-specific option structure */
+} ua_option_t;
+
+#define UA_AS_IOCGOPTIONS       ((UA_AS_IOC_MAGIC<<8)|000)      /* ua_option_t */
+#define UA_AS_IOCSOPTIONS       ((UA_AS_IOC_MAGIC<<8)|001)      /* ua_option_t */
+\s+1\fP
+.fi
+.TP
+.I type
+.TP
+.I id
+.TP
+.B UA_AS_IOCGOPTIONS
+.TP
+.B UA_AS_IOCSOPTIONS
+.\"
+.SS Default (DF)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_opt_conf_df {
+    struct ua_opt_conf_lm lm;   /* LM defaults */
+    struct ua_opt_conf_up up;   /* UP defaults */
+    struct ua_opt_conf_as as;   /* AS defaults */
+    struct ua_opt_conf_sp sp;   /* SP defaults */
+    struct ua_opt_conf_sg sg;   /* SG defaults */
+    struct ua_opt_conf_gp gp;   /* GP defaults */
+    struct ua_opt_conf_xp xp;   /* XP defaults */
+} ua_opt_conf_df_t;
+\s+1\fP
+.fi
+.TP
+.I lm
+.TP
+.I up
+.TP
+.I as
+.TP
+.I sp
+.TP
+.I sg
+.TP
+.I gp
+.TP
+.I xp
+.\"
+.SS Layer Management (LM)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_opt_conf_lm {
+} ua_opt_conf_lm_t;
+\s+1\fP
+.fi
+.PP
+No options are defined.
+.\"
+.SS User Part (UP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_opt_conf_up {
+    struct lmi_option options;  /* protocol variant and options */
+    uint max_sdu;      /* maximum sdu size */
+    uint opt_sdu;      /* optimal sdu size */
+    uint max_cdata;    /* maximum amount of connection data */
+    uint max_ddata;    /* maximum amount of disconnection data */
+    uint max_esdu;     /* maximum esdu size */
+    uint testab;       /* duration of establish timer (TS 102 141) */
+} ua_opt_conf_up_t;
+\s+1\fP
+.fi
+.TP
+.I options
+.TP
+.I max_sdu
+.TP
+.I opt_sdu
+.TP
+.I max_cdata
+.TP
+.I max_ddata
+.TP
+.I max_esdu
+.TP
+.I testab
+.\"
+.SS Application Server (AS)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_opt_conf_as {
+    uint tmode;        /* traffic mode */
+    uint loadgrp;      /* load group */
+    uint loadsel;      /* load selection */
+    uint tack;         /* duration of ack timer */
+    uint tbeat;        /* duration of heartbeat time */
+} ua_opt_conf_as_t;
+\s+1\fP
+.fi
+.TP
+.I tmode
+.TP
+.I loadgrp
+.TP
+.I loadsel
+.TP
+.I tack
+.TP
+.I tbeat
+.\"
+.SS Application Server Process (SP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_opt_conf_sp {
+    struct lmi_option options;  /* Protocol variant and options */
+    uint aspid;        /* External UA ASP Identifier */
+    uint tack;         /* duration of ack timer */
+    uint tbeat;        /* duration of heartbeat timer */
+    uint tidle;        /* duration of idle timer */
+} ua_opt_conf_sp_t;
+\s+1\fP
+.fi
+.TP
+.I options
+.TP
+.I aspid
+.TP
+.I tack
+.TP
+.I tbeat
+.TP
+.I tidle
+.\"
+.SS Signalling Gateway (SG)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_opt_conf_sg {
+    struct lmi_option options;  /* protocol variant and options */
+    uint tmode;        /* traffic mode for sg */
+} ua_opt_conf_sg_t;
+\s+1\fP
+.fi
+.TP
+.I options
+.TP
+.I tmode
+.\"
+.SS Signalling Gateway Process (GP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_opt_conf_gp {
+};
+\s+1\fP
+.fi
+.PP
+No options are defined.
+.\"
+.SS SCTP Transport Provider (XP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_opt_conf_xp {
+    uint ppi;          /* payload protocol identifier */
+} ua_opt_conf_xp_t;
+\s+1\fP
+.fi
+.TP
+.I ppi
+.\"
+.\"
+.SH STATE
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_statem {
+    uint type;         /* object type */
+    uint id;           /* object id */
+    uint flags;        /* object flags */
+    union {
+        uint state;    /* object state (output) */
+        uint numb;     /* sub-state structures available (input) */
+    };
+    /* followed by object-specific state structure */
+} ua_statem_t;
+
+#define UA_AS_IOCGSTATEM        ((UA_AS_IOC_MAGIC<<8)|006)      /* ua_statem_t */
+#define UA_AS_IOCCMRESET        ((UA_AS_IOC_MAGIC<<8)|007)      /* ua_statem_t */
+\s+1\fP
+.fi
+.TP
+.I type
+.TP
+.I id
+.TP
+.I flags
+.TP
+.I state
+.TP
+.I numb
+.TP
+.B UA_AS_IOCGSTATEM
+.TP
+.B UA_AS_IOCCMRESET
+.\"
+.SS Default (DF)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_statem_df {
+} ua_statem_df_t;
+\s+1\fP
+.fi
+.\"
+.SS Layer Management (LM)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_statem_lm {
+} ua_statem_lm_t;
+\s+1\fP
+.fi
+.PP
+No additional state variables are defined.
+.\"
+.SS User Part (UP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_statem_up {
+} ua_statem_up_t;
+\s+1\fP
+.fi
+.PP
+No additional state variables are defined.
+.\"
+.SS Application Server (AS)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_statem_as_sg {
+    uint type;         /* object type AS or SG */
+    uint id;           /* object identifier */
+    uint state;        /* current AS state */
+} ua_statem_as_sg_t;
+
+typedef struct ua_statem_as_gp {
+    uint type;         /* object type AS or GP */
+    uint id;           /* object identifier */
+    uint state;        /* current AS state */
+} ua_statem_as_gp_t;
+
+typedef struct ua_statem_as {
+    struct ua_statem sg_list[0];
+    struct ua_statem gp_list[0];
+} ua_statem_as_t;
+
+/* AS State */
+#define AS_DOWN         0
+#define AS_WACK_RREQ    1
+#define AS_WACK_DREQ    2
+#define AS_INACTIVE     3
+#define AS_WACK_ASPAC   4
+#define AS_WACK_ASPIA   5
+#define AS_ACTIVE       7
+\s+1\fP
+.fi
+.TP
+.I sg_list
+.TP
+.I gp_list
+.\"
+.SS Application Server Process (SP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_statem_sp_as {
+    uint asid;         /* AS object identifier */
+    uint state;        /* current overall AS state */
+} ua_statem_sp_as_t;
+
+typedef struct ua_statem_sp {
+    struct ua_statem as_list[0];
+} ua_statem_sp_t;
+
+/* ASP State */
+#define ASP_DOWN        0
+#define ASP_WACK_ASPUP  1
+#define ASP_WACK_ASPDN  2
+#define ASP_UP          3
+\s+1\fP
+.fi
+.TP
+.I as_list
+.\"
+.SS Signalling Gateway (SG)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_statem_sg_gp {
+    uint type;         /* SG or GP */
+    uint gpid;         /* object identifier */
+    uint state;        /* current GP state */
+} ua_statem_sg_gp_t;
+
+typedef struct ua_statem_sg {
+    struct ua_statem gp_list[0];
+    struct ua_statem as_list[0];
+} ua_statem_sg_t;
+\s+1\fP
+.fi
+.TP
+.I gp_list
+.TP
+.I as_list
+.\"
+.SS Signalling Gateway Process (GP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_statem_gp {
+    struct ua_statem sg_list[0];
+    struct ua_statem as_list[0];
+} ua_statem_gp_t;
+\s+1\fP
+.fi
+.TP
+.I sg_list
+.TP
+.I as_list
+.\"
+.SS SCTP Transport Provider (XP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_statem_xp {
+} ua_statem_xp_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH STATISTICS
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_stats {
+    uint type;         /* object type */
+    uint id;           /* object id */
+    uint header;       /* object stats header */
+    /* followed by object-specific stats structure */
+} ua_stats_t;
+
+#
+define UA_AS_IOCGSTATSP        ((UA_AS_IOC_MAGIC<<8)|010)      /* ua_stats_t */
+#define UA_AS_IOCSSTATSP        ((UA_AS_IOC_MAGIC<<8)|011)      /* ua_stats_t */
+#define UA_AS_IOCGSTATS         ((UA_AS_IOC_MAGIC<<8)|012)      /* ua_stats_t */
+#define UA_AS_IOCCSTATS         ((UA_AS_IOC_MAGIC<<8)|013)      /* ua_stats_t */
+\s+1\fP
+.fi
+.TP
+.I type
+.TP
+.I id
+.TP
+.I header
+.TP
+.B UA_AS_IOCGSTATSP
+.TP
+.B UA_AS_IOCSSTATSP
+.TP
+.B UA_AS_IOCGSTATS
+.TP
+.B UA_AS_IOCCSTATS
+.\"
+.SS Default (DF)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_stats_df {
+} ua_stats_df_t;
+\s+1\fP
+.fi
+.PP
+No statistics are currently defined.
+.\"
+.SS Layer Management (LM)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_stats_lm {
+} ua_stats_lm_t;
+\s+1\fP
+.fi
+.PP
+No statistics are currently defined.
+.\"
+.SS User Part (UP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_stats_up {
+} ua_stats_up_t;
+\s+1\fP
+.fi
+.PP
+No statistics are currently defined.
+.\"
+.SS Application Server (AS)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_stats_as {
+} ua_stats_as_t;
+\s+1\fP
+.fi
+.PP
+No statistics are currently defined.
+.\"
+.SS Application Server Process (SP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_stats_sp {
+} ua_stats_sp_t;
+\s+1\fP
+.fi
+.PP
+No statistics are currently defined.
+.\"
+.SS Signalling Gateway (SG)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_stats_gp {
+} ua_stats_gp_t;
+\s+1\fP
+.fi
+.PP
+No statistics are currently defined.
+.\"
+.SS Signalling Gateway Process (GP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_stats_sg {
+} ua_stats_sg_t;
+\s+1\fP
+.fi
+.PP
+No statistics are currently defined.
+.\"
+.SS SCTP Transport Provider (XP)
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_stats_xp {
+} ua_stats_xp_t;
+\s+1\fP
+.fi
+.PP
+No statistics are currently defined.
+.\"
+.\"
+.SH EVENTS
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_notify {
+    uint type;         /* object type */
+    uint id;           /* object id */
+    lmi_notify_t notify;        /* notifications */
+} ua_notify_t;
+
+#define UA_AS_IOCGNOTIFY        ((UA_AS_IOC_MAGIC<<8)|014)      /* ua_notify_t */
+#define UA_AS_IOCSNOTIFY        ((UA_AS_IOC_MAGIC<<8)|015)      /* ua_notify_t */
+#define UA_AS_IOCCNOTIFY        ((UA_AS_IOC_MAGIC<<8)|016)      /* ua_notify_t */
+\s+1\fP
+.fi
+.TP
+.I type
+.TP
+.I id
+.TP
+.I notify
+.TP
+.B UA_AS_IOCGNOTIFY
+.TP
+.B UA_AS_IOCSNOTIFY
+.TP
+.B UA_AS_IOCCNOTIFY
+.\"
+.SS Default (DF)
+.PP
+No events are currently defined.  Use the
+.BR ua_as_lm (7)
+for protocol specific notifications.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi
+.\"
+.SS Layer Management (LM)
+.PP
+No events are currently defined.  Use the
+.BR ua_as_lm (7)
+for protocol specific notifications.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi
+.\"
+.SS User Part (UP)
+.PP
+No events are currently defined.  Use the
+.BR ua_as_lm (7)
+for protocol specific notifications.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi
+.\"
+.SS Application Server (AS)
+.PP
+No events are currently defined.  Use the
+.BR ua_as_lm (7)
+for protocol specific notifications.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi
+.\"
+.SS Application Server Process (SP)
+.PP
+No events are currently defined.  Use the
+.BR ua_as_lm (7)
+for protocol specific notifications.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi
+.\"
+.SS Signalling Gateway (SG)
+.PP
+No events are currently defined.  Use the
+.BR ua_as_lm (7)
+for protocol specific notifications.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi
+.\"
+.SS Signalling Gateway Process (GP)
+.PP
+No events are currently defined.  Use the
+.BR ua_as_lm (7)
+for protocol specific notifications.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi
+.\"
+.SS SCTP Transport Provider (XP)
+.PP
+No events are currently defined.  Use the
+.BR ua_as_lm (7)
+for protocol specific notifications.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi
+.\"
+.\"
+.SH CONTROLS
+.PP
+.nf
+\fC\s-1\
+typedef struct ua_mgmt {
+    uint type;         /* object type */
+    uint id;           /* object id */
+    uint cmd;          /* object command */
+} ua_mgmt_t;
+
+#define UA_AS_IOCCMGMT          ((UA_AS_IOC_MAGIC<<8)|017)      /* ua_mgmt_t */
+
+#define UA_AS_MGMT_UP                   1
+#define UA_AS_MGMT_DOWN                 2
+#define UA_AS_MGMT_ACTIVATE             3
+#define UA_AS_MGMT_DEACTIVATE           4
+#define UA_AS_MGMT_UP_BLOCK             5
+#define UA_AS_MGMT_UP_UNBLOCK           6
+#define UA_AS_MGMT_ACT_BLOCK            7
+#define UA_AS_MGMT_ACT_UNBLOCK          8
+\s+1\fP
+.fi
+.TP
+.I type
+.TP
+.I id
+.TP
+.I cmd
+.TP
+.B UA_AS_IOCCMGMT
+.\"
+.SS Default (DF)
+.PP
+No controls are currently implemented.  Use the
+.BR ua_as_lm (7)
+service interface instead.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi
+.\"
+.SS Layer Management (LM)
+.PP
+No controls are currently implemented.  Use the
+.BR ua_as_lm (7)
+service interface instead.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi
+.\"
+.SS User Part (UP)
+.PP
+No controls are currently implemented.  Use the
+.BR ua_as_lm (7)
+service interface instead.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi
+.\"
+.SS Application Server (AS)
+.PP
+No controls are currently implemented.  Use the
+.BR ua_as_lm (7)
+service interface instead.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi
+.\"
+.SS Application Server Process (SP)
+.PP
+No controls are currently implemented.  Use the
+.BR ua_as_lm (7)
+service interface instead.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi
+.\"
+.SS Signalling Gateway (SG)
+.PP
+No controls are currently implemented.  Use the
+.BR ua_as_lm (7)
+service interface instead.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi
+.\"
+.SS Signalling Gateway Process (GP)
+.PP
+No controls are currently implemented.  Use the
+.BR ua_as_lm (7)
+service interface instead.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi
+.\"
+.SS SCTP Transport Provider (XP)
+.PP
+No controls are currently implemented.  Use the
+.BR ua_as_lm (7)
+service interface instead.
+.nf
+\fC\s-1\
+\s+1\fP
+.fi

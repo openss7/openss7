@@ -1,0 +1,441 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
+.\"
+.\" @(#) $Id: ua_as_lm.7.man,v 1.1.2.1 2007/02/03 03:05:13 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/02/03 03:05:13 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ua_as_lm.7.man,v $
+.\" Revision 1.1.2.1  2007/02/03 03:05:13  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database sigtran.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so sigtran.macros
+.\"
+.\"
+.TH UA_AS_LM 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ UA AS Local Management (UA-LM)"
+.SH NAME
+.B ua_as_lm
+\- SIGTRAN User Adaptation (UA) Application Server (AS) Local Management (LM)
+.SH SYNOPSIS
+.PP
+.B #include <sys/tiuser.h>
+.br
+.B #include <sys/ua_as_lm.h>
+.HP
+\fBint\fP \fIfd\fP \fB= open(\fIua-as-device\fB, \fRO_RDWR\fB);
+.HP
+\fBint\fP \fIret\fP \fB= ioctl(\fIfd\fB, \fIcmd\fB, \fI... \fB/* \fIarg\fB */);
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This manual page describes the STREAMS interface which is used to manage and configure SIGTRAN AS
+modules and drivers conforming to the UA-AS Local Management (LM) specification.
+.PP
+UA-AS-LM is the common interface to
+.I OpenSS7
+modules and drivers configured by a set of SIGTRAN configuration utilities,
+.RB ( m2uaasconf (8),
+.BR m3uaasconf (8),
+.BR suaasconf (8),
+.BR tuaasconf (8),
+.BR isuaasconf (8),
+.BR iuaasconf (8),
+.BR duaasconf (8),
+.BR v5uaasconf (8),
+.BR g303uaasconf (8)),
+using
+.BR streamio (2)
+.IR I_PUSH (7)
+and
+.BR I_LINK (7)
+input-output controls.  This interface is provided also for the development of special purpose
+management entities (e.g. SNMP, TMN) for amangement of the SIGTRAN stack.  All SIGTRAN AS drivers,
+modules and multiplexing drivers in the
+.I OpenSS7
+SIGTRAN
+stack provide for this management interface.
+.PP
+The UA-AS-LM
+consists of two subcomponents:
+.TP
+.I LAYER MANAGEMENT INTERFACE
+The layer management interface provides a local management service interface that utilitizes
+.BR M_PROTO (9)
+and
+.BR M_PCPROTO (9)
+message that can be exchanged across the service interface using
+.BR putmsg (2)
+and
+.BR getmsg (2)
+system calls on the Stream head once a control Stream is opened on the AS driver (or once an AS
+module is pushed).  The layer management interface controls local and layer management (SIGTRAN
+configuration functions) which are normally used by a configuration utility on the driver interface
+or control Stream of a multiplexing driver after pushing a module on the Stream head or linking a
+Stream under the multiplexing driver.  The layer management interface is described in detail int he
+section
+.RI \(lq "LAYER MANAGEMENT INTERFACE" ,\(rq
+below.
+.TP
+.I INPUT-OUTPUT CONTROL INTERFACE
+The UA-AS-LM
+also provides an input-output control interface which utilitizes
+.BR ioctl (2)
+transparent calls, pass-through calls, or
+.IR I_STR (7)
+input-output calls using
+.BR streamio (7)
+from a Stream head or a multiplexing driver control Stream.  The input-output control interface
+provides for the control of layer-specific and device specific aspects which are outside the scope
+of the SIGTRAN protocol proper, such as interface configuration and is normally used by a SIGTRAN
+configuration utility or upstream modules during stack operation.
+.\"
+.\"
+.SH "OBJECT MODEL"
+.PP
+The
+UA-AS-LM
+provides for management of a numer of managed objects.  These objects are of a number of types as
+follows:
+.TP
+.B Defaults
+This managed object contains system-wide defaults.  Changing the values associated with this object
+change the defaults used when new objects are created.  There is only one instance of the default
+object that is created when the kernel module is loaded and destroyed when the kernel module is
+unloaded.  Information in this object is not persistent between module loads.
+.TP
+.B User Part (UP)
+This managed object represents the user of the provider-user interface being exported from server to
+client using SIGTRAN.  For example, for M2UA, this is a Signalling Link; for M3UA, an MTP-User.  An
+instance of this object is created by opening a UA-AS driver or pushing a UA-AS module.  The service
+interface provided to an instance of this object is the approprate protocol-specific interface.
+Management of this object, therefore, is in accordance with the specific protocol (see for example,
+.BR lmi (7)).
+UP objects are attached to AS objects and ASP objects using the local management interface for the
+corresponding protocol-specific layer.  For example, M2UA uses the Signalling Link Interface (SLI),
+.BR sli (7),
+which includes a local management interface; M3UA, Message Trasfer Part Interface (MTPI),
+.BR mtpi (7),
+and
+.BR SUA, Network Provider Interface (NPI),
+.BR npi_sccp (7).
+.IP ""
+For AS multiplexing drivers, this is the object associated with a Stream opened on the upper
+multiplexing driver; for AS modules, the Stream after the module is pushed.  In the STREAMS
+implementation, it is the private data associated with a queue-pair on the upper multiplex, or
+module.
+.TP
+.B Application Server (AS)
+An AS object represents the client-server relationship between a UP object and an ASP and SG object.
+Each AS instances is an instance of a bound or attached UP object.  AS objects are created when a UP
+object is associated with an ASP (normally part of the bind or attach) and destroyed when a UP
+object is disassociated with an ASP (or otherwise when the UP object is destroyed).  An AS object
+has a state for every ASP-SGP relation for the ASP to which it is linked, as well as an overall state.
+.TP
+.B Application Server Process (ASP)
+An ASP object represents a local server process (in the STREAMS case, a weightless process)
+providing service to UP objects through AS objects.  ASP objects are created on demand, using
+defaults from the Default object, and destroyed when unused.  Whenever it is requested that an AS be
+associated with an ASP for which an ASP does not yet exist, an ASP object is created on demand.
+Whenever the ASP object is no longer used it is destroyed.  The ASP object is \(lqused\(rq when it
+has AS objects associated with it.
+.TP
+.B Signalling Gateway (SG)
+The SG object is a management object that represents the remote SG.  SG objects are created on
+demand, using defaults from the Default object, and destroyed when unused.  Whenever it is requested
+that an SGP be associated with an SG for which an SG does not yet exist, an SG object is created on
+demand.  Whenever the SG object is no longer used, it is destroyed.  An SG object is \(lqused\(rq
+when it has SG objects associated with it.
+.TP
+.B Signalling Gateway Process (SGP)
+The SGP object is a management object that represents the remote SGP.  SGP objects are created on
+demand, using defaults from the Default object, and destroyed when unused.  Whenever it is requested
+that an TP be associated with an SGP for which an SGP does not yet exist, an SGP object is created
+on demand.  Whenever the SGP object is no longer used, it is destroyed.  An SGP object is
+\(lqused\(rq when it has TP objects associated with it. 
+.TP
+.B Transport Provider (TP)
+The TP object is a management object that represents the SCTP association.  TP objects are created
+on demand, using defaults from the Default object, and information obtained by interrogating the
+SCTP transport, and destroyed when unused.  Whenever an SCTP Stream is linked under an AS
+multiplexing driver or has an AS module pushed over it, a TP object is created on demand.  Whenever
+the SCTP Stream is unlinked  from the AS multiplexing driver or the AS module is popped, the object
+is destroyed.  A TP object is \(lqused\(rq when it has an SCTP Stream associated with it.
+.IP ""
+For AS multiplexing drivers, this is the object associated with a Stream linked under the
+multiplexing driver; for AS modules, the Stream upon which the module was pushed.  In the STREAMS
+implementation, it is the private data associated with a queue-pair on the lower multiplex, or
+module.
+.PP
+.BR "Figure 1" ,
+below, illustrates the object model.
+.PP
+As can be seen from the illustration, User Streams, UP objects and AS objects have a one-to-one
+relationship.  The User Stream can be viewed as the implementation of the UP-AS managed objects.
+The UP managed object can be viewed as all of the SS7- or ISDN-specific attributes of the User
+Stream, whereas the AS object can be viewed as all of the SIGTRAN aspects of the User Stream.
+.PP
+Also, SCTP Streams, TP objects and SGP objects also have a one-to-one relationship.  The SCTP Stream
+can be viewed as the implementation of the SGP-TP managed objects.  The TP managed object can be
+viewed as all of the SCTP/IP aspects of the SCTP Stream, whereas the SGP object can be viewed as all
+of the SIGTRAN aspects of the SCTP Stream.
+.PP
+ASP and SG objects have a one-to-one relationship.  To communicate with two SGs (as in the SG as STP
+scenario for M3UA and SUA) requires two User Streams for each AS: one for each SG.
+.PP
+.ce 39
+\fC\s-1\
+     UA-AS Multiplexing Driver    UA-AS Module\ 
+  ________   ________   ________    ________  \ 
+ |        | |        | |        |  |        | \ 
+ |  User  | |  User  | | Master |  |  User  | \ 
+ | Stream | | Stream | | Stream |  | Stream | \ 
+ |________| |________| |________|  |________| \ 
+  ___|__________|__________|_____   ___|____  \ 
+ |  _|__        |         _|__  |  |  _|__  | \ 
+ | |    |       |        |    | |  | |    | | \ 
+ | | LM |       |        | LM | |  | | LM | | \ 
+ | |____|      _|__      |____| |  | |____| | \ 
+ | |    |     |    |            |  | |    | | \ 
+ | | UP |     | UP |            |  | | DF | | \ 
+ | |____|     |____|            |  | |____| | \ 
+ | |    |     |    |            |  |  _|__  | \ 
+ | | AS |     | AS |            |  | |    | | \ 
+ | |____|     |____|            |  | | UP | | \ 
+ |    |_________ |              |  | |____| | \ 
+ |             _||_       ____  |  | |    | | \ 
+ |            |    |     |    | |  | | AS | | \ 
+ |            | SP |     | DF | |  | |____| | \ 
+ |            |____|     |____| |  | |    | | \ 
+ |            |    |            |  | | SP | | \ 
+ |            | SG |            |  | |____| | \ 
+ |            |____|            |  | |    | | \ 
+ |     ________|| |________     |  | | SG | | \ 
+ |  __|_       _|__       _|__  |  | |____| | \ 
+ | |    |     |    |     |    | |  | |    | | \ 
+ | | GP |     | GP |     | GP | |  | | GP | | \ 
+ | |____|     |____|     |____| |  | |____| | \ 
+ | |    |     |    |     |    | |  | |    | | \ 
+ | | TP |     | TP |     | TP | |  | | TP | | \ 
+ | |____|     |____|     |____| |  | |____| | \ 
+ |___|__________|__________|____|  |___|____| \ 
+  ___|____   ___|____   ___|____    ___|____  \ 
+ |        | |        | |        |  |        | \ 
+ |  SCTP  | |  SCTP  | |  SCTP  |  |  SCTP  | \ 
+ | Stream | | Stream | | Stream |  | Stream | \ 
+ |________| |________| |________|  |________| \ 
+\s+1\fP
+.PP
+.ce
+\fBFigure 1.\fR \- \fIAS Multiplexing Driver and Module Example\fR
+.PP
+The illustration in
+.BR "Figure 1"
+is simpified in that the AS object has one ASP state for each associated SGP and one overall AS
+state, and the SGP object has on ASP state for each associated AS.  the AS-SGP relation is a
+many-to-many relation bound by the ASP-SG relation.
+.\"
+.SS "OBJECT CONFIGURATION"
+.PP
+.\"
+.SS "OBJECT OPTIONS"
+.PP
+.\"
+.SS "OBJECT STATES"
+.PP
+.\"
+.SS "OBJECT STATISTICS"
+.PP
+.\"
+.SS "OBJECT MANAGEMENT"
+.PP
+.\"
+.\"
+.SH "LAYER MANAGEMENT INTERFACE"
+.PP
+.\"
+.SS "LOCAL MANAGEMENT PRIMITIVES"
+.PP
+.TP
+.BR UA_OK_ACK ", " UA_ERROR_ACK
+.\"
+.SS "SCTP MANAGEMENT PRIMITIVES"
+.PP
+.PP
+.B Restrictions:
+These services can only be invoked by the control Stream for the addressed SCTP Stream.  For
+temporary links and modules, the control Stream is the Stream that linked the SCTP Stream or upon
+which the module was pushed; for permanent links, the control Stream is the current master control
+Stream.
+.TP
+.BR UA_LINK_REQ ", " UA_LINK_ACK
+Link an SCTP association to an ASP and acknowlege linkage of an SCTP association.  This service
+associates TP-SGP objects with an ASP-SG object and may result in the creation of an ASP-SG object
+and the assignment of an SGP identifier to the SGP object.
+This is a primary configuration service and is used to \(lqadd\(rq an SGP to an SG (as viewed from
+the ASP).
+.TP
+.BR UA_UNLINK_REQ ", " UA_OK_ACK
+Unlink an SCTP association from an ASP and acknowledge receipt.  This service disassociates a
+TP-SGP object from an ASP-SG object and may result in the destruction of the ASP-SG object (if it is
+no longer used).
+This is a primary configuration services and is used to \(lqremove\(rq an SGP from an SG (as viewed
+from the ASP).
+.TP
+.BR UA_SCTP_REQ ", " UA_SCTP_IND
+Request management of an SCTP association and indicate management of an SCTP association.  This
+service tunnels TPI primitives to and from the control Stream and the SCTP Stream identified with
+the TP object identifier.  The encapsultated TPI primitives can be used to directly control the SCTP
+Stream as described in
+.BR tpi_sctp (7).
+This is a primary configuration and monitoring service and is used to both configure and perform
+ongoing monitoring and management of the SCTP associations.  SCTP associations under the control of
+a control Stream can exchange TPI primitives with ease as though the Stream was neither pushed nor
+linked.
+.\"
+.SS "ASP MANAGEMENT PRIMITIVES"
+.PP
+.PP
+.B Restrictions:
+These services can only be inovked by the control Stream for the ASP.  Each ASP can have at most
+one control Stream.  The control Stream for the ASP is the Stream that is also the control Stream
+for the SCTP Stream linked under the multiplexing driver or upon which the module was pushed.
+.TP
+.BR UA_ASPUP_REQ ", " UA_ASPUP_IND
+.TP
+.BR UA_ASPDN_REQ ", " UA_ASPDN_IND
+.TP
+.BR UA_INFO_REQ ", " UA_INFO_ACK
+.TP
+.BR UA_ERROR_IND ", " UA_NOTIFY_IND
+.\"
+.SS "AS MANAGEMENT PRIMITIVES"
+.PP
+.PP
+.B Restrictions:
+AS management primitives may be invoked by the control Stream for the ASP or by a user Stream
+associated with the AS (by binding or attachment using the UP service interface).
+.TP
+.BR UA_REG_REQ ", " UA_OK_ACK ", " UA_REG_RSP
+Request that a Link/Routing Key be registered with an SGP and provide acknowlegement and
+registration status.
+Registration of Link/Routing Keys is normally performed by the UA-AS driver or module in response to
+user Streams issuing UP specific local management primitives (e.g. binding an address or attaching a
+PPA).  When issued by a control Stream, this service does not affect the state of the associated AS,
+but directly invokes the registration procedure.  When issued by a user Stream, the AS state tracks
+the response (i.e, the IID or RC is assigned and the AS is moved to the ASP_INACTIVE state for the
+SGP).
+.IP ""
+This service might change the form or validity of a user address later presented to a
+UP specific bind or attachment primitive.
+.TP
+.BR UA_DEREG_REQ ", " UA_OK_ACK ", " UA_DEREG_RSP
+Request that an AS be deregistered with an SGP and provide acknowledgement and registration status.
+Deregistration of Link/Routing Keys is normally performed by the UA-AS driver or module in response
+to user Stream issuing UP specific local management primitives (e.g. unbinding or detaching a
+Stream).  When issued  by a control Stream, this service does not affect the state of the associated
+AS, but directly invokes the registration procedure.  When issued by a user Stream, the AS state
+tracks the response (i.e, the IID or RC is removed and the AS is moved to the ASP_DOWN state for the
+SGP).
+.TP
+.BR UA_ASPAC_REQ ", " UA_ASPAC_IND
+Requests activation of an AS for an SGP and indicates activation of an AS for an SGP .
+Activation of AS is normally performed in response to user Streams issuing UP specific local
+management primitives (e.g. connecting to an address, enabling a PPA).  When issued by a control
+Stream or user Stream, this service but directly invokes the ASP Active procedures, however, the
+associated AS, if any, will track the resulting state.
+.IP ""
+For a connected or enabled UP Stream, this service changes the target state of the AS for the SGP to
+the active state.  Should the SGP deactivate the AS, the UA-AS driver will attempt to reactivate the
+AS.
+For a disconnect or diabled UP Stream, the procedure is still invoked, but the target state remains
+at inactive,  quickly resulting in automatic invocation of the ASP Inactive procedures when the ASP
+Active Ack message arrives.  This may, however, be useful for \(lqkicking\(rq the AS state at the
+SGP in a manual resynchornization effort.
+.TP
+.BR UA_ASPIA_REQ ", " UA_ASPIA_IND
+Requests deactivation of an AS and indicates deactivation of an AS.  Deactivation of an AS is
+normally performed in response to user Streams issuing UP specific local management primtives (e.g.
+disconnecting a Stream or disabling a PPA).  When issued by a control Stream or user Stream, this
+service directly invokes the ASP Inactive procedures, however, the associated AS, if any, will track
+the resulting state.
+.IP ""
+For a connected or enabled UP Stream, this service changes the target state of the AS for the SGP to
+the inactive state.
+Disconnected or disabled UP Streams are inactive by definition and are unaffected by this service.
+.TP
+.BR UA_ASINFO_REQ ", " UA_ASINFO_ACK
+Requests information about the configuration and current state of an AS, either with respect to a
+given SGP or the overall state of the AS.
+.TP
+.BR UA_ERROR_IND ", " UA_NOTIFY_IND
+
+
+
+
+
