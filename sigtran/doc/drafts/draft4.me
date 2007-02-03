@@ -1,0 +1,468 @@
+.R1
+abbreviate A
+label L
+no-default-database
+no-accumulate
+no-annotate
+database ../idrefs
+annotate X lp
+move-punctuation
+discard Y
+join-authors ", " ", " " and "
+et-al " et al" 1 2
+search-truncate 32
+separate-label-second-parts ""
+bracket-label " [" "]" "], ["
+sort Z
+sort-adjacent-labels
+reverse A
+.R2
+.\"abbreviate-label-ranges ".."
+.de $0
+.if \\$3<4 \{\
+.(x 0
+.#v
+.ie '\\$2'' \\$1
+.el \\$2 \\$1
+.)x
+.\}
+..
+.if !'\*(.T'ps' \{\
+.fo 'B. Bidulock'\\\\*[version]'FORMFEED[Page %]'
+.ds |x txt
+.ds #n <\\**>
+.m1 1 \" top margin above header
+.m2 1 \" top margin below header
+.m3 1 \" btm margin above footer
+.m4 0 \" btm margin below footer
+.pl 9.66i
+.ll 7.2i
+.lt 7.2i
+.nr PL 9.66i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad l
+.hy 0
+.ta 3
+.ba 0
+.po 0
+.nr so 0
+.nr si 0
+.nr ii 4n
+.nr pi 2n
+.nr po 2n
+.nr bi 2n
+.nr hi 6n
+.nr qi 4n
+.nr bt 30v
+.nr ps 1v
+.nr bs 1v
+.nr qs 1v
+.nr ss 1v
+.nr xs 0
+.nr zs 1v
+.de #v
+.ad l
+.hy 0
+..
+.ds sc Section\ 
+.\}
+.\" want <n> instead of [n] on delayed text
+.rm (d
+.rm d)
+.rm pd
+.rr #
+.de (d
+.am |d )d
+.sp \\n(bsu
+..
+.de )d
+.if \\n# \
+.nr $d +1
+.ds # <\\n($d>\k#
+.rr #
+..
+.de pd
+.|d
+.rm |d
+.nr $d 1 1
+.ds # <1>\k#
+..
+.ds # <\\n($d>\k#
+.if '\*(.T'ps' \{\
+.fo 'B. Bidulock'\\\\*[version]'Page %'
+.ds |x ps
+.ds #n \\**
+.m1 0.25i \" top margin above header
+.m2 0.25i \" top margin below header
+.m3 0.25i \" btm margin above footer
+.m4 0.25i \" btm margin below footer
+.pl 11.0i
+.ll 7.2i
+.lt 7.2i
+.nr PL 11.0i
+.nr LL 7.2i
+.nr LT 7.2i
+.ad b
+.hy 6
+.ta 3
+.ba 0
+.po 0.75i
+.nr so 0
+.nr si 0
+.nr ii 0.5i
+.nr pi 0.25i
+.nr po 0.25i
+.nr bi 0.5i
+.nr hi 0.5i
+.nr qi 0.5i
+.nr bt 44v
+.nr pp 11
+.nr qp 9
+.nr fp 8
+.nr gp 10
+.nr sp 12
+.nr tp 12
+.de #v
+.ad b
+.hy 6
+..
+.ds sc \\(sc
+.\}
+.dn &a
+.dn &b
+.dn &n
+.dn &p
+.dn tables
+.dn figures
+.nr &a 1
+.nr &b 0
+.nr &n 1
+.nr &p 0
+.nr tables 0
+.nr figures 0
+.ds &f Figure\ 
+.ds &t Table\ 
+.if \n[levels]>0 \{\
+.de $1
+.ds &f Figure \\n($1-
+.nr &n 1
+.nr &p 0
+.ds &t Table \\n($1-
+.nr &a 1
+.nr &p 0
+..
+.\}
+.if \n[levels]>1 \{\
+.de $2
+.ds &f Figure \\n($1.\\n($2-
+.nr &n 1
+.nr &p 0
+.ds &t Table \\n($1.\\n($2-
+.nr &a 1
+.nr &p 0
+..
+.\}
+.if \n[levels]>2 \{\
+.de $3
+.ds &f Figure \\n($1.\\n($2.\\n($3-
+.nr &n 1
+.nr &p 0
+.ds &t Table \\n($1.\\n($2.\\n($3-
+.nr &a 1
+.nr &p 0
+..
+.\}
+.de #f
+.(l C
+.#v
+.sz \\n(pp
+\fI\\*(&f\\n(&n.\fR  \\$1
+.(x 2
+.#v
+\\*(&f\\n(&n. \\$1
+.)x
+.nr bs 0
+.)l
+.nr &p +1
+.nr &n +1
+.nr bs 1v
+.nr figures +1
+..
+.de #t
+.nr bs 0
+.(l C
+.#v
+.sz \\n(pp
+\fI\\*(&t\\n(&a.\fR \\$1
+.(x 3
+.#v
+\\*(&t\\n(&a. \\$1
+.)x
+.)l
+.nr bs 1v
+.nr &b +1
+.nr &a +1
+.nr tables +1
+..
+.de #e
+.if \\n($d>1 \{\
+.nr bs 0
+.nr ps 0
+.(b M
+.#v
+.(l
+.#v
+.nr ii 0.5i
+.uh Notes\ for\ \\\\*(sc\\\\n($1
+.pd
+.)l
+.)b
+.nr bs 1v
+.nr ps 1v
+.\}
+..
+.de ]<
+.rm (f )f
+.af $1 A
+.nr $1 17
+.\".sh 1 References
+..
+.dn &r
+.nr &r 0
+.de ][
+.if \\n(&r=0 \{\
+.if '\\*([Z'' \{\
+.\".uh References
+.nr &r 1
+.\}
+.if '\\*([Z'1' \{\
+.\".sh 2 Normative\ References
+.uh Normative\ References
+.nr &r 2
+.\}
+.if '\\*([Z'2' \{\
+.\".sh 2 Informative\ References
+.uh Informative\ References
+.nr &r 3
+.\}
+.\}
+.if \\n(&r=1 \{\
+.if '\\*([Z'1' \{\
+.\".sh 2 Normative\ References
+.uh Normative\ References
+.nr &r 2
+.\}
+.if '\\*([Z'2' \{\
+.\".sh 2 Informative\ References
+.uh Informative\ References
+.nr &r 3
+.\}
+.\}
+.if \\n(&r=2 \{\
+.if '\\*([Z'2' \{\
+.\".sh 2 Informative\ References
+.uh Informative\ References
+.nr &r 3
+.\}
+.\}
+.if \\n(&r=3 \{\
+.if '\\*([Z'' \{\
+.\".uh References
+.nr &r 1
+.\}
+.\}
+.if !'\\*([F'' \{\
+.(f
+.#v
+.lp
+[\\fB\\*([F\\fR]\0
+.ix +\\n(iiu
+.if !'\\*([A'' \\*([A, \c
+\\fI\\*(lq\\*([T,\\*(rq\\fR
+\\fB\\*([R\\fR\c
+.if !'\\*([G'' \& [\\*([G]\c
+.if !'\\*([I'' , \\*([I\c
+.if !'\\*([C'' , \\*([C\c
+ (\\*([D).
+.if !'\\*([O'' \\fI\\*([O\\fR
+.if !'\\*([U'' \\fR<\\fB\\*([U\\fR>
+.)f
+.\}
+.rm [F [L [R [T [C [N [D [E [I [G [O [U [Q [A [X [Z
+..
+.ds a \a
+.de #E
+.nr bs 0
+.if \\n($d>1 \{\
+.nr ps 0
+.(b M
+.#v
+.(l
+.#v
+.nr ii 0.5i
+.uh "End Notes"
+.pd
+.)l
+.)b
+.nr ps 1v
+.\}
+..
+.de #T
+.bp
+.if \\n[tables]>0 \{\
+.(b M
+.#v
+.ce
+.uh "List of Tables"
+.lp
+.(l L
+.#v
+.xp 3
+.)l
+.)b
+.\}
+.if \\n[figures]>0 \{\
+.(b M
+.#v
+.ce
+.uh "List of Illustrations"
+.lp
+.(l L
+.#v
+.xp 2
+.)l
+.)b
+.\}
+.(b M
+.#v
+.ce
+.uh "Table of Contents"
+.)b
+.lp
+.(l L
+.#v
+.xp 0
+.)l
+.if !'\\$1'' \{\
+.bp
+.uh "Intellectual Property"
+.lp
+The IETF takes no position regarding the validity or scope of any
+Intellectual Property Rights or other rights that might be claimed to
+pertain to the implementation or use of the technology described in this
+document or the extent to which any license under such rights might or
+might not be available; nor does it represent that it has made any
+independent effort to identify any such rights.  Information on the
+procedures with respect to rights in RFC documents can be found in BCP
+78 and BCP 79.
+.lp
+Copies of IPR disclosures made to the IETF Secretariat and any
+assurances of licenses to be made available, or the result of an attempt
+made to obtain a general license or permission for the use of such
+proprietary rights by implementers or users of this specification can be
+obtained from the IETF on-line IPR repository at
+http://www.ietf.org/ipr.
+.lp
+The IETF invites any interested party to bring to its attention any
+copyrights, patents or patent applications, or other proprietary rights
+that may cover technology that may be required to implement this
+standard.  Please address the information to the IETF at ietf-ipr@ietf.org.
+.uh "Disclaimer of Validity"
+.lp
+\fR\f[HR]\\s-1\\
+This document and the information contained herein are provided on an "AS
+IS" basis and \fB\f[HB]THE CONTRIBUTOR, THE ORGANIZATION HE/SHE
+REPRESENTS OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY, THE IETF TRUST
+AND THE INTERNET ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF
+THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+.uh "Full Copyright Statement"
+.lp
+\fB\f[HB]\\s-1\\
+Copyright \\(co The IETF Trust (\\$1).\fR
+\fR\f[HR]\\s-1\\
+This document is subject to the rights, licenses and restrictions
+contained in BCP 78, and except as set forth therein, the authors retain
+all their rights.
+.uh Acknowledgement
+.lp
+Funding for the RFC Editor function is currently provided by the
+Internet Society.
+.\}
+..
+.de #S
+.uh "Status of this Memo"
+.pp
+By submitting this Internet-Draft, each author represents that any
+applicable patent or other IPR claims of which he or she is aware have
+been or will be disclosed, and any of which he or she becomes aware will
+be disclosed, in accordance with Section 6 of BCP 79.
+.if '\\$3'a' \{\
+.pp
+This document may not be modified, and derivative works of it may not be
+created, except to publish it as an RFC and to translate it into
+languages other than English.
+.\}
+.if '\\$3'b' \{\
+.pp
+This document may not be modified, and derivative works of it may not be
+created.
+.\}
+.if '\\$3'c' \{\
+.pp
+This document may not be modified, and derivative works of it may not be
+created.
+.pp
+This document may only be posted in an Internet-Draft.
+.\}
+.pp
+Internet-Drafts are working documents of the Internet Engineering Task
+Force (IETF), its areas, and its working groups.  Note that other groups
+may also distribute working documents as Internet-Drafts.
+.pp
+Internet-Drafts are draft documents valid for a maximum of six months
+and may be updated, replaced, or obsoleted by other documents at any
+time.  It is inappropriate to use Internet-Drafts as reference material
+or to cite them other than as \(lqwork in progress\(rq.
+.pp
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt.
+.pp
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html.
+.if !'\\$2'' \{\
+.pp
+This Internet-Draft will expire in \\$2.
+.\}
+.uh Copyright
+.pp
+\fB\f[HB]\\s-1\\
+Copyright \\(co The IETF Trust (\\$1).\fR
+..
+.de #C
+.pp
+The key words \(lq\fB\)MUST\fR\(rq, \(lq\fB\)MUST NOT\fR\(rq, \(lq\fB\)REQUIRED\fR\(rq, \(lq\fB\)SHALL\fR\(rq,
+\(lq\fB\)SHALL NOT\fR\(rq, \(lq\fB\)SHOULD\fR\(rq, \(lq\fB\)SHOULD NOT\fR\(rq, \(lq\fB\)RECOMMENDED\fR\(rq, \(lq\fB\)MAY\fR\(rq,
+and \(lq\fB\)OPTIONAL\fR\(rq in this document are to be interpreted as described in.
+.[
+key words
+%Z 1
+.]
+..
+.de #A
+.uh "Author's Addresses"
+.lp
+.nf
+Brian Bidulock
+OpenSS7 Corporation
+1469 Jeffreys Crescent
+Edmonton, AB  T6L 6T1
+Canada
+.bl
+Phone: +1-780-490-1141
+Email: bidulock@openss7.org
+URL: http//www.openss7.org/
+.fi
+..
