@@ -1,0 +1,523 @@
+
+
+
+Network Working Group                                     Brian Bidulock
+INTERNET-DRAFT                                       OpenSS7 Corporation
+Intended status: PROPOSED STANDARD                      February 3, 2007
+
+Expires in August 2007
+
+
+
+              SS7 MTP2-User Peer-to-Peer Adaptation Layer
+                          Implementer's Guide
+                <draft-bidulock-sigtran-m2pa-ig-01.txt>
+
+
+Status of this Memo
+
+    By submitting this Internet-Draft, each author represents that any
+  applicable patent or other IPR claims of which he or she is aware have
+  been or will be disclosed, and any of which he or she becomes aware
+  will be disclosed, in accordance with Section 6 of BCP 79.
+
+    Internet-Drafts are working documents of the Internet Engineering
+  Task Force (IETF), its areas, and its working groups.  Note that other
+  groups may also distribute working documents as Internet-Drafts.
+
+    Internet-Drafts are draft documents valid for a maximum of six
+  months and may be updated, replaced, or obsoleted by other documents
+  at any time.  It is inappropriate to use Internet-Drafts as reference
+  material or to cite them other than as "work in progress".
+
+    The list of current Internet-Drafts can be accessed at
+  http://www.ietf.org/ietf/1id-abstracts.txt.
+
+    The list of Internet-Draft Shadow Directories can be accessed at
+  http://www.ietf.org/shadow.html.
+
+    This Internet-Draft will expire in August 2007.
+
+Copyright
+
+    Copyright (C) The IETF Trust (2007).
+
+Abstract
+
+    This Internet-Draft provides information for the Internet community
+  on clarifications and interpretations of the text of the SS7 MTP2-User
+  Peer-to-Peer Adaptation Layer [M2PA] based on working group comments
+  and experience at interoperability events.  It also provides
+  information on specification addendum and errata -- whether of an
+  editorial or technical nature -- discovered to the date of this
+  document.
+
+
+
+
+B. Bidulock                    Version 0.1                        Page 1
+
+Internet Draft                   M2PA-IG                February 3, 2007
+
+    This document is intended as a companion document to the M2PA RFC
+  [M2PA] to be used in the implementation of M2PA to clarify the
+  original M2PA document.
+
+    This document updates RFC 4165 [M2PA] and text within this document
+  supersedes the text found in RFC 4165 [M2PA].
+
+Contents
+
+    A complete table of contents, list of illustrations, list of tables
+  and change history for this document appears at the end of the
+  document.
+
+1.  Introduction
+
+    This document contains a compilation of all specification addenda
+  and errata found up until the publishing of this document for SS7
+  MTP2-User Peer-to-Peer Adaptation Layer, RFC 4165 [M2PA].  These
+  addenda and errata may be of an editorial or technical nature.  This
+  document may be thought of as a companion document to be used in the
+  implementation of M2PA to clarify errata and provide addenda to the
+  original M2PA document [M2PA].
+
+    This document updates RFC 4165 [M2PA] and text within this document,
+  where noted, supersedes the text found in RFC 4165 [M2PA].  Each error
+  will be detailed within this document in the form of:
+
+  +  The problem description.
+
+  +  The text quoted from RFC 4165 [M2PA].
+
+  +  The replacement text.
+
+  +  A description of the solution.
+
+1.1.  Conventions
+
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+  document are to be interpreted as described in [RFC2119].
+
+2.  Errata, Addenda and Clarifications
+
+2.1.  Initial Sequence Number
+
+2.1.1.  Problem Statement
+
+    Although it is described in the applicable MTP2 standard, some
+  implementers have become confused over what the initial value of the
+  FSN and BSN should be.
+
+
+
+
+B. Bidulock                    Version 0.1                        Page 2
+
+Internet Draft                   M2PA-IG                February 3, 2007
+
+2.1.2.  Text Changes
+
+2.1.2.1.  Old Text (Section 4.1.3, Page 25)
+
+  None.
+
+2.1.2.2.  New Text (Section 4.1.3, Page 25, at end of page.)
+
+  The value of the FSN in the first Non-Empty User Data message
+  transmitted on an M2PA link after alignment is the same as that
+  described in the applicable standard (e.g. Q.703, ANSI T1.111.3),
+  typically zero (0).
+
+
+2.1.3.  Solution Description
+
+    The text change clarifies that the value of the initial sequence
+  numbers is specified by the applicable standard and identifies that
+  the value of the initial FSN is typically zero (0).
+
+2.2.  BSN when FSN Out of Order
+
+2.2.1.  Problem Statement
+
+2.2.2.  Text Changes
+
+2.2.2.1.  Old Text (Section 4.2.1, Page 30)
+
+  If M2PA receives a User Data message with an FSN that is out of
+  order, M2PA SHALL discard the message.
+
+
+2.2.2.2.  New Text (Section 4.2.1, Page 30)
+
+  In accordance with the applicable MTP2 standard, if M2PA receives a
+  User Data message with an FSN that is out of order, M2PA SHALL
+  discard the message.  Processing of the BSN in the discarded message
+  is in accordance with the applicable MTP2 standard.
+
+
+2.2.3.  Solution Description
+
+    The text change identifies that this procedure is in accordance with
+  the applicable MTP2 standard and does not change the way that messages
+  received with FSN out of order are handled.
+
+2.3.  LS Ready received during Proving
+
+2.3.1.  Problem Statement
+
+    If an implementation operates precisely as described in the MTP2
+  SDLs (e.g.  Q.703/Clause 12) [Q.703] then such an M2PA link will fail
+  to align if an "LS Ready" message is received during the Proving
+
+B. Bidulock                    Version 0.1                        Page 3
+
+Internet Draft                   M2PA-IG                February 3, 2007
+
+  period and no additional "LS Ready" message is later received after
+  proving ends.
+
+2.3.2.  Text Changes
+
+2.3.2.1.  Old Text (Section 4.1.3, Page 25)
+
+  The Link Status Ready message replaces the FISU of MTP2 that is sent
+  at the end of the proving period.  The Link Status Ready message is
+  used to verify that both ends have completed proving.  When M2PA
+  starts timer T1, it SHALL send a Link Status Ready message to its
+  peer in the case where MTP2 would send a FISU after proving is
+  complete.  If the Link Status Ready message is sent, then M2PA MAY
+  send additional Link Status Ready messages while timer T1 is running.
+  These Link Status Ready messages are sent on the Link Status stream.
+
+  In the case that MTP2 sends an MSU or SIPO message at the end of
+  proving, M2PA SHALL send (respectively) a User Data or Link Status
+  Processor Outage message.
+
+
+2.3.2.2.  New Text (Section 4.1.3, Page 25)
+
+  The Link Status Ready message replaces the FISU(s) of MTP2 sent at
+  the end of the proving period.  The Link Status Ready message is used
+  to verify that both ends have completed proving.  When M2PA starts
+  timer T1, it SHALL send a Link Status Ready message to its peer in
+  the case where MTP2 would send FISU(s) after proving is complete.  If
+  the Link Status Ready message is sent, then M2PA MAY send additional
+  Link Status Ready messages while timer T1 is running.  These Link
+  Status Ready messages are sent on the Link Status stream.
+
+  In the case that MTP2 sends an MSU or SIPO message at the end of
+  proving, M2PA SHALL send (respectively) a User Data or Link Status
+  Processor Outage message.
+
+
+2.3.2.3.  Old Text (Section 4, Page 19)
+
+  None.
+
+2.3.2.4.  New Text (Section 4, Page 19, 4th Paragraph)
+
+  As they contain errors that impede interoperability of M2PA
+  implementations, M2PA SHOULD NOT follow precisely in implementation
+  the SDLs described in Clause 12 of the applicable MTP2 standards.
+
+
+2.3.3.  Solution Description
+
+    The first text change more clearly identifies that the single
+  transmission of a "Link Status Ready" message replaces the possibly
+  multiple repeated FISU(s) sent at the end of the proving period in
+
+B. Bidulock                    Version 0.1                        Page 4
+
+Internet Draft                   M2PA-IG                February 3, 2007
+
+  MTP2.
+
+    It is not within the scope of the document to dictate
+  implementation; however, strictly following the SDLs of Q.703/Clause
+  12 [Q.703] or ANSI T1.111.3 [T1.111] will result in an implementation
+  that does not function in the second respect (MSU sent at the end of
+  proving), even though there is a test case for same in Q.781 [Q.781]
+  and M2PA validation tests [M2PATEST].  Anyone not heeding the the
+  statements at the beginning of Clause 12 in the MTP2 standards, and
+  using the SDLs directly for implementation might fail to create a
+  fully interoperable implementation.  The second text change identifies
+  this interoperability concern.
+
+Security Considerations
+
+    There are no security considerations for this draft.
+
+IANA Considerations
+
+    There are no IANA considerations for this draft.
+
+
+0.  Change History
+
+    This section provides historical information on the changes made to
+  this draft.  This section will be removed from the document when the
+  document is finalized.
+
+0.1.  Changes from Version 0.0 to Version 0.1
+
+   + updated boilerplate and to idnits-2.00.1.
+   + updated references, version numbers and dates.
+
+0.0.  Version 0.0
+
+    The initial version of this document representing the three items
+  from Jeffrey Craig's document upon which consensus could be reached.
+
+0.0.0.  Change Log
+
+    $Log: draft-bidulock-sigtran-m2pa-ig-01.me,v $
+    Revision 0.9.2.1  2007/02/03 15:47:14  brian
+    - added new drafts
+
+    Revision 0.9.2.1  2006/07/11 22:56:23  brian
+    - initial version of M2PA IG replacement draft
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.1                        Page 5
+
+Internet Draft                   M2PA-IG                February 3, 2007
+
+
+Normative References
+
+  [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+      Requirement Levels," BCP 14/RFC 2119, The Internet Society (March
+      1997).  <http://www.ietf.org/rfc/rfc2119.txt>
+
+  [M2PA]  George, T., Bidulock, B., Dantu, R., Schwarzbauer, H. J. and
+      Morneault, K., "Signaling System 7 (SS7) Message Transfer Part 2
+      (MTP2)-User Peer-to-Peer Adaptation Layer (M2PA)," RFC 4165, The
+      Internet Society (September 2005).  (Status: PROPOSED STANDARD)
+      <http://www.ietf.org/rfc/rfc4165.txt>
+
+Informative References
+
+  [Q.703]  ITU, "Signalling System No. 7 -- Signalling Link," ITU-T
+      Recommendation Q.703, ITU-T Telecommunication Standardization
+      Sector of ITU, Geneva (March 1993).  (Previously "CCITT
+      Recommendation")
+
+  [T1.111]  ANSI, "Signalling System No. 7 -- Message Transfer Part,"
+      ANSI T1.111, American National Standards Institute (1992).
+
+  [Q.781]  ITU, "Signalling System No. 7 -- MTP Level 2 Test
+      Specification," ITU-T Recommendation Q.781, ITU-T
+      Telecommunication Standardization Sector of ITU, Geneva (March
+      1993).  (Previously "CCITT Recommendation")
+
+  [M2PATEST]  Bidulock, B., "SS7 MTP2-User Peer-to-Peer Adaptation Layer
+      -- Test Specifications," draft-bidulock-sigtran-m2pa-test-08.txt,
+      Internet Engineering Task Force -- Signalling Transport Working
+      Group (February 3, 2007).  Work In Progress.
+      <http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-m2pa-
+      test-08.txt>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.1                        Page 6
+
+Internet Draft                   M2PA-IG                February 3, 2007
+
+
+Acknowledgements
+
+    The author would like to thank Andrew Booth, Jeffrey Craig, Mark
+  Davidson, Mark Erickson, Tom George, Michael Tuexen, for their
+  valuable comments and suggestions.
+
+Author's Addresses
+
+  Brian Bidulock
+  OpenSS7 Corporation
+  1469 Jeffreys Crescent
+  Edmonton, AB  T6L 6T1
+  Canada
+
+  Phone: +1-780-490-1141
+  Email: bidulock@openss7.org
+  URL: http//www.openss7.org/
+
+
+
+
+  This draft expires August 2007.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.1                        Page 7
+
+Internet Draft                   M2PA-IG                February 3, 2007
+
+
+                          Table of Contents
+
+  Status of this Memo .............................................    1
+  Copyright .......................................................    1
+  Abstract ........................................................    1
+  Contents ........................................................    2
+  1 Introduction ..................................................    2
+  1.1 Conventions .................................................    2
+  2 Errata, Addenda and Clarifications ............................    2
+  2.1 Initial Sequence Number .....................................    2
+  2.1.1 Problem Statement .........................................    2
+  2.1.2 Text Changes ..............................................    3
+  2.1.3 Solution Description ......................................    3
+  2.2 BSN when FSN Out of Order ...................................    3
+  2.2.1 Problem Statement .........................................    3
+  2.2.2 Text Changes ..............................................    3
+  2.2.3 Solution Description ......................................    3
+  2.3 LS Ready received during Proving ............................    3
+  2.3.1 Problem Statement .........................................    3
+  2.3.2 Text Changes ..............................................    4
+  2.3.3 Solution Description ......................................    4
+  Security Considerations .........................................    5
+  IANA Considerations .............................................    5
+  0 Change History ................................................    5
+  0.1 Changes from Version 0.0 to Version 0.1 .....................    5
+  0.0 Version 0.0 .................................................    5
+  0.0.0 Change Log ................................................    5
+  Normative References ............................................    6
+  Informative References ..........................................    6
+  Acknowledgements ................................................    7
+  Author's Addresses ..............................................    7
+  Table of Contents ...............................................    8
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.1                        Page 8
+
+Internet Draft                   M2PA-IG                February 3, 2007
+
+Intellectual Property
+
+  The IETF takes no position regarding the validity or scope of any
+  Intellectual Property Rights or other rights that might be claimed to
+  pertain to the implementation or use of the technology described in
+  this document or the extent to which any license under such rights
+  might or might not be available; nor does it represent that it has
+  made any independent effort to identify any such rights.  Information
+  on the procedures with respect to rights in RFC documents can be found
+  in BCP 78 and BCP 79.
+
+  Copies of IPR disclosures made to the IETF Secretariat and any
+  assurances of licenses to be made available, or the result of an
+  attempt made to obtain a general license or permission for the use of
+  such proprietary rights by implementers or users of this specification
+  can be obtained from the IETF on-line IPR repository at
+  http://www.ietf.org/ipr.
+
+  The IETF invites any interested party to bring to its attention any
+  copyrights, patents or patent applications, or other proprietary
+  rights that may cover technology that may be required to implement
+  this standard.  Please address the information to the IETF at ietf-
+  ipr@ietf.org.
+
+Disclaimer of Validity
+
+  This document and the information contained herein are provided on an
+  "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+  OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY, THE IETF TRUST AND
+  THE INTERNET ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS
+  OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF
+  THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+  WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Full Copyright Statement
+
+  Copyright (C) The IETF Trust (2007).  This document is subject to the
+  rights, licenses and restrictions contained in BCP 78, and except as
+  set forth therein, the authors retain all their rights.
+
+Acknowledgement
+
+  Funding for the RFC Editor function is currently provided by the
+  Internet Society.
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.1                        Page 9
+
