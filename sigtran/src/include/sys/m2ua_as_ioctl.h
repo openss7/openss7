@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m2ua_as_ioctl.h,v 0.9.2.2 2007/01/28 01:09:44 brian Exp $
+ @(#) $Id: m2ua_as_ioctl.h,v 0.9.2.3 2007/02/03 03:07:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/28 01:09:44 $ by $Author: brian $
+ Last Modified $Date: 2007/02/03 03:07:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as_ioctl.h,v $
+ Revision 0.9.2.3  2007/02/03 03:07:51  brian
+ - working up drivers
+
  Revision 0.9.2.2  2007/01/28 01:09:44  brian
  - updated test programs and working up m2ua-as driver
 
@@ -61,14 +64,9 @@
 #ifndef __SYS_M2UA_AS_H__
 #define __SYS_M2UA_AS_H__
 
-#ident "@(#) $RCSfile: m2ua_as_ioctl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: m2ua_as_ioctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
-
-typedef lmi_long m2_long;
-typedef lmi_ulong m2_ulong;
-typedef lmi_ushort m2_ushort;
-typedef lmi_uchar m2_uchar;
 
 #ifndef M2UA_AS_IOC_MAGIC
 #define M2UA_AS_IOC_MAGIC			('2' + 30)
@@ -79,11 +77,9 @@ typedef lmi_uchar m2_uchar;
 #define M2UA_AS_OBJ_TYPE_SL	2	/* Signalling Link (User) */
 #define M2UA_AS_OBJ_TYPE_AS	3	/* Application Server */
 #define M2UA_AS_OBJ_TYPE_SP	4	/* Application Server Process */
-#define M2UA_AS_OBJ_TYPE_SG	5	/* Signalling Gateway */
-#define M2UA_AS_OBJ_TYPE_XP	6	/* SCTP Transport Provider */
-
-/* Note that the SL and XP objects are more for obtaining information about streams opened on the
- * upper multiplex and linked on the lower multiplex. */
+#define M2UA_AS_OBJ_TYPE_GP	5	/* Signalling Gateway Process */
+#define M2UA_AS_OBJ_TYPE_SG	6	/* Signalling Gateway */
+#define M2UA_AS_OBJ_TYPE_XP	7	/* SCTP Transport Provider */
 
 /*
  * Rather than get too detailed with the object model, we define a more complete address for M2UA.
@@ -92,12 +88,12 @@ typedef lmi_uchar m2_uchar;
 #define M2UA_AS_CLEI_MAX	32
 
 struct m2ua_ppa {
-	m2_long sgid;
-	m2_ushort sdti;
-	m2_ushort sdli;
-	m2_ulong iid;
+	int sgid;
+	ushort sdti;
+	ushort sdli;
+	uint iid;
 	char iid_text[M2UA_AS_CLEI_MAX];
-	m2_ulong tmode;
+	uint tmode;
 };
 
 #define M2UA_AS_TMODE_NONE		0
@@ -110,13 +106,13 @@ typedef struct m2ua_opt_conf_df {
 	struct lmi_option sl_proto;
 	struct lmi_option sp_proto;
 	struct lmi_option sg_proto;
-	lmi_ulong tack;
-	lmi_ulong tbeat;
-	lmi_ulong tidle;
-	lmi_ulong testab;
-	lmi_ulong ppi;
-	lmi_ushort istreams;
-	lmi_ushort ostreams;
+	uint tack;
+	uint tbeat;
+	uint tidle;
+	uint testab;
+	uint ppi;
+	ushort istreams;
+	ushort ostreams;
 } m2ua_opt_conf_df_t;
 
 /* Layer Management options */
@@ -127,29 +123,29 @@ typedef struct m2ua_opt_conf_lm {
 /* Signalling Link options are specified using SLI IOCTLs, however, the values of timers
    T1, T2, T3, and T4 are echoed here for use by M2UA. */
 typedef struct m2ua_opt_conf_sl {
-	lmi_ulong t1;
-	lmi_ulong t2;
-	lmi_ulong t2h;
-	lmi_ulong t2l;
-	lmi_ulong t3;
-	lmi_ulong t4e;
-	lmi_ulong t4n;
+	uint t1;
+	uint t2;
+	uint t2h;
+	uint t2l;
+	uint t3;
+	uint t4e;
+	uint t4n;
 } m2ua_opt_conf_sl_t;
 
 /* Application Server options */
 typedef struct m2ua_opt_conf_as {
-	lmi_ulong tack;			/* duration of ack timer */
-	lmi_ulong tbeat;		/* duration of heartbeat time */
-	lmi_ulong testab;		/* duration of establish timer (TS 102 141) */
+	uint tack;			/* duration of ack timer */
+	uint tbeat;			/* duration of heartbeat time */
+	uint testab;			/* duration of establish timer (TS 102 141) */
 } m2ua_opt_conf_as_t;
 
 /* Application Server Process options */
 typedef struct m2ua_opt_conf_sp {
 	struct lmi_option options;
-	lmi_ulong aspid;		/* External M2UA ASP Identifier */
-	lmi_ulong tack;			/* duration of ack timer */
-	lmi_ulong tbeat;		/* duration of heartbeat timer */
-	lmi_ulong tidle;		/* duration of idle timer */
+	uint aspid;			/* External M2UA ASP Identifier */
+	uint tack;			/* duration of ack timer */
+	uint tbeat;			/* duration of heartbeat timer */
+	uint tidle;			/* duration of idle timer */
 } m2ua_opt_conf_sp_t;
 
 /* Signalling Gateway options */
@@ -166,7 +162,7 @@ typedef struct m2ua_opt_conf_sg {
 #define M2UA_SG_REGEXT		(1<<5)
 #define M2UA_SG_SESSID		(1<<6)
 #define M2UA_SG_DYNAMIC		(1<<7)	/* SG supports dynamic registration */
-/* (1<<8) reserved */
+#define M2UA_SG_RESERVED		(1<<8)	/* reserved */
 #define M2UA_SG_ASPCONG		(1<<9)
 #define M2UA_SG_TEXTIID		(1<<10)	/* SG supports text interface identifiers */
 
@@ -179,11 +175,11 @@ typedef struct m2ua_opt_conf_sg {
 /* SCTP Transport Provider options */
 /* Other transport options are specified using the TPI interface. */
 typedef struct m2ua_opt_conf_xp {
-	lmi_ulong ppi;			/* Payload Protocol Identifier (2) */
-	lmi_ushort istreams;		/* Maximum number of input streams (default 257). */
-	lmi_ushort ostreams;		/* Requested number of output streams (default 257). */
-	lmi_ulong loc_len;		/* loc_add significant length */
-	lmi_ulong rem_len;		/* rem_add significant length */
+	uint ppi;			/* Payload Protocol Identifier (2) */
+	ushort istreams;		/* Maximum number of input streams (default 257). */
+	ushort ostreams;		/* Requested number of output streams (default 257). */
+	uint loc_len;			/* loc_add significant length */
+	uint rem_len;			/* rem_add significant length */
 	struct sockaddr loc_add;	/* local address */
 	struct sockaddr rem_add;	/* remote address */
 } m2ua_opt_conf_xp_t;
@@ -196,8 +192,8 @@ typedef struct m2ua_opt_conf_xp {
  */
 
 typedef struct m2ua_option {
-	lmi_ulong type;
-	lmi_ulong id;
+	uint type;
+	uint id;
 	/* followed by object-specific option structure */
 } m2ua_option_t;
 
@@ -238,7 +234,7 @@ typedef struct m2ua_conf_sg {
 /* The linked lower stream must be associated with an sgid.  The object identifier is the
    muxid of the linked transport provider stream. */
 typedef struct m2ua_conf_xp {
-	lmi_ulong sgid;			/* SG identifier */
+	uint sgid;			/* SG identifier */
 } m2ua_conf_xp_t;
 
 /*
@@ -246,9 +242,9 @@ typedef struct m2ua_conf_xp {
  */
 
 typedef struct m2ua_config {
-	lmi_ulong type;			/* object type */
-	lmi_ulong id;			/* object id */
-	lmi_ulong cmd;			/* object command/count */
+	uint type;			/* object type */
+	uint id;			/* object id */
+	uint cmd;			/* object command/count */
 	/* followed by object-specific config structure */
 } m2ua_config_t;
 
@@ -268,7 +264,7 @@ typedef struct m2ua_timers_df {
 } m2ua_timers_df_t;
 typedef struct m2ua_statem_df {
 	struct m2ua_timers_df timers;
-	lmi_ulong df_numb;		/* number of id/state pairs for DF */
+	uint df_numb;			/* number of id/state pairs for DF */
 	/* followed by id/state paris for DF */
 	/* terminated by zero */
 } m2ua_statem_df_t;
@@ -277,7 +273,7 @@ typedef struct m2ua_timers_lm {
 } m2ua_timers_lm_t;
 typedef struct m2ua_statem_lm {
 	struct m2ua_timers_lm timers;
-	lmi_ulong lm_numb;		/* number of id/state pairs for LM */
+	uint lm_numb;			/* number of id/state pairs for LM */
 	/* followed by id/state paris for LM */
 	/* terminated by zero */
 } m2ua_statem_lm_t;
@@ -286,7 +282,7 @@ typedef struct m2ua_timers_sl {
 } m2ua_timers_sl_t;
 typedef struct m2ua_statem_sl {
 	struct m2ua_timers_sl timers;
-	lmi_ulong sl_numb;		/* number of id/state pairs for SL */
+	uint sl_numb;			/* number of id/state pairs for SL */
 	/* followed by id/state paris for SL */
 	/* terminated by zero */
 } m2ua_statem_sl_t;
@@ -295,7 +291,7 @@ typedef struct m2ua_timers_as {
 } m2ua_timers_as_t;
 typedef struct m2ua_statem_as {
 	struct m2ua_timers_as timers;
-	lmi_ulong as_numb;		/* number of id/state pairs for AS */
+	uint as_numb;			/* number of id/state pairs for AS */
 	/* followed by id/state paris for AS */
 	/* terminated by zero */
 } m2ua_statem_as_t;
@@ -304,7 +300,7 @@ typedef struct m2ua_timers_sp {
 } m2ua_timers_sp_t;
 typedef struct m2ua_statem_sp {
 	struct m2ua_timers_sp timers;
-	lmi_ulong asp_numb;		/* number of id/state pairs for ASP */
+	uint asp_numb;			/* number of id/state pairs for ASP */
 	/* followed by id/state paris for SG */
 	/* terminated by zero */
 } m2ua_statem_sp_t;
@@ -313,7 +309,7 @@ typedef struct m2ua_timers_sg {
 } m2ua_timers_sg_t;
 typedef struct m2ua_statem_sg {
 	struct m2ua_timers_sg timers;
-	lmi_ulong sg_numb;		/* number of id/state pairs for SG */
+	uint sg_numb;			/* number of id/state pairs for SG */
 	/* followed by id/state paris for SG */
 	/* terminated by zero */
 } m2ua_statem_sg_t;
@@ -322,7 +318,7 @@ typedef struct m2ua_timers_xp {
 } m2ua_timers_xp_t;
 typedef struct m2ua_statem_xp {
 	struct m2ua_timers_xp timers;
-	lmi_ulong xp_numb;		/* number of id/state pairs for XP */
+	uint xp_numb;			/* number of id/state pairs for XP */
 	/* followed by id/state paris for XP */
 	/* terminated by zero */
 } m2ua_statem_xp_t;
@@ -332,10 +328,10 @@ typedef struct m2ua_statem_xp {
  */
 
 typedef struct m2ua_statem {
-	lmi_ulong type;			/* object type */
-	lmi_ulong id;			/* object id */
-	lmi_ulong flags;		/* object flags */
-	lmi_ulong state;		/* object state */
+	uint type;			/* object type */
+	uint id;			/* object id */
+	uint flags;			/* object flags */
+	uint state;			/* object state */
 	/* followed by object-specific state structure */
 } m2ua_statem_t;
 
@@ -367,9 +363,9 @@ typedef struct m2ua_stats_xp {
  *  STATISTICS
  */
 typedef struct m2ua_stats {
-	lmi_ulong type;			/* object type */
-	lmi_ulong id;			/* object id */
-	lmi_ulong header;		/* object stats header */
+	uint type;			/* object type */
+	uint id;			/* object id */
+	uint header;			/* object stats header */
 	/* followed by object-specific stats structure */
 } m2ua_stats_t;
 
@@ -382,8 +378,8 @@ typedef struct m2ua_stats {
  *  EVENTS
  */
 typedef struct m2ua_notify {
-	lmi_ulong type;			/* object type */
-	lmi_ulong id;			/* object id */
+	uint type;			/* object type */
+	uint id;			/* object id */
 	lmi_notify_t notify;		/* notifications */
 } m2ua_notify_t;
 
@@ -395,9 +391,9 @@ typedef struct m2ua_notify {
  *  MANAGEMENT
  */
 typedef struct m2ua_mgmt {
-	lmi_ulong type;			/* object type */
-	lmi_ulong id;			/* object id */
-	lmi_ulong cmd;			/* object command */
+	uint type;			/* object type */
+	uint id;			/* object id */
+	uint cmd;			/* object command */
 } m2ua_mgmt_t;
 
 #define M2UA_AS_MGMT_UP			1
@@ -415,11 +411,11 @@ typedef struct m2ua_mgmt {
  *  CONTROL LOWER
  */
 typedef struct m2ua_pass {
-	lmi_ulong muxid;
-	lmi_ulong type;
-	lmi_ulong band;
-	lmi_ulong ctl_length;
-	lmi_ulong dat_length;
+	uint muxid;
+	uint type;
+	uint band;
+	uint ctl_length;
+	uint dat_length;
 	/* followed by cntl and data part of message to pass to lower */
 } m2ua_pass_t;
 

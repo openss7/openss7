@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 13:06:50 $
+ @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/03 03:07:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/23 13:06:50 $ by $Author: brian $
+ Last Modified $Date: 2007/02/03 03:07:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua.c,v $
+ Revision 0.9.2.4  2007/02/03 03:07:46  brian
+ - working up drivers
+
  Revision 0.9.2.3  2006/12/23 13:06:50  brian
  - manual page and other package updates for release
 
@@ -61,13 +64,13 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 13:06:50 $"
+#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/03 03:07:46 $"
 
 static char const ident[] =
-    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 13:06:50 $";
+    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/03 03:07:46 $";
 
 #define UA_DESCRIP	"SIGTRAN USER ADAPTATION (UA) STREAMS MULTIPLEXING DRIVER."
-#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/23 13:06:50 $"
+#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/03 03:07:46 $"
 #define UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -863,13 +866,18 @@ struct ua_msg {
 	};
 };
 
+/*
+ *  UA Message Definitions
+ *  =========================================================================
+ */
+
 #define M2UA_PPI    5
 /* FIXME: need other PPIs */
 
 #define UA_VERSION  1
 #define UA_PAD4(__len) (((__len)+3)&~0x3)
 #define UA_MHDR(__version, __spare, __class, __type) \
-	(__constant_htonl(((__version)<<24)|((__spare)<<16)|((__class)<<8)|(__type)))
+	(htonl(((__version)<<24)|((__spare)<<16)|((__class)<<8)|(__type)))
 
 #define UA_MSG_VERS(__hdr) ((ntohl(__hdr)>>24)&0xff)
 #define UA_MSG_CLAS(__hdr) ((ntohl(__hdr)>> 8)&0xff)
@@ -883,7 +891,7 @@ struct ua_msg {
 #define UA_CLASS_SNMM	0x02	/* Signalling Network Mgmt (SNM) Messages */
 #define UA_CLASS_ASPS	0x03	/* ASP State Maintenance (ASPSM) Messages */
 #define UA_CLASS_ASPT	0x04	/* ASP Traffic Maintenance (ASPTM) Messages */
-#define UA_CLASS_QPTM	0x05	/* Q.931 User Part Messages */
+#define UA_CLASS_QPTM	0x05	/* Q.921 User Part Messages */
 #define UA_CLASS_MAUP	0x06	/* M2UA Messages */
 #define UA_CLASS_CNLS	0x07	/* SUA Connectionless Messages */
 #define UA_CLASS_CONS	0x08	/* SUA Connection Oriented Messages */
@@ -932,15 +940,15 @@ struct ua_msg {
 #define UA_PHDR_SIZE (sizeof(uint32_t))
 #define UA_MAUP_SIZE (UA_MHDR_SIZE + UA_PHDR_SIZE + sizeof(uint32_t))
 
-#define UA_TAG_MASK		(__constant_htonl(0xffff0000))
+#define UA_TAG_MASK		(htonl(0xffff0000))
 #define UA_PTAG(__phdr)		((htonl(__phdr)>>16)&0xffff)
 #define UA_PLEN(__phdr)		(htonl(__phdr)&0xffff)
-#define UA_SIZE(__phdr)		(__constant_htonl(__phdr)&0xffff)
-#define UA_TAG(__phdr)		((__constant_htonl(__phdr)>>16)&0xffff)
+#define UA_SIZE(__phdr)		(htonl(__phdr)&0xffff)
+#define UA_TAG(__phdr)		((htonl(__phdr)>>16)&0xffff)
 #define UA_PHDR(__phdr, __length) \
 	(htonl(((__phdr)<<16)|((__length)+sizeof(uint32_t))))
 #define UA_CONST_PHDR(__phdr, __length) \
-	(__constant_htonl(((__phdr)<<16)|((__length)+sizeof(uint32_t))))
+	(htonl(((__phdr)<<16)|((__length)+sizeof(uint32_t))))
 
 /*
  *  COMMON PARAMETERS:-
@@ -957,7 +965,7 @@ struct ua_msg {
 #define UA_PARM_DATA		UA_CONST_PHDR(0x0003,0)	/* sua-07 */
 #define UA_PARM_IID_TEXT	UA_CONST_PHDR(0x0003,0)
 #define UA_PARM_INFO		UA_CONST_PHDR(0x0004,0)
-//#define UA_PARM_APC           UA_CONST_PHDR(0x0005,sizeof(uint32_t))  /* sua-07 */
+//#define UA_PARM_APC		UA_CONST_PHDR(0x0005,sizeof(uint32_t))	/* sua-07 */
 #define UA_PARM_DLCI		UA_CONST_PHDR(0x0005,sizeof(uint32_t))	/* rfc3057 */
 #define UA_PARM_RC		UA_CONST_PHDR(0x0006,sizeof(uint32_t))
 #define UA_PARM_DIAG		UA_CONST_PHDR(0x0007,0)
@@ -967,8 +975,8 @@ struct ua_msg {
 #define UA_PARM_TMODE		UA_CONST_PHDR(0x000b,sizeof(uint32_t))
 #define UA_PARM_ECODE		UA_CONST_PHDR(0x000c,sizeof(uint32_t))
 #define UA_PARM_STATUS		UA_CONST_PHDR(0x000d,sizeof(uint32_t))
-//#define UA_PARM_ASPID         UA_CONST_PHDR(0x000e,sizeof(uint32_t))
-#define UA_PARM_PROT_DATA	UA_CONST_PHDR(0x000e,sizeof(uint32_t))	/* rfc3057 */
+//#define UA_PARM_ASPID		UA_CONST_PHDR(0x000e,sizeof(uint32_t))
+#define UA_PARM_PROT_DATA	UA_CONST_PHDR(0x000e,sizeof(uint32_t))	/* rfc3057, rfc4233 */
 #define UA_PARM_CONG_LEVEL	UA_CONST_PHDR(0x000f,sizeof(uint32_t))	/* sua-07 */
 #define UA_PARM_REL_REASON	UA_CONST_PHDR(0x000f,sizeof(uint32_t))	/* rfc3057 */
 #define UA_PARM_TEI_STATUS	UA_CONST_PHDR(0x0010,sizeof(uint32_t))	/* rfc3057 */
@@ -980,6 +988,9 @@ struct ua_msg {
 #define UA_PARM_REG_STATUS	UA_CONST_PHDR(0x0016,sizeof(uint32_t))	/* rfc3868, tua-04 */
 #define UA_PARM_DEREG_STATUS	UA_CONST_PHDR(0x0017,sizeof(uint32_t))	/* rfc3868, tua-04 */
 #define UA_PARM_LOC_KEY_ID	UA_CONST_PHDR(0x0018,sizeof(uint32_t))	/* rfc3868, tua-04 */
+
+#define UA_PARM_ASPEXT		UA_CONST_PHDR(0x0011,sizeof(uint32_t))	/* aspext-04 */
+#define UA_PARM_PROTO_LIMITS	UA_CONST_PHDR(0x001b,sizeof(uint32_t)*6)	/* sginfo-05 */
 
 /*
  *  Somewhat common field values:
@@ -1037,25 +1048,58 @@ struct ua_msg {
 #define UA_DEREG_STATUS_NOT_REGISTERED		(0x4)
 #define UA_DEREG_STATUS_ID_ACTIVE_FOR_AS	(0x5)	/* but not m2ua */
 
+#define UA_ASPEXT_NONE				(0x0)
+#define UA_ASPEXT_SGINFO			(0x1)
+#define UA_ASPEXT_LOADSEL			(0x2)
+#define UA_ASPEXT_LOADGRP			(0x3)
+#define UA_ASPEXT_CORID				(0x4)
+#define UA_ASPEXT_REGEXT			(0x5)
+#define UA_ASPEXT_SESSID			(0x6)
+#define UA_ASPEXT_DYNAMIC			(0x7)
+#define UA_ASPEXT_DEIPSP			(0x8)
+#define UA_ASPEXT_ASPCONG			(0x9)
+#define UA_ASPEXT_TEXTIID			(0xa)
+
+/*
+ *  IUA-Specific Messages: per RFC 3057 and RFC 4233
+ *  -------------------------------------------------------------------
+ */
+
+#define IUA_MGMT_TEIS_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_MGMT, 0x02)
+#define IUA_MGMT_TEIS_CON	UA_MHDR(UA_VERSION, 0, UA_CLASS_MGMT, 0x03)
+#define IUA_MGMT_TEIS_IND	UA_MHDR(UA_VERSION, 0, UA_CLASS_MGMT, 0x04)
+#define IUA_MGMT_TEIQ_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_MGMT, 0x05)
+
+#define IUA_QPTM_DATA_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_QPTM, 0x01)
+#define IUA_QPTM_DATA_IND	UA_MHDR(UA_VERSION, 0, UA_CLASS_QPTM, 0x02)
+#define IUA_QPTM_UDAT_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_QPTM, 0x03)
+#define IUA_QPTM_UDAT_IND	UA_MHDR(UA_VERSION, 0, UA_CLASS_QPTM, 0x04)
+#define IUA_QPTM_ESTB_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_QPTM, 0x05)
+#define IUA_QPTM_ESTB_CON	UA_MHDR(UA_VERSION, 0, UA_CLASS_QPTM, 0x06)
+#define IUA_QPTM_ESTB_IND	UA_MHDR(UA_VERSION, 0, UA_CLASS_QPTM, 0x07)
+#define IUA_QPTM_RELS_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_QPTM, 0x08)
+#define IUA_QPTM_RELS_CON	UA_MHDR(UA_VERSION, 0, UA_CLASS_QPTM, 0x09)
+#define IUA_QPTM_RELS_IND	UA_MHDR(UA_VERSION, 0, UA_CLASS_QPTM, 0x10)
+
 /*
  *  M2UA-Specific Messages: per draft-ietf-sigtran-m2ua-10.txt
  *  -------------------------------------------------------------------
  */
-#define M2UA_MAUP_DATA		UA_MHDR(1, 0, UA_CLASS_MAUP, 0x01)
-#define M2UA_MAUP_ESTAB_REQ	UA_MHDR(1, 0, UA_CLASS_MAUP, 0x02)
-#define M2UA_MAUP_ESTAB_CON	UA_MHDR(1, 0, UA_CLASS_MAUP, 0x03)
-#define M2UA_MAUP_REL_REQ	UA_MHDR(1, 0, UA_CLASS_MAUP, 0x04)
-#define M2UA_MAUP_REL_CON	UA_MHDR(1, 0, UA_CLASS_MAUP, 0x05)
-#define M2UA_MAUP_REL_IND	UA_MHDR(1, 0, UA_CLASS_MAUP, 0x06)
-#define M2UA_MAUP_STATE_REQ	UA_MHDR(1, 0, UA_CLASS_MAUP, 0x07)
-#define M2UA_MAUP_STATE_CON	UA_MHDR(1, 0, UA_CLASS_MAUP, 0x08)
-#define M2UA_MAUP_STATE_IND	UA_MHDR(1, 0, UA_CLASS_MAUP, 0x09)
-#define M2UA_MAUP_RETR_REQ	UA_MHDR(1, 0, UA_CLASS_MAUP, 0x0a)
-#define M2UA_MAUP_RETR_CON	UA_MHDR(1, 0, UA_CLASS_MAUP, 0x0b)
-#define M2UA_MAUP_RETR_IND	UA_MHDR(1, 0, UA_CLASS_MAUP, 0x0c)
-#define M2UA_MAUP_RETR_COMP_IND	UA_MHDR(1, 0, UA_CLASS_MAUP, 0x0d)
-#define M2UA_MAUP_CONG_IND	UA_MHDR(1, 0, UA_CLASS_MAUP, 0x0e)
-#define M2UA_MAUP_DATA_ACK	UA_MHDR(1, 0, UA_CLASS_MAUP, 0x0f)
+#define M2UA_MAUP_DATA		UA_MHDR(UA_VERSION, 0, UA_CLASS_MAUP, 0x01)
+#define M2UA_MAUP_ESTAB_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_MAUP, 0x02)
+#define M2UA_MAUP_ESTAB_CON	UA_MHDR(UA_VERSION, 0, UA_CLASS_MAUP, 0x03)
+#define M2UA_MAUP_REL_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_MAUP, 0x04)
+#define M2UA_MAUP_REL_CON	UA_MHDR(UA_VERSION, 0, UA_CLASS_MAUP, 0x05)
+#define M2UA_MAUP_REL_IND	UA_MHDR(UA_VERSION, 0, UA_CLASS_MAUP, 0x06)
+#define M2UA_MAUP_STATE_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_MAUP, 0x07)
+#define M2UA_MAUP_STATE_CON	UA_MHDR(UA_VERSION, 0, UA_CLASS_MAUP, 0x08)
+#define M2UA_MAUP_STATE_IND	UA_MHDR(UA_VERSION, 0, UA_CLASS_MAUP, 0x09)
+#define M2UA_MAUP_RETR_REQ	UA_MHDR(UA_VERSION, 0, UA_CLASS_MAUP, 0x0a)
+#define M2UA_MAUP_RETR_CON	UA_MHDR(UA_VERSION, 0, UA_CLASS_MAUP, 0x0b)
+#define M2UA_MAUP_RETR_IND	UA_MHDR(UA_VERSION, 0, UA_CLASS_MAUP, 0x0c)
+#define M2UA_MAUP_RETR_COMP_IND	UA_MHDR(UA_VERSION, 0, UA_CLASS_MAUP, 0x0d)
+#define M2UA_MAUP_CONG_IND	UA_MHDR(UA_VERSION, 0, UA_CLASS_MAUP, 0x0e)
+#define M2UA_MAUP_DATA_ACK	UA_MHDR(UA_VERSION, 0, UA_CLASS_MAUP, 0x0f)
 #define M2UA_MAUP_LAST		0x0f
 
 /*
@@ -1108,7 +1152,15 @@ struct ua_msg {
 #define M2UA_LEVEL_3			(0x03)
 #define M2UA_LEVEL_4			(0x04)	/* big argument */
 
-/* M3UA Specific parameters. */
+/*
+ *  M3UA-Specific Messages: per RFC 3332/RFC 4666
+ *  -------------------------------------------------------------------
+ */
+
+/*
+ *  M3UA-Specific Parameters: per RFC 3332/RFC 4666
+ *  -------------------------------------------------------------------
+ */
 
 #define M3UA_PARM_NTWK_APP	UA_CONST_PHDR(0x0200,sizeof(uint32_t))
 #define M3UA_PARM_PROT_DATA1	UA_CONST_PHDR(0x0201,0)
@@ -1130,7 +1182,30 @@ struct ua_msg {
 #define M3UA_PARM_REG_STATUS	UA_CONST_PHDR(0x0212,sizeof(uint32_t))
 #define M3UA_PARM_DEREG_STATUS	UA_CONST_PHDR(0x0213,sizeof(uint32_t))
 
-/* SUA Specific parameters. */
+/*
+ *  SUA-Specific Messages: per RFC 3868
+ *  -------------------------------------------------------------------
+ */
+
+#define SUA_CLNS_CLDT		UA_MHDR(UA_VERSION, 0, UA_CLASS_CNLS, 0x01)
+#define SUA_CLNS_CLDR		UA_MHDR(UA_VERSION, 0, UA_CLASS_CNLS, 0x02)
+
+#define SUA_CONS_CORE		UA_MHDR(UA_VERSION, 0, UA_CLASS_CONS, 0x01)
+#define SUA_CONS_COAK		UA_MHDR(UA_VERSION, 0, UA_CLASS_CONS, 0x02)
+#define SUA_CONS_COREF		UA_MHDR(UA_VERSION, 0, UA_CLASS_CONS, 0x03)
+#define SUA_CONS_RELRE		UA_MHDR(UA_VERSION, 0, UA_CLASS_CONS, 0x04)
+#define SUA_CONS_RELCO		UA_MHDR(UA_VERSION, 0, UA_CLASS_CONS, 0x05)
+#define SUA_CONS_RESCO		UA_MHDR(UA_VERSION, 0, UA_CLASS_CONS, 0x06)
+#define SUA_CONS_RESRE		UA_MHDR(UA_VERSION, 0, UA_CLASS_CONS, 0x07)
+#define SUA_CONS_CODT		UA_MHDR(UA_VERSION, 0, UA_CLASS_CONS, 0x08)
+#define SUA_CONS_CODA		UA_MHDR(UA_VERSION, 0, UA_CLASS_CONS, 0x09)
+#define SUA_CONS_COERR		UA_MHDR(UA_VERSION, 0, UA_CLASS_CONS, 0x10)
+#define SUA_CONS_COIT		UA_MHDR(UA_VERSION, 0, UA_CLASS_CONS, 0x11)
+
+/*
+ *  SUA-Specific Parameters: per RFC 3868
+ *  -------------------------------------------------------------------
+ */
 
 #define SUA_PARM_FLAGS		UA_CONST_PHDR(0x0101,sizeof(uint32_t))
 #define SUA_PARM_SRCE_ADDR	UA_CONST_PHDR(0x0102,sizeof(uint32_t)*5)	/* XXX */
@@ -1155,7 +1230,29 @@ struct ua_msg {
 #define SUA_SPARM_HOSTNAME	UA_CONST_PHDR(0x8005,0)
 #define SUA_SPARM_IPV6_ADDR	UA_CONST_PHDR(0x8006,sizeof(uint32_t)*4)
 
-/* TUA Specific parameters */
+/*
+ *  TUA-Specific Messages: per draft-bidulock-sigtran-tua-03.txt
+ *  -------------------------------------------------------------------
+ */
+
+#define TUA_TDHM_TUNI		UA_MHDR(UA_VERSION, 0, UA_CLASS_TDHM, 0x01)
+#define TUA_TDHM_TQRY		UA_MHDR(UA_VERSION, 0, UA_CLASS_TDHM, 0x02)
+#define TUA_TDHM_TCNV		UA_MHDR(UA_VERSION, 0, UA_CLASS_TDHM, 0x03)
+#define TUA_TDHM_TRSP		UA_MHDR(UA_VERSION, 0, UA_CLASS_TDHM, 0x04)
+#define TUA_TDHM_TUAB		UA_MHDR(UA_VERSION, 0, UA_CLASS_TDHM, 0x05)
+#define TUA_TDHM_TPAB		UA_MHDR(UA_VERSION, 0, UA_CLASS_TDHM, 0x06)
+#define TUA_TDHM_TNOT		UA_MHDR(UA_VERSION, 0, UA_CLASS_TDHM, 0x07)
+
+#define TUA_TCHM_CINV		UA_MHDR(UA_VERSION, 0, UA_CLASS_TCHM, 0x01)
+#define TUA_TCHM_CRES		UA_MHDR(UA_VERSION, 0, UA_CLASS_TCHM, 0x02)
+#define TUA_TCHM_CERR		UA_MHDR(UA_VERSION, 0, UA_CLASS_TCHM, 0x03)
+#define TUA_TCHM_CREJ		UA_MHDR(UA_VERSION, 0, UA_CLASS_TCHM, 0x04)
+#define TUA_TCHM_CCAN		UA_MHDR(UA_VERSION, 0, UA_CLASS_TCHM, 0x05)
+
+/*
+ *  TUA-Specific Parameters: per draft-bidulock-sigtran-tua-03.txt
+ *  -------------------------------------------------------------------
+ */
 
 #define TUA_PARM_QOS		UA_CONST_PHDR(0x0101,sizeof(uint32_t))
 #define TUA_PARM_DEST_ADDR	UA_CONST_PHDR(0x0102,0)
@@ -11007,7 +11104,7 @@ spp_recv_qptm(struct as *as, queue_t *q, struct ua_msg *m)
 		return spp_recv_qptm_rels_req(as, q, m);
 	case IUA_QPTM_RELS_CON:
 		return spp_recv_qptm_rels_con(as, q, m);
-	case IUA_QPTM_RESL_IND:
+	case IUA_QPTM_RELS_IND:
 		return spp_recv_qptm_rels_ind(as, q, m);
 	}
 	return (-ENOPROTOOPT);
