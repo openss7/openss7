@@ -1,7 +1,7 @@
 .\" -*- nroff -*-
 .\" =========================================================================
 .\"
-.\" @(#) $Id: draft-bidulock-sigtran-regext-04.me,v 0.9.2.3 2005/10/17 11:53:46 brian Exp $
+.\" @(#) $Id: draft-bidulock-sigtran-regext-04.me,v 0.9.2.4 2007/02/03 15:50:20 brian Exp $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
@@ -47,14 +47,14 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Name:  $($Revision: 0.9.2.3 $) modified $Date: 2005/10/17 11:53:46 $ by $Author: brian $
+.\" $Name:  $($Revision: 0.9.2.4 $) modified $Date: 2007/02/03 15:50:20 $ by $Author: brian $
 .\"
 .\" =========================================================================
 .ds version Version\ 0.4
-.ds date October\ 16,\ 2005
-.ds expiry April\ 2006
+.ds date February\ 3,\ 2007
+.ds expiry August\ 2007
 .nr levels 0
-.so ../draft2.me
+.so ../draft4.me
 .af &n A
 .af &p A
 .bp
@@ -65,8 +65,8 @@ expand tab(;);
 l c r.
 Network Working Group;;Brian Bidulock
 INTERNET-DRAFT;;OpenSS7 Corporation
+Intended status: PROPOSED STANDARD;;\*[date]
 .bl 1
-;;\*[date]
 Expires in \*[expiry]
 .bl 1
 .TE
@@ -81,7 +81,7 @@ Signalling User Adaptation Layers
 .)l
 .rr |x
 .ne 4
-.#S 2005 \*[expiry]
+.#S 2007 \*[expiry]
 .uh "Abstract"
 .pp
 This memo describes \f(BI\)Registration Extensions (REGEXT)\fR that provides
@@ -90,23 +90,23 @@ the ability for an Application Server Process (ASP) to modify existing
 .pp
 Current procedures in the SS7 Signalling User Adaptation Layers (UAs)
 .[
-m2ua
+m2uarfc
 %Z 1
 .]
 .[
-m3ua
+m3uarfc
 %Z 1
 .]
 .[
-isua
+isua04
 %Z 2
 .]
 .[
-sua
+suarfc
 %Z 1
 .]
 .[
-tua
+tua05
 %Z 2
 .]
 do not provide for the modification of \fI\)Routing (Link) Keys\fR without
@@ -116,27 +116,27 @@ changes to live systems.
 The extensions described in this memo permit modification of Signalling Link
 membership in Application Servers for SS7 MTP2-User Adaptation Layer,
 .[
-m2ua
+m2uarfc
 .]
 modification of Circuit Identification Code (CIC) ranges for the SS7 MTP3-User
 Adaptation Layer,
 .[
-m3ua
+m3uarfc
 .]
 modification of Circuit Identification Code (CIC) ranges for the SS7 ISUP-User
 Adaptation Layer,
 .[
-isua
+isua04
 .]
 modificiation of Destination Local Reference (DLR) ranges for SS7 SCCP-User
 Adaptation Layer,
 .[
-sua
+suarfc
 .]
 and modification of Transaction Identifier (TID) ranges for SS7 TCAP-User
 Adaptation Layer.
 .[
-tua
+tua05
 .]
 .uh "Contents"
 .pp
@@ -148,19 +148,19 @@ history, are included at the end of this document.
 This Internet-Draft provides parameters and procedures in extension to the
 parameters and procedures of the SS7 Signalling User Adaptation Layers (UAs),
 .[
-m2ua
+m2uarfc
 .]
 .[
-m3ua
+m3uarfc
 .]
 .[
-isua
+isua04
 .]
 .[
-sua
+suarfc
 .]
 .[
-tua
+tua05
 .]
 for the purpose of supporting changed to \fI\)Routing (Link) Keys\fR to be
 made in live systems.
@@ -210,24 +210,32 @@ refers to an ASP, SGP or IPSP.
 .ix +\n(iiu
 one or more of the Stream Control Transmission Protocol (SCTP)
 .[
-RFC 2960
+rfc2960
 %Z 1
+.]
+.[
+rfc3309
+%Z 1
+.]
+.[
+rfc4460
+%Z 2
 .]
 SS7 Signalling User Adaptation Layers
 .[
-m2ua
+m2uarfc
 .]
 .[
-m3ua
+m3uarfc
 .]
 .[
-isua
+isua04
 .]
 .[
-sua
+suarfc
 .]
 .[
-tua
+tua05
 .]
 supporting Registration.
 .sh 2 "Overview"
@@ -240,19 +248,19 @@ extension procedures that permit this modification.
 .pp
 Each of the SS7 UAs
 .[
-m2ua
+m2uarfc
 .]
 .[
-m3ua
+m3uarfc
 .]
 .[
-isua
+isua04
 .]
 .[
-sua
+suarfc
 .]
 .[
-tua
+tua05
 .]
 provides procedures for registration and deregistration of \fI\)Routing (Link)
 Keys\fR.  None of these procedures currently provides for alteration of
@@ -261,7 +269,7 @@ Keys\fR.  None of these procedures currently provides for alteration of
 .pp
 In SS7 MTP2-User Adaptation Layer
 .[
-m2ua
+m2uarfc
 .]
 registration of a \fI\)Link Key\fR associates a signalling link with an
 \fI\)Interface Identifier (IID)\fR.  However, registration does not provide a
@@ -272,7 +280,7 @@ the membership of signalling links associated with an Application Server.
 .pp
 The SS7 MTP3-User Adaptation Layer
 .[
-m3ua
+m3uarfc
 .]
 registration of a \fI\)Routing Key\fR associates a range of traffic with an
 Application Server through a \fI\)Routing Context\fR.  However, it does not
@@ -287,7 +295,7 @@ circuits (circuit groups) to and from Application Servers.\*#
 \fB\)EDITOR'S NOTE:\-\fR
 Text was included in the M3UA specification
 .[
-m3ua
+m3uarfc
 .]
 to permit this operation, however, detailed procedures and the addition of the
 \fI\)Routing Context\fR parameter to the \fI\)Routing Key\fR, and addition of
@@ -297,7 +305,7 @@ the corresponding error code was missed.
 .pp
 The SS7 ISUP-User Adaptation Layer
 .[
-isua
+isua04
 .]
 registration of a \fI\)Routing Key\fR associates a range of traffic with an
 Application Server through a \fI\)Routing Context\fR.  However, it does not
@@ -311,7 +319,7 @@ Application Servers.\*#
 .pp
 The SS7 SCCP-User Adaptation Layer
 .[
-sua
+suarfc
 .]
 registration of a \fI\)Routing Key\fR associates a range of traffic with an
 Application Server through a \fI\)Routing Context\fR and the Address Mapping
@@ -326,7 +334,7 @@ connections to Application Servers.\*#
 \fB\)EDITOR'S NOTE:\-\fR
 Text was include in the SUA specification
 .[
-sua
+suarfc
 .]
 to permit this operation, however, detailed procedures and the addition of the
 \fI\)Routing Context\fR parameter to the \fI\)Routing Key\fR was missed.
@@ -336,14 +344,14 @@ acting as STPs, and can replace the \fI\)DRN Label\fR and associated
 mechanism.  The \fI\)TID Label\fR and associated mechanism is inadequate and
 should be removed from the SUA specification.
 .[
-sua
+suarfc
 .]
 .)d
 .sh 4 "Limitations of Registration for TUA"
 .pp
 The SS7 TCAP-User Adaptation Layer
 .[
-tua
+tua05
 .]
 registration of a \fI\)Routing Key\fR associates a range of traffic wtih an
 Application Server through a \fI\)Routing Context\fR and the Transaction
@@ -363,7 +371,7 @@ Key\fR for an active Application Server.
 .pp
 The purpose of \fI\)REGEXT\fR for M2UA
 .[
-m2ua
+m2uarfc
 .]
 is to support the Dynamic Allocation of Signalling Data Links and Signalling
 Terminals,
@@ -431,7 +439,7 @@ provided in Section 6.
 .pp
 The purpose of \fI\)REGEXT\fR for M3UA
 .[
-m3ua
+m3uarfc
 .]
 is to support the modification of traffic to and from an active Application
 Server for operations, maintenance, administration and provisioning.  In
@@ -487,7 +495,7 @@ the \f(BI\)REG REQ\fR message.
 .pp
 The purpose of \fI\)REGEXT\fR for ISUA
 .[
-isua
+isua04
 .]
 is to support the modification of traffic to and from an active Application
 Server for operations, maintenance, administration and provisioning.  In
@@ -544,7 +552,7 @@ the \f(BI\)REG REQ\fR message.
 The purpose of \fI\)REGEXT\fR for
 SUA
 .[
-sua
+suarfc
 .]
 is to associate a newly formed connection with an Application Server that is
 responsible for the connection.  Almost all connection-oriented interface
@@ -616,7 +624,7 @@ approach.
 The purpose of \fI\)REGEXT\fR for
 TUA
 .[
-tua
+tua05
 .]
 is to associate a newly formed dialogue or transaction with an Application
 Server that is responsible for the dialogue or transaction.  Almost all
@@ -676,7 +684,7 @@ additional \fI\)Terminating Transaction Id\fR that is assigned to the
 transaction, permitting the TCAP implementation to follow the Transport
 Provider Interface.
 .[
-tpi
+tpi revision 2.0.0
 %Z 2
 .]
 .[
@@ -726,13 +734,13 @@ It also allows the use of the \fI\)Routing (Link) Key\fR\) parameter within a
 \fB\)DEREG REQ\fR\) message.  This memo also defines a new \fI\)Reference
 Number Range\fR parameter for use in the SUA
 .[
-sua
+suarfc
 .]
 \fI\)Routing Key\fR.  In addition, this memo permits the use of the
 \fI\)Source Reference Number\fR, \fI\)Destination Reference Number\fR and
 \fI\)Reference Number Range\fR parameters in the SUA
 .[
-sua
+suarfc
 .]
 \fI\)Routing Key\fR.
 .sh 3 "Routing Key Parameters"
@@ -740,7 +748,7 @@ sua
 .pp
 \fI\)REGEXT\fR defines a new SUA
 .[
-sua
+suarfc
 .]
 \fI\)Reference Number Range\fR parameter for use in the \fI\)Routing Key\fR in
 the \f(BI\)REG REQ\fR message.  This parameter is used to associate a range of
@@ -771,7 +779,7 @@ The \fI\)Reference Number Range\fR parameter is formatted as follows: \*#
 will be assigned by IANA within the specific parameter range of
 SUA
 .[
-sua
+suarfc
 .]
 and may change its value in further versions of this document.
 .)d
@@ -804,26 +812,26 @@ Reference Numbers\fR with \fI\)Destination Reference Numbers\fR in the same
 .pp
 \fI\)REGEXT\fR\) extends the \fI\)Link Key\fR\) parameter of M2UA
 .[
-m2ua
+m2uarfc
 .]
 and the \fI\)Routing Key\fR\) parameters of M3UA, SUA, and TUA.
 .[
-m3ua
+m3uarfc
 .]
 .[
-isua
+isua04
 .]
 .[
-sua
+suarfc
 .]
 .[
-tua
+tua05
 .]
 .sh 4 "M2UA Link Key"
 .lp
 The M2UA
 .[
-m2ua
+m2uarfc
 .]
 \fI\)Link Key\fR parameter is formatted as follows:
 .(b L
@@ -870,7 +878,7 @@ single text \fI\)Interface Identifier\fR.
 .lp
 The M3UA
 .[
-m3ua
+m3uarfc
 .]
 \fI\)Routing Key\fR parameter is formatted as follows:
 .(b L
@@ -900,7 +908,7 @@ for which an ASP is registering or deregistering.
 .pp
 \fI\)REGEXT\fR extends the M3UA
 .[
-m3ua
+m3uarfc
 .]
 \fI\)Routing Key\fR parameter by allowing the following parameters to be used
 as optional sub-parameters within the \fI\)Routing Key\fR:
@@ -924,7 +932,7 @@ Context\fR consists of a single \fI\)Routing Context\fR value.
 .lp
 The ISUA
 .[
-isua
+isua04
 .]
 \fI\)Routing Key\fR parameter is formatted as follows:
 .(b L
@@ -949,7 +957,7 @@ isua
 .pp
 \fI\)REGEXT\fR extends the ISUA \fI\)Routing Key\fR
 .[
-isua
+isua04
 .]
 by adding the following optional \fI\)Key parameters\fR to the \fI\)Routing
 Key\fR.
@@ -973,7 +981,7 @@ parameter \fB\)MUST\fR only occur once in the \fI\)Key\fR parameters.
 .lp
 The SUA
 .[
-sua
+suarfc
 .]
 \fI\)Routing Key\fR parameter is formatted as follows:
 .(b L
@@ -999,7 +1007,7 @@ sua
 .pp
 \fI\)REGEXT\fR extends the SUA \fI\)Routing Key\fR
 .[
-sua
+suarfc
 .]
 by adding the following optional \fI\)Key parameters\fR to the \fI\)Routing
 Key\fR.
@@ -1030,7 +1038,7 @@ only occur once in the \fI\)Key\fR parameters.
 .lp
 The TUA
 .[
-tua
+tua05
 .]
 \fI\)Routing Key\fR parameter is formatted as follows:
 .(b L
@@ -1055,7 +1063,7 @@ tua
 .pp
 \fI\)REGEXT\fR extends the TUA \fI\)Routing Key\fR
 .[
-tua
+tua05
 .]
 by adding the following optional \fI\)Key parameters\fR to the \fI\)Routing
 Key\fR.
@@ -1080,11 +1088,11 @@ parameter \fB\)MUST\fR only occur once in the \fI\)Key\fR parameters.
 .lp
 The M2UA
 .[
-m2ua
+m2uarfc
 .]
 \fI\)Load Selection\fR parameter
 .[
-loadsel
+loadsel05
 %Z 1
 .]
 is formatted as follows:
@@ -1108,7 +1116,7 @@ is formatted as follows:
 .pp
 \fI\)REGEXT\fR extends the M2UA \fI\)Load Selection\fR
 .[
-loadsel
+loadsel05
 .]
 parameter by adding the following optional \fI\)Load Key parameters\fR to the
 \fI\)Load Selection\fR.
@@ -1133,11 +1141,11 @@ parameter.
 .lp
 The M3UA
 .[
-m3ua
+m3uarfc
 .]
 \fI\)Load Selection\fR parameter
 .[
-loadsel
+loadsel05
 .]
 is formatted as follows:
 .(b L
@@ -1160,7 +1168,7 @@ is formatted as follows:
 .pp
 \fI\)REGEXT\fR extends the M3UA \fI\)Load Selection\fR
 .[
-loadsel
+loadsel05
 .]
 parameter by adding the following optional \fI\)Load Key parameters\fR to the
 \fI\)Load Selection\fR.
@@ -1185,11 +1193,11 @@ parameter.
 .lp
 The ISUA
 .[
-isua
+isua04
 .]
 \fI\)Load Selection\fR parameter
 .[
-loadsel
+loadsel05
 .]
 is formatted as follows:
 .(b L
@@ -1212,7 +1220,7 @@ is formatted as follows:
 .pp
 \fI\)REGEXT\fR extends the ISUA \fI\)Load Selection\fR
 .[
-loadsel
+loadsel05
 .]
 parameter by adding the following optional \fI\)Load Key parameters\fR to the
 \fI\)Load Selection\fR.
@@ -1237,11 +1245,11 @@ parameter.
 .lp
 The SUA
 .[
-sua
+suarfc
 .]
 \fI\)Load Selection\fR parameter
 .[
-loadsel
+loadsel05
 .]
 is formatted as follows:
 .(b L
@@ -1264,7 +1272,7 @@ is formatted as follows:
 .pp
 \fI\)REGEXT\fR extends the SUA \fI\)Load Selection\fR
 .[
-loadsel
+loadsel05
 .]
 parameter by adding the following optional \fI\)Load Key parameters\fR to the
 \fI\)Load Selection\fR.
@@ -1289,11 +1297,11 @@ parameter.
 .lp
 The TUA
 .[
-tua
+tua05
 .]
 \fI\)Load Selection\fR parameter
 .[
-loadsel
+loadsel05
 .]
 is formatted as follows:
 .(b L
@@ -1316,7 +1324,7 @@ is formatted as follows:
 .pp
 \fI\)REGEXT\fR extends the TUA \fI\)Load Selection\fR
 .[
-loadsel
+loadsel05
 .]
 parameter by adding the following optional \fI\)Load Key parameters\fR to the
 \fI\)Load Selection\fR.
@@ -1362,7 +1370,7 @@ In addition, \fI\)REGEXT\fR removes the following text associated with the
 The "Routing Key Change Refused" error is sent when the SG refuses a change in
 the Routing Key parameters. 
 .[
-sua
+suarfc
 .]
 .)q
 .sh 3 "Registration Status"
@@ -1375,25 +1383,25 @@ Status\fR parameter\*#
 \fB\)IANA Note:\-\fR  Note that the \fI\)Registration Status\fR parameter has
 tag value 0x030e for M2UA,
 .[
-m2ua
+m2uarfc
 .]
 tag value 0x0212 for M3UA
 .[
-m3ua
+m3uarfc
 .]
 and (perhaps not surprisingly)
 tag value 0x0016 for
 ISUA,
 .[
-isua
+isua04
 .]
 SUA
 .[
-sua
+suarfc
 .]
 and TUA.
 .[
-tua
+tua05
 .]
 .)d
 in the \f(BI\)REG RSP\fR message:
@@ -1413,13 +1421,13 @@ _
 .lp
 The Common
 .[
-isua
+isua04
 .]
 .[
-sua
+suarfc
 .]
 .[
-tua
+tua05
 .]
 \fI\)Registration Status\fR parameter is formatted as follows:
 .(b
@@ -1442,15 +1450,15 @@ tua
 \fI\)Registration Status\fR parameter for
 ISUA,
 .[
-isua
+isua04
 .]
 SUA
 .[
-sua
+suarfc
 .]
 and TUA
 .[
-tua
+tua05
 .]
 by adding the following values to the
 status field:
@@ -1489,14 +1497,14 @@ currently permitted.
 .lp
 The M2UA
 .[
-m2ua
+m2uarfc
 .]
 \fI\)Registration Status\fR parameter is formatted as follows: \*#
 .(d
 .ip \*#
 \fB\)EDITOR'S NOTE:\-\fR  The M2UA
 .[
-m2ua
+m2uarfc
 .]
 \fI\)Registration Result\fR, \fI\)Registration Status\fR, \fI\)Deregistration
 Result\fR and \fI\)Deregistration Status\fR parameter should be altered from
@@ -1520,7 +1528,7 @@ the other UAs.
 .pp
 \fI\)REGEXT\fR extends the M2UA
 .[
-m2ua
+m2uarfc
 .]
 \fI\)Registration Status\fR parameter by adding the following values to the
 status field: \*#
@@ -1542,7 +1550,7 @@ _
 \f(CB\)11\fR and \f(CB\)17\fR will be assigned by IANA as a value of the
 M2UA-specific \fI\)Registration Status\fR parameter for M2UA
 .[
-m2ua
+m2uarfc
 .]
 and may change its value in further versions of this document.
 .)d
@@ -1562,14 +1570,14 @@ Selection\fR is not currently permitted.
 .lp
 The M3UA
 .[
-m3ua
+m3uarfc
 .]
 \fI\)Registration Status\fR parameter is formatted as follows: \*#
 .(d
 .ip \*#
 \fB\)EDITOR'S NOTE:\-\fR  The M3UA
 .[
-m3ua
+m3uarfc
 .]
 \fI\)Registration Result\fR, \fI\)Registration Status\fR, \fI\)Deregistration
 Result\fR and \fI\)Deregistration Status\fR parameter should be altered from
@@ -1593,7 +1601,7 @@ the other UAs.
 .pp
 \fI\)REGEXT\fR extends the M3UA
 .[
-m3ua
+m3uarfc
 .]
 \fI\)Registration Status\fR parameter by adding the following values to the
 status field:
@@ -1615,7 +1623,7 @@ _
 \f(CB\)11\fR and \f(CB\)17\fR will be assigned by IANA as a value of the
 M3UA-specific \fI\)Registration Status\fR parameter for M3UA
 .[
-m3ua
+m3uarfc
 .]
 and may change its value in further versions of this document.
 .)d
@@ -1644,7 +1652,7 @@ the \f(BI\)REG REQ\fR message.
 \fI\)REGEXT\fR also extends the \f(BI\)REG REQ\fR message by extending the
 \fI\)Load Selection\fR parameter
 .[
-loadsel
+loadsel05
 .]
 and permitting the \fI\)Load Selector\fR to be included in the \f(BI\)REG
 REQ\fR message.
@@ -1696,23 +1704,23 @@ the \fI\)Load Selection\fR as requested by the ASP.
 .pp
 In extension to the registration procedures of M2UA,
 .[
-m2ua
+m2uarfc
 .]
 \fI\)REGEXT\fR provides the following registration procedures:
 .sh 3 "Common Registration Procedures"
 .pp
 In extension to the registration procedures of Common,
 .[
-m3ua
+m3uarfc
 .]
 .[
-isua
+isua04
 .]
 .[
-sua
+suarfc
 .]
 .[
-tua
+tua05
 .]
 \fI\)REGEXT\fR provides the following registration procedures:
 .pp
@@ -1729,15 +1737,15 @@ Refused"\fR is returned if the SGP does not accept the modification of the
 \fB\)EDITOR'S NOTE:\-\fR
 ISUA,
 .[
-isua
+isua04
 .]
 SUA
 .[
-sua
+suarfc
 .]
 and TUA
 .[
-tua
+tua05
 .]
 already contains the procedures described in this paragraph.  The only
 difference provided by \fI\)REGEXT\fR is that the \fI\)Registration Status\fR
@@ -1748,7 +1756,7 @@ An ASP \fB\)MAY\fR modify an existing \fI\)Load Selection\fR by including the
 \fI\)Load Selector\fR in the \f(BI\)REG REQ\fR.  If the SGP supports load
 selection extensions
 .[
-loadsel
+loadsel05
 .]
 and determines that the \fI\)Load Selector\fR applies to an existing \fI\)Load
 Selection\fR, the SGP \fB\)MAY\fR adjust the existing \fI\)Load Selection\fR
@@ -1760,7 +1768,7 @@ modification of the \fI\)Load Selection\fR.
 .pp
 In extension to the registration procedures of M2UA,
 .[
-m2ua
+m2uarfc
 .]
 \fI\)REGEXT\fR provides the following registration procedures:
 .pp
@@ -1776,7 +1784,7 @@ An ASP \fB\)MAY\fR modify an existing \fI\)Load Selection\fR by including the
 \fI\)Load Selector\fR in the \f(BI\)REG REQ\fR.  If the SGP supports load
 selection extensions
 .[
-loadsel
+loadsel05
 .]
 and determines that the \fI\)Load Selector\fR applies to an existing \fI\)Load
 Selection\fR, the SGP \fB\)MAY\fR adjust the existing \fI\)Load Selection\fR
@@ -1797,13 +1805,13 @@ a \fI\)Routing Context\fR (or \fI\)Interface Identifier\fR) to that SG.
 .pp
 An SG or ASP supporting \fI\)ASPEXT\fR
 .[
-aspext
+aspext-04
 %Z 2
 .]
 will identify its ability or inability to support \fI\)REGEXT\fR using the ASP
 Extensions procedure.
 .[
-aspext
+aspext-04
 .]
 .pp
 If an SG does not support dynamic registration, it also does not support
@@ -1819,7 +1827,7 @@ the \f(BI\)REG REQ\fR message and an indication that the \fI\)Routing
 Context\fR (\fI\)Interface Identifier\fR) parameter was considered invalid,
 from an SG not supporting ASP Extensions,
 .[
-aspext
+aspext-04
 .]
 then the ASP \fB\)SHOULD\fR\) mark the SG as unequipped to perform
 \fI\)REGEXT\fR and not place any \fI\)Routing Context\fR (\fI\)Interface
@@ -1884,23 +1892,23 @@ _
 \fI\)REGEXT\fR provides adds some security risks to
 M2UA,
 .[
-m2ua
+m2uarfc
 .]
 M3UA,
 .[
-m3ua
+m3uarfc
 .]
 ISUA,
 .[
-isua
+isua04
 .]
 SUA
 .[
-sua
+suarfc
 .]
 and TUA.
 .[
-tua
+tua05
 .]
 .pp
 If the Signalling Gateway (SG) does cannot properly authenticate the peer, the
@@ -1924,7 +1932,7 @@ parameter in the \f(BI\)REG REQ\fR message as is experienced in the
 adds the following parameter tag value (described in Section 3) to the
 SUA-Specific Parameter numbering range for SUA:
 .[
-sua
+suarfc
 .]
 .ix +\n(iiu
 .(b L
@@ -1945,7 +1953,7 @@ _
 through this document as \f(CB\)0x0119\fR will be assigned by IANA within the
 SUA-specific parameter range of the SUA
 .[
-sua
+suarfc
 .]
 and may change its value in further versions of this document.
 .)d
@@ -1961,13 +1969,15 @@ draft.  This section will be removed from the document when the document is
 finalized.
 .sh 2 "Changes from Version 0.3 to Version 0.4" 0 4
 .bu
-updated first and last page to IETF boilerplate.
+updated to new boilerplate and idnits 2.00.1
 .bu
 updated references, version numbers and dates.
 .sh 2 "Changes from Version 0.2 to Version 0.3" 0 3
 .bu
 updated references, version numbers and dates.
 .sh 2 "Changes from Version 0.1 to Version 0.2" 0 2
+.bu
+updated first and last page to IETF boilerplate.
 .bu
 added list of abbreviations.
 .bu
@@ -1997,7 +2007,7 @@ updated author's address.
 addition of \fI\)Source Reference Number\fR, \fI\)Destination Reference
 Number\fR and \fI\)Reference Number Range\fR to SUA
 .[
-sua-14
+sua14
 %Z 2
 .]
 \fI\)Routing Key\fR.
@@ -2007,6 +2017,12 @@ sua-14
 .nf
 \fC\s-3\
 $Log: draft-bidulock-sigtran-regext-04.me,v $
+Revision 0.9.2.4  2007/02/03 15:50:20  brian
+- added new drafts, updated refs
+
+Revision 0.9.2.3  2006/06/27 09:41:15  brian
+- rereleased drafts
+
 Revision 0.9.2.3  2005/10/17 11:53:46  brian
 - updated drafts for republication
 
@@ -2048,4 +2064,4 @@ $LIST$
 .lp
 This draft expires \*[expiry].
 .)b
-.#T 2005
+.#T 2007
