@@ -265,6 +265,162 @@ r_recv_reopen_req(struct rmux *rm, queue_t *q, mblk_t *mp)
 {
 }
 
+#if 0
+static int
+r_m_read(queue_t *q, mblk_t *mp)
+{
+	switch (DB_TYPE(mp)) {
+	case M_READ:		/* bad, contains unsigned long *//* FIXME */
+		break;
+	case M_DELAY:		/* int value */
+		if (mp->b_wptr >= mp->b_rptr + sizeof(uint32_t))
+			*(uint32_t *) mp->b_rptr = cpu_to_be32(*(uint32_t *) mp->b_rptr);
+		break;
+	default:
+		break;
+	}
+	putnext(q, mp);
+	return (0);
+}
+
+/* 40-bytes for 32-bit, 58-bytes for 64-bits and a fastbuf is not less than 64 bytes */
+struct stroptions64 {
+	uint32_t so_flags;
+	int16_t so_readopt;
+	uint16_t so_wroff;
+	int64_t so_minpsz;
+	int64_t so_maxpsz;
+	uint64_t so_hiwat;
+	uint64_t so_lowat;
+	uint8_t so_band;
+	uint8_t so_filler[3];
+	uint16_t so_erropt;
+	int64_t so_maxblk;
+	uint16_t so_copyopt;
+	uint16_t so_wrpad;
+};
+
+static int
+r_m_setopts(queue_t *q, mblk_t *mp)
+{
+	switch (DB_TYPE(mp)) {
+	case M_SETOPTS:	/* really bad, contains ssize_t and size_t *//* FIXME */
+		break;
+	case M_PCSETOPTS:	/* really bad, contains ssize_t and size_t *//* FIXME */
+		break;
+	default:
+		break;
+	}
+	putnext(q, mp);
+	return (0);
+}
+
+static int
+r_m_ioctl(queue_t *q, mblk_t *mp)
+{
+	switch (DB_TYPE(mp)) {
+	case M_IOCTL:		/* really bad, contains long and ulong and pointers *//* FIXME */
+		break;
+	case M_IOCACK:		/* really bad, contains long and ulong and pointers *//* FIXME */
+		break;
+	case M_IOCNAK:		/* really bad, contains long and ulong and pointers *//* FIXME */
+		break;
+	case M_COPYIN:		/* really bad, contains long and ulong and pointers *//* FIXME */
+		break;
+	case M_COPYOUT:	/* really bad, contains long and ulong and pointers *//* FIXME */
+		break;
+	case M_IOCDATA:	/* really bad, contains long and ulong and pointers *//* FIXME */
+		break;
+	case M_CTL:		/* bad, format unknown */
+		break;
+	case M_PCCTL:		/* bad, format unknown */
+		break;
+	default:
+		break;
+	}
+	putnext(q, mp);
+	return (0);
+}
+
+static int
+r_m_letsplay(queue_t *q, mblk_t *mp)
+{
+	switch (DB_TYPE(mp)) {
+	case M_BACKWASH:
+		/* bad, contains attache M_DATA, M_PROTO or M_PCPROTO, but we should never get one
+		   of this because we interrupt M_LETSPLAY */
+		freemsg(mp->b_cont);
+		mp->b_datap->db_type = M_DONTPLAY;
+		break;
+	case M_LETSPLAY:	/* refuse */
+		mp->b_datap->db_type = M_DONTPLAY;
+		qreply(q, mp);
+		return (0);
+	case M_DONTPLAY:
+		break;
+	case M_BACKDONE:	/* complicated but we shouldn't get this */
+		mp->b_datap->db_type = M_DONTPLAY;
+		break;
+	default:
+		break;
+	}
+	putnext(q, mp);
+	return (0);
+}
+
+static int
+r_m_other(queue_t *q, mblk_t *mp)
+{
+	switch (DB_TYPE(mp)) {
+	case M_PASSFP:
+		/* really bad, we can't do this */
+		freemsg(mp);
+		return (0);
+	case M_READ:
+	case M_DELAY:
+		return cd_m_read(q, mp);
+	case M_SETOPTS:
+	case M_PCSETOPTS:
+		return cd_m_setopts(q, mp);
+	case M_IOCTL:
+	case M_IOCACK:
+	case M_IOCNAK:
+	case M_COPYIN:
+	case M_COPYOUT:
+	case M_IOCDATA:
+	case M_CTL:
+	case M_PCCTL:
+		return cd_m_ioctl(q, mp);
+	case M_BACKWASH:
+	case M_LETSPLAY:
+	case M_DONTPLAY:
+	case M_BACKDONE:
+		return cd_m_letsplay(q, mp);
+	default:
+	case M_BREAK:
+	case M_EVENT:		/* osbolete anyway */
+	case M_SIG:		/* unsigned char - ok */
+	case M_RSE:		/* bad */
+	case M_TRAIL:		/* bad */
+	case M_PCSIG:		/* just a char like M_SIG */
+	case M_FLUSH:		/* just bytes */
+	case M_STOP:		/* nothing */
+	case M_START:		/* nothing */
+	case M_HANGUP:		/* nothing */
+	case M_ERROR:		/* just bytes */
+	case M_PCRSE:		/* bad */
+	case M_STOPI:		/* bad, format unknown */
+	case M_STARTI:		/* bad, format unknown */
+	case M_PCEVENT:	/* osbolete anyway */
+	case M_UNHANGUP:	/* nothing */
+	case M_NOTIFY:		/* nothing */
+		break;
+	}
+	putnext(q, mp);
+	return (0);
+}
+#endif
+
 /*
  * There are two types of upper Streams: control Streams and user Streams.  The control Stream is a
  * clone minor device that can only be opened once.  User Streams are either clone or non-clone

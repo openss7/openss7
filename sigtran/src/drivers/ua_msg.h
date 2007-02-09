@@ -80,28 +80,39 @@
 
 #define UA_PROTOCOL_ALL		0
 #define UA_PROTOCOL_IUA		1
-#define UA_PROTOCOL_M2UA	2
-#define UA_PROTOCOL_M3UA	3
-#define UA_PROTOCOL_SUA		4
-#define UA_PROTOCOL_TUA		5
-#define UA_PROTOCOL_ISUA	6
-#define UA_PROTOCOL_V5UA	7
-#define UA_PROTOCOL_DUA		8
-#define UA_PROTOCOL_GUA		9
+#define UA_PROTOCOL_DUA		2
+#define UA_PROTOCOL_V5UA	3
+#define UA_PROTOCOL_GUA		4
+#define UA_PROTOCOL_M2UA	5
+#define UA_PROTOCOL_M3UA	6
+#define UA_PROTOCOL_SUA		7
+#define UA_PROTOCOL_TUA		8
+#define UA_PROTOCOL_ISUA	9
 
 #define UA_USE_PROTOCOL(x) ((UA_PROTOCOL == UA_PROTOCOL_ALL) || (UA_PROTOCOL == (x)))
 
-#define UA_PROFILE_RFC3057	 1	/* IUA RFC 3057 */
-#define UA_PROFILE_RFC4233	 2	/* IUA RFC 4133 */
-#define UA_PROFILE_RFC3331	 3	/* M2UA RFC 3331 */
-#define UA_PROFILE_TS102141	 4	/* M2UA TS 102 141 */
-#define UA_PROFILE_RFC3332	 5	/* M3UA RFC 3332 */
-#define UA_PROFILE_TS102142	 6	/* M3UA TS 102 142 */
-#define UA_PROFILE_RFC4666	 7	/* M3UA RFC 4666 */
-#define UA_PROFILE_RFC3868	 8	/* SUA RFC 3868 */
-#define UA_PROFILE_TS102143	 9	/* SUA TS 102 143 */
-#define UA_PROFILE_SUABIS	10	/* draft-ietf-sigtran-sua-00.txt */
-#define UA_PROFILE_TUA04	11	/* draft-bidulock-sigtran-tua-04.txt */
+#define UA_PROFILE(level,version,standard) ((level<<16)|(version<<8)|(standard<<0))
+
+#define UA_PROFILE_LEVEL(profile) ((profile>>16)&0xff)
+#define UA_PROFILE_VERSION(profile) ((profile>>8)&0xff)
+#define UA_PROFILE_STANDARD(profile) ((profile>>0)&0xff)
+
+/* *INDENT-OFF* */
+#define UA_PROFILE_NONE		UA_PROFILE(0,                0,             0)
+#define UA_PROFILE_RFC3057	UA_PROFILE(UA_PROTOCOL_IUA,  IUA_VERSION,   1)	/* IUA RFC 3057 */
+#define UA_PROFILE_RFC3331	UA_PROFILE(UA_PROTOCOL_M2UA, M2UA_VERSION,  2)	/* M2UA RFC 3331 */
+#define UA_PROFILE_RFC3332	UA_PROFILE(UA_PROTOCOL_M3UA, M3UA_VERSION,  3)	/* M3UA RFC 3332 */
+#define UA_PROFILE_RFC3868	UA_PROFILE(UA_PROTOCOL_SUA,  SUA_VERSION,   4)	/* SUA RFC 3868 */
+#define UA_PROFILE_RFC4233	UA_PROFILE(UA_PROTOCOL_IUA,  IUA_VERSION,   5)	/* IUA RFC 4133 */
+#define UA_PROFILE_RFC4666	UA_PROFILE(UA_PROTOCOL_M3UA, M3UA_VERSION,  6)	/* M3UA RFC 4666 */
+#define UA_PROFILE_TS102141	UA_PROFILE(UA_PROTOCOL_M2UA, M2UA_VERSION,  7)	/* M2UA TS 102 141 */
+#define UA_PROFILE_TS102142	UA_PROFILE(UA_PROTOCOL_M3UA, M3UA_VERSION,  8)	/* M3UA TS 102 142 */
+#define UA_PROFILE_TS102143	UA_PROFILE(UA_PROTOCOL_SUA,  SUA_VERSION,   9)	/* SUA TS 102 143 */
+#define UA_PROFILE_SUABIS	UA_PROFILE(UA_PROTOCOL_SUA,  SUA_VERSION,  10)	/* draft-ietf-sigtran-sua-00.txt */
+#define UA_PROFILE_TUA05	UA_PROFILE(UA_PROTOCOL_TUA,  TUA_VERSION,  11)	/* draft-bidulock-sigtran-tua-05.txt */
+#define UA_PROFILE_ISUA04	UA_PROFILE(UA_PROTOCOL_ISUA, ISUA_VERSION, 12)	/* draft-bidulock-sigtran-isua-04.txt */
+#define UA_PROFILE_DEFAULT	UA_PROFILE_RFC3332
+/* *INDENT-ON* */
 
 #define UA_PAD4(__len) (((__len)+3)&~0x3)
 #define UA_MHDR(__version, __spare, __class, __type) \
@@ -227,6 +238,7 @@
  */
 #define   UA_ECODE_INVALID_VERSION		(0x01)
 #define   UA_ECODE_INVALID_IID			(0x02)
+#define   UA_ECODE_INVALID_RC			(0x02)
 #define   UA_ECODE_UNSUPPORTED_MESSAGE_CLASS	(0x03)
 #define   UA_ECODE_UNSUPPORTED_MESSAGE_TYPE	(0x04)
 #define   UA_ECODE_UNSUPPORTED_TRAFFIC_MODE	(0x05)
@@ -265,9 +277,11 @@
 #define UA_STATUS_ASP_FAILURE			(0x00020003)
 #define UA_STATUS_AS_MINIMUM_ASPS		(0x00020004)
 
+#ifndef UA_TMODE_OVERRIDE
 #define UA_TMODE_OVERRIDE			(0x1)
 #define UA_TMODE_LOADSHARE			(0x2)
 #define UA_TMODE_BROADCAST			(0x3)
+#endif				/* UA_TMODE_OVERRIDE */
 #define UA_TMODE_SB_OVERRIDE			(0x4)
 #define UA_TMODE_SB_LOADSHARE			(0x5)
 #define UA_TMODE_SB_BROADCAST			(0x6)
@@ -437,6 +451,8 @@
 #define M2UA_LEVEL_3			(0x03)
 #define M2UA_LEVEL_4			(0x04)	/* big argument */
 
+#endif
+
 /*
  *  M3UA-Specific Values
  *  -------------------------------------------------------------------
@@ -532,6 +548,7 @@
 #define SUA_PARM_DEST_ADDR	UA_CONST_PHDR(0x0103,0)
 #define SUA_PARM_SRN		UA_CONST_PHDR(0x0104,sizeof(uint32_t))
 #define SUA_PARM_DRN		UA_CONST_PHDR(0x0105,sizeof(uint32_t))
+/* FIXME: Which one is it? */
 #define SUA_PARM_CAUSE		UA_CONST_PHDR(0x0106,sizeof(uint32_t))
 #define SUA_PARM_SEQ_NUM	UA_CONST_PHDR(0x0107,sizeof(uint32_t))
 #define SUA_PARM_RX_SEQ_NUM	UA_CONST_PHDR(0x0108,sizeof(uint32_t))
@@ -540,7 +557,8 @@
 #define SUA_PARM_RESERVED1	UA_CONST_PHDR(0x010b,0)
 #define SUA_PARM_DATA		UA_CONST_PHDR(0x010b,0)	/* rfc3868 */
 #define SUA_PARM_SMI_SUBSYS	UA_CONST_PHDR(0x010c,sizeof(uint32_t))
-#define SUA_PARM_CAUSE		UA_CONST_PHDR(0x010c,sizeof(uint32_t))
+/* FIXME: Which one is it? */
+//#define SUA_PARM_CAUSE                UA_CONST_PHDR(0x010c,sizeof(uint32_t))
 #define SUA_PARM_NTWK_APP	UA_CONST_PHDR(0x010d,sizeof(uint32_t))	/* rfc3868 */
 #define SUA_PARM_ROUTING_KEY	UA_CONST_PHDR(0x010e,sizeof(uint32_t))	/* rfc3868 */
 #define SUA_PARM_DRN_LABEL	UA_CONST_PHDR(0x010f,sizeof(uint32_t))	/* rfc3868 */
@@ -687,7 +705,7 @@
 
 #ifndef ISUA_PPI
 #define ISUA_PPI	6	/* ISUA SCTP Payload Protocol Identifier */
-#ifndef ISUA_PPI
+#endif				/* ISUA_PPI */
 
 #define ISUA_VERSION	1	/* draft-bidulock-sigtran-isua-03.txt */
 
@@ -735,7 +753,7 @@
 
 #endif				/* UA_USE_PROTOCOL(UA_PROTOCOL_ISUA) */
 
-static struct {
+static struct ua_profile {
 	uchar protocol;			/* locally defined protocol level */
 	uchar version;			/* UA message header version */
 	ushort port;			/* SCTP well-known port number, host byte order */
@@ -743,21 +761,24 @@ static struct {
 	uint optmask;			/* UA options mask */
 } ua_profiles[] = {
 	/* *INDENT-OFF* */
-	[UA_PROFILE_RFC3057]  = { UA_PROTOCOL_IUA,   IUA_PORT,  IUA_PPI,  IUA_VERSION, -1U, },
-	[UA_PROFILE_RFC4233]  = { UA_PROTOCOL_IUA,   IUA_PORT,  IUA_PPI,  IUA_VERSION, -1U, },
-	[UA_PROFILE_RFC3331]  = { UA_PROTOCOL_M2UA, M2UA_PORT, M2UA_PPI, M2UA_VERSION, -1U, },
-	[UA_PROFILE_TS102141] = { UA_PROTOOCL_M2UA, M2UA_PORT, M2UA_PPI, M2UA_VERSION, -1U, },
-	[UA_PROFILE_RFC3332]  = { UA_PROTOCOL_M3UA, M3UA_PORT, M3UA_PPI, M3UA_VERSION, -1U, },
-	[UA_PROFILE_TS102142] = { UA_PROTOCOL_M3UA, M3UA_PORT, M3UA_PPI, M3UA_VERSION, -1U, },
-	[UA_PROFILE_RFC4666]  = { UA_PROTOCOL_M3UA, M3UA_PORT, M3UA_PPI, M3UA_VERSION, -1U, },
-	[UA_PROFILE_RFC3868]  = { UA_PROTOCOL_SUA,   SUA_PORT,  SUA_PPI,  SUA_VERSION, -1U, },
-	[UA_PROFILE_TS102143] = { UA_PROTOCOL_SUA,   SUA_PORT,  SUA_PPI,  SUA_VERSION, -1U, },
-	[UA_PROFILE_SUABIS]   = { UA_PROTOCOL_SUA,   SUA_PORT,  SUA_PPI,  SUA_VERSION, -1U, },
-	[UA_PROFILE_TUA04]    = { UA_PROTOCOL_TUA,   TUA_PORT,  TUA_PPI,  TUA_VERSION, -1U, },
+	[UA_PROFILE_NONE]	= { UA_PROTOCOL_M3UA, M3UA_VERSION, M3UA_PORT, M3UA_PPI, -1U, },
+	[UA_PROFILE_RFC3057]	= { UA_PROTOCOL_IUA,   IUA_VERSION,  IUA_PORT,  IUA_PPI, -1U, },
+	[UA_PROFILE_RFC3331]	= { UA_PROTOCOL_M2UA, M2UA_VERSION, M2UA_PORT, M2UA_PPI, -1U, },
+	[UA_PROFILE_RFC3332]	= { UA_PROTOCOL_M3UA, M3UA_VERSION, M3UA_PORT, M3UA_PPI, -1U, },
+	[UA_PROFILE_RFC3868]	= { UA_PROTOCOL_SUA,   SUA_VERSION,  SUA_PORT,  SUA_PPI, -1U, },
+	[UA_PROFILE_RFC4233]	= { UA_PROTOCOL_IUA,   IUA_VERSION,  IUA_PORT,  IUA_PPI, -1U, },
+	[UA_PROFILE_RFC4666]	= { UA_PROTOCOL_M3UA, M3UA_VERSION, M3UA_PORT, M3UA_PPI, -1U, },
+	[UA_PROFILE_TS102141]	= { UA_PROTOCOL_M2UA, M2UA_VERSION, M2UA_PORT, M2UA_PPI, -1U, },
+	[UA_PROFILE_TS102142]	= { UA_PROTOCOL_M3UA, M3UA_VERSION, M3UA_PORT, M3UA_PPI, -1U, },
+	[UA_PROFILE_TS102143]	= { UA_PROTOCOL_SUA,   SUA_VERSION,  SUA_PORT,  SUA_PPI, -1U, },
+	[UA_PROFILE_SUABIS]	= { UA_PROTOCOL_SUA,   SUA_VERSION,  SUA_PORT,  SUA_PPI, -1U, },
+	[UA_PROFILE_TUA05]	= { UA_PROTOCOL_TUA,   TUA_VERSION,  TUA_PORT,  TUA_PPI, -1U, },
+	[UA_PROFILE_ISUA04]	= { UA_PROTOCOL_ISUA, ISUA_VERSION, ISUA_PORT, ISUA_PPI, -1U, },
 	/* *INDENT-ON* */
 };
 
 struct ua_parm {
+	uint32_t tag;			/* tag for parameter */
 	union {
 		uchar *cp;		/* pointer to parameter value field */
 		uint32_t *wp;		/* pointer to parameter value field */
@@ -769,9 +790,10 @@ struct ua_parm {
 /**
  * ua_dec_parm: - extract parameter from message or field.
  * @beg: beginning of field or message
- * @eng: end of field or message
+ * @end: end of field or message
  * @parm: structure to hold result
- * @tag: parameter tag value
+ * @tags: array of tags to match
+ * @num: number of tags in array
  *
  * If the parameter does not exist in the field or message it returns false; otherwise true, and
  * sets the parameter values if parm is non-NULL.
@@ -786,28 +808,66 @@ struct ua_parm {
  * information can be obtained?  No, probably not.  We can be forgiving.
  */
 static inline bool
-ua_dec_parm(uchar *beg, uchar *end, struct ua_parm *parm, uint32_t tag)
+ua_dec_parm_any(uchar *beg, uchar *end, struct ua_parm *parm, uint32_t *tags, uint num)
 {
 	register uint32_t *p;
-	bool rtn = false;
-	int plen;
+	int plen, i;
 
 	for (p = (uint32_t *) beg;
 	     (uchar *) (p + 1) <= end && (plen = UA_SIZE(*p)) >= UA_PHDR_SIZE;
 	     p = (uint32_t *) ((uchar *) p + UA_PAD4(plen))) {
-		if (UA_TAG(p[0]) == UA_TAG(tag)) {
-			rtn = true;
-			if (parm) {
-				parm->wp = (p + 1);
-				if ((parm->len = plen) >= 4)
-					parm->val = ntohl(p[1]);
-				else
-					parm->val = 0;
+		for (i = 0; i < num; i++) {
+			if (UA_TAG(p[0]) == UA_TAG(tags[i])) {
+				if (parm) {
+					parm->tag = tags[i];
+					parm->wp = (p + 1);
+					if ((parm->len = plen - UA_PHDR_SIZE) >= 4)
+						parm->val = ntohl(p[1]);
+					else
+						parm->val = 0;
+				}
+				return (true);
 			}
-			break;
 		}
 	}
-	return (rtn);
+	return (false);
+}
+
+/**
+ * ua_dec_parm_any_next: - extract next parameter from message or field.
+ * @end: end of field or message
+ * @parm: structure to hold result (as passed to ua_dec_parm)
+ * @tags: array of tags to match
+ * @num: number of tags in array
+ */
+static inline bool
+ua_dec_parm_any_next(uchar *end, struct ua_parm *parm, uint32_t *tags, uint num)
+{
+	return ua_dec_parm_any(parm->cp + UA_PAD4(parm->len), end, parm, tags, num);
+}
+
+/**
+ * ua_dec_parm: - extract parameter from message or field.
+ * @beg: beginning of field or message
+ * @end: end of field or message
+ * @parm: structure to hold result
+ * @tag: parameter tag value
+ */
+static inline bool
+ua_dec_parm(uchar *beg, uchar *end, struct ua_parm *parm, uint32_t tag)
+{
+	return ua_dec_parm_any(beg, end, parm, &tag, 1);
+}
+
+/**
+ * ua_dec_parm_next: - extract next parameter from message or field.
+ * @end: end of field or message
+ * @parm: structure to hold result (as passed to ua_dec_parm)
+ */
+static inline bool
+ua_dec_parm_next(uchar *end, struct ua_parm *parm)
+{
+	return ua_dec_parm(parm->cp + UA_PAD4(parm->len), end, parm, &parm->tag);
 }
 
 #endif				/* __LOCAL_UA_MSG_H__ */

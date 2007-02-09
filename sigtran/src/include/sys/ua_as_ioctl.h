@@ -73,7 +73,7 @@
 #define UA_CLEI_MAX	32
 
 struct m2ua_ppa {
-	int sgid;
+	int spid;
 	ushort sdti;
 	ushort sdli;
 	uint iid;
@@ -133,35 +133,37 @@ typedef struct ua_conf_df {
 } ua_conf_df_t;
 
 typedef struct ua_conf_lm {
-	uint sgid;			/* LM Controls-And-Manages this SG id */
+	uint spid;			/* LM Controls-And-Manages this SP id */
 } ua_conf_lm_t;
 
 typedef struct ua_conf_up {
+	uint asid;			/* UP Is-Served-By this AS id */
 } ua_conf_up_t;
 
 typedef struct ua_conf_as {
-	uint sgid;			/* AS Obtains-Service-From this SG id */
+	uint spid;			/* AS Obtains-Service-From this SP id */
+	ua_oid_t gpids[0];		/* AS Is-Served-By these GP ids */
 } ua_conf_as_t;
-
-typedef struct ua_conf_sg {
-	ua_oid_t gpids[0];		/* SG Contains these GP ids */
-	ua_oid_t asids[0];		/* SG Serves these AS ids */
-} ua_conf_sg_t;
 
 typedef struct ua_conf_sp {
 	uint aspid;			/* SP uses this External ASPID */
 	ua_oid_t sgids[0];		/* SP Connects-To these SG ids */
-	ua_oid_t gpids[0];		/* SP Connects-To these GP ids */
+	ua_oid_t asids[0];		/* SP Serves these AS ids */
 } ua_conf_sp_t;
+
+typedef struct ua_conf_sg {
+	uint spid;			/* SG Serves this SP id */
+	uint position;			/* SG Serves in this SP position (small integer) */
+	ua_oid_t gpids[0];		/* SG Contains these GP ids */
+} ua_conf_sg_t;
 
 typedef struct ua_conf_gp {
 	uint sgid;			/* GP Is-Contained-By this SG id */
 	uint position;			/* GP Is-Located in this SG position (small integer) */
-	ua_oid_t spids[0];		/* GP Connects-To these SP ids */
+	ua_oid_t asids[0];		/* GP Serves these AS ids */
 } ua_conf_gp_t;
 
 typedef struct ua_conf_xp {
-	uint spid;			/* SP that this XP Connects-To */
 	uint gpid;			/* GP that this XP Connects-To */
 } ua_conf_xp_t;
 
@@ -180,44 +182,49 @@ typedef struct ua_option {
 #define UA_IOCSOPTIONS	((UA_IOC_MAGIC<<8)|001)	/* ua_option_t */
 
 #define UA_TMODE_NONE		0
+#ifndef UA_TMODE_OVERRIDE
 #define UA_TMODE_OVERRIDE	1
 #define UA_TMODE_LOADSHARE	2
 #define UA_TMODE_BROADCAST	3
+#endif				/* UA_TMODE_OVERRIDE */
 
 /* protocol variants */
 #define UA_VERSION_NONE		0	/* interoperable */
-#define UA_VERSION_RFC3331	1	/* per RFC 3331 */
-#define UA_VERSION_RFC3332	1	/* per RFC 3332 */
-#define UA_VERSION_RFC4666	1	/* per RFC 4666 */
-#define UA_VERSION_RFC3868	1	/* per RFC 3868 */
-#define UA_VERSION_TS102141	2	/* per ETSI TS 102 141 */
-#define UA_VERSION_TS102142	2	/* per ETSI TS 102 142 */
-#define UA_VERSION_TS102143	2	/* per ETSI TS 102 143 */
-#define UA_VERSION_DEFAULT	UA_VERSION_RFC3331
+#define UA_VERSION_RFC3057	1	/* per RFC 3057 */
+#define UA_VERSION_RFC3331	2	/* per RFC 3331 */
+#define UA_VERSION_RFC3332	3	/* per RFC 3332 */
+#define UA_VERSION_RFC3868	4	/* per RFC 3868 */
+#define UA_VERSION_RFC4233	5	/* per RFC 4233 */
+#define UA_VERSION_RFC4666	6	/* per RFC 4666 */
+#define UA_VERSION_TS102141	7	/* per ETSI TS 102 141 */
+#define UA_VERSION_TS102142	8	/* per ETSI TS 102 142 */
+#define UA_VERSION_TS102143	9	/* per ETSI TS 102 143 */
+#define UA_VERSION_SUABIS	10	/* */
+#define UA_VERSION_TUA05	11	/* draft-bidulock-sigtran-tua-05.txt */
+#define UA_VERSION_ISUA04	12	/* draft-bidulock-sigtran-isua-04.txt */
+#define UA_VERSION_DEFAULT	UA_VERSION_NONE
 
 /* protocol options */
-#define UA_ASPEXT		(1<<0)	/* SG supports draft-bidulock-sigtran-aspext */
-#define UA_SGINFO		(1<<1)	/* SG supports draft-bidulock-sigtran-sginfo */
-#define UA_LOADSEL		(1<<2)
-#define UA_LOADGRP		(1<<3)
-#define UA_CORID		(1<<4)
-#define UA_REGEXT		(1<<5)
-#define UA_SESSID		(1<<6)
-#define UA_DYNAMIC		(1<<7)	/* SG supports dynamic registration */
-#define UA_RESERVED		(1<<8)	/* reserved */
-#define UA_ASPCONG		(1<<9)
-#define UA_TEXTIID		(1<<10)	/* SG supports text interface identifiers */
+#define UA_ASPEXT		(1<< 0)	/* Extension draft-bidulock-sigtran-aspext */
+#define UA_SGINFO		(1<< 1)	/* Extension draft-bidulock-sigtran-sginfo */
+#define UA_LOADSEL		(1<< 2)	/* Extension draft-bidulock-sigtran-loadsel */
+#define UA_LOADGRP		(1<< 3)	/* Extension draft-bidulock-sigtran-loadgrp */
+#define UA_CORID		(1<< 4)	/* Extension draft-bidulock-sigtran-corid */
+#define UA_REGEXT		(1<< 5)	/* Extension draft-bidulock-sigtran-regext */
+#define UA_SESSID		(1<< 6)	/* Extension draft-bidulock-sigtran-sessid */
+#define UA_DYNAMIC		(1<< 7)	/* Option dynamic registration */
+#define UA_DEIPSP		(1<< 8)	/* Option Double-Ended IPSP */
+#define UA_ASPCONG		(1<< 9)	/* Extension draft-bidulock-sigtran-aspcong */
+#define UA_TEXTIID		(1<<10)	/* Option Text IIDs */
+
+#define UA_BROADCAST		(1<<11)	/* Option Broadcast traffic mode */
+#define UA_SEIPSP		(1<<12) /* Option Single-Ended IPSP */
 
 typedef struct ua_opt_conf_lm {
 } ua_opt_conf_lm_t;
 
 typedef struct ua_opt_conf_up {
-	struct lmi_option options;	/* protocol variant and options */
-	uint max_sdu;			/* maximum sdu size */
-	uint opt_sdu;			/* optimal sdu size */
-	uint max_cdata;			/* maximum amount of connection data */
-	uint max_ddata;			/* maximum amount of disconnection data */
-	uint max_esdu;			/* maximum esdu size */
+	struct lmi_option proto;	/* protocol variant and options */
 	uint testab;			/* duration of establish timer (TS 102 141) */
 } ua_opt_conf_up_t;
 
@@ -225,22 +232,33 @@ typedef struct ua_opt_conf_as {
 	uint tmode;			/* traffic mode */
 	uint loadgrp;			/* load group */
 	uint loadsel;			/* load selection */
+	uint max_sdu;			/* maximum sdu size */
+	uint opt_sdu;			/* optimal sdu size */
+	uint max_cdata;			/* maximum amount of connection data */
+	uint max_ddata;			/* maximum amount of disconnection data */
+	uint max_esdu;			/* maximum esdu size */
 	uint tack;			/* duration of ack timer */
 	uint tbeat;			/* duration of heartbeat time */
 } ua_opt_conf_as_t;
 
 typedef struct ua_opt_conf_sg {
-	struct lmi_option options;	/* protocol variant and options */
+	struct lmi_option proto;	/* protocol variant and options */
 	uint tmode;			/* traffic mode for sg */
 } ua_opt_conf_sg_t;
 
 typedef struct ua_opt_conf_sp {
-	struct lmi_option options;	/* Protocol variant and options */
+	struct lmi_option proto;	/* Protocol variant and options */
 	uint aspid;			/* External UA ASP Identifier */
 	uint tack;			/* duration of ack timer */
 	uint tbeat;			/* duration of heartbeat timer */
 	uint tidle;			/* duration of idle timer */
 } ua_opt_conf_sp_t;
+
+typedef struct ua_opt_conf_xp {
+	uint ppi;			/* payload protocol identifier */
+	ushort istreams;		/* inbound SCTP streams */
+	ushort ostreams;		/* outbound SCTP streams */
+} ua_opt_conf_xp_t;
 
 /* 
  *  Signalling Gateway Process (GP) options
@@ -248,7 +266,7 @@ typedef struct ua_opt_conf_sp {
  *  None for the moment.
  */
 typedef struct ua_opt_conf_gp {
-};
+} ua_opt_conf_gp_t;
 
 typedef struct ua_opt_conf_df {
 	struct ua_opt_conf_lm lm;	/* LM defaults */
@@ -259,10 +277,6 @@ typedef struct ua_opt_conf_df {
 	struct ua_opt_conf_gp gp;	/* GP defaults */
 	struct ua_opt_conf_xp xp;	/* XP defaults */
 } ua_opt_conf_df_t;
-
-typedef struct ua_opt_conf_xp {
-	uint ppi;			/* payload protocol identifier */
-} ua_opt_conf_xp_t;
 
 typedef struct ua_statem_df {
 } ua_statem_df_t;
@@ -291,7 +305,7 @@ typedef struct ua_statem {
 #define AS_INACTIVE	3
 #define AS_WACK_ASPAC	4
 #define	AS_WACK_ASPIA	5
-#define AS_ACTIVE	7
+#define AS_ACTIVE	6
 
 /* ASP State */
 #define ASP_DOWN	0

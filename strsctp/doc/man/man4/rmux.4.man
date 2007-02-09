@@ -140,6 +140,31 @@ and can provide automatic failover from one path to another.  Because the acknow
 service is used, each encapsulated message can be marked with an identifier and the ultimate
 receiving device can remove duplications.
 .\"
+.SS Initialization
+.PP
+At the local
+.B RMUX
+driver, the RMUX daemon listens for SCTP connections on a well-known port number.  For each
+client connection configured the RMUX daemon forms an outgoing SCTP connection to the remote host.
+For each client or server connection, the RMUX daemon sends an R_INIT_REQ message and awaits an
+R_INIT_ACK message.  The R_INIT_REQ message provides information about the RMUX driver as follows:
+.TP \w'\fIendianess\fR\(em'u
+.I version
+The version of the RMUX protocol.
+.TP
+.I endianess
+The endianess of the host sending the R_INIT_REQ.
+.PP
+Sending and receiving
+.I endianess
+is important.  If there is an endian mismatch between the client and the server, full transparency
+cannot be acheived.  Each driver opened must identify the format of the service primitive interface
+for the driver to be able to perform the necessary conversion.  Conversion is always performed at
+the server side of a connection (where the service interface can be defined).  When a Stream is
+opened on the server, it pushes an endian conversion module before linking it under the server-side
+.B RMUX
+driver.
+.\"
 .SS Open and Close
 .PP
 When a user opens a configured minor device number, the local
@@ -182,6 +207,157 @@ on open may be lost for the remote system.  Using knowledge about the Linux Fast
 implementation it is possible to determine whether
 .BR M_HANGUP "(9) or " M_SETOPTS (9)
 as performed while linking.
+.TP
+.B First Open
+.TP
+\fIActions at the client \fBRMUX\fP driver:
+.PP
+The following actions are taken resulting from the first open of a device at the client
+.B RMUX
+driver:
+.IP \(em \w'\(em\(em'u
+When a local user process opens a configured minor device on the
+.B RMUX
+driver, resulting in the first open of the minor device, the
+.B RMUX
+driver
+.BR qopen (9)
+routine sends an
+.B R_OPEN_REQ
+message to the corresponding serving
+.B RMUX
+driver on the corresponding SCTP connection, and blocks the calling user awaiting a timeout, signal
+or reception of optional
+.B R_NORMAL_REQ
+or
+.B R_HIPRI_REQ
+messages, followed by a
+.B R_OPEN_CON
+message confirming the open request.
+.IP \(em
+When an
+.B R_OPEN_CON
+message is received, or a timeout occurs, or a signal is received, the user process is awoken in the
+.BR qopen (9)
+call, and returns the appropriate error number.
+.IP \(em
+When awoken by a
+.B R_OPEN_CON
+message confirming successful open of the device at the serving
+.B RMUX
+driver, the message also includes the value of the effective
+.I sflag
+argument to
+.BR qopen (9).
+.IP ""
+If the effective
+.I sflag
+argument is
+.BR CLONEOPEN ,
+a new minor unique device number is assigned before success is returned.
+(Note that if no minor device numbers remain available for assignment, the client
+.B RMUX
+driver will have to issue a separate
+.B R_CLOSE_REQ
+primitive to close the Stream alreay open at the serving
+.BR RMUX
+driver.)
+.IP ""
+If the effective
+.I sflag
+argument is
+.BR DRVOPEN ,
+the current device number is used.
+.TP
+\fIActions at the serving \fBRMUX\fP driver:
+.PP
+The following actions are taken resulting from the reception of an
+.B R_OPEN_REQ
+message at the serving
+.B RMUX
+driver:
+.IP \(em \w'\(em\(em'u
+The
+.B RMUX
+driver checks if the control Stream is open.  If the control Stream is not open, an
+.B R_OPEN_CON
+message with the error
+.RB [ ENXIO ]
+is returned.  If a control Stream is open, the
+.B RMUX
+driver formulates and issues a
+.BR R_OPEN_IND
+service primitive to the control Stream.
+.IP \(em
+When it receives the
+.B R_OPEN_IND
+primitive on the control Stream, the user level RMUX daemon opens the device path in the filesystem
+corresponding to the logical path, using the open flags in the service primitive.  If an error
+occurs on open, the error is returned in an
+.B R_OPEN_RES
+response.  If the device opens successfully, the daemon compares the device number of the the
+filesystem path against the device number of the resulting Stream.  If they match,
+.I sflag
+in the response primitive is set to
+.BR DRVOPEN ,
+otherwise, it is set to
+.BR CLONEOPEN .
+.IP \(em
+If the endianess of client and server do not match, the server pushes an endian conversion module
+for the interface configured locally against the opened driver.  For example, if the interface is an
+NPI service primitive interface, an NPI conversion module is pushed.  When the endianess of the
+client and server match, no module is pushed.
+.IP \(em
+The server then links the open driver Stream with the conditional conversion modules pushed, under
+the
+.B RMUX
+multiplexing driver and configures it against the driver.  The
+.B RMUX
+driver then responds with the
+.B R_OPEN_RES
+message containing the
+.I sflag
+argument and zero error return code.
+.TP
+.B Subsequent Open
+.TP
+\fIActions at the client \fBRMUX\fP driver:
+.PP
+The following actions are taken resulting from a subsequent open of a device at the client
+.B RMUX
+driver:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.TP
+\fIActions at the serving \fBRMUX\fP driver:
+.PP
+The following actions are taken resulting from the reception of an
+.B R_REOPEN_REQ
+message at the serving
+.B RMUX
+driver:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.TP
+.B Close
+.TP
+\fIActions at the client \fBRMUX\fP driver:
+.PP
+The following actions are taken resulting from the last close of a device at the client
+.B RMUX
+driver:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.TP
+\fIActions at the serving \fBRMUX\fP driver:
+.PP
+The following actions are taken resulting from the reception of an
+.B R_CLOSE_REQ
+message at the serving
+.B RMUX
+driver:
+.IP \(em \w'\(em\(em'u
+.IP \(em
 .\"
 .SS I_LINK and I_PLINK
 .PP

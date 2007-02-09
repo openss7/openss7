@@ -73,8 +73,8 @@
 ## -----------------------------------------------------------
 ##	name	    prefix
 module	m2pa-sl	    m2pa_sl
-module	m2ua-as	    m2ua_as
-module	m3ua-as	    m3ua_as
+#module	m2ua-as	    m2ua_as
+#module	m3ua-as	    m3ua_as
 module	sdt-tpi	    sdt_tpi
 module	sl-tpi	    sl_tpi
 module	sdl-sctp    sdl_sctp
@@ -86,8 +86,8 @@ module	m2tp	    m2tp
 ## -----------------------------------------------------------
 ##	type	name	    object name
 objname	module	m2pa-sl	    m2pa-sl
-objname module	m2ua-as	    m2ua-as
-objname module	m3ua-as	    m3ua-as
+#objname module	m2ua-as	    m2ua-as
+#objname module	m3ua-as	    m3ua-as
 objname	module	sdt-tpi	    sdt-tpi
 objname	module	sl-tpi	    sl-tpi
 objname	module	sdl-sctp    sdl-sctp
@@ -100,8 +100,8 @@ objname	module	m2tp	    m2tp
 ## -----------------------------------------------------------
 ##		name
 loadable	m2pa-sl
-loadable	m2ua-as
-loadable	m3ua-as
+#loadable	m2ua-as
+#loadable	m3ua-as
 loadable	sdt-tpi
 loadable	sl-tpi
 loadable	sdl-sctp

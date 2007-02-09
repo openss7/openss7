@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_as_ioctl.h,v 1.1.2.1 2007/02/03 03:05:18 brian Exp $
+ @(#) $Id: m3ua_as_ioctl.h,v 0.9.2.1 2007/02/03 03:05:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as_ioctl.h,v $
- Revision 1.1.2.1  2007/02/03 03:05:18  brian
+ Revision 0.9.2.1  2007/02/03 03:05:18  brian
  - added new files
 
  *****************************************************************************/
@@ -58,7 +58,7 @@
 #ifndef __SYS_M3UA_AS_IOCTL_H__
 #define __SYS_M3UA_AS_IOCTL_H__
 
-#ident "@(#) $RCSfile: m3ua_as_ioctl.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: m3ua_as_ioctl.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 

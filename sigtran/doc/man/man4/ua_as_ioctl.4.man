@@ -122,7 +122,7 @@ The illustration is simpified in that the AS object has one ASP state for each a
 one overall AS state, and the SGP object has on ASP state for each associated AS.  the AS-SGP
 relation is a many-to-many relation bound by the ASP-SG relation.
 .PP
-.ce 39
+.ce 50
 \fC\s-1\
      UA-AS Multiplexing Driver    UA-AS Module\ 
   ________   ________   ________    ________  \ 
@@ -138,10 +138,11 @@ relation is a many-to-many relation bound by the ASP-SG relation.
  | |    |     |    |            |  | |    | | \ 
  | | UP |     | UP |            |  | | DF | | \ 
  | |____|     |____|            |  | |____| | \ 
- | |    |     |    |            |  |  _|__  | \ 
- | | AS |     | AS |            |  | |    | | \ 
- | |____|     |____|            |  | | UP | | \ 
- |   | _________|               |  | |____| | \ 
+ |  _|__       _|__             |  |  _|__  | \ 
+ | |    |     |    |            |  | |    | | \ 
+ | | AS |     | AS |            |  | | UP | | \ 
+ | |____|     |____|            |  | |____| | \ 
+ |   | _________|               |  |  _|__  | \ 
  |  _||_                  ____  |  | |    | | \ 
  | |    |                |    | |  | | AS | | \ 
  | | SP |_______         | DF | |  | |____| | \ 
@@ -154,6 +155,7 @@ relation is a many-to-many relation bound by the ASP-SG relation.
  | |    |     |    |     |    | |  | |    | | \ 
  | | GP |     | GP |     | GP | |  | | GP | | \ 
  | |____|     |____|     |____| |  | |____| | \ 
+ |  _|__       _|__       _|__  |  |  _|__  | \ 
  | |    |     |    |     |    | |  | |    | | \ 
  | | TP |     | TP |     | TP | |  | | TP | | \ 
  | |____|     |____|     |____| |  | |____| | \ 
@@ -394,6 +396,7 @@ control Stream, or corresponding user Stream.
 \fC\s-1\
 typedef struct ua_conf_as {
     uint spid;         /* SP identifier */
+    /* followed by ua specific link/routing key */
 } ua_conf_as_t;
 \s+1\fP
 .fi
@@ -404,17 +407,22 @@ When specified as zero (0) either an existing SP associated with the control Str
 a new anonymous SP will be created and the issuing Stream made is local control Stream.
 .PP
 .B Identification:
-AS objects are coincident with UP objects and user Streams.  An AS object is identified by the
-device number of the user Stream to which the object corresponds.
+.\"AS objects are coincident with UP objects and user Streams.  An AS object is identified by the
+.\"device number of the user Stream to which the object corresponds.
+AS objects are identified with a unique identification number.  However, they can also be identified
+by their spid and link/routing key.
 .PP
 .B Life-cycle:
-AS objects exist when an UP object exists, however, they are not necessarily fully specified
-(associated with an SP object).  AS objects are destroyed when the corresponding UP object is
-destroyed.
+.\"AS objects exist when an UP object exists, however, they are not necessarily fully specified
+.\"(associated with an SP object).  AS objects are destroyed when the corresponding UP object is
+.\"destroyed.
+AS objects are created by management.  They are destroyed by management, or when the related SP
+and SG objects are destroyed by management.
 .PP
 .B Access:
 An AS object can be altered by the master control Stream, the local control Stream for the ASP to
-which the AS object corresponds, or by the user Stream to which the AS object corresponds.
+which the AS object corresponds.
+.\"corresponds, or by the user Stream to which the AS object corresponds.
 Attributes of the AS object can be queried by the master control Stream, its corresponding local
 control Stream, or corresponding user Stream.
 .\"
@@ -517,13 +525,17 @@ typedef struct ua_conf_gp {
 .I position
 .PP
 .B Identification:
-GP objects are coincident with XP objects.  GP objects are identified by the same identifier as the
-corresponding XP object.
+.\"GP objects are coincident with XP objects.  GP objects are identified by the same identifier as the
+.\"corresponding XP object.
+GP objects are identified by a unique identification number.  However, they can also be identified
+by their sgid and position.
 .PP
 .B Life-cycle:
-GP objects exist when an XP object exists, however, they are not necessarily fully specified
-(associated with an SG object).  GP objects are destroyed when the corresponding XP object is
-destroyed.
+.\"GP objects exist when an XP object exists, however, they are not necessarily fully specified
+.\"(associated with an SG object).  GP objects are destroyed when the corresponding XP object is
+.\"destroyed.
+GP objects are created by management.  They are destroyed by management, or when the related SG and
+XP objects are destroyed by management.
 .PP
 .B Access:
 A GP object can be altered by the control Stream to which the XP object corresponds, or by the SCTP
@@ -536,11 +548,18 @@ control Stream, or corresponding user Streams.
 .nf
 \fC\s-1\
 typedef struct ua_conf_xp {
+    uint gpid;         /* SGP to which this XP connects */
+    uint sgid;         /* SG to which this SGP belongs. */
+    uint position;     /* SG position for this SGP (small integer) */
 } ua_conf_xp_t;
 \s+1\fP
 .fi
-.PP
-No additional configuration elements are defined.
+.TP
+.I gpid
+.TP
+.I sgid
+.TP
+.I position
 .PP
 .B Identification:
 An XP object is identified by the lower multiplex identifier of the linked or pushed SCTP transport
@@ -550,6 +569,9 @@ Stream.  In the case of pushing, the XP object is anonymous and has a zero (0) i
 An XP object is created when an SCTP transport Stream is linked under the UA-AS multiplexing driver
 or pushed beneath the UA-AS module.  It is destroyed when unlinked from the UA-AS multiplexing
 driver or the UA-AS module is popped.
+After linking, an XP object must be created by management to associate it with a GP object.
+Unlinking will automatically disassociate the XP object from the GP object and destroy the XP
+object.
 .PP
 .B Access:
 An XP object can be altered by the control Stream to which it corresponds.  The control Stream is

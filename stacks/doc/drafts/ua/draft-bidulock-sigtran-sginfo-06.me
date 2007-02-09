@@ -1,0 +1,1239 @@
+.\" -*- nroff -*-
+.\" =========================================================================
+.\"
+.\" @(#) $Id: draft-bidulock-sigtran-sginfo-06.me,v 0.9.2.1 2007/02/03 15:47:25 brian Exp $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" Copyright (C) 2003  OpenSS7 Corporation <http://www.openss7.com>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Name:  $($Revision: 0.9.2.1 $) modified $Date: 2007/02/03 15:47:25 $ by $Author: brian $
+.\"
+.\" =========================================================================
+.ds version Version\ 0.6
+.ds date June\ 18,\ 2007
+.ds expiry December\ 2007
+.nr levels 0
+.so ../draft4.me
+.bp
+.sz \n(tp
+.he 'Internet Draft'UA SGINFO'\\\\*[date]'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+Intended status: PROPOSED STANDARD;;\*[date]
+.bl 1
+Expires in \*[expiry];;
+.bl 1
+.TE
+.(l C
+.sz \n(tp
+\fB\
+Signalling Gateway (SG) Information (SGINFO) Support
+for
+Signalling User Adaptation Layers
+
+<draft-bidulock-sigtran-sginfo-06.\*(|x>
+.)l
+.rr |x
+.ne 4
+.#S 2007 \*[expiry]
+.uh "Abstract"
+.pp
+This Internet-Draft describes \fI\)Signalling Gateway (SG) Information
+(SGINFO)\fR for Signalling User Adaptation Protocols,
+.[
+m2uarfc
+%Z 1
+.]
+.[
+m3uarfc
+%Z 1
+.]
+.[
+suarfc
+%Z 1
+.]
+.[
+isua04
+%Z 2
+.]
+.[
+tua05
+%Z 2
+.]
+which permits supporting Signalling Gateways (SG) to convey additional
+Application Server (AS) support information to Application Server Processes
+(ASPs) activating for AS on the SG.  This additional AS support information
+consists of information pertaining to the underlying SS7 Signalling Provider
+that otherwise would have to be statically configured at the Application
+Server Process (ASP) or exchanged between SG and ASP using a non-IETF defined
+protocol.
+.uh "Contents"
+.pp
+A complete table of contents, list of tables and illustrations, and change
+history appears at the end of this document.
+.sh 1 "Introduction"
+.sh 2 "Scope"
+.pp
+This Internet-Draft provides parameters and procedures in extension to the
+parameters and procedures of the Signalling User Adaptation Layers
+(UAs),
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+for the purpose of supporting the transfer of SG-specific information of
+interest to an Application Server during the ASP Active procedure.
+.pp
+UA implementations with \fI\)SGINFO\fR are intended to be compatible with UA
+implementations not supporting this configuration.
+.sh 2 "Abbreviations"
+.lp
+.ix +\n(iiu
+.TS
+tab(:);
+li1c0lssss.
+AS:\(em:Application Server.
+ASP:\(em:Application Server Process.
+IANA:\(em:Internet Assigned Numbers Authority
+I-D:\(em:Internet-Draft
+IETF:\(em:Internet Engineering Task Force
+IP:\(em:Internet Protocol.
+IPSP:\(em:IP Signalling Point.
+SCCP:\(em:Signalling Connection Control Part.
+SCTP:\(em:Stream Control Transmission Protocol.
+SG:\(em:Signalling Gateway.
+SGP:\(em:Signalling Gateway Process.
+SIGTRAN:\(em:IETF Signalling Transport WG
+SPP:\(em:Signalling Peer Process.
+SS7:\(em:Signalling System No. 7.
+SUA:\(em:SS7 SCCP-User Adpatation Layer.
+TCAP:\(em:Transaction Capabilities Application Part.
+TUA:\(em:SS7 TCAP-User Adaptation Layer.
+UA:\(em:User Adaptation Layer.
+WG:\(em:Working Group
+.TE
+.sh 2 "Terminology"
+.pp
+\fI\)SGINFO\fR adds the following terms to the terminology presented
+in the UA documents:\*#
+.(d
+.ip \*#
+See, for example, Section 1.2 of the specific UA document.
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+.)d
+.lp
+\fI\)Signalling User Adaptation Layer (UA)\fR \-
+.ix +\n(iiu
+one or more of the Stream Control Transmission Protocol (SCTP)
+.[
+rfc2960
+%Z 1
+.]
+.[
+rfc3309
+%Z 1
+.]
+.[
+rfc4460
+%Z 2
+.]
+SS7 Signalling User Adaptation Layers
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+supporting ASP Management.
+.sh 2 "Overview"
+.pp
+There is a need to provide extensions for the Signalling User Adaptation Layer
+protocols to permit a Signalling Gateway (SG) to provide Application Server
+(AS) specific information pertaining to the SG's ability to support the
+Application Server.
+.pp
+For example, the "Maximum SIF Length" of MTP3
+.[
+q704
+%Z 2
+.]
+is a value that an MTP-User at an AS needs to reference to avoid sending MSU
+data in excess of these MTP-PDU length restrictions.  The "Maximum SIF
+Length"; however, can change due to SS7 Network failures or reconfiguration at
+the SG that cannot be handled purely by static configuration information at an
+ASP.
+.pp
+Additional examples exist for SCCP
+.[
+q711
+%Z 2
+.]
+and TCAP
+.[
+q771
+%Z 2
+.]
+and the need for these protocol limits at the Application Server is evidenced
+by the requirements for these values in the OSI/ISO NSD
+.[
+x213
+%Z 2
+.]
+Compliant NPI,
+.[
+npi
+%Z 2
+.]
+and the OSI/ISO TSD
+.[
+x214
+%Z 2
+.]
+and the OSI/ISO ROSE
+.[
+x219
+%Z 2
+.]
+Compliant TPI,
+.[
+tpi revision 2.0.0
+%Z 2
+.]
+and the ACSE
+.[
+x217
+%Z 2
+.]
+.[
+x227
+%Z 2
+.]
+compliant mOSI extensions to the XNS.
+.[
+xns
+%Z 2
+.]
+.pp
+\fI\)SGINFO\fR provides parameters and procedures that allow
+Signalling Gateway Processes (SGPs) to inform Application Server Processes
+(ASPs) of the SG parameters, as well as provides procedures to update these
+parameters in an active AS.
+.sh 3 "Existing Information Management"
+.ds #u \*#
+.pp
+While there is a mandate to provide MIBs to support UA configuration, the
+existing UA procedures\*#
+.(d
+.ip \*#
+See, for example, Section 4 of the specific UA document.
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+.)d
+and MIBs
+make no provisions for the management of dynamic operational information at a
+Signalling Gateway that is of specific concern to a UA-User at an Application
+Server (AS).
+.pp
+For example, if an Signalling Gateway changes an operation parameter of
+necessary to a UA-User at an Application Server (AS), such as the "Maximum SIF
+Length", there is no mechanism for the SG to communicate this information to
+the concerned Application Server (AS).
+.pp
+While the
+existing UA procedures\*(#u provide for the SG giving an indication of a
+"Protocol Error" or "Invalid Parameter Value" as a result of an operational
+parameter being exceeded, there are no procedures for the Application Server
+to discover the operational parameters when they are dynamic.
+.pp
+The lack of an IETF procedure for managing operational parameter information
+represents a deficiency of the existing UA procedures\*(#u that detracts from
+interoperability between separate implementations of SGP and ASP.
+.sh 3 "SGINFO Information Management"
+.pp
+To remedy these deficiencies, \fI\)SGINFO\fR provides support for the
+following:
+.bu
+Support for an SG indicating operational parameters to an Application Server
+(AS).
+.bu
+Support for an SG changing operational parameter for an active Application
+Server (AS).
+.bu
+Support for interworking between SGPs supporting \fI\)SGINFO\fR and ASPs not
+supporting \fI\)SGINFO\fR.
+.#e
+.sh 1 "Conventions"
+.#C
+.#e
+.sh 1 "Protocol Elements"
+.ds #w \*#
+.pp
+\fI\)SGINFO\fR provides the following parameters and the messages in which
+they are included in addition to the parameters of the UAs.\*#
+.(d
+.ip \*#
+See, for example, Section 3 of the specific UA document.
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+.)d
+.sh 2 "Parameters"
+.pp
+\fI\)SGINFO\fR provides the following parameters in addition to the parameters
+defined for the UAs.\*(#w
+.sh 3 "Protocol Limits"
+.pp
+The \fI\)Protocol Limits\fR parameter is a common parameter used in the
+\fB\)ASPAC ACK\fR message to indicate the protocol data unit size limitations
+presented by a Signalling Gateway to an Application Server.
+.pp
+The \fI\)Protocol Limits\fR parameter is formatted as follows:\*#
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0x001b          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                        Maximum SDU Size                       |
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+|                   Optimal SDU Size (optional)                 |
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+|              Maximum Connect Data Size (optional)             |
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+|             Maximum Disconnect Data Size (optional)           |
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+|                  Maximum ESDU Size (optional)                 |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.)c
+.)b
+.lp
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\  The parameter tag values shown as \f(CB\)0x001b\fR
+will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)d
+.pp
+The \fI\)Protocol Limits\fR parameter contains the following fields:
+.ip "\fB\)Maximum SDU Size field: 32-bits (signed integer)\fR" 2
+
+The \fI\)Maximum SDU Size\fR field
+contains the maximum number of bytes in the \fI\)Protocol Data\fR parameter that the
+Signalling Gateway can support to the specific Application Server.
+.ba +2
+.ip "M2UA"
+For M2UA
+.[
+m2uarfc
+.]
+the \fI\)Maximum SDU Size\fR field
+provides the maximum size of the data payload of the \fI\)Protocol Data\fR field.  The
+maximum size is the largest maximum data payload size that can be transferred
+across the SS7 network by the SG for the specified link.
+For example, for an SG supporting an SIF Maximum Size
+.[
+q704
+.]
+of 3094 bytes on the link, this size would be 3094.  For an SG supporting 272
+bytes, this size would be 272.
+.ip "M3UA"
+For M3UA
+.[
+m3uarfc
+.]
+the \fI\)Maximum SDU Size\fR field
+provides the limit on the maximum size of the data payload of the \fI\)Protocol Data\fR field.
+The maximum size is the largest maximum data payload size that can be transferred across
+the SS7 network by the SG for the specific Application Server.
+For example, for an SG supporting both an SIF Maximum Size
+.[
+q704
+.]
+of 3094 bytes on a primary links and 272 bytes on secondary links, this size
+would be 3094.
+.ip "SUA"
+For SUA
+.[
+suarfc
+.]
+the \fI\)Maximum SDU Size\fR field
+provides the limit on the maximum size of the User Data field for a normal
+(non-expedited) data transfer.
+The maximum size is the largest data payload size that can be
+transferred across the SS7 network for the specific Application Server (and
+associated Protocol Class) considering segmentation.  If there is
+no limit on the NSDU size for an SCCP provider at an SG, this field will be
+set to a value of -1 (0xFFFFFFFF).
+.ip "TUA"
+For TUA
+.[
+tua05
+.]
+the \fI\)Maximum SDU Size\fR field
+provide the limit on the maximum size of the Components field for a
+TC-CONTINUE data transfer.
+The maximum size is the largest component size that can be
+transferred across the SS7 network for the specific Application Server (and
+associated Operation Class) considering segmentation.  If there is no
+limit on the component size for a TCAP provider at the SG, this field will be
+set to a value of -1 (0xFFFFFFFF).
+.ba -2
+.ip "\fB\)Optimal SDU Size field: 32-bits (signed integer)\fR" 2
+
+The \fI\)Optimal SDU Size\fR field
+contains the optimal number of bytes in the \fI\)Protocol Data\fR parameter that the
+Signalling Gateway can support to the specific Application Server.
+.ba +2
+.ip "M2UA"
+For M2UA
+.[
+m2uarfc
+.]
+the \fI\)Optimal SDU Size\fR field
+does not apply and
+is not included in the \fI\)Protocol Limits\fR parameter.
+.ip "M3UA"
+For M3UA
+.[
+m3uarfc
+.]
+the \fI\)Optimal SDU Size\fR field
+provides the limit on the optimal size of the data payload of the \fI\)Protocol Data\fR field.
+The optimal size is the smallest maximum data payload size that can be transferred across
+the SS7 network by the SG for the specific Application Server.
+For example, for an SG supporting both an SIF Maximum Size
+.[
+q704
+.]
+of 3094 bytes on a primary links and 272 bytes on secondary links, this size
+would be 272.
+.ip "SUA"
+For SUA
+.[
+suarfc
+.]
+the \fI\)Optimal SDU Size\fR field
+provides the limit on the optimal size of the User Data field for a normal
+(non-expedited) data transfer.
+The optimal size is the largest data protocol size that can be
+transferred across the SS7 network for the specific Application Server (and
+associated Protocol Class) without segmentation.
+.ip "TUA"
+For TUA
+.[
+tua05
+.]
+the \fI\)Optimal SDU Size\fR field
+provides the limit on the optimal size of the Components field for a
+TC-CONTINUE data transfer.
+The optimal size is the largest component size that can be
+transferred across the SS7 network for the specific Application Server (and
+associated Operation Class) without segmentation.
+.ba -2
+.ip "\fB\)Maximum Connect Data Size field: 32-bits (signed integer)\fR" 2
+
+The \fI\)Maximum Connect Data Size\fR field
+contains the maximum number of bytes in the Data parameter that the
+Signalling Gateway can support to the specific Application Server upon
+connection or transaction dialogue establishment.
+.ba +2
+.ip "M2UA"
+For M2UA
+.[
+m2uarfc
+.]
+the \fI\)Maximum Connect Data Size\fR field does not apply and is not included
+in the \fI\)Protocol Limits\fR parameter.
+.ip "M3UA"
+For M3UA
+.[
+m3uarfc
+.]
+the \fI\)Maximum Connect Data Size\fR field
+does not apply and
+is not included in the \fI\)Protocol Limits\fR parameter.
+.ip "SUA"
+For SUA
+.[
+suarfc
+.]
+the \fI\)Maximum Connect Data Size\fR field
+provides a limit on the maximum size of the User Data field that can be
+included in CORE and COAK messages.
+For Connection-less operation, this field does not apply and is not included in
+the \fI\)Protocol Limits\fR parameter.
+.ip "TUA"
+For TUA
+.[
+tua05
+.]
+the \fI\)Maximum Connect Data Size\fR field
+provides the limit on the maximum size of the User Information and Components
+that can be included in a TQRY or initial TCNV message.
+For Operation Class 4, this field does not apply and is not included in the
+\fI\)Protocol Limits\fR parameter.
+.ba -2
+.ip "\fB\)Maximum Disconnect Data Size field: 32-bits (signed integer)\fR" 2
+
+The \fI\)Maximum Disconnect Data Size\fR field
+contains the maximum number of bytes in the Data parameter that the
+Signalling Gateway can support to the specific Application Server upon
+disconnection or transaction dialogue abort.
+.ba +2
+.ip "M2UA"
+For M2UA
+.[
+m2uarfc
+.]
+the \fI\)Maximum Disconnect Data Size\fR field
+does not apply and
+is not included in the \fI\)Protocol Limits\fR parameter.
+.ip "M3UA"
+For M3UA
+.[
+m3uarfc
+.]
+the \fI\)Maximum Disconnect Data Size\fR field
+does not apply and
+is not included in the \fI\)Protocol Limits\fR parameter.
+.ip "SUA"
+For SUA
+.[
+suarfc
+.]
+the \fI\)Maximum Disconnect Data Size\fR field
+provides a limit on the maximum size of the User Data field that can be
+included in a RELRE message.
+For Connection-less operation, this field does not apply and is not included in
+the \fI\)Protocol Limits\fR parameter.
+.ip "TUA"
+For TUA
+.[
+tua05
+.]
+the \fI\)Maximum Disconnect Data Size\fR field
+provides the limit on the maximum size of the User Abort Information
+that can be included in a TUAB message.
+For Operation Class 4, this field does not apply and is not included in the
+\fI\)Protocol Limits\fR parameter.
+.ba -2
+.ip "\fB\)Maximum ESDU Size field: 32-bits (signed integer)\fR" 2
+
+The \fI\)Maximum ESDU Size\fR field
+contains the maximum number of bytes in the Data parameter that the
+Signalling Gateway can support to the specific Application Server when data is
+expedited on a connection.
+.ba +2
+.ip "M2UA"
+For M2UA
+.[
+m2uarfc
+.]
+The \fI\)Maximum ESDU Size\fR field
+does not apply and
+is not included in the \fI\)Protocol Limits\fR parameter.
+.ip "M3UA"
+For M3UA
+.[
+m3uarfc
+.]
+the \fI\)Maximum ESDU Size\fR field
+does not apply and
+is not included in the \fI\)Protocol Limits\fR parameter.
+.ip "SUA"
+For SUA
+.[
+suarfc
+.]
+the \fI\)Maximum ESDU Size\fR field
+provides a maximum number of bytes in the User Data field for an expedited
+data transfer.
+The maximum size is the largest expedited data payload size that can be transferred
+across the SS7 network for the specific Application Server.
+For Connection-less or Protocol Class 2 operation, this field does not apply
+and is not included in the \fI\)Protocol Limits\fR parameter.
+.ip "TUA"
+For TUA
+.[
+tua05
+.]
+the \fI\)Maximum ESDU Size\fR field
+does not apply and
+is not included in the \fI\)Protocol Limits\fR parameter.
+.ba -2
+.sh 2 "Messages"
+.pp
+\fI\)SGINFO\fR extends the following messages defined for the UAs.\*(#w
+.sh 3 "ASP Active Acknowledgment (ASPAC ACK)"
+.pp
+\fI\)SGINFO\fR supplements the \fB\)ASPAC ACK\fR message by permitting
+the following optional parameters to be included in the message:
+.ix +4
+.TS
+tab(:);
+lbss
+lw(2.5i)lc.
+Extension Parameters
+_
+Protocol Limits:Optional:
+.TE
+.pp
+The format of the resulting \fB\)ASP ACK\fR message for M2UA is as follows:\*#
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0x000b          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                       Traffic Mode Type                       |
++-------------------------------+-------------------------------+
+|         Tag = 0x0001          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                    Interface Identifiers                      /
+\\                                                               \\
++-------------------------------+-------------------------------+
+|         Tag = 0x0008          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+|                  Interface Identifier Start1                  |
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+|                   Interface Identifier Stop1                  |
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+|                  Interface Identifier Start2                  |
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+|                   Interface Identifier Stop2                  |
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+\\                               .                               \\
+/                               .                               /
+\\                               .                               \\
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+|                  Interface Identifier StartN                  |
++- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+|                   Interface Identifier StopN                  |
++---------------------------------------------------------------+
+/                                                               /
+\\               Additional Interface Identifiers                \\
+/                     of Tag Type 0x1 or 0x8                    /
+\\                                                               \\
+\f(CB\
++-------------------------------+-------------------------------+
+|         Tag = 0x001b          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                        Protocol Limits                        /
+\\                                                               \\
++-------------------------------+-------------------------------+
+\f(CR\
+|         Tag = 0x0004          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                           Info String                         /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.)c
+.)b
+.lp
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\  The parameter tag values shown as \f(CB\)0x001b\fR
+will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)d
+.pp
+The format of the resulting \fB\)ASPAC ACK\fR message for M3UA, ISUA, SUA and
+TUA is as follows:\*#
+.(b
+.(c
+.nf
+.sz -2
+\fC\
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|         Tag = 0x0006          |            Length = 8         |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                        Routing Context                        /
+\\                                                               \\
+\f(CB\
++-------------------------------+-------------------------------+
+|         Tag = 0x001b          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                        Protocol Limits                        /
+\\                                                               \\
++-------------------------------+-------------------------------+
+\f(CR\
+|         Tag = 0x0004          |            Length             |
++- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+\\                                                               \\
+/                           Info String                         /
+\\                                                               \\
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.)c
+.)b
+.lp
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\  The parameter tag values shown as \f(CB\)0x001b\fR
+will be assigned by IANA within the common parameter range of the
+SIGTRAN UAs and may change its value in further versions of this document.
+.)d
+.pp
+To indicate restrictions on the maximum sizes for transfer of data, the SGP and
+IPSP \fB\)MUST\fR include the \fI\)Protocol Limits\fR parameter in the
+\fB\)ASPAC ACK\fR message.
+.pp
+No other changes to the \fB\)ASPAC ACK\fR message format are provided by this
+extension.
+.#e
+.sh 1 "Procedures"
+.pp
+The following procedures are provided in extension to the UA procedures by
+\fI\)SGINFO\fR.
+.sh 2 "ASP Management Procedures"
+.sh 3 "ASP Active Procedures"
+.pp
+In extension of the "ASP Active Procedures" of the UAs\*(#u, \fI\)SGINFO\fR
+provides the following procedures:
+.pp
+Whenever an SGP, as a part of the normal UA procedures, sends an ASP Active
+Acknowledgment (ASPAC ACK) to an ASP, it \fB\)MAY\fR include the \fI\)Protocol
+Limits\fR parameter indicating the protocol data size limits that apply to the
+Application Server associated with the \fI\)Routing Contexts\fR
+(\fI\)Interface Identifiers\fR) specified or implied in the \fB\)ASPAC ACK\fR
+message.  Where the protocol limits only apply to one Application Server, the
+SGP \fB\)SHOULD NOT\fR include more than one \fI\)Routing Context\fR
+(\fI\)Interface Identifier\fR) in the \fB\)ASPAC ACK\fR response.  That is, in
+response to an \fB\)ASPAC\fR message containing multiple \fI\)Routing
+Contexts\fR (\fI\)Interface Identifiers\fR), the SGP \fB\)SHOULD\fR send a
+separate \fB\)ASPAC ACK\fR reply for each \fI\)Routing Context\fR
+(\fI\)Interface Identifier\fR) for which it includes the \fI\)Protocol
+Limits\fR parameter.
+.pp
+If an SG discovers that the protocol data size limits has changed due to an
+event, (such as a failure in the SS7 network), the SGP \fB\)MAY\fR send an
+unsolicited \fB\)ASPAC ACK\fR message containing the new protocol limits.
+.pp
+Whenever an ASP receives an \fB\)ASPAC ACK\fR message as part of the normal
+UA procedures, or receives an unsolicited \fB\)ASPAC ACK\fR for an active
+Application Server (AS), the ASP will apply the new protocol data size limits
+to the Application Server.
+.sh 2 "Interworking"
+.pp
+Whenever an SGP receives an \fB\)ERR\fR("Invalid Parameter") message
+indicating the \fI\)Protocol Limits\fR parameter in response to a sent
+\fB\)ASPAC ACK\fR message containing a \fI\)Protocol Limits\fR parameter, the
+SGP \fB\)SHOULD\fR re-attempt by sending the \fB\)ASPAC ACK\fR without a
+\fI\)Protocol Limits\fR parameter.
+.pp
+.#e
+.sh 1 "Examples"
+.sh 2 "ASP and SGP both supporting Protocol Limits"
+.pp
+An example of an
+ASP and SGP both supporting Protocol Limits
+is illustrated in \fI\)\*(&f\n(&n\fR.
+.(z
+.ie '\*(.T'ps' \{\
+.so sginfo-04.fig1.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+       SGP                             ASP
+        |            ASPUP              |
+        |<------------------------------|
+        |          ASPUP ACK            |
+(1)     |------------------------------>|
+        |                               |
+        |            ASPAC              |
+(2)     |<------------------------------|
+        |                               |
+        |   ASPAC ACK(Protocol Limits)  |
+(3)     |------------------------------>|
+        |                               |
+        .                               .
+        .                               .
+        .                               .
+        |   ASPAC ACK(Protocol Limits)  |
+(4)     |------------------------------>|
+        |                               |
+.)c
+.\}
+.#f "ASP and SGP both supporting Protocol Limits"
+.)z
+.pp
+As illustrated in \fI\)\*(&f\n(&p\fR, the sequence of events for this example
+are as follows:
+.np
+An Application Server at an ASP begins in the AS-DOWN or AS-INACTIVE state.
+.np
+The ASP activates an Application Server by sending an \fB\)ASPAC\fR message.
+.np
+The SGP responds with an \fB\)ASPAC ACK\fR message containing the current
+protocol limits in the \fI\)Protocol Limits\fR parameter.
+The ASP applies these protocol limits to the Application Server upon
+activation.
+.np
+Later, when the SGP notes a change to protocol limits, the SGP sends an
+unsolicited \fB\)ASPAC ACK\fR message containing the updated \fI\)Protocol
+Limits\fR.
+The ASP applies these updated protocol limits to the Application Server upon
+receipt.
+.sh 2 "SGP only supporting Protocol Limits"
+.sh 3 "ASP ignores Protocol Limits"
+.pp
+An example of an
+SGP only supporting Protocol Limits
+where the ASP ignores the \fI\)Protocol Limits\fR parameter
+is illustrated in \fI\)\*(&f\n(&n\fR.
+.(z
+.ie '\*(.T'ps' \{\
+.so sginfo-04.fig2.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+       SGP                             ASP
+        |            ASPUP              |
+        |<------------------------------|
+        |          ASPUP ACK            |
+(1)     |------------------------------>|
+        |                               |
+        |            ASPAC              |
+(2)     |<------------------------------|
+        |                               |
+        |   ASPAC ACK(Protocol Limits)  |
+(3)     |------------------------------>|
+        |                               |
+        .                               .
+        .                               .
+        .                               .
+        |   ASPAC ACK(Protocol Limits)  |
+(4)     |------------------------------>|
+        |                               |
+.)c
+.\}
+.#f "ASP and SGP both supporting Protocol Limits"
+.)z
+.pp
+As illustrated in \fI\)\*(&f\n(&p\fR, the sequence of events for this example
+are as follows:
+.np
+An Application Server at an ASP begins in the AS-DOWN or AS-INACTIVE state.
+.np
+The ASP activates an Application Server by sending an \fB\)ASPAC\fR message.
+.np
+The SGP responds with an \fB\)ASPAC ACK\fR message containing the current
+protocol limits in the \fI\)Protocol Limits\fR parameter.
+The ASP ignores the \fI\)Protocol Limits\fR parameter and, instead, relies
+upon internal configuration data to determine protocol limits.
+.np
+Later, when the SGP notes a change to protocol limits, the SGP sends an
+unsolicited \fB\)ASPAC ACK\fR message containing the updated \fI\)Protocol
+Limits\fR.
+The ASP ignores the \fI\)Protocol Limits\fR parameter and, instead, relies
+upon internal configuration data to determine protocol limits.
+.sh 3 "ASP refuses Protocol Limits"
+.pp
+An example of an
+SGP only supporting Protocol Limits
+where the ASP refuses the \fI\)Protocol Limits\fR parameter
+is illustrated in \fI\)\*(&f\n(&n\fR.
+.(z
+.ie '\*(.T'ps' \{\
+.so sginfo-04.fig3.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+       SGP                             ASP
+        |            ASPUP              |
+        |<------------------------------|
+        |          ASPUP ACK            |
+(1)     |------------------------------>|
+        |                               |
+        |            ASPAC              |
+(2)     |<------------------------------|
+        |                               |
+        |   ASPAC ACK(Protocol Limits)  |
+(3)     |------------------------------>|
+        |                               |
+        |    ERR("Invalid Parameter")   |
+(4)     |<------------------------------|
+        |                               |
+        |          ASPAC ACK            |
+(5)     |------------------------------>|
+        |                               |
+        .                               .
+        .                               .
+        .                               .
+        |                               |
+(6)     |                               |
+        |                               |
+.)c
+.\}
+.#f "ASP and SGP both supporting Protocol Limits"
+.)z
+.pp
+As illustrated in \fI\)\*(&f\n(&p\fR, the sequence of events for this example
+are as follows:
+.np
+An Application Server at an ASP begins in the AS-DOWN or AS-INACTIVE state.
+.np
+The ASP activates an Application Server by sending an \fB\)ASPAC\fR message.
+.np
+The SGP responds with an \fB\)ASPAC ACK\fR message containing the current
+protocol limits in the \fI\)Protocol Limits\fR parameter.
+.np
+The ASP refuses the \fB\)ASPAC ACK\fR message and responds with an
+\fB\)ERR\fR("Invalid Parameter") message indicating the \fI\)Protocol
+Limits\fR parameter as invalid.
+.np
+The SGP re-attempts and sends the \fB\)ASPAC ACK\fR message without the
+\fI\)Protocol Limits\fR parameter and marks the ASP as incapable of processing
+protocol limits.
+.np
+When a subsequent change in the protocol limits at the SGP occurs, the SGP
+does nothing (the ASP is marked as incapable of handling protocol limits).
+.sh 2 "ASP only supporting Protocol Limits"
+.pp
+An example of an
+ASP only supporting Protocol Limits
+is illustrated in \fI\)\*(&f\n(&n\fR.
+.(z
+.ie '\*(.T'ps' \{\
+.so sginfo-04.fig4.pic
+.\}
+.el \{\
+.(c
+.nf
+.sz -2
+\fC\
+       SGP                             ASP
+        |            ASPUP              |
+        |<------------------------------|
+        |          ASPUP ACK            |
+(1)     |------------------------------>|
+        |                               |
+        |            ASPAC              |
+(2)     |<------------------------------|
+        |                               |
+        |          ASPAC ACK            |
+(3)     |------------------------------>|
+        |                               |
+        |                               |
+(4)     |                               |
+        |                               |
+.)c
+.\}
+.#f "ASP and SGP both supporting Protocol Limits"
+.)z
+.pp
+As illustrated in \fI\)\*(&f\n(&p\fR, the sequence of events for this example
+are as follows:
+.np
+An Application Server at an ASP begins in the AS-DOWN or AS-INACTIVE state.
+.np
+The ASP activates an Application Server by sending an \fB\)ASPAC\fR message.
+.np
+The SGP responds with an \fB\)ASPAC ACK\fR message not containing the
+\fI\)Protocol Limits\fR parameter.
+.np
+The ASP receiving the \fB\)ASPAC ACK\fR with no \fI\)Protocol Limits\fR
+parameter relies upon internal configuration data to determine protocol
+limits.
+.#e
+.sh 1 "Security"
+.pp
+\fI\)SGINFO\fR does not introduce any new security risks or
+considerations that are not already inherent in the UA
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+Please see the SIGTRAN Security document
+.[
+sigsec
+%Z 1
+.]
+for security considerations and recommendations that are applicable to each of
+these UAs.
+.#e
+.sh 1 "IANA Considerations"
+.sh 2 "Protocol Extensions"
+.pp
+\fI\)SGINFO\fR provides an additional \fI\)Protocol Limits\fR message
+parameter to the common parameter range of the SIGTRAN UAs:
+.[
+m2uarfc
+.]
+.[
+m3uarfc
+.]
+.[
+suarfc
+.]
+.[
+isua04
+.]
+.[
+tua05
+.]
+.af $p a
+.np
+The parameter is named the \fI\)Protocol Limits\fR parameter.
+.np
+The structure of the \fI\)Protocol Limits\fR parameter field conforms to the UA
+general TLV format and is described in detail in Section 3.1.1.
+.np
+The detailed definition of each component of the \fI\)Protocol Limits\fR
+parameter values is described in Section 3.1.1.
+.np
+This document also provides a detailed description of the intended use of the
+\fI\)Protocol Limits\fR\*# parameter, and in which messages the \fI\)Protocol
+Limits\fR parameter should appear, how many times, and when.
+.lp
+.(d
+.#v
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\  The \fI\)Protocol Limits\fR parameter tag value
+shown throughout this document as \f(CB\)0x001b\fR will be assigned by IANA
+within the common parameter range of the SIGTRAN UAs and may change its value
+in further versions of this document.
+.)d
+.\"
+.\"
+.#e
+.(b M
+.#v
+.sh 1 "Revision History" 0
+.pp
+This section provides historical information on the changes made to this
+draft.  This section will be removed from the document when the document is
+finalized.
+.sh 2 "Changes from Version 0.5 to Version 0.6" 0 6
+.bu
+updated new boilerplate and idnits 2.00.1.
+.bu
+updated references, version numbers and dates.
+.sh 2 "Changes from Version 0.4 to Version 0.5" 0 5
+.bu
+updated to IETF boilerplate for first and last page.
+.bu
+updated references, version numbers and dates.
+.bu
+resubmitted to sync with IETF numbering
+.sh 2 "Changes from Version 0.3 to Version 0.4" 0 4
+.bu
+updated references, version numbers and dates.
+.sh 2 "Changes from Version 0.2 to Version 0.3" 0 3
+.bu
+added list of abbreviations.
+.bu
+moved history section.
+.bu
+updated revision and dates.
+.bu
+updated references.
+.bu
+split reference section.
+.bu
+updated secuirty section.
+.bu
+moved notes to end.
+.sh 2 "Changes from Version 0.1 to Version 0.2" 0 2
+.bu
+added this section,
+.bu
+updated references, release version and dates,
+.bu
+minor corrections,
+.bu
+updated postscript diagrams,
+.bu
+updated author's address.
+.sh 2 "Changes from Version 0.0 to Version 0.1" 0 1
+.sh 2 "Version 0.0" 0 0
+.sh 3 "Change Log" 0 0 0
+.lp
+.(l I
+.nf
+\fC\s-3\
+$Log: draft-bidulock-sigtran-sginfo-06.me,v $
+Revision 0.9.2.1  2007/02/03 15:47:25  brian
+- added new drafts
+
+Revision 0.9.2.5  2006/06/27 09:41:15  brian
+- rereleased drafts
+
+Revision 0.9.2.4  2006/06/18 20:53:35  brian
+- preparing for draft rerelease
+
+Revision 0.9.2.3  2005/10/17 11:53:46  brian
+- updated drafts for republication
+
+Revision 0.9.2.2  2005/05/14 08:33:21  brian
+- copyright header correction
+
+Revision 0.9.2.1  2004/03/16 05:10:46  brian
+- Added drafts and figures.
+
+Revision 0.8.2.1  2003/08/01 12:23:16  brian
+Added abbreviations, updated format.
+
+.)l
+.)b
+.\"
+.\"
+.#E
+.(b M
+.#v
+.[
+$LIST$
+.]
+.)b
+.(b M
+.#v
+.\".uh "Acknowledgments"
+.\".pp
+.\"The authors would like to thank
+.\"for their valuable comments and suggestions.
+.#A
+.bl 3
+.lp
+This draft expires \*[expiry].
+.)b
+.#T 2007

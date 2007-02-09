@@ -1,0 +1,1741 @@
+
+
+
+Network Working Group                                     Brian Bidulock
+INTERNET-DRAFT                                       OpenSS7 Corporation
+Intended status:PROPOSED STANDARD                       February 3, 2007
+
+Expires in August 2007
+
+
+
+                        ASP Congestion (ASPCONG)
+                                  for
+                   Signalling User Adaptation Layers
+                <draft-bidulock-sigtran-aspcong-01.txt>
+
+
+Status of this Memo
+
+    By submitting this Internet-Draft, each author represents that any
+  applicable patent or other IPR claims of which he or she is aware have
+  been or will be disclosed, and any of which he or she becomes aware
+  will be disclosed, in accordance with Section 6 of BCP 79.
+
+    Internet-Drafts are working documents of the Internet Engineering
+  Task Force (IETF), its areas, and its working groups.  Note that other
+  groups may also distribute working documents as Internet-Drafts.
+
+    Internet-Drafts are draft documents valid for a maximum of six
+  months and may be updated, replaced, or obsoleted by other documents
+  at any time.  It is inappropriate to use Internet-Drafts as reference
+  material or to cite them other than as "work in progress".
+
+    The list of current Internet-Drafts can be accessed at
+  http://www.ietf.org/ietf/1id-abstracts.txt.
+
+    The list of Internet-Draft Shadow Directories can be accessed at
+  http://www.ietf.org/shadow.html.
+
+    This Internet-Draft will expire in August 2007.
+
+Copyright
+
+    Copyright (C) The IETF Trust (2007).
+
+Abstract
+
+    This memo describes ASP Congestion (ASPCONG) that provides the
+  ability for an Application Server Process (ASP) to indicate congestion
+  to a Signalling Gateway (SG) for the SS7 Signalling User Adaptation
+  Layers [M2UA], [M3UA], [SUA], [ISUA], [TUA].  Extension parameters and
+  procedures are added by this memo in extension to those of the User
+  Adaptation layers to provide for ASP congestion.
+
+
+
+
+B. Bidulock                    Version 0.1                        Page 1
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+1.  Introduction
+
+1.1.  Scope
+
+    This Internet-Draft describes ASP Congestion (ASPCONG) procedures to
+  support the management of congestion and flow control between a
+  Signalling Gateway (SG) and an Application Server (AS) across SCTP
+  [SCTP], [SCTPCRC], [SCTPIG] associations for SS7 [Q.700] Signalling
+  User Adaptation Protocols [M2UA], [M3UA], [SUA], [ISUA], [TUA]
+  supporting the concept of a Routing Context or Interface Identifier.
+  These procedures permit the coordination of ASP Congestion on traffic
+  directed at an Application Server (AS) via an Application Server
+  Process (ASP) from a Signalling Gateway Process (SGP) and supports the
+  coordination of AS Congestion into a coordinated network view at a
+  Signalling Gateway (SG) toward the SS7 network.
+
+    UA implementations utilizing ASPCONG are intended to be compatible
+  with UA implementations not support the configuration; however, the
+  full benefits achieved by the ASPCONG procedures will not be realized
+  unless implementations at both endpoints implement ASPCONG.
+
+1.2.  Abbreviations
+
+      AS      -- Application Server.
+      ASP     -- Application Server Process.
+      CORID   -- Correlation Id Extension
+      IANA    -- Internet Assigned Numbers Authority
+      I-D     -- Internet-Draft
+      IETF    -- Internet Engineering Task Force
+      IP      -- Internet Protocol.
+      IPSP    -- IP Signalling Point.
+      LIF     -- Local Interworking Function.
+      NIF     -- Nodal Interworking Function.
+      SCCP    -- Signalling Connection Control Part.
+      SCTP    -- Stream Control Transmission Protocol.
+      SG      -- Signalling Gateway.
+      SGP     -- Signalling Gateway Process.
+      SIGTRAN -- IETF Signalling Transport WG
+      SPP     -- Signalling Peer Process.
+      SS7     -- Signalling System No. 7.
+      SUA     -- SS7 SCCP-User Adaptation Layer.
+      TCAP    -- Transaction Capabilities Application Part.
+      TUA     -- SS7 TCAP-User Adaptation Layer.
+      UA      -- User Adaptation Layer.
+      WG      -- Working Group
+
+
+1.3.  Terminology
+
+    ASPCONG supplements the terminology used in the UA documents [M2UA],
+  [M3UA], [SUA], [ISUA], [TUA] by adding the following terms:
+
+
+
+B. Bidulock                    Version 0.1                        Page 2
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+  Accepted Rate - the rate in number of messages (or message octets) per
+      unit time that are removed from a buffer used to queue messages
+      from one functional unit to another.
+
+  Offered Rate - the rate in number of messages (or message octets) per
+      unit time that are placed into a buffer used to queue messages
+      from one functional unit to another.
+
+  Buffer Occupancy - refers to the degree of fill experienced a buffer
+      used to queue messages from one functional unit to another.  If
+      the Offered Rate exceeds the Accepted Rate, Buffer Occupancy will,
+      by definition, be increasing; the Offered Rate is less than the
+      Accepted Rate, Buffer Occupancy decreases; when equal, the Buffer
+      Occupancy does not change.
+
+  Local Interworking Function (LIF) - refers to the function that
+      converts between the lower-layer interface of the UA protocol
+      layer at the ASP and the upper-layer SS7 protocol interface to an
+      Application Server (AS) at served by the ASP.
+
+  Nodal Interworking Function (NIF) - refers to the function that
+      converts between the upper-layer interface of an SS7 protocol
+      stack at an SGP and the UA protocol layer at the SGP.
+
+  Signalling Endpoint (SEP) - in this document, a Signalling Endpoint is
+      an SS7 SEP [Q.700] or an Application Server.
+
+  Signalling Peer Process (SPP) - refers to an ASP, SGP or IPSP.
+
+  Signalling User Adaptation Layer (UA) - one or more of the Stream
+      Control Transmission Protocol (SCTP) [SCTP], [SCTPCRC], [SCTPIG]
+      SS7 Signalling User Adaptation Layers [M2UA], [M3UA], [SUA],
+      [ISUA], [TUA] supporting the Correlation Id parameter and the BEAT
+      message.
+
+1.4.  Overview
+
+    There are a number of possible mechanisms that can be used to
+  determine congestion toward SS7-Users at an SGP and at an ASP that
+  permit the SG to correlate congestion and present it toward the SS7
+  network on a basis that followed applicable SS7 standards.  This
+  document provides protocol elements within the SS7 User Adaptation
+  Layers (UAs) to assist in the detection of congestion toward SS7 Users
+  at an ASP and that communicate the detection to an SGP for use by the
+  SG in presenting a network view of SS7-User congestion toward the SS7
+  network.
+
+1.4.1.  ASP Congestion
+
+    ASP Congestion is defined as the situation where an Application
+  Server at an ASP is not accepting signalling messaging traffic at the
+  rate at which it is being offered by an SGP.  ASP Congestion only
+  includes the congestion experienced by signalling messaging traffic
+
+B. Bidulock                    Version 0.1                        Page 3
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+  that is directed from a given SGP toward a specific Application
+  Server, via a specific ASP.  As such, ASP Congestion can be identified
+  by the 3-tuple of the SGP, AS and ASP.  Because there is a 1:1:1
+  relationship between an RK, and AS, and an RC (or IID), and since
+  there is no more than one SCTP Association for any given SGP-ASP
+  relation, ASP Congestion relates to traffic with a specific RC (or
+  IID) on a given SCTP association.
+
+    ASP Congestion does not include congestion in signalling messaging
+  traffic flow from the ASP toward the SGP.
+
+1.4.1.1.  Points of Detection
+
+    ASP Congestion can occur at an SGP within the Nodal Interworking
+  Function (NIF), at an SGP within the UA layer at the SGP, within the
+  IP network for a given SCTP association, or at an ASP within the UA
+  layer at the ASP.  Congestion or flow control above the UA layer at
+  the ASP, or within an SS7 protocol stack at the SGP are not included
+  under the term ASP Congestion.
+
+1.4.1.2.  Models for Detection
+
+    Methods for detection of ASP Congestion at the various detection
+  points are, of course, implementation specific.  That is, the method
+  of detection cannot be specified without knowledge of the actual
+  implementation at the detection point.  Nevertheless, models for
+  detection are here presented.
+
+1.4.1.2.1.  Detection at the SGP
+
+    At the SGP, the flow of traffic between the SS7 protocol stack and
+  the UA protocol layer at the SGP can be viewed as traversing a Nodal
+  Interworking Function (NIF) that resides between the SS7 protocol
+  stack and the UA protocol layer.  The interface (if one exists)
+  between the NIF and the UA Protocol Layer can be modelled as a set of
+  message queues, one for each SGP-ASP-AS traffic flow.  Detection of
+  ASP Congestion at the interface between the NIF and the UA protocol
+  layer at the SGP could then be modelled as detecting the buffer
+  occupancy of a specific message queue (corresponding to a specific
+  SGP-ASP-AS traffic flow) across the interface.  Any number of
+  congestion levels could be effected by establishing a set of
+  congestion onset and abatement thresholds.
+
+    In this document when reference is made to detecting ASP Congestion
+  within the NIF at an SGP, it is this model for detection that is being
+  cited.
+
+    In a similar way, at the SGP, the flow of traffic between the UA
+  protocol layer and the SCTP association between SGP and ASP, can be
+  viewed as traversing the SCTP transport endpoint functions
+  corresponding to the transmit side of the SCTP association at the SGP.
+  Detection of ASP Congestion at the interface between the UA protocol
+  layer and SCTP at the SGP could then be modelled as detecting buffer
+
+B. Bidulock                    Version 0.1                        Page 4
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+  occupancy of a specific message queue (corresponding to a specific
+  SGP-ASP-AS traffic flow) across the interface.  Again, any number of
+  congestion levels could be effected by establishing a set of
+  congestion onset and abatement thresholds.
+
+    In this document when reference is made to detecting ASP Congestion
+  at the SCTP send buffer, it is this model for detection that is being
+  cited.
+
+    Congestion below the interface between the SS7 stack and the NIF
+  (e.g.  congestion within the SS7 stack proper), is not considered part
+  of ASP Congestion, but is considered as congestion within the SS7
+  Provider layer for the corresponding UA.
+
+1.4.1.2.2.  Detection at the ASP
+
+    At the ASP, the flow of traffic between the SCTP association from an
+  SGP and the UA protocol layer at the ASP, can be viewed as traversing
+  the SCTP transport endpoint functions corresponding to the receive
+  side of the SCTP association at the ASP.  Detection of ASP Congestion
+  at the interface between SCTP and the UA protocol layer at the ASP
+  could then be modelled as detecting buffer occupancy of a specific
+  message queue (corresponding to a specific SGP-ASP-AS traffic flow)
+  across the interface.  Any number of congestion levels could be
+  effected by establishing a set of congestion onset and abatement
+  thresholds.
+
+    In this document when reference is made to detecting ASP Congestion
+  at the SCTP receive buffer, it is this model for detection that is
+  being cited.
+
+    In yet a similar way, at the ASP, the flow of traffic between the UA
+  protocol layer and the Application Server can be viewed as traversing
+  a Local Interworking Function (LIF) that resides between the UA
+  protocol layer and the upper-layer SS7 protocol stack.  The interface
+  (if one exists) between the LIF and the Application Server can be
+  modelled as a set of message queues, one for each SGP-ASP-AS traffic
+  flow.  Detection of ASP Congestion at the interface between the LIF
+  and the AS at the ASP could then be modelled as detecting the buffer
+  occupancy of a specific message queue (corresponding to a specific
+  SGP-ASP-AS traffic flow) across the interface.  Also, any number of
+  congestion levels could be effected by establishing a set of
+  congestion onset and abatement thresholds.
+
+    In this document when reference is made to detecting ASP Congestion
+  within the LIF at an ASP, it is this model for detection that is being
+  cited.
+
+    Congestion beyond the interface between the UA protocol layer and
+  the Application Server (e.g. congestion within the Application Server
+  function itself), is not considered as part of ASP Congestion, but is
+  considered as congestion within the SS7 User layer for the
+  corresponding UA.
+
+B. Bidulock                    Version 0.1                        Page 5
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+1.5.  Sample Configurations
+
+    (This section will include some diagrams indicating the placement of
+  NIF and LIF functions, the location of SCTP send and receive buffers
+  in relation to the UA protocol layer, the SS7 stack and the
+  Application Server at both the SGP and the ASP.)
+
+1.6.  ASP Congestion Management
+
+    ASP Congestion management is performed at both the SG and the ASP.
+  For proper interworking, protocol elements are used between the ASP
+  and the SGP, and a set of procedures are provided for the management
+  of ASP Congestion.
+
+1.6.1.  ASP Congestion Management at an ASP
+
+    ASP Congestion can be detected at an ASP (as described in section
+  "Detection at the ASP") at the SCTP receive buffer or within the LIF.
+  Whenever an ASP detects a change in congestion toward an AS (ASP
+  Congestion), and the ASP is in the ASP-ACTIVE state with the sending
+  SGP for the corresponding Application Server, it sends an ASP Status
+  message to the sending SGP with the level of congestion indicated in
+  the ASP Congestion parameter contained in the message.
+
+    While detecting ASP Congestion and sending ASP Status messages
+  indicating congestion to the SGP, the ASP SHOULD NOT discard messages
+  with a priority or importance beneath that of the indicated congestion
+  level.  It should be left to the SG to determine which messages should
+  subsequently be discarded as part of whatever procedures are necessary
+  toward the SS7 network.
+
+    Whenever an ASP receives a NTFY ("AS-CONGESTED") message from an SG
+  indicating that an AS served by the ASP is congested, it is not
+  compelled to take any action.  Each ASP that receives the message
+  SHOULD, however, determine whether it can bring additional resources
+  to bear that will relieve the congestion of the Application Server.<1>
+
+1.6.2.  ASP Congestion Management at an SGP
+
+    ASP Congestion can be detected at an SGP (as described in section
+  "Detection at the SGP") within the NIF or at the SCTP send buffer.
+  Also, an SGP can use receipt of an ASPSTAT message as indication of
+  ASP Congestion detected at the ASP.
+
+    Each SGP maintains an ASP state for each AS at each ASP that the SGP
+  serves.  In addition to the activation state of an ASP within an AS,
+  ASPCONG requires that each SGP maintain a congestion level associated
+  with each ASP within each AS.
+
+    Also, each SG maintains an overall AS state for each AS served by
+  the SG.  In addition to the activate state of an AS, ASPCONG requires
+  that each SG maintain a congestion level associated with each AS
+  served by the SG.
+
+B. Bidulock                    Version 0.1                        Page 6
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+    The SG uses the activation state of individual ASPs within AS served
+  by the SG to determine the overall AS state in accordance with the UA
+  state machine (which is similar if not identical for all UAs discussed
+  here).  ASPCONG adds the requirement that the SG determine the overall
+  AS congestion status by considering each ASP congestion status within
+  the AS.  This is performed in accordance with the state machine
+  procedures of Section 4.
+
+    The SG uses the activation state of AS server by the SG to present a
+  coordinated network view of the activation served AS toward the SS7
+  network using standard SS7 procedures.  ASPCONG requires that each SG
+  also present a coordinated network view of the congestion status of
+  served AS toward the SS7 network, also using standard SS7 procedures.
+
+    Whenever an SG determines that the overall congestion status of an
+  Application Server has changed, it notifies all ASPs in the AS-ACTIVE
+  or AS-INACTIVE state for the AS using a NTFY ("AS-CONGESTION") message
+  that contains the ASP Congestion parameter indicating the new
+  congestion Level for the AS.  Note that the change in AS congestion
+  status determined by an SG could result either from detection of ASP
+  Congestion local to the SGP, or from receipt of an ASPSTAT message
+  from an ASP indicating ASP Congestion.
+
+    Once the SG has indicated AS congestion to an AS, it MAY discard
+  messages and provide protocol congestion indications toward the SS7
+  network in accordance with relevant SS7 standards<2>, but, regardless
+  of the actions taken by the SG toward the SS7 network, the SG SHOULD
+  cease passing traffic toward the congested AS at a priority or
+  importance level lower than the congestion level.
+
+1.7.  Issues
+
+    Although the mechanism presented in this document provides some
+  essential protocol capabilities to the SS7 User Adaptation Layers
+  (UAs) for use in detecting and reporting SS7 User congestion from an
+  ASP to an SGP, a number of issues associated with this approach
+  remain:
+
+   (1)   The UA protocols were designed to permit a Nodal Interworking
+         Function (NIF) to be placed over an existing SS7 protocol layer
+         provider and, using only the primitives and interface to the
+         SS7-Provider that is available to a normal SS7-User as
+         described by the SS7 standards, provide the functions necessary
+         to implement a Signalling Gateway (SG) in the back-haul SG/ASP
+         configuration.
+
+         The ASPSTAT message would remove this ability.
+
+         Because the UAs permitted an SG to be implemented over an
+         existing SS7 protocol stack, details of the NIF, and details of
+         the interfaces between the SS7-Provider and the NIF were
+         avoided.
+
+
+B. Bidulock                    Version 0.1                        Page 7
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+         The ASPSTAT message would require both a description of the NIF
+         as well as details of the additional capabilities required of
+         an SS7 provider a the interface between the NIF and the SS7
+         provider.
+
+   (2)   Typically, within an SS7 provider implementation, congestion
+         toward an SS7-User is determined within the SS7 provider
+         protocol layer using implementation dependent means.
+         Nevertheless, each SS7 protocol layer provides specific
+         congestion onset and abatement thresholds that are managed
+         within the SS7 protocol layer.
+
+         Use of the ASPSTAT would require that the management of onset
+         and abatement thresholds span multiple devices, multiple queues
+         and buffers, and also span the SCTP transport carrying traffic.
+         This would make the task of managing onset and abatement
+         thresholds problematic for SS7 network operators.
+
+         A mechanism where the management of onset and abatement
+         thresholds are contained within the SG if not within the SS7
+         provider layer is far more preferable than the arrangement
+         required by the ASPSTAT message.
+
+   (3)   The UAs have an existing optional mechanism for communicating
+         SS7 User congestion to the SG.  For  [M3UA], [SUA], [ISUA],
+         [TUA] that mechanism is the use of the SCON message in the ASP
+         to SG direction.  For [M2UA] it is the use of the Status
+         Request message.
+
+         Adoption of ASPSTAT message would likely require the removal of
+         that mechanism so that it does not conflict with the ASPSTAT
+         mechanism.
+
+   (4)   Use of the ASP Status procedures at the SG for redistribution
+         of traffic within an AS can be dangerous.  Without proper
+         knowledge about the load characteristics of the ASPs serving an
+         AS, an SG could provoke rapid oscillations in load distribution
+         across the ASP pool.
+
+         Although some techniques could be used at the SG to mitigate
+         this (e.g. providing a long duration between switch-overs), all
+         of the UAs follow the principle that traffic decisions are best
+         made by the ASPs rather than at the SG.
+
+         In fitting with this principle, use of the Notify procedures in
+         conjunction with the [LOADSEL] or [LOADGRP] approach to ASP
+         management of load sharing selection and grouping would allow
+         the ASPs to activate an alternate load selection and grouping
+         in response to congestion that could not be afforded by
+         redistribution at the SG.
+
+
+
+
+B. Bidulock                    Version 0.1                        Page 8
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+1.8.  Conclusions
+
+    The following conclusions have been reached regarding the mechanisms
+  described in this document.
+
+   (1)   Giving considerations to the issues with the ASPSTAT message
+         described in the previous section, use of the ASPSTAT message
+         at the SGP and SG should be completely OPTIONAL.  This permits
+         an implementation that uses an existing SS7 protocol stack
+         implementation to use other mechanisms local to the SG for
+         effecting proper SS7 User congestion controls.
+
+   (2)   Considering that an existing SS7 protocol stack implementation
+         can give indications about SS7 User congestion to SS7
+         management at the node using a management interface, it is
+         likely possible to implement the NTFY (AS-CONGESTED) procedures
+         at the SG without having to describe the NIF and the
+         NIF/SS7-Provider interface in detail.  Therefore, the Notify
+         procedures should be RECOMMENDED.  These procedures afford
+         notification of ASPs that in the ASP-INACTIVE state for an AS
+         of the congestion status of the AS a effected by the SG, and
+         permit the ASPs serving the AS to take actions with regard to
+         traffic in the AS (e.g. bringing an ASP from the ASP-INACTIVE
+         state to the ASP-ACTIVE state to relieve the congestion).  Note
+         that the Notify procedures do not compel an ASP to take action,
+         but the procedure provides additional information that can
+         enable effective ASP management at the ASP pool.
+
+   (3)   Danger of suboptimal load balancing at the SG resulting from
+         redistribution of traffic from the SG toward an AS and the
+         ensuing message loss and mis-sequencing is justification for
+         making load redistribution in response to AS congestion at the
+         SG NOT RECOMMENDED.  If performed at all, load redistribution
+         SHOULD be performed using [LOADSEL] and [LOADGRP] in
+         conjunction with [CORID] (to minimize message loss and mis-
+         sequencing) by the ASPs in response to the Notify procedures
+         outlined in this document, and the SG SHOULD NOT perform load
+         redistribution on its own.
+
+   (4)   provides some adjustments to the HEARTBEAT mechanism that can
+         be used effectively by the SG to determine congestion toward
+         the SS7 User at the ASP, while retaining the management of
+         congestion onset and abatement levels on the SG.  In
+         particular,  [CORID] provides that a HEARTBEAT sent within an
+         Application Server traffic flow MUST not be responded to by the
+         ASP until the messages in the traffic flow before it have be
+         accepted by the SS7 User (Application Server) at the ASP.  This
+         mechanism can be used periodically by the SG to determine the
+         amount of outstanding signalling messages toward the SS7 User
+         and apply SG managed thresholds.  The HEARTBEAT mechanism from
+         [CORID] SHOULD be used instead of the ASPSTAT mechanism
+         described here.
+
+
+B. Bidulock                    Version 0.1                        Page 9
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+
+Notes for Section 1
+
+  <1>  IMPLEMENTATION NOTE:-  Actions taken by an ASP in response to a
+       NTFY ("AS-CONGESTED") message might include, for example, an
+       ASP in the ASP-INACTIVE state for a Load Sharing AS moving
+       itself to the ASP-ACTIVE state for the AS using the ASPAC
+       message; or it might include an already active ASP bringing
+       additional redundant AS processors on-line to service the
+       overload.
+
+  <2>  IMPLEMENTATION NOTE:-  Note that one way to effect indications
+       of congestion under proper conditions toward the SS7 network
+       using an existing SS7 protocol stack and user interface
+       implementation that does not include a mechanism for requesting
+       congestion downward across the SS7/SS7-User interface, is to
+       cease accepting messages for the affected traffic flow from the
+       SS7/SS7-User interface.  This could trigger the SS7-Provider's
+       own congestion procedures in an appropriate manner.
+
+  <3>  IMPLEMENTATION NOTE:-  Note that it is NOT RECOMMENDED that an
+       SG redistribute traffic within a Load Share AS.  Doing so could
+       cause congestive oscillation between the various ASPs that are
+       active within the Load Share AS.  Based on ASP Congestion
+       detected within the SCTP receive buffer or LIF at an ASP, it
+       might be tempting to have an SG decide to redistribute the
+       transmission of traffic over the ASPs in a Load Share AS,
+       however, this is NOT RECOMMENDED: oscillations could occur as a
+       result of this action between the ASPs in a Load Share AS.
+       Based on ASP Congestion detected within the NIF or SCTP send
+       buffer at an SGP, it might also be tempting to have an SG
+       decide to redistribute the transmission of traffic from the SGP
+       that make up the SG, however, this is NOT RECOMMENDED for the
+       same reason (oscillation could occur between the SGP).  Any
+       redistribution of traffic with a Load Share AS, or within an
+       Active-Standby AS should result for the activation or
+       deactivate of an ASP within the AS, and then, the procedures of
+       [CORID] SHOULD be followed to avoid message loss, duplication
+       or mis-sequencing.
+
+2.  Conventions
+
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+  document are to be interpreted as described in [RFC2119].
+
+3.  Protocol Elements
+
+    The following protocol element definitions are provided by ASPCONG
+  in extension to the existing protocol element definitions for the UAs
+  [M2UA], [M3UA], [SUA], [ISUA], [TUA].
+
+
+
+B. Bidulock                    Version 0.1                       Page 10
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+3.1.  Parameters
+
+    The following subsections describe the parameters used for APSCONG,
+  their format and the message in which they are used.
+
+3.1.1.  ASP Congestion Level
+
+    The ASP Congestion Level parameter is used in the ASPSTAT message.
+  It is used in the ASPSTAT message to identify the level of congestion
+  currently experienced by the ASP.
+
+  The ASP Congestion parameter is formatted as follows:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         Tag = 0xXXXX          |            Length             |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   |                         ASP Congestion                        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+  The ASP Congestion parameter contains the following field:
+
+  ASP Congestion field: 4 bytes
+
+    The ASP Congestion field is formatted as follows:
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                       Reserved                          |Level|
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+    Reserved field: 29-bits
+
+         The Reserved field is reserved, MUST be ignored by the
+         receiving SG, and SHOULD be coded zero by the sending ASP.
+
+    Level field: 3-bits (unsigned integer)
+
+         The Level field is used by the sending ASP to indicate the
+         current congestion level at the ASP for the indicated AS.  This
+         field can take on values from 0 through 7 (inclusive) and is
+         used to indicated the current congestion level of the AS.  The
+         value 0 always indicates "no congestion".
+
+        For [M2UA], the values of the Level field are interpreted in
+        accordance with [Q.703], [T1.111] as follows:
+
+
+
+
+B. Bidulock                    Version 0.1                       Page 11
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+
+            0   no congestion
+            1   congestion-accept
+            2   congestion-discard
+            3-7 reserved
+
+
+
+        For [M3UA], the values of the Level field are interpreted in
+        accordance with [T1.111], [Q.704] as follows:
+
+            0   no congestion
+            1   congestion level 1
+            2   congestion level 2
+            3   congestion level 3
+            4-7 reserved
+
+
+        For [SUA], [TUA], the values of the Level field are interpreted
+        in accordance with [Q.714], [T1.112], [Q.774], [T1.114] as
+        follows:
+
+            0   no congestion
+            1   restricted importance level 1
+            2   restricted importance level 2
+            3   restricted importance level 3
+            4   restricted importance level 4
+            5   restricted importance level 5
+            6   restricted importance level 6
+            7   restricted importance level 7
+
+
+        For [ISUA], the values of the Level field are interpreted in
+        accordance with [Q.764], [T1.113] as follows:
+
+            0   no congestion
+            1   automatic congestion level 1
+            2   automatic congestion level 2
+            3   automatic congestion level 3
+            4-7 reserved
+
+        Note that some switches use only two levels of ACL, others use
+        three.
+
+3.1.2.  Status
+
+    ASPCONG extends the Status parameter used in the NTFY message as
+  follows:
+
+  If the Status Type is AS_STATE_CHANGE, then the Status ID (16 bit
+  unsigned integer) values are:
+
+
+
+B. Bidulock                    Version 0.1                       Page 12
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+        1   reserved
+        2   Application Server Inactive (AS-Inactive)
+        3   Application Server Active (AS-Active)
+        4   Application Server Pending (AS-Pending)
+        5   Application Server Congested (AS-Congested)
+
+
+  These notifications are sent from an SGP to an ASP upon a change in
+  status of a particular Application Server.  The value reflects the new
+  state of the Application Server.
+
+3.2.  Messages
+
+  ASPCONG adds two messages (ASPSTAT and ASPSTAT QRY) to the ASPTM class
+  of messages as follows:
+
+      Application Server Process Traffic Maintenance (ASPTM) Messages
+        0         Reserved
+        1         ASP Active (ASPAC)
+        2         ASP Inactive (ASPIA)
+        3         ASP Active Ack (ASPAC ACK)
+        4         ASP Inactive Ack (ASPIA ACK)
+        5         ASP Status (ASPSTAT)
+        6         ASP Status Query (ASPSTST QRY)
+        7 -  127  Reserved by the IETF
+      128 -  255  Reserved for IETF-Defined Message Class Extensions
+
+
+  ASPCONG also modifies the ACTIVE and NTFY messages as follows:
+
+3.2.1.  ASP Active (ACTIVE)
+
+    The ASPAC message is sent by an ASP to indicate to an SGP that it is
+  Active and ready to process signalling traffic for a particular
+  Application Server.
+
+  The format of the ACTIVE message is as follows:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.1                       Page 13
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         Tag = 0x000B          |            Length = 8         |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   |                       Traffic Mode Type                       |
+   +-------------------------------+-------------------------------+
+   |         Tag = 0x0006          |            Length = 8         |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   |                         Routing Context                       |
+   +-------------------------------+-------------------------------+
+   |         Tag = 0x0001          |           Length=8            |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   |                 Interface Identifier (integer)                |
+   +-------------------------------+-------------------------------+
+   |         Tag = 0x0003          |             Length            |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   \                                                               \
+   /                   Interface Identifier (text)                 /
+   \                                                               \
+   +-------------------------------+-------------------------------+
+   |         Tag = 0xXXXX          |           Length=8            |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   |                         ASP Congestion                        |
+   +-------------------------------+-------------------------------+
+   |         Tag = 0x0110          |           Length=8            |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   |                           TID Label                           |
+   +-------------------------------+-------------------------------+
+   |         Tag = 0x010F          |           Length=8            |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   |                           DRN Label                           |
+   +-------------------------------+-------------------------------+
+   |         Tag = 0x0004          |            Length             |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   \                                                               \
+   /                           Info String                         /
+   \                                                               \
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+  The ACTIVE message can contain the following parameters:
+
+      Parameters
+      ------------------------------------------------
+      Traffic Mode Type                Optional
+      Routing Context                  Optional    *1
+      Interface Identifier (integer)   Optional    *2
+      Interface Identifier (text)      Optional    *2
+      ASP Congestion                   Mandatory   *3
+
+
+
+
+B. Bidulock                    Version 0.1                       Page 14
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+      TID Label                        Optional
+      DRN Label                        Optional
+      Info String                      Optional
+
+
+  Note 1: The Routing Context parameter is only optionally included in
+          UA protocols that support it [M3UA], [SUA], [ISUA], [TUA], and
+          indicates the Application Server to which the message applies.
+          If there is only one Application Server provisioned for a
+          given SCTP association, then the Routing Context field is
+          optional.  Otherwise, the Routing Context field is mandatory.
+
+  Note 2: The Interface Identifier parameter is only optionally included
+          in UA protocols that support it [M2UA].
+
+  Note 3: The ASP Congestion parameter is included in the ASPAC message
+          to indicate to the SGP that the congestion sub-state in which
+          ASP is activating.  In this case, the ASP Congestion parameter
+          contains the congestion level currently experienced by the
+          ASP.  If the ASP is not activating in a congested state, the
+          Level field of the ASP Congestion parameter MUST contain zero
+          (0), indicating "no congestion".
+
+3.2.2.  Notify (NTFY)
+
+    ASPCONG extends the Notify message as follows:
+
+  The Notify message is used to provide an autonomous indication of UA
+  events at an SGP/IPSP to an ASP/IPSP.
+
+  The NTFY message is formatted as follows:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.1                       Page 15
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+     0                     1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |         Tag = 0x000D          |            Length = 8         |
+    +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+    |                           Status                              |
+    +-------------------------------+-------------------------------+
+    |         Tag = 0x0011          |            Length             |
+    +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+    |                        ASP Identifier                         |
+    +-------------------------------+-------------------------------
+    |         Tag = 0x0006          |            Length             |
+    +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+    \                                                               \
+    /                       Routing Context                         /
+    \                                                               \
+    +-------------------------------+-------------------------------+
+    |         Tag = 0x0001          |           Length=8            |
+    +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+    |                 Interface Identifier (integer)                |
+    +-------------------------------+-------------------------------+
+    |         Tag = 0x0003          |             Length            |
+    +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+    \                                                               \
+    /                   Interface Identifier (text)                 /
+    \                                                               \
+    +-------------------------------+-------------------------------+
+    |         Tag = 0xXXXX          |           Length=8            |
+    +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+    |                         ASP Congestion                        |
+    +-------------------------------+-------------------------------+
+    |         Tag = 0x0004          |            Length             |
+    +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+    \                                                               \
+    /                          Info String                          /
+    \                                                               \
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+  The NTFY message can contain the following parameters:
+
+      Parameters
+      -----------------------------------------------------
+      Status                           Mandatory
+      ASP Identifier                   Conditional    *1
+      Routing Context                  Conditional   *2 *3
+      Interface Identifier (integer)   Conditional    *4
+      Interface Identifier (text)      Conditional    *4
+      ASP Congestion                   Conditional    *5
+      Info String                      Optional
+
+
+
+
+B. Bidulock                    Version 0.1                       Page 16
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+  Note 1: ASP Identifier MUST be used where the IPSP/SGP cannot identify
+          the ASP by pre-configured address/port number information
+          (e.g, where an ASP is resident on a Host using dynamic
+          address/port number assignment) and the Status parameter is
+          set to "Alternate ASP Active" or "ASP Failure".
+
+  Note 2: When an ASP is registered or configured for multiple AS with
+          an SG, to identify the Application Server, the Routing Context
+          associated with the AS whose state is being notified MUST be
+          placed in the NTFY message when the Status parameter is set to
+          "AS_State_Change".
+
+  Note 3: The Routing Context parameter is only optionally included in
+          UA protocols that support it [M3UA], [SUA], [ISUA], [TUA], and
+          indicates the Application Server to which the message applies.
+          If there is only one Application Server provisioned for a
+          given SCTP association, then the Routing Context field is
+          optional.  Otherwise, the Routing Context field is mandatory.
+
+  Note 4: The Interface Identifier parameter is only optionally included
+          in UA protocols that support it [M2UA].
+
+  Note 5: The ASP Congestion parameter MUST be included in the NTFY
+          message when the Status parameter is set to "AS_State_Change"
+          and the Status ID  field is set to "ASP-Congested".  The ASP
+          Congestion parameter contains the level of congestion being
+          experienced by the Application Server, as determined by the
+          SGP.
+
+3.2.3.  ASP Status (ASPSTAT)
+
+    The ASP Status message is used by an ASP to report the congestion
+  status toward a local Application Server at the ASP, to an SGP.  It
+  may also be used by an IPSP to report the congestion status toward a
+  local Application server at the IPSP to a remote IPSP.
+
+  The format of the ASPSTAT message is as follows:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.1                       Page 17
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         Tag = 0x0006          |            Length = 8         |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   |                         Routing Context                       |
+   +-------------------------------+-------------------------------+
+   |         Tag = 0x0001          |           Length=8            |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   |                 Interface Identifier (integer)                |
+   +-------------------------------+-------------------------------+
+   |         Tag = 0x0003          |             Length            |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   \                                                               \
+   /                   Interface Identifier (text)                 /
+   \                                                               \
+   +-------------------------------+-------------------------------+
+   |         Tag = 0xXXXX          |           Length=8            |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   |                         ASP Congestion                        |
+   +-------------------------------+-------------------------------+
+   |         Tag = 0x0004          |            Length             |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   \                                                               \
+   /                           Info String                         /
+   \                                                               \
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+  The ASPSTAT message can contain the following parameters:
+
+      Parameters
+      --------------------------------------------------
+      Routing Context                  Conditional   *1
+      Interface Identifier (integer)   Conditional   *2
+      Interface Identifier (text)      Conditional   *2
+      ASP Congestion                   Mandatory     *3
+      Info String                      Optional
+
+
+  Note 1: The Routing Context parameter is only optionally included in
+          UA protocols that support it [M3UA], [SUA], [ISUA], [TUA], and
+          indicates the Application Server to which the message applies.
+          If there is only one Application Server provisioned for a
+          given SCTP association, then the Routing Context field is
+          optional.  Otherwise, the Routing Context field is mandatory.
+
+  Note 2: The Interface Identifier parameter is only optionally included
+          in UA protocols that support it [M2UA].
+
+  Note 3: The ASP Congestion parameter is used by the ASP in the ASPSTAT
+          message to indicate the current congestion level of the
+
+
+B. Bidulock                    Version 0.1                       Page 18
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+          Application Server (AS) indicated by the Routing Context (or
+          Interface Identifier) associated with the AS.
+
+    The ASPSTAT message MAY contain additional extension parameters
+  provided for by other extensions.
+
+3.2.4.  ASP Status Query (ASPSTAT QRY)
+
+    The ASP Status Query message is used by an SGP to query an ASP
+  concerning the congestion status toward an Application Server at the
+  ASP.  It may also be used by an IPSP to query the congestion status
+  toward an Application Server at a remote IPSP.
+
+  The format of the ASPSTAT QRY message is as follows:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         Tag = 0x0006          |            Length = 8         |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   |                         Routing Context                       |
+   +-------------------------------+-------------------------------+
+   |         Tag = 0x0001          |           Length=8            |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   |                 Interface Identifier (integer)                |
+   +-------------------------------+-------------------------------+
+   |         Tag = 0x0003          |             Length            |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   \                                                               \
+   /                   Interface Identifier (text)                 /
+   \                                                               \
+   +-------------------------------+-------------------------------+
+   |         Tag = 0x0004          |            Length             |
+   +- - - - - - - - - - - - - - - -+- - - - - - - - - - - - - - - -+
+   \                                                               \
+   /                           Info String                         /
+   \                                                               \
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+  The ASPSTAT QRY message can contain the following parameters:
+
+      Parameters
+      -----------------------------------------------------
+      Routing Context                  Conditional   *1 *2
+      Interface Identifier (integer)   Conditional    *3
+      Interface Identifier (text)      Conditional    *3
+      Info String                      Optional
+
+
+  Note 1: The Routing Context (or Interface Identifier) is used by the
+          Signalling Gateway (SG) to indicate to the ASP for which
+          Application Server (AS) the current congestion status is
+
+
+B. Bidulock                    Version 0.1                       Page 19
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+          requested.
+
+  Note 2: The Routing Context parameter is only optionally included in
+          UA protocols that support it [M3UA], [SUA], [ISUA], [TUA], and
+          indicates the Application Server to which the message applies.
+          If there is only one Application Server provisioned for a
+          given SCTP association, then the Routing Context field is
+          optional.  Otherwise, the Routing Context field is mandatory.
+
+  Note 3: The Interface Identifier parameter is only optionally included
+          in UA protocols that support it [M2UA].
+
+    The ASPSTAT QRY message MAY contain additional extension parameters
+  provided for by other extensions.
+
+4.  Procedures
+
+    ASPCONG provides the following procedures in extension to the
+  procedures of the UAs [M2UA], [M3UA], [SUA], [ISUA], [TUA].
+
+4.1.  AS and ASP State Maintenance
+
+    ASPCONG introduces the concept of a congested state, both for
+  Application Server Processes (ASPs) and Applications Servers (ASs).
+  These congestion states can be viewed as sub-states of the ASP-ACTIVE
+  and AS-ACTIVE states, respectively.
+
+4.1.1.  ASP State
+
+    ASPCONG adds the following ASP state definition to the state
+  transitions for an Application Server Process:
+
+  ASP-CONGESTED(n):-  This state is a sub-state of the ASP-ACTIVE state.
+                      Whenever an ASP is in the ASP-ACTIVE state, it may
+                      also be in one of the ASP-CONGESTED(n) sub-states,
+                      where "n" is the congestion level associated with
+                      the ASP in the AS.
+
+    Any existing procedure that causes an Application Server Process to
+  leave the ASP-ACTIVE states also applies to any congested ASP-
+  CONGESTED sub-states.  Any existing procedure that causes an
+  Application Server Process to enter the ASP-ACTIVE state, enters the
+  state as "uncongested", unless an ASP Congestion parameter is
+  associated with the procedure, in which case the ASP-CONGESTED(n)
+  state is entered, where "n" is the congestion level associated with
+  the ASP Congestion parameter.  (Note that the ASP Active message can
+  now contains an ASP Congestion parameter.)
+
+4.1.2.  AS State
+
+  AS-CONGESTED(n):-  This state is a sub-state of the AS-ACTIVE state.
+                     Whenever an AS is in the AS-ACTIVE state, it may
+                     also be in one of the AS-CONGESTED(n) sub-states,
+
+B. Bidulock                    Version 0.1                       Page 20
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+                     where "n" is the congestion level associated with
+                     the AS.
+
+    Any existing procedure that causes an Application Server to leave
+  the AS-ACTIVE states also applies to any congested AS-CONGESTED sub-
+  states.  Any existing procedure that causes an Application Server to
+  enter the AS-ACTIVE state, enters the state as "uncongested", unless
+  an ASP Congestion parameter is associated with the procedure, in which
+  case the AS-CONGESTED(n) state is entered, where "n" is derived by the
+  SG from the congestion level associated with the ASP Congestion
+  parameter.  (Note that the ASP Active message can now contains an ASP
+  Congestion parameter.)
+
+4.1.3.  ASP Up Procedures
+
+    ASP Up procedures are not modified by ASPCONG with the exception
+  that when an ASP moves to the ASP-INACTIVE state for an Application
+  Server from the ASP-DOWN state, the SGP SHOULD send notifications to
+  the newly inactive ASP that it would have otherwise received if it
+  were previously in the ASP-INACTIVE state for the AS.  This can now
+  also include the NTFY (AS-CONGESTED) notification.
+
+4.1.4.  ASP Down Procedures
+
+    When an ASP moves to the ASP-DOWN state and is deactivated for all
+  Application Servers served by the ASP at an SGP, the previous
+  congestion status associated with the ASP for the Application Servers
+  will be disregarded and removed from consideration for the calculation
+  of the overall AS congestion status for the corresponding Application
+  Servers.
+
+4.1.5.  ASP Active Procedures
+
+    ASPCONG enhances the ASP Active Procedures of the UAs as follows:
+
+    When an ASP sends an ASP Active message to an SGP to activate itself
+  for a given Application Server, the ASP includes the ASP Congestion
+  parameter in the message if the ASP is activating for the AS in an
+  already congested state.  It is not necessary to include an ASP
+  Congestion parameter if the ASP is not congested at the time of
+  activation.
+
+    Upon receiving an ASP Active message containing an ASP Congestion
+  parameter, and the SGP is moving the ASP to the ASP-ACTIVE state for
+  the AS, the SGP will also mark the ASP a congested at the congestion
+  Level indicated in the ASP Congestion parameter.  The SGP will also
+  take appropriate actions with regard to AS congestion in the same
+  manner as if the SGP had received an ASP Status message for the
+  congestion level immediately following the ASP Active message.
+
+
+
+
+
+B. Bidulock                    Version 0.1                       Page 21
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+4.1.6.  ASP Inactive Procedures
+
+    When an ASP is deactivated for an Application Server at an SGP, the
+  previous congestion status associated with the ASP for the Application
+  Server will be disregarded and removed from consideration for the
+  calculation of the overall AS congestion status for the corresponding
+  Application Server.
+
+4.1.7.  ASP Status Procedures
+
+    Whenever an ASP in the ASP-ACTIVE state for an Application Server,
+  determines that it is experiencing congestion toward the Application
+  Server (see "Detection of ASP Congestion at the ASP"), and that the
+  level of congestion toward the Application Server has changed since
+  the last status sent to the SGP, the ASP MAY send the SGP an ASP
+  Status message reporting the change in detected congestion level.
+
+    The receipt of the ASP Status message is not acknowledged by the
+  SGP.
+
+    The ASP Status message is sent by the ASP in the same SCTP stream as
+  other ASPTM and signalling messages related to the Application Server
+  (i.e, the same Routing Context (or Interface Identifier) to SCTP
+  stream mapping that is performed for the signalling messages causing
+  the congestion.) ASP Status messages are sent ordered within the SCTP
+  stream.  ASP Status messages are not sent on SCTP Stream 0.
+
+    Whenever an SGP receives an ASP Status message from an ASP in the
+  ASP-ACTIVE state for an Application Server, the SGP MAY consider the
+  congestion level reported in the ASP Congestion parameter contained in
+  the message when determining the congestion level of the ASP within
+  the AS (i.e. ASP-CONGESTED sub-state) as well as when determining the
+  overall AS congestion level (i.e.  AS-CONGESTED sub-state) and when
+  considering indication of congestion and invocation of congestion
+  related procedures toward the SS7 network.
+
+    If an SGP should receive an ASP Status message for an ASP that is
+  not in the ASP-ACTIVE state at an AS, an ERR("Unexpected Message")
+  should be returned and the ASP Status message discarded.
+
+4.1.8.  ASP Status Query Procedures
+
+    At any time that an ASP is in the ASP-ACTIVE state at an SGP for an
+  Application Server, the SGP MAY send an ASP Status Query message to
+  the ASP requesting the current congestion status for the ASP toward
+  the Application Server.
+
+    ASP Status Query messages can be sent unordered on the SCTP
+  association, and MAY be sent on SCTP Stream 0.
+
+    Whenever an ASP receives an ASP Status Query message from an SGP for
+  an Application Server, and the ASP is in the ASP-ACTIVE or ASP-
+  INACTIVE state for the Application Server, the ASP MUST respond with
+
+B. Bidulock                    Version 0.1                       Page 22
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+  an ASP Status message indicating the current congestion level toward
+  the Application Server.  The Routing Context (or Interface Identifier)
+  contained in the ASP Status message must be the same as appeared in
+  the received ASP Status Query message, and the ASP Congestion
+  parameter contained in the ASP Status message MUST reflect the current
+  congestion level toward the Application Server associated with the
+  Routing Context (or Interface Identifier).
+
+    If the ASP receives an ASP Status Query message and the ASP is not
+  in the ASP-ACTIVE or ASP-INACTIVE state for Application Server
+  indicated in the Message, it SHOULD return an ERR("Unexpected
+  Message") and take steps to move the SGP state to the current state of
+  the ASP (e.g. by sending, for example, ASP Down).
+
+    Using this procedure, the SGP can query the ASP Congestion status of
+  an Application Server from an ASP.
+
+4.1.9.  Notify Procedures
+
+    A Notify (NTFY) message reflecting a change in the AS state MUST be
+  sent to all ASPs in the AS, except those in the ASP-DOWN state, with
+  appropriate Status information, any ASP Identifier of the failed ASP,
+  and the ASP Congestion parameter when ("AS-CONGESTED") is indicated.
+  At the ASP, Layer Management is informed with an M-NOTIFY indication
+  primitive.  The Notify (NTFY) message must be sent whether the AS
+  state change was a result of an ASP failure or reception of an ASP
+  State Management (ASPSM) or ASP Traffic Management (ASPTM) message.
+  In the second case, the Notify (NTFY) message MUST be sent after any
+  ASP State or Traffic Management related acknowledgements messages
+  (e.g, ASP Up Ack, ASP Down Ack, ASP Active Ack, or ASP Inactive Ack).
+
+    Whenever a Notify (NTFY) ("AS-PENDING") message is sent by an SGP
+  that now has no ASPs active to service the traffic, or where a Notify
+  NTFY ("Insufficient ASP resources active in AS") message MUST be sent
+  in the Load-share or Broadcast mode, the Notify (NTFY) message does
+  not explicitly compel the ASP(s) receiving the message to become
+  active.  The ASPs remain in control of what (and when) traffic action
+  is taken.  Whenever a Notify (NTFY) ("AS-CONGESTED") message is sent
+  by an SGP that is experiencing AS congestion, the Notify (NTFY)
+  message does not explicitly compel the ASP(s) receiving the message,
+  whether in the ASP-ACTIVE or ASP-INACTIVE state for the Application
+  Server, to take any action: again, the ASPs remain in control of what
+  (and when) traffic action is taken.
+
+    Whenever a Notify (NTYF) message does not contain a Routing Context
+  (or Interface Identifier) parameter, the receiver must know, via
+  configuration data, of which Application Servers the ASP is a member
+  and take the appropriate action in each AS.
+
+5.  Examples
+
+    (This section will include some examples and message sequence charts
+  indicating the use of each new protocol element and procedure.)
+
+B. Bidulock                    Version 0.1                       Page 23
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+6.  Security
+
+    ASPCONG does not introduce any new security risks or considerations
+  that are not already inherent in the UAs [M2UA], [M3UA], [SUA],
+  [ISUA], [TUA].  Please see the SIGTRAN Security document [SIGSEC] for
+  security consideration and recommendations that are applicable to each
+  of the UAs.
+
+6.1.  Interworking Procedures
+
+    Because the ASPCONG procedures provided here rely upon cooperation
+  between ASP and SGP, if either the ASP or the SGP does not support
+  these ASPCONG procedures, neither the ASP nor the SGP is able to take
+  advantage of the full benefits of the procedures.  The ASP or SGP
+  supporting ASPCONG MAY fall back to the interworking procedures
+  provided in this section, or to procedures based on the original (non-
+  ASPCONG) UA procedures.
+
+    A peer ASP or SGP that does not support the ASPCONG procedures can
+  either be identified by local configuration information, the ASP
+  Extensions [ASPEXT] procedure, or at ASP Activation time.  The lack of
+  support for ASPCONG can be determined at ASP Activation time when the
+  peer ASP or SGP does not place a ASP Congestion parameter (as it MUST
+  if both peers support ASPCONG) in the ASPAC message.
+
+    When interwokring to an ASP or SGP that does not support ASPCONG,
+  the SGP or ASP supporting ASPCONG SHALL perform all of the local
+  procedures as though the peer SGP or ASP supported ASPCONG with the
+  following exceptions:
+
+   (1)   The ASP MUST NOT send ASP Status messages, either autonomously
+         or in response to a received ASP Status Query message.
+
+   (2)   The SGP MUST NOT send ASP Status Query messages.
+
+   (3)   The ASP MUST NOT send ASP Congestion parameters in ASP Active
+         messages after having received an ERR("Unrecognized Parameter")
+         in response to an initial well-formed ASP Active message
+         containing an ASP Congestion parameter.
+
+   (4)   The SGP MUST NOT send ASP Congestion parameters or NTFY ("AS-
+         CONGESTED") messages after having received an ERR("Invalid
+         Parameter") or ERR("Unrecognized Parameter") in response to an
+         initial well-formed NTFY (AS-CONGESTED) message.
+
+    The ASP and SGP MAY continue performing local ASP Congestion
+  detection and the SGP MAY continue taking ASP Congestion into
+  consideration when determining actions with regard to congestion
+  toward the SS7 network.
+
+
+
+
+
+B. Bidulock                    Version 0.1                       Page 24
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+7.  IANA Considerations
+
+    ASPCONG redefines the format of the Status ID field of the Status
+  parmeter contained in the Notify message in the [M2UA], [M3UA] and
+  [SUA] registries.
+
+    ASPCONG defines a new ASP Congestion parameter in the [M2UA], [M3UA]
+  and [SUA] registries.
+
+    ASPCONG redefines the parameters accepted in the ASP Active message
+  to include the new conditional ASP Congestion parameter in the [M2UA],
+  [M3UA] and [SUA] registries.  ASPCONG redefines the parameters
+  accepted in the Notify message to include the new conditioanl ASP
+  Congestion parameter in the [M2UA], [M3UA] and [SUA] registries.
+
+    ASPCONG defines two new messages in the ASP Traffic Management
+  messge class, the ASP Status and ASP Status Query messages, in the
+  [M2UA], [M3UA] and [SUA] registries.
+
+
+0.  Change History
+
+    This section provides historical information on the changes made to
+  this draft.  This section will be removed from the document when the
+  document is finalized.
+
+0.1.  Changes from Version 0.0 to Version 0.1
+
+   (1)   Updated dates and version numbers.
+
+   (2)   Updates for new boilerplate and idnits-2.00.1.
+
+0.0.  Version 0.0
+
+  The initial version of this document.
+
+0.0.0.  Change Log
+
+    $Log: draft-bidulock-sigtran-aspcong-01.me,v $
+    Revision 0.9.2.1  2007/02/03 15:47:25  brian
+    - added new drafts
+
+    Revision-0.9.2.3  2006/07/11 23:03:44  brian
+    - another attempt at submitting version 0
+
+    Revision-0.9.2.2  2006/06/27 09:41:15  brian
+    - rereleased drafts
+
+    Revision-0.9.2.1  2005/10/17 11:53:45  brian
+    - updated drafts for republication
+
+
+
+
+B. Bidulock                    Version 0.1                       Page 25
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+
+Normative References
+
+  [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+       Requirement Levels," BCP 14/RFC 2119, The Internet Society (March
+       1997).  <http://www.ietf.org/rfc/rfc2119.txt>
+
+  [M2UA]  Morneault, K., Dantu, R., Sidebottom, G., Bidulock, B. and
+       Heitz, J., "Signaling System 7 (SS7) Message Transfer Part 2
+       (MTP2) -- User Adaptation Layer," RFC 3331, The Internet Society
+       (September 2002).  <http://www.ietf.org/rfc/rfc3331.txt>
+
+  [M3UA]  Morneault, K., Pastor-Balbas, J., (eds), "Signaling System 7
+       (SS7) Message Transfer Part 3 (MTP3) -- User Adaptation Layer
+       (M3UA)," RFC 4666, The Internet Society (September 2006).
+       <http://www.ietf.org/rfc/rfc4666.txt>
+
+  [SUA]  Loughney, J., Sidebottom, G., Coene, L., Verwimp, G., Keller,
+       J. and Bidulock, B., "Signalling Connection Control Part User
+       Adaptation Layer (SUA)," RFC 3868, The Internet Society (October
+       2004).  <http://www.ietf.org/rfc/rfc3868.txt>
+
+  [SCTP]  Stewart, R. R., Xie, Q., Morneault, K., Sharp, C.,
+       Schwarzbauer, H. J., Taylor, T., Rytina, I., Kalla, H., Zhang, L.
+       and Paxson, V., "Stream Control Transmission Protocol (SCTP),"
+       RFC 2960, The Internet Society (October 2000).  (Updated by RFC
+       3309) (Status: PROPOSED STANDARD)
+       <http://www.ietf.org/rfc/rfc2960.txt>
+
+  [SCTPCRC]  Stone, J., Stewart, R. R. and Otis, D., "Stream Control
+       Transmission Protocol (SCTP) Checksum Change," RFC 3309, The
+       Internet Society (September 2002).  (Updates RFC 2960) (Status:
+       PROPOSED STANDARD) <http://www.ietf.org/rfc/rfc3309.txt>
+
+  [Q.700]  ITU, "Introduction to CCITT Signalling System No. 7," ITU-T
+       Recommendation Q.700, ITU-T Telecommunication Standardization
+       Sector of ITU, Geneva (March 1993).  (Previously "CCITT
+       Recommendation")
+
+  [Q.703]  ITU, "Signalling System No. 7 -- Signalling Link," ITU-T
+       Recommendation Q.703, ITU-T Telecommunication Standardization
+       Sector of ITU, Geneva (March 1993).  (Previously "CCITT
+       Recommendation")
+
+  [T1.111]  ANSI, "Signalling System No. 7 -- Message Transfer Part,"
+       ANSI T1.111, American National Standards Institute (1992).
+
+  [Q.704]  ITU, "Message Transfer Part -- Signalling Network Functions
+       and Messages," ITU-T Recommendation Q.704, ITU-T
+       Telecommunication Standardization Sector of ITU, Geneva (March
+       1993).  (Previously "CCITT Recommendation")
+
+  [Q.714]  ITU, "Signalling Connection Control Part Procedures," ITU-T
+
+B. Bidulock                    Version 0.1                       Page 26
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+       Recommendation Q.714, ITU-T Telecommunication Standardization
+       Sector of ITU, Geneva (March 1993).  (Previously "CCITT
+       Recommendation")
+
+  [T1.112]  ANSI, "Signalling System No. 7 -- Signalling Connection
+       Control Part," ANSI T1.112, American National Standards Institute
+       (1992).
+
+  [Q.774]  ITU, "Signalling System No. 7 -- Transaction Capabilities
+       Procedures," ITU-T Recommendation Q.774, ITU-T Telecommunication
+       Standardization Sector of ITU, Geneva (March 1993).  (Previously
+       "CCITT Recommendation")
+
+  [T1.114]  ANSI, "Signalling System No. 7 -- Transaction Capabilities
+       Application Part," ANSI T1.114, American National Standards
+       Institute (1992).
+
+  [Q.764]  ITU, "Signalling System No. 7 -- ISDN User Part Signalling
+       Procedures," ITU-T Recommendation Q.764, ITU-T Telecommunication
+       Standardization Sector of ITU, Geneva (March 1993).  (Previously
+       "CCITT Recommendation")
+
+  [T1.113]  ANSI, "Signalling System No. 7 -- ISDN User Part," ANSI
+       T1.113, American National Standards Institute (1992).
+
+  [SIGSEC]  Loughney, J., Tuexen, M. and Pastor-Balbas, J., "Security
+       Considerations for Signaling Transport (SIGTRAN) Protocols," RFC
+       3788, Internet Engineering Task Force -- Signalling Transport
+       Working Group (June 2004).  <http://www.ietf.org/rfc/rfc3788.txt>
+
+Informative References
+
+  [ISUA]  Bidulock, B., "SS7 ISUP-User Adaptation Layer (ISUA)," draft-
+       bidulock-sigtran-isua-04.txt, Internet Engineering Task Force --
+       Signalling Transport Working Group (February 3, 2007).  Work In
+       Progress.  <http://www.ietf.org/internet-drafts/draft-bidulock-
+       sigtran-isua-04.txt>
+
+  [TUA]  Bidulock, B., "SS7 TCAP-User Adaptation Layer (TUA)," draft-
+       bidulock-sigtran-tua-05.txt, Internet Engineering Task Force --
+       Signalling Transport Working Group (February 3, 2007).  Work In
+       Progress.  <http://www.ietf.org/internet-drafts/draft-bidulock-
+       sigtran-tua-05.txt>
+
+  [SCTPIG]  Stewart, R., Aria-Rodriguez, I., Poon, K., Caro, A. and
+       Tuexen, M., "Stream Control Transmission Protocol (SCTP)
+       Specification Errata and Issues," RFC 4460, The Internet Society
+       (April 2006).  (Status: INFORMATIONAL)
+       <http://www.ietf.org/rfc/rfc4460.txt>
+
+  [CORID]  Bidulock, B., "Correlation Id and Heartbeat Procedures
+       Supporting Lossless Fail-Over," draft-bidulock-sigtran-
+       corid-05.txt, Internet Engineering Task Force -- Signalling
+
+B. Bidulock                    Version 0.1                       Page 27
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+       Transport Working Group (February 3, 2007).  Work In Progress.
+       <http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-
+       corid-05.txt>
+
+  [LOADSEL]  Bidulock, B., "Load Selection Extension for Signalling User
+       Adaptation Layers (LOADSEL)," draft-bidulock-sigtran-
+       loadsel-05.txt, Internet Engineering Task Force -- Signalling
+       Transport Working Group (February 3, 2007).  Work In Progress.
+       <http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-
+       loadsel-05.txt>
+
+  [LOADGRP]  Bidulock, B., "Load Grouping Extension for Signalling User
+       Adaptation Layers (LOADGRP)," draft-bidulock-sigtran-
+       loadgrp-05.txt, Internet Engineering Task Force -- Signalling
+       Transport Working Group (February 3, 2007).  Work In Progress.
+       <http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-
+       loadgrp-05.txt>
+
+  [ASPEXT]  Bidulock, B., "Application Server Process (ASP) Extension
+       Framework," draft-bidulock-sigtran-aspext-05.txt, Internet
+       Engineering Task Force -- Signalling Transport Working Group
+       (February 3, 2007).  Work In Progress.
+       <http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-
+       aspext-05.txt>
+
+
+Acknowledgements
+
+    The authors would like to thank Lincoln Haresign, and Tolga Averson
+  for their valuable comments and suggestions.
+
+Author's Addresses
+
+  Brian Bidulock
+  OpenSS7 Corporation
+  1469 Jeffreys Crescent
+  Edmonton, AB  T6L 6T1
+  Canada
+
+  Phone: +1-780-490-1141
+  Email: bidulock@openss7.org
+  URL: http//www.openss7.org/
+
+
+
+
+  This draft expires August 2007.
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.1                       Page 28
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+
+                          Table of Contents
+
+  Status of this Memo .............................................    1
+  Copyright .......................................................    1
+  Abstract ........................................................    1
+  1 Introduction ..................................................    2
+  1.1 Scope .......................................................    2
+  1.2 Abbreviations ...............................................    2
+  1.3 Terminology .................................................    2
+  1.4 Overview ....................................................    3
+  1.4.1 ASP Congestion ............................................    3
+  1.5 Sample Configurations .......................................    6
+  1.6 ASP Congestion Management ...................................    6
+  1.6.1 ASP Congestion Management at an ASP .......................    6
+  1.6.2 ASP Congestion Management at an SGP .......................    6
+  1.7 Issues ......................................................    7
+  1.8 Conclusions .................................................    9
+  Notes for Section 1 .............................................   10
+  2 Conventions ...................................................   10
+  3 Protocol Elements .............................................   10
+  3.1 Parameters ..................................................   11
+  3.1.1 ASP Congestion Level ......................................   11
+  3.1.2 Status ....................................................   12
+  3.2 Messages ....................................................   13
+  3.2.1 ASP Active (ACTIVE) .......................................   13
+  3.2.2 Notify (NTFY) .............................................   15
+  3.2.3 ASP Status (ASPSTAT) ......................................   17
+  3.2.4 ASP Status Query (ASPSTAT QRY) ............................   19
+  4 Procedures ....................................................   20
+  4.1 AS and ASP State Maintenance ................................   20
+  4.1.1 ASP State .................................................   20
+  4.1.2 AS State ..................................................   20
+  4.1.3 ASP Up Procedures .........................................   21
+  4.1.4 ASP Down Procedures .......................................   21
+  4.1.5 ASP Active Procedures .....................................   21
+  4.1.6 ASP Inactive Procedures ...................................   22
+  4.1.7 ASP Status Procedures .....................................   22
+  4.1.8 ASP Status Query Procedures ...............................   22
+  4.1.9 Notify Procedures .........................................   23
+  5 Examples ......................................................   23
+  6 Security ......................................................   24
+  6.1 Interworking Procedures .....................................   24
+  7 IANA Considerations ...........................................   25
+  0 Change History ................................................   25
+  0.1 Changes from Version 0.0 to Version 0.1 .....................   25
+  0.0 Version 0.0 .................................................   25
+  0.0.0 Change Log ................................................   25
+  Normative References ............................................   26
+  Informative References ..........................................   27
+  Acknowledgements ................................................   28
+  Author's Addresses ..............................................   28
+  Table of Contents ...............................................   29
+
+B. Bidulock                    Version 0.1                       Page 29
+
+Internet Draft                 UA ASPCONG               February 3, 2007
+
+Intellectual Property
+
+  The IETF takes no position regarding the validity or scope of any
+  Intellectual Property Rights or other rights that might be claimed to
+  pertain to the implementation or use of the technology described in
+  this document or the extent to which any license under such rights
+  might or might not be available; nor does it represent that it has
+  made any independent effort to identify any such rights.  Information
+  on the procedures with respect to rights in RFC documents can be found
+  in BCP 78 and BCP 79.
+
+  Copies of IPR disclosures made to the IETF Secretariat and any
+  assurances of licenses to be made available, or the result of an
+  attempt made to obtain a general license or permission for the use of
+  such proprietary rights by implementers or users of this specification
+  can be obtained from the IETF on-line IPR repository at
+  http://www.ietf.org/ipr.
+
+  The IETF invites any interested party to bring to its attention any
+  copyrights, patents or patent applications, or other proprietary
+  rights that may cover technology that may be required to implement
+  this standard.  Please address the information to the IETF at ietf-
+  ipr@ietf.org.
+
+Disclaimer of Validity
+
+  This document and the information contained herein are provided on an
+  "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+  OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY, THE IETF TRUST AND
+  THE INTERNET ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS
+  OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF
+  THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+  WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Full Copyright Statement
+
+  Copyright (C) The IETF Trust (2007).  This document is subject to the
+  rights, licenses and restrictions contained in BCP 78, and except as
+  set forth therein, the authors retain all their rights.
+
+Acknowledgement
+
+  Funding for the RFC Editor function is currently provided by the
+  Internet Society.
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.1                       Page 30
+

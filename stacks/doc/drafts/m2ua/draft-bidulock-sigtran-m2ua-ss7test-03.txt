@@ -1,0 +1,1277 @@
+
+
+
+Network Working Group                                     Brian Bidulock
+INTERNET-DRAFT                                       OpenSS7 Corporation
+Intended status: INFORMATIONAL                          February 3, 2007
+
+Expires in August 2007
+
+
+
+                 SS7 MTP2-User Adaptation Layer (M2UA)
+                        SS7 Test Specifications
+                              M2UA-SS7TEST
+              <draft-bidulock-sigtran-m2ua-ss7test-03.txt>
+
+
+Status of this Memo
+
+    By submitting this Internet-Draft, each author represents that any
+  applicable patent or other IPR claims of which he or she is aware have
+  been or will be disclosed, and any of which he or she becomes aware
+  will be disclosed, in accordance with Section 6 of BCP 79.
+
+    This document may not be modified, and derivative works of it may
+  not be created, except to publish it as an RFC and to translate it
+  into languages other than English.
+
+    Internet-Drafts are working documents of the Internet Engineering
+  Task Force (IETF), its areas, and its working groups.  Note that other
+  groups may also distribute working documents as Internet-Drafts.
+
+    Internet-Drafts are draft documents valid for a maximum of six
+  months and may be updated, replaced, or obsoleted by other documents
+  at any time.  It is inappropriate to use Internet-Drafts as reference
+  material or to cite them other than as "work in progress".
+
+    The list of current Internet-Drafts can be accessed at
+  http://www.ietf.org/ietf/1id-abstracts.txt.
+
+    The list of Internet-Draft Shadow Directories can be accessed at
+  http://www.ietf.org/shadow.html.
+
+    This Internet-Draft will expire in August 2007.
+
+Copyright
+
+    Copyright (C) The IETF Trust (2007).
+
+Abstract
+
+    This Internet-Draft provides information for the Internet community
+  on the implementation of test cases for testing the SS7 MTP2-User
+  Adaptation Layer [M2UA] Signalling Gateway (SG) based on the
+  conformance test specifications for SS7 MTP Level 2 [Q.780], [Q.781],
+
+
+B. Bidulock                    Version 0.3                        Page 1
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+  [M2PATEST07].
+
+1.  Introduction
+
+    This draft provides details for implementation of testing of SS7
+  MTP-User Adaptation Layer [M2UA] Signalling Gateways (SG) based on the
+  test specifications for SS7 MTP Level 2 [Q.780], [Q.781],
+  [M2PATEST07].  The general aspects for SS7 protocol testing [Q.780],
+  [M2PATEST07] describes the requirement for an MTP Level 3 Simulator in
+  the test environment for SS7 MTP Level 2 testing [Q.781],
+  [M2PATEST07].  This MTP Level 3 Simulator is responsible for issuing
+  and accepting request and indication primitives as well as sending and
+  receiving signalling messages [Q.780], [M2PATEST07].
+
+    This memo describes how the MTP Level 3 Simulator would use SS7
+  MTP2-User Adaptation Layer messages to test a Signalling Gateway
+  implementation of [M2UA].
+
+1.1.  Scope
+
+    Although the SS7 MTP Level 2 test cases [Q.781], [M2PATEST07] are
+  applicable in entirety to SS7 signalling links implemented at the M2UA
+  Signalling Gateway, this memo details the mapping of M2UA messages to
+  SS7 Message Transfer Part (MTP) Signalling Link [Q.703], [M2PA]
+  signals used in the SS7 MTP Level 2 tests [Q.781], [M2PATEST07].
+
+1.2.  Abbreviations
+
+      ANSI --American National Standards Institute.
+      ASP  --Application Server Process.
+      BSNT --Backward Sequence Number Transmitted.
+      CPT  --Compatibility Test.
+      ETSI --European Telecommunications Standards Institute.
+      FSNC --Forward Sequence Number Confirmed.
+      I-D  --Internet-Draft.
+      IETF --Internet Engineering Task Force.
+      IOT  --Interoperability Test.
+      IPSP --IP Signalling Point.
+      ITU  --International Telecommunications Union.
+      IUT  --Implementation Under Test.
+      M2PA --SS7 MTP2-User Peer-to-Peer Adaptation Layer.
+      M2UA --SS7 MTP2-User Adaptation Layer.
+      MTP2 --MTP Level 2.
+      MTP  --Message Transfer Part.
+      PT   --Protocol Tester.
+      RFC  --Request For Comments.
+      RTB  --Retransmission Buffer.
+      SCTP --Stream Control Transmission Protocol.
+      SG   --Signalling Gateway.
+      SGP  --Signalling Gateway Process.
+
+
+
+
+B. Bidulock                    Version 0.3                        Page 2
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+      SP   --Signalling Point.
+      SS7  --Signalling System No. 7.
+      TC   --Test Case.
+      TS   --Test Suite.
+      VAT  --Validation Test.
+
+
+1.3.  Terminology
+
+  Compatibility Test (CPT)-- A test where multiple implementations are
+      tested in interaction with each other to test for compatibility
+      between implementations.
+
+  Implementation Under Test (IUT)-- An implementation being tested (the
+      object of testing) as part of a validation, compatibility or
+      interoperability test within the test environment.
+
+  Interoperability Test (IOT)-- A test where multiple implementations
+      are tested in interaction with each other to test for
+      interoperability between implementations.
+
+  M2UA Monitor-- A device or function used to monitor, capture, record
+      and analyze the exchange of M2UA messages across and IP network
+      between implementations or protocol testers.  This device function
+      may be integrated with a protocol tester.
+
+  MTP Level 3 Simulator-- A device or function used to simulate the SS7
+      MTP Level 3 [Q.704] to SS7 MTP Level 2 [Q.703], [M2PA]
+      implementation.  This device or function may be integrated within
+      the Test Environment.  This device or function is normally
+      required for SS7 MTP Level 2 Test Specifications [Q.781], [M2PA]
+      validation, compatibility or interoperability tests.
+
+  Protocol Tester (PT)-- A device or function used to generate normal or
+      abnormal messages and test sequences for the purpose of validation
+      testing.
+
+  Signalling Link-- A signalling link, SS7 [Q.703] or M2PA [M2PA], used
+      to carry SS7 MTP Level 2 signalling between IUT and PT.
+
+  Test Case-- A particular sequence of messages and patters that make up
+      a single validation, compatibility or interoperability test.
+
+  Test Environment-- The environment that contains the testing device
+      and functiosn necessary and sufficient for executing a test suite.
+
+  Test Suite-- A collection of test cases meant to acheive a specific
+      objective of validation, compatibility or interoperability
+      testing.
+
+  Validation Test (VAT)-- A test where a single implementation is tested
+      in interaction with a protocol tester to test for validation of
+
+
+B. Bidulock                    Version 0.3                        Page 3
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+      the implementation to a technical specification.
+
+1.4.  Conventions
+
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+  document are to be interpreted as described in [RFC2119].
+
+2.  Test Environment
+
+    The test environment for SS7 MTP Level 2 [Q.781], [M2PATEST07]
+  testing is described in the General Aspects of SS7 testing [Q.780],
+  [M2PATEST07].  There are two types of testing that are accomodated as
+  follows:
+
+  Validation Testing -- consists of validating a single Implementation
+      Under Test (IUT).  This is performed by connecting the IUT to a
+      Protocol Tester (PT) within the test enviroment.
+
+      Validation testing is more extensive that compatibility testing.
+      This is because it is possible, with the use of the Protocol
+      Tester (PT), to generate messages and patterns, that cannot
+      normally be generated from an implementation, to test the response
+      of the Implementation Under Test (IUT) to abnormal conditions.
+
+  Compatibility Testing -- consists of testing the compatiability of one
+      Implementation Under Test (IUT) with another.  This is performed
+      by connecting the IUTs together within the test environment.
+
+      Compatibility testing is less extensive than validation testing.
+      This is because it is not normally possible to generate non-
+      compliant test patterns with an implementation that conforms to
+      validation testing.  However, compatibility tests are better at
+      testing the interoperability of two implementations.
+
+  Interoperability Testing -- consists of testing the interoperability
+      of one Implementation Under Test (IUT) with another.  This is
+      performed by connecting the IUT together within the test
+      environment.
+
+      Interoperability testing is more extensive than compatibility
+      testing and less extensive than validation testing.  Where
+      compatibility testing assumes that the IUT have passed validation
+      testing, interoperability testing makes no such assumption.  In
+      addition, the test environment is expected to have more control
+      over the IUT in interoperability testing than in compatibility
+      testing.  It may be possible to generate some message and command
+      or response sequences that would not normally by possible with an
+      IUT during compatibility testing.
+
+      The objectives of interoperability testing are often different
+      than compatibility testing.  The object of compatibility testing
+      is to assure that an implementation that passes validation testing
+
+B. Bidulock                    Version 0.3                        Page 4
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+      is, in other respects not tested by validation testing, compatible
+      with other such implementations.  The object of interoperability
+      testing is to show that there exist implementations with which
+      each of the IUT being tested can indeed function.
+
+      Although they have different objectives, the test environment
+      configuration for interoperability testing is the same as that for
+      compatibility testing.
+
+2.1.  Test Configurations
+
+    This section details the Validation and Compatibility test
+  configurations used for testing M2UA SG and ASP for SS7 MTP Level 2
+  conformance.
+
+2.1.1.  Validation Test Configuration
+
+    Validation testing consists of validating a single Implementation
+  Under Test (IUT) for SS7 MTP Level 2 conformance.  Several test
+  configurations can be used with M2UA Signalling Gateways (SG) and
+  Application Server Processes (ASP) as follows:
+
+2.1.1.1.  SS7 Validation Test Configuration
+
+    Figure 1 illustrates the Validation Test configuration.  As
+  described in the SS7 Test Specification [Q.780], [M2PATEST07], the SS7
+  Level 2 validation testing environment consists of the following
+  components:
+
+
+
+     _____________________________________________________________
+    |                                                             |
+    | TEST ENVIRONMENT                                            |
+    |                                    MTP Level 3 Simulator    |
+    |       ___________                      _____|_____          |
+    |      |           |                    |           |         |
+    |      |    PT     |____________________|    IUT    |         |
+    |      |   SP B    |  |  Signalling     |   SP A    |         |
+    |      |___________|  |     Link        |___________|         |
+    |         SS7 PT      |                    M2UA SG            |
+    |                     |                                       |
+    |                 ____|____                                   |
+    |                |         |                                  |
+    |                |  Link   |                                  |
+    |                | Monitor |                                  |
+    |                |_________|                                  |
+    |                                                             |
+    |_____________________________________________________________|
+
+              Figure 1.  Validation Test Configuration #1
+
+
+
+B. Bidulock                    Version 0.3                        Page 5
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+   (1)   The Implementation Under Test (IUT) that is being validated a
+         position "SP A".
+
+   (2)   The MTP Level 3 Simulator attached to the IUT at position "SP
+         A".
+
+   (3)   The Protocol Tester (PT) performing validation tests at
+         position "SP B".
+
+   (4)   A Signalling Link [Q.703 or M2PA] between the PT at position
+         "SP B" and the IUT at position "SP A".
+
+   (5)   A Link Monitor monitoring the message exchange accross the
+         Signalling Link [Q.703 or M2PA].  This function MAY be
+         integrated with the Protocol Tester or the Test Environment.
+
+    For this configuration, the interface between the Implementation
+  Under Test (IUT) and the MTP Level 3 Simulator is that described in
+  the SS7 Test Specification [Q.780], [M2PATEST07].  This is the normal
+  configuration for SS7 MTP Level 2 testing [Q.781], [M2PATEST07] and is
+  not modified by this memo.  Normal SS7 MTP Level 2 testing SHOULD be
+  performed on the M2UA SG before performing validation, compatibility
+  or interoperability tests in the other configurations described in
+  this memo.
+
+2.1.1.2.  SG Validation Test Configuration
+
+
+     _____________________________________________________________
+    |                                                             |
+    | TEST ENVIRONMENT                                            |
+    |                                    MTP Level 3 Simulator    |
+    |                                             |               |
+    |                                       M2UA  |  SCTP         |
+    |                                             |  Association  |
+    |       ___________                      _____|_____          |
+    |      |           |                    |           |         |
+    |      |    PT     |____________________|    IUT    |         |
+    |      |   SP B    |  |  Signalling     |   SP A    |         |
+    |      |___________|  |     Link        |___________|         |
+    |         SS7 PT      |                    M2UA SG            |
+    |                     |                                       |
+    |                 ____|____                                   |
+    |                |         |                                  |
+    |                |  Link   |                                  |
+    |                | Monitor |                                  |
+    |                |_________|                                  |
+    |                                                             |
+    |_____________________________________________________________|
+
+              Figure 2.  Validation Test Configuration #2
+
+
+
+B. Bidulock                    Version 0.3                        Page 6
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+    Figure 2 illustrates the Validation Test configuration.  As
+  described in the SS7 Test Specification [Q.780], [M2PATEST07], the SS7
+  Level 2 validation testing environment consists of the following
+  components:
+
+   (1)   The Implementation Under Test (IUT) that is being validated at
+         position "SP A".
+
+   (2)   An MTP Level 3 Simulator attached to the IUT at position "SP
+         A".
+
+   (3)   The Protocol Tester (PT) performing validation tests at
+         position "SP B".
+
+   (4)   A Signalling Link [Q.703 or M2PA] between the PT at position
+         "SP B" and the IUT at position "SP A".
+
+   (5)   A Link Monitor monitoring the message exchange accross the
+         Signalling Link [Q.703 or M2PA].  This function MAY be
+         integrated with the Protocol Tester or the Test Environment.
+
+    In addition, this memo specifies the interface between the
+  Implementation Under Test (IUT) and the MTP Level 3 Simulator [Q.780],
+  [M2PATEST07] within the test environment.
+
+    The MTP Level 3 Simulator SHALL be attached to the IUT a position
+  "SP A" using an M2UA SCTP Association.  The MTP Level 3 Simulator
+  SHALL inject and collect M2UA messages to and from the IUT during the
+  performance of SS7 MTP Level 2 testing [Q.781], [M2PATEST07].  The MTP
+  Level 3 Simulator SHALL inject and collect the M2UA messages as
+  decribed in Section 4 of this document.
+
+2.1.1.3.  SG-ASP Validation Test Configuration
+
+    Figure 3 illustrates a Validation Test Configuration that includes
+  an ASP in the validation tests.  In this case the MTP Level 3
+  Simulator is connected at the ASP rather than directly to the SG.  In
+  this configuration, the combination of ASP and SG form the
+  Implementation Under Test (IUT).
+
+    For this configuration the interface between the MTP Level 3
+  Simulator and the M2UA ASP is the same as for normal SS7 MTP Level 2
+  Testing [Q.780], [Q.781], [M2PATEST07].  The test envirnoment SHOULD
+  include monitoring of the M2UA SCTP Association to ensure the mapping
+  between SS7 MTP Level 2 [Q.703], [M2PA] signals, SS7 MTP Level 2 Test
+  Specification [Q.781], [M2PATEST07] commands, and SS7 MTP2-User
+  Adaptation Layer [M2UA] messages as described in Section 4.
+
+2.1.2.  Compatibility Test Configurations
+
+    Compatibility testing consists of testing two Implementations Under
+  Test (IUT) for compatibility with each other.  Several test
+  configurations can be used with M2UA Signalling Gateways (SG) and
+
+B. Bidulock                    Version 0.3                        Page 7
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+
+     _____________________________________________________________
+    |                                                             |
+    | TEST ENVIRONMENT                                            |
+    |                                    MTP Level 3 Simulator    |
+    |                                        _____|_____          |
+    |                                       |           |         |
+    |                                       |    IUT    | M2UA    |
+    |                                       |   SP A    | ASP     |
+    |                                       |___________|         |
+    |                                             |               |
+    |                                       M2UA  |  SCTP         |
+    |                                             |  Association  |
+    |       ___________                      _____|_____          |
+    |      |           |                    |           |         |
+    |      |    PT     |____________________|    IUT    |         |
+    |      |   SP B    |  |  Signalling     |   SP A    |         |
+    |      |___________|  |     Link        |___________|         |
+    |         Protocol    |                    M2UA SG            |
+    |          Tester     |                                       |
+    |                 ____|____                                   |
+    |                |         |                                  |
+    |                |  Link   |                                  |
+    |                | Monitor |                                  |
+    |                |_________|                                  |
+    |                                                             |
+    |_____________________________________________________________|
+
+              Figure 3.  Validation Test Configuration #3
+
+  Application Server Processes (ASP) as follows:
+
+2.1.2.1.  SS7 Compatibility Test Configuration
+
+    Figure 4 illustrates the Compatibility Test configuration.  As
+  described in the SS7 Test Specification [Q.780], [M2PATEST07], The SS7
+  Level 2 compatibility testing environment consists of the following
+  components:
+
+   (1)   One Impementation Under Test (IUT) for compatibility testing at
+         position "SP A".
+
+   (2)   An MTP Level 3 Simulator attached to the IUT at position "SP
+         A".
+
+   (3)   Another Impementation Under Test (IUT) for compatibility
+         testing at position "SP B".
+
+   (4)   Another MTP Level 3 Simulator attached to the IUT at position
+         "SP B".
+
+   (5)   A Signalling Link [Q.703 or M2PA] between IUT at position "SP
+         A" and IUT at position "SP B".
+
+B. Bidulock                    Version 0.3                        Page 8
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+
+     _____________________________________________________________
+    |                                                             |
+    | TEST ENVIRONMENT                                            |
+    |                                                             |
+    |   MTP Level 3 Simulator            MTP Level 3 Simulator    |
+    |       _____|_____                      _____|_____          |
+    |      |           |                    |           |         |
+    |      |    IUT    |____________________|    IUT    |         |
+    |      |   SP B    |  |  Signalling     |   SP A    |         |
+    |      |___________|  |     Link        |___________|         |
+    |         M2UA SG     |                    M2UA SG            |
+    |                     |                                       |
+    |                 ____|____                                   |
+    |                |         |                                  |
+    |                |  Link   |                                  |
+    |                | Monitor |                                  |
+    |                |_________|                                  |
+    |                                                             |
+    |_____________________________________________________________|
+
+             Figure 4.  Compatibility Test Configuration #1
+
+   (6)   A Link Monitor monitoring the message exchange accross the
+         Signalling Link [Q.703 or M2PA].
+
+    For this configuration, the interface between each Implementation
+  Under Test (IUT) and the MTP Level 3 Simulator is that described in
+  the SS7 Test Specifications [Q.780], [M2PATEST07].  This is the normal
+  configuration for SS7 MTP Level 2 testing [Q.781], [M2PATEST07] and is
+  not modified by this memo.  Normal SS7 MTP Level 2 testing SHOULD be
+  peformed on the M2UA SG before performing compatibility tests in the
+  other configurations described in this memo.
+
+2.1.2.2.  SG Compatibility Test Configuration
+
+    Figure 5 illustrates the Compatibility Test configuration.  As
+  described in the SS7 Test Specification [Q.780], [M2PATEST07], The SS7
+  Level 2 compatibility testing environment consists of the following
+  components:
+
+   (1)   One Impementation Under Test (IUT) for compatibility testing at
+         position "SP A".
+
+   (2)   An MTP Level 3 Simulator attached to the IUT at position "SP
+         A".
+
+   (3)   Another Impementation Under Test (IUT) for compatibility
+         testing at position "SP B".
+
+   (4)   Another MTP Level 3 Simulator attached to the IUT at position
+         "SP B".
+
+
+B. Bidulock                    Version 0.3                        Page 9
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+
+     _____________________________________________________________
+    |                                                             |
+    | TEST ENVIRONMENT                                            |
+    |                                                             |
+    |   MTP Level 3 Simulator            MTP Level 3 Simulator    |
+    |            |                                |               |
+    |      M2UA  |  SCTP                    M2UA  |  SCTP         |
+    |            |  Association                   |  Association  |
+    |       _____|_____                      _____|_____          |
+    |      |           |                    |           |         |
+    |      |    IUT    |____________________|    IUT    |         |
+    |      |   SP B    |  |  Signalling     |   SP A    |         |
+    |      |___________|  |     Link        |___________|         |
+    |         M2UA SG     |                    M2UA SG            |
+    |                     |                                       |
+    |                 ____|____                                   |
+    |                |         |                                  |
+    |                |  Link   |                                  |
+    |                | Monitor |                                  |
+    |                |_________|                                  |
+    |                                                             |
+    |_____________________________________________________________|
+
+             Figure 5.  Compatibility Test Configuration #2
+
+   (5)   A Signalling Link [Q.703 or M2PA] between IUT at position "SP
+         A" and IUT at position "SP B".
+
+   (6)   A Link Monitor monitoring the message exchange accross the
+         Signalling Link [Q.703 or M2PA].
+
+    In addition, this memo specifies the interface between the
+  Implementation Under Test (IUT) and the MTP Level 3 Simulator [Q.780],
+  [M2PATEST07] within the test environment.
+
+    The MTP Level 3 Simulators SHALL be attached to the IUT at position
+  "SP A" and the IUT at position "SP B" using an M2UA SCTP Association.
+  The MTP Level 3 Simulator SHALL inject and collect M2UA messages to
+  and from the IUT during the performance of SS7 MTP Level 2 testing
+  [Q.781], [M2PATEST07].  The MTP Level 3 Simulator SHALL inject and
+  collect the M2UA messages as decribed in Section 4 of this document.
+
+2.1.2.3.  SG-ASP Compatibility Test Configuration
+
+    Figure 6 illustrates a Compatibility Test Configuration that
+  includes an ASP in the compatibility tests.  In this case the MTP
+  Level 3 Simulator is connected at the ASP rather than directly to the
+  SGs.  IN this configuration, the combination of each ASP and SG form
+  the two Implementations Under Test (IUT).
+
+    For this configuration, the interface between the MTP Level 3
+  Simulator and the M2UA ASP is the same as for normal SS7 MTP Level 2
+
+B. Bidulock                    Version 0.3                       Page 10
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+
+     _____________________________________________________________
+    |                                                             |
+    | TEST ENVIRONMENT                                            |
+    |                                                             |
+    |   MTP Level 3 Simulator            MTP Level 3 Simulator    |
+    |       _____|_____                      _____|_____          |
+    |      |           |                    |           |         |
+    |      |    IUT    | M2UA               |    IUT    | M2UA    |
+    |      |   SP A    | ASP                |   SP B    | ASP     |
+    |      |___________|                    |___________|         |
+    |            |                                |               |
+    |      M2UA  |  SCTP                    M2UA  |  SCTP         |
+    |            |  Association                   |  Association  |
+    |       _____|_____                      _____|_____          |
+    |      |           |                    |           |         |
+    |      |    IUT    |____________________|    IUT    |         |
+    |      |   SP A    |  |  Signalling     |   SP B    |         |
+    |      |___________|  |     Link        |___________|         |
+    |         M2UA SG     |                    M2UA SG            |
+    |                     |                                       |
+    |                 ____|____                                   |
+    |                |         |                                  |
+    |                |  Link   |                                  |
+    |                | Monitor |                                  |
+    |                |_________|                                  |
+    |                                                             |
+    |_____________________________________________________________|
+
+             Figure 6.  Compatibility Test Configuration #3
+
+  Testing [Q.780], [Q.781], [M2PATEST07].  The test environment SHOULD
+  include monitoring of the M2UA SCTP Association to ensure the mapping
+  between SS7 MTP Level 2 [Q.703], [M2PA] signals, SS7 MTP Level 2 Test
+  Specification [Q.781], [M2PATEST07] commands, and SS7 MTP2-User
+  Adaptation Layer [M2UA] messages as described in Section 4.
+
+2.2.  Testing Methodologies
+
+2.2.1.  Test Sequence
+
+    Testing of a particular M2UA SG implementation SHOULD be performed
+  in the following order.
+
+   (1)   Validation Test Configuration #1 -- validation tests [Q.781
+         or M2PATEST07] directly.
+
+   (2)   Validation Test Configuration #2 -- validation tests [Q.781
+         or M2PATEST07] with M2UA interface between SG and MTP Level 3
+         Simulator.
+
+   (3)   Compatibility Test Configuration #1 -- compatibility tests
+         [Q.781 or M2PATEST07] directly.
+
+B. Bidulock                    Version 0.3                       Page 11
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+   (4)   Compatibility Test Configuration #2 -- compatibility tests
+         [Q.781 or M2PATEST07] with M2UA interface between SG and MTP
+         Level 3 Simulator.
+
+    Testing of a particular M2UA ASP implementation against an SG
+  implementation (already tested per above) SHOULD be performed in the
+  following order:
+
+   (5)   Validation Test Configuration #3 -- validation tests [Q.781
+         or M2PATEST07] directly, with SG/ASP interaction within the
+         IUT.
+
+   (6)   Compatibility Test Configuration #3 -- compatibility tests
+         [Q.781 or M2PATEST07] directly, with SG/ASP interaction within
+         the IUT.
+
+    In addtion, validation testing of the M2UA protocol between ASP and
+  SG SHOULD be performed independent of SS7 MTP Level 2 validation
+  testing in accordance with a validation test suite for M2UA<1>.  Also,
+  compatibility testing of the M2UA protocol between ASP and SG SHOULD
+  be performed independent of SS7 MTP Level 2 compatibility testing in
+  accordance with a compatibility test suite for M2UA<2>.
+
+    The normal methodology for testing SS7 MTP Level 2 [Q.781],
+  [M2PATEST07] is to perform validation testing on an IUT before
+  performing compatibility testing.  The tests presented in [Q.781
+  and M2PATEST07] test the functionality of the MTP Level 2 state
+  machines; however, they do not adequately test the L2 to L3 interface.
+
+    To complete validation and compatibility testing of M2UA, the
+  validation and compatibility tests presented in the SS7 MTP Level 3
+  Test Specification [Q.782] SHOULD be performed with the M2UA ASP in
+  the test environment to assure that the M2UA IUT has properly
+  implemented the L2 to L3 interface.  The test environment for
+  executing [Q.782] tests are outside the scope of this document.
+
+   (7)   MTP Level 3 Validation Tests -- validation tests [Q.781]
+         performed with SG/ASP interaction within the IUT.
+
+   (8)   MTP Level 3 Compatibility Tests -- compatibility tests [Q.781]
+         performed with SG/ASP interaction within the IUT.
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 12
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+
+Notes for Section 2
+
+  <1>  At the time of writing this memo, there did not exist an IETF
+       validation test suite specification for the M2UA protocol.  The
+       author of this memo is working on the development of such a
+       specification.
+
+  <2>  At the timer of writing this memo, there did not exist an IETF
+       compatibility test suite specificaiton for the M2UA protocol.
+       There does exist, however, several M2UA Interop test plans that
+       come close to such a specification.  The author of this memo is
+       also working on the development of such a specification.
+
+3.  Tests
+
+    This section details the validation and compatibility tests to be
+  performed.
+
+3.1.  Test Cases
+
+    In each test configuration, the applicable Validation tests or
+  Compatibility tests of the SS7 MTP Level 2 Test Specification [Q.781],
+  [M2PATEST07], or other applicatble SS7 MTP Level 2 test specification,
+  SHALL be performed.
+
+4.  Mapping of Signals
+
+    The mapping of SS7 MTP Level 2 [Q.703], [M2PA] signals, SS7 MTP
+  Level 2 Test [Q.781], [M2PATEST07] commands, and SS7 MTP2-User
+  Adaptation Layer [M2UA] messages are listed in Table 1.  Each [Q.703],
+  [M2PA] signal SHALL be mapped onto a [Q.781], [M2PATEST07] command or
+  indication and onto a [M2UA] message.  When the SS7 MTP Level 2
+  [Q.781], [M2PATEST07] test case calls for a given [Q.703], [M2PA]
+  signal or [Q.781], [M2PATEST07] command or indication, the
+  corresponding [M2UA] message SHALL be injected or collected by the MTP
+  Level 3 Simulator.
+
+   Table 1. Mapping of Q.703 Signals, Q.781 Commands and M2UA Messages
+
+      M2UA        | M2UA                 | Q.703        | Q.781
+      Message     | Parameter            | Signal       | Notation
+      ------------+----------------------+--------------+------------
+      ESTABLISH   |                      | Start        | :start
+      Request     |                      |              |
+      ------------+----------------------+--------------+------------
+      ESTABLISH   |                      | In Service   | <1>
+      Confirm     |                      |              |
+      ------------+----------------------+--------------+------------
+      RELEASE     |                      | Stop         | :stop
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 13
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+      M2UA        | M2UA                 | Q.703        | Q.781
+      Message     | Parameter            | Signal       | Notation
+      ------------+----------------------+--------------+------------
+      Request     |                      |              |
+      ------------+----------------------+--------------+------------
+      RELEASE     |                      | <5>          | <5>
+      Confirm     |                      |              |
+      ------------+----------------------+--------------+------------
+      RELEASE     |                      | Link         | <2>
+      Indication  |                      | Failure      |
+      ------------+----------------------+--------------+------------
+      STATE       | STATUS_LPO_SET       | Local        | :set LPO
+      Request     |                      | Processor    |
+                  |                      | Outage       |
+                  +----------------------+--------------+------------
+                  | STATUS_LPO_CLR       | Local        | :clear LPO
+                  |                      | Processor    |
+                  |                      | Recovered    |
+                  +----------------------+--------------+------------
+                  | STATUS_EMER_SET      | Emergency    | :set EM
+                  +----------------------+--------------+------------
+                  | STATUS_EMER_CLR      | Emergency    | :clear EM
+                  |                      | Ceases       |
+                  +----------------------+--------------+------------
+                  | STATUS_FLUSH_BUFFERS | Flush        | <3>
+                  |                      | Buffers      |
+                  +----------------------+--------------+------------
+                  | STATUS_CONTINUE      | Continue     | <3>
+                  +----------------------+--------------+------------
+                  | STATUS_CLEAR_RTB     | Clear        | <3>
+                  |                      | RTB          |
+                  +----------------------+--------------+------------
+                  | STATUS_CONG_ACCEPT   | Congestion   | <4>
+                  |                      | Accept       |
+                  +----------------------+--------------+------------
+                  | STATUS_CONG_DISCARD  | Congestion   | :make
+                  |                      | Discard      | congestion
+                  |                      |              | state
+                  +----------------------+--------------+------------
+                  | STATUS_CONG_CLEAR    | No           | :clear
+                  |                      | Congestion   | congestion
+                  |                      |              | state
+      ------------+----------------------+--------------+------------
+      STATE       |                      | <5>          | <5>
+      Confirm     |                      |              |
+      ------------+----------------------+--------------+------------
+      STATE       | EVENT_RPO_ENTER      | Remote       | <9>
+      Indication  |                      | Processor    |
+                  |                      | Outage       |
+                  +----------------------+--------------+------------
+                  | EVENT_RPO_EXIT       | Remote       | <9>
+                  |                      | Processor    |
+
+
+B. Bidulock                    Version 0.3                       Page 14
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+      M2UA        | M2UA                 | Q.703        | Q.781
+      Message     | Parameter            | Signal       | Notation
+      ------------+----------------------+--------------+------------
+                  |                      | Recovered    |
+      ------------+----------------------+--------------+------------
+      DATA        | ACTION_RTRV_BSN      | Retrieve     | <7>
+      RETRIEVAL   |                      | BSNT         |
+      Request     +----------------------+--------------+------------
+                  | ACTION_RTRV_MSGS     | Retrieval    | <7>
+                  |                      | Request      |
+                  |                      | and FSNC     |
+      ------------+----------------------+--------------+------------
+      DATA        | ACTION_RTRV_MSGS     | Retrieved    | <7>
+      RETRIEVAL   |                      | Message      |
+      Confirm     +----------------------+--------------+------------
+                  | ACTION_RTRV_BSN      | BSNT         | <7>
+      ------------+----------------------+--------------+------------
+      DATA        |                      | Retrieval    | <7>
+      RETRIEVAL   |                      | Complete     |
+      COMPLETE    |                      |              |
+      Indication  |                      |              |
+      ------------+----------------------+--------------+------------
+      CONGESTION  |                      | <6>          | <6>
+      Indication  |                      |              |
+      ------------+----------------------+--------------+------------
+      DATA        |                      | <5>          | <5>
+      Acknowledge |                      |              |
+      ------------+----------------------+--------------+------------
+      DATA        |                      | Message      | <8>
+      Request     |                      | for          |
+                  |                      | Transmission |
+      ------------+----------------------+--------------+------------
+      DATA        |                      | Received     |
+      Indication  |                      | Message      |
+      ------------+----------------------+--------------+------------
+      <10>        |                      | Power On     | :power ON
+      ------------+----------------------+--------------+------------
+      <10>        |                      | --           | :tx break
+      ------------+----------------------+--------------+------------
+
+
+  Notes for Table 1:
+
+  <1>  MTP Level 2 Test Specifications [Q.781], [M2PATEST07] do not
+       provide a notation for "In Service" indication; however, in a
+       number of test cases it is necessary to establish that the link
+       is in the "In Service" state.  The ESTABLISH Confirm [M2UA]
+       message sent by the SG can be used to confirm that the link has
+       acheived the "In Service" state.
+
+  <2>  MTP Level 2 Test Specifications [Q.781], [M2PATEST07] do not
+       provide a notation for "Link Failure" indication; however, in a
+
+
+B. Bidulock                    Version 0.3                       Page 15
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+       number of test cases it is necessary to establish that the link
+       has failed.  The RELEASE Indication [M2UA] message sent by the SG
+       can be used to confirm that the link has failed.
+
+  <3>  MTP Level 2 Test Specifications [Q.781], [M2PATEST07] do not
+       provide a notation for "Flush Buffers," "Clear RTB," "Continue,"
+       or "Resume."  However, use of these primitives is necessary in
+       some test cases (e.g. test case 4.1 [Q.781], test case 3.4.1
+       [M2PATEST07]).  The STATE Request [M2UA] message with the
+       STATUS_FLUSH_BUFFERS, STATUS_CLEAR_RTB or STATUS_CONTINUE state
+       values SHOULD be used to perform these functions.
+
+  <4>  MTP Level 2 Test Specifications [Q.781], [M2PATEST07] do not
+       require the use of this request.
+
+  <5>  There are no SS7 MTP Level 2 [Q.703], [M2PA] signals or SS7 MTP
+       Level 2 Test [Q.781], [M2PATEST07] actions that correspond to
+       these [M2UA] messages; however, these messages are required by
+       the [M2UA] specifications and it SHOULD be verified that the SG
+       issues these messages to the test enviroment under the
+       appropriate conditions during testing.
+
+  <6>  Although SS7 MTP Level 2 [Q.703], [M2PA] provides signals to SS7
+       MTP Level 3 [Q.704] indicating congesiton onset and abatement
+       that use these [M2UA] messages, SS7 MTP Level 2 Tests [Q.781],
+       [M2PATEST07] do not perform congestion testing that would
+       generate these indications to the test environment.
+
+  <7>  MTP Level 2 Test Specifications [Q.781], [M2PATEST07] do not test
+       retrieval.  Retrieval tests are performed by SS7 MTP Level 3
+       testing [Q.782].
+
+  <8>  MTP Level 2 Test Specifications [Q.781], [M2PATEST07] do not have
+       a notation for signalling messages (other than indicating that an
+       MSU is sent or received); however, signalling messages are
+       exchanged between L2 and L3 as a normal course of most of the SS7
+       MTP Level 2 tests [Q.781], [M2PATEST07].
+
+  <9>  MTP Level 2 Test Specifications [Q.781], [M2PATEST07] do not
+       provide a notation for "Remote Processor Outage" or "Remote
+       Processor Recovered" indications.  These indications are not
+       required in SS7 MTP Level 2 tests [Q.781], [M2PATEST07]; however,
+       these indications SHOULD be delivered to the test environment on
+       entry and exit from the "Remote Processour Outage" state.
+
+  <10> MTP Level 2 Test Specifications [Q.781], [M2PATEST07] defines
+       these signals, and these signals are required within the test
+       environment [Q.780], [M2PATEST07]; however, these signals are
+       outside the scope of the SS7 MTP2-User Adaptation Layer [M2UA]
+       protocol and SHOULD be generated by other means.
+
+       Note that it is possible that some implementations might use the
+       REGISTRATION Request or ASP-ACTIVE [M2UA] messages for powering
+
+B. Bidulock                    Version 0.3                       Page 16
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+       on the signalling link.
+
+    All of the applicable validation or compatibility tests of the SS7
+  MTP Level 2 Test Specification [Q.781], [M2PATEST07] SHALL be
+  performed in this fashion with the mapping presented in Table 1.  For
+  other SS7 Conformance Test Specifications, a similar mapping and the
+  test configurations presented SHOULD be used.
+
+5.  Examples
+
+Security Considerations
+
+    There are no security considerations for this draft.
+
+IANA Considerations
+
+    There are no IANA considerations for this draft.
+
+
+0.  Change History
+
+    This section provides historical information on the changes made to
+  this draft.  This section will be removed from the document when the
+  document is finalized.
+
+0.3.  Changes from Version 0.2 to Version 0.3
+
+   (1)   updated to new boilerplate and idnits-2.00.1
+
+   (2)   updated references, version numbers and dates
+
+0.2.  Changes from Version 0.1 to Version 0.2
+
+   (1)   Updated version numbers and resubmitted.
+
+   (2)   Updated first and last page to IETF boiler plate.
+
+    Updated dates, versions and references.
+
+0.1.  Changes from Version 0.0 to Version 0.1
+
+    Updated dates and references.
+
+0.0.  Version 0.0
+
+    This is the first version of this document.
+
+0.0.0.  Change Log
+
+    $Log: draft-bidulock-sigtran-m2ua-ss7test-03.me,v $
+    Revision 0.9.2.1  2007/02/03 15:47:17  brian
+    - added new drafts
+
+
+B. Bidulock                    Version 0.3                       Page 17
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+    Revision 0.9.2.5  2006/06/27 09:41:12  brian
+    - rereleased drafts
+
+    Revision 0.9.2.4  2006/06/18 20:53:33  brian
+    - preparing for draft rerelease
+
+    Revision 0.9.2.3  2005/10/17 11:53:44  brian
+    - updated drafts for republication
+
+    Revision 0.9.2.2  2005/05/14 08:33:15  brian
+    - copyright header correction
+
+    Revision 0.9.2.1  2004/08/21 10:14:37  brian
+    - Force checkin on branch.
+
+    Revision 0.9  2004/02/17 09:44:31  brian
+    - Baseline for documentation.
+
+    Revision 0.8.2.3  2003/07/28 13:10:34  brian
+    Reformatting.
+
+    Revision 0.8.2.2  2003/07/27 08:15:27  brian
+    Checking in changes.
+
+    Revision 0.8.2.1  2003/07/26 23:19:03  brian
+    Minor corrections to table.
+
+    Revision 0.8  2003/07/26 19:10:57  brian
+    Added new drafts.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 18
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+
+Normative References
+
+  [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+       Requirement Levels," BCP 14/RFC 2119, The Internet Society (March
+       1997).  <http://www.ietf.org/rfc/rfc2119.txt>
+
+  [M2UA]  Morneault, K., Dantu, R., Sidebottom, G., Bidulock, B. and
+       Heitz, J., "Signaling System 7 (SS7) Message Transfer Part 2
+       (MTP2) -- User Adaptation Layer," RFC 3331, The Internet Society
+       (September 2002).  <http://www.ietf.org/rfc/rfc3331.txt>
+
+  [Q.780]  ITU, "Signalling System No. 7 Test Specification -- General
+       Description," ITU-T Recommendation Q.780, ITU-T Telecommunication
+       Standardization Sector of ITU, Geneva (October 1995).
+       (Previously "CCITT Recommendation")
+
+  [Q.781]  ITU, "Signalling System No. 7 -- MTP Level 2 Test
+       Specification," ITU-T Recommendation Q.781, ITU-T
+       Telecommunication Standardization Sector of ITU, Geneva (March
+       1993).  (Previously "CCITT Recommendation")
+
+  [M2PATEST07]  Bidulock, B., "SS7 MTP2-User Peer-to-Peer Adaptation
+       Layer -- Test Specifications," draft-bidulock-sigtran-m2pa-
+       test-07.txt, Internet Engineering Task Force -- Signalling
+       Transport Working Group (June 18, 2006).  Work In Progress.
+       (Expired) <http://www.ietf.org/internet-drafts/draft-bidulock-
+       sigtran-m2pa-test-07.txt>
+
+  [Q.703]  ITU, "Signalling System No. 7 -- Signalling Link," ITU-T
+       Recommendation Q.703, ITU-T Telecommunication Standardization
+       Sector of ITU, Geneva (March 1993).  (Previously "CCITT
+       Recommendation")
+
+  [M2PA]  George, T., Bidulock, B., Dantu, R., Schwarzbauer, H. J. and
+       Morneault, K., "Signaling System 7 (SS7) Message Transfer Part 2
+       (MTP2)-User Peer-to-Peer Adaptation Layer (M2PA)," RFC 4165, The
+       Internet Society (September 2005).  (Status: PROPOSED STANDARD)
+       <http://www.ietf.org/rfc/rfc4165.txt>
+
+Informative References
+
+  [Q.704]  ITU, "Message Transfer Part -- Signalling Network Functions
+       and Messages," ITU-T Recommendation Q.704, ITU-T
+       Telecommunication Standardization Sector of ITU, Geneva (March
+       1993).  (Previously "CCITT Recommendation")
+
+  [Q.782]  ITU, "Specifications of Signalling System No. 7 -- Test
+       Specification -- MTP Level 3 Test Specification," ITU-T
+       Recommendation Q.782, ITU-T Telecommunication Standardization
+       Sector of ITU, Geneva (July 1996).  (Previously "CCITT
+       Recommendation")
+
+
+B. Bidulock                    Version 0.3                       Page 19
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+
+Author's Addresses
+
+  Brian Bidulock
+  OpenSS7 Corporation
+  1469 Jeffreys Crescent
+  Edmonton, AB  T6L 6T1
+  Canada
+
+  Phone: +1-780-490-1141
+  Email: bidulock@openss7.org
+  URL: http//www.openss7.org/
+
+
+
+
+  This draft expires August 2007.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 20
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+
+                            List of Tables
+
+  Table 1. Mapping of Q.703 Signals, Q.781 Commands and M2UA
+    Messages ......................................................   13
+
+                        List of Illustrations
+
+  Figure 1. Validation Test Configuration #1 ......................    5
+  Figure 2. Validation Test Configuration #2 ......................    6
+  Figure 3. Validation Test Configuration #3 ......................    8
+  Figure 4. Compatibility Test Configuration #1 ...................    9
+  Figure 5. Compatibility Test Configuration #2 ...................   10
+  Figure 6. Compatibility Test Configuration #3 ...................   11
+
+                          Table of Contents
+
+  Status of this Memo .............................................    1
+  Copyright .......................................................    1
+  Abstract ........................................................    1
+  1 Introduction ..................................................    2
+  1.1 Scope .......................................................    2
+  1.2 Abbreviations ...............................................    2
+  1.3 Terminology .................................................    3
+  1.4 Conventions .................................................    4
+  2 Test Environment ..............................................    4
+  2.1 Test Configurations .........................................    5
+  2.1.1 Validation Test Configuration .............................    5
+  2.1.2 Compatibility Test Configurations .........................    7
+  2.2 Testing Methodologies .......................................   11
+  2.2.1 Test Sequence .............................................   11
+  Notes for Section 2 .............................................   13
+  3 Tests .........................................................   13
+  3.1 Test Cases ..................................................   13
+  4 Mapping of Signals ............................................   13
+  5 Examples ......................................................   17
+  Security Considerations .........................................   17
+  IANA Considerations .............................................   17
+  0 Change History ................................................   17
+  0.3 Changes from Version 0.2 to Version 0.3 .....................   17
+  0.2 Changes from Version 0.1 to Version 0.2 .....................   17
+  0.1 Changes from Version 0.0 to Version 0.1 .....................   17
+  0.0 Version 0.0 .................................................   17
+  0.0.0 Change Log ................................................   17
+  Normative References ............................................   19
+  Informative References ..........................................   19
+  Author's Addresses ..............................................   20
+  List of Tables ..................................................   21
+  List of Illustrations ...........................................   21
+  Table of Contents ...............................................   21
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 21
+
+Internet-Draft                M2UA-SS7TEST              February 3, 2007
+
+Intellectual Property
+
+  The IETF takes no position regarding the validity or scope of any
+  Intellectual Property Rights or other rights that might be claimed to
+  pertain to the implementation or use of the technology described in
+  this document or the extent to which any license under such rights
+  might or might not be available; nor does it represent that it has
+  made any independent effort to identify any such rights.  Information
+  on the procedures with respect to rights in RFC documents can be found
+  in BCP 78 and BCP 79.
+
+  Copies of IPR disclosures made to the IETF Secretariat and any
+  assurances of licenses to be made available, or the result of an
+  attempt made to obtain a general license or permission for the use of
+  such proprietary rights by implementers or users of this specification
+  can be obtained from the IETF on-line IPR repository at
+  http://www.ietf.org/ipr.
+
+  The IETF invites any interested party to bring to its attention any
+  copyrights, patents or patent applications, or other proprietary
+  rights that may cover technology that may be required to implement
+  this standard.  Please address the information to the IETF at ietf-
+  ipr@ietf.org.
+
+Disclaimer of Validity
+
+  This document and the information contained herein are provided on an
+  "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+  OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY, THE IETF TRUST AND
+  THE INTERNET ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS
+  OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF
+  THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+  WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Full Copyright Statement
+
+  Copyright (C) The IETF Trust (2007).  This document is subject to the
+  rights, licenses and restrictions contained in BCP 78, and except as
+  set forth therein, the authors retain all their rights.
+
+Acknowledgement
+
+  Funding for the RFC Editor function is currently provided by the
+  Internet Society.
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.3                       Page 22
+

@@ -64,8 +64,11 @@
 ##	name	    prefix	major	n-minors    n-majors
 #driver	mg	    mg		*
 #driver	mx	    mx		*
-#driver	m2ua-as	    m2ua_as	*
-driver	m2ua-mux	    m2ua_mux	*
+driver	m2ua-as	    m2ua_as	*
+driver	m3ua-as	    m3ua_as	*
+driver	sua-as	    sua_as	*
+driver	tua-as	    tua_as	*
+driver	isua-as	    isua_as	*
 
 ## Pushable module specifications
 ## -----------------------------------------------------------
@@ -76,8 +79,11 @@ driver	m2ua-mux	    m2ua_mux	*
 ##	type	name	    object name
 #objname	driver	mg	    mg
 #objname	driver	mx	    mx
-#objname	driver	m2ua-as	    m2ua_as
-objname	driver	m2ua-mux	    m2ua_mux
+objname	driver	m2ua-as	    m2ua_as
+objname	driver	m3ua-as	    m3ua_as
+objname	driver	sua-as	    sua_as
+objname	driver	tua-as	    tua_as
+objname	driver	isua-as	    isua_as
 
 
 ##
@@ -86,8 +92,11 @@ objname	driver	m2ua-mux	    m2ua_mux
 ##		name
 #loadable	mg
 #loadable	mx
-#loadable	m2ua-as
-loadable	m2ua-mux
+loadable	m2ua-as
+loadable	m3ua-as
+loadable	sua-as
+loadable	tua-as
+loadable	isua-as
 
 ##   Node specifications
 ## -----------------------------------------------------------
@@ -96,7 +105,10 @@ loadable	m2ua-mux
 #node	/dev/mg-lm		c   0666    mg		1
 #node	/dev/mx			c   0666    mx		0
 #node	/dev/mx-lm		c   0666    mx		1
-#node	/dev/m2ua-as		c   0666    m2ua-as	0
-node	/dev/m2ua-mux		c   0666    m2ua-mux	0
+node	/dev/m2ua-as		c   0666    m2ua-as	0
+node	/dev/m3ua-as		c   0666    m3ua-as	0
+node	/dev/sua-as		c   0666    sua-as	0
+node	/dev/tua-as		c   0666    tua-as	0
+node	/dev/isua-as		c   0666    isua-as	0
 
 ## vim: ft=config comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

@@ -250,7 +250,11 @@ EXTRA_libSIGTRANdrvs_a_SOURCES	= \
 				src/drivers/tua_spp.c \
 				src/drivers/tua_ss7.c
 libSIGTRANdrvs_a_SOURCES	= \
-				src/drivers/m2ua_as.c
+				src/drivers/m2ua_as.c \
+				src/drivers/m3ua_as.c \
+				src/drivers/sua_as.c \
+				src/drivers/tua_as.c \
+				src/drivers/isua_as.c
 libSIGTRANdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libSIGTRANdrvs_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libSIGTRANdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
