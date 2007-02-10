@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2006/08/16 07:30:47 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2007/02/10 22:30:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/16 07:30:47 $ by $Author: brian $
+# Last Modified $Date: 2007/02/10 22:30:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -155,7 +155,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		    (centos)
 			case $dist_cv_host_release in
 			    (3|3.?)	rpm_cv_dist_extra=".centos3"	;;
-			    (4|4.0)	rpm_cv_dist_extra=".centos4"	;;
+			    (4|4.?)	rpm_cv_dist_extra=".centos4"	;;
 			    (5|5.0)	rpm_cv_dist_extra=".centos5"	;;
 			esac
 			;;
@@ -232,7 +232,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		    (centos)
 			case $dist_cv_host_release in
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
-			    (4|4.0)	rpm_cv_dist_extra2=".EL4"	;;
+			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
 			    (5|5.0)	rpm_cv_dist_extra2=".EL5"	;;
 			    (*)		rpm_cv_dist_extra2=".COS${dist_cvs_host_release}" ;;
 			esac
@@ -240,7 +240,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		    (lineox)
 			case $dist_cv_host_release in
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
-			    (4|4.0)	rpm_cv_dist_extra2=".EL4"	;;
+			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
 			    (5|5.0)	rpm_cv_dist_extra2=".EL5"	;;
 			    (*)		rpm_cv_dist_extra2=".LEL${dist_cvs_host_release}" ;;
 			esac
