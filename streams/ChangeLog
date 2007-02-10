@@ -1,3 +1,9 @@
+2007-02-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/sth.c: fixed missing spinlock symbols
+	  - corrected missing spinlock symbols on ubuntu i386 UP kernels
+	  - this fixes problem report openss7/3474
+
 2007-01-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/streams.refs: added references to all packages

@@ -1,3 +1,11 @@
+2007-02-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/rawip.c: fixed missing spinlock symbols
+	* src/drivers/tcp.c: fixed missing spinlock symbols
+	* src/drivers/udp.c: fixed missing spinlock symbols
+	  - corrected missing spinlock symbols on ubuntu i386 UP kernels
+	  - this fixes problem report openss7/3474
+
 2007-01-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/test/test-inet_raw.c: updated test programs

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.173 $) $Date: 2007/01/27 09:23:54 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.174 $) $Date: 2007/02/10 15:53:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/27 09:23:54 $ by $Author: brian $
+ Last Modified $Date: 2007/02/10 15:53:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.174  2007/02/10 15:53:11  brian
+ - PR: openss7/4734 fixed missing spinlock symbols on ubuntu i386 UP kernels
+
  Revision 0.9.2.173  2007/01/27 09:23:54  brian
  - behavior and docs for IOC_NONE
 
@@ -178,10 +181,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.173 $) $Date: 2007/01/27 09:23:54 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.174 $) $Date: 2007/02/10 15:53:11 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.173 $) $Date: 2007/01/27 09:23:54 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.174 $) $Date: 2007/02/10 15:53:11 $";
 
 //#define __NO_VERSION__
 
@@ -282,7 +285,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.173 $) $Date: 2007/01/27 09:23:54 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.174 $) $Date: 2007/02/10 15:53:11 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1292,7 +1295,11 @@ alloc_proto(const struct stdata *sd, const struct strbuf *ctlp, const struct str
 
 #ifndef HAVE_TASKLIST_LOCK_EXPORT
 #ifndef HAVE_TASKLIST_LOCK_ADDR
+#ifdef CONFIG_SMP
 #error Need access to tasklist_lock.
+#else
+static rwlock_t tasklist_lock = RW_LOCK_UNLOCKED;
+#endif
 #endif				/* HAVE_TASKLIST_LOCK_ADDR */
 static rwlock_t *tasklist_lock_p = (typeof(&tasklist_lock)) HAVE_TASKLIST_LOCK_ADDR;
 #define tasklist_lock (*tasklist_lock_p)

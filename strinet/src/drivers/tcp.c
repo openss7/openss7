@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/08/16 07:47:37 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/02/10 15:53:23 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/16 07:47:37 $ by $Author: brian $
+ Last Modified $Date: 2007/02/10 15:53:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.15  2007/02/10 15:53:23  brian
+ - PR: openss7/4734 fixed missing spinlock symbols on ubuntu i386 UP kernels
+
  Revision 0.9.2.14  2006/08/16 07:47:37  brian
  - removed locking macro pollution
 
@@ -95,9 +98,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/08/16 07:47:37 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/02/10 15:53:23 $"
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/08/16 07:47:37 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/02/10 15:53:23 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -176,7 +179,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.14 $
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/08/16 07:47:37 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/02/10 15:53:23 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -4041,7 +4044,13 @@ tpi_v4_err_next(struct sk_buff *skb, __u32 info)
 		ip->next->err_handler(skb, info);
 	return (0);
 }
+#ifdef CONFIG_SMP
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
+#else				/* CONFIG_SMP */
+static spinlock_t inet_proto_lock_ = SPIN_LOCK_UNLOCKED;
+
+#define inet_proto_lockp (&inet_proto_lock_)
+#endif				/* CONFIG_SMP */
 
 #ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
 #define module_text_address(__arg) ((typeof(&module_text_address))HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))

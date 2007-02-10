@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/12/08 05:23:57 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/02/10 15:53:23 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:23:57 $ by $Author: brian $
+ Last Modified $Date: 2007/02/10 15:53:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.52  2007/02/10 15:53:23  brian
+ - PR: openss7/4734 fixed missing spinlock symbols on ubuntu i386 UP kernels
+
  Revision 0.9.2.51  2006/12/08 05:23:57  brian
  - bufq locking changes and debian init script name correction
 
@@ -224,10 +227,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/12/08 05:23:57 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/02/10 15:53:23 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/12/08 05:23:57 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/02/10 15:53:23 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -309,7 +312,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2006/12/08 05:23:57 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/02/10 15:53:23 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -3753,6 +3756,10 @@ tp_v4_err_next(struct sk_buff *skb, __u32 info)
 	return;
 }
 
+#ifndef CONFIG_SMP
+#define net_protocol_lock() local_bh_disable()
+#define net_protocol_unlock() local_bh_enable()
+#else				/* CONFIG_SMP */
 #ifdef HAVE_INET_PROTO_LOCK_ADDR
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
 
@@ -3762,6 +3769,7 @@ STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO
 #define net_protocol_lock() br_write_lock_bh(BR_NETPROTO_LOCK)
 #define net_protocol_unlock() br_write_unlock_bh(BR_NETPROTO_LOCK)
 #endif
+#endif				/* CONFIG_SMP */
 #ifdef HAVE_INET_PROTOS_ADDR
 STATIC struct mynet_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
 #endif

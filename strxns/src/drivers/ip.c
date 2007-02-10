@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/07/15 13:06:28 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/02/10 15:53:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/15 13:06:28 $ by $Author: brian $
+ Last Modified $Date: 2007/02/10 15:53:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.33  2007/02/10 15:53:17  brian
+ - PR: openss7/4734 fixed missing spinlock symbols on ubuntu i386 UP kernels
+
  Revision 0.9.2.32  2006/07/15 13:06:28  brian
  - rationalized np_ip.c and rawip.c to upd.c drivers
 
@@ -149,10 +152,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/07/15 13:06:28 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/02/10 15:53:17 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/07/15 13:06:28 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/02/10 15:53:17 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -205,7 +208,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2006/07/15 13:06:28 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/02/10 15:53:17 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -724,7 +727,12 @@ npi_v4_err_next(struct sk_buff *skb, __u32 info)
 }
 
 #ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#ifdef CONFIG_SMP
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
+#else
+static spinlock_t *inet_proto_lock_ = SPIN_LOCK_UNLOCKED;
+#define inet_proto_lockp (&inet_proto_lock_)
+#endif
 STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
 #endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/12/08 05:23:56 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/02/10 15:53:22 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:23:56 $ by $Author: brian $
+ Last Modified $Date: 2007/02/10 15:53:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.41  2007/02/10 15:53:22  brian
+ - PR: openss7/4734 fixed missing spinlock symbols on ubuntu i386 UP kernels
+
  Revision 0.9.2.40  2006/12/08 05:23:56  brian
  - bufq locking changes and debian init script name correction
 
@@ -191,10 +194,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/12/08 05:23:56 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/02/10 15:53:22 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/12/08 05:23:56 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/02/10 15:53:22 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -275,7 +278,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2006/12/08 05:23:56 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/02/10 15:53:22 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -3480,6 +3483,10 @@ tp_v4_err_next(struct sk_buff *skb, __u32 info)
 	return;
 }
 
+#ifndef CONFIG_SMP
+#define net_protocol_lock() local_bh_disable()
+#define net_protocol_unlock() local_bh_enable()
+#else				/* CONFIG_SMP */
 #ifdef HAVE_INET_PROTO_LOCK_ADDR
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
 
@@ -3489,6 +3496,7 @@ STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO
 #define net_protocol_lock() br_write_lock_bh(BR_NETPROTO_LOCK)
 #define net_protocol_unlock() br_write_unlock_bh(BR_NETPROTO_LOCK)
 #endif
+#endif				/* CONFIG_SMP */
 #ifdef HAVE_INET_PROTOS_ADDR
 STATIC struct mynet_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
 #endif
