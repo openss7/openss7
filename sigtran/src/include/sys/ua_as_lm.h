@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ua_as_lm.h,v 1.1.2.1 2007/02/03 03:05:18 brian Exp $
+ @(#) $Id: ua_as_lm.h,v 0.9.2.2 2007/02/10 22:32:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/03 03:05:18 $ by $Author: brian $
+ Last Modified $Date: 2007/02/10 22:32:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua_as_lm.h,v $
+ Revision 0.9.2.2  2007/02/10 22:32:15  brian
+ - working up sigtran drivers
+
  Revision 1.1.2.1  2007/02/03 03:05:18  brian
  - added new files
 
@@ -407,6 +410,14 @@ struct UA_aspdn_ind {
 	uint ORIGIN;			/* origin */
 	uint REASON;			/* reason */
 };
+
+#define UA_ORIGIN_USER	    0
+#define UA_ORIGIN_PROVIDER  1
+
+#define UA_ASPDN_REASON_UNKNOWN	    0	/* Unknown, unspecified */
+#define UA_ASPDN_REASON_ASPDN_ACK   1	/* Unsolicited ASP Down Ack */
+#define UA_ASPDN_REASON_DISCONNECT  2	/* SCTP disconnect */
+#define UA_ASPDN_REASON_RESTART	    3	/* SCTP restart */
 
 /*
  *  UA_HBEAT_REQ - Request a Hearbeat (M_PROTO)
@@ -771,6 +782,6 @@ struct UA_notify_ind {
 	uint ASPID;			/* External ASP Identifier */
 };
 
-#ident "@(#) $RCSfile: ua_as_lm.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ua_as_lm.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #endif				/* __SYS_UA_AS_LM_H__ */

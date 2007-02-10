@@ -1,3 +1,8 @@
+2007-02-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/rmux.4.man: working up RMUX driver
+	* src/drivers/rmux.c: working up RMUX driver
+
 2007-02-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man4/rmux.4.man: added: roughing in RMUX driver

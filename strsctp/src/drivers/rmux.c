@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2007/02/03 03:05:22 $
+ @(#) $RCSfile: rmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/10 22:32:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/03 03:05:22 $ by $Author: brian $
+ Last Modified $Date: 2007/02/10 22:32:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rmux.c,v $
+ Revision 0.9.2.2  2007/02/10 22:32:33  brian
+ - working up sigtran drivers
+
  Revision 1.1.2.1  2007/02/03 03:05:22  brian
  - added new files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2007/02/03 03:05:22 $"
+#ident "@(#) $RCSfile: rmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/10 22:32:33 $"
 
-static char const ident[] = "$RCSfile: rmux.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2007/02/03 03:05:22 $";
+static char const ident[] = "$RCSfile: rmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/10 22:32:33 $";
 
 /*
  *  RMUX is a remote multiplexing driver using SCTP.  Its purpose is to make remote STREAMS devices

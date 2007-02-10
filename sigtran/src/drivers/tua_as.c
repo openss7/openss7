@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2007/02/03 03:05:16 $
+ @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/10 22:32:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/03 03:05:16 $ by $Author: brian $
+ Last Modified $Date: 2007/02/10 22:32:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua_as.c,v $
+ Revision 0.9.2.2  2007/02/10 22:32:12  brian
+ - working up sigtran drivers
+
  Revision 1.1.2.1  2007/02/03 03:05:16  brian
  - added new files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2007/02/03 03:05:16 $"
+#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/10 22:32:12 $"
 
-static char const ident[] = "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2007/02/03 03:05:16 $";
+static char const ident[] = "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/10 22:32:12 $";
 
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
@@ -129,7 +132,7 @@ static char const ident[] = "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 1.1.2.1
 /* ============================== */
 
 #define TUA_AS_DECRIP		"TUA/SCTP AS TCAP STREAMS MULTIPLEXING DRIVER."
-#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 1.1.2.1 $) $Date: 2007/02/03 03:05:16 $"
+#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2007/02/10 22:32:12 $"
 #define TUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
