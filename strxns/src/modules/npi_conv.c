@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/02/10 22:33:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: npi_conv.c,v $
+ Revision 0.9.2.1  2007/02/10 22:33:13  brian
+ - added new working files
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:13 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:13 $";
 
 /*
  *  NPI-CONV is a simple endian conversion module for use with the RMUX driver.  It converts service
@@ -68,7 +71,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #define NPI_CONV_DESCRIP	"NPI ENDIAN CONVERSION (NPI-CONV) FOR LINUX FAST-STREAMS"
 #define NPI_CONV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NPI_CONV_REVISION	"OpenSS7 $RCSfile$ $Name$($Revision$) $Date$"
+#define NPI_CONV_REVISION	"OpenSS7 $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:13 $"
 #define NPI_CONV_DEVICE		"SVR 4.2 NPI Endian Conversion (NPI-CONV) for STREAMS"
 #define NPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NPI_CONV_LICENSE	"GPL"

@@ -1,5 +1,9 @@
 2007-02-10  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/modules/cdi_conv.c: added endian conversion module for CDI
+	* src/modules/dlpi_conv.c: added endian conversion module for DLPI
+	* src/modules/npi_conv.c: added endian conversion module for NPI
+
 	* src/drivers/ip.c: fixed missing spinlock symbols
 	* src/drivers/np.c: fixed missing spinlock symbols
 	* src/drivers/np_ip.c: fixed missing spinlock symbols

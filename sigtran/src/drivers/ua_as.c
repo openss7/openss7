@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/02/03 03:07:46 $
+ @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/03 03:07:46 $ by $Author: brian $
+ Last Modified $Date: 2007/02/10 22:33:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ua_as.c,v $
+ Revision 0.9.2.1  2007/02/10 22:33:09  brian
+ - added new working files
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/02/03 03:07:46 $"
+#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:09 $"
 
 static char const ident[] =
-    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/02/03 03:07:46 $";
+    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:09 $";
 
 /*
  *  This is an UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -156,7 +159,7 @@ static char const ident[] =
 /* ============================== */
 
 #define UA_AS_DESCRIP	"UA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2007/02/03 03:07:46 $"
+#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:09 $"
 #define UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define UA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -359,21 +362,17 @@ struct as {
 
 		struct ua_opt_conf_as options;
 		struct ua_conf_as config;
-#if M2UA
-		struct m2ua_ppa addr;
-#endif
-#if M3UA
-		struct m3ua_addr addr;
-#endif
-#if SUA
-		struct sua_addr addr;
-#endif
-#if TUA
-		struct tua_addr addr;
-#endif
-#if ISUA
-		struct isua_addr addr;
-#endif
+		struct {
+			uint32_t asid;
+			char clei[32];
+			union {
+				struct m2ua_ppa m2ua;
+				struct m3ua_addr m3ua;
+				struct sua_addr sua;
+				struct tua_addr tua;
+				struct isua_addr isua;
+			};
+		} addr;
 		struct ua_statem_as statem;
 		struct ua_stats_as statsp;
 		struct ua_stats_as stats;
@@ -586,6 +585,8 @@ struct tp {
 		uint target;		/* object target state */
 		uint mstate;		/* object management state */
 
+		mblk_t *sctp_estab;	/* Timer waiting in TS_IDLE. */
+
 		uint32_t acceptorid;
 		struct T_info_ack info;
 
@@ -672,6 +673,7 @@ enum {
 	gp_wack_aspup = 0,
 	gp_wack_aspdn,
 	gp_wack_hbeat,
+	tp_sctp_estab,
 	rp_wack_aspac,
 	rp_wack_aspia,
 	rp_wack_hbeat,
@@ -720,9 +722,10 @@ up_set_state(struct up *up, uint newstate)
 {
 	uint oldstate = up->lm.state;
 
-	if (oldstate != newstate)
+	if (oldstate != newstate) {
 		strlog(up->mid, up->sid, UALOGST, SL_TRACE, "%s <- %s", up_state_name(newstate),
 		       up_state_name(oldstate));
+	}
 	return ((up->lm.state = newstate));
 }
 static inline uint
@@ -746,6 +749,11 @@ up_not_state(struct up *up, uint mask)
 	return (up_chk_state(up, ~mask));
 }
 
+static int up_aspac_con(struct up *up, queue_t *q);
+static int up_aspia_con(struct up *up, queue_t *q);
+static int up_aspac_ind(struct up *up, queue_t *q);
+static int up_aspia_ind(struct up *up, queue_t *q);
+
 const char *
 as_state_name(uint state)
 {
@@ -768,6 +776,104 @@ as_state_name(uint state)
 		return ("ASP_????");
 	}
 }
+
+static inline uint
+as_set_m_state(struct as *as, queue_t *q, uint newstate)
+{
+	uint oldstate = as->as.mstate;
+
+	if (newstate != oldstate)
+		STRLOG(q, UALOGST, SL_TRACE, "%s <- %s", as_state_name(newstate),
+		       as_state_name(oldstate));
+	return ((as->as.mstate = newstate));
+}
+static inline uint
+as_get_m_state(struct as *as)
+{
+	return (as->as.mstate);
+}
+static inline uint
+as_get_m_statef(struct as *as)
+{
+	return (1 << as_get_m_state(as));
+}
+static inline uint
+as_chk_m_state(struct as *as, uint mask)
+{
+	return (as_get_m_statef(as) & mask);
+}
+static inline uint
+as_not_m_state(struct as *as, uint mask)
+{
+	return (as_chk_m_statef(as, ~mask));
+}
+
+static int
+up_set_m_state(struct up *up, queue_t *q, uint newstate)
+{
+	uint oldstate = up->up.mstate;
+	struct as *as = up->as.as;
+
+	if (newstate == oldstate)
+		return (0);
+
+	strlog(up->mid, up->sid, SL_TRACE, "%s <- %s", as_state_name(newstate),
+	       as_state_name(oldstate));
+
+	if (newstate >= as_get_m_state(as)) {
+		as_set_m_state(as, newstate);
+	} else {
+		if (oldstate == as_get_m_state(as) && as->up.count[oldstate] == 1) {
+			switch (oldstate) {
+			case AS_ACTIVE:
+				if (as->up.count[AS_WACK_ASPIA]
+				    || newstate == AS_WACK_ASPIA) {
+					as_set_m_state(as, AS_WACK_ASPIA);
+					break;
+				}
+				/* fall through */
+			case AS_WACK_ASPIA:
+				if (as->up.count[AS_WACK_ASPAC]
+				    || newstate == AS_WACK_ASPAC) {
+				      as_set_m_state(as, AS_WACK_ASPAC):
+					break;
+				}
+				/* fall through */
+			case AS_WACK_ASPAC:
+				if (as->up.count[AS_INACTIVE]
+				    || newstate == AS_INACTIVE) {
+				      as_set_m_state(as, AS_INACTIVE):
+					break;
+				}
+				/* fall through */
+			case AS_INACTIVE:
+				if (as->up.count[ASP_WACK_ASPDN]
+				    || newstate == ASP_WACK_ASPDN) {
+					as_set_m_state(as, ASP_WACK_ASPDN);
+					break;
+				}
+				/* fall through */
+			case ASP_WACK_ASPDN:
+				if (as->up.count[ASP_WACK_ASPUP]
+				    || newstate == ASP_WACK_ASPUP) {
+					as_set_m_state(as, ASP_WACK_ASPUP);
+					break;
+				}
+				/* fall through */
+			case ASP_WACK_ASPUP:
+				as_set_m_state(as, q, AS_DOWN);
+				/* fall through */
+			case AS_DOWN:
+				break;
+			}
+		}
+	}
+	up->up.mstate = newstate;
+	as->up.count[oldstate]--;
+	as->up.count[newstate]++;
+	return (err);
+}
+
 static int
 as_set_state(struct as *as, queue_t *q, uint newstate)
 {
@@ -798,62 +904,9 @@ as_set_state(struct as *as, queue_t *q, uint newstate)
 		case AS_WACK_ASPAC:
 			for (up = as->up.list; up; up = up->as.next)
 				if (up_get_t_state(up) == AS_WACK_ASPAC)
-					if ((err = up_aspac_con(up, q, NULL)))
+					if ((err = up_aspac_con(up, q)))
 						return (err);
 			as_set_t_state(as, AS_ACTIVE);
-#if 0				/* needs to be in up_aspac_con */
-			/* Inform management (UP or LM). */
-			switch (ua_profiles[as->sp.sp->sp.options.pvar].protocol) {
-			case UA_PROTOCOL_M2UA:
-				if ((up = as->up.list)) {
-					switch (up_get_state(up)) {
-					case LMI_ENABLE_PENDING:
-						if ((err = lmi_enable_con(up, q, NULL)))
-							return (err);
-						break;
-					}
-				}
-				break;
-			case UA_PROTOCOL_M3UA:
-				if ((up = as->up.list)) {
-					switch (up_get_state(up)) {
-					case MTPS_WACK_BREQ:
-						if ((err = mtp_bind_ack(up, q, NULL)))
-							return (err);
-						break;
-					case MTPS_WACK_CREQ:
-						if ((err = mtp_ok_ack(up, q, NULL, MTP_CONN_REQ)))
-							return (err);
-						/* fall through */
-					case MTPS_WCON_CREQ:
-						if ((err = mtp_conn_con(up, q, NULL)))
-							return (err);
-						break;
-					}
-				}
-				break;
-			case UA_PROTOCOL_SUA:
-				for (up = as->up.list; up; up = up->as.next) {
-					switch (up_get_state(up)) {
-					case NS_WACK_BREQ:
-						if ((err = n_bind_ack(up, q, NULL)))
-							return (err);
-						break;
-					}
-				}
-				break;
-			case UA_PROTOCOL_TUA:
-				for (up = ap->up.list; up; up = up->as.next) {
-					switch (up_get_state(up)) {
-					case TS_WACK_BREQ:
-						if ((err = tr_bind_ack(up, q, NULL)))
-							return (err);
-						break;
-					}
-				}
-				break;
-			}
-#endif
 			break;
 		case AS_ACTIVE:
 			break;
@@ -901,8 +954,8 @@ as_set_state(struct as *as, queue_t *q, uint newstate)
 			break;
 		}
 		break;
-	case ASP_WACK_ASPDN:
-	case ASP_WACK_ASPUP:
+	case AS_WRSP_DREQ:
+	case AS_WRSP_RREQ:
 		/* wait for result */
 		break;
 	case AS_DOWN:
@@ -996,71 +1049,70 @@ static int
 rp_set_state(struct rp *rp, queue_t *q, uint newstate)
 {
 	uint oldstate = rp->rp.state;
+	struct as *as = rp->as.as;
 	int err = 0;
 
-	if (newstate != oldstate) {
-		struct as *as = rp->as.as;
+	if (newstate == oldstate)
+		return (0);
 
-		STRLOG(q, UALOGST, SL_TRACE, "%s <- %s", as_state_name(newstate),
-		       as_state_name(oldstate));
-		if (newstate >= as_get_state(as)) {
-			if ((err = as_set_state(as, q, newstate)))
-				return (err);
-		} else {
-			if (oldstate == as_get_state(as) && as->rp.count[oldstate] == 1) {
-				switch (oldstate) {
-				case AS_ACTIVE:
-					if (as->rp.count[AS_WACK_ASPIA]
-					    || newstate == AS_WACK_ASPIA) {
-						if ((err = as_set_state(as, q, AS_WACK_ASPIA)))
-							return (err);
-						break;
-					}
-					/* fall through */
-				case AS_WACK_ASPIA:
-					if (as->rp.count[AS_WACK_ASPAC]
-					    || newstate == AS_WACK_ASPAC) {
-						if ((err = as_set_state(as, q, AS_WACK_ASPAC)))
-							return (err);
-						break;
-					}
-					/* fall through */
-				case AS_WACK_ASPAC:
-					if (as->rp.count[AS_INACTIVE]
-					    || newstate == AS_INACTIVE) {
-						if ((err = as_set_state(as, q, AS_INACTIVE)))
-							return (err);
-						break;
-					}
-					/* fall through */
-				case AS_INACTIVE:
-					if (as->rp.count[ASP_WACK_ASPDN]
-					    || newstate == ASP_WACK_ASPDN) {
-						if ((err = as_set_state(as, q, ASP_WACK_ASPDN)))
-							return (err);
-						break;
-					}
-					/* fall through */
-				case ASP_WACK_ASPDN:
-					if (as->rp.count[ASP_WACK_ASPUP]
-					    || newstate == ASP_WACK_ASPUP) {
-						if ((err = as_set_state(as, q, ASP_WACK_ASPUP)))
-							return (err);
-						break;
-					}
-					/* fall through */
-				case ASP_WACK_ASPUP:
-					if ((err = as_set_state(as, q, AS_DOWN)))
+	STRLOG(q, UALOGST, SL_TRACE, "%s <- %s", as_state_name(newstate), as_state_name(oldstate));
+	if (newstate >= as_get_state(as)) {
+		if ((err = as_set_state(as, q, newstate)))
+			return (err);
+	} else {
+		if (oldstate == as_get_state(as) && as->rp.count[oldstate] == 1) {
+			switch (oldstate) {
+			case AS_ACTIVE:
+				if (as->rp.count[AS_WACK_ASPIA]
+				    || newstate == AS_WACK_ASPIA) {
+					if ((err = as_set_state(as, q, AS_WACK_ASPIA)))
 						return (err);
-				case AS_DOWN:
 					break;
 				}
+				/* fall through */
+			case AS_WACK_ASPIA:
+				if (as->rp.count[AS_WACK_ASPAC]
+				    || newstate == AS_WACK_ASPAC) {
+					if ((err = as_set_state(as, q, AS_WACK_ASPAC)))
+						return (err);
+					break;
+				}
+				/* fall through */
+			case AS_WACK_ASPAC:
+				if (as->rp.count[AS_INACTIVE]
+				    || newstate == AS_INACTIVE) {
+					if ((err = as_set_state(as, q, AS_INACTIVE)))
+						return (err);
+					break;
+				}
+				/* fall through */
+			case AS_INACTIVE:
+				if (as->rp.count[ASP_WACK_ASPDN]
+				    || newstate == ASP_WACK_ASPDN) {
+					if ((err = as_set_state(as, q, ASP_WACK_ASPDN)))
+						return (err);
+					break;
+				}
+				/* fall through */
+			case ASP_WACK_ASPDN:
+				if (as->rp.count[ASP_WACK_ASPUP]
+				    || newstate == ASP_WACK_ASPUP) {
+					if ((err = as_set_state(as, q, ASP_WACK_ASPUP)))
+						return (err);
+					break;
+				}
+				/* fall through */
+			case ASP_WACK_ASPUP:
+				if ((err = as_set_state(as, q, AS_DOWN)))
+					return (err);
+			case AS_DOWN:
+				break;
 			}
 		}
-		rp->rp.state = newstate;
-		as->rp.count[oldstate]--;
-		as->rp.count[newstate]++;
 	}
+	rp->rp.state = newstate;
+	as->rp.count[oldstate]--;
+	as->rp.count[newstate]++;
 	return (err);
 }
 static inline uint
@@ -1231,83 +1283,9 @@ gp_set_state(struct gp *gp, queue_t *q, uint newstate, int errno)
 
 	if (newstate != oldstate) {
 		struct sg *sg = gp->sg.sg;
-		struct sp *sp = sg->sp.sp;
-		bool dynamic =
-		    ((sg->gp.options.proto.popt & UA_DYNAMIC) &&
-		     (sp->sp.options.proto.pvar != UA_PROFILE_TS102141));
 
 		STRLOG(q, UALOGST, SL_TRACE, "SGP: %s <- %s", asp_state_name(newstate),
 		       asp_state_name(oldstate));
-		switch (newstate) {
-		case ASP_DOWN:
-			/* When the SGP goes ASP_DOWN, all AS down for this SGP. */
-			for (rp = gp->rp.list; rp; rp = rp->gp.next)
-				if ((err = rp_set_state(rp, q, dynamic ? AS_DOWN : AS_INACTIVE)))
-					return (err);
-			switch (gp_get_t_state(gp)) {
-			case ASP_WACK_ASPDN:
-				/* Management needs a confirmation. */
-				if ((lm = gp->sg.sg->sp.sp->lm.lm ? : lm_ctrl)) {
-					if ((err = ua_aspdn_con(lm, q, NULL, gp)))
-						return (err);
-				} else
-					gp_set_t_state(gp, ASP_DOWN);
-				/* fall through */
-			case ASP_DOWN:
-				break;
-			case ASP_UP:
-			case ASP_WACK_ASPUP:
-				/* try to bring ASP back up */
-				if ((tp = gp->xp.xp) && tp_get_state(tp) == TS_DATA_XFER)
-					/* Note: this will reenter this function! */
-					return gp_send_asps_aspup_req(gp, q, NULL, NULL, 0);
-				break;
-			}
-			break;
-		case ASP_WACK_ASPUP:
-		case ASP_WACK_ASPDN:
-			break;
-		case ASP_UP:
-			switch (gp_get_t_state(gp)) {
-			case ASP_WACK_ASPUP:
-				/* Management needs a confirmation. */
-				if ((lm = gp->sg.sg->sp.sp->lm.lm ? : lm_ctrl)) {
-					if ((err = ua_aspup_con(lm, q, NULL, gp)))
-						return (err);
-				} else
-					gp_set_t_state(gp, ASP_UP);
-				/* fall through */
-			case ASP_UP:
-				/* When the SGP comes ASP_UP, and management wants it up, check if
-				   there are keys that need to be registered and AS that need to be 
-				   activated. */
-				for (rp = gp->rp.list; rp; rp = rp->gp.next) {
-					struct as *as = rp->as.as;
-
-					if (as_get_t_state(as) >= AS_WRSP_RREQ
-					    && rp_get_state(rp) < AS_WRSP_RREQ) {
-						/* need to register */
-						if ((err = rp_send_rkmm_reg_req(rp, q, NULL)))
-							return (err);
-						continue;
-					}
-					if (as_get_t_state(as) >= AS_WACK_ASPAC
-					    && rp_get_state(rp) < AS_WACK_ASPAC) {
-						/* need to activate */
-						if ((err = rp_send_aspt_aspac_req(rp, q, NULL)))
-							return (err);
-						continue;
-					}
-				}
-				break;
-			case ASP_DOWN:
-			case ASP_WACK_ASPDN:
-				/* try to put ASP back down */
-				/* Note: this will reenter this function! */
-				return gp_send_asps_aspdn_req(gp, q, mp, NULL, 0);
-				break;
-			}
-		}
 		if (newstate >= sg_get_state(sg)) {
 			if ((err = sg_set_state(sg, q, newstate)))
 				return (err);
@@ -1442,7 +1420,8 @@ tp_set_state(struct tp *tp, uint newstate)
 	if (newstate != oldstate)
 		strlog(tp->mid, tp->sid, UALOGST, SL_TRACE, "%s <- %s", tp_state_name(newstate),
 		       tp_state_name(oldstate));
-	return ((tp->xp.info.CURRENT_state = newstate));
+	tp->xp.info.CURRENT_state = newstate;
+	return (oldstate);
 }
 static inline uint
 tp_get_state(struct tp *tp)
@@ -1803,19 +1782,62 @@ up_release(struct up *up)
 	up_unlock(up);
 }
 
+/**
+ * tp_lm_acquire: - acquire LM lock
+ * @tp: TP private structure
+ * @q: active queue
+ * @errp: pointer to error
+ *
+ * This function acquires a lock on an upper management Stream from a lower multiplex Stream.
+ * There are several cases:  When there is an SP and an LM associated with the TP, just leave it (we
+ * already have a lock on the SP).  When there is no SP, if the TP has its own LM Stream (SP not
+ * created), lock that, otherwise, lock the master Stream if it exists.
+ */
 static inline struct up *
-lm_acquire(queue_t *q)
+tp_lm_acquire(struct tp *tp, queue_t *q, int *errp)
 {
-	struct up *lm = UP_PRIV(q);
+	struct up *lm;
 
-	if (!up_trylock(lm, q))
-		return (NULL);
+	read_lock(&ua_mux_lock);
+	if ((!tp->sp.sp || (lm = tp->lm.lm)) && ((lm = tp->lm.lm) || (lm = lm_ctrl))) {
+		if (!up_trylock(lm, q)) {
+			if (errp)
+				*errp = -EDEADLK;
+			lm = NULL;
+		}
+	}
+	read_unlock(&ua_mux_lock);
 	return (lm);
 }
+
 static inline void
-lm_release(struct up *lm)
+tp_lm_release(struct up *lm)
 {
-	up_unlock(lm);
+	if (lm == lm_ctrl || !tp->sp.sp)
+		up_unlock(lm);
+}
+
+static inline struct up *
+sp_lm_acquire(struct sp *sp, queue_t *q, int *errp)
+{
+	struct up *lm;
+
+	read_lock(&ua_mux_lock);
+	if (!(lm = sp->lm.lm) && (lm = lm_ctrl))
+		if (!up_trylock(lm, q)) {
+			if (errp)
+				*errp = -EDEADLK;
+			lm = NULL;
+		}
+	read_unlock(&ua_mux_lock);
+	return (lm);
+}
+
+static inline void
+sp_lm_release(struct up *lm)
+{
+	if (lm != lm_ctrl)
+		up_unlock(lm);
 }
 
 /*
@@ -2000,6 +2022,75 @@ ua_find_object_xp(int *errp, struct up *lm, uint id, struct ua_conf_xp *c)
 }
 
 /*
+ *  Free managed objects
+ *  =========================================================================
+ */
+static void __unlikely
+ua_free_object_df(struct df *df)
+{
+}
+static void __unlikely
+ua_free_object_lm(struct up *lm)
+{
+	mi_close_free((caddr_t) up);
+}
+static void __unlikely
+ua_free_object_up(struct up *up)
+{
+	mi_close_free((caddr_t) up);
+}
+static void __unlikely
+ua_free_object_as(struct as *as)
+{
+	return kmem_free(as, sizeof(struct as));
+}
+static void __unlikely
+ua_free_object_sp(struct sp *sp)
+{
+	return kmem_free(sp, sizeof(struct sp));
+}
+static void __unlikely
+ua_free_object_sg(struct sg *sg)
+{
+	return kmem_free(sg, sizeof(struct sg));
+}
+static void __unlikely
+ua_free_object_gp(struct gp *gp)
+{
+	struct ua_timer *t;
+
+	if ((t = xchg(&gp->gp.wack_aspup, NULL)))
+		mi_timer_free(t);
+	if ((t = xchg(&gp->gp.wack_aspdn, NULL)))
+		mi_timer_free(t);
+	if ((t = xchg(&gp->gp.wack_hbeat, NULL)))
+		mi_timer_free(t);
+	return kmem_free(gp, sizeof(struct gp));
+}
+static void __unlikely
+ua_free_object_xp(struct tp *xp)
+{
+	struct ua_timer *t;
+
+	if ((t = xchg(&tp->tp.sctp_estab, NULL)))
+		mi_timer_free(t);
+	mi_close_free((caddr_t) tp);
+}
+static void __unlikely
+ua_free_object_rp(struct rp *rp)
+{
+	struct ua_timer *t;
+
+	if ((t = xchg(&rp->rp.wack_aspac, NULL)))
+		mi_timer_free(t);
+	if ((t = xchg(&rp->rp.wack_aspia, NULL)))
+		mi_timer_free(t);
+	if ((t = xchg(&rp->rp.wack_hbeat, NULL)))
+		mi_timer_free(t);
+	return kmem_free(rp, sizeof(struct rp));
+}
+
+/*
  *  Allocate managed objects
  *  =========================================================================
  */
@@ -2085,9 +2176,16 @@ ua_alloc_object_xp(int *errp)
 
 	if ((tp = (typeof(tp)) mi_open_alloc(sizeof(*tp)))) {
 		bzero(tp, sizeof(*tp));
+		if (!(tp->tp.sctp_estab = mi_timer_alloc(sizeof(struct ua_timer))))
+			goto enobufs;
 	} else if (errp)
 		*errp = ENOMEM;
 	return (tp);
+      enobufs:
+	ua_free_object_xp(tp);
+	if (errp)
+		*errp = ENOBUFS;
+	return (NULL);
 }
 static struct rp *__unlikely
 ua_alloc_object_rp(int *errp)
@@ -2194,19 +2292,21 @@ ua_init_object_gp(struct gp *gp, uint id)
 	gp->gp.nextstream = 0;
 	gp->gp.options = ua_defaults.options.gp;
 
-	t = (typeof(t)) gp->rp.wack_aspup->b_rptr;
+	t = (typeof(t)) gp->gp.wack_aspup->b_rptr;
 	t->timer = gp_wack_aspup;
 	t->obj = gp;
-	t = (typeof(t)) gp->rp.wack_aspdn->b_rptr;
+	t = (typeof(t)) gp->gp.wack_aspdn->b_rptr;
 	t->timer = gp_wack_aspdn;
 	t->obj = gp;
-	t = (typeof(t)) gp->rp.wack_hbeat->b_rptr;
+	t = (typeof(t)) gp->gp.wack_hbeat->b_rptr;
 	t->timer = gp_wack_hbeat;
 	t->obj = gp;
 }
 static void __unlikely
 ua_init_object_xp(struct tp *tp, uint id)
 {
+	struct ua_timer *t;
+
 	ua_syncq_init_locked(&tp->sq);
 	/* start life locked */
 	tp->xp.id = id;		/* FIXME: assign if zero */
@@ -2225,6 +2325,10 @@ ua_init_object_xp(struct tp *tp, uint id)
 	tp->xp.info.SERV_type = T_COTS_ORD;
 	tp->xp.info.CURRENT_state = -1;
 	tp->xp.info.PROVIDER_flag = T_XPG4_1;
+
+	t = (typeof(t)) tp->tp.sctp_estab->b_rptr;
+	t->timer = tp_sctp_estab;
+	t->obj = tp;
 }
 static void __unlikely
 ua_init_object_rp(struct rp *rp, uint id)
@@ -2300,71 +2404,6 @@ ua_term_object_xp(struct tp *xp)
 static void __unlikely
 ua_term_object_rp(struct rp *rp)
 {
-}
-
-/*
- *  Free managed objects
- *  =========================================================================
- */
-static void __unlikely
-ua_free_object_df(struct df *df)
-{
-}
-static void __unlikely
-ua_free_object_lm(struct up *lm)
-{
-	mi_close_free((caddr_t) up);
-}
-static void __unlikely
-ua_free_object_up(struct up *up)
-{
-	mi_close_free((caddr_t) up);
-}
-static void __unlikely
-ua_free_object_as(struct as *as)
-{
-	return kmem_free(as, sizeof(struct as));
-}
-static void __unlikely
-ua_free_object_sp(struct sp *sp)
-{
-	return kmem_free(sp, sizeof(struct sp));
-}
-static void __unlikely
-ua_free_object_sg(struct sg *sg)
-{
-	return kmem_free(sg, sizeof(struct sg));
-}
-static void __unlikely
-ua_free_object_gp(struct gp *gp)
-{
-	struct ua_timer *t;
-
-	if ((t = xchg(&gp->gp.wack_aspup, NULL)))
-		mi_timer_free(t);
-	if ((t = xchg(&gp->gp.wack_aspdn, NULL)))
-		mi_timer_free(t);
-	if ((t = xchg(&gp->gp.wack_hbeat, NULL)))
-		mi_timer_free(t);
-	return kmem_free(gp, sizeof(struct gp));
-}
-static void __unlikely
-ua_free_object_xp(struct tp *xp)
-{
-	mi_close_free((caddr_t) tp);
-}
-static void __unlikely
-ua_free_object_rp(struct rp *rp)
-{
-	struct ua_timer *t;
-
-	if ((t = xchg(&rp->rp.wack_aspac, NULL)))
-		mi_timer_free(t);
-	if ((t = xchg(&rp->rp.wack_aspia, NULL)))
-		mi_timer_free(t);
-	if ((t = xchg(&rp->rp.wack_hbeat, NULL)))
-		mi_timer_free(t);
-	return kmem_free(rp, sizeof(struct rp));
 }
 
 /*
@@ -3119,23 +3158,40 @@ ua_attach_ack(struct up *lm, struct up *up, queue_t *q, mblk_t *msg)
  * ua_sctp_ind: - issue a UA_SCTP_IND primitive to layer management
  * @tp: TP private structure
  * @q: active queue
- * @msg: message to free upon success
+ * @dp: message to pass
  */
 static inline fastcall int
-ua_sctp_ind(struct tp *tp, queue_t *q, mblk_t *msg)
+ua_sctp_ind(struct tp *tp, queue_t *q, mblk_t *dp)
 {
-	struct UA_sctp_ind *p;
-	mblk_t *mp;
 	struct up *lm;
+	int err = 0;
 
-	if (!(lm = tp->sp.sp ? (tp->sp.sp->lm.lm ? : lm_ctrl) : lm_ctrl)) {
-		freemsg(msg);
-		return (0);
+	if ((lm = tp_lm_acquire(tp, q, &err))) {
+		struct UA_sctp_ind *p;
+		mblk_t *mp;
+
+		if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+			if (pcmsg(DB_TYPE(dp)) || bcanputnext(q, dp->b_band)) {
+				DB_TYPE(mp) = (DB_TYPE(dp) == M_PCPROTO) ? M_PCPROTO : M_PROTO;
+				mp->b_band = dp->b_band;
+				p = (typeof(p)) mp->b_wptr;
+				p->PRIM_type = UA_SCTP_IND;
+				/* FIXME: fill out more */
+				mp->b_wptr += sizeof(*p);
+				mp->b_cont = dp;
+				strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "<- UA_SCTP_IND");
+				putnext(lm->rq, mp);
+			} else {
+				freeb(mp);
+				err = -EBUSY;
+			}
+		} else {
+			err = -ENOBUFS;
+		}
+		tp_lm_release(lm);
 	}
-
-	(void) p;
-	(void) mp;
-	/* FIXME: write this function */
+	if (err)
+		return (err);
 	freemsg(msg);
 	return (0);
 }
@@ -3207,7 +3263,7 @@ ua_error_ack(struct up *lm, struct up *up, queue_t *q, mblk_t *msg)
  * @msg: message to free upon success
  * @gp: GP object
  */
-static inline fastcall int
+static int
 ua_aspup_con(struct up *lm, queue_t *q, mblk_t *msg, struct gp *gp)
 {
 	struct UA_aspup_con *p;
@@ -3244,7 +3300,7 @@ ua_aspup_con(struct up *lm, queue_t *q, mblk_t *msg, struct gp *gp)
  * @q: active queue
  * @msg: message to free upon success
  */
-static inline fastcall int
+static int
 ua_aspup_ind(struct up *lm, struct up *up, queue_t *q, mblk_t *msg)
 {
 	struct UA_aspup_ind *p;
@@ -3259,40 +3315,106 @@ ua_aspup_ind(struct up *lm, struct up *up, queue_t *q, mblk_t *msg)
 
 /**
  * ua_aspdn_con: - issue a UA_ASPDN_CON primitive to layer management
- * @lm: layer management stream
- * @up: UP private structure
+ * @gp: GP object confirming
  * @q: active queue
  * @msg: message to free upon success
  */
-static inline fastcall int
-ua_aspdn_con(struct up *lm, struct up *up, queue_t *q, mblk_t *msg)
+static int
+ua_aspdn_con(struct gp *gp, queue_t *q, mblk_t *msg)
 {
-	struct UA_aspdn_con *p;
-	mblk_t *mp;
+	struct lm *lm;
+	int err = 0;
 
-	(void) p;
-	(void) mp;
-	/* FIXME: write this function */
+	if (gp_get_m_state(gp) == ASP_WACK_ASPDN) {
+		if ((lm = sp_lm_acquire(gp->sp.sp, q, &err))) {
+			struct UA_aspdn_con *p;
+			mblk_t *mp;
+
+			if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+				if (canputnext(lm->rq)) {
+					DB_TYPE(mp) = M_PROTO;
+					p = (typeof(p)) mp->b_wptr;
+					mp->b_wptr += sizeof(*p);
+					p->PRIM_type = UA_ASPDN_CON;
+					/* FIXME: more */
+					strlog(lm->mid, lm->sid, UALOGRX, SL_TRACE,
+					       "<- UA_ASPDN_CON");
+					gp_set_t_state(gp, ASP_DOWN);
+					putnext(lm->rq, mp);
+				} else {
+					freeb(mp);
+					err = -EBUSY;
+				}
+			} else {
+				err = -ENOBUFS;
+			}
+			sp_lm_release(lm);
+		}
+		if (err)
+			return (err);
+		gp_set_m_state(gp, ASP_DOWN);
+	}
 	freemsg(msg);
 	return (0);
 }
 
 /**
- * ua_aspdn_ind: - issue a UA_ASPDN_IND primitive to layer management
- * @lm: layer management stream
- * @up: UP private structure
+ * ua_aspdn_ind: - issue a UA_ASPDN_IND or UA_ASPDN_CON primitive to layer management
+ * @gp: GP object indicating
  * @q: active queue
  * @msg: message to free upon success
+ * @reason: reason for failure
  */
-static inline fastcall int
-ua_aspdn_ind(struct up *lm, struct up *up, queue_t *q, mblk_t *msg)
+static int
+ua_aspdn_ind(struct gp *gp, queue_t *q, mblk_t *msg, uint reason)
 {
-	struct UA_aspdn_ind *p;
-	mblk_t *mp;
+	struct lm *lm;
+	int err = 0;
 
-	(void) p;
-	(void) mp;
-	/* FIXME: write this function */
+	if ((lm = sp_lm_acquire(gp->sp.sp, q, &err))) {
+		mblk_t *mp;
+
+		if ((mp = ua_allocb(q, sizeof(struct UA_aspdn_ind), BPRI_MED))) {
+			if (canputnext(lm->rq)) {
+				DB_TYPE(mp) = M_PROTO;
+				if (gp_get_m_state(gp) == ASP_WACK_ASPDN) {
+					struct UA_aspdn_con *p;
+
+					p = (typeof(p)) mp->b_wptr;
+					mp->b_wptr += sizeof(*p);
+					p->PRIM_type = UA_ASPDN_CON;
+					p->ASP_id = gp->sp.sp->sp.id;
+					p->SGP_id = gp->gp.id;
+					p->REQUEST_id = XCHG(&gp->gp.correlation, 0);
+					strlog(lm->mid, lm->sid, UALOGRX, SL_TRACE,
+					       "<- UA_ASPDN_CON");
+				} else {
+					struct UA_aspdn_ind *p;
+					mblk_t *mp;
+
+					p = (typeof(p)) mp->b_wptr;
+					mp->b_wptr += sizeof(*p);
+					p->PRIM_type = UA_ASPDN_IND;
+					p->ASP_id = gp->sp.sp->sp.id;
+					p->SGP_id = gp->gp.id;
+					p->ORIGIN = UA_PROVIDER;
+					p->REASON = reason;
+					strlog(lm->mid, lm->sid, UALOGRX, SL_TRACE,
+					       "<- UA_ASPDN_IND");
+				}
+				putnext(lm->rq, mp);
+			} else {
+				freeb(mp);
+				err = -EBUSY;
+			}
+		} else {
+			err = -ENOBUFS;
+		}
+		sp_lm_release(lm);
+	}
+	if (err)
+		return (err);
+	gp_set_m_state(gp, ASP_DOWN);
 	freemsg(msg);
 	return (0);
 }
@@ -3597,8 +3719,9 @@ lmi_info_ack(struct up *up, queue_t *q, mblk_t *msg)
 		case LMI_ENABLED:
 		case LMI_DISABLE_PENDING:
 		case LMI_DETACH_PENDING:
-			bcopy(&up->as.as->as.addr, mp->b_wptr, sizeof(up->as.as->as.addr));
-			mp->b_wptr += sizeof(up->as.as->as.addr);
+			bcopy(&up->as.as->as.addr.m2ua, mp->b_wptr,
+			      sizeof(up->as.as->as.addr.m2ua));
+			mp->b_wptr += sizeof(up->as.as->as.addr.m2ua);
 			break;
 		}
 		freemsg(msg);
@@ -5671,11 +5794,11 @@ rp_send_asps_hbeat_req(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t hptr, siz
 	mblk_t *mp;
 
 #if M2UA
-	size_t tlen = strnlen(as->as.addr.iid_text, 32);
+	size_t tlen = strnlen(as->as.addr.m2ua.iid_text, 32);
 #endif
 	size_t mlen = UA_MHDR_SIZE + (hlen ? UA_PHDR_SIZE + UA_PAD4(hlen) : 0) +
 #if M2UA
-	    (as->as.addr.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
+	    (as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
 #endif
 	    (as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0);
 
@@ -5695,9 +5818,9 @@ rp_send_asps_hbeat_req(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t hptr, siz
 			p += 2;
 		}
 #if M2UA
-		if (as->as.addr.iid_text[0]) {
+		if (as->as.addr.m2ua.iid_text[0]) {
 			*p++ = UA_PHDR(UA_PARM_IID_TEXT, tlen);
-			bcopy(as->as.addr.iid_text, p, tlen);
+			bcopy(as->as.addr.m2ua.iid_text, p, tlen);
 			p = (uint32_t *) ((caddr_t) p + UA_PAD4(tlen));
 		}
 #endif
@@ -5831,13 +5954,13 @@ rp_send_aspt_aspac_req(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 	mblk_t *mp;
 
 #if M2UA
-	size_t tlen = strnlen(as->as.addr.iid_text, 32);
+	size_t tlen = strnlen(as->as.addr.m2ua.iid_text, 32);
 #endif
 	size_t mlen = UA_MHDR_SIZE +
 	    (as->as.addr.tmode ? UA_SIZE(UA_PARM_TMODE) : 0) +
 	    (as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
 #if M2UA
-	    (as->as.addr.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
+	    (as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
 #endif
 	    (ilen ? UA_PHDR_SIZE + UA_PAD4(ilen) : 0);
 
@@ -5862,9 +5985,9 @@ rp_send_aspt_aspac_req(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 			p += 2;
 		}
 #if M2UA
-		if (as->as.addr.iid_text[0]) {
+		if (as->as.addr.m2ua.iid_text[0]) {
 			*p++ = UA_PHDR(UA_PARM_IID_TEXT, tlen);
-			bcopy(as->as.addr.iid_text, p, tlen);
+			bcopy(as->as.addr.m2ua.iid_text, p, tlen);
 			p = (uint32_t *) ((caddr_t) p + UA_PAD4(tlen));
 		}
 #endif
@@ -5913,7 +6036,7 @@ rp_send_aspt_aspac_ack(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 	mblk_t *mp;
 	uint popt = sp->sp.options.proto.popt;
 	uint plev = UA_PROTOCOL_LEVEL(sp->sp.options.proto.pvar);
-	size_t tlen = (popt & UA_TEXTIID) ? strnlen(as->as.addr.iid_text, 32) : 0;
+	size_t tlen = (popt & UA_TEXTIID) ? strnlen(as->as.addr.m2ua.iid_text, 32) : 0;
 	size_t mlen = UA_MHDR_SIZE +
 	    (as->as.addr.tmode ? UA_SIZE(UA_PARM_TMODE) : 0) +
 	    (as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
@@ -5936,7 +6059,7 @@ rp_send_aspt_aspac_ack(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 			/* Only M2UA supports text interface identifiers. */
 			if (tlen) {
 				*p++ = UA_PHDR(UA_PARM_IID_TEXT, tlen);
-				bcopy(as->as.addr.iid_text, p, tlen);
+				bcopy(as->as.addr.m2ua.iid_text, p, tlen);
 				p = (uint32_t *) ((caddr_t) p + UA_PAD4(tlen));
 			}
 			/* fall through */
@@ -6063,11 +6186,11 @@ rp_send_aspt_aspia_req(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 	mblk_t *mp;
 
 #if M2UA
-	size_t tlen = strnlen(as->as.addr.iid_text, 32);
+	size_t tlen = strnlen(as->as.addr.m2ua.iid_text, 32);
 #endif
 	size_t mlen = UA_MHDR_SIZE + (as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
 #if M2UA
-	    (as->as.addr.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
+	    (as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
 #endif
 	    (ilen ? UA_PHDR_SIZE + UA_PAD4(ilen) : 0);
 
@@ -6087,9 +6210,9 @@ rp_send_aspt_aspia_req(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 			p += 2;
 		}
 #if M2UA
-		if (as->as.addr.iid_text[0]) {
+		if (as->as.addr.m2ua.iid_text[0]) {
 			*p++ = UA_PHDR(UA_PARM_IID_TEXT, tlen);
-			bcopy(as->as.addr.iid_text, p, tlen);
+			bcopy(as->as.addr.m2ua.iid_text, p, tlen);
 			p = (uint32_t *) ((caddr_t) p + UA_PAD4(tlen));
 		}
 #endif
@@ -6116,6 +6239,14 @@ rp_send_aspt_aspia_req(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * rp_sent_aspt_aspia_ack: - send an ASP Active Ack
+ * @rp: AS-SGP relation pointer
+ * @tp: TP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 
 /**
  * rp_send_rkmm_reg_req: - send REG REQ
@@ -6178,11 +6309,11 @@ rp_send_rkmm_dereg_req(struct rp *rp, queue_t *q, mblk_t *msg)
 	mblk_t *mp;
 
 #if M2UA
-	size_t tlen = strnlen(as->as.addr.iid_text, 32);
+	size_t tlen = strnlen(as->as.addr.m2ua.iid_text, 32);
 #endif
 	size_t mlen = UA_MHDR_SIZE +
 #if M2UA
-	    (as->as.addr.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
+	    (as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
 #endif
 	    (as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0);
 
@@ -6204,9 +6335,9 @@ rp_send_rkmm_dereg_req(struct rp *rp, queue_t *q, mblk_t *msg)
 			p += 2;
 		}
 #if M2UA
-		if (as->as.addr.iid_text[0]) {
+		if (as->as.addr.m2ua.iid_text[0]) {
 			*p++ = UA_PHDR(UA_PARM_IID_TEXT, tlen);
-			bcopy(as->as.addr.iid_text, p, tlen);
+			bcopy(as->as.addr.m2ua.iid_text, p, tlen);
 			p = (uint32_t *) ((caddr_t) p + UA_PAD4(tlen));
 		}
 #endif
@@ -6237,10 +6368,10 @@ as_send_maup_data1(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg, mblk_t
 	int err;
 	mblk_t *mp;
 	size_t dlen = msgdsize(dp->b_cont);
-	size_t tlen = strnlen(up->as.as->as.addr.iid_text, 32);
+	size_t tlen = strnlen(up->as.as->as.addr.m2ua.iid_text, 32);
 	size_t mlen = UA_MHDR_SIZE +
 	    (up->as.as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
-	    (up->as.as->as.addr.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) + UA_PHDR_SIZE;
+	    (up->as.as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) + UA_PHDR_SIZE;
 
 	if (unlikely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
@@ -6253,9 +6384,9 @@ as_send_maup_data1(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg, mblk_t
 			p[1] = htonl(up->as.as->as.asid);
 			p += 2;
 		}
-		if (up->as.as->as.addr.iid_text[0]) {
+		if (up->as.as->as.addr.m2ua.iid_text[0]) {
 			*p++ = UA_PHDR(UA_PARM_IID_TEXT, tlen);
-			bcopy(up->as.as->as.addr.iid_text, p, tlen);
+			bcopy(up->as.as->as.addr.m2ua.iid_text, p, tlen);
 			p = (uint32_t *) ((caddr_t) p + UA_PAD4(tlen));
 		}
 		*p++ = UA_PHDR(M2UA_PARM_DATA1, dlen);
@@ -6284,10 +6415,11 @@ as_send_maup_data2(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg, mblk_t
 	int err;
 	mblk_t *mp;
 	size_t dlen = msgdsize(dp->b_cont);
-	size_t tlen = strnlen(up->as.as->as.addr.iid_text, 32);
+	size_t tlen = strnlen(up->as.as->as.addr.m2ua.iid_text, 32);
 	size_t mlen = UA_MHDR_SIZE +
 	    (up->as.as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
-	    (up->as.as->as.addr.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) + UA_PHDR_SIZE + 1;
+	    (up->as.as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
+	    UA_PHDR_SIZE + 1;
 
 	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
@@ -6300,9 +6432,9 @@ as_send_maup_data2(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg, mblk_t
 			p[1] = htonl(up->as.as->as.asid);
 			p += 2;
 		}
-		if (up->as.as->as.addr.iid_text[0]) {
+		if (up->as.as->as.addr.m2ua.iid_text[0]) {
 			*p++ = UA_PHDR(UA_PARM_IID_TEXT, tlen);
-			bcopy(up->as.as->as.addr.iid_text, p, tlen);
+			bcopy(up->as.as->as.addr.m2ua.iid_text, p, tlen);
 			p = (uint32_t *) ((caddr_t) p + UA_PAD4(tlen));
 		}
 		*p++ = UA_PHDR(M2UA_PARM_DATA2, dlen + 1);
@@ -6329,10 +6461,10 @@ as_send_maup_estab_req(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg)
 {
 	int err;
 	mblk_t *mp;
-	size_t tlen = strnlen(up->as.as->as.addr.iid_text, 32);
+	size_t tlen = strnlen(up->as.as->as.addr.m2ua.iid_text, 32);
 	size_t mlen = UA_MHDR_SIZE +
 	    (up->as.as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
-	    (up->as.as->as.addr.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0);
+	    (up->as.as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0);
 
 	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
@@ -6345,9 +6477,9 @@ as_send_maup_estab_req(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg)
 			p[1] = htonl(up->as.as->as.asid);
 			p += 2;
 		}
-		if (up->as.as->as.addr.iid_text[0]) {
+		if (up->as.as->as.addr.m2ua.iid_text[0]) {
 			*p++ = UA_PHDR(UA_PARM_IID_TEXT, tlen);
-			bcopy(up->as.as->as.addr.iid_text, p, tlen);
+			bcopy(up->as.as->as.addr.m2ua.iid_text, p, tlen);
 			p = (uint32_t *) ((caddr_t) p + UA_PAD4(tlen));
 		}
 		mp->b_wptr = (unsigned char *) p;
@@ -6373,10 +6505,10 @@ as_send_maup_rel_req(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg)
 {
 	int err;
 	mblk_t *mp;
-	size_t tlen = strnlen(up->as.as->as.addr.iid_text, 32);
+	size_t tlen = strnlen(up->as.as->as.addr.m2ua.iid_text, 32);
 	size_t mlen = UA_MHDR_SIZE +
 	    (up->as.as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
-	    (up->as.as->as.addr.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0);
+	    (up->as.as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0);
 
 	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
@@ -6389,9 +6521,9 @@ as_send_maup_rel_req(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg)
 			p[1] = htonl(up->as.as->as.asid);
 			p += 2;
 		}
-		if (up->as.as->as.addr.iid_text[0]) {
+		if (up->as.as->as.addr.m2ua.iid_text[0]) {
 			*p++ = UA_PHDR(UA_PARM_IID_TEXT, tlen);
-			bcopy(up->as.as->as.addr.iid_text, p, tlen);
+			bcopy(up->as.as->as.addr.m2ua.iid_text, p, tlen);
 			p = (uint32_t *) ((caddr_t) p + UA_PAD4(tlen));
 		}
 		mp->b_wptr = (unsigned char *) p;
@@ -6439,10 +6571,10 @@ as_send_maup_state_req(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg,
 {
 	int err;
 	mblk_t *mp;
-	size_t tlen = strnlen(up->as.as->as.addr.iid_text, 32);
+	size_t tlen = strnlen(up->as.as->as.addr.m2ua.iid_text, 32);
 	size_t mlen = UA_MHDR_SIZE +
 	    (up->as.as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
-	    (up->as.as->as.addr.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
+	    (up->as.as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
 	    UA_SIZE(M2UA_PARM_STATE_REQUEST);
 
 	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
@@ -6456,9 +6588,9 @@ as_send_maup_state_req(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg,
 			p[1] = htonl(up->as.as->as.asid);
 			p += 2;
 		}
-		if (up->as.as->as.addr.iid_text[0]) {
+		if (up->as.as->as.addr.m2ua.iid_text[0]) {
 			*p++ = UA_PHDR(UA_PARM_IID_TEXT, tlen);
-			bcopy(up->as.as->as.addr.iid_text, p, tlen);
+			bcopy(up->as.as->as.addr.m2ua.iid_text, p, tlen);
 			p = (uint32_t *) ((caddr_t) p + UA_PAD4(tlen));
 		}
 		p[0] = M2UA_PARM_STATE_REQUEST;
@@ -6489,10 +6621,10 @@ as_send_maup_retr_req(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg, uin
 {
 	int err;
 	mblk_t *mp;
-	size_t tlen = strnlen(up->as.as->as.addr.iid_text, 32);
+	size_t tlen = strnlen(up->as.as->as.addr.m2ua.iid_text, 32);
 	size_t mlen = UA_MHDR_SIZE +
 	    (up->as.as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
-	    (up->as.as->as.addr.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
+	    (up->as.as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
 	    UA_SIZE(M2UA_PARM_ACTION) + (fsnc ? UA_SIZE(M2UA_PARM_SEQNO) : 0);
 
 	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
@@ -6506,9 +6638,9 @@ as_send_maup_retr_req(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg, uin
 			p[1] = htonl(up->as.as->as.asid);
 			p += 2;
 		}
-		if (up->as.as->as.addr.iid_text[0]) {
+		if (up->as.as->as.addr.m2ua.iid_text[0]) {
 			*p++ = UA_PHDR(UA_PARM_IID_TEXT, tlen);
-			bcopy(up->as.as->as.addr.iid_text, p, tlen);
+			bcopy(up->as.as->as.addr.m2ua.iid_text, p, tlen);
 			p = (uint32_t *) ((caddr_t) p + UA_PAD4(tlen));
 		}
 		*p++ = M2UA_PARM_ACTION;
@@ -6543,10 +6675,10 @@ as_send_maup_data_ack(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg, uin
 {
 	int err;
 	mblk_t *mp;
-	size_t tlen = strnlen(up->as.as->as.addr.iid_text, 32);
+	size_t tlen = strnlen(up->as.as->as.addr.m2ua.iid_text, 32);
 	size_t mlen = UA_MHDR_SIZE +
 	    (up->as.as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
-	    (up->as.as->as.addr.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
+	    (up->as.as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
 	    UA_SIZE(M2UA_PARM_CORR_ID_ACK);
 
 	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
@@ -6560,9 +6692,9 @@ as_send_maup_data_ack(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg, uin
 			p[1] = htonl(up->as.as->as.asid);
 			p += 2;
 		}
-		if (up->as.as->as.addr.iid_text[0]) {
+		if (up->as.as->as.addr.m2ua.iid_text[0]) {
 			*p++ = UA_PHDR(UA_PARM_IID_TEXT, tlen);
-			bcopy(up->as.as->as.addr.iid_text, p, tlen);
+			bcopy(up->as.as->as.addr.m2ua.iid_text, p, tlen);
 			p = (uint32_t *) ((caddr_t) p + UA_PAD4(tlen));
 		}
 		p[0] = M2UA_PARM_CORR_ID_ACK;
@@ -6773,7 +6905,7 @@ as_send_snmm_scon(struct as *as, queue_t *q, mblk_t *msg, uint32_t apc,
  * @ilen: info length
  */
 static int
-as_send_snmm_duna(struct as *as, queue_t *q, mblk_t *msg, uint32_t apc, caddr_t iptr, size_t ilen)
+as_send_snmm_daud(struct as *as, queue_t *q, mblk_t *msg, uint32_t apc, caddr_t iptr, size_t ilen)
 {
 	int err;
 	mblk_t *mp;
@@ -6898,7 +7030,7 @@ as_send_snmm_scon(struct as *as, queue_t *q, mblk_t *msg, uint32_t apc,
  * @ilen: info length
  */
 static int
-as_send_snmm_duna(struct as *as, queue_t *q, mblk_t *msg, uint32_t apc, caddr_t iptr, size_t ilen)
+as_send_snmm_daud(struct as *as, queue_t *q, mblk_t *msg, uint32_t apc, caddr_t iptr, size_t ilen)
 {
 	int err;
 	mblk_t *mp;
@@ -7013,6 +7145,144 @@ as_send_snmm_scon(struct as *as, queue_t *q, mblk_t *msg, uint32_t apc,
 #endif
 
 /*
+ *  AS to UP state transitions
+ *  =========================================================================
+ */
+
+/**
+ * up_aspac_con: - confirm AS activation
+ * @up: UP private structure
+ * @q: active queue
+ */
+static int
+up_aspac_con(struct up *up, queue_t *q)
+{
+	switch (UA_PROTOCOL_LEVEL(up->sp.sp->sp.options.proto.pvar)) {
+	case UA_PROTOCOL_M2UA:
+		switch (up_get_state(up)) {
+		case LMI_ENABLE_PENDING:
+			if ((err = lmi_enable_con(up, q, NULL)))
+				return (err);
+			break;
+		}
+		break;
+	case UA_PROTOCOL_M3UA:
+		switch (up_get_state(up)) {
+		case MTPS_WACK_BREQ:
+			if ((err = mtp_bind_ack(up, q, NULL)))
+				return (err);
+			break;
+		case MTPS_WACK_CREQ:
+			if ((err = mtp_ok_ack(up, q, NULL, MTP_CONN_REQ)))
+				return (err);
+			/* fall through */
+		case MTPS_WCON_CREQ:
+			if ((err = mtp_conn_con(up, q, NULL)))
+				return (err);
+			break;
+		}
+		break;
+	case UA_PROTOCOL_SUA:
+		switch (up_get_state(up)) {
+		case NS_WACK_BREQ:
+			if ((err = n_bind_ack(up, q, NULL)))
+				return (err);
+			break;
+		}
+		break;
+	case UA_PROTOCOL_TUA:
+		switch (up_get_state(up)) {
+		case TS_WACK_BREQ:
+			if ((err = tr_bind_ack(up, q, NULL)))
+				return (err);
+			break;
+		}
+		break;
+	case UA_PROTOCOL_ISUA:
+		switch (up_get_state(up)) {
+		case CCS_WACK_BREQ:
+			if ((err = cc_bind_ack(up, q, NULL)))
+				return (err);
+			break;
+		}
+		break;
+	}
+	return (0);
+}
+
+/**
+ * up_aspia_con: - confirm AS deactivation
+ * @up: UP private structure
+ * @q: active queue
+ */
+static int
+up_aspia_con(struct up *up, queue_t *q)
+{
+}
+
+/**
+ * up_aspac_ind: - indicate AS activation
+ * @up: UP private structure
+ * @q: active queue
+ */
+static int
+up_aspac_ind(struct up *up, queue_t *q)
+{
+}
+
+/**
+ * up_aspia_ind: - indicate AS deactivation
+ * @up: UP private structure
+ * @q: active queue
+ */
+static int
+up_aspia_ind(struct up *up, queue_t *q)
+{
+	switch (UA_PROTOCOL_LEVEL(up->sp.sp->sp.options.proto.pvar)) {
+	case UA_PROTOCOL_IUA:
+	case UA_PROTOCOL_DUA:
+	case UA_PROTOCOL_V5UA:
+	case UA_PROTOCOL_GUA:
+	{
+		switch (dl_get_state(up)) {
+		}
+		break;
+	}
+	case UA_PROTOCOL_M2UA:
+	{
+		switch (lm_get_state(up)) {
+		}
+		break;
+	}
+	case UA_PROTOCOL_M3UA:
+	{
+		switch (mt_get_state(up)) {
+		}
+		break;
+	}
+	case UA_PROTOCOL_SUA:
+	{
+		switch (np_get_state(up)) {
+		}
+		break;
+	}
+	case UA_PROTOCOL_TUA:
+	{
+		switch (tp_get_state(up)) {
+		}
+		break;
+	}
+	case UA_PROTOCOL_ISUA:
+	{
+		switch (cc_get_state(up)) {
+		}
+		break;
+	}
+	}
+	return (0);
+}
+
+/*
  *  SGP to ASP UA protocol messages
  *  =========================================================================
  */
@@ -7072,7 +7342,7 @@ rp_lookup_first(struct tp *tp, uchar *beg, uchar *end, struct ua_parm *asid, int
 					break;
 				for (rp = tp->gp.gp->rp.list; rp; rp = rp->gp.next)
 					if (strncmp(asid->cp,
-						    rp->as.as->as.addr.iid_text,
+						    rp->as.as->as.addr.m2ua.iid_text,
 						    min(asid->len, 32)) == 0)
 						return (rp);
 			} while (0);
@@ -7453,35 +7723,69 @@ tp_recv_asps_aspup_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 	struct ua_parm parm = { {NULL,}, };
 	int ecode, err;
 
-	switch (gp_get_state(gp)) {
-	case ASP_UP:
-		/* Unsolicited: about the only time that an unsolicited ASP Up message is expected
-		   is when the SG updates options */
-	case ASP_WACK_ASPUP:
-		if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &parm, UA_PARM_ASPID))
-			tp->sp.sp->sp.options.aspid = parm.val;
-		if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &parm, UA_PARM_ASPEXT)) {
-			uint32_t *p = parm.wp;
-			uint popt = 0, opt;
-
-			if (parm.len < sizeof(uint32_t))
-				goto field_error;
-
-			while (p < ((uint32_t *) parm.cp))
-				if ((opt = *p++) >= UA_ASPEXT_NONE || UA_ASPEXT_ASPCONG >= opt)
-					popt |= (1 << opt);
-			sg->sg.options.proto.popt &= ~((1 << (UA_ASPEXT_ASPCONG + 1)) - 1);
-			sg->sg.options.proto.popt |= popt;
-		}
-		break;
-	default:
+	if (gp_not_state(gp, (1 << ASP_UP) | (1 << ASP_WACK_ASPUP)))
 		goto outstate;
+
+	if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &parm, UA_PARM_ASPID))
+		tp->sp.sp->sp.options.aspid = parm.val;
+
+	/* About the only time that an unsolicited ASP Up message is expected is when the SG
+	   updates options */
+	if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &parm, UA_PARM_ASPEXT)) {
+		uint32_t *p = parm.wp;
+		uint popt = 0, opt;
+
+		if (parm.len < sizeof(uint32_t))
+			goto field_error;
+
+		while (p < ((uint32_t *) parm.cp))
+			if ((opt = *p++) >= UA_ASPEXT_NONE || UA_ASPEXT_ASPCONG >= opt)
+				popt |= (1 << opt);
+		sg->sg.options.proto.popt &= ~((1 << (UA_ASPEXT_ASPCONG + 1)) - 1);
+		sg->sg.options.proto.popt |= popt;
 	}
+
 	if (gp_get_state(gp) == ASP_WACK_ASPUP) {
 		/* Solicited */
-		if ((err = gp_set_state(gp, q, ASP_UP, 0)))
-			return (err);
-		mi_timer_stop(gp->gp.wack_aspup);
+		switch (gp_get_t_state(gp)) {
+		case ASP_WACK_ASPUP:
+			mi_timer_stop(gp->gp.wack_aspup);
+			/* fall through */
+		case ASP_UP:
+			/* When the SGP comes ASP_UP, and management wants it up, check if there
+			   are keys that need to be registered and AS that need to be activated. */
+			for (rp = gp->rp.list; rp; rp = rp->gp.next) {
+				struct as *as = rp->as.as;
+
+				if (as_get_t_state(as) >= AS_WRSP_RREQ
+				    && rp_get_state(rp) < AS_WRSP_RREQ) {
+					/* need to register */
+					if ((err = rp_send_rkmm_reg_req(rp, q, NULL)))
+						return (err);
+					continue;
+				}
+				if (as_get_t_state(as) >= AS_WACK_ASPAC
+				    && rp_get_state(rp) < AS_WACK_ASPAC) {
+					/* need to activate */
+					if ((err = rp_send_aspt_aspac_req(rp, q, NULL)))
+						return (err);
+					continue;
+				}
+			}
+			if ((err = gp_set_state(gp, q, ASP_UP, 0)))
+				return (err);
+			/* Management might need an indication or confirmation. */
+			if ((err = ua_aspup_ind(lm, q, NULL, gp)))
+				return (err);
+			break;
+		case ASP_DOWN:
+		case ASP_WACK_ASPDN:
+			/* try to put ASP back down */
+			/* Note: this will reenter this function! */
+			if ((err = gp_send_asps_aspdn_req(gp, q, NULL, NULL, 0)))
+				return (err);
+			break;
+		}
 	}
 	freemsg(mp);
 	return (0);
@@ -7511,13 +7815,25 @@ static int
 tp_recv_asps_aspdn_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct gp *gp = tp->gp.gp;
+	struct rp *rp;
 	int err;
 
-	if (gp_get_state(gp) != ASP_DOWN) {
-		if ((err = gp_set_state(gp, q, ASP_DOWN, 0)))
-			return (err);
-		mi_timer_stop(gp->gp.wack_aspup);
+	switch (gp_get_state(gp)) {
+	case ASP_WACK_ASPDN:	/* Solicited */
 		mi_timer_stop(gp->gp.wack_aspdn);
+	case ASP_UP:		/* Unsolicited */
+		for (rp = gp->rp.list; rp; rp = rp->gp.next)
+			if ((err = rp_set_state(rp, q, AS_DOWN)))
+				return (err);
+		if ((err = gp_set_state(gp, q, ASP_DOWN)))
+			return (err);
+		return ua_aspdn_ind(gp, q, mp, UA_ASPDN_REASON_ASPDN_ACK);
+	case ASP_DOWN:
+		/* Unexpected, but ignored. */
+		break;
+	case ASP_WACK_ASPUP:
+		/* Unexpected, and ignored (fall back on timer) */
+		break;
 	}
 	freemsg(mp);
 	return (0);
@@ -7607,6 +7923,9 @@ tp_recv_aspt_aspac_req(struct tp *tp, queue_t *q, mblk_t *mp)
 	uint plev = UA_PROTOCOL_LEVEL(pvar);
 	int err = 0;
 
+	if (!(popt & UA_SEIPSP))
+		return (UA_ECODE_UNEXPECTED_MESSAGE);
+
 	if (gp_not_t_state(tp->gp.gp, (1 << ASP_UP) | (1 << ASP_WACK_ASPUP)))
 		return (UA_ECODE_REFUSED_MANAGEMENT_BLOCKING);
 
@@ -7630,7 +7949,7 @@ tp_recv_aspt_aspac_req(struct tp *tp, queue_t *q, mblk_t *mp)
 			return (UA_ECODE_MISSING_PARAMETER);
 	}
 
-	if (!(rp = rp_lookup_first(tp, mp->b_rptr, mp->b_wptr, &asid, &err)) && err)
+	if (!(rp = rp_lookup_first(tp, mp->b_rptr, mp->b_wptr, &parm, &err)) && err)
 		return (err);
 	if (!rp) {
 		/* all IUA variants require an IID in the ASPAC */
@@ -7649,7 +7968,65 @@ tp_recv_aspt_aspac_req(struct tp *tp, queue_t *q, mblk_t *mp)
 			if ((plev <= UA_PROTOCOL_M2UA && parm.tag == UA_PARM_RC) ||
 			    (plev >= UA_PROTOCOL_M3UA && parm.tag != UA_PARM_RC))
 				return (UA_ECODE_UNEXPECTED_PARAMETER);
-		if ((err = rp_recv_aspt_aspac_req(rp, tp, q, mp)))
+		if ((err = rp_recv_aspt_aspac_req(rp, tp, q, mp, tmode)))
+			return (err);
+	}
+	if (err)
+		return (err);
+	freemsg(mp);
+	return (0);
+}
+
+/**
+ * rp_recv_aspt_aspia_req: - process received ASPIA Request
+ * @rp: AS-SGP relation pointer
+ * @tp: TP private pointer
+ * @q: active queue (lower read queue)
+ * @mp: the received message
+ */
+static int
+rp_recv_aspt_aspia_req(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	struct as *as = rp->as.as;
+
+	if (rp_get_state(rp) < ASP_INACTIVE)
+		return (UA_ECODE_PROTOCOL_ERROR);
+	return rp_send_apst_aspia_ack(rp, q, NULL, NULL);
+}
+
+static int
+tp_recv_aspt_aspia_req(struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	struct ua_parm parm = { {NULL,}, };
+	struct rp *rp;
+	uint pvar = tp->sp.sp->sp.options.proto.pvar;
+	uint popt = tp->sp.sp->sp.options.proto.popt;
+	uint plev = UA_PROTOCOL_LEVEL(pvar);
+	int err = 0;
+
+	if (!(popt & UA_SEIPSP))
+		return (UA_ECODE_UNEXPECTED_MESSAGE);
+
+	if (!(rp = rp_lookup_first(tp, mp->b_rptr, mp->b_wptr, &parm, &err)) && err)
+		return (err);
+	if (!rp) {
+		/* all IUA variants required an IID in the ASPa */
+		if (pleve < UA_PROTOCOL_M2UA)
+			return (UA_ECODE_MISSING_PARAMETER);
+		/* for M2UA, no IID in the ASPAC mesans ALL IIDs (maybe even none) */
+		if (plev == UA_PROTOCOL_M2UA)
+			rp = tp->gp.gp->rp.list;
+		/* for M3UA and up, no RC in the ASPAC means the default AS */
+		if (plev > UA_PROTOCOL_M2UA)
+			if (!(rp = tp->gp.gp->rp.list) || rp->gp.next)
+				return (UA_ECODE_NO_CONFIGURED_AS_FOR_ASP);
+	}
+	for (; rp; rp = rp_lookup_next(tp, mp->b_wptr, &parm, rp, &err)) {
+		if (parm.tag != 0)
+			if ((plev <= UA_PROTOCOL_M2UA && parm.tag == UA_PARM_RC) ||
+			    (plev >= UA_PROTOCOL_M3UA && parm.tag != UA_PARM_RC))
+				return (UA_ECODE_UNEXPECTED_PARAMETER);
+		if ((err = rp_recv_aspt_aspia_req(rp, tp, q, mp)))
 			return (err);
 	}
 	if (err)
@@ -7795,22 +8172,20 @@ tp_recv_aspt_aspia_ack(struct tp *tp, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-#if M3UA
 /**
- * as_recv_xfer_data: - receive XFER DATA message
- * @as: AS structure
+ * up_recv_xfer_data: - receive XFER DATA message
+ * @up: UP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static inline __hot_in int
-as_recv_xfer_data(struct as *as, queue_t *q, mblk_t *mp)
+up_recv_xfer_data(struct up *up, queue_t *q, mblk_t *mp)
 {
 	int err;
 	struct ua_parm data;
 	struct mtp_addr srce;
 	int pri, sls;
 	unsigned char *b_rptr = mp->b_rptr;
-	struct up *up = as->up.list;	/* only one user part */
 
 	if (!up || up_get_state(up) == MTPS_UNBND)
 		goto outstate;
@@ -7827,13 +8202,12 @@ as_recv_xfer_data(struct as *as, queue_t *q, mblk_t *mp)
 	mp->b_rptr = b_rptr;
 	return (err);
       missing:
-	strlog(as->tp.tp->mid, as->tp.tp->sid, 0, SL_ERROR,
-	       "XFER DATA missing PROT DATA3 parameter");
+	strlog(up->mid, up->sid, 0, SL_ERROR, "XFER DATA missing PROT DATA3 parameter");
 	err = UA_ECODE_MISSING_PARAMETER;
 	goto error;
       outstate:
-	strlog(as->tp.tp->mid, as->tp.tp->sid, 0, SL_TRACE, "XFER DATA in unexpected AS state %s",
-	       as_u_state_name(as));
+	strlog(up->mid, up->sid, 0, SL_TRACE, "XFER DATA in unexpected AS state %s",
+	       as_u_state_name(up->as.as));
 	err = UA_ECODE_UNEXPECTED_MESSAGE;
 	goto error;
       error:
@@ -7851,50 +8225,67 @@ as_recv_xfer_data(struct as *as, queue_t *q, mblk_t *mp)
 static inline __hot_in int
 tp_recv_xfer_data(struct tp *tp, queue_t *q, mblk_t *mp)
 {
-	struct as *as;
+	struct rp *rp;
+	struct up *up;
+	int err = 0;
 
-	if ((as = rp_lookup(tp, mp, NULL)))
-		return as_recv_xfer_data(as, tp, q, mp);
-	return (-ENOENT);
+	if (!(rp = rp_lookup(tp, mp, &err)) && err)
+		return (err);
+	if (!(up = rp->as.as->up.list)) {
+		freemsg(mp);
+		return (0);
+	}
+	return up_recv_xfer_data(up, q, mp);
 }
-#endif
 
-#if TUA
-/* FIXME: SNMM for TUA */
-#endif
-
-#if M3UA || SUA
 /**
- * rp_recv_snmm_duna: - receive SNMM DUNA message
- * @rp: AS-SGP relation pointer
+ * up_recv_snmm_duna: - receive SNMM DUNA message
+ * @up: UP private structure
  * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-rp_recv_snmm_duna(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *mp)
+up_recv_snmm_duna(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err;
 	struct ua_parm apc = { {NULL,}, };
-	struct mtp_addr addr;
-	struct as *as = rp->as.as;
-	struct up *up = as->up.list;	/* only one user part */
 
-	if (!up || up_get_state(up) == MTPS_UNBND)
-		goto outstate;
 	if (!ua_dec_parm(mp->b_rptr, mp->b_wptr, &apc, UA_PARM_APC))
 		goto missing;
-	addr.pc = apc.val;
-	addr.si = 0;
-	addr.ni = 0;
-	/* FIXME: sanity check value */
-	return mtp_pause_ind(up, q, mp, &addr);
+	switch (UA_PROTOCOL_LEVEL(up->sp.sp->sp.options.proto.pvar)) {
+	case UA_PROTOCOL_M3UA:
+	{
+		struct mtp_addr addr;
+
+		if (up_get_state(up) == MTPS_UNBND)
+			goto outstate;
+		addr.pc = apc.val;
+		addr.si = 0;
+		addr.ni = 0;
+		/* FIXME: sanity check value */
+		return mtp_pause_ind(up, q, mp, &addr);
+	}
+	case UA_PROTOCOL_SUA:
+	{
+		break;
+	}
+	case UA_PROTOCOL_TUA:
+	{
+		break;
+	}
+	case UA_PROTOCOL_ISUA:
+	{
+		break;
+	}
+	}
+
       missing:
-	strlog(tp->mid, tp->sid, 0, SL_ERROR, "SNMM DUNA missing APC parameter");
-	err = -ENXIO;		/* missing mandatory parameter */
+	strlog(up->mid, up->sid, 0, SL_ERROR, "SNMM DUNA missing APC parameter");
+	err = UA_ECODE_MISSING_PARAMETER;
 	goto error;
       outstate:
-	strlog(tp->mid, tp->sid, 0, SL_ERROR, "SNMM DUNA in unexpected AS state %s",
+	strlog(up->mid, up->sid, 0, SL_ERROR, "SNMM DUNA in unexpected AS state %s",
 	       as_state_name(rp_get_state(rp)));
 	err = UA_ECODE_UNEXPECTED_MESSAGE;
 	goto error;
@@ -7904,18 +8295,18 @@ rp_recv_snmm_duna(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *mp)
 }
 
 /**
- * as_recv_snmm_dava: - receive SNMM DAVA message
- * @as: AS structure
+ * up_recv_snmm_dava: - receive SNMM DAVA message
+ * @up: UP private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-as_recv_snmm_dava(struct as *as, queue_t *q, mblk_t *mp)
+up_recv_snmm_dava(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err;
 	struct ua_parm apc = { {NULL,}, };
 	struct mtp_addr addr;
-	struct up *up = as->up.list;	/* only one user part */
 
 	if (!up || up_get_state(up) == MTPS_UNBND)
 		goto outstate;
@@ -7927,12 +8318,12 @@ as_recv_snmm_dava(struct as *as, queue_t *q, mblk_t *mp)
 	/* FIXME: sanity check value */
 	return mtp_resume_ind(up, q, mp, &addr);
       missing:
-	strlog(as->tp.tp->mid, as->tp.tp->sid, 0, SL_ERROR, "SNMM DAVA missing APC parameter");
+	strlog(up->mid, up->sid, 0, SL_ERROR, "SNMM DAVA missing APC parameter");
 	err = UA_ECODE_MISSING_PARAMETER;
 	goto error;
       outstate:
-	strlog(as->tp.tp->mid, as->tp.tp->sid, 0, SL_ERROR, "SNMM DAVA in unexpected AS state %s",
-	       as_u_state_name(as));
+	strlog(up->mid, up->sid, 0, SL_ERROR, "SNMM DAVA in unexpected AS state %s",
+	       as_state_name(up->as.as));
 	err = UA_ECODE_UNEXPECTED_MESSAGE;
 	goto error;
       error:
@@ -7941,19 +8332,33 @@ as_recv_snmm_dava(struct as *as, queue_t *q, mblk_t *mp)
 }
 
 /**
- * as_recv_snmm_scon: - receive SNMM SCON message
- * @as: AS structure
+ * up_recv_snmm_daud: - receive SNMM DAUD message
+ * @up: UP private strucutre
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-as_recv_snmm_scon(struct as *as, queue_t *q, mblk_t *mp)
+up_recv_snmm_daud(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	/* unexpected in this direction, except maybe for IPSP */
+	return (UA_ECODE_UNEXPECTED_MESSAGE);
+}
+
+/**
+ * up_recv_snmm_scon: - receive SNMM SCON message
+ * @up: UP private strucutre
+ * @tp: TP private structure
+ * @q: active queue (lower read queue)
+ * @mp: the message
+ */
+static int
+up_recv_snmm_scon(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err;
 	struct ua_parm apc, cong;
 	struct mtp_addr addr;
 	int status = MTP_STATUS_CONGESTION;
-	struct up *up = as->up.list;	/* only one user part */
 
 	if (!up || up_get_state(up) == MTPS_UNBND)
 		goto outstate;
@@ -7993,12 +8398,12 @@ as_recv_snmm_scon(struct as *as, queue_t *q, mblk_t *mp)
 #endif
 	return mtp_status_ind(up, q, mp, &addr, MTP_STATUS_TYPE_CONG, status);
       missing:
-	strlog(as->tp.tp->mid, as->tp.tp->sid, 0, SL_ERROR, "SNMM SCON missing APC parameter");
+	strlog(up->mid, up->sid, 0, SL_ERROR, "SNMM SCON missing APC parameter");
 	err = UA_ECODE_MISSING_PARAMETER;
 	goto error;
       outstate:
-	strlog(as->tp.tp->mid, as->tp.tp->sid, 0, SL_ERROR, "SNMM SCON in unexpected AS state %s",
-	       as_u_state_name(as));
+	strlog(up->mid, up->sid, 0, SL_ERROR, "SNMM SCON in unexpected AS state %s",
+	       as_u_state_name(up->as.as));
 	err = UA_ECODE_UNEXPECTED_MESSAGE;
 	goto error;
       error:
@@ -8007,19 +8412,19 @@ as_recv_snmm_scon(struct as *as, queue_t *q, mblk_t *mp)
 }
 
 /**
- * as_recv_snmm_dupu: - receive SNMM DUPU message
- * @as: AS structure
+ * up_recv_snmm_dupu: - receive SNMM DUPU message
+ * @up: UP private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-as_recv_snmm_dupu(struct as *as, queue_t *q, mblk_t *mp)
+up_recv_snmm_dupu(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err;
 	struct ua_parm apc, cause;
 	struct mtp_addr addr;
 	int status = MTP_STATUS_UPU_UNKNOWN;
-	struct up *up = as->up.list;	/* only one user part */
 
 	if (!up || up_get_state(up) == MTPS_UNBND)
 		goto outstate;
@@ -8055,17 +8460,16 @@ as_recv_snmm_dupu(struct as *as, queue_t *q, mblk_t *mp)
 	}
 	return mtp_status_ind(up, q, mp, &addr, MTP_STATUS_TYPE_UPU, status);
       missing_user_cause:
-	strlog(as->tp.tp->mid, as->tp.tp->sid, 0, SL_ERROR,
-	       "SNMM DUPU missing USER/CAUSE parameter");
-	err = -ENXIO;		/* missing mandatory parameter */
+	strlog(up->mid, up->sid, 0, SL_ERROR, "SNMM DUPU missing USER/CAUSE parameter");
+	err = UA_ECODE_MISSING_PARAMETER;
 	goto error;
       missing_apc:
-	strlog(as->tp.tp->mid, as->tp.tp->sid, 0, SL_ERROR, "SNMM DUPU missing APC parameter");
+	strlog(up->mid, up->sid, 0, SL_ERROR, "SNMM DUPU missing APC parameter");
 	err = UA_ECODE_MISSING_PARAMETER;
 	goto error;
       outstate:
-	strlog(as->tp.tp->mid, as->tp.tp->sid, 0, SL_ERROR, "SNMM DUPU in unexpected AS state %s",
-	       as_u_state_name(as));
+	strlog(up->mid, up->sid, 0, SL_ERROR, "SNMM DUPU in unexpected AS state %s",
+	       as_u_state_name(up->as.as));
 	err = UA_ECODE_UNEXPECTED_MESSAGE;
 	goto error;
       error:
@@ -8074,18 +8478,18 @@ as_recv_snmm_dupu(struct as *as, queue_t *q, mblk_t *mp)
 }
 
 /**
- * as_recv_snmm_drst: - receive SNMM DRST message
- * @as: AS structure
+ * up_recv_snmm_drst: - receive SNMM DRST message
+ * @up: UP private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-as_recv_snmm_drst(struct as *as, queue_t *q, mblk_t *mp)
+up_recv_snmm_drst(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err;
 	struct ua_parm apc = { {NULL,}, };
 	struct mtp_addr addr;
-	struct up *up = as->up.list;	/* only one user part */
 
 	if (!up || up_get_state(up) == MTPS_UNBND)
 		goto outstate;
@@ -8097,23 +8501,34 @@ as_recv_snmm_drst(struct as *as, queue_t *q, mblk_t *mp)
 	/* FIXME: sanity check value */
 	return mtp_status_ind(up, q, mp, &addr, MTP_STATUS_TYPE_RSTR, 0);
       missing:
-	strlog(as->tp.tp->mid, as->tp.tp->sid, 0, SL_ERROR, "SNMM DRST missing APC parameter");
+	strlog(up->mid, up->sid, 0, SL_ERROR, "SNMM DRST missing APC parameter");
 	err = UA_ECODE_MISSING_PARAMETER;
 	goto error;
       outstate:
-	strlog(as->tp.tp->mid, as->tp.tp->sid, 0, SL_ERROR, "SNMM DRST in unexpected AS state %s",
-	       as_u_state_name(as));
+	strlog(up->mid, up->sid, 0, SL_ERROR, "SNMM DRST in unexpected AS state %s",
+	       as_u_state_name(up->as.as));
 	err = UA_ECODE_UNEXPECTED_MESSAGE;
 	goto error;
       error:
 	freemsg(mp);
 	return (err);
 }
+
+#if SUA
+/* FIXME: SNMM for SUA */
+#endif
+
+#if TUA
+/* FIXME: SNMM for TUA */
+#endif
+
+#if ISUA
+/* FIXME: SNMM for ISUA */
 #endif
 
 #if M2UA
 /**
- * as_recv_maup_estab_con: - receive ESTAB Con message
+ * up_recv_maup_estab_con: - receive ESTAB Con message
  * @up: UP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
@@ -8122,7 +8537,7 @@ as_recv_snmm_drst(struct as *as, queue_t *q, mblk_t *mp)
  * for outstate, we should try to restore synchronization of link state.
  */
 static int
-as_recv_maup_estab_con(struct up *up, queue_t *q, mblk_t *mp)
+up_recv_maup_estab_con(struct up *up, queue_t *q, mblk_t *mp)
 {
 	int err;
 
@@ -8145,7 +8560,7 @@ as_recv_maup_estab_con(struct up *up, queue_t *q, mblk_t *mp)
 }
 
 /**
- * as_recv_maup_rel_con: - receive REL Con message
+ * up_recv_maup_rel_con: - receive REL Con message
  * @up: UP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
@@ -8154,7 +8569,7 @@ as_recv_maup_estab_con(struct up *up, queue_t *q, mblk_t *mp)
  * state.
  */
 static int
-as_recv_maup_rel_con(struct up *up, queue_t *q, mblk_t *mp)
+up_recv_maup_rel_con(struct up *up, queue_t *q, mblk_t *mp)
 {
 	int err;
 
@@ -8178,7 +8593,7 @@ as_recv_maup_rel_con(struct up *up, queue_t *q, mblk_t *mp)
 }
 
 /**
- * as_recv_maup_rel_ind: - receive REL Ind message
+ * up_recv_maup_rel_ind: - receive REL Ind message
  * @up: UP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
@@ -8187,7 +8602,7 @@ as_recv_maup_rel_con(struct up *up, queue_t *q, mblk_t *mp)
  * indication does not provide the reason for failure (release).
  */
 static int
-as_recv_maup_rel_ind(struct up *up, queue_t *q, mblk_t *mp)
+up_recv_maup_rel_ind(struct up *up, queue_t *q, mblk_t *mp)
 {
 	int err;
 
@@ -8217,6 +8632,7 @@ as_recv_maup_rel_ind(struct up *up, queue_t *q, mblk_t *mp)
 /**
  * as_recv_status_lpo_set: - receive Status LPO Set message
  * @up: UP private structure
+ * @tp: TP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  *
@@ -8495,13 +8911,13 @@ enum {
 #endif
 
 /**
- * as_recv_maup_state_con: - receive State Con message
+ * up_recv_maup_state_con: - receive State Con message
  * @up: UP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-as_recv_maup_state_con(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
+up_recv_maup_state_con(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm status = { {NULL,}, };
 
@@ -8598,13 +9014,13 @@ enum {
 #endif
 
 /**
- * as_recv_maup_state_ind: - receive STATE Ind message
+ * up_recv_maup_state_ind: - receive STATE Ind message
  * @up: UP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-as_recv_maup_state_ind(struct up *up, queue_t *q, mblk_t *mp)
+up_recv_maup_state_ind(struct up *up, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm event = { {NULL,}, };
 
@@ -8626,13 +9042,13 @@ as_recv_maup_state_ind(struct up *up, queue_t *q, mblk_t *mp)
 }
 
 /**
- * as_recv_maup_retr_con: - receive RETR Con message
+ * up_recv_maup_retr_con: - receive RETR Con message
  * @up: UP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-as_recv_maup_retr_con(struct up *up, queue_t *q, mblk_t *mp)
+up_recv_maup_retr_con(struct up *up, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm action, bsnt;
 
@@ -8654,13 +9070,13 @@ as_recv_maup_retr_con(struct up *up, queue_t *q, mblk_t *mp)
 }
 
 /**
- * as_recv_maup_retr_ind: - receive RETR Ind message
+ * up_recv_maup_retr_ind: - receive RETR Ind message
  * @up: UP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-as_recv_maup_retr_ind(struct up *up, queue_t *q, mblk_t *mp)
+up_recv_maup_retr_ind(struct up *up, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm data;
 	unsigned char *b_rptr = mp->b_rptr;
@@ -8684,13 +9100,13 @@ as_recv_maup_retr_ind(struct up *up, queue_t *q, mblk_t *mp)
 }
 
 /**
- * as_recv_maup_retr_comp_ind: - receive RETR COMP Ind message
+ * up_recv_maup_retr_comp_ind: - receive RETR COMP Ind message
  * @up: UP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-as_recv_maup_retr_comp_ind(struct up *up, queue_t *q, mblk_t *mp)
+up_recv_maup_retr_comp_ind(struct up *up, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm data;
 	unsigned char *b_rptr = mp->b_rptr;
@@ -8714,13 +9130,13 @@ as_recv_maup_retr_comp_ind(struct up *up, queue_t *q, mblk_t *mp)
 }
 
 /**
- * as_recv_maup_cong_ind: - receive CONG Ind message
+ * up_recv_maup_cong_ind: - receive CONG Ind message
  * @up: UP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-as_recv_maup_cong_ind(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
+up_recv_maup_cong_ind(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct ua_parm cong, disc;
 	int ecode;
@@ -8740,13 +9156,13 @@ as_recv_maup_cong_ind(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 }
 
 /**
- * as_recv_maup_data: - receive DATA message
+ * up_recv_maup_data: - receive DATA message
  * @up: UP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static fastcall __hot_in int
-as_recv_maup_data(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
+up_recv_maup_data(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	unsigned char *b_rptr = mp->b_rptr;
 	struct ua_parm data;
@@ -8783,22 +9199,27 @@ as_recv_maup_data(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 static inline fastcall __hot_in int
 tp_recv_maup_data(struct tp *tp, queue_t *q, mblk_t *mp)
 {
+	struct rp *rp;
 	struct up *up;
 	int err;
 
 	if (!(rp = rp_lookup(tp, mp, &err)) && err)
 		return (err);
-	return as_recv_maup_data(up, tp, q, mp);
+	if (!(up = rp->as.as->up.list)) {
+		freemsg(mp);
+		return (0);
+	}
+	return up_recv_maup_data(up, tp, q, mp);
 }
 
 /**
- * as_recv_maup_data_ack: - receive DATA Ack message
+ * up_recv_maup_data_ack: - receive DATA Ack message
  * @up: UP private structure
  * @q: active queue (lower read queue)
  * @mp: the message
  */
 static int
-as_recv_maup_data_ack(struct up *up, queue_t *q, mblk_t *mp)
+up_recv_maup_data_ack(struct up *up, queue_t *q, mblk_t *mp)
 {
 	/* ignore for now */
 	freemsg(mp);
@@ -9086,7 +9507,6 @@ tp_recv_aspt(struct tp *tp, queue_t *q, mblk_t *mp)
 	return (err);
 }
 
-#if M2UA
 /**
  * tp_recv_maup: - receive MAUP message
  * @tp: TP private structure
@@ -9097,56 +9517,62 @@ static int
 tp_recv_maup(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	register uint32_t *p = (typeof(p)) mp->b_rptr;
+	struct rp *rp;
 	struct up *up;
 	int err;
 
 	if (!(rp = rp_lookup(tp, mp, &err)) && err)
 		return (err);
 
+	if (!(up = rp->as.as->up.list)) {
+		freemsg(mp);
+		return (0);
+	}
+
 	switch (UA_MSG_TYPE(p[0])) {
 	case M2UA_MAUP_ESTAB_CON:
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "ESTAB Con <-");
-		err = as_recv_maup_estab_con(up, q, mp);
+		err = up_recv_maup_estab_con(up, q, mp);
 		break;
 	case M2UA_MAUP_REL_CON:
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "REL Con <-");
-		err = as_recv_maup_rel_con(up, q, mp);
+		err = up_recv_maup_rel_con(up, q, mp);
 		break;
 	case M2UA_MAUP_REL_IND:
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "REL Ind <-");
-		err = as_recv_maup_rel_ind(up, q, mp);
+		err = up_recv_maup_rel_ind(up, q, mp);
 		break;
 	case M2UA_MAUP_STATE_CON:
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "STATE Con <-");
-		err = as_recv_maup_state_con(up, tp, q, mp);
+		err = up_recv_maup_state_con(up, tp, q, mp);
 		break;
 	case M2UA_MAUP_STATE_IND:
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "STATE Ind <-");
-		err = as_recv_maup_state_ind(up, q, mp);
+		err = up_recv_maup_state_ind(up, q, mp);
 		break;
 	case M2UA_MAUP_RETR_CON:
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "RETR Con <-");
-		err = as_recv_maup_retr_con(up, q, mp);
+		err = up_recv_maup_retr_con(up, q, mp);
 		break;
 	case M2UA_MAUP_RETR_IND:
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "RETR Ind <-");
-		err = as_recv_maup_retr_ind(up, q, mp);
+		err = up_recv_maup_retr_ind(up, q, mp);
 		break;
 	case M2UA_MAUP_RETR_COMP_IND:
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "RETR COMP Ind <-");
-		err = as_recv_maup_retr_comp_ind(up, q, mp);
+		err = up_recv_maup_retr_comp_ind(up, q, mp);
 		break;
 	case M2UA_MAUP_CONG_IND:
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "CONG Ind <-");
-		err = as_recv_maup_cong_ind(up, tp, q, mp);
+		err = up_recv_maup_cong_ind(up, tp, q, mp);
 		break;
 	case M2UA_MAUP_DATA:
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "DATA <-");
-		err = as_recv_maup_data(up, tp, q, mp);
+		err = up_recv_maup_data(up, tp, q, mp);
 		break;
 	case M2UA_MAUP_DATA_ACK:
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "DATA Ack <-");
-		err = as_recv_maup_data_ack(up, q, mp);
+		err = up_recv_maup_data_ack(up, q, mp);
 		break;
 	default:
 		err = (-EOPNOTSUPP);
@@ -9154,9 +9580,7 @@ tp_recv_maup(struct tp *tp, queue_t *q, mblk_t *mp)
 	}
 	return (err);
 }
-#endif
 
-#if M3UA
 /**
  * tp_recv_xfer: - receive XFER message
  * @tp: TP private structure
@@ -9167,16 +9591,21 @@ static int
 tp_recv_xfer(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	register uint32_t *p = (typeof(p)) mp->b_rptr;
-	struct as *as;
+	struct rp *rp;
+	struct up *up;
 	int err;
 
-	if (!(as = rp_lookup(tp, mp, &err)) && err)
+	if (!(rp = rp_lookup(tp, mp, &err)) && err)
 		return (err);
+	if (!(up = rp->as.as->up.list)) {
+		freemsg(mp);
+		return (0);
+	}
 
 	switch (UA_MSG_TYPE(p[0])) {
 	case UA_XFER_DATA:
-		strlog(tp->mid, tp->sid, UALOGDA, SL_TRACE, "XFER DATA <-");
-		err = as_recv_xfer_data(as, tp, q, mp);
+		strlog(up->mid, up->sid, UALOGDA, SL_TRACE, "XFER DATA <-");
+		err = up_recv_xfer_data(up, q, mp);
 		break;
 	default:
 		err = -EOPNOTSUPP;
@@ -9195,45 +9624,53 @@ static int
 tp_recv_snmm(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	register uint32_t *p = (typeof(p)) mp->b_rptr;
+	struct ua_parm asid = { {NULL,}, };
 	struct rp *rp;
+	struct up *up;
 	int err;
 
-	if (!(rp = rp_lookup(tp->gp.gp, mp, &err)) && err)
+	if (!(rp = rp_lookup_first(tp, mp->b_rptr, mp->b_wtpr, &asid, &err)) && err)
 		return (err);
 
-	switch (UA_MSG_TYPE(p[0])) {
-	case UA_SNMM_DUNA:
-		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "SNMM DUNA <-");
-		err = as_recv_snmm_duna(rp, tp, q, mp);
-		break;
-	case UA_SNMM_DAVA:
-		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "SNMM DAVA <-");
-		err = as_recv_snmm_dava(rp, tp, q, mp);
-		break;
-	case UA_SNMM_DAUD:
-		err = -EINVAL;	/* unexpected in this direction */
-		break;
-	case UA_SNMM_SCON:
-		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "SNMM SCON <-");
-		err = as_recv_snmm_scon(rp, tp, q, mp);
-		break;
-	case UA_SNMM_DUPU:
-		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "SNMM DUPU <-");
-		err = as_recv_snmm_dupu(rp, tp, q, mp);
-		break;
-	case UA_SNMM_DRST:
-		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "SNMM DRST <-");
-		err = as_recv_snmm_drst(rp, tp, q, mp);
-		break;
-	default:
-		err = -EOPNOTSUPP;
-		break;
+	for (; rp; rp = rp_lookup_next(tp, mp->b_wptr, &asid, &err)) {
+		for (up = rp->as.as->up.list; up; up = up->as.next) {
+			switch (UA_MSG_TYPE(p[0])) {
+			case UA_SNMM_DUNA:
+				strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "SNMM DUNA <-");
+				err = up_recv_snmm_duna(up, tp, q, mp);
+				break;
+			case UA_SNMM_DAVA:
+				strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "SNMM DAVA <-");
+				err = up_recv_snmm_dava(up, tp, q, mp);
+				break;
+			case UA_SNMM_DAUD:
+				strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "SNMM DAUD <-");
+				err = up_recv_snmm_daud(up, tp, q, mp);
+				break;
+			case UA_SNMM_SCON:
+				strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "SNMM SCON <-");
+				err = up_recv_snmm_scon(up, tp, q, mp);
+				break;
+			case UA_SNMM_DUPU:
+				strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "SNMM DUPU <-");
+				err = up_recv_snmm_dupu(up, tp, q, mp);
+				break;
+			case UA_SNMM_DRST:
+				strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "SNMM DRST <-");
+				err = up_recv_snmm_drst(up, tp, q, mp);
+				break;
+			default:
+				err = -EOPNOTSUPP;
+				break;
+			}
+		}
 	}
-	return (err);
+	if (err)
+		return (err);
+	freemsg(mp);
+	return (0);
 }
-#endif
 
-#if SUA
 /**
  * tp_recv_cnls: - receive CNLS message from SG
  * @tp: TP private structure
@@ -9257,103 +9694,6 @@ tp_recv_cons(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	register uint32_t *p = (typeof(p)) mp->b_rptr;
 }
-
-/**
- * tp_recv_snmm: - receive SNMM message
- * @tp: TP private structure
- * @q: active queue (lower read queue)
- * @mp: the message
- */
-static int
-tp_recv_snmm(struct tp *tp, queue_t *q, mblk_t *mp)
-{
-	register uint32_t *p = (typeof(p)) mp->b_rptr;
-	struct as *as;
-	int err;
-
-	if (!(as = as_lookup(tp, q, mp, &err)) && err)
-		return (err);
-
-	switch (UA_MSG_TYPE(p[0])) {
-	case UA_SNMM_DUNA:
-		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "SNMM DUNA <-");
-		err = as_recv_snmm_duna(rp, tp, q, mp);
-		break;
-	case UA_SNMM_DAVA:
-		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "SNMM DAVA <-");
-		err = as_recv_snmm_dava(as, q, mp);
-		break;
-	case UA_SNMM_DAUD:
-		err = -EINVAL;	/* unexpected in this direction */
-		break;
-	case UA_SNMM_SCON:
-		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "SNMM SCON <-");
-		err = as_recv_snmm_scon(as, q, mp);
-		break;
-	case UA_SNMM_DUPU:
-		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "SNMM DUPU <-");
-		err = as_recv_snmm_dupu(as, q, mp);
-		break;
-	case UA_SNMM_DRST:
-		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "SNMM DRST <-");
-		err = as_recv_snmm_drst(as, q, mp);
-		break;
-	default:
-		err = -EOPNOTSUPP;
-		break;
-	}
-	return (err);
-}
-#endif
-
-#if TUA
-/**
- * tp_recv_snmm: - receive SNMM message
- * @tp: TP private structure
- * @q: active queue (lower read queue)
- * @mp: the message
- */
-static int
-tp_recv_snmm(struct tp *tp, queue_t *q, mblk_t *mp)
-{
-	register uint32_t *p = (typeof(p)) mp->b_rptr;
-	struct as *as;
-	int err;
-
-	if (!(as = as_lookup(tp, q, mp, &err)) && err)
-		return (err);
-
-	switch (UA_MSG_TYPE(p[0])) {
-	case UA_SNMM_DUNA:
-		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "SNMM DUNA <-");
-		err = as_recv_snmm_duna(rp, tp, q, mp);
-		break;
-	case UA_SNMM_DAVA:
-		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "SNMM DAVA <-");
-		err = as_recv_snmm_dava(as, q, mp);
-		break;
-	case UA_SNMM_DAUD:
-		err = -EINVAL;	/* unexpected in this direction */
-		break;
-	case UA_SNMM_SCON:
-		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "SNMM SCON <-");
-		err = as_recv_snmm_scon(as, q, mp);
-		break;
-	case UA_SNMM_DUPU:
-		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "SNMM DUPU <-");
-		err = as_recv_snmm_dupu(as, q, mp);
-		break;
-	case UA_SNMM_DRST:
-		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "SNMM DRST <-");
-		err = as_recv_snmm_drst(as, q, mp);
-		break;
-	default:
-		err = -EOPNOTSUPP;
-		break;
-	}
-	return (err);
-}
-#endif
 
 /**
  * tp_recv_rkmm: - receive RKMM message from SG
@@ -9532,15 +9872,16 @@ tp_recv_msg_slow(struct tp *tp, queue_t *q, mblk_t *mp)
 	uint class;
 	int err;
 
+	err = -EAGAIN;
+	if (!(gp = tp->gp.gp))
+		goto error;
 	err = -EMSGSIZE;
 	if (mp->b_wptr < mp->b_rptr + 2 * sizeof(*p))
 		goto error;
 	if (mp->b_wptr < mp->b_rptr + ntohl(p[1]))
 		goto error;
-	if (!(gp = tp->gp.gp))
-		return (-EAGAIN);
 	class = UA_MSG_CLAS(p[0]);
-	switch (ua_profile[tp->sp.sp->sp.options.proto.pvar].protocol) {
+	switch (UA_PROTOCOL_LEVEL(tp->sp.sp->sp.options.proto.pvar)) {
 	case UA_PROTOCOL_IUA:
 	case UA_PROTOCOL_V5UA:
 	case UA_PROTOCOL_DUA:
@@ -9664,42 +10005,42 @@ tp_recv_msg(struct tp *tp, queue_t *q, mblk_t *mp)
 	int err;
 
 	/* fast path for data */
-	if (mp->b_wptr >= mp->b_rptr + 2 * sizeof(*p))
-		if (mp->b_wptr >= mp->b_rptr + ntohl(p[1])) {
+	if (tp->gp.gp && mp->b_wptr >= mp->b_rptr + 2 * sizeof(*p)
+	    && mp->b_wptr >= mp->b_rptr + ntohl(p[1])) {
 #if M2UA
-			if (UA_MSG_CLAS(p[0]) == UA_CLASS_MAUP) {
-				if (UA_MSG_TYPE(p[0]) == M2UA_MAUP_DATA) {
-					if ((err = tp_recv_maup_data(tp, q, mp)) == 0)
-						return (0);
-					return tp_recv_err(tp, q, mp, err);
-				}
+		if (UA_MSG_CLAS(p[0]) == UA_CLASS_MAUP) {
+			if (UA_MSG_TYPE(p[0]) == M2UA_MAUP_DATA) {
+				if ((err = tp_recv_maup_data(tp, q, mp)) == 0)
+					return (0);
+				return tp_recv_err(tp, q, mp, err);
 			}
+		}
 #endif
 #if M3UA
-			if (UA_MSG_CLAS(p[0]) == UA_CLASS_XFER) {
-				if (UA_MSG_TYPE(p[0]) == UA_XFER_DATA) {
-					if ((err = tp_recv_xfer_data(tp, q, mp)) == 0)
-						return (0);
-					return tp_recv_err(tp, q, mp, err);
-				}
+		if (UA_MSG_CLAS(p[0]) == UA_CLASS_XFER) {
+			if (UA_MSG_TYPE(p[0]) == UA_XFER_DATA) {
+				if ((err = tp_recv_xfer_data(tp, q, mp)) == 0)
+					return (0);
+				return tp_recv_err(tp, q, mp, err);
 			}
+		}
 #endif
 #if SUA
-			if (UA_MSG_CLAS(p[0]) == UA_CLASS_CNLS) {
-				if (UA_MSG_TYPE(p[0]) == SUA_CNLS_CLDT) {
-					if ((err = tp_recv_clns_cldt(tp, q, mp)) == 0)
-						return (0);
-					return tp_recv_err(tp, q, mp, err);
-				}
-			} else if (UA_MSG_CLAS(p[0]) == UA_CLASS_CONS) {
-				if (UA_MSG_TYPE(p[0]) == SUA_CONS_CODT) {
-					if ((err = tp_recv_cons_codt(tp, q, mp)) == 0)
-						return (0);
-					return tp_recv_err(tp, q, mp, err);
-				}
+		if (UA_MSG_CLAS(p[0]) == UA_CLASS_CNLS) {
+			if (UA_MSG_TYPE(p[0]) == SUA_CNLS_CLDT) {
+				if ((err = tp_recv_clns_cldt(tp, q, mp)) == 0)
+					return (0);
+				return tp_recv_err(tp, q, mp, err);
 			}
-#endif
+		} else if (UA_MSG_CLAS(p[0]) == UA_CLASS_CONS) {
+			if (UA_MSG_TYPE(p[0]) == SUA_CONS_CODT) {
+				if ((err = tp_recv_cons_codt(tp, q, mp)) == 0)
+					return (0);
+				return tp_recv_err(tp, q, mp, err);
+			}
 		}
+#endif
+	}
 	return tp_recv_msg_slow(tp, q, mp);
 }
 
@@ -9799,7 +10140,7 @@ lmi_attach_req(struct up *up, queue_t *q, mblk_t *mp)
 	if (ppa_len == 0) {
 		/* the user can specific a zero-length PPA when reattaching */
 		if (up->as.as->as.addr.sdti == 0 && up->as.as->as.addr.sdli == 0
-		    && up->as.as->as.asid == 0 && up->as.as->as.addr.iid_text[0] == '\0')
+		    && up->as.as->as.asid == 0 && up->as.as->as.addr.m2ua.iid_text[0] == '\0')
 			goto badppa;
 		if ((spid = up->as.as->as.addr.spid) == 0)
 			goto badppa;
@@ -9807,7 +10148,8 @@ lmi_attach_req(struct up *up, queue_t *q, mblk_t *mp)
 		    ((up->as.as->as.addr.sdti << 16) | up->as.as->as.addr.sdli) ? : up->as.as->as.
 		    addr.asid;
 		iid_ptr =
-		    (up->as.as->as.addr.iid_text[0] == '\0') ? NULL : up->as.as->as.addr.iid_text;
+		    (up->as.as->as.addr.m2ua.iid_text[0] ==
+		     '\0') ? NULL : up->as.as->as.addr.m2ua.iid_text;
 		iid_len = iid_ptr ? strnlen(iid_ptr, 32) : 0;
 	} else {
 		size_t spid_len = ((spid = up->unit) == 0) ? sizeof(uint32_t) : 0;
@@ -9861,7 +10203,7 @@ lmi_attach_req(struct up *up, queue_t *q, mblk_t *mp)
 			goto badppa;
 		}
 		for (sl2 = sp->up.list; sl2; sl2 = sl2->sp.next)
-			if (strncmp(sl2->as.as->as.addr.iid_text, iid_ptr, iid_len) == 0)
+			if (strncmp(sl2->as.as->as.addr.m2ua.iid_text, iid_ptr, iid_len) == 0)
 				break;
 	} else {
 		/* asid is integer */
@@ -9883,9 +10225,9 @@ lmi_attach_req(struct up *up, queue_t *q, mblk_t *mp)
 		up->as.as->as.addr.sdti = (asid >> 16) & 0xffff;
 		up->as.as->as.addr.sdli = (asid >> 0) & 0xffff;
 		up->as.as->as.asid = 0;
-		up->as.as->as.addr.iid_text[0] = '\0';
+		up->as.as->as.addr.m2ua.iid_text[0] = '\0';
 		if (iid_len)
-			strncpy(iid_ptr, up->as.as->as.addr.iid_text, iid_len);
+			strncpy(iid_ptr, up->as.as->as.addr.m2ua.iid_text, iid_len);
 		/* When a signalling link interface is attached to an SCTP transport, it is
 		   assigned one of the available DATA (non-zero) stream ids for use for MAUP
 		   messages.  The precise stream id number is unimportant: we just want to spread
@@ -14678,7 +15020,7 @@ up_w_ioctl(queue_t *q, mblk_t *mp)
 		mi_copy_done(q, mp, EFAULT);
 		return (0);
 	}
-	if (!(lm = lm_acquire(q)))
+	if (!(lm = up_acquire(q)))
 		return (-EDEADLK);
 
 	switch (_IOC_TYPE(ioc->ioc_cmd)) {
@@ -14703,7 +15045,7 @@ up_w_ioctl(queue_t *q, mblk_t *mp)
 		mi_copy_done(q, mp, EINVAL);
 		break;
 	}
-	lm_release(lm);
+	up_release(lm);
 	return (rtn);
 }
 
@@ -14720,7 +15062,7 @@ up_w_iocdata(queue_t *q, mblk_t *mp)
 	int rtn = 0;
 	mblk_t *dp;
 
-	if (!(lm = lm_acquire(q)))
+	if (!(lm = up_acquire(q)))
 		return (-EDEADLK);
 	switch (mi_copy_state(q, mp, &dp)) {
 	case -1:
@@ -14781,7 +15123,7 @@ up_w_iocdata(queue_t *q, mblk_t *mp)
 		mi_copy_done(q, mp, EPROTO);
 		break;
 	}
-	lm_release(lm);
+	up_release(lm);
 	return (rtn);
 }
 
@@ -15002,41 +15344,43 @@ static noinline fastcall int
 t_discon_ind(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct T_discon_ind *p = (typeof(p)) mp->b_rptr;
-	struct up *up;
+	struct gp *gp = tp->gp.gp;
+	struct sp *sp = tp->sp.sp;
+	struct rp *rp;
+	uint state;
 	int err = 0;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto tooshort;
-	switch (tp_get_state(tp)) {
-	case TS_DATA_XFER:
-	case TS_WIND_ORDREL:
-	case TS_WREQ_ORDREL:
-	case TS_WCON_CREQ:
-		break;
-	case TS_IDLE:
-		goto idle;
-	default:
-		goto outstate;
+	if (gp) {
+		switch ((state = gp_get_state(gp))) {
+		case ASP_WACK_ASPDN:
+			mi_timer_stop(gp->gp.wack_aspdn);
+		case ASP_UP:
+			for (rp = gp->rp.list; rp; rp = rp->gp.next)
+				if ((err = rp_set_state(rp, q, AS_DOWN)))
+					return (err);
+			if ((err = gp_set_state(gp, q, ASP_DOWN)))
+				return (err);
+			if ((err = ua_aspdn_ind(gp, q, NULL, UA_ASPDN_REASON_DISCONNECT)))
+				return (err);
+			break;
+		case ASP_WACK_ASPUP:
+			/* Fall back on timer. */
+			break;
+		case ASP_DOWN:
+			/* Does not alter state. */
+			break;
+		}
 	}
-	if ((err = gp_set_state(tp->gp.gp, q, ASP_DOWN, ECONNRESET)))
-		return (err);
 	tp_set_state(tp, TS_IDLE);
-      idle:
-	switch (tp_get_t_state(tp)) {
-	case TS_IDLE:
-		break;
-	case TS_WCON_CREQ:
-	case TS_DATA_XFER:
-		/* If the TP target state is TS_WCON_CREQ or TS_DATA_XFER, then attempt a
-		   reconnect. */
-		return t_conn_req(tp, q, mp);
+	if (tp->tp.options.testab) {
+		/* start restoration timer (really a lockout timer) */
+		strlog(tp->mid, tp->sid, UALOGTE, SL_TRACE,
+		       "-> SCTP ESTB START <- (%u msec)", tp->tp.options.testab);
+		mi_timer(tp->rq, tp->tp.sctp_estb, tp->tp.options.testab);
 	}
-	freemsg(mp);
-	return (0);
-      outstate:
-	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_DISCON_IND out of state");
-	/* Should really generate T_CAPABILITY_REQ to synchronize state. */
-	goto error;
+	return ua_sctp_ind(tp, q, msg);
       tooshort:
 	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_DISCON_IND too short");
 	goto error;
@@ -15158,10 +15502,6 @@ t_info(struct tp *tp, queue_t *q, mblk_t *mp, struct T_info_ack *p)
 	case TS_WREQ_ORDREL:
 		if ((err = t_ordrel_req(tp, q, NULL)))
 			return (err);
-		if ((gp = tp->gp.gp) && (err = gp_set_state(gp, q, ASP_DOWN, ECONNRESET)))
-			return (err);
-		if (tp_get_t_state(tp) == TS_DATA_XFER)
-			return t_conn_req(tp, q, mp);
 		break;
 	case TS_WACK_BREQ:
 	case TS_WACK_UREQ:
@@ -15544,51 +15884,51 @@ static noinline fastcall int
 t_ordrel_ind(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	struct T_ordrel_ind *p = (typeof(p)) mp->b_rptr;
-	struct gp *gp;
+	struct gp *gp = tp->gp.gp;
 	struct sp *sp = tp->sp.sp;
+	uint state;
 	int err;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto tooshort;
-	if ((gp = tp->gp.gp)) {
-		if ((err = gp_set_state(gp, q, ASP_DOWN, ECONNRESET)))
-			return (err);
+	if (gp) {
+		switch ((state = gp_get_state(gp))) {
+		case ASP_WACK_ASPDN:
+			mi_timer_stop(gp->gp.wack_aspdn);
+		case ASP_UP:
+			for (rp = gp->rp.list; rp; rp = rp->gp.next)
+				if ((err = rp_set_state(rp, q, AS_DOWN)))
+					return (err);
+			if ((err = gp_set_state(gp, q, ASP_DOWN)))
+				return (err);
+			if ((err = ua_aspdn_ind(gp, q, NULL, UA_ASPDN_REASON_DISCONNECT)))
+				return (err);
+			break;
+		case ASP_WACK_ASPUP:
+			/* Fall back on timer. */
+			break;
+		case ASP_DOWN:
+			/* Does not alter state. */
+			break;
+		}
 	}
-	switch (tp_get_state(tp)) {
-	case TS_DATA_XFER:
-		tp_set_state(tp, TS_WREQ_ORDREL);
+	if (tp_get_state(tp) == TS_DATA_XFER)
 		if ((err = t_ordrel_req(tp, q, NULL)))
 			return (err);
-		if (tp_get_t_state(tp) == TS_DATA_XFER)
-			return t_conn_req(tp, q, mp);
-		break;
-	case TS_WIND_ORDREL:
-		tp_set_state(tp, TS_IDLE);
-		switch (tp_get_t_state(tp)) {
-		case TS_WIND_ORDREL:
-			tp_set_t_state(tp, TS_IDLE);
-			return ua_sctp_ind(tp, q, mp);
-		case TS_IDLE:
-			break;
-		default:
-			return t_conn_req(tp, q, mp);
-		}
-		break;
-	case TS_IDLE:
-		if (tp_get_t_state(tp) == TS_DATA_XFER)
-			return t_conn_req(tp, q, mp);
-		break;
-	default:
-		strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_ORDREL_IND out of state");
-		/* Should really generate T_CAPABILITY_REQ to synchronize state. */
-		return ua_sctp_ind(tp, q, mp);
+	tp_set_t_state(tp, TS_IDLE);
+	if (tp->tp.options.testab) {
+		/* start restoration timer (really a lockout timer) */
+		strlog(tp->mid, tp->sid, UALOGTE, SL_TRACE,
+		       "-> SCTP ESTB START <- (%u msec)", tp->tp.options.testab);
+		mi_timer(tp->rq, tp->tp.sctp_estb, tp->tp.options.testab);
 	}
-      error:
-	freemsg(mp);
-	return (0);
+	return ua_sctp_ind(tp, q, mp);
       tooshort:
 	strlog(tp->mid, tp->sid, 0, SL_ERROR, "T_ORDREL_IND too short");
 	goto error;
+      error:
+	freemsg(mp);
+	return (0);
 }
 
 /**
@@ -15795,9 +16135,15 @@ gp_wack_aspup_timeout(struct gp *gp, struct tp *tp, queue_t *q, mblk_t *mp)
 	uint tack = gp->sg.sg->sp.sp->sp.options.tack;
 	int err = 0;
 
-	if (gp_get_state(gp) != ASP_WACK_ASPUP
-	    (err = gp_send_asps_aspup_req(gp, q, NULL, NULL, 0)) || !tack)
-		return (err);
+	if (tp_get_state(tp) != TS_DATA_XFER) {
+		if ((err = t_conn_req(tp, q, NULL)))
+			return (err);
+	} else if (gp_get_state(gp) != ASP_WACK_ASPUP) {
+		if ((err = gp_send_asps_aspup_req(gp, q, NULL, NULL, 0)))
+			return (err);
+	}
+	if (!tack)
+		return (0);
 	strlog(tp->mid, tp->sid, UALOGTE, SL_TRACE, "-> WACK ASPUP START <- (%u msec)", tack);
 	mi_timer(q, mp, tack);
 	return (0);
@@ -15826,6 +16172,19 @@ gp_wack_hbeat_timeout(struct gp *gp, struct tp *tp, queue_t *q, mblk_t *mp)
 		return (err);
 	strlog(tp->mid, tp->sid, UALOGTE, SL_TRACE, "-> WACK HBEAT START <- (%u msec)", tack);
 	mi_timer(q, mp, tack);
+	return (0);
+}
+
+static fastcall int
+tp_sctp_estab_timeout(struct tp *dummy, struct tp *tp, queue_t *q, mblk_t *mp)
+{
+	uint testab = tp->tp.options.testab;
+	int err = 0;
+
+	if (tp_get_state(tp) != TS_IDLE || (err = t_conn_req(tp, q, NULL)) || !testab)
+		return (err);
+	strlog(tp->mid, tp->sid, UALOGTE, SL_TRACE, "-> SCTP ESTAB START <- (%u msec)", tack);
+	mi_timer(q, mp, testab);
 	return (0);
 }
 
@@ -15868,11 +16227,6 @@ tp_r_proto(queue_t *q, mblk_t *mp)
 
 	if (!(tp = tp_acquire(q)))
 		return (-EDEADLK);
-
-	if (!(gp = tp->gp.gp)) {
-		tp_release(tp);
-		return (-EAGAIN);
-	}
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(uint32_t)) {
 		strlog(tp->mid, tp->sid, 0, SL_ERROR, "primitive too short <-");
@@ -16000,6 +16354,10 @@ tp_r_sig(queue_t *q, mblk_t *mp)
 		case gp_wack_hbeat:
 			strlog(tp->mid, tp->sid, UALOGTO, SL_TRACE, "-> WACK HBEAT TIMEOUT <-");
 			rtn = gp_wack_hbeat_timeout(t->obj, tp, q, mp);
+			break;
+		case tp_sctp_estab:
+			strlog(tp->mid, tp->sid, UALOGTO, SL_TRACE, "-> SCTP ESTAB TIMEOUT <-");
+			rtn = tp_sctp_estab_timeout(t->obj, tp, q, mp);
 			break;
 		case rp_wack_aspac:
 			strlog(tp->mid, tp->sid, UALOGTO, SL_TRACE, "-> WACK ASPAC TIMEOUT <-");
