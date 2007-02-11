@@ -140,7 +140,7 @@ dnl AM_GNU_GETTEXT
 if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_FORK fi
 AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MEMCMP
-AC_FUNC_STRNLEN
+dnl AC_FUNC_STRNLEN
 AC_CHECK_FUNCS([bzero gethostbyname gettimeofday memset strerror strtol])
 
 AC_SCTP
