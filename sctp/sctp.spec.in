@@ -1,11 +1,11 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2006/12/29 12:18:04 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2007/02/12 16:55:55 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/29 12:18:04 $ by $Author: brian $
+# Last Modified $Date: 2007/02/12 16:55:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,6 +121,14 @@
 %global NEED_init     0
 %endif
 
+# define new autoconf 2.60, 2.61 stuff
+%{!?_datarootdir:     %{expand: %%global _datarootdir     %%{_datadir}}}
+%{!?_docdir:          %{expand: %%global _docdir          %%{_datarootdir}/doc}}
+%{!?_htmldir:         %{expand: %%global _htmldir         %%{_docdir}}}
+%{!?_dvidir:          %{expand: %%global _dvidir          %%{_docdir}}}
+%{!?_pdfdir:          %{expand: %%global _pdfdir          %%{_docdir}}}
+%{!?_psdir:           %{expand: %%global _psdir           %%{_docdir}}}
+%{!?_localedir:       %{expand: %%global _localedir       %%{_docdir}}}
 %{!?_configdir:       %{expand: %%global _configdir       %%{_sysconfdir}/sysconfig}}
 %{!?_modutildir:      %{expand: %%global _modutildir      %%{_sysconfdir}/modutils}}
 %{!?_kmoduledir:      %{expand: %%global _kmoduledir      /lib/modules/%%{kernel_version}}}
@@ -553,6 +561,13 @@ fi
     --sharedstatedir=%{_sharedstatedir} \
     --mandir=%{_mandir} \
     --infodir=%{_infodir} \
+    --datarootdir=%{_datarootdir} \
+    --docdir=%{_docdir} \
+    --htmldir=%{_htmldir} \
+    --dvidir=%{_dvidir} \
+    --pdfdir=%{_pdfdir} \
+    --psdir=%{_psdir} \
+    --localedir=%{_localedir} \
     --disable-maintainer-mode \
     --disable-dependency-tracking \
     --with-gnu-ld \
@@ -1016,7 +1031,7 @@ Summary:        %{title} run-time libraries.
 Group:          System Environment/Libraries
 Prefix:         %{_libdir}
 Prefix:         %{_lib32dir}
-Prefix:         %{_datadir}/locale
+Prefix:         %{_localedir}
 Obsoletes:      %{name}-libs
 Prereq:         /sbin/ldconfig
 Autoreq:        true
@@ -1071,7 +1086,7 @@ fi
 %{_libdir}/*.la
 %{_lib32dir}/*.so*
 %{_lib32dir}/*.la
-#{_datadir}/locale/*
+#{_localedir}/*
 %endif
 
 %if %{FILES_libs}
@@ -1080,7 +1095,7 @@ fi
 %defattr(-,root,root)
 %{_libdir}/*.so*
 %{_libdir}/*.la
-#{_datadir}/locale/*
+#{_localedir}/*
 %endif
 
 # ===========================================================================
@@ -1694,9 +1709,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.93  2006/12/29 12:18:04  brian
-# - old rpms hate nested ifs, release updates
+# Revision 0.9.2.94  2007/02/12 16:55:55  brian
+# - more autoconf 2.61 support
 #
+
+* Fri Dec 29 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.93  2006/12/29 12:18:04  brian
+- old rpms hate nested ifs, release updates
 
 * Fri Dec 29 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.92  2006/12/29 05:50:51  brian

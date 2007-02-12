@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/02/12 10:39:48 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/02/12 16:55:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/12 10:39:48 $ by $Author: brian $
+# Last Modified $Date: 2007/02/12 16:55:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,16 @@ dnl Handle differences between autoconf 2.59 and 2.60, 2.61.  The reason for
 dnl some backward compatibility to 2.59 is cause many still recent Linux
 dnl distros ship with 2.59.  (Although Debian and Ubuntu are at 2.60.)
 dnl
-m4_ifndef([AC_USE_SYSTEM_EXTENSIONS], [m4_define([AC_USE_SYSTEM_EXTENSIONS], [AC_GNU_SOURCE])])
+m4_ifndef([AC_USE_SYSTEM_EXTENSIONS],
+	  [m4_define([AC_USE_SYSTEM_EXTENSIONS], [AC_GNU_SOURCE])])
+
+m4_ifdef([AC_COPYRIGHT],
+	 [m4_define([AC_NOTICE], [AC_COPYRIGHT([$1]) AH_TOP([/* 
+]m4_bpatsubst([[$1]], [^], [ * ])[
+ */])])],
+	 [m4_define([AC_NOTICE], [AH_TOP([/* 
+]m4_bpatsubst([[$1]], [^], [ * ])[
+ */])])])
 
 # =============================================================================
 # _OPENSS7_PACKAGE([SHORT-TITLE], [LONG-TITLE])
@@ -83,6 +92,42 @@ AC_DEFUN([_OPENSS7_PACKAGE], [dnl
     AC_DEFINE_UNQUOTED([PACKAGE_DATE], ["$PACKAGE_DATE"], [The package release date.])
     PKGINCL="include/sys/${PACKAGE_NAME}"
     AC_SUBST([PKGINCL])dnl
+    AC_NOTICE(
+[Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; version 2 of the License.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+Ave, Cambridge, MA 02139, USA.
+
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+behalf of the U.S. Government ("Government"), the following provisions apply
+to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+is classified as "Commercial Computer Software" under paragraph 252.227-7014
+of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+successor regulations) and the Government is acquiring only the license rights
+granted herein (the license rights customarily provided to non-Government
+users).  If the Software is supplied to any unit or agency of the Government
+other than DoD, it is classified as "Restricted Computer Software" and the
+Government's rights in the Software are defined in paragraph 52.227-19 of the
+Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+(or any successor regulations).
+
+Commercial licensing and support of this software is available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/])dnl
+
     _OPENSS7_OPTIONS
     _OPENSS7_CACHE
     _OPENSS7_OPTIONS_CFLAGS
@@ -539,6 +584,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.40  2007/02/12 16:55:47  brian
+# - more autoconf 2.61 support
+#
 # Revision 0.9.2.39  2007/02/12 10:39:48  brian
 # - added support for autoconf 2.61
 #

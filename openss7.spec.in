@@ -1,11 +1,11 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2006/09/29 11:49:56 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2007/02/12 16:55:44 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:49:56 $ by $Author: brian $
+# Last Modified $Date: 2007/02/12 16:55:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,6 +77,15 @@
 #    just let it default to `uname -r`
 #{!?_kversion: #{expand: ##global _kversion #(env | grep PACKAGE_KVERSION | sed -e 's|.*=||')}}
 %{!?_kversion: %{expand: %%global _kversion %(uname -r)}}
+
+# define new autoconf 2.60, 2.61 stuff
+%{!?_datarootdir: %{expand: %%global _datarootdir %{_datadir}}}
+%{!?_docdir:      %{expand: %%global _docdir      %{_datarootdir}/doc}}
+%{!?_htmldir:     %{expand: %%global _htmldir     %{_docdir}}}
+%{!?_dvidir:      %{expand: %%global _dvidir      %{_docdir}}}
+%{!?_pdfdir:      %{expand: %%global _pdfdir      %{_docdir}}}
+%{!?_psdir:       %{expand: %%global _psdir       %{_docdir}}}
+%{!?_localedir:   %{expand: %%global _localedir   %{_docdir}}}
 
 %global kernel_version %{_kversion}
 %global kernel_source %(echo %{_kversion} | sed -r -e 's|BOOT$||;s|-?smp$||;s|bigmem$||;s|debug$||;s|enterprise$||;s|hugemem$||;s|secure$||;s|-i686-up-4GB$||;s|-p3-smp-64GB$||;s|-64GB-SMP|.SuSE|;s|-default$||')
@@ -520,6 +529,13 @@ fi
     --sharedstatedir=%{_sharedstatedir} \
     --mandir=%{_mandir} \
     --infodir=%{_infodir} \
+    --datarootdir=%{_datarootdir} \
+    --docdir=%{_docdir} \
+    --htmldir=%{_htmldir} \
+    --dvidir=%{_dvidir} \
+    --pdfdir=%{_pdfdir} \
+    --psdir=%{_psdir} \
+    --localedir=%{_localedir} \
     --disable-maintainer-mode \
     --disable-dependency-tracking \
     --with-gnu-ld \
@@ -1216,7 +1232,7 @@ Summary:        %{title} run-time libraries.
 Group:          System Environment/Libraries
 Prefix:         %{_libdir}
 Prefix:         %{_lib32dir}
-Prefix:         %{_datadir}/locale
+Prefix:         %{_localedir}
 Obsoletes:      %{name}-libs
 Prereq:         /sbin/ldconfig
 Autoreq:        true
@@ -1272,7 +1288,7 @@ fi
 %{_libdir}/*.la
 %{_lib32dir}/*.so*
 %{_lib32dir}/*.la
-%{_datadir}/locale/*
+%{_localedir}/*
 %endif
 
 # ===========================================================================
@@ -2036,14 +2052,18 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.66  2006/09/29 11:49:56  brian
-# - libtool library tweaks in Makefile.am
-# - better rpm spec handling in *.spec.in
-# - added AC_LIBTOOL_DLOPEN to configure.ac
-# - updated some copyright headers
-# - rationalized item in two packages
-# - added manual pages, drivers and modules to new strtty package
+# Revision 0.9.2.67  2007/02/12 16:55:44  brian
+# - more autoconf 2.61 support
 #
+
+* Fri Sep 29 2006 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.66  2006/09/29 11:49:56  brian
+- libtool library tweaks in Makefile.am
+- better rpm spec handling in *.spec.in
+- added AC_LIBTOOL_DLOPEN to configure.ac
+- updated some copyright headers
+- rationalized item in two packages
+- added manual pages, drivers and modules to new strtty package
 
 * Mon Sep 18 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.65  2006/09/18 01:23:00  brian
@@ -2304,5 +2324,4 @@ fi
 - Revision 0.9.2.2  2005/01/27 07:20:01  brian
 - First cut at master spec file.
 
-#
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi

@@ -1,5 +1,6 @@
 2007-02-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* strvoip.spec.in: support for autoconf 2.61
 	* configure.ac: support for autoconf 2.61
 	* debian/mscript_header.in: support for autoconf 2.61
 	* debian/rules.in: support for autoconf 2.61

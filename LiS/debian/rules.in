@@ -2,7 +2,7 @@
 # @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.18 $) $Date: 2007/02/12 10:39:59 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.19 $) $Date: 2007/02/12 16:55:49 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/02/12 10:39:59 $ by $Author: brian $
+## Last Modified $Date: 2007/02/12 16:55:49 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -331,6 +331,13 @@ build:
 		--sharedstatedir=$(sharedstatedir) \
 		--mandir=$(mandir) \
 		--infodir=$(infodir) \
+		--datarootdir=$(datarootdir) \
+		--docdir=$(docdir) \
+		--htmldir=$(htmldir) \
+		--dvidir=$(dvidir) \
+		--pdfdir=$(pdfdir) \
+		--psdir=$(psdir) \
+		--localedir=$(localedir) \
 		--disable-maintainer-mode \
 		--disable-dependency-tracking \
 		--with-gnu-ld \
@@ -455,6 +462,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.4.19  2007/02/12 16:55:49  brian
+# - more autoconf 2.61 support
+#
 # Revision 1.1.4.18  2007/02/12 10:39:59  brian
 # - added support for autoconf 2.61
 #
