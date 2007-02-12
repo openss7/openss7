@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2006/12/28 08:32:32 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2007/02/12 10:39:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
+# Last Modified $Date: 2007/02/12 10:39:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -192,7 +192,7 @@ dnl so we use defines.
 	    then :;
 dnl             PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_lis --with-lis\""
 dnl		PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-lis'"
-dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lis"
+dnl             ac_configure_args="$ac_configure_args --with-lis"
 	    fi
 	    AC_MSG_RESULT([--with-lis])
 	    ;;
@@ -201,7 +201,7 @@ dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--
 	    then :;
 dnl             PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_lfs --with-lfs\""
 dnl		PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-lfs'"
-dnl             ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--with-lfs"
+dnl             ac_configure_args="$ac_configure_args --with-lfs"
 	    fi
 	    AC_MSG_RESULT([--with-lfs])
 	    ;;

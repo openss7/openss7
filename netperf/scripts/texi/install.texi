@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.38 2006/12/18 11:49:26 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.39 2007/02/12 10:39:50 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/12/18 11:49:26 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/12 10:39:50 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -657,15 +657,15 @@ the other releases.
 The build host requires the following GNU tools:
 
 @itemize
-@item @command{autoconf 2.59}
+@item @command{autoconf 2.61}
 @item @command{automake 1.9.6}
 @item @command{libtool 1.5.22}
-@item @command{gettext 0.14.5}
+@item @command{gettext 0.16}
 @end itemize
 
 It should be stressed that, in particular, the @manpage{autoconf(1)}, and @manpage{automake(1)},
-must be at version releases @command{2.59} and @command{1.9}.  @emph{The versions normally
-distributed in mainstream GNU/Linux distributions are, in fact, much older than these
+must be at version releases @command{2.61} and @command{1.9.6}.  @emph{The versions normally
+distributed in some mainstream GNU/Linux distributions are, in fact, much older than these
 versions.}@footnote{A notable exception is Debian.}  GNU version of these packages configured and
 installed to default directories will install in @file{/usr/local/} allowing them to coexist with
 distribution installed versions.

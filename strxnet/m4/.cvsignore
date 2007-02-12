@@ -37,3 +37,7 @@ ulonglong.m4
 wchar_t.m4
 wint_t.m4
 xsize.m4
+intl.m4
+intldir.m4
+lock.m4
+visibility.m4

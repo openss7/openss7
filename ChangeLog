@@ -1,3 +1,17 @@
+2007-02-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: support for autoconf 2.61
+	* configure.ac: support for autoconf 2.61
+	* debian/mscript_header.in: support for autoconf 2.61
+	* debian/rules.in: support for autoconf 2.61
+	* doc/manual/news.texi: support for autoconf 2.61
+	* doc/manual/texi/install.texi: support for autoconf 2.61
+	* m4/devfs.m4: support for autoconf 2.61
+	* m4/openss7.m4: support for autoconf 2.61
+	* m4/streams.m4: support for autoconf 2.61
+	* scripts/texi/install.texi: support for autoconf 2.61
+	* texi/install.texi: support for autoconf 2.61
+
 2007-02-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/rpm.m4: recognize minor releases of CentOS

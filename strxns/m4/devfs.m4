@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: devfs.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/14 09:04:10 $
+# @(#) $RCSfile: devfs.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/02/12 10:39:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/14 09:04:10 $ by $Author: brian $
+# Last Modified $Date: 2007/02/12 10:39:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -128,11 +128,11 @@ AC_DEFUN([_LINUX_DEVFS], [dnl
     then
 	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_devfs --disable-devfs\""
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--disable-devfs'"
-dnl	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--disable-devfs"
+dnl	ac_configure_args="$ac_configure_args --disable-devfs"
     else
 	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_devfs --enable-devfs\""
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--enable-devfs'"
-dnl	ac_configure_args="${ac_configure_args}${ac_configure_args:+ }--enable-devfs"
+dnl	ac_configure_args="$ac_configure_args --enable-devfs"
     fi
     AM_CONDITIONAL([WITH_DEVFS], [test :"${devfs_cv_build:-no}" != :no])dnl
 ])# _LINUX_DEVFS

@@ -1,11 +1,11 @@
 # vim: ft=sh sw=4 et nosi nocin fo+=or tw=78
 # =============================================================================
 # 
-# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 1.1.4.7 $) $Date: 2006/09/18 00:48:44 $
+# @(#) $RCSfile: atlocal.in,v $ $Name:  $($Revision: 1.1.4.8 $) $Date: 2007/02/12 10:40:02 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -60,22 +60,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 00:48:44 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: atlocal.in,v $
-# Revision 1.1.4.7  2006/09/18 00:48:44  brian
-# - updated testsuite headers
-#
-# Revision 1.1.4.6  2006/01/03 21:39:05  brian
-# - rootdir not krootdir
-#
-# Revision 1.1.4.5  2005/11/01 11:20:32  brian
-# - updates for testing and documentation
-#
-# Revision 1.1.4.4  2005/05/27 19:48:41  brian
-# - updated headers
+# Last Modified $Date: 2007/02/12 10:40:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -165,6 +150,14 @@ at_sbindir="@sbindir@"
 at_sharedstatedir="@sharedstatedir@"
 at_sysconfdir="@sysconfdir@"
 
+at_datarootdir="@datarootdir@"
+at_docdir="@docdir@"
+at_htmldir="@htmldir@"
+at_dvidir="@dvidir@"
+at_pdfdir="@pdfdir@"
+at_psdir="@psdir@"
+at_localedir="@localedir@"
+
 #
 #   The following needs to be performed by the individual test suites instead
 #   of when atlocal is sourced.  atlocal just needs to contain information
@@ -203,4 +196,23 @@ at_sysconfdir="@sysconfdir@"
 #    at_library_tests='no'
 #fi
 
+# =============================================================================
+#
+# $Log: atlocal.in,v $
+# Revision 1.1.4.8  2007/02/12 10:40:02  brian
+# - added support for autoconf 2.61
+#
+# Revision 1.1.4.7  2006/09/18 00:48:44  brian
+# - updated testsuite headers
+#
+# Revision 1.1.4.6  2006/01/03 21:39:05  brian
+# - rootdir not krootdir
+#
+# Revision 1.1.4.5  2005/11/01 11:20:32  brian
+# - updates for testing and documentation
+#
+# Revision 1.1.4.4  2005/05/27 19:48:41  brian
+# - updated headers
+#
+# =============================================================================
 # vim: ft=sh sw=4 et nosi nocin fo+=or tw=78

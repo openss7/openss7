@@ -1,13 +1,13 @@
-# vim: ft=config sw=4 noet nocindent nosmartindent
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/29 11:50:58 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/12 10:41:09 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:50:58 $ by $Author: brian $
+# Last Modified $Date: 2007/02/12 10:41:09 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.4  2007/02/12 10:41:09  brian
+# - added support for autoconf 2.61
+#
 # Revision 0.9.2.3  2006/09/29 11:50:58  brian
 # - libtool library tweaks in Makefile.am
 # - better rpm spec handling in *.spec.in
@@ -73,9 +76,9 @@
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_PREREQ(2.60)
+AC_PREREQ(2.59)
 AC_INIT([strtty],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name$($Revision: 0.9.2.3$) $Date$])
+AC_REVISION([$Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/12 10:41:09 $])
 AC_COPYRIGHT(
 [Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
@@ -136,7 +139,7 @@ if test :${USE_MAINTAINER_MODE:-yes} = :yes ; then
 	enable_dependency_tracking="${enable_dependency_tracking:-yes}"
 fi
 
-AC_GNU_SOURCE
+AC_USE_SYSTEM_EXTENSIONS
 
 dnl
 dnl Checks for programs.
@@ -153,10 +156,11 @@ AC_ARG_VAR([LD], [Linker loader command])
 AC_PROG_LD
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_YACC
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
-dnl AM_GNU_GETTEXT_VERSION(0.14.5)
+dnl AM_GNU_GETTEXT_VERSION([0.14.5])
 
 dnl
 dnl Checks for libraries.
@@ -182,21 +186,47 @@ AC_CHECK_HEADERS([fcntl.h inttypes.h stdint.h stdlib.h string.h sys/ioctl.h sys/
 dnl
 dnl Checks for typedefs, structures, and compiler characteristics.
 dnl
+AC_HEADER_STAT
+AC_HEADER_STDBOOL
 AC_C_CONST
+AC_TYPE_UID_T
 AC_C_INLINE
+AC_TYPE_MODE_T
+AC_TYPE_OFF_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
+AC_CHECK_MEMBERS([struct stat.st_blksize])
+AC_STRUCT_ST_BLOCKS
+AC_CHECK_MEMBERS([struct stat.st_rdev])
 AC_HEADER_TIME
+AC_STRUCT_TM
+AC_TYPE_UINT8_T
+AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 AC_C_VOLATILE
+AC_CHECK_TYPES([ptrdiff_t])
 
 dnl
 dnl Checks for library functions.
 dnl
-AC_FUNC_FORK
+dnl AM_GNU_GETTEXT
+AC_FUNC_ERROR_AT_LINE
+if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_FORK fi
 AC_PROG_GCC_TRADITIONAL
+AC_FUNC_LSTAT
+AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
+if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_MALLOC fi
 AC_FUNC_MEMCMP
+AC_FUNC_MMAP
+AC_FUNC_REALLOC
+AC_FUNC_SELECT_ARGTYPES
+if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_SETPGRP fi
 AC_TYPE_SIGNAL
+AC_FUNC_STAT
+AC_FUNC_STRFTIME
+AC_FUNC_STRNLEN
+AC_FUNC_STRTOD
+AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([bzero gettimeofday strerror strtol])
 
 AC_TTY
@@ -217,10 +247,10 @@ AC_OUTPUT
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
 # ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
-# vim: ft=config sw=4 noet nocindent nosmartindent
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn

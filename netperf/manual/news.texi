@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.7 2007/01/09 22:20:43 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.8 2007/02/12 10:40:07 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/09 22:20:43 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/12 10:40:07 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -83,6 +83,26 @@ The sections that follow provide information on
 @node Release @value{PACKAGE}-@value{VERSION}
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+This is the fifth full release of the @cite{@value{PACKAGE_TITLE}} package.
+
+This release is largely a maintenance release that provides support for more
+distributions an architectures as well as tracking feature updates on related
+packages.
+
+Major features since the last public release are as follows:
+
+@itemize -
+@item
+Support for autoconf 2.61 and gettext 0.16.
+
+@item
+Support for Ubuntu 6.10 distribution and bug fixes for i386 kenels.
+
+@item
+The package now looks for other subpackages with a version number as unpacked by separate tarball.
+
+@end itemize
 
 @c ----------------------------------------------------------------------------
 

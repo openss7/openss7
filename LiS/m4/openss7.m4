@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/10/21 09:18:51 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/02/12 10:39:48 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -48,39 +48,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/21 09:18:51 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: openss7.m4,v $
-# Revision 0.9.2.38  2006/10/21 09:18:51  brian
-# - better config.site generation
-#
-# Revision 0.9.2.37  2006/09/25 08:56:35  brian
-# - corrections by inspection
-#
-# Revision 0.9.2.35  2006/07/25 06:38:52  brian
-# - expanded minor device numbers and optimization and locking corrections
-#
-# Revision 0.9.2.34  2006/07/23 04:04:10  brian
-# - more control for user optimizations
-#
-# Revision 0.9.2.33  2006/07/14 00:12:25  brian
-# - substitute config cache and site filenames
-#
-# Revision 0.9.2.32  2006/03/25 12:55:08  brian
-# - got enable_static backwards
-#
-# Revision 0.9.2.31  2006/03/20 12:12:18  brian
-# - don't build libtool static libraries no devel
-#
-# Revision 0.9.2.30  2006/03/20 11:51:09  brian
-# - added check for --disable-devel
-#
-# Revision 0.9.2.29  2006/03/11 09:49:51  brian
-# - a bit better checking
+# Last Modified $Date: 2007/02/12 10:39:48 $ by $Author: brian $
 #
 # =============================================================================
+
+dnl
+dnl Handle differences between autoconf 2.59 and 2.60, 2.61.  The reason for
+dnl some backward compatibility to 2.59 is cause many still recent Linux
+dnl distros ship with 2.59.  (Although Debian and Ubuntu are at 2.60.)
+dnl
+m4_ifndef([AC_USE_SYSTEM_EXTENSIONS], [m4_define([AC_USE_SYSTEM_EXTENSIONS], [AC_GNU_SOURCE])])
 
 # =============================================================================
 # _OPENSS7_PACKAGE([SHORT-TITLE], [LONG-TITLE])
@@ -136,18 +113,38 @@ dnl
     fi
     rootdir=`echo $newprefix | sed -e 's|/local$||;s|/usr$||'`
 dnl
-dnl Need to adjust directories if default
+dnl Need to adjust directories if default.  This also handles subtitutional
+dnl differences between autoconf 2.59 and autoconf 2.60 and 2.61.
 dnl
     if test :"$sysconfdir" = :'${prefix}/etc' ; then sysconfdir='${rootdir}/etc' ; fi
     if test :"$localstatedir" = :'${prefix}/var' ; then localstatdir='${rootdir}/var' ; fi
+    if test :"$sharedstatedir" = :'${prefix}/com' ; then localstatdir='${rootdir}/com' ; fi
     if test :"${newprefix#$rootdir}" = : ; then
-	if test :"$infodir" = :'${prefix}/info' ; then infodir='${prefix}/usr/share/info' ; fi
-	if test :"$mandir" = :'${prefix}/man' ; then mandir='${prefix}/usr/share/man' ; fi
+	if test :"${datarootdir+set}" != :set ; then datarootdir='${prefix}/usr/share' ; fi
+	if test :"$datarootdir" = :'${prefix}/share' ; then datarootdir='${prefix}/usr/share' ; fi
+	if test :"$infodir" = :'${prefix}/info' ; then infodir='${datarootdir}/info' ; fi
+	if test :"$mandir" = :'${prefix}/man' ; then mandir='${datarootdir}/man' ; fi
     fi
     if test :"${newprefix#$rootdir}" = :/usr ; then
-	if test :"$infodir" = :'${prefix}/info' ; then infodir='${prefix}/share/info' ; fi
-	if test :"$mandir" = :'${prefix}/man' ; then mandir='${prefix}/share/man' ; fi
+	if test :"${datarootdir+set}" != :set ; then datarootdir='${prefix}/share' ; fi
+	if test :"$infodir" = :'${prefix}/info' ; then infodir='${datarootdir}/info' ; fi
+	if test :"$mandir" = :'${prefix}/man' ; then mandir='${datarootdir}/man' ; fi
     fi
+    AC_SUBST([datarootdir])
+    if test :"${datadir+set}" != :set ; then datadir='${datarootdir}' ; fi
+    AC_SUBST([datadir])
+    if test :"${localedir+set}" != :set ; then localedir='${datarootdir}/locale' ; fi
+    AC_SUBST([localedir])
+    if test :"${docdir+set}" != :set ; then docdir='${datarootdir}/doc/${PACKAGE_TARNAME}' ; fi
+    AC_SUBST([docdir])
+    if test :"${htmldir+set}" != :set ; then htmldir='${docdir}' ; fi
+    AC_SUBST([htmldir])
+    if test :"${dvidir+set}" != :set ; then dvidir='${docdir}' ; fi
+    AC_SUBST([dvidir])
+    if test :"${pdfdir+set}" != :set ; then pdfdir='${docdir}' ; fi
+    AC_SUBST([pdfdir])
+    if test :"${psdir+set}" != :set ; then psdir='${docdir}' ; fi
+    AC_SUBST([psdir])
     AC_SUBST([rootdir])
 dnl
 dnl Need to check this before libtool gets done
@@ -540,8 +537,41 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 
 # =============================================================================
+#
+# $Log: openss7.m4,v $
+# Revision 0.9.2.39  2007/02/12 10:39:48  brian
+# - added support for autoconf 2.61
+#
+# Revision 0.9.2.38  2006/10/21 09:18:51  brian
+# - better config.site generation
+#
+# Revision 0.9.2.37  2006/09/25 08:56:35  brian
+# - corrections by inspection
+#
+# Revision 0.9.2.35  2006/07/25 06:38:52  brian
+# - expanded minor device numbers and optimization and locking corrections
+#
+# Revision 0.9.2.34  2006/07/23 04:04:10  brian
+# - more control for user optimizations
+#
+# Revision 0.9.2.33  2006/07/14 00:12:25  brian
+# - substitute config cache and site filenames
+#
+# Revision 0.9.2.32  2006/03/25 12:55:08  brian
+# - got enable_static backwards
+#
+# Revision 0.9.2.31  2006/03/20 12:12:18  brian
+# - don't build libtool static libraries no devel
+#
+# Revision 0.9.2.30  2006/03/20 11:51:09  brian
+# - added check for --disable-devel
+#
+# Revision 0.9.2.29  2006/03/11 09:49:51  brian
+# - a bit better checking
+#
+# =============================================================================
 # 
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

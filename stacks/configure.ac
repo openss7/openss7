@@ -1,12 +1,13 @@
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2006/12/28 05:32:57 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/02/12 10:40:23 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -47,16 +48,60 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/28 05:32:57 $ by $Author: brian $
+# Last Modified $Date: 2007/02/12 10:40:23 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: configure.ac,v $
+# Revision 0.9.2.38  2007/02/12 10:40:23  brian
+# - added support for autoconf 2.61
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_REVISION([$Id: configure.ac,v 0.9.2.37 2006/12/28 05:32:57 brian Exp $])
 AC_PREREQ(2.59)
 AC_INIT([strss7],[0.9a],[bugs@openss7.org])
+AC_REVISION([$Name:  $($Revision: 0.9.2.38 $) $Date: 2007/02/12 10:40:23 $])
+AC_COPYRIGHT(
+[Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 of the License.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this
+Software on behalf of the U.S. Government ("Government"), the
+following provisions apply to you.  If the Software is supplied by
+the Department of Defense ("DoD"), it is classified as "Commercial
+Computer Software" under paragraph 252.227-7014 of the DoD
+Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+successor regulations) and the Government is acquiring only the
+license rights granted herein (the license rights customarily
+provided to non-Government users).  If the Software is supplied to
+any unit or agency of the Government other than DoD, it is
+classified as "Restricted Computer Software" and the Government's
+rights in the Software are defined in paragraph 52.227-19 of the
+Federal Acquisition Regulations ("FAR") (or any successor
+regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of
+the NASA Supplement to the FAR (or any successor regulations).
+
+Commercial licensing and support of this software is available from
+OpenSS7 Corporation at a fee.  See http://www.openss7.com/]
+)
 
 _OPENSS7_DIRCHANGE
 
@@ -79,7 +124,7 @@ if test :${USE_MAINTAINER_MODE:-yes} = :yes ; then
 	enable_dependency_tracking="${enable_dependency_tracking:-yes}"
 fi
 
-AC_GNU_SOURCE
+AC_USE_SYSTEM_EXTENSIONS
 
 dnl
 dnl Checks for programs.
@@ -100,7 +145,7 @@ AC_PROG_YACC
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
-AM_GNU_GETTEXT_VERSION([0.14.5])
+AM_GNU_GETTEXT_VERSION([0.16])
 
 dnl
 dnl Checks for libraries.
@@ -140,6 +185,9 @@ AC_STRUCT_ST_BLOCKS
 AC_CHECK_MEMBERS([struct stat.st_rdev])
 AC_HEADER_TIME
 AC_STRUCT_TM
+AC_TYPE_UINT8_T
+AC_TYPE_UINT16_T
+AC_TYPE_UINT32_T
 AC_C_VOLATILE
 AC_CHECK_TYPES([ptrdiff_t])
 
@@ -160,7 +208,9 @@ AC_FUNC_SELECT_ARGTYPES
 if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_SETPGRP fi
 AC_TYPE_SIGNAL
 AC_FUNC_STAT
-dnl AC_FUNC_STRNLEN
+AC_FUNC_STRFTIME
+AC_FUNC_STRNLEN
+AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify bzero getcwd gethostbyname gettimeofday inet_ntoa mempcpy memset munmap nl_langinfo setlocale socket stpcpy strcasecmp strchr strcspn strdup strerror strstr strtol strtoul])
 
@@ -206,10 +256,10 @@ AC_OUTPUT
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
 # ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
-# vim: ft=config sw=4 noet nocindent nosmartindent
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
