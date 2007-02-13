@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/29 05:51:01 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/13 15:37:36 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/12/29 05:51:01 $ by $Author: brian $
+## Last Modified $Date: 2007/02/13 15:37:36 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.4  2007/02/13 15:37:36  brian
+## - no directory names in file list please
+##
 ## Revision 0.9.2.3  2006/12/29 05:51:01  brian
 ## - changes for successful master build
 ##
@@ -85,7 +88,6 @@ nobase_pkginclude_HEADERS = \
 	sys/m3ua_as.h \
 	sys/m3ua_as_ioctl.h \
 	sys/m3ua_ioctl.h \
-	sys/sigtran \
 	sys/ua_as_ioctl.h \
 	sys/ua_as_lm.h \
 	sys/ua_ioctl.h \
