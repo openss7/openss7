@@ -909,9 +909,11 @@ up_set_m_state(struct up *up, queue_t *q, uint newstate)
 }
 
 static uint as_get_t_state(struct as *as);
-static int rp_send_aspt_aspia_req(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t iptr, size_t ilen);
+static int rp_send_aspt_aspia_req(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t iptr,
+				  size_t ilen);
 static uint as_set_t_state(struct as *as, uint newstate);
-static noinline fastcall int lmi_error_ack(struct up *up, queue_t *q, mblk_t *msg, lmi_long prim, lmi_long err);
+static noinline fastcall int lmi_error_ack(struct up *up, queue_t *q, mblk_t *msg, lmi_long prim,
+					   lmi_long err);
 static noinline fastcall int lmi_disable_con(struct up *up, queue_t *q, mblk_t *msg);
 static noinline fastcall int m_hangup(struct up *up, queue_t *q, mblk_t *msg);
 
@@ -1064,11 +1066,13 @@ as_not_state(struct as *as, uint mask)
 {
 	return (as_chk_state(as, ~mask));
 }
+
 static uint
 as_get_t_state(struct as *as)
 {
 	return (as->as.target);
 }
+
 static uint
 as_set_t_state(struct as *as, uint newstate)
 {
@@ -2324,6 +2328,7 @@ ua_init_object_df(struct df *df, uint id)
 	bzero(df, sizeof(*df));
 	/* assign defaults */
 }
+
 void __unlikely
 ua_init_object_lm(struct up *lm, uint id)
 {
@@ -2902,7 +2907,7 @@ ua_remove_object_up(struct up *up)
 	ua_free_object_up(up);
 }
 static void __unlikely
-remove_object_rp(struct rp *rp)
+ua_remove_object_rp(struct rp *rp)
 {
 	unsigned long flags;
 	mblk_t *t;
@@ -2944,7 +2949,7 @@ ua_remove_object_as(struct as *as)
 	struct rp *rp;
 
 	while ((rp = as->rp.list))
-		remove_object_rp(rp);
+		ua_remove_object_rp(rp);
 
 	write_lock_irqsave(&ua_mux_lock, flags);
 	while ((up = as->up.list)) {
@@ -3037,7 +3042,7 @@ ua_remove_object_gp(struct gp *gp)
 	if (gp->xp.xp)
 		ua_remove_object_xp(gp->xp.xp);
 	while (gp->rp.list)
-		remove_object_rp(gp->rp.list);
+		ua_remove_object_rp(gp->rp.list);
 
 	write_lock_irqsave(&ua_mux_lock, flags);
 	if ((*gp->sg.prev = gp->sg.next))
@@ -4747,7 +4752,7 @@ mtp_bind_ack(struct up *up, queue_t *q, mblk_t *msg, caddr_t aptr, size_t alen, 
 		p->mtp_primitive = MTP_BIND_ACK;
 		p->mtp_addr_length = alen;
 		p->mtp_addr_offset = sizeof(*p);
-		//p->mtp_bind_flags = flags;
+		// p->mtp_bind_flags = flags;
 		mp->b_wptr += sizeof(*p);
 		bcopy(aptr, mp->b_wptr, alen);
 		mp->b_wptr += alen;
@@ -7863,7 +7868,8 @@ up_send_cons(struct up *up, queue_t *q, uint pri, uint sls, mblk_t *dp)
  * @ilen: info length
  */
 static inline int
-rp_send_snmm_daud(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *msg, uint32_t apc, caddr_t iptr, size_t ilen)
+rp_send_snmm_daud(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *msg, uint32_t apc, caddr_t iptr,
+		  size_t ilen)
 {
 	int err;
 	mblk_t *mp;
@@ -7993,7 +7999,8 @@ rp_send_snmm_scon(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *msg, uint32_
  * @ilen: info length
  */
 static inline int
-as_send_snmm_daud(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *msg, uint32_t apc, caddr_t iptr, size_t ilen)
+as_send_snmm_daud(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *msg, uint32_t apc, caddr_t iptr,
+		  size_t ilen)
 {
 	int err;
 	mblk_t *mp;
@@ -8178,7 +8185,7 @@ up_aspac_con(struct up *up, queue_t *q)
 		break;
 	case UA_PROTOCOL_ISUA:
 		switch (up_get_state(up)) {
-		//case CCS_WACK_BREQ:
+			// case CCS_WACK_BREQ:
 		default:
 			if ((err = cc_bind_ack(up, q, NULL)))
 				return (err);
@@ -8599,8 +8606,8 @@ rp_recv_mgmt_ntfy(struct rp *rp, queue_t *q, mblk_t *mp)
 			goto outstate;
 		}
 	      outstate:
-		strlog(DRV_ID, rp->rp.streamid, 0, SL_TRACE, "Alternate ASP Active in invalid state %u",
-		       rp_get_state(rp));
+		strlog(DRV_ID, rp->rp.streamid, 0, SL_TRACE,
+		       "Alternate ASP Active in invalid state %u", rp_get_state(rp));
 		if ((err = rp_set_state(rp, q, AS_DOWN)))
 			return (err);
 		return lmi_error_ind(rp->as.as->up.list, q, mp, LMI_FATALERR, LMI_UNUSABLE);
@@ -9340,7 +9347,8 @@ static int
 up_recv_snmm_scon(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err;
-	struct ua_parm apc = { 0, }, cong = { 0, };
+	struct ua_parm apc = { 0, }, cong = {
+	0,};
 	struct mtp_addr addr;
 	int status = MTP_STATUS_CONGESTION;
 
@@ -9406,7 +9414,8 @@ static int
 up_recv_snmm_dupu(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err;
-	struct ua_parm apc = { 0, }, cause = { 0, };
+	struct ua_parm apc = { 0, }, cause = {
+	0,};
 	struct mtp_addr addr;
 	int status = MTP_STATUS_UPU_UNKNOWN;
 
@@ -9472,7 +9481,7 @@ static int
 up_recv_snmm_drst(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err;
-	struct ua_parm apc = { 0, }; 
+	struct ua_parm apc = { 0, };
 	struct mtp_addr addr;
 
 	if (!up || up_get_state(up) == MTPS_UNBND)
@@ -10034,7 +10043,8 @@ up_recv_maup_state_ind(struct up *up, queue_t *q, mblk_t *mp)
 static int
 up_recv_maup_retr_con(struct up *up, queue_t *q, mblk_t *mp)
 {
-	struct ua_parm action = { 0, }, bsnt = { 0, };
+	struct ua_parm action = { 0, }, bsnt = {
+	0,};
 
 	if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &action, M2UA_PARM_ACTION)) {
 		switch (action.val) {
@@ -10122,7 +10132,8 @@ up_recv_maup_retr_comp_ind(struct up *up, queue_t *q, mblk_t *mp)
 static int
 up_recv_maup_cong_ind(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 {
-	struct ua_parm cong = { 0, }, disc = { 0, };
+	struct ua_parm cong = { 0, }, disc = {
+	0,};
 	int ecode;
 
 	if (!ua_dec_parm(mp->b_rptr, mp->b_wptr, &cong, M2UA_PARM_CONG_STATUS))
@@ -10399,7 +10410,7 @@ tp_recv_mgmt(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err;
 
-	switch (UA_MSG_TYPE(*(uint32_t *)mp->b_rptr)) {
+	switch (UA_MSG_TYPE(*(uint32_t *) mp->b_rptr)) {
 	case UA_MGMT_ERR:
 		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "ERR <-");
 		err = tp_recv_mgmt_err(tp, q, mp);
@@ -10426,7 +10437,7 @@ tp_recv_asps(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	int err;
 
-	switch (UA_MSG_TYPE(*(uint32_t *)mp->b_rptr)) {
+	switch (UA_MSG_TYPE(*(uint32_t *) mp->b_rptr)) {
 	case UA_ASPS_HBEAT_REQ:
 		strlog(tp->mid, tp->sid, UALOGRX, SL_TRACE, "BEAT <-");
 		err = tp_recv_asps_hbeat_req(tp, q, mp);
@@ -10523,7 +10534,7 @@ tp_recv_maup(struct tp *tp, queue_t *q, mblk_t *mp)
 		return (0);
 	}
 
-	switch (UA_MSG_TYPE(*(uint32_t *)mp->b_rptr)) {
+	switch (UA_MSG_TYPE(*(uint32_t *) mp->b_rptr)) {
 	case M2UA_MAUP_ESTAB_CON:
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "ESTAB Con <-");
 		err = up_recv_maup_estab_con(up, q, mp);
@@ -10595,7 +10606,7 @@ tp_recv_xfer(struct tp *tp, queue_t *q, mblk_t *mp)
 		return (0);
 	}
 
-	switch (UA_MSG_TYPE(*(uint32_t *)mp->b_rptr)) {
+	switch (UA_MSG_TYPE(*(uint32_t *) mp->b_rptr)) {
 	case UA_XFER_DATA:
 		strlog(up->mid, up->sid, UALOGDA, SL_TRACE, "XFER DATA <-");
 		err = up_recv_xfer_data(up, q, mp);
@@ -10626,7 +10637,7 @@ tp_recv_snmm(struct tp *tp, queue_t *q, mblk_t *mp)
 
 	for (; rp; rp = rp_lookup_next(tp, mp->b_wptr, &asid, rp, &err)) {
 		for (up = rp->as.as->up.list; up; up = up->as.next) {
-			switch (UA_MSG_TYPE(*(uint32_t *)mp->b_rptr)) {
+			switch (UA_MSG_TYPE(*(uint32_t *) mp->b_rptr)) {
 			case UA_SNMM_DUNA:
 				strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "SNMM DUNA <-");
 				err = up_recv_snmm_duna(up, tp, q, mp);
@@ -10668,6 +10679,7 @@ tp_recv_clns_cldt(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	return (0);
 }
+
 /**
  * tp_recv_cnls: - receive CNLS message from SG
  * @tp: TP private structure
@@ -10685,6 +10697,7 @@ tp_recv_cons_codt(struct tp *tp, queue_t *q, mblk_t *mp)
 {
 	return (0);
 }
+
 /**
  * tp_recv_cons: - receive CONS message from SG
  * @tp: TP private structure
@@ -10752,7 +10765,7 @@ tp_recv_rkmm(struct tp *tp, queue_t *q, mblk_t *mp)
 			   it */
 			return (-EPROTO);
 
-		switch (UA_MSG_TYPE(*(uint32_t *)mp->b_rptr)) {
+		switch (UA_MSG_TYPE(*(uint32_t *) mp->b_rptr)) {
 		case UA_RKMM_REG_RSP:
 			/* FIXME: dig registration status and AS identifier out of the registration 
 			   result. */
@@ -10787,7 +10800,7 @@ tp_recv_rkmm(struct tp *tp, queue_t *q, mblk_t *mp)
 			   it */
 			return (-EPROTO);
 
-		switch (UA_MSG_TYPE(*(uint32_t *)mp->b_rptr)) {
+		switch (UA_MSG_TYPE(*(uint32_t *) mp->b_rptr)) {
 		case UA_RKMM_REG_RSP:
 			/* FIXME: dig registration status and AS identifier out of the registration 
 			   result. */
@@ -10822,7 +10835,7 @@ tp_recv_rkmm(struct tp *tp, queue_t *q, mblk_t *mp)
 			   it */
 			return (-EPROTO);
 
-		switch (UA_MSG_TYPE(*(uint32_t *)mp->b_rptr)) {
+		switch (UA_MSG_TYPE(*(uint32_t *) mp->b_rptr)) {
 		case UA_RKMM_REG_RSP:
 			/* FIXME: dig registration status and AS identifier out of the registration 
 			   result. */
@@ -10857,7 +10870,7 @@ tp_recv_rkmm(struct tp *tp, queue_t *q, mblk_t *mp)
 			   it */
 			return (-EPROTO);
 
-		switch (UA_MSG_TYPE(*(uint32_t *)mp->b_rptr)) {
+		switch (UA_MSG_TYPE(*(uint32_t *) mp->b_rptr)) {
 		case UA_RKMM_REG_RSP:
 			/* FIXME: dig registration status and AS identifier out of the registration 
 			   result. */
@@ -10899,9 +10912,9 @@ tp_recv_msg_slow(struct tp *tp, queue_t *q, mblk_t *mp)
 	err = -EMSGSIZE;
 	if (mp->b_wptr < mp->b_rptr + 2 * sizeof(uint32_t))
 		goto error;
-	if (mp->b_wptr < mp->b_rptr + ntohl(((uint32_t *)mp->b_rptr)[1]))
+	if (mp->b_wptr < mp->b_rptr + ntohl(((uint32_t *) mp->b_rptr)[1]))
 		goto error;
-	class = UA_MSG_CLAS(*(uint32_t *)mp->b_rptr);
+	class = UA_MSG_CLAS(*(uint32_t *) mp->b_rptr);
 	switch (UA_PROFILE_LEVEL(tp->sp.sp->sp.options.proto.pvar)) {
 	case UA_PROTOCOL_IUA:
 	case UA_PROTOCOL_V5UA:
@@ -11165,8 +11178,12 @@ lmi_attach_req(struct up *up, queue_t *q, mblk_t *mp)
 			goto badppa;
 		if ((spid = up->as.as->as.addr.m2ua.spid) == 0)
 			goto badppa;
-		asid = ((up->as.as->as.addr.m2ua.sdti << 16) | up->as.as->as.addr.m2ua.sdli) ? : up->as.as->as.asid;
-		iid_ptr = (up->as.as->as.addr.m2ua.iid_text[0] == '\0') ? NULL : up->as.as->as.addr.m2ua.iid_text;
+		asid =
+		    ((up->as.as->as.addr.m2ua.sdti << 16) | up->as.as->as.addr.m2ua.sdli) ? : up->
+		    as.as->as.asid;
+		iid_ptr =
+		    (up->as.as->as.addr.m2ua.iid_text[0] ==
+		     '\0') ? NULL : up->as.as->as.addr.m2ua.iid_text;
 		iid_len = iid_ptr ? strnlen(iid_ptr, 32) : 0;
 	} else {
 		size_t spid_len = ((spid = up->spid) == 0) ? sizeof(uint32_t) : 0;
@@ -11208,7 +11225,8 @@ lmi_attach_req(struct up *up, queue_t *q, mblk_t *mp)
 		}
 		/* interpret asid as link key */
 		for (sl2 = sp->up.list; sl2; sl2 = sl2->sp.next)
-			if (((up->as.as->as.addr.m2ua.sdti << 16) | up->as.as->as.addr.m2ua.sdli) == asid)
+			if (((up->as.as->as.addr.m2ua.sdti << 16) | up->as.as->as.addr.m2ua.sdli) ==
+			    asid)
 				break;
 	} else if (iid_ptr) {
 		/* asid is text */
@@ -11526,7 +11544,7 @@ sl_emergency_req(struct up *up, queue_t *q, mblk_t *mp)
 {
 	sl_emergency_req_t *p = (typeof(p)) mp->b_rptr;
 	struct tp *tp;
-	struct as *as = up->as.as; 
+	struct as *as = up->as.as;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto tooshort;
@@ -15446,7 +15464,7 @@ sdl_ioctl(struct up *up, queue_t *q, mblk_t *mp)
 	case _IOC_NR(SDL_IOCGCONFIG):
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "-> M_IOCTL(SDL_IOCGCONFIG)");
 		// if (!(bp = mi_copyout_aloc(q, mp, NULL, sizeof(struct sdl_config), false)))
-		// 	goto enobufs;
+		// goto enobufs;
 		// *(struct sdl_config *) bp->b_rptr = up->sdl.config;
 		break;
 	case _IOC_NR(SDL_IOCSCONFIG):
@@ -15464,7 +15482,7 @@ sdl_ioctl(struct up *up, queue_t *q, mblk_t *mp)
 	case _IOC_NR(SDL_IOCGSTATEM):
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "-> M_IOCTL(SDL_IOCGSTATEM)");
 		// if (!(bp = mi_copyout_aloc(q, mp, NULL, sizeof(struct sdl_statem), false)))
-		// 	goto enobufs;
+		// goto enobufs;
 		// *(struct sdl_statem *) bp->b_rptr = up->sdl.statem;
 		break;
 	case _IOC_NR(SDL_IOCCMRESET):
@@ -15473,7 +15491,7 @@ sdl_ioctl(struct up *up, queue_t *q, mblk_t *mp)
 	case _IOC_NR(SDL_IOCGSTATSP):
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "-> M_IOCTL(SDL_IOCGSTATSP)");
 		// if (!(bp = mi_copyout_aloc(q, mp, NULL, sizeof(struct sdl_stats), false)))
-		// 	goto enobufs;
+		// goto enobufs;
 		// *(struct sdl_stats *) bp->b_rptr = up->sdl.statsp;
 		break;
 	case _IOC_NR(SDL_IOCSSTATSP):
@@ -15482,20 +15500,20 @@ sdl_ioctl(struct up *up, queue_t *q, mblk_t *mp)
 	case _IOC_NR(SDL_IOCGSTATS):
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "-> M_IOCTL(SDL_IOCGSTATS)");
 		// if (!(bp = mi_copyout_aloc(q, mp, NULL, sizeof(struct sdl_stats), false)))
-		// 	goto enobufs;
+		// goto enobufs;
 		// *(struct sdl_stats *) bp->b_rptr = up->sdl.stats;
 		break;
 	case _IOC_NR(SDL_IOCCSTATS):
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "-> M_IOCTL(SDL_IOCCSTATS)");
 		// if (!(bp = mi_copyout_aloc(q, mp, NULL, sizeof(struct sdl_stats), false)))
-		// 	goto enobufs;
+		// goto enobufs;
 		// *(struct sdl_stats *) bp->b_rptr = up->sdl.stats;
 		// bzero(&up->sdl.stats, sizeof(up->sdl.stats));
 		break;
 	case _IOC_NR(SDL_IOCGNOTIFY):
 		strlog(up->mid, up->sid, UALOGRX, SL_TRACE, "-> M_IOCTL(SDL_IOCGNOTIFY)");
 		// if (!(bp = mi_copyout_aloc(q, mp, NULL, sizeof(struct lmi_notify), false)))
-		// 	goto enobufs;
+		// goto enobufs;
 		// *(struct lmi_notify *) bp->b_rptr = up->sdl.events;
 		break;
 	case _IOC_NR(SDL_IOCSNOTIFY):
@@ -15631,11 +15649,17 @@ up_w_data(queue_t *q, mblk_t *mp)
 	switch (up_get_state(up)) {
 	case MTPS_IDLE:
 		/* XXX Well.... must be connectionless. */
-		err = rp_send_xfer_data(up->as.as->rp.list, tp, q, NULL, &up->as.as->as.addr.m3ua.orig, &up->as.as->as.addr.m3ua.dest, 0, 0, mp);
+		err =
+		    rp_send_xfer_data(up->as.as->rp.list, tp, q, NULL,
+				      &up->as.as->as.addr.m3ua.orig, &up->as.as->as.addr.m3ua.dest,
+				      0, 0, mp);
 		break;
 	case MTPS_CONNECTED:
 		/* XXX Well.... must be connection oriented. */
-		err = rp_send_xfer_data(up->as.as->rp.list, tp, q, NULL, &up->as.as->as.addr.m3ua.orig, &up->as.as->as.addr.m3ua.dest, 0, 0, mp);
+		err =
+		    rp_send_xfer_data(up->as.as->rp.list, tp, q, NULL,
+				      &up->as.as->as.addr.m3ua.orig, &up->as.as->as.addr.m3ua.dest,
+				      0, 0, mp);
 		break;
 	default:
 		up_release(up);
@@ -15646,7 +15670,9 @@ up_w_data(queue_t *q, mblk_t *mp)
 	switch (up_get_state(up)) {
 	case NS_IDLE:
 		/* XXX Well.... must be connectionless. */
-		err = up_send_clns(up, q, &up->as.as->as.addr.m3ua.orig, &up->as.as->as.addr.m3ua.dest, 0, 0, mp);
+		err =
+		    up_send_clns(up, q, &up->as.as->as.addr.m3ua.orig,
+				 &up->as.as->as.addr.m3ua.dest, 0, 0, mp);
 		break;
 	case NS_DATA_XFER:
 		/* XXX Well.... must be connection oriented. */
