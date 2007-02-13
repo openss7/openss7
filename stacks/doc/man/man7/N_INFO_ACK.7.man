@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: N_INFO_ACK.7.man,v 0.9.2.5 2006/04/05 09:43:16 brian Exp $
+.\" @(#) $Id: N_INFO_ACK.7.man,v 0.9.2.6 2007/02/13 05:55:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:16 $ by $Author: brian $
+.\" Last Modified $Date: 2007/02/13 05:55:13 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: N_INFO_ACK.7.man,v $
+.\" Revision 0.9.2.6  2007/02/13 05:55:13  brian
+.\" - corrected ulong to np_ulong
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:16  brian
 .\" - moved .so line and updated headers
 .\"
@@ -96,36 +99,30 @@ message block and its structure is as follows:
 .nf
 \fC\s-1\
 typedef struct {
-    ulong PRIM_type;            /* always N_INFO_ACK */
-    ulong NSDU_size;            /* maximum NSDU size */
-    ulong ENSDU_size;           /* maximum ENSDU size */
-    ulong CDATA_size;           /* connect data size */
-    ulong DDATA_size;           /* discon data size */
-    ulong ADDR_size;            /* address size */
-    ulong ADDR_length;          /* address length */
-    ulong ADDR_offset;          /* address offset */
-    ulong QOS_length;           /* length of default QOS values */
-    ulong QOS_offset;           /* offset of default QOS values 
-                                   from the beginning of block */
-    ulong QOS_range_length;     /* length of range of QOS
-                                   values */
-    ulong QOS_range_offset;     /* offset of range of QOS
-                                   values from the beginning of 
-                                   block */
-    ulong OPTIONS_flags;        /* bit masking for options
-                                   supported */
-    ulong NIDU_size;            /* network interface data unit
-                                   size */
-    long SERV_type;             /* service type */
-    ulong CURRENT_state;        /* current state */
-    ulong PROVIDER_type;        /* type of provider */
-    ulong NODU_size;            /* optimal NSDU size */
-    ulong PROTOID_length;       /* length of bound protocol ids 
-                                 */
-    ulong PROTOID_offset;       /* offset of bound protocol ids 
-                                 */
-    ulong NPI_version;          /* version number of NPI that's 
-                                   supported */
+    np_ulong PRIM_type;		/* always N_INFO_ACK */
+    np_ulong NSDU_size;		/* maximum NSDU size */
+    np_ulong ENSDU_size;	/* maximum ENSDU size */
+    np_ulong CDATA_size;	/* connect data size */
+    np_ulong DDATA_size;	/* discon data size */
+    np_ulong ADDR_size;		/* address size */
+    np_ulong ADDR_length;	/* address length */
+    np_ulong ADDR_offset;	/* address offset */
+    np_ulong QOS_length;	/* length of default QOS values */
+    np_ulong QOS_offset;	/* offset of default QOS values from
+				   the beginning of block */
+    np_ulong QOS_range_length;	/* length of range of QOS values */
+    np_ulong QOS_range_offset;	/* offset of range of QOS values from 
+				   the beginning of block */
+    np_ulong OPTIONS_flags;	/* bit masking for options supported */
+    np_ulong NIDU_size;		/* network interface data unit size */
+    np_long SERV_type;		/* service type */
+    np_ulong CURRENT_state;	/* current state */
+    np_ulong PROVIDER_type;	/* type of provider */
+    np_ulong NODU_size;		/* optimal NSDU size */
+    np_ulong PROTOID_length;	/* length of bound protocol ids */
+    np_ulong PROTOID_offset;	/* offset of bound protocol ids */
+    np_ulong NPI_version;	/* version number of NPI that's
+				   supported */
 } N_info_ack_t;
 
 /* Flags to indicate support of NS provider options */

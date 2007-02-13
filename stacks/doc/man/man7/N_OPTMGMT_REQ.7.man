@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: N_OPTMGMT_REQ.7.man,v 0.9.2.5 2006/04/05 09:43:16 brian Exp $
+.\" @(#) $Id: N_OPTMGMT_REQ.7.man,v 0.9.2.6 2007/02/13 05:55:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:16 $ by $Author: brian $
+.\" Last Modified $Date: 2007/02/13 05:55:13 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: N_OPTMGMT_REQ.7.man,v $
+.\" Revision 0.9.2.6  2007/02/13 05:55:13  brian
+.\" - corrected ulong to np_ulong
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:16  brian
 .\" - moved .so line and updated headers
 .\"
@@ -92,11 +95,10 @@ message block, and its structure is as follows:
 .nf
 \fC\s-1\
 typedef struct {
-    ulong PRIM_type;		/* always N_OPTMGMT_REQ */
-    ulong QOS_length;		/* length of QOS values */
-    ulong QOS_offset;		/* offset of QOS values */
-    ulong OPTMGMT_flags;	/* default receipt conf.
-				   selection */
+    np_ulong PRIM_type;         /* always N_OPTMGMT_REQ */
+    np_ulong QOS_length;        /* length of QOS values */
+    np_ulong QOS_offset;        /* offset of QOS values */
+    np_ulong OPTMGMT_flags;     /* default receipt conf. selection */
 } N_optmgmt_req_t;
 \fR\s+1
 .FI

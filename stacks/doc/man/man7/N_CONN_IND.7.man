@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: N_CONN_IND.7.man,v 0.9.2.5 2006/04/05 09:43:16 brian Exp $
+.\" @(#) $Id: N_CONN_IND.7.man,v 0.9.2.6 2007/02/13 05:55:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:16 $ by $Author: brian $
+.\" Last Modified $Date: 2007/02/13 05:55:13 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: N_CONN_IND.7.man,v $
+.\" Revision 0.9.2.6  2007/02/13 05:55:13  brian
+.\" - corrected ulong to np_ulong
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:16  brian
 .\" - moved .so line and updated headers
 .\"
@@ -94,15 +97,15 @@ message block is as follows:
 .nf
 \fC\s-1\
 typedef struct {
-    ulong PRIM_type;            /* always N_CONN_IND */
-    ulong DEST_length;          /* destination address length */
-    ulong DEST_offset;          /* destination address offset */
-    ulong SRC_length;           /* source address length */
-    ulong SRC_offset;           /* source address offset */
-    ulong SEQ_number;           /* sequence number */
-    ulong CONN_flags;           /* bit masking for options flags */
-    ulong QOS_length;           /* QOS parameters' length */
-    ulong QOS_offset;           /* QOS parameters' offset */
+    np_ulong PRIM_type;         /* always N_CONN_IND */
+    np_ulong DEST_length;       /* destination address length */
+    np_ulong DEST_offset;       /* destination address offset */
+    np_ulong SRC_length;        /* source address length */
+    np_ulong SRC_offset;        /* source address offset */
+    np_ulong SEQ_number;        /* sequence number */
+    np_ulong CONN_flags;        /* bit masking for options flags */
+    np_ulong QOS_length;        /* QOS parameters' length */
+    np_ulong QOS_offset;        /* QOS parameters' offset */
 } N_conn_ind_t;
 \fR\s+1
 .fi
