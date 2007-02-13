@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: mtp.h,v 0.9.2.3 2006/09/18 13:52:33 brian Exp $
+ @(#) $Id: mtp.h,v 0.9.2.4 2007/02/13 14:05:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:33 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:28 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: mtp.h,v $
+ Revision 0.9.2.4  2007/02/13 14:05:28  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef __SS7_MTP_H__
 #define __SS7_MTP_H__
 
-#ident "@(#) $RCSfile: mtp.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mtp.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -78,8 +84,8 @@
  */
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_SEL_MTP */
-	ulong sls;			/* signalling link selection */
-	ulong mp;			/* message priority */
+	np_ulong sls;			/* signalling link selection */
+	np_ulong mp;			/* message priority */
 } N_qos_sel_mtp_t;
 
 /*
@@ -94,8 +100,8 @@ typedef struct {
  */
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_RANGE_MTP */
-	ulong sls_range;		/* signalling link selection */
-	ulong mp_range;			/* message priority */
+	np_ulong sls_range;		/* signalling link selection */
+	np_ulong mp_range;		/* message priority */
 } N_qos_range_mtp_t;
 
 /*
@@ -115,8 +121,8 @@ typedef struct {
  *  MTP Address format:
  */
 typedef struct mtp_pc {
-	ulong ni;			/* network indicator */
-	ulong pc;			/* point code */
+	np_ulong ni;			/* network indicator */
+	np_ulong pc;			/* point code */
 } mtp_pc_t;
 
 #ifndef N_unitdata_req_t
@@ -182,6 +188,7 @@ mtp_n_unitdata_req(caddr_t dst_ptr, size_t dst_len,
 {
 	mblk_t *mp;
 	N_unitdata_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len + src_len + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_unitdata_req_t *) mp->b_wptr;
@@ -218,6 +225,7 @@ mtp_n_unitdata_ind(caddr_t dst_ptr, size_t dst_len,
 {
 	mblk_t *mp;
 	N_unitdata_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len + src_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_unitdata_ind_t *) mp->b_wptr;
@@ -253,6 +261,7 @@ mtp_n_uderror_ind(uint etype,
 {
 	mblk_t *mp;
 	N_uderror_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len + src_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_uderror_ind_t *) mp->b_wptr;

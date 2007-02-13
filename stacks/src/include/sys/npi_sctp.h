@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: npi_sctp.h,v 0.9.2.4 2006/10/19 17:18:51 brian Exp $
+ @(#) $Id: npi_sctp.h,v 0.9.2.5 2007/02/13 14:05:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/19 17:18:51 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:30 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: npi_sctp.h,v $
+ Revision 0.9.2.5  2007/02/13 14:05:30  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef _SYS_NPI_SCTP_H
 #define _SYS_NPI_SCTP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_sctp.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  *  LiS npi.h is version 1
@@ -80,7 +86,7 @@ typedef struct {
 	np_ulong QOS_range_offset;	/** Offset of QOS values' range. */
 	np_ulong OPTIONS_flags;		/** Bit masking for options supported. */
 	np_ulong NIDU_size;		/** Network i/f data unit size. */
-	long SERV_type;			/** Service type. */
+	np_long SERV_type;			/** Service type. */
 	np_ulong CURRENT_state;		/** Current state. */
 	np_ulong PROVIDER_type;		/** Type of NS provider. */
 	np_ulong NODU_size;		/** Optimal NSDU size. */
@@ -109,8 +115,8 @@ typedef struct {
 #endif				/* N_VERSION_2 */
 
 typedef struct sctp_addr {
-	uint16_t port __attribute__ ((packed));
-	uint32_t addr[0] __attribute__ ((packed));
+	u_int16_t port __attribute__ ((packed));
+	u_int32_t addr[0] __attribute__ ((packed));
 } sctp_addr_t;
 
 #define NSF_UNBND	(1<<NS_UNBND	  )

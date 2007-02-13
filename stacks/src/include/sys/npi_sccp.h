@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_sccp.h,v 0.9.2.4 2007/02/13 07:55:42 brian Exp $
+ @(#) $Id: npi_sccp.h,v 0.9.2.5 2007/02/13 14:05:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/13 07:55:42 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_sccp.h,v $
+ Revision 0.9.2.5  2007/02/13 14:05:30  brian
+ - corrected ulong and long for 32-bit compat
+
  Revision 0.9.2.4  2007/02/13 07:55:42  brian
  - working up MTP and UAs
 
@@ -58,7 +61,7 @@
 #ifndef _SYS_NPI_SCCP_H
 #define _SYS_NPI_SCCP_H
 
-#ident "@(#) $RCSfile: npi_sccp.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_sccp.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -90,7 +93,7 @@ typedef struct {
 	np_ulong QOS_range_offset;	/* offset of QOS values' range */
 	np_ulong OPTIONS_flags;		/* bit masking for options supported */
 	np_ulong NIDU_size;		/* network i/f data unit size */
-	long SERV_type;			/* service type */
+	np_long SERV_type;		/* service type */
 	np_ulong CURRENT_state;		/* current state */
 	np_ulong PROVIDER_type;		/* type of NS provider */
 	np_ulong NODU_size;		/* optimal NSDU size */
@@ -278,7 +281,7 @@ typedef struct sccp_addr {
 	np_ulong nplan;			/* numbering plan */
 	np_ulong nai;			/* nature of address indicator */
 	np_ulong alen;			/* address length */
-	uchar addr[0];		/* address digits */
+	uchar addr[0];			/* address digits */
 	/* followed by address bytes */
 } sccp_addr_t;
 

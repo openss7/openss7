@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: chi.h,v 0.9.2.4 2006/11/27 11:47:42 brian Exp $
+ @(#) $Id: chi.h,v 0.9.2.5 2007/02/13 14:05:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,21 +45,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/27 11:47:42 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:28 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: chi.h,v $
+ Revision 0.9.2.5  2007/02/13 14:05:28  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef __SS7_CHI_H__
 #define __SS7_CHI_H__
 
-#ident "@(#) $RCSfile: chi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: chi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
 typedef int32_t ch_long;
-typedef uint32_t ch_ulong;
-typedef uint16_t ch_ushort;
-typedef uint8_t ch_uchar;
+typedef u_int32_t ch_ulong;
+typedef u_int16_t ch_ushort;
+typedef u_int8_t ch_uchar;
 
 #define CH_INFO_REQ		 1UL
 #define CH_OPTMGMT_REQ		 2UL

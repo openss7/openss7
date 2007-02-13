@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: tihdr.h,v 0.9.2.2 2005/05/14 08:30:43 brian Exp $
+ @(#) $Id: tihdr.h,v 0.9.2.3 2007/02/13 14:05:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,9 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:43 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:27 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
 
  $Log: tihdr.h,v $
+ Revision 0.9.2.3  2007/02/13 14:05:27  brian
+ - corrected ulong and long for 32-bit compat
+
  Revision 0.9.2.2  2005/05/14 08:30:43  brian
  - copyright header correction
 
@@ -62,7 +67,11 @@
 #ifndef _TIHDR_H
 #define _TIHDR_H
 
-#ident "@(#) $RCSfile: tihdr.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:30:43 $"
+#ident "@(#) $RCSfile: tihdr.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
+/* This file can be processed with doxygen(1). */
+
+#include <sys/tihdr.h>
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
@@ -70,7 +79,15 @@ __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
 
-#include <sys/tihdr.h>
+/** @weakgroup tli STREAMS TLI Library
+  * @{ */
+
+/** @file
+  * Transport Interface header file. */
+
+/* This is where we could put the old TLI interface definitions. */
+
+/** @} */
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */
@@ -79,3 +96,5 @@ __END_DECLS
 #endif
 
 #endif				/* _TIHDR_H */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

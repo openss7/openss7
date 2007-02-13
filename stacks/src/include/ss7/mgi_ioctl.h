@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: mgi_ioctl.h,v 0.9.2.4 2006/12/23 13:07:07 brian Exp $
+ @(#) $Id: mgi_ioctl.h,v 0.9.2.5 2007/02/13 14:05:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/23 13:07:07 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:28 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: mgi_ioctl.h,v $
+ Revision 0.9.2.5  2007/02/13 14:05:28  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef __SS7_MGI_IOCTL_H__
 #define __SS7_MGI_IOCTL_H__
 
-#ident "@(#) $RCSfile: mgi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mgi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -72,15 +78,15 @@
  *  -----------------------------------
  */
 typedef struct mg_opt_conf_mg {
-	ulong type;			/* media type */
-	ulong flags;			/* options flags */
-	ulong encoding;			/* encoding */
-	ulong block_size;		/* data block size (bits) */
-	ulong sample_size;		/* sample size (bits) */
-	ulong samples;			/* samples per block */
-	ulong rate;			/* clock rate (samples/second) */
-	ulong tx_channels;		/* number of tx channels */
-	ulong rx_channels;		/* number of rx channels */
+	mg_ulong type;			/* media type */
+	mg_ulong flags;			/* options flags */
+	mg_ulong encoding;		/* encoding */
+	mg_ulong block_size;		/* data block size (bits) */
+	mg_ulong sample_size;		/* sample size (bits) */
+	mg_ulong samples;		/* samples per block */
+	mg_ulong rate;			/* clock rate (samples/second) */
+	mg_ulong tx_channels;		/* number of tx channels */
+	mg_ulong rx_channels;		/* number of rx channels */
 } mg_opt_conf_mg_t;
 
 /*
@@ -95,15 +101,15 @@ typedef struct mg_opt_conf_mg {
  *  pass-thru ioctls performed.
  */
 typedef struct mg_opt_conf_mx {
-	ulong type;			/* media type */
-	ulong flags;			/* options flags */
-	ulong encoding;			/* encoding */
-	ulong block_size;		/* data block size (bits) */
-	ulong sample_size;		/* sample size (bits) */
-	ulong samples;			/* samples per block */
-	ulong rate;			/* clock rate (samples/second) */
-	ulong tx_channels;		/* number of tx channels */
-	ulong rx_channels;		/* number of rx channels */
+	mg_ulong type;			/* media type */
+	mg_ulong flags;			/* options flags */
+	mg_ulong encoding;		/* encoding */
+	mg_ulong block_size;		/* data block size (bits) */
+	mg_ulong sample_size;		/* sample size (bits) */
+	mg_ulong samples;		/* samples per block */
+	mg_ulong rate;			/* clock rate (samples/second) */
+	mg_ulong tx_channels;		/* number of tx channels */
+	mg_ulong rx_channels;		/* number of rx channels */
 } mg_opt_conf_mx_t;
 
 /*
@@ -115,15 +121,15 @@ typedef struct mg_opt_conf_mx {
  *  tx_channels and rx_channels must be 1 or 0.
  */
 typedef struct mg_opt_conf_ch {
-	ulong type;			/* media type */
-	ulong flags;			/* options flags */
-	ulong encoding;			/* encoding */
-	ulong block_size;		/* data block size (bits) */
-	ulong sample_size;		/* sample size (bits) */
-	ulong samples;			/* samples per block */
-	ulong rate;			/* clock rate (samples/second) */
-	ulong tx_channels;		/* number of tx channels */
-	ulong rx_channels;		/* number of rx channels */
+	mg_ulong type;			/* media type */
+	mg_ulong flags;			/* options flags */
+	mg_ulong encoding;		/* encoding */
+	mg_ulong block_size;		/* data block size (bits) */
+	mg_ulong sample_size;		/* sample size (bits) */
+	mg_ulong samples;		/* samples per block */
+	mg_ulong rate;			/* clock rate (samples/second) */
+	mg_ulong tx_channels;		/* number of tx channels */
+	mg_ulong rx_channels;		/* number of rx channels */
 } mg_opt_conf_ch_t;
 
 /*
@@ -154,15 +160,15 @@ typedef struct mg_opt_conf_ch {
  *  In that case, commnection leg characteristics are read-only.
  */
 typedef struct mg_opt_conf_lg {
-	ulong type;			/* media type */
-	ulong flags;			/* options flags */
-	ulong encoding;			/* encoding */
-	ulong block_size;		/* data block size (bits) */
-	ulong sample_size;		/* sample size (bits) */
-	ulong samples;			/* samples per block */
-	ulong rate;			/* clock rate (samples/second) */
-	ulong tx_channels;		/* number of tx channels */
-	ulong rx_channels;		/* number of rx channels */
+	mg_ulong type;			/* media type */
+	mg_ulong flags;			/* options flags */
+	mg_ulong encoding;		/* encoding */
+	mg_ulong block_size;		/* data block size (bits) */
+	mg_ulong sample_size;		/* sample size (bits) */
+	mg_ulong samples;		/* samples per block */
+	mg_ulong rate;			/* clock rate (samples/second) */
+	mg_ulong tx_channels;		/* number of tx channels */
+	mg_ulong rx_channels;		/* number of rx channels */
 } mg_opt_conf_lg_t;
 
 /*
@@ -190,15 +196,15 @@ typedef struct mg_opt_conf_lg {
  *  options are normall read-only.
  */
 typedef struct mg_opt_conf_se {
-	ulong type;			/* media type */
-	ulong flags;			/* options flags */
-	ulong encoding;			/* encoding */
-	ulong block_size;		/* data block size (bits) */
-	ulong sample_size;		/* sample size (bits) */
-	ulong samples;			/* samples per block */
-	ulong rate;			/* clock rate (samples/second) */
-	ulong tx_channels;		/* number of tx channels */
-	ulong rx_channels;		/* number of rx channels */
+	mg_ulong type;			/* media type */
+	mg_ulong flags;			/* options flags */
+	mg_ulong encoding;		/* encoding */
+	mg_ulong block_size;		/* data block size (bits) */
+	mg_ulong sample_size;		/* sample size (bits) */
+	mg_ulong samples;		/* samples per block */
+	mg_ulong rate;			/* clock rate (samples/second) */
+	mg_ulong tx_channels;		/* number of tx channels */
+	mg_ulong rx_channels;		/* number of rx channels */
 } mg_opt_conf_se_t;
 
 /*
@@ -209,23 +215,23 @@ typedef struct mg_opt_conf_se {
  *  be initially assigned.
  */
 typedef struct mg_opt_conf_df {
-	ulong type;			/* media type */
-	ulong flags;			/* options flags */
-	ulong encoding;			/* encoding */
-	ulong block_size;		/* data block size (bits) */
-	ulong sample_size;		/* sample size (bits) */
-	ulong samples;			/* samples per block */
-	ulong rate;			/* clock rate (samples/second) */
-	ulong tx_channels;		/* number of tx channels */
-	ulong rx_channels;		/* number of rx channels */
+	mg_ulong type;			/* media type */
+	mg_ulong flags;			/* options flags */
+	mg_ulong encoding;		/* encoding */
+	mg_ulong block_size;		/* data block size (bits) */
+	mg_ulong sample_size;		/* sample size (bits) */
+	mg_ulong samples;		/* samples per block */
+	mg_ulong rate;			/* clock rate (samples/second) */
+	mg_ulong tx_channels;		/* number of tx channels */
+	mg_ulong rx_channels;		/* number of rx channels */
 } mg_opt_conf_df_t;
 
 /*
  *  OPTIONS
  */
 typedef struct mg_option {
-	ulong type;
-	ulong id;
+	mg_ulong type;
+	mg_ulong id;
 	/* followed by specific object options structure */
 } mg_option_t;
 
@@ -244,7 +250,7 @@ typedef struct mg_conf_mg {
  *  -----------------------------------
  */
 typedef struct mg_conf_mx {
-	ulong muxid;			/* lower multiplexing driver id */
+	mg_ulong muxid;			/* lower multiplexing driver id */
 } mg_conf_mx_t;
 
 /*
@@ -252,10 +258,10 @@ typedef struct mg_conf_mx {
  *  -----------------------------------
  */
 typedef struct mg_conf_ch {
-	ulong tpid;			/* termination point id */
-	ulong mxid;			/* multiplex id */
-	ulong slot;			/* slot in multiplex */
-	ulong encoding;			/* channel encoding */
+	mg_ulong tpid;			/* termination point id */
+	mg_ulong mxid;			/* multiplex id */
+	mg_ulong slot;			/* slot in multiplex */
+	mg_ulong encoding;		/* channel encoding */
 } mg_conf_ch_t;
 
 /*
@@ -264,7 +270,7 @@ typedef struct mg_conf_ch {
  *  Connection leg object are not created statically.
  */
 typedef struct mg_conf_lg {
-	ulong seid;			/* session id */
+	mg_ulong seid;			/* session id */
 } mg_conf_lg_t;
 
 /*
@@ -287,9 +293,9 @@ typedef struct mg_conf_df {
  *  CONFIGURATION
  */
 typedef struct mg_config {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong cmd;			/* configuration command */
+	mg_ulong type;			/* object type */
+	mg_ulong id;			/* object id */
+	mg_ulong cmd;			/* configuration command */
 	/* followed by specific configuration structure */
 } mg_config_t;
 
@@ -313,8 +319,8 @@ typedef struct mg_statem_mx {
 	struct mg_timers_mx timers;
 	/* followed by the channel associations */
 	struct {
-		ulong slot;		/* slot number */
-		ulong chid;		/* channel id */
+		mg_ulong slot;		/* slot number */
+		mg_ulong chid;		/* channel id */
 	} slot[0];
 } mg_statem_mx_t;
 
@@ -326,7 +332,7 @@ typedef struct mg_timers_ch {
 } mg_timers_ch_t;
 typedef struct mg_statem_ch {
 	struct mg_timers_ch timers;
-	ulong mxid;
+	mg_ulong mxid;
 } mg_statem_ch_t;
 
 /*
@@ -337,7 +343,7 @@ typedef struct mg_timers_lg {
 } mg_timers_lg_t;
 typedef struct mg_statem_lg {
 	struct mg_timers_lg timers;
-	ulong mxid;
+	mg_ulong mxid;
 } mg_statem_lg_t;
 
 /*
@@ -350,9 +356,9 @@ typedef struct mg_statem_se {
 	struct mg_timers_se timers;
 	/* followed by the connection leg participation */
 	struct {
-		ulong role;		/* participant role */
-		ulong flags;		/* topology flags */
-		ulong lgid;		/* connection leg id */
+		mg_ulong role;		/* participant role */
+		mg_ulong flags;		/* topology flags */
+		mg_ulong lgid;		/* connection leg id */
 	} leg[0];
 } mg_statem_se_t;
 
@@ -376,7 +382,7 @@ typedef struct mg_statem_df {
 	struct mg_timers_df timers;
 	/* followed by a list of connection sessions */
 	struct {
-		ulong seid;		/* session identifier */
+		mg_ulong seid;		/* session identifier */
 	} sessions[0];
 } mg_statem_df_t;
 
@@ -384,10 +390,10 @@ typedef struct mg_statem_df {
  *  STATE
  */
 typedef struct mg_statem {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong flags;			/* object flags */
-	ulong state;			/* object state */
+	mg_ulong type;			/* object type */
+	mg_ulong id;			/* object id */
+	mg_ulong flags;			/* object flags */
+	mg_ulong state;			/* object state */
 	/* followed by object-specific state structure */
 } mg_statem_t;
 
@@ -440,8 +446,8 @@ typedef struct mg_stats_df {
  *  STATISTICS
  */
 typedef struct mg_stats {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
+	mg_ulong type;			/* object type */
+	mg_ulong id;			/* object id */
 	/* followed by object-specific statistics type */
 } mg_stats_t;
 
@@ -455,7 +461,7 @@ typedef struct mg_stats {
  *  -----------------------------------
  */
 typedef struct mg_notify_mg {
-	ulong events;
+	mg_ulong events;
 } mg_notify_mg_t;
 
 /*
@@ -463,7 +469,7 @@ typedef struct mg_notify_mg {
  *  -----------------------------------
  */
 typedef struct mg_notify_mx {
-	ulong events;
+	mg_ulong events;
 } mg_notify_mx_t;
 
 /*
@@ -471,7 +477,7 @@ typedef struct mg_notify_mx {
  *  -----------------------------------
  */
 typedef struct mg_notify_ch {
-	ulong events;
+	mg_ulong events;
 } mg_notify_ch_t;
 
 /*
@@ -479,7 +485,7 @@ typedef struct mg_notify_ch {
  *  -----------------------------------
  */
 typedef struct mg_notify_lg {
-	ulong events;
+	mg_ulong events;
 } mg_notify_lg_t;
 
 /*
@@ -487,7 +493,7 @@ typedef struct mg_notify_lg {
  *  -----------------------------------
  */
 typedef struct mg_notify_se {
-	ulong events;
+	mg_ulong events;
 } mg_notify_se_t;
 
 /*
@@ -495,15 +501,15 @@ typedef struct mg_notify_se {
  *  -----------------------------------
  */
 typedef struct mg_notify_df {
-	ulong events;
+	mg_ulong events;
 } mg_notify_df_t;
 
 /*
  *  EVENTS
  */
 typedef struct mg_notify {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
+	mg_ulong type;			/* object type */
+	mg_ulong id;			/* object id */
 	/* followed by object-specific notification type */
 } mg_notify_t;
 
@@ -515,9 +521,9 @@ typedef struct mg_notify {
  *  MG MANAGEMENT
  */
 typedef struct mg_mgmt {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong cmd;			/* mgmt command */
+	mg_ulong type;			/* object type */
+	mg_ulong id;			/* object id */
+	mg_ulong cmd;			/* mgmt command */
 } mg_mgmt_t;
 
 #define MG_MGMT_BLOCK	    1
@@ -531,11 +537,11 @@ typedef struct mg_mgmt {
  *  PASS LOWER
  */
 typedef struct mg_pass {
-	ulong muxid;			/* mux index of lower CH structure to pass message to */
-	ulong type;			/* type of message block */
-	ulong band;			/* band of message block */
-	ulong ctl_length;		/* length of cntl part */
-	ulong dat_length;		/* length of data part */
+	mg_ulong muxid;			/* mux index of lower CH structure to pass message to */
+	mg_ulong type;			/* type of message block */
+	mg_ulong band;			/* band of message block */
+	mg_ulong ctl_length;		/* length of cntl part */
+	mg_ulong dat_length;		/* length of data part */
 	/* followed by cntl and data part of message to pass to to channel */
 } mg_pass_t;
 

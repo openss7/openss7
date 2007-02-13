@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: mtpi.h,v 0.9.2.4 2006/12/23 13:07:07 brian Exp $
+ @(#) $Id: mtpi.h,v 0.9.2.5 2007/02/13 14:05:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/23 13:07:07 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:28 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: mtpi.h,v $
+ Revision 0.9.2.5  2007/02/13 14:05:28  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef __SS7_MTPI_H__
 #define __SS7_MTPI_H__
 
-#ident "@(#) $RCSfile: mtpi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mtpi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -60,9 +66,9 @@
 #define MTP_CURRENT_VERSION MTP_VERSION_1
 
 typedef int32_t mtp_long;
-typedef uint32_t mtp_ulong;
-typedef uint16_t mtp_ushort;
-typedef uint8_t mtp_uchar;
+typedef u_int32_t mtp_ulong;
+typedef u_int16_t mtp_ushort;
+typedef u_int8_t mtp_uchar;
 
 #define MTP_BIND_REQ			 1+120	/* Bind to an MTP-SAP */
 #define MTP_UNBIND_REQ			 2+120	/* Unbind from an MTP-SAP */
@@ -110,10 +116,11 @@ typedef uint8_t mtp_uchar;
 #endif
 typedef struct mtp_addr {
 	unsigned int family __attribute__ ((packed));
-	unsigned short int ni __attribute__ ((packed));	/* network indentifier */
+	unsigned short int ni __attribute__ ((packed));	/* network identifier */
 	unsigned short int si __attribute__ ((packed));	/* service indicator */
 	unsigned int pc __attribute__ ((packed));	/* point code */
 } mtp_addr_t;
+
 #define __HAVE_MTP_ADDR
 #endif
 
@@ -708,6 +715,7 @@ typedef union {
  *  MTP_MSU_REQ , M_PROTO or M_PCPROTO (M_DATA)
  */
 typedef MTP_signals mtp_msu_req_t;
+
 /*
  *  MTP_MSU_IND , M_PROTO or M_PCPROTO (M_DATA)
  */

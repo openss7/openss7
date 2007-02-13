@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: sl.h,v 0.9.2.3 2006/09/18 13:52:34 brian Exp $
+ @(#) $Id: sl.h,v 0.9.2.4 2007/02/13 14:05:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:34 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:28 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sl.h,v $
+ Revision 0.9.2.4  2007/02/13 14:05:28  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef __SS7_SL_H__
 #define __SS7_SL_H__
 
-#ident "@(#) $RCSfile: sl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: sl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -144,358 +150,356 @@
  *  SL_INFO_REQ                        1 - Information request
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_INFO_REQ */
+	lmi_ulong sl_primitive;		/* always SL_INFO_REQ */
 } sl_info_req_t;
 
 /*
  *  SL_ATTACH_REQ                      2 - Attach request
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_ATTACH_REQ */
-	/*
-	   followed by ppa 
-	 */
+	lmi_ulong sl_primitive;		/* always SL_ATTACH_REQ */
+	/* 
+	   followed by ppa */
 } sl_attach_req_t;
 
 /*
  *  SL_DETACH_REQ                      3 - Detach request
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_DETACH_REQ */
+	lmi_ulong sl_primitive;		/* always SL_DETACH_REQ */
 } sl_detach_req_t;
 
 /*
  *  SL_ENABLE_REQ                      4 - Enable request
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_ENABLE_REQ */
+	lmi_ulong sl_primitive;		/* always SL_ENABLE_REQ */
 } sl_enable_req_t;
 
 /*
  *  SL_DISABLE_REQ                     5 - Disable request
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_DISABLE_REQ */
+	lmi_ulong sl_primitive;		/* always SL_DISABLE_REQ */
 } sl_disable_req_t;
 
 /*
  *  SL_OPTMGMT_REQ                     6 - Options mangement request
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_OPTMGMT_REQ */
-	ulong sl_opt_length;		/* options length */
-	ulong sl_opt_offset;		/* options offset */
-	ulong sl_mgmt_flags;		/* management flags */
+	lmi_ulong sl_primitive;		/* always SL_OPTMGMT_REQ */
+	lmi_ulong sl_opt_length;	/* options length */
+	lmi_ulong sl_opt_offset;	/* options offset */
+	lmi_ulong sl_mgmt_flags;	/* management flags */
 } sl_optmgmt_req_t;
 
 /*
  *  SL_NOTIFY_REQ                      7 - Notifications request
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_NOTIFY_REQ */
+	lmi_ulong sl_primitive;		/* always SL_NOTIFY_REQ */
 } sl_notify_req_t;
 
 /*
  *  SL_PDU_REQ                         8 - Message transfer request
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_PDU_REQ */
+	lmi_ulong sl_primitive;		/* always SL_PDU_REQ */
 } sl_pdu_req_t;
 
 /*
  *  SL_EMERGENCY_REQ                   9 - Emergency begins
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_EMERGENCY_REQ */
+	lmi_ulong sl_primitive;		/* always SL_EMERGENCY_REQ */
 } sl_emergency_req_t;
 
 /*
  *  SL_EMERGENCY_CEASES_REQ           10 - Emergency ceases
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_EMERGENCY_CEASES_REQ */
+	lmi_ulong sl_primitive;		/* always SL_EMERGENCY_CEASES_REQ */
 } sl_emergency_ceases_req_t;
 
 /*
  *  SL_START_REQ                      11 - Start
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_START_REQ */
+	lmi_ulong sl_primitive;		/* always SL_START_REQ */
 } sl_start_req_t;
 
 /*
  *  SL_STOP_REQ                       12 - Stop
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_STOP_REQ */
+	lmi_ulong sl_primitive;		/* always SL_STOP_REQ */
 } sl_stop_req_t;
 
 /*
  *  SL_RETRIEVE_BSNT_REQ              13 - Retrieve BSNT value
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_RETRIEVE_BSNT_REQ */
+	lmi_ulong sl_primitive;		/* always SL_RETRIEVE_BSNT_REQ */
 } sl_retrieve_bsnt_req_t;
 
 /*
  *  SL_RETRIEVAL_REQUEST_AND_FSNC_REQ 14 - Retrieve messages from FSNC
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_RETRIEVAL_REQUEST_AND_FSNC_REQ */
-	ulong sl_fsnc;			/* FSNC value */
+	lmi_ulong sl_primitive;		/* always SL_RETRIEVAL_REQUEST_AND_FSNC_REQ */
+	lmi_ulong sl_fsnc;		/* FSNC value */
 } sl_retrieval_request_and_fsnc_req_t;
 
 /*
  *  SL_RESUME_REQ                     15 - Resume request
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_RESUME_REQ */
+	lmi_ulong sl_primitive;		/* always SL_RESUME_REQ */
 } sl_resume_req_t;
 
 /*
  *  SL_CLEAR_BUFFERS_REQ              16 - Clear buffers
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_CLEAR_BUFFERS_REQ */
+	lmi_ulong sl_primitive;		/* always SL_CLEAR_BUFFERS_REQ */
 } sl_clear_buffers_req_t;
 
 /*
  *  SL_CLEAR_RTB_REQ                  17 - Clear retransmit buffer
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_CLEAR_RTB_REQ */
+	lmi_ulong sl_primitive;		/* always SL_CLEAR_RTB_REQ */
 } sl_clear_rtb_req_t;
 
 /*
  *  SL_LOCAL_PROCESSOR_OUTAGE_REQ     18 - local processor outage begins
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_LOCAL_PROCESSOR_OUTAGE_REQ */
+	lmi_ulong sl_primitive;		/* always SL_LOCAL_PROCESSOR_OUTAGE_REQ */
 } sl_local_processor_outage_req_t;
 
 /*
  *  SL_CONGESTION_DISCARD_REQ         19 - receive congestion discard
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_CONGESTION_DISCARD_REQ */
+	lmi_ulong sl_primitive;		/* always SL_CONGESTION_DISCARD_REQ */
 } sl_congestion_discard_req_t;
 
 /*
  *  SL_CONGESTION_ACCEPT_REQ          20 - receive congestion accept
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_CONGESTION_ACCEPT_REQ */
+	lmi_ulong sl_primitive;		/* always SL_CONGESTION_ACCEPT_REQ */
 } sl_congestion_accept_req_t;
 
 /*
  *  SL_NO_CONGESTION_REQ              21 - receive congestion ceased
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_NO_CONGESTION_REQ */
+	lmi_ulong sl_primitive;		/* always SL_NO_CONGESTION_REQ */
 } sl_no_congestion_req_t;
 
 /*
  *  SL_POWER_ON_REQ                   22 - power on reset
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_POWER_ON_REQ */
+	lmi_ulong sl_primitive;		/* always SL_POWER_ON_REQ */
 } sl_power_on_req_t;
 
 /*
  *  SL_INFO_ACK                       25 - Information acknowledgement
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_INFO_ACK */
-	ulong sl_version;		/* version */
-	ulong sl_state;			/* interface state */
-	ulong sl_max_sdu;		/* maximum sdu size */
-	ulong sl_min_sdu;		/* minimum sdu size */
-	ulong sl_header_len;		/* header length to reserve */
-	ulong sl_ppa_style;		/* style of PPA address */
-	/*
-	   followed by PPA address 
-	 */
+	lmi_ulong sl_primitive;		/* always SL_INFO_ACK */
+	lmi_ulong sl_version;		/* version */
+	lmi_ulong sl_state;		/* interface state */
+	lmi_ulong sl_max_sdu;		/* maximum sdu size */
+	lmi_ulong sl_min_sdu;		/* minimum sdu size */
+	lmi_ulong sl_header_len;	/* header length to reserve */
+	lmi_ulong sl_ppa_style;		/* style of PPA address */
+	/* 
+	   followed by PPA address */
 } sl_info_ack_t;
 
 /*
  *  SL_OK_ACK                         26 - Success acknowledgement
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_OK_ACK */
-	ulong sl_correct_primitive;	/* correct primitive */
+	lmi_ulong sl_primitive;		/* always SL_OK_ACK */
+	lmi_ulong sl_correct_primitive;	/* correct primitive */
 } sl_ok_ack_t;
 
 /*
  *  SL_ERROR_ACK                      27 - Error acknowledgement
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_ERROR_ACK */
-	ulong sl_error_primitive;	/* primitive in error */
-	ulong sl_errno;			/* error type */
-	ulong sl_unix_error;		/* unix error code */
+	lmi_ulong sl_primitive;		/* always SL_ERROR_ACK */
+	lmi_ulong sl_error_primitive;	/* primitive in error */
+	lmi_ulong sl_errno;		/* error type */
+	lmi_ulong sl_unix_error;	/* unix error code */
 } sl_error_ack_t;
 
 /*
  *  SL_ENABLE_CON                     28 - Enable confirmation
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_ENABLE_CON */
+	lmi_ulong sl_primitive;		/* always SL_ENABLE_CON */
 } sl_enable_con_t;
 
 /*
  *  SL_DISABLE_CON                    29 - Disable confirmation
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_DISABLE_CON */
+	lmi_ulong sl_primitive;		/* always SL_DISABLE_CON */
 } sl_disable_con_t;
 
 /*
  *  SL_OPTMGMT_ACK                    30 - Options management reply
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_OPTMGMT_ACK */
-	ulong sl_opt_length;		/* options length */
-	ulong sl_opt_offset;		/* options offset */
-	ulong sl_mgmt_flags;		/* management flags */
+	lmi_ulong sl_primitive;		/* always SL_OPTMGMT_ACK */
+	lmi_ulong sl_opt_length;	/* options length */
+	lmi_ulong sl_opt_offset;	/* options offset */
+	lmi_ulong sl_mgmt_flags;	/* management flags */
 } sl_optmgmt_ack_t;
 
 /*
  *  SL_NOTIFY_IND                     31 - Notification indications
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_NOTIFY_IND */
-	ulong sl_objectid;		/* event object id */
-	ulong sl_timestamp;		/* event timestamp */
-	ulong sl_severity;		/* event severity */
+	lmi_ulong sl_primitive;		/* always SL_NOTIFY_IND */
+	lmi_ulong sl_objectid;		/* event object id */
+	lmi_ulong sl_timestamp;		/* event timestamp */
+	lmi_ulong sl_severity;		/* event severity */
 } sl_notify_ind_t;
 
 /*
  *  SL_ERROR_IND                      32 - Error indication
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_ERROR_IND */
+	lmi_ulong sl_primitive;		/* always SL_ERROR_IND */
 } sl_error_ind_t;
 
 /*
  *  SL_STATS_IND                      33 - Statistics report
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_STATS_IND */
+	lmi_ulong sl_primitive;		/* always SL_STATS_IND */
 } sl_stats_ind_t;
 
 /*
  *  SL_EVENT_IND                      34 - Event indication
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_EVENT_IND */
+	lmi_ulong sl_primitive;		/* always SL_EVENT_IND */
 } sl_event_ind_t;
 
 /*
  *  SL_PDU_IND                        35 - Received message indication
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_PDU_IND */
+	lmi_ulong sl_primitive;		/* always SL_PDU_IND */
 } sl_pdu_ind_t;
 
 /*
  *  SL_LINK_CONGESTED_IND             36 - Link congested
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_LINK_CONGESTED_IND */
-	ulong sl_cong_status;		/* congestion status */
-	ulong sl_disc_status;		/* discard status */
+	lmi_ulong sl_primitive;		/* always SL_LINK_CONGESTED_IND */
+	lmi_ulong sl_cong_status;	/* congestion status */
+	lmi_ulong sl_disc_status;	/* discard status */
 } sl_link_congested_ind_t;
 
 /*
  *  SL_LINK_CONGESTION_CEASED_IND     37 - Link cnogestion ceased
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_LINK_CONGESTION_CEASED_IND */
-	ulong sl_cong_status;		/* congestion status */
-	ulong sl_disc_status;		/* discard status */
+	lmi_ulong sl_primitive;		/* always SL_LINK_CONGESTION_CEASED_IND */
+	lmi_ulong sl_cong_status;	/* congestion status */
+	lmi_ulong sl_disc_status;	/* discard status */
 } sl_link_congestion_ceased_ind_t;
 
 /*
  *  SL_RETRIEVED_MESSAGE_IND          38 - Retrieved message indication
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_RETRIEVED_MESSAGE_IND */
+	lmi_ulong sl_primitive;		/* always SL_RETRIEVED_MESSAGE_IND */
 } sl_retrieved_message_ind_t;
 
 /*
  *  SL_RETRIEVAL_COMPLETED_IND        39 - Retrieval confirmation
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_RETRIEVAL_COMPLETED_IND */
+	lmi_ulong sl_primitive;		/* always SL_RETRIEVAL_COMPLETED_IND */
 } sl_retrieval_completed_ind_t;
 
 /*
  *  SL_RB_CLEARED_IND                 40 - Receive buffer cleared ind
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_RB_CLEARED_IND */
+	lmi_ulong sl_primitive;		/* always SL_RB_CLEARED_IND */
 } sl_rb_cleared_ind_t;
 
 /*
  *  SL_BSNT_IND                       41 - Retrieved BSNT indication
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_BSNT_IND */
-	ulong sl_bsnt;			/* returned BSNT value */
+	lmi_ulong sl_primitive;		/* always SL_BSNT_IND */
+	lmi_ulong sl_bsnt;		/* returned BSNT value */
 } sl_bsnt_ind_t;
 
 /*
  *  SL_IN_SERVICE_IND                 42 - In service indication
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_IN_SERVICE_IND */
+	lmi_ulong sl_primitive;		/* always SL_IN_SERVICE_IND */
 } sl_in_service_ind_t;
 
 /*
  *  SL_OUT_OF_SERVICE_IND             43 - Out of service indication
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_OUT_OF_SERVICE_IND */
-	ulong sl_reason;		/* reason for link failure */
+	lmi_ulong sl_primitive;		/* always SL_OUT_OF_SERVICE_IND */
+	lmi_ulong sl_reason;		/* reason for link failure */
 } sl_out_of_service_ind_t;
 
 /*
  *  SL_REMOTE_PROCESSOR_OUTAGE_IND    44 - Remote processor out
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_REMOTE_PROCESSOR_OUTAGE_IND */
+	lmi_ulong sl_primitive;		/* always SL_REMOTE_PROCESSOR_OUTAGE_IND */
 } sl_remote_processor_outage_ind_t;
 
 /*
  *  SL_REMOTE_PROCESSOR_RECOVERED_IND 45 - Remote processor recovered
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_REMOTE_PROCESSOR_RECOVERED_IND */
+	lmi_ulong sl_primitive;		/* always SL_REMOTE_PROCESSOR_RECOVERED_IND */
 } sl_remote_processor_recovered_ind_t;
 
 /*
  *  SL_RTB_CLEARED_IND                46 - Retransmit buffer cleared ind
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_RTB_CLEARED_IND */
+	lmi_ulong sl_primitive;		/* always SL_RTB_CLEARED_IND */
 } sl_rtb_cleared_ind_t;
 
 /*
  *  SL_RETRIEVAL_NOT_POSSIBLE_IND     47 - Retrieval not possible ind
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_RETRIEVAL_NOT_POSSIBLE_IND */
+	lmi_ulong sl_primitive;		/* always SL_RETRIEVAL_NOT_POSSIBLE_IND */
 } sl_retrieval_not_possible_ind_t;
 
 /*
  *  SL_BSNT_NOT_RETRIEVABLE_IND       48 - BSNT not retrievable ind
  */
 typedef struct {
-	ulong sl_primitive;		/* always SL_BSNT_NOT_RETRIEVABLE_IND */
+	lmi_ulong sl_primitive;		/* always SL_BSNT_NOT_RETRIEVABLE_IND */
 } sl_bsnt_not_retrievable_ind_t;
 
 union SL_primitives {
-	ulong sl_primitive;
+	lmi_ulong sl_primitive;
 	sl_info_req_t info_req;
 	sl_attach_req_t attach_req;
 	sl_detach_req_t detach_req;

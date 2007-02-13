@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: mxi.h,v 0.9.2.4 2006/11/27 11:47:42 brian Exp $
+ @(#) $Id: mxi.h,v 0.9.2.5 2007/02/13 14:05:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,21 +45,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/27 11:47:42 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:28 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: mxi.h,v $
+ Revision 0.9.2.5  2007/02/13 14:05:28  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef __SS7_MXI_H__
 #define __SS7_MXI_H__
 
-#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
 typedef int32_t mx_long;
-typedef uint32_t mx_ulong;
-typedef uint16_t mx_ushort;
-typedef uint8_t mx_uchar;
+typedef u_int32_t mx_ulong;
+typedef u_int16_t mx_ushort;
+typedef u_int8_t mx_uchar;
 
 #define MX_INFO_REQ		 1UL
 #define MX_OPTMGMT_REQ		 2UL

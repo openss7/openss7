@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: sccpi_ioctl.h,v 0.9.2.3 2006/09/18 13:52:34 brian Exp $
+ @(#) $Id: sccpi_ioctl.h,v 0.9.2.4 2007/02/13 14:05:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:34 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:28 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sccpi_ioctl.h,v $
+ Revision 0.9.2.4  2007/02/13 14:05:28  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef __SCCPI_IOCTL_H__
 #define __SCCPI_IOCTL_H__
 
-#ident "@(#) $RCSfile: sccpi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: sccpi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -75,59 +81,67 @@
  */
 typedef struct sccp_opt_conf_mt {
 } sccp_opt_conf_mt_t;
+
 /*
  *  Signalling point options
  */
 typedef struct sccp_opt_conf_sp {
-	ulong tgtt;
+	np_ulong tgtt;
 } sccp_opt_conf_sp_t;
+
 /*
  *  Signalling relation options
  */
 typedef struct sccp_opt_conf_sr {
-	ulong tattack;			/* T(attack) timer */
-	ulong tdecay;			/* T(decay) timer */
-	ulong tstatinfo;		/* T(stat_info) timer */
-	ulong tsst;			/* T(sst) timer */
+	np_ulong tattack;		/* T(attack) timer */
+	np_ulong tdecay;		/* T(decay) timer */
+	np_ulong tstatinfo;		/* T(stat_info) timer */
+	np_ulong tsst;			/* T(sst) timer */
 } sccp_opt_conf_sr_t;
+
 /*
  *  Remote subsystem options
  */
 typedef struct sccp_opt_conf_rs {
-	ulong tsst;			/* T(sst) timer */
+	np_ulong tsst;			/* T(sst) timer */
 } sccp_opt_conf_rs_t;
+
 /*
  *  Coupling options
  */
 typedef struct sccp_opt_conf_cp {
 } sccp_opt_conf_cp_t;
+
 /*
  *  Local subsystem options
  */
 typedef struct sccp_opt_conf_ss {
-	ulong tisst;
-	ulong twsog;
+	np_ulong tisst;
+	np_ulong twsog;
 } sccp_opt_conf_ss_t;
+
 /*
  *  Network appearance options
  */
 typedef struct sccp_opt_conf_na {
 } sccp_opt_conf_na_t;
+
 /*
  *  SCCP user options
  */
 typedef struct sccp_opt_conf_sc {
-	ulong tcon;
-	ulong tias;
-	ulong tiar;
-	ulong trel;
-	ulong trel2;
-	ulong tint;
-	ulong tguard;
-	ulong tres;
-	ulong trea;
-	ulong tack;
+	np_ulong tcon;
+	np_ulong tias;
+	np_ulong tiar;
+	np_ulong trel;
+	np_ulong trel2;
+	np_ulong tint;
+	np_ulong tguard;
+	np_ulong tres;
+	np_ulong trea;
+	np_ulong tack;
 } sccp_opt_conf_sc_t;
+
 /*
  *  Default options
  */
@@ -138,11 +152,10 @@ typedef struct sccp_opt_conf_df {
  *  OPTIONS
  */
 typedef struct sccp_option {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	/*
-	   followed by object-specific protocol options structure 
-	 */
+	np_ulong type;			/* object type */
+	np_ulong id;			/* object id */
+	/* 
+	   followed by object-specific protocol options structure */
 } sccp_option_t;
 
 #define SCCP_IOCGOPTION	_IOWR(	SCCP_IOC_MAGIC,	 0,	sccp_option_t	)
@@ -152,57 +165,65 @@ typedef struct sccp_option {
  *  Mesage transfer part configuration
  */
 typedef struct sccp_conf_mt {
-	ulong spid;			/* local signalling point identifier */
-	ulong srid;			/* remote signalling point identifier */
-	ulong muxid;			/* lower multipleding driver id */
+	np_ulong spid;			/* local signalling point identifier */
+	np_ulong srid;			/* remote signalling point identifier */
+	np_ulong muxid;			/* lower multipleding driver id */
 	lmi_option_t proto;		/* protocol variant and options */
 } sccp_conf_mt_t;
+
 /*
  *  Signalling point configuration
  */
 typedef struct sccp_conf_sp {
-	ulong naid;			/* network appearance id */
+	np_ulong naid;			/* network appearance id */
 	struct mtp_addr add;		/* local signalling point code */
 	lmi_option_t proto;		/* protocol variant and options */
 } sccp_conf_sp_t;
+
 /*
  *  Signalling relation configuration
  */
 typedef struct sccp_conf_sr {
-	ulong spid;			/* local signalling point identifier */
+	np_ulong spid;			/* local signalling point identifier */
 	struct mtp_addr add;		/* remote signalling point code */
 	lmi_option_t proto;		/* protocol variant and options */
 } sccp_conf_sr_t;
+
 /*
  *  Remote subsystem configuration
  */
 typedef struct sccp_conf_rs {
-	ulong srid;			/* remote signalling point identifier */
-	ulong ssn;			/* subsystem number */
+	np_ulong srid;			/* remote signalling point identifier */
+	np_ulong ssn;			/* subsystem number */
 } sccp_conf_rs_t;
+
 /*
  *  Coupling configuration
  */
 typedef struct sccp_conf_cp {
 } sccp_conf_cp_t;
+
 /*
  *  Local subsystem configuration
  */
 typedef struct sccp_conf_ss {
-	ulong spid;			/* local signalling point identifier */
-	ulong ssn;			/* subsystem number */
+	np_ulong spid;			/* local signalling point identifier */
+	np_ulong ssn;			/* subsystem number */
 } sccp_conf_ss_t;
+
 /*
  *  Network appearance configuration
  */
 typedef struct sccp_conf_na {
 	lmi_option_t proto;		/* protocol variant and options */
 } sccp_conf_na_t;
+
 /*
  *  SCCP user configuration
  */
 typedef struct sccp_conf_sc {
 } sccp_conf_sc_t;
+
 /*
  *  Default configuration
  */
@@ -218,12 +239,11 @@ typedef struct sccp_conf_df {
  *  CONFIGURATION
  */
 typedef struct sccp_config {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong cmd;			/* configuration command */
-	/*
-	   followed by object-specific configuration structure 
-	 */
+	np_ulong type;			/* object type */
+	np_ulong id;			/* object id */
+	np_ulong cmd;			/* configuration command */
+	/* 
+	   followed by object-specific configuration structure */
 } sccp_config_t;
 
 #define SCCP_GET	0	/* get configuration */
@@ -244,36 +264,40 @@ typedef struct sccp_timers_mt {
 typedef struct sccp_statem_mt {
 	struct sccp_timers_mt timers;
 } sccp_statem_mt_t;
+
 /*
  *  Signalling point state
  */
 typedef struct sccp_timers_sp {
-	ulong tgtt;
+	np_ulong tgtt;
 } sccp_timers_sp_t;
 typedef struct sccp_statem_sp {
 	struct sccp_timers_sp timers;
 } sccp_statem_sp_t;
+
 /*
  *  Signalling relation state
  */
 typedef struct sccp_timers_sr {
-	ulong tattack;			/* T(attack) timer */
-	ulong tdecay;			/* T(decay) timer */
-	ulong tstatinfo;		/* T(stat_info) timer */
-	ulong tsst;			/* T(sst) timer */
+	np_ulong tattack;		/* T(attack) timer */
+	np_ulong tdecay;		/* T(decay) timer */
+	np_ulong tstatinfo;		/* T(stat_info) timer */
+	np_ulong tsst;			/* T(sst) timer */
 } sccp_timers_sr_t;
 typedef struct sccp_statem_sr {
 	struct sccp_timers_sr timers;
 } sccp_statem_sr_t;
+
 /*
  *  Remote subsystem state
  */
 typedef struct sccp_timers_rs {
-	ulong tsst;			/* T(sst) timer */
+	np_ulong tsst;			/* T(sst) timer */
 } sccp_timers_rs_t;
 typedef struct sccp_statem_rs {
 	struct sccp_timers_rs timers;
 } sccp_statem_rs_t;
+
 /*
  *  Coupling state
  */
@@ -282,16 +306,18 @@ typedef struct sccp_timers_cp {
 typedef struct sccp_statem_cp {
 	struct sccp_timers_cp timers;
 } sccp_statem_cp_t;
+
 /*
  *  Local subsystem state
  */
 typedef struct sccp_timers_ss {
-	ulong tisst;
-	ulong twsog;
+	np_ulong tisst;
+	np_ulong twsog;
 } sccp_timers_ss_t;
 typedef struct sccp_statem_ss {
 	struct sccp_timers_ss timers;
 } sccp_statem_ss_t;
+
 /*
  *  Network appearance state
  */
@@ -300,24 +326,26 @@ typedef struct sccp_timers_na {
 typedef struct sccp_statem_na {
 	struct sccp_timers_na timers;
 } sccp_statem_na_t;
+
 /*
  *  Network appearance state
  */
 typedef struct sccp_timers_sc {
-	ulong tcon;
-	ulong tias;
-	ulong tiar;
-	ulong trel;
-	ulong trel2;
-	ulong tint;
-	ulong tguard;
-	ulong tres;
-	ulong trea;
-	ulong tack;
+	np_ulong tcon;
+	np_ulong tias;
+	np_ulong tiar;
+	np_ulong trel;
+	np_ulong trel2;
+	np_ulong tint;
+	np_ulong tguard;
+	np_ulong tres;
+	np_ulong trea;
+	np_ulong tack;
 } sccp_timers_sc_t;
 typedef struct sccp_statem_sc {
 	struct sccp_timers_sc timers;
 } sccp_statem_sc_t;
+
 /*
  *  Default state
  */
@@ -331,13 +359,12 @@ typedef struct sccp_statem_df {
  *  STATE
  */
 typedef struct sccp_statem {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong flags;			/* object flags */
-	ulong state;			/* object state */
-	/*
-	   followed by object-specific state structure 
-	 */
+	np_ulong type;			/* object type */
+	np_ulong id;			/* object id */
+	np_ulong flags;			/* object flags */
+	np_ulong state;			/* object state */
+	/* 
+	   followed by object-specific state structure */
 } sccp_statem_t;
 
 #define	SCCP_IOCGSTATEM	_IOWR(	SCCP_IOC_MAGIC,	 6,	sccp_statem_t	)
@@ -348,41 +375,49 @@ typedef struct sccp_statem {
  */
 typedef struct sccp_stats_mt {
 } sccp_stats_mt_t;
+
 /*
  *  Signalling point statistics
  */
 typedef struct sccp_stats_sp {
 } sccp_stats_sp_t;
+
 /*
  *  Signalling relation statistics
  */
 typedef struct sccp_stats_sr {
 } sccp_stats_sr_t;
+
 /*
  *  Remote subsystem statistics
  */
 typedef struct sccp_stats_rs {
 } sccp_stats_rs_t;
+
 /*
  *  Coupling statistics
  */
 typedef struct sccp_stats_cp {
 } sccp_stats_cp_t;
+
 /*
  *  Local subsystem statistics
  */
 typedef struct sccp_stats_ss {
 } sccp_stats_ss_t;
+
 /*
  *  Network appearance statistics
  */
 typedef struct sccp_stats_na {
 } sccp_stats_na_t;
+
 /*
  *  SCCP user statistics
  */
 typedef struct sccp_stats_sc {
 } sccp_stats_sc_t;
+
 /*
  *  Default statistics
  */
@@ -393,12 +428,11 @@ typedef struct sccp_stats_df {
  *  STATISTICS
  */
 typedef struct sccp_stats {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong header;			/* object stats header */
-	/*
-	   followed by object-specific statistics structure 
-	 */
+	np_ulong type;			/* object type */
+	np_ulong id;			/* object id */
+	np_ulong header;		/* object stats header */
+	/* 
+	   followed by object-specific statistics structure */
 } sccp_stats_t;
 
 #define	SCCP_IOCGSTATSP	_IOWR(	SCCP_IOC_MAGIC,	 8,	sccp_stats_t	)
@@ -410,66 +444,73 @@ typedef struct sccp_stats {
  *  Mesage transfer part notifications
  */
 typedef struct sccp_notify_mt {
-	ulong events;
+	np_ulong events;
 } sccp_notify_mt_t;
+
 /*
  *  Signalling point notifications
  */
 typedef struct sccp_notify_sp {
-	ulong events;
+	np_ulong events;
 } sccp_notify_sp_t;
+
 /*
  *  Signalling relation notifications
  */
 typedef struct sccp_notify_sr {
-	ulong events;
+	np_ulong events;
 } sccp_notify_sr_t;
+
 /*
  *  Remote subsystem notifications
  */
 typedef struct sccp_notify_rs {
-	ulong events;
+	np_ulong events;
 } sccp_notify_rs_t;
+
 /*
  *  Coupling notifications
  */
 typedef struct sccp_notify_cp {
-	ulong events;
+	np_ulong events;
 } sccp_notify_cp_t;
+
 /*
  *  Local subsystem notifications
  */
 typedef struct sccp_notify_ss {
-	ulong events;
+	np_ulong events;
 } sccp_notify_ss_t;
+
 /*
  *  Network appearance notifications
  */
 typedef struct sccp_notify_na {
-	ulong events;
+	np_ulong events;
 } sccp_notify_na_t;
+
 /*
  *  SCCP user notifications
  */
 typedef struct sccp_notify_sc {
-	ulong events;
+	np_ulong events;
 } sccp_notify_sc_t;
+
 /*
  *  Default notifications
  */
 typedef struct sccp_notify_df {
-	ulong events;
+	np_ulong events;
 } sccp_notify_df_t;
 
 /*
  *  EVENTS
  */
 typedef struct sccp_notify {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	/*
-	   followed by object-specific notification structure 
-	 */
+	np_ulong type;			/* object type */
+	np_ulong id;			/* object id */
+	/* 
+	   followed by object-specific notification structure */
 } sccp_notify_t;
 
 #define	SCCP_IOCGNOTIFY	_IOWR(	SCCP_IOC_MAGIC,	12,	sccp_notify_t	)
@@ -480,9 +521,9 @@ typedef struct sccp_notify {
  *  MANAGEMENT
  */
 typedef struct sccp_mgmt {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong cmd;			/* mgmt command */
+	np_ulong type;			/* object type */
+	np_ulong id;			/* object id */
+	np_ulong cmd;			/* mgmt command */
 } sccp_mgmt_t;
 
 #define SCCP_MGMT_ALLOW			 0
@@ -507,14 +548,13 @@ typedef struct sccp_mgmt {
  *  PASS LOWER
  */
 typedef struct sccp_pass {
-	ulong muxid;			/* mux index of lower SL structure to pass message to */
-	ulong type;			/* type of message block */
-	ulong band;			/* band of mesage block */
-	ulong ctl_length;		/* length of cntl part */
-	ulong dat_length;		/* length of data part */
-	/*
-	   followed by cntl and data part of message to pass to signalling link 
-	 */
+	np_ulong muxid;			/* mux index of lower SL structure to pass message to */
+	np_ulong type;			/* type of message block */
+	np_ulong band;			/* band of mesage block */
+	np_ulong ctl_length;		/* length of cntl part */
+	np_ulong dat_length;		/* length of data part */
+	/* 
+	   followed by cntl and data part of message to pass to signalling link */
 } sccp_pass_t;
 
 #define SCCP_IOCCPASS	_IOW(	SCCP_IOC_MAGIC,	16,	sccp_pass_t	)

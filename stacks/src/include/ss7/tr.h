@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: tr.h,v 0.9.2.6 2006/09/18 13:52:34 brian Exp $
+ @(#) $Id: tr.h,v 0.9.2.7 2007/02/13 14:05:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:34 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:29 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tr.h,v $
+ Revision 0.9.2.7  2007/02/13 14:05:29  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef __SS7_TR_H__
 #define __SS7_TR_H__
 
-#ident "@(#) $RCSfile: tr.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: tr.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -83,10 +89,10 @@
 #define TR_QOS_SEL1		0x0501
 
 typedef struct {
-	ulong type;			/* Always TR_QOS_SEL1 */
-	ulong flags;			/* Return option */
-	ulong seq_ctrl;			/* Sequence Control */
-	ulong priority;			/* Message priority */
+	t_uscalar_t type;		/* Always TR_QOS_SEL1 */
+	t_uscalar_t flags;		/* Return option */
+	t_uscalar_t seq_ctrl;		/* Sequence Control */
+	t_uscalar_t priority;		/* Message priority */
 } TR_qos_sel1_t;
 
 #define TR_PROVIDER		0x0001
@@ -140,112 +146,112 @@ typedef struct {
  *  TR_INFO_REQ.  This primitive consists of one M_PCPROTO message block.
  */
 typedef struct TR_info_req {
-	ulong PRIM_type;		/* Always TR_INFO_REQ */
+	t_uscalar_t PRIM_type;		/* Always TR_INFO_REQ */
 } TR_info_req_t;
 
 /*
  *  TR_INFO_ACK.  This primitive consists of one M_PCPROTO message block.
  */
 typedef struct TR_info_ack {
-	long PRIM_type;			/* Always TR_INFO_ACK */
-	long TSDU_size;			/* maximum TSDU size */
-	long ETSDU_size;		/* maximum ETSDU size */
-	long CDATA_size;		/* connect data size */
-	long DDATA_size;		/* discon data size */
-	long ADDR_size;			/* address size */
-	long OPT_size;			/* options size */
-	long TIDU_size;			/* transaction i/f data unit size */
-	long SERV_type;			/* service type */
-	long CURRENT_state;		/* current state */
-	long PROVIDER_flag;		/* type of TR provider */
-	long TRPI_version;		/* version # of trpi that is supported */
+	t_scalar_t PRIM_type;		/* Always TR_INFO_ACK */
+	t_scalar_t TSDU_size;		/* maximum TSDU size */
+	t_scalar_t ETSDU_size;		/* maximum ETSDU size */
+	t_scalar_t CDATA_size;		/* connect data size */
+	t_scalar_t DDATA_size;		/* discon data size */
+	t_scalar_t ADDR_size;		/* address size */
+	t_scalar_t OPT_size;		/* options size */
+	t_scalar_t TIDU_size;		/* transaction i/f data unit size */
+	t_scalar_t SERV_type;		/* service type */
+	t_scalar_t CURRENT_state;	/* current state */
+	t_scalar_t PROVIDER_flag;	/* type of TR provider */
+	t_scalar_t TRPI_version;	/* version # of trpi that is supported */
 } TR_info_ack_t;
 
 /*
  *  TR_BIND_REQ.  This primitive consists of one M_PROTO message block.
  */
 typedef struct TR_bind_req {
-	ulong PRIM_type;		/* Always TR_BIND_REQ */
-	ulong ADDR_length;		/* address length */
-	ulong ADDR_offset;		/* address offset */
-	ulong XACT_number;		/* maximum outstanding transaction reqs. */
-	ulong BIND_flags;		/* bind flags */
+	t_uscalar_t PRIM_type;		/* Always TR_BIND_REQ */
+	t_uscalar_t ADDR_length;	/* address length */
+	t_uscalar_t ADDR_offset;	/* address offset */
+	t_uscalar_t XACT_number;	/* maximum outstanding transaction reqs. */
+	t_uscalar_t BIND_flags;		/* bind flags */
 } TR_bind_req_t;
 
 /*
  *  TR_BIND_ACK.  This primitive consists of one M_PROTO message block.
  */
 typedef struct TR_bind_ack {
-	ulong PRIM_type;		/* Always TR_BIND_ACK */
-	ulong ADDR_length;		/* address length */
-	ulong ADDR_offset;		/* address offset */
-	ulong XACT_number;		/* open transactions */
-	ulong TOKEN_value;		/* value of "token" assigned to stream */
+	t_uscalar_t PRIM_type;		/* Always TR_BIND_ACK */
+	t_uscalar_t ADDR_length;	/* address length */
+	t_uscalar_t ADDR_offset;	/* address offset */
+	t_uscalar_t XACT_number;	/* open transactions */
+	t_uscalar_t TOKEN_value;	/* value of "token" assigned to stream */
 } TR_bind_ack_t;
 
 /*
  *  TR_ADDR_REQ.  This primitive consists of one M_PROTO message block.
  */
 typedef struct TR_addr_req {
-	ulong PRIM_type;		/* Always TR_ADDR_REQ */
-	ulong TRANS_id;			/* Transaction id */
+	t_uscalar_t PRIM_type;		/* Always TR_ADDR_REQ */
+	t_uscalar_t TRANS_id;		/* Transaction id */
 } TR_addr_req_t;
 
 /*
  *  TR_ADDR_ACK.  This primitive consists of one M_PCPROTO message block.
  */
 typedef struct TR_addr_ack {
-	ulong PRIM_type;		/* Always TR_ADDR_ACK */
-	ulong LOCADDR_length;		/* local address length */
-	ulong LOCADDR_offset;		/* local address offset */
-	ulong REMADDR_length;		/* remote address length */
-	ulong REMADDR_offset;		/* remote address offset */
+	t_uscalar_t PRIM_type;		/* Always TR_ADDR_ACK */
+	t_uscalar_t LOCADDR_length;	/* local address length */
+	t_uscalar_t LOCADDR_offset;	/* local address offset */
+	t_uscalar_t REMADDR_length;	/* remote address length */
+	t_uscalar_t REMADDR_offset;	/* remote address offset */
 } TR_addr_ack_t;
 
 /*
  *  TR_UNBIND_REQ.  This primtive consists of one M_PROTO message block.
  */
 typedef struct TR_unbind_req {
-	ulong PRIM_type;		/* Always TR_UNBIND_REQ */
+	t_uscalar_t PRIM_type;		/* Always TR_UNBIND_REQ */
 } TR_unbind_req_t;
 
 /*
  *  TR_OPTMGMT_REQ.  This primtive consists of one M_PROTO message block.
  */
 typedef struct TR_optmgmt_req {
-	ulong PRIM_type;		/* Always T_OPTMGMT_REQ */
-	ulong OPT_length;		/* options length */
-	ulong OPT_offset;		/* options offset */
-	ulong MGMT_flags;		/* options data flags */
+	t_uscalar_t PRIM_type;		/* Always T_OPTMGMT_REQ */
+	t_uscalar_t OPT_length;		/* options length */
+	t_uscalar_t OPT_offset;		/* options offset */
+	t_uscalar_t MGMT_flags;		/* options data flags */
 } TR_optmgmt_req_t;
 
 /*
  *  TR_OPTMGMT_ACK.  This primitive consists of one M_PCPROTO message block.
  */
 typedef struct TR_optmgmt_ack {
-	ulong PRIM_type;		/* Always T_OPTMGMT_ACK */
-	ulong OPT_length;		/* options length */
-	ulong OPT_offset;		/* options offset */
-	ulong MGMT_flags;		/* options data flags */
+	t_uscalar_t PRIM_type;		/* Always T_OPTMGMT_ACK */
+	t_uscalar_t OPT_length;		/* options length */
+	t_uscalar_t OPT_offset;		/* options offset */
+	t_uscalar_t MGMT_flags;		/* options data flags */
 } TR_optmgmt_ack_t;
 
 /*
  *  TR_OK_ACK.  This primitive consists of one M_PCPROTO message block.
  */
 typedef struct TR_ok_ack {
-	ulong PRIM_type;		/* Always T_OK_ACK */
-	ulong CORRECT_prim;		/* correct primitive */
+	t_uscalar_t PRIM_type;		/* Always T_OK_ACK */
+	t_uscalar_t CORRECT_prim;	/* correct primitive */
 } TR_ok_ack_t;
 
 /*
  *  TR_ERROR_ACK.  This primitive consists of one M_PCPROTO message block.
  */
 typedef struct TR_error_ack {
-	ulong PRIM_type;		/* Always T_ERROR_ACK */
-	ulong ERROR_prim;		/* primitive in error */
-	ulong TRPI_error;		/* TRPI error code */
-	ulong UNIX_error;		/* UNIX error code */
-	ulong TRANS_id;			/* Transaction id */
+	t_uscalar_t PRIM_type;		/* Always T_ERROR_ACK */
+	t_uscalar_t ERROR_prim;		/* primitive in error */
+	t_uscalar_t TRPI_error;		/* TRPI error code */
+	t_uscalar_t UNIX_error;		/* UNIX error code */
+	t_uscalar_t TRANS_id;		/* Transaction id */
 } TR_error_ack_t;
 
 /*
@@ -253,13 +259,13 @@ typedef struct TR_error_ack {
  *  by one or more M_DATA blocks.
  */
 typedef struct TR_uni_req {
-	ulong PRIM_type;		/* Always TR_UNI_REQ */
-	ulong DEST_length;		/* Destination address length */
-	ulong DEST_offset;		/* Destination address offset */
-	ulong ORIG_length;		/* Originating address length */
-	ulong ORIG_offset;		/* Originating address offset */
-	ulong OPT_length;		/* Options structure length */
-	ulong OPT_offset;		/* Options structure offset */
+	t_uscalar_t PRIM_type;		/* Always TR_UNI_REQ */
+	t_uscalar_t DEST_length;	/* Destination address length */
+	t_uscalar_t DEST_offset;	/* Destination address offset */
+	t_uscalar_t ORIG_length;	/* Originating address length */
+	t_uscalar_t ORIG_offset;	/* Originating address offset */
+	t_uscalar_t OPT_length;		/* Options structure length */
+	t_uscalar_t OPT_offset;		/* Options structure offset */
 } TR_uni_req_t;
 
 /*
@@ -267,43 +273,43 @@ typedef struct TR_uni_req {
  *  by one or more M_DATA blocks.
  */
 typedef struct TR_uni_ind {
-	ulong PRIM_type;		/* Always TR_UNI_REQ */
-	ulong DEST_length;		/* Destination address length */
-	ulong DEST_offset;		/* Destination address offset */
-	ulong ORIG_length;		/* Originating address length */
-	ulong ORIG_offset;		/* Originating address offset */
-	ulong OPT_length;		/* Options structure length */
-	ulong OPT_offset;		/* Options structure offset */
+	t_uscalar_t PRIM_type;		/* Always TR_UNI_REQ */
+	t_uscalar_t DEST_length;	/* Destination address length */
+	t_uscalar_t DEST_offset;	/* Destination address offset */
+	t_uscalar_t ORIG_length;	/* Originating address length */
+	t_uscalar_t ORIG_offset;	/* Originating address offset */
+	t_uscalar_t OPT_length;		/* Options structure length */
+	t_uscalar_t OPT_offset;		/* Options structure offset */
 } TR_uni_ind_t;
 
 /*
  *  TR_BEGIN_REQ.
  */
 typedef struct TR_begin_req {
-	ulong PRIM_type;		/* Always TR_BEGIN_REQ */
-	ulong CORR_id;			/* Correlation id */
-	ulong ASSOC_flags;		/* Association flags */
-	ulong DEST_length;		/* Destination address length */
-	ulong DEST_offset;		/* Destination address offset */
-	ulong ORIG_length;		/* Originating address length */
-	ulong ORIG_offset;		/* Originating address offset */
-	ulong OPT_length;		/* Options structure length */
-	ulong OPT_offset;		/* Options structure offset */
+	t_uscalar_t PRIM_type;		/* Always TR_BEGIN_REQ */
+	t_uscalar_t CORR_id;		/* Correlation id */
+	t_uscalar_t ASSOC_flags;	/* Association flags */
+	t_uscalar_t DEST_length;	/* Destination address length */
+	t_uscalar_t DEST_offset;	/* Destination address offset */
+	t_uscalar_t ORIG_length;	/* Originating address length */
+	t_uscalar_t ORIG_offset;	/* Originating address offset */
+	t_uscalar_t OPT_length;		/* Options structure length */
+	t_uscalar_t OPT_offset;		/* Options structure offset */
 } TR_begin_req_t;
 
 /*
  *  TR_BEGIN_IND.
  */
 typedef struct TR_begin_ind {
-	ulong PRIM_type;		/* Always TR_BEGIN_IND */
-	ulong TRANS_id;			/* Transaction id */
-	ulong ASSOC_flags;		/* Association flags */
-	ulong DEST_length;		/* Destination address length */
-	ulong DEST_offset;		/* Destination address offset */
-	ulong ORIG_length;		/* Originating address length */
-	ulong ORIG_offset;		/* Originating address offset */
-	ulong OPT_length;		/* Options structure length */
-	ulong OPT_offset;		/* Options structure offset */
+	t_uscalar_t PRIM_type;		/* Always TR_BEGIN_IND */
+	t_uscalar_t TRANS_id;		/* Transaction id */
+	t_uscalar_t ASSOC_flags;	/* Association flags */
+	t_uscalar_t DEST_length;	/* Destination address length */
+	t_uscalar_t DEST_offset;	/* Destination address offset */
+	t_uscalar_t ORIG_length;	/* Originating address length */
+	t_uscalar_t ORIG_offset;	/* Originating address offset */
+	t_uscalar_t OPT_length;		/* Options structure length */
+	t_uscalar_t OPT_offset;		/* Options structure offset */
 } TR_begin_ind_t;
 
 /*
@@ -313,13 +319,13 @@ typedef struct TR_begin_ind {
  *  indication.
  */
 typedef struct TR_begin_res {
-	ulong PRIM_type;		/* Always TR_BEGIN_RES */
-	ulong TRANS_id;			/* Transaction id */
-	ulong ASSOC_flags;		/* Association flags */
-	ulong ORIG_length;		/* Originating address length */
-	ulong ORIG_offset;		/* Originating address offset */
-	ulong OPT_length;		/* Options structure length */
-	ulong OPT_offset;		/* Options structure offset */
+	t_uscalar_t PRIM_type;		/* Always TR_BEGIN_RES */
+	t_uscalar_t TRANS_id;		/* Transaction id */
+	t_uscalar_t ASSOC_flags;	/* Association flags */
+	t_uscalar_t ORIG_length;	/* Originating address length */
+	t_uscalar_t ORIG_offset;	/* Originating address offset */
+	t_uscalar_t OPT_length;		/* Options structure length */
+	t_uscalar_t OPT_offset;		/* Options structure offset */
 } TR_begin_res_t;
 
 /*
@@ -329,92 +335,92 @@ typedef struct TR_begin_res {
  *  TR-BEGIN request.
  */
 typedef struct TR_begin_con {
-	ulong PRIM_type;		/* Always TR_BEGIN_CON */
-	ulong CORR_id;			/* Correlation Id */
-	ulong ASSOC_flags;		/* Association flags */
-	ulong TRANS_id;			/* Transaction id */
-	ulong ORIG_length;		/* Originating address length */
-	ulong ORIG_offset;		/* Originating address offset */
-	ulong OPT_length;		/* Options structure length */
-	ulong OPT_offset;		/* Options structure offset */
+	t_uscalar_t PRIM_type;		/* Always TR_BEGIN_CON */
+	t_uscalar_t CORR_id;		/* Correlation Id */
+	t_uscalar_t ASSOC_flags;	/* Association flags */
+	t_uscalar_t TRANS_id;		/* Transaction id */
+	t_uscalar_t ORIG_length;	/* Originating address length */
+	t_uscalar_t ORIG_offset;	/* Originating address offset */
+	t_uscalar_t OPT_length;		/* Options structure length */
+	t_uscalar_t OPT_offset;		/* Options structure offset */
 } TR_begin_con_t;
 
 /*
  *  TR_CONT_REQ.
  */
 typedef struct TR_cont_req {
-	ulong PRIM_type;		/* Always TR_CONT_REQ */
-	ulong TRANS_id;			/* Transaction id */
-	ulong ASSOC_flags;		/* Association flags */
-	ulong OPT_length;		/* Options structure length */
-	ulong OPT_offset;		/* Options structure offset */
+	t_uscalar_t PRIM_type;		/* Always TR_CONT_REQ */
+	t_uscalar_t TRANS_id;		/* Transaction id */
+	t_uscalar_t ASSOC_flags;	/* Association flags */
+	t_uscalar_t OPT_length;		/* Options structure length */
+	t_uscalar_t OPT_offset;		/* Options structure offset */
 } TR_cont_req_t;
 
 /*
  *  TR_CONT_IND.
  */
 typedef struct TR_cont_ind {
-	ulong PRIM_type;		/* Always TR_CONT_IND */
-	ulong TRANS_id;			/* Transaction id */
-	ulong ASSOC_flags;		/* Association flags */
-	ulong OPT_length;		/* Options structure length */
-	ulong OPT_offset;		/* Options structure offset */
+	t_uscalar_t PRIM_type;		/* Always TR_CONT_IND */
+	t_uscalar_t TRANS_id;		/* Transaction id */
+	t_uscalar_t ASSOC_flags;	/* Association flags */
+	t_uscalar_t OPT_length;		/* Options structure length */
+	t_uscalar_t OPT_offset;		/* Options structure offset */
 } TR_cont_ind_t;
 
 /*
  *  TR_END_REQ.
  */
 typedef struct TR_end_req {
-	ulong PRIM_type;		/* Always TR_END_REQ */
-	ulong TRANS_id;			/* Transaction id */
-	ulong TERM_scenario;		/* Termination scenario */
-	ulong OPT_length;		/* Options structure length */
-	ulong OPT_offset;		/* Options structure offset */
+	t_uscalar_t PRIM_type;		/* Always TR_END_REQ */
+	t_uscalar_t TRANS_id;		/* Transaction id */
+	t_uscalar_t TERM_scenario;	/* Termination scenario */
+	t_uscalar_t OPT_length;		/* Options structure length */
+	t_uscalar_t OPT_offset;		/* Options structure offset */
 } TR_end_req_t;
 
 /*
  *  TR_END_IND.
  */
 typedef struct TR_end_ind {
-	ulong PRIM_type;		/* Always TR_END_IND */
-	ulong CORR_id;			/* Correlation id */
-	ulong TRANS_id;			/* Transaction id */
-	ulong OPT_length;		/* Options structure length */
-	ulong OPT_offset;		/* Options structure offset */
+	t_uscalar_t PRIM_type;		/* Always TR_END_IND */
+	t_uscalar_t CORR_id;		/* Correlation id */
+	t_uscalar_t TRANS_id;		/* Transaction id */
+	t_uscalar_t OPT_length;		/* Options structure length */
+	t_uscalar_t OPT_offset;		/* Options structure offset */
 } TR_end_ind_t;
 
 /*
  *  TR_ABORT_REQ.
  */
 typedef struct TR_abort_req {
-	ulong PRIM_type;		/* Always TR_ABORT_REQ */
-	ulong TRANS_id;			/* Transaction id */
-	ulong ABORT_cause;		/* Cause of the abort */
-	ulong OPT_length;		/* Options structure length */
-	ulong OPT_offset;		/* Options structure offset */
+	t_uscalar_t PRIM_type;		/* Always TR_ABORT_REQ */
+	t_uscalar_t TRANS_id;		/* Transaction id */
+	t_uscalar_t ABORT_cause;	/* Cause of the abort */
+	t_uscalar_t OPT_length;		/* Options structure length */
+	t_uscalar_t OPT_offset;		/* Options structure offset */
 } TR_abort_req_t;
 
 /*
  *  TR_ABORT_IND.
  */
 typedef struct TR_abort_ind {
-	ulong PRIM_type;		/* Always TR_ABORT_IND */
-	ulong CORR_id;			/* Correlation id */
-	ulong TRANS_id;			/* Transaction id */
-	ulong OPT_length;		/* Options structure length */
-	ulong OPT_offset;		/* Options structure offset */
-	ulong ABORT_cause;		/* Cause of the abort */
-	ulong ORIGINATOR;		/* Originator P or U */
+	t_uscalar_t PRIM_type;		/* Always TR_ABORT_IND */
+	t_uscalar_t CORR_id;		/* Correlation id */
+	t_uscalar_t TRANS_id;		/* Transaction id */
+	t_uscalar_t OPT_length;		/* Options structure length */
+	t_uscalar_t OPT_offset;		/* Options structure offset */
+	t_uscalar_t ABORT_cause;	/* Cause of the abort */
+	t_uscalar_t ORIGINATOR;		/* Originator P or U */
 } TR_abort_ind_t;
 
 /*
  *  TR_NOTICE_IND.
  */
 typedef struct TR_notice_ind {
-	ulong PRIM_type;		/* Always TR_NOTICE_IND */
-	ulong CORR_id;			/* Correlation id */
-	ulong TRANS_id;			/* Transaction id */
-	ulong REPORT_cause;		/* SCCP return cause */
+	t_uscalar_t PRIM_type;		/* Always TR_NOTICE_IND */
+	t_uscalar_t CORR_id;		/* Correlation id */
+	t_uscalar_t TRANS_id;		/* Transaction id */
+	t_uscalar_t REPORT_cause;	/* SCCP return cause */
 } TR_notice_ind_t;
 
 #endif				/* __SS7_TR_H__ */

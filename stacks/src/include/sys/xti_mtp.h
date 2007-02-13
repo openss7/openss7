@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: xti_mtp.h,v 0.9.2.5 2006/09/25 12:10:09 brian Exp $
+ @(#) $Id: xti_mtp.h,v 0.9.2.6 2007/02/13 14:05:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/25 12:10:09 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti_mtp.h,v $
+ Revision 0.9.2.6  2007/02/13 14:05:30  brian
+ - corrected ulong and long for 32-bit compat
+
  Revision 0.9.2.5  2006/09/25 12:10:09  brian
  - updated and doxygenified headers
 
@@ -58,7 +61,7 @@
 #ifndef _SYS_XTI_MTP_H
 #define _SYS_XTI_MTP_H
 
-#ident "@(#) $RCSfile: xti_mtp.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_mtp.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -192,7 +195,7 @@ typedef struct t_mtp_mod_ls {
 
 /** Link set configuratoin structure. */
 typedef struct t_mtp_cnf_ls {
-	t_uscalar_t ls_id;		/**< Combined link set id. */ 
+	t_uscalar_t ls_id;		/**< Combined link set id. */
 } t_mtp_cnf_ls_t;
 
 /** @} */

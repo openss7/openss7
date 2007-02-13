@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: cdi.h,v 0.9.2.3 2006/09/18 13:52:33 brian Exp $
+ @(#) $Id: cdi.h,v 0.9.2.4 2007/02/13 14:05:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:33 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:28 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: cdi.h,v $
+ Revision 0.9.2.4  2007/02/13 14:05:28  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef _SYS_CDI_H
 #define _SYS_CDI_H
 
-#ident "@(#) $RCSfile: cdi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: cdi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -91,9 +97,9 @@
 #define CD_HALT_INPUT_REQ	0x11	/* Halt input */
 #define CD_ABORT_OUTPUT_REQ	0x12	/* Abort output */
 #define CD_MUX_NAME_REQ		0x13	/* get mux name (Gcom) */
-#define	CD_BAD_FRAME_IND	0x14	/* frame w/error (Gcom extension) */
-#define	CD_MODEM_SIG_REQ	0x15	/* Assert modem signals (Gcom) */
-#define	CD_MODEM_SIG_IND	0x16	/* Report modem signal state (Gcom) */
+#define CD_BAD_FRAME_IND	0x14	/* frame w/error (Gcom extension) */
+#define CD_MODEM_SIG_REQ	0x15	/* Assert modem signals (Gcom) */
+#define CD_MODEM_SIG_IND	0x16	/* Report modem signal state (Gcom) */
 #define CD_MODEM_SIG_POLL	0x17	/* requests a CD_MODEM_SIG_IND (Gcom) */
 
 /*
@@ -108,29 +114,30 @@
 #define CD_INPUT_ALLOWED	0x06	/* Input section permanently enabled */
 #define CD_DISABLE_PENDING	0x07	/* Waiting ack of disable req */
 #define CD_OUTPUT_ACTIVE	0x08	/* Output section active only */
-#define	CD_XRAY			0x09	/* Xray-ing another ppa */
+#define CD_XRAY			0x09	/* Xray-ing another ppa */
+#define CD_NOT_AUTH		0x0A	/* Not authorized, unusable */
 
 /*
  * CD_ERROR_ACK and CD_ERROR_IND error return values
  */
-#define CD_BADADDRESS	0x01	/* Address was invalid */
-#define CD_BADADDRTYPE	0x02	/* Invalid address type */
-#define CD_BADDIAL	0x03	/* Dial information was invalid */
-#define CD_BADDIALTYPE	0x04	/* Invalid dial information type */
-#define CD_BADDISPOSAL	0x05	/* Invalid disposal parameter */
-#define CD_BADFRAME	0x06	/* Defective SDU received */
-#define CD_BADPPA	0x07	/* Invalid PPA identifier */
-#define CD_BADPRIM	0x08	/* Unrecognized primitive */
-#define CD_DISC		0x09	/* Disconnected */
-#define CD_EVENT	0x0a	/* Protocol-specific event occurred */
-#define CD_FATALERR	0x0b	/* Device has become unusable */
-#define CD_INITFAILED	0x0c	/* Line initialization failed */
-#define CD_NOTSUPP	0x0d	/* Primitive not supported by this device */
-#define CD_OUTSTATE	0x0e	/* Primitive was issued from an invalid state */
-#define CD_PROTOSHORT	0x0f	/* M_PROTO block too short */
-#define CD_READTIMEOUT	0x10	/* Read request timed out before data arrived */
-#define CD_SYSERR	0x11	/* UNIX system error */
-#define CD_WRITEFAIL	0x12	/* Unitdata request failed */
+#define CD_BADADDRESS		0x01	/* Address was invalid */
+#define CD_BADADDRTYPE		0x02	/* Invalid address type */
+#define CD_BADDIAL		0x03	/* Dial information was invalid */
+#define CD_BADDIALTYPE		0x04	/* Invalid dial information type */
+#define CD_BADDISPOSAL		0x05	/* Invalid disposal parameter */
+#define CD_BADFRAME		0x06	/* Defective SDU received */
+#define CD_BADPPA		0x07	/* Invalid PPA identifier */
+#define CD_BADPRIM		0x08	/* Unrecognized primitive */
+#define CD_DISC			0x09	/* Disconnected */
+#define CD_EVENT		0x0a	/* Protocol-specific event occurred */
+#define CD_FATALERR		0x0b	/* Device has become unusable */
+#define CD_INITFAILED		0x0c	/* Line initialization failed */
+#define CD_NOTSUPP		0x0d	/* Primitive not supported by this device */
+#define CD_OUTSTATE		0x0e	/* Primitive was issued from an invalid state */
+#define CD_PROTOSHORT		0x0f	/* M_PROTO block too short */
+#define CD_READTIMEOUT		0x10	/* Read request timed out before data arrived */
+#define CD_SYSERR		0x11	/* UNIX system error */
+#define CD_WRITEFAIL		0x12	/* Unitdata request failed */
 
 /*
  * Error explanations
@@ -159,16 +166,16 @@
 /*
  * CDI device classes
  */
-#define CD_HDLC		0x00	/* Bit-synchronous */
-#define CD_BISYNC	0x01	/* Character-synchronous */
-#define CD_LAN		0x02	/* ISO 8802-3,4,5 local-area network MAC */
-#define	CD_NODEV	0x03	/* no device, ppa used for X-ray */
+#define CD_HDLC			0x00	/* Bit-synchronous */
+#define CD_BISYNC		0x01	/* Character-synchronous */
+#define CD_LAN			0x02	/* ISO 8802-3,4,5 local-area network MAC */
+#define CD_NODEV		0x03	/* no device, ppa used for X-ray */
 
 /*
  * CDI duplex types
  */
-#define CD_FULLDUPLEX	0x00	/* Full duplex; allow input supported */
-#define CD_HALFDUPLEX	0x01	/* Half duplex; read and write/read supported */
+#define CD_FULLDUPLEX		0x00	/* Full duplex; allow input supported */
+#define CD_HALFDUPLEX		0x01	/* Half duplex; read and write/read supported */
 
 /*
  * CDI output styles
@@ -193,8 +200,8 @@
  */
 #define CD_STYLE1	0x00	/* PPA is implicitly bound by open(2) */
 #define CD_STYLE2	0x01	/* PPA must be explicitly bound via CD_ATTACH_REQ */
-#define	CD_STYLE_1	CD_STYLE1	/* Gcom -- to match document */
-#define	CD_STYLE_2	CD_STYLE2	/* Gcom -- to match document */
+#define CD_STYLE_1	CD_STYLE1	/* Gcom -- to match document */
+#define CD_STYLE_2	CD_STYLE2	/* Gcom -- to match document */
 
 /*
  * Symbolic value for "no dialing information"
@@ -220,12 +227,12 @@
  * Error types for CD_BAD_FRAME_IND
  */
 
-#define	CD_FRMTOOLONG	0xFFFF	/* frame overflowed rcv bfr */
-#define	CD_FRMNONOCTET	0xFFFE	/* frame not octet-aligned */
-#define	CD_EMPTY_BFR	0xFFFD	/* empty rcv buffer (not used) */
-#define	CD_BAD_CRC	0xFFFC	/* CRC error */
-#define	CD_FRM_ABORTED	0xFFFB	/* frame aborted */
-#define	CD_RCV_OVERRUN	0xFFFA	/* receive overrun */
+#define CD_FRMTOOLONG	0xFFFF	/* frame overflowed rcv bfr */
+#define CD_FRMNONOCTET	0xFFFE	/* frame not octet-aligned */
+#define CD_EMPTY_BFR	0xFFFD	/* empty rcv buffer (not used) */
+#define CD_BAD_CRC	0xFFFC	/* CRC error */
+#define CD_FRM_ABORTED	0xFFFB	/* frame aborted */
+#define CD_RCV_OVERRUN	0xFFFA	/* receive overrun */
 
 /*
  * Modem signal bits for modem signal related requests and indications
@@ -251,8 +258,9 @@
  * Stream message type (M_PROTO, M_PCPROTO, M_DATA)
  */
 
-typedef unsigned long cd_ulong;
-typedef unsigned short cd_ushort;
+typedef int32_t cd_long;
+typedef u_int32_t cd_ulong;
+typedef u_int16_t cd_ushort;
 
 /*
  *      LOCAL MANAGEMENT PRIMITIVES

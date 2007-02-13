@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: sccp.h,v 0.9.2.3 2006/09/18 13:52:33 brian Exp $
+ @(#) $Id: sccp.h,v 0.9.2.4 2007/02/13 14:05:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:33 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:28 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sccp.h,v $
+ Revision 0.9.2.4  2007/02/13 14:05:28  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef __SS7_SCCP_H__
 #define __SS7_SCCP_H__
 
-#ident "@(#) $RCSfile: sccp.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: sccp.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -75,22 +81,22 @@
 
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_SEL_SCCP */
-	long protocol_class;		/* protocol class 2 or 3 */
-	long option_flags;		/* options flags (return option) *//* XXX */
-	long importance;		/* importance */
-	long sequence_selection;	/* selected SLS value */
-	long message_priority;		/* MTP message priority */
+	np_long protocol_class;		/* protocol class 2 or 3 */
+	np_long option_flags;		/* options flags (return option) *//* XXX */
+	np_long importance;		/* importance */
+	np_long sequence_selection;	/* selected SLS value */
+	np_long message_priority;	/* MTP message priority */
 } N_qos_sel_sccp_t;
 
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_OPT_SEL_SCCP */
-	long protocol_class;		/* protocol class 0 or 1 */
+	np_long protocol_class;		/* protocol class 0 or 1 */
 } N_qos_opt_sel_sccp_t;
 
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_RANGE_SCCP */
-	long protocol_classes;		/* protocol class support range */
-	long sequence_selection;	/* SLS range */
+	np_long protocol_classes;	/* protocol class support range */
+	np_long sequence_selection;	/* SLS range */
 } N_qos_range_sccp_t;
 
 /*
@@ -107,20 +113,19 @@ typedef struct {
  */
 
 typedef struct sccp_addr {
-	ulong ni;			/* network indicator */
-	ulong ri;			/* routing indicator */
-	ulong pc;			/* point code (-1 not present) */
-	ulong ssn;			/* subsystem number (-1 not present) */
-	ulong gtt;			/* type of global title */
-	ulong tt;			/* translaction type */
-	ulong es;			/* encoding scheme */
-	ulong nplan;			/* numbering plan */
-	ulong nai;			/* nature of address indicator */
-	ulong alen;			/* address length */
-	uint8_t addr[0];		/* adress digits */
-	/*
-	   followed by alen address bytes 
-	 */
+	np_ulong ni;			/* network indicator */
+	np_ulong ri;			/* routing indicator */
+	np_ulong pc;			/* point code (-1 not present) */
+	np_ulong ssn;			/* subsystem number (-1 not present) */
+	np_ulong gtt;			/* type of global title */
+	np_ulong tt;			/* translaction type */
+	np_ulong es;			/* encoding scheme */
+	np_ulong nplan;			/* numbering plan */
+	np_ulong nai;			/* nature of address indicator */
+	np_ulong alen;			/* address length */
+	np_uchar addr[0];		/* adress digits */
+	/* 
+	   followed by alen address bytes */
 } sccp_addr_t;
 
 #define SCCP_MAX_ADDR_LENGTH 32

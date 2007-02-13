@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: tcap_ioctl.h,v 0.9.2.4 2006/09/18 13:52:34 brian Exp $
+ @(#) $Id: tcap_ioctl.h,v 0.9.2.5 2007/02/13 14:05:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:34 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:29 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tcap_ioctl.h,v $
+ Revision 0.9.2.5  2007/02/13 14:05:29  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef __SSCP_IOCTL_H__
 #define __SSCP_IOCTL_H__
 
-#ident "@(#) $RCSfile: tcap_ioctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: tcap_ioctl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -135,11 +141,10 @@ typedef struct tcap_opt_conf_df {
  *  OPTIONS
  */
 typedef struct tcap_option {
-	ulong type; /* object type */
-	ulong id; /* object id */
-	/*
-	   followed by specific proto structure
-	 */
+	t_uscalar_t type;		/* object type */
+	t_uscalar_t id;			/* object id */
+	/* 
+	   followed by specific proto structure */
 } tcap_option_t;
 
 #define TCAP_IOCGOPTIONS	_IOR(	TCAP_IOC_MAGIC,	 0, tcap_option_t   )
@@ -149,12 +154,11 @@ typedef struct tcap_option {
  *  CONFIGURATION
  */
 typedef struct tcap_config {
-	ulong type; /* object type */
-	ulong id; /* object id */
-	ulong cmd; /* object command */
-	/*
-	   followed by specific configuration structure
-	 */
+	t_uscalar_t type;		/* object type */
+	t_uscalar_t id;			/* object id */
+	t_uscalar_t cmd;		/* object command */
+	/* 
+	   followed by specific configuration structure */
 } tcap_config_t;
 
 #define TCAP_GET	0
@@ -216,12 +220,11 @@ typedef struct tcap_statem_df {
  *  STATISTICS
  */
 typedef struct tcap_stats {
-	ulong type; /* object type */
-	ulong id; /* object id */
-	ulong header; /* object stats header */
-	/*
-	   followed by object specific stats structure
-	 */
+	t_uscalar_t type;		/* object type */
+	t_uscalar_t id;			/* object id */
+	t_uscalar_t header;		/* object stats header */
+	/* 
+	   followed by object specific stats structure */
 } tcap_stats_t;
 
 typedef struct tcap_stats_tc {
@@ -254,8 +257,8 @@ typedef struct tcap_stats_df {
  *  EVENTS
  */
 typedef struct tcap_notify {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
+	t_uscalar_t type;		/* object type */
+	t_uscalar_t id;			/* object id */
 	lmi_notify_t notify;		/* notifications */
 } tcap_notify_t;
 
@@ -282,9 +285,9 @@ typedef struct tcap_notify_df {
  *  MANAGEMENT
  */
 typedef struct tcap_mgmt {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong cmd;			/* command */
+	t_uscalar_t type;		/* object type */
+	t_uscalar_t id;			/* object id */
+	t_uscalar_t cmd;		/* command */
 } tcap_mgmt_t;
 
 #define TCAP_MGMT_BLOCK			1
@@ -298,14 +301,13 @@ typedef struct tcap_mgmt {
  *  CONTROL LOWER
  */
 typedef struct tcap_pass {
-	ulong muxid;			/* mux index of lower MTP to pass message to */
-	ulong type;			/* type of message block */
-	ulong band;			/* band of message block */
-	ulong ctl_length;		/* length of cntl part */
-	ulong dat_length;		/* length of data part */
-	/*
-	   followed by cntl and data part of message to pass to MTP 
-	 */
+	t_uscalar_t muxid;		/* mux index of lower MTP to pass message to */
+	t_uscalar_t type;		/* type of message block */
+	t_uscalar_t band;		/* band of message block */
+	t_uscalar_t ctl_length;		/* length of cntl part */
+	t_uscalar_t dat_length;		/* length of data part */
+	/* 
+	   followed by cntl and data part of message to pass to MTP */
 } tcap_pass_t;
 
 #define TCAP_IOCCPASS		_IOWR(	TCAP_IOC_MAGIC, 16,  tcap_pass_t )
@@ -313,7 +315,5 @@ typedef struct tcap_pass {
 #define TCAP_IOC_FIRST		 0
 #define TCAP_IOC_LAST		16
 #define TCAP_IOC_PRIVATE	32
-
-
 
 #endif				/* __SSCP_IOCTL_H__ */

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: tc.h,v 0.9.2.7 2006/09/18 13:52:34 brian Exp $
+ @(#) $Id: tc.h,v 0.9.2.8 2007/02/13 14:05:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:34 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:29 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tc.h,v $
+ Revision 0.9.2.8  2007/02/13 14:05:29  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef __SS7_TC_H__
 #define __SS7_TC_H__
 
-#ident "@(#) $RCSfile: tc.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: tc.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -105,10 +111,10 @@
 #define TC_QOS_SEL1		0x0701
 
 typedef struct {
-	ulong type;			/* Always TC_QOS_SEL1 */
-	ulong flags;			/* Return option */
-	ulong seq_ctrl;			/* Sequence Control */
-	ulong priority;			/* Message priority */
+	t_uscalar_t type;		/* Always TC_QOS_SEL1 */
+	t_uscalar_t flags;		/* Return option */
+	t_uscalar_t seq_ctrl;		/* Sequence Control */
+	t_uscalar_t priority;		/* Message priority */
 } TC_qos_sel1_t;
 
 /*
@@ -159,108 +165,108 @@ typedef struct {
  *  TC_INFO_REQ
  */
 typedef struct TC_info_req {
-	ulong PRIM_type;		/* Always TC_INFO_REQ */
+	t_uscalar_t PRIM_type;		/* Always TC_INFO_REQ */
 } TC_info_req_t;
 
 /*
  *  TC_INFO_ACK
  */
 typedef struct TC_info_ack {
-	long PRIM_type;			/* always TC_INFO_ACK */
-	long TSDU_size;			/* maximum TSDU size */
-	long ETSDU_size;		/* maximum ETSDU size */
-	long CDATA_size;		/* connect data size */
-	long DDATA_size;		/* disconnect data size */
-	long ADDR_size;			/* maximum address size */
-	long OPT_size;			/* maximum options size */
-	long TIDU_size;			/* transaction interface data size */
-	long SERV_type;			/* service type */
-	long CURRENT_state;		/* current state */
-	long PROVIDER_flag;		/* provider flags */
-	long TCI_version;		/* TCI version */
+	t_scalar_t PRIM_type;		/* always TC_INFO_ACK */
+	t_scalar_t TSDU_size;		/* maximum TSDU size */
+	t_scalar_t ETSDU_size;		/* maximum ETSDU size */
+	t_scalar_t CDATA_size;		/* connect data size */
+	t_scalar_t DDATA_size;		/* disconnect data size */
+	t_scalar_t ADDR_size;		/* maximum address size */
+	t_scalar_t OPT_size;		/* maximum options size */
+	t_scalar_t TIDU_size;		/* transaction interface data size */
+	t_scalar_t SERV_type;		/* service type */
+	t_scalar_t CURRENT_state;	/* current state */
+	t_scalar_t PROVIDER_flag;	/* provider flags */
+	t_scalar_t TCI_version;		/* TCI version */
 } TC_info_ack_t;
 
 /*
  *  TC_BIND_REQ
  */
 typedef struct TC_bind_req {
-	ulong PRIM_type;
-	ulong ADDR_length;		/* address length */
-	ulong ADDR_offset;		/* address offset */
-	ulong XACT_number;		/* maximum outstanding transaction reqs. */
-	ulong BIND_flags;		/* bind flags */
+	t_uscalar_t PRIM_type;
+	t_uscalar_t ADDR_length;	/* address length */
+	t_uscalar_t ADDR_offset;	/* address offset */
+	t_uscalar_t XACT_number;	/* maximum outstanding transaction reqs. */
+	t_uscalar_t BIND_flags;		/* bind flags */
 } TC_bind_req_t;
 
 /*
  *  TC_BIND_ACK
  */
 typedef struct TC_bind_ack {
-	ulong PRIM_type;
-	ulong ADDR_length;
-	ulong ADDR_offset;
-	ulong XACT_number;
-	ulong TOKEN_value;
+	t_uscalar_t PRIM_type;
+	t_uscalar_t ADDR_length;
+	t_uscalar_t ADDR_offset;
+	t_uscalar_t XACT_number;
+	t_uscalar_t TOKEN_value;
 } TC_bind_ack_t;
 
 /*
  *  TC_SUBS_BIND_REQ
  */
 typedef struct TC_subs_bind_req {
-	ulong PRIM_type;
+	t_uscalar_t PRIM_type;
 } TC_subs_bind_req_t;
 
 /*
  *  TC_SUBS_BIND_ACK
  */
 typedef struct TC_subs_bind_ack {
-	ulong PRIM_type;
+	t_uscalar_t PRIM_type;
 } TC_subs_bind_ack_t;
 
 /*
  *  TC_UNBIND_REQ
  */
 typedef struct TC_unbind_req {
-	ulong PRIM_type;		/* Always TC_UNBIND_REQ */
+	t_uscalar_t PRIM_type;		/* Always TC_UNBIND_REQ */
 } TC_unbind_req_t;
 
 /*
  *  TC_OK_ACK
  */
 typedef struct TC_ok_ack {
-	ulong PRIM_type;		/* Always TC_OK_ACK */
-	ulong CORRECT_prim;		/* correct primitive */
+	t_uscalar_t PRIM_type;		/* Always TC_OK_ACK */
+	t_uscalar_t CORRECT_prim;	/* correct primitive */
 } TC_ok_ack_t;
 
 /*
  *  TC_ERROR_ACK
  */
 typedef struct TC_error_ack {
-	ulong PRIM_type;
-	ulong ERROR_prim;
-	ulong TRPI_error;
-	ulong UNIX_error;
-	ulong DIALOG_id;
-	ulong INVOKE_id;
+	t_uscalar_t PRIM_type;
+	t_uscalar_t ERROR_prim;
+	t_uscalar_t TRPI_error;
+	t_uscalar_t UNIX_error;
+	t_uscalar_t DIALOG_id;
+	t_uscalar_t INVOKE_id;
 } TC_error_ack_t;
 
 /*
  *  TC_OPTMGMT_REQ
  */
 typedef struct TC_optmgmt_req {
-	ulong PRIM_type;
-	ulong OPT_length;
-	ulong OPT_offset;
-	ulong MGMT_flags;
+	t_uscalar_t PRIM_type;
+	t_uscalar_t OPT_length;
+	t_uscalar_t OPT_offset;
+	t_uscalar_t MGMT_flags;
 } TC_optmgmt_req_t;
 
 /*
  *  TC_OPTMGMT_ACK
  */
 typedef struct TC_optmgmt_ack {
-	ulong PRIM_type;
-	ulong OPT_length;
-	ulong OPT_offset;
-	ulong MGMT_flags;
+	t_uscalar_t PRIM_type;
+	t_uscalar_t OPT_length;
+	t_uscalar_t OPT_offset;
+	t_uscalar_t MGMT_flags;
 } TC_optmgmt_ack_t;
 
 /*
@@ -278,14 +284,14 @@ typedef struct TC_optmgmt_ack {
  *          the local TC-User and TC-Provider to refer to a dialog.
  */
 typedef struct TC_uni_req {
-	ulong PRIM_type;		/* Always TC_UNI_REQ */
-	ulong SRC_length;		/* Source address length */
-	ulong SRC_offset;		/* Source address offset */
-	ulong DEST_length;		/* Destination address length */
-	ulong DEST_offset;		/* Destination address offset */
-	ulong OPT_length;		/* Options associated with the primitive */
-	ulong OPT_offset;		/* Options associated wtih the primitive */
-	ulong DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t PRIM_type;		/* Always TC_UNI_REQ */
+	t_uscalar_t SRC_length;		/* Source address length */
+	t_uscalar_t SRC_offset;		/* Source address offset */
+	t_uscalar_t DEST_length;	/* Destination address length */
+	t_uscalar_t DEST_offset;	/* Destination address offset */
+	t_uscalar_t OPT_length;		/* Options associated with the primitive */
+	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
 } TC_uni_req_t;
 
 /*
@@ -303,15 +309,15 @@ typedef struct TC_uni_req {
  *          it must be passed up in the indication.
  */
 typedef struct TC_uni_ind {
-	ulong PRIM_type;		/* Always TC_UNI_IND */
-	ulong SRC_length;		/* Source address length */
-	ulong SRC_offset;		/* Source address offset */
-	ulong DEST_length;		/* Destination address length */
-	ulong DEST_offset;		/* Destination address offset */
-	ulong OPT_length;		/* Options associated with the primitive */
-	ulong OPT_offset;		/* Options associated wtih the primitive */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong COMP_flags;		/* Components preset flag */
+	t_uscalar_t PRIM_type;		/* Always TC_UNI_IND */
+	t_uscalar_t SRC_length;		/* Source address length */
+	t_uscalar_t SRC_offset;		/* Source address offset */
+	t_uscalar_t DEST_length;	/* Destination address length */
+	t_uscalar_t DEST_offset;	/* Destination address offset */
+	t_uscalar_t OPT_length;		/* Options associated with the primitive */
+	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t COMP_flags;		/* Components preset flag */
 } TC_uni_ind_t;
 
 /*
@@ -325,15 +331,15 @@ typedef struct TC_uni_ind {
  *  Also T_QUERY_REQ for ANSI.
  */
 typedef struct TC_begin_req {
-	ulong PRIM_type;		/* Always TC_BEGIN_REQ */
-	ulong SRC_length;		/* Source address length */
-	ulong SRC_offset;		/* Source address offset */
-	ulong DEST_length;		/* Destination address length */
-	ulong DEST_offset;		/* Destination address offset */
-	ulong OPT_length;		/* Options associated with the primitive */
-	ulong OPT_offset;		/* Options associated wtih the primitive */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong COMP_flags;		/* For use with ANSI QWP/QWOP */
+	t_uscalar_t PRIM_type;		/* Always TC_BEGIN_REQ */
+	t_uscalar_t SRC_length;		/* Source address length */
+	t_uscalar_t SRC_offset;		/* Source address offset */
+	t_uscalar_t DEST_length;	/* Destination address length */
+	t_uscalar_t DEST_offset;	/* Destination address offset */
+	t_uscalar_t OPT_length;		/* Options associated with the primitive */
+	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t COMP_flags;		/* For use with ANSI QWP/QWOP */
 } TC_begin_req_t;
 
 typedef struct TC_begin_req TC_query_req;
@@ -349,15 +355,15 @@ typedef struct TC_begin_req TC_query_req;
  *  Also T_QUERY_IND for ANSI.
  */
 typedef struct TC_begin_ind {
-	ulong PRIM_type;		/* Always TC_BEGIN_IND */
-	ulong SRC_length;		/* Source address length */
-	ulong SRC_offset;		/* Source address offset */
-	ulong DEST_length;		/* Destination address length */
-	ulong DEST_offset;		/* Destination address offset */
-	ulong OPT_length;		/* Options associated with the primitive */
-	ulong OPT_offset;		/* Options associated wtih the primitive */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong COMP_flags;		/* For use with ANSI QWP/QWOP */
+	t_uscalar_t PRIM_type;		/* Always TC_BEGIN_IND */
+	t_uscalar_t SRC_length;		/* Source address length */
+	t_uscalar_t SRC_offset;		/* Source address offset */
+	t_uscalar_t DEST_length;	/* Destination address length */
+	t_uscalar_t DEST_offset;	/* Destination address offset */
+	t_uscalar_t OPT_length;		/* Options associated with the primitive */
+	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t COMP_flags;		/* For use with ANSI QWP/QWOP */
 } TC_begin_ind_t;
 
 typedef struct TC_begin_ind TC_query_ind;
@@ -368,11 +374,11 @@ typedef struct TC_begin_ind TC_query_ind;
  *  Also TC_RESP_REQ for ANSI.
  */
 typedef struct TC_end_req {
-	ulong PRIM_type;		/* Always TC_END_REQ */
-	ulong OPT_length;		/* Options associated with the primitive */
-	ulong OPT_offset;		/* Options associated wtih the primitive */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong TERM_scenario;		/* Reason for termination */
+	t_uscalar_t PRIM_type;		/* Always TC_END_REQ */
+	t_uscalar_t OPT_length;		/* Options associated with the primitive */
+	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t TERM_scenario;	/* Reason for termination */
 } TC_end_req_t;
 
 typedef struct TC_end_req TC_resp_req_t;
@@ -383,11 +389,11 @@ typedef struct TC_end_req TC_resp_req_t;
  *  Also TC_RESP_IND for ANSI.
  */
 typedef struct TC_end_ind {
-	ulong PRIM_type;		/* Always TC_END_IND */
-	ulong OPT_length;		/* Options associated with the primitive */
-	ulong OPT_offset;		/* Options associated wtih the primitive */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong COMP_flags;		/* Components present flag */
+	t_uscalar_t PRIM_type;		/* Always TC_END_IND */
+	t_uscalar_t OPT_length;		/* Options associated with the primitive */
+	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t COMP_flags;		/* Components present flag */
 } TC_end_ind_t;
 
 typedef struct TC_end_ind TC_resp_ind_t;
@@ -403,21 +409,21 @@ typedef struct TC_end_ind TC_resp_ind_t;
  *  Also TC_CONV_REQ for ANSI.
  */
 typedef struct TC_begin_res {
-	ulong PRIM_type;		/* Always TC_CONT_REQ */
-	ulong SRC_length;		/* Source address length */
-	ulong SRC_offset;		/* Source address offset */
-	ulong OPT_length;		/* Options associated with the primitive */
-	ulong OPT_offset;		/* Options associated wtih the primitive */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong COMP_flags;		/* For use with ANSI CWP/CWOP */
+	t_uscalar_t PRIM_type;		/* Always TC_CONT_REQ */
+	t_uscalar_t SRC_length;		/* Source address length */
+	t_uscalar_t SRC_offset;		/* Source address offset */
+	t_uscalar_t OPT_length;		/* Options associated with the primitive */
+	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t COMP_flags;		/* For use with ANSI CWP/CWOP */
 } TC_begin_res_t;
 
 typedef struct TC_cont_req {
-	ulong PRIM_type;		/* Always TC_CONT_REQ */
-	ulong OPT_length;		/* Options associated with the primitive */
-	ulong OPT_offset;		/* Options associated wtih the primitive */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong COMP_flags;		/* For use with ANSI CWP/CWOP */
+	t_uscalar_t PRIM_type;		/* Always TC_CONT_REQ */
+	t_uscalar_t OPT_length;		/* Options associated with the primitive */
+	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t COMP_flags;		/* For use with ANSI CWP/CWOP */
 } TC_cont_req_t;
 
 typedef struct TC_cont_req TC_conv_req_t;
@@ -433,19 +439,19 @@ typedef struct TC_cont_req TC_conv_req_t;
  *  Also TC_CONV_IND for ASNI.
  */
 typedef struct TC_begin_con {
-	ulong PRIM_type;		/* Always TC_BEGIN_CON */
-	ulong OPT_length;		/* Options associated with the primitive */
-	ulong OPT_offset;		/* Options associated wtih the primitive */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong COMP_flags;		/* For use with ANSI CWP/CWOP */
+	t_uscalar_t PRIM_type;		/* Always TC_BEGIN_CON */
+	t_uscalar_t OPT_length;		/* Options associated with the primitive */
+	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t COMP_flags;		/* For use with ANSI CWP/CWOP */
 } TC_begin_con_t;
 
 typedef struct TC_cont_ind {
-	ulong PRIM_type;		/* Always TC_CONT_IND */
-	ulong OPT_length;		/* Options associated with the primitive */
-	ulong OPT_offset;		/* Options associated wtih the primitive */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong COMP_flags;		/* For use with ANSI CWP/CWOP */
+	t_uscalar_t PRIM_type;		/* Always TC_CONT_IND */
+	t_uscalar_t OPT_length;		/* Options associated with the primitive */
+	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t COMP_flags;		/* For use with ANSI CWP/CWOP */
 } TC_cont_ind_t;
 
 typedef struct TC_cont_ind TC_conv_ind_t;
@@ -457,11 +463,11 @@ typedef struct TC_cont_ind TC_conv_ind_t;
  *          "application context not supported".
  */
 typedef struct TC_abort_req {
-	ulong PRIM_type;		/* Always TC_ABORT_REQ */
-	ulong OPT_length;		/* Options associated with the primitive */
-	ulong OPT_offset;		/* Options associated wtih the primitive */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong ABORT_reason;		/* Abort reason */
+	t_uscalar_t PRIM_type;		/* Always TC_ABORT_REQ */
+	t_uscalar_t OPT_length;		/* Options associated with the primitive */
+	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t ABORT_reason;	/* Abort reason */
 } TC_abort_req_t;
 
 /*
@@ -471,21 +477,21 @@ typedef struct TC_abort_req {
  *          "application context not supported".
  */
 typedef struct TC_abort_ind {
-	ulong PRIM_type;		/* Always TC_ABORT_IND */
-	ulong OPT_length;		/* Options associated with the primitive */
-	ulong OPT_offset;		/* Options associated wtih the primitive */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong ABORT_reason;		/* Abort reason */
-	ulong ORIGINATOR;		/* Either User or Provider originated */
+	t_uscalar_t PRIM_type;		/* Always TC_ABORT_IND */
+	t_uscalar_t OPT_length;		/* Options associated with the primitive */
+	t_uscalar_t OPT_offset;		/* Options associated wtih the primitive */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t ABORT_reason;	/* Abort reason */
+	t_uscalar_t ORIGINATOR;		/* Either User or Provider originated */
 } TC_abort_ind_t;
 
 /*
  *  TC_NOTICE_IND.
  */
 typedef struct TC_notice_ind {
-	ulong PRIM_type;		/* Always TC_NOTICE_IND */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong REPORT_cause;		/* Report cause */
+	t_uscalar_t PRIM_type;		/* Always TC_NOTICE_IND */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t REPORT_cause;	/* Report cause */
 } TC_notice_ind_t;
 
 /*
@@ -497,14 +503,14 @@ typedef struct TC_notice_ind {
  *  zero or more M_DATA blocks containing the parameters of the operation.
  */
 typedef struct TC_invoke_req {
-	ulong PRIM_type;		/* Always TC_INVOKE_REQ */
-	ulong DIALOG_id;		/* Dialog identifier */
-	ulong PROTOCOL_class;		/* Application protocol class */
-	ulong INVOKE_id;		/* Invoke Identifier */
-	ulong LINKED_id;		/* Linked Invoke Identifier */
-	ulong OPERATION;		/* Requested operation to invoke */
-	ulong MORE_flag;		/* Not last */
-	ulong TIMEOUT;			/* Timeout */
+	t_uscalar_t PRIM_type;		/* Always TC_INVOKE_REQ */
+	t_uscalar_t DIALOG_id;		/* Dialog identifier */
+	t_uscalar_t PROTOCOL_class;	/* Application protocol class */
+	t_uscalar_t INVOKE_id;		/* Invoke Identifier */
+	t_uscalar_t LINKED_id;		/* Linked Invoke Identifier */
+	t_uscalar_t OPERATION;		/* Requested operation to invoke */
+	t_uscalar_t MORE_flag;		/* Not last */
+	t_uscalar_t TIMEOUT;		/* Timeout */
 } TC_invoke_req_t;
 
 /*
@@ -514,13 +520,13 @@ typedef struct TC_invoke_req {
  *  Note:   Dialog Id is ignored for Class 4 (TC_UNI_IND) operations.
  */
 typedef struct TC_invoke_ind {
-	ulong PRIM_type;		/* Always TC_INVOKE_IND */
-	ulong DIALOG_id;		/* Dialog identifier */
-	ulong OP_class;			/* Application operation class */
-	ulong INVOKE_id;		/* Invoke Identifier */
-	ulong LINKED_id;		/* Linked Invoke Identifier */
-	ulong OPERATION;		/* Requested operation to invoke */
-	ulong MORE_flag;		/* Not last */
+	t_uscalar_t PRIM_type;		/* Always TC_INVOKE_IND */
+	t_uscalar_t DIALOG_id;		/* Dialog identifier */
+	t_uscalar_t OP_class;		/* Application operation class */
+	t_uscalar_t INVOKE_id;		/* Invoke Identifier */
+	t_uscalar_t LINKED_id;		/* Linked Invoke Identifier */
+	t_uscalar_t OPERATION;		/* Requested operation to invoke */
+	t_uscalar_t MORE_flag;		/* Not last */
 } TC_invoke_ind_t;
 
 /*
@@ -529,11 +535,11 @@ typedef struct TC_invoke_ind {
  *  operation.
  */
 typedef struct TC_result_req {
-	ulong PRIM_type;		/* Always TC_RESULT_REQ */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong INVOKE_id;		/* Invoke Identifier */
-	ulong OPERATION;		/* Requested operation result */
-	ulong MORE_flag;		/* Not last */
+	t_uscalar_t PRIM_type;		/* Always TC_RESULT_REQ */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t INVOKE_id;		/* Invoke Identifier */
+	t_uscalar_t OPERATION;		/* Requested operation result */
+	t_uscalar_t MORE_flag;		/* Not last */
 } TC_result_req_t;
 
 /*
@@ -544,11 +550,11 @@ typedef struct TC_result_req {
  *  This primitive is only valid (expected) for operation class 1 and 3.
  */
 typedef struct TC_result_ind {
-	ulong PRIM_type;		/* Always TC_RESULT_IND */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong INVOKE_id;		/* Invoke Identifier */
-	ulong OPERATION;		/* Requested operation result */
-	ulong MORE_flag;		/* Not last */
+	t_uscalar_t PRIM_type;		/* Always TC_RESULT_IND */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t INVOKE_id;		/* Invoke Identifier */
+	t_uscalar_t OPERATION;		/* Requested operation result */
+	t_uscalar_t MORE_flag;		/* Not last */
 } TC_result_ind_t;
 
 /*
@@ -557,11 +563,11 @@ typedef struct TC_result_ind {
  *  error.
  */
 typedef struct TC_error_req {
-	ulong PRIM_type;		/* Always TC_ERROR_REQ */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong INVOKE_id;		/* Invoke Identifier */
-	ulong ERROR_code;		/* Error code */
-	ulong MORE_flag;		/* Not last */
+	t_uscalar_t PRIM_type;		/* Always TC_ERROR_REQ */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t INVOKE_id;		/* Invoke Identifier */
+	t_uscalar_t ERROR_code;		/* Error code */
+	t_uscalar_t MORE_flag;		/* Not last */
 } TC_error_req_t;
 
 /*
@@ -570,49 +576,49 @@ typedef struct TC_error_req {
  *  error.
  */
 typedef struct TC_error_ind {
-	ulong PRIM_type;		/* Always TC_ERROR_IND */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong INVOKE_id;		/* Invoke Identifier */
-	ulong ERROR_code;		/* Error code */
+	t_uscalar_t PRIM_type;		/* Always TC_ERROR_IND */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t INVOKE_id;		/* Invoke Identifier */
+	t_uscalar_t ERROR_code;		/* Error code */
 } TC_error_ind_t;
 
 /*
  *  TC_REJECT_REQ.  This primitive consists of one M_PROTO message block.
  */
 typedef struct TC_reject_req {
-	ulong PRIM_type;		/* Always TC_REJECT_REQ */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong INVOKE_id;		/* Invoke identifier */
-	ulong PROBLEM_code;		/* Problem code */
+	t_uscalar_t PRIM_type;		/* Always TC_REJECT_REQ */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t INVOKE_id;		/* Invoke identifier */
+	t_uscalar_t PROBLEM_code;	/* Problem code */
 } TC_reject_req_t;
 
 /*
  *  TC_REJECT_IND.  This primitive consists of one M_PROTO message block.
  */
 typedef struct TC_reject_ind {
-	ulong PRIM_type;		/* Always TC_REJECT_IND */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong INVOKE_id;		/* Invoke identifier */
-	ulong ORIGINATOR;		/* Either User, Local or Remote */
-	ulong PROBLEM_code;		/* Problem code */
+	t_uscalar_t PRIM_type;		/* Always TC_REJECT_IND */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t INVOKE_id;		/* Invoke identifier */
+	t_uscalar_t ORIGINATOR;		/* Either User, Local or Remote */
+	t_uscalar_t PROBLEM_code;	/* Problem code */
 } TC_reject_ind_t;
 
 /*
  *  TC_CANCEL_REQ.  This primitive consists of one M_PROTO message block.
  */
 typedef struct TC_cancel_req {
-	ulong PRIM_type;		/* Always TC_CANCEL_REQ */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong INVOKE_id;		/* Invoke identifier */
+	t_uscalar_t PRIM_type;		/* Always TC_CANCEL_REQ */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t INVOKE_id;		/* Invoke identifier */
 } TC_cancel_req_t;
 
 /*
  *  TC_CANCEL_IND.  This primitive consists of one M_PROTO message block.
  */
 typedef struct TC_cancel_ind {
-	ulong PRIM_type;		/* Always TC_CANCEL_REQ */
-	ulong DIALOG_id;		/* Dialog Identifier */
-	ulong INVOKE_id;		/* Invoke identifier */
+	t_uscalar_t PRIM_type;		/* Always TC_CANCEL_REQ */
+	t_uscalar_t DIALOG_id;		/* Dialog Identifier */
+	t_uscalar_t INVOKE_id;		/* Invoke identifier */
 } TC_cancel_ind_t;
 
 #endif				/* __SS7_TC_H__ */

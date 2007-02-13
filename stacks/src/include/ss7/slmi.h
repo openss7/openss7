@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: slmi.h,v 0.9.2.3 2006/09/18 13:52:34 brian Exp $
+ @(#) $Id: slmi.h,v 0.9.2.4 2007/02/13 14:05:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:34 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:29 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: slmi.h,v $
+ Revision 0.9.2.4  2007/02/13 14:05:29  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef __SS7_SLMI_H__
 #define __SS7_SLMI_H__
 
-#ident "@(#) $RCSfile: slmi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: slmi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -83,72 +89,72 @@
  *  SLM_LINK_REQ
  */
 typedef struct {
-	long prim;
-	ulong devnum;
-	ulong linkid;
+	lmi_long prim;
+	lmi_ulong devnum;
+	lmi_ulong linkid;
 } slm_link_req_t;
 
 /*
  *  SLM_OK_ACK
  */
 typedef struct {
-	long prim;
-	long correct_prim;
+	lmi_long prim;
+	lmi_long correct_prim;
 } slm_ok_ack_t;
 
 /*
  *  SLM_ERROR_ACK
  */
 typedef struct {
-	long prim;
-	long error_prim;
-	long errno;
+	lmi_long prim;
+	lmi_long error_prim;
+	lmi_long errno;
 } slm_error_ack_t;
 
 /*
  *  SLM_ATTACH_IND
  */
 typedef struct {
-	long prim;
-	ulong devnum;
-	ulong linkid;
+	lmi_long prim;
+	lmi_ulong devnum;
+	lmi_ulong linkid;
 } slm_attach_ind_t;
 
 /*
  *  SLM_ATTACH_RES
  */
 typedef struct {
-	long prim;
-	ulong devnum;
-	ulong index;
+	lmi_long prim;
+	lmi_ulong devnum;
+	lmi_ulong index;
 } slm_attach_ind_t;
 
 /*
  *  SLM_DETACH_IND
  */
 typedef struct {
-	long prim;
-	ulong devnum;
+	lmi_long prim;
+	lmi_ulong devnum;
 } slm_detach_ind_t;
 
 /*
  *  SLM_ENABLE_IND
  */
 typedef struct {
-	long prim;
-	ulong devnum;
+	lmi_long prim;
+	lmi_ulong devnum;
 } slm_enable_ind_t;
 
 /*
  *  SLM_DISABLE_IND
  */
 typedef struct {
-	long prim;
-	ulong devnum;
+	lmi_long prim;
+	lmi_ulong devnum;
 } slm_disable_ind_t;
 
 union SLM_primitives {
-	long prim;
+	lmi_long prim;
 	slm_link_req_t link_req;
 	slm_attach_res_t attach_res;
 	slm_detach_res_t detach_res;

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: smi.h,v 0.9.2.3 2006/09/18 13:52:34 brian Exp $
+ @(#) $Id: smi.h,v 0.9.2.4 2007/02/13 14:05:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:34 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:29 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: smi.h,v $
+ Revision 0.9.2.4  2007/02/13 14:05:29  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef __SMI_H__
 #define __SMI_H__
 
-#ident "@(#) $RCSfile: smi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2004  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: smi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -72,9 +78,9 @@ enum {
 	SMI_EVENT_IND
 };
 
-typedef unsigned long smi_ulong;
-typedef unsigned short smi_ushort;
-typedef unsigned char smi_uchar;
+typedef u_int32_t smi_ulong;
+typedef u_int16_t smi_ushort;
+typedef u_int8_t smi_uchar;
 typedef caddr_t smi_caddr;
 
 /*

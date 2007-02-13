@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: timod.h,v 0.9.2.3 2006/09/18 13:52:37 brian Exp $
+ @(#) $Id: timod.h,v 0.9.2.4 2007/02/13 14:05:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,9 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:30 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
 
  $Log: timod.h,v $
+ Revision 0.9.2.4  2007/02/13 14:05:30  brian
+ - corrected ulong and long for 32-bit compat
+
  Revision 0.9.2.3  2006/09/18 13:52:37  brian
  - added doxygen markers to sources
 
@@ -62,72 +67,117 @@
 #ifndef _SYS_TIMOD_H
 #define _SYS_TIMOD_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
+/** @addtogroup timod
+  * @{ */
+
+/** @file
+  * Transport Interface Module (timod) header file.  */
+
+/*
+ * Transport Interface "timod" Header File.
+ */
+
+/** @name Old (TLI) transport interface input-output controls.
+  * @{ */
 #define TIMOD			('T'<<8)
-#define O_TI_GETINFO		(TIMOD|100)	/* OSF 1 */
-#define O_TI_OPTMGMT		(TIMOD|101)	/* OSF 2 */
-#define O_TI_BIND		(TIMOD|102)	/* OSF 3 */
-#define O_TI_UNBIND		(TIMOD|103)	/* OSF 4 */
+#define O_TI_GETINFO		(TIMOD|100)	/**< Get info (1 under OSF). */
+#define O_TI_OPTMGMT		(TIMOD|101)	/**< Manage options (2 under OSF). */
+#define O_TI_BIND		(TIMOD|102)	/**< Bind TP (3 under OSF). */
+#define O_TI_UNBIND		(TIMOD|103)	/**< Unbind TP (4 under OSF). */
+/** @} */
 
-#define O_TI_USED		0x01	/* data structure in use */
-#define O_TI_FATAL		0x02	/* fatal M_ERROR_occured */
-#define O_TI_WAITIOCACK		0x04	/* waiting for info for ioctl act */
-#define O_TI_MORE		0x08	/* more data */
+/** @name Old ti_flags Flags.
+  * @{ */
+#define O_TI_USED		0x01	/**< Data structure in use. */
+#define O_TI_FATAL		0x02	/**< Fatal M_ERROR_occured. */
+#define O_TI_WAITIOCACK		0x04	/**< Waiting for info for ioctl act. */
+#define O_TI_MORE		0x08	/**< More data. */
+/** @} */
 
+/** Old (TLI) transport interface user structure.
+  */
 struct _o_ti_user {
-	ushort ti_flags;		/* flags */
-	int ti_rcvsize;			/* receive buffer size */
-	char *ti_rcvbuf;		/* receive buffer */
-	int ti_ctlsize;			/* control buffer size */
-	char *ti_ctlbuf;		/* control buffer */
-	char *ti_lookdbuf;		/* look data buffer */
-	char *ti_lookcbuf;		/* look ctrl buffer */
-	int ti_lookdsize;		/* look data buffer size */
-	int ti_lookcsize;		/* look ctrl buffer size */
-	int ti_maxpsz;			/* TIDU size */
-	long ti_servtype;		/* service type */
-	int ti_lookflg;			/* buffered look flag */
+	ushort ti_flags;		/**< Flags. */
+	int ti_rcvsize;			/**< Receive buffer size. */
+	char *ti_rcvbuf;		/**< Receive buffer. */
+	int ti_ctlsize;			/**< Control buffer size. */
+	char *ti_ctlbuf;		/**< Control buffer. */
+	char *ti_lookdbuf;		/**< Look data buffer. */
+	char *ti_lookcbuf;		/**< Look ctrl buffer. */
+	int ti_lookdsize;		/**< Look data buffer size. */
+	int ti_lookcsize;		/**< Look ctrl buffer size. */
+	int ti_maxpsz;			/**< TIDU size. */
+#ifdef __LP64__
+	u_int32_t ti_servtype;		/**< Service type. */
+#else					/* __LP64__ */
+	long ti_servtype;		/**< Service type. */
+#endif					/* __LP64__ */
+	int ti_lookflg;			/**< Buffered look flag. */
 };
 
-#define _O_TI_GETINFO		(TIMOD|1)	/* OSF */
-#define _O_TI_OPTMGMT		(TIMOD|2)	/* OSF */
-#define _O_TI_BIND		(TIMOD|3)	/* OSF */
-#define _O_TI_UNBIND		(TIMOD|4)	/* OSF */
-#define _O_TI_GETMYNAME		(TIMOD|5)	/* OSF */
-#define _O_TI_GETPEERNAME	(TIMOD|6)	/* OSF */
-#define _O_TI_XTI_HELLO		(TIMOD|7)	/* OSF */
-#define _O_TI_XTI_GET_STATE	(TIMOD|8)	/* OSF */
-#define _O_TI_XTI_CLEAR_EVENT	(TIMOD|9)	/* OSF */
-#define _O_TI_XTI_MODE		(TIMOD|10)	/* OSF */
-#define _O_TI_TLI_MODE		(TIMOD|11)	/* OSF */
+/**
+  * @name Old timod Input/Output Controls
+  * OSF specific compatibility constants.
+  * These clash with termios ioctls if 'T' is used.
+  * OSF uses 't' instead.
+  * @{
+  */
+#define _O_TI_GETINFO		(TIMOD|1)	/**< (OSF) Get information from TP. */
+#define _O_TI_OPTMGMT		(TIMOD|2)	/**< (OSF) Manage options for TP. */
+#define _O_TI_BIND		(TIMOD|3)	/**< (OSF) Bind a Transport Provider. */
+#define _O_TI_UNBIND		(TIMOD|4)	/**< (OSF) Unbind a Transport Provider. */
+#define _O_TI_GETMYNAME		(TIMOD|5)	/**< (OSF) Get local addresses. */
+#define _O_TI_GETPEERNAME	(TIMOD|6)	/**< (OSF) Get remote addresses. */
+#define _O_TI_XTI_HELLO		(TIMOD|7)	/**< (OSF) Accept a Transport Connection. */
+#define _O_TI_XTI_GET_STATE	(TIMOD|8)	/**< (OSF) Form a Transport Connection. */
+#define _O_TI_XTI_CLEAR_EVENT	(TIMOD|9)	/**< (OSF) Synchronize user/kernel data. */
+#define _O_TI_XTI_MODE		(TIMOD|10)	/**< (OSF) Get addresses from TP. */
+#define _O_TI_TLI_MODE		(TIMOD|11)	/**< (OSF) Get TP capabilities. */
+/** @} */
 
 typedef struct xti_state {
 	unsigned int xtis_qlen;		/* Saved qlen parameter from t_bind */
 } XTIS, *XTISP;
 
-#define TI_GETINFO		(TIMOD|140)
-#define TI_OPTMGMT		(TIMOD|141)
-#define TI_BIND			(TIMOD|142)
-#define TI_UNBIND		(TIMOD|143)
-#define TI_GETMYNAME		(TIMOD|144)
-#define TI_GETPEERNAME		(TIMOD|145)
-#define TI_SETMYNAME		(TIMOD|146)
-#define TI_SETPEERNAME		(TIMOD|147)
-#define TI_SYNC			(TIMOD|148)
-#define TI_GETADDRS		(TIMOD|149)
-#define TI_CAPABILITY		(TIMOD|150)
+/** 
+  * @name timod Input/Output Controls
+  * Some of these clash with BSD termios ioctls if 'T' is used.
+  * Linux wrongly uses 'T' instead of 't' for BSD ioctls.
+  * @{
+  */
+#define TI_GETINFO		(TIMOD|140)	/**< Get information from TP. */
+#define TI_OPTMGMT		(TIMOD|141)	/**< Manage options for TP. */
+#define TI_BIND			(TIMOD|142)	/**< Bind a Transport Provider. */
+#define TI_UNBIND		(TIMOD|143)	/**< Unbind a Transport Provider. */
+#define TI_GETMYNAME		(TIMOD|144)	/**< Get local addresses. */
+#define TI_GETPEERNAME		(TIMOD|145)	/**< Get remote addresses. */
+#define TI_SETMYNAME		(TIMOD|146)	/**< Accept a Transport Connection. */
+#define TI_SETPEERNAME		(TIMOD|147)	/**< Form a Transport Connection. */
+#define TI_SYNC			(TIMOD|148)	/**< Synchronize user/kernel data. */
+#define TI_GETADDRS		(TIMOD|149)	/**< Get addresses from TP. */
+#define TI_CAPABILITY		(TIMOD|150)	/**< Get TP capabilities. */
+/** @} */
 
+/** Structure for use with TI_SYNC request.
+  */
 struct ti_sync_req {
 	u_int32_t tsr_flags;
 };
 
-#define TSRF_INFO_REQ		01
-#define TSRF_IS_EXP_IN_RCVBUF	02
-#define TSRF_QLEN_REQ		04
+/** @name tsr_flags Flags
+  * Flags for use with #ti_sync_req#tsr_flags.
+  * @{ */
+#define TSRF_INFO_REQ		01		/**< Request information. */
+#define TSRF_IS_EXP_IN_RCVBUF	02		/**< Is Exp data in Receive buffer? */
+#define TSRF_QLEN_REQ		04		/**< Request queue length. */
+/** @} */
 
+/** Structure for use with TI_SYNC response.
+  */
 struct ti_sync_ack {
 	t_scalar_t PRIM_type;
 	t_scalar_t TSDU_size;
@@ -145,6 +195,14 @@ struct ti_sync_ack {
 	u_int32_t tsa_flags;
 };
 
-#define TSA_EXP_QUEUED		01
+/** @name tsa_flags Flags
+  * Flags for use with #ti_sync_ack#tsa_flags.
+  * @{ */
+#define TSA_EXP_QUEUED		01		/**< Expedited data is queued. */
+/** @} */
 
 #endif				/* _SYS_TIMOD_H */
+
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

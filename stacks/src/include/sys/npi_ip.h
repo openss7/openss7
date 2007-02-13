@@ -1,27 +1,26 @@
 /*****************************************************************************
 
- @(#) $Id: npi_ip.h,v 0.9.2.3 2006/09/18 13:52:37 brian Exp $
+ @(#) $Id: npi_ip.h,v 0.9.2.4 2007/02/13 14:05:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
-     Copyright (C) 1997-2002 OpenSS7 Corporation.  All Rights Reserved.
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
-                                  PUBLIC LICENSE
+ All Rights Reserved.
 
-     This license is provided without fee, provided that the above copy-
-     right notice and this public license must be retained on all copies,
-     extracts, compilations and derivative works.  Use or distribution of
-     this work in a manner that restricts its use except as provided here
-     will render this license void.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
 
-     The author(s) hereby waive any and all other restrictions in respect
-     of their copyright in this software and its associated documentation.
-     The authors(s) of this software place in the public domain any novel
-     methods or processes which are embodied in this software.
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
 
-     The author(s) undertook to write it for the sake of the advancement
-     of the Arts and Sciences, but it is provided as is, and the author(s)
-     will not take any responsibility in it.
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +40,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2007/02/13 14:05:30 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: npi_ip.h,v $
+ Revision 0.9.2.4  2007/02/13 14:05:30  brian
+ - corrected ulong and long for 32-bit compat
 
  *****************************************************************************/
 
 #ifndef _SYS_NPI_IP_H
 #define _SYS_NPI_IP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -78,7 +88,7 @@ typedef struct {
 	np_ulong QOS_range_offset;	/* offset of QOS values' range */
 	np_ulong OPTIONS_flags;		/* bit masking for options supported */
 	np_ulong NIDU_size;		/* network i/f data unit size */
-	long SERV_type;			/* service type */
+	np_long SERV_type;		/* service type */
 	np_ulong CURRENT_state;		/* current state */
 	np_ulong PROVIDER_type;		/* type of NS provider */
 	np_ulong NODU_size;		/* optimal NSDU size */
@@ -86,6 +96,7 @@ typedef struct {
 	np_ulong PROTOID_offset;	/* offset of bound protocol ids */
 	np_ulong NPI_version;		/* version # of npi that is supported */
 } __N_info_ack_t;
+
 #define N_info_ack_t __N_info_ack_t
 
 /*
@@ -100,6 +111,7 @@ typedef struct {
 	np_ulong PROTOID_length;	/* length of bound protocol ids */
 	np_ulong PROTOID_offset;	/* offset of bound protocol ids */
 } __N_bind_ack_t;
+
 #define N_bind_ack_t __N_bind_ack_t
 
 #endif				/* N_VERSION_2 */
@@ -126,37 +138,37 @@ typedef struct {
 
 #define N_QOS_SEL_DATA_IP	0x0001
 typedef struct {
-	ulong n_qos_type;		/* always N_QOS_SEL_DATA_IP */
-	ulong opt;			/* options */
-	ulong tos;			/* type of service */
-	ulong ttl;			/* time to live */
+	np_ulong n_qos_type;		/* always N_QOS_SEL_DATA_IP */
+	np_ulong opt;			/* options */
+	np_ulong tos;			/* type of service */
+	np_ulong ttl;			/* time to live */
 } N_qos_sel_data_ip_t;
 
 #define N_QOS_SEL_CONN_IP	0x0002
 typedef struct {
-	ulong n_qos_type;		/* always N_QOS_SEL_CONN_IP */
+	np_ulong n_qos_type;		/* always N_QOS_SEL_CONN_IP */
 } N_qos_sel_conn_ip_t;
 
 #define N_QOS_SEL_INFO_IP	0x0003
 typedef struct {
-	ulong n_qos_type;		/* always N_QOS_SEL_INFO_IP */
-	ulong opt;			/* options */
-	ulong tos;			/* type of service */
-	ulong ttl;			/* time to live */
-	ulong reuse;			/* reuse address */
-	ulong norte;			/* don't route */
-	ulong bcast;			/* broadcast */
+	np_ulong n_qos_type;		/* always N_QOS_SEL_INFO_IP */
+	np_ulong opt;			/* options */
+	np_ulong tos;			/* type of service */
+	np_ulong ttl;			/* time to live */
+	np_ulong reuse;			/* reuse address */
+	np_ulong norte;			/* don't route */
+	np_ulong bcast;			/* broadcast */
 } N_qos_sel_info_ip_t;
 
 #define N_QOS_RANGE_INFO_IP	0x0004
 typedef struct {
-	ulong n_qos_type;		/* always N_QOS_RANGE_INFO_IP */
-	ulong tos_range;		/* type of service range */
-	ulong ttl_range;		/* time to live range */
+	np_ulong n_qos_type;		/* always N_QOS_RANGE_INFO_IP */
+	np_ulong tos_range;		/* type of service range */
+	np_ulong ttl_range;		/* time to live range */
 } N_qos_range_ip_t;
 
 typedef union N_qos_ip {
-	ulong n_qos_type;
+	np_ulong n_qos_type;
 	N_qos_sel_conn_ip_t n_qos_conn;
 	N_qos_sel_data_ip_t n_qos_data;
 	N_qos_sel_info_ip_t n_qos_info;

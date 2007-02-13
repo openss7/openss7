@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sl_mux.h,v 0.9.2.1 2007/01/21 20:20:10 brian Exp $
+ @(#) $Id: sl_mux.h,v 0.9.2.2 2007/02/13 14:05:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/21 20:20:10 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 14:05:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.h,v $
+ Revision 0.9.2.2  2007/02/13 14:05:28  brian
+ - corrected ulong and long for 32-bit compat
+
  Revision 0.9.2.1  2007/01/21 20:20:10  brian
  - added documetation
 
@@ -58,13 +61,13 @@
 #ifndef __SS7_SL_MUX_H__
 #define __SS7_SL_MUX_H__
 
-#ident "@(#) $RCSfile: sl_mux.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sl_mux.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #define SLMUX_CLEI_MAX	    32
 
 struct slmux_ppa {
 	int slm_index;
-	uint32_t slm_ppa;
+	u_int32_t slm_ppa;
 	char slm_clei[SLMUX_CLEI_MAX];
 };
 
