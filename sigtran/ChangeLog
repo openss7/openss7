@@ -1,5 +1,8 @@
 2007-02-13  Brian Bidulock  <bidulock@openss7.org>
 
+	* Makefile.am: added headers for ua_as.c
+	* src/include/Makefile.am: added headers for ua_as.c
+
 	* Makefile.am: get compile working for ua_as.c
 	* src/drivers/Config.in: get compile working for ua_as.c
 	* src/drivers/m2ua_as.c: get compile working for ua_as.c
