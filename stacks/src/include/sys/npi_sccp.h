@@ -70,6 +70,8 @@
 #define N_CURRENT_VERSION   0x02	/* current version of NPI */
 #define N_VERSION_2	    0x02	/* version of npi, December 16, 1991 */
 
+typedef uchar np_uchar;
+
 /*
  * Information acknowledgement
  */
@@ -276,7 +278,7 @@ typedef struct sccp_addr {
 	np_ulong nplan;			/* numbering plan */
 	np_ulong nai;			/* nature of address indicator */
 	np_ulong alen;			/* address length */
-	np_uchar addr[0];		/* address digits */
+	uchar addr[0];		/* address digits */
 	/* followed by address bytes */
 } sccp_addr_t;
 

@@ -75,13 +75,16 @@ static char const ident[] =
  *  This module is intended to be used by application programs or by upper
  *  modules that expect an NPI connectionless service provider.
  */
-#define _LFS_SOURCE
-#define _SVR4_SOURCE
-#define _MPS_SOURCE
-#define _SUN_SOURCE
+#define _LFS_SOURCE	1
+#define _SVR4_SOURCE	1
+#define _MPS_SOURCE	1
+#define _SUN_SOURCE	1
 
 #include <sys/os7/compat.h>
 #include <sys/strsun.h>
+
+#undef DB_TYPE
+#define DB_TYPE(mp) mp->b_datap->db_type
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -243,7 +246,6 @@ mtp_parse_qos(struct mtp *mtp, struct mtp_opts *ops, unsigned char *op, size_t l
  *
  *  -------------------------------------------------------------------------
  */
-#ifdef _DEBUG
 static const char *
 mtp_state(ulong state)
 {
@@ -288,7 +290,6 @@ mtp_state(ulong state)
 		return ("????");
 	}
 }
-#endif
 
 static ulong
 mtp_get_state(struct mtp *mtp)
@@ -312,11 +313,13 @@ mtp_bind(struct mtp *mtp, struct mtp_addr *src)
 		mtp->src = *src;
 	return (0);
 }
+#if 0
 static int
 mtp_connect(struct mtp *mtp, struct mtp_addr *dst)
 {
 	return (0);
 }
+#endif
 static int
 mtp_unbind(struct mtp *mtp)
 {
@@ -367,6 +370,7 @@ m_error(queue_t *q, struct mtp *mtp, int etype)
 }
 static int n_error_ack(queue_t *q, struct mtp *mtp, ulong prim, long error);
 
+#if 0
 /*
  *  N_CONN_IND          11 - Incoming connection indication
  *  -----------------------------------------------------------
@@ -418,6 +422,7 @@ n_conn_ind(queue_t *q, struct mtp *mtp, ulong seq, ulong flags, struct mtp_addr 
       error:
 	return (err);
 }
+#endif
 
 /*
  *  N_CONN_CON          12 - Connection established
@@ -536,6 +541,7 @@ n_data_ind(queue_t *q, struct mtp *mtp, ulong flags, mblk_t *dp)
 	return (err);
 }
 
+#if 0
 /*
  *  N_EXDATA_IND        15 - Incoming expedited data indication
  *  -----------------------------------------------------------
@@ -564,6 +570,7 @@ n_exdata_ind(queue_t *q, struct mtp *mtp, mblk_t *dp)
       error:
 	return (err);
 }
+#endif
 
 /*
  *  N_INFO_ACK          16 - Information Acknowledgement
@@ -877,6 +884,7 @@ n_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, mblk_t *dp, ulo
 	return (err);
 }
 
+#if 0
 /*
  *  N_DATACK_IND        24 - Data acknowledgement indication
  *  -----------------------------------------------------------
@@ -904,6 +912,7 @@ n_datack_ind(queue_t *q, struct mtp *mtp)
       error:
 	return (err);
 }
+#endif
 
 /*
  *  N_RESET_IND         26 - Incoming NC reset request indication
@@ -935,6 +944,7 @@ n_reset_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason)
 	return (err);
 }
 
+#if 0
 /*
  *  N_RESET_CON         28 - Reset processing complete
  *  -----------------------------------------------------------
@@ -962,6 +972,7 @@ n_reset_con(queue_t *q, struct mtp *mtp)
       error:
 	return (err);
 }
+#endif
 
 /*
  *  -------------------------------------------------------------------------
@@ -1032,6 +1043,7 @@ mtp_unbind_req(queue_t *q, struct mtp *mtp)
 	return (err);
 }
 
+#if 0
 /*
  *  MTP_CONN_REQ        3 - Connect to a remote MTP-SAP
  *  -----------------------------------------------------------
@@ -1067,7 +1079,9 @@ mtp_conn_req(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong flags, mbl
       error:
 	return (err);
 }
+#endif
 
+#if 0
 /*
  *  MTP_DISCON_REQ      4 - Disconnect from a remote MTP-SAP
  *  -----------------------------------------------------------
@@ -1094,7 +1108,9 @@ mtp_discon_req(queue_t *q, struct mtp *mtp)
       error:
 	return (err);
 }
+#endif
 
+#if 0
 /*
  *  MTP_ADDR_REQ        5 - Address service
  *  -----------------------------------------------------------
@@ -1121,7 +1137,9 @@ mtp_addr_req(queue_t *q, struct mtp *mtp)
       error:
 	return (err);
 }
+#endif
 
+#if 0
 /*
  *  MTP_INFO_REQ        6 - Information service
  *  -----------------------------------------------------------
@@ -1148,6 +1166,7 @@ mtp_info_req(queue_t *q, struct mtp *mtp)
       error:
 	return (err);
 }
+#endif
 
 #if 0
 /*

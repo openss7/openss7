@@ -190,6 +190,11 @@ typedef struct t_mtp_mod_ls {
 	t_uscalar_t ls_sls_mask;	/**< Mask of bits selecting link set. */
 } t_mtp_mod_ls_t;
 
+/** Link set configuratoin structure. */
+typedef struct t_mtp_cnf_ls {
+	t_uscalar_t ls_id;		/**< Combined link set id. */ 
+} t_mtp_cnf_ls_t;
+
 /** @} */
 
 /** @name Route

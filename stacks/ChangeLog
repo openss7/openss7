@@ -1,5 +1,10 @@
 2007-02-13  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/include/sys/npi_sccp.h: mods for compile
+	* src/include/sys/xti_mtp.h: mods for compile
+	* src/modules/mtp/mtp_npi.c: added strlog
+	* src/modules/mtp/mtp_tpi.c: added strlog
+
 	* doc/man/man7/npi_sccp.7.man: updated man page
 	* src/include/sys/npi_sccp.h: corrected header file
 	* src/modules/mtp/mtp_npi.c: module for MTP-NPI conversion

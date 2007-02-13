@@ -142,33 +142,33 @@ MODULE_ALIAS("streams-mtp_tpi");
 #define MOD_BANNER	MTP_TPI_SPLASH
 #endif				/* MODULE */
 
-STATIC struct module_info mtp_minfo = {
-	mi_idnum:MOD_ID,		/* Module ID number */
-	mi_idname:MOD_NAME,		/* Module name */
-	mi_minpsz:1,			/* Min packet size accepted */
-	mi_maxpsz:INFPSZ,		/* Max packet size accepted */
-	mi_hiwat:1 << 15,		/* Hi water mark */
-	mi_lowat:1 << 10,		/* Lo water mark */
+static struct module_info mtp_minfo = {
+      mi_idnum:MOD_ID,		/* Module ID number */
+      mi_idname:MOD_NAME,	/* Module name */
+      mi_minpsz:1,		/* Min packet size accepted */
+      mi_maxpsz:INFPSZ,	/* Max packet size accepted */
+      mi_hiwat:1 << 15,	/* Hi water mark */
+      mi_lowat:1 << 10,	/* Lo water mark */
 };
 
-STATIC streamscall int mtp_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC streamscall int mtp_close(queue_t *, int, cred_t *);
+static streamscall int mtp_open(queue_t *, dev_t *, int, int, cred_t *);
+static streamscall int mtp_close(queue_t *, int, cred_t *);
 
-STATIC struct qinit mtp_rinit = {
-	qi_putp:ss7_oput,		/* Read put (msg from below) */
-	qi_qopen:mtp_open,		/* Each open */
-	qi_qclose:mtp_close,		/* Last close */
-	qi_minfo:&mtp_minfo,		/* Information */
+static struct qinit mtp_rinit = {
+      qi_putp:ss7_oput,	/* Read put (msg from below) */
+      qi_qopen:mtp_open,	/* Each open */
+      qi_qclose:mtp_close,	/* Last close */
+      qi_minfo:&mtp_minfo,	/* Information */
 };
 
-STATIC struct qinit mtp_winit = {
-	qi_putp:ss7_iput,		/* Write put (msg from above) */
-	qi_minfo:&mtp_minfo,		/* Information */
+static struct qinit mtp_winit = {
+      qi_putp:ss7_iput,	/* Write put (msg from above) */
+      qi_minfo:&mtp_minfo,	/* Information */
 };
 
-STATIC struct streamtab mtp_tpiinfo = {
-	st_rdinit:&mtp_rinit,		/* Upper read queue */
-	st_wrinit:&mtp_winit,		/* Upper write queue */
+static struct streamtab mtp_tpiinfo = {
+      st_rdinit:&mtp_rinit,	/* Upper read queue */
+      st_wrinit:&mtp_winit,	/* Upper write queue */
 };
 
 /*
@@ -185,9 +185,9 @@ typedef struct mtp {
 	struct mtp_addr dst;		/* dest address */
 	struct T_info_ack prot;
 	struct {
-		ulong sls;		/* default options */
-		ulong mp;		/* default options */
-		ulong debug;		/* default options */
+		mtp_ulong sls;		/* default options */
+		mtp_ulong mp;		/* default options */
+		mtp_ulong debug;	/* default options */
 	} options;
 } mtp_t;
 
@@ -195,10 +195,10 @@ typedef struct mtp {
 
 struct mtp *mtp_opens = NULL;
 
-STATIC struct mtp *mtp_alloc_priv(queue_t *q, struct mtp **, dev_t *, cred_t *);
-STATIC struct mtp *mtp_get(struct mtp *);
-STATIC void mtp_put(struct mtp *);
-STATIC void mtp_free_priv(queue_t *q);
+static struct mtp *mtp_alloc_priv(queue_t *q, struct mtp **, dev_t *, cred_t *);
+static struct mtp *mtp_get(struct mtp *);
+static void mtp_put(struct mtp *);
+static void mtp_free_priv(queue_t *q);
 
 #define STRLOGST	1	/* log Stream state transitions */
 #define STRLOGTO	2	/* log Stream timeouts */
@@ -218,21 +218,21 @@ STATIC void mtp_free_priv(queue_t *q);
  */
 typedef struct mtp_opts {
 	uint flags;			/* success flags */
-	ulong *sls;
-	ulong *mp;
-	ulong *debug;
+	mtp_ulong *sls;
+	mtp_ulong *mp;
+	mtp_ulong *debug;
 } mtp_opts_t;
 
 struct {
-	ulong sls;
-	ulong mp;
-	ulong debug;
+	mtp_ulong sls;
+	mtp_ulong mp;
+	mtp_ulong debug;
 } opt_defaults = {
 0, 0, 0};
 
 #define _T_ALIGN_SIZEOF(s) \
 	((sizeof((s)) + _T_ALIGN_SIZE - 1) & ~(_T_ALIGN_SIZE - 1))
-STATIC size_t
+static size_t
 mtp_opts_size(struct mtp *mtp, struct mtp_opts *ops)
 {
 	size_t len = 0;
@@ -249,7 +249,7 @@ mtp_opts_size(struct mtp *mtp, struct mtp_opts *ops)
 	}
 	return (len);
 }
-STATIC void
+static void
 mtp_build_opts(struct mtp *mtp, struct mtp_opts *ops, unsigned char *p)
 {
 	if (ops) {
@@ -285,7 +285,7 @@ mtp_build_opts(struct mtp *mtp, struct mtp_opts *ops, unsigned char *p)
 		}
 	}
 }
-STATIC int
+static int
 mtp_parse_opts(struct mtp *mtp, struct mtp_opts *ops, unsigned char *op, size_t len)
 {
 	struct t_opthdr *oh;
@@ -315,7 +315,7 @@ mtp_parse_opts(struct mtp *mtp, struct mtp_opts *ops, unsigned char *op, size_t 
 }
 
 #if 0
-STATIC int
+static int
 mtp_parse_qos(struct mtp *mtp, struct mtp_opts *ops, unsigned char *op, size_t len)
 {
 	fixme(("Write this function\n"));
@@ -330,7 +330,7 @@ mtp_parse_qos(struct mtp *mtp, struct mtp_opts *ops, unsigned char *op, size_t l
  *
  *  =========================================================================
  */
-STATIC int
+static int
 mtp_opt_check(struct mtp *mtp, struct mtp_opts *ops)
 {
 	if (ops->flags) {
@@ -344,7 +344,7 @@ mtp_opt_check(struct mtp *mtp, struct mtp_opts *ops)
 	}
 	return (0);
 }
-STATIC int
+static int
 mtp_opt_default(struct mtp *mtp, struct mtp_opts *ops)
 {
 	if (ops) {
@@ -368,7 +368,7 @@ mtp_opt_default(struct mtp *mtp, struct mtp_opts *ops)
 	swerr();
 	return (-EFAULT);
 }
-STATIC int
+static int
 mtp_opt_current(struct mtp *mtp, struct mtp_opts *ops)
 {
 	int flags = ops->flags;
@@ -388,7 +388,7 @@ mtp_opt_current(struct mtp *mtp, struct mtp_opts *ops)
 	}
 	return (0);
 }
-STATIC int
+static int
 mtp_opt_negotiate(struct mtp *mtp, struct mtp_opts *ops)
 {
 	if (ops->flags) {
@@ -419,9 +419,8 @@ mtp_opt_negotiate(struct mtp *mtp, struct mtp_opts *ops)
  *
  *  =========================================================================
  */
-#ifdef _DEBUG
-STATIC INLINE const char *
-mtp_state(ulong state)
+static const char *
+mtp_state(mtp_ulong state)
 {
 	switch (state) {
 	case TS_UNBND:
@@ -464,17 +463,16 @@ mtp_state(ulong state)
 		return ("????");
 	}
 }
-#endif
 
-STATIC INLINE ulong
+static mtp_ulong
 mtp_get_state(struct mtp *mtp)
 {
 	return mtp->i_state;
 }
-STATIC INLINE void
-mtp_set_state(struct mtp *mtp, ulong newstate)
+static void
+mtp_set_state(struct mtp *mtp, mtp_ulong newstate)
 {
-	ulong oldstate = mtp->i_state;
+	mtp_ulong oldstate = mtp->i_state;
 
 	(void) oldstate;
 	STRLOG(mtp, STRLOGST, SL_TRACE, "%s <- %s", mtp_state(newstate), mtp_state(oldstate));
@@ -509,24 +507,24 @@ mtp_set_state(struct mtp *mtp, ulong newstate)
 			|TSF_WACK_DREQ10 \
 			|TSF_WACK_DREQ11)
 
-STATIC INLINE int
+static int
 mtp_bind(struct mtp *mtp, struct mtp_addr *src)
 {
 	if (src)
 		mtp->src = *src;
 	return (0);
 }
-STATIC INLINE int
+static int
 mtp_connect(struct mtp *mtp, struct mtp_addr *dst)
 {
 	return (0);
 }
-STATIC INLINE int
+static int
 mtp_unbind(struct mtp *mtp)
 {
 	return (0);
 }
-STATIC INLINE int
+static int
 mtp_disconnect(struct mtp *mtp)
 {
 	return (0);
@@ -547,7 +545,7 @@ mtp_disconnect(struct mtp *mtp)
  *  M_ERROR
  *  -----------------------------------
  */
-STATIC INLINE int
+static int
 m_error(queue_t *q, struct mtp *mtp, int err)
 {
 	mblk_t *mp;
@@ -565,10 +563,10 @@ m_error(queue_t *q, struct mtp *mtp, int err)
 	return (-ENOBUFS);
 }
 
-STATIC int t_error_ack(queue_t *q, struct mtp *mtp, const ulong prim, long error);
+static int t_error_ack(queue_t *q, struct mtp *mtp, const mtp_ulong prim, mtp_long error);
 
 #if 0
-STATIC int
+static int
 m_error(q, mtp, error)
 	queue_t *q;			/* service queue */
 	struct mtp *mtp;		/* mtp private structure */
@@ -612,22 +610,24 @@ m_error(q, mtp, error)
 }
 #endif
 
+#if 0
 /*
  *  T_CONN_IND
  *  -----------------------------------
  */
-STATIC INLINE int
+static int
 t_conn_ind(queue_t *q, struct mtp *mtp)
 {
 	STRLOG(mtp, 0, SL_ERROR, "unsupported primitive");
 	return (-EFAULT);
 }
+#endif
 
 /*
  *  T_CONN_CON
  *  -----------------------------------
  */
-STATIC INLINE int
+static int
 t_conn_con(queue_t *q, struct mtp *mtp, struct mtp_addr *res, struct mtp_opts *opt, mblk_t *dp)
 {
 	int err;
@@ -669,8 +669,8 @@ t_conn_con(queue_t *q, struct mtp *mtp, struct mtp_addr *res, struct mtp_opts *o
  *  T_DISCON_IND
  *  -----------------------------------
  */
-STATIC INLINE int
-t_discon_ind(queue_t *q, struct mtp *mtp, ulong reason, mblk_t *dp)
+static int
+t_discon_ind(queue_t *q, struct mtp *mtp, mtp_ulong reason, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -697,18 +697,19 @@ t_discon_ind(queue_t *q, struct mtp *mtp, ulong reason, mblk_t *dp)
 	goto error;
       efault:
 	err = -EFAULT;
-	STRLOG(mtp, 0, SL_ERROR, "unexpected indication for state %ld", mtp_get_state(mtp));
+	STRLOG(mtp, 0, SL_ERROR, "unexpected indication for state %u", mtp_get_state(mtp));
 	goto error;
       error:
 	return (err);
 }
 
+#if 0
 /*
  *  T_DATA_IND
  *  -----------------------------------
  */
-STATIC INLINE int
-t_data_ind(queue_t *q, struct mtp *mtp, ulong more, mblk_t *dp)
+static int
+t_data_ind(queue_t *q, struct mtp *mtp, mtp_ulong more, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -732,28 +733,31 @@ t_data_ind(queue_t *q, struct mtp *mtp, ulong more, mblk_t *dp)
 	goto error;
       efault:
 	err = -EFAULT;
-	STRLOG(mtp, 0, SL_ERROR, "unexpected indication for state %ld", mtp_get_state(mtp));
+	STRLOG(mtp, 0, SL_ERROR, "unexpected indication for state %u", mtp_get_state(mtp));
 	goto error;
       error:
 	return (err);
 }
+#endif
 
+#if 0
 /*
  *  T_EXDATA_IND
  *  -----------------------------------
  */
-STATIC INLINE int
+static int
 t_exdata_ind(queue_t *q, struct mtp *mtp)
 {
 	STRLOG(mtp, 0, SL_ERROR, "unsupported primitive");
 	return (-EFAULT);
 }
+#endif
 
 /*
  *  T_INFO_ACK
  *  -----------------------------------
  */
-STATIC INLINE int
+static int
 t_info_ack(queue_t *q, struct mtp *mtp)
 {
 	int err;
@@ -780,8 +784,8 @@ t_info_ack(queue_t *q, struct mtp *mtp)
  *  T_BIND_ACK
  *  -----------------------------------
  */
-STATIC INLINE int
-t_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong cons)
+static int
+t_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add, mtp_ulong cons)
 {
 	int err;
 	mblk_t *mp;
@@ -815,7 +819,7 @@ t_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong cons)
 	goto error;
       efault:
 	err = -EFAULT;
-	STRLOG(mtp, 0, SL_ERROR, "unexpected indication for state %ld", mtp_get_state(mtp));
+	STRLOG(mtp, 0, SL_ERROR, "unexpected indication for state %u", mtp_get_state(mtp));
 	goto error;
       error:
 	return (err);
@@ -828,8 +832,8 @@ t_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong cons)
  *  T_ERROR_ACK
  *  -----------------------------------
  */
-STATIC int
-t_error_ack(queue_t *q, struct mtp *mtp, const ulong prim, long etype)
+static int
+t_error_ack(queue_t *q, struct mtp *mtp, const mtp_ulong prim, mtp_long etype)
 {
 	int err = etype;
 	mblk_t *mp;
@@ -908,8 +912,8 @@ t_error_ack(queue_t *q, struct mtp *mtp, const ulong prim, long etype)
  *  T_OK_ACK
  *  -----------------------------------
  */
-STATIC INLINE int
-t_ok_ack(queue_t *q, struct mtp *mtp, ulong prim, ulong seq, ulong tok)
+static int
+t_ok_ack(queue_t *q, struct mtp *mtp, mtp_ulong prim, mtp_ulong seq, mtp_ulong tok)
 {
 	int err;
 	mblk_t *mp;
@@ -973,7 +977,7 @@ t_ok_ack(queue_t *q, struct mtp *mtp, ulong prim, ulong seq, ulong tok)
  *  T_UNITDATA_IND
  *  -----------------------------------
  */
-STATIC INLINE int
+static int
 t_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_opts *opt, mblk_t *dp)
 {
 	int err;
@@ -1016,9 +1020,9 @@ t_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_opt
  *  T_UDERROR_IND
  *  -----------------------------------
  */
-STATIC INLINE int
+static int
 t_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, struct mtp_opts *opt,
-	      mblk_t *dp, ulong etype)
+	      mblk_t *dp, mtp_ulong etype)
 {
 	int err;
 	mblk_t *mp;
@@ -1058,12 +1062,13 @@ t_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, struct mtp_opts
 	return (err);
 }
 
+#if 0
 /*
  *  T_OPTMGMT_ACK
  *  -----------------------------------
  */
-STATIC INLINE int
-t_optmgmt_ack(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt)
+static int
+t_optmgmt_ack(queue_t *q, struct mtp *mtp, mtp_ulong flags, struct mtp_opts *opt)
 {
 	int err;
 	mblk_t *mp;
@@ -1097,24 +1102,27 @@ t_optmgmt_ack(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt)
       error:
 	return (err);
 }
+#endif
 
+#if 0
 /*
  *  T_ORDREL_IND
  *  -----------------------------------
  */
-STATIC INLINE int
+static int
 t_ordrel_ind(queue_t *q, struct mtp *mtp)
 {
 	STRLOG(mtp, 0, SL_ERROR, "unsupported primitive");
 	return (-EFAULT);
 }
+#endif
 
 /*
  *  T_OPTDATA_IND
  *  -----------------------------------
  */
-STATIC INLINE int
-t_optdata_ind(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt, mblk_t *dp)
+static int
+t_optdata_ind(queue_t *q, struct mtp *mtp, mtp_ulong flags, struct mtp_opts *opt, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -1151,7 +1159,7 @@ t_optdata_ind(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt, mb
  *  T_ADDR_ACK
  *  -----------------------------------
  */
-STATIC INLINE int
+static int
 t_addr_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *loc, struct mtp_addr *rem)
 {
 	int err;
@@ -1194,8 +1202,8 @@ t_addr_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *loc, struct mtp_addr *r
  *  T_CAPABILITY_ACK
  *  -----------------------------------
  */
-STATIC INLINE int
-t_capability_ack(queue_t *q, struct mtp *mtp, ulong caps)
+static int
+t_capability_ack(queue_t *q, struct mtp *mtp, mtp_ulong caps)
 {
 	int err;
 	mblk_t *mp;
@@ -1208,7 +1216,7 @@ t_capability_ack(queue_t *q, struct mtp *mtp, ulong caps)
 	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = T_CAPABILITY_ACK;
 	p->CAP_bits1 = TC1_INFO;
-	p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (ulong) mtp->oq : 0;
+	p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (mtp_ulong) mtp->oq : 0;
 	if (caps & TC1_INFO)
 		p->INFO_ack = mtp->prot;
 	else
@@ -1228,8 +1236,8 @@ t_capability_ack(queue_t *q, struct mtp *mtp, ulong caps)
  *  T_RESET_IND
  *  -----------------------------------
  */
-STATIC INLINE int
-t_reset_ind(queue_t *q, struct mtp *mtp, ulong reason)
+static int
+t_reset_ind(queue_t *q, struct mtp *mtp, mtp_ulong reason)
 {
 	fixme(("Do something for congestion resets in TPI\n"));
 	return (-EFAULT);
@@ -1246,8 +1254,8 @@ t_reset_ind(queue_t *q, struct mtp *mtp, ulong reason)
  *  MTP_BIND_REQ        1 - Bind to an MTP-SAP
  *  -----------------------------------------------------------
  */
-STATIC INLINE int
-mtp_bind_req(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong flags)
+static int
+mtp_bind_req(queue_t *q, struct mtp *mtp, struct mtp_addr *add, mtp_ulong flags)
 {
 	int err;
 	mblk_t *mp;
@@ -1281,7 +1289,7 @@ mtp_bind_req(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong flags)
  *  MTP_UNBIND_REQ      2 - Unbind from an MTP-SAP
  *  -----------------------------------------------------------
  */
-STATIC INLINE int
+static int
 mtp_unbind_req(queue_t *q, struct mtp *mtp)
 {
 	int err;
@@ -1308,8 +1316,8 @@ mtp_unbind_req(queue_t *q, struct mtp *mtp)
  *  MTP_CONN_REQ        3 - Connect to a remote MTP-SAP
  *  -----------------------------------------------------------
  */
-STATIC INLINE int
-mtp_conn_req(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong flags, mblk_t *dp)
+static int
+mtp_conn_req(queue_t *q, struct mtp *mtp, struct mtp_addr *add, mtp_ulong flags, mblk_t *dp)
 {
 	int err;
 	mblk_t *mp;
@@ -1344,7 +1352,7 @@ mtp_conn_req(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong flags, mbl
  *  MTP_DISCON_REQ      4 - Disconnect from a remote MTP-SAP
  *  -----------------------------------------------------------
  */
-STATIC INLINE int
+static int
 mtp_discon_req(queue_t *q, struct mtp *mtp)
 {
 	int err;
@@ -1371,7 +1379,7 @@ mtp_discon_req(queue_t *q, struct mtp *mtp)
  *  MTP_ADDR_REQ        5 - Address service
  *  -----------------------------------------------------------
  */
-STATIC INLINE int
+static int
 mtp_addr_req(queue_t *q, struct mtp *mtp)
 {
 	int err;
@@ -1398,7 +1406,7 @@ mtp_addr_req(queue_t *q, struct mtp *mtp)
  *  MTP_INFO_REQ        6 - Information service
  *  -----------------------------------------------------------
  */
-STATIC INLINE int
+static int
 mtp_info_req(queue_t *q, struct mtp *mtp)
 {
 	int err;
@@ -1425,8 +1433,8 @@ mtp_info_req(queue_t *q, struct mtp *mtp)
  *  MTP_OPTMGMT_REQ     7 - Options management service
  *  -----------------------------------------------------------
  */
-STATIC INLINE int
-mtp_optmgmt_req(queue_t *q, struct mtp *mtp, struct mtp_opts *opt, ulong flags)
+static int
+mtp_optmgmt_req(queue_t *q, struct mtp *mtp, struct mtp_opts *opt, mtp_ulong flags)
 {
 	int err;
 	mblk_t *mp;
@@ -1460,8 +1468,8 @@ mtp_optmgmt_req(queue_t *q, struct mtp *mtp, struct mtp_opts *opt, ulong flags)
  *  MTP_TRANSFER_REQ    8 - MTP data transfer request
  *  -----------------------------------------------------------
  */
-STATIC INLINE int
-mtp_transfer_req(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, ulong pri, ulong sls,
+static int
+mtp_transfer_req(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, mtp_ulong pri, mtp_ulong sls,
 		 mblk_t *dp)
 {
 	int err;
@@ -1506,7 +1514,7 @@ mtp_transfer_req(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, ulong pri, u
  *  M_DATA
  *  -----------------------------------
  */
-STATIC int
+static int
 t_data(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int dlen = msgdsize(mp);
@@ -1545,7 +1553,7 @@ t_data(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  has this ability, we wait for the result of the User Part Test before
  *  confirming the connection.
  */
-STATIC int
+static int
 t_conn_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int err = -EFAULT;
@@ -1623,7 +1631,7 @@ t_conn_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  T_CONN_RES
  *  -------------------------------------------------------------------
  */
-STATIC int
+static int
 t_conn_res(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int err;
@@ -1656,7 +1664,7 @@ t_conn_res(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  T_DISCON_REQ         2 - TC disconnection request
  *  -------------------------------------------------------------------
  */
-STATIC int
+static int
 t_discon_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int err;
@@ -1701,7 +1709,7 @@ t_discon_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  T_DATA_REQ           3 - Connection-Mode data transfer request
  *  -------------------------------------------------------------------
  */
-STATIC int
+static int
 t_data_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	const struct T_data_req *p = (typeof(p)) mp->b_rptr;
@@ -1741,7 +1749,7 @@ t_data_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  T_EXDATA_REQ         4 - Expedited data request
  *  -------------------------------------------------------------------
  */
-STATIC int
+static int
 t_exdata_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	(void) mp;
@@ -1752,7 +1760,7 @@ t_exdata_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  T_INFO_REQ           5 - Information Request
  *  -------------------------------------------------------------------
  */
-STATIC int
+static int
 t_info_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	(void) mp;
@@ -1763,7 +1771,7 @@ t_info_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  T_BIND_REQ           6 - Bind a TS user to a transport address
  *  -------------------------------------------------------------------
  */
-STATIC int
+static int
 t_bind_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int err;
@@ -1826,7 +1834,7 @@ t_bind_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  T_UNBIND_REQ         7 - Unbind TS user from transport address
  *  -------------------------------------------------------------------
  */
-STATIC int
+static int
 t_unbind_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	const struct T_unbind_req *p = (typeof(p)) mp->b_rptr;
@@ -1848,7 +1856,7 @@ t_unbind_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  T_UNITDATA_REQ       8 -Unitdata Request 
  *  -------------------------------------------------------------------
  */
-STATIC int
+static int
 t_unitdata_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	const struct T_unitdata_req *p = (typeof(p)) mp->b_rptr;
@@ -1906,7 +1914,7 @@ t_unitdata_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  T_OPTMGMT_REQ        9 - Options management request
  *  -------------------------------------------------------------------
  */
-STATIC int
+static int
 t_optmgmt_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int err = 0;
@@ -1969,7 +1977,7 @@ t_optmgmt_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  T_ORDREL_REQ        10 - TS user is finished sending
  *  -------------------------------------------------------------------
  */
-STATIC int
+static int
 t_ordrel_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	const struct T_ordrel_req *p = (typeof(p)) mp->b_rptr;
@@ -2000,7 +2008,7 @@ t_ordrel_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  T_OPTDATA_REQ       24 - Data with options request
  *  -------------------------------------------------------------------
  */
-STATIC int
+static int
 t_optdata_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int err;
@@ -2049,7 +2057,7 @@ t_optdata_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  T_ADDR_REQ          25 - Address Request
  *  -------------------------------------------------------------------
  */
-STATIC int
+static int
 t_addr_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	const struct T_addr_req *p = (typeof(p)) mp->b_rptr;
@@ -2064,7 +2072,7 @@ t_addr_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  T_CAPABILITY_REQ    ?? - Capability Request
  *  -------------------------------------------------------------------
  */
-STATIC int
+static int
 t_capability_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	const struct T_capability_req *p = (typeof(p)) mp->b_rptr;
@@ -2089,7 +2097,7 @@ t_capability_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  M_DATA
  *  -----------------------------------
  */
-STATIC INLINE int
+static int
 mtp_data(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	if (mtp->prot.SERV_type == T_COTS)
@@ -2103,11 +2111,11 @@ mtp_data(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  -----------------------------------
  *  Simply translate the MTP_OK_ACK into a T_OK_ACK.
  */
-STATIC INLINE int
+static int
 mtp_ok_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int err;
-	ulong prim;
+	mtp_ulong prim;
 	struct MTP_ok_ack *p = (typeof(p)) mp->b_rptr;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -2160,11 +2168,11 @@ mtp_ok_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  -----------------------------------
  *  Simply translate the MTP_ERROR_ACK into a T_ERROR_ACK.
  */
-STATIC INLINE int
+static int
 mtp_error_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int err;
-	ulong prim;
+	mtp_ulong prim;
 	struct MTP_error_ack *p = (typeof(p)) mp->b_rptr;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -2245,7 +2253,7 @@ mtp_error_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  -----------------------------------
  *  Translate the MTP_BIND_ACK into a T_BIND_ACK.
  */
-STATIC INLINE int
+static int
 mtp_bind_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	struct MTP_bind_ack *p = (typeof(p)) mp->b_rptr;
@@ -2268,7 +2276,7 @@ mtp_bind_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  -----------------------------------
  *  Simply translate MTP_ADDR_ACK to T_ADDR_ACK.
  */
-STATIC INLINE int
+static int
 mtp_addr_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	struct MTP_addr_ack *p = (typeof(p)) mp->b_rptr;
@@ -2295,7 +2303,7 @@ mtp_addr_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  -----------------------------------
  *  Simply translate MTP_INFO_ACK to T_INFO_ACK.
  */
-STATIC INLINE int
+static int
 mtp_info_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	struct MTP_info_ack *p = (typeof(p)) mp->b_rptr;
@@ -2332,7 +2340,7 @@ mtp_info_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  MTP_OPTMGMT_ACK:
  *  -----------------------------------
  */
-STATIC INLINE int
+static int
 mtp_optmgmt_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	swerr();
@@ -2344,7 +2352,7 @@ mtp_optmgmt_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  -----------------------------------
  *  Translate MTP_TRANSFER_IND into T_OPTDATA_IND or T_UNITDATA_IND.
  */
-STATIC INLINE int
+static int
 mtp_transfer_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int err;
@@ -2391,7 +2399,7 @@ mtp_transfer_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  -----------------------------------
  *  Translate MTP_PAUSE_IND into T_UDERROR_IND or T_DISCON_IND.
  */
-STATIC INLINE int
+static int
 mtp_pause_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	struct MTP_pause_ind *p = (typeof(p)) mp->b_rptr;
@@ -2431,7 +2439,7 @@ mtp_pause_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  -----------------------------------
  *  Translate MTP_RESUME_IND.
  */
-STATIC INLINE int
+static int
 mtp_resume_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	/* 
@@ -2445,13 +2453,13 @@ mtp_resume_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  Translate MTP_STATUS_IND into T_UDERROR_IND or T_RESET_IND or
  *  T_DISCON_IND.
  */
-STATIC INLINE int
+static int
 mtp_status_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	struct MTP_status_ind *p = (typeof(p)) mp->b_rptr;
-	ulong type;
-	ulong status;
-	ulong error;
+	mtp_ulong type;
+	mtp_ulong status;
+	mtp_ulong error;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
@@ -2535,11 +2543,11 @@ mtp_status_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  -----------------------------------
  *  Translate MTP_RESTART_BEGINS_IND into T_UDERROR_IND or T_DISCON_IND.
  */
-STATIC INLINE int
+static int
 mtp_restart_begins_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	struct MTP_restart_begins_ind *p = (typeof(p)) mp->b_rptr;
-	ulong error = T_MTP_RESTARTING;
+	mtp_ulong error = T_MTP_RESTARTING;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
@@ -2569,7 +2577,7 @@ mtp_restart_begins_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *  -----------------------------------
  *  Translate MTP_RESTART_COMPLETE_IND.
  */
-STATIC INLINE int
+static int
 mtp_restart_complete_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	/* 
@@ -2592,7 +2600,7 @@ mtp_restart_complete_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int
+static int
 mtp_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	struct mtp *mtp = MTP_PRIV(q);
@@ -2655,17 +2663,17 @@ mtp_w_ioctl(queue_t *q, mblk_t *mp)
  *  Primitives from TPI to MTP.
  *  -----------------------------------
  */
-STATIC int
+static int
 mtp_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
-	ulong prim;
+	mtp_ulong prim;
 	struct mtp *mtp = MTP_PRIV(q);
-	ulong oldstate = mtp_get_state(mtp);
+	mtp_ulong oldstate = mtp_get_state(mtp);
 
 	/* 
 	   Fast Path */
-	if ((prim = *((ulong *) mp->b_rptr)) == T_DATA_REQ) {
+	if ((prim = *((mtp_ulong *) mp->b_rptr)) == T_DATA_REQ) {
 		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_DATA_REQ [%d]", msgdsize(mp->b_cont));
 		if ((rtn = t_data_req(q, mtp, mp)))
 			mtp_set_state(mtp, oldstate);
@@ -2746,17 +2754,17 @@ mtp_w_proto(queue_t *q, mblk_t *mp)
  *  Primitives from MTP to TPI.
  *  -----------------------------------
  */
-STATIC int
+static int
 mtp_r_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
-	ulong prim;
+	mtp_ulong prim;
 	struct mtp *mtp = MTP_PRIV(q);
-	ulong oldstate = mtp_get_state(mtp);
+	mtp_ulong oldstate = mtp_get_state(mtp);
 
 	/* 
 	   Fast Path */
-	if ((prim = *((ulong *) mp->b_rptr)) == MTP_TRANSFER_IND) {
+	if ((prim = *((mtp_ulong *) mp->b_rptr)) == MTP_TRANSFER_IND) {
 		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_TRANSFER_IND [%d] <-", msgdsize(mp->b_cont));
 		if ((rtn = mtp_transfer_ind(q, mtp, mp)) < 0)
 			mtp_set_state(mtp, oldstate);
@@ -2828,7 +2836,7 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC int
+static int
 mtp_w_data(queue_t *q, mblk_t *mp)
 {
 	struct mtp *mtp = MTP_PRIV(q);
@@ -2838,7 +2846,7 @@ mtp_w_data(queue_t *q, mblk_t *mp)
 	STRLOG(mtp, STRLOGDA, SL_TRACE, "-> M_DATA [%d]", msgdsize(mp));
 	return t_data(q, mtp, mp);
 }
-STATIC int
+static int
 mtp_r_data(queue_t *q, mblk_t *mp)
 {
 	struct mtp *mtp = MTP_PRIV(q);
@@ -2856,7 +2864,7 @@ mtp_r_data(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC INLINE int
+static int
 mtp_w_prim(queue_t *q, mblk_t *mp)
 {
 	/* 
@@ -2878,7 +2886,7 @@ mtp_w_prim(queue_t *q, mblk_t *mp)
 	}
 	return (QR_PASSALONG);
 }
-STATIC INLINE int
+static int
 mtp_r_prim(queue_t *q, mblk_t *mp)
 {
 	/* 
@@ -2914,7 +2922,7 @@ mtp_r_prim(queue_t *q, mblk_t *mp)
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-STATIC streamscall int
+static streamscall int
 mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	MOD_INC_USE_COUNT;	/* keep module from unloading in our face */
@@ -2959,7 +2967,7 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC streamscall int
+static streamscall int
 mtp_close(queue_t *q, int flag, cred_t *crp)
 {
 	(void) flag;
@@ -2976,8 +2984,8 @@ mtp_close(queue_t *q, int flag, cred_t *crp)
  *
  *  =========================================================================
  */
-STATIC kmem_cache_t *mtp_priv_cachep = NULL;
-STATIC int
+static kmem_cache_t *mtp_priv_cachep = NULL;
+static int
 mtp_init_caches(void)
 {
 	if (!mtp_priv_cachep &&
@@ -2989,7 +2997,7 @@ mtp_init_caches(void)
 		printd(("%s: initialized module private structure cace\n", MOD_NAME));
 	return (0);
 }
-STATIC int
+static int
 mtp_term_caches(void)
 {
 	if (mtp_priv_cachep) {
@@ -3001,7 +3009,7 @@ mtp_term_caches(void)
 	}
 	return (0);
 }
-STATIC struct mtp *
+static struct mtp *
 mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp)
 {
 	struct mtp *mtp;
@@ -3047,7 +3055,7 @@ mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp)
 		ptrace(("%s: ERROR: Could not allocate module private structure\n", MOD_NAME));
 	return (mtp);
 }
-STATIC void
+static void
 mtp_free_priv(queue_t *q)
 {
 	struct mtp *mtp = MTP_PRIV(q);
@@ -3074,13 +3082,13 @@ mtp_free_priv(queue_t *q)
 	spin_unlock_irqrestore(&mtp->lock, flags);
 	mtp_put(mtp);		/* final put */
 }
-STATIC struct mtp *
+static struct mtp *
 mtp_get(struct mtp *mtp)
 {
 	atomic_inc(&mtp->refcnt);
 	return (mtp);
 }
-STATIC void
+static void
 mtp_put(struct mtp *mtp)
 {
 	if (atomic_dec_and_test(&mtp->refcnt)) {
@@ -3117,14 +3125,14 @@ MODULE_PARM_DESC(modid, "Module ID for the MTP-TPI module. (0 for allocation.)")
  */
 #ifdef LFS
 
-STATIC struct fmodsw mtp_fmod = {
+static struct fmodsw mtp_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &mtp_tpiinfo,
 	.f_flag = 0,
 	.f_kmod = THIS_MODULE,
 };
 
-STATIC int
+static int
 mtp_register_strmod(void)
 {
 	int err;
@@ -3134,7 +3142,7 @@ mtp_register_strmod(void)
 	return (0);
 }
 
-STATIC int
+static int
 mtp_unregister_strmod(void)
 {
 	int err;
@@ -3152,7 +3160,7 @@ mtp_unregister_strmod(void)
  */
 #ifdef LIS
 
-STATIC int
+static int
 mtp_register_strmod(void)
 {
 	int err;
@@ -3162,7 +3170,7 @@ mtp_register_strmod(void)
 	return (0);
 }
 
-STATIC int
+static int
 mtp_unregister_strmod(void)
 {
 	int err;
