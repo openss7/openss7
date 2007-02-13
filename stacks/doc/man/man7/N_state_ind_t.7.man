@@ -1,0 +1,1 @@
+.so man7/N_STATE_IND.7.man

@@ -1,0 +1,1 @@
+.so man7/N_COORD_CON.7.man
