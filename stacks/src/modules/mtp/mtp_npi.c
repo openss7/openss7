@@ -1715,9 +1715,9 @@ n_optmgmt_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		goto badqostype;
 	if (qos->n_qos_type != N_QOS_SEL_DATA_MTP)
 		goto badqostype;
-	if (qos->n_qos_data.sls > 255 && qos->n_qos_data.sls != -1UL)
+	if (qos->n_qos_data.sls > 255 && qos->n_qos_data.sls != -1U)
 		goto badqosparam;
-	if (qos->n_qos_data.mp > 3 && qos->n_qos_data.mp != -1UL)
+	if (qos->n_qos_data.mp > 3 && qos->n_qos_data.mp != -1U)
 		goto badqosparam;
 	mtp->options.sls = qos->n_qos_data.sls;
 	mtp->options.mp = qos->n_qos_data.mp;
