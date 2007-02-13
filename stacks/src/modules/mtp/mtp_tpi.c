@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/08 11:01:01 $
+ @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/02/13 07:55:43 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 11:01:01 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 07:55:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_tpi.c,v $
+ Revision 0.9.2.19  2007/02/13 07:55:43  brian
+ - working up MTP and UAs
+
  Revision 0.9.2.18  2006/05/08 11:01:01  brian
  - new compilers mishandle postincrement of cast pointers
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/08 11:01:01 $"
+#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/02/13 07:55:43 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/08 11:01:01 $";
+    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/02/13 07:55:43 $";
 
 /*
  *  This is a MTP TPI module which can be pushed over an MTPI (Message
@@ -72,7 +75,14 @@ static char const ident[] =
  *  This module is intended to be used by application programs or by upper
  *  modules that expect a TPI connectionless service provider.
  */
+#define _LFS_SOURCE 1
+#define _SVR4_SOURCE 1
+#define _MPS_SOURCE 1
+#define _SUN_SOURCE 1
+
 #include <sys/os7/compat.h>
+#include <sys/strsun.h>
+
 #include <linux/socket.h>
 
 #include <ss7/lmi.h>
@@ -86,8 +96,8 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_TPI_DESCRIP		"SS7 Message Transfer Part (MTP) TPI STREAMS MODULE."
-#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2006/05/08 11:01:01 $"
-#define MTP_TPI_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/02/13 07:55:43 $"
+#define MTP_TPI_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_TPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MTP_TPI_LICENSE		"GPL"
@@ -190,6 +200,15 @@ STATIC struct mtp *mtp_get(struct mtp *);
 STATIC void mtp_put(struct mtp *);
 STATIC void mtp_free_priv(queue_t *q);
 
+#define STRLOGST	1	/* log Stream state transitions */
+#define STRLOGTO	2	/* log Stream timeouts */
+#define STRLOGRX	3	/* log Stream primitives received */
+#define STRLOGTX	4	/* log Stream primitives issued */
+#define STRLOGTE	5	/* log Stream timer events */
+#define STRLOGDA	6	/* log Stream data */
+
+#define STRLOG(mtp, args...) strlog((mtp)->u.dev.cmajor, (mtp)->u.dev.cminor, args)
+
 /*
  *  =========================================================================
  *
@@ -217,8 +236,10 @@ STATIC size_t
 mtp_opts_size(struct mtp *mtp, struct mtp_opts *ops)
 {
 	size_t len = 0;
+
 	if (ops) {
 		const size_t hlen = sizeof(struct t_opthdr);	/* 32 bytes */
+
 		if (ops->sls)
 			len += hlen + _T_ALIGN_SIZEOF(*(ops->sls));
 		if (ops->mp)
@@ -234,6 +255,7 @@ mtp_build_opts(struct mtp *mtp, struct mtp_opts *ops, unsigned char *p)
 	if (ops) {
 		struct t_opthdr *oh;
 		const size_t hlen = sizeof(struct t_opthdr);
+
 		if (ops->sls) {
 			oh = (typeof(oh)) p++;
 			oh->len = hlen + sizeof(*(ops->sls));
@@ -267,6 +289,7 @@ STATIC int
 mtp_parse_opts(struct mtp *mtp, struct mtp_opts *ops, unsigned char *op, size_t len)
 {
 	struct t_opthdr *oh;
+
 	for (oh = _T_OPT_FIRSTHDR_OFS(op, len, 0); oh; oh = _T_OPT_NEXTHDR_OFS(op, len, oh, 0)) {
 		switch (oh->level) {
 		case T_SS7_MTP:
@@ -290,6 +313,7 @@ mtp_parse_opts(struct mtp *mtp, struct mtp_opts *ops, unsigned char *op, size_t 
 		return (TBADOPT);
 	return (0);
 }
+
 #if 0
 STATIC int
 mtp_parse_qos(struct mtp *mtp, struct mtp_opts *ops, unsigned char *op, size_t len)
@@ -325,6 +349,7 @@ mtp_opt_default(struct mtp *mtp, struct mtp_opts *ops)
 {
 	if (ops) {
 		int flags = ops->flags;
+
 		ops->flags = 0;
 		if (!flags || ops->sls) {
 			ops->sls = &opt_defaults.sls;
@@ -347,6 +372,7 @@ STATIC int
 mtp_opt_current(struct mtp *mtp, struct mtp_opts *ops)
 {
 	int flags = ops->flags;
+
 	ops->flags = 0;
 	if (!flags || ops->sls) {
 		ops->sls = &mtp->options.sls;
@@ -449,8 +475,9 @@ STATIC INLINE void
 mtp_set_state(struct mtp *mtp, ulong newstate)
 {
 	ulong oldstate = mtp->i_state;
+
 	(void) oldstate;
-	printd(("%s: %p: %s <- %s\n", MOD_NAME, mtp, mtp_state(newstate), mtp_state(oldstate)));
+	STRLOG(mtp, STRLOGST, SL_TRACE, "%s <- %s", mtp_state(newstate), mtp_state(oldstate));
 	mtp->i_state = mtp->prot.CURRENT_state = newstate;
 }
 
@@ -524,12 +551,13 @@ STATIC INLINE int
 m_error(queue_t *q, struct mtp *mtp, int err)
 {
 	mblk_t *mp;
+
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_ERROR;
 		*mp->b_wptr++ = err < 0 ? -err : err;
 		*mp->b_wptr++ = err < 0 ? -err : err;
 		mtp_set_state(mtp, TS_NOSTATES);
-		printd(("%s: %p: <- M_ERROR\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "<- M_ERROR");
 		putnext(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -548,6 +576,7 @@ m_error(q, mtp, error)
 {
 	mblk_t *mp;
 	int hangup = 0;
+
 	if (error < 0)
 		error = -error;
 	switch (error) {
@@ -565,7 +594,7 @@ m_error(q, mtp, error)
 		goto enobufs;
 	if (hangup) {
 		mp->b_datap->db_type = M_HANGUP;
-		printd(("%s: %p: <- M_HANGUP\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "<- M_HANGUP");
 		putnext(mtp->oq, mp);
 		return (-error);
 	} else {
@@ -573,7 +602,7 @@ m_error(q, mtp, error)
 		*mp->b_wptr++ = error < 0 ? -error : error;
 		*mp->b_wptr++ = error < 0 ? -error : error;
 		mtp_set_state(mtp, TS_NO_STATES);
-		printd(("%s; %p: <- M_ERROR\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "<- M_ERROR");
 		putnext(mtp->oq, mp);
 		return (QR_DONE);
 	}
@@ -590,7 +619,7 @@ m_error(q, mtp, error)
 STATIC INLINE int
 t_conn_ind(queue_t *q, struct mtp *mtp)
 {
-	pswerr(("%s: %p: ERROR: unsupported primitive\n", MOD_NAME, mtp));
+	STRLOG(mtp, 0, SL_ERROR, "unsupported primitive");
 	return (-EFAULT);
 }
 
@@ -606,6 +635,7 @@ t_conn_con(queue_t *q, struct mtp *mtp, struct mtp_addr *res, struct mtp_opts *o
 	struct T_conn_con *p;
 	size_t res_len = res ? sizeof(*res) : 0;
 	size_t opt_len = opt ? mtp_opts_size(mtp, opt) : 0;
+
 	if (!(mp = ss7_allocb(q, sizeof(*p), BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
@@ -625,12 +655,11 @@ t_conn_con(queue_t *q, struct mtp *mtp, struct mtp_addr *res, struct mtp_opts *o
 		mp->b_wptr += opt_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- T_CONN_CON\n", MOD_NAME, mtp));
+	STRLOG(mtp, STRLOGRX, SL_TRACE, "<- T_CONN_CON");
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -646,6 +675,7 @@ t_discon_ind(queue_t *q, struct mtp *mtp, ulong reason, mblk_t *dp)
 	int err;
 	mblk_t *mp;
 	struct T_discon_ind *p;
+
 	if ((1 << mtp_get_state(mtp)) &
 	    ~(TSF_WCON_CREQ | TSF_WRES_CIND | TSF_DATA_XFER | TSF_WIND_ORDREL | TSF_WREQ_ORDREL))
 		goto efault;
@@ -659,17 +689,15 @@ t_discon_ind(queue_t *q, struct mtp *mtp, ulong reason, mblk_t *dp)
 	p->SEQ_number = 0;
 	mtp_set_state(mtp, TS_IDLE);
 	mp->b_cont = dp;
-	printd(("%s: %p: <- T_DISCON_IND\n", MOD_NAME, mtp));
+	STRLOG(mtp, STRLOGRX, SL_TRACE, "<- T_DISCON_IND");
 	putnext(mtp->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       efault:
 	err = -EFAULT;
-	ptrace(("%s: %p: SWERR: unexpected indication for state %ld\n", MOD_NAME, mtp,
-		mtp_get_state(mtp)));
+	STRLOG(mtp, 0, SL_ERROR, "unexpected indication for state %ld", mtp_get_state(mtp));
 	goto error;
       error:
 	return (err);
@@ -685,6 +713,7 @@ t_data_ind(queue_t *q, struct mtp *mtp, ulong more, mblk_t *dp)
 	int err;
 	mblk_t *mp;
 	struct T_data_ind *p;
+
 	if ((1 << mtp_get_state(mtp)) & ~(TSF_DATA_XFER | TSF_WIND_ORDREL))
 		goto efault;
 	if (!(mp = ss7_allocb(q, sizeof(*p), BPRI_MED)))
@@ -695,17 +724,15 @@ t_data_ind(queue_t *q, struct mtp *mtp, ulong more, mblk_t *dp)
 	p->PRIM_type = T_DATA_IND;
 	p->MORE_flag = more;
 	mp->b_cont = dp;
-	printd(("%s: %p: <- T_DATA_IND\n", MOD_NAME, mtp));
+	STRLOG(mtp, STRLOGRX, SL_TRACE, "<- T_DATA_IND");
 	putnext(mtp->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       efault:
 	err = -EFAULT;
-	ptrace(("%s: %p: SWERR: unexpected indication for state %ld\n", MOD_NAME, mtp,
-		mtp_get_state(mtp)));
+	STRLOG(mtp, 0, SL_ERROR, "unexpected indication for state %ld", mtp_get_state(mtp));
 	goto error;
       error:
 	return (err);
@@ -718,7 +745,7 @@ t_data_ind(queue_t *q, struct mtp *mtp, ulong more, mblk_t *dp)
 STATIC INLINE int
 t_exdata_ind(queue_t *q, struct mtp *mtp)
 {
-	pswerr(("%s: %p: ERROR: unsupported primitive\n", MOD_NAME, mtp));
+	STRLOG(mtp, 0, SL_ERROR, "unsupported primitive");
 	return (-EFAULT);
 }
 
@@ -732,18 +759,18 @@ t_info_ack(queue_t *q, struct mtp *mtp)
 	int err;
 	mblk_t *mp;
 	struct T_info_ack *p;
+
 	if (!(mp = ss7_allocb(q, sizeof(*p), BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
 	p = (typeof(p)) mp->b_wptr;
 	mp->b_wptr += sizeof(*p);
 	*p = mtp->prot;
-	printd(("%s: %p: <- T_INFO_ACK\n", MOD_NAME, mtp));
+	STRLOG(mtp, STRLOGRX, SL_TRACE, "<- T_INFO_ACK");
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -761,6 +788,7 @@ t_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong cons)
 	struct T_bind_ack *p;
 	size_t add_len = add ? sizeof(*add) : 0;
 	size_t msg_len = sizeof(*p) + add_len;
+
 	if (mtp_get_state(mtp) != TS_WACK_BREQ)
 		goto efault;
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
@@ -779,17 +807,15 @@ t_bind_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong cons)
 	if ((err = mtp_bind(mtp, add)))
 		goto free_error;
 	mtp_set_state(mtp, TS_IDLE);
-	printd(("%s: %p: <- T_BIND_ACK\n", MOD_NAME, mtp));
+	STRLOG(mtp, STRLOGRX, SL_TRACE, "<- T_BIND_ACK");
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       efault:
 	err = -EFAULT;
-	pswerr(("%s: %p: SWERR: unexpected indication for state %ld\n", MOD_NAME, mtp,
-		mtp_get_state(mtp)));
+	STRLOG(mtp, 0, SL_ERROR, "unexpected indication for state %ld", mtp_get_state(mtp));
 	goto error;
       error:
 	return (err);
@@ -809,6 +835,7 @@ t_error_ack(queue_t *q, struct mtp *mtp, const ulong prim, long etype)
 	mblk_t *mp;
 	struct T_error_ack *p;
 	size_t msg_len = sizeof(*p);
+
 	switch (etype) {
 	case -EBUSY:
 	case -EAGAIN:
@@ -867,12 +894,11 @@ t_error_ack(queue_t *q, struct mtp *mtp, const ulong prim, long etype)
 		   T_OPTMGMT_REQ in other than TS_IDLE state. */
 		break;
 	}
-	printd(("%s: %p: <- T_ERROR_ACK\n", MOD_NAME, mtp));
+	STRLOG(mtp, STRLOGRX, SL_TRACE, "<- T_ERROR_ACK");
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -889,6 +915,7 @@ t_ok_ack(queue_t *q, struct mtp *mtp, ulong prim, ulong seq, ulong tok)
 	mblk_t *mp;
 	struct T_ok_ack *p;
 	size_t msg_len = sizeof(*p);
+
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
@@ -929,12 +956,11 @@ t_ok_ack(queue_t *q, struct mtp *mtp, ulong prim, ulong seq, ulong tok)
 		   state. */
 		break;
 	}
-	printd(("%s: %p: <- T_OK_ACK\n", MOD_NAME, mtp));
+	STRLOG(mtp, STRLOGRX, SL_TRACE, "<- T_OK_ACK");
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -956,6 +982,7 @@ t_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_opt
 	size_t src_len = src ? sizeof(*src) : 0;
 	size_t opt_len = opt ? mtp_opts_size(mtp, opt) : 0;
 	size_t msg_len = sizeof(*p) + src_len + opt_len;
+
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
@@ -975,12 +1002,11 @@ t_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_opt
 		mp->b_wptr += opt_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- T_UNITDATA_IND\n", MOD_NAME, mtp));
+	STRLOG(mtp, STRLOGRX, SL_TRACE, "<- T_UNITDATA_IND");
 	putnext(mtp->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: no buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1000,6 +1026,7 @@ t_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, struct mtp_opts
 	size_t dst_len = dst ? sizeof(*dst) : 0;
 	size_t opt_len = opt ? mtp_opts_size(mtp, opt) : 0;
 	size_t msg_len = sizeof(*p) + dst_len + opt_len;
+
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
@@ -1021,12 +1048,11 @@ t_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, struct mtp_opts
 		mp->b_wptr += opt_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- T_UDERROR_IND\n", MOD_NAME, mtp));
+	STRLOG(mtp, STRLOGRX, SL_TRACE, "<- T_UDERROR_IND");
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1044,6 +1070,7 @@ t_optmgmt_ack(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt)
 	struct T_optmgmt_ack *p;
 	size_t opt_len = opt ? mtp_opts_size(mtp, opt) : 0;
 	size_t msg_len = sizeof(*p) + opt_len;
+
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
@@ -1061,12 +1088,11 @@ t_optmgmt_ack(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt)
 	if (mtp_get_state(mtp) == TS_WACK_OPTREQ)
 		mtp_set_state(mtp, TS_IDLE);
 #endif
-	printd(("%s: %p: <- T_OPTMGMT_ACK\n", MOD_NAME, mtp));
+	STRLOG(mtp, STRLOGRX, SL_TRACE, "<- T_OPTMGMT_ACK");
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1079,7 +1105,7 @@ t_optmgmt_ack(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt)
 STATIC INLINE int
 t_ordrel_ind(queue_t *q, struct mtp *mtp)
 {
-	pswerr(("%s: %p: ERROR: unsupported primitive\n", MOD_NAME, mtp));
+	STRLOG(mtp, 0, SL_ERROR, "unsupported primitive");
 	return (-EFAULT);
 }
 
@@ -1095,6 +1121,7 @@ t_optdata_ind(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt, mb
 	struct T_optdata_ind *p;
 	size_t opt_len = opt ? mtp_opts_size(mtp, opt) : 0;
 	size_t msg_len = sizeof(*p) + opt_len;
+
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
@@ -1109,12 +1136,11 @@ t_optdata_ind(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt, mb
 		mp->b_wptr += opt_len;
 	}
 	mp->b_cont = dp;
-	printd(("%s: %p: <- T_OPTDATA_IND\n", MOD_NAME, mtp));
+	STRLOG(mtp, STRLOGRX, SL_TRACE, "<- T_OPTDATA_IND");
 	putnext(mtp->oq, mp);
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1133,6 +1159,7 @@ t_addr_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *loc, struct mtp_addr *r
 	struct T_addr_ack *p;
 	size_t loc_len = loc ? sizeof(*loc) : 0;
 	size_t rem_len = rem ? sizeof(*rem) : 0;
+
 	if (!(mp = ss7_allocb(q, sizeof(*p) + loc_len + rem_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
@@ -1151,12 +1178,11 @@ t_addr_ack(queue_t *q, struct mtp *mtp, struct mtp_addr *loc, struct mtp_addr *r
 		bcopy(rem, mp->b_wptr, rem_len);
 		mp->b_wptr += rem_len;
 	}
-	printd(("%s: %p: <- T_ADDR_ACK\n", MOD_NAME, mtp));
+	STRLOG(mtp, STRLOGRX, SL_TRACE, "<- T_ADDR_ACK");
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1174,6 +1200,7 @@ t_capability_ack(queue_t *q, struct mtp *mtp, ulong caps)
 	int err;
 	mblk_t *mp;
 	struct T_capability_ack *p;
+
 	if (!(mp = ss7_allocb(q, sizeof(*p), BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
@@ -1186,12 +1213,11 @@ t_capability_ack(queue_t *q, struct mtp *mtp, ulong caps)
 		p->INFO_ack = mtp->prot;
 	else
 		bzero(&p->INFO_ack, sizeof(p->INFO_ack));
-	printd(("%s: %p: <- T_CAPABILITY_ACK\n", MOD_NAME, mtp));
+	STRLOG(mtp, STRLOGRX, SL_TRACE, "<- T_CAPABILITY_ACK");
 	putnext(mtp->oq, mp);
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1228,6 +1254,7 @@ mtp_bind_req(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong flags)
 	struct MTP_bind_req *p;
 	size_t add_len = add ? sizeof(*add) : 0;
 	size_t msg_len = sizeof(*p);
+
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
@@ -1245,7 +1272,6 @@ mtp_bind_req(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong flags)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1262,6 +1288,7 @@ mtp_unbind_req(queue_t *q, struct mtp *mtp)
 	mblk_t *mp;
 	struct MTP_unbind_req *p;
 	size_t msg_len = sizeof(*p);
+
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
@@ -1272,7 +1299,6 @@ mtp_unbind_req(queue_t *q, struct mtp *mtp)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1290,6 +1316,7 @@ mtp_conn_req(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong flags, mbl
 	struct MTP_conn_req *p;
 	size_t add_len = add ? sizeof(*add) : 0;
 	size_t msg_len = sizeof(*p) + add_len;
+
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
@@ -1308,7 +1335,6 @@ mtp_conn_req(queue_t *q, struct mtp *mtp, struct mtp_addr *add, ulong flags, mbl
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1325,6 +1351,7 @@ mtp_discon_req(queue_t *q, struct mtp *mtp)
 	mblk_t *mp;
 	struct MTP_discon_req *p;
 	size_t msg_len = sizeof(*p);
+
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
@@ -1335,7 +1362,6 @@ mtp_discon_req(queue_t *q, struct mtp *mtp)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1352,6 +1378,7 @@ mtp_addr_req(queue_t *q, struct mtp *mtp)
 	mblk_t *mp;
 	struct MTP_addr_req *p;
 	size_t msg_len = sizeof(*p);
+
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
@@ -1362,7 +1389,6 @@ mtp_addr_req(queue_t *q, struct mtp *mtp)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1379,6 +1405,7 @@ mtp_info_req(queue_t *q, struct mtp *mtp)
 	mblk_t *mp;
 	struct MTP_info_req *p;
 	size_t msg_len = sizeof(*p);
+
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PCPROTO;
@@ -1389,7 +1416,6 @@ mtp_info_req(queue_t *q, struct mtp *mtp)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1407,6 +1433,7 @@ mtp_optmgmt_req(queue_t *q, struct mtp *mtp, struct mtp_opts *opt, ulong flags)
 	struct MTP_optmgmt_req *p;
 	size_t opt_len = opt ? mtp_opts_size(mtp, opt) : 0;
 	size_t msg_len = sizeof(*p) + opt_len;
+
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
@@ -1424,7 +1451,6 @@ mtp_optmgmt_req(queue_t *q, struct mtp *mtp, struct mtp_opts *opt, ulong flags)
 	return (QR_DONE);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1443,6 +1469,7 @@ mtp_transfer_req(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, ulong pri, u
 	struct MTP_transfer_req *p;
 	size_t dst_len = dst ? sizeof(*dst) : 0;
 	size_t msg_len = sizeof(*p) + dst_len;
+
 	if (!(mp = ss7_allocb(q, msg_len, BPRI_MED)))
 		goto enobufs;
 	mp->b_datap->db_type = M_PROTO;
@@ -1462,7 +1489,6 @@ mtp_transfer_req(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, ulong pri, u
 	return (QR_ABSORBED);
       enobufs:
 	err = -ENOBUFS;
-	ptrace(("%s: %p: ERROR: No buffers\n", MOD_NAME, mtp));
 	goto error;
       error:
 	return (err);
@@ -1484,6 +1510,7 @@ STATIC int
 t_data(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int dlen = msgdsize(mp);
+
 	if (mtp->prot.SERV_type == T_CLTS)
 		goto notsupport;
 	if (mtp_get_state(mtp) == TS_IDLE)
@@ -1494,16 +1521,16 @@ t_data(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		goto baddata;
 	return mtp_transfer_req(q, mtp, &mtp->dst, mtp->options.mp, mtp->options.sls, mp);
       baddata:
-	ptrace(("%s: %p: ERROR: bad data size %d\n", MTP_DRV_NAME, mtp, dlen));
+	STRLOG(mtp, 0, SL_TRACE, "bad data size %d", dlen);
 	goto error;
       outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", MTP_DRV_NAME));
+	STRLOG(mtp, 0, SL_TRACE, "would place i/f out of state");
 	goto error;
       discard:
-	ptrace(("%s: ERROR: ignore in idle state\n", MTP_DRV_NAME));
+	STRLOG(mtp, 0, SL_TRACE, "ignore in idle state");
 	return (QR_DONE);
       notsupport:
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", MTP_DRV_NAME));
+	STRLOG(mtp, 0, SL_TRACE, "primitive not supported for T_CLTS");
 	goto error;
       error:
 	return m_error(q, mtp, -EPROTO);
@@ -1526,6 +1553,7 @@ t_conn_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	struct mtp_addr *dst;
 	uchar *opt;
 	struct mtp_opts opts = { 0L, NULL, };
+
 	if (mtp_get_state(mtp) != TS_IDLE)
 		goto outstate;
 	if (mtp->prot.SERV_type == T_CLTS)
@@ -1561,31 +1589,31 @@ t_conn_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	return mtp_conn_req(q, mtp, dst, 0, NULL);
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: bad options\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "bad options");
 	goto error;
       acces:
 	err = TACCES;
-	ptrace(("%s: %p: ERROR: no permission for address\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "no permission for address");
 	goto error;
       badaddr:
 	err = TBADADDR;
-	ptrace(("%s: %p: ERROR: address is unusable\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "address is unusable");
 	goto error;
       noaddr:
 	err = TNOADDR;
-	ptrace(("%s: %p: ERROR: couldn't allocate address\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "couldn't allocate address");
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid message format\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "invalid message format");
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "would place i/f out of state");
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported for T_CLTS\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "primitive not supported for T_CLTS");
 	goto error;
       error:
 	return t_error_ack(q, mtp, p->PRIM_type, err);
@@ -1600,6 +1628,7 @@ t_conn_res(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int err;
 	const struct T_conn_res *p = (typeof(p)) mp->b_rptr;
+
 	if (mtp->prot.SERV_type == T_CLTS)
 		goto notsupport;
 	if (mtp_get_state(mtp) != TS_WRES_CIND)
@@ -1609,15 +1638,15 @@ t_conn_res(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	goto notsupport;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: ERROR: invalid primitive format\n", MTP_DRV_NAME));
+	STRLOG(mtp, 0, SL_TRACE, "invalid primitive format");
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: ERROR: would place i/f out of state\n", MTP_DRV_NAME));
+	STRLOG(mtp, 0, SL_TRACE, "would place i/f out of state");
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", MTP_DRV_NAME));
+	STRLOG(mtp, 0, SL_TRACE, "primitive not supported for T_CLTS");
 	goto error;
       error:
 	return t_error_ack(q, mtp, p->PRIM_type, err);
@@ -1632,6 +1661,7 @@ t_discon_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int err;
 	const struct T_discon_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mtp->prot.SERV_type == T_CLTS)
 		goto notsupport;
 	switch (mtp_get_state(mtp)) {
@@ -1653,15 +1683,15 @@ t_discon_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	return mtp_discon_req(q, mtp);
       einval:
 	err = -EINVAL;
-	ptrace(("%s: ERROR: invalid primitive format\n", MTP_DRV_NAME));
+	STRLOG(mtp, 0, SL_TRACE, "invalid primitive format");
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: ERROR: would place i/f out of state\n", MTP_DRV_NAME));
+	STRLOG(mtp, 0, SL_TRACE, "would place i/f out of state");
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", MTP_DRV_NAME));
+	STRLOG(mtp, 0, SL_TRACE, "primitive not supported for T_CLTS");
 	goto error;
       error:
 	return t_error_ack(q, mtp, p->PRIM_type, err);
@@ -1676,6 +1706,7 @@ t_data_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	const struct T_data_req *p = (typeof(p)) mp->b_rptr;
 	size_t dlen = mp->b_cont ? msgdsize(mp->b_cont) : 0;
+
 	if (mtp->prot.SERV_type == T_CLTS)
 		goto notsupport;
 	if (mtp_get_state(mtp) == TS_IDLE)
@@ -1688,19 +1719,19 @@ t_data_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		goto baddata;
 	return mtp_transfer_req(q, mtp, &mtp->dst, mtp->options.mp, mtp->options.sls, mp->b_cont);
       baddata:
-	ptrace(("%s: %p: ERROR: bad data size %d\n", MTP_DRV_NAME, mtp, dlen));
+	STRLOG(mtp, 0, SL_TRACE, "bad data size %d", dlen);
 	goto error;
       outstate:
-	ptrace(("%s: ERROR: would place i/f out of state\n", MTP_DRV_NAME));
+	STRLOG(mtp, 0, SL_TRACE, "would place i/f out of state");
 	goto error;
       einval:
-	ptrace(("%s: ERROR: invalid primitive format\n", MTP_DRV_NAME));
+	STRLOG(mtp, 0, SL_TRACE, "invalid primitive format");
 	goto error;
       discard:
-	ptrace(("%s: ERROR: ignore in idle state\n", MTP_DRV_NAME));
+	STRLOG(mtp, 0, SL_TRACE, "ignore in idle state");
 	return (QR_DONE);
       notsupport:
-	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", MTP_DRV_NAME));
+	STRLOG(mtp, 0, SL_TRACE, "primitive not supported for T_CLTS");
 	goto error;
       error:
 	return m_error(q, mtp, -EPROTO);
@@ -1738,6 +1769,7 @@ t_bind_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	int err;
 	const struct T_bind_req *p = (typeof(p)) mp->b_rptr;
 	struct mtp_addr *src;
+
 	if (mtp_get_state != TS_UNBND)
 		goto outstate;
 	mtp_set_state(mtp, TS_WACK_BREQ);
@@ -1764,27 +1796,27 @@ t_bind_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	return mtp_bind_req(q, mtp, src, 0);
       acces:
 	err = TACCES;
-	ptrace(("%s: %p: ERROR: no permission for address\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "no permission for address");
 	goto error;
       noaddr:
 	err = TNOADDR;
-	ptrace(("%s: %p: ERROR: couldn't allocate address\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "couldn't allocate address");
 	goto error;
       badaddr:
 	err = TBADADDR;
-	ptrace(("%s: %p: ERROR: address is invalid\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "address is invalid");
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "invalid primitive format");
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "would place i/f out of state");
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not support for T_CLTS\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "primitive not support for T_CLTS");
 	goto error;
       error:
 	return t_error_ack(q, mtp, p->PRIM_type, err);
@@ -1799,13 +1831,14 @@ t_unbind_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	const struct T_unbind_req *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mtp_get_state(mtp) != TS_IDLE)
 		goto outstate;
 	mtp_set_state(mtp, TS_WACK_UREQ);
 	return mtp_unbind_req(q, mtp);
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "would place i/f out of state");
 	goto error;
       error:
 	return t_error_ack(q, mtp, p->PRIM_type, err);
@@ -1822,6 +1855,7 @@ t_unitdata_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	size_t dlen = mp->b_cont ? msgdsize(mp->b_cont) : 0;
 	struct mtp_addr *dst;
 	struct mtp_opts opts = { 0L, NULL, };
+
 	if (mtp->prot.SERV_type != T_CLTS)
 		goto notsupport;
 	if (mtp_get_state(mtp) != TS_IDLE)
@@ -1844,26 +1878,25 @@ t_unitdata_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	fixme(("Handle options correctly\n"));
 	return mtp_transfer_req(q, mtp, dst, mtp->options.mp, mtp->options.sls, mp->b_cont);
       badopt:
-	ptrace(("%s: %p: ERROR: bad options\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "bad options");
 	goto error;
       acces:
-	ptrace(("%s: %p: ERROR: no permission to address\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "no permission to address");
 	goto error;
       badaddr:
-	ptrace(("%s: %p: ERROR: bad destination address\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "bad destination address");
 	goto error;
       einval:
-	ptrace(("%s: %p: ERROR: invalid parameter\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "invalid parameter");
 	goto error;
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "would place i/f out of state");
 	goto error;
       baddata:
-	ptrace(("%s: %p: ERROR: bad data size %d\n", MTP_DRV_NAME, mtp, dlen));
+	STRLOG(mtp, 0, SL_TRACE, "bad data size %d", dlen);
 	goto error;
       notsupport:
-	ptrace(("%s: %p: ERROR: primitive not supported for T_COTS or T_COTS_ORD\n", MTP_DRV_NAME,
-		mtp));
+	STRLOG(mtp, 0, SL_TRACE, "primitive not supported for T_COTS or T_COTS_ORD");
 	goto error;
       error:
 	return m_error(q, mtp, -EPROTO);
@@ -1879,6 +1912,7 @@ t_optmgmt_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	int err = 0;
 	const struct T_optmgmt_req *p = (typeof(p)) mp->b_rptr;
 	struct mtp_opts opts = { 0L, NULL, };
+
 #ifdef TS_WACK_OPTREQ
 	if (mtp_get_state(mtp) == TS_IDLE)
 		mtp_set_state(mtp, TS_WACK_OPTREQ);
@@ -1913,19 +1947,19 @@ t_optmgmt_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	return mtp_optmgmt_req(q, mtp, &opts, p->MGMT_flags);
       provspec:
 	err = err;
-	ptrace(("%s: %p: ERROR: provider specific\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "provider specific");
 	goto error;
       badflag:
 	err = TBADFLAG;
-	ptrace(("%s: %p: ERROR: bad options flags\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "bad options flags");
 	goto error;
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: bad options\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "bad options");
 	goto error;
       einval:
 	err = -EINVAL;
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "invalid primitive format");
 	goto error;
       error:
 	return t_error_ack(q, mtp, p->PRIM_type, err);
@@ -1939,6 +1973,7 @@ STATIC int
 t_ordrel_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	const struct T_ordrel_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mtp->prot.SERV_type != T_COTS_ORD)
 		goto notsupport;
 	if ((1 << mtp_get_state(mtp)) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL))
@@ -1952,11 +1987,10 @@ t_ordrel_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	}
 	return t_error_ack(q, mtp, T_ORDREL_REQ, TNOTSUPPORT);
       outstate:
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "would place i/f out of state");
 	goto error;
       notsupport:
-	ptrace(("%s: %p: ERROR: primitive not supported for T_CLTS or T_COTS\n", MTP_DRV_NAME,
-		mtp));
+	STRLOG(mtp, 0, SL_TRACE, "primitive not supported for T_CLTS or T_COTS");
 	goto error;
       error:
 	return m_error(q, mtp, EPROTO);
@@ -1972,6 +2006,7 @@ t_optdata_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	int err;
 	const struct T_optdata_req *p = (typeof(p)) mp->b_rptr;
 	struct mtp_opts opts = { 0L, NULL, };
+
 	if (mtp->prot.SERV_type == T_CLTS)
 		goto notsupport;
 	if (mtp_get_state(mtp) == TS_IDLE)
@@ -1989,21 +2024,21 @@ t_optdata_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	return mtp_transfer_req(q, mtp, &mtp->dst, mtp->options.mp, mtp->options.sls, mp->b_cont);
       badopt:
 	err = TBADOPT;
-	ptrace(("%s: %p: ERROR: bad options\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "bad options");
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	ptrace(("%s: %p: ERROR: would place i/f out of state\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "would place i/f out of state");
 	goto error;
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "invalid primitive format");
 	return m_error(q, mtp, EPROTO);
       discard:
-	ptrace(("%s: %p: ERROR: ignore in idle state\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "ignore in idle state");
 	return (QR_DONE);
       notsupport:
 	err = TNOTSUPPORT;
-	ptrace(("%s: %p: ERROR: primitive not supported for T_CLTS\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "primitive not supported for T_CLTS");
 	goto error;
       error:
 	return t_error_ack(q, mtp, p->PRIM_type, err);
@@ -2018,6 +2053,7 @@ STATIC int
 t_addr_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	const struct T_addr_req *p = (typeof(p)) mp->b_rptr;
+
 	(void) mp;
 	return mtp_addr_req(q, mtp);
 }
@@ -2032,11 +2068,12 @@ STATIC int
 t_capability_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	const struct T_capability_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
 	return t_capability_ack(q, mtp, p->CAP_bits1);
       einval:
-	ptrace(("%s: %p: ERROR: invalid primitive format\n", MTP_DRV_NAME, mtp));
+	STRLOG(mtp, 0, SL_TRACE, "invalid primitive format");
 	return t_error_ack(q, mtp, p->PRIM_type, -EINVAL);
 }
 #endif
@@ -2072,6 +2109,7 @@ mtp_ok_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	int err;
 	ulong prim;
 	struct MTP_ok_ack *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	switch (p->mtp_correct_prim) {
@@ -2113,7 +2151,7 @@ mtp_ok_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	}
 	return t_ok_ack(q, mtp, prim, 0, 0);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
+	STRLOG(mtp, 0, SL_ERROR, "invalid primitive from below");
 	return (-EFAULT);
 }
 
@@ -2128,6 +2166,7 @@ mtp_error_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	int err;
 	ulong prim;
 	struct MTP_error_ack *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	switch (p->mtp_primitive) {
@@ -2197,7 +2236,7 @@ mtp_error_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	}
 	return t_error_ack(q, mtp, prim, err);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
+	STRLOG(mtp, 0, SL_ERROR, "invalid primitive from below");
 	return (-EFAULT);
 }
 
@@ -2211,6 +2250,7 @@ mtp_bind_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	struct MTP_bind_ack *p = (typeof(p)) mp->b_rptr;
 	struct mtp_addr *add = NULL;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	if (mp->b_wptr < mp->b_rptr + p->mtp_addr_offset + p->mtp_addr_length)
@@ -2219,7 +2259,7 @@ mtp_bind_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		add = (typeof(add)) (mp->b_rptr + p->mtp_addr_offset);
 	return t_bind_ack(q, mtp, add, 0);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
+	STRLOG(mtp, 0, SL_ERROR, "invalid primitive from below");
 	return (-EFAULT);
 }
 
@@ -2233,6 +2273,7 @@ mtp_addr_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	struct MTP_addr_ack *p = (typeof(p)) mp->b_rptr;
 	struct mtp_addr *loc = NULL, *rem = NULL;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	if (mp->b_wptr < mp->b_rptr + p->mtp_loc_offset + p->mtp_loc_length)
@@ -2245,7 +2286,7 @@ mtp_addr_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		rem = (typeof(rem)) (mp->b_rptr + p->mtp_rem_offset);
 	return t_addr_ack(q, mtp, loc, rem);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
+	STRLOG(mtp, 0, SL_ERROR, "invalid primitive from below");
 	return (-EFAULT);
 }
 
@@ -2258,6 +2299,7 @@ STATIC INLINE int
 mtp_info_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	struct MTP_info_ack *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	if (mp->b_wptr < mp->b_rptr + p->mtp_addr_offset + p->mtp_addr_length)
@@ -2282,7 +2324,7 @@ mtp_info_ack(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	}
 	return t_info_ack(q, mtp);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
+	STRLOG(mtp, 0, SL_ERROR, "invalid primitive from below");
 	return (-EFAULT);
 }
 
@@ -2309,6 +2351,7 @@ mtp_transfer_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	struct MTP_transfer_ind *p = (typeof(p)) mp->b_rptr;
 	struct mtp_addr *src;
 	struct mtp_opts opts = { 0L, NULL, };
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	if (mp->b_wptr < mp->b_rptr + p->mtp_srce_offset + p->mtp_srce_length)
@@ -2337,7 +2380,7 @@ mtp_transfer_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	swerr();
 	return (-EFAULT);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
+	STRLOG(mtp, 0, SL_ERROR, "invalid primitive from below");
 	return (-EFAULT);
       error:
 	return (err);
@@ -2353,6 +2396,7 @@ mtp_pause_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	struct MTP_pause_ind *p = (typeof(p)) mp->b_rptr;
 	struct mtp_addr *dst;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	if (mp->b_wptr < mp->b_rptr + p->mtp_addr_offset + p->mtp_addr_length)
@@ -2368,6 +2412,7 @@ mtp_pause_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	case T_CLTS:
 	{
 		struct mtp_addr *dst;
+
 		dst = (typeof(dst)) (mp->b_rptr + p->mtp_addr_length);
 		/* 
 		   T_UDERROR_IND */
@@ -2377,7 +2422,7 @@ mtp_pause_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	swerr();
 	return (-EFAULT);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
+	STRLOG(mtp, 0, SL_ERROR, "invalid primitive from below");
 	return (-EFAULT);
 }
 
@@ -2407,6 +2452,7 @@ mtp_status_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	ulong type;
 	ulong status;
 	ulong error;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	type = p->mtp_type;
@@ -2472,6 +2518,7 @@ mtp_status_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		/* 
 		   T_UDERROR_IND */
 		struct mtp_addr *dst;
+
 		dst = (typeof(dst)) (mp->b_rptr + p->mtp_addr_length);
 		return t_uderror_ind(q, mtp, dst, NULL, mp->b_cont, error);
 	}
@@ -2479,7 +2526,7 @@ mtp_status_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	swerr();
 	return (-EFAULT);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
+	STRLOG(mtp, 0, SL_ERROR, "invalid primitive from below");
 	return (-EFAULT);
 }
 
@@ -2493,6 +2540,7 @@ mtp_restart_begins_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	struct MTP_restart_begins_ind *p = (typeof(p)) mp->b_rptr;
 	ulong error = T_MTP_RESTARTING;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	switch (mtp->prot.SERV_type) {
@@ -2505,13 +2553,14 @@ mtp_restart_begins_ind(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		/* 
 		   T_UDERROR_IND */
 		struct mtp_addr *dst = NULL;
+
 		return t_uderror_ind(q, mtp, dst, NULL, mp->b_cont, error);
 	}
 	}
 	swerr();
 	return (-EFAULT);
       efault:
-	pswerr(("%s: %p: SWERR: invalid primitive from below\n", MOD_NAME, mtp));
+	STRLOG(mtp, 0, SL_ERROR, "invalid primitive from below");
 	return (-EFAULT);
 }
 
@@ -2553,6 +2602,7 @@ mtp_w_ioctl(queue_t *q, mblk_t *mp)
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	struct linkblk *lp = (struct linkblk *) arg;
 	int ret = 0;
+
 	switch (type) {
 	case __SID:
 		switch (nr) {
@@ -2562,11 +2612,11 @@ mtp_w_ioctl(queue_t *q, mblk_t *mp)
 		case _IOC_NR(I_UNLINK):
 		case _IOC_NR(I_PUNLINK):
 			(void) lp;
-			ptrace(("%s: ERROR: Unsupported STREAMS ioctl %d\n", MOD_NAME, nr));
+			STRLOG(mtp, 0, SL_ERROR, "Unsupported STREAMS ioctl %d", nr);
 			ret = -EINVAL;
 			break;
 		default:
-			ptrace(("%s: ERROR: Unsupported STREAMS ioctl %d\n", MOD_NAME, nr));
+			STRLOG(mtp, 0, SL_ERROR, "Unsupported STREAMS ioctl %d", nr);
 			ret = -EOPNOTSUPP;
 			break;
 		}
@@ -2612,72 +2662,73 @@ mtp_w_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	struct mtp *mtp = MTP_PRIV(q);
 	ulong oldstate = mtp_get_state(mtp);
+
 	/* 
 	   Fast Path */
 	if ((prim = *((ulong *) mp->b_rptr)) == T_DATA_REQ) {
-		printd(("%s: %p: -> T_DATA_REQ [%d]\n", MOD_NAME, mtp, msgdsize(mp->b_cont)));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_DATA_REQ [%d]", msgdsize(mp->b_cont));
 		if ((rtn = t_data_req(q, mtp, mp)))
 			mtp_set_state(mtp, oldstate);
 		return (rtn);
 	}
 	switch (prim) {
 	case T_CONN_REQ:
-		printd(("%s: %p: -> T_CONN_REQ\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_CONN_REQ");
 		rtn = t_conn_req(q, mtp, mp);
 		break;
 	case T_CONN_RES:
-		printd(("%s: %p: -> T_CONN_RES\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_CONN_RES");
 		rtn = t_conn_res(q, mtp, mp);
 		break;
 	case T_DISCON_REQ:
-		printd(("%s: %p: -> T_DISCON_REQ\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_DISCON_REQ");
 		rtn = t_discon_req(q, mtp, mp);
 		break;
 	case T_DATA_REQ:
-		printd(("%s: %p: -> T_DATA_REQ\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_DATA_REQ");
 		rtn = t_data_req(q, mtp, mp);
 		break;
 	case T_EXDATA_REQ:
-		printd(("%s: %p: -> T_EXDATA_REQ\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_EXDATA_REQ");
 		rtn = t_exdata_req(q, mtp, mp);
 		break;
 	case T_INFO_REQ:
-		printd(("%s: %p: -> T_INFO_REQ\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_INFO_REQ");
 		rtn = t_info_req(q, mtp, mp);
 		break;
 	case T_BIND_REQ:
-		printd(("%s: %p: -> T_BIND_REQ\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_BIND_REQ");
 		rtn = t_bind_req(q, mtp, mp);
 		break;
 	case T_UNBIND_REQ:
-		printd(("%s: %p: -> T_UNBIND_REQ\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_UNBIND_REQ");
 		rtn = t_unbind_req(q, mtp, mp);
 		break;
 	case T_UNITDATA_REQ:
-		printd(("%s: %p: -> T_UNITDATA_REQ\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_UNITDATA_REQ");
 		rtn = t_unitdata_req(q, mtp, mp);
 		break;
 	case T_OPTMGMT_REQ:
-		printd(("%s: %p: -> T_OPTMGMT_REQ\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_OPTMGMT_REQ");
 		rtn = t_optmgmt_req(q, mtp, mp);
 		break;
 	case T_ORDREL_REQ:
-		printd(("%s: %p: -> T_ORDREL_REQ\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_ORDREL_REQ");
 		rtn = t_ordrel_req(q, mtp, mp);
 		break;
 	case T_OPTDATA_REQ:
-		printd(("%s: %p: -> T_OPTDATA_REQ\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_OPTDATA_REQ");
 		rtn = t_optdata_req(q, mtp, mp);
 		break;
 #ifdef T_ADDR_REQ
 	case T_ADDR_REQ:
-		printd(("%s: %p: -> T_ADDR_REQ\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_ADDR_REQ");
 		rtn = t_addr_req(q, mtp, mp);
 		break;
 #endif
 #ifdef T_CAPABILITY_REQ
 	case T_CAPABILITY_REQ:
-		printd(("%s: %p: -> T_CAPABILITY_REQ\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_CAPABILITY_REQ");
 		rtn = t_capability_req(q, mtp, mp);
 		break;
 #endif
@@ -2702,61 +2753,62 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	struct mtp *mtp = MTP_PRIV(q);
 	ulong oldstate = mtp_get_state(mtp);
+
 	/* 
 	   Fast Path */
 	if ((prim = *((ulong *) mp->b_rptr)) == MTP_TRANSFER_IND) {
-		printd(("%s: %p: MTP_TRANSFER_IND [%d] <-\n", MOD_NAME, mtp, msgdsize(mp->b_cont)));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_TRANSFER_IND [%d] <-", msgdsize(mp->b_cont));
 		if ((rtn = mtp_transfer_ind(q, mtp, mp)) < 0)
 			mtp_set_state(mtp, oldstate);
 		return (rtn);
 	}
 	switch (prim) {
 	case MTP_OK_ACK:
-		printd(("%s: %p: MTP_OK_ACK <-\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_OK_ACK <-");
 		rtn = mtp_ok_ack(q, mtp, mp);
 		break;
 	case MTP_ERROR_ACK:
-		printd(("%s: %p: MTP_ERROR_ACK <-\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_ERROR_ACK <-");
 		rtn = mtp_error_ack(q, mtp, mp);
 		break;
 	case MTP_BIND_ACK:
-		printd(("%s: %p: MTP_BIND_ACK <-\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_BIND_ACK <-");
 		rtn = mtp_bind_ack(q, mtp, mp);
 		break;
 	case MTP_ADDR_ACK:
-		printd(("%s: %p: MTP_ADDR_ACK <-\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_ADDR_ACK <-");
 		rtn = mtp_addr_ack(q, mtp, mp);
 		break;
 	case MTP_INFO_ACK:
-		printd(("%s: %p: MTP_INFO_ACK <-\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_INFO_ACK <-");
 		rtn = mtp_info_ack(q, mtp, mp);
 		break;
 	case MTP_OPTMGMT_ACK:
-		printd(("%s: %p: MTP_OPTMGMT_ACK <-\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_OPTMGMT_ACK <-");
 		rtn = mtp_optmgmt_ack(q, mtp, mp);
 		break;
 	case MTP_TRANSFER_IND:
-		printd(("%s: %p: MTP_TRANSFER_IND <-\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_TRANSFER_IND <-");
 		rtn = mtp_transfer_ind(q, mtp, mp);
 		break;
 	case MTP_PAUSE_IND:
-		printd(("%s: %p: MTP_PAUSE_IND <-\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_PAUSE_IND <-");
 		rtn = mtp_pause_ind(q, mtp, mp);
 		break;
 	case MTP_RESUME_IND:
-		printd(("%s: %p: MTP_RESUME_IND <-\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_RESUME_IND <-");
 		rtn = mtp_resume_ind(q, mtp, mp);
 		break;
 	case MTP_STATUS_IND:
-		printd(("%s: %p: MTP_STATUS_IND <-\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_STATUS_IND <-");
 		rtn = mtp_status_ind(q, mtp, mp);
 		break;
 	case MTP_RESTART_BEGINS_IND:
-		printd(("%s: %p: MTP_RESTART_BEGINS_IND <-\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_RESTART_BEGINS_IND <-");
 		rtn = mtp_restart_begins_ind(q, mtp, mp);
 		break;
 	case MTP_RESTART_COMPLETE_IND:
-		printd(("%s: %p: MTP_RESTART_COMPLETE_IND <-\n", MOD_NAME, mtp));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_RESTART_COMPLETE_IND <-");
 		rtn = mtp_restart_complete_ind(q, mtp, mp);
 		break;
 	default:
@@ -2780,18 +2832,20 @@ STATIC int
 mtp_w_data(queue_t *q, mblk_t *mp)
 {
 	struct mtp *mtp = MTP_PRIV(q);
+
 	/* 
 	   data from above */
-	printd(("%s: %p: -> M_DATA [%d]\n", MOD_NAME, mtp, msgdsize(mp)));
+	STRLOG(mtp, STRLOGDA, SL_TRACE, "-> M_DATA [%d]", msgdsize(mp));
 	return t_data(q, mtp, mp);
 }
 STATIC int
 mtp_r_data(queue_t *q, mblk_t *mp)
 {
 	struct mtp *mtp = MTP_PRIV(q);
+
 	/* 
 	   data from below */
-	printd(("%s: %p: M_DATA [%d] <-\n", MOD_NAME, mtp, msgdsize(mp)));
+	STRLOG(mtp, STRLOGDA, SL_TRACE, "M_DATA [%d] <-", msgdsize(mp));
 	return mtp_data(q, mtp, mp);
 }
 
@@ -2872,6 +2926,7 @@ mtp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct mtp *mtp;
+
 		/* test for multiple push */
 		for (mtp = mtp_opens; mtp; mtp = mtp->next) {
 			if (mtp->u.dev.cmajor == cmajor && mtp->u.dev.cminor == cminor) {
@@ -2950,6 +3005,7 @@ STATIC struct mtp *
 mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp)
 {
 	struct mtp *mtp;
+
 	if ((mtp = kmem_cache_alloc(mtp_priv_cachep, SLAB_ATOMIC))) {
 		printd(("%s: allocated module private structure\n", MOD_NAME));
 		bzero(mtp, sizeof(*mtp));
@@ -2996,6 +3052,7 @@ mtp_free_priv(queue_t *q)
 {
 	struct mtp *mtp = MTP_PRIV(q);
 	psw_t flags;
+
 	ensure(mtp, return);
 	spin_lock_irqsave(&mtp->lock, flags);
 	{
@@ -3046,6 +3103,7 @@ mtp_put(struct mtp *mtp)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -3070,6 +3128,7 @@ STATIC int
 mtp_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&mtp_fmod)) < 0)
 		return (err);
 	return (0);
@@ -3079,6 +3138,7 @@ STATIC int
 mtp_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&mtp_fmod)) < 0)
 		return (err);
 	return (0);
@@ -3096,6 +3156,7 @@ STATIC int
 mtp_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&mtp_tpiinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	return (0);
@@ -3105,6 +3166,7 @@ STATIC int
 mtp_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&mtp_tpiinfo)) < 0)
 		return (err);
 	return (0);
@@ -3116,6 +3178,7 @@ MODULE_STATIC int __init
 mtp_tpiinit(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = mtp_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
@@ -3135,6 +3198,7 @@ MODULE_STATIC void __exit
 mtp_tpiterminate(void)
 {
 	int err;
+
 	if ((err = mtp_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = mtp_term_caches()))

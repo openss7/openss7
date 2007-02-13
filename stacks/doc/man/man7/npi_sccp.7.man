@@ -1,1 +1,501 @@
-.so man7/ss7_undoc.7.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
+.\"
+.\" @(#) $Id: npi_sccp.7.man,v 0.9.2.4 2007/02/13 07:55:41 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/02/13 07:55:41 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: npi_sccp.7.man,v $
+.\" Revision 0.9.2.4  2007/02/13 07:55:41  brian
+.\" - working up MTP and UAs
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.\"
+.\"
+.TH NPI-SCCP 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Provider Interface (NPI)"
+.\"
+.\"
+.SH NAME
+.B NPI-SCCP
+\- Network Provider Interface \- Corrigendum for SCCP Conformance
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/npi.h>
+.br
+.B #include <sys/npi_ss7.h>
+.br
+.B #include <sys/npi_mtp.h>
+.br
+.B #include <sys/npi_sccp.h>
+.HP
+.BI "int " fd " = open(" device ", " flags );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B NPI-SCCP
+provides a Stream supporting the Network Provider Interface,
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+to the Signalling Connection Control Part,
+.[
+q711
+.]
+.BR sccp (4).
+This
+.IR STREAMS (9)
+interface provides the
+.BR sccp (4)
+protocol service interface using the
+N-primitives of the
+.BR npi (7).
+This interface is intended solely for use by user programs or protocol modules
+requiring a rich
+.BR npi (7)
+interface.
+.\"
+.\"
+.SH "ADDRESS FORMATS"
+.PP
+The
+.B NPI-SCCP
+address is formatted as a socket address for compatibility with the
+.BR sockets (3)
+library for
+.BR tpi (7).
+The address is formatted as follows:
+.PP
+.nf
+\fC\s-1\
+typedef struct sccp_addr {
+    np_ulong ni;                /* network indicator */
+    np_ulong ri;                /* routing indicator */
+    np_ulong pc;                /* point code (-1 not present) */
+    np_ulong ssn;               /* subsystem number (0 not present) */
+    np_ulong gtt;               /* type of global title */
+    np_ulong tt;                /* translation type */
+    np_ulong es;                /* encoding scheme */
+    np_ulong nplan;             /* numbering plan */
+    np_ulong nai;               /* nature of address indicator */
+    np_ulong alen;              /* address length */
+    np_uchar addr[0];           /* address digits */
+    /* followed by address bytes */
+} sccp_addr_t;
+
+#define SCCP_RI_DPC_SSN         0       /* route on DPC/SSN */
+#define SCCP_RI_GT              1       /* route on GT */
+
+#define SCCP_GTTTYPE_NONE       0       /* no GT */
+#define SCCP_GTTTYPE_NAI        1       /* NAI only */
+#define SCCP_GTTTYPE_TT         2       /* TT only */
+#define SCCP_GTTTYPE_NP         3       /* TT, ES, NPLAN */
+#define SCCP_GTTTYPE_NP_NAI     4       /* TT, ES, NPLAN and NAI */
+\s+1\fP
+.fi
+.PP
+The
+.B NPI-SCCP
+address contains the following fields:
+.TP
+.I ni
+Conveys the Network Indicator.  The Network Indicator is an implementation specific indication of
+the numbering space in which the
+.I pc
+is relevant.  Network Indicators are assigned by the system administrator.
+.TP
+.I ri
+Conveys the Routing Indicator.  The Routing Indicator determines which elements of the SCCP address
+will be used for routing and can be one of the following values:
+.RS
+.TP
+.B SCCP_RI_DPC_SSN
+Route on DPC/SSN.
+.TP
+.B SCCP_RI_GT
+Route on Global Title.
+.RE
+.TP
+.I pc
+Conveys the SCCP Signalling Point Code.  The format of the Signalling Point Code is network
+dependent.  Signalling Point Codes are least significant bit aligned in a 32-bit long word.
+.TP
+.I ssn
+Conveys the SCCP Subsystem Number.  The subsystem number is network specific.
+.TP
+.I gtt
+Conveys the Global Title type.  The global title type can also take on one of the following values:
+.RS
+.TP
+.B SCCP_GTTTYPE_NONE
+No global title translation.
+.TP
+.B SCCP_GTTTYPE_NAI
+Translate on Nature of Address Indicator only.
+.TP
+.B SCCP_GTTTYPE_TT
+Translate on Translation Type only.
+.TP
+.B SCCP_GTTTYPE_NP
+Translate on Translation Type, Encoding Scheme and Numbering Plan.
+.TP
+.B SCCP_GTTTYPE_NP_NAI
+Translate on Translation Type, Encoding Scheme, Numbering Plan and Nature of Address Indicator.
+.RE
+.TP
+.I tt
+Conveys the Translation type.  Translation type assignments are network specific.
+.TP
+.I es
+Conveys the Encoding Scheme.  The encoding scheme can also take on one of the following values:
+.RS
+.TP
+.B SCCP_ES_UNKNOWN
+.TP
+.B SCCP_ES_BCD_ODD
+.TP
+.B SCCP_ES_BCD_EVEN
+.TP
+.B SCCP_ES_NATIONAL
+.RE
+.TP
+.I nplan
+Conveys the Numbering Plan.  The numbering plan can also take on one of the following values:
+.RS
+.TP
+.B SCCP_NPLAN_UNKNOWN
+.TP
+.B SCCP_NPLAN_ISDN
+.TP
+.B SCCP_NPLAN_GENERIC
+.TP
+.B SCCP_NPLAN_DATA
+.TP
+.B SCCP_NPLAN_TELEX
+.TP
+.B SCCP_NPLAN_MARITIME
+.TP
+.B SCCP_NPLAN_LAND_MOBILE
+.TP
+.B SCCP_NPLAN_ISDN_MOBILE
+.TP
+.B SCCP_NPLAN_PRIVATE
+.RE
+.TP
+.I nai
+Conveys the Nature of Address Indicator.
+.TP
+.I alen
+Conveys the Address Length (length of the
+.I addr
+array).
+.TP
+.I addr
+Conveys the Address.
+.\"
+.\"
+.SH "LOCAL MANAGEMENT PRIMITIVES"
+.PP
+.\"
+.SS N_INFO_REQ
+.PP
+As described in
+.BR N_INFO_REQ (7).
+.\"
+.SS N_INFO_ACK
+.PP
+As described in
+.BR N_INFO_ACK (7).
+.\"
+.SS N_BIND_REQ
+.PP
+As described in
+.BR N_BIND_REQ (7).
+.\"
+.SS N_BIND_ACK
+.PP
+As described in
+.BR N_BIND_ACK (7).
+.\"
+.SS N_UNBIND_REQ
+.PP
+As described in
+.BR N_UNBIND_REQ (7).
+.\"
+.SS N_OK_ACK
+.PP
+As described in
+.BR N_OK_ACK (7).
+.\"
+.SS N_ERROR_ACK
+.PP
+As described in
+.BR N_ERROR_ACK (7).
+.\"
+.SS N_OPTMGMT_REQ
+.PP
+As described in
+.BR N_OPTMGMT_REQ (7).
+.\"
+.\"
+.SH "PROTOCOL SERVICE PRIMITIVES"
+.PP
+.\"
+.SS N_UNITDATA_REQ
+.PP
+As described in
+.BR N_UNITDATA_REQ (7).
+.\"
+.SS N_UNITDATA_IND
+.PP
+As described in
+.BR U_UNITDATA_IND (7).
+.\"
+.SS N_UDERROR_IND
+.PP
+As described in
+.BR N_UDERROR_IND (7).
+.\"
+.SS N_CONN_REQ
+.PP
+As described in
+.BR N_CONN_REQ (7).
+.\"
+.SS N_CONN_CON
+.PP
+As described in
+.BR N_CONN_CON (7).
+.\"
+.SS N_CONN_IND
+.PP
+As described in
+.BR N_CONN_IND (7).
+.\"
+.SS N_CONN_RES
+.PP
+As described in
+.BR N_CONN_RES (7).
+.\"
+.SS N_DATA_REQ
+.PP
+As described in
+.BR N_DATA_REQ (7).
+.\"
+.SS N_DATA_IND
+.PP
+As described in
+.BR N_DATA_IND (7).
+.\"
+.SS N_EXDATA_REQ
+.PP
+As described in
+.BR N_EXDATA_REQ (7).
+.\"
+.SS N_DISCON_REQ
+.PP
+As described in
+.BR N_DISCON_REQ (7).
+.\"
+.SS N_DISCON_IND
+.PP
+As described in
+.BR N_DISCON_IND (7).
+.\"
+.SS N_DATACK_REQ
+.PP
+As described in
+.BR N_DATACK_REQ (7).
+.\"
+.SS N_DATACK_IND
+.PP
+As described in
+.BR N_DATACK_IND (7).
+.\"
+.SS N_RESET_REQ
+.PP
+As described in
+.BR N_RESET_REQ (7).
+.\"
+.SS N_RESET_RES
+.PP
+As described in
+.BR N_RESET_RES (7).
+.\"
+.SS N_RESET_IND
+.PP
+As described in
+.BR N_RESET_IND (7).
+.\"
+.SS N_RESET_CON
+.PP
+As described in
+.BR N_RESET_CON (7).
+.\"
+.\"
+.SH "EXTENSION SERVICE PRIMITIVES"
+.PP
+.\"
+.SS N_NOTICE_IND
+.PP
+As described in
+.BR N_NOTICE_IND (7).
+.\"
+.SS N_INFORM_REQ
+.PP
+As described in
+.BR N_INFORM_REQ (7).
+.\"
+.SS N_INFORM_IND
+.PP
+As described in
+.BR N_INFORM_IND (7).
+.\"
+.SS N_COORD_REQ
+.PP
+As described in
+.BR N_COORD_REQ (7).
+.\"
+.SS N_COORD_RES
+.PP
+As described in
+.BR N_COORD_RES (7).
+.\"
+.SS N_COORD_IND
+.PP
+As described in
+.BR N_COORD_IND (7).
+.\"
+.SS N_COORD_CON
+.PP
+As described in
+.BR N_COORD_CON (7).
+.\"
+.SS N_STATE_REQ
+.PP
+As described in
+.BR N_STATE_REQ (7).
+.\"
+.SS N_STATE_IND
+.PP
+As described in
+.BR N_STATE_IND (7).
+.\"
+.SS N_PCSTATE_IND
+.PP
+As described in
+.BR N_PCPSTATE_IND (7).
+.\"
+.SS N_TRAFFIC_IND
+.PP
+As described in
+.BR N_TRAFFIC_IND (7).
+.\"
+.\"
+.SH IOCTLS
+.PP
+.\"
+.\"
+.SH "ERROR HANDLING"
+.PP
+.\"
+.\"
+.SH ERRORS
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

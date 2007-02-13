@@ -1,27 +1,26 @@
 /*****************************************************************************
 
- @(#) $Id: npi_sccp.h,v 0.9.2.3 2006/09/18 13:52:37 brian Exp $
+ @(#) $Id: npi_sccp.h,v 0.9.2.4 2007/02/13 07:55:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
-     Copyright (C) 1997-2002 OpenSS7 Corporation.  All Rights Reserved.
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
-                                  PUBLIC LICENSE
+ All Rights Reserved.
 
-     This license is provided without fee, provided that the above copy-
-     right notice and this public license must be retained on all copies,
-     extracts, compilations and derivative works.  Use or distribution of
-     this work in a manner that restricts its use except as provided here
-     will render this license void.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
 
-     The author(s) hereby waive any and all other restrictions in respect
-     of their copyright in this software and its associated documentation.
-     The authors(s) of this software place in the public domain any novel
-     methods or processes which are embodied in this software.
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
 
-     The author(s) undertook to write it for the sake of the advancement
-     of the Arts and Sciences, but it is provided as is, and the author(s)
-     will not take any responsibility in it.
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -41,14 +40,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2007/02/13 07:55:42 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: npi_sccp.h,v $
+ Revision 0.9.2.4  2007/02/13 07:55:42  brian
+ - working up MTP and UAs
 
  *****************************************************************************/
 
 #ifndef _SYS_NPI_SCCP_H
 #define _SYS_NPI_SCCP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_sccp.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -64,42 +74,44 @@
  * Information acknowledgement
  */
 typedef struct {
-	np_ulong PRIM_type;			/* always N_INFO_ACK */
-	np_ulong NSDU_size;			/* maximum NSDU size */
-	np_ulong ENSDU_size;			/* maximum ENSDU size */
-	np_ulong CDATA_size;			/* connect data size */
-	np_ulong DDATA_size;			/* discon data size */
-	np_ulong ADDR_size;			/* address size */
-	np_ulong ADDR_length;			/* address length */
-	np_ulong ADDR_offset;			/* address offset */
-	np_ulong QOS_length;			/* QOS values length */
-	np_ulong QOS_offset;			/* QOS values offset */
-	np_ulong QOS_range_length;		/* length of QOS values' range */
-	np_ulong QOS_range_offset;		/* offset of QOS values' range */
-	np_ulong OPTIONS_flags;			/* bit masking for options supported */
-	np_ulong NIDU_size;			/* network i/f data unit size */
-	long SERV_type;				/* service type */
-	np_ulong CURRENT_state;			/* current state */
-	np_ulong PROVIDER_type;			/* type of NS provider */
-	np_ulong NODU_size;			/* optimal NSDU size */
-	np_ulong PROTOID_length;		/* length of bound protocol ids */
-	np_ulong PROTOID_offset;		/* offset of bound protocol ids */
-	np_ulong NPI_version;			/* version # of npi that is supported */
+	np_ulong PRIM_type;		/* always N_INFO_ACK */
+	np_ulong NSDU_size;		/* maximum NSDU size */
+	np_ulong ENSDU_size;		/* maximum ENSDU size */
+	np_ulong CDATA_size;		/* connect data size */
+	np_ulong DDATA_size;		/* discon data size */
+	np_ulong ADDR_size;		/* address size */
+	np_ulong ADDR_length;		/* address length */
+	np_ulong ADDR_offset;		/* address offset */
+	np_ulong QOS_length;		/* QOS values length */
+	np_ulong QOS_offset;		/* QOS values offset */
+	np_ulong QOS_range_length;	/* length of QOS values' range */
+	np_ulong QOS_range_offset;	/* offset of QOS values' range */
+	np_ulong OPTIONS_flags;		/* bit masking for options supported */
+	np_ulong NIDU_size;		/* network i/f data unit size */
+	long SERV_type;			/* service type */
+	np_ulong CURRENT_state;		/* current state */
+	np_ulong PROVIDER_type;		/* type of NS provider */
+	np_ulong NODU_size;		/* optimal NSDU size */
+	np_ulong PROTOID_length;	/* length of bound protocol ids */
+	np_ulong PROTOID_offset;	/* offset of bound protocol ids */
+	np_ulong NPI_version;		/* version # of npi that is supported */
 } __N_info_ack_t;
+
 #define N_info_ack_t __N_info_ack_t
 
 /*
  * Bind acknowledgement
  */
 typedef struct {
-	np_ulong PRIM_type;			/* always N_BIND_ACK */
-	np_ulong ADDR_length;			/* address length */
-	np_ulong ADDR_offset;			/* offset of address */
-	np_ulong CONIND_number;			/* connection indications */
-	np_ulong TOKEN_value;			/* value of "token" assigned to stream */
-	np_ulong PROTOID_length;		/* length of bound protocol ids */
-	np_ulong PROTOID_offset;		/* offset of bound protocol ids */
+	np_ulong PRIM_type;		/* always N_BIND_ACK */
+	np_ulong ADDR_length;		/* address length */
+	np_ulong ADDR_offset;		/* offset of address */
+	np_ulong CONIND_number;		/* connection indications */
+	np_ulong TOKEN_value;		/* value of "token" assigned to stream */
+	np_ulong PROTOID_length;	/* length of bound protocol ids */
+	np_ulong PROTOID_offset;	/* offset of bound protocol ids */
 } __N_bind_ack_t;
+
 #define N_bind_ack_t __N_bind_ack_t
 
 #endif				/* N_VERSION_2 */
@@ -110,30 +122,30 @@ typedef struct {
 
 #define N_NOTICE_IND	32
 typedef struct {
-	np_ulong PRIM_type;			/* always N_NOTICE_IND */
-	np_ulong DEST_length;			/* address data was sent to */
+	np_ulong PRIM_type;		/* always N_NOTICE_IND */
+	np_ulong DEST_length;		/* address data was sent to */
 	np_ulong DEST_offset;
-	np_ulong SRC_length;			/* address data was sent from */
+	np_ulong SRC_length;		/* address data was sent from */
 	np_ulong SRC_offset;
-	np_ulong QOS_length;			/* QOS parameters data was sent with */
+	np_ulong QOS_length;		/* QOS parameters data was sent with */
 	np_ulong QOS_offset;
-	np_ulong RETURN_cause;			/* reason for return of data */
+	np_ulong RETURN_cause;		/* reason for return of data */
 } N_notice_ind_t;
 
 #define N_INFORM_REQ	33
 typedef struct {
-	np_ulong PRIM_type;			/* always N_INFORM_REQ */
-	np_ulong QOS_length;			/* qos parameters */
+	np_ulong PRIM_type;		/* always N_INFORM_REQ */
+	np_ulong QOS_length;		/* qos parameters */
 	np_ulong QOS_offset;
-	np_ulong REASON;			/* inform reason */
+	np_ulong REASON;		/* inform reason */
 } N_inform_req_t;
 
 #define N_INFORM_IND	34
 typedef struct {
-	np_ulong PRIM_type;			/* always N_INFORM_IND */
-	np_ulong QOS_length;			/* qos parameters */
+	np_ulong PRIM_type;		/* always N_INFORM_IND */
+	np_ulong QOS_length;		/* qos parameters */
 	np_ulong QOS_offset;
-	np_ulong REASON;			/* inform reason */
+	np_ulong REASON;		/* inform reason */
 } N_inform_ind_t;
 
 /* Inform reasons for use with N_INFORM_IND */
@@ -149,65 +161,65 @@ typedef struct {
 
 #define N_COORD_REQ	35
 typedef struct {
-	np_ulong PRIM_type;			/* alwyas N_COORD_REQ */
-	np_ulong ADDR_length;			/* affected subsystem */
+	np_ulong PRIM_type;		/* alwyas N_COORD_REQ */
+	np_ulong ADDR_length;		/* affected subsystem */
 	np_ulong ADDR_offset;
 } N_coord_req_t;
 
 #define N_COORD_RES	36
 typedef struct {
-	np_ulong PRIM_type;			/* always N_COORD_RES */
-	np_ulong ADDR_length;			/* affected subsystem */
+	np_ulong PRIM_type;		/* always N_COORD_RES */
+	np_ulong ADDR_length;		/* affected subsystem */
 	np_ulong ADDR_offset;
 } N_coord_res_t;
 
 #define N_COORD_IND	37
 typedef struct {
-	np_ulong PRIM_type;			/* alwyas N_COORD_IND */
-	np_ulong ADDR_length;			/* affected subsystem */
+	np_ulong PRIM_type;		/* alwyas N_COORD_IND */
+	np_ulong ADDR_length;		/* affected subsystem */
 	np_ulong ADDR_offset;
-	np_ulong SMI;				/* subsystem multiplicity indicator */
+	np_ulong SMI;			/* subsystem multiplicity indicator */
 } N_coord_ind_t;
 
 #define N_COORD_CON	38
 typedef struct {
-	np_ulong PRIM_type;			/* always N_COORD_CON */
-	np_ulong ADDR_length;			/* affected subsystem */
+	np_ulong PRIM_type;		/* always N_COORD_CON */
+	np_ulong ADDR_length;		/* affected subsystem */
 	np_ulong ADDR_offset;
-	np_ulong SMI;				/* subsystem multiplicity indicator */
+	np_ulong SMI;			/* subsystem multiplicity indicator */
 } N_coord_con_t;
 
 #define N_STATE_REQ	39
 typedef struct {
-	np_ulong PRIM_type;			/* always N_STATE_REQ */
-	np_ulong ADDR_length;			/* affected subsystem */
+	np_ulong PRIM_type;		/* always N_STATE_REQ */
+	np_ulong ADDR_length;		/* affected subsystem */
 	np_ulong ADDR_offset;
-	np_ulong STATUS;			/* user status */
+	np_ulong STATUS;		/* user status */
 } N_state_req_t;
 
 #define N_STATE_IND	40
 typedef struct {
-	np_ulong PRIM_type;			/* always N_STATE_IND */
-	np_ulong ADDR_length;			/* affected subsystem */
+	np_ulong PRIM_type;		/* always N_STATE_IND */
+	np_ulong ADDR_length;		/* affected subsystem */
 	np_ulong ADDR_offset;
-	np_ulong STATUS;			/* user status */
-	np_ulong SMI;				/* subsystem multiplicity indicator */
+	np_ulong STATUS;		/* user status */
+	np_ulong SMI;			/* subsystem multiplicity indicator */
 } N_state_ind_t;
 
 #define N_PCSTATE_IND	41
 typedef struct {
-	np_ulong PRIM_type;			/* always N_PCSTATE_IND */
-	np_ulong ADDR_length;			/* affected point code */
+	np_ulong PRIM_type;		/* always N_PCSTATE_IND */
+	np_ulong ADDR_length;		/* affected point code */
 	np_ulong ADDR_offset;
-	np_ulong STATUS;			/* status */
+	np_ulong STATUS;		/* status */
 } N_pcstate_ind_t;
 
 #define N_TRAFFIC_IND	42
 typedef struct {
-	np_ulong PRIM_type;			/* always N_TRAFFIC_IND */
-	np_ulong ADDR_length;			/* affected user */
+	np_ulong PRIM_type;		/* always N_TRAFFIC_IND */
+	np_ulong ADDR_length;		/* affected user */
 	np_ulong ADDR_offset;
-	np_ulong TRAFFIC_mix;			/* traffic mix */
+	np_ulong TRAFFIC_mix;		/* traffic mix */
 } N_traffic_ind_t;
 
 #define N_SCCP_STATUS_USER_IN_SERVICE			1
@@ -216,10 +228,10 @@ typedef struct {
 #define N_SCCP_STATUS_REMOTE_SCCP_UNAVAILABLE		4
 #define N_SCCP_STATUS_REMOTE_SCCP_UNEQUIPPED		5
 #define N_SCCP_STATUS_REMOTE_SCCP_INACCESSIBLE		6
-//#define N_SCCP_STATUS_REMOTE_SCCP_CONGESTED		
+//#define N_SCCP_STATUS_REMOTE_SCCP_CONGESTED           
 #define N_SCCP_STATUS_REMOTE_SCCP_CONGESTED(_x)		(7 + _x)
 #define N_SCCP_STATUS_SIGNALLING_POINT_INACCESSIBLE	16
-//#define N_SCCP_STATUS_SIGNALLING_POINT_CONGESTED	
+//#define N_SCCP_STATUS_SIGNALLING_POINT_CONGESTED      
 #define N_SCCP_STATUS_SIGNALLING_POINT_CONGESTED(_x)	(17 + _x)
 #define N_SCCP_STATUS_SIGNALLING_POINT_ACCESSIBLE	26
 
@@ -254,17 +266,17 @@ typedef struct {
 #endif				/* NSF_UNBND */
 
 typedef struct sccp_addr {
-	ulong ni;				/* network indicator */
-	ulong ri;				/* routing indicator */
-	ulong pc;				/* point code (-1 not present) */
-	ulong ssn;				/* subsystem number (0 not present) */
-	ulong gtt;				/* type of global title */
-	ulong tt;				/* translation type */
-	ulong es;				/* encoding scheme */
-	ulong nplan;				/* numbering plan */
-	ulong nai;				/* nature of address indicator */
-	ulong alen;				/* address length */
-	uint8_t addr[0];			/* address digits */
+	np_ulong ni;			/* network indicator */
+	np_ulong ri;			/* routing indicator */
+	np_ulong pc;			/* point code (-1 not present) */
+	np_ulong ssn;			/* subsystem number (0 not present) */
+	np_ulong gtt;			/* type of global title */
+	np_ulong tt;			/* translation type */
+	np_ulong es;			/* encoding scheme */
+	np_ulong nplan;			/* numbering plan */
+	np_ulong nai;			/* nature of address indicator */
+	np_ulong alen;			/* address length */
+	np_uchar addr[0];		/* address digits */
 	/* followed by address bytes */
 } sccp_addr_t;
 
@@ -281,53 +293,53 @@ typedef struct sccp_addr {
 
 #define N_QOS_SEL_DATA_SCCP	0x0901
 typedef struct {
-	ulong n_qos_type;			/* always N_QOS_SEL_DATA_SCCP */
-	ulong protocol_class;			/* protocol class */
-	ulong option_flags;			/* options flags (return option) */
-	ulong sequence_selection;		/* selected SLS value */
-	ulong message_priority;			/* MTP message priority */
-	ulong importance;			/* importance */
+	np_ulong n_qos_type;		/* always N_QOS_SEL_DATA_SCCP */
+	np_ulong protocol_class;	/* protocol class */
+	np_ulong option_flags;		/* options flags (return option) */
+	np_ulong sequence_selection;	/* selected SLS value */
+	np_ulong message_priority;	/* MTP message priority */
+	np_ulong importance;		/* importance */
 } N_qos_sel_data_sccp_t;
 
 #define N_QOS_SEL_CONN_SCCP	0x0902
 typedef struct {
-	ulong n_qos_type;			/* always N_QOS_SEL_CONN_SCCP */
-	ulong protocol_class;			/* protocol class 2 or 3 */
-	ulong option_flags;			/* options flags (return option) */
-	ulong sequence_selection;		/* selected SLS value */
-	ulong message_priority;			/* MTP message priority */
-	ulong importance;			/* importance */
+	np_ulong n_qos_type;		/* always N_QOS_SEL_CONN_SCCP */
+	np_ulong protocol_class;	/* protocol class 2 or 3 */
+	np_ulong option_flags;		/* options flags (return option) */
+	np_ulong sequence_selection;	/* selected SLS value */
+	np_ulong message_priority;	/* MTP message priority */
+	np_ulong importance;		/* importance */
 } N_qos_sel_conn_sccp_t;
 
 #define N_QOS_SEL_INFO_SCCP	0x0903
 typedef struct {
-	ulong n_qos_type;			/* always N_QOS_SEL_INFO_SCCP */
-	ulong protocol_class;			/* protocol class */
-	ulong option_flags;			/* options flags (return option) */
-	ulong sequence_selection;		/* selected SLS value */
-	ulong message_priority;			/* MTP message priority */
-	ulong importance;			/* importance */
+	np_ulong n_qos_type;		/* always N_QOS_SEL_INFO_SCCP */
+	np_ulong protocol_class;	/* protocol class */
+	np_ulong option_flags;		/* options flags (return option) */
+	np_ulong sequence_selection;	/* selected SLS value */
+	np_ulong message_priority;	/* MTP message priority */
+	np_ulong importance;		/* importance */
 } N_qos_sel_info_sccp_t;
 
 #define N_QOS_RANGE_INFO_SCCP	0x0904
 typedef struct {
-	ulong n_qos_type;			/* always N_QOS_RANGE_INFO_SCCP */
-	ulong protocol_classes;			/* protocol class */
-	ulong sequence_selection;		/* SLS range */
+	np_ulong n_qos_type;		/* always N_QOS_RANGE_INFO_SCCP */
+	np_ulong protocol_classes;	/* protocol class */
+	np_ulong sequence_selection;	/* SLS range */
 } N_qos_range_info_sccp_t;
 
 #define N_QOS_SEL_INFR_SCCP	0x0905
 typedef struct {
-	ulong n_qos_type;			/* always N_QOS_SEL_INFR_SCCP */
-	ulong protocol_class;			/* protocol class */
-	ulong option_flags;			/* options flags (return option) */
-	ulong sequence_selection;		/* selected SLS value */
-	ulong message_priority;			/* MTP message priority */
-	ulong importance;			/* importance */
+	np_ulong n_qos_type;		/* always N_QOS_SEL_INFR_SCCP */
+	np_ulong protocol_class;	/* protocol class */
+	np_ulong option_flags;		/* options flags (return option) */
+	np_ulong sequence_selection;	/* selected SLS value */
+	np_ulong message_priority;	/* MTP message priority */
+	np_ulong importance;		/* importance */
 } N_qos_sel_infr_sccp_t;
 
 typedef union {
-	ulong n_qos_type;
+	np_ulong n_qos_type;
 	N_qos_sel_data_sccp_t sel_data;
 	N_qos_sel_conn_sccp_t sel_conn;
 	N_qos_sel_info_sccp_t sel_info;

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2007/01/21 20:22:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2007/02/13 07:55:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/01/21 20:22:35 $ by $Author: brian $
+# Last Modified $Date: 2007/02/13 07:55:40 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.84  2007/02/13 07:55:40  brian
+# - working up MTP and UAs
+#
 # Revision 0.9.2.83  2007/01/21 20:22:35  brian
 # - working up drivers
 #
@@ -358,6 +361,8 @@ noinst_LIBRARIES		= libSS7mods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libSS7mods_a_SOURCES	= \
+				  src/modules/mtp/mtp_npi.c \
+				  src/modules/mtp/mtp_tpi.c \
 				  src/modules/sdl/sdl.c \
 				  src/modules/sdl/sdlm.c \
 				  src/modules/sdl/spm.c \

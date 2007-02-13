@@ -1,5 +1,10 @@
 2007-02-13  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man7/npi_sccp.7.man: updated man page
+	* src/include/sys/npi_sccp.h: corrected header file
+	* src/modules/mtp/mtp_npi.c: module for MTP-NPI conversion
+	* src/modules/mtp/mtp_tpi.c: module for MTP-TPI conversion
+
 	* doc/man/man7/N_BIND_ACK.7.man: correct ulong to np_ulong
 	* doc/man/man7/N_BIND_REQ.7.man: correct ulong to np_ulong
 	* doc/man/man7/N_CONN_CON.7.man: correct ulong to np_ulong

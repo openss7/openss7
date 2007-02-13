@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:09 $
+ @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/13 07:55:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/10 22:33:09 $ by $Author: brian $
+ Last Modified $Date: 2007/02/13 07:55:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua_as.c,v $
+ Revision 0.9.2.2  2007/02/13 07:55:38  brian
+ - working up MTP and UAs
+
  Revision 0.9.2.1  2007/02/10 22:33:09  brian
  - added new working files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:09 $"
+#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/13 07:55:38 $"
 
 static char const ident[] =
-    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:09 $";
+    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/13 07:55:38 $";
 
 /*
  *  This is an UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -149,17 +152,17 @@ static char const ident[] =
 
 #include "ua_msg.h"		/* UA message definitions */
 
-#define UALOGST	    1		/* loc UA state transitions */
-#define UALOGTO	    2		/* loc UA timeouts */
-#define UALOGRX	    3		/* loc UA primitives received */
-#define UALOGTX	    4		/* loc UA primitives issued */
-#define UALOGTE	    5		/* loc UA timer events */
-#define UALOGDA	    6		/* loc UA data */
+#define UALOGST	    1		/* log UA state transitions */
+#define UALOGTO	    2		/* log UA timeouts */
+#define UALOGRX	    3		/* log UA primitives received */
+#define UALOGTX	    4		/* log UA primitives issued */
+#define UALOGTE	    5		/* log UA timer events */
+#define UALOGDA	    6		/* log UA data */
 
 /* ============================== */
 
 #define UA_AS_DESCRIP	"UA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:09 $"
+#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2007/02/13 07:55:38 $"
 #define UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define UA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -5081,12 +5084,778 @@ mtp_restart_complete_ind(struct up *up, queue_t *q, mblk_t *msg)
  *  SCCP-Provider to SCCP-User primitives.
  *  =========================================================================
  */
+/**
+ * n_conn_ind - issue a N_CONN_IND primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static int
-n_error_ack(struct up *up, queue_t *q, mblk_t *msg, np_ulong prim, np_ulong state)
+n_conn_ind(struct up *up, queue_t *q, mblk_t *msg, np_ulong seq, np_ulong flags, caddr_t dptr,
+	   size_t dlen, caddr_t sptr, size_t slen, caddr_t qptr, size_t qlen, mblk_t *dp)
 {
-	/* FIXME */
-	freemsg(msg);
-	return (0);
+	N_conn_ind_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p) + dlen + slen + qlen;
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(canputnext(up->rq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_CONN_IND;
+			p->DEST_length = dlen;
+			p->DEST_offset = sizeof(*p);
+			p->SRC_length = slen;
+			p->SRC_offset = sizeof(*p) + dlen;
+			p->SEQ_number = seq;
+			p->CONN_flags = flags;
+			p->QOS_length = qlen;
+			p->QOS_offset = sizeof(*p) + dlen + slen;
+			mp->b_wptr += sizeof(*p);
+			bcopy(dptr, mp->b_wptr, dlen);
+			mp->b_wptr += dlen;
+			bcopy(sptr, mp->b_wptr, slen);
+			mp->b_wptr += slen;
+			bcopy(qptr, mp->b_wptr, qlen);
+			mp->b_wptr += qlen;
+			mp->b_cont = dp;
+			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_CONN_IND");
+			freemsg(msg);
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_conn_con - issue a N_CONN_CON primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_conn_con(struct up *up, queue_t *q, mblk_t *msg, np_ulong flags, caddr_t rptr, size_t rlen,
+	   caddr_t qptr, size_t qlen, mblk_t *dp)
+{
+	N_conn_con_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p) + rlen + qlen;
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(canputnext(up->rq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_CONN_CON;
+			p->RES_length = rlen;
+			p->RES_offset = sizeof(*p);
+			p->CONN_flags = flags;
+			p->QOS_length = qlen;
+			p->QOS_offset = sizeof(*p) + rlen;
+			mp->b_wptr += sizeof(*p);
+			bcopy(rptr, mp->b_wptr, rlen);
+			mp->b_wptr += rlen;
+			bcopy(qptr, mp->b_wptr, qlen);
+			mp->b_wptr += qlen;
+			mp->b_cont = dp;
+			freemsg(msg);
+			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_CONN_CON");
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_discon_ind - issue a N_DISCON_IND primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_discon_ind(struct up *up, queue_t *q, mblk_t *msg, np_ulong seq, np_ulong orig, np_ulong reason,
+	     caddr_t rptr, size_t rlen, mblk_t *dp)
+{
+	N_discon_ind_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p) + rlen;
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(canputnext(up->rq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_DISCON_IND;
+			p->DISCON_orig = orig;
+			p->DISCON_reason = reason;
+			p->RES_length = rlen;
+			p->RES_offset = sizeof(*p);
+			p->SEQ_number = seq;
+			mp->b_wptr += sizeof(*p);
+			bcopy(rptr, mp->b_wptr, rlen);
+			mp->b_wptr += rlen;
+			mp->b_cont = dp;
+			freemsg(msg);
+			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_DISCON_IND");
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_data_ind - issue a N_DATA_IND primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_data_ind(struct up *up, queue_t *q, mblk_t *msg, np_ulong flags, mblk_t *dp)
+{
+	N_data_ind_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p);
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(bcanputnext(up->rq, dp->b_band))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_DATA_IND;
+			p->DATA_xfer_flags = flags;
+			mp->b_wptr += sizeof(*p);
+			mp->b_cont = dp;
+			freemsg(msg);
+			strlog(up->mid, up->sid, UALOGDA, SL_TRACE, "<- N_DATA_IND");
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_exdata_ind - issue a N_EXDATA_IND primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_exdata_ind(struct up *up, queue_t *q, mblk_t *msg)
+{
+	N_exdata_ind_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p);
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(bcanputnext(up->rq, dp->b_band))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_EXDATA_IND;
+			mp->b_wptr += sizeof(*p);
+			mp->b_cont = dp;
+			freemsg(msg);
+			strlog(up->mid, up->sid, UALOGDA, SL_TRACE, "<- N_EXDATA_IND");
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_info_ack - issue a N_INFO_ACK primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_info_ack(struct up *up, queue_t *q, mblk_t *msg)
+{
+	N_info_ack_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p);
+
+	if (mlen < up->up.info.ADDR_offset + up->up.info.ADDR_length)
+		mlen = up->up.info.ADDR_offset + up->up.info.ADDR_length;
+	if (mlen < up->up.info.QOS_offset + up->up.info.QOS_length)
+		mlen = up->up.info.QOS_offset + up->up.info.QOS_length;
+	if (mlen < up->up.info.QOS_range_offset + up->up.info.QOS_range_length)
+		mlen = up->up.info.QOS_range_offset + up->up.info.QOS_range_length;
+	if (mlen < up->up.info.PROTOID_offset + up->up.info.PROTOID_length)
+		mlen = up->up.info.PROTOID_offset + up->up.info.PROTOID_length;
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->PRIM_type = N_INFO_ACK;
+		p->NSDU_size = up->up.info.NSDU_size;
+		p->ENSDU_size = up->up.info.ENSDU_size;
+		p->CDATA_size = up->up.info.CDATA_size;
+		p->DDATA_size = up->up.info.DDATA_size;
+		p->ADDR_size = up->up.info.ADDR_size;
+		p->ADDR_length = up->up.info.ADDR_length;
+		p->ADDR_offset = up->up.info.QOS_offset;
+		p->QOS_length = up->up.info.QOS_length;
+		p->QOS_offset = up->up.info.NSDU_size;
+		p->QOS_range_length = up->up.info.QOS_range_length;
+		p->QOS_range_offset = up->up.info.QOS_range_offset;
+		p->OPTIONS_flags = up->up.info.OPTIONS_flags;
+		p->NIDU_size = up->up.info.NIDU_size;
+		p->SERV_type = up->up.info.SERV_type;
+		p->CURRENT_state = up->up.info.CURRENT_state;
+		p->PROVIDER_type = up->up.info.PROVIDER_type;
+		p->NODU_size = up->up.info.NODU_size;
+		p->PROTOID_length = up->up.info.PROTOID_length;
+		p->PROTOID_offset = up->up.info.PROTOID_offset;
+		p->NPI_version = up->up.info.NPI_version;
+		mp->b_wptr += sizeof(*p);
+		bcopy((caddr_t) &up->up.info + up->up.info.ADDR_offset, mp->b_wptr,
+		      up->up.info.ADDR_length);
+		mp->b_wptr += up->up.info.ADDR_length;
+		bcopy((caddr_t) &up->up.info + up->up.info.QOS_offset, mp->b_wptr,
+		      up->up.info.QOS_length);
+		mp->b_wptr += up->up.info.QOS_length;
+		bcopy((caddr_t) &up->up.info + up->up.info.QOS_range_offset, mp->b_wptr,
+		      up->up.info.QOS_range_length);
+		mp->b_wptr += up->up.info.QOS_range_length;
+		bcopy((caddr_t) &up->up.info + up->up.info.PROTOID_offset, mp->b_wptr,
+		      up->up.info.PROTOID_length);
+		mp->b_wptr += up->up.info.PROTOID_length;
+		freemsg(msg);
+		strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_INFO_ACK");
+		putnext(up->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_bind_ack - issue a N_BIND_ACK primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_bind_ack(struct up *up, queue_t *q, mblk_t *msg, np_ulong coninds, np_ulong token, caddr_t aptr,
+	   size_t alen, caddr_t pptr, size_t plen)
+{
+	N_bind_ack_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p) + alen + plen;
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->PRIM_type = N_BIND_ACK;
+		p->ADDR_length = alen;
+		p->ADDR_offset = sizeof(*p);
+		p->CONIND_number = coninds;
+		p->TOKEN_value = token;
+		p->PROTOID_length = plen;
+		p->PROTOID_offset = sizeof(*p) + alen;
+		mp->b_wptr += sizeof(*p);
+		bcopy(aptr, mp->b_wptr, alen);
+		mp->b_wptr += alen;
+		bcopy(pptr, mp->b_wptr, plen);
+		mp->b_wptr += plen;
+		strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_BIND_ACK");
+		freemsg(msg);
+		putnext(up->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_error_ack - issue a N_ERROR_ACK primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @prim: primtivie in error
+ * @state: resulting state
+ */
+static int
+n_error_ack(struct up *up, queue_t *q, mblk_t *msg, np_ulong prim, np_long error)
+{
+	N_error_ack_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p);
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->PRIM_type = N_ERROR_ACK;
+		p->ERROR_prim = prim;
+		p->NPI_error = error < 0 ? NSYSERR : error;
+		p->UNIX_error = error < 0 ? -error : 0;
+		mp->b_wptr += sizeof(*p);
+		strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_ERROR_ACK");
+		freemsg(msg);
+		putnext(up->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_ok_ack - issue a N_OK_ACK primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_ok_ack(struct up *up, queue_t *q, mblk_t *msg, np_long prim)
+{
+	N_ok_ack_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p);
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->PRIM_type = N_OK_ACK;
+		p->CORRECT_prim = prim;
+		mp->b_wptr += sizeof(*p);
+		strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_OK_ACK");
+		freemsg(msg);
+		putnext(up->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_unitdata_ind - issue a N_UNITDATA_IND primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_unitdata_ind(struct up *up, queue_t *q, mblk_t *msg, np_long error, caddr_t dptr, size_t dlen,
+	       caddr_t sptr, size_t slen, mblk_t *dp)
+{
+	N_unitdata_ind_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p);
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(bcanputnext(up->rq, dp->b_band))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_UNITDATA_IND;
+			p->DEST_length = dlen;
+			p->DEST_offset = sizeof(*p);
+			p->SRC_length = slen;
+			p->SRC_offset = sizeof(*p) + dlen;
+			p->ERROR_type = error;
+			mp->b_wptr += sizeof(*p);
+			bcopy(dptr, mp->b_wptr, dlen);
+			mp->b_wptr += dlen;
+			bcopy(sptr, mp->b_wptr, slen);
+			mp->b_wptr += slen;
+			mp->b_cont = dp;
+			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_UNITDATA_IND");
+			freemsg(msg);
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_uderror_ind - issue a N_UDERROR_IND primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_uderror_ind(struct up *up, queue_t *q, mblk_t *msg, caddr_t dptr, size_t dlen, mblk_t *dp)
+{
+	N_uderror_ind_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p);
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(bcanputnext(up->rq, dp->b_band))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_UDERROR_IND;
+			p->DEST_length = dlen;
+			p->DEST_offset = sizeof(*p);
+			p->RESERVED_field = 0;
+			mp->b_wptr += sizeof(*p);
+			bcopy(dptr, mp->b_wptr, dlen);
+			mp->b_wptr += dlen;
+			mp->b_cont = dp;
+			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_UDERROR_IND");
+			freemsg(msg);
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_datack_ind - issue a N_DATACK_IND primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_datack_ind(struct up *up, queue_t *q, mblk_t *msg)
+{
+	N_datack_ind_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p);
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(canputnext(up->rq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_DATACK_IND;
+			mp->b_wptr += sizeof(*p);
+			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_DATACK_IND");
+			freemsg(msg);
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_reset_ind - issue a N_RESET_IND primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_reset_ind(struct up *up, queue_t *q, mblk_t *msg, np_ulong orig, np_ulong reason)
+{
+	N_reset_ind_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p);
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(canputnext(up->rq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_RESET_IND;
+			p->RESET_orig = orig;
+			p->RESET_reason = reason;
+			mp->b_wptr += sizeof(*p);
+			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_RESET_IND");
+			freemsg(msg);
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_reset_con - issue a N_RESET_CON primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_reset_con(struct up *up, queue_t *q, mblk_t *msg)
+{
+	N_reset_con_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p);
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(canputnext(up->rq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_RESET_CON;
+			mp->b_wptr += sizeof(*p);
+			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_RESET_CON");
+			freemsg(msg);
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_notice_ind - issue a N_NOTICE_IND primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_notice_ind(struct up *up, queue_t *q, mblk_t *msg)
+{
+	N_notice_ind_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p) + dlen + slen + qlen;
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(canputnext(up->rq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_NOTICE_IND;
+			p->DEST_length = dlen;
+			p->DEST_offset = sizeof(*p);
+			p->SRC_length = slen;
+			p->SRC_offset = sizeof(*p) + dlen;
+			p->QOS_length = qlen;
+			p->QOS_offset = sizeof(*p) + dlen + slen;
+			p->RETURN_cause = cause;;
+			mp->b_wptr += sizeof(*p);
+			bcopy(dptr, mp->b_wptr, dlen);
+			mp->b_wptr += dlen;
+			bcopy(sptr, mp->b_wptr, slen);
+			mp->b_wptr += slen;
+			bcopy(wptr, mp->b_wptr, qlen);
+			mp->b_wptr += qlen;
+			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_NOTICE_IND");
+			freemsg(msg);
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_inform_ind - issue a N_INFORM_IND primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_inform_ind(struct up *up, queue_t *q, mblk_t *msg)
+{
+	N_inform_ind_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p) + qlen;
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(canputnext(up->rq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_INFORM_IND;
+			p->QOS_length = qlen;
+			p->QOS_offset = sizeof(*p);
+			p->REASON = reason;
+			mp->b_wptr += sizeof(*p);
+			bcopy(qptr, mp->b_wptr, qlen);
+			mp->b_wptr += qlen;
+			freemsg(msg);
+			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_INFORM_IND");
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_coord_ind - issue a N_COORD_IND primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_coord_ind(struct up *up, queue_t *q, mblk_t *msg)
+{
+	N_coord_ind_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p) + alen;
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(canputnext(up->rq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_COORD_IND;
+			p->ADDR_length = alen;
+			p->ADDR_offset = sizeof(*p);
+			p->SMI = smi;
+			mp->b_wptr += sizeof(*p);
+			bcopy(aptr, mp->b_wptr, alen);
+			mp->b_wptr += alen;
+			freemsg(msg);
+			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_COORD_IND");
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_coord_con - issue a N_COORD_CON primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_coord_con(struct up *up, queue_t *q, mblk_t *msg)
+{
+	N_coord_con_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p) + alen;
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(canputnext(up->rq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_COORD_CON;
+			p->ADDR_length = alen;
+			p->ADDR_offset = sizeof(*p);
+			p->SMI = smi;
+			mp->b_wptr += sizeof(*p);
+			bcopy(aptr, mp->b_wptr, alen);
+			mp->b_wptr += alen;
+			freemsg(msg);
+			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_COORD_CON");
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_state_ind - issue a N_STATE_IND primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_state_ind(struct up *up, queue_t *q, mblk_t *msg)
+{
+	N_state_ind_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p) + alen;
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(canputnext(up->rq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_STATE_IND;
+			p->ADDR_length = alen;
+			p->ADDR_offset = sizeof(*p);
+			p->STATUS = status;
+			p->SMI = smi;
+			mp->b_wptr += sizeof(*p);
+			bcopy(aptr, mp->b_wptr, alen);
+			mp->b_wptr += alen;
+			freemsg(msg);
+			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_STATE_IND");
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_pcstate_ind - issue a N_PCSTATE_IND primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_pcstate_ind(struct up *up, queue_t *q, mblk_t *msg)
+{
+	N_pcstate_ind_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p) + alen;
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(canputnext(up->rq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_PCSTATE_IND;
+			p->ADDR_length = alen;
+			p->ADDR_offset = sizeof(*p);
+			p->STATUS = status;
+			mp->b_wptr += sizeof(*p);
+			bcopy(aptr, mp->b_wptr, alen);
+			mp->b_wptr += alen;
+			freemsg(msg);
+			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_PCSTATE_IND");
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
+}
+
+/**
+ * n_traffic_ind - issue a N_TRAFFIC_IND primitive to user
+ * @up: UP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
+static int
+n_traffic_ind(struct up *up, queue_t *q, mblk_t *msg)
+{
+	N_traffic_ind_t *p;
+	mblk_t *mp;
+	size_t mlen = sizeof(*p) + alen;
+
+	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+		if (likely(canputnext(up->rq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_TRAFFIC_IND;
+			p->ADDR_length = alen;
+			p->ADDR_offset = sizeof(*p);
+			p->TRAFFIC_mix = mix;
+			mp->b_wptr += sizeof(*p);
+			bcopy(aptr, mp->b_wptr, alen);
+			mp->b_wptr += alen;
+			freemsg(msg);
+			strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- N_TRAFFIC_IND");
+			putnext(up->rq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
+	}
+	return (-ENOBUFS);
 }
 #endif
 
