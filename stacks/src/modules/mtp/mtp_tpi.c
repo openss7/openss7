@@ -1216,7 +1216,7 @@ t_capability_ack(queue_t *q, struct mtp *mtp, mtp_ulong caps)
 	mp->b_wptr += sizeof(*p);
 	p->PRIM_type = T_CAPABILITY_ACK;
 	p->CAP_bits1 = TC1_INFO;
-	p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (mtp_ulong) mtp->oq : 0;
+	p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (mtp_ulong) (ulong) mtp->oq : 0;
 	if (caps & TC1_INFO)
 		p->INFO_ack = mtp->prot;
 	else
@@ -1727,7 +1727,7 @@ t_data_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 		goto baddata;
 	return mtp_transfer_req(q, mtp, &mtp->dst, mtp->options.mp, mtp->options.sls, mp->b_cont);
       baddata:
-	STRLOG(mtp, 0, SL_TRACE, "bad data size %d", dlen);
+	STRLOG(mtp, 0, SL_TRACE, "bad data size %lu", dlen);
 	goto error;
       outstate:
 	STRLOG(mtp, 0, SL_TRACE, "would place i/f out of state");
@@ -1901,7 +1901,7 @@ t_unitdata_req(queue_t *q, struct mtp *mtp, mblk_t *mp)
 	STRLOG(mtp, 0, SL_TRACE, "would place i/f out of state");
 	goto error;
       baddata:
-	STRLOG(mtp, 0, SL_TRACE, "bad data size %d", dlen);
+	STRLOG(mtp, 0, SL_TRACE, "bad data size %lu", dlen);
 	goto error;
       notsupport:
 	STRLOG(mtp, 0, SL_TRACE, "primitive not supported for T_COTS or T_COTS_ORD");
@@ -2674,7 +2674,7 @@ mtp_w_proto(queue_t *q, mblk_t *mp)
 	/* 
 	   Fast Path */
 	if ((prim = *((mtp_ulong *) mp->b_rptr)) == T_DATA_REQ) {
-		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_DATA_REQ [%d]", msgdsize(mp->b_cont));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> T_DATA_REQ [%lu]", msgdsize(mp->b_cont));
 		if ((rtn = t_data_req(q, mtp, mp)))
 			mtp_set_state(mtp, oldstate);
 		return (rtn);
@@ -2765,7 +2765,7 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 	/* 
 	   Fast Path */
 	if ((prim = *((mtp_ulong *) mp->b_rptr)) == MTP_TRANSFER_IND) {
-		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_TRANSFER_IND [%d] <-", msgdsize(mp->b_cont));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_TRANSFER_IND [%lu] <-", msgdsize(mp->b_cont));
 		if ((rtn = mtp_transfer_ind(q, mtp, mp)) < 0)
 			mtp_set_state(mtp, oldstate);
 		return (rtn);
@@ -2843,7 +2843,7 @@ mtp_w_data(queue_t *q, mblk_t *mp)
 
 	/* 
 	   data from above */
-	STRLOG(mtp, STRLOGDA, SL_TRACE, "-> M_DATA [%d]", msgdsize(mp));
+	STRLOG(mtp, STRLOGDA, SL_TRACE, "-> M_DATA [%lu]", msgdsize(mp));
 	return t_data(q, mtp, mp);
 }
 static int
@@ -2853,7 +2853,7 @@ mtp_r_data(queue_t *q, mblk_t *mp)
 
 	/* 
 	   data from below */
-	STRLOG(mtp, STRLOGDA, SL_TRACE, "M_DATA [%d] <-", msgdsize(mp));
+	STRLOG(mtp, STRLOGDA, SL_TRACE, "M_DATA [%lu] <-", msgdsize(mp));
 	return mtp_data(q, mtp, mp);
 }
 

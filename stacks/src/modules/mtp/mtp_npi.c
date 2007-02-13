@@ -2369,7 +2369,7 @@ mtp_w_proto(queue_t *q, mblk_t *mp)
 	/* 
 	   Fast Path */
 	if ((prim = *((ulong *) mp->b_rptr)) == N_DATA_REQ) {
-		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> N_DATA_REQ [%d]", msgdsize(mp->b_cont));
+		STRLOG(mtp, STRLOGTX, SL_TRACE, "-> N_DATA_REQ [%lu]", msgdsize(mp->b_cont));
 		if ((rtn = n_data_req(q, mtp, mp)))
 			mtp_set_state(mtp, oldstate);
 		return (rtn);
@@ -2452,7 +2452,7 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 	/* 
 	   Fast Path */
 	if ((prim = *((ulong *) mp->b_rptr)) == MTP_TRANSFER_IND) {
-		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_TRANSFER_IND [%d] <-", msgdsize(mp->b_cont));
+		STRLOG(mtp, STRLOGRX, SL_TRACE, "MTP_TRANSFER_IND [%lu] <-", msgdsize(mp->b_cont));
 		if ((rtn = mtp_transfer_ind(q, mtp, mp)) < 0)
 			mtp_set_state(mtp, oldstate);
 		return (rtn);
@@ -2530,7 +2530,7 @@ mtp_w_data(queue_t *q, mblk_t *mp)
 
 	/* 
 	   data from above */
-	STRLOG(mtp, STRLOGDA, SL_TRACE, "-> M_DATA [%d]", msgdsize(mp));
+	STRLOG(mtp, STRLOGDA, SL_TRACE, "-> M_DATA [%lu]", msgdsize(mp));
 	return n_data(q, mtp, mp);
 }
 static int
@@ -2540,7 +2540,7 @@ mtp_r_data(queue_t *q, mblk_t *mp)
 
 	/* 
 	   data from below */
-	STRLOG(mtp, STRLOGDA, SL_TRACE, "M_DATA [%d] <-", msgdsize(mp));
+	STRLOG(mtp, STRLOGDA, SL_TRACE, "M_DATA [%lu] <-", msgdsize(mp));
 	return mtp_data(q, mtp, mp);
 }
 

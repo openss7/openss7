@@ -1,5 +1,8 @@
 2007-02-13  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/modules/mtp/mtp_npi.c: corrections for 64-bit
+	* src/modules/mtp/mtp_tpi.c: corrections for 64-bit
+
 	* src/include/tihdr.h: 32-bit compat corrections
 	* src/include/tiuser.h: 32-bit compat corrections
 	* src/include/ss7/cdi.h: 32-bit compat corrections
