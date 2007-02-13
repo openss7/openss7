@@ -77,12 +77,21 @@ nobase_pkginclude_HEADERS = \
 	sys/gr303ua_ioctl.h \
 	sys/iua_ioctl.h \
 	sys/m2pa_ioctl.h \
+	sys/m2ua_as.h \
+	sys/m2ua_as_ioctl.h \
 	sys/m2ua_ioctl.h \
+	sys/m2ua_lm.h \
 	sys/m3ua.h \
+	sys/m3ua_as.h \
+	sys/m3ua_as_ioctl.h \
 	sys/m3ua_ioctl.h \
+	sys/sigtran \
+	sys/ua_as_ioctl.h \
+	sys/ua_as_lm.h \
 	sys/ua_ioctl.h \
 	sys/ua_lm.h \
 	sys/ua_lm_ioctl.h \
+	sys/ua_sg_ioctl.h \
 	sys/v5ua_ioctl.h
 
 nobase_nodist_pkginclude_HEADERS = \
