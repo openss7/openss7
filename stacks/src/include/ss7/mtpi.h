@@ -59,32 +59,32 @@
 #define MTP_VERSION_1	    0x10
 #define MTP_CURRENT_VERSION MTP_VERSION_1
 
-typedef long mtp_long;
-typedef unsigned long mtp_ulong;
-typedef unsigned short mtp_ushort;
-typedef unsigned char mtp_uchar;
+typedef int32_t mtp_long;
+typedef uint32_t mtp_ulong;
+typedef uint16_t mtp_ushort;
+typedef uint8_t mtp_uchar;
 
-#define MTP_BIND_REQ			1	/* Bind to an MTP-SAP */
-#define MTP_UNBIND_REQ			2	/* Unbind from an MTP-SAP */
-#define MTP_CONN_REQ			3	/* Connect to a remote MTP-SAP */
-#define MTP_DISCON_REQ			4	/* Disconnect from a remote MTP-SAP */
-#define MTP_ADDR_REQ			5	/* Address service */
-#define MTP_INFO_REQ			6	/* Information service */
-#define MTP_OPTMGMT_REQ			7	/* Options management service */
-#define MTP_TRANSFER_REQ		8	/* MTP data transfer request */
+#define MTP_BIND_REQ			 1+120	/* Bind to an MTP-SAP */
+#define MTP_UNBIND_REQ			 2+120	/* Unbind from an MTP-SAP */
+#define MTP_CONN_REQ			 3+120	/* Connect to a remote MTP-SAP */
+#define MTP_DISCON_REQ			 4+120	/* Disconnect from a remote MTP-SAP */
+#define MTP_ADDR_REQ			 5+120	/* Address service */
+#define MTP_INFO_REQ			 6+120	/* Information service */
+#define MTP_OPTMGMT_REQ			 7+120	/* Options management service */
+#define MTP_TRANSFER_REQ		 8+120	/* MTP data transfer request */
 
-#define MTP_OK_ACK			9	/* Positive acknowledgement */
-#define MTP_ERROR_ACK			10	/* Negative acknowledgement */
-#define MTP_BIND_ACK			11	/* Bind acknowledgement */
-#define MTP_ADDR_ACK			12	/* Address acknowledgement */
-#define MTP_INFO_ACK			13	/* Information acknowledgement */
-#define MTP_OPTMGMT_ACK			14	/* Options management acknowledgement */
-#define MTP_TRANSFER_IND		15	/* MTP data transfer indication */
-#define MTP_PAUSE_IND			16	/* MTP pause (stop) indication */
-#define MTP_RESUME_IND			17	/* MTP resume (start) indication */
-#define MTP_STATUS_IND			18	/* MTP status indication */
-#define MTP_RESTART_BEGINS_IND		19	/* MTP restart begins (impl. dep.) */
-#define MTP_RESTART_COMPLETE_IND	20	/* MTP restart complete (impl. dep.) */
+#define MTP_OK_ACK			 9+120	/* Positive acknowledgement */
+#define MTP_ERROR_ACK			10+120	/* Negative acknowledgement */
+#define MTP_BIND_ACK			11+120	/* Bind acknowledgement */
+#define MTP_ADDR_ACK			12+120	/* Address acknowledgement */
+#define MTP_INFO_ACK			13+120	/* Information acknowledgement */
+#define MTP_OPTMGMT_ACK			14+120	/* Options management acknowledgement */
+#define MTP_TRANSFER_IND		15+120	/* MTP data transfer indication */
+#define MTP_PAUSE_IND			16+120	/* MTP pause (stop) indication */
+#define MTP_RESUME_IND			17+120	/* MTP resume (start) indication */
+#define MTP_STATUS_IND			18+120	/* MTP status indication */
+#define MTP_RESTART_BEGINS_IND		19+120	/* MTP restart begins (impl. dep.) */
+#define MTP_RESTART_COMPLETE_IND	20+120	/* MTP restart complete (impl. dep.) */
 
 /*
  *  Interface States

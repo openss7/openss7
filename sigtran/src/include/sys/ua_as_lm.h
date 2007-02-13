@@ -129,11 +129,6 @@
 #define ASPEXT_ASPCONG	(1<< 9)    /* ASPCONG extension */
 #define ASPEXT_TEXTIID	(1<<10)    /* TEXTIID option */
 
-/* UA origins */
-#define UA_ORIGIN_UNSPEC	0   /* origin is unspecified or unknown */
-#define UA_ORIGIN_USER		1   /* origin is the user */
-#define UA_ORIGIN_PROVIDER	2   /* origin is the provider */
-
 /* UA reason codes */
 #define UA_REASON_UNSPECIFIED			0   /* reason is unspecified or unknown */
 #define UA_REASON_INVALID_VERSION		1
@@ -411,13 +406,15 @@ struct UA_aspdn_ind {
 	uint REASON;			/* reason */
 };
 
-#define UA_ORIGIN_USER	    0
-#define UA_ORIGIN_PROVIDER  1
+/* UA origins */
+#define UA_ORIGIN_UNSPEC	0   /* origin is unspecified or unknown */
+#define UA_ORIGIN_USER		1   /* origin is the user */
+#define UA_ORIGIN_PROVIDER	2   /* origin is the provider */
 
-#define UA_ASPDN_REASON_UNKNOWN	    0	/* Unknown, unspecified */
-#define UA_ASPDN_REASON_ASPDN_ACK   1	/* Unsolicited ASP Down Ack */
-#define UA_ASPDN_REASON_DISCONNECT  2	/* SCTP disconnect */
-#define UA_ASPDN_REASON_RESTART	    3	/* SCTP restart */
+#define UA_ASPDN_REASON_UNKNOWN		0	/* Unknown, unspecified */
+#define UA_ASPDN_REASON_ASPDN_ACK	1	/* Unsolicited ASP Down Ack */
+#define UA_ASPDN_REASON_DISCONNECT	2	/* SCTP disconnect */
+#define UA_ASPDN_REASON_RESTART		3	/* SCTP restart */
 
 /*
  *  UA_HBEAT_REQ - Request a Hearbeat (M_PROTO)

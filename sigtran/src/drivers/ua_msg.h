@@ -190,9 +190,9 @@
 #define UA_SIZE(__phdr)		(htonl(__phdr)&0xffff)
 #define UA_TAG(__phdr)		((htonl(__phdr)>>16)&0xffff)
 #define UA_PHDR(__phdr, __length) \
-	(htonl(((__phdr)<<16)|((__length)+sizeof(uint32_t))))
+	(__constant_htonl(((__phdr)<<16)|((__length)+sizeof(uint32_t))))
 #define UA_CONST_PHDR(__phdr, __length) \
-	(htonl(((__phdr)<<16)|((__length)+sizeof(uint32_t))))
+	(__constant_htonl(((__phdr)<<16)|((__length)+sizeof(uint32_t))))
 
 /*
  *  COMMON PARAMETERS:-
@@ -816,6 +816,7 @@ ua_dec_parm_any(uchar *beg, uchar *end, struct ua_parm *parm, uint32_t *tags, ui
 	register uint32_t *p;
 	int plen, i;
 
+	(void) ua_profiles;
 	for (p = (uint32_t *) beg;
 	     (uchar *) (p + 1) <= end && (plen = UA_SIZE(*p)) >= UA_PHDR_SIZE;
 	     p = (uint32_t *) ((uchar *) p + UA_PAD4(plen))) {
@@ -870,7 +871,7 @@ ua_dec_parm(uchar *beg, uchar *end, struct ua_parm *parm, uint32_t tag)
 static inline bool
 ua_dec_parm_next(uchar *end, struct ua_parm *parm)
 {
-	return ua_dec_parm(parm->cp + UA_PAD4(parm->len), end, parm, &parm->tag);
+	return ua_dec_parm(parm->cp + UA_PAD4(parm->len), end, parm, parm->tag);
 }
 
 #endif				/* __LOCAL_UA_MSG_H__ */

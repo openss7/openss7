@@ -176,6 +176,7 @@ EXTRA_libSIGTRANmods_a_SOURCES	= \
 				src/modules/m2tp.c
 libSIGTRANmods_a_SOURCES	= \
 				src/modules/m2pa_sl.c \
+				src/modules/m2ua_as.c \
 				src/modules/m3ua_as.c \
 				src/modules/sdl_sctp.c \
 				src/modules/sdt_sctp.c \
@@ -188,6 +189,7 @@ libSIGTRANmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 $(libSIGTRANmods_a_OBJECTS):	$(libSIGTRANmods_a_DEPENDENCIES)
 
 EXTRA_libSIGTRANdrvs_a_SOURCES	= \
+				src/drivers/isua_as.c \
 				src/drivers/m2ua.c \
 				src/drivers/m2ua_as.c \
 				src/drivers/m3ua_as.c \
@@ -213,6 +215,7 @@ EXTRA_libSIGTRANdrvs_a_SOURCES	= \
 				src/drivers/m3ua_ss7.c \
 				src/drivers/m3ua_tsp.c \
 				src/drivers/m3ua_tsp.h \
+				src/drivers/sua_as.c \
 				src/drivers/sua_asp.c \
 				src/drivers/sua_asp.h \
 				src/drivers/sua.c \
@@ -243,6 +246,7 @@ EXTRA_libSIGTRANdrvs_a_SOURCES	= \
 				src/drivers/tali_msgs.h \
 				src/drivers/tali_mtp.c \
 				src/drivers/tali_sccp.c \
+				src/drivers/tua_as.c \
 				src/drivers/tua_asp.c \
 				src/drivers/tua_asp.h \
 				src/drivers/tua.c \
@@ -253,11 +257,7 @@ EXTRA_libSIGTRANdrvs_a_SOURCES	= \
 				src/drivers/tua_spp.c \
 				src/drivers/tua_ss7.c
 libSIGTRANdrvs_a_SOURCES	= \
-				src/drivers/m2ua_as.c \
-				src/drivers/m3ua_as.c \
-				src/drivers/sua_as.c \
-				src/drivers/tua_as.c \
-				src/drivers/isua_as.c
+				src/drivers/ua_as.c
 libSIGTRANdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libSIGTRANdrvs_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libSIGTRANdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)

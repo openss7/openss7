@@ -635,6 +635,7 @@ struct tp {
 #define UA_CONFIGURED	0x01	/* SG has been configured by ioctl */
 #define UA_LOCADDR	0x02	/* SG has local address determined */
 #define UA_REMADDR	0x04	/* SG has remote address determined */
+#define UA_HUNGUP	0x08	/* SG has been hung up */
 
 #ifndef M2UA_PPI
 #define M2UA_PPI    5
@@ -797,10 +798,17 @@ as_state_name(uint state)
 		return ("ASP_????");
 	}
 }
+noinline fastcall int m_unhangup(struct up *up, queue_t *q, mblk_t *msg);
+static noinline fastcall int lmi_enable_con(struct up *up, queue_t *q, mblk_t *msg);
+static noinline fastcall int lmi_error_ack(struct up *up, queue_t *q, mblk_t *msg, lmi_long prim, lmi_long err);
+static noinline fastcall int lmi_disable_con(struct up *up, queue_t *q, mblk_t *msg);
+noinline fastcall int m_hangup(struct up *up, queue_t *q, mblk_t *msg);
+
 static int
 as_set_state(struct as *as, queue_t *q, uint newstate)
 {
 	uint oldstate = as->as.state;
+	struct up *up;
 	int err = 0;
 
 	if (newstate == oldstate)
@@ -1019,6 +1027,8 @@ sp_set_state(struct sp *sp, queue_t *q, uint newstate)
 		struct as *as;
 		struct up *up;
 
+		(void) up;
+		(void) as;
 		strlog(DRV_ID, sp->sp.id, UALOGST, SL_TRACE, "ASP: %s <- %s",
 		       asp_state_name(newstate), asp_state_name(oldstate));
 		switch (newstate) {
@@ -1026,6 +1036,7 @@ sp_set_state(struct sp *sp, queue_t *q, uint newstate)
 		case ASP_WACK_ASPUP:
 		case ASP_WACK_ASPDN:
 		case ASP_DOWN:
+			break;
 		}
 		sp->sp.state = newstate;
 	}
@@ -1121,6 +1132,11 @@ sg_not_state(struct sg *sg, uint mask)
 	return (sg_chk_state(sg, ~mask));
 }
 
+static uint tp_get_state(struct tp *tp);
+static fastcall int gp_send_asps_aspup_req(struct gp *gp, queue_t *q, mblk_t *msg, caddr_t iptr, size_t ilen);
+static int rp_send_rkmm_reg_req(struct rp *rp, queue_t *q, mblk_t *msg);
+static int rp_send_aspt_aspac_req(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t iptr, size_t ilen);
+
 static int
 gp_set_state(struct gp *gp, queue_t *q, uint newstate)
 {
@@ -1129,12 +1145,12 @@ gp_set_state(struct gp *gp, queue_t *q, uint newstate)
 
 	if (newstate != oldstate) {
 		struct sg *sg = gp->sg.sg;
-		struct sp *sp = sg->sp.sp;
+		struct rp *rp;
 		bool dynamic =
-		    ((sg->gp.options.options.popt & UA_DYNAMIC) &&
-		     (sp->sp.options.options.pvar != UA_VERSION_TS102141));
+		    ((sg->sg.options.proto.popt & UA_DYNAMIC) &&
+		     (sg->sg.options.proto.pvar != UA_VERSION_TS102141));
 
-		strlog(gp->tp.tp->mid, gp->tp.tp->sid, UALOGST, SL_TRACE, "SGP: %s <- %s",
+		strlog(gp->xp.xp->mid, gp->xp.xp->sid, UALOGST, SL_TRACE, "SGP: %s <- %s",
 		       asp_state_name(newstate), asp_state_name(oldstate));
 		switch (newstate) {
 		case ASP_DOWN:
@@ -1144,7 +1160,7 @@ gp_set_state(struct gp *gp, queue_t *q, uint newstate)
 					return (err);
 			if (oldstate == ASP_UP)	/* try to bring ASP back up */
 				if (gp->xp.xp && tp_get_state(gp->xp.xp) == TS_DATA_XFER)
-					if ((err = gp_send_asps_aspup_req(gp, q, mp, NULL, 0)))
+					if ((err = gp_send_asps_aspup_req(gp, q, NULL, NULL, 0)))
 						return (err);
 			break;
 		case ASP_WACK_ASPUP:
@@ -1163,7 +1179,7 @@ gp_set_state(struct gp *gp, queue_t *q, uint newstate)
 							return (err);
 				} else if (up && up_get_state(up) != LMI_DISABLED) {
 					if (rp_get_state(rp) == AS_INACTIVE)
-						if ((err = rp_send_aspt_aspac_req(rp, q, NULL)))
+						if ((err = rp_send_aspt_aspac_req(rp, q, NULL, NULL, 0)))
 							return (err);
 				}
 			}
@@ -1280,7 +1296,7 @@ tp_set_state(struct tp *tp, uint newstate)
 		       tp_state_name(oldstate));
 	return ((tp->xp.info.CURRENT_state = newstate));
 }
-static inline uint
+static uint
 tp_get_state(struct tp *tp)
 {
 	return (tp->xp.info.CURRENT_state);
@@ -1446,7 +1462,7 @@ static inline bool
 ua_trylock(struct ua_syncq *sq, queue_t *q)
 {
 	unsigned long flags;
-	queue_t *oldq == NULL;
+	queue_t *oldq = NULL;
 	bool rtn;
 
 	spin_lock_irqsave(&sq->lock, flags);
@@ -1569,6 +1585,7 @@ static inline struct up *
 up_acquire(queue_t *q)
 {
 	struct sp *sp;
+	struct up *up;
 
 	read_lock(&ua_mux_lock);
 	if (!(up = UP_PRIV(q)) || !up_trylock(up, q)) {
@@ -1689,6 +1706,8 @@ m_error(struct up *up, queue_t *q, mblk_t *msg, uchar rerr, uchar werr)
  *  =========================================================================
  */
 
+static struct up *alloc_object_up(int *errp, uint id) __unlikely;
+
 static struct up *
 up_alloc_priv(queue_t *q, dev_t *devp, cred_t *crp, minor_t unit)
 {
@@ -1749,13 +1768,14 @@ tp_sp_unlink(struct tp *tp)
 static void
 tp_free_priv(struct tp *tp)
 {
-	free_object if (tp->bc.rbid)
+	if (tp->bc.rbid)
 		 unbufcall(xchg(&tp->bc.rbid, 0));
 
 	if (tp->bc.wbid)
 		unbufcall(xchg(&tp->bc.wbid, 0));
 	mi_close_free((caddr_t) tp);
 }
+static struct tp *alloc_object_xp(int *errp, uint id) __unlikely;
 static struct tp *
 tp_alloc_priv(queue_t *q, int index, cred_t *crp, minor_t unit)
 {
@@ -1926,25 +1946,25 @@ free_object_up(struct up *up)
 static void __unlikely
 free_object_as(struct as *as)
 {
-	return kmem_free(obj, sizeof(struct as));
+	return kmem_free(as, sizeof(struct as));
 }
 static void __unlikely
 free_object_sp(struct sp *sp)
 {
-	return kmem_free(obj, sizeof(struct sp));
+	return kmem_free(sp, sizeof(struct sp));
 }
 static void __unlikely
 free_object_sg(struct sg *sg)
 {
-	return kmem_free(obj, sizeof(struct sg));
+	return kmem_free(sg, sizeof(struct sg));
 }
 static void __unlikely
 free_object_gp(struct gp *gp)
 {
-	return kmem_free(obj, sizeof(struct gp));
+	return kmem_free(gp, sizeof(struct gp));
 }
 static void __unlikely
-free_object_xp(struct tp *xp)
+free_object_xp(struct tp *tp)
 {
 	int b;
 
@@ -1960,7 +1980,7 @@ free_object_xp(struct tp *xp)
 static void __unlikely
 free_object_rp(struct rp *rp)
 {
-	return kmem_free(obj, sizeof(struct rp));
+	return kmem_free(rp, sizeof(struct rp));
 }
 
 static void __unlikely
@@ -2124,7 +2144,7 @@ alloc_object_gp(int *errp, uint id)
 	*errp = ENOBUFS;
 	return (gp);
 }
-static struct xp *__unlikely
+static struct tp *__unlikely
 alloc_object_xp(int *errp, uint id)
 {
 	struct tp *tp;

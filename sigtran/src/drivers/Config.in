@@ -67,6 +67,7 @@
 ##	name	    prefix	major	n-minors    n-majors
 #driver	mg	    mg		*
 #driver	mx	    mx		*
+driver	ua-as	    ua_as	*
 driver	m2ua-as	    m2ua_as	*
 driver	m3ua-as	    m3ua_as	*
 driver	sua-as	    sua_as	*
@@ -82,6 +83,7 @@ driver	isua-as	    isua_as	*
 ##	type	name	    object name
 #objname	driver	mg	    mg
 #objname	driver	mx	    mx
+objname	driver	ua-as	    ua_as
 objname	driver	m2ua-as	    m2ua_as
 objname	driver	m3ua-as	    m3ua_as
 objname	driver	sua-as	    sua_as
@@ -95,6 +97,7 @@ objname	driver	isua-as	    isua_as
 ##		name
 #loadable	mg
 #loadable	mx
+loadable	ua-as
 loadable	m2ua-as
 loadable	m3ua-as
 loadable	sua-as
@@ -108,6 +111,7 @@ loadable	isua-as
 #node	/dev/mg-lm		c   0666    mg		1
 #node	/dev/mx			c   0666    mx		0
 #node	/dev/mx-lm		c   0666    mx		1
+node	/dev/ua-as		c   0666    ua-as	0
 node	/dev/m2ua-as		c   0666    m2ua-as	0
 node	/dev/m3ua-as		c   0666    m3ua-as	0
 node	/dev/sua-as		c   0666    sua-as	0

@@ -84,6 +84,34 @@ struct m2ua_ppa {
 	uint tmode;
 };
 
+struct m3ua_addr {
+	int spid;
+	struct mtp_addr orig;
+	struct mtp_addr dest;
+	uint si;
+	uint ni;
+	uint rc;
+	uint tmode;
+};
+
+struct sua_addr {
+	int spid;
+	uint rc;
+	uint tmode;
+};
+
+struct tua_addr {
+	int spid;
+	uint rc;
+	uint tmode;
+};
+
+struct isua_addr {
+	int spid;
+	uint rc;
+	uint tmode;
+};
+
 /*
  *  IDENTIFICATION
  *  =========================================================================
@@ -258,6 +286,11 @@ typedef struct ua_opt_conf_sp {
 } ua_opt_conf_sp_t;
 
 typedef struct ua_opt_conf_xp {
+	struct sockaddr rem_add;
+	struct sockaddr loc_add;
+	uint rem_len;
+	uint loc_len;
+	uint testab;
 	uint ppi;			/* payload protocol identifier */
 	ushort istreams;		/* inbound SCTP streams */
 	ushort ostreams;		/* outbound SCTP streams */
