@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tiuser.h,v 0.9.2.4 2006/09/24 21:57:21 brian Exp $
+ @(#) $Id: tiuser.h,v 0.9.2.5 2007/02/14 14:09:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/24 21:57:21 $ by $Author: brian $
+ Last Modified $Date: 2007/02/14 14:09:20 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef _TIUSER_H
 #define _TIUSER_H
 
-#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -173,7 +173,6 @@ extern char *t_errlist[];
 extern char *t_errstr[];
 
 /* TLI Library - deprecated length of error list. */
-extern int t_nerr;
 extern int t_nerr;
 
 /* @} */

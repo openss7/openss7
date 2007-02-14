@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/02/13 07:55:43 $
+ @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/02/14 14:09:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/13 07:55:43 $ by $Author: brian $
+ Last Modified $Date: 2007/02/14 14:09:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_npi.c,v $
+ Revision 0.9.2.17  2007/02/14 14:09:11  brian
+ - broad changes updating support for SS7 MTP and M3UA
+
  Revision 0.9.2.16  2007/02/13 07:55:43  brian
  - working up MTP and UAs
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/02/13 07:55:43 $"
+#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/02/14 14:09:11 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/02/13 07:55:43 $";
+    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/02/14 14:09:11 $";
 
 /*
  *  This is a MTP NPI module which can be pushed over an MTPI (Message
@@ -95,7 +98,7 @@ static char const ident[] =
 #include <sys/npi_mtp.h>
 
 #define MTP_NPI_DESCRIP		"SS7 Message Transfer Part (MTP) NPI STREAMS MODULE."
-#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/02/13 07:55:43 $"
+#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/02/14 14:09:11 $"
 #define MTP_NPI_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_NPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_NPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

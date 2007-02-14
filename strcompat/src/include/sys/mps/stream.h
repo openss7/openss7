@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.15 2007/01/28 01:09:56 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.16 2007/02/14 14:09:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/28 01:09:56 $ by $Author: brian $
+ Last Modified $Date: 2007/02/14 14:09:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.16  2007/02/14 14:09:15  brian
+ - broad changes updating support for SS7 MTP and M3UA
+
  Revision 0.9.2.15  2007/01/28 01:09:56  brian
  - updated test programs and working up m2ua-as driver
 
@@ -100,7 +103,7 @@
 #ifndef __SYS_MPS_STREAM_H__
 #define __SYS_MPS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mps/stream.h directly, include sys/stream.h instead."
@@ -158,11 +161,7 @@ mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp)
 	return (NULL);
 }
 
-__MPS_EXTERN_INLINE void
-mi_attach(queue_t *q, caddr_t ptr)
-{
-	q->q_ptr = WR(q)->q_ptr = ptr;
-}
+extern void mi_attach(queue_t *q, caddr_t ptr);
 
 __MPS_EXTERN_INLINE int
 mi_open_comm(caddr_t *mi_head, size_t size, queue_t *q, dev_t *devp, int flag, int sflag,
@@ -232,6 +231,13 @@ extern int mi_timer_valid(mblk_t *mp);
 extern void mi_timer_free(mblk_t *mp);
 
 /*
+ *  Locking helper function.
+ */
+extern caddr_t mi_trylock(queue_t *q);
+extern caddr_t mi_sleeplock(queue_t *q);
+extern void mi_unlock(caddr_t ptr);
+
+/*
  *  Buffer call helper function.
  */
 extern void mi_bufcall(queue_t *q, int size, int priority);
@@ -241,6 +247,16 @@ extern void mi_bufcall(queue_t *q, int size, int priority);
  */
 extern mblk_t *mi_reuse_proto(mblk_t *mp, size_t size, int keep_on_error);
 extern mblk_t *mi_reallocb(mblk_t *mp, size_t size);
+
+__MPS_EXTERN_INLINE mblk_t *
+mi_allocb(queue_t *q, size_t size, int priority)
+{
+	mblk_t *mp;
+
+	if (unlikely((mp = allocb(size, priority)) == NULL))
+		mi_bufcall(q, size, priority);
+	return (mp);
+}
 
 /*
  *  M_IOTCL handling helper functions.

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ua_as_ioctl.h,v 0.9.2.2 2007/02/10 22:32:15 brian Exp $
+ @(#) $Id: ua_as_ioctl.h,v 0.9.2.3 2007/02/14 14:08:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/10 22:32:15 $ by $Author: brian $
+ Last Modified $Date: 2007/02/14 14:08:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua_as_ioctl.h,v $
+ Revision 0.9.2.3  2007/02/14 14:08:59  brian
+ - broad changes updating support for SS7 MTP and M3UA
+
  Revision 0.9.2.2  2007/02/10 22:32:15  brian
  - working up sigtran drivers
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_UA_AS_IOCTL_H__
 #define __SYS_UA_AS_IOCTL_H__
 
-#ident "@(#) $RCSfile: ua_as_ioctl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ua_as_ioctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/01/21 20:22:43 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/02/14 14:09:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/21 20:22:43 $ by $Author: brian $
+ Last Modified $Date: 2007/02/14 14:09:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.36  2007/02/14 14:09:16  brian
+ - broad changes updating support for SS7 MTP and M3UA
+
  Revision 0.9.2.35  2007/01/21 20:22:43  brian
  - working up drivers
 
@@ -160,10 +163,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/01/21 20:22:43 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/02/14 14:09:16 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/01/21 20:22:43 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/02/14 14:09:16 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -191,7 +194,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/01/21 20:22:43 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/02/14 14:09:16 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -272,13 +275,19 @@ struct mi_comm {
 	struct mi_comm **mi_prev;	/* must be first */
 	struct mi_comm **mi_head;
 	struct mi_comm *mi_next;
+	size_t mi_size;			/* size of this structure plus private data */
+	unsigned short mi_mid;		/* module identifier */
+	unsigned short mi_sid;		/* stream identifier */
+	bcid_t mi_rbid;			/* rd queue bufcall */
+	bcid_t mi_wbid;			/* wr queue bufcall */
+	spinlock_t mi_lock;		/* structure lock */
+	uint mi_users;			/* number of users */
+	queue_t *mi_qwait;		/* queue waiting on lock */
+	wait_queue_head_t mi_waitq;	/* processes waiting on lock */
 	union {
 		dev_t dev;		/* device number (or NODEV for modules) */
 		int index;		/* link index */
 	} mi_u;
-	size_t mi_size;			/* size of this structure plus private data */
-	bcid_t mi_rbid;			/* rd queue bufcall */
-	bcid_t mi_wbid;			/* wr queue bufcall */
 	char mi_priv[0];		/* followed by private data */
 };
 
@@ -294,7 +303,10 @@ mi_open_alloc(size_t size)
 {
 	struct mi_comm *mi;
 	if ((mi = kmem_zalloc(sizeof(struct mi_comm) + size, KM_NOSLEEP))) {
+		mi->mi_prev = mi->mi_head = &mi->mi_next;
 		mi->mi_size = size;
+		spin_lock_init(&mi->mi_lock);
+		init_waitqueue_head(&mi->mi_waitq);
 		return ((caddr_t) (mi + 1));
 	}
 	return (NULL);
@@ -311,7 +323,10 @@ mi_open_alloc_sleep(size_t size)
 {
 	struct mi_comm *mi;
 	if ((mi = kmem_zalloc(sizeof(struct mi_comm) + size, KM_SLEEP))) {
+		mi->mi_prev = mi->mi_head = &mi->mi_next;
 		mi->mi_size = size;
+		spin_lock_init(&mi->mi_lock);
+		init_waitqueue_head(&mi->mi_waitq);
 		return ((caddr_t) (mi + 1));
 	}
 	return (NULL);
@@ -415,53 +430,43 @@ mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cr
 	struct mi_comm *mi = ((struct mi_comm *) ptr) - 1, **mip = (struct mi_comm **) mi_head;
 	major_t cmajor = devp ? getmajor(*devp) : 0;
 	minor_t cminor = devp ? getminor(*devp) : 0;
+	major_t dmajor;
 
 	spin_lock(&mi_list_lock);
-	switch (sflag) {
-	case CLONEOPEN:
+	if (sflag == CLONEOPEN) {
 		/* first clone minor (above 5 per AIX docs, above 10 per MacOT docs), but the
 		   caller can start wherever they want above that */
 #define MI_OPEN_COMM_CLONE_MINOR 10
 		if (cminor <= MI_OPEN_COMM_CLONE_MINOR)
 			cminor = MI_OPEN_COMM_CLONE_MINOR + 1;
-		/* fall through */
-	default:
-	case DRVOPEN:
-	{
-		major_t dmajor = cmajor;
+	}
+	if (sflag == MODOPEN) {
+		cmajor = 0;
+		/* caller can specify a preferred instance number */
+		if (cminor == 0)
+			cminor = 1;
+	}
+	dmajor = cmajor;
+	for (; *mip && (dmajor = getmajor((*mip)->mi_dev)) < cmajor; mip = &(*mip)->mi_next) ;
+	for (; *mip && dmajor == getmajor((*mip)->mi_dev)
+	     && getminor(makedevice(0, cminor)) != 0; mip = &(*mip)->mi_next, cminor++) {
+		minor_t dminor = getminor((*mip)->mi_dev);
 
-		for (; *mip && (dmajor = getmajor((*mip)->mi_dev)) < cmajor;
-		     mip = &(*mip)->mi_next) ;
-		for (; *mip && dmajor == getmajor((*mip)->mi_dev)
-		     && getminor(makedevice(0, cminor)) != 0; mip = &(*mip)->mi_next, cminor++) {
-			minor_t dminor = getminor((*mip)->mi_dev);
-
-			if (cminor < dminor)
-				break;
-			if (cminor == dminor)
-				if (sflag != CLONEOPEN) {
-					spin_unlock(&mi_list_lock);
-					return (ENXIO);
-				}
-		}
-		if (getminor(makedevice(0, cminor)) == 0) {	/* no minors left */
-			spin_unlock(&mi_list_lock);
-			return (EAGAIN);
-		}
-		mi->mi_dev = makedevice(cmajor, cminor);
-		break;
+		if (cminor < dminor)
+			break;
+		if (cminor == dminor)
+			if (sflag == DRVOPEN) {
+				spin_unlock(&mi_list_lock);
+				return (ENXIO);
+			}
 	}
-	case MODOPEN:
-	{
-		/* just push modules on list with no device */
-#ifdef NODEV
-		mi->mi_dev = NODEV;
-#else
-		mi->mi_dev = 0;
-#endif
-		break;
+	if (getminor(makedevice(0, cminor)) == 0) {	/* no minors left */
+		spin_unlock(&mi_list_lock);
+		return (EAGAIN);
 	}
-	}
+	mi->mi_dev = makedevice(cmajor, cminor);
+	mi->mi_mid = cmajor;
+	mi->mi_sid = cminor;
 	if ((mi->mi_next = *mip))
 		mi->mi_next->mi_prev = &mi;
 	mi->mi_prev = mip;
@@ -485,7 +490,14 @@ EXPORT_SYMBOL_NOVERS(mi_open_detached);	/* mps/ddi.h */
  *  MI_ATTACH
  *  -------------------------------------------------------------------------
  */
-__MPS_EXTERN_INLINE void mi_attach(queue_t *q, caddr_t ptr);
+void
+mi_attach(queue_t *q, caddr_t ptr)
+{
+	struct mi_comm *mi = ((struct mi_comm *) ptr) - 1;
+
+	mi->mi_mid = q->q_qinfo->qi_minfo->mi_idnum;
+	q->q_ptr = WR(q)->q_ptr = ptr;
+}
 
 EXPORT_SYMBOL_NOVERS(mi_attach);	/* mps/ddi.h, mac/ddi.h */
 
@@ -581,6 +593,92 @@ struct mi_iocblk {
 /*
  *  =========================================================================
  *
+ *  Locking helper function.
+ *
+ *  =========================================================================
+ */
+caddr_t
+mi_trylock(queue_t *q)
+{
+	caddr_t rtn;
+
+	if ((rtn = q->q_ptr)) {
+		struct mi_comm *mi = ((struct mi_comm *) rtn) - 1;
+		unsigned long flags;
+
+		spin_lock_irqsave(&mi->mi_lock, flags);
+		if (mi->mi_users != 0)
+			rtn = NULL;
+		else
+			mi->mi_users = 1;
+		spin_unlock_irqrestore(&mi->mi_lock, flags);
+	}
+	return (rtn);
+}
+
+EXPORT_SYMBOL_NOVERS(mi_trylock);
+
+caddr_t
+mi_sleeplock(queue_t *q)
+{
+	caddr_t rtn = q->q_ptr;
+	struct mi_comm *mi = ((struct mi_comm *) rtn) - 1;
+	unsigned long flags;
+
+	DECLARE_WAITQUEUE(wait, current);
+
+	add_wait_queue(&mi->mi_waitq, &wait);
+	spin_lock_irqsave(&mi->mi_lock, flags);
+	if (mi->mi_users != 0) {
+		for (;;) {
+			set_current_state(TASK_INTERRUPTIBLE);
+			if (signal_pending(current)) {
+				rtn = NULL;
+				break;
+			}
+			if (mi->mi_users == 0) {
+				mi->mi_users = 1;
+				break;
+			}
+			spin_unlock_irqrestore(&mi->mi_lock, flags);
+			schedule();
+			spin_lock_irqsave(&mi->mi_lock, flags);
+		}
+	} else
+		mi->mi_users = 1;
+	spin_unlock_irqrestore(&mi->mi_lock, flags);
+	set_current_state(TASK_RUNNING);
+	remove_wait_queue(&mi->mi_waitq, &wait);
+	return (rtn);
+
+}
+
+EXPORT_SYMBOL_NOVERS(mi_sleeplock);
+
+void
+mi_unlock(caddr_t ptr)
+{
+	struct mi_comm *mi = ((struct mi_comm *) ptr) - 1;
+	unsigned long flags;
+	queue_t *newq;
+
+	spin_lock_irqsave(&mi->mi_lock, flags);
+	mi->mi_users = 0;
+	if ((newq = mi->mi_qwait))
+		mi->mi_qwait = NULL;
+	spin_unlock_irqrestore(&mi->mi_lock, flags);
+	if (waitqueue_active(&mi->mi_waitq))
+		wake_up_all(&mi->mi_waitq);
+	if (newq)
+		qenable(newq);
+	return;
+}
+
+EXPORT_SYMBOL_NOVERS(mi_unlock);
+
+/*
+ *  =========================================================================
+ *
  *  Buffer call helper function.
  *
  *  =========================================================================
@@ -661,6 +759,10 @@ mi_reallocb(mblk_t *mp, size_t size)
 }
 
 EXPORT_SYMBOL_NOVERS(mi_reallocb);
+
+__MPS_EXTERN_INLINE mblk_t *mi_allocb(queue_t *q, size_t size, int priority);
+
+EXPORT_SYMBOL_NOVERS(mi_allocb);	/* mps/stream.h */
 
 /*
  *  =========================================================================
@@ -1583,9 +1685,10 @@ mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
 	int result = 0;
 
 	if (vstrlog != NULL) {
+		struct mi_comm *mi = (struct mi_comm *) q->q_ptr + 1;
+		modID_t mid = mi->mi_mid;
+		minor_t sid = mi->mi_sid;
 		va_list args;
-		modID_t mid = q ? q->q_qinfo->qi_minfo->mi_idnum : 0;
-		minor_t sid = 0;	/* FIXME - should be minor devce number */
 
 		va_start(args, fmt);
 		result = vstrlog(mid, sid, level, flags, fmt, args);

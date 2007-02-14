@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ua_as_lm.h,v 0.9.2.2 2007/02/10 22:32:15 brian Exp $
+ @(#) $Id: ua_as_lm.h,v 0.9.2.3 2007/02/14 14:09:00 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/10 22:32:15 $ by $Author: brian $
+ Last Modified $Date: 2007/02/14 14:09:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua_as_lm.h,v $
+ Revision 0.9.2.3  2007/02/14 14:09:00  brian
+ - broad changes updating support for SS7 MTP and M3UA
+
  Revision 0.9.2.2  2007/02/10 22:32:15  brian
  - working up sigtran drivers
 
@@ -779,6 +782,6 @@ struct UA_notify_ind {
 	uint ASPID;			/* External ASP Identifier */
 };
 
-#ident "@(#) $RCSfile: ua_as_lm.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ua_as_lm.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #endif				/* __SYS_UA_AS_LM_H__ */

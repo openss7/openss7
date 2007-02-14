@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/02/10 22:32:01 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/02/14 14:08:45 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/02/10 22:32:01 $ by $Author: brian $
+## Last Modified $Date: 2007/02/14 14:08:45 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.8  2007/02/14 14:08:45  brian
+## - broad changes updating support for SS7 MTP and M3UA
+##
 ## Revision 0.9.2.7  2007/02/10 22:32:01  brian
 ## - working up sigtran drivers
 ##

@@ -1,3 +1,14 @@
+2007-02-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man9/mi_strlog.9.man: updated docs
+	* src/include/sys/mps/stream.h: new mi_lock functions, better mi_strlog
+	* src/kernel/mpscompat.c: new mi_lock functions, better mi_strlog
+
+	* doc/man/man9/mi_allocb.9.man: added docs for new functions
+	* doc/man/man9/mi_sleeplock.9.man: added docs for new functions
+	* doc/man/man9/mi_trylock.9.man: added docs for new functions
+	* doc/man/man9/mi_unlock.9.man: added docs for new functions
+
 2007-02-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* strcompat.spec.in: support for autoconf 2.61

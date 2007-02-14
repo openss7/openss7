@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/02/10 22:32:06 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/02/14 14:08:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/10 22:32:06 $ by $Author: brian $
+ Last Modified $Date: 2007/02/14 14:08:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 0.9.2.9  2007/02/14 14:08:46  brian
+ - broad changes updating support for SS7 MTP and M3UA
+
  Revision 0.9.2.8  2007/02/10 22:32:06  brian
  - working up sigtran drivers
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/02/10 22:32:06 $"
+#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/02/14 14:08:46 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/02/10 22:32:06 $";
+    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/02/14 14:08:46 $";
 
 /*
  *  This is an M2UA multiplexing driver.  It is necessary to use a multiplexing driver because most
@@ -206,7 +209,7 @@ static char const ident[] =
 /* ============================== */
 
 #define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/02/10 22:32:06 $"
+#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/02/14 14:08:46 $"
 #define M2UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
