@@ -186,24 +186,15 @@ static caddr_t mtp_opens = NULL;
 static inline fastcall size_t
 n_addr_size(struct mtp_addr *add)
 {
-	size_t len = 0;
-
-	if (add) {
-		len = sizeof(struct sockaddr_mtp);
-	}
-	return (len);
+	if (add)
+		return sizeof(*add);
+	return (0);
 }
 static inline fastcall void
 n_build_addr(struct mtp_addr *add, unsigned char *p)
 {
-	if (add) {
-		struct sockaddr_mtp *sa = (typeof(sa)) p;
-
-		sa->mtp_family = 0;
-		sa->mtp_ni = add->ni;
-		sa->mtp_si = add->si;
-		sa->mtp_pc = add->pc;
-	}
+	if (add)
+		bcopy(add, p, sizeof(*add));
 }
 
 /*
@@ -232,6 +223,20 @@ n_parse_opts(struct mtp *mtp, struct mtp_opts *ops, unsigned char *op, size_t le
 {
 	fixme(("Write this function\n"));
 	return (-EFAULT);
+}
+
+static inline fastcall size_t
+n_opts_size(N_qos_sel_conn_mtp_t *qos)
+{
+	if (qos)
+		return (sizeof(*qos));
+	return (0);
+}
+static inline fastcall void
+n_build_opts(N_qos_sel_conn_mtp_t *qos, unsigned char *p)
+{
+	if (qos)
+		bcopy(qos, p, sizeof(*qos));
 }
 
 /*
@@ -329,6 +334,7 @@ mtp_not_state(struct mtp *mtp, mtp_ulong mask)
 /*
  *  TLI interface state flags
  */
+#if 0
 #define NSF_UNBND	( 1 << NS_UNBND		)
 #define NSF_WACK_BREQ	( 1 << NS_WACK_BREQ	)
 #define NSF_WACK_UREQ	( 1 << NS_WACK_UREQ	)
@@ -346,6 +352,7 @@ mtp_not_state(struct mtp *mtp, mtp_ulong mask)
 #define NSF_WACK_DREQ9	( 1 << NS_WACK_DREQ9	)
 #define NSF_WACK_DREQ10	( 1 << NS_WACK_DREQ10	)
 #define NSF_WACK_DREQ11	( 1 << NS_WACK_DREQ11	)
+#endif
 #define NSF_NOSTATES	( 1 << NS_NOSTATES	)
 
 #define NSF_WACK_DREQ	(NSF_WACK_DREQ6 \
@@ -470,7 +477,7 @@ n_conn_ind(struct mtp *mtp, queue_t *q, mblk_t *bp,
 			mp->b_wptr += src_len;
 			n_build_addr(dst, mp->b_wptr);
 			mp->b_wptr += dst_len;
-			n_build_opts(qos, mp->b_qptr);
+			n_build_opts(qos, mp->b_wptr);
 			mp->b_wptr += qos_len;
 			mp->b_cont = dp;
 			if (bp)
@@ -600,7 +607,7 @@ n_data_ind(struct mtp *mtp, queue_t *q, mblk_t *bp, np_ulong flags, mblk_t *dp)
 	N_data_ind_t *p;
 	mblk_t *mp;
 
-	if (mtp_chk_state(mtp, (NSF_DATA_XFER | NSF_WCON_RIND))) {
+	if (mtp_chk_state(mtp, (NSF_DATA_XFER | NSF_WCON_RREQ))) {
 		if (likely((mp = mi_allocb(q, sizeof(*p), BPRI_MED)) != NULL)) {
 			if (likely(canputnext(mtp->rq))) {
 				DB_TYPE(mp) = M_PROTO;
@@ -769,7 +776,7 @@ n_bind_ack(struct mtp *mtp, queue_t *q, mblk_t *msg, struct mtp_addr *add, np_ul
 			p->PROTOID_length = 0;
 			p->PROTOID_offset = 0;
 			mp->b_wptr += sizeof(*p);
-			n_build_addr(add, mp->b_wtpr);
+			n_build_addr(add, mp->b_wptr);
 			mp->b_wptr += add_len;
 			mtp_bind(mtp, add);
 			mtp_set_state(mtp, NS_IDLE);
@@ -1405,7 +1412,7 @@ n_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (dlen == 0 || dlen > mtp->prot.NSDU_size || dlen > mtp->prot.NIDU_size)
 		goto baddata;
-	return mtp_transfer_req(mtp, q, &mtp->dst, mtp->options.mp, mtp->options.sls, mp);
+	return mtp_transfer_req(mtp, q, mp, &mtp->dst, mtp->options.mp, mtp->options.sls, mp);
       baddata:
 	mi_strlog(q, 0, SL_TRACE, "bad data size %d", dlen);
 	goto error;
@@ -1464,7 +1471,7 @@ n_conn_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	if (dst->si < 3 && mtp->src.si != 0)
 		goto badaddr;
 	if (dst->si < 3 && mtp->cred.cr_uid != 0)
-		goto acces;
+		goto access;
 	if (dst->si != mtp->src.si && mtp->src.si != 0)
 		goto badaddr;
 	if (n_parse_opts(mtp, &opts, mp->b_rptr + p->QOS_offset, p->QOS_length))
@@ -1476,7 +1483,11 @@ n_conn_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	}
 	mtp->dst = *dst;
 	mtp_set_state(mtp, NS_WCON_CREQ);
-	return n_conn_con(mtp, q, 0, &mtp->dst, NULL);
+	return n_conn_con(mtp, q, mp, 0, &mtp->dst, NULL, NULL);
+      access:
+	err = NACCESS;
+	mi_strlog(q, 0, SL_TRACE, "no permission");
+	goto error;
       badqostype:
 	err = NBADQOSTYPE;
 	mi_strlog(q, 0, SL_TRACE, "bad qos type");
@@ -1508,7 +1519,7 @@ n_conn_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_TRACE, "primitive not supported for N_CLNS");
 	goto error;
       error:
-	return n_error_ack(mtp, q, N_CONN_REQ, err);
+	return n_error_ack(mtp, q, mp, N_CONN_REQ, err);
 }
 
 /**
@@ -1551,7 +1562,7 @@ n_conn_res(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_TRACE, "primitive not supported");
 	goto error;
       error:
-	return n_error_ack(mtp, q, N_CONN_RES, err);
+	return n_error_ack(mtp, q, mp, N_CONN_RES, err);
 }
 
 /**
@@ -1587,7 +1598,7 @@ n_discon_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto outstate;
 	}
 	/* change state and let mtp_ok_ack do all the work */
-	return mtp_discon_req(mtp, q, mp);
+	return mtp_discon_req(mtp, q, mp, NULL);
       badprim:
 	err = -EMSGSIZE;
 	mi_strlog(q, 0, SL_TRACE, "invalid primitive format");
@@ -1719,7 +1730,7 @@ n_bind_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	if (src.si < 3 && mtp->cred.cr_uid != 0)
 		goto acces;
 	mtp_set_state(mtp, NS_WACK_BREQ);
-	return mtp_bind_req(mtp, q, &src, 0);
+	return mtp_bind_req(mtp, q, mp, &src, 0);
       acces:
 	err = NACCESS;
 	mi_strlog(q, 0, SL_TRACE, "no priviledge for requested address");
@@ -1790,7 +1801,9 @@ n_unitdata_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	const N_unitdata_req_t *p = (typeof(p)) mp->b_rptr;
 	size_t dlen = mp->b_cont ? msgdsize(mp->b_cont) : 0;
 	struct mtp_addr dst;
+#if 0
 	struct mtp_opts opts = { 0L, NULL, };
+#endif
 
 	if (mtp->prot.SERV_type != N_CLNS)
 		goto notsupport;
@@ -1805,8 +1818,7 @@ n_unitdata_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	if (dlen > mtp->prot.NSDU_size || dlen > mtp->prot.NIDU_size)
 		goto baddata;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p)
-	    || mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length
-	    || mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
+	    || mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)
 		goto badprim;
 	if (!p->DEST_length)
 		goto noaddr;
@@ -1821,13 +1833,17 @@ n_unitdata_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto acces;
 	if (dst.si != mtp->src.si)
 		goto badaddr;
+#if 0
 	if (n_parse_opts(&opts, mp->b_rptr + p->QOS_offset, p->QOS_length))
 		goto badopt;
+#endif
 	fixme(("Handle options correctly\n"));
 	return mtp_transfer_req(mtp, q, mp, &dst, mtp->options.mp, mtp->options.sls, mp->b_cont);
+#if 0
       badopt:
 	mi_strlog(q, 0, SL_TRACE, "bad options");
 	goto error;
+#endif
       acces:
 	mi_strlog(q, 0, SL_TRACE, "no permission to address");
 	goto error;
@@ -1864,7 +1880,7 @@ n_optmgmt_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 {
 	int err = 0;
 	const N_optmgmt_req_t *p = (typeof(p)) mp->b_rptr;
-	union N_qos_mtp *qos = { 0L, NULL, };
+	union N_qos_mtp *qos = { 0L, };
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
@@ -1888,7 +1904,7 @@ n_optmgmt_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto badqosparam;
 	mtp->options.sls = qos->n_qos_data.sls;
 	mtp->options.mp = qos->n_qos_data.mp;
-	return n_ok_ack(mtp, q, N_OPTMGMT_REQ);
+	return n_ok_ack(mtp, q, mp, N_OPTMGMT_REQ);
       badqostype:
 	err = NBADQOSTYPE;
 	mi_strlog(q, 0, SL_TRACE, "invalid qos type");
@@ -1906,7 +1922,7 @@ n_optmgmt_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_TRACE, "invalid primitive format");
 	goto error;
       error:
-	return n_error_ack(mtp, q, N_OPTMGMT_REQ, err);
+	return n_error_ack(mtp, q, mp, N_OPTMGMT_REQ, err);
 }
 
 /*
@@ -2002,9 +2018,9 @@ mtp_ok_ack(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		break;
 	case MTP_CONN_REQ:
 		prim = N_CONN_REQ;
-		if ((err = n_ok_ack(mtp, q, NULL, prim, 0, 0)) < 0)
+		if ((err = n_ok_ack(mtp, q, NULL, prim)) < 0)
 			return (err);
-		return n_conn_con(mtp, q, mp, NULL, NULL, NULL);
+		return n_conn_con(mtp, q, mp, 0, NULL, NULL, NULL);
 	case MTP_DISCON_REQ:
 		prim = N_DISCON_REQ;
 		break;
@@ -2029,7 +2045,7 @@ mtp_ok_ack(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		prim = 0;
 		break;
 	}
-	return n_ok_ack(mtp, q, mp, prim, 0, 0);
+	return n_ok_ack(mtp, q, mp, prim);
       efault:
 	mi_strlog(q, 0, SL_ERROR, "invalid primitive from below");
 	return (-EFAULT);
@@ -2173,7 +2189,9 @@ mtp_addr_ack(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		loc = (typeof(loc)) (mp->b_rptr + p->mtp_loc_offset);
 	if (p->mtp_rem_length == sizeof(*rem))
 		rem = (typeof(rem)) (mp->b_rptr + p->mtp_rem_offset);
-	return n_addr_ack(mtp, q, mp, loc, rem);
+	// return n_addr_ack(mtp, q, mp, loc, rem);
+	freemsg(mp);
+	return (0);
       efault:
 	mi_strlog(q, 0, SL_ERROR, "invalid primitive from below");
 	return (-EFAULT);
@@ -2265,7 +2283,7 @@ mtp_info_ack(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		break;
 	}
 	if (!first)
-		return t_info_ack(mtp, q, mp);
+		return n_info_ack(mtp, q, mp);
       error:
 	freemsg(mp);
 	return (0);
@@ -2316,11 +2334,11 @@ mtp_transfer_ind(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	switch (mtp->prot.SERV_type) {
 	case N_CONS:
 		if (mtp_not_state(mtp, (NSF_WCON_RREQ | NSF_DATA_XFER)))
-			goto oustate;
-		return n_data_ind(mtp, q, 0, mp->b_cont);
+			goto outstate;
+		return n_data_ind(mtp, q, mp, 0, mp->b_cont);
 	case N_CLNS:
 		if (mtp_not_state(mtp, (NSF_IDLE | NSF_WACK_UREQ)))
-			goto oustate;
+			goto outstate;
 		if (mp->b_wptr < mp->b_rptr + p->mtp_srce_offset + p->mtp_srce_length)
 			goto badaddr;
 		if (p->mtp_srce_length) {
@@ -2379,18 +2397,18 @@ mtp_pause_ind(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	case N_CONS:
 		if (mtp_not_state(mtp, (NSF_DATA_XFER | NSF_WCON_RREQ)))
 			goto outstate;
-		return n_discon_ind(mtp, q, N_PROVIDER, N_MTP_DEST_PROHIBITED, 0, NULL, mp->b_cont);
+		return n_discon_ind(mtp, q, mp, N_PROVIDER, N_MTP_DEST_PROHIBITED, 0, NULL, mp->b_cont);
 	case N_CLNS:
 		if (mtp_not_state(mtp, NSF_IDLE))
 			goto outstate;
 		if (mp->b_wptr < mp->b_rptr + p->mtp_addr_offset + p->mtp_addr_length)
-			goto efault;
+			goto badaddr;
 		if (p->mtp_addr_length) {
 			if (p->mtp_addr_length < sizeof(*dst))
-				goto efault;
+				goto badaddr;
 			dst = (typeof(dst)) (mp->b_rptr + p->mtp_addr_offset);
 		}
-		return n_uderror_ind(mtp, q, dst, mp->b_cont, N_MTP_DEST_PROHIBITED);
+		return n_uderror_ind(mtp, q, mp, dst, mp->b_cont, N_MTP_DEST_PROHIBITED);
 	default:
 		goto notsupp;
 	}
@@ -2402,7 +2420,7 @@ mtp_pause_ind(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_ERROR, "primitive received in incorrect state %u", mtp_get_state(mtp));
 	goto error;
       notsupp:
-	mi_strlog(q, 0, SL_ERROR, "invalid service type %d", mtp->prot.SERV_type);
+	mi_strlog(q, 0, SL_ERROR, "invalid service type %d", (int) mtp->prot.SERV_type);
 	goto error;
       badaddr:
 	mi_strlog(q, 0, SL_ERROR, "invalid or bad address format");
@@ -2448,12 +2466,12 @@ mtp_resume_ind(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	case N_CONS:
 		switch (mtp_get_state(mtp)) {
 		case NS_WCON_CREQ:
-			return n_conn_con(mtp, q, mp, add, NULL, mp->b_cont);
+			return n_conn_con(mtp, q, mp, 0, add, NULL, mp->b_cont);
 		case NS_IDLE:
 		case NS_WRES_CIND:
 			if (mtp->coninds > 0)
 				/* FIXME: need a sequence number */
-				return n_conn_ind(mtp, q, mp, 0, add, NULL, mp->b_cont);
+				return n_conn_ind(mtp, q, mp, 0, 0, add, NULL, NULL, mp->b_cont);
 		default:
 			goto outstate;
 		}
@@ -2461,7 +2479,7 @@ mtp_resume_ind(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	case N_CLNS:
 		if (mtp_get_state(mtp) != NS_IDLE)
 			goto outstate;
-		return n_uderror_ind(mtp, q, mp, add, NULL, mp->b_cont, N_MTP_DEST_AVAILABLE);
+		return n_uderror_ind(mtp, q, mp, add, mp->b_cont, N_MTP_DEST_AVAILABLE);
 	default:
 		goto notsupp;
 	}
@@ -2473,7 +2491,7 @@ mtp_resume_ind(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_ERROR, "primitive received in incorrect state %u", mtp_get_state(mtp));
 	goto error;
       notsupp:
-	mi_strlog(q, 0, SL_ERROR, "invalid service type %d", mtp->prot.SERV_type);
+	mi_strlog(q, 0, SL_ERROR, "invalid service type %d", (int) mtp->prot.SERV_type);
 	goto error;
       badaddr:
 	mi_strlog(q, 0, SL_ERROR, "invalid or bad address format");
@@ -2556,16 +2574,16 @@ mtp_status_ind(struct mtp *mtp, queue_t *q, mblk_t *mp)
 			goto outstate;
 		switch (type) {
 		case MTP_STATUS_TYPE_UPU:
-			return n_discon_ind(mtp, q, N_USER, error, 0, NULL, mp->b_cont);
+			return n_discon_ind(mtp, q, mp, N_USER, error, 0, NULL, mp->b_cont);
 		case MTP_STATUS_TYPE_CONG:
-			return n_reset_ind(mtp, q, N_PROVIDER, error);
+			return n_reset_ind(mtp, q, mp, N_PROVIDER, error);
 		}
 		goto badstatus;
 	case N_CLNS:
 		if (mtp_get_state(mtp) != NS_IDLE)
 			goto outstate;
 		dst = (typeof(dst)) (mp->b_rptr + p->mtp_addr_length);
-		return n_uderror_ind(mtp, q, dst, mp->b_cont, error);
+		return n_uderror_ind(mtp, q, mp, dst, mp->b_cont, error);
 	default:
 		goto notsupp;
 	}
@@ -2582,7 +2600,7 @@ mtp_status_ind(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_ERROR, "primitive received in incorrect state %u", mtp_get_state(mtp));
 	goto error;
       notsupp:
-	mi_strlog(q, 0, SL_ERROR, "invalid service type %d", mtp->prot.SERV_type);
+	mi_strlog(q, 0, SL_ERROR, "invalid service type %d", (int) mtp->prot.SERV_type);
 	goto error;
       protoshort:
 	mi_strlog(q, 0, SL_ERROR, "protocol block too short");
@@ -2619,7 +2637,7 @@ mtp_restart_begins_ind(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		case NS_WRES_RIND:
 		case NS_WCON_CREQ:
 		case NS_DATA_XFER:
-			return n_discon_ind(mtp, q, N_PROVIDER, error, 0, NULL, mp->b_cont);
+			return n_discon_ind(mtp, q, mp, N_PROVIDER, error, 0, NULL, mp->b_cont);
 		default:
 			goto outstate;
 		}
@@ -2629,7 +2647,7 @@ mtp_restart_begins_ind(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		case NS_UNBND:
 			goto outstate;
 		case NS_IDLE:
-			return n_uderror_ind(mtp, q, dst, mp->b_cont, error);
+			return n_uderror_ind(mtp, q, mp, dst, mp->b_cont, error);
 		default:
 			goto outstate;
 		}
@@ -2645,7 +2663,7 @@ mtp_restart_begins_ind(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_ERROR, "primitive received in incorrect state %u", mtp_get_state(mtp));
 	goto error;
       notsupp:
-	mi_strlog(q, 0, SL_ERROR, "invalid service type %d", mtp->prot.SERV_type);
+	mi_strlog(q, 0, SL_ERROR, "invalid service type %d", (int) mtp->prot.SERV_type);
 	goto error;
       protoshort:
 	mi_strlog(q, 0, SL_ERROR, "protocol block too short");
@@ -2956,7 +2974,9 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 	case N_CONS:
 		if (unlikely(mtp_not_state(mtp, (NSF_WRES_RIND | NSF_WCON_RREQ | NSF_DATA_XFER))))
 			goto go_slow;
-		return t_optdata_ind(mtp, q, mp, 0, &opts, mp->b_cont);
+		// return t_optdata_ind(mtp, q, mp, 0, &opts, mp->b_cont);
+		freemsg(mp);
+		return (0);
 	case N_CLNS:
 		if (unlikely(mtp_not_state(mtp, (NSF_IDLE | NSF_WACK_UREQ))))
 			goto go_slow;
@@ -2968,7 +2988,7 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 			src = (typeof(src)) (mp->b_rptr + p->mtp_srce_offset);
 		}
 		mp->b_cont->b_band = mp->b_band;
-		return t_unitdata_ind(mtp, q, mp, src, &opts, mp->b_cont);
+		return n_unitdata_ind(mtp, q, mp, src, NULL, mp->b_cont);
 	default:
 		break;
 	}
@@ -2989,8 +3009,8 @@ mtp_w_data(queue_t *q, mblk_t *mp)
 	struct mtp *mtp = MTP_PRIV(q);
 
 	/* data from above */
-	mi_strlog(q, STRLOGDA, SL_TRACE, "-> M_DATA [%lu]", (mtp_ulong) msgdsize(mp));
-	return t_data(mtp, q, mp);
+	mi_strlog(q, STRLOGDA, SL_TRACE, "-> M_DATA [%lu]", (ulong) msgdsize(mp));
+	return n_data(mtp, q, mp);
 }
 static int
 mtp_r_data(queue_t *q, mblk_t *mp)
@@ -2998,7 +3018,7 @@ mtp_r_data(queue_t *q, mblk_t *mp)
 	struct mtp *mtp = MTP_PRIV(q);
 
 	/* data from below */
-	mi_strlog(q, STRLOGDA, SL_TRACE, "M_DATA [%lu] <-", (mtp_ulong) msgdsize(mp));
+	mi_strlog(q, STRLOGDA, SL_TRACE, "M_DATA [%lu] <-", (ulong) msgdsize(mp));
 	return mtp_data(mtp, q, mp);
 }
 
