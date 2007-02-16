@@ -142,7 +142,7 @@ service type.
 The
 .B MTP-TPI
 address is formatted as a socket address for compatability with the
-.BR sockets (4)
+.BR sockets (3)
 library for
 .BR tpi (7).
 The address format is as follows:
@@ -1242,12 +1242,22 @@ primitive is also local and automatic.
 .SH "AUTHOR"
 .PP
 Brian F. G. Bidulock <bidulock@openss7.org>
-.SH "CONFORMING TO"
+.SH CONFORMANCE
 .PP
 This interface conforms to NPI Revision 2.
 .[
-npi
+npi revision 2.0.0
 .]
+.SH "SEE ALSO"
+.BR mtp (7),
+.BR npi (7),
+.BR streamio (2),
+.BR putmsg (2),
+.BR putpmsg (2),
+.BR getmsg (2),
+.BR getpmsg (2),
+.BR read "(2), and "
+.BR write (2).
 .SH "HISTORY"
 .PP
 The Network Provider Interface first appeared in SVR4.
@@ -1256,10 +1266,28 @@ svr4
 .]
 .XX
 .[
-magic
+npi revision 2.0.0
 .]
 .[
-advprog
+q700
+.]
+.[
+q701
+.]
+.[
+q704
+.]
+.[
+t1.111
+.]
+.[
+mtpv1
+.]
+.[
+jtq704
+.]
+.[
+mtpi
 .]
 .[
 $LIST$

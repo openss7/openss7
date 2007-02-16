@@ -151,6 +151,9 @@ MTPI Stream using the
 .IR I_PUSH (7)
 command of
 .BR streamio (7),
+or the
+.BR autopush (8)
+utility,
 to provide a Network Provider Interface (NPI) to the MTPI Stream.
 .\"
 .\"

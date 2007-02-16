@@ -126,6 +126,7 @@ ss7_man_MANS = \
 	man4/mtp-mgmt.4 \
 	man4/mtp-min.4 \
 	man4/mtp-mtpi.4 \
+	man4/mtp_npi.4 \
 	man4/mtp-npi.4 \
 	man4/mtp_tpi.4 \
 	man4/mtp-tpi.4 \
@@ -224,7 +225,6 @@ ss7_man_MANS = \
 	man7/mtpi.7 \
 	man7/MTP_INFO_ACK.7 \
 	man7/MTP_INFO_REQ.7 \
-	man7/mtp_npi.7 \
 	man7/MTP_OK_ACK.7 \
 	man7/MTP_OPTMGMT_ACK.7 \
 	man7/MTP_OPTMGMT_REQ.7 \
@@ -234,7 +234,6 @@ ss7_man_MANS = \
 	man7/MTP_RESUME_IND.7 \
 	man7/mtp_socket.7 \
 	man7/MTP_STATUS_IND.7 \
-	man7/mtp_tpi.7 \
 	man7/MTP_TRANSFER_IND.7 \
 	man7/MTP_TRANSFER_REQ.7 \
 	man7/MTP_UNBIND_REQ.7 \
@@ -1612,6 +1611,7 @@ ss7_dist_noinst_MANS = \
 	man4/mtp-mgmt.4.man \
 	man4/mtp-min.4.man \
 	man4/mtp-mtpi.4.man \
+	man4/mtp_npi.4.man \
 	man4/mtp-npi.4.man \
 	man4/mtp_tpi.4.man \
 	man4/mtp-tpi.4.man \
@@ -1743,7 +1743,6 @@ ss7_dist_noinst_MANS = \
 	man7/mtpi.7.man \
 	man7/MTP_INFO_ACK.7.man \
 	man7/MTP_INFO_REQ.7.man \
-	man7/mtp_npi.7.man \
 	man7/MTP_OK_ACK.7.man \
 	man7/MTP_OPTMGMT_ACK.7.man \
 	man7/MTP_OPTMGMT_REQ.7.man \
@@ -1753,7 +1752,6 @@ ss7_dist_noinst_MANS = \
 	man7/MTP_RESUME_IND.7.man \
 	man7/mtp_socket.7.man \
 	man7/MTP_STATUS_IND.7.man \
-	man7/mtp_tpi.7.man \
 	man7/MTP_TRANSFER_IND.7.man \
 	man7/MTP_TRANSFER_REQ.7.man \
 	man7/MTP_UNBIND_REQ.7.man \

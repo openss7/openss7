@@ -95,8 +95,6 @@ static char const ident[] =
 #include <ss7/mtpi.h>
 #include <ss7/mtpi_ioctl.h>
 #include <sys/tihdr.h>
-// #include <sys/tpi_ss7.h>
-// #include <sys/tpi_mtp.h>
 #include <sys/xti.h>
 #include <sys/xti_mtp.h>
 
@@ -156,12 +154,15 @@ typedef struct mtp {
 	size_t src_len;
 	size_t dst_len;
 	uint coninds;
-	struct T_info_ack prot;
 	struct {
+		mtp_ulong pvar;
+		mtp_ulong popt;
 		mtp_ulong sls;		/* default options */
 		mtp_ulong mp;		/* default options */
 		mtp_ulong debug;	/* default options */
+		mtp_ulong sls_mask;
 	} options;
+	struct T_info_ack prot;
 } mtp_t;
 
 #define MTP_PRIV(__q) ((struct mtp *)(__q)->q_ptr)
@@ -689,6 +690,9 @@ t_conn_con(struct mtp *mtp, queue_t *q, mblk_t *bp,
 			if (bp)
 				freeb(bp);
 			mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_CONN_CON");
+			if (mtp_get_state(mtp) != TS_WCON_CREQ)
+				swerr();
+			mtp_set_state(mtp, TS_DATA_XFER);
 			putnext(mtp->rq, mp);
 			return (0);
 		}
@@ -713,8 +717,7 @@ t_discon_ind(struct mtp *mtp, queue_t *q, mblk_t *bp, t_scalar_t reason, mblk_t 
 	mblk_t *mp;
 	size_t msg_len = sizeof(*p);
 
-	if ((1 << mtp_get_state(mtp)) &
-	    (TSF_WCON_CREQ | TSF_WRES_CIND | TSF_DATA_XFER | TSF_WIND_ORDREL | TSF_WREQ_ORDREL)) {
+	if (mtp_chk_state(mtp, (TSF_WCON_CREQ | TSF_WRES_CIND | TSF_DATA_XFER | TSF_WIND_ORDREL | TSF_WREQ_ORDREL))) {
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
 			if (likely(canputnext(mtp->rq))) {
 				DB_TYPE(mp) = M_PROTO;
@@ -729,7 +732,7 @@ t_discon_ind(struct mtp *mtp, queue_t *q, mblk_t *bp, t_scalar_t reason, mblk_t 
 					freeb(bp);
 				mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_DISCON_IND");
 				putnext(mtp->rq, mp);
-				return (QR_ABSORBED);
+				return (0);
 			}
 			freeb(mp);
 			return (-EBUSY);
@@ -756,7 +759,7 @@ t_data_ind(struct mtp *mtp, queue_t *q, mblk_t *bp, t_scalar_t more, mblk_t *dp)
 	struct T_data_ind *p;
 	mblk_t *mp;
 
-	if ((1 << mtp_get_state(mtp)) & (TSF_DATA_XFER | TSF_WIND_ORDREL)) {
+	if (mtp_chk_state(mtp, (TSF_DATA_XFER | TSF_WIND_ORDREL))) {
 		if (likely((mp = mi_allocb(q, sizeof(*p), BPRI_MED)) != NULL)) {
 			if (likely(canputnext(mtp->rq))) {
 				DB_TYPE(mp) = M_PROTO;
@@ -795,7 +798,7 @@ t_exdata_ind(struct mtp *mtp, queue_t *q, mblk_t *bp, t_scalar_t more, mblk_t *d
 	struct T_exdata_ind *p;
 	mblk_t *mp;
 
-	if ((1 << mtp_get_state(mtp)) & (TSF_DATA_XFER | TSF_WIND_ORDREL)) {
+	if (mtp_chk_state(mtp, (TSF_DATA_XFER | TSF_WIND_ORDREL))) {
 		if (likely((mp = mi_allocb(q, sizeof(*p), BPRI_MED)) != NULL)) {
 			if (likely(canputnext(mtp->rq))) {
 				DB_TYPE(mp) = M_PROTO;
@@ -833,19 +836,16 @@ t_info_ack(struct mtp *mtp, queue_t *q, mblk_t *msg)
 	struct T_info_ack *p;
 	mblk_t *mp;
 
+
 	if (likely((mp = mi_allocb(q, sizeof(*p), BPRI_MED)) != NULL)) {
-		if (likely(canputnext(mtp->rq))) {
-			DB_TYPE(mp) = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
-			*p = mtp->prot;
-			freemsg(msg);
-			mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_INFO_ACK");
-			putnext(mtp->rq, mp);
-			return (0);
-		}
-		freeb(mp);
-		return (-EBUSY);
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		mp->b_wptr += sizeof(*p);
+		*p = mtp->prot;
+		freemsg(msg);
+		mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_INFO_ACK");
+		putnext(mtp->rq, mp);
+		return (0);
 	}
 	return (-ENOBUFS);
 }
@@ -944,8 +944,7 @@ t_error_ack(struct mtp *mtp, queue_t *q, mblk_t *msg, const t_scalar_t prim, t_s
 			mtp_set_state(mtp, TS_WREQ_ORDREL);
 			break;
 		default:
-			/* 
-			   Note: if we are not in a WACK state we simply do not change state.  This 
+			/* Note: if we are not in a WACK state we simply do not change state.  This 
 			   occurs normally when we send TOUTSTATE or TNOTSUPPORT or are responding
 			   to a T_OPTMGMT_REQ in other than TS_IDLE state. */
 			break;
@@ -1006,15 +1005,14 @@ t_ok_ack(struct mtp *mtp, queue_t *q, mblk_t *msg, t_scalar_t prim, t_scalar_t s
 			mtp_set_state(mtp, TS_IDLE);
 			break;
 		default:
-			/* 
-			   Note: if we are not in a WACK state we simply do not change state.  This 
+			/* Note: if we are not in a WACK state we simply do not change state.  This 
 			   occurs normally when we are responding to a T_OPTMGMT_REQ in other than
 			   the TS_IDLE state. */
 			break;
 		}
 		mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_OK_ACK");
 		putnext(mtp->rq, mp);
-		return (QR_DONE);
+		return (0);
 	}
 	return (-ENOBUFS);
 }
@@ -1065,9 +1063,15 @@ t_unitdata_ind(struct mtp *mtp, queue_t *q, mblk_t *bp,
 	return (-ENOBUFS);
 }
 
-/*
- *  T_UDERROR_IND
- *  -----------------------------------
+/**
+ * t_uderror_ind: - issue a T_UDERROR_IND primitive
+ * @mtp: MTP private data
+ * @q: active queue
+ * @bp: message block to free upon success
+ * @dst: destination address (or NULL)
+ * @opt: options (or NULL)
+ * @dp: user data
+ * @etype: error type
  */
 static inline fastcall __unlikely int
 t_uderror_ind(struct mtp *mtp, queue_t *q, mblk_t *bp,
@@ -1080,7 +1084,7 @@ t_uderror_ind(struct mtp *mtp, queue_t *q, mblk_t *bp,
 	size_t msg_len = sizeof(*p) + dst_len + opt_len;
 
 	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-		if (likely(canputnext(mtp->rq))) {
+		if (likely(bcanputnext(mtp->rq, 2))) {
 			DB_TYPE(mp) = M_PROTO;
 			mp->b_band = 2;	/* XXX move ahead of data indications */
 			p = (typeof(p)) mp->b_wptr;
@@ -1108,9 +1112,13 @@ t_uderror_ind(struct mtp *mtp, queue_t *q, mblk_t *bp,
 	return (-ENOBUFS);
 }
 
-/*
- *  T_OPTMGMT_ACK
- *  -----------------------------------
+/**
+ * t_optmgmt_ack: - issue a T_OPTMGMT_ACK primitive
+ * @mtp: MTP private data
+ * @q: active queue
+ * @msg: message to free upon success
+ * @flags: management flags
+ * @opt: options
  */
 static inline fastcall __unlikely int
 t_optmgmt_ack(struct mtp *mtp, queue_t *q, mblk_t *msg, t_scalar_t flags, struct mtp_opts *opt)
@@ -1142,9 +1150,11 @@ t_optmgmt_ack(struct mtp *mtp, queue_t *q, mblk_t *msg, t_scalar_t flags, struct
 	return (-ENOBUFS);
 }
 
-/*
- *  T_ORDREL_IND
- *  -----------------------------------
+/**
+ * t_ordrel_ind: - issue a T_ORDREL_IND primitive
+ * @mtp: MTP private data
+ * @q: active queue
+ * @msg: message to free upon success
  */
 static inline fastcall __unlikely int
 t_ordrel_ind(struct mtp *mtp, queue_t *q, mblk_t *msg)
@@ -1197,9 +1207,13 @@ t_optdata_ind(struct mtp *mtp, queue_t *q, mblk_t *bp,
 }
 
 #ifdef T_ADDR_ACK
-/*
- *  T_ADDR_ACK
- *  -----------------------------------
+/**
+ * t_addr_ack: - issue a T_ADDR_ACK primtive upstream
+ * @mtp: MTP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @loc: local address (or NULL)
+ * @rem: remote address (or NULL)
  */
 static inline fastcall __unlikely int
 t_addr_ack(struct mtp *mtp, queue_t *q, mblk_t *msg, struct mtp_addr *loc, struct mtp_addr *rem)
@@ -1233,9 +1247,12 @@ t_addr_ack(struct mtp *mtp, queue_t *q, mblk_t *msg, struct mtp_addr *loc, struc
 #endif
 
 #ifdef T_CAPABILITY_ACK
-/*
- *  T_CAPABILITY_ACK
- *  -----------------------------------
+/**
+ * t_capability_ack: - issue a T_CAPABILITY_ACK upstream
+ * @mtp: MTP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @caps: capability bits
  */
 static inline fastcall __unlikely int
 t_capability_ack(struct mtp *mtp, queue_t *q, mblk_t *msg, t_scalar_t caps)
@@ -1264,9 +1281,12 @@ t_capability_ack(struct mtp *mtp, queue_t *q, mblk_t *msg, t_scalar_t caps)
 }
 #endif
 
-/*
- *  T_RESET_IND
- *  -----------------------------------
+/**
+ * t_reset_ind: issue a T_RESET_IND upstream
+ * @mtp: MTP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @reason: reason for reset
  */
 static inline fastcall __unlikely int
 t_reset_ind(struct mtp *mtp, queue_t *q, mblk_t *msg, t_scalar_t reason)
@@ -1283,9 +1303,13 @@ t_reset_ind(struct mtp *mtp, queue_t *q, mblk_t *msg, t_scalar_t reason)
  *
  *  -------------------------------------------------------------------------
  */
-/*
- *  MTP_BIND_REQ        1 - Bind to an MTP-SAP
- *  -----------------------------------------------------------
+/**
+ * mtp_bind_req: - issue a MTP_BIND_REQ primitive
+ * @mtp: MTP private data
+ * @q: active queue
+ * @msg: message to free upon success
+ * @add: address to which to bind (or NULL)
+ * @flags: bind flags
  */
 static inline fastcall __unlikely int
 mtp_bind_req(struct mtp *mtp, queue_t *q, mblk_t *msg, struct mtp_addr *add, mtp_ulong flags)
@@ -1313,9 +1337,11 @@ mtp_bind_req(struct mtp *mtp, queue_t *q, mblk_t *msg, struct mtp_addr *add, mtp
 	return (-ENOBUFS);
 }
 
-/*
- *  MTP_UNBIND_REQ      2 - Unbind from an MTP-SAP
- *  -----------------------------------------------------------
+/**
+ * mtp_unbind_req: - issue a MTP_UNBIND_REQ primitive
+ * @mtp: MTP private data
+ * @q: active queue
+ * @msg: message to free upon success
  */
 static inline fastcall __unlikely int
 mtp_unbind_req(struct mtp *mtp, queue_t *q, mblk_t *msg)
@@ -1337,9 +1363,14 @@ mtp_unbind_req(struct mtp *mtp, queue_t *q, mblk_t *msg)
 	return (-ENOBUFS);
 }
 
-/*
- *  MTP_CONN_REQ        3 - Connect to a remote MTP-SAP
- *  -----------------------------------------------------------
+/**
+ * mtp_conn_req: - issue a MTP_CONN_REQ primitive
+ * @mtp: MTP private data
+ * @q: active queue
+ * @bp: message block to free upon success
+ * @add: address to which to connect (or NULL)
+ * @flags: connect flags
+ * @dp: user data
  */
 static inline fastcall __unlikely int
 mtp_conn_req(struct mtp *mtp, queue_t *q, mblk_t *bp,
@@ -1354,11 +1385,11 @@ mtp_conn_req(struct mtp *mtp, queue_t *q, mblk_t *bp,
 		if (likely(canputnext(mtp->wq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
-			mp->b_wptr += sizeof(*p);
 			p->mtp_primitive = MTP_CONN_REQ;
 			p->mtp_addr_length = add_len;
 			p->mtp_addr_offset = add_len ? sizeof(*p) : 0;
 			p->mtp_conn_flags = flags;
+			mp->b_wptr += sizeof(*p);
 			bcopy(add, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
 			mp->b_cont = dp;
@@ -1374,24 +1405,29 @@ mtp_conn_req(struct mtp *mtp, queue_t *q, mblk_t *bp,
 	return (-ENOBUFS);
 }
 
-/*
- *  MTP_DISCON_REQ      4 - Disconnect from a remote MTP-SAP
- *  -----------------------------------------------------------
+/**
+ * mtp_discon_req: - issue an MTP_DISCON_REQ primitive
+ * @mtp: MTP private data
+ * @q: active queue
+ * @bp: message block to free upon success
+ * @dp: user data
  */
 static inline fastcall __unlikely int
-mtp_discon_req(struct mtp *mtp, queue_t *q, mblk_t *msg)
+mtp_discon_req(struct mtp *mtp, queue_t *q, mblk_t *bp, mblk_t *dp)
 {
 	struct MTP_discon_req *p;
 	mblk_t *mp;
 	size_t msg_len = sizeof(*p);
 
 	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-		if (canputnext(mtp->wq)) {
+		if (likely(canputnext(mtp->wq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->mtp_primitive = MTP_DISCON_REQ;
 			mp->b_wptr += sizeof(*p);
-			freemsg(msg);
+			mp->b_cont = dp;
+			if (bp)
+				freeb(bp);
 			mi_strlog(q, STRLOGTX, SL_TRACE, "MTP_DISCON_REQ ->");
 			putnext(mtp->wq, mp);
 			return (0);
@@ -1402,9 +1438,11 @@ mtp_discon_req(struct mtp *mtp, queue_t *q, mblk_t *msg)
 	return (-ENOBUFS);
 }
 
-/*
- *  MTP_ADDR_REQ        5 - Address service
- *  -----------------------------------------------------------
+/**
+ * mtp_addr_request: - issue an MTP_ADDR_REQ primitive
+ * @mtp: MTP private data
+ * @q: active queue
+ * @msg: message to free upon success
  */
 static inline fastcall __unlikely int
 mtp_addr_req(struct mtp *mtp, queue_t *q, mblk_t *msg)
@@ -1426,9 +1464,11 @@ mtp_addr_req(struct mtp *mtp, queue_t *q, mblk_t *msg)
 	return (-ENOBUFS);
 }
 
-/*
- *  MTP_INFO_REQ        6 - Information service
- *  -----------------------------------------------------------
+/**
+ * mtp_info_req: - issue an MTP_INFO_REQ primitive
+ * @mtp: MTP private data
+ * @q: active queue
+ * @msg: message to free upon success
  */
 static inline fastcall __unlikely int
 mtp_info_req(struct mtp *mtp, queue_t *q, mblk_t *msg)
@@ -1450,9 +1490,13 @@ mtp_info_req(struct mtp *mtp, queue_t *q, mblk_t *msg)
 	return (-ENOBUFS);
 }
 
-/*
- *  MTP_OPTMGMT_REQ     7 - Options management service
- *  -----------------------------------------------------------
+/**
+ * mtp_optmgmt_req: - issue an MTP_OPTMGMT_REQ primitive
+ * @mtp: MTP private data
+ * @q: active queue
+ * @msg: message to free upon success
+ * @opt: options (or NULL)
+ * @flags: management flags
  */
 static inline fastcall __unlikely int
 mtp_optmgmt_req(struct mtp *mtp, queue_t *q, mblk_t *msg, struct mtp_opts *opt, mtp_ulong flags)
@@ -1463,26 +1507,36 @@ mtp_optmgmt_req(struct mtp *mtp, queue_t *q, mblk_t *msg, struct mtp_opts *opt, 
 	size_t msg_len = sizeof(*p) + opt_len;
 
 	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-		DB_TYPE(mp) = M_PROTO;
-		p = (typeof(p)) mp->b_wptr;
-		p->mtp_primitive = MTP_OPTMGMT_REQ;
-		p->mtp_opt_length = opt_len;
-		p->mtp_opt_offset = sizeof(*p);
-		p->mtp_mgmt_flags = flags;
-		mp->b_wptr += sizeof(*p);
-		t_build_opts(opt, mp->b_wptr);
-		mp->b_wptr += opt_len;
-		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "MTP_OPTMGMT_REQ ->");
-		putnext(mtp->wq, mp);
-		return (0);
+		if (likely(canputnext(mtp->wq))) {
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->mtp_primitive = MTP_OPTMGMT_REQ;
+			p->mtp_opt_length = opt_len;
+			p->mtp_opt_offset = sizeof(*p);
+			p->mtp_mgmt_flags = flags;
+			mp->b_wptr += sizeof(*p);
+			t_build_opts(opt, mp->b_wptr);
+			mp->b_wptr += opt_len;
+			freemsg(msg);
+			mi_strlog(q, STRLOGTX, SL_TRACE, "MTP_OPTMGMT_REQ ->");
+			putnext(mtp->wq, mp);
+			return (0);
+		}
+		freeb(mp);
+		return (-EBUSY);
 	}
 	return (-ENOBUFS);
 }
 
-/*
- *  MTP_TRANSFER_REQ    8 - MTP data transfer request
- *  -----------------------------------------------------------
+/**
+ * mtp_transfer_req: - issue an MTP_TRANSFER_REQ primitive
+ * @mtp: MTP private data
+ * @q: active queue
+ * @bp: message block to free upon success
+ * @dst: destination address (or NULL)
+ * @pri: message priority
+ * @sls: signalling link selection
+ * @dp: user data
  */
 static inline fastcall __unlikely int
 mtp_transfer_req(struct mtp *mtp, queue_t *q, mblk_t *bp,
@@ -1493,7 +1547,7 @@ mtp_transfer_req(struct mtp *mtp, queue_t *q, mblk_t *bp,
 	size_t dst_len = dst ? sizeof(*dst) : 0;
 	size_t msg_len = sizeof(*p) + dst_len;
 
-	if (unlikely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
 		if (likely(bcanputnext(mtp->wq, dp->b_band))) {
 			DB_TYPE(mp) = M_PROTO;
 			mp->b_band = dp->b_band;
@@ -1532,17 +1586,20 @@ mtp_transfer_req(struct mtp *mtp, queue_t *q, mblk_t *bp,
  * @mtp: private structure
  * @q: active queue
  * @mp: the message
+ *
+ * To support pseudo-connectionless modes, when this message is sent for T_CLTS we should send the
+ * data to the same adress and with the same options as the last T_UNITDATA_REQ primitive.
  */
 static inline fastcall __hot_read int
 t_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
 {
-	int dlen = msgdsize(mp);
+	const size_t dlen = msgdsize(mp);
 
 	if (mtp->prot.SERV_type == T_CLTS)
 		goto notsupport;
 	if (mtp_get_state(mtp) == TS_IDLE)
 		goto discard;
-	if ((1 << mtp_get_state(mtp)) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL))
+	if (mtp_not_state(mtp, (TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto outstate;
 	if (dlen == 0 || dlen > mtp->prot.TSDU_size || dlen > mtp->prot.TIDU_size)
 		goto baddata;
@@ -1555,7 +1612,8 @@ t_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	goto error;
       discard:
 	mi_strlog(q, 0, SL_TRACE, "ignore in idle state");
-	return (QR_DONE);
+	freemsg(mp);
+	return (0);
       notsupport:
 	mi_strlog(q, 0, SL_TRACE, "primitive not supported for T_CLTS");
 	goto error;
@@ -1587,21 +1645,25 @@ t_conn_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	if (mtp->prot.SERV_type == T_CLTS)
 		goto notsupport;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
+		goto badprim;
 	if (mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)
-		goto einval;
+		goto badprim;
 	if (mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
-		goto einval;
+		goto badprim;
 	dst = (typeof(dst)) (mp->b_rptr + p->DEST_offset);
+	if (!p->DEST_length)
+		goto noaddr;
 	if (p->DEST_length < sizeof(*dst))
 		goto badaddr;
 	if (dst->family != AF_MTP)
 		goto badaddr;
 	if (dst->si == 0 && mtp->src.si == 0)
 		goto noaddr;
+	if (dst->si < 3 && mtp->src.si != 0)
+		goto badaddr;
 	if (dst->si < 3 && mtp->cred.cr_uid != 0)
 		goto acces;
-	if (dst->si != mtp->src.si)
+	if (dst->si != mtp->src.si && mtp->src.si != 0)
 		goto badaddr;
 	if (t_parse_opts(&opts, mp->b_rptr + p->OPT_offset, p->OPT_length))
 		goto badopt;
@@ -1629,9 +1691,9 @@ t_conn_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	err = TNOADDR;
 	mi_strlog(q, 0, SL_TRACE, "couldn't allocate address");
 	goto error;
-      einval:
-	err = -EINVAL;
-	mi_strlog(q, 0, SL_TRACE, "invalid message format");
+      badprim:
+	err = -EMSGSIZE;
+	mi_strlog(q, 0, SL_TRACE, "invalid primitive format");
 	goto error;
       outstate:
 	err = TOUTSTATE;
@@ -1662,10 +1724,18 @@ t_conn_res(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	if (mtp_get_state(mtp) != TS_WRES_CIND)
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
-	goto notsupport;
-      einval:
-	err = -EINVAL;
+		goto badprim;
+	/* We never give an T_CONN_IND, so there is no reason for a T_CONN_RES.  We probably could
+	   do this (issue an T_CONN_IND on a listening stream when there is no other MTP user for
+	   the SI value and * send a UPU on an N_DISCON_REQ or just redirect all traffic for that
+	   user on a T_CONN_RES) but that is for later. */
+	goto eopnotsupp;
+      eopnotsupp:
+	err = -EOPNOTSUPP;
+	mi_strlog(q, 0, SL_TRACE, "operation not supported");
+	goto error;
+      badprim:
+	err = -EMSGSIZE;
 	mi_strlog(q, 0, SL_TRACE, "invalid primitive format");
 	goto error;
       outstate:
@@ -1694,25 +1764,28 @@ t_discon_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 
 	if (mtp->prot.SERV_type == T_CLTS)
 		goto notsupport;
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto badprim;
+	/* Currently there are only three states we can disconnect from.  The first does not
+	   happen. Only the second one is normal.  The third should occur during simulteneous
+	   diconnect only. */
 	switch (mtp_get_state(mtp)) {
 	case TS_WCON_CREQ:
-		if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-			goto einval;
 		mtp_set_state(mtp, TS_WACK_DREQ6);
 		break;
 	case TS_DATA_XFER:
-		if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-			goto einval;
 		mtp_set_state(mtp, TS_WACK_DREQ9);
+		break;
+	case TS_IDLE:
+		rare();
 		break;
 	default:
 		goto outstate;
 	}
-	/* 
-	   change state and let t_ok_ack do all the work */
+	/* change state and let mtp_ok_ack do all the work */
 	return mtp_discon_req(mtp, q, mp);
-      einval:
-	err = -EINVAL;
+      badprim:
+	err = -EMSGSIZE;
 	mi_strlog(q, 0, SL_TRACE, "invalid primitive format");
 	goto error;
       outstate:
@@ -1745,6 +1818,8 @@ t_data_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
+	if (!mp->b_cont)
+		goto einval;
 	if ((1 << mtp_get_state(mtp)) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL))
 		goto outstate;
 	if (dlen == 0 || dlen > mtp->prot.TSDU_size || dlen > mtp->prot.TIDU_size)
@@ -1762,7 +1837,7 @@ t_data_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	goto error;
       discard:
 	mi_strlog(q, 0, SL_TRACE, "ignore in idle state");
-	return (QR_DONE);
+	return (0);
       notsupport:
 	mi_strlog(q, 0, SL_TRACE, "primitive not supported for T_CLTS");
 	goto error;
@@ -1806,32 +1881,30 @@ t_bind_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 {
 	int err;
 	const struct T_bind_req *p = (typeof(p)) mp->b_rptr;
-	struct mtp_addr *src;
+	struct mtp_addr src;
 
-	if (mtp_get_state != TS_UNBND)
+	if (mtp_get_state(mtp) != TS_UNBND)
 		goto outstate;
-	mtp_set_state(mtp, TS_WACK_BREQ);
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto einval;
-	if ((mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length))
-		goto einval;
+		goto badprim;
+	if (mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length)
+		goto badprim;
 	if (p->CONIND_number)
 		goto notsupport;
 	if (!p->ADDR_length)
 		goto noaddr;
-	if (p->ADDR_length < sizeof(*src))
+	if (p->ADDR_length < sizeof(src))
 		goto badaddr;
-	src = (typeof(src)) (mp->b_rptr + p->ADDR_offset);
-	/* 
-	   we don't allow wildcards yet. */
-	if (src->family != AF_MTP)
+	bcopy(mp->b_rptr + p->ADDR_offset, &src, sizeof(src));
+	/* we don't allow wildcards yet. */
+	if (src.family != AF_MTP)
 		goto badaddr;
-	if (!src->si || !src->pc)
+	if (!src.si || !src.pc)
 		goto noaddr;
-	if (src->si < 3 && mtp->cred.cr_uid != 0)
+	if (src.si < 3 && mtp->cred.cr_uid != 0)
 		goto acces;
 	mtp_set_state(mtp, TS_WACK_BREQ);
-	return mtp_bind_req(mtp, q, mp, src, 0);
+	return mtp_bind_req(mtp, q, mp, &src, 0);
       acces:
 	err = TACCES;
 	mi_strlog(q, 0, SL_TRACE, "no permission for address");
@@ -1844,17 +1917,17 @@ t_bind_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	err = TBADADDR;
 	mi_strlog(q, 0, SL_TRACE, "address is invalid");
 	goto error;
-      einval:
-	err = -EINVAL;
+      notsupport:
+	err = TNOTSUPPORT;
+	mi_strlog(q, 0, SL_TRACE, "primitive not support for T_CLTS");
+	goto error;
+      badprim:
+	err = -EMSGSIZE;
 	mi_strlog(q, 0, SL_TRACE, "invalid primitive format");
 	goto error;
       outstate:
 	err = TOUTSTATE;
 	mi_strlog(q, 0, SL_TRACE, "would place i/f out of state");
-	goto error;
-      notsupport:
-	err = TNOTSUPPORT;
-	mi_strlog(q, 0, SL_TRACE, "primitive not support for T_CLTS");
 	goto error;
       error:
 	return t_error_ack(mtp, q, mp, p->PRIM_type, err);
@@ -1872,6 +1945,8 @@ t_unbind_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	const struct T_unbind_req *p = (typeof(p)) mp->b_rptr;
 	int err;
 
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto badprim;
 	if (mtp_get_state(mtp) != TS_IDLE)
 		goto outstate;
 	mtp_set_state(mtp, TS_WACK_UREQ);
@@ -1879,6 +1954,10 @@ t_unbind_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
       outstate:
 	err = TOUTSTATE;
 	mi_strlog(q, 0, SL_TRACE, "would place i/f out of state");
+	goto error;
+      badprim:
+	err = -EMSGSIZE;
+	mi_strlog(q, 0, SL_TRACE, "invalid primitive format");
 	goto error;
       error:
 	return t_error_ack(mtp, q, mp, p->PRIM_type, err);
@@ -1895,11 +1974,15 @@ t_unitdata_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 {
 	const struct T_unitdata_req *p = (typeof(p)) mp->b_rptr;
 	size_t dlen = mp->b_cont ? msgdsize(mp->b_cont) : 0;
-	struct mtp_addr *dst;
+	struct mtp_addr dst;
 	struct mtp_opts opts = { 0L, NULL, };
 
 	if (mtp->prot.SERV_type != T_CLTS)
 		goto notsupport;
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto badprim;
+	if (mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)
+		goto badprim;
 	if (mtp_get_state(mtp) != TS_IDLE)
 		goto outstate;
 	if (dlen == 0 && !(mtp->prot.PROVIDER_flag & T_SNDZERO))
@@ -1909,16 +1992,24 @@ t_unitdata_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p)
 	    || mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length
 	    || mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
-		goto einval;
-	dst = (typeof(dst)) (mp->b_rptr + p->DEST_offset);
-	if (p->DEST_length < sizeof(*dst))
+		goto badprim;
+	if (!p->DEST_length)
+		goto noaddr;
+	if (p->DEST_length < sizeof(dst))
 		goto badaddr;
-	if (dst->si < 3 && mtp->cred.cr_uid != 0)
+	bcopy(mp->b_rptr + p->DEST_offset, &dst, sizeof(dst));
+	if (dst.family != AF_MTP)
+		goto badaddr;
+	if (!dst.si || !dst.pc)
+		goto badaddr;
+	if (dst.si < 3 && mtp->cred.cr_uid != 0)
 		goto acces;
+	if (dst.si != mtp->src.si)
+		goto badaddr;
 	if (t_parse_opts(&opts, mp->b_rptr + p->OPT_offset, p->OPT_length))
 		goto badopt;
 	fixme(("Handle options correctly\n"));
-	return mtp_transfer_req(mtp, q, mp, dst, mtp->options.mp, mtp->options.sls, mp->b_cont);
+	return mtp_transfer_req(mtp, q, mp, &dst, mtp->options.mp, mtp->options.sls, mp->b_cont);
       badopt:
 	mi_strlog(q, 0, SL_TRACE, "bad options");
 	goto error;
@@ -1928,14 +2019,17 @@ t_unitdata_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
       badaddr:
 	mi_strlog(q, 0, SL_TRACE, "bad destination address");
 	goto error;
-      einval:
-	mi_strlog(q, 0, SL_TRACE, "invalid parameter");
+      noaddr:
+	mi_strlog(q, 0, SL_TRACE, "could not allocate address");
+	goto error;
+      baddata:
+	mi_strlog(q, 0, SL_TRACE, "bad data size %lu", (ulong) dlen);
 	goto error;
       outstate:
 	mi_strlog(q, 0, SL_TRACE, "would place i/f out of state");
 	goto error;
-      baddata:
-	mi_strlog(q, 0, SL_TRACE, "bad data size %lu", (ulong) dlen);
+      badprim:
+	mi_strlog(q, 0, SL_TRACE, "invalid primitive format");
 	goto error;
       notsupport:
 	mi_strlog(q, 0, SL_TRACE, "primitive not supported for T_COTS or T_COTS_ORD");
@@ -1957,13 +2051,14 @@ t_optmgmt_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	const struct T_optmgmt_req *p = (typeof(p)) mp->b_rptr;
 	struct mtp_opts opts = { 0L, NULL, };
 
+	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		goto badprim;
+	if (mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
+		goto badprim;
 #ifdef TS_WACK_OPTREQ
 	if (mtp_get_state(mtp) == TS_IDLE)
 		mtp_set_state(mtp, TS_WACK_OPTREQ);
 #endif
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p)
-	    || mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
-		goto einval;
 	if (t_parse_opts(&opts, mp->b_rptr + p->OPT_offset, p->OPT_length))
 		goto badopt;
 	switch (p->MGMT_flags) {
@@ -2001,8 +2096,8 @@ t_optmgmt_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	err = TBADOPT;
 	mi_strlog(q, 0, SL_TRACE, "bad options");
 	goto error;
-      einval:
-	err = -EINVAL;
+      badprim:
+	err = -EMSGSIZE;
 	mi_strlog(q, 0, SL_TRACE, "invalid primitive format");
 	goto error;
       error:
@@ -2084,7 +2179,7 @@ t_optdata_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	return m_error(mtp, q, mp, EPROTO);
       discard:
 	mi_strlog(q, 0, SL_TRACE, "ignore in idle state");
-	return (QR_DONE);
+	return (0);
       notsupport:
 	err = TNOTSUPPORT;
 	mi_strlog(q, 0, SL_TRACE, "primitive not supported for T_CLTS");
@@ -2485,12 +2580,10 @@ mtp_transfer_ind(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto baddata;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto protoshort;
-
 	opts.flags = (1 << T_MTP_SLS) | (1 << T_MTP_MP);
 	opts.sls = &p->mtp_sls;
 	opts.mp = &p->mtp_mp;
 	opts.debug = NULL;
-
 	if (mtp_chk_state(mtp, TSF_WACK))
 		goto wait;
 	switch (mtp->prot.SERV_type) {
@@ -2922,7 +3015,7 @@ mtp_w_ioctl(queue_t *q, mblk_t *mp)
 		iocp->ioc_rval = -1;
 	}
 	qreply(q, mp);
-	return (QR_ABSORBED);
+	return (0);
 }
 #endif
 
@@ -2946,9 +3039,7 @@ mtp_w_proto_slow(queue_t *q, mblk_t *mp)
 
 	if (!(mtp = (struct mtp *) mi_trylock(q)))
 		return (-EAGAIN);
-
 	oldstate = mtp_get_state(mtp);
-
 	switch (*(mtp_ulong *) mp->b_rptr) {
 	case T_CONN_REQ:
 		mi_strlog(q, STRLOGTX, SL_TRACE, "-> T_CONN_REQ");
@@ -3017,7 +3108,6 @@ mtp_w_proto_slow(queue_t *q, mblk_t *mp)
 	}
 	if (err < 0)
 		mtp_set_state(mtp, oldstate);
-
 	mi_unlock((caddr_t) mtp);
 	return (err);
 }
@@ -3054,9 +3144,7 @@ mtp_r_proto_slow(queue_t *q, mblk_t *mp)
 
 	if (!(mtp = (struct mtp *) mi_trylock(q)))
 		return (-EAGAIN);
-
 	oldstate = mtp_get_state(mtp);
-
 	switch (*(mtp_ulong *) mp->b_rptr) {
 	case MTP_OK_ACK:
 		mi_strlog(q, STRLOGRX, SL_TRACE, "MTP_OK_ACK <-");
@@ -3140,12 +3228,10 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 		goto go_slow;
 	if (unlikely(p->mtp_primitive != MTP_TRANSFER_IND))
 		goto go_slow;
-
 	opts.flags = (1 << T_MTP_SLS) | (1 << T_MTP_MP);
 	opts.sls = &p->mtp_sls;
 	opts.mp = &p->mtp_mp;
 	opts.debug = NULL;
-
 	if (unlikely(mtp_chk_state(mtp, TSF_WACK)))
 		goto go_slow;
 	/* Two choices, either we are connectionless or connection oriented. */
@@ -3434,10 +3520,8 @@ static struct module_info mtp_minfo = {
 	.mi_hiwat = 1,			/* Hi water mark */
 	.mi_lowat = 0,			/* Lo water mark */
 };
-
-static struct module_stat mtp_rstat __attribute__ ((aligned(SMP_CACHE_BYTES)));
-static struct module_stat mtp_wstat __attribute__ ((aligned(SMP_CACHE_BYTES)));
-
+static struct module_stat mtp_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat mtp_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 static struct qinit mtp_rinit = {
 	.qi_putp = mtp_rput,		/* Read put (msg from below) */
 	.qi_srvp = mtp_rsrv,
@@ -3446,14 +3530,12 @@ static struct qinit mtp_rinit = {
 	.qi_minfo = &mtp_minfo,		/* Information */
 	.qi_mstat = &mtp_rstat,		/* Statistics */
 };
-
 static struct qinit mtp_winit = {
 	.qi_putp = mtp_wput,		/* Write put (msg from above) */
 	.qi_srvp = mtp_wsrv,
 	.qi_minfo = &mtp_minfo,		/* Information */
 	.qi_mstat = &mtp_wstat,		/* Statistics */
 };
-
 static struct streamtab mtp_tpiinfo = {
 	.st_rdinit = &mtp_rinit,	/* Upper read queue */
 	.st_wrinit = &mtp_winit,	/* Upper write queue */

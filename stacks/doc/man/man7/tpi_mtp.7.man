@@ -591,8 +591,6 @@ associated with the MTP-TRANSFER-REQ will be the default or user-specified
 values for the stream specified with the
 .B T_OPTMGMT_REQ
 primitive.
-.TP
-.I MORE_flag
 .SS T_DATA_IND
 .PP
 Indicates the MTP-TRANSFER-IND primitive.  The source and destination address
@@ -834,6 +832,15 @@ interface.
 .BR write (2).
 .XX
 .[
+TPI Revision 2.0.0
+.]
+.[
+q700
+.]
+.[
+q701
+.]
+.[
 q702
 .]
 .[
@@ -855,7 +862,7 @@ mtpv1
 jtq704
 .]
 .[
-TPI Revision 2.0.0
+mtpi
 .]
 .[
 magic

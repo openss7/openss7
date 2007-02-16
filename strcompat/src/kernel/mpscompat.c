@@ -288,11 +288,37 @@ struct mi_comm {
 		dev_t dev;		/* device number (or NODEV for modules) */
 		int index;		/* link index */
 	} mi_u;
-	char mi_priv[0];		/* followed by private data */
+	char mi_ptr[0];			/* followed by private data */
 };
 
 #define mi_dev mi_u.dev
 #define mi_index mi_u.index
+
+#define mi_to_ptr(mi) ((mi) ? (mi)->mi_ptr : NULL)
+#define ptr_to_mi(ptr) ((ptr) ? (struct mi_comm *)(ptr) - 1 : NULL)
+
+static void
+mi_open_init(struct mi_comm *mi, size_t size)
+{
+	bzero(mi, sizeof(*mi));
+	mi->mi_prev = mi->mi_head = &mi->mi_next;
+	mi->mi_size = size;
+	spin_lock_init(&mi->mi_lock);
+	init_waitqueue_head(&mi->mi_waitq);
+	return;
+}
+
+static caddr_t
+mi_open_alloc_flag(size_t size, int flag)
+{
+	struct mi_comm *mi;
+
+	if ((mi = kmem_zalloc(sizeof(struct mi_comm) + size, flag))) {
+		mi_open_init(mi, size);
+		return (mi_to_ptr(mi));
+	}
+	return (NULL);
+}
 
 /*
  *  MI_OPEN_ALLOC
@@ -301,15 +327,7 @@ struct mi_comm {
 caddr_t
 mi_open_alloc(size_t size)
 {
-	struct mi_comm *mi;
-	if ((mi = kmem_zalloc(sizeof(struct mi_comm) + size, KM_NOSLEEP))) {
-		mi->mi_prev = mi->mi_head = &mi->mi_next;
-		mi->mi_size = size;
-		spin_lock_init(&mi->mi_lock);
-		init_waitqueue_head(&mi->mi_waitq);
-		return ((caddr_t) (mi + 1));
-	}
-	return (NULL);
+	return mi_open_alloc_flag(size, KM_NOSLEEP);
 }
 
 EXPORT_SYMBOL_NOVERS(mi_open_alloc);	/* mps/ddi.h */
@@ -321,15 +339,7 @@ EXPORT_SYMBOL_NOVERS(mi_open_alloc);	/* mps/ddi.h */
 caddr_t
 mi_open_alloc_sleep(size_t size)
 {
-	struct mi_comm *mi;
-	if ((mi = kmem_zalloc(sizeof(struct mi_comm) + size, KM_SLEEP))) {
-		mi->mi_prev = mi->mi_head = &mi->mi_next;
-		mi->mi_size = size;
-		spin_lock_init(&mi->mi_lock);
-		init_waitqueue_head(&mi->mi_waitq);
-		return ((caddr_t) (mi + 1));
-	}
-	return (NULL);
+	return mi_open_alloc_flag(size, KM_SLEEP);
 }
 
 EXPORT_SYMBOL_NOVERS(mi_open_alloc_sleep);	/* mps/ddi.h */
@@ -346,7 +356,7 @@ mi_first_ptr(caddr_t *mi_head)
 {
 	struct mi_comm *mi = *(struct mi_comm **) mi_head;
 
-	return mi ? ((caddr_t) (mi + 1)) : NULL;
+	return (mi_to_ptr(mi));
 }
 
 EXPORT_SYMBOL_NOVERS(mi_first_ptr);	/* mps/ddi.h */
@@ -364,7 +374,7 @@ mi_first_dev_ptr(caddr_t *mi_head)
 	struct mi_comm *mi = *(struct mi_comm **) mi_head;
 
 	for (; mi && getmajor(mi->mi_dev) != 0; mi = mi->mi_next) ;
-	return mi ? ((caddr_t) (mi + 1)) : NULL;
+	return (mi_to_ptr(mi));
 }
 
 EXPORT_SYMBOL_NOVERS(mi_first_dev_ptr);	/* mps/ddi.h */
@@ -376,9 +386,11 @@ EXPORT_SYMBOL_NOVERS(mi_first_dev_ptr);	/* mps/ddi.h */
 caddr_t
 mi_next_ptr(caddr_t ptr)
 {
-	struct mi_comm *mi = ptr ? (((struct mi_comm *) ptr) - 1)->mi_next : NULL;
+	struct mi_comm *mi = ptr_to_mi(ptr);
 
-	return mi ? ((caddr_t) (mi + 1)) : NULL;
+	if (mi)
+		mi = mi->mi_next;
+	return (mi_to_ptr(mi));
 }
 
 EXPORT_SYMBOL_NOVERS(mi_next_ptr);	/* mps/ddi.h, aix/ddi.h */
@@ -393,10 +405,10 @@ EXPORT_SYMBOL_NOVERS(mi_next_ptr);	/* mps/ddi.h, aix/ddi.h */
 caddr_t
 mi_next_dev_ptr(caddr_t *mi_head, caddr_t ptr)
 {
-	struct mi_comm *mi = ptr ? (((struct mi_comm *) ptr) - 1) : NULL;
+	struct mi_comm *mi = ptr_to_mi(ptr);
 
 	for (mi = mi ? mi->mi_next : NULL; mi && getmajor(mi->mi_dev) != 0; mi = mi->mi_next) ;
-	return mi ? ((caddr_t) (mi + 1)) : NULL;
+	return (mi_to_ptr(mi));
 }
 
 EXPORT_SYMBOL_NOVERS(mi_next_dev_ptr);	/* mps/ddi.h */
@@ -409,7 +421,7 @@ EXPORT_SYMBOL_NOVERS(mi_next_dev_ptr);	/* mps/ddi.h */
 caddr_t
 mi_prev_ptr(caddr_t ptr)
 {
-	struct mi_comm *mi = ptr ? (((struct mi_comm *) ptr) - 1) : NULL;
+	struct mi_comm *mi = ptr_to_mi(ptr);
 
 	if (mi && mi->mi_prev != &mi->mi_next && mi->mi_prev != mi->mi_head)
 		return ((caddr_t) (((struct mi_comm *) mi->mi_prev) + 1));
@@ -427,7 +439,9 @@ static spinlock_t mi_list_lock = SPIN_LOCK_UNLOCKED;
 int
 mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
-	struct mi_comm *mi = ((struct mi_comm *) ptr) - 1, **mip = (struct mi_comm **) mi_head;
+	struct mi_comm *mi = ptr_to_mi(ptr);
+	struct mi_comm **mip = (struct mi_comm **) mi_head;
+
 	major_t cmajor = devp ? getmajor(*devp) : 0;
 	minor_t cminor = devp ? getminor(*devp) : 0;
 	major_t dmajor;
@@ -493,7 +507,7 @@ EXPORT_SYMBOL_NOVERS(mi_open_detached);	/* mps/ddi.h */
 void
 mi_attach(queue_t *q, caddr_t ptr)
 {
-	struct mi_comm *mi = ((struct mi_comm *) ptr) - 1;
+	struct mi_comm *mi = ptr_to_mi(ptr);
 
 	mi->mi_mid = q->q_qinfo->qi_minfo->mi_idnum;
 	q->q_ptr = WR(q)->q_ptr = ptr;
@@ -516,9 +530,9 @@ EXPORT_SYMBOL_NOVERS(mi_open_comm);	/* mps/ddi.h, aix/ddi.h */
 void
 mi_close_unlink(caddr_t *mi_head, caddr_t ptr)
 {
-	if (ptr) {
-		struct mi_comm *mi = ((struct mi_comm *) ptr) - 1;
+	struct mi_comm *mi = ptr_to_mi(ptr);
 
+	if (mi) {
 		spin_lock(&mi_list_lock);
 		if ((*mi->mi_prev = mi->mi_next))
 			mi->mi_next->mi_prev = mi->mi_prev;
@@ -538,9 +552,9 @@ EXPORT_SYMBOL_NOVERS(mi_close_unlink);	/* mps/ddi.h */
 void
 mi_close_free(caddr_t ptr)
 {
-	struct mi_comm *mi = ((struct mi_comm *) ptr) - 1;
+	struct mi_comm *mi = ptr_to_mi(ptr);
 
-	if (ptr && mi->mi_head == NULL && mi->mi_next == NULL)
+	if (mi && mi->mi_head == NULL && mi->mi_next == NULL)
 		kmem_free(mi, mi->mi_size);
 }
 
@@ -553,14 +567,15 @@ EXPORT_SYMBOL_NOVERS(mi_close_free);	/* mps/ddi.h */
 void
 mi_detach(queue_t *q, caddr_t ptr)
 {
-	struct mi_comm *mi = ((struct mi_comm *) ptr) - 1;
+	struct mi_comm *mi = ptr_to_mi(ptr);
 	bcid_t bid;
 
-	if ((bid = xchg(&mi->mi_rbid, 0)))
-		unbufcall(bid);
-	if ((bid = xchg(&mi->mi_wbid, 0)))
-		unbufcall(bid);
-
+	if (mi) {
+		if ((bid = xchg(&mi->mi_rbid, 0)))
+			unbufcall(bid);
+		if ((bid = xchg(&mi->mi_wbid, 0)))
+			unbufcall(bid);
+	}
 	q->q_ptr = WR(q)->q_ptr = NULL;
 }
 
@@ -600,20 +615,19 @@ struct mi_iocblk {
 caddr_t
 mi_trylock(queue_t *q)
 {
-	caddr_t rtn;
+	caddr_t ptr = q->q_ptr;
+	struct mi_comm *mi = ptr_to_mi(ptr);
+	unsigned long flags;
 
-	if ((rtn = q->q_ptr)) {
-		struct mi_comm *mi = ((struct mi_comm *) rtn) - 1;
-		unsigned long flags;
-
+	if (mi) {
 		spin_lock_irqsave(&mi->mi_lock, flags);
 		if (mi->mi_users != 0)
-			rtn = NULL;
+			ptr = NULL;
 		else
 			mi->mi_users = 1;
 		spin_unlock_irqrestore(&mi->mi_lock, flags);
 	}
-	return (rtn);
+	return (ptr);
 }
 
 EXPORT_SYMBOL_NOVERS(mi_trylock);
@@ -621,35 +635,37 @@ EXPORT_SYMBOL_NOVERS(mi_trylock);
 caddr_t
 mi_sleeplock(queue_t *q)
 {
-	caddr_t rtn = q->q_ptr;
-	struct mi_comm *mi = ((struct mi_comm *) rtn) - 1;
+	caddr_t ptr = q->q_ptr;
+	struct mi_comm *mi = ptr_to_mi(ptr);
 	unsigned long flags;
 
 	DECLARE_WAITQUEUE(wait, current);
 
-	add_wait_queue(&mi->mi_waitq, &wait);
-	spin_lock_irqsave(&mi->mi_lock, flags);
-	if (mi->mi_users != 0) {
-		for (;;) {
-			set_current_state(TASK_INTERRUPTIBLE);
-			if (signal_pending(current)) {
-				rtn = NULL;
-				break;
+	if (mi) {
+		add_wait_queue(&mi->mi_waitq, &wait);
+		spin_lock_irqsave(&mi->mi_lock, flags);
+		if (mi->mi_users != 0) {
+			for (;;) {
+				set_current_state(TASK_INTERRUPTIBLE);
+				if (signal_pending(current)) {
+					ptr = NULL;
+					break;
+				}
+				if (mi->mi_users == 0) {
+					mi->mi_users = 1;
+					break;
+				}
+				spin_unlock_irqrestore(&mi->mi_lock, flags);
+				schedule();
+				spin_lock_irqsave(&mi->mi_lock, flags);
 			}
-			if (mi->mi_users == 0) {
-				mi->mi_users = 1;
-				break;
-			}
-			spin_unlock_irqrestore(&mi->mi_lock, flags);
-			schedule();
-			spin_lock_irqsave(&mi->mi_lock, flags);
-		}
-	} else
-		mi->mi_users = 1;
-	spin_unlock_irqrestore(&mi->mi_lock, flags);
-	set_current_state(TASK_RUNNING);
-	remove_wait_queue(&mi->mi_waitq, &wait);
-	return (rtn);
+		} else
+			mi->mi_users = 1;
+		spin_unlock_irqrestore(&mi->mi_lock, flags);
+		set_current_state(TASK_RUNNING);
+		remove_wait_queue(&mi->mi_waitq, &wait);
+	}
+	return (ptr);
 
 }
 
@@ -658,19 +674,21 @@ EXPORT_SYMBOL_NOVERS(mi_sleeplock);
 void
 mi_unlock(caddr_t ptr)
 {
-	struct mi_comm *mi = ((struct mi_comm *) ptr) - 1;
+	struct mi_comm *mi = ptr_to_mi(ptr);
 	unsigned long flags;
 	queue_t *newq;
 
-	spin_lock_irqsave(&mi->mi_lock, flags);
-	mi->mi_users = 0;
-	if ((newq = mi->mi_qwait))
-		mi->mi_qwait = NULL;
-	spin_unlock_irqrestore(&mi->mi_lock, flags);
-	if (waitqueue_active(&mi->mi_waitq))
-		wake_up_all(&mi->mi_waitq);
-	if (newq)
-		qenable(newq);
+	if (mi) {
+		spin_lock_irqsave(&mi->mi_lock, flags);
+		mi->mi_users = 0;
+		if ((newq = mi->mi_qwait))
+			mi->mi_qwait = NULL;
+		spin_unlock_irqrestore(&mi->mi_lock, flags);
+		if (waitqueue_active(&mi->mi_waitq))
+			wake_up_all(&mi->mi_waitq);
+		if (newq)
+			qenable(newq);
+	}
 	return;
 }
 
@@ -687,7 +705,7 @@ static streamscall void
 mi_qenable(long data)
 {
 	queue_t *q = (queue_t *) data;
-	struct mi_comm *mi = ((struct mi_comm *) q->q_ptr) - 1;
+	struct mi_comm *mi = ptr_to_mi(q->q_ptr);
 	bcid_t *bidp = (q->q_flag & QREADR) ? &mi->mi_rbid : &mi->mi_wbid;
 
 	*bidp = 0;
@@ -697,7 +715,7 @@ mi_qenable(long data)
 void
 mi_bufcall(queue_t *q, int size, int priority)
 {
-	struct mi_comm *mi = ((struct mi_comm *) q->q_ptr) - 1;
+	struct mi_comm *mi = ptr_to_mi(q->q_ptr);
 	bcid_t bid, *bidp = (q->q_flag & QREADR) ? &mi->mi_rbid : &mi->mi_wbid;
 
 	if ((bid = bufcall(size, priority, &mi_qenable, (long) q))) {
