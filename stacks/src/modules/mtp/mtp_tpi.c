@@ -1783,7 +1783,7 @@ t_discon_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto outstate;
 	}
 	/* change state and let mtp_ok_ack do all the work */
-	return mtp_discon_req(mtp, q, mp);
+	return mtp_discon_req(mtp, q, mp, mp->b_cont);
       badprim:
 	err = -EMSGSIZE;
 	mi_strlog(q, 0, SL_TRACE, "invalid primitive format");

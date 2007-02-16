@@ -97,6 +97,9 @@ static char const ident[] =
 #include <sys/npi.h>
 #include <sys/npi_ss7.h>
 #include <sys/npi_mtp.h>
+#include <sys/xti.h>
+#include <sys/xti_ss7.h>
+#include <sys/xti_mtp.h>
 
 #define MTP_NPI_DESCRIP		"SS7 Message Transfer Part (MTP) NPI STREAMS MODULE."
 #define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/02/14 14:09:11 $"
@@ -226,17 +229,41 @@ n_parse_opts(struct mtp *mtp, struct mtp_opts *ops, unsigned char *op, size_t le
 }
 
 static inline fastcall size_t
-n_opts_size(N_qos_sel_conn_mtp_t *qos)
+n_opts_size(union N_qos_mtp *qos)
 {
-	if (qos)
-		return (sizeof(*qos));
+	if (qos) {
+		switch(qos->n_qos_type) {
+		case N_QOS_SEL_DATA_MTP:
+			return (sizeof(qos->n_qos_data));
+		case N_QOS_SEL_CONN_MTP:
+			return (sizeof(qos->n_qos_conn));
+		case N_QOS_SEL_INFO_MTP:
+			return (sizeof(qos->n_qos_info));
+		case N_QOS_RANGE_INFO_MTP:
+			return (sizeof(qos->n_qos_range));
+		default:
+			return (0);
+		}
+	}
 	return (0);
 }
 static inline fastcall void
-n_build_opts(N_qos_sel_conn_mtp_t *qos, unsigned char *p)
+n_build_opts(union N_qos_mtp *qos, unsigned char *p)
 {
-	if (qos)
-		bcopy(qos, p, sizeof(*qos));
+	if (qos) {
+		switch (qos->n_qos_type) {
+		case N_QOS_SEL_DATA_MTP:
+			return bcopy(qos, p, sizeof(qos->n_qos_data));
+		case N_QOS_SEL_CONN_MTP:
+			return bcopy(qos, p, sizeof(qos->n_qos_conn));
+		case N_QOS_SEL_INFO_MTP:
+			return bcopy(qos, p, sizeof(qos->n_qos_info));
+		case N_QOS_RANGE_INFO_MTP:
+			return bcopy(qos, p, sizeof(qos->n_qos_range));
+		default:
+			return;
+		}
+	}
 }
 
 /*
@@ -380,7 +407,7 @@ mtp_bind(struct mtp *mtp, struct mtp_addr *src)
 	}
 	return;
 }
-static void
+static inline void
 mtp_connect(struct mtp *mtp, struct mtp_addr *dst)
 {
 	if (dst) {
@@ -450,7 +477,7 @@ m_error(struct mtp *mtp, queue_t *q, mblk_t *msg, int err)
 static inline fastcall __unlikely int
 n_conn_ind(struct mtp *mtp, queue_t *q, mblk_t *bp,
 	   np_ulong seq, np_ulong flags, struct mtp_addr *src, struct mtp_addr *dst,
-	   N_qos_sel_conn_mtp_t *qos, mblk_t *dp)
+	   union N_qos_mtp *qos, mblk_t *dp)
 {
 	N_conn_ind_t *p;
 	mblk_t *mp;
@@ -503,7 +530,7 @@ n_conn_ind(struct mtp *mtp, queue_t *q, mblk_t *bp,
  */
 static inline fastcall __unlikely int
 n_conn_con(struct mtp *mtp, queue_t *q, mblk_t *bp,
-	   np_ulong flags, struct mtp_addr *res, N_qos_sel_conn_mtp_t *qos, mblk_t *dp)
+	   np_ulong flags, struct mtp_addr *res, union N_qos_mtp *qos, mblk_t *dp)
 {
 	N_conn_con_t *p;
 	mblk_t *mp;
@@ -628,7 +655,8 @@ n_data_ind(struct mtp *mtp, queue_t *q, mblk_t *bp, np_ulong flags, mblk_t *dp)
 		return (-ENOBUFS);
 	}
 	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", mtp_get_state(mtp));
-	freemsg(mp);
+	freeb(bp);
+	freemsg(dp);
 	return (0);
 }
 
@@ -667,7 +695,8 @@ n_exdata_ind(struct mtp *mtp, queue_t *q, mblk_t *bp, mblk_t *dp)
 		return (-ENOBUFS);
 	}
 	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", mtp_get_state(mtp));
-	freemsg(mp);
+	freeb(bp);
+	freemsg(dp);
 	return (0);
 }
 
@@ -1308,11 +1337,12 @@ mtp_info_req(struct mtp *mtp, queue_t *q, mblk_t *msg)
  * @flags: management flags
  */
 static inline fastcall __unlikely int
-mtp_optmgmt_req(struct mtp *mtp, queue_t *q, mblk_t *msg, struct mtp_opts *opt, mtp_ulong flags)
+mtp_optmgmt_req(struct mtp *mtp, queue_t *q, mblk_t *msg, union N_qos_mtp *opt, mtp_ulong flags)
 {
 	struct MTP_optmgmt_req *p;
 	mblk_t *mp;
-	size_t opt_len = n_opts_size(opt);
+	struct t_opthdr *oh;
+	size_t opt_len = opt ? 2 * sizeof(*oh) + 2 * sizeof(t_scalar_t) : 0;
 	size_t msg_len = sizeof(*p) + opt_len;
 
 	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
@@ -1324,8 +1354,24 @@ mtp_optmgmt_req(struct mtp *mtp, queue_t *q, mblk_t *msg, struct mtp_opts *opt, 
 			p->mtp_opt_offset = sizeof(*p);
 			p->mtp_mgmt_flags = flags;
 			mp->b_wptr += sizeof(*p);
-			n_build_opts(opt, mp->b_wptr);
-			mp->b_wptr += opt_len;
+			if (opt_len) {
+				oh = (typeof(oh)) mp->b_wptr;
+				oh->level = T_SS7_MTP;
+				oh->name = T_MTP_SLS;
+				oh->len = sizeof(*oh) + sizeof(t_scalar_t);
+				oh->status = T_SUCCESS;
+				mp->b_wptr += sizeof(*oh);
+				*(t_scalar_t *)mp->b_wptr = opt->n_qos_info.sls;
+				mp->b_wptr += sizeof(t_scalar_t);
+				oh = (typeof(oh)) mp->b_wptr;
+				oh->level = T_SS7_MTP;
+				oh->name = T_MTP_MP;
+				oh->len = sizeof(*oh) + sizeof(t_scalar_t);
+				oh->status = T_SUCCESS;
+				mp->b_wptr += sizeof(*oh);
+				*(t_scalar_t *)mp->b_wptr = opt->n_qos_info.mp;
+				mp->b_wptr += sizeof(t_scalar_t);
+			}
 			freemsg(msg);
 			mi_strlog(q, STRLOGTX, SL_TRACE, "MTP_OPTMGMT_REQ ->");
 			putnext(mtp->wq, mp);
@@ -2319,16 +2365,11 @@ mtp_transfer_ind(struct mtp *mtp, queue_t *q, mblk_t *mp)
 {
 	struct MTP_transfer_ind *p = (typeof(p)) mp->b_rptr;
 	struct mtp_addr *src = NULL;
-	struct mtp_opts opts;
 
 	if (mp->b_cont == NULL)
 		goto baddata;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto protoshort;
-	opts.flags = (1 << N_MTP_SLS) | (1 << N_MTP_MP);
-	opts.sls = &p->mtp_sls;
-	opts.mp = &p->mtp_mp;
-	opts.debug = NULL;
 	if (mtp_chk_state(mtp, NSF_WACK))
 		goto wait;
 	switch (mtp->prot.SERV_type) {
@@ -2955,7 +2996,6 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 	struct mtp *mtp = MTP_PRIV(q);
 	struct MTP_transfer_ind *p = (typeof(p)) mp->b_rptr;
 	struct mtp_addr *src = NULL;
-	struct mtp_opts opts;
 
 	if (unlikely(mp->b_cont == NULL))
 		goto go_slow;
@@ -2963,10 +3003,6 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 		goto go_slow;
 	if (unlikely(p->mtp_primitive != MTP_TRANSFER_IND))
 		goto go_slow;
-	opts.flags = (1 << N_MTP_SLS) | (1 << N_MTP_MP);
-	opts.sls = &p->mtp_sls;
-	opts.mp = &p->mtp_mp;
-	opts.debug = NULL;
 	if (unlikely(mtp_chk_state(mtp, NSF_WACK)))
 		goto go_slow;
 	/* Two choices, either we are connectionless or connection oriented. */
@@ -2974,9 +3010,7 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 	case N_CONS:
 		if (unlikely(mtp_not_state(mtp, (NSF_WRES_RIND | NSF_WCON_RREQ | NSF_DATA_XFER))))
 			goto go_slow;
-		// return t_optdata_ind(mtp, q, mp, 0, &opts, mp->b_cont);
-		freemsg(mp);
-		return (0);
+		return n_data_ind(mtp, q, mp, 0, mp->b_cont);
 	case N_CLNS:
 		if (unlikely(mtp_not_state(mtp, (NSF_IDLE | NSF_WACK_UREQ))))
 			goto go_slow;
@@ -2988,7 +3022,7 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 			src = (typeof(src)) (mp->b_rptr + p->mtp_srce_offset);
 		}
 		mp->b_cont->b_band = mp->b_band;
-		return n_unitdata_ind(mtp, q, mp, src, NULL, mp->b_cont);
+		return n_unitdata_ind(mtp, q, mp, src, &mtp->src, mp->b_cont);
 	default:
 		break;
 	}
