@@ -1,3 +1,9 @@
+2007-02-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: added mtp.c
+	* stacks/src/include/ss7/mtpi_ioctl.h: timer corrections
+	* stacks/src/modules/mtp/mtp.c: first clean recompile on LFS
+
 2007-02-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man4/mtp_tpi.4.man: added missing documentation

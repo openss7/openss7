@@ -67,12 +67,21 @@ static char const ident[] =
     "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:00:58 $";
 
 /*
- *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
- *  (Signalling Link) streams I_LINK'ed or I_PLINK'ed underneath it to form a
- *  complete Message Transfer Part protocol layer for SS7.
+ *  This an MTP (Message Transfer Part) multiplexing driver which can have SL (Signalling Link) streams I_LINK'ed or
+ *  I_PLINK'ed underneath it to form a complete Message Transfer Part protocol layer for SS7.
  */
+
+#define _LFS_SOURCE	1
+#define _SVR4_SOURCE	1
+#define _MPS_SOURCE	1
+
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
+
+#undef DB_TYPE
+#define DB_TYPE(mp) ((mp)->b_datap->db_type)
+
+#define mi_timer mi_timer_MAC
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -89,6 +98,13 @@ static char const ident[] =
 // #include <sys/tpi_mtp.h>
 #include <sys/xti.h>
 #include <sys/xti_mtp.h>
+
+#define STRLOGST	1	/* log Stream state transitions */
+#define STRLOGTO	2	/* log Stream timeouts */
+#define STRLOGRX	3	/* log Stream primitives received */
+#define STRLOGTX	4	/* log Stream primitives issued */
+#define STRLOGTE	5	/* log Stream timer events */
+#define STRLOGDA	6	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
 #define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:00:58 $"
@@ -369,7 +385,7 @@ typedef struct cr {
 	} rt;
 	SLIST_LINKAGE (rl, cr, rl);	/* route list list linkage */
 	struct {
-		ulong t6;		/* controlled rerouting timer */
+		mblk_t *t6;		/* controlled rerouting timer */
 	} timers;
 	struct bufq buf;		/* message buffer */
 } cr_t;
@@ -449,6 +465,8 @@ static void rt_put(struct rt *);
  */
 typedef struct sp {
 	HEAD_DECLARATION (struct sp);	/* head declaration */
+	int users;
+	queue_t *waitq;
 	uint32_t ni;			/* network indicator */
 	uint32_t pc;			/* point code */
 	uint sls;			/* sls for loadsharing of management messages */
@@ -492,11 +510,11 @@ typedef struct cb {
 	} sl;
 	SLIST_LINKAGE (lk, cb, lk);	/* link list linkage */
 	struct {
-		ulong t1;		/* changeover timer */
-		ulong t2;		/* changeover ack timer */
-		ulong t3;		/* changeback timer */
-		ulong t4;		/* changeback ack timer */
-		ulong t5;		/* changeback ack second attempt timer */
+		mblk_t *t1;		/* changeover timer */
+		mblk_t *t2;		/* changeover ack timer */
+		mblk_t *t3;		/* changeback timer */
+		mblk_t *t4;		/* changeback ack timer */
+		mblk_t *t5;		/* changeback ack second attempt timer */
 	} timers;
 	struct bufq buf;		/* message buffer */
 } cb_t;
@@ -652,6 +670,114 @@ static void sl_put(struct sl *);
 			|TSF_WACK_DREQ10 \
 			|TSF_WACK_DREQ11)
 
+static rwlock_t mtp_mux_lock = RW_LOCK_UNLOCKED;
+/*
+ *  =========================================================================
+ *
+ *  Locking
+ *
+ *  =========================================================================
+ */
+static inline int
+sp_trylock(struct sp *sp, queue_t *q)
+{
+	unsigned long flags;
+	queue_t *oldq = NULL;
+	int result = 0;
+
+	spin_lock_irqsave(&sp->lock, flags);
+	if (sp->users == 0) {
+		sp->users = result = 1;
+	} else {
+		oldq = sp->waitq;
+		sp->waitq = q;
+	}
+	spin_unlock_irqrestore(&sp->lock, flags);
+	if (oldq)
+		qenable(oldq);
+	return (result);
+}
+static inline void
+sp_unlock(struct sp *sp)
+{
+	unsigned long flags;
+	queue_t *newq = NULL;
+
+	spin_lock_irqsave(&sp->lock, flags);
+	sp->users = 0;
+	newq = sp->waitq;
+	sp->waitq = NULL;
+	spin_unlock_irqrestore(&sp->lock, flags);
+	if (newq)
+		qenable(newq);
+}
+
+static inline struct mtp *
+mtp_acquire(queue_t *q)
+{
+	struct mtp *mtp;
+	struct sp *sp;
+
+	read_lock(&mtp_mux_lock);
+	if ((mtp = (void *) mi_trylock(q))) {
+		read_unlock(&mtp_mux_lock);
+		if ((sp = mtp->sp.loc)) {
+			if (!sp_trylock(sp, q)) {
+				mi_unlock((caddr_t) mtp);
+				return (0);
+			}
+		}
+		return (mtp);
+	}
+	read_unlock(&mtp_mux_lock);
+	return (NULL);
+}
+static inline void
+mtp_release(struct mtp *mtp)
+{
+	struct sp *sp;
+
+	if ((sp = mtp->sp.loc))
+		sp_unlock(sp);
+	mi_unlock((caddr_t) mtp);
+}
+static inline struct sl *
+sl_acquire(queue_t *q)
+{
+	struct sl *sl;
+	struct sp *sp;
+
+	read_lock(&mtp_mux_lock);
+	if ((sl = (void *) mi_trylock(q))) {
+		read_unlock(&mtp_mux_lock);
+		if ((sp = sl->lk.lk->ls.ls->sp.sp)) {
+			if (!sp_trylock(sp, q)) {
+				mi_unlock((caddr_t) sl);
+				return (0);
+			}
+		}
+		return (sl);
+	}
+	read_unlock(&mtp_mux_lock);
+	return (NULL);
+}
+static inline void
+sl_release(struct sl *sl)
+{
+	struct sp *sp;
+
+	if ((sp = sl->lk.lk->ls.ls->sp.sp))
+		sp_unlock(sp);
+	mi_unlock((caddr_t) sl);
+}
+
+/*
+ *  =========================================================================
+ *
+ *  OPTION Handling
+ *
+ *  =========================================================================
+ */
 typedef struct mtp_opts {
 	uint flags;			/* success flags */
 	t_uscalar_t *sls;
@@ -666,13 +792,6 @@ static struct {
 } opt_defaults = {
 0, 0, 0};
 
-/*
- *  =========================================================================
- *
- *  OPTION Handling
- *
- *  =========================================================================
- */
 #define _T_ALIGN_SIZEOF(s) \
 	((sizeof((s)) + _T_ALIGN_SIZE - 1) & ~(_T_ALIGN_SIZE - 1))
 static size_t
@@ -1751,7 +1870,7 @@ m_status_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *add, struct mtp_opts 
  *  MTP_RESTART_COMPLETE_IND    19 - MTP restart complete (impl. dep.)
  *  -----------------------------------
  */
-static int
+static inline int
 m_restart_complete_ind(queue_t *q, struct mtp *mtp)
 {
 	mblk_t *mp;
@@ -1773,7 +1892,7 @@ m_restart_complete_ind(queue_t *q, struct mtp *mtp)
  *  N_CONN_IND          11 - Incoming connection indication
  *  -----------------------------------
  */
-static int
+static inline int
 n_conn_ind(queue_t *q, struct mtp *mtp, ulong seq, ulong flags, struct mtp_addr *src,
 	   struct mtp_addr *dst, N_qos_sel_conn_mtp_t *qos)
 {
@@ -1858,7 +1977,7 @@ n_conn_con(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong flags, struct mtp_add
  *  N_DISCON_IND        13 - NC disconnected
  *  -----------------------------------
  */
-static int
+static inline int
 n_discon_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason, ulong seq, struct mtp_addr *res,
 	     mblk_t *dp)
 {
@@ -1923,7 +2042,7 @@ n_data_ind(queue_t *q, struct mtp *mtp, ulong flags, mblk_t *dp)
  *  N_EXDATA_IND        15 - Incoming expedited data indication
  *  -----------------------------------
  */
-static int
+static inline int
 n_exdata_ind(queue_t *q, struct mtp *mtp, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -2284,7 +2403,7 @@ n_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, struct mtp_opts
  *  N_DATACK_IND        24 - Data acknowledgement indication
  *  -----------------------------------
  */
-static int
+static inline int
 n_datack_ind(queue_t *q, struct mtp *mtp)
 {
 	mblk_t *mp;
@@ -2332,7 +2451,7 @@ n_reset_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason)
  *  N_RESET_CON         28 - Reset processing complete
  *  -----------------------------------
  */
-static int
+static inline int
 n_reset_con(queue_t *q, struct mtp *mtp)
 {
 	mblk_t *mp;
@@ -2355,7 +2474,7 @@ n_reset_con(queue_t *q, struct mtp *mtp)
  *  T_CONN_IND          11 - 
  *  -----------------------------------
  */
-static int
+static inline int
 t_conn_ind(queue_t *q, struct mtp *mtp)
 {
 	pswerr(("%s: %p: ERROR: unsupported primitive\n", DRV_NAME, mtp));
@@ -2405,7 +2524,7 @@ t_conn_con(queue_t *q, struct mtp *mtp, mblk_t *msg, struct mtp_addr *res, struc
  *  T_DISCON_IND        13 - 
  *  -----------------------------------
  */
-static int
+static inline int
 t_discon_ind(queue_t *q, struct mtp *mtp)
 {
 	pswerr(("%s: %p: ERROR: unsupported primitive\n", DRV_NAME, mtp));
@@ -2446,7 +2565,7 @@ t_data_ind(queue_t *q, struct mtp *mtp, ulong more, mblk_t *dp)
  *  T_EXDATA_IND        15 - 
  *  -----------------------------------
  */
-static int
+static inline int
 t_exdata_ind(queue_t *q, struct mtp *mtp)
 {
 	pswerr(("%s: %p: ERROR: unsupported primitive\n", DRV_NAME, mtp));
@@ -2746,7 +2865,7 @@ t_ordrel_ind(queue_t *q, struct mtp *mtp, mblk_t *msg)
  *  T_OPTDATA_IND       26 - 
  *  -----------------------------------
  */
-static int
+static inline int
 t_optdata_ind(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -2854,7 +2973,7 @@ t_capability_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong caps)
  *  SL_PDU_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_pdu_req(queue_t *q, struct sl *sl, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -2882,7 +3001,7 @@ sl_pdu_req(queue_t *q, struct sl *sl, mblk_t *dp)
  *  SL_EMERGENCY_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_emergency_req(queue_t *q, struct sl *sl)
 {
 	mblk_t *mp;
@@ -2905,7 +3024,7 @@ sl_emergency_req(queue_t *q, struct sl *sl)
  *  SL_EMERGENCY_CEASES_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_emergency_ceases_req(queue_t *q, struct sl *sl)
 {
 	mblk_t *mp;
@@ -3026,7 +3145,7 @@ sl_retrieval_request_and_fsnc_req(queue_t *q, struct sl *sl, ulong fsnc)
  *  SL_RESUME_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_resume_req(queue_t *q, struct sl *sl)
 {
 	mblk_t *mp;
@@ -3094,7 +3213,7 @@ sl_clear_rtb_req(queue_t *q, struct sl *sl)
  *  SL_LOCAL_PROCESSOR_OUTAGE_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_local_processor_outage_req(queue_t *q, struct sl *sl)
 {
 	mblk_t *mp;
@@ -3116,7 +3235,7 @@ sl_local_processor_outage_req(queue_t *q, struct sl *sl)
  *  SL_CONGESTION_DISCARD_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_congestion_discard_req(queue_t *q, struct sl *sl)
 {
 	mblk_t *mp;
@@ -3138,7 +3257,7 @@ sl_congestion_discard_req(queue_t *q, struct sl *sl)
  *  SL_CONGESTION_ACCEPT_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_congestion_accept_req(queue_t *q, struct sl *sl)
 {
 	mblk_t *mp;
@@ -3160,7 +3279,7 @@ sl_congestion_accept_req(queue_t *q, struct sl *sl)
  *  SL_NO_CONGESTION_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_no_congestion_req(queue_t *q, struct sl *sl)
 {
 	mblk_t *mp;
@@ -3182,7 +3301,7 @@ sl_no_congestion_req(queue_t *q, struct sl *sl)
  *  SL_POWER_ON_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_power_on_req(queue_t *q, struct sl *sl)
 {
 	mblk_t *mp;
@@ -3251,7 +3370,7 @@ sl_notify_req(queue_t *q, struct sl *sl)
  *  LMI_INFO_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 lmi_info_req(queue_t *q, struct sl *sl)
 {
 	mblk_t *mp;
@@ -3273,7 +3392,7 @@ lmi_info_req(queue_t *q, struct sl *sl)
  *  LMI_ATTACH_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 lmi_attach_req(queue_t *q, struct sl *sl, caddr_t ppa_ptr, size_t ppa_len)
 {
 	mblk_t *mp;
@@ -3299,7 +3418,7 @@ lmi_attach_req(queue_t *q, struct sl *sl, caddr_t ppa_ptr, size_t ppa_len)
  *  LMI_DETACH_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 lmi_detach_req(queue_t *q, struct sl *sl)
 {
 	mblk_t *mp;
@@ -3321,7 +3440,7 @@ lmi_detach_req(queue_t *q, struct sl *sl)
  *  LMI_ENABLE_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 lmi_enable_req(queue_t *q, struct sl *sl, caddr_t dst_ptr, size_t dst_len)
 {
 	mblk_t *mp;
@@ -3347,7 +3466,7 @@ lmi_enable_req(queue_t *q, struct sl *sl, caddr_t dst_ptr, size_t dst_len)
  *  LMI_DISABLE_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 lmi_disable_req(queue_t *q, struct sl *sl)
 {
 	mblk_t *mp;
@@ -3369,7 +3488,7 @@ lmi_disable_req(queue_t *q, struct sl *sl)
  *  LMI_OPTMGMT_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 lmi_optmgmt_req(queue_t *q, struct sl *sl, ulong flags, caddr_t opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
@@ -3815,191 +3934,206 @@ enum { tall, t1, t1r, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14,
 };
 
 static mtp_opt_conf_na_t itut_na_config_default = {
-	t1:((800 * HZ) / 1000),		/* (sl) T1 0.5 (0.8) 1.2 sec */
-	t1r:((800 * HZ) / 1000),	/* (sp) T1R 0.5 (0.8) 1.2 sec */
-	t2:((1400 * HZ) / 1000),	/* (sl) T2 0.7 (1.4) 2.0 sec */
-	t3:((800 * HZ) / 1000),		/* (sl) T3 0.5 (0.8) 1.2 sec */
-	t4:((800 * HZ) / 1000),		/* (sl) T4 0.5 (0.8) 1.2 sec */
-	t5:((800 * HZ) / 1000),		/* (sl) T5 0.5 (0.8) 1.2 sec */
-	t6:((800 * HZ) / 1000),		/* (rt) T6 0.5 (0.8) 1.2 sec */
-	t7:((1500 * HZ) / 1000),	/* (lk) T7 1 to 2 sec */
-	t8:((1000 * HZ) / 1000),	/* (rs) T8 0.8 to 1.2 sec */
-	t10:(45 * HZ),			/* (rt) T10 30 to 60 sec */
-	t11:(60 * HZ),			/* (rs) T11 30 to 90 sec */
-	t12:((1150 * HZ) / 1000),	/* (sl) T12 0.8 to 1.5 sec */
-	t13:((1150 * HZ) / 1000),	/* (sl) T13 0.8 to 1.5 sec */
-	t14:((2500 * HZ) / 1000),	/* (sl) T14 2 to 3 sec */
-	t15:((2500 * HZ) / 1000),	/* (rs) T15 2 to 3 sec */
-	t16:((1700 * HZ) / 1000),	/* (rs) T16 1.4 to 2.0 sec */
-	t17:((1150 * HZ) / 1000),	/* (sl) T17 0.8 to 1.5 sec */
-	t18:(600 * HZ),			/* (sp) T18 network dependent */
-	t18a:(12 * HZ),			/* (rs) T18A 2 to 20 sec */
-	t19:(68 * HZ),			/* (sp) T19 67 to 69 sec */
-	t19a:(540 * HZ),		/* (sl) T19A 480 to 600 sec */
-	t20:(60 * HZ),			/* (sp) T20 59 to 61 sec */
-	t20a:(105 * HZ),		/* (sl) T20A 90 to 120 sec */
-	t21:(64 * HZ),			/* (sp) T21 63 to 65 sec */
-	t21a:(105 * HZ),		/* (sl) T21A 90 to 120 sec */
-	t22:(270 * HZ),			/* (sl) T22 3 to 6 min */
-	t22a:(600 * HZ),		/* (sp) T22A network dependent */
-	t23:(270 * HZ),			/* (sl) T23 3 to 6 min */
-	t23a:(600 * HZ),		/* (sp) T23A network dependent */
-	t24:((500 * HZ) / 1000),	/* (sl) T24 500 ms */
-	t24a:(600 * HZ),		/* (sp) T24A network dependent */
-	t25a:(32 * HZ),			/* (sp) T25 32 to 35 sec */
-	t26a:(13 * HZ),			/* (sp) T26 12 to 15 sec */
-	t27a:(3 * HZ),			/* (sp) T27 2 (3) 5 sec */
-	t28a:(19 * HZ),			/* (sp) T28 3 to 35 sec */
-	t29a:(63 * HZ),			/* (sp) T29 60 to 65 sec */
-	t30a:(33 * HZ),			/* (sp) T30 30 to 35 sec */
-	t31a:(60 * HZ),			/* (sl) T31 10 to 120 sec */
-	t32a:(60 * HZ),			/* (sl) T32 5 to 120 sec */
-	t33a:(360 * HZ),		/* (sl) T33 60 to 600 sec */
-	t34a:(60 * HZ),			/* (sl) T34 5 to 120 sec */
-	t1t:(4 * HZ),			/* (sl) T1T 4 to 12 sec */
-	t2t:(60 * HZ),			/* (sl) T2T 30 to 90 sec */
-	t1s:(4 * HZ),			/* (sl) T1S 4 to 12 sec */
+      t1:((800 * HZ) / 1000),	/* (sl) T1 0.5 (0.8) 1.2 sec */
+      t1r:((800 * HZ) / 1000),	/* (sp) T1R 0.5 (0.8) 1.2 sec */
+      t2:((1400 * HZ) / 1000),	/* (sl) T2 0.7 (1.4) 2.0 sec */
+      t3:((800 * HZ) / 1000),	/* (sl) T3 0.5 (0.8) 1.2 sec */
+      t4:((800 * HZ) / 1000),	/* (sl) T4 0.5 (0.8) 1.2 sec */
+      t5:((800 * HZ) / 1000),	/* (sl) T5 0.5 (0.8) 1.2 sec */
+      t6:((800 * HZ) / 1000),	/* (rt) T6 0.5 (0.8) 1.2 sec */
+      t7:((1500 * HZ) / 1000),	/* (lk) T7 1 to 2 sec */
+      t8:((1000 * HZ) / 1000),	/* (rs) T8 0.8 to 1.2 sec */
+      t10:(45 * HZ),		/* (rt) T10 30 to 60 sec */
+      t11:(60 * HZ),		/* (rs) T11 30 to 90 sec */
+      t12:((1150 * HZ) / 1000),/* (sl) T12 0.8 to 1.5 sec */
+      t13:((1150 * HZ) / 1000),/* (sl) T13 0.8 to 1.5 sec */
+      t14:((2500 * HZ) / 1000),/* (sl) T14 2 to 3 sec */
+      t15:((2500 * HZ) / 1000),/* (rs) T15 2 to 3 sec */
+      t16:((1700 * HZ) / 1000),/* (rs) T16 1.4 to 2.0 sec */
+      t17:((1150 * HZ) / 1000),/* (sl) T17 0.8 to 1.5 sec */
+      t18:(600 * HZ),		/* (sp) T18 network dependent */
+      t18a:(12 * HZ),		/* (rs) T18A 2 to 20 sec */
+      t19:(68 * HZ),		/* (sp) T19 67 to 69 sec */
+      t19a:(540 * HZ),		/* (sl) T19A 480 to 600 sec */
+      t20:(60 * HZ),		/* (sp) T20 59 to 61 sec */
+      t20a:(105 * HZ),		/* (sl) T20A 90 to 120 sec */
+      t21:(64 * HZ),		/* (sp) T21 63 to 65 sec */
+      t21a:(105 * HZ),		/* (sl) T21A 90 to 120 sec */
+      t22:(270 * HZ),		/* (sl) T22 3 to 6 min */
+      t22a:(600 * HZ),		/* (sp) T22A network dependent */
+      t23:(270 * HZ),		/* (sl) T23 3 to 6 min */
+      t23a:(600 * HZ),		/* (sp) T23A network dependent */
+      t24:((500 * HZ) / 1000),	/* (sl) T24 500 ms */
+      t24a:(600 * HZ),		/* (sp) T24A network dependent */
+      t25a:(32 * HZ),		/* (sp) T25 32 to 35 sec */
+      t26a:(13 * HZ),		/* (sp) T26 12 to 15 sec */
+      t27a:(3 * HZ),		/* (sp) T27 2 (3) 5 sec */
+      t28a:(19 * HZ),		/* (sp) T28 3 to 35 sec */
+      t29a:(63 * HZ),		/* (sp) T29 60 to 65 sec */
+      t30a:(33 * HZ),		/* (sp) T30 30 to 35 sec */
+      t31a:(60 * HZ),		/* (sl) T31 10 to 120 sec */
+      t32a:(60 * HZ),		/* (sl) T32 5 to 120 sec */
+      t33a:(360 * HZ),		/* (sl) T33 60 to 600 sec */
+      t34a:(60 * HZ),		/* (sl) T34 5 to 120 sec */
+      t1t:(4 * HZ),		/* (sl) T1T 4 to 12 sec */
+      t2t:(60 * HZ),		/* (sl) T2T 30 to 90 sec */
+      t1s:(4 * HZ),		/* (sl) T1S 4 to 12 sec */
 };
 
 static mtp_opt_conf_na_t etsi_na_config_default = {
-	t1:((800 * HZ) / 1000),		/* (sl) T1 0.5 (0.8) 1.2 sec */
-	t1r:((800 * HZ) / 1000),	/* (sp) T1R 0.5 (0.8) 1.2 sec */
-	t2:((1400 * HZ) / 1000),	/* (sl) T2 0.7 (1.4) 2.0 sec */
-	t3:((800 * HZ) / 1000),		/* (sl) T3 0.5 (0.8) 1.2 sec */
-	t4:((800 * HZ) / 1000),		/* (sl) T4 0.5 (0.8) 1.2 sec */
-	t5:((800 * HZ) / 1000),		/* (sl) T5 0.5 (0.8) 1.2 sec */
-	t6:((800 * HZ) / 1000),		/* (rt) T6 0.5 (0.8) 1.2 sec */
-	t7:((1500 * HZ) / 1000),	/* (lk) T7 1 to 2 sec */
-	t8:((1000 * HZ) / 1000),	/* (rs) T8 0.8 to 1.2 sec */
-	t10:(45 * HZ),			/* (rt) T10 30 to 60 sec */
-	t11:(60 * HZ),			/* (rs) T11 30 to 90 sec */
-	t12:((1150 * HZ) / 1000),	/* (sl) T12 0.8 to 1.5 sec */
-	t13:((1150 * HZ) / 1000),	/* (sl) T13 0.8 to 1.5 sec */
-	t14:((2500 * HZ) / 1000),	/* (sl) T14 2 to 3 sec */
-	t15:((2500 * HZ) / 1000),	/* (rs) T15 2 to 3 sec */
-	t16:((1700 * HZ) / 1000),	/* (rs) T16 1.4 to 2.0 sec */
-	t17:((1150 * HZ) / 1000),	/* (sl) T17 0.8 to 1.5 sec */
-	t18:(600 * HZ),			/* (sp) T18 network dependent */
-	t18a:(12 * HZ),			/* (rs) T18A 2 to 20 sec */
-	t19:(68 * HZ),			/* (sp) T19 67 to 69 sec */
-	t19a:(540 * HZ),		/* (sl) T19A 480 to 600 sec */
-	t20:(60 * HZ),			/* (sp) T20 59 to 61 sec */
-	t20a:(105 * HZ),		/* (sl) T20A 90 to 120 sec */
-	t21:(64 * HZ),			/* (sp) T21 63 to 65 sec */
-	t21a:(105 * HZ),		/* (sl) T21A 90 to 120 sec */
-	t22:(270 * HZ),			/* (sl) T22 3 to 6 min */
-	t22a:(600 * HZ),		/* (sp) T22A network dependent */
-	t23:(270 * HZ),			/* (sl) T23 3 to 6 min */
-	t23a:(600 * HZ),		/* (sp) T23A network dependent */
-	t24:((500 * HZ) / 1000),	/* (sl) T24 500 ms */
-	t24a:(600 * HZ),		/* (sp) T24A network dependent */
-	t25a:(32 * HZ),			/* (sp) T25 32 to 35 sec */
-	t26a:(13 * HZ),			/* (sp) T26 12 to 15 sec */
-	t27a:(3 * HZ),			/* (sp) T27 2 (3) 5 sec */
-	t28a:(19 * HZ),			/* (sp) T28 3 to 35 sec */
-	t29a:(63 * HZ),			/* (sp) T29 60 to 65 sec */
-	t30a:(33 * HZ),			/* (sp) T30 30 to 35 sec */
-	t31a:(60 * HZ),			/* (sl) T31 10 to 120 sec */
-	t32a:(60 * HZ),			/* (sl) T32 5 to 120 sec */
-	t33a:(360 * HZ),		/* (sl) T33 60 to 600 sec */
-	t34a:(60 * HZ),			/* (sl) T34 5 to 120 sec */
-	t1t:(4 * HZ),			/* (sl) T1T 4 to 12 sec */
-	t2t:(60 * HZ),			/* (sl) T2T 30 to 90 sec */
-	t1s:(4 * HZ),			/* (sl) T1S 4 to 12 sec */
+      t1:((800 * HZ) / 1000),	/* (sl) T1 0.5 (0.8) 1.2 sec */
+      t1r:((800 * HZ) / 1000),	/* (sp) T1R 0.5 (0.8) 1.2 sec */
+      t2:((1400 * HZ) / 1000),	/* (sl) T2 0.7 (1.4) 2.0 sec */
+      t3:((800 * HZ) / 1000),	/* (sl) T3 0.5 (0.8) 1.2 sec */
+      t4:((800 * HZ) / 1000),	/* (sl) T4 0.5 (0.8) 1.2 sec */
+      t5:((800 * HZ) / 1000),	/* (sl) T5 0.5 (0.8) 1.2 sec */
+      t6:((800 * HZ) / 1000),	/* (rt) T6 0.5 (0.8) 1.2 sec */
+      t7:((1500 * HZ) / 1000),	/* (lk) T7 1 to 2 sec */
+      t8:((1000 * HZ) / 1000),	/* (rs) T8 0.8 to 1.2 sec */
+      t10:(45 * HZ),		/* (rt) T10 30 to 60 sec */
+      t11:(60 * HZ),		/* (rs) T11 30 to 90 sec */
+      t12:((1150 * HZ) / 1000),/* (sl) T12 0.8 to 1.5 sec */
+      t13:((1150 * HZ) / 1000),/* (sl) T13 0.8 to 1.5 sec */
+      t14:((2500 * HZ) / 1000),/* (sl) T14 2 to 3 sec */
+      t15:((2500 * HZ) / 1000),/* (rs) T15 2 to 3 sec */
+      t16:((1700 * HZ) / 1000),/* (rs) T16 1.4 to 2.0 sec */
+      t17:((1150 * HZ) / 1000),/* (sl) T17 0.8 to 1.5 sec */
+      t18:(600 * HZ),		/* (sp) T18 network dependent */
+      t18a:(12 * HZ),		/* (rs) T18A 2 to 20 sec */
+      t19:(68 * HZ),		/* (sp) T19 67 to 69 sec */
+      t19a:(540 * HZ),		/* (sl) T19A 480 to 600 sec */
+      t20:(60 * HZ),		/* (sp) T20 59 to 61 sec */
+      t20a:(105 * HZ),		/* (sl) T20A 90 to 120 sec */
+      t21:(64 * HZ),		/* (sp) T21 63 to 65 sec */
+      t21a:(105 * HZ),		/* (sl) T21A 90 to 120 sec */
+      t22:(270 * HZ),		/* (sl) T22 3 to 6 min */
+      t22a:(600 * HZ),		/* (sp) T22A network dependent */
+      t23:(270 * HZ),		/* (sl) T23 3 to 6 min */
+      t23a:(600 * HZ),		/* (sp) T23A network dependent */
+      t24:((500 * HZ) / 1000),	/* (sl) T24 500 ms */
+      t24a:(600 * HZ),		/* (sp) T24A network dependent */
+      t25a:(32 * HZ),		/* (sp) T25 32 to 35 sec */
+      t26a:(13 * HZ),		/* (sp) T26 12 to 15 sec */
+      t27a:(3 * HZ),		/* (sp) T27 2 (3) 5 sec */
+      t28a:(19 * HZ),		/* (sp) T28 3 to 35 sec */
+      t29a:(63 * HZ),		/* (sp) T29 60 to 65 sec */
+      t30a:(33 * HZ),		/* (sp) T30 30 to 35 sec */
+      t31a:(60 * HZ),		/* (sl) T31 10 to 120 sec */
+      t32a:(60 * HZ),		/* (sl) T32 5 to 120 sec */
+      t33a:(360 * HZ),		/* (sl) T33 60 to 600 sec */
+      t34a:(60 * HZ),		/* (sl) T34 5 to 120 sec */
+      t1t:(4 * HZ),		/* (sl) T1T 4 to 12 sec */
+      t2t:(60 * HZ),		/* (sl) T2T 30 to 90 sec */
+      t1s:(4 * HZ),		/* (sl) T1S 4 to 12 sec */
 };
 
 static mtp_opt_conf_na_t ansi_na_config_default = {
-	t1:((800 * HZ) / 1000),		/* (sl) T1 0.5 (0.8) 1.2 sec */
-	t1r:((800 * HZ) / 1000),	/* (sp) T1R 0.5 (0.8) 1.2 sec */
-	t2:((1400 * HZ) / 1000),	/* (sl) T2 0.7 (1.4) 2.0 sec */
-	t3:((800 * HZ) / 1000),		/* (sl) T3 0.5 (0.8) 1.2 sec */
-	t4:((800 * HZ) / 1000),		/* (sl) T4 0.5 (0.8) 1.2 sec */
-	t5:((800 * HZ) / 1000),		/* (sl) T5 0.5 (0.8) 1.2 sec */
-	t6:((800 * HZ) / 1000),		/* (rt) T6 0.5 (0.8) 1.2 sec */
-	t7:((1500 * HZ) / 1000),	/* (lk) T7 1 to 2 sec */
-	t8:((1000 * HZ) / 1000),	/* (rs) T8 0.8 to 1.2 sec */
-	t10:(45 * HZ),			/* (rt) T10 30 to 60 sec */
-	t11:(60 * HZ),			/* (rs) T11 30 to 90 sec */
-	t12:((1150 * HZ) / 1000),	/* (sl) T12 0.8 to 1.5 sec */
-	t13:((1150 * HZ) / 1000),	/* (sl) T13 0.8 to 1.5 sec */
-	t14:((2500 * HZ) / 1000),	/* (sl) T14 2 to 3 sec */
-	t15:((2500 * HZ) / 1000),	/* (rs) T15 2 to 3 sec */
-	t16:((1700 * HZ) / 1000),	/* (rs) T16 1.4 to 2.0 sec */
-	t17:((1150 * HZ) / 1000),	/* (sl) T17 0.8 to 1.5 sec */
-	t18:(600 * HZ),			/* (sp) T18 network dependent */
-	t18a:(12 * HZ),			/* (rs) T18A 2 to 20 sec */
-	t19:(68 * HZ),			/* (sp) T19 67 to 69 sec */
-	t19a:(540 * HZ),		/* (sl) T19A 480 to 600 sec */
-	t20:(60 * HZ),			/* (sp) T20 59 to 61 sec */
-	t20a:(105 * HZ),		/* (sl) T20A 90 to 120 sec */
-	t21:(64 * HZ),			/* (sp) T21 63 to 65 sec */
-	t21a:(105 * HZ),		/* (sl) T21A 90 to 120 sec */
-	t22:(270 * HZ),			/* (sl) T22 3 to 6 min */
-	t22a:(600 * HZ),		/* (sp) T22A network dependent */
-	t23:(270 * HZ),			/* (sl) T23 3 to 6 min */
-	t23a:(600 * HZ),		/* (sp) T23A network dependent */
-	t24:((500 * HZ) / 1000),	/* (sl) T24 500 ms */
-	t24a:(600 * HZ),		/* (sp) T24A network dependent */
-	t25a:(32 * HZ),			/* (sp) T25 32 to 35 sec */
-	t26a:(13 * HZ),			/* (sp) T26 12 to 15 sec */
-	t27a:(3 * HZ),			/* (sp) T27 2 (3) 5 sec */
-	t28a:(19 * HZ),			/* (sp) T28 3 to 35 sec */
-	t29a:(63 * HZ),			/* (sp) T29 60 to 65 sec */
-	t30a:(33 * HZ),			/* (sp) T30 30 to 35 sec */
-	t31a:(60 * HZ),			/* (sl) T31 10 to 120 sec */
-	t32a:(60 * HZ),			/* (sl) T32 5 to 120 sec */
-	t33a:(360 * HZ),		/* (sl) T33 60 to 600 sec */
-	t34a:(60 * HZ),			/* (sl) T34 5 to 120 sec */
-	t1t:(4 * HZ),			/* (sl) T1T 4 to 12 sec */
-	t2t:(60 * HZ),			/* (sl) T2T 30 to 90 sec */
-	t1s:(4 * HZ),			/* (sl) T1S 4 to 12 sec */
+      t1:((800 * HZ) / 1000),	/* (sl) T1 0.5 (0.8) 1.2 sec */
+      t1r:((800 * HZ) / 1000),	/* (sp) T1R 0.5 (0.8) 1.2 sec */
+      t2:((1400 * HZ) / 1000),	/* (sl) T2 0.7 (1.4) 2.0 sec */
+      t3:((800 * HZ) / 1000),	/* (sl) T3 0.5 (0.8) 1.2 sec */
+      t4:((800 * HZ) / 1000),	/* (sl) T4 0.5 (0.8) 1.2 sec */
+      t5:((800 * HZ) / 1000),	/* (sl) T5 0.5 (0.8) 1.2 sec */
+      t6:((800 * HZ) / 1000),	/* (rt) T6 0.5 (0.8) 1.2 sec */
+      t7:((1500 * HZ) / 1000),	/* (lk) T7 1 to 2 sec */
+      t8:((1000 * HZ) / 1000),	/* (rs) T8 0.8 to 1.2 sec */
+      t10:(45 * HZ),		/* (rt) T10 30 to 60 sec */
+      t11:(60 * HZ),		/* (rs) T11 30 to 90 sec */
+      t12:((1150 * HZ) / 1000),/* (sl) T12 0.8 to 1.5 sec */
+      t13:((1150 * HZ) / 1000),/* (sl) T13 0.8 to 1.5 sec */
+      t14:((2500 * HZ) / 1000),/* (sl) T14 2 to 3 sec */
+      t15:((2500 * HZ) / 1000),/* (rs) T15 2 to 3 sec */
+      t16:((1700 * HZ) / 1000),/* (rs) T16 1.4 to 2.0 sec */
+      t17:((1150 * HZ) / 1000),/* (sl) T17 0.8 to 1.5 sec */
+      t18:(600 * HZ),		/* (sp) T18 network dependent */
+      t18a:(12 * HZ),		/* (rs) T18A 2 to 20 sec */
+      t19:(68 * HZ),		/* (sp) T19 67 to 69 sec */
+      t19a:(540 * HZ),		/* (sl) T19A 480 to 600 sec */
+      t20:(60 * HZ),		/* (sp) T20 59 to 61 sec */
+      t20a:(105 * HZ),		/* (sl) T20A 90 to 120 sec */
+      t21:(64 * HZ),		/* (sp) T21 63 to 65 sec */
+      t21a:(105 * HZ),		/* (sl) T21A 90 to 120 sec */
+      t22:(270 * HZ),		/* (sl) T22 3 to 6 min */
+      t22a:(600 * HZ),		/* (sp) T22A network dependent */
+      t23:(270 * HZ),		/* (sl) T23 3 to 6 min */
+      t23a:(600 * HZ),		/* (sp) T23A network dependent */
+      t24:((500 * HZ) / 1000),	/* (sl) T24 500 ms */
+      t24a:(600 * HZ),		/* (sp) T24A network dependent */
+      t25a:(32 * HZ),		/* (sp) T25 32 to 35 sec */
+      t26a:(13 * HZ),		/* (sp) T26 12 to 15 sec */
+      t27a:(3 * HZ),		/* (sp) T27 2 (3) 5 sec */
+      t28a:(19 * HZ),		/* (sp) T28 3 to 35 sec */
+      t29a:(63 * HZ),		/* (sp) T29 60 to 65 sec */
+      t30a:(33 * HZ),		/* (sp) T30 30 to 35 sec */
+      t31a:(60 * HZ),		/* (sl) T31 10 to 120 sec */
+      t32a:(60 * HZ),		/* (sl) T32 5 to 120 sec */
+      t33a:(360 * HZ),		/* (sl) T33 60 to 600 sec */
+      t34a:(60 * HZ),		/* (sl) T34 5 to 120 sec */
+      t1t:(4 * HZ),		/* (sl) T1T 4 to 12 sec */
+      t2t:(60 * HZ),		/* (sl) T2T 30 to 90 sec */
+      t1s:(4 * HZ),		/* (sl) T1S 4 to 12 sec */
 };
 
 static mtp_opt_conf_na_t jttc_na_config_default = {
-	t1:((800 * HZ) / 1000),		/* (sl) T1 0.5 (0.8) 1.2 sec */
-	t1r:((800 * HZ) / 1000),	/* (sp) T1R 0.5 (0.8) 1.2 sec */
-	t2:((1400 * HZ) / 1000),	/* (sl) T2 0.7 (1.4) 2.0 sec */
-	t3:((800 * HZ) / 1000),		/* (sl) T3 0.5 (0.8) 1.2 sec */
-	t4:((800 * HZ) / 1000),		/* (sl) T4 0.5 (0.8) 1.2 sec */
-	t5:((800 * HZ) / 1000),		/* (sl) T5 0.5 (0.8) 1.2 sec */
-	t6:((800 * HZ) / 1000),		/* (rt) T6 0.5 (0.8) 1.2 sec */
-	t7:((1500 * HZ) / 1000),	/* (lk) T7 1 to 2 sec */
-	t8:((1000 * HZ) / 1000),	/* (rs) T8 0.8 to 1.2 sec */
-	t10:(45 * HZ),			/* (rt) T10 30 to 60 sec */
-	t11:(60 * HZ),			/* (rs) T11 30 to 90 sec */
-	t12:((1150 * HZ) / 1000),	/* (sl) T12 0.8 to 1.5 sec */
-	t13:((1150 * HZ) / 1000),	/* (sl) T13 0.8 to 1.5 sec */
-	t14:((2500 * HZ) / 1000),	/* (sl) T14 2 to 3 sec */
-	t15:((2500 * HZ) / 1000),	/* (rs) T15 2 to 3 sec */
-	t16:((1700 * HZ) / 1000),	/* (rs) T16 1.4 to 2.0 sec */
-	t17:((1150 * HZ) / 1000),	/* (sl) T17 0.8 to 1.5 sec */
-	t18:(600 * HZ),			/* (sp) T18 network dependent */
-	t18a:(12 * HZ),			/* (rs) T18A 2 to 20 sec */
-	t19:(68 * HZ),			/* (sp) T19 67 to 69 sec */
-	t19a:(540 * HZ),		/* (sl) T19A 480 to 600 sec */
-	t20:(60 * HZ),			/* (sp) T20 59 to 61 sec */
-	t20a:(105 * HZ),		/* (sl) T20A 90 to 120 sec */
-	t21:(64 * HZ),			/* (sp) T21 63 to 65 sec */
-	t21a:(105 * HZ),		/* (sl) T21A 90 to 120 sec */
-	t22:(270 * HZ),			/* (sl) T22 3 to 6 min */
-	t22a:(600 * HZ),		/* (sp) T22A network dependent */
-	t23:(270 * HZ),			/* (sl) T23 3 to 6 min */
-	t23a:(600 * HZ),		/* (sp) T23A network dependent */
-	t24:((500 * HZ) / 1000),	/* (sl) T24 500 ms */
-	t24a:(600 * HZ),		/* (sp) T24A network dependent */
-	t25a:(32 * HZ),			/* (sp) T25 32 to 35 sec */
-	t26a:(13 * HZ),			/* (sp) T26 12 to 15 sec */
-	t27a:(3 * HZ),			/* (sp) T27 2 (3) 5 sec */
-	t28a:(19 * HZ),			/* (sp) T28 3 to 35 sec */
-	t29a:(63 * HZ),			/* (sp) T29 60 to 65 sec */
-	t30a:(33 * HZ),			/* (sp) T30 30 to 35 sec */
-	t31a:(60 * HZ),			/* (sl) T31 10 to 120 sec */
-	t32a:(60 * HZ),			/* (sl) T32 5 to 120 sec */
-	t33a:(360 * HZ),		/* (sl) T33 60 to 600 sec */
-	t34a:(60 * HZ),			/* (sl) T34 5 to 120 sec */
-	t1t:(4 * HZ),			/* (sl) T1T 4 to 12 sec */
-	t2t:(60 * HZ),			/* (sl) T2T 30 to 90 sec */
-	t1s:(4 * HZ),			/* (sl) T1S 4 to 12 sec */
+      t1:((800 * HZ) / 1000),	/* (sl) T1 0.5 (0.8) 1.2 sec */
+      t1r:((800 * HZ) / 1000),	/* (sp) T1R 0.5 (0.8) 1.2 sec */
+      t2:((1400 * HZ) / 1000),	/* (sl) T2 0.7 (1.4) 2.0 sec */
+      t3:((800 * HZ) / 1000),	/* (sl) T3 0.5 (0.8) 1.2 sec */
+      t4:((800 * HZ) / 1000),	/* (sl) T4 0.5 (0.8) 1.2 sec */
+      t5:((800 * HZ) / 1000),	/* (sl) T5 0.5 (0.8) 1.2 sec */
+      t6:((800 * HZ) / 1000),	/* (rt) T6 0.5 (0.8) 1.2 sec */
+      t7:((1500 * HZ) / 1000),	/* (lk) T7 1 to 2 sec */
+      t8:((1000 * HZ) / 1000),	/* (rs) T8 0.8 to 1.2 sec */
+      t10:(45 * HZ),		/* (rt) T10 30 to 60 sec */
+      t11:(60 * HZ),		/* (rs) T11 30 to 90 sec */
+      t12:((1150 * HZ) / 1000),/* (sl) T12 0.8 to 1.5 sec */
+      t13:((1150 * HZ) / 1000),/* (sl) T13 0.8 to 1.5 sec */
+      t14:((2500 * HZ) / 1000),/* (sl) T14 2 to 3 sec */
+      t15:((2500 * HZ) / 1000),/* (rs) T15 2 to 3 sec */
+      t16:((1700 * HZ) / 1000),/* (rs) T16 1.4 to 2.0 sec */
+      t17:((1150 * HZ) / 1000),/* (sl) T17 0.8 to 1.5 sec */
+      t18:(600 * HZ),		/* (sp) T18 network dependent */
+      t18a:(12 * HZ),		/* (rs) T18A 2 to 20 sec */
+      t19:(68 * HZ),		/* (sp) T19 67 to 69 sec */
+      t19a:(540 * HZ),		/* (sl) T19A 480 to 600 sec */
+      t20:(60 * HZ),		/* (sp) T20 59 to 61 sec */
+      t20a:(105 * HZ),		/* (sl) T20A 90 to 120 sec */
+      t21:(64 * HZ),		/* (sp) T21 63 to 65 sec */
+      t21a:(105 * HZ),		/* (sl) T21A 90 to 120 sec */
+      t22:(270 * HZ),		/* (sl) T22 3 to 6 min */
+      t22a:(600 * HZ),		/* (sp) T22A network dependent */
+      t23:(270 * HZ),		/* (sl) T23 3 to 6 min */
+      t23a:(600 * HZ),		/* (sp) T23A network dependent */
+      t24:((500 * HZ) / 1000),	/* (sl) T24 500 ms */
+      t24a:(600 * HZ),		/* (sp) T24A network dependent */
+      t25a:(32 * HZ),		/* (sp) T25 32 to 35 sec */
+      t26a:(13 * HZ),		/* (sp) T26 12 to 15 sec */
+      t27a:(3 * HZ),		/* (sp) T27 2 (3) 5 sec */
+      t28a:(19 * HZ),		/* (sp) T28 3 to 35 sec */
+      t29a:(63 * HZ),		/* (sp) T29 60 to 65 sec */
+      t30a:(33 * HZ),		/* (sp) T30 30 to 35 sec */
+      t31a:(60 * HZ),		/* (sl) T31 10 to 120 sec */
+      t32a:(60 * HZ),		/* (sl) T32 5 to 120 sec */
+      t33a:(360 * HZ),		/* (sl) T33 60 to 600 sec */
+      t34a:(60 * HZ),		/* (sl) T34 5 to 120 sec */
+      t1t:(4 * HZ),		/* (sl) T1T 4 to 12 sec */
+      t2t:(60 * HZ),		/* (sl) T2T 30 to 90 sec */
+      t1s:(4 * HZ),		/* (sl) T1S 4 to 12 sec */
+};
+
+struct mtp_timer {
+	int timer;
+	union {
+		struct sp *sp;
+		struct rs *rs;
+		struct rt *rt;
+		struct mtp *mtp;
+		struct cb *cb;
+		struct sr *sr;
+		struct sl *sl;
+		struct lk *lk;
+		struct cr *cr;
+	};
 };
 
 /*
@@ -4009,8 +4143,8 @@ static mtp_opt_conf_na_t jttc_na_config_default = {
  *
  *  -------------------------------------------------------------------------
  */
-static void
-__mtp_timer_stop(struct mtp *mtp, const uint t)
+static inline void
+mtp_timer_stop(struct mtp *mtp, const uint t)
 {
 	int single = 1;
 
@@ -4024,32 +4158,14 @@ __mtp_timer_stop(struct mtp *mtp, const uint t)
 		break;
 	}
 }
-static void
-mtp_timer_stop(struct mtp *mtp, const uint t)
-{
-	psw_t flags;
-
-	spin_lock_irqsave(&mtp->lock, flags);
-	{
-		__mtp_timer_stop(mtp, t);
-	}
-	spin_unlock_irqrestore(&mtp->lock, flags);
-}
-static void
+static inline void
 mtp_timer_start(struct mtp *mtp, const uint t)
 {
-	psw_t flags;
-
-	spin_lock_irqsave(&mtp->qlock, flags);
-	{
-		__mtp_timer_stop(mtp, t);
-		switch (t) {
-		default:
-			swerr();
-			break;
-		}
+	switch (t) {
+	default:
+		swerr();
+		break;
 	}
-	spin_unlock_irqrestore(&mtp->qlock, flags);
 }
 
 /*
@@ -4059,14 +4175,14 @@ mtp_timer_start(struct mtp *mtp, const uint t)
  *
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(DRV_NAME, rs, t8, config);	/* transfer prohibited inhibitition timer */
-SS7_DECLARE_TIMER(DRV_NAME, rs, t11, config);	/* waiting to begin transfer restricted */
-SS7_DECLARE_TIMER(DRV_NAME, rs, t15, config);	/* waiting to start routeset congestion test */
-SS7_DECLARE_TIMER(DRV_NAME, rs, t16, config);	/* waiting for routeset congestion status update */
-SS7_DECLARE_TIMER(DRV_NAME, rs, t18a, config);
+/* t8 - transfer prohibited inhibitition timer */
+/* t11 - waiting to begin transfer restricted */
+/* t15 - waiting to start routeset congestion test */
+/* t16 - waiting for routeset congestion status update */
+/* t18a - */
 
 static void
-__rs_timer_stop(struct rs *rs, const uint t)
+rs_timer_stop(struct rs *rs, const uint t)
 {
 	int single = 1;
 
@@ -4075,27 +4191,27 @@ __rs_timer_stop(struct rs *rs, const uint t)
 		single = 0;
 		/* fall through */
 	case t8:
-		rs_stop_timer_t8(rs);
+		mi_timer_stop(rs->timers.t8);
 		if (single)
 			break;
 		/* fall through */
 	case t11:
-		rs_stop_timer_t11(rs);
+		mi_timer_stop(rs->timers.t11);
 		if (single)
 			break;
 		/* fall through */
 	case t15:
-		rs_stop_timer_t15(rs);
+		mi_timer_stop(rs->timers.t15);
 		if (single)
 			break;
 		/* fall through */
 	case t16:
-		rs_stop_timer_t16(rs);
+		mi_timer_stop(rs->timers.t16);
 		if (single)
 			break;
 		/* fall through */
 	case t18a:
-		rs_stop_timer_t18a(rs);
+		mi_timer_stop(rs->timers.t18a);
 		if (single)
 			break;
 		/* fall through */
@@ -4106,46 +4222,28 @@ __rs_timer_stop(struct rs *rs, const uint t)
 	}
 }
 static void
-rs_timer_stop(struct rs *rs, const uint t)
-{
-	psw_t flags;
-
-	spin_lock_irqsave(&rs->lock, flags);
-	{
-		__rs_timer_stop(rs, t);
-	}
-	spin_unlock_irqrestore(&rs->lock, flags);
-}
-static void
 rs_timer_start(struct rs *rs, const uint t)
 {
-	psw_t flags;
-
-	spin_lock_irqsave(&rs->lock, flags);
-	{
-		__rs_timer_stop(rs, t);
-		switch (t) {
-		case t8:
-			rs_start_timer_t8(rs);
-			break;
-		case t11:
-			rs_start_timer_t11(rs);
-			break;
-		case t15:
-			rs_start_timer_t15(rs);
-			break;
-		case t16:
-			rs_start_timer_t16(rs);
-			break;
-		case t18a:
-			rs_start_timer_t18a(rs);
-			break;
-		default:
-			swerr();
-			break;
-		}
+	switch (t) {
+	case t8:
+		mi_timer(rs->timers.t8, rs->config.t8);
+		break;
+	case t11:
+		mi_timer(rs->timers.t11, rs->config.t11);
+		break;
+	case t15:
+		mi_timer(rs->timers.t15, rs->config.t15);
+		break;
+	case t16:
+		mi_timer(rs->timers.t16, rs->config.t16);
+		break;
+	case t18a:
+		mi_timer(rs->timers.t18a, rs->config.t18a);
+		break;
+	default:
+		swerr();
+		break;
 	}
-	spin_unlock_irqrestore(&rs->lock, flags);
 }
 
 /*
@@ -4155,10 +4253,8 @@ rs_timer_start(struct rs *rs, const uint t)
  *
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(DRV_NAME, cr, t6, rt.onto->config);
-
 static void
-__cr_timer_stop(struct cr *cr, const uint t)
+cr_timer_stop(struct cr *cr, const uint t)
 {
 	int single = 1;
 
@@ -4167,7 +4263,7 @@ __cr_timer_stop(struct cr *cr, const uint t)
 		single = 0;
 		/* fall through */
 	case t6:
-		cr_stop_timer_t6(cr);
+		mi_timer_stop(cr->timers.t6);
 		if (single)
 			break;
 		/* fall through */
@@ -4178,34 +4274,16 @@ __cr_timer_stop(struct cr *cr, const uint t)
 	}
 }
 static void
-cr_timer_stop(struct cr *cr, const uint t)
-{
-	psw_t flags;
-
-	spin_lock_irqsave(&cr->lock, flags);
-	{
-		__cr_timer_stop(cr, t);
-	}
-	spin_unlock_irqrestore(&cr->lock, flags);
-}
-static void
 cr_timer_start(struct cr *cr, const uint t)
 {
-	psw_t flags;
-
-	spin_lock_irqsave(&cr->lock, flags);
-	{
-		__cr_timer_stop(cr, t);
-		switch (t) {
-		case t6:
-			cr_start_timer_t6(cr);
-			break;
-		default:
-			swerr();
-			break;
-		}
+	switch (t) {
+	case t6:
+		mi_timer(cr->timers.t6, cr->rt.onto->config.t6);
+		break;
+	default:
+		swerr();
+		break;
 	}
-	spin_unlock_irqrestore(&cr->lock, flags);
 }
 
 /*
@@ -4215,10 +4293,10 @@ cr_timer_start(struct cr *cr, const uint t)
  *
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(DRV_NAME, rt, t10, config);	/* waiting to repeat RST message */
+/* t10 - waiting to repeat RST message */
 
 static void
-__rt_timer_stop(struct rt *rt, const uint t)
+rt_timer_stop(struct rt *rt, const uint t)
 {
 	int single = 1;
 
@@ -4227,7 +4305,7 @@ __rt_timer_stop(struct rt *rt, const uint t)
 		single = 0;
 		/* fall through */
 	case t10:
-		rt_stop_timer_t10(rt);
+		mi_timer_stop(rt->timers.t10);
 		if (single)
 			break;
 		/* fall through */
@@ -4238,34 +4316,16 @@ __rt_timer_stop(struct rt *rt, const uint t)
 	}
 }
 static void
-rt_timer_stop(struct rt *rt, const uint t)
-{
-	psw_t flags;
-
-	spin_lock_irqsave(&rt->lock, flags);
-	{
-		__rt_timer_stop(rt, t);
-	}
-	spin_unlock_irqrestore(&rt->lock, flags);
-}
-static void
 rt_timer_start(struct rt *rt, const uint t)
 {
-	psw_t flags;
-
-	spin_lock_irqsave(&rt->lock, flags);
-	{
-		__rt_timer_stop(rt, t);
-		switch (t) {
-		case t10:
-			rt_start_timer_t10(rt);
-			break;
-		default:
-			swerr();
-			break;
-		}
+	switch (t) {
+	case t10:
+		mi_timer(rt->timers.t10, rt->config.t10);
+		break;
+	default:
+		swerr();
+		break;
 	}
-	spin_unlock_irqrestore(&rt->lock, flags);
 }
 
 /*
@@ -4275,23 +4335,8 @@ rt_timer_start(struct rt *rt, const uint t)
  *
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(DRV_NAME, sp, t1r, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(DRV_NAME, sp, t18, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(DRV_NAME, sp, t19, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(DRV_NAME, sp, t20, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(DRV_NAME, sp, t21, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(DRV_NAME, sp, t22a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(DRV_NAME, sp, t23a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(DRV_NAME, sp, t24a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(DRV_NAME, sp, t25a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(DRV_NAME, sp, t26a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(DRV_NAME, sp, t27a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(DRV_NAME, sp, t28a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(DRV_NAME, sp, t29a, config);	/* MTP restart timer */
-SS7_DECLARE_TIMER(DRV_NAME, sp, t30a, config);	/* MTP restart timer */
-
 static void
-__sp_timer_stop(struct sp *sp, const uint t)
+sp_timer_stop(struct sp *sp, const uint t)
 {
 	int single = 1;
 
@@ -4300,72 +4345,72 @@ __sp_timer_stop(struct sp *sp, const uint t)
 		single = 0;
 		/* fall through */
 	case t1r:
-		sp_stop_timer_t1r(sp);
+		mi_timer_stop(sp->timers.t1r);
 		if (single)
 			break;
 		/* fall through */
 	case t18:
-		sp_stop_timer_t18(sp);
+		mi_timer_stop(sp->timers.t18);
 		if (single)
 			break;
 		/* fall through */
 	case t19:
-		sp_stop_timer_t19(sp);
+		mi_timer_stop(sp->timers.t19);
 		if (single)
 			break;
 		/* fall through */
 	case t20:
-		sp_stop_timer_t20(sp);
+		mi_timer_stop(sp->timers.t20);
 		if (single)
 			break;
 		/* fall through */
 	case t21:
-		sp_stop_timer_t21(sp);
+		mi_timer_stop(sp->timers.t21);
 		if (single)
 			break;
 		/* fall through */
 	case t22a:
-		sp_stop_timer_t22a(sp);
+		mi_timer_stop(sp->timers.t22a);
 		if (single)
 			break;
 		/* fall through */
 	case t23a:
-		sp_stop_timer_t23a(sp);
+		mi_timer_stop(sp->timers.t23a);
 		if (single)
 			break;
 		/* fall through */
 	case t24a:
-		sp_stop_timer_t24a(sp);
+		mi_timer_stop(sp->timers.t24a);
 		if (single)
 			break;
 		/* fall through */
 	case t25a:
-		sp_stop_timer_t25a(sp);
+		mi_timer_stop(sp->timers.t25a);
 		if (single)
 			break;
 		/* fall through */
 	case t26a:
-		sp_stop_timer_t26a(sp);
+		mi_timer_stop(sp->timers.t26a);
 		if (single)
 			break;
 		/* fall through */
 	case t27a:
-		sp_stop_timer_t27a(sp);
+		mi_timer_stop(sp->timers.t27a);
 		if (single)
 			break;
 		/* fall through */
 	case t28a:
-		sp_stop_timer_t28a(sp);
+		mi_timer_stop(sp->timers.t28a);
 		if (single)
 			break;
 		/* fall through */
 	case t29a:
-		sp_stop_timer_t29a(sp);
+		mi_timer_stop(sp->timers.t29a);
 		if (single)
 			break;
 		/* fall through */
 	case t30a:
-		sp_stop_timer_t30a(sp);
+		mi_timer_stop(sp->timers.t30a);
 		if (single)
 			break;
 		/* fall through */
@@ -4376,73 +4421,55 @@ __sp_timer_stop(struct sp *sp, const uint t)
 	}
 }
 static void
-sp_timer_stop(struct sp *sp, const uint t)
-{
-	psw_t flags;
-
-	spin_lock_irqsave(&sp->lock, flags);
-	{
-		__sp_timer_stop(sp, t);
-	}
-	spin_unlock_irqrestore(&sp->lock, flags);
-}
-static void
 sp_timer_start(struct sp *sp, const uint t)
 {
-	psw_t flags;
-
-	spin_lock_irqsave(&sp->lock, flags);
-	{
-		__sp_timer_stop(sp, t);
-		switch (t) {
-		case t1r:
-			sp_start_timer_t1r(sp);
-			break;
-		case t18:
-			sp_start_timer_t18(sp);
-			break;
-		case t19:
-			sp_start_timer_t19(sp);
-			break;
-		case t20:
-			sp_start_timer_t20(sp);
-			break;
-		case t21:
-			sp_start_timer_t21(sp);
-			break;
-		case t22a:
-			sp_start_timer_t22a(sp);
-			break;
-		case t23a:
-			sp_start_timer_t23a(sp);
-			break;
-		case t24a:
-			sp_start_timer_t24a(sp);
-			break;
-		case t25a:
-			sp_start_timer_t25a(sp);
-			break;
-		case t26a:
-			sp_start_timer_t26a(sp);
-			break;
-		case t27a:
-			sp_start_timer_t27a(sp);
-			break;
-		case t28a:
-			sp_start_timer_t28a(sp);
-			break;
-		case t29a:
-			sp_start_timer_t29a(sp);
-			break;
-		case t30a:
-			sp_start_timer_t30a(sp);
-			break;
-		default:
-			swerr();
-			break;
-		}
+	switch (t) {
+	case t1r:
+		mi_timer(sp->timers.t1r, sp->config.t1r);
+		break;
+	case t18:
+		mi_timer(sp->timers.t18, sp->config.t18);
+		break;
+	case t19:
+		mi_timer(sp->timers.t19, sp->config.t19);
+		break;
+	case t20:
+		mi_timer(sp->timers.t20, sp->config.t20);
+		break;
+	case t21:
+		mi_timer(sp->timers.t21, sp->config.t21);
+		break;
+	case t22a:
+		mi_timer(sp->timers.t22a, sp->config.t22a);
+		break;
+	case t23a:
+		mi_timer(sp->timers.t23a, sp->config.t23a);
+		break;
+	case t24a:
+		mi_timer(sp->timers.t24a, sp->config.t24a);
+		break;
+	case t25a:
+		mi_timer(sp->timers.t25a, sp->config.t25a);
+		break;
+	case t26a:
+		mi_timer(sp->timers.t26a, sp->config.t26a);
+		break;
+	case t27a:
+		mi_timer(sp->timers.t27a, sp->config.t27a);
+		break;
+	case t28a:
+		mi_timer(sp->timers.t28a, sp->config.t28a);
+		break;
+	case t29a:
+		mi_timer(sp->timers.t29a, sp->config.t29a);
+		break;
+	case t30a:
+		mi_timer(sp->timers.t30a, sp->config.t30a);
+		break;
+	default:
+		swerr();
+		break;
 	}
-	spin_unlock_irqrestore(&sp->lock, flags);
 }
 
 /*
@@ -4452,14 +4479,8 @@ sp_timer_start(struct sp *sp, const uint t)
  *
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(DRV_NAME, cb, t1, sl.from->config);
-SS7_DECLARE_TIMER(DRV_NAME, cb, t2, sl.from->config);
-SS7_DECLARE_TIMER(DRV_NAME, cb, t3, sl.from->config);
-SS7_DECLARE_TIMER(DRV_NAME, cb, t4, sl.from->config);
-SS7_DECLARE_TIMER(DRV_NAME, cb, t5, sl.from->config);
-
 static void
-__cb_timer_stop(struct cb *cb, const uint t)
+cb_timer_stop(struct cb *cb, const uint t)
 {
 	int single = 1;
 
@@ -4468,27 +4489,27 @@ __cb_timer_stop(struct cb *cb, const uint t)
 		single = 0;
 		/* fall through */
 	case t1:
-		cb_stop_timer_t1(cb);
+		mi_timer_stop(cb->timers.t1);
 		if (single)
 			break;
 		/* fall through */
 	case t2:
-		cb_stop_timer_t2(cb);
+		mi_timer_stop(cb->timers.t2);
 		if (single)
 			break;
 		/* fall through */
 	case t3:
-		cb_stop_timer_t3(cb);
+		mi_timer_stop(cb->timers.t3);
 		if (single)
 			break;
 		/* fall through */
 	case t4:
-		cb_stop_timer_t4(cb);
+		mi_timer_stop(cb->timers.t4);
 		if (single)
 			break;
 		/* fall through */
 	case t5:
-		cb_stop_timer_t5(cb);
+		mi_timer_stop(cb->timers.t5);
 		if (single)
 			break;
 		/* fall through */
@@ -4499,46 +4520,28 @@ __cb_timer_stop(struct cb *cb, const uint t)
 	}
 }
 static void
-cb_timer_stop(struct cb *cb, const uint t)
-{
-	psw_t flags;
-
-	spin_lock_irqsave(&cb->lock, flags);
-	{
-		__cb_timer_stop(cb, t);
-	}
-	spin_unlock_irqrestore(&cb->lock, flags);
-}
-static void
 cb_timer_start(struct cb *cb, const uint t)
 {
-	psw_t flags;
-
-	spin_lock_irqsave(&cb->lock, flags);
-	{
-		__cb_timer_stop(cb, t);
-		switch (t) {
-		case t1:
-			cb_start_timer_t1(cb);
-			break;
-		case t2:
-			cb_start_timer_t2(cb);
-			break;
-		case t3:
-			cb_start_timer_t3(cb);
-			break;
-		case t4:
-			cb_start_timer_t4(cb);
-			break;
-		case t5:
-			cb_start_timer_t5(cb);
-			break;
-		default:
-			swerr();
-			break;
-		}
+	switch (t) {
+	case t1:
+		mi_timer(cb->timers.t1, cb->sl.from->config.t1);
+		break;
+	case t2:
+		mi_timer(cb->timers.t2, cb->sl.from->config.t2);
+		break;
+	case t3:
+		mi_timer(cb->timers.t3, cb->sl.from->config.t3);
+		break;
+	case t4:
+		mi_timer(cb->timers.t4, cb->sl.from->config.t4);
+		break;
+	case t5:
+		mi_timer(cb->timers.t5, cb->sl.from->config.t5);
+		break;
+	default:
+		swerr();
+		break;
 	}
-	spin_unlock_irqrestore(&cb->lock, flags);
 }
 
 /*
@@ -4550,7 +4553,7 @@ cb_timer_start(struct cb *cb, const uint t)
  */
 
 static void
-__ls_timer_stop(struct ls *ls, const uint t)
+ls_timer_stop(struct ls *ls, const uint t)
 {
 	int single = 1;
 
@@ -4564,32 +4567,14 @@ __ls_timer_stop(struct ls *ls, const uint t)
 		break;
 	}
 }
-static void
-ls_timer_stop(struct ls *ls, const uint t)
-{
-	psw_t flags;
-
-	spin_lock_irqsave(&ls->lock, flags);
-	{
-		__ls_timer_stop(ls, t);
-	}
-	spin_unlock_irqrestore(&ls->lock, flags);
-}
-static void
+static inline void
 ls_timer_start(struct ls *ls, const uint t)
 {
-	psw_t flags;
-
-	spin_lock_irqsave(&ls->lock, flags);
-	{
-		ls_timer_stop(ls, t);
-		switch (t) {
-		default:
-			swerr();
-			break;
-		}
+	switch (t) {
+	default:
+		swerr();
+		break;
 	}
-	spin_unlock_irqrestore(&ls->lock, flags);
 }
 
 /*
@@ -4599,10 +4584,8 @@ ls_timer_start(struct ls *ls, const uint t)
  *
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(DRV_NAME, lk, t7, config);
-
 static void
-__lk_timer_stop(struct lk *lk, const uint t)
+lk_timer_stop(struct lk *lk, const uint t)
 {
 	int single = 1;
 
@@ -4611,7 +4594,7 @@ __lk_timer_stop(struct lk *lk, const uint t)
 		single = 0;
 		/* fall through */
 	case t7:
-		lk_stop_timer_t7(lk);
+		mi_timer_stop(lk->timers.t7);
 		if (single)
 			break;
 		/* fall through */
@@ -4621,35 +4604,17 @@ __lk_timer_stop(struct lk *lk, const uint t)
 		break;
 	}
 }
-static void
-lk_timer_stop(struct lk *lk, const uint t)
-{
-	psw_t flags;
-
-	spin_lock_irqsave(&lk->lock, flags);
-	{
-		__lk_timer_stop(lk, t);
-	}
-	spin_unlock_irqrestore(&lk->lock, flags);
-}
-static void
+static inline void
 lk_timer_start(struct lk *lk, const uint t)
 {
-	psw_t flags;
-
-	spin_lock_irqsave(&lk->lock, flags);
-	{
-		__lk_timer_stop(lk, t);
-		switch (t) {
-		case t7:
-			lk_start_timer_t7(lk);
-			break;
-		default:
-			swerr();
-			break;
-		}
+	switch (t) {
+	case t7:
+		mi_timer(lk->timers.t7, lk->config.t7);
+		break;
+	default:
+		swerr();
+		break;
 	}
-	spin_unlock_irqrestore(&lk->lock, flags);
 }
 
 /*
@@ -4659,26 +4624,8 @@ lk_timer_start(struct lk *lk, const uint t)
  *
  *  -------------------------------------------------------------------------
  */
-SS7_DECLARE_TIMER(DRV_NAME, sl, t12, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t13, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t14, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t17, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t19a, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t20a, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t21a, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t22, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t23, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t24, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t31a, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t32a, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t33a, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t34a, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t1t, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t2t, config);
-SS7_DECLARE_TIMER(DRV_NAME, sl, t1s, config);
-
 static void
-__sl_timer_stop(struct sl *sl, const uint t)
+sl_timer_stop(struct sl *sl, const uint t)
 {
 	int single = 1;
 
@@ -4687,87 +4634,87 @@ __sl_timer_stop(struct sl *sl, const uint t)
 		single = 0;
 		/* fall through */
 	case t12:
-		sl_stop_timer_t12(sl);
+		mi_timer_stop(sl->timers.t12);
 		if (single)
 			break;
 		/* fall through */
 	case t13:
-		sl_stop_timer_t13(sl);
+		mi_timer_stop(sl->timers.t13);
 		if (single)
 			break;
 		/* fall through */
 	case t14:
-		sl_stop_timer_t14(sl);
+		mi_timer_stop(sl->timers.t14);
 		if (single)
 			break;
 		/* fall through */
 	case t17:
-		sl_stop_timer_t17(sl);
+		mi_timer_stop(sl->timers.t17);
 		if (single)
 			break;
 		/* fall through */
 	case t19a:
-		sl_stop_timer_t19a(sl);
+		mi_timer_stop(sl->timers.t19a);
 		if (single)
 			break;
 		/* fall through */
 	case t20a:
-		sl_stop_timer_t20a(sl);
+		mi_timer_stop(sl->timers.t20a);
 		if (single)
 			break;
 		/* fall through */
 	case t21a:
-		sl_stop_timer_t21a(sl);
+		mi_timer_stop(sl->timers.t21a);
 		if (single)
 			break;
 		/* fall through */
 	case t22:
-		sl_stop_timer_t22(sl);
+		mi_timer_stop(sl->timers.t22);
 		if (single)
 			break;
 		/* fall through */
 	case t23:
-		sl_stop_timer_t23(sl);
+		mi_timer_stop(sl->timers.t23);
 		if (single)
 			break;
 		/* fall through */
 	case t24:
-		sl_stop_timer_t24(sl);
+		mi_timer_stop(sl->timers.t24);
 		if (single)
 			break;
 		/* fall through */
 	case t31a:
-		sl_stop_timer_t31a(sl);
+		mi_timer_stop(sl->timers.t31a);
 		if (single)
 			break;
 		/* fall through */
 	case t32a:
-		sl_stop_timer_t32a(sl);
+		mi_timer_stop(sl->timers.t32a);
 		if (single)
 			break;
 		/* fall through */
 	case t33a:
-		sl_stop_timer_t33a(sl);
+		mi_timer_stop(sl->timers.t33a);
 		if (single)
 			break;
 		/* fall through */
 	case t34a:
-		sl_stop_timer_t34a(sl);
+		mi_timer_stop(sl->timers.t34a);
 		if (single)
 			break;
 		/* fall through */
 	case t1t:
-		sl_stop_timer_t1t(sl);
+		mi_timer_stop(sl->timers.t1t);
 		if (single)
 			break;
 		/* fall through */
 	case t2t:
-		sl_stop_timer_t2t(sl);
+		mi_timer_stop(sl->timers.t2t);
 		if (single)
 			break;
 		/* fall through */
 	case t1s:
-		sl_stop_timer_t1s(sl);
+		mi_timer_stop(sl->timers.t1s);
 		if (single)
 			break;
 		/* fall through */
@@ -4778,82 +4725,64 @@ __sl_timer_stop(struct sl *sl, const uint t)
 	}
 }
 static void
-sl_timer_stop(struct sl *sl, const uint t)
-{
-	psw_t flags;
-
-	spin_lock_irqsave(&sl->lock, flags);
-	{
-		__sl_timer_stop(sl, t);
-	}
-	spin_unlock_irqrestore(&sl->lock, flags);
-}
-static void
 sl_timer_start(struct sl *sl, const uint t)
 {
-	psw_t flags;
-
-	spin_lock_irqsave(&sl->lock, flags);
-	{
-		__sl_timer_stop(sl, t);
-		switch (t) {
-		case t12:
-			sl_start_timer_t12(sl);
-			break;
-		case t13:
-			sl_start_timer_t13(sl);
-			break;
-		case t14:
-			sl_start_timer_t14(sl);
-			break;
-		case t17:
-			sl_start_timer_t17(sl);
-			break;
-		case t19a:
-			sl_start_timer_t19a(sl);
-			break;
-		case t20a:
-			sl_start_timer_t20a(sl);
-			break;
-		case t21a:
-			sl_start_timer_t21a(sl);
-			break;
-		case t22:
-			sl_start_timer_t22(sl);
-			break;
-		case t23:
-			sl_start_timer_t23(sl);
-			break;
-		case t24:
-			sl_start_timer_t24(sl);
-			break;
-		case t31a:
-			sl_start_timer_t31a(sl);
-			break;
-		case t32a:
-			sl_start_timer_t32a(sl);
-			break;
-		case t33a:
-			sl_start_timer_t33a(sl);
-			break;
-		case t34a:
-			sl_start_timer_t34a(sl);
-			break;
-		case t1t:
-			sl_start_timer_t1t(sl);
-			break;
-		case t2t:
-			sl_start_timer_t2t(sl);
-			break;
-		case t1s:
-			sl_start_timer_t1s(sl);
-			break;
-		default:
-			swerr();
-			break;
-		}
+	switch (t) {
+	case t12:
+		mi_timer(sl->timers.t12, sl->config.t12);
+		break;
+	case t13:
+		mi_timer(sl->timers.t13, sl->config.t13);
+		break;
+	case t14:
+		mi_timer(sl->timers.t14, sl->config.t14);
+		break;
+	case t17:
+		mi_timer(sl->timers.t17, sl->config.t17);
+		break;
+	case t19a:
+		mi_timer(sl->timers.t19a, sl->config.t19a);
+		break;
+	case t20a:
+		mi_timer(sl->timers.t20a, sl->config.t20a);
+		break;
+	case t21a:
+		mi_timer(sl->timers.t21a, sl->config.t21a);
+		break;
+	case t22:
+		mi_timer(sl->timers.t22, sl->config.t22);
+		break;
+	case t23:
+		mi_timer(sl->timers.t23, sl->config.t23);
+		break;
+	case t24:
+		mi_timer(sl->timers.t24, sl->config.t24);
+		break;
+	case t31a:
+		mi_timer(sl->timers.t31a, sl->config.t31a);
+		break;
+	case t32a:
+		mi_timer(sl->timers.t32a, sl->config.t32a);
+		break;
+	case t33a:
+		mi_timer(sl->timers.t33a, sl->config.t33a);
+		break;
+	case t34a:
+		mi_timer(sl->timers.t34a, sl->config.t34a);
+		break;
+	case t1t:
+		mi_timer(sl->timers.t1t, sl->config.t1t);
+		break;
+	case t2t:
+		mi_timer(sl->timers.t2t, sl->config.t2t);
+		break;
+	case t1s:
+		mi_timer(sl->timers.t1s, sl->config.t1s);
+		break;
+	default:
+		swerr();
+		break;
 	}
-	spin_unlock_irqrestore(&sl->lock, flags);
 }
 
 /*
@@ -4928,7 +4857,7 @@ mtp_up_status_ind(queue_t *q, struct mtp *mtp, struct rs *rs, uint user, uint st
 	}
 	return mtp_status_ind(q, mtp, &dest, error);
 }
-static int
+static inline int
 mtp_up_status_ind_all_local(queue_t *q, struct rs *rs, uint si, uint status)
 {
 	struct mtp *mtp;
@@ -5053,8 +4982,8 @@ mtp_transfer_ind(queue_t *q, struct mtp *mtp, struct mtp_msg *m)
 	mblk_t *dp;
 
 	if ((dp = ss7_dupb(q, m->bp))) {
-		struct mtp_addr src = { ni:m->ni, pc:m->opc, si:m->si };
-		struct mtp_addr dst = { ni:m->ni, pc:m->dpc, si:m->si };
+	      struct mtp_addr src = { ni: m->ni, pc: m->opc, si:m->si };
+	      struct mtp_addr dst = { ni: m->ni, pc: m->dpc, si:m->si };
 
 		dp->b_rptr = m->data;
 		dp->b_wptr = dp->b_rptr + m->dlen;
@@ -5124,16 +5053,13 @@ mtp_transfer_ind_local(queue_t *q, struct sp *sp, struct mtp_msg *m)
 #endif
 	if (!(sp->mtp.equipped & (1 << m->si))) {
 		fixme(("Reply with UPU unequipped\n"));
-		freemsg(mp);
 		return (0);
 	}
 	if (!(sp->mtp.available & (1 << m->si))) {
 		fixme(("Reply with UPU inaccessible\n"));
-		freemsg(mp);
 		return (0);
 	}
 	swerr();
-	freemsg(mp);
 	return (0);
 }
 
@@ -5338,7 +5264,7 @@ static int
 mtp_send_route_loadshare(queue_t *q, struct sp *sp, mblk_t *bp, uint mp, uint32_t dpc, uint sls)
 {
 	fixme(("Select new sls based on loadsharing\n"));
-	return mtp_send_route(q, sp, mp, dpc, sls);
+	return mtp_send_route(q, sp, bp, mp, dpc, sls);
 }
 
 /*
@@ -5618,7 +5544,7 @@ mtp_send_rcr(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_lin(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc)
 {
 	mblk_t *bp;
@@ -5631,7 +5557,7 @@ mtp_send_lin(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_lun(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc)
 {
 	mblk_t *bp;
@@ -5644,7 +5570,7 @@ mtp_send_lun(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_lia(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc)
 {
 	mblk_t *bp;
@@ -5657,7 +5583,7 @@ mtp_send_lia(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_lua(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc)
 {
 	mblk_t *bp;
@@ -5670,7 +5596,7 @@ mtp_send_lua(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_lid(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc)
 {
 	mblk_t *bp;
@@ -5683,7 +5609,7 @@ mtp_send_lid(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_lfu(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc)
 {
 	mblk_t *bp;
@@ -5696,7 +5622,7 @@ mtp_send_lfu(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_llt(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc)
 {
 	mblk_t *bp;
@@ -5709,7 +5635,7 @@ mtp_send_llt(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_lrt(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc)
 {
 	mblk_t *bp;
@@ -5722,7 +5648,7 @@ mtp_send_lrt(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_tra(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls)
 {
 	mblk_t *bp;
@@ -5733,7 +5659,7 @@ mtp_send_tra(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_trw(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls)
 {
 	mblk_t *bp;
@@ -5744,7 +5670,7 @@ mtp_send_trw(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_dlc(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc,
 	     uint sdli)
 {
@@ -5758,7 +5684,7 @@ mtp_send_dlc(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_css(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc)
 {
 	mblk_t *bp;
@@ -5771,7 +5697,7 @@ mtp_send_css(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_cns(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc)
 {
 	mblk_t *bp;
@@ -5784,7 +5710,7 @@ mtp_send_cns(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_cnp(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls, uint slc)
 {
 	mblk_t *bp;
@@ -5797,7 +5723,7 @@ mtp_send_cnp(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_upu(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest, uint upi)
 {
@@ -5810,7 +5736,7 @@ mtp_send_upu(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uin
 	}
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_upa(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest, uint upi)
 {
@@ -5965,8 +5891,7 @@ mtp_tfp_broadcast(queue_t *q, struct rs *rs)
 
 					if (adj->dest == rs->dest)
 						continue;
-					mtp_send_tfp(q, sp, NULL, lk->ni, adj->dest, sp->pc, 0,
-						     rs->dest);
+					mtp_send_tfp(q, sp, lk->ni, adj->dest, sp->pc, 0, rs->dest);
 				}
 			}
 		} else {
@@ -6004,7 +5929,7 @@ mtp_tfp_reroute(struct rl *rl)
 				struct rs *adj = lk->sp.adj;
 
 				if (adj->dest != rs->dest)
-					mtp_send_tfp(NULL, sp, NULL, lk->ni, adj->dest, sp->pc, 0,
+					mtp_send_tfp(NULL, sp, lk->ni, adj->dest, sp->pc, 0,
 						     rs->dest);
 			}
 		} else {
@@ -6066,8 +5991,8 @@ mtp_tfr_broadcast(queue_t *q, struct rs *rs)
 					struct rs *adj = lk->sp.adj;
 
 					if (ls != lc && ls != lp && adj->dest != rs->dest)
-						mtp_send_tfr(q, sp, NULL, lk->ni, adj->dest, sp->pc,
-							     0, rs->dest);
+						mtp_send_tfr(q, sp, lk->ni, adj->dest, sp->pc, 0,
+							     rs->dest);
 				}
 			}
 		} else {
@@ -6080,8 +6005,8 @@ mtp_tfr_broadcast(queue_t *q, struct rs *rs)
 					struct rs *adj = lk->sp.adj;
 
 					if (ls != lc && ls != lp && adj->dest != rs->dest)
-						mtp_send_tcr(q, sp, NULL, lk->ni, adj->dest, sp->pc,
-							     0, rs->dest);
+						mtp_send_tcr(q, sp, lk->ni, adj->dest, sp->pc, 0,
+							     rs->dest);
 				}
 			}
 		}
@@ -6107,7 +6032,7 @@ mtp_tfr_reroute(struct rl *rl)
 				struct rs *adj = lk->sp.adj;
 
 				if (adj->dest != rs->dest)
-					mtp_send_tfr(NULL, sp, NULL, lk->ni, adj->dest, sp->pc, 0,
+					mtp_send_tfr(NULL, sp, lk->ni, adj->dest, sp->pc, 0,
 						     rs->dest);
 			}
 		} else {
@@ -6118,7 +6043,7 @@ mtp_tfr_reroute(struct rl *rl)
 				struct rs *adj = lk->sp.adj;
 
 				if (adj->dest != rs->dest)
-					mtp_send_tcr(NULL, sp, NULL, lk->ni, adj->dest, sp->pc, 0,
+					mtp_send_tcr(NULL, sp, lk->ni, adj->dest, sp->pc, 0,
 						     rs->dest);
 			}
 		}
@@ -6187,8 +6112,8 @@ mtp_tfa_broadcast(queue_t *q, struct rs *rs)
 					struct rs *adj = lk->sp.adj;
 
 					if (ls != lc && ls != lp && adj->dest != rs->dest)
-						mtp_send_tca(q, sp, NULL, lk->ni, adj->dest, sp->pc,
-							     0, rs->dest);
+						mtp_send_tca(q, sp, lk->ni, adj->dest, sp->pc, 0,
+							     rs->dest);
 				}
 			}
 		}
@@ -6225,7 +6150,7 @@ mtp_tfa_reroute(struct rl *rl)
 				struct rs *adj = lk->sp.adj;
 
 				if (adj->dest != rs->dest)
-					mtp_send_tca(NULL, sp, NULL, lk->ni, adj->dest, sp->pc, 0,
+					mtp_send_tca(NULL, sp, lk->ni, adj->dest, sp->pc, 0,
 						     rs->dest);
 			}
 		}
@@ -6361,7 +6286,7 @@ mtp_xfer_route(struct sl *sl, queue_t *q, mblk_t *mp, struct mtp_msg *m)
 			goto error;
 	if (sl->disc_status > m->mp)
 		goto discard;
-	if (!canputenxt(sl->oq))
+	if (!canputnext(sl->oq))
 		goto ebusy;
 	if (rl->rt.numb > 1) {
 		/* Only rotate when part of the sls was actually used for route selection (i.e. not 
@@ -7740,19 +7665,23 @@ mtp_lookup_rt_test(queue_t *q, struct sl *sl, struct mtp_msg *m, uint type)
 	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route set test message: no cluster support");
 	goto error;
       error3:
-	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route set test message: no local route to originator");
+	mi_strlog(q, 0, SL_TRACE,
+		  "PROTOCOL ERROR: Route set test message: no local route to originator");
 	goto error;
       error4:
-	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route set test message: originator not adjacent");
+	mi_strlog(q, 0, SL_TRACE,
+		  "PROTOCOL ERROR: Route set test message: originator not adjacent");
 	goto error;
       error5:
 	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route set test message: testing local adjacent");
 	goto error;
       error6:
-	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route set test message: no local route to destination");
+	mi_strlog(q, 0, SL_TRACE,
+		  "PROTOCOL ERROR: Route set test message: no local route to destination");
 	goto error;
       error7:
-	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route set test message: no route to destination");
+	mi_strlog(q, 0, SL_TRACE,
+		  "PROTOCOL ERROR: Route set test message: no route to destination");
 	goto error;
       error:
 	todo(("Deliver screened message to MTP management\n"));
@@ -7816,13 +7745,15 @@ mtp_lookup_rt(queue_t *q, struct sl *sl, struct mtp_msg *m, uint type)
 	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route related message: concerning adjacent");
 	goto error;
       error4:
-	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route related message: no local route to originator");
+	mi_strlog(q, 0, SL_TRACE,
+		  "PROTOCOL ERROR: Route related message: no local route to originator");
 	goto error;
       error5:
 	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route related message: from non-adjacent");
 	goto error;
       error6:
-	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route related message: no local route to destination");
+	mi_strlog(q, 0, SL_TRACE,
+		  "PROTOCOL ERROR: Route related message: no local route to destination");
 	goto error;
       error7:
 	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route related message: no route to destination");
@@ -7864,7 +7795,8 @@ mtp_lookup_sl(queue_t *q, struct sl *sl, struct mtp_msg *m)
       found:
 	return (s2);
       screened:
-	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Signallingl link message: no local signalling link");
+	mi_strlog(q, 0, SL_TRACE,
+		  "PROTOCOL ERROR: Signallingl link message: no local signalling link");
 	goto error;
       error:
 	todo(("Deliver screened message to MTP management\n"));
@@ -8370,7 +8302,7 @@ sl_stop_restore(queue_t *q, struct sl *sl)
  *  IMPLEMENTATION NOTE:-  Similar analysis as for T2 timer: we discard the buffer and restart traffic.
  */
 static int
-cb_t1_timeout(struct cb *cb)
+cb_t1_timeout(struct cb *cb, queue_t *q)
 {
 	struct sl *sl = cb->sl.from;
 
@@ -8385,7 +8317,7 @@ cb_t1_timeout(struct cb *cb)
 			cb_reroute_buffer(cb);
 		}
 	}
-	return sl_stop_restore(NULL, sl);
+	return sl_stop_restore(q, sl);
 }
 
 /*
@@ -8401,7 +8333,7 @@ cb_t1_timeout(struct cb *cb)
  *  literally, we will flush the buffer and start new traffic only.
  */
 static int
-cb_t2_timeout(struct cb *cb)
+cb_t2_timeout(struct cb *cb, queue_t *q)
 {
 	struct sl *sl = cb->sl.from;
 
@@ -8416,7 +8348,7 @@ cb_t2_timeout(struct cb *cb)
 			cb_reroute_buffer(cb);
 		}
 	}
-	return sl_stop_restore(NULL, sl);
+	return sl_stop_restore(q, sl);
 }
 
 /*
@@ -8438,7 +8370,7 @@ cb_t2_timeout(struct cb *cb)
  *  probability of out-of-sequence delivery to the destination point(s).
  */
 static int
-cb_t3_timeout(struct cb *cb)
+cb_t3_timeout(struct cb *cb, queue_t *q)
 {
 	/* restart traffic */
 	cb_reroute_buffer(cb);
@@ -8456,7 +8388,7 @@ cb_t3_timeout(struct cb *cb)
  *  unacknowledged and has therefore to be repeated.
  */
 static int
-cb_t4_timeout(struct cb *cb)
+cb_t4_timeout(struct cb *cb, queue_t *q)
 {
 	struct sl *sl_from = cb->sl.from;
 	struct sl *sl_onto = cb->sl.onto;
@@ -8464,8 +8396,7 @@ cb_t4_timeout(struct cb *cb)
 	struct sp *sp = lk->sp.loc;
 	struct rs *rs = lk->sp.adj;
 
-	mtp_send_cbd(NULL, sp, lk->ni, rs->dest, sp->pc, sl_onto->slc, sl_onto->slc, cb->cbc,
-		     sl_from);
+	mtp_send_cbd(q, sp, lk->ni, rs->dest, sp->pc, sl_onto->slc, sl_onto->slc, cb->cbc, sl_from);
 	cb_timer_start(cb, t5);
 	return (0);
 }
@@ -8475,7 +8406,7 @@ cb_t4_timeout(struct cb *cb)
  *  -----------------------------------
  */
 static int
-cb_t5_timeout(struct cb *cb)
+cb_t5_timeout(struct cb *cb, queue_t *q)
 {
 	/* restart traffic */
 	cb_reroute_buffer(cb);
@@ -8492,7 +8423,7 @@ cb_t5_timeout(struct cb *cb)
  *  is not mentioned in the MTP specifications.
  */
 static int
-cr_t6_timeout(struct cr *cr)
+cr_t6_timeout(struct cr *cr, queue_t *q)
 {
 	/* restart traffic */
 	return cr_reroute_buffer(cr);
@@ -8503,7 +8434,7 @@ cr_t6_timeout(struct cr *cr)
  *  -----------------------------------
  */
 static int
-lk_t7_timeout(struct lk *lk)
+lk_t7_timeout(struct lk *lk, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -8514,7 +8445,7 @@ lk_t7_timeout(struct lk *lk)
  *  -----------------------------------
  */
 static int
-rs_t8_timeout(struct rs *rs)
+rs_t8_timeout(struct rs *rs, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -8544,7 +8475,7 @@ rs_t8_timeout(struct rs *rs)
  *  Expiry: send RST, RCP, RSR, RCR and start T10
  */
 static int
-rt_t10_timeout(struct rt *rt)
+rt_t10_timeout(struct rt *rt, queue_t *q)
 {
 	int err;
 	struct lk *lk = rt->lk.lk;
@@ -8555,23 +8486,23 @@ rt_t10_timeout(struct rt *rt)
 	switch (rt->state) {
 	case RT_PROHIBITED:
 		if (rt->type != RT_TYPE_CLUSTER) {
-			if ((err =
-			     mtp_send_rst(NULL, loc, lk->ni, adj->dest, loc->pc, 0, rs->dest)) < 0)
+			if ((err = mtp_send_rst(q, loc, lk->ni, adj->dest, loc->pc, 0,
+						rs->dest)) < 0)
 				goto error;
 		} else {
-			if ((err =
-			     mtp_send_rcp(NULL, loc, lk->ni, adj->dest, loc->pc, 0, rs->dest)) < 0)
+			if ((err = mtp_send_rcp(q, loc, lk->ni, adj->dest, loc->pc, 0,
+						rs->dest)) < 0)
 				goto error;
 		}
 		break;
 	case RT_RESTRICTED:
 		if (rt->type != RT_TYPE_CLUSTER) {
-			if ((err =
-			     mtp_send_rsr(NULL, loc, lk->ni, adj->dest, loc->pc, 0, rs->dest)) < 0)
+			if ((err = mtp_send_rsr(q, loc, lk->ni, adj->dest, loc->pc, 0,
+						rs->dest)) < 0)
 				goto error;
 		} else {
-			if ((err =
-			     mtp_send_rcr(NULL, loc, lk->ni, adj->dest, loc->pc, 0, rs->dest)) < 0)
+			if ((err = mtp_send_rcr(q, loc, lk->ni, adj->dest, loc->pc, 0,
+						rs->dest)) < 0)
 				goto error;
 		}
 		break;
@@ -8609,7 +8540,7 @@ rt_t10_timeout(struct rt *rt)
  *
  */
 static int
-rs_t11_timeout(struct rs *rs)
+rs_t11_timeout(struct rs *rs, queue_t *q)
 {
 	int err;
 	struct sp *sp = rs->sp.sp;
@@ -8624,7 +8555,7 @@ rs_t11_timeout(struct rs *rs)
 			break;
 		case SS7_POPT_TFR:
 			/* old broadcast method - no responsive */
-			if ((err = mtp_tfr_broadcast(NULL, rs)))
+			if ((err = mtp_tfr_broadcast(q, rs)))
 				return (err);
 			break;
 		case SS7_POPT_TFRB:
@@ -8633,7 +8564,7 @@ rs_t11_timeout(struct rs *rs)
 			   13.4.2 (1)(a).  If the operator wishes to regular the rate of TFRs
 			   initially sent, the Responsive method should be used (i.e. with
 			   SS7_POPT_TFRR */
-			if ((err = mtp_tfr_broadcast(NULL, rs)))
+			if ((err = mtp_tfr_broadcast(q, rs)))
 				return (err);
 			if (sp->flags & SPF_XFER_FUNC)
 				/* prepare for final TFR response */
@@ -8679,7 +8610,7 @@ rs_t11_timeout(struct rs *rs)
  *  -----------------------------------
  */
 static int
-rs_t18a_timeout(struct rs *rs)
+rs_t18a_timeout(struct rs *rs, queue_t *q)
 {
 	struct rr *rr, *rr_next = rs->rr.list;
 
@@ -8714,7 +8645,7 @@ rs_t18a_timeout(struct rs *rs)
  *  -----------------------------------
  */
 static int
-sl_t12_timeout(struct sl *sl)
+sl_t12_timeout(struct sl *sl, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -8725,7 +8656,7 @@ sl_t12_timeout(struct sl *sl)
  *  -----------------------------------
  */
 static int
-sl_t13_timeout(struct sl *sl)
+sl_t13_timeout(struct sl *sl, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -8736,7 +8667,7 @@ sl_t13_timeout(struct sl *sl)
  *  -----------------------------------
  */
 static int
-sl_t14_timeout(struct sl *sl)
+sl_t14_timeout(struct sl *sl, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -8759,7 +8690,7 @@ sl_t14_timeout(struct sl *sl)
  *  Expiry: Send RCT, start T16
  */
 static int
-rs_t15_timeout(struct rs *rs)
+rs_t15_timeout(struct rs *rs, queue_t *q)
 {
 	int err;
 
@@ -8767,8 +8698,7 @@ rs_t15_timeout(struct rs *rs)
 		struct sp *sp = rs->sp.sp;
 
 		rs_timer_start(rs, t16);
-		if ((err =
-		     mtp_send_rct(NULL, sp, sp->ni, rs->dest, sp->pc, 0, rs->cong_status)) < 0)
+		if ((err = mtp_send_rct(q, sp, sp->ni, rs->dest, sp->pc, 0, rs->cong_status)) < 0)
 			goto error;
 	}
 	return (0);
@@ -8797,7 +8727,7 @@ rs_t15_timeout(struct rs *rs)
  *          congested
  */
 static int
-rs_t16_timeout(struct rs *rs)
+rs_t16_timeout(struct rs *rs, queue_t *q)
 {
 	int err;
 
@@ -8807,11 +8737,10 @@ rs_t16_timeout(struct rs *rs)
 
 		if ((newstatus = rs->cong_status - 1)) {
 			rs_timer_start(rs, t16);
-			if ((err =
-			     mtp_send_rct(NULL, sp, sp->ni, rs->dest, sp->pc, 0, newstatus)) < 0)
+			if ((err = mtp_send_rct(q, sp, sp->ni, rs->dest, sp->pc, 0, newstatus)) < 0)
 				goto error;
 		}
-		if ((err = mtp_cong_status_ind_all_local(NULL, rs, newstatus)) < 0)
+		if ((err = mtp_cong_status_ind_all_local(q, rs, newstatus)) < 0)
 			goto error;
 		rs->cong_status = newstatus;
 	}
@@ -8847,12 +8776,12 @@ rs_t16_timeout(struct rs *rs)
  *  intervention is made.
  */
 static int
-sl_t17_timeout(struct sl *sl)
+sl_t17_timeout(struct sl *sl, queue_t *q)
 {
 	/* simply attempt to restart the link */
 	/* T19(ANSI) is a maintenance guard timer */
 	sl_timer_start(sl, t19a);
-	return sl_start_req(NULL, sl);
+	return sl_start_req(q, sl);
 }
 
 /*
@@ -8862,7 +8791,7 @@ sl_t17_timeout(struct sl *sl)
  *  failed signalling link until restart is required.
  */
 static int
-sp_t1r_timeout(struct sp *sp)
+sp_t1r_timeout(struct sp *sp, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -8891,7 +8820,7 @@ sp_t1r_timeout(struct sp *sp)
  *  TFR messages may be completed in normal situations.
  */
 static int
-sp_t18_timeout(struct sp *sp)
+sp_t18_timeout(struct sp *sp, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -8911,7 +8840,7 @@ sp_t18_timeout(struct sp *sp)
  *  TRA is discarded and no further action is taken.
  */
 static int
-sp_t19_timeout(struct sp *sp)
+sp_t19_timeout(struct sp *sp, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -8932,14 +8861,14 @@ sp_t19_timeout(struct sp *sp)
  *  is notified, and, optionally, T19 may be restarted.
  */
 static int
-sl_t19a_timeout(struct sl *sl)
+sl_t19a_timeout(struct sl *sl, queue_t *q)
 {
 	switch (sl_get_l_state(sl)) {
 	case SLS_WIND_INSI:
 		todo(("Management notification\n"));
 		sl_timer_start(sl, t19a);
 		/* kick it again */
-		return sl_start_req(NULL, sl);
+		return sl_start_req(q, sl);
 	}
 	rare();
 	return (-EFAULT);
@@ -8978,7 +8907,7 @@ sl_t19a_timeout(struct sl *sl)
  *
  */
 static int
-sp_t20_timeout(struct sp *sp)
+sp_t20_timeout(struct sp *sp, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -8989,7 +8918,7 @@ sp_t20_timeout(struct sp *sp)
  *  -----------------------------------
  */
 static int
-sl_t20a_timeout(struct sl *sl)
+sl_t20a_timeout(struct sl *sl, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9051,7 +8980,7 @@ sl_t20a_timeout(struct sl *sl)
  *
  */
 static int
-sl_t21a_timeout(struct sl *sl)
+sl_t21a_timeout(struct sl *sl, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9098,7 +9027,7 @@ sl_t21a_timeout(struct sl *sl)
  *  running.
  */
 static int
-sp_t21_timeout(struct sp *sp)
+sp_t21_timeout(struct sp *sp, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9109,7 +9038,7 @@ sp_t21_timeout(struct sp *sp)
  *  -----------------------------------
  */
 static int
-sl_t22_timeout(struct sl *sl)
+sl_t22_timeout(struct sl *sl, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9120,7 +9049,7 @@ sl_t22_timeout(struct sl *sl)
  *  -----------------------------------
  */
 static int
-sp_t22a_timeout(struct sp *sp)
+sp_t22a_timeout(struct sp *sp, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9131,7 +9060,7 @@ sp_t22a_timeout(struct sp *sp)
  *  -----------------------------------
  */
 static int
-sl_t23_timeout(struct sl *sl)
+sl_t23_timeout(struct sl *sl, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9142,7 +9071,7 @@ sl_t23_timeout(struct sl *sl)
  *  -----------------------------------
  */
 static int
-sp_t23a_timeout(struct sp *sp)
+sp_t23a_timeout(struct sp *sp, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9153,7 +9082,7 @@ sp_t23a_timeout(struct sp *sp)
  *  -----------------------------------
  */
 static int
-sl_t24_timeout(struct sl *sl)
+sl_t24_timeout(struct sl *sl, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9164,7 +9093,7 @@ sl_t24_timeout(struct sl *sl)
  *  -----------------------------------
  */
 static int
-sp_t24a_timeout(struct sp *sp)
+sp_t24a_timeout(struct sp *sp, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9175,7 +9104,7 @@ sp_t24a_timeout(struct sp *sp)
  *  -----------------------------------
  */
 static int
-sp_t25a_timeout(struct sp *sp)
+sp_t25a_timeout(struct sp *sp, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9186,7 +9115,7 @@ sp_t25a_timeout(struct sp *sp)
  *  -----------------------------------
  */
 static int
-sp_t26a_timeout(struct sp *sp)
+sp_t26a_timeout(struct sp *sp, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9197,7 +9126,7 @@ sp_t26a_timeout(struct sp *sp)
  *  -----------------------------------
  */
 static int
-sp_t27a_timeout(struct sp *sp)
+sp_t27a_timeout(struct sp *sp, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9208,7 +9137,7 @@ sp_t27a_timeout(struct sp *sp)
  *  -----------------------------------
  */
 static int
-sp_t28a_timeout(struct sp *sp)
+sp_t28a_timeout(struct sp *sp, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9219,7 +9148,7 @@ sp_t28a_timeout(struct sp *sp)
  *  -----------------------------------
  */
 static int
-sp_t29a_timeout(struct sp *sp)
+sp_t29a_timeout(struct sp *sp, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9230,7 +9159,7 @@ sp_t29a_timeout(struct sp *sp)
  *  -----------------------------------
  */
 static int
-sp_t30a_timeout(struct sp *sp)
+sp_t30a_timeout(struct sp *sp, queue_t *q)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9248,11 +9177,11 @@ sp_t30a_timeout(struct sp *sp)
  *  zero.  The management should be notified if the link is restarted due to false link congestion.
  */
 static int
-sl_t31a_timeout(struct sl *sl)
+sl_t31a_timeout(struct sl *sl, queue_t *q)
 {
 	if (sl_get_l_state(sl) == SLS_IN_SERVICE) {
 		todo(("Notify management of false congestion\n"));
-		return sl_stop_restore(NULL, sl);
+		return sl_stop_restore(q, sl);
 	}
 	rare();
 	return (-EFAULT);
@@ -9282,7 +9211,7 @@ sl_t31a_timeout(struct sl *sl)
  *
  */
 static int
-sl_t32a_timeout(struct sl *sl)
+sl_t32a_timeout(struct sl *sl, queue_t *q)
 {
 	switch (sl_get_l_state(sl)) {
 	case SLS_OUT_OF_SERVICE:
@@ -9318,7 +9247,7 @@ sl_t32a_timeout(struct sl *sl)
  *  and function of the node in the network and may be modified by management action.
  */
 static int
-sl_t33a_timeout(struct sl *sl)
+sl_t33a_timeout(struct sl *sl, queue_t *q)
 {
 	if (sl_get_l_state(sl) == SLS_IN_SERVICE)
 		/* link has passed probation */
@@ -9332,14 +9261,14 @@ sl_t33a_timeout(struct sl *sl)
  *  -----------------------------------
  */
 static int
-sl_t34a_timeout(struct sl *sl)
+sl_t34a_timeout(struct sl *sl, queue_t *q)
 {
 	switch (sl_get_l_state(sl)) {
 	case SLS_OUT_OF_SERVICE:
 		/* link has exited suspension */
 		/* T19(ANSI) is a maintenance guard timer */
 		sl_timer_start(sl, t19a);
-		return sl_start_req(NULL, sl);
+		return sl_start_req(q, sl);
 	}
 	rare();
 	return (-EFAULT);
@@ -9366,7 +9295,7 @@ sl_t34a_timeout(struct sl *sl)
  *  to management.
  */
 static int
-sl_t1t_timeout(struct sl *sl)
+sl_t1t_timeout(struct sl *sl, queue_t *q)
 {
 	struct lk *lk = sl->lk.lk;
 	struct sp *sp = lk->sp.loc;
@@ -9386,7 +9315,7 @@ sl_t1t_timeout(struct sl *sl)
 		/* second test failed */
 		if (sl_get_l_state(sl) == SLS_WACK_SLTM) {
 			/* initial testing failed, fail link */
-			if ((err = sl_stop_restore(NULL, sl)) < 0)
+			if ((err = sl_stop_restore(q, sl)) < 0)
 				return (err);
 		} else {
 			/* periodic testing failed, just report to management */
@@ -9406,7 +9335,7 @@ sl_t1t_timeout(struct sl *sl)
  *  performed independently from each end.
  */
 static int
-sl_t2t_timeout(struct sl *sl)
+sl_t2t_timeout(struct sl *sl, queue_t *q)
 {
 	if (sl_get_l_state(sl) == SLS_IN_SERVICE) {
 		struct lk *lk = sl->lk.lk;
@@ -9420,7 +9349,7 @@ sl_t2t_timeout(struct sl *sl)
 			sl->tdata[i] ^= ((jiffies >> 8) & 0xff);
 		/* start new signalling link test */
 		if ((err =
-		     mtp_send_sltm(NULL, loc, lk->ni, adj->dest, loc->pc, sl->slc, sl->slc,
+		     mtp_send_sltm(q, loc, lk->ni, adj->dest, loc->pc, sl->slc, sl->slc,
 				   sl->tdata, sl->tlen, sl)))
 			return (err);
 		sl_timer_start(sl, t1t);
@@ -9443,7 +9372,7 @@ sl_ssltm_failed(queue_t *q, struct sl *sl)
 	return (-EFAULT);
 }
 static int
-sl_t1s_timeout(struct sl *sl)
+sl_t1s_timeout(struct sl *sl, queue_t *q)
 {
 	struct lk *lk = sl->lk.lk;
 	struct sp *loc = lk->sp.loc;
@@ -9453,15 +9382,14 @@ sl_t1s_timeout(struct sl *sl)
 	if (sl->flags & (SLF_WACK_SSLTM | SLF_WACK_SSLTM2)) {
 		if (sl->flags & SLF_WACK_SSLTM) {
 			sl_timer_start(sl, t1s);
-			if ((err =
-			     mtp_send_ssltm(NULL, loc, lk->ni, adj->dest, loc->pc, sl->slc, sl->slc,
-					    sl->tdata, sl->tlen, sl)) < 0)
+			if ((err = mtp_send_ssltm(q, loc, lk->ni, adj->dest, loc->pc, sl->slc,
+						  sl->slc, sl->tdata, sl->tlen, sl)) < 0)
 				goto error;
 			sl->flags &= ~SLF_WACK_SSLTM;
 			sl->flags |= SLF_WACK_SSLTM2;
 			return (0);
 		}
-		if ((err = sl_ssltm_failed(NULL, sl)) < 0)
+		if ((err = sl_ssltm_failed(q, sl)) < 0)
 			goto error;
 		sl->flags &= ~SLF_WACK_SSLTM2;
 		return (0);
@@ -9540,13 +9468,11 @@ mtp_recv_coo(queue_t *q, struct mtp_msg *m)
 		if (sl->fsnc != -1) {
 			/* BSNT already retrieved -- reply anyway with COA */
 			if ((err =
-			     mtp_send_coa(q, sp, NULL, m->ni, m->opc, m->dpc, m->sls, m->slc,
-					  sl->fsnc)))
+			     mtp_send_coa(q, sp, m->ni, m->opc, m->dpc, m->sls, m->slc, sl->fsnc)))
 				goto error;
 		} else {
 			/* BSNT failed retrieval -- reply anyway with ECA */
-			if ((err =
-			     mtp_send_eca(q, sp, NULL, m->ni, m->opc, m->dpc, m->sls, m->slc)))
+			if ((err = mtp_send_eca(q, sp, m->ni, m->opc, m->dpc, m->sls, m->slc)))
 				goto error;
 		}
 		if (sl_get_l_state(sl) != SLS_WCON_RET) {
@@ -9691,12 +9617,12 @@ mtp_recv_eco(queue_t *q, struct mtp_msg *m)
 		case SLS_WCON_RET:
 			if (sl->fsnc != -1) {
 				/* BSNT already retrieved -- reply anyway with COA */
-				if ((err = mtp_send_coa(q, sp, NULL, m->ni, m->opc, m->dpc
+				if ((err = mtp_send_coa(q, sp, m->ni, m->opc, m->dpc,
 							m->sls, m->slc, sl->fsnc)))
 					return (err);
 			} else {
 				/* BSNT failed retrieval -- reply anyway with ECA */
-				if ((err = mtp_send_eca(q, sp, NULL, m->ni, m->opc, m->dpc,
+				if ((err = mtp_send_eca(q, sp, m->ni, m->opc, m->dpc,
 							m->sls, m->slc)))
 					return (err);
 			}
@@ -10565,7 +10491,7 @@ mtp_recv_sslta(queue_t *q, struct mtp_msg *m)
 	struct lk *lk = sl->lk.lk;
 	struct sp *loc = lk->sp.loc;
 	struct rs *adj = lk->sp.adj;
-	int i;
+	int i, err;
 
 	if (m->slc != sl->slc || m->opc != adj->dest || m->dpc != loc->pc)
 		goto eproto;
@@ -10607,8 +10533,9 @@ mtp_recv_sslta(queue_t *q, struct mtp_msg *m)
  *  Note: if we are restarting, we never get here.
  */
 static int
-mtp_recv_user(struct sl *sl, queue_t *q, struct mtp_msg *m)
+mtp_recv_user(queue_t *q, struct mtp_msg *m)
 {
+	struct sl *sl = SL_PRIV(q);
 	struct sp *sp = sl->lk.lk->sp.loc;
 
 	return mtp_transfer_ind_local(q, sp, m);
@@ -11379,7 +11306,7 @@ sl_recv_msg(struct sl *sl, queue_t *q, mblk_t *mp)
 	}
 	if ((loc->flags & SPF_XFER_FUNC)) {
 		/* message is not for us, transfer it */
-		if ((err = mtp_xfer_route(sl, q, &msg)) < 0)
+		if ((err = mtp_xfer_route(sl, q, mp, &msg)) < 0)
 			return (err);
 		freemsg(mp);
 		return (0);
@@ -11415,11 +11342,10 @@ static int
 sl_data(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl = SL_PRIV(q);
-	int err;
 
 	if ((1 << sl_get_l_state(sl)) & ~(SLSF_IN_SERVICE | SLSF_WACK_SLTM | SLSF_PROC_OUTG))
 		goto outstate;
-	return sl_recv_msg(sl, q, NULL, mp);
+	return sl_recv_msg(sl, q, mp);
       outstate:
 	mi_strlog(q, 0, SL_ERROR, "M_DATA: would place i/f out of state");
 	return (EPROTO);
@@ -11435,14 +11361,13 @@ static int
 sl_pdu_ind(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl = SL_PRIV(q);
-	int err;
 	const sl_pdu_ind_t *p = (typeof(p)) mp->b_rptr;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p) || !mp->b_cont)
 		goto einval;
 	if ((1 << sl_get_l_state(sl)) & ~(SLSF_IN_SERVICE | SLSF_WACK_SLTM | SLSF_PROC_OUTG))
 		goto outstate;
-	return sl_recv_msg(sl, q, mp, mp->b_cont);
+	return sl_recv_msg(sl, q, mp->b_cont);
       outstate:
 	mi_strlog(q, 0, SL_ERROR, "SL_PDU_IND: would place i/f out of state");
 	return (EPROTO);
@@ -11698,8 +11623,7 @@ sl_bsnt_ind(queue_t *q, mblk_t *mp)
 	if (sl->flags & (SLF_COO_RECV | SLF_ECO_RECV)) {
 		/* send COA */
 		if ((err =
-		     mtp_send_coa(q, loc, NULL, loc->ni, adj->dest, loc->pc, sl->slc, sl->slc,
-				  sl->bsnt)))
+		     mtp_send_coa(q, loc, loc->ni, adj->dest, loc->pc, sl->slc, sl->slc, sl->bsnt)))
 			return (err);
 		if (sl->fsnc == -1) {
 			if ((err = sl_clear_rtb_req(q, sl)))
@@ -11711,8 +11635,7 @@ sl_bsnt_ind(queue_t *q, mblk_t *mp)
 	} else {
 		/* send COO */
 		if ((err =
-		     mtp_send_coo(q, loc, NULL, loc->ni, adj->dest, loc->pc, sl->slc, sl->slc,
-				  sl->bsnt)))
+		     mtp_send_coo(q, loc, loc->ni, adj->dest, loc->pc, sl->slc, sl->slc, sl->bsnt)))
 			return (err);
 		sl_set_l_state(sl, SLS_WACK_COO);
 		return (0);
@@ -12037,7 +11960,8 @@ sl_remote_processor_recovered_ind(queue_t *q, mblk_t *mp)
 	sl_set_l_state(sl, SLS_IN_SERVICE);
 	return (0);
       outstate:
-	mi_strlog(q, 0, SL_ERROR, "SL_REMOTE_PROCESSOR_RECOVERED_IND: would place i/f out of state");
+	mi_strlog(q, 0, SL_ERROR,
+		  "SL_REMOTE_PROCESSOR_RECOVERED_IND: would place i/f out of state");
 	return (EPROTO);
       einval:
 	mi_strlog(q, 0, SL_ERROR, "SL_REMOTE_PROCESSOR_RECOVERED_IND: invalid primitive format");
@@ -12887,12 +12811,12 @@ t_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (dlen == 0 || dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
 		goto baddata;
-	if ((err = mtp_send_msg(q, mtp, mp, NULL, &mtp->dst, mp->b_cont)) < 0)
+	if ((err = mtp_send_msg(q, mtp, NULL, &mtp->dst, mp->b_cont)) < 0)
 		return (err);
 	freeb(mp);
 	return (0);
       baddata:
-	mi_strlog(q, 0, SL_TRACE, "M_DATA: bad data size %d");
+	mi_strlog(q, 0, SL_TRACE, "M_DATA: bad data size %d", (int) msgdsize(mp));
 	goto error;
       outstate:
 	mi_strlog(q, 0, SL_TRACE, "M_DATA i/f out of state");
@@ -13072,12 +12996,12 @@ t_data_req(queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (dlen == 0 || dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
 		goto baddata;
-	if ((err = mtp_send_msg(q, mtp, mp, NULL, &mtp->dst, mp->b_cont)) < 0)
+	if ((err = mtp_send_msg(q, mtp, NULL, &mtp->dst, mp->b_cont)) < 0)
 		return (err);
 	freeb(mp);
 	return (0);
       baddata:
-	mi_strlog(q, 0, SL_TRACE, "T_DATA_REQ: bad data size %d");
+	mi_strlog(q, 0, SL_TRACE, "T_DATA_REQ: bad data size %d", (int) msgdsize(mp->b_cont));
 	goto error;
       outstate:
 	mi_strlog(q, 0, SL_TRACE, "T_DATA_REQ: would place i/f out of state");
@@ -13249,7 +13173,7 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 
 			if (mtp_parse_opts(mtp, &opts, mp->b_rptr + p->OPT_offset, p->OPT_length))
 				goto badopt;
-			if ((err = mtp_send_msg(q, mtp, mp, &opts, dst, mp->b_cont)) < 0)
+			if ((err = mtp_send_msg(q, mtp, &opts, dst, mp->b_cont)) < 0)
 				return (err);
 			freeb(mp);
 			return (0);
@@ -13271,10 +13195,11 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_TRACE, "T_UNITDATA_REQ: would place i/f out of state");
 	goto error;
       baddata:
-	mi_strlog(q, 0, SL_TRACE, "T_UNITDATA_REQ: bad data size %d");
+	mi_strlog(q, 0, SL_TRACE, "T_UNITDATA_REQ: bad data size %d", (int) msgdsize(mp->b_cont));
 	goto error;
       notsupport:
-	mi_strlog(q, 0, SL_TRACE, "T_UNITDATA_REQ: primitive not supported for T_COTS or T_COTS_ORD");
+	mi_strlog(q, 0, SL_TRACE,
+		  "T_UNITDATA_REQ: primitive not supported for T_COTS or T_COTS_ORD");
 	goto error;
       error:
 	return m_error(q, mtp, mp, EPROTO);
@@ -13406,7 +13331,7 @@ t_optdata_req(queue_t *q, mblk_t *mp)
 
 		if (mtp_parse_opts(mtp, &opts, mp->b_rptr + p->OPT_offset, p->OPT_length))
 			goto badopt;
-		if ((err = mtp_send_msg(q, mtp, mp, &opts, &mtp->dst, mp->b_cont)) < 0)
+		if ((err = mtp_send_msg(q, mtp, &opts, &mtp->dst, mp->b_cont)) < 0)
 			return (err);
 		freeb(mp);
 		return (0);
@@ -13498,7 +13423,7 @@ n_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto baddata;
 	switch (mtp_get_state(mtp)) {
 	case NS_DATA_XFER:
-		if ((err = mtp_send_msg(q, mtp, mp, NULL, &mtp->dst, mp->b_cont)) < 0)
+		if ((err = mtp_send_msg(q, mtp, NULL, &mtp->dst, mp->b_cont)) < 0)
 			return (err);
 		freeb(mp);
 		return (0);
@@ -13723,7 +13648,7 @@ n_data_req(queue_t *q, mblk_t *mp)
 		goto baddata;
 	switch (mtp_get_state(mtp)) {
 	case NS_DATA_XFER:
-		if ((err = mtp_send_msg(q, mtp, mp, NULL, &mtp->dst, mp->b_cont)) < 0)
+		if ((err = mtp_send_msg(q, mtp, NULL, &mtp->dst, mp->b_cont)) < 0)
 			return (err);
 		freeb(mp);
 		return (0);
@@ -13914,7 +13839,7 @@ n_unitdata_req(queue_t *q, mblk_t *mp)
 		goto badaddr;
 	if (!mtp_check_dst(mtp, &dst))
 		goto badaddr;
-	if ((err = mtp_send_msg(q, mtp, mp, NULL, &dst, mp->b_cont)) < 0)
+	if ((err = mtp_send_msg(q, mtp, NULL, &dst, mp->b_cont)) < 0)
 		return (err);
 	freeb(mp);
 	return (0);
@@ -17017,6 +16942,13 @@ mtp_w_ioctl(queue_t *q, mblk_t *mp)
 	return (QR_ABSORBED);
 }
 
+static int
+mtp_w_iocdata(queue_t *q, mblk_t *mp)
+{
+	mi_copy_done(q, mp, EPROTO);
+	return (0);
+}
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -17287,10 +17219,10 @@ sl_r_proto(queue_t *q, mblk_t *mp)
 	int err = -EAGAIN;
 
 	if ((sl = sl_acquire(q))) {
-		uint oldstate = sl_get_state(sl);
+		uint oldstate = sl_get_l_state(sl);
 
 		if ((err = sli_r_proto(q, mp)))
-			sl_set_state(sp, oldstate);
+			sl_set_state(q, sl, oldstate);
 
 		sl_release(sl);
 	}
@@ -17325,7 +17257,7 @@ mtp_w_data(queue_t *q, mblk_t *mp)
 	struct mtp *mtp;
 	int err = -EAGAIN;
 
-	if (likely((mtp = mtp_acquire(q))) != NULL) {
+	if (likely((mtp = mtp_acquire(q)) != NULL)) {
 		switch (mtp->i_style) {
 		default:
 		case MTP_STYLE_MTPI:
@@ -17351,7 +17283,7 @@ sl_r_data(queue_t *q, mblk_t *mp)
 	int err = -EAGAIN;
 
 	if (likely((sl = sl_acquire(q)))) {
-		err = sl_data(sl, q, mp);
+		err = sl_data(q, mp);
 		sl_release(sl);
 	}
 	return (err);
@@ -17365,13 +17297,274 @@ sl_r_data(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 static int
+do_timeout(queue_t *q, mblk_t *mp)
+{
+	struct mtp_timer *t = (typeof(t)) mp->b_rptr;
+
+	switch (t->timer) {
+	case t1:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t1 expiry at %lu", jiffies);
+		return cb_t1_timeout(t->cb, q);
+	case t1r:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t1r expiry at %lu", jiffies);
+		return sp_t1r_timeout(t->sp, q);
+	case t2:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t2 expiry at %lu", jiffies);
+		return cb_t2_timeout(t->cb, q);
+	case t3:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t3 expiry at %lu", jiffies);
+		return cb_t3_timeout(t->cb, q);
+	case t4:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t4 expiry at %lu", jiffies);
+		return cb_t4_timeout(t->cb, q);
+	case t5:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t5 expiry at %lu", jiffies);
+		return cb_t5_timeout(t->cb, q);
+	case t6:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t6 expiry at %lu", jiffies);
+		return cr_t6_timeout(t->cr, q);
+	case t7:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t7 expiry at %lu", jiffies);
+		return lk_t7_timeout(t->lk, q);
+	case t8:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t8 expiry at %lu", jiffies);
+		return rs_t8_timeout(t->rs, q);
+	case t10:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t10 expiry at %lu", jiffies);
+		return rt_t10_timeout(t->rt, q);
+	case t11:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t11 expiry at %lu", jiffies);
+		return rs_t11_timeout(t->rs, q);
+	case t12:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t12 expiry at %lu", jiffies);
+		return sl_t12_timeout(t->sl, q);
+	case t13:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t13 expiry at %lu", jiffies);
+		return sl_t13_timeout(t->sl, q);
+	case t14:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t14 expiry at %lu", jiffies);
+		return sl_t14_timeout(t->sl, q);
+	case t15:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t15 expiry at %lu", jiffies);
+		return rs_t15_timeout(t->rs, q);
+	case t16:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t16 expiry at %lu", jiffies);
+		return rs_t16_timeout(t->rs, q);
+	case t17:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t17 expiry at %lu", jiffies);
+		return sl_t17_timeout(t->sl, q);
+	case t18:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t18 expiry at %lu", jiffies);
+		return sp_t18_timeout(t->sp, q);
+	case t18a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t18a expiry at %lu", jiffies);
+		return rs_t18a_timeout(t->rs, q);
+	case t19:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t19 expiry at %lu", jiffies);
+		return sp_t19_timeout(t->sp, q);
+	case t19a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t19a expiry at %lu", jiffies);
+		return sl_t19a_timeout(t->sl, q);
+	case t20:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t20 expiry at %lu", jiffies);
+		return sp_t20_timeout(t->sp, q);
+	case t20a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t20a expiry at %lu", jiffies);
+		return sl_t20a_timeout(t->sl, q);
+	case t21:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t21 expiry at %lu", jiffies);
+		return sp_t21_timeout(t->sp, q);
+	case t21a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t21a expiry at %lu", jiffies);
+		return sl_t21a_timeout(t->sl, q);
+	case t22:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t22 expiry at %lu", jiffies);
+		return sl_t22_timeout(t->sl, q);
+	case t22a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t22a expiry at %lu", jiffies);
+		return sp_t22a_timeout(t->sp, q);
+	case t23:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t23 expiry at %lu", jiffies);
+		return sl_t23_timeout(t->sl, q);
+	case t23a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t23a expiry at %lu", jiffies);
+		return sp_t23a_timeout(t->sp, q);
+	case t24:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t24 expiry at %lu", jiffies);
+		return sl_t24_timeout(t->sl, q);
+	case t24a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t24a expiry at %lu", jiffies);
+		return sp_t24a_timeout(t->sp, q);
+	case t25a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t25a expiry at %lu", jiffies);
+		return sp_t25a_timeout(t->sp, q);
+	case t26a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t26a expiry at %lu", jiffies);
+		return sp_t26a_timeout(t->sp, q);
+	case t27a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t27a expiry at %lu", jiffies);
+		return sp_t27a_timeout(t->sp, q);
+	case t28a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t28a expiry at %lu", jiffies);
+		return sp_t28a_timeout(t->sp, q);
+	case t29a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t29a expiry at %lu", jiffies);
+		return sp_t29a_timeout(t->sp, q);
+	case t30a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t30a expiry at %lu", jiffies);
+		return sp_t30a_timeout(t->sp, q);
+	case t31a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t31a expiry at %lu", jiffies);
+		return sl_t31a_timeout(t->sl, q);
+	case t32a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t32a expiry at %lu", jiffies);
+		return sl_t32a_timeout(t->sl, q);
+	case t33a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t33a expiry at %lu", jiffies);
+		return sl_t33a_timeout(t->sl, q);
+	case t34a:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t34a expiry at %lu", jiffies);
+		return sl_t34a_timeout(t->sl, q);
+	case t1t:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t1t expiry at %lu", jiffies);
+		return sl_t1t_timeout(t->sl, q);
+	case t2t:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t2t expiry at %lu", jiffies);
+		return sl_t2t_timeout(t->sl, q);
+	case t1s:
+		mi_strlog(q, STRLOGTO, SL_TRACE, "t1s expiry at %lu", jiffies);
+		return sl_t1s_timeout(t->sl, q);
+	default:
+		return (0);
+	}
+}
+static int
 mtp_w_sig(queue_t *q, mblk_t *mp)
 {
+	struct mtp *mtp;
+	uint oldstate;
+	int err = 0;
+
+	if (!(mtp = mtp_acquire(q)))
+		return (-EAGAIN);
+
+	oldstate = mtp_get_state(mtp);
+
+	if (likely(mi_timer_valid(mp)))
+		err = do_timeout(q, mp);
+
+	if (err)
+		mtp_set_state(mtp, oldstate);
+	mtp_release(mtp);
+	return (err < 0 ? err : 0);
 }
 
 static int
 sl_r_sig(queue_t *q, mblk_t *mp)
 {
+	struct sl *sl;
+	uint oldstate;
+	int err = 0;
+
+	if (!(sl = sl_acquire(q)))
+		return (-EAGAIN);
+
+	oldstate = sl_get_l_state(sl);
+
+	if (likely(mi_timer_valid(mp)))
+		err = do_timeout(q, mp);
+
+	if (err)
+		sl_set_state(q, sl, oldstate);
+	sl_release(sl);
+	return (err < 0 ? err : 0);
+}
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  M_RSE, M_PCRSE Handling
+ *
+ *  -------------------------------------------------------------------------
+ */
+static int
+mtp_w_rse(queue_t *q, mblk_t *mp)
+{
+	return (EPROTO);
+}
+
+static int
+sl_r_rse(queue_t *q, mblk_t *mp)
+{
+	return (EPROTO);
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Unknown STREAMS Message Handling
+ *
+ *  -------------------------------------------------------------------------
+ */
+static int
+mtp_w_unknown(queue_t *q, mblk_t *mp)
+{
+	return (EOPNOTSUPP);
+}
+
+static int
+sl_r_unknown(queue_t *q, mblk_t *mp)
+{
+	return (EOPNOTSUPP);
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  M_FLUSH Handling
+ *
+ *  -------------------------------------------------------------------------
+ */
+static int
+mtp_w_flush(queue_t *q, mblk_t *mp)
+{
+	if (mp->b_rptr[0] & FLUSHW) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(q, FLUSHDATA);
+		mp->b_rptr[0] &= ~FLUSHW;
+	}
+	if (mp->b_rptr[0] & FLUSHR) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(RD(q), FLUSHDATA);
+		qreply(q, mp);
+		return (0);
+	}
+	freemsg(mp);
+	return (0);
+}
+static int
+sl_r_flush(queue_t *q, mblk_t *mp)
+{
+	if (mp->b_rptr[0] & FLUSHR) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(q, FLUSHDATA);
+		mp->b_rptr[0] &= ~FLUSHR;
+	}
+	if (mp->b_rptr[0] & FLUSHW) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(WR(q), mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(WR(q), FLUSHDATA);
+		qreply(q, mp);
+		return (0);
+	}
+	freemsg(mp);
+	return (0);
 }
 
 /*
@@ -17466,11 +17659,13 @@ sl_r_msg_slow(queue_t *q, mblk_t *mp)
 		return sl_r_error(q, mp);
 	case M_HANGUP:
 		return sl_r_hangup(q, mp);
+#if 0
 	case M_IOCACK:
 	case M_IOCNAK:
 	case M_COPYIN:
 	case M_COPYOUT:
 		return sl_r_copy(q, mp);
+#endif
 	case M_RSE:
 	case M_PCRSE:
 		return sl_r_rse(q, mp);
@@ -17500,7 +17695,7 @@ sl_r_msg(queue_t *q, mblk_t *mp)
 static streamscall __hot_put int
 mtp_wput(queue_t *q, mblk_t *mp)
 {
-	if ((!pcmsg(DB_TYPE(mp)) && (q->q_first || (q->q_flags & QSVCBUSY))) || mtp_w_msg(q, mp))
+	if ((!pcmsg(DB_TYPE(mp)) && (q->q_first || (q->q_flag & QSVCBUSY))) || mtp_w_msg(q, mp))
 		putq(q, mp);
 	return (0);
 }
@@ -17524,14 +17719,14 @@ mtp_rsrv(queue_t *q)
 	return (0);
 }
 static streamscall __unlikely int
-mtp_rput(queue_t *q)
+mtp_rput(queue_t *q, mblk_t *mp)
 {
 	mi_strlog(q, 0, SL_ERROR, "mtp_rput() called");
 	putnext(q, mp);
 	return (0);
 }
 static streamscall __unlikely int
-sl_wput(queue_t *q)
+sl_wput(queue_t *q, mblk_t *mp)
 {
 	mi_strlog(q, 0, SL_ERROR, "sl_wput() called");
 	putnext(q, mp);
@@ -17557,9 +17752,9 @@ sl_rsrv(queue_t *q)
 	return (0);
 }
 static streamscall __hot_in int
-sl_rput(queue_t *q)
+sl_rput(queue_t *q, mblk_t *mp)
 {
-	if ((!pcmsg(DB_TYPE(mp)) && (q->q_first || (q->q_flags & QSVCBUSY))) || sl_r_msg(q, mp))
+	if ((!pcmsg(DB_TYPE(mp)) && (q->q_first || (q->q_flag & QSVCBUSY))) || sl_r_msg(q, mp))
 		putq(q, mp);
 	return (0);
 }
@@ -17893,7 +18088,7 @@ mtp_lookup(ulong id)
 		for (mtp = master.mtp.list; mtp && mtp->id != id; mtp = mtp->next) ;
 	return (mtp);
 }
-static ulong
+static inline ulong
 mtp_get_id(ulong id)
 {
 	static ulong sequence = 0;
@@ -17932,6 +18127,7 @@ mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp, minor_t 
 		(mt->oq = RD(q))->q_ptr = mtp_get(mt);
 		(mt->iq = WR(q))->q_ptr = mtp_get(mt);
 		spin_lock_init(&mt->qlock);	/* "mt-queue-lock" */
+#if 0
 		mt->o_prim = &mtp_r_prim;
 		/* style of interface depends on bminor */
 		switch (bminor) {
@@ -17948,6 +18144,7 @@ mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp, minor_t 
 			mt->i_prim = &mgm_w_prim;
 			break;
 		}
+#endif
 		mt->i_state = 0;
 		mt->i_style = bminor;
 		mt->i_version = 1;
@@ -18063,8 +18260,10 @@ mtp_alloc_link(queue_t *q, struct sl **slp, ulong index, cred_t *crp)
 		spin_lock_init(&sl->qlock);	/* "sl-queue-lock" */
 		(sl->iq = RD(q))->q_ptr = sl_get(sl);
 		(sl->oq = WR(q))->q_ptr = sl_get(sl);
+#if 0
 		sl->o_prim = sl_w_prim;
 		sl->i_prim = sl_r_prim;
+#endif
 		sl->i_state = LMI_UNATTACHED;
 		sl->i_style = LMI_STYLE2;
 		sl->i_version = 1;
@@ -18131,7 +18330,7 @@ mtp_free_sl(struct sl *sl)
 		struct lk *lk;
 
 		/* stop timers */
-		__sl_timer_stop(sl, tall);
+		sl_timer_stop(sl, tall);
 		/* remove from lk list */
 		if ((lk = sl->lk.lk)) {
 			if ((*sl->lk.prev = sl->lk.next))
@@ -18152,7 +18351,7 @@ mtp_free_sl(struct sl *sl)
  *  CB allocation and deallocaiton
  *  -------------------------------------------------------------------------
  */
-static struct cb *
+static inline struct cb *
 cb_lookup(ulong id)
 {
 	struct cb *cb = NULL;
@@ -18418,7 +18617,7 @@ mtp_free_lk(struct lk *lk)
 		struct ls *ls;
 
 		/* stop timers */
-		__lk_timer_stop(lk, tall);
+		lk_timer_stop(lk, tall);
 		/* remove all changeback buffers */
 		while ((cb = lk->cb.list))
 			mtp_free_cb(cb);
@@ -18572,7 +18771,7 @@ mtp_free_ls(struct ls *ls)
 		struct lk *lk;
 
 		/* stop all timers */
-		__ls_timer_stop(ls, tall);
+		ls_timer_stop(ls, tall);
 		/* remove links */
 		while ((lk = ls->lk.list))
 			mtp_free_lk(lk);
@@ -18617,7 +18816,7 @@ mtp_free_ls(struct ls *ls)
  *  CR allocation and deallocaiton
  *  -------------------------------------------------------------------------
  */
-static struct cr *
+static inline struct cr *
 cr_lookup(ulong id)
 {
 	struct cr *cr = NULL;
@@ -18699,7 +18898,7 @@ mtp_free_cr(struct cr *cr)
 		struct rl *rl;
 
 		/* stop timers and purge queues */
-		__cr_timer_stop(cr, tall);
+		cr_timer_stop(cr, tall);
 		bufq_purge(&cr->buf);
 		/* unlink from route sets */
 		if ((rt = xchg(&cr->rt.onto, NULL))) {
@@ -18877,7 +19076,7 @@ mtp_free_rt(struct rt *rt)
 		struct rl *rl;
 
 		/* stop timers */
-		__rt_timer_stop(rt, tall);
+		rt_timer_stop(rt, tall);
 		/* remove from rl list */
 		if ((rl = rt->rl.rl)) {
 			if ((*rt->rl.prev = rt->rl.next))
@@ -19169,7 +19368,7 @@ mtp_free_rs(struct rs *rs)
 		struct sp *sp;
 
 		/* stop timers */
-		__rs_timer_stop(rs, tall);
+		rs_timer_stop(rs, tall);
 		/* remove all route restrictions */
 		while ((rr = rs->rr.list))
 			mtp_free_rr(rr);
@@ -19340,7 +19539,7 @@ mtp_free_sp(struct sp *sp)
 		struct na *na;
 
 		/* stop timers */
-		__sp_timer_stop(sp, tall);
+		sp_timer_stop(sp, tall);
 		fixme(("Hangup on all mtp users\n"));
 		/* remove all route sets */
 		while ((rs = sp->rs.list))
@@ -19495,66 +19694,66 @@ static struct module_stat sl_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES))
 static struct module_stat sl_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 static struct module_info mtp_winfo = {
-	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idnum = DRV_ID,	/* Module ID number */
 	.mi_idname = DRV_NAME "-wr",	/* Module ID name */
-	.mi_minpsz = 1,			/* Min packet size accepted */
-	.mi_maxpsz = 272 + 1,		/* Max packet size accepted */
-	.mi_hiwat = STRHIGH,		/* Hi water mark */
-	.mi_lowat = STRLOW,		/* Lo water mark */
+	.mi_minpsz = 1,		/* Min packet size accepted */
+	.mi_maxpsz = 272 + 1,	/* Max packet size accepted */
+	.mi_hiwat = STRHIGH,	/* Hi water mark */
+	.mi_lowat = STRLOW,	/* Lo water mark */
 };
 static struct module_info mtp_rinfo = {
-	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idnum = DRV_ID,	/* Module ID number */
 	.mi_idname = DRV_NAME "-rd",	/* Module ID name */
-	.mi_minpsz = 1,			/* Min packet size accepted */
-	.mi_maxpsz = 272 + 1,		/* Max packet size accepted */
-	.mi_hiwat = STRHIGH,		/* Hi water mark */
-	.mi_lowat = STRLOW,		/* Lo water mark */
+	.mi_minpsz = 1,		/* Min packet size accepted */
+	.mi_maxpsz = 272 + 1,	/* Max packet size accepted */
+	.mi_hiwat = STRHIGH,	/* Hi water mark */
+	.mi_lowat = STRLOW,	/* Lo water mark */
 };
 static struct module_info sl_winfo = {
-	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idnum = DRV_ID,	/* Module ID number */
 	.mi_idname = DRV_NAME "-muxw",	/* Module ID name */
-	.mi_minpsz = 1,			/* Min packet size accepted */
-	.mi_maxpsz = 272 + 1,		/* Max packet size accepted */
-	.mi_hiwat = STRHIGH,		/* Hi water mark */
-	.mi_lowat = STRLOW,		/* Lo water mark */
+	.mi_minpsz = 1,		/* Min packet size accepted */
+	.mi_maxpsz = 272 + 1,	/* Max packet size accepted */
+	.mi_hiwat = STRHIGH,	/* Hi water mark */
+	.mi_lowat = STRLOW,	/* Lo water mark */
 };
 static struct module_info sl_rinfo = {
-	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idnum = DRV_ID,	/* Module ID number */
 	.mi_idname = DRV_NAME "-muxr",	/* Module ID name */
-	.mi_minpsz = 1,			/* Min packet size accepted */
-	.mi_maxpsz = 272 + 1,		/* Max packet size accepted */
-	.mi_hiwat = STRHIGH,		/* Hi water mark */
-	.mi_lowat = STRLOW,		/* Lo water mark */
+	.mi_minpsz = 1,		/* Min packet size accepted */
+	.mi_maxpsz = 272 + 1,	/* Max packet size accepted */
+	.mi_hiwat = STRHIGH,	/* Hi water mark */
+	.mi_lowat = STRLOW,	/* Lo water mark */
 };
 
 static struct qinit mtp_rinit = {
-	.qi_putp = mtp_rput,		/* Write put (message from below) */
-	.qi_srvp = mtp_rsrv,		/* Write queue service */
-	.qi_qopen = mtp_qopen,		/* Each open */
+	.qi_putp = mtp_rput,	/* Write put (message from below) */
+	.qi_srvp = mtp_rsrv,	/* Write queue service */
+	.qi_qopen = mtp_qopen,	/* Each open */
 	.qi_qclose = mtp_qclose,	/* Last close */
-	.qi_minfo = &mtp_rinfo,		/* Information */
-	.qi_mstat = &mtp_rstat,		/* Statistics */
+	.qi_minfo = &mtp_rinfo,	/* Information */
+	.qi_mstat = &mtp_rstat,	/* Statistics */
 };
 
 static struct qinit mtp_winit = {
-	.qi_putp = mtp_wput,		/* Write put (message from above) */
-	.qi_srvp = mtp_wsrv,		/* Write queue service */
-	.qi_minfo = &mtp_winfo,		/* Information */
-	.qi_mstat = &mtp_wstat,		/* Statistics */
+	.qi_putp = mtp_wput,	/* Write put (message from above) */
+	.qi_srvp = mtp_wsrv,	/* Write queue service */
+	.qi_minfo = &mtp_winfo,	/* Information */
+	.qi_mstat = &mtp_wstat,	/* Statistics */
 };
 
 static struct qinit sl_rinit = {
-	.qi_putp = sl_rput,		/* Write put (message from below) */
-	.qi_srvp = sl_rsrv,		/* Write queue service */
-	.qi_minfo = &sl_rinfo,		/* Information */
-	.qi_mstat = &sl_rstat,		/* Statistics */
+	.qi_putp = sl_rput,	/* Write put (message from below) */
+	.qi_srvp = sl_rsrv,	/* Write queue service */
+	.qi_minfo = &sl_rinfo,	/* Information */
+	.qi_mstat = &sl_rstat,	/* Statistics */
 };
 
 static struct qinit sl_winit = {
-	.qi_putp = sl_wput,		/* Write put (message from above) */
-	.qi_srvp = sl_wsrv,		/* Write queue service */
-	.qi_minfo = &sl_winfo,		/* Information */
-	.qi_mstat = &sl_wstat,		/* Statistics */
+	.qi_putp = sl_wput,	/* Write put (message from above) */
+	.qi_srvp = sl_wsrv,	/* Write queue service */
+	.qi_minfo = &sl_winfo,	/* Information */
+	.qi_mstat = &sl_wstat,	/* Statistics */
 };
 
 MODULE_STATIC struct streamtab mtpinfo = {

@@ -85,12 +85,17 @@
 #define RS_TYPE_MEMBER	0
 #define RS_TYPE_CLUSTER	1
 
+#ifdef __KERNEL__
+typedef mblk_t *mtp_timer_t;
+#else				/* __KERNEL__ */
+typedef unsigned long mtp_timer_t;
+#endif				/* __KERNEL__ */
+
 /*
  *  Signalling link options
  */
 typedef struct mtp_opt_conf_sl {
-	/* 
-	   signalling link timers */
+	/* signalling link timers */
 	mtp_ulong t1;			/* timer t1 value */
 	mtp_ulong t2;			/* timer t2 value */
 	mtp_ulong t3;			/* timer t3 value */
@@ -119,8 +124,7 @@ typedef struct mtp_opt_conf_sl {
  *  Link set options
  */
 typedef struct mtp_opt_conf_lk {
-	/* 
-	   signalling link timers */
+	/* signalling link timers */
 	mtp_ulong t1;			/* timer t1 value */
 	mtp_ulong t2;			/* timer t2 value */
 	mtp_ulong t3;			/* timer t3 value */
@@ -143,8 +147,7 @@ typedef struct mtp_opt_conf_lk {
 	mtp_ulong t1t;			/* timer t1t value */
 	mtp_ulong t2t;			/* timer t2t value */
 	mtp_ulong t1s;			/* timer t1s value */
-	/* 
-	   link timers */
+	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
 } mtp_opt_conf_lk_t;
 
@@ -152,8 +155,7 @@ typedef struct mtp_opt_conf_lk {
  *  Combined link set options
  */
 typedef struct mtp_opt_conf_ls {
-	/* 
-	   signalling link timers */
+	/* signalling link timers */
 	mtp_ulong t1;			/* timer t1 value */
 	mtp_ulong t2;			/* timer t2 value */
 	mtp_ulong t3;			/* timer t3 value */
@@ -176,8 +178,7 @@ typedef struct mtp_opt_conf_ls {
 	mtp_ulong t1t;			/* timer t1t value */
 	mtp_ulong t2t;			/* timer t2t value */
 	mtp_ulong t1s;			/* timer t1s value */
-	/* 
-	   link timers */
+	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
 } mtp_opt_conf_ls_t;
 
@@ -185,8 +186,7 @@ typedef struct mtp_opt_conf_ls {
  *  Route options
  */
 typedef struct mtp_opt_conf_rt {
-	/* 
-	   route timers */
+	/* route timers */
 	mtp_ulong t6;			/* timer t6 value */
 	mtp_ulong t10;			/* timer t10 value */
 } mtp_opt_conf_rt_t;
@@ -195,8 +195,7 @@ typedef struct mtp_opt_conf_rt {
  *  Route list options
  */
 typedef struct mtp_opt_conf_rl {
-	/* 
-	   route timers */
+	/* route timers */
 	mtp_ulong t6;			/* timer t6 value */
 	mtp_ulong t10;			/* timer t10 value */
 } mtp_opt_conf_rl_t;
@@ -205,12 +204,10 @@ typedef struct mtp_opt_conf_rl {
  *  Route set options
  */
 typedef struct mtp_opt_conf_rs {
-	/* 
-	   route timers */
+	/* route timers */
 	mtp_ulong t6;			/* timer t6 value */
 	mtp_ulong t10;			/* timer t10 value */
-	/* 
-	   route set timers */
+	/* route set timers */
 	mtp_ulong t8;			/* timer t8 value */
 	mtp_ulong t11;			/* timer t11 value */
 	mtp_ulong t15;			/* timer t15 value */
@@ -222,8 +219,7 @@ typedef struct mtp_opt_conf_rs {
  *  Signalling point options
  */
 typedef struct mtp_opt_conf_sp {
-	/* 
-	   signalling link timers */
+	/* signalling link timers */
 	mtp_ulong t1;			/* timer t1 value */
 	mtp_ulong t2;			/* timer t2 value */
 	mtp_ulong t3;			/* timer t3 value */
@@ -246,22 +242,18 @@ typedef struct mtp_opt_conf_sp {
 	mtp_ulong t1t;			/* timer t1t value */
 	mtp_ulong t2t;			/* timer t2t value */
 	mtp_ulong t1s;			/* timer t1s value */
-	/* 
-	   link timers */
+	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
-	/* 
-	   route timers */
+	/* route timers */
 	mtp_ulong t6;			/* timer t6 value */
 	mtp_ulong t10;			/* timer t10 value */
-	/* 
-	   route set timers */
+	/* route set timers */
 	mtp_ulong t8;			/* timer t8 value */
 	mtp_ulong t11;			/* timer t11 value */
 	mtp_ulong t15;			/* timer t15 value */
 	mtp_ulong t16;			/* timer t16 value */
 	mtp_ulong t18a;			/* timer t18a value */
-	/* 
-	   signalling point timers */
+	/* signalling point timers */
 	mtp_ulong t1r;			/* timer t1r value */
 	mtp_ulong t18;			/* timer t18 value */
 	mtp_ulong t19;			/* timer t19 value */
@@ -282,8 +274,7 @@ typedef struct mtp_opt_conf_sp {
  *  Network appearance options
  */
 typedef struct mtp_opt_conf_na {
-	/* 
-	   signalling link timers */
+	/* signalling link timers */
 	mtp_ulong t1;			/* timer t1 value */
 	mtp_ulong t2;			/* timer t2 value */
 	mtp_ulong t3;			/* timer t3 value */
@@ -306,22 +297,18 @@ typedef struct mtp_opt_conf_na {
 	mtp_ulong t1t;			/* timer t1t value */
 	mtp_ulong t2t;			/* timer t2t value */
 	mtp_ulong t1s;			/* timer t1s value */
-	/* 
-	   link timers */
+	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
-	/* 
-	   route timers */
+	/* route timers */
 	mtp_ulong t6;			/* timer t6 value */
 	mtp_ulong t10;			/* timer t10 value */
-	/* 
-	   route set timers */
+	/* route set timers */
 	mtp_ulong t8;			/* timer t8 value */
 	mtp_ulong t11;			/* timer t11 value */
 	mtp_ulong t15;			/* timer t15 value */
 	mtp_ulong t16;			/* timer t16 value */
 	mtp_ulong t18a;			/* timer t18a value */
-	/* 
-	   signalling point timers */
+	/* signalling point timers */
 	mtp_ulong t1r;			/* timer t1r value */
 	mtp_ulong t18;			/* timer t18 value */
 	mtp_ulong t19;			/* timer t19 value */
@@ -350,8 +337,7 @@ typedef struct mtp_opt_conf_df {
 typedef struct mtp_option {
 	mtp_ulong type;			/* object type */
 	mtp_ulong id;			/* object id */
-	/* 
-	   followed by object-specific protocol options structure */
+	/* followed by object-specific protocol options structure */
 } mtp_option_t;
 
 #define	MTP_IOCGOPTION	_IOWR(	MTP_IOC_MAGIC,	 0,	mtp_option_t	)
@@ -455,8 +441,7 @@ typedef struct mtp_config {
 	mtp_ulong type;			/* object type */
 	mtp_ulong id;			/* object id */
 	mtp_ulong cmd;			/* configuration command */
-	/* 
-	   followed by object-specific configuration structure */
+	/* followed by object-specific configuration structure */
 } mtp_config_t;
 
 #define MTP_GET		0	/* get configuration */
@@ -539,28 +524,28 @@ typedef struct mtp_config {
  *  Signalling link state
  */
 typedef struct mtp_timers_sl {
-	mtp_ulong t1;			/* timer t1 */
-	mtp_ulong t2;			/* timer t2 */
-	mtp_ulong t3;			/* timer t3 */
-	mtp_ulong t4;			/* timer t4 */
-	mtp_ulong t5;			/* timer t5 */
-	mtp_ulong t12;			/* timer t12 */
-	mtp_ulong t13;			/* timer t13 */
-	mtp_ulong t14;			/* timer t14 */
-	mtp_ulong t17;			/* timer t17 */
-	mtp_ulong t19a;			/* timer t19a */
-	mtp_ulong t20a;			/* timer t20a */
-	mtp_ulong t21a;			/* timer t21a */
-	mtp_ulong t22;			/* timer t22 */
-	mtp_ulong t23;			/* timer t23 */
-	mtp_ulong t24;			/* timer t24 */
-	mtp_ulong t31a;			/* timer t31a */
-	mtp_ulong t32a;			/* timer t32a */
-	mtp_ulong t33a;			/* timer t33a */
-	mtp_ulong t34a;			/* timer t34a */
-	mtp_ulong t1t;			/* timer t1t */
-	mtp_ulong t2t;			/* timer t2t */
-	mtp_ulong t1s;			/* timer t1s */
+	mtp_timer_t t1;			/* timer t1 */
+	mtp_timer_t t2;			/* timer t2 */
+	mtp_timer_t t3;			/* timer t3 */
+	mtp_timer_t t4;			/* timer t4 */
+	mtp_timer_t t5;			/* timer t5 */
+	mtp_timer_t t12;		/* timer t12 */
+	mtp_timer_t t13;		/* timer t13 */
+	mtp_timer_t t14;		/* timer t14 */
+	mtp_timer_t t17;		/* timer t17 */
+	mtp_timer_t t19a;		/* timer t19a */
+	mtp_timer_t t20a;		/* timer t20a */
+	mtp_timer_t t21a;		/* timer t21a */
+	mtp_timer_t t22;		/* timer t22 */
+	mtp_timer_t t23;		/* timer t23 */
+	mtp_timer_t t24;		/* timer t24 */
+	mtp_timer_t t31a;		/* timer t31a */
+	mtp_timer_t t32a;		/* timer t32a */
+	mtp_timer_t t33a;		/* timer t33a */
+	mtp_timer_t t34a;		/* timer t34a */
+	mtp_timer_t t1t;		/* timer t1t */
+	mtp_timer_t t2t;		/* timer t2t */
+	mtp_timer_t t1s;		/* timer t1s */
 } mtp_timers_sl_t;
 typedef struct mtp_statem_sl {
 	struct mtp_timers_sl timers;
@@ -619,7 +604,7 @@ typedef struct mtp_statem_sl {
  *  Link set state
  */
 typedef struct mtp_timers_lk {
-	mtp_ulong t7;			/* timer t7 */
+	mtp_timer_t t7;			/* timer t7 */
 } mtp_timers_lk_t;
 typedef struct mtp_statem_lk {
 	struct mtp_timers_lk timers;
@@ -675,8 +660,8 @@ typedef struct mtp_statem_ls {
  *  Route state
  */
 typedef struct mtp_timers_rt {
-	mtp_ulong t6;			/* timer t6 */
-	mtp_ulong t10;			/* timer t10 */
+	mtp_timer_t t6;			/* timer t6 */
+	mtp_timer_t t10;		/* timer t10 */
 } mtp_timers_rt_t;
 typedef struct mtp_statem_rt {
 	struct mtp_timers_rt timers;
@@ -746,11 +731,11 @@ typedef struct mtp_statem_rl {
  *  Route set state
  */
 typedef struct mtp_timers_rs {
-	mtp_ulong t8;			/* timer t8 */
-	mtp_ulong t11;			/* timer t11 */
-	mtp_ulong t15;			/* timer t15 */
-	mtp_ulong t16;			/* timer t16 */
-	mtp_ulong t18a;			/* timer t18a */
+	mtp_timer_t t8;			/* timer t8 */
+	mtp_timer_t t11;		/* timer t11 */
+	mtp_timer_t t15;		/* timer t15 */
+	mtp_timer_t t16;		/* timer t16 */
+	mtp_timer_t t18a;		/* timer t18a */
 } mtp_timers_rs_t;
 typedef struct mtp_statem_rs {
 	struct mtp_timers_rs timers;
@@ -796,20 +781,20 @@ typedef struct mtp_statem_rs {
  *  Signalling point state
  */
 typedef struct mtp_timers_sp {
-	mtp_ulong t1r;			/* timer t1r */
-	mtp_ulong t18;			/* timer t18 */
-	mtp_ulong t19;			/* timer t19 */
-	mtp_ulong t20;			/* timer t20 */
-	mtp_ulong t21;			/* timer t21 */
-	mtp_ulong t22a;			/* timer t22a */
-	mtp_ulong t23a;			/* timer t23a */
-	mtp_ulong t24a;			/* timer t24a */
-	mtp_ulong t25a;			/* timer t25a */
-	mtp_ulong t26a;			/* timer t26a */
-	mtp_ulong t27a;			/* timer t27a */
-	mtp_ulong t28a;			/* timer t28a */
-	mtp_ulong t29a;			/* timer t29a */
-	mtp_ulong t30a;			/* timer t30a */
+	mtp_timer_t t1r;		/* timer t1r */
+	mtp_timer_t t18;		/* timer t18 */
+	mtp_timer_t t19;		/* timer t19 */
+	mtp_timer_t t20;		/* timer t20 */
+	mtp_timer_t t21;		/* timer t21 */
+	mtp_timer_t t22a;		/* timer t22a */
+	mtp_timer_t t23a;		/* timer t23a */
+	mtp_timer_t t24a;		/* timer t24a */
+	mtp_timer_t t25a;		/* timer t25a */
+	mtp_timer_t t26a;		/* timer t26a */
+	mtp_timer_t t27a;		/* timer t27a */
+	mtp_timer_t t28a;		/* timer t28a */
+	mtp_timer_t t29a;		/* timer t29a */
+	mtp_timer_t t30a;		/* timer t30a */
 } mtp_timers_sp_t;
 typedef struct mtp_statem_sp {
 	struct mtp_timers_sp timers;
@@ -872,8 +857,7 @@ typedef struct mtp_statem {
 	mtp_ulong id;			/* object id */
 	mtp_ulong flags;		/* object flags */
 	mtp_ulong state;		/* object state */
-	/* 
-	   followed by object-specific state structure */
+	/* followed by object-specific state structure */
 } mtp_statem_t;
 
 #define	MTP_IOCGSTATEM	_IOWR(	MTP_IOC_MAGIC,	 6,	mtp_statem_t	)
@@ -940,8 +924,7 @@ typedef struct mtp_stats {
 	mtp_ulong type;			/* object type */
 	mtp_ulong id;			/* object id */
 	mtp_ulong header;		/* object stats header */
-	/* 
-	   followed by object-specific statistics structure */
+	/* followed by object-specific statistics structure */
 } mtp_stats_t;
 
 #define	MTP_IOCGSTATSP	_IOWR(	MTP_IOC_MAGIC,	 8,	mtp_stats_t	)
@@ -1044,8 +1027,7 @@ typedef struct mtp_notify_df {
 typedef struct mtp_notify {
 	mtp_ulong type;			/* object type */
 	mtp_ulong id;			/* object id */
-	/* 
-	   followed by object-specific notification structure */
+	/* followed by object-specific notification structure */
 } mtp_notify_t;
 
 #define	MTP_IOCGNOTIFY	_IOWR(	MTP_IOC_MAGIC,	12,	mtp_notify_t	)
@@ -1088,8 +1070,7 @@ typedef struct mtp_pass {
 	mtp_ulong band;			/* band of mesage block */
 	mtp_ulong ctl_length;		/* length of cntl part */
 	mtp_ulong dat_length;		/* length of data part */
-	/* 
-	   followed by cntl and data part of message to pass to signalling link */
+	/* followed by cntl and data part of message to pass to signalling link */
 } mtp_pass_t;
 
 #define MTP_IOCCPASS	_IOW(	MTP_IOC_MAGIC,	16,	mtp_pass_t	)
