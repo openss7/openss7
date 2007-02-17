@@ -1,3 +1,7 @@
+2007-02-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/mpscompat.c: improved allocation functions
+
 2007-02-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/mi_strlog.9.man: updated docs

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/02/14 14:09:16 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/02/17 02:53:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/14 14:09:16 $ by $Author: brian $
+ Last Modified $Date: 2007/02/17 02:53:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.37  2007/02/17 02:53:01  brian
+ - improved allocation functions
+
  Revision 0.9.2.36  2007/02/14 14:09:16  brian
  - broad changes updating support for SS7 MTP and M3UA
 
@@ -163,10 +166,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/02/14 14:09:16 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/02/17 02:53:01 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/02/14 14:09:16 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/02/17 02:53:01 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -194,7 +197,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/02/14 14:09:16 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/02/17 02:53:01 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
