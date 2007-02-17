@@ -4,6 +4,20 @@
 	* stacks/src/include/ss7/mtpi_ioctl.h: timer corrections
 	* stacks/src/modules/mtp/mtp.c: first clean recompile on LFS
 
+	* doc/man/man7/mtp_npi.7.man: removed
+	* doc/man/man7/mtp_tpi.7.man: removed
+
+	* doc/man/Makefile.am: roughed in docs
+	* doc/man/man4/mtp_npi.4.man: roughed in docs
+	* doc/man/man7/npi_mtp.7.man: roughed in docs
+	* doc/man/man7/tpi_mtp.7.man: roughed in docs
+	* src/include/ss7/mtpi_ioctl.h: corrections
+	* src/modules/mtp/mtp.c: working up MTP
+	* src/modules/mtp/mtp_min.c: working up MTP-min
+	* src/modules/mtp/mtp_npi.c: clean recompile
+	* src/modules/mtp/mtp_tpi.c: clean recompile
+	* src/modules/sccp/sccp.c: working up SCCP
+
 2007-02-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man4/mtp_tpi.4.man: added missing documentation

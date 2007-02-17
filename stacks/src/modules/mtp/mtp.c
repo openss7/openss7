@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:00:58 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/02/17 02:49:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 11:00:58 $ by $Author: brian $
+ Last Modified $Date: 2007/02/17 02:49:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 0.9.2.15  2007/02/17 02:49:13  brian
+ - first clean recompile of MTP modules on LFS
+
  Revision 0.9.2.14  2006/05/08 11:00:58  brian
  - new compilers mishandle postincrement of cast pointers
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:00:58 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/02/17 02:49:13 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:00:58 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/02/17 02:49:13 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL (Signalling Link) streams I_LINK'ed or
@@ -107,7 +110,7 @@ static char const ident[] =
 #define STRLOGDA	6	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:00:58 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/02/17 02:49:13 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
