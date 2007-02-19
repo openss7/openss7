@@ -213,6 +213,7 @@ extern void mi_timer_stop(mblk_t *mp);
 extern void mi_timer_move(queue_t *q, mblk_t *mp);
 extern int mi_timer_valid(mblk_t *mp);
 extern void mi_timer_free(mblk_t *mp);
+extern unsigned long mi_timer_remain(mblk_t *mp);
 
 #define mi_timer_alloc(_size)		mi_timer_alloc_SUN(_size)
 #define mi_timer(_q,_mp,_msec)		mi_timer_SUN(_q,_mp,_msec)

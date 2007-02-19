@@ -183,23 +183,28 @@ MODULE_ALIAS("streams-mtp");
 		struct __s1 *curr;	/* current __s1 */ \
 		size_t sls_mask;	/* mask for selecting __s1 */ \
 		size_t sls_bits;	/* numb of significant bits (1's) in the sls mask */ \
-		size_t allowed;		/* numb of __s1 allowed */ \
-		size_t danger;		/* numb of __s1 in danger */ \
-		size_t congested;	/* numb of __s1 congested */ \
-		size_t restricted;	/* numb of __s1 restricted */ \
-		size_t prohibited;	/* numb of __s1 prohibited */ \
-		size_t inhibited;	/* numb of __s1 inhibited */ \
-		size_t blocked;		/* numb of __s1 blocked */ \
-		size_t inactive;	/* numb of __s1 inactive */ \
-		size_t restart;		/* numb of __s1 restart */ \
+		union { \
+			struct { \
+				size_t allowed;		/* numb of __s1 allowed */ \
+				size_t danger;		/* numb of __s1 in danger */ \
+				size_t congested;	/* numb of __s1 congested */ \
+				size_t restricted;	/* numb of __s1 restricted */ \
+				size_t prohibited;	/* numb of __s1 prohibited */ \
+				size_t inhibited;	/* numb of __s1 inhibited */ \
+				size_t blocked;		/* numb of __s1 blocked */ \
+				size_t inactive;	/* numb of __s1 inactive */ \
+				size_t restart;		/* numb of __s1 restart */ \
+			}; \
+			size_t states[9]; \
+		}; \
 	} __s2; \
 
 /*
    generic counters structure 
  */
-typedef struct counters {
+struct counters {
 	SLIST_COUNTERS (head, c);	/* counter declaration */
-} counters_t;
+};
 
 /*
    structure map 
@@ -231,8 +236,8 @@ struct sl;				/* Signalling Link */
 /*
    default 
  */
-typedef struct df {
-	spinlock_t lock;		/* master list lock */
+struct df {
+	rwlock_t lock;			/* master lock */
 	SLIST_HEAD (mtp, mtp);		/* list of MTP structures */
 	SLIST_COUNTERS (na, na);	/* list of NA structures */
 	SLIST_HEAD (sp, sp);		/* list of SP structures */
@@ -249,12 +254,14 @@ typedef struct df {
 	struct mtp_stats_df statsp;	/* default statistics periods */
 	struct mtp_stats_df stats;	/* default statistics */
 	struct mtp_notify_df notify;	/* default notificiations */
-} df_t;
+};
 
-static struct df master;
+static struct df master = {
+	.lock = RW_LOCK_UNLOCKED,
+};
 
 static struct df *
-df_lookup(ulong id)
+df_lookup(uint id)
 {
 	if (id)
 		return (NULL);
@@ -269,8 +276,16 @@ df_lookup(ulong id)
  *  signalling point and the destination address defines a routeset to the remote signalling point for pseudo-
  *  connection-oriented service indicators.
  */
-typedef struct mtp {
-	STR_DECLARATION (struct mtp);	/* stream declaration */
+struct mtp {
+	queue_t *rq;			/* RD queue */
+	dev_t dev;			/* device number */
+	cred_t cred;			/* credentials of creator */
+	struct {
+		uint type;		/* interface type */
+		uint state;		/* interface state */
+		uint style;		/* interface style */
+		uint version;		/* interface version */
+	} i;
 	struct mtp_addr src;		/* srce address */
 	struct mtp_addr dst;		/* dest address */
 	struct {
@@ -285,16 +300,14 @@ typedef struct mtp {
 		t_uscalar_t debug;	/* default options */
 	} options;
 	struct T_info_ack *prot;	/* Protocol parameters */
-} mtp_t;
+};
 
 #define MTP_PRIV(__q) ((struct mtp *)(__q)->q_ptr)
 
-static struct mtp *mtp_alloc_priv(queue_t *, struct mtp **, dev_t *, cred_t *, minor_t);
+static struct mtp *mtp_alloc_priv(queue_t *, dev_t *, cred_t *, minor_t);
 static void mtp_free_priv(struct mtp *);
-static struct mtp *mtp_lookup(ulong);
-static ulong mtp_get_id(ulong);
-static struct mtp *mtp_get(struct mtp *);
-static void mtp_put(struct mtp *);
+static struct mtp *mtp_lookup(uint);
+static uint mtp_get_id(uint);
 
 /*
  *  NA - Network Apperance
@@ -303,7 +316,7 @@ static void mtp_put(struct mtp *);
  *  options and point code format.  The network appearance identifies a point code numbering space and defines the
  *  service indicators within that numbering space.  Signalling points belong to a single network apperance.
  */
-typedef struct na {
+struct na {
 	HEAD_DECLARATION (struct na);	/* head declaration */
 	struct {
 		uint32_t member;	/* pc member mask */
@@ -318,24 +331,22 @@ typedef struct na {
 	struct mtp_stats_na statsp;	/* network appearance statistics periods */
 	struct mtp_stats_na stats;	/* network appearance statistics */
 	struct mtp_notify_na notify;	/* network appearance notifications */
-} na_t;
+};
 
-static struct na *mtp_alloc_na(ulong, uint32_t, uint32_t, uint32_t, uint, struct lmi_option *);
+static struct na *mtp_alloc_na(uint, struct mtp_conf_na *);
 static void mtp_free_na(struct na *);
-static struct na *na_lookup(ulong);
-static ulong na_get_id(ulong);
-static struct na *na_get(struct na *);
-static void na_put(struct na *);
+static struct na *na_lookup(uint);
+static uint na_get_id(uint);
 
 /*
  *  RR - Routeset restriction
  *  -----------------------------------
  *  The routeset restriction (RR) structure...
  */
-typedef struct rr {
+struct rr {
 	struct lk *lk;			/* link (set) that this route restriction corresponds to */
 	SLIST_LINKAGE (rs, rr, rs);	/* route restriction list linkage */
-} rr_t;
+};
 
 static struct rr *mtp_alloc_rr(struct rs *, struct lk *);
 static void mtp_free_rr(struct rr *);
@@ -346,7 +357,7 @@ static void mtp_free_rr(struct rr *);
  *  The routeset structure defines the SS7 routeset to a remote signalling point within the network appearance and
  *  belonging to a signalling point.
  */
-typedef struct rs {
+struct rs {
 	HEAD_DECLARATION (struct rs);	/* head declaration */
 	int rs_type;			/* type of routeset (cluster, member) */
 	int cong_status;		/* congestion status */
@@ -362,14 +373,12 @@ typedef struct rs {
 	struct mtp_stats_rs statsp;	/* routeset statistics periods */
 	struct mtp_stats_rs stats;	/* routeset statistics */
 	struct mtp_notify_rs notify;	/* routeset notifications */
-} rs_t;
+};
 
-static struct rs *mtp_alloc_rs(ulong, struct sp *, ulong, ulong);
+static struct rs *mtp_alloc_rs(uint, struct sp *, struct mtp_conf_rs *);
 static void mtp_free_rs(struct rs *);
-static struct rs *rs_lookup(ulong);
-static ulong rs_get_id(ulong);
-static struct rs *rs_get(struct rs *);
-static void rs_put(struct rs *);
+static struct rs *rs_lookup(uint);
+static uint rs_get_id(uint);
 
 /*
  *  CR - Controlled rerouting buffer
@@ -379,9 +388,9 @@ static void rs_put(struct rs *);
  *  controlled rerouting is cancelled or the associated t6 timer expires and buffered signalling traffic is rerouted
  *  to the normal route.
  */
-typedef struct cr {
+struct cr {
 	HEAD_DECLARATION (struct cr);	/* head declaration */
-	ulong index;			/* sls index in route sls map */
+	uint index;			/* sls index in route sls map */
 	struct {
 		struct rt *from;	/* route we are buffering from */
 		struct rt *onto;	/* route we are buffering onto */
@@ -391,14 +400,12 @@ typedef struct cr {
 		mblk_t *t6;		/* controlled rerouting timer */
 	} timers;
 	struct bufq buf;		/* message buffer */
-} cr_t;
+};
 
-static struct cr *mtp_alloc_cr(ulong, struct rl *, struct rt *, struct rt *, ulong);
+static struct cr *mtp_alloc_cr(uint, struct rl *, struct rt *, struct rt *, uint);
 static void mtp_free_cr(struct cr *);
-static struct cr *cr_lookup(ulong);
-static ulong cr_get_id(ulong);
-static struct cr *cr_get(struct cr *);
-static void cr_put(struct cr *);
+static struct cr *cr_lookup(uint);
+static uint cr_get_id(uint);
 
 /*
  *  RL - Routelist
@@ -409,9 +416,9 @@ static void cr_put(struct cr *);
  *  messages to the appropriate route within the route list whenever the route list is actively carrying traffic.
  */
 #define RT_SMAP_SIZE	32
-typedef struct rl {
+struct rl {
 	HEAD_DECLARATION (struct rl);	/* head declaration */
-	ulong cost;			/* priority of this route list */
+	uint cost;			/* priority of this route list */
 	SLIST_LINKAGE (rs, rl, rs);	/* route list linkage */
 	SLIST_LINKAGE (ls, rl, ls);	/* linkset list linkage */
 	SLIST_COUNTERS (rt, rt);	/* list of routes and counts */
@@ -422,14 +429,12 @@ typedef struct rl {
 	struct mtp_stats_rl statsp;	/* routelist statistics periods */
 	struct mtp_stats_rl stats;	/* routelist statistics */
 	struct mtp_notify_rl notify;	/* routelist notifications */
-} rl_t;
+};
 
-static struct rl *mtp_alloc_rl(ulong, struct rs *, struct ls *, ulong);
+static struct rl *mtp_alloc_rl(uint, struct rs *, struct ls *, struct mtp_conf_rl *);
 static void mtp_free_rl(struct rl *);
-static struct rl *rl_lookup(ulong);
-static ulong rl_get_id(ulong);
-static struct rl *rl_get(struct rl *);
-static void rl_put(struct rl *);
+static struct rl *rl_lookup(uint);
+static uint rl_get_id(uint);
 
 /*
  *  RT - Route
@@ -440,7 +445,7 @@ static void rl_put(struct rl *);
  *  factors are used to determine danger of congestion for ANSI transfer restricted procedures as well as when
  *  rebalancing load due to a destination which has become inaccessible or accessible.
  */
-typedef struct rt {
+struct rt {
 	HEAD_DECLARATION (struct rt);	/* head declaration */
 	uint load;			/* load in this route list */
 	uint slot;			/* slot in this route list */
@@ -451,14 +456,12 @@ typedef struct rt {
 	struct mtp_stats_rt statsp;	/* route statistics periods */
 	struct mtp_stats_rt stats;	/* route statistics */
 	struct mtp_notify_rt notify;	/* route notifications */
-} rt_t;
+};
 
-static struct rt *mtp_alloc_rt(ulong, struct rl *, struct lk *, ulong);
+static struct rt *mtp_alloc_rt(uint, struct rl *, struct lk *, struct mtp_conf_rt *);
 static void mtp_free_rt(struct rt *);
-static struct rt *rt_lookup(ulong);
-static ulong rt_get_id(ulong);
-static struct rt *rt_get(struct rt *);
-static void rt_put(struct rt *);
+static struct rt *rt_lookup(uint);
+static uint rt_get_id(uint);
 
 /*
  *  SP - Signalling point
@@ -466,7 +469,7 @@ static void rt_put(struct rt *);
  *  The signalling point structure represents a local (real, virtual or alias) signalling point within a network
  *  appearance.
  */
-typedef struct sp {
+struct sp {
 	HEAD_DECLARATION (struct sp);	/* head declaration */
 	int users;
 	queue_t *waitq;
@@ -486,14 +489,12 @@ typedef struct sp {
 	struct mtp_stats_sp statsp;	/* signalling point statistics periods */
 	struct mtp_stats_sp stats;	/* signalling point statistics */
 	struct mtp_notify_sp notify;	/* signalling point notifications */
-} sp_t;
+};
 
-static struct sp *mtp_alloc_sp(ulong, struct na *, ulong, ulong, ulong);
+static struct sp *mtp_alloc_sp(uint, struct na *, struct mtp_conf_sp *);
 static void mtp_free_sp(struct sp *);
-static struct sp *sp_lookup(ulong);
-static ulong sp_get_id(ulong);
-static struct sp *sp_get(struct sp *);
-static void sp_put(struct sp *);
+static struct sp *sp_lookup(uint);
+static uint sp_get_id(uint);
 
 /*
  *  CB - Changeback buffer
@@ -502,11 +503,11 @@ static void sp_put(struct sp *);
  *  buffered and trasferred from one signalling link in the (combined) link set (from) to another signalling link
  *  the combined link set (onto).
  */
-typedef struct cb {
+struct cb {
 	HEAD_DECLARATION (struct cb);	/* head declaration */
-	ulong cbc;			/* changeback code */
-	ulong slc;			/* signalling link code */
-	ulong index;			/* sls index in signaling link sls map */
+	uint cbc;			/* changeback code */
+	uint slc;			/* signalling link code */
+	uint index;			/* sls index in signaling link sls map */
 	struct {
 		struct sl *from;	/* signalling link we are buffering from */
 		struct sl *onto;	/* signalling link we are buffering onto */
@@ -520,14 +521,12 @@ typedef struct cb {
 		mblk_t *t5;		/* changeback ack second attempt timer */
 	} timers;
 	struct bufq buf;		/* message buffer */
-} cb_t;
+};
 
-static struct cb *mtp_alloc_cb(ulong, struct lk *, struct sl *, struct sl *, ulong);
+static struct cb *mtp_alloc_cb(uint, struct lk *, struct sl *, struct sl *, uint);
 static void mtp_free_cb(struct cb *);
-static struct cb *cb_lookup(ulong);
-static ulong cb_get_id(ulong);
-static struct cb *cb_get(struct cb *);
-static void cb_put(struct cb *);
+static struct cb *cb_lookup(uint);
+static uint cb_get_id(uint);
 
 /*
  *  LS - (Combined) Link Set
@@ -535,9 +534,9 @@ static void cb_put(struct cb *);
  *  The link set structure represents a combined link set.  Each link set belongs to a local signalling point and
  *  contains a number of link (LK) structures.  An SLS map is used to select a link within the link set.
  */
-typedef struct ls {
+struct ls {
 	HEAD_DECLARATION (struct ls);	/* head declaration */
-	ulong sls;			/* sls for mgmt loadsharing */
+	uint sls;			/* sls for mgmt loadsharing */
 	SLIST_LINKAGE (sp, ls, sp);	/* signalling point list linkage */
 	SLIST_COUNTERS (rl, rl);	/* list and counts of route lists */
 	SLIST_COUNTERS (lk, lk);	/* list and counts of links */
@@ -546,14 +545,12 @@ typedef struct ls {
 	struct mtp_stats_ls statsp;	/* link set statistics periods */
 	struct mtp_stats_ls stats;	/* link set statistics */
 	struct mtp_notify_ls notify;	/* link set notifications */
-} ls_t;
+};
 
-static struct ls *mtp_alloc_ls(ulong, struct sp *, ulong);
+static struct ls *mtp_alloc_ls(uint, struct sp *, struct mtp_conf_ls *);
 static void mtp_free_ls(struct ls *);
-static struct ls *ls_lookup(ulong);
-static ulong ls_get_id(ulong);
-static struct ls *ls_get(struct ls *);
-static void ls_put(struct ls *);
+static struct ls *ls_lookup(uint);
+static uint ls_get_id(uint);
 
 /*
  *  LK - Link (set)
@@ -562,9 +559,9 @@ static void ls_put(struct ls *);
  *  signalling link (SL) structure.  An SLS map is ued to select a signalling link within the link.
  */
 #define SL_SMAP_SIZE	256
-typedef struct lk {
+struct lk {
 	HEAD_DECLARATION (struct lk);	/* head declaration */
-	ulong ni;			/* network indicator for link */
+	uint ni;			/* network indicator for link */
 	uint slot;			/* slot in this linkset */
 	uint load;			/* load in this linkset */
 	struct {
@@ -581,14 +578,12 @@ typedef struct lk {
 	struct mtp_stats_lk statsp;	/* link statistics periods */
 	struct mtp_stats_lk stats;	/* link statistics */
 	struct mtp_notify_lk notify;	/* link notifications */
-} lk_t;
+};
 
-static struct lk *mtp_alloc_lk(ulong, struct ls *, struct sp *, struct rs *, ulong, ulong);
+static struct lk *mtp_alloc_lk(uint, struct ls *, struct rs *, struct sp *, struct mtp_conf_lk *);
 static void mtp_free_lk(struct lk *);
-static struct lk *lk_lookup(ulong);
-static ulong lk_get_id(ulong);
-static struct lk *lk_get(struct lk *);
-static void lk_put(struct lk *);
+static struct lk *lk_lookup(uint);
+static uint lk_get_id(uint);
 
 /*
  *  SL - Signalling link
@@ -598,14 +593,22 @@ static void lk_put(struct lk *);
  *  Data Link Identifier identifying the signalling data link (channel).  Each signalling link has a load factor
  *  which indicates how many Signalling Link Selection (SLS) codes of traffic are assigned to this signalling link.
  */
-typedef struct sl {
-	STR_DECLARATION (struct sl);	/* stream declaration */
-	long l_state;			/* signalling link state */
+struct sl {
+	queue_t *wq;			/* WR queue */
+	int index;			/* multiplex index */
+	cred_t cred;			/* credentials of creator */
+	struct {
+		uint type;		/* interface type */
+		uint state;		/* interface state */
+		uint style;		/* interface style */
+		uint version;		/* interface version */
+	} i;
+	uint l_state;			/* signalling link state */
 	uint load;			/* load in this link */
 	uint slot;			/* slot in this link */
 	SLIST_LINKAGE (lk, sl, lk);	/* link list linkage */
-	ulong slc;			/* signalling link code */
-	ulong sdli;			/* signalling data link identifier */
+	uint slc;			/* signalling link code */
+	uint sdli;			/* signalling data link identifier */
 	int cong_status;		/* congestion status */
 	int disc_status;		/* discard status */
 	uint fsnc;			/* FSNC received remotely */
@@ -619,17 +622,17 @@ typedef struct sl {
 	struct mtp_stats_sl statsp;	/* signalling link statistics periods */
 	struct mtp_stats_sl stats;	/* signalling link statistics */
 	struct mtp_notify_sl notify;	/* signalling link notifications */
-} sl_t;
+};
 
 #define SL_PRIV(__q) ((struct sl *)(__q)->q_ptr)
 
-static struct sl *mtp_alloc_link(queue_t *, struct sl **, ulong, cred_t *);
+static struct sl *mtp_alloc_link(queue_t *, int, cred_t *, minor_t);
 static void mtp_free_link(struct sl *);
+static struct sl *mtp_alloc_sl(uint, struct sl *, struct lk *, struct mtp_conf_sl *);
 static void mtp_free_sl(struct sl *);
-static struct sl *sl_lookup(ulong);
-static ulong sl_get_id(ulong);
-static struct sl *sl_get(struct sl *);
-static void sl_put(struct sl *);
+static struct sl *sl_looup_mux(int);
+static struct sl *sl_lookup(uint);
+static uint sl_get_id(uint);
 
 /*
  *  SL interface state flags
@@ -674,6 +677,7 @@ static void sl_put(struct sl *);
 			|TSF_WACK_DREQ11)
 
 static rwlock_t mtp_mux_lock = RW_LOCK_UNLOCKED;
+
 /*
  *  =========================================================================
  *
@@ -682,7 +686,7 @@ static rwlock_t mtp_mux_lock = RW_LOCK_UNLOCKED;
  *  =========================================================================
  */
 static inline int
-sp_trylock(struct sp *sp, queue_t *q)
+sp_trylock(queue_t *q, struct sp *sp)
 {
 	unsigned long flags;
 	queue_t *oldq = NULL;
@@ -725,7 +729,7 @@ mtp_acquire(queue_t *q)
 	if ((mtp = (void *) mi_trylock(q))) {
 		read_unlock(&mtp_mux_lock);
 		if ((sp = mtp->sp.loc)) {
-			if (!sp_trylock(sp, q)) {
+			if (!sp_trylock(q, sp)) {
 				mi_unlock((caddr_t) mtp);
 				return (0);
 			}
@@ -754,7 +758,7 @@ sl_acquire(queue_t *q)
 	if ((sl = (void *) mi_trylock(q))) {
 		read_unlock(&mtp_mux_lock);
 		if ((sp = sl->lk.lk->ls.ls->sp.sp)) {
-			if (!sp_trylock(sp, q)) {
+			if (!sp_trylock(q, sp)) {
 				mi_unlock((caddr_t) sl);
 				return (0);
 			}
@@ -781,12 +785,12 @@ sl_release(struct sl *sl)
  *
  *  =========================================================================
  */
-typedef struct mtp_opts {
+struct mtp_opts {
 	uint flags;			/* success flags */
 	t_uscalar_t *sls;
 	t_uscalar_t *mp;
 	t_uscalar_t *debug;
-} mtp_opts_t;
+};
 
 static struct {
 	t_uscalar_t sls;
@@ -983,9 +987,9 @@ mtp_opt_negotiate(struct mtp *mtp, struct mtp_opts *ops)
  */
 #ifdef _DEBUG
 static const char *
-mtp_state_name(struct mtp *mtp, long state)
+mtp_state_name(struct mtp *mtp, uint state)
 {
-	switch (mtp->i_style) {
+	switch (mtp->i.type) {
 	case MTP_STYLE_MGMT:
 	case MTP_STYLE_MTPI:
 		switch (state) {
@@ -1110,7 +1114,7 @@ mtp_state_name(struct mtp *mtp, long state)
 	}
 }
 static const char *
-sl_state_name(struct sl *sl, long state)
+sl_state_name(struct sl *sl, uint state)
 {
 	switch (state) {
 	case SLS_OUT_OF_SERVICE:
@@ -1138,7 +1142,7 @@ sl_state_name(struct sl *sl, long state)
 	}
 }
 static const char *
-sl_i_state_name(struct sl *sl, long state)
+sl_i_state_name(struct sl *sl, uint state)
 {
 	switch (state) {
 	case LMI_UNATTACHED:
@@ -1162,41 +1166,49 @@ sl_i_state_name(struct sl *sl, long state)
 	}
 }
 #endif
-static void
-mtp_set_state(struct mtp *mtp, long state)
+static uint
+mtp_set_state(struct mtp *mtp, uint newstate)
 {
-	printd(("%s: %p: %s <- %s\n", DRV_NAME, mtp, mtp_state_name(mtp, state),
-		mtp_state_name(mtp, mtp->prot->CURRENT_state)));
-	mtp->prot->CURRENT_state = state;
+	uint oldstate = mtp->i.state;
+
+	if (newstate != oldstate) {
+		mi_strlog(mtp->rq, STRLOGST, SL_TRACE, "%s <- %s", mtp_state_name(mtp, newstate),
+			  mtp_state_name(mtp, oldstate));
+		mtp->i.state = newstate;
+	}
+	return (oldstate);
 }
-static long
+
+static uint
 mtp_get_state(struct mtp *mtp)
 {
-	return (mtp->prot->CURRENT_state);
+	return (mtp->i.state);
 }
 static void
-sl_set_l_state(struct sl *sl, long state)
+sl_set_l_state(struct sl *sl, uint state)
 {
 	printd(("%s: %p: %s <- %s\n", DRV_NAME, sl, sl_state_name(sl, state),
 		sl_state_name(sl, sl->l_state)));
 	sl->l_state = state;
 }
-static long
+
+static uint
 sl_get_l_state(struct sl *sl)
 {
 	return (sl->l_state);
 }
 static void
-sl_set_i_state(struct sl *sl, long state)
+sl_set_i_state(struct sl *sl, uint state)
 {
 	printd(("%s: %p: %s <- %s\n", DRV_NAME, sl, sl_i_state_name(sl, state),
-		sl_i_state_name(sl, sl->i_state)));
-	sl->i_state = state;
+		sl_i_state_name(sl, sl->i.state)));
+	sl->i.state = state;
 }
-static long
+
+static uint
 sl_get_i_state(struct sl *sl)
 {
-	return (sl->i_state);
+	return (sl->i.state);
 }
 
 /*
@@ -1217,13 +1229,16 @@ static struct sp *
 mtp_check_src(struct mtp *mtp, struct mtp_addr *src, int *errp)
 {
 	struct sp *sp;
+	struct T_info_ack *i;
 
 	for (sp = master.sp.list; sp; sp = (struct sp *) sp->next)
 		if (sp->ni == src->ni && sp->pc == (src->pc & sp->na.na->mask.member))
 			goto check;
 	goto noaddr;
       check:
-	if (sp->na.na->prot[src->si]->SERV_type == T_CLTS && sp->mtp.lists[src->si])
+	if (!(i = sp->na.na->prot[src->si]))
+		goto badaddr;
+	if (i->SERV_type == T_CLTS && sp->mtp.lists[src->si])
 		goto addrbusy;
 	return (sp);
       noaddr:
@@ -1233,6 +1248,10 @@ mtp_check_src(struct mtp *mtp, struct mtp_addr *src, int *errp)
       addrbusy:
 	*errp = (TADDRBUSY);
 	printd(("%s: %p: ERROR: Source address in use\n", DRV_NAME, mtp));
+	return (NULL);
+      badaddr:
+	*errp = (TBADADDR);
+	printd(("%s: %p: ERROR: Bad address\n", DRV_NAME, mtp));
 	return (NULL);
 }
 
@@ -1254,7 +1273,7 @@ mtp_check_dst(struct mtp *mtp, struct mtp_addr *dst)
 			goto check;
 	goto noaddr;
       check:
-	if (mtp->prot->SERV_type == T_CLTS)
+	if (mtp->i.style == T_CLTS)
 		goto efault;
 	for (m2 = sp->mtp.lists[dst->si & 0x0f]; m2; m2 = m2->next)
 		if (m2->src.ni == dst->ni
@@ -1285,17 +1304,19 @@ mtp_bind(struct mtp *mtp, struct mtp_addr *src)
 
 	if (!(loc = mtp_check_src(mtp, src, &err)))
 		goto error;
+	mtp->src = *src;
 	if (!mtp->sp.loc)
-		mtp->sp.loc = sp_get(loc);
-	mtp->prot = na_get(loc->na.na)->prot[src->si];	/* point to protocol profile */
+		mtp->sp.loc = loc;
+	mtp->prot = loc->na.na->prot[src->si];	/* point to protocol profile */
 	loc->mtp.equipped |= (1 << src->si);
-	if (mtp->prot->SERV_type == T_CLTS) {
+	mtp->i.style = mtp->prot->SERV_type;
+	if (mtp->i.style == T_CLTS) {
 		/* connectionless, add to user lists now */
 		loc->mtp.available |= (1 << src->si);
 		if ((mtp->sp.next = loc->mtp.lists[src->si]))
 			mtp->sp.next->sp.prev = &mtp->sp.next;
 		mtp->sp.prev = &loc->mtp.lists[src->si];
-		loc->mtp.lists[src->si] = mtp_get(mtp);
+		loc->mtp.lists[src->si] = mtp;
 	}
 	/* connection oriented, add to user lists on connect only */
 	return (0);
@@ -1316,19 +1337,16 @@ mtp_unbind(struct mtp *mtp)
 
 	if (!mtp || !mtp->prot || !(loc = mtp->sp.loc) || !(na = loc->na.na))
 		goto efault;
-	if (mtp->prot->SERV_type == T_CLTS) {
+	if (mtp->i.style == T_CLTS) {
 		/* connectionless, remove from user lists now */
 		if ((*(mtp->sp.prev) = mtp->sp.next))
 			mtp->sp.next->sp.prev = mtp->sp.prev;
 		else
 			loc->mtp.available &= ~(1 << mtp->src.si);
 		mtp->sp.next = NULL;
-		mtp_put(mtp);
 	}
 	/* connection oriented, already removed from user lists on disconnect */
 	mtp->sp.loc = NULL;
-	sp_put(loc);
-	na_put(na);
 	mtp->prot = NULL;
 	return (0);
       efault:
@@ -1356,12 +1374,12 @@ mtp_connect(struct mtp *mtp, struct mtp_addr *dst)
 	for (rem = loc->rs.list; rem && rem->dest != dst->pc; rem = rem->sp.next) ;
 	if (!rem)
 		goto badaddr;
-	mtp->sp.rem = rs_get(rem);
+	mtp->sp.rem = rem;
 	loc->mtp.available |= (1 << dst->si);
 	if ((mtp->sp.next = loc->mtp.lists[dst->si]))
 		mtp->sp.next->sp.prev = &mtp->sp.next;
 	mtp->sp.prev = &loc->mtp.lists[dst->si];
-	loc->mtp.lists[dst->si] = mtp_get(mtp);
+	loc->mtp.lists[dst->si] = mtp;
 	return (0);
       efault:
 	swerr();
@@ -1392,9 +1410,7 @@ mtp_disconnect(struct mtp *mtp)
 	mtp->sp.prev = NULL;
 	if (!loc->mtp.lists[mtp->src.si])
 		loc->mtp.available &= ~(1 << mtp->src.si);
-	mtp_put(mtp);
 	mtp->sp.rem = NULL;
-	rs_put(rem);
 	return (0);
       efault:
 	swerr();
@@ -1412,8 +1428,8 @@ static int
 mtp_send_msg(queue_t *q, struct mtp *mtp, struct mtp_opts *opt, struct mtp_addr *dst, mblk_t *dp)
 {
 	struct sp *sp = mtp->sp.loc;
-	ulong mp = (opt && opt->mp) ? *opt->mp : 0;
-	ulong sls = (opt && opt->sls) ? *opt->sls : (sp->sls++ & sp->ls.sls_mask);
+	uint mp = (opt && opt->mp) ? *opt->mp : 0;
+	uint sls = (opt && opt->sls) ? *opt->sls : (sp->sls++ & sp->ls.sls_mask);
 
 	fixme(("Rewrite this function for multiple interface styles\n"));
 	return mtp_send_user(q, sp, sp->ni, dst->pc, sp->pc, sls, mp, dst->si, dp);
@@ -1467,7 +1483,7 @@ m_error(queue_t *q, struct mtp *mtp, mblk_t *msg, int error)
 			DB_TYPE(mp) = M_HANGUP;
 			mi_strlog(q, STRLOGRX, SL_TRACE, "<- M_HANGUP");
 			freemsg(msg);
-			putnext(mtp->oq, mp);
+			putnext(mtp->rq, mp);
 			return (0);
 		} else {
 			DB_TYPE(mp) = M_ERROR;
@@ -1476,7 +1492,7 @@ m_error(queue_t *q, struct mtp *mtp, mblk_t *msg, int error)
 			mtp_set_state(mtp, TS_NO_STATES);
 			freemsg(msg);
 			mi_strlog(q, STRLOGRX, SL_TRACE, "<- M_ERROR");
-			putnext(mtp->oq, mp);
+			putnext(mtp->rq, mp);
 			return (0);
 		}
 	}
@@ -1492,7 +1508,7 @@ m_error(queue_t *q, struct mtp *mtp, mblk_t *msg, int error)
  *  @err: error type
  */
 static int
-m_error_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong prim, ulong err)
+m_error_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, uint prim, uint err)
 {
 	mblk_t *mp;
 	struct MTP_error_ack *p;
@@ -1518,7 +1534,7 @@ m_error_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong prim, ulong err)
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- MTP_ERROR_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		/* Returning -EPROTO here will make sure that the old state is restored correctly
 		   (in mtp_w_proto).  If we return 0, then the state will never be restored. */
 		if (err >= 0)
@@ -1533,7 +1549,7 @@ m_error_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong prim, ulong err)
  *  -----------------------------------
  */
 static int
-m_ok_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong prim)
+m_ok_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, uint prim)
 {
 	int err = -EFAULT;
 	mblk_t *mp;
@@ -1570,7 +1586,7 @@ m_ok_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong prim)
 		}
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- MTP_OK_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -1605,7 +1621,7 @@ m_bind_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, struct mtp_addr *add)
 		mtp_set_state(mtp, MTPS_IDLE);
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- MTP_BIND_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -1641,7 +1657,7 @@ m_addr_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, struct mtp_addr *loc, struc
 		mp->b_wptr += rem_len;
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- MTP_ADDR_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -1694,7 +1710,7 @@ m_info_ack(queue_t *q, struct mtp *mtp, mblk_t *msg)
 		p->mtp_addr_length = src_len + dst_len;
 		p->mtp_addr_offset = sizeof(*p);
 		p->mtp_current_state = mtp_get_state(mtp);
-		p->mtp_serv_type = mtp->prot->SERV_type == T_CLTS ? M_CLMS : M_COMS;
+		p->mtp_serv_type = (mtp->i.style == T_CLTS) ? M_CLMS : M_COMS;
 		p->mtp_version = MTP_CURRENT_VERSION;
 		mp->b_wptr += sizeof(*p);
 		bcopy(&mtp->src, mp->b_wptr, sizeof(mtp->src));
@@ -1703,7 +1719,7 @@ m_info_ack(queue_t *q, struct mtp *mtp, mblk_t *msg)
 		mp->b_wptr += sizeof(mtp->dst);
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- MTP_INFO_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -1714,7 +1730,7 @@ m_info_ack(queue_t *q, struct mtp *mtp, mblk_t *msg)
  *  -----------------------------------
  */
 static int
-m_optmgmt_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, struct mtp_opts *opt, ulong flags)
+m_optmgmt_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, struct mtp_opts *opt, mtp_ulong flags)
 {
 	mblk_t *mp;
 	struct MTP_optmgmt_ack *p;
@@ -1734,7 +1750,7 @@ m_optmgmt_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, struct mtp_opts *opt, ul
 			mtp_set_state(mtp, MTPS_IDLE);
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- MTP_OPTMGMT_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -1745,14 +1761,15 @@ m_optmgmt_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, struct mtp_opts *opt, ul
  *  -----------------------------------
  */
 static int
-m_transfer_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, ulong sls, ulong pri, mblk_t *dp)
+m_transfer_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, mtp_ulong sls, mtp_ulong pri,
+	       mblk_t *dp)
 {
 	mblk_t *mp;
 	struct MTP_transfer_ind *p;
 	size_t src_len = src ? sizeof(*src) : 0;
 
 	if ((mp = mi_allocb(q, sizeof(*p) + src_len, BPRI_MED))) {
-		if (canputnext(mtp->oq)) {
+		if (canputnext(mtp->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->mtp_primitive = MTP_TRANSFER_IND;
@@ -1763,7 +1780,7 @@ m_transfer_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, ulong sls, ulo
 			mp->b_wptr += sizeof(*p);
 			mp->b_cont = dp;	/* absorb user data */
 			mi_strlog(q, STRLOGRX, SL_TRACE, "<- MTP_TRANSFER_IND");
-			putnext(mtp->oq, mp);
+			putnext(mtp->rq, mp);
 			return (0);
 		}
 		freeb(mp);	/* free allocated message block */
@@ -1797,7 +1814,7 @@ m_pause_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
 			mp->b_wptr += add_len;
 		}
 		printd(("%s: %p: <- MTP_TRANSFER_IND\n", DRV_NAME, mtp));
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -1826,7 +1843,7 @@ m_resume_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
 			mp->b_wptr += add_len;
 		}
 		printd(("%s: %p: <- MTP_RESUME_IND\n", DRV_NAME, mtp));
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -1838,7 +1855,7 @@ m_resume_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *add)
  */
 static int
 m_status_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *add, struct mtp_opts *opt, mblk_t *dp,
-	     ulong etype)
+	     mtp_ulong etype)
 {
 	mblk_t *mp;
 	struct MTP_status_ind *p;
@@ -1863,7 +1880,7 @@ m_status_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *add, struct mtp_opts 
 			mp->b_wptr += add_len;
 		}
 		printd(("%s: %p: <- MTP_STATUS_IND\n", DRV_NAME, mtp));
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -1885,7 +1902,7 @@ m_restart_complete_ind(queue_t *q, struct mtp *mtp)
 		mp->b_wptr += sizeof(*p);
 		p->mtp_primitive = MTP_RESTART_COMPLETE_IND;
 		printd(("%s: %p: <- MTP_RESTART_COMPLETE_IND\n", DRV_NAME, mtp));
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -1896,7 +1913,7 @@ m_restart_complete_ind(queue_t *q, struct mtp *mtp)
  *  -----------------------------------
  */
 static inline int
-n_conn_ind(queue_t *q, struct mtp *mtp, ulong seq, ulong flags, struct mtp_addr *src,
+n_conn_ind(queue_t *q, struct mtp *mtp, np_ulong seq, np_ulong flags, struct mtp_addr *src,
 	   struct mtp_addr *dst, N_qos_sel_conn_mtp_t *qos)
 {
 	mblk_t *mp;
@@ -1931,7 +1948,7 @@ n_conn_ind(queue_t *q, struct mtp *mtp, ulong seq, ulong flags, struct mtp_addr 
 			mp->b_wptr += qos_len;
 		}
 		printd(("%s: %p: <- N_CONN_IND\n", DRV_NAME, mtp));
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	rare();
@@ -1943,7 +1960,7 @@ n_conn_ind(queue_t *q, struct mtp *mtp, ulong seq, ulong flags, struct mtp_addr 
  *  -----------------------------------
  */
 static int
-n_conn_con(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong flags, struct mtp_addr *res,
+n_conn_con(queue_t *q, struct mtp *mtp, mblk_t *msg, np_ulong flags, struct mtp_addr *res,
 	   N_qos_sel_conn_mtp_t *qos)
 {
 	mblk_t *mp;
@@ -1970,7 +1987,7 @@ n_conn_con(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong flags, struct mtp_add
 		mtp_set_state(mtp, NS_DATA_XFER);
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- N_CONN_CON");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -1981,8 +1998,8 @@ n_conn_con(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong flags, struct mtp_add
  *  -----------------------------------
  */
 static inline int
-n_discon_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason, ulong seq, struct mtp_addr *res,
-	     mblk_t *dp)
+n_discon_ind(queue_t *q, struct mtp *mtp, np_ulong orig, np_ulong reason, np_ulong seq,
+	     struct mtp_addr *res, mblk_t *dp)
 {
 	mblk_t *mp;
 	N_discon_ind_t *p;
@@ -2004,7 +2021,7 @@ n_discon_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason, ulong seq, s
 		}
 		mp->b_cont = dp;
 		printd(("%s: %p: <- N_DISCON_IND\n", DRV_NAME, mtp));
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	rare();
@@ -2016,14 +2033,14 @@ n_discon_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason, ulong seq, s
  *  -----------------------------------
  */
 static int
-n_data_ind(queue_t *q, struct mtp *mtp, ulong flags, mblk_t *dp)
+n_data_ind(queue_t *q, struct mtp *mtp, np_ulong flags, mblk_t *dp)
 {
 	mblk_t *mp;
 	N_data_ind_t *p;
 	int err = -ENOBUFS;
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(mtp->oq)) {
+		if (canputnext(mtp->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = N_DATA_IND;
@@ -2031,7 +2048,7 @@ n_data_ind(queue_t *q, struct mtp *mtp, ulong flags, mblk_t *dp)
 			mp->b_wptr += sizeof(*p);
 			mp->b_cont = dp;	/* absorb user data */
 			mi_strlog(q, STRLOGDA, SL_TRACE, "<- N_DATA_IND");
-			putnext(mtp->oq, mp);
+			putnext(mtp->rq, mp);
 			return (0);
 		}
 		freeb(mp);	/* free allocated message block */
@@ -2059,7 +2076,7 @@ n_exdata_ind(queue_t *q, struct mtp *mtp, mblk_t *dp)
 		p->PRIM_type = N_EXDATA_IND;
 		mp->b_cont = dp;
 		printd(("%s: %p: <- N_EXDATA_IND\n", DRV_NAME, mtp));
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (QR_ABSORBED);
 	}
 	rare();
@@ -2080,7 +2097,6 @@ n_info_ack(queue_t *q, struct mtp *mtp, mblk_t *msg)
 	N_qos_range_info_mtp_t *qor;
 	struct sp *sp = mtp->sp.loc;
 	struct na *na;
-	ulong state;
 
 	if (sp && sp->na.na) {
 		na = sp->na.na;
@@ -2111,35 +2127,6 @@ n_info_ack(queue_t *q, struct mtp *mtp, mblk_t *msg)
 		dst_len = sizeof(mtp->dst);
 		break;
 	}
-	switch (mtp_get_state(mtp)) {
-	case MTPS_UNBND:
-		state = NS_UNBND;
-		break;
-	case MTPS_WACK_BREQ:
-		state = NS_WACK_BREQ;
-		break;
-	case MTPS_IDLE:
-		state = NS_IDLE;
-		break;
-	case MTPS_WACK_UREQ:
-		state = NS_WACK_UREQ;
-		break;
-	case MTPS_WACK_CREQ:
-		state = NS_WCON_CREQ;
-		break;
-	case MTPS_CONNECTED:
-		state = NS_DATA_XFER;
-		break;
-	case MTPS_WACK_DREQ6:
-		state = NS_WACK_DREQ6;
-		break;
-	case MTPS_WACK_DREQ9:
-		state = NS_WACK_DREQ9;
-		break;
-	default:
-		state = NS_NOSTATES;
-		break;
-	}
 	if ((mp = mi_allocb(q, sizeof(*p) + src_len + dst_len + qos_len + qor_len, BPRI_MED))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2151,15 +2138,15 @@ n_info_ack(queue_t *q, struct mtp *mtp, mblk_t *msg)
 		p->DDATA_size = 0;
 		p->ADDR_size = sizeof(struct mtp_addr);
 		p->ADDR_length = src_len + dst_len;
-		p->ADDR_offset = src_len + dst_len ? sizeof(*p) : 0;
+		p->ADDR_offset = sizeof(*p);
 		p->QOS_length = qos_len;
-		p->QOS_offset = qos_len ? sizeof(*p) + src_len + dst_len : 0;
+		p->QOS_offset = sizeof(*p) + src_len + dst_len;
 		p->QOS_range_length = qor_len;
-		p->QOS_range_offset = qor_len ? sizeof(*p) + src_len + dst_len + qos_len : 0;
+		p->QOS_range_offset = sizeof(*p) + src_len + dst_len + qos_len;
 		p->OPTIONS_flags = 0;
 		p->NIDU_size = 279;
-		p->SERV_type = (mtp->prot->SERV_type == T_CLTS) ? N_CLNS : N_CONS;
-		p->CURRENT_state = state;
+		p->SERV_type = mtp->i.style;
+		p->CURRENT_state = mtp->i.state;
 		p->PROVIDER_type = N_SNICFP;
 		p->NODU_size = 279;
 		p->PROTOID_length = 0;
@@ -2189,7 +2176,7 @@ n_info_ack(queue_t *q, struct mtp *mtp, mblk_t *msg)
 		}
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- N_INFO_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -2200,7 +2187,7 @@ n_info_ack(queue_t *q, struct mtp *mtp, mblk_t *msg)
  *  -----------------------------------
  */
 static int
-n_error_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong prim, long err)
+n_error_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, np_ulong prim, np_long err)
 {
 	mblk_t *mp;
 	N_error_ack_t *p;
@@ -2226,7 +2213,7 @@ n_error_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong prim, long err)
 		p->UNIX_error = err < 0 ? -err : 0;
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- N_ERROR_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		/* Retruning EPROTO here will make sure that the old state is restored correctly.
 		   If we return 0, then the state will never be restored. */
 		return (EPROTO);
@@ -2240,7 +2227,7 @@ n_error_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong prim, long err)
  *  -----------------------------------
  */
 static int
-n_ok_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong prim)
+n_ok_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, np_ulong prim)
 {
 	mblk_t *mp;
 	N_ok_ack_t *p;
@@ -2285,7 +2272,7 @@ n_ok_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong prim)
 		}
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- N_OK_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -2311,7 +2298,7 @@ n_bind_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, struct mtp_addr *add)
 		p->ADDR_length = add_len;
 		p->ADDR_offset = sizeof(*p);
 		p->CONIND_number = 0;
-		p->TOKEN_value = (ulong) mtp->oq;
+		p->TOKEN_value = (np_ulong) (ulong) mtp->rq;
 		p->PROTOID_length = 0;
 		p->PROTOID_offset = 0;
 		bcopy(add, mp->b_wptr, add_len);
@@ -2321,7 +2308,7 @@ n_bind_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, struct mtp_addr *add)
 		mtp_set_state(mtp, NS_IDLE);
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- N_BIND_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -2344,7 +2331,7 @@ n_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_add
 	int err = -ENOBUFS;
 
 	if ((mp = mi_allocb(q, sizeof(*p) + src_len + dst_len, BPRI_MED))) {
-		if (canputnext(mtp->oq)) {
+		if (canputnext(mtp->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = N_UNITDATA_IND;
@@ -2359,7 +2346,7 @@ n_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_add
 			mp->b_wptr += dst_len;
 			mp->b_cont = dp;	/* absorb user data */
 			mi_strlog(q, STRLOGDA, SL_TRACE, "<- N_UNITDATA_IND");
-			putnext(mtp->oq, mp);
+			putnext(mtp->rq, mp);
 			return (0);
 		}
 		freeb(mp);	/* free allocated message block */
@@ -2375,7 +2362,7 @@ n_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_add
  */
 static int
 n_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, struct mtp_opts *opt, mblk_t *dp,
-	      ulong etype)
+	      np_ulong etype)
 {
 	mblk_t *mp;
 	N_uderror_ind_t *p;
@@ -2395,7 +2382,7 @@ n_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, struct mtp_opts
 		}
 		mp->b_cont = dp;
 		printd(("%s: %p: <- N_UDERROR_IND\n", DRV_NAME, mtp));
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	rare();
@@ -2418,7 +2405,7 @@ n_datack_ind(queue_t *q, struct mtp *mtp)
 		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_DATACK_IND;
 		printd(("%s: %p: <- N_DATACK_IND\n", DRV_NAME, mtp));
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	rare();
@@ -2430,7 +2417,7 @@ n_datack_ind(queue_t *q, struct mtp *mtp)
  *  -----------------------------------
  */
 static int
-n_reset_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason)
+n_reset_ind(queue_t *q, struct mtp *mtp, np_ulong orig, np_ulong reason)
 {
 	mblk_t *mp;
 	N_reset_ind_t *p;
@@ -2443,7 +2430,7 @@ n_reset_ind(queue_t *q, struct mtp *mtp, ulong orig, ulong reason)
 		p->RESET_orig = orig;
 		p->RESET_reason = reason;
 		printd(("%s: %p: <- N_RESET_IND\n", DRV_NAME, mtp));
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	rare();
@@ -2466,7 +2453,7 @@ n_reset_con(queue_t *q, struct mtp *mtp)
 		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = N_RESET_CON;
 		printd(("%s: %p: <- N_RESET_CON\n", DRV_NAME, mtp));
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	rare();
@@ -2498,7 +2485,7 @@ t_conn_con(queue_t *q, struct mtp *mtp, mblk_t *msg, struct mtp_addr *res, struc
 	size_t opt_len = opt ? mtp_opts_size(mtp, opt) : 0;
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(mtp->oq)) {
+		if (canputnext(mtp->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = T_CONN_CON;
@@ -2514,7 +2501,7 @@ t_conn_con(queue_t *q, struct mtp *mtp, mblk_t *msg, struct mtp_addr *res, struc
 			mp->b_cont = dp;
 			freemsg(msg);
 			mi_strlog(q, STRLOGTX, SL_TRACE, "<- T_CONN_CON");
-			putnext(mtp->oq, mp);
+			putnext(mtp->rq, mp);
 			return (0);
 		}
 		freeb(mp);
@@ -2539,14 +2526,14 @@ t_discon_ind(queue_t *q, struct mtp *mtp)
  *  -----------------------------------
  */
 static int
-t_data_ind(queue_t *q, struct mtp *mtp, ulong more, mblk_t *dp)
+t_data_ind(queue_t *q, struct mtp *mtp, t_uscalar_t more, mblk_t *dp)
 {
 	mblk_t *mp;
 	struct T_data_ind *p;
 	int err = -ENOBUFS;
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(mtp->oq)) {
+		if (canputnext(mtp->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = T_DATA_IND;
@@ -2554,7 +2541,7 @@ t_data_ind(queue_t *q, struct mtp *mtp, ulong more, mblk_t *dp)
 			mp->b_wptr += sizeof(*p);
 			mp->b_cont = dp;	/* absorb user data */
 			mi_strlog(q, STRLOGDA, SL_TRACE, "<- T_DATA_IND");
-			putnext(mtp->oq, mp);
+			putnext(mtp->rq, mp);
 			return (0);
 		}
 		freeb(mp);	/* free allocated message block */
@@ -2590,10 +2577,24 @@ t_info_ack(queue_t *q, struct mtp *mtp, mblk_t *msg)
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = T_INFO_ACK;
-		*p = *mtp->prot;
+		if (mtp->prot) {
+			*p = *(mtp->prot);
+		} else {
+			p->PRIM_type = T_INFO_ACK;
+			p->TSDU_size = 272;
+			p->ETSDU_size = T_INVALID;
+			p->CDATA_size = T_INVALID;
+			p->DDATA_size = T_INVALID;
+			p->ADDR_size = sizeof(struct sockaddr_mtp);
+			p->OPT_size = 4 * (sizeof(struct t_opthdr) + sizeof(t_scalar_t));
+			p->TIDU_size = 272;
+			p->PROVIDER_flag = T_XPG4_1;
+		}
+		p->SERV_type = mtp->i.style;
+		p->CURRENT_state = mtp->i.state;
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- T_INFO_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -2604,7 +2605,7 @@ t_info_ack(queue_t *q, struct mtp *mtp, mblk_t *msg)
  *  -----------------------------------
  */
 static int
-t_error_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong prim, long error)
+t_error_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, t_uscalar_t prim, t_scalar_t error)
 {
 	mblk_t *mp;
 	struct T_error_ack *p;
@@ -2630,7 +2631,7 @@ t_error_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong prim, long error)
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- T_ERROR_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		/* Retruning EPROTO here will make sure that the old state is restored correctly.
 		   If we return 0, then the state will never be restored. */
 		return (EPROTO);
@@ -2643,7 +2644,7 @@ t_error_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong prim, long error)
  *  -----------------------------------
  */
 static int
-t_ok_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong prim)
+t_ok_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, t_uscalar_t prim)
 {
 	int err = -EFAULT;
 	mblk_t *mp;
@@ -2689,7 +2690,7 @@ t_ok_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong prim)
 		}
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- T_OK_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -2725,7 +2726,7 @@ t_bind_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, struct mtp_addr *add)
 		mtp_set_state(mtp, TS_IDLE);
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- T_BIND_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -2748,7 +2749,7 @@ t_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_opt
 	int err = -ENOBUFS;
 
 	if ((mp = mi_allocb(q, sizeof(*p) + src_len + opt_len, BPRI_MED))) {
-		if (canputnext(mtp->oq)) {
+		if (canputnext(mtp->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = T_UNITDATA_IND;
@@ -2763,7 +2764,7 @@ t_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_opt
 			mp->b_wptr += opt_len;
 			mp->b_cont = dp;	/* absorb user data */
 			mi_strlog(q, STRLOGDA, SL_TRACE, "<- T_UNITDATA_IND");
-			putnext(mtp->oq, mp);
+			putnext(mtp->rq, mp);
 			return (0);
 		}
 		freeb(mp);	/* free allocated message block */
@@ -2781,7 +2782,7 @@ t_unitdata_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *src, struct mtp_opt
  */
 static int
 t_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, struct mtp_opts *opt, mblk_t *dp,
-	      ulong etype)
+	      t_uscalar_t etype)
 {
 	mblk_t *mp;
 	struct T_uderror_ind *p;
@@ -2789,7 +2790,7 @@ t_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, struct mtp_opts
 	size_t opt_len = opt ? mtp_opts_size(mtp, opt) : 0;
 
 	if ((mp = mi_allocb(q, sizeof(*p) + dst_len + opt_len, BPRI_MED))) {
-		if (bcanputnext(mtp->oq, 2)) {
+		if (bcanputnext(mtp->rq, 2)) {
 			DB_TYPE(mp) = M_PROTO;
 			mp->b_band = 2;	/* XXX move ahead of data indications */
 			p = (typeof(p)) mp->b_wptr;
@@ -2810,7 +2811,7 @@ t_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, struct mtp_opts
 			}
 			mp->b_cont = dp;
 			printd(("%s: %p: <- T_UDERROR_IND\n", DRV_NAME, mtp));
-			putnext(mtp->oq, mp);
+			putnext(mtp->rq, mp);
 			return (0);
 		}
 		freeb(mp);
@@ -2824,7 +2825,7 @@ t_uderror_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, struct mtp_opts
  *  -----------------------------------
  */
 static int
-t_optmgmt_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong flags, struct mtp_opts *opt)
+t_optmgmt_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, t_uscalar_t flags, struct mtp_opts *opt)
 {
 	mblk_t *mp;
 	struct T_optmgmt_ack *p;
@@ -2846,7 +2847,7 @@ t_optmgmt_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong flags, struct mtp_
 #endif
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- T_OPTMGMT_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -2869,14 +2870,14 @@ t_ordrel_ind(queue_t *q, struct mtp *mtp, mblk_t *msg)
  *  -----------------------------------
  */
 static inline int
-t_optdata_ind(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt, mblk_t *dp)
+t_optdata_ind(queue_t *q, struct mtp *mtp, t_uscalar_t flags, struct mtp_opts *opt, mblk_t *dp)
 {
 	mblk_t *mp;
 	struct T_optdata_ind *p;
 	size_t opt_len = opt ? mtp_opts_size(mtp, opt) : 0;
 
 	if ((mp = mi_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
-		if (canputnext(mtp->oq)) {
+		if (canputnext(mtp->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			mp->b_wptr += sizeof(*p);
@@ -2890,7 +2891,7 @@ t_optdata_ind(queue_t *q, struct mtp *mtp, ulong flags, struct mtp_opts *opt, mb
 			}
 			mp->b_cont = dp;
 			printd(("%s: %p: <- T_OPTDATA_IND\n", DRV_NAME, mtp));
-			putnext(mtp->oq, mp);
+			putnext(mtp->rq, mp);
 			return (QR_ABSORBED);
 		}
 		freeb(mp);
@@ -2927,7 +2928,7 @@ t_addr_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, struct mtp_addr *loc, struc
 		mp->b_wptr += rem_len;
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- T_ADDR_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -2940,7 +2941,7 @@ t_addr_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, struct mtp_addr *loc, struc
  *  -----------------------------------
  */
 static int
-t_capability_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong caps)
+t_capability_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, t_uscalar_t caps)
 {
 	mblk_t *mp;
 	struct T_capability_ack *p;
@@ -2950,15 +2951,31 @@ t_capability_ack(queue_t *q, struct mtp *mtp, mblk_t *msg, ulong caps)
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_CAPABILITY_ACK;
 		p->CAP_bits1 = TC1_INFO;
-		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (ulong) mtp->oq : 0;
-		if (caps & TC1_INFO)
-			p->INFO_ack = *(mtp->prot);
-		else
+		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (t_uscalar_t) (ulong) mtp->rq : 0;
+		if (caps & TC1_INFO) {
+			if (mtp->prot) {
+				p->INFO_ack = *(mtp->prot);
+			} else {
+				p->INFO_ack.PRIM_type = T_INFO_ACK;
+				p->INFO_ack.TSDU_size = 272;
+				p->INFO_ack.ETSDU_size = T_INVALID;
+				p->INFO_ack.CDATA_size = T_INVALID;
+				p->INFO_ack.DDATA_size = T_INVALID;
+				p->INFO_ack.ADDR_size = sizeof(struct sockaddr_mtp);
+				p->INFO_ack.OPT_size =
+				    4 * (sizeof(struct t_opthdr) + sizeof(t_scalar_t));
+				p->INFO_ack.TIDU_size = 272;
+				p->INFO_ack.PROVIDER_flag = T_XPG4_1;
+			}
+			p->INFO_ack.SERV_type = mtp->i.style;
+			p->INFO_ack.CURRENT_state = mtp->i.state;
+		} else {
 			bzero(&p->INFO_ack, sizeof(p->INFO_ack));
+		}
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- T_CAPABILITY_ACK");
-		putnext(mtp->oq, mp);
+		putnext(mtp->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -2983,7 +3000,7 @@ sl_pdu_req(queue_t *q, struct sl *sl, mblk_t *dp)
 	sl_pdu_req_t *p;
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(sl->oq)) {
+		if (canputnext(sl->wq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			mp->b_wptr += sizeof(*p);
@@ -2991,7 +3008,7 @@ sl_pdu_req(queue_t *q, struct sl *sl, mblk_t *dp)
 			p->sl_mp = 0;
 			mp->b_cont = dp;
 			printd(("%s: %p: SL_PDU_REQ [%d] ->\n", DRV_NAME, sl, msgdsize(dp)));
-			putnext(sl->oq, mp);
+			putnext(sl->wq, mp);
 			return (QR_ABSORBED);
 		}
 		freeb(mp);
@@ -3017,7 +3034,7 @@ sl_emergency_req(queue_t *q, struct sl *sl)
 		p->sl_primitive = SL_EMERGENCY_REQ;
 		printd(("%s: %p: SL_EMERGENCY_REQ ->\n", DRV_NAME, sl));
 		/* does not change interface state */
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3040,7 +3057,7 @@ sl_emergency_ceases_req(queue_t *q, struct sl *sl)
 		p->sl_primitive = SL_EMERGENCY_CEASES_REQ;
 		printd(("%s: %p: SL_EMERGENCY_CEASES_REQ ->\n", DRV_NAME, sl));
 		/* does not change interface state */
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3064,7 +3081,7 @@ sl_start_req(queue_t *q, struct sl *sl)
 		/* routing state of link does not change */
 		printd(("%s: %p: SL_START_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_WIND_INSI);
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3087,7 +3104,7 @@ sl_stop_req(queue_t *q, struct sl *sl)
 		p->sl_primitive = SL_STOP_REQ;
 		printd(("%s: %p: SL_STOP_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_OUT_OF_SERVICE);
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3110,7 +3127,7 @@ sl_retrieve_bsnt_req(queue_t *q, struct sl *sl)
 		p->sl_primitive = SL_RETRIEVE_BSNT_REQ;
 		printd(("%s: %p: SL_RETRIEVE_BSNT_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_WIND_BSNT);
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3121,13 +3138,13 @@ sl_retrieve_bsnt_req(queue_t *q, struct sl *sl)
  *  -----------------------------------
  */
 static int
-sl_retrieval_request_and_fsnc_req(queue_t *q, struct sl *sl, ulong fsnc)
+sl_retrieval_request_and_fsnc_req(queue_t *q, struct sl *sl, lmi_ulong fsnc)
 {
 	mblk_t *mp;
 	sl_retrieval_req_and_fsnc_t *p;
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
-		if (canputnext(sl->oq)) {
+		if (canputnext(sl->wq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->sl_primitive = SL_RETRIEVAL_REQUEST_AND_FSNC_REQ;
@@ -3135,7 +3152,7 @@ sl_retrieval_request_and_fsnc_req(queue_t *q, struct sl *sl, ulong fsnc)
 			mp->b_wptr += sizeof(*p);
 			mi_strlog(q, STRLOGTX, SL_TRACE, "SL_RETRIEVAL_REQUEST_AND_FSNC_REQ ->");
 			sl_set_l_state(sl, SLS_WCON_RET);
-			putnext(sl->oq, mp);
+			putnext(sl->wq, mp);
 			return (0);
 		}
 		freeb(mp);
@@ -3160,7 +3177,7 @@ sl_resume_req(queue_t *q, struct sl *sl)
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_RESUME_REQ;
 		printd(("%s: %p: SL_RESUME_REQ ->\n", DRV_NAME, sl));
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3183,7 +3200,7 @@ sl_clear_buffers_req(queue_t *q, struct sl *sl)
 		p->sl_primitive = SL_CLEAR_BUFFERS_REQ;
 		printd(("%s: %p: SL_CLEAR_BUFFERS_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_OUT_OF_SERVICE);
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3206,7 +3223,7 @@ sl_clear_rtb_req(queue_t *q, struct sl *sl)
 		p->sl_primitive = SL_CLEAR_RTB_REQ;
 		printd(("%s: %p: SL_CLEAR_RTB_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_WIND_CLRB);
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3228,7 +3245,7 @@ sl_local_processor_outage_req(queue_t *q, struct sl *sl)
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_LOCAL_PROCESSOR_OUTAGE_REQ;
 		printd(("%s: %p: SL_LOCAL_PROCESSOR_OUTAGE_REQ ->\n", DRV_NAME, sl));
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3250,7 +3267,7 @@ sl_congestion_discard_req(queue_t *q, struct sl *sl)
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_CONGESTION_DISCARD_REQ;
 		printd(("%s: %p: SL_CONGESTION_DISCARD_REQ ->\n", DRV_NAME, sl));
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3272,7 +3289,7 @@ sl_congestion_accept_req(queue_t *q, struct sl *sl)
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_CONGESTION_ACCEPT_REQ;
 		printd(("%s: %p: SL_CONGESTION_ACCEPT_REQ ->\n", DRV_NAME, sl));
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3294,7 +3311,7 @@ sl_no_congestion_req(queue_t *q, struct sl *sl)
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_NO_CONGESTION_REQ;
 		printd(("%s: %p: SL_NO_CONGESTION_REQ ->\n", DRV_NAME, sl));
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3318,7 +3335,7 @@ sl_power_on_req(queue_t *q, struct sl *sl)
 		/* should maybe set routing state to active */
 		printd(("%s: %p: SL_POWER_ON_REQ ->\n", DRV_NAME, sl));
 		sl_set_l_state(sl, SLS_OUT_OF_SERVICE);
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3341,7 +3358,7 @@ sl_optmgmt_req(queue_t *q, struct sl *sl)
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_OPTMGMT_REQ;
 		printd(("%s: %p: SL_OPTMGMT_REQ ->\n", DRV_NAME, sl));
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3363,7 +3380,7 @@ sl_notify_req(queue_t *q, struct sl *sl)
 		mp->b_wptr += sizeof(*p);
 		p->sl_primitive = SL_NOTIFY_REQ;
 		printd(("%s: %p: SL_NOTIFY_REQ ->\n", DRV_NAME, sl));
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3385,7 +3402,7 @@ lmi_info_req(queue_t *q, struct sl *sl)
 		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_REQ;
 		printd(("%s: %p: LMI_INFO_REQ ->\n", DRV_NAME, sl));
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3411,7 +3428,7 @@ lmi_attach_req(queue_t *q, struct sl *sl, caddr_t ppa_ptr, size_t ppa_len)
 			mp->b_wptr += ppa_len;
 		}
 		printd(("%s: %p: LMI_ATTACH_REQ ->\n", DRV_NAME, sl));
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3433,7 +3450,7 @@ lmi_detach_req(queue_t *q, struct sl *sl)
 		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_DETACH_REQ;
 		printd(("%s: %p: LMI_DETACH_REQ ->\n", DRV_NAME, sl));
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3459,7 +3476,7 @@ lmi_enable_req(queue_t *q, struct sl *sl, caddr_t dst_ptr, size_t dst_len)
 			mp->b_wptr += dst_len;
 		}
 		printd(("%s: %p: LMI_ENABLE_REQ ->\n", DRV_NAME, sl));
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3481,7 +3498,7 @@ lmi_disable_req(queue_t *q, struct sl *sl)
 		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_DISABLE_REQ;
 		printd(("%s: %p: LMI_DISABLE_REQ ->\n", DRV_NAME, sl));
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3492,7 +3509,7 @@ lmi_disable_req(queue_t *q, struct sl *sl)
  *  -----------------------------------
  */
 static inline int
-lmi_optmgmt_req(queue_t *q, struct sl *sl, ulong flags, caddr_t opt_ptr, size_t opt_len)
+lmi_optmgmt_req(queue_t *q, struct sl *sl, lmi_ulong flags, caddr_t opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
 	lmi_optmgmt_req_t *p;
@@ -3510,7 +3527,7 @@ lmi_optmgmt_req(queue_t *q, struct sl *sl, ulong flags, caddr_t opt_ptr, size_t 
 			mp->b_wptr += opt_len;
 		}
 		printd(("%s: %p: LMI_OPTMGMT_REQ ->\n", DRV_NAME, sl));
-		putnext(sl->oq, mp);
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -3523,15 +3540,15 @@ lmi_optmgmt_req(queue_t *q, struct sl *sl, ulong flags, caddr_t opt_ptr, size_t 
  *
  *  =========================================================================
  */
-typedef struct mtp_msg {
+struct mtp_msg {
 	mblk_t *bp;			/* identd */
 	queue_t *eq;			/* queue to write errors to */
 	queue_t *xq;			/* queue to write results to */
 	struct mtp *mtp;		/* MTP-User to which this message belongs */
 	struct sl *sl;			/* Signalling Link to which thes message belongs */
 	unsigned long timestamp;	/* jiffie clock timestamp */
-	ulong pvar;			/* protocol variant */
-	ulong popt;			/* protocol options */
+	uint pvar;			/* protocol variant */
+	uint popt;			/* protocol options */
 	uint mp;			/* message priority */
 	uint ni;			/* network indicator */
 	uint si;			/* service indicator */
@@ -3551,7 +3568,7 @@ typedef struct mtp_msg {
 	} arg;
 	caddr_t data;			/* user data */
 	size_t dlen;			/* user data length */
-} mtp_msg_t;
+};
 
 /*
  *  -------------------------------------------------------------------------
@@ -3936,192 +3953,219 @@ enum { tall, t1, t1r, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14,
 	t33a, t34a, t1t, t2t, t1s
 };
 
+static struct T_info_ack t_cots_prot_default = {
+	.PRIM_type = T_INFO_ACK,
+	.TSDU_size = 272,
+	.ETSDU_size = T_INVALID,
+	.CDATA_size = T_INVALID,
+	.DDATA_size = T_INVALID,
+	.ADDR_size = sizeof(struct sockaddr_mtp),
+	.OPT_size = 4 * (sizeof(struct t_opthdr) + sizeof(t_scalar_t)),
+	.TIDU_size = 272,
+	.SERV_type = T_CLTS,
+	.CURRENT_state = TS_UNBND,
+	.PROVIDER_flag = T_XPG4_1,
+};
+static struct T_info_ack t_clts_prot_default = {
+	.PRIM_type = T_INFO_ACK,
+	.TSDU_size = 272,
+	.ETSDU_size = T_INVALID,
+	.CDATA_size = T_INVALID,
+	.DDATA_size = T_INVALID,
+	.ADDR_size = sizeof(struct sockaddr_mtp),
+	.OPT_size = 4 * (sizeof(struct t_opthdr) + sizeof(t_scalar_t)),
+	.TIDU_size = 272,
+	.SERV_type = T_COTS,
+	.CURRENT_state = TS_UNBND,
+	.PROVIDER_flag = T_XPG4_1,
+};
+
 static mtp_opt_conf_na_t itut_na_config_default = {
-      t1:((800 * HZ) / 1000),	/* (sl) T1 0.5 (0.8) 1.2 sec */
-      t1r:((800 * HZ) / 1000),	/* (sp) T1R 0.5 (0.8) 1.2 sec */
-      t2:((1400 * HZ) / 1000),	/* (sl) T2 0.7 (1.4) 2.0 sec */
-      t3:((800 * HZ) / 1000),	/* (sl) T3 0.5 (0.8) 1.2 sec */
-      t4:((800 * HZ) / 1000),	/* (sl) T4 0.5 (0.8) 1.2 sec */
-      t5:((800 * HZ) / 1000),	/* (sl) T5 0.5 (0.8) 1.2 sec */
-      t6:((800 * HZ) / 1000),	/* (rt) T6 0.5 (0.8) 1.2 sec */
-      t7:((1500 * HZ) / 1000),	/* (lk) T7 1 to 2 sec */
-      t8:((1000 * HZ) / 1000),	/* (rs) T8 0.8 to 1.2 sec */
-      t10:(45 * HZ),		/* (rt) T10 30 to 60 sec */
-      t11:(60 * HZ),		/* (rs) T11 30 to 90 sec */
-      t12:((1150 * HZ) / 1000),/* (sl) T12 0.8 to 1.5 sec */
-      t13:((1150 * HZ) / 1000),/* (sl) T13 0.8 to 1.5 sec */
-      t14:((2500 * HZ) / 1000),/* (sl) T14 2 to 3 sec */
-      t15:((2500 * HZ) / 1000),/* (rs) T15 2 to 3 sec */
-      t16:((1700 * HZ) / 1000),/* (rs) T16 1.4 to 2.0 sec */
-      t17:((1150 * HZ) / 1000),/* (sl) T17 0.8 to 1.5 sec */
-      t18:(600 * HZ),		/* (sp) T18 network dependent */
-      t18a:(12 * HZ),		/* (rs) T18A 2 to 20 sec */
-      t19:(68 * HZ),		/* (sp) T19 67 to 69 sec */
-      t19a:(540 * HZ),		/* (sl) T19A 480 to 600 sec */
-      t20:(60 * HZ),		/* (sp) T20 59 to 61 sec */
-      t20a:(105 * HZ),		/* (sl) T20A 90 to 120 sec */
-      t21:(64 * HZ),		/* (sp) T21 63 to 65 sec */
-      t21a:(105 * HZ),		/* (sl) T21A 90 to 120 sec */
-      t22:(270 * HZ),		/* (sl) T22 3 to 6 min */
-      t22a:(600 * HZ),		/* (sp) T22A network dependent */
-      t23:(270 * HZ),		/* (sl) T23 3 to 6 min */
-      t23a:(600 * HZ),		/* (sp) T23A network dependent */
-      t24:((500 * HZ) / 1000),	/* (sl) T24 500 ms */
-      t24a:(600 * HZ),		/* (sp) T24A network dependent */
-      t25a:(32 * HZ),		/* (sp) T25 32 to 35 sec */
-      t26a:(13 * HZ),		/* (sp) T26 12 to 15 sec */
-      t27a:(3 * HZ),		/* (sp) T27 2 (3) 5 sec */
-      t28a:(19 * HZ),		/* (sp) T28 3 to 35 sec */
-      t29a:(63 * HZ),		/* (sp) T29 60 to 65 sec */
-      t30a:(33 * HZ),		/* (sp) T30 30 to 35 sec */
-      t31a:(60 * HZ),		/* (sl) T31 10 to 120 sec */
-      t32a:(60 * HZ),		/* (sl) T32 5 to 120 sec */
-      t33a:(360 * HZ),		/* (sl) T33 60 to 600 sec */
-      t34a:(60 * HZ),		/* (sl) T34 5 to 120 sec */
-      t1t:(4 * HZ),		/* (sl) T1T 4 to 12 sec */
-      t2t:(60 * HZ),		/* (sl) T2T 30 to 90 sec */
-      t1s:(4 * HZ),		/* (sl) T1S 4 to 12 sec */
+	.t1 = 800,			/* (sl) T1 0.5 (0.8) 1.2 sec */
+	.t1r = 800,			/* (sp) T1R 0.5 (0.8) 1.2 sec */
+	.t2 = 1400,			/* (sl) T2 0.7 (1.4) 2.0 sec */
+	.t3 = 800,			/* (sl) T3 0.5 (0.8) 1.2 sec */
+	.t4 = 800,			/* (sl) T4 0.5 (0.8) 1.2 sec */
+	.t5 = 800,			/* (sl) T5 0.5 (0.8) 1.2 sec */
+	.t6 = 800,			/* (rt) T6 0.5 (0.8) 1.2 sec */
+	.t7 = 1500,			/* (lk) T7 1 to 2 sec */
+	.t8 = 1000,			/* (rs) T8 0.8 to 1.2 sec */
+	.t10 = 45000,			/* (rt) T10 30 to 60 sec */
+	.t11 = 60000,			/* (rs) T11 30 to 90 sec */
+	.t12 = 1150,			/* (sl) T12 0.8 to 1.5 sec */
+	.t13 = 1150,			/* (sl) T13 0.8 to 1.5 sec */
+	.t14 = 2500,			/* (sl) T14 2 to 3 sec */
+	.t15 = 2500,			/* (rs) T15 2 to 3 sec */
+	.t16 = 1700,			/* (rs) T16 1.4 to 2.0 sec */
+	.t17 = 1150,			/* (sl) T17 0.8 to 1.5 sec */
+	.t18 = 600000,			/* (sp) T18 network dependent */
+	.t18a = 12000,			/* (rs) T18A 2 to 20 sec */
+	.t19 = 68000,			/* (sp) T19 67 to 69 sec */
+	.t19a = 540000,			/* (sl) T19A 480 to 600 sec */
+	.t20 = 60000,			/* (sp) T20 59 to 61 sec */
+	.t20a = 105000,			/* (sl) T20A 90 to 120 sec */
+	.t21 = 64000,			/* (sp) T21 63 to 65 sec */
+	.t21a = 105000,			/* (sl) T21A 90 to 120 sec */
+	.t22 = 270000,			/* (sl) T22 3 to 6 min */
+	.t22a = 600000,			/* (sp) T22A network dependent */
+	.t23 = 270000,			/* (sl) T23 3 to 6 min */
+	.t23a = 600000,			/* (sp) T23A network dependent */
+	.t24 = 500,			/* (sl) T24 500 ms */
+	.t24a = 600000,			/* (sp) T24A network dependent */
+	.t25a = = 32000,		/* (sp) T25 32 to 35 sec */
+	.t26a = 13000,			/* (sp) T26 12 to 15 sec */
+	.t27a = 3000,			/* (sp) T27 2 (3) 5 sec */
+	.t28a = 19000,			/* (sp) T28 3 to 35 sec */
+	.t29a = 63000,			/* (sp) T29 60 to 65 sec */
+	.t30a = 33000,			/* (sp) T30 30 to 35 sec */
+	.t31a = 60000,			/* (sl) T31 10 to 120 sec */
+	.t32a = 60000,			/* (sl) T32 5 to 120 sec */
+	.t33a = 360000,			/* (sl) T33 60 to 600 sec */
+	.t34a = 60000,			/* (sl) T34 5 to 120 sec */
+	.t1t = 4000,			/* (sl) T1T 4 to 12 sec */
+	.t2t = 60000,			/* (sl) T2T 30 to 90 sec */
+	.t1s = 4000,			/* (sl) T1S 4 to 12 sec */
 };
 
 static mtp_opt_conf_na_t etsi_na_config_default = {
-      t1:((800 * HZ) / 1000),	/* (sl) T1 0.5 (0.8) 1.2 sec */
-      t1r:((800 * HZ) / 1000),	/* (sp) T1R 0.5 (0.8) 1.2 sec */
-      t2:((1400 * HZ) / 1000),	/* (sl) T2 0.7 (1.4) 2.0 sec */
-      t3:((800 * HZ) / 1000),	/* (sl) T3 0.5 (0.8) 1.2 sec */
-      t4:((800 * HZ) / 1000),	/* (sl) T4 0.5 (0.8) 1.2 sec */
-      t5:((800 * HZ) / 1000),	/* (sl) T5 0.5 (0.8) 1.2 sec */
-      t6:((800 * HZ) / 1000),	/* (rt) T6 0.5 (0.8) 1.2 sec */
-      t7:((1500 * HZ) / 1000),	/* (lk) T7 1 to 2 sec */
-      t8:((1000 * HZ) / 1000),	/* (rs) T8 0.8 to 1.2 sec */
-      t10:(45 * HZ),		/* (rt) T10 30 to 60 sec */
-      t11:(60 * HZ),		/* (rs) T11 30 to 90 sec */
-      t12:((1150 * HZ) / 1000),/* (sl) T12 0.8 to 1.5 sec */
-      t13:((1150 * HZ) / 1000),/* (sl) T13 0.8 to 1.5 sec */
-      t14:((2500 * HZ) / 1000),/* (sl) T14 2 to 3 sec */
-      t15:((2500 * HZ) / 1000),/* (rs) T15 2 to 3 sec */
-      t16:((1700 * HZ) / 1000),/* (rs) T16 1.4 to 2.0 sec */
-      t17:((1150 * HZ) / 1000),/* (sl) T17 0.8 to 1.5 sec */
-      t18:(600 * HZ),		/* (sp) T18 network dependent */
-      t18a:(12 * HZ),		/* (rs) T18A 2 to 20 sec */
-      t19:(68 * HZ),		/* (sp) T19 67 to 69 sec */
-      t19a:(540 * HZ),		/* (sl) T19A 480 to 600 sec */
-      t20:(60 * HZ),		/* (sp) T20 59 to 61 sec */
-      t20a:(105 * HZ),		/* (sl) T20A 90 to 120 sec */
-      t21:(64 * HZ),		/* (sp) T21 63 to 65 sec */
-      t21a:(105 * HZ),		/* (sl) T21A 90 to 120 sec */
-      t22:(270 * HZ),		/* (sl) T22 3 to 6 min */
-      t22a:(600 * HZ),		/* (sp) T22A network dependent */
-      t23:(270 * HZ),		/* (sl) T23 3 to 6 min */
-      t23a:(600 * HZ),		/* (sp) T23A network dependent */
-      t24:((500 * HZ) / 1000),	/* (sl) T24 500 ms */
-      t24a:(600 * HZ),		/* (sp) T24A network dependent */
-      t25a:(32 * HZ),		/* (sp) T25 32 to 35 sec */
-      t26a:(13 * HZ),		/* (sp) T26 12 to 15 sec */
-      t27a:(3 * HZ),		/* (sp) T27 2 (3) 5 sec */
-      t28a:(19 * HZ),		/* (sp) T28 3 to 35 sec */
-      t29a:(63 * HZ),		/* (sp) T29 60 to 65 sec */
-      t30a:(33 * HZ),		/* (sp) T30 30 to 35 sec */
-      t31a:(60 * HZ),		/* (sl) T31 10 to 120 sec */
-      t32a:(60 * HZ),		/* (sl) T32 5 to 120 sec */
-      t33a:(360 * HZ),		/* (sl) T33 60 to 600 sec */
-      t34a:(60 * HZ),		/* (sl) T34 5 to 120 sec */
-      t1t:(4 * HZ),		/* (sl) T1T 4 to 12 sec */
-      t2t:(60 * HZ),		/* (sl) T2T 30 to 90 sec */
-      t1s:(4 * HZ),		/* (sl) T1S 4 to 12 sec */
+	.t1 = 800,			/* (sl) T1 0.5 (0.8) 1.2 sec */
+	.t1r = 800,			/* (sp) T1R 0.5 (0.8) 1.2 sec */
+	.t2 = 1400,			/* (sl) T2 0.7 (1.4) 2.0 sec */
+	.t3 = 800,			/* (sl) T3 0.5 (0.8) 1.2 sec */
+	.t4 = 800,			/* (sl) T4 0.5 (0.8) 1.2 sec */
+	.t5 = 800,			/* (sl) T5 0.5 (0.8) 1.2 sec */
+	.t6 = 800,			/* (rt) T6 0.5 (0.8) 1.2 sec */
+	.t7 = 1500,			/* (lk) T7 1 to 2 sec */
+	.t8 = 1000,			/* (rs) T8 0.8 to 1.2 sec */
+	.t10 = 45000,			/* (rt) T10 30 to 60 sec */
+	.t11 = 60000,			/* (rs) T11 30 to 90 sec */
+	.t12 = 1150,			/* (sl) T12 0.8 to 1.5 sec */
+	.t13 = 1150,			/* (sl) T13 0.8 to 1.5 sec */
+	.t14 = 2500,			/* (sl) T14 2 to 3 sec */
+	.t15 = 2500,			/* (rs) T15 2 to 3 sec */
+	.t16 = 1700,			/* (rs) T16 1.4 to 2.0 sec */
+	.t17 = 1150,			/* (sl) T17 0.8 to 1.5 sec */
+	.t18 = 600000,			/* (sp) T18 network dependent */
+	.t18a = 12000,			/* (rs) T18A 2 to 20 sec */
+	.t19 = 68000,			/* (sp) T19 67 to 69 sec */
+	.t19a = 540000,			/* (sl) T19A 480 to 600 sec */
+	.t20 = 60000,			/* (sp) T20 59 to 61 sec */
+	.t20a = 105000,			/* (sl) T20A 90 to 120 sec */
+	.t21 = 64000,			/* (sp) T21 63 to 65 sec */
+	.t21a = 105000,			/* (sl) T21A 90 to 120 sec */
+	.t22 = 270000,			/* (sl) T22 3 to 6 min */
+	.t22a = 600000,			/* (sp) T22A network dependent */
+	.t23 = 270000,			/* (sl) T23 3 to 6 min */
+	.t23a = 600000,			/* (sp) T23A network dependent */
+	.t24 = 500,			/* (sl) T24 500 ms */
+	.t24a = 600000,			/* (sp) T24A network dependent */
+	.t25a = 32000,			/* (sp) T25 32 to 35 sec */
+	.t26a = 13000,			/* (sp) T26 12 to 15 sec */
+	.t27a = 3000,			/* (sp) T27 2 (3) 5 sec */
+	.t28a = 19000,			/* (sp) T28 3 to 35 sec */
+	.t29a = 63000,			/* (sp) T29 60 to 65 sec */
+	.t30a = 33000,			/* (sp) T30 30 to 35 sec */
+	.t31a = 60000,			/* (sl) T31 10 to 120 sec */
+	.t32a = 60000,			/* (sl) T32 5 to 120 sec */
+	.t33a = 360000,			/* (sl) T33 60 to 600 sec */
+	.t34a = 60000,			/* (sl) T34 5 to 120 sec */
+	.t1t = 4000,			/* (sl) T1T 4 to 12 sec */
+	.t2t = 60000,			/* (sl) T2T 30 to 90 sec */
+	.t1s = 4000,			/* (sl) T1S 4 to 12 sec */
 };
 
 static mtp_opt_conf_na_t ansi_na_config_default = {
-      t1:((800 * HZ) / 1000),	/* (sl) T1 0.5 (0.8) 1.2 sec */
-      t1r:((800 * HZ) / 1000),	/* (sp) T1R 0.5 (0.8) 1.2 sec */
-      t2:((1400 * HZ) / 1000),	/* (sl) T2 0.7 (1.4) 2.0 sec */
-      t3:((800 * HZ) / 1000),	/* (sl) T3 0.5 (0.8) 1.2 sec */
-      t4:((800 * HZ) / 1000),	/* (sl) T4 0.5 (0.8) 1.2 sec */
-      t5:((800 * HZ) / 1000),	/* (sl) T5 0.5 (0.8) 1.2 sec */
-      t6:((800 * HZ) / 1000),	/* (rt) T6 0.5 (0.8) 1.2 sec */
-      t7:((1500 * HZ) / 1000),	/* (lk) T7 1 to 2 sec */
-      t8:((1000 * HZ) / 1000),	/* (rs) T8 0.8 to 1.2 sec */
-      t10:(45 * HZ),		/* (rt) T10 30 to 60 sec */
-      t11:(60 * HZ),		/* (rs) T11 30 to 90 sec */
-      t12:((1150 * HZ) / 1000),/* (sl) T12 0.8 to 1.5 sec */
-      t13:((1150 * HZ) / 1000),/* (sl) T13 0.8 to 1.5 sec */
-      t14:((2500 * HZ) / 1000),/* (sl) T14 2 to 3 sec */
-      t15:((2500 * HZ) / 1000),/* (rs) T15 2 to 3 sec */
-      t16:((1700 * HZ) / 1000),/* (rs) T16 1.4 to 2.0 sec */
-      t17:((1150 * HZ) / 1000),/* (sl) T17 0.8 to 1.5 sec */
-      t18:(600 * HZ),		/* (sp) T18 network dependent */
-      t18a:(12 * HZ),		/* (rs) T18A 2 to 20 sec */
-      t19:(68 * HZ),		/* (sp) T19 67 to 69 sec */
-      t19a:(540 * HZ),		/* (sl) T19A 480 to 600 sec */
-      t20:(60 * HZ),		/* (sp) T20 59 to 61 sec */
-      t20a:(105 * HZ),		/* (sl) T20A 90 to 120 sec */
-      t21:(64 * HZ),		/* (sp) T21 63 to 65 sec */
-      t21a:(105 * HZ),		/* (sl) T21A 90 to 120 sec */
-      t22:(270 * HZ),		/* (sl) T22 3 to 6 min */
-      t22a:(600 * HZ),		/* (sp) T22A network dependent */
-      t23:(270 * HZ),		/* (sl) T23 3 to 6 min */
-      t23a:(600 * HZ),		/* (sp) T23A network dependent */
-      t24:((500 * HZ) / 1000),	/* (sl) T24 500 ms */
-      t24a:(600 * HZ),		/* (sp) T24A network dependent */
-      t25a:(32 * HZ),		/* (sp) T25 32 to 35 sec */
-      t26a:(13 * HZ),		/* (sp) T26 12 to 15 sec */
-      t27a:(3 * HZ),		/* (sp) T27 2 (3) 5 sec */
-      t28a:(19 * HZ),		/* (sp) T28 3 to 35 sec */
-      t29a:(63 * HZ),		/* (sp) T29 60 to 65 sec */
-      t30a:(33 * HZ),		/* (sp) T30 30 to 35 sec */
-      t31a:(60 * HZ),		/* (sl) T31 10 to 120 sec */
-      t32a:(60 * HZ),		/* (sl) T32 5 to 120 sec */
-      t33a:(360 * HZ),		/* (sl) T33 60 to 600 sec */
-      t34a:(60 * HZ),		/* (sl) T34 5 to 120 sec */
-      t1t:(4 * HZ),		/* (sl) T1T 4 to 12 sec */
-      t2t:(60 * HZ),		/* (sl) T2T 30 to 90 sec */
-      t1s:(4 * HZ),		/* (sl) T1S 4 to 12 sec */
+	.t1 = 800,			/* (sl) T1 0.5 (0.8) 1.2 sec */
+	.t1r = 800,			/* (sp) T1R 0.5 (0.8) 1.2 sec */
+	.t2 = 1400,			/* (sl) T2 0.7 (1.4) 2.0 sec */
+	.t3 = 800,			/* (sl) T3 0.5 (0.8) 1.2 sec */
+	.t4 = 800,			/* (sl) T4 0.5 (0.8) 1.2 sec */
+	.t5 = 800,			/* (sl) T5 0.5 (0.8) 1.2 sec */
+	.t6 = 800,			/* (rt) T6 0.5 (0.8) 1.2 sec */
+	.t7 = 1500,			/* (lk) T7 1 to 2 sec */
+	.t8 = 1000,			/* (rs) T8 0.8 to 1.2 sec */
+	.t10 = 45000,			/* (rt) T10 30 to 60 sec */
+	.t11 = 60000,			/* (rs) T11 30 to 90 sec */
+	.t12 = 1150,			/* (sl) T12 0.8 to 1.5 sec */
+	.t13 = 1150,			/* (sl) T13 0.8 to 1.5 sec */
+	.t14 = 2500,			/* (sl) T14 2 to 3 sec */
+	.t15 = 2500,			/* (rs) T15 2 to 3 sec */
+	.t16 = 1700,			/* (rs) T16 1.4 to 2.0 sec */
+	.t17 = 1150,			/* (sl) T17 0.8 to 1.5 sec */
+	.t18 = 600000,			/* (sp) T18 network dependent */
+	.t18a = 12000,			/* (rs) T18A 2 to 20 sec */
+	.t19 = 68000,			/* (sp) T19 67 to 69 sec */
+	.t19a = 540000,			/* (sl) T19A 480 to 600 sec */
+	.t20 = 60000,			/* (sp) T20 59 to 61 sec */
+	.t20a = 105000,			/* (sl) T20A 90 to 120 sec */
+	.t21 = 64000,			/* (sp) T21 63 to 65 sec */
+	.t21a = 105000,			/* (sl) T21A 90 to 120 sec */
+	.t22 = 270000,			/* (sl) T22 3 to 6 min */
+	.t22a = 600000,			/* (sp) T22A network dependent */
+	.t23 = 270000,			/* (sl) T23 3 to 6 min */
+	.t23a = 600000,			/* (sp) T23A network dependent */
+	.t24 = 500,			/* (sl) T24 500 ms */
+	.t24a = 600000,			/* (sp) T24A network dependent */
+	.t25a = 32000,			/* (sp) T25 32 to 35 sec */
+	.t26a = 13000,			/* (sp) T26 12 to 15 sec */
+	.t27a = 3000,			/* (sp) T27 2 (3) 5 sec */
+	.t28a = 19000,			/* (sp) T28 3 to 35 sec */
+	.t29a = 63000,			/* (sp) T29 60 to 65 sec */
+	.t30a = 33000,			/* (sp) T30 30 to 35 sec */
+	.t31a = 60000,			/* (sl) T31 10 to 120 sec */
+	.t32a = 60000,			/* (sl) T32 5 to 120 sec */
+	.t33a = 360000,			/* (sl) T33 60 to 600 sec */
+	.t34a = 60000,			/* (sl) T34 5 to 120 sec */
+	.t1t = 4000,			/* (sl) T1T 4 to 12 sec */
+	.t2t = 60000,			/* (sl) T2T 30 to 90 sec */
+	.t1s = 4000,			/* (sl) T1S 4 to 12 sec */
 };
 
 static mtp_opt_conf_na_t jttc_na_config_default = {
-      t1:((800 * HZ) / 1000),	/* (sl) T1 0.5 (0.8) 1.2 sec */
-      t1r:((800 * HZ) / 1000),	/* (sp) T1R 0.5 (0.8) 1.2 sec */
-      t2:((1400 * HZ) / 1000),	/* (sl) T2 0.7 (1.4) 2.0 sec */
-      t3:((800 * HZ) / 1000),	/* (sl) T3 0.5 (0.8) 1.2 sec */
-      t4:((800 * HZ) / 1000),	/* (sl) T4 0.5 (0.8) 1.2 sec */
-      t5:((800 * HZ) / 1000),	/* (sl) T5 0.5 (0.8) 1.2 sec */
-      t6:((800 * HZ) / 1000),	/* (rt) T6 0.5 (0.8) 1.2 sec */
-      t7:((1500 * HZ) / 1000),	/* (lk) T7 1 to 2 sec */
-      t8:((1000 * HZ) / 1000),	/* (rs) T8 0.8 to 1.2 sec */
-      t10:(45 * HZ),		/* (rt) T10 30 to 60 sec */
-      t11:(60 * HZ),		/* (rs) T11 30 to 90 sec */
-      t12:((1150 * HZ) / 1000),/* (sl) T12 0.8 to 1.5 sec */
-      t13:((1150 * HZ) / 1000),/* (sl) T13 0.8 to 1.5 sec */
-      t14:((2500 * HZ) / 1000),/* (sl) T14 2 to 3 sec */
-      t15:((2500 * HZ) / 1000),/* (rs) T15 2 to 3 sec */
-      t16:((1700 * HZ) / 1000),/* (rs) T16 1.4 to 2.0 sec */
-      t17:((1150 * HZ) / 1000),/* (sl) T17 0.8 to 1.5 sec */
-      t18:(600 * HZ),		/* (sp) T18 network dependent */
-      t18a:(12 * HZ),		/* (rs) T18A 2 to 20 sec */
-      t19:(68 * HZ),		/* (sp) T19 67 to 69 sec */
-      t19a:(540 * HZ),		/* (sl) T19A 480 to 600 sec */
-      t20:(60 * HZ),		/* (sp) T20 59 to 61 sec */
-      t20a:(105 * HZ),		/* (sl) T20A 90 to 120 sec */
-      t21:(64 * HZ),		/* (sp) T21 63 to 65 sec */
-      t21a:(105 * HZ),		/* (sl) T21A 90 to 120 sec */
-      t22:(270 * HZ),		/* (sl) T22 3 to 6 min */
-      t22a:(600 * HZ),		/* (sp) T22A network dependent */
-      t23:(270 * HZ),		/* (sl) T23 3 to 6 min */
-      t23a:(600 * HZ),		/* (sp) T23A network dependent */
-      t24:((500 * HZ) / 1000),	/* (sl) T24 500 ms */
-      t24a:(600 * HZ),		/* (sp) T24A network dependent */
-      t25a:(32 * HZ),		/* (sp) T25 32 to 35 sec */
-      t26a:(13 * HZ),		/* (sp) T26 12 to 15 sec */
-      t27a:(3 * HZ),		/* (sp) T27 2 (3) 5 sec */
-      t28a:(19 * HZ),		/* (sp) T28 3 to 35 sec */
-      t29a:(63 * HZ),		/* (sp) T29 60 to 65 sec */
-      t30a:(33 * HZ),		/* (sp) T30 30 to 35 sec */
-      t31a:(60 * HZ),		/* (sl) T31 10 to 120 sec */
-      t32a:(60 * HZ),		/* (sl) T32 5 to 120 sec */
-      t33a:(360 * HZ),		/* (sl) T33 60 to 600 sec */
-      t34a:(60 * HZ),		/* (sl) T34 5 to 120 sec */
-      t1t:(4 * HZ),		/* (sl) T1T 4 to 12 sec */
-      t2t:(60 * HZ),		/* (sl) T2T 30 to 90 sec */
-      t1s:(4 * HZ),		/* (sl) T1S 4 to 12 sec */
+	.t1 = 800,			/* (sl) T1 0.5 (0.8) 1.2 sec */
+	.t1r = 800,			/* (sp) T1R 0.5 (0.8) 1.2 sec */
+	.t2 = 1400,			/* (sl) T2 0.7 (1.4) 2.0 sec */
+	.t3 = 800,			/* (sl) T3 0.5 (0.8) 1.2 sec */
+	.t4 = 800,			/* (sl) T4 0.5 (0.8) 1.2 sec */
+	.t5 = 800,			/* (sl) T5 0.5 (0.8) 1.2 sec */
+	.t6 = 800,			/* (rt) T6 0.5 (0.8) 1.2 sec */
+	.t7 = 1500,			/* (lk) T7 1 to 2 sec */
+	.t8 = 1000,			/* (rs) T8 0.8 to 1.2 sec */
+	.t10 = 45000,			/* (rt) T10 30 to 60 sec */
+	.t11 = 60000,			/* (rs) T11 30 to 90 sec */
+	.t12 = 1150,			/* (sl) T12 0.8 to 1.5 sec */
+	.t13 = 1150,			/* (sl) T13 0.8 to 1.5 sec */
+	.t14 = 2500,			/* (sl) T14 2 to 3 sec */
+	.t15 = 2500,			/* (rs) T15 2 to 3 sec */
+	.t16 = 1700,			/* (rs) T16 1.4 to 2.0 sec */
+	.t17 = 1150,			/* (sl) T17 0.8 to 1.5 sec */
+	.t18 = 600000,			/* (sp) T18 network dependent */
+	.t18a = 12000,			/* (rs) T18A 2 to 20 sec */
+	.t19 = 68000,			/* (sp) T19 67 to 69 sec */
+	.t19a = 540000,			/* (sl) T19A 480 to 600 sec */
+	.t20 = 60000,			/* (sp) T20 59 to 61 sec */
+	.t20a = 105000,			/* (sl) T20A 90 to 120 sec */
+	.t21 = 64000,			/* (sp) T21 63 to 65 sec */
+	.t21a = 105000,			/* (sl) T21A 90 to 120 sec */
+	.t22 = 270000,			/* (sl) T22 3 to 6 min */
+	.t22a = 600000,			/* (sp) T22A network dependent */
+	.t23 = 270000,			/* (sl) T23 3 to 6 min */
+	.t23a = 600000,			/* (sp) T23A network dependent */
+	.t24 = 500,			/* (sl) T24 500 ms */
+	.t24a = 600000,			/* (sp) T24A network dependent */
+	.t25a = 32000,			/* (sp) T25 32 to 35 sec */
+	.t26a = 13000,			/* (sp) T26 12 to 15 sec */
+	.t27a = 3000,			/* (sp) T27 2 (3) 5 sec */
+	.t28a = 19000,			/* (sp) T28 3 to 35 sec */
+	.t29a = 63000,			/* (sp) T29 60 to 65 sec */
+	.t30a = 33000,			/* (sp) T30 30 to 35 sec */
+	.t31a = 60000,			/* (sl) T31 10 to 120 sec */
+	.t32a = 60000,			/* (sl) T32 5 to 120 sec */
+	.t33a = 360000,			/* (sl) T33 60 to 600 sec */
+	.t34a = 60000,			/* (sl) T34 5 to 120 sec */
+	.t1t = 4000,			/* (sl) T1T 4 to 12 sec */
+	.t2t = 60000,			/* (sl) T2T 30 to 90 sec */
+	.t1s = 4000,			/* (sl) T1S 4 to 12 sec */
 };
 
 struct mtp_timer {
@@ -4162,7 +4206,7 @@ mtp_timer_stop(struct mtp *mtp, const uint t)
 	}
 }
 static inline void
-mtp_timer_start(struct mtp *mtp, const uint t)
+mtp_timer_start(queue_t *q, struct mtp *mtp, const uint t)
 {
 	switch (t) {
 	default:
@@ -4225,23 +4269,23 @@ rs_timer_stop(struct rs *rs, const uint t)
 	}
 }
 static void
-rs_timer_start(struct rs *rs, const uint t)
+rs_timer_start(queue_t *q, struct rs *rs, const uint t)
 {
 	switch (t) {
 	case t8:
-		mi_timer(rs->timers.t8, rs->config.t8);
+		mi_timer(q, rs->timers.t8, rs->config.t8);
 		break;
 	case t11:
-		mi_timer(rs->timers.t11, rs->config.t11);
+		mi_timer(q, rs->timers.t11, rs->config.t11);
 		break;
 	case t15:
-		mi_timer(rs->timers.t15, rs->config.t15);
+		mi_timer(q, rs->timers.t15, rs->config.t15);
 		break;
 	case t16:
-		mi_timer(rs->timers.t16, rs->config.t16);
+		mi_timer(q, rs->timers.t16, rs->config.t16);
 		break;
 	case t18a:
-		mi_timer(rs->timers.t18a, rs->config.t18a);
+		mi_timer(q, rs->timers.t18a, rs->config.t18a);
 		break;
 	default:
 		swerr();
@@ -4277,11 +4321,11 @@ cr_timer_stop(struct cr *cr, const uint t)
 	}
 }
 static void
-cr_timer_start(struct cr *cr, const uint t)
+cr_timer_start(queue_t *q, struct cr *cr, const uint t)
 {
 	switch (t) {
 	case t6:
-		mi_timer(cr->timers.t6, cr->rt.onto->config.t6);
+		mi_timer(q, cr->timers.t6, cr->rt.onto->config.t6);
 		break;
 	default:
 		swerr();
@@ -4319,11 +4363,11 @@ rt_timer_stop(struct rt *rt, const uint t)
 	}
 }
 static void
-rt_timer_start(struct rt *rt, const uint t)
+rt_timer_start(queue_t *q, struct rt *rt, const uint t)
 {
 	switch (t) {
 	case t10:
-		mi_timer(rt->timers.t10, rt->config.t10);
+		mi_timer(q, rt->timers.t10, rt->config.t10);
 		break;
 	default:
 		swerr();
@@ -4387,11 +4431,6 @@ sp_timer_stop(struct sp *sp, const uint t)
 		if (single)
 			break;
 		/* fall through */
-	case t25a:
-		mi_timer_stop(sp->timers.t25a);
-		if (single)
-			break;
-		/* fall through */
 	case t26a:
 		mi_timer_stop(sp->timers.t26a);
 		if (single)
@@ -4402,21 +4441,6 @@ sp_timer_stop(struct sp *sp, const uint t)
 		if (single)
 			break;
 		/* fall through */
-	case t28a:
-		mi_timer_stop(sp->timers.t28a);
-		if (single)
-			break;
-		/* fall through */
-	case t29a:
-		mi_timer_stop(sp->timers.t29a);
-		if (single)
-			break;
-		/* fall through */
-	case t30a:
-		mi_timer_stop(sp->timers.t30a);
-		if (single)
-			break;
-		/* fall through */
 		break;
 	default:
 		swerr();
@@ -4424,50 +4448,38 @@ sp_timer_stop(struct sp *sp, const uint t)
 	}
 }
 static void
-sp_timer_start(struct sp *sp, const uint t)
+sp_timer_start(queue_t *q, struct sp *sp, const uint t)
 {
 	switch (t) {
 	case t1r:
-		mi_timer(sp->timers.t1r, sp->config.t1r);
+		mi_timer(q, sp->timers.t1r, sp->config.t1r);
 		break;
 	case t18:
-		mi_timer(sp->timers.t18, sp->config.t18);
+		mi_timer(q, sp->timers.t18, sp->config.t18);
 		break;
 	case t19:
-		mi_timer(sp->timers.t19, sp->config.t19);
+		mi_timer(q, sp->timers.t19, sp->config.t19);
 		break;
 	case t20:
-		mi_timer(sp->timers.t20, sp->config.t20);
+		mi_timer(q, sp->timers.t20, sp->config.t20);
 		break;
 	case t21:
-		mi_timer(sp->timers.t21, sp->config.t21);
+		mi_timer(q, sp->timers.t21, sp->config.t21);
 		break;
 	case t22a:
-		mi_timer(sp->timers.t22a, sp->config.t22a);
+		mi_timer(q, sp->timers.t22a, sp->config.t22a);
 		break;
 	case t23a:
-		mi_timer(sp->timers.t23a, sp->config.t23a);
+		mi_timer(q, sp->timers.t23a, sp->config.t23a);
 		break;
 	case t24a:
-		mi_timer(sp->timers.t24a, sp->config.t24a);
-		break;
-	case t25a:
-		mi_timer(sp->timers.t25a, sp->config.t25a);
+		mi_timer(q, sp->timers.t24a, sp->config.t24a);
 		break;
 	case t26a:
-		mi_timer(sp->timers.t26a, sp->config.t26a);
+		mi_timer(q, sp->timers.t26a, sp->config.t26a);
 		break;
 	case t27a:
-		mi_timer(sp->timers.t27a, sp->config.t27a);
-		break;
-	case t28a:
-		mi_timer(sp->timers.t28a, sp->config.t28a);
-		break;
-	case t29a:
-		mi_timer(sp->timers.t29a, sp->config.t29a);
-		break;
-	case t30a:
-		mi_timer(sp->timers.t30a, sp->config.t30a);
+		mi_timer(q, sp->timers.t27a, sp->config.t27a);
 		break;
 	default:
 		swerr();
@@ -4523,23 +4535,23 @@ cb_timer_stop(struct cb *cb, const uint t)
 	}
 }
 static void
-cb_timer_start(struct cb *cb, const uint t)
+cb_timer_start(queue_t *q, struct cb *cb, const uint t)
 {
 	switch (t) {
 	case t1:
-		mi_timer(cb->timers.t1, cb->sl.from->config.t1);
+		mi_timer(q, cb->timers.t1, cb->sl.from->config.t1);
 		break;
 	case t2:
-		mi_timer(cb->timers.t2, cb->sl.from->config.t2);
+		mi_timer(q, cb->timers.t2, cb->sl.from->config.t2);
 		break;
 	case t3:
-		mi_timer(cb->timers.t3, cb->sl.from->config.t3);
+		mi_timer(q, qb->timers.t3, cb->sl.from->config.t3);
 		break;
 	case t4:
-		mi_timer(cb->timers.t4, cb->sl.from->config.t4);
+		mi_timer(q, cb->timers.t4, cb->sl.from->config.t4);
 		break;
 	case t5:
-		mi_timer(cb->timers.t5, cb->sl.from->config.t5);
+		mi_timer(q, cb->timers.t5, cb->sl.from->config.t5);
 		break;
 	default:
 		swerr();
@@ -4571,7 +4583,7 @@ ls_timer_stop(struct ls *ls, const uint t)
 	}
 }
 static inline void
-ls_timer_start(struct ls *ls, const uint t)
+ls_timer_start(queue_t *q, struct ls *ls, const uint t)
 {
 	switch (t) {
 	default:
@@ -4602,18 +4614,51 @@ lk_timer_stop(struct lk *lk, const uint t)
 			break;
 		/* fall through */
 		break;
+	case t25a:
+		mi_timer_stop(lk->timers.t25a);
+		if (single)
+			break;
+		/* fall through */
+		break;
+	case t28a:
+		mi_timer_stop(lk->timers.t28a);
+		if (single)
+			break;
+		/* fall through */
+	case t29a:
+		mi_timer_stop(lk->timers.t29a);
+		if (single)
+			break;
+		/* fall through */
+	case t30a:
+		mi_timer_stop(lk->timers.t30a);
+		if (single)
+			break;
+		/* fall through */
+		break;
 	default:
 		swerr();
 		break;
 	}
 }
 static inline void
-lk_timer_start(struct lk *lk, const uint t)
+lk_timer_start(queue_t *q, struct lk *lk, const uint t)
 {
 	switch (t) {
 	case t7:
-		mi_timer(lk->timers.t7, lk->config.t7);
+		mi_timer(q, lk->timers.t7, lk->config.t7);
 		break;
+	case t25a:
+		mi_timer(q, lk->timers.t25a, lk->config.t25a);
+		break;
+	case t28a:
+		mi_timer(q, lk->timers.t28a, lk->config.t28a);
+		breakq,;
+	case t29a:
+		mi_timer(q, lk->timers.t29a, lk->config.t29a);
+		break;
+	case t30a:
+		mi_timer(q, lk->timers.t30a, lk->config.t30a);
 	default:
 		swerr();
 		break;
@@ -4728,59 +4773,59 @@ sl_timer_stop(struct sl *sl, const uint t)
 	}
 }
 static void
-sl_timer_start(struct sl *sl, const uint t)
+sl_timer_start(queue_t *q, struct sl *sl, const uint t)
 {
 	switch (t) {
 	case t12:
-		mi_timer(sl->timers.t12, sl->config.t12);
+		mi_timer(q, sl->timers.t12, sl->config.t12);
 		break;
 	case t13:
-		mi_timer(sl->timers.t13, sl->config.t13);
+		mi_timer(q, sl->timers.t13, sl->config.t13);
 		break;
 	case t14:
-		mi_timer(sl->timers.t14, sl->config.t14);
+		mi_timer(q, sl->timers.t14, sl->config.t14);
 		break;
 	case t17:
-		mi_timer(sl->timers.t17, sl->config.t17);
+		mi_timer(q, sl->timers.t17, sl->config.t17);
 		break;
 	case t19a:
-		mi_timer(sl->timers.t19a, sl->config.t19a);
+		mi_timer(q, sl->timers.t19a, sl->config.t19a);
 		break;
 	case t20a:
-		mi_timer(sl->timers.t20a, sl->config.t20a);
+		mi_timer(q, sl->timers.t20a, sl->config.t20a);
 		break;
 	case t21a:
-		mi_timer(sl->timers.t21a, sl->config.t21a);
+		mi_timer(q, sl->timers.t21a, sl->config.t21a);
 		break;
 	case t22:
-		mi_timer(sl->timers.t22, sl->config.t22);
+		mi_timer(q, sl->timers.t22, sl->config.t22);
 		break;
 	case t23:
-		mi_timer(sl->timers.t23, sl->config.t23);
+		mi_timer(q, sl->timers.t23, sl->config.t23);
 		break;
 	case t24:
-		mi_timer(sl->timers.t24, sl->config.t24);
+		mi_timer(q, sl->timers.t24, sl->config.t24);
 		break;
 	case t31a:
-		mi_timer(sl->timers.t31a, sl->config.t31a);
+		mi_timer(q, sl->timers.t31a, sl->config.t31a);
 		break;
 	case t32a:
-		mi_timer(sl->timers.t32a, sl->config.t32a);
+		mi_timer(q, sl->timers.t32a, sl->config.t32a);
 		break;
 	case t33a:
-		mi_timer(sl->timers.t33a, sl->config.t33a);
+		mi_timer(q, sl->timers.t33a, sl->config.t33a);
 		break;
 	case t34a:
-		mi_timer(sl->timers.t34a, sl->config.t34a);
+		mi_timer(q, sl->timers.t34a, sl->config.t34a);
 		break;
 	case t1t:
-		mi_timer(sl->timers.t1t, sl->config.t1t);
+		mi_timer(q, sl->timers.t1t, sl->config.t1t);
 		break;
 	case t2t:
-		mi_timer(sl->timers.t2t, sl->config.t2t);
+		mi_timer(q, sl->timers.t2t, sl->config.t2t);
 		break;
 	case t1s:
-		mi_timer(sl->timers.t1s, sl->config.t1s);
+		mi_timer(q, sl->timers.t1s, sl->config.t1s);
 		break;
 	default:
 		swerr();
@@ -4803,7 +4848,7 @@ sl_timer_start(struct sl *sl, const uint t)
 static int
 mtp_status_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, int status)
 {
-	switch (mtp->i_style) {
+	switch (mtp->i.type) {
 	case MTP_STYLE_MTPI:
 	case MTP_STYLE_MGMT:
 		switch (status) {
@@ -4816,21 +4861,21 @@ mtp_status_ind(queue_t *q, struct mtp *mtp, struct mtp_addr *dst, int status)
 		}
 		break;
 	case MTP_STYLE_TPI:
-		switch (mtp->prot->SERV_type) {
-		case T_CLTS:
+		if (mtp->i.style == T_CLTS) {
+			/* T_CLTS */
 			return t_uderror_ind(q, mtp, dst, NULL, NULL, status);
-		case T_COTS:
-		case T_COTS_ORD:
+		} else {
+			/* T_COTS */
 			fixme(("We should send an optdata indication with null data instead\n"));
 			return t_uderror_ind(q, mtp, dst, NULL, NULL, status);
 		}
 		break;
 	case MTP_STYLE_NPI:
-		switch (mtp->prot->SERV_type) {
-		case T_CLTS:	/* N_CLNS */
+		if (mtp->i.style == T_CLTS) {
+			/* N_CLNS */
 			return n_uderror_ind(q, mtp, dst, NULL, NULL, status);
-		case T_COTS:	/* N_CONS */
-		case T_COTS_ORD:
+		} else {
+			/* N_CONS */
 			todo(("We should actually set the originator properly\n"));
 			return n_reset_ind(q, mtp, N_UNDEFINED, status);
 		}
@@ -4899,6 +4944,37 @@ mtp_cong_status_ind_all_local(queue_t *q, struct rs *rs, uint newstatus)
 	for (i = 0; i < 16; i++)
 		for (mtp = rs->sp.sp->mtp.lists[i]; mtp; mtp = mtp->sp.next)
 			if ((err = mtp_cong_status_ind(q, mtp, rs, newstatus)))
+				return (err);
+	return (0);
+}
+static int
+mtp_restr_status_ind(queue_t *q, struct mtp *mtp, struct rs *rs)
+{
+	struct mtp_addr dest = mtp->src;
+	uint error = T_MTP_RESTRICTED;
+
+	dest.pc = rs->dest;
+	switch (rs->rs_type) {
+	default:
+		swerr();
+	case RT_TYPE_MEMBER:
+		error |= T_MTP_M_MEMBER;
+		break;
+	case RT_TYPE_CLUSTER:
+		error |= T_MTP_M_CLUSTER;
+		break;
+	}
+	return mtp_status_ind(q, mtp, &dest, error);
+}
+static int
+mtp_restr_status_ind_all_local(queue_t *q, struct rs *rs)
+{
+	int i, err;
+	struct mtp *mtp;
+
+	for (i = 0; i < 16; i++)
+		for (mtp = rs->sp.sp->mtp.lists[i]; mtp; mtp = mtp->sp.next)
+			if ((err = mtp_restr_status_ind(q, mtp, rs)))
 				return (err);
 	return (0);
 }
@@ -4985,38 +5061,32 @@ mtp_transfer_ind(queue_t *q, struct mtp *mtp, struct mtp_msg *m)
 	mblk_t *dp;
 
 	if ((dp = ss7_dupb(q, m->bp))) {
-	      struct mtp_addr src = { ni: m->ni, pc: m->opc, si:m->si };
-	      struct mtp_addr dst = { ni: m->ni, pc: m->dpc, si:m->si };
+		struct mtp_addr src = { ni:m->ni, pc:m->opc, si:m->si };
+		struct mtp_addr dst = { ni:m->ni, pc:m->dpc, si:m->si };
 
 		dp->b_rptr = m->data;
 		dp->b_wptr = dp->b_rptr + m->dlen;
-		switch (mtp->i_style) {
+		switch (mtp->i.type) {
 		default:
 		case MTP_STYLE_MTPI:
 		case MTP_STYLE_MGMT:
 			return m_transfer_ind(q, mtp, &src, m->sls, m->mp, dp);
 		case MTP_STYLE_TPI:
-			switch (mtp->prot->SERV_type) {
-			case T_CLTS:
+			if (mtp->i.style == T_CLTS) {
+				/* T_CLTS */
 				return t_unitdata_ind(q, mtp, &src, NULL, dp);
-			case T_COTS:
-			case T_COTS_ORD:
+			} else {
+				/* T_COTS */
 				return t_data_ind(q, mtp, 0, dp);
-			default:
-				swerr();
-				break;
 			}
 			break;
 		case MTP_STYLE_NPI:
-			switch (mtp->prot->SERV_type) {
-			case T_CLTS:	/* N_CLNS */
+			if (mtp->i.style == T_CLTS) {
+				/* N_CLNS */
 				return n_unitdata_ind(q, mtp, &src, &dst, dp);
-			case T_COTS:	/* N_CONS */
-			case T_COTS_ORD:
+			} else {
+				/* N_CONS */
 				return n_data_ind(q, mtp, 0, dp);
-			default:
-				swerr();
-				break;
 			}
 			break;
 		}
@@ -5031,20 +5101,17 @@ mtp_transfer_ind_local(queue_t *q, struct sp *sp, struct mtp_msg *m)
 	struct mtp *mtp;
 
 	for (mtp = sp->mtp.lists[m->si & 0xf]; mtp; mtp = mtp->sp.next) {
-		switch (mtp->prot->SERV_type) {
-		default:
-			swerr();
-		case T_CLTS:
+		if (mtp->i.style == T_CLTS) {
+			/* T_CLTS */
 			if (mtp->state != TS_IDLE || mtp->src.pc != m->dpc)
 				continue;
-			break;
-		case T_COTS:
-		case T_COTS_ORD:
+		} else {
+			/* T_COTS */
 			if (mtp->state != TS_DATA_XFER || mtp->src.pc != m->dpc
 			    || mtp->dst.pc != m->opc)
 				continue;
-			break;
 		}
+		break;
 	}
 	if (mtp)
 		return mtp_transfer_ind(q, mtp, m);
@@ -5114,7 +5181,7 @@ static int
 mtp_send_link(queue_t *q, mblk_t *dp, struct sl *sl)
 {
 	(void) q;
-	if (canputnext(sl->oq)) {
+	if (canputnext(sl->wq)) {
 		if (sl->lk.lk->ls.ls->lk.numb > 1) {
 			/* only rotate on combined linksets (i.e. not C-links) */
 			struct sp *sp = sl->lk.lk->sp.loc;
@@ -5138,7 +5205,7 @@ mtp_send_link(queue_t *q, mblk_t *dp, struct sl *sl)
 			}
 			}
 		}
-		putnext(sl->oq, dp);	/* send message */
+		putnext(sl->wq, dp);	/* send message */
 		return (0);
 	}
 	rare();
@@ -5212,11 +5279,11 @@ mtp_send_route(queue_t *q, struct sp *sp, mblk_t *mp, uint priority, uint32_t dp
 		if ((err = mtp_cong_status_ind_all_local(q, rs, sl->cong_status)))
 			return (err);
 		rs->cong_status = sl->cong_status;
-		rs_timer_start(rs, t15);
+		rs_timer_start(q, rs, t15);
 	}
 	if (sl->disc_status > priority)
 		goto discard;
-	if (!canputnext(sl->oq))
+	if (!canputnext(sl->wq))
 		goto ebusy;
 	/* Note: we do not do SLS bit rotation for messages sent from this signalling point, even
 	   if it is an STP.  We only perform SLS bit rotation on messages transferred across a
@@ -5242,7 +5309,7 @@ mtp_send_route(queue_t *q, struct sp *sp, mblk_t *mp, uint priority, uint32_t dp
 		}
 	}
 	sl->flags |= SLF_TRAFFIC;
-	putnext(sl->oq, mp);	/* send message */
+	putnext(sl->wq, mp);	/* send message */
 	return (0);
       discard:
 	/* This is for management messages only, so we do not report congestion or prohibited
@@ -5261,7 +5328,7 @@ mtp_send_route(queue_t *q, struct sp *sp, mblk_t *mp, uint priority, uint32_t dp
 /*
  *  SEND ROUTE (LOADSHARE)
  *  -------------------------------------------------------------------------
- *  Full routine for a message we created with loadsharing.
+ *  Full routing for a message we created with loadsharing.
  */
 static int
 mtp_send_route_loadshare(queue_t *q, struct sp *sp, mblk_t *bp, uint mp, uint32_t dpc, uint sls)
@@ -5878,75 +5945,67 @@ static int
 mtp_tfp_broadcast(queue_t *q, struct rs *rs)
 {
 	struct sp *sp = rs->sp.sp;
+	struct ls *ls;
 	int err;
 
+	/* inform users */
 	if ((err = mtp_pause_ind_all_local(q, rs)))
 		return (err);
-	if (sp->flags & SPF_XFER_FUNC) {
-		if (!(rs->flags & RSF_CLUSTER)) {
-			struct ls *ls;
 
-			for (ls = sp->ls.list; ls; ls = ls->sp.next) {
-				struct lk *lk;
+	/* adjacent SP broadcast is only for STPs */
+	/* do not broadcast during restart phase 1 */
+	if (!(sp->flags & SPF_XFER_FUNC) || (sp->flags & SPF_RESTART_PHASE_1))
+		return (0);
 
-				for (lk = ls->lk.list; lk; lk = lk->ls.next) {
-					struct rs *adj = lk->sp.adj;
+	for (ls = sp->ls.list; ls; ls = ls->sp.next) {
+		struct lk *lk;
 
-					if (adj->dest == rs->dest)
-						continue;
-					mtp_send_tfp(q, sp, lk->ni, adj->dest, sp->pc, 0, rs->dest);
-				}
-			}
-		} else {
-			struct ls *ls;
+		for (lk = ls->lk.list; lk; lk = lk->ls.next) {
+			struct rs *adj = lk->sp.adj;
 
-			for (ls = sp->ls.list; ls; ls = ls->sp.next) {
-				struct lk *lk;
-
-				for (lk = ls->lk.list; lk; lk = lk->ls.next) {
-					struct rs *adj = lk->sp.adj;
-
-					mtp_send_tcp(q, sp, lk->ni, adj->dest, sp->pc, 0, rs->dest);
-				}
-			}
+			if (!(rs->flags & RSF_CLUSTER)) {
+				if (adj->dest == rs->dest)
+					continue;
+				mtp_send_tfp(q, sp, lk->ni, adj->dest, sp->pc, 0, rs->dest);
+			} else
+				mtp_send_tcp(q, sp, lk->ni, adj->dest, sp->pc, 0, rs->dest);
 		}
 	}
 	return (0);
 }
 
-/*
-   TFP procedure for STPs during rerouting 
+/**
+ * mtp_tfp_reroute: - perform TFP procedures for STPs during rerouting
+ * @q: active queue
+ * @rl: route list to prohibit traffic from
+ *
+ * This performs special TFP procedures for STPs.  When rerouting traffic toward a route list,
+ * send TFP/TCP for the rerouted traffic to let the adjacent signalling point know that it
+ * cannot route traffic via this STP.
+ *
+ * Note that we ignore the error on sending TFP and TCP, because if we fail to send it now, the
+ * responsive procedure will eventually correct the situation.
  */
 static void
-mtp_tfp_reroute(struct rl *rl)
+mtp_tfp_reroute(queue_t *q, struct rl *rl)
 {
 	struct rs *rs = rl->rs.rs;
 	struct sp *sp = rs->sp.sp;
+	struct rt *rt;
 
-	if (sp->flags & SPF_XFER_FUNC) {
+	if (!(sp->flags & SPF_XFER_FUNC) || (sp->flags & SPF_RESTART_PHASE_1))
+		return;
+
+	for (rt = rl->rt.list; rt; rt = rt->rl.next) {
+		struct lk *lk = rt->lk.lk;
+		struct rs *adj = lk->sp.adj;
+
 		if (!(rs->flags & RSF_CLUSTER)) {
-			struct rt *rt;
-
-			for (rt = rl->rt.list; rt; rt = rt->rl.next) {
-				struct lk *lk = rt->lk.lk;
-				struct rs *adj = lk->sp.adj;
-
-				if (adj->dest != rs->dest)
-					mtp_send_tfp(NULL, sp, lk->ni, adj->dest, sp->pc, 0,
-						     rs->dest);
-			}
-		} else {
-			struct rt *rt;
-
-			for (rt = rl->rt.list; rt; rt = rt->rl.next) {
-				struct lk *lk = rt->lk.lk;
-				struct rs *adj = lk->sp.adj;
-
-				if (adj->dest != rs->dest)
-					mtp_send_tcp(NULL, sp, lk->ni, adj->dest, sp->pc, 0,
-						     rs->dest);
-			}
-		}
+			if (adj->dest == rs->dest)
+				continue;
+			mtp_send_tfp(q, sp, lk->ni, adj->dest, sp->pc, 0, rs->dest);
+		} else
+			mtp_send_tcp(q, sp, lk->ni, adj->dest, sp->pc, 0, rs->dest);
 	}
 }
 
@@ -5976,80 +6035,75 @@ static int
 mtp_tfr_broadcast(queue_t *q, struct rs *rs)
 {
 	struct sp *sp = rs->sp.sp;
+	struct ls *lc, *lp, *ls;
+	int err;
 
-	/* don't inform local users */
-	if (sp->flags & SPF_XFER_FUNC) {
-		/* current and primary linksets were addressed during rerouting */
-		struct ls *lc = rs->rl.curr ? rs->rl.curr->ls.ls : NULL;	/* current link set 
-										 */
-		struct ls *lp = rs->rl.list ? rs->rl.list->ls.ls : NULL;	/* primary link set 
-										 */
-		if (!(rs->flags & RSF_CLUSTER)) {
-			struct ls *ls;
+	/* inform users (for completeness and M3UA) */
+	if ((err = mtp_restr_status_ind_all_local(q, rs)))
+		return (err);
 
-			for (ls = sp->ls.list; ls; ls = ls->sp.next) {
-				struct lk *lk;
+	/* adjacent SP broadcast is only for STPs */
+	/* do not broadcast during restart phase 1 */
+	if (!(sp->flags & SPF_XFER_FUNC) || (sp->flags & SPF_RESTART_PHASE_1))
+		return (0);
 
-				for (lk = ls->lk.list; lk; lk = lk->ls.next) {
-					struct rs *adj = lk->sp.adj;
+	/* current and primary linksets were addressed during rerouting */
+	lc = rs->rl.curr ? rs->rl.curr->ls.ls : NULL;	/* current link set */
+	lp = rs->rl.list ? rs->rl.list->ls.ls : NULL;	/* primary link set */
 
-					if (ls != lc && ls != lp && adj->dest != rs->dest)
-						mtp_send_tfr(q, sp, lk->ni, adj->dest, sp->pc, 0,
-							     rs->dest);
-				}
-			}
-		} else {
-			struct ls *ls;
+	for (ls = sp->ls.list; ls; ls = ls->sp.next) {
+		struct lk *lk;
 
-			for (ls = sp->ls.list; ls; ls = ls->sp.next) {
-				struct lk *lk;
+		for (lk = ls->lk.list; lk; lk = lk->ls.next) {
+			struct rs *adj = lk->sp.adj;
 
-				for (lk = ls->lk.list; lk; lk = lk->ls.next) {
-					struct rs *adj = lk->sp.adj;
-
-					if (ls != lc && ls != lp && adj->dest != rs->dest)
-						mtp_send_tcr(q, sp, lk->ni, adj->dest, sp->pc, 0,
-							     rs->dest);
-				}
-			}
+			if (ls == lc || ls == lp)
+				continue;
+			if (!(rs->flags & RSF_CLUSTER)) {
+				if (adj->dest == rs->dest)
+					continue;
+				mtp_send_tfr(q, sp, lk->ni, adj->dest, sp->pc, 0, rs->dest);
+			} else
+				mtp_send_tcr(q, sp, lk->ni, adj->dest, sp->pc, 0, rs->dest);
 		}
 	}
 	return (0);
 }
 
-/*
-   TFA procedure for STPs during rerouting 
+/**
+ * mtp_tfr_reroute: - perform TFR procedure for STPs during rerouting
+ * @q: active queue
+ * @rl: route list to restrict traffic from
+ *
+ * This performs special TFR procedures for STPs.  When rerouting traffic away from a route
+ * list, to a higher cost route list, send TFR/TCR for the rerouted traffic to let the adjacent
+ * signalling point know that it can now route traffic via this STP, but inefficiently.
+ *
+ * Note that we ignore the error on sending TFR or TCR, because if we fail to send it now, the
+ * route set test procedures of the adjacent singalling point will discover the situation.
+ * Also, if we are short of buffers, we do not mind that the adjacent signalling point does not
+ * yet know of our availability, however inefficient, for these routes.
  */
 static void
-mtp_tfr_reroute(struct rl *rl)
+mtp_tfr_reroute(queue_t *q, struct rl *rl)
 {
 	struct rs *rs = rl->rs.rs;
 	struct sp *sp = rs->sp.sp;
+	struct rt *rt;
 
-	if (sp->flags & SPF_XFER_FUNC) {
+	if (!(sp->flags & SPF_XFER_FUNC) || (sp->flags & SPF_RESTART_PHASE_1))
+		return;
+
+	for (rt = rl->rt.list; rt; rt = rt->rl.next) {
+		struct lk *lk = rt->lk.lk;
+		struct rs *adj = lk->sp.adj;
+
 		if (!(rs->flags * RSF_CLUSTER)) {
-			struct rt *rt;
-
-			for (rt = rl->rt.list; rt; rt = rt->rl.next) {
-				struct lk *lk = rt->lk.lk;
-				struct rs *adj = lk->sp.adj;
-
-				if (adj->dest != rs->dest)
-					mtp_send_tfr(NULL, sp, lk->ni, adj->dest, sp->pc, 0,
-						     rs->dest);
-			}
-		} else {
-			struct rt *rt;
-
-			for (rt = rl->rt.list; rt; rt = rt->rl.next) {
-				struct lk *lk = rt->lk.lk;
-				struct rs *adj = lk->sp.adj;
-
-				if (adj->dest != rs->dest)
-					mtp_send_tcr(NULL, sp, lk->ni, adj->dest, sp->pc, 0,
-						     rs->dest);
-			}
-		}
+			if (adj->dest == rs->dest)
+				continue;
+			mtp_send_tfr(q, sp, lk->ni, adj->dest, sp->pc, 0, rs->dest);
+		} else
+			mtp_send_tcr(q, sp, lk->ni, adj->dest, sp->pc, 0, rs->dest);
 	}
 }
 
@@ -6079,95 +6133,93 @@ static int
 mtp_tfa_broadcast(queue_t *q, struct rs *rs)
 {
 	struct sp *sp = rs->sp.sp;
-
-	/* inform users */
+	struct ls *lc, *lp, *ls;
 	int err;
 
+	/* inform users */
 	if ((err = mtp_resume_ind_all_local(q, rs)))
 		return (err);
-	if (sp->flags & SPF_XFER_FUNC) {
-		/* current and primary linksets were addressed during rerouting below */
-		struct ls *lc = rs->rl.curr ? rs->rl.curr->ls.ls : NULL;	/* current link set 
-										 */
-		struct ls *lp = rs->rl.list ? rs->rl.list->ls.ls : NULL;	/* primary link set 
-										 */
-		if (!(rs->flags & RSF_CLUSTER)) {
-			struct ls *ls;
 
-			for (ls = sp->ls.list; ls; ls = ls->sp.next) {
-				struct lk *lk;
+	/* adjacent SP broadcast is only for STPs */
+	/* do not broadcast during restart phase 1 */
+	if (!(sp->flags & SPF_XFER_FUNC) || (sp->flags & SPF_RESTART_PHASE_1))
+		return (0);
 
-				for (lk = ls->lk.list; lk; lk = lk->ls.next) {
-					struct rs *adj = lk->sp.adj;
+	/* current and primary linksets were addressed during rerouting below */
+	lc = rs->rl.curr ? rs->rl.curr->ls.ls : NULL;	/* current link set */
+	lp = rs->rl.list ? rs->rl.list->ls.ls : NULL;	/* primary link set */
 
-					if (ls != lc && ls != lp && adj->dest != rs->dest)
-						mtp_send_tfa(q, sp, lk->ni, adj->dest, sp->pc, 0,
-							     rs->dest);
-				}
-			}
-		} else {
-			struct ls *ls;
+	for (ls = sp->ls.list; ls; ls = ls->sp.next) {
+		struct lk *lk;
 
-			for (ls = sp->ls.list; ls; ls = ls->sp.next) {
-				struct lk *lk;
+		for (lk = ls->lk.list; lk; lk = lk->ls.next) {
+			struct rs *adj = lk->sp.adj;
 
-				for (lk = ls->lk.list; lk; lk = lk->ls.next) {
-					struct rs *adj = lk->sp.adj;
+			if (ls == lc || ls == lp)
+				continue;
+			if (!(rs->flags & RSF_CLUSTER)) {
+				if (adj->dest == rs->dest)
+					continue;
+				mtp_send_tfa(q, sp, lk->ni, adj->dest, sp->pc, 0, rs->dest);
+			} else
+				mtp_send_tca(q, sp, lk->ni, adj->dest, sp->pc, 0, rs->dest);
 
-					if (ls != lc && ls != lp && adj->dest != rs->dest)
-						mtp_send_tca(q, sp, lk->ni, adj->dest, sp->pc, 0,
-							     rs->dest);
-				}
-			}
+			/* Note that errors are ignored on sending TFA/TCA because remote route set 
+			   test procedures will discover the loss. */
 		}
 	}
 	return (0);
 }
 
-/*
-   TFA procedure for STPs during rerouting 
+/**
+ * mtp_tfa_reroute: - perform TFA procedure for STPs during rerouting
+ * @q: active queue
+ * @rl: route list to allow traffic from
+ *
+ * This performs special TFA procedures for STPs.  When rerouting traffic away from a route
+ * list, to a lower cost route list, send TFA/TCA for the rerouted traffic to let the adjacent
+ * signalling point know that it can now route traffic via this STP.
+ *
+ * Note that we ignore the error on sending TFA or TCA, because if we fail to send it now, the
+ * route set test procedures of the adjacent singalling point will discover the situation.
+ * Also, if we are short of buffers, we do not mind that the adjacent signalling point does not
+ * yet know of our availability for these routes.
  */
 static void
-mtp_tfa_reroute(struct rl *rl)
+mtp_tfa_reroute(queue_t *q, struct rl *rl)
 {
 	struct rs *rs = rl->rs.rs;
 	struct sp *sp = rs->sp.sp;
+	struct rt *rt;
 
-	if (sp->flags & SPF_XFER_FUNC) {
-		if (!(rs->flags * RSF_CLUSTER)) {
-			struct rt *rt;
+	if (!(sp->flags & SPF_XFER_FUNC) || (sp->flags & SPF_RESTART_PHASE_1))
+		return;
 
-			for (rt = rl->rt.list; rt; rt = rt->rl.next) {
-				struct lk *lk = rt->lk.lk;
-				struct rs *adj = lk->sp.adj;
+	for (rt = rl->rt.list; rt; rt = rt->rl.next) {
+		struct lk *lk = rt->lk.lk;
+		struct rs *adj = lk->sp.adj;
 
-				if (adj->dest != rs->dest)
-					mtp_send_tfa(NULL, sp, lk->ni, adj->dest, sp->pc, 0,
-						     rs->dest);
-			}
-		} else {
-			struct rt *rt;
-
-			for (rt = rl->rt.list; rt; rt = rt->rl.next) {
-				struct lk *lk = rt->lk.lk;
-				struct rs *adj = lk->sp.adj;
-
-				if (adj->dest != rs->dest)
-					mtp_send_tca(NULL, sp, lk->ni, adj->dest, sp->pc, 0,
-						     rs->dest);
-			}
-		}
+		if (!(rs->flags & RSF_CLUSTER)) {
+			if (adj->dest == rs->dest)
+				continue;
+			mtp_send_tfa(q, sp, lk->ni, adj->dest, sp->pc, 0, rs->dest);
+		} else
+			mtp_send_tca(q, sp, lk->ni, adj->dest, sp->pc, 0, rs->dest);
 	}
 }
 
-/*
- *  SEND XFER
- *  ------------------------------------------------------------------------
- *  Full routing for messages transfered through a signalling transfer point.  This is for normal transfer messages
- *  (including the possibility of circular route tests).
+/**
+ * mtp_xfer_route: - route messages through a signalling transfer point
+ * @q: active queue
+ * @sl: signalling link from which message arrived
+ * @mp: the message
+ * @m: the message decoding
+ *
+ * Full routing for messages transfered through a signalling transfer point.  This is for
+ * normal transfer messages (including the possibility of circular route tests).
  */
 static int
-mtp_xfer_route(struct sl *sl, queue_t *q, mblk_t *mp, struct mtp_msg *m)
+mtp_xfer_route(queue_t *q, struct sl *sl, mblk_t *mp, struct mtp_msg *m)
 {
 	struct lk *lk = sl->lk.lk;	/* the link (set) on which the message arrived */
 	struct rs *rs;			/* the outgoing route set when transferring */
@@ -6219,7 +6271,7 @@ mtp_xfer_route(struct sl *sl, queue_t *q, mblk_t *mp, struct mtp_msg *m)
 			   TFR sent, we need to start timer T18a. */
 			if ((rs->flags & RSF_TFR_PENDING)) {
 				rs->flags &= ~RSF_TFR_PENDING;
-				rs_timer_start(rs, t18a);
+				rs_timer_start(q, rs, t18a);
 			}
 		}
 		/* fall through */
@@ -6238,12 +6290,12 @@ mtp_xfer_route(struct sl *sl, queue_t *q, mblk_t *mp, struct mtp_msg *m)
 	case RS_INACTIVE:
 		/* if the destination is currently inaccessible and we have not sent a TFP within
 		   the last t8, send a responsive TFP */
-		if (!rs->timers.t8) {
+		if (!mi_timer_remain(rs->timers.t8)) {
 			if (!(rs->flags & RSF_CLUSTER))
 				mtp_send_tfp(q, loc, m->ni, adj->dest, loc->pc, 0, rs->dest);
 			else
 				mtp_send_tcp(q, loc, m->ni, adj->dest, loc->pc, 0, rs->dest);
-			rs_timer_start(rs, t8);
+			rs_timer_start(q, rs, t8);
 		}
 		return (0);
 	}
@@ -6289,7 +6341,7 @@ mtp_xfer_route(struct sl *sl, queue_t *q, mblk_t *mp, struct mtp_msg *m)
 			goto error;
 	if (sl->disc_status > m->mp)
 		goto discard;
-	if (!canputnext(sl->oq))
+	if (!canputnext(sl->wq))
 		goto ebusy;
 	if (rl->rt.numb > 1) {
 		/* Only rotate when part of the sls was actually used for route selection (i.e. not 
@@ -6310,7 +6362,7 @@ mtp_xfer_route(struct sl *sl, queue_t *q, mblk_t *mp, struct mtp_msg *m)
 		}
 	}
 	sl->flags |= SLF_TRAFFIC;
-	putnext(sl->oq, mp);	/* send message */
+	putnext(sl->wq, mp);	/* send message */
 	return (0);
       screened:
 	todo(("Deliver screened message to MGMT\n"));
@@ -6341,19 +6393,21 @@ mtp_xfer_route(struct sl *sl, queue_t *q, mblk_t *mp, struct mtp_msg *m)
  *
  *  -------------------------------------------------------------------------
  */
-/*
- *  CR REROUTE BUFFER
- *  -----------------------------------
- *  Controlled rerouting is performed with a special controlled rerouting buffer which is attached to both the route
- *  from which traffic is being rerouted and the route to which traffic is being rerouted.  If the routeset has
- *  become unavailable while the timer was running, this will result in purging the controlled rerouting buffer.  If
- *  the unavailability was transient and the routeset is now available again, these messages will not be lost.  This
- *  is not mentioned in the MTP specifications.
+/**
+ * cr_reroute_buffer: - reroute controlled rerouting buffer contents
+ * @cr: controlled rerouting buffer
  *
- *  Rerouting a controlled rerouting buffer consists of diverting the buffer contents on the normal route onto which
- *  traffic was being held for diversion.
+ * Controlled rerouting is performed with a special controlled rerouting buffer which is
+ * attached to both the route from which traffic is being rerouted and the route to which
+ * traffic is being rerouted.  If the routeset has become unavailable while the timer was
+ * running, this will result in purging the controlled rerouting buffer.  If the unavailability
+ * was transient and the routeset is now available again, these messages will not be lost.
+ * This is not mentioned in the MTP specifications.
+ *
+ * Rerouting a controlled rerouting buffer consists of diverting the buffer contents on the
+ * normal route onto which traffic was being held for diversion.
  */
-static int
+static void
 cr_reroute_buffer(struct cr *cr)
 {
 	struct cr **cr_slot = &cr->rl.rl->smap[cr->index].cr;
@@ -6362,8 +6416,8 @@ cr_reroute_buffer(struct cr *cr)
 	cr_timer_stop(cr, tall);
 	if (cr->rt.onto) {
 		if (*cr_slot == cr) {
-			cr_put(xchg(cr_slot, NULL));
-			*rt_slot = rt_get(cr->rt.onto);
+			*cr_slot = NULL;
+			*rt_slot = cr->rt.onto;
 		} else if (*rt_slot != cr->rt.onto) {
 			swerr();
 			goto fault;
@@ -6375,14 +6429,16 @@ cr_reroute_buffer(struct cr *cr)
 	}
       fault:
 	mtp_free_cr(cr);
-	return (0);
+	return;
 }
 
-/*
- *  CR CANCEL BUFFER
- *  -----------------------------------
- *  Cancelling a controlled rerouting buffer consists of sending the buffer contents back on the original route from
- *  which traffic was being held for diversion.
+/**
+ * cr_cancel_buffer: - cancel a controlled rerouting buffer
+ * @cr: controlled rerouting buffer
+ *
+ * Cancelling a controlled rerouting buffer consists of sending the buffer contents back on the
+ * original route from which traffic was being held for diversion.  This occurs when the route
+ * becomes aviailable again before the controlled rerouting timer expires.
  */
 static void
 cr_cancel_buffer(struct cr *cr)
@@ -6396,8 +6452,8 @@ cr_cancel_buffer(struct cr *cr)
 		if (cr->rt.onto)
 			cr->rt.onto->load--;
 		if (*cr_slot == cr) {
-			cr_put(xchg(cr_slot, NULL));
-			*rt_slot = rt_get(cr->rt.from);
+			*cr_slot = NULL;
+			*rt_slot = cr->rt.from;
 		} else if (*rt_slot != cr->rt.from) {
 			swerr();
 			mtp_free_cr(cr);
@@ -6416,14 +6472,16 @@ cr_cancel_buffer(struct cr *cr)
 	return;
 }
 
-/*
- *  CB REROUTE BUFFER
- *  -----------------------------------
- *  Rerouting changeback/changeover buffer consists of diverting the buffer contents on the normal signalling link
- *  onto which traffic was being held for diversion (changeover or changeback).
+/**
+ * cb_divert_buffer: - divert changeover/changeback buffer contents
+ * @cb: changeover/changeback buffer
+ *
+ * Rerouting changeback/changeover buffer consists of diverting the buffer contents on the
+ * normal signalling link onto which traffic was being held for diversion (changeover or
+ * changeback).
  */
 static void
-cb_reroute_buffer(struct cb *cb)
+cb_divert_buffer(struct cb *cb)
 {
 	struct cb **cb_slot = &cb->lk.lk->smap[cb->index].cb;
 	struct sl **sl_slot = &cb->lk.lk->smap[cb->index].sl;
@@ -6431,8 +6489,8 @@ cb_reroute_buffer(struct cb *cb)
 	cb_timer_stop(cb, tall);
 	if (cb->sl.onto) {
 		if (*cb_slot == cb) {
-			cb_put(xchg(cb_slot, NULL));
-			*sl_slot = sl_get(cb->sl.onto);
+			cb_slot = NULL;
+			*sl_slot = cb->sl.onto;
 		} else if (*sl_slot != cb->sl.onto) {
 			swerr();
 			goto fault;
@@ -6447,11 +6505,13 @@ cb_reroute_buffer(struct cb *cb)
 	return;
 }
 
-/*
- *  CB CANCEL BUFFER
- *  -----------------------------------
- *  Cancelling a changeback/changeover buffer consists of sending the buffer contents back on the original
- *  signalling link from which traffic was being held for diversion (changeover or changeback).
+/**
+ * cb_cancel_buffer: - cancel a changeover/changeback buffer
+ * @cb: changeover/changeback buffer
+ *
+ * Cancelling a changeback/changeover buffer consists of sending the buffer contents back on
+ * the original signalling link from which traffic was being held for diversion (changeover or
+ * changeback).
  */
 static void
 cb_cancel_buffer(struct cb *cb)
@@ -6465,8 +6525,8 @@ cb_cancel_buffer(struct cb *cb)
 		if (cb->sl.onto)
 			cb->sl.onto->load--;
 		if (*cb_slot == cb) {
-			cb_put(xchg(cb_slot, NULL));
-			*sl_slot = sl_get(cb->sl.from);
+			*cb_slot = NULL;
+			*sl_slot = cb->sl.from;
 		} else if (*sl_slot != cb->sl.from) {
 			swerr();
 			mtp_free_cb(cb);
@@ -6481,19 +6541,30 @@ cb_cancel_buffer(struct cb *cb)
 	}
 	/* can't cancel, change forward */
 	pswerr(("Forward change non-cancellable changeover/changeback buffer.\n"));
-	cb_reroute_buffer(cb);
+	cb_divert_buffer(cb);
 	return;
 }
 
 /*
- *  REROUTE between routing lists.
- *  -----------------------------------
- *  Reroute traffic from the current route-list (rl_from) onto the specified route-list (rl_onto).  Any controlled
- *  rerouting buffers will be reused and T6 timers left running.  Any traffic flows that do not already have
- *  controlled rerouting buffers will have buffers allocated (controlled rerouting) or not (forced rerouting).
+ *  Rerouting Traffic
+ *  =========================================================================
+ */
+
+/**
+ * rl_reroute: - reroute traffic between route lists
+ * @q: active queue
+ * @rs: routeset to which route list belongs
+ * @rl_onto: the route list to which to reroute traffic
+ * @force: forced or controlled rerouting
+ *
+ * Reroute traffic from the current route-list (rl_from) onto the specified
+ * route-list (rl_onto).  Any controlled rerouting buffers will be reused and T6
+ * timers left running.  Any traffic flows that do not already have controlled
+ * rerouting buffers will have buffers allocated (controlled rerouting) or not
+ * (forced rerouting).
  */
 static void
-rl_reroute(struct rs *rs, struct rl *rl_onto, const int force)
+rl_reroute(queue_t *q, struct rs *rs, struct rl *rl_onto, const bool force)
 {
 	struct sp *sp = rs->sp.sp;
 	struct rl *rl_from = rs->rl.curr;	/* current route list */
@@ -6510,6 +6581,7 @@ rl_reroute(struct rs *rs, struct rl *rl_onto, const int force)
 			mtp_free_cr(cr);
 	else {
 		int index;
+		int total = (1 << rs->rl.sls_bits);
 
 		while ((cr = rl_from->cr.list)) {
 			/* if there are existing controlled rerouting buffers in the SLS map, move
@@ -6518,17 +6590,17 @@ rl_reroute(struct rs *rs, struct rl *rl_onto, const int force)
 			rl_from->smap[cr->index].rt = cr->rt.onto;
 			if ((*cr->rl.prev = cr->rl.next))
 				cr->rl.next->rl.prev = cr->rl.prev;
-			rl_put(xchg(&cr->rl.rl, NULL));
+			cr->rl.rl = NULL;
 			/* insert into new list */
 			if ((cr->rl.next = rl_onto->cr.list))
 				cr->rl.next->rl.prev = &cr->rl.next;
 			cr->prev = &rl_onto->cr.list;
 			rl_onto->cr.list = cr;
-			cr->rl.rl = rl_get(rl_onto);
-			cr->rt.onto = rt_get(rl_onto->smap[cr->index].rt);
+			cr->rl.rl = rl_onto;
+			cr->rt.onto = rl_onto->smap[cr->index].rt;
 			rl_onto->smap[cr->index].cr = cr;
 		}
-		for (index = 0; index < RT_SMAP_SIZE; index++) {
+		for (index = 0; index < total; index++) {
 			if (rl_onto->smap[index].rt->type == MTP_OBJ_TYPE_RT && !force) {
 				/* if there are not controlled rerouting buffers in the resulting
 				   SLS map, create them if we are doing controlled rerouting */
@@ -6536,9 +6608,8 @@ rl_reroute(struct rs *rs, struct rl *rl_onto, const int force)
 				struct rt *rt_onto = rl_onto->smap[index].rt;
 
 				if ((cr = mtp_alloc_cr(0, rl_onto, rt_from, rt_onto, index))) {
-					cr_timer_start(cr, t6);
-					rt_put(rt_from);
-					rl_onto->smap[index].cr = cr_get(cr);
+					cr_timer_start(q, cr, t6);
+					rl_onto->smap[index].cr = cr;
 				}
 			}
 		}
@@ -6552,34 +6623,38 @@ rl_reroute(struct rs *rs, struct rl *rl_onto, const int force)
 			case RS_DANGER:
 			case RS_CONGESTED:
 				/* perform STP transfer-allowed procedure */
-				mtp_tfa_reroute(rl_from);
+				mtp_tfa_reroute(q, rl_from);
 				break;
 			case RS_RESTRICTED:
 				/* perform STP transfer-restricted procedure */
-				mtp_tfr_reroute(rl_from);
+				mtp_tfr_reroute(q, rl_from);
 				break;
 			}
 		}
 		if (rl_onto && rl_onto != rl_prim) {
 			/* rerouting onto a non-primary route list */
 			/* perform STP transfer-prohibited procedure */
-			mtp_tfp_reroute(rl_onto);
+			mtp_tfp_reroute(q, rl_onto);
 		}
 	}
 	/* make new route list current */
 	rs->rl.curr = rl_onto;
 }
 
-/*
- *  REROUTE between routes
- *  -----------------------------------
- *  Reroute traffic from the current route for the index (rt_from) onto the specified route (rl_onto).  Any
- *  controlled rerouting buffers are automatically assumed and T6 timers left running.  Any traffic flows that do
- *  not already have controlled rerouting buffers will have buffers allocated (controlled rerouting) or not (forced
- *  rerouting).
+/**
+ * rt_reroute: - reroute between routes
+ * @q: active queue
+ * @rl: route list to which routes belong
+ * @rt_onto: route to which to reroute traffic
+ * @index: traffic selection
+ * @force: forced or controlled rerouting
+ *
+ * Reroute traffic from the current route for the index (rt_from) onto the specified route (rl_onto).  Any controlled
+ * rerouting buffers are automatically assumed and T6 timers left running.  Any traffic flows that do not already have
+ * controlled rerouting buffers will have buffers allocated (controlled rerouting) or not (forced rerouting).
  */
 static void
-rt_reroute(struct rl *rl, struct rt *rt_onto, ulong index, int force)
+rt_reroute(queue_t *q, struct rl *rl, struct rt *rt_onto, uint index, const bool force)
 {
 	struct rt *rt;
 	struct cr *cr;
@@ -6589,15 +6664,15 @@ rt_reroute(struct rl *rl, struct rt *rt_onto, ulong index, int force)
 			if (rt) {
 				/* unload existing route */
 				rt->load--;
-				rt_put(xchg(&rl->smap[index].rt, NULL));
+				rl->smap[index].rt = NULL;
 			}
 			if (rl == rl->rs.rs->rl.curr && !force
 			    && (cr = mtp_alloc_cr(0, rl, rt, rt_onto, index))) {
-				cr_timer_start(cr, t6);
-				rl->smap[index].cr = cr_get(cr);
+				cr_timer_start(q, cr, t6);
+				rl->smap[index].cr = cr;
 			} else {
 				/* force reroute anyway */
-				rl->smap[index].rt = rt_get(rt_onto);
+				rl->smap[index].rt = rt_onto;
 			}
 			rt_onto->load++;
 		}
@@ -6608,62 +6683,106 @@ rt_reroute(struct rl *rl, struct rt *rt_onto, ulong index, int force)
 			if (rt) {
 				/* unload existing route */
 				rt->load--;
-				rt_put(xchg(&cr->rt.onto, NULL));
+				cr->rt.onto = NULL;
 			}
-			cr->rt.onto = rt_get(rt_onto);
+			cr->rt.onto = rt_onto;
 			rt_onto->load++;
 		}
 	} else {
-		pswerr(("Wrong object type in SMAP\n"));
+		mi_strlog(q, 0, SL_ERROR, "rt_reroute() bad object type in SMAP");
 	}
 }
 
-/*
- *  REROUTE ALL
- *  -----------------------------------
- *  The specified route takes over all traffic for the route-list.  This is used when the specified route is the
- *  only accessilble route.
+/**
+ * rt_reroute_all: - reroute all traffic to a single route
+ * @q: active queue
+ * @rl: route list to which route belongs
+ * @rt_onto: route onto which to reroute traffic
+ * @force: forced or controlled rerouting
+ *
+ * The specified route takes over all traffic for the route-list.  This is used when the specified route is the only
+ * accessible route.
  */
 static void
-rt_reroute_all(struct rl *rl, struct rt *rt_onto, int force)
+rt_reroute_all(queue_t *q, struct rl *rl, struct rt *rt_onto, const bool force)
 {
 	int i;
+	int total = (1 << rl->rt.sls_bits);
 
-	for (i = 0; i < RT_SMAP_SIZE; i++)
-		rt_reroute(rl, rt_onto, i, force);
+	for (i = 0; i < total; i++)
+		rt_reroute(q, rl, rt_onto, i, force);
 	return;
 }
 
-/*
- *  REROUTE ADD
- *  -----------------------------------
- *  Add the specified accessible or restricted route to hand traffic within the route-list.  Assume traffic
- *  dedicated to the specified route as well as any non-normal excess traffic from other active routes in the
- *  route-list.
+/**
+ * rt_reroute_add: - add traffic to a newly accesible route
+ * @q: active queue
+ * @rl: route list to which the route belongs
+ * @rt_onto: route to which to add traffic
+ * @active: the number of active routes including this one
+ * 
+ * Add the specified accessible or restricted route to hand traffic within the route-list.  Assume traffic dedicated
+ * to the specified route as well as any non-normal excess traffic from other active routes in the route-list.
+ *
+ * The newly restored route is loaded only to maxload and not maxload + excess.  This is to avoid unnecessarily
+ * rerouting 1 slot's worth of traffic under some conditions.  Existing active routes are left loaded to maxload +
+ * excess, to narrow the load disparity between routes to 1/total from 2/total.
+ *
+ * When rerouting back traffic, reroute the traffic selection when, (1) no route is assigned for the traffic selection
+ * (this only occurs when the newly available route is the only route serving the route list), (2) the traffic
+ * selection is normally sent to the restored route, (3) the traffic selection is not normally sent to the route to
+ * which it is currently send, and the route to which it is currently send would be excessively loaded.
  */
 static void
-rt_reroute_add(struct rl *rl, struct rt *rt_onto, int maxload)
+rt_reroute_add(queue_t *q, struct rl *rl, struct rt *rt_onto, int active)
 {
 	int i, n = rl->rt.numb;
+	int total = (1 << rl->rt.sls_bits);
+	int maxload = total / active;
+	int excess = ((total % active) != 0) ? 1 : 0;
 
-	for (i = 0; i < RT_SMAP_SIZE && rt_onto->load < maxload; i++) {
-		ulong slot = i % n;
+	for (i = 0; i < total && rt_onto->load <= maxload; i++) {
+		struct rt *rt = rl->smap[i].rt;
+
+		if (!rt) {
+			rl->smap[i].rt = rt_onto;
+			rt_onto->load++;
+		}
+	}
+	for (i = 0; i < total && rt_onto->load <= maxload; i++) {
 		struct rt *rt = rl->smap[i].rt;
 
 		if (rt->type == MTP_OBJ_TYPE_CR)
 			rt = ((struct cr *) rt)->rt.onto;
-		if ((slot == rt_onto->slot) || (slot != rt->slot && rt->load > maxload))
+		if (rt == rt_onto)
+			continue;
+		if (rt_onto->slot == (i % n))
 			/* controlled rerouting for addition */
-			rt_reroute(rl, rt_onto, i, 0);
+			rt_reroute(q, rl, rt_onto, i, false);
 	}
-	assure(rt_onto->load >= maxload - 1);
+	for (i = 0; i < total && rt_onto->load <= maxload; i++) {
+		struct rt *rt = rl->smap[i].rt;
+
+		if (rt->type == MTP_OBJ_TYPE_CR)
+			rt = ((struct cr *) rt)->rt.onto;
+		if (rt == rt_onto)
+			continue;
+		if (rt->load > maxload + excess && rt->slot != (i % n))
+			/* controlled rerouting for addition */
+			rt_reroute(q, rl, rt_onto, i, false);
+	}
+	if (rt_onto->load < maxload)
+		mi_strlog(q, 0, SL_ERROR, "rt_reroute_add() route not fully loaded");
 }
 
-/*
- *  REROUTE CAN(CEL)
- *  -----------------------------------
- *  When a route fails, this procedure is used to cancel any controlled rerouting which is being performed onto
- *  the failed route.
+/**
+ * rt_reroute_can: - cancel controlled rerouting for a route
+ * @rl: route list containing the route
+ * @rt: route for which to cancel controlled rerouting
+ *
+ * When a route fails, this procedure is used to cancel any controlled rerouting which is being
+ * performed onto the failed route.  At any given point in time the number of controlled
+ * rerouting buffers that are allocated should rarely be greater than zero.
  */
 static void
 rt_reroute_can(struct rl *rl, struct rt *rt)
@@ -6677,20 +6796,28 @@ rt_reroute_can(struct rl *rl, struct rt *rt)
 	}
 }
 
-/*
- *  REROUTE SUB
- *  -----------------------------------
- *  Remove the specified route from handling traffic within the route-list.  Offload the traffic from the specified
- *  route to other routes currently handling traffic.
+/**
+ * rt_reroute_sub: - remove route from handling traffic
+ * @q: active queue
+ * @rl: route list to which the route belongs
+ * @rt_from: the route from which to divert traffic
+ * @accessible: the number of accessible routes after the reroute
+ *
+ * Remove the specified route from handling traffic within the route-list.  Offload the traffic
+ * from the specified route to other routes currently handling traffic.
+ *
+ * First, cancel any controlled rerouting procedures for the route.
  */
 static void
-rt_reroute_sub(struct rl *rl, struct rt *rt_from, int maxload)
+rt_reroute_sub(queue_t *q, struct rl *rl, struct rt *rt_from, int accessible)
 {
 	int i;
+	int total = (1 << rl->rt.sls_bits);
+	int maxload = (total + accessible - 1) / accessible;
 
 	/* first cancel any route controlled rerouting to the failed route */
 	rt_reroute_can(rl, rt_from);
-	for (i = 0; i < RT_SMAP_SIZE && rt_from->load; i++) {
+	for (i = 0; i < total && rt_from->load; i++) {
 		struct rt *rt = rl->smap[i].rt;
 
 		if (rt && rt->type == MTP_OBJ_TYPE_CR)
@@ -6700,21 +6827,30 @@ rt_reroute_sub(struct rl *rl, struct rt *rt_from, int maxload)
 		for (rt = rl->rt.list; rt; rt = rt->rl.next)
 			if (rt->load && rt->load < maxload)
 				/* force rerouting for subtraction */
-				rt_reroute(rl, rt, i, 1);
+				rt_reroute(q, rl, rt, i, true);
 	}
-	assure(rt_from->load == 0);
+	if (rt_from->load != 0)
+		mi_strlog(q, 0, SL_ERROR, "rt_reroute_sub() did not unload route %u", rt_from->id);
 }
 
-/*
- *  REROUTE RES
- *  -----------------------------------
- *  Remove the sepcified accessible route from handling traffic within the route-list.  Offload the traffic from the
- *  specified route to restricted routes currently handling traffic.
+/**
+ * rt_reroute_res: - remove route from handling traffic
+ * @q: active queue
+ * @rl: route list to which the route belongs
+ * @rt_from: the route from which to divert traffic
+ * @restricted: the number of restricted routes after the reroute
+ *
+ * Remove the sepcified accessible route from handling traffic within the route-list.  Offload
+ * the traffic from the specified route to restricted routes currently handling traffic.
+ *
+ * First, cancel any controlled rerouting procedures for the route.
  */
 static void
-rt_reroute_res(struct rl *rl, struct rt *rt_from, int maxload)
+rt_reroute_res(queue_t *q, struct rl *rl, struct rt *rt_from, int restricted)
 {
 	int i;
+	int total = (1 << rl->rt.sls_bits);
+	int maxload = (total + restricted - 1) / restricted;
 
 	/* first cancel any route controlled rerouting to the failed route */
 	rt_reroute_can(rl, rt_from);
@@ -6728,24 +6864,37 @@ rt_reroute_res(struct rl *rl, struct rt *rt_from, int maxload)
 		for (rt = rl->rt.list; rt; rt = rt->rl.next)
 			if (rt->state == RT_RESTRICTED && rt->load < maxload)
 				/* force rerouting under failure */
-				rt_reroute(rl, rt, i, 1);
+				rt_reroute(q, rl, rt, i, true);
 	}
 	assure(rt_from->load == 0);
 }
 
 /*
- *  CHANGEBACK
- *  -----------------------------------
+ *  Diverting Traffic
+ *  =========================================================================
+ */
+
+/**
+ * sl_changeback: - changeback onto a newly restored signalling link
+ * @q: active queue
+ * @lk: link set
+ * @sl_onto: newly restored signalling link
+ * @index: sls index to changeback
  */
 static void
-sl_changeback(struct lk *lk, struct sl *sl_onto, ulong index)
+sl_changeback(queue_t *q, struct lk *lk, struct sl *sl_onto, uint index)
 {
 	struct cb *cb;
 	struct sl *sl, **slp;
 
-	ensure(sl_onto, return);
-	if (!(sl = lk->smap[index].sl))
+	if (!sl_onto) {
+		mi_strlog(q, 0, SL_ERROR, "sl_changeback() passed NULL pointer");
 		return;
+	}
+	if (!(sl = lk->smap[index].sl)) {
+		mi_strlog(q, 0, SL_ERROR, "sl_changeback() no signalling link");
+		return;
+	}
 	if (sl->type == MTP_OBJ_TYPE_CB) {
 		cb = ((struct cb *) sl);
 		slp = &cb->sl.onto;
@@ -6761,9 +6910,9 @@ sl_changeback(struct lk *lk, struct sl *sl_onto, ulong index)
 		}
 		if (sl->load)
 			sl->load--;
-		sl_put(xchg(slp, NULL));
+		*slp = NULL;
 	}
-	*slp = sl_get(sl_onto);
+	*slp = sl_onto;
 	sl_onto->load++;
 	/* if carrying traffic for the linkset */
 	if (lk->load && sl) {
@@ -6772,44 +6921,58 @@ sl_changeback(struct lk *lk, struct sl *sl_onto, ulong index)
 		struct lk *lk = sl_onto->lk.lk;
 		struct sp *loc = lk->sp.loc;
 		struct rs *adj = lk->sp.adj;
+		int err;
 
 		if (cb)
 			cb_timer_stop(cb, tall);
-		else if (!(cb = mtp_alloc_cb(0, lk, sl, sl_onto, index)))
+		else if (!(cb = mtp_alloc_cb(0, lk, sl, sl_onto, index))) {
+			/* forced changeback */
 			return;
+		}
 		for (rl = adj->rl.list; rl; rl = rl->rs.next)
 			for (rt = rl->rt.list; rt; rt = rt->rl.next)
 				if (rt->lk.lk == lk)
 					break;
 		if (!rt) {
-			swerr();
+			mi_strlog(q, 0, SL_ERROR, "sl_changeback() no route for linkset");
+			/* forced changeback */
 			return;
 		}
 		if (rt->state < RT_RESTART) {
 			/* sequence changeback */
-			mtp_send_cbd(NULL, loc, lk->ni, adj->dest, loc->pc, sl_onto->slc,
-				     sl_onto->slc, cb->cbc, sl);
-			cb_timer_start(cb, t4);
+			if ((err = mtp_send_cbd(q, loc, lk->ni, adj->dest, loc->pc, sl_onto->slc,
+						sl_onto->slc, cb->cbc, sl)))
+				return (err);
+			cb_timer_start(q, cb, t4);
 		} else {
 			/* time controlled changeback */
-			cb_timer_start(cb, t3);
+			cb_timer_start(q, cb, t3);
 		}
 	}
+	return;
 }
 
-/*
- *  CHANGEOVER
- *  -----------------------------------
+/**
+ * sl_changeover: - changeover from a newly unusable signalling link
+ * @q: active queue
+ * @lk: link set
+ * @sl_onto: signalling link to changeover to
+ * @index: traffic selection to changeover
  */
 static void
-sl_changeover(struct lk *lk, struct sl *sl_onto, ulong index)
+sl_changeover(queue_t *q, struct lk *lk, struct sl *sl_onto, uint index)
 {
 	struct cb *cb;
 	struct sl *sl, **slp;
 
-	ensure(sl_onto, return);
-	if (!(sl = lk->smap[index].sl))
+	if (!sl_onto) {
+		mi_strlog(q, 0, SL_ERROR, "sl_changeover() passed NULL pointer");
 		return;
+	}
+	if (!(sl = lk->smap[index].sl)) {
+		mi_strlog(q, 0, SL_ERROR, "sl_changeover() no signalling link");
+		return;
+	}
 	if (sl->type == MTP_OBJ_TYPE_CB) {
 		cb = ((struct cb *) sl);
 		slp = &cb->sl.onto;
@@ -6820,9 +6983,9 @@ sl_changeover(struct lk *lk, struct sl *sl_onto, ulong index)
 	if ((sl = *slp)) {
 		if (sl->load)
 			sl->load--;
-		sl_put(xchg(slp, NULL));
+		*slp = NULL;
 	}
-	*slp = sl_get(sl_onto);
+	*slp = sl_onto;
 	sl_onto->load++;
 	if (lk->load && sl) {
 		struct lk *lk = sl->lk.lk;
@@ -6830,47 +6993,95 @@ sl_changeover(struct lk *lk, struct sl *sl_onto, ulong index)
 
 		if (cb)
 			cb_timer_stop(cb, tall);
-		else if (!(cb = mtp_alloc_cb(0, lk, sl, sl_onto, index)))
+		else if (!(cb = mtp_alloc_cb(0, lk, sl, sl_onto, index))) {
+			/* forced changeover */
 			return;
+		}
 		if (adj->state < RS_RESTART) {
 			/* sequence changeover */
 			/* the changeover (COO or ECO) should be sent after BSNT retrieval succeeds 
 			   or fails */
-			cb_timer_start(cb, t2);
+			cb_timer_start(q, cb, t2);
 		} else {
 			/* time controlled changeover */
-			cb_timer_start(cb, t1);
+			cb_timer_start(q, cb, t1);
 		}
 	}
+	return;
 }
 
-/*
- *  CHANGEBACK ADD
- *  -----------------------------------
+/**
+ * sl_changeback_add: - add and changeback to a newly active signalling link
+ * @lk: link set containing the signalling link
+ * @sl_onto: signalling link to changeback onto
+ * @active: number of active signalling links (in link set) after changeback
+ *
+ * Note that the entire smap is not necessarily significant, just the number of significant SLS values for this
+ * Signalling Point.
+ *
+ * Some notes:
+ *
+ * The newly restored signalling link is loaded only to maxload and not maxload + excess.  This is to avoid
+ * unnecessarily changing over 1 slot's worth of traffic under some conditions.  Existing active links are left loaded
+ * to maxload + excess, to narrow the load disparity between signalling links to 1/total from 2/total.
+ *
+ * When changing back traffic, changeback the traffic selection when, (1) no signalling link is assigned for the
+ * traffic selection (this only occurs when the restored signalling link is the only signalling link serving the link
+ * (set)), (2) the traffic selection is normally sent to the restored signalling link, (3) the traffic selection is
+ * not normally sent to the link to which it is currently sent, and the link to which it is currently sent would be
+ * excessively loaded.
  */
 static void
-sl_changeback_add(struct lk *lk, struct sl *sl_onto, int maxload)
+sl_changeback_add(queue_t *q, struct lk *lk, struct sl *sl_onto, int active)
 {
 	int i, n = lk->sl.numb;
+	int total = (1 << lk->sl.sls_bits);
+	int maxload = total / active;
+	int excess = ((total % active) != 0) ? 1 : 0;
 
-	for (i = 0; i < SL_SMAP_SIZE && sl_onto->load < maxload; i++) {
-		ulong slot = i % n;
+	for (i = 0; i < total && sl_onto->load <= maxload; i++) {
+		struct sl *sl = lk->smap[i].sl;
+
+		if (!sl) {
+			lk->smap[i].sl = sl_onto;
+			sl_onto->load++;
+		}
+	}
+	for (i = 0; i < total && sl_onto->load <= maxload; i++) {
 		struct sl *sl = lk->smap[i].sl;
 
 		if (sl->type == MTP_OBJ_TYPE_CB)
 			sl = ((struct cb *) sl)->sl.onto;
-		if ((slot == sl_onto->slot) || (slot != sl->slot && sl->load > maxload))
+		if (sl == sl_onto)
+			continue;
+		if (sl_onto->slot == (i % n))
 			/* changeback for addition */
-			sl_changeback(lk, sl_onto, i);
+			sl_changeback(q, lk, sl_onto, i);
 	}
-	assure(sl_onto->load >= maxload - 1);
+	for (i = 0; i < total && sl_onto->load <= maxload; i++) {
+		struct sl *sl = lk->smap[i].sl;
+
+		if (sl->type == MTP_OBJ_TYPE_CB)
+			sl = ((struct cb *) sl)->sl.onto;
+		if (sl == sl_onto)
+			continue;
+		if (sl->load > maxload + excess && sl->slot != (i % n))
+			/* changeback for addition */
+			sl_changeback(q, lk, sl_onto, i);
+	}
+	if (sl_onto->load < maxload)
+		mi_strlog(q, 0, SL_ERROR, "sl_changeback_add() link not fully loaded");
 }
 
-/*
- *  CHANGOVER CAN(CEL)
- *  -----------------------------------
- *  When a signalling link fails, this procedure is used to cancel any changeovers or changebacks which are being
- *  performed onto the failed signalling link.
+/**
+ * sl_changeover_can: - cancel changebacks and changeovers for a signalling link
+ * @lk: link set containing the signalling link
+ * @sl: signalling link for which to cance changeovers and changebacks
+ *
+ * When a signalling link fails, this procedure is used to cancel any changeovers or
+ * changebacks which are being performed onto the failed signalling link.  At any given point
+ * in time the number of changeback/changeover buffers that are allocated should rarely be
+ * greater than zero.
  */
 static void
 sl_changeover_can(struct lk *lk, struct sl *sl)
@@ -6884,18 +7095,28 @@ sl_changeover_can(struct lk *lk, struct sl *sl)
 	}
 }
 
-/*
- *  CHANGOVER SUB
- *  -----------------------------------
+/**
+ * sl_changeover_sub: - subtract and changeover a newly failed signalling link to active links
+ * @lk: link set containing the signalling link
+ * @sl_from: signalling link to changeover from
+ * @active: number of active signalling links (in link set) after changeover
+ *
+ * This procedure changes over to active signalling links only.  When there are no active
+ * signalling links to which to change over, but there are inhibited signalling links that can
+ * be force uninhibited, the sl_changeover_res() procedure below is used instead.
+ *
+ * First, cancel any current changeover or changeback procedures for the signalling link.
  */
 static void
-sl_changeover_sub(struct lk *lk, struct sl *sl_from, int maxload)
+sl_changeover_sub(queue_t *q, struct lk *lk, struct sl *sl_from, int active)
 {
 	int i;
+	int total = (1 << lk->sl.sls_bits);
+	int maxload = (total + active - 1) / active;
 
 	/* first cancel any signalling link changing over or back to the failed signalling link */
 	sl_changeover_can(lk, sl_from);
-	for (i = 0; i < SL_SMAP_SIZE && sl_from->load; i++) {
+	for (i = 0; i < total && sl_from->load; i++) {
 		struct sl *sl = lk->smap[i].sl;
 
 		if (sl && sl->type == MTP_OBJ_TYPE_CB)
@@ -6905,23 +7126,33 @@ sl_changeover_sub(struct lk *lk, struct sl *sl_from, int maxload)
 		for (sl = lk->sl.list; sl; sl = sl->lk.next)
 			if (sl->load && sl->load < maxload)
 				/* changeover for subtraction */
-				sl_changeover(lk, sl, i);
+				sl_changeover(q, lk, sl, i);
 	}
-	assure(sl_from->load == 0);
+	if (sl_from->load != 0)
+		mi_strlog(q, 0, SL_ERROR, "sl_changeover_sub() did not unload link %u",
+			  sl_from->id);
 }
 
-/*
- *  CHANGOVER RES
- *  -----------------------------------
+/**
+ * sl_changeover_res: - subtract and changeover a newly failed signalling link to inhibited links
+ * @lk: link set containing the signalling link
+ * @sl_from: signalling link to changeover from
+ * @active: number of inhibited signalling links (in link set) after changeover
+ *
+ * This procedure changes over to inhibited signalling links only.  When there
+ * are active signalling links to which to change over, the sl_changeover_sub()
+ * procedure above is used instead.
  */
 static void
-sl_changeover_res(struct lk *lk, struct sl *sl_from, int maxload)
+sl_changeover_res(queue_t *q, struct lk *lk, struct sl *sl_from, int inhibited)
 {
 	int i;
+	int total = (1 << lk->sl.sls_bits);
+	int maxload = (total + inhibited - 1) / inhibited;
 
 	/* first cancel any signalling link changing over or back to the failed signalling link */
 	sl_changeover_can(lk, sl_from);
-	for (i = 0; i < RT_SMAP_SIZE && sl_from->load; i++) {
+	for (i = 0; i < total && sl_from->load; i++) {
 		struct sl *sl = lk->smap[i].sl;
 
 		if (sl && sl->type == MTP_OBJ_TYPE_CB)
@@ -6931,9 +7162,10 @@ sl_changeover_res(struct lk *lk, struct sl *sl_from, int maxload)
 		for (sl = lk->sl.list; sl; sl = sl->lk.next)
 			if (sl->state == SL_INHIBITED && sl->load < maxload)
 				/* changeover for subtraction */
-				sl_changeover(lk, sl, i);
+				sl_changeover(q, lk, sl, i);
 	}
-	assure(sl_from->load = 0);
+	if (sl_from->load != 0)
+		mi_strlog(q, 0, SL_ERROR, "sl_changeover_res() did not unload link");
 }
 
 /*
@@ -6944,10 +7176,10 @@ sl_changeover_res(struct lk *lk, struct sl *sl_from, int maxload)
  *  -------------------------------------------------------------------------
  */
 
-static ulong
-mtp_sta_flags(const ulong state, ulong oldflags)
+static uint
+mtp_sta_flags(const uint state, uint oldflags)
 {
-	ulong newflags = oldflags;
+	uint newflags = oldflags;
 	/* *INDENT-OFF* */
 	switch (state) {
 	case MTP_INACTIVE:	newflags |=  MTPF_INACTIVE;	break;
@@ -6979,11 +7211,11 @@ mtp_sta_flags(const ulong state, ulong oldflags)
 	return (newflags);
 }
 
-static ulong
-mtp_flg_state(ulong newflags)
+static uint
+mtp_flg_state(uint newflags)
 {
 	/* *INDENT-OFF* */
-	ulong newstate =
+	uint newstate =
 	    (newflags & MTPF_INACTIVE  ) ? MTP_INACTIVE   :
 	    (newflags & MTPF_BLOCKED   ) ? MTP_BLOCKED    :
 	    (newflags & MTPF_INHIBITED ) ? MTP_INHIBITED  :
@@ -6997,11 +7229,11 @@ mtp_flg_state(ulong newflags)
 	return (newstate);
 }
 
-static ulong
-mtp_cnt_state(struct counters *c, ulong oldstate)
+static uint
+mtp_cnt_state(struct counters *c, uint oldstate)
 {
 	/* *INDENT-OFF* */
-	ulong newstate =
+	uint newstate =
 	    c->c.allowed    ? MTP_ALLOWED    :
 	    c->c.danger     ? MTP_DANGER     :
 	    c->c.congested  ? MTP_CONGESTED  :
@@ -7019,13 +7251,20 @@ mtp_cnt_state(struct counters *c, ulong oldstate)
 /*
    Change state 
  */
+
+/**
+ * sp_set_state: - set new signalling point state
+ * @q: active queue
+ * @sp: signalling point whose state to change
+ * @state: the new state
+ */
 static int
-sp_set_state(queue_t *q, struct sp *sp, const ulong state)
+sp_set_state(queue_t *q, struct sp *sp, const uint state)
 {
-	ulong sp_oldstate = sp->state;
-	ulong sp_newstate = sp->state;
-	ulong sp_oldflags = sp->flags;
-	ulong sp_newflags = sp->flags;
+	uint sp_oldstate = sp->state;
+	uint sp_newstate = sp->state;
+	uint sp_oldflags = sp->flags;
+	uint sp_newflags = sp->flags;
 
 	if ((sp_newflags = mtp_sta_flags(state, sp_oldflags)) == sp_oldflags)
 		goto no_flags_change;
@@ -7033,17 +7272,60 @@ sp_set_state(queue_t *q, struct sp *sp, const ulong state)
 		goto no_state_change;
 	if (sp_oldstate == SP_INACTIVE && sp_newstate < SP_RESTART) {
 		/* This is the first link in service (usable) at Level 3. */
-		if (sp->timers.t1r) {
+		if (mi_timer_remain(sp->timers.t1r)) {
 			/* If we have a T1 timer running, this is a simple recovery.  We cancel the 
 			   t1 timer and move to the active state. */
 			sp_timer_stop(sp, t1r);
+			/* ANSI T1.111.4/2000 9.1 ... If the management function determines that a
+			   full restart procedureis not needed when the first signalling link(s)
+			   become available, then traffic restart allowed message are sent to the
+			   adjacent points at the remote ends of the available links, MTP-RESUME
+			   primitives are given to users for all destinations accessible via the
+			   available links, and the procedure terminates. Any traffic restart
+			   allowed or traffic restart waiting messages received from adjacent
+			   points are considered unexpected; see 9.4.  Messages that were buffered
+			   in level 2 (transmit buffer, retransmit buffer, or receive buffer)
+			   during the period of unavailability on links that were transmitting or
+			   receiving process outage status units (MTP Level 2 links) are discarded
+			   unless it can be determined that they were buffers for a time of less
+			   than T1. */
 		} else {
 			/* If T1 timer is not running (has expired) then an MTP restart procedure
 			   is required if the SP is an STP or is attached to an STP */
 			fixme(("Write this procedure\n"));
 			sp_newflags |= SPF_RESTART;
 			sp_newstate = SP_RESTART;
+			/* ANSI T1.111.4/2000 9.1 ... If the mangement function determines that a
+			   full restart procedures is needed, then it ensures, for example, by
+			   using local processor outage, that the period of unvailability persists
+			   for a time of at least T27. The purpose of remaining unavailable for
+			   time T27 is to increaase the probability that adjacent points are aware
+			   of the unavailability of the restarting point and initiate the
+			   appropriate restart procedrues (see 9.3).
+
+			   As the first step in restarting, the signalling point attempts to brin a 
+			   predetermined number of links into the available state in each of its
+			   link sets (see Section 12).  Links that are transmitting or receiving
+			   processor outage status units become available when reception and
+			   transmisison of the processor outage status units ceases.  Messages that 
+			   were buffered in level 2 (transmit buffer, retransmit buffer, or receive 
+			   buffer) during the period of unavailability on links that were
+			   transmitting ore receiving processor outage status units (MTP Level 2
+			   links) are discarded unless it can be determined that they were buffered 
+			   for a time of less than T1.  Link activation procedures are carried out
+			   in parallel on as many other unavailable links as possible (see Section
+			   12). */
+
 		}
+	}
+	if (sp_oldstate == SP_INACTIVE && sp_newstate == SP_RESTART) {
+		/* This is the first link in service (usable) at level 2: move to Restart Phase 1, where we collect
+		 * information about available routes in the network but do not send any information ourselves. This
+		 * persists for a duration T18,  or enough TRA messages are received.  For ANSI this is far more
+		 * complicated. */
+		sp->flags |= SPF_RESTART_PHASE_1;
+		sp->flags &= ~SPF_RESTART_PHASE_2;
+		sp_timer_start(q, sp, t18);
 	}
 	if (sp_newstate == SP_INACTIVE && sp_oldstate < SP_RESTART) {
 		/* This is the last link in service (usable) at level 3. We need to start T1 for
@@ -7051,11 +7333,11 @@ sp_set_state(queue_t *q, struct sp *sp, const ulong state)
 		   already set emergency on all signalling links and have initiated restoration of
 		   any signalling links that have not been activated. */
 		fixme(("Don't need t1r because last t1 has already expired\n"));
-		if (!sp->timers.t1r)
-			sp_timer_start(sp, t1r);
+		if (!mi_timer_remain(sp->timers.t1r))
+			sp_timer_start(q, sp, t1r);
 	}
-	(&sp->na.na->sp.allowed)[sp_oldstate]--;
-	(&sp->na.na->sp.allowed)[sp_newstate]++;
+	&sp->na.na->sp.states[sp_oldstate]--;
+	&sp->na.na->sp.states[sp_newstate]++;
 	sp->state = sp_newstate;
       no_state_change:
 	sp->flags = sp_newflags;
@@ -7063,14 +7345,27 @@ sp_set_state(queue_t *q, struct sp *sp, const ulong state)
 	return (0);
 }
 
+/**
+ * rs_set_state: - set new route set state
+ * @q: active queue
+ * @rs: route set whose state to change
+ * @state: the new state
+ *
+ * A change to a route set state affects no other state. 
+ *
+ * Unfortunately, this is one of the only state transition functions that can
+ * return an error.  The others have a timer fallback.  The difficulty here is
+ * with local broadcast of MTP-PAUSE, MTP-RESUME and MTP-STATUS.  If a buffer is
+ * not available, an error must be returned.
+ */
 static int
-rs_set_state(queue_t *q, struct rs *rs, const ulong state)
+rs_set_state(queue_t *q, struct rs *rs, const uint state)
 {
 	struct sp *sp = rs->sp.sp;
-	ulong rs_oldstate = rs->state;
-	ulong rs_newstate = rs->state;
-	ulong rs_oldflags = rs->flags;
-	ulong rs_newflags = rs->flags;
+	uint rs_oldstate = rs->state;
+	uint rs_newstate = rs->state;
+	uint rs_oldflags = rs->flags;
+	uint rs_newflags = rs->flags;
 	int err;
 
 	if ((rs_newflags = mtp_sta_flags(state, rs_oldflags)) == rs_oldflags)
@@ -7082,6 +7377,107 @@ rs_set_state(queue_t *q, struct rs *rs, const ulong state)
 		    && ((sp->flags & SPF_XFER_FUNC) || (rs->flags & RSF_XFER_FUNC))) {
 			/* perform adjacent restart procedure */
 			fixme(("Write this procedure\n"));
+			/* ANSI T1.111.4/2000 9.3 A signalling point X considers that the MTP of an inaccessible
+			   adjacent signalling point Y is restarting when: (1) The first link in a direct link set is
+			   in the in service state at level 2, or (2) A route other than a direct link set becomes
+			   available, e.g. through receipt of a transfer allowed or traffic restart allowed message or 
+			   the availability of the corresponding link set.
+
+			   When the first link in a direct link set towards the restarting signalling point Y goes int
+			   othe in services state at level 2, signaling point X begins taking into account any traffic 
+			   restart waiting, traffic restart allowed, transfer-prohibited, transfer-restricted, and
+			   transfer-allowed messages from Y.  Signalling point X starts timer T28 either when the first 
+			   link goes into the in service state at level 2 or when the first sginallin link becomes
+			   available at level 3.  IN addition it takes the following actions:
+
+			   (1) If a TRW message is reeived from Y while T28 is running or before it is started, X
+			   starts T25.  X stops T28 if it is running.
+
+			   (2) If a TRW message is received from Y while T25 is running, X restarts T25.
+
+			   (3) When the first link in a link set to Y becomes available, singallin point X sends to Y a 
+			   traffic restart allowed message or, if X has the transfer function, a traffic restart
+			   waiting message followed by transfer-prohibited (note that all tranfer prohibited messages
+			   according to 13.2.2 (1) must be sent) and transfer-restricted messages and a traffic restart 
+			   allowed message.
+
+			   (4) If a destination becomes prohibited, restricted, or available at X, after X has sent a
+			   traffic restart allowed message to Y, X notifies Y of the statu change by the normal
+			   procedures in Section 13.
+
+			   (5) When a traffic restart allowed message has been sent to Y and a traffic restart allowed
+			   message has been received from Y, X stops T25 or T28, whichever is running, and restarts
+			   traffic on the link set to Y.  X gives MTP-RESUME primitives to users concerning Y and any
+			   destinations made accessible via Y.  If X has the transfer function it also broadcasts
+			   transfer-allowed or transfer-restricted messages concerning the same destinations.
+
+			   (6) If T28 expires, X restarts traffic on the link set to Y as in (5), unles a traffic
+			   restart allowed message has not been sent to Y.  In that case, X starts T25 and completes
+			   the sending of transfer prohbited and transfer-restricted messages, followed by a traffic
+			   restart allowed message.  Then, unless a traffic restart waiting message has been received
+			   from Y without a subsequent traffic restart allowed message, X stops 25 and restarts traffic 
+			   on the link set to Y.
+
+			   (7) If T25 expires, X restarts traffic on the link set towards Y.  In the abnormal case
+			   when X has not completed sending transfer-prohibited and transfer-restricted messages to Y,
+			   X completes sending the transfer-prohibited messages required by 13.2.2 (1) and sends a
+			   traffic restart allowed message before restarting user traffic.
+
+			   (8) If no traffic restart allowed message has been received from Y when traficc is restarted 
+			   to Y, timer T9 (see 9.4) is started.
+
+			   When signalling point Y becomes accessible via a route other than a direct link set between
+			   X and Y, X sends a MTP-RESUME primitive concerning Y to all local MTP users.  In addition,
+			   if signalling point X has the transfer function, X sends to Y any required
+			   transfer-prohibited and transfer-restricted message by the availabl route and broadcasts
+			   transfer-allowed or transfer-restricted messages concerning Y. */
+
+			/* ANSI T1.111.4/2000 9.5 (General Rules) Whe a signalling point restarts, it considers, at the 
+			   beginning of the restart procedure, all signalling routes to be allowed and all signalling
+			   links to be uninhibited.  A signalling route set test messae received in a restarting
+			   singalling point during the restart procedure is ignored.
+
+			   Signalling route set test messages received in asignalling point adjacent to a restarting
+			   signalling point while T25 or T28 is running are handled, but the relies consider that all
+			   signalling routes using the restarting signalling point are prohibited.  When T28 exires or
+			   T25 is stopped or expires, these signalling routes are allowed unless a transfer-prohibited
+			   or transfer-restricted message was received from the restarting signalling point while T28
+			   or T25 was running.
+
+			   While T25 or T28 is running, all traffic from local Level 4 or other signalling points
+			   destinged to the adjacent restarting point is discarded.
+
+			   When an adjacent signalling point restarts, all signalling links to the restarting point
+			   are marked as uninhibited.
+
+			   In the case that an adjacent signalling point becomes inaccessible, but routing control
+			   initiates a successful uninhibiting (see 10.3), no restart procedure is performed on either
+			   side of the link.  If the inihibiting is unsuccessful because the link has failed or was
+			   blocked after it was inihibitied, then MTP restart procedures should apply based on the
+			   criteria in Section 9.3.
+
+			   Message traffic is restarted on newly available links by using the time controlled
+			   changeback procedure (see 6.4).
+
+			   If a link becomes unavailable during MTP restart, after having been successfully activated 
+			   during the restart, time controlled changeover is peformed (see 5.6.2).
+
+			   If a message concerning another destination is received at a restarting point before TRA
+			   messages have been sent out, the restarting point may discard the message or it may route
+			   the message if it is able according to the current routing data.  If the restarting point
+			   discards the mesage, it sends a tranfer prohibited message to the adjacent signalling point 
+			   from which the message was received.  If a transfer prohibited message is sent in these
+			   circumstances, and a signalling route is established to the concerned destination before the 
+			   traffic restart allowed messages are broadcast, then a transfer-allowed message is sent to
+			   the adjacent point after traffic restart allowed messages are broadcast.
+
+			   A message concerning a local MTP user with service indicator (SI) of 0010 is handled
+			   normally hwen received in a restarting signalling point. Treatments for some message with
+			   SI = 0000 receive in a resarting signalling point have been specified already in 9.1 thorugh 
+			   9.5; other messages with SI = 0000 may be treated normally or discarded when received in a
+			   restarting signalling point.  Message with other values of service indicators may be
+			   treated normally or discarded when received in the restarting point (appropriate treatment
+			   may depend on the application resident at the particular restarting point). */
 		}
 	}
 	if (rs_oldstate == RS_RESTRICTED) {
@@ -7097,6 +7493,7 @@ rs_set_state(queue_t *q, struct rs *rs, const ulong state)
 		}
 	}
 	if (rs_newstate < RS_RESTRICTED && rs_oldstate >= RS_RESTRICTED) {
+		rs_timer_stop(rs, t8);
 		/* transfer allowed broadcast */
 		if ((err = mtp_tfa_broadcast(q, rs)) < 0)
 			return (err);
@@ -7104,7 +7501,7 @@ rs_set_state(queue_t *q, struct rs *rs, const ulong state)
 	if (rs_newstate == RS_RESTRICTED && (sp->na.na->option.popt & SS7_POPT_TFR)) {
 		if (rs_oldstate < RS_RESTRICTED) {
 			/* prepare for transfer restricted broadcast */
-			rs_timer_start(rs, t11);
+			rs_timer_start(q, rs, t11);
 		}
 		if (rs_oldstate > RS_RESTRICTED) {
 			/* transfer restricted broadcast */
@@ -7113,6 +7510,7 @@ rs_set_state(queue_t *q, struct rs *rs, const ulong state)
 		}
 	}
 	if (rs_newstate > RS_RESTART && rs_oldstate <= RS_RESTART) {
+		rs_timer_start(q, rs, t8);
 		/* transfer prohibited broadcast */
 		if ((err = mtp_tfp_broadcast(q, rs)))
 			return (err);
@@ -7124,14 +7522,30 @@ rs_set_state(queue_t *q, struct rs *rs, const ulong state)
 	return (0);
 }
 
+/**
+ * rl_set_state: - set new route list state
+ * @q: active queue
+ * @rl: route list whose state to change
+ * @state: the new state
+ *
+ * A change to a route list state might also affect the state of a route set.
+ *
+ * In this driver, a route list is a collection of routes via link sets in a combined link
+ * set.  A route set is a collection of route lists.  In an SP, the only case of multiplex
+ * route lists is where A-, E- and/or F-links exist that provide access to the same
+ * destination.  In an STP, all routesets normally have multiplex route lists, one for each
+ * combined B/D link set and one for the C-link set to its associated STP in the pair.  Each
+ * route list within a route set has a different cost.  Traffic is directed to the route list
+ * with the lowest cost and other route lists do not receive traffic.
+ */
 static int
-rl_set_state(queue_t *q, struct rl *rl, const ulong state)
+rl_set_state(queue_t *q, struct rl *rl, const uint state)
 {
 	struct rs *rs = rl->rs.rs;
-	ulong rl_oldstate = rl->state;
-	ulong rl_newstate = rl->state;
-	ulong rl_oldflags = rl->flags;
-	ulong rl_newflags = rl->flags;
+	uint rl_oldstate = rl->state;
+	uint rl_newstate = rl->state;
+	uint rl_oldflags = rl->flags;
+	uint rl_newflags = rl->flags;
 	int err;
 
 	if ((rl_newflags = mtp_sta_flags(state, rl_oldflags)) == rl_oldflags)
@@ -7146,7 +7560,7 @@ rl_set_state(queue_t *q, struct rl *rl, const ulong state)
 
 			for (ra = rs->rl.list; ra && (ra == rl || ra->state > RL_RESTRICTED);
 			     ra = ra->rs.next) ;
-			rl_reroute(rs, ra, 1);
+			rl_reroute(q, rs, ra, true);
 			goto reroute;
 		}
 	}
@@ -7154,26 +7568,26 @@ rl_set_state(queue_t *q, struct rl *rl, const ulong state)
 		/* route list moved from inaccessible to accessible */
 		if (!rs->rl.curr || rs->rl.curr->cost > rl->cost) {
 			/* accessible route-list is highest priority available route-list */
-			rl_reroute(rs, rl, 0);
+			rl_reroute(q, rs, rl, false);
 			goto reroute;
 		}
 	}
 	if (rl == rs->rl.curr) {
 	      reroute:
-		(&rs->rl.allowed)[rl_oldstate]--;
-		(&rs->rl.allowed)[rl_newstate]++;
+		rs->rl.states[rl_oldstate]--;
+		rs->rl.states[rl_newstate]++;
 		if ((err = rs_set_state(q, rs, state))) {
-			(&rs->rl.allowed)[rl_oldstate]++;
-			(&rs->rl.allowed)[rl_newstate]--;
+			rs->rl.states[rl_oldstate]++;
+			rs->rl.states[rl_newstate]--;
 			return (err);
 		}
 	} else {
-		(&rs->rl.allowed)[rl_oldstate]--;
-		(&rs->rl.allowed)[rl_newstate]++;
+		rs->rl.states[rl_oldstate]--;
+		rs->rl.states[rl_newstate]++;
 	}
 	/* push counts to ls */
-	(&rl->ls.ls->rl.allowed)[rl_oldstate]--;
-	(&rl->ls.ls->rl.allowed)[rl_newstate]++;
+	rl->ls.ls->rl.states[rl_oldstate]--;
+	rl->ls.ls->rl.states[rl_newstate]++;
 	/* What we are more interested in than pushing state here is determining the route loading
 	   of the link, and whether the link is in danger of congestion due to route loading.  That 
 	   is a difficult thing to calculate, however.  The link can only be in danger of
@@ -7186,15 +7600,23 @@ rl_set_state(queue_t *q, struct rl *rl, const ulong state)
 	return (0);
 }
 
+/**
+ * rt_set_state: - set new route state
+ * @q: active queue
+ * @rt: route whose state to change
+ * @state: the new state
+ *
+ * A change to a route state might also affect the state of the route list.
+ */
 static int
-rt_set_state(queue_t *q, struct rt *rt, const ulong state)
+rt_set_state(queue_t *q, struct rt *rt, const uint state)
 {
 	struct rl *rl = rt->rl.rl;
-	ulong rl_newstate;
-	ulong rt_oldstate = rt->state;
-	ulong rt_newstate = rt->state;
-	ulong rt_oldflags = rt->flags;
-	ulong rt_newflags = rt->flags;
+	uint rl_newstate;
+	uint rt_oldstate = rt->state;
+	uint rt_newstate = rt->state;
+	uint rt_oldflags = rt->flags;
+	uint rt_newflags = rt->flags;
 	int err;
 
 	if ((rt_newflags = mtp_sta_flags(state, rt_oldflags)) == rt_oldflags)
@@ -7204,7 +7626,7 @@ rt_set_state(queue_t *q, struct rt *rt, const ulong state)
 	/* ---------------------------------------------- */
 	if (rt_newflags & (RTF_PROHIBITED | RTF_RESTRICTED)) {
 		/* start signalling route set test procedure */
-		rt_timer_start(rt, t10);
+		rt_timer_start(q, rt, t10);
 	} else {
 		/* stop signalling route set test procedure */
 		rt_timer_stop(rt, t10);
@@ -7217,31 +7639,25 @@ rt_set_state(queue_t *q, struct rt *rt, const ulong state)
 			/* route has moved from accessible to inaccessible */
 			if (accessible > 1) {
 				/* offload traffic to other accessible routes */
-				int maxload = RT_SMAP_SIZE / (accessible - 1) + 1;
-
-				rt_reroute_sub(rl, rt, maxload);
+				rt_reroute_sub(q, rl, rt, accessible - 1);
 			} else if (restricted) {
 				/* offload traffic to restricted routes */
-				int maxload = RT_SMAP_SIZE / restricted + 1;
-
-				rt_reroute_res(rl, rt, maxload);
+				rt_reroute_res(q, rl, rt, restricted);
 			} else {
 				/* we are the last accessible route in route list */
 				/* empty route list */
-				rt_reroute_all(rl, NULL, 1);
+				rt_reroute_all(q, rl, NULL, true);
 			}
 		} else {
 			/* route has moved from restricted to inaccessible */
 			if (!accessible && restricted > 1) {
 				/* route was carrying traffic */
 				/* offload traffic to other restricted routes */
-				int maxload = RT_SMAP_SIZE / (restricted - 1) + 1;
-
-				rt_reroute_sub(rl, rt, maxload);
+				rt_reroute_sub(q, rl, rt, restricted - 1);
 			} else if (!accessible) {
 				/* we are the last accessible route in route list */
 				/* empty route list */
-				rt_reroute_all(rl, NULL, 1);
+				rt_reroute_all(q, rl, NULL, true);
 			}
 		}
 	}
@@ -7254,42 +7670,38 @@ rt_set_state(queue_t *q, struct rt *rt, const ulong state)
 			if (accessible == 0) {
 				/* only allowed route in route list */
 				/* take over all traffic */
-				rt_reroute_all(rl, rt, 0);
+				rt_reroute_all(q, rl, rt, false);
 			} else {
 				/* other routes are allowed */
 				/* rebalance the route load */
-				int maxload = RT_SMAP_SIZE / (accessible + 1) + 1;
-
-				rt_reroute_add(rl, rt, maxload);
+				rt_reroute_add(q, rl, rt, accessible + 1);
 			}
 		} else {
 			/* route has moved from inaccessible to restricted */
 			if (accessible + restricted == 0) {
 				/* only accessible route in route list */
 				/* take over all traffic */
-				rt_reroute_all(rl, rt, 0);
+				rt_reroute_all(q, rl, rt, false);
 			} else if (!accessible) {
 				/* other routes are restricted but none are allowed */
 				/* rebalance the route load */
-				int maxload = RT_SMAP_SIZE / (restricted + 1) + 1;
-
-				rt_reroute_add(rl, rt, maxload);
+				rt_reroute_add(q, rl, rt, restricted + 1);
 			}
 		}
 	}
 	/* ---------------------------------------------- */
 	/* push state change to rl */
-	(&rl->rt.allowed)[rt_oldstate]--;
-	(&rl->rt.allowed)[rt_newstate]++;
+	rl->rt.states[rt_oldstate]--;
+	rl->rt.states[rt_newstate]++;
 	if ((rl_newstate = mtp_cnt_state((struct counters *) (&rl->rt), rl->state)) != rl->state)
 		if ((err = rl_set_state(q, rl, rl_newstate)) < 0) {
-			(&rl->rt.allowed)[rt_oldstate]++;
-			(&rl->rt.allowed)[rt_newstate]--;
+			rl->rt.states[rt_oldstate]++;
+			rl->rt.states[rt_newstate]--;
 			return (err);
 		}
 	/* push counts to lk */
-	(&rt->lk.lk->rt.allowed)[rt_oldstate]--;
-	(&rt->lk.lk->rt.allowed)[rt_newstate]++;
+	rt->lk.lk->rt.states[rt_oldstate]--;
+	rt->lk.lk->rt.states[rt_newstate]++;
 	/* What we are more interested in than pushing state here is determining the route loading
 	   of the link, and whether the link is in danger of congestion due to route loading.  That 
 	   is a difficult thing to calculate, however.  The link can only be in danger of
@@ -7307,17 +7719,25 @@ rt_set_state(queue_t *q, struct rt *rt, const ulong state)
 	return (0);
 }
 
+/**
+ * ls_set_state: - set new combined link set state
+ * @q: active queue
+ * @ls: combined link set
+ * @state: new state
+ *
+ * A link set state change might also change a route list or signalling point state or both.
+ */
 static int
-ls_set_state(queue_t *q, struct ls *ls, ulong state)
+ls_set_state(queue_t *q, struct ls *ls, uint state)
 {
 	struct sp *sp = ls->sp.sp;
 	struct rl *rl;
-	ulong sp_newstate;
-	ulong rl_newstate;
-	ulong ls_oldstate = ls->state;
-	ulong ls_newstate = ls->state;
-	ulong ls_oldflags = ls->flags;
-	ulong ls_newflags = ls->flags;
+	uint sp_newstate;
+	uint rl_newstate;
+	uint ls_oldstate = ls->state;
+	uint ls_newstate = ls->state;
+	uint ls_oldflags = ls->flags;
+	uint ls_newflags = ls->flags;
 	int err;
 
 	if ((ls_newflags = mtp_sta_flags(state, ls_oldflags)) == ls_oldflags)
@@ -7337,12 +7757,12 @@ ls_set_state(queue_t *q, struct ls *ls, ulong state)
 				return (err);
 	/* --------------------------------------------- */
 	/* push state change to sp */
-	(&sp->ls.allowed)[ls_oldstate]--;
-	(&sp->ls.allowed)[ls_newstate]++;
+	sp->ls.states[ls_oldstate]--;
+	sp->ls.states[ls_newstate]++;
 	if ((sp_newstate = mtp_cnt_state((struct counters *) (&sp->ls), sp->state)) != sp->state)
 		if ((err = sp_set_state(q, sp, sp_newstate)) < 0) {
-			(&sp->ls.allowed)[ls_oldstate]++;
-			(&sp->ls.allowed)[ls_newstate]--;
+			sp->ls.states[ls_oldstate]++;
+			sp->ls.states[ls_newstate]--;
 			return (err);
 		}
 	ls->state = ls_newstate;
@@ -7352,17 +7772,25 @@ ls_set_state(queue_t *q, struct ls *ls, ulong state)
 	return (0);
 }
 
+/**
+ * lk_set_state: - set new link set state
+ * @q: active queue
+ * @lk: link set
+ * @state: new state
+ *
+ * A link set state change might also change a route or combined link set state or both.
+ */
 static int
-lk_set_state(queue_t *q, struct lk *lk, ulong state)
+lk_set_state(queue_t *q, struct lk *lk, uint state)
 {
 	struct ls *ls = lk->ls.ls;
 	struct rt *rt;
-	ulong ls_newstate;
-	ulong rt_newstate;
-	ulong lk_oldstate = lk->state;
-	ulong lk_newstate = lk->state;
-	ulong lk_oldflags = lk->flags;
-	ulong lk_newflags = lk->flags;
+	uint ls_newstate;
+	uint rt_newstate;
+	uint lk_oldstate = lk->state;
+	uint lk_newstate = lk->state;
+	uint lk_oldflags = lk->flags;
+	uint lk_newflags = lk->flags;
 	int err;
 
 	if ((lk_newflags = mtp_sta_flags(state, lk_oldflags)) == lk_oldflags)
@@ -7382,12 +7810,12 @@ lk_set_state(queue_t *q, struct lk *lk, ulong state)
 				return (err);
 	/* --------------------------------------------- */
 	/* push state change to ls */
-	(&ls->lk.allowed)[lk_oldstate]--;
-	(&ls->lk.allowed)[lk_newstate]++;
+	ls->lk.states[lk_oldstate]--;
+	ls->lk.states[lk_newstate]++;
 	if ((ls_newstate = mtp_cnt_state((struct counters *) (&ls->lk), ls->state)) != ls->state)
 		if ((err = ls_set_state(q, ls, ls_newstate)) < 0) {
-			(&ls->lk.allowed)[lk_oldstate]++;
-			(&ls->lk.allowed)[lk_newstate]--;
+			ls->lk.states[lk_oldstate]++;
+			ls->lk.states[lk_newstate]--;
 			return (err);
 		}
 	lk->state = lk_newstate;
@@ -7397,15 +7825,23 @@ lk_set_state(queue_t *q, struct lk *lk, ulong state)
 	return (0);
 }
 
+/**
+ * sl_set_state: - set new signalling link state
+ * @q: active quee
+ * @sl: signalling link whose state to change
+ * @state: new state
+ *
+ * A signalling link state change might also change the link set state.
+ */
 static int
-sl_set_state(queue_t *q, struct sl *sl, ulong state)
+sl_set_state(queue_t *q, struct sl *sl, uint state)
 {
 	struct lk *lk = sl->lk.lk;
-	ulong lk_newstate;
-	ulong sl_oldstate = sl->state;
-	ulong sl_newstate = sl->state;
-	ulong sl_oldflags = sl->flags;
-	ulong sl_newflags = sl->flags;
+	uint lk_newstate;
+	uint sl_oldstate = sl->state;
+	uint sl_newstate = sl->state;
+	uint sl_oldflags = sl->flags;
+	uint sl_newflags = sl->flags;
 	int err;
 
 	if ((sl_newflags = mtp_sta_flags(state, sl_oldflags)) == sl_oldflags)
@@ -7414,55 +7850,56 @@ sl_set_state(queue_t *q, struct sl *sl, ulong state)
 		goto no_state_change;
 	/* --------------------------------------------- */
 	if (sl_newstate < SL_UNUSABLE && sl_oldstate > SL_CONGESTED) {
-		/* link has become usable from unusable */
-		/* in all cases when we move to active, we could have our own changeover buffers
-		   hanging around or we could have links that at the time that they initiated
-		   changeover, they had no alternate (but they do now). */
-		/* redistribute traffic to the new link if required */
 		int active =
 		    lk->sl.allowed + lk->sl.danger + lk->sl.congested + lk->sl.restricted + 1;
-		int maxload = SL_SMAP_SIZE / active + 1;
 
-		sl_changeback_add(lk, sl, maxload);
+		/* The link will become usable (active) from unusable (blocked or inactive).  In
+		   all cases when the signalling link moves to active, redistribute traffic to the
+		   new link as required. */
+		sl_changeback_add(q, lk, sl, active);
 	}
 	if (sl_newstate == SL_INHIBITED && sl_oldstate < SL_UNUSABLE) {
-		/* inihibited from usable */
-		/* we already have a changeover buffer allocated at the beginning of the inhibition 
-		   process, this is just the final state change.  We should check if there are any
-		   changeovers or changebacks to us and redirect them. */
-		fixme(("Write this function\n"));
+		/* When the link become inhibited from usable, there should already be a changeover 
+		   buffer that was allocated at the beginning of the inhibition process.  Setting
+		   the state is just the final state change.  Perhaps it should be checked whether
+		   there are any changeovers or changebacks to this signalling link and redirect
+		   them. */
+		mi_strlog(q, 0, SL_TRACE, "sl_set_state() check for cb operations?");
 	}
 	if (sl_oldstate < SL_UNUSABLE && sl_newstate > SL_CONGESTED) {
-		/* unusable (blocked or inactive) from usable */
-		int active = lk->sl.allowed + lk->sl.danger + lk->sl.congested;
-		int inhibited = lk->sl.restricted;
+		/* The link will become unusable (blocked or inactive) from usable (active or
+		   inibited). */
 
 		if (sl_oldstate != SL_INHIBITED) {
-			/* link has moved from active to unusable */
-			if (active > 1) {
-				/* offload traffic to other active links */
-				int maxload = SL_SMAP_SIZE / (active - 1) + 1;
+			int active = lk->sl.allowed + lk->sl.danger + lk->sl.congested - 1;
+			int inhibited = lk->sl.restricted;
 
-				sl_changeover_sub(lk, sl, maxload);
+			/* The link has moved from active (uninhibbited) to unusable. */
+			if (active > 0) {
+				/* When the link becomes unusable (blocked or inactive) and there
+				   are other active signalling links, offload traffic to those
+				   other active signalling links. */
+				sl_changeover_sub(q, lk, sl, active);
 			} else if (inhibited) {
-				/* offload traffic to inhibited links */
-				int maxload = SL_SMAP_SIZE / inhibited + 1;
-
-				sl_changeover_res(lk, sl, maxload);
+				/* When the link becomes unusable (blocked or inactive) and there
+				   are only inhibited signalling links available, offload traffic
+				   to the inhibited links using forced unihibiting. */
+				sl_changeover_res(q, lk, sl, inhibited);
 			}
 		} else {
-			/* link has moved from inhibited to unusable */
-			/* link was not carrying traffic */
+			/* When the link moves from inihibited to unusable (blocked or inactive),
+			   the link was not carrying traffic while inhibited and no action is
+			   required to keep it from carrying further traffic. */
 		}
 	}
 	/* --------------------------------------------- */
 	/* push state change to lk */
-	(&lk->sl.allowed)[sl_oldstate]--;
-	(&lk->sl.allowed)[sl_newstate]++;
+	lk->sl.states[sl_oldstate]--;
+	lk->sl.states[sl_newstate]++;
 	if ((lk_newstate = mtp_cnt_state((struct counters *) (&lk->sl), lk->state)) != lk->state)
 		if ((err = lk_set_state(q, lk, lk_newstate)) < 0) {
-			(&lk->sl.allowed)[sl_oldstate]++;
-			(&lk->sl.allowed)[sl_newstate]--;
+			lk->sl.states[sl_oldstate]++;
+			lk->sl.states[sl_newstate]--;
 			return (err);
 		}
 	sl->state = sl_newstate;
@@ -7521,14 +7958,13 @@ rt_find(struct rl *rl, int state)
 }
 #endif
 
-/*
- *  LOOKUP ROUTESET (LOCAL)
- *  -----------------------------------
- *  @sl: signalling link for the local route set
- *  @dest: destination of the route set
- *  @type: type of route set
+/**
+ * mtp_lookup_rs_local: - lookup a routeset (local)
+ * @sl: signalling link for the local route set
+ * @dest: destination of the route set
+ * @type: type of route set
  *
- *  Find a local route set via the signalling link with the specified destination and type.
+ * Find a local route set via the signalling link with the specified destination and type.
  */
 static struct rs *
 mtp_lookup_rs_local(struct sl *sl, uint32_t dest, int type)
@@ -7545,15 +7981,18 @@ mtp_lookup_rs_local(struct sl *sl, uint32_t dest, int type)
 	return (rs);
 }
 
-/*
- *  LOOKUP ROUTESET
- *  -----------------------------------
- *  @sl: the signalling link the message came in on
- *  @m: the decoded message
- *  @type: type of destination in message
+/**
+ * mtp_lookup_rs: - lookup a routeset for a routeset-related message
+ * @q: active queue
+ * @sl: the signalling link the message came in on
+ * @m: the decoded message
+ * @type: type of destination in message
  *
- *  Lookup the route set to which a route set related message pertains with appropriate security screening.  Route
- *  set related messages include TFC, UPU, UPA, and UPT.
+ * Lookup the route set to which a route set related message pertains with appropriate security screening.  Route set
+ * related messages include TFC, UPU, UPA, and UPT.
+ *
+ * Route set related message which arrive on link sets upon which we have no existing route to the specified
+ * destination are suspect and should be ignored.  Several DoS attacks are possible without this screening.
  */
 static struct rs *
 mtp_lookup_rs(queue_t *q, struct sl *sl, struct mtp_msg *m, uint type)
@@ -7562,9 +8001,6 @@ mtp_lookup_rs(queue_t *q, struct sl *sl, struct mtp_msg *m, uint type)
 	struct lk *lk = sl->lk.lk;
 	struct sp *sp = lk->sp.loc;
 
-	/* Route set related message which arrive on link sets upon which we have no existing route 
-	   to the specified destination are suspect and should be ignored.  Several DoS attacks are 
-	   possible without this screening. */
 	if (sp->flags & SPF_SECURITY) {
 		if (!mtp_lookup_rs_local(sl, m->dest, type))
 			goto error1;
@@ -7575,32 +8011,34 @@ mtp_lookup_rs(queue_t *q, struct sl *sl, struct mtp_msg *m, uint type)
 	}
 	for (rs = sp->rs.list; rs; rs = rs->sp.next)
 		if (rs->dest == m->dest && rs->rs_type == type)
-			goto found;
-      found:
-	if (rs)
-		return (rs);
-	goto error7;
+			break;
+	if (!rs)
+		goto error7;
+	return (rs);
       error1:
-	mi_strlog(q, 0, SL_TRACE, "Route set message: no local route to destination");
+	mi_strlog(q, 0, SL_ERROR, "Route set message: no local route to destination");
 	goto error;
       error2:
-	mi_strlog(q, 0, SL_TRACE, "Route set message: no local route to originator");
+	mi_strlog(q, 0, SL_ERROR, "Route set message: no local route to originator");
 	goto error;
       error3:
-	mi_strlog(q, 0, SL_TRACE, "Route set message: originator non-STP");
+	mi_strlog(q, 0, SL_ERROR, "Route set message: originator non-STP");
 	goto error;
       error7:
-	mi_strlog(q, 0, SL_TRACE, "Route set message: no route to destination");
+	mi_strlog(q, 0, SL_ERROR, "Route set message: no route to destination");
 	goto error;
       error:
 	todo(("Deliver screened message to MTP management\n"));
 	return (NULL);
 }
 
-/*
- *  LOOKUP ROUTE (LOCAL)
- *  -----------------------------------
- *  Find a local route via the signalling link with the specified destination and type.
+/**
+ * mtp_lookup_rt_local: lookup a route (local)
+ * @sl: signallign link message came in on
+ * @dest: destination of the route
+ * @type: type of the route
+ * 
+ * Find a local route via the signalling link with the specified destination and type.
  */
 static struct rt *
 mtp_lookup_rt_local(struct sl *sl, uint32_t dest, int type)
@@ -7615,15 +8053,14 @@ mtp_lookup_rt_local(struct sl *sl, uint32_t dest, int type)
 	return (rt);
 }
 
-/*
- *  LOOKUP ROUTE (TEST)
- *  -----------------------------------
- *  @sl: the signalling link the message came in on
- *  @m: the decoded message
- *  @type: type of destination in message
+/**
+ * mtp_lookup_rt_test: - lookup route for a route test message
+ * @sl: the signalling link the message came in on
+ * @m: the decoded message
+ * @type: type of destination in message
  *
- *  Lookup the route to which a route related test message pertains with appropriate screening.  Route related test
- *  messages include RST, RSR, RCP, and RCR.
+ * Lookup the route to which a route related test message pertains with appropriate screening.  Route related test
+ * messages include RST, RSR, RCP, and RCR.
  */
 static struct rt *
 mtp_lookup_rt_test(queue_t *q, struct sl *sl, struct mtp_msg *m, uint type)
@@ -7662,44 +8099,51 @@ mtp_lookup_rt_test(queue_t *q, struct sl *sl, struct mtp_msg *m, uint type)
 		return (rt);
 	goto error7;
       error1:
-	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route set test message: local is non-STP");
+	/* If we are not equipped with the transfer function, we never expect to receive route
+	   related test messages.  Can be an attempt to probe screening tables. */
+	mi_strlog(q, 0, SL_ERROR, "Route set test message: local is non-STP");
 	goto error;
       error2:
-	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route set test message: no cluster support");
+	/* If the message is a cluster message and we do not support cluster routing, it is an
+	   obvious error.  Can be an attempt to probe screening tables. */
+	mi_strlog(q, 0, SL_ERROR, "Route set test message: no cluster support");
 	goto error;
       error3:
-	mi_strlog(q, 0, SL_TRACE,
-		  "PROTOCOL ERROR: Route set test message: no local route to originator");
+	/* If we do not have a route set for the originator of the message, then it is another
+	   obvious error.  The true originator might be spoofing the originating point code. */
+	mi_strlog(q, 0, SL_ERROR, "Route set test message: no local route to originator");
 	goto error;
       error4:
-	mi_strlog(q, 0, SL_TRACE,
-		  "PROTOCOL ERROR: Route set test message: originator not adjacent");
+	/* If the message is not sent by a known adjacent signalling point, then it is another
+	   obvious error.  The originator may be attempting to bounce test messages around.  */
+	mi_strlog(q, 0, SL_ERROR, "Route set test message: originator not adjacent");
 	goto error;
       error5:
-	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route set test message: testing local adjacent");
+	/* If the message is testing the local point code, then it is an error.  Adjacent point
+	   codes never test the adjacent point code, it is assumed available when there is a
+	   signalling link available to it. */
+	mi_strlog(q, 0, SL_ERROR, "Route set test message: testing local adjacent");
 	goto error;
       error6:
-	mi_strlog(q, 0, SL_TRACE,
-		  "PROTOCOL ERROR: Route set test message: no local route to destination");
+	mi_strlog(q, 0, SL_ERROR, "Route set test message: no local route to destination");
 	goto error;
       error7:
-	mi_strlog(q, 0, SL_TRACE,
-		  "PROTOCOL ERROR: Route set test message: no route to destination");
+	mi_strlog(q, 0, SL_ERROR, "Route set test message: no route to destination");
 	goto error;
       error:
 	todo(("Deliver screened message to MTP management\n"));
 	return (NULL);
 }
 
-/*
- *  LOOKUP ROUTE
- *  -----------------------------------
- *  @sl: the signalling link the message came in on
- *  @m: the message
- *  @type: type of destination in message
+/**
+ * mtp_lookup_rt: - lookup route for a route-related message
+ * @q: active queue
+ * @sl: the signalling link the message came in on
+ * @m: the message
+ * @type: type of destination in message
  *
- *  Lookup the route to which a route related message pertains with appropriate security screening.  Route related
- *  messages include TFA, TFR, TFP, TCA, TCR, TCP.
+ * Lookup the route to which a route related message pertains with appropriate security screening.  Route related
+ * messages include TFA, TFR, TFP, TCA, TCR, TCP.
  */
 static struct rt *
 mtp_lookup_rt(queue_t *q, struct sl *sl, struct mtp_msg *m, uint type)
@@ -7735,44 +8179,42 @@ mtp_lookup_rt(queue_t *q, struct sl *sl, struct mtp_msg *m, uint type)
 					    && rs->rs_type == type)
 						goto found;
       found:
-	if (rt)
-		return (rt);
-	goto error7;
+	if (!rt)
+		goto error7;
+	return (rt);
       error1:
-	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route related message: from adjacent non-STP");
+	mi_strlog(q, 0, SL_ERROR, "Route related message: from adjacent non-STP");
 	goto error;
       error2:
-	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route related message: no cluster support");
+	mi_strlog(q, 0, SL_ERROR, "Route related message: no cluster support");
 	goto error;
       error3:
-	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route related message: concerning adjacent");
+	mi_strlog(q, 0, SL_ERROR, "Route related message: concerning adjacent");
 	goto error;
       error4:
-	mi_strlog(q, 0, SL_TRACE,
-		  "PROTOCOL ERROR: Route related message: no local route to originator");
+	mi_strlog(q, 0, SL_ERROR, "Route related message: no local route to originator");
 	goto error;
       error5:
-	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route related message: from non-adjacent");
+	mi_strlog(q, 0, SL_ERROR, "Route related message: from non-adjacent");
 	goto error;
       error6:
-	mi_strlog(q, 0, SL_TRACE,
-		  "PROTOCOL ERROR: Route related message: no local route to destination");
+	mi_strlog(q, 0, SL_ERROR, "Route related message: no local route to destination");
 	goto error;
       error7:
-	mi_strlog(q, 0, SL_TRACE, "PROTOCOL ERROR: Route related message: no route to destination");
+	mi_strlog(q, 0, SL_ERROR, "Route related message: no route to destination");
 	goto error;
       error:
 	todo(("Deliver screened message to MTP management\n"));
 	return (NULL);
 }
 
-/*
- *  LOOKUP SIGNALLING LINK
- *  -----------------------------------
- *  @sl: the signalling link the message came in on
- *  @m: the message
+/**
+ * mtp_lookup_sl: - lookup signalling-link related message
+ * @q: active queue
+ * @sl: the signalling link the message came in on
+ * @m: the message
  *
- *  Lookup the signalling link to which a signalling link related message pertains.
+ * Lookup the signalling link to which a signalling link related message pertains.
  */
 static struct sl *
 mtp_lookup_sl(queue_t *q, struct sl *sl, struct mtp_msg *m)
@@ -7782,9 +8224,6 @@ mtp_lookup_sl(queue_t *q, struct sl *sl, struct mtp_msg *m)
 	struct lk *lk;
 	struct sl *s2 = NULL;
 
-	/* Signalling link related messages which arrive on link sets upon which we have no
-	   existing route to the adjacent signalling point are suspect and should be ignored.
-	   Several DoS attacks are possible without this screening. */
 	if (sp->flags & SPF_SECURITY)
 		if (!mtp_lookup_rt_local(sl, m->opc, RT_TYPE_MEMBER)
 		    && !mtp_lookup_rt_local(sl, m->opc & sp->na.na->mask.cluster, RT_TYPE_CLUSTER))
@@ -7798,8 +8237,10 @@ mtp_lookup_sl(queue_t *q, struct sl *sl, struct mtp_msg *m)
       found:
 	return (s2);
       screened:
-	mi_strlog(q, 0, SL_TRACE,
-		  "PROTOCOL ERROR: Signallingl link message: no local signalling link");
+	/* Signalling link related messages which arrive on link sets upon which we have no
+	   existing route to the adjacent signalling point are suspect and should be ignored.
+	   Several DoS attacks are possible without this screening. */
+	mi_strlog(q, 0, SL_ERROR, "Signallingl link message: no local signalling link");
 	goto error;
       error:
 	todo(("Deliver screened message to MTP management\n"));
@@ -8179,7 +8620,7 @@ sl_stop_restore(queue_t *q, struct sl *sl)
 		/* T19(ANSI) is a maintenance guard timer */
 		sl_timer_stop(sl, t19a);
 		/* wait for T17 before attempting restoration again */
-		sl_timer_start(sl, t17);
+		sl_timer_start(q, sl, t17);
 		/* If we are waiting for in service then we do not change the routing state of the
 		   link.  Also, we do not need to perform retrieval because we have not sent
 		   anything on the link (other than SLTM). */
@@ -8222,15 +8663,15 @@ sl_stop_restore(queue_t *q, struct sl *sl)
 					continue;
 				}
 				/* release the changeback buffer */
-				cb_reroute_buffer(cb);
+				cb_divert_buffer(cb);
 			}
 		}
-	}
 		/* purge any remaining unclaimed messages */
 		bufq_purge(&sl->rbuf);
 		if ((err = sl_set_state(q, sl, SL_UPDATED)) < 0)
 			goto error;
 		/* fall through */
+	}
 	case SLS_PROC_OUTG:
 	case SLS_IN_SERVICE:
 		/* T31(ANSI) is a false congesiton detection timer */
@@ -8259,27 +8700,29 @@ sl_stop_restore(queue_t *q, struct sl *sl)
 			if ((err = sl_set_state(q, sl, SL_UNBLOCKED)) < 0)
 				goto error;
 			/* flush old signalling link buffers */
-			if ((err = sl_clear_buffers_req(NULL, sl)))
+			if ((err = sl_clear_buffers_req(q, sl)))
 				goto error;
 		}
 		/* purge any remaining unclaimed messages */
 		bufq_purge(&sl->rbuf);
 		if ((err = sl_set_state(q, sl, SL_UPDATED)) < 0)
 			goto error;
-		if ((sl->lk.lk->sp.loc->flags & SPF_LOSC_PROC_A) && sl->timers.t32a) {
+		if ((sl->lk.lk->sp.loc->flags & SPF_LOSC_PROC_A)
+		    && mi_timer_reamin(sl->timers.t32a)) {
 			/* ANSI link oscillation procedure A */
 			/* link was in probation, now in suspension */
-		} else if ((sl->lk.lk->sp.loc->flags & SPF_LOSC_PROC_B) && sl->timers.t33a) {
+		} else if ((sl->lk.lk->sp.loc->flags & SPF_LOSC_PROC_B)
+			   && mi_timer_remain(sl->timers.t33a)) {
 			/* ANSI link oscillation procedure B */
 			/* link was in probation, now place it in suspension */
 			sl_timer_stop(sl, t33a);
-			sl_timer_start(sl, t34a);
+			sl_timer_start(q, sl, t34a);
 		} else {
 			/* start restoration */
-			if ((err = sl_start_req(NULL, sl)))
+			if ((err = sl_start_req(q, sl)))
 				goto error;
 			/* T19(ANSI) is a maintenance guard timer */
-			sl_timer_start(sl, t19a);
+			sl_timer_start(q, sl, t19a);
 		}
 		sl->flags &= ~(SLF_WACK_SLTM | SLF_WACK_SLTM2);
 		return (0);
@@ -8299,99 +8742,107 @@ sl_stop_restore(queue_t *q, struct sl *sl)
  *
  *  -------------------------------------------------------------------------
  */
-/*
- *  TIMER T1  -  changeover
- *  -----------------------------------
- *  IMPLEMENTATION NOTE:-  Similar analysis as for T2 timer: we discard the buffer and restart traffic.
+/**
+ * cb_t1_timeout: - TIMER T1 - changeover
+ * @q: active queue
+ * @cb: related changeover/changeback buffer
+ *
+ * IMPLEMENTATION NOTE:-  Similar analysis as for T2 timer: we discard the buffer and restart traffic.
  */
 static int
-cb_t1_timeout(struct cb *cb, queue_t *q)
+cb_t1_timeout(queue_t *q, struct cb *cb)
 {
 	struct sl *sl = cb->sl.from;
 
 	/* complete the changeover but discard buffer contents first */
 	bufq_purge(&cb->buf);
-	cb_reroute_buffer(cb);
+	cb_divert_buffer(cb);
 	/* Also purge and reroute any other buffers pending on t1 for the same link */
 	for (cb = sl->lk.lk->cb.list; cb; cb = cb->lk.next) {
-		if (cb->sl.from == sl && cb->timers.t1) {
+		if (cb->sl.from == sl && mi_timer_remain(cb->timers.t1)) {
 			cb_timer_stop(cb, t1);
 			bufq_purge(&cb->buf);
-			cb_reroute_buffer(cb);
+			cb_divert_buffer(cb);
 		}
 	}
 	return sl_stop_restore(q, sl);
 }
 
-/*
- *  TIMER T2  -  changeover ack
- *  -----------------------------------
- *  5.7.2  If no changeover message in response to a changeover order is received within a timer T2 (see 16.8), new
- *  traffic is started on the alternative signalling link(s).
+/**
+ * cb_t2_timeout: - TIMER T2 - changeover ack
+ * @q: active queue
+ * @cb: related changeover/changeback buffer
  *
- *  IMPLEMENTATION NOTE: There is a problem here.  We cannot check the link for congestion when trasferring the
- *  buffer.  If we a transferring a very large changeover buffer (up to 2 seconds worth of messages at 1 Erlang) we
- *  could congest the new link leading to a cascading failure.  Section 5.7.2 above, does not say to transfer the
- *  buffer on T2 expiry.  Instead it says to start "new traffic" on the alternative signalling link(s).  Taking this
- *  literally, we will flush the buffer and start new traffic only.
+ * 5.7.2  If no changeover message in response to a changeover order is received within a timer T2 (see 16.8), new
+ * traffic is started on the alternative signalling link(s).
+ *
+ * IMPLEMENTATION NOTE: There is a problem here.  We cannot check the link for congestion when trasferring the buffer.
+ * If we a transferring a very large changeover buffer (up to 2 seconds worth of messages at 1 Erlang) we could
+ * congest the new link leading to a cascading failure.  Section 5.7.2 above, does not say to transfer the buffer on
+ * T2 expiry.  Instead it says to start "new traffic" on the alternative signalling link(s).  Taking this literally,
+ * we will flush the buffer and start new traffic only.
  */
 static int
-cb_t2_timeout(struct cb *cb, queue_t *q)
+cb_t2_timeout(queue_t *q, struct cb *cb)
 {
 	struct sl *sl = cb->sl.from;
 
 	/* complete the changeover but discard buffer contents first */
 	bufq_purge(&cb->buf);
-	cb_reroute_buffer(cb);
+	cb_divert_buffer(cb);
 	/* Also purge and reroute any other buffers pending on t2 for the same link */
 	for (cb = sl->lk.lk->cb.list; cb; cb = cb->lk.next) {
-		if (cb->sl.from == sl && cb->timers.t2) {
+		if (cb->sl.from == sl && mi_timer_remain(cb->timers.t2)) {
 			cb_timer_stop(cb, t2);
 			bufq_purge(&cb->buf);
-			cb_reroute_buffer(cb);
+			cb_divert_buffer(cb);
 		}
 	}
 	return sl_stop_restore(q, sl);
 }
 
-/*
- *  TIMER T3  -  changeback
- *  -----------------------------------
- *  6.2.5  If the signalling point at the far end of the link made available currently is inaccessible, from the
- *  siganlling point initiating changeback (see clause 9 on MTP Restart), the sequence control procedure specified
- *  in 6.3 (which requires communication betwen the two concerned signalling points) does not apply; instead, the
- *  time-controlled diversion specified in 6.4 is performed.  This is made also when the concerned signalling points
- *  are accessible, but there is no signalling route to it using the same outgoing signalling link(s) (or one of the
- *  same signalling links) from which traffic will be diverted.
+/**
+ * cb_t3_timeout: - TIMER T3 - changeback
+ * @q: active queue
+ * @cb: related changeover/changeback buffer
  *
- *  6.4.1  The timer-controlled diversion procedure is sued at the end of the MTP restart procedure (see clause 9)
- *  when an adjacent signalling point becomes available, as well as for the reasons given in 6.2.5. ...
+ * 6.2.5  If the signalling point at the far end of the link made available currently is inaccessible, from the
+ * siganlling point initiating changeback (see clause 9 on MTP Restart), the sequence control procedure specified in
+ * 6.3 (which requires communication betwen the two concerned signalling points) does not apply; instead, the
+ * time-controlled diversion specified in 6.4 is performed.  This is made also when the concerned signalling points
+ * are accessible, but there is no signalling route to it using the same outgoing signalling link(s) (or one of the
+ * same signalling links) from which traffic will be diverted.
  *
- *  6.4.2  When changeback is intiated after the MTP restart procedure, the adjacent signalling point of the point
- *  whose MTP is restarting stops traffic to be directed from the alternative signalling link(s) for a time T3,
- *  after which it starts traffic on the signalling link(s) made available.  The time delay minimizes the
- *  probability of out-of-sequence delivery to the destination point(s).
+ * 6.4.1  The timer-controlled diversion procedure is sued at the end of the MTP restart procedure (see clause 9) when
+ * an adjacent signalling point becomes available, as well as for the reasons given in 6.2.5. ...
+ *
+ * 6.4.2  When changeback is intiated after the MTP restart procedure, the adjacent signalling point of the point
+ * whose MTP is restarting stops traffic to be directed from the alternative signalling link(s) for a time T3, after
+ * which it starts traffic on the signalling link(s) made available.  The time delay minimizes the probability of
+ * out-of-sequence delivery to the destination point(s).
  */
 static int
-cb_t3_timeout(struct cb *cb, queue_t *q)
+cb_t3_timeout(queue_t *q, struct cb *cb)
 {
 	/* restart traffic */
-	cb_reroute_buffer(cb);
+	cb_divert_buffer(cb);
 	return (0);
 }
 
-/*
- *  TIMER T4  -  changeback ack
- *  -----------------------------------
- *  6.5.3   If no changeback-acknowledgement is received in response to a changeback declaration within a timer T4,
- *  the changeback declaration is repeanted and a new timer T5 is started.  If no changeback acknowledgement is
- *  received before the expiry of T5, the maintenance functions are alerted and traffic on the link made available
- *  is started.  The changeback code contained in the changeback-acknowledgement message makes it possible to
- *  determine, in the case of parallel changebacks, from more than one reserve path, which changeback-declaration is
- *  unacknowledged and has therefore to be repeated.
+/**
+ * cb_t4_timeout: - TIMER T4 - changeback ack
+ * @q: active queue
+ * @cb: related changeover/changeback buffer
+ *
+ * 6.5.3   If no changeback-acknowledgement is received in response to a changeback declaration within a timer T4, the
+ * changeback declaration is repeanted and a new timer T5 is started.  If no changeback acknowledgement is received
+ * before the expiry of T5, the maintenance functions are alerted and traffic on the link made available is started.
+ * The changeback code contained in the changeback-acknowledgement message makes it possible to determine, in the case
+ * of parallel changebacks, from more than one reserve path, which changeback-declaration is unacknowledged and has
+ * therefore to be repeated.
  */
 static int
-cb_t4_timeout(struct cb *cb, queue_t *q)
+cb_t4_timeout(queue_t *q, struct cb *cb)
 {
 	struct sl *sl_from = cb->sl.from;
 	struct sl *sl_onto = cb->sl.onto;
@@ -8400,85 +8851,92 @@ cb_t4_timeout(struct cb *cb, queue_t *q)
 	struct rs *rs = lk->sp.adj;
 
 	mtp_send_cbd(q, sp, lk->ni, rs->dest, sp->pc, sl_onto->slc, sl_onto->slc, cb->cbc, sl_from);
-	cb_timer_start(cb, t5);
+	cb_timer_start(q, cb, t5);
 	return (0);
 }
 
-/*
- *  TIMER T5  -  changeback ack second attempt
- *  -----------------------------------
+/**
+ * cb_t5_timeout: - TIMER T5 - changeback ack second attempt
+ * @q: active queue
+ * @cb: related changeover/changeback buffer
  */
 static int
-cb_t5_timeout(struct cb *cb, queue_t *q)
+cb_t5_timeout(queue_t *q, struct cb *cb)
 {
 	/* restart traffic */
-	cb_reroute_buffer(cb);
+	cb_divert_buffer(cb);
 	return (0);
 }
 
-/*
- *  TIMER T6  -  controlled rerouting
- *  -----------------------------------
- *  Controlled rerouting is performed with a special controlled rerouting buffer which is attached to both the route
- *  from which traffic is being rerouted and the route to which traffic is being rerouted.  If the routeset has
- *  become unavailable while the timer was running, this will result in purging the controlled rerouting buffer.  If
- *  the unavailability was transient and the routeset is now available again, these messages will not be lost.  This
- *  is not mentioned in the MTP specifications.
+/**
+ * cr_t6_timeout: - TIMER T6 - controlled rerouting
+ * @q: active queue
+ * @cr: related controlled rerouting buffer
+ * 
+ * Controlled rerouting is performed with a special controlled rerouting buffer which is attached to both the route
+ * from which traffic is being rerouted and the route to which traffic is being rerouted.  If the routeset has become
+ * unavailable while the timer was running, this will result in purging the controlled rerouting buffer.  If the
+ * unavailability was transient and the routeset is now available again, these messages will not be lost.  This is not
+ * mentioned in the MTP specifications.
  */
 static int
-cr_t6_timeout(struct cr *cr, queue_t *q)
+cr_t6_timeout(queue_t *q, struct cr *cr)
 {
 	/* restart traffic */
-	return cr_reroute_buffer(cr);
+	cr_reroute_buffer(cr);
+	return (0);
 }
 
-/*
- *  TIMER T7  -  waiting for SDLC ack
- *  -----------------------------------
+/**
+ * lk_t7_timeout: - TIMER T7 - waiting for SDLC ack
+ * @q: active queue
+ * @lk: related link set
  */
 static int
-lk_t7_timeout(struct lk *lk, queue_t *q)
+lk_t7_timeout(queue_t *q, struct lk *lk)
+{
+	fixme(("Implement this function\n"));
+	return (-EFAULT);
+}
+
+/**
+ * rs_t8_timeout: - TIMER T8 - transfer prohibited inhibitition timer
+ * @q: active queue
+ * @rs: related route set
+ */
+static int
+rs_t8_timeout(queue_t *q, struct rs *rs)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
 }
 
 /*
- *  TIMER T8  -  transfer prohibited inhibitition timer
- *  -----------------------------------
- */
-static int
-rs_t8_timeout(struct rs *rs, queue_t *q)
-{
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
-}
-
-/*
- *  TIMER T9 - (not used)
- *  -----------------------------------
+ * xx_t9_timeout: - TIMER T9 - (not used)
+ * @q: active queue
+ * @xx: related xx
  */
 
-/*
- *  TIMER T10  -  waiting to repeat routeset test message
- *  -----------------------------------
- *  This timer is started after receiving a TFP, TCP, TFR or TCR for the route.  It runs and sends a RST message on
- *  the route every T10 seconds until stopped.  This timer is stopped after receiving a TFA or TCA message for the
- *  route.
+/**
+ * rt_t10_timeout: - TIMER T10 - waiting to repeat routeset test message
+ * @q: active queue
+ * @rt: related route
+ * 
+ * This timer is started after receiving a TFP, TCP, TFR or TCR for the route.  It runs and sends a RST message on the
+ * route every T10 seconds until stopped.  This timer is stopped after receiving a TFA or TCA message for the route.
  *
- *  13.5.2  A signalling route set test message is sent from a signalling point after a transfer prohibited or
- *  transfer restricted message is received from an adjacent signalling transfer point (see 13.2.4 and 13.4.4).  In
- *  this case, a signalling route set test message is sent to that signalling transfer point referring to the
- *  destination declared inaccessible or restricted by the transfer prohibited or transfer restricted message, every
- *  T10 period (see clause 16) until a transfer-allowed message, indicating that the destination has become
- *  accessible, is received.
+ * 13.5.2  A signalling route set test message is sent from a signalling point after a transfer prohibited or transfer
+ * restricted message is received from an adjacent signalling transfer point (see 13.2.4 and 13.4.4).  In this case, a
+ * signalling route set test message is sent to that signalling transfer point referring to the destination declared
+ * inaccessible or restricted by the transfer prohibited or transfer restricted message, every T10 period (see clause
+ * 16) until a transfer-allowed message, indicating that the destination has become accessible, is received.
  *
- *  Start:  receive TFP, TCP, TFR, TCR for first time
- *  Stop:   receive TFA, TCA
- *  Expiry: send RST, RCP, RSR, RCR and start T10
+ * Start:  receive TFP, TCP, TFR, TCR for first time
+ * Stop:   receive TFA, TCA
+ * Expiry: send RST, RCP, RSR, RCR and start T10
  */
 static int
-rt_t10_timeout(struct rt *rt, queue_t *q)
+rt_t10_timeout(queue_t *q, struct rt *rt)
 {
 	int err;
 	struct lk *lk = rt->lk.lk;
@@ -8513,37 +8971,39 @@ rt_t10_timeout(struct rt *rt, queue_t *q)
 	case RT_ALLOWED:
 		return (0);
 	}
-	rt_timer_start(rt, t10);
+	rt_timer_start(q, rt, t10);
 	return (0);
       error:
 	rare();
 	return (err);
 }
 
-/*
- *  TIMER T11  -  transfer restricted timer
- *  -----------------------------------
- *  ANSI T1.111.4 (1996-2000)  13.4.2 ... (1) When the normal route(s) to destination X become unavailable and
- *  signalling transfer point Y begins using a lower priority route to destination X, timer T11 is started.  When
- *  timer T11 expires or the lower priority route expreriences danger of congestion (whichever occurs first),
- *  signalling transfer point Y notifies accessible adjacent signalling points using one of two possible methods:
+/**
+ * rs_t11_timeout: - TIMER T11 - transfer restricted timer
+ * @q: active queue
+ * @rs: related route set
  *
- *  (a) Broadcast Method
+ * ANSI T1.111.4 (1996-2000)  13.4.2 ... (1) When the normal route(s) to destination X become unavailable and
+ * signalling transfer point Y begins using a lower priority route to destination X, timer T11 is started.  When timer
+ * T11 expires or the lower priority route expreriences danger of congestion (whichever occurs first), signalling
+ * transfer point Y notifies accessible adjacent signalling points using one of two possible methods:
  *
- *  Signalling transfer point Y sends transfer-restricted messages concerning destination X to all accessible
- *  adjacent signalling points, except those signalling points that receive a transfer-prohibited message according
- *  to 13.2.2 (1) and except destination X if it is an adjacent point.  Timer T18 is started after the broadcast is
- *  complete.  If the failure is still present and T18 expires, a transfer-restricted message is sent once per
- *  incoming link or link set by signalling transfer point Y in response to a message for destination X.
+ * (a) Broadcast Method
  *
- *  As a network option, the rate that transfer-restricted messages are broadcast may be regulated to minimize the
- *  burst of traffic that can occur due to controlled rerouting in adjacent nodes.  This regulation is not performed
- *  for the broadcasting of transfer-restricted messages indicating that a previously isolated destination is
- *  accessible.
+ * Signalling transfer point Y sends transfer-restricted messages concerning destination X to all accessible adjacent
+ * signalling points, except those signalling points that receive a transfer-prohibited message according to 13.2.2
+ * (1) and except destination X if it is an adjacent point.  Timer T18 is started after the broadcast is complete.  If
+ * the failure is still present and T18 expires, a transfer-restricted message is sent once per incoming link or link
+ * set by signalling transfer point Y in response to a message for destination X.
+ *
+ * As a network option, the rate that transfer-restricted messages are broadcast may be regulated to minimize the
+ * burst of traffic that can occur due to controlled rerouting in adjacent nodes.  This regulation is not performed
+ * for the broadcasting of transfer-restricted messages indicating that a previously isolated destination is
+ * accessible.
  *
  */
 static int
-rs_t11_timeout(struct rs *rs, queue_t *q)
+rs_t11_timeout(queue_t *q, struct rs *rs)
 {
 	int err;
 	struct sp *sp = rs->sp.sp;
@@ -8571,7 +9031,7 @@ rs_t11_timeout(struct rs *rs, queue_t *q)
 				return (err);
 			if (sp->flags & SPF_XFER_FUNC)
 				/* prepare for final TFR response */
-				rs_timer_start(rs, t18a);
+				rs_timer_start(q, rs, t18a);
 			break;
 		case SS7_POPT_TFRR:
 		case SS7_POPT_TFRR | SS7_POPT_TFRB:
@@ -8608,12 +9068,13 @@ rs_t11_timeout(struct rs *rs, queue_t *q)
 	return (0);
 }
 
-/*
- *  TIMER T18(ANSI)  -  awaiting TFR final repsonse
- *  -----------------------------------
+/**
+ * rs_t18a_timeout: - TIMER T18(ANSI) - awaiting TFR final repsonse
+ * @q: active queue
+ * @rs: related route set
  */
 static int
-rs_t18a_timeout(struct rs *rs, queue_t *q)
+rs_t18a_timeout(queue_t *q, struct rs *rs)
 {
 	struct rr *rr, *rr_next = rs->rr.list;
 
@@ -8643,64 +9104,69 @@ rs_t18a_timeout(struct rs *rs, queue_t *q)
 	return (0);
 }
 
-/*
- *  TIMER T12  -  uninhibit ack
- *  -----------------------------------
+/**
+ * sl_t12_timeout: - TIMER T12 - uninhibit ack
+ * @q: active queue
+ * @sl: related signalling link
  */
 static int
-sl_t12_timeout(struct sl *sl, queue_t *q)
+sl_t12_timeout(queue_t *q, struct sl *sl)
+{
+	fixme(("Implement this function\n"));
+	return (-EFAULT);
+}
+
+/**
+ * sl_t13_timeout: - TIMER T13 - waiting for force uninhibit
+ * @q: active queue
+ * @sl: related signalling link
+ */
+static int
+sl_t13_timeout(queue_t *q, struct sl *sl)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
 }
 
 /*
- *  TIMER T13  -  waiting for force uninhibit
- *  -----------------------------------
+ * sl_t14_timeout: - TIMER T14 - waiting for inhibition ack
+ * @q: active queue
+ * @sl: related signalling link
  */
 static int
-sl_t13_timeout(struct sl *sl, queue_t *q)
+sl_t14_timeout(queue_t *q, struct sl *sl)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
 }
 
 /*
- *  TIMER T14  -  waiting for inhibition ack
- *  -----------------------------------
- */
-static int
-sl_t14_timeout(struct sl *sl, queue_t *q)
-{
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
-}
-
-/*
- *  TIMER T15  -  waiting to start routeset congestion test
- *  -------------------------------------------------------------------------
- *  13.7.5  If T15 expires after the last update of the signalling route set towards destination X by a
- *  transfer-controlled message relating to the same destination, the signalling route set congestion test rocedure
- *  is invoked (see 13.9).
+ * rs_t15_timeout: - TIMER T15 - waiting to start routeset congestion test
+ * @q: active queue
+ * @rs: related route set
  *
- *  13.9.4  Provided that the signalling route set towards destination X is not in the "unavailable" state, a
- *  signalling route set congestion test message is sent from an originating signalling point to destination X in
- *  the following cases: i) When T15 expires after the last update of the congestion status of the signalling route
- *  set toward destination X by a transfer controlled message relating to the same destination.
+ * 13.7.5  If T15 expires after the last update of the signalling route set towards destination X by a
+ * transfer-controlled message relating to the same destination, the signalling route set congestion test rocedure is
+ * invoked (see 13.9).
  *
- *  Start:  TFC received
- *  Stop:   --
- *  Expiry: Send RCT, start T16
+ * 13.9.4  Provided that the signalling route set towards destination X is not in the "unavailable" state, a
+ * signalling route set congestion test message is sent from an originating signalling point to destination X in the
+ * following cases: i) When T15 expires after the last update of the congestion status of the signalling route set
+ * toward destination X by a transfer controlled message relating to the same destination.
+ *
+ * Start:  TFC received
+ * Stop:   --
+ * Expiry: Send RCT, start T16
  */
 static int
-rs_t15_timeout(struct rs *rs, queue_t *q)
+rs_t15_timeout(queue_t *q, struct rs *rs)
 {
 	int err;
 
 	if (rs->cong_status) {
 		struct sp *sp = rs->sp.sp;
 
-		rs_timer_start(rs, t16);
+		rs_timer_start(q, rs, t16);
 		if ((err = mtp_send_rct(q, sp, sp->ni, rs->dest, sp->pc, 0, rs->cong_status)) < 0)
 			goto error;
 	}
@@ -8709,28 +9175,27 @@ rs_t15_timeout(struct rs *rs, queue_t *q)
 	return (err);
 }
 
-/*
- *  TIMER T16  -  waiting for routeset congestion status update
- *  -------------------------------------------------------------------------
- *  13.9.3  If T16 expires after sending a signalling route set congestion test message without a transfer
- *  controlled message relating to the concerned destination having been received, the signalling point changes the
- *  congestion status associated with the signalling route set towards the concerned destination to the next lower
- *  status.
+/**
+ * rs_t16_timeout: - TIMER T16 - waiting for routeset congestion status update
+ * @q: active queue
+ * @rs: related route set
  *
- *  13.9.4  Provided that the signalling route set towards destination X is not in the "unavailable" state, a
- *  signalling route set congestion test message is sent from an originating signalling point to destination X in
- *  the following cases: i) ... ii) When T16 expires after sending a signalling route set congestion test message to
- *  destination X without a transfer controlled message relating to the same destination having been received.
- *  After the congestion status have been decremented by one, the test is repeated, unless the congestion status is
- *  zero.
+ * 13.9.3  If T16 expires after sending a signalling route set congestion test message without a transfer controlled
+ * message relating to the concerned destination having been received, the signalling point changes the congestion
+ * status associated with the signalling route set towards the concerned destination to the next lower status.
  *
- *  Start:  T15 expires
- *  Stop:   TFC received
- *  Expiry: Decrement cong status, inform users, send RCT and restart if still
- *          congested
+ * 13.9.4  Provided that the signalling route set towards destination X is not in the "unavailable" state, a
+ * signalling route set congestion test message is sent from an originating signalling point to destination X in the
+ * following cases: i) ... ii) When T16 expires after sending a signalling route set congestion test message to
+ * destination X without a transfer controlled message relating to the same destination having been received.  After
+ * the congestion status have been decremented by one, the test is repeated, unless the congestion status is zero.
+ *
+ * Start:  T15 expires
+ * Stop:   TFC received
+ * Expiry: Decrement cong status, inform users, send RCT and restart if still congested
  */
 static int
-rs_t16_timeout(struct rs *rs, queue_t *q)
+rs_t16_timeout(queue_t *q, struct rs *rs)
 {
 	int err;
 
@@ -8739,7 +9204,7 @@ rs_t16_timeout(struct rs *rs, queue_t *q)
 		uint newstatus;
 
 		if ((newstatus = rs->cong_status - 1)) {
-			rs_timer_start(rs, t16);
+			rs_timer_start(q, rs, t16);
 			if ((err = mtp_send_rct(q, sp, sp->ni, rs->dest, sp->pc, 0, newstatus)) < 0)
 				goto error;
 		}
@@ -8752,124 +9217,157 @@ rs_t16_timeout(struct rs *rs, queue_t *q)
 	return (err);
 }
 
-/*
- *  TIMER T17  -  link restart
- *  -----------------------------------
- *  12.2.1.2    When a decision is taken to activate an inactive signalling link; initial alignment starts.  If the
- *  initial alignment procedure is successful, the signalling link is active and a signalling link test is started.
- *  If the signalling link test is successful the link becomes ready to convey signalling traffic.  In the case when
- *  initial alignment is not possible, as determined at Message Transfer Part level 2 (see clause 7/Q.703), new
- *  initial alignment procedures are started on the same signalling link after a timer T17 (delay to avoid the
- *  oscillation of initial alignment failure and link restart.  The value of T17 should be greater than the loop
- *  delay and less than timer T2, see 7.3/Q.703).  If the signalling link test fails, link restoration starts until
- *  the signalling link is activated or a manual intervention is made.
+/**
+ * sl_t17_timeout: - TIMER T17 - link restart
+ * @q: active queue
+ * @sl: related signalling link
  *
- *  12.2.2  Signalling link restoration
+ * 12.2.1.2    When a decision is taken to activate an inactive signalling link; initial alignment starts.  If the
+ * initial alignment procedure is successful, the signalling link is active and a signalling link test is started.  If
+ * the signalling link test is successful the link becomes ready to convey signalling traffic.  In the case when
+ * initial alignment is not possible, as determined at Message Transfer Part level 2 (see clause 7/Q.703), new initial
+ * alignment procedures are started on the same signalling link after a timer T17 (delay to avoid the oscillation of
+ * initial alignment failure and link restart.  The value of T17 should be greater than the loop delay and less than
+ * timer T2, see 7.3/Q.703).  If the signalling link test fails, link restoration starts until the signalling link is
+ * activated or a manual intervention is made.
  *
- *  After a signalling link failure is detected, signalling link intial alignment will take place.  In the case when
- *  the initial alignment procedure is successful, a signalling link test is started.  If the signalling link test
- *  is successful the link becomes restored and thus available for signalling.
+ * 12.2.2  Signalling link restoration
  *
- *  If the initial alignmeent is not possible, as determined at Message Transfer Part level 2 (see clause 7/Q.703),
- *  new initial alignment procedures may be started on the same signalling link after a time T17 until the
- *  signalling link is restored or a manual intervention is made, e.g. to replace the signalling data link or the
- *  signalling terminal.
+ * After a signalling link failure is detected, signalling link intial alignment will take place.  In the case when
+ * the initial alignment procedure is successful, a signalling link test is started.  If the signalling link test is
+ * successful the link becomes restored and thus available for signalling.
  *
- *  If the signalling link test fails, the restoration procedure is repeated until the link is restored or a manual
- *  intervention is made.
+ * If the initial alignmeent is not possible, as determined at Message Transfer Part level 2 (see clause 7/Q.703), new
+ * initial alignment procedures may be started on the same signalling link after a time T17 until the signalling link
+ * is restored or a manual intervention is made, e.g. to replace the signalling data link or the signalling terminal.
+ *
+ * If the signalling link test fails, the restoration procedure is repeated until the link is restored or a manual
+ * intervention is made.
  */
 static int
-sl_t17_timeout(struct sl *sl, queue_t *q)
+sl_t17_timeout(queue_t *q, struct sl *sl)
 {
 	/* simply attempt to restart the link */
 	/* T19(ANSI) is a maintenance guard timer */
-	sl_timer_start(sl, t19a);
+	sl_timer_start(q, sl, t19a);
 	return sl_start_req(q, sl);
 }
 
-/*
- *  TIMER T1R  -  MTP restart timer
- *  -----------------------------------
- *  This is the same as timer T1 for signalling links, but is used to determine the amount of time from the last
- *  failed signalling link until restart is required.
+/**
+ * sp_t1r_timeout: - TIMER T1R - MTP restart timer
+ * @q: active queue
+ * @sp: related signalling point
+ *
+ * This is the same as timer T1 for signalling links, but is used to determine the amount of time from the last failed
+ * signalling link until restart is required.
+ *
+ * When the timer expires, mark restart.  (ANSI procedures call for the extension of the MTP unavailability period by
+ * T27a so that adjancent nodes are aware of the restart condition.  Note that this is about the time of T1 + T2 which
+ * is the amount of time taken for the remote end to institute and complete changeover procedures for the restarting
+ * node.) When the first link is in service at level 2 (and T27a is not running or expires), additional actions will
+ * be performed.
  */
 static int
-sp_t1r_timeout(struct sp *sp, queue_t *q)
+sp_t1r_timeout(queue_t *q, struct sp *sp)
+{
+	struct ls *ls;
+	struct lk *lk;
+	struct sl *sl;
+	int err;
+
+	for (ls = sp->ls.list; ls; ls = ls->sp.next) {
+		for (lk = ls->lk.list;  lk; lk = lk->ls.next) {
+			for (sl = lk->sl.list; sl; sl = sl->lk.next) {
+				if ((err = sl_local_processor_outage_req(q, sl)))
+					return (err);
+				noenable(sl->rq);
+				sl->flags |= SLF_RESTART_LOCKOUT;
+			}
+		}
+	}
+	sp->flags |= (SPF_RESTART|SPF_RESTART_LOCKOUT);
+	mi_timer(q, sp->timers.t27a, sp->config.t27a);
+	return (0);
+}
+
+/**
+ * sp_t18_timeout: - TIMER T18 - MTP restart timer
+ * @q: active queue
+ * @sp: related signalling point
+ *
+ * Timer T18 is a phase 1 restart timer and is started by a restarting signalling point with the transfer function
+ * when the first link goes into service at level 2.
+ *
+ * 9.2.2 ... Timer T18 is implementation and network dependent, and is stopped when:
+ *
+ * 1)  sufficient links and link sets are available to carry the expected signalling traffic; and
+ *
+ * 2)  enough TRA messages (and therefore routing data) have been received to give a high level of confidence in the
+ *     MTP routing tables.
+ *
+ * NOTE -- In normal circumstances the restarting MTP should wait for TRA messgaes from all adjacent nodes.  There
+ * are, however, other situations where this might not be useful, e.g. for a long-term equipment failure.
+ *
+ * When T18 is stopped or expires, these second phase begins, which includes as a major part a broadcast of
+ * non-preventitive transfer prohibited messages [i.e. those TFPs according to 13.2.2 v)] and transfer-restricted
+ * messages, taking into account signalling link sets which are not available and any TFP, TFA and TFR messages
+ * received during phase 1.  Note that timer T18 is determined such that during phase 2 the broadcast of TFP and TFR
+ * messages may be completed in normal situations.
+ */
+static int
+sp_t18_timeout(queue_t *q, struct sp *sp)
+{
+	sp->flags &= ~SPF_RESTART_PHASE_1;
+	sp->flags |= SPF_RESTART_PHASE_2;
+	fixme(("complete this function\n"));
+	return (-EFAULT);
+}
+
+/**
+ * sp_t19_timeout: - TIMER T19 - MTP restart timer
+ * @q: active queue
+ * @sp: related signalling point
+ *
+ * 9.2.4 ... In addition, [to sending TRA] timer T19 is started (see 9.5.2) for all signalling points to which a TRA
+ * message has just been sent.  Normal operation is then resumed.
+ *
+ * 9.5.1  If a signalling point X receives an unexpected TRA message from an adjacent node Y and no associated T19
+ * timer is running, X sends to Y any necessary TFP and TFR messages if X has the transfer function, and a TRA message
+ * to Y.  In addition, X starts timer T19 associated with Y.
+ *
+ * 9.5.2  If a signalling point receives a TRA message from an adjacent node and an associated T19 is running, this
+ * TRA is discarded and no further action is taken.
+ */
+static int
+sp_t19_timeout(queue_t *q, struct sp *sp)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
 }
 
-/*
- *  TIMER T18  -  MTP restart timer
- *  -----------------------------------
- *  Timer T18 is a phase 1 restart timer and is started by a restarting signalling point with the transfer function
- *  when the first link goes into service at level 2.
+/**
+ * sl_t19a_timeout: - TIMER T19(ANSI) - Link Maintenance timer
+ * @q: active queue
+ * @sl: related signalling link
  *
- *  9.2.2 ... Timer T18 is implementation and network dependent, and is stopped when:
+ * ANSI T1.111.4 (1996 and 2000) 12.2.2.  After a signalling link failure is detected, signalling link initial
+ * alignment will take place.  When the initial alignment procedure is successful, a signalling link test is started.
+ * If the signalling link test is successful, the signalling link is regarded as restored and thus available for
+ * siganlling.
  *
- *  1)  sufficient links and link sets are available to carry the expected signalling traffic; and
- *
- *  2)  enough TRA messages (and therefore routing data) have been received to give a high level of confidence in
- *  the MTP routing tables.
- *
- *  NOTE -- In normal circumstances the restarting MTP should wait for TRA messgaes from all adjacent nodes.  There
- *  are, however, other situations where this might not be useful, e.g. for a long-term equipment failure.
- *
- *  When T18 is stopped or expires, these second phase begins, which includes as a major part a broadcast of
- *  non-preventitive transfer prohibited messages [i.e. those TFPs according to 13.2.2 v)] and transfer-restricted
- *  messages, taking into account signalling link sets which are not available and any TFP, TFA and TFR messages
- *  received during phase 1.  Note that timer T18 is determined such that during phase 2 the broadcast of TFP and
- *  TFR messages may be completed in normal situations.
+ * If initial alignment is not possible, as determined at level 2 (see Section 7 of Chapter T1.111.3 or Section 6.2.2
+ * of T1.645), new initial alignment procedures may be started on the same signalling link after a timer T17 until the
+ * signalling link is restored or a manual intervention is made, e.g., to replace the signalling data link or the
+ * signalling terminal.  If after time T19 the signalling link has not activated, a management function is notified,
+ * and, optionally, T19 may be restarted.
  */
 static int
-sp_t18_timeout(struct sp *sp, queue_t *q)
-{
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
-}
-
-/*
- *  TIMER T19  -  MTP restart timer
- *  -----------------------------------
- *  9.2.4 ... In addition, [to sending TRA] timer T19 is started (see 9.5.2) for all signalling points to which a
- *  TRA message has just been sent.  Normal operation is then resumed.
- *
- *  9.5.1  If a signalling point X receives an unexpected TRA message from an adjacent node Y and no associated T19
- *  timer is running, X sends to Y any necessary TFP and TFR messages if X has the transfer function, and a TRA
- *  message to Y.  In addition, X starts timer T19 associated with Y.
- *
- *  9.5.2  If a signalling point receives a TRA message from an adjacent node and an associated T19 is running, this
- *  TRA is discarded and no further action is taken.
- */
-static int
-sp_t19_timeout(struct sp *sp, queue_t *q)
-{
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
-}
-
-/*
- *  TIMER T19(ANSI)  -  Link Maintenance timer
- *  -----------------------------------
- *  ANSI T1.111.4 (1996 and 2000) 12.2.2.  After a signalling link failure is detected, signalling link initial
- *  alignment will take place.  When the initial alignment procedure is successful, a signalling link test is
- *  started.  If the signalling link test is successful, the signalling link is regarded as restored and thus
- *  available for siganlling.
- *
- *  If initial alignment is not possible, as determined at level 2 (see Section 7 of Chapter T1.111.3 or Section
- *  6.2.2 of T1.645), new initial alignment procedures may be started on the same signalling link after a timer T17
- *  until the signalling link is restored or a manual intervention is made, e.g., to replace the signalling data
- *  link or the signalling terminal.  If after time T19 the signalling link has not activated, a management function
- *  is notified, and, optionally, T19 may be restarted.
- */
-static int
-sl_t19a_timeout(struct sl *sl, queue_t *q)
+sl_t19a_timeout(queue_t *q, struct sl *sl)
 {
 	switch (sl_get_l_state(sl)) {
 	case SLS_WIND_INSI:
 		todo(("Management notification\n"));
-		sl_timer_start(sl, t19a);
+		sl_timer_start(q, sl, t19a);
 		/* kick it again */
 		return sl_start_req(q, sl);
 	}
@@ -8877,310 +9375,435 @@ sl_t19a_timeout(struct sl *sl, queue_t *q)
 	return (-EFAULT);
 }
 
-/*
- *  TIMER T20  -  MTP restart timer
- *  -----------------------------------
- *  Timer T20 is an overall restart timer that is started by a restarting signalling point when the first link goes
- *  into service at level 2.
+/**
+ * sp_t20_timeout: - TIMER T20 - MTP restart timer
+ * @q: active queue
+ * @sp: related signalling point
  *
- *  9.2.2 ... When all TFP and TFR messages have been sent, the overall restart timer T20 is stopped and phase 2 is
- *  finished.  Note that preventative TFP messages [i.e. those according to 13.2.2 i)], except possibly those for
- *  highest priority routes, must have been sent before normal User traffic is carried.  This might be done during
- *  or after phase 2.
+ * Timer T20 is an overall restart timer that is started by a restarting signalling point when the first link goes
+ * into service at level 2.
  *
- *  9.2.3 If the restarting MTP has no transfer function, phase 1 (see 9.2.2) but not phase 2 is present.  In this
- *  case, the whole restart time is available for phase 1.  The overall restart timer T20 is stopped when:
+ * 9.2.2 ... When all TFP and TFR messages have been sent, the overall restart timer T20 is stopped and phase 2 is
+ * finished.  Note that preventative TFP messages [i.e. those according to 13.2.2 i)], except possibly those for
+ * highest priority routes, must have been sent before normal User traffic is carried.  This might be done during or
+ * after phase 2.
  *
- *  1)  sufficient links and link sets are available to carry the expected signalling traffic; and
+ * 9.2.3 If the restarting MTP has no transfer function, phase 1 (see 9.2.2) but not phase 2 is present.  In this
+ * case, the whole restart time is available for phase 1.  The overall restart timer T20 is stopped when:
  *
- *  2)  enough TRA messages (and therefore routing data) have been received to give a high level of confidence in
- *  the MTP routing tables.
+ * 1)  sufficient links and link sets are available to carry the expected signalling traffic; and
  *
- *  9.2.4  When T20 is stopped or expires, the restaring MTP of the signalling point or signalling transfer point
- *  sends traffic restart allowed messages to all adjacent signalling points via corresponding available direct link
- *  sets, and an indication of the end of MTP restart is sent to all local MTP Users showing each signalling point's
- *  accessibility or inaccessibility.  The means of doing the latter is implementation dependent.
+ * 2)  enough TRA messages (and therefore routing data) have been received to give a high level of confidence in the
+ *     MTP routing tables.
  *
- *  In addition, [to sending TRA] timer T19 is started (see 9.5.2) for all signalling points to which a TRA message
- *  has just been sent.  Normal operation is then resumed.
+ * 9.2.4  When T20 is stopped or expires, the restaring MTP of the signalling point or signalling transfer point sends
+ * traffic restart allowed messages to all adjacent signalling points via corresponding available direct link sets,
+ * and an indication of the end of MTP restart is sent to all local MTP Users showing each signalling point's
+ * accessibility or inaccessibility.  The means of doing the latter is implementation dependent.
  *
- *  When T20 expires the transmission of TFP and TFR messages is stopped.  However, preventative TFP messages [i.e.
- *  those according to 13.2.2 i)] except possibly those for highest priority routes, must have been sent before MTP
- *  User traffic is restarted.
+ * In addition, [to sending TRA] timer T19 is started (see 9.5.2) for all signalling points to which a TRA message has
+ * just been sent.  Normal operation is then resumed.
+ *
+ * When T20 expires the transmission of TFP and TFR messages is stopped.  However, preventative TFP messages [i.e.
+ * those according to 13.2.2 i)] except possibly those for highest priority routes, must have been sent before MTP
+ * User traffic is restarted.
  *
  */
 static int
-sp_t20_timeout(struct sp *sp, queue_t *q)
+sp_t20_timeout(queue_t *q, struct sp *sp)
+{
+	fixme(("Implement this function\n"));
+	return (-EFAULT);
+}
+
+/**
+ * sl_t20a_timeout: - TIMER T20(ANSI)
+ * @q: active queue
+ * @sl: related signalling link
+ */
+static int
+sl_t20a_timeout(queue_t *q, struct sl *sl)
+{
+	fixme(("Implement this function\n"));
+	return (-EFAULT);
+}
+
+/**
+ * sl_t21a_timeout: - TIMER T21(ANSI)
+ * @q: active queue
+ * @sl: related signalling link
+ *
+ * ANSI T1.111.4-2000  10.2.  Inihibiting Initiation and Actions.  When at signalling point X, a request is received
+ * from a management function to inhibit a signalling link to signalling point Y, the following actions take place:
+ *
+ * (1) A check is performed at signalling point X to determine whether, in the case of an unavailable link, inhibiting
+ * will result in a destination becoming inaccessible, or in the case of an unavailable link, signalling point Y is
+ * inaccessible.  If either is the case, management is informed that the inihibiting request is denied.
+ *
+ * (2) If inhibiting is permitted, signalling point X sends an inhibit message to signaling point Y, indicating that
+ * it wishes to inhibit the signalling link identified in the message.
+ *
+ * (3) Signalling point Y, on receiving the inhibit message from X, checks whether, in the case of an available link,
+ * inhibiting will result in a destination becomming inaccessible; and, if so, an inhibit denied message is returned
+ * to signalling point X.  The latter then informs the management function which requested inhibiting that the request
+ * cannot be granted.
+ *
+ * (4) If signalling point Y finds the inhibiting of the concerned link is permissible, it sends an inhibit
+ * acknowledgement to signalling point X, marks the link remotely inhibited, and starts inhibit test procedure timer
+ * T21. [10]  If the link concerned is currently carrying traffic, signalling point Y sends the inhibit
+ * acknowledgement via that link and diverts subsequent traffic for it, using the time controlled changeover
+ * procedure.
+ *
+ * (5) On receiving an inhibit acknowledgement message, signalling point X marks the link locally inhibited, informs
+ * management that the link is inhibited, and starts inhibit test procedure timer T20. [10]  If the link concerned is
+ * currently carrying traffic, signalling point X diverts subsequent traffic for the link, using the time controlled
+ * changeover procedure.
+ *
+ * (6) When changeover has been completed, the link while inhibited, is unavailable for the transfer of user-generated
+ * traffic but still permits the exchange of test messages.
+ *
+ * (7) If, for any reason, the inhibit acknowledgement message is not received, a timer T14 [10] expires and the
+ * procedure is restarted including inspection of the status of the destination of the inhibit message.  If the
+ * destination is not available, management is informed.
+ *
+ * At most two consecutive automatic attempts may be made to inhibit a particular link.
+ *
+ * ...
+ *
+ * 10.3A  Inhibit Test Procedure Actions.  When a signalling link becomes inhibited, either locally, remotely, or
+ * both, the following test procedure actions take place, as appropriate:
+ *
+ * (1) If timer T20 expires at signalling point X and the signalling link is locally inhibited at signalling point X,
+ * signalling point X transmits a local inhibit test message to the signalling point at the other end of the locally
+ * inhibited link and restarts timer T20.
+ *
+ * (2) If timer T20 expires at signalling point X and the signalling link is no longer locally inhibited, no action is
+ * taken.
+ *
+ * (3) If timer T21 expires at signalling point X and the signalling link is remotely inhibited at signalling point X,
+ * singalling
+ *
+ */
+static int
+sl_t21a_timeout(queue_t *q, struct sl *sl)
+{
+	fixme(("Implement this function\n"));
+	return (-EFAULT);
+}
+
+/**
+ * sp_t21_timeout: - TIMER T21 - MTP restart timer
+ * @q: active queue
+ * @sp: related signalling point
+ *
+ * 9.3.1  A signalling point X considers that MTP of an inaccessible adjacent signalling point Y is restarting when:
+ *
+ * - the first link in a direct link set is in the "in service" state at level 2; or
+ *
+ * - another route becomes available due either to reception of a corresponding TFA, TFR or TRA message, or by the
+ *   corresponding link set becoming available (see 3.6.2.2).
+ *
+ * 9.3.2  When the first link in a direct linkset towards singlling point Y, whose MTP is restarting, is in the "in
+ * service" state at level 2, signalling point X starts a timer T21 and takes account of any TFP, TFA and TFR messages
+ * received from signalling point Y.  In addition, X takes the following actions:
+ *
+ * - if X has the transfer function, when the direct linkset is available at level 3, X sends any necessary TFP and
+ *   TFR message to Y; then
+ *
+ * - X sends a traffic restart allowed mesage to signalling point Y.
+ *
+ * If a signalling point, previously declared to be inaccessible, becomes available again before T21 is stopped or
+ * expires, a corresponding TFA or TFR message is sent to the signalling point Y whose MTP is restarting.
+ *
+ * If a signalling point becomes prohibited or restricted to signalling X after a TRA message has been sent by X to Y,
+ * X sends a corresponding TFP or TFR message to Y.
+ *
+ * When a traffic restart allowed message has been received by X from signalling point Y, and a TRA message has been
+ * sent by X to Y, X stops timer T21.
+ *
+ * ...
+ *
+ * When T21 is stopped or expires, signalling point X sends a MTP-RESUME primitive concerning Y, and all signalling
+ * points made available via Y, to all local MTP Users.  If X has the transfer function, it broadcasts to adjacent
+ * available signalling points transfer-allowed and/or transfer restricted messages concerning Y and all signalling
+ * points made accessible by Y.
+ *
+ * 9.6.2  After the MTP of an adjacent node X has restarted, and if T21 has been started (see 9.3.2), all routes using
+ * X are considered to be available unless corresponding TFP or TFR message have been received whilst T21 was running.
+ */
+static int
+sp_t21_timeout(queue_t *q, struct sp *sp)
+{
+	fixme(("Implement this function\n"));
+	return (-EFAULT);
+}
+
+/**
+ * sl_t22_timeout: - TIMER T22 - local inhibit test timer
+ * @q: active queue
+ * @sl: related signalling link
+ */
+static int
+sl_t22_timeout(queue_t *q, struct sl *sl)
+{
+	fixme(("Implement this function\n"));
+	return (-EFAULT);
+}
+
+/**
+ * sp_22a_timeout: - TIMER T22(ANSI)
+ * @q: active queue
+ * @sp: related signalling point
+ */
+static int
+sp_t22a_timeout(queue_t *q, struct sp *sp)
+{
+	fixme(("Implement this function\n"));
+	return (-EFAULT);
+}
+
+/**
+ * sl_t23_timeout: - TIMER T23 - remote inhibit test timer
+ * @q: active queue
+ * @sl: related signalling link
+ */
+static int
+sl_t23_timeout(queue_t *q, struct sl *sl)
+{
+	fixme(("Implement this function\n"));
+	return (-EFAULT);
+}
+
+/**
+ * sp_t23a_timeout: - TIMER T23(ANSI)
+ * @q: active queue
+ * @sp: related signalling point
+ */
+static int
+sp_t23a_timeout(queue_t *q, struct sp *sp)
+{
+	fixme(("Implement this function\n"));
+	return (-EFAULT);
+}
+
+/**
+ * sl_t24_timeout: - TIMER T24 - LPO timer
+ * @q: active queue
+ * @sl: related signalling link
+ *
+ * Q.704/3.3.5.1 Signalling traffic management: as specified in 3.3.1.1.  (See SL_OUT_OF_SERVICE_IND).
+ *
+ * As a national option, local processor outage may also be applied to the affected signalling link before
+ * commencement of the appropriate signalling traffic management option.  On completion of that signalling traffic
+ * management action, local processor outage is removed from the affected signalling link.  No further signalling
+ * traffic management will be performed on that affected signalling link until a timer T24 (see 16.8) has expired or
+ * been cancelled, thus allowing time for indications from the remote end to stabilize as it carries out any
+ * signalling traffic management of its own.
+ */
+static int
+sl_t24_timeout(queue_t *q, struct sl *sl)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
 }
 
 /*
- *  TIMER T20(ANSI)
- *  -----------------------------------
+ * sp_t24a_timeout: - TIMER T24(ANSI)
+ * @q: active queue
+ * @sp: related signalling point
  */
 static int
-sl_t20a_timeout(struct sl *sl, queue_t *q)
+sp_t24a_timeout(queue_t *q, struct sp *sp)
+{
+	fixme(("Implement this function\n"));
+	return (-EFAULT);
+}
+
+/**
+ * lk_t25a_timeout: - TIMER T25(ANSI)
+ * @q: active queue
+ * @lk: related link set
+ *
+ * ANSI T1.111.4/2000 9.1 When the first signalling link goes into the in service state at level 2, the restarting
+ * singalling point begins taking into account any transfer-prohibited, transfer-restricted, transfer-allowed, traffic
+ * restart allowed, and traffic restart waiting messages received.  The restarting piont starts timers T22 and T26
+ * either when the first signalling link goes in the in service state at level 2 or when the first signalling link
+ * becomes available at level 3.  When a traffic restart waiting message is receive before user traffic is restarted
+ * on the link(s) to the point that sent the traffic restart waiting message, timer T25 is started and user traffic is
+ * not restarted on that link set until a traffic restart allowed mesage is received or timer T25 expires (see 9.3).
+ *
+ * ANSI T1.111.4/2000 9.3 A signalling point X considers that the MTP of an inaccessible adjacent signalling point Y
+ * is restarting when: (1) The first link in a direct link set is in the in service state at level 2, or (2) A route
+ * other than a direct link set becomes available, e.g. through receipt of a transfer allowed or traffic restart
+ * allowed message or the availability of the corresponding link set.
+ *
+ * When the first link in a direct link set towards the restarting signalling point Y goes int othe in services state
+ * at level 2, signaling point X begins taking into account any traffic restart waiting, traffic restart allowed,
+ * transfer-prohibited, transfer-restricted, and transfer-allowed messages from Y.  Signalling point X starts timer
+ * T28 either when the first link goes into the in service state at level 2 or when the first sginallin link becomes
+ * available at level 3.  IN addition it takes the following actions:
+ *
+ * (1) If a TRW message is reeived from Y while T28 is running or before it is started, X starts T25.  X stops T28 if
+ * it is running.
+ *
+ * (2) If a TRW message is received from Y while T25 is running, X restarts T25.
+ *
+ * (3) When the first link in a link set to Y becomes available, singallin point X sends to Y a traffic restart
+ * allowed message or, if X has the transfer function, a traffic restart waiting message followed by
+ * transfer-prohibited (note that all tranfer prohibited messages according to 13.2.2 (1) must be sent) and
+ * transfer-restricted messages and a traffic restart allowed message.
+ *
+ * (4) If a destination becomes prohibited, restricted, or available at X, after X has sent a traffic restart allowed
+ * message to Y, X notifies Y of the statu change by the normal procedures in Section 13.
+ *
+ * (5) When a traffic restart allowed message has been sent to Y and a traffic restart allowed message has been
+ * received from Y, X stops T25 or T28, whichever is running, and restarts traffic on the link set to Y.  X gives
+ * MTP-RESUME primitives to users concerning Y and any destinations made accessible via Y.  If X has the transfer
+ * function it also broadcasts transfer-allowed or transfer-restricted messages concerning the same destinations.
+ *
+ * (6) If T28 expires, X restarts traffic on the link set to Y as in (5), unles a traffic restart allowed message has
+ * not been sent to Y.  In that case, X starts T25 and completes the sending of transfer prohbited and
+ * transfer-restricted messages, followed by a traffic restart allowed message.  Then, unless a traffic restart
+ * waiting message has been received from Y without a subsequent traffic restart allowed message, X stops 25 and
+ * restarts traffic on the link set to Y.
+ *
+ * (7) If T25 expires, X restarts traffic on the link set towards Y.  In the abnormal case when X has not completed
+ * sending transfer-prohibited and transfer-restricted messages to Y, X completes sending the transfer-prohibited
+ * messages required by 13.2.2 (1) and sends a traffic restart allowed message before restarting user traffic.
+ *
+ * (8) If no traffic restart allowed message has been received from Y when traficc is restarted to Y, timer T9 (see
+ * 9.4) is started.
+ *
+ * When signalling point Y becomes accessible via a route other than a direct link set between X and Y, X sends a
+ * MTP-RESUME primitive concerning Y to all local MTP users.  In addition, if signalling point X has the transfer
+ * function, X sends to Y any required transfer-prohibited and transfer-restricted message by the availabl route and
+ * broadcasts transfer-alloed or transfer-restricted messages concerning Y.
+ */
+static int
+lk_t25a_timeout(queue_t *q, struct lk *lk)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
 }
 
 /*
- *  TIMER T21(ANSI)
- *  -----------------------------------
- *  ANSI T1.111.4-2000  10.2.  Inihibiting Initiation and Actions.  When at signalling point X, a request is
- *  received from a management function to inhibit a signalling link to signalling point Y, the following actions
- *  take place:
- *
- *  (1) A check is performed at signalling point X to determine whether, in the case of an unavailable link,
- *  inhibiting will result in a destination becoming inaccessible, or in the case of an unavailable link, signalling
- *  point Y is inaccessible.  If either is the case, management is informed that the inihibiting request is denied.
- *
- *  (2) If inhibiting is permitted, signalling point X sends an inhibit message to signaling point Y, indicating
- *  that it wishes to inhibit the signalling link identified in the message.
- *
- *  (3) Signalling point Y, on receiving the inhibit message from X, checks whether, in the case of an available
- *  link, inhibiting will result in a destination becomming inaccessible; and, if so, an inhibit denied message is
- *  returned to signalling point X.  The latter then informs the management function which requested inhibiting that
- *  the request cannot be granted.
- *
- *  (4) If signalling point Y finds the inhibiting of the concerned link is permissible, it sends an inhibit
- *  acknowledgement to signalling point X, marks the link remotely inhibited, and starts inhibit test procedure
- *  timer T21. [10]  If the link concerned is currently carrying traffic, signalling point Y sends the inhibit
- *  acknowledgement via that link and diverts subsequent traffic for it, using the time controlled changeover
- *  procedure.
- *
- *  (5) On receiving an inhibit acknowledgement message, signalling point X marks the link locally inhibited,
- *  informs management that the link is inhibited, and starts inhibit test procedure timer T20. [10]  If the link
- *  concerned is currently carrying traffic, signalling point X diverts subsequent traffic for the link, using the
- *  time controlled changeover procedure.
- *
- *  (6) When changeover has been completed, the link while inhibited, is unavailable for the transfer of
- *  user-generated traffic but still permits the exchange of test messages.
- *
- *  (7) If, for any reason, the inhibit acknowledgement message is not received, a timer T14 [10] expires and the
- *  procedure is restarted including inspection of the status of the destination of the inhibit message.  If the
- *  destination is not available, management is informed.
- *
- *  At most two consecutive automatic attempts may be made to inhibit a particular link.
- *
- *  ...
- *
- *  10.3A  Inhibit Test Procedure Actions.  When a signalling link becomes inhibited, either locally, remotely, or
- *  both, the following test procedure actions take place, as appropriate:
- *
- *  (1) If timer T20 expires at signalling point X and the signalling link is locally inhibited at signalling point
- *  X, signalling point X transmits a local inhibit test message to the signalling point at the other end of the
- *  locally inhibited link and restarts timer T20.
- *
- *  (2) If timer T20 expires at signalling point X and the signalling link is no longer locally inhibited, no action
- *  is taken.
- *
- *  (3) If timer T21 expires at signalling point X and the signalling link is remotely inhibited at signalling point
- *  X, singalling
- *
+ * sp_t26a_timeout: - TIMER T26(ANSI)
+ * @q: active queue
+ * @sp: related signalling point
  */
 static int
-sl_t21a_timeout(struct sl *sl, queue_t *q)
+sp_t26a_timeout(queue_t *q, struct sp *sp)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
 }
 
 /*
- *  TIMER T21  -  MTP restart timer
- *  -----------------------------------
- *  9.3.1  A signalling point X considers that MTP of an inaccessible adjacent signalling point Y is restarting
- *  when:
+ * sp_t27a_timeout: - TIMER T27(ANSI)
+ * @q: active queue
+ * @sp: related signalling point
  *
- *  -   the first link in a direct link set is in the "in service" state at level 2; or
+ * ANSI T1.111.4/2000 9.1 (Actions in a Signalling Point Having the Transfer Function Which Restarts.) ... If the
+ * management function determines that a full restart procedure is needed, then it ensures, for example, by using
+ * local processor outage, that the period of unavailability persists for a time of at least T27.  The purpose of
+ * remaining unvailable for time T27 is to increase the probability that adjacent points are aware of the
+ * unavailability of the restarting point and initiate the appropriate restart procedures (see 9.3).
  *
- *  -   another route becomes available due either to reception of a corresponding TFA, TFR or TRA message, or by
- *  the corresponding link set becoming available (see 3.6.2.2).
+ * Timer T27:
+ * Start:   When SP becomes unvailable (SPF_RESTART_LOCKOUT flag set)
+ * Stop:    When SP restarts without requiring restart procedure (SPF_RESTART_LOCKOUT flag cleared)
+ * Timeout: Deassert local processor outage condition on signalling links that realigned during the period that T27
+ *          was running.
  *
- *  9.3.2  When the first link in a direct linkset towards singlling point Y, whose MTP is restarting, is in the "in
- *  service" state at level 2, signalling point X starts a timer T21 and takes account of any TFP, TFA and TFR
- *  messages received from signalling point Y.  In addition, X takes the following actions:
+ * Signalling links that are in restart lockout are signalling links that aligned during the T27a lockout period and
+ * were placed into local processor outage state to affect the lockout.  Other options include suppressing activation
+ * of the signalling link, or stopping signalling link that was in a processor outage situation.  (Note that not all
+ * types of signalling links support processor outage.) At any rate, depending on the state of the signalling link at
+ * the time that the outage is to be cleared, the next action is determined.  The purpose is always to return the
+ * signalling link to the active state unless it is locally blocked by management.
  *
- *  -   if X has the transfer function, when the direct linkset is available at level 3, X sends any necessary TFP
- *  and TFR message to Y; then
- *
- *  -   X sends a traffic restart allowed mesage to signalling point Y.
- *
- *  If a signalling point, previously declared to be inaccessible, becomes available again before T21 is stopped or
- *  expires, a corresponding TFA or TFR message is sent to the signalling point Y whose MTP is restarting.
- *
- *  If a signalling point becomes prohibited or restricted to signalling X after a TRA message has been sent by X to
- *  Y, X sends a corresponding TFP or TFR message to Y.
- *
- *  When a traffic restart allowed message has been received by X from signalling point Y, and a TRA message has
- *  been sent by X to Y, X stops timer T21.
- *
- *  ...
- *
- *  When T21 is stopped or expires, signalling point X sends a MTP-RESUME primitive concerning Y, and all signalling
- *  points made available via Y, to all local MTP Users.  If X has the transfer function, it broadcasts to adjacent
- *  available signalling points transfer-allowed and/or transfer restricted messages concerning Y and all signalling
- *  points made accessible by Y.
- *
- *  9.6.2  After the MTP of an adjacent node X has restarted, and if T21 has been started (see 9.3.2), all routes
- *  using X are considered to be available unless corresponding TFP or TFR message have been received whilst T21 was
- *  running.
  */
 static int
-sp_t21_timeout(struct sp *sp, queue_t *q)
+sp_t27a_timeout(queue_t *q, struct sp *sp)
+{
+	struct ls *ls;
+	struct lk *lk;
+	struct sl *sl;
+	int err;
+
+	sp->flags &= ~SPF_RESTART_LOCKOUT;
+
+	/* Go looking for signalling links that are in restart lockout. */
+	for (ls = sp->ls.list; ls; ls = ls->sp.next) {
+		for (lk = ls->lk.list; lk; lk = lk->ls.next) {
+			for (sl = lk->sl.list; sl; sl = sl->lk.next) {
+				if (!(sl->flags & SLF_RESTART_LOCKOUT))
+					continue;
+				enableok(sl->rq);
+				if ((err = sl_clear_buffers_req(q, sl)))
+					return (err);
+				if ((err = sl_resume_req(q, sl)))
+					return (err);
+				sl->flags &= ~SLF_RESTART_LOCKOUT;
+				/* XXX: Might need to change state of link here, but probably not.  I believe that
+				 * in-service indication from the aligned-not-ready state and link-failure indication
+				 * from failures during local processor outage will be delivered automatically. */
+			}
+		}
+	}
+}
+
+/*
+ * lk_t28a_timeout: - TIMER T28(ANSI)
+ * @q: active queue
+ * @sp: related signalling point
+ */
+static int
+lk_t28a_timeout(queue_t *q, struct lk *lk)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
 }
 
 /*
- *  TIMER T22  -  local inhibit test timer
- *  -----------------------------------
+ * lk_t29a_timeout: - TIMER T29(ANSI)
+ * @q: active queue
+ * @sp: related signalling point
  */
 static int
-sl_t22_timeout(struct sl *sl, queue_t *q)
+lk_t29a_timeout(queue_t *q, struct lk *lk)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
 }
 
 /*
- *  TIMER T22(ANSI)
- *  -----------------------------------
+ * lk_t30a_timeout: - TIMER T30(ANSI)
+ * @q: active queue
+ * @sp: related signalling point
  */
 static int
-sp_t22a_timeout(struct sp *sp, queue_t *q)
+lk_t30a_timeout(queue_t *q, struct lk *lk)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
 }
 
-/*
- *  TIMER T23  -  remote inhibit test timer
- *  -----------------------------------
+/**
+ * sl_t31a_timeout: - TIMER T31 - False link congestion detection timer
+ * @q: active queue
+ * @sl: related signalling link
+ * 
+ * ANSI T1.111.4 (2000) 3.8.2.2.  ...  If the link remains at a congestion level, as defined below, for greater than
+ * T31 [10] (a false link congestion condition), and it also remains in service, an audit should trigger the link to
+ * be restarted.  T31 is started when buffer occupancy increases through onset level 1.  Any change of congestion
+ * level [defined as a change ofsignalling link congestion status (see Section 3.8.2.1) and optionally including the
+ * first time the discard status is increased to n after signalling link congestion status is increased to  n (n=1, 2,
+ * 3)] restarts the timer.  T31 is stopped when the signalling link congestion status is zero.  The management should
+ * be notified if the link is restarted due to false link congestion.
  */
 static int
-sl_t23_timeout(struct sl *sl, queue_t *q)
-{
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
-}
-
-/*
- *  TIMER T23(ANSI)
- *  -----------------------------------
- */
-static int
-sp_t23a_timeout(struct sp *sp, queue_t *q)
-{
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
-}
-
-/*
- *  TIMER T24  -  LPO timer
- *  -----------------------------------
- */
-static int
-sl_t24_timeout(struct sl *sl, queue_t *q)
-{
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
-}
-
-/*
- *  TIMER T24(ANSI)
- *  -----------------------------------
- */
-static int
-sp_t24a_timeout(struct sp *sp, queue_t *q)
-{
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
-}
-
-/*
- *  TIMER T25(ANSI)
- *  -----------------------------------
- */
-static int
-sp_t25a_timeout(struct sp *sp, queue_t *q)
-{
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
-}
-
-/*
- *  TIMER T26(ANSI)
- *  -----------------------------------
- */
-static int
-sp_t26a_timeout(struct sp *sp, queue_t *q)
-{
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
-}
-
-/*
- *  TIMER T27(ANSI)
- *  -----------------------------------
- */
-static int
-sp_t27a_timeout(struct sp *sp, queue_t *q)
-{
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
-}
-
-/*
- *  TIMER T28(ANSI)
- *  -----------------------------------
- */
-static int
-sp_t28a_timeout(struct sp *sp, queue_t *q)
-{
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
-}
-
-/*
- *  TIMER T29(ANSI)
- *  -----------------------------------
- */
-static int
-sp_t29a_timeout(struct sp *sp, queue_t *q)
-{
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
-}
-
-/*
- *  TIMER T30(ANSI)
- *  -----------------------------------
- */
-static int
-sp_t30a_timeout(struct sp *sp, queue_t *q)
-{
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
-}
-
-/*
- *  TIMER T31 - False link congestion detection timer
- *  -----------------------------------
- *  ANSI T1.111.4 (2000) 3.8.2.2.  ...  If the link remains at a congestion level, as defined below, for greater
- *  than T31 [10] (a false link congestion condition), and it also remains in service, an audit should trigger the
- *  link to be restarted.  T31 is started when buffer occupancy increases through onset level 1.  Any change of
- *  congestion level [defined as a change ofsignalling link congestion status (see Section 3.8.2.1) and optionally
- *  including the first time the discard status is increased to n after signalling link congestion status is
- *  increased to  n (n=1, 2, 3)] restarts the timer.  T31 is stopped when the signalling link congestion status is
- *  zero.  The management should be notified if the link is restarted due to false link congestion.
- */
-static int
-sl_t31a_timeout(struct sl *sl, queue_t *q)
+sl_t31a_timeout(queue_t *q, struct sl *sl)
 {
 	if (sl_get_l_state(sl) == SLS_IN_SERVICE) {
 		todo(("Notify management of false congestion\n"));
@@ -9190,38 +9813,39 @@ sl_t31a_timeout(struct sl *sl, queue_t *q)
 	return (-EFAULT);
 }
 
-/*
- *  TIMER T32  -  Link oscillation timer (Procedure A)
- *  -----------------------------------
- *  ANSI T1.111.4 (1996 and 2000) 12.2.2 ... In order to [sic] prevent links from oscillating rapidly between the
- *  in-service and out-of-service states, a link oscillation filtering procedure shall be provdided.  This procedure
- *  is applicable in all cases where automatic restoration and removal of signalling links to and from service is
- *  used.  The procedure is not invoked if restoration to or removal from service is initiated manually.
+/**
+ * sl_t32a_timeout: - TIMER T32 - Link oscillation timer (Procedure A)
+ * @q: active queue
+ * @sl: related signalling link
  *
- *  Link oscillation filtering is a local procedure.  One of the following procedures, A or B, is used.
+ * ANSI T1.111.4 (1996 and 2000) 12.2.2 ... In order to [sic] prevent links from oscillating rapidly between the
+ * in-service and out-of-service states, a link oscillation filtering procedure shall be provdided.  This procedure is
+ * applicable in all cases where automatic restoration and removal of signalling links to and from service is used.
+ * The procedure is not invoked if restoration to or removal from service is initiated manually.
  *
- *  (A) When restoration begins, the oscillation timer T32 is started.  If the link fails within T32, the link is
- *  placed in the "suspension" state until T32 expires.
+ * Link oscillation filtering is a local procedure.  One of the following procedures, A or B, is used.
  *
- *  When a link exits in the "suspension" state, link restoration is to be started and T32 is restarted.
+ * (A) When restoration begins, the oscillation timer T32 is started.  If the link fails within T32, the link is
+ * placed in the "suspension" state until T32 expires.
  *
- *  When a link is in "suspension," the link remains in the out-of-service state at level 2, restoration procedures
- *  to bring the link back into alignment are not invoked and realignment attempts initiated by the remote end are
- *  ignored.
+ * When a link exits in the "suspension" state, link restoration is to be started and T32 is restarted.
  *
- *  The oscillation timer T32 value chosen in a given signalling point may be modified by management action.  The
- *  expiration of the timer does not change the link status.
+ * When a link is in "suspension," the link remains in the out-of-service state at level 2, restoration procedures to
+ * bring the link back into alignment are not invoked and realignment attempts initiated by the remote end are
+ * ignored.
  *
+ * The oscillation timer T32 value chosen in a given signalling point may be modified by management action.  The
+ * expiration of the timer does not change the link status.
  */
 static int
-sl_t32a_timeout(struct sl *sl, queue_t *q)
+sl_t32a_timeout(queue_t *q, struct sl *sl)
 {
 	switch (sl_get_l_state(sl)) {
 	case SLS_OUT_OF_SERVICE:
 		/* we can now restore the link */
 		/* T19(ANSI) is a maintenance guard timer */
-		sl_timer_start(sl, t19a);
-		return sl_start_req(NULL, sl);
+		sl_timer_start(q, sl, t19a);
+		return sl_start_req(q, sl);
 	case SLS_IN_SERVICE:
 		/* nothing to do */
 		return (0);
@@ -9230,27 +9854,29 @@ sl_t32a_timeout(struct sl *sl, queue_t *q)
 	return (-EFAULT);
 }
 
-/*
- *  TIMER T33  -  Link oscillation probation timer (Procedure B)
- *  -----------------------------------
- *  ANSI T1.111.4 (1996 and 2000) 12.2.2 ...
+/**
+ * sl_t33a_timeout: - TIMER T33 - Link oscillation probation timer (Procedure B)
+ * @q: active queue
+ * @sl: related signalling link
  *
- *  (B) When activation or restoration of a signalling link has been completed, it is put on probation for a period
- *  controlled by timer T33 which starts running when the link enters the in-service state and is stopped either on
- *  time-out or on link failure.
+ * ANSI T1.111.4 (1996 and 2000) 12.2.2 ...
  *
- *  If a link fails during the probation, i.e. before expiration of timer T33, it is put on suspension.  While
- *  suspended the link remains in the out-of-service state at level 2, restoration procedures to bring the link back
- *  into alignment are not invoked and realignment attempts initiated by the remote end are ignored.
+ * (B) When activation or restoration of a signalling link has been completed, it is put on probation for a period
+ * controlled by timer T33 which starts running when the link enters the in-service state and is stopped either on
+ * time-out or on link failure.
  *
- *  The suspension time period is controlled by timer T34 which starts running when the link enters the
- *  out-of-service state.  Link restoration is resumed, on expiry of timer T34.
+ * If a link fails during the probation, i.e. before expiration of timer T33, it is put on suspension.  While
+ * suspended the link remains in the out-of-service state at level 2, restoration procedures to bring the link back
+ * into alignment are not invoked and realignment attempts initiated by the remote end are ignored.
  *
- *  The values chosen in a given network node for the probation and suspesion time periods are dependent on the type
- *  and function of the node in the network and may be modified by management action.
+ * The suspension time period is controlled by timer T34 which starts running when the link enters the out-of-service
+ * state.  Link restoration is resumed, on expiry of timer T34.
+ *
+ * The values chosen in a given network node for the probation and suspesion time periods are dependent on the type
+ * and function of the node in the network and may be modified by management action.
  */
 static int
-sl_t33a_timeout(struct sl *sl, queue_t *q)
+sl_t33a_timeout(queue_t *q, struct sl *sl)
 {
 	if (sl_get_l_state(sl) == SLS_IN_SERVICE)
 		/* link has passed probation */
@@ -9259,46 +9885,48 @@ sl_t33a_timeout(struct sl *sl, queue_t *q)
 	return (-EFAULT);
 }
 
-/*
- *  TIMER T34  -  Link oscillation suspension timer (Procedure B)
- *  -----------------------------------
+/**
+ * sl_t34a_timeout: - TIMER T34 - Link oscillation suspension timer (Procedure B)
+ * @q: active queue
+ * @sl: related signalling link
  */
 static int
-sl_t34a_timeout(struct sl *sl, queue_t *q)
+sl_t34a_timeout(queue_t *q, struct sl *sl)
 {
 	switch (sl_get_l_state(sl)) {
 	case SLS_OUT_OF_SERVICE:
 		/* link has exited suspension */
 		/* T19(ANSI) is a maintenance guard timer */
-		sl_timer_start(sl, t19a);
+		sl_timer_start(q, sl, t19a);
 		return sl_start_req(q, sl);
 	}
 	rare();
 	return (-EFAULT);
 }
 
-/*
- *  TIMER T1T  -  SLTM ack
- *  -----------------------------------
- *  Q.707 2.2 ...  In the case when the criteria given above are not met or a signalling link test acknowledgement
- *  message is not received on the link being tested within T1 (see 5.5) after the signalling link test message has
- *  been sent, the test is considered to have failed and is repeated once.  In the case when also the repeat test
- *  fails, the following actions have to be taken:
+/**
+ * sl_t1t_timeout: - TIMER T1T - SLTM ack
+ * @q: active queue
+ * @sl: related signalling link
+ * 
+ * Q.707 2.2 ...  In the case when the criteria given above are not met or a signalling link test acknowledgement
+ * message is not received on the link being tested within T1 (see 5.5) after the signalling link test message has
+ * been sent, the test is considered to have failed and is repeated once.  In the case when also the repeat test
+ * fails, the following actions have to be taken:
  *
- *  -   SLT applied on activation/restoration, the link is put out of service, restoration is attempted and a
- *      management system must be informed.
+ * - SLT applied on activation/restoration, the link is put out of service, restoration is attempted and a management
+ *   system must be informed.
  *
- *  -   SLT applied periodically, for further study.
+ * - SLT applied periodically, for further study.
  *
- *  IMPLEMENTATION NOTE:- The action when the periodic test fails is for further study.  Taking the link out of
- *  service can be an especially bad idea during times of congestion. This is because the buffers may be filled with
- *  management messages already and the signaling link test might fail due to timeout. We merely report the
- *  information to management and leave the link in service. If the test failed because of an inserted loopback
- *  while the link is in service, the link will fail rapidly due to other causes. So we do nothing more than report
- *  to management.
+ * IMPLEMENTATION NOTE:- The action when the periodic test fails is for further study.  Taking the link out of service
+ * can be an especially bad idea during times of congestion. This is because the buffers may be filled with management
+ * messages already and the signaling link test might fail due to timeout. We merely report the information to
+ * management and leave the link in service. If the test failed because of an inserted loopback while the link is in
+ * service, the link will fail rapidly due to other causes. So we do nothing more than report to management.
  */
 static int
-sl_t1t_timeout(struct sl *sl, queue_t *q)
+sl_t1t_timeout(queue_t *q, struct sl *sl)
 {
 	struct lk *lk = sl->lk.lk;
 	struct sp *sp = lk->sp.loc;
@@ -9307,12 +9935,11 @@ sl_t1t_timeout(struct sl *sl, queue_t *q)
 
 	if (sl->flags & SLF_WACK_SLTM) {
 		/* first test failed -- repeat test */
-		if ((err =
-		     mtp_send_sltm(NULL, sp, lk->ni, rs->dest, sp->pc, sl->slc, sl->slc, sl->tdata,
-				   sl->tlen, sl)) < 0)
+		if ((err = mtp_send_sltm(q, sp, lk->ni, rs->dest, sp->pc, sl->slc, sl->slc,
+					 sl->tdata, sl->tlen, sl)) < 0)
 			return (err);
 		sl->flags &= ~SLF_WACK_SLTM;
-		sl_timer_start(sl, t1t);
+		sl_timer_start(q, sl, t1t);
 		sl->flags |= SLF_WACK_SLTM2;
 	} else if (sl->flags & SLF_WACK_SLTM2) {
 		/* second test failed */
@@ -9323,22 +9950,24 @@ sl_t1t_timeout(struct sl *sl, queue_t *q)
 		} else {
 			/* periodic testing failed, just report to management */
 			todo(("Report periodic test failure to management\n"));
-			sl_timer_start(sl, t2t);	/* restart periodic test */
+			sl_timer_start(q, sl, t2t);	/* restart periodic test */
 		}
 		sl->flags &= ~SLF_WACK_SLTM2;
 	}
 	return (0);
 }
 
-/*
- *  TIMER T2T  -  SLTM interval
- *  -----------------------------------
- *  Q.707 2.2 ... In the case the signalling link test (SLT) is applied while the signalling link is in service the
- *  signalling link test mesage is sent at regular intervals T2 (see 5.5).  The testing of a signalling link is
- *  performed independently from each end.
+/**
+ * sl_t2t_timeout: - TIMER T2T - SLTM interval
+ * @q: active queue
+ * @sl: related signalling link
+ * 
+ * Q.707 2.2 ... In the case the signalling link test (SLT) is applied while the signalling link is in service the
+ * signalling link test mesage is sent at regular intervals T2 (see 5.5).  The testing of a signalling link is
+ * performed independently from each end.
  */
 static int
-sl_t2t_timeout(struct sl *sl, queue_t *q)
+sl_t2t_timeout(queue_t *q, struct sl *sl)
 {
 	if (sl_get_l_state(sl) == SLS_IN_SERVICE) {
 		struct lk *lk = sl->lk.lk;
@@ -9355,7 +9984,7 @@ sl_t2t_timeout(struct sl *sl, queue_t *q)
 		     mtp_send_sltm(q, loc, lk->ni, adj->dest, loc->pc, sl->slc, sl->slc,
 				   sl->tdata, sl->tlen, sl)))
 			return (err);
-		sl_timer_start(sl, t1t);
+		sl_timer_start(q, sl, t1t);
 		sl->flags &= ~SLF_WACK_SLTM2;
 		sl->flags |= SLF_WACK_SLTM;
 		return (0);
@@ -9364,18 +9993,20 @@ sl_t2t_timeout(struct sl *sl, queue_t *q)
 	return (-EFAULT);
 }
 
-/*
- *  TIMER T1S  -  SSLTM ack
- *  -----------------------------------
- */
 static int
 sl_ssltm_failed(queue_t *q, struct sl *sl)
 {
 	fixme(("Write this function\n"));
 	return (-EFAULT);
 }
+
+/**
+ * sl_t1s_timeout: - TIMER T1S - SSLTM ack
+ * @q: active queue
+ * @sl: related signalling link
+ */
 static int
-sl_t1s_timeout(struct sl *sl, queue_t *q)
+sl_t1s_timeout(queue_t *q, struct sl *sl)
 {
 	struct lk *lk = sl->lk.lk;
 	struct sp *loc = lk->sp.loc;
@@ -9384,7 +10015,7 @@ sl_t1s_timeout(struct sl *sl, queue_t *q)
 
 	if (sl->flags & (SLF_WACK_SSLTM | SLF_WACK_SSLTM2)) {
 		if (sl->flags & SLF_WACK_SSLTM) {
-			sl_timer_start(sl, t1s);
+			sl_timer_start(q, sl, t1s);
 			if ((err = mtp_send_ssltm(q, loc, lk->ni, adj->dest, loc->pc, sl->slc,
 						  sl->slc, sl->tdata, sl->tlen, sl)) < 0)
 				goto error;
@@ -9439,9 +10070,10 @@ sl_t1s_timeout(struct sl *sl, queue_t *q)
  *
  *
  */
-/*
- *  RECV COO
- *  -----------------------------------
+/**
+ * mtp_recv_coo: - RECV COO
+ * @q: active queue
+ * @m: decoded message
  */
 static int
 mtp_recv_coo(queue_t *q, struct mtp_msg *m)
@@ -9498,9 +10130,10 @@ mtp_recv_coo(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV COA
- *  -----------------------------------
+/**
+ * mtp_recv_coa: - RECV COA
+ * @q: active queue
+ * @m: decoded message
  */
 static int
 mtp_recv_coa(queue_t *q, struct mtp_msg *m)
@@ -9526,36 +10159,37 @@ mtp_recv_coa(queue_t *q, struct mtp_msg *m)
 	return (0);		/* discard */
 }
 
-/*
- *  RECV CDB
- *  -----------------------------------
+/**
+ * mtp_recv_cbd: - RECV CDB
+ * @q: active queue
+ * @m: decoded message
  *
- *  6.2.1  Changeback is initiated at a signalling point when a signalling link is restored, unblocked or
- *  uninhibited, and therefore it becomes once again available, according to the criteria listed in 3.2.3 and 3.2.7.
- *  The following actions are then performed:
+ * 6.2.1  Changeback is initiated at a signalling point when a signalling link is restored, unblocked or uninhibited,
+ * and therefore it becomes once again available, according to the criteria listed in 3.2.3 and 3.2.7.  The following
+ * actions are then performed:
  *
- *  a)  the alternative signalling link(s) to which traffic normally carried by the siganalling link make available
- *  was previously diverted (e.g. on occurence of a changeover), are determined.  To this set are added, if
- *  applicable, other links determined as defined in 4.4.2;
+ * a)  the alternative signalling link(s) to which traffic normally carried by the siganalling link make available was
+ * previously diverted (e.g. on occurence of a changeover), are determined.  To this set are added, if applicable,
+ * other links determined as defined in 4.4.2;
  *
- *  b)  signalling traffic is diverted (if appropriate, according to the criteria specified in clause 4) to the
- *  concerned signalling link by means of the sequence control procedure specified in 6.3; traffic diversion can be
- *  performed at the discretion of the siganlling point initiating changeback, as follows:
+ * b)  signalling traffic is diverted (if appropriate, according to the criteria specified in clause 4) to the
+ * concerned signalling link by means of the sequence control procedure specified in 6.3; traffic diversion can be
+ * performed at the discretion of the siganlling point initiating changeback, as follows:
  *
- *  i)      individually for each traffic flow (i.e. on destination basis);
+ * i)      individually for each traffic flow (i.e. on destination basis);
  *
- *  ii)     individually for each alternative signalling link (i.e. for all the destinations previously diverted on
- *  that alternative signalling link);
+ * ii)     individually for each alternative signalling link (i.e. for all the destinations previously diverted on
+ *         that alternative signalling link);
  *
- *  iii)    at the same time for a number of, or for all the alternative signalling links.
+ * iii)    at the same time for a number of, or for all the alternative signalling links.
  *
- *  6.3.2   ... The remote signalling point will send the changeback acknowledgement to the signalling point
- *  initiated changeback in response to the changeback declaration; any available signalling route between the two
- *  signalling points can be used to carry the changeback acknowledgement.
+ * 6.3.2   ... The remote signalling point will send the changeback acknowledgement to the signalling point initiated
+ * changeback in response to the changeback declaration; any available signalling route between the two signalling
+ * points can be used to carry the changeback acknowledgement.
  *
- *  6.5.2   If a changeback-declaration is received after the completion of the changeback procedure, a
- *  changeback-acknowledgement is sent in response, without taking any further action.  This corresponds to the
- *  normal action described in 6.3.2 above.
+ * 6.5.2   If a changeback-declaration is received after the completion of the changeback procedure, a
+ * changeback-acknowledgement is sent in response, without taking any further action.  This corresponds to the normal
+ * action described in 6.3.2 above.
  */
 static int
 mtp_recv_cbd(queue_t *q, struct mtp_msg *m)
@@ -9567,11 +10201,13 @@ mtp_recv_cbd(queue_t *q, struct mtp_msg *m)
 	return mtp_send_cba(q, sp, lk->ni, m->opc, sp->pc, 0, m->slc, m->arg.cbc);
 }
 
-/*
- *  RECV CBA
- *  -----------------------------------
- *  6.5.1   If a changeback-acknowledgement is received by a signalling point which has not previously sent a
- *  changeback-declaration, no action is taken.
+/**
+ * mtp_recv_cba: - RECV CBA
+ * @q: active queue
+ * @m: decoded message
+ *
+ * 6.5.1   If a changeback-acknowledgement is received by a signalling point which has not previously sent a
+ * changeback-declaration, no action is taken.
  */
 static int
 mtp_recv_cba(queue_t *q, struct mtp_msg *m)
@@ -9583,7 +10219,7 @@ mtp_recv_cba(queue_t *q, struct mtp_msg *m)
 
 		if (cb->cbc == m->arg.cbc && cb->slc == m->slc && m->opc == lk->sp.adj->dest) {
 			/* restart traffic */
-			cb_reroute_buffer(cb);
+			cb_divert_buffer(cb);
 			return (0);
 		}
 	}
@@ -9591,9 +10227,10 @@ mtp_recv_cba(queue_t *q, struct mtp_msg *m)
 	return (EPROTO);
 }
 
-/*
- *  RECV ECO
- *  -----------------------------------
+/**
+ * mtp_recv_eco: - RECV ECO
+ * @q: active queue
+ * @m: decoded message
  */
 static int
 mtp_recv_eco(queue_t *q, struct mtp_msg *m)
@@ -9651,9 +10288,10 @@ mtp_recv_eco(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV ECA
- *  -----------------------------------
+/**
+ * mtp_recv_eca: - RECV ECA
+ * @q: active queue
+ * @m: decoded message
  */
 static int
 mtp_recv_eca(queue_t *q, struct mtp_msg *m)
@@ -9683,10 +10321,12 @@ mtp_recv_eca(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV ECA
- *  -----------------------------------
- *  13.9.6.  When a signalling route set congestion test message reaches its destination, it is discarded.
+/**
+ * mtp_recv_eca: - RECV ECA
+ * @q: active queue
+ * @m: decoded message
+ *
+ * 13.9.6.  When a signalling route set congestion test message reaches its destination, it is discarded.
  */
 static int
 mtp_recv_rct(queue_t *q, struct mtp_msg *m)
@@ -9694,48 +10334,50 @@ mtp_recv_rct(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  TFC - Transfer Controlled
- *  -------------------------------------------------------------------------
- *  Multiple congestion priorities:
- *  -----------------------------------
- *  13.7.2   A transfer-controlled message relating to a given destination X is sent from a signalling transfer
- *  point Y to a received message originating from signalling point Z destined to signalling point X when the
- *  congestion prioirty of the concerned message is less than the current congesiton status of the signalling link
- *  selected to transmit the concerned message from Y to X.
+/**
+ * mtp_recv_tfc: - TFC - Transfer Controlled
+ * @q: active queue
+ * @m: decoded message
  *
- *  In this case, the transfer-controlled message is sent to the originating point Z with the congestion status
- *  filed set to the current congestion status of the signalling link.
+ * Multiple congestion priorities:
+ * -----------------------------------
+ * 13.7.2   A transfer-controlled message relating to a given destination X is sent from a signalling transfer point Y
+ * to a received message originating from signalling point Z destined to signalling point X when the congestion
+ * prioirty of the concerned message is less than the current congesiton status of the signalling link selected to
+ * transmit the concerned message from Y to X.
  *
- *  13.7.3.  When the originating signalling point Z receives a transfer-controlled message relating to destination
- *  X, it the current congestion status of the signalling route set towards destination X is less than the
- *  congestion status in the transfer-controlled message, it updates the congestion status of the signalling route
- *  set towards destination X with the value of the congestion status carried in the transfer-controlled message.
+ * In this case, the transfer-controlled message is sent to the originating point Z with the congestion status filed
+ * set to the current congestion status of the signalling link.
  *
- *  13.9.3.  If within T16 after sending a signalling route set congestion test message, a transfer controlled
- *  message relating to the concerned destination is received, the signalling point updates the congestion status of
- *  the signalling route set towards the concerned destination withi the value of the congestion status carried in
- *  the transfer controlled message.  Following this, the procedures pecified in 13.9.4 and 13.9.5 are performed.
+ * 13.7.3.  When the originating signalling point Z receives a transfer-controlled message relating to destination X,
+ * it the current congestion status of the signalling route set towards destination X is less than the congestion
+ * status in the transfer-controlled message, it updates the congestion status of the signalling route set towards
+ * destination X with the value of the congestion status carried in the transfer-controlled message.
  *
- *  Multiple congestion states:
- *  -----------------------------------
- *  13.8 The only use made of the TFC procedure by the national signalling network, using multiple congestion states
- *  without congestion priorities, it to convey the congestion indication primitive from the SP where congestion was
- *  detected to the originating SP in a transfer controlled message.
+ * 13.9.3.  If within T16 after sending a signalling route set congestion test message, a transfer controlled message
+ * relating to the concerned destination is received, the signalling point updates the congestion status of the
+ * signalling route set towards the concerned destination withi the value of the congestion status carried in the
+ * transfer controlled message.  Following this, the procedures pecified in 13.9.4 and 13.9.5 are performed.
  *
- *  11.2.5 For national signalling networks using multiple signalling link congestion states without congestion
- *  priority, S + 1 (1 <= S <= 3) levels of route set congestion status are provided.  The procedure is the same as
- *  that specified in 11.2.3 [below], except that the MTP-STATUS primitive contains the congestion status as a
- *  parameter in addition to the DPC of the affected destination.
+ * Multiple congestion states:
+ * -----------------------------------
+ * 13.8 The only use made of the TFC procedure by the national signalling network, using multiple congestion states
+ * without congestion priorities, it to convey the congestion indication primitive from the SP where congestion was
+ * detected to the originating SP in a transfer controlled message.
  *
- *  International:
- *  -----------------------------------
- *  13.6 The only use of the transfer controlled procedure in the international signalling network is to convey the
- *  congestion indication from the SP where congestion was detected to the originating SP in a transfer controlled
- *  message.
+ * 11.2.5 For national signalling networks using multiple signalling link congestion states without congestion
+ * priority, S + 1 (1 <= S <= 3) levels of route set congestion status are provided.  The procedure is the same as
+ * that specified in 11.2.3 [below], except that the MTP-STATUS primitive contains the congestion status as a
+ * parameter in addition to the DPC of the affected destination.
  *
- *  11.2.3.2 After the reception of a transfer controlled message, the receiving signalling point informs each level
- *  4 User Part of the affected destination by means of an MTP-STATUS primitive specified in 11.2.3.1 i).
+ * International:
+ * -----------------------------------
+ * 13.6 The only use of the transfer controlled procedure in the international signalling network is to convey the
+ * congestion indication from the SP where congestion was detected to the originating SP in a transfer controlled
+ * message.
+ *
+ * 11.2.3.2 After the reception of a transfer controlled message, the receiving signalling point informs each level 4
+ * User Part of the affected destination by means of an MTP-STATUS primitive specified in 11.2.3.1 i).
  */
 static int
 mtp_recv_tfc(queue_t *q, struct mtp_msg *m)
@@ -9771,7 +10413,7 @@ mtp_recv_tfc(queue_t *q, struct mtp_msg *m)
 			}
 			rs->cong_status = newstatus;
 			if (popt & SS7_POPT_MPLEV)
-				rs_timer_start(rs, t15);
+				rs_timer_start(q, rs, t15);
 		}
 		goto discard;
 	}
@@ -9780,21 +10422,23 @@ mtp_recv_tfc(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV TFP
- *  -----------------------------------
- *  13.5.2  A signalling-route-set-test message is sent from a signalling point after a transfer-prohibited or
- *  trasfer-restricted message is received from an adjacent signalling trasfer point (see 13.2.4 and
+/**
+ * mtp_recv_tfp: - RECV TFP
+ * @q: active queue
+ * @m: decoded message
  *
- *  13.4.4).  In this case, a signalling-route-set-test message is sent to that signalling transfer point referring
- *  to the destination declared inaccessible or restricted by the transfer-prohibited or transfer-restricted
- *  message, every T10 period (see clause 16) until a transfer-allowed message, indicating that the desination has
- *  become accessible, is received.
+ * 13.5.2  A signalling-route-set-test message is sent from a signalling point after a transfer-prohibited or
+ * trasfer-restricted message is received from an adjacent signalling trasfer point (see 13.2.4 and
  *
- *  13.2.4  In some circumstances it may happen that a signalling point receives either a repeated
- *  transfer-prohibited message relating to a non-existent route (i.e., there is no route from that signalling point
- *  to the concerned destination via signalling transfer point Y, according to the signalling network configuration)
- *  or to a destination which is already inaccessible, due to previous failures; in this case, no actions are taken.
+ * 13.4.4).  In this case, a signalling-route-set-test message is sent to that signalling transfer point referring to
+ * the destination declared inaccessible or restricted by the transfer-prohibited or transfer-restricted message,
+ * every T10 period (see clause 16) until a transfer-allowed message, indicating that the desination has become
+ * accessible, is received.
+ *
+ * 13.2.4  In some circumstances it may happen that a signalling point receives either a repeated transfer-prohibited
+ * message relating to a non-existent route (i.e., there is no route from that signalling point to the concerned
+ * destination via signalling transfer point Y, according to the signalling network configuration) or to a destination
+ * which is already inaccessible, due to previous failures; in this case, no actions are taken.
  */
 static int
 mtp_recv_tfp(queue_t *q, struct mtp_msg *m)
@@ -9814,9 +10458,10 @@ mtp_recv_tfp(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV TCP
- *  -----------------------------------
+/**
+ * mtp_recv_tcp: - RECV TCP
+ * @q: active queue
+ * @m: decoded message
  */
 static int
 mtp_recv_tcp(queue_t *q, struct mtp_msg *m)
@@ -9836,21 +10481,23 @@ mtp_recv_tcp(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV TFR
- *  -----------------------------------
- *  13.5.2  A signalling-route-set-test message is sent from a signalling point after a transfer-prohibited or
- *  trasfer-restricted message is received from an adjacent signalling trasfer point (see 13.2.4 and
+/**
+ * mtp_recv_tfr: - RECV TFR
+ * @q: active queue
+ * @m: decoded message
  *
- *  13.4.4).  In this case, a signalling-route-set-test message is sent to that signalling transfer point referring
- *  to the destination declared inaccessible or restricted by the transfer-prohibited or transfer-restricted
- *  message, every T10 period (see clause 16) until a transfer-allowed message, indicating that the desination has
- *  become accessible, is received.
+ * 13.5.2  A signalling-route-set-test message is sent from a signalling point after a transfer-prohibited or
+ * transfer-restricted message is received from an adjacent signalling trasfer point (see 13.2.4 and
  *
- *  13.4.4  In some cirumstances, it may happen that a signalling point receives either a repeated
- *  transfer-restricted message or a transfer-retricted message message relating to a non-existent route (i.e.
- *  there is not route from that signalling point to the concerned destination via signalling transfer point Y,
- *  according to the signalling network configuration); in this case, no actions are taken.
+ * 13.4.4).  In this case, a signalling-route-set-test message is sent to that signalling transfer point referring to
+ * the destination declared inaccessible or restricted by the transfer-prohibited or transfer-restricted message,
+ * every T10 period (see clause 16) until a transfer-allowed message, indicating that the desination has become
+ * accessible, is received.
+ *
+ * 13.4.4  In some cirumstances, it may happen that a signalling point receives either a repeated transfer-restricted
+ * message or a transfer-retricted message message relating to a non-existent route (i.e.  there is not route from
+ * that signalling point to the concerned destination via signalling transfer point Y, according to the signalling
+ * network configuration); in this case, no actions are taken.
  */
 static int
 mtp_recv_tfr(queue_t *q, struct mtp_msg *m)
@@ -9870,9 +10517,10 @@ mtp_recv_tfr(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV TCR
- *  -----------------------------------
+/**
+ * mtp_recv_tcr: - RECV TCR
+ * @q: active queue
+ * @m: decoded message
  */
 static int
 mtp_recv_tcr(queue_t *q, struct mtp_msg *m)
@@ -9892,26 +10540,28 @@ mtp_recv_tcr(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV TFA
- *  -----------------------------------
- *  13.3.2  A transfer-allowed message relating to a given destination X is sent from a signalling transfer point Y
- *  in the following cases:
+/**
+ * mtp_recv_tfa: - RECV TFA
+ * @q: active queue
+ * @m: decoded message
  *
- *  i)  When signalling transfer point Y stops routing (at changeback or controlled re-routing), signalling traffic
- *  destination to signalling point X via a signalling transfer point Z (to which the concerned traffic was
- *  previously divered as a consequence of changeover or forced rerouting).  In this case the transfer-allowed
- *  message is sent to signalling transfer point Z.
+ * 13.3.2  A transfer-allowed message relating to a given destination X is sent from a signalling transfer point Y in
+ * the following cases:
  *
- *  ii) When signalling transfer point Y recognizes that it is again able to transfer signalling traffic destined to
- *  signalling point Y (see 6.2.3 and 8.2.3).  In this case a transfer-allowed message is sent to all accessible
- *  adjacent signalling points, except those signalling points that receive a transfer-prohibited message according
- *  to 13.2.2 i) and except signalling point X if it is an adjacent signalling point.  (Broadcast Method).
+ * i)  When signalling transfer point Y stops routing (at changeback or controlled re-routing), signalling traffic
+ * destination to signalling point X via a signalling transfer point Z (to which the concerned traffic was previously
+ * divered as a consequence of changeover or forced rerouting).  In this case the transfer-allowed message is sent to
+ * signalling transfer point Z.
  *
- *  13.3.4  In some circumstances it may happen that a signalling point receives either a repeated transfer-allowed
- *  message or a transfer allowed message relating to a non-existent signalling route (i.e. there is not route from
- *  that signalling point to the concerned destination via signalling transfer point Y according to the signalling
- *  network configuration); in this case no actions are taken.
+ * ii) When signalling transfer point Y recognizes that it is again able to transfer signalling traffic destined to
+ * signalling point Y (see 6.2.3 and 8.2.3).  In this case a transfer-allowed message is sent to all accessible
+ * adjacent signalling points, except those signalling points that receive a transfer-prohibited message according to
+ * 13.2.2 i) and except signalling point X if it is an adjacent signalling point.  (Broadcast Method).
+ *
+ * 13.3.4  In some circumstances it may happen that a signalling point receives either a repeated transfer-allowed
+ * message or a transfer allowed message relating to a non-existent signalling route (i.e. there is not route from
+ * that signalling point to the concerned destination via signalling transfer point Y according to the signalling
+ * network configuration); in this case no actions are taken.
  */
 static int
 mtp_recv_tfa(queue_t *q, struct mtp_msg *m)
@@ -9931,9 +10581,10 @@ mtp_recv_tfa(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV TCA
- *  -----------------------------------
+/**
+ * mtp_recv_tca: - RECV TCA
+ * @q: active queue
+ * @m: decoded message
  */
 static int
 mtp_recv_tca(queue_t *q, struct mtp_msg *m)
@@ -9953,31 +10604,32 @@ mtp_recv_tca(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV RST
- *  -----------------------------------
- *  13.5.4  At the reception of a signalling route set test message, a signalling transfer point will compare the
- *  status of the destination to the received message with the actual status of the destination.  If they are the
- *  same, no further action is taken.  If they are the same, no action is taken, If they are different, one of the
- *  following message is sent in response, dictated by the actual status of the destination:
+/**
+ * mtp_recv_rst: - RECV RST
+ * @q: active queue
+ * @m: decoded message
  *
- *  -   a transfer-allowed message, referring to the destination the accesibility of which is tested, if the
- *  signalling transfer point can reach the indicated destination via a signalling link not connected to the
- *  signalling point from which the signalling route set test message was received (and if the transfer restricted
- *  procedure is used in the the network, the signalling link is on the normal route or an equally efficient
- *  alternative route);
+ * 13.5.4  At the reception of a signalling route set test message, a signalling transfer point will compare the
+ * status of the destination to the received message with the actual status of the destination.  If they are the same,
+ * no further action is taken.  If they are the same, no action is taken, If they are different, one of the following
+ * message is sent in response, dictated by the actual status of the destination:
  *
- *  -   a transfer-restricted message when access to the destination is possible via an alternative to the normal
- *  routing which is less efficient, but still not via the signalling point from which the signalling route set test
- *  was originated;
+ * - a transfer-allowed message, referring to the destination the accesibility of which is tested, if the signalling
+ *   transfer point can reach the indicated destination via a signalling link not connected to the signalling point
+ *   from which the signalling route set test message was received (and if the transfer restricted procedure is used
+ *   in the the network, the signalling link is on the normal route or an equally efficient alternative route);
  *
- *  -   a transfer-prohibited message in all other caes (including the inaccessiblity of the destination).
+ * - a transfer-restricted message when access to the destination is possible via an alternative to the normal routing
+ *   which is less efficient, but still not via the signalling point from which the signalling route set test was
+ *   originated;
  *
- *  9.6.3  A signalling route test message received in a restarting MTP is ignored during the MTP restart procedure.
+ * - a transfer-prohibited message in all other caes (including the inaccessiblity of the destination).
  *
- *  Signalling route set test messages received in a signalling point adjacent to signalling point Y whose MTP is
- *  restarting before T21 expires are handled, but the replies assume that all signalling routes using Y are
- *  prohibited.
+ * 9.6.3  A signalling route test message received in a restarting MTP is ignored during the MTP restart procedure.
+ *
+ * Signalling route set test messages received in a signalling point adjacent to signalling point Y whose MTP is
+ * restarting before T21 expires are handled, but the replies assume that all signalling routes using Y are
+ * prohibited.
  */
 static int
 mtp_recv_rst(queue_t *q, struct mtp_msg *m)
@@ -10010,9 +10662,10 @@ mtp_recv_rst(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV RSR
- *  -----------------------------------
+/**
+ * mtp_recv_rsr: - RECV RSR
+ * @q: active queue
+ * @m: decoded message
  */
 static int
 mtp_recv_rsr(queue_t *q, struct mtp_msg *m)
@@ -10045,9 +10698,10 @@ mtp_recv_rsr(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV RCP
- *  -----------------------------------
+/**
+ * mtp_recv_rcp: - RECV RCP
+ * @q: active queue
+ * @m: decoded message
  */
 static int
 mtp_recv_rcp(queue_t *q, struct mtp_msg *m)
@@ -10080,9 +10734,10 @@ mtp_recv_rcp(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV RCR
- *  -----------------------------------
+/**
+ * mtp_recv_rcr: 0 RECV RCR
+ * @q: active queue
+ * @m: decoded message
  */
 static int
 mtp_recv_rcr(queue_t *q, struct mtp_msg *m)
@@ -10115,6 +10770,11 @@ mtp_recv_rcr(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_lin: - RECV LIN
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_lin(queue_t *q, struct mtp_msg *m)
 {
@@ -10129,6 +10789,11 @@ mtp_recv_lin(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_lun: RECV LUN
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_lun(queue_t *q, struct mtp_msg *m)
 {
@@ -10143,6 +10808,11 @@ mtp_recv_lun(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_lia: - RECV LIA
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_lia(queue_t *q, struct mtp_msg *m)
 {
@@ -10157,6 +10827,11 @@ mtp_recv_lia(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_lua: - RECV LUA
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_lua(queue_t *q, struct mtp_msg *m)
 {
@@ -10171,6 +10846,11 @@ mtp_recv_lua(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_lid: RECV LID
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_lid(queue_t *q, struct mtp_msg *m)
 {
@@ -10185,6 +10865,11 @@ mtp_recv_lid(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_lfu: - RECV LFU
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_lfu(queue_t *q, struct mtp_msg *m)
 {
@@ -10199,6 +10884,11 @@ mtp_recv_lfu(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_llt: - RECV LLT
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_llt(queue_t *q, struct mtp_msg *m)
 {
@@ -10213,6 +10903,11 @@ mtp_recv_llt(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_lrt: - RECV LRT
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_lrt(queue_t *q, struct mtp_msg *m)
 {
@@ -10227,6 +10922,32 @@ mtp_recv_lrt(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_tra: - RECV TRA
+ * @q: active queue
+ * @m: decoded message
+ *
+ * ANSI T1.111.4/2000 9.4 (Actions in Signalling Point X on Receipt of an Unexpected TRA or TRW Message.)  If an
+ * unexpected traffic restart allowed message or traffic restart waiting message is received from an adjacent point,
+ *
+ * (1) If the receiving point has no trasnfer function it returns a traffic restart allowed message to the adjacent
+ * point from which the unexpected traffic restart allowed or traffic restart waiting message was received and starts
+ * time T29 concerning that point.
+ *
+ * (2) If the receiving point has the transfer function function, it starts timer T30, sends a traffic restart waiting
+ * message followed by the necessary transfer-restricted and transfer-prohibited messages (preventative transfer
+ * prohibited messages according to 13.2.2 (1) are required for traffic currently being routed via the point from
+ * which the unexpected traffic restart allowed or traffic restart waiting message was received), and a traffic
+ * restart allowed message.  It then stops T30 and starts T29.  In the abnormal case that T30 expires before the
+ * sending of transfer-prohibited and transfer-restricted messages is complete, it sends a traffic restart allowed
+ * message, starts T29, and then completes sending any preventative transfer-prohibited messages according to 13.2.2
+ * (1) for traffic currently being routed via the point from which the unexpected traffic restart allowed or traffic
+ * restart waiting message was received.
+ *
+ * NOTE: A received traffic restart waiting or traffic restart allowed message is not unexpected if T22, T23 or T24 is
+ * running and a direct link is in service at level 2 to the point from which the message is received or if T25, T28,
+ * T29 or T30 is running for the point from which the message is received.
+ */
 static int
 mtp_recv_tra(queue_t *q, struct mtp_msg *m)
 {
@@ -10242,6 +10963,32 @@ mtp_recv_tra(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_trw: - RECV TRW
+ * @q: active queue
+ * @m: decoded message
+ *
+ * ANSI T1.111.4/2000 9.4 (Actions in Signalling Point X on Receipt of an Unexpected TRA or TRW Message.)  If an
+ * unexpected traffic restart allowed message or traffic restart waiting message is received from an adjacent point,
+ *
+ * (1) If the receiving point has no trasnfer function it returns a traffic restart allowed message to the adjacent
+ * point from which the unexpected traffic restart allowed or traffic restart waiting message was received and starts
+ * time T29 concerning that point.
+ *
+ * (2) If the receiving point has the transfer function function, it starts timer T30, sends a traffic restart waiting
+ * message followed by the necessary transfer-restricted and transfer-prohibited messages (preventative transfer
+ * prohibited messages according to 13.2.2 (1) are required for traffic currently being routed via the point from
+ * which the unexpected traffic restart allowed or traffic restart waiting message was received), and a traffic
+ * restart allowed message.  It then stops T30 and starts T29.  In the abnormal case that T30 expires before the
+ * sending of transfer-prohibited and transfer-restricted messages is complete, it sends a traffic restart allowed
+ * message, starts T29, and then completes sending any preventative transfer-prohibited messages according to 13.2.2
+ * (1) for traffic currently being routed via the point from which the unexpected traffic restart allowed or traffic
+ * restart waiting message was received.
+ *
+ * NOTE: A received traffic restart waiting or traffic restart allowed message is not unexpected if T22, T23 or T24 is
+ * running and a direct link is in service at level 2 to the point from which the message is received or if T25, T28,
+ * T29 or T30 is running for the point from which the message is received.
+ */
 static int
 mtp_recv_trw(queue_t *q, struct mtp_msg *m)
 {
@@ -10257,6 +11004,11 @@ mtp_recv_trw(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_dlc: - RECV DLC
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_dlc(queue_t *q, struct mtp_msg *m)
 {
@@ -10264,6 +11016,11 @@ mtp_recv_dlc(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_css: - RECV CSS
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_css(queue_t *q, struct mtp_msg *m)
 {
@@ -10271,6 +11028,11 @@ mtp_recv_css(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_cns: - RECV CNS
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_cns(queue_t *q, struct mtp_msg *m)
 {
@@ -10278,6 +11040,11 @@ mtp_recv_cns(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_cnp: - RECV CNP
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_cnp(queue_t *q, struct mtp_msg *m)
 {
@@ -10285,6 +11052,11 @@ mtp_recv_cnp(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_upu: - RECV UPU
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_upu(queue_t *q, struct mtp_msg *m)
 {
@@ -10300,6 +11072,11 @@ mtp_recv_upu(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_upa: - RECV UPA
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_upa(queue_t *q, struct mtp_msg *m)
 {
@@ -10315,6 +11092,11 @@ mtp_recv_upa(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
+/**
+ * mtp_recv_upt: - RECV UPT
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_upt(queue_t *q, struct mtp_msg *m)
 {
@@ -10330,11 +11112,13 @@ mtp_recv_upt(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV SLTM
- *  -----------------------------------
- *  Signalling link test messages must be received on the same signalling link to which they pertain and must have
- *  the correct originating and destination point codes and signalling link code.  Otherwise they are discarded.
+/**
+ * mtp_recv_sltm: - RECV SLTM
+ * @q: active queue
+ * @m: decoded message
+ *
+ * Signalling link test messages must be received on the same signalling link to which they pertain and must have the
+ * correct originating and destination point codes and signalling link code.  Otherwise they are discarded.
  */
 static int
 mtp_recv_sltm(queue_t *q, struct mtp_msg *m)
@@ -10345,7 +11129,8 @@ mtp_recv_sltm(queue_t *q, struct mtp_msg *m)
 	struct rs *adj = lk->sp.adj;
 
 	if (m->slc != sl->slc || m->opc != adj->dest || m->dpc != loc->pc) {
-		if (sl->timers.t1t && m->slc == sl->slc && m->opc == loc->pc && m->dpc == adj->dest)
+		if (mi_timer_remain(sl->timers.t1t) && m->slc == sl->slc && m->opc == loc->pc
+		    && m->dpc == adj->dest)
 			goto loopback;
 		else
 			goto eproto;
@@ -10362,29 +11147,31 @@ mtp_recv_sltm(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV SLTA
- *  -----------------------------------
- *  Q.707 2.2 ... The signalling link test will be considered successful only if the received signalling link test
- *  acknowledgement message fulfills the following criteria:
+/**
+ * mtp_recv_slta: - RECV SLTA
+ * @q: active queue
+ * @m: decoded message
  *
- *  a)  the SLC identifies the physical signalling link on which the SLTA was received.
+ * Q.707 2.2 ... The signalling link test will be considered successful only if the received signalling link test
+ * acknowledgement message fulfills the following criteria:
  *
- *  b)  the OPC identifies the signalling point at the other end of the link.
+ * a)  the SLC identifies the physical signalling link on which the SLTA was received.
  *
- *  c)  the test pattern is correct.
+ * b)  the OPC identifies the signalling point at the other end of the link.
  *
- *  In the case when the criteria given above are not met or a signalling link test acknowledgement message is not
- *  received on the link being tested within T1 (see 5.5) after the signalling link test message has been sent, the
- *  test is considered to have failed and is repeated once.  In the case when also the repeat test fails, the
- *  following actions have to be taken:
+ * c)  the test pattern is correct.
  *
- *  -   SLT applied on activation/restoration, the link is put out of service, restoration is attempted and a
- *  management system must be informed.
+ * In the case when the criteria given above are not met or a signalling link test acknowledgement message is not
+ * received on the link being tested within T1 (see 5.5) after the signalling link test message has been sent, the
+ * test is considered to have failed and is repeated once.  In the case when also the repeat test fails, the following
+ * actions have to be taken:
  *
- *  -   SLT applied periodically, for further study.
+ * - SLT applied on activation/restoration, the link is put out of service, restoration is attempted and a management
+ *   system must be informed.
  *
- *  (Same for ANSI.)
+ * - SLT applied periodically, for further study.
+ *
+ * (Same for ANSI.)
  */
 static int
 mtp_recv_slta(queue_t *q, struct mtp_msg *m)
@@ -10411,16 +11198,16 @@ mtp_recv_slta(queue_t *q, struct mtp_msg *m)
 			sl_timer_stop(sl, t17);
 			if (sl->lk.lk->sp.loc->flags & SPF_LOSC_PROC_B) {
 				/* link is in probation */
-				sl_timer_start(sl, t33a);
+				sl_timer_start(q, sl, t33a);
 			}
-			if ((err = sl_set_state(q, sl, SL_ACTIVE)))
+			if ((err = sl_set_state(q, sl, SL_RESTORED)))
 				return (err);
 			/* in service at level 3 */
 			sl_set_l_state(sl, SLS_IN_SERVICE);
 			goto discard;
 		}
 		/* no further action taken on success */
-		sl_timer_start(sl, t2t);	/* start periodic test */
+		sl_timer_start(q, sl, t2t);	/* start periodic test */
 		goto discard;
 	}
       failed:
@@ -10429,7 +11216,7 @@ mtp_recv_slta(queue_t *q, struct mtp_msg *m)
 		if ((err = mtp_send_sltm(q, loc, lk->ni, adj->dest, loc->pc, sl->slc,
 					 sl->slc, sl->tdata, sl->tlen, sl)))
 			return (err);
-		sl_timer_start(sl, t1t);
+		sl_timer_start(q, sl, t1t);
 		sl->flags &= ~SLF_WACK_SLTM;
 		sl->flags |= SLF_WACK_SLTM2;	/* second attempt */
 		goto discard;
@@ -10447,7 +11234,7 @@ mtp_recv_slta(queue_t *q, struct mtp_msg *m)
 	   management and leave the link in service. If the test failed because of an inserted
 	   loopback while the link is in service, the link will fail rapidly due to other causes.
 	   So we do nothing more than report to management. */
-	sl_timer_start(sl, t2t);	/* restart periodic test */
+	sl_timer_start(q, sl, t2t);	/* restart periodic test */
 	mi_strlog(q, 0, SL_ERROR, "periodic SLT failed");
 	goto discard;
       unexpected:
@@ -10457,9 +11244,10 @@ mtp_recv_slta(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV SSLTM
- *  -----------------------------------
+/**
+ * mtp_recv_ssltm: - RECV SSLTM
+ * @q: active queue
+ * @m: decoded message
  */
 static int
 mtp_recv_ssltm(queue_t *q, struct mtp_msg *m)
@@ -10477,16 +11265,18 @@ mtp_recv_ssltm(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV SSLTA
- *  -----------------------------------
- */
 static int
 sl_ssltm_success(queue_t *q, struct sl *sl)
 {
 	fixme(("Write this function\n"));
 	return (0);
 }
+
+/**
+ * mtp_recv_sslta: - RECV SSLTA
+ * @q: active queue
+ * @m: decoded message
+ */
 static int
 mtp_recv_sslta(queue_t *q, struct mtp_msg *m)
 {
@@ -10514,7 +11304,7 @@ mtp_recv_sslta(queue_t *q, struct mtp_msg *m)
 		if ((err = mtp_send_ssltm(q, loc, lk->ni, adj->dest, loc->pc, sl->slc,
 					  sl->slc, sl->tdata, sl->tlen, sl)) < 0)
 			return (err);
-		sl_timer_start(sl, t1s);
+		sl_timer_start(q, sl, t1s);
 		sl->flags &= ~SLF_WACK_SSLTM;
 		sl->flags |= ~SLF_WACK_SSLTM2;
 		goto discard;
@@ -10530,10 +11320,12 @@ mtp_recv_sslta(queue_t *q, struct mtp_msg *m)
 	return (0);
 }
 
-/*
- *  RECV USER
- *  -----------------------------------
- *  Note: if we are restarting, we never get here.
+/**
+ * mtp_recv_user: - RECV USER
+ * @q: active queue
+ * @m: decoded message
+ *
+ * Note: if we are restarting, we never get here.
  */
 static int
 mtp_recv_user(queue_t *q, struct mtp_msg *m)
@@ -10559,7 +11351,7 @@ mtp_recv_user(queue_t *q, struct mtp_msg *m)
  *  -------------------------------------------------------------------------
  */
 static int
-mtp_proc_msg(struct sl *sl, queue_t *q, struct mtp_msg *m)
+mtp_proc_msg(queue_t *q, struct sl *sl, struct mtp_msg *m)
 {
 	unsigned char tag;
 
@@ -11263,13 +12055,16 @@ mtp_dec_msg(queue_t *q, mblk_t *mp, struct mtp_msg *m, struct na *na)
 	return (err);
 }
 
-/*
- *  SL RECEIVE MESSAGE
- *  -----------------------------------
- *  9.6.6  All messages to another destination received at a signalling point whose MTP is restarting are discarded.
+/**
+ * sl_recv_msg: - receive signalling link message
+ * @q: active queue (lower read queue)
+ * @sl: receiving signalling link
+ * @mp: the message
+ *
+ * 9.6.6  All messages to another destination received at a signalling point whose MTP is restarting are discarded.
  */
 static int
-sl_recv_msg(struct sl *sl, queue_t *q, mblk_t *mp)
+sl_recv_msg(queue_t *q, struct sl *sl, mblk_t *mp)
 {
 	struct mtp_msg msg = { NULL, };
 	struct lk *lk = sl->lk.lk;	/* the link (set) on which the message arrived */
@@ -11302,14 +12097,14 @@ sl_recv_msg(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (loc->pc == msg.dpc) {
 		/* message is for us, process it */
 		todo(("Also check local aliases\n"));
-		if ((err = mtp_proc_msg(sl, q, &msg)) < 0)
+		if ((err = mtp_proc_msg(q, sl, &msg)) < 0)
 			return (err);
 		freemsg(mp);
 		return (0);
 	}
 	if ((loc->flags & SPF_XFER_FUNC)) {
 		/* message is not for us, transfer it */
-		if ((err = mtp_xfer_route(sl, q, mp, &msg)) < 0)
+		if ((err = mtp_xfer_route(q, sl, mp, &msg)) < 0)
 			return (err);
 		freemsg(mp);
 		return (0);
@@ -11335,11 +12130,13 @@ sl_recv_msg(struct sl *sl, queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-/*
- *  M_DATA:
- *  -------------------------------------------------------------------
- *  When we receive a PDU from below, we want to decode it and then determine what to do based on the decoding of
- *  the message.
+/**
+ * sl_data: - process M_DATA
+ * @q: active queue (lower read queue)
+ * @mp: the message
+ *
+ * When we receive a PDU from below, we want to decode it and then determine what to do based on the decoding of the
+ * message.
  */
 static int
 sl_data(queue_t *q, mblk_t *mp)
@@ -11348,17 +12145,19 @@ sl_data(queue_t *q, mblk_t *mp)
 
 	if ((1 << sl_get_l_state(sl)) & ~(SLSF_IN_SERVICE | SLSF_WACK_SLTM | SLSF_PROC_OUTG))
 		goto outstate;
-	return sl_recv_msg(sl, q, mp);
+	return sl_recv_msg(q, sl, mp);
       outstate:
 	mi_strlog(q, 0, SL_ERROR, "M_DATA: would place i/f out of state");
 	return (EPROTO);
 }
 
-/*
- *  SL_PDU_IND:
- *  -------------------------------------------------------------------
- *  When we receive a PDU from below, we want to decode it and then determine what to do based on the decoding of
- *  the message.
+/**
+ * sl_pdu_ind: - process SL_PDU_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
+ * 
+ * When we receive a PDU from below, we want to decode it and then determine what to do based on the decoding of the
+ * message.
  */
 static int
 sl_pdu_ind(queue_t *q, mblk_t *mp)
@@ -11370,7 +12169,7 @@ sl_pdu_ind(queue_t *q, mblk_t *mp)
 		goto einval;
 	if ((1 << sl_get_l_state(sl)) & ~(SLSF_IN_SERVICE | SLSF_WACK_SLTM | SLSF_PROC_OUTG))
 		goto outstate;
-	return sl_recv_msg(sl, q, mp->b_cont);
+	return sl_recv_msg(q, sl, mp->b_cont);
       outstate:
 	mi_strlog(q, 0, SL_ERROR, "SL_PDU_IND: would place i/f out of state");
 	return (EPROTO);
@@ -11379,13 +12178,15 @@ sl_pdu_ind(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  SL_LINK_CONGESTED_IND:
- *  -------------------------------------------------------------------
- *  We keep track of overall link congestion status primarily so that we can restrict routes when link congestion
- *  onsets.  This ensures that when a link set becomes congestion (premably from loss of links or general signalling
- *  overload) that we attempt to reroute what traffic we can to another available route.  Also, this is necessary
- *  for triggering congestion related transfer restricted procedure in an STP than sends TFR.
+/**
+ * sl_link_congested_ind: - process SL_LINK_CONGESTED_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
+ * 
+ * We keep track of overall link congestion status primarily so that we can restrict routes when link congestion
+ * onsets.  This ensures that when a link set becomes congestion (premably from loss of links or general signalling
+ * overload) that we attempt to reroute what traffic we can to another available route.  Also, this is necessary for
+ * triggering congestion related transfer restricted procedure in an STP than sends TFR.
  */
 static int
 sl_link_congested_ind(queue_t *q, mblk_t *mp)
@@ -11405,7 +12206,7 @@ sl_link_congested_ind(queue_t *q, mblk_t *mp)
 	if (!old_status && new_status) {
 		sl_set_state(q, sl, SL_CONGESTED);
 		/* T31(ANSI) is a false congesiton detection timer */
-		sl_timer_start(sl, t31a);
+		sl_timer_start(q, sl, t31a);
 	}
 	if (!new_status && old_status) {
 		sl_set_state(q, sl, SL_UNCONGESTED);
@@ -11421,13 +12222,15 @@ sl_link_congested_ind(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  SL_LINK_CONGESTION_CEASED_IND:
- *  -------------------------------------------------------------------
- *  We keep track of overall link congestion status primarily so that we can unrestrict routes when link congestion
- *  abates.  This ensures that when a link set becomes congested (presumably from loss of links or general
- *  signalling overload) that we attempt to reroute what traffic we can to another available route.  Also, this is
- *  necessary for triggering congestion related transfer restricted procedure in an STP that sends TFR.
+/**
+ * sl_link_congestion_ceased_ind: - process SL_LINK_CONGESTION_CEASED_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
+ * 
+ * We keep track of overall link congestion status primarily so that we can unrestrict routes when link congestion
+ * abates.  This ensures that when a link set becomes congested (presumably from loss of links or general signalling
+ * overload) that we attempt to reroute what traffic we can to another available route.  Also, this is necessary for
+ * triggering congestion related transfer restricted procedure in an STP that sends TFR.
  */
 static int
 sl_link_congestion_ceased_ind(queue_t *q, mblk_t *mp)
@@ -11452,7 +12255,7 @@ sl_link_congestion_ceased_ind(queue_t *q, mblk_t *mp)
 	if (!old_status && new_status) {
 		sl_set_state(q, sl, SL_CONGESTED);
 		/* T31(ANSI) is a false congesiton detection timer */
-		sl_timer_start(sl, t31a);
+		sl_timer_start(q, sl, t31a);
 	}
 	return (0);
       outstate:
@@ -11463,11 +12266,13 @@ sl_link_congestion_ceased_ind(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  SL_RETRIEVED_MESSAGE_IND:
- *  -------------------------------------------------------------------
- *  As messages are retrieved, we simply tack the messages onto the end of the retrieval buffer.  If we are not in
- *  the retrieval state, then we discard the messages and complain.
+/**
+ * sl_retrieved_message_ind: - process SL_RETRIEVED_MESSAGE_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
+ * 
+ * As messages are retrieved, we simply tack the messages onto the end of the retrieval buffer.  If we are not in the
+ * retrieval state, then we discard the messages and complain.
  */
 static int
 sl_retrieved_message_ind(queue_t *q, mblk_t *mp)
@@ -11490,7 +12295,7 @@ sl_retrieved_message_ind(queue_t *q, mblk_t *mp)
 		{
 			/* XXX Actually, for 5-bit and 7-bit compatibility, we rotate based on 5
 			   sls bits regardless of the number of bits in the SLS */
-			ulong sls = mp->b_cont->b_rptr[7];
+			uint sls = mp->b_cont->b_rptr[7];
 
 			if (sls & 0x10)
 				sls = (sls & 0xe0) | ((sls & 0x0f) << 1) | 0x01;
@@ -11515,19 +12320,21 @@ sl_retrieved_message_ind(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  SL_RETRIEVAL_COMPLETE_IND:
- *  -------------------------------------------------------------------
- *  5.5 Retrieval and diversion of traffic
+/**
+ * sl_retrieval_complete_ind: - process SL_RETRIEVAL_COMPLETE_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
  *
- *  When the procedure to update the retransmission buffer content is completed, the following actions are
- *  performed: the routing of the signalling traffic to be diverted is changed; the signal traffic already stored in
- *  the transmission buffers and retransmission buffer of the unavailable signalling link is sent directly towards
- *  the new signalling link(s), according to the modified routing.
+ * 5.5 Retrieval and diversion of traffic
  *
- *  The diverted signalling traffic will be sent towards the new signalling link(s) in such a way that the correct
- *  message sequence is maintained.  The diverted traffic has no priority in relation to normal traffic already
- *  conveyed on the signalling link(s).
+ * When the procedure to update the retransmission buffer content is completed, the following actions are performed:
+ * the routing of the signalling traffic to be diverted is changed; the signal traffic already stored in the
+ * transmission buffers and retransmission buffer of the unavailable signalling link is sent directly towards the new
+ * signalling link(s), according to the modified routing.
+ *
+ * The diverted signalling traffic will be sent towards the new signalling link(s) in such a way that the correct
+ * message sequence is maintained.  The diverted traffic has no priority in relation to normal traffic already
+ * conveyed on the signalling link(s).
  */
 static int
 sl_retrieval_complete_ind(queue_t *q, mblk_t *mp)
@@ -11554,7 +12361,7 @@ sl_retrieval_complete_ind(queue_t *q, mblk_t *mp)
 			{
 				/* XXX Actually, for 5-bit and 7-bit compatibility, we rotate based 
 				   on 5 sls bits regardless of the number of bits in the SLS */
-				ulong sls = mp->b_cont->b_rptr[7];
+				uint sls = mp->b_cont->b_rptr[7];
 
 				if (sls & 0x10)
 					sls = (sls & 0xe0) | ((sls & 0x0f) << 1) | 0x01;
@@ -11577,9 +12384,10 @@ sl_retrieval_complete_ind(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  SL_RB_CLEARED_IND:
- *  -------------------------------------------------------------------
+/**
+ * sl_rb_cleared_ind: - process SL_RB_CLEARED_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
  */
 static int
 sl_rb_cleared_ind(queue_t *q, mblk_t *mp)
@@ -11605,9 +12413,10 @@ sl_rb_cleared_ind(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  SL_BSNT_IND:
- *  -------------------------------------------------------------------
+/**
+ * sl_bsnt_ind: - process SL_BSNT_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
  */
 static int
 sl_bsnt_ind(queue_t *q, mblk_t *mp)
@@ -11652,52 +12461,54 @@ sl_bsnt_ind(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  SL_IN_SERVICE_IND:
- *  -------------------------------------------------------------------
- *  3.3.2 Signalling link restored
+/**
+ * sl_in_service_ind: - process SL_IN_SERVICE_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
+ * 
+ * 3.3.2 Signalling link restored
  *
- *  3.3.2.1 Signalling traffic management: the changeback procedure (see clause 6) is applied, if required, to
- *  divert signalling traffic from one or more links to a link which has become available; it includes determination
- *  of the traffic to be diverted and procedures for maintaining the correct message sequence.
+ * 3.3.2.1 Signalling traffic management: the changeback procedure (see clause 6) is applied, if required, to divert
+ * signalling traffic from one or more links to a link which has become available; it includes determination of the
+ * traffic to be diverted and procedures for maintaining the correct message sequence.
  *
- *  3.3.2.2 Signalling link management: the signalling link deactivation procedure (see clause 12) is used if,
- *  during the signalling link failure, another signalling link of the same link was activated; it is used to assure
- *  that the link set status is returned to the same state as before the failure.  This requires that the active
- *  link activated during the link failure is deactivated and considered no longer available for signalling.
+ * 3.3.2.2 Signalling link management: the signalling link deactivation procedure (see clause 12) is used if, during
+ * the signalling link failure, another signalling link of the same link was activated; it is used to assure that the
+ * link set status is returned to the same state as before the failure.  This requires that the active link activated
+ * during the link failure is deactivated and considered no longer available for signalling.
  *
- *  3.3.2.3 Signalling route management: in the case when the restoration of a signalling link causes a signalling
- *  route set to become available, the signalling transfer point which can once again route the concerned signalling
- *  traffic applies the transfer-allowed procedures described in clause 13.
+ * 3.3.2.3 Signalling route management: in the case when the restoration of a signalling link causes a signalling
+ * route set to become available, the signalling transfer point which can once again route the concerned signalling
+ * traffic applies the transfer-allowed procedures described in clause 13.
  *
- *  4.4 Signalling link availablity
+ * 4.4 Signalling link availablity
  *
- *  4.4.1 When a previously unavailable signalling link becomes available again (see 3.2), signalling traffic may be
- *  transferred to the available signalling link by means of the changeback procedure.  The traffic to be
- *  transferred is determined in accordance with the following criteria.
+ * 4.4.1 When a previously unavailable signalling link becomes available again (see 3.2), signalling traffic may be
+ * transferred to the available signalling link by means of the changeback procedure.  The traffic to be transferred
+ * is determined in accordance with the following criteria.
  *
- *  4.4.2 In the case when the link set to which the available signalling link belongs, already carries signalling
- *  traffic on other signalling links in the link set, the traffic to be transferred includes the traffic for which
- *  the available signalling link is the normal one.  Note that the assignment of the normal traffic to a signalling
- *  link may be changed during the changeback process taking into account, for example, system performance.
+ * 4.4.2 In the case when the link set to which the available signalling link belongs, already carries signalling
+ * traffic on other signalling links in the link set, the traffic to be transferred includes the traffic for which the
+ * available signalling link is the normal one.  Note that the assignment of the normal traffic to a signalling link
+ * may be changed during the changeback process taking into account, for example, system performance.
  *
- *  The normal traffic is transferred from one or more signalling links, depending on the criteria applied when the
- *  signalling link became unavailable (see 4.3.2), and upon the criteria applied if any of the alternative
- *  signalling links(s) themselves became unavailable, or available, in the meantime.
+ * The normal traffic is transferred from one or more signalling links, depending on the criteria applied when the
+ * signalling link became unavailable (see 4.3.2), and upon the criteria applied if any of the alternative signalling
+ * links(s) themselves became unavailable, or available, in the meantime.
  *
- *  If signalling links in the linkset are still unavailable, and if it is required for load balancing purposes,
- *  signalling traffic extra to that normally carried by any link might also be identified for diversion to the
- *  signalling link made available, and to other available links in the linkset.
+ * If signalling links in the linkset are still unavailable, and if it is required for load balancing purposes,
+ * signalling traffic extra to that normally carried by any link might also be identified for diversion to the
+ * signalling link made available, and to other available links in the linkset.
  *
- *  This extra traffic is transferred from one or more signalling links.
+ * This extra traffic is transferred from one or more signalling links.
  *
- *  4.4.3  In the case when the link set (combined link set) to which the available signalling links belong, does
- *  not cary any signalling traffic [i.e., a link set (combined link set) has become available], the traffic to be
- *  trasferred is the traffic for which the available link set (combined link set) has higher priority than the link
- *  set (combined link set) currently used.
+ * 4.4.3  In the case when the link set (combined link set) to which the available signalling links belong, does not
+ * cary any signalling traffic [i.e., a link set (combined link set) has become available], the traffic to be
+ * trasferred is the traffic for which the available link set (combined link set) has higher priority than the link
+ * set (combined link set) currently used.
  *
- *  The traffic is transferred from one or more link sets (combined link sets) and from one or more signalling links
- *  within each link set.
+ * The traffic is transferred from one or more link sets (combined link sets) and from one or more signalling links
+ * within each link set.
  */
 static int
 sl_in_service_ind(queue_t *q, mblk_t *mp)
@@ -11723,7 +12534,7 @@ sl_in_service_ind(queue_t *q, mblk_t *mp)
 			   sl)))
 		return (err);
 	sl_timer_stop(sl, t17);
-	sl_timer_start(sl, t1t);
+	sl_timer_start(q, sl, t1t);
 	sl->flags &= ~SLF_WACK_SLTM2;
 	sl->flags |= SLF_WACK_SLTM;
 	sl_set_l_state(sl, SLS_WACK_SLTM);
@@ -11737,138 +12548,138 @@ sl_in_service_ind(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  SL_OUT_OF_SERVICE_IND:
- *  -------------------------------------------------------------------
- *  3.3.1 Signalling link failed
+/**
+ * sl_out_of_service_ind: - process SL_OUT_OF_SERVICE_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
+ * 
+ * 3.3.1 Signalling link failed
  *
- *  3.3.1.1 Signalling traffic management: the changeover procedure (see clause 5) is applied, if required, to diver
- *  signalling traffic from the unavailable link to one or more alternative links with the objective of avoiding
- *  message loss, repetition or mis-sequencing; it includes determination of the alternative link or links where the
- *  affected traffic can be transferred and procedures to retrieve messages sent over the failed link but not
- *  received by the far end.
+ * 3.3.1.1 Signalling traffic management: the changeover procedure (see clause 5) is applied, if required, to diver
+ * signalling traffic from the unavailable link to one or more alternative links with the objective of avoiding
+ * message loss, repetition or mis-sequencing; it includes determination of the alternative link or links where the
+ * affected traffic can be transferred and procedures to retrieve messages sent over the failed link but not received
+ * by the far end.
  *
- *  3.3.1.2 Signalling link management: the procedures described in clause 12 are used to restore a signalling link
- *  and to make it available for signalling.  Moreover, depending on the link set status, the procedures can also be
- *  used to activate another signalling link in the same link set to which the unavailable link belongs and to make
- *  it available for signalling.
+ * 3.3.1.2 Signalling link management: the procedures described in clause 12 are used to restore a signalling link and
+ * to make it available for signalling.  Moreover, depending on the link set status, the procedures can also be used
+ * to activate another signalling link in the same link set to which the unavailable link belongs and to make it
+ * available for signalling.
  *
- *  3.3.1.3 Signalling route management: in the case when the failure of a signalling link causes a signalling route
- *  set to become unavailable or restricted, the signalling transfer point which can no longer route the concerned
- *  signalling traffic applies the transfer-prohibited procedures or transfer-restricted procedures described in
- *  clause 13.
+ * 3.3.1.3 Signalling route management: in the case when the failure of a signalling link causes a signalling route
+ * set to become unavailable or restricted, the signalling transfer point which can no longer route the concerned
+ * signalling traffic applies the transfer-prohibited procedures or transfer-restricted procedures described in clause
+ * 13.
  *
- *  4.3 Signalling link unavailability
+ * 4.3 Signalling link unavailability
  *
- *  4.3.1 When a signalling link becomes unavailable, signalling traffic carried by the link is transferred to one
- *  ore more alternative links by means of a changeover procedure.  The alternative link or links are determined in
- *  accordance with the following criteria.
+ * 4.3.1 When a signalling link becomes unavailable, signalling traffic carried by the link is transferred to one ore
+ * more alternative links by means of a changeover procedure.  The alternative link or links are determined in
+ * accordance with the following criteria.
  *
- *  4.3.2 In thc case when there is one or more alternative signalling links available in the link set to which the
- *  unavailable link belongs, the signalling traffic is transferred within the link set to: a) an active and
- *  unblocked signalling link, currently not carrying any traffic.  If no such signalling link exists, the
- *  signalling traffic is transferred to; b) one ore possibly more than one signalling link currently carrying
- *  traffic.  In the case of transfer to one signalling link, the alternative signalling link is that having the
- *  highest priority of the signalling links in service.
+ * 4.3.2 In thc case when there is one or more alternative signalling links available in the link set to which the
+ * unavailable link belongs, the signalling traffic is transferred within the link set to: a) an active and unblocked
+ * signalling link, currently not carrying any traffic.  If no such signalling link exists, the signalling traffic is
+ * transferred to; b) one ore possibly more than one signalling link currently carrying traffic.  In the case of
+ * transfer to one signalling link, the alternative signalling link is that having the highest priority of the
+ * signalling links in service.
  *
- *  4.3.3 In the case when there is no alternative signalling link within the link set to which the unavailable
- *  signalling link belongs, the signalling traffic is transferred to one or more alternative link sets (combined
- *  link sets) in accordance with the alternative routing defined for each destination.  For a particular
- *  destination, the alternative link set (combined link set) si the link set (combined link set) in service having
- *  the highest priority.
+ * 4.3.3 In the case when there is no alternative signalling link within the link set to which the unavailable
+ * signalling link belongs, the signalling traffic is transferred to one or more alternative link sets (combined link
+ * sets) in accordance with the alternative routing defined for each destination.  For a particular destination, the
+ * alternative link set (combined link set) si the link set (combined link set) in service having the highest
+ * priority.
  *
- *  Within a new link set, signalling traffic is distributed over the signalling links in accordance with the
- *  routing currently applicable for that link set; i.e. the trasferred traffic is routed in the same way as the
- *  traffic already using the link set.
+ * Within a new link set, signalling traffic is distributed over the signalling links in accordance with the routing
+ * currently applicable for that link set; i.e. the trasferred traffic is routed in the same way as the traffic
+ * already using the link set.
  *
- *  5.3 Changeover initiation and actions
+ * 5.3 Changeover initiation and actions
  *
- *  5.3.1  Changeover is initiated at a signalling point when a signalling link is recognized as unavailable
- *  according to the criteria listed in 3.2.2.
+ * 5.3.1  Changeover is initiated at a signalling point when a signalling link is recognized as unavailable according
+ * to the criteria listed in 3.2.2.
  *
- *  The following actions are then performed: a) transmission and acceptance of message signal unites on the
- *  concerned signalling link is terminated; b) transmission of link status signal units or fill in signal units, as
- *  described in 5.3/Q.703 takes place; c) the alternative signalling link(s) are determined according to the rules
- *  specified in clause 4; d) a procedure to update the content of the retransmission buffer of the unavailable
- *  signalling link is performed as specified in 5.4 below; e) signalling traffic is diverted to the alternative
- *  signalling link(s) as specified in 5.5 below.
+ * The following actions are then performed: a) transmission and acceptance of message signal unites on the concerned
+ * signalling link is terminated; b) transmission of link status signal units or fill in signal units, as described in
+ * 5.3/Q.703 takes place; c) the alternative signalling link(s) are determined according to the rules specified in
+ * clause 4; d) a procedure to update the content of the retransmission buffer of the unavailable signalling link is
+ * performed as specified in 5.4 below; e) signalling traffic is diverted to the alternative signalling link(s) as
+ * specified in 5.5 below.
  *
- *  In addition, if traffic towards a given destination is diverted to an alternative signalling link terminating in
- *  a signalling transfer point not currently used to carry traffic towards that destination, a transfer-prohibited
- *  procedure is performed as specified in 13.2.
+ * In addition, if traffic towards a given destination is diverted to an alternative signalling link terminating in a
+ * signalling transfer point not currently used to carry traffic towards that destination, a transfer-prohibited
+ * procedure is performed as specified in 13.2.
  *
- *  5.3.2 In the case when there is no traffic to transfer from the unavailable signalling link action, only item b)
- *  of 5.3.1 is required.
+ * 5.3.2 In the case when there is no traffic to transfer from the unavailable signalling link action, only item b) of
+ * 5.3.1 is required.
  *
- *  5.3.3 If no alternative signalling link exists for signalling traffic towards one or more destinations, the
- *  concerned destination(s) are declared inaccessible and the following actions apply: i) the routing of the
- *  concerned signalling traffic is blocked and the concerned messages already stored in the transmission and
- *  retransmission buffers of the unavailable signalling link, as well as those received subsequently, are
- *  discarded; ii) a command is sent to the User Part(s) (if any) in order to stop generating the concerned
- *  signalling traffic; iii) the transfer-prohibited procedure is performed, as specified in 13.2; iv) the
- *  appropriate signalling link management proceudres are performed, as specified in clause 12.
+ * 5.3.3 If no alternative signalling link exists for signalling traffic towards one or more destinations, the
+ * concerned destination(s) are declared inaccessible and the following actions apply: i) the routing of the concerned
+ * signalling traffic is blocked and the concerned messages already stored in the transmission and retransmission
+ * buffers of the unavailable signalling link, as well as those received subsequently, are discarded; ii) a command is
+ * sent to the User Part(s) (if any) in order to stop generating the concerned signalling traffic; iii) the
+ * transfer-prohibited procedure is performed, as specified in 13.2; iv) the appropriate signalling link management
+ * proceudres are performed, as specified in clause 12.
  *
- *  5.3.4  In some cases of failures or in some network configuration, the normal buffer updating and retrieval
- *  procedures described in 5.4 and 5.5 cannot be accomplisehd.  In such cases, the emergency changeover procedures
- *  described in 5.6 apply.
+ * 5.3.4  In some cases of failures or in some network configuration, the normal buffer updating and retrieval
+ * procedures described in 5.4 and 5.5 cannot be accomplisehd.  In such cases, the emergency changeover procedures
+ * described in 5.6 apply.
  *
- *  Other proceudres to cover possible abnormal cases appear in 5.7.
+ * Other proceudres to cover possible abnormal cases appear in 5.7.
  *
- *  5.4 Buffer updating procedure
+ * 5.4 Buffer updating procedure
  *
- *  5.4.1  When a decision to changeover is made, a changeover order is sent to the remote signalling point.  In the
- *  case that the changeover was initiated by the reception of a changeover order (see 5.2), a changeover
- *  acknowledgement is sent instead.
+ * 5.4.1  When a decision to changeover is made, a changeover order is sent to the remote signalling point.  In the
+ * case that the changeover was initiated by the reception of a changeover order (see 5.2), a changeover
+ * acknowledgement is sent instead.
  *
- *  A changeover order is always acknowledged by a changeover acknowledgement, even when changeover has already been
- *  initiated in accordance with another criterion.
+ * A changeover order is always acknowledged by a changeover acknowledgement, even when changeover has already been
+ * initiated in accordance with another criterion.
  *
- *  No priority is given to the changeover order or changeover acknowledgement in relation to the normal traffic of
- *  the signalling link on which the message is sent.
+ * No priority is given to the changeover order or changeover acknowledgement in relation to the normal traffic of the
+ * signalling link on which the message is sent.
  *
- *  5.4.2  The changeover order and changeover acknowledgement are signalling network management messages and
- *  contain the following information: the label, indicating the destination and originating signalling points and
- *  the identity of the unavailable signalling link; the changeover order (or changeover order acknowledgement)
- *  signal; and the forward sequence number of the last message signal unit accepted from the unavailable signalling
- *  link.
+ * 5.4.2  The changeover order and changeover acknowledgement are signalling network management messages and contain
+ * the following information: the label, indicating the destination and originating signalling points and the identity
+ * of the unavailable signalling link; the changeover order (or changeover order acknowledgement) signal; and the
+ * forward sequence number of the last message signal unit accepted from the unavailable signalling link.
  *
- *  5.4.3  Upon reception of a changeover order or changeover acknowledgement, the retransmission buffer of the
- *  unavailable signalling link is updated (except as noted in 5.6), according to the information contained in the
- *  message.  The message signal units successive to that indicated by the message are those which have to be
- *  retransmitted on the alternative signalling link(s), according to the retrieval and diversion procedure.
+ * 5.4.3  Upon reception of a changeover order or changeover acknowledgement, the retransmission buffer of the
+ * unavailable signalling link is updated (except as noted in 5.6), according to the information contained in the
+ * message.  The message signal units successive to that indicated by the message are those which have to be
+ * retransmitted on the alternative signalling link(s), according to the retrieval and diversion procedure.
  *
- *  12.2.1.2    When a decision is taken to activate an inactive signalling link; initiali alignment starts.  If the
- *  initial alignment procedure is successful, the signalling link is active and a signalling link test is started.
- *  If the signalling link test is successful the link becomes ready to convey signalling traffic.  In the case when
- *  initial alignment is not possible, as determined at Message Transfer Part level 2 (see clause 7/Q.703), new
- *  initial alignment procedures are started on the same signalling link after a timer T17 (delay to avoid the
- *  oscillation of initial alignment failure and link restart.  The value of T17 should be greater than the loop
- *  delay and less than timer T2, see 7.3/Q.703).  If the signalling link test fails, link restoration starts until
- *  the signalling link is activated or a manual intervention is made.
+ * 12.2.1.2    When a decision is taken to activate an inactive signalling link; initiali alignment starts.  If the
+ * initial alignment procedure is successful, the signalling link is active and a signalling link test is started.  If
+ * the signalling link test is successful the link becomes ready to convey signalling traffic.  In the case when
+ * initial alignment is not possible, as determined at Message Transfer Part level 2 (see clause 7/Q.703), new initial
+ * alignment procedures are started on the same signalling link after a timer T17 (delay to avoid the oscillation of
+ * initial alignment failure and link restart.  The value of T17 should be greater than the loop delay and less than
+ * timer T2, see 7.3/Q.703).  If the signalling link test fails, link restoration starts until the signalling link is
+ * activated or a manual intervention is made.
  *
- *  12.2.2  Signalling link restoration
+ * 12.2.2  Signalling link restoration
  *
- *  After a signalling link failure is detected, signalling link intial alignment will take place.  In the case when
- *  the initial alignment procedure is successful, a signalling link test is started.  If the signalling link test
- *  is successful the link becomes restored and thus available for signalling.
+ * After a signalling link failure is detected, signalling link intial alignment will take place.  In the case when
+ * the initial alignment procedure is successful, a signalling link test is started.  If the signalling link test is
+ * successful the link becomes restored and thus available for signalling.
  *
- *  If the initial alignmeent is not possible, as determined at Message Transfer Part level 2 (see clause 7/Q.703),
- *  new initial alignment procedures may be started on the same signalling link after a time T17 until the
- *  signalling link is restored ro a manual intervention is made, e.g. to replace the signalling data link or the
- *  signalling terminal.
+ * If the initial alignmeent is not possible, as determined at Message Transfer Part level 2 (see clause 7/Q.703), new
+ * initial alignment procedures may be started on the same signalling link after a time T17 until the signalling link
+ * is restored ro a manual intervention is made, e.g. to replace the signalling data link or the signalling terminal.
  *
- *  If the signalling link test fails, the restoration procedure is repeated until the link is
+ * If the signalling link test fails, the restoration procedure is repeated until the link is
  *
- *  ANSI T1.111.4 (1996 and 2000) 12.2.2.  After a signalling link failure is detected, signalling link initial
- *  alignment will take place.  When the initial alignment procedure is successful, a signalling link test is
- *  started.  If the signalling link test is successful, the signalling link is regarded as restored and thus
- *  available for siganlling.
+ * ANSI T1.111.4 (1996 and 2000) 12.2.2.  After a signalling link failure is detected, signalling link initial
+ * alignment will take place.  When the initial alignment procedure is successful, a signalling link test is started.
+ * If the signalling link test is successful, the signalling link is regarded as restored and thus available for
+ * signalling.
  *
- *  If initial alignment is not possible, as determined at level 2 (see Section 7 of Chapter T1.111.3 or Section
- *  6.2.2 of T1.645), new initial alignment procedures may be started on the same signalling link after a timer T17
- *  until the signalling link is restored or a manual intervention is made, e.g., to replace the signalling data
- *  link or the signalling terminal.  If after time T19 the signalling link has not activated, a management function
- *  is notified, and, optionally, T19 may be restarted.  restored or a manual intervention is made.
+ * If initial alignment is not possible, as determined at level 2 (see Section 7 of Chapter T1.111.3 or Section 6.2.2
+ * of T1.645), new initial alignment procedures may be started on the same signalling link after a timer T17 until the
+ * signalling link is restored or a manual intervention is made, e.g., to replace the signalling data link or the
+ * signalling terminal.  If after time T19 the signalling link has not activated, a management function is notified,
+ * and, optionally, T19 may be restarted.  restored or a manual intervention is made.
  */
 static int
 sl_out_of_service_ind(queue_t *q, mblk_t *mp)
@@ -11895,23 +12706,25 @@ sl_out_of_service_ind(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  SL_REMOTE_PROCESSOR_OUTAGE_IND:
- *  -------------------------------------------------------------------
- *  3.3.5 Signalling link blocked
+/**
+ * sl_remote_processor_outage_ind: - process SL_REMOTE_PROCESSOR_OUTAGE_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
+ * 
+ * 3.3.5 Signalling link blocked
  *
- *  3.3.5.1 Signalling traffic management: as specified in 3.3.1.1.  (See SL_OUT_OF_SERVICE_IND).
+ * 3.3.5.1 Signalling traffic management: as specified in 3.3.1.1.  (See SL_OUT_OF_SERVICE_IND).
  *
- *  As a natioanl option, local processor outage may also be applied to the affected signalling link before
- *  commencement of the appropriate signalling traffic management option.  On completion of that signalling traffic
- *  management action, local processor outage is removed from the affected signalling link.  No further signalling
- *  traffic management will be performed on that affected signalling link until a timer T24 (see 16.8) has expired
- *  or been cancelled, thus allowing time for indications from the remote end to stabilize as it carries out any
- *  signalling traffic management of its own.
+ * As a national option, local processor outage may also be applied to the affected signalling link before
+ * commencement of the appropriate signalling traffic management option.  On completion of that signalling traffic
+ * management action, local processor outage is removed from the affected signalling link.  No further signalling
+ * traffic management will be performed on that affected signalling link until a timer T24 (see 16.8) has expired or
+ * been cancelled, thus allowing time for indications from the remote end to stabilize as it carries out any
+ * signalling traffic management of its own.
  *
- *  3.3.5.2 Signalling route management: if the blocking of the link causes a signalling route set to become
- *  unavailable or restricted, the signalling transfer point which can no longer route the concerned signalling
- *  traffic applies the transfer-prohibited procedures described in clause 13.
+ * 3.3.5.2 Signalling route management: if the blocking of the link causes a signalling route set to become
+ * unavailable or restricted, the signalling transfer point which can no longer route the concerned signalling traffic
+ * applies the transfer-prohibited procedures described in clause 13.
  */
 static int
 sl_remote_processor_outage_ind(queue_t *q, mblk_t *mp)
@@ -11936,16 +12749,18 @@ sl_remote_processor_outage_ind(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  SL_REMOTE_PROCESSOR_RECOVERED_IND:
- *  -------------------------------------------------------------------
- *  3.3.6 Signalling link unblocked
+/**
+ * sl_remote_processor_recovered_ind: - process SL_REMOTE_PROCESSOR_RECOVERED_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
+ * 
+ * 3.3.6 Signalling link unblocked
  *
- *  3.3.6.1 Signalling traffic management: the actions will be the same as in 3.3.2.1. (See SL_IN_SERIVCE_IND)
+ * 3.3.6.1 Signalling traffic management: the actions will be the same as in 3.3.2.1. (See SL_IN_SERIVCE_IND)
  *
- *  3.3.6.2 Signalling route management: if the link unblocked causes a signalling route set to become available,
- *  the signalling transfer point which can once again route the signalling traffic in that route set applies the
- *  transfer-allowed procedures described in clause 13.
+ * 3.3.6.2 Signalling route management: if the link unblocked causes a signalling route set to become available, the
+ * signalling transfer point which can once again route the signalling traffic in that route set applies the
+ * transfer-allowed procedures described in clause 13.
  */
 static int
 sl_remote_processor_recovered_ind(queue_t *q, mblk_t *mp)
@@ -11971,16 +12786,18 @@ sl_remote_processor_recovered_ind(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  SL_RTB_CLEARED_IND:
- *  -------------------------------------------------------------------
- *  We receive this indication when we send sl_clear_buffers_req in a state other than processor outage, or in
- *  response to a sl_clear_rtb_req after the remote processor has recovered.  For ITU, sl_clear_buffers_req will
- *  place us back to in service from the local processor outage state, but not for ANSI.  Effectively, it a
- *  processor outage has been of a long duration (i.e. T1 has expired) then we should flush buffers before resuming
- *  operation on the link.  If we are failing a remotely blocked link (again because of T1 expiry) in ANSI, we
- *  should fail the link and then flush buffers (which will result in only the RTB being flushed) before buffer
- *  updating.  Or, we could choose to flush buffers completely in the processor outage state.
+/**
+ * sl_rtb_cleared_ind: - process SL_RTB_CLEARED_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
+ * 
+ * We receive this indication when we send sl_clear_buffers_req in a state other than processor outage, or in response
+ * to a sl_clear_rtb_req after the remote processor has recovered.  For ITU, sl_clear_buffers_req will place us back
+ * to in service from the local processor outage state, but not for ANSI.  Effectively, it a processor outage has been
+ * of a long duration (i.e. T1 has expired) then we should flush buffers before resuming operation on the link.  If we
+ * are failing a remotely blocked link (again because of T1 expiry) in ANSI, we should fail the link and then flush
+ * buffers (which will result in only the RTB being flushed) before buffer updating.  Or, we could choose to flush
+ * buffers completely in the processor outage state.
  */
 static int
 sl_rtb_cleared_ind(queue_t *q, mblk_t *mp)
@@ -12008,23 +12825,25 @@ sl_rtb_cleared_ind(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  SL_RETRIEVAL_NOT_POSSIBLE_IND:
- *  -------------------------------------------------------------------
- *  5.5 Retrieval and diversion of traffic
+/**
+ * sl_retrieval_not_possible_ind: - process SL_RETRIEVAL_NOT_POSSIBLE_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
+ * 
+ * 5.5 Retrieval and diversion of traffic
  *
- *  When the procedure to update the retransmission buffer content is completed, the following actions are
- *  performed: the routing of the signalling traffic to be diverted is changed; the signal traffic already stored in
- *  the transmission buffers and retransmission buffer of the unavailable signalling link is sent directly towards
- *  the new signalling link(s), according to the modified routing.
+ * When the procedure to update the retransmission buffer content is completed, the following actions are performed:
+ * the routing of the signalling traffic to be diverted is changed; the signal traffic already stored in the
+ * transmission buffers and retransmission buffer of the unavailable signalling link is sent directly towards the new
+ * signalling link(s), according to the modified routing.
  *
- *  The diverted signalling traffic will be sent towards the new signalling link(s) in such a way that the correct
- *  message sequence is maintained.  The diverted traffic has no priority in relation to normal traffic already
- *  conveyed on the signalling link(s).
+ * The diverted signalling traffic will be sent towards the new signalling link(s) in such a way that the correct
+ * message sequence is maintained.  The diverted traffic has no priority in relation to normal traffic already
+ * conveyed on the signalling link(s).
  *
- *  NOTE: we actually never send this.  Retrieval is always possible.  Where it might not be possible is in the case
- *  where M2UA is used and it is not possible to talk to the signalling link.   We treat this the same as a
- *  SL_RETRIEVAL_COMPLETE_IND, we just may have an empty retrieval buffer.
+ * NOTE: we actually never send this.  Retrieval is always possible.  Where it might not be possible is in the case
+ * where M2UA is used and it is not possible to talk to the signalling link.   We treat this the same as a
+ * SL_RETRIEVAL_COMPLETE_IND, we just may have an empty retrieval buffer.
  */
 static int
 sl_retrieval_not_possible_ind(queue_t *q, mblk_t *mp)
@@ -12047,9 +12866,10 @@ sl_retrieval_not_possible_ind(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  SL_BSNT_NOT_RETRIEVABLE_IND:
- *  -------------------------------------------------------------------
+/**
+ * sl_bsnt_not_retrievable_ind: - process SL_BSNT_NOT_RETRIEVABLE_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
  */
 static int
 sl_bsnt_not_retrievable_ind(queue_t *q, mblk_t *mp)
@@ -12097,9 +12917,10 @@ sl_bsnt_not_retrievable_ind(queue_t *q, mblk_t *mp)
 }
 
 #if 0
-/*
- *  SL_OPTMGMT_ACK:
- *  -------------------------------------------------------------------
+/**
+ * sl_optmgmt_ack: - process SL_OPTMGMT_ACK
+ * @q: active queue (lower read queue)
+ * @mp: the message
  */
 static int
 sl_optmgmt_ack(queue_t *q, mblk_t *mp)
@@ -12118,9 +12939,10 @@ sl_optmgmt_ack(queue_t *q, mblk_t *mp)
 	return (-EINVAL);
 }
 
-/*
- *  SL_NOTIFY_IND:
- *  -------------------------------------------------------------------
+/**
+ * sl_notify_ind: - process SL_NOTIFY_IND:
+ * @q: active queue (lower read queue)
+ * @mp: the message
  */
 static int
 sl_notify_ind(queue_t *q, mblk_t *mp)
@@ -12139,9 +12961,10 @@ sl_notify_ind(queue_t *q, mblk_t *mp)
 	return (-EINVAL);
 }
 #endif
-/*
- *  LMI_INFO_ACK:
- *  -------------------------------------------------------------------
+/**
+ * lmi_info_ack: - process LMI_INFO_ACK
+ * @q: active queue (lower read queue)
+ * @mp: the message
  */
 static int
 lmi_info_ack(queue_t *q, mblk_t *mp)
@@ -12157,9 +12980,10 @@ lmi_info_ack(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  LMI_OK_ACK:
- *  -------------------------------------------------------------------
+/**
+ * lmi_ok_ack: - process LMI_OK_ACK
+ * @q: active queue (lower read queue)
+ * @mp: the message
  */
 static int
 lmi_ok_ack(queue_t *q, mblk_t *mp)
@@ -12189,9 +13013,10 @@ lmi_ok_ack(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  LMI_ERROR_ACK:
- *  -------------------------------------------------------------------
+/**
+ * lmi_error_ack: - process LMI_ERROR_ACK
+ * @q: active queue (lower read queue)
+ * @mp: the message
  */
 static int
 lmi_error_ack(queue_t *q, mblk_t *mp)
@@ -12225,9 +13050,10 @@ lmi_error_ack(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  LMI_ENABLE_CON:
- *  -------------------------------------------------------------------
+/**
+ * lmi_enable_con: - process LMI_ENABLE_CON
+ * @q: active queue (lower read queue)
+ * @mp: the message
  */
 static int
 lmi_enable_con(queue_t *q, mblk_t *mp)
@@ -12249,9 +13075,10 @@ lmi_enable_con(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  LMI_DISABLE_CON:
- *  -------------------------------------------------------------------
+/**
+ * lmi_disable_con: - process LMI_DISABLE_CON
+ * @q: active queue (lower read queue)
+ * @mp: the message
  */
 static int
 lmi_disable_con(queue_t *q, mblk_t *mp)
@@ -12273,9 +13100,10 @@ lmi_disable_con(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  LMI_OPTMGMT_ACK:
- *  -------------------------------------------------------------------
+/**
+ * lmi_optmgmt_ack: - process LMI_OPTMGMT_ACK
+ * @q: active queue (lower read queue)
+ * @mp: the message
  */
 static int
 lmi_optmgmt_ack(queue_t *q, mblk_t *mp)
@@ -12291,9 +13119,10 @@ lmi_optmgmt_ack(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  LMI_ERROR_IND:
- *  -------------------------------------------------------------------
+/**
+ * lmi_error_ind: - process LMI_ERROR_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
  */
 static int
 lmi_error_ind(queue_t *q, mblk_t *mp)
@@ -12309,9 +13138,10 @@ lmi_error_ind(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  LMI_STATS_IND:
- *  -------------------------------------------------------------------
+/**
+ * lmi_stats_ind: - process LMI_STATS_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
  */
 static int
 lmi_stats_ind(queue_t *q, mblk_t *mp)
@@ -12327,9 +13157,10 @@ lmi_stats_ind(queue_t *q, mblk_t *mp)
 	return (EINVAL);
 }
 
-/*
- *  LMI_EVENT_IND:
- *  -------------------------------------------------------------------
+/**
+ * lmi_event_ind: - process LMI_EVENT_IND
+ * @q: active queue (lower read queue)
+ * @mp: the message
  */
 static int
 lmi_event_ind(queue_t *q, mblk_t *mp)
@@ -12352,22 +13183,23 @@ lmi_event_ind(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-/*
- *  M_DATA
- *  -------------------------------------------------------------------
+/**
+ * m_data: - process M_DATA message
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
-m_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
+m_data(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int dlen = msgdsize(mp);
 
-	if (mtp->prot->SERV_type == T_CLTS)
+	if (mtp->i.style == T_CLTS)
 		goto notsupport;
 	if (mtp_get_state(mtp) == MTPS_IDLE)
 		goto discard;
 	if (mtp_get_state(mtp) != MTPS_CONNECTED)
 		goto outstate;
-	if (dlen == 0 || dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
+	if (dlen == 0 || !mtp->prot || dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
 		goto baddata;
 	return mtp_send_msg(q, mtp, NULL, &mtp->dst, mp);
       baddata:
@@ -12387,9 +13219,10 @@ m_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	return m_error(q, mtp, mp, EPROTO);
 }
 
-/*
- *  MTP_BIND_REQ:
- *  -------------------------------------------------------------------
+/**
+ * mtp_bind_req: - process MTP_BIND_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 m_bind_req(queue_t *q, mblk_t *mp)
@@ -12412,7 +13245,7 @@ m_bind_req(queue_t *q, mblk_t *mp)
 		struct mtp_addr *src = (typeof(src)) (mp->b_rptr + p->mtp_addr_offset);
 		struct sp *loc;
 
-		if (src->family != AF_MTP)
+		if (src->family && src->family != AF_MTP)
 			goto badaddr;
 		if (!src->si || !src->pc)
 			goto noaddr;
@@ -12421,7 +13254,7 @@ m_bind_req(queue_t *q, mblk_t *mp)
 		if (!(loc = mtp_check_src(mtp, src, &err)))
 			goto error;
 		if (!mtp->sp.loc)
-			mtp->sp.loc = sp_get(loc);
+			mtp->sp.loc = loc;
 		return m_bind_ack(q, mtp, mp, src);
 	}
       access:
@@ -12448,9 +13281,10 @@ m_bind_req(queue_t *q, mblk_t *mp)
 	return m_error_ack(q, mtp, mp, p->mtp_primitive, err);
 }
 
-/*
- *  MTP_UNBIND_REQ:
- *  -------------------------------------------------------------------
+/**
+ * mtp_unbind_req: - process MTP_UNBIND_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 m_unbind_req(queue_t *q, mblk_t *mp)
@@ -12477,12 +13311,14 @@ m_unbind_req(queue_t *q, mblk_t *mp)
 	return m_error_ack(q, mtp, mp, p->mtp_primitive, err);
 }
 
-/*
- *  MTP_CONN_REQ:
- *  -------------------------------------------------------------------
- *  MTP is really a connectionless protocol.  When we form a connection we simply remember the destination address.
- *  Some interim MTPs had the ability to send a UPT (User Part Test) message.  If the protocol variant has this
- *  ability, we wait for the result of the User Part Test before confirming the connection.
+/**
+ * mtp_conn_req: - process MTP_CONN_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
+ * 
+ * MTP is really a connectionless protocol.  When we form a connection we simply remember the destination address.
+ * Some interim MTPs had the ability to send a UPT (User Part Test) message.  If the protocol variant has this
+ * ability, we wait for the result of the User Part Test before confirming the connection.
  */
 static int
 m_conn_req(queue_t *q, mblk_t *mp)
@@ -12495,7 +13331,7 @@ m_conn_req(queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	case MTPS_IDLE:
-		if (mtp->sp.loc->na.na->prot[mtp->src.si]->SERV_type == T_CLTS)
+		if (mtp->i.style == T_CLTS)
 			goto notsupp;
 		if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 			goto badprim;
@@ -12508,7 +13344,7 @@ m_conn_req(queue_t *q, mblk_t *mp)
 		{
 			struct mtp_addr *dst = (typeof(dst)) (mp->b_rptr + p->mtp_addr_offset);
 
-			if (dst->family != AF_MTP)
+			if (dst->family && dst->family != AF_MTP)
 				goto badaddr;
 			if (dst->si == 0 && mtp->src.si == 0)
 				goto noaddr;
@@ -12580,9 +13416,10 @@ m_conn_req(queue_t *q, mblk_t *mp)
 	return m_error_ack(q, mtp, mp, p->mtp_primitive, err);
 }
 
-/*
- *  MTP_DISCON_REQ:
- *  -------------------------------------------------------------------
+/**
+ * mtp_discon_req: - process MTP_DISCON_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 m_discon_req(queue_t *q, mblk_t *mp)
@@ -12591,7 +13428,7 @@ m_discon_req(queue_t *q, mblk_t *mp)
 	const struct MTP_discon_req *p = (typeof(p)) mp->b_rptr;
 	int err;
 
-	if (mtp->sp.loc->na.na->prot[mtp->src.si]->SERV_type == T_CLTS)
+	if (mtp->i.style == T_CLTS)
 		goto notsupp;
 	switch (mtp_get_state(mtp)) {
 	case MTPS_WCON_CREQ:
@@ -12625,9 +13462,10 @@ m_discon_req(queue_t *q, mblk_t *mp)
 	return m_error_ack(q, mtp, mp, p->mtp_primitive, err);
 }
 
-/*
- *  MTP_ADDR_REQ:
- *  -------------------------------------------------------------------
+/**
+ * mtp_addr_req: - process MTP_ADDR_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 m_addr_req(queue_t *q, mblk_t *mp)
@@ -12664,9 +13502,10 @@ m_addr_req(queue_t *q, mblk_t *mp)
 	return m_error_ack(q, mtp, mp, p->mtp_primitive, err);
 }
 
-/*
- *  MTP_INFO_REQ:
- *  -------------------------------------------------------------------
+/**
+ * mtp_info_req: - process MTP_INFO_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 m_info_req(queue_t *q, mblk_t *mp)
@@ -12686,9 +13525,10 @@ m_info_req(queue_t *q, mblk_t *mp)
 	return m_error_ack(q, mtp, mp, p->mtp_primitive, err);
 }
 
-/*
- *  MTP_OPTMGMT_REQ:
- *  -------------------------------------------------------------------
+/**
+ * mtp_optmgmt_req: - process MTP_OPTMGMT_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 m_optmgmt_req(queue_t *q, mblk_t *mp)
@@ -12747,9 +13587,10 @@ m_optmgmt_req(queue_t *q, mblk_t *mp)
 	return m_error_ack(q, mtp, mp, p->mtp_primitive, err);
 }
 
-/*
- *  MTP_TRANSFER_REQ:
- *  -------------------------------------------------------------------
+/**
+ * mtp_transfer_req: - process MTP_TRANSFER_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 m_transfer_req(queue_t *q, mblk_t *mp)
@@ -12759,7 +13600,7 @@ m_transfer_req(queue_t *q, mblk_t *mp)
 	size_t dlen = mp->b_cont ? msgsize(mp->b_cont) : 0;
 	int err;
 
-	if (mtp->prot->SERV_type == T_CLTS)
+	if (mtp->i.style == T_CLTS)
 		goto notsupp;
 	if (mtp_get_state(mtp) == MTPS_IDLE)
 		goto discard;
@@ -12767,7 +13608,7 @@ m_transfer_req(queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
-	if (dlen == 0 || dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
+	if (dlen == 0 || !mtp->prot || dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
 		goto baddata;
 	if ((err = mtp_send_msg(q, mtp, NULL, &mtp->dst, mp->b_cont)) < 0)
 		return (err);
@@ -12796,23 +13637,25 @@ m_transfer_req(queue_t *q, mblk_t *mp)
 	return m_error(q, mtp, mp, err);
 }
 
-/*
- *  M_DATA
- *  -----------------------------------
+/**
+ * t_data: - process M_DATA message
+ * @q: active queue (upper write queue)
+ * @mtp: MTP private structure
+ * @mp: the message
  */
 static int
-t_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
+t_data(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int dlen = msgdsize(mp);
 	int err;
 
-	if (mtp->prot->SERV_type == T_CLTS)
+	if (mtp->i.style == T_CLTS)
 		goto notsupport;
 	if (mtp_get_state(mtp) == TS_IDLE)
 		goto discard;
 	if ((1 << mtp_get_state(mtp)) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL))
 		goto outstate;
-	if (dlen == 0 || dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
+	if (dlen == 0 || !mtp->prot || dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
 		goto baddata;
 	if ((err = mtp_send_msg(q, mtp, NULL, &mtp->dst, mp->b_cont)) < 0)
 		return (err);
@@ -12834,12 +13677,14 @@ t_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	return m_error(q, mtp, mp, EPROTO);
 }
 
-/*
- *  T_CONN_REQ
- *  -----------------------------------
- *  As MTP is really a connectionless protocol, when we form a connection we simply remember the destination address.
- *  Some interim MTPs had the abilitty to send a UPT (User Part Test) message.  If the protocol variant has this
- *  ability, we wait for the result of the User Part Test before confirming the connection.
+/**
+ * t_conn_req: - process T_CONN_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
+ *
+ * As MTP is really a connectionless protocol, when we form a connection we simply remember the destination address.
+ * Some interim MTPs had the abilitty to send a UPT (User Part Test) message.  If the protocol variant has this
+ * ability, we wait for the result of the User Part Test before confirming the connection.
  */
 static int
 t_conn_req(queue_t *q, mblk_t *mp)
@@ -12851,7 +13696,7 @@ t_conn_req(queue_t *q, mblk_t *mp)
 
 	if (mtp_get_state(mtp) != TS_IDLE)
 		goto outstate;
-	if (mtp->prot->SERV_type == T_CLTS)
+	if (mtp->i.style == T_CLTS)
 		goto notsupport;
 	if (mlen < sizeof(*p))
 		goto einval;
@@ -12864,7 +13709,7 @@ t_conn_req(queue_t *q, mblk_t *mp)
 
 		if (p->DEST_length < sizeof(*dst))
 			goto badaddr;
-		if (dst->family != AF_MTP)
+		if (dst->family && dst->family != AF_MTP)
 			goto badaddr;
 		if (dst->si == 0 && mtp->src.si == 0)
 			goto noaddr;
@@ -12932,9 +13777,10 @@ t_conn_req(queue_t *q, mblk_t *mp)
 	return t_error_ack(q, mtp, mp, p->PRIM_type, err);
 }
 
-/*
- *  T_DISCON_REQ         2 - TC disconnection request
- *  -------------------------------------------------------------------
+/**
+ * t_discon_req: - process T_DISCON_REQ - 2 - TC disconnection request
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 t_discon_req(queue_t *q, mblk_t *mp)
@@ -12943,7 +13789,7 @@ t_discon_req(queue_t *q, mblk_t *mp)
 	int err;
 	const struct T_discon_req *p = (typeof(p)) mp->b_rptr;
 
-	if (mtp->prot->SERV_type == T_CLTS)
+	if (mtp->i.style == T_CLTS)
 		goto notsupport;
 	switch (mtp_get_state(mtp)) {
 	case TS_WCON_CREQ:
@@ -12977,9 +13823,10 @@ t_discon_req(queue_t *q, mblk_t *mp)
 	return t_error_ack(q, mtp, mp, p->PRIM_type, err);
 }
 
-/*
- *  T_DATA_REQ           3 - Connection-Mode data transfer request
- *  -------------------------------------------------------------------
+/**
+ * t_data_req: - process T_DATA_REQ - 3 - Connection-Mode data transfer request
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 t_data_req(queue_t *q, mblk_t *mp)
@@ -12989,7 +13836,7 @@ t_data_req(queue_t *q, mblk_t *mp)
 	const struct T_data_req *p = (typeof(p)) mp->b_rptr;
 	size_t dlen = mp->b_cont ? msgdsize(mp->b_cont) : 0;
 
-	if (mtp->prot->SERV_type == T_CLTS)
+	if (mtp->i.style == T_CLTS)
 		goto notsupport;
 	if (mtp_get_state(mtp) == TS_IDLE)
 		goto discard;
@@ -12997,7 +13844,7 @@ t_data_req(queue_t *q, mblk_t *mp)
 		goto einval;
 	if ((1 << mtp_get_state(mtp)) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL))
 		goto outstate;
-	if (dlen == 0 || dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
+	if (dlen == 0 || !mtp->prot || dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
 		goto baddata;
 	if ((err = mtp_send_msg(q, mtp, NULL, &mtp->dst, mp->b_cont)) < 0)
 		return (err);
@@ -13022,9 +13869,10 @@ t_data_req(queue_t *q, mblk_t *mp)
 	return m_error(q, mtp, mp, EPROTO);
 }
 
-/*
- *  T_EXDATA_REQ         4 - Expedited data request
- *  -------------------------------------------------------------------
+/**
+ * t_exdata_req: - process T_EXDATA_REQ - 4 - Expedited data request
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 t_exdata_req(queue_t *q, mblk_t *mp)
@@ -13034,9 +13882,10 @@ t_exdata_req(queue_t *q, mblk_t *mp)
 	return m_error(q, mtp, mp, EPROTO);
 }
 
-/*
- *  T_INFO_REQ           5 - Information Request
- *  -------------------------------------------------------------------
+/**
+ * t_info_req: - process T_INFO_REQ -5 - Information Request
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 t_info_req(queue_t *q, mblk_t *mp)
@@ -13046,9 +13895,10 @@ t_info_req(queue_t *q, mblk_t *mp)
 	return t_info_ack(q, mtp, mp);
 }
 
-/*
- *  T_BIND_REQ           6 - Bind a TS user to a transport address
- *  -------------------------------------------------------------------
+/**
+ * t_bind_req: - process T_BIND_REQ - 6 - Bind a TS user to a transport address
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 t_bind_req(queue_t *q, mblk_t *mp)
@@ -13075,7 +13925,7 @@ t_bind_req(queue_t *q, mblk_t *mp)
 		struct sp *loc;
 
 		/* we don't allow wildcards yet. */
-		if (src->family != AF_MTP)
+		if (src->family && src->family != AF_MTP)
 			goto badaddr;
 		if (!src->si || !src->pc)
 			goto noaddr;
@@ -13084,7 +13934,7 @@ t_bind_req(queue_t *q, mblk_t *mp)
 		if ((loc = mtp_check_src(mtp, src, &err)))
 			goto error;
 		if (!mtp->sp.loc)
-			mtp->sp.loc = sp_get(loc);
+			mtp->sp.loc = loc;
 		return t_bind_ack(q, mtp, mp, src);
 	}
       acces:
@@ -13115,9 +13965,10 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	return t_error_ack(q, mtp, mp, p->PRIM_type, err);
 }
 
-/*
- *  T_UNBIND_REQ         7 - Unbind TS user from transport address
- *  -------------------------------------------------------------------
+/**
+ * t_unbind_req: - process T_UNBIND_REQ - 7 - Unbind TS user from transport address
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 t_unbind_req(queue_t *q, mblk_t *mp)
@@ -13138,9 +13989,10 @@ t_unbind_req(queue_t *q, mblk_t *mp)
 	return t_error_ack(q, mtp, mp, p->PRIM_type, err);
 }
 
-/*
- *  T_UNITDATA_REQ       8 -Unitdata Request 
- *  -------------------------------------------------------------------
+/**
+ * t_unitdata_req: - process T_UNITDATA_REQ - 8 -Unitdata Request 
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 t_unitdata_req(queue_t *q, mblk_t *mp)
@@ -13150,13 +14002,11 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 	const struct T_unitdata_req *p = (typeof(p)) mp->b_rptr;
 	size_t dlen = mp->b_cont ? msgdsize(mp->b_cont) : 0;
 
-	if (mtp->prot->SERV_type != T_CLTS)
+	if (mtp->i.style != T_CLTS)
 		goto notsupport;
 	if (mtp_get_state(mtp) != TS_IDLE)
 		goto outstate;
-	if (dlen == 0 && !(mtp->prot->PROVIDER_flag & T_SNDZERO))
-		goto baddata;
-	if (dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
+	if (dlen == 0 || !mtp->prot || dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
 		goto baddata;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p)
 	    || mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length
@@ -13208,9 +14058,10 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 	return m_error(q, mtp, mp, EPROTO);
 }
 
-/*
- *  T_OPTMGMT_REQ        9 - Options management request
- *  -------------------------------------------------------------------
+/**
+ * t_optmgmt_req: - process T_OPTMGMT_REQ - 9 - Options management request
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 t_optmgmt_req(queue_t *q, mblk_t *mp)
@@ -13275,9 +14126,10 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 	return t_error_ack(q, mtp, mp, p->PRIM_type, err);
 }
 
-/*
- *  T_ORDREL_REQ        10 - TS user is finished sending
- *  -------------------------------------------------------------------
+/**
+ * t_ordrel_req: - process T_ORDREL_REQ - 10 - TS user is finished sending
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 t_ordrel_req(queue_t *q, mblk_t *mp)
@@ -13285,7 +14137,7 @@ t_ordrel_req(queue_t *q, mblk_t *mp)
 	struct mtp *mtp = MTP_PRIV(q);
 	const struct T_ordrel_req *p = (typeof(p)) mp->b_rptr;
 
-	if (mtp->prot->SERV_type != T_COTS_ORD)
+	if (mtp->i.style != T_COTS_ORD)
 		goto notsupport;
 	if ((1 << mtp_get_state(mtp)) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL))
 		goto outstate;
@@ -13307,9 +14159,10 @@ t_ordrel_req(queue_t *q, mblk_t *mp)
 	return m_error(q, mtp, mp, EPROTO);
 }
 
-/*
- *  T_OPTDATA_REQ       24 - Data with options request
- *  -------------------------------------------------------------------
+/**
+ * t_optdata_req: - process T_OPTDATA_REQ  - 24 - Data with options request
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 t_optdata_req(queue_t *q, mblk_t *mp)
@@ -13318,7 +14171,7 @@ t_optdata_req(queue_t *q, mblk_t *mp)
 	int err;
 	const struct T_optdata_req *p = (typeof(p)) mp->b_rptr;
 
-	if (mtp->prot->SERV_type == T_CLTS)
+	if (mtp->i.style == T_CLTS)
 		goto notsupport;
 	if (mtp_get_state(mtp) == TS_IDLE)
 		goto discard;
@@ -13362,9 +14215,10 @@ t_optdata_req(queue_t *q, mblk_t *mp)
 }
 
 #ifdef T_ADDR_REQ
-/*
- *  T_ADDR_REQ          25 - Address Request
- *  -------------------------------------------------------------------
+/**
+ * t_addr_req: - process T_ADDR_REQ - 25 - Address Request
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 t_addr_req(queue_t *q, mblk_t *mp)
@@ -13391,9 +14245,10 @@ t_addr_req(queue_t *q, mblk_t *mp)
 #endif
 
 #ifdef T_CAPABILITY_REQ
-/*
- *  T_CAPABILITY_REQ    ?? - Capability Request
- *  -------------------------------------------------------------------
+/**
+ * t_capability_req: - process T_CAPABILITY_REQ - ?? - Capability Request
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 t_capability_req(queue_t *q, mblk_t *mp)
@@ -13410,19 +14265,20 @@ t_capability_req(queue_t *q, mblk_t *mp)
 }
 #endif
 
-/*
- *  M_DATA
- *  -------------------------------------------------------------------
+/**
+ * n_data: - process M_DATA message
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
-n_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
+n_data(queue_t *q, struct mtp *mtp, mblk_t *mp)
 {
 	int err;
 	const size_t dlen = msgdsize(mp);
 
-	if (!mtp->prot || mtp->prot->SERV_type == T_CLTS)
+	if (mtp->i.style == T_CLTS)
 		goto notsupp;
-	if (dlen == 0 || dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
+	if (dlen == 0 || !mtp->prot || dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
 		goto baddata;
 	switch (mtp_get_state(mtp)) {
 	case NS_DATA_XFER:
@@ -13455,9 +14311,10 @@ n_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	return m_error(q, mtp, mp, EPROTO);
 }
 
-/*
- *  N_CONN_REQ:
- *  -------------------------------------------------------------------
+/**
+ * n_conn_req: - process N_CONN_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 n_conn_req(queue_t *q, mblk_t *mp)
@@ -13472,7 +14329,7 @@ n_conn_req(queue_t *q, mblk_t *mp)
 
 	if (mtp_get_state(mtp) != NS_IDLE)
 		goto outstate;
-	if (mtp->sp.loc->na.na->prot[mtp->src.si]->SERV_type == T_CLTS)
+	if (mtp->i.style == T_CLTS)
 		goto notsupp;
 	if (mp->b_wptr < mp->b_rptr)
 		goto badprim;
@@ -13485,7 +14342,7 @@ n_conn_req(queue_t *q, mblk_t *mp)
 		goto noaddr;
 	if (p->DEST_length < sizeof(*dst))
 		goto badaddr;
-	if (dst->family != AF_MTP)
+	if (dst->family && dst->family != AF_MTP)
 		goto badaddr;
 	if (dst->si == 0 && mtp->src.si == 0)
 		goto noaddr;
@@ -13533,9 +14390,10 @@ n_conn_req(queue_t *q, mblk_t *mp)
 	return n_error_ack(q, mtp, mp, p->PRIM_type, err);
 }
 
-/*
- *  N_CONN_RES:
- *  -------------------------------------------------------------------
+/**
+ * n_conn_res: - process N_CONN_RES
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 n_conn_res(queue_t *q, mblk_t *mp)
@@ -13544,7 +14402,7 @@ n_conn_res(queue_t *q, mblk_t *mp)
 	int err;
 	const N_conn_res_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mtp->sp.loc->na.na->prot[mtp->src.si]->SERV_type == T_CLTS)
+	if (mtp->i.style == T_CLTS)
 		goto notsupp;
 	if (mtp_get_state(mtp) != NS_WRES_CIND)
 		goto outstate;
@@ -13575,9 +14433,10 @@ n_conn_res(queue_t *q, mblk_t *mp)
 	return n_error_ack(q, mtp, mp, p->PRIM_type, err);
 }
 
-/*
- *  N_DISCON_REQ:
- *  -------------------------------------------------------------------
+/**
+ * n_discon_req: - process N_DISCON_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 n_discon_req(queue_t *q, mblk_t *mp)
@@ -13586,7 +14445,7 @@ n_discon_req(queue_t *q, mblk_t *mp)
 	int err;
 	const N_discon_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mtp->sp.loc->na.na->prot[mtp->src.si]->SERV_type == T_CLTS)
+	if (mtp->i.style == T_CLTS)
 		goto notsupp;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
@@ -13623,9 +14482,10 @@ n_discon_req(queue_t *q, mblk_t *mp)
 	return n_error_ack(q, mtp, mp, p->PRIM_type, err);
 }
 
-/*
- *  N_DATA_REQ:
- *  -------------------------------------------------------------------
+/**
+ * n_data_req: - process N_DATA_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 n_data_req(queue_t *q, mblk_t *mp)
@@ -13634,9 +14494,8 @@ n_data_req(queue_t *q, mblk_t *mp)
 	int err;
 	const N_data_req_t *p = (typeof(p)) mp->b_rptr;
 	const size_t dlen = msgdsize(mp);
-	const struct T_info_ack *i = mtp->sp.loc->na.na->prot[mtp->src.si];
 
-	if (i->SERV_type == T_CLTS)
+	if (mtp->i.style == T_CLTS)
 		goto notsupp;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
@@ -13647,7 +14506,7 @@ n_data_req(queue_t *q, mblk_t *mp)
 		   N_RC_FLAG cannot be supported until the DLPI link driver is done and zero-loss
 		   operation is completed. */
 		goto notsupp;
-	if (dlen == 0 || dlen > i->TSDU_size || dlen > i->TIDU_size)
+	if (dlen == 0 || !mtp->prot || dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
 		goto baddata;
 	switch (mtp_get_state(mtp)) {
 	case NS_DATA_XFER:
@@ -13684,9 +14543,10 @@ n_data_req(queue_t *q, mblk_t *mp)
 	return m_error(q, mtp, mp, EPROTO);
 }
 
-/*
- *  N_EXDATA_REQ:
- *  -------------------------------------------------------------------
+/**
+ * n_exdata_req: - process N_EXDATA_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 n_exdata_req(queue_t *q, mblk_t *mp)
@@ -13696,9 +14556,10 @@ n_exdata_req(queue_t *q, mblk_t *mp)
 	return m_error(q, mtp, mp, EPROTO);
 }
 
-/*
- *  N_INFO_REQ:
- *  -------------------------------------------------------------------
+/**
+ * n_info_req: - process N_INFO_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 n_info_req(queue_t *q, mblk_t *mp)
@@ -13708,9 +14569,10 @@ n_info_req(queue_t *q, mblk_t *mp)
 	return n_info_ack(q, mtp, mp);
 }
 
-/*
- *  N_BIND_REQ:
- *  -------------------------------------------------------------------
+/**
+ * n_bind_req: - process N_BIND_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 n_bind_req(queue_t *q, mblk_t *mp)
@@ -13736,7 +14598,7 @@ n_bind_req(queue_t *q, mblk_t *mp)
 	if (p->ADDR_length < sizeof(src))
 		goto badaddr;
 	bcopy(mp->b_rptr + p->ADDR_offset, &src, sizeof(src));
-	if (src.family != AF_MTP)
+	if (src.family && src.family != AF_MTP)
 		goto badaddr;
 	if (!src.si || !src.pc)
 		goto noaddr;
@@ -13745,7 +14607,7 @@ n_bind_req(queue_t *q, mblk_t *mp)
 	if ((loc = mtp_check_src(mtp, &src, &err)))
 		goto error;
 	if (!mtp->sp.loc)
-		mtp->sp.loc = sp_get(loc);
+		mtp->sp.loc = loc;
 	mtp_set_state(mtp, NS_WACK_BREQ);
 	return n_bind_ack(q, mtp, mp, &src);
       access:
@@ -13772,9 +14634,10 @@ n_bind_req(queue_t *q, mblk_t *mp)
 	return n_error_ack(q, mtp, mp, p->PRIM_type, err);
 }
 
-/*
- *  N_UNBIND_REQ:
- *  -------------------------------------------------------------------
+/**
+ * n_unbind_req: - process N_UNBIND_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 n_unbind_req(queue_t *q, mblk_t *mp)
@@ -13801,9 +14664,10 @@ n_unbind_req(queue_t *q, mblk_t *mp)
 	return n_error_ack(q, mtp, mp, p->PRIM_type, err);
 }
 
-/*
- *  N_UNITDATA_REQ:
- *  -------------------------------------------------------------------
+/**
+ * n_unitdata_req: - process N_UNITDATA_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 n_unitdata_req(queue_t *q, mblk_t *mp)
@@ -13811,11 +14675,10 @@ n_unitdata_req(queue_t *q, mblk_t *mp)
 	struct mtp *mtp = MTP_PRIV(q);
 	int err;
 	const N_unitdata_req_t *p = (typeof(p)) mp->b_rptr;
-	const struct T_info_ack *i = mtp->sp.loc->na.na->prot[mtp->src.si];
 	const size_t dlen = msgdsize(mp);
 	struct mtp_addr dst;
 
-	if (i->SERV_type != T_CLTS)
+	if (mtp->i.style != T_CLTS)
 		goto notsupp;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
@@ -13823,16 +14686,14 @@ n_unitdata_req(queue_t *q, mblk_t *mp)
 		goto badprim;
 	if (mtp_get_state(mtp) != NS_IDLE)
 		goto outstate;
-	if (dlen == 0 && !(i->PROVIDER_flag & T_SNDZERO))
-		goto baddata;
-	if (dlen > i->TSDU_size || dlen > i->TIDU_size)
+	if (dlen == 0 || !mtp->prot || dlen > mtp->prot->TSDU_size || dlen > mtp->prot->TIDU_size)
 		goto baddata;
 	if (!p->DEST_length)
 		goto noaddr;
 	if (p->DEST_length < sizeof(dst))
 		goto badaddr;
 	bcopy(mp->b_rptr + p->DEST_length, &dst, sizeof(dst));
-	if (dst.family != AF_MTP)
+	if (dst.family && dst.family != AF_MTP)
 		goto badaddr;
 	if (!dst.si || !dst.pc)
 		goto badaddr;
@@ -13878,9 +14739,10 @@ n_unitdata_req(queue_t *q, mblk_t *mp)
 	return n_error_ack(q, mtp, mp, p->PRIM_type, err);
 }
 
-/*
- *  N_OPTMGMT_REQ:
- *  -------------------------------------------------------------------
+/**
+ * n_optmgmt_req: - process N_OPTMGMT_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 n_optmgmt_req(queue_t *q, mblk_t *mp)
@@ -13930,9 +14792,10 @@ n_optmgmt_req(queue_t *q, mblk_t *mp)
 	return n_error_ack(q, mtp, mp, p->PRIM_type, err);
 }
 
-/*
- *  N_DATACK_REQ:
- *  -------------------------------------------------------------------
+/**
+ * n_datack_req: - process N_DATACK_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 n_datack_req(queue_t *q, mblk_t *mp)
@@ -13944,9 +14807,10 @@ n_datack_req(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-/*
- *  N_RESET_REQ:
- *  -------------------------------------------------------------------
+/**
+ * n_reset_req: - process N_RESET_REQ
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 n_reset_req(queue_t *q, mblk_t *mp)
@@ -13958,9 +14822,10 @@ n_reset_req(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-/*
- *  N_RESET_RES:
- *  -------------------------------------------------------------------
+/**
+ * n_reset_res: - process N_RESET_RES
+ * @q: active queue (upper write queue)
+ * @mp: the message
  */
 static int
 n_reset_res(queue_t *q, mblk_t *mp)
@@ -13980,259 +14845,1553 @@ n_reset_res(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 
+static int
+mtp_do_options_na(struct mtp_option *p, struct na *na, int cmd)
+{
+	struct mtp_opt_conf_na *c = (typeof(c)) (p + 1);
+
+	if (!na)
+		return (-ESRCH);
+	p->id = na->id;
+	if (cmd == MTP_CHA)
+		na->config = *c;
+	*c = na->config;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_options_sp(struct mtp_option *p, struct sp *sp, int cmd)
+{
+	struct mtp_opt_conf_sp *c = (typeof(c)) (p + 1);
+
+	if (!sp)
+		return (-ESRCH);
+	p->id = sp->id;
+	if (cmd == MTP_CHA)
+		sp->config = *c;
+	*c = sp->config;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_options_rs(struct mtp_option *p, struct rs *rs, int cmd)
+{
+	struct mtp_opt_conf_rs *c = (typeof(c)) (p + 1);
+
+	if (!rs)
+		return (-ESRCH);
+	p->id = rs->id;
+	if (cmd == MTP_CHA)
+		rs->config = *c;
+	*c = rs->config;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_options_rl(struct mtp_option *p, struct rl *rl, int cmd)
+{
+	struct mtp_opt_conf_rl *c = (typeof(c)) (p + 1);
+
+	if (!rl)
+		return (-ESRCH);
+	p->id = rl->id;
+	if (cmd == MTP_CHA)
+		rl->config = *c;
+	*c = rl->config;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_options_rt(struct mtp_option *p, struct rt *rt, int cmd)
+{
+	struct mtp_opt_conf_rt *c = (typeof(c)) (p + 1);
+
+	if (!rt)
+		return (-ESRCH);
+	p->id = rt->id;
+	if (cmd == MTP_CHA)
+		rt->config = *c;
+	*c = rt->config;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_options_ls(struct mtp_option *p, struct ls *ls, int cmd)
+{
+	struct mtp_opt_conf_ls *c = (typeof(c)) (p + 1);
+
+	if (!ls)
+		return (-ESRCH);
+	p->id = ls->id;
+	if (cmd == MTP_CHA)
+		ls->config = *c;
+	*c = ls->config;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_options_lk(struct mtp_option *p, struct lk *lk, int cmd)
+{
+	struct mtp_opt_conf_lk *c = (typeof(c)) (p + 1);
+
+	if (!lk)
+		return (-ESRCH);
+	p->id = lk->id;
+	if (cmd == MTP_CHA)
+		lk->config = *c;
+	*c = lk->config;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_options_sl(struct mtp_option *p, struct sl *sl, int cmd)
+{
+	struct mtp_opt_conf_sl *c = (typeof(c)) (p + 1);
+
+	if (!sl)
+		return (-ESRCH);
+	p->id = sl->id;
+	if (cmd == MTP_CHA)
+		sl->config = *c;
+	*c = sl->config;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_options_df(struct mtp_option *p, struct df *df, int cmd)
+{
+	struct mtp_opt_conf_df *c = (typeof(c)) (p + 1);
+
+	if (!df)
+		return (-ESRCH);
+	p->id = df->id;
+	if (cmd == MTP_CHA)
+		df->config = *c;
+	*c = df->config;
+	return (sizeof(*p) + sizeof(*c));
+}
+
+static int
+mtp_do_options(mblk_t *dp, int cmd)
+{
+	struct mtp_option *p = (typeof(p)) dp->b_rptr;
+	int rtn;
+
+	switch (cmd) {
+	case MTP_GET:		/* get */
+	case MTP_CHA:		/* set */
+		switch (p->type) {
+		case MTP_OBJ_TYPE_NA:
+			rtn = mtp_do_options_na(p, na_lookup(p->id), cmd);
+			break;
+		case MTP_OBJ_TYPE_SP:
+			rtn = mtp_do_options_sp(p, sp_lookup(p->id), cmd);
+			break;
+		case MTP_OBJ_TYPE_RS:
+			rtn = mtp_do_options_rs(p, rs_lookup(p->id), cmd);
+			break;
+		case MTP_OBJ_TYPE_RL:
+			rtn = mtp_do_options_rl(p, rl_lookup(p->id), cmd);
+			break;
+		case MTP_OBJ_TYPE_RT:
+			rtn = mtp_do_options_rt(p, rt_lookup(p->id), cmd);
+			break;
+		case MTP_OBJ_TYPE_LS:
+			rtn = mtp_do_options_ls(p, ls_lookup(p->id), cmd);
+			break;
+		case MTP_OBJ_TYPE_LK:
+			rtn = mtp_do_options_lk(p, lk_lookup(p->id), cmd);
+			break;
+		case MTP_OBJ_TYPE_SL:
+			rtn = mtp_do_options_sl(p, sl_lookup(p->id), cmd);
+			break;
+		case MTP_OBJ_TYPE_DF:
+			rtn = mtp_do_options_df(p, df_lookup(p->id), cmd);
+			break;
+		default:
+			return (EINVAL);
+		}
+		if (rtn < 0)
+			return (-rtn);
+		dp->b_wptr = dp->b_rptr + rtn;
+		return (0);
+	default:
+		return (EINVAL);
+	}
+}
+static int
+mtp_get_options(mblk_t *dp)
+{
+	return mtp_do_options(dp, MTP_GET);
+}
+static int
+mtp_set_options(mblk_t *dp)
+{
+	return mtp_do_options(dp, MTP_SET);
+}
+
+static int
+mtp_get_statem_na(struct mtp_statem *p, struct na *na)
+{
+	struct mtp_statem_na *c = (typeof(c)) (p + 1);
+
+	if (!na)
+		return (-ESRCH);
+	p->id = na->id;
+	p->flags = na->flags;
+	p->state = na->state;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_statem_sp(struct mtp_statem *p, struct sp *sp)
+{
+	struct mtp_statem_sp *c = (typeof(c)) (p + 1);
+
+	if (!sp)
+		return (-ESRCH);
+	p->id = sp->id;
+	p->flags = sp->flags;
+	p->state = sp->state;
+	c->timers.t1r = (mtp_timer_t) mi_timer_remain(sp->timers.t1r);
+	c->timers.t18 = (mtp_timer_t) mi_timer_remain(sp->timers.t18);
+	c->timers.t19 = (mtp_timer_t) mi_timer_remain(sp->timers.t19);
+	c->timers.t20 = (mtp_timer_t) mi_timer_remain(sp->timers.t20);
+	c->timers.t21 = (mtp_timer_t) mi_timer_remain(sp->timers.t21);
+	c->timers.t22a = (mtp_timer_t) mi_timer_remain(sp->timers.t22a);
+	c->timers.t23a = (mtp_timer_t) mi_timer_remain(sp->timers.t23a);
+	c->timers.t24a = (mtp_timer_t) mi_timer_remain(sp->timers.t24a);
+	c->timers.t26a = (mtp_timer_t) mi_timer_remain(sp->timers.t26a);
+	c->timers.t27a = (mtp_timer_t) mi_timer_remain(sp->timers.t27a);
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_statem_rs(struct mtp_statem *p, struct rs *rs)
+{
+	struct mtp_statem_rs *c = (typeof(c)) (p + 1);
+
+	if (!rs)
+		return (-ESRCH);
+	p->id = rs->id;
+	p->flags = rs->flags;
+	p->state = rs->state;
+	c->timers.t8 = (mtp_timer_t) mi_timer_remain(rs->timers.t8);
+	c->timers.t11 = (mtp_timer_t) mi_timer_remain(rs->timers.t11);
+	c->timers.t15 = (mtp_timer_t) mi_timer_remain(rs->timers.t15);
+	c->timers.t16 = (mtp_timer_t) mi_timer_remain(rs->timers.t16);
+	c->timers.t18a = (mtp_timer_t) mi_timer_remain(rs->timers.t18a);
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_statem_rl(struct mtp_statem *p, struct rl *rl)
+{
+	struct mtp_statem_rl *c = (typeof(c)) (p + 1);
+
+	if (!rl)
+		return (-ESRCH);
+	p->id = rl->id;
+	p->flags = rl->flags;
+	p->state = rl->state;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_statem_rt(struct mtp_statem *p, struct rt *rt)
+{
+	struct mtp_statem_rt *c = (typeof(c)) (p + 1);
+
+	if (!rt)
+		return (-ESRCH);
+	p->id = rt->id;
+	p->flags = rt->flags;
+	p->state = rt->state;
+	c->timers.t6 = (mtp_timer_t) mi_timer_remain(rt->timers.t6);
+	c->timers.t10 = (mtp_timer_t) mi_timer_remain(rt->timers.t10);
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_statem_ls(struct mtp_statem *p, struct ls *ls)
+{
+	struct mtp_statem_ls *c = (typeof(c)) (p + 1);
+
+	if (!ls)
+		return (-ESRCH);
+	p->id = ls->id;
+	p->flags = ls->flags;
+	p->state = ls->state;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_statem_lk(struct mtp_statem *p, struct lk *lk)
+{
+	struct mtp_statem_lk *c = (typeof(c)) (p + 1);
+
+	if (!lk)
+		return (-ESRCH);
+	p->id = lk->id;
+	p->flags = lk->flags;
+	p->state = lk->state;
+	c->timers.t7 = (mtp_timer_t) mi_timer_remain(lk->timers.t7);
+	c->timers.t25a = (mtp_timer_t) mi_timer_remain(lk->timers.t25a);
+	c->timers.t28a = (mtp_timer_t) mi_timer_remain(lk->timers.t28a);
+	c->timers.t29a = (mtp_timer_t) mi_timer_remain(lk->timers.t29a);
+	c->timers.t30a = (mtp_timer_t) mi_timer_remain(lk->timers.t30a);
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_statem_sl(struct mtp_statem *p, struct sl *sl)
+{
+	struct mtp_statem_sl *c = (typeof(c)) (p + 1);
+
+	if (!sl)
+		return (-ESRCH);
+	p->id = sl->id;
+	p->flags = sl->flags;
+	p->state = sl->state;
+	c->timers.t1 = (mtp_timer_t) mi_timer_remain(sl->timers.t1);
+	c->timers.t2 = (mtp_timer_t) mi_timer_remain(sl->timers.t2);
+	c->timers.t3 = (mtp_timer_t) mi_timer_remain(sl->timers.t3);
+	c->timers.t4 = (mtp_timer_t) mi_timer_remain(sl->timers.t4);
+	c->timers.t5 = (mtp_timer_t) mi_timer_remain(sl->timers.t5);
+	c->timers.t12 = (mtp_timer_t) mi_timer_remain(sl->timers.t12);
+	c->timers.t13 = (mtp_timer_t) mi_timer_remain(sl->timers.t13);
+	c->timers.t14 = (mtp_timer_t) mi_timer_remain(sl->timers.t14);
+	c->timers.t17 = (mtp_timer_t) mi_timer_remain(sl->timers.t17);
+	c->timers.t19a = (mtp_timer_t) mi_timer_remain(sl->timers.t19a);
+	c->timers.t20a = (mtp_timer_t) mi_timer_remain(sl->timers.t20a);
+	c->timers.t21a = (mtp_timer_t) mi_timer_remain(sl->timers.t21a);
+	c->timers.t22 = (mtp_timer_t) mi_timer_remain(sl->timers.t22);
+	c->timers.t23 = (mtp_timer_t) mi_timer_remain(sl->timers.t23);
+	c->timers.t24 = (mtp_timer_t) mi_timer_remain(sl->timers.t24);
+	c->timers.t31a = (mtp_timer_t) mi_timer_remain(sl->timers.t31a);
+	c->timers.t32a = (mtp_timer_t) mi_timer_remain(sl->timers.t32a);
+	c->timers.t33a = (mtp_timer_t) mi_timer_remain(sl->timers.t33a);
+	c->timers.t34a = (mtp_timer_t) mi_timer_remain(sl->timers.t34a);
+	c->timers.t1t = (mtp_timer_t) mi_timer_remain(sl->timers.t1t);
+	c->timers.t2t = (mtp_timer_t) mi_timer_remain(sl->timers.t2t);
+	c->timers.t1s = (mtp_timer_t) mi_timer_remain(sl->timers.t1s);
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_statem_df(struct mtp_statem *p, struct df *df)
+{
+	struct mtp_statem_df *c = (typeof(c)) (p + 1);
+
+	if (!df)
+		return (-ESRCH);
+	p->id = df->id;
+	p->flags = df->flags;
+	p->state = df->state;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_statem(mblk_t *dp)
+{
+	struct mtp_statem *p = (typeof(p)) dp->b_rptr;
+	int rtn;
+
+	switch (p->type) {
+	case MTP_OBJ_TYPE_NA:
+		rtn = mtp_get_statem_na(p, na_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_SP:
+		rtn = mtp_get_statem_sp(p, sp_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_RS:
+		rtn = mtp_get_statem_rs(p, rs_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_RL:
+		rtn = mtp_get_statem_rl(p, rl_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_RT:
+		rtn = mtp_get_statem_rt(p, rt_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_LS:
+		rtn = mtp_get_statem_ls(p, ls_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_LK:
+		rtn = mtp_get_statem_lk(p, lk_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_SL:
+		rtn = mtp_get_statem_sl(p, sl_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_DF:
+		rtn = mtp_get_statem_df(p, df_lookup(p->id));
+		break;
+	default:
+		return (EINVAL);
+	}
+	if (rtn < 0)
+		return (-rtn);
+	dp->b_wptr = dp->b_rptr + rtn;
+	return (0);
+}
+
+static int
+mtp_get_stats_na(struct mtp_stats *p, struct na *na, bool clear)
+{
+	struct mtp_stats_na *c = (typeof(c)) (p + 1);
+
+	if (!na)
+		return (-ESRCH);
+	p->id = na->id;
+	*c = na->stats;
+	if (clear)
+		bzero(&na->stats, sizeof(na->stats));
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_stats_sp(struct mtp_stats *p, struct sp *sp, bool clear)
+{
+	struct mtp_stats_sp *c = (typeof(c)) (p + 1);
+
+	if (!sp)
+		return (-ESRCH);
+	p->id = sp->id;
+	*c = sp->stats;
+	if (clear)
+		bzero(&sp->stats, sizeof(sp->stats));
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_stats_rs(struct mtp_stats *p, struct rs *rs, bool clear)
+{
+	struct mtp_stats_rs *c = (typeof(c)) (p + 1);
+
+	if (!rs)
+		return (-ESRCH);
+	p->id = rs->id;
+	*c = rs->stats;
+	if (clear)
+		bzero(&rs->stats, sizeof(rs->stats));
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_stats_rl(struct mtp_stats *p, struct rl *rl, bool clear)
+{
+	struct mtp_stats_rl *c = (typeof(c)) (p + 1);
+
+	if (!rl)
+		return (-ESRCH);
+	p->id = rl->id;
+	*c = rl->stats;
+	if (clear)
+		bzero(&rl->stats, sizeof(rl->stats));
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_stats_rt(struct mtp_stats *p, struct rt *rt, bool clear)
+{
+	struct mtp_stats_rt *c = (typeof(c)) (p + 1);
+
+	if (!rt)
+		return (-ESRCH);
+	p->id = rt->id;
+	*c = rt->stats;
+	if (clear)
+		bzero(&rt->stats, sizeof(rt->stats));
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_stats_ls(struct mtp_stats *p, struct ls *ls, bool clear)
+{
+	struct mtp_stats_ls *c = (typeof(c)) (p + 1);
+
+	if (!ls)
+		return (-ESRCH);
+	p->id = ls->id;
+	*c = ls->stats;
+	if (clear)
+		bzero(&ls->stats, sizeof(ls->stats));
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_stats_lk(struct mtp_stats *p, struct lk *lk, bool clear)
+{
+	struct mtp_stats_lk *c = (typeof(c)) (p + 1);
+
+	if (!lk)
+		return (-ESRCH);
+	p->id = lk->id;
+	*c = lk->stats;
+	if (clear)
+		bzero(&lk->stats, sizeof(lk->stats));
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_stats_sl(struct mtp_stats *p, struct sl *sl, bool clear)
+{
+	struct mtp_stats_sl *c = (typeof(c)) (p + 1);
+
+	if (!sl)
+		return (-ESRCH);
+	p->id = sl->id;
+	*c = sl->stats;
+	if (clear)
+		bzero(&sl->stats, sizeof(sl->stats));
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_get_stats_df(struct mtp_stats *p, struct df *df, bool clear)
+{
+	struct mtp_stats_df *c = (typeof(c)) (p + 1);
+
+	if (!df)
+		return (-ESRCH);
+	p->id = df->id;
+	*c = df->stats;
+	if (clear)
+		bzero(&df->stats, sizeof(df->stats));
+	return (sizeof(*p) + sizeof(*c));
+}
+
+static int
+mtp_get_stats(mblk_t *dp, const bool clear)
+{
+	struct mtp_stats *p = (typeof(p)) dp->b_rptr;
+	int rtn;
+
+	p->header = (mtp_ulong) drv_hztomsec(jiffies);
+	switch (p->type) {
+	case MTP_OBJ_TYPE_NA:
+		rtn = mtp_get_stats_na(p, na_lookup(p->id), clear);
+		break;
+	case MTP_OBJ_TYPE_SP:
+		rtn = mtp_get_stats_sp(p, sp_lookup(p->id), clear);
+		break;
+	case MTP_OBJ_TYPE_RS:
+		rtn = mtp_get_stats_rs(p, rs_lookup(p->id), clear);
+		break;
+	case MTP_OBJ_TYPE_RL:
+		rtn = mtp_get_stats_rl(p, rl_lookup(p->id), clear);
+		break;
+	case MTP_OBJ_TYPE_RT:
+		rtn = mtp_get_stats_rt(p, rt_lookup(p->id), clear);
+		break;
+	case MTP_OBJ_TYPE_LS:
+		rtn = mtp_get_stats_ls(p, ls_lookup(p->id), clear);
+		break;
+	case MTP_OBJ_TYPE_LK:
+		rtn = mtp_get_stats_lk(p, lk_lookup(p->id), clear);
+		break;
+	case MTP_OBJ_TYPE_SL:
+		rtn = mtp_get_stats_sl(p, sl_lookup(p->id), clear);
+		break;
+	case MTP_OBJ_TYPE_DF:
+		rtn = mtp_get_stats_df(p, df_lookup(p->id), clear);
+		break;
+	default:
+		return (EINVAL);
+	}
+	if (rtn < 0)
+		return (-rtn);
+	dp->b_wptr = dp->b_rptr + rtn;
+	return (0);
+}
+
+static int
+mtp_do_notify_na(struct mtp_notify *p, struct na *na, int size, int cmd)
+{
+	struct mtp_notify_na *c = (typeof(c)) (p + 1);
+
+	if (!na)
+		return (-ESRCH);
+	p->id = na->id;
+	switch (cmd) {
+	case MTP_ADD:		/* set */
+		na->notify.events |= c->events;
+		break;
+	case MTP_DEL:		/* clear */
+		na->notify.events &= ~c->events;
+		break;
+	}
+	c->events = na->notify.events;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_notify_sp(struct mtp_notify *p, struct sp *sp, int size, int cmd)
+{
+	struct mtp_notify_sp *c = (typeof(c)) (p + 1);
+
+	if (!sp)
+		return (-ESRCH);
+	p->id = sp->id;
+	switch (cmd) {
+	case MTP_ADD:		/* set */
+		sp->notify.events |= c->events;
+		break;
+	case MTP_DEL:		/* clear */
+		sp->notify.events &= ~c->events;
+		break;
+	}
+	c->events = sp->notify.events;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_notify_rs(struct mtp_notify *p, struct rs *rs, int size, int cmd)
+{
+	struct mtp_notify_rs *c = (typeof(c)) (p + 1);
+
+	if (!rs)
+		return (-ESRCH);
+	p->id = rs->id;
+	switch (cmd) {
+	case MTP_ADD:		/* set */
+		rs->notify.events |= c->events;
+		break;
+	case MTP_DEL:		/* clear */
+		rs->notify.events &= ~c->events;
+		break;
+	}
+	c->events = rs->notify.events;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_notify_rl(struct mtp_notify *p, struct rl *rl, int size, int cmd)
+{
+	struct mtp_notify_rl *c = (typeof(c)) (p + 1);
+
+	if (!rl)
+		return (-ESRCH);
+	p->id = rl->id;
+	switch (cmd) {
+	case MTP_ADD:		/* set */
+		rl->notify.events |= c->events;
+		break;
+	case MTP_DEL:		/* clear */
+		rl->notify.events &= ~c->events;
+		break;
+	}
+	c->events = rl->notify.events;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_notify_rt(struct mtp_notify *p, struct rt *rt, int size, int cmd)
+{
+	struct mtp_notify_rt *c = (typeof(c)) (p + 1);
+
+	if (!rt)
+		return (-ESRCH);
+	p->id = rt->id;
+	switch (cmd) {
+	case MTP_ADD:		/* set */
+		rt->notify.events |= c->events;
+		break;
+	case MTP_DEL:		/* clear */
+		rt->notify.events &= ~c->events;
+		break;
+	}
+	c->events = rt->notify.events;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_notify_ls(struct mtp_notify *p, struct ls *ls, int size, int cmd)
+{
+	struct mtp_notify_ls *c = (typeof(c)) (p + 1);
+
+	if (!ls)
+		return (-ESRCH);
+	p->id = ls->id;
+	switch (cmd) {
+	case MTP_ADD:		/* set */
+		ls->notify.events |= c->events;
+		break;
+	case MTP_DEL:		/* clear */
+		ls->notify.events &= ~c->events;
+		break;
+	}
+	c->events = ls->notify.events;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_notify_lk(struct mtp_notify *p, struct lk *lk, int size, int cmd)
+{
+	struct mtp_notify_lk *c = (typeof(c)) (p + 1);
+
+	if (!lk)
+		return (-ESRCH);
+	p->id = lk->id;
+	switch (cmd) {
+	case MTP_ADD:		/* set */
+		lk->notify.events |= c->events;
+		break;
+	case MTP_DEL:		/* clear */
+		lk->notify.events &= ~c->events;
+		break;
+	}
+	c->events = lk->notify.events;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_notify_sl(struct mtp_notify *p, struct sl *sl, int size, int cmd)
+{
+	struct mtp_notify_sl *c = (typeof(c)) (p + 1);
+
+	if (!sl)
+		return (-ESRCH);
+	p->id = sl->id;
+	switch (cmd) {
+	case MTP_ADD:		/* set */
+		sl->notify.events |= c->events;
+		break;
+	case MTP_DEL:		/* clear */
+		sl->notify.events &= ~c->events;
+		break;
+	}
+	c->events = sl->notify.events;
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_notify_df(struct mtp_notify *p, struct df *df, int size, int cmd)
+{
+	struct mtp_notify_df *c = (typeof(c)) (p + 1);
+
+	if (!df)
+		return (-ESRCH);
+	p->id = df->id;
+	switch (cmd) {
+	case MTP_ADD:		/* set */
+		df->notify.events |= c->events;
+		break;
+	case MTP_DEL:		/* clear */
+		df->notify.events &= ~c->events;
+		break;
+	}
+	c->events = df->notify.events;
+	return (sizeof(*p) + sizeof(*c));
+}
+
+static int
+mtp_do_notify(mblk_t *dp, int size, int cmd)
+{
+	struct mtp_notify *p = (typeof(p)) dp->b_rptr;
+	int rtn;
+
+	switch (cmd) {
+	case MTP_GET:		/* get */
+	case MTP_ADD:		/* set */
+	case MTP_DEL:		/* clear */
+		break;
+	default:
+		return (EFAULT);
+	}
+	switch (p->type) {
+	case MTP_OBJ_TYPE_NA:
+		rtn = mtp_do_notify_na(p, na_lookup(p->id), size, cmd);
+		break;
+	case MTP_OBJ_TYPE_SP:
+		rtn = mtp_do_notify_sp(p, sp_lookup(p->id), size, cmd);
+		break;
+	case MTP_OBJ_TYPE_RS:
+		rtn = mtp_do_notify_rs(p, rs_lookup(p->id), size, cmd);
+		break;
+	case MTP_OBJ_TYPE_RL:
+		rtn = mtp_do_notify_rl(p, rl_lookup(p->id), size, cmd);
+		break;
+	case MTP_OBJ_TYPE_RT:
+		rtn = mtp_do_notify_rt(p, rt_lookup(p->id), size, cmd);
+		break;
+	case MTP_OBJ_TYPE_LS:
+		rtn = mtp_do_notify_ls(p, ls_lookup(p->id), size, cmd);
+		break;
+	case MTP_OBJ_TYPE_LK:
+		rtn = mtp_do_notify_lk(p, lk_lookup(p->id), size, cmd);
+		break;
+	case MTP_OBJ_TYPE_SL:
+		rtn = mtp_do_notify_sl(p, sl_lookup(p->id), size, cmd);
+		break;
+	case MTP_OBJ_TYPE_DF:
+		rtn = mtp_do_notify_df(p, df_lookup(p->id), size, cmd);
+		break;
+	default:
+		return (EINVAL);
+	}
+	if (rtn < 0)
+		return (-rtn);
+	dp->b_wptr = dp->b_rptr + rtn;
+	return (0);
+}
+
+static int
+mtp_do_statsp_na(struct mtp_stats *p, struct na *na, int cmd)
+{
+	struct mtp_stats_na *c = (typeof(c)) (p + 1);
+
+	if (!na)
+		return (-ESRCH);
+	p->id = na->id;
+	switch (cmd) {
+	case MTP_GET:		/* get */
+		*c = na->statsp;
+		break;
+	case MTP_CHA:		/* set */
+		na->statsp = *c;
+		break;
+	}
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_statsp_sp(struct mtp_stats *p, struct sp *sp, int cmd)
+{
+	struct mtp_stats_sp *c = (typeof(c)) (p + 1);
+
+	if (!sp)
+		return (-ESRCH);
+	p->id = sp->id;
+	switch (cmd) {
+	case MTP_GET:		/* get */
+		*c = sp->statsp;
+		break;
+	case MTP_CHA:		/* set */
+		sp->statsp = *c;
+		break;
+	}
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_statsp_rs(struct mtp_stats *p, struct rs *rs, int cmd)
+{
+	struct mtp_stats_rs *c = (typeof(c)) (p + 1);
+
+	if (!rs)
+		return (-ESRCH);
+	p->id = rs->id;
+	switch (cmd) {
+	case MTP_GET:		/* get */
+		*c = rs->statsp;
+		break;
+	case MTP_CHA:		/* set */
+		rs->statsp = *c;
+		break;
+	}
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_statsp_rl(struct mtp_stats *p, struct rl *rl, int cmd)
+{
+	struct mtp_stats_rl *c = (typeof(c)) (p + 1);
+
+	if (!rl)
+		return (-ESRCH);
+	p->id = rl->id;
+	switch (cmd) {
+	case MTP_GET:		/* get */
+		*c = rl->statsp;
+		break;
+	case MTP_CHA:		/* set */
+		rl->statsp = *c;
+		break;
+	}
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_statsp_rt(struct mtp_stats *p, struct rt *rt, int cmd)
+{
+	struct mtp_stats_rt *c = (typeof(c)) (p + 1);
+
+	if (!rt)
+		return (-ESRCH);
+	p->id = rt->id;
+	switch (cmd) {
+	case MTP_GET:		/* get */
+		*c = rt->statsp;
+		break;
+	case MTP_CHA:		/* set */
+		rt->statsp = *c;
+		break;
+	}
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_statsp_ls(struct mtp_stats *p, struct ls *ls, int cmd)
+{
+	struct mtp_stats_ls *c = (typeof(c)) (p + 1);
+
+	if (!ls)
+		return (-ESRCH);
+	p->id = ls->id;
+	switch (cmd) {
+	case MTP_GET:		/* get */
+		*c = ls->statsp;
+		break;
+	case MTP_CHA:		/* set */
+		ls->statsp = *c;
+		break;
+	}
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_statsp_lk(struct mtp_stats *p, struct lk *lk, int cmd)
+{
+	struct mtp_stats_lk *c = (typeof(c)) (p + 1);
+
+	if (!lk)
+		return (-ESRCH);
+	p->id = lk->id;
+	switch (cmd) {
+	case MTP_GET:		/* get */
+		*c = lk->statsp;
+		break;
+	case MTP_CHA:		/* set */
+		lk->statsp = *c;
+		break;
+	}
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_statsp_sl(struct mtp_stats *p, struct sl *sl, int cmd)
+{
+	struct mtp_stats_sl *c = (typeof(c)) (p + 1);
+
+	if (!sl)
+		return (-ESRCH);
+	p->id = sl->id;
+	switch (cmd) {
+	case MTP_GET:		/* get */
+		*c = sl->statsp;
+		break;
+	case MTP_CHA:		/* set */
+		sl->statsp = *c;
+		break;
+	}
+	return (sizeof(*p) + sizeof(*c));
+}
+static int
+mtp_do_statsp_df(struct mtp_stats *p, struct df *df, int cmd)
+{
+	struct mtp_stats_df *c = (typeof(c)) (p + 1);
+
+	if (!df)
+		return (-ESRCH);
+	p->id = df->id;
+	switch (cmd) {
+	case MTP_GET:		/* get */
+		*c = df->statsp;
+		break;
+	case MTP_CHA:		/* set */
+		df->statsp = *c;
+		break;
+	}
+	return (sizeof(*p) + sizeof(*c));
+}
+
+static int
+mtp_do_statsp(mblk_t *dp, int cmd)
+{
+	struct mtp_stats *p = (typeof(p)) dp->b_rptr;
+	int rtn;
+
+	switch (cmd) {
+	case MTP_GET:		/* get */
+	case MTP_CHA:		/* set */
+		break;
+	default:
+		return (EFAULT);
+	}
+	switch (p->type) {
+	case MTP_OBJ_TYPE_NA:
+		rtn = mtp_do_statsp_na(p, na_lookup(p->id), cmd);
+		break;
+	case MTP_OBJ_TYPE_SP:
+		rtn = mtp_do_statsp_sp(p, sp_lookup(p->id), cmd);
+		break;
+	case MTP_OBJ_TYPE_RS:
+		rtn = mtp_do_statsp_rs(p, rs_lookup(p->id), cmd);
+		break;
+	case MTP_OBJ_TYPE_RL:
+		rtn = mtp_do_statsp_rl(p, rl_lookup(p->id), cmd);
+		break;
+	case MTP_OBJ_TYPE_RT:
+		rtn = mtp_do_statsp_rt(p, rt_lookup(p->id), cmd);
+		break;
+	case MTP_OBJ_TYPE_LS:
+		rtn = mtp_do_statsp_ls(p, ls_lookup(p->id), cmd);
+		break;
+	case MTP_OBJ_TYPE_LK:
+		rtn = mtp_do_statsp_lk(p, lk_lookup(p->id), cmd);
+		break;
+	case MTP_OBJ_TYPE_SL:
+		rtn = mtp_do_statsp_sl(p, sl_lookup(p->id), cmd);
+		break;
+	case MTP_OBJ_TYPE_DF:
+		rtn = mtp_do_statsp_df(p, df_lookup(p->id), cmd);
+		break;
+	default:
+		return (EINVAL);
+	}
+	if (rtn < 0)
+		return (-rtn);
+	dp->b_wptr = dp->b_rptr + rtn;
+	return (0);
+}
+
+/*
+ *  LIST Object Configuration
+ *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ */
+/**
+ * mtp_lst_na: - list network appearance
+ * @p: configuration header
+ * @na: id lookup network appearance structure
+ *
+ * Lists the signalling point code identifiers associated with a specified network appearance, or if no network
+ * appearance is specified, lists all network appearance identifiers.
+ */
+static int
+mtp_lst_na(struct mtp_config *p, struct na *na)
+{
+	struct mtp_config *o = p;
+	struct sp *sp;
+	int num = p->cmd;
+
+	if (na) {
+		o++;
+		/* write list of local signalling points */
+		for (sp = na->sp.list; sp && num > 0; sp = sp->na.next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_SP;
+			o->id = sp->id;
+			o->cmd = MTP_GET;
+		}
+	} else {
+		num++;
+		/* write out list of network appearances */
+		for (na = master.na.list; na && num > 0; na = na->next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_NA;
+			o->id = na->id;
+			o->cmd = MTP_GET;
+		}
+	}
+	if (num > 0) {
+		/* end list with zero object type */
+		o->type = 0;
+		o->id = 0;
+		o->cmd = 0;
+	}
+	return ((caddr_t) o - (caddr_t) p);
+}
+
+/**
+ * mtp_lst_sp: - list signalling point
+ * @p: configuration header
+ * @sp: id lookup signalling point structure
+ *
+ * Lists the route set and link set identifiers associated with a specified signalling point, or if no signalling
+ * point is specified, lists all signalling point identifiers.
+ */
+static int
+mtp_lst_sp(struct mtp_config *p, struct sp *sp)
+{
+	struct mtp_config *o = p;
+	struct rs *rs;
+	struct ls *ls;
+	int num = p->cmd;
+
+	if (sp) {
+		o++;
+		/* write list of routesets */
+		for (rs = sp->rs.list; rs && num > 0; rs = rs->sp.next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_RS;
+			o->id = rs->id;
+			o->cmd = MTP_GET;
+		}
+		/* write list of linksets */
+		for (ls = sp->ls.list; ls && num > 0; ls = ls->sp.next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_LS;
+			o->id = ls->id;
+			o->cmd = MTP_GET;
+		}
+	} else {
+		num++;
+		/* write out list of signalling points */
+		for (sp = master.sp.list; sp && num > 0; sp = sp->next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_SP;
+			o->id = sp->id;
+			o->cmd = MTP_GET;
+		}
+	}
+	if (num > 0) {
+		/* end list with zero object type */
+		o->type = 0;
+		o->id = 0;
+		o->cmd = 0;
+	}
+	return ((caddr_t) o - (caddr_t) p);
+}
+
+/**
+ * mtp_lst_rs: - list route sets
+ * @p: configuration header
+ * @rs: id lookup route set structure
+ *
+ * Lists the route list identifiers associated with a specified route set, or if no route set is specified,  lists all
+ * route set identifiers.
+ */
+static int
+mtp_lst_rs(struct mtp_config *p, struct rs *rs)
+{
+	struct mtp_config *o = p;
+	struct rl *rl;
+	int num = p->cmd;
+
+	if (rs) {
+		o++;
+		/* write list of routelists */
+		for (rl = rs->rl.list; rl && num > 0; rl = rl->rs.next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_RL;
+			o->id = rl->id;
+			o->cmd = MTP_GET;
+		}
+	} else {
+		num++;
+		/* write list of route sets */
+		for (rs = master.rs.list; rs && num > 0; rs = rs->next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_RS;
+			o->id = rs->id;
+			o->cmd = MTP_GET;
+		}
+	}
+	if (num > 0) {
+		/* end list with zero object type */
+		o->type = 0;
+		o->id = 0;
+		o->cmd = 0;
+	}
+	return ((caddr_t) o - (caddr_t) p);
+}
+
+/**
+ * mtp_lst_rl: - list route list
+ * @p: configuration header
+ * @rl: id lookup of route list structure
+ *
+ * Lists the route identifiers associated with a specified route list, or if no route list is specified, lists all
+ * route list identifiers.
+ */
+static int
+mtp_lst_rl(struct mtp_config *p, struct rl *rl)
+{
+	struct mtp_config *o = p;
+	struct rt *rt;
+	int num = p->cmd;
+
+	if (rl) {
+		o++;
+		/* write list of routes */
+		for (rt = rl->rt.list; rt && num > 0; rt = rt->rl.next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_RT;
+			o->id = rt->id;
+			o->cmd = MTP_GET;
+		}
+	} else {
+		num++;
+		/* write list of route lists */
+		for (rl = master.rl.list; rl && num > 0; rl = rl->next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_RL;
+			o->id = rl->id;
+			o->cmd = MTP_GET;
+		}
+	}
+	if (num > 0) {
+		/* end list with zero object type */
+		o->type = 0;
+		o->id = 0;
+		o->cmd = 0;
+	}
+	return ((caddr_t) o - (caddr_t) p);
+}
+
+/**
+ * mtp_lst_rt: - list route
+ * @p: configuration header
+ * @rt: id lookup of route structure
+ *
+ * Lists nothing assocaited with a specified route, or if no route is specified, lists all route identifiers.
+ */
+static int
+mtp_lst_rt(struct mtp_config *p, struct rt *rt)
+{
+	struct mtp_config *o = p;
+	int num = p->cmd;
+
+	if (rt) {
+		o++;
+	} else {
+		num++;
+		/* write out list of routes */
+		for (rt = master.rt.list; rt && num > 0; rt = rt->next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_RT;
+			o->id = rt->id;
+			o->cmd = MTP_GET;
+		}
+	}
+	if (num > 0) {
+		/* end list with zero object type */
+		o->type = 0;
+		o->id = 0;
+		o->cmd = 0;
+	}
+	return ((caddr_t) o - (caddr_t) p);
+}
+
+/**
+ * mtp_lst_ls: - list combined link set
+ * @p: configuration header
+ * @ls: id lookup of combined link set
+ *
+ * Lists link sets associated with a specified combined link set, or if no combined link set is specified, lists all
+ * combined link set identifiers.
+ */
+static int
+mtp_lst_ls(struct mtp_config *p, struct ls *ls)
+{
+	struct mtp_config *o = p;
+	struct lk *lk;
+	int num = p->cmd;
+
+	if (ls) {
+		o++;
+		/* write list of links */
+		for (lk = ls->lk.list; lk && num > 0; lk = lk->ls.next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_LK;
+			o->id = lk->id;
+			o->cmd = MTP_GET;
+		}
+	} else {
+		num++;
+		/* write list of (combined) link sets */
+		for (ls = master.ls.list; sl && num > 0; ls = ls->next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_LS;
+			o->id = ls->id;
+			o->cmd = MTP_GET;
+		}
+	}
+	if (num > 0) {
+		/* end list with zero object type */
+		o->type = 0;
+		o->id = 0;
+		o->cmd = 0;
+	}
+	return ((caddr_t) o - (caddr_t) p);
+}
+
+/**
+ * mtp_lst_lk: - list link set
+ * @p: configuration header
+ * @lk: id lookup of link set structure
+ *
+ * Lists signalling links associated with a specified link set, or if no link set is specified, lists all link set
+ * identifiers.
+ */
+static int
+mtp_lst_lk(struct mtp_config *p, struct lk *lk)
+{
+	struct mtp_config *o = p;
+	struct sl *sl;
+	int num = p->cmd;
+
+	if (lk) {
+		o++;
+		/* write list of signalling links */
+		for (sl = lk->sl.list; sl && num > 0; sl = sl->lk.next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_SL;
+			o->id = sl->id;
+			o->cmd = MTP_GET;
+		}
+	} else {
+		num++;
+		/* write list of link (set)s */
+		for (lk = master.lk.list; lk && num > 0; lk = lk->next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_LK;
+			o->id = lk->id;
+			o->cmd = MTP_GET;
+		}
+	}
+	if (num > 0) {
+		/* end list with zero object type */
+		o->type = 0;
+		o->id = 0;
+		o->cmd = 0;
+	}
+	return ((caddr_t) o - (caddr_t) p);
+}
+
+/**
+ * mtp_lst_sl: - list signalling link
+ * @p: configuration header
+ * @sl: id lookup of signalling link structure
+ *
+ * Lists nothing associated with a specified signalling link, or if no signalling link is specified, lists all
+ * signalling link identifiers.
+ */
+static int
+mtp_lst_sl(struct mtp_config *p, struct sl *sl)
+{
+	struct mtp_config *o = p;
+	int num = p->cmd;
+
+	if (sl) {
+		o++;
+	} else {
+		num++;
+		/* write list of signalling links */
+		for (sl = master.sl.list; sl && num > 0; sl = sl->next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_SL;
+			o->id = sl->id;
+			o->cmd = MTP_GET;
+		}
+	}
+	if (num > 0) {
+		/* end list with zero object type */
+		o->type = 0;
+		o->id = 0;
+		o->cmd = 0;
+	}
+	return ((caddr_t) o - (caddr_t) p);
+}
+
+/**
+ * mtp_lst_df: - list default
+ * @p: configuration header
+ * @df: id lookup of default structure
+ *
+ * Lists the network appearance identifiers associated with the default, or if no default is specified, lists the
+ * default identifier.
+ */
+static int
+mtp_lst_df(struct mtp_config *p, struct df *df)
+{
+	struct mtp_config *o = p;
+	struct na *na;
+	int num = p->cmd;
+
+	if (df) {
+		o++;
+		/* write list of network appearances */
+		for (na = df->na.list; na && num > 0; na = na->next, num--, o++) {
+			o->type = MTP_OBJ_TYPE_NA;
+			o->id = na->id;
+			o->cmd = MTP_GET;
+		}
+	} else {
+		num++;
+		/* write list of default objects */
+		df = &master;
+		o->type = MTP_OBJ_TYPE_DF;
+		o->id = 0;
+		o->cmd = MTP_GET;
+		num--;
+		o++;
+	}
+	if (num > 0) {
+		/* end list with zero object type */
+		o->type = 0;
+		o->id = 0;
+		o->cmd = 0;
+	}
+	return ((caddr_t) o - (caddr_t) p);
+}
+
+/**
+ * mtp_lst_conf: - list configuation
+ * @dp: data block to fill
+ *
+ * Lists the information associated with the configuration header structure contained in the data buffer.
+ */
+static int
+mtp_lst_conf(mblk_t *dp)
+{
+	struct mtp_config *p = (typeof(p)) dp->b_rptr;
+	int rtn;
+
+	switch (p->type) {
+	case MTP_OBJ_TYPE_NA:
+		rtn = mtp_lst_na(p, na_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_SP:
+		rtn = mtp_lst_sp(p, sp_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_RS:
+		rtn = mtp_lst_rs(p, rs_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_RL:
+		rtn = mtp_lst_rl(p, rl_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_RT:
+		rtn = mtp_lst_rt(p, rt_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_LS:
+		rtn = mtp_lst_ls(p, ls_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_LK:
+		rtn = mtp_lst_lk(p, lk_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_SL:
+		rtn = mtp_lst_sl(p, sl_lookup(p->id));
+		break;
+	case MTP_OBJ_TYPE_DF:
+		rtn = mtp_lst_df(p, df_lookup(p->id));
+		break;
+	default:
+		return (EINVAL);
+	}
+	if (rtn < 0)
+		return (-rtn);
+	dp->b_wptr = dp->b_rptr + rtn;
+	return (0);
+}
+
 /*
  *  GET Object Configuration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
 static int
-mtp_get_na(struct mtp_config *arg, struct na *na, int size)
+mtp_get_na(struct mtp_config *p, struct na *na)
 {
-	struct sp *sp;
-	mtp_conf_na_t *cnf = (typeof(cnf)) (arg + 1);
-	mtp_conf_sp_t *chd;
+	struct mtp_conf_na *c = (typeof(c)) (p + 1);
 
-	if ((size -= sizeof(*cnf)) < sizeof(*arg))
-		return (-EINVAL);
-	if (!na || size < sizeof(*arg))
-		return (-EINVAL);
-	arg = (typeof(arg)) (cnf + 1);
-	/* write list of local signalling points */
-	chd = (typeof(chd)) (arg + 1);
-	for (sp = na->sp.list; sp && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
-	     sp = sp->na.next, size -= sizeof(*arg) + sizeof(*chd), arg =
-	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
-		arg->type = MTP_OBJ_TYPE_SP;
-		arg->id = sp->id;
-		chd->naid = sp->na.na ? sp->na.na->id : 0;
-	}
-	/* end list with zero object type */
-	arg->type = 0;
-	arg->id = 0;
-	return (0);
+	if (!na)
+		return (-ESRCH);
+	c->options = na->option;
+	c->mask = na->mask;
+	c->sls_bits = na->sp.sls_bits;
+	p->id = na->id;
+	return (sizeof(*p) + sizeof(*c));
 }
 static int
-mtp_get_sp(struct mtp_config *arg, struct sp *sp, int size)
+mtp_get_sp(struct mtp_config *p, struct sp *sp)
 {
-	struct rs *rs;
-	struct ls *ls;
-	mtp_conf_sp_t *cnf = (typeof(cnf)) (arg + 1);
-	mtp_conf_rs_t *chr;
-	mtp_conf_ls_t *chl;
+	struct mtp_conf_sp *c = (typeof(c)) (p + 1);
 
-	if ((size -= sizeof(*cnf)) < sizeof(*arg))
-		return (-EINVAL);
-	if (!sp || size < sizeof(*arg))
-		return (-EINVAL);
-	arg = (typeof(arg)) (cnf + 1);
-	/* write list of routesets */
-	chr = (typeof(chr)) (arg + 1);
-	for (rs = sp->rs.list; rs && size >= sizeof(*arg) + sizeof(*chr) + sizeof(*arg);
-	     rs = rs->sp.next, size -= sizeof(*arg) + sizeof(*chr), arg =
-	     (typeof(arg)) (chr + 1), chr = (typeof(chr)) (arg + 1)) {
-		arg->type = MTP_OBJ_TYPE_RS;
-		arg->id = rs->id;
-		chr->spid = rs->sp.sp ? rs->sp.sp->id : 0;
-	}
-	arg = (typeof(arg)) (cnf + 1);
-	/* write list of linksets */
-	chl = (typeof(chl)) (arg + 1);
-	for (ls = sp->ls.list; ls && size >= sizeof(*arg) + sizeof(*chl) + sizeof(*arg);
-	     ls = ls->sp.next, size -= sizeof(*arg) + sizeof(*chl), arg =
-	     (typeof(arg)) (chl + 1), chl = (typeof(chl)) (arg + 1)) {
-		arg->type = MTP_OBJ_TYPE_LS;
-		arg->id = ls->id;
-		chr->spid = ls->sp.sp ? ls->sp.sp->id : 0;
-	}
-	/* end list with zero object type */
-	arg->type = 0;
-	arg->id = 0;
-	return (0);
+	if (!sp)
+		return (-ESRCH);
+	c->naid = sp->na.na->id;
+	c->pc = sp->pc;
+	c->users = sp->equipped;
+	c->flags = sp->flags;
+	p->id = sp->id;
+	return (sizeof(*p) + sizeof(*c));
 }
 static int
-mtp_get_rs(struct mtp_config *arg, struct rs *rs, int size)
+mtp_get_rs(struct mtp_config *p, struct rs *rs)
 {
-	struct rl *rl;
-	mtp_conf_rs_t *cnf = (typeof(cnf)) (arg + 1);
-	mtp_conf_rl_t *chd;
+	struct mtp_conf_rs *c = (typeof(c)) (p + 1);
 
-	if ((size -= sizeof(*cnf)) < sizeof(*arg))
-		return (-EINVAL);
-	if (!rs || size < sizeof(*arg))
-		return (-EINVAL);
-	arg = (typeof(arg)) (cnf + 1);
-	/* write list of routelists */
-	chd = (typeof(chd)) (arg + 1);
-	for (rl = rs->rl.list; rl && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
-	     rl = rl->rs.next, size -= sizeof(*arg) + sizeof(*chd), arg =
-	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
-		arg->type = MTP_OBJ_TYPE_RL;
-		arg->id = rl->id;
-		chd->rsid = rl->rs.rs ? rl->rs.rs->id : 0;
-	}
-	/* end list with zero object type */
-	arg->type = 0;
-	arg->id = 0;
-	return (0);
+	if (!rs)
+		return (-ESRCH);
+	c->spid = rs->sp.sp->id;
+	c->dest = rs->dest;
+	c->flags = rs->flags;
+	p->id = rs->id;
+	return (sizeof(*p) + sizeof(*c));
 }
 static int
-mtp_get_rl(struct mtp_config *arg, struct rl *rl, int size)
+mtp_get_rl(struct mtp_config *p, struct rl *rl)
 {
-	struct rt *rt;
-	mtp_conf_rl_t *cnf = (typeof(cnf)) (arg + 1);
-	mtp_conf_rt_t *chd;
+	struct mtp_conf_rl *c = (typeof(c)) (p + 1);
 
-	if ((size -= sizeof(*cnf)) < sizeof(*arg))
-		return (-EINVAL);
-	if (!rl || size < sizeof(*arg))
-		return (-EINVAL);
-	arg = (typeof(arg)) (cnf + 1);
-	/* write list of routes */
-	chd = (typeof(chd)) (arg + 1);
-	for (rt = rl->rt.list; rt && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
-	     rt = rt->rl.next, size -= sizeof(*arg) + sizeof(*chd), arg =
-	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
-		arg->type = MTP_OBJ_TYPE_RT;
-		arg->id = rt->id;
-		chd->rlid = rt->rl.rl ? rt->rl.rl->id : 0;
-	}
-	/* end list with zero object type */
-	arg->type = 0;
-	arg->id = 0;
-	return (0);
+	if (!rl)
+		return (-ESRCH);
+	c->rsid = rl->rs.rs->id;
+	c->lsid = rl->ls.ls->id;
+	c->cost = rl->cost;
+	p->id = rl->id;
+	return (sizeof(*p) + sizeof(*c));
 }
 static int
-mtp_get_rt(struct mtp_config *arg, struct rt *rt, int size)
+mtp_get_rt(struct mtp_config *p, struct rt *rt)
 {
-	mtp_conf_rt_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_rt *c = (typeof(c)) (p + 1);
 
-	if ((size -= sizeof(*cnf)) < sizeof(*arg))
-		return (-EINVAL);
-	if (!rt || size < sizeof(*arg))
-		return (-EINVAL);
-	arg = (typeof(arg)) (cnf + 1);
-	/* end list with zero object type */
-	arg->type = 0;
-	arg->id = 0;
-	return (0);
+	if (!rt)
+		return (-ESRCH);
+	c->rlid = rt->rl.rl->id;
+	c->lsid = rt->ls.ls->id;
+	c->slot = rt->slot;
+	p->id = rt->id;
+	return (sizeof(*p) + sizeof(*c));
 }
 static int
-mtp_get_ls(struct mtp_config *arg, struct ls *ls, int size)
+mtp_get_ls(struct mtp_config *p, struct ls *ls)
 {
-	struct lk *lk;
-	mtp_conf_ls_t *cnf = (typeof(cnf)) (arg + 1);
-	mtp_conf_lk_t *chd;
+	struct mtp_conf_ls *c = (typeof(c)) (p + 1);
 
-	if ((size -= sizeof(*cnf)) < sizeof(*arg))
-		return (-EINVAL);
-	if (!ls || size < sizeof(*arg))
-		return (-EINVAL);
-	arg = (typeof(arg)) (cnf + 1);
-	/* write list of links */
-	chd = (typeof(chd)) (arg + 1);
-	for (lk = ls->lk.list; lk && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
-	     lk = lk->ls.next, size -= sizeof(*arg) + sizeof(*chd), arg =
-	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
-		arg->type = MTP_OBJ_TYPE_LK;
-		arg->id = lk->id;
-		chd->lsid = lk->ls.ls ? lk->ls.ls->id : 0;
-	}
-	/* end list with zero object type */
-	arg->type = 0;
-	arg->id = 0;
-	return (0);
+	if (!ls)
+		return (-ESRCH);
+	c->spid = ls->sp.sp->id;
+	c->sls_mask = ls->lk.sls_mask;
+	p->id = ls->id;
+	return (sizeof(*p) + sizeof(*c));
 }
 static int
-mtp_get_lk(struct mtp_config *arg, struct lk *lk, int size)
+mtp_get_lk(struct mtp_config *p, struct lk *lk)
 {
-	struct sl *sl;
-	mtp_conf_lk_t *cnf = (typeof(cnf)) (arg + 1);
-	mtp_conf_sl_t *chd;
+	struct mtp_conf_lk *c = (typeof(c)) (p + 1);
 
-	if ((size -= sizeof(*cnf)) < sizeof(*arg))
-		return (-EINVAL);
-	if (!lk || size < sizeof(*arg))
-		return (-EINVAL);
-	arg = (typeof(arg)) (cnf + 1);
-	/* write list of signalling links */
-	chd = (typeof(chd)) (arg + 1);
-	for (sl = lk->sl.list; sl && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
-	     sl = sl->lk.next, size -= sizeof(*arg) + sizeof(*chd), arg =
-	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
-		arg->type = MTP_OBJ_TYPE_SL;
-		arg->id = sl->id;
-		chd->lkid = sl->lk.lk ? sl->lk.lk->id : 0;
-	}
-	/* end list with zero object type */
-	arg->type = 0;
-	arg->id = 0;
-	return (0);
+	if (!lk)
+		return (-ESRCH);
+	c->lsid = lk->ls.ls->id;
+	c->rsid = lk->rs.rs->id;
+	c->ni = lk->ni;
+	c->slot = lk->slot;
+	p->id = lk->id;
+	return (sizeof(*p) + sizeof(*c));
 }
 static int
-mtp_get_sl(struct mtp_config *arg, struct sl *sl, int size)
+mtp_get_sl(struct mtp_config *p, struct sl *sl)
 {
-	mtp_conf_sl_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_sl *c = (typeof(c)) (p + 1);
 
-	if ((size -= sizeof(*cnf)) < sizeof(*arg))
-		return (-EINVAL);
-	if (!sl || size < sizeof(*arg))
-		return (-EINVAL);
-	arg = (typeof(arg)) (cnf + 1);
-	/* end list with zero object type */
-	arg->type = 0;
-	arg->id = 0;
-	return (0);
+	if (!sl)
+		return (-ESRCH);
+	c->muxid = sl->u.mux.index;
+	c->lkid = sl->lk.lk->id;
+	c->slc = sl->slc;
+	p->id = sl->id;
+	return (sizeof(*p) + sizeof(*c));
 }
 static int
-mtp_get_df(struct mtp_config *arg, struct df *df, int size)
+mtp_get_df(struct mtp_config *p, struct df *df)
 {
-	struct na *na;
-	mtp_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
-	mtp_conf_na_t *chd;
+	struct mtp_conf_df *c = (typeof(c)) (p + 1);
 
-	if ((size -= sizeof(*cnf)) < sizeof(*arg))
-		return (-EINVAL);
-	if (!df || size < sizeof(*arg))
-		return (-EINVAL);
-	arg = (typeof(arg)) (cnf + 1);
-	/* write list of network appearances */
-	chd = (typeof(chd)) (arg + 1);
-	for (na = df->na.list; na && size >= sizeof(*arg) + sizeof(*chd) + sizeof(*arg);
-	     na = na->next, size -= sizeof(*arg) + sizeof(*chd), arg =
-	     (typeof(arg)) (chd + 1), chd = (typeof(chd)) (arg + 1)) {
-		arg->type = MTP_OBJ_TYPE_NA;
-		arg->id = na->id;
-	}
-	/* end list with zero object type */
-	arg->type = 0;
-	arg->id = 0;
-	return (0);
+	if (!df)
+		return (-ESRCH);
+	p->id = df->id;
+	return (sizeof(*p) + sizeof(*c));
 }
 static int
-mtp_get_conf(struct mtp_config *arg, int size)
+mtp_get_conf(mblk_t *dp)
 {
-	switch (arg->type) {
+	struct mtp_config *p = (typeof(p)) dp->b_rptr;
+	int rtn;
+
+	p->cmd = MTP_GET;
+	switch (p->type) {
 	case MTP_OBJ_TYPE_NA:
-		return mtp_get_na(arg, na_lookup(arg->id), size);
+		rtn = mtp_get_na(p, na_lookup(p->id));
+		break;
 	case MTP_OBJ_TYPE_SP:
-		return mtp_get_sp(arg, sp_lookup(arg->id), size);
+		rtn = mtp_get_sp(p, sp_lookup(p->id));
+		break;
 	case MTP_OBJ_TYPE_RS:
-		return mtp_get_rs(arg, rs_lookup(arg->id), size);
+		rtn = mtp_get_rs(p, rs_lookup(p->id));
+		break;
 	case MTP_OBJ_TYPE_RL:
-		return mtp_get_rl(arg, rl_lookup(arg->id), size);
+		rtn = mtp_get_rl(p, rl_lookup(p->id));
+		break;
 	case MTP_OBJ_TYPE_RT:
-		return mtp_get_rt(arg, rt_lookup(arg->id), size);
+		rtn = mtp_get_rt(p, rt_lookup(p->id));
+		break;
 	case MTP_OBJ_TYPE_LS:
-		return mtp_get_ls(arg, ls_lookup(arg->id), size);
+		rtn = mtp_get_ls(p, ls_lookup(p->id));
+		break;
 	case MTP_OBJ_TYPE_LK:
-		return mtp_get_lk(arg, lk_lookup(arg->id), size);
+		rtn = mtp_get_lk(p, lk_lookup(p->id));
+		break;
 	case MTP_OBJ_TYPE_SL:
-		return mtp_get_sl(arg, sl_lookup(arg->id), size);
+		rtn = mtp_get_sl(p, sl_lookup(p->id));
+		break;
 	case MTP_OBJ_TYPE_DF:
-		return mtp_get_df(arg, df_lookup(arg->id), size);
+		rtn = mtp_get_df(p, df_lookup(p->id));
+		break;
 	default:
 		rare();
-		return (-EINVAL);
+		return (EINVAL);
 	}
+	if (rtn < 0)
+		return (-rtn);
+	dp->b_wptr = dp->b_rptr + rtn;
+	return (0);
 }
 
 /*
@@ -14240,255 +16399,227 @@ mtp_get_conf(struct mtp_config *arg, int size)
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
 static int
-mtp_add_na(struct mtp_config *arg, struct na *na, int size, const int force, const int test)
+mtp_add_na(struct mtp_config *p, struct na *na, const bool force, const bool test)
 {
-	mtp_conf_na_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_na *c = (typeof(c)) (p + 1);
 
-	if (na || (size -= sizeof(*cnf)) < 0)
-		return (-EMSGSIZE);
+	if (na)
+		return (-EEXIST);
 	if (!test) {
-		if (!
-		    (na =
-		     mtp_alloc_na(na_get_id(arg->id), cnf->mask.member, cnf->mask.cluster,
-				  cnf->mask.network, cnf->sls_bits, &cnf->options)))
+		if (!(na = mtp_alloc_na(na_get_id(p->id), c)))
 			return (-ENOMEM);
-		arg->id = na->id;
+		p->id = na->id;
 	}
-	return (0);
+	return (sizeof(*p));
 }
 static int
-mtp_add_sp(struct mtp_config *arg, struct sp *sp, int size, const int force, const int test)
+mtp_add_sp(struct mtp_config *p, struct sp *sp, const bool force, const bool test)
 {
 	struct na *na;
-	mtp_conf_sp_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_sp *c = (typeof(c)) (p + 1);
 
-	if (sp || (size -= sizeof(*cnf)) < 0)
-		return (-EMSGSIZE);
-	for (na = master.na.list; na && na->id != cnf->naid; na = na->next) ;
-	if (!na)
-		return (-EINVAL);
-	/* signalling point point code must not be assigned yet */
-	for (sp = na->sp.list; sp && sp->pc != cnf->pc; sp = sp->na.next) ;
 	if (sp)
-		return (-EADDRINUSE);
-	if (!test) {
-		if (!(sp = mtp_alloc_sp(sp_get_id(arg->id), na, cnf->pc, cnf->users, cnf->flags)))
-			return (-ENOMEM);
-		arg->id = sp->id;
+		return (-EEXIST);
+	/* network appearance must exist */
+	if (!(na = na_lookup(c->naid)))
+		return (-ESRCH);
+	if (!force) {
+		/* signalling point point code must not be assigned yet */
+		for (sp = na->sp.list; sp && sp->pc != c->pc; sp = sp->na.next) ;
+		if (sp)
+			return (-EADDRINUSE);
 	}
-	return (0);
+	if (!test) {
+		if (!(sp = mtp_alloc_sp(sp_get_id(p->id), na, c)))
+			return (-ENOMEM);
+		p->id = sp->id;
+	}
+	return (sizeof(*p));
 }
 static int
-mtp_add_rs(struct mtp_config *arg, struct rs *rs, int size, const int force, const int test)
+mtp_add_rs(struct mtp_config *p, struct rs *rs, const bool force, const bool test)
 {
 	struct sp *sp;
-	mtp_conf_rs_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_rs *c = (typeof(c)) (p + 1);
 
-	if (rs || (size -= sizeof(*cnf)) < 0)
-		return (-EMSGSIZE);
-	for (sp = master.sp.list; sp && sp->id != cnf->spid; sp = sp->next) ;
-	if (!sp)
-		return (-EINVAL);
-	/* route set point code must not be assigned yet */
-	for (rs = sp->rs.list; rs && rs->dest != cnf->dest; rs = rs->sp.next) ;
 	if (rs)
-		return (-EADDRINUSE);
-	if (!test) {
-		if (!(rs = mtp_alloc_rs(rs_get_id(arg->id), sp, cnf->dest, cnf->flags)))
-			return (-ENOMEM);
-		arg->id = rs->id;
+		return (-EEXIST);
+	/* signalling point must exist */
+	if (!(sp = sp_lookup(c->spid)))
+		return (-ESRCH);
+	if (!force) {
+		/* route set point code must not be assigned yet */
+		for (rs = sp->rs.list; rs && rs->dest != c->dest; rs = rs->sp.next) ;
+		if (rs)
+			return (-EADDRINUSE);
 	}
-	return (0);
+	if (!test) {
+		if (!(rs = mtp_alloc_rs(rs_get_id(p->id), sp, c)))
+			return (-ENOMEM);
+		p->id = rs->id;
+	}
+	return (sizeof(*p));
 }
 static int
-mtp_add_rl(struct mtp_config *arg, struct rl *rl, int size, const int force, const int test)
+mtp_add_rl(struct mtp_config *p, struct rl *rl, const bool force, const bool test)
 {
 	struct rs *rs;
 	struct ls *ls;
-	mtp_conf_rl_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_rl *c = (typeof(c)) (p + 1);
 
-	if (rl || (size -= sizeof(*cnf)) < 0)
-		return (-EMSGSIZE);
-	for (ls = master.ls.list; ls && ls->id != cnf->lsid; ls = ls->next) ;
-	if (!ls)
-		return (-EINVAL);
-	for (rs = master.rs.list; rs && rs->id != cnf->rsid; rs = rs->next) ;
-	if (!rs)
+	if (rl)
+		return (-EEXIST);
+	/* combined link set must exist */
+	if (!(ls = ls_lookup(c->lsid)))
+		return (-ESRCH);
+	/* route set must exist */
+	if (!(rs = rs_lookup(c->rsid)))
+		return (-ESRCH);
+	/* combined link set must belong to the same sp */
+	if (rs->sp.sp != ls->sp.sp)
 		return (-EINVAL);
 	if (!test) {
-		if (!(rl = mtp_alloc_rl(rl_get_id(arg->id), rs, ls, cnf->cost)))
+		if (!(rl = mtp_alloc_rl(rl_get_id(p->id), rs, ls, c)))
 			return (-ENOMEM);
-		arg->id = rl->id;
+		p->id = rl->id;
 	}
-	return (0);
+	return (sizeof(*p));
 }
 static int
-mtp_add_rt(struct mtp_config *arg, struct rt *rt, int size, const int force, const int test)
+mtp_add_rt(struct mtp_config *p, struct rt *rt, const bool force, const bool test)
 {
 	struct rl *rl;
 	struct lk *lk = NULL;
 	struct ls *ls;
-	mtp_conf_rt_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_rt *c = (typeof(c)) (p + 1);
 
-	if (rt || (size -= sizeof(*cnf)) < 0)
-		return (-EMSGSIZE);
-	for (rl = master.rl.list; rl && rl->id != cnf->rlid; rl = rl->next) ;
-	if (!rl)
-		return (-EINVAL);
-	for (ls = rl->rs.rs->sp.sp->ls.list; ls; ls = ls->sp.next)
-		for (lk = ls->lk.list; lk; lk = lk->ls.next)
-			if (lk->id == cnf->lkid)
-				goto found_lk;
-	if (!lk)
-		return (-EINVAL);
-      found_lk:
-	if (!test) {
-		if (!(rt = mtp_alloc_rt(rt_get_id(arg->id), rl, lk, cnf->slot)))
-			return (-ENOMEM);
-		arg->id = rt->id;
-	}
-	return (0);
-}
-static int
-mtp_add_ls(struct mtp_config *arg, struct ls *ls, int size, const int force, const int test)
-{
-	struct sp *sp;
-	mtp_conf_ls_t *cnf = (typeof(cnf)) (arg + 1);
-
-	if (ls || (size -= sizeof(*cnf)) < 0)
-		return (-EMSGSIZE);
-	for (sp = master.sp.list; sp && sp->id != cnf->spid; sp = sp->next) ;
-	if (!sp)
+	if (rt)
+		return (-EEXIST);
+	/* route list must exist */
+	if (!(rl = rl_lookup(c->rlid)))
+		return (-ESRCH);
+	/* link set must exist */
+	if (!(lk = lk_lookup(c->lkid)))
+		return (-ESRCH);
+	/* link must belong to same combined linkset */
+	if (rl->rs.rs->ls.ls != lk->ls.ls)
 		return (-EINVAL);
 	if (!test) {
-		if (!(ls = mtp_alloc_ls(ls_get_id(arg->id), sp, cnf->sls_mask)))
+		if (!(rt = mtp_alloc_rt(rt_get_id(p->id), rl, lk, c)))
 			return (-ENOMEM);
-		arg->id = ls->id;
+		p->id = rt->id;
 	}
-	return (0);
+	return (sizeof(*p));
 }
 static int
-mtp_add_lk(struct mtp_config *arg, struct lk *lk, int size, const int force, const int test)
+mtp_add_ls(struct mtp_config *p, struct ls *ls, const bool force, const bool test)
 {
-	struct ls *ls, *l;
 	struct sp *sp;
+	struct mtp_conf_ls *c = (typeof(c)) (p + 1);
+
+	if (ls)
+		return (-EEXIST);
+	/* signalling point must exist */
+	if (!(sp = sp_lookup(c->spid)))
+		return (-ESRCH);
+	if (!test) {
+		if (!(ls = mtp_alloc_ls(ls_get_id(p->id), sp, c)))
+			return (-ENOMEM);
+		p->id = ls->id;
+	}
+	return (sizeof(*p));
+}
+static int
+mtp_add_lk(struct mtp_config *p, struct lk *lk, const bool force, const bool test)
+{
+	struct ls *ls;
 	struct rs *rs;
-	mtp_conf_lk_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_lk *c = (typeof(c)) (p + 1);
 
-	if (lk || (size -= sizeof(*cnf)) < 0)
-		return (-EMSGSIZE);
-	for (ls = master.ls.list; ls && ls->id != cnf->lsid; ls = ls->next) ;
-	if (!ls)
-		return (-EINVAL);
-	if (!(sp = ls->sp.sp))
-		return (-EFAULT);
-	for (rs = sp->rs.list; rs && rs->id != cnf->rsid; rs = rs->sp.next) ;
-	if (!rs)
-		return (-EINVAL);
-	for (l = sp->ls.list; l; l = l->sp.next)
-		for (lk = l->lk.list; lk; lk = lk->ls.next)
+	if (lk)
+		return (-EEXIST);
+	/* route set must exist */
+	if (!(rs = rs_lookup(c->rsid)))
+		return (-ESRCH);
+	/* adjacent routeset must not already be assigned */
+	for (ls = sp->ls.list; ls; ls = ls->sp.next)
+		for (lk = ls->lk.list; lk; lk = lk->ls.next)
 			if (lk->sp.adj == rs)
-				return (-EBUSY);
+				return (-EADDRINUSE);
+	/* (combined) link set must exist */
+	if (!(ls = ls_lookup(c->lsid)))
+		return (-ESRCH);
+	/* link set must belong to the same sp */
+	if (ls->sp.sp != rs->sp.sp)
+		return (-EINVAL);
+	/* no other link must be assigned to same slot */
 	for (lk = ls->lk.list; lk; lk = lk->ls.next)
-		if (lk->slot == cnf->slot)
+		if (lk->slot == c->slot)
 			return (-EBUSY);
 	if (!test) {
-		if (!(lk = mtp_alloc_lk(lk_get_id(arg->id), ls, sp, rs, cnf->ni, cnf->slot)))
+		if (!(lk = mtp_alloc_lk(lk_get_id(p->id), ls, rs, rs->sp.sp, c)))
 			return (-ENOMEM);
-		arg->id = lk->id;
+		p->id = lk->id;
 	}
-	return (0);
+	return (sizeof(*p));
 }
 static int
-mtp_add_sl(struct mtp_config *arg, struct sl *sl, int size, const int force, const int test)
+mtp_add_sl(struct mtp_config *p, struct sl *sl, const bool force, const bool test)
 {
 	struct lk *lk;
-	mtp_conf_sl_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_sl *c = (typeof(c)) (p + 1);
 
-	if (sl || (size -= sizeof(*cnf)) < 0)
-		return (-EMSGSIZE);
-	for (lk = master.lk.list; lk && lk->id != cnf->lkid; lk = lk->next) ;
-	if (!lk)
-		return (-EINVAL);
+	if (sl)
+		return (-EEXIST);
+	/* link (set) must already exist */
+	if (!(lk = lk_lookup(c->lkid)))
+		return (-ESRCH);
+	/* signalling link code must be unique */
 	for (sl = lk->sl.list; sl; sl = sl->lk.next)
-		if (sl->slc == cnf->slc)
+		if (sl->slc == c->slc)
 			return (-EBUSY);
-	for (sl = master.sl.list; sl && sl->u.mux.index != cnf->muxid; sl = sl->next) ;
-	if (!sl)
-		return (-EINVAL);
+	/* signalling link must be linked */
+	if (!(sl = sl_lookup_mux(c->muxid)))
+		return (-ESRCH);
 	if (!test) {
-		sl->id = sl_get_id(arg->id);
-		if (lk) {
-			/* add to link (set) list */
-			if ((sl->lk.next = lk->sl.list))
-				sl->lk.next->lk.prev = &sl->lk.next;
-			sl->lk.prev = &lk->sl.list;
-			sl->lk.lk = lk_get(lk);
-			lk->sl.list = sl_get(sl);
-			lk->sl.numb++;
-		}
-		sl->slc = cnf->slc;
-		{
-			/* defaults inherited from lk */
-			sl->config.t1 = lk->config.t1;
-			sl->config.t2 = lk->config.t2;
-			sl->config.t3 = lk->config.t3;
-			sl->config.t4 = lk->config.t4;
-			sl->config.t5 = lk->config.t5;
-			sl->config.t12 = lk->config.t12;
-			sl->config.t13 = lk->config.t13;
-			sl->config.t14 = lk->config.t14;
-			sl->config.t17 = lk->config.t17;
-			sl->config.t19a = lk->config.t19a;
-			sl->config.t20a = lk->config.t20a;
-			sl->config.t21a = lk->config.t21a;
-			sl->config.t22 = lk->config.t22;
-			sl->config.t23 = lk->config.t23;
-			sl->config.t24 = lk->config.t24;
-			sl->config.t31a = lk->config.t31a;
-			sl->config.t32a = lk->config.t32a;
-			sl->config.t33a = lk->config.t33a;
-			sl->config.t34a = lk->config.t34a;
-			sl->config.t1t = lk->config.t1t;
-			sl->config.t2t = lk->config.t2t;
-			sl->config.t1s = lk->config.t1s;
-		}
-		arg->id = sl->id;
+		if (!(sl = mtp_alloc_sl(sl_get_id(p->id), sl, lk, c)))
+			return (-ENOMEM);
+		p->id = lk->id;
 	}
-	return (0);
+	return (sizeof(*p));
 }
 static int
-mtp_add_df(struct mtp_config *arg, struct df *df, int size, const int force, const int test)
+mtp_add_df(struct mtp_config *p, struct df *df, const bool force, const bool test)
 {
-	mtp_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_df *c = (typeof(c)) (p + 1);
 
-	if (df || (size -= sizeof(*cnf)) < 0)
-		return (-EMSGSIZE);
+	if (df)
+		return (-EEXIST);
 	/* DF objects are not added statically */
 	return (-EINVAL);
 }
 static int
-mtp_add_conf(struct mtp_config *arg, int size, const int force, const int test)
+mtp_add_conf(struct mtp_config *p, const bool force, const bool test)
 {
-	switch (arg->type) {
+	switch (p->type) {
 	case MTP_OBJ_TYPE_NA:
-		return mtp_add_na(arg, na_lookup(arg->id), size, force, test);
+		return mtp_add_na(p, na_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_SP:
-		return mtp_add_sp(arg, sp_lookup(arg->id), size, force, test);
+		return mtp_add_sp(p, sp_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_RS:
-		return mtp_add_rs(arg, rs_lookup(arg->id), size, force, test);
+		return mtp_add_rs(p, rs_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_RL:
-		return mtp_add_rl(arg, rl_lookup(arg->id), size, force, test);
+		return mtp_add_rl(p, rl_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_RT:
-		return mtp_add_rt(arg, rt_lookup(arg->id), size, force, test);
+		return mtp_add_rt(p, rt_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_LS:
-		return mtp_add_ls(arg, ls_lookup(arg->id), size, force, test);
+		return mtp_add_ls(p, ls_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_LK:
-		return mtp_add_lk(arg, lk_lookup(arg->id), size, force, test);
+		return mtp_add_lk(p, lk_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_SL:
-		return mtp_add_sl(arg, sl_lookup(arg->id), size, force, test);
+		return mtp_add_sl(p, sl_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_DF:
-		return mtp_add_df(arg, df_lookup(arg->id), size, force, test);
+		return mtp_add_df(p, df_lookup(p->id), force, test);
 	default:
 		rare();
 		return (-EINVAL);
@@ -14500,36 +16631,36 @@ mtp_add_conf(struct mtp_config *arg, int size, const int force, const int test)
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
 static int
-mtp_cha_na(struct mtp_config *arg, struct na *na, int size, const int force, const int test)
+mtp_cha_na(struct mtp_config *p, struct na *na, const bool force, const bool test)
 {
-	mtp_conf_na_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_na *c = (typeof(c)) (p + 1);
 
-	if (!na || (size -= sizeof(*cnf)) < 0)
-		return (-EINVAL);
+	if (!na)
+		return (-ESRCH);
 	if (!force) {
 	}
 	if (!test) {
-		na->option = cnf->options;
-		na->mask.member = cnf->mask.member;
-		na->mask.cluster = cnf->mask.cluster;
-		na->mask.network = cnf->mask.network;
-		na->sp.sls_bits = cnf->sls_bits;
-		na->sp.sls_mask = ((1 << cnf->sls_bits) - 1);
+		na->option = c->options;
+		na->mask.member = c->mask.member;
+		na->mask.cluster = c->mask.cluster;
+		na->mask.network = c->mask.network;
+		na->sp.sls_bits = c->sls_bits;
+		na->sp.sls_mask = ((1 << c->sls_bits) - 1);
 	}
 	return (0);
 }
 static int
-mtp_cha_sp(struct mtp_config *arg, struct sp *sp, int size, const int force, const int test)
+mtp_cha_sp(struct mtp_config *p, struct sp *sp, const bool force, const bool test)
 {
 	struct sp *s;
-	mtp_conf_sp_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_sp *c = (typeof(c)) (p + 1);
 
-	if (!sp || (size -= sizeof(*cnf)) < 0)
-		return (-EINVAL);
-	if (cnf->naid && cnf->naid != sp->na.na->id)
+	if (!sp)
+		return (-ESRCH);
+	if (c->naid && c->naid != sp->na.na->id)
 		return (-EINVAL);
 	for (s = sp->na.na->sp.list; s; s = s->na.next)
-		if (s != sp && s->pc == cnf->pc)
+		if (s != sp && s->pc == c->pc)
 			return (-EINVAL);
 	if (!force) {
 		int i;
@@ -14543,28 +16674,28 @@ mtp_cha_sp(struct mtp_config *arg, struct sp *sp, int size, const int force, con
 			return (-EBUSY);
 	}
 	if (!test) {
-		ulong mask =
+		uint mask =
 		    (SPF_CLUSTER | SPF_LOSC_PROC_A | SPF_LOSC_PROC_B | SPF_SECURITY |
 		     SPF_XFER_FUNC);
-		sp->pc = cnf->pc;
-		sp->mtp.equipped = cnf->users | sp->mtp.available;
+		sp->pc = c->pc;
+		sp->mtp.equipped = c->users | sp->mtp.available;
 		sp->flags &= ~mask;
-		sp->flags |= cnf->flags & mask;
+		sp->flags |= c->flags & mask;
 	}
 	return (0);
 }
 static int
-mtp_cha_rs(struct mtp_config *arg, struct rs *rs, int size, const int force, const int test)
+mtp_cha_rs(struct mtp_config *p, struct rs *rs, const bool force, const bool test)
 {
 	struct rs *r;
-	mtp_conf_rs_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_rs *c = (typeof(c)) (p + 1);
 
-	if (!rs || (size -= sizeof(*cnf)) < 0)
-		return (-EINVAL);
-	if (cnf->spid && cnf->spid != rs->sp.sp->id)
+	if (!rs)
+		return (-ESRCH);
+	if (c->spid && c->spid != rs->sp.sp->id)
 		return (-EINVAL);
 	for (r = rs->sp.sp->rs.list; r; r = r->sp.next)
-		if (r != rs && r->dest == cnf->dest)
+		if (r != rs && r->dest == c->dest)
 			return (-EINVAL);
 	if (!force) {
 		/* have route lists */
@@ -14572,76 +16703,76 @@ mtp_cha_rs(struct mtp_config *arg, struct rs *rs, int size, const int force, con
 			return (-EBUSY);
 	}
 	if (!test) {
-		ulong mask = (RSF_TFR_PENDING | RSF_ADJACENT | RSF_CLUSTER | RSF_XFER_FUNC);
+		uint mask = (RSF_TFR_PENDING | RSF_ADJACENT | RSF_CLUSTER | RSF_XFER_FUNC);
 
-		rs->dest = cnf->dest;
+		rs->dest = c->dest;
 		rs->flags &= ~mask;
-		rs->flags |= cnf->flags & mask;
+		rs->flags |= c->flags & mask;
 	}
 	return (0);
 }
 static int
-mtp_cha_rl(struct mtp_config *arg, struct rl *rl, int size, const int force, const int test)
+mtp_cha_rl(struct mtp_config *p, struct rl *rl, const bool force, const bool test)
 {
 	struct rl *r;
-	mtp_conf_rl_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_rl *c = (typeof(c)) (p + 1);
 
-	if (!rl || (size -= sizeof(*cnf)) < 0)
+	if (!rl)
+		return (-ESRCH);
+	if (c->rsid && c->rsid != rl->rs.rs->id)
 		return (-EINVAL);
-	if (cnf->rsid && cnf->rsid != rl->rs.rs->id)
-		return (-EINVAL);
-	if (cnf->lsid && cnf->lsid != rl->ls.ls->id)
+	if (c->lsid && c->lsid != rl->ls.ls->id)
 		return (-EINVAL);
 	for (r = rl->rs.rs->rl.list; r; r = r->rs.next)
-		if (r != rl && r->cost == cnf->cost)
+		if (r != rl && r->cost == c->cost)
 			return (-EINVAL);
 	if (!force) {
 		if (rl->rt.list || rl->cr.list)
 			return (-EBUSY);
 	}
 	if (!test) {
-		rl->cost = cnf->cost;
+		rl->cost = c->cost;
 	}
 	return (0);
 }
 static int
-mtp_cha_rt(struct mtp_config *arg, struct rt *rt, int size, const int force, const int test)
+mtp_cha_rt(struct mtp_config *p, struct rt *rt, const bool force, const bool test)
 {
 	struct rt *r;
-	mtp_conf_rt_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_rt *c = (typeof(c)) (p + 1);
 
-	if (!rt || (size -= sizeof(*cnf)) < 0)
+	if (!rt)
+		return (-ESRCH);
+	if (c->rlid && c->rlid != rt->rl.rl->id)
 		return (-EINVAL);
-	if (cnf->rlid && cnf->rlid != rt->rl.rl->id)
-		return (-EINVAL);
-	if (cnf->lkid && cnf->lkid != rt->lk.lk->id)
+	if (c->lkid && c->lkid != rt->lk.lk->id)
 		return (-EINVAL);
 	for (r = rt->rl.rl->rt.list; r; r = r->next)
-		if (r != rt && r->slot == cnf->slot)
+		if (r != rt && r->slot == c->slot)
 			return (-EINVAL);
 	if (!force) {
 	}
 	if (!test) {
-		rt->slot = cnf->slot;
+		rt->slot = c->slot;
 	}
 	return (0);
 }
 static int
-mtp_cha_ls(struct mtp_config *arg, struct ls *ls, int size, const int force, const int test)
+mtp_cha_ls(struct mtp_config *p, struct ls *ls, const bool force, const bool test)
 {
-	mtp_conf_ls_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_ls *c = (typeof(c)) (p + 1);
 
-	if (!ls || (size -= sizeof(*cnf)) < 0)
-		return (-EINVAL);
-	if (cnf->spid && cnf->spid != ls->sp.sp->id)
+	if (!ls)
+		return (-ESRCH);
+	if (c->spid && c->spid != ls->sp.sp->id)
 		return (-EINVAL);
 	if (!force) {
 	}
 	if (!test) {
 		struct sp *sp = ls->sp.sp;
-		ulong mask = cnf->sls_mask;
+		uint mask = c->sls_mask;
 
-		ls->lk.sls_mask = cnf->sls_mask;
+		ls->lk.sls_mask = c->sls_mask;
 		ls->lk.sls_bits = 0;
 		/* count the 1's in the mask */
 		while (mask) {
@@ -14649,59 +16780,61 @@ mtp_cha_ls(struct mtp_config *arg, struct ls *ls, int size, const int force, con
 				ls->lk.sls_bits++;
 			mask >>= 1;
 		}
-		ls->rl.sls_mask = ~cnf->sls_mask & sp->ls.sls_mask;
+		ls->rl.sls_mask = ~c->sls_mask & sp->ls.sls_mask;
 		ls->rl.sls_bits = sp->ls.sls_bits - ls->lk.sls_bits;
 	}
 	return (0);
 }
 static int
-mtp_cha_lk(struct mtp_config *arg, struct lk *lk, int size, const int force, const int test)
+mtp_cha_lk(struct mtp_config *p, struct lk *lk, const bool force, const bool test)
 {
-	mtp_conf_lk_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_lk *c = (typeof(c)) (p + 1);
 
-	if (!lk || (size -= sizeof(*cnf)) < 0)
+	if (!lk)
+		return (-ESRCH);
+	if (c->lsid && c->lsid != lk->ls.ls->id)
 		return (-EINVAL);
-	if (cnf->lsid && cnf->lsid != lk->ls.ls->id)
-		return (-EINVAL);
-	if (cnf->rsid && cnf->rsid != lk->sp.adj->id)
+	if (c->rsid && c->rsid != lk->sp.adj->id)
 		return (-EINVAL);
 	if (!force) {
 	}
 	if (!test) {
-		lk->ni = cnf->ni;
-		lk->slot = cnf->slot;
+		lk->ni = c->ni;
+		lk->slot = c->slot;
 	}
 	return (0);
 }
 static int
-mtp_cha_sl(struct mtp_config *arg, struct sl *sl, int size, const int force, const int test)
+mtp_cha_sl(struct mtp_config *p, struct sl *sl, const bool force, const bool test)
 {
 	struct sl *s;
-	mtp_conf_sl_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_sl *c = (typeof(c)) (p + 1);
 
-	if (!sl || (size -= sizeof(*cnf)) < 0)
+	if (!sl)
+		return (-ESRCH);
+	if (!sl->lk.lk)
 		return (-EINVAL);
-	if (cnf->muxid && cnf->muxid != sl->u.mux.index)
+	if (c->muxid && c->muxid != sl->u.mux.index)
 		return (-EINVAL);
-	if (cnf->lkid && cnf->lkid != sl->lk.lk->id)
+	if (c->lkid && c->lkid != sl->lk.lk->id)
 		return (-EINVAL);
 	for (s = sl->lk.lk->sl.list; s; s = s->lk.next)
-		if (s != sl && s->slc == cnf->slc)
+		if (s != sl && s->slc == c->slc)
 			return (-EINVAL);
 	if (!force) {
 	}
 	if (!test) {
-		sl->slc = cnf->slc;
+		sl->slc = c->slc;
 	}
 	return (0);
 }
 static int
-mtp_cha_df(struct mtp_config *arg, struct df *df, int size, const int force, const int test)
+mtp_cha_df(struct mtp_config *p, struct df *df, const bool force, const bool test)
 {
-	mtp_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_df *c = (typeof(c)) (p + 1);
 
-	if (!df || (size -= sizeof(*cnf)) < 0)
-		return (-EINVAL);
+	if (!df)
+		return (-ESRCH);
 	if (!force) {
 	}
 	if (!test) {
@@ -14709,27 +16842,27 @@ mtp_cha_df(struct mtp_config *arg, struct df *df, int size, const int force, con
 	return (0);
 }
 static int
-mtp_cha_conf(struct mtp_config *arg, int size, const int force, const int test)
+mtp_cha_conf(struct mtp_config *p, const bool force, const bool test)
 {
-	switch (arg->type) {
+	switch (p->type) {
 	case MTP_OBJ_TYPE_NA:
-		return mtp_cha_na(arg, na_lookup(arg->id), size, force, test);
+		return mtp_cha_na(p, na_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_SP:
-		return mtp_cha_sp(arg, sp_lookup(arg->id), size, force, test);
+		return mtp_cha_sp(p, sp_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_RS:
-		return mtp_cha_rs(arg, rs_lookup(arg->id), size, force, test);
+		return mtp_cha_rs(p, rs_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_RL:
-		return mtp_cha_rl(arg, rl_lookup(arg->id), size, force, test);
+		return mtp_cha_rl(p, rl_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_RT:
-		return mtp_cha_rt(arg, rt_lookup(arg->id), size, force, test);
+		return mtp_cha_rt(p, rt_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_LS:
-		return mtp_cha_ls(arg, ls_lookup(arg->id), size, force, test);
+		return mtp_cha_ls(p, ls_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_LK:
-		return mtp_cha_lk(arg, lk_lookup(arg->id), size, force, test);
+		return mtp_cha_lk(p, lk_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_SL:
-		return mtp_cha_sl(arg, sl_lookup(arg->id), size, force, test);
+		return mtp_cha_sl(p, sl_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_DF:
-		return mtp_cha_df(arg, df_lookup(arg->id), size, force, test);
+		return mtp_cha_df(p, df_lookup(p->id), force, test);
 	default:
 		rare();
 		return (-EINVAL);
@@ -14741,10 +16874,10 @@ mtp_cha_conf(struct mtp_config *arg, int size, const int force, const int test)
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
 static int
-mtp_del_na(struct mtp_config *arg, struct na *na, int size, const int force, const int test)
+mtp_del_na(struct mtp_config *p, struct na *na, const bool force, const bool test)
 {
 	if (!na)
-		return (-EINVAL);
+		return (-ESRCH);
 	if (!force) {
 		/* bound to internal data structures */
 		if (na->sp.list)
@@ -14756,10 +16889,10 @@ mtp_del_na(struct mtp_config *arg, struct na *na, int size, const int force, con
 	return (0);
 }
 static int
-mtp_del_sp(struct mtp_config *arg, struct sp *sp, int size, const int force, const int test)
+mtp_del_sp(struct mtp_config *p, struct sp *sp, const bool force, const bool test)
 {
 	if (!sp)
-		return (-EINVAL);
+		return (-ESRCH);
 	if (!force) {
 		int i;
 
@@ -14776,10 +16909,10 @@ mtp_del_sp(struct mtp_config *arg, struct sp *sp, int size, const int force, con
 	return (0);
 }
 static int
-mtp_del_rs(struct mtp_config *arg, struct rs *rs, int size, const int force, const int test)
+mtp_del_rs(struct mtp_config *p, struct rs *rs, const bool force, const bool test)
 {
 	if (!rs)
-		return (-EINVAL);
+		return (-ESRCH);
 	if (!force) {
 		/* bound to internal data structures */
 		if (rs->rl.list || rs->rr.list)
@@ -14791,10 +16924,10 @@ mtp_del_rs(struct mtp_config *arg, struct rs *rs, int size, const int force, con
 	return (0);
 }
 static int
-mtp_del_rl(struct mtp_config *arg, struct rl *rl, int size, const int force, const int test)
+mtp_del_rl(struct mtp_config *p, struct rl *rl, const bool force, const bool test)
 {
 	if (!rl)
-		return (-EINVAL);
+		return (-ESRCH);
 	if (!force) {
 		/* bound to internal data structures */
 		if (rl->rt.list || rl->cr.list)
@@ -14806,10 +16939,10 @@ mtp_del_rl(struct mtp_config *arg, struct rl *rl, int size, const int force, con
 	return (0);
 }
 static int
-mtp_del_rt(struct mtp_config *arg, struct rt *rt, int size, const int force, const int test)
+mtp_del_rt(struct mtp_config *p, struct rt *rt, const bool force, const bool test)
 {
 	if (!rt)
-		return (-EINVAL);
+		return (-ESRCH);
 	if (!force) {
 		/* bound to internal data structures */
 	}
@@ -14819,10 +16952,10 @@ mtp_del_rt(struct mtp_config *arg, struct rt *rt, int size, const int force, con
 	return (0);
 }
 static int
-mtp_del_ls(struct mtp_config *arg, struct ls *ls, int size, const int force, const int test)
+mtp_del_ls(struct mtp_config *p, struct ls *ls, const bool force, const bool test)
 {
 	if (!ls)
-		return (-EINVAL);
+		return (-ESRCH);
 	if (!force) {
 		/* bound to internal data structures */
 	}
@@ -14832,10 +16965,10 @@ mtp_del_ls(struct mtp_config *arg, struct ls *ls, int size, const int force, con
 	return (0);
 }
 static int
-mtp_del_lk(struct mtp_config *arg, struct lk *lk, int size, const int force, const int test)
+mtp_del_lk(struct mtp_config *p, struct lk *lk, const bool force, const bool test)
 {
 	if (!lk)
-		return (-EINVAL);
+		return (-ESRCH);
 	if (!force) {
 		/* bound to internal data structures */
 		if (lk->rt.list || lk->cb.list || lk->sl.list)
@@ -14847,10 +16980,10 @@ mtp_del_lk(struct mtp_config *arg, struct lk *lk, int size, const int force, con
 	return (0);
 }
 static int
-mtp_del_sl(struct mtp_config *arg, struct sl *sl, int size, const int force, const int test)
+mtp_del_sl(struct mtp_config *p, struct sl *sl, const bool force, const bool test)
 {
 	if (!sl)
-		return (-EINVAL);
+		return (-ESRCH);
 	if (!force) {
 		/* bound to internal datastructures */
 		if (sl->lk.lk)
@@ -14862,12 +16995,12 @@ mtp_del_sl(struct mtp_config *arg, struct sl *sl, int size, const int force, con
 	return (0);
 }
 static int
-mtp_del_df(struct mtp_config *arg, struct df *df, int size, const int force, const int test)
+mtp_del_df(struct mtp_config *p, struct df *df, const bool force, const bool test)
 {
-	mtp_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+	struct mtp_conf_df *c = (typeof(c)) (p + 1);
 
-	if (!df || (size -= sizeof(*cnf)) < 0)
-		return (-EINVAL);
+	if (!df)
+		return (-ESRCH);
 	if (!force) {
 		return (-EBUSY);
 	}
@@ -14877,358 +17010,82 @@ mtp_del_df(struct mtp_config *arg, struct df *df, int size, const int force, con
 	return (0);
 }
 static int
-mtp_del_conf(struct mtp_config *arg, int size, const int force, const int test)
+mtp_del_conf(struct mtp_config *p, const bool force, const bool test)
 {
-	switch (arg->type) {
+	switch (p->type) {
 	case MTP_OBJ_TYPE_NA:
-		return mtp_del_na(arg, na_lookup(arg->id), size, force, test);
+		return mtp_del_na(p, na_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_SP:
-		return mtp_del_sp(arg, sp_lookup(arg->id), size, force, test);
+		return mtp_del_sp(p, sp_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_RS:
-		return mtp_del_rs(arg, rs_lookup(arg->id), size, force, test);
+		return mtp_del_rs(p, rs_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_RL:
-		return mtp_del_rl(arg, rl_lookup(arg->id), size, force, test);
+		return mtp_del_rl(p, rl_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_RT:
-		return mtp_del_rt(arg, rt_lookup(arg->id), size, force, test);
+		return mtp_del_rt(p, rt_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_LS:
-		return mtp_del_ls(arg, ls_lookup(arg->id), size, force, test);
+		return mtp_del_ls(p, ls_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_LK:
-		return mtp_del_lk(arg, lk_lookup(arg->id), size, force, test);
+		return mtp_del_lk(p, lk_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_SL:
-		return mtp_del_sl(arg, sl_lookup(arg->id), size, force, test);
+		return mtp_del_sl(p, sl_lookup(p->id), force, test);
 	case MTP_OBJ_TYPE_DF:
-		return mtp_del_df(arg, df_lookup(arg->id), size, force, test);
+		return mtp_del_df(p, df_lookup(p->id), force, test);
 	default:
 		rare();
 		return (-EINVAL);
 	}
 }
 
-static int mtp_mgmt_na(queue_t *q, struct na *, ulong);
-static int mtp_mgmt_sp(queue_t *q, struct sp *, ulong);
-static int mtp_mgmt_rs(queue_t *q, struct rs *, ulong);
-static int mtp_mgmt_rl(queue_t *q, struct rl *, ulong);
-static int mtp_mgmt_rt(queue_t *q, struct rt *, ulong);
-static int mtp_mgmt_ls(queue_t *q, struct ls *, ulong);
-static int mtp_mgmt_lk(queue_t *q, struct lk *, ulong);
-static int mtp_mgmt_sl(queue_t *q, struct sl *, ulong);
-static int mtp_mgmt_df(queue_t *q, struct df *, ulong);
+static int
+mtp_do_conf(mblk_t *dp, const bool force, const bool test)
+{
+	struct mtp_config *p = (typeof(p)) dp->b_rptr;
+	int rtn;
+
+	switch (p->cmd) {
+	case MTP_ADD:
+		rtn = mtp_add_conf(p, force, test);
+		break;
+	case MTP_CHA:
+		rtn = mtp_cha_conf(p, force, test);
+		break;
+	case MTP_DEL:
+		rtn = mtp_del_conf(p, force, test);
+		break;
+	default:
+		return (EINVAL);
+	}
+	if (rtn < 0)
+		return (-rtn);
+	dp->b_wptr = dp->b_rptr + rtn;
+	return (0);
+}
+static int
+mtp_set_conf(mblk_t *dp)
+{
+	return mtp_do_conf(dp, false, false);
+}
+static int
+mtp_test_conf(mblk_t *dp)
+{
+	return mtp_do_conf(dp, false, true);
+}
+static int
+mtp_commit_conf(mblk_t *dp)
+{
+	return mtp_do_conf(dp, true, false);
+}
 
 /*
  *  MGMT - Manage Object
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
 static int
-mtp_mgmt_na(queue_t *q, struct na *na, ulong action)
+mtp_mgmt_sl(queue_t *q, struct sl *sl, uint action)
 {
-	int ret, err = 0;
-	struct sp *sp;
-
-	/* we actually don't manage network appearances, just all of the signalling points that
-	   make up a network appearance. */
-	for (sp = na->sp.list; sp; sp = sp->na.next)
-		if ((ret = mtp_mgmt_sp(q, sp, action)) < 0) {
-			if (ret != -EOPNOTSUPP)
-				return (ret);
-			err = ret;
-		}
-	return (err);
-}
-static int
-mtp_mgmt_sp(queue_t *q, struct sp *sp, ulong action)
-{
-	int ret, err = 0;
-	struct rs *rs;
-	struct ls *ls;
-
-	switch (action) {
-	case MTP_MGMT_ALLOW:
-		break;
-	case MTP_MGMT_RESTRICT:
-		break;
-	case MTP_MGMT_PROHIBIT:
-		break;
-	case MTP_MGMT_ACTIVATE:
-		break;
-	case MTP_MGMT_DEACTIVATE:
-		break;
-	case MTP_MGMT_BLOCK:
-		break;
-	case MTP_MGMT_UNBLOCK:
-		break;
-	case MTP_MGMT_INHIBIT:
-		break;
-	case MTP_MGMT_UNINHIBIT:
-		break;
-	case MTP_MGMT_CONGEST:
-		break;
-	case MTP_MGMT_UNCONGEST:
-		break;
-	case MTP_MGMT_DANGER:
-		break;
-	case MTP_MGMT_NODANGER:
-		break;
-	case MTP_MGMT_RESTART:
-		break;
-	case MTP_MGMT_RESTARTED:
-		break;
-	default:
-		rare();
-		return (-EOPNOTSUPP);
-	}
-	for (rs = sp->rs.list; rs; rs = rs->sp.next)
-		if ((ret = mtp_mgmt_rs(q, rs, action)) < 0) {
-			if (ret != -EOPNOTSUPP)
-				return (ret);
-			err = ret;
-		}
-	for (ls = sp->ls.list; ls; ls = ls->sp.next)
-		if ((ret = mtp_mgmt_ls(q, ls, action)) < 0) {
-			if (ret != -EOPNOTSUPP)
-				return (ret);
-			err = ret;
-		}
-	return (err);
-}
-static int
-mtp_mgmt_rs(queue_t *q, struct rs *rs, ulong action)
-{
-	int ret, err = 0;
-	struct rl *rl;
-
-	switch (action) {
-	case MTP_MGMT_ALLOW:
-		break;
-	case MTP_MGMT_RESTRICT:
-		break;
-	case MTP_MGMT_PROHIBIT:
-		break;
-	case MTP_MGMT_ACTIVATE:
-		break;
-	case MTP_MGMT_DEACTIVATE:
-		break;
-	case MTP_MGMT_BLOCK:
-		break;
-	case MTP_MGMT_UNBLOCK:
-		break;
-	case MTP_MGMT_INHIBIT:
-		break;
-	case MTP_MGMT_UNINHIBIT:
-		break;
-	case MTP_MGMT_CONGEST:
-		break;
-	case MTP_MGMT_UNCONGEST:
-		break;
-	case MTP_MGMT_DANGER:
-		break;
-	case MTP_MGMT_NODANGER:
-		break;
-	case MTP_MGMT_RESTART:
-		break;
-	case MTP_MGMT_RESTARTED:
-		break;
-	default:
-		rare();
-		return (-EOPNOTSUPP);
-	}
-	for (rl = rs->rl.list; rl; rl = rl->rs.next)
-		if ((ret = mtp_mgmt_rl(q, rl, action)) < 0) {
-			if (ret != -EOPNOTSUPP)
-				return (ret);
-			err = ret;
-		}
-	return (err);
-}
-static int
-mtp_mgmt_rl(queue_t *q, struct rl *rl, ulong action)
-{
-	int ret, err = 0;
-	struct rt *rt;
-
-	switch (action) {
-	case MTP_MGMT_ALLOW:
-		break;
-	case MTP_MGMT_RESTRICT:
-		break;
-	case MTP_MGMT_PROHIBIT:
-		break;
-	case MTP_MGMT_ACTIVATE:
-		break;
-	case MTP_MGMT_DEACTIVATE:
-		break;
-	case MTP_MGMT_BLOCK:
-		break;
-	case MTP_MGMT_UNBLOCK:
-		break;
-	case MTP_MGMT_INHIBIT:
-		break;
-	case MTP_MGMT_UNINHIBIT:
-		break;
-	case MTP_MGMT_CONGEST:
-		break;
-	case MTP_MGMT_UNCONGEST:
-		break;
-	case MTP_MGMT_DANGER:
-		break;
-	case MTP_MGMT_NODANGER:
-		break;
-	case MTP_MGMT_RESTART:
-		break;
-	case MTP_MGMT_RESTARTED:
-		break;
-	default:
-		rare();
-		return (-EOPNOTSUPP);
-	}
-	for (rt = rl->rt.list; rt; rt = rt->rl.next)
-		if ((ret = mtp_mgmt_rt(q, rt, action)) < 0) {
-			if (ret != -EOPNOTSUPP)
-				return (ret);
-			err = ret;
-		}
-	return (err);
-}
-static int
-mtp_mgmt_rt(queue_t *q, struct rt *rt, ulong action)
-{
-	switch (action) {
-	case MTP_MGMT_ALLOW:
-		return rt_set_state(q, rt, RT_ALLOWED);
-	case MTP_MGMT_RESTRICT:
-		return rt_set_state(q, rt, RT_RESTRICTED);
-	case MTP_MGMT_PROHIBIT:
-		return rt_set_state(q, rt, RT_PROHIBITED);
-	case MTP_MGMT_ACTIVATE:
-		return rt_set_state(q, rt, RT_ACTIVE);
-	case MTP_MGMT_DEACTIVATE:
-		return rt_set_state(q, rt, RT_INACTIVE);
-	case MTP_MGMT_BLOCK:
-		return rt_set_state(q, rt, RT_BLOCKED);
-	case MTP_MGMT_UNBLOCK:
-		return rt_set_state(q, rt, RT_UNBLOCKED);
-	case MTP_MGMT_INHIBIT:
-		return rt_set_state(q, rt, RT_INHIBITED);
-	case MTP_MGMT_UNINHIBIT:
-		return rt_set_state(q, rt, RT_UNINHIBITED);
-	case MTP_MGMT_CONGEST:
-		return rt_set_state(q, rt, RT_CONGESTED);
-	case MTP_MGMT_UNCONGEST:
-		return rt_set_state(q, rt, RT_UNCONGESTED);
-	case MTP_MGMT_DANGER:
-		return rt_set_state(q, rt, RT_DANGER);
-	case MTP_MGMT_NODANGER:
-		return rt_set_state(q, rt, RT_NODANGER);
-	case MTP_MGMT_RESTART:
-		return rt_set_state(q, rt, RT_RESTART);
-	case MTP_MGMT_RESTARTED:
-		return rt_set_state(q, rt, RT_RESTARTED);
-	default:
-		rare();
-		return (-EOPNOTSUPP);
-	}
-	return (0);
-}
-static int
-mtp_mgmt_ls(queue_t *q, struct ls *ls, ulong action)
-{
-	int ret, err = 0;
-	struct lk *lk;
-
-	switch (action) {
-	case MTP_MGMT_ALLOW:
-		break;
-	case MTP_MGMT_RESTRICT:
-		break;
-	case MTP_MGMT_PROHIBIT:
-		break;
-	case MTP_MGMT_ACTIVATE:
-		break;
-	case MTP_MGMT_DEACTIVATE:
-		break;
-	case MTP_MGMT_BLOCK:
-		break;
-	case MTP_MGMT_UNBLOCK:
-		break;
-	case MTP_MGMT_INHIBIT:
-		break;
-	case MTP_MGMT_UNINHIBIT:
-		break;
-	case MTP_MGMT_CONGEST:
-		break;
-	case MTP_MGMT_UNCONGEST:
-		break;
-	case MTP_MGMT_DANGER:
-		break;
-	case MTP_MGMT_NODANGER:
-		break;
-	case MTP_MGMT_RESTART:
-		break;
-	case MTP_MGMT_RESTARTED:
-		break;
-	default:
-		rare();
-		return (-EOPNOTSUPP);
-	}
-	for (lk = ls->lk.list; lk; lk = lk->ls.next)
-		if ((ret = mtp_mgmt_lk(q, lk, action)) < 0) {
-			if (ret != -EOPNOTSUPP)
-				return (ret);
-			err = ret;
-		}
-	return (err);
-}
-static int
-mtp_mgmt_lk(queue_t *q, struct lk *lk, ulong action)
-{
-	int ret, err = 0;
-	struct sl *sl;
-
-	switch (action) {
-	case MTP_MGMT_ALLOW:
-		break;
-	case MTP_MGMT_RESTRICT:
-		break;
-	case MTP_MGMT_PROHIBIT:
-		break;
-	case MTP_MGMT_ACTIVATE:
-		break;
-	case MTP_MGMT_DEACTIVATE:
-		break;
-	case MTP_MGMT_BLOCK:
-		break;
-	case MTP_MGMT_UNBLOCK:
-		break;
-	case MTP_MGMT_INHIBIT:
-		break;
-	case MTP_MGMT_UNINHIBIT:
-		break;
-	case MTP_MGMT_CONGEST:
-		break;
-	case MTP_MGMT_UNCONGEST:
-		break;
-	case MTP_MGMT_DANGER:
-		break;
-	case MTP_MGMT_NODANGER:
-		break;
-	case MTP_MGMT_RESTART:
-		break;
-	case MTP_MGMT_RESTARTED:
-		break;
-	default:
-		rare();
-		return (-EOPNOTSUPP);
-	}
-	for (sl = lk->sl.list; sl; sl = sl->lk.next)
-		if ((ret = mtp_mgmt_sl(q, sl, action)) < 0) {
-			if (ret != -EOPNOTSUPP)
-				return (ret);
-			err = ret;
-		}
-	return (err);
-}
-static int
-mtp_mgmt_sl(queue_t *q, struct sl *sl, ulong action)
-{
+	if (!sl)
+		return (-ESRCH);
 	switch (action) {
 	case MTP_MGMT_ALLOW:
 		return sl_set_state(q, sl, SL_RESTORED);
@@ -15260,1481 +17117,498 @@ mtp_mgmt_sl(queue_t *q, struct sl *sl, ulong action)
 		return sl_set_state(q, sl, SL_RETRIEVAL);
 	case MTP_MGMT_RESTARTED:
 		return sl_set_state(q, sl, SL_UPDATED);
-	default:
-		rare();
-		return (-EOPNOTSUPP);
 	}
 	return (0);
 }
 static int
-mtp_mgmt_df(queue_t *q, struct df *df, ulong action)
+mtp_mgmt_lk(queue_t *q, struct lk *lk, uint action)
 {
-	int ret, err = 0;
+	int err = 0;
+	struct sl *sl;
+
+	if (!lk)
+		return (-ESRCH);
+	switch (action) {
+	case MTP_MGMT_ALLOW:
+	case MTP_MGMT_RESTRICT:
+	case MTP_MGMT_PROHIBIT:
+	case MTP_MGMT_ACTIVATE:
+	case MTP_MGMT_DEACTIVATE:
+	case MTP_MGMT_BLOCK:
+	case MTP_MGMT_UNBLOCK:
+	case MTP_MGMT_INHIBIT:
+	case MTP_MGMT_UNINHIBIT:
+	case MTP_MGMT_CONGEST:
+	case MTP_MGMT_UNCONGEST:
+	case MTP_MGMT_DANGER:
+	case MTP_MGMT_NODANGER:
+	case MTP_MGMT_RESTART:
+	case MTP_MGMT_RESTARTED:
+	default:
+		return (0);
+	}
+	for (sl = lk->sl.list; sl; sl = sl->lk.next)
+		if ((err = mtp_mgmt_sl(q, sl, action)))
+			return (err);
+	return (err);
+}
+static int
+mtp_mgmt_ls(queue_t *q, struct ls *ls, uint action)
+{
+	int err = 0;
+	struct lk *lk;
+
+	if (!ls)
+		return (-ESRCH);
+	switch (action) {
+	case MTP_MGMT_ALLOW:
+	case MTP_MGMT_RESTRICT:
+	case MTP_MGMT_PROHIBIT:
+	case MTP_MGMT_ACTIVATE:
+	case MTP_MGMT_DEACTIVATE:
+	case MTP_MGMT_BLOCK:
+	case MTP_MGMT_UNBLOCK:
+	case MTP_MGMT_INHIBIT:
+	case MTP_MGMT_UNINHIBIT:
+	case MTP_MGMT_CONGEST:
+	case MTP_MGMT_UNCONGEST:
+	case MTP_MGMT_DANGER:
+	case MTP_MGMT_NODANGER:
+	case MTP_MGMT_RESTART:
+	case MTP_MGMT_RESTARTED:
+	default:
+		return (0);
+	}
+	for (lk = ls->lk.list; lk; lk = lk->ls.next)
+		if ((err = mtp_mgmt_lk(q, lk, action)))
+			return (err);
+	return (err);
+}
+static int
+mtp_mgmt_rt(queue_t *q, struct rt *rt, uint action)
+{
+	if (!rt)
+		return (-ESRCH);
+	switch (action) {
+	case MTP_MGMT_ALLOW:
+		return rt_set_state(q, rt, RT_ALLOWED);
+	case MTP_MGMT_RESTRICT:
+		return rt_set_state(q, rt, RT_RESTRICTED);
+	case MTP_MGMT_PROHIBIT:
+		return rt_set_state(q, rt, RT_PROHIBITED);
+	case MTP_MGMT_ACTIVATE:
+		return rt_set_state(q, rt, RT_ACTIVE);
+	case MTP_MGMT_DEACTIVATE:
+		return rt_set_state(q, rt, RT_INACTIVE);
+	case MTP_MGMT_BLOCK:
+		return rt_set_state(q, rt, RT_BLOCKED);
+	case MTP_MGMT_UNBLOCK:
+		return rt_set_state(q, rt, RT_UNBLOCKED);
+	case MTP_MGMT_INHIBIT:
+		return rt_set_state(q, rt, RT_INHIBITED);
+	case MTP_MGMT_UNINHIBIT:
+		return rt_set_state(q, rt, RT_UNINHIBITED);
+	case MTP_MGMT_CONGEST:
+		return rt_set_state(q, rt, RT_CONGESTED);
+	case MTP_MGMT_UNCONGEST:
+		return rt_set_state(q, rt, RT_UNCONGESTED);
+	case MTP_MGMT_DANGER:
+		return rt_set_state(q, rt, RT_DANGER);
+	case MTP_MGMT_NODANGER:
+		return rt_set_state(q, rt, RT_NODANGER);
+	case MTP_MGMT_RESTART:
+		return rt_set_state(q, rt, RT_RESTART);
+	case MTP_MGMT_RESTARTED:
+		return rt_set_state(q, rt, RT_RESTARTED);
+	}
+	return (0);
+}
+static int
+mtp_mgmt_rl(queue_t *q, struct rl *rl, uint action)
+{
+	int err = 0;
+	struct rt *rt;
+
+	if (!rl)
+		return (-ESRCH);
+	switch (action) {
+	case MTP_MGMT_ALLOW:
+	case MTP_MGMT_RESTRICT:
+	case MTP_MGMT_PROHIBIT:
+	case MTP_MGMT_ACTIVATE:
+	case MTP_MGMT_DEACTIVATE:
+	case MTP_MGMT_BLOCK:
+	case MTP_MGMT_UNBLOCK:
+	case MTP_MGMT_INHIBIT:
+	case MTP_MGMT_UNINHIBIT:
+	case MTP_MGMT_CONGEST:
+	case MTP_MGMT_UNCONGEST:
+	case MTP_MGMT_DANGER:
+	case MTP_MGMT_NODANGER:
+	case MTP_MGMT_RESTART:
+	case MTP_MGMT_RESTARTED:
+	default:
+		return (0);
+	}
+	for (rt = rl->rt.list; rt; rt = rt->rl.next)
+		if ((err = mtp_mgmt_rt(q, rt, action)))
+			return (err);
+	return (err);
+}
+static int
+mtp_mgmt_rs(queue_t *q, struct rs *rs, uint action)
+{
+	int err = 0;
+	struct rl *rl;
+
+	if (!rs)
+		return (-ESRCH);
+	switch (action) {
+	case MTP_MGMT_ALLOW:
+	case MTP_MGMT_RESTRICT:
+	case MTP_MGMT_PROHIBIT:
+	case MTP_MGMT_ACTIVATE:
+	case MTP_MGMT_DEACTIVATE:
+	case MTP_MGMT_BLOCK:
+	case MTP_MGMT_UNBLOCK:
+	case MTP_MGMT_INHIBIT:
+	case MTP_MGMT_UNINHIBIT:
+	case MTP_MGMT_CONGEST:
+	case MTP_MGMT_UNCONGEST:
+	case MTP_MGMT_DANGER:
+	case MTP_MGMT_NODANGER:
+	case MTP_MGMT_RESTART:
+	case MTP_MGMT_RESTARTED:
+	default:
+		return (0);
+	}
+	for (rl = rs->rl.list; rl; rl = rl->rs.next)
+		if ((err = mtp_mgmt_rl(q, rl, action)))
+			return (err);
+	return (err);
+}
+static int
+mtp_mgmt_sp(queue_t *q, struct sp *sp, uint action)
+{
+	int err = 0;
+	struct rs *rs;
+	struct ls *ls;
+
+	if (!sp)
+		return (-ESRCH);
+	switch (action) {
+	case MTP_MGMT_ALLOW:
+	case MTP_MGMT_RESTRICT:
+	case MTP_MGMT_PROHIBIT:
+	case MTP_MGMT_ACTIVATE:
+	case MTP_MGMT_DEACTIVATE:
+	case MTP_MGMT_BLOCK:
+	case MTP_MGMT_UNBLOCK:
+	case MTP_MGMT_INHIBIT:
+	case MTP_MGMT_UNINHIBIT:
+	case MTP_MGMT_CONGEST:
+	case MTP_MGMT_UNCONGEST:
+	case MTP_MGMT_DANGER:
+	case MTP_MGMT_NODANGER:
+	case MTP_MGMT_RESTART:
+	case MTP_MGMT_RESTARTED:
+		break;
+	default:
+		return (0);
+	}
+	for (rs = sp->rs.list; rs; rs = rs->sp.next)
+		if ((err = mtp_mgmt_rs(q, rs, action)))
+			return (err);
+	for (ls = sp->ls.list; ls; ls = ls->sp.next)
+		if ((err = mtp_mgmt_ls(q, ls, action)))
+			return (err);
+	return (err);
+}
+static int
+mtp_mgmt_na(queue_t *q, struct na *na, uint action)
+{
+	int err = 0;
+	struct sp *sp;
+
+	if (!na)
+		return (-ESRCH);
+	/* we actually don't manage network appearances, just all of the signalling points that
+	   make up a network appearance. */
+	for (sp = na->sp.list; sp; sp = sp->na.next)
+		if ((err = mtp_mgmt_sp(q, sp, action)))
+			return (err);
+	return (err);
+}
+static int
+mtp_mgmt_df(queue_t *q, struct df *df, uint action)
+{
+	int err = 0;
 	struct na *na;
 
+	if (!df)
+		return (-ESRCH);
 	/* we actually don't manage the default object, just all of the network appearances that
 	   make up the stack. */
 	for (na = df->na.list; na; na = na->next)
-		if ((ret = mtp_mgmt_na(q, na, action)) < 0) {
-			if (ret != -EOPNOTSUPP)
-				return (ret);
-			err = ret;
-		}
+		if ((err = mtp_mgmt_na(q, na, action)))
+			return (err);
 	return (err);
 }
 
-/*
- *  MTP_IOCGOPTION  - mtp_option_t
- *  -------------------------------------------------------------------
- *  Get configuration options by object type and id.
- *
- */
 static int
-mtp_iocgoptions(queue_t *q, mblk_t *mp)
+mtp_action(queue_t *q, mblk_t *dp)
 {
-	if (mp->b_cont) {
-		int size = msgdsize(mp);
-		mtp_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	struct mtp_mgmt *p = (typeof(p)) dp->b_rptr;
+	int rtn;
 
-		if ((size -= sizeof(*arg)) >= 0) {
-			switch (arg->type) {
-			case MTP_OBJ_TYPE_NA:
-			{
-				struct na *na = na_lookup(arg->id);
-				mtp_opt_conf_na_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!na || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				*opt = na->config;
-				break;
-			}
-			case MTP_OBJ_TYPE_SP:
-			{
-				struct sp *sp = sp_lookup(arg->id);
-				mtp_opt_conf_sp_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!sp || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				*opt = sp->config;
-				break;
-			}
-			case MTP_OBJ_TYPE_RS:
-			{
-				struct rs *rs = rs_lookup(arg->id);
-				mtp_opt_conf_rs_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!rs || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				*opt = rs->config;
-				break;
-			}
-			case MTP_OBJ_TYPE_RL:
-			{
-				struct rl *rl = rl_lookup(arg->id);
-				mtp_opt_conf_rl_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!rl || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				*opt = rl->config;
-				break;
-			}
-			case MTP_OBJ_TYPE_RT:
-			{
-				struct rt *rt = rt_lookup(arg->id);
-				mtp_opt_conf_rt_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!rt || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				*opt = rt->config;
-				break;
-			}
-			case MTP_OBJ_TYPE_LS:
-			{
-				struct ls *ls = ls_lookup(arg->id);
-				mtp_opt_conf_ls_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!ls || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				*opt = ls->config;
-				break;
-			}
-			case MTP_OBJ_TYPE_LK:
-			{
-				struct lk *lk = lk_lookup(arg->id);
-				mtp_opt_conf_lk_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!lk || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				*opt = lk->config;
-				break;
-			}
-			case MTP_OBJ_TYPE_SL:
-			{
-				struct sl *sl = sl_lookup(arg->id);
-				mtp_opt_conf_sl_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!sl || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				*opt = sl->config;
-				break;
-			}
-			case MTP_OBJ_TYPE_DF:
-			{
-				struct df *df = df_lookup(arg->id);
-				mtp_opt_conf_df_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!df || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				*opt = df->config;
-				break;
-			}
-			default:
-				rare();
-			      einval:
-				return (-EINVAL);
-			}
-			return (0);
-		}
+	switch (p->type) {
+	case MTP_OBJ_TYPE_NA:
+		rtn = mtp_mgmt_na(q, na_lookup(p->id), p->cmd);
+		break;
+	case MTP_OBJ_TYPE_SP:
+		rtn = mtp_mgmt_sp(q, sp_lookup(p->id), p->cmd);
+		break;
+	case MTP_OBJ_TYPE_RS:
+		rtn = mtp_mgmt_rs(q, rs_lookup(p->id), p->cmd);
+		break;
+	case MTP_OBJ_TYPE_RL:
+		rtn = mtp_mgmt_rl(q, rl_lookup(p->id), p->cmd);
+		break;
+	case MTP_OBJ_TYPE_RT:
+		rtn = mtp_mgmt_rt(q, rt_lookup(p->id), p->cmd);
+		break;
+	case MTP_OBJ_TYPE_LS:
+		rtn = mtp_mgmt_ls(q, ls_lookup(p->id), p->cmd);
+		break;
+	case MTP_OBJ_TYPE_LK:
+		rtn = mtp_mgmt_lk(q, lk_lookup(p->id), p->cmd);
+		break;
+	case MTP_OBJ_TYPE_SL:
+		rtn = mtp_mgmt_sl(q, sl_lookup(p->id), p->cmd);
+		break;
+	case MTP_OBJ_TYPE_DF:
+		rtn = mtp_mgmt_df(q, df_lookup(p->id), p->cmd);
+		break;
+	default:
+		return (EINVAL);
 	}
-	rare();
-	return (-EINVAL);
+	if (rtn < 0)
+		return (-rtn);
+	return (0);
 }
 
-/*
- *  MTP_IOCSOPTION  - mtp_option_t
- *  -------------------------------------------------------------------
- *  Set configuration options by object type and id.
- */
 static int
-mtp_iocsoptions(queue_t *q, mblk_t *mp)
+mtp_size_conf(unsigned char *arg, int *sizep)
 {
-	if (mp->b_cont) {
-		int size = msgdsize(mp);
-		mtp_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+	struct mtp_config *p = (typeof(p)) arg;
 
-		if ((size -= sizeof(*arg)) >= 0) {
-			switch (arg->type) {
-			case MTP_OBJ_TYPE_NA:
-			{
-				struct na *na = na_lookup(arg->id);
-				mtp_opt_conf_na_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!na || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				na->config = *opt;
-				break;
-			}
-			case MTP_OBJ_TYPE_SP:
-			{
-				struct sp *sp = sp_lookup(arg->id);
-				mtp_opt_conf_sp_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!sp || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				sp->config = *opt;
-				break;
-			}
-			case MTP_OBJ_TYPE_RS:
-			{
-				struct rs *rs = rs_lookup(arg->id);
-				mtp_opt_conf_rs_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!rs || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				rs->config = *opt;
-				break;
-			}
-			case MTP_OBJ_TYPE_RL:
-			{
-				struct rl *rl = rl_lookup(arg->id);
-				mtp_opt_conf_rl_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!rl || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				rl->config = *opt;
-				break;
-			}
-			case MTP_OBJ_TYPE_RT:
-			{
-				struct rt *rt = rt_lookup(arg->id);
-				mtp_opt_conf_rt_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!rt || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				rt->config = *opt;
-				break;
-			}
-			case MTP_OBJ_TYPE_LS:
-			{
-				struct ls *ls = ls_lookup(arg->id);
-				mtp_opt_conf_ls_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!ls || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				ls->config = *opt;
-				break;
-			}
-			case MTP_OBJ_TYPE_LK:
-			{
-				struct lk *lk = lk_lookup(arg->id);
-				mtp_opt_conf_lk_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!lk || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				lk->config = *opt;
-				break;
-			}
-			case MTP_OBJ_TYPE_SL:
-			{
-				struct sl *sl = sl_lookup(arg->id);
-				mtp_opt_conf_sl_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!sl || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				sl->config = *opt;
-				break;
-			}
-			case MTP_OBJ_TYPE_DF:
-			{
-				struct df *df = df_lookup(arg->id);
-				mtp_opt_conf_df_t *opt = (typeof(opt)) (arg + 1);
-
-				if (!df || (size -= sizeof(*opt)) < 0)
-					goto einval;
-				df->config = *opt;
-				break;
-			}
-			default:
-				rare();
-			      einval:
-				return (-EINVAL);
-			}
-			return (0);
-		}
+	switch (p->cmd) {
+	case MTP_ADD:
+		break;
+	case MTP_CHA:
+	case MTP_DEL:
+		break;
+	default:
+	case MTP_GET:
+		return (EINVAL);
 	}
-	rare();
-	return (-EINVAL);
-}
-
-/*
- *  MTP_IOCGCONFIG  - struct mtp_config
- *  -------------------------------------------------------------------
- */
-static int
-mtp_iocgconfig(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_cont) {
-		int size = msgdsize(mp);
-		struct mtp_config *arg = (typeof(arg)) mp->b_cont->b_rptr;
-
-		if ((size -= sizeof(*arg)) >= 0)
-			return mtp_get_conf(arg, size);
-	}
-	rare();
-	return (-EINVAL);
-}
-
-/*
- *  MTP_IOCSCONFIG  - struct mtp_config
- *  -------------------------------------------------------------------
- */
-static int
-mtp_iocsconfig(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_cont) {
-		int size = msgdsize(mp);
-		struct mtp_config *arg = (typeof(arg)) mp->b_cont->b_rptr;
-
-		if ((size -= sizeof(*arg)) >= 0)
-			switch (arg->cmd) {
-			case MTP_ADD:
-				return mtp_add_conf(arg, size, 0, 0);
-			case MTP_CHA:
-				return mtp_cha_conf(arg, size, 0, 0);
-			case MTP_DEL:
-				return mtp_del_conf(arg, size, 0, 0);
-			default:
-				rare();
-				return (-EINVAL);
-			}
-	}
-	rare();
-	return (-EINVAL);
-}
-
-/*
- *  MTP_IOCTCONFIG  - struct mtp_config
- *  -------------------------------------------------------------------
- */
-static int
-mtp_ioctconfig(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_cont) {
-		int size = msgdsize(mp);
-		struct mtp_config *arg = (typeof(arg)) mp->b_cont->b_rptr;
-
-		if ((size -= sizeof(*arg)) >= 0)
-			switch (arg->cmd) {
-			case MTP_ADD:
-				return mtp_add_conf(arg, size, 0, 1);
-			case MTP_CHA:
-				return mtp_cha_conf(arg, size, 0, 1);
-			case MTP_DEL:
-				return mtp_del_conf(arg, size, 0, 1);
-			default:
-				rare();
-				return (-EINVAL);
-			}
-	}
-	rare();
-	return (-EINVAL);
-}
-
-/*
- *  MTP_IOCCCONFIG  - struct mtp_config
- *  -------------------------------------------------------------------
- */
-static int
-mtp_ioccconfig(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_cont) {
-		int size = msgdsize(mp);
-		struct mtp_config *arg = (typeof(arg)) mp->b_cont->b_rptr;
-
-		if ((size -= sizeof(*arg)) >= 0)
-			switch (arg->cmd) {
-			case MTP_ADD:
-				return mtp_add_conf(arg, size, 1, 0);
-			case MTP_CHA:
-				return mtp_cha_conf(arg, size, 1, 0);
-			case MTP_DEL:
-				return mtp_del_conf(arg, size, 1, 0);
-			default:
-				rare();
-				return (-EINVAL);
-			}
-	}
-	rare();
-	return (-EINVAL);
-}
-
-/*
- *  MTP_IOCGSTATEM  - struct mtp_statem
- *  -------------------------------------------------------------------
- */
-static int
-mtp_iocgstatem(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_cont) {
-		psw_t flags;
-		int ret = 0;
-		int size = msgdsize(mp);
-		struct mtp_statem *arg = (typeof(arg)) mp->b_cont->b_rptr;
-
-		if ((size -= sizeof(*arg)) < 0)
-			return (-EMSGSIZE);
-		spin_lock_irqsave(&master.lock, flags);
-		switch (arg->type) {
-		case MTP_OBJ_TYPE_NA:
-		{
-			struct na *na = na_lookup(arg->id);
-			mtp_statem_na_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!na || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			arg->flags = na->flags;
-			arg->state = na->state;
-			sta->timers = na->timers;
-			break;
-		}
-		case MTP_OBJ_TYPE_SP:
-		{
-			struct sp *sp = sp_lookup(arg->id);
-			mtp_statem_sp_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!sp || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			arg->flags = sp->flags;
-			arg->state = sp->state;
-			sta->timers = sp->timers;
-			break;
-		}
-		case MTP_OBJ_TYPE_RS:
-		{
-			struct rs *rs = rs_lookup(arg->id);
-			mtp_statem_rs_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!rs || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			arg->flags = rs->flags;
-			arg->state = rs->state;
-			sta->timers = rs->timers;
-			break;
-		}
-		case MTP_OBJ_TYPE_RL:
-		{
-			struct rl *rl = rl_lookup(arg->id);
-			mtp_statem_rl_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!rl || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			arg->flags = rl->flags;
-			arg->state = rl->state;
-			sta->timers = rl->timers;
-			break;
-		}
-		case MTP_OBJ_TYPE_RT:
-		{
-			struct rt *rt = rt_lookup(arg->id);
-			mtp_statem_rt_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!rt || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			arg->flags = rt->flags;
-			arg->state = rt->state;
-			sta->timers = rt->timers;
-			break;
-		}
-		case MTP_OBJ_TYPE_LS:
-		{
-			struct ls *ls = ls_lookup(arg->id);
-			mtp_statem_ls_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!ls || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			arg->flags = ls->flags;
-			arg->state = ls->state;
-			sta->timers = ls->timers;
-			break;
-		}
-		case MTP_OBJ_TYPE_LK:
-		{
-			struct lk *lk = lk_lookup(arg->id);
-			mtp_statem_lk_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!lk || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			arg->flags = lk->flags;
-			arg->state = lk->state;
-			sta->timers = lk->timers;
-			break;
-		}
-		case MTP_OBJ_TYPE_SL:
-		{
-			struct sl *sl = sl_lookup(arg->id);
-			mtp_statem_sl_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!sl || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			arg->flags = sl->flags;
-			arg->state = sl->state;
-			sta->timers = sl->timers;
-			break;
-		}
-		case MTP_OBJ_TYPE_DF:
-		{
-			struct df *df = df_lookup(arg->id);
-			mtp_statem_df_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!df || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			arg->flags = 0;
-			arg->state = 0;
-			sta->timers = df->timers;
-			break;
-		}
-		default:
-			rare();
-		      einval:
-			ret = -EINVAL;
-			break;
-		}
-		spin_unlock_irqrestore(&master.lock, flags);
-		return (ret);
-	}
-	rare();
-	return (-EINVAL);
-}
-
-/*
- *  MTP_IOCCMRESET  - struct mtp_statem
- *  -------------------------------------------------------------------
- */
-static int
-mtp_ioccmreset(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_cont) {
-		int size = msgdsize(mp);
-		struct mtp_statem *arg = (typeof(arg)) mp->b_cont->b_rptr;
-
-		if ((size -= sizeof(*arg)) < 0)
-			return (-EMSGSIZE);
-		(void) arg;
-		return (-EOPNOTSUPP);
-	}
-	rare();
-	return (-EINVAL);
-}
-
-/*
- *  MTP_IOCGSTATSP  - struct mtp_stats
- *  -------------------------------------------------------------------
- */
-static int
-mtp_iocgstatsp(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_cont) {
-		psw_t flags;
-		int ret = 0;
-		int size = msgdsize(mp);
-		struct mtp_stats *arg = (typeof(arg)) mp->b_cont->b_rptr;
-
-		if ((size -= sizeof(*arg)) < 0)
-			return (-EMSGSIZE);
-		spin_lock_irqsave(&master.lock, flags);
-		switch (arg->type) {
-		case MTP_OBJ_TYPE_NA:
-		{
-			struct na *na = na_lookup(arg->id);
-			mtp_stats_na_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!na || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = na->statsp;
-			break;
-		}
-		case MTP_OBJ_TYPE_SP:
-		{
-			struct sp *sp = sp_lookup(arg->id);
-			mtp_stats_sp_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!sp || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = sp->statsp;
-			break;
-		}
-		case MTP_OBJ_TYPE_RS:
-		{
-			struct rs *rs = rs_lookup(arg->id);
-			mtp_stats_rs_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!rs || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = rs->statsp;
-			break;
-		}
-		case MTP_OBJ_TYPE_RL:
-		{
-			struct rl *rl = rl_lookup(arg->id);
-			mtp_stats_rl_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!rl || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = rl->statsp;
-			break;
-		}
-		case MTP_OBJ_TYPE_RT:
-		{
-			struct rt *rt = rt_lookup(arg->id);
-			mtp_stats_rt_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!rt || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = rt->statsp;
-			break;
-		}
-		case MTP_OBJ_TYPE_LS:
-		{
-			struct ls *ls = ls_lookup(arg->id);
-			mtp_stats_ls_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!ls || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = ls->statsp;
-			break;
-		}
-		case MTP_OBJ_TYPE_LK:
-		{
-			struct lk *lk = lk_lookup(arg->id);
-			mtp_stats_lk_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!lk || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = lk->statsp;
-			break;
-		}
-		case MTP_OBJ_TYPE_SL:
-		{
-			struct sl *sl = sl_lookup(arg->id);
-			mtp_stats_sl_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!sl || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = sl->statsp;
-			break;
-		}
-		case MTP_OBJ_TYPE_DF:
-		{
-			struct df *df = df_lookup(arg->id);
-			mtp_stats_df_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!df || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = df->statsp;
-			break;
-		}
-		default:
-			rare();
-		      einval:
-			ret = -EINVAL;
-			break;
-		}
-		spin_unlock_irqrestore(&master.lock, flags);
-		return (ret);
-	}
-	rare();
-	return (-EINVAL);
-}
-
-/*
- *  MTP_IOCSSTATSP  - struct mtp_stats
- *  -------------------------------------------------------------------
- */
-static int
-mtp_iocsstatsp(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_cont) {
-		psw_t flags;
-		int ret = 0;
-		int size = msgdsize(mp);
-		struct mtp_stats *arg = (typeof(arg)) mp->b_cont->b_rptr;
-
-		if ((size -= sizeof(*arg)) < 0)
-			return (-EMSGSIZE);
-		spin_lock_irqsave(&master.lock, flags);
-		switch (arg->type) {
-		case MTP_OBJ_TYPE_NA:
-		{
-			struct na *na = na_lookup(arg->id);
-			mtp_stats_na_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!na || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			na->statsp = *sta;
-			break;
-		}
-		case MTP_OBJ_TYPE_SP:
-		{
-			struct sp *sp = sp_lookup(arg->id);
-			mtp_stats_sp_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!sp || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			sp->statsp = *sta;
-			break;
-		}
-		case MTP_OBJ_TYPE_RS:
-		{
-			struct rs *rs = rs_lookup(arg->id);
-			mtp_stats_rs_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!rs || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			rs->statsp = *sta;
-			break;
-		}
-		case MTP_OBJ_TYPE_RL:
-		{
-			struct rl *rl = rl_lookup(arg->id);
-			mtp_stats_rl_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!rl || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			rl->statsp = *sta;
-			break;
-		}
-		case MTP_OBJ_TYPE_RT:
-		{
-			struct rt *rt = rt_lookup(arg->id);
-			mtp_stats_rt_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!rt || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			rt->statsp = *sta;
-			break;
-		}
-		case MTP_OBJ_TYPE_LS:
-		{
-			struct ls *ls = ls_lookup(arg->id);
-			mtp_stats_ls_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!ls || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			ls->statsp = *sta;
-			break;
-		}
-		case MTP_OBJ_TYPE_LK:
-		{
-			struct lk *lk = lk_lookup(arg->id);
-			mtp_stats_lk_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!lk || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			lk->statsp = *sta;
-			break;
-		}
-		case MTP_OBJ_TYPE_SL:
-		{
-			struct sl *sl = sl_lookup(arg->id);
-			mtp_stats_sl_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!sl || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			sl->statsp = *sta;
-			break;
-		}
-		case MTP_OBJ_TYPE_DF:
-		{
-			struct df *df = df_lookup(arg->id);
-			mtp_stats_df_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!df || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			df->statsp = *sta;
-			break;
-		}
-		default:
-			rare();
-		      einval:
-			ret = -EINVAL;
-			break;
-		}
-		spin_unlock_irqrestore(&master.lock, flags);
-		return (ret);
-	}
-	rare();
-	return (-EINVAL);
-}
-
-/*
- *  MTP_IOCGSTATS   - struct mtp_stats
- *  -------------------------------------------------------------------
- */
-static int
-mtp_iocgstats(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_cont) {
-		psw_t flags;
-		int ret = 0;
-		int size = msgdsize(mp);
-		struct mtp_stats *arg = (typeof(arg)) mp->b_cont->b_rptr;
-
-		if ((size -= sizeof(*arg)) < 0)
-			return (-EMSGSIZE);
-		spin_lock_irqsave(&master.lock, flags);
-		switch (arg->type) {
-		case MTP_OBJ_TYPE_NA:
-		{
-			struct na *na = na_lookup(arg->id);
-			mtp_stats_na_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!na || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = na->stats;
-			arg->header = jiffies;
-			break;
-		}
-		case MTP_OBJ_TYPE_SP:
-		{
-			struct sp *sp = sp_lookup(arg->id);
-			mtp_stats_sp_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!sp || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = sp->stats;
-			arg->header = jiffies;
-			break;
-		}
-		case MTP_OBJ_TYPE_RS:
-		{
-			struct rs *rs = rs_lookup(arg->id);
-			mtp_stats_rs_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!rs || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = rs->stats;
-			arg->header = jiffies;
-			break;
-		}
-		case MTP_OBJ_TYPE_RL:
-		{
-			struct rl *rl = rl_lookup(arg->id);
-			mtp_stats_rl_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!rl || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = rl->stats;
-			arg->header = jiffies;
-			break;
-		}
-		case MTP_OBJ_TYPE_RT:
-		{
-			struct rt *rt = rt_lookup(arg->id);
-			mtp_stats_rt_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!rt || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = rt->stats;
-			arg->header = jiffies;
-			break;
-		}
-		case MTP_OBJ_TYPE_LS:
-		{
-			struct ls *ls = ls_lookup(arg->id);
-			mtp_stats_ls_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!ls || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = ls->stats;
-			arg->header = jiffies;
-			break;
-		}
-		case MTP_OBJ_TYPE_LK:
-		{
-			struct lk *lk = lk_lookup(arg->id);
-			mtp_stats_lk_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!lk || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = lk->stats;
-			arg->header = jiffies;
-			break;
-		}
-		case MTP_OBJ_TYPE_SL:
-		{
-			struct sl *sl = sl_lookup(arg->id);
-			mtp_stats_sl_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!sl || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = sl->stats;
-			arg->header = jiffies;
-			break;
-		}
-		case MTP_OBJ_TYPE_DF:
-		{
-			struct df *df = df_lookup(arg->id);
-			mtp_stats_df_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!df || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			*sta = df->stats;
-			arg->header = jiffies;
-			break;
-		}
-		default:
-			rare();
-		      einval:
-			ret = -EINVAL;
-			break;
-		}
-		spin_unlock_irqrestore(&master.lock, flags);
-		return (ret);
-	}
-	rare();
-	return (-EINVAL);
-}
-
-/*
- *  MTP_IOCSSTATS   - struct mtp_stats
- *  -------------------------------------------------------------------
- */
-static int
-mtp_iocsstats(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_cont) {
-		psw_t flags;
-		int ret = 0;
-		int size = msgdsize(mp);
-		struct mtp_stats *arg = (typeof(arg)) mp->b_cont->b_rptr;
-		uchar *d, *s = (typeof(s)) (arg + 1);
-
-		if ((size -= sizeof(*arg)) < 0)
-			return (-EMSGSIZE);
-		spin_lock_irqsave(&master.lock, flags);
-		arg->header = jiffies;
-		switch (arg->type) {
-		case MTP_OBJ_TYPE_NA:
-		{
-			struct na *na = na_lookup(arg->id);
-			mtp_stats_na_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!na || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			d = (typeof(d)) & na->stats;
-			for (size = sizeof(*sta); size--; *d &= *s) ;
-			break;
-		}
-		case MTP_OBJ_TYPE_SP:
-		{
-			struct sp *sp = sp_lookup(arg->id);
-			mtp_stats_sp_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!sp || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			d = (typeof(d)) & sp->stats;
-			for (size = sizeof(*sta); size--; *d &= *s) ;
-			break;
-		}
-		case MTP_OBJ_TYPE_RS:
-		{
-			struct rs *rs = rs_lookup(arg->id);
-			mtp_stats_rs_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!rs || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			d = (typeof(d)) & rs->stats;
-			for (size = sizeof(*sta); size--; *d &= *s) ;
-			break;
-		}
-		case MTP_OBJ_TYPE_RL:
-		{
-			struct rl *rl = rl_lookup(arg->id);
-			mtp_stats_rl_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!rl || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			d = (typeof(d)) & rl->stats;
-			for (size = sizeof(*sta); size--; *d &= *s) ;
-			break;
-		}
-		case MTP_OBJ_TYPE_RT:
-		{
-			struct rt *rt = rt_lookup(arg->id);
-			mtp_stats_rt_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!rt || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			d = (typeof(d)) & rt->stats;
-			for (size = sizeof(*sta); size--; *d &= *s) ;
-			break;
-		}
-		case MTP_OBJ_TYPE_LS:
-		{
-			struct ls *ls = ls_lookup(arg->id);
-			mtp_stats_ls_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!ls || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			d = (typeof(d)) & ls->stats;
-			for (size = sizeof(*sta); size--; *d &= *s) ;
-			break;
-		}
-		case MTP_OBJ_TYPE_LK:
-		{
-			struct lk *lk = lk_lookup(arg->id);
-			mtp_stats_lk_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!lk || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			d = (typeof(d)) & lk->stats;
-			for (size = sizeof(*sta); size--; *d &= *s) ;
-			break;
-		}
-		case MTP_OBJ_TYPE_SL:
-		{
-			struct sl *sl = sl_lookup(arg->id);
-			mtp_stats_sl_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!sl || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			d = (typeof(d)) & sl->stats;
-			for (size = sizeof(*sta); size--; *d &= *s) ;
-			break;
-		}
-		case MTP_OBJ_TYPE_DF:
-		{
-			struct df *df = df_lookup(arg->id);
-			mtp_stats_df_t *sta = (typeof(sta)) (arg + 1);
-
-			if (!df || (size -= sizeof(*sta)) < 0)
-				goto einval;
-			d = (typeof(d)) & df->stats;
-			for (size = sizeof(*sta); size--; *d &= *s) ;
-			break;
-		}
-		default:
-			rare();
-		      einval:
-			ret = -EINVAL;
-			break;
-		}
-		spin_unlock_irqrestore(&master.lock, flags);
-		return (ret);
-	}
-	rare();
-	return (-EINVAL);
-}
-
-/*
- *  MTP_IOCGNOTIFY  - struct mtp_notify
- *  -------------------------------------------------------------------
- */
-static int
-mtp_iocgnotify(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_cont) {
-		int size = msgdsize(mp);
-		struct mtp_notify *arg = (typeof(arg)) mp->b_cont->b_rptr;
-
-		if ((size -= sizeof(*arg)) >= 0) {
-			switch (arg->type) {
-			case MTP_OBJ_TYPE_NA:
-			{
-				struct na *na = na_lookup(arg->id);
-				mtp_notify_na_t *not = (typeof(not)) (arg + 1);
-
-				if (!na || (size -= sizeof(*not)) < 0)
-					goto einval;
-				not->events = na->notify.events;
-				break;
-			}
-			case MTP_OBJ_TYPE_SP:
-			{
-				struct sp *sp = sp_lookup(arg->id);
-				mtp_notify_sp_t *not = (typeof(not)) (arg + 1);
-
-				if (!sp || (size -= sizeof(*not)) < 0)
-					goto einval;
-				not->events = sp->notify.events;
-				break;
-			}
-			case MTP_OBJ_TYPE_RS:
-			{
-				struct rs *rs = rs_lookup(arg->id);
-				mtp_notify_rs_t *not = (typeof(not)) (arg + 1);
-
-				if (!rs || (size -= sizeof(*not)) < 0)
-					goto einval;
-				not->events = rs->notify.events;
-				break;
-			}
-			case MTP_OBJ_TYPE_RL:
-			{
-				struct rl *rl = rl_lookup(arg->id);
-				mtp_notify_rl_t *not = (typeof(not)) (arg + 1);
-
-				if (!rl || (size -= sizeof(*not)) < 0)
-					goto einval;
-				not->events = rl->notify.events;
-				break;
-			}
-			case MTP_OBJ_TYPE_RT:
-			{
-				struct rt *rt = rt_lookup(arg->id);
-				mtp_notify_rt_t *not = (typeof(not)) (arg + 1);
-
-				if (!rt || (size -= sizeof(*not)) < 0)
-					goto einval;
-				not->events = rt->notify.events;
-				break;
-			}
-			case MTP_OBJ_TYPE_LS:
-			{
-				struct ls *ls = ls_lookup(arg->id);
-				mtp_notify_ls_t *not = (typeof(not)) (arg + 1);
-
-				if (!ls || (size -= sizeof(*not)) < 0)
-					goto einval;
-				not->events = ls->notify.events;
-				break;
-			}
-			case MTP_OBJ_TYPE_LK:
-			{
-				struct lk *lk = lk_lookup(arg->id);
-				mtp_notify_lk_t *not = (typeof(not)) (arg + 1);
-
-				if (!lk || (size -= sizeof(*not)) < 0)
-					goto einval;
-				not->events = lk->notify.events;
-				break;
-			}
-			case MTP_OBJ_TYPE_SL:
-			{
-				struct sl *sl = sl_lookup(arg->id);
-				mtp_notify_sl_t *not = (typeof(not)) (arg + 1);
-
-				if (!sl || (size -= sizeof(*not)) < 0)
-					goto einval;
-				not->events = sl->notify.events;
-				break;
-			}
-			case MTP_OBJ_TYPE_DF:
-			{
-				struct df *df = df_lookup(arg->id);
-				mtp_notify_df_t *not = (typeof(not)) (arg + 1);
-
-				if (!df || (size -= sizeof(*not)) < 0)
-					goto einval;
-				not->events = df->notify.events;
-				break;
-			}
-			default:
-				rare();
-				goto einval;
-			}
-			return (0);
-		}
-	}
-	rare();
-      einval:
-	return (-EINVAL);
-}
-
-/*
- *  MTP_IOCSNOTIFY  - struct mtp_notify
- *  -------------------------------------------------------------------
- */
-static int
-mtp_iocsnotify(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_cont) {
-		int size = msgdsize(mp);
-		struct mtp_notify *arg = (typeof(arg)) mp->b_cont->b_rptr;
-
-		if ((size -= sizeof(*arg)) >= 0) {
-			switch (arg->type) {
-			case MTP_OBJ_TYPE_NA:
-			{
-				struct na *na = na_lookup(arg->id);
-				mtp_notify_na_t *not = (typeof(not)) (arg + 1);
-
-				if (!na || (size -= sizeof(*not)) < 0)
-					goto einval;
-				na->notify.events |= not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_SP:
-			{
-				struct sp *sp = sp_lookup(arg->id);
-				mtp_notify_sp_t *not = (typeof(not)) (arg + 1);
-
-				if (!sp || (size -= sizeof(*not)) < 0)
-					goto einval;
-				sp->notify.events |= not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_RS:
-			{
-				struct rs *rs = rs_lookup(arg->id);
-				mtp_notify_rs_t *not = (typeof(not)) (arg + 1);
-
-				if (!rs || (size -= sizeof(*not)) < 0)
-					goto einval;
-				rs->notify.events |= not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_RL:
-			{
-				struct rl *rl = rl_lookup(arg->id);
-				mtp_notify_rl_t *not = (typeof(not)) (arg + 1);
-
-				if (!rl || (size -= sizeof(*not)) < 0)
-					goto einval;
-				rl->notify.events |= not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_RT:
-			{
-				struct rt *rt = rt_lookup(arg->id);
-				mtp_notify_rt_t *not = (typeof(not)) (arg + 1);
-
-				if (!rt || (size -= sizeof(*not)) < 0)
-					goto einval;
-				rt->notify.events |= not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_LS:
-			{
-				struct ls *ls = ls_lookup(arg->id);
-				mtp_notify_ls_t *not = (typeof(not)) (arg + 1);
-
-				if (!ls || (size -= sizeof(*not)) < 0)
-					goto einval;
-				ls->notify.events |= not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_LK:
-			{
-				struct lk *lk = lk_lookup(arg->id);
-				mtp_notify_lk_t *not = (typeof(not)) (arg + 1);
-
-				if (!lk || (size -= sizeof(*not)) < 0)
-					goto einval;
-				lk->notify.events |= not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_SL:
-			{
-				struct sl *sl = sl_lookup(arg->id);
-				mtp_notify_sl_t *not = (typeof(not)) (arg + 1);
-
-				if (!sl || (size -= sizeof(*not)) < 0)
-					goto einval;
-				sl->notify.events |= not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_DF:
-			{
-				struct df *df = df_lookup(arg->id);
-				mtp_notify_df_t *not = (typeof(not)) (arg + 1);
-
-				if (!df || (size -= sizeof(*not)) < 0)
-					goto einval;
-				df->notify.events |= not->events;
-				break;
-			}
-			default:
-				rare();
-				goto einval;
-			}
-			return (0);
-		}
-	}
-	rare();
-      einval:
-	return (-EINVAL);
-}
-
-/*
- *  MTP_IOCCNOTIFY  - struct mtp_notify
- *  -------------------------------------------------------------------
- */
-static int
-mtp_ioccnotify(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_cont) {
-		int size = msgdsize(mp);
-		struct mtp_notify *arg = (typeof(arg)) mp->b_cont->b_rptr;
-
-		if ((size -= sizeof(*arg)) >= 0) {
-			switch (arg->type) {
-			case MTP_OBJ_TYPE_NA:
-			{
-				struct na *na = na_lookup(arg->id);
-				mtp_notify_na_t *not = (typeof(not)) (arg + 1);
-
-				if (!na || (size -= sizeof(*not)) < 0)
-					goto einval;
-				na->notify.events &= ~not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_SP:
-			{
-				struct sp *sp = sp_lookup(arg->id);
-				mtp_notify_sp_t *not = (typeof(not)) (arg + 1);
-
-				if (!sp || (size -= sizeof(*not)) < 0)
-					goto einval;
-				sp->notify.events &= ~not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_RS:
-			{
-				struct rs *rs = rs_lookup(arg->id);
-				mtp_notify_rs_t *not = (typeof(not)) (arg + 1);
-
-				if (!rs || (size -= sizeof(*not)) < 0)
-					goto einval;
-				rs->notify.events &= ~not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_RL:
-			{
-				struct rl *rl = rl_lookup(arg->id);
-				mtp_notify_rl_t *not = (typeof(not)) (arg + 1);
-
-				if (!rl || (size -= sizeof(*not)) < 0)
-					goto einval;
-				rl->notify.events &= ~not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_RT:
-			{
-				struct rt *rt = rt_lookup(arg->id);
-				mtp_notify_rt_t *not = (typeof(not)) (arg + 1);
-
-				if (!rt || (size -= sizeof(*not)) < 0)
-					goto einval;
-				rt->notify.events &= ~not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_LS:
-			{
-				struct ls *ls = ls_lookup(arg->id);
-				mtp_notify_ls_t *not = (typeof(not)) (arg + 1);
-
-				if (!ls || (size -= sizeof(*not)) < 0)
-					goto einval;
-				ls->notify.events &= ~not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_LK:
-			{
-				struct lk *lk = lk_lookup(arg->id);
-				mtp_notify_lk_t *not = (typeof(not)) (arg + 1);
-
-				if (!lk || (size -= sizeof(*not)) < 0)
-					goto einval;
-				lk->notify.events &= ~not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_SL:
-			{
-				struct sl *sl = sl_lookup(arg->id);
-				mtp_notify_sl_t *not = (typeof(not)) (arg + 1);
-
-				if (!sl || (size -= sizeof(*not)) < 0)
-					goto einval;
-				sl->notify.events &= ~not->events;
-				break;
-			}
-			case MTP_OBJ_TYPE_DF:
-			{
-				struct df *df = df_lookup(arg->id);
-				mtp_notify_df_t *not = (typeof(not)) (arg + 1);
-
-				if (!df || (size -= sizeof(*not)) < 0)
-					goto einval;
-				df->notify.events &= ~not->events;
-				break;
-			}
-			default:
-				rare();
-				goto einval;
-			}
-		}
-	}
-	rare();
-      einval:
-	return (-EINVAL);
-}
-
-/*
- *  MTP_IOCCMGMT    - mtp_mgmt_t
- *  -------------------------------------------------------------------
- */
-static int
-mtp_ioccmgmt(queue_t *q, mblk_t *mp)
-{
-	int err;
-
-	if (mp->b_cont) {
-		mtp_mgmt_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-
-		switch (arg->type) {
-		case MTP_OBJ_TYPE_NA:
-		{
-			struct na *na = na_lookup(arg->id);
-
-			if (!na)
-				goto einval;
-			if ((err = mtp_mgmt_na(q, na, arg->cmd)))
-				goto error;
-			break;
-		}
-		case MTP_OBJ_TYPE_SP:
-		{
-			struct sp *sp = sp_lookup(arg->id);
-
-			if (!sp)
-				goto einval;
-			if ((err = mtp_mgmt_sp(q, sp, arg->cmd)))
-				goto error;
-			break;
-		}
-		case MTP_OBJ_TYPE_RS:
-		{
-			struct rs *rs = rs_lookup(arg->id);
-
-			if (!rs)
-				goto einval;
-			if ((err = mtp_mgmt_rs(q, rs, arg->cmd)))
-				goto error;
-			break;
-		}
-		case MTP_OBJ_TYPE_RL:
-		{
-			struct rl *rl = rl_lookup(arg->id);
-
-			if (!rl)
-				goto einval;
-			if ((err = mtp_mgmt_rl(q, rl, arg->cmd)))
-				goto error;
-			break;
-		}
-		case MTP_OBJ_TYPE_RT:
-		{
-			struct rt *rt = rt_lookup(arg->id);
-
-			if (!rt)
-				goto einval;
-			if ((err = mtp_mgmt_rt(q, rt, arg->cmd)))
-				goto error;
-			break;
-		}
-		case MTP_OBJ_TYPE_LS:
-		{
-			struct ls *ls = ls_lookup(arg->id);
-
-			if (!ls)
-				goto einval;
-			if ((err = mtp_mgmt_ls(q, ls, arg->cmd)))
-				goto error;
-			break;
-		}
-		case MTP_OBJ_TYPE_LK:
-		{
-			struct lk *lk = lk_lookup(arg->id);
-
-			if (!lk)
-				goto einval;
-			if ((err = mtp_mgmt_lk(q, lk, arg->cmd)))
-				goto error;
-			break;
-		}
-		case MTP_OBJ_TYPE_SL:
-		{
-			struct sl *sl = sl_lookup(arg->id);
-
-			if (!sl)
-				goto einval;
-			if ((err = mtp_mgmt_sl(q, sl, arg->cmd)))
-				goto error;
-			break;
-		}
-		case MTP_OBJ_TYPE_DF:
-		{
-			struct df *df = df_lookup(arg->id);
-
-			if (!df)
-				goto einval;
-			if ((err = mtp_mgmt_df(q, df, arg->cmd)))
-				goto error;
-			break;
-		}
-		default:
-			rare();
-		      einval:
-			return (-EINVAL);
-		}
+	switch (p->type) {
+	case MTP_OBJ_TYPE_NA:
+		if (p->cmd != MTP_ADD && !na_lookup(p->id))
+			return (ESRCH);
+		*sizep = sizeof(struct mtp_conf_na);
 		return (0);
+	case MTP_OBJ_TYPE_SP:
+		if (p->cmd != MTP_ADD && !sp_lookup(p->id))
+			return (ESRCH);
+		*sizep = sizeof(struct mtp_conf_sp);
+		return (0);
+	case MTP_OBJ_TYPE_RS:
+		if (p->cmd != MTP_ADD && !rs_lookup(p->id))
+			return (ESRCH);
+		*sizep = sizeof(struct mtp_conf_rs);
+		return (0);
+	case MTP_OBJ_TYPE_RL:
+		if (p->cmd != MTP_ADD && !rl_lookup(p->id))
+			return (ESRCH);
+		*sizep = sizeof(struct mtp_conf_rl);
+		return (0);
+	case MTP_OBJ_TYPE_RT:
+		if (p->cmd != MTP_ADD && !rt_lookup(p->id))
+			return (ESRCH);
+		*sizep = sizeof(struct mtp_conf_rt);
+		return (0);
+	case MTP_OBJ_TYPE_LS:
+		if (p->cmd != MTP_ADD && !ls_lookup(p->id))
+			return (ESRCH);
+		*sizep = sizeof(struct mtp_conf_ls);
+		return (0);
+	case MTP_OBJ_TYPE_LK:
+		if (p->cmd != MTP_ADD && !lk_lookup(p->id))
+			return (ESRCH);
+		*sizep = sizeof(struct mtp_conf_lk);
+		return (0);
+	case MTP_OBJ_TYPE_SL:
+		if (p->cmd != MTP_ADD && !sl_lookup(p->id))
+			return (ESRCH);
+		*sizep = sizeof(struct mtp_conf_sl);
+		return (0);
+	case MTP_OBJ_TYPE_DF:
+		if (p->cmd != MTP_ADD && !df_lookup(p->id))
+			return (ESRCH);
+		*sizep = sizeof(struct mtp_conf_df);
+		return (0);
+	default:
+		return (EINVAL);
 	}
-	rare();
-	return (-EINVAL);
-      error:
-	rare();
-	return (err);
+}
+static int
+mtp_size_opt_conf(unsigned char *arg, int *sizep)
+{
+	struct mtp_option *p = (typeof(p)) arg;
+
+	switch (p->type) {
+	case MTP_OBJ_TYPE_NA:
+		*sizep = sizeof(struct mtp_opt_conf_na);
+		return (0);
+	case MTP_OBJ_TYPE_SP:
+		*sizep = sizeof(struct mtp_opt_conf_sp);
+		return (0);
+	case MTP_OBJ_TYPE_RS:
+		*sizep = sizeof(struct mtp_opt_conf_rs);
+		return (0);
+	case MTP_OBJ_TYPE_RL:
+		*sizep = sizeof(struct mtp_opt_conf_rl);
+		return (0);
+	case MTP_OBJ_TYPE_RT:
+		*sizep = sizeof(struct mtp_opt_conf_rt);
+		return (0);
+	case MTP_OBJ_TYPE_LS:
+		*sizep = sizeof(struct mtp_opt_conf_ls);
+		return (0);
+	case MTP_OBJ_TYPE_LK:
+		*sizep = sizeof(struct mtp_opt_conf_lk);
+		return (0);
+	case MTP_OBJ_TYPE_SL:
+		*sizep = sizeof(struct mtp_opt_conf_sl);
+		return (0);
+	case MTP_OBJ_TYPE_DF:
+		*sizep = sizeof(struct mtp_opt_conf_df);
+		return (0);
+	default:
+		return (EINVAL);
+	}
+}
+static int
+mtp_size_stats(unsigned char *arg, int *sizep)
+{
+	struct mtp_stats *p = (typeof(p)) arg;
+
+	switch (p->type) {
+	case MTP_OBJ_TYPE_NA:
+		*sizep = sizeof(struct mtp_stats_na);
+		return (0);
+	case MTP_OBJ_TYPE_SP:
+		*sizep = sizeof(struct mtp_stats_sp);
+		return (0);
+	case MTP_OBJ_TYPE_RS:
+		*sizep = sizeof(struct mtp_stats_rs);
+		return (0);
+	case MTP_OBJ_TYPE_RL:
+		*sizep = sizeof(struct mtp_stats_rl);
+		return (0);
+	case MTP_OBJ_TYPE_RT:
+		*sizep = sizeof(struct mtp_stats_rt);
+		return (0);
+	case MTP_OBJ_TYPE_LS:
+		*sizep = sizeof(struct mtp_stats_ls);
+		return (0);
+	case MTP_OBJ_TYPE_LK:
+		*sizep = sizeof(struct mtp_stats_lk);
+		return (0);
+	case MTP_OBJ_TYPE_SL:
+		*sizep = sizeof(struct mtp_stats_sl);
+		return (0);
+	case MTP_OBJ_TYPE_DF:
+		*sizep = sizeof(struct mtp_stats_df);
+		return (0);
+	default:
+		return (EINVAL);
+	}
+}
+static int
+mtp_size_statem(unsigned char *arg, int *sizep)
+{
+	struct mtp_statem *p = (typeof(p)) arg;
+
+	switch (p->type) {
+	case MTP_OBJ_TYPE_NA:
+		*sizep = sizeof(struct mtp_statem_na);
+		return (0);
+	case MTP_OBJ_TYPE_SP:
+		*sizep = sizeof(struct mtp_statem_sp);
+		return (0);
+	case MTP_OBJ_TYPE_RS:
+		*sizep = sizeof(struct mtp_statem_rs);
+		return (0);
+	case MTP_OBJ_TYPE_RL:
+		*sizep = sizeof(struct mtp_statem_rl);
+		return (0);
+	case MTP_OBJ_TYPE_RT:
+		*sizep = sizeof(struct mtp_statem_rt);
+		return (0);
+	case MTP_OBJ_TYPE_LS:
+		*sizep = sizeof(struct mtp_statem_ls);
+		return (0);
+	case MTP_OBJ_TYPE_LK:
+		*sizep = sizeof(struct mtp_statem_lk);
+		return (0);
+	case MTP_OBJ_TYPE_SL:
+		*sizep = sizeof(struct mtp_statem_sl);
+		return (0);
+	case MTP_OBJ_TYPE_DF:
+		*sizep = sizeof(struct mtp_statem_df);
+		return (0);
+	default:
+		return (EINVAL);
+	}
+}
+static int
+mtp_size_notify(unsigned char *arg, int *sizep)
+{
+	struct mtp_notify *p = (typeof(p)) arg;
+
+	switch (p->type) {
+	case MTP_OBJ_TYPE_NA:
+		*sizep = sizeof(struct mtp_notify_na);
+		return (0);
+	case MTP_OBJ_TYPE_SP:
+		*sizep = sizeof(struct mtp_notify_sp);
+		return (0);
+	case MTP_OBJ_TYPE_RS:
+		*sizep = sizeof(struct mtp_notify_rs);
+		return (0);
+	case MTP_OBJ_TYPE_RL:
+		*sizep = sizeof(struct mtp_notify_rl);
+		return (0);
+	case MTP_OBJ_TYPE_RT:
+		*sizep = sizeof(struct mtp_notify_rt);
+		return (0);
+	case MTP_OBJ_TYPE_LS:
+		*sizep = sizeof(struct mtp_notify_ls);
+		return (0);
+	case MTP_OBJ_TYPE_LK:
+		*sizep = sizeof(struct mtp_notify_lk);
+		return (0);
+	case MTP_OBJ_TYPE_SL:
+		*sizep = sizeof(struct mtp_notify_sl);
+		return (0);
+	case MTP_OBJ_TYPE_DF:
+		*sizep = sizeof(struct mtp_notify_df);
+		return (0);
+	default:
+		return (EINVAL);
+	}
 }
 
 /*
@@ -16745,14 +17619,14 @@ static int
 mtp_ioccpass(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
-		mtp_pass_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		mtp_pass_t *p = (typeof(p)) mp->b_cont->b_rptr;
 		mblk_t *bp, *dp;
 		struct sl *sl;
 
-		for (sl = master.sl.list; sl && sl->u.mux.index != arg->muxid; sl = sl->next) ;
-		if (!sl || !sl->oq)
+		for (sl = master.sl.list; sl && sl->u.mux.index != p->muxid; sl = sl->next) ;
+		if (!sl || !sl->wq)
 			return (-EINVAL);
-		if (arg->type < QPCTL && !canputnext(sl->oq))
+		if (p->type < QPCTL && !canputnext(sl->wq))
 			return (-EBUSY);
 		if (!(bp = ss7_dupb(q, mp)))
 			return (-ENOBUFS);
@@ -16760,15 +17634,15 @@ mtp_ioccpass(queue_t *q, mblk_t *mp)
 			freeb(bp);
 			return (-ENOBUFS);
 		}
-		bp->b_datap->db_type = arg->type;
-		bp->b_band = arg->band;
+		bp->b_datap->db_type = p->type;
+		bp->b_band = p->band;
 		bp->b_cont = dp;
-		bp->b_rptr += sizeof(*arg);
-		bp->b_wptr = bp->b_rptr + arg->ctl_length;
+		bp->b_rptr += sizeof(*p);
+		bp->b_wptr = bp->b_rptr + p->ctl_length;
 		dp->b_datap->db_type = M_DATA;
-		dp->b_rptr += sizeof(*arg) + arg->ctl_length;
-		dp->b_wptr = dp->b_rptr + arg->dat_length;
-		putnext(sl->oq, bp);
+		dp->b_rptr += sizeof(*p) + p->ctl_length;
+		dp->b_wptr = dp->b_rptr + p->dat_length;
+		putnext(sl->wq, bp);
 		return (0);
 	}
 	rare();
@@ -16789,167 +17663,652 @@ mtp_ioccpass(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
+/**
+ * mtp_i_link: - perform I_LINK operation
+ * @mtp: MTP private structure
+ * @q: active queue (upper write queue)
+ * @mp: the M_IOCTL message
+ *
+ * The driver spuports I_LINK operations; however, any SL Stream that is linked with an I_LINK operation can only be
+ * managed by the control Stream linking the lower Stream and cannot be shared across other upper Streams unless
+ * configured against a SPID.
+ *
+ * Note that if this is not the first SL linked and there are running Users, this SL will not be available to them
+ * until it is conifgured and brought to the active state.  If this is the first SL, there cannot be running users.
+ */
+static int
+mtp_i_link(queue_t *q, struct mtp *mtp, mblk_t *mp)
+{
+	struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
+	struct linkblk *l = (typeof(l)) mp->b_cont->b_rptr;
+	lmi_info_req_t *p;
+	unsigned long flags;
+	struct sp *sp;
+	struct sl *sl = NULL;
+	mblk_t *rp = NULL;
+	int err;
+
+	if (!(rp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		err = -ENOBUFS;
+		goto error;
+	}
+	if (!(sl = mi_open_alloc(sizeof(*sl)))) {
+		err = ENOMEM;
+		goto error;
+	} else {
+		bzero(sl, sizeof(*sl));
+		sl->wq = WR(l->l_qtop);
+		sl->id = l->l_index;
+		sl->i.state = LMI_UNATTACHED;
+		sl->i.style = LMI_STYLE2;
+		sl->i.version = 1;
+		sl->i.state = SLS_OUT_OF_SERVICE;
+	}
+
+	write_lock_irqsave(&mtp_mux_lock, flags);
+
+	if (!(sp = mtp->sp.sp)) {
+		write_unlock_irqrestore(&mtp_mux_lock, flags);
+		err = ENXIO;
+		goto error;
+	}
+	if (!sp_trylock(q, sp)) {
+		err = -EDEADLK;
+		write_unlock_irqrestore(&mtp_mux_lock, flags);
+		goto error;
+	}
+	/* Note that there can only be one layer management Stream per SP.  For temporary links,
+	   that must be the same layer management Stream used to create the SP. */
+	if (sp->lm.lm != mtp) {
+		err = EPERM;
+		sp_unlock(sp);
+		write_unlock_irqrestore(&mtp_mux_lock, flags);
+		goto error;
+	}
+
+	if ((sl->sp.next = sp->sl.list))
+		sl->sp.next->sp.prev = &sl->sp.next;
+	sl->sp.prev = &sp->sl.list;
+	sl->sp.sp = sp;
+	sp->sl.list = sl;
+
+	mi_attach(l->l_qtop, (caddr_t) sl);
+	sp_unlock(sp);
+	write_unlock_irqrestore(&mtp_mux_lock, flags);
+
+	mi_copy_done(q, mp, 0);
+
+	DB_TYPE(rp) = M_PCPROTO;
+	p = (typeof(p)) rp->b_rptr;
+	p->lmi_primitive = LMI_INFO_REQ;
+	rp->b_wptr = rp->b_rptr + sizeof(*p);
+	putnext(sl->wq, rp);	/* immediate info request */
+
+	return (0);
+      error:
+	if (rp)
+		freeb(rp);
+	if (sl) {
+		mtp_unlink_free(sl);
+	}
+	if (err >= 0) {
+		mi_copy_done(q, mp, err);
+		return (0);
+	}
+	return (err);
+}
+static int
+mtp_i_plink(queue_t *q, struct mtp *mtp, mblk_t *mp)
+{
+	struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
+	struct linkblk *l = (typeof(l)) mp->b_cont->b_rptr;
+	struct sl *sl;
+	int err = EPERM;
+
+	if (ioc->ioc_cr->cr_uid == 0) {
+		err = ENOMEM;
+		if ((sl = mtp_alloc_link(l->l_qbot, l->l_index, iocp->ioc_cr, 0)))
+			err = 0;
+	}
+	mi_copy_done(q, mp, err);
+	return (0);
+}
+static int
+mtp_i_unlink(queue_t *q, struct mtp *mtp, mblk_t *mp)
+{
+	struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
+	struct linkblk *l = (typeof(l)) mp->b_cont->b_rptr;
+	struct sl *sl;
+
+	sl = SL_PRIV(l->l_qtop);
+	mtp_free_link(sl);
+	mi_copy_done(q, mp, 0);
+	return (0);
+}
+static int
+mtp_i_punlink(queue_t *q, struct mtp *mtp, mblk_t *mp)
+{
+	struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
+	struct linkblk *l = (typeof(l)) mp->b_cont->b_rptr;
+	struct sl *sl;
+	int err = EPERM;
+
+	if (ioc->ioc_cr->cr_uid == 0) {
+		sl = SL_PRIV(l->l_qtop);
+		mtp_free_link(sl);
+		err = 0;
+	}
+	mi_copy_done(q, mp, err);
+	return (0);
+}
+static int
+mtp_i_ioctl(queue_t *q, struct mtp *mtp, mblk_t *mp)
+{
+	struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
+
+	switch (_IOC_NR(ioc->ioc_cmd)) {
+	case _IOC_NR(I_LINK):
+		return mtp_i_link(q, mtp, mp);
+	case _IOC_NR(I_PLINK):
+		return mtp_i_plink(q, mtp, mp);
+	case _IOC_NR(I_UNLINK):
+		return mtp_i_unlink(q, mtp, mp);
+	case _IOC_NR(I_PUNLINK):
+		return mtp_i_punlink(q, mtp, mp);
+	}
+	mi_copy_done(q, mp, EINVAL);
+	return (0);
+}
+
+/**
+ * mtp_ioctl: - process MTP M_IOCTL message
+ * @mtp: MTP private structure
+ * @q: active queue (upper write queue)
+ * @mp: the M_IOCTL message
+ *
+ * This is step 1 of the input-output control operation.  Step 1 consists of copying in the necessary prefix structure
+ * that identifies the object type and id being managed.
+ */
+static int
+mtp_ioctl(queue_t *q, struct mtp *mtp, mblk_t *mp)
+{
+	struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
+	int size = -1;
+	int err = 0;
+
+	switch (_IOC_NR(ioc->ioc_cmd)) {
+	case _IOC_NR(MTP_IOCGOPTION):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCGOPTION)");
+		size = sizeof(struct mtp_option);
+		break;
+	case _IOC_NR(MTP_IOCSOPTION):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCSOPTION)");
+		size = sizeof(struct mtp_option);
+		break;
+	case _IOC_NR(MTP_IOCSCONFIG):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCSCONFIG)");
+		size = sizeof(struct mtp_config);
+		break;
+	case _IOC_NR(MTP_IOCGCONFIG):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCGCONFIG)");
+		size = sizeof(struct mtp_config);
+		break;
+	case _IOC_NR(MTP_IOCTCONFIG):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCTCONFIG)");
+		size = sizeof(struct mtp_config);
+		break;
+	case _IOC_NR(MTP_IOCCCONFIG):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCCCONFIG)");
+		size = sizeof(struct mtp_config);
+		break;
+	case _IOC_NR(MTP_IOCLCONFIG):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCLCONFIG)");
+		size = sizeof(struct mtp_config);
+		break;
+	case _IOC_NR(MTP_IOCGSTATEM):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCGSTATEM)");
+		size = sizeof(struct mtp_statem);
+		break;
+	case _IOC_NR(MTP_IOCCMRESET):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCCMRESET)");
+		size = sizeof(struct mtp_statem);
+		break;
+	case _IOC_NR(MTP_IOCGSTATSP):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCGSTATSP)");
+		size = sizeof(struct mtp_stats);
+		break;
+	case _IOC_NR(MTP_IOCSSTATSP):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCSSTATSP)");
+		size = sizeof(struct mtp_stats);
+		break;
+	case _IOC_NR(MTP_IOCGSTATS):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCGSTATS)");
+		size = sizeof(struct mtp_stats);
+		break;
+	case _IOC_NR(MTP_IOCCSTATS):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCCSTATS)");
+		size = sizeof(struct mtp_stats);
+		break;
+	case _IOC_NR(MTP_IOCGNOTIFY):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCGNOTIFY)");
+		size = sizeof(struct mtp_notify);
+		break;
+	case _IOC_NR(MTP_IOCSNOTIFY):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCSNOTIFY)");
+		size = sizeof(struct mtp_notify);
+		break;
+	case _IOC_NR(MTP_IOCCNOTIFY):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCCNOTIFY)");
+		size = sizeof(struct mtp_notify);
+		break;
+	case _IOC_NR(MTP_IOCCMGMT):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCCMGMT)");
+		size = sizeof(struct mtp_mgmt);
+		break;
+	case _IOC_NR(MTP_IOCCPASS):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(MTP_IOCCPASS)");
+		size = sizeof(struct mtp_pass);
+		break;
+	default:
+		err = EOPNOTSUPP;
+		break;
+	}
+	if (err < 0)
+		return (err);
+	if (err > 0)
+		mi_copy_done(q, mp, err);
+	if (err == 0) {
+		if (size == -1)
+			mi_copyout(q, mp);
+		else
+			mi_copyin(q, mp, NULL, size);
+	}
+	return (0);
+}
+
+/* this structure is just to determine the maximum size of an ioctl */
+union mtp_ioctls {
+	struct {
+		struct mtp_option option;
+		union mtp_option_obj obj;
+	} opt_conf;
+	struct {
+		struct mtp_config config;
+		union mtp_config_obj obj;
+	} conf;
+	struct {
+		struct mtp_statem statem;
+		union mtp_statem_obj obj;
+	} statem;
+	struct {
+		struct mtp_stats stats;
+		union mtp_stats_obj obj;
+	} stats;
+	struct {
+		struct mtp_notify notify;
+		union mtp_notify_obj obj;
+	} notify;
+	struct mtp_mgmt mgmt;
+	struct mtp_pass pass;
+};
+
+/**
+ * mtp_copyin: - process MTP M_IOCDATA message
+ * @mtp: MTP private structure
+ * @q: active queue (upper write queue)
+ * @mp: the M_IOCDATA message
+ * @dp: data part
+ *
+ * This is step 2 of the MTP input-output control operation.  Step 2 consists of copying out for GET operations, and
+ * processing an additional copy in operation of object specific information for SET operations.
+ */
+static int
+mtp_copyin(queue_t *q, struct mtp *mtp, mblk_t *mp, mblk_t *dp)
+{
+	struct copyresp *cp = (typeof(cp)) mp->b_rptr;
+	mblk_t *bp;
+	int size = -1;
+	int err = 0;
+
+	switch (_IOC_NR(cp->cp_cmd)) {
+		int len;
+
+	case _IOC_NR(MTP_IOCGOPTION):
+	case _IOC_NR(MTP_IOCGCONFIG):
+	case _IOC_NR(MTP_IOCGSTATEM):
+	case _IOC_NR(MTP_IOCGSTATSP):
+	case _IOC_NR(MTP_IOCGSTATS):
+	case _IOC_NR(MTP_IOCCSTATS):
+	case _IOC_NR(MTP_IOCGNOTIFY):
+		len = sizeof(union mtp_ioctls);
+		if (!(bp = mi_copyout_alloc(q, mp, NULL, len, false)))
+			goto enobufs;
+		bcopy(dp->b_rptr, bp->b_rptr, min(dp->b_wptr - dp->b_rptr, len));
+		break;
+	case _IOC_NR(MTP_IOCLCONFIG):
+	{
+		struct mtp_config *p = (typeof(p)) dp->b_rptr;
+
+		len = (p->cmd + 1) * sizeof(*p);
+		if (!(bp = mi_copyout_alloc(q, mp, NULL, len, false)))
+			goto enobufs;
+		bcopy(dp->b_rptr, bp->b_rptr, min(dp->b_wptr - dp->b_rptr, len));
+		break;
+	}
+	}
+	switch (_IOC_NR(cp->cp_cmd)) {
+	case _IOC_NR(MTP_IOCGOPTION):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCGOPTION)");
+		err = mtp_get_options(bp);
+		break;
+	case _IOC_NR(MTP_IOCSOPTION):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCSOPTION)");
+		err = mtp_size_opt_conf(dp->b_rptr, &size);
+		break;
+	case _IOC_NR(MTP_IOCGCONFIG):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCGCONFIG)");
+		err = mtp_get_conf(bp);
+		break;
+	case _IOC_NR(MTP_IOCSCONFIG):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCSCONFIG)");
+		err = mtp_size_conf(dp->b_rptr, &size);
+		break;
+	case _IOC_NR(MTP_IOCTCONFIG):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCTCONFIG)");
+		err = mtp_size_conf(dp->b_rptr, &size);
+		break;
+	case _IOC_NR(MTP_IOCCCONFIG):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCCCONFIG)");
+		err = mtp_size_conf(dp->b_rptr, &size);
+		break;
+	case _IOC_NR(MTP_IOCLCONFIG):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCLCONFIG)");
+		err = mtp_lst_conf(bp);
+		break;
+	case _IOC_NR(MTP_IOCGSTATEM):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCGSTATEM)");
+		err = mtp_get_statem(bp);
+		break;
+	case _IOC_NR(MTP_IOCCMRESET):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCCMRESET)");
+		err = EOPNOTSUPP; /* later */ ;
+		break;
+	case _IOC_NR(MTP_IOCGSTATSP):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCGSTATSP)");
+		err = mtp_do_statsp(bp, MTP_GET);
+		break;
+	case _IOC_NR(MTP_IOCSSTATSP):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCSSTATSP)");
+		err = mtp_size_stats(dp->b_rptr, &size);
+		break;
+	case _IOC_NR(MTP_IOCGSTATS):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCGSTATS)");
+		err = mtp_get_stats(bp, false);
+		break;
+	case _IOC_NR(MTP_IOCCSTATS):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCCSTATS)");
+		err = mtp_get_stats(bp, true);
+		break;
+	case _IOC_NR(MTP_IOCGNOTIFY):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCCSTATS)");
+		err = mtp_do_notify(bp, MTP_GET);
+		break;
+	case _IOC_NR(MTP_IOCSNOTIFY):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCSNOTIFY)");
+		err = mtp_size_notify(dp->b_rptr, &size);
+		break;
+	case _IOC_NR(MTP_IOCCNOTIFY):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCCNOTIFY)");
+		err = mtp_size_notify(dp->b_rptr, &size);
+		break;
+	case _IOC_NR(MTP_IOCCMGMT):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCCMGMT)");
+		err = mtp_action(q, dp);
+		break;
+	case _IOC_NR(MTP_IOCPASS):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCCPASS)");
+		break;
+	default:
+		err = EOPNOTSUPP;
+		break;
+	}
+      done:
+	if (err < 0)
+		return (err);
+	if (err > 0)
+		mi_copy_done(q, mp, err);
+	if (err == 0) {
+		if (size == -1)
+			mi_copyout(q, mp);
+		else
+			mi_copyin_n(q, mp, 0, size);
+	}
+	return (0);
+      enobufs:
+	err = ENOBUFS;
+	goto done;
+}
+
+/**
+ * mtp_copyin2: - process MTP M_IOCDATA message
+ * @mtp: MTP private structure
+ * @q: active queue (upper write queue)
+ * @mp: the M_IOCDATA message
+ * @dp: data part
+ *
+ * Step 3 of the input-output control operation is an optional step that is used for SET operations.  After the second
+ * copyin we now have the object specific structure that was passed by the user and can complete the SET operation.
+ * All SET operations also include a last copyout step that copies out the information actually set (e.g. the assigned
+ * id on MTP_ADD operations).
+ */
+static int
+mtp_copyin2(queue_t *q, struct mtp *mtp, mblk_t *mp, mblk_t *dp)
+{
+	int err = 0;
+	mblk_t *bp;
+
+	if (!(bp = mi_copyout_alloc(q, mp, NULL, dp->b_wptr - dp->b_rptr, false)))
+		goto enobufs;
+	bcopy(dp->b_rptr, bp->b_wptr, dp->b_wptr - dp->b_rptr);
+
+	switch (_IOC_NR(((struct copyresp *) mp->b_rptr)->cp_cmd)) {
+	case _IOC_NR(MTP_IOCGOPTION):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCGOPTION)");
+		err = EPROTO;
+		break;
+	case _IOC_NR(MTP_IOCSOPTION):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCSOPTION)");
+		err = mtp_set_options(bp);
+		break;
+	case _IOC_NR(MTP_IOCGCONFIG):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCGCONFIG)");
+		err = EPROTO;
+		break;
+	case _IOC_NR(MTP_IOCSCONFIG):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCSCONFIG)");
+		err = mtp_set_conf(bp);
+		break;
+	case _IOC_NR(MTP_IOCTCONFIG):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCTCONFIG)");
+		err = mtp_test_conf(bp);
+		break;
+	case _IOC_NR(MTP_IOCCCONFIG):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCCCONFIG)");
+		err = mtp_commit_conf(bp);
+		break;
+	case _IOC_NR(MTP_IOCLCONFIG):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCLCONFIG)");
+		err = EPROTO;
+		break;
+	case _IOC_NR(MTP_IOCGSTATEM):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCGSTATEM)");
+		err = EPROTO;
+		break;
+	case _IOC_NR(MTP_IOCCMRESET):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCCMRESET)");
+		err = EPROTO;
+		break;
+	case _IOC_NR(MTP_IOCGSTATSP):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCGSTATSP)");
+		err = EPROTO;
+		break;
+	case _IOC_NR(MTP_IOCSSTATSP):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCSSTATSP)");
+		err = mtp_do_statsp(bp, MTP_CHA);
+		break;
+	case _IOC_NR(MTP_IOCGSTATS):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCGSTATS)");
+		err = EPROTO;
+		break;
+	case _IOC_NR(MTP_IOCCSTATS):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCCSTATS)");
+		err = EPROTO;
+		break;
+	case _IOC_NR(MTP_IOCGNOTIFY):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCGNOTIFY)");
+		err = EPROTO;
+		break;
+	case _IOC_NR(MTP_IOCSNOTIFY):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCSNOTIFY)");
+		err = mtp_do_notify(bp, MTP_ADD);
+		break;
+	case _IOC_NR(MTP_IOCCNOTIFY):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCCNOTIFY)");
+		err = mtp_do_notify(bp, MTP_DEL);
+		break;
+	case _IOC_NR(MTP_IOCCMGMT):
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCCMGMT)");
+		err = EPROTO;
+		break;
+	case _IOC_NR(MTP_IOCCPASS):
+	{
+		struct mtp_pass *p = (typeof(p)) dp->b_rptr;
+
+		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(MTP_IOCCPASS)");
+		break;
+	}
+	default:
+		err = EOPNOTSUPP;
+		break;
+	}
+      done:
+	if (err < 0)
+		return (err);
+	if (err > 0)
+		mi_copy_done(q, mp, err);
+	if (err == 0)
+		mi_copyout(q, mp);
+	return (0);
+      enobufs:
+	err = ENOBUFS;
+	goto done;
+}
+
+/**
+ * mtp_copyout: - process MTP M_IOCDATA message
+ * @mtp: MTP private structure
+ * @q: active queue (upper write queue)
+ * @mp: the M_IOCDATA message
+ * @dp: data part
+ * 
+ * Step 4 and the final step of the input-output control operation is a final copyout step.
+ */
+static int
+mtp_copyout(queue_t *q, struct mtp *mtp, mblk_t *mp, mblk_t *dp)
+{
+	mi_copyout(q, mp);
+	return (0);
+}
+
+/**
+ * mtp_w_ioctl: - process M_IOCTL message
+ * @q: active queue (upper write queue)
+ * @mp: the M_IOCTL message
+ */
 static int
 mtp_w_ioctl(queue_t *q, mblk_t *mp)
 {
-	struct mtp *mtp = MTP_PRIV(q);
-	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
-	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
-	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
-	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
-	int ret = 0;
+	struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
+	struct mtp *mtp;
+	int err = 0;
 
-	(void) mtp;
-	switch (type) {
-	case _IOC_TYPE(__SID):
-	{
-		struct sl *sl;
-		struct linkblk *lb;
-
-		if (!(lb = arg)) {
-			swerr();
-			ret = (-EINVAL);
-			break;
-		}
-		switch (nr) {
-		case _IOC_NR(I_PLINK):
-			if (iocp->ioc_cr->cr_uid != 0) {
-				mi_strlog(q, 0, SL_ERROR, "I_PLINK: Non-root attempt to I_PLINK");
-				ret = -EPERM;
-				break;
-			}
-		case _IOC_NR(I_LINK):
-			if ((sl = mtp_alloc_link(lb->l_qbot, &master.sl.list,
-						 lb->l_index, iocp->ioc_cr)))
-				break;
-			ret = -ENOMEM;
-			break;
-		case _IOC_NR(I_PUNLINK):
-			if (iocp->ioc_cr->cr_uid != 0) {
-				mi_strlog(q, 0, SL_ERROR,
-					  "I_PUNLINK: Non-root attempt to I_PUNLINK");
-				ret = -EPERM;
-				break;
-			}
-		case _IOC_NR(I_UNLINK):
-			sl = SL_PRIV(lb->l_qtop);
-			mtp_free_link(sl);
-			break;
-		default:
-		case _IOC_NR(I_STR):
-			mi_strlog(q, 0, SL_ERROR, "Unsupported STREAMS ioctl %d", nr);
-			ret = (-EOPNOTSUPP);
-			break;
-		}
-		break;
+	if (!mp->b - cont) {
+		mi_copy_done(q, mp, EFAULT);
+		return (0);
 	}
+	if (!(mtp = mtp_acquire(q)))
+		return (-EAGAIN);
+
+	switch (_IOC_TYPE(ioc->ioc_cmd)) {
+	case __SID:
+		err = mtp_i_ioctl(q, mtp, mp);
+		break;
 	case MTP_IOC_MAGIC:
-	{
-		if (count < size) {
-			ret = (-EINVAL);
-			break;
-		}
-		switch (nr) {
-		case _IOC_NR(MTP_IOCGOPTION):	/* struct lmi_option */
-			printd(("%s: %p: -> MTP_IOCGOPTION\n", DRV_NAME, mtp));
-			ret = mtp_iocgoptions(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCSOPTION):	/* struct lmi_option */
-			printd(("%s: %p: -> MTP_IOCSOPTION\n", DRV_NAME, mtp));
-			ret = mtp_iocsoptions(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCGCONFIG):	/* struct mtp_config */
-			printd(("%s: %p: -> MTP_IOCGCONFIG\n", DRV_NAME, mtp));
-			ret = mtp_iocgconfig(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCSCONFIG):	/* struct mtp_config */
-			printd(("%s: %p: -> MTP_IOCSCONFIG\n", DRV_NAME, mtp));
-			ret = mtp_iocsconfig(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCTCONFIG):	/* struct mtp_config */
-			printd(("%s: %p: -> MTP_IOCTCONFIG\n", DRV_NAME, mtp));
-			ret = mtp_ioctconfig(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCCCONFIG):	/* struct mtp_config */
-			printd(("%s: %p: -> MTP_IOCCCONFIG\n", DRV_NAME, mtp));
-			ret = mtp_ioccconfig(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCGSTATEM):	/* struct mtp_statem */
-			printd(("%s: %p: -> MTP_IOCGSTATEM\n", DRV_NAME, mtp));
-			ret = mtp_iocgstatem(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCCMRESET):	/* struct mtp_statem */
-			printd(("%s: %p: -> MTP_IOCCMRESET\n", DRV_NAME, mtp));
-			ret = mtp_ioccmreset(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCGSTATSP):	/* struct mtp_stats */
-			printd(("%s: %p: -> MTP_IOCGSTATSP\n", DRV_NAME, mtp));
-			ret = mtp_iocgstatsp(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCSSTATSP):	/* struct mtp_stats */
-			printd(("%s: %p: -> MTP_IOCSSTATSP\n", DRV_NAME, mtp));
-			ret = mtp_iocsstatsp(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCGSTATS):	/* struct mtp_stats */
-			printd(("%s: %p: -> MTP_IOCGSTATS\n", DRV_NAME, mtp));
-			ret = mtp_iocgstats(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCSSTATS):	/* struct mtp_stats */
-			printd(("%s: %p: -> MTP_IOCSSTATS\n", DRV_NAME, mtp));
-			ret = mtp_iocsstats(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCGNOTIFY):	/* struct mtp_notify */
-			printd(("%s: %p: -> MTP_IOCGNOTIFY\n", DRV_NAME, mtp));
-			ret = mtp_iocgnotify(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCSNOTIFY):	/* struct mtp_notify */
-			printd(("%s: %p: -> MTP_IOCSNOTIFY\n", DRV_NAME, mtp));
-			ret = mtp_iocsnotify(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCCNOTIFY):	/* struct mtp_notify */
-			printd(("%s: %p: -> MTP_IOCCNOTIFY\n", DRV_NAME, mtp));
-			ret = mtp_ioccnotify(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCCMGMT):	/* struct mtp_ctl */
-			printd(("%s: %p: -> MTP_IOCCMGMT\n", DRV_NAME, mtp));
-			ret = mtp_ioccmgmt(q, mp);
-			break;
-		case _IOC_NR(MTP_IOCCPASS):	/* ulong */
-			printd(("%s: %p: -> MTP_IOCCPASS\n", DRV_NAME, mtp));
-			ret = mtp_ioccpass(q, mp);
-			break;
-		default:
-			mi_strlog(q, 0, SL_ERROR, "Unsupported MTP ioctl %d", nr);
-			ret = (-EOPNOTSUPP);
-			break;
-		}
+		err = mtp_ioctl(q, mtp, mp);
 		break;
-	}
-		/* TODO: Need to add standard TPI/NPI ioctls */
 	default:
-		ret = (-EOPNOTSUPP);
+		mi_copy_done(q, mp, EINVAL);
 		break;
 	}
-	if (ret > 0) {
-		return (ret);
-	} else if (ret == 0) {
-		DB_TYPE(mp) = M_IOCACK;
-		iocp->ioc_error = 0;
-		iocp->ioc_rval = 0;
-	} else {
-		DB_TYPE(mp) = M_IOCNAK;
-		iocp->ioc_error = -ret;
-		iocp->ioc_rval = -1;
-	}
-	qreply(q, mp);
-	return (QR_ABSORBED);
+	mtp_release(mtp);
+	return (err);
+
 }
 
+/**
+ * mtp_w_iocdata: - process M_IOCDATA message
+ * @q: active queue (upper write queue)
+ * @mp: the M_IOCDATA message
+ */
 static int
 mtp_w_iocdata(queue_t *q, mblk_t *mp)
 {
-	mi_copy_done(q, mp, EPROTO);
-	return (0);
+	struct copyresp *cp = (typeof(cp)) mp->b_rptr;
+	struct mtp *mtp;
+	int err = 0;
+	mblk_t *dp;
+
+	if (!(mtp = mtp_acquire(q)))
+		return (-EAGAIN);
+	switch (mi_copy_state(q, mp, &dp)) {
+	case -1:
+		break;
+	case MI_COPY_CASE(MI_COPY_IN, 1):
+		switch (_IOC_TYPE(cp->cp_cmd)) {
+		case MTP_IOC_MAGIC:
+			err = mtp_copyin(q, mtp, mp, dp);
+			break;
+		default:
+			mi_copy_done(q, mp, EINVAL);
+			break;
+		}
+		break;
+	case MI_COPY_CASE(MI_COPY_IN, 2):
+		switch (_IOC_TYPE(cp->cp_cmd)) {
+		case MTP_IOC_MAGIC:
+			err = mtp_copyin2(q, mtp, mp, dp);
+			break;
+		default:
+			mi_copy_done(q, mp, EINVAL);
+			break;
+		}
+		break;
+	case MI_COPY_CASE(MI_COPY_OUT, 1):
+		switch (_IOC_TYPE(cp->cp_cmd)) {
+		case MTP_IOC_MAGIC:
+			err = mtp_copyout(q, mtp, mp, dp);
+			break;
+		default:
+			mi_copy_done(q, mp, EINVAL);
+			break;
+		}
+		break;
+	default:
+		mi_copy_done(q, mp, EPROTO);
+		break;
+	}
+	mtp_release(mtp);
+	return (err);
 }
 
 /*
@@ -17107,7 +18466,7 @@ mtp_w_proto(queue_t *q, mblk_t *mp)
 	if (likely((mtp = mtp_acquire(q)) != NULL)) {
 		uint oldstate = mtp_get_state(mtp);
 
-		switch (mtp->i_style) {
+		switch (mtp->i.type) {
 		default:
 		case MTP_STYLE_MTPI:
 		case MTP_STYLE_MGMT:
@@ -17132,8 +18491,7 @@ sli_r_proto(queue_t *q, mblk_t *mp)
 {
 	switch (*(lmi_ulong *) mp->b_rptr) {
 	case SL_PDU_IND:
-		mi_strlog(q, STRLOGDA, SL_TRACE, "SL_PDU_IND [%lu] <-",
-			  (ulong) msgdsize(mp->b_cont));
+		mi_strlog(q, STRLOGDA, SL_TRACE, "SL_PDU_IND [%u] <-", (uint) msgdsize(mp->b_cont));
 		return sl_pdu_ind(q, mp);
 	case SL_LINK_CONGESTED_IND:
 		mi_strlog(q, STRLOGRX, SL_TRACE, "SL_LINK_CONGESTED_IND <-");
@@ -17239,21 +18597,6 @@ sl_r_proto(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
-mtpi_w_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
-{
-	return m_data(mtp, q, mp);
-}
-static int
-tpi_w_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
-{
-	return t_data(mtp, q, mp);
-}
-static int
-npi_w_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
-{
-	return n_data(mtp, q, mp);
-}
 static inline fastcall int
 mtp_w_data(queue_t *q, mblk_t *mp)
 {
@@ -17261,17 +18604,17 @@ mtp_w_data(queue_t *q, mblk_t *mp)
 	int err = -EAGAIN;
 
 	if (likely((mtp = mtp_acquire(q)) != NULL)) {
-		switch (mtp->i_style) {
+		switch (mtp->i.type) {
 		default:
 		case MTP_STYLE_MTPI:
 		case MTP_STYLE_MGMT:
-			err = mtpi_w_data(mtp, q, mp);
+			err = m_data(q, mtp, mp);
 			break;
 		case MTP_STYLE_NPI:
-			err = npi_w_data(mtp, q, mp);
+			err = n_data(q, mtp, mp);
 			break;
 		case MTP_STYLE_TPI:
-			err = tpi_w_data(mtp, q, mp);
+			err = t_data(q, mtp, mp);
 			break;
 		}
 		mtp_release(mtp);
@@ -17307,136 +18650,136 @@ do_timeout(queue_t *q, mblk_t *mp)
 	switch (t->timer) {
 	case t1:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t1 expiry at %lu", jiffies);
-		return cb_t1_timeout(t->cb, q);
+		return cb_t1_timeout(q, t->cb);
 	case t1r:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t1r expiry at %lu", jiffies);
-		return sp_t1r_timeout(t->sp, q);
+		return sp_t1r_timeout(q, t->sp);
 	case t2:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t2 expiry at %lu", jiffies);
-		return cb_t2_timeout(t->cb, q);
+		return cb_t2_timeout(q, t->cb);
 	case t3:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t3 expiry at %lu", jiffies);
-		return cb_t3_timeout(t->cb, q);
+		return cb_t3_timeout(q, t->cb);
 	case t4:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t4 expiry at %lu", jiffies);
-		return cb_t4_timeout(t->cb, q);
+		return cb_t4_timeout(q, t->cb);
 	case t5:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t5 expiry at %lu", jiffies);
-		return cb_t5_timeout(t->cb, q);
+		return cb_t5_timeout(q, t->cb);
 	case t6:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t6 expiry at %lu", jiffies);
-		return cr_t6_timeout(t->cr, q);
+		return cr_t6_timeout(q, t->cr);
 	case t7:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t7 expiry at %lu", jiffies);
-		return lk_t7_timeout(t->lk, q);
+		return lk_t7_timeout(q, t->lk);
 	case t8:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t8 expiry at %lu", jiffies);
-		return rs_t8_timeout(t->rs, q);
+		return rs_t8_timeout(q, t->rs);
 	case t10:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t10 expiry at %lu", jiffies);
-		return rt_t10_timeout(t->rt, q);
+		return rt_t10_timeout(q, t->rt);
 	case t11:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t11 expiry at %lu", jiffies);
-		return rs_t11_timeout(t->rs, q);
+		return rs_t11_timeout(q, t->rs);
 	case t12:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t12 expiry at %lu", jiffies);
-		return sl_t12_timeout(t->sl, q);
+		return sl_t12_timeout(q, t->sl);
 	case t13:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t13 expiry at %lu", jiffies);
-		return sl_t13_timeout(t->sl, q);
+		return sl_t13_timeout(q, t->sl);
 	case t14:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t14 expiry at %lu", jiffies);
-		return sl_t14_timeout(t->sl, q);
+		return sl_t14_timeout(q, t->sl);
 	case t15:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t15 expiry at %lu", jiffies);
-		return rs_t15_timeout(t->rs, q);
+		return rs_t15_timeout(q, t->rs);
 	case t16:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t16 expiry at %lu", jiffies);
-		return rs_t16_timeout(t->rs, q);
+		return rs_t16_timeout(q, t->rs);
 	case t17:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t17 expiry at %lu", jiffies);
-		return sl_t17_timeout(t->sl, q);
+		return sl_t17_timeout(q, t->sl);
 	case t18:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t18 expiry at %lu", jiffies);
-		return sp_t18_timeout(t->sp, q);
+		return sp_t18_timeout(q, t->sp);
 	case t18a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t18a expiry at %lu", jiffies);
-		return rs_t18a_timeout(t->rs, q);
+		return rs_t18a_timeout(q, t->rs);
 	case t19:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t19 expiry at %lu", jiffies);
-		return sp_t19_timeout(t->sp, q);
+		return sp_t19_timeout(q, t->sp);
 	case t19a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t19a expiry at %lu", jiffies);
-		return sl_t19a_timeout(t->sl, q);
+		return sl_t19a_timeout(q, t->sl);
 	case t20:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t20 expiry at %lu", jiffies);
-		return sp_t20_timeout(t->sp, q);
+		return sp_t20_timeout(q, t->sp);
 	case t20a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t20a expiry at %lu", jiffies);
-		return sl_t20a_timeout(t->sl, q);
+		return sl_t20a_timeout(q, t->sl);
 	case t21:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t21 expiry at %lu", jiffies);
-		return sp_t21_timeout(t->sp, q);
+		return sp_t21_timeout(q, t->sp);
 	case t21a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t21a expiry at %lu", jiffies);
-		return sl_t21a_timeout(t->sl, q);
+		return sl_t21a_timeout(q, t->sl);
 	case t22:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t22 expiry at %lu", jiffies);
-		return sl_t22_timeout(t->sl, q);
+		return sl_t22_timeout(q, t->sl);
 	case t22a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t22a expiry at %lu", jiffies);
-		return sp_t22a_timeout(t->sp, q);
+		return sp_t22a_timeout(q, t->sp);
 	case t23:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t23 expiry at %lu", jiffies);
-		return sl_t23_timeout(t->sl, q);
+		return sl_t23_timeout(q, t->sl);
 	case t23a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t23a expiry at %lu", jiffies);
-		return sp_t23a_timeout(t->sp, q);
+		return sp_t23a_timeout(q, t->sp);
 	case t24:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t24 expiry at %lu", jiffies);
-		return sl_t24_timeout(t->sl, q);
+		return sl_t24_timeout(q, t->sl);
 	case t24a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t24a expiry at %lu", jiffies);
-		return sp_t24a_timeout(t->sp, q);
+		return sp_t24a_timeout(q, t->sp);
 	case t25a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t25a expiry at %lu", jiffies);
-		return sp_t25a_timeout(t->sp, q);
+		return lk_t25a_timeout(q, t->lk);
 	case t26a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t26a expiry at %lu", jiffies);
-		return sp_t26a_timeout(t->sp, q);
+		return sp_t26a_timeout(q, t->sp);
 	case t27a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t27a expiry at %lu", jiffies);
-		return sp_t27a_timeout(t->sp, q);
+		return sp_t27a_timeout(q, t->sp);
 	case t28a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t28a expiry at %lu", jiffies);
-		return sp_t28a_timeout(t->sp, q);
+		return lk_t28a_timeout(q, t->lk);
 	case t29a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t29a expiry at %lu", jiffies);
-		return sp_t29a_timeout(t->sp, q);
+		return lk_t29a_timeout(q, t->lk);
 	case t30a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t30a expiry at %lu", jiffies);
-		return sp_t30a_timeout(t->sp, q);
+		return lk_t30a_timeout(q, t->lk);
 	case t31a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t31a expiry at %lu", jiffies);
-		return sl_t31a_timeout(t->sl, q);
+		return sl_t31a_timeout(q, t->sl);
 	case t32a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t32a expiry at %lu", jiffies);
-		return sl_t32a_timeout(t->sl, q);
+		return sl_t32a_timeout(q, t->sl);
 	case t33a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t33a expiry at %lu", jiffies);
-		return sl_t33a_timeout(t->sl, q);
+		return sl_t33a_timeout(q, t->sl);
 	case t34a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t34a expiry at %lu", jiffies);
-		return sl_t34a_timeout(t->sl, q);
+		return sl_t34a_timeout(q, t->sl);
 	case t1t:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t1t expiry at %lu", jiffies);
-		return sl_t1t_timeout(t->sl, q);
+		return sl_t1t_timeout(q, t->sl);
 	case t2t:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t2t expiry at %lu", jiffies);
-		return sl_t2t_timeout(t->sl, q);
+		return sl_t2t_timeout(q, t->sl);
 	case t1s:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t1s expiry at %lu", jiffies);
-		return sl_t1s_timeout(t->sl, q);
+		return sl_t1s_timeout(q, t->sl);
 	default:
 		return (0);
 	}
@@ -17482,6 +18825,7 @@ sl_r_sig(queue_t *q, mblk_t *mp)
 	sl_release(sl);
 	return (err < 0 ? err : 0);
 }
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -17768,20 +19112,52 @@ sl_rput(queue_t *q, mblk_t *mp)
  *  OPEN and CLOSE
  *
  *  =========================================================================
- *
- *  OPEN
- *  -------------------------------------------------------------------------
  */
 static int mtp_majors[MTP_CMAJORS] = { MTP_CMAJOR_0, };
+
+/**
+ * mtp_qopen: - STREAMS driver open routine
+ * @q: read queue of newly created queue pair
+ * @devp: pointer to device number associated with Stream
+ * @oflags: flags to the open(2s) call
+ * @sflag: STREAMS flag
+ * @crp: pointer to the credentials of the opening process
+ *
+ * When a Stream is opened on the driver it corresponds to an SP associated with the driver.  The SP is determined
+ * from the minor device opened.  All minor devices corresponding to SP are clone or auto-clone devices.  There may be
+ * several SL lower Streams for each SP.  If an SP structure has not been allocated for the corresponding minor device
+ * number, we allocate one.  When an SL Stream is I_LINK'ed under the driver, it is associated with the SP structure.
+ * An MTP structure is allocated and associated with each upper Stream.
+ *
+ * This driver cannot be pushed as a module.
+ *
+ * (cminor == 0) && (sflag == DRVOPEN)
+ *	When minor device number 0 is opened with DRVOPEN (non-clone), a control Stream is opened.  If a control
+ *	Stream has already been opened, the open is refused.  The @sflag is changed from %DRVOPEN to %CLONEOPEN and a
+ *	new minor device number above NUM_SP is assigned.  This uses the autocloning features of Linux Fast-STREAMS.
+ *	This corresponds to the /dev/streams/mtp/lm minor device node.
+ *
+ * (cminor == 0) && (sflag == CLONEOPEN)
+ *	This is a normal clone open using the clone(4) driver.  A disassociated user Stream is opened.  A new unique
+ *	minor device number above NUM_SP is assigned.  This corresponds to the /dev/streams/clone/mtp clone device
+ *	node.
+ *
+ * (1 <= cminor && cminor <= NUM_SP)
+ *	This is a normal non-clone open.  Where the minor device number is between 1 and NUM_SP, an associated user
+ *	Stream is opened.  If there is no SP structure to associate, one is created with default values (and
+ *	associated with the default NA).  A new minor device number above NUM_SP is assigned.  This uses the
+ *	autocloning features of Linux Fast-STREAMS.  This corresponds to the /dev/streams/mtp/NNNN minor device node
+ *	where NNNN is the minor device number.
+ */
 static streamscall int
-mtp_qopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+mtp_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
 	psw_t flags;
 	int mindex = 0;
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 	minor_t bminor = cminor;
-	struct mtp *mtp, **mtpp = &master.mtp.list;
+	struct mtp *mtp;
 
 	if (q->q_ptr != NULL) {
 		return (0);	/* already open */
@@ -17790,73 +19166,156 @@ mtp_qopen(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		mi_strlog(q, 0, SL_ERROR, "cannot push as module");
 		return (ENXIO);
 	}
+	if (cminor > NUM_SP) {
+		mi_strlog(q, 0, SL_ERROR, "cannot open dynamic minor device number");
+		return (ENXIO);
+	}
 	if (cmajor != MTP_CMAJOR_0 || cminor >= MTP_CMINOR_FREE) {
 		mi_strlog(q, 0, SL_ERROR, "cannot open cloned minors");
 		return (ENXIO);
 	}
-	/* allocate a new device */
-	cminor = MTP_CMINOR_FREE;
-	spin_lock_irqsave(&master.lock, flags);
-	for (; *mtpp; mtpp = &(*mtpp)->next) {
-		major_t dmajor = (*mtpp)->u.dev.cmajor;
+	if (!(mtp = mtp_open_alloc(q, devp, crp, cminor)))
+		return (ENOMEM);
 
-		if (cmajor != dmajor)
-			break;
-		if (cmajor == dmajor) {
-			minor_t dminor = (*mtpp)->u.dev.cminor;
+	*devp = makedevice(cmajor, NUM_SP + 1);
+	/* start assigning minors at NUM_SP + 1 */
 
-			if (cminor < dminor)
-				break;
-			if (cminor > dminor)
-				continue;
-			if (cminor == dminor) {
-				if (++cminor >= NMINORS) {
-					if (++mindex >= MTP_CMAJORS
-					    || !(cmajor = mtp_majors[mindex]))
-						break;
-					cminor = 0;
-				}
-				continue;
+	write_lock_irqsave(&mtp_mux_lock, flags);
+
+	if (cminor == 0) {
+		/* When a zero minor device number was opened, the Stream is either a clone open or 
+		   an attempt to open the master control Stream.  The difference is whether the
+		   @sflag was %DRVOPEN or %CLONEOPEN. */
+		if (sflag == DRVOPEN) {
+			/* When the master control Stream is opened, another master control Stream
+			   must not yet exist. If this is the only master control Stream then it is 
+			   created. */
+			if (lm_ctrl != NULL) {
+				write_unlock_irqrestore(&mtp_mux_lock, flags);
+				mtp_close_free(mtp);
+				return (ENXIO);
 			}
 		}
+		if ((err = mi_open_link(&mtp_opens, (caddr_t) mtp, devp, oflags, CLONEOPEN, crp))) {
+			write_unlock_irqrestore(&mtp_mux_lock, flags);
+			mtp_close_free(mtp);
+			return (ENXIO);
+		}
+		if (sflag == DRVOPEN)
+			lm_ctrl = mtp;
+		/* Both master control Streams and clone user Streams are disassociated with any
+		   specific SP.  Master control Streams are never associated with a specific SP.
+		   User Streams are associated with an SP using the spid in the MTP addres to the
+		   bind primitive, or when an SL Stream is temporarily linked under the driver
+		   using the I_LINK input-output control. */
+	} else {
+		DECLARE_WAITQUEUE(wait, current);
+
+		/* When a non-zero minor device number was opened, the Stream is automatically
+		   associated with the SP to which the minor device number corresponds.  It cannot
+		   be disassociated except when it is closed. */
+		if (!(sp = sp_lookup(cminor))) {
+			write_unlock_irqrestore(&mtp_mux_lock, flags);
+			mtp_close_free(mtp);
+			return (ENXIO);
+		}
+		/* Locking: need to wait until a lock on the SP structure can be acquired, or a
+		   signal is received, or the SP structure is deallocated.  If the lock can be
+		   acquired, associate the User Stream with the SP structure; in all other cases,
+		   return an error.  Note that it is a likely event that the lock can be acquired
+		   without waiting. */
+		err = 0;
+		add_wait_queue(&mtp_waitq, &wait);
+		spin_lock(&sp->sq.lock);
+		for (;;) {
+			set_current_state(TASK_INTERRUPTIBLE);
+			if (signal_pending(current)) {
+				err = EINTR;
+				spin_unlock(&sp->sq.lock);
+				break;
+			}
+			if (sp->sq.users != 0) {
+				spin_unlock(&sp->sq.lock);
+				write_unlock_irqrestore(&mtp_mux_lock, flags);
+				if (!(sp = sp_lookup(cminor))) {
+					err = ENXIO;
+					break;
+				}
+				spin_lock(&sp->sq.lock);
+				continue;
+			}
+			err = mi_open_link(&mtp_opens, (caddr_t) mtp, devp, oflags, CLONEOPEN, crp);
+			if (err == 0)
+				mtp_attach(mtp, sp);
+			spin_unlock(&sp->sq.lock);
+			break;
+		}
+		set_current_state(TASK_RUNNING);
+		remove_wait_queue(&mtp_waitq, &wait);
+		if (err) {
+			write_unlock_irqrestore(&mtp_mux_lock, flags);
+			mtp_close_free(mtp);
+			return (err);
+		}
 	}
-	if (mindex >= MTP_CMAJORS || !cmajor) {
-		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
-		spin_unlock_irqrestore(&master.lock, flags);
-		MOD_DEC_USE_COUNT;
-		return (ENXIO);
-	}
-	printd(("%s: opened character device %d:%d\n", DRV_NAME, cmajor, cminor));
-	*devp = makedevice(cmajor, cminor);
-	if (!(mtp = mtp_alloc_priv(q, mtpp, devp, crp, bminor))) {
-		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
-		spin_unlock_irqrestore(&master.lock, flags);
-		MOD_DEC_USE_COUNT;
-		return (ENOMEM);
-	}
-	spin_unlock_irqrestore(&master.lock, flags);
+	write_unlock_irqrestore(&mtp_mux_lock, flags);
+
+	mi_attach(q, (caddr_t) mtp);
+	qprocson(q);
 	return (0);
 }
 
-/*
- *  CLOSE
- *  -------------------------------------------------------------------------
+/**
+ * mtp_qclose: - STREAMS driver close routine
+ * @q: queue pair
+ * @oflags: flags to the open(2s) call
+ * @crp: pointer to the credentials of the closing process
  */
 static streamscall int
 mtp_qclose(queue_t *q, int flag, cred_t *crp)
 {
 	struct mtp *mtp = MTP_PRIV(q);
 	psw_t flags;
+	struct sp *sp;
 
-	(void) flag;
-	(void) crp;
-	(void) mtp;
-	printd(("%s: closing character device %d:%d\n", DRV_NAME, mtp->u.dev.cmajor,
-		mtp->u.dev.cminor));
-	spin_lock_irqsave(&master.lock, flags);
-	mtp_free_priv(mtp);
-	spin_unlock_irqrestore(&master.lock, flags);
-	MOD_DEC_USE_COUNT;
+	qprocsoff(q);
+	mi_detach(q, (caddr_t) mtp);
+
+	write_lock_irqsave(&mtp_mux_lock, flags);
+
+	if ((sp = mtp->sp.sp)) {
+		DECLARE_WAITQUEUE(wait, current);
+
+		/* Locking: need to wait until an SP lock can be acquired, or the SP structure is
+		   deallocated.  If a lock can be acquired, the closing Stream is disassociated
+		   with the SP; otherwise, if the SP structure is deallocated, there is no further
+		   need to disassociate.  Note that it is a likely event that the lock can be
+		   acquired without waiting. */
+		add_wait_queue(&mtp_waitq, &wait);
+		spin_lock(&sp->sq.lock);
+		for (;;) {
+			set_current_state(TASK_INTERRUPTIBLE);
+			if (sp->sq.users == 0) {
+				mtp_detach(mtp);
+				spin_unlock(&sp->sq.lock);
+				break;
+			}
+			spin_unlock(&sp->sq.lock);
+			write_unlock_irqrestore(&mtp_mux_lock, flags);
+			schedule();
+			write_lock_irqsave(&mtp_mux_lock, flags);
+			if (!(sp = mtp->sp.sp))
+				break;
+			spin_lock(&sp->sq.lock);
+		}
+		set_current_state(TASK_RUNNING);
+		remove_wait_queue(&mtp_waitq, &wait);
+	}
+	mi_close_unlink(&mtp_opens, (caddr_t) mtp);
+
+	write_unlock_irqrestore(&mtp_opens, (caddr_t) mtp);
+
+	mtp_close_free(mtp);
 	return (0);
 }
 
@@ -17881,9 +19340,12 @@ static kmem_cache_t *mtp_sl_cachep = NULL;	/* Signalling Link cache */
 static int
 mtp_init_caches(void)
 {
+	size_t sizeof_struct_mt = mi_open_size(sizeof(struct mtp));
+	size_t sizeof_struct_sl = mi_open_size(sizeof(struct sl));
+
 	if (!mtp_mt_cachep
 	    && !(mtp_mt_cachep =
-		 kmem_cache_create("mtp_mt_cachep", sizeof(struct mtp), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_cache_create("mtp_mt_cachep", sizeof_struct_mt, 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate mtp_mt_cachep", DRV_NAME);
 		goto failed_mt;
@@ -17963,7 +19425,7 @@ mtp_init_caches(void)
 		printd(("%s: initialized lk structure cache\n", DRV_NAME));
 	if (!mtp_sl_cachep
 	    && !(mtp_sl_cachep =
-		 kmem_cache_create("mtp_sl_cachep", sizeof(struct sl), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_cache_create("mtp_sl_cachep", sizeof_struct_sl, 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate mtp_sl_cachep", DRV_NAME);
 		goto failed_sl;
@@ -18083,7 +19545,7 @@ mtp_term_caches(void)
  *  -------------------------------------------------------------------------
  */
 static struct mtp *
-mtp_lookup(ulong id)
+mtp_lookup(uint id)
 {
 	struct mtp *mtp = NULL;
 
@@ -18091,71 +19553,30 @@ mtp_lookup(ulong id)
 		for (mtp = master.mtp.list; mtp && mtp->id != id; mtp = mtp->next) ;
 	return (mtp);
 }
-static inline ulong
-mtp_get_id(ulong id)
+static inline uint
+mtp_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		for (id = ++sequence; mtp_lookup(id); id = ++sequence) ;
 	return (id);
 }
 static struct mtp *
-mtp_get(struct mtp *mtp)
-{
-	atomic_inc(&mtp->refcnt);
-	return (mtp);
-}
-static void
-mtp_put(struct mtp *mtp)
-{
-	if (atomic_dec_and_test(&mtp->refcnt)) {
-		kmem_cache_free(mtp_mt_cachep, mtp);
-		printd(("%s: %s: %p: deallocated mtp private structure", DRV_NAME, __FUNCTION__,
-			mtp));
-	}
-}
-static struct mtp *
-mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp, minor_t bminor)
+mtp_alloc_priv(queue_t *q, dev_t *devp, cred_t *crp, minor_t bminor)
 {
 	struct mtp *mt;
 
-	if ((mt = kmem_cache_alloc(mtp_mt_cachep, SLAB_ATOMIC))) {
+	if ((mt = (struct mtp *)mi_open_alloc_cache(mtp_mt_cachep, SLAB_ATOMIC))) {
 		printd(("%s: %p: allocated mt private structure\n", DRV_NAME, mt));
 		bzero(mt, sizeof(*mt));
-		mt->priv_put = &mtp_put;
-		mt->u.dev.cmajor = getmajor(*devp);
-		mt->u.dev.cminor = getminor(*devp);
+		mt->rq = RD(q);
+		mt->dev = *devp;
 		mt->cred = *crp;
-		(mt->oq = RD(q))->q_ptr = mtp_get(mt);
-		(mt->iq = WR(q))->q_ptr = mtp_get(mt);
-		spin_lock_init(&mt->qlock);	/* "mt-queue-lock" */
-#if 0
-		mt->o_prim = &mtp_r_prim;
-		/* style of interface depends on bminor */
-		switch (bminor) {
-		case MTP_STYLE_MTPI:
-			mt->i_prim = &mtp_w_prim;
-			break;
-		case MTP_STYLE_TPI:
-			mt->i_prim = &tpi_w_prim;
-			break;
-		case MTP_STYLE_NPI:
-			mt->i_prim = &npi_w_prim;
-			break;
-		case MTP_STYLE_MGMT:
-			mt->i_prim = &mgm_w_prim;
-			break;
-		}
-#endif
-		mt->i_state = 0;
-		mt->i_style = bminor;
-		mt->i_version = 1;
-		spin_lock_init(&mt->lock);	/* "mt-queue-lock" */
-		if ((mt->next = *mtpp))
-			mt->next->prev = &mt->next;
-		mt->prev = mtpp;
-		*mtpp = mtp_get(mt);
+		mt->i.state = 0;
+		mt->i.type = bminor;
+		mt->i.style = T_CLTS;
+		mt->i.version = 1;
 		/* not attached to sp yet */
 		mt->sp.loc = NULL;
 		mt->sp.rem = NULL;
@@ -18170,41 +19591,26 @@ mtp_alloc_priv(queue_t *q, struct mtp **mtpp, dev_t *devp, cred_t *crp, minor_t 
 static void
 mtp_free_priv(struct mtp *mtp)
 {
-	psw_t flags;
 
 	ensure(mtp, return);
-	spin_lock_irqsave(&mtp->lock, flags);
-	{
-		ss7_unbufcall((str_t *) mtp);
-		if (mtp->sp.loc) {
-			if ((*mtp->sp.prev = mtp->sp.next))
-				mtp->sp.next->sp.prev = mtp->sp.prev;
-			mtp->sp.next = NULL;
-			mtp->sp.prev = &mtp->sp.next;
-			sp_put(xchg(&mtp->sp.loc, NULL));
-			mtp_put(mtp);
-		}
-		if (mtp->sp.rem) {
-			rs_put(xchg(&mtp->sp.rem, NULL));
-		}
-		if (mtp->next || mtp->prev != &mtp->next) {
-			/* remove from master list */
-			if ((*mtp->prev = mtp->next))
-				mtp->next->prev = mtp->prev;
-			mtp->next = NULL;
-			mtp->prev = &mtp->next;
-			mtp_put(mtp);
-		}
-		mtp->oq->q_ptr = NULL;
-		flushq(mtp->oq, FLUSHALL);
-		mtp->oq = NULL;
-		mtp_put(mtp);
-		mtp->iq->q_ptr = NULL;
-		flushq(mtp->iq, FLUSHALL);
-		mtp->iq = NULL;
+	if (mtp->sp.loc) {
+		if ((*mtp->sp.prev = mtp->sp.next))
+			mtp->sp.next->sp.prev = mtp->sp.prev;
+		mtp->sp.next = NULL;
+		mtp->sp.prev = &mtp->sp.next;
+		mtp->sp.loc = NULL;
 	}
-	spin_unlock_irqrestore(&mtp->lock, flags);
-	mtp_put(mtp);		/* final put */
+	if (mtp->sp.rem) {
+		mtp->sp.rem = NULL;
+	}
+	if (mtp->next || mtp->prev != &mtp->next) {
+		/* remove from master list */
+		if ((*mtp->prev = mtp->next))
+			mtp->next->prev = mtp->prev;
+		mtp->next = NULL;
+		mtp->prev = &mtp->next;
+	}
+	mi_close_free_cache(mtp_mt_cachep, (caddr_t) mtp);
 }
 
 /*
@@ -18212,7 +19618,15 @@ mtp_free_priv(struct mtp *mtp)
  *  -------------------------------------------------------------------------
  */
 static struct sl *
-sl_lookup(ulong id)
+sl_lookup_mux(int index)
+{
+	struct sl *sl = NULL;
+
+	for (sl = master.sl.list; sl && sl->u.mux.index != index; sl = sl->next) ;
+	return (sl);
+}
+static struct sl *
+sl_lookup(uint id)
 {
 	struct sl *sl = NULL;
 
@@ -18220,134 +19634,220 @@ sl_lookup(ulong id)
 		for (sl = master.sl.list; sl && sl->id != id; sl = sl->next) ;
 	return (sl);
 }
-static ulong
-sl_get_id(ulong id)
+
+static uint
+sl_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		for (id = ++sequence; sl_lookup(id); id = ++sequence) ;
 	return (id);
 }
-static struct sl *
-sl_get(struct sl *sl)
-{
-	assure(sl);
-	if (sl)
-		atomic_inc(&sl->refcnt);
-	return (sl);
-}
 static void
-sl_put(struct sl *sl)
+mtp_free_link(struct sl *sl)
 {
-	assure(sl);
-	if (sl) {
-		if (atomic_dec_and_test(&sl->refcnt)) {
-			kmem_cache_free(mtp_sl_cachep, sl);
-			printd(("%s: %p: freed sl structure\n", DRV_NAME, sl));
-		}
-	}
+	/* Note: both mi_timer_stop and mi_timer_free can handle a NULL pointer. */
+	sl_timer_stop(sl, tall);
+	mi_timer_free(sl->timers.t1);
+	mi_timer_free(sl->timers.t2);
+	mi_timer_free(sl->timers.t3);
+	mi_timer_free(sl->timers.t4);
+	mi_timer_free(sl->timers.t5);
+	mi_timer_free(sl->timers.t12);
+	mi_timer_free(sl->timers.t13);
+	mi_timer_free(sl->timers.t14);
+	mi_timer_free(sl->timers.t17);
+	mi_timer_free(sl->timers.t19a);
+	mi_timer_free(sl->timers.t20a);
+	mi_timer_free(sl->timers.t21a);
+	mi_timer_free(sl->timers.t22);
+	mi_timer_free(sl->timers.t23);
+	mi_timer_free(sl->timers.t24);
+	mi_timer_free(sl->timers.t31a);
+	mi_timer_free(sl->timers.t32a);
+	mi_timer_free(sl->timers.t33a);
+	mi_timer_free(sl->timers.t34a);
+	mi_timer_free(sl->timers.t1t);
+	mi_timer_free(sl->timers.t2t);
+	mi_timer_free(sl->timers.t1s);
+	mi_close_free_cache(mtp_sl_cachep, (caddr_t) sl);
 }
 static struct sl *
-mtp_alloc_link(queue_t *q, struct sl **slp, ulong index, cred_t *crp)
+mtp_alloc_link(queue_t *q, int index, cred_t *crp, minor_t unit)
 {
 	struct sl *sl;
+	struct mtp_timer *t;
 
-	if ((sl = kmem_cache_alloc(mtp_sl_cachep, SLAB_ATOMIC))) {
+	if ((sl = (struct sl *) mi_open_alloc_cache(mtp_sl_cachep, SLAB_ATOMIC))) {
 		printd(("%s: %p: allocated sl private structure %lu\n", DRV_NAME, sl, index));
 		bzero(sl, sizeof(*sl));
-		sl->priv_put = &sl_put;
-		sl_get(sl);	/* first get */
-		sl->u.mux.index = index;
+		sl->wq = WR(q);
+		sl->index = index;
 		sl->cred = *crp;
-		spin_lock_init(&sl->qlock);	/* "sl-queue-lock" */
-		(sl->iq = RD(q))->q_ptr = sl_get(sl);
-		(sl->oq = WR(q))->q_ptr = sl_get(sl);
-#if 0
-		sl->o_prim = sl_w_prim;
-		sl->i_prim = sl_r_prim;
-#endif
-		sl->i_state = LMI_UNATTACHED;
-		sl->i_style = LMI_STYLE2;
-		sl->i_version = 1;
+		sl->i.state = LMI_UNATTACHED;
+		sl->i.style = LMI_STYLE2;
+		sl->i.version = 1;
 		sl->l_state = SLS_OUT_OF_SERVICE;
-		spin_lock_init(&sl->lock);	/* "sl-priv-lock" */
-		/* place in master list */
-		if ((sl->next = *slp))
-			sl->next->prev = &sl->next;
-		sl->prev = slp;
-		*slp = sl_get(sl);
-		master.sl.numb++;
-		sl->id = index;	/* just use mux index for id */
-		sl->type = MTP_OBJ_TYPE_SL;
+		/* allocate timers */
+		if (!(sl->timers.t1 = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t1->b_rptr)->timer = t1;
+		t->sl = sl;
+		if (!(sl->timers.t2 = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t2->b_rptr)->timer = t2;
+		t->sl = sl;
+		if (!(sl->timers.t3 = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t3->b_rptr)->timer = t3;
+		t->sl = sl;
+		if (!(sl->timers.t4 = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t4->b_rptr)->timer = t4;
+		t->sl = sl;
+		if (!(sl->timers.t5 = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t5->b_rptr)->timer = t5;
+		t->sl = sl;
+		if (!(sl->timers.t12 = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t12->b_rptr)->timer = t12;
+		t->sl = sl;
+		if (!(sl->timers.t13 = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t13->b_rptr)->timer = t13;
+		t->sl = sl;
+		if (!(sl->timers.t14 = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t14->b_rptr)->timer = t14;
+		t->sl = sl;
+		if (!(sl->timers.t17 = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t17->b_rptr)->timer = t17;
+		t->sl = sl;
+		if (!(sl->timers.t19a = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t19a->b_rptr)->timer = t19a;
+		t->sl = sl;
+		if (!(sl->timers.t20a = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t20a->b_rptr)->timer = t20a;
+		t->sl = sl;
+		if (!(sl->timers.t21a = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t21a->b_rptr)->timer = t21a;
+		t->sl = sl;
+		if (!(sl->timers.t22 = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t22a->b_rptr)->timer = t22a;
+		t->sl = sl;
+		if (!(sl->timers.t23 = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t23a->b_rptr)->timer = t23a;
+		t->sl = sl;
+		if (!(sl->timers.t24 = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t24a->b_rptr)->timer = t24a;
+		t->sl = sl;
+		if (!(sl->timers.t31a = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t31a->b_rptr)->timer = t31a;
+		t->sl = sl;
+		if (!(sl->timers.t32a = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t32a->b_rptr)->timer = t32a;
+		t->sl = sl;
+		if (!(sl->timers.t33a = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t33a->b_rptr)->timer = t33a;
+		t->sl = sl;
+		if (!(sl->timers.t34a = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t34a->b_rptr)->timer = t34a;
+		t->sl = sl;
+		if (!(sl->timers.t1t = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t1t->b_rptr)->timer = t1t;
+		t->sl = sl;
+		if (!(sl->timers.t2t = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t2t->b_rptr)->timer = t2t;
+		t->sl = sl;
+		if (!(sl->timers.t1s = mi_timer_alloc(sizeof(*t))))
+			goto enobufs;
+		(t = (typeof(t)) sl->timers.t1s->b_rptr)->timer = t1s;
+		t->sl = sl;
+		/* assign defaults */
 	} else
 		ptrace(("%s: ERROR: Could not allocate sl private structure %lu\n", DRV_NAME,
 			index));
 	return (sl);
+      enobufs:
+	mtp_free_link(sl);
+	return (NULL);
 }
-static void
-mtp_free_link(struct sl *sl)
+static struct sl *
+mtp_alloc_sl(uint id, struct sl *sl, struct lk *lk, struct mtp_conf_sl *c)
 {
-	psw_t flags;
-
-	ensure(sl, return);
-	spin_lock_irqsave(&sl->lock, flags);
-	{
-		ss7_unbufcall((str_t *) sl);
-		flushq(sl->oq, FLUSHALL);
-		flushq(sl->iq, FLUSHALL);
-		sl_timer_stop(sl, tall);
-		if (sl->next || sl->prev != &sl->next) {
-			/* remove from master list */
-			if ((*sl->prev = sl->next))
-				sl->next->prev = sl->prev;
-			sl->next = NULL;
-			sl->prev = &sl->next;
-			ensure(atomic_read(&sl->refcnt) > 1, sl_get(sl));
-			sl_put(sl);
-			ensure(master.sl.numb > 0, master.sl.numb++);
-			master.sl.numb--;
-		}
-		ensure(atomic_read(&sl->refcnt) > 1, sl_get(sl));
-		sl_put(xchg(&sl->iq->q_ptr, NULL));
-		ensure(atomic_read(&sl->refcnt) > 1, sl_get(sl));
-		sl_put(xchg(&sl->oq->q_ptr, NULL));
-		/* done, check final count */
-		if (atomic_read(&sl->refcnt) != 1) {
-			pswerr(("%s: %p: ERROR: sl lingering reference count = %d\n", DRV_NAME, sl,
-				atomic_read(&sl->refcnt)));
-			atomic_set(&sl->refcnt, 1);
-		}
+	if (!sl)
+		return (sl);
+	if (lk) {
+		/* add to link (set) list */
+		if ((sl->lk.next = lk->sl.list))
+			sl->lk.next->lk.prev = &sl->lk.next;
+		sl->lk.prev = &lk->sl.list;
+		sl->lk.lk = lk;
+		lk->sl.list = sl;
+		lk->sl.numb++;
 	}
-	spin_unlock_irqrestore(&sl->lock, flags);
-	sl_put(sl);		/* final put */
+	sl->id = sl_get_id(id);
+	sl->slc = c->slc;
+	if (lk) {
+		/* defaults inherited from lk */
+		sl->config.t1 = lk->config.t1;
+		sl->config.t2 = lk->config.t2;
+		sl->config.t3 = lk->config.t3;
+		sl->config.t4 = lk->config.t4;
+		sl->config.t5 = lk->config.t5;
+		sl->config.t12 = lk->config.t12;
+		sl->config.t13 = lk->config.t13;
+		sl->config.t14 = lk->config.t14;
+		sl->config.t17 = lk->config.t17;
+		sl->config.t19a = lk->config.t19a;
+		sl->config.t20a = lk->config.t20a;
+		sl->config.t21a = lk->config.t21a;
+		sl->config.t22 = lk->config.t22;
+		sl->config.t23 = lk->config.t23;
+		sl->config.t24 = lk->config.t24;
+		sl->config.t31a = lk->config.t31a;
+		sl->config.t32a = lk->config.t32a;
+		sl->config.t33a = lk->config.t33a;
+		sl->config.t34a = lk->config.t34a;
+		sl->config.t1t = lk->config.t1t;
+		sl->config.t2t = lk->config.t2t;
+		sl->config.t1s = lk->config.t1s;
+	}
+	return (sl);
 }
 static void
 mtp_free_sl(struct sl *sl)
 {
-	psw_t flags;
+	struct lk *lk;
 
 	ensure(sl, return);
-	spin_lock_irqsave(&sl->lock, flags);
-	{
-		struct lk *lk;
-
-		/* stop timers */
-		sl_timer_stop(sl, tall);
-		/* remove from lk list */
-		if ((lk = sl->lk.lk)) {
-			if ((*sl->lk.prev = sl->lk.next))
-				sl->lk.next->lk.prev = sl->lk.prev;
-			sl->lk.next = NULL;
-			sl->lk.prev = &sl->lk.next;
-			ensure(atomic_read(&sl->refcnt) > 1, sl_get(sl));
-			sl_put(sl);
-			assure(lk->sl.numb > 0);
-			lk->sl.numb--;
-			lk_put(xchg(&sl->lk.lk, NULL));
-		}
+	/* stop timers */
+	sl_timer_stop(sl, tall);
+	/* remove from lk list */
+	if ((lk = sl->lk.lk)) {
+		if ((*sl->lk.prev = sl->lk.next))
+			sl->lk.next->lk.prev = sl->lk.prev;
+		sl->lk.next = NULL;
+		sl->lk.prev = &sl->lk.next;
+		assure(lk->sl.numb > 0);
+		lk->sl.numb--;
+		sl->lk.lk = NULL;
 	}
-	spin_unlock_irqrestore(&sl->lock, flags);
 }
 
 /*
@@ -18355,7 +19855,7 @@ mtp_free_sl(struct sl *sl)
  *  -------------------------------------------------------------------------
  */
 static inline struct cb *
-cb_lookup(ulong id)
+cb_lookup(uint id)
 {
 	struct cb *cb = NULL;
 
@@ -18363,61 +19863,45 @@ cb_lookup(ulong id)
 		for (cb = master.cb.list; cb && cb->id != id; cb = cb->next) ;
 	return (cb);
 }
-static ulong
-cb_get_id(ulong id)
+
+static uint
+cb_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		id = ++sequence;
 	return (id);
 }
 static struct cb *
-cb_get(struct cb *cb)
-{
-	atomic_inc(&cb->refcnt);
-	return (cb);
-}
-static void
-cb_put(struct cb *cb)
-{
-	if (atomic_dec_and_test(&cb->refcnt)) {
-		kmem_cache_free(mtp_cb_cachep, cb);
-		printd(("%s: %p: freed cb structure\n", DRV_NAME, cb));
-	}
-}
-static struct cb *
-mtp_alloc_cb(ulong id, struct lk *lk, struct sl *from, struct sl *onto, ulong index)
+mtp_alloc_cb(uint id, struct lk *lk, struct sl *from, struct sl *onto, uint index)
 {
 	struct cb *cb;
 
 	if ((cb = kmem_cache_alloc(mtp_cb_cachep, SLAB_ATOMIC))) {
 		bzero(cb, sizeof(*cb));
-		cb->priv_put = &cb_put;
 		bufq_init(&cb->buf);
-		spin_lock_init(&cb->lock);	/* "cb-lock" */
-		cb_get(cb);	/* first get */
 		/* add to master list */
 		if ((cb->next = master.cb.list))
 			cb->next->prev = &cb->next;
 		cb->prev = &master.cb.list;
-		master.cb.list = cb_get(cb);
+		master.cb.list = cb;
 		master.cb.numb++;
 		/* add to link changeover buffer list */
 		if (lk) {
 			if ((cb->lk.next = lk->cb.list))
 				cb->lk.next->lk.prev = &cb->lk.next;
 			cb->lk.prev = &lk->cb.list;
-			lk->cb.list = cb_get(cb);
-			cb->lk.lk = lk_get(lk);
+			lk->cb.list = cb;
+			cb->lk.lk = lk;
 		}
 		cb->id = cb_get_id(id);
 		cb->type = MTP_OBJ_TYPE_CB;
 		cb->state = 0;
 		cb->index = index;
 		cb->slc = from->slc;
-		cb->sl.from = sl_get(from);
-		cb->sl.onto = sl_get(onto);
+		cb->sl.from = from;
+		cb->sl.onto = onto;
 		printd(("%s: %p: linked cb structure %lu\n", DRV_NAME, cb, cb->id));
 	} else
 		ptrace(("%s: ERROR: Could not allocate cb structure %lu\n", DRV_NAME, id));
@@ -18426,58 +19910,40 @@ mtp_alloc_cb(ulong id, struct lk *lk, struct sl *from, struct sl *onto, ulong in
 static void
 mtp_free_cb(struct cb *cb)
 {
-	psw_t flags;
+	struct lk *lk;
+	struct sl *sl;
 
-	ensure(cb, return);
-	spin_lock_irqsave(&cb->lock, flags);
-	{
-		struct lk *lk;
-		struct sl *sl;
-
-		/* stop timers and purge buffers */
-		cb_timer_stop(cb, tall);
-		bufq_purge(&cb->buf);
-		/* unlink from signalling links */
-		if ((sl = xchg(&cb->sl.onto, NULL))) {
-			sl->load--;
-			sl_put(sl);
-		}
-		if ((sl = xchg(&cb->sl.from, NULL))) {
-			sl->load++;
-			sl_put(sl);
-		}
-		if ((lk = cb->lk.lk)) {
-			/* unlink from lk */
-			if ((*cb->lk.prev = cb->lk.next))
-				cb->lk.next->lk.prev = cb->lk.prev;
-			cb->lk.next = NULL;
-			cb->lk.prev = &cb->lk.next;
-			ensure(atomic_read(&cb->refcnt) > 1, cb_get(cb));
-			cb_put(cb);
-			assure(lk->cb.numb > 0);
-			lk->cb.numb--;
-			lk_put(xchg(&cb->lk.lk, NULL));
-		}
-		if (cb->next || cb->prev != &cb->next) {
-			/* remove from master list */
-			if ((*cb->prev = cb->next))
-				cb->next->prev = cb->prev;
-			cb->next = NULL;
-			cb->prev = &cb->next;
-			cb_put(cb);
-			assure(master.cb.numb > 0);
-			master.cb.numb--;
-		}
-		/* done, check final count */
-		cb->id = 0;
-		if (atomic_read(&cb->refcnt) != 1) {
-			pswerr(("%s: %p: ERROR: cb lingering reference count = %d\n", DRV_NAME, cb,
-				atomic_read(&cb->refcnt)));
-			atomic_set(&cb->refcnt, 1);
-		}
+	/* stop timers and purge buffers */
+	cb_timer_stop(cb, tall);
+	bufq_purge(&cb->buf);
+	/* unlink from signalling links */
+	if ((sl = xchg(&cb->sl.onto, NULL))) {
+		sl->load--;
 	}
-	spin_unlock_irqrestore(&cb->lock, flags);
-	cb_put(cb);		/* final put */
+	if ((sl = xchg(&cb->sl.from, NULL))) {
+		sl->load++;
+	}
+	if ((lk = cb->lk.lk)) {
+		/* unlink from lk */
+		if ((*cb->lk.prev = cb->lk.next))
+			cb->lk.next->lk.prev = cb->lk.prev;
+		cb->lk.next = NULL;
+		cb->lk.prev = &cb->lk.next;
+		assure(lk->cb.numb > 0);
+		lk->cb.numb--;
+		cb->lk.lk = NULL;
+	}
+	if (cb->next || cb->prev != &cb->next) {
+		/* remove from master list */
+		if ((*cb->prev = cb->next))
+			cb->next->prev = cb->prev;
+		cb->next = NULL;
+		cb->prev = &cb->next;
+		assure(master.cb.numb > 0);
+		master.cb.numb--;
+	}
+	cb->id = 0;
+	kmem_cache_free(mtp_cb_cachep, cb);
 }
 
 /*
@@ -18485,7 +19951,7 @@ mtp_free_cb(struct cb *cb)
  *  -------------------------------------------------------------------------
  */
 static struct lk *
-lk_lookup(ulong id)
+lk_lookup(uint id)
 {
 	struct lk *lk = NULL;
 
@@ -18493,61 +19959,72 @@ lk_lookup(ulong id)
 		for (lk = master.lk.list; lk && lk->id != id; lk = lk->next) ;
 	return (lk);
 }
-static ulong
-lk_get_id(ulong id)
+
+static uint
+lk_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		id = ++sequence;
 	return (id);
 }
 static struct lk *
-lk_get(struct lk *lk)
+mtp_alloc_lk(uint id, struct ls *ls, struct sp *loc, struct rs *adj, struct mtp_conf_lk *c)
 {
-	atomic_inc(&lk->refcnt);
-	return (lk);
-}
-static void
-lk_put(struct lk *lk)
-{
-	if (atomic_dec_and_test(&lk->refcnt)) {
-		kmem_cache_free(mtp_lk_cachep, lk);
-		printd(("%s: %p: freed lk structure\n", DRV_NAME, lk));
-	}
-}
-static struct lk *
-mtp_alloc_lk(ulong id, struct ls *ls, struct sp *loc, struct rs *adj, ulong ni, ulong slot)
-{
+	struct mtp_timer *t;
 	struct lk *lk;
 
 	if ((lk = kmem_cache_alloc(mtp_lk_cachep, SLAB_ATOMIC))) {
 		bzero(lk, sizeof(*lk));
-		lk->priv_put = &lk_put;
-		spin_lock_init(&lk->lock);	/* "lk-lock" */
-		lk_get(lk);	/* first get */
 		/* add to master list */
 		if ((lk->next = master.lk.list))
 			lk->next->prev = &lk->next;
 		lk->prev = &master.lk.list;
-		master.lk.list = lk_get(lk);
+		master.lk.list = lk;
 		master.lk.numb++;
 		if (ls) {
 			/* add to linkset list */
 			if ((lk->ls.next = ls->lk.list))
 				lk->ls.next->ls.prev = &lk->ls.next;
 			lk->ls.prev = &ls->lk.list;
-			lk->ls.ls = ls_get(ls);
-			ls->lk.list = lk_get(lk);
+			lk->ls.ls = ls;
+			ls->lk.list = lk;
 			ls->lk.numb++;
 		}
 		/* fill out structure */
 		lk->id = lk_get_id(id);
 		lk->type = MTP_OBJ_TYPE_LK;
-		lk->ni = ni;
-		lk->slot = slot;
-		lk->sp.loc = sp_get(loc);
-		lk->sp.adj = rs_get(adj);
+		lk->ni = c->ni;
+		lk->slot = c->slot;
+		lk->sp.loc = loc;
+		lk->sp.adj = adj;
+		/* timer allocation */
+		if (!(lk->timers.t7 = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) lk->timers.t7;
+		t->timer = t7;
+		t->lk = lk;
+		if (!(lk->timers.t25a = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) lk->timers.t25a;
+		t->timer = t25a;
+		t->lk = lk;
+		if (!(lk->timers.t28a = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) lk->timers.t28a;
+		t->timer = t28a;
+		t->lk = lk;
+		if (!(lk->timers.t29a = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) lk->timers.t29a;
+		t->timer = t29a;
+		t->lk = lk;
+		if (!(lk->timers.t30a = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) lk->timers.t30a;
+		t->timer = t30a;
+		t->lk = lk;
 		/* defaults inherited from ls */
 		if (ls) {
 			/* sls bits and mask */
@@ -18578,6 +20055,10 @@ mtp_alloc_lk(ulong id, struct ls *ls, struct sp *loc, struct rs *adj, ulong ni, 
 			lk->config.t1s = ls->config.t1s;
 			/* link timer defaults */
 			lk->config.t7 = ls->config.t7;
+			lk->config.t25a = ls->config.t25a;
+			lk->config.t28a = ls->config.t28a;
+			lk->config.t29a = ls->config.t29a;
+			lk->config.t30a = ls->config.t30a;
 		}
 		if (ls) {
 			/* automatically allocate routes if the linkset already has routesets */
@@ -18591,12 +20072,13 @@ mtp_alloc_lk(ulong id, struct ls *ls, struct sp *loc, struct rs *adj, ulong ni, 
 		if (ls && adj) {
 			/* ensure that there is a route to the adjacent via this linkset */
 			struct rl *rl;
+			struct mtp_conf_rl c = {.cost = 0, };
 
 			for (rl = adj->rl.list; rl; rl = rl->rs.next)
 				if (rl->ls.ls == ls)
 					break;
 			/* cost is alway zero (0) because route is to adjacent */
-			if (!rl && !(rl = mtp_alloc_rl(0, adj, ls, 0)))
+			if (!rl && !(rl = mtp_alloc_rl(0, adj, ls, &c)))
 				goto free_error;
 			adj->flags |= RSF_ADJACENT;
 		}
@@ -18609,49 +20091,46 @@ mtp_alloc_lk(ulong id, struct ls *ls, struct sp *loc, struct rs *adj, ulong ni, 
 static void
 mtp_free_lk(struct lk *lk)
 {
-	psw_t flags;
+	struct cb *cb;
+	struct sl *sl;
+	struct rt *rt;
+	struct ls *ls;
 
-	ensure(lk, return);
-	spin_lock_irqsave(&lk->lock, flags);
-	{
-		struct cb *cb;
-		struct sl *sl;
-		struct rt *rt;
-		struct ls *ls;
-
-		/* stop timers */
-		lk_timer_stop(lk, tall);
-		/* remove all changeback buffers */
-		while ((cb = lk->cb.list))
-			mtp_free_cb(cb);
-		/* remove all routes */
-		while ((rt = lk->rt.list))
-			mtp_free_rt(rt);
-		/* remove all signalling links */
-		while ((sl = lk->sl.list))
-			mtp_free_sl(sl);
-		/* remove from ls list */
-		if ((ls = lk->ls.ls)) {
-			if ((*lk->ls.prev = lk->ls.next))
-				lk->ls.next->ls.prev = lk->ls.prev;
-			lk->ls.next = NULL;
-			lk->ls.prev = &lk->ls.next;
-			lk_put(lk);
-			ls->lk.numb--;
-			ls_put(xchg(&lk->ls.ls, NULL));
-		}
-		if (lk->next || lk->prev != &lk->next) {
-			/* remove from master list */
-			if ((*lk->prev = lk->next))
-				lk->next->prev = lk->prev;
-			lk->next = NULL;
-			lk->prev = &lk->next;
-			master.lk.numb--;
-			lk_put(lk);
-		}
+	/* stop timers */
+	lk_timer_stop(lk, tall);
+	/* remove all changeback buffers */
+	while ((cb = lk->cb.list))
+		mtp_free_cb(cb);
+	/* remove all routes */
+	while ((rt = lk->rt.list))
+		mtp_free_rt(rt);
+	/* remove all signalling links */
+	while ((sl = lk->sl.list))
+		mtp_free_sl(sl);
+	/* remove from ls list */
+	if ((ls = lk->ls.ls)) {
+		if ((*lk->ls.prev = lk->ls.next))
+			lk->ls.next->ls.prev = lk->ls.prev;
+		lk->ls.next = NULL;
+		lk->ls.prev = &lk->ls.next;
+		ls->lk.numb--;
+		lk->ls.ls = NULL;
 	}
-	spin_unlock_irqrestore(&lk->lock, flags);
-	lk_put(lk);		/* final put */
+	if (lk->next || lk->prev != &lk->next) {
+		/* remove from master list */
+		if ((*lk->prev = lk->next))
+			lk->next->prev = lk->prev;
+		lk->next = NULL;
+		lk->prev = &lk->next;
+		master.lk.numb--;
+	}
+	/* free timer */
+	mi_timer_free(lk->timers.t7);
+	mi_timer_free(lk->timers.t25a);
+	mi_timer_free(lk->timers.t28a);
+	mi_timer_free(lk->timers.t29a);
+	mi_timer_free(lk->timers.t30a);
+	kmem_cache_free(mtp_lk_cachep, lk);
 }
 
 /*
@@ -18659,7 +20138,7 @@ mtp_free_lk(struct lk *lk)
  *  -------------------------------------------------------------------------
  */
 static struct ls *
-ls_lookup(ulong id)
+ls_lookup(uint id)
 {
 	struct ls *ls = NULL;
 
@@ -18667,59 +20146,43 @@ ls_lookup(ulong id)
 		for (ls = master.ls.list; ls && ls->id != id; ls = ls->next) ;
 	return (ls);
 }
-static ulong
-ls_get_id(ulong id)
+
+static uint
+ls_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		id = ++sequence;
 	return (id);
 }
 static struct ls *
-ls_get(struct ls *ls)
-{
-	atomic_inc(&ls->refcnt);
-	return (ls);
-}
-static void
-ls_put(struct ls *ls)
-{
-	if (atomic_dec_and_test(&ls->refcnt)) {
-		kmem_cache_free(mtp_ls_cachep, ls);
-		printd(("%s: %p: freed ls structure\n", DRV_NAME, ls));
-	}
-}
-static struct ls *
-mtp_alloc_ls(ulong id, struct sp *sp, ulong sls_mask)
+mtp_alloc_ls(uint id, struct sp *sp, struct mtp_conf_ls *c)
 {
 	struct ls *ls;
 
 	if ((ls = kmem_cache_alloc(mtp_ls_cachep, SLAB_ATOMIC))) {
 		bzero(ls, sizeof(*ls));
-		ls->priv_put = &ls_put;
-		spin_lock_init(&ls->lock);	/* "ls-lock" */
-		ls_get(ls);	/* first get */
 		/* add to master list */
 		if ((ls->next = master.ls.list))
 			ls->next->prev = &ls->next;
 		ls->prev = &master.ls.list;
-		master.ls.list = ls_get(ls);
+		master.ls.list = ls;
 		master.ls.numb++;
 		/* add to signalling point list */
 		if ((ls->sp.next = sp->ls.list))
 			ls->sp.next->sp.prev = &ls->sp.next;
 		ls->sp.prev = &sp->ls.list;
-		ls->sp.sp = sp_get(sp);
-		sp->ls.list = ls_get(ls);
+		ls->sp.sp = sp;
+		sp->ls.list = ls;
 		sp->ls.numb++;
 		/* fill out structure */
 		ls->id = ls_get_id(id);
 		ls->type = MTP_OBJ_TYPE_LS;
-		ls->lk.sls_mask = sls_mask;
+		ls->lk.sls_mask = c->sls_mask;
 		ls->lk.sls_bits = 0;
 		{
-			ulong mask = sls_mask;
+			uint mask = c->sls_mask;
 
 			/* count the 1's in the mask */
 			while (mask) {
@@ -18728,7 +20191,7 @@ mtp_alloc_ls(ulong id, struct sp *sp, ulong sls_mask)
 				mask >>= 1;
 			}
 		}
-		ls->rl.sls_mask = ~sls_mask & sp->ls.sls_mask;
+		ls->rl.sls_mask = ~c->sls_mask & sp->ls.sls_mask;
 		ls->rl.sls_bits = sp->ls.sls_bits - ls->lk.sls_bits;
 		/* defaults inherited from sp */
 		{
@@ -18757,6 +20220,10 @@ mtp_alloc_ls(ulong id, struct sp *sp, ulong sls_mask)
 			ls->config.t1s = sp->config.t1s;
 			/* link timer defaults */
 			ls->config.t7 = sp->config.t7;
+			ls->config.t25a = sp->config.t25a;
+			ls->config.t28a = sp->config.t28a;
+			ls->config.t29a = sp->config.t29a;
+			ls->config.t30a = sp->config.t30a;
 		}
 	}
 	return (ls);
@@ -18764,55 +20231,39 @@ mtp_alloc_ls(ulong id, struct sp *sp, ulong sls_mask)
 static void
 mtp_free_ls(struct ls *ls)
 {
-	psw_t flags;
+	struct sp *sp;
+	struct rl *rl;
+	struct lk *lk;
 
-	ensure(ls, return);
-	spin_lock_irqsave(&ls->lock, flags);
-	{
-		struct sp *sp;
-		struct rl *rl;
-		struct lk *lk;
-
-		/* stop all timers */
-		ls_timer_stop(ls, tall);
-		/* remove links */
-		while ((lk = ls->lk.list))
-			mtp_free_lk(lk);
-		/* remove route lists */
-		while ((rl = ls->rl.list))
-			mtp_free_rl(rl);
-		if ((sp = ls->sp.sp)) {
-			/* remove from signalling point list */
-			if ((*ls->sp.prev = ls->sp.next))
-				ls->sp.next->sp.prev = ls->sp.prev;
-			ls->sp.next = NULL;
-			ls->sp.prev = &ls->sp.next;
-			ensure(atomic_read(&ls->refcnt) > 1, ls_get(ls));
-			ls_put(ls);
-			assure(sp->ls.numb > 0);
-			sp->ls.numb--;
-			sp_put(xchg(&ls->sp.sp, NULL));
-		}
-		if (ls->next || ls->prev != &ls->next) {
-			/* remove from master list */
-			if ((*ls->prev = ls->next))
-				ls->next->prev = ls->prev;
-			ls->next = NULL;
-			ls->prev = &ls->next;
-			ls_put(ls);
-			assure(master.ls.numb > 0);
-			master.ls.numb--;
-		}
-		/* done, check final count */
-		ls->id = 0;
-		if (atomic_read(&ls->refcnt) != 1) {
-			pswerr(("%s: %p: ERROR: ls lingering reference count = %d\n", DRV_NAME, ls,
-				atomic_read(&ls->refcnt)));
-			atomic_set(&ls->refcnt, 1);
-		}
+	/* stop all timers */
+	ls_timer_stop(ls, tall);
+	/* remove links */
+	while ((lk = ls->lk.list))
+		mtp_free_lk(lk);
+	/* remove route lists */
+	while ((rl = ls->rl.list))
+		mtp_free_rl(rl);
+	if ((sp = ls->sp.sp)) {
+		/* remove from signalling point list */
+		if ((*ls->sp.prev = ls->sp.next))
+			ls->sp.next->sp.prev = ls->sp.prev;
+		ls->sp.next = NULL;
+		ls->sp.prev = &ls->sp.next;
+		assure(sp->ls.numb > 0);
+		sp->ls.numb--;
+		ls->sp.sp = NULL;
 	}
-	spin_unlock_irqrestore(&ls->lock, flags);
-	ls_put(ls);		/* final put */
+	if (ls->next || ls->prev != &ls->next) {
+		/* remove from master list */
+		if ((*ls->prev = ls->next))
+			ls->next->prev = ls->prev;
+		ls->next = NULL;
+		ls->prev = &ls->next;
+		assure(master.ls.numb > 0);
+		master.ls.numb--;
+	}
+	ls->id = 0;
+	kmem_cache_free(mtp_ls_cachep, ls);
 }
 
 /*
@@ -18820,7 +20271,7 @@ mtp_free_ls(struct ls *ls)
  *  -------------------------------------------------------------------------
  */
 static inline struct cr *
-cr_lookup(ulong id)
+cr_lookup(uint id)
 {
 	struct cr *cr = NULL;
 
@@ -18828,53 +20279,44 @@ cr_lookup(ulong id)
 		for (cr = master.cr.list; cr && cr->id != id; cr = cr->next) ;
 	return (cr);
 }
-static ulong
-cr_get_id(ulong id)
+
+static uint
+cr_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		id = ++sequence;
 	return (id);
 }
 static struct cr *
-cr_get(struct cr *cr)
+mtp_alloc_cr(uint id, struct rl *rl, struct rt *from, struct rt *onto, uint index)
 {
-	atomic_inc(&cr->refcnt);
-	return (cr);
-}
-static void
-cr_put(struct cr *cr)
-{
-	if (atomic_dec_and_test(&cr->refcnt)) {
-		kmem_cache_free(mtp_cr_cachep, cr);
-		printd(("%s: %p: freed cr structure\n", DRV_NAME, cr));
-	}
-}
-static struct cr *
-mtp_alloc_cr(ulong id, struct rl *rl, struct rt *from, struct rt *onto, ulong index)
-{
+	struct mtp_timer *t;
 	struct cr *cr;
 
 	if ((cr = kmem_cache_alloc(mtp_cr_cachep, SLAB_ATOMIC))) {
 		bzero(cr, sizeof(*cr));
-		cr->priv_put = &cr_put;
 		bufq_init(&cr->buf);
-		spin_lock_init(&cr->lock);	/* "cr-lock" */
-		cr_get(cr);	/* first get */
 		/* add to master list */
 		if ((cr->next = master.cr.list))
 			cr->next->prev = &cr->next;
 		cr->prev = &master.cr.list;
-		master.cr.list = cr_get(cr);
+		master.cr.list = cr;
 		master.cr.numb++;
+		/* allocate timers */
+		if (!(cr->timers.t6 = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) cr-.timers.t6->b_rptr;
+		t->timer = t6;
+		t->cr = cr;
 		/* add to route list controlled rerouting buffer list */
 		if (rl) {
 			if ((cr->rl.next = rl->cr.list))
 				cr->rl.next->rl.prev = &cr->rl.next;
 			cr->rl.prev = &rl->cr.list;
-			rl->cr.list = cr_get(cr);
-			cr->rl.rl = rl_get(rl);
+			rl->cr.list = cr;
+			cr->rl.rl = rl;
 		}
 		cr->id = cr_get_id(id);
 		cr->type = MTP_OBJ_TYPE_CR;
@@ -18883,66 +20325,53 @@ mtp_alloc_cr(ulong id, struct rl *rl, struct rt *from, struct rt *onto, ulong in
 		assure(from);
 		assure(onto);
 		if (from)
-			cr->rt.from = rt_get(from);
+			cr->rt.from = from;
 		if (onto)
-			cr->rt.onto = rt_get(onto);
+			cr->rt.onto = onto;
 	}
 	return (cr);
+free_error:
+	mtp_free_cr(cr);
+	return (NULL);
 }
 static void
 mtp_free_cr(struct cr *cr)
 {
-	psw_t flags;
+	struct rt *rt;
+	struct rl *rl;
 
-	ensure(cr, return);
-	spin_lock_irqsave(&cr->lock, flags);
-	{
-		struct rt *rt;
-		struct rl *rl;
-
-		/* stop timers and purge queues */
-		cr_timer_stop(cr, tall);
-		bufq_purge(&cr->buf);
-		/* unlink from route sets */
-		if ((rt = xchg(&cr->rt.onto, NULL))) {
-			rt->load--;
-			rt_put(rt);
-		}
-		if ((rt = xchg(&cr->rt.from, NULL))) {
-			rt->load++;
-			rt_put(rt);
-		}
-		if ((rl = cr->rl.rl)) {
-			/* remove from route list */
-			if ((*cr->rl.prev = cr->rl.next))
-				cr->rl.next->rl.prev = cr->rl.prev;
-			cr->rl.next = NULL;
-			cr->rl.prev = &cr->rl.next;
-			ensure(atomic_read(&cr->refcnt) > 1, cr_get(cr));
-			cr_put(cr);
-			assure(rl->cr.numb > 0);
-			rl->cr.numb--;
-			rl_put(xchg(&cr->rl.rl, NULL));
-		}
-		if (cr->next || cr->prev != &cr->next) {
-			/* remove from master list */
-			if ((*cr->prev = cr->next))
-				cr->next->prev = cr->prev;
-			cr->next = NULL;
-			cr->prev = &cr->next;
-			cr_put(cr);
-			assure(master.cr.numb > 0);
-			master.cr.numb--;
-		}
-		/* done, check final count */
-		if (atomic_read(&cr->refcnt) != 1) {
-			pswerr(("%s: %p: ERROR: cr lingering reference count = %d\n", DRV_NAME, cr,
-				atomic_read(&cr->refcnt)));
-			atomic_set(&cr->refcnt, 1);
-		}
+	/* stop timers and purge queues */
+	cr_timer_stop(cr, tall);
+	bufq_purge(&cr->buf);
+	/* unlink from route sets */
+	if ((rt = xchg(&cr->rt.onto, NULL))) {
+		rt->load--;
 	}
-	spin_unlock_irqrestore(&cr->lock, flags);
-	cr_put(cr);		/* final put */
+	if ((rt = xchg(&cr->rt.from, NULL))) {
+		rt->load++;
+	}
+	if ((rl = cr->rl.rl)) {
+		/* remove from route list */
+		if ((*cr->rl.prev = cr->rl.next))
+			cr->rl.next->rl.prev = cr->rl.prev;
+		cr->rl.next = NULL;
+		cr->rl.prev = &cr->rl.next;
+		assure(rl->cr.numb > 0);
+		rl->cr.numb--;
+		cr->rl.rl = NULL;
+	}
+	if (cr->next || cr->prev != &cr->next) {
+		/* remove from master list */
+		if ((*cr->prev = cr->next))
+			cr->next->prev = cr->prev;
+		cr->next = NULL;
+		cr->prev = &cr->next;
+		assure(master.cr.numb > 0);
+		master.cr.numb--;
+	}
+	/* free timers */
+	mi_timer_free(cr->timers.t6);
+	kmem_cache_free(mtp_cr_cachep, cr);
 }
 
 /*
@@ -18960,8 +20389,8 @@ mtp_alloc_rr(struct rs *rs, struct lk *lk)
 			rr->rs.next->rs.prev = &rr->rs.next;
 		rr->rs.prev = &rs->rr.list;
 		rs->rr.list = rr;
-		rr->rs.rs = rs_get(rs);
-		rr->lk = lk_get(lk);
+		rr->rs.rs = rs;
+		rr->lk = lk;
 	}
 	return (rr);
 }
@@ -18974,10 +20403,10 @@ mtp_free_rr(struct rr *rr)
 			rr->rs.next->rs.prev = rr->rs.prev;
 		rr->rs.next = NULL;
 		rr->rs.prev = &rr->rs.next;
-		rs_put(xchg(&rr->rs.rs, NULL));
+		rr->rs.rs = NULL;
 	}
 	if (rr->lk)
-		lk_put(xchg(&rr->lk, NULL));
+		rr->lk = NULL;
 	kfree(rr);
 }
 
@@ -18986,7 +20415,7 @@ mtp_free_rr(struct rr *rr)
  *  -------------------------------------------------------------------------
  */
 static struct rt *
-rt_lookup(ulong id)
+rt_lookup(uint id)
 {
 	struct rt *rt = NULL;
 
@@ -18994,52 +20423,37 @@ rt_lookup(ulong id)
 		for (rt = master.rt.list; rt && rt->id != id; rt = rt->next) ;
 	return (rt);
 }
-static ulong
-rt_get_id(ulong id)
+
+static uint
+rt_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		id = ++sequence;
 	return (id);
 }
 static struct rt *
-rt_get(struct rt *rt)
+mtp_alloc_rt(uint id, struct rl *rl, struct lk *lk, struct mtp_conf_rt *c)
 {
-	atomic_inc(&rt->refcnt);
-	return (rt);
-}
-static void
-rt_put(struct rt *rt)
-{
-	if (atomic_dec_and_test(&rt->refcnt)) {
-		kmem_cache_free(mtp_rt_cachep, rt);
-		printd(("%s: %p: freed rt structure\n", DRV_NAME, rt));
-	}
-}
-static struct rt *
-mtp_alloc_rt(ulong id, struct rl *rl, struct lk *lk, ulong slot)
-{
+	struct mtp_timer *t;
 	struct rt *rt;
 
 	if ((rt = kmem_cache_alloc(mtp_rt_cachep, SLAB_ATOMIC))) {
 		bzero(rt, sizeof(*rt));
-		rt->priv_put = &rt_put;
-		spin_lock_init(&rt->lock);	/* "rt-lock" */
-		rt_get(rt);	/* first get */
 		/* add to master list */
 		if ((rt->next = master.rt.list))
 			rt->next->prev = &rt->next;
 		rt->prev = &master.rt.list;
-		master.rt.list = rt_get(rt);
+		master.rt.list = rt;
 		master.rt.numb++;
 		if (rl) {
 			/* add to routelist list */
 			if ((rt->rl.next = rl->rt.list))
 				rt->rl.next->rl.prev = &rt->rl.next;
 			rt->rl.prev = &rl->rt.list;
-			rt->rl.rl = rl_get(rl);
-			rl->rt.list = rt_get(rt);
+			rt->rl.rl = rl;
+			rl->rt.list = rt;
 			rl->rt.numb++;
 		}
 		if (lk) {
@@ -19047,8 +20461,8 @@ mtp_alloc_rt(ulong id, struct rl *rl, struct lk *lk, ulong slot)
 			if ((rt->lk.next = lk->rt.list))
 				rt->lk.next->lk.prev = &rt->lk.next;
 			rt->lk.prev = &lk->rt.list;
-			rt->lk.lk = lk_get(lk);
-			lk->rt.list = rt_get(rt);
+			rt->lk.lk = lk;
+			lk->rt.list = rt;
 			lk->rt.numb++;
 		}
 		/* fill out structure */
@@ -19057,7 +20471,13 @@ mtp_alloc_rt(ulong id, struct rl *rl, struct lk *lk, ulong slot)
 		rt->state = RT_ALLOWED;
 		rt->flags = 0;
 		rt->load = 0;	/* not loaded yet */
-		rt->slot = slot;
+		rt->slot = c->slot;
+		/* allocate timers */
+		if (!(rt->timers.t10 = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) rt->timers.t10->b_rptr;
+		t->timer = t10;
+		t->rt = rt;
 		/* defaults inherited from rl */
 		{
 			/* route timer defaults */
@@ -19066,56 +20486,49 @@ mtp_alloc_rt(ulong id, struct rl *rl, struct lk *lk, ulong slot)
 		}
 	}
 	return (rt);
+free_error:
+	mtp_free_rt(rt);
+	return (NULL);
 }
 static void
 mtp_free_rt(struct rt *rt)
 {
-	psw_t flags;
+	struct lk *lk;
+	struct rl *rl;
 
-	ensure(rt, return);
-	spin_lock_irqsave(&rt->lock, flags);
-	{
-		struct lk *lk;
-		struct rl *rl;
-
-		/* stop timers */
-		rt_timer_stop(rt, tall);
-		/* remove from rl list */
-		if ((rl = rt->rl.rl)) {
-			if ((*rt->rl.prev = rt->rl.next))
-				rt->rl.next->rl.prev = rt->rl.prev;
-			rt->rl.next = NULL;
-			rt->rl.prev = &rt->rl.next;
-			ensure(atomic_read(&rt->refcnt) > 1, rt_get(rt));
-			rt_put(rt);
-			assure(rl->rt.numb > 0);
-			rl->rt.numb--;
-			rl_put(xchg(&rt->rl.rl, NULL));
-		}
-		/* remove from lk list */
-		if ((lk = rt->lk.lk)) {
-			if ((*rt->lk.prev = rt->lk.next))
-				rt->lk.next->lk.prev = rt->lk.prev;
-			rt->lk.next = NULL;
-			rt->lk.prev = &rt->lk.next;
-			ensure(atomic_read(&rt->refcnt) > 1, rt_get(rt));
-			rt_put(rt);
-			assure(lk->rt.numb > 0);
-			lk->rt.numb--;
-			lk_put(xchg(&rt->lk.lk, NULL));
-		}
-		if (rt->next || rt->prev != &rt->next) {
-			/* remove from master list */
-			if ((*rt->prev = rt->next))
-				rt->next->prev = rt->prev;
-			rt->next = NULL;
-			rt->prev = &rt->next;
-			master.rt.numb--;
-			rt_put(rt);
-		}
+	/* stop timers */
+	rt_timer_stop(rt, tall);
+	/* remove from rl list */
+	if ((rl = rt->rl.rl)) {
+		if ((*rt->rl.prev = rt->rl.next))
+			rt->rl.next->rl.prev = rt->rl.prev;
+		rt->rl.next = NULL;
+		rt->rl.prev = &rt->rl.next;
+		assure(rl->rt.numb > 0);
+		rl->rt.numb--;
+		rt->rl.rl = NULL;
 	}
-	spin_unlock_irqrestore(&rt->lock, flags);
-	rt_put(rt);		/* final put */
+	/* remove from lk list */
+	if ((lk = rt->lk.lk)) {
+		if ((*rt->lk.prev = rt->lk.next))
+			rt->lk.next->lk.prev = rt->lk.prev;
+		rt->lk.next = NULL;
+		rt->lk.prev = &rt->lk.next;
+		assure(lk->rt.numb > 0);
+		lk->rt.numb--;
+		rt->lk.lk = NULL;
+	}
+	if (rt->next || rt->prev != &rt->next) {
+		/* remove from master list */
+		if ((*rt->prev = rt->next))
+			rt->next->prev = rt->prev;
+		rt->next = NULL;
+		rt->prev = &rt->next;
+		master.rt.numb--;
+	}
+	/* free timers */
+	mi_timer_free(rt->timers.t10);
+	kmem_cache_free(mtp_rt_cachep, rt);
 }
 
 /*
@@ -19123,7 +20536,7 @@ mtp_free_rt(struct rt *rt)
  *  -------------------------------------------------------------------------
  */
 static struct rl *
-rl_lookup(ulong id)
+rl_lookup(uint id)
 {
 	struct rl *rl = NULL;
 
@@ -19131,31 +20544,18 @@ rl_lookup(ulong id)
 		for (rl = master.rl.list; rl && rl->id != id; rl = rl->next) ;
 	return (rl);
 }
-static ulong
-rl_get_id(ulong id)
+
+static uint
+rl_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		id = ++sequence;
 	return (id);
 }
 static struct rl *
-rl_get(struct rl *rl)
-{
-	atomic_inc(&rl->refcnt);
-	return (rl);
-}
-static void
-rl_put(struct rl *rl)
-{
-	if (atomic_dec_and_test(&rl->refcnt)) {
-		kmem_cache_free(mtp_rl_cachep, rl);
-		printd(("%s: %p: freed rl structure\n", DRV_NAME, rl));
-	}
-}
-static struct rl *
-mtp_alloc_rl(ulong id, struct rs *rs, struct ls *ls, ulong cost)
+mtp_alloc_rl(uint id, struct rs *rs, struct ls *ls, struct mtp_conf_rl *c)
 {
 	struct rl *rl;
 
@@ -19164,24 +20564,21 @@ mtp_alloc_rl(ulong id, struct rs *rs, struct ls *ls, ulong cost)
 		struct rl **rlp;
 
 		bzero(rl, sizeof(*rl));
-		rl->priv_put = &rl_put;
-		spin_lock_init(&rl->lock);	/* "rl-lock" */
-		rl_get(rl);	/* first get */
 		/* add to master list */
 		if ((rl->next = master.rl.list))
 			rl->next->prev = &rl->next;
 		rl->prev = &master.rl.list;
-		master.rl.list = rl_get(rl);
+		master.rl.list = rl;
 		master.rl.numb++;
 		if (rs) {
 			/* add to routset list (descending cost) */
-			for (rlp = &rs->rl.list; (*rlp) && (*rlp)->cost < cost;
+			for (rlp = &rs->rl.list; (*rlp) && (*rlp)->cost < c->cost;
 			     rlp = &(*rlp)->rs.next) ;
 			if ((rl->rs.next = *rlp))
 				rl->rs.next->rs.prev = &rl->rs.next;
 			rl->rs.prev = rlp;
-			rl->rs.rs = rs_get(rs);
-			*rlp = rl_get(rl);
+			rl->rs.rs = rs;
+			*rlp = rl;
 			rs->rl.numb++;
 		}
 		if (ls) {
@@ -19189,13 +20586,13 @@ mtp_alloc_rl(ulong id, struct rs *rs, struct ls *ls, ulong cost)
 			if ((rl->ls.next = ls->rl.list))
 				rl->ls.next->ls.prev = &rl->ls.next;
 			rl->ls.prev = &ls->rl.list;
-			rl->ls.ls = ls_get(ls);
-			ls->rl.list = rl_get(rl);
+			rl->ls.ls = ls;
+			ls->rl.list = rl;
 			ls->rl.numb++;
 		}
 		rl->id = rl_get_id(id);
 		rl->type = MTP_OBJ_TYPE_RL;
-		rl->cost = cost;
+		rl->cost = c->cost;
 		/* defaults inherited from rs */
 		if (rs) {
 			/* route timer defaults */
@@ -19212,9 +20609,12 @@ mtp_alloc_rl(ulong id, struct rs *rs, struct ls *ls, ulong cost)
 			struct rt *rt;
 
 			/* automatically allocate routes */
-			for (lk = ls->lk.list; lk; lk = lk->ls.next)
-				if (!(rt = mtp_alloc_rt(0, rl, lk, lk->slot)))
+			for (lk = ls->lk.list; lk; lk = lk->ls.next) {
+				struct mtp_conf_rt c = {.slot = lk->slot, };
+
+				if (!(rt = mtp_alloc_rt(0, rl, lk, &c)))
 					goto free_error;
+			}
 		}
 	}
 	return (rl);
@@ -19225,56 +20625,46 @@ mtp_alloc_rl(ulong id, struct rs *rs, struct ls *ls, ulong cost)
 static void
 mtp_free_rl(struct rl *rl)
 {
-	psw_t flags;
+	struct cr *cr;
+	struct rt *rt;
+	struct ls *ls;
+	struct rs *rs;
 
-	ensure(rl, return);
-	spin_lock_irqsave(&rl->lock, flags);
-	{
-		struct cr *cr;
-		struct rt *rt;
-		struct ls *ls;
-		struct rs *rs;
-
-		/* stop timers */
-		// __rl_timer_stop(rl, tall); /* no timers */
-		/* remove all controlled rerouting buffers */
-		while ((cr = rl->cr.list))
-			mtp_free_cr(cr);
-		/* remove all routes */
-		while ((rt = rl->rt.list))
-			mtp_free_rt(rt);
-		/* remove from rs list */
-		if ((rs = rl->rs.rs)) {
-			if ((*rl->rs.prev = rl->rs.next))
-				rl->rs.next->rs.prev = rl->rs.prev;
-			rl->rs.next = NULL;
-			rl->rs.prev = &rl->rs.next;
-			rl_put(rl);
-			rs->rl.numb--;
-			rs_put(xchg(&rl->rs.rs, NULL));
-		}
-		/* remove from ls list */
-		if ((ls = rl->ls.ls)) {
-			if ((*rl->ls.prev = rl->ls.next))
-				rl->ls.next->ls.prev = rl->ls.prev;
-			rl->ls.next = NULL;
-			rl->ls.prev = &rl->ls.next;
-			rl_put(rl);
-			ls->rl.numb--;
-			ls_put(xchg(&rl->ls.ls, NULL));
-		}
-		if (rl->next || rl->prev != &rl->next) {
-			/* remove from master list */
-			if ((*rl->prev = rl->next))
-				rl->next->prev = rl->prev;
-			rl->next = NULL;
-			rl->prev = &rl->next;
-			master.rl.numb--;
-			rl_put(rl);
-		}
+	/* stop timers */
+	// __rl_timer_stop(rl, tall); /* no timers */
+	/* remove all controlled rerouting buffers */
+	while ((cr = rl->cr.list))
+		mtp_free_cr(cr);
+	/* remove all routes */
+	while ((rt = rl->rt.list))
+		mtp_free_rt(rt);
+	/* remove from rs list */
+	if ((rs = rl->rs.rs)) {
+		if ((*rl->rs.prev = rl->rs.next))
+			rl->rs.next->rs.prev = rl->rs.prev;
+		rl->rs.next = NULL;
+		rl->rs.prev = &rl->rs.next;
+		rs->rl.numb--;
+		rl->rs.rs = NULL;
 	}
-	spin_unlock_irqrestore(&rl->lock, flags);
-	rl_put(rl);		/* final put */
+	/* remove from ls list */
+	if ((ls = rl->ls.ls)) {
+		if ((*rl->ls.prev = rl->ls.next))
+			rl->ls.next->ls.prev = rl->ls.prev;
+		rl->ls.next = NULL;
+		rl->ls.prev = &rl->ls.next;
+		ls->rl.numb--;
+		rl->ls.ls = NULL;
+	}
+	if (rl->next || rl->prev != &rl->next) {
+		/* remove from master list */
+		if ((*rl->prev = rl->next))
+			rl->next->prev = rl->prev;
+		rl->next = NULL;
+		rl->prev = &rl->next;
+		master.rl.numb--;
+	}
+	kmem_cache_free(mtp_rl_cachep, rl);
 }
 
 /*
@@ -19282,7 +20672,7 @@ mtp_free_rl(struct rl *rl)
  *  -------------------------------------------------------------------------
  */
 static struct rs *
-rs_lookup(ulong id)
+rs_lookup(uint id)
 {
 	struct rs *rs = NULL;
 
@@ -19290,59 +20680,71 @@ rs_lookup(ulong id)
 		for (rs = master.rs.list; rs && rs->id != id; rs = rs->next) ;
 	return (rs);
 }
-static ulong
-rs_get_id(ulong id)
+
+static uint
+rs_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		id = ++sequence;
 	return (id);
 }
 static struct rs *
-rs_get(struct rs *rs)
+mtp_alloc_rs(uint id, struct sp *sp, struct mtp_conf_rs *c)
 {
-	atomic_inc(&rs->refcnt);
-	return (rs);
-}
-static void
-rs_put(struct rs *rs)
-{
-	if (atomic_dec_and_test(&rs->refcnt)) {
-		kmem_cache_free(mtp_rs_cachep, rs);
-		printd(("%s: %p: freed rs structure\n", DRV_NAME, rs));
-	}
-}
-static struct rs *
-mtp_alloc_rs(ulong id, struct sp *sp, ulong dest, ulong flags)
-{
+	struct mtp_timer *t;
 	struct rs *rs;
 
 	if ((rs = kmem_cache_alloc(mtp_rs_cachep, SLAB_ATOMIC))) {
 		bzero(rs, sizeof(*rs));
-		rs->priv_put = &rs_put;
-		spin_lock_init(&rs->lock);	/* "rs-lock" */
-		rs_get(rs);	/* first get */
 		/* add to master list */
 		if ((rs->next = master.rs.list))
 			rs->next->prev = &rs->next;
 		rs->prev = &master.rs.list;
-		master.rs.list = rs_get(rs);
+		master.rs.list = rs;
 		master.rs.numb++;
 		if (sp) {
 			/* add to sp list */
 			if ((rs->sp.next = sp->rs.list))
 				rs->sp.next->sp.prev = &rs->sp.next;
 			rs->sp.prev = &sp->rs.list;
-			rs->sp.sp = sp_get(sp);
-			sp->rs.list = rs_get(rs);
+			rs->sp.sp = sp;
+			sp->rs.list = rs;
 			sp->rs.numb++;
 		}
 		/* fill out structure */
 		rs->id = rs_get_id(id);
 		rs->type = MTP_OBJ_TYPE_RS;
-		rs->flags = flags & (RSF_TFR_PENDING | RSF_ADJACENT | RSF_CLUSTER | RSF_XFER_FUNC);
-		rs->dest = dest;
+		rs->flags =
+		    c->flags & (RSF_TFR_PENDING | RSF_ADJACENT | RSF_CLUSTER | RSF_XFER_FUNC);
+		rs->dest = c->dest;
+		/* allocate timers */
+		if (!(rs->timers.t8 = mi_alloc_timer(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) rs->timers.t8->b_rptr;
+		t->timer = t8;
+		t->rs = rs;
+		if (!(rs->timers.t11 = mi_alloc_timer(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) rs->timers.t11->b_rptr;
+		t->timer = t11;
+		t->rs = rs;
+		if (!(rs->timers.t15 = mi_alloc_timer(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) rs->timers.t15->b_rptr;
+		t->timer = t15;
+		t->rs = rs;
+		if (!(rs->timers.t16 = mi_alloc_timer(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) rs->timers.t16->b_rptr;
+		t->timer = t16;
+		t->rs = rs;
+		if (!(rs->timers.t18a = mi_alloc_timer(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) rs->timers.t18a->b_rptr;
+		t->timer = t18a;
+		t->rs = rs;
 		/* defaults inherited from sp */
 		{
 			/* route timer defaults */
@@ -19357,49 +20759,49 @@ mtp_alloc_rs(ulong id, struct sp *sp, ulong dest, ulong flags)
 		}
 	}
 	return (rs);
+      free_error:
+	mtp_free_rs(rs);
+	return (NULL);
 }
 static void
 mtp_free_rs(struct rs *rs)
 {
-	psw_t flags;
+	struct rr *rr;
+	struct rl *rl;
+	struct sp *sp;
 
-	ensure(rs, return);
-	spin_lock_irqsave(&rs->lock, flags);
-	{
-		struct rr *rr;
-		struct rl *rl;
-		struct sp *sp;
-
-		/* stop timers */
-		rs_timer_stop(rs, tall);
-		/* remove all route restrictions */
-		while ((rr = rs->rr.list))
-			mtp_free_rr(rr);
-		/* remove all route lists */
-		while ((rl = rs->rl.list))
-			mtp_free_rl(rl);
-		/* remove from sp list */
-		if ((sp = rs->sp.sp)) {
-			if ((*rs->sp.prev = rs->sp.next))
-				rs->sp.next->sp.prev = rs->sp.prev;
-			rs->sp.next = NULL;
-			rs->sp.prev = &rs->sp.next;
-			rs_put(rs);
-			sp->rs.numb--;
-			sp_put(xchg(&rs->sp.sp, NULL));
-		}
-		if (rs->next || rs->prev != &rs->next) {
-			/* remove from master list */
-			if ((*rs->prev = rs->next))
-				rs->next->prev = rs->prev;
-			rs->next = NULL;
-			rs->prev = &rs->next;
-			master.rs.numb--;
-			rs_put(rs);
-		}
+	/* stop timers */
+	rs_timer_stop(rs, tall);
+	/* remove all route restrictions */
+	while ((rr = rs->rr.list))
+		mtp_free_rr(rr);
+	/* remove all route lists */
+	while ((rl = rs->rl.list))
+		mtp_free_rl(rl);
+	/* remove from sp list */
+	if ((sp = rs->sp.sp)) {
+		if ((*rs->sp.prev = rs->sp.next))
+			rs->sp.next->sp.prev = rs->sp.prev;
+		rs->sp.next = NULL;
+		rs->sp.prev = &rs->sp.next;
+		sp->rs.numb--;
+		rs->sp.sp = NULL;
 	}
-	spin_unlock_irqrestore(&rs->lock, flags);
-	rs_put(rs);		/* final put */
+	if (rs->next || rs->prev != &rs->next) {
+		/* remove from master list */
+		if ((*rs->prev = rs->next))
+			rs->next->prev = rs->prev;
+		rs->next = NULL;
+		rs->prev = &rs->next;
+		master.rs.numb--;
+	}
+	/* free timers */
+	mi_timer_free(rs->timers.t8);
+	mi_timer_free(rs->timers.t11);
+	mi_timer_free(rs->timers.t15);
+	mi_timer_free(rs->timers.t16);
+	mi_timer_free(rs->timers.t18a);
+	kmem_cache_free(mtp_rs_cachep, rs);
 }
 
 /*
@@ -19407,7 +20809,7 @@ mtp_free_rs(struct rs *rs)
  *  -------------------------------------------------------------------------
  */
 static struct sp *
-sp_lookup(ulong id)
+sp_lookup(uint id)
 {
 	struct sp *sp = NULL;
 
@@ -19415,62 +20817,97 @@ sp_lookup(ulong id)
 		for (sp = master.sp.list; sp && sp->id != id; sp = sp->next) ;
 	return (sp);
 }
-static ulong
-sp_get_id(ulong id)
+
+static uint
+sp_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		id = ++sequence;
 	return (id);
 }
 static struct sp *
-sp_get(struct sp *sp)
+mtp_alloc_sp(uint id, struct na *na, struct mtp_conf_sp *c)
 {
-	atomic_inc(&sp->refcnt);
-	return (sp);
-}
-static void
-sp_put(struct sp *sp)
-{
-	if (atomic_dec_and_test(&sp->refcnt)) {
-		kmem_cache_free(mtp_sp_cachep, sp);
-		printd(("%s: %p: freed sp structure\n", DRV_NAME, sp));
-	}
-}
-static struct sp *
-mtp_alloc_sp(ulong id, struct na *na, ulong pc, ulong equipped, ulong flags)
-{
+	struct mtp_timer *t;
 	struct sp *sp;
 
 	if ((sp = kmem_cache_alloc(mtp_sp_cachep, SLAB_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
-		sp->priv_put = &sp_put;
-		spin_lock_init(&sp->lock);	/* "sp-lock" */
-		sp_get(sp);	/* first get */
 		/* add to master list */
 		if ((sp->next = master.sp.list))
 			sp->next->prev = &sp->next;
 		sp->prev = &master.sp.list;
-		master.sp.list = sp_get(sp);
+		master.sp.list = sp;
 		master.sp.numb++;
 		if (na) {
 			/* add to na list */
 			if ((sp->na.next = na->sp.list))
 				sp->na.next->na.prev = &sp->na.next;
 			sp->na.prev = &na->sp.list;
-			sp->na.na = na_get(na);
-			na->sp.list = sp_get(sp);
+			sp->na.na = na;
+			na->sp.list = sp;
 			na->sp.numb++;
 		}
 		/* fill out structure */
 		sp->id = sp_get_id(id);
 		sp->type = MTP_OBJ_TYPE_SP;
-		sp->flags =
-		    flags & (SPF_CLUSTER | SPF_LOSC_PROC_A | SPF_LOSC_PROC_B | SPF_SECURITY |
-			     SPF_XFER_FUNC);
-		sp->pc = pc;
-		sp->mtp.equipped = equipped;
+		sp->flags = c->flags & (SPF_CLUSTER | SPF_LOSC_PROC_A | SPF_LOSC_PROC_B |
+					SPF_SECURITY | SPF_XFER_FUNC);
+		sp->pc = c->pc;
+		sp->mtp.equipped = c->users;
+		/* allocate timers */
+		if (!(sp->timers.t1r = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) sp->timers.t1r->b_rptr;
+		t->timer = t1r;
+		t->sp = sp;
+		if (!(sp->timers.t18 = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) sp->timers.t18->b_rptr;
+		t->timer = t18;
+		t->sp = sp;
+		if (!(sp->timers.t19 = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) sp->timers.t19->b_rptr;
+		t->timer = t19;
+		t->sp = sp;
+		if (!(sp->timers.t20 = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) sp->timers.t20->b_rptr;
+		t->timer = t20;
+		t->sp = sp;
+		if (!(sp->timers.t21 = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) sp->timers.t21->b_rptr;
+		t->timer = t21;
+		t->sp = sp;
+		if (!(sp->timers.t22a = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) sp->timers.t22a->b_rptr;
+		t->timer = t22a;
+		t->sp = sp;
+		if (!(sp->timers.t23a = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) sp->timers.t23a->b_rptr;
+		t->timer = t23a;
+		t->sp = sp;
+		if (!(sp->timers.t24a = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) sp->timers.t24a->b_rptr;
+		t->timer = t24a;
+		t->sp = sp;
+		if (!(sp->timers.t26a = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) sp->timers.t26a->b_rptr;
+		t->timer = t26a;
+		t->sp = sp;
+		if (!(sp->timers.t27a = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) sp->timers.t27a->b_rptr;
+		t->timer = t27a;
+		t->sp = sp;
 		/* defaults inherited from na */
 		{
 			/* sls bits and mask */
@@ -19501,6 +20938,10 @@ mtp_alloc_sp(ulong id, struct na *na, ulong pc, ulong equipped, ulong flags)
 			sp->config.t1s = na->config.t1s;
 			/* link timer defaults */
 			sp->config.t7 = na->config.t7;
+			sp->config.t25a = na->config.t25a;
+			sp->config.t28a = na->config.t28a;
+			sp->config.t29a = na->config.t29a;
+			sp->config.t30a = na->config.t30a;
 			/* route timer defaults */
 			sp->config.t6 = na->config.t6;
 			sp->config.t10 = na->config.t10;
@@ -19519,59 +20960,60 @@ mtp_alloc_sp(ulong id, struct na *na, ulong pc, ulong equipped, ulong flags)
 			sp->config.t22a = na->config.t22a;
 			sp->config.t23a = na->config.t23a;
 			sp->config.t24a = na->config.t24a;
-			sp->config.t25a = na->config.t25a;
 			sp->config.t26a = na->config.t26a;
 			sp->config.t27a = na->config.t27a;
-			sp->config.t28a = na->config.t28a;
-			sp->config.t29a = na->config.t29a;
-			sp->config.t30a = na->config.t30a;
 		}
 	}
 	return (sp);
+free_error:
+	mtp_free_sp(sp);
+	return (NULL);
 }
 static void
 mtp_free_sp(struct sp *sp)
 {
-	psw_t flags;
+	struct ls *ls;
+	struct rs *rs;
+	struct na *na;
 
-	ensure(sp, return);
-	spin_lock_irqsave(&sp->lock, flags);
-	{
-		struct ls *ls;
-		struct rs *rs;
-		struct na *na;
-
-		/* stop timers */
-		sp_timer_stop(sp, tall);
-		fixme(("Hangup on all mtp users\n"));
-		/* remove all route sets */
-		while ((rs = sp->rs.list))
-			mtp_free_rs(rs);
-		/* remove all link sets */
-		while ((ls = sp->ls.list))
-			mtp_free_ls(ls);
-		/* remove from na list */
-		if ((na = sp->na.na)) {
-			if ((*sp->na.prev = sp->na.next))
-				sp->na.next->na.prev = sp->na.prev;
-			sp->na.next = NULL;
-			sp->na.prev = &sp->na.next;
-			sp_put(sp);
-			na->sp.numb--;
-			na_put(xchg(&sp->na.na, NULL));
-		}
-		if (sp->next || sp->prev != &sp->next) {
-			/* remove from master list */
-			if ((*sp->prev = sp->next))
-				sp->next->prev = sp->prev;
-			sp->next = NULL;
-			sp->prev = &sp->next;
-			master.sp.numb--;
-			sp_put(sp);
-		}
+	/* stop timers */
+	sp_timer_stop(sp, tall);
+	fixme(("Hangup on all mtp users\n"));
+	/* remove all route sets */
+	while ((rs = sp->rs.list))
+		mtp_free_rs(rs);
+	/* remove all link sets */
+	while ((ls = sp->ls.list))
+		mtp_free_ls(ls);
+	/* remove from na list */
+	if ((na = sp->na.na)) {
+		if ((*sp->na.prev = sp->na.next))
+			sp->na.next->na.prev = sp->na.prev;
+		sp->na.next = NULL;
+		sp->na.prev = &sp->na.next;
+		na->sp.numb--;
+		sp->na.na = NULL;
 	}
-	spin_unlock_irqrestore(&sp->lock, flags);
-	sp_put(sp);		/* final put */
+	if (sp->next || sp->prev != &sp->next) {
+		/* remove from master list */
+		if ((*sp->prev = sp->next))
+			sp->next->prev = sp->prev;
+		sp->next = NULL;
+		sp->prev = &sp->next;
+		master.sp.numb--;
+	}
+	/* free timers */
+	mi_timer_free(sp->timers.t1r);
+	mi_timer_free(sp->timers.t18);
+	mi_timer_free(sp->timers.t19);
+	mi_timer_free(sp->timers.t20);
+	mi_timer_free(sp->timers.t21);
+	mi_timer_free(sp->timers.t22a);
+	mi_timer_free(sp->timers.t23a);
+	mi_timer_free(sp->timers.t24a);
+	mi_timer_free(sp->timers.t26a);
+	mi_timer_free(sp->timers.t27a);
+	kmem_cache_free(mtp_sp_cachep, sp);
 }
 
 /*
@@ -19579,45 +21021,71 @@ mtp_free_sp(struct sp *sp)
  *  -------------------------------------------------------------------------
  */
 static struct na *
-mtp_alloc_na(ulong id, uint32_t member, uint32_t cluster, uint32_t network, uint sls_bits,
+mtp_alloc_na(uint id, struct mtp_conf_na *c)
+mtp_alloc_na(uint id, uint32_t member, uint32_t cluster, uint32_t network, uint sls_bits,
 	     struct lmi_option *option)
 {
 	struct na *na;
 
 	if ((na = kmem_cache_alloc(mtp_na_cachep, SLAB_ATOMIC))) {
 		bzero(na, sizeof(*na));
-		na->priv_put = &na_put;
-		spin_lock_init(&na->lock);	/* "na-lock" */
-		na_get(na);	/* first get */
 		/* add to master list */
 		if ((na->next = master.na.list))
 			na->next->prev = &na->next;
 		na->prev = &master.na.list;
-		master.na.list = na_get(na);
+		master.na.list = na;
 		master.na.numb++;
 		/* fill out structure */
 		na->id = na_get_id(id);
 		na->type = MTP_OBJ_TYPE_NA;
-		na->mask.member = member;
-		na->mask.cluster = cluster;
-		na->mask.network = network;
-		na->sp.sls_bits = sls_bits;
+		na->mask.member = c->mask.member;
+		na->mask.cluster = c->mask.cluster;
+		na->mask.network = c->mask.network;
+		na->sp.sls_bits = c->sls_bits;
 		na->sp.sls_mask = (1 << sls_bits) - 1;
-		na->option = *option;
+		na->option = c->options;
 		/* populate defaults based on protoocl variant */
 		switch ((na->option.pvar & SS7_PVAR_MASK)) {
 		default:
 		case SS7_PVAR_ITUT:
 			na->config = itut_na_config_default;
+			na->prot[0] = &t_clts_prot_default;
+			na->prot[1] = &t_clts_prot_default;
+			na->prot[2] = &t_clts_prot_default;
+			na->prot[3] = &t_clts_prot_default;
+			na->prot[4] = &t_clts_prot_default;
+			na->prot[5] = &t_cots_prot_default;
+			na->prot[8] = &t_clts_prot_default;
 			break;
 		case SS7_PVAR_ETSI:
 			na->config = etsi_na_config_default;
+			na->prot[0] = &t_clts_prot_default;
+			na->prot[1] = &t_clts_prot_default;
+			na->prot[2] = &t_clts_prot_default;
+			na->prot[3] = &t_clts_prot_default;
+			na->prot[4] = &t_clts_prot_default;
+			na->prot[5] = &t_cots_prot_default;
+			na->prot[8] = &t_clts_prot_default;
 			break;
 		case SS7_PVAR_ANSI:
 			na->config = ansi_na_config_default;
+			na->prot[0] = &t_clts_prot_default;
+			na->prot[1] = &t_clts_prot_default;
+			na->prot[2] = &t_clts_prot_default;
+			na->prot[3] = &t_clts_prot_default;
+			na->prot[4] = &t_clts_prot_default;
+			na->prot[5] = &t_cots_prot_default;
+			na->prot[8] = &t_clts_prot_default;
 			break;
 		case SS7_PVAR_JTTC:
 			na->config = jttc_na_config_default;
+			na->prot[0] = &t_clts_prot_default;
+			na->prot[1] = &t_clts_prot_default;
+			na->prot[2] = &t_clts_prot_default;
+			na->prot[3] = &t_clts_prot_default;
+			na->prot[4] = &t_clts_prot_default;
+			na->prot[5] = &t_cots_prot_default;
+			na->prot[8] = &t_clts_prot_default;
 			break;
 		}
 	}
@@ -19626,32 +21094,23 @@ mtp_alloc_na(ulong id, uint32_t member, uint32_t cluster, uint32_t network, uint
 static void
 mtp_free_na(struct na *na)
 {
-	psw_t flags;
+	struct sp *sp;
 
-	ensure(na, return);
-	spin_lock_irqsave(&na->lock, flags);
-	{
-		struct sp *sp;
-
-		/* remove all attached signalling points */
-		while ((sp = na->sp.list))
-			mtp_free_sp(sp);
-		if (na->next || na->prev != &na->next) {
-			/* remove from master list */
-			if ((*na->prev = na->next))
-				na->next->prev = na->prev;
-			na->next = NULL;
-			na->prev = &na->next;
-			master.na.numb--;
-			na_put(na);
-		}
+	/* remove all attached signalling points */
+	while ((sp = na->sp.list))
+		mtp_free_sp(sp);
+	if (na->next || na->prev != &na->next) {
+		/* remove from master list */
+		if ((*na->prev = na->next))
+			na->next->prev = na->prev;
+		na->next = NULL;
+		na->prev = &na->next;
+		master.na.numb--;
 	}
-	spin_unlock_irqrestore(&na->lock, flags);
-	na_put(na);		/* final put */
-	return;
+	kmem_cache_free(mtp_na_cachep, na);
 }
 static struct na *
-na_lookup(ulong id)
+na_lookup(uint id)
 {
 	struct na *na = NULL;
 
@@ -19659,28 +21118,15 @@ na_lookup(ulong id)
 		for (na = master.na.list; na && na->id != id; na = na->next) ;
 	return (na);
 }
-static ulong
-na_get_id(ulong id)
+
+static uint
+na_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		id = ++sequence;
 	return (id);
-}
-static struct na *
-na_get(struct na *na)
-{
-	atomic_inc(&na->refcnt);
-	return (na);
-}
-static void
-na_put(struct na *na)
-{
-	if (atomic_dec_and_test(&na->refcnt)) {
-		kmem_cache_free(mtp_na_cachep, na);
-		printd(("%s: %p: freed na structure\n", DRV_NAME, na));
-	}
 }
 
 /*
@@ -19697,66 +21143,66 @@ static struct module_stat sl_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES))
 static struct module_stat sl_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 static struct module_info mtp_winfo = {
-	.mi_idnum = DRV_ID,	/* Module ID number */
+	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME "-wr",	/* Module ID name */
-	.mi_minpsz = 1,		/* Min packet size accepted */
-	.mi_maxpsz = 272 + 1,	/* Max packet size accepted */
-	.mi_hiwat = STRHIGH,	/* Hi water mark */
-	.mi_lowat = STRLOW,	/* Lo water mark */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = 272 + 1,		/* Max packet size accepted */
+	.mi_hiwat = STRHIGH,		/* Hi water mark */
+	.mi_lowat = STRLOW,		/* Lo water mark */
 };
 static struct module_info mtp_rinfo = {
-	.mi_idnum = DRV_ID,	/* Module ID number */
+	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME "-rd",	/* Module ID name */
-	.mi_minpsz = 1,		/* Min packet size accepted */
-	.mi_maxpsz = 272 + 1,	/* Max packet size accepted */
-	.mi_hiwat = STRHIGH,	/* Hi water mark */
-	.mi_lowat = STRLOW,	/* Lo water mark */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = 272 + 1,		/* Max packet size accepted */
+	.mi_hiwat = STRHIGH,		/* Hi water mark */
+	.mi_lowat = STRLOW,		/* Lo water mark */
 };
 static struct module_info sl_winfo = {
-	.mi_idnum = DRV_ID,	/* Module ID number */
+	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME "-muxw",	/* Module ID name */
-	.mi_minpsz = 1,		/* Min packet size accepted */
-	.mi_maxpsz = 272 + 1,	/* Max packet size accepted */
-	.mi_hiwat = STRHIGH,	/* Hi water mark */
-	.mi_lowat = STRLOW,	/* Lo water mark */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = 272 + 1,		/* Max packet size accepted */
+	.mi_hiwat = STRHIGH,		/* Hi water mark */
+	.mi_lowat = STRLOW,		/* Lo water mark */
 };
 static struct module_info sl_rinfo = {
-	.mi_idnum = DRV_ID,	/* Module ID number */
+	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME "-muxr",	/* Module ID name */
-	.mi_minpsz = 1,		/* Min packet size accepted */
-	.mi_maxpsz = 272 + 1,	/* Max packet size accepted */
-	.mi_hiwat = STRHIGH,	/* Hi water mark */
-	.mi_lowat = STRLOW,	/* Lo water mark */
+	.mi_minpsz = 1,			/* Min packet size accepted */
+	.mi_maxpsz = 272 + 1,		/* Max packet size accepted */
+	.mi_hiwat = STRHIGH,		/* Hi water mark */
+	.mi_lowat = STRLOW,		/* Lo water mark */
 };
 
 static struct qinit mtp_rinit = {
-	.qi_putp = mtp_rput,	/* Write put (message from below) */
-	.qi_srvp = mtp_rsrv,	/* Write queue service */
-	.qi_qopen = mtp_qopen,	/* Each open */
+	.qi_putp = mtp_rput,		/* Write put (message from below) */
+	.qi_srvp = mtp_rsrv,		/* Write queue service */
+	.qi_qopen = mtp_qopen,		/* Each open */
 	.qi_qclose = mtp_qclose,	/* Last close */
-	.qi_minfo = &mtp_rinfo,	/* Information */
-	.qi_mstat = &mtp_rstat,	/* Statistics */
+	.qi_minfo = &mtp_rinfo,		/* Information */
+	.qi_mstat = &mtp_rstat,		/* Statistics */
 };
 
 static struct qinit mtp_winit = {
-	.qi_putp = mtp_wput,	/* Write put (message from above) */
-	.qi_srvp = mtp_wsrv,	/* Write queue service */
-	.qi_minfo = &mtp_winfo,	/* Information */
-	.qi_mstat = &mtp_wstat,	/* Statistics */
+	.qi_putp = mtp_wput,		/* Write put (message from above) */
+	.qi_srvp = mtp_wsrv,		/* Write queue service */
+	.qi_minfo = &mtp_winfo,		/* Information */
+	.qi_mstat = &mtp_wstat,		/* Statistics */
 };
 
 static struct qinit sl_rinit = {
-	.qi_putp = sl_rput,	/* Write put (message from below) */
-	.qi_srvp = sl_rsrv,	/* Write queue service */
-	.qi_minfo = &sl_rinfo,	/* Information */
-	.qi_mstat = &sl_rstat,	/* Statistics */
+	.qi_putp = sl_rput,		/* Write put (message from below) */
+	.qi_srvp = sl_rsrv,		/* Write queue service */
+	.qi_minfo = &sl_rinfo,		/* Information */
+	.qi_mstat = &sl_rstat,		/* Statistics */
 };
 
 static struct qinit sl_winit = {
-	.qi_putp = sl_wput,	/* Write put (message from above) */
-	.qi_srvp = sl_wsrv,	/* Write queue service */
-	.qi_minfo = &sl_winfo,	/* Information */
-	.qi_mstat = &sl_wstat,	/* Statistics */
+	.qi_putp = sl_wput,		/* Write put (message from above) */
+	.qi_srvp = sl_wsrv,		/* Write queue service */
+	.qi_minfo = &sl_winfo,		/* Information */
+	.qi_mstat = &sl_wstat,		/* Statistics */
 };
 
 MODULE_STATIC struct streamtab mtpinfo = {

@@ -1,0 +1,327 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strcompat.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strcompat.macros
+.\"
+.\"
+.TH MI_OPEN_ALLOC_CACHE 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mi_open_alloc_cache, mi_close_free_cache
+\- \fISTREAMS\fR driver or module instance allocation and deallocation for open and close
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
+.HP
+.BI "caddr_t mi_open_alloc_cache(kmem_cache_t *" cachep ", int " flag ");
+.HP
+.BI "void mi_close_free_cache(kmem_cache_t *" cachep ", caddr_t " ptr ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I cachep
+a pointer to a kernel memory slab cache.
+.TP
+.I flag
+a slab allocation flag as passed to
+.BR kmem_cache_alloc (9).
+.TP
+.I ptr
+a pointer to the per-instance user data structure returned by
+.BR mi_open_alloc_cache ().
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mi_open_alloc_cache ()
+and
+.BR mi_close_free_cache ()
+can be used to perform
+.I STREAMS
+.IR qi_qopen (9)
+housekeeping functions.  The functions can be used to allocate and deallocate
+a
+.I STREAMS
+driver or module private instance datastructure from a preallocated kernel
+memory slab cache.
+These functions are similar to
+.BR mi_open_alloc (9)
+and
+.BR mi_close_free (9),
+with the exception that they utilize user defined memory caches instead of
+general kernel memory.
+.PP
+.BR mi_open_alloc_cache ()
+returns
+.B NULL
+if the appropriate object from the memory cache could not be allocated.
+.BR mi_open_alloc_cache ()
+returns a pointer to the module private part of the instance datastructure.
+Those portions of the data structure that are used for further housekeeping by
+functions such as
+.BR mi_open_link (9)
+are hidden before the head of the structure.
+.BR mi_close_free_cache ()
+frees objects allocated by
+.BR mi_open_alloc_cache ()
+back to the kernel memory slab cache.
+.BR mi_close_free_cache ()
+must be passed the pointer,
+.IR ptr ,
+returned by
+.BR mi_open_alloc_cache ().
+.PP
+The kernel memory slab cache pointer,
+.IR cachep ,
+must be the same for both functions for the same object.
+.I cachep
+is a kernel memory slab cache pointer that contains objects of the appropriate
+size.  The appropriate size can be obtained using the
+.BR mi_open_size (9)
+utility, which calculates the size of a kernel memory slab cache object from
+the size of the user portion.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR mi_open_size (9)
+is used to obtain the size of the overall memory object and to create a memory
+cache using
+.BR kmem_cache_create (9).
+The cache is normally created when the kernel module loads and destroyed when
+the kernel module unloads.
+.PP
+The cache pointer,
+.IR cachep ,
+returned by
+.BR kmem_cache_create (9)
+is used in subsequent calls to
+.BR mi_open_alloc_cache ()
+and
+.BR mi_close_free_cache ().
+Each call to
+.BR mi_open_alloc_cache ()
+from the
+.I STREAMS
+driver or module
+.IR qi_qopen (9)
+routine should have a corresponding call to
+.BR mi_close_free_cache ()
+in the
+.IR qi_qclose (9)
+routine.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR mi_open_alloc_cache ()
+succeeds, it returns a pointer to an instance structure; when it fails, it
+returns
+.BR NULL .
+.PP
+.BR mi_close_free_cache ()
+returns
+.BR void .
+.\"
+.\"
+.SH ERRORS
+.BR mi_open_alloc_cache ()
+fails when it cannot allocate a kernel memory slab cache object to satisfy the
+request.
+.BR mi_close_free_cache ()
+does not fail when passed valid arguments.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mi_open_alloc_cache ()
+and
+.BR mi_close_free_cache ()
+can be called from any context (however,
+.B SLAB_ATOMIC
+must be used as a flag in a non-blocking context).
+Nevertheless, both functions are intended to be called from within the
+.I STREAMS
+driver or module
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+routines.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mi_open_alloc_cache ()
+and
+.BR mi_close_free_cache ()
+are MP-safe.  The caller has exclusive acess to the returned data structures.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mi_open_alloc_cache ()
+and
+.BR mi_close_free_cache ()
+are
+.IR MPS \(rg-specific
+functions:
+.BR _MPS_SOURCE ,
+.B _AIX_SOURCE
+or
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.BR "@PACKAGE_TITLE@"
+must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_AIX ,
+.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_MAC
+or
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mi_open_alloc (9),
+.BR mi_close_free (9),
+.BR mi_open_size (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mi_open_alloc_cache ()
+and
+.BR mi_close_free_cache ()
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mi_open_alloc_cache ()
+and
+.BR mi_close_free_cache ()
+are
+.I OpenSS7 Project
+specific implementations of
+.BR mi_open_alloc (9)
+and
+.BR mi_close_free (9)
+that are inherently non-portable.
+While it is fairly straightforward to implement these in any Mentat
+implementation present on modern day UNIX systems, it requires exposing
+internals to the MPS implementation that might not be desirable.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "The OpenSS7 Project" .
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mi_open_alloc_cache ()
+and
+.BR mi_close_free_cache ()
+are
+.I OpenSS7 Project
+functions based loosely on the
+.BR mi_open_alloc (9)
+and
+.BR mi_close_free (9)
+Mentat functions.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

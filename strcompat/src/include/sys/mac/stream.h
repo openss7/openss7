@@ -117,6 +117,7 @@ extern int mi_timer_cancel(mblk_t *mp);
 extern mblk_t *mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp);
 extern int mi_timer_valid(mblk_t *mp);
 extern void mi_timer_free(mblk_t *mp);
+extern unsigned long mi_timer_remain(mblk_t *mp);
 
 extern queue_t *mi_allocq(struct streamtab *st);
 

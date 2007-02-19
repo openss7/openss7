@@ -300,26 +300,116 @@ struct mi_comm {
 #define mi_to_ptr(mi) ((mi) ? (mi)->mi_ptr : NULL)
 #define ptr_to_mi(ptr) ((ptr) ? (struct mi_comm *)(ptr) - 1 : NULL)
 
-static void
-mi_open_init(struct mi_comm *mi, size_t size)
+/**
+ * mi_open_size: - obtain size of open structure
+ * @size: size of user portion
+ * 
+ * Calculates and returns the size of the structure necessary for the user to
+ * allocate to use the mi_open procedures with the structure.  The allocated
+ * structure must be initialized using mi_open_obj.
+ */
+size_t
+mi_open_size(size_t size)
 {
-	bzero(mi, sizeof(*mi));
-	mi->mi_prev = mi->mi_head = &mi->mi_next;
-	mi->mi_size = size;
-	spin_lock_init(&mi->mi_lock);
-	init_waitqueue_head(&mi->mi_waitq);
-	return;
+	return (size + sizeof(struct mi_comm));
 }
+
+EXPORT_SYMBOL(mi_open_size);
+
+/**
+ * mi_open_obj: - initialize open structure
+ * @obj: pointer to allocated memory extent
+ * @size: size of user portion
+ *
+ * Initializes a user allocated structure for use by the mi_open routines and
+ * returns a pointer to the user portion.  The structure allocated should be
+ * of the size returned by mi_open_size().  The pointer returned points to the
+ * user portion of the structure.  The object pointer can be obtained using
+ * the mi_close_obj() function.
+ *
+ * Note that this function will return NULL if passed NULL.
+ */
+caddr_t
+mi_open_obj(void *obj, size_t size)
+{
+	struct mi_comm *mi;
+	
+	if ((mi = (typeof(mi)) obj)) {
+		bzero(mi, sizeof(*mi));
+		mi->mi_prev = mi->mi_head = &mi->mi_next;
+		mi->mi_size = size;
+		spin_lock_init(&mi->mi_lock);
+		init_waitqueue_head(&mi->mi_waitq);
+	}
+	return (mi_to_ptr(mi));
+}
+
+EXPORT_SYMBOL(mi_open_obj);
+
+/**
+ * mi_close_obj: - obtain an pointer to the object to free
+ * @ptr: a pointer to the user portion of the structure
+ *
+ * Returns a pointer to the memory extent to free when deallocating a user
+ * allocated structure for use with mi_open routines.  The purpose of these
+ * functions are to permit the user to provide their own allocation schemes
+ * (such as memory caches).
+ * 
+ */
+void *
+mi_close_obj(caddr_t ptr)
+{
+	return ((caddr_t) ptr_to_mi(ptr));
+}
+
+EXPORT_SYMBOL(mi_close_obj);
+
+/**
+ * mi_close_size: - obtain size of close structure
+ * @ptr: a pointer to the user portion of the structure
+ *
+ * Calculates and returns the size of the structure necessary for the user to
+ * deallocate.
+ */
+size_t
+mi_close_size(caddr_t ptr)
+{
+	struct mi_comm *mi = ptr_to_mi(ptr);
+	return (mi_open_size(mi->mi-size));
+}
+
+EXPORT_SYMBOL(mi_close_size);
+
+caddr_t
+mi_open_alloc_cache(kmem_cache_t *cachep, int flag)
+{
+	struct mi_comm *mi;
+
+	if ((mi = kmem_cache_alloc(cachep, flag)))
+		return mi_open_obj(mi, 0);
+	return (NULL);
+}
+
+EXPORT_SYMBOL(mi_open_alloc_cache);
+
+void
+mi_close_free_cache(kmem_cache_t *cachep, caddr_t ptr)
+{
+	struct mi_comm *mi = ptr_to_mi(ptr);
+
+	if (mi && mi->mi_head == NULL && mi->mi_next == NULL)
+		kmem_cache_free(cachep, mi);
+}
+
+EXPORT_SYMBOL(mi_close_free_cache);
 
 static caddr_t
 mi_open_alloc_flag(size_t size, int flag)
 {
 	struct mi_comm *mi;
 
-	if ((mi = kmem_zalloc(sizeof(struct mi_comm) + size, flag))) {
-		mi_open_init(mi, size);
-		return (mi_to_ptr(mi));
-	}
+	if ((mi = kmem_zalloc(mi_open_size(size), flag)))
+		return mi_open_obj(mi, size);
 	return (NULL);
 }
 
@@ -1326,10 +1416,16 @@ EXPORT_SYMBOL_NOVERS(mi_timer_MAC);
 int
 mi_timer_cancel(mblk_t *mp)
 {
-	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+	tblk_t *tb;
 	unsigned long flags;
 	toid_t tid;
 	int rval;
+
+	if (mp == NULL)
+		/* successful cancel, does not exist */
+		return (0);
+
+	tb = (typeof(tb)) mp->b_datap->db_base;
 
 	if ((tid = xchg(&tb->tb_tid, 0)))
 		untimeout(tid);
@@ -1633,6 +1729,31 @@ mi_timer_valid(mblk_t *mp)
 
 EXPORT_SYMBOL_NOVERS(mi_timer_valid);
 
+unsigned long
+mi_timer_remain(mblk_t *mp)
+{
+	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+	unsigned long flags;
+	unsigned long rval = 0;
+
+	spin_lock_irqsave(&tp->tb_lock, flags);
+	switch(tb->tb_state) {
+	case TB_ACTIVE:
+	case TB_RESCHEDULED:
+		if (tp->tb_time > jiffies)
+			rval = tp->tb_time - jiffies;
+		break;
+	default:
+		rval = 0;
+		break;
+	}
+	spin_unlock_irqrestore(&tp->tb_lock, flags);
+	if (rval)
+		rval = drv_hztomsec(rval);
+	return (rval);
+}
+EXPORT_SYMBOL_NOVERS(mi_timer_remain);
+
 /*
  *  MI_TIMER_FREE (Common)
  *  -------------------------------------------------------------------------
@@ -1640,9 +1761,14 @@ EXPORT_SYMBOL_NOVERS(mi_timer_valid);
 void
 mi_timer_free(mblk_t *mp)
 {
-	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+	tblk_t *tp;
 	unsigned long flags;
 	toid_t tid;
+
+	if (mp == NULL)
+		return;
+
+	tb = (typeof(tb)) mp->b_datap->db_base;
 
 	if ((tid = xchg(&tb->tb_tid, 0)))
 		untimeout(tid);

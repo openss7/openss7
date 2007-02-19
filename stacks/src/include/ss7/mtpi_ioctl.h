@@ -152,6 +152,7 @@ typedef struct mtp_opt_conf_lk {
 	mtp_ulong t1s;			/* timer t1s value */
 	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
+	mtp_ulong t25a;			/* timer t25a value */
 } mtp_opt_conf_lk_t;
 
 /*
@@ -183,6 +184,7 @@ typedef struct mtp_opt_conf_ls {
 	mtp_ulong t1s;			/* timer t1s value */
 	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
+	mtp_ulong t25a;			/* timer t25a value */
 } mtp_opt_conf_ls_t;
 
 /*
@@ -247,6 +249,7 @@ typedef struct mtp_opt_conf_sp {
 	mtp_ulong t1s;			/* timer t1s value */
 	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
+	mtp_ulong t25a;			/* timer t25a value */
 	/* route timers */
 	mtp_ulong t6;			/* timer t6 value */
 	mtp_ulong t10;			/* timer t10 value */
@@ -265,7 +268,6 @@ typedef struct mtp_opt_conf_sp {
 	mtp_ulong t22a;			/* timer t22a value */
 	mtp_ulong t23a;			/* timer t23a value */
 	mtp_ulong t24a;			/* timer t24a value */
-	mtp_ulong t25a;			/* timer t25a value */
 	mtp_ulong t26a;			/* timer t26a value */
 	mtp_ulong t27a;			/* timer t27a value */
 	mtp_ulong t28a;			/* timer t28a value */
@@ -302,6 +304,7 @@ typedef struct mtp_opt_conf_na {
 	mtp_ulong t1s;			/* timer t1s value */
 	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
+	mtp_ulong t25a;			/* timer t25a value */
 	/* route timers */
 	mtp_ulong t6;			/* timer t6 value */
 	mtp_ulong t10;			/* timer t10 value */
@@ -334,6 +337,18 @@ typedef struct mtp_opt_conf_na {
 typedef struct mtp_opt_conf_df {
 } mtp_opt_conf_df_t;
 
+typedef union mtp_option_obj {
+	struct mtp_opt_conf_na na;	/* Network Appearance */
+	struct mtp_opt_conf_sp sp;	/* Signalling Point */
+	struct mtp_opt_conf_rs rs;	/* Route Set */
+	struct mtp_opt_conf_rl rl;	/* Route List */
+	struct mtp_opt_conf_rt rt;	/* Route */
+	struct mtp_opt_conf_ls ls;	/* Combined Link Set */
+	struct mtp_opt_conf_lk lk;	/* Link Set */
+	struct mtp_opt_conf_sl sl;	/* Signalling Link */
+	struct mtp_opt_conf_df df;	/* Default */
+} mtp_option_obj_t;
+
 /*
  *  OPTIONS
  */
@@ -341,6 +356,7 @@ typedef struct mtp_option {
 	mtp_ulong type;			/* object type */
 	mtp_ulong id;			/* object id */
 	/* followed by object-specific protocol options structure */
+	mtp_option_obj_t options[0];
 } mtp_option_t;
 
 #define	MTP_IOCGOPTION	_IOWR(	MTP_IOC_MAGIC,	 0,	mtp_option_t	)
@@ -437,6 +453,18 @@ typedef struct mtp_conf_na {
 typedef struct mtp_conf_df {
 } mtp_conf_df_t;
 
+typedef union mtp_conf_obj {
+	struct mtp_conf_na na;		/* Network Appearance */
+	struct mtp_conf_sp sp;		/* Signalling Point */
+	struct mtp_conf_rs rs;		/* Route Set */
+	struct mtp_conf_rl rl;		/* Route List */
+	struct mtp_conf_rt rt;		/* Route */
+	struct mtp_conf_ls ls;		/* Combined Link Set */
+	struct mtp_conf_lk lk;		/* Link Set */
+	struct mtp_conf_sl sl;		/* Signalling Link */
+	struct mtp_conf_df df;		/* Default */
+} mtp_conf_obj_t;
+
 /*
  *  CONFIGURATION
  */
@@ -445,6 +473,7 @@ typedef struct mtp_config {
 	mtp_ulong id;			/* object id */
 	mtp_ulong cmd;			/* configuration command */
 	/* followed by object-specific configuration structure */
+	mtp_conf_obj_t config[0];
 } mtp_config_t;
 
 #define MTP_GET		0	/* get configuration */
@@ -522,6 +551,7 @@ typedef struct mtp_config {
 #define MTPF_LOSC_PROC_B	(1<<22)	/* Entity uses link oscillation procedure B */
 #define MTPF_RESTART_PHASE_1	(1<<23)	/* Entity restarting phase 1 */
 #define MTPF_RESTART_PHASE_2	(1<<24)	/* Entity restarting phase 2 */
+#define MTPF_RESTART_LOCKOUT	(1<<25)	/* Entity restarting but locked out (T27a) */
 
 /*
  *  Signalling link state
@@ -602,12 +632,14 @@ typedef struct mtp_statem_sl {
 
 #define SLF_LOSC_PROC_A	    (MTPF_LOSC_PROC_A)	/* Sig link uses link oscillation procedure A */
 #define SLF_LOSC_PROC_B	    (MTPF_LOSC_PROC_B)	/* Sig link uses link oscillation procedure B */
+#define SLF_RESTART_LOCKOUT (MTPF_RESTART_LOCKOUT)   /* Sig link restart lockout (T27a running) */
 
 /*
  *  Link set state
  */
 typedef struct mtp_timers_lk {
 	mtp_timer_t t7;			/* timer t7 */
+	mtp_timer_t t25a;		/* timer t25a */
 } mtp_timers_lk_t;
 typedef struct mtp_statem_lk {
 	struct mtp_timers_lk timers;
@@ -832,6 +864,7 @@ typedef struct mtp_statem_sp {
 #define SPF_LOSC_PROC_B	    (MTPF_LOSC_PROC_B)	/* Sig Point uses link oscillation procedure B */
 #define SPF_RESTART_PHASE_1 (MTPF_RESTART_PHASE_1)	/* Sig Point restarting */
 #define SPF_RESTART_PHASE_2 (MTPF_RESTART_PHASE_2)	/* Sig Point restarting */
+#define SPF_RESTART_LOCKOUT (MTPF_RESTART_LOCKOUT)   /* Sig Point restarting (T27a running) */
 
 /*
  *  Network appearance state
@@ -851,6 +884,18 @@ typedef struct mtp_statem_df {
 	struct mtp_timers_df timers;
 } mtp_statem_df_t;
 
+typeodef union mtp_statem_obj {
+	struct mtp_statem_na na;	/* Network Appearance */
+	struct mtp_statem_sp sp;	/* Signalling Point */
+	struct mtp_statem_rs rs;	/* Route Set */
+	struct mtp_statem_rl rl;	/* Route List */
+	struct mtp_statem_rt rt;	/* Route */
+	struct mtp_statem_ls ls;	/* Combined Link Set */
+	struct mtp_statem_lk lk;	/* Link Set */
+	struct mtp_statem_sl sl;	/* Signalling Link */
+	struct mtp_statem_df df;	/* Default */
+} mtp_statem_obj_t;
+
 /*
  *  STATE
  */
@@ -861,6 +906,7 @@ typedef struct mtp_statem {
 	mtp_ulong flags;		/* object flags */
 	mtp_ulong state;		/* object state */
 	/* followed by object-specific state structure */
+	mtp_statem_obj_t statem[0];
 } mtp_statem_t;
 
 #define	MTP_IOCGSTATEM	_IOWR(	MTP_IOC_MAGIC,	 6,	mtp_statem_t	)
@@ -920,6 +966,18 @@ typedef struct mtp_stats_na {
 typedef struct mtp_stats_df {
 } mtp_stats_df_t;
 
+typedef union mtp_stats_obj {
+	struct mtp_stats_na na;		/* Network Appearance */
+	struct mtp_stats_sp sp;		/* Signalling Point */
+	struct mtp_stats_rs rs;		/* Route Set */
+	struct mtp_stats_rl rl;		/* Route List */
+	struct mtp_stats_rt rt;		/* Route */
+	struct mtp_stats_ls ls;		/* Combined Link Set */
+	struct mtp_stats_lk lk;		/* Link Set */
+	struct mtp_stats_sl sl;		/* Signalling Link */
+	struct mtp_stats_df df;		/* Default */
+} mtp_stats_obj_t;
+
 /*
  *  STATISTICS
  */
@@ -928,6 +986,7 @@ typedef struct mtp_stats {
 	mtp_ulong id;			/* object id */
 	mtp_ulong header;		/* object stats header */
 	/* followed by object-specific statistics structure */
+	mtp_stats_obj_t stats[0];
 } mtp_stats_t;
 
 #define	MTP_IOCGSTATSP	_IOWR(	MTP_IOC_MAGIC,	 8,	mtp_stats_t	)
@@ -1024,6 +1083,18 @@ typedef struct mtp_notify_df {
 	mtp_ulong events;
 } mtp_notify_df_t;
 
+typedef union mtp_notify_obj {
+	struct mtp_notify_na na;	/* Network Appearance */
+	struct mtp_notify_sp sp;	/* Signalling Point */
+	struct mtp_notify_rs rs;	/* Route Set */
+	struct mtp_notify_rl rl;	/* Route List */
+	struct mtp_notify_rt rt;	/* Route */
+	struct mtp_notify_ls ls;	/* Combined Link Set */
+	struct mtp_notify_lk lk;	/* Link Set */
+	struct mtp_notify_sl sl;	/* Signalling Link */
+	struct mtp_notify_df df;	/* Default */
+} mtp_notify_obj_t;
+
 /*
  *  EVENTS
  */
@@ -1031,6 +1102,7 @@ typedef struct mtp_notify {
 	mtp_ulong type;			/* object type */
 	mtp_ulong id;			/* object id */
 	/* followed by object-specific notification structure */
+	mtp_notify_obj_t events[0];
 } mtp_notify_t;
 
 #define	MTP_IOCGNOTIFY	_IOWR(	MTP_IOC_MAGIC,	12,	mtp_notify_t	)

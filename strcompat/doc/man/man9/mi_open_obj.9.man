@@ -1,0 +1,324 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strcompat.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strcompat.macros
+.\"
+.\"
+.TH MI_OPEN_INIT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mi_open_obj, mi_open_size, mi_close_obj, mi_close_size
+\- mi_open user allocation helper functions
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
+.HP
+.BI "size_t mi_open_size(size_t " size ");
+.HP
+.BI "caddr_t mi_open_obj(void *" obj ", size_t " size ");
+.HP
+.BI "void *mi_close_obj(caddr_t " ptr ");
+.HP
+.BI "size_t mi_close_size(caddr_t " ptr ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I size
+the size of the per-instance user data structure to allocate.
+.TP
+.I obj
+a pointer to the allocated object of the appropriate size.
+.TP
+.I ptr
+a pointer to the per-instance user data structure.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mi_open_size (),
+.BR mi_open_obj ()
+and
+.BR mi_close_obj ()
+are housekeeping functions that can be used instead of
+.BR mi_open_alloc (9),
+.BR mi_open_alloc_sleep (9)
+and
+.BR mi_close_free (9),
+when a user specific allocation mechanism is required.  These functions were
+added by
+.I The OpenSS7 Project
+so that memory cache allocators could be used instead of the non-caching
+.BR kmem_alloc (9)
+and
+.BR kmem_free (9)
+used by the traditional MPS functions.
+.PP
+.BR mi_open_size ()
+can be used to determine the size of the overall structure necessary for
+allocation given the size of the per-instance user data portion.  The return
+value from this function can be used to size objects in memory caches.
+.PP
+.BR mi_open_obj ()
+can be used after allocation to initialize the hidden portion of the data
+structure and return a pointer to the per-instance user data portion.
+.PP
+.BR mi_close_obj ()
+can be used when deallocating the structure to obtain a pointer to the
+initially allocated memory extent.
+.\"
+.\"
+.SH USAGE
+.PP
+Using these helper functions it is possible to perform the same actions as are
+performed by
+.BR mi_open_alloc (9)
+and
+.BR mi_close_free (9)
+as follows:
+.nf
+\fC\s-1\
+caddr_t
+mi_open_alloc(size_t size)
+{
+    void *obj;
+
+    if ((obj = kmem_alloc(mi_open_size(size))))
+        return mi_open_obj(obj, size);
+    return (NULL);
+}
+
+void
+mi_close_free(caddr_t ptr)
+{
+    kmem_free(mi_close_obj(ptr), mi_close_size(ptr));
+}
+\s+1\fP
+.fi
+.\"
+.\"
+.SH RETURN
+.PP
+.BR mi_open_size ()
+and
+.BR mi_close_size ()
+returns the necessary size for allocation or deallocation of a memory extent.
+.BR mi_open_obj ()
+returns a pointer to the per-instance user data portion normally returned by
+.BR mi_open_alloc (9).
+.BR mi_close_obj ()
+returns a pointer to allocated memory extent to be used for deallocation.
+.\"
+.\"
+.SH ERRORS
+.PP
+When passed valid arguments, these functions alway succeed.  When pased a
+.B NULL
+pointer,
+.BR mi_open_obj ()
+and
+.BR mi_close_obj ()
+will return a
+.B NULL
+pointer.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mi_open_size (),
+.BR mi_open_obj (),
+.BR mi_close_obj ()
+and
+.BR mi_close_size ()
+can be called from any context.  Nevertheless, the functions are intended to
+be called from within the
+.I STREAMS
+driver or module
+.IR qi_qopen (9)
+routine.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mi_open_size (),
+.BR mi_open_obj (),
+.BR mi_close_obj ()
+and
+.BR mi_close_size ()
+are MP-safe.  The caller has exclusive access to the returned data structures.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mi_open_size (),
+.BR mi_open_obj (),
+.BR mi_close_obj ()
+and
+.BR mi_close_size ()
+are
+.IR MPS \(rg-specific
+ufnctions:
+.BR _MPS_SOURCE ,
+.B _AIX_SOURCE
+or
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose these
+symbols.
+.BR "@PACKAGE_TITLE@"
+must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ,
+.BR CONFIG_STREAMS_COMPAT_MPS_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_AIX ,
+.BR CONFIG_STREAMS_COMPAT_AIX_MODULE ,
+.BR CONFIG_STREAMS_COMPAT_MAC " or "
+.BR CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mi_open_alloc (9),
+.BR mi_open_alloc_sleep (9),
+.BR mi_close_free (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mi_open_size (),
+.BR mi_open_obj (),
+.BR mi_close_obj ()
+and
+.BR mi_close_size ()
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mi_open_size (),
+.BR mi_open_obj (),
+.BR mi_close_obj ()
+and
+.BR mi_close_size ()
+are
+.I OpenSS7 Project
+specific implementations of
+.BR mi_open_alloc (9)
+and
+.BR mi_close_free (9)
+that are inherently non-portable.
+While it is fairly straightforward to implement these in any Mentat
+implementation present on modern day UNIX systems, it requires exposing
+internals to the MPS implementation that might not be desirable.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "The OpenSS7 Project" .
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mi_open_size (),
+.BR mi_open_obj (),
+.BR mi_close_obj ()
+and
+.BR mi_close_size ()
+are
+.I OpenSS7 Project
+functions based loosely on the
+.BR mi_open_alloc (9)
+and
+.BR mi_close_free (9)
+Mentat functions.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

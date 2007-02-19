@@ -18004,7 +18004,7 @@ up_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 
 	if (q->q_ptr != NULL)
 		return (0);	/* already open */
-	if (sflag == MODOPEN || q->q_next)
+	if (sflag == MODOPEN || WR(q)->q_next)
 		return (ENXIO);
 	if (cminor > NUM_SP)
 		return (ENXIO);

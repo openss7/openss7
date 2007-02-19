@@ -136,8 +136,13 @@
 /*
  *  Module or driver open and close helper functions.
  */
+extern void *mi_close_obj(caddr_t ptr);
+extern size_t mi_open_size(size_t size);
+extern size_t mi_close_size(caddr_t ptr);
+extern caddr_t mi_open_obj(void *obj, size_t size);
 extern caddr_t mi_open_alloc(size_t size);
 extern caddr_t mi_open_alloc_sleep(size_t size);
+extern caddr_t mi_open_alloc_cache(kmem_cache_t *cachep, int flag);
 extern caddr_t mi_first_ptr(caddr_t *mi_head);
 extern caddr_t mi_first_dev_ptr(caddr_t *mi_head);
 extern caddr_t mi_next_ptr(caddr_t ptr);
@@ -146,6 +151,7 @@ extern caddr_t mi_prev_ptr(caddr_t ptr);
 extern int mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag,
 			cred_t *credp);
 extern void mi_close_free(caddr_t ptr);
+extern void mi_close_free_cachep(kmem_cache_t *cachep, caddr_t ptr);
 
 __MPS_EXTERN_INLINE caddr_t
 mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp)
@@ -229,6 +235,7 @@ extern void mi_timer_move(queue_t *q, mblk_t *mp);
 /* common */
 extern int mi_timer_valid(mblk_t *mp);
 extern void mi_timer_free(mblk_t *mp);
+extern unsigned long mi_timer_remain(mblk_t *mp);
 
 /*
  *  Locking helper function.
