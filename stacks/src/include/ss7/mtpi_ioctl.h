@@ -152,7 +152,11 @@ typedef struct mtp_opt_conf_lk {
 	mtp_ulong t1s;			/* timer t1s value */
 	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
+	mtp_ulong t19;			/* timer t19 value */
 	mtp_ulong t25a;			/* timer t25a value */
+	mtp_ulong t28a;			/* timer t28a value */
+	mtp_ulong t29a;			/* timer t29a value */
+	mtp_ulong t30a;			/* timer t30a value */
 } mtp_opt_conf_lk_t;
 
 /*
@@ -184,7 +188,11 @@ typedef struct mtp_opt_conf_ls {
 	mtp_ulong t1s;			/* timer t1s value */
 	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
+	mtp_ulong t19;			/* timer t19 value */
 	mtp_ulong t25a;			/* timer t25a value */
+	mtp_ulong t28a;			/* timer t28a value */
+	mtp_ulong t29a;			/* timer t29a value */
+	mtp_ulong t30a;			/* timer t30a value */
 } mtp_opt_conf_ls_t;
 
 /*
@@ -249,7 +257,11 @@ typedef struct mtp_opt_conf_sp {
 	mtp_ulong t1s;			/* timer t1s value */
 	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
+	mtp_ulong t19;			/* timer t19 value */
 	mtp_ulong t25a;			/* timer t25a value */
+	mtp_ulong t28a;			/* timer t28a value */
+	mtp_ulong t29a;			/* timer t29a value */
+	mtp_ulong t30a;			/* timer t30a value */
 	/* route timers */
 	mtp_ulong t6;			/* timer t6 value */
 	mtp_ulong t10;			/* timer t10 value */
@@ -262,7 +274,6 @@ typedef struct mtp_opt_conf_sp {
 	/* signalling point timers */
 	mtp_ulong t1r;			/* timer t1r value */
 	mtp_ulong t18;			/* timer t18 value */
-	mtp_ulong t19;			/* timer t19 value */
 	mtp_ulong t20;			/* timer t20 value */
 	mtp_ulong t21;			/* timer t21 value */
 	mtp_ulong t22a;			/* timer t22a value */
@@ -270,9 +281,6 @@ typedef struct mtp_opt_conf_sp {
 	mtp_ulong t24a;			/* timer t24a value */
 	mtp_ulong t26a;			/* timer t26a value */
 	mtp_ulong t27a;			/* timer t27a value */
-	mtp_ulong t28a;			/* timer t28a value */
-	mtp_ulong t29a;			/* timer t29a value */
-	mtp_ulong t30a;			/* timer t30a value */
 } mtp_opt_conf_sp_t;
 
 /*
@@ -304,7 +312,11 @@ typedef struct mtp_opt_conf_na {
 	mtp_ulong t1s;			/* timer t1s value */
 	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
+	mtp_ulong t19;			/* timer t19 value */
 	mtp_ulong t25a;			/* timer t25a value */
+	mtp_ulong t28a;			/* timer t28a value */
+	mtp_ulong t29a;			/* timer t29a value */
+	mtp_ulong t30a;			/* timer t30a value */
 	/* route timers */
 	mtp_ulong t6;			/* timer t6 value */
 	mtp_ulong t10;			/* timer t10 value */
@@ -317,18 +329,13 @@ typedef struct mtp_opt_conf_na {
 	/* signalling point timers */
 	mtp_ulong t1r;			/* timer t1r value */
 	mtp_ulong t18;			/* timer t18 value */
-	mtp_ulong t19;			/* timer t19 value */
 	mtp_ulong t20;			/* timer t20 value */
 	mtp_ulong t21;			/* timer t21 value */
 	mtp_ulong t22a;			/* timer t22a value */
 	mtp_ulong t23a;			/* timer t23a value */
 	mtp_ulong t24a;			/* timer t24a value */
-	mtp_ulong t25a;			/* timer t25a value */
 	mtp_ulong t26a;			/* timer t26a value */
 	mtp_ulong t27a;			/* timer t27a value */
-	mtp_ulong t28a;			/* timer t28a value */
-	mtp_ulong t29a;			/* timer t29a value */
-	mtp_ulong t30a;			/* timer t30a value */
 } mtp_opt_conf_na_t;
 
 /*
@@ -639,7 +646,11 @@ typedef struct mtp_statem_sl {
  */
 typedef struct mtp_timers_lk {
 	mtp_timer_t t7;			/* timer t7 */
+	mtp_timer_t t19;		/* timer t19 */
 	mtp_timer_t t25a;		/* timer t25a */
+	mtp_timer_t t28a;		/* timer t28a */
+	mtp_timer_t t29a;		/* timer t29a */
+	mtp_timer_t t30a;		/* timer t30a */
 } mtp_timers_lk_t;
 typedef struct mtp_statem_lk {
 	struct mtp_timers_lk timers;
@@ -818,18 +829,13 @@ typedef struct mtp_statem_rs {
 typedef struct mtp_timers_sp {
 	mtp_timer_t t1r;		/* timer t1r */
 	mtp_timer_t t18;		/* timer t18 */
-	mtp_timer_t t19;		/* timer t19 */
 	mtp_timer_t t20;		/* timer t20 */
 	mtp_timer_t t21;		/* timer t21 */
 	mtp_timer_t t22a;		/* timer t22a */
 	mtp_timer_t t23a;		/* timer t23a */
 	mtp_timer_t t24a;		/* timer t24a */
-	mtp_timer_t t25a;		/* timer t25a */
 	mtp_timer_t t26a;		/* timer t26a */
 	mtp_timer_t t27a;		/* timer t27a */
-	mtp_timer_t t28a;		/* timer t28a */
-	mtp_timer_t t29a;		/* timer t29a */
-	mtp_timer_t t30a;		/* timer t30a */
 } mtp_timers_sp_t;
 typedef struct mtp_statem_sp {
 	struct mtp_timers_sp timers;

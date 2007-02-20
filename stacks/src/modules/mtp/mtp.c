@@ -605,7 +605,7 @@ struct sl {
 	} i;
 	uint l_state;			/* signalling link state */
 	uint load;			/* load in this link */
-	uint slot;			/* slot in this link */
+	uint  slot;			/* slot in this link */
 	SLIST_LINKAGE (lk, sl, lk);	/* link list linkage */
 	uint slc;			/* signalling link code */
 	uint sdli;			/* signalling data link identifier */
@@ -4401,11 +4401,6 @@ sp_timer_stop(struct sp *sp, const uint t)
 		if (single)
 			break;
 		/* fall through */
-	case t19:
-		mi_timer_stop(sp->timers.t19);
-		if (single)
-			break;
-		/* fall through */
 	case t20:
 		mi_timer_stop(sp->timers.t20);
 		if (single)
@@ -4456,9 +4451,6 @@ sp_timer_start(queue_t *q, struct sp *sp, const uint t)
 		break;
 	case t18:
 		mi_timer(q, sp->timers.t18, sp->config.t18);
-		break;
-	case t19:
-		mi_timer(q, sp->timers.t19, sp->config.t19);
 		break;
 	case t20:
 		mi_timer(q, sp->timers.t20, sp->config.t20);
@@ -4614,6 +4606,11 @@ lk_timer_stop(struct lk *lk, const uint t)
 			break;
 		/* fall through */
 		break;
+	case t19:
+		mi_timer_stop(lk->timers.t19);
+		if (single)
+			break;
+		/* fall through */
 	case t25a:
 		mi_timer_stop(lk->timers.t25a);
 		if (single)
@@ -4647,6 +4644,9 @@ lk_timer_start(queue_t *q, struct lk *lk, const uint t)
 	switch (t) {
 	case t7:
 		mi_timer(q, lk->timers.t7, lk->config.t7);
+		break;
+	case t19:
+		mi_timer(q, lk->timers.t19, lk->config.t19);
 		break;
 	case t25a:
 		mi_timer(q, lk->timers.t25a, lk->config.t25a);
@@ -7373,111 +7373,146 @@ rs_set_state(queue_t *q, struct rs *rs, const uint state)
 	if ((rs_newstate = mtp_flg_state(rs_newflags)) == rs_oldstate)
 		goto no_state_change;
 	if (rs_oldstate > RS_RESTART && rs_newstate <= RS_RESTART) {
-		if ((rs->flags & RSF_ADJACENT)
-		    && ((sp->flags & SPF_XFER_FUNC) || (rs->flags & RSF_XFER_FUNC))) {
-			/* perform adjacent restart procedure */
-			fixme(("Write this procedure\n"));
-			/* ANSI T1.111.4/2000 9.3 A signalling point X considers that the MTP of an inaccessible
-			   adjacent signalling point Y is restarting when: (1) The first link in a direct link set is
-			   in the in service state at level 2, or (2) A route other than a direct link set becomes
-			   available, e.g. through receipt of a transfer allowed or traffic restart allowed message or 
-			   the availability of the corresponding link set.
+		if ((rs->flags & RSF_ADJACENT)) {
+			if ((sp->flags & SPF_XFER_FUNC) || (rs->flags & RSF_XFER_FUNC)) {
+				/* perform adjacent restart procedure */
+				fixme(("Write this procedure\n"));
+				/* ANSI T1.111.4/2000 9.3 A signalling point X considers that the
+				   MTP of an inaccessible adjacent signalling point Y is restarting 
+				   when: (1) The first link in a direct link set is in the in
+				   service state at level 2, or (2) A route other than a direct
+				   link set becomes available, e.g. through receipt of a transfer
+				   allowed or traffic restart allowed message or the availability
+				   of the corresponding link set.
 
-			   When the first link in a direct link set towards the restarting signalling point Y goes int
-			   othe in services state at level 2, signaling point X begins taking into account any traffic 
-			   restart waiting, traffic restart allowed, transfer-prohibited, transfer-restricted, and
-			   transfer-allowed messages from Y.  Signalling point X starts timer T28 either when the first 
-			   link goes into the in service state at level 2 or when the first sginallin link becomes
-			   available at level 3.  IN addition it takes the following actions:
+				   When the first link in a direct link set towards the restarting
+				   signalling point Y goes into the in services state at level 2,
+				   signaling point X begins taking into account any traffic
+				   restart waiting, traffic restart allowed, transfer-prohibited,
+				   transfer-restricted, and transfer-allowed messages from Y.
+				   Signalling point X starts timer T28 either when the first link
+				   goes into the in service state at level 2 or when the first
+				   sginallin link becomes available at level 3.  IN addition it
+				   takes the following actions:
 
-			   (1) If a TRW message is reeived from Y while T28 is running or before it is started, X
-			   starts T25.  X stops T28 if it is running.
+				   (1) If a TRW message is reeived from Y while T28 is running or
+				   before it is started, X starts T25.  X stops T28 if it is
+				   running.
 
-			   (2) If a TRW message is received from Y while T25 is running, X restarts T25.
+				   (2) If a TRW message is received from Y while T25 is running, X
+				   restarts T25.
 
-			   (3) When the first link in a link set to Y becomes available, singallin point X sends to Y a 
-			   traffic restart allowed message or, if X has the transfer function, a traffic restart
-			   waiting message followed by transfer-prohibited (note that all tranfer prohibited messages
-			   according to 13.2.2 (1) must be sent) and transfer-restricted messages and a traffic restart 
-			   allowed message.
+				   (3) When the first link in a link set to Y becomes available,
+				   singalling point X sends to Y a traffic restart allowed message 
+				   or, if X has the transfer function, a traffic restart waiting
+				   message followed by transfer-prohibited (note that all tranfer
+				   prohibited messages according to 13.2.2 (1) must be sent) and
+				   transfer-restricted messages and a traffic restart allowed
+				   message.
 
-			   (4) If a destination becomes prohibited, restricted, or available at X, after X has sent a
-			   traffic restart allowed message to Y, X notifies Y of the statu change by the normal
-			   procedures in Section 13.
+				   (4) If a destination becomes prohibited, restricted, or
+				   available at X, after X has sent a traffic restart allowed
+				   message to Y, X notifies Y of the statu change by the normal
+				   procedures in Section 13.
 
-			   (5) When a traffic restart allowed message has been sent to Y and a traffic restart allowed
-			   message has been received from Y, X stops T25 or T28, whichever is running, and restarts
-			   traffic on the link set to Y.  X gives MTP-RESUME primitives to users concerning Y and any
-			   destinations made accessible via Y.  If X has the transfer function it also broadcasts
-			   transfer-allowed or transfer-restricted messages concerning the same destinations.
+				   (5) When a traffic restart allowed message has been sent to Y
+				   and a traffic restart allowed message has been received from Y,
+				   X stops T25 or T28, whichever is running, and restarts traffic
+				   on the link set to Y.  X gives MTP-RESUME primitives to users
+				   concerning Y and any destinations made accessible via Y.  If X
+				   has the transfer function it also broadcasts transfer-allowed or 
+				   transfer-restricted messages concerning the same destinations.
 
-			   (6) If T28 expires, X restarts traffic on the link set to Y as in (5), unles a traffic
-			   restart allowed message has not been sent to Y.  In that case, X starts T25 and completes
-			   the sending of transfer prohbited and transfer-restricted messages, followed by a traffic
-			   restart allowed message.  Then, unless a traffic restart waiting message has been received
-			   from Y without a subsequent traffic restart allowed message, X stops 25 and restarts traffic 
-			   on the link set to Y.
+				   (6) If T28 expires, X restarts traffic on the link set to Y as
+				   in (5), unles a traffic restart allowed message has not been
+				   sent to Y.  In that case, X starts T25 and completes the sending 
+				   of transfer prohbited and transfer-restricted messages, followed 
+				   by a traffic restart allowed message.  Then, unless a traffic
+				   restart waiting message has been received from Y without a
+				   subsequent traffic restart allowed message, X stops 25 and
+				   restarts traffic on the link set to Y.
 
-			   (7) If T25 expires, X restarts traffic on the link set towards Y.  In the abnormal case
-			   when X has not completed sending transfer-prohibited and transfer-restricted messages to Y,
-			   X completes sending the transfer-prohibited messages required by 13.2.2 (1) and sends a
-			   traffic restart allowed message before restarting user traffic.
+				   (7) If T25 expires, X restarts traffic on the link set towards
+				   Y.  In the abnormal case when X has not completed sending
+				   transfer-prohibited and transfer-restricted messages to Y, X
+				   completes sending the transfer-prohibited messages required by
+				   13.2.2 (1) and sends a traffic restart allowed message before
+				   restarting user traffic.
 
-			   (8) If no traffic restart allowed message has been received from Y when traficc is restarted 
-			   to Y, timer T9 (see 9.4) is started.
+				   (8) If no traffic restart allowed message has been received from 
+				   Y when traficc is restarted to Y, timer T9 (see 9.4) is
+				   started.
 
-			   When signalling point Y becomes accessible via a route other than a direct link set between
-			   X and Y, X sends a MTP-RESUME primitive concerning Y to all local MTP users.  In addition,
-			   if signalling point X has the transfer function, X sends to Y any required
-			   transfer-prohibited and transfer-restricted message by the availabl route and broadcasts
-			   transfer-allowed or transfer-restricted messages concerning Y. */
+				   When signalling point Y becomes accessible via a route other
+				   than a direct link set between X and Y, X sends a MTP-RESUME
+				   primitive concerning Y to all local MTP users.  In addition, if
+				   signalling point X has the transfer function, X sends to Y any
+				   required transfer-prohibited and transfer-restricted message by
+				   the availabl route and broadcasts transfer-allowed or
+				   transfer-restricted messages concerning Y. */
 
-			/* ANSI T1.111.4/2000 9.5 (General Rules) Whe a signalling point restarts, it considers, at the 
-			   beginning of the restart procedure, all signalling routes to be allowed and all signalling
-			   links to be uninhibited.  A signalling route set test messae received in a restarting
-			   singalling point during the restart procedure is ignored.
+				/* ANSI T1.111.4/2000 9.5 (General Rules) Whe a signalling point
+				   restarts, it considers, at the beginning of the restart
+				   procedure, all signalling routes to be allowed and all
+				   signalling links to be uninhibited.  A signalling route set test 
+				   messae received in a restarting singalling point during the
+				   restart procedure is ignored.
 
-			   Signalling route set test messages received in asignalling point adjacent to a restarting
-			   signalling point while T25 or T28 is running are handled, but the relies consider that all
-			   signalling routes using the restarting signalling point are prohibited.  When T28 exires or
-			   T25 is stopped or expires, these signalling routes are allowed unless a transfer-prohibited
-			   or transfer-restricted message was received from the restarting signalling point while T28
-			   or T25 was running.
+				   Signalling route set test messages received in asignalling point 
+				   adjacent to a restarting signalling point while T25 or T28 is
+				   running are handled, but the relies consider that all signalling 
+				   routes using the restarting signalling point are prohibited.
+				   When T28 exires or T25 is stopped or expires, these signalling
+				   routes are allowed unless a transfer-prohibited or
+				   transfer-restricted message was received from the restarting
+				   signalling point while T28 or T25 was running.
 
-			   While T25 or T28 is running, all traffic from local Level 4 or other signalling points
-			   destinged to the adjacent restarting point is discarded.
+				   While T25 or T28 is running, all traffic from local Level 4 or
+				   other signalling points destinged to the adjacent restarting
+				   point is discarded.
 
-			   When an adjacent signalling point restarts, all signalling links to the restarting point
-			   are marked as uninhibited.
+				   When an adjacent signalling point restarts, all signalling links 
+				   to the restarting point are marked as uninhibited.
 
-			   In the case that an adjacent signalling point becomes inaccessible, but routing control
-			   initiates a successful uninhibiting (see 10.3), no restart procedure is performed on either
-			   side of the link.  If the inihibiting is unsuccessful because the link has failed or was
-			   blocked after it was inihibitied, then MTP restart procedures should apply based on the
-			   criteria in Section 9.3.
+				   In the case that an adjacent signalling point becomes
+				   inaccessible, but routing control initiates a successful
+				   uninhibiting (see 10.3), no restart procedure is performed on
+				   either side of the link.  If the inihibiting is unsuccessful
+				   because the link has failed or was blocked after it was
+				   inihibitied, then MTP restart procedures should apply based on
+				   the criteria in Section 9.3.
 
-			   Message traffic is restarted on newly available links by using the time controlled
-			   changeback procedure (see 6.4).
+				   Message traffic is restarted on newly available links by using
+				   the time controlled changeback procedure (see 6.4).
 
-			   If a link becomes unavailable during MTP restart, after having been successfully activated 
-			   during the restart, time controlled changeover is peformed (see 5.6.2).
+				   If a link becomes unavailable during MTP restart, after having
+				   been successfully activated during the restart, time controlled 
+				   changeover is peformed (see 5.6.2).
 
-			   If a message concerning another destination is received at a restarting point before TRA
-			   messages have been sent out, the restarting point may discard the message or it may route
-			   the message if it is able according to the current routing data.  If the restarting point
-			   discards the mesage, it sends a tranfer prohibited message to the adjacent signalling point 
-			   from which the message was received.  If a transfer prohibited message is sent in these
-			   circumstances, and a signalling route is established to the concerned destination before the 
-			   traffic restart allowed messages are broadcast, then a transfer-allowed message is sent to
-			   the adjacent point after traffic restart allowed messages are broadcast.
+				   If a message concerning another destination is received at a
+				   restarting point before TRA messages have been sent out, the
+				   restarting point may discard the message or it may route the
+				   message if it is able according to the current routing data.  If 
+				   the restarting point discards the mesage, it sends a tranfer
+				   prohibited message to the adjacent signalling point from which
+				   the message was received.  If a transfer prohibited message is
+				   sent in these circumstances, and a signalling route is
+				   established to the concerned destination before the traffic
+				   restart allowed messages are broadcast, then a transfer-allowed
+				   message is sent to the adjacent point after traffic restart
+				   allowed messages are broadcast.
 
-			   A message concerning a local MTP user with service indicator (SI) of 0010 is handled
-			   normally hwen received in a restarting signalling point. Treatments for some message with
-			   SI = 0000 receive in a resarting signalling point have been specified already in 9.1 thorugh 
-			   9.5; other messages with SI = 0000 may be treated normally or discarded when received in a
-			   restarting signalling point.  Message with other values of service indicators may be
-			   treated normally or discarded when received in the restarting point (appropriate treatment
-			   may depend on the application resident at the particular restarting point). */
+				   A message concerning a local MTP user with service indicator
+				   (SI) of 0010 is handled normally hwen received in a restarting
+				   signalling point. Treatments for some message with SI = 0000
+				   receive in a resarting signalling point have been specified
+				   already in 9.1 thorugh 9.5; other messages with SI = 0000 may
+				   be treated normally or discarded when received in a restarting
+				   signalling point.  Message with other values of service
+				   indicators may be treated normally or discarded when received in 
+				   the restarting point (appropriate treatment may depend on the
+				   application resident at the particular restarting point). */
+			}
 		}
 	}
 	if (rs_oldstate == RS_RESTRICTED) {
@@ -7798,6 +7833,95 @@ lk_set_state(queue_t *q, struct lk *lk, uint state)
 	if ((lk_newstate = mtp_flg_state(lk_newflags)) == lk_oldstate)
 		goto no_state_change;
 	/* --------------------------------------------- */
+	/* ANSI T1.111.4/2000 9.3 A signalling point X considers that the MTP of an inaccessible
+	   adjacent signalling point Y is restarting when: (1) the first link in a direct link set
+	   is in the in service state at level 2, or (2) a route other than a direct link set
+	   becomes available. e.g. through receipt of a transfer allowed or traffic restart allowed
+	   message or the availability of the corresponding link set.
+
+	   ...  When a signalling point Y becomes acessible via a route other than a direct link set
+	   between X and Y, X sends a MTP-RESUME primitive concerning Y to all local MTP users.  In
+	   addition, if signalling point X has the transfer function, X sends to Y any required
+	   transfer-prohibited and transfer-restricted messages by the available route and broadcasts 
+	   transfer-allowed or transfer-restricted messages concerning Y. */
+	/* --------------------------------------------- */
+	if (lk_oldstate > LK_RESTART && lk_newstate <= LK_RESTART) {
+		/* The first link in the direct linkset to lk->sp.adj is active a level 3. */
+		if (lk->sp.adj->state > RS_RESTART) {
+			/* If the route set lk->sp.adj is currently inactive, then the adjacent
+			   signalling point is restarting and ANSI T1.111.4/2000 9.3 applies. */
+
+			/* ANSI T1.111.4/2000 9.2 ... If the first link in a previously unavailable 
+			   link set becomes available while T23 or T24 is running, a traffic
+			   restart waiting message is sent to the point at the far end of the link. 
+			   The necessary transfer-prohibited and transfer-restricted mesages and a
+			   traffic restart allowed mesage are sent either during the restart
+			   procedure or thereafter.  Whether user traffic is restarted on such
+			   available links when T24 stops or at some time thereafter is
+			   implementation dependent.  If changes in the availability of links or
+			   the reception of signalling route management messages causes the status
+			   of a destination to change during T24, it is implementation dependent
+			   whether this status change is reflected in the broadcast of
+			   transfer-prohibited and transfer-restricted messages during T24 or is
+			   handled outside the restart procedure. */
+
+			/* ANSI T1.111.4/2000 9.3 ... When the first link in a direct link set
+			   towards the restarting signalling point Y goes into the in services
+			   state at level 2, signaling point X begins taking into account any
+			   traffic restart waiting, traffic restart allowed, transfer-prohibited,
+			   transfer-restricted, and transfer-allowed messages from Y. Signalling
+			   point X starts timer T28 either when the first link goes into the in
+			   service state at level 2 or when the first sginallin link becomes
+			   available at level 3. */
+
+			if (!mi_timer_remain(lk->timers.t28a))
+				lk_timer_start(q, lk, t28a);
+
+			/* ANSI T1.111.4/2000 9.3 ... In addition it takes the following actions:
+
+			   (1) If a TRW message is received from Y while T28 is running or before
+			   it is started, X starts T25.  X stops T28 if it is running.
+
+			   (2) If a TRW message is received from Y while T25 is running, X restarts 
+			   T25.
+
+			   (3) When the first link in a link set to Y becomes available, signalling 
+			   point X sends to Y a traffic restart allowed message or, if X has the
+			   transfer function, a traffic restart waiting message followed by
+			   transfer-prohibited (note that all tranfer prohibited messages according 
+			   to 13.2.2 (1) must be sent) and transfer-restricted messages and a
+			   traffic restart allowed message.
+
+			   (4) If a destination becomes prohibited, restricted, or available at X,
+			   after X has sent a traffic restart allowed message to Y, X notifies Y of 
+			   the statu change by the normal procedures in Section 13.
+
+			   (5) When a traffic restart allowed message has been sent to Y and a
+			   traffic restart allowed message has been received from Y, X stops T25 or 
+			   T28, whichever is running, and restarts traffic on the link set to Y.  X 
+			   gives MTP-RESUME primitives to users concerning Y and any destinations
+			   made accessible via Y.  If X has the transfer function it also
+			   broadcasts transfer-allowed or transfer-restricted messages concerning
+			   the same destinations.
+
+			   (6) If T28 expires, X restarts traffic on the link set to Y as in (5),
+			   unles a traffic restart allowed message has not been sent to Y.  In that 
+			   case, X starts T25 and completes the sending of transfer prohbited and
+			   transfer-restricted messages, followed by a traffic restart allowed
+			   message.  Then, unless a traffic restart waiting message has been
+			   received from Y without a subsequent traffic restart allowed message, X
+			   stops 25 and restarts traffic on the link set to Y.
+
+			   (7) If T25 expires, X restarts traffic on the link set towards Y.  In
+			   the abnormal case when X has not completed sending transfer-prohibited
+			   and transfer-restricted messages to Y, X completes sending the
+			   transfer-prohibited messages required by 13.2.2 (1) and sends a traffic
+			   restart allowed message before restarting user traffic.
+
+			   (8) If no traffic restart allowed message has been received from Y when
+			   traficc is restarted to Y, timer T9 (see 9.4) is started. */
+		}
+	}
 	/* --------------------------------------------- */
 	/* push state change to rt */
 	if (lk_newstate == SL_INACTIVE)
@@ -8143,7 +8267,7 @@ mtp_lookup_rt_test(queue_t *q, struct sl *sl, struct mtp_msg *m, uint type)
  * @type: type of destination in message
  *
  * Lookup the route to which a route related message pertains with appropriate security screening.  Route related
- * messages include TFA, TFR, TFP, TCA, TCR, TCP.
+ * messages include TFA, TFW, TFR, TFP, TCA, TCR, TCP.
  */
 static struct rt *
 mtp_lookup_rt(queue_t *q, struct sl *sl, struct mtp_msg *m, uint type)
@@ -9324,7 +9448,7 @@ sp_t18_timeout(queue_t *q, struct sp *sp)
 }
 
 /**
- * sp_t19_timeout: - TIMER T19 - MTP restart timer
+ * lk_t19_timeout: - TIMER T19 - MTP restart timer
  * @q: active queue
  * @sp: related signalling point
  *
@@ -9337,9 +9461,11 @@ sp_t18_timeout(queue_t *q, struct sp *sp)
  *
  * 9.5.2  If a signalling point receives a TRA message from an adjacent node and an associated T19 is running, this
  * TRA is discarded and no further action is taken.
+ *
+ * IMPLEMENTATION NOTES:- ITU T19 is like ANSI T29 and T30 and is set on a link set basis.
  */
 static int
-sp_t19_timeout(queue_t *q, struct sp *sp)
+lk_t19_timeout(queue_t *q, struct lk *lk)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9554,12 +9680,49 @@ sl_t22_timeout(queue_t *q, struct sl *sl)
  * sp_22a_timeout: - TIMER T22(ANSI)
  * @q: active queue
  * @sp: related signalling point
+ *
+ * ANSI T1.111.4/20000 9.2 ... When the first signalling link goes into the in service state at level 2, the
+ * restarting signalling point begins taking into account any transfer-prohibited, transfer-restricted,
+ * transfer-allowed, traffic restart allowed, and traffic restart waiting messages received.  The restarting point
+ * starts timers T22 and T26 either when the first signallin link goes into the in service state at level 2 or when
+ * the first signalling link becomes available at level 3.  When a traffic restart waiting message is received before
+ * user traffic is restarted on the link(s) to the point that sent the traffic restart waiting message, timer T25 is
+ * started and user traffic is not restarted on that link set until after a traffic restart allowed message is
+ * received or timer T25 expires (see 9.3).
+ *
+ * When the first signalling link of a signalling link set is available, MTP message traffic terminating at the far
+ * end of the signallin link set is immediately restarted (see also 9.5), and a traffic restart waiting messsage is
+ * sent to the point at the end of the link set.
+ *
+ * Whenever timer T26 expires, the restarting signallin point restarts timer T26 and broadcasts a traffic restart
+ * waiting message to those adjacent signallin points connected by an available link.
+ *
+ * T22 is stopped when sufficient links are available to carry the expected signalling traffic: stopping T22 is a
+ * management decision that may take into account factors such as the known long term unavailability of certain
+ * signalling links because of equipment failures.
+ *
+ * When T22 is stopped or expires, the signalling point starts a timer T23, during which it expects to receive
+ * additional transfer-prohibited, transfer-restricted, transfer-allowed (see Section 13), traffic restart waiting,
+ * and traffic restart allowed messages.  When traffic restart allowed mssage have been received for all available
+ * links or the management function determines that sufficient traffic restart allowed messages have been received
+ * that the expected traffic can be handled, T23 is stopped.
+ *
+ * IMPLEMENTATION NOTES:- T22 is used to place an upper limit on the availability of sufficient signalling links to
+ * handle the expected load.  A good rule of thumb would be that when at least half of the signalling links in each
+ * signalling link set are available, that there are sufficient links available to handle traffic; however, this does
+ * not include the knowledge of long term failures.  Note that T22 is set to about 10 minutes, and it would be really
+ * bad if there was a signalling link set will long term link failures that kept it below the rule of thumb causing
+ * the restart to take longer than 10 minutes.  Therefore a better rule of thumb might be that half the signalling
+ * links are either active or management blocked or in link oscillation lockout.  With reference to ITU, this is still
+ * Restart Phase 1 and the next phase is also Restart Phase 1.
  */
 static int
 sp_t22a_timeout(queue_t *q, struct sp *sp)
 {
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
+	/* Automatically move from the first part of Phase 1 to the second part of Phase 1.  The coming available or
+	 * oscillation lockout of signalling links should terminate this part earlier. */
+	sp_timer_start(q, sp, t23a);
+	return (0);
 }
 
 /**
@@ -9578,12 +9741,27 @@ sl_t23_timeout(queue_t *q, struct sl *sl)
  * sp_t23a_timeout: - TIMER T23(ANSI)
  * @q: active queue
  * @sp: related signalling point
+ *
+ * ANSI T1.111.4/2000 9.2 ... When T23 is stopped or expires, the signalling point starts a timer T24, during which it
+ * broadcasts transfer-prohibited and transfer-restricted messages (see Section 13), taking into account signalling
+ * links which are not available and at least those transfer prohibited, transfer-restricted and transfer-allowed
+ * message that were received befor T23 expired or was stopped.  Before user traffic is restarted, preventative
+ * transfer-prohibited messages according to 13.2.2 (1) must be sent.  Whether these preventative transfer-prohibited
+ * messages are sent for all routes or only for alternate routes is a network option.  When the broadcast of
+ * transfer-prohibited and transfer-restricted messages is completed, timer T24 is stopped.
+ *
+ * IMPLEMENTATION NOTES:- In ANSI T22 and T23 are similar to ITU-T T18.  After expiry of T23 or T18, the broadcast of
+ * trasnfer-prohibited, transfer-restricted and transfer-allowed messages begins.  ANSI starts T24 in the same way
+ * that ITU-T (use to) starts T19.  ANSI T26 is the overall timer that is equivalent to ITU T20.
  */
 static int
 sp_t23a_timeout(queue_t *q, struct sp *sp)
 {
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
+	sp->flags &= ~SPF_RESTART_PHASE_1;
+	sp->flags |= ~SPF_RESTART_PHASE_2;
+	sp_timer_start(q, sp, t24a);
+	/* FIXME: start broadcast */
+	return (0);
 }
 
 /**
@@ -9611,6 +9789,16 @@ sl_t24_timeout(queue_t *q, struct sl *sl)
  * sp_t24a_timeout: - TIMER T24(ANSI)
  * @q: active queue
  * @sp: related signalling point
+ *
+ * ANSI T1.111.4/2000 9.2 ... When T24 is stopped, timer T26 is also stopped, and the signalling point broadcasts
+ * traffic restart allowed message to all adjacent signallin points and restarts the remaining traffic by giving
+ * MTP-RESUME primitives to users for all accessible destinations.  It also starts timer T29 for those points to which
+ * it has sent a traffic restart allowed message.
+ *
+ * If T24 expires, the sending of any transfer-prohibited messages required by 13.2.2 (1) is completed, timer T26 is
+ * stopped, and the signalling point broadcasts traffic restart allowed messages to all adjacent signalling points and
+ * restarts the remaining traffic by giving MTP-RESUME primitives to users for all accessible destinations.  It also
+ * starts timer T29 for those points to which it has sent a traffic restart allowed message.
  */
 static int
 sp_t24a_timeout(queue_t *q, struct sp *sp)
@@ -9781,12 +9969,38 @@ lk_t29a_timeout(queue_t *q, struct lk *lk)
  * lk_t30a_timeout: - TIMER T30(ANSI)
  * @q: active queue
  * @sp: related signalling point
+ *
+ * ANSI T1.111.4/2000 9.4 ... If the receiving point has the transfer function, it starts timer T30, sends a traffic
+ * restart waiting message followed by the necessary transfer-restricted and transfer-prohibited messages (preventive
+ * transfer-prohibited messages according to 13.2.2 (1) are required for traffic currently being routed via the point
+ * from which the unexpected traffic restart allowed or traffic restart waiting message was received), and a traffic
+ * restart allowed message.  It then stops T30 and starts T29.  In the abnormal case that T30 expires before the
+ * sending of transfer-prohibited and transfer-restricted messages is completed, it sends a traffic restart allowed
+ * message, starts T29, and then completes sending any preventative transfer-prohibited messages according to 13.2.2
+ * (1) for traffic currently being routed via the point from which the unexpected traffic restart allowed or traffic
+ * restart waiting message was received.
  */
 static int
 lk_t30a_timeout(queue_t *q, struct lk *lk)
 {
-	fixme(("Implement this function\n"));
-	return (-EFAULT);
+	struct ls *ls = lk->ls.ls;
+	struct sp *sp = ls->sp.sp;
+	struct rs *rs = lk->sp.adj;
+	int err;
+
+	if ((err = mtp_send_tra(q, sp, lk->ni, rs->dest, sp->pc, 0)))
+		return (err);
+
+	if ((sp->flags & SPF_XFER_FUNC) && (rs->flags & RSF_XFER_FUNC)) {
+		for (rs = sp->rs.list; rs; rs = rs->sp.next) {
+			/* If the route set it active and the current route is via the signalling
+			   point that sent the TRA or TRW message, send a tranfer-prohibited
+			   message to the adjacent signalling point.  NOTE: this is only requred
+			   when both this and the adjacent signalling points are equipped with the
+			   transfer function. */
+		}
+	}
+	return (0);
 }
 
 /**
@@ -10947,6 +11161,9 @@ mtp_recv_lrt(queue_t *q, struct mtp_msg *m)
  * NOTE: A received traffic restart waiting or traffic restart allowed message is not unexpected if T22, T23 or T24 is
  * running and a direct link is in service at level 2 to the point from which the message is received or if T25, T28,
  * T29 or T30 is running for the point from which the message is received.
+ *
+ * Q.704/1996 9.5.2  If a signalling point receives a TRA message from an adjacent node and an associated T19 is
+ * running, this TRA is discarded and no further action is taken.
  */
 static int
 mtp_recv_tra(queue_t *q, struct mtp_msg *m)
@@ -10955,6 +11172,11 @@ mtp_recv_tra(queue_t *q, struct mtp_msg *m)
 	struct rt *rt;
 
 	if ((rt = mtp_lookup_rt(q, sl, m, RT_TYPE_MEMBER))) {
+		struct lk *lk = rt->lk.lk;
+
+		if (mi_timer_remain(lk->timers.t19))
+			goto discard;
+
 		fixme(("Write this function\n"));
 		goto discard;
 	}
@@ -10971,7 +11193,7 @@ mtp_recv_tra(queue_t *q, struct mtp_msg *m)
  * ANSI T1.111.4/2000 9.4 (Actions in Signalling Point X on Receipt of an Unexpected TRA or TRW Message.)  If an
  * unexpected traffic restart allowed message or traffic restart waiting message is received from an adjacent point,
  *
- * (1) If the receiving point has no trasnfer function it returns a traffic restart allowed message to the adjacent
+ * (1) If the receiving point has no transfer function it returns a traffic restart allowed message to the adjacent
  * point from which the unexpected traffic restart allowed or traffic restart waiting message was received and starts
  * time T29 concerning that point.
  *
@@ -10988,6 +11210,14 @@ mtp_recv_tra(queue_t *q, struct mtp_msg *m)
  * NOTE: A received traffic restart waiting or traffic restart allowed message is not unexpected if T22, T23 or T24 is
  * running and a direct link is in service at level 2 to the point from which the message is received or if T25, T28,
  * T29 or T30 is running for the point from which the message is received.
+ *
+ * ANSI T1.111.4/2000 9.3 ... (1) If a TRW message is received from Y while T28 is running, or before it is started, X
+ * starts T25.  X stops T28 if it is running.  (2) If a TRW message is received from Y while T25 is running, X
+ * restarts T25.
+ *
+ * IMPLEMENTATION NOTES:- TRW is only sent from an signalling point to an adjacent signalling point, normally only on
+ * a direct link set.  The TRW message is addressed to the adjacent signalling point.  mtp_lookup_rt() performs
+ * appropriate screening for TRW and TRA mesages.
  */
 static int
 mtp_recv_trw(queue_t *q, struct mtp_msg *m)
@@ -10996,8 +11226,26 @@ mtp_recv_trw(queue_t *q, struct mtp_msg *m)
 	struct rt *rt;
 
 	if ((rt = mtp_lookup_rt(q, sl, m, RT_TYPE_MEMBER))) {
-		fixme(("Write this function\n"));
-		goto discard;
+		struct lk *lk = rt->lk.lk;
+		struct sp *sp = lk->ls.ls->sp.sp;
+
+		/* Note: lk is the direct link set to the adjacent signalling point sending the TRW message. */
+
+		if (mi_timer_remain(sp->timers.t22a)) {
+		} else if (mi_timer_remain(sp->timers.t23a)) {
+		} else if (mi_timer_remain(sp->timers.t24a)) {
+		} else if (mi_timer_remain(lk->timers.t25a)) {
+			lk_timer_start(q, lk, t25a);
+			return (0);
+		} else if (mi_timer_remain(lk->timers.t28a)) {
+			/* FIXME: start sending messages */
+			lk_timer_stop(lk, t28a);
+			lk_timer_start(lk, t25a);
+			return (0);
+		} else if (mi_timer_remain(lk->timers.t29a)) {
+		} else if (mi_timer_remain(lk->timers.t30a)) {
+		}
+
 	}
 	mi_strlog(q, 0, SL_ERROR, "TRW received for unknown route");
       discard:
@@ -15046,7 +15294,6 @@ mtp_get_statem_sp(struct mtp_statem *p, struct sp *sp)
 	p->state = sp->state;
 	c->timers.t1r = (mtp_timer_t) mi_timer_remain(sp->timers.t1r);
 	c->timers.t18 = (mtp_timer_t) mi_timer_remain(sp->timers.t18);
-	c->timers.t19 = (mtp_timer_t) mi_timer_remain(sp->timers.t19);
 	c->timers.t20 = (mtp_timer_t) mi_timer_remain(sp->timers.t20);
 	c->timers.t21 = (mtp_timer_t) mi_timer_remain(sp->timers.t21);
 	c->timers.t22a = (mtp_timer_t) mi_timer_remain(sp->timers.t22a);
@@ -15122,6 +15369,7 @@ mtp_get_statem_lk(struct mtp_statem *p, struct lk *lk)
 	p->flags = lk->flags;
 	p->state = lk->state;
 	c->timers.t7 = (mtp_timer_t) mi_timer_remain(lk->timers.t7);
+	c->timers.t19 = (mtp_timer_t) mi_timer_remain(lk->timers.t19);
 	c->timers.t25a = (mtp_timer_t) mi_timer_remain(lk->timers.t25a);
 	c->timers.t28a = (mtp_timer_t) mi_timer_remain(lk->timers.t28a);
 	c->timers.t29a = (mtp_timer_t) mi_timer_remain(lk->timers.t29a);
@@ -18707,7 +18955,7 @@ do_timeout(queue_t *q, mblk_t *mp)
 		return rs_t18a_timeout(q, t->rs);
 	case t19:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t19 expiry at %lu", jiffies);
-		return sp_t19_timeout(q, t->sp);
+		return lk_t19_timeout(q, t->lk);
 	case t19a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t19a expiry at %lu", jiffies);
 		return sl_t19a_timeout(q, t->sl);
@@ -20005,6 +20253,11 @@ mtp_alloc_lk(uint id, struct ls *ls, struct sp *loc, struct rs *adj, struct mtp_
 		t = (typeof(t)) lk->timers.t7;
 		t->timer = t7;
 		t->lk = lk;
+		if (!(lk->timers.t19 = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) lk->timers.t19;
+		t->timer = t19;
+		t->lk = lk;
 		if (!(lk->timers.t25a = mi_timer_alloc(sizeof(*t))))
 			goto free_error;
 		t = (typeof(t)) lk->timers.t25a;
@@ -20055,6 +20308,7 @@ mtp_alloc_lk(uint id, struct ls *ls, struct sp *loc, struct rs *adj, struct mtp_
 			lk->config.t1s = ls->config.t1s;
 			/* link timer defaults */
 			lk->config.t7 = ls->config.t7;
+			lk->config.t19 = ls->config.t19;
 			lk->config.t25a = ls->config.t25a;
 			lk->config.t28a = ls->config.t28a;
 			lk->config.t29a = ls->config.t29a;
@@ -20126,6 +20380,7 @@ mtp_free_lk(struct lk *lk)
 	}
 	/* free timer */
 	mi_timer_free(lk->timers.t7);
+	mi_timer_free(lk->timers.t19);
 	mi_timer_free(lk->timers.t25a);
 	mi_timer_free(lk->timers.t28a);
 	mi_timer_free(lk->timers.t29a);
@@ -20220,6 +20475,7 @@ mtp_alloc_ls(uint id, struct sp *sp, struct mtp_conf_ls *c)
 			ls->config.t1s = sp->config.t1s;
 			/* link timer defaults */
 			ls->config.t7 = sp->config.t7;
+			ls->config.t19 = sp->config.t19;
 			ls->config.t25a = sp->config.t25a;
 			ls->config.t28a = sp->config.t28a;
 			ls->config.t29a = sp->config.t29a;
@@ -20868,11 +21124,6 @@ mtp_alloc_sp(uint id, struct na *na, struct mtp_conf_sp *c)
 		t = (typeof(t)) sp->timers.t18->b_rptr;
 		t->timer = t18;
 		t->sp = sp;
-		if (!(sp->timers.t19 = mi_timer_alloc(sizeof(*t))))
-			goto free_error;
-		t = (typeof(t)) sp->timers.t19->b_rptr;
-		t->timer = t19;
-		t->sp = sp;
 		if (!(sp->timers.t20 = mi_timer_alloc(sizeof(*t))))
 			goto free_error;
 		t = (typeof(t)) sp->timers.t20->b_rptr;
@@ -20938,6 +21189,7 @@ mtp_alloc_sp(uint id, struct na *na, struct mtp_conf_sp *c)
 			sp->config.t1s = na->config.t1s;
 			/* link timer defaults */
 			sp->config.t7 = na->config.t7;
+			sp->config.t19 = na->config.t19;
 			sp->config.t25a = na->config.t25a;
 			sp->config.t28a = na->config.t28a;
 			sp->config.t29a = na->config.t29a;
@@ -20954,7 +21206,6 @@ mtp_alloc_sp(uint id, struct na *na, struct mtp_conf_sp *c)
 			/* signalling point timer defaults */
 			sp->config.t1r = na->config.t1r;
 			sp->config.t18 = na->config.t18;
-			sp->config.t19 = na->config.t19;
 			sp->config.t20 = na->config.t20;
 			sp->config.t21 = na->config.t21;
 			sp->config.t22a = na->config.t22a;
@@ -21005,7 +21256,6 @@ mtp_free_sp(struct sp *sp)
 	/* free timers */
 	mi_timer_free(sp->timers.t1r);
 	mi_timer_free(sp->timers.t18);
-	mi_timer_free(sp->timers.t19);
 	mi_timer_free(sp->timers.t20);
 	mi_timer_free(sp->timers.t21);
 	mi_timer_free(sp->timers.t22a);
