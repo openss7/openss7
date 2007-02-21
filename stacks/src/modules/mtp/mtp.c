@@ -561,12 +561,12 @@ static uint ls_get_id(uint);
 #define SL_SMAP_SIZE	256
 struct lk {
 	HEAD_DECLARATION (struct lk);	/* head declaration */
-	uint ni;			/* network indicator for link */
+	uint ni;			/* network indicator for link set */
 	uint slot;			/* slot in this linkset */
 	uint load;			/* load in this linkset */
 	struct {
-		struct sp *loc;		/* local signalling point for this link */
-		struct rs *adj;		/* adjacent signalling point for this link */
+		struct sp *loc;		/* local signalling point for this link set */
+		struct rs *adj;		/* adjacent signalling point for this link set */
 	} sp;
 	SLIST_LINKAGE (ls, lk, ls);	/* linkset list linkage */
 	SLIST_COUNTERS (rt, rt);	/* list and counts of routes */
@@ -605,7 +605,7 @@ struct sl {
 	} i;
 	uint l_state;			/* signalling link state */
 	uint load;			/* load in this link */
-	uint  slot;			/* slot in this link */
+	uint slot;			/* slot in this link */
 	SLIST_LINKAGE (lk, sl, lk);	/* link list linkage */
 	uint slc;			/* signalling link code */
 	uint sdli;			/* signalling data link identifier */
@@ -4406,11 +4406,6 @@ sp_timer_stop(struct sp *sp, const uint t)
 		if (single)
 			break;
 		/* fall through */
-	case t21:
-		mi_timer_stop(sp->timers.t21);
-		if (single)
-			break;
-		/* fall through */
 	case t22a:
 		mi_timer_stop(sp->timers.t22a);
 		if (single)
@@ -4455,9 +4450,6 @@ sp_timer_start(queue_t *q, struct sp *sp, const uint t)
 	case t20:
 		mi_timer(q, sp->timers.t20, sp->config.t20);
 		break;
-	case t21:
-		mi_timer(q, sp->timers.t21, sp->config.t21);
-		break;
 	case t22a:
 		mi_timer(q, sp->timers.t22a, sp->config.t22a);
 		break;
@@ -4477,6 +4469,30 @@ sp_timer_start(queue_t *q, struct sp *sp, const uint t)
 		swerr();
 		break;
 	}
+}
+static uint
+sp_timer_remain(struct sp *sp, const uint t)
+{
+	switch (t) {
+	case t1r:
+		return mi_timer_remain(sp->timers.t1r);
+	case t18:
+		return mi_timer_remain(sp->timers.t18);
+	case t20:
+		return mi_timer_remain(sp->timers.t20);
+	case t22a:
+		return mi_timer_remain(sp->timers.t22a);
+	case t23a:
+		return mi_timer_remain(sp->timers.t23a);
+	case t24a:
+		return mi_timer_remain(sp->timers.t24a);
+	case t26a:
+		return mi_timer_remain(sp->timers.t26a);
+	case t27a:
+		return mi_timer_remain(sp->timers.t27a);
+	}
+	swerr();
+	return (0);
 }
 
 /*
@@ -4550,6 +4566,24 @@ cb_timer_start(queue_t *q, struct cb *cb, const uint t)
 		break;
 	}
 }
+static uint
+cb_timer_remain(struct cb *cb, const uint t)
+{
+	switch (t) {
+	case t1:
+		return mi_timer_remain(cb->timers.t1);
+	case t2:
+		return mi_timer_remain(cb->timers.t2);
+	case t3:
+		return mi_timer_remain(qb->timers.t3);
+	case t4:
+		return mi_timer_remain(cb->timers.t4);
+	case t5:
+		return mi_timer_remain(cb->timers.t5);
+	}
+	swerr();
+	return (0);
+}
 
 /*
  *  -------------------------------------------------------------------------
@@ -4583,6 +4617,16 @@ ls_timer_start(queue_t *q, struct ls *ls, const uint t)
 		break;
 	}
 }
+static inline uint
+ls_timer_remain(struct ls *ls, const uint t)
+{
+	switch (t) {
+	default:
+		break;
+	}
+	swerr();
+	return (0);
+}
 
 /*
  *  -------------------------------------------------------------------------
@@ -4611,6 +4655,11 @@ lk_timer_stop(struct lk *lk, const uint t)
 		if (single)
 			break;
 		/* fall through */
+	case t21:
+		mi_timer_stop(lk->timers.t21);
+		if (single)
+			break;
+		/* fall through */
 	case t25a:
 		mi_timer_stop(lk->timers.t25a);
 		if (single)
@@ -4634,9 +4683,9 @@ lk_timer_stop(struct lk *lk, const uint t)
 		/* fall through */
 		break;
 	default:
-		swerr();
 		break;
 	}
+	swerr();
 }
 static inline void
 lk_timer_start(queue_t *q, struct lk *lk, const uint t)
@@ -4647,6 +4696,9 @@ lk_timer_start(queue_t *q, struct lk *lk, const uint t)
 		break;
 	case t19:
 		mi_timer(q, lk->timers.t19, lk->config.t19);
+		break;
+	case t21:
+		mi_timer(q, lk->timers.t21, lk->config.t21);
 		break;
 	case t25a:
 		mi_timer(q, lk->timers.t25a, lk->config.t25a);
@@ -4659,10 +4711,36 @@ lk_timer_start(queue_t *q, struct lk *lk, const uint t)
 		break;
 	case t30a:
 		mi_timer(q, lk->timers.t30a, lk->config.t30a);
+		break;
 	default:
-		swerr();
 		break;
 	}
+	swerr();
+}
+
+static inline uint
+lk_timer_remain(struct lk *lk, const uint t)
+{
+	switch (t) {
+	case t7:
+		return mi_timer_remain(lk->timers.t7);
+	case t19:
+		return mi_timer_remain(lk->timers.t19);
+	case t21:
+		return mi_timer_remain(lk->timers.t21);
+	case t25a:
+		return mi_timer_remain(lk->timers.t25a);
+	case t28a:
+		return mi_timer_remain(lk->timers.t28a);
+	case t29a:
+		return mi_timer_remain(lk->timers.t29a);
+	case t30a:
+		return mi_timer_remain(lk->timers.t30a);
+	default:
+		break;
+	}
+	swerr();
+	return (0);
 }
 
 /*
@@ -4831,6 +4909,50 @@ sl_timer_start(queue_t *q, struct sl *sl, const uint t)
 		swerr();
 		break;
 	}
+}
+static uint
+sl_timer_remain(struct sl *sl, const uint t)
+{
+	switch (t) {
+	case t12:
+		return mi_timer_remain(sl->timers.t12);
+	case t13:
+		return mi_timer_remain(sl->timers.t13);
+	case t14:
+		return mi_timer_remain(sl->timers.t14);
+	case t17:
+		return mi_timer_remain(sl->timers.t17);
+	case t19a:
+		return mi_timer_remain(sl->timers.t19a);
+	case t20a:
+		return mi_timer_remain(sl->timers.t20a);
+	case t21a:
+		return mi_timer_remain(sl->timers.t21a);
+	case t22:
+		return mi_timer_remain(sl->timers.t22);
+	case t23:
+		return mi_timer_remain(sl->timers.t23);
+	case t24:
+		return mi_timer_remain(sl->timers.t24);
+	case t31a:
+		return mi_timer_remain(sl->timers.t31a);
+	case t32a:
+		return mi_timer_remain(sl->timers.t32a);
+	case t33a:
+		return mi_timer_remain(sl->timers.t33a);
+	case t34a:
+		return mi_timer_remain(sl->timers.t34a);
+	case t1t:
+		return mi_timer_remain(sl->timers.t1t);
+	case t2t:
+		return mi_timer_remain(sl->timers.t2t);
+	case t1s:
+		return mi_timer_remain(sl->timers.t1s);
+	default:
+		break;
+	}
+	swerr();
+	return (0);
 }
 
 /*
@@ -6290,7 +6412,7 @@ mtp_xfer_route(queue_t *q, struct sl *sl, mblk_t *mp, struct mtp_msg *m)
 	case RS_INACTIVE:
 		/* if the destination is currently inaccessible and we have not sent a TFP within
 		   the last t8, send a responsive TFP */
-		if (!mi_timer_remain(rs->timers.t8)) {
+		if (!rs_timer_remain(rs, t8)) {
 			if (!(rs->flags & RSF_CLUSTER))
 				mtp_send_tfp(q, loc, m->ni, adj->dest, loc->pc, 0, rs->dest);
 			else
@@ -6702,6 +6824,21 @@ rt_reroute(queue_t *q, struct rl *rl, struct rt *rt_onto, uint index, const bool
  *
  * The specified route takes over all traffic for the route-list.  This is used when the specified route is the only
  * accessible route.
+ *
+ * If this will also be the only active route list in the route set and the route set is to an adjacent signalling
+ * point, and the route is not via a direct link set (handled separately), then the adjacent signalling point is
+ * restarting via a non-direct route.
+ *
+ * Q.704/1996 9.3.3 When signalling point Y becomes accessible by means other than via a direct link set between X and
+ * Y, X sends an MTP-RESUME primitive concerning Y to all local MTP Users.  In adition, if signalling point X has the
+ * transfer function, X sends to Y any required transfer-prohibited and transfer restricted messages on the available
+ * route.  X then broadcasts TFA and/or TFR messages (see clause 13) concerning Y.  Note that X should not in this
+ *
+ * ANSI T1.111.4/2000 9.3 .. When signalling point Y becomes accessible via a route other than a direct link set
+ * between X and Y, X sends an MTP-RESUME primitive concerning Y to all local MTP users.  In addition, if signalling
+ * point X has the transfer function, X send to Y any required transfer-prohibited and transfer-restricted message by
+ * the available route and broadcasts transfer-allowed or transfer-restricted messages concerning Y.
+ * case alter any routing data other than that for Y.
  */
 static void
 rt_reroute_all(queue_t *q, struct rl *rl, struct rt *rt_onto, const bool force)
@@ -7272,7 +7409,7 @@ sp_set_state(queue_t *q, struct sp *sp, const uint state)
 		goto no_state_change;
 	if (sp_oldstate == SP_INACTIVE && sp_newstate < SP_RESTART) {
 		/* This is the first link in service (usable) at Level 3. */
-		if (mi_timer_remain(sp->timers.t1r)) {
+		if (sp_timer_remain(sp, t1r)) {
 			/* If we have a T1 timer running, this is a simple recovery.  We cancel the 
 			   t1 timer and move to the active state. */
 			sp_timer_stop(sp, t1r);
@@ -7319,10 +7456,10 @@ sp_set_state(queue_t *q, struct sp *sp, const uint state)
 		}
 	}
 	if (sp_oldstate == SP_INACTIVE && sp_newstate == SP_RESTART) {
-		/* This is the first link in service (usable) at level 2: move to Restart Phase 1, where we collect
-		 * information about available routes in the network but do not send any information ourselves. This
-		 * persists for a duration T18,  or enough TRA messages are received.  For ANSI this is far more
-		 * complicated. */
+		/* This is the first link in service (usable) at level 2: move to Restart Phase 1,
+		   where we collect information about available routes in the network but do not
+		   send any information ourselves. This persists for a duration T18, or enough TRA
+		   messages are received.  For ANSI this is far more complicated. */
 		sp->flags |= SPF_RESTART_PHASE_1;
 		sp->flags &= ~SPF_RESTART_PHASE_2;
 		sp_timer_start(q, sp, t18);
@@ -7333,7 +7470,7 @@ sp_set_state(queue_t *q, struct sp *sp, const uint state)
 		   already set emergency on all signalling links and have initiated restoration of
 		   any signalling links that have not been activated. */
 		fixme(("Don't need t1r because last t1 has already expired\n"));
-		if (!mi_timer_remain(sp->timers.t1r))
+		if (!sp_timer_remain(sp, t1r))
 			sp_timer_start(q, sp, t1r);
 	}
 	&sp->na.na->sp.states[sp_oldstate]--;
@@ -7387,8 +7524,8 @@ rs_set_state(queue_t *q, struct rs *rs, const uint state)
 
 				   When the first link in a direct link set towards the restarting
 				   signalling point Y goes into the in services state at level 2,
-				   signaling point X begins taking into account any traffic
-				   restart waiting, traffic restart allowed, transfer-prohibited,
+				   signaling point X begins taking into account any traffic restart 
+				   waiting, traffic restart allowed, transfer-prohibited,
 				   transfer-restricted, and transfer-allowed messages from Y.
 				   Signalling point X starts timer T28 either when the first link
 				   goes into the in service state at level 2 or when the first
@@ -7403,7 +7540,7 @@ rs_set_state(queue_t *q, struct rs *rs, const uint state)
 				   restarts T25.
 
 				   (3) When the first link in a link set to Y becomes available,
-				   singalling point X sends to Y a traffic restart allowed message 
+				   singalling point X sends to Y a traffic restart allowed message
 				   or, if X has the transfer function, a traffic restart waiting
 				   message followed by transfer-prohibited (note that all tranfer
 				   prohibited messages according to 13.2.2 (1) must be sent) and
@@ -7416,39 +7553,38 @@ rs_set_state(queue_t *q, struct rs *rs, const uint state)
 				   procedures in Section 13.
 
 				   (5) When a traffic restart allowed message has been sent to Y
-				   and a traffic restart allowed message has been received from Y,
+				   and a traffic restart allowed message has been received from Y, 
 				   X stops T25 or T28, whichever is running, and restarts traffic
 				   on the link set to Y.  X gives MTP-RESUME primitives to users
 				   concerning Y and any destinations made accessible via Y.  If X
-				   has the transfer function it also broadcasts transfer-allowed or 
+				   has the transfer function it also broadcasts transfer-allowed or
 				   transfer-restricted messages concerning the same destinations.
 
-				   (6) If T28 expires, X restarts traffic on the link set to Y as
-				   in (5), unles a traffic restart allowed message has not been
-				   sent to Y.  In that case, X starts T25 and completes the sending 
-				   of transfer prohbited and transfer-restricted messages, followed 
-				   by a traffic restart allowed message.  Then, unless a traffic
-				   restart waiting message has been received from Y without a
-				   subsequent traffic restart allowed message, X stops 25 and
-				   restarts traffic on the link set to Y.
+				   (6) If T28 expires, X restarts traffic on the link set to Y as in
+				   (5), unles a traffic restart allowed message has not been sent to
+				   Y.  In that case, X starts T25 and completes the sending of
+				   transfer prohbited and transfer-restricted messages, followed by a 
+				   traffic restart allowed message.  Then, unless a traffic restart
+				   waiting message has been received from Y without a subsequent
+				   traffic restart allowed message, X stops 25 and restarts traffic
+				   on the link set to Y.
 
-				   (7) If T25 expires, X restarts traffic on the link set towards
-				   Y.  In the abnormal case when X has not completed sending
+				   (7) If T25 expires, X restarts traffic on the link set towards Y.
+				   In the abnormal case when X has not completed sending
 				   transfer-prohibited and transfer-restricted messages to Y, X
 				   completes sending the transfer-prohibited messages required by
 				   13.2.2 (1) and sends a traffic restart allowed message before
 				   restarting user traffic.
 
-				   (8) If no traffic restart allowed message has been received from 
-				   Y when traficc is restarted to Y, timer T9 (see 9.4) is
-				   started.
+				   (8) If no traffic restart allowed message has been received from Y 
+				   when traficc is restarted to Y, timer T9 (see 9.4) is started.
 
-				   When signalling point Y becomes accessible via a route other
-				   than a direct link set between X and Y, X sends a MTP-RESUME
-				   primitive concerning Y to all local MTP users.  In addition, if
-				   signalling point X has the transfer function, X sends to Y any
-				   required transfer-prohibited and transfer-restricted message by
-				   the availabl route and broadcasts transfer-allowed or
+				   When signalling point Y becomes accessible via a route other than
+				   a direct link set between X and Y, X sends a MTP-RESUME primitive
+				   concerning Y to all local MTP users.  In addition, if signalling
+				   point X has the transfer function, X sends to Y any required
+				   transfer-prohibited and transfer-restricted message by the
+				   availabl route and broadcasts transfer-allowed or
 				   transfer-restricted messages concerning Y. */
 
 				/* ANSI T1.111.4/2000 9.5 (General Rules) Whe a signalling point
@@ -7486,13 +7622,13 @@ rs_set_state(queue_t *q, struct rs *rs, const uint state)
 				   the time controlled changeback procedure (see 6.4).
 
 				   If a link becomes unavailable during MTP restart, after having
-				   been successfully activated during the restart, time controlled 
+				   been successfully activated during the restart, time controlled
 				   changeover is peformed (see 5.6.2).
 
 				   If a message concerning another destination is received at a
 				   restarting point before TRA messages have been sent out, the
 				   restarting point may discard the message or it may route the
-				   message if it is able according to the current routing data.  If 
+				   message if it is able according to the current routing data.  If
 				   the restarting point discards the mesage, it sends a tranfer
 				   prohibited message to the adjacent signalling point from which
 				   the message was received.  If a transfer prohibited message is
@@ -7502,15 +7638,15 @@ rs_set_state(queue_t *q, struct rs *rs, const uint state)
 				   message is sent to the adjacent point after traffic restart
 				   allowed messages are broadcast.
 
-				   A message concerning a local MTP user with service indicator
-				   (SI) of 0010 is handled normally hwen received in a restarting
+				   A message concerning a local MTP user with service indicator (SI)
+				   of 0010 is handled normally hwen received in a restarting
 				   signalling point. Treatments for some message with SI = 0000
 				   receive in a resarting signalling point have been specified
-				   already in 9.1 thorugh 9.5; other messages with SI = 0000 may
-				   be treated normally or discarded when received in a restarting
-				   signalling point.  Message with other values of service
-				   indicators may be treated normally or discarded when received in 
-				   the restarting point (appropriate treatment may depend on the
+				   already in 9.1 thorugh 9.5; other messages with SI = 0000 may be
+				   treated normally or discarded when received in a restarting
+				   signalling point.  Message with other values of service indicators 
+				   may be treated normally or discarded when received in the
+				   restarting point (appropriate treatment may depend on the
 				   application resident at the particular restarting point). */
 			}
 		}
@@ -7874,7 +8010,7 @@ lk_set_state(queue_t *q, struct lk *lk, uint state)
 			   service state at level 2 or when the first sginallin link becomes
 			   available at level 3. */
 
-			if (!mi_timer_remain(lk->timers.t28a))
+			if (!lk_timer_remain(lk, t28a))
 				lk_timer_start(q, lk, t28a);
 
 			/* ANSI T1.111.4/2000 9.3 ... In addition it takes the following actions:
@@ -8267,68 +8403,250 @@ mtp_lookup_rt_test(queue_t *q, struct sl *sl, struct mtp_msg *m, uint type)
  * @type: type of destination in message
  *
  * Lookup the route to which a route related message pertains with appropriate security screening.  Route related
- * messages include TFA, TFW, TFR, TFP, TCA, TCR, TCP.
+ * messages include TFA, TFR, TFP, TCA, TCR, TCP.
+ *
+ * The following characteristics of route-related (TFA, TFR, TFP, TCA, TCR, TCP) messages are enforced when security
+ * is set against the local or adjacent signalling point:
+ *
+ * 01. route-related messages are sent only from a known adjacent signalling point
+ * 02. route-related messages must have the local (non-alias) signalling point code as the DPC
+ * 03. route-related messages must have the adjacent (non-alias) signalling point code as the OPC
+ * 04. route-related messages are only sent by a signalling point with the transfer function (i.e an STP)
+ * 05. route-related messages are only relayed by a signalling point with the transfer function (i.e an STP)
+ * 06. route-related messages can only affect clusters if the local signalling point supports clusters
+ * 07. route-related messages can only affect clusters if the adjacent signalling point supports clusters
+ * 08. route-related messages can only affect clusters if the relaying signalling point supports clusters.
+ * 09. route-related messages are never affecting the cluster containing the local signalling point
+ * 10. route-related messages are never affecting the cluster containing the adjacent signalling point 
+ * 11. route-related messages are never affecting the cluster containing the relaying signalling point 
+ * 12. route-related messages are never affecting the local signalling point code
+ * 13. route-related messages are never affecting the adjacent signalling point code
+ * 14. route-related messages will not arrive on a link set with no local route to the originator
+ * 15. route-related messages will not arrive on a link set with no route to the affected destination/cluster
+ * 16. route-related messages will not affect a destination/cluster with no route on the direct link set to originator
+ *
  */
 static struct rt *
 mtp_lookup_rt(queue_t *q, struct sl *sl, struct mtp_msg *m, uint type)
 {
-	struct sp *sp = sl->lk.lk->sp.loc;
+	struct sp *loc = sl->lk.lk->sp.loc;
+	struct rs *rel = sl->lk.lk->sp.adj;
+	struct rs *adj;
+	struct rs *dst;
 	struct ls *ls;
-	struct lk *lk;
-	struct rs *rs;
+	struct lk *lk, *direct;
+	struct rl *rl;
 	struct rt *rt = NULL;
 
-	if (sp->flags & SPF_SECURITY) {
-		if (!(sl->lk.lk->sp.adj->flags & RSF_XFER_FUNC))
-			goto error1;
-		if (type == RT_TYPE_CLUSTER && !(sp->flags & RSF_CLUSTER))
-			goto error2;
-		if ((type == RT_TYPE_MEMBER && m->dest == m->opc)
-		    || (type == RT_TYPE_CLUSTER && m->dest == (m->opc & sp->na.na->mask.cluster)))
-			goto error3;
-		if (!(rs = mtp_lookup_rs_local(sl, m->opc, RT_TYPE_MEMBER)))
-			goto error4;
-		if (!(rs->flags & RSF_ADJACENT))
-			goto error5;
-		if (!mtp_lookup_rs_local(sl, m->dest, type))
-			goto error6;
+	if ((loc->flags & SPF_SECURITY) || (rel->flags & RSF_SECURITY)) {
+		/* 01. route-related messages are sent only from a known adjacent signalling point */
+		if (!(rel->flags & RSF_ADJACENT))
+			goto error01;
+		/* 02. route-related messages must have the local (non-alias) signalling point code
+		   as the DPC */
+		if (loc->pc != m->dpc)
+			goto error02;
+		/* 03. route-related messages must have the adjacent (non-alias) signalling point
+		   code as the OPC */
+		if ((adj = rel)->dest != m->opc) {
+			for (adj = loc->rs.list; adj; adj = adj->sp.next)
+				if (adj->rs_type == RT_TYPE_MEMBER && adj->dest == m->opc)
+					break;
+			if (!adj)
+				goto error03;
+			if (!(adj->flags & RSF_ADJACENT))
+				goto error03;
+		}
+		/* 04. route-related messages are only sent by a signalling point with the transfer
+		   function (i.e an STP) */
+		if (!(adj->flags & RSF_XFER_FUNC))
+			goto error04;
+		/* 05. route-related messages are only relayed by a signalling point with the
+		   transfer function (i.e an STP) */
+		if (!(rel->flags & RSF_XFER_FUNC))
+			goto error05;
+		if (type == RT_TYPE_CLUSTER) {
+			/* 06. route-related messages can only affect clusters if the local
+			   signalling point supports clusters */
+			if (!(loc->flags & SPF_CLUSTER))
+				goto error06;
+			/* 07. route-related messages can only affect clusters if the adjacent
+			   signalling point supports clusters */
+			if (!(adj->flags & RSF_CLUSTER))
+				goto error07;
+			/* 08. route-related messages can only affect clusters if the relaying
+			   signalling point supports clusters. */
+			if (!(rel->flags & RSF_CLUSTER))
+				goto error08;
+			/* 09. route-related messages are never affecting the cluster containing
+			   the local signalling point */
+			if ((m->dest == (loc->pc & loc->na.na->mask.cluster)))
+				goto error09;
+			/* 10. route-related messages are never affecting the cluster containing
+			   the adjacent signalling point */
+			if ((m->dest == (adj->dest & loc->na.na->mask.cluster)))
+				goto error10;
+			/* 11. route-related messages are never affecting the cluster containing
+			   the relaying signalling point */
+			if ((m->dest == (rel->dest & loc->na.na->mask.cluster)))
+				goto error11;
+		} else {
+			/* 12. route-related messages are never affecting the local signalling
+			   point code */
+			if (m->dest == loc->pc)
+				goto error12;
+			/* 13. route-related messages are never affecting the adjacent signalling
+			   point code */
+			if (m->dest == adj->dest)
+				goto error13;
+		}
+		/* 14. route-related messages will not arrive on a link set with no local route to
+		   the originator */
+		for (rt = lk->rl.list; rt && (rt->rl.rl->rs.rs != adj); rt = rt->lk.next) ;
+		if (!rt)
+			goto error14;
+		/* 15. route-related messages will not arrive on a link set with no route to the
+		   affected destination/cluster */
+		for (dst = NULL, rt = lk->rl.list; rt; rt = rt->lk.next)
+			if ((dst = rt->rl.rl->rs.rs)->rs_type == type && dst->dest == m->dest)
+				break;
+		if (!dst)
+			goto error15;
+		/* 16. route-related messages will not affect a destination/cluster with no route
+		   on the direct link set to originator */
+		for (rt = NULL, rl = dst->rl.list; rl; rl = rl->rs.next)
+			for (rt = rl->rt.list; rt; rt = rt->rl.next)
+				if (rt->lk.lk->sp.adj == adj)
+					break;
+		if (!rt)
+			goto error16;
+		return (rt);
 	}
-	for (ls = sp->ls.list; ls; ls = ls->sp.next)
-		for (lk = ls->lk.list; lk; lk = lk->ls.next)
-			if ((rs = lk->sp.adj)->dest == m->opc
-			    && ((!(rs->flags & RSF_CLUSTER) && type == RT_TYPE_MEMBER)
-				|| ((rs->flags & RSF_CLUSTER) && type == RT_TYPE_CLUSTER)))
-				for (rt = lk->rt.list; rt; rt = rt->lk.next)
-					if ((rs = rt->rl.rl->rs.rs) && rs->dest == m->dest
-					    && rs->rs_type == type)
-						goto found;
-      found:
+	for (rt == NULL, ls = loc->ls.list; ls; ls = ls->sp.next) {
+		for (lk = ls->lk.list; lk; lk == lk->ls.next) {
+			if (lk->sp.adj->dest != m->opc || lk->sp.loc->pc != m->dpc)
+				continue;
+			for (rt = lk->rt.list; rt; rt = rt->lk.next)
+				if (rt->rl.rl->rs.rs->dest == m->dest &&
+				    rt->rl.rl->rs.rs->rs_type == type)
+					break;
+			break;
+		}
+	}
 	if (!rt)
-		goto error7;
+		goto error16;
 	return (rt);
-      error1:
-	mi_strlog(q, 0, SL_ERROR, "Route related message: from adjacent non-STP");
+      error01:
+	mi_strlog(q, 0, SL_ERROR, "Route message: non-adjacent SP");
 	goto error;
-      error2:
-	mi_strlog(q, 0, SL_ERROR, "Route related message: no cluster support");
+      error02:
+	mi_strlog(q, 0, SL_ERROR, "Route message: not addressed for local SP");
 	goto error;
-      error3:
-	mi_strlog(q, 0, SL_ERROR, "Route related message: concerning adjacent");
+      error03:
+	mi_strlog(q, 0, SL_ERROR, "Route message: not addressed from adjacent SP");
 	goto error;
-      error4:
-	mi_strlog(q, 0, SL_ERROR, "Route related message: no local route to originator");
+      error04:
+	mi_strlog(q, 0, SL_ERROR, "Route message: addressed from non-STP");
 	goto error;
-      error5:
-	mi_strlog(q, 0, SL_ERROR, "Route related message: from non-adjacent");
+      error05:
+	mi_strlog(q, 0, SL_ERROR, "Route message: relayed by non-STP");
 	goto error;
-      error6:
-	mi_strlog(q, 0, SL_ERROR, "Route related message: no local route to destination");
+      error06:
+	mi_strlog(q, 0, SL_ERROR, "Route message: to non-cluster SP");
 	goto error;
-      error7:
-	mi_strlog(q, 0, SL_ERROR, "Route related message: no route to destination");
+      error07:
+	mi_strlog(q, 0, SL_ERROR, "Route message: from non-cluster adjacent STP");
+	goto error;
+      error08:
+	mi_strlog(q, 0, SL_ERROR, "Route message: from non-cluster relaying STP");
+	goto error;
+      error09:
+	mi_strlog(q, 0, SL_ERROR, "Route message: affects local cluster");
+	goto error;
+      error10:
+	mi_strlog(q, 0, SL_ERROR, "Route message: affects adjacent cluster");
+	goto error;
+      error11:
+	mi_strlog(q, 0, SL_ERROR, "Route message: affects relaying cluster");
+	goto error;
+      error12:
+	mi_strlog(q, 0, SL_ERROR, "Route message: affects local SP");
+	goto error;
+      error13:
+	mi_strlog(q, 0, SL_ERROR, "Route message: affects adjacent SP");
+	goto error;
+      error14:
+	mi_strlog(q, 0, SL_ERROR, "Route message: no route to originator through relay");
+	goto error;
+      error15:
+	mi_strlog(q, 0, SL_ERROR, "Route message: no route to adjacent through relay");
+	goto error;
+      error16:
+	mi_strlog(q, 0, SL_ERROR, "Route message: no route to affected SP");
 	goto error;
       error:
 	todo(("Deliver screened message to MTP management\n"));
+	return (NULL);
+}
+
+/**
+ * mtp_lookup_adj: - lookup adjacent route for an adjacent signalling point related message
+ * @q: active queue (lower read queue)
+ * @sl: the siganlling link the message came in on
+ * @m: the decoded message
+ *
+ * Lookup the route to which an adjacent signalling point related message pertains with appropriate security
+ * screening.  Adjacent signalling point related messages include: TRA, TRW.
+ *
+ * The following charactersitics of adjacent signalling point related messages (TRA, TRW) are enforced when security
+ * screening is set against the local or adjacent signalling point:
+ *
+ * 1. TRA and TRW are always sent by the adjacent signalling point on a direct link set
+ * 2. TRA and TRW must have the adjacent signalling point code as the OPC
+ * 3. TRA and TRW must have the local (non-alias) signalling point code as the DPC
+ */
+static struct rt *
+mtp_lookup_adj(queue_t *q, struct sl *sl, struct mtp_msg *m)
+{
+	struct lk *lk = sl->lk.lk;
+	struct sp *loc = lk->sp.loc;
+	struct rs *adj = lk->sp.adj;
+	struct rl *rl;
+	struct rt *rt;
+
+	if ((loc->flags & SPF_SECURITY) || (adj->flags & RSF_SECURITY)) {
+		/* 1. TRA and TRW are always sent by the adjacent signalling point on a direct link 
+		   set */
+		if (!(adj->flags & RSC_ADJACENT))
+			goto error1;
+		/* 2. TRA and TRW must have the adjacent signalling point code as the OPC */
+		if (adj->dest != m->opc)
+			goto error2;
+		/* 3. TRA and TRW must have the local (non-alias) signalling point code as the DPC */
+		if (loc->pc != m->dpc)
+			goto error3;
+	}
+	/* find the route for the adjacent signalling point leading to the link set from which the
+	   message arrived */
+	for (rl = adj->rl.list; rl; rl = rl->rs.next)
+		for (rt = rl->rt.list; rt && rt->lk.lk != lk; rt = rt->rl.next) ;
+	if (!rt)
+		goto error4;
+	return (rt);
+      error1:
+	mi_strlog(q, 0, SL_ERROR, "Adjacent SP message: from non-adjacent SP");
+	goto error;
+      error2:
+	mi_strlog(q, 0, SL_ERROR, "Adjacent SP message: not addressed from adjacent SP");
+	goto error;
+      error3:
+	mi_strlog(q, 0, SL_ERROR, "Adjacent SP message: not addressed to local SP");
+	goto error;
+      error4:
+	mi_strlog(q, 0, SL_ERROR, "Adjacent SP message: no route to adjacent");
+	goto error;
+      error:
+	todo(("Deliver screened message to MTP management."));
 	return (NULL);
 }
 
@@ -8836,7 +9154,7 @@ sl_stop_restore(queue_t *q, struct sl *sl)
 			/* ANSI link oscillation procedure A */
 			/* link was in probation, now in suspension */
 		} else if ((sl->lk.lk->sp.loc->flags & SPF_LOSC_PROC_B)
-			   && mi_timer_remain(sl->timers.t33a)) {
+			   && sl_timer_remain(sl, t33a)) {
 			/* ANSI link oscillation procedure B */
 			/* link was in probation, now place it in suspension */
 			sl_timer_stop(sl, t33a);
@@ -8883,7 +9201,7 @@ cb_t1_timeout(queue_t *q, struct cb *cb)
 	cb_divert_buffer(cb);
 	/* Also purge and reroute any other buffers pending on t1 for the same link */
 	for (cb = sl->lk.lk->cb.list; cb; cb = cb->lk.next) {
-		if (cb->sl.from == sl && mi_timer_remain(cb->timers.t1)) {
+		if (cb->sl.from == sl && cb_timer_remain(cb, t1)) {
 			cb_timer_stop(cb, t1);
 			bufq_purge(&cb->buf);
 			cb_divert_buffer(cb);
@@ -8916,7 +9234,7 @@ cb_t2_timeout(queue_t *q, struct cb *cb)
 	cb_divert_buffer(cb);
 	/* Also purge and reroute any other buffers pending on t2 for the same link */
 	for (cb = sl->lk.lk->cb.list; cb; cb = cb->lk.next) {
-		if (cb->sl.from == sl && mi_timer_remain(cb->timers.t2)) {
+		if (cb->sl.from == sl && cb_timer_remain(cb, t2)) {
 			cb_timer_stop(cb, t2);
 			bufq_purge(&cb->buf);
 			cb_divert_buffer(cb);
@@ -9252,7 +9570,7 @@ sl_t13_timeout(queue_t *q, struct sl *sl)
 	return (-EFAULT);
 }
 
-/*
+/**
  * sl_t14_timeout: - TIMER T14 - waiting for inhibition ack
  * @q: active queue
  * @sl: related signalling link
@@ -9264,7 +9582,7 @@ sl_t14_timeout(queue_t *q, struct sl *sl)
 	return (-EFAULT);
 }
 
-/*
+/**
  * rs_t15_timeout: - TIMER T15 - waiting to start routeset congestion test
  * @q: active queue
  * @rs: related route set
@@ -9400,7 +9718,7 @@ sp_t1r_timeout(queue_t *q, struct sp *sp)
 	int err;
 
 	for (ls = sp->ls.list; ls; ls = ls->sp.next) {
-		for (lk = ls->lk.list;  lk; lk = lk->ls.next) {
+		for (lk = ls->lk.list; lk; lk = lk->ls.next) {
 			for (sl = lk->sl.list; sl; sl = sl->lk.next) {
 				if ((err = sl_local_processor_outage_req(q, sl)))
 					return (err);
@@ -9409,7 +9727,7 @@ sp_t1r_timeout(queue_t *q, struct sp *sp)
 			}
 		}
 	}
-	sp->flags |= (SPF_RESTART|SPF_RESTART_LOCKOUT);
+	sp->flags |= (SPF_RESTART | SPF_RESTART_LOCKOUT);
 	mi_timer(q, sp->timers.t27a, sp->config.t27a);
 	return (0);
 }
@@ -9618,7 +9936,7 @@ sl_t21a_timeout(queue_t *q, struct sl *sl)
 }
 
 /**
- * sp_t21_timeout: - TIMER T21 - MTP restart timer
+ * lk_t21_timeout: - TIMER T21 - MTP restart timer
  * @q: active queue
  * @sp: related signalling point
  *
@@ -9656,9 +9974,11 @@ sl_t21a_timeout(queue_t *q, struct sl *sl)
  *
  * 9.6.2  After the MTP of an adjacent node X has restarted, and if T21 has been started (see 9.3.2), all routes using
  * X are considered to be available unless corresponding TFP or TFR message have been received whilst T21 was running.
+ *
+ * IMPLEMENTATION NOTES:- ITU-T T21 is similar to ANSI T28 and T25.
  */
 static int
-sp_t21_timeout(queue_t *q, struct sp *sp)
+lk_t21_timeout(queue_t *q, struct lk *lk)
 {
 	fixme(("Implement this function\n"));
 	return (-EFAULT);
@@ -9719,8 +10039,9 @@ sl_t22_timeout(queue_t *q, struct sl *sl)
 static int
 sp_t22a_timeout(queue_t *q, struct sp *sp)
 {
-	/* Automatically move from the first part of Phase 1 to the second part of Phase 1.  The coming available or
-	 * oscillation lockout of signalling links should terminate this part earlier. */
+	/* Automatically move from the first part of Phase 1 to the second part of Phase 1.  The
+	   coming available or oscillation lockout of signalling links should terminate this part
+	   earlier. */
 	sp_timer_start(q, sp, t23a);
 	return (0);
 }
@@ -9785,7 +10106,7 @@ sl_t24_timeout(queue_t *q, struct sl *sl)
 	return (-EFAULT);
 }
 
-/*
+/**
  * sp_t24a_timeout: - TIMER T24(ANSI)
  * @q: active queue
  * @sp: related signalling point
@@ -9874,7 +10195,7 @@ lk_t25a_timeout(queue_t *q, struct lk *lk)
 	return (-EFAULT);
 }
 
-/*
+/**
  * sp_t26a_timeout: - TIMER T26(ANSI)
  * @q: active queue
  * @sp: related signalling point
@@ -9886,7 +10207,7 @@ sp_t26a_timeout(queue_t *q, struct sp *sp)
 	return (-EFAULT);
 }
 
-/*
+/**
  * sp_t27a_timeout: - TIMER T27(ANSI)
  * @q: active queue
  * @sp: related signalling point
@@ -9933,18 +10254,70 @@ sp_t27a_timeout(queue_t *q, struct sp *sp)
 				if ((err = sl_resume_req(q, sl)))
 					return (err);
 				sl->flags &= ~SLF_RESTART_LOCKOUT;
-				/* XXX: Might need to change state of link here, but probably not.  I believe that
-				 * in-service indication from the aligned-not-ready state and link-failure indication
-				 * from failures during local processor outage will be delivered automatically. */
+				/* XXX: Might need to change state of link here, but probably not.
+				   I believe that in-service indication from the aligned-not-ready
+				   state and link-failure indication from failures during local
+				   processor outage will be delivered automatically. */
 			}
 		}
 	}
 }
 
-/*
+/**
  * lk_t28a_timeout: - TIMER T28(ANSI)
  * @q: active queue
  * @sp: related signalling point
+ *
+ * ANSI T1.111.4/2000 9.3 (Acitions in Signalling Poitn X Adjacent to a Restarting Signalling Point Y.)  A signalling
+ * point X considers that the MTP of an inaccessible adjacent signalling point Y is restarting when:
+ *
+ * (1) The first link in a direct link set is in the in service state at level 2, or
+ *
+ * (2) A route other than a direct link set becomes available, e.g., through receipt of a transfer allowed or traffic
+ * restart allowed message or the availability of the corresponding link set.
+ *
+ * When the first link in a direct lin set towards the restarting signalling point Y goes into the in service state at
+ * level 2, signalling point X begins taking into account any traffic restart waiting, traffic restart allowed,
+ * transfer-prohibited, transfer-restricted, and transfer-allowed messages from Y.  Signalling point X starts timer
+ * T28 either when the first link goes into the in services state at level 2 or when the first signalling link becomes
+ * available at level 3.  In addition, it takes the following actions:
+ *
+ * (1) If a TRW message is received from Y while T28 is running or before it is started, X starts T25.  X stops T28 if
+ * it is running.
+ *
+ * (2) If a TRW message is received from Y while T25 is running, X restarts T25.
+ *
+ * (3) When the first link in a link set to Y becomes available, signalling point X sends to Y a traffic restart
+ * allowed message or, if X has the transfer function, a traffic restart waiting message followed by
+ * transfer-prohibited (note that all transfer-prohibited messages according to 13.2.2 (1) must be sent) and transfer
+ * restricted messages and a traffic restart allowed message.
+ *
+ * (4) If a destination becomes prohibited, restricted, or available at X, after X has sent a traffic restart allowed
+ * message to Y, X notifies Y of the status change by the normal procedrues in Section 13.
+ *
+ * (5) When a traffic restart allowed message has been sent to Y and a traffic restart allowed message has been
+ * received from Y, X stops T25 or T28, whichever is running, and restarts traffic on the link set to Y.  X gives
+ * MTP-RESUME primitives to users concerning Y and any destinations made accessible via Y.  If X has the transfer
+ * function it also broadcasts transfer-allowed or transfer-restricted messages concerning the same destinations.
+ *
+ * (6) If T28 expires, X restarts traffic on the link set to Y as in (5), unless a traffic allowed message has not
+ * been sent to Y.  In that case, X starts T25 and completes the sending of transfer-prohibited and
+ * transfer-restricted messages, followed by a traffic restart allowed message.  Then, unless a traffic restart
+ * waiting message has been received from Y without a subsequent traffic restart allowed message, X stops T25 and
+ * restarts traffic on the link set to Y.
+ *
+ * (7) If T25 expires, X restarts traffic on the link set towards Y.  In the abnormal case when X has not completed
+ * sending transfer-prohibited and trasnfer-restricted messages to Y, X completes sending the tranfer-prohibited
+ * messages required by 13.2.2 (1) and sends a traffic restart allowed message before restarting user traffic.
+ *
+ * (8) If no traffic restart allowed message has been received from Y when traffic is restarted to Y, timer T29 (see
+ * 9.4) is started.
+ *
+ * When signalling point Y becomes accessible via a route other than a direct link set between X and Y, X sends an
+ * MTP-RESUME primitive concerning Y to all local MTP users.  In addition, if signalling point X has the transfer
+ * function, X sends to Y any required transfer-prohibited and transfer-restructed messages by the available route and
+ * broadcasts transfer-alowed or transfer-restricted messages concerning Y.
+ *
  */
 static int
 lk_t28a_timeout(queue_t *q, struct lk *lk)
@@ -9953,7 +10326,7 @@ lk_t28a_timeout(queue_t *q, struct lk *lk)
 	return (-EFAULT);
 }
 
-/*
+/**
  * lk_t29a_timeout: - TIMER T29(ANSI)
  * @q: active queue
  * @sp: related signalling point
@@ -9965,7 +10338,7 @@ lk_t29a_timeout(queue_t *q, struct lk *lk)
 	return (-EFAULT);
 }
 
-/*
+/**
  * lk_t30a_timeout: - TIMER T30(ANSI)
  * @q: active queue
  * @sp: related signalling point
@@ -11162,8 +11535,14 @@ mtp_recv_lrt(queue_t *q, struct mtp_msg *m)
  * running and a direct link is in service at level 2 to the point from which the message is received or if T25, T28,
  * T29 or T30 is running for the point from which the message is received.
  *
- * Q.704/1996 9.5.2  If a signalling point receives a TRA message from an adjacent node and an associated T19 is
- * running, this TRA is discarded and no further action is taken.
+ * Q.704/1996 9.5 (TRA messages and timer T19).
+ *
+ * 9.5.1  If a signalling point X receives an unexpected TRA message from an adjacent node Y and no associated T19
+ * timer is running, X sends to Y any necessary TFP and TFR message if X has the transfer function, and a TRA message
+ * to Y.  In addition, X starts timer T19 associated with Y.
+ *
+ * 9.5.2  If a signalling point receives a TRA message from an adjacent node and an associated T19 is running, this
+ * TRA is discarded and no further action is taken.
  */
 static int
 mtp_recv_tra(queue_t *q, struct mtp_msg *m)
@@ -11171,14 +11550,132 @@ mtp_recv_tra(queue_t *q, struct mtp_msg *m)
 	struct sl *sl = SL_PRIV(q);
 	struct rt *rt;
 
-	if ((rt = mtp_lookup_rt(q, sl, m, RT_TYPE_MEMBER))) {
+	if ((rt = mtp_lookup_adj(q, sl, m))) {
 		struct lk *lk = rt->lk.lk;
+		struct rs *rs = rt->rs.rs;
+		struct sp *sp = rs->sp.sp;
+		int err;
 
-		if (mi_timer_remain(lk->timers.t19))
+		if ((sp->flags & SPF_RESTART) || (lk->flags & LKF_RESTART)) {
+			if (lk_timer_remain(lk, t19))
+				goto discard;
+			if (lk_timer_remain(lk, t29a))
+				goto discard;
+			if (lk_timer_remain(lk, t30a))
+				goto discard;
+			if ((sp->flag & SPF_XFER_FUNC)) {
+				/* FIXME: send necessary TFP and TFR messages. */
+			}
+			if ((err = mtp_send_tra()))
+				return (err);
+			if (ansi)
+				lk_timer_start(q, lk, t29a);
+			else
+				lk_timer_start(q, lk, t19);
+			return (0);
+		} else if ((sp->flags & SPF_XFER_FUNC)) {
+			/* unexpected per 9.4 with transfer function */
+			if (ansi) {
+				/* ANSI T1.111.4/2000 9.4 (2) If the receiving point has the
+				   transfer function function, it starts timer T30, sends a traffic 
+				   restart waiting message followed by the necessary
+				   transfer-restricted and transfer-prohibited messages
+				   (preventative transfer prohibited messages according to 13.2.2
+				   (1) are required for traffic currently being routed via the
+				   point from which the unexpected traffic restart allowed or
+				   traffic restart waiting message was received), and a traffic
+				   restart allowed message.  It then stops T30 and starts T29.  In
+				   the abnormal case that T30 expires before the sending of
+				   transfer-prohibited and transfer-restricted messages is
+				   complete, it sends a traffic restart allowed message, starts
+				   T29, and then completes sending any preventative
+				   transfer-prohibited messages according to 13.2.2 (1) for traffic 
+				   currently being routed via the point from which the unexpected
+				   traffic restart allowed or traffic restart waiting message was
+				   received. */
+				if (!lk_timer_remain(lk, t29a)) {
+					if (!lk_timer_remain(lk, t30a)) {
+						if ((err = mtp_send_trw(q, sp, lk->ni, m->opc, m->dpc, m->sls)))
+							return (err);
+						lk_timer_start(q, lk, t30a);
+					}
+					for (rs = sp->rs.list; rs; rs = rs->sp.next) {
+						if (rs->rl.curr->rt.curr->lk.lk == lk) {
+							if ((err = mtp_send_tfp(q,...)))
+								return (err);
+							continue;
+						}
+						switch (rs->state) {
+						case MTP_ALLOWED:
+							continue;
+						case MTP_DANGER:
+						case MTP_CONGESTED:
+						case MTP_RESTRICTED:
+							if ((err = mtp_send_tfr(q,...)))
+								return (err);
+							continue;
+						default:
+							swerr();
+						case MTP_RESTART:
+						case MTP_PROHIBITED:
+						case MTP_INHIBITED:
+						case MTP_BLOCKED:
+						case MTP_INACTIVE:
+							if ((err = mtp_send_tfp(q,...)))
+								return (err);
+							continue;
+						}
+					}
+					lk_timer_stop(lk, t30a);
+					lk_timer_start(q, lk, t29a);
+				}
+			} else {
+				/* Q.704/1996 9.5.1 If a signalling point X receives an unexpected
+				   TRA message from an adjacent node Y and no asosciated T19 timer
+				   is running, X sends to Y any necessary TFP and TFR messages if X 
+				   has the transfer function, and a TRA message to Y.  In addition
+				   X starts a timer T19 associated with Y. 9.5.2 If a signalling
+				   point receives a TRA message from an adjacent node and an
+				   associated timer T19 is running, this TRA is discarded and no
+				   further action is taken. */
+				if (!lk_timer_remain(lk, t19)) {
+					for (rs = sp->rs.list; rs; rs = rs->sp.next) {
+					}
+					if ((err = mtp_send_tra(q, sp, lk->ni, m->opc, m->dpc, m->sls)))
+						return (err);
+					lk_timer_start(q, lk, t19);
+				}
+			}
 			goto discard;
-
-		fixme(("Write this function\n"));
-		goto discard;
+		} else {
+			/* unexpected per 9.4 without transfer function */
+			if (ansi) {
+				/* ANSI T.111.4/2000 9.4 (1) If the receiving point has no transfer 
+				   function it returns a traffic restart allowed message to the
+				   adjacent point from which the unexpected traffic restart allowed 
+				   or traffic restart waiting message was received and starts time
+				   T29 concerning that point. */
+				if (!lk_timer_remain(lk, t29a)) {
+					if ((err = mtp_send_tra(q, sp, lk->ni, m->opc, m->dpc, m->sls)))
+						return (err);
+					lk_timer_start(q, lk, t29a);
+				}
+			} else {
+				/* Q.704/1996 9.5.1 If a signalling point X receives an unexpected
+				   TRA message from an adjacent node Y and no associated T19 timer
+				   is running, X sends ... a TRA message to Y.  In addition, X
+				   starts a timer T19 associated with Y. 9.5.2 If a signalling
+				   point receives a TRA message from an adjacent node and an
+				   associated timer T19 is running, this TRA is discarded and no
+				   further action is taken. */
+				if (!lk_timer_remain(lk, t19)) {
+					if ((err = mtp_send_tra(q, sp, lk->ni, m->opc, m->dpc, m->sls)))
+						return (err);
+					lk_timer_start(q, lk, t19);
+				}
+			}
+			goto discard;
+		}
 	}
 	mi_strlog(q, 0, SL_ERROR, "TRA received for unknown route");
       discard:
@@ -11215,35 +11712,120 @@ mtp_recv_tra(queue_t *q, struct mtp_msg *m)
  * starts T25.  X stops T28 if it is running.  (2) If a TRW message is received from Y while T25 is running, X
  * restarts T25.
  *
- * IMPLEMENTATION NOTES:- TRW is only sent from an signalling point to an adjacent signalling point, normally only on
- * a direct link set.  The TRW message is addressed to the adjacent signalling point.  mtp_lookup_rt() performs
- * appropriate screening for TRW and TRA mesages.
+ * IMPLEMENTATION NOTES:-
+ * - TRW is only sent from an signalling point to an adjacent signalling point, only on a direct link set.
+ * - TRW message is addressed to the remote adjacent signalling point from the local adjacent signalling point.
+ * - TRW is only sent by a signalling point having the transfer function (i.e. and STP).
+ * - TRW is sent followed by transfer-prohitbited and transfer-restricted messages, followed by TRA.
+ * - TRW is sent by the adjacent signalling point only when it, or the local signalling point, or both, are restarting
+ *   (i.e. after the first signalling link in the direct link set becomes available at level 2).
+ * mtp_lookup_rt() performs appropriate screening for TRW and TRA mesages.
  */
 static int
 mtp_recv_trw(queue_t *q, struct mtp_msg *m)
 {
 	struct sl *sl = SL_PRIV(q);
 	struct rt *rt;
+	int err;
 
-	if ((rt = mtp_lookup_rt(q, sl, m, RT_TYPE_MEMBER))) {
+	/* mtp_lookup_rt() checks the following: - the message arrives on a direct link set - the
+	   message is address from the adjacent signalling point to the local signalling poin - the 
+	   message is address from the adjacent signalling point for the arriving linkset - the
+	   adjacent signalling point has the transfer function */
+	if ((rt = mtp_lookup_adj(q, sl, m))) {
 		struct lk *lk = rt->lk.lk;
-		struct sp *sp = lk->ls.ls->sp.sp;
+		struct rs *rs = rt->rs.rs;
+		struct sp *sp = rs->sp.sp;
 
-		/* Note: lk is the direct link set to the adjacent signalling point sending the TRW message. */
+		/* Note: lk is the direct link set to the adjacent signalling point sending the TRW 
+		   message. */
 
-		if (mi_timer_remain(sp->timers.t22a)) {
-		} else if (mi_timer_remain(sp->timers.t23a)) {
-		} else if (mi_timer_remain(sp->timers.t24a)) {
-		} else if (mi_timer_remain(lk->timers.t25a)) {
-			lk_timer_start(q, lk, t25a);
-			return (0);
-		} else if (mi_timer_remain(lk->timers.t28a)) {
-			/* FIXME: start sending messages */
-			lk_timer_stop(lk, t28a);
-			lk_timer_start(lk, t25a);
-			return (0);
-		} else if (mi_timer_remain(lk->timers.t29a)) {
-		} else if (mi_timer_remain(lk->timers.t30a)) {
+		/* IMPLEMENTATION NOTE: When T22, T23 or T24 is running the RESTART flag is set on
+		   the signalling point; when T25, T28, T29 or T30 is running, the RESTART flag is
+		   set on the link; when neither flag is set, the TRW is unexpected. */
+
+		if ((sp->flags & SPF_RESTART) || (lk->flags & LKF_RESTART)) {
+			if (ansi) {
+			} else {
+			}
+			if (sp_timer_remain(sp, t22a)) {
+			} else if (sp_timer_remain(sp, t23a)) {
+			} else if (sp_timer_remain(sp, t24a)) {
+			} else if (lk_timer_remain(lk, t25a)) {
+				lk_timer_start(q, lk, t25a);
+				return (0);
+			} else if (lk_timer_remain(lk, t28a)) {
+				/* FIXME: start sending messages */
+				lk_timer_stop(lk, t28a);
+				lk_timer_start(lk, t25a);
+				return (0);
+			} else if (lk_timer_remain(lk, t29a)) {
+			} else if (lk_timer_remain(lk, t30a)) {
+			}
+		} else if ((sp->flags & SPF_XFER_FUNC)) {
+			/* unexpected per 9.4 with transfer function */
+/*
+ * ANSI T1.111.4/2000 9.4 (2) If the receiving point has the transfer function function, it starts timer T30, sends a
+ * traffic restart waiting message followed by the necessary transfer-restricted and transfer-prohibited messages
+ * (preventative transfer prohibited messages according to 13.2.2 (1) are required for traffic currently being routed
+ * via the point from which the unexpected traffic restart allowed or traffic restart waiting message was received),
+ * and a traffic restart allowed message.  It then stops T30 and starts T29.  In the abnormal case that T30 expires
+ * before the sending of transfer-prohibited and transfer-restricted messages is complete, it sends a traffic restart
+ * allowed message, starts T29, and then completes sending any preventative transfer-prohibited messages according to
+ * 13.2.2 (1) for traffic currently being routed via the point from which the unexpected traffic restart allowed or
+ * traffic restart waiting message was received.
+ */
+			if (!lk_timer_remain(lk, t29a)) {
+				if (!lk_timer_remain(lk, t30a)) {
+					if ((err =
+					     mtp_send_trw(q, sp, lk->ni, m->opc, m->dpc, m->sls)))
+						return (err);
+					lk_timer_start(q, lk, t30a);
+				}
+				for (rs = sp->rs.list; rs; rs = rs->sp.next) {
+					if (rs->rl.curr->rt.curr->lk.lk == lk) {
+						if ((err = mtp_send_tfp(q,...)))
+							return (err);
+						continue;
+					}
+					switch (rs->state) {
+					case MTP_ALLOWED:
+						continue;
+					case MTP_DANGER:
+					case MTP_CONGESTED:
+					case MTP_RESTRICTED:
+						if ((err = mtp_send_tfr(q,...)))
+							return (err);
+						continue;
+					default:
+						swerr();
+					case MTP_RESTART:
+					case MTP_PROHIBITED:
+					case MTP_INHIBITED:
+					case MTP_BLOCKED:
+					case MTP_INACTIVE:
+						if ((err = mtp_send_tfp(q,...)))
+							return (err);
+						continue;
+					}
+				}
+				lk_timer_stop(lk, t30a);
+				lk_timer_start(q, lk, t29a);
+			}
+			goto discard;
+		} else {
+			/* unexpected per 9.4 without transfer function */
+/*
+ * ANSI T.111.4/2000 9.4 (1) If the receiving point has no transfer function it returns a traffic restart allowed
+ * message to the adjacent point from which the unexpected traffic restart allowed or traffic restart waiting message
+ * was received and starts time T29 concerning that point.
+ */
+			if (!lk_timer_remain(lk, t29a)) {
+				if ((err = mtp_send_tra(q, sp, lk->ni, m->opc, m->dpc, m->sls)))
+					return (err);
+				lk_timer_start(q, lk, t29a);
+			}
+			goto discard;
 		}
 
 	}
@@ -11377,7 +11959,7 @@ mtp_recv_sltm(queue_t *q, struct mtp_msg *m)
 	struct rs *adj = lk->sp.adj;
 
 	if (m->slc != sl->slc || m->opc != adj->dest || m->dpc != loc->pc) {
-		if (mi_timer_remain(sl->timers.t1t) && m->slc == sl->slc && m->opc == loc->pc
+		if (sl_timer_remain(sl, t1t) && m->slc == sl->slc && m->opc == loc->pc
 		    && m->dpc == adj->dest)
 			goto loopback;
 		else
@@ -15292,15 +15874,14 @@ mtp_get_statem_sp(struct mtp_statem *p, struct sp *sp)
 	p->id = sp->id;
 	p->flags = sp->flags;
 	p->state = sp->state;
-	c->timers.t1r = (mtp_timer_t) mi_timer_remain(sp->timers.t1r);
-	c->timers.t18 = (mtp_timer_t) mi_timer_remain(sp->timers.t18);
-	c->timers.t20 = (mtp_timer_t) mi_timer_remain(sp->timers.t20);
-	c->timers.t21 = (mtp_timer_t) mi_timer_remain(sp->timers.t21);
-	c->timers.t22a = (mtp_timer_t) mi_timer_remain(sp->timers.t22a);
-	c->timers.t23a = (mtp_timer_t) mi_timer_remain(sp->timers.t23a);
-	c->timers.t24a = (mtp_timer_t) mi_timer_remain(sp->timers.t24a);
-	c->timers.t26a = (mtp_timer_t) mi_timer_remain(sp->timers.t26a);
-	c->timers.t27a = (mtp_timer_t) mi_timer_remain(sp->timers.t27a);
+	c->timers.t1r = (mtp_timer_t) sp_timer_remain(sp, t1r);
+	c->timers.t18 = (mtp_timer_t) sp_timer_remain(sp, t18);
+	c->timers.t20 = (mtp_timer_t) sp_timer_remain(sp.t20);
+	c->timers.t22a = (mtp_timer_t) sp_timer_remain(sp, t22a);
+	c->timers.t23a = (mtp_timer_t) sp_timer_remain(sp, t23a);
+	c->timers.t24a = (mtp_timer_t) sp_timer_remain(sp, t24a);
+	c->timers.t26a = (mtp_timer_t) sp_timer_remain(sp, t26a);
+	c->timers.t27a = (mtp_timer_t) sp_timer_remain(sp, t27a);
 	return (sizeof(*p) + sizeof(*c));
 }
 static int
@@ -15313,11 +15894,11 @@ mtp_get_statem_rs(struct mtp_statem *p, struct rs *rs)
 	p->id = rs->id;
 	p->flags = rs->flags;
 	p->state = rs->state;
-	c->timers.t8 = (mtp_timer_t) mi_timer_remain(rs->timers.t8);
-	c->timers.t11 = (mtp_timer_t) mi_timer_remain(rs->timers.t11);
-	c->timers.t15 = (mtp_timer_t) mi_timer_remain(rs->timers.t15);
-	c->timers.t16 = (mtp_timer_t) mi_timer_remain(rs->timers.t16);
-	c->timers.t18a = (mtp_timer_t) mi_timer_remain(rs->timers.t18a);
+	c->timers.t8 = (mtp_timer_t) rs_timer_remain(rs, t8);
+	c->timers.t11 = (mtp_timer_t) rs_timer_remain(rs, t11);
+	c->timers.t15 = (mtp_timer_t) rs_timer_remain(rs, t15);
+	c->timers.t16 = (mtp_timer_t) rs_timer_remain(rs, t16);
+	c->timers.t18a = (mtp_timer_t) rs_timer_remain(rs, t18a);
 	return (sizeof(*p) + sizeof(*c));
 }
 static int
@@ -15342,8 +15923,8 @@ mtp_get_statem_rt(struct mtp_statem *p, struct rt *rt)
 	p->id = rt->id;
 	p->flags = rt->flags;
 	p->state = rt->state;
-	c->timers.t6 = (mtp_timer_t) mi_timer_remain(rt->timers.t6);
-	c->timers.t10 = (mtp_timer_t) mi_timer_remain(rt->timers.t10);
+	c->timers.t6 = (mtp_timer_t) rt_timer_remain(rt, t6);
+	c->timers.t10 = (mtp_timer_t) rt_timer_remain(rt, t10);
 	return (sizeof(*p) + sizeof(*c));
 }
 static int
@@ -15368,12 +15949,13 @@ mtp_get_statem_lk(struct mtp_statem *p, struct lk *lk)
 	p->id = lk->id;
 	p->flags = lk->flags;
 	p->state = lk->state;
-	c->timers.t7 = (mtp_timer_t) mi_timer_remain(lk->timers.t7);
-	c->timers.t19 = (mtp_timer_t) mi_timer_remain(lk->timers.t19);
-	c->timers.t25a = (mtp_timer_t) mi_timer_remain(lk->timers.t25a);
-	c->timers.t28a = (mtp_timer_t) mi_timer_remain(lk->timers.t28a);
-	c->timers.t29a = (mtp_timer_t) mi_timer_remain(lk->timers.t29a);
-	c->timers.t30a = (mtp_timer_t) mi_timer_remain(lk->timers.t30a);
+	c->timers.t7 = (mtp_timer_t) lk_timer_remain(lk, t7);
+	c->timers.t19 = (mtp_timer_t) lk_timer_remain(lk, t19);
+	c->timers.t21 = (mtp_timer_t) lk_timer_remain(lk, t21);
+	c->timers.t25a = (mtp_timer_t) lk_timer_remain(lk, t25a);
+	c->timers.t28a = (mtp_timer_t) lk_timer_remain(lk, t28a);
+	c->timers.t29a = (mtp_timer_t) lk_timer_remain(lk, t29a);
+	c->timers.t30a = (mtp_timer_t) lk_timer_remain(lk, t30a);
 	return (sizeof(*p) + sizeof(*c));
 }
 static int
@@ -15386,28 +15968,28 @@ mtp_get_statem_sl(struct mtp_statem *p, struct sl *sl)
 	p->id = sl->id;
 	p->flags = sl->flags;
 	p->state = sl->state;
-	c->timers.t1 = (mtp_timer_t) mi_timer_remain(sl->timers.t1);
-	c->timers.t2 = (mtp_timer_t) mi_timer_remain(sl->timers.t2);
-	c->timers.t3 = (mtp_timer_t) mi_timer_remain(sl->timers.t3);
-	c->timers.t4 = (mtp_timer_t) mi_timer_remain(sl->timers.t4);
-	c->timers.t5 = (mtp_timer_t) mi_timer_remain(sl->timers.t5);
-	c->timers.t12 = (mtp_timer_t) mi_timer_remain(sl->timers.t12);
-	c->timers.t13 = (mtp_timer_t) mi_timer_remain(sl->timers.t13);
-	c->timers.t14 = (mtp_timer_t) mi_timer_remain(sl->timers.t14);
-	c->timers.t17 = (mtp_timer_t) mi_timer_remain(sl->timers.t17);
-	c->timers.t19a = (mtp_timer_t) mi_timer_remain(sl->timers.t19a);
-	c->timers.t20a = (mtp_timer_t) mi_timer_remain(sl->timers.t20a);
-	c->timers.t21a = (mtp_timer_t) mi_timer_remain(sl->timers.t21a);
-	c->timers.t22 = (mtp_timer_t) mi_timer_remain(sl->timers.t22);
-	c->timers.t23 = (mtp_timer_t) mi_timer_remain(sl->timers.t23);
-	c->timers.t24 = (mtp_timer_t) mi_timer_remain(sl->timers.t24);
-	c->timers.t31a = (mtp_timer_t) mi_timer_remain(sl->timers.t31a);
-	c->timers.t32a = (mtp_timer_t) mi_timer_remain(sl->timers.t32a);
-	c->timers.t33a = (mtp_timer_t) mi_timer_remain(sl->timers.t33a);
-	c->timers.t34a = (mtp_timer_t) mi_timer_remain(sl->timers.t34a);
-	c->timers.t1t = (mtp_timer_t) mi_timer_remain(sl->timers.t1t);
-	c->timers.t2t = (mtp_timer_t) mi_timer_remain(sl->timers.t2t);
-	c->timers.t1s = (mtp_timer_t) mi_timer_remain(sl->timers.t1s);
+	c->timers.t1 = (mtp_timer_t) sl_timer_remain(sl, t1);
+	c->timers.t2 = (mtp_timer_t) sl_timer_remain(sl, t2);
+	c->timers.t3 = (mtp_timer_t) sl_timer_remain(sl, t3);
+	c->timers.t4 = (mtp_timer_t) sl_timer_remain(sl, t4);
+	c->timers.t5 = (mtp_timer_t) sl_timer_remain(sl, t5);
+	c->timers.t12 = (mtp_timer_t) sl_timer_remain(sl, t12);
+	c->timers.t13 = (mtp_timer_t) sl_timer_remain(sl, t13);
+	c->timers.t14 = (mtp_timer_t) sl_timer_remain(sl, t14);
+	c->timers.t17 = (mtp_timer_t) sl_timer_remain(sl, t17);
+	c->timers.t19a = (mtp_timer_t) sl_timer_remain(sl, t19a);
+	c->timers.t20a = (mtp_timer_t) sl_timer_remain(sl, t20a);
+	c->timers.t21a = (mtp_timer_t) sl_timer_remain(sl, t21a);
+	c->timers.t22 = (mtp_timer_t) sl_timer_remain(sl, t22);
+	c->timers.t23 = (mtp_timer_t) sl_timer_remain(sl, t23);
+	c->timers.t24 = (mtp_timer_t) sl_timer_remain(sl, t24);
+	c->timers.t31a = (mtp_timer_t) sl_timer_remain(sl, t31a);
+	c->timers.t32a = (mtp_timer_t) sl_timer_remain(sl, t32a);
+	c->timers.t33a = (mtp_timer_t) sl_timer_remain(sl, t33a);
+	c->timers.t34a = (mtp_timer_t) sl_timer_remain(sl, t34a);
+	c->timers.t1t = (mtp_timer_t) sl_timer_remain(sl, t1t);
+	c->timers.t2t = (mtp_timer_t) sl_timer_remain(sl, t2t);
+	c->timers.t1s = (mtp_timer_t) sl_timer_remain(sl, t1s);
 	return (sizeof(*p) + sizeof(*c));
 }
 static int
@@ -18967,7 +19549,7 @@ do_timeout(queue_t *q, mblk_t *mp)
 		return sl_t20a_timeout(q, t->sl);
 	case t21:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t21 expiry at %lu", jiffies);
-		return sp_t21_timeout(q, t->sp);
+		return lk_t21_timeout(q, t->lk);
 	case t21a:
 		mi_strlog(q, STRLOGTO, SL_TRACE, "t21a expiry at %lu", jiffies);
 		return sl_t21a_timeout(q, t->sl);
@@ -19815,7 +20397,7 @@ mtp_alloc_priv(queue_t *q, dev_t *devp, cred_t *crp, minor_t bminor)
 {
 	struct mtp *mt;
 
-	if ((mt = (struct mtp *)mi_open_alloc_cache(mtp_mt_cachep, SLAB_ATOMIC))) {
+	if ((mt = (struct mtp *) mi_open_alloc_cache(mtp_mt_cachep, SLAB_ATOMIC))) {
 		printd(("%s: %p: allocated mt private structure\n", DRV_NAME, mt));
 		bzero(mt, sizeof(*mt));
 		mt->rq = RD(q);
@@ -20258,6 +20840,11 @@ mtp_alloc_lk(uint id, struct ls *ls, struct sp *loc, struct rs *adj, struct mtp_
 		t = (typeof(t)) lk->timers.t19;
 		t->timer = t19;
 		t->lk = lk;
+		if (!(lk->timers.t21 = mi_timer_alloc(sizeof(*t))))
+			goto free_error;
+		t = (typeof(t)) lk->timers.t21;
+		t->timer = t21;
+		t->lk = lk;
 		if (!(lk->timers.t25a = mi_timer_alloc(sizeof(*t))))
 			goto free_error;
 		t = (typeof(t)) lk->timers.t25a;
@@ -20309,6 +20896,7 @@ mtp_alloc_lk(uint id, struct ls *ls, struct sp *loc, struct rs *adj, struct mtp_
 			/* link timer defaults */
 			lk->config.t7 = ls->config.t7;
 			lk->config.t19 = ls->config.t19;
+			lk->config.t21 = ls->config.t21;
 			lk->config.t25a = ls->config.t25a;
 			lk->config.t28a = ls->config.t28a;
 			lk->config.t29a = ls->config.t29a;
@@ -20381,6 +20969,7 @@ mtp_free_lk(struct lk *lk)
 	/* free timer */
 	mi_timer_free(lk->timers.t7);
 	mi_timer_free(lk->timers.t19);
+	mi_timer_free(lk->timers.t21);
 	mi_timer_free(lk->timers.t25a);
 	mi_timer_free(lk->timers.t28a);
 	mi_timer_free(lk->timers.t29a);
@@ -20476,6 +21065,7 @@ mtp_alloc_ls(uint id, struct sp *sp, struct mtp_conf_ls *c)
 			/* link timer defaults */
 			ls->config.t7 = sp->config.t7;
 			ls->config.t19 = sp->config.t19;
+			ls->config.t21 = sp->config.t21;
 			ls->config.t25a = sp->config.t25a;
 			ls->config.t28a = sp->config.t28a;
 			ls->config.t29a = sp->config.t29a;
@@ -20563,7 +21153,7 @@ mtp_alloc_cr(uint id, struct rl *rl, struct rt *from, struct rt *onto, uint inde
 		/* allocate timers */
 		if (!(cr->timers.t6 = mi_timer_alloc(sizeof(*t))))
 			goto free_error;
-		t = (typeof(t)) cr-.timers.t6->b_rptr;
+		t = (typeof(t)) cr -.timers.t6->b_rptr;
 		t->timer = t6;
 		t->cr = cr;
 		/* add to route list controlled rerouting buffer list */
@@ -20586,7 +21176,7 @@ mtp_alloc_cr(uint id, struct rl *rl, struct rt *from, struct rt *onto, uint inde
 			cr->rt.onto = onto;
 	}
 	return (cr);
-free_error:
+      free_error:
 	mtp_free_cr(cr);
 	return (NULL);
 }
@@ -20742,7 +21332,7 @@ mtp_alloc_rt(uint id, struct rl *rl, struct lk *lk, struct mtp_conf_rt *c)
 		}
 	}
 	return (rt);
-free_error:
+      free_error:
 	mtp_free_rt(rt);
 	return (NULL);
 }
@@ -21129,11 +21719,6 @@ mtp_alloc_sp(uint id, struct na *na, struct mtp_conf_sp *c)
 		t = (typeof(t)) sp->timers.t20->b_rptr;
 		t->timer = t20;
 		t->sp = sp;
-		if (!(sp->timers.t21 = mi_timer_alloc(sizeof(*t))))
-			goto free_error;
-		t = (typeof(t)) sp->timers.t21->b_rptr;
-		t->timer = t21;
-		t->sp = sp;
 		if (!(sp->timers.t22a = mi_timer_alloc(sizeof(*t))))
 			goto free_error;
 		t = (typeof(t)) sp->timers.t22a->b_rptr;
@@ -21190,6 +21775,7 @@ mtp_alloc_sp(uint id, struct na *na, struct mtp_conf_sp *c)
 			/* link timer defaults */
 			sp->config.t7 = na->config.t7;
 			sp->config.t19 = na->config.t19;
+			sp->config.t21 = na->config.t21;
 			sp->config.t25a = na->config.t25a;
 			sp->config.t28a = na->config.t28a;
 			sp->config.t29a = na->config.t29a;
@@ -21207,7 +21793,6 @@ mtp_alloc_sp(uint id, struct na *na, struct mtp_conf_sp *c)
 			sp->config.t1r = na->config.t1r;
 			sp->config.t18 = na->config.t18;
 			sp->config.t20 = na->config.t20;
-			sp->config.t21 = na->config.t21;
 			sp->config.t22a = na->config.t22a;
 			sp->config.t23a = na->config.t23a;
 			sp->config.t24a = na->config.t24a;
@@ -21216,7 +21801,7 @@ mtp_alloc_sp(uint id, struct na *na, struct mtp_conf_sp *c)
 		}
 	}
 	return (sp);
-free_error:
+      free_error:
 	mtp_free_sp(sp);
 	return (NULL);
 }
@@ -21257,7 +21842,6 @@ mtp_free_sp(struct sp *sp)
 	mi_timer_free(sp->timers.t1r);
 	mi_timer_free(sp->timers.t18);
 	mi_timer_free(sp->timers.t20);
-	mi_timer_free(sp->timers.t21);
 	mi_timer_free(sp->timers.t22a);
 	mi_timer_free(sp->timers.t23a);
 	mi_timer_free(sp->timers.t24a);

@@ -153,6 +153,7 @@ typedef struct mtp_opt_conf_lk {
 	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
 	mtp_ulong t19;			/* timer t19 value */
+	mtp_ulong t21;			/* timer t21 value */
 	mtp_ulong t25a;			/* timer t25a value */
 	mtp_ulong t28a;			/* timer t28a value */
 	mtp_ulong t29a;			/* timer t29a value */
@@ -189,6 +190,7 @@ typedef struct mtp_opt_conf_ls {
 	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
 	mtp_ulong t19;			/* timer t19 value */
+	mtp_ulong t21;			/* timer t21 value */
 	mtp_ulong t25a;			/* timer t25a value */
 	mtp_ulong t28a;			/* timer t28a value */
 	mtp_ulong t29a;			/* timer t29a value */
@@ -258,6 +260,7 @@ typedef struct mtp_opt_conf_sp {
 	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
 	mtp_ulong t19;			/* timer t19 value */
+	mtp_ulong t21;			/* timer t21 value */
 	mtp_ulong t25a;			/* timer t25a value */
 	mtp_ulong t28a;			/* timer t28a value */
 	mtp_ulong t29a;			/* timer t29a value */
@@ -275,7 +278,6 @@ typedef struct mtp_opt_conf_sp {
 	mtp_ulong t1r;			/* timer t1r value */
 	mtp_ulong t18;			/* timer t18 value */
 	mtp_ulong t20;			/* timer t20 value */
-	mtp_ulong t21;			/* timer t21 value */
 	mtp_ulong t22a;			/* timer t22a value */
 	mtp_ulong t23a;			/* timer t23a value */
 	mtp_ulong t24a;			/* timer t24a value */
@@ -313,6 +315,7 @@ typedef struct mtp_opt_conf_na {
 	/* link timers */
 	mtp_ulong t7;			/* timer t7 value */
 	mtp_ulong t19;			/* timer t19 value */
+	mtp_ulong t21;			/* timer t21 value */
 	mtp_ulong t25a;			/* timer t25a value */
 	mtp_ulong t28a;			/* timer t28a value */
 	mtp_ulong t29a;			/* timer t29a value */
@@ -330,7 +333,6 @@ typedef struct mtp_opt_conf_na {
 	mtp_ulong t1r;			/* timer t1r value */
 	mtp_ulong t18;			/* timer t18 value */
 	mtp_ulong t20;			/* timer t20 value */
-	mtp_ulong t21;			/* timer t21 value */
 	mtp_ulong t22a;			/* timer t22a value */
 	mtp_ulong t23a;			/* timer t23a value */
 	mtp_ulong t24a;			/* timer t24a value */
@@ -639,7 +641,7 @@ typedef struct mtp_statem_sl {
 
 #define SLF_LOSC_PROC_A	    (MTPF_LOSC_PROC_A)	/* Sig link uses link oscillation procedure A */
 #define SLF_LOSC_PROC_B	    (MTPF_LOSC_PROC_B)	/* Sig link uses link oscillation procedure B */
-#define SLF_RESTART_LOCKOUT (MTPF_RESTART_LOCKOUT)   /* Sig link restart lockout (T27a running) */
+#define SLF_RESTART_LOCKOUT (MTPF_RESTART_LOCKOUT)	/* Sig link restart lockout (T27a running) */
 
 /*
  *  Link set state
@@ -647,6 +649,7 @@ typedef struct mtp_statem_sl {
 typedef struct mtp_timers_lk {
 	mtp_timer_t t7;			/* timer t7 */
 	mtp_timer_t t19;		/* timer t19 */
+	mtp_timer_t t21;		/* timer t21 */
 	mtp_timer_t t25a;		/* timer t25a */
 	mtp_timer_t t28a;		/* timer t28a */
 	mtp_timer_t t29a;		/* timer t29a */
@@ -656,23 +659,34 @@ typedef struct mtp_statem_lk {
 	struct mtp_timers_lk timers;
 } mtp_statem_lk_t;
 
-#define LK_ALLOWED	    (MTP_ALLOWED)	/* Link Allowed */
-#define LK_DANGER	    (MTP_DANGER)	/* Link Danger of congestion (primary or secondary) 
-						 */
-#define LK_CONGESTED	    (MTP_CONGESTED)	/* Link Congested (Link Set congestion, primary or
-						   secondary ) */
-#define LK_RESTRICTED	    (MTP_RESTRICTED)	/* Link Restricted (Route Failure or received TFR) */
-#define LK_RESTART	    (MTP_RESTART)	/* Link Restarting */
-#define LK_PROHIBITED	    (MTP_PROHIBITED)	/* Link Prohibited (Received TFP) */
-#define LK_INHIBITED	    (MTP_INHIBITED)	/* Link Inhibited (Management inhibited) */
-#define LK_BLOCKED	    (MTP_BLOCKED)	/* Link Blocked (Local Link Set failure) */
-#define LK_INACTIVE	    (MTP_INACTIVE)	/* Link Inactive (Link out of service) */
-#define LK_NODANGER	    (MTP_NODANGER)	/* Link Out of Danger (transient state) */
-#define LK_UNCONGESTED	    (MTP_UNCONGESTED)	/* Link Uncongested (transient state) */
-#define LK_RESTARTED	    (MTP_RESTARTED)	/* Link Restarted */
-#define LK_UNINHIBITED	    (MTP_UNINHIBITED)	/* Link Uninhibited (transient state) */
-#define LK_UNBLOCKED	    (MTP_UNBLOCKED)	/* Link Unblocked (transient state) */
-#define LK_ACTIVE	    (MTP_ACTIVE)	/* Link Active (Link in service) */
+#define LK_ALLOWED	    (MTP_ALLOWED)	/* Link Set Allowed */
+#define LK_DANGER	    (MTP_DANGER)	/* Link Set Danger of congestion (primary or
+						   secondary) */
+#define LK_CONGESTED	    (MTP_CONGESTED)	/* Link Set Congested (Link Set congestion, primary 
+						   or secondary ) */
+#define LK_RESTRICTED	    (MTP_RESTRICTED)	/* Link Set Restricted (Route Failure or received
+						   TFR) */
+#define LK_RESTART	    (MTP_RESTART)	/* Link Set Restarting */
+#define LK_PROHIBITED	    (MTP_PROHIBITED)	/* Link Set Prohibited (Received TFP) */
+#define LK_INHIBITED	    (MTP_INHIBITED)	/* Link Set Inhibited (Management inhibited) */
+#define LK_BLOCKED	    (MTP_BLOCKED)	/* Link Set Blocked (Local Link Set failure) */
+#define LK_INACTIVE	    (MTP_INACTIVE)	/* Link Set Inactive (Link out of service) */
+#define LK_NODANGER	    (MTP_NODANGER)	/* Link Set Out of Danger (transient state) */
+#define LK_UNCONGESTED	    (MTP_UNCONGESTED)	/* Link Set Uncongested (transient state) */
+#define LK_RESTARTED	    (MTP_RESTARTED)	/* Link Set Restarted */
+#define LK_UNINHIBITED	    (MTP_UNINHIBITED)	/* Link Set Uninhibited (transient state) */
+#define LK_UNBLOCKED	    (MTP_UNBLOCKED)	/* Link Set Unblocked (transient state) */
+#define LK_ACTIVE	    (MTP_ACTIVE)	/* Link Set Active (Link in service) */
+
+#define LKF_ALLOWED	    (MTPF_ALLOWED)	/* Link Set is active */
+#define LKF_DANGER	    (MTPF_DANGER)	/* Link Set is in danger of congestion */
+#define LKF_CONGESTED	    (MTPF_CONGESTED)	/* Link Set is congested */
+#define LKF_UNUSABLE	    (MTPF_RESTRICTED)	/* Link Set is unusable (local processor outage) */
+#define LKF_RESTART	    (MTPF_RESTART)	/* Link Set is restarting */
+#define LKF_FAILED	    (MTPF_PROHIBITED)	/* Link Set is failed */
+#define LKF_INHIBITED	    (MTPF_INHIBITED)	/* Link Set is inhibited (management inhibited) */
+#define LKF_BLOCKED	    (MTPF_BLOCKED)	/* Link Set is blocked (remote processor outage) */
+#define LKF_INACTIVE	    (MTPF_INACTIVE)	/* Link Set is out of service */
 
 /*
  *  Combined link set state
@@ -830,7 +844,6 @@ typedef struct mtp_timers_sp {
 	mtp_timer_t t1r;		/* timer t1r */
 	mtp_timer_t t18;		/* timer t18 */
 	mtp_timer_t t20;		/* timer t20 */
-	mtp_timer_t t21;		/* timer t21 */
 	mtp_timer_t t22a;		/* timer t22a */
 	mtp_timer_t t23a;		/* timer t23a */
 	mtp_timer_t t24a;		/* timer t24a */
@@ -870,7 +883,7 @@ typedef struct mtp_statem_sp {
 #define SPF_LOSC_PROC_B	    (MTPF_LOSC_PROC_B)	/* Sig Point uses link oscillation procedure B */
 #define SPF_RESTART_PHASE_1 (MTPF_RESTART_PHASE_1)	/* Sig Point restarting */
 #define SPF_RESTART_PHASE_2 (MTPF_RESTART_PHASE_2)	/* Sig Point restarting */
-#define SPF_RESTART_LOCKOUT (MTPF_RESTART_LOCKOUT)   /* Sig Point restarting (T27a running) */
+#define SPF_RESTART_LOCKOUT (MTPF_RESTART_LOCKOUT)	/* Sig Point restarting (T27a running) */
 
 /*
  *  Network appearance state
