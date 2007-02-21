@@ -375,7 +375,7 @@ size_t
 mi_close_size(caddr_t ptr)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
-	return (mi_open_size(mi->mi-size));
+	return (mi_open_size(mi->mi_size));
 }
 
 EXPORT_SYMBOL(mi_close_size);
@@ -1736,18 +1736,18 @@ mi_timer_remain(mblk_t *mp)
 	unsigned long flags;
 	unsigned long rval = 0;
 
-	spin_lock_irqsave(&tp->tb_lock, flags);
+	spin_lock_irqsave(&tb->tb_lock, flags);
 	switch(tb->tb_state) {
 	case TB_ACTIVE:
 	case TB_RESCHEDULED:
-		if (tp->tb_time > jiffies)
-			rval = tp->tb_time - jiffies;
+		if (tb->tb_time > jiffies)
+			rval = tb->tb_time - jiffies;
 		break;
 	default:
 		rval = 0;
 		break;
 	}
-	spin_unlock_irqrestore(&tp->tb_lock, flags);
+	spin_unlock_irqrestore(&tb->tb_lock, flags);
 	if (rval)
 		rval = drv_hztomsec(rval);
 	return (rval);
@@ -1761,7 +1761,7 @@ EXPORT_SYMBOL_NOVERS(mi_timer_remain);
 void
 mi_timer_free(mblk_t *mp)
 {
-	tblk_t *tp;
+	tblk_t *tb;
 	unsigned long flags;
 	toid_t tid;
 
