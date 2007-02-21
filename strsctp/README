@@ -1,4 +1,4 @@
-OpenSS7 STREAMS SCTP -- read me first file.  2007-01-08
+OpenSS7 STREAMS SCTP -- read me first file.  2007-02-13
 $Id: README,v 0.9.2.21 2007/01/09 11:25:49 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS SCTP
 =====================
 
-Package strsctp-0.9.2.6 was released under GPLv2 2007-01-08.
+Package strsctp-0.9.2.7 was released under GPLv2 2007-02-13.
 
 `OpenSS7 STREAMS SCTP' (`strsctp') is an `OpenSS7 Project'
 implementation of Stream Control Transmission Protocol (SCTP - RFC
@@ -22,7 +22,7 @@ networking driver, `sctp(4)', is provided, as well as NPI, TPI and XTI
 header files for SCTP operation.  The package contains the necessary
 manual pages and other documentation for SCTP components in a separate
 autoconf tarball.  This release is also part of the OpenSS7 Master
-Package (`openss7-0.9.2.D').
+Package (`openss7-0.9.2.E').
 
 The package currently includes the following "STREAMS" kernel modules
 and drivers:
@@ -55,12 +55,12 @@ well.
  Release
 --------
 
-This is the `strsctp-0.9.2.6' package, released 2007-01-08.  This
-`0.9.2.6' release, and the latest version, can be obtained from the
+This is the `strsctp-0.9.2.7' package, released 2007-02-13.  This
+`0.9.2.7' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/strsctp-0.9.2.6.tar.bz2
+     $> wget http://www.openss7.org/tarballs/strsctp-0.9.2.7.tar.bz2
 
 The release is available as an `autoconf(1)' tarball, `src.rpm' or
 `dsc', or as a set of binary `rpm's or `deb's.  See the download page
@@ -95,7 +95,7 @@ See `README-alpha' (if it exists) for alpha release information.
 
 The quickest and easiest way to ensure that all prerequisites are met
 is to download and install this package from within the `OpenSS7 Master
-Package', `openss7-0.9.2.D', instead of separately.
+Package', `openss7-0.9.2.E', instead of separately.
 
 Prerequisites for the OpenSS7 STREAMS SCTP package are as follows:
 
@@ -117,18 +117,18 @@ Prerequisites for the OpenSS7 STREAMS SCTP package are as follows:
 Package', then the dependencies listed below will already have been met
 by unpacking the master package.)
 
-  2. `OpenSS7 Linux Fast-STREAMS', streams-0.9.2.1
-     (http://www.openss7.org/tarballs/streams-0.9.2.1.tar.bz2).  (3)
+  2. `OpenSS7 Linux Fast-STREAMS', streams-0.9.2.2
+     (http://www.openss7.org/tarballs/streams-0.9.2.2.tar.bz2).  (3)
 
   3. `OpenSS7 STREAMS Compatibility Modules',
-     strcompat-0.9.2.4
-     (http://www.openss7.org/tarballs/strcompat-0.9.2.4.tar.bz2).
+     strcompat-0.9.2.5
+     (http://www.openss7.org/tarballs/strcompat-0.9.2.5.tar.bz2).
 
-  4. `OpenSS7 STREAMS XNS', strxns-0.9.2.4
-     (http://www.openss7.org/tarballs/strxns-0.9.2.4.tar.bz2).
+  4. `OpenSS7 STREAMS XNS', strxns-0.9.2.5
+     (http://www.openss7.org/tarballs/strxns-0.9.2.5.tar.bz2).
 
-  5. `OpenSS7 STREAMS XTI/TLI', strxnet-0.9.2.9
-     (http://www.openss7.org/tarballs/strxnet-0.9.2.9.tar.bz2).
+  5. `OpenSS7 STREAMS XTI/TLI', strxnet-0.9.2.10
+     (http://www.openss7.org/tarballs/strxnet-0.9.2.10.tar.bz2).
 
 
 When configuring and building multiple `OpenSS7 Project' release
@@ -148,7 +148,7 @@ You also need the same version of `gcc(1)' compiler with which the
 kernel was built.  If it is not the default, add `CC=kgcc' on the line
 after `./configure', for example:
 
-     $> ../strsctp-0.9.2.6/configure CC='gcc-3.4'
+     $> ../strsctp-0.9.2.7/configure CC='gcc-3.4'
 
  Installation
 -------------
@@ -156,11 +156,11 @@ after `./configure', for example:
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
 
-     $> wget http://www.openss7.org/tarballs/strsctp-0.9.2.6.tar.bz2
-     $> tar -xjvf strsctp-0.9.2.6.tar.bz2
+     $> wget http://www.openss7.org/tarballs/strsctp-0.9.2.7.tar.bz2
+     $> tar -xjvf strsctp-0.9.2.7.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../strsctp-0.9.2.6/configure --enable-autotest
+     $> ../strsctp-0.9.2.7/configure --enable-autotest
      $> make
      $> make check
      $> sudo make install
@@ -168,8 +168,8 @@ validate, uninstall and remove the package:
      $> sudo make uninstall
      $> popd
      $> sudo rm -rf build
-     $> rm -rf strsctp-0.9.2.6
-     $> rm -f strsctp-0.9.2.6.tar.bz2
+     $> rm -rf strsctp-0.9.2.7
+     $> rm -f strsctp-0.9.2.7.tar.bz2
 
 If you have problems, try building with the logging targets instead.
 If the make of a logging target fails, an automatic problem report will
@@ -177,11 +177,11 @@ be generated that can be mailed to The OpenSS7 Project
 <bugs@openss7.org>.(4) Installation steps using the logging targets
 proceed as follows:
 
-     $> wget http://www.openss7.org/tarballs/strsctp-0.9.2.6.tar.bz2
-     $> tar -xjvf strsctp-0.9.2.6.tar.bz2
+     $> wget http://www.openss7.org/tarballs/strsctp-0.9.2.7.tar.bz2
+     $> tar -xjvf strsctp-0.9.2.7.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../strsctp-0.9.2.6/configure --enable-autotest
+     $> ../strsctp-0.9.2.7/configure --enable-autotest
      $> make compile.log
      $> make check.log
      $> sudo make install.log
@@ -189,8 +189,8 @@ proceed as follows:
      $> sudo make uninstall.log
      $> popd
      $> sudo rm -rf build
-     $> rm -rf strsctp-0.9.2.6
-     $> rm -f strsctp-0.9.2.6.tar.bz2
+     $> rm -rf strsctp-0.9.2.7
+     $> rm -f strsctp-0.9.2.7.tar.bz2
 
 See `README-make' for additional specialized make targets.
 
@@ -206,14 +206,14 @@ The OpenSS7 STREAMS SCTP package is available from the downloads area
 of The OpenSS7 Project website (http://www.openss7.org/download.html)
 using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/strsctp-0.9.2.6.tar.bz2
+     $> wget http://www.openss7.org/tarballs/strsctp-0.9.2.7.tar.bz2
 
 Unpack the tarball using a command such as:
 
-     $> tar -xjvf strsctp-0.9.2.6.tar.bz2
+     $> tar -xjvf strsctp-0.9.2.7.tar.bz2
 
 The tarball will unpack into the relative subdirectory named after the
-package name: strsctp-0.9.2.6.
+package name: strsctp-0.9.2.7.
 
 The package builds using the GNU `autoconf' utilities and the
 `configure' script.  To build the package, we recommend using a
@@ -221,19 +221,19 @@ separate `build' directory as follows:
 
      $> mkdir build
      $> cd build
-     $> ../strsctp-0.9.2.6/configure
+     $> ../strsctp-0.9.2.7/configure
 
 In general, the package configures and builds without adding any
 special options to the `configure' script.  For general options to the
 `configure' script, see the GNU `INSTALL' file in the distribution:
 
-     $> less ../strsctp-0.9.2.6/INSTALL
+     $> less ../strsctp-0.9.2.7/INSTALL
 
 For specific options to the `configure' script, see the
 `INSTALL-strsctp' file in the distribution, or simply execute the
 configure script with the `--help' option like so:
 
-     $> ../strsctp-0.9.2.6/configure --help
+     $> ../strsctp-0.9.2.7/configure --help
 
 After configuring the package, the package can be compiled simply by
 issuing the `make' command:
@@ -273,8 +273,8 @@ Then the build directory and tarball can be simply removed:
 
      $> cd ..
      $> rm -rf build
-     $> rm -rf strsctp-0.9.2.6
-     $> rm -f strsctp-0.9.2.6.tar.bz2
+     $> rm -rf strsctp-0.9.2.7
+     $> rm -f strsctp-0.9.2.7.tar.bz2
 
  Detailed Installation Instructions
 -----------------------------------
@@ -283,7 +283,7 @@ More detailed installation instructions can be found in the
 `Installation', in the manual, contained in the distribution in `text',
 `info', `html' and `pdf' formats:
 
-     $> cd ../strsctp-0.9.2.6
+     $> cd ../strsctp-0.9.2.7
      $> less doc/manual/strsctp.txt
      $> lynx doc/manual/strsctp.html
      $> info doc/manual/strsctp.info

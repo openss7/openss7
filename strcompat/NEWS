@@ -1,4 +1,4 @@
-OpenSS7 STREAMS Compatibility -- history of user visible changes.  2007-01-07
+OpenSS7 STREAMS Compatibility -- history of user visible changes.  2007-02-13
 $Id: NEWS,v 0.9.2.24 2007/01/09 11:25:36 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -6,6 +6,36 @@ See the end for copying conditions (for this file).
 
 The sections that follow provide information on OpenSS7 releases of the
 OpenSS7 STREAMS Compatibility package.
+
+ Major changes for release strcompat-0.9.2.5
+--------------------------------------------
+
+This is the fifth separate `OpenSS7 Project' release of the
+`OpenSS7 STREAMS Compatibility' package.  The package was originally
+present in the `Linux Fast-STREAMS' `streams-0.7a.2' release package,
+but has been separated for five releases.
+
+This release is a stable, production grade release for `Linux
+Fast-STREAMS' and is part of the OpenSS7 Master Package
+(`openss7-0.9.2.E').  It deprecates previous releases.  Please upgrade
+before reporting bugs on previous releases.
+
+This release is primarily a maintenance release.  Some functionality of
+the package has been tested by its use in other packages and some
+defects corrected.  Support for `LiS' was deprecated as of the previous
+release.
+
+Major features since the last public release are as follows:
+
+   - Fixed bug found from inspection in `mi_copyout(9)' function.
+
+   - Support for autoconf 2.61 and gettext 0.16.
+
+   - Support for Ubuntu 6.10 distribution and bug fixes for i386 kenels.
+
+   - The package now looks for other subpackages with a version number
+     as unpacked by separate tarball.
+
 
  Major changes for release strcompat-0.9.2.4
 --------------------------------------------
@@ -17,7 +47,7 @@ but has been separated for four releases.
 
 This release is a stable, production grade release for `Linux
 Fast-STREAMS' and is part of the OpenSS7 Master Package
-(`openss7-0.9.2.D').  It deprecates previous releases.  Please upgrade
+(`openss7-0.9.2.E').  It deprecates previous releases.  Please upgrade
 before reporting bugs on previous releases.
 
 This release is primarily a maintenance release.  Some functionality of
@@ -85,8 +115,8 @@ SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
 see the strcompat package page
 (http://www.openss7.org/strcompat_pkg.html).
 
-See `http://www.openss7.org/codefiles/strcompat-0.9.2.4/ChangeLog' and
-`http://www.openss7.org/codefiles/strcompat-0.9.2.4/NEWS' in the
+See `http://www.openss7.org/codefiles/strcompat-0.9.2.5/ChangeLog' and
+`http://www.openss7.org/codefiles/strcompat-0.9.2.5/NEWS' in the
 release for more information.  Also, see the `strcompat.pdf' manual in
 the release (also in html
 `http://www.openss7.org/strcompat_manual.html').
