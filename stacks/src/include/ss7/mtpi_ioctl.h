@@ -906,7 +906,7 @@ typedef struct mtp_statem_df {
 	struct mtp_timers_df timers;
 } mtp_statem_df_t;
 
-typeodef union mtp_statem_obj {
+typedef union mtp_statem_obj {
 	struct mtp_statem_na na;	/* Network Appearance */
 	struct mtp_statem_sp sp;	/* Signalling Point */
 	struct mtp_statem_rs rs;	/* Route Set */
