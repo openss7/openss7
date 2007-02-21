@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.16 2007/02/14 14:09:15 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.17 2007/02/21 01:09:16 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/14 14:09:15 $ by $Author: brian $
+ Last Modified $Date: 2007/02/21 01:09:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.17  2007/02/21 01:09:16  brian
+ - updating mtp.c driver, better mi_open allocators
+
  Revision 0.9.2.16  2007/02/14 14:09:15  brian
  - broad changes updating support for SS7 MTP and M3UA
 
@@ -103,7 +106,7 @@
 #ifndef __SYS_MPS_STREAM_H__
 #define __SYS_MPS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mps/stream.h directly, include sys/stream.h instead."

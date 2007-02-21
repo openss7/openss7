@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_mtp.h,v 0.9.2.6 2007/02/13 14:05:30 brian Exp $
+ @(#) $Id: xti_mtp.h,v 0.9.2.7 2007/02/21 01:09:07 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/13 14:05:30 $ by $Author: brian $
+ Last Modified $Date: 2007/02/21 01:09:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti_mtp.h,v $
+ Revision 0.9.2.7  2007/02/21 01:09:07  brian
+ - updating mtp.c driver, better mi_open allocators
+
  Revision 0.9.2.6  2007/02/13 14:05:30  brian
  - corrected ulong and long for 32-bit compat
 
@@ -61,7 +64,7 @@
 #ifndef _SYS_XTI_MTP_H
 #define _SYS_XTI_MTP_H
 
-#ident "@(#) $RCSfile: xti_mtp.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_mtp.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

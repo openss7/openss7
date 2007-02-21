@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mtpi_ioctl.h,v 0.9.2.5 2007/02/17 02:49:11 brian Exp $
+ @(#) $Id: mtpi_ioctl.h,v 0.9.2.6 2007/02/21 01:09:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/17 02:49:11 $ by $Author: brian $
+ Last Modified $Date: 2007/02/21 01:09:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtpi_ioctl.h,v $
+ Revision 0.9.2.6  2007/02/21 01:09:06  brian
+ - updating mtp.c driver, better mi_open allocators
+
  Revision 0.9.2.5  2007/02/17 02:49:11  brian
  - first clean recompile of MTP modules on LFS
 
@@ -61,7 +64,7 @@
 #ifndef __MTPI_IOCTL_H__
 #define __MTPI_IOCTL_H__
 
-#ident "@(#) $RCSfile: mtpi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mtpi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 

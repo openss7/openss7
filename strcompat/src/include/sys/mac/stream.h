@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.8 2006/12/23 13:07:13 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.9 2007/02/21 01:09:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/23 13:07:13 $ by $Author: brian $
+ Last Modified $Date: 2007/02/21 01:09:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.9  2007/02/21 01:09:14  brian
+ - updating mtp.c driver, better mi_open allocators
+
  Revision 0.9.2.8  2006/12/23 13:07:13  brian
  - manual page and other package updates for release
 
@@ -79,7 +82,7 @@
 #ifndef __SYS_MAC_STREAM_H__
 #define __SYS_MAC_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mac/stream.h directly, include sys/stream.h instead."
