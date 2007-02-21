@@ -364,7 +364,6 @@ noinst_LIBRARIES		= libSS7mods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libSS7mods_a_SOURCES	= \
-				  src/modules/mtp/mtp.c \
 				  src/modules/mtp/mtp_npi.c \
 				  src/modules/mtp/mtp_tpi.c \
 				  src/modules/sdl/sdl.c \
