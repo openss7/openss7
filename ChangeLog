@@ -1,3 +1,46 @@
+2007-02-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* LiS/configure.ac: updated required autoconf to 2.60
+	* configure.ac: updated required autoconf to 2.60
+	* iperf/configure.ac: updated required autoconf to 2.60
+	* netperf/configure.ac: updated required autoconf to 2.60
+	* sctp/configure.ac: updated required autoconf to 2.60
+	* sigtran/configure.ac: updated required autoconf to 2.60
+	* stacks/configure.ac: updated required autoconf to 2.60
+	* strbcm/configure.ac: updated required autoconf to 2.60
+	* strchan/configure.ac: updated required autoconf to 2.60
+	* strcompat/configure.ac: updated required autoconf to 2.60
+	* streams/configure.ac: updated required autoconf to 2.60
+	* strinet/configure.ac: updated required autoconf to 2.60
+	* strisdn/configure.ac: updated required autoconf to 2.60
+	* striso/configure.ac: updated required autoconf to 2.60
+	* strnsl/configure.ac: updated required autoconf to 2.60
+	* strsctp/configure.ac: updated required autoconf to 2.60
+	* strsock/configure.ac: updated required autoconf to 2.60
+	* strtty/configure.ac: updated required autoconf to 2.60
+	* strutil/configure.ac: updated required autoconf to 2.60
+	* strvoip/configure.ac: updated required autoconf to 2.60
+	* strxnet/configure.ac: updated required autoconf to 2.60
+	* strxns/configure.ac: updated required autoconf to 2.60
+
+2007-02-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/acx_pthread.m4: balance parentheses
+	* m4/chan.m4: balance parentheses
+	* m4/deb.m4: balance parentheses
+	* m4/devfs.m4: balance parentheses
+	* m4/dist.m4: balance parentheses
+	* m4/doxy.m4: balance parentheses
+	* m4/inet.m4: balance parentheses
+	* m4/iso.m4: balance parentheses
+	* m4/kernel.m4: balance parentheses
+	* m4/nsl.m4: balance parentheses
+	* m4/openss7.m4: balance parentheses
+	* m4/rpm.m4: balance parentheses
+	* m4/sock.m4: balance parentheses
+	* m4/streams.m4: balance parentheses
+	* m4/xti.m4: balance parentheses
+
 2007-02-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/install.texi: updated autoconf requirement to 2.61

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.6.11 $) $Date: 2007/02/12 16:55:48 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.6.12 $) $Date: 2007/02/22 08:46:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,16 +48,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/12 16:55:48 $ by $Author: brian $
+# Last Modified $Date: 2007/02/22 08:46:36 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_PREREQ([2.59])
+AC_PREREQ([2.60])
 AC_INIT([LiS],[2.18],[bugs@openss7.org],[LiS])
-AC_REVISION([$Name:  $($Revision: 1.1.6.11 $) $Date: 2007/02/12 16:55:48 $])
+AC_REVISION([$Name:  $($Revision: 1.1.6.12 $) $Date: 2007/02/22 08:46:36 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -184,6 +184,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 1.1.6.12  2007/02/22 08:46:36  brian
+# - updated required autoconf to 2.60
+#
 # Revision 1.1.6.11  2007/02/12 16:55:48  brian
 # - more autoconf 2.61 support
 #
