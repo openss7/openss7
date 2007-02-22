@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2007/02/10 22:30:24 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/02/22 08:36:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/10 22:30:24 $ by $Author: brian $
+# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -147,10 +147,10 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 	 fi])
     AC_CACHE_CHECK([for rpm distribution extra release string], [rpm_cv_dist_extra], [dnl
 	case :${with_rpm_extra:-auto} in
-	    :no)
+	    (:no)
 		rpm_cv_dist_extra=
 		;;
-	    :auto)
+	    (:auto)
 		case "$dist_cv_host_flavor" in
 		    (centos)
 			case $dist_cv_host_release in
@@ -217,17 +217,17 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			;;
 		esac
 		;;
-	    *)
+	    (*)
 		rpm_cv_dist_extra="$with_rpm_extra"
 		;;
 	esac
     ])
     AC_CACHE_CHECK([for rpm distribution extra release string2], [rpm_cv_dist_extra2], [dnl
 	case :${with_rpm_extra:-auto} in
-	    :no)
+	    (:no)
 		rpm_cv_dist_extra2=
 		;;
-	    :auto)
+	    (:auto)
 		case "$dist_cv_host_flavor" in
 		    (centos)
 			case $dist_cv_host_release in
@@ -296,7 +296,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			;;
 		esac
 		;;
-	    *)
+	    (*)
 		rpm_cv_dist_extra2="$with_rpm_extra"
 		;;
 	esac
@@ -396,13 +396,13 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
 	[with_rpm_topdir="$rpm_tmp"])
     AC_CACHE_CHECK([for rpm top build directory], [rpm_cv_topdir], [dnl
 	case :"${with_rpm_topdir:-default}" in
-	    :no | :NO)
+	    (:no | :NO)
 		rpm_cv_topdir="$rpm_tmp"
 		;;
-	    :yes | :YES | :default | :DEFAULT)
+	    (:yes | :YES | :default | :DEFAULT)
 		rpm_cv_topdir="$rpm_cv_dist_topdir"
 		;;
-	    *)
+	    (*)
 		rpm_cv_topdir="$with_rpm_topdir"
 		;;
 	esac

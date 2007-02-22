@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: devfs.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/02/12 10:39:47 $
+# @(#) $RCSfile: devfs.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/02/22 08:36:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/12 10:39:47 $ by $Author: brian $
+# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,9 +68,9 @@ AC_DEFUN([_LINUX_DEVFS], [dnl
 	    [build for the devfs. @<:@default=auto@:>@]))
     AC_CACHE_CHECK([for devfs kernel support], [devfs_cv_kernel_support], [dnl
 	case ":$enable_devfs" in
-	    :yes)   devfs_cv_kernel_support=yes ;;
-	    :no)    devfs_cv_kernel_support=no ;;
-	    :)  if test :"${linux_cv_CONFIG_DEVFS_FS:-no}" = :yes -o :"${linux_cv_CONFIG_DEVFS_MOUNT:-no}" = :yes
+	    (:yes)   devfs_cv_kernel_support=yes ;;
+	    (:no)    devfs_cv_kernel_support=no ;;
+	    (:)  if test :"${linux_cv_CONFIG_DEVFS_FS:-no}" = :yes -o :"${linux_cv_CONFIG_DEVFS_MOUNT:-no}" = :yes
 		then devfs_cv_kernel_support=yes
 		else devfs_cv_kernel_support=no
 		fi ;;

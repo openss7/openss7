@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/28 08:32:32 $
+# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/02/22 08:36:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,12 +48,15 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
+# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: nsl.m4,v $
-# Revision 0.9.2.8  2006/12/28 08:32:32  brian
+# Revision 0.9.2.9  2007/02/22 08:36:38  brian
+# - balance parentheses
+#
+# Revision 0.9.2.8  2006-12-28 08:32:32  brian
 # - use cache names for master src and build directories
 #
 # Revision 0.9.2.7  2006/09/30 07:29:06  brian
@@ -286,7 +289,7 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/local/include/strxnet
 			${DESTDIR}/usr/src/strxnet/src/include\""
 		    ;;
-		LfS)
+		(LfS)
 		    eval "nsl_search_path=\"
 			${DESTDIR}${includedir}/strnsl
 			${DESTDIR}${rootdir}${oldincludedir}/strnsl

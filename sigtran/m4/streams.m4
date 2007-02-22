@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2007/02/12 10:39:49 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2007/02/22 08:36:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/12 10:39:49 $ by $Author: brian $
+# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -187,7 +187,7 @@ dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
 dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly,
 dnl so we use defines.
     case "$streams_cv_package" in
-	LiS)
+	(LiS)
 	    if test -z "$with_lis" 
 	    then :;
 dnl             PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_lis --with-lis\""
@@ -196,7 +196,7 @@ dnl             ac_configure_args="$ac_configure_args --with-lis"
 	    fi
 	    AC_MSG_RESULT([--with-lis])
 	    ;;
-	LfS)
+	(LfS)
 	    if test -z "$with_lfs" 
 	    then :;
 dnl             PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_lfs --with-lfs\""
@@ -205,7 +205,7 @@ dnl             ac_configure_args="$ac_configure_args --with-lfs"
 	    fi
 	    AC_MSG_RESULT([--with-lfs])
 	    ;;
-	*)
+	(*)
 	    if test :"${with_lis:-no}" != :no ; then
 		AC_MSG_ERROR([
 *** 
@@ -812,10 +812,10 @@ AC_DEFUN([_LINUX_STREAMS_KERNEL], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS_OUTPUT], [dnl
     case "$streams_cv_package" in
-	LiS)
+	(LiS)
 	    _LINUX_STREAMS_LIS_DEFINES
 	    : ;;
-	LfS)
+	(LfS)
 	    _LINUX_STREAMS_LFS_DEFINES
 	    : ;;
     esac
@@ -837,15 +837,15 @@ AC_DEFUN([_LINUX_STREAMS_LIS_DEFINES], [dnl
 	    releases.])
     fi
     case "$target_cpu" in
-	alpha*)			: ;;
-	arm*)			: ;;
-	cris*)			: ;;
-	i?86* | k6* | athlon*)	: ;;
-	ia64)			: ;;
-	m68*)			: ;;
-	mips64*)		: ;;
-	mips*)			: ;;
-	hppa*)
+	(alpha*)		: ;;
+	(arm*)			: ;;
+	(cris*)			: ;;
+	(i?86* | k6* | athlon*)	: ;;
+	(ia64)			: ;;
+	(m68*)			: ;;
+	(mips64*)		: ;;
+	(mips*)			: ;;
+	(hppa*)
 dnl
 dnl	    Define when compiling for HPPA.  This define is only used for linux
 dnl	    kernel target.  This is really the wrong way to go about doing this:
@@ -858,7 +858,7 @@ dnl	    of PCI DMA mapping functions are available.
 dnl
 	    STREAMS_CPPFLAGS="-D_HPPA_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
-	ppc64* | powerpc64* )
+	(ppc64* | powerpc64* )
 dnl
 dnl	    Define when compiling for PPC64.  This define is only used for linux
 dnl	    kernel target.  This is really the wrong way to go about doing this:
@@ -874,7 +874,7 @@ dnl
 	    STREAMS_CPPFLAGS="-D_PPC64_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    STREAMS_CPPFLAGS="-D_PPC_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
-	ppc* | powerpc*)	
+	(ppc* | powerpc*)	
 dnl
 dnl	    Define when compiling for PPC.  This define is only used for linux
 dnl	    kernel target.  This is really the wrong way to go about doing this:
@@ -890,7 +890,7 @@ dnl	    memory.
 dnl
 	    STREAMS_CPPFLAGS="-D_PPC_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
-	s390x*)			
+	(s390x*)			
 dnl
 dnl	    Define when compiling for S390X.  This define is only used for the
 dnl	    linux kernel target.  This is really the wrong way to go about doing
@@ -906,7 +906,7 @@ dnl
 	    STREAMS_CPPFLAGS="-D_S390X_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    STREAMS_CPPFLAGS="-D_S390_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
-	s390*)			
+	(s390*)			
 dnl
 dnl	    Define when compiling for S390.  Strangely enough, _S390_LIS_ is
 dnl	    never checked without _S390X_LIS_.  Rendering it as an alias for the
@@ -914,8 +914,8 @@ dnl	    above.
 dnl
 	    STREAMS_CPPFLAGS="-D_S390_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
-	sh*)			: ;;
-	sparc64*)		
+	(sh*)			: ;;
+	(sparc64*)		
 dnl
 dnl	    Define when compiling for Sparc64.  This define is only used for the
 dnl	    linux kernel target.  This is really the wrong way to go about doing
@@ -928,7 +928,7 @@ dnl
 	    STREAMS_CPPFLAGS="-D_SPARC64_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    STREAMS_CPPFLAGS="-D_SPARC_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
-	sparc*)			
+	(sparc*)			
 dnl
 dnl	    Define when compiling for Sparc.  This define is used for the linux
 dnl	    kernel target.  This is really the wrong way to go about doing this:
@@ -940,7 +940,7 @@ dnl	    and when <linux/poll.h> is missing POLLMSG <LiS/include/sys/poll.h>
 dnl
 	    STREAMS_CPPFLAGS="-D_SPARC_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
-	x86_64*)
+	(x86_64*)
 dnl
 dnl	    Define when compiling for X86_64.  This define is only used for
 dnl	    linux kernel target.  This is really the wrong way to go about doing
@@ -955,7 +955,7 @@ dnl	    functions are available.
 dnl
 	    STREAMS_CPPFLAGS="-D_X86_64_LIS_${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
 	    ;;
-	*)			: ;;
+	(*)			: ;;
     esac
     STREAMS_CPPFLAGS="-DLIS${STREAMS_CPPFLAGS:+ }${STREAMS_CPPFLAGS}"
     STREAMS_LDADD="$streams_cv_lis_ldadd"

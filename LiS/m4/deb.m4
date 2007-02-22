@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/06/30 19:36:08 $
+# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/02/22 08:36:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/06/30 19:36:08 $ by $Author: brian $
+# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -169,13 +169,13 @@ AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
 	[with_deb_topdir="$deb_tmp"])
     AC_CACHE_CHECK([for deb top build directory], [deb_cv_topdir], [dnl
 	case :"$with_deb_topdir" in
-	    :no | :NO)
+	    (:no | :NO)
 		deb_cv_topdir="$deb_tmp"
 		;;
-	    :yes | :YES | :default | :DEFAULT)
+	    (:yes | :YES | :default | :DEFAULT)
 		deb_cv_topdir="/usr/src/debian"
 		;;
-	    *)
+	    (*)
 		deb_cv_topdir="$with_deb_topdir"
 		;;
 	esac

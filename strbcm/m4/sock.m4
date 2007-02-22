@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/28 08:32:32 $
+# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/02/22 08:36:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,12 +48,15 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
+# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sock.m4,v $
-# Revision 0.9.2.9  2006/12/28 08:32:32  brian
+# Revision 0.9.2.10  2007/02/22 08:36:38  brian
+# - balance parentheses
+#
+# Revision 0.9.2.9  2006-12-28 08:32:32  brian
 # - use cache names for master src and build directories
 #
 # Revision 0.9.2.8  2006/09/30 08:12:45  brian
@@ -278,7 +281,7 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/include/sock
 			${DESTDIR}/usr/local/include/sock\""
 		    ;;
-		LfS)
+		(LfS)
 		    eval "sock_search_path=\"
 			${DESTDIR}${includedir}/strsock
 			${DESTDIR}${rootdir}${oldincludedir}/strsock

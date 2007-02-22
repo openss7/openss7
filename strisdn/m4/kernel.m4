@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2006/10/27 22:17:02 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2007/02/22 08:36:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/27 22:17:02 $ by $Author: brian $
+# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -103,19 +103,19 @@ dnl But we need to skip -DMODVERSIONS and -include /blah/blah/modversion.h on rh
 dnl careful about -Wno warnings which we must keep, so put them back one at a time
     for i in $MODFLAGS $KERNEL_CPPFLAGS ; do
 	case "$i" in
-	    -Wno-*)
+	    (-Wno-*)
 		CPPFLAGS="$CPPFLAGS $i" ;;
 	esac
     done
     for i in $KERNEL_CFLAGS ; do
 	case "$i" in
-	    -Wno-*)
+	    (-Wno-*)
 		CFLAGS="$CFLAGS $i" ;;
 	esac
     done
     for i in $KERNEL_LDFLAGS ; do
 	case "$i" in
-	    -Wno-*)
+	    (-Wno-*)
 		LDFLAGS="$LDFLAGS $i" ;;
 	esac
     done
@@ -1239,9 +1239,9 @@ dnl
 	    else
 		linux_cv_k_compiler_match=no
 		linux_c1=`echo "$linux_cv_k_compiler" | sed -e 's|gcc version ||;s|[[[:space:]]].*[$]||'`
-		case "$linux_c1" in [[34]].*.*) linux_c1=`echo $linux_c1 | sed -e 's|\.[[^\.]]*[$]||'` ;; esac
+		case "$linux_c1" in ([[34]].*.*) linux_c1=`echo $linux_c1 | sed -e 's|\.[[^\.]]*[$]||'` ;; esac
 		linux_c2=`echo "$linux_cv_compiler" | sed -e 's|gcc version ||;s|[[[:space:]]].*[$]||'`
-		case "$linux_c2" in [[34]].*.*) linux_c2=`echo $linux_c2 | sed -e 's|\.[[^\.]]*[$]||'` ;; esac
+		case "$linux_c2" in ([[34]].*.*) linux_c2=`echo $linux_c2 | sed -e 's|\.[[^\.]]*[$]||'` ;; esac
 		if test "$linux_c1" = "$linux_c2"
 		then
 		    linux_cv_k_compiler_vmatch=yes
@@ -1252,11 +1252,11 @@ dnl
 	fi
     ])
     case :"$linux_cv_k_compiler_match" in
-	:yes)
+	(:yes)
 	    ;;
-	:no)
+	(:no)
 	    case :"$linux_cv_k_compiler_vmatch" in
-		:no)
+		(:no)
 	    AC_MSG_ERROR([
 *** 
 *** The kernel compiler was:
@@ -1268,7 +1268,7 @@ dnl
 *** This will cause real problems later.  Cannot proceed.
 *** ])
 		    ;;
-		:yes)
+		(:yes)
 	    AC_MSG_WARN([
 *** 
 *** The kernel compiler was:
@@ -1282,7 +1282,7 @@ dnl
 		    ;;
 	    esac
 	    ;;
-	:unknown)
+	(:unknown)
 	    AC_MSG_WARN([
 *** 
 *** The kernel compiler was:
@@ -1753,9 +1753,9 @@ dnl
 	shift 1
 	while test [$]# -gt 0 ; do
 	    case ":[$]1" in
-		:-I|:-D)   linux_cppflags="${linux_cppflags}${linux_cppflags:+ }[$]1 [$]2" ; shift 2 ;;
-		:-I*|:-D*) linux_cppflags="${linux_cppflags}${linux_cppflags:+ }[$]1"    ; shift 1 ;;
-		:*)          linux_cflags="${linux_cflags}${linux_cflags:+ }[$]1"        ; shift 1 ;;
+		(:-I|:-D)   linux_cppflags="${linux_cppflags}${linux_cppflags:+ }[$]1 [$]2" ; shift 2 ;;
+		(:-I*|:-D*) linux_cppflags="${linux_cppflags}${linux_cppflags:+ }[$]1"    ; shift 1 ;;
+		(:*)          linux_cflags="${linux_cflags}${linux_cflags:+ }[$]1"        ; shift 1 ;;
 	    esac
 	done
 	linux_cv_k_cflags="$linux_cflags"

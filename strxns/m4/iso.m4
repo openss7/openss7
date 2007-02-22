@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/28 08:32:31 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/02/22 08:36:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,12 +48,15 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/28 08:32:31 $ by $Author: brian $
+# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: iso.m4,v $
-# Revision 0.9.2.4  2006/12/28 08:32:31  brian
+# Revision 0.9.2.5  2007/02/22 08:36:38  brian
+# - balance parentheses
+#
+# Revision 0.9.2.4  2006-12-28 08:32:31  brian
 # - use cache names for master src and build directories
 #
 # Revision 0.9.2.3  2006/09/30 08:12:45  brian
@@ -247,7 +250,7 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/local/include/striso
 			${DESTDIR}/usr/src/striso/src/include\""
 		    ;;
-		LfS)
+		(LfS)
 		    eval "iso_search_path=\"
 			${DESTDIR}${includedir}/striso
 			${DESTDIR}${rootdir}${oldincludedir}/striso

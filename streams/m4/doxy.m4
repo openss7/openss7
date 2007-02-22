@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/19 10:51:00 $
+# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/02/22 08:36:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/19 10:51:00 $ by $Author: brian $
+# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,13 +79,13 @@ AC_DEFUN([_DOXY_CONFIG_STRIP_FROM_INC_PATH], [dnl
     do
 	doxy_incs=
 	case $doxy_tmp in
-	    -I*)
+	    (-I*)
 	    doxy_tmp=`echo $doxy_tmp | sed -e 's|^-I||'`
 	    doxy_tmp=`eval "echo \"$doxy_tmp\""`
 	    AC_MSG_CHECKING([for doxy include $doxy_tmp])
 	    case $doxy_tmp in
-		/*) ;;
-		*)
+		(/*) ;;
+		(*)
 		    if test -d $doxy_tmp ; then
 			doxy_tmp=`(cd $doxy_tmp ; pwd)`
 		    else

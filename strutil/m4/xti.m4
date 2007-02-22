@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2006/12/28 08:32:32 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/02/22 08:36:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,12 +48,15 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
+# Last Modified $Date: 2007/02/22 08:36:39 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xti.m4,v $
-# Revision 0.9.2.43  2006/12/28 08:32:32  brian
+# Revision 0.9.2.44  2007/02/22 08:36:39  brian
+# - balance parentheses
+#
+# Revision 0.9.2.43  2006-12-28 08:32:32  brian
 # - use cache names for master src and build directories
 #
 # Revision 0.9.2.42  2006/09/30 07:29:06  brian
@@ -281,7 +284,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/include/xti
 			${DESTDIR}/usr/local/include/xti\""
 		    ;;
-		LfS)
+		(LfS)
 		    eval "xti_search_path=\"
 			${DESTDIR}${includedir}/strxnet
 			${DESTDIR}${rootdir}${oldincludedir}/strxnet

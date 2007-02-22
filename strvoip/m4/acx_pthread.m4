@@ -62,7 +62,7 @@ acx_pthread_flags="pthreads none -Kthread -kthread lthread -pthread -pthreads -m
 # pthread-config: use pthread-config program (for GNU Pth library)
 
 case "${host_cpu}-${host_os}" in
-        *solaris*)
+        (*solaris*)
 
         # On Solaris (at least, for some versions), libc contains stubbed
         # (non-functional) versions of the pthreads routines, so link-based
@@ -80,23 +80,23 @@ if test x"$acx_pthread_ok" = xno; then
 for flag in $acx_pthread_flags; do
 
         case $flag in
-                none)
+                (none)
                 AC_MSG_CHECKING([whether pthreads work without any flags])
                 ;;
 
-                -*)
+                (-*)
                 AC_MSG_CHECKING([whether pthreads work with $flag])
                 PTHREAD_CFLAGS="$flag"
                 ;;
 
-		pthread-config)
+		(pthread-config)
 		AC_CHECK_PROG(acx_pthread_config, pthread-config, yes, no)
 		if test x"$acx_pthread_config" = xno; then continue; fi
 		PTHREAD_CFLAGS="`pthread-config --cflags`"
 		PTHREAD_LIBS="`pthread-config --ldflags` `pthread-config --libs`"
 		;;
 
-                *)
+                (*)
                 AC_MSG_CHECKING([for the pthreads library -l$flag])
                 PTHREAD_LIBS="-l$flag"
                 ;;
@@ -166,8 +166,8 @@ if test "x$acx_pthread_ok" = xyes; then
         AC_MSG_CHECKING([if more special flags are required for pthreads])
         flag=no
         case "${host_cpu}-${host_os}" in
-                *-aix* | *-freebsd* | *-darwin*) flag="-D_THREAD_SAFE";;
-                *solaris* | *-osf* | *-hpux*) flag="-D_REENTRANT";;
+                (*-aix* | *-freebsd* | *-darwin*) flag="-D_THREAD_SAFE";;
+                (*solaris* | *-osf* | *-hpux*) flag="-D_REENTRANT";;
         esac
         AC_MSG_RESULT(${flag})
         if test "x$flag" != xno; then
