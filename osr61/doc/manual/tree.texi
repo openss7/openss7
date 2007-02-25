@@ -1,0 +1,396 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id: tree.texi,v 0.9.2.1 2007/02/25 12:45:12 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2007/02/25 12:45:12 $ by $Author: brian $
+@c
+@c =========================================================================
+@c
+@c $Log: tree.texi,v $
+@c Revision 0.9.2.1  2007/02/25 12:45:12  brian
+@c - added new files for release package
+@c
+@c =========================================================================
+
+@cite{@value{PACKAGE_UCNAME}} creates the following kernel modules files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-}:@footnote{The kernel version
+@samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is expected.}
+
+@table @file
+@item modules.@value{PACKAGE_LCNAME}
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following kernel module files in the kernel modules
+directory, @file{/@-lib/@-modules/@-@value{_kversion}/@-@value{PACKAGE}/@-}:@footnote{The kernel
+version @samp{@value{_kversion}} is just and example.  For the running kernel, @samp{uname -r} is
+expected.}
+
+@table @file
+@item streams_dlgn.ko
+kernel module containing the @manref{dlgn(4)} @dfn{STREAMS} driver.
+@item streams_dvbm.ko
+kernel module containing the @manref{dvbm(4)} @dfn{STREAMS} module.
+@item streams_gncfg.ko
+kernel module containing the @manref{gncfd(4)} @dfn{STREAMS} driver.
+@item streams_gpio.ko
+kernel module containing the @manref{gpio(4)} @dfn{STREAMS} driver.
+@item streams_sctmr.ko
+kernel module containing the @manref{sctmr(4)} @dfn{STREAMS} module.
+@item streams_mercd.ko
+kernel module containing the @manref{mercd(4)} @dfn{STREAMS} driver.
+@item streams_pmacd.ko
+kernel module containing the @manref{pmacd(4)} @dfn{STREAMS} driver.
+@item ctimod.ko
+kernel module containing the @manref{ctimod(4)} kernel module.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following header files in the system include directory,
+@file{/@-usr/@-include/@-@value{PACKAGE}/@-}:
+
+@table @header
+@item sys/@value{PACKAGE}/config.h
+@value{PACKAGE} configuration header.
+@item sys/@value{PACKAGE}/version.h
+@value{PACKAGE} module version header.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following test programs in the system libexec directory,
+@file{/@-usr/@-libexec/@-@value{PACKAGE}/@-}:@footnote{Note that on some systems,
+@file{/usr/libexec} does not exist, and @file{/usr/lib} is used instead.}
+
+@table @file
+@item send-pr
+@itemx send-pr.config
+The @command{send-pr} stand-alone shell script can be used for the automatic generation of problem
+reports for the @cite{@value{PACKAGE_TITLE}} package.  The @file{send-pr.config} file provides
+localized definitions used by the @command{send-pr} program.
+For more information on problem reports, @xref{Problem Reports}, and, in particular, @xref{Stand
+Alone Problem Reports}.
+@item test-osr61
+test program.
+@item testsuite
+@itemx atlocal
+The @command{testsuite} stand-alone shell script invokes test cases in the test programs above as
+compiled into a comprehensive regression, troubleshooting and validation test suite for the
+@cite{@value{PACKAGE_TITLE}} drivers.  The @file{atlocal} file provides localized definitions used
+by the @command{testsuite} program.
+For more information on test suites, @xref{Test Suites}, and, in particular, @xref{Running Test
+Suites}.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following utility programs in the system binary
+directory, @file{/@-usr/@-sbin/@-}:
+
+@table @file
+@item @value{PACKAGE}_mknod
+This utility can be used by init scripts or administrative users to create or remove device nodes in
+the @file{/dev} directory for @cite{@value{PACKAGE_TITLE}} drivers.
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following user programs in the user binary
+directory, @file{/@-usr/@-bin/@-}:
+
+@table @file
+@end table
+@end ignore
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following static and shared object libraries in the
+system library directory, @file{/@-usr/@-lib/@-} (32-bit libraries) and @file{/@-usr/@-lib64/@-}
+(64-bit libraries):
+
+@table @file
+@item libtty.so.0.0.1
+@itemx libtty.so.0
+@itemx libtty.so
+@item libtty.a
+@item libtty.la
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following internationalization catalogues in
+the internationalization directory, @file{/@-usr/@-share/@-locale/}:
+
+@table @file
+@item de/LC_MESSAGES/@value{PACKAGE}.mo
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following init scripts in the system init directory,
+@file{/@-etc/@-rc.d/@-init.d/@-} (non-Debian) or @file{/@-etc/@-init.d/@-} (Debian):
+
+@table @file
+@item @value{PACKAGE}
+This is the name of the system init script on non-Debian based systems.
+@item @value{PACKAGE}.sh
+This is the name of the system init script on Debian based systems.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration files in the configuration
+directory, @file{/@-etc/@-}:
+
+@table @file
+@item @value{PACKAGE}.conf
+This file provided configuration information for any system controls affected by the
+@samp{@value{PACKAGE_NAME}} package.
+@item modutils/@-@value{PACKAGE}
+This file provides module definitions and demand loading aliases for the @file{@value{PACKAGE}}
+package.  This file is really only applicable to older 2.4 kernels.
+@ignore
+@item netconfig.d/@value{PACKAGE}
+This file provides the @manpage{netconfig(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{netconfig(5)} definitions are used by the @file{strnsl} package and the @file{libxnsl}
+library.
+@item sock2path.d/@value{PACKAGE}
+This file provides the @manpage{sock2path(5)} definitions for the @cite{@value{PACKAGE_TITLE}}
+drivers.
+@manpage{sock2path(5)} definitions are used by the @file{strsock} package and the @file{libsocket}
+library.
+@end ignore
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following system configuration file in the system
+configuration directory, @file{/@-etc/@-sysconfig/@-} (non-Debian) or @file{/@-etc/@-default/@-}
+(Debian):
+
+@table @file
+@item @value{PACKAGE}
+This file provides system configuration information used by init scripts for the
+@samp{@value{PACKAGE_NAME}} package.  Some options of init script execution can be controlled by
+this file.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following info files in the system info directory,
+@file{/@-usr/@-share/@-info/@-}:
+
+@table @file
+@item @value{PACKAGE}.info
+@itemx @value{PACKAGE}.info-1
+@itemx @value{PACKAGE}.info-2
+These files contain this manual in @cite{GNU info} format.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manpage macros and reference database files in
+the system man directory, @file{/@-usr/@-share/@-man/@-}:@footnote{Note that macro and reference
+databse files are not installed if the package is configured for cooked manpages.}
+
+@table @file
+@item @value{PACKAGE}.macros
+This file contains manual page macro definitions included by the manual pages included in the
+package.
+@item @value{PACKAGE}.refs
+This file contains a reference database referenced by the manual pages included in the package.
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man1/@-}:
+
+@table @file
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man2/@-}:
+
+@table @file
+@end table
+@end ignore
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man3/@-}:
+
+@table @file
+@item grantpt.3tty
+manual page for the @manref{grantpt(3tty)} library function.
+@item ptsname.3tty
+manual page for the @manref{ptsname(3tty)} library function.
+@item unlockpt.3tty
+manual page for the @manref{unlockpt(3tty)} library function.
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man4/@-}:
+
+@table @file
+@item dlgn.4
+manual page for the @manref{dlgn(4)} @dfn{STREAMS} driver.
+@item dvbm.4
+manual page for the @manref{dvbm(4)} @dfn{STREAMS} module.
+@item gncfd.4
+manual page for the @manref{gncfd(4)} @dfn{STREAMS} driver.
+@item gpio.4
+manual page for the @manref{gpio(4)} @dfn{STREAMS} driver.
+@item sctmr.4
+manual page for the @manref{sctmr(4)} @dfn{STREAMS} module.
+@item mercd.4
+manual page for the @manref{mercd(4)} @dfn{STREAMS} driver.
+@item pmacd.4
+manual page for the @manref{pmacd(4)} driver.
+@item ctimod.4
+manual page for the @manref{ctimod(4)} kernel module.
+@end table
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man5/@-}:
+
+@table @file
+@item @value{PACKAGE}.5
+manual page for the @manpage{@value{PACKAGE}(5)} package.
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man7/@-}:
+
+@table @file
+@end table
+@end ignore
+
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man8/@-}:
+
+@table @file
+@item @value{PACKAGE}_mknod.8
+Documentation for the @manpage{@value{PACKAGE}_mknod(8)} utility program.
+@item test-osr61.8
+manual page for the @manref{test-osr61(8)} program.
+@end table
+
+@ignore
+@cite{@value{PACKAGE_UCNAME}} installs the following manual pages in the system man directory,
+@file{/@-usr/@-share/@-man/@-man9/@-}:
+
+@table @file
+@end table
+@end ignore
+
+@ignore
+/usr
+/usr/include
+/usr/include/strtty
+/usr/include/strtty/sys
+/usr/include/strtty/sys/strtty
+/usr/include/strtty/sys/strtty/config.h
+/usr/include/strtty/sys/strtty/version.h
+/usr/include/strtty/sys/ttydev.h
+/usr/include/strtty/sys/termios.h
+/usr/include/strtty/sys/termio.h
+/usr/include/strtty/sys/sgtty.h
+/usr/include/strtty/sys/ttyio.h
+/usr/include/strtty/sys/strtty.h
+/usr/include/strtty/sys/ttychars.h
+/usr/include/strtty/sys/pty.h
+/usr/include/strtty/ttychars.h
+/usr/include/strtty/ttcompat.h
+/usr/include/strtty/sgtty.h
+/usr/include/strtty/termios.h
+/usr/include/strtty/termio.h
+/usr/lib
+/usr/bin
+/usr/libexec
+/usr/libexec/strtty
+/usr/libexec/strtty/send-pr
+/usr/libexec/strtty/send-pr.config
+/usr/libexec/strtty/test-tty
+/usr/libexec/strtty/testsuite
+/usr/libexec/strtty/atlocal
+/usr/sbin
+/usr/sbin/strtty_mknod
+/usr/share
+/usr/share/man
+/usr/share/man/strtty.macros
+/usr/share/man/strtty.refs
+/usr/share/man/man3
+/usr/share/man/man3/grantpt.3tty
+/usr/share/man/man3/ptsname.3tty
+/usr/share/man/man3/unlockpt.3tty
+/usr/share/man/man4
+/usr/share/man/man4/ldterm.4
+/usr/share/man/man4/pckt.4
+/usr/share/man/man4/ptc.4
+/usr/share/man/man4/ptem.4
+/usr/share/man/man4/ptm.4
+/usr/share/man/man4/ptmx.4tty
+/usr/share/man/man4/pts.4tty
+/usr/share/man/man4/pty.4
+/usr/share/man/man4/ttcompat.4
+/usr/share/man/man5
+/usr/share/man/man5/strtty.5
+/usr/share/man/man8
+/usr/share/man/man8/strtty_mknod.8
+/usr/share/man/man8/test-tty.8
+/usr/share/info
+/usr/share/info/strtty.info
+/usr/share/info/strtty.info-1
+/usr/share/info/strtty.info-2
+/etc
+/etc/strtty.conf
+/etc/default
+/etc/default/strtty
+/etc/init.d
+/etc/init.d/strtty.sh
+/etc/modutils
+/lib
+/lib/modules
+/lib/modules/2.6.15-27-server
+/lib/modules/2.6.15-27-server/strtty
+/lib/modules/2.6.15-27-server/strtty/streams_pckt.ko
+/lib/modules/2.6.15-27-server/strtty/streams_ptem.ko
+/lib/modules/2.6.15-27-server/strtty/streams_ttcompat.ko
+/lib/modules/2.6.15-27-server/strtty/streams_ldterm.ko
+/lib/modules/2.6.15-27-server/strtty/streams_pty.ko
+@end ignore

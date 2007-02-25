@@ -1,0 +1,178 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: gpio.4.man,v 0.9.2.1 2007/02/25 12:45:00 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/02/25 12:45:00 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: gpio.4.man,v $
+.\" Revision 0.9.2.1  2007/02/25 12:45:00  brian
+.\" - added new files for release package
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database osr61.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so osr61.macros
+.\"
+.\"
+.TH GPIO 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B gpio
+\- Dialogic \fISTREAMS\fR device driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP
+.BI "int " fd " = open(" \fR\(lq/dev/streams/clone/gpio\(rq\fP ", " \fRO_RDWR\fP );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B gpio
+module is a generic input-output driver and is used to download the firmware onto the board.  This
+driver interfaces with the GPIO Driver library (libgpio.so) and is utilized by the GENLOAD
+application during the start of all the Dialogic\(rg services.  The driver locates boards in the
+system by providing the physical address, bus, slot and other information to GENLOAD.  This is used
+by gpiodebug for debugging the memory and I/O devices.
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.\".SH IOCTLS
+.\".PP
+.\"
+.\"
+.SH NOTICES
+.PP
+This is a port of the Dialogic\(rg Open System Release 6.1 version 239 GPL'ed
+drivers to
+.BR "Linux Fast-STREAMS" .
+.PP
+This is alpha-release software and has not been tested on any actual
+Dialogic\(rg hardware to date (the problem being the lack of hardware with
+which to test).
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH DEVICES
+.PP
+Devices provided by the
+.B gpio
+driver are as follows:
+.TP
+.B /dev/streams/clone/gpio
+clone device for the
+.B gpio
+driver under
+.BR "Linux Fast-STREAMS" .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR dlgn (4),
+.BR dvbm (4),
+.BR gncfd (4),
+.BR gpio (4),
+.BR sctmr (4),
+.BR osr61 (5).
+.\"
+.\"
+.SH BUGS
+.PP
+.B gpio
+has obvious bugs from inspection.
+The penchant of the original GPL release for suppressing compiler warnings is
+worrisome.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+These drivers should be compatible with OSR 6.1 Release 239.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR Dialogic \(rg
+specifications.
+.\"
+.\"
+.SH HISTORY
+.PP
+This driver is part of the Springware support from earlier Dialogic\(rg
+drivers.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

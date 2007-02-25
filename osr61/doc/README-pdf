@@ -1,0 +1,117 @@
+Dialogic Open Systems Release 6.1 -- read me first file.  2007-02-24
+$Id: README-pdf,v 0.9.2.1 2007/02/25 12:26:17 brian Exp $
+Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+PDF documentation in this directory cannot be redistributed.  It is
+checked in to CVS and GIT just to keep my copy in a convenient location.
+Please obtain your own copies from the Intel website.  This is Intel
+documentation:
+
+	app_note_h323_to_host_based_v2.pdf
+	audio_conf_api_v3.pdf
+	audio_conf_programming_lin_v4.pdf
+	board_mgmt_api_v2.pdf
+	clock_fallback_demo_lin_v2.pdf
+	csp_api_v5.pdf
+	csp_demo_v5.pdf
+	csp_programming_v5.pdf
+	digital_network_api_v5.pdf
+	dm3_config_lin_v2.pdf
+	dm3_config_lin_v3.pdf
+	DriverArchitectureHLD-1.pdf
+	fax_api_v1.pdf
+	globalcall_api_v6.pdf
+	globalcall_cdp_config_v5.pdf
+	globalcall_demo_v3.pdf
+	globalcall_for_analog_v8.pdf
+	globalcall_for_e1t1_v1.pdf
+	globalcall_for_ip_v3.pdf
+	globalcall_for_isdn_v3.pdf
+	globalcall_for_ss7_v4.pdf
+	globalcall_programming_lin_v3.pdf
+	high_availability_demo_lin_v4.pdf
+	hld.pdf
+	HostProductArchitectur-1.pdf
+	ip_media_api_v5.pdf
+	ip_media_programming_v5.pdf
+	ip_media_server_demo_v3.pdf
+	iptseries_config_lin_v2.pdf
+	isdn_api_v5.pdf
+	learnmode_tsf_api_v1.pdf
+	msi_api_v4.pdf
+	msi_programming_v2.pdf
+	oam_api_lin_v4.pdf
+	OAMProductArchitecture.pdf
+	oam_programming_lin_v4.pdf
+	pbx_integration_api_v11.pdf
+	pbx_integration_programming_v9.pdf
+	ProductArchitecture_iphost.pdf
+	release_guide.pdf
+	release_install.pdf
+	release_update.pdf
+	snmp_admin_lin_v3.pdf
+	springware_config_lin_v1.pdf
+	springware_config_lin_v2.pdf
+	srl_api_v4.pdf
+	srl_programming_lin_v3.pdf
+	system_admin_lin_v4.pdf
+	system_diagnostics_v7.pdf
+	voice_api_v2.pdf
+	voice_demo_lin_v2.pdf
+	voice_programming_v2.pdf
+
+-----
+
+=========================================================================
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

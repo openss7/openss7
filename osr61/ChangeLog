@@ -1,0 +1,431 @@
+2007-02-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* .cvsignore: added release file
+	* .debepoch: added release file
+	* .debrelease: added release file
+	* .pkgepoch: added release file
+	* .pkgrelease: added release file
+	* .rpmepoch: added release file
+	* .rpmrelease: added release file
+	* ANNOUNCE: added release file
+	* AUTHORS: added release file
+	* ChangeLog: added release file
+	* Makefile.am: added release file
+	* NEWS: added release file
+	* README: added release file
+	* THANKS: added release file
+	* acinclude.m4: added release file
+	* configure.ac: added release file
+	* configure.nexusware: added release file
+	* osr61.dox.in: added release file
+	* osr61.gif: added release file
+	* osr61.lsm.in: added release file
+	* osr61.spec.in: added release file
+	* osr61.tif: added release file
+	* osr61.xcf: added release file
+	* osr61.xpm: added release file
+	* debian/README.Debian: added release file
+	* debian/TODO.Debian: added release file
+	* debian/changelog: added release file
+	* debian/control.in: added release file
+	* debian/copyright: added release file
+	* debian/mscript_header.in: added release file
+	* debian/mscript_postinst.in: added release file
+	* debian/mscript_postrm.in: added release file
+	* debian/mscript_preinst.in: added release file
+	* debian/mscript_prerm.in: added release file
+	* debian/osr61-core.postinst.in: added release file
+	* debian/osr61-core.postrm.in: added release file
+	* debian/osr61-core.preinst.in: added release file
+	* debian/osr61-core.prerm.in: added release file
+	* debian/osr61-dev.postinst.in: added release file
+	* debian/osr61-dev.preinst.in: added release file
+	* debian/osr61-dev.prerm.in: added release file
+	* debian/osr61-devel.preinst.in: added release file
+	* debian/osr61-doc.postinst.in: added release file
+	* debian/osr61-doc.preinst.in: added release file
+	* debian/osr61-doc.prerm.in: added release file
+	* debian/osr61-init.postinst.in: added release file
+	* debian/osr61-init.postrm.in: added release file
+	* debian/osr61-init.preinst.in: added release file
+	* debian/osr61-init.prerm.in: added release file
+	* debian/osr61-lib.preinst.in: added release file
+	* debian/osr61-source.preinst.in: added release file
+	* debian/osr61-util.preinst.in: added release file
+	* debian/rules.in: added release file
+	* doc/.cvsignore: added release file
+	* doc/DriverArchitectureHLD-1.pdf: added release file
+	* doc/HostProductArchitectur-1.pdf: added release file
+	* doc/Makefile.am: added release file
+	* doc/OAMProductArchitecture.pdf: added release file
+	* doc/ProductArchitecture_iphost.pdf: added release file
+	* doc/README-pdf: added release file
+	* doc/app_note_h323_to_host_based_v2.pdf: added release file
+	* doc/audio_conf_api_v3.pdf: added release file
+	* doc/audio_conf_programming_lin_v4.pdf: added release file
+	* doc/board_mgmt_api_v2.pdf: added release file
+	* doc/clock_fallback_demo_lin_v2.pdf: added release file
+	* doc/csp_api_v5.pdf: added release file
+	* doc/csp_demo_v5.pdf: added release file
+	* doc/csp_programming_v5.pdf: added release file
+	* doc/digital_network_api_v5.pdf: added release file
+	* doc/dm3_config_lin_v2.pdf: added release file
+	* doc/dm3_config_lin_v3.pdf: added release file
+	* doc/fax_api_v1.pdf: added release file
+	* doc/globalcall_api_v6.pdf: added release file
+	* doc/globalcall_cdp_config_v5.pdf: added release file
+	* doc/globalcall_demo_v3.pdf: added release file
+	* doc/globalcall_for_analog_v8.pdf: added release file
+	* doc/globalcall_for_e1t1_v1.pdf: added release file
+	* doc/globalcall_for_ip_v3.pdf: added release file
+	* doc/globalcall_for_isdn_v3.pdf: added release file
+	* doc/globalcall_for_ss7_v4.pdf: added release file
+	* doc/globalcall_programming_lin_v3.pdf: added release file
+	* doc/high_availability_demo_lin_v4.pdf: added release file
+	* doc/hld.pdf: added release file
+	* doc/ip_media_api_v5.pdf: added release file
+	* doc/ip_media_programming_v5.pdf: added release file
+	* doc/ip_media_server_demo_v3.pdf: added release file
+	* doc/iptseries_config_lin_v2.pdf: added release file
+	* doc/isdn_api_v5.pdf: added release file
+	* doc/learnmode_tsf_api_v1.pdf: added release file
+	* doc/msi_api_v4.pdf: added release file
+	* doc/msi_programming_v2.pdf: added release file
+	* doc/oam_api_lin_v4.pdf: added release file
+	* doc/oam_programming_lin_v4.pdf: added release file
+	* doc/pbx_integration_api_v11.pdf: added release file
+	* doc/pbx_integration_programming_v9.pdf: added release file
+	* doc/release_guide.pdf: added release file
+	* doc/release_install.pdf: added release file
+	* doc/release_update.pdf: added release file
+	* doc/snmp_admin_lin_v3.pdf: added release file
+	* doc/springware_config_lin_v1.pdf: added release file
+	* doc/springware_config_lin_v2.pdf: added release file
+	* doc/srl_api_v4.pdf: added release file
+	* doc/srl_programming_lin_v3.pdf: added release file
+	* doc/system_admin_lin_v4.pdf: added release file
+	* doc/system_diagnostics_v7.pdf: added release file
+	* doc/voice_api_v2.pdf: added release file
+	* doc/voice_demo_lin_v2.pdf: added release file
+	* doc/voice_programming_v2.pdf: added release file
+	* doc/man/.cvsignore: added release file
+	* doc/man/Makefile.am: added release file
+	* doc/man/osr61.macros: added release file
+	* doc/man/osr61.refs: added release file
+	* doc/man/man4/ctimod.4.man: added release file
+	* doc/man/man4/dlgn.4.man: added release file
+	* doc/man/man4/dvbm.4.man: added release file
+	* doc/man/man4/gncfd.4.man: added release file
+	* doc/man/man4/gpio.4.man: added release file
+	* doc/man/man4/mercd.4.man: added release file
+	* doc/man/man4/pmacd.4.man: added release file
+	* doc/man/man4/sctmr.4.man: added release file
+	* doc/man/man5/osr61.5.man: added release file
+	* doc/man/man8/osr61_mknod.8.man: added release file
+	* doc/man/man8/test-osr61.8.man: added release file
+	* doc/manual/.cvsignore: added release file
+	* doc/manual/Makefile.am: added release file
+	* doc/manual/bugs.texi: added release file
+	* doc/manual/configure.texi: added release file
+	* doc/manual/descrip.texi: added release file
+	* doc/manual/news.texi: added release file
+	* doc/manual/osr61.texi: added release file
+	* doc/manual/prerequisites.texi: added release file
+	* doc/manual/releases.texi: added release file
+	* doc/manual/rpm.texi: added release file
+	* doc/manual/todo.texi: added release file
+	* doc/manual/tree.texi: added release file
+	* lib32/.cvsignore: added release file
+	* lib32/Makefile.am: added release file
+	* src/.cvsignore: added release file
+	* src/Makefile.am: added release file
+	* src/drivers/Config.in: added release file
+	* src/include/.cvsignore: added release file
+	* src/include/Makefile.am: added release file
+	* src/include/sys/osr61/config.h.in: added release file
+	* src/include/sys/osr61/version.h.in: added release file
+	* src/lib/gc/gclib.h: added release file
+	* src/test/test-osr61.c: added release file
+	* src/util/init/README: added release file
+	* src/util/init/osr61: added release file
+	* src/util/init/osr61.sh: added release file
+	* src/util/modutils/osr61.in: added release file
+	* src/util/sysconfig/osr61: added release file
+	* src/util/sysconfig/osr61.conf: added release file
+	* tests/.cvsignore: added release file
+	* tests/Makefile.am: added release file
+	* tests/atlocal.in: added release file
+	* tests/dummy1.m4: added release file
+	* tests/dummy2.m4: added release file
+	* tests/dummy3.m4: added release file
+	* tests/dummy4.m4: added release file
+	* tests/kernel.at: added release file
+	* tests/local.at: added release file
+	* tests/testsuite.at: added release file
+
+2007-02-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/ins_rmv_drvs.sh: added upstream file
+	* src/drivers/ctimod/Makefile: added upstream file
+	* src/drivers/ctimod/ctimod.c: added upstream file
+	* src/drivers/dlgn/Makefile: added upstream file
+	* src/drivers/dlgn/include/andam.h: added upstream file
+	* src/drivers/dlgn/include/andrv.h: added upstream file
+	* src/drivers/dlgn/include/anlibdrv.h: added upstream file
+	* src/drivers/dlgn/include/anprot.h: added upstream file
+	* src/drivers/dlgn/include/anstart.h: added upstream file
+	* src/drivers/dlgn/include/antares.h: added upstream file
+	* src/drivers/dlgn/include/antares.ver: added upstream file
+	* src/drivers/dlgn/include/anterror.h: added upstream file
+	* src/drivers/dlgn/include/antglob.h: added upstream file
+	* src/drivers/dlgn/include/antpci.h: added upstream file
+	* src/drivers/dlgn/include/d40defs.h: added upstream file
+	* src/drivers/dlgn/include/d40low.h: added upstream file
+	* src/drivers/dlgn/include/dlgclinux.h: added upstream file
+	* src/drivers/dlgn/include/dlgcos.h: added upstream file
+	* src/drivers/dlgn/include/dlgn.h: added upstream file
+	* src/drivers/dlgn/include/dlgn2cfd.h: added upstream file
+	* src/drivers/dlgn/include/dlgnextern.h: added upstream file
+	* src/drivers/dlgn/include/dpci.h: added upstream file
+	* src/drivers/dlgn/include/drvdebug.h: added upstream file
+	* src/drivers/dlgn/include/drvprot.h: added upstream file
+	* src/drivers/dlgn/include/dxdevdef.h: added upstream file
+	* src/drivers/dlgn/include/dxdrv.h: added upstream file
+	* src/drivers/dlgn/include/dxlibdrv.h: added upstream file
+	* src/drivers/dlgn/include/dxmsg.h: added upstream file
+	* src/drivers/dlgn/include/dxstart.h: added upstream file
+	* src/drivers/dlgn/include/extern.h: added upstream file
+	* src/drivers/dlgn/include/extvar.h: added upstream file
+	* src/drivers/dlgn/include/fln.h: added upstream file
+	* src/drivers/dlgn/include/fx12low.h: added upstream file
+	* src/drivers/dlgn/include/fxphym.h: added upstream file
+	* src/drivers/dlgn/include/genboot.h: added upstream file
+	* src/drivers/dlgn/include/genbootdef.h: added upstream file
+	* src/drivers/dlgn/include/gentypedefs.h: added upstream file
+	* src/drivers/dlgn/include/gnbulk.h: added upstream file
+	* src/drivers/dlgn/include/gndbg.h: added upstream file
+	* src/drivers/dlgn/include/gndefs.h: added upstream file
+	* src/drivers/dlgn/include/gndlgn.h: added upstream file
+	* src/drivers/dlgn/include/gndrv.h: added upstream file
+	* src/drivers/dlgn/include/gnerrno.h: added upstream file
+	* src/drivers/dlgn/include/gnlibdrv.h: added upstream file
+	* src/drivers/dlgn/include/gnlogmsg.h: added upstream file
+	* src/drivers/dlgn/include/gnmsg.h: added upstream file
+	* src/drivers/dlgn/include/gnstart.h: added upstream file
+	* src/drivers/dlgn/include/gpiolib.h: added upstream file
+	* src/drivers/dlgn/include/hardexp.h: added upstream file
+	* src/drivers/dlgn/include/hardware.h: added upstream file
+	* src/drivers/dlgn/include/include.h: added upstream file
+	* src/drivers/dlgn/include/intrface.h: added upstream file
+	* src/drivers/dlgn/include/pmswtbl.h: added upstream file
+	* src/drivers/dlgn/include/protocol.h: added upstream file
+	* src/drivers/dlgn/include/sbadefs.h: added upstream file
+	* src/drivers/dlgn/include/sbaextern.h: added upstream file
+	* src/drivers/dlgn/include/sbalibdrv.h: added upstream file
+	* src/drivers/dlgn/include/sbamapin.h: added upstream file
+	* src/drivers/dlgn/include/sbapm.h: added upstream file
+	* src/drivers/dlgn/include/sbastart.h: added upstream file
+	* src/drivers/dlgn/include/sbdlib.h: added upstream file
+	* src/drivers/dlgn/include/sbdmsg.h: added upstream file
+	* src/drivers/dlgn/include/srbulk.h: added upstream file
+	* src/drivers/dlgn/include/srchk.h: added upstream file
+	* src/drivers/dlgn/include/srcmd.h: added upstream file
+	* src/drivers/dlgn/include/srdbg.h: added upstream file
+	* src/drivers/dlgn/include/srdefs.h: added upstream file
+	* src/drivers/dlgn/include/srextern.h: added upstream file
+	* src/drivers/dlgn/include/srmap.h: added upstream file
+	* src/drivers/dlgn/include/srmisc.h: added upstream file
+	* src/drivers/dlgn/include/srpm.h: added upstream file
+	* src/drivers/dlgn/include/typedef.h: added upstream file
+	* src/drivers/dlgn/include/typedefs.h: added upstream file
+	* src/drivers/dlgn/include/var.h: added upstream file
+	* src/drivers/dlgn/include/vrxlow.h: added upstream file
+	* src/drivers/dlgn/include/vvfwdefs.h: added upstream file
+	* src/drivers/dlgn/source/andam.c: added upstream file
+	* src/drivers/dlgn/source/aninit.c: added upstream file
+	* src/drivers/dlgn/source/anprot.c: added upstream file
+	* src/drivers/dlgn/source/antbd.c: added upstream file
+	* src/drivers/dlgn/source/antlow.c: added upstream file
+	* src/drivers/dlgn/source/antpci.c: added upstream file
+	* src/drivers/dlgn/source/dlgn.c: added upstream file
+	* src/drivers/dlgn/source/driver.c: added upstream file
+	* src/drivers/dlgn/source/drvprot.c: added upstream file
+	* src/drivers/dlgn/source/hardware.c: added upstream file
+	* src/drivers/dlgn/source/sbamapin.c: added upstream file
+	* src/drivers/dlgn/source/shrdware.c: added upstream file
+	* src/drivers/dlgn/source/srbulk.c: added upstream file
+	* src/drivers/dlgn/source/srchk.c: added upstream file
+	* src/drivers/dlgn/source/srcmd.c: added upstream file
+	* src/drivers/dlgn/source/srintr.c: added upstream file
+	* src/drivers/dlgn/source/srmap.c: added upstream file
+	* src/drivers/dlgn/source/srmisc.c: added upstream file
+	* src/drivers/dlgn/source/srpm.c: added upstream file
+	* src/drivers/dvbm/Makefile: added upstream file
+	* src/drivers/dvbm/include/dvbm.h: added upstream file
+	* src/drivers/dvbm/include/dvbmextern.h: added upstream file
+	* src/drivers/dvbm/source/dvbm.c: added upstream file
+	* src/drivers/gncfd/Makefile: added upstream file
+	* src/drivers/gncfd/include/cfd.h: added upstream file
+	* src/drivers/gncfd/include/cfd2dlgn.h: added upstream file
+	* src/drivers/gncfd/include/cfdextern.h: added upstream file
+	* src/drivers/gncfd/include/cfmsg.h: added upstream file
+	* src/drivers/gncfd/include/gncfd.h: added upstream file
+	* src/drivers/gncfd/include/gnstatus.h: added upstream file
+	* src/drivers/gncfd/source/cfd.c: added upstream file
+	* src/drivers/gpio/Makefile: added upstream file
+	* src/drivers/gpio/include/gpiodrv.h: added upstream file
+	* src/drivers/gpio/source/gpiodrv.c: added upstream file
+	* src/drivers/mercd/Makefile: added upstream file
+	* src/drivers/mercd/include/ctimod.h: added upstream file
+	* src/drivers/mercd/include/debug.h: added upstream file
+	* src/drivers/mercd/include/dlver.h: added upstream file
+	* src/drivers/mercd/include/dtrace.h: added upstream file
+	* src/drivers/mercd/include/mercd.h: added upstream file
+	* src/drivers/mercd/include/mercd_dhal.h: added upstream file
+	* src/drivers/mercd/include/mercd_osal.h: added upstream file
+	* src/drivers/mercd/include/msd.h: added upstream file
+	* src/drivers/mercd/include/msddbg.h: added upstream file
+	* src/drivers/mercd/include/msddlver.h: added upstream file
+	* src/drivers/mercd/include/msddrvparam.h: added upstream file
+	* src/drivers/mercd/include/msdextern.h: added upstream file
+	* src/drivers/mercd/include/msdlinux.h: added upstream file
+	* src/drivers/mercd/include/msdlinuxlock.h: added upstream file
+	* src/drivers/mercd/include/msdlinuxwwmacros.h: added upstream file
+	* src/drivers/mercd/include/msdmacro.h: added upstream file
+	* src/drivers/mercd/include/msdmercif.h: added upstream file
+	* src/drivers/mercd/include/msdmmgr.h: added upstream file
+	* src/drivers/mercd/include/msdmsgdef.h: added upstream file
+	* src/drivers/mercd/include/msdmsgs.h: added upstream file
+	* src/drivers/mercd/include/msdnative.h: added upstream file
+	* src/drivers/mercd/include/msdparam.h: added upstream file
+	* src/drivers/mercd/include/msdpciif.h: added upstream file
+	* src/drivers/mercd/include/msdqueue.h: added upstream file
+	* src/drivers/mercd/include/msdshrdata.h: added upstream file
+	* src/drivers/mercd/include/msdsram.h: added upstream file
+	* src/drivers/mercd/include/msdsramif.h: added upstream file
+	* src/drivers/mercd/include/msdstrms.h: added upstream file
+	* src/drivers/mercd/include/msdstruct.h: added upstream file
+	* src/drivers/mercd/include/msdthread.h: added upstream file
+	* src/drivers/mercd/include/msdtypes.h: added upstream file
+	* src/drivers/mercd/include/msdvbrd.h: added upstream file
+	* src/drivers/mercd/include/msdwwdefs.h: added upstream file
+	* src/drivers/mercd/include/msdwwtypes.h: added upstream file
+	* src/drivers/mercd/include/qdrverr.h: added upstream file
+	* src/drivers/mercd/include/qhosttypes.h: added upstream file
+	* src/drivers/mercd/include/qoscommon.h: added upstream file
+	* src/drivers/mercd/include/qstrtype.h: added upstream file
+	* src/drivers/mercd/include/qtypes.h: added upstream file
+	* src/drivers/mercd/source/mercd.c: added upstream file
+	* src/drivers/mercd/source/mercd_linux_dma_pci.c: added upstream file
+	* src/drivers/mercd/source/mercd_linux_entry.c: added upstream file
+	* src/drivers/mercd/source/mercd_linux_osal.c: added upstream file
+	* src/drivers/mercd/source/mercd_linux_pci_dhal.c: added upstream file
+	* src/drivers/mercd/source/mercd_native.c: added upstream file
+	* src/drivers/mercd/source/mercd_native_util.c: added upstream file
+	* src/drivers/mercd/source/mercd_ossdl_linux.c: added upstream file
+	* src/drivers/mercd/source/mercd_osshl_linux_pci.c: added upstream file
+	* src/drivers/mercd/source/mercd_ww_ossdl_linux.c: added upstream file
+	* src/drivers/mercd/source/msdbndmgr.c: added upstream file
+	* src/drivers/mercd/source/msdbndutl.c: added upstream file
+	* src/drivers/mercd/source/msdbrdmgr.c: added upstream file
+	* src/drivers/mercd/source/msdbrdutl.c: added upstream file
+	* src/drivers/mercd/source/msddbg.c: added upstream file
+	* src/drivers/mercd/source/msddpc.c: added upstream file
+	* src/drivers/mercd/source/msddrvrmgr.c: added upstream file
+	* src/drivers/mercd/source/msdfwmgr.c: added upstream file
+	* src/drivers/mercd/source/msdmsgmgr.c: added upstream file
+	* src/drivers/mercd/source/msdqueue.c: added upstream file
+	* src/drivers/mercd/source/msdrcv.c: added upstream file
+	* src/drivers/mercd/source/msdshrdata.c: added upstream file
+	* src/drivers/mercd/source/msdsnd.c: added upstream file
+	* src/drivers/mercd/source/msdstrmmgr.c: added upstream file
+	* src/drivers/mercd/source/msdstrmutl.c: added upstream file
+	* src/drivers/mercd/source/msdsupp.c: added upstream file
+	* src/drivers/mercd/source/msdtime.c: added upstream file
+	* src/drivers/mercd/source/msdversion.ver: added upstream file
+	* src/drivers/mercd/source/msdwwdpc.c: added upstream file
+	* src/drivers/mercd/source/msdwwinitmngr.c: added upstream file
+	* src/drivers/mercd/source/msdwwinitmngrutl.c: added upstream file
+	* src/drivers/mercd/source/msdwwmsgutl.c: added upstream file
+	* src/drivers/mercd/source/msdwwrcv.c: added upstream file
+	* src/drivers/mercd/source/msdwwsnd.c: added upstream file
+	* src/drivers/mercd/source/msdwwstrmutl.c: added upstream file
+	* src/drivers/mercd/source/msdwwtime.c: added upstream file
+	* src/drivers/mercd/source/msdwwutl.c: added upstream file
+	* src/drivers/pmacd/Makefile: added upstream file
+	* src/drivers/pmacd/include/21554.h: added upstream file
+	* src/drivers/pmacd/include/pmacd.h: added upstream file
+	* src/drivers/pmacd/include/pmacd_board.h: added upstream file
+	* src/drivers/pmacd/include/pmacd_control.h: added upstream file
+	* src/drivers/pmacd/include/pmacd_driver.h: added upstream file
+	* src/drivers/pmacd/include/pmacd_interrupt.h: added upstream file
+	* src/drivers/pmacd/include/pmacd_linux_entry.h: added upstream file
+	* src/drivers/pmacd/include/pmacd_linux_pci.h: added upstream file
+	* src/drivers/pmacd/include/pmacd_mf.h: added upstream file
+	* src/drivers/pmacd/include/pmacd_parameters.h: added upstream file
+	* src/drivers/pmacd/include/pmacd_pmb.h: added upstream file
+	* src/drivers/pmacd/include/pmacd_proc.h: added upstream file
+	* src/drivers/pmacd/include/pmacd_stream.h: added upstream file
+	* src/drivers/pmacd/source/pmacd_board.c: added upstream file
+	* src/drivers/pmacd/source/pmacd_control.c: added upstream file
+	* src/drivers/pmacd/source/pmacd_driver.c: added upstream file
+	* src/drivers/pmacd/source/pmacd_interrupt.c: added upstream file
+	* src/drivers/pmacd/source/pmacd_linux_entry.c: added upstream file
+	* src/drivers/pmacd/source/pmacd_linux_pci.c: added upstream file
+	* src/drivers/pmacd/source/pmacd_mf.c: added upstream file
+	* src/drivers/pmacd/source/pmacd_parameters.c: added upstream file
+	* src/drivers/pmacd/source/pmacd_pmb.c: added upstream file
+	* src/drivers/pmacd/source/pmacd_proc.c: added upstream file
+	* src/drivers/pmacd/source/pmacd_stream.c: added upstream file
+	* src/drivers/pmacd/source/pmacd_version.c: added upstream file
+	* src/drivers/sctmr/Makefile: added upstream file
+	* src/drivers/sctmr/include/diagkern.h: added upstream file
+	* src/drivers/sctmr/include/sctextern.h: added upstream file
+	* src/drivers/sctmr/include/sctqueue.h: added upstream file
+	* src/drivers/sctmr/include/scttimer.h: added upstream file
+	* src/drivers/sctmr/include/timerlibmod.h: added upstream file
+	* src/drivers/sctmr/source/sctqueue.c: added upstream file
+	* src/drivers/sctmr/source/scttimer.c: added upstream file
+	* src/drivers/IPScreen.tcl: added upstream file
+	* src/drivers/gpl.txt: added upstream file
+
+-----
+
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; version 2 of the License.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+Ave, Cambridge, MA 02139, USA.
+
+
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+behalf of the U.S. Government ("Government"), the following provisions apply
+to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+is classified as "Commercial Computer Software" under paragraph 252.227-7014
+of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+successor regulations) and the Government is acquiring only the license rights
+granted herein (the license rights customarily provided to non-Government
+users).  If the Software is supplied to any unit or agency of the Government
+other than DoD, it is classified as "Restricted Computer Software" and the
+Government's rights in the Software are defined in paragraph 52.227-19 of the
+Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+(or any successor regulations).
+
+
+Commercial licensing and support of this software is available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+
+vim: ft=changelog tw=80 com=fb\:*,fb\:- fo+=tcqlorn nocin nosi

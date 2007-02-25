@@ -1,0 +1,1240 @@
+% -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
+% =========================================================================
+%
+% @(#) $Id: osr61.texi,v 0.9.2.1 2007/02/25 12:45:12 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (C) 2001-2007  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2007/02/25 12:45:12 $ by $Author: brian $
+%
+% =========================================================================
+
+\input texinfo
+@setfilename osr61.info
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+@settitle @value{MANUAL_TITLE}
+
+@dircategory STREAMS
+@direntry
+* OpenSS7 TTY: (@value{PACKAGE_TARNAME}).	An Open STREAMS Terminals Package.
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of the
+@cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+Release @value{PACKAGE_RELEASE}.
+
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+Copyright @copyright{} 2005 @uref{http://www.intel.com/, Intel}
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed manual carries copying permission notice identical to
+this one except for the removal of this paragraph (this paragraph not being
+relevant to the printed manual).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE Installation and Reference Manual
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Package @value{PACKAGE}-@value{VERSION}
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2007  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
+All Rights Reserved. @*
+
+@noindent
+Published by OpenSS7 Corporation @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+This is texinfo edition @value{PACKAGE_RELEASE} of the @value{MANUAL_TITLE}
+manual, and is consistent with @value{PACKAGE_NAME} @value{PACKAGE_VERSION}.
+This manual was developed under the @uref{http://www.openss7.org/, OpenSS7
+Project} and was funded in part by
+@uref{http://www.openss7.com/, OpenSS7 Corporation}.
+
+@noindent
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@noindent
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical
+to this one.
+
+@noindent
+Permission is granted to copy and distribute translations of this manual into
+another language, under the same conditions as for modified versions.
+
+@vskip 0pt
+@end titlepage
+@page
+
+@c Define an index of authors.
+@defindex au
+
+@c Define an index of makefile targets
+@defcodeindex mk
+
+@c Define an index of configure output variables.
+@c @defcodeindex ov
+
+@c Define an index of configure variables.
+@c @defcodeindex cv
+
+@c Define an index of options.
+@defcodeindex op
+
+@c Define an index of targets.
+@c @defcodeindex tr
+
+@c Define an index of commands.
+@c @defcodeindex cm
+
+@c Put the macros and variables into their own index.
+@c @syncodeindex fn cp
+@c @syncodeindex ov vr
+@c @syncodeindex cv vr
+@c @syncodeindex fn vr
+
+@c Put everything else into one index (arbitrarily chosen to be the concept index).
+@c @syncodeindex op cp
+@c @syncodeindex tr cp
+@c @syncodeindex cm cp
+
+@c An index of manual pages
+@defcodeindex mp
+
+@include texi/macros.texi
+@include texi/versions.texi
+
+@ifnottex
+@node Top
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@unnumbered About This Manual
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of @cite{The
+@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
+release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
+@end ifnottex
+
+@menu
+* Preface::			Preface to this manual
+
+* Quick Start Guide::		Quick Installation Instructions
+
+* Introduction::		Introduction to the package
+* Objective::			Objective of the package
+* Reference::			Contents of the package
+* Conformance::			Conformance of the package
+* Releases::			Releases of the package
+* Installation::		Installation of the package
+* Troubleshooting::		Troubleshooting of the package
+
+* Licenses::			Copies of OpenSource Licenses
+
+* Indices::			Index of Indices
+
+ ----- detailed node listing -----
+
+Preface
+
+* Notice::			Notices for this package
+* Abstract::			Abstract for this manual
+* Revisions::			Revisions of this manual
+* Disclaimer::			IPR Disclaimers for this package
+* Acknowledgements::		Sponsors of and Contributors to the package
+* Authors::			Authors of the package
+* Maintainer::			Maintainers of the package
+* Web Resources::		Web Resources for the package
+
+Introduction
+
+* Overview::			Overview
+* Organization::		Organization
+* Conventions::			Conventions
+
+Objective
+
+Reference
+
+* Files::			Files included in the package
+* Drivers::			Drivers included in the package
+* Modules::			Modules included in the package
+* Libraries::			Libraries included in the package
+* Utilities::			Utilities included in the package
+* Development::			Development against the package
+
+Conformance
+
+* STREAMS Compatibility::	Compatibility with other STREAMS packages
+* Porting::			Porting to this STREAMS package
+
+Releases
+
+* Prerequisites::		Prerequisite packages
+* Compatibility::		Compatibility Issues
+* Release Notes::		Release Notes
+* Maturity::			Package Maturity
+* Bugs::			Package Defects
+* Schedule::			Development and Bug Fix Schedule
+* History::			Project History
+
+Installation
+
+* Downloading::			Downloading the package
+* Configuration::		Configuration of the package
+* Building::			Building the package
+* Installing::			Installing the package
+* Removing::			Removing the package
+* Loading::			Loading the package
+* Maintenance::			Maintaining the package
+
+Troubleshooting
+
+* Test Suites::			Test Suites for the package
+* Problem Reports::		Problem Reports for the package
+* Known Problems::		Known Probelms with the package
+
+Appendices
+
+Licenses
+
+* GNU General Public License::		The GPL license
+* GNU Lesser General Public License::	The LGPL license
+* GNU Free Documentation License::	The FDL license
+
+Indices
+
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
+* Option Index::		Index of Configuration Options
+* Makefile Target Index::	Index of Makefile Targets
+* Author Index::		Index of Authors
+* Manual Page Index::		Index of Manual Pages Referenced
+@end menu
+
+@c --------------------------------------------------------------------------
+
+@node Preface
+@unnumbered Preface
+
+@menu
+* Notice::			Notices for this package
+* Abstract::			Abstract for this manual
+* Revisions::			Revisions of this manual
+* Disclaimer::			IPR Disclaimers for this package
+* Acknowledgements::		Sponsors of and Contributors to the package
+* Authors::			Authors of the package
+* Maintainer::			Maintainers of the package
+* Web Resources::		Web Resources for the package
+@end menu
+
+@node Notice
+@unnumberedsec Notice
+@cindex manual notice
+@cindex licensing
+
+This version of @command{@value{PACKAGE_TARNAME}} is a version of the Dialogic@registeredsymbol{}
+Open System Release 6.1 GPL drivers, modified by @uref{http://www.openss7.org/, The OpenSS7 Project}
+to support the package using @cite{Linux Fast-STREAMS} instead of the deprecated @cite{LiS}.
+
+This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
+General Public License}).  Please note, however, that there are different licensing terms for the
+manual pages and some of the documentation (derived from publications and other sources).  Consult
+the permission notices contained in the documentation for more information.
+
+This manual is released under the @cite{FDL} (@pxref{GNU Free Documentation License}) with all
+sections invariant.
+
+@node Abstract
+@unnumberedsec Abstract
+@cindex manual abstract
+
+This manual provides a @cite{@value{MANUAL_TYPE}} for @cite{@value{PACKAGE_TITLE}}.
+
+@unnumberedsubsec Objective
+@cindex manual objective
+
+The objective of this manual is to provide a guide for the @dfn{STREAMS} programmer when
+developing @dfn{STREAMS} modules, drivers and application programs for @cite{@value{PACKAGE_TITLE}}.
+
+This guide provides information to developers on the use of the @dfn{STREAMS} mechanism at user and
+kernel levels.
+
+@dfn{STREAMS} was incorporated in UNIX System V Release 3 to augment the character input/output
+(I/O) mechanism and to support development of communication services.
+
+@dfn{STREAMS} provides developers with integral functions, a set of utility routines, and facilities
+that expedite software design and implementation.
+
+@unnumberedsubsec Intent
+@cindex manual intent
+
+The intent of this manual is to act as an introductory guide to the @dfn{STREAMS} programmer.  It
+is intended to be read alone and is not intended to replace or supplement the
+@cite{@value{PACKAGE_TITLE}} manual pages.  For a reference for writing code, the manual pages
+(see @manref{STREAMS(9)}) provide a better reference to the programmer.
+Although this describes the features of the @cite{@value{PACKAGE_TITLE}} package,
+@uref{http://www.openss7.com/,OpenSS7 Corporation} is under no obligation to provide any software,
+system or feature listed herein.
+
+@unnumberedsubsec Audience
+@cindex manual audience
+
+This manual is intended for a highly technical audience.  The reader should already be familiar
+with @cite{Linux} kernel programming, the @cite{Linux} file system, character devices, driver input
+and output, interrupts, software interrupt handling, scheduling, process contexts, multiprocessor
+locks, etc.
+
+The guide is intended for network and systems programmers, who use the @dfn{STREAMS} mechanism at
+user and kernel levels for @cite{Linux} and @cite{UNIX} system communication services.
+
+Readers of the guide are expected to possess prior knowledge of the @cite{Linux} and @cite{UNIX}
+system, programming, networking, and data communication.
+
+@node Revisions
+@unnumberedsec Revisions
+@cindex manual revisions
+
+Take care that you are working with a current version of this manual: you will not be notified of
+updates.  To ensure that you are working with a current version, contact the
+@uref{mailto:bidulock@@openss7.org,Author}, or check @uref{http://www.openss7.org/,The OpenSS7
+Project} website for a current version.
+
+A current version of this manual is normally distributed with the @cite{@value{PACKAGE_TITLE}}
+package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2}}
+
+@unnumberedsubsec Version Control
+
+@smallexample
+
+$Log: osr61.texi,v $
+Revision 0.9.2.1  2007/02/25 12:45:12  brian
+- added new files for release package
+
+
+@end smallexample
+
+@unnumberedsubsec ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this manual is controlled.  An opaque (printed,
+postscript or portable manual format) version of this manual is an @strong{UNCONTROLLED
+VERSION}.
+
+@node Disclaimer
+@unnumberedsec Disclaimer
+@cindex manual disclaimer
+
+@noindent
+@cite{OpenSS7 Corporation} disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the manual are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall @cite{OpenSS7 Corporation} be liable for any direct, indirect, special or
+consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether
+in an action of contract, negligence or other tortious action, arising out of or in connection with
+any use of this manual or the performance or implementation of the contents thereof.
+
+@noindent
+@cite{OpenSS7 Corporation} reserves the right to revise this software and documentation for any
+reason, including but not limited to, conformity with standards promulgated by various agencies,
+utilization of advances in the state of the technical arts, or the reflection of changes in the
+design of any techniques, or procedures embodied, described, or referred to herein.  @cite{OpenSS7
+Corporation} is under no obligation to provide any feature listed herein.
+
+@unnumberedsubsec U.S. Government Restricted Rights
+
+If you are licensing this Software on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department of Defense ("DoD"), it is
+classified as "Commercial Computer Software" under paragraph 252.227-7014 of the DoD Supplement to
+the Federal Acquisition Regulations ("DFARS") (or any successor regulations) and the Government is
+acquiring only the license rights granted herein (the license rights customarily provided to
+non-Government users).  If the Software is supplied to any unit or agency of the Government other
+than DoD, it is classified as "Restricted Computer Software" and the Government's rights in the
+Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
+successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to
+the FAR (or any successor regulations).
+
+@c ----------------------------------------------------------------------------
+
+@node Acknowledgements
+@unnumberedsec Acknowledgements
+@cindex credits
+
+@include texi/funding.texi
+
+@node Authors
+@unnumberedsec Authors
+@cindex authors
+
+The authors of the @cite{OpenSS7 @value{PACKAGE_TITLE}} package include:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @url{http://www.dialogic.com/, Dialogic Corporation}
+@auindex Dialogic Corporation
+@item @tab @minus{} @url{http://www.intel.com/, Intel}
+@auindex Intel
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@auindex Bidulock, Brian
+@end multitable
+
+See @refman{Author Index}, for a complete listing and cross-index of authors to
+sections of this manual.
+
+@node Maintainer
+@unnumberedsec Maintainer
+@cindex maintainer
+
+The maintainer of this modified @cite{OpenSS7 @value{PACKAGE_TITLE}} package is:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @email{bidulock@@openss7.org, Brian Bidulock}
+@end multitable
+
+Please send bug reports to @email{@value{PACKAGE_BUGREPORT}} using the @file{send-pr} script
+included in the package, only after reading the @file{BUGS} file in the release, or @xrefman{Problem
+Reports}.
+
+@node Web Resources
+@unnumberedsec Web Resources
+@cindex web resources
+
+@include texi/mail.texi
+
+@c ----------------------------------------------------------------------------
+
+@node Quick Start Guide
+@unnumbered Quick Start Guide
+@cindex quick start guide
+
+@include texi/quick.texi
+
+@c ----------------------------------------------------------------------------
+
+@node Introduction
+@chapter Introduction
+@cindex introduction
+
+This manual documents the design, implementation, installation, operation and future development
+schedule of the @cite{@value{PACKAGE_TITLE}} package.
+
+@c ----------------------------------------------------------------------------
+
+@menu
+* Overview::			Overview
+* Organization::		Organization
+* Conventions::			Conventions
+@end menu
+
+@ignore
+@node Notice
+@section Notice
+@cindex notice
+@cindex licensing
+
+This version of @command{@value{PACKAGE_TARNAME}} is a version of the Dialogic@registeredsymbol{}
+Open System Release 6.1 GPL drivers, modified by @uref{http://www.openss7.org/, The OpenSS7 Project}
+to support the package using @cite{Linux Fast-STREAMS} instead of the deprecated @cite{LiS}.
+
+This package is released and distributed under the @cite{GPL} (@pxref{GNU General Public
+License}).  Please note, however, that there are different licensing terms for the manual pages and
+some of the documentation (derived from publications and other sources).  Consult the permission
+notices contained in the documentation for more information.
+
+This manual is released under the @cite{FDL} (@pxref{GNU Free Documentation License}) with all
+sections invariant.
+@end ignore
+
+@node Overview
+@section Overview
+@cindex overview
+
+This manual documents the design, implementation, installation, operation and future development of
+the @cite{@value{PACKAGE_TITLE}} package.
+
+@ignore
+Insert a brief description here of the OSR61 drivers.
+@end ignore
+
+@node Organization
+@section Organization of this Manual
+@cindex organization
+
+This manual is organized (loosely) into several sections as follows:
+
+@ifnottex
+@menu
+  Introduction::		This introduction
+* Objective::			Objective of the package
+* Reference::			Contents of the package
+* Conformance::			Conformance of the package
+* Releases::			Releases of the package
+* Installation::		Installation of the package
+* Troubleshooting::		Troubleshooting of the package
+@end menu
+@end ifnottex
+@ifnotinfo
+@multitable @columnfractions .50 .50
+@item @ref{Introduction}.
+@tab This introduction
+@item @ref{Objective}.
+@tab Objective of the package
+@item @ref{Reference}.
+@tab Contents of the package
+@item @ref{Conformance}.
+@tab Conformance of the package
+@item @ref{Releases}.
+@tab Releases of the package
+@item @ref{Installation}.
+@tab Installation of the package
+@item @ref{Troubleshooting}.
+@tab Troubleshooting of the package
+@end multitable
+@end ifnotinfo
+@ifplaintext
+@multitable @columnfractions .50 .50
+@item @cite{Introduction}.
+@tab This introduction
+@item @cite{Objective}.
+@tab Objective of the package
+@item @cite{Reference}.
+@tab Contents of the package
+@item @cite{Conformance}.
+@tab Conformance of the package
+@item @cite{Releases}.
+@tab Releases of the package
+@item @cite{Installation}.
+@tab Installation of the package
+@item @cite{Troubleshooting}.
+@tab Troubleshooting of the package
+@end multitable
+@end ifplaintext
+
+@node Conventions
+@section Conventions and Definitions
+@cindex conventions
+@cindex definitions
+
+This manual uses @cite{texinfo} typographic conventions.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Objective
+@chapter Objective
+@cindex objective
+
+The objective for creating the @cite{@value{PACKAGE_TITLE}} package was to provide support for
+@cite{Linux Fast-STREAMS} to the @cite{@value{PACKAGE_TITLE}} GPL drivers.  Originally, these
+drivers worked with @cite{LiS}, but as @cite{LiS} is deprecated and buggy and does not support
+recent Linux distribtions, it became necessary to support these drivers using @cite{Linux
+Fast-STREAMS}.
+
+The @cite{@value{PACKAGE_TITLE}} package also demonstrates the ease with which former @cite{LiS}
+drivers can be ported to the production @cite{Linux Fast-STREAMS}.  The entire port from concept to
+completed package was performed in under 5 days.
+
+The only component for the @cite{@value{PACKAGE_TITLE}} release that is released by
+@url{http://www.opensystemrelease.com/, Dialogic} under the GPL (@pxref{GNU General Public License})
+are the core drivers for the release under Linux.  The original driver package can be obtained from
+the @file{osr61_239_GPLdrivers.tgz} tarball from the @url{http://www.opensystemrelease.com/,
+Dialogic Website}.  The runtime libraries that make the drivers useful are released under far more
+restrictive terms and are, therefore, only available directly from
+@url{http://www.opensystemrelease.com/, Dialogic}.
+
+@cite{The OpenSS7 Project} currently does not have any applications or @dfn{STREAMS} modules that
+depend upon the availability of the @cite{@value{PACKAGE_TITLE}} package, and this is one of the
+reasons that this package is initially untested (the @manref{test-osr61(8)} test suite is
+incomplete).  Nevertheless, it has all of the components of a fully functional OSR61 driver release
+and can easily be tested against exiting (even binary) runtime libraries and applications.  If you
+have appications or modules that required the @cite{@value{PACKAGE_TITLE}} package, contact
+@cite{The OpenSS7 Project} about advancing testing of this package.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@page
+@node Reference
+@chapter Reference
+@cindex reference
+
+This chapter provides a reference to the contents of the @cite{@value{PACKAGE_UCNAME}} package.
+Please note that this @command{texinfo} documentation is not updated as regularly as the manual
+pages.  For a more up to date package reference, please begin with the @manref{@value{PACKAGE}(5)}
+manual page (that documents the package).
+
+@menu
+* Files::			Files included in the package
+* Drivers::			Drivers included in the package
+* Modules::			Modules included in the package
+* Libraries::			Libraries included in the package
+* Utilities::			Utilities included in the package
+* Development::			Development against the package
+@end menu
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Files
+@section Files
+@cindex headers
+
+@include tree.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Drivers
+@section Drivers
+@cindex drivers
+
+The configuration of @dfn{STREAMS} drivers is performed when compiling the
+@cite{@value{PACKAGE_TITLE}} subsystem.  The @dfn{OSR61} subsystem, core drivers are part of every
+@cite{@value{PACKAGE_TITLE}} system.
+
+Kernel modules are installed by the @cite{@value{PACKAGE_TITLE}} package in the
+@file{/lib/modules/@value{_kversion}/@value{PACKAGE}/} directory, with either a @samp{.o} or
+@samp{.ko} extension.@footnote{The kernel version, @samp{@value{_kversion}} is just an example.
+When installed with a @samp{.ko} extension, dashes (@samp{-}) are also changed to underscores
+(@samp{_}).}
+
+The following lists the core drivers, @dfn{STREAMS} kernel tunable parameters, and @dfn{STREAMS}
+configuration information:@footnote{Note that documentation of @dfn{OSR61} drivers is in the form of
+manual pages in Section 4 of the manual pages with the same name as the driver.}
+
+@table @asis
+
+@item @manpage{dlgn(4)} (@file{streams-dlgn})
+@pgindex streams-dlgn
+
+See @manref{dlgn(4)} for more information.
+
+@item @manpage{gncfd(4)} (@file{streams-gncfd})
+@pgindex streams-gncfd
+
+See @manref{gpio(4)} for more information.
+
+@item @manpage{gpio(4)} (@file{streams-gpio})
+@pgindex streams-gpio
+
+See @manref{gpio(4)} for more information.
+
+@item @manpage{mercd(4)} (@file{streams-mercd})
+@pgindex streams-mercd
+
+See @manref{mercd(4)} for more information.
+
+@item @manpage{pmacd(4)} (@file{streams-pmacd})
+@pgindex streams-pmacd
+
+See @manref{pmacd(4)} for more information.
+
+@end table
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Modules
+@section Modules
+@cindex modules
+
+The configuration of @dfn{STREAMS} modules is performed when compiling the
+@cite{@value{PACKAGE_TITLE}} subsystem.  The @dfn{OSR61} subsystem, core modules are part of every
+@cite{@value{PACKAGE_TITLE}} system.
+
+Kernel modules are installed by the @cite{@value{PACKAGE_TITLE}} package in the
+@file{/lib/modules/@value{_kversion}/@value{PACKAGE}/} directory, with either a @samp{.o} or
+@samp{.ko} extension.@footnote{The kernel version, @samp{@value{_kversion}} is just an example.
+When installed with a @samp{.ko} extension, dashes (@samp{-}) are also changed to underscores
+(@samp{_}).}
+
+The following lists the core modules, @dfn{STREAMS} kernel tunable parameters, and @dfn{STREAMS}
+configuration information:@footnote{Note that documentation of @dfn{OSR61} modules is in the form of
+manual pages in Section 4 of the manual pages with the same name as the modules.}
+
+@table @asis
+
+@item @manpage{dvbm(4)} (@file{streams-dvbm})
+@pgindex streams-dvbm
+
+See @manref{dvbm(4)} for more information.
+
+@item @manpage{sctmr(4)} (@file{streams-sctmr})
+@pgindex streams-sctmr
+
+See @manref{sctmr(4)} for more information.
+
+@item @manpage{ctimod(4)} (@file{streams-sctmr})
+@pgindex ctimod
+
+See @manref{ctimod(4)} for more information.
+
+@end table
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Libraries
+@section Libraries
+@cindex libraries
+
+Although the @cite{Dialogic@registeredsymbol{} Open System Release 6.1} contains a number of runtime
+libraries for talking to the @dfn{STREAMS} drivers, these libraries carry restrictive licensing
+terms and are not included in this package.   To compile the libraries, download the runtime library
+releases from the @url{http://www.opensystemrelease.com/, Dialogic Website} and compile them yourself.
+
+Existing binary runtime libraries and applications should not have to be recompiled to use the
+@cite{Linux Fast-STREAMS} drivers.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Utilities
+@section Utilities
+@cindex utilities
+
+@menu
+* Init Scripts::
+* User Utilities::
+* Administrative Utilities::
+* Performance Test Programs::
+* Conformance Test Programs::
+@end menu
+
+@node Init Scripts
+@subsection Init Scripts
+@cindex init scripts
+
+Following are System V Init Scripts that are installed by the package:
+
+@table @asis
+
+@item @manpage{@value{PACKAGE}(8)} (@file{/etc/init.d/@value{PACKAGE}})
+@pgindex @value{PACKAGE}
+@pgindex /etc/init.d/@value{PACKAGE}
+@itemx @manpage{@value{PACKAGE}.sh(8)} (@file{/etc/init.d/@value{PACKAGE}.sh})
+@pgindex @value{PACKAGE}.sh
+@pgindex /etc/init.d/@value{PACKAGE}.sh
+
+System V Init Script for the @dfn{OSR61} Subsystem.
+The @manpage{@value{PACKAGE}(8)} init script provides the ability to initialize, configure and mount the
+@dfn{OSR61} subsystem, @manpage{@value{PACKAGE}(5)}.
+The @manpage{@value{PACKAGE}(8)} script provides the RedHat-style init script, whereas the
+@manpage{@value{PACKAGE}.sh(8)} script provides the Debian-style init script.
+
+See @manref{@value{PACKAGE}(8)} for more information.
+
+@end table
+
+@node User Utilities
+@subsection User Utilities
+@cindex user utilities
+
+Following are user utilities for manipulating @dfn{Streams}:
+
+@c @table @asis
+@c @end table
+
+The @cite{@value{PACKAGE_UCNAME}} package does not currently contain any user utilities.
+
+
+@node Administrative Utilities
+@subsection Administrative Utilities
+@cindex administrative utilities
+
+Following are administrative utilities for manipulating and examining the @dfn{OSR61} subsystem:
+
+@c @table @asis
+@c @end table
+
+The @cite{@value{PACKAGE_UCNAME}} package does not currently contain any administrative utilities.
+
+@node Performance Test Programs
+@subsection Performance Test Programs
+@cindex performance test programs
+
+Following are performance test programs:
+
+@c @table @asis
+@c @end table
+
+The @cite{@value{PACKAGE_UCNAME}} package does not currently contain any performance test programs.
+
+@node Conformance Test Programs
+@subsection Conformance Test Programs
+@cindex conformance test programs
+
+Following and conformance and validation testing programs:
+
+@table @asis
+
+@item @manpage{test-osr61(8)} (@file{/usr/libexec/@value{PACKAGE}/test-osr61})
+@pgindex test-osr61
+@pgindex /usr/libexec/@value{PACKAGE}/test-osr61
+
+The @manpage{test-osr61(8)} C-language program is a conformance and validation test program, in the
+OpenSS7 Project style, for the
+@manpage{sctmr(4)} @dfn{STREAMS} module.
+
+See @manref{test-osr61(8)} for more information.
+
+@end table
+
+For the proper way to execute these validation test programs in a conformance and validation test
+suite, see @refman{Running Test Suites}.
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@page
+@node Development
+@section Development
+@cindex developing
+
+The @cite{@value{PACKAGE_UCNAME}} package contains the necessary header files, shared and static
+libraries, manuals and manual pages necessary for the development of kernel modules, @dfn{STREAMS}
+modules and drivers, and applications programs based on the @cite{@value{PACKAGE_UCNAME}} package.
+
+@menu
+* Development Header Files::
+* Static and Shared Libraries::
+* Kernel Module Development::
+* Manual Pages::
+@end menu
+
+@node Development Header Files
+@subsection Header Files
+
+Header files are installed, typically, in the @file{/usr/include/@value{PACKAGE}}
+subdirectory.@footnote{One of the major reasons for using this non-standard subdirectory is to avoid
+conflict with header files already located in the @file{/usr/include} directory.} To use the header
+files from the package, @samp{-I/usr/include/@value{PACKAGE}} must be included in the @command{gcc}
+command line as a compile option.  This is true regardless of whether user space or kernel space
+programs are being compiled.
+
+In general, @samp{-I} include directives on the @command{gcc} command line should be ordered in the
+reverse order of the dependencies between packages.  So, for example, if the include files from all
+add-on packages are required, the order of these directives would be: @samp{-I/usr/include/strss7
+-I/usr/include/strsctp -I/usr/include/strinet -I/usr/include/strxnet -I/usr/include/strxns
+-I/usr/include/strcompat -I/usr/include/streams}.
+
+@ignore
+Following are the user visible header files provided by the
+@command{@value{PACKAGE}-@value{VERSION}} package in directory @file{/usr/include/@value{PACKAGE}}:
+
+@table @file
+
+@item sys/ttydev.h
+@pgindex sys/ttydev.h
+@pgindex /usr/include/@value{PACKAGE}/sys/ttydev.h
+
+This is a replacement for the standard @cite{SVR 4} header file.
+
+@item sys/termios.h
+@pgindex sys/termios.h
+@pgindex /usr/include/@value{PACKAGE}/sys/termios.h
+
+This is a replacement for the standard @cite{SVR 4} header file.
+
+@item sys/termio.h
+@pgindex sys/termio.h
+@pgindex /usr/include/@value{PACKAGE}/sys/termio.h
+
+This is a replacement for the standard @cite{SVR 4} header file.
+
+@item sys/sgtty.h
+@pgindex sys/sgtty.h
+@pgindex /usr/include/@value{PACKAGE}/sys/sgtty.h
+
+This is a replacement for the standard @cite{SVR 4} header file.
+
+@item sys/ttyio.h
+@pgindex sys/ttyio.h
+@pgindex /usr/include/@value{PACKAGE}/sys/ttyio.h
+
+This is a replacement for the standard @cite{SVR 4} header file.
+
+@item sys/strtty.h
+@pgindex sys/strtty.h
+@pgindex /usr/include/@value{PACKAGE}/sys/strtty.h
+
+This is a replacement for the standard @cite{SVR 4} header file.
+
+@item sys/ttychars.h
+@pgindex sys/ttychars.h
+@pgindex /usr/include/@value{PACKAGE}/sys/ttychars.h
+
+This is a replacement for the standard @cite{SVR 4} header file.
+
+@item sys/pty.h
+@pgindex sys/pty.h
+@pgindex /usr/include/@value{PACKAGE}/sys/pty.h
+
+See @manref{pty(4)} for more information.
+
+@item ttychars.h
+@pgindex ttychars.h
+@pgindex /usr/include/@value{PACKAGE}/ttychars.h
+
+This is a replacement for the standard @cite{SVR 4} header file.
+
+@item ttcompat.h
+@pgindex ttcompat.h
+@pgindex /usr/include/@value{PACKAGE}/ttcompat.h
+
+See @manref{ttcompat(4)} for more information.
+
+@item sgtty.h
+@pgindex sgtty.h
+@pgindex /usr/include/@value{PACKAGE}/sgtty.h
+
+This is a replacement for the standard @cite{SVR 4} header file.
+
+@item termios.h
+@pgindex termios.h
+@pgindex /usr/include/@value{PACKAGE}/termios.h
+
+This is a replacement for the standard @cite{SVR 4} header file.
+
+@item termio.h
+@pgindex termio.h
+@pgindex /usr/include/@value{PACKAGE}/termio.h
+
+This is a replacement for the standard @cite{SVR 4} header file.
+
+@end table
+@end ignore
+
+@subsubsection User Space Programs
+
+Typical include files for interacting with @dfn{STREAMS} from user space include the
+@file{stropts.h} header file.  Additional header files for interacting with specific drivers or
+modules may also be required.
+
+@subsubsection Kernel Space Drivers and Modules
+
+Typical include files for writing @dfn{STREAMS} modules and drivers for kernel space include the
+@file{sys/cmn_err.h}, @file{sys/kmem.h}, @file{sys/dki.h}, @file{sys/stream.h}, @file{sys/ddi.h},
+and @file{sys/strconf.h} header files.  Additional header files for interacting with specific
+drivers or modules may also be required.
+
+@node Static and Shared Libraries
+@subsection Libraries
+
+Shared or static versions of the @file{libstreams} library must be linked when using the
+@command{@value{PACKAGE}-@value{VERSION}} package.  This library must either be specified on the
+@command{gcc} command line as a shared library (e.g. @samp{-lstreams}) or as a static library (e.g.
+@samp{/usr/lib/libstreams.a}).
+
+If the shared library is linked, include the following options on the @command{gcc} command line:
+
+@table @asis
+
+@end table
+
+If the static library is linked, include the following options on the @command{gcc} command line:
+
+@table @asis
+
+@end table
+
+@node Kernel Module Development
+@subsection Kernel Modules
+
+Developing @dfn{STREAMS} kernel modules is similar to user space programs with regard to header
+files.  @file{/usr/include/@value{PACKAGE}} should be placed as an include directory to search in
+the @command{gcc} command line.  The rules for compiling @cite{Linux} kernel modules should be
+followed.  In particular, several important intricacies should be considered:
+
+@itemize @bullet
+
+@item
+The @command{gcc} compiler used to compile the kernel modules must be the same version of compiler
+that was used to compile the kernel.
+
+@item
+The @command{gcc} command line must have the same compile flags that were used to compile the
+kernel.
+
+@item
+The @command{gcc} command line must define several important kernel defines including
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.
+
+@item
+The @command{gcc} command line must include several important include files directly on the command
+line such as @samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-autoconf.h} and
+maybe even @samp{--include
+/@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-modversions.h}.@footnote{The kernel version
+@samp{@value{_kversion}} is just an example.  For the running kernel, use the output of @samp{uname
+-r}.}
+
+@end itemize
+
+@node Manual Pages
+@subsection Manual Pages
+
+The @command{@value{PACKAGE}-@value{VERSION}} package installs the following manual pages in the
+@file{/@-usr/@-share/@-man/} subdirectory:
+
+@multitable @columnfractions .30 .70
+
+@item @manref{dlgn(4)} -- @tab the DLGN @dfn{STREAMS} driver.
+@item @manref{dvbm(4)} -- @tab the DVBM @dfn{STREAMS} module.
+@item @manref{gncfd(4)} -- @tab the GNCFD @dfn{STREAMS} driver.
+@item @manref{gpio(4)} -- @tab the GPIO @dfn{STREAMS} driver.
+@item @manref{sctmr(4)} -- @tab the SCTMR @dfn{STREAMS} module.
+@item @manref{mercd(4)} -- @tab the MERCD @dfn{STREAMS} driver.
+@item @manref{pmacd(4)} -- @tab the PMACD driver.
+@item @manref{ctimod(4)} -- @tab the CTIMOD kernel module.
+@item @manref{osr61(5)} -- @tab @cite{@value{PACKAGE_TITLE}} package.
+@item @manref{osr61_mknod(8)} -- @tab create or remove OSR61 device nodes.
+@item @manref{test-osr61(8)} -- @tab a test suite executable for @manpage{osr61(5)}.
+
+@end multitable
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Conformance
+@chapter Conformance
+@cindex conformance
+
+When modifying the @cite{@value{PACKAGE_TITLE}} package, an attempt was made to maintain binary
+compatibility and conformance for all of the drivers.
+It should be noted that as the @cite{LiS} package against which these drivers were formerly compiled
+is buggy and cannot support full 32-bit over 64-bit compatibility, the binary interface to, and
+experienced behaviour of, the drivers may differ.
+
+It is intended that conformance to specifications for the OSR61 interface be tested using the
+@manref{test-osr61(8)} test case executable and the package @command{autotest} test suite; however,
+at the time of writing these test programs are incomplete.
+
+@ignore
+When developing the @cite{@value{PACKAGE_TITLE}} package, an attempt was made to maintain
+compatibility and conformance across as many documented implementations of the @dfn{SVR 4 Terminal
+Subsystem} as possible.  It is intended that conformance to specifications for the terminal
+subsystem be tested using the @manref{test-tty(8)} test case executable and the package
+@command{autotest} test suite; however, at the time of writing these test programs are incomplete.
+@end ignore
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Releases
+@chapter Releases
+@cindex releases
+
+@include releases.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Installation
+@chapter Installation
+@cindex installation
+
+@include texi/install.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Troubleshooting
+@chapter Troubleshooting
+@cindex troubleshooting
+
+@include texi/testsuite.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Licenses
+@unnumbered Licenses
+@cindex licenses
+
+@menu
+* GNU General Public License::		The GPL license
+* GNU Lesser General Public License::	The LGPL license
+* GNU Free Documentation License::	The FDL license
+@end menu
+
+@page
+@include texi/gpl.texi
+@page
+@include texi/lesser.texi
+@page
+@include texi/fdl.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Indices
+@unnumbered Indices
+@cindex indices
+
+@c ----------------------------------------------------------------------------
+
+@menu
+* Concept Index::		Index of Concepts
+* Type Index::			Index of Data Types
+* Function Index::		Index of Functions and Macros
+* Variable Index::		Index of Variables and Constants
+* File Index::			Index of Files and Programs
+* Option Index::		Index of Configuration Options
+* Makefile Target Index::	Index of Makefile Targets
+* Author Index::		Index of Authors
+* Manual Page Index::		Index of Manual Pages Referenced
+@end menu
+
+@c ----------------------------------------------------------------------------
+
+@node Concept Index
+@unnumberedsec Index of Concepts
+@printindex cp
+
+@page
+@node Type Index
+@unnumberedsec Index of Data Types
+@printindex tp
+
+@page
+@node Function Index
+@unnumberedsec Index of Functions and Macros
+@printindex fn
+
+@page
+@node Variable Index
+@unnumberedsec Index of Variables and Constants
+@printindex vr
+
+@page
+@node File Index
+@unnumberedsec Index of Files and Programs
+@printindex pg
+
+@page
+@node Option Index
+@unnumberedsec Index of Configuration Options
+@printindex op
+
+@page
+@node Makefile Target Index
+@unnumberedsec Index of Makefile Targets
+@printindex mk
+
+@page
+@node Author Index
+@unnumberedsec Index of Authors
+@printindex au
+
+@page
+@node Manual Page Index
+@unnumberedsec Index of Manual Pages Referenced
+@printindex mp
+
+@c ----------------------------------------------------------------------------
+
+@page
+@shortcontents
+@page
+@contents
+@bye
+
+@c ============================================================================

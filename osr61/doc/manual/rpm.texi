@@ -1,0 +1,179 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id: rpm.texi,v 0.9.2.1 2007/02/25 12:45:12 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2007/02/25 12:45:12 $ by $Author: brian $
+@c
+@c =========================================================================
+@c
+@c $Log: rpm.texi,v $
+@c Revision 0.9.2.1  2007/02/25 12:45:12  brian
+@c - added new files for release package
+@c
+@c =========================================================================
+
+In addition, the following @command{rpm} options, specific to the
+@value{PACKAGE_TITLE} package are available:
+
+@table @code
+@item --without dlgn
+@itemx --with dlgn
+@opindex dlgn
+Disable build of the @manpage{dlgn(4)} related Dialogic@registeredsymbol{} Springware based firmware
+boards.  The default is to build the @manpage{dlgn(4)}, and related drivers and modules, for the
+Springware based boards (the interface based on @cite{Linux Fast-STREAMS} only).  Normally the
+@manpage{dlgn(4)} driver @file{streams-dlgn} is built, however, buidling and installing the driver
+can be disabled with this option.
+
+@item --without dlgn-bri
+@itemx --with dlgn-bri
+@opindex dlgn-bri
+Disable ISDN BRI support in the @manpage{dlgn(4)} driver for Dialogic@registeredsymbol{} Springware
+based firmware boards.  The default is to build the @manpage{dlgn(4)} drivers with BRI support,
+however, the ISDN BRI support can be disabled with this option.
+
+@item --without dlgn-isa
+@itemx --with dlgn-isa
+@opindex dlgn-isa
+Disable ISA bus support in the @manpage{dlgn(4)} driver for Dialogic@registeredsymbol{} Springware
+based firmware boards.  The default is to build the @manpage{dlgn(4)} drivers with ISA bus support,
+however, the ISA bus support can be disabled with this option.
+
+@item --with dlgn-sba
+@itemx --without dlgn-sba
+@opindex dlgn-sba
+Enable SBA support in the @manpage{dlgn(4)} driver for Dialogic@registeredsymbol{} Springware based
+firmware boards.  The default is to build the @manpage{dlgn(4)} drivers without SBA support,
+however, the SBA support can be enabled with this option.
+
+@item --with dlgn-msm
+@itemx --without dlgn-msm
+@opindex dlgn-msm
+Enable multiple session managers per logical device for the @manpage{dlgn(4)} driver for
+Dialogic@registeredsymbol{} Srpingware based firmware boards.  The default is to build the
+@manpage{dlgn(4)} driver without multiple session manager per logical device support, however, the
+feature can be enabled with this option.
+
+@item --without dlgn-isdn
+@itemx --with dlgn-isdn
+@opindex dlgn-isdn
+Disable ISDN support in the @manpage{dlgn(4)} driver for Dialogic@registeredsymbol{} Springware
+based firmware boards.  The default is to build the @manpage{dlgn(4)} drivers with ISDN support,
+however, the ISDN support can be disabled with this option.
+
+@item --without dlgn-stats
+@itemx --with dlgn-stats
+@opindex dlgn-stats
+Disable statistics support in the @manpage{dlgn(4)} driver for Dialogic@registeredsymbol{}
+Springware based firmware boards.  The default is to build the @manpage{dlgn(4)} drivers with
+statistics support, however, the statistics support can be disabled with this option.
+
+@item --without antares
+@itemx --with antares
+@opindex antares
+Disable build of the @manpage{dlgn(4)} driver and related modules and drivers for
+Dialogic@registeredsymbol{} Springware based firmware boards with Antares support.  The default is
+to bild the @manpage{dlgn(4)} driver and related modules and drivers with Antares support.  Normally
+the @manpage{dlgn(4)} driver is built without Antares support on Linux 2.6 kernels and with Antares
+support on Linux 2.4 kernels.  This option can be used to disable Antares support which this package
+builds on all kernels.
+
+@item --with antares-rtdl
+@itemx --without antares-rtdl
+@opindex antares-rtdl
+Enable remote download for for Antares cards in the @manpage{dlgn(4)} driver for
+Dialogic@registeredsymbol{} Springware firmware based boards.  The default is to build
+@manpage{dlgn(4)} drivers without remote download support, however, the support can be enabled with
+this option.
+
+@item --without merc
+@itemx --with merc
+@opindex merc
+Disable build of the @manpage{mercd(4)} Dialogic@registeredsymbol{} Media III (DM3) based firmware
+boards.  The default is to build the @manpage{mercd(4)} driver for the DM3 boards (the interface
+based on @cite{Linux Fast-STREAMS} only).  Normally the @manpage{mercd(4)} driver
+@file{streams-mercd} is built, however, building and installing the driver can be disabled with this
+option.
+
+@item --without mercd-pps
+@itemx --with mercd-pps
+@opindex mercd-pps
+Disable PPS support for the @manpage{mercd(4)} Dialogic@registeredsymbol{} Media III (DM3) based
+firmware boards.  The default is to build the @manpage{mercd(4)} driver with PPS support, however,
+this option can be used to the disable the feature.
+
+@item --without mercd-dma
+@itemx --with mercd-dma
+@opindex mercd-dma
+Disable SRAM DMA support for the @manpage{mercd(4)} Dialogic@registeredsymbol{} Media III (DM3)
+based firmware boards.  The default is to build the @manpage{mercd(4)} driver with SRAM DMA support,
+however, this option can be used to disable the feature.
+
+@item --with mercd-lid
+@itemx --without mercd-lid
+@opindex mercd-lid
+Enable Logical ID support for the @manpage{mercd(4)} Dialogic@registeredsymbol{} Media II (DM3) based
+firmware boards.  The default is to build the @manpage{mercd(4)} driver without logical ID support,
+however, this feature can be enabled using this option.
+
+@item --without pmac
+@itemx --with pmac
+@opindex pmac
+Disable build of the @manpage{pmacd(4)} Dialogic@registeredsymbol{} packet media access cards based
+on the IPT family.  The default is to build the @manpage{pmacd(4)} driver for the IPT boards.
+Normally the @manpage{pmacd(4)} driver @file{pmacd} is built, however, building and installing the
+driver can be disabled with this option.
+
+@end table
+

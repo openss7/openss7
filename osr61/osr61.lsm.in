@@ -1,0 +1,35 @@
+Begin4
+Title:			@PACKAGE@
+Version:		@VERSION@
+Entered-date:		@PACKAGE_DATE@
+Description:		@PACKAGE_TITLE@.
+			Dialogic Open System Release 6.1 STREAMS Drivers.
+			The @PACKAGE@ package includes kernel modules, SVR 4.2
+			STREAMS drivers, modules, libraries, utilities, test
+			programs, daemons, and development environment for the
+			development and execution of STREAMS modules and
+			drivers.
+			This package provides the Dialogic OSR 6.1 GPL Drivers
+			modified to compile for Linux Fast-STREAMS.
+			This distribution is currently applicable to 2.4 and 2.6
+			kernels and was targetted at ix86, x86_64, pcc and ppc64
+			architectures, but should build and install for other
+			architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to @PACKAGE_BUGREPORT@
+Keywords:		STREAMS, SVR 4.2 MP, LiS, LfS, OSR61
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			2M @PACKAGE@-@VERSION@.tar.gz
+			2M @PACKAGE@-@VERSION@.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			2M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4 or 2.6,
+			streams @STREAMS_VERSION@ SVR 4.2 STREAMS,
+			strcompat @STRCOMP_VERSION@, strxns @XNS_VERSION@
+			strxnet @XTI_VERSION@
+Copying-policy:		GPL
+End
