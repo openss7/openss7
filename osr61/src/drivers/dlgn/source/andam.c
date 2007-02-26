@@ -970,7 +970,11 @@ int anopen(GN_LOGDEV *ldp)
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifdef LFS
+    unsigned long oldspl;
+#else
     int oldspl;
+#endif
 #endif
 
    /* Return error if device not started */
@@ -1041,7 +1045,11 @@ int anclose(
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifdef LFS
+    unsigned long oldspl;
+#else
     int oldspl;
+#endif
 #endif
 #ifdef AIX_ANT
     struct io_map iomap;
@@ -2372,7 +2380,11 @@ void UpdateFill(BD_CHANNEL *bx,SHORT loc,BYTE cr)
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifdef LFS
+    unsigned long oldspl;
+#else
     int oldspl;
+#endif
 #endif
 #ifdef AIX_ANT
 #else

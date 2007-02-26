@@ -240,7 +240,11 @@ VOID call_interrupt(VOID)
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifdef LFS
+    unsigned long oldspl;
+#else
     int oldspl;
+#endif
 #endif
 #ifdef VME_ANT
     int i;
@@ -1768,7 +1772,11 @@ SHORT p_bd_xplayf(SHORT dev,P_FILE *pfile)
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifdef LFS
+    unsigned long oldspl;
+#else
     int oldspl;
+#endif
 #endif
 
     BYTE board;	  /* board number */
@@ -1948,7 +1956,11 @@ SHORT p_bd_xrecf(SHORT dev,P_FILE far *pfile)
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifdef LFS
+    unsigned long oldspl;
+#else
     int oldspl;
+#endif
 #endif
 
     BYTE board;	  /* board number */

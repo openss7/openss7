@@ -215,7 +215,11 @@ int st_Add2UsedQ( qptr, msgp, timeInTicks, ddd, identifier )
    TIMER_INFO	*tmp;
    TIMER_INFO	*newq;
    long		expiretime = 0;
+#ifdef LFS
+   unsigned long z_flag;
+#else
    int		z_flag;
+#endif
    DLGCDECLARESPL(oldspl)
 
    if(timeInTicks<0)
@@ -360,7 +364,11 @@ int st_Add2UsedQ( qptr, msgp, timeInTicks, ddd, identifier )
 int st_Add2FreeQ( infop )
    TIMER_INFO *infop;
 {
+#ifdef LFS
+   unsigned long z_flag;
+#else
    int z_flag;
+#endif
 #ifndef LFS
    TIMER_INFO *tmp;
 #endif

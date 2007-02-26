@@ -139,7 +139,11 @@ VOID A4_setAddress(WORD port,ULONG address)
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifdef LFS
+    unsigned long oldspl;
+#else
     int oldspl;
+#endif
 #endif
 
     mix.fourbytes = address;
@@ -204,7 +208,11 @@ ULONG A4_getAddress(WORD port)
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifdef LFS
+    unsigned long oldspl;
+#else
     int oldspl;
+#endif
 #endif
 
 #ifdef AIX_ANT

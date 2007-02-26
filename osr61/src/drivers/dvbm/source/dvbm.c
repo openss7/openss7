@@ -269,7 +269,11 @@ dvbmclose(queue_t *q, int dummy, cred_t *crp)
 #ifndef LFS
    GN_BULKPARM *bmp;
 #endif
+#ifdef LFS
+   unsigned long z_flag;
+#else
    int		z_flag;
+#endif
    DLGCDECLARESPL(oldspl)
 
    DLGC_DEBUG_MSG3(CE_DEBUG, "dvbmclose() q:%x\n", q);
@@ -370,7 +374,11 @@ mblk_t   *mp;
    int            count;
    unsigned int   flusharg;
    unsigned int   sendbytes;
+#ifdef LFS
+   unsigned long z_flag;
+#else
    int		  z_flag;
+#endif
    DLGCDECLARESPL(oldspl)
 
    DLGC_DEBUG_MSG4(CE_DEBUG, "dvbmwput() q:%x mp:%x\n", q, mp);

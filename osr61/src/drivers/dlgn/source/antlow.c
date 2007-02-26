@@ -211,7 +211,11 @@ SHORT send_message(SHORT prcu, SHORT board, RCU destrcu,
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifdef LFS
+    unsigned long oldspl;
+#else
     int oldspl;
+#endif
 #endif
 
     LONG timecount;

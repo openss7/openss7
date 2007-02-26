@@ -312,7 +312,11 @@ SHORT bd_open(BYTE bn, SHORT bddir, SHORT *bdstream,SHORT loc)
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifdef LFS
+    unsigned long oldspl;
+#else
     int oldspl;
+#endif
 #endif
 
     retcode = E_SUCC;
@@ -552,7 +556,11 @@ SHORT bd_close(BYTE board,BYTE stream)
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifdef LFS
+    unsigned long oldspl;
+#else
     int oldspl;
+#endif
 #endif
 
     port = p_board[board].port;

@@ -139,7 +139,8 @@ OpenSS7 Project is concerned.  @cite{Linux Fast-STREAMS} is the preferred replac
 
 The @cite{@value{PACKAGE_TITLE}} package is currently compatible with @cite{Linux Fast-STREAMS
 (LfS)}.
-The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7 @b{streams-0.7a.6} release
+The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7
+@b{streams-@value{VERSION_STREAMS}} release
 that is available from the @url{http://www.openss7.org/download.html, The OpenSS7 Project Downloads
 Page}.
 

@@ -1,0 +1,526 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database osr61.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so osr61.macros
+.\"
+.\"
+.TH CTIMOD 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.SH NAME
+.B ctimod
+\- various kernel function wrappers
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.BR ctimod (4)
+kernel module provided with the Dialogic\(rg Open System Release 6.1 GPL drivers is a kernel module
+that provides a set of wrapper functions for Linux kernel functions as follows:
+.PP
+.TS
+tab(:);
+lblb
+ll.
+CTIMOD Function:Kernel Function
+_
+ctimod_add_timer:add_timer
+ctimod_add_wait_queue:add_wait_queue
+ctimod_bzero:bzero
+ctimod_check_rh:check_rh
+ctimod_copy_from_user:copy_from_user
+ctimod_copy_to_user:copy_to_user
+ctimod_create_proc_entry:create_proc_entry
+ctimod_create_workqueue:create_workqueue
+ctimod_debug_clear:debug_clear
+ctimod_debug_off:debug_off
+ctimod_debug_on:debug_on
+ctimod_debug_print:debug_print
+ctimod_debug_toggle:debug_toggle
+ctimod_del_timer:del_timer
+ctimod_do_gettimeofday:do_gettimeofday
+ctimod_free_irq:free_irq
+ctimod_free_pages:free_pages
+ctimod_get_free_pages:get_free_pages
+ctimod_init_timer:init_timer
+ctimod_init_waitqueue_head:init_waitqueue_head
+ctimod_ioremap:ioremap
+ctimod_iounmap:iounmap
+ctimod_jiffies:jiffies
+ctimod_kfree:kfree
+ctimod_kmalloc:kmalloc
+ctimod_memcpy:memcpy
+ctimod_memset:memset
+ctimod_pci_find_device:pci_find_device
+ctimod_pci_module_init:pci_module_init
+ctimod_pci_read_config_byte:pci_read_config_byte
+ctimod_pci_read_config_dword:pci_read_config_dword
+ctimod_pci_read_config_word:pci_read_config_word
+ctimod_pci_unregister_driver:pci_unregister_driver
+ctimod_pci_write_config_byte:pci_write_config_byte
+ctimod_pci_write_config_dword:pci_write_config_dword
+ctimod_pci_write_config_word:pci_write_config_word
+ctimod_poll_wait:poll_wait
+ctimod_printk:printk
+ctimod_queue_work:queue_work
+ctimod_register_chrdev:register_chrdev
+ctimod_remove_proc_entry:remove_proc_entry
+ctimod_remove_wait_queue:remove_wait_queue
+ctimod_request_irq:request_irq
+ctimod_schedule:schedule
+ctimod_schedule_timeout:schedule_timeout
+ctimod_spin_lock:spin_lock
+ctimod_spin_lock_bh:spin_lock_bh
+ctimod_spin_lock_init:spin_lock_init
+ctimod_spin_lock_irq:spin_lock_irq
+ctimod_spin_trylock:spin_trylock
+ctimod_spin_unlock:spin_unlock
+ctimod_spin_unlock_bh:spin_unlock_bh
+ctimod_spin_unlock_irq:spin_unlock_irq
+ctimod_sprintf:sprintf
+ctimod_tasklet_init:tasklet_init
+ctimod_tasklet_kill:tasklet_kill
+ctimod_udelay:udelay
+ctimod_unregister_chrdev:unregister_chrdev
+ctimod_virt_to_page:virt_to_page
+ctimod_vsprintf:vsprintf
+ctimod_wake_up_interruptible:wake_up_interruptible
+ctimod_wake_up_process:wake_up_process
+.TE
+.PP
+Most of these functions are useless wrappers for the Linux kernel functions.  These functions are
+only used by the
+.BR pmacd (4)
+driver, which is a non-STREAMS driver.  In general, it was rather useless to write the
+.BR pmacd (4)
+driver as a non-STREAMS driver as the driver winds up reinventing a significant portion of the
+DDI/DKI and duplication of the functions of the Stream head.
+.TP
+.BR ctimod_add_timer ()
+This function is purposeless.  Call
+.BR add_timer (9)
+instead if absolutely necessary; however,
+.BR add_timer (9)
+is non-portable.  Use the DDI/DKI portable function
+.BR timeout (9)
+instead.
+.TP
+.BR ctimod_add_wait_queue ()
+This function is purposeless.  Call
+.BR add_wait_queue (9)
+instead if absolutely necessary; however,
+.BR add_wait_queue (9)
+is non-portable.  Use the DDI/DKI portable function
+.BR SV_WAIT (9)
+instead.
+.TP
+.BR ctimod_bzero ()
+This function is purposeless.  Call the portable DDI/DKI
+function
+.BR bzero (9)
+directly instead.
+.TP
+.BR ctimod_check_rh ()
+.TP
+.BR ctimod_copy_from_user ()
+This function is purposeless.  Call
+.BR copy_from_user (9)
+if absolutely necessary; however,
+.BR copy_from_user (9)
+is non-portable.  Use the DDI/DKI portable
+function
+.BR copyin (9)
+instead.
+.TP
+.BR ctimod_copy_to_user ()
+This function is purposeless.  Call
+.BR copy_to_user (9)
+is absolutely necessary; however,
+.BR copy_to_user (9)
+is non-portable.  Use the DDI/DKI portable function
+.BR copyout (9)
+instead.
+.TP
+.BR ctimod_create_proc_entry ()
+.TP
+.BR ctimod_create_workqueue ()
+.TP
+.BR ctimod_debug_clear ()
+.TP
+.BR ctimod_debug_off ()
+.TP
+.BR ctimod_debug_on ()
+.TP
+.BR ctimod_debug_print ()
+.TP
+.BR ctimod_debug_toggle ()
+.TP
+.BR ctimod_del_timer ()
+This function is purposeless.  Call
+.BR del_timer (9)
+instead if absolutely necessary; however,
+.BR del_timer (9)
+is non-portable.  Use the DDI/DKI portable function
+.BR untimeout (9)
+instead.
+.TP
+.BR ctimod_do_gettimeofday ()
+This function is purposeless.  Call
+.BR do_gettimeofday (9)
+instead if absolutely necessry; however,
+.BR do_gettimeofday (9)
+is non-portable.  Use the DDI/DKI portable function
+.BR drv_getparm (9)
+with the
+.I TIME
+parameter instead.
+.TP
+.BR ctimod_free_irq ()
+This function is purposeless.  Call
+.BR free_irq (9)
+instead if absolutely necessary.
+.TP
+.BR ctimod_free_pages ()
+This function is purposeless. Call
+.BR free_pages (9)
+if absolutely necessary; however,
+.BR free_pages (9)
+is non-portable.
+.TP
+.BR ctimod_get_free_pages ()
+This function is purposeless.  Call
+.BR get_free_pages (9)
+if absolutely necessary; however,
+.BR get_free_pages (9)
+is non-portable.
+.BR get_free_pages (9)
+is often unnecessary and the DDI/DKI function
+.BR kmem_alloc (9)
+can be used in its stead.
+.BR get_free_pages (9)
+is only necessary when physically contiguous pages of unique character (e.g. suitable for ISA DMA)
+ar required.
+.TP
+.BR ctimod_init_timer ()
+This function is purposeless.  Call
+.BR init_timer (9)
+instead.  As Linux native timers are non-portable, use the DDI/DKI functions
+.BR timeout (9)
+and
+.BR untimeout (9)
+instead.
+.TP
+.BR ctimod_init_waitqueue_head ()
+.TP
+.BR ctimod_ioremap ()
+.TP
+.BR ctimod_iounmap ()
+.TP
+.BR ctimod_jiffies ()
+This function is purposeless.  Call
+.BR jiffies (9)
+if absolutely necessary; however,
+.BR jiffies (9)
+is non-portable: use the DDI/DKI function
+.BR drv_getparm (9)
+with the
+.I LBOLT
+parameter instead.
+.TP
+.BR ctimod_kfree ()
+This function is purposeless.  Call
+.BR kfree (9)
+instead if absolutely necessary.
+.BR kfree (9)
+is non-portable: use the DDI/DKI function
+.BR kmem_free (9)
+instead.
+.TP
+.BR ctimod_kmalloc ()
+This function is purposeless.  Call
+.BR kmalloc (9)
+instead if absolutely necessary.
+.BR kmalloc (9)
+is non-portable: use the DDI/DKI function
+.BR kmem_free (9)
+instead.
+.TP
+.BR ctimod_memcpy ()
+This function is purposeless.  Call
+.BR memcpy (9)
+instead of absolutely necessary.  Better still, use the portable DDI/DKI function
+.BR bcopy (9).
+.TP
+.BR ctimod_memset ()
+This function is purposeless.  Call
+.BR memset (9)
+instead of absolutely necessary.  Better still, use the portable DDI/DKI function
+.BR bzero (9).
+.TP
+.BR ctimod_pci_find_device ()
+.TP
+.BR ctimod_pci_module_init ()
+.TP
+.BR ctimod_pci_read_config_byte ()
+.TP
+.BR ctimod_pci_read_config_dword ()
+.TP
+.BR ctimod_pci_read_config_word ()
+.TP
+.BR ctimod_pci_unregister_driver ()
+.TP
+.BR ctimod_pci_write_config_byte ()
+.TP
+.BR ctimod_pci_write_config_dword ()
+.TP
+.BR ctimod_pci_write_config_word ()
+.TP
+.BR ctimod_poll_wait ()
+.TP
+.BR ctimod_printk ()
+This function's implementation is flawed.  It uses a static buffer without protecting locks.  Do not
+use this function, if necessary use
+.BR printk (9)
+instead; however,
+.BR printk (9)
+is non-portable.  Use
+.BR cmn_err (9)
+or
+.BR strlog (9)
+instead.
+.TP
+.BR ctimod_queue_work ()
+.TP
+.BR ctimod_register_chrdev ()
+.TP
+.BR ctimod_remove_proc_entry ()
+.TP
+.BR ctimod_remove_wait_queue ()
+.TP
+.BR ctimod_request_irq ()
+.TP
+.BR ctimod_schedule ()
+.TP
+.BR ctimod_schedule_timeout ()
+.TP
+.BR ctimod_spin_lock ()
+This function is useless; call
+.BR spin_lock (9)
+directly if absolutely necessary.
+Use the portable DDI/DKI function
+.BR LOCK (9)
+instead.
+.TP
+.BR ctimod_spin_lock_bh ()
+This function is useless; call
+.BR spin_lock_bh (9)
+drirectly if absolutely necessary.
+This function is never what you want.  Use
+.BR spin_lock_irqsave (9)
+instead anyway.
+Use the portable DDI/DKI function
+.BR LOCK (9)
+instead.
+.TP
+.BR ctimod_spin_lock_init ()
+Use the portable DDI/DKI function
+.BR LOCK_ALLOC (9)
+or a lock initalizer string
+instead.
+.TP
+.BR ctimod_spin_lock_irq ()
+This function is useless; call
+.BR spin_lock_irq (9)
+directly if absolutely necessary.
+This function is seldom what you want.  Use
+.BR spin_lock_irqsave (9)
+instead anyway.
+Use the portable DDI/DKI function
+.BR LOCK (9)
+instead.
+.TP
+.BR ctimod_spin_trylock ()
+This function is useless; call
+.BR spin_trylock (9)
+directly if absolutely necessary.
+Use the portable DDI/DKI function
+.BR TRYLOCK (9)
+instead.
+.TP
+.BR ctimod_spin_unlock ()
+This function is usless; call
+.BR spin_unlock (9)
+directly if absolutely necessary.
+Use the portable DDI/DKI function
+.BR UNLOCK (9)
+instead.
+.TP
+.BR ctimod_spin_unlock_bh ()
+This function is useless; call
+.BR spin_unlock_bh (9)
+directly if absolutely necessary; however, it is dangerous.
+Use the portable DDI/DKI function
+.BR UNLOCK (9)
+instead.
+.TP
+.BR ctimod_spin_unlock_irq ()
+This funciton is useless; call
+.BR spin_unlock_irq (9)
+directly if absolutely necessary.  This is seldom what you want.  Use
+.BR spin_unlock_irqrestore (9).
+Use the portable DDI/DKI function
+.BR UNLOCK (9)
+instead.
+.TP
+.BR ctimod_sprintf ()
+Use the function
+.BR sprintf (9)
+directly if absolutely necessary, or use the more portable
+.BR mi_sprintf (9)
+function.
+.TP
+.BR ctimod_tasklet_init ()
+.TP
+.BR ctimod_tasklet_kill ()
+.TP
+.BR ctimod_udelay ()
+Use the portable DDI/DKI function
+.BR drv_usecwait (9)
+instead.
+.TP
+.BR ctimod_unregister_chrdev ()
+.TP
+.BR ctimod_virt_to_page ()
+Use the portable DDI/DKI function
+.BR vtop (9)
+instead.
+.TP
+.BR ctimod_vsprintf ()
+Use the function
+.BR vsprintf (9)
+directly if absolutely necessary, or use the more portable
+.BR mi_sprintf (9)
+instead.
+.TP
+.BR ctimod_wake_up_interruptible ()
+Use the portable DDI/DKI functions
+.BR SV_BROADCAST (9)
+or
+.BR SV_SINGLE (9)
+instead.
+.TP
+.BR ctimod_wake_up_process ()
+Use the portable DDI/DKI function
+.BR wakeup (9)
+instead.
+.\"
+.\"
+.SH NOTICES
+.PP
+For the most part, the
+.B ctimod
+wrapper functions are another useless set of wrappers for Linu kernel functions.  Do not use these
+function: use Linux kernel functions directly or select a STREAMS DDI/DKI equivalent, see
+.BR DDI (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR cti_printk ()
+uses a static buffer without spinlock protection or interrupt suppression and is completely unsafe.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+These function provide a private Kernel DDI/DKI for Dialogic\(rg drivers and are not subject to
+conformance.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B ctimod
+kenel module and associated wrapper functions were part of Dialogic\(rg SR 5.1.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

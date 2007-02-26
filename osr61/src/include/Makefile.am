@@ -60,7 +60,8 @@ include ../../am/openss7.am
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
-nobase_pkginclude_HEADERS = 
+nobase_pkginclude_HEADERS = \
+	$(top_srcdir)/src/drivers/mercd/include/ctimod.h
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/$(PACKAGE)/config.h \

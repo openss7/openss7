@@ -549,7 +549,11 @@ GN_BOARD *bdp;
 #ifdef PCI_SPAN
    USHORT      PCIBoardId =  GET_PCIBRDID(bdp);
 #endif /* PCI_SPAN */
+#ifdef LFS
+   unsigned long z_flag;
+#else
    int 	       z_flag;
+#endif
 
    /* Get the pointer to the board's shared RAM area & validate it */
    if ((bdaddr = (D4XSRAM *)(dxbdp->db_sramaddr)) == NULL) {

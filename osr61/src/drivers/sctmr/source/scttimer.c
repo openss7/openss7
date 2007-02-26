@@ -306,7 +306,11 @@ int sctmropen(q, devp, flag, sflag, credp)
    SCT_INFO    *sctmsp;
    SCT_INFO    *esctmsp;
    static unsigned long once = 0;
+#ifdef LFS
+   unsigned long z_flag;
+#else
    int		z_flag;
+#endif
    unsigned long ulong_dev;
    DLGCDECLARESPL(oldspl)
 
@@ -408,7 +412,11 @@ int sctmrclose(q, flag, credp)
    int      flag;
    cred_t  *credp;
 {
+#ifdef LFS
+   unsigned long z_flag;
+#else
    int		 z_flag;
+#endif
    DLGCDECLARESPL(oldspl)
    TIMER_INFO	*tmp;
 
@@ -607,7 +615,11 @@ void sct_timer( tmoflag )
    long tmoflag;
 #endif
 {
+#ifdef LFS
+   unsigned long z_flag;
+#else
    int	z_flag;
+#endif
    DLGCDECLARESPL(oldspl)
    DIAGENTER1( "sct_timer", "tmoflag:%x", tmoflag )
 #ifdef LFS
@@ -735,7 +747,11 @@ int sctmrwput(q, mp)
    int		 handle;
 #endif
    int		 count;
+#ifdef LFS
+   unsigned long z_flag;
+#else
    int		 z_flag;
+#endif
    DLGCDECLARESPL(oldspl)
 #ifndef LFS
    int		 rc;

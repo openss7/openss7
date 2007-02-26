@@ -1676,7 +1676,11 @@ register mblk_t      *mp;
    register LD_CMD         *ld_cmdp = &ldp->ld_cmds[ldp->ld_cmdcnt];
    register GN_CMDMSG      *drvhdr = (GN_CMDMSG *) mp->b_rptr;
    static   unsigned long  command_seq = 1;
+#ifdef LFS
+   unsigned long z_flag;
+#else
    int	    z_flag;
+#endif
 
 #ifdef DLGN_DEBUG
    if (dlgn_debug & 0x0010)
@@ -1738,7 +1742,11 @@ register GN_LOGDEV   *ldp;
 register int         cmd;
 int flag;
 {
+#ifdef LFS
+   unsigned long z_flag;
+#else
    int z_flag;
+#endif
 #ifdef DLGN_DEBUG
    if (dlgn_debug & 0x0010)
       cmn_err(CE_NOTE,"dlgn_rmvcmd(0x%x, %d, 0x%x)", ldp, cmd, flag);
@@ -1919,8 +1927,13 @@ int sflag;
 cred_t *crp;
 {
    int	dev = 0;
+#ifdef LFS
+   unsigned long  z_flag1;
+   unsigned long  z_flag2;
+#else
    int  z_flag1;
    int  z_flag2;
+#endif
    int  major;
    register queue_t  **qpp;
 #ifndef LFS
@@ -2045,9 +2058,15 @@ int dlgnclose(queue_t *q, int dummy, cred_t *crp)
    int            j, k;
 #endif
    unsigned long  flags = 0;
+#ifdef LFS
+   unsigned long  z_flag1;
+   unsigned long  z_flag2;
+   unsigned long  z_flag3;
+#else
    int 		  z_flag1;
    int		  z_flag2;
    int		  z_flag3;
+#endif
    DLGCDECLARESPL(oldspl)
 
    DLGCSPLSTR(oldspl);
@@ -2175,7 +2194,11 @@ irqreturn_t dlgnintr(int vecnum, void *dev_id, struct pt_regs * regs)
    register PM_SWTBL *psp;
    register int hit = 0;
 #endif
+#ifdef LFS
+   unsigned long z_flag;
+#else
    int		z_flag;
+#endif
 
    DLGCSPINLOCK(inthw_lock, z_flag);
 
@@ -2229,7 +2252,12 @@ int dlgnwput(q, mp)
 queue_t *q;
 mblk_t *mp;
 {
+#ifdef LFS
+   unsigned long z_flag;
+   int i;
+#else
    int z_flag, i;
+#endif
 
    switch (mp->b_datap->db_type) {
    case M_PROTO:
@@ -2413,7 +2441,11 @@ mblk_t *mp;
 #endif
    int handle;
    int indx;
+#ifdef LFS
+   unsigned long z_flag;
+#else
    int z_flag;
+#endif
    DLGCDECLARESPL(oldspl)
 
    /* Unbind must be from the same STREAM that handle was bound on */
@@ -2807,7 +2839,11 @@ mblk_t *mp;
    GN_LOGDEV *ldp;
    GN_BIND *bindp;
    int len;
+#ifdef LFS
+   unsigned long z_flag;
+#else
    int z_flag;
+#endif
    int handle;
    DLGCDECLARESPL(oldspl)
 
@@ -2913,8 +2949,13 @@ int dlgnwsrv(q)
 queue_t *q;
 {
    mblk_t      *mp;
+#ifdef LFS
+   unsigned long z_flag1;
+   unsigned long z_flag2;
+#else
    int		z_flag1;
    int		z_flag2;
+#endif
 
    DLGCSPINLOCK(intmod_lock, z_flag1);
    DLGCSPINLOCK(intdrv_lock, z_flag2);
@@ -3940,7 +3981,11 @@ mblk_t  *mp;
 #ifndef LFS
    int      rcode;
 #endif
+#ifdef LFS
+   unsigned long z_flag;
+#else
    int	    z_flag;
+#endif
    register GN_LOGDEV      *ldp;
    register GN_CMDMSG      *drvhdr;
    register unsigned long  handle;

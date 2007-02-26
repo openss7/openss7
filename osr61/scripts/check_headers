@@ -132,14 +132,26 @@ fi
 #
 headers=
 for f in $PKG_HEADERS ; do
-	if test -f ./$f ; then
-		header=`pwd`/$f
-	elif test -f $abs_srcdir/$f ; then
-		header=$abs_srcdir/$f
-	else
-		header=
-		echo_d "file $f does not exist" $LINENO
-	fi
+	case $f in
+	(/*)
+		if test -f $f ; then
+			header=$f
+		else
+			header=
+			echo_d "file $f does not exit" $LINENO
+		fi
+		;;
+	(*)
+		if test -f ./$f ; then
+			header=`pwd`/$f
+		elif test -f $abs_srcdir/$f ; then
+			header=$abs_srcdir/$f
+		else
+			header=
+			echo_d "file $f does not exist" $LINENO
+		fi
+		;;
+	esac
 	headers="${headers:+$headers${header:+ }}${header}"
 done
 if test -z "$headers"
