@@ -74,13 +74,13 @@
 #   define DLGC_MSG7(t,u,v,w,x,y,z)      printk((u),(v),(w),(x),(y),(z))
 #   define DLGC_MSG8(s,t,u,v,w,x,y,z)    printk((t),(u),(v),(w),(x),(y),(z))
 #else
-#   define DLGC_MSG2(x,args...)		 cmn_err((x), args)
-#   define DLGC_MSG3(x,args...)		 cmn_err((x), args)
-#   define DLGC_MSG4(x,args...)		 cmn_err((x), args)
-#   define DLGC_MSG5(x,args...)		 cmn_err((x), args)
-#   define DLGC_MSG6(x,args...)		 cmn_err((x), args)
-#   define DLGC_MSG7(x,args...)		 cmn_err((x), args)
-#   define DLGC_MSG8(x,args...)		 cmn_err((x), args)
+#   define DLGC_MSG2(x,args...)		 cmn_err((x), ##args)
+#   define DLGC_MSG3(x,args...)		 cmn_err((x), ##args)
+#   define DLGC_MSG4(x,args...)		 cmn_err((x), ##args)
+#   define DLGC_MSG5(x,args...)		 cmn_err((x), ##args)
+#   define DLGC_MSG6(x,args...)		 cmn_err((x), ##args)
+#   define DLGC_MSG7(x,args...)		 cmn_err((x), ##args)
+#   define DLGC_MSG8(x,args...)		 cmn_err((x), ##args)
 #endif
 #else
 #ifndef LFS
@@ -92,13 +92,13 @@
 #   define DLGC_MSG7(t,u,v,w,x,y,z)             dlgn_msg((t),(u),(v),(w),(x),(y),(z))
 #   define DLGC_MSG8(s,t,u,v,w,x,y,z)           dlgn_msg((s),(t),(u),(v),(w),(x),(y),(z))
 #else
-#   define DLGC_MSG2(x,args...)			dlgn_msg((x), args)
-#   define DLGC_MSG3(x,args...)			dlgn_msg((x), args)
-#   define DLGC_MSG4(x,args...)			dlgn_msg((x), args)
-#   define DLGC_MSG5(x,args...)			dlgn_msg((x), args)
-#   define DLGC_MSG6(x,args...)			dlgn_msg((x), args)
-#   define DLGC_MSG7(x,args...)			dlgn_msg((x), args)
-#   define DLGC_MSG8(x,args...)			dlgn_msg((x), args)
+#   define DLGC_MSG2(x,args...)			dlgn_msg((x), ##args)
+#   define DLGC_MSG3(x,args...)			dlgn_msg((x), ##args)
+#   define DLGC_MSG4(x,args...)			dlgn_msg((x), ##args)
+#   define DLGC_MSG5(x,args...)			dlgn_msg((x), ##args)
+#   define DLGC_MSG6(x,args...)			dlgn_msg((x), ##args)
+#   define DLGC_MSG7(x,args...)			dlgn_msg((x), ##args)
+#   define DLGC_MSG8(x,args...)			dlgn_msg((x), ##args)
 #endif
 #endif /* LINUX */
 

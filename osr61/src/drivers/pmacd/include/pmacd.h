@@ -223,8 +223,8 @@ typedef void irqreturn_t;
 // These versions shutoff interrupts on the present processor, 
 // and save/restore processor flags.
 // These should be used when protecting against ISRs/BHs (avoid preemption)
-#define MUTEX_ENTER_IRQSAVE(mutex, flags)spin_lock_irqsave(&(mutex), (flags))
-#define MUTEX_EXIT_IRQRESTORE(mutex, flags)spin_unlock_irqrestore(&(mutex),(flags))
+#define MUTEX_ENTER_IRQSAVE(mutex, flags) spin_lock_irqsave(&(mutex), (flags))
+#define MUTEX_EXIT_IRQRESTORE(mutex, flags) spin_unlock_irqrestore(&(mutex),(flags))
 
 #define ATOMIC_T atomic_t
 #define ATOMIC_SET(atomicVar,val) atomic_set(&(atomicVar),(val))
@@ -235,7 +235,7 @@ typedef void irqreturn_t;
 #define ATOMIC_SUB(atomicVar,val) atomic_sub((val), &(atomicVar))
 #define ATOMIC_DEC_AND_TEST(atomicVar) atomic_dec_and_test(&(atomicVar))
 
-#define pmacd_printError(fmt, args...)printk(KERN_ERR "pmacd: ERROR: " fmt, ##args)
+#define pmacd_printError(fmt, args...) printk(KERN_ERR "pmacd: ERROR: " fmt, ##args)
 #define pmacd_printDebug(fmt, args...) printk(KERN_DEBUG "pmacd: DEBUG: " fmt, ##args)
 #define pmacd_memcpy_UtoK(retCode, dest, src, size) { *(retCode)=copy_from_user((dest), (src), (size));}
 #define pmacd_memcpy_KtoK(retCode, dest, src, size) { *(retCode)=0; memcpy((dest), (src), (size));}

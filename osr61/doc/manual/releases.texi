@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.1 2007/02/25 12:45:12 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.2 2007/02/26 07:24:58 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,11 +54,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/02/25 12:45:12 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/26 07:24:58 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: releases.texi,v $
+@c Revision 0.9.2.2  2007/02/26 07:24:58  brian
+@c - synchronizing changes
+@c
 @c Revision 0.9.2.1  2007/02/25 12:45:12  brian
 @c - added new files for release package
 @c

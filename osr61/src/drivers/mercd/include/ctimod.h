@@ -21,80 +21,82 @@
 
 // Undefine and redefine functions as ctimod
 
+#ifndef CTIMOD_NO_MACROS
+
 #ifdef add_timer
 #undef add_timer
 #endif
-#define add_timer 			ctimod_add_timer
+#define add_timer(tlist)		ctimod_add_timer(tlist)
 
 #ifdef add_wait_queue
 #undef add_wait_queue
 #endif
-#define add_wait_queue 			ctimod_add_wait_queue
+#define add_wait_queue(list,item)	ctimod_add_wait_queue(list,item)
 
 #ifdef bzero
 #undef bzero
 #endif
-#define bzero				ctimod_bzero
+#define bzero(ptr,size)			ctimod_bzero(ptr,size)
 
 #ifdef copy_to_user
 #undef copy_to_user
 #endif
-#define copy_to_user 			ctimod_copy_to_user
+#define copy_to_user(src,dst,size)	ctimod_copy_to_user(src,dst,size)
 
 #ifdef copy_from_user
 #undef copy_from_user
 #endif
-#define copy_from_user 			ctimod_copy_from_user
+#define copy_from_user(dst,src,size)	ctimod_copy_from_user(dst,src,size)
 
 #ifdef create_proc_entry 
 #undef create_proc_entry 
 #endif
-#define create_proc_entry		ctimod_create_proc_entry 
+#define create_proc_entry(name,mode,entry) ctimod_create_proc_entry(name,mode,entry)
 
 #ifdef del_timer
 #undef del_timer
 #endif
-#define del_timer			ctimod_del_timer
+#define del_timer(tlist)		ctimod_del_timer(tlist)
 
 #ifdef do_gettimeofday
 #undef do_gettimeofday
 #endif
-#define do_gettimeofday			ctimod_do_gettimeofday
+#define do_gettimeofday(tv)		ctimod_do_gettimeofday(tv)
 
 #ifdef free_pages
 #undef free_pages
 #endif
-#define free_pages			ctimod_free_pages
+#define free_pages(addr,order)		ctimod_free_pages(addr,order)
 
 #ifdef free_irq
 #undef free_irq
 #endif
-#define free_irq			ctimod_free_irq
+#define free_irq(num,ptr)		ctimod_free_irq(num,ptr)
 
 #ifdef __get_free_pages
 #undef __get_free_pages
 #endif
-#define __get_free_pages		ctimod_get_free_pages
+#define __get_free_pages(gfp,order)	ctimod_get_free_pages(gfp,order)
 
 #ifdef init_timer
 #undef init_timer
 #endif
-#define init_timer			ctimod_init_timer
+#define init_timer(tlist)		ctimod_init_timer(tlist)
 
 #ifdef init_waitqueue_head
 #undef init_waitqueue_head
 #endif
-#define init_waitqueue_head             ctimod_init_waitqueue_head
+#define init_waitqueue_head(head)	ctimod_init_waitqueue_head(head)
 
 #ifdef ioremap
 #undef ioremap
 #endif
-#define ioremap				ctimod_ioremap
+#define ioremap(src,dst)		ctimod_ioremap(src,dst)
 
 #ifdef iounmap
 #undef iounmap
 #endif
-#define iounmap				ctimod_iounmap
+#define iounmap(ptr)			ctimod_iounmap(ptr)
 
 #ifdef jiffies
 #undef jiffies
@@ -104,87 +106,87 @@
 #ifdef kfree
 #undef kfree
 #endif
-#define kfree				ctimod_kfree
+#define kfree(ptr,size)			ctimod_kfree(ptr,size)
 
 #ifdef kmalloc
 #undef kmalloc
 #endif
-#define kmalloc				ctimod_kmalloc
+#define kmalloc(size,gfp)		ctimod_kmalloc(size,gfp)
 
 #ifdef mark_bh
 #undef mark_dh
 #endif
-#define mark_bh				ctimod_mark_bh
+#define mark_bh(num)			ctimod_mark_bh(num)
 
 #ifdef memcpy
 #undef memcpy
 #endif
-#define memcpy				ctimod_memcpy
+#define memcpy(dst,src,size)		ctimod_memcpy(dst,src,size)
 
 #ifdef memset
 #undef memset
 #endif
-#define memset				ctimod_memset
+#define memset(ptr,val,size)		ctimod_memset(ptr,val,size)
 
 #ifdef pcibios_present
 #undef pcibios_present
 #endif
-#define pcibios_present			ctimod_pcibios_present
+#define pcibios_present()		ctimod_pcibios_present()
 
 #ifdef pci_module_init
 #undef pci_module_init
 #endif
-#define pci_module_init			ctimod_pci_module_init
+#define pci_module_init(pci)		ctimod_pci_module_init(pci)
 
 #ifdef pci_register_driver
 #undef pci_register_driver
 #endif
-#define pci_register_driver		ctimod_pci_register_driver
+#define pci_register_driver(pci)	ctimod_pci_register_driver(pci)
 
 #ifdef pci_unregister_driver
 #undef pci_unregister_driver
 #endif
-#define pci_unregister_driver		ctimod_pci_unregister_driver
+#define pci_unregister_driver(pci)	ctimod_pci_unregister_driver(pci)
 
 #ifdef pci_find_device
 #undef pci_find_device
 #endif
-#define pci_find_device			ctimod_pci_find_device
+#define pci_find_device(clas,type,pci)	ctimod_pci_find_device(clas,type,pci)
 
 #ifdef pci_read_config_byte
 #undef pci_read_config_byte
 #endif
-#define pci_read_config_byte		ctimod_pci_read_config_byte
+#define pci_read_config_byte(pci,num,valp) ctimod_pci_read_config_byte(pci,num,valp)
 
 #ifdef pci_read_config_word
 #undef pci_read_config_word
 #endif
-#define pci_read_config_word            ctimod_pci_read_config_word
+#define pci_read_config_word(pci,num,valp) ctimod_pci_read_config_word(pci,num,valp)
 
 #ifdef pci_read_config_dword
 #undef pci_read_config_dword
 #endif
-#define pci_read_config_dword           ctimod_pci_read_config_dword
+#define pci_read_config_dword(pci,num,valp) ctimod_pci_read_config_dword(pci,num,valp)
 
 #ifdef pci_write_config_byte
 #undef pci_write_config_byte
 #endif
-#define pci_write_config_byte           ctimod_pci_write_config_byte
+#define pci_write_config_byte(pci,num,val) ctimod_pci_write_config_byte(pci,num,val)
 
 #ifdef pci_write_config_word
 #undef pci_write_config_word
 #endif
-#define pci_write_config_word		ctimod_pci_write_config_word
+#define pci_write_config_word(pci,num,val) ctimod_pci_write_config_word(pci,num,val)
 
 #ifdef pci_write_config_dword
 #undef pci_write_config_dword
 #endif
-#define pci_write_config_dword          ctimod_pci_write_config_dword
+#define pci_write_config_dword(pci,num,val) ctimod_pci_write_config_dword(pci,num,val)
 
 #ifdef printk
 #undef printk
 #endif
-#define printk				ctimod_printk
+#define printk(fmt,args...)		ctimod_printk(fmt,##args)
 
 #ifdef proc_root
 #undef proc_root
@@ -194,7 +196,7 @@
 #ifdef poll_wait
 #undef poll_wait
 #endif
-#define poll_wait			ctimod_poll_wait
+#define poll_wait(file,wait,poll)	ctimod_poll_wait(file,wait,poll)
 
 #ifdef remap_page_range
 #undef remap_page_range
@@ -234,57 +236,57 @@
 #ifdef spin_trylock
 #undef spin_trylock
 #endif
-#define spin_trylock                    ctimod_spin_trylock
+#define spin_trylock(lockp)		ctimod_spin_trylock(lockp)
 
 #ifdef spin_lock_bh
 #undef spin_lock_bh
 #endif
-#define spin_lock_bh                    ctimod_spin_lock_bh
+#define spin_lock_bh(lockp)		ctimod_spin_lock_bh(lockp)
 
 #ifdef spin_unlock_bh
 #undef spin_unlock_bh
 #endif
-#define spin_unlock_bh                  ctimod_spin_unlock_bh
+#define spin_unlock_bh(lockp)		ctimod_spin_unlock_bh(lockp)
 
 #ifdef spin_lock
 #undef spin_lock
 #endif
-#define spin_lock                       ctimod_spin_lock
+#define spin_lock(lockp)		ctimod_spin_lock(lockp)
 
 #ifdef spin_unlock
 #undef spin_unlock
 #endif
-#define spin_unlock                     ctimod_spin_unlock
+#define spin_unlock(lockp)		ctimod_spin_unlock(lockp)
 
 #ifdef spin_lock_irq
 #undef spin_lock_irq
 #endif
-#define spin_lock_irq                   ctimod_spin_lock_irq
+#define spin_lock_irq(lockp)		ctimod_spin_lock_irq(lockp)
 
 #ifdef spin_unlock_irq
 #undef spin_unlock_irq
 #endif
-#define spin_unlock_irq                 ctimod_spin_unlock_irq
+#define spin_unlock_irq(lockp)		ctimod_spin_unlock_irq(lockp)
 
 #ifdef spin_lock_irqsave
 #undef spin_lock_irqsave
 #endif
-#define spin_lock_irqsave		ctimod_spin_lock_irqsave
+#define spin_lock_irqsave(lockp,flags)	ctimod_spin_lock_irqsave(lockp,&flags)
 
 #ifdef spin_unlock_irqrestore
 #undef spin_unlock_irqrestore
 #endif
-#define spin_unlock_irqrestore          ctimod_spin_unlock_irqrestore
+#define spin_unlock_irqrestore(lockp,flags) ctimod_spin_unlock_irqrestore(lockp,flags)
 
 #ifdef spin_lock_init
 #undef spin_lock_init
 #endif
-#define spin_lock_init                  ctimod_spin_lock_init
+#define spin_lock_init(lockp)		ctimod_spin_lock_init(lockp)
 
 #ifdef sprintf
 #undef sprintf
 #endif
-#define sprintf				ctimod_sprintf
+#define sprintf(buf,fmt,args...)	ctimod_sprintf(buf,fmt,##args)
 
 #ifdef tasklet_init
 #undef tasklet_init
@@ -314,13 +316,14 @@
 #ifdef vsprintf
 #undef vsprintf
 #endif
-#define vsprintf			ctimod_vsprintf
+#define vsprintf(buf,fmt,args)		ctimod_vsprintf(buf,fmt,args)
 
 #ifdef wake_up_interruptible
 #undef wake_up_interruptible
 #endif
 #define wake_up_interruptible		ctimod_wake_up_interruptible
 
+#endif /* CTIMOD_NO_MACROS */
 
 
 // ctimod Prototypes 
@@ -335,7 +338,7 @@ struct proc_dir_entry *ctimod_create_proc_entry(const char *, mode_t,
 void   ctimod_do_gettimeofday(struct timeval *);
 void   ctimod_free_irq(int, void *);
 void   ctimod_free_pages(ulong, ulong);
-ulong  ctimod_get_free_pages(uint, ulong);
+ulong  ctimod_get_free_pages(uint, unsigned int);
 void   ctimod_init_timer(struct timer_list *);
 void   ctimod_init_waitqueue_head(wait_queue_head_t *);
 void   *ctimod_ioremap(ulong, ulong);
@@ -344,7 +347,7 @@ ulong  ctimod_jiffies(void);
 void   ctimod_kfree(void *, int);
 void   *ctimod_kmalloc(size_t, int);
 void   ctimod_mark_bh(int);
-void   ctimod_memcpy(void *, const void *, size_t);
+void   *ctimod_memcpy(void *, const void *, size_t);
 void   ctimod_memset(void *, int, size_t);
 int    ctimod_pcibios_present(void);
 int    ctimod_pci_module_init(struct pci_driver *);
@@ -379,8 +382,13 @@ void   ctimod_spin_lock(spinlock_t *);
 void   ctimod_spin_unlock(spinlock_t *);
 void   ctimod_spin_lock_irq(spinlock_t *);
 void   ctimod_spin_unlock_irq(spinlock_t *);
-void   ctimod_spin_lock_irqsave(spinlock_t *, int);
+#if defined LINUX24 && !defined LFS
+void   ctimod_spin_lock_irqsave(spinlock_t *, int *);
 void   ctimod_spin_unlock_irqrestore(spinlock_t *, int);
+#else
+void   ctimod_spin_lock_irqsave(spinlock_t *, unsigned long *);
+void   ctimod_spin_unlock_irqrestore(spinlock_t *, unsigned long);
+#endif
 void   ctimod_spin_lock_init(spinlock_t *);
 int    ctimod_sprintf(char *, const char *fmt, ...);
 void   ctimod_tasklet_init(struct tasklet_struct *, void (*)(unsigned long), unsigned long);

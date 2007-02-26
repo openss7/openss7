@@ -65,13 +65,13 @@
 #endif
 #else
 #ifdef LFS
-#   define DLGC_MSG2(x,args...)		    dlgn_msg((x),args)
-#   define DLGC_MSG3(x,args...)		    dlgn_msg((x),args)
-#   define DLGC_MSG4(x,args...)		    dlgn_msg((x),args)
-#   define DLGC_MSG5(x,args...)		    dlgn_msg((x),args)
-#   define DLGC_MSG6(x,args...)		    dlgn_msg((x),args)
-#   define DLGC_MSG7(x,args...)		    dlgn_msg((x),args)
-#   define DLGC_MSG8(x,args...)		    dlgn_msg((x),args)
+#   define DLGC_MSG2(x,args...)		    dlgn_msg((x),##args)
+#   define DLGC_MSG3(x,args...)		    dlgn_msg((x),##args)
+#   define DLGC_MSG4(x,args...)		    dlgn_msg((x),##args)
+#   define DLGC_MSG5(x,args...)		    dlgn_msg((x),##args)
+#   define DLGC_MSG6(x,args...)		    dlgn_msg((x),##args)
+#   define DLGC_MSG7(x,args...)		    dlgn_msg((x),##args)
+#   define DLGC_MSG8(x,args...)		    dlgn_msg((x),##args)
 #else
 #   define DLGC_MSG2(y,z)                    dlgn_msg((y),(z))
 #   define DLGC_MSG3(x,y,z)                  dlgn_msg((x),(y),(z))

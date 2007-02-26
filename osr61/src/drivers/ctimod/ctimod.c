@@ -41,6 +41,13 @@
 #include <linux/interrupt.h>
 #include <linux/proc_fs.h>
 
+#ifdef LFS
+/* header file verification */
+#define CTIMOD_NO_MACROS
+#include <src/drivers/mercd/include/ctimod.h>
+#undef CTIMOD_NO_MACROS
+#endif
+
 // Licensing 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Intel Corp. (c) 2005");
@@ -101,14 +108,14 @@ static struct file_operations ctimod_fops =
 
 
 int ctimod_printk(const char *fmt, ...) {
-	int             len ;
-	va_list         args;
-	char		ctimod_buf[1024];
-	
- 	va_start(args, fmt);
-	len = vsprintf (ctimod_buf, fmt, args);
-	va_end (args);
-	printk("%s", ctimod_buf) ;
+	int len;
+	va_list args;
+	char ctimod_buf[1024];
+
+	va_start(args, fmt);
+	len = vsprintf(ctimod_buf, fmt, args);
+	va_end(args);
+	printk("%s", ctimod_buf);
 	return len;
 }
 
@@ -460,17 +467,31 @@ void ctimod_spin_unlock_irq(spinlock_t *mutex) {
         return;
 }
 
-void ctimod_spin_lock_irqsave(spinlock_t *mutex, int flag) {
-        ctimod_dbg_locks("ctimod: spin_unlock_irqsave \n");
-        spin_lock_irqsave(mutex, flag);
-        return;
+#if defined LINUX24 && !defined LFS
+void ctimod_spin_lock_irqsave(spinlock_t *mutex, int *flagp)
+#else
+void ctimod_spin_lock_irqsave(spinlock_t *mutex, unsigned long *flagp)
+#endif
+{
+	unsigned long flags;
+
+	ctimod_dbg_locks("ctimod: spin_unlock_irqsave \n");
+	/* Whomever wrote this function obviously does not understand the spin_lock_irqsave macro.
+	   The processor status word is saved to the flag argument (&flag) which previously was
+	   discarded.  I have corrected this function and the corresponding macro. Not suprisingly
+	   use of this function is commented out in the MERCD code and avoided altogether in the
+	   PMACD code.  PMACD calls the bottom half versions (where is shouldn't). --bb */
+	spin_lock_irqsave(mutex, flags);
+	*flagp = flags;
+	return;
 }
 
-#ifdef LINUX24
-void ctimod_spin_unlock_irqrestore(spinlock_t *mutex, int flag) {
+#if defined LINUX24 && !defined LFS
+void ctimod_spin_unlock_irqrestore(spinlock_t *mutex, int flag)
 #else
-void ctimod_spin_unlock_irqrestore(spinlock_t *mutex, ulong flag) {
+void ctimod_spin_unlock_irqrestore(spinlock_t *mutex, ulong flag)
 #endif
+{
 	ctimod_dbg_locks("ctimod: spin_unlock_irqrestore \n");
 	spin_unlock_irqrestore(mutex, flag);
 	return;

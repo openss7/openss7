@@ -60,7 +60,7 @@ extern kmutex_t inthw_lock;
 #   define DLGC_MSG6(u,v,w,x,y,z)        printk((v),(w),(x),(y),(z))
 #   define DLGC_MSG7(t,u,v,w,x,y,z)      printk((u),(v),(w),(x),(y),(z))
 #   define DLGC_MSG8(s,t,u,v,w,x,y,z)    printk((t),(u),(v),(w),(x),(y),(z))
-#   define DLGC_MSG(level, fmt, args...)    printk(fmt, args)
+#   define DLGC_MSG(level, fmt, args...)    printk(fmt, ##args)
 #else
 #   define DLGC_MSG2(y,z)                       dlgn_msg((y),(z))
 #   define DLGC_MSG3(x,y,z)                     dlgn_msg((x),(y),(z))
@@ -69,6 +69,6 @@ extern kmutex_t inthw_lock;
 #   define DLGC_MSG6(u,v,w,x,y,z)               dlgn_msg((u),(v),(w),(x),(y),(z))
 #   define DLGC_MSG7(t,u,v,w,x,y,z)             dlgn_msg((t),(u),(v),(w),(x),(y),(z))
 #   define DLGC_MSG8(s,t,u,v,w,x,y,z)           dlgn_msg((s),(t),(u),(v),(w),(x),(y),(z))
-#   define DLGC_MSG(level, fmt, args...)    dlgn_msg(level, fmt, args)
+#   define DLGC_MSG(level, fmt, args...)    dlgn_msg(level, fmt, ##args)
 #endif
 #endif /* __CFDEXTERN_H__ */

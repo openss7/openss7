@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/02/21 01:09:07 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/02/26 07:25:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/21 01:09:07 $ by $Author: brian $
+ Last Modified $Date: 2007/02/26 07:25:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 0.9.2.17  2007/02/26 07:25:33  brian
+ - synchronizing changes
+
  Revision 0.9.2.16  2007/02/21 01:09:07  brian
  - updating mtp.c driver, better mi_open allocators
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/02/21 01:09:07 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/02/26 07:25:33 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/02/21 01:09:07 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/02/26 07:25:33 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -114,7 +117,7 @@ static char const ident[] =
 #define STRLOGDA	6	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/02/21 01:09:07 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/02/26 07:25:33 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
