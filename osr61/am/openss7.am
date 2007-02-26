@@ -1,0 +1,701 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2007-01-08 09:37:10 $
+#
+#! -----------------------------------------------------------------------------
+#!
+#! Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+#! Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#!
+#! All Rights Reserved.
+#!
+#! This program is free software; you can redistribute it and/or modify it under
+#! the terms of the GNU General Public License as published by the Free Software
+#! Foundation; version 2 of the License.
+#!
+#! This program is distributed in the hope that it will be useful, but WITHOUT
+#! ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#! FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+#! details.
+#!
+#! You should have received a copy of the GNU General Public License along with
+#! this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+#! Ave, Cambridge, MA 02139, USA.
+#!
+#! -----------------------------------------------------------------------------
+#!
+#! U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+#! behalf of the U.S. Government ("Government"), the following provisions apply
+#! to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+#! is classified as "Commercial Computer Software" under paragraph 252.227-7014
+#! of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+#! successor regulations) and the Government is acquiring only the license rights
+#! granted herein (the license rights customarily provided to non-Government
+#! users).  If the Software is supplied to any unit or agency of the Government
+#! other than DoD, it is classified as "Restricted Computer Software" and the
+#! Government's rights in the Software are defined in paragraph 52.227-19 of the
+#! Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+#! the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+#! (or any successor regulations).
+#!
+#! -----------------------------------------------------------------------------
+#!
+#! Commercial licensing and support of this software is available from OpenSS7
+#! Corporation at a fee.  See http://www.openss7.com/
+#!
+#! -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2007-01-08 09:37:10 $ by $Author: brian $
+##
+## -----------------------------------------------------------------------------
+##
+## $Log: openss7.am,v $
+## Revision 0.9.2.106  2007-01-08 09:37:10  brian
+## - got manual pages building and instaling separately
+##
+## Revision 0.9.2.105  2007/01/08 09:33:27  brian
+## - added help for manual page targets
+##
+## Revision 0.9.2.104  2007/01/08 09:01:59  brian
+## - try to get manpages rigth again
+##
+## Revision 0.9.2.103  2007/01/08 08:55:17  brian
+## - try to get manpages installing separately
+##
+## Revision 0.9.2.102  2007/01/08 08:52:26  brian
+## - try to get manpages installing separately
+##
+## Revision 0.9.2.101  2007/01/08 08:37:05  brian
+## - get manpages building on their own
+##
+## Revision 0.9.2.100  2007/01/08 08:25:16  brian
+## - added man recursive target
+##
+## Revision 0.9.2.99  2006/09/18 11:52:05  brian
+## - try adding doxy target to common
+##
+## Revision 0.9.2.98  2006/09/18 00:43:44  brian
+## - correct broken recursion and add release-files target
+##
+## Revision 0.9.2.97  2006/07/09 20:58:58  brian
+## - added optimization tag ids
+##
+## Revision 0.9.2.96  2006/07/04 00:00:04  brian
+## - add deb logging targets
+##
+## Revision 0.9.2.95  2006/07/03 23:28:58  brian
+## - hide precious dependency from automake
+##
+## Revision 0.9.2.94  2006/07/03 23:25:43  brian
+## - automake hates precious assignments
+##
+## Revision 0.9.2.93  2006/07/03 23:13:28  brian
+## - make logging targets precious
+##
+## Revision 0.9.2.92  2006/06/21 09:33:45  brian
+## - added noinline stuff to ctags ignore list
+##
+## Revision 0.9.2.91  2006/03/23 11:19:14  brian
+## - working up send-pr
+##
+## Revision 0.9.2.90  2006/03/23 05:41:18  brian
+## - renamed auto-pr to send-pr
+##
+## Revision 0.9.2.89  2006/03/21 13:26:12  brian
+## - added pr checks to logging targets
+##
+## Revision 0.9.2.88  2006/03/08 00:05:12  brian
+## - added remove and reverse recursive targets
+##
+## Revision 0.9.2.87  2006/03/06 11:35:14  brian
+## - updated headers
+##
+## =============================================================================
+
+AUTOMAKE_OPTIONS = gnits 1.8 dist-bzip2 std-options -Wall
+
+#ACLOCAL_AMFLAGS = -I m4
+
+ECHO = echo
+
+##
+# Accumulate these 'till the end
+##
+ALL_LOCAL		=
+INSTALL_DATA_LOCAL	=
+INSTALL_DATA_HOOK	=
+INSTALL_EXEC_LOCAL	=
+INSTALL_EXEC_HOOK	=
+UNINSTALL_LOCAL		=
+UNINSTALL_HOOK		=
+MOSTLYCLEAN_LOCAL	=
+CLEAN_LOCAL		=
+DISTCLEAN_LOCAL		=
+MAINTAINER_CLEAN_LOCAL	=
+DIST_HOOK		=
+CHECK_LOCAL		=
+INSTALLCHECK_LOCAL	=
+DISTCHECK_HOOK		=
+RELEASE_CLEAN_LOCAL	=
+
+PRE_INSTALL_AM		=
+POST_INSTALL_AM		=
+PRE_UNINSTALL_AM	=
+POST_UNINSTALL_AM	=
+
+RETEST_AM		=
+
+MANS_AM			=
+INSTALL_MANS_AM		=
+UNINSTALL_MANS_AM	=
+
+##
+# In case we only need the files version:
+##
+MOSTLYCLEANFILES	=
+CLEANFILES		=
+DISTCLEANFILES		=
+MAINTAINERCLEANFILES	=
+RELEASECLEANFILES	=
+
+##
+# Accumulate extras until the end.
+##
+EXTRA_DIST		=
+EXTRA_SCRIPTS		=
+EXTRA_PROGRAMS		=
+EXTRA_LIBRARIES		=
+EXTRA_KERNEL_MODULES	=
+EXTRA_DOCS		=
+EXTRA_TEX		=
+
+##
+# Accumlate special targets until the end.
+##
+MY_SUFFIXES		=
+MY_PHONY		=
+
+dist_noinst_SCRIPTS	=
+
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT =
+
+RELEASE			=
+RELEASE_FILES		=
+RELEASE_SIGN		=
+RELEASE_DIRECTORIES	=
+
+FORCED_TARGETS		=
+FORCE			=
+
+$(FORCED_TARGETS): FORCE = force
+$(FORCED_TARGETS): forced-% : %
+
+MY_PHONY		+= $(FORCED_TARGETS)
+
+$(RELEASE_DIRECTORIES)::
+	@test -d $@ || { $(ECHO) " $(mkdir_p) $@" ; $(mkdir_p) $@ ; }
+	
+release: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+release: $(RELEASE_DIRECTORIES) $(RELEASE)
+
+release-files-am: $(RELEASE_FILES)
+
+release-clean-local:
+	@$(ECHO) "Making $@ in `pwd`"
+	@targets="$(RELEASE_CLEAN_LOCAL)" ; for target in $$targets ; do \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target" ; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target ; \
+	done
+
+release-clean-am: release-clean-local
+	@$(ECHO) "Making $@ in `pwd`"
+	@if test -n "$(RELEASECLEANFILES)" ; then \
+		$(ECHO) "rm -f -- $(RELEASECLEANFILES)" ; \
+		rm -f -- $(RELEASECLEANFILES) ; \
+	fi
+
+MY_PHONY	+= release $(RELEASE)
+MY_PHONY	+= release-files-am release-files
+MY_PHONY	+= release-sign $(RELEASE_SIGN)
+MY_PHONY	+= release-clean-am release-clean-local release-clean $(RELEASE_CLEAN_LOCAL)
+FORCED_TARGETS	+= forced-release
+
+if MAINTAINER_MODE
+MAINTAINER_MODE = yes
+else
+MAINTAINER_MODE = no
+endif
+
+##
+## Like automake recursive targets, but mine.
+##
+MY_RECURSIVE_TARGETS = release-files-recursive
+
+$(MY_RECURSIVE_TARGETS):
+	@$(ECHO) "Making $@ in `pwd`"
+	@set fnord $$MAKEFLAGS ; amf=$$2 ; dot_seen=no ; \
+	target=`$(ECHO) $@ | sed s/-recursive//` ; \
+	list='$(SUBDIRS)' ; for subdir in $$list ; do \
+	     if test "$$subdir" = "." ; then dot_seen=yes ; fi ; \
+	done ; \
+	if test "$$dot_seen" = "no" ; then list="$$list ." ; fi ; \
+	for subdir in $$list ; do \
+		case " m4 intl po " in *" $$subdir "*) continue ;; esac ; \
+		$(ECHO) "Making $$target in $$subdir" ; \
+		if test "$$subdir" = "." ; then local="$$target-am" ; else local="$$target" ; fi ; \
+		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local)" ; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local) \
+			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
+	done ; \
+	test -z "$$fail"
+
+MY_PHONY	+= $(MY_RECURSIVE_TARGETS)
+
+##
+## Like automake recursive targets, except that they execute subdirectories in the reverse order.
+## We also try to override uninstall-recursive.  Automake will probably complain violently.
+##
+MY_REVERSIVE_TARGETS = release-clean-recursive
+
+$(MY_REVERSIVE_TARGETS):
+	@$(ECHO) "Making $@ in `pwd`"
+	@set fnord $$MAKEFLAGS ; amf=$$2 ; dot_seen=no ; \
+	target=`$(ECHO) $@ | sed s/-recursive//` ; \
+	list='' ; rev='$(subdirs)' ; for subdir in $$rev ; do \
+	     	if test "$$subdir" = "." ; then dot_seen=yes ; fi ; \
+		list="$$subdir $$list" ; \
+	done ; \
+	if test "$$dot_seen" = "no" ; then list=". $$list" ; fi ; \
+	for subdir in $$list ; do \
+		echo "Making $$target in $$subdir" ; \
+		if test "$$subdir" = "." ; then local="$$target-am" ; else local="$$target" ; fi ; \
+		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local)" ; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local) \
+			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
+	done ; \
+	test -z "$$fail"
+
+MY_PHONY	+= $(MY_REVERSIVE_TARGETS)
+
+##
+## Like automake recursive targets, except that they do not execute in the current directory, only
+## subdirectories.
+##
+ALL_RECURSIVE_TARGETS = all-check all-distcheck all-installcheck all-install
+
+ALL_EXPORT_OPTS =
+
+$(ALL_RECURSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+$(ALL_RECURSIVE_TARGETS):
+	@$(ECHO) "Making $@ in `pwd`"
+	@set fnord $$MAKEFLAGS ; amf=$$2 ; \
+	target=`$(ECHO) $@ | sed -e 's|^all-||'` ; \
+	list='$(subdirs)' ; \
+	for subdir in $$list ; do \
+		if test "$$subdir" = "." ; then continue ; fi ; \
+		$(ECHO) "Making $$target in $$subdir" ; \
+		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target)" ; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
+			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
+	done ; \
+	test -z "$$fail"
+
+MY_PHONY	+= $(ALL_RECURSIVE_TARGETS)
+
+##
+## Like automake recursive targets, except that they do not execute in the current directory, and
+## operate on subdirectories in reverse order.
+##
+ALL_REVERSIVE_TARGETS = all-uninstall
+
+$(ALL_REVERSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+$(ALL_REVERSIVE_TARGETS):
+	@$(ECHO) "Making $@ in `pwd`"
+	@set fnord $$MAKEFLAGS ; amf=$$2 ; \
+	target=`$(ECHO) $@ | sed -e 's|^all-||'` ; \
+	list='' ; rev='$(subdirs)' ; for subdir in $$rev ; do \
+		list="$$subdir $$list" ; \
+	done ; \
+	for subdir in $$list ; do \
+		if test "$$subdir" = "." ; then continue ; fi ; \
+		$(ECHO) "Making $$target in $$subdir" ; \
+		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target)" ; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
+			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
+	done ; \
+	test -z "$$fail"
+
+MY_PHONY	+= $(ALL_REVERSIVE_TARGETS)
+
+##
+# directory for test suites and other test programs
+##
+pkglibexecdir = $(libexecdir)/@PACKAGE@
+
+if PERFORM_CHECKS
+dist_check_SCRIPTS	= $(top_srcdir)/scripts/check_commands
+TESTS			= $(dist_check_SCRIPTS)
+TESTS_ENVIRONMENT	= srcdir='$(srcdir)' \
+			  top_srcdir='$(top_srcdir)' \
+			  top_builddir='$(top_builddir)' \
+			  cross_compiling='$(cross_compiling)' \
+			  MAINTAINER_MODE='$(MAINTAINER_MODE)' \
+			  bin_PROGRAMS='$(bin_PROGRAMS)' \
+			  sbin_PROGRAMS='$(sbin_PROGRAMS)' \
+			  libexec_PROGRAMS='$(libexec_PROGRAMS)' \
+			  pkglibexec_PROGRAMS='$(pkglibexec_PROGRAMS)' \
+			  dist_bin_SCRIPTS='$(dist_bin_SCRIPTS)' \
+			  dist_sbin_SCRIPTS='$(dist_sbin_SCRIPTS)' \
+			  dist_libexec_SCRIPTS='$(dist_libexec_SCRIPTS)' \
+			  AM_INSTALLCHECK_STD_OPTIONS_EXEMPT='$(AM_INSTALLCHECK_STD_OPTIONS_EXEMPT)'
+else
+dist_check_SCRIPTS	= 
+TESTS			= 
+TESTS_ENVIRONMENT	= 
+endif
+
+MY_RECURSIVE_TARGETS	+= check-clean-recursive
+
+#! check-clean:
+#!     This target removes log files left behind by the `check' target.  By
+#!     default, the check scripts append to log files in the top level build
+#!     directory.  This target can be used to clean out those log files before
+#!     the next run.
+#!
+check-clean: check-clean-recursive
+
+check-clean-am:
+	rm -f -- check_*.log check_*.err check_*.out
+
+MY_PHONY	+= check-clean check-clean-am
+
+MY_RECURSIVE_TARGETS	+= txt-recursive sgml-recursive
+
+txt: txt-recursive
+
+txt-am:
+
+sgml: sgml-recursive
+
+sgml-am:
+
+doxy:
+
+MY_PHONY	+= txt txt-am sgml sgml-am doxy
+
+#!
+#! Manual Page Targets
+#! -------------------
+#!
+#! The following targets are used to build, install and uninstall just the
+#! manual pages from the distribution.  These targets are good for creating a
+#! distribution of just the manual pages.  When building atop multiple
+#! packages, these targets recurse down through each package.
+#!
+#! mans:
+#!     Build all of the manual pages.  This involves performing parameter
+#!     substitutions on manual pages and optionally cooking the manual pages
+#!     if `--with-cooked-manpages' was requested during configuration.
+#!
+#! install-mans:
+#!     Installs the manual pages under DESTDIR.  Specify DESTDIR to place the
+#!     manual pages wherever you see fit.  If DESTDIR is not specified on the
+#!     command line, the manual pages will be installed in the normal
+#!     installation directory.
+#!
+#! uninstall-mans:
+#!     Uninstalls the manual pages from DESTDIR.  Specify DESTDIR to indicate
+#!     where to remove the manual pages from.  If DESTDIR is not specified on
+#!     the command line, the manual pages will be removed from the normal
+#!     installation directory.
+#!
+mans: mans-recursive
+
+mans-am: $(MANS_AM)
+
+install-mans: install-mans-recursive
+
+install-mans-am: $(INSTALL_MANS_AM)
+
+uninstall-mans: uninstall-mans-recursive
+
+uninstall-mans-am: $(UNINSTALL_MANS_AM)
+
+MY_PHONY	+= mans mans-am install-mans install-mans-am uninstall-mans uninstall-mans-am
+
+MY_RECURSIVE_TARGETS	+= mans-recursive install-mans-recursive uninstall-mans-recursive
+
+##
+# Have the makefile regenerate libtool if necessary
+##
+$(OBJECTS): libtool
+libtool: $(LIBTOOL_DEPS)
+	$(SHELL) ./config.status --recheck
+
+##
+# I use vim, not emacs.  The following triggers Automake 1.8 to include
+# targets for making vim tags files along with emacs TAGS files.
+##
+CTAGIDS			= -I __initdata \
+			  -I __exitdata \
+			  -I EXPORT_SYMBOL \
+			  -I EXPORT_SYMBOL_NOVERS \
+			  -I EXPORT_SYMBOL_GPL \
+			  -I FASTCALL \
+			  -I STREAMSCALL \
+			  -I STREAMS_FASTCALL \
+			  -I STREAMS_REGPARMS \
+			  -I asmlinkage \
+			  -I fastcall \
+			  -I streamscall \
+			  -I streams_fastcall \
+			  -I streams_regparms \
+			  -I __attribute__+ \
+			  -I __BEGIN_DECLS \
+			  -I __END_DECLS \
+			  -I __THROW \
+			  -I __const=const \
+			  -I __inline__=inline \
+			  -I STATIC=static \
+			  -I BIG_STATIC=static \
+			  -I BIG_STATIC_INLINE=inline \
+			  -I BIG_STATIC_STH=static \
+			  -I BIG_STATIC_INLINE_STH=inline \
+			  -I streams_inline=inline \
+			  -I INLINE=inline \
+			  -I streams_noinline \
+			  -I noinline \
+			  -I __always_inline=inline \
+			  -I _RP \
+			  -I __depr \
+			  -I HEAD_DECLARATION+ \
+			  -I STR_DECLARATION+ \
+			  -I __EXTERN_INLINE=inline \
+			  -I __STREAMS_EXTERN_INLINE=inline \
+			  -I __STRUTIL_EXTERN_INLINE=inline \
+			  -I __STRSCHD_EXTERN_INLINE=inline \
+			  -I __AIX_EXTERN_INLINE=inline \
+			  -I __HPUX_EXTERN_INLINE=inline \
+			  -I __IRIX_EXTERN_INLINE=inline \
+			  -I __LIS_EXTERN_INLINE=inline \
+			  -I __LFS_EXTERN_INLINE=inline \
+			  -I __MAC_EXTERN_INLINE=inline \
+			  -I __MPS_EXTERN_INLINE=inline \
+			  -I __OS7_EXTERN_INLINE=inline \
+			  -I __OSF_EXTERN_INLINE=inline \
+			  -I __SUN_EXTERN_INLINE=inline \
+			  -I __SUX_EXTERN_INLINE=inline \
+			  -I __SVR3_EXTERN_INLINE=inline \
+			  -I __SVR4_EXTERN_INLINE=inline \
+			  -I __UW7_EXTERN_INLINE=inline \
+			  -I __UXP_EXTERN_INLINE=inline \
+			  -I __unlikely \
+			  -I __hot \
+			  -I __hot_in \
+			  -I __hot_out \
+			  -I __hot_put \
+			  -I __hot_get \
+			  -I __hot_read \
+			  -I __hot_write
+CTAGSFLAGS = --language-force=C --c-types=+px $(CTAGIDS)
+TAGS_FILES = $(DIST_SOURCES)
+
+# if MAINTAINER_MODE
+# ALL_LOCAL		+= TAGS CTAGS
+# endif
+
+##
+# A rule to generate an ifnames.log file
+##
+ifnames:
+	ifnames `find $(srcdir) -name "*.h" -o -name "*.c"` > ifnames.log
+
+MY_PHONY		+= ifnames
+
+CLEANFILES		+= check_commands.log
+
+DISTCLEANFILES		+= *.log config.site *.err *.out
+
+MAINTAINERCLEANFILES	+= $(srcdir)/Makefile.in
+
+all-local: $(ALL_LOCAL)
+
+pre-install: pre-install-recursive
+
+pre-install-am: $(PRE_INSTALL_AM)
+
+MY_RECURSIVE_TARGETS	+= pre-install-recursive
+MY_PHONY		+= pre-install pre-install-am
+
+install-exec-local: pre-install-am $(INSTALL_EXEC_LOCAL)
+
+install-exec-hook: $(INSTALL_EXEC_HOOK)
+
+install-data-local: $(INSTALL_DATA_LOCAL)
+
+install-data-hook: $(INSTALL_DATA_HOOK) post-install-am
+
+post-install: post-install-recursive
+
+post-install-am: $(POST_INSTALL_AM)
+
+MY_RECURSIVE_TARGETS	+= post-install-recursive
+MY_PHONY		+= post-install post-install-am
+
+pre-uninstall: pre-uninstall-recursive
+
+pre-uninstall-am: $(PRE_UNINSTALL_AM)
+
+MY_REVERSIVE_TARGETS	+= pre-uninstall-recursive
+MY_PHONY		+= pre-uninstall pre-uninstall-am
+
+uninstall-local: pre-uninstall-am $(UNINSTALL_LOCAL)
+
+uninstall-hook: $(UNINSTALL_HOOK) post-uninstall-am
+
+post-uninstall: post-uninstall-am
+
+post-uninstall-am: $(POST_UNINSTALL_AM)
+
+MY_REVERSIVE_TARGETS	+= post-uninstall-recursive
+MY_PHONY		+= post-uninstall post-uninstall-am
+
+mostlyclean-local: $(MOSTLYCLEAN_LOCAL)
+
+clean-local: $(CLEAN_LOCAL)
+
+distclean-local: $(DISTCLEAN_LOCAL)
+
+maintainer-clean-local: $(MAINTAINER_CLEAN_LOCAL)
+
+dist-hook: $(DIST_HOOK)
+
+check-local: $(CHECK_LOCAL)
+
+installcheck-local: $(INSTALLCHECK_LOCAL)
+
+distcheck-hook: $(DISTCHECK_HOOK)
+
+retest: retest-recursive
+
+retest-am: $(RETEST_AM)
+
+MY_RECURSIVE_TARGETS	+= retest-recursive
+MY_PHONY		+= retest retest-am
+
+remove: all-uninstall
+
+MY_PHONY		+= remove
+
+#!
+#! Release Targets:
+#! ----------------
+#!
+#! The following are targets used to generate complete releases into the package
+#! distribution directory.  These are good for unattended and NFS builds, which
+#! is what I use them for.  Also, when building from atop multiple packages,
+#! these targets also recurse down through each package.
+#!
+#! release:
+#!     Build all of the things necessary to generate a release.  On an rpm
+#!     system this is the distribution archives, the source rpm, and the
+#!     architecture dependent and architecture independent binary rpms.  All
+#!     items are placed in the package distribution directory that can be
+#!     specified with the `--with-pkg-distdir=DIR' option to `configure'.
+#!
+#! forced-release:
+#!     The release target will not regenerate any files that already exist in
+#!     the package distribution directory.  This forced target will.
+#!
+release: $(RELEASE)
+
+#! release-files:
+#!	This target automagically updates release files when in maintainer mode.
+#!
+release-files: release-files-recursive
+
+#! release-sign:
+#!     You will be prompted for a password, unless to specify it to make with
+#!     the GNUPGPASS variable.  For unattended or non-interactive builds with
+#!     signing, you can do that as: 'make GNUPGPASS=mypasswd release-sign'
+#!
+#! forced-release-sign:
+#!     The release-sign target will not regenerate any files that already exist
+#!     in the package distribution directory.  This forced target will.
+#!
+release-sign: $(RELEASE_SIGN)
+
+#! release-clean:
+#!     This target will remove all distribution files for the current package
+#!     from the package distribution directory.
+#!
+release-clean: release-clean-recursive release-clean-am
+
+##
+## Some logging targets for the head makefile targets.
+##
+LOGGING_TARGETS = compile.log check.log install.log installcheck.log dist.log distcheck.log \
+		  rpms.log sign.log srpm.log resign.log dsc.log sigs.log debs.log csig.log \
+		  uninstall.log release.log release-sign.log rebuild.log remove.log
+
+#!
+#! Logging targets:
+#! ----------------
+#!
+#! For convenience, to log the output of a number of targets to a file, log
+#! targets are defined.  The log file itself is used as the target to make, but
+#! make invokes the target minus a .log suffix.  So, for example, to log the
+#! results of target 'foo', invoke the target 'foo.log'.  The only target that
+#! this does not apply to is 'compile.log'.  When you invoke the target
+#! 'compile.log' a simple 'make' is invoked and logged to the file
+#! 'compile.log'.  The 'foo.log' rule applies to all other targets.  This does
+#! not work for all targets, just a selected few.  Following are the logging
+#! targets:
+#!
+#! First the common ones:
+#!
+#! 	compile.log, check.log, install.log, installcheck.log, uninstall.log,
+#! 	remove.log
+#!
+#! and the maintainer mode ones:
+#!
+#! 	dist.log, distcheck.log, srpm.log, rpms.log, sign.log, rebuild.log,
+#! 	resign.log, release.log, release-sign.log
+#!
+#! If you want to add one, simply add it to LOGGING_TARGETS in Makefile.am
+#!
+$(LOGGING_TARGETS): FORCE
+	@$(ECHO) "Making $@ in `pwd`"
+	@target=`echo "$@" | sed -e 's|\.log$$||;s|compile||'` ; \
+	if test -n '$(AP_AUTOPR)' ; then sendpr='$(AP_AUTOPR)' ; else sendpr='false' ; fi ; \
+	{ $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target || \
+	{ exec 1>/dev/stdout ; $$sendpr --batch --config=$(AP_CONFIG) --target="$@" ; } ; } 2>&1 \
+	| tee $@
+
+configure.log: FORCE
+	@$(ECHO) "Making $@ in `pwd`"
+	@if test -n '$(AP_AUTOPR)' ; then sendpr='$(AP_AUTOPR)' ; else sendpr='false' ; fi ; \
+	{ (cd $(top_builddir); ./config.status --recheck; ./config.status) || \
+	{ exec 1>/dev/stdout ; $$sendpr --batch --config=$(AP_CONFIG) --target="$@" ; } ; } 2>&1 \
+	| tee $@
+
+FORCE:
+
+##
+# Make logging targets precious (automake hates direct dependencies so we hide it)
+##
+PRECIOUS = .PRECIOUS
+$(PRECIOUS): $(LOGGING_TARGETS) configure.log
+
+##
+# Collected suffixes from other automake fragments to avoid problems with automake conditionals.
+##
+SUFFIXES = $(MY_SUFFIXES)
+
+##
+# Collected phonys from other automake fragments to avoid problems with automake conditionals.
+##
+.PHONY: $(MY_PHONY)
+
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

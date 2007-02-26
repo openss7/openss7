@@ -1,0 +1,167 @@
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
+@c =========================================================================
+@c
+@c @(#) $Id: mail.texi,v 0.9.2.5 2006-09-18 00:56:19 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2006-09-18 00:56:19 $ by $Author: brian $
+@c
+@c =========================================================================
+
+The @uref{http://www.openss7.org/, OpenSS7 Project} provides a website dedicated to the software
+packages released by the @uref{http://www.openss7.org/,, OpenSS7 Project}.
+
+@subsubheading Bug Reports
+
+Please send bug reports to @email{bugs@@openss7.org} using the @file{send-pr} script included in the
+@cite{@value{PACKAGE_TITLE}} package, only after reading the @file{BUGS} file in the release, or
+@xrefman{Problem Reports}.  You can access the
+@uref{http://www.openss7.org/bugreport.html, OpenSS7 GNATS database} directly via the web, however,
+the preferred method for sending new bug reports is via mail with the @file{send-pr} script.
+
+@subsubheading Mailing Lists
+
+@uref{http://www.openss7.org/,, The OpenSS7 Project} provides a number of general discussion
+@uref{http://www.openss7.org/mailman/listinfo,, Mailing Lists} for discussion concerning the
+@cite{OpenSS7 @value{PACKAGE_TITLE}} package as well as other packages released by
+@uref{http://www.openss7.org/,, The OpenSS7 Project}.
+
+These are @command{mailman} mailing lists and so have convenient web interfaces for subscribers to
+control their settings.  See @uref{http://www.openss7.org/mailinglist.html}.
+
+The mailing lists are as follows:
+
+@table @file
+@item @uref{http://www.openss7.org/mailman/listinfo/openss7,, openss7}
+The @file{openss7} mailing list is for general enquiries, information exchange and announcements
+regarding the @uref{http://www.openss7.org/,, OpenSS7 Project}.  This is our original mailing list
+and takes the highest amount of traffic.
+
+@item @uref{http://www.openss7.org/mailman/listinfo/openss7-announce,, openss7-announce}
+The @file{openss7-announce} mailing list is for announcements related to the
+@uref{http://www.openss7.org/,, OpenSS7 Project}.  This list will accept announcements posted by
+subscribers.  Subscribe to this list if you are interested in announcements from the
+@uref{http://www.openss7.org,, OpenSS7 Project}, subscribers and sponsors, related to the
+@uref{http://www.openss7.org,, OpenSS7 Project} or STREAMS, SS7, SIGTRAN or SCTP in general.
+
+@item @uref{http://www.openss7.org/mailman/listinfo/openss7-cvs,, openss7-cvs}
+The @file{openss7-cvs} mailing list is for automatic CVS log reporting.  You must get permission of
+the owner to subscribe to this list.  Subscribers are not allowed to post to this list, this is
+merely for distributing notification of changes to the CVS repository.h
+
+@item @uref{http://www.openss7.org/mailman/listinfo/openss7-develop,, openss7-develop}
+The @file{openss7-develop} mailing list is for email exchange related to the development projects
+under the @uref{http://www.openss7.org/,, OpenSS7 Project}.  This includes development requests,
+proposals, requests for comment or proposal.  Subscribe to this list if you are interested in
+ongoing development details regarding the @uref{http://www.openss7.org/,, OpenSS7 Project}.
+
+@item @uref{http://www.openss7.org/mailman/listinfo/openss7-test,, openss7-test}
+The @file{openss7-test} mailing list is for email exchange related to the testing of code under the
+@uref{http://www.openss7.org/,, OpenSS7 Project}.  This specifically relates to conformance testing,
+verification testing, interoperability testing and beta testing.  Subscribe to this list if you are
+interested in participating in and receiving ongoing details of test activities under the
+@uref{http://www.openss7.org/,, OpenSS7 Project}.
+
+@item @uref{http://www.openss7.org/mailman/listinfo/openss7-bugs,, openss7-bugs}
+The @file{openss7-bugs} mailing list is specifically tailored to bug tracking.  The mailing list
+takes a feed from the @uref{http://www.openss7.org/bugreport.html,, OpenSS7 GNATS} bug tracking
+system and accepts posting of responses to bug reports, tracking and resolution.  Subscribe to this
+list if you are interested in receiving detailed @cite{OpenSS7} release code bug tracking
+information.  This list is not archived; for historical information on problem reports, see our
+@uref{http://www.openss7.org/bugreport.html,, GNATS databases}.
+
+@item @uref{http://www.openss7.org/mailman/listinfo/openss7-updates,, openss7-updates}
+The @file{openss7-updates} mailing list provides updates on @uref{http://www.openss7.org//,, OpenSS7
+Project} code releases and ongoing activities.  Subscribers are not allowed to post to this list;
+this list is for official @uref{http://www.openss7.org/,, OpenSS7 Project} announcements only.
+Subscribe to this list if you are interested in receiving updates concerning official releases and
+activities of the @uref{http://www.opensss7.org/,, OpenSS7 Project}.
+
+@item @uref{http://www.openss7.org/mailman/listinfo/openss7-streams,, openss7-streams}
+The @file{openss7-streams} mailing list is for email exchange related to the @dfn{STREAMS}
+development projects under the @uref{http://www.openss7.org/,, OpenSS7 Project}.  This includes
+development requests, proposals, requests for comment or proposal.  Subscribe to this list if you
+are interested in ongoing development details regarding the @uref{http://www.openss7.org/,, OpenSS7
+Project} @dfn{STREAMS} components.
+
+@item @uref{http://www.openss7.org/mailman/listinfo/linux-streams,, linux-streams}
+The @file{linux-streams} mailing list is for mail exchange related to @cite{Linux Fast-STREAMS} or
+@cite{Linux STREAMS}.  This includes patches, development requests, proposals, requests for comment
+or proposal.  Subscribe to this list if you are interested in ongoing development details regarding
+the @dfn{STREAMS} for Linux components.  This is the the new (September 2006) home of the
+@file{linux-streams} list formerly of @indicateurl{gsyc.escet.urjc.es}.
+@end table
+
+@subsubheading Spam
+
+To avoid spam being sent to the members of the @cite{OpenSS7} mailing list(s), we have blocked mail
+from non-subscribers.  Please subscribe to the mailing list before attempting to post to them.
+(Attempts to post when not subscribed get bounced.)
+
+As an additional measure against spam, subscriber lists for all @cite{OpenSS7} mailing lists are not
+accessible to non-subscribers; for most lists subscriber  lists are only accessible to the list
+administrator.  This keeps your mailing address from being picked off our website by bulk mailers.
+
+@subsubheading Acceptable Use Policy
+
+It is acceptable to post professional and courteous messages regarding the @cite{OpenSS7} package or
+any general information or questions concerning @dfn{STREAMS}, @dfn{SS7}, @dfn{SIGTRAN}, @dfn{SCTP}
+or telecommunications applications in general.
+
+@subsubheading Large Attachments
+
+The mailing list is blocked from messages of greater than @code{40k}.   If you have attachments
+(patches, test programs, etc.) and you mail them to the list, it will bounce to the list
+administrator.  If you are interested in  making your patches, test programs, test results or other
+large attachments available to the members of the mailing list, state in the message that you would
+like them posted and the list administrator will place them in the mail archives.
+

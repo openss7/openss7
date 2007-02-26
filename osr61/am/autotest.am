@@ -1,0 +1,180 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: autotest.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.7 $) $Date: 2006-09-18 00:43:41 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation; version 2 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+## Ave, Cambridge, MA 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2006-09-18 00:43:41 $ by $Author: brian $
+##
+## -----------------------------------------------------------------------------
+##
+## $Log: autotest.am,v $
+## Revision 0.9.2.7  2006-09-18 00:43:41  brian
+## - run testsuite twice, once for compatibility libs
+##
+## Revision 0.9.2.6  2006/05/19 13:21:44  brian
+## - strip leading zeros from test case numbers
+##
+## Revision 0.9.2.5  2006/03/24 10:07:43  brian
+## - send-pr is architecture independent
+##
+## Revision 0.9.2.4  2006/03/06 11:35:14  brian
+## - updated headers
+##
+## =============================================================================
+
+## my rule
+TESTSUITE		= testsuite
+
+## my rule
+package.m4: $(top_srcdir)/configure
+	@( \
+		$(ECHO) 'm4_define([AT_PACKAGE_NAME], [@PACKAGE_NAME@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_TARNAME], [@PACKAGE@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_VERSION], [@VERSION@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_RELEASE], [@PACKAGE_RELEASE@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@.@PACKAGE_RELEASE@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
+	) > $@
+
+## my rule
+TESTSUITE_DEPS		= package.m4
+
+## my rule
+$(TESTSUITE): $(TESTSUITE_DEPS)
+	$(AUTOTEST) -I $(srcdir) $@.at -o $@
+
+## my rule
+atconfig: $(top_builddir)/config.status
+	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
+
+## automake does this one for us
+##
+##atlocal: $(srcdir)/atlocal.in $(top_builddir)/config.status
+##	( cd $(top_builddir) ; $(SHELL) ./config.status $(subdir)/$@ )
+
+## my rule
+all-testsuite: $(TESTSUITE) atconfig atlocal
+
+if PERFORM_TESTING
+## PERFORM_TESTING
+
+INSTALLCHECK_TESTS =
+
+## my rule
+installcheck-test: $(TESTSUITE)
+	$(SHELL) $< DESTDIR='$(DESTDIR)' rootdir='$(rootdir)' AUTOTEST_PATH='.' $(TESTSUITE_OPTS)
+if WITH_32BIT_LIBS
+	$(SHELL) $< DESTDIR='$(DESTDIR)' rootdir='$(rootdir)' AUTOTEST_PATH='./lib32' $(TESTSUITE_OPTS)
+endif
+
+INSTALLCHECK_TESTS += installcheck-test
+
+## my rule
+installcheck-testsuite: $(TESTSUITE) atconfig atlocal $(INSTALLCHECK_TESTS)
+
+## PERFORM_TESTING
+else
+## ! PERFORM_TESTING
+
+## my rule
+installcheck-testsuite: $(TESTSUITE) atconfig atlocal
+
+## ! PERFORM_TESTING
+endif
+
+## my rule
+retest-testsuite:
+	opts='-v' ; \
+	list="./testsuite.dir/*/run" ; for t in $$list ; do \
+		if test -x $$t ; then \
+			n=`echo $$t | sed -e 's|.*testsuite.dir/||;s|/run$$||;s|^00*||'` ; \
+			opts="$$opts $$n" ; \
+		fi ; \
+	done ; \
+	make TESTSUITE_OPTS="$$opts" installcheck-testsuite
+
+RETEST_AM		+= retest-testsuite
+
+## my rule
+clean-testsuite:
+	@for f in $(TESTSUITE) ; do \
+		if test -r "$$f" ; then \
+			$(ECHO) "$(SHELL) $$f --clean" ; \
+			$(SHELL) $$f --clean ; \
+			$(ECHO) "rm -f -- $$f" ; \
+			rm -f -- $$f ; \
+		fi ; \
+	done
+
+CLEANFILES		+= \
+			package.m4
+
+DISTCLEANFILES		+= \
+			atconfig \
+			atlocal
+
+ALL_LOCAL += all-testsuite
+
+INSTALLCHECK_LOCAL += installcheck-testsuite
+
+CLEAN_LOCAL += clean-testsuite
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
+## Test suites are actually architecture independent!
+pkglibexec_DATA		= atlocal
+dist_pkglibexec_SCRIPTS	= $(TESTSUITE)
+
+## PKG_BUILD_INDEP
+endif
+
+## my rule
+EXTRA_DIST		+= $(TESTSUITE_DEPS)
+
+MY_PHONY		+= all-testsuite installcheck-testsuite clean-testsuite $(INSTALLCHECK_TESTS)
+
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

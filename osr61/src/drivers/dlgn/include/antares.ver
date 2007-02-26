@@ -1,0 +1,32 @@
+/**********************************************************************
+ * File Name                    : antares.ver
+ * Description                  : version
+ *
+ * Copyright (C) 2001-2005 Intel Corporation.
+ *
+ * All Rights Reserved.  All names, products,
+ * and services mentioned herein are the trademarks
+ * or registered trademarks of their respective organizations
+ * and are the sole property of their respective owners.
+ *
+ **********************************************************************/
+
+#ifdef SVR3
+#define	VERNUM	"Version 2.1 Release 1 System V Release 3"
+#endif
+#ifdef SVR4
+#ifdef AIX_ANT
+#define	VERNUM	"Version 2.1 Release 1 AIX 4.1"
+#elif SPARC_PCI
+#define	VERNUM	"Version 1.10 Beta for Solaris SPARC PCI"
+#elif SOL_ANT
+#define	VERNUM	"Version 2.1 Release 2 Solaris 2.5"
+#elif SVR5
+#define	VERNUM	"Version 2.1 Release 2 System V Release 5"
+#else
+#define	VERNUM	"Version 2.1 Release 1 System V Release 4"
+#endif /* AIX_ANT */
+#endif /* SVR4  */
+
+#define HVERP  0x00000201
+#define LVERP  0x03000000

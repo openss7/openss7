@@ -1,0 +1,350 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile: check_streams,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.14 $) $Date: 2006-10-02 22:37:48 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2006-10-02 22:37:48 $ by $Author: brian $
+#
+# =============================================================================
+
+me=`basename $0`
+errors=0
+warnings=0
+
+abs_top_builddir=`(cd $top_builddir; pwd)`
+abs_builddir=`(cd $builddir; pwd)`
+abs_top_srcdir=`(cd $top_srcdir; pwd)`
+abs_srcdir=`(cd $srcdir; pwd)`
+
+exec 5>>$top_builddir/$me.log
+
+export -p >&5
+
+function echo_v()
+{
+	echo "$me:  : $1"
+}
+function echo_t()
+{
+	echo "$me: T: $1"
+}
+function echo_s()
+{
+	case :"${MAINTAINER_MODE:-no}" in
+	(:verbose|:continue) echo "$me: S: $1" ;;
+	esac
+	echo "$me:$2: S: $1" >&5
+}
+function echo_d()
+{
+	echo "$me:$2: D: $1" >&5
+}
+function echo_e()
+{
+	echo "$me: E: --- $1" >&2
+	echo "$me:$2: E: $1" >&5
+	((errors++))
+}
+function echo_w()
+{
+#	if test :"${MAINTAINER_MODE:-no}" != :no ; then
+		echo "$me: W: --- $1" >&2
+#	fi
+	echo "$me:$2: W: $1" >&5
+	((warnings++))
+}
+function echo_fls()
+{
+	echo_s "$3" "$4"
+}
+function echo_flw()
+{
+	echo "$1:$2: warning: $3" >&2
+	echo "$me:$4: W: $3" >&5
+	((warnings++))
+}
+function echo_fle()
+{
+	echo "$1:$2: error: $3" >&2
+	echo "$me:$4: E: $3" >&5
+	((errors++))
+}
+
+export -p | while read line
+do
+	echo_d "$line" $LINENO
+done
+
+#
+# Skip test if we have nothing to test
+#
+if test -z "$STRCONF_MAKEDEV$STRCONF_STRLOAD" \
+	-o ! -f "${top_builddir}/$STRCONF_MAKEDEV" \
+	-o ! -f "${top_builddir}/$STRCONF_STRLOAD"
+then
+	echo_d "nothing to check, skipping test" $LINENO
+	exit 77
+fi
+
+#
+# Get a driver and module name list from devices.lst
+#
+echo_d "${top_builddir}/$STRCONF_MAKEDEV file contents:" $LINENO
+echo_d "--------------------------------------" $LINENO
+while read line
+do
+	echo_d "| $line" $LINENO
+done < ${top_builddir}/$STRCONF_MAKEDEV
+echo_d "--------------------------------------" $LINENO
+
+devices=`cat "${top_builddir}/$STRCONF_MAKEDEV" | grep '%dev' | sed -e 's|^.*)[[:space:]][[:space:]]*||'`
+
+echo_d "${top_builddir}/$STRCONF_STRLOAD file contents:" $LINENO
+echo_d "--------------------------------------" $LINENO
+while read line
+do
+	echo_d "| $line" $LINENO
+done < ${top_builddir}/$STRCONF_STRLOAD
+echo_d "--------------------------------------" $LINENO
+
+
+drivers=`cat "${top_builddir}/$STRCONF_STRLOAD" | grep '^d[[:space:]]' | sed -e 's|^d[[:space:]][[:space:]]*||;s|[[:space:]].*$||'`
+
+echo_d "drivers are:" $LINENO
+echo "$drivers" | while read line
+do
+	echo_d "$line" $LINENO
+done
+
+modules=`cat "${top_builddir}/$STRCONF_STRLOAD" | grep '^m[[:space:]]' | sed -e 's|^m[[:space:]][[:space:]]*||;s|[[:space:]].*$||'`
+
+echo_d "modules are:" $LINENO
+echo "$modules" | while read line
+do
+	echo_d "$line" $LINENO
+done
+
+if test :"${MAINTAINER_MODE:-no}" != :no
+then
+	if test -n "$PKG_MANPATH" ; then
+		manpath="$PKG_MANPATH"
+	else
+		manpath="${abs_top_builddir}/doc/man:${abs_top_builddir}/man:${abs_top_builddir}:./doc/man:./man:.${mandir:+:${mandir}}"
+	fi
+	srcpath="${abs_top_srcdir}/doc/man:${abs_top_srcdir}/man:${abs_top_srcdir}:${abs_srcdir}/doc/man:${abs_srcdir}/man:${abs_srcdir}${mandir:+:$mandir}"
+	searchpath=`echo "$manpath" | sed -e 's|:| |g'`
+	sourcepath=`echo "$srcpath" | sed -e 's|:| |g'`
+	#
+	# For each driver name, check that there is a manual page in section 4.
+	#
+	echo_v "testing for section 4 manual pages"
+	for driver in $drivers
+	do
+		mcname=`echo $driver | sed -e 's|[^-_[:alnum:]]|_|g'`
+		msname=`echo $mcname | sed -e 's|-|_|g'`
+		ucname=`echo $mcname | sed -e 'y|abcdefghijklmnopqrstuvwxyz|ABCDEFGHIJKLMNOPQRSTUVWXYZ|'`
+		sections="4"
+		string="$mcname, $msname or $ucname in section $sections"
+		echo_t "testing for $string"
+		# look for it in section 4
+		found=no
+		list=
+		for n in $sections ; do list="${list:+$list }man${n}/$mcname.${n} man${n}/$msname.${n} man${n}/$ucname.${n}" ; done
+		for page in $list; do
+			for dir in $searchpath ; do
+				test -d $dir || continue
+				files=`ls $dir/$page* 2>/dev/null`
+				for file in $files ; do
+					if test -f $file ; then
+						echo_s "manual page $file exists" $LINENO
+						dirmask=`echo $dir | sed -e's|.|.|g'`
+						page=`echo $file | sed -e 's|^'$dirmask'/||'`
+						echo "$page" >> ${top_builddir}/check_used.log
+						found=yes
+					fi
+				done
+			done
+		done
+		if test :$found = :yes ; then
+			echo_s "found $string" $LINENO
+		else
+			for page in $list; do
+				for dir in $sourcepath ; do
+					test -d $dir || continue
+					files=`ls $dir/$page*.man 2>/dev/null`
+					for file in $files ; do
+						if test -f $file ; then
+							echo_flw "$file" "1" "manual source page for $string" $LINENO
+						fi
+					done
+				done
+			done
+			echo_e "cannot find $string" $LINENO
+		fi
+	done
+	for device in $devices
+	do
+		myname=`echo $device | sed -e 's|^.*/||;s|^[0-9][0-9]*$||;s|\.[0-9].*$||'`
+		[ -z $myname ] && continue
+		mcname=`echo $myname | sed -e 's|[^-_[:alnum:]]|_|g'`
+		msname=`echo $mcname | sed -e 's|-|_|g'`
+		ucname=`echo $mcname | sed -e 'y|abcdefghijklmnopqrstuvwxyz|ABCDEFGHIJKLMNOPQRSTUVWXYZ|'`
+		[ -z $mcname -a -z $msname -a -z $ucname ] && continue
+		sections="4"
+		string="$mcname, $msname or $ucname in section $sections"
+		echo_t "testing for $string"
+		# look for it in section 4
+		found=no
+		list=
+		for n in $sections ; do list="${list:+$list }man${n}/$mcname.${n} man${n}/$msname.${n} man${n}/$ucname.${n}" ; done
+		for page in $list; do
+			for dir in $searchpath ; do
+				test -d $dir || continue
+				files=`ls $dir/$page* 2>/dev/null`
+				for file in $files ; do
+					if test -f $file ; then
+						echo_s "manual page $file exists" $LINENO
+						dirmask=`echo $dir | sed -e's|.|.|g'`
+						page=`echo $file | sed -e 's|^'$dirmask'/||'`
+						echo "$page" >> ${top_builddir}/check_used.log
+						found=yes
+					fi
+				done
+			done
+		done
+		if test :$found = :yes ; then
+			echo_s "found $string" $LINENO
+		else
+			for page in $list; do
+				for dir in $sourcepath ; do
+					test -d $dir || continue
+					files=`ls $dir/$page*.man 2>/dev/null`
+					for file in $files ; do
+						if test -f $file ; then
+							echo_flw "$file" "1" "manual source page for $string" $LINENO
+						fi
+					done
+				done
+			done
+			echo_e "cannot find $string" $LINENO
+		fi
+	done
+	#
+	# For each module name, check that there is a manual page in section 4 or section 7
+	#
+	echo_v "testing for section 4 or 7 manual pages"
+	for module in $modules
+	do
+		mcname=`echo $module | sed -e 's|[^-_[:alnum:]]|_|g'`
+		msname=`echo $mcname | sed -e 's|-|_|g'`
+		ucname=`echo $mcname | sed -e 'y|abcdefghijklmnopqrstuvwxyz|ABCDEFGHIJKLMNOPQRSTUVWXYZ|'`
+		sections="4 7"
+		string="$mcname, $msname or $ucname in sections $sections"
+		echo_t "testing for $string"
+		# look for it in section 4 or 7
+		found=no
+		list=
+		for n in $sections ; do list="${list:+$list }man${n}/$mcname.${n} man${n}/$msname.${n} man${n}/$ucname.${n}" ; done
+		for page in $list; do
+			for dir in $searchpath ; do
+				test -d $dir || continue
+				files=`ls $dir/$page* 2>/dev/null`
+				for file in $files ; do
+					if test -f $file ; then
+						echo_s "manual page $file exists" $LINENO
+						dirmask=`echo $dir | sed -e's|.|.|g'`
+						page=`echo $file | sed -e 's|^'$dirmask'/||'`
+						echo "$page" >> ${top_builddir}/check_used.log
+						found=yes
+					fi
+				done
+			done
+		done
+		if test :$found = :yes ; then
+			echo_s "found $string" $LINENO
+		else
+			for page in $list; do
+				for dir in $sourcepath ; do
+					test -d $dir || continue
+					files=`ls $dir/$page*.man 2>/dev/null`
+					for file in $files ; do
+						if test -f $file ; then
+							echo_flw "$file" "1" "manual source page for $string" $LINENO
+						fi
+					done
+				done
+			done
+			echo_e "cannot find $string" $LINENO
+		fi
+	done
+fi
+
+retval=0
+if test $warnings -gt 0
+then
+	echo_v "--------------"
+	echo_v "Warning summary:"
+	echo_v "--------------"
+	egrep -- '\<W:' $top_builddir/$me.log >&2
+	echo_v "--------------"
+	retval=77
+fi
+if test $errors -gt 0
+then
+	echo_v "--------------"
+	echo_v "Error summary:"
+	echo_v "--------------"
+	egrep -- '\<E:' $top_builddir/$me.log >&2
+	echo_v "--------------"
+	if test :"${MAINTAINER_MODE:-no}" = :continue
+	then
+		retval=77
+	else
+		retval=1
+	fi
+fi
+
+exit $retval

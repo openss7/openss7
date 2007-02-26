@@ -1,0 +1,244 @@
+This is /home/brian/os8/osr61/doc/manual/osr61.info, produced by makeinfo
+version 4.8 from /home/brian/os8/osr61/doc/manual/osr61.texi.
+
+INFO-DIR-SECTION STREAMS
+START-INFO-DIR-ENTRY
+* OpenSS7 TTY: (osr61).	An Open STREAMS Terminals Package.
+END-INFO-DIR-ENTRY
+
+This file provides the Installation and Reference Manual for Dialogic Open
+Systems Release 6.1.
+
+This is Edition 1, last updated 2007-02-25, of the `Dialogic Open Systems
+Release 6.1 Installation and Reference Manual', for Version 0.9.2 Release
+1.
+
+Copyright (C) 2001-2007  OpenSS7 Corporation (http://www.openss7.com/)
+Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+Copyright (C) 2005 Intel (http://www.intel.com/)
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided the entire resulting
+derived work is distributed under the terms of a permission notice identical to
+this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+
+
+Indirect:
+osr61.info-1: 1275
+osr61.info-2: 301214
+
+Tag Table:
+(Indirect)
+Node: Top1275
+Node: Preface4476
+Node: Notice4954
+Node: Abstract5749
+Node: Revisions7832
+Ref: Revisions-Footnote-18789
+Node: Disclaimer8850
+Node: Acknowledgements11180
+Node: Sponsors11574
+Node: Contributors12139
+Node: Authors12638
+Node: Maintainer13075
+Node: Web Resources13504
+Node: Quick Start Guide19380
+Ref: Quick Start Guide-Footnote-135052
+Ref: Quick Start Guide-Footnote-235116
+Ref: Quick Start Guide-Footnote-335331
+Ref: Quick Start Guide-Footnote-435430
+Node: Introduction35577
+Node: Overview35957
+Node: Organization36211
+Node: Conventions36752
+Node: Objective36950
+Node: Reference38946
+Node: Files39669
+Ref: Files-Footnote-145481
+Ref: Files-Footnote-245595
+Ref: Files-Footnote-345709
+Ref: Files-Footnote-445804
+Node: Drivers45921
+Ref: Drivers-Footnote-147086
+Ref: Drivers-Footnote-247243
+Node: Modules47389
+Ref: Modules-Footnote-148361
+Ref: Modules-Footnote-248518
+Node: Libraries48665
+Node: Utilities49280
+Node: Init Scripts49536
+Node: User Utilities50201
+Node: Administrative Utilities50483
+Node: Performance Test Programs50844
+Node: Conformance Test Programs51167
+Node: Development51843
+Node: Development Header Files52316
+Ref: Development Header Files-Footnote-153863
+Node: Static and Shared Libraries54022
+Node: Kernel Module Development54650
+Ref: Kernel Module Development-Footnote-155892
+Node: Manual Pages56011
+Node: Conformance57433
+Node: Releases58222
+Ref: Releases-Footnote-159362
+Ref: Releases-Footnote-259437
+Ref: Releases-Footnote-359512
+Node: Prerequisites59587
+Ref: Prerequisites-Footnote-161430
+Ref: Prerequisites-Footnote-261494
+Ref: Prerequisites-Footnote-361709
+Node: Compatibility61808
+Node: GNU/Linux Distributions62285
+Ref: GNU/Linux Distributions-Footnote-164247
+Node: Linux Kernel64423
+Ref: Linux Kernel-Footnote-166154
+Node: Linux Architectures66348
+Node: Linux STREAMS67114
+Ref: Linux STREAMS-Footnote-167834
+Node: Linux Fast-STREAMS67909
+Node: Release Notes68360
+Node: Release osr61-0.9.2.168656
+Node: Maturity70810
+Node: Pre-Alpha Releases71431
+Node: Alpha Releases72024
+Node: Beta Releases72799
+Node: Gamma Releases73689
+Node: Production Releases74607
+Node: Unstable Releases75495
+Node: Bugs76442
+Node: Defect Notices76711
+Ref: Defect Notices-Footnote-177973
+Node: Known Defects78044
+Node: Historical Defects78449
+Node: Schedule80093
+Node: History80710
+Node: Installation80923
+Node: Downloading81334
+Node: Downloading the Binary RPM83069
+Ref: Downloading the Binary RPM-Footnote-191198
+Ref: Downloading the Binary RPM-Footnote-291633
+Ref: Downloading the Binary RPM-Footnote-391782
+Ref: Downloading the Binary RPM-Footnote-491911
+Ref: Downloading the Binary RPM-Footnote-592207
+Ref: Downloading the Binary RPM-Footnote-692381
+Ref: Downloading the Binary RPM-Footnote-792637
+Ref: Downloading the Binary RPM-Footnote-892711
+Ref: Downloading the Binary RPM-Footnote-992785
+Ref: Downloading the Binary RPM-Footnote-1092859
+Ref: Downloading the Binary RPM-Footnote-1192997
+Ref: Downloading the Binary RPM-Footnote-1293072
+Ref: Downloading the Binary RPM-Footnote-1393214
+Node: Downloading the Debian DEB93289
+Ref: Downloading the Debian DEB-Footnote-1101375
+Ref: Downloading the Debian DEB-Footnote-2101572
+Ref: Downloading the Debian DEB-Footnote-3101721
+Ref: Downloading the Debian DEB-Footnote-4101850
+Ref: Downloading the Debian DEB-Footnote-5102146
+Ref: Downloading the Debian DEB-Footnote-6102320
+Ref: Downloading the Debian DEB-Footnote-7102576
+Ref: Downloading the Debian DEB-Footnote-8102650
+Ref: Downloading the Debian DEB-Footnote-9102724
+Ref: Downloading the Debian DEB-Footnote-10102798
+Ref: Downloading the Debian DEB-Footnote-11102936
+Ref: Downloading the Debian DEB-Footnote-12103011
+Ref: Downloading the Debian DEB-Footnote-13103153
+Node: Downloading the Source RPM103228
+Node: Downloading the Debian DSC103921
+Node: Downloading the Tar Ball104625
+Node: Downloading from CVS106257
+Ref: Downloading from CVS-Footnote-1111336
+Node: Configuration111372
+Node: Configuring the Binary RPM111797
+Ref: Configuring the Binary RPM-Footnote-1114806
+Ref: Configuring the Binary RPM-Footnote-2114880
+Node: Configuring the Debian DEB115038
+Node: Configuring the Source RPM115403
+Ref: Configuring the Source RPM-Footnote-1128916
+Node: Configuring the Debian DSC129185
+Node: Configuring the Tar Ball129766
+Node: Configure Options130265
+Ref: Configure Options-Footnote-1154044
+Node: Environment Variables154337
+Node: Building163213
+Node: Building from the Source RPM163514
+Ref: Building from the Source RPM-Footnote-1164789
+Node: Building from the Debian DSC164863
+Ref: Building from the Debian DSC-Footnote-1166374
+Node: Building from the Tar Ball166448
+Ref: Building from the Tar Ball-Footnote-1174196
+Ref: Building from the Tar Ball-Footnote-2174355
+Node: Installing174606
+Node: Installing the Binary RPM174895
+Node: Installing the Debian DEB176180
+Node: Installing the Tar Ball176850
+Node: Removing177604
+Node: Removing the Binary RPM177997
+Node: Removing the Debian DEB178443
+Node: Removing the Source RPM178923
+Node: Removing the Debian DSC179431
+Node: Removing the Tar Ball180053
+Node: Loading180838
+Ref: Loading-Footnote-1183582
+Ref: Loading-Footnote-2183656
+Node: Maintenance183813
+Node: Makefile Targets183952
+Node: User Targets184646
+Ref: User Targets-Footnote-1190312
+Ref: User Targets-Footnote-2190530
+Ref: User Targets-Footnote-3190730
+Node: Maintainer Targets190785
+Node: Clean Targets192354
+Ref: Clean Targets-Footnote-1195051
+Node: Release Targets195205
+Node: Logging Targets197306
+Ref: Logging Targets-Footnote-1200379
+Node: Problem Report Targets200668
+Node: Release Archive Targets202276
+Node: RPM Build Targets204587
+Node: Debian Build Targets207600
+Node: Troubleshooting209544
+Node: Test Suites209834
+Node: Pre-installation Checks210093
+Ref: testsuite:ex0211470
+Ref: testsuite:ex1212314
+Ref: testsuite:ex2213121
+Ref: Pre-installation Checks-Footnote-1220239
+Node: Post-installation Checks220343
+Node: Running Test Suites221226
+Ref: testsuite:ex3222084
+Ref: testsuite:ex4223265
+Node: Problem Reports223629
+Node: Problem Report Guidelines223912
+Node: Generating Problem Reports226526
+Ref: autopr:ex0227871
+Ref: Generating Problem Reports-Footnote-1229078
+Node: Automatic Problem Reports229169
+Ref: autopr:ex2229915
+Node: Stand Alone Problem Reports231318
+Ref: autopr:ex2232017
+Node: Known Problems233451
+Node: Licenses233983
+Node: GNU General Public License234255
+Node: GNU Lesser General Public License253375
+Node: GNU Free Documentation License281429
+Node: Indices301214
+Node: Concept Index301735
+Node: Type Index314499
+Node: Function Index314660
+Node: Variable Index314842
+Node: File Index318353
+Node: Option Index319908
+Node: Makefile Target Index327065
+Node: Author Index331460
+Node: Manual Page Index331873
+
+End Tag Table

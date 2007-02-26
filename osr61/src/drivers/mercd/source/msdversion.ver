@@ -1,0 +1,38 @@
+//========================================================================
+// PURPOSE:
+//    Version file
+//
+//    Version number looks like this:
+//    "KEYWORD TMmmBBAA-<build> exename <optional string>"
+//
+// Where:
+//       KEYWORD = DLcid
+//       T  = type (0-Prod, 1-Beta, 2-Alpha, 3-Expr, 4-Special)
+//       M  = major number (0-9)
+//       mm = minor number (00-99)
+//       BB = beta number  (00-99)
+//       AA = alpha/experimental number (00-99)
+//       <build> - build number (reset to 0 when major/minor/alpha/beta change)
+//       <exename> - name of file this is a version of
+//       <optional string> - optional comment string
+//
+// Some examples:
+//
+//  "DLcid 31000002-00 d40drv.exe"
+//       1.00 Exp 0.02 of the file d40drv.exe
+//
+//  "DLcid 11000100-02 d40drv.exe"
+//        1.00 Beta 1 build 2 of d40drv.exe
+//
+//========================================================================
+
+#ifndef _MSDVERSION_
+#define _MSDVERSION_
+
+#ifdef LiS
+char VersionString[41]="DLcid 29000101-11 Mercury_Streams_Driver";
+#else
+char VersionString[41]="DLcid 02010102-83 Mercury_Native_Driver";
+#endif
+
+#endif // _MSDVERSION_

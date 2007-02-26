@@ -1,0 +1,633 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile: install_initd,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.7 $) $Date: 2006-05-23 22:43:38 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+# Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2006-05-23 22:43:38 $ by $Author: brian $
+#
+# =============================================================================
+
+ident='@(#) $RCSfile: install_initd,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.7 $) $Date: 2006-05-23 22:43:38 $'
+
+ECHO='echo'
+SHELL='/bin/bash'
+SED='sed'
+
+# Check that we have a working $ECHO.
+if test "X$1" = X--no-reexec; then
+    # Discard the --no-reexec flag, and continue
+    shift
+elif test "X`($ECHO '\t') 2>/dev/null`" = 'X\t'; then
+    :
+else
+    exec $SHELL "$0" --no-reexec ${1+"$@"}
+fi
+
+if test "X$1" = X--fallback-echo ; then
+    shift
+    cat <<EOF
+$*
+EOF
+    exit 0
+fi
+
+program=`$ECHO "$0" | ${SED} -e 's%^.*/%%'`
+modename="$program"
+reexec="$SHELL $0"
+
+help="Try '$program --help' for more information."
+mkdir="mkdir"
+mv="mv -f"
+rm="rm -f"
+
+# Sed substitution that helps us do robust quoting.  It backslashifies
+# metacharacters that are still active within double-quoted strings.
+Xsed="${SED}"' -e 1s/^X//'
+sed_quote_subst='s/\([\\`\\"$\\\\]\)/\\\1/g'
+# test EBCDIC or ASCII
+case `$ECHO A|od -x` in
+ *[Cc]1*) # EBCDIC based system
+  SP2NL="tr '\100' '\n'"
+  NL2SP="tr '\r\n' '\100\100'"
+  ;;
+ *) # Assume ASCII based system
+  SP2NL="tr '\040' '\012'"
+  NL2SP="tr '\015\012' '\040\040'"
+  ;;
+esac
+
+# NLS nuisances.
+# Only set LANG and LC_ALL to C if already set.
+# These must not be set unconditionally because not all systems understand
+# e.g. LANG=C (notably SCO).
+# We save the old values to restore during execute mode.
+if test "${LC_ALL+set}" = set; then
+  save_LC_ALL="$LC_ALL"; LC_ALL=C; export LC_ALL
+fi
+if test "${LANG+set}" = set; then
+  save_LANG="$LANG"; LANG=C; export LANG
+fi
+
+# Make sure IFS has a sensible default
+: ${IFS=" 	"}
+
+initd_letters='abcdefghijklmnopqrstuvwxyz'
+initd_LETTERS='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+initd_Letters=$strconf_letters$strconf_LETTERS
+initd_numbers='0123456789'
+initd_alphano=$strconf_Letters$strconf_numbers
+initd_uppercase="$SED y%*$strconf_letters%P$strconf_LETTERS%;s%[^_$strconf_alphano]%_%g"
+initd_tokenize="$SED s%[^a-zA-Z0-9]%_%g"
+
+# Defaults
+
+default_command="list"
+default_filesrch=""
+
+command=
+filename=
+debug=0
+verbose=1
+
+function version()
+{
+    if test ${show:-yes} = no ; then
+	return
+    fi
+    cat <<EOF
+$ident
+Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.
+Distributed under GPL Version 2, included here by reference.
+See '$program --copying' for copying permissions.
+EOF
+}
+
+function usage()
+{
+    if test ${show:-yes} = no ; then
+	return
+    fi
+    cat <<EOF
+Usage:
+    $program [options] FILE
+    $program {-h|--help}
+    $program {-V|--version}
+    $program {-C|--copying}
+EOF
+}
+
+function help()
+{
+    if test ${show:-yes} = no ; then
+	return
+    fi
+    usage
+    cat <<EOF
+Arguments:
+    FILE
+	the name of the init.d file to install
+Options:
+    -n, --dryrun
+	don't perform any actions, just check them
+    -Q, --quiet
+	suppress normal output
+    -D, --debug [LEVEL]
+	increase or set debugging verbosity
+    -v, --verbose [LEVEL]
+	increase or set output verbosity
+    -h, --help
+	prints this usage information and exits
+    -V, --version
+	prints the version and exits
+    -C, --copying
+	prints copying permissions and exits
+EOF
+}
+
+function copying()
+{
+    if test ${show:-yes} = no ; then
+	return
+    fi
+    cat <<EOF
+--------------------------------------------------------------------------------
+$ident
+--------------------------------------------------------------------------------
+Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+--------------------------------------------------------------------------------
+This program is free software; you can  redistribute  it and/or modify  it under
+the terms  of the GNU General Public License  as  published by the Free Software
+Foundation; version 2 of the License.
+
+This program is distributed in the hope that it will  be useful, but WITHOUT ANY
+WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should  have received a copy of the GNU  General  Public License  along with
+this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,
+Cambridge, MA 02139, USA.
+--------------------------------------------------------------------------------
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf
+of the U.S. Government ("Government"), the following provisions apply to you. If
+the Software is supplied by the  Department of Defense ("DoD"), it is classified
+as "Commercial  Computer  Software"  under  paragraph  252.227-7014  of the  DoD
+Supplement  to the  Federal Acquisition Regulations  ("DFARS") (or any successor
+regulations) and the  Government  is acquiring  only the  license rights granted
+herein (the license rights customarily provided to non-Government users). If the
+Software is supplied to any unit or agency of the Government  other than DoD, it
+is  classified as  "Restricted Computer Software" and the Government's rights in
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition
+Regulations ("FAR")  (or any successor regulations) or, in the cases of NASA, in
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor
+regulations).
+--------------------------------------------------------------------------------
+Commercial  licensing  and  support of this  software is  available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+--------------------------------------------------------------------------------
+EOF
+}
+
+function syntax_error()
+{
+    if test ${verbose:-0} -gt 0 ; then
+	$ECHO "$program: syntax error -- $1" >&2
+	( usage ) >&2
+    fi
+    exit 2
+}
+
+function option_unrec()
+{
+    opt=`$ECHO -n "X$1" | $Xsed -e 's|=.*||'`
+    syntax_error "'$opt' unrecognized"
+}
+
+function option_noarg()
+{
+    opt=`$ECHO -n "X$1" | $Xsed -e 's|=.*||'`
+    syntax_error "'$opt' does not accept an argument"
+}
+
+function option_needarg()
+{
+    syntax_error "'$1' requires an argument"
+}
+
+function option_after()
+{
+    syntax_error "'$1' cannot occur after '$2'"
+}
+
+function option_with()
+{
+    syntax_error "'$1' cannot occur with '$2'"
+}
+
+function args_toomany()
+{
+    syntax_error "excess arguments '$1'"
+}
+
+function args_toofew()
+{
+    syntax_error "'$1' mode needs $2 arguments"
+}
+
+# Parse our command line options once, thoroughly.
+while test "$#" -gt 0 -o ":$more" != ":"
+do
+    if test ":$more" != ":" ; then arg="-$more" ; more= ; else arg="$1" ; shift ; fi
+    # check for attached option argument
+    case $arg in
+	--verbose=* | --verbos=* | --verb=* | --ver=* | --v=* | \
+	--debug=* | --debu=* | --deb=* | --de=* | --d=* )
+	    optarg=`$ECHO "X$arg" | $Xsed -e 's/[-_a-zA-Z0-9]*=//'` ;;
+	--*=*)
+	    option_noarg $arg ;;
+	-[QDvhVC])
+	    optarg= ;;
+	-[QDvhVC]*)
+	    optarg=
+	    more=`$ECHO "X$arg" | $Xsed -e 's|-[QDvhVC]||'`
+	    eval "arg=\`$ECHO \"X$arg\" | $Xsed -e 's|$more||'\`"
+	    ;;
+#	-[L])
+#	    optarg= ;;
+#	-[L]*)
+#	    optarg=`$ECHO "X$arg" | $Xsed -e 's|-[L]||'` ;;
+	*)
+	    optarg= ;;
+    esac
+    # check for optional or required option argument
+    if test -n "$prev" ; then
+	case $arg in
+	    -*) # optional arguments not forthcoming
+		case $prev in
+		    debug | verbose) eval "(($prev++))" ;;
+		    # the rest have required arguments
+#		    level)
+#			option_needarg $prevopt ;;
+		esac
+		prev= ; prevopt=
+		;;
+	    *) # if the previous option needs an argument, assign it.
+		eval "$prev=\"\$arg\""
+		prev= ; prevopt=
+		continue
+		;;
+	esac
+    fi
+    # Have we seen a non-optional argument yet?
+    case $arg in
+	--help | --h | --Help | --H | -h | -H | -\? | --\?)
+	    if test ":$comand" != ":" -a ":$command" != ":help" ; then option_after $arg --$command ; fi
+	    command='help'
+	    ;;
+	--version | --versio | --versi | --vers | -V)
+	    if test ":$comand" != ":" -a ":$command" != ":version" ; then option_after $arg --$command ; fi
+	    command='version'
+	    ;;
+	--copying | --copyin | --copyi | --copy | --cop | --co | --c | -C)
+	    if test ":$comand" != ":" -a ":$command" != ":copying" ; then option_after $arg --$command ; fi
+	    command='copying'
+	    ;;
+	--verbose | --verbos | --verbo | --verb)
+	    prevopt="$arg"
+	    prev='verbose'
+	    ;;
+	-v)
+	    ((verbose++))
+	    ;;
+	--verbose=* | --verbos=* | --verbo=* | --verb=*)
+	    verbose="$optarg"
+	    ;;
+	--debug | --debu | --deb)
+	    prevopt="$arg"
+	    prev='debug'
+	    ;;
+	-D)
+	    $ECHO "$program: enabling shell trace mode" 1>&2
+	    set -x
+	    ;;
+	--debug=* | --debu=* | --deb=*)
+	    debug="$optarg"
+	    ;;
+	--dry-run | --dryrun | --n | -n)
+	    run=no
+	    ;;
+	--quiet | --silent | -Q)
+	    show=no
+	    verbose=0
+	    debug=0
+	    ;;
+	--level | --leve | --lev | --le | --L | -L)
+	    prevopt="$arg"
+	    prev='level'
+	    ;;
+	--)
+	    # end of options
+	    break
+	    ;;
+	-*)
+	    option_unrec $arg
+	    ;;
+	*)
+	    nonopt="${nonopt}${nonopt:+ }$arg"
+	    ;;
+    esac
+done
+
+# hit end of list wanting arguments
+case $prev in
+    # these have optional arguments
+    debug | verbose) eval "(($prev++))" ;;
+    # the rest have required arguments
+#    level)
+#	option_needarg $prevopt ;;
+esac
+
+trace_opts=
+if [ $debug -gt 0 ] ; then
+    trace_opts="${trace_opts}x"
+fi
+if [ $debug -gt 1 ] ; then
+    trace_opts="${trace_opts}v"
+fi
+trace_on="${trace_opts:+set -$trace_opts}"
+trace_no="${trace_opts:+set +$trace_opts}"
+
+$trace_on
+
+if [ x"$nonopt${nonopt:+ }${1+$@}" != "x" ] ; then
+    eval "args=\"$nonopt${nonopt:+ }${1+$@}\""
+else
+    args=
+fi
+
+if [ -n "$args" ] ; then
+    set $args
+fi
+
+command=${command:-'install'}
+
+# parse non-option arguments
+case ":$command" in
+    (:help|:version|:copying)
+	$command
+	exit 0
+	;;
+    (:install)
+	if [ $# -lt 1 ] ; then
+	    args_toofew "$command" "1"
+	fi
+	if [ $# -gt 1 ] ; then
+	    shift
+	    args_toomany "$*"
+	fi
+	;;
+    (*)
+	$ECHO "error: unrecognized command mode '$command'" >&2
+	exit 1
+	;;
+esac
+
+here=`pwd`
+filename="$1"
+initname="$(basename $filename)"
+initrddir="$(dirname $filename)"
+
+if [ ! -d "${initrddir:-.}" ] ; then
+    $ECHO "error: directory '${initrddir:-.}' does not exist" >&2
+    exit 1
+fi
+
+initrddir=`(cd $initrddir ; pwd)`
+filename="$initrddir/$initname"
+
+if [ ! -f "$filename" ] ; then
+    $ECHO "error: file '${filename}' does not exist" >&2
+    exit 1
+fi
+
+basedir=$(basename $initrddir)
+
+if [ "$basedir" != init.d ] ; then
+    $ECHO "warning: path to init.d file should have init.d as its last component instead of $basedir" >&2
+fi
+
+rootdir="${initrddir}"
+rootdir=${rootdir//\/rc.d/}
+rootdir=${rootdir//\/init.d/}
+rootdir=${rootdir//\/etc/}
+
+# If we are installing on the host, we might as well use the host's
+# own install function, if one exists.  chkconfig works best on most
+# platforms, insserv next, and, strangely enough, lsb is the least
+# compatible.
+
+if [ -z "$rootdir" ] ; then
+    if [ -x /usr/lib/lsb/install_initd ] ; then
+	$ECHO " /usr/lib/lsb/install_initd $filename"
+	/usr/lib/lsb/install_initd $filename
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && exit 0
+    fi
+    if [ -x /sbin/insserv ] ; then
+	$ECHO " /sbin/insserv -v $filename"
+	/sbin/insserv -v $filename
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && exit 0
+    fi
+    if [ -x /sbin/chkconfig ] ; then
+	$ECHO " /sbin/chkconfig --add $initname"
+	/sbin/chkconfig --add $initname
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && /sbin/chkconfig --list $initname
+	[ $RETVAL -eq 0 ] && exit 0
+    fi
+fi
+
+# Fall back to doing it ourselves.
+
+sysconfdir="${rootdir}/etc"
+
+#
+# There are three situations here:
+#
+# RedHat-like system shave a real /etc/rc.d/init.d directory and a symbolic link from /etc/init.d
+# Debian systems have no rc.d, place all the rcX.d directories in /etc, and /etc/init.d is real.
+# SuSE/UL systems have a real /etc/init.d directory and a symbolic link from /etc/rc.d to /etc/init.d
+#
+# This means
+# - symbolic links for RedHat  from an rcX.d directory go to ../init.d/scriptname.
+# - symbolic links for Debian  from an rcX.d directory go to ../init.d/scriptname.
+# - symbolic links for SuSE/UL from an rcX.d directory go to ../scriptname
+#
+# Now, for
+# - Redhat,  rcX.d directories are in /etc/rc.d
+# - Debian,  rcX.d directories are in /etc
+# - SuSE/UL, rcX.d directories are in /etc/init.d
+#
+# so that is how we detect which system we are installing for.
+#
+if [ -d $sysconfdir/rc0.d ] ; then
+    rcdir="${sysconfdir}"
+    basedir="init.d"
+    flavor="update-rc.d"
+elif [ -d $sysconfdir/init.d/rc0.d ] ; then
+    rcdir="${sysconfdir}/init.d"
+    basedir=""
+    flavor="insserv"
+elif [ -d $sysconfdir/rc.d/rc0.d ] ; then
+    rcdir="${sysconfdir}/rc.d"
+    basedir="init.d"
+    flavor="chkconfig"
+else
+    $ECHO "warning: $program cannot grok SysV init for $initname" >&2
+    exit 1
+fi
+
+install_links() {
+    while [ -n "$1" ] ; do
+	local cmd="$1"
+	local prio="$2"
+	shift 2
+	while [ -n "$1" ] ; do
+	    if [ "$1" = '.' ] ; then shift ; break ; fi
+	    [ -d $rcdir/rc${1}.d ] || {
+		[ $verbose -gt 1 ] && echo " mkdir -p -- $rcdir/rc${1}.d"
+		mkdir -p -- $rcdir/rc${1}.d
+	    }
+	    pushd $rcdir/rc${1}.d >/dev/null
+	    case "$cmd" in
+		(start)
+		    [ -L S${prio}${initname} -a "$(readlink S${prio}${initname})" = ../${basedir:+$basedir/}$initname ] \
+		    || {
+			[ $verbose -gt 1 ] && echo " cd `pwd` ; rm -f -- S${prio}${initname} ; ln -sf ../${basedir:+$basedir/}$initname S${prio}${initname}"
+			rm -f -- S${prio}${initname} ; ln -sf ../${basedir:+$basedir/}$initname S${prio}${initname}
+		    }
+		    ;;
+		(stop)
+		    [ -L K${prio}${initname} -a "$(readlink K${prio}${initname})" = ../${basedir:+$basedir/}$initname ] \
+		    || {
+			[ $verbose -gt 1 ] && echo " cd `pwd` ; rm -f -- K${prio}${initname} ; ln -sf ../${basedir:+$basedir/}$initname K${prio}${initname}"
+			rm -f -- K${prio}${initname} ; ln -sf ../${basedir:+$basedir/}$initname K${prio}${initname}
+		    }
+		    ;;
+	    esac
+	    popd >/dev/null
+	    shift
+	done
+    done
+}
+
+install_from_debconfig() {
+    shift 2
+    install_links $*
+}
+
+install_from_chkconfig() {
+    shift 2
+    local klevs=
+    local slevs=`echo "$1" | sed -e 's|.|& |g;s| $||;s|-||'`
+    local sprio="$2"
+    local kprio="$3"
+    for l in 0 1 2 3 4 5 6 ; do
+	case " $slevs " in
+	    (*" $l "*) continue ;;
+	    (*) klevs="${klevs}${klevs:+ }${l}" ;;
+	esac
+    done
+    install_links start $sprio $slevs . stop $kprio $klevs .
+}
+
+install_from_lsbconfig() {
+    local slevs=`echo "$1" | grep '^# Default-Start:' | sed -e 's|^# Default-Start:[[:space:]]*||'`
+    local klevs=`echo "$1" | grep '^# Default-Stop:' | sed -e 's|^# Default-Stop:[[:space:]]*||'`
+#   cannot handle priorities yet...
+    local sprio='55'
+    local kprio='88'
+    install_links start $sprio $slevs . stop $kprio $klevs .
+}
+
+if [ $flavor = "update-rc.d" -o $flavor = "none" ] ; then
+    debsearch='^#[[:space:]][[:space:]]*update-rc\.d:\([[:space:]][[:space:]]*\(start\|stop\)[[:space:]][[:space:]]*[0-9][0-9]\([[:space:]][[:space:]]*[0-6S]\)*[[:space:]][[:space:]]*\.\)*[[:space:]]*$'
+    if grep "$debsearch" $filename >/dev/null 2>&1 ; then
+	cat $filename | sed -e "\,$debsearch,!d" | \
+	while read line ; do
+	    install_from_debconfig $line
+	done
+	exit $?
+    fi
+fi
+
+if [ $flavor = "chkconfig" -o $flavor = "none" ] ; then
+    chksearch='#[[:space:]][[:space:]]*chkconfig:[[:space:]][[:space:]]*[-0-7][0-7]*[[:space:]][[:space:]]*[0-9][0-9][[:space:]][[:space:]]*[0-9][0-9][[:space:]]*$'
+    if grep "$chksearch" $filename >/dev/null 2>&1
+    then
+	cat $filename | sed -e "\,$chksearch,!d" | \
+	while read line ; do
+	    install_from_chkconfig $line
+	done
+	exit $?
+    fi
+fi
+
+if [ $flavor = "insserv" -o $flavor = "none" ] ; then
+    if grep '^### BEGIN INIT INFO[[:space:]]*$' $filename >/dev/null 2>&1
+    then
+	install_from_lsbconfig "$(cat $filename | sed -e '\,^### BEGIN INIT INFO[[:space:]]*$,,\,^### END INIT INFO[[:space:]]*$,!d')"
+	exit $?
+    fi
+fi
+
+$ECHO "error: service $initname does not support $program" >&2
+exit 1
+
+# vim: ft=sh sw=4
