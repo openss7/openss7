@@ -465,7 +465,12 @@ ULONG    allocsize;
          }
          sztblp = sztbl;
 
+#ifdef LFS
+	 /* Do not use BPRI_HI: it can fail too easily.  --bb */
+         while ((dbp = (mblk_t *)allocb(lallocsize, BPRI_MED)) == NULL) {
+#else
          while ((dbp = (mblk_t *)allocb(lallocsize, BPRI_HI)) == NULL) {
+#endif
 
             do {
                if (*sztblp < lallocsize) {

@@ -258,6 +258,16 @@ void sct_getfreemp( freemp )
    /* Get an unsolicited msg block for general use */
    DLGCSPLSTR(oldspl);
 
+#ifdef LFS
+   /* Do not use BPRI_HI.  It can fail too easily. --bb */
+   if ( ( sct_freemp = (mblk_t *) allocb( size, BPRI_MED ) ) == NULL ) {
+      if ( !bufcall( size, BPRI_MED, sct_getfreemp, (long) freemp ) ) {
+         DLGC_MSG2( CE_WARN, "TMR: sct_getfreemp(): Unable to recover from allocb failure!" );
+      }
+      DLGCSPLX(oldspl);
+      return;
+   }
+#else
    if ( ( sct_freemp = (mblk_t *) allocb( size, BPRI_HI ) ) == NULL ) {
       if ( !bufcall( size, BPRI_HI, sct_getfreemp, (long) freemp ) ) {
          DLGC_MSG2( CE_WARN, "TMR: sct_getfreemp(): Unable to recover from allocb failure!" );
@@ -265,6 +275,7 @@ void sct_getfreemp( freemp )
       DLGCSPLX(oldspl);
       return;
    }
+#endif
 
    /*
     * Zero out the message buffer and adjust b_wptr accordingly

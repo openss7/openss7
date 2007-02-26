@@ -117,7 +117,7 @@ ctimod_del_timer:del_timer
 ctimod_do_gettimeofday:do_gettimeofday
 ctimod_free_irq:free_irq
 ctimod_free_pages:free_pages
-ctimod_get_free_pages:get_free_pages
+ctimod_get_free_pages:__get_free_pages
 ctimod_init_timer:init_timer
 ctimod_init_waitqueue_head:init_waitqueue_head
 ctimod_ioremap:ioremap
@@ -125,13 +125,16 @@ ctimod_iounmap:iounmap
 ctimod_jiffies:jiffies
 ctimod_kfree:kfree
 ctimod_kmalloc:kmalloc
+ctimod_mark_bh:mark_bh
 ctimod_memcpy:memcpy
 ctimod_memset:memset
+ctimod_pcibios_present:pcibios_present
 ctimod_pci_find_device:pci_find_device
 ctimod_pci_module_init:pci_module_init
 ctimod_pci_read_config_byte:pci_read_config_byte
 ctimod_pci_read_config_dword:pci_read_config_dword
 ctimod_pci_read_config_word:pci_read_config_word
+ctimod_pci_register_driver:pci_register_driver
 ctimod_pci_unregister_driver:pci_unregister_driver
 ctimod_pci_write_config_byte:pci_write_config_byte
 ctimod_pci_write_config_dword:pci_write_config_dword
@@ -140,19 +143,22 @@ ctimod_poll_wait:poll_wait
 ctimod_printk:printk
 ctimod_queue_work:queue_work
 ctimod_register_chrdev:register_chrdev
+ctimod_remap_page_range:remap_page_range
 ctimod_remove_proc_entry:remove_proc_entry
 ctimod_remove_wait_queue:remove_wait_queue
 ctimod_request_irq:request_irq
 ctimod_schedule:schedule
 ctimod_schedule_timeout:schedule_timeout
-ctimod_spin_lock:spin_lock
 ctimod_spin_lock_bh:spin_lock_bh
 ctimod_spin_lock_init:spin_lock_init
+ctimod_spin_lock_irqsave:spin_lock_irqsave
 ctimod_spin_lock_irq:spin_lock_irq
+ctimod_spin_lock:spin_lock
 ctimod_spin_trylock:spin_trylock
-ctimod_spin_unlock:spin_unlock
 ctimod_spin_unlock_bh:spin_unlock_bh
+ctimod_spin_unlock_irqrestore:spin_unlock_irqrestore
 ctimod_spin_unlock_irq:spin_unlock_irq
+ctimod_spin_unlock:spin_unlock
 ctimod_sprintf:sprintf
 ctimod_tasklet_init:tasklet_init
 ctimod_tasklet_kill:tasklet_kill
@@ -271,15 +277,15 @@ is non-portable.
 .TP
 .BR ctimod_get_free_pages ()
 This function is purposeless.  Call
-.BR get_free_pages (9)
+.BR __get_free_pages (9)
 if absolutely necessary; however,
-.BR get_free_pages (9)
+.BR __get_free_pages (9)
 is non-portable.
-.BR get_free_pages (9)
+.BR __get_free_pages (9)
 is often unnecessary and the DDI/DKI function
 .BR kmem_alloc (9)
 can be used in its stead.
-.BR get_free_pages (9)
+.BR __get_free_pages (9)
 is only necessary when physically contiguous pages of unique character (e.g. suitable for ISA DMA)
 ar required.
 .TP
@@ -327,6 +333,8 @@ is non-portable: use the DDI/DKI function
 .BR kmem_free (9)
 instead.
 .TP
+.BR ctimod_mark_bh ()
+.TP
 .BR ctimod_memcpy ()
 This function is purposeless.  Call
 .BR memcpy (9)
@@ -339,6 +347,8 @@ This function is purposeless.  Call
 instead of absolutely necessary.  Better still, use the portable DDI/DKI function
 .BR bzero (9).
 .TP
+.BR ctimod_pcibios_present
+.TP
 .BR ctimod_pci_find_device ()
 .TP
 .BR ctimod_pci_module_init ()
@@ -348,6 +358,8 @@ instead of absolutely necessary.  Better still, use the portable DDI/DKI functio
 .BR ctimod_pci_read_config_dword ()
 .TP
 .BR ctimod_pci_read_config_word ()
+.TP
+.BR ctimod_pci_register_driver ()
 .TP
 .BR ctimod_pci_unregister_driver ()
 .TP
@@ -375,6 +387,8 @@ instead.
 This function is a useless wrapper that is strapped out.  Do not use it.
 .TP
 .BR ctimod_register_chrdev ()
+.TP
+.BR ctimod_remap_page_range ()
 .TP
 .BR ctimod_remove_proc_entry ()
 .TP
@@ -411,6 +425,8 @@ Use the portable DDI/DKI function
 or a lock initalizer string
 instead.
 .TP
+.BR ctimod_spin_lock_irqsave ()
+.TP
 .BR ctimod_spin_lock_irq ()
 This function is useless; call
 .BR spin_lock_irq (9)
@@ -445,6 +461,8 @@ directly if absolutely necessary; however, it is dangerous.
 Use the portable DDI/DKI function
 .BR UNLOCK (9)
 instead.
+.TP
+.BR ctimod_spin_unlock_irqrestore ()
 .TP
 .BR ctimod_spin_unlock_irq ()
 This funciton is useless; call

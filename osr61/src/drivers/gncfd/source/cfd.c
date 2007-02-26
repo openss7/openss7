@@ -693,10 +693,19 @@ mblk_t  *mp;
     * ALLOCATE AND ZERO-FILL THE STRUCTURE SPACE 
    if ((Gn_Headerp = (GN_HEADER *)
     */
+#ifdef LFS
+   if ((Gn_Headerp = (GN_HEADER *)(void *) lis_get_free_pages(GFP_ATOMIC, Gn_Memsz)) == NULL) {
+      retval = EGN_NOMEM;
+      goto init_err;
+   }
+#else
+   /* This function can be called by a write put procedure and must not block.  GFP_ATOMIC is
+    * required here instead of GFP_KERNEL. --bb */
    if ((Gn_Headerp = (GN_HEADER *)(void *) lis_get_free_pages(GFP_KERNEL, Gn_Memsz)) == NULL) {
       retval = EGN_NOMEM;
       goto init_err;
    }
+#endif
    
    bzero(Gn_Headerp,Gn_Memsz);
 
@@ -1712,10 +1721,18 @@ mblk_t   *mp;
            numpms * sizeof(GN_PMSTATUS) +
            numbds * sizeof(GN_BDSTATUS);
 
+#ifdef LFS
+   /* Do no use BRPI_HI: it can fail too easily.  --bb */
+   if ((nmp = allocb(memsz,BPRI_MED)) == NULL) {
+      retval = EGN_NOMEM;
+      goto status_exit;
+   }
+#else
    if ((nmp = allocb(memsz,BPRI_HI)) == NULL) {
       retval = EGN_NOMEM;
       goto status_exit;
    }
+#endif
 
    /* Set up the data block pointers */
    gdrvsp = (GN_DRVSTATUS *)nmp->b_rptr;

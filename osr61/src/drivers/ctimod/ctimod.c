@@ -663,8 +663,6 @@ static void __exit ctimod_cleanup_module(void)
 module_exit(ctimod_cleanup_module);
 
 
-// Export Symbols for 2.6 kernel
-#ifndef LINUX24 
 EXPORT_SYMBOL(ctimod_printk);
 EXPORT_SYMBOL(ctimod_kmalloc);
 EXPORT_SYMBOL(ctimod_free_irq);
@@ -677,7 +675,9 @@ EXPORT_SYMBOL(ctimod_pci_read_config_byte);
 EXPORT_SYMBOL(ctimod_debug_off);
 EXPORT_SYMBOL(ctimod_vsprintf);
 EXPORT_SYMBOL(ctimod_sprintf);
+#ifndef LINUX24
 EXPORT_SYMBOL(ctimod_wake_up_process);
+#endif
 EXPORT_SYMBOL(ctimod_spin_unlock);
 EXPORT_SYMBOL(ctimod_spin_unlock_bh);
 EXPORT_SYMBOL(ctimod_add_timer);
@@ -686,7 +686,9 @@ EXPORT_SYMBOL(ctimod_spin_lock_bh);
 EXPORT_SYMBOL(ctimod_spin_lock_irq);
 EXPORT_SYMBOL(ctimod_wake_up_interruptible);
 EXPORT_SYMBOL(ctimod_pci_find_device);
+#ifndef LINUX24
 EXPORT_SYMBOL(ctimod_queue_work);
+#endif
 EXPORT_SYMBOL(ctimod_spin_lock_init);
 EXPORT_SYMBOL(ctimod_tasklet_init);
 EXPORT_SYMBOL(ctimod_tasklet_kill);
@@ -700,7 +702,9 @@ EXPORT_SYMBOL(ctimod_debug_toggle);
 EXPORT_SYMBOL(ctimod_spin_unlock_irq);
 EXPORT_SYMBOL(ctimod_del_timer);
 EXPORT_SYMBOL(ctimod_pci_read_config_dword);
+#ifndef LINUX24
 EXPORT_SYMBOL(ctimod_create_workqueue);
+#endif
 EXPORT_SYMBOL(ctimod_iounmap);
 EXPORT_SYMBOL(ctimod_pci_read_config_word);
 EXPORT_SYMBOL(ctimod_schedule_timeout);
@@ -730,5 +734,4 @@ EXPORT_SYMBOL(ctimod_check_rh);
 EXPORT_SYMBOL(ctimod_memset);
 EXPORT_SYMBOL(ctimod_remove_proc_entry);
 EXPORT_SYMBOL(ctimod_create_proc_entry);
-#endif
 

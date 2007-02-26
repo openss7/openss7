@@ -406,6 +406,12 @@ void   ctimod_debug_clear(void);
 void   ctimod_debug_print(void);
 void   ctimod_debug_toggle(void);
 
+#ifndef LINUX24
+struct workqueue_struct *ctimod_create_workqueue(char *);
+int    ctimod_queue_work(struct workqueue_struct *, struct work_struct *);
+int    ctimod_wake_up_process(struct task_struct *);
+#endif
+
 int    ctimod_check_rh(void);
 
 #endif /* _CTIMOD_H_ */

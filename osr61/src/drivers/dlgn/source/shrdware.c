@@ -495,7 +495,13 @@ VOID a4_auto_read(WORD port, WORD size, ULONG addr, WORD *buf)
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifndef LFS
     int oldspl;
+#endif
+#endif
+
+#ifdef LFS
+    DLGCDECLARESPL(oldspl);
 #endif
 
 #ifdef AIX_ANT
@@ -570,7 +576,13 @@ VOID a4_auto_write(WORD port, WORD size, ULONG addr, WORD *buf)
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifndef LFS
     int oldspl;
+#endif
+#endif
+
+#ifdef LFS
+    DLGCDECLARESPL(oldspl);
 #endif
 
 #ifdef AIX_ANT
@@ -665,7 +677,13 @@ VOID wctrl(WORD port, BYTE data)
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifndef LFS
     int oldspl;
+#endif
+#endif
+
+#ifdef LFS
+    DLGCDECLARESPL(oldspl);
 #endif
 
 #ifdef AIX_ANT
@@ -717,7 +735,13 @@ VOID wask(WORD port, BYTE data)
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifndef LFS
     int oldspl;
+#endif
+#endif
+
+#ifdef LFS
+    DLGCDECLARESPL(oldspl);
 #endif
 
 #ifdef AIX_ANT
@@ -767,7 +791,13 @@ VOID wfree(WORD port, BYTE data)
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifndef LFS
     int oldspl;
+#endif
+#endif
+
+#ifdef LFS
+    DLGCDECLARESPL(oldspl);
 #endif
 
 #ifdef AIX_ANT
@@ -817,7 +847,13 @@ WORD is_bit(WORD port, WORD data)
 #ifdef WNT_ANT
     KIRQL oldspl;
 #else
+#ifndef LFS
     int oldspl;
+#endif
+#endif
+
+#ifdef LFS
+    DLGCDECLARESPL(oldspl);
 #endif
 
 #ifdef AIX_ANT

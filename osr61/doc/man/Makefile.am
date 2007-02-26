@@ -65,11 +65,8 @@ MANMACRO_PFX			= @PACKAGE_TARNAME@
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-man_MANS = \
+ctimod_mans = \
 	man4/ctimod.4 \
-	man5/osr61.5 \
-	man8/osr61_mknod.8 \
-	man8/test-osr61.8 \
 	man9/ctimod.9 \
 	man9/ctimod_add_timer.9 \
 	man9/ctimod_add_wait_queue.9 \
@@ -140,28 +137,83 @@ man_MANS = \
 	man9/ctimod_wake_up_interruptible.9 \
 	man9/ctimod_wake_up_process.9
 
-if WITH_DLGN
-man_MANS += \
+dlgn_mans = \
 	man4/dlgn.4 \
 	man4/dvbm.4 \
 	man4/gncfd.4 \
 	man4/gpio.4 \
-	man4/sctmr.4
-endif
-if WITH_MERC
-man_MANS += \
+	man4/sctmr.4  \
+	man9/cf_cmpstr.9 \
+	man9/cf_ioccopy.9 \
+	man9/cf_iocput.9 \
+	man9/dlgn_copymp.9 \
+	man9/dlgn_drvstart.9 \
+	man9/dlgn_drvstop.9 \
+	man9/dlgn_getpeak.9 \
+	man9/dlgn_msg.9 \
+	man9/dlgn_undoc.9 \
+	man9/dlgn_wqreply.9 \
+	man9/dl_setintr.9 \
+	man9/DriverStats.9 \
+	man9/Gn_Boardp.9 \
+	man9/Gn_Endp.9 \
+	man9/Gn_Freep.9 \
+	man9/Gn_Headerp.9 \
+	man9/Gn_Logdevp.9 \
+	man9/Gn_Maxpm.9 \
+	man9/Gn_Memsz.9 \
+	man9/Gn_Msglvl.9 \
+	man9/Gn_Numpms.9 \
+	man9/GpControlBlock.9 \
+	man9/index.9 \
+	man9/intmod_lock.9 \
+	man9/NumOfVoiceBoards.9 \
+	man9/pmswtbl.9 \
+	man9/StatisticsMonitoring.9 \
+	man9/st_freelock.9 \
+	man9/st_sctlock.9 \
+	man9/st_uselock.9
+
+merc_mans = \
 	man4/mercd.4
-endif
-if WITH_PMAC
-man_MANS += \
+
+pmac_mans = \
 	man4/pmacd.4
+
+man_MANS = \
+	man5/osr61.5 \
+	man8/osr61_mknod.8 \
+	man8/test-osr61.8
+
+man_MANS += $(ctimod_mans)
+
+if WITH_DLGN
+man_MANS += $(dlgn_mans)
+endif
+
+if WITH_MERC
+man_MANS += $(merc_mans)
+endif
+
+if WITH_PMAC
+man_MANS += $(pmac_mans)
 endif
 
 dist_noinst_MANS = \
 	man4/ctimod.4.man \
+	man4/dlgn.4.man \
+	man4/dvbm.4.man \
+	man4/gncfd.4.man \
+	man4/gpio.4.man \
+	man4/mercd.4.man \
+	man4/pmacd.4.man \
+	man4/sctmr.4.man  \
 	man5/osr61.5.man \
 	man8/osr61_mknod.8.man \
 	man8/test-osr61.8.man \
+	man9/cf_cmpstr.9.man \
+	man9/cf_ioccopy.9.man \
+	man9/cf_iocput.9.man \
 	man9/ctimod.9.man \
 	man9/ctimod_add_timer.9.man \
 	man9/ctimod_add_wait_queue.9.man \
@@ -230,24 +282,34 @@ dist_noinst_MANS = \
 	man9/ctimod_virt_to_page.9.man \
 	man9/ctimod_vsprintf.9.man \
 	man9/ctimod_wake_up_interruptible.9.man \
-	man9/ctimod_wake_up_process.9.man
-
-if WITH_DLGN
-dist_noinst_MANS += \
-	man4/dlgn.4.man \
-	man4/dvbm.4.man \
-	man4/gncfd.4.man \
-	man4/gpio.4.man \
-	man4/sctmr.4.man 
-endif
-if WITH_MERC
-dist_noinst_MANS += \
-	man4/mercd.4.man
-endif
-if WITH_PMAC
-dist_noinst_MANS += \
-	man4/pmacd.4.man
-endif
+	man9/ctimod_wake_up_process.9.man \
+	man9/dlgn_copymp.9.man \
+	man9/dlgn_drvstart.9.man \
+	man9/dlgn_drvstop.9.man \
+	man9/dlgn_getpeak.9.man \
+	man9/dlgn_msg.9.man \
+	man9/dlgn_undoc.9.man \
+	man9/dlgn_wqreply.9.man \
+	man9/dl_setintr.9.man \
+	man9/DriverStats.9.man \
+	man9/Gn_Boardp.9.man \
+	man9/Gn_Endp.9.man \
+	man9/Gn_Freep.9.man \
+	man9/Gn_Headerp.9.man \
+	man9/Gn_Logdevp.9.man \
+	man9/Gn_Maxpm.9.man \
+	man9/Gn_Memsz.9.man \
+	man9/Gn_Msglvl.9.man \
+	man9/Gn_Numpms.9.man \
+	man9/GpControlBlock.9.man \
+	man9/index.9.man \
+	man9/intmod_lock.9.man \
+	man9/NumOfVoiceBoards.9.man \
+	man9/pmswtbl.9.man \
+	man9/StatisticsMonitoring.9.man \
+	man9/st_freelock.9.man \
+	man9/st_sctlock.9.man \
+	man9/st_uselock.9.man
 
 MANS_UNUSED = \
 	man5/osr61.5

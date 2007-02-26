@@ -270,7 +270,12 @@ SHORT send_delay_request(SHORT loc, BYTE opt, BYTE cr,
                 bsize = dataleft;
             }
 
+#ifdef LFS
+	    /* Do not use BPRI_HI: it can fail too easily. -- bb */
+            dmp = (mblk_t *) allocb(bsize,BPRI_MED);
+#else
             dmp = (mblk_t *) allocb(bsize,BPRI_HI);
+#endif
             if (dmp == NULL) {
                 cmn_err(CE_WARN,"allocb() fail in xsend_delay_request()");
                 return -1;

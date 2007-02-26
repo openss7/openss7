@@ -770,17 +770,29 @@ mblk_t *mp;
    }
  
 #ifdef LFS
-   if ((curptr = baseptr = (char *)kmem_alloc(_ioc_count, KM_SLEEP)) == NULL){
+   /* Use KM_NOSLEEP instead of KM_SLEEP because this function is called from
+    * a write put procedure. --bb */
+   if ((curptr = baseptr = (char *)kmem_alloc(_ioc_count, KM_NOSLEEP)) == NULL){
       return (NULL);
    }
 #else
-   if ((curptr = baseptr = (char *)lis_kmalloc(ioc_count, GFP_KERNEL)) == NULL){
+   /* This is an error. This function is called from a put procedure and must
+    * not block.  This should be GFP_ATOMIC instead of GFP_KERNEL. --bb */
+   if ((curptr = baseptr = (char *)lis_kmalloc(_ioc_count, GFP_KERNEL)) == NULL){
       return (NULL);
    }
 #endif
 
    for (nmp = mp->b_cont; nmp != NULL; nmp = nmp->b_cont) {
       cur_count = (int)(nmp->b_wptr - nmp->b_rptr);
+#ifdef LFS
+      /* This was dangerous because bytes were blidly copied without checking
+       * if _ioc_count was less than the extent being copied.  This also
+       * causes the function to succeed if there are more bytes available than
+       * _ioc_count. --bb */
+      if (_ioc_count < tot_count + cur_count)
+	      cur_count = tot_count - _ioc_count;
+#endif
 #ifdef DLGC_LIS_FLAG
       __wrap_memcpy(curptr, nmp->b_rptr, cur_count);
 #else
@@ -791,6 +803,10 @@ mblk_t *mp;
    }
  
    if (tot_count != _ioc_count) {
+#ifdef LFS
+      /* Memory leak. --bb */
+      kmem_free(baseptr, _ioc_count);
+#endif
       return (NULL);
    }
 
@@ -3750,11 +3766,20 @@ register unsigned long  size;
        * allocb returns M_DATA messages by default.
        */
       tot_size = size + sizeof(GN_CMDMSG);
+#ifdef LFS
+      /* Do not use BPRI_HI: it can fail too easily. --bb */
+      if ((tmp = (mblk_t *) allocb(tot_size, BPRI_MED)) == NULL) {
+         DLGC_MSG2(CE_WARN,
+            "dlgn_copymp(): Cannot copy message: STREAMS allocb failure!");
+         goto exit;
+      }
+#else
       if ((tmp = (mblk_t *) allocb(tot_size, BPRI_HI)) == NULL) {
          DLGC_MSG2(CE_WARN,
             "dlgn_copymp(): Cannot copy message: STREAMS allocb failure!");
          goto exit;
       }
+#endif
 
       /*
        * Zero out the message buffer and adjust b_wptr accordingly
@@ -3912,9 +3937,14 @@ PRIVATE void _dlgn_replyck()
    register LD_CMD      *lcp;
    register GN_CMDMSG   *drvhdr;
    register int         i;
+#ifndef LFS
    int                  oldspl;
+#endif
    int                  handle;
 
+#ifdef LFS
+   DLGCDECLARESPL(oldspl);
+#endif
 
    DLGCSPLSTR(oldspl);
 

@@ -186,6 +186,8 @@ ULONG nbds;
 #ifdef LFS
    if ((mlp = (SR_MAPLST *)kmem_zalloc(memsz, KM_NOSLEEP)) == NULL) { 
 #else
+   /* This is an error.  sr_mapinit can be called from a write put procedure and
+    * must not sleep. GFP_ATOMIC must be used here instead of GFP_KERNEL. --bb */
    if ((mlp = (SR_MAPLST *)lis_kmalloc(memsz, GFP_KERNEL)) == NULL) { 
 #endif
 #else

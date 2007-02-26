@@ -75,5 +75,22 @@ the performance of other Streams and @dfn{STREAMS} devices or modules in the sys
 
 @item In many places, inappropriate LiS recursive spinlocks were being used and interrupts were not
 being suppressed.
+
+@item In many places, BPRI_HI was being used inappropriately.
+
+@item Fixed a memory leak and a buffer overflow in cf_ioccopy().
+
+@item The sct_getfreemp() function in the @manref{sctmr(4)} module should not allocate message
+blocks with @manref{allocb(9)} and call @manref{bufcall(9)} with interrupts suppressed.
+Furthermore, suppressing interrupts is not sufficient protection on MP architectures and this
+function is not MP safe.  Also, the buffer call does not increase the module count and the callback
+function could be deallocated by module unloading before the callback is called.  In fact there are
+many instances throughout the code that show the inexperience of the STREAMS module programmer that
+generated this code.
+
+@item The dlgn_copymp() function in the @manref{dlgn(4)} driver unnecessarily suppresses interrupts
+when allocating and copying buffers.  Just about everywhere where splstr() is called is now
+suppressed.
+
 @end itemize
 

@@ -64,6 +64,11 @@ Things to do:
 Testing.  This package is completely untested.
 
 @emph{*todo*}
+
+@item
+Rewrite the PMAC driver as a STREAMS driver.
+
+@emph{*todo*}
 @end itemize
 
 The @command{@value{PACKAGE}} package is currently complete but untested.

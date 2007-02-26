@@ -237,8 +237,11 @@ void *AllocMem(LONG size)
 {
 #ifdef LINUX
 #ifdef LFS
-      return((void *)kmem_alloc(size, KM_SLEEP));
+      /* Use KM_NOSLEEP as in the regular unix case. */
+      return((void *)kmem_alloc(size, KM_NOSLEEP));
 #else
+      /* This is an error.  This should be GFP_ATOMIC instead of GFP_KERNEL.  AllocMem() is called
+       * potentially with interrupts suppressed.  This will cause a crash on current kernels. --bb */
       return((void *)lis_kmalloc(size, GFP_KERNEL));
 #endif
 #endif /* LINUX */
@@ -2167,7 +2170,13 @@ an_addirq(
    register AN_BOARD  *anbdp = Gbdp2Anbp(bdp);
    int                 vec = bdp->bd_irq;
    AN_BOARD           *irqp;
+#ifndef LFS
    int                 oldspl;
+#endif
+
+#ifdef LFS
+   DLGCDECLARESPL(oldspl);
+#endif
  
 #ifdef _MY_COMOUT_
    /*
@@ -2220,8 +2229,12 @@ GN_BOARD *bdp;
 #ifndef LFS
    register AN_BOARD  *anbdp = Gbdp2Anbp(bdp);
    int vec = bdp->bd_irq;
-#endif
    int oldspl;
+#endif
+
+#ifdef LFS
+   DLGCDECLARESPL(oldspl);
+#endif
  
 #ifdef _MY_COMOUT_ /* could not tell a board on the end of list or
                     * not, and vec == 0 are tested before board

@@ -24,10 +24,10 @@
 #ifdef LFS
 #   define DLGCQPROCSON(z)    qprocson((z))
 #   define DLGCQPROCSOFF(z)   qprocsoff((z))
-#   define DLGCDECLARESPL(z)  pl_t (z);
-#   define DLGCSPLSTR(z)      (z) = splstr()
-#   define DLGCSPLHI(z)       (z) = splhi()
-#   define DLGCSPLX(z)        splx((z))
+#   define DLGCDECLARESPL(z)
+#   define DLGCSPLSTR(z)
+#   define DLGCSPLHI(z)
+#   define DLGCSPLX(z)
 #   define inb(p)		inb_p((p))
 #   define outb(p,v)		outb_p((v),(p))
 #else
