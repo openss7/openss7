@@ -11416,7 +11416,8 @@ lmi_attach_req(struct up *up, queue_t *q, mblk_t *mp)
 		up_set_state(up, LMI_ATTACH_PENDING);
 		as_set_state(up->as.as, q, AS_WRSP_RREQ);
 		/* issue registation request */
-		up->as.as->as.request_id = atomic_inc_return(&ua_request_id);
+		atomic_inc(&ua_request_id);
+		up->as.as->as.request_id = atomic_read(&ua_request_id);
 		rtn = rp_send_rkmm_reg_req(up->as.as->rp.list, q, mp);
 		sp_unlock(sp);
 		return (rtn);
@@ -11461,7 +11462,7 @@ lmi_detach_req(struct up *up, queue_t *q, mblk_t *mp)
 	if (up_get_state(up) != LMI_DISABLED)
 		goto outstate;
 	up_set_state(up, LMI_DETACH_PENDING);
-	switch (sp_get_state(sp) != ASP_UP)
+	if (sp_get_state(sp) != ASP_UP)
 		return lmi_ok_ack(up, q, mp, LMI_DETACH_REQ);
 	switch (as_get_state(as)) {
 	case AS_INACTIVE:

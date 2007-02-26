@@ -339,7 +339,8 @@ EXTRA_TEX			+= \
 				scripts/texi/fdl.texi \
 				scripts/texi/gpl.texi \
 				scripts/texi/install.texi \
-				scripts/texi/lesser.texi
+				scripts/texi/lesser.texi \
+				scripts/texi/testsuite.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
 dist_noinst_SCRIPTS		+= configure.nexusware
@@ -548,6 +549,9 @@ endif
 GENKSYMS_CPPFLAGS		= \
 				  -I./src/kernel -I$(srcdir)/src/kernel \
 				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS)
+
+EXTRA_DIST			+= \
+				  $(top_srcdir)/scripts/hot.lds
 
 ##
 ## Rules for generating versioned kernel symbols

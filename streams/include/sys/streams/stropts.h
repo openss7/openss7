@@ -106,7 +106,7 @@ typedef unsigned long int t_uscalar_t;
 #endif
 
 #define __SID		('S' << 8)
-#define STR		('S'<<8)	/* for UnixWare/Solaris compatibility */
+//#define STR		('S'<<8)	/* for UnixWare/Solaris compatibility */
 
 #undef __NOT_IMPLEMENTED__
 

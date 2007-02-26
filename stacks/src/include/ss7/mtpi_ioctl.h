@@ -445,7 +445,7 @@ typedef struct mtp_conf_sp {
  *  Network appearance configuration
  */
 typedef struct mtp_conf_na {
-	lmi_option_t options;		/* protocol options */
+	struct lmi_option options;		/* protocol options */
 	struct {
 		mtp_ulong member;	/* PC member mask */
 		mtp_ulong cluster;	/* PC cluster mask */

@@ -657,6 +657,29 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 	    ( cd $srcdir ; rm -f strvoip ; ln -sf $os7_cv_strvoip_dir strvoip )
 	fi
     fi
+    AC_ARG_WITH([OSR61],
+		AS_HELP_STRING([--without-OSR61],
+			       [dno not include OSR61 in master pack @<:@included@:>@]),
+		[with_OSR61="$withval"],
+		[with_OSR61='yes'])
+    AC_CACHE_CHECK([for sub-package osr61],[os7_cvs_osr61_dir],[dnl
+	    os7_cv_osr61_dir=''
+	    for dir in "$srcdir/osr61-*" ; do
+		if test -d "$dir" ; then
+		    os7_cv_osr61_dir="$dir"
+		fi
+	    done
+	    if test -d "$srcdir/osr61" ; then
+		os7_cv_osr61_dir="osr61"
+	    fi
+	])
+    if test :"${os7_cv_osr61_dir:-no}" = :no ; then
+	with_OSR61='no'
+    else
+	if test :"${os7_cv_osr61_dir:-no}" != :osr61 ; then
+	    ( cd $srcdir ; rm -f osr61 ; ln -sf $os7_cv_osr61_dir osr61 )
+	fi
+    fi
 ])# _OS7_OPTIONS
 # =============================================================================
 
@@ -924,6 +947,9 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     fi
     if test :${with_STRVOIP:-yes} = :yes ; then
 	AC_CONFIG_SUBDIRS([strvoip])
+    fi
+    if test :${with_OSR61:-yes} = :yes ; then
+	AC_CONFIG_SUBDIRS([osr61])
     fi
 ])# _OS7_OUTPUT
 # =============================================================================

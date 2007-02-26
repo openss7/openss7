@@ -1463,10 +1463,11 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %doc ABOUT-NLS
-%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
+%doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
+%doc README README-alpha README-cvs README-make README-nexusware THANKS TODO
+%doc %{name}-%{version}.lsm
+%doc doc/manual
 #doc doc/specs doc/projects doc/drafts
-%doc LSM %{name}-%{version}.lsm
-%doc README-make
 %{_infodir}/*
 %{manrefs}
 %{manmacros}
@@ -1477,9 +1478,11 @@ fi
 %files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%doc AUTHORS ChangeLog COPYING INSTALL NEWS README THANKS doc/manual
+%doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
+%doc README README-alpha README-cvs README-make README-nexusware THANKS TODO
+%doc %{name}-%{version}.lsm
+%doc doc/manual
 #doc doc/specs doc/projects doc/drafts
-%doc LSM %{name}-%{version}.lsm
 %{_infodir}/*
 %{manrefs}
 %{manmacros}

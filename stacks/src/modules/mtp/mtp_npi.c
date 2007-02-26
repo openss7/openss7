@@ -1463,7 +1463,7 @@ n_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto baddata;
 	return mtp_transfer_req(mtp, q, mp, &mtp->dst, mtp->options.mp, mtp->options.sls, mp);
       baddata:
-	mi_strlog(q, 0, SL_TRACE, "bad data size %d", dlen);
+	mi_strlog(q, 0, SL_TRACE, "bad data size %lu", (ulong)dlen);
 	goto error;
       outstate:
 	mi_strlog(q, 0, SL_TRACE, "would place i/f out of state");
