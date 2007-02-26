@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/12/18 10:08:58 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/02/26 15:29:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 10:08:58 $ by $Author: brian $
+ Last Modified $Date: 2007/02/26 15:29:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clone.c,v $
+ Revision 0.9.2.55  2007/02/26 15:29:42  brian
+ - two little bug fixes from Jérémy Composte
+
  Revision 0.9.2.54  2006/12/18 10:08:58  brian
  - updated headers for release
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/12/18 10:08:58 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/02/26 15:29:42 $"
 
-static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/12/18 10:08:58 $";
+static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/02/26 15:29:42 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -74,7 +77,7 @@ static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.54
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2006/12/18 10:08:58 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/02/26 15:29:42 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -379,9 +382,9 @@ unregister_clone(struct cdevsw *cdev)
 	struct devnode *cmin;
 
 	err = -ENXIO;
-	if (!(cmin = cmin_get(&clone_cdev, cdev->d_modid)))
+	if (!(cmin = cmin_get(&clone_cdev, cdev->d_major)))
 		goto error;
-	if ((err = unregister_strnod(&clone_cdev, cdev->d_modid)))
+	if ((err = unregister_strnod(&clone_cdev, cdev->d_major)))
 		goto error;
 	kfree(cmin);
       error:

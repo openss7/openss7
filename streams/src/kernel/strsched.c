@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2006/10/27 23:19:37 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2007/02/26 15:29:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:37 $ by $Author: brian $
+ Last Modified $Date: 2007/02/26 15:29:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.149  2007/02/26 15:29:44  brian
+ - two little bug fixes from Jérémy Composte
+
  Revision 0.9.2.148  2006/10/27 23:19:37  brian
  - changes for 2.6.18 kernel
 
@@ -128,10 +131,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2006/10/27 23:19:37 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2007/02/26 15:29:44 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2006/10/27 23:19:37 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2007/02/26 15:29:44 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -1411,11 +1414,11 @@ sq_put(struct syncq **sqp)
 {
 	struct syncq *sq;
 
-	dassert(sap != NULL);
-	sq = *sap;
+	dassert(sqp != NULL);
+	sq = *sqp;
 	prefetchw(sq);
 	if (sq != NULL) {
-		*sap = NULL;
+		*sqp = NULL;
 		if (unlikely(atomic_dec_and_test(&sq->sq_refs) != 0))
 			sq_free(sq);
 		else
