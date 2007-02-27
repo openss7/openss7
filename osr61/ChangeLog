@@ -1,5 +1,9 @@
 2007-02-27  Brian Bidulock  <bidulock@openss7.org>
 
+	* Makefile.am: get rid of circular dependencies
+	* acinclude.m4: avoid _ISDN macro conflict
+	* src/include/Makefile.am: add manpages
+
 	* doc/man/Makefile.am: documentation updates
 	* doc/man/man4/ctimod.4.man: documentation updates
 	* doc/man/man4/mercd.4.man: documentation updates
