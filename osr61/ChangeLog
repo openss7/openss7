@@ -1,3 +1,48 @@
+2007-02-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: documentation updates
+	* doc/man/man4/ctimod.4.man: documentation updates
+	* doc/man/man4/mercd.4.man: documentation updates
+	* doc/man/man4/pmacd.4.man: documentation updates
+	* doc/man/man5/osr61.5.man: documentation updates
+	* doc/man/man9/ctimod.9.man: documentation updates
+	* doc/manual/bugs.texi: documentation updates
+	* doc/manual/todo.texi: documentation updates
+
+	* src/include/sys/ctimod.h: added installed header
+	* src/include/sys/dlgn.h: added installed header
+
+	* doc/man/man9/DriverStats.9.man: added manpage
+	* doc/man/man9/Gn_Boardp.9.man: added manpage
+	* doc/man/man9/Gn_Endp.9.man: added manpage
+	* doc/man/man9/Gn_Freep.9.man: added manpage
+	* doc/man/man9/Gn_Headerp.9.man: added manpage
+	* doc/man/man9/Gn_Logdevp.9.man: added manpage
+	* doc/man/man9/Gn_Maxpm.9.man: added manpage
+	* doc/man/man9/Gn_Memsz.9.man: added manpage
+	* doc/man/man9/Gn_Msglvl.9.man: added manpage
+	* doc/man/man9/Gn_Numpms.9.man: added manpage
+	* doc/man/man9/GpControlBlock.9.man: added manpage
+	* doc/man/man9/NumOfVoiceBoards.9.man: added manpage
+	* doc/man/man9/StatisticsMonitoring.9.man: added manpage
+	* doc/man/man9/cf_cmpstr.9.man: added manpage
+	* doc/man/man9/cf_ioccopy.9.man: added manpage
+	* doc/man/man9/cf_iocput.9.man: added manpage
+	* doc/man/man9/dl_setintr.9.man: added manpage
+	* doc/man/man9/dlgn_copymp.9.man: added manpage
+	* doc/man/man9/dlgn_drvstart.9.man: added manpage
+	* doc/man/man9/dlgn_drvstop.9.man: added manpage
+	* doc/man/man9/dlgn_getpeak.9.man: added manpage
+	* doc/man/man9/dlgn_msg.9.man: added manpage
+	* doc/man/man9/dlgn_undoc.9.man: added manpage
+	* doc/man/man9/dlgn_wqreply.9.man: added manpage
+	* doc/man/man9/index.9.man: added manpage
+	* doc/man/man9/intmod_lock.9.man: added manpage
+	* doc/man/man9/pmswtbl.9.man: added manpage
+	* doc/man/man9/st_freelock.9.man: added manpage
+	* doc/man/man9/st_sctlock.9.man: added manpage
+	* doc/man/man9/st_uselock.9.man: added manpage
+
 2007-02-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/openss7.am: revert, it was a different problem

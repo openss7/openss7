@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mercd.4.man,v 0.9.2.1 2007/02/25 12:45:00 brian Exp $
+.\" @(#) $Id: mercd.4.man,v 0.9.2.2 2007/02/27 01:35:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/02/25 12:45:00 $ by $Author: brian $
+.\" Last Modified $Date: 2007/02/27 01:35:56 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mercd.4.man,v $
+.\" Revision 0.9.2.2  2007/02/27 01:35:56  brian
+.\" - documentation updates
+.\"
 .\" Revision 0.9.2.1  2007/02/25 12:45:00  brian
 .\" - added new files for release package
 .\"
@@ -77,7 +80,7 @@ sort-adjacent-labels
 .so osr61.macros
 .\"
 .\"
-.TH DLGN 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.TH MERCD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
 .SH NAME
 .B mercd
 \- Dialogic \fISTREAMS\fR device driver
@@ -91,6 +94,51 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B mercd
+driver is a STREAMS version of the DM3 (Dialogic\(rg Media III) firmware
+driver modified for use with
+.BR "Linux Fast-STREAMS" ,
+including the
+.I Mercury
+cards (and thus the name of the driver).
+.PP
+The DM3,
+.BR mercd ,
+driver is a
+.I STREAMS
+based device driver.  The
+.B mercd
+driver is based on the
+Dialogic\(rg
+Media III (a.k.a. DM3) architecutre.  The driver supports both the SRAM
+protocol (used in the older products like DMVA) and the Werewolf (WW) protocol
+(used in new platforms such as the DMVB/DMN160 boards) merged into one driver.
+.PP
+It appears that somewhere along the lifetime of this driver, its developers
+decided to attempt to deviate from STREAMS and provide a legacy characeter
+based interface to the driver.  That approach appears to simply increase
+complexity, obviate the reuse possible using the STREAMS framework, and result
+in a poorer overall implementation.
+.PP
+When compiled as a legacy character device driver, this driver uses the
+.BR ctimod (4)
+kernel module and the DKI described in
+.BR ctimod (9).
+This has portability issues as well and the approach simply introduces more
+bugs.
+.PP
+This
+.I OpenSS7 Project
+modified version has been modified to run again as a STREAMS driver using the
+DDI/DKI from
+.B Linux Fast-STREAMS
+and the
+.B STREAMS Compatibiltiy Modules
+packages.
+Dialogic\(rg
+warns in their documentation, however, that this driver has not been
+maintained as a STREAMS driver.  Your mileage may vary.
 .\"
 .\"
 .SH NOTICES
@@ -102,6 +150,16 @@ drivers to
 This is alpha-release software and has not been tested on any actual
 Dialogic\(rg hardware to date (the problem being the lack of hardware with
 which to test).
+.\"
+.\"
+.SH FILES
+.PP
+The driver is in the kernel module file,
+.BR streams-mercd ,
+however, it can also be loaded (see
+.BR insmod (8))
+using the aliases:
+.BR mercd " and " streams-mercdDriver .
 .\"
 .\"
 .SH DEVICES

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/26 07:24:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/02/27 01:35:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/26 07:24:57 $ by $Author: brian $
+# Last Modified $Date: 2007/02/27 01:35:55 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2007/02/27 01:35:55  brian
+# - documentation updates
+#
 # Revision 0.9.2.2  2007/02/26 07:24:57  brian
 # - synchronizing changes
 #
@@ -75,7 +78,6 @@ ctimod_mans = \
 	man9/ctimod_copy_from_user.9 \
 	man9/ctimod_copy_to_user.9 \
 	man9/ctimod_create_proc_entry.9 \
-	man9/ctimod_create_workqueue.9 \
 	man9/ctimod_debug_clear.9 \
 	man9/ctimod_debug_off.9 \
 	man9/ctimod_debug_on.9 \
@@ -93,7 +95,6 @@ ctimod_mans = \
 	man9/ctimod_jiffies.9 \
 	man9/ctimod_kfree.9 \
 	man9/ctimod_kmalloc.9 \
-	man9/ctimod_mark_bh.9 \
 	man9/ctimod_memcpy.9 \
 	man9/ctimod_memset.9 \
 	man9/ctimod_pcibios_present.9 \
@@ -109,7 +110,6 @@ ctimod_mans = \
 	man9/ctimod_pci_write_config_word.9 \
 	man9/ctimod_poll_wait.9 \
 	man9/ctimod_printk.9 \
-	man9/ctimod_queue_work.9 \
 	man9/ctimod_register_chrdev.9 \
 	man9/ctimod_remap_page_range.9 \
 	man9/ctimod_remove_proc_entry.9 \
@@ -134,8 +134,12 @@ ctimod_mans = \
 	man9/ctimod_unregister_chrdev.9 \
 	man9/ctimod_virt_to_page.9 \
 	man9/ctimod_vsprintf.9 \
-	man9/ctimod_wake_up_interruptible.9 \
-	man9/ctimod_wake_up_process.9
+	man9/ctimod_wake_up_interruptible.9
+
+##	man9/ctimod_create_workqueue.9
+##	man9/ctimod_queue_work.9
+##	man9/ctimod_mark_bh.9
+##	man9/ctimod_wake_up_process.9
 
 dlgn_mans = \
 	man4/dlgn.4 \
@@ -222,7 +226,6 @@ dist_noinst_MANS = \
 	man9/ctimod_copy_from_user.9.man \
 	man9/ctimod_copy_to_user.9.man \
 	man9/ctimod_create_proc_entry.9.man \
-	man9/ctimod_create_workqueue.9.man \
 	man9/ctimod_debug_clear.9.man \
 	man9/ctimod_debug_off.9.man \
 	man9/ctimod_debug_on.9.man \
@@ -240,7 +243,6 @@ dist_noinst_MANS = \
 	man9/ctimod_jiffies.9.man \
 	man9/ctimod_kfree.9.man \
 	man9/ctimod_kmalloc.9.man \
-	man9/ctimod_mark_bh.9.man \
 	man9/ctimod_memcpy.9.man \
 	man9/ctimod_memset.9.man \
 	man9/ctimod_pcibios_present.9.man \
@@ -256,7 +258,6 @@ dist_noinst_MANS = \
 	man9/ctimod_pci_write_config_word.9.man \
 	man9/ctimod_poll_wait.9.man \
 	man9/ctimod_printk.9.man \
-	man9/ctimod_queue_work.9.man \
 	man9/ctimod_register_chrdev.9.man \
 	man9/ctimod_remap_page_range.9.man \
 	man9/ctimod_remove_proc_entry.9.man \
@@ -282,7 +283,6 @@ dist_noinst_MANS = \
 	man9/ctimod_virt_to_page.9.man \
 	man9/ctimod_vsprintf.9.man \
 	man9/ctimod_wake_up_interruptible.9.man \
-	man9/ctimod_wake_up_process.9.man \
 	man9/dlgn_copymp.9.man \
 	man9/dlgn_drvstart.9.man \
 	man9/dlgn_drvstop.9.man \
@@ -310,6 +310,11 @@ dist_noinst_MANS = \
 	man9/st_freelock.9.man \
 	man9/st_sctlock.9.man \
 	man9/st_uselock.9.man
+
+##	man9/ctimod_create_workqueue.9.man
+##	man9/ctimod_queue_work.9.man
+##	man9/ctimod_mark_bh.9.man
+##	man9/ctimod_wake_up_process.9.man
 
 MANS_UNUSED = \
 	man5/osr61.5
