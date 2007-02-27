@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/25 12:26:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/27 01:40:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/25 12:26:05 $ by $Author: brian $
+# Last Modified $Date: 2007/02/27 01:40:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2007/02/27 01:40:10  brian
+# - final corrections to build
+#
 # Revision 0.9.2.1  2007/02/25 12:26:05  brian
 # - added new files for release package
 #
@@ -260,13 +263,11 @@ streams_dlgn.o: $(libOSRdlgn_a_OBJECTS)
 	$(LD) -r -o $@ $^
 streams_dlgn.ver: dlgn.ver
 	cat $^ > $@
-EXTRA_KERNEL_MODULES		+= streams_dlgn.o
+ADDON_MODS			+= streams_dlgn.o
 else
 streams-dlgn.o: $(libOSRdlgn_a_OBJECTS)
 	$(LD) -r -o $@ $^
-streams-dlgn.ver: dlgn.ver
-	cat $^ > $@
-EXTRA_KERNEL_MODULES		+= streams-dlgn.o
+ADDON_MODS			+= streams-dlgn.o
 endif
 
 EXTRA_libOSRdvbm_a_SOURCES	= 
@@ -292,11 +293,11 @@ $(libOSRdvbm_a_OBJECTS):	$(libOSRdvbm_a_DEPENDENCIES)
 if WITH_KO_MODULES
 streams_dvbm.o: $(libOSRdvbm_a_OBJECTS)
 	$(LD) -r -o $@ $^
-EXTRA_KERNEL_MODULES		+= streams_dvbm.o
+ADDON_MODS			+= streams_dvbm.o
 else
 streams-dvbm.o: $(libOSRdvbm_a_OBJECTS)
 	$(LD) -r -o $@ $^
-EXTRA_KERNEL_MODULES		+= streams-dvbm.o
+ADDON_MODS			+= streams-dvbm.o
 endif
 
 EXTRA_libOSRgncfd_a_SOURCES	= 
@@ -327,11 +328,11 @@ $(libOSRgncfd_a_OBJECTS):	$(libOSRgncfd_a_DEPENDENCIES)
 if WITH_KO_MODULES
 streams_gncfd.o: $(libOSRgncfd_a_OBJECTS)
 	$(LD) -r -o $@ $^
-EXTRA_KERNEL_MODULES		+= streams_gncfd.o
+ADDON_MODS			+= streams_gncfd.o
 else
 streams-gncfd.o: $(libOSRgncfd_a_OBJECTS)
 	$(LD) -r -o $@ $^
-EXTRA_KERNEL_MODULES		+= streams-gncfd.o
+ADDON_MODS			+= streams-gncfd.o
 endif
 
 EXTRA_libOSRgpio_a_SOURCES	= 
@@ -353,11 +354,11 @@ $(libOSRgpio_a_OBJECTS):	$(libOSRgpio_a_SOURCES) $(libOSRgpio_a_DEPENDENCIES)
 if WITH_KO_MODULES
 streams_gpio.o: $(libOSRgpio_a_OBJECTS)
 	$(LD) -r -o $@ $^
-EXTRA_KERNEL_MODULES		+= streams_gpio.o
+ADDON_MODS			+= streams_gpio.o
 else
 streams-gpio.o: $(libOSRgpio_a_OBJECTS)
 	$(LD) -r -o $@ $^
-EXTRA_KERNEL_MODULES		+= streams-gpio.o
+ADDON_MODS			+= streams-gpio.o
 endif
 
 EXTRA_libOSRsctmr_a_SOURCES	=
@@ -387,11 +388,11 @@ $(libOSRsctmr_a_OBJECTS):	$(libOSRsctmr_a_DEPENDENCIES)
 if WITH_KO_MODULES
 streams_sctmr.o: $(libOSRsctmr_a_OBJECTS)
 	$(LD) -r -o $@ $^
-EXTRA_KERNEL_MODULES		+= streams_sctmr.o
+ADDON_MODS			+= streams_sctmr.o
 else
 streams-sctmr.o: $(libOSRsctmr_a_OBJECTS)
 	$(LD) -r -o $@ $^
-EXTRA_KERNEL_MODULES		+= streams-sctmr.o
+ADDON_MODS			+= streams-sctmr.o
 endif
 
 ## WITH_DLGN
@@ -413,13 +414,10 @@ libOSRctimod_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOSRctimod_a_OBJECTS): $(libOSRctimod_a_DEPENDENCIES)
 
-ADDON_OBJS			+= $(libOSRctimod_a_OBJECTS)
-ADDON_MODS			+= ctimod.o
+ctimod.o: $(libOSRctimod_a_OBJECTS)
+	$(LD) -r -o $@ $^
 
-ctimod.o: stamp-verobjs
-	@list=`$(ECHO) " $(libOSRctimod_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
-	$(ECHO) "$(LD) -r -o $@ $$list" ; \
-	$(LD) -r -o $@ $$list
+ADDON_MODS			+= ctimod.o
 
 if WITH_MERC
 ## WITH_MERC
@@ -518,11 +516,11 @@ $(libOSRmercd_a_OBJECTS):	$(libOSRmercd_a_DEPENDENCIES)
 if WITH_KO_MODULES
 streams_mercd.o: $(libOSRmercd_a_OBJECTS)
 	$(LD) -r -o $@ $^
-EXTRA_KERNEL_MODULES		+= streams_mercd.o
+ADDON_MODS			+= streams_mercd.o
 else
 streams-mercd.o: $(libOSRmercd_a_OBJECTS)
 	$(LD) -r -o $@ $^
-EXTRA_KERNEL_MODULES		+= streams-mercd.o
+ADDON_MODS			+= streams-mercd.o
 endif
 
 ## WITH_MERC
@@ -572,21 +570,13 @@ libOSRpmacd_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOSRpmacd_a_OBJECTS):	$(libOSRpmacd_a_DEPENDENCIES)
 
-if WITH_KO_MODULES
-streams_pmacd.o: $(libOSRpmacd_a_OBJECTS)
+pmacd.o: $(libOSRpmacd_a_OBJECTS)
 	$(LD) -r -o $@ $^
-EXTRA_KERNEL_MODULES		+= streams_pmacd.o
-else
-streams-pmacd.o: $(libOSRpmacd_a_OBJECTS)
-	$(LD) -r -o $@ $^
-EXTRA_KERNEL_MODULES		+= streams-pmacd.o
-endif
+
+ADDON_MODS			+= pmacd.o
 
 ## WITH_PMAC
 endif
-
-ADDON_OBJS			+= $(EXTRA_KERNEL_MODULES)
-ADDON_MODS			+= $(EXTRA_KERNEL_MODULES)
 
 ## RPM_BUILD_KERNEL
 endif

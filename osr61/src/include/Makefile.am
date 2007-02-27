@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/26 07:25:23 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/02/27 01:40:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/26 07:25:23 $ by $Author: brian $
+# Last Modified $Date: 2007/02/27 01:40:11 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2007/02/27 01:40:11  brian
+# - final corrections to build
+#
 # Revision 0.9.2.2  2007/02/26 07:25:23  brian
 # - synchronizing changes
 #
@@ -64,7 +67,8 @@ if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
 nobase_pkginclude_HEADERS = \
-	$(top_srcdir)/src/drivers/mercd/include/ctimod.h
+	sys/ctimod.h \
+	sys/dlgn.h
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/$(PACKAGE)/config.h \

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/25 12:26:05 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/27 01:40:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/25 12:26:05 $ by $Author: brian $
+# Last Modified $Date: 2007/02/27 01:40:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.2  2007/02/27 01:40:10  brian
+# - final corrections to build
+#
 # Revision 0.9.2.1  2007/02/25 12:26:05  brian
 # - added new files for release package
 #
@@ -210,13 +213,13 @@ dnl
 		 do this).  This is normally undefined.])
     AH_TEMPLATE([ABNORMAL_TERM_CLEAN_FOR_NO_CLOSE_ACKS], [Causes some checks for
 		 abnormal termination to be use that otherwise would not,
-		 particularly in strm_ack2usr() for the mercury driver.  This is
+		 particularly in strm_ack2usr for the mercury driver.  This is
 		 normally undefined.])
     AH_TEMPLATE([_ABNORMAL_TERM_CLEAN_FOR_NO_CLOSE_ACKS], [Causes additional
 		 checks for abnormal termination in a number of places in the
 		 mercury driver.  This is normally undefined.])
     AH_TEMPLATE([ANHD_DEBUG], [Causes the rcu array to be copied into the
-		 dbg_busy array in delete_rcus() found in file drvprot.c.  This
+		 dbg_busy array in delete_rcus found in file drvprot.c.  This
 		 is normally undefined.])
     AH_TEMPLATE([ANT_AIX], [Define when Antares drivers are build built for the
 		 AIX operating system.  The current build only supports Linux
@@ -250,8 +253,8 @@ dnl
     AH_TEMPLATE([DBG_PRT], [When defined, causes the SRAM interrupt service
 		 routing to print one debug statement in one circumstance.  This
 		 is not normally defined.])
-    AH_TEMPLATE([DCB], [When defined, also support the DCB family of cards
-		 (DCB320, DCB640, DCB960) in the DLGN driver.  This is normally
+    AH_TEMPLATE([DCB], [When defined, also support the DCB family of cards,
+		 DCB320, DCB640, DCB960, in the DLGN driver.  This is normally
 		 defined, and was defined in the original Intel make files.])
     AH_TEMPLATE([DEBUG], [When defined causes some debugging messages to be
 		 printed at a couple of places across most drivers.  This is not
@@ -299,6 +302,9 @@ dnl
 		 mechanism should be replaced by strlog(9).])
     AH_TEMPLATE([DLGN_DEBUG], [When defined, turns on a couple of debug
 		 statements for the DLGN driver.  This is normally undefined.])
+    AH_TEMPLATE([DLGN_ISDN], [When defined, provide ISDN support for the DLGN
+		 driver.  The Intel make files define this.  This is normally
+		 defined, but we provide a configuration option to disable it.])
     AH_TEMPLATE([DONGLE_SECURITY], [When defined, turns on some sort of dongle
 		 detection for cards for the DLGN driver.  This is normally not
 		 defined])
@@ -425,9 +431,6 @@ dnl
 		 defined it when CONFIG_VME is defined.])
     AH_TEMPLATE([XPRT], [When defined, print debugging information for the GPIO
 		 driver.  This is normally undefined.])
-    AH_TEMPLATE([_ISDN], [When defined, provide ISDN support for the DLGN
-		 driver.  The Intel make files define this.  This is normally
-		 defined, but we provide a configuration option to disable it.])
     AH_TEMPLATE([_STATS_], [When defined, provide statistics support for the
 		 DLGN driver.  The Intel make files define this.  This is
 		 normally defined, but we provide a configuration option to
@@ -515,6 +518,17 @@ dnl _XOPEN
 # _OSR61_CHECKS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OSR61_CHECKS], [dnl
+    _LINUX_CHECK_FUNCS([remap_pfn_range remap_page_range], [:], [:], [
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/timer.h>
+#include <linux/errno.h>
+#include <linux/delay.h>
+#include <linux/poll.h>
+#include <linux/slab.h>
+#include <linux/init.h>
+#include <linux/mm.h>
+])
     AC_MSG_CHECKING([for DLGN BRI support])
     if test x$enable_dlgn_bri = xyes ; then
 	AC_DEFINE([BRI_SUPPORT], [1])
@@ -544,7 +558,17 @@ AC_DEFUN([_OSR61_CHECKS], [dnl
     AC_MSG_RESULT([$enable_dlgn_msm])
     AC_MSG_CHECKING([for DLGN ISDN support])
     if test x$enable_dlgn_isdn = xyes ; then
-	AC_DEFINE([_ISDN], [1])
+	AC_DEFINE([DLGN_ISDN], [1])
+	AH_VERBATIM([__ac_dummy_2], m4_text_wrap([When defined, provide ISDN
+		     support for the DLGN driver.  The Intel make files define
+		     this.  This is normally defined, but we provide a
+		     configuration option to disable it.  This is a bit of a
+		     diversion to get around an autoconf macro named _ISDN. */],
+		     [   ], [/* ])[
+#undef DLGN_ISDN
+#ifdef DLGN_ISDN
+#define _ISDN 1
+#endif])
     fi
     AC_MSG_RESULT([$enable_dlgn_isdn])
     AC_MSG_CHECKING([for DLGN statistics support])
