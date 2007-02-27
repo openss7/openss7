@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2006/03/14 09:04:10 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/02/27 08:38:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/14 09:04:10 $ by $Author: brian $
+# Last Modified $Date: 2007/02/27 08:38:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -223,7 +223,7 @@ AC_DEFUN([_KSYMS_OUTPUT_MODPOST_CONFIG], [dnl
 	ksyms_cv_modpost_moddir="$DESTDIR$kmoduledir"])
     MODPOST_MODDIR="$ksyms_cv_modpost_moddir"
     AC_SUBST([MODPOST_MODDIR])dnl
-    AC_ARG_VAR([MODPOST_CACHE], [Cache file for modpost])
+dnl AC_ARG_VAR([MODPOST_CACHE], [Cache file for modpost])
     test :"$MODPOST_CACHE" != : && unset ksyms_cv_modpost_cache
     AC_CACHE_CHECK([for modpost cache file], [ksyms_cv_modpost_cache], [dnl
 	if test :$MODPOST_CACHE != : ; then
