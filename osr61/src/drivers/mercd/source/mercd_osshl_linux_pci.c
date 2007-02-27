@@ -2185,6 +2185,15 @@ else
             pdmadescr->flag = (MERCD_WW_DMA_DESCR_SBIT | MERCD_WW_DMA_DESCR_VBIT |
                       MERCD_WW_DMA_DESCR_EBIT);
             //pdmadescr->host_address is alredy Filled
+#ifdef LFS
+            pdmadescr->board_address =  
+                     (pmerc_void_t) (long)pci_map_single(
+                                                    padapter->pdevi,
+                                                    (pmerc_void_t)(RcvMsg->b_cont->b_rptr),
+                                                    szData,
+                                                    PCI_DMA_FROMDEVICE
+                                                  );
+#else
             pdmadescr->board_address =  
                      (pmerc_void_t) pci_map_single(
                                                     padapter->pdevi,
@@ -2192,6 +2201,7 @@ else
                                                     szData,
                                                     PCI_DMA_FROMDEVICE
                                                   );
+#endif
             pdmadescr->size = szData;
          }
        else
@@ -2244,6 +2254,15 @@ else
              pdmadescr->flag = (MERCD_WW_DMA_DESCR_SBIT | MERCD_WW_DMA_DESCR_VBIT |
                       MERCD_WW_DMA_DESCR_EBIT);
              //pdmadescr->host_address is alredy Filled
+#ifdef LFS
+             pdmadescr->board_address = (pmerc_void_t)
+                                        (long)pci_map_single (
+                                                         padapter->pdevi,
+                                                         (pmerc_void_t)(RcvMsg->b_rptr),
+                                                         MERCURY_HOST_IF_BLK_SIZE,
+                                                         PCI_DMA_FROMDEVICE
+                                                        );
+#else
              pdmadescr->board_address = (pmerc_void_t)
                                         pci_map_single (
                                                          padapter->pdevi,
@@ -2251,6 +2270,7 @@ else
                                                          MERCURY_HOST_IF_BLK_SIZE,
                                                          PCI_DMA_FROMDEVICE
                                                         );
+#endif
 
              pdmadescr->size = MERCURY_HOST_IF_BLK_SIZE;
             }
@@ -2264,6 +2284,15 @@ else
              MdMsg = MD_EXTRACT_MDMSG_FROM_STRMMSG(RcvMsg);
              Ptr = (PSTREAM_RECEIVE)MD_GET_MDMSG_PAYLOAD(MdMsg);
              brdaddress = &Ptr->StreamUserHeader.UserHeaderBytes[0];
+#ifdef LFS
+             pdmadescr->board_address =  (pmerc_void_t)
+                                          (long)pci_map_single (
+                                                          padapter->pdevi,
+                                                          brdaddress,
+                                                          sizeof(USER_HEADER),
+                                                          PCI_DMA_FROMDEVICE
+                                                        );
+#else
              pdmadescr->board_address =  (pmerc_void_t)
                                           pci_map_single (
                                                           padapter->pdevi,
@@ -2271,6 +2300,7 @@ else
                                                           sizeof(USER_HEADER),
                                                           PCI_DMA_FROMDEVICE
                                                         );
+#endif
 
              pdmadescr->size = sizeof(USER_HEADER);
              //For a B Stream we have a next descriptor for data
@@ -2395,8 +2425,13 @@ void linux_pci_ww_send_descriptor_table_from_strm_buffers(void *rcvPtr)
     //one more descriptor at this index for data.
     pdmaDescr->flag &= ~(MERCD_WW_DMA_DESCR_EBIT);
     pdmaDescr->host_address  = (pmerc_void_t)FirstMblk;
+#ifdef LFS
+    pdmaDescr->board_address = (pmerc_void_t) (long)
+	    pci_map_single(padapter->pdevi, pUsrHdr, sizeof(USER_HEADER), PCI_DMA_TODEVICE);
+#else
     pdmaDescr->board_address = (pmerc_void_t)
 	    pci_map_single(padapter->pdevi, pUsrHdr, sizeof(USER_HEADER), PCI_DMA_TODEVICE);
+#endif
     pdmaDescr->size = (merc_ushort_t)sizeof(USER_HEADER);
     pdmaDescr->next = (pmercd_ww_dma_descr_sT)
 		      MSD_ALLOCATE_ATOMIC_KERNEL_MEMORY(sizeof(mercd_ww_dma_descr_sT));
@@ -2488,8 +2523,13 @@ void linux_pci_ww_send_descriptor_table_from_strm_buffers(void *rcvPtr)
 
         if (size != 0) {
             npdmaDescr->host_address  = (pmerc_void_t)FirstMblk; /* just Msg, really dont care */
+#ifdef LFS
+            npdmaDescr->board_address = (pmerc_void_t)  (long)
+		   pci_map_single(padapter->pdevi, start, size, PCI_DMA_TODEVICE);
+#else
             npdmaDescr->board_address = (pmerc_void_t) 
 		   pci_map_single(padapter->pdevi, start, size, PCI_DMA_TODEVICE);
+#endif
             npdmaDescr->size = (merc_ushort_t)size;
             start = end + 1 ;
 
@@ -2683,8 +2723,13 @@ void linux_pci_ww_dealloc_snd_bigmsg_descriptors(void *rcvPtr)
 	 
          //Do the pci unmap before freeing
 	 if (pfreeDesc->purpose == MERCD_WW_STRM_WRITE_COMPLETE) {
+#ifdef LFS
+	     pci_unmap_single(padapter->pdevi, (dma_addr_t)(long)npdmaDescr->board_address,
+			                         npdmaDescr->size, PCI_DMA_TODEVICE);
+#else
 	     pci_unmap_single(padapter->pdevi, (dma_addr_t)npdmaDescr->board_address,
 			                         npdmaDescr->size, PCI_DMA_TODEVICE);
+#endif
              npdmaDescr->host_address = 0;
           }
 
@@ -2706,10 +2751,17 @@ void linux_pci_ww_dealloc_snd_bigmsg_descriptors(void *rcvPtr)
 
       //Do the pci unmap before freeing
       if (pfreeDesc->purpose == MERCD_WW_STRM_WRITE_COMPLETE) {
+#ifdef LFS
+	  pci_unmap_single(padapter->pdevi,
+			   (dma_addr_t)(long)pdmaDescr->board_address,
+			   pdmaDescr->size,
+			   PCI_DMA_TODEVICE);
+#else
 	  pci_unmap_single(padapter->pdevi,
 			   (dma_addr_t)pdmaDescr->board_address,
 			   pdmaDescr->size,
 			   PCI_DMA_TODEVICE);
+#endif
       }
       if (pdmaDescr->host_address)
          MSD_FREE_MESSAGE(pdmaDescr->host_address);
@@ -3033,9 +3085,15 @@ void linux_pci_ww_dealloc_descriptor_table(void *rcvPtr)
 	   	    // New Phys Address
    		    // Do the pci unmap before freeing
 		    if (npdmaDescr->board_address)
+#ifdef LFS
+		        pci_unmap_single(padapter->pdevi, 
+					(dma_addr_t)(long)npdmaDescr->board_address,
+				         npdmaDescr->size, PCI_DMA_FROMDEVICE);
+#else
 		        pci_unmap_single(padapter->pdevi, 
 					(dma_addr_t)npdmaDescr->board_address,
 				         npdmaDescr->size, PCI_DMA_FROMDEVICE);
+#endif
 
 	    	    nnpdmaDescr->next = NULL;
 		    if (npdmaDescr)
@@ -3047,9 +3105,15 @@ void linux_pci_ww_dealloc_descriptor_table(void *rcvPtr)
 		      printk("QCNTRL_SUCCEEDED:Problem in dealloc the nexts\n");
 
 	          if (pdmaDescr->board_address) {
+#ifdef LFS
+	              pci_unmap_single(padapter->pdevi, 
+				      (dma_addr_t)(long)pdmaDescr->board_address,
+				       pdmaDescr->size, PCI_DMA_FROMDEVICE);
+#else
 	              pci_unmap_single(padapter->pdevi, 
 				      (dma_addr_t)pdmaDescr->board_address,
 				       pdmaDescr->size, PCI_DMA_FROMDEVICE);
+#endif
 		  }
 
 	      } /* STREAM_OPEN_F_RECEIVE_ONLY */
@@ -3068,9 +3132,15 @@ void linux_pci_ww_dealloc_descriptor_table(void *rcvPtr)
 			// New Phys Address
 			// Do the pci unmap before freeing
 			if (npdmaDescr->board_address)
+#ifdef LFS
+			    pci_unmap_single(padapter->pdevi, 
+					    (dma_addr_t)(long)npdmaDescr->board_address,
+					     npdmaDescr->size, PCI_DMA_TODEVICE);
+#else
 			    pci_unmap_single(padapter->pdevi, 
 					    (dma_addr_t)npdmaDescr->board_address,
 					     npdmaDescr->size, PCI_DMA_TODEVICE);
+#endif
 
 			nnpdmaDescr->next = NULL;
 		        if (npdmaDescr)
@@ -3082,9 +3152,15 @@ void linux_pci_ww_dealloc_descriptor_table(void *rcvPtr)
 			  printk("QCNTRL_SUCCEEDED:Problem in dealloc the nexts\n");
 
 		      if (pdmaDescr->board_address)
+#ifdef LFS
+			  pci_unmap_single(padapter->pdevi, 
+					  (dma_addr_t)(long)pdmaDescr->board_address,
+					   pdmaDescr->size, PCI_DMA_TODEVICE);
+#else
 			  pci_unmap_single(padapter->pdevi, 
 					  (dma_addr_t)pdmaDescr->board_address,
 					   pdmaDescr->size, PCI_DMA_TODEVICE);
+#endif
 		  } /* StreamBlock read vs write */
 	  } /* MERCD_WW_STREAM_DESCR_DEALLOC */
 	  

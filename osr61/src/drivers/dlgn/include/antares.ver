@@ -11,6 +11,9 @@
  *
  **********************************************************************/
 
+#ifdef LFS
+#define VERNUM  "Version 2.1 Release 1 Linux Fast-STREAMS"
+#else
 #ifdef SVR3
 #define	VERNUM	"Version 2.1 Release 1 System V Release 3"
 #endif
@@ -27,6 +30,7 @@
 #define	VERNUM	"Version 2.1 Release 1 System V Release 4"
 #endif /* AIX_ANT */
 #endif /* SVR4  */
+#endif /* LFS */
 
 #define HVERP  0x00000201
 #define LVERP  0x03000000

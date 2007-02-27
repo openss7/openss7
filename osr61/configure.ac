@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/25 12:26:05 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/27 08:38:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/25 12:26:05 $ by $Author: brian $
+# Last Modified $Date: 2007/02/27 08:38:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.60])
 AC_INIT([osr61],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/25 12:26:05 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/27 08:38:33 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -189,6 +189,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.2  2007/02/27 08:38:33  brian
+# - release corrections for 2.4 kernel builds
+#
 # Revision 0.9.2.1  2007/02/25 12:26:05  brian
 # - added new files for release package
 #

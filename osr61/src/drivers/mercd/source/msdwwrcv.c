@@ -2594,7 +2594,7 @@ rcv_ww_process_read_request_complete_from_adapter(pmercd_ww_get_mfAddress_sT pmf
       {
 #ifdef LFS
         pci_unmap_single(padapter->pdevi,
-                        (dma_addr_t)pdmadescr->board_address,
+                        (dma_addr_t)(long)pdmadescr->board_address,
                         pdmadescr->size,
                         PCI_DMA_FROMDEVICE);
 #else
@@ -2608,12 +2608,12 @@ rcv_ww_process_read_request_complete_from_adapter(pmercd_ww_get_mfAddress_sT pmf
       {
 #ifdef LFS
         pci_unmap_single(padapter->pdevi,
-                        (dma_addr_t) pdmadescr->board_address,
+                        (dma_addr_t) (long)pdmadescr->board_address,
                         pdmadescr->size,
                         PCI_DMA_FROMDEVICE);
             
         pci_unmap_single(padapter->pdevi,
-                        (dma_addr_t) pdmadescr->next->board_address,
+                        (dma_addr_t) (long)pdmadescr->next->board_address,
                         pdmadescr->next->size,
                         PCI_DMA_FROMDEVICE);
 #else
@@ -3121,7 +3121,7 @@ rcv_ww_process_eos_read_stream_from_adapter(pmercd_ww_get_mfAddress_sT pmfAddrSt
                                        npdmadescr->size,prevSize, count, pdmadescr->size);
 
 #ifdef LFS
-             pci_unmap_single(padapter->pdevi, (dma_addr_t) npdmadescr->board_address,
+             pci_unmap_single(padapter->pdevi, (dma_addr_t) (long)npdmadescr->board_address,
                                    npdmadescr->size, PCI_DMA_FROMDEVICE);
 #else
              pci_unmap_single(padapter->pdevi, npdmadescr->board_address,
@@ -3143,7 +3143,7 @@ rcv_ww_process_eos_read_stream_from_adapter(pmercd_ww_get_mfAddress_sT pmfAddrSt
           } 
 
 #ifdef LFS
-          pci_unmap_single(padapter->pdevi, (dma_addr_t) pdmadescr->board_address,
+          pci_unmap_single(padapter->pdevi, (dma_addr_t) (long)pdmadescr->board_address,
                             pdmadescr->size, PCI_DMA_FROMDEVICE);
 #else
           pci_unmap_single(padapter->pdevi, pdmadescr->board_address,
@@ -3389,8 +3389,13 @@ rcv_ww_process_stream_session_close(pmercd_ww_get_mfAddress_sT pmfAddrSt)
 
           npdmaDescr->host_address = 0;
           if (npdmaDescr->board_address) {
+#ifdef LFS
+              pci_unmap_single(padapter->pdevi, (dma_addr_t)(long)npdmaDescr->board_address,
+                                                  npdmaDescr->size, PCI_DMA_TODEVICE);
+#else
               pci_unmap_single(padapter->pdevi, (dma_addr_t)npdmaDescr->board_address,
                                                   npdmaDescr->size, PCI_DMA_TODEVICE);
+#endif
               npdmaDescr->board_address = 0;
           }
             
@@ -3408,8 +3413,13 @@ rcv_ww_process_stream_session_close(pmercd_ww_get_mfAddress_sT pmfAddrSt)
        }
 
        if (pdmaDescr->board_address) {
+#ifdef LFS
+           pci_unmap_single(padapter->pdevi, (dma_addr_t)(long)pdmaDescr->board_address,
+                                               pdmaDescr->size, PCI_DMA_TODEVICE);
+#else
            pci_unmap_single(padapter->pdevi, (dma_addr_t)pdmaDescr->board_address,
                                                pdmaDescr->size, PCI_DMA_TODEVICE);
+#endif
            pdmaDescr->board_address = 0;
        }
 

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.21 $) $Date: 2006-12-28 08:32:32 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/02/27 08:38:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006-12-28 08:32:32 $ by $Author: brian $
+# Last Modified $Date: 2007/02/27 08:38:37 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strcomp.m4,v $
+# Revision 0.9.2.22  2007/02/27 08:38:37  brian
+# - release corrections for 2.4 kernel builds
+#
 # Revision 0.9.2.21  2006-12-28 08:32:32  brian
 # - use cache names for master src and build directories
 #
@@ -247,7 +250,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    # Compat header files are normally found in the strcompat package now.
 	    # They used to be part of the compatibility add-on package and even older
 	    # versions are part of the LfS release packages.
-	    case "$strcomp_cv_package" in
+	    case "$streams_cv_package" in
 		(LiS)
 		    eval "strcomp_search_path=\"
 			${DESTDIR}${includedir}/strcompat

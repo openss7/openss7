@@ -369,7 +369,11 @@ int ctimod_remap_page_range(struct vm_area_struct *vma, ulong from, ulong to, ul
 #if   defined HAVE_KFUNC_REMAP_PFN_RANGE
         return remap_pfn_range(vma, from, to, sz, prot);
 #elif defined HAVE_KFUNC_REMAP_PAGE_RANGE
+#if   defined HAVE_KFUNC_REMAP_PAGE_RANGE_4ARGS
+        return remap_page_range(from, to, sz, prot);
+#else
         return remap_page_range(vma, from, to, sz, prot);
+#endif
 #else
 #error HAVE_KFUNC_REMAP_PFN_RANGE or HAVE_KFUNC_REMAP_PAGE_RANGE must be defined.
 #endif

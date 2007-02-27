@@ -1,5 +1,23 @@
 2007-02-27  Brian Bidulock  <bidulock@openss7.org>
 
+	* Makefile.am: add version files
+	* acinclude.m4: adde check for 4 arg remap_page_range, remove redundant
+	  PMACD_VERSION define
+	* configure.ac: add AC_C_BIGENDING check early
+	* osr61.spec.in: correct module list, remove netconfig and sock2path
+	* doc/manual/descrip.texi: corrections to pmacd driver name
+	* doc/manual/osr61.texi: corrections to pmacd driver name
+	* doc/manual/releases.texi: mark pre-alpha
+	* doc/manual/tree.texi: corrections to pmacd driver name
+	* m4/genksyms.m4: remove special marks from MODPOST_CACHE for autoconf 2.61
+	* m4/strcomp.m4: correct strcomp_cv_package to streams_cv_package
+	* m4/streams.m4: correct checking statement
+	* src/drivers/ctimod/ctimod.c: corrections for 2.4 bigmem
+	* src/drivers/dlgn/include/antares.ver: corrections for 2.4 bigmem
+	* src/drivers/mercd/source/mercd_osshl_linux_pci.c: corrections for 2.4 bigmem
+	* src/drivers/mercd/source/msdversion.ver: corrections for 2.4 bigmem
+	* src/drivers/mercd/source/msdwwrcv.c: corrections for 2.4 bigmem
+
 	* src/drivers/ctimod/ctimod.c: corrections for 2.4 build
 	* src/drivers/dlgn/include/dlgcos.h: corrections for 2.4 build
 	* src/drivers/dlgn/source/andam.c: corrections for 2.4 build
