@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: pmacd.4.man,v 0.9.2.1 2007/02/25 12:45:00 brian Exp $
+.\" @(#) $Id: pmacd.4.man,v 0.9.2.2 2007/02/27 01:35:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/02/25 12:45:00 $ by $Author: brian $
+.\" Last Modified $Date: 2007/02/27 01:35:56 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: pmacd.4.man,v $
+.\" Revision 0.9.2.2  2007/02/27 01:35:56  brian
+.\" - documentation updates
+.\"
 .\" Revision 0.9.2.1  2007/02/25 12:45:00  brian
 .\" - added new files for release package
 .\"
@@ -77,20 +80,46 @@ sort-adjacent-labels
 .so osr61.macros
 .\"
 .\"
-.TH DLGN 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.TH PMACD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
 .SH NAME
 .B pmacd
-\- Dialogic \fISTREAMS\fR device driver
+\- Dialogic\(rg non-\fISTREAMS\fR IPT device driver
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .HP
-.BI "int " fd " = open(" \fR\(lq/dev/streams/clone/pmacd\(rq\fP ", " \fRO_RDWR\fP );
+.BI "int " fd " = open(" \fR\(lq/dev/pmacd\(rq\fP ", " \fRO_RDWR\fP );
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B pmacd
+is a non-STREAMS driver for the Dialogic\(rg IPT family of boards.
+.PP
+The packet media access card driver,
+.BR pmacd ,
+is a straightforward driver for the IPT family of boards based on Intelligent
+Input-Output (I20) technology.  It provides all the driver interfaces, namely
+the user, driver interfaces.  This driver only supports messaging based on the
+IPT protocol and Streaming is not supported on the IPT boards.  This makes the
+PMAC driver simple and efficient since there is not much processing required
+at the driver level.  The driver uses DPC and a 40 millisecond timer.
+.PP
+The
+.B pmacd
+driver is the only Dialogic\(rg driver in the OSR 6.1 GPL driver release that
+does not run as a STREAMS driver.  As a result, the driver reinvents the wheel
+in a number of uninteresting ways: it reimplements the wait loops and queueing
+provided by the Stream head; it reimplements the queueing provided by the
+STREAMS queueing; it reimplements message handling provided by the STREAMS
+framework; it reimplements STREAMS timer queueing and event handling; it
+reimplements STREAMS trace and error logging; and, it reimplements a portion
+of the STREAMS DDI/DKI for general purpose kernel functions (see
+.BR ctimod (9)).
+.PP
+This driver would be much simpler and perform much better as a STREAMS driver.
 .\"
 .\"
 .SH NOTICES
@@ -102,6 +131,20 @@ drivers to
 This is alpha-release software and has not been tested on any actual
 Dialogic\(rg hardware to date (the problem being the lack of hardware with
 which to test).
+.\"
+.\"
+.SH FILES
+.PP
+The
+.B pmacd
+driver provides the
+.RI \(lq pmacd \(rq
+kernel module.  Also, in preparation for a STREAMS based driver, the driver
+also recognizes
+.RI \(lq streams-pmacd \(rq
+and
+.IR \(lq streams-pmacdDriver \(rq
+as kernel module aliases.
 .\"
 .\"
 .SH DEVICES

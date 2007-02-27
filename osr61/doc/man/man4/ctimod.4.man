@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ctimod.4.man,v 0.9.2.1 2007/02/25 12:45:00 brian Exp $
+.\" @(#) $Id: ctimod.4.man,v 0.9.2.2 2007/02/27 01:35:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/02/25 12:45:00 $ by $Author: brian $
+.\" Last Modified $Date: 2007/02/27 01:35:56 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ctimod.4.man,v $
+.\" Revision 0.9.2.2  2007/02/27 01:35:56  brian
+.\" - documentation updates
+.\"
 .\" Revision 0.9.2.1  2007/02/25 12:45:00  brian
 .\" - added new files for release package
 .\"
@@ -77,20 +80,50 @@ sort-adjacent-labels
 .so osr61.macros
 .\"
 .\"
-.TH DLGN 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.TH CTIMOD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
 .SH NAME
 .B ctimod
-\- Dialogic \fISTREAMS\fR device driver
+\- Dialogic DKI kernel module
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .HP
-.BI "int " fd " = open(" \fR\(lq/dev/streams/clone/ctimod\(rq\fP ", " \fRO_RDWR\fP );
+.B insmod ctimod
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.B ctimod
+is Dialogic\(rg kernel module that provides thin wrapper functions for Linux
+kernel functions.  Its original purpose appears to be to replace a small
+portion of the STREAMS DDI/DKI for use by the
+.BR pmacd (4)
+driver which is a non-STREAMS (basic Linux character device) driver.  For a
+discussion of the relative merits of this approach, see
+.BR pmacd (4).
+.PP
+.BR ctimod ,
+in the deprecated
+.I LiS
+tradition, provides wrapper functions of the same name (prefixed by
+.BR ctimod_ )
+for Linux kernel functions.  Because calling conventions on these functions
+are not carefully controlled, they to not constitute an ABI in the same
+fashion as the
+.B Linux Fast-STREAMS
+DDI/DKI and thus do not support binary module distribution.  (Note that the
+Dialogic\(rg drivers are GPL so binary distribution might be a moot
+consideration.)
+Nevertheless, by wrapping Linux kernel functions, the modules provides a DKI
+that is inherently non-portable.  The STREAMS DDI/DKI is superior in that its
+base set of functions are provided by all SVR4 based systems.
+.PP
+For a list an discussion of the exported symbols provided by the
+.B ctimod
+kernel module, see the
+.BR ctimod (9)
+manual page.
 .\"
 .\"
 .SH NOTICES
@@ -119,6 +152,7 @@ driver under
 .\"
 .SH "SEE ALSO"
 .PP
+.BR ctimod (9),
 .BR dlgn (4),
 .BR dvbm (4),
 .BR gncfd (4),

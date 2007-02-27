@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ctimod.9.man,v 0.9.2.1 2007/02/26 06:53:36 brian Exp $
+.\" @(#) $Id: ctimod.9.man,v 0.9.2.2 2007/02/27 01:35:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/02/26 06:53:36 $ by $Author: brian $
+.\" Last Modified $Date: 2007/02/27 01:35:58 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ctimod.9.man,v $
+.\" Revision 0.9.2.2  2007/02/27 01:35:58  brian
+.\" - documentation updates
+.\"
 .\" Revision 0.9.2.1  2007/02/26 06:53:36  brian
 .\" - added manual pages
 .\"
@@ -85,14 +88,165 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <sys/ctimod.h>
+.HP
+.BI "void ctimod_add_timer(struct timer_list *" timer ");
+.PD 0
+.HP
+.BI "void ctimod_add_wait_queue(wait_queue_head_t *" head ", wait_queue_t *" wait ");
+.HP
+.BI "void ctimod_bzero(void *" ptr ", size_t " size );
+.HP
+.BI "ulong ctimod_copy_to_user(void *" to ", const void *" from ", ulong " len );
+.HP
+.BI "ulong ctimod_copy_from_user(void *" to ", const void *" from ", ulong " len );
+.HP
+.BI "int ctimod_del_timer(struct timer_list *" timer );
+.HP
+.BI "struct proc_dir_entry *ctimod_create_proc_entry(const char *" name ", mode_t " mode ", struct proc_dir_entry *" entry );
+.HP
+.BI "void ctimod_do_gettimeofday(struct timeval *" tv );
+.HP
+.BI "void ctimod_free_irq(int " num ", void *" ptr );
+.HP
+.BI "void ctimod_free_pages(ulong, ulong);
+.HP
+.BI "ulong ctimod_get_free_pages(uint " order ", unsigned int" gfp );
+.HP
+.BI "void ctimod_init_timer(struct timer_list *" timer );
+.HP
+.BI "void ctimod_init_waitqueue_head(wait_queue_head_t *" head );
+.HP
+.BI "void *ctimod_ioremap(ulong, ulong);
+.HP
+.BI "void ctimod_iounmap(void *);
+.HP
+.BI "ulong ctimod_jiffies(void);
+.HP
+.BI "void ctimod_kfree(void *" ptr ", int " size );
+.HP
+.BI "void *ctimod_kmalloc(size_t " size ", int " gfp );
+.HP
+.BI "void ctimod_mark_bh(int " task );
+.HP
+.BI "void *ctimod_memcpy(void *" to ", const void *" from ", size_t " size );
+.HP
+.BI "void ctimod_memset(void *" ptr ", int " val ", size_t " size );
+.HP
+.BI "int ctimod_pcibios_present(void);
+.HP
+.BI "int ctimod_pci_module_init(struct pci_driver *" pci );
+.HP
+.BI "int ctimod_pci_register_driver(struct pci_driver *" pci );
+.HP
+.BI "void ctimod_pci_unregister_driver(struct pci_driver *" pci );
+.HP
+.BI "struct pci_dev *ctimod_pci_find_device(uint " clas ", uint " type ", const struct pci_dev *" pci );
+.HP
+.BI "int ctimod_pci_read_config_byte(struct pci_dev *" pci ", int " offset ", u8 *" valp ");
+.HP
+.BI "int ctimod_pci_read_config_word(struct pci_dev *" pci ", int " offset ", u16 *" valp ");
+.HP
+.BI "int ctimod_pci_read_config_dword(struct pci_dev *" pci ", int " offset ", u32 *" valp ");
+.HP
+.BI "int ctimod_pci_write_config_byte(struct pci_dev *" pci ", int " offset ", u8 " val );
+.HP
+.BI "int ctimod_pci_write_config_word(struct pci_dev *" pci ", int " offset ", u16 " val );
+.HP
+.BI "int ctimod_pci_write_config_dword(struct pci_dev *" pci ", int " offset ", u32 " val );
+.HP
+.BI "int ctimod_printk(const char *" fmt ", " ... );
+.HP
+.BI "void ctimod_poll_wait(struct file *" file ", wait_queue_head_t *" head ", poll_table *" poll );
+.HP
+.BI "int ctimod_remap_page_range(struct vm_area_struct *, ulong, ulong, ulong, pgprot_t);
+.HP
+.BI "int ctimod_register_chrdev(uint, const char *" name ", struct file_operations *" fops );
+.HP
+.BI "void ctimod_remove_proc_entry(const char *" name ", struct proc_dir_entry *" entry );
+.HP
+.BI "void ctimod_remove_wait_queue(wait_queue_head_t *" head ", wait_queue_t *" wait );
+.HP
+.BI "int ctimod_request_irq(uint " num ", irqreturn_t(*" handler ") (int, void *, struct pt_regs *), ulong, const char *, void *);
+.HP
+.BI "void ctimod_schedule(void);
+.HP
+.BI "void ctimod_schedule_timeout(signed long " timeout );
+.HP
+.BI "int ctimod_spin_trylock(spinlock_t *" lockp );
+.HP
+.BI "void ctimod_spin_lock_bh(spinlock_t *" lockp );
+.HP
+.BI "void ctimod_spin_unlock_bh(spinlock_t *" lockp );
+.HP
+.BI "void ctimod_spin_lock(spinlock_t *" lockp );
+.HP
+.BI "void ctimod_spin_unlock(spinlock_t *" lockp );
+.HP
+.BI "void ctimod_spin_lock_irq(spinlock_t *" lockp );
+.HP
+.BI "void ctimod_spin_unlock_irq(spinlock_t *" lockp );
+.HP
+.BI "void ctimod_spin_lock_irqsave(spinlock_t *" lockp ", unsigned long *" flags );
+.HP
+.BI "void ctimod_spin_unlock_irqrestore(spinlock_t *" lockp ", unsigned long" flags );
+.HP
+.BI "void ctimod_spin_lock_init(spinlock_t *" lockp );
+.HP
+.BI "int ctimod_sprintf(char *" buf ", const char *" fmt ", " ... );
+.HP
+.BI "void ctimod_tasklet_init(struct tasklet_struct *" task ", void (*" func ")(unsigned long), unsigned long " data );
+.HP
+.BI "void ctimod_tasklet_kill(struct tasklet_struct *" task);
+.HP
+.BI "void ctimod_udelay(long);
+.HP
+.BI "int ctimod_unregister_chrdev(uint " major ", const char *" name );
+.HP
+.BI "struct page *ctimod_virt_to_page(ulong " addr );
+.HP
+.BI "int ctimod_vsprintf(char *" buf ", const char *" fmt ", va_list " args );
+.HP
+.BI "void ctimod_wake_up_interruptible(wait_queue_head_t *" head );
+.HP
+.BI "void ctimod_debug_on(void);
+.HP
+.BI "void ctimod_debug_off(void);
+.HP
+.BI "void ctimod_debug_clear(void);
+.HP
+.BI "void ctimod_debug_print(void);
+.HP
+.BI "void ctimod_debug_toggle(void);
+.HP
+.BI "struct workqueue_struct *ctimod_create_workqueue(char *);
+.HP
+.BI "int ctimod_queue_work(struct workqueue_struct *, struct work_struct *);
+.HP
+.BI "int ctimod_wake_up_process(struct task_struct *" task );
+.HP
+.BI "int ctimod_check_rh(void);
+.PD
 .\"
 .\"
-.SH DESCRIPTION
+.SH ARGUMENTS
+.PP
+Various.
+.\"
+.\"
+.SH OVERVIEW
 .PP
 The
 .BR ctimod (4)
 kernel module provided with the Dialogic\(rg Open System Release 6.1 GPL drivers is a kernel module
-that provides a set of wrapper functions for Linux kernel functions as follows:
+that provides a set of wrapper functions for Linux kernel functions.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The wrapper functions provided by the
+.B ctimod
+kernel module are as follows:
 .PP
 .TS
 tab(:);
@@ -516,6 +670,21 @@ Use the portable DDI/DKI function
 instead.
 .\"
 .\"
+.SH CONTEXT
+.PP
+These wrapper functions are intended to be called from the same context as
+their Linux counterparts, with the most obvious expection of
+.B ctimod_printk ()
+which allocates 1024 bytes on the stack for a buffer and can simply not be
+called at ISR due to this excessive stack use.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+For the most part, these wrapper functions are as MP safe as the Linux kernel
+functions that they wrap.
+.\"
+.\"
 .SH NOTICES
 .PP
 For the most part, the
@@ -523,6 +692,14 @@ For the most part, the
 wrapper functions are another useless set of wrappers for Linu kernel functions.  Do not use these
 function: use Linux kernel functions directly or select a STREAMS DDI/DKI equivalent, see
 .BR DDI (9).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR ctimod (4),
+.BR pmacd (4),
+.BR mercd (4),
+.BR osr61 (5).
 .\"
 .\"
 .SH BUGS
@@ -533,12 +710,17 @@ uses a static buffer without spinlock protection or interrupt suppression and is
 .\"
 .SH COMPATIBILITY
 .PP
+The functions provided by
+.BR ctimod ,
+while somewhat compatible with the Linux kernel interfaces, are incompatible
+with the more portable SVR4 DDI/DKI or even the richer Mentat Portable
+Streams\(rg or  Solaris\(rg DDI.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-These function provide a private Kernel DDI/DKI for Dialogic\(rg drivers and are not subject to
-conformance.
+These function provide a non-standard Linux Kernel DDI/DKI for non-STREAMS Dialogic\(rg
+drivers that do not conform with any standard.
 .\"
 .\"
 .SH HISTORY

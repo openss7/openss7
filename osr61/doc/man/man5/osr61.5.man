@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: osr61.5.man,v 0.9.2.1 2007/02/25 12:45:05 brian Exp $
+.\" @(#) $Id: osr61.5.man,v 0.9.2.2 2007/02/27 01:35:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/02/25 12:45:05 $ by $Author: brian $
+.\" Last Modified $Date: 2007/02/27 01:35:57 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: osr61.5.man,v $
+.\" Revision 0.9.2.2  2007/02/27 01:35:57  brian
+.\" - documentation updates
+.\"
 .\" Revision 0.9.2.1  2007/02/25 12:45:05  brian
 .\" - added new files for release package
 .\"
@@ -77,7 +80,7 @@ sort-adjacent-labels
 .so osr61.macros
 .\"
 .\"
-.TH STRTTY 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.TH OSR61 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
 .\"
 .\"
 .SH NAME
@@ -128,139 +131,186 @@ The package builds and installs the following
 .I STREAMS
 kernel modules and drivers:
 .IP \(en \w'\(en\(em'u
-.B streams_gncfd.ko
-driver
-.IP \(en
 .B streams_dlgn.ko
 driver
+.PD 0
 .IP \(en
 .B streams_dvbm.ko
 module
+.RI \(lq dvbm \(rq.
+.IP \(en
+.B streams_gncfd.ko
+driver
+.RB \(lq /dev/streams/clone/gncfd \(rq
 .IP \(en
 .B streams_gpio.ko
 driver
+.RB \(lq /dev/streams/clone/gpio \(rq
 .IP \(en
 .B streams_sctmr.ko
 module
+.RI \(lq sctmr \(rq.
 .IP \(en
-.B streams_pty.ko
+.B streams_mercd.ko
 driver
-.RI \(lq /dev/ptmx \(rq,
-.RI \(lq /dev/pts/0 \(rq.
-.PD 0
+.RB \(lq /dev/streams/clone/mercd \(rq
 .IP \(en
-.B streams_ptem.ko
-module
-.RI \(lq ptem \(rq.
+.B pmacd.ko
+driver
+.RB \(lq /dev/pmacd \(rq.
 .IP \(en
-.B streams_pckt.ko
-module
-.RI \(lq pckt \(rq.
-.IP \(en
-.B streams_ldterm.ko
-module
-.RI \(lq ldterm \(rq.
-.IP \(en
-.B streams_ttcompat.ko
-module
-.RI \(lq ttcompat \(rq.
+.B ctimod.ko
+kernel module
 .PD
 .TP
-.BR pty (4)
+.BR dlgn (4)
 The
-.BR pty (4)
-driver is a Pseudo-Terminal Driver that provides the classical
-.IR UNIX \(rg
-master and slave pseudo-terminals.
+.BR dlgn (4)
+driver is a device driver that provides access to the Dialogic\(rg Springware
+and Antares boards.
 .IP ""
-This driver is complete but untested.
+The
+.BR dlgn (4)
+is the main driver that controls the firmware interfaces.  It follows the
+Springware protocol to communicate with the firmware.  There is no DPC or
+timer in this driver and its use has not been required since SRAM access is
+done quickly enough in the messaging via the channel and device SRAM areas.
+No other processing is required in this driver.
+.BR dlgn (4)
+will read or write a block of data from and to the host runtime library or the
+bulk data module.
+.IP ""
+This driver is complete by untested.
 .TP
-.BR ptem (4)
+.BR dvbm (4)
 The
-.BR ptem (4)
-module is a Pseudo-Terminal Emulation Module that provide
-hardware terminal emulation for the slave side of a Pseudo-Terminal provided
-by the
-.BR pty (4)
-driver.  This module is pushed over the slave side of a
-pseudo-terminal before pusing
-.BR ldterm (4).
+.BR dvbm (4)
+module is a device access module that is pushed over a
+.BR dlgn (4)
+driver Stream.
 .IP ""
-This module is complete but untested.
+The bulk data module buffers media data from and to the
+.BR dlgn (4)
+driver.  It is configured by the host runtime libraries (which can be
+configured by the application via setparm API).  The configuration sets the
+flow of data between
+.BR dlgn (4)
+and host.
+.IP ""
+This module is complete by untested.
 .TP
-.BR pckt (4)
+.BR gncfd (4)
 The
-.BR pckt (4)
-module is a Packet Module.  This is the classical
-.IR UNIX \(rg
-packetization module that is pushed over the master side of a pseudo-terminal
-to allow the master to view the detailed state of the pseudo-terminal.
+.BR gncfd (4)
+driver is a generic configuration driver that is used by the Dialogic\(rg
+runtim libraries to perform configuration for Dialogic\(rg Springware and
+Anatares boards.
 .IP ""
-This module is complete but untested.
+The generic configuration driver interfaces with the
+.BR gncfd (4)
+driver library
+.RB ( libgncf.so )
+and is used to set up local devices for the Springware boards.  The driver is
+invoked after firmware has been downloaded via the
+.B voxctl
+application.  After the logical devices are created
+.RB ( dxxxB1 ", " dxxB1C1 ,
+etc.), the driver will start the board (enable interrupts).
+.B voxctl
+will create the
+.I /usr/dialogic/cfg/.voxcfg
+file that contains all the logical device information given by the
+.BR gncfd (4)
+driver.
+.IP ""
+This driver is complete by untested.
 .TP
-.BR ldterm (4)
+.BR gpio (4)
 The
-.BR ldterm (4)
-module is a Line Discipline Terminal Module.  This
-is the classical
-.IR UNIX \(rg
-line discipline module for terminals.  This module
-is pushed last on the slave side of a psuedo-terminal, after
-.BR ptem (4)
-and
-provides the
-.I POSIX
-.[
-susv3
-.]
-terminal interface to the user.
+.BR gpio (4)
+driver is the generic input-output interface for downloading firmware.
 .IP ""
-This module is incomplete.
+The generic input-output driver is used to download firmware onto the board.
+This driver interfaces with the
+.BR gpio (4)
+driver library,
+.RB ( libgpio.so )
+and is utilized by the
+.B genload
+application during the start of all the Dialogic\(rg services.  The driver
+locates boards in the system by providing the physical address, bus, slot and
+other information to
+.BR genload .
+This is used by
+.B gpiodebug
+for debugging the memory and input-output devices.
+.IP ""
+This driver is complete by untested.
 .TP
-.BR ttcompat (4)
+.BR sctmr (4)
 The
-.BR ttcompat (4)
-module is a TTY Compatibility Module.  This is a module that
-provides
-.IR UNIX \(rg " Version 7"
-and
-.I 4BSD
-compatible terminal interfaces.  These
-interfaces are no longer in use and this module has only marginal value.
+.BR sctmr (4)
+module is a timer module that is pushed over a
+.BR dlgn (4)
+driver Stream (but may also be pushed over a null Stream such as
+.BR nuls (4)).
 .IP ""
-This module is incomplete.
+The timer module is used by the global call libraries to keep time in kernel
+mode.  No other functionality is performed by this driver.  It has no
+interaction with the board or the other drivers.
+.IP ""
+This module is complete by untested.
+.TP
+.BR mercd (4)
+The
+.BR mercd (4)
+driver is a device driver for the Dialogic\(rg DM3 family of boards including
+the Mecury board (after which it is named).
+.IP ""
+The DM3 driver,
+.BR mercd (4),
+is a
+.I STREAMS
+based device driver.  The
+.BR mercd (4)
+driver is based on the Dialogic\(rg Media III (a.k.a. DM3) architecture.  The
+driver consists of both SRAM protocol (used in older products like DMVA) and
+Werewolf (WW) protocol (used in newer platforms like the DMVB/DMN160 boards)
+merged into one driver.
+.IP ""
+This driver is complete by untested.
+.TP
+.BR pmacd (4)
+The
+.BR pmacd (4)
+driver is a non-STREAMS driver for the Dialogic\(rg IPT family of boards.
+.IP ""
+The packet media access card driver,
+.BR pmacd (4),
+is a straightforward driver for the IPT family of boards based on Intelligent
+Input-Output (I2O) technology.  It provides all the driver interfaces, namely
+the user, drvier interfaces.  This driver only supports messaging based on the
+IPT protocol and Streaming is not supported on the IPT boards.  This makes the
+PMAC driver simple and efficient since there is not much processing required
+at the driver level.  The driver uses DPC and a 40 millisecond timer.
+.IP ""
+This driver is complete by untested.
+.TP
+.BR ctimod (4)
+The
+.BR ctimod (4)
+kernel module is a CTI wrapper module that provides wrappers of kernel
+functions for use principally by the
+.BR pmacd (4)
+driver.
+.IP ""
+.BR ctimod (4)
+provides an interface to kernel level services through a thin layer of
+abstraction calls.  This is available only on the PMAC driver.
+.IP ""
+This module is complete by untested.
 .PP
-The package builds and installs the following shared object libraries:
-.TP
-.BR libtty (3)
-The
-.BR libtty (3)
-library provides replacements for
-.I POSIX
-.[
-susv3
-.]
-terminal handling
-functions that are not properly implemented in
-`glibc'.  These functions are:
-.RS
-.TP \w'\fBunlockpt\fR(3tty)\(em'u
-.BR openpt (3tty)
-\-\ open a master pseudo-terminal
-.PD 0
-.TP
-.BR ptsname (3tty)
-\-\ obtain name for slave device
-.TP
-.BR grantpt (3tty)
-\-\ grant access to the slave device
-.TP
-.BR unlockpt (3tty)
-\-\ unlock the pseudo-terminal
-.PD
-.RE
-.PP
-This library is incomplete.
+This package does not build any shared object or static libraries.
 .PP
 The
 .B @PACKAGE_TITLE@
@@ -284,7 +334,7 @@ This distribution is only currently applicable to
 .IR ix86 ", " x86_64 ", " ppc " and " ppc64
 architectures, but should build and install for other architectures as well.
 .PP
-This package is currently incomplete.
+This package is currently complete but untested.
 It is being released as a reference point for the community.  If you are interested in completion of
 this package, contact
 .RB < info@openss7.com >.
@@ -295,52 +345,47 @@ this package, contact
 The
 .BR "@PACKAGE_TITLE@ " ( @PACKAGE@-@VERSION@ )
 package contains the following manual pages:
-.HP
-.BR grantpt (3tty)\ \-\ \c
-grant access to a slave pseudo-terminal device.
+
+.HP 12
+.BR ctimod (4)\ \-\ \c
+CTI DKI kernel module
 .PD 0
 .HP
-.BR ptsname (3tty)\ \-\ \c
-get the file system path to a slave pseudo-terminal device.
+.BR dlgn (4)\ \-\ \c
+Dialogic\(rg Springware \fISTREAMS\fR device driver
 .HP
-.BR unlockpt (3tty)\ \-\ \c
-unlock a slave pseudo-terminal device.
+.BR dvbm (4)\ \-\ \c
+device access module
 .HP
-.BR ldterm (4)\ \-\ \c
-Line Discipline \fISTREAMS\fR module.
+.BR gncfd (4)\ \-\ \c
+generic configuration \fISTREAMS\fR driver
 .HP
-.BR pckt (4)\ \-\ \c
-Packet mode \fISTREAMS\fR module.
+.BR gpio (4)\ \-\ \c
+general input-output \fISTREAMS\fR driver
 .HP
-.BR ptc (4)\ \-\ \c
-controlling pty device.
+.BR mercd (4)\ \-\ \c
+Dialogic\(rg DM3 \fISTREAMS\fR device driver
 .HP
-.BR ptem (4)\ \-\ \c
-Pseudo-Terminal Emulation Module.
+.BR pmacd (4)\ \-\ \c
+Dialogic\(rg IPT device driver
 .HP
-.BR ptm (4)\ \-\ \c
-Master pseudo-terminal driver.
-.HP
-.BR ptmx (4tty)\ \-\ \c
-Master pseduo-terminal \fBclone\fR(4) device.
-.HP
-.BR pts (4tty)\ \-\ \c
-Slave pseudo-terminal driver.
-.HP
-.BR pty (4)\ \-\ \c
-Pseudo-terminal drivers.
-.HP
-.BR ttcompat (4)\ \-\ \c
-TTY compatibility \fISTREAMS\fR module.
+.BR sctmr (4)\ \-\ \c
+timer module
 .HP
 .BR osr61 (5)\ \-\ \c
 The \fB@PACKAGE_TITLE@\fR package.
 .HP
-.BR osr61 (8)\ \-\ \c
+.BR osr61_mknod (8)\ \-\ \c
 create \fB@PACKAGE@\fR device nodes.
 .HP
-.BR test-tty (8)\ \-\ \c
+.BR test-osr61 (8)\ \-\ \c
 test case executable for the \fB@PACKAGE@\fR package.
+.HP
+.BR ctimod (9)\ \-\ \c
+CTI driver-kernel interface
+.HP
+.BR dlgn_undoc (9)\ \-\ \c
+undocumented \fBdlgn\fR(4) driver exports
 .PD
 .\"
 .\"
@@ -352,18 +397,15 @@ package provides the following
 .I STREAMS
 modules:
 .HP
-.BR pckt (4)\ \-\ \c
-Packet Mode module.
+.BR dvbm (4)\ \-\ \c
+device access module.
 .PD 0
 .HP
-.BR ptem (4)\ \-\ \c
-Pseudo-terminal Emulation modules.
+.BR sctmr (4)\ \-\ \c
+timer module.
 .HP
-.BR ldterm (4)\ \-\ \c
-Line Discipline for Terminals module.
-.HP
-.BR ttcompat (4)\ \-\ \c
-Teletypewriter compatibiltiy module.
+.BR ctimod (4)\ \-\ \c
+DKI replacement kernel module.
 .PD
 .\"
 .\"
@@ -374,9 +416,23 @@ The
 package provides the following
 .I STREAMS
 drivers:
+.HP 12
+.BR dlgn (4)\ \-\ \c
+the Antares and Springware drivers.
+.PD 0
 .HP
-.BR pty (4)\ \-\ \c
-Pseudo-terminal device driver.
+.BR gncfd (4)\ \-\ \c
+the general configuration driver.
+.HP
+.BR gpio (4)\ \-\ \c
+the general purpose input-output driver (for loading firmware).
+.HP
+.BR mercd (4)\ \-\ \c
+the DM3 card driver.
+.HP
+.BR pmacd (4)\ \-\ \c
+the IPT card driver.
+.PD
 .\"
 .\"
 .\".SH FILES
@@ -398,6 +454,28 @@ base package.
 The
 .B Linux Fast-STREAMS
 compatibility modules package.
+.TP
+.BR strxns (5)
+The
+.B OpenSS7 XNS Networking Package
+that contains the DLPI
+.[
+dlpi revision 2.0.0
+.]
+and NPI
+.[
+npi revision 2.0.0
+.]
+header files.
+.TP
+.B strxnet (5)
+The
+.B OpenSS7 XTI/TLI Networking Package
+that contains the TPI
+.[
+tpi revision 2.0.0
+.]
+header files.
 .\"
 .\"
 .SH NOTICES
@@ -466,109 +544,56 @@ in the release for problem reporting guidelines.
 .\"
 .SH "SEE ALSO"
 .PP
-.BR grantpt (3tty),
-.BR ptsname (3tty),
-.BR unlockpt (3tty),
-.BR ldterm (4),
-.BR pckt (4),
-.BR ptc (4),
-.BR ptem (4),
-.BR ptm (4),
-.BR ptmx (4tty),
-.BR pts (4tty),
-.BR pty (4),
-.BR ttcompat (4),
-.BR osr61 (5),
+.BR ctimod (4),
+.BR dlgn (4),
+.BR dvbm (4),
+.BR gncfd (4),
+.BR gpio (4),
+.BR mercd (4),
+.BR pmacd (4),
+.BR sctmr (4),
 .BR osr61_mknod (8),
-.BR test-tty (8).
-.\"
+.BR test-osr61 (8),
+.BR ctimod (9),
+.BR dlgn_undoc (9),
+.IR STREAMS (9).
 .\"
 .SH COMPATIBILITY
 .PP
-The
+The drivers in the
 .B @PACKAGE@
-package is compatible with
-.I "SVR 4.2"
-and systems based on
-.IR "SVR 4.2" ,
-such as
-.IR Solaris \(rg
-and
-.IR UnixWare \(rg,
-with the following portability considerations:
-.IP \(em \w'\(em\(em'u
-An attempt was made to make each of the modules and drivers contained in this
-package as compatible as possible with all documented implementations of the
-.I SVR 4
-style
-.I "Terminal Subsystem" .
-As the package is incomplete and as yet does not have a fully functional
-validation test suite, this claim is currently difficult to substatiate.
-.IP \(em
-There is some deviation between documented implementations of the
-.BR pckt (4)
-module.  In fact, it appears that many implementations do this somewhat
-differently.  One of the major problems is how many bytes are included to hold
-the message type.  See
-.BR pckt (4)
-for more information.
-.IP \(em
-Each manual page contains compatibility information that was documented during
-the development of the associated component.  Please refer to the individual
-manual pages for additional compatibility information.
+package are compatible with the Dialogic\(rg Open System Release 6.1 version 239 GPL
+drivers.  It should not be necessary to recompile libraries used with the
+driver to use these modified drivers that work with
+.BR "Linux Fast-STREAMS" .
+.B "Linux Fast-STREAMS"
+provides a
+.B libLiS.so
+library that can be dynamically linked by these libraries to access these
+drivers without knowledge of the fact that
+.B Linux Fast-STREAMS
+is providing the underlying STREAMS framework for the drivers.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-.IR "UNIX95" ,
-.IR "UNIX98" ,
-.IR "SUSv2" ,
-.[
-susv2
-.]
-.IR "SUSv3" ,
-.[
-susv3
-.]
-.IR "SVR 4.2" ,
-.[
-svr42spg
-.]
-.IR Solaris \(rg,
-.[
-solspg
-.]
-.IR UnixWare \(rg.
-.[
-uw7spg
-.]
-.PP
-Much of the behavior of
-.I SVR 4
-pseudo-terminals within the
-.I SVR 4 Terminal Subsystem
-made it into
-.I POSIX
-and particularly into the
-.I UNIX 98
-specifications from the
-.IR OpenGroup .
-Consult individual manual pages for additional conformance information.
+The drivers in the
+.B @PACKAGE@
+package conform to the Dialogic\(rg Open System Release 6.1 version 239 GPL
+drivers.  Asside from a number of the drivers and modules being STREAMS drivers,
+These drivers do not conform to any standard.
 .\"
 .\"
 .SH HISTORY
 .PP
-The first
-.IR STREAMS -based
-.I Terminal Subsystem
-was released with
-.IR "SVR 4" .
-.PP
 The
 .B @PACKAGE@
-package was first publicly released (version
+package, based on the Dialogic\(rg Open System Release 6.1 GPL drivers, was
+first publicly released by
+.I The OpenSS7 Project
+(version
 .BR 0.9.2.1 )
-at the end of 2006.
+at the beginning of 2007.
 .\"
 .\"
 .[
