@@ -611,13 +611,12 @@ AC_DEFUN([_OSR61_CHECKS], [dnl
 	AC_DEFINE([VME_SPAN], [1])
     ])
     AC_DEFINE([__DRVDEBUG_H__], [1])
-    AC_DEFINE([PMACD_VERSION], [1])
     AC_DEFINE([PKGVER], ["Version 6.1"])
     AC_DEFINE([OSTYPEVER], ["Linux"])
     AC_DEFINE([COPYRIGHT], ["Copyright (C) 2005 Intel Corporation"])
+    AC_DEFINE([PMACD_VERSION], [4.0.0])
     AC_DEFINE([_LIS_SOURCE], [1], [Define because most of this source was LiS
 	       source beforehand.])
-    AC_DEFINE([PMACD_VERSION],[4.0.0],[This is the pmacd driver version.])
     AH_VERBATIM([__ac_dummy_1], m4_text_wrap([Some of the drivers need LINUX24
 		 defined when they are being build for a 2.4 Linx kernel.  We
 		 already have LINUX_2_4 defined in this case, so just
