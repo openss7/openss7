@@ -1,3 +1,9 @@
+2007-02-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/genksyms.m4: remove special marks from MODPOST_CACHE for autoconf 2.61
+	* m4/strcomp.m4: correct strcomp_cv_package to streams_cv_package
+	* m4/streams.m4: correct checking statement
+
 2007-02-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/releases.texi: correct streams version

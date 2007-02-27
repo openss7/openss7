@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2007/02/22 08:36:38 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2007/02/27 08:38:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
+# Last Modified $Date: 2007/02/27 08:38:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -632,7 +632,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	    AC_MSG_RESULT([(searching)])
 	    for streams_dir in $streams_search_path ; do
 		if test -d "$streams_dir" ; then
-		    AC_MSG_CHECKING([for stream lfs include directory... $streams_dir])
+		    AC_MSG_CHECKING([for streams lfs include directory... $streams_dir])
 		    if test -r "$streams_dir/$streams_what" ; then
 			streams_cv_lfs_includes="$streams_dir"
 			streams_cv_lfs_modmap=

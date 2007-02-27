@@ -524,7 +524,6 @@ AC_DEFUN([_OSR61_CHECKS], [dnl
     _LINUX_CHECK_FUNCS([remap_pfn_range remap_page_range], [:], [:], [
 #include <linux/module.h>
 #include <linux/kernel.h>
-#include <linux/timer.h>
 #include <linux/errno.h>
 #include <linux/delay.h>
 #include <linux/poll.h>
@@ -537,7 +536,6 @@ AC_DEFUN([_OSR61_CHECKS], [dnl
 	    AC_LANG_PROGRAM([[
 #include <linux/module.h>
 #include <linux/kernel.h>
-#include <linux/timer.h>
 #include <linux/errno.h>
 #include <linux/delay.h>
 #include <linux/poll.h>
