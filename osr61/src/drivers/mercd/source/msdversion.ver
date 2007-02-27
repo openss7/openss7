@@ -29,10 +29,14 @@
 #ifndef _MSDVERSION_
 #define _MSDVERSION_
 
+#ifdef LFS
+char VersionString[41]="DLcid 29000102-00 Mercury_Streams_Driver";
+#else
 #ifdef LiS
 char VersionString[41]="DLcid 29000101-11 Mercury_Streams_Driver";
 #else
 char VersionString[41]="DLcid 02010102-83 Mercury_Native_Driver";
+#endif
 #endif
 
 #endif // _MSDVERSION_

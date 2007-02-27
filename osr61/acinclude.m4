@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/27 01:40:10 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/02/27 08:38:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/27 01:40:10 $ by $Author: brian $
+# Last Modified $Date: 2007/02/27 08:38:33 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.3  2007/02/27 08:38:33  brian
+# - release corrections for 2.4 kernel builds
+#
 # Revision 0.9.2.2  2007/02/27 01:40:10  brian
 # - final corrections to build
 #
@@ -529,6 +532,27 @@ AC_DEFUN([_OSR61_CHECKS], [dnl
 #include <linux/init.h>
 #include <linux/mm.h>
 ])
+    AC_CACHE_CHECK([for kernel remap_page_range with 4 arguments], [linux_cv_have_remap_page_range_4args], [dnl
+	AC_COMPILE_IFELSE([
+	    AC_LANG_PROGRAM([[
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/timer.h>
+#include <linux/errno.h>
+#include <linux/delay.h>
+#include <linux/poll.h>
+#include <linux/slab.h>
+#include <linux/init.h>
+#include <linux/mm.h>]],
+	    [[void (*my_autoconf_function_pointer)(ulong,ulong,ulong,pgprot_t) = &remap_page_range;]]) ],
+	    [linux_cv_have_remap_page_range_4args='yes'],
+	    [linux_cv_have_remap_page_range_4args='no'])
+    ])
+    if test x$linux_cv_have_remap_page_range_4args = xyes ; then
+	AC_DEFINE([HAVE_KFUNC_REMAP_PAGE_RANGE_4ARGS], [1], [Define this for older
+		   2.4 kernels where the remap_page_range() function only
+		   takes 4 arguments.])
+    fi
     AC_MSG_CHECKING([for DLGN BRI support])
     if test x$enable_dlgn_bri = xyes ; then
 	AC_DEFINE([BRI_SUPPORT], [1])

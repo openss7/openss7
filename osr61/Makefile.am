@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/27 01:40:10 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/02/27 08:38:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/27 01:40:10 $ by $Author: brian $
+# Last Modified $Date: 2007/02/27 08:38:33 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2007/02/27 08:38:33  brian
+# - release corrections for 2.4 kernel builds
+#
 # Revision 0.9.2.2  2007/02/27 01:40:10  brian
 # - final corrections to build
 #
@@ -241,7 +244,8 @@ libOSRdlgn_a_SOURCES		= \
 				src/drivers/dlgn/include/typedefs.h \
 				src/drivers/dlgn/include/var.h \
 				src/drivers/dlgn/include/vrxlow.h \
-				src/drivers/dlgn/include/vvfwdefs.h
+				src/drivers/dlgn/include/vvfwdefs.h \
+				src/drivers/dlgn/include/antares.ver
 
 if WITH_ANTARES
 libOSRdlgn_a_SOURCES		+= $(EXTRA_libOSRdlgn_a_SOURCES)
@@ -498,7 +502,8 @@ libOSRmercd_a_SOURCES		= \
 				src/drivers/mercd/include/qhosttypes.h \
 				src/drivers/mercd/include/qoscommon.h \
 				src/drivers/mercd/include/qstrtype.h \
-				src/drivers/mercd/include/qtypes.h
+				src/drivers/mercd/include/qtypes.h \
+				src/drivers/mercd/source/msdversion.ver
 
 libOSRmercd_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libOSRmercd_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB) \
@@ -640,25 +645,7 @@ EXPORT_SRCFILES			= \
 if WITH_DLGN
 ## WITH_DLGN
 EXPORT_SRCFILES			+= \
-				src/drivers/dlgn/source/andam.c \
-				src/drivers/dlgn/source/aninit.c \
-				src/drivers/dlgn/source/anprot.c \
-				src/drivers/dlgn/source/antbd.c \
-				src/drivers/dlgn/source/antlow.c \
-				src/drivers/dlgn/source/antpci.c \
-				src/drivers/dlgn/source/dlgn.c \
-				src/drivers/dlgn/source/driver.c \
-				src/drivers/dlgn/source/drvprot.c \
-				src/drivers/dlgn/source/hardware.c \
-				src/drivers/dlgn/source/sbamapin.c \
-				src/drivers/dlgn/source/shrdware.c \
-				src/drivers/dlgn/source/srbulk.c \
-				src/drivers/dlgn/source/srchk.c \
-				src/drivers/dlgn/source/srcmd.c \
-				src/drivers/dlgn/source/srintr.c \
-				src/drivers/dlgn/source/srmap.c \
-				src/drivers/dlgn/source/srmisc.c \
-				src/drivers/dlgn/source/srpm.c
+				src/drivers/dlgn/source/dlgn.c
 ## WITH_DLGN
 endif
 
