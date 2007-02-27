@@ -113,10 +113,12 @@
 #endif
 #define kmalloc(size,gfp)		ctimod_kmalloc(size,gfp)
 
+#if 0
 #ifdef mark_bh
 #undef mark_dh
 #endif
 #define mark_bh(num)			ctimod_mark_bh(num)
+#endif
 
 #ifdef memcpy
 #undef memcpy
@@ -346,7 +348,9 @@ void   ctimod_iounmap(void *);
 ulong  ctimod_jiffies(void);
 void   ctimod_kfree(void *, int);
 void   *ctimod_kmalloc(size_t, int);
+#if 0
 void   ctimod_mark_bh(int);
+#endif
 void   *ctimod_memcpy(void *, const void *, size_t);
 void   ctimod_memset(void *, int, size_t);
 int    ctimod_pcibios_present(void);
@@ -382,13 +386,8 @@ void   ctimod_spin_lock(spinlock_t *);
 void   ctimod_spin_unlock(spinlock_t *);
 void   ctimod_spin_lock_irq(spinlock_t *);
 void   ctimod_spin_unlock_irq(spinlock_t *);
-#if defined LINUX24 && !defined LFS
-void   ctimod_spin_lock_irqsave(spinlock_t *, int *);
-void   ctimod_spin_unlock_irqrestore(spinlock_t *, int);
-#else
 void   ctimod_spin_lock_irqsave(spinlock_t *, unsigned long *);
 void   ctimod_spin_unlock_irqrestore(spinlock_t *, unsigned long);
-#endif
 void   ctimod_spin_lock_init(spinlock_t *);
 int    ctimod_sprintf(char *, const char *fmt, ...);
 void   ctimod_tasklet_init(struct tasklet_struct *, void (*)(unsigned long), unsigned long);
@@ -406,10 +405,12 @@ void   ctimod_debug_clear(void);
 void   ctimod_debug_print(void);
 void   ctimod_debug_toggle(void);
 
+#if 0
 #ifndef LINUX24
 struct workqueue_struct *ctimod_create_workqueue(char *);
 int    ctimod_queue_work(struct workqueue_struct *, struct work_struct *);
 int    ctimod_wake_up_process(struct task_struct *);
+#endif
 #endif
 
 int    ctimod_check_rh(void);

@@ -363,9 +363,17 @@ void ctimod_poll_wait(struct file *filp, wait_queue_head_t *q, poll_table *p) {
 	return;
 }
 
-#ifndef LFS
 int ctimod_remap_page_range(struct vm_area_struct *vma, ulong from, ulong to, ulong sz,pgprot_t prot) {
         ctimod_dbg("ctimod: remap_page_range \n");
+#ifdef LFS
+#if   defined HAVE_KFUNC_REMAP_PFN_RANGE
+        return remap_pfn_range(vma, from, to, sz, prot);
+#elif defined HAVE_KFUNC_REMAP_PAGE_RANGE
+        return remap_page_range(vma, from, to, sz, prot);
+#else
+#error HAVE_KFUNC_REMAP_PFN_RANGE or HAVE_KFUNC_REMAP_PAGE_RANGE must be defined.
+#endif
+#else
 #if (LINUX_VERSION_CODE == KERNEL_VERSION(2,4,21) || !defined(LINUX24))
         // for RHEL and 2.6 kernel uses 5 parameters
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,11))
@@ -378,8 +386,8 @@ int ctimod_remap_page_range(struct vm_area_struct *vma, ulong from, ulong to, ul
 #else
         return remap_page_range(from, to, sz, prot);
 #endif
-}
 #endif
+}
 
 int ctimod_register_chrdev(uint major, const char *name, struct file_operations *fops) {
 	ctimod_dbg("ctimod: register_chrdev \n");
@@ -467,11 +475,7 @@ void ctimod_spin_unlock_irq(spinlock_t *mutex) {
         return;
 }
 
-#if defined LINUX24 && !defined LFS
-void ctimod_spin_lock_irqsave(spinlock_t *mutex, int *flagp)
-#else
 void ctimod_spin_lock_irqsave(spinlock_t *mutex, unsigned long *flagp)
-#endif
 {
 	unsigned long flags;
 
@@ -486,11 +490,7 @@ void ctimod_spin_lock_irqsave(spinlock_t *mutex, unsigned long *flagp)
 	return;
 }
 
-#if defined LINUX24 && !defined LFS
-void ctimod_spin_unlock_irqrestore(spinlock_t *mutex, int flag)
-#else
-void ctimod_spin_unlock_irqrestore(spinlock_t *mutex, ulong flag)
-#endif
+void ctimod_spin_unlock_irqrestore(spinlock_t *mutex, unsigned long flag)
 {
 	ctimod_dbg_locks("ctimod: spin_unlock_irqrestore \n");
 	spin_unlock_irqrestore(mutex, flag);
@@ -550,6 +550,7 @@ void ctimod_wake_up_interruptible(wait_queue_head_t *q) {
 	return;
 }
 
+#if 0
 #ifndef LINUX24
 struct workqueue_struct *ctimod_create_workqueue(char *name) {
 	ctimod_dbg("ctimod: ctimod_create_workqueue %s\n", name);
@@ -565,6 +566,7 @@ int ctimod_wake_up_process(struct task_struct *ts) {
 	ctimod_dbg("ctimod: wake_up_process \n");
 	return wake_up_process(ts);
 }
+#endif
 #endif
 
 
@@ -675,8 +677,10 @@ EXPORT_SYMBOL(ctimod_pci_read_config_byte);
 EXPORT_SYMBOL(ctimod_debug_off);
 EXPORT_SYMBOL(ctimod_vsprintf);
 EXPORT_SYMBOL(ctimod_sprintf);
+#if 0
 #ifndef LINUX24
 EXPORT_SYMBOL(ctimod_wake_up_process);
+#endif
 #endif
 EXPORT_SYMBOL(ctimod_spin_unlock);
 EXPORT_SYMBOL(ctimod_spin_unlock_bh);
@@ -685,14 +689,18 @@ EXPORT_SYMBOL(ctimod_spin_lock);
 EXPORT_SYMBOL(ctimod_spin_lock_bh);
 EXPORT_SYMBOL(ctimod_spin_lock_irq);
 EXPORT_SYMBOL(ctimod_wake_up_interruptible);
+EXPORT_SYMBOL(ctimod_pcibios_present);
 EXPORT_SYMBOL(ctimod_pci_find_device);
+#if 0
 #ifndef LINUX24
 EXPORT_SYMBOL(ctimod_queue_work);
+#endif
 #endif
 EXPORT_SYMBOL(ctimod_spin_lock_init);
 EXPORT_SYMBOL(ctimod_tasklet_init);
 EXPORT_SYMBOL(ctimod_tasklet_kill);
 EXPORT_SYMBOL(ctimod_udelay);
+EXPORT_SYMBOL(ctimod_pci_register_driver);
 EXPORT_SYMBOL(ctimod_pci_unregister_driver);
 EXPORT_SYMBOL(ctimod_request_irq);
 EXPORT_SYMBOL(ctimod_pci_module_init);
@@ -702,16 +710,16 @@ EXPORT_SYMBOL(ctimod_debug_toggle);
 EXPORT_SYMBOL(ctimod_spin_unlock_irq);
 EXPORT_SYMBOL(ctimod_del_timer);
 EXPORT_SYMBOL(ctimod_pci_read_config_dword);
+#if 0
 #ifndef LINUX24
 EXPORT_SYMBOL(ctimod_create_workqueue);
+#endif
 #endif
 EXPORT_SYMBOL(ctimod_iounmap);
 EXPORT_SYMBOL(ctimod_pci_read_config_word);
 EXPORT_SYMBOL(ctimod_schedule_timeout);
 EXPORT_SYMBOL(ctimod_ioremap);
-#ifndef LFS
 EXPORT_SYMBOL(ctimod_remap_page_range);
-#endif
 EXPORT_SYMBOL(ctimod_poll_wait);
 EXPORT_SYMBOL(ctimod_schedule);
 EXPORT_SYMBOL(ctimod_pci_write_config_byte);
@@ -734,4 +742,6 @@ EXPORT_SYMBOL(ctimod_check_rh);
 EXPORT_SYMBOL(ctimod_memset);
 EXPORT_SYMBOL(ctimod_remove_proc_entry);
 EXPORT_SYMBOL(ctimod_create_proc_entry);
+EXPORT_SYMBOL(ctimod_spin_lock_irqsave);
+EXPORT_SYMBOL(ctimod_spin_unlock_irqrestore);
 
