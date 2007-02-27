@@ -82,7 +82,11 @@ typedef struct{
   UINT8_T errorState;   // Upon an errored response what state to move to.
   struct timer_list responseTimer;     // Timer for waiting for response.
 #ifdef LINUX24
+#ifdef LFS
+  struct tasklet_struct handleResponseTask; // Task to process responses when they arrive.
+#else
   struct tq_struct handleResponseTask; // Task to process responses when they arrive.
+#endif
 #else
   struct work_struct handleResponseTask; // Task to process responses when they arrive.
 #endif

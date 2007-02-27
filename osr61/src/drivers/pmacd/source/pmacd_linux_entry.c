@@ -31,9 +31,15 @@ ATOMIC_T pmacd_dynamicMemoryUsage = { 0 };
 //extern pmacd_driver_t pmacd_driver;
 
 // MODULE Parameters
+#ifdef LFS
+int  pmacd_major_number   = PMACD_MAJOR;
+char pmacd_string[]       = "pmac";
+char *pmacd_driver_name;
+#else
 static int  pmacd_major_number   = PMACD_MAJOR;
 static char pmacd_string[]       = "pmac";
 static char *pmacd_driver_name;
+#endif
 
 static long pmacd_msg_size            = PMACD_MF_SIZE;
 static long pmacd_mf_pull_option      = pmacd_MFPullOption_AllOnHost;

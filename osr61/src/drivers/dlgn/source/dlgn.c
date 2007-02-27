@@ -4248,7 +4248,7 @@ int rc;
    return (0);
 }
 
-#ifdef LINUX26
+#if defined LINUX26 || defined LFS
 EXPORT_SYMBOL(dlgn_msg);
 EXPORT_SYMBOL(dlgn_copymp);
 EXPORT_SYMBOL(dlgn_getpeak);

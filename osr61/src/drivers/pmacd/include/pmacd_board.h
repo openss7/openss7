@@ -52,7 +52,11 @@ typedef struct{
   struct timer_list sendMessagesTimer; // Timer used for sending msgs to the board
   struct timer_list resetBoardTimer;   // Timer for hard reseting the board
 #ifdef LINUX24
+#ifdef LFS
+  struct tasklet_struct getMessagesTask;    // Task for retrieving messages
+#else
   struct tq_struct getMessagesTask;    // Task for retrieving messages
+#endif
 #else
   struct work_struct getMessagesTask;    // Task for retrieving messages
 #endif

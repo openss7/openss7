@@ -1,5 +1,20 @@
 2007-02-27  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/ctimod/ctimod.c: corrections for 2.4 build
+	* src/drivers/dlgn/include/dlgcos.h: corrections for 2.4 build
+	* src/drivers/dlgn/source/andam.c: corrections for 2.4 build
+	* src/drivers/dlgn/source/anprot.c: corrections for 2.4 build
+	* src/drivers/dlgn/source/dlgn.c: corrections for 2.4 build
+	* src/drivers/dlgn/source/shrdware.c: corrections for 2.4 build
+	* src/drivers/dlgn/source/srmap.c: corrections for 2.4 build
+	* src/drivers/dlgn/source/srmisc.c: corrections for 2.4 build
+	* src/drivers/gncfd/source/cfd.c: corrections for 2.4 build
+	* src/drivers/mercd/include/ctimod.h: corrections for 2.4 build
+	* src/drivers/pmacd/include/pmacd_board.h: corrections for 2.4 build
+	* src/drivers/pmacd/include/pmacd_control.h: corrections for 2.4 build
+	* src/drivers/pmacd/source/pmacd_linux_entry.c: corrections for 2.4 build
+	* src/drivers/sctmr/source/scttimer.c: corrections for 2.4 build
+
 	* Makefile.am: get rid of circular dependencies
 	* acinclude.m4: avoid _ISDN macro conflict
 	* src/include/Makefile.am: add manpages
