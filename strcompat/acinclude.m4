@@ -657,10 +657,10 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
-#if HAVE_KINC_LINUX_LOCKS_H
+#ifdef HAVE_KINC_LINUX_LOCKS_H
 #include <linux/locks.h>
 #endif
-#if HAVE_KINC_LINUX_SLAB_H
+#ifdef HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
@@ -698,29 +698,29 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
-#if HAVE_KINC_LINUX_LOCKS_H
+#ifdef HAVE_KINC_LINUX_LOCKS_H
 #include <linux/locks.h>
 #endif
-#if HAVE_KINC_LINUX_SLAB_H
+#ifdef HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
 #include <linux/sched.h>
 #include <linux/wait.h>
-#if HAVE_KINC_LINUX_KDEV_T_H
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
 #endif
-#if HAVE_KINC_LINUX_STATFS_H
+#ifdef HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
-#if HAVE_KINC_LINUX_NAMESPACE_H
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
 #include <linux/namespace.h>
 #endif
-#if HAVE_KINC_LINUX_NAMEI_H
+#ifdef HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
 #endif
 #include <linux/interrupt.h>	/* for cpu_raise_softirq */
-#if HAVE_KINC_LINUX_HARDIRQ_H
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_interrupt */
 #endif
 #include <linux/ioport.h>	/* for check_region */
@@ -733,25 +733,25 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
-#if HAVE_KINC_LINUX_LOCKS_H
+#ifdef HAVE_KINC_LINUX_LOCKS_H
 #include <linux/locks.h>
 #endif
-#if HAVE_KINC_LINUX_SLAB_H
+#ifdef HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
-#if HAVE_KINC_LINUX_CPUMASK_H
+#ifdef HAVE_KINC_LINUX_CPUMASK_H
 #include <linux/cpumask.h>
 #endif
 #include <linux/sched.h>
 #include <linux/wait.h>
-#if HAVE_KINC_LINUX_KDEV_T_H
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
 #endif
-#if HAVE_KINC_LINUX_STATFS_H
+#ifdef HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
-#if HAVE_KINC_LINUX_NAMESPACE_H
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
 #include <linux/namespace.h>
 #endif
 #include <linux/interrupt.h>	/* for cpu_raise_softirq */
@@ -764,26 +764,26 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
-#if HAVE_KINC_LINUX_LOCKS_H
+#ifdef HAVE_KINC_LINUX_LOCKS_H
 #include <linux/locks.h>
 #endif
-#if HAVE_KINC_LINUX_SLAB_H
+#ifdef HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
 #include <linux/sched.h>
 #include <linux/wait.h>
-#if HAVE_KINC_LINUX_KDEV_T_H
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
 #endif
-#if HAVE_KINC_LINUX_STATFS_H
+#ifdef HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
-#if HAVE_KINC_LINUX_NAMESPACE_H
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
 #include <linux/namespace.h>
 #endif
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
-#if HAVE_KINC_LINUX_HARDIRQ_H
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_interrupt */
 #endif
 #include <linux/time.h>		/* for struct timespec */
@@ -808,19 +808,19 @@ dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
-#if HAVE_KINC_LINUX_LOCKS_H
+#ifdef HAVE_KINC_LINUX_LOCKS_H
 #include <linux/locks.h>
 #endif
-#if HAVE_KINC_LINUX_SLAB_H
+#ifdef HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
 #include <linux/sched.h>
 #include <linux/wait.h>
-#if HAVE_KINC_LINUX_STATFS_H
+#ifdef HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
-#if HAVE_KINC_LINUX_NAMESPACE_H
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
 #include <linux/namespace.h>
 #endif
 ])
@@ -838,20 +838,20 @@ dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
-#if HAVE_KINC_LINUX_LOCKS_H
+#ifdef HAVE_KINC_LINUX_LOCKS_H
 #include <linux/locks.h>
 #endif
-#if HAVE_KINC_LINUX_SLAB_H
+#ifdef HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
-#if HAVE_KINC_LINUX_STATFS_H
+#ifdef HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
-#if HAVE_KINC_LINUX_NAMESPACE_H
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
 #include <linux/namespace.h>
 #endif
-#if HAVE_KINC_LINUX_NAMEI_H
+#ifdef HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
 #endif]],
 			[[struct inode_operations temp;
@@ -872,29 +872,29 @@ dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
-#if HAVE_KINC_LINUX_LOCKS_H
+#ifdef HAVE_KINC_LINUX_LOCKS_H
 #include <linux/locks.h>
 #endif
-#if HAVE_KINC_LINUX_SLAB_H
+#ifdef HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
 #include <linux/sched.h>
 #include <linux/wait.h>
-#if HAVE_KINC_LINUX_KDEV_T_H
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
 #endif
-#if HAVE_KINC_LINUX_STATFS_H
+#ifdef HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
-#if HAVE_KINC_LINUX_NAMESPACE_H
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
 #include <linux/namespace.h>
 #endif
-#if HAVE_KINC_LINUX_NAMEI_H
+#ifdef HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
 #endif
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
-#if HAVE_KINC_LINUX_HARDIRQ_H
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_interrupt */
 #endif
 #include <linux/time.h>		/* for struct timespec */]],
