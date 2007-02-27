@@ -521,36 +521,96 @@ dnl _XOPEN
 # _OSR61_CHECKS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OSR61_CHECKS], [dnl
-    _LINUX_CHECK_FUNCS([remap_pfn_range remap_page_range], [:], [:], [
+    _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
+			  linux/locks.h asm/softirq.h linux/slab.h linux/cdev.h \
+			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
+			  asm/uaccess.h linux/kthread.h linux/compat.h linux/ioctl32.h \
+			  asm/ioctl32.h linux/syscalls.h linux/rwsem.h linux/smp_lock.h \
+			  linux/devfs_fs_kernel.h linux/compile.h linux/utsrelease.h], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
 #include <linux/module.h>
-#include <linux/kernel.h>
-#include <linux/errno.h>
-#include <linux/delay.h>
-#include <linux/poll.h>
-#include <linux/slab.h>
 #include <linux/init.h>
+#include <linux/types.h>
+#include <linux/timer.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+])
+    _LINUX_CHECK_FUNCS([remap_pfn_range remap_page_range], [:], [:], [
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/types.h>
+#include <linux/timer.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#ifdef HAVE_KINC_LINUX_CPUMASK_H
+#include <linux/cpumask.h>
+#endif
+#include <linux/sched.h>
+#include <linux/wait.h>
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#include <linux/interrupt.h>	/* for cpu_raise_softirq */
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
 #include <linux/mm.h>
 ])
-    AC_CACHE_CHECK([for kernel remap_page_range with 4 arguments], [linux_cv_have_remap_page_range_4args], [dnl
-	AC_COMPILE_IFELSE([
-	    AC_LANG_PROGRAM([[
+    _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel remap_page_range with 4 arguments], [linux_cv_have_remap_page_range_4args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/autoconf.h>
+#include <linux/version.h>
 #include <linux/module.h>
-#include <linux/kernel.h>
-#include <linux/errno.h>
-#include <linux/delay.h>
-#include <linux/poll.h>
-#include <linux/slab.h>
 #include <linux/init.h>
+#include <linux/types.h>
+#include <linux/timer.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#ifdef HAVE_KINC_LINUX_CPUMASK_H
+#include <linux/cpumask.h>
+#endif
+#include <linux/sched.h>
+#include <linux/wait.h>
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#include <linux/interrupt.h>	/* for cpu_raise_softirq */
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
 #include <linux/mm.h>]],
-	    [[void (*my_autoconf_function_pointer)(ulong,ulong,ulong,pgprot_t) = &remap_page_range;]]) ],
+	    [[int (*my_autoconf_function_pointer)(ulong,ulong,ulong,pgprot_t) = &remap_page_range;]]) ],
 	    [linux_cv_have_remap_page_range_4args='yes'],
 	    [linux_cv_have_remap_page_range_4args='no'])
+	])
+	if test x$linux_cv_have_remap_page_range_4args = xyes ; then
+	    AC_DEFINE([HAVE_KFUNC_REMAP_PAGE_RANGE_4ARGS], [1], [Define this for older
+		       2.4 kernels where the remap_page_range() function only
+		       takes 4 arguments.])
+	fi
     ])
-    if test x$linux_cv_have_remap_page_range_4args = xyes ; then
-	AC_DEFINE([HAVE_KFUNC_REMAP_PAGE_RANGE_4ARGS], [1], [Define this for older
-		   2.4 kernels where the remap_page_range() function only
-		   takes 4 arguments.])
-    fi
     AC_MSG_CHECKING([for DLGN BRI support])
     if test x$enable_dlgn_bri = xyes ; then
 	AC_DEFINE([BRI_SUPPORT], [1])

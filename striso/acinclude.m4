@@ -260,7 +260,7 @@ AC_DEFUN([_ISO_CONFIG_KERNEL], [dnl
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
-#if HAVE_KINC_LINUX_SLAB_H
+#ifdef HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
@@ -268,10 +268,10 @@ AC_DEFUN([_ISO_CONFIG_KERNEL], [dnl
 #include <net/sock.h>
 #include <net/protocol.h>
 #include <net/inet_common.h>
-#if HAVE_KINC_NET_XFRM_H
+#ifdef HAVE_KINC_NET_XFRM_H
 #include <net/xfrm.h>
 #endif
-#if HAVE_KINC_NET_DST_H
+#ifdef HAVE_KINC_NET_DST_H
 #include <net/dst.h>
 #endif
 #include <linux/sched.h>
@@ -283,18 +283,18 @@ AC_DEFUN([_ISO_CONFIG_KERNEL], [dnl
 #include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
-#if HAVE_KINC_LINUX_SLAB_H
+#ifdef HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
 #include <linux/sched.h>
-#if HAVE_KINC_LINUX_KDEV_T_H
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
 #endif
-#if HAVE_KINC_LINUX_STATFS_H
+#ifdef HAVE_KINC_LINUX_STATFS_H
 #include <linux/statfs.h>
 #endif
-#if HAVE_KINC_LINUX_NAMESPACE_H
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
 #include <linux/namespace.h>
 #endif
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
