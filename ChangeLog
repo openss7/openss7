@@ -1,3 +1,13 @@
+2007-02-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/configure.texi: updates for OSR61 subpackage
+	* doc/manual/descrip.texi: updates for OSR61 subpackage
+	* doc/manual/news.texi: updates for OSR61 subpackage
+	* doc/manual/openss7.texi: updates for OSR61 subpackage
+	* doc/manual/rpm.texi: updates for OSR61 subpackage
+	* doc/manual/tree.texi: updates for OSR61 subpackage
+	* scripts/texi/versions.texi: updates for OSR61 subpackage
+
 2007-02-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/genksyms.m4: remove special marks from MODPOST_CACHE for autoconf 2.61

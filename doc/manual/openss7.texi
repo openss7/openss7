@@ -687,11 +687,11 @@ dependencies between packages.
 Because OpenSS7 packages first built with @dfn{Linux STREAMS (LiS)} but now build with the superior
 @dfn{Linux Fast-STREAMS (LfS)}, the master package had the objective from the onset of being able to
 build all OpenSS7 packages against either @dfn{LiS} or @dfn{LfS} or both.  This was the case from
-@dfn{LiS} version @emph{2.18.1} through @emph{@value{VERSION_LIS}} and @dfn{streams} version @emph{0.7a.3}
+@dfn{LiS} version @emph{2.18.1} through @emph{2.18.3} and @dfn{streams} version @emph{0.7a.3}
 through @emph{0.7a.5}, or master package releases @emph{0.9.2.A} through @emph{0.9.2.C}.  With the
-release of master package @emph{0.9.2.D} containing @dfn{streams} @emph{0.7a.6}, @dfn{LiS} is no
-longer supported in the master package.  The contained @dfn{LiS} @emph{@value{VERSION_LIS}} is the final release
-of @dfn{LiS} from the OpenSS7 Project.
+release of master package @emph{0.9.2.D} containing @dfn{streams} @emph{0.9.2.1}, @dfn{LiS} is no
+longer supported in the master package.  @dfn{LiS} @emph{2.18.3} was the final public release of
+@dfn{LiS} from the OpenSS7 Project.
 
 @node Other Packages
 @section Other Packages
@@ -701,9 +701,9 @@ The other packages in the @value{PACKAGE_TITLE} normally depend upon one of the 
 packages and zero or more of the other sub-packages in the master package.  The
 @value{PACKAGE_TITLE}, by default, builds @cite{Linux Fast-STREAMS}
 (@command{streams-@value{VERSION_STREAMS}}) and all other packages against @cite{Linux
-Fast-STREAMS}.  It is possible; however, to direct the package to build against @cite{Linux STREAMS}
-(@command{LiS-@value{VERSION_LIS}}), or both @cite{LiS} and @cite{LfS} (such as is done to release
-the master package).
+Fast-STREAMS}.  It was formerly possible; however, to direct the package to build against
+@cite{Linux STREAMS} (@command{LiS-@value{VERSION_LIS}}), or both @cite{LiS} and @cite{LfS} (such as
+is done to release the master package).
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -752,6 +752,7 @@ Following is a list of the sub-packages contained in the @dfn{@value{PACKAGE_TIT
 * strss7::		STREAMS SS7 Stacks
 * sigtran::		STREAMS SIGTRAN Stacks
 * strvoip::		STREAMS VoIP Stacks
+* osr61::		Dialog Open System Release 6.1
 * LiS::			Linux STREAMS
 @end menu
 
@@ -797,6 +798,8 @@ Following is a list of the sub-packages contained in the @dfn{@value{PACKAGE_TIT
 @tab @ref{sigtran}.
 @item STREAMS VoIP Stacks
 @tab @ref{strvoip}.
+@item STREAMS Dialogic Open System Release 6.1
+@tab @ref{osr61}.
 @item Linux STREAMS
 @tab @ref{LiS}.
 @end multitable
@@ -843,6 +846,8 @@ Following is a list of the sub-packages contained in the @dfn{@value{PACKAGE_TIT
 @tab @ref{sigtran}.
 @item STREAMS VoIP Stacks
 @tab @ref{strvoip}.
+@item STREAMS Dialogic Open System Release 6.1
+@tab @ref{osr61}.
 @item Linux STREAMS
 @tab @ref{LiS}.
 @end multitable
@@ -1317,13 +1322,17 @@ distribution.
 @node sigtran
 @subsection sigtran-@value{VERSION_SIGTRAN}
 
-The @cite{STREAMS SIGTRAN} (@command{sigtran-@value{VERSION_SIGTRAN}}) package contains
+The @cite{STREAMS SIGTRAN} (@command{sigtran-@value{VERSION_SIGTRAN}}) package contains a wide array
+of Signalling Transport components used for telephony signalling over SCTP/IP.
 
 The components in this subpackage are the
 SIGTRAN
 components that were originally part of the @command{strss7} package.@footnote{The @command{strss7}
 package was getting much too large and was split into @command{strchan}, @command{strsio},
 @command{strisdn}, @command{strss7}, @command{sigtran} and @command{strvoip} sub-packages.}
+
+This package is a work in progress and partially tested.   This package relies upon the presence of
+the following packages also included in the @value{PACKAGE_TITLE}:
 
 @enumerate
 @item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
@@ -1346,6 +1355,9 @@ components that were originally part of the @command{strss7} package.@footnote{T
 package was getting much too large and was split into @command{strchan}, @command{strsio},
 @command{strisdn}, @command{strss7}, @command{sigtran} and @command{strvoip} sub-packages.}
 
+This package is a work in progress and partially tested.   This package relies upon the presence of
+the following packages also included in the @value{PACKAGE_TITLE}:
+
 @enumerate
 @item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
 @item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
@@ -1361,6 +1373,24 @@ package was getting much too large and was split into @command{strchan}, @comman
 @end enumerate
 
 The @cite{STREAMS VoIP} (@command{strvoip-@value{VERSION_STRVOIP}}) package contains
+
+@node osr61
+@subsection osr61-@value{VERSION_OSR}
+
+The components in this subpackage are the
+Dialogic Open System Release 6.1
+components that were originally in the Dialogic Open System Release 6.1 version 239 GPL drivers
+release package from @url{http://www.dialogic.com/, Dialogic}.
+
+This package is a work in progress and is untested.   This package relies upon the presence of
+the following packages also included in the @value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
+@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}),
+@item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}),
+@end enumerate
 
 @node LiS
 @subsection LiS-@value{VERSION_LIS}
@@ -1453,6 +1483,17 @@ the coordinated build and installation of the contained sub-packages.
 @item @file{streams_x400p-ss7.ko}
 @tab For more information, see @manref{x400p-ss7(4)}.
 
+@item @file{streams_dlgn.ko}
+@tab For more information, see @manref{dlgn(4)}.
+@item @file{streams_gncfd.ko}
+@tab For more information, see @manref{gncfd(4)}.
+@item @file{streams_gpio.ko}
+@tab For more information, see @manref{gpio(4)}.
+@item @file{streams_mercd.ko}
+@tab For more information, see @manref{mercd(4)}.
+@item @file{pmacd.ko}
+@tab For more information, see @manref{pmacd(4)}.
+
 @end multitable
 
 @c ----------------------------------------------------------------------------
@@ -1513,6 +1554,13 @@ the coordinated build and installation of the contained sub-packages.
 @tab For more information, see @manref{sm_mod(4)}.
 @item @file{streams_spm.ko}
 @tab For more information, see @manref{spm(4)}.
+
+@item @file{streams_dvbm.ko}
+@tab For more information, see @manref{dvbm(4)}.
+@item @file{streams_sctmr.ko}
+@tab For more information, see @manref{sctmr(4)}.
+@item @file{ctimod.ko}
+@tab For more information, see @manref{ctimod(4)}.
 
 @end multitable
 
@@ -1587,12 +1635,12 @@ providing a set of Socket functions described in Section 3 of the manual pages, 
 @item libLiS
 @itemx libpLiS
 
-These are @dfn{STREAMS} libraries installed by the @command{LiS-@value{VERSION_LIS}} package
-providing usable @manref{getmsg(2)}, @manref{getpmsg(2)}, @manref{putmsg(2)}, @manref{putpmsg(2)}
-and @manref{isastream(2)} system call emulation.
+These are @dfn{STREAMS} libraries formerly installed by the @command{LiS-@value{VERSION_LIS}}
+package providing usable @manref{getmsg(2)}, @manref{getpmsg(2)}, @manref{putmsg(2)},
+@manref{putpmsg(2)} and @manref{isastream(2)} system call emulation.
 
 These libraries are also installed by the @command{streams-@value{VERSION_STREAMS}} package for
-compatibilty with LiS.
+backware compatibilty with @dfn{LiS}.
 
 @end table
 

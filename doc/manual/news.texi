@@ -99,6 +99,13 @@ Major features since the last public release are as follows:
 
 @itemize -
 @item
+Addition of the @command{osr61} sub-package that contains Dialogic@registeredsymbol{} Open System
+Release 6.1 version 239 GPL drivers.
+
+@item
+A few minor corrections to the common build process.
+
+@item
 Support for autoconf 2.61 and gettext 0.16.
 
 @item

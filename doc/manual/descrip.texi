@@ -82,7 +82,8 @@ The @cite{@value{PACKAGE_TITLE}} package contains:
 @command{strisdn-@value{VERSION_STRISDN}} (@cite{STREAMS ISDN Stack}), @*
 @command{strss7-@value{VERSION_STRSS7}} (@cite{STREAMS SS7 Stacks}), @*
 @command{sigtran-@value{VERSION_SIGTRAN}} (@cite{STREAMS SIGTRAN Stack}), @*
-@command{strvoip-@value{VERSION_STRVOIP}} (@cite{STREAMS VoIP Stacks}) and @*
+@command{strvoip-@value{VERSION_STRVOIP}} (@cite{STREAMS VoIP Stacks}), @*
+@command{osr61-@value{VERSION_OSR}} (@cite{Dialogic Open System Release 6.1}) and @*
 @command{LiS-@value{VERSION_LIS}} (@cite{Linux STREAMS}).
 
 If you need to build an install a significant number of these packages, the
