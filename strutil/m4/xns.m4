@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/12/28 08:32:32 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/02/28 11:51:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,12 +48,15 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
+# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xns.m4,v $
-# Revision 0.9.2.38  2006/12/28 08:32:32  brian
+# Revision 0.9.2.39  2007/02/28 11:51:32  brian
+# - make sure build directory exists
+#
+# Revision 0.9.2.38  2006-12-28 08:32:32  brian
 # - use cache names for master src and build directories
 #
 # Revision 0.9.2.37  2006/09/29 10:57:46  brian
@@ -194,23 +197,22 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    xns_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strxns/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strxns/src/include}"
-	    for xns_dir in $xns_search_path ; do
-		if test -d "$xns_dir" ; then
-		    AC_MSG_CHECKING([for xns include directory... $xns_dir])
-		    if test -r "$xns_dir/$xns_what" ; then
-			xns_cv_includes="$xns_search_path"
-			xns_cv_ldadd= # "$os7_cv_master_builddir/strxns/libxns.la"
-			xns_cv_ldadd32= # "$os7_cv_master_builddir/strxns/lib32/libxns.la"
-			xns_cv_modmap= # "$os7_cv_master_builddir/strxns/Modules.map"
-			xns_cv_symver= # "$os7_cv_master_builddir/strxns/Module.symvers"
-			xns_cv_manpath="$os7_cv_master_builddir/strxns/doc/man"
-			AC_MSG_RESULT([yes])
-			break
-		    fi
+	    xns_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strxns/src/include}"
+	    xns_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/strxns/src/include}"
+	    if test -d "$xns_dir" ; then
+		AC_MSG_CHECKING([for xns include directory... $xns_dir $xns_bld])
+		if test -d "$xns_bld" -a -r "$xns_dir/$xns_what" ; then
+		    xns_cv_includes="$xns_dir $xns_bld"
+		    #xns_cv_ldadd= # "$os7_cv_master_builddir/strxns/libxns.la"
+		    #xns_cv_ldadd32= # "$os7_cv_master_builddir/strxns/lib32/libxns.la"
+		    #xns_cv_modmap="$os7_cv_master_builddir/strxns/Modules.map"
+		    #xns_cv_symver="$os7_cv_master_builddir/strxns/Module.symvers"
+		    #xns_cv_manpath="$os7_cv_master_builddir/strxns/doc/man"
+		    AC_MSG_RESULT([yes])
+		else
 		    AC_MSG_RESULT([no])
 		fi
-	    done
+	    fi
 	    AC_MSG_CHECKING([for xns include directory])
 	fi
 	if test :"${xns_cv_includes:-no}" = :no ; then
@@ -227,14 +229,14 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 		if test -d "$xns_dir" ; then
 		    xns_bld=`echo $xns_dir | sed -e "s|^$srcdir/|$xns_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    xns_dir=`(cd $xns_dir; pwd)`
-		    AC_MSG_CHECKING([for xns include directory... $xns_dir])
-		    if test -r "$xns_dir/$xns_what" ; then
+		    AC_MSG_CHECKING([for xns include directory... $xns_dir $xns_bld])
+		    if test -d "$xns_bld" -a -r "$xns_dir/$xns_what" ; then
 			xns_cv_includes="$xns_dir $xns_bld"
-			xns_cv_ldadd= # `echo "$xns_bld/../../libxns.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xns_cv_ldadd32= # `echo "$xns_bld/../../lib32/libxns.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xns_cv_modmap= # `echo "$xns_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xns_cv_symver= # `echo "$xns_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xns_cv_manpath=`echo "$xns_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#xns_cv_ldadd= # `echo "$xns_bld/../../libxns.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#xns_cv_ldadd32= # `echo "$xns_bld/../../lib32/libxns.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#xns_cv_modmap=`echo "$xns_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#xns_cv_symver=`echo "$xns_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#xns_cv_manpath=`echo "$xns_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -351,11 +353,11 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for xns include directory... $xns_dir])
 		    if test -r "$xns_dir/$xns_what" ; then
 			xns_cv_includes="$xns_dir"
-			xns_cv_ldadd=
-			xns_cv_ldadd32=
-			xns_cv_modmap=
-			xns_cv_symver=
-			xns_cv_manpath=
+			#xns_cv_ldadd=
+			#xns_cv_ldadd32=
+			#xns_cv_modmap=
+			#xns_cv_symver=
+			#xns_cv_manpath=
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -365,7 +367,8 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for xns include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for xns ldadd native],[xns_cv_ldadd],[dnl
+    AC_CACHE_CHECK([for xns ldadd native], [xns_cv_ldadd], [dnl
+	xns_cv_ldadd=
 	for xns_dir in $xns_cv_includes ; do
 	    if test -f "$xns_dir/../../libxns.la" ; then
 		xns_cv_ldadd=`echo "$xns_dir/../../libxns.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -373,14 +376,16 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for xns ldflags],[xns_cv_ldflags],[dnl
+    AC_CACHE_CHECK([for xns ldflags], [xns_cv_ldflags], [dnl
+	xns_cv_ldflags=
 	if test -z "$xns_cv_ldadd" ; then
 	    xns_cv_ldflags= # '-lxns'
 	else
 	    xns_cv_ldflags= # "-L$(dirname $xns_cv_ldflags)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for xns ldadd 32-bit],[xns_cv_ldadd32],[dnl
+    AC_CACHE_CHECK([for xns ldadd 32-bit], [xns_cv_ldadd32], [dnl
+	xns_cv_ldadd32=
 	for xns_dir in $xns_cv_includes ; do
 	    if test -f "$xns_dir/../../libxns.la" ; then
 		xns_cv_ldadd32=`echo "$xns_dir/../../libxns.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -388,14 +393,16 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for xns ldflags 32-bit],[xns_cv_ldflags32],[dnl
+    AC_CACHE_CHECK([for xns ldflags 32-bit], [xns_cv_ldflags32], [dnl
+	xns_cv_ldflags32=
 	if test -z "$xns_cv_ldadd32" ; then
 	    xns_cv_ldflags32= # '-lxns'
 	else
 	    xns_cv_ldflags32= # "-L$(dirname $xns_cv_ldflags32)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for xns modmap],[xns_cv_modmap],[dnl
+    AC_CACHE_CHECK([for xns modmap], [xns_cv_modmap], [dnl
+	xns_cv_modmap=
 	for xns_dir in $xns_cv_includes ; do
 	    if test -f "$xns_dir/../../Modules.map" ; then
 		xns_cv_modmap=`echo "$xns_dir/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -403,7 +410,8 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for xns symver],[xns_cv_symver],[dnl
+    AC_CACHE_CHECK([for xns symver], [xns_cv_symver], [dnl
+	xns_cv_symver=
 	for xns_dir in $xns_cv_includes ; do
 	    if test -f "$xns_dir/../../Module.symvers" ; then
 		xns_cv_symver=`echo "$xns_dir/../../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -411,7 +419,8 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for xns manpath],[xns_cv_manpath],[dnl
+    AC_CACHE_CHECK([for xns manpath], [xns_cv_manpath], [dnl
+	xns_cv_manpath=
 	for xns_dir in $xns_cv_includes ; do
 	    if test -d "$xns_dir/../../doc/man" ; then
 		xns_cv_manpath=`echo "$xns_dir/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

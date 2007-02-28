@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/02/22 08:36:38 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/02/28 11:51:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
+# Last Modified $Date: 2007/02/28 11:51:31 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: inet.m4,v $
+# Revision 0.9.2.34  2007/02/28 11:51:31  brian
+# - make sure build directory exists
+#
 # Revision 0.9.2.33  2007/02/22 08:36:38  brian
 # - balance parentheses
 #
@@ -194,23 +197,22 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    inet_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strinet/src/includes} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strinet/src/includes}"
-	    for inet_dir in $inet_search_path ; do
-		if test -d "$inet_dir" ; then
-		    AC_MSG_CHECKING([for inet include directory... $inet_dir])
-		    if test -r "$inet_dir/$inet_what" ; then
-			inet_cv_includes="$inet_search_path"
-			inet_cv_ldadd= # "$os7_cv_master_builddir/strinet/libinet.la"
-			inet_cv_ldadd32= # "$os7_cv_master_builddir/strinet/lib32/libinet.la"
-			inet_cv_modmap= # "$os7_cv_master_builddir/strinet/Modules.map"
-			inet_cv_symver= # "$os7_cv_master_builddir/strinet/Module.symvers"
-			inet_cv_manpath="$os7_cv_master_builddir/strinet/doc/man"
-			AC_MSG_RESULT([yes])
-			break
-		    fi
+	    inet_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strinet/src/includes}"
+	    inet_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/strinet/src/includes}"
+	    if test -d "$inet_dir" ; then
+		AC_MSG_CHECKING([for inet include directory... $inet_dir $inet_bld])
+		if test -d "$inet_bld" -a -r "$inet_dir/$inet_what" ; then
+		    inet_cv_includes="$inet_dir $inet_bld"
+		    #inet_cv_ldadd= # "$os7_cv_master_builddir/strinet/libinet.la"
+		    #inet_cv_ldadd32= # "$os7_cv_master_builddir/strinet/lib32/libinet.la"
+		    #inet_cv_modmap="$os7_cv_master_builddir/strinet/Modules.map"
+		    #inet_cv_symver="$os7_cv_master_builddir/strinet/Module.symvers"
+		    #inet_cv_manpath="$os7_cv_master_builddir/strinet/doc/man"
+		    AC_MSG_RESULT([yes])
+		else
 		    AC_MSG_RESULT([no])
 		fi
-	    done
+	    fi
 	    AC_MSG_CHECKING([for inet include directory])
 	fi
 	if test :"${inet_cv_includes:-no}" = :no ; then
@@ -227,14 +229,14 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 		if test -d "$inet_dir" ; then
 		    inet_bld=`echo $inet_dir | sed -e "s|^$srcdir/|$inet_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    inet_dir=`(cd $inet_dir; pwd)`
-		    AC_MSG_CHECKING([for inet include directory... $inet_dir])
-		    if test -r "$inet_dir/$inet_what" ; then
+		    AC_MSG_CHECKING([for inet include directory... $inet_dir $inet_bld])
+		    if test -d "$inet_bld" -a -r "$inet_dir/$inet_what" ; then
 			inet_cv_includes="$inet_dir $inet_bld"
-			inet_cv_ldadd= # `echo "$inet_bld/../../libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			inet_cv_ldadd32= # `echo "$inet_bld/../../lib32/libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			inet_cv_modmap= # `echo "$inet_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			inet_cv_symver= # `echo "$inet_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			inet_cv_manpath=`echo "$inet_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#inet_cv_ldadd= # `echo "$inet_bld/../../libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#inet_cv_ldadd32= # `echo "$inet_bld/../../lib32/libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#inet_cv_modmap=`echo "$inet_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#inet_cv_symver=`echo "$inet_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#inet_cv_manpath=`echo "$inet_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -317,11 +319,11 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for inet include directory... $inet_dir])
 		    if test -r "$inet_dir/$inet_what" ; then
 			inet_cv_includes="$inet_dir"
-			inet_cv_ldadd=
-			inet_cv_ldadd32=
-			inet_cv_modmap=
-			inet_cv_symver=
-			inet_cv_manpath=
+			#inet_cv_ldadd=
+			#inet_cv_ldadd32=
+			#inet_cv_modmap=
+			#inet_cv_symver=
+			#inet_cv_manpath=
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -331,7 +333,8 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for inet include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for inet ldadd native],[inet_cv_ldadd],[dnl
+    AC_CACHE_CHECK([for inet ldadd native], [inet_cv_ldadd], [dnl
+	inet_cv_ldadd=
 	for inet_dir in $inet_cv_includes ; do
 	    if test -f "$inet_dir/../../libinet.la" ; then
 		inet_cv_ldadd=`echo "$inet_dir/../../libinet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -339,14 +342,16 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for inet ldflags],[inet_cv_ldflags],[dnl
+    AC_CACHE_CHECK([for inet ldflags], [inet_cv_ldflags], [dnl
+	inet_cv_ldflags=
 	if test -z "$inet_cv_ldadd" ; then
 	    inet_cv_ldflags= # '-linet'
 	else
 	    inet_cv_ldflags= # "-L$(dirname $inet_cv_ldadd)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for inet ldadd 32-bit],[inet_cv_ldadd32],[dnl
+    AC_CACHE_CHECK([for inet ldadd 32-bit], [inet_cv_ldadd32], [dnl
+	inet_cv_ldadd32=
 	for inet_dir in $inet_cv_includes ; do
 	    if test -f "$inet_dir/../../lib32/libinet.la" ; then
 		inet_cv_ldadd32=`echo "$inet_dir/../../lib32/libinet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -354,14 +359,16 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for inet ldflags 32-bit],[inet_cv_ldflags32],[dnl
+    AC_CACHE_CHECK([for inet ldflags 32-bit], [inet_cv_ldflags32], [dnl
+	inet_cv_ldflags32=
 	if test -z "$inet_cv_ldadd32" ; then
 	    inet_cv_ldflags32= # '-linet'
 	else
 	    inet_cv_ldflags32= # "-L$(dirname $inet_cv_ldadd32)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for inet modmap],[inet_cv_modmap],[dnl
+    AC_CACHE_CHECK([for inet modmap], [inet_cv_modmap], [dnl
+	inet_cv_modmap=
 	for inet_dir in $inet_cv_includes ; do
 	    if test -f "$inet_dir/../../Modules.map" ; then
 		inet_cv_modmap=`echo "$inet_dir/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -369,7 +376,8 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for inet symver],[inet_cv_symver],[dnl
+    AC_CACHE_CHECK([for inet symver], [inet_cv_symver], [dnl
+	inet_cv_symver=
 	for inet_dir in $inet_cv_includes ; do
 	    if test -f "$inet_dir/../../Module.symvers" ; then
 		inet_cv_symver=`echo "$inet_dir/../../Modules.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -377,7 +385,8 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for inet manpath],[inet_cv_manpath],[dnl
+    AC_CACHE_CHECK([for inet manpath], [inet_cv_manpath], [dnl
+	inet_cv_manpath=
 	for inet_dir in $inet_cv_includes ; do
 	    if test -d "$inet_dir/../../doc/man" ; then
 		inet_cv_manpath=`echo "$inet_dir/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

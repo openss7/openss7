@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/28 08:32:32 $
+# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/02/28 11:51:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,12 +48,15 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/28 08:32:32 $ by $Author: brian $
+# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: ss7.m4,v $
-# Revision 0.9.2.10  2006/12/28 08:32:32  brian
+# Revision 0.9.2.11  2007/02/28 11:51:32  brian
+# - make sure build directory exists
+#
+# Revision 0.9.2.10  2006-12-28 08:32:32  brian
 # - use cache names for master src and build directories
 #
 # Revision 0.9.2.9  2006/10/16 08:29:20  brian
@@ -194,23 +197,22 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    ss7_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/stacks/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/stacks/src/include}"
-	    for ss7_dir in $ss7_search_path ; do
-		if test -d "$ss7_dir" ; then
-		    AC_MSG_CHECKING([for ss7 include directory... $ss7_dir])
-		    if test -r "$ss7_dir/$ss7_what" ; then
-			ss7_cv_includes="$ss7_search_path"
-			ss7_cv_ldadd= # "$os7_cv_master_builddir/stacks/libss7.la"
-			ss7_cv_ldadd32= # "$os7_cv_master_builddir/stacks/lib32/libss7.la"
-			ss7_cv_modmap= # "$os7_cv_master_builddir/stacks/Modules.map"
-			ss7_cv_symver= # "$os7_cv_master_builddir/stacks/Module.symvers"
-			ss7_cv_manpath="$os7_cv_master_builddir/stacks/doc/man"
-			AC_MSG_RESULT([yes])
-			break
-		    fi
+	    ss7_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/stacks/src/include}"
+	    ss7_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/stacks/src/include}"
+	    if test -d "$ss7_dir" ; then
+		AC_MSG_CHECKING([for ss7 include directory... $ss7_dir $ss7_bld])
+		if test -d "$ss7_bld" -a -r "$ss7_dir/$ss7_what" ; then
+		    ss7_cv_includes="$ss7_dir $ss7_bld"
+		    #ss7_cv_ldadd= # "$os7_cv_master_builddir/stacks/libss7.la"
+		    #ss7_cv_ldadd32= # "$os7_cv_master_builddir/stacks/lib32/libss7.la"
+		    #ss7_cv_modmap="$os7_cv_master_builddir/stacks/Modules.map"
+		    #ss7_cv_symver="$os7_cv_master_builddir/stacks/Module.symvers"
+		    #ss7_cv_manpath="$os7_cv_master_builddir/stacks/doc/man"
+		    AC_MSG_RESULT([yes])
+		else
 		    AC_MSG_RESULT([no])
 		fi
-	    done
+	    fi
 	    AC_MSG_CHECKING([for ss7 include directory])
 	fi
 	if test :"${ss7_cv_includes:-no}" = :no ; then
@@ -231,14 +233,14 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 		if test -d "$ss7_dir" ; then
 		    ss7_bld=`echo $ss7_dir | sed -e "s|^$srcdir/|$ss7_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    ss7_dir=`(cd $ss7_dir; pwd)`
-		    AC_MSG_CHECKING([for ss7 include directory... $ss7_dir])
-		    if test -r "$ss7_dir/$ss7_what" ; then
+		    AC_MSG_CHECKING([for ss7 include directory... $ss7_dir $ss7_bld])
+		    if test -d "$ss7_bld" -a -r "$ss7_dir/$ss7_what" ; then
 			ss7_cv_includes="$ss7_dir $ss7_bld"
-			ss7_cv_ldadd= # `echo "$ss7_bld/../../libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			ss7_cv_ldadd32= # `echo "$ss7_bld/../../lib32/libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			ss7_cv_modmap= # `echo "$ss7_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			ss7_cv_symver= # `echo "$ss7_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			ss7_cv_manpath=`echo "$ss7_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#ss7_cv_ldadd= # `echo "$ss7_bld/../../libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#ss7_cv_ldadd32= # `echo "$ss7_bld/../../lib32/libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#ss7_cv_modmap=`echo "$ss7_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#ss7_cv_symver=`echo "$ss7_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#ss7_cv_manpath=`echo "$ss7_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -301,9 +303,9 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for ss7 include directory... $ss7_dir])
 		    if test -r "$ss7_dir/$ss7_what" ; then
 			ss7_cv_includes="$ss7_dir"
-			ss7_cv_modmap=
-			ss7_cv_symver=
-			ss7_cv_manpath=
+			#ss7_cv_modmap=
+			#ss7_cv_symver=
+			#ss7_cv_manpath=
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -313,7 +315,8 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for ss7 include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for ss7 ldadd native],[ss7_cv_ldadd],[dnl
+    AC_CACHE_CHECK([for ss7 ldadd native], [ss7_cv_ldadd], [dnl
+	ss7_cv_ldadd=
 	for ss7_dir in $ss7_cv_includes ; do
 	    if test -f "$ss7_dir/../../libss7.la" ; then
 		ss7_cv_ldadd=`echo "$ss7_dir/../../libss7.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -321,14 +324,16 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for ss7 ldflags],[ss7_cv_ldflags],[dnl
+    AC_CACHE_CHECK([for ss7 ldflags], [ss7_cv_ldflags], [dnl
+	ss7_cv_ldflags=
 	if test -z "$ss7_cv_ldadd" ; then
 	    ss7_cv_ldflags= # '-lss7'
 	else
 	    ss7_cv_ldflags= # "-L$(dirname $ss7_cv_ldadd)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for ss7 ldadd 32-bit],[ss7_cv_ldadd32],[dnl
+    AC_CACHE_CHECK([for ss7 ldadd 32-bit], [ss7_cv_ldadd32], [dnl
+	ss7_cv_ldadd32=
 	for ss7_dir in $ss7_cv_includes ; do
 	    if test -f "$ss7_dir/../../libss7.la" ; then
 		ss7_cv_ldadd32=`echo "$ss7_dir/../../lib32/libss7.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -336,14 +341,16 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for ss7 ldflags 32-bit],[ss7_cv_ldflags32],[dnl
+    AC_CACHE_CHECK([for ss7 ldflags 32-bit], [ss7_cv_ldflags32], [dnl
+	ss7_cv_ldflags32=
 	if test -z "$ss7_cv_ldadd32" ; then
 	    ss7_cv_ldflags32= # '-lss7'
 	else
 	    ss7_cv_ldflags32= # "-L$(dirname $ss7_cv_ldadd32)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for ss7 modmap],[ss7_cv_modmap],[dnl
+    AC_CACHE_CHECK([for ss7 modmap], [ss7_cv_modmap], [dnl
+	ss7_cv_modmap=
 	for ss7_dir in $ss7_cv_includes ; do
 	    if test -f "$ss7_dir/../../Modules.map" ; then
 		ss7_cv_modmap=`echo "$ss7_dir/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -351,7 +358,8 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for ss7 symver],[ss7_cv_symver],[dnl
+    AC_CACHE_CHECK([for ss7 symver], [ss7_cv_symver], [dnl
+	ss7_cv_symver=
 	for ss7_dir in $ss7_cv_includes ; do
 	    if test -f "$ss7_dir/../../Module.symvers" ; then
 		ss7_cv_symver=`echo "$ss7_dir/../../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -359,7 +367,8 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for ss7 manpath],[ss7_cv_manpath],[dnl
+    AC_CACHE_CHECK([for ss7 manpath], [ss7_cv_manpath], [dnl
+	ss7_cv_manpath=
 	for ss7_dir in $ss7_cv_includes ; do
 	    if test -d "$ss7_dir/../../doc/man" ; then
 		ss7_cv_manpath=`echo "$ss7_dir/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

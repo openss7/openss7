@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/02/27 08:38:37 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/02/28 11:51:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/27 08:38:37 $ by $Author: brian $
+# Last Modified $Date: 2007/02/28 11:51:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -169,7 +169,7 @@ AC_DEFUN([_KSYMS_OUTPUT_MODSYMS_CONFIG], [dnl
 	    fi
 	fi
     ])
-    AC_CACHE_CHECK([for modsyms module dir], [MODSYMS_MODDIR], [MODSYMS_MODDIR="$kmoduledir"])
+    AC_CACHE_CHECK([for modsyms module dir], [MODSYMS_MODDIR], [MODSYMS_MODDIR="$kmoddir"])
     AC_SUBST([MODSYMS_SCRIPT])
     AC_SUBST([MODSYMS])
     AC_SUBST([MODSYMS_SYMVER])
@@ -220,7 +220,7 @@ AC_DEFUN([_KSYMS_OUTPUT_MODPOST_CONFIG], [dnl
     MODPOST_SYSMAP="$ksyms_cv_modpost_sysmap"
     AC_SUBST([MODPOST_SYSMAP])dnl
     AC_CACHE_CHECK([for modpost module dir], [ksyms_cv_modpost_moddir], [dnl
-	ksyms_cv_modpost_moddir="$DESTDIR$kmoduledir"])
+	ksyms_cv_modpost_moddir="$kmoddir"])
     MODPOST_MODDIR="$ksyms_cv_modpost_moddir"
     AC_SUBST([MODPOST_MODDIR])dnl
 dnl AC_ARG_VAR([MODPOST_CACHE], [Cache file for modpost])

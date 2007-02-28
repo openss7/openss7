@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/22 08:36:38 $
+# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/02/28 11:51:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
+# Last Modified $Date: 2007/02/28 11:51:31 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.5  2007/02/28 11:51:31  brian
+# - make sure build directory exists
+#
 # Revision 0.9.2.4  2007/02/22 08:36:38  brian
 # - balance parentheses
 #
@@ -179,23 +182,22 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    chan_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strchan/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strchan/src/include}"
-	    for chan_dir in $chan_search_path ; do
-		if test -d "$chan_dir" ; then
-		    AC_MSG_CHECKING([for chan include directory... $chan_dir])
-		    if test -r "$chan_dir/$chan_what" ; then
-			chan_cv_includes="$chan_search_path"
-			chan_cv_ldadd= # "$os7_cv_master_builddir/strchan/libchan.la"
-			chan_cv_ldadd32= # "$os7_cv_master_builddir/strchan/lib32/libchan.la"
-			chan_cv_modmap= # "$os7_cv_master_builddir/strchan/Modules.map"
-			chan_cv_symver= # "$os7_cv_master_builddir/strchan/Module.symvers"
-			chan_cv_manpath="$os7_cv_master_builddir/strchan/doc/man"
-			AC_MSG_RESULT([yes])
-			break
-		    fi
+	    chan_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strchan/src/include}"
+	    chan_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/strchan/src/include}"
+	    if test -d "$chan_dir" ; then
+		AC_MSG_CHECKING([for chan include directory... $chan_dir $chan_bld])
+		if test -d "$chan_bld" -a -r "$chan_dir/$chan_what" ; then
+		    chan_cv_includes="$chan_dir $chan_bld"
+		    #chan_cv_ldadd= # "$os7_cv_master_builddir/strchan/libchan.la"
+		    #chan_cv_ldadd32= # "$os7_cv_master_builddir/strchan/lib32/libchan.la"
+		    #chan_cv_modmap="$os7_cv_master_builddir/strchan/Modules.map"
+		    #chan_cv_symver="$os7_cv_master_builddir/strchan/Module.symvers"
+		    #chan_cv_manpath="$os7_cv_master_builddir/strchan/doc/man"
+		    AC_MSG_RESULT([yes])
+		else
 		    AC_MSG_RESULT([no])
 		fi
-	    done
+	    fi
 	    AC_MSG_CHECKING([for chan include directory])
 	fi
 	if test :"${chan_cv_includes:-no}" = :no ; then
@@ -212,14 +214,14 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 		if test -d "$chan_dir" ; then
 		    chan_bld=`echo $chan_dir | sed -e "s|^$srcdir/|$chan_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    chan_dir=`(cd $chan_dir; pwd)`
-		    AC_MSG_CHECKING([for chan include directory... $chan_dir])
-		    if test -r "$chan_dir/$chan_what" ; then
+		    AC_MSG_CHECKING([for chan include directory... $chan_dir $chan_bld])
+		    if test -d "$chan_bld" -a -r "$chan_dir/$chan_what" ; then
 			chan_cv_includes="$chan_dir $chan_bld"
-			chan_cv_ldadd= # `echo "$chan_bld/../../libchan.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			chan_cv_ldadd32= # `echo "$chan_bld/../../lib32/libchan.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			chan_cv_modmap= # `echo "$chan_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			chan_cv_symver= # `echo "$chan_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			chan_cv_manpath=`echo "$chan_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#chan_cv_ldadd= # `echo "$chan_bld/../../libchan.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#chan_cv_ldadd32= # `echo "$chan_bld/../../lib32/libchan.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#chan_cv_modmap=`echo "$chan_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#chan_cv_symver=`echo "$chan_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#chan_cv_manpath=`echo "$chan_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -275,9 +277,9 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for chan include directory... $chan_dir])
 		    if test -r "$chan_dir/$chan_what" ; then
 			chan_cv_includes="$chan_dir"
-			chan_cv_modmap=
-			chan_cv_symver=
-			chan_cv_manpath=
+			#chan_cv_modmap=
+			#chan_cv_symver=
+			#chan_cv_manpath=
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -287,7 +289,8 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for chan include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for chan ldadd native],[chan_cv_ldadd],[dnl
+    AC_CACHE_CHECK([for chan ldadd native], [chan_cv_ldadd], [dnl
+	chan_cv_ldadd=
 	for chan_dir in $chan_cv_includes ; do
 	    if test -f "$chan_dir/../../libchan.la" ; then
 		chan_cv_ldadd=`echo "$chan_dir/../../libchan.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -295,14 +298,16 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for chan ldflags],[chan_cv_ldflags],[dnl
+    AC_CACHE_CHECK([for chan ldflags], [chan_cv_ldflags], [dnl
+	chan_cv_ldflags=
 	if test -z "$chan_cv_ldadd" ; then
 	    chan_cv_ldflags="-lchan"
 	else
 	    chan_cv_ldflags="-L$(dirname $chan_cv_ldadd)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for chan ldadd 32-bit],[chan_cv_ldadd32],[dnl
+    AC_CACHE_CHECK([for chan ldadd 32-bit], [chan_cv_ldadd32], [dnl
+	chan_cv_ldadd32=
 	for chan_dir in $chan_cv_includes ; do
 	    if test -f "$chan_dir/../../lib32/libchan.la" ; then
 		chan_cv_ldadd32=`echo "$chan_dir/../../lib32/libchan.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -310,14 +315,16 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for chan ldflags 32-bit],[chan_cv_ldflags32],[dnl
+    AC_CACHE_CHECK([for chan ldflags 32-bit], [chan_cv_ldflags32], [dnl
+	chan_cv_ldflags32=
 	if test -z "$chan_cv_ldadd32" ; then
 	    chan_cv_ldflags32="-lchan"
 	else
 	    chan_cv_ldflags32="-L$(dirname $chan_cv_ldadd32)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for chan modmap],[chan_cv_modmap],[dnl
+    AC_CACHE_CHECK([for chan modmap], [chan_cv_modmap], [dnl
+	chan_cv_modmap=
 	for chan_dir in $chan_cv_includes ; do
 	    if test -f "$chan_dir/../../Modules.map" ; then
 		chan_cv_modmap=`echo "$chan_dir/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -325,7 +332,8 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for chan symver],[chan_cv_symver],[dnl
+    AC_CACHE_CHECK([for chan symver], [chan_cv_symver], [dnl
+	chan_cv_symver=
 	for chan_dir in $chan_cv_includes ; do
 	    if test -f "$chan_dir/../../Module.symvers" ; then
 		chan_cv_symver=`echo "$chan_dir/../../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -333,7 +341,8 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for chan manpath],[chan_cv_manpath],[dnl
+    AC_CACHE_CHECK([for chan manpath], [chan_cv_manpath], [dnl
+	chan_cv_manpath=
 	for chan_dir in $chan_cv_includes ; do
 	    if test -d "$chan_dir/../../doc/man" ; then
 		chan_cv_manpath=`echo "$chan_dir/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

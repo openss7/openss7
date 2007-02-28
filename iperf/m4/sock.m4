@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/02/22 08:36:38 $
+# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/02/28 11:51:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
+# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.11  2007/02/28 11:51:32  brian
+# - make sure build directory exists
+#
 # Revision 0.9.2.10  2007/02/22 08:36:38  brian
 # - balance parentheses
 #
@@ -199,23 +202,22 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    sock_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strsock/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strsock/src/include}"
-	    for sock_dir in $sock_search_path ; do
-		if test -d "$sock_dir" ; then
-		    AC_MSG_CHECKING([for sock include directory... $sock_dir])
-		    if test -r "$sock_dir/$sock_what" ; then
-			sock_cv_includes="$sock_search_path"
-			sock_cv_ldadd="$os7_cv_master_builddir/strsock/libsocket.la"
-			sock_cv_ldadd32="$os7_cv_master_builddir/strsock/lib32/libsocket.la"
-			sock_cv_modmap= # "$os7_cv_master_builddir/strsock/Modules.map"
-			sock_cv_symver= # "$os7_cv_master_builddir/strsock/Module.symvers"
-			sock_cv_manpath="$os7_cv_master_builddir/strsock/doc/man"
-			AC_MSG_RESULT([yes])
-			break
-		    fi
+	    sock_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strsock/src/include}"
+	    sock_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/strsock/src/include}"
+	    if test -d "$sock_dir" ; then
+		AC_MSG_CHECKING([for sock include directory... $sock_dir $sock_bld])
+		if test -d "$sock_bld" -a -r "$sock_dir/$sock_what" ; then
+		    sock_cv_includes="$sock_dir $sock_bld"
+		    #sock_cv_ldadd="$os7_cv_master_builddir/strsock/libsocket.la"
+		    #sock_cv_ldadd32="$os7_cv_master_builddir/strsock/lib32/libsocket.la"
+		    #sock_cv_modmap="$os7_cv_master_builddir/strsock/Modules.map"
+		    #sock_cv_symver="$os7_cv_master_builddir/strsock/Module.symvers"
+		    #sock_cv_manpath="$os7_cv_master_builddir/strsock/doc/man"
+		    AC_MSG_RESULT([yes])
+		else
 		    AC_MSG_RESULT([no])
 		fi
-	    done
+	    fi
 	    AC_MSG_CHECKING([for sock include directory])
 	fi
 	if test :"${sock_cv_includes:-no}" = :no ; then
@@ -232,14 +234,14 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 		if test -d "$sock_dir" ; then
 		    sock_bld=`echo $sock_dir | sed -e "s|^$srcdir/|$sock_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    sock_dir=`(cd $sock_dir; pwd)`
-		    AC_MSG_CHECKING([for sock include directory... $sock_dir])
-		    if test -r "$sock_dir/$sock_what" ; then
+		    AC_MSG_CHECKING([for sock include directory... $sock_dir $sock_bld])
+		    if test -d "$sock_bld" -a -r "$sock_dir/$sock_what" ; then
 			sock_cv_includes="$sock_dir $sock_bld"
-			sock_cv_ldadd=`echo "$sock_bld/../../libsocket.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			sock_cv_ldadd32=`echo "$sock_bld/../../lib32/libsocket.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			sock_cv_modmap= # `echo "$sock_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			sock_cv_symver= # `echo "$sock_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			sock_cv_manpath=`echo "$sock_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#sock_cv_ldadd=`echo "$sock_bld/../../libsocket.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#sock_cv_ldadd32=`echo "$sock_bld/../../lib32/libsocket.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#sock_cv_modmap=`echo "$sock_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#sock_cv_symver=`echo "$sock_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#sock_cv_manpath=`echo "$sock_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -311,9 +313,9 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for sock include directory... $sock_dir])
 		    if test -r "$sock_dir/$sock_what" ; then
 			sock_cv_includes="$sock_dir"
-			sock_cv_modmap=
-			sock_cv_symver=
-			sock_cv_manpath=
+			#sock_cv_modmap=
+			#sock_cv_symver=
+			#sock_cv_manpath=
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -323,7 +325,8 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for sock include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for sock ldadd native],[sock_cv_ldadd],[dnl
+    AC_CACHE_CHECK([for sock ldadd native], [sock_cv_ldadd], [dnl
+	sock_cv_ldadd=
 	for sock_dir in $sock_cv_includes ; do
 	    if test -f "$sock_dir/../../libsocket.la" ; then
 		sock_cv_ldadd=`echo "$sock_dir/../../libsocket.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -331,14 +334,16 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for sock ldflags],[sock_cv_ldflags],[dnl
+    AC_CACHE_CHECK([for sock ldflags], [sock_cv_ldflags], [dnl
+	sock_cv_ldflags=
 	if test -z "$sock_cv_ldadd" ; then
 	    sock_cv_ldflags="-lsocket"
 	else
 	    sock_cv_ldflags="-L$(dirname $sock_cv_ldadd)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for sock ldadd 32-bit],[sock_cv_ldadd32],[dnl
+    AC_CACHE_CHECK([for sock ldadd 32-bit], [sock_cv_ldadd32], [dnl
+	sock_cv_ldadd32=
 	for sock_dir in $sock_cv_includes ; do
 	    if test -f "$sock_dir/../../lib32/libsocket.la" ; then
 		sock_cv_ldadd32=`echo "$sock_dir/../../lib32/libsocket.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -346,14 +351,16 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for sock ldflags 32-bit],[sock_cv_ldflags32],[dnl
+    AC_CACHE_CHECK([for sock ldflags 32-bit], [sock_cv_ldflags32], [dnl
+	sock_cv_ldflags32=
 	if test -z "$sock_cv_ldadd32" ; then
 	    sock_cv_ldflags32="-lsocket"
 	else
 	    sock_cv_ldflags32="-L$(dirname $sock_cv_ldadd32)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for sock modmap],[sock_cv_modmap],[dnl
+    AC_CACHE_CHECK([for sock modmap], [sock_cv_modmap], [dnl
+	sock_cv_modmap=
 	for sock_dir in $sock_cv_includes ; do
 	    if test -f "$sock_dir/../../Modules.map" ; then
 		sock_cv_modmap=`echo "$sock_dir/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -361,7 +368,8 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for sock symver],[sock_cv_symver],[dnl
+    AC_CACHE_CHECK([for sock symver], [sock_cv_symver], [dnl
+	sock_cv_symver=
 	for sock_dir in $sock_cv_includes ; do
 	    if test -f "$sock_dir/../../Module.symvers" ; then
 		sock_cv_symver=`echo "$sock_dir/../../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -369,7 +377,8 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for sock manpath],[sock_cv_manpath],[dnl
+    AC_CACHE_CHECK([for sock manpath], [sock_cv_manpath], [dnl
+	sock_cv_manpath=
 	for sock_dir in $sock_cv_includes ; do
 	    if test -d "$sock_dir/../../doc/man" ; then
 		sock_cv_manpath=`echo "$sock_dir/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 08:32:31 $
+# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/28 11:51:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/28 08:32:31 $ by $Author: brian $
+# Last Modified $Date: 2007/02/28 11:51:31 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: isdn.m4,v $
+# Revision 0.9.2.4  2007/02/28 11:51:31  brian
+# - make sure build directory exists
+#
 # Revision 0.9.2.3  2006/12/28 08:32:31  brian
 # - use cache names for master src and build directories
 #
@@ -176,23 +179,22 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    isdn_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strisdn/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strisdn/src/include}"
-	    for isdn_dir in $isdn_search_path ; do
-		if test -d "$isdn_dir" ; then
-		    AC_MSG_CHECKING([for isdn include directory... $isdn_dir])
-		    if test -r "$isdn_dir/$isdn_what" ; then
-			isdn_cv_includes="$isdn_search_path"
-			isdn_cv_ldadd= # "$os7_cv_master_builddir/strisdn/libisdn.la"
-			isdn_cv_ldadd32= # "$os7_cv_master_builddir/strisdn/lib32/libisdn.la"
-			isdn_cv_modmap= # "$os7_cv_master_builddir/strisdn/Modules.map"
-			isdn_cv_symver= # "$os7_cv_master_builddir/strisdn/Module.symvers"
-			isdn_cv_manpath="$os7_cv_master_builddir/strisdn/doc/man"
-			AC_MSG_RESULT([yes])
-			break
-		    fi
+	    isdn_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strisdn/src/include}"
+	    isdn_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/strisdn/src/include}"
+	    if test -d "$isdn_dir" ; then
+		AC_MSG_CHECKING([for isdn include directory... $isdn_dir $isdn_bld])
+		if test -d "$isdn_bld" -a -r "$isdn_dir/$isdn_what" ; then
+		    isdn_cv_includes="$isdn_dir $isdn_bld"
+		    #isdn_cv_ldadd= # "$os7_cv_master_builddir/strisdn/libisdn.la"
+		    #isdn_cv_ldadd32= # "$os7_cv_master_builddir/strisdn/lib32/libisdn.la"
+		    #isdn_cv_modmap="$os7_cv_master_builddir/strisdn/Modules.map"
+		    #isdn_cv_symver="$os7_cv_master_builddir/strisdn/Module.symvers"
+		    #isdn_cv_manpath="$os7_cv_master_builddir/strisdn/doc/man"
+		    AC_MSG_RESULT([yes])
+		else
 		    AC_MSG_RESULT([no])
 		fi
-	    done
+	    fi
 	    AC_MSG_CHECKING([for isdn include directory])
 	fi
 	if test :"${isdn_cv_includes:-no}" = :no ; then
@@ -209,14 +211,14 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 		if test -d "$isdn_dir" ; then
 		    isdn_bld=`echo $isdn_dir | sed -e "s|^$srcdir/|$isdn_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    isdn_dir=`(cd $isdn_dir; pwd)`
-		    AC_MSG_CHECKING([for isdn include directory... $isdn_dir])
-		    if test -r "$isdn_dir/$isdn_what" ; then
+		    AC_MSG_CHECKING([for isdn include directory... $isdn_dir $isdn_bld])
+		    if test -d "$isdn_bld" -a -r "$isdn_dir/$isdn_what" ; then
 			isdn_cv_includes="$isdn_dir $isdn_bld"
-			isdn_cv_ldadd= # `echo "$isdn_bld/../../libisdn.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			isdn_cv_ldadd32= # `echo "$isdn_bld/../../lib32/libisdn.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			isdn_cv_modmap= # `echo "$isdn_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			isdn_cv_symver= # `echo "$isdn_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			isdn_cv_manpath=`echo "$isdn_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#isdn_cv_ldadd= # `echo "$isdn_bld/../../libisdn.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#isdn_cv_ldadd32= # `echo "$isdn_bld/../../lib32/libisdn.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#isdn_cv_modmap=`echo "$isdn_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#isdn_cv_symver=`echo "$isdn_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#isdn_cv_manpath=`echo "$isdn_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -279,9 +281,9 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for isdn include directory... $isdn_dir])
 		    if test -r "$isdn_dir/$isdn_what" ; then
 			isdn_cv_includes="$isdn_dir"
-			isdn_cv_modmap=
-			isdn_cv_symver=
-			isdn_cv_manpath=
+			#isdn_cv_modmap=
+			#isdn_cv_symver=
+			#isdn_cv_manpath=
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -291,7 +293,8 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for isdn include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for isdn ldadd native],[isdn_cv_ldadd],[dnl
+    AC_CACHE_CHECK([for isdn ldadd native], [isdn_cv_ldadd], [dnl
+	isdn_cv_ldadd=
 	for isdn_dir in $isdn_cv_includes ; do
 	    if test -f "$isdn_dir/../../libisdn.la" ; then
 		isdn_cv_ldadd=`echo "$isdn_dir/../../libisdn.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -299,14 +302,16 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for isdn ldflags],[isdn_cv_ldflags],[dnl
+    AC_CACHE_CHECK([for isdn ldflags], [isdn_cv_ldflags], [dnl
+	isdn_cv_ldflags=
 	if test -z "$isdn_cv_ldadd" ; then
 	    isdn_cv_ldflags= # '-lisdn'
 	else
 	    isdn_cv_ldflags= # "-L$(dirname $isdn_cv_ldadd)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for isdn ldadd 32-bit],[isdn_cv_ldadd32],[dnl
+    AC_CACHE_CHECK([for isdn ldadd 32-bit], [isdn_cv_ldadd32], [dnl
+	isdn_cv_ldadd32=
 	for isdn_dir in $isdn_cv_includes ; do
 	    if test -f "$isdn_dir/../../libisdn.la" ; then
 		isdn_cv_ldadd32=`echo "$isdn_dir/../../lib32/libisdn.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -314,14 +319,16 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for isdn ldflags 32-bit],[isdn_cv_ldflags32],[dnl
+    AC_CACHE_CHECK([for isdn ldflags 32-bit], [isdn_cv_ldflags32], [dnl
+	isdn_cv_ldflags32=
 	if test -z "$isdn_cv_ldadd32" ; then
 	    isdn_cv_ldflags32= # '-lisdn'
 	else
 	    isdn_cv_ldflags32= # "-L$(dirname $isdn_cv_ldadd32)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for isdn modmap],[isdn_cv_modmap],[dnl
+    AC_CACHE_CHECK([for isdn modmap], [isdn_cv_modmap], [dnl
+	isdn_cv_modmap=
 	for isdn_dir in $isdn_cv_includes ; do
 	    if test -f "$isdn_dir/../../Modules.map" ; then
 		isdn_cv_modmap=`echo "$isdn_dir/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -329,7 +336,8 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for isdn symver],[isdn_cv_symver],[dnl
+    AC_CACHE_CHECK([for isdn symver], [isdn_cv_symver], [dnl
+	isdn_cv_symver=
 	for isdn_dir in $isdn_cv_includes ; do
 	    if test -f "$isdn_dir/../../Module.symvers" ; then
 		isdn_cv_symver=`echo "$isdn_dir/../../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -337,7 +345,8 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for isdn manpath],[isdn_cv_manpath],[dnl
+    AC_CACHE_CHECK([for isdn manpath], [isdn_cv_manpath], [dnl
+	isdn_cv_manpath=
 	for isdn_dir in $isdn_cv_includes ; do
 	    if test -d "$isdn_dir/../../doc/man" ; then
 		isdn_cv_manpath=`echo "$isdn_dir/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
