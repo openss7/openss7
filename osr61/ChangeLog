@@ -1,5 +1,22 @@
 2007-02-28  Brian Bidulock  <bidulock@openss7.org>
 
+	* m4/chan.m4: make sure build directory exists
+	* m4/genksyms.m4: make sure build directory exists
+	* m4/inet.m4: make sure build directory exists
+	* m4/isdn.m4: make sure build directory exists
+	* m4/iso.m4: make sure build directory exists
+	* m4/kernel.m4: make sure build directory exists
+	* m4/nsl.m4: make sure build directory exists
+	* m4/sctp.m4: make sure build directory exists
+	* m4/sigtran.m4: make sure build directory exists
+	* m4/sock.m4: make sure build directory exists
+	* m4/ss7.m4: make sure build directory exists
+	* m4/strcomp.m4: make sure build directory exists
+	* m4/streams.m4: make sure build directory exists
+	* m4/voip.m4: make sure build directory exists
+	* m4/xns.m4: make sure build directory exists
+	* m4/xti.m4: make sure build directory exists
+
 	* acinclude.m4: #ifdef instead of #if
 	* doc/manual/bugs.texi: updates and corrections
 	* doc/manual/news.texi: updates and corrections
