@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.5 2007/01/08 16:23:14 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.6 2007/02/28 06:30:41 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/08 16:23:14 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:30:41 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: descrip.texi,v $
+@c Revision 0.9.2.6  2007/02/28 06:30:41  brian
+@c - updates and corrections, #ifdef instead of #if
+@c
 @c Revision 0.9.2.5  2007/01/08 16:23:14  brian
 @c - final updates for release
 @c
@@ -124,7 +127,7 @@ on this device driver support delivery of the raw octet streams associated with 
 channel.
 
 @item mx(4)
-The @manpage{mx(4)} multiplexing pseudo-device driver is a fully functional matrix swithing device
+The @manpage{mx(4)} multiplexing pseudo-device driver is a fully functional matrix switching device
 capable of switching, performing rate adaption, echo cancellation, digital padding, conferencing,
 tones, announcements, detection of tones, detection of speech, continuity tests, progress tones,
 A-law/mu-law conversion, decompression/compression, comb filtering, and other functions of a digital
@@ -157,7 +160,7 @@ the historical @manpage{zaptel(4)} interface for asterisk and other open-PBX pac
 @manpage{zaptel(4)}.
 
 @item cd_hdlc(4)
-The @manpage{cd_hdlc(4)} module is a pushable @dfn{STREAMS} module that provides the capabilties of
+The @manpage{cd_hdlc(4)} module is a pushable @dfn{STREAMS} module that provides the capabilities of
 the High-Level Data Link Control and can be pushed over a raw @manpage{ch(4)} channel to provide a
 Communications Device Interface (CDI) or Data Link Provider Interface (DLPI) suitable for use with
 ISO/OSI protocols, X.25, ISDN or Frame Relay.
@@ -185,7 +188,7 @@ the Link Access Procedure (D-Channel) Q.921 and can be pushed over an @manpage{h
 provide a Data Link Provider Interface (DLPI) suitable for use with ISDN, Q.931, protocols.
 
 @item llc(4)
-The @manpage{llc(4)} module is a @dfn{STREAMS} pseudo-device driver that provides the capabilites of
+The @manpage{llc(4)} module is a @dfn{STREAMS} pseudo-device driver that provides the capabilities of
 the Logical Link Control, ISO 8802, and provides a Data Link Provider Interface (DLPI) suitable for
 use with OSI protocols.  This pseudo-device driver hook into the Linux packet handling system.
 @end ignore

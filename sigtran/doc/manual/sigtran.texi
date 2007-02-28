@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: sigtran.texi,v 0.9.2.2 2006/12/31 13:37:38 brian Exp $
+% @(#) $Id: sigtran.texi,v 0.9.2.3 2007/02/28 06:30:32 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/12/31 13:37:38 $ by $Author: brian $
+% Last Modified $Date: 2007/02/28 06:30:32 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -401,6 +401,9 @@ package.
 @smallexample
 
 $Log: sigtran.texi,v $
+Revision 0.9.2.3  2007/02/28 06:30:32  brian
+- updates and corrections, #ifdef instead of #if
+
 Revision 0.9.2.2  2006/12/31 13:37:38  brian
 - documentation updates for release
 
@@ -413,7 +416,7 @@ Revision 0.9.2.1  2006/10/16 10:42:45  brian
 @unnumberedsubsec ISO 9000 Compliance
 
 Only the @TeX{}, texinfo, or roff source for this manual is controlled.  An opaque (printed,
-postscript or portable manual format) version of this manual is an @strong{UNCONTROLLED
+postscript or portable document format) version of this manual is an @strong{UNCONTROLLED
 VERSION}.
 
 @node Disclaimer
@@ -640,7 +643,7 @@ This manual uses @cite{texinfo} typographic conventions.
 @section Drivers
 @cindex drivers
 
-The configuration of @dfn{STREAMS} drivers is peformed when compiling the
+The configuration of @dfn{STREAMS} drivers is performed when compiling the
 @cite{@value{PACKAGE_TITLE}} subsystem.  The @dfn{SIGTRAN} subsystem, core drivers are part of every
 @cite{@value{PACKAGE_TITLE}} system.
 
@@ -882,7 +885,7 @@ add-on packages are required, the order of these directives would be: @samp{-I/u
 -I/usr/include/strnsl -I/usr/include/strxnet -I/usr/include/strxns -I/usr/include/strtty
 -I/usr/include/strcompat -I/usr/include/streams}.
 
-Following are the user visable header files provided by the
+Following are the user visible header files provided by the
 @command{@value{PACKAGE}-@value{VERSION}} package in directory @file{/usr/include/@value{PACKAGE}}:
 
 @table @file
@@ -979,7 +982,7 @@ with specific drivers or modules may also be required.
 
 @subsubsection Kernel Space Drivers and Modules
 
-Typical include files for writing @dfn{STREAMS} modules and drivers for kernel sapce include the
+Typical include files for writing @dfn{STREAMS} modules and drivers for kernel space include the
 @file{sys/cmn_err.h}, @file{sys/kmem.h}, @file{sys/dki.h}, @file{sys/stream.h}, @file{sys/ddi.h},
 @file{sys/strconf.h}, @file{sys/ua_lm.h} header files.  Additional header files for interacting with
 specific drivers or modules may also be required.
@@ -1016,7 +1019,7 @@ Link to the @file{/usr/lib/libstreams.a} static library.
 Developing @dfn{STREAMS} kernel modules is similar to user space programs with regard to header
 files.  @file{/usr/include/@value{PACKAGE}} should be placed as an include directory to search in
 the @command{gcc} command line.  The rules for compiling @cite{Linux} kernel modules should be
-followed.  In particular, several important intracacies should be considered:
+followed.  In particular, several important intricacies should be considered:
 
 @itemize @bullet
 
@@ -1030,7 +1033,7 @@ kernel.
 
 @item
 The @command{gcc} command line must define several important kernel defines including
-@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the base name of the module.
 
 @item
 The @command{gcc} command line must include several important include files directly on the command

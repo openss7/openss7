@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.22 2006/09/18 01:06:12 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.23 2007/02/28 06:30:12 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/09/18 01:06:12 $ by $Author: brian $
+% Last Modified $Date: 2007/02/28 06:30:12 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -403,6 +403,9 @@ package.
 @smallexample
 
 $Log: LiS.texi,v $
+Revision 1.1.6.23  2007/02/28 06:30:12  brian
+- updates and corrections, #ifdef instead of #if
+
 Revision 1.1.6.22  2006/09/18 01:06:12  brian
 - updated manuals and release texi docs
 
@@ -529,7 +532,7 @@ Revision 1.1.2.3  2003-12-16 17:23:42 -0700  brian
 - Added XTI/TLI package into release.
 
 Revision 1.1.2.2  2003-12-16 05:21:04 -0700  brian
-- Added liscense files and extra distributions.
+- Added license files and extra distributions.
 
 Revision 1.1.2.1  2003-12-15 16:38:03 -0700  brian
 - New info documentation.
@@ -542,7 +545,7 @@ file LiS.texi was initially added on branch LIS-2-16-16-autoconf.
 @unnumberedsubsec ISO 9000 Compliance
 
 Only the @TeX{}, texinfo, or roff source for this manual is controlled.  An opaque (printed,
-postscript or portable manual format) version of this manual is an @strong{UNCONTROLLED
+postscript or portable document format) version of this manual is an @strong{UNCONTROLLED
 VERSION}.
 
 @node Disclaimer
@@ -1104,7 +1107,7 @@ driver, and whose minor number is the major number of the driver to
 which the clone open is to be directed.
 @pgindex /dev
 
-The clone driver's open routine forwards the open call to the target
+The clone driver's open routine transfers the open call to the target
 driver, passing a unique flag that informs the driver that a clone
 open is being requested.  The target driver then allocated a minor
 device number to uniquely associate with this instance of the open
@@ -1195,12 +1198,12 @@ allocated to cover the requested number of minor devices (if
 available, else an error will occur in strconf(8)).  The number
 allocated will include one minor device per major number to be used as
 a fifo-specific clone minor device (specifically, minor number 0),
-which exhibits special behavior.
+which exhibits special behaviour.
 @pgindex Config
 
 Normally, when cloning is done via the clone pseudo-driver, the clone
 major device number is used, along with the desired actual major
-number as the minor device num ber.  When an open() is performed on
+number as the minor device number.  When an open() is performed on
 such a device, the clone open() routine in turn calls the appropriate
 driver's open(), with the sflag parameter set to CLONEOPEN.  The
 driver's open() is expected in this case to allocate an unused minor
@@ -1217,7 +1220,7 @@ the same STREAMS-based file; at the same time, opens of different file
 system nodes via different paths will open their respectively
 different STREAMS-based files.  This is essentially how kernel-based
 fifos behave -applications and users of STREAMS-based fifos don't have
-to keep track of minor numbers to achieve this same behavior when it
+to keep track of minor numbers to achieve this same behaviour when it
 is desired.
 
 It is in fact recommended that only two forms of file sys tem nodes be
@@ -1428,7 +1431,7 @@ If the data transmission operation fails, a @code{DL_UDERROR_IND} is sent
 upstream.  There is no response in the case of success.
 
 @vrindex DL_UNITDATA_IND
-For data received from the Linux network driver, LDL forwards a copy
+For data received from the Linux network driver, LDL transfers a copy
 of the received data in a @code{DL_UNITDATA_IND} DLPI message to each client
 whose stream is attached to the particular network driver and who has
 a SAP bound to the stream that matches the SAP information in the
@@ -1455,7 +1458,7 @@ structure differs for each type of ic_cmd.
 internal option flags for the open stream.  See ldl.c source for details.
 @tpindex struct ldl_flags_ioctl
 
-@item LDL_FINDPPA @tab IN: char[] OUT: long @tab The agrument is an ASCII
+@item LDL_FINDPPA @tab IN: char[] OUT: long @tab The argument is an ASCII
 string representing a network device mnemonic such as "eth0." If such a
 device can be found then the argument is overwritten with a long word
 whose numerical value can be used as the dl_ppa field of a
@@ -1488,10 +1491,10 @@ Ole Husgaard @email{sparre@@login.dknet.dk}
 
 @unnumberedsubsec Description
 
-This driver is used by LiS and the strtst utility to assist in the
-regression testing of LiS.  It connects two streams together in a
-manner similar to that of a pipe.  Messages written into one stream
-can be read back from the other.
+This driver is used by LiS and the @manpage{strtst(8)} utility to assist in the
+regression testing of LiS.  It connects two streams together in a manner similar
+to that of a pipe.  Messages written into one stream can be read back from the
+other.
 
 The driver can be operated as a clone device with the two streams
 being connected via ioctls.  A number of ioctls exist that tailor the
@@ -1516,8 +1519,8 @@ minor device can be discovered via the LOOP_GET_DEV ioctl.
 @pgindex /dev/loop.1
 
 @item LOOP_PUTNXT @tab None @tab Set the driver into a mode in which it
-will perform a direct putnext call on the other stream rather than the
-default behavior of using the service queue to forward the message.
+will perform a direct @manpage{putnext(9)} call on the other stream rather than
+the default behaviour of using the service queue to forward the message.
 
 @item LOOP_MSGLVL @tab IN: int @tab Set to the number of messages to queue
 in the service queue before forwarding to the other stream.  Zero means
@@ -1532,13 +1535,13 @@ next n messages before forwarding them to the other stream.
 @item LOOP_GET_DEV @tab OUT: int @tab Return the minor device number of
 this stream.  Useful for finding out the minor number of a clone device.
 
-@item LOOP_BUFCALL @tab None @tab Use the bufcall mechanism to allocate a
-buffer for copying the next message.
+@item LOOP_BUFCALL @tab None @tab Use the @manpage{bufcall(9)} mechanism to
+allocate a buffer for copying the next message.
 
 @item LOOP_CONCAT @tab IN: int @tab Concatenate this many messages into a
 single message and then forward on the other stream.  One concatenation
 resets this value to zero and the ioctl needs to be issued again to repeat
-the behavior.
+the behaviour.
 
 @item LOOP_COPY @tab None @tab From this point on, copy messages rather
 than passing them through to the other stream.
@@ -1714,8 +1717,8 @@ user.
 
 
 The ioctl function call returns zero upon success or -1 on failure.
-Upon failure errno is set to the error number describing the failure,
-usually either EFAULT or EINVAL.
+Upon failure @manpage{errno(3)} is set to the error number describing the
+failure, usually either EFAULT or EINVAL.
 
 Note that the sad driver is a standard AT&T STREAMS function.  More
 comprehensive documentation for this driver can be found in the
@@ -1960,9 +1963,9 @@ relay2
 @unnumberedsubsec Description
 
 These are two names for the same module.  All the module does is forward
-STREAMS messages along on the stream using putnext.  These modules are used in
-the testing of LiS but are not otherwise useful.  One could use the source
-code as a starting point for coding a pushable STREAMS module.
+STREAMS messages along on the stream using @manpage{putnext(9)}.  These modules
+are used in the testing of LiS but are not otherwise useful.  One could use the
+source code as a starting point for coding a pushable STREAMS module.
 
 @unnumberedsubsec Author
 
@@ -2251,7 +2254,7 @@ referred to a "global commands."
 @pgindex /usr/sbin
 
 A second group is built in the LiS installation directory and left there.  This
-second group is oriented more towards testing of LiS than towards its operation.
+second group is oriented more toward testing of LiS than toward its operation.
 These commands remain undocumented since they are primarily intended for the use
 of the authors of the modules that they test.
 
@@ -2288,7 +2291,7 @@ directories in his/her path.
 @unnumberedsubsubsec Description
 
 The fattach program provides a command-line interface to the
-underlying fattach(3) function.  If the -p and/or the -c option is
+underlying @manpage{fattach(3)} function.  If the -p and/or the -c option is
 specified, a STREAMS-based pipe is created and its two ends are
 alternately attached to the path names given.  In this mode of
 usage, at least two path names are required, but there need not be an
@@ -2343,7 +2346,7 @@ Upon successful completion, i.e., if all given path names are
 attached to, fattach returns 0.  Upon failure, fattach returns 1.
 However, the failure of one more attachments does not otherwise affect
 those that succeed, and the user is responsible for detaching any
-that may have succeeded if that is the desired behavior in the event
+that may have succeeded if that is the desired behaviour in the event
 of any failures.
 
 @unnumberedsubsubsec Application Usage
@@ -2357,7 +2360,7 @@ one end of which will be given to the opener, and the other end of
 which will be passed as if by the I_SENDFD ioctl to the path attached
 to the other end (e.g., the server end).  Each opener of the server
 path could poll(2) for input, receive a new pipe end using the
-I_RECVFD ioctl, and then close the server path, therefter using the
+I_RECVFD ioctl, and then close the server path, thereafter using the
 new pipe end to communicate with the corresponding opener of the
 client path (note that the sense of client and server will in fact
 depend on the application - users of the two paths need only be aware
@@ -2660,7 +2663,7 @@ With the -g option, ldltest obtains statistics maintained by the ldl
 driver and prints them out.  This is useful for troubleshooting
 protocol stack configuration since you can see whether packets
 entering ldl from either above or below was forwarded to the
-neighboring module.
+neighbouring module.
 
 By setting debug bits via the -d option, you can cause the ldl driver
 to print the contents of packets flowing into it and out of it.
@@ -2808,7 +2811,7 @@ allocations are changing dynamically.
 Print out STREAMS queue-runner thread statistics.
 
 @item -t
-Print STREAMS timing statistics.  Used inconjunction with the
+Print STREAMS timing statistics.  Used in conjunction with the
 @code{DEBUG_MEAS_TIME} debug option.
 
 @item -T
@@ -2881,8 +2884,8 @@ circumstances this option can be used to time STREAMS driver code.  It is used
 in conjunction with the -t option to print out the timing statistics.
 
 The @code{DEBUG_SAFE} option causes LiS to carefully check for NULL pointers
-when performing message passing and queueing operations such as putq and
-putnext.
+when performing message passing and queueing operations such as
+@manpage{putq(9)} and @manpage{putnext(9)}.
 
 The @code{DEBUG_CLEAN_MSG} option causes LiS to clear message data buffers to
 zero when they are allocated.  It is useful for tracking down driver problems
@@ -2961,7 +2964,7 @@ voluminous log file whose output is routed to the "messages" file
 (kernel informational messages).
 
 The output of strtst can be compared to earlier "reference" outputs to
-see if the behavior of LiS has changed as a result of modifications to
+see if the behaviour of LiS has changed as a result of modifications to
 the code.
 
 @unnumberedsubsubsec Author
@@ -3226,8 +3229,9 @@ of its kernel threads.
 @item If the decision is being made from an interrupt routine then the
 queue processing routine is not to be called directly.
 
-@item If the decision is being made from a call on the routine qenable
-then the queue processing routine is not to be called directly.
+@item If the decision is being made from a call on the routine
+@manpage{qenable(9)} then the queue processing routine is not to be called
+directly.
 
 @item The number of queues in the scheduling list affects the decision
 making process.
@@ -3290,7 +3294,7 @@ queue.  In this case, one or the other spins until the first CPU finishes
 the operation and releases the spin lock.
 
 When LiS is about to call the put procedure of a queue from the put or
-service procedure of a neighboring queue (because the driver called the
+service procedure of a neighbouring queue (because the driver called the
 putnext function), it continues to hold the lock for the calling queue
 while acquiring the lock for the destination queue.  The locks are
 acquired sequentially as the chain of putnext calls traverse the stream.
@@ -3298,11 +3302,11 @@ The locks are released in reverse order as the put procedures return.
 This has the effect of incrementally locking the entire stream as messages
 are passed from one module to another.
 
-This behavior is only of interest when modules are I_PUSHed on top of a
+This behaviour is only of interest when modules are I_PUSHed on top of a
 driver.  Otherwise, it is just the stream head write queue and the driver
 write queue that need to be locked (or other pairwise combinations such as
 the driver read queue and stream head read queue, or queues involving
-multiplexors).
+multiplexers).
 
 The lock that LiS uses has the effect of excluding multiple entries from
 different threads into the put or service procedure for a given queue.
@@ -3330,7 +3334,7 @@ the task structure before calling a service procedure on that stream.
 
 When calling put procedures, however, no such identity restoration occurs.
 So the credentials in place when a driver or module put procedure is
-invoked are those of the invoking entity.  Because the queue runner theads
+invoked are those of the invoking entity.  Because the queue runner threads
 always begin driver entry with a call to the service procedure, entries
 into the put procedures of subsequent drivers will have the credentials of
 the stream whose service procedure was called in the first instance.  When
@@ -3363,7 +3367,7 @@ Number of queue runner kernel threads.  These are the processes that
 appear as LiS-2.12:0 in a ps display.
 
 @item N-Running
-Number of qeuue runner threads that are currently active.
+Number of queue runner threads that are currently active.
 
 @item N-Requested
 The number of queues that are in the list of scheduled queues.
@@ -3402,7 +3406,7 @@ running on the particular CPU at the time that the statistics were
 sampled.
 
 @item Thread-PID
-The process id of the queue runner thread assaigned to eachCPU.
+The process id of the queue runner thread asiigned to eachCPU.
 @end table
 
 @node Operating System Interface
@@ -3429,7 +3433,7 @@ of function.
 These are routines that utilize or simulate the original PCI BIOS interface of
 the 2.0 series of kernels.  The names of these routines are changed via defines.
 Use them as if the prototypes were as follows.  You can use these routines on 2.2
-kernels even though they represent the 2.0 style of inteface.
+kernels even though they represent the 2.0 style of interface.
 
 @smallexample
 #if LINUX_VERSION_CODE < 0x020100       /* 2.0 kernel */
@@ -3937,12 +3941,12 @@ source code.
 
 This structure is distinct from a similar structure which is defined by the
 Linux kernel, but which differs significantly between the 2.2 and 2.4 kernels.
-The LiS version of this structure is oriented towards providing just enough
+The LiS version of this structure is oriented toward providing just enough
 information to allow a driver to operate the PCI device, without being concerned
 about the details of PCI bus topology.
 
 This structure is used to return information to the STREAMS driver concerning
-devices that meet certain criteria, such as device class or manufacturer devide
+devices that meet certain criteria, such as device class or manufacturer device
 identification.
 
 @smallexample
@@ -3990,7 +3994,7 @@ Given a device number and a function number, this macro will synthesize a
 dev_fcn value suitable for use in searching the bus.
 @end table
 
-The vendor and device fields contain the vendor id (manuracturer code) and the
+The vendor and device fields contain the vendor id (manufacturer code) and the
 vendor's device identifier for the device.  Devices can be searched for on the
 PCI bus by vendor and device identifier (see below).
 
@@ -4019,7 +4023,7 @@ Find the device by vendor identification and vendor device identification.  By
 passing in the pointer to the previous structure returned it is possible to find
 all devices of a given type.
 
-The routine returns NULL if there are no (more) devices for the given vender and
+The routine returns NULL if there are no (more) devices for the given vendor and
 device identifiers.
 
 Usage example:
@@ -4099,7 +4103,7 @@ source tree.  The kernel provides more functionality than is provided in LiS, so
 there are more routines documented there than are found in this interface.
 @pgindex /usr/src/linux/Documentation/DMA-mapping.txt
 
-You can use these routines in 2.2 kernels but the functions perfomed are simply
+You can use these routines in 2.2 kernels but the functions performed are simply
 approximations of the 2.4 semantics and may not work in all cases.
 
 Note that the LiS routines have simplified the kernel interface involving "DMA
@@ -4417,7 +4421,7 @@ calling the lock routine.
 LiS spin locks can be locked and unlocked in nested fashion.  When doing so, it
 is always best to use the same pair of lock and unlock routines at all levels of
 nesting for the same lock.  Mixing different types of locking can lead to
-unexpected results and non-portable behavior.
+unexpected results and non-portable behaviour.
 
 LiS allows a single thread to lock spin locks in nested fashion.  That is, the
 second and subsequent calls to the lock routine from a single thread will not
@@ -4652,7 +4656,7 @@ return code will be set to -EINTR.
 
 The function @command{lis_down_nosig}
 @findex lis_down_nosig
-waits for the sempahore with signals blocked.  It is useful in driver close
+waits for the semaphore with signals blocked.  It is useful in driver close
 routines that must use a semaphore to control access to the structures that need
 to be deallocated.  It is common for the driver close routine to be called from
 a process that has been signalled -- for example a process that was killed with
@@ -4746,7 +4750,7 @@ forever.
 
 Note that the LiS splstr and splx functions are written in terms of LiS spin
 locks.  LiS does not use these routines internally.  They are provided to the user
-for backwards compatibility.  However, it is important to know that these
+for backward compatibility.  However, it is important to know that these
 routines are spin locks in disguise.  This means that the order of use of these
 functions mixed in with explicit spin lock manipulations may also lead to deadly
 embraces.
@@ -4824,7 +4828,7 @@ The trace buffer contains 4096 of these entries, maintained in a circular
 fashion.  By printing out these entries you can see the history of lock
 manipulation within LiS.  The command streams -p causes LiS to print out this
 table from within the kernel.  The resulting output can be found in
-@file{/var/log/messages} (typically).  However, in practice the system is usually hung
+@file{/var/log/messages} (typically).  However, in practise the system is usually hung
 when you need this information so you end up printing it from within the
 debugger.
 @pgindex /var/log/messages
@@ -4832,15 +4836,15 @@ debugger.
 @node Lock Semaphore and Queue Contention
 @subsection Lock Semaphore and Queue Contention
 
-The @command{streams} command can be used to enable the tracking of contetion
+The @command{streams} command can be used to enable the tracking of contention
 for locks, semaphores and STREAMS queues.  Use the command @samp{streams -D0x08}
 to enable the contention tracking.  The command @samp{streams -L} then causes
 the contention tables to be printed out.
 
 Locks and semaphores are in contention when a thread goes to spin on a lock or
-perform a @command{down} function on a sempahore, and the thread has to wait
+perform a @command{down} function on a semaphore, and the thread has to wait
 because the lock or semaphore is owned by another thread.  LiS counts such
-occurences on a per-lock basis and reports the results with the @samp{streams -L}
+occurrences on a per-lock basis and reports the results with the @samp{streams -L}
 command.
 
 Queues are in contention when the semaphore that controls access to the queue is
@@ -4948,7 +4952,7 @@ is called on a queue within a frozen stream the passed message is placed into a
 special deferred message list.  Messages are removed from this list and passed
 to the @command{put} procedure when the stream is later unfrozen.
 
-Drivers that have frozen a stream should refrain from performing queuing
+Drivers that have frozen a stream should refrain from performing queueing
 operations on queues within the stream, such as @command{getq} and
 @command{putq}.  LiS does not enforce this so one must exercise some care when
 using these routines.
@@ -4986,7 +4990,7 @@ except that it applies just to the single queue rather than to the entire
 stream.  Once significant difference is that if a pushable modules is in a
 @samp{qprocsoff} condition and a message flows into the module, STREAMS will
 route the message to the next module or driver in the chain of queues, looking
-for one that is enabled.  If no such module or driver exists, the messag will be
+for one that is enabled.  If no such module or driver exists, the message will be
 placed into the deferred message list of the queue at the far end of the chain
 of queues.  The messages will be presented to the driver put routine when
 @command{qprocon} is called.
@@ -5043,7 +5047,7 @@ The case of the routine flushband(q,band,flag) is more complicated.
 
 If the band argument is zero then special rules apply.  In this case, only
 "ordinary" messages are flushed from the queue.  The value of the flag parameter
-does not influence the operation.  In Solaris STREAMS this behavior does not
+does not influence the operation.  In Solaris STREAMS this behaviour does not
 occur.  They flush either "data messages" or "all" messages on band zero.
 Comments in the Solaris 8 source code indicate that the author of the flush code
 was somewhat confused on this point.
@@ -5296,63 +5300,63 @@ For additional details,
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{SVR 4.2 ES/MP}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from SVR 4.2 MP, , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- AIX 5L Version 5.1
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{AIX 5L Version 5.1}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from AIX 5L Version 5.1, , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- HP-UX 11.0i v2
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{HP-UX 11.0i v2}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from HP-UX 11.0i v2, , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- OSF/1 1.2/Digital UNIX/True 64
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{OSF/1 1.2/Digital UNIX/True 64}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from OSF/1 1.2/Digital UNIX, , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- UnixWare 7.1.3 (OpenUnix 8)
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{UnixWare 7.1.3 (OpenUnix 8)}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from UnixWare 7.1.3 (OpenUnix 8), , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- Solaris 9/SunOS 5.9
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{Solaris 9/SunOS 5.9}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from Solaris 9/SunOS 5.9, , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- SUPER-UX
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{SUPER-UX}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from SUPER-UX, , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- UXP/V
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{UXP/V}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from UXP/V, , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- LiS-2.16.18
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{LiS-2.16.18}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from Linux STREAMS (LiS) 2.16.18, , , porting, Linux Fast-STREAMS Porting Guide}.
 @end table
 

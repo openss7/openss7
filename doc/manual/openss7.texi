@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 0.9.2.12 2007/01/08 11:10:06 brian Exp $
+% @(#) $Id: openss7.texi,v 0.9.2.13 2007/02/28 06:30:07 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/01/08 11:10:06 $ by $Author: brian $
+% Last Modified $Date: 2007/02/28 06:30:07 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -377,7 +377,7 @@ system or feature listed herein.
 This manual is intended for a highly technical audience.  The reader should already be familiar
 with @cite{Linux} kernel programming, the @cite{Linux} file system, character devices, driver input
 and output, interrupts, software interrupt handling, scheduling, process contexts, multiprocessor
-locks, adminstration, kernel dumps, crashes, oops logs, package managers, the autoconf packaging
+locks, administration, kernel dumps, crashes, oops logs, package managers, the autoconf packaging
 system, etc.
 
 The guide is intended for installers and maintainers of @cite{@value{PACKAGE_TITLE}} software.
@@ -402,6 +402,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: openss7.texi,v $
+Revision 0.9.2.13  2007/02/28 06:30:07  brian
+- updates and corrections, #ifdef instead of #if
+
 Revision 0.9.2.12  2007/01/08 11:10:06  brian
 - updated documentation for release
 
@@ -462,7 +465,7 @@ Revision 1.1.2.1  2006/08/22 12:40:13  brian
 @unnumberedsubsec ISO 9000 Compliance
 
 Only the @TeX{}, texinfo, or roff source for this manual is controlled.  An opaque (printed,
-postscript or portable manual format) version of this manual is an @strong{UNCONTROLLED
+postscript or portable document format) version of this manual is an @strong{UNCONTROLLED
 VERSION}.
 
 @node Disclaimer
@@ -859,7 +862,7 @@ These sub-packages are described in sections following.
 @subsection sctp-@value{VERSION_SCTP}
 
 @dfn{sctp-@value{VERSION_SCTP}} is the @cite{Linux} native (Sockets) version of OpenSS7 Stream
-Control Transmission Prtocol (SCTP).  This is an implementation of SCTP built on the same protocol
+Control Transmission Protocol (SCTP).  This is an implementation of SCTP built on the same protocol
 engine core as the @dfn{STREAMS} implementation: @command{strsctp-@value{VERSION_STRSCTP}}.  This
 sub-package currently only builds for @cite{Linux} kernels in the 2.4 series; however, the
 @dfn{STREAMS} implementation (@command{strsctp-@value{VERSION_STRSCTP}}) runs on both 2.4 and 2.6
@@ -907,7 +910,7 @@ this sub-package.
 @subsection strcompat-@value{VERSION_STRCOMPAT}
 
 The @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}) package is
-an SVR 4.2 @dfn{STREAMS} compatibility package that provides @dfn{STREAMS} compatibilty for the
+an SVR 4.2 @dfn{STREAMS} compatibility package that provides @dfn{STREAMS} compatibility for the
 following mainstream @dfn{STREAMS} implementations:
 
 @itemize @bullet
@@ -975,7 +978,7 @@ this sub-package.
 @subsection strbcm-@value{VERSION_STRBCM}
 
 The @cite{STREAMS Binary Compatibility Module} (@command{strbcm-@value{VERSION_STRBCM}}) package
-was intended to provide the ability to take a precompiled binary object, pre-compiled either for
+was intended to provide the ability to take a pre-compiled binary object, pre-compiled either for
 @cite{Linux STREAMS} or @cite{Linux Fast-STREAMS} and install it onto a system running @cite{Linux
 Fast-STREAMS}.  This package would provide the ability to run older, deprecated, @cite{Lis}
 pre-compiled binaries and run them under a new production @cite{Linux Fast-STREAMS} installation.
@@ -1062,8 +1065,8 @@ this sub-package.
 
 The @cite{STREAMS XTI/TLI Library} (@command{strxnet-@value{VERSION_STRXNET}}) package
 
-This package contains drivers, modules and header files that were split off frm the @cite{Linux
-STREAMS} release so that they could be corrrected and used wtih @cite{Linux Fast-STREAMS}.  In
+This package contains drivers, modules and header files that were split off from the @cite{Linux
+STREAMS} release so that they could be corrected and used with @cite{Linux Fast-STREAMS}.  In
 particular, the standard header files (@file{sys/tihdr.h} and @file{sys/tiuser.h}) that formed part
 of the original @cite{LiS} releases from @uref{http://www.gcom.com/, GCOM} release of @cite{LiS}
 contained errors.
@@ -1106,7 +1109,7 @@ similar fashion to the XTI/TLI library package above.
 
 It was the intention of this package to provide Sockets interface capability for @cite{Linux
 STREAMS}.  Unfortunately, @cite{Linux STREAMS} does not provide the necessary capabilities for
-supporting Socket and Terminal input/output controls direclty from the @dfn{Stream head} as is
+supporting Socket and Terminal input/output controls directly from the @dfn{Stream head} as is
 necessary for proper implementation of this package.
 
 Currently, @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}) contains direct
@@ -1218,7 +1221,7 @@ on this sub-package.
 The @cite{STREAMS ISO} (@command{striso-@value{VERSION_STRISO}}) package provides pseudo-device
 drivers providing the Communications Datalink Interface (CDI) for X.21 PAD, Data Link Provider
 Interface (DLPI) for X.25 LP, Network Provider Interface (NPI) for X.25 PLP CONS and ISO CLNS, and
-Transport Provider Interace (TPI) for ISO TP0, TP1, TP2, TP3, TP4.  It also supports Ethernet LAP
+Transport Provider Interface (TPI) for ISO TP0, TP1, TP2, TP3, TP4.  It also supports Ethernet LAP
 over LLC2.  It is intended that this package support ISOT, CMOT, CMISE/CMIP for TMN management.
 
 This package is incomplete and untested and neither forms part of the build, nor part of the
@@ -1579,7 +1582,7 @@ the coordinated build and installation of the contained sub-packages.
 * strnsl Libraries::
 * strsock Libraries::
 * striso Libraries::
-* netperf Libraries::
+* osr61 Libraries::
 * LiS Libraries::
 @end menu
 
@@ -1590,7 +1593,7 @@ During the installation process of the sub-packages, subroutine libraries are bu
 the system.  For 64-bit systems that support 32-bit compatibility, two version of each library are
 built and installed: one 64-bit native library and one 32-bit compatibility library.  64-bit native
 libraries are installed to the @file{/@-usr/@-lib@-64/@-} subdirectory; 32-bit native and 32-bit
-compatiblity libraries are installed to the @file{/@-usr/@-lib/@-} subdirectory.
+compatibility libraries are installed to the @file{/@-usr/@-lib/@-} subdirectory.
 
 Libraries contained in sub-packages consist of the following:
 
@@ -1640,7 +1643,7 @@ package providing usable @manref{getmsg(2)}, @manref{getpmsg(2)}, @manref{putmsg
 @manref{putpmsg(2)} and @manref{isastream(2)} system call emulation.
 
 These libraries are also installed by the @command{streams-@value{VERSION_STREAMS}} package for
-backware compatibilty with @dfn{LiS}.
+backward compatibility with @dfn{LiS}.
 
 @end table
 
@@ -1779,7 +1782,7 @@ For more information, see @manref{netdir_getbyaddr(3)}.
 @tab Look up address in directory service by name.
 For more information, see @manref{netdir_getbyname(3)}.
 @item @manpage{netdir_options(3)} --
-@tab Perform options management on a trasnport endpoint.
+@tab Perform options management on a transport endpoint.
 For more information, see @manref{netdir_options(3)}.
 @item @manpage{netdir_perror(3)} --
 @tab Print network directory error message.
@@ -1811,9 +1814,9 @@ libraries are standard @dfn{STREAMS} interface system calls documented in the
 @cite{UNIX@registeredsymbol{} System V Release 4.2 Programmer's Manual -- STREAMS}.  Refer to the
 associated manual pages for detailed information on these subroutines.
 
-@multitable @columnfractions .25 .75
-
 @subsubsection libsockpath Library Routines
+
+@multitable @columnfractions .25 .75
 @item @manpage{accept(3)} --
 @tab Accept a transport connection.
 For more information, see @manref{accept(3)}.
@@ -1848,7 +1851,7 @@ For more information, see @manref{recvmsg(3)}.
 @tab Send data on a transport endpoint.
 For more information, see @manref{send(3)}.
 @item @manpage{sendmsg(3)} --
-@tab Send a message on a trasnport endpoint.
+@tab Send a message on a transport endpoint.
 For more information, see @manref{sendmsg(3)}.
 @item @manpage{sendto(3)} --
 @tab Send data to a transport endpoint.
@@ -1897,8 +1900,13 @@ For more information, see @manref{freesockpathent(3)}.
 
 In the future the @file{libiso} libraries will provide the SunLink X.25 interface routines.
 
-@node netperf Libraries
-@subsection netperf
+@node osr61 Libraries
+@subsection osr61
+
+Although the Dialogic@registeredsymbol{} Open System Release 6.1 contains quite a few runtime
+libraries, these libraries currently have licensing too restrictive for an open source release.
+Check the Dialogic@registeredsymbol{} @url{http://www.opensystemrelease.com/,Open System Release}
+website for how to obtain the runtime libraries.
 
 @node LiS Libraries
 @subsection LiS
@@ -1984,6 +1992,8 @@ the coordinated build and installation of the contained sub-packages.
 
 Utilities contained in sub-packages consist of the following:
 
+@emph{This section is incomplete.}
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -2056,6 +2066,7 @@ add-on packages:
 * strss7 Header Files::
 * sigtran Header Files::
 * strvoip Header Files::
+* osr61 Header Files::
 * LiS Header Files::
 @end menu
 
@@ -2393,7 +2404,7 @@ header files in @file{/usr/include/strchan}:
 @node netperf Header Files
 @subsubsection netperf
 
-The @command{netperf-@value{VERSION_NETPERF}} add-on pacakge does not provide any user-visible
+The @command{netperf-@value{VERSION_NETPERF}} add-on package does not provide any user-visible
 header files.
 
 @node strisdn Header Files
@@ -2879,6 +2890,21 @@ header files in @file{/usr/include/strvoip}:
 @tab header file for the @manref{h225(4)} driver, input-output controls.
 @end multitable
 
+@node osr61 Header Files
+@subsubsection osr61
+
+The @command{osr61-@value{VERSION_OSR}} add-on package provides the following user-visible header
+files in @file{/usr/include/osr61}:
+
+@multitable @columnfractions .25 .75
+@item @file{sys/dlgn.h}
+@tab system specific header file including declarations for the exported symbols from the
+@manpage{dlgn(4)} driver.
+@item @file{sys/ctimod.h}
+@tab system specific header file including declarations for the exported symbols from the
+@manpage{ctimod(4)} kernel module.
+@end multitable
+
 @node LiS Header Files
 @subsubsection LiS
 
@@ -2959,7 +2985,7 @@ compiler that was used to compile the kernel.
 kernel.
 
 @item The @command{gcc} command line must define several important kernel defines including
-@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the base name of the module.
 
 @item The @command{gcc} command line must include several important include files directly on the
 command line such as @samp{--include /@-lib/@-modules/@-`uname
@@ -3070,63 +3096,63 @@ For additional details,
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{SVR 4.2 ES/MP}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from SVR 4.2 MP, , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- AIX 5L Version 5.1
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{AIX 5L Version 5.1}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from AIX 5L Version 5.1, , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- HP-UX 11.0i v2
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{HP-UX 11.0i v2}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from HP-UX 11.0i v2, , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- OSF/1 1.2/Digital UNIX/True 64
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{OSF/1 1.2/Digital UNIX/True 64}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from OSF/1 1.2/Digital UNIX, , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- UnixWare 7.1.3 (OpenUnix 8)
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{UnixWare 7.1.3 (OpenUnix 8)}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from UnixWare 7.1.3 (OpenUnix 8), , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- Solaris 9/SunOS 5.9
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{Solaris 9/SunOS 5.9}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from Solaris 9/SunOS 5.9, , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- SUPER-UX
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{SUPER-UX}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from SUPER-UX, , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- UXP/V
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{UXP/V}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from UXP/V, , , porting, Linux Fast-STREAMS Porting Guide}.
 
 @item --- LiS-2.16.18
 @cite{@value{PACKAGE_TITLE}} provides compatibility functions for source level compatibility with
 @cite{LiS-2.16.18}
 and to ease porting of modules and drivers to @cite{@value{PACKAGE_TITLE}}.
-Portability considerations are mantained in a separate manual:
+Portability considerations are maintained in a separate manual:
 @pxref{Porting from Linux STREAMS (LiS) 2.16.18, , , porting, Linux Fast-STREAMS Porting Guide}.
 @end table
 

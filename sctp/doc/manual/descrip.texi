@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.2 2007/01/08 16:23:00 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.3 2007/02/28 06:30:29 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/08 16:23:00 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:30:29 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -65,7 +65,7 @@ implementation of @cite{RFC 2960} Stream Control Transmission Protocol.  For inf
 the implementation see the @file{man/sctp.7} Linux manual page and look at the test programs in
 @file{@value{PACKAGE}-@value{VERSION}/test/}.
 
-@emph{Warning}: This is prerelease code.  It is Beta but rather stable.  Nevertheless, it is
+@emph{Warning}: This is pre-release code.  It is Beta but rather stable.  Nevertheless, it is
 possible it will crash or lock your machine in some situations.  Please remember that there is
 @emph{NO WARRANTY} with this code and take appropriate precautions when attempting to run it.
 

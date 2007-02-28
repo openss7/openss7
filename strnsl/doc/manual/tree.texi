@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.3 2007/01/08 16:24:22 brian Exp $
+@c @(#) $Id: tree.texi,v 0.9.2.4 2007/02/28 06:31:22 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/08 16:24:22 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:31:22 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: tree.texi,v $
+@c Revision 0.9.2.4  2007/02/28 06:31:22  brian
+@c - updates and corrections, #ifdef instead of #if
+@c
 @c Revision 0.9.2.3  2007/01/08 16:24:22  brian
 @c - final updates for release
 @c
@@ -223,7 +226,7 @@ An incomplete info manual for the @file{libxnsl} library.  See the manual pages,
 @manref{libxnsl(3)}, instead.
 @end table
 
-@cite{@value{PACKAGE_UCNAME}} installs the following manpage macros and reference database files in
+@cite{@value{PACKAGE_UCNAME}} installs the following manual page macros and reference database files in
 the system man directory, @file{/@-usr/@-share/@-man/@-}:@footnote{Note that macro and reference
 databse files are not installed if the package is configured for cooked manpages.}
 

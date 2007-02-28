@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 0.9.2.56 2006/10/21 10:31:21 brian Exp $
+% @(#) $Id: SPG.texi,v 0.9.2.57 2007/02/28 06:30:49 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/10/21 10:31:21 $ by $Author: brian $
+% Last Modified $Date: 2007/02/28 06:30:49 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -301,13 +301,13 @@ STREAMS Drivers
 
 STREAMS Multiplexing
 
-* Multiplexors::		STREAMS Multiplexing
+* Multiplexers::		STREAMS Multiplexing
 * Connecting and Disconnecting Lower Stream::
-				STREAMS Multiplexor Connect and Disconnect Lower Stream
-* Multiplexor Construction Example::
-				STREAMS Multiplexor Construction Example
+				STREAMS Multiplexer Connect and Disconnect Lower Stream
+* Multiplexer Construction Example::
+				STREAMS Multiplexer Construction Example
 * Multiplexing Driver::		STREAMS Multiplexing Driver
-* Persistent Links::		STREAMS Multiplexor Persistent Links
+* Persistent Links::		STREAMS Multiplexer Persistent Links
 * Multiplexing Driver Design Guidelines::
 				STREAMS Multiplexing Driver Design Guidelines
 
@@ -522,7 +522,7 @@ system or feature listed herein.
 @cindex document audience
 
 This document is intended for a highly technical audience.  The reader should already be familiar
-with @cite{Linux} kernel programming, the @cite{Linux} filesystem, character devices, driver input
+with @cite{Linux} kernel programming, the @cite{Linux} file system, character devices, driver input
 and output, interrupts, software interrupt handling, scheduling, process contexts, multiprocessor
 locks, etc.
 
@@ -548,6 +548,9 @@ package.
 @smallexample
 
 $Log: SPG.texi,v $
+Revision 0.9.2.57  2007/02/28 06:30:49  brian
+- updates and corrections, #ifdef instead of #if
+
 Revision 0.9.2.56  2006/10/21 10:31:21  brian
 - updated LiS release number
 
@@ -723,7 +726,7 @@ Processing and procedures within the @dfn{STREAMS} framework.  Gives an overview
 @dfn{STREAMS} put and service routines.
 @item @ref{STREAMS Messages}
 @dfn{STREAMS} Messages, organization, types, priority, queueing, and general handling.  Discusses
-@dfn{STREAMS} messages, their structure, linkage, queuing, and interfacing with other @dfn{STREAMS}
+@dfn{STREAMS} messages, their structure, linkage, queueing, and interfacing with other @dfn{STREAMS}
 components.
 @item @ref{Polling}
 Polling of @dfn{STREAMS} file descriptors and other asynchronous application techniques.  Describes
@@ -731,7 +734,7 @@ how @dfn{STREAMS} allows user processes to monitor, control, and poll Streams to
 utilization of system resources.
 @item @ref{Modules and Drivers}
 An overview of @dfn{STREAMS} modules, drivers and multiplexing drivers.  Describes the @dfn{STREAMS}
-module and driver environment, ioctls, routines, declarations, flush handling, driver-kernel
+module and driver environment, input-output controls, routines, declarations, flush handling, driver-kernel
 interface, and also provides general design guidelines for modules and drivers.
 @item @ref{STREAMS Modules}
 Details of @dfn{STREAMS} modules, including examples.  Provides information on module construction
@@ -757,11 +760,11 @@ Collected examples.
 @item @ref{Device Numbers}
 Specifics on device numbering and the @dfn{Shadow Special Filesystem}.
 @item @ref{Multi-Threading}
-Syncrhonization for Symmetrical Multiprocessor (SMP) architectures.
+Synchronization for Symmetrical Multiprocessor (SMP) architectures.
 @item @ref{Administration}
 Administration of the @dfn{STREAMS} subsystem.
 @item @ref{STREAMS Data Structures}
-Primary @dfn{STREAMS} Data Sturctures, descriptions of their members, flags, constants and use.
+Primary @dfn{STREAMS} Data Structures, descriptions of their members, flags, constants and use.
 Summarizes data structures commonly used by @dfn{STREAMS} modules and drivers.
 @item @ref{STREAMS Message Types}
 @dfn{STREAMS} Message Type reference, with descriptions of each message type.  Describes
@@ -806,13 +809,13 @@ System calls, @dfn{STREAMS} utility routines, header files, and data structures 
 
 Variable names, pointers, and parameters are given using @command{texinfo} @var{variable}
 typesetting conventions.  Routine, field, and structure names unique to the examples are also given
-using @command{texinfo} @var{variable} typesetting convestions when they are mentioned in the text.
+using @command{texinfo} @var{variable} typesetting conventions when they are mentioned in the text.
 
 Declarations and short examples are in @command{texinfo} @samp{sample} typesetting.
 
 @command{texinfo} displays are used to show program source code.
 @ignore
-Screens are used to simulate what a user whill see on a video display screeen or to show program
+Screens are used to simulate what a user will see on a video display screen or to show program
 source code.
 @end ignore
 
@@ -956,8 +959,8 @@ process data, status, and control information.  Data processing may involve chan
 data are represented, adding/deleting header and trailer information to data, and/or
 packetizing/depacketizing data.  Status and control information includes signals and input/output
 control information.  Each module is self-contained and functionally isolated from any other
-component in the @dfn{Stream} except its two neighboring components.  The module communicates with
-its neighbors by passing messages.  The module is not a required component in @dfn{STREAMS}, whereas
+component in the @dfn{Stream} except its two neighbouring components.  The module communicates with
+its neighbours by passing messages.  The module is not a required component in @dfn{STREAMS}, whereas
 the driver is, except in a @dfn{STREAMS}-based pipe where only the @dfn{Stream head} is required.
 
 @figuresized{SPG_fig01,101,Simple Stream,4in}
@@ -1115,7 +1118,7 @@ module in the @dfn{Stream} to give the processed message to the next queue.
 
 A queue's @command{put} routine is invoked by the preceding queue's @command{put} and/or
 @command{service} routine to add a message to the current queue.  If a module does not need to
-enqueue messages, its @command{put} routine can call the neighboring queue's @command{put} routine.
+enqueue messages, its @command{put} routine can call the neighbouring queue's @command{put} routine.
 (@ref{Processing} discusses the @command{service} and @command{put} routines in more detail.)
 
 Each queue also has a pointer to an open and close routine.  The open routine of a driver is called
@@ -1173,7 +1176,7 @@ message (if present).  The message queue head and tail are contained in the queu
 
 In certain cases, messages containing urgent information (such as a break or alarm conditions) must
 pass through the @dfn{Stream} quickly.  To accommodate these cases, @dfn{STREAMS} provides multiple
-classes of message queuing priority.  All messages have an associated priority field.  Normal
+classes of message queueing priority.  All messages have an associated priority field.  Normal
 (ordinary) messages have a priority of zero.  Priority messages have a priority greater than zero.
 High priority messages are high priority by virtue of their message type.  The priority field in
 high priority messages is unused and should always be set to zero.  @dfn{STREAMS} prevents high
@@ -1261,7 +1264,7 @@ Earlier, @dfn{Streams} were described as linear connections of modules, where ea
 module is connected to at most one upstream module and one downstream module.  While this
 configuration is suitable for many applications, others require the ability to multiplex
 @dfn{Streams} in a variety of configurations.  Typical examples are terminal window facilities, and
-internetworking protocols (which might route data over several subnetworks).
+inter-networking protocols (which might route data over several subnetworks).
 
 An example of a multiplexer is one that multiplexes data from several upper @dfn{Streams} over a
 single lower @dfn{Stream}, as shown in @figref{49}.  An upper @dfn{Stream} is one that is upstream
@@ -1269,20 +1272,20 @@ from a multiplexer, and a lower @dfn{Stream} is one that is downstream from a mu
 terminal windowing facility might be implemented in this fashion, where each upper @dfn{Stream} is
 associated with a separate window.
 
-@figuresized{SPG_fig49,49,Many-to-one Multiplexor,1.5in}
+@figuresized{SPG_fig49,49,Many-to-one Multiplexer,1.5in}
 @c [strm.mltprx1.gif]
 
 A second type of multiplexer might route data from a single upper @dfn{Stream} to one of several
-lower @dfn{Streams}, as shown in @figref{50}.  An internetworking protocol could take this form,
+lower @dfn{Streams}, as shown in @figref{50}.  An inter-networking protocol could take this form,
 where each lower @dfn{Stream} links the protocol to a different physical network.
 
-@figuresized{SPG_fig50,50,One-to-many Multiplexor,1.5in}
+@figuresized{SPG_fig50,50,One-to-many Multiplexer,1.5in}
 @c [strm.mltprx2.gif]
 
 A third type of multiplexer might route data from one of many upper @dfn{Streams} to one of many
 lower @dfn{Streams}, as shown in @figref{51}.
 
-@figuresized{SPG_fig51,51,Many-to-many Multiplexor,1.5in}
+@figuresized{SPG_fig51,51,Many-to-many Multiplexer,1.5in}
 @c [strm.mltprx3.gif]
 
 The @dfn{STREAMS} mechanism supports the multiplexing of @dfn{Streams} through special pseudo-device
@@ -1291,15 +1294,15 @@ drivers.  Using a linking facility, users can dynamically build, maintain, and d
 can be further combined to form complex, multi-level multiplexed @dfn{Stream} configurations.
 
 @dfn{STREAMS} multiplexing configurations are created in the kernel by interconnecting multiple
-@dfn{Streams}.  Conceptually, there are two kinds of multiplexors: upper and lower multiplexors.
-Lower multiplexors have multiple lower @dfn{Streams} between device drivers and the multiplexer, and
-upper multiplexors have multiple upper @dfn{Streams} between user processes and the multiplexer.
+@dfn{Streams}.  Conceptually, there are two kinds of multiplexers: upper and lower multiplexers.
+Lower multiplexers have multiple lower @dfn{Streams} between device drivers and the multiplexer, and
+upper multiplexers have multiple upper @dfn{Streams} between user processes and the multiplexer.
 
 @figuresized{SPG_fig47,47,Internet Multiplexing @dfn{Stream},5in}
 @c [strm.netmlt.gif]
 
 @figref{47} is an example of the multiplexer configuration that would typically occur where
-internetworking functions were included in the system.  This configuration contains three hardware
+inter-networking functions were included in the system.  This configuration contains three hardware
 device drivers.  The @dfn{IP (Internet Protocol)} is a multiplexer.
 
 The @dfn{IP} multiplexer switches messages among the lower @dfn{Streams} or sends them upstream to
@@ -1308,7 +1311,7 @@ downstream to @samp{Module 1}, @samp{Module 2}, and @samp{Driver 3}.
 
 @figref{47} depicts the @dfn{IP} multiplexer as part of a larger configuration.  The multiplexer
 configuration, as shown in the dashed rectangle, would generally have an upper multiplexer and
-additional modules.  Multiplexors could also be cascaded below the @dfn{IP} multiplexer driver if
+additional modules.  Multiplexers could also be cascaded below the @dfn{IP} multiplexer driver if
 the device drivers were replaced by multiplexer drivers.
 
 @figuresized{SPG_fig52,52,Multiplexing @dfn{Stream},4in}
@@ -1317,7 +1320,7 @@ the device drivers were replaced by multiplexer drivers.
 @figref{52} shows a multiplexer configuration where the multiplexer (or multiplexing driver) routes
 messages between the lower @dfn{Stream} and one of the upper @dfn{Streams}.  This @dfn{Stream}
 performs X.25 multiplexing to multiple independent SVC (Switched Virtual Circuit) and PVC (Permanent
-Virtual Circuit) user processes.  Upper multiplexors are a specific application of standard
+Virtual Circuit) user processes.  Upper multiplexers are a specific application of standard
 @dfn{STREAMS} facilities that support multiple minor devices in a device driver.  This figure also
 shows that more complex configurations can be built by having one or more multiplexed drivers below
 and multiple modules above an upper multiplexer.
@@ -1331,9 +1334,9 @@ multiplexer drivers would differ significantly.  The @dfn{IP} multiplexer of @fi
 different configuration than the X.25 multiplexer, and the driver would implement its own set of
 processing and routing requirements in each configuration.
 
-In addition to upper and lower multiplexors, more complex configurations can be created by
-connecting @dfn{Streams} containing multiplexors to other multiplexer drivers.  With such a
-diversity of needs for multiplexors, it is not possible to provide general purpose multiplexer
+In addition to upper and lower multiplexers, more complex configurations can be created by
+connecting @dfn{Streams} containing multiplexers to other multiplexer drivers.  With such a
+diversity of needs for multiplexers, it is not possible to provide general purpose multiplexer
 drivers.  Rather, @dfn{STREAMS} provides a general purpose multiplexing facility.  The facility
 allows users to set up the inter-module/driver plumbing to create multiplexer configurations of
 generally unlimited interconnection.
@@ -1357,11 +1360,11 @@ output requirements.  This is discussed in @ref{STREAMS-based Terminal Subsystem
 @node Standardized Service Interfaces
 @subsection Standardized Service Interfaces
 
-@dfn{STREAMS} simplifies the creation of modules that present a service interface to any neighboring
+@dfn{STREAMS} simplifies the creation of modules that present a service interface to any neighbouring
 application program, module, or device driver.  A service interface is defined at the boundary
-between two neighbors.  In @dfn{STREAMS}, a service interface is a specified set of messages and the
+between two neighbours.  In @dfn{STREAMS}, a service interface is a specified set of messages and the
 rules that allow passage of these messages across the boundary.  A module that implements a service
-interface will receive a message from a neighbor and respond with an appropriate action (for
+interface will receive a message from a neighbour and respond with an appropriate action (for
 example, send back a request to retransmit) based on the specific message received and the preceding
 sequence of messages.
 
@@ -2148,7 +2151,7 @@ The stream head accepts the following input-output controls:
 @item @streamio{I_PUSH} @tab push a module
 @item @streamio{I_POP} @tab pop a module
 @item @streamio{I_SETSIG} @tab receive a @signal{SIGPOLL} signal when an event occurs
-@item @streamio{I_FDINSERT} @tab pass informationa about a stream
+@item @streamio{I_FDINSERT} @tab pass information about a stream
 @item @streamio{I_STR} @tab generate an @manpage{ioctl(2)} to a streams module
 @item @streamio{I_SENDFD} @tab send a file descriptor down a stream
 @item @streamio{I_LINK} @tab link a stream under a multiplexer
@@ -2168,7 +2171,7 @@ The stream head accepts the following input-output controls:
 @item @streamio{I_ATMARK} @tab see if stream head message has been marked
 @item @streamio{I_CKBAND} @tab check if message of a particular band is writable
 @item @streamio{I_GETBAND} @tab get priority band of first message at stream head
-@item @streamio{I_CANPUT} @tab cehck if given band is writable
+@item @streamio{I_CANPUT} @tab check if given band is writable
 @item @streamio{I_SETCLTIME} @tab set the time that @dfn{STREAMS} will wait while closing
 @item @streamio{I_GETCLTIME} @tab get the time that @dfn{STREAMS} will wait while closing
 @item @streamio{I_UNLINK} @tab unlink a stream from beneath a multiplexer
@@ -2214,7 +2217,7 @@ The stream head accepts the following input-output controls:
 @item @constant{STWRERR} @tab @msg{M_ERROR} for write received
 @item @constant{STRCLOSE} @tab wait for strclose to complete
 @item @constant{SNDMREAD} @tab send @msg{M_READ} msg when read issued
-@item @constant{STRHOLD} @tab coallese written messages
+@item @constant{STRHOLD} @tab coalesce written messages
 @item @constant{STRMSIG} @tab @msg{M_SIG} at head of queue
 @item @constant{STRDELIM} @tab generate delimited messages
 @item @constant{STRTOSTOP} @tab stop timeout
@@ -2623,14 +2626,14 @@ described in @ref{STREAMS Data Structures}.
 
 @figuresized{SPG_fig14,14,@dfn{Stream} Queue Relationship,5.5in}
 
-@figref{14} shows two neighboring queue pairs with links (solid vertical arrows) in both directions.
+@figref{14} shows two neighbouring queue pairs with links (solid vertical arrows) in both directions.
 When a module is pushed onto a @dfn{Stream}, @dfn{STREAMS} creates a queue pair and links each queue
-in the pair to its neighboring queue in the upstream and downstream direction.  The linkage allows
-each queue to locate its next neighbor.  This relation is implemented between adjacent queue pairs
+in the pair to its neighbouring queue in the upstream and downstream direction.  The linkage allows
+each queue to locate its next neighbour.  This relation is implemented between adjacent queue pairs
 by the @var{q_next} pointer.  Within a queue pair, each queue locates its mate (see dashed arrows in
 @figref{14}) by use of @dfn{STREAMS} macros, since there is no pointer between the two queues.  The
 existence of the @dfn{Stream head} and @dfn{Stream end} is known to the queue procedures only as
-destinations towards which messages are sent.
+destinations toward which messages are sent.
 
 @page
 @subsection Opening a STREAMS Device File
@@ -2639,10 +2642,10 @@ One way to construct a @dfn{Stream} is to open (see @manref{open(2)}) a @dfn{STR
 file (see @figref{15}).
 
 A @dfn{STREAMS}-based driver file is either a character device special file within a @b{Linux}
-filesystem, or a @dfn{STREAMS} special file file within the @dfn{Shadow Special Filesystem
+file system, or a @dfn{STREAMS} special file file within the @dfn{Shadow Special Filesystem
 (specfs)}.  When the @file{specfs} is mounted, @file{specfs} device nodes can be opened directly.
 When the @file{specfs} is not mounted, @file{specfs} device nodes can only be opened indirectly via
-character device nodes in a filesystem external to the @file{specfs}.
+character device nodes in a file system external to the @file{specfs}.
 
 All entry points into the driver are defined by the @mantype{streamtab(9)} structure
 for that driver.  The @type{streamtab} structure has a format as follows:
@@ -2685,12 +2688,12 @@ head} is created from a pair of @code{queue} structures.  The content of @code{s
 procedures.
 
 The @dfn{snode} contains the file system dependent information.  The @dfn{snode} is an @dfn{inode}
-within the @file{specfs} filesystem.  It is associated with the @dfn{inode} representing the device
+within the @file{specfs} file system.  It is associated with the @dfn{inode} representing the device
 by device number.  The @var{sd_inode} field of the @code{stdata} structure is initialized to point
 to the @dfn{snode}.  The @var{i_pipe} field of the @dfn{inode} data structure is initialized to
 point to the @dfn{Stream header}, thus there is a forward and backward pointer between the
 @dfn{Stream header} and the @dfn{inode}.@footnote{For those familiar with the @cite{UNIX} virtual
-filesystem approach to @dfn{STREAMS}, the @b{Linux} @dfn{file pointer} corresponds to the SVR4
+file system approach to @dfn{STREAMS}, the @b{Linux} @dfn{file pointer} corresponds to the SVR4
 @dfn{vnode} and the @dfn{inode} corresponds to the the common @dfn{vnode}.}
 
 The @dfn{private_data} member of the @dfn{file pointer} is initialized to point to the @dfn{Stream
@@ -2780,7 +2783,7 @@ Next, @dfn{STREAMS} allocates a pair of @code{queue} structures and initializes 
 the driver open.
 
 Then, @var{q_next} values are set and modified so that the module is interposed between the
-@dfn{Stream} head and its neighbor immediately downstream.  Finally, the module @command{open}
+@dfn{Stream} head and its neighbour immediately downstream.  Finally, the module @command{open}
 procedure (located via @code{qinit}) is called.
 
 Each push of a module is independent, even in the same @dfn{Stream}.  If the same module is pushed
@@ -3019,7 +3022,7 @@ arrive, for later processing by the @command{service} procedure.
 
 A queue will always contain a @command{put} procedure and may also contain an associated
 @command{service} procedure.  Having both a @command{put} and @command{service} procedure in a queue
-enables @dfn{STREAMS} to provide the rapid response and the queuing required in multi-user systems.
+enables @dfn{STREAMS} to provide the rapid response and the queueing required in multi-user systems.
 
 The @command{service} and @command{put} routines pointed at by a queue, and the queues themselves,
 are not associated with any process.  These routines may not sleep if they cannot continue
@@ -3054,7 +3057,7 @@ multi-user system, then this manner of processing may be good for this @dfn{Stre
 detrimental for others.  @dfn{Streams} may have to wait too long to get their turn, since each
 @command{put} procedure is called from the preceding one, and the kernel stack (or interrupt stack)
 grows with each function call.  The possibility of running off the stack exists, thus panicking the
-system or producing undeterminate results.
+system or producing indeterminate results.
 
 @subsection Service Procedure
 
@@ -3109,7 +3112,7 @@ for example, it detects and reports line and modem status, but does not check pa
 Communications software support for these terminals is provided via a @dfn{STREAMS} based
 asynchronous protocol.  The protocol includes a variety of options that are set when a terminal
 operator dials in to log on.  The options are determined by a @dfn{STREAMS} user process,
-@command{getstrm}, which analyzes data sent to it through a series of dialogs (prompts and
+@command{getstrm}, which analyzes data sent to it through a series of dialogues (prompts and
 responses) between the process and terminal operator.
 
 The process sets the terminal options for the duration of the connection by pushing modules onto the
@@ -3211,7 +3214,7 @@ example, parity is checked only when the characters are sent upstream.  This rel
 which the checking must occur, that is, it can be deferred along with the canonical processing.
 @constant{CHARPROC} uses @manpage{putq(9)} to schedule the (original) message for parity check processing
 by its read @command{service} procedure.  When the @constant{CHARPROC} read @command{service} procedure
-is complete, it forwards the message to the read @command{put} procedure of @constant{CANONPROC}.  Note
+is complete, it transfers the message to the read @command{put} procedure of @constant{CANONPROC}.  Note
 that if parity checking was not required, the @constant{CHARPROC} @command{put} procedure would call the
 @constant{CANONPROC} @command{put} procedure directly.
 
@@ -3517,7 +3520,7 @@ can be categorized as upstream, downstream, or bidirectional.  @msg{M_DATA}, @ms
 intended to be sent upstream to be processed only by the @dfn{Stream head}.  Messages intended to be
 sent downstream are silently discarded if received by the @dfn{Stream head}.
 
-@dfn{STREAMS} enables modules to create messages and pass them to neighboring modules.  However, the
+@dfn{STREAMS} enables modules to create messages and pass them to neighbouring modules.  However, the
 @manpage{read(2)} and @manpage{write(2)} system calls are not sufficient to enable a user process to
 generate and receive all such messages.  First, read and write are byte-stream oriented with no
 concept of message boundaries.  To support service interfaces, the message boundary of each service
@@ -3547,7 +3550,7 @@ present, setting @var{flags} to @samp{0} generates an @msg{M_PROTO} message.  If
 @constant{RS_HIPRI}, an @msg{M_PCPROTO} message is generated.
 
 The @dfn{Stream} head guarantees that the control part of a message generated by @manpage{putmsg(2)}
-is at least @samp{64} bytes in length.  This promotes reusability of the buffer.  When the buffer is
+is at least @samp{64} bytes in length.  This promotes reuse of the buffer.  When the buffer is
 a reasonable size, modules and drivers may reuse the buffer for other headers.
 
 The @code{strbuf} structure is used to describe the control and data parts of a message, and has the
@@ -4267,7 +4270,7 @@ only for flow control.
 @manpage{qenable(9)}, another flow control utility, allows a module or driver to cause one of its
 queues, or another module's queues, to be scheduled.  @manpage{qenable(9)} might also be used when a
 module or driver wants to delay message processing for some reason.  An example of this is a buffer
-module that gathers messages in its message queue and forwards them as a single, larger message.
+module that gathers messages in its message queue and transfers them as a single, larger message.
 This module uses @manpage{noenable(9)} to inhibit its @command{service} procedure and queues
 messages with its @command{put} procedure until a certain byte count or "in queue" time has been
 reached.  When either of these conditions is met, the module calls @manpage{qenable(9)} to cause its
@@ -4286,12 +4289,12 @@ interrupt routines).  Put routines are generally called at @var{str} priority.
 
 Flow control and scheduling mechanisms are closely related.  They are also influenced by other parts
 of the kernel such as the memory management routines and the system call mechanism.  The following
-subsections describ how the variables and data structures for flow control and scheduling are used,
+subsections describes how the variables and data structures for flow control and scheduling are used,
 and how the individual procedures work together.
 
 @subsubsection Flow Control Variables
 
-The flow control mechanism uses the @member{q_flag} bitmask in the @mantype{queue(9)} structure to
+The flow control mechanism uses the @member{q_flag} bit mask in the @mantype{queue(9)} structure to
 hold state information.  The flag values are described as follows:
 
 @multitable @columnfractions .20 .80
@@ -4468,7 +4471,7 @@ independent of the underlying protocols and physical communication media.
 
 Each @dfn{STREAMS} module provides a set of processing functions, or services, and an interface to those
 services.  The service interface of a module defines the interaction between that module and any
-neighboring modules, and is a necessary component for providing module substitution.  By creating a
+neighbouring modules, and is a necessary component for providing module substitution.  By creating a
 well defined service interface, applications and @dfn{STREAMS} modules can interact with any module that
 supports that interface.  @figref{26} demonstrates this.
 
@@ -4520,14 +4523,14 @@ will reside in a header file associated with the service interface.
  * Primitives initiated by the service user.
  */
 #define BIND_REQ 1              /* bind request */
-#define UNITDATA_REQ 2          /* unitdata request */
+#define UNITDATA_REQ 2          /* unit data request */
 
 /*
  * Primitives initiated by the service provider.
  */
-#define OK_ACK 3                /* bind acknowledgment */
-#define ERROR_ACK 4             /* error acknowledgment */
-#define UNITDATA_IND 5          /* unitdata indication */
+#define OK_ACK 3                /* bind acknowledgement */
+#define ERROR_ACK 4             /* error acknowledgement */
+#define UNITDATA_IND 5          /* unit data indication */
 
 /*
  * The following structure definitions define the format of the
@@ -4538,18 +4541,18 @@ struct bind_req @{               /* bind request */
     long PRIM_type;             /* always BIND_REQ */
     long BIND_addr;             /* addr to bind */
 @};
-struct unitdata_req @{           /* unitdata request */
+struct unitdata_req @{           /* unit data request */
     long PRIM_type;             /* always UNITDATA_REQ */
     long BEST_addr;             /* destination addr */
 @};
-struct ok_ack @{                 /* positive acknowledgment */
+struct ok_ack @{                 /* positive acknowledgement */
     long PRIM_type;             /* always OK_ACK */
 @};
-struct error_ack @{              /* error acknowledgment */
+struct error_ack @{              /* error acknowledgement */
     long PRIM_type;             /* always ERROR_ACK */
     long UNIX_error;            /* UNIX system error code */
 @};
-struct unitdata_ind @{           /* unitdata indication */
+struct unitdata_ind @{           /* unit data indication */
     long PRIM_type;             /* always UNITDATA_IND */
     long SRC_addr;              /* source addr */
 @};
@@ -4890,13 +4893,13 @@ The service interface primitives are defined in the declarations:
 /* Primitives initiated by the service user */
 
 #define BIND_req 1              /* bind request */
-#define UNITDATA_REQ 2          /* unitdata request */
+#define UNITDATA_REQ 2          /* unit data request */
 
 /* Primitives initiated by the service provider */
 
-#define OK_ACK 3                /* bind acknowledgment */
-#define ERROR_ACK 4             /* error acknowledgment */
-#define UNITDATA_IND 5          /* unitdata indication */
+#define OK_ACK 3                /* bind acknowledgement */
+#define ERROR_ACK 4             /* error acknowledgement */
+#define UNITDATA_IND 5          /* unit data indication */
 /*
  * The following structures define the format of the
  * stream message block of the above primitives.
@@ -4905,18 +4908,18 @@ struct bind_req @{               /* bind request */
     long PRIM_type;             /* always BIND_REQ */
     long BIND_addr;             /* addr to bind */
 @};
-struct unitdata_req @{           /* unitdata request */
+struct unitdata_req @{           /* unit data request */
     long PRIM_type;             /* always UNITDATA_REQ */
     long DEST_addr;             /* dest addr */
 @};
-struct ok_ack @{                 /* ok acknowledgment */
+struct ok_ack @{                 /* ok acknowledgement */
     long PRIM_type;             /* always OK_ACK */
 @};
-struct error_ack @{              /* error acknowledgment */
+struct error_ack @{              /* error acknowledgement */
     long PRIM_type;             /* always ERROR_ACK */
     long UNIX_error;            /* UNIX system error code */
 @};
-struct unitdata_ind @{           /* unitdata indication */
+struct unitdata_ind @{           /* unit data indication */
     long PRIM_type;             /* always UNITDATA_IND */
     long SRC_addr;              /* source addr */
 @};
@@ -5363,7 +5366,7 @@ kernel space, the data are packaged into message blocks and processed on the usu
 
 When data are transmitted from user process to the network, data are copied from the user space to
 the kernel space, and packaged as a message block and sent to the downstream driver.  The driver
-interrupts the I/O card signaling that data are ready to be transmitted to the network.  The
+interrupts the I/O card signalling that data are ready to be transmitted to the network.  The
 controller copies the data from the kernel space to the internal buffer on the I/O card, and from
 there data are placed on the network.
 
@@ -5560,8 +5563,8 @@ struct pollfd @{
 @end smallexample
 
 For each entry in the array, @var{fd} specifies the file descriptor to be polled and events is a
-bitmask that contains the bitwise inclusive OR of events to be polled on that file descriptor.  On
-return, the revents bitmask will indicate which of the requested events has occurred.
+bit mask that contains the bitwise inclusive OR of events to be polled on that file descriptor.  On
+return, the @var{revents} bit mask will indicate which of the requested events has occurred.
 
 The example continues to process incoming data as follows:
 
@@ -5632,7 +5635,7 @@ The specified file descriptor is not associated with an open @dfn{Stream}.
 @end vtable
 
 These events may not be polled for by the user, but will be reported in @var{revents} whenever they
-occur.  As such, they are only valid in the @var{revents} bitmask.
+occur.  As such, they are only valid in the @var{revents} bit mask.
 
 The example attempts to process incoming data as quickly as possible.  However, when writing data to
 a @dfn{Stream}, the write call may block if the @dfn{Stream} is exerting flow control.  To prevent
@@ -5720,7 +5723,7 @@ signal is sent to the process group associated with the @dfn{Stream}.  If the si
 @signal{SIGPOLL}, the signal is only sent to processes that have registered for the signal by using the
 @ioctlref{I_SETSIG} @manpage{ioctl(2)}.
 
-An @msg{M_SIG} message can be used by modules or drivers that wish to insert an explicit inband
+An @msg{M_SIG} message can be used by modules or drivers that wish to insert an explicit in-band
 signal into a message @dfn{Stream}.  For example, this message can be sent to the user process
 immediately before a particular service interface message to gain the immediate attention of the
 user process.  When the @msg{M_SIG} message reaches the head of the @dfn{Stream} head read queue, a
@@ -5739,7 +5742,7 @@ describes the data available in the @code{siginfo_t} structure passed to the sig
 @item event @tab @code{si_signo} @tab @code{si_code} @tab @code{si_band} @tab @code{si_errno}
 @item @constant{S_INPUT} @tab @signal{SIGPOLL} @tab @constant{POLL_IN} @tab band readable @tab unused
 @item @constant{S_OUTPUT} @tab @signal{SIGPOLL} @tab @constant{POLL_OUT} @tab band writable @tab unused
-@item @constant{S_MSG} @tab @signal{SIGPOLL} @tab @constant{POLL_MSG} @tab band signaled @tab unused
+@item @constant{S_MSG} @tab @signal{SIGPOLL} @tab @constant{POLL_MSG} @tab band signalled @tab unused
 @item @constant{S_ERROR} @tab @signal{SIGPOLL} @tab @constant{POLL_ERR} @tab unused @tab @dfn{Stream} error
 @item @constant{S_HANGUP} @tab @signal{SIGPOLL} @tab @constant{POLL_HUP} @tab unused @tab unused
 @item @constant{S_HIPRI} @tab @signal{SIGPOLL} @tab @constant{POLL_PRI} @tab unused @tab unused
@@ -5775,7 +5778,7 @@ terminal, and do not interfere with the creation of new login sessions.
 The following defines terms associated with @dfn{Job Control}:
 
 @itemize @bullet
-@item Background Process group A process group that is a member of a sessionthat established a
+@item Background Process group A process group that is a member of a session that established a
 connection with a controlling terminal and is not the foreground process group.
 @item Controlling Process A session leader that established a connection to a controlling terminal.
 @item Controlling Terminal A terminal that is associated with a session.  Each session may have at
@@ -5986,7 +5989,7 @@ value.  The process will never return from the sleep call and the system call wi
 @end itemize
 @end ignore
 That is, if they sleep, the sleep must be interruptible (i.e., @constant{TASK_INTERRUPTIBLE} instead
-of @constant{TASK_UNINTERRUPTIBLE}).  If queue syncrhonization or synchronization variables are used
+of @constant{TASK_UNINTERRUPTIBLE}).  If queue synchronization or synchronization variables are used
 to sleep, @manref{qwait_sig(9)} should be used instead of @manref{qwait(9)} and
 @manref{SV_WAIT_SIG(9)} should be used instead of @manref{SV_WAIT(9)}.
 
@@ -7588,7 +7591,7 @@ user ids.  See note.
 
 @item  If a module or a driver wants to allocate a controlling terminal, it should send an
 @msg{M_SETOPTS} message to the @dfn{Stream} head with the @stropt{SO_ISTTY} flag set.  Otherwise
-signaling will not work on the @dfn{Stream}.
+signalling will not work on the @dfn{Stream}.
 
 @end enumerate
 
@@ -7662,11 +7665,11 @@ messages between modules.
 to enqueue a message on its own queue.  This is necessary to ensure that the various fields of the
 queue structure are maintained consistently.
 
-@item  When passing messages to a neighboring module, a module may not call @manpage{putq(9)}
-directly, but must call its neighbor module's @command{put} procedure (see @manpage{putnext(9)}).
+@item  When passing messages to a neighbouring module, a module may not call @manpage{putq(9)}
+directly, but must call its neighbour module's @command{put} procedure (see @manpage{putnext(9)}).
 However, the @var{q_qinfo} structure that points to a module's @command{put} procedure may point to
 @manpage{putq(9)} (i.e., @manpage{putq(9)} is used as the @command{put} procedure for that module).
-When a module calls a neighbor module's @command{put} procedure that is defined in this manner, it
+When a module calls a neighbour module's @command{put} procedure that is defined in this manner, it
 will be calling @manpage{putq(9)} indirectly.  If any module uses @manpage{putq(9)} as its
 @command{put} procedure in this manner, the module must define a @command{service} procedure.
 Otherwise, no messages will ever be processed by the next module.  Also, because @manpage{putq(9)}
@@ -7688,7 +7691,7 @@ switch to a different stack.
 @enumerate
 @item  If flow control is desired, a @command{service} procedure is required.  The
 @manpage{canput(9)} or @manpage{bcanput(9)} routines should be used by @command{service} procedures
-before doing @manpage{putnext(9)} to honor flow control.
+before doing @manpage{putnext(9)} to honour flow control.
 @item  The @command{service} procedure must use @manpage{getq(9)} to remove a message from its
 message queue, so that the flow control mechanism is maintained.
 @item  The @command{service} procedure should process all messages on its queue.  The only exception
@@ -8096,7 +8099,7 @@ reaches one, it looks at the total message space currently allocated at that que
 messages.  If the amount of space currently used at that queue exceeds the high water mark, the
 @manpage{canput(9)} routine sets the @constant{QWANTW} flag@footnote{Setting the @constant{QWANTW} flag on the
 queue is an indication to the @manpage{getq(9)} utility that the queue needs to be back-enabled when
-the count falls to the low water mark.} for the quueue and returns @samp{false} (zero).  If the next
+the count falls to the low water mark.} for the queue and returns @samp{false} (zero).  If the next
 queue with a @command{service} routine is within acceptable flow control limits, @manpage{canput(9)}
 simply returns @samp{true} (nonzero).
 
@@ -8428,7 +8431,7 @@ can be used by all drivers.
 
 @item In general, modules should not require the data in an @msg{M_DATA} message to follow a particular
 format, such as a specific alignment.  This makes it easier to arbitrarily push modules on top of
-each other in a sensible fashion.  Not following this rule may limit module reusability.
+each other in a sensible fashion.  Not following this rule may limit module reuse.
 
 @item Filter modules pushed between a service user and a service provider may not alter the contents
 of the @msg{M_PROTO} or @msg{M_PCPROTO} block in messages.  The contents of the data blocks may be manipulated,
@@ -8457,7 +8460,7 @@ processing typically required in drivers.
 Unlike a module, a device driver must have an interrupt routine so that it is accessible from a
 hardware interrupt as well as from the @dfn{Stream}.  A driver can have multiple @dfn{Streams}
 connected to it.  Multiple connections occur when more than one minor device of the same driver is
-in use and in the case of multiplexors (multiplexing is discussed in Multiplexing).  However, these
+in use and in the case of multiplexers (multiplexing is discussed in Multiplexing).  However, these
 particular differences are not recognized by the @dfn{STREAMS} mechanism.  They are handled by
 developer-provided code included in the driver procedures.
 
@@ -9499,24 +9502,24 @@ Also see @ref{Module Design Guidelines}.
 @chapter STREAMS Multiplexing
 @cindex STREAMS multiplexing
 @menu
-* Multiplexors::		STREAMS Multiplexing
+* Multiplexers::		STREAMS Multiplexing
 * Connecting and Disconnecting Lower Stream::
-				STREAMS Multiplexor Connect and Disconnect Lower Stream
-* Multiplexor Construction Example::
-				STREAMS Multiplexor Construction Example
+				STREAMS Multiplexer Connect and Disconnect Lower Stream
+* Multiplexer Construction Example::
+				STREAMS Multiplexer Construction Example
 * Multiplexing Driver::		STREAMS Multiplexing Driver
-* Persistent Links::		STREAMS Multiplexor Persistent Links
+* Persistent Links::		STREAMS Multiplexer Persistent Links
 * Multiplexing Driver Design Guidelines::
 				STREAMS Multiplexing Driver Design Guidelines
 @end menu
 
-@node Multiplexors
+@node Multiplexers
 @section Multiplexing
 
 This chapter describes how @dfn{STREAMS} multiplexing configurations are created and also discusses
 multiplexing drivers.  A @dfn{STREAMS} multiplexer is a driver with multiple @dfn{Streams} connected
 to it.  The primary function of the multiplexing driver is to switch messages among the connected
-@dfn{Streams}.  Multiplexor configurations are created from user level by system calls.
+@dfn{Streams}.  Multiplexer configurations are created from user level by system calls.
 
 @dfn{STREAMS} related system calls are used to set up the "plumbing," or @dfn{Stream}
 interconnections, for multiplexing drivers.  The subset of these calls that allows a user to connect
@@ -9546,30 +9549,30 @@ driver.
 As discussed in Drivers, the multiple @dfn{Streams} that represent minor devices are actually
 distinct @dfn{Streams} in which the driver keeps track of each @dfn{Stream} attached to it.  The
 @dfn{STREAMS} subsystem does not recognize any relationship between the @dfn{Streams}.  The same is
-true for @dfn{STREAMS} multiplexors of any configuration.  The multiplexed @dfn{Streams} are
+true for @dfn{STREAMS} multiplexers of any configuration.  The multiplexed @dfn{Streams} are
 distinct and the driver must be implemented to do most of the work.
 
-In addition to upper and lower multiplexors, more complex configurations can be created by
-connecting @dfn{Streams} containing multiplexors to other multiplexer drivers.  With such a
-diversity of needs for multiplexors, it is not possible to provide general purpose multiplexer
+In addition to upper and lower multiplexers, more complex configurations can be created by
+connecting @dfn{Streams} containing multiplexers to other multiplexer drivers.  With such a
+diversity of needs for multiplexers, it is not possible to provide general purpose multiplexer
 drivers.  Rather, @dfn{STREAMS} provides a general purpose multiplexing facility.  The facility
 allows users to set up the inter-module/driver plumbing to create multiplexer configurations of
 generally unlimited interconnection.
 
-@subsection Building a Multiplexor
+@subsection Building a Multiplexer
 
 This section builds a protocol multiplexer with the multiplexing configuration shown in @figref{30}.
 To free users from the need to know about the underlying protocol structure, a user-level daemon
 process will be built to maintain the multiplexing configuration.  Users can then access the
 transport protocol directly by opening the transport protocol (TP) driver device node.
 
-An internetworking protocol driver (IP) routes data from a single upper @dfn{Stream} to one of two
+An inter-networking protocol driver (IP) routes data from a single upper @dfn{Stream} to one of two
 lower @dfn{Streams}.  This driver supports two @dfn{STREAMS} connection beneath it.  These
 connections are to two distinct networks; one for the @cite{IEEE 802.3} standard via the 802.3 driver, and
 other to the @cite{IEEE 802.4} standard via the 802.4 driver.  The TP driver multiplexes upper
 @dfn{Streams} over a single @dfn{Stream} to the IP driver.
 
-@figuresized{SPG_fig30,30,Protocol Multiplexor,5in}
+@figuresized{SPG_fig30,30,Protocol Multiplexer,5in}
 
 The following example shows how this daemon process sets up the protocol multiplexer.  The necessary
 declarations and initialization for the daemon program are as follows:
@@ -9601,7 +9604,7 @@ main()
 @end smallexample
 
 This multi-level multiplexed @dfn{Stream} configuration will be built from the bottom up.
-Therefore, the example begins by first constructing the Internel Protocol (IP) multiplexer.  This
+Therefore, the example begins by first constructing the Internet Protocol (IP) multiplexer.  This
 multiplexing device driver is treated like any other software driver.  It owns a node in the
 @b{Linux} file system and is opened just like any other @dfn{STREAMS} device driver.
 
@@ -9640,14 +9643,14 @@ of these @dfn{Streams} following the @ioctlref{I_LINK} call.  The complete @dfn{
 driver has been connected below the IP driver.  The @dfn{Stream head}'s queues of the 802.4 driver
 will be used by the IP driver to manage the lower half of the multiplexer.
 
-@figuresized{SPG_fig32,32,IP Multiplexor After First Link,4in}
+@figuresized{SPG_fig32,32,IP Multiplexer After First Link,4in}
 
 @ioctlref{I_LINK} will return an integer value, called @var{muxid}, which is used by the
 multiplexing driver to identify the @dfn{Stream} just connected below it.  This @var{muxid} is
 ignored in the example, but it is useful for dismantling a multiplexer or routing data through the
 multiplexer.  Its significance is discussed later.
 
-The following sequence of system calls is used to continue building the internetworking protocol
+The following sequence of system calls is used to continue building the inter-networking protocol
 multiplexer (IP):
 
 @smallexample
@@ -9664,7 +9667,7 @@ multiplexer (IP):
 
 All links below the IP driver have now been established, giving the configuration in @figref{33}.
 
-@figuresized{SPG_fig33,33,IP Multiplexor,4in}
+@figuresized{SPG_fig33,33,IP Multiplexer,4in}
 
 The @dfn{Stream} above the multiplexing driver used to establish the lower connections is the
 controlling @dfn{Stream} and has special significance when dismantling the multiplexing
@@ -9679,7 +9682,7 @@ drivers, these modules must be added to the @dfn{Streams} associated with the me
 The number of @dfn{Streams} that can be linked to a multiplexer is restricted by the design of the
 particular multiplexer.  The manual page describing each driver describes such restrictions.
 However, only one @ioctlref{I_LINK} operation is allowed for each lower @dfn{Stream}; a single @dfn{Stream}
-cannot be linked below two multiplexors simultaneously.
+cannot be linked below two multiplexers simultaneously.
 
 Continuing with the example, the IP driver will now be linked below the transport protocol (TP)
 multiplexing driver.  As seen earlier in @figref{30}, only one link will be supported below the
@@ -9742,7 +9745,7 @@ Multi-level multiplexing configurations should be assembled from the bottom up. 
 passing of ioctls through the multiplexer is determined by the nature of the multiplexing driver and
 cannot generally be relied on.
 
-@subsection Dismantling a Multiplexor
+@subsection Dismantling a Multiplexer
 
 @dfn{Streams} connected to a multiplexing driver from above with open, can be dismantled by closing
 each @dfn{Stream} with close.  The mechanism for dismantling @dfn{Streams} that have been linked
@@ -9786,7 +9789,7 @@ However, if the process uses persistent links via the @ioctlref{I_PLINK} @manref
 multiplexer configuration would remain intact after the process exits.  Persistent links are
 described later in this chapter.
 
-@subsection Routing Data Through a Multiplexor
+@subsection Routing Data Through a Multiplexer
 
 As demonstrated, @dfn{STREAMS} provides a mechanism for building multiplexed @dfn{Stream}
 configurations.  However, the criteria on which a multiplexer routes data is driver dependent.  For
@@ -9812,8 +9815,8 @@ either different minor devices, or on a cloneable device file.  Note that any dr
 more than one minor device is considered an upper multiplexer.
 
 To connect @dfn{Streams} below a multiplexer requires additional software within the multiplexer.
-The main difference between @dfn{STREAMS} lower multiplexors and @dfn{STREAMS} device drivers are
-that multiplexors are pseudo-devices and that multiplexors have two additional qinit structures,
+The main difference between @dfn{STREAMS} lower multiplexers and @dfn{STREAMS} device drivers are
+that multiplexers are pseudo-devices and that multiplexers have two additional qinit structures,
 pointed to by fields in the @type{streamtab} structure: the lower half read-side qinit and the lower half
 write-side qinit.
 
@@ -9822,7 +9825,7 @@ The multiplexer is conceptually divided into two parts: the lower half (bottom) 
 use the usual qinit entries from the multiplexer's @type{streamtab}.  This is the same as any open of the
 @dfn{STREAMS} device.  When a lower @dfn{Stream} is linked beneath the multiplexer, the qinit
 structures at the @dfn{Stream head} are substituted by the bottom half qinit structures of the
-multiplexors.  Once the linkage is made, the multiplexer switches messages between upper and lower
+multiplexers.  Once the linkage is made, the multiplexer switches messages between upper and lower
 @dfn{Streams}.  When messages reach the top of the lower @dfn{Stream}, they are handled by
 @command{put} and @command{service} routines specified in the bottom half of the multiplexer.
 
@@ -9904,19 +9907,19 @@ series of individual unlinks.
 
 If no open references exist for a lower @dfn{Stream}, a subsequent unlink will automatically close
 the @dfn{Stream}.  Otherwise, the lower @dfn{Stream} must be closed by close following the unlink.
-@dfn{STREAMS} will automatically dismantle all cascaded multiplexors (below other multiplexing
+@dfn{STREAMS} will automatically dismantle all cascaded multiplexers (below other multiplexing
 @dfn{Streams}) if their controlling @dfn{Stream} is closed.  An @streamio{I_UNLINK} will leave lower, cascaded
 multiplexing @dfn{Streams} intact unless the @dfn{Stream} file descriptor was previously closed.
 
-@node Multiplexor Construction Example
-@section Multiplexor Construction Example
+@node Multiplexer Construction Example
+@section Multiplexer Construction Example
 
 This section describes an example of multiplexer construction and usage.  @figref{35} shows the
 @dfn{Streams} before their connection to create the multiplexing configuration of @figref{36}.
 Multiple upper and lower @dfn{Streams} interface to the multiplexer driver.  The user processes of
 @figref{36} are not shown in @figref{35}.
 
-@figuresized{SPG_fig35,35,Internet Multiplexor Before Connecting,5in}
+@figuresized{SPG_fig35,35,Internet Multiplexer Before Connecting,5in}
 
 The Ethernet, @dfn{LAPB} and @cite{IEEE 802.2} device drivers terminate links to other nodes.  The multiplexer
 driver is an Internet Protocol (IP) multiplexer that switches data among the various nodes or sends
@@ -9926,10 +9929,10 @@ function which matches the multiplexer driver and device driver interface.
 @figref{35} depicts only a portion of the full, larger
 @dfn{Stream}.  In the dotted rectangle above the IP multiplexer, there generally would be an upper
 transport control protocol (@dfn{TCP}) multiplexer, additional modules and, possibly, additional
-multiplexors in the @dfn{Stream}.  Multiplexors could also be cascaded below the IP driver if the
+multiplexers in the @dfn{Stream}.  Multiplexers could also be cascaded below the IP driver if the
 device drivers were replaced by multiplexer drivers.
 
-@figuresized{SPG_fig36,36,Internet Multiplexor After Connecting,5.5in}
+@figuresized{SPG_fig36,36,Internet Multiplexer After Connecting,5.5in}
 
 @dfn{Streams} A, B, and C are opened by the process, and modules are pushed as needed.  Two upper
 @dfn{Streams} are opened to the IP multiplexer.  The rightmost @dfn{Stream} represents multiple
@@ -9940,7 +9943,7 @@ directly connected to the IP driver.  Although not shown, modules can be pushed 
 @dfn{Stream}.
 
 After the @dfn{Streams} are opened, the supervisory process typically transfers routing information
-to the IP drivers (and any other multiplexors above the IP), and initializes the links.  As each
+to the IP drivers (and any other multiplexers above the IP), and initializes the links.  As each
 link becomes operational, its @dfn{Stream} is connected below the IP driver.  If a more complex
 multiplexing configuration is required, the IP multiplexer @dfn{Stream} with all its connected links
 can be connected below another multiplexer driver.
@@ -10077,7 +10080,7 @@ mux_mux[t] structure.
 
 The core multiplexer processing is the following: downstream data written to an upper @dfn{Stream}
 is queued on the corresponding upper write message queue if the lower @dfn{Stream} is flow
-controlled.  This allows flow control to propagate towards the @dfn{Stream head} for each upper
+controlled.  This allows flow control to propagate toward the @dfn{Stream head} for each upper
 @dfn{Stream}.  A lower write @command{service} procedure, rather than a write @command{put}
 procedure, is used so that flow control, coming up from the driver below, may be handled.
 
@@ -10167,7 +10170,7 @@ muxuwput(q, mp)
 First, there is a check to enforce that the @dfn{Stream} associated with minor device 0 will be the
 single, controlling @dfn{Stream}.  The ioctls are only accepted on this @dfn{Stream}.  As described
 previously, a controlling @dfn{Stream} is the one that issues the @streamio{I_LINK}.  Having a
-single control @dfn{Stream} is a recommended practice.  @streamio{I_LINK} and @streamio{I_UNLINK}
+single control @dfn{Stream} is a recommended practise.  @streamio{I_LINK} and @streamio{I_UNLINK}
 include a linkblk structure containing:
 
 @table @member
@@ -10184,15 +10187,15 @@ unlinks.  Since the example only supports a single link, @member{l_index} is not
 
 @end table
 
-For @streamio{I_LINK}, @member{l_qbot} is saved in muxbot and a positive acknowledgment is
+For @streamio{I_LINK}, @member{l_qbot} is saved in muxbot and a positive acknowledgement is
 generated.  From this point on, until an @streamio{I_UNLINK} occurs, data from upper queues will be
 routed through muxbot.  Note that when an @streamio{I_LINK}, is received, the lower Stream has
 already been connected.  This allows the driver to send messages downstream to perform any
-initialization functions.  Returning an @msg{M_IOCNAK} message (negative acknowledgment) in response
-to an @streamio{I_LINK} will cause the lower @dfn{Stream} to be disconnected.
+initialization functions.  Returning an @msg{M_IOCNAK} message (negative acknowledgement) in
+response to an @streamio{I_LINK} will cause the lower @dfn{Stream} to be disconnected.
 
-The @streamio{I_UNLINK} handling code nulls out muxbot and generates a positive acknowledgment.  A
-negative acknowledgment should not be returned to an @streamio{I_UNLINK}.  The @dfn{Stream head}
+The @streamio{I_UNLINK} handling code nulls out muxbot and generates a positive acknowledgement.  A
+negative acknowledgement should not be returned to an @streamio{I_UNLINK}.  The @dfn{Stream head}
 assures that the lower Stream is connected to a multiplexer before sending an @streamio{I_UNLINK}
 @msg{M_IOCTL}.
 
@@ -10464,7 +10467,7 @@ other process to dismantle the link, if the dismantling is desired, or it can le
 value in a file so that other processes may find it later.  @figref{38} shows a multiplexer after
 @streamio{I_PLINK}.
 
-@figuresized{SPG_fig38,38,Multiplexor After @streamio{I_PLINK},4in}
+@figuresized{SPG_fig38,38,Multiplexer After @streamio{I_PLINK},4in}
 
 Several users can open the @var{MUXdriver} and send data to the @var{Driver1} since the persistent
 link to the @var{Driver1} remains intact.  This is shown in the following figure.
@@ -11180,7 +11183,7 @@ The ldterm module supports the following ioctls:
 @termio{TCGETA}, @termio{TCGETS}, @termio{TCXONC}, @termio{TCFLSH}, @termio{TCSBRK},
 @termio{TIOCSWINSZ}, @termio{TIOCGWINSZ}, and @termio{JWINSIZE}.
 
-All ioctls not recognized by the ldterm module are passed downstream to the neighboring module or
+All ioctls not recognized by the ldterm module are passed downstream to the neighbouring module or
 driver.  @cite{BSD} functionality is turned off by @constant{IEXTEN} (see @manref{termio(7)}, for more details).
 
 The following messages can be received on the write-side:
@@ -11252,7 +11255,7 @@ First, the multi-byte and multi-column character handling is only enabled when t
 @command{ioctl} indicates that one of the following conditions is met:
 
 @itemize @bullet
-@item Code set consists of more than one byte (including the SS2 and/or SS3) ofcharacters, or
+@item Code set consists of more than one byte (including the SS2 and/or SS3) of characters, or
 
 @item Code set requires more than one column to display on the current device, as indicated in the
 EUC_WSET structure.
@@ -11637,7 +11640,7 @@ The pckt module does the following:
 
 @itemize @bullet
 
-@item When a message is passed to this module on its write queue, the module does noprocessing and
+@item When a message is passed to this module on its write queue, the module does no processing and
 passes the message to the next module or driver.
 
 @item The pckt module creates an @msg{M_PROTO} message when one of the following messages is passed
@@ -11779,7 +11782,7 @@ To summarize, the master driver and slave driver have the following characterist
 
 @itemize @bullet
 
-@item Each master driver has one-to-one relationship with a slave devicebased on major/minor device
+@item Each master driver has one-to-one relationship with a slave device based on major/minor device
 numbers.
 
 @item Only one open is allowed on a master device.  Multiple opens are allowed on the slave device
@@ -14303,7 +14306,7 @@ strload @{-C|--copying@}
 @end smallexample
 @subsubheading DESCRIPTION
 @dfn{@value{PACKAGE_TITLE}} drivers and modules are dynamically loaded and unloaded.  To support
-this fuction, each driver and module must have a configuration routine that performs the necessary
+this function, each driver and module must have a configuration routine that performs the necessary
 initialization and setup operations.
 
 For compatibility with @cite{AIX PSE}, @dfn{@value{PACKAGE_TITLE}} provides the @command{strload}
@@ -15503,7 +15506,7 @@ specify one of the following actions:
 @item @code{FLUSHBAND}: @tab Flush the message according to the priority associated with the band.
 @end multitable
 
-Each module passes this message to its neighbor after flushing its appropriate queue(s), until the
+Each module passes this message to its neighbour after flushing its appropriate queue(s), until the
 message reaches one of the ends of the @dfn{Stream}.
 
 Drivers are expected to include the following processing for @msg{M_FLUSH} messages.  When an
@@ -15865,9 +15868,9 @@ int canputnext(register queue_t *q);
 
 @manpage{canputnext(9)} determines if there is room left in a message queue, pointed to by
 @samp{q->q_next}.  If the queue does not have a @command{service} procedure, @manpage{canputnext(9)}
-will search further in the same direction in the @dfn{Stream} util it finds a queue containaing a
-@command{service} procedure (this is the first queue on whcih the passed message can actually be
-queued.)  If such a queue cannot be found, the search terminates ont he queue at the end of the
+will search further in the same direction in the @dfn{Stream} until it finds a queue containing a
+@command{service} procedure (this is the first queue on which the passed message can actually be
+queued.)  If such a queue cannot be found, the search terminates on the queue at the end of the
 @dfn{Stream}.  @manpage{canputnext(9)} tests the queue found by the search.  If the message queue is
 in this queue is not full, @manpage{canputnext)9)} returns 1.  This return indicates that a message
 can be @manpage{put(9)} to queue @var{q}.  If the message queue is full, @manpage{canputnext(9)}
@@ -15984,12 +15987,12 @@ If an error occurs, @manpage{esballoc(9)} returns @samp{NULL}.
 The method by which @type{free_rtn} is called is implementation specific.  Do not assume that
 @member{free_func} will or will not be called directly from @dfn{STREAMS} utility routines like
 @manpage{freeb(9)}.  The @member{free_func} function must not call another module's @command{put}
-procedure nor attempt to acquire a private lcok which may be held by another thread across a call to
-a @dfn{STREAMS} utility function which could free a message block.  Otherwise, the possiblity for
+procedure nor attempt to acquire a private lock which may be held by another thread across a call to
+a @dfn{STREAMS} utility function which could free a message block.  Otherwise, the possibility for
 lock recursion and/or deadlock exists.
 
-Note that modules and drivers using @manpage{esballoc(9)} must be prepatred to handle calls to the
-@manpage{esballoc(9)}'s callback free function after the last instance of the mdoule or driver has
+Note that modules and drivers using @manpage{esballoc(9)} must be prepared to handle calls to the
+@manpage{esballoc(9)}'s callback free function after the last instance of the module or driver has
 been closed.  To prevent the module text form being unloaded while there are outstanding
 @manpage{esballoc(9)} callbacks, modules using @manpage{esballoc(9)} must perform their own kernel
 module reference counting.
@@ -16311,7 +16314,7 @@ and the message type @var{type}.
 int putnextctl1(queue_t *q, int type, int param);
 @end smallexample
 
-@manpage{putnextctl1(9)} call @manref{putctl1(9)}, passing the queue pointex to by @samp{q->q_next},
+@manpage{putnextctl1(9)} call @manref{putctl1(9)}, passing the queue pointed to by @samp{q->q_next},
 the message type @var{type} and the one byte parameter @var{param}.
 
 @appendixsubsec putq-put a message on a queue
@@ -16351,7 +16354,7 @@ intermediate bands.}
 
 @manpage{putq(9)} is intended to be used from the @command{put} procedure in the same queue in which
 the message will be queued.  A module should not call @manpage{putq(9)} directly to pass messages to
-a neighboring module.  @manpage{putq(9)} may be used as the @member{qi_putp} @command{put} procedure
+a neighbouring module.  @manpage{putq(9)} may be used as the @member{qi_putp} @command{put} procedure
 value in either or both of a module's @mantype{qinit(9)} structures.  This effectively bypasses any
 @command{put} procedure processing and uses only the module's @command{service} procedure(s).
 
@@ -16421,7 +16424,7 @@ void qreply(register queue_t *q, mblk_t *bp);
 @manpage{qreply(9)} sends the message pointed at by @var{bp} up (or down) the @dfn{Stream} in the
 reverse direction from the queue pointed at by @var{q}.  This is done by locating the partner of
 @var{q} (see @manref{OTHERQ(9)}), and then calling the @command{put} procedure of that queue's
-neighbor (as in @manref{putnext(9)}).  @manpage{qreply(9)} is typically used to send back a response
+neighbour (as in @manref{putnext(9)}).  @manpage{qreply(9)} is typically used to send back a response
 (@msg{M_IOCACK} or @msg{M_IOCNAK} message) to an @msg{M_IOCTL} message.
 
 @appendixsubsec qsize-find the number of messages on a queue
@@ -16574,7 +16577,7 @@ void unbufcall(register int id);
 @manpage{unbufcall(9)} cancels a @manref{bufcall(9)} request.  @var{id} identifies an event returned
 by the @manref{bufcall(9)} request.
 
-@strong{Caution}: If a @manref{bufcall(9)} request is made and the callback has not occured before
+@strong{Caution}: If a @manref{bufcall(9)} request is made and the callback has not occurred before
 closing the driver, an @manpage{unbufcall(9)} must be made to cancel the scheduled callback.
 Otherwise a system crash may occur.
 
@@ -16650,7 +16653,7 @@ must be included after @header{sys/stream.h} to get function definitions instead
 @item @command{insq} @tab put a message at a specific place in a queue
 @item @command{linkb} @tab concatenate two messages into one
 @item @command{msgdsize} @tab get the number of data bytes in a message
-@item @command{msgpullup} @tab concatentate bytes in a message
+@item @command{msgpullup} @tab concatenate bytes in a message
 @item @command{noenable} @tab prevent a queue from being scheduled
 @item @command{OTHERQ} @tab get pointer to the mate queue
 @item @command{pullupmsg} @tab concatenate and align bytes in a message
@@ -17369,7 +17372,7 @@ dumpshow(mp, cmd)
 @}
 @end smallexample
 
-The situation with "cooperating modules" that seems to contradict the basic idea of reusability and
+The situation with "cooperating modules" that seems to contradict the basic idea of reuse and
 independence of modules has risen in the internationalization context (@pxref{STREAMS-based Terminal
 Subsystem}) related to input methods of languages. It turns out that some back-end processing for
 input methods can be re-used and the size of the kernel reduced from what would be necessary by
@@ -18492,7 +18495,7 @@ drivers that were written for the older system.  These are core functions in the
 
 @appendixsubsubsec Memory Alignment
 
-In attempting to unify several desparaging @cite{UNIX}-based systems (in particular @cite{XENIX}
+In attempting to unify several disparaging @cite{UNIX}-based systems (in particular @cite{XENIX}
 @cindex XENIX
 and @cite{UnixWare},
 @cindex UnixWare
@@ -19196,7 +19199,7 @@ hardware emulation module.
 
 @item @dfn{push} @tab
 @cindex push
-A term used when a muodule is inserted in a @dfn{Stream} immediately below the @dfn{Stream head}.
+A term used when a module is inserted in a @dfn{Stream} immediately below the @dfn{Stream head}.
 
 @item @dfn{pushable module} @tab
 @cindex pushable module
@@ -19303,7 +19306,7 @@ A @dfn{Stream} component closest to the user process.  It provides the interface
 @item @dfn{STREAMS} @tab
 @cindex STREAMS
 A kernel mechanism that provides the framework for network services and data communication.  It
-defines interface standards for character intput/output within the kernel, and between the kernel
+defines interface standards for character input/output within the kernel, and between the kernel
 and user level.  The @dfn{STREAMS} mechanism includes integral functions, utility routines, kernel
 facilities, and a set of structures.
 
@@ -19331,7 +19334,7 @@ are reduced to the low-water mark value, the other queue is unblocked by @dfn{ST
 
 @item @dfn{write queue} @tab
 @cindex write queue
-A message qeuue in a module or driver containing messages moving downstream.  Associated with the
+A message queue in a module or driver containing messages moving downstream.  Associated with the
 @manref{write(2)} system call and output from a user process.
 
 @item @dfn{write-side} @tab

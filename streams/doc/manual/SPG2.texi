@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG2.texi,v 0.9.2.12 2006/10/21 10:31:30 brian Exp $
+% @(#) $Id: SPG2.texi,v 0.9.2.13 2007/02/28 06:30:54 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/10/21 10:31:30 $ by $Author: brian $
+% Last Modified $Date: 2007/02/28 06:30:54 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -538,6 +538,9 @@ package.
 @smallexample
 
 $Log: SPG2.texi,v $
+Revision 0.9.2.13  2007/02/28 06:30:54  brian
+- updates and corrections, #ifdef instead of #if
+
 Revision 0.9.2.12  2006/10/21 10:31:30  brian
 - updated LiS release number
 
@@ -755,7 +758,7 @@ Portability of @dfn{STREAMS} modules and drivers written for other @cite{UNIX} i
 @dfn{STREAMS} and how they can most easily be ported into @cite{@value{PACKAGE_TITLE}}; but, for
 more details on this topic, see the @cite{@value{PACKAGE_TITLE} - @dfn{STREAMS} Portability Guide}.
 @item @ref{Data Structures}
-Primary @dfn{STREAMS} Data Sturctures, descriptions of their members, flags, constants and use.
+Primary @dfn{STREAMS} Data Structures, descriptions of their members, flags, constants and use.
 Summarizes data structures commonly used by @dfn{STREAMS} modules and drivers.
 @item @ref{Message Types}
 @dfn{STREAMS} Message Type reference, with descriptions of each message type.  Describes
@@ -1081,7 +1084,7 @@ A @dfn{STREAMS} @dfn{Module} is an optional processing element that is placed be
 the data and control information flowing in either direction on the @dfn{Stream}.  It can
 communicate with neighbouring modules, the @dfn{Stream head} or a @dfn{Driver} using @dfn{STREAMS}
 messages.  Each @dfn{Module} is self-contained in the sense that it does not directly invoke
-functions provided by, nor access datastructures of, neighbouring modules, but rather communicates
+functions provided by, nor access data structures of, neighbouring modules, but rather communicates
 data, status and control information using messages.  This functional isolation provides a loose
 coupling that permits flexible recombination and reuse of @dfn{Modules}.  A @dfn{Module} follows the
 same framework as the @dfn{Stream head} and @dfn{Driver}, has all of the same entry points and can
@@ -1121,7 +1124,7 @@ pair of queues.  One @dfn{queue} in each pair is responsible for managing the me
 Each @dfn{queue} in the pair provides pointers necessary for organizing the temporary storage and
 management of @dfn{STREAMS} messages on the @dfn{queue}, as well as function pointers to procedures
 to be invoked when messages are placed on the @dfn{queue} or need to be taken off of the
-@dfn{queue}, and pointers to auxillary and module-private data structures.  The @dfn{read-side}
+@dfn{queue}, and pointers to auxiliary and module-private data structures.  The @dfn{read-side}
 @dfn{queue} also contains function pointers to procedures used to @command{open} and @command{close}
 the @dfn{Stream head}, @dfn{Module} or @dfn{Driver} instance associated with the @dfn{queue} pair.
 @dfn{Queue} pairs are dynamically allocated when an instance of the @dfn{driver}, @dfn{module} or
@@ -1135,7 +1138,7 @@ For more information on @dfn{STREAMS Queues}, @pxref{Queue Component}.
 information or data, or both.  Messages that contain control information are intended to illicit a
 response from a neighbouring module, @dfn{Stream head} or @dfn{Stream end}.  The control information
 typically uses the message type to invoke a general function and the fields in the control part of
-the messge as arguments to a call to the function.  The data portion of a message represents
+the message as arguments to a call to the function.  The data portion of a message represents
 information that is (from the perspective of the @dfn{STREAMS} framework) unstructured.  Only
 cooperating modules, the @dfn{Stream head} or @dfn{Stream end} need know or agree upon the format of
 control or data messages.
@@ -1149,12 +1152,12 @@ typically consist of one control-type block (@constant{M_PROTO}) and zero or mor
 A set of specialized and standard message types define messages that can be sent by a @dfn{module}
 or @dfn{driver} to control the @dfn{Stream head}.  A set of specialized and standard message types
 define messages that can be sent by the @dfn{Stream head} to control a @dfn{module} or @dfn{driver},
-normaly in response to a standard input-output control for the @dfn{Stream}.
+normally in response to a standard input-output control for the @dfn{Stream}.
 
 @dfn{STREAMS} messages are passed between a module, @dfn{Stream head} or @dfn{Driver} using a
 @command{put} procedure associated with the queue in the queue pair for the direction in which
-the message is being passed.  Messages passed towards the @dfn{Stream head} are passed in the
-@dfn{upstream} direction, and those towards the @dfn{Stream end}, in the @dfn{downstream} direction.
+the message is being passed.  Messages passed toward the @dfn{Stream head} are passed in the
+@dfn{upstream} direction, and those toward the @dfn{Stream end}, in the @dfn{downstream} direction.
 The @dfn{read-side} queue in the queue pair associated with the module instance to which a message
 is passed is responsible for processing or queueing @dfn{upstream} messages; the @dfn{write-side}
 queue, for processing @dfn{downstream} messages.
@@ -1634,7 +1637,7 @@ Modules are described in greater detail in @ref{Modules}.
 
 This subsection provides a brief overview of @dfn{STREAMS drivers}.
 
-The @dfn{Device} component of the @dfn{Stream} is an inital part of the regular @dfn{Stream}
+The @dfn{Device} component of the @dfn{Stream} is an initial part of the regular @dfn{Stream}
 (positioned just below the @dfn{Stream head}).  Most @dfn{Streams} start out life as a @dfn{Stream
 head} connected to a @dfn{driver}.  The driver is positioned within the @dfn{Stream} at the
 @dfn{Stream end}.  Note that not all @dfn{Streams} require the presence of a driver: a
@@ -1727,7 +1730,7 @@ Basic @dfn{Streams} that can be created with the
 @manpage{open(2)} or
 @manpage{pipe(2)} system calls
 are linear arrangements from @dfn{Stream head} to @dfn{Driver} or @dfn{Stream head} to @dfn{Stream
-haed}.  Althoug these linear arrangements satisfy the needs of a large class of @dfn{STREAMS}
+head}.  Although these linear arrangements satisfy the needs of a large class of @dfn{STREAMS}
 applications, there exits a class of application that are more naturally represented by
 multiplexing: that is, an arrangements where one or more upper @dfn{Streams} feed into one or more
 lower @dfn{Streams}.  Network protocol stacks (a significant application are for @dfn{STREAMS}) are
@@ -1745,7 +1748,7 @@ multiple lower @dfn{Streams} in a @dfn{one-to-many} relationship as illustrated 
 @figuresized{SPG_fig50,50,One-to-many Multiplexor,1.5in}
 
 A @dfn{fan-in/fan-out} multiplexing arrangement is one in which multiple upper @dfn{Streams} feed
-into mutliple lower @dfn{Streams} in a @dfn{many-to-many} relationship as illustrated in
+into multiple lower @dfn{Streams} in a @dfn{many-to-many} relationship as illustrated in
 @figref{51}.
 
 @figuresized{SPG_fig51,51,Many-to-many Multiplexor,1.5in}
@@ -1816,7 +1819,7 @@ messages between upper @dfn{Streams} supporting @cite{Permanent Virtual Circuits
 The ability to multiplex upper @dfn{Streams} to a driver is a characteristic supported by all
 @dfn{STREAMS} drivers: not just @dfn{multiplexing drivers}.  Each
 @manpage{open(2)} to a minor
-device node results in another uppper @dfn{Stream} that can be associated with the device driver.
+device node results in another upper @dfn{Stream} that can be associated with the device driver.
 What the @dfn{multiplexing driver} permits over the normal @dfn{STREAMS} driver is the ability to
 link one or more lower @dfn{Streams} (possibly containing modules and another multiplexing driver)
 beneath it.
@@ -1845,7 +1848,7 @@ Multiplexing is described in greater detail in @ref{Multiplexing}.
 * Manipulating Modules::
 @end menu
 
-@dfn{STREAMS} provides a flexible, scalable, portable, and resuable kernel and user level facility
+@dfn{STREAMS} provides a flexible, scalable, portable, and reusable kernel and user level facility
 for the development of @cite{GNU/Linux} system communications services.  @dfn{STREAMS} allows the
 creation of kernel resident modules that offer standard message passing facilities and the ability
 for user level processes to manipulate and configure those modules into complex topologies.
@@ -1886,15 +1889,15 @@ receipt of the message (i.e., in accordance with the state of the module).
 
 Instances of protocol stacks are formed using @dfn{STREAMS} facilities for pushing modules and
 linking multiplexers.  For proper and consistent operation, protocol stacks are assembled so that
-each neighboring module, driver and multiplexer implement the same service interface.  For example,
+each neighbouring module, driver and multiplexer implement the same service interface.  For example,
 a module that implements the @cite{SS7 MTP} protocol layer, as shown in @figref{53}, presents a
 protocol service interface at it input and output sides.  Other modules, drivers and multiplexers
 should only be connected at the input and output sides of the @cite{SS7 MTP} protocol module if they
-provide the same interface in the symetric role (i.e., user or provider).
+provide the same interface in the symmetric role (i.e., user or provider).
 
 It is the ability of @dfn{STREAMS} to implement service primitive interfaces between protocol
 modules that makes it most appropriate for implementation of protocols based on the @cite{OSI}
-service primitie interface such as @cite{X.25}, @cite{Integrated Services Digital Network (ISDN)},
+service primitive interface such as @cite{X.25}, @cite{Integrated Services Digital Network (ISDN)},
 @cite{Signalling System No. 7 (SS7)}.
 
 @c ----------------------------------------
@@ -1929,8 +1932,8 @@ protocol, drivers, device implementation, and physical communications media.
 layer protocols and services.
 @end itemize
 
-The benfits of the @dfn{STREAMS} approach are protocol portability, protocol substitution, protocol
-migration, and module reusability.  Examples provided in the sections that follow are real-world
+The benefits of the @dfn{STREAMS} approach are protocol portability, protocol substitution, protocol
+migration, and module reuse.  Examples provided in the sections that follow are real-world
 examples taken from the open source @cite{Signalling System No. 7 (SS7)} stack implemented by the
 @uref{http://www.openss7.org/,OpenSS7 Project}.
 
@@ -1963,7 +1966,7 @@ of existing @dfn{STREAMS} modules to the @cite{GNU/Linux} operating system.
 @node Protocol Substitution
 @subsubsection Protocol Substitution
 
-@dfn{STREAMS} permits the easy substitution of protocol modules (or devic drivers) within a protocol
+@dfn{STREAMS} permits the easy substitution of protocol modules (or device drivers) within a protocol
 stack providing a new protocol profile.  When protocol modules are implemented to a compatible
 service interface the can be recombined and substituted, providing a flexible protocol architecture.
 In some circumstances, and through proper design, protocol modules can be substituted that implement
@@ -2081,7 +2084,7 @@ implement a @dfn{STREAMS} device driver in such a way that an application is una
 opened and is controlling a @dfn{STREAMS} device driver: the application could treat the device in
 the identical manner to a character device.  This make it possible to convert an existing character
 device driver to @dfn{STREAMS} and make possible the portability, migration, substitution and
-reusability benefits of the @dfn{STREAMS} framework.
+reuse benefits of the @dfn{STREAMS} framework.
 
 @dfn{STREAMS} provides @dfn{STREAMS}-specific system calls and
 @manpage{ioctl(2)} commands, in
@@ -2335,7 +2338,7 @@ character special file and invokes the character device open routine in
 @cite{@value{PACKAGE_TITLE}} uses the major and minor device numbers associated with the character
 special file to locate an @type{inode} within the @cite{Shadow Special File System (specfs)} that is
 also provided by @cite{@value{PACKAGE_TITLE}}, and the @member{f_inode} pointer of the file
-pointeris adjusted to point directly to this @file{specfs} @type{inode}.  This @file{specfs}
+pointer is adjusted to point directly to this @file{specfs} @type{inode}.  This @file{specfs}
 @type{inode} is equivalent to the common @type{snode} used by @cite{UNIX System V Release 4.2}.
 
 Next, a @dfn{Stream header} is created from a @mantype{stdata(9)} data structure and a @dfn{Stream
@@ -2490,7 +2493,7 @@ of the other @dfn{Stream head}.  This is illustrated in @figref{16}.
 When a @dfn{Stream} has been constructed, modules can be inserted into the @dfn{Stream} between the
 @dfn{Stream head} and the @dfn{Stream end} (or between the @dfn{Stream head} and the midpoint of a
 @dfn{STREAMS}-based pipe or FIFO.)  Addition (or pushing) of modules is accomplished by inserting
-the module into the @dfn{Stream} immediately below the @dfn{Stream head}.  Removal (or poppping) of
+the module into the @dfn{Stream} immediately below the @dfn{Stream head}.  Removal (or popping) of
 modules is accomplished by deleting the module immediately below the @dfn{Stream head} from the
 @dfn{Stream}.
 
@@ -2572,7 +2575,7 @@ links consists of issuing an @msg{M_IOCTL} message to the driver indicating the 
 operation and entering an uninterrupted wait for an acknowledgement.  Waiting for acknowledgement to
 the @msg{M_IOCTL} command can cause the close to be delayed.  If unlinking any temporary links
 results in the last reference being released to the now unlinked @dfn{Stream}, that @dfn{Stream}
-will be dismantled before proceding.
+will be dismantled before proceeding.
 
 @item Each module that is present on the @dfn{Stream} being dismantled will be popped from the
 @dfn{Stream} by calling the module's @command{close} procedure and then deleting the module instance
@@ -2623,7 +2626,7 @@ independent processing an manipulation of data passing between the driver and us
 This example is of a character conversion module is given a command and a string of characters by
 the user.  Once this command is received, the character conversion module examines all character
 passing through it for an occurrence of the characters in the command string.  When an instance of
-the string is discovered in the data path, the requested command acition is performed on matching
+the string is discovered in the data path, the requested command action is performed on matching
 characters.
 
 The declarations for the user program are shown in @ref{Listing 3.1}.
@@ -2747,7 +2750,7 @@ Converter} module.
 @subsubsection Module and Driver Control
 
 The next steps in this example are to pass control information to the module to tell it what command
-to execute on which string of characters.  A sequence that acheives this is shown in @ref{Listing
+to execute on which string of characters.  A sequence that achieves this is shown in @ref{Listing
 3.4}.  The sequence makes use of the @ioctlref{I_STR} @manref{ioctl(2)} command for @dfn{STREAMS}
 special files.
 
@@ -2957,7 +2960,7 @@ this chapter.
 @section Procedures
 
 The @command{put} and @command{service} procedures associated with a given @manref{queue(9)} in a
-module queue pair are reponsible for the processing of messages entering and leaving the queue.
+module queue pair are responsible for the processing of messages entering and leaving the queue.
 Processing within these procedures is performed according to the message type of the message being
 processed.  Messages can be modified, queued, passed in either direction on a @dfn{Stream}, freed,
 copied, duplicated, or otherwise manipulated.  In processing for typical filter module, a resulting
@@ -3011,7 +3014,7 @@ The @command{put} procedure processes a message immediately or places it onto th
 later processing (generally by the @command{service} procedure).  Because the @command{put}
 procedure is invoked before any queueing takes place, it provides a processing point at which the
 module or driver can take actions on time critical messages.  @command{put} procedures are
-executed a higher priority than @command{service} prcedures.  @command{put} propcedures in the
+executed a higher priority than @command{service} procedures.  @command{put} procedures in the
 upstream direction may even be executed with interrupts disabled.
 
 As illustrated in @figref{18a}, when a queue's @command{put} procedure is invoked by an adjacent
@@ -3030,14 +3033,14 @@ The advantage of this approach is that @command{put} processing is invoked seque
 immediately.  A disadvantage of this approach is that, if there are additional stack frames nested
 in each @command{put} procedure, the interrupt service routine stack limits can be exceeded, causing
 a kernel crash.  This is also the case for normal (non-ISR) operation and the kernel stack limits
-might be exceeded if execessive nesting of @command{put} procedures occurs.@footnote{Because the
+might be exceeded if excessive nesting of @command{put} procedures occurs.@footnote{Because the
 @dfn{Interrupt Service Routine (ISR)} stack is particularly limited, @manref{put(9)} should not be
 called from @samp{in_irq()} context under @cite{Linux}, execution of @manref{put(9)} should be
 deferred by the ISR, either with an immediate bottom half procedure (i.e., software interrupt), or
 by placing messages on the driver queue and processing from the queue's @command{service}
 proceedure: either of which run with a full kernel stack instead of an interrupt stack.}
 
-The driver and module writers need to be congnizant of the fact that a limited stack might exist at
+The driver and module writers need to be cognisant of the fact that a limited stack might exist at
 the time that the @command{put} procedure is invoked.  However, @dfn{STREAMS} also provides the
 @command{service} procedure as a way to defer processing to a @samp{!in_irq()} context.
 
@@ -3061,7 +3064,7 @@ Adjacent modules or drivers invoke a queue's @command{put} procedure.  The @comm
 can then defer processing to the @command{service} procedure in a number of ways.  The most direct
 way that a @command{put} procedure can invoke a @command{service} procedure for a message is to
 place that message on the message queue using @manref{putq(9)}.  Once the message is placed on the
-message queue in this manenr, the @command{put} procedure can return, freeing the associated stack
+message queue in this manner, the @command{put} procedure can return, freeing the associated stack
 frame.  Also, placing a message on the message queue with @manref{putq(9)} will normally result in
 the queue's @command{service} procedure being @dfn{scheduled} for later execution by the
 @dfn{STREAMS} scheduler.
@@ -3076,7 +3079,7 @@ of the list of queues awaiting @command{service} procedure execution for the @df
 scheduler.  When the @dfn{STREAMS} scheduler runs queues, each queue on the list is unlinked,
 starting at the head of the list, and its @command{service} procedure executed.
 
-To provide reponsive scheduling of @command{service} procedures without necessarily requiring a task
+To provide responsive scheduling of @command{service} procedures without necessarily requiring a task
 switch (to the @dfn{STREAMS} kernel thread), the @dfn{STREAMS} scheduler is invoked and queue
 @command{service} procedures executed within user context before returning to user level from any
 @dfn{STREAMS} system call.
@@ -3098,7 +3101,7 @@ In general, because drivers run at a software priority higher than the @dfn{STRE
 drivers calling @manref{put(9)} can cause multiple messages to be queued for service before the
 @command{service} procedure runs.  On the other hand, because the @dfn{STREAMS} scheduler is always
 invoked before return to user level at the end of a system call, it is unlikely that the @dfn{Stream
-head} calling @manref{put(9)} will result in mutliple messages being accumulated before the
+head} calling @manref{put(9)} will result in multiple messages being accumulated before the
 corresponding @command{service} procedure runs.
 
 @subsection Put and Service Procedure Summary
@@ -3112,7 +3115,7 @@ downstream messages can be independent, giving consideration to the needs of eac
 mechanism allows a flexible arrangement for the module and driver writer.
 
 @command{put} and @command{service} procedures are addressed in more detail under @ref{Modules and
-Drivers}.  Design guildlines for @command{put} and @command{service} processing are given in
+Drivers}.  Design guidelines for @command{put} and @command{service} processing are given in
 @ref{Design Guidlines}, @ref{Module Design Guidlines}, and @ref{Driver Design Guidlines}.
 
 @c ----------------------------------------------------------------------------
@@ -3127,7 +3130,7 @@ for example, it detects and reports line and modem status, but does not check pa
 Communications software support for these terminals is provided via a @dfn{STREAMS} based
 asynchronous protocol.  The protocol includes a variety of options that are set when a terminal
 operator dials in to log on.  The options are determined by a @dfn{STREAMS} user process,
-@command{getstrm}, which analyzes data sent to it through a series of dialogs (prompts and
+@command{getstrm}, which analyzes data sent to it through a series of dialogues (prompts and
 responses) between the process and terminal operator.
 
 The process sets the terminal options for the duration of the connection by pushing modules onto the
@@ -3229,7 +3232,7 @@ example, parity is checked only when the characters are sent upstream.  This rel
 which the checking must occur, that is, it can be deferred along with the canonical processing.
 @constant{CHARPROC} uses @manpage{putq(9)} to schedule the (original) message for parity check processing
 by its read @command{service} procedure.  When the @constant{CHARPROC} read @command{service} procedure
-is complete, it forwards the message to the read @command{put} procedure of @constant{CANONPROC}.  Note
+is complete, it transfers the message to the read @command{put} procedure of @constant{CANONPROC}.  Note
 that if parity checking was not required, the @constant{CHARPROC} @command{put} procedure would call the
 @constant{CANONPROC} @command{put} procedure directly.
 
@@ -3391,7 +3394,7 @@ Ordinary messages are described in detail throughout this chapter and in @ref{Me
 
 @subsubsection High Priority Messages
 
-High Priority Messages messae are listed in the table below.
+High Priority Messages message are listed in the table below.
 Messages with a @samp{D} beside them can normally travel in the @dfn{downstream} direction; with a
 @samp{U}, @dfn{upstream}.  Messages with an @samp{H} beside them can be generated by the @dfn{Stream
 head}; an @samp{M}, a module; an @samp{E}, the @dfn{Stream end} or driver.
@@ -3489,7 +3492,7 @@ buffer.  A message block (@mantype{msgb(9)} structure) is an instance of a refer
 contained in the data buffer.  Many message block structures can refer to a data block and data
 buffer.  A data block (@mantype{datab(9)} structure) contains information not contained in the data
 buffer, but directly associated with the data buffer (e.g., the size of the data buffer).  One and
-only one data block is normaly associated with each data buffer.  Data buffers can be internal to
+only one data block is normally associated with each data buffer.  Data buffers can be internal to
 the message block, data block, data buffer triplet, automatically allocated using
 @manref{kmem_alloc(9)}, or allocated by the module or driver and associated with a data block (i.e.,
 using @manref{esballoc(9)}).
@@ -3522,7 +3525,7 @@ The members of the @mantype{msgb(9)} structure are described as follows:
 @item @member{b_cont} @tab points to the next message block in the same message chain;
 @item @member{b_rptr} @tab points to the beginning of the data (the point from which to read);
 @item @member{b_wptr} @tab Points to the end of the data (the point from which to write);
-@item @member{b_datap} @tab points to the associated datablock (@mantype{datab(9)});
+@item @member{b_datap} @tab points to the associated data block (@mantype{datab(9)});
 @item @member{b_band} @tab indicates the priority band;
 @item @member{b_pad1} @tab provides padding; and
 @item @member{b_flag} @tab holds flags for this message block.  Flags are normally set only on the first
@@ -3574,7 +3577,7 @@ The following flags are defined by @cite{SVR 4.2}:
 
 @multitable @columnfractions .25 .75
 @item @constant{MSGMARK} @tab  last byte of message is marked
-@item @constant{MSGNOLOOP} @tab  don't loop mesage at stream head
+@item @constant{MSGNOLOOP} @tab  don't loop message at Stream head
 @item @constant{MSGDELIM} @tab  message is delimited
 @end multitable
 
@@ -3634,7 +3637,7 @@ The following members are defined by @cite{SVR 4.2}:
 @item @member{db_frtnp} @tab pointer to an routine to free an extended buffer;
 @item @member{db_base} @tab base of the buffer (first usable byte);
 @item @member{db_lim} @tab limit of the buffer (last usable byte plus 1);
-@item @member{db_ref} @tab numer of references to this data block by message blocks;
+@item @member{db_ref} @tab number of references to this data block by message blocks;
 @item @member{db_type} @tab the data block type (i.e., @dfn{STREAMS} message type);
 @item @member{db_class} @tab the class of the message (normal or high priority);
 @item @member{db_iswhat} @tab another name for @member{db_class};
@@ -3671,7 +3674,7 @@ buffer associated with the message block.  Multiple message blocks can be chaine
 type of the first message block (its @member{db_type}) determines the type of the overall message.
 For example, a message consisting of an @msg{M_IOCTL} message block followed by an @msg{M_DATA}
 message block is considered to be an @msg{M_IOCTL} message.  Other message block members of the
-first message block, such as @member{b_band}, also apply to the entire message.  The intial message
+first message block, such as @member{b_band}, also apply to the entire message.  The initial message
 block of a message block chain can be queued onto a message queue (with the @member{b_next} and
 @member{b_prev} pointers).  The chaining of message blocks into messages using the @member{b_cont}
 pointer, and linkage onto message queues using the @member{b_next} and @member{b_prev} pointers, are
@@ -3690,7 +3693,7 @@ message block can refer to the same data block.  This is illustrated in @figref{
 the second message block of @samp{Message 1} shares a data block with the second message block of
 @samp{Message 2}.  Message blocks that share data blocks result from use of the @manref{dupb(9)} and
 @manref{dupmsg(9)} @dfn{STREAMS} utilities.  The first of these utilities, @manref{dupb(9)}, will
-duplicate a message block, obtiaining a new reference to the data block.  The @member{db_ref} member
+duplicate a message block, obtaining a new reference to the data block.  The @member{db_ref} member
 of the associated data block will be increased by one to indicate the number of message blocks that
 refer to this data block.  The second of these utilities, @manref{dupmsg(9)} duplicate all of the
 message blocks in a message, following the @member{b_cont} pointers, resulting in a duplicated
@@ -3713,7 +3716,7 @@ that define the range of data used by the reference.  The @member{b_rptr} indica
 the range of data in the data buffer, and represents the position at which a module or driver would
 begin reading data; the @member{b_wptr}, the end of the range of data, where a module or driver
 would begin writing data.  The data block, on the other hand, has two pointers representing the
-absolute limits of the data buffer.  The @member{db_base} indicates the begining of the data buffer;
+absolute limits of the data buffer.  The @member{db_base} indicates the beginning of the data buffer;
 @member{db_lim}, the end.  This relationship between pointers into the data buffer is illustrated in
 @figref{21b}.
 
@@ -3732,7 +3735,7 @@ by the module or driver write: an appropriate @dfn{STREAMS} message utility shou
 * getpmsg(2s)::			Priority message read(2)-like system call.
 @end menu
 
-As shown in the message lists of @ref{Messages Overview}, a large subsset of the available message
+As shown in the message lists of @ref{Messages Overview}, a large subset of the available message
 types can be generated and consumed by modules and drivers.  Another subset, are dedicated to
 generation and consumption by the @dfn{Stream head}.
 
@@ -3896,7 +3899,7 @@ return.
 @end table
 
 On call, the integer pointed to by @var{flagsp} can contain @samp{0} indicating that the first
-available message is to be retrieved regardless of priotity; or, @samp{RS_HIPRI}, indicating that
+available message is to be retrieved regardless of priority; or, @samp{RS_HIPRI}, indicating that
 only the first high priority message is to be retrieved and no low priority message.
 On successful return, the integer pointed to by @var{flagsp} will contain @samp{0} to indicate that
 the message retrieved was an ordinary message (@msg{M_PROTO} or just @msg{M_DATA}), or
@@ -3907,10 +3910,10 @@ The members of the @mantype{strbuf(5)} structure are interpreted by @manref{getm
 
 @multitable @columnfractions .15 .85
 @item @member{maxlen} @tab specifies the maximum length of the buffer into which the message part is
-to be writen;
+to be written;
 @item @member{len} @tab ignored by @manref{getmsg(2)} on call, but set on return to indicate the
 length of the data that was actually written to the buffer by @manref{getmsg(2)}; and,
-@item @member{buf} @tab specifies the location of the data buffer to contain the data retrived for 
+@item @member{buf} @tab specifies the location of the data buffer to contain the data retrieved for 
 the control or data part of the message.
 @end multitable
 
@@ -3935,7 +3938,7 @@ int @b{putpmsg}(int @i{fildes}, const struct strbuf *@i{ctlptr},
 @end example
 @end cartouche
 
-The arguments to @manref{putpmsg(2s)} are intepreted the same as those for @manref{putmsg(2)} as
+The arguments to @manref{putpmsg(2s)} are interpreted the same as those for @manref{putmsg(2)} as
 described in @ref{putmsg(2)} with the exception of the @var{band} and @var{flags} arguments.
 
 The @var{band} argument provides a band number to be placed in the @member{b_band} member of the
@@ -3966,7 +3969,7 @@ For additional details, see the @manref{putpmsg(2s)} or @manref{putpmsg(2p)} ref
 @subsubsection getpmsg(2s)
 
 @manref{getpmsg(2s)} is similar to @manref{getmsg(2)}, but provides the additional ability to
-specify the queue priority band (@member{b_band}) of the retreived message.  The prototype for the
+specify the queue priority band (@member{b_band}) of the retrieved message.  The prototype for the
 @manref{getpmsg(2s)} system call is exposed by including the @header{sys/stropts.h} system header
 file.  The prototype for the @manref{getpmsg(2s)} system call is as follows:
 
@@ -3993,13 +3996,13 @@ On call, specifies that an orinary message of message band @var{bandp} or greate
 On return, indicates that an ordinary message was retrieved of the band returned in @var{bandp}.
 @item MSG_HIPRI
 On call, specifies that a high priority message is to be retrieved.  On return, indicates that a
-high priority message was retreived.
+high priority message was retrieved.
 @end table
 
 On call, @var{bandp} is ignored unless @var{flagsp} specifies @samp{MSG_BAND}.  When @samp{MSG_BAND}
 is specified, @var{bandp} specifies the minimum band number of the message to be retrieved.  On
 return, @var{bandp} indicates the band number (@member{b_band}) of the retrieved message, or
-@samp{0} if the retreived message was a high priority message.
+@samp{0} if the retrieved message was a high priority message.
 
 Under @cite{@value{PACKAGE_TITLE}},
 @manref{getmsg(2)} is implemented as a library call to @manref{getpmsg(2s)}.  This is possible
@@ -4048,7 +4051,7 @@ to the current discussion are the read and write options associated with the @df
 
 User level processes can also alter the read and write options associated with the @dfn{Stream
 head}.  User level processes use the @ioctlref{I_SRDOPT}, @ioctlref{I_GRDOPT}, @ioctlref{I_SWROPT}
-and @ioctlref{I_GWROPT} @manref{ioctl(2)} commands to acheive the same purpose as the
+and @ioctlref{I_GWROPT} @manref{ioctl(2)} commands to achieve the same purpose as the
 @msg{M_SETOPTS} message used by modules and drivers.
 
 @node Read Options
@@ -4230,7 +4233,7 @@ from a queue's @command{put} procedure, but they may also be queued to the messa
 queue, a high priority message will always cause the @command{service} procedure of the queue (if
 any) to be scheduled for execution by the @dfn{STREAMS} scheduler.  When a @command{service}
 procedure runs, and a message is retrieved from the message queue (e.g., with @manref{getq(9)}),
-high priority messages will always be retrieved first.  High priority messges must be acted upon
+high priority messages will always be retrieved first.  High priority messages must be acted upon
 immediately by a @command{service} procedure, it is not possible to place a high priority message
 back on a queue with @manref{putbq(9)}.
 
@@ -4278,7 +4281,7 @@ breaking binary modules compiled against the older definitions.  @manref{strqget
 @manref{strqset(9)} provide structure independent access to these members.
 
 @item On @dfn{Symetric Multi-Processing (SMP)} architectures, it may be necessary to protect access
-to a member of these structures to guarnatee atomicity of operations.  @manref{strqget(9)} and
+to a member of these structures to guarantee atomicity of operations.  @manref{strqget(9)} and
 @manref{strqset(9)} provide necessary locking on @dfn{SMP} architectures.
 
 @end itemize
@@ -4404,7 +4407,7 @@ manual page.
 
 Aside from the @manref{putpmsg(2)} and @manref{getpmsg(2)} system calls, a number of
 @manref{streamio(7)} commands associated with queueing and priorities can be issued by a user level
-process using the @manref{ioctl(2)} system call.  The intput output controls that accept a queue
+process using the @manref{ioctl(2)} system call.  The input output controls that accept a queue
 band or indicate a queue band event are as follows:
 
 @table @ioctlref
@@ -4515,7 +4518,7 @@ where,
 @item arg @tab contains the band number for which to check for flow control.
 @end multitable
 
-Checsk whether message can be written to the queue band specified by @var{arg}.  @var{arg} is an
+Checks whether message can be written to the queue band specified by @var{arg}.  @var{arg} is an
 integer which contains the queue band to test for flow control.  @var{arg} can also have the
 following value:
 
@@ -4595,7 +4598,7 @@ possible values of the @var{arg} argument are as follows:
 
 @table @constant
 @item ANYMARK
-Determine if the message at the head of the @dfn{Stream head} read queue is makred by a donwstream
+Determine if the message at the head of the @dfn{Stream head} read queue is marked by a downstream
 module or driver.
 @item LASTMARK
 Determine if the message at the head of the @dfn{Stream head} read queue is the last message that is
@@ -4616,7 +4619,7 @@ terminates with the amount of data read.  The resulting short read is an indicat
 a marked message could exist on the read queue.  (Short reads can also result from zero-byte data,
 or from a delimited message: one with the @constant{MSGDELIM} flag set in @member{b_flag}).  When a
 short read occurs, the user should test for a marked message using the @constant{ANYMARK} flag to
-the @ioctlref{I_ATMARK} @manref{ioctl(2)} command.  A subsesuent @manref{read(2)} will consume the
+the @ioctlref{I_ATMARK} @manref{ioctl(2)} command.  A subsequent @manref{read(2)} will consume the
 marked message following the marked message.  This can be checked by using the @constant{LASTMARK}
 flag to the @ioctlref{I_ATMARK} @manref{ioctl(2)} command.
 
@@ -4637,7 +4640,7 @@ the queue.
 Upon success, the @ioctlref{I_ATMARK} @manref{ioctl(2)} command returns zero (@samp{0}) or a
 positive integer.  The @ioctlref{I_ATMARK} operation returns a value of true (@samp{1}) if the
 marking criteria is met.  It returns false (@samp{0}) if the marking criteria is not met.  Upon
-failure, the @ioctlref{I_ATMARK} @manref{ioctl(2)} command returnes @samp{-1} and sets
+failure, the @ioctlref{I_ATMARK} @manref{ioctl(2)} command returns @samp{-1} and sets
 @manref{errno(3)} to an appropriate error number.
 
 When the @ioctlref{I_ATMARK} @manref{ioctl(2)} command fails, it returns @samp{-1} and sets
@@ -4697,7 +4700,7 @@ a file is set for asynchronous I/O and the operation would block.
 @item EWOULDBLOCK
 same as @errno{EAGAIN}.
 @item ETIME
-the operation timed out awiating an acknowledgement or response from the driver.
+the operation timed out awaiting an acknowledgement or response from the driver.
 @item ENOSR
 a message block could not be allocated during the operation and the operation is not permitted to
 block.
@@ -4730,7 +4733,7 @@ This @manref{ioctl(2)} command is discussed under @ref{Input and Output Polling}
 @multitable @columnfractions .10 .90
 @item fildes @tab the @dfn{Stream} for which the command is issued;
 @item cmd @tab is @samp{I_GETSIG}.
-@item arg @tab is a pointer to a @type{int} to contain the retreived event flags.
+@item arg @tab is a pointer to a @type{int} to contain the retrieved event flags.
 @end multitable
 
 Event flags can include the following band related events:
@@ -4812,7 +4815,7 @@ The following members are defined in @cite{SVR 4.2}:
 
 @multitable @columnfractions .15 .85
 @item @member{q_qinfo} @tab points to the @mantype{qinit(9)} structure associated with this queue;
-@item @member{q_first} @tab first message on the message queue (@constant{NULL} if message queue is emptry);
+@item @member{q_first} @tab first message on the message queue (@constant{NULL} if message queue is empty);
 @item @member{q_last} @tab last message on the message queue (@constant{NULL} if message queue is empty);
 @item @member{q_next} @tab next queue in the @dfn{Stream};
 @item @member{q_link} @tab next queue in the @dfn{STREAMS} scheduler list;
@@ -5729,7 +5732,7 @@ hardware emulation module.
 
 @item @dfn{push} @tab
 @cindex push
-A term used when a muodule is inserted in a @dfn{Stream} immediately below the @dfn{Stream head}.
+A term used when a module is inserted in a @dfn{Stream} immediately below the @dfn{Stream head}.
 
 @item @dfn{pushable module} @tab
 @cindex pushable module
@@ -5836,7 +5839,7 @@ A @dfn{Stream} component closest to the user process.  It provides the interface
 @item @dfn{STREAMS} @tab
 @cindex STREAMS
 A kernel mechanism that provides the framework for network services and data communication.  It
-defines interface standards for character intput/output within the kernel, and between the kernel
+defines interface standards for character input/output within the kernel, and between the kernel
 and user level.  The @dfn{STREAMS} mechanism includes integral functions, utility routines, kernel
 facilities, and a set of structures.
 

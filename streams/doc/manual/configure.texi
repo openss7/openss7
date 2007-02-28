@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: configure.texi,v 0.9.2.9 2007/01/02 16:32:03 brian Exp $
+@c @(#) $Id: configure.texi,v 0.9.2.10 2007/02/28 06:30:55 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/02 16:32:03 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:30:55 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -78,7 +78,7 @@ This option defaults to @samp{disabled}.
 @opindex streams-irq
 Disable @dfn{STREAMS} irq suppression.
 When enabled, hard interrupts are suppressed whenever locks are taken throughout the @dfn{STREAMS}
-executive.  When profiling using maskable interrupt driven profilers, this makes profiling
+executive.  When profiling using masked interrupt driven profilers, this makes profiling
 difficult.  When disabled, soft interrupts are suppressed only.  This allows interrupt driven
 profilers to give more meaningful information.  Do not disable hard interrupt suppression unless you
 know what your are doing.  Also, as the softirq threads are run whenever soft interrupt locks are
@@ -98,7 +98,7 @@ This option defaults to @samp{disabled}.
 
 @item --enable-streams-syncqs
 @opindex streams-syncqs
-When enabled, MP synchonization queues are enabled for SMP kernels.
+When enabled, MP synchronization queues are enabled for SMP kernels.
 This option defaults to @samp{disabled}.
 This option is not tested for early releases.
 

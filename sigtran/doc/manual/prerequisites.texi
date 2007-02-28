@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: prerequisites.texi,v 0.9.2.2 2006/12/29 05:50:58 brian Exp $
+@c @(#) $Id: prerequisites.texi,v 0.9.2.3 2007/02/28 06:30:32 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/12/29 05:50:58 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:30:32 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: prerequisites.texi,v $
+@c Revision 0.9.2.3  2007/02/28 06:30:32  brian
+@c - updates and corrections, #ifdef instead of #if
+@c
 @c Revision 0.9.2.2  2006/12/29 05:50:58  brian
 @c - changes for successful master build
 @c
@@ -121,7 +124,7 @@ including references in the manual pages.}
 @enumerate 1
 @item @cite{Linux} distribution, somewhat @cite{Linux Standards Base} compliant, with a 2.4 or 2.6
 kernel and the appropriate tool chain for compiling out-of-tree kernel modules.  Most recent
-@cite{Linux} distributions are okay out of the box, but some development packages must be installed.
+@cite{Linux} distributions are usable out of the box, but some development packages must be installed.
 For more information, see
 @refman{Compatibility}.
 

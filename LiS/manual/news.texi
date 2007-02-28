@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.13 2007/02/12 10:40:00 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.14 2007/02/28 06:30:14 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/02/12 10:40:00 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:30:14 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -186,7 +186,7 @@ timely text documentation present in the release directory.
 
 @item
 Bug fixes to STREAMS library for proper asynchronous thread cancellation
-handling.  Versioning of all library symbols.
+handling.  Versions for all library symbols.
 
 @item
 Now builds 32-bit compatibility libraries and tests them against 64-bit kernel
@@ -226,7 +226,7 @@ For the news release, see @uref{http://www.openss7.org/rel20070108_0.html}.
 @unnumberedsubsec Major changes for release @value{PACKAGE}-2.18.4.rc3
 @cindex release @value{PACKAGE}-2.18.4.rc3
 
-Third release candidiate.
+Third release candidate.
 
 @value{PACKAGE} is really not supported any longer.  Use Linux Fast-STREAMS instead.
 The purpose of this release is to demonstrate the inability of the @value{PACKAGE}
@@ -251,7 +251,7 @@ automatically test both 64-bit native and 32-bit compatibility versions, one
 after the other, on 64-bit platforms.
 
 @item
-Added versioning of all library symbols.
+Added versions for all library symbols.
 
 @item
 Automated release file generation making for vastly improved and timely text
@@ -527,7 +527,7 @@ of detected ksyms.
 @unnumberedsubsec Major changes for release @value{PACKAGE}-2.16.18-17
 @cindex release @value{PACKAGE}-2.16.18-17
 
-Added option @code{--disable-k-modversions} to supress versioning of LiS
+Added option @code{--disable-k-modversions} to suppress versions for LiS
 exported symbols.
 
 A couple of corrections to the build process reported by Gurol.  Changed order
@@ -566,7 +566,7 @@ Added HP @code{ldl} patches.
 
 Made modifications to @code{putq()}, @code{putbq()}, @code{insq()} and
 @code{appq()} discussed on linux-streams mailing list.  These do not free
-messages on failure.  Modified all occurences internal to LiS to free the
+messages on failure.  Modified all occurrences internal to LiS to free the
 message on error to ensure old behaviour.
 
 Added HP dejagnu patches to @code{strtst} and added dejagnu testsuite
@@ -649,8 +649,8 @@ kernel builds.
 
 Enhanced build process.
   
-All kernel symbols exported by LiS are versioned on kernels that have
-versioned symbols.  This makes it safer to compile kernel modules against
+All kernel symbols exported by LiS have versions on kernels that have
+versions on symbols.  This makes it safer to compile kernel modules against
 kernel/LiS combinations.  This is in preparation for splitting off the strxnet
 package, and the technique was imported from the Linux Fast-STREAMS build.
 
@@ -701,10 +701,10 @@ XTI/TLI library calls.  Updated xti documentation as well.
 Many changes to the inet.c INET driver.  Wildcard IP addresses can now be
 bound and wildcard addresses will be assigned with no address is passed to
 most providers.  (/dev/rawip still requires an address or TNOADDR is
-returned.)  Option management has been extensively rewritten to be more
-conformant to XNS documentation.  Test programs test-inet_raw, test-inet_udp,
+returned.)  Option management has been extensively rewritten to closer conform
+to XNS documentation.  Test programs test-inet_raw, test-inet_udp,
 test-inet_tcp have been upgraded and converted to multiple child processes.  A
-number of fixes to SMP lock behavior and M_FLUSH have beend added as reported
+number of fixes to SMP lock behaviour and M_FLUSH have been added as reported
 by Dave Grothe.  Corrected all level and TBADOPT behaviour on negotiation.
 
 Although this driver is now closer to expected behaviour, it has not been
@@ -804,7 +804,7 @@ release level.
 This OpenSS7 release of @value{PACKAGE}-2.16.16 includes autoconf for
 configuration, complete manual pages and documentation, and packaging in
 source and binary RPMs for ease and repeatability of installation.  The
-package also builds and installs properly versioned LiS shared object
+package also builds and installs properly versions LiS shared object
 libraries.
 
 Before the OpenSS7 release of LiS, it was necessary to have a significant
@@ -846,7 +846,7 @@ provides a source and binary release mechanism using both autoconf
 distributions as well as RedHat source and binary RPMs.
 
 Use of the RPM mechanism for release permits add-on packages to ensure that
-they have sufficient level of support and verionsing of the LiS load during
+they have sufficient level of support and versions for the LiS load during
 their build and installation process.  It is now also possible to ensure that
 add on binaries are compatible with a loaded LiS during installation.
 

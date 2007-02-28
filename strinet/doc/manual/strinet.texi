@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strinet.texi,v 0.9.2.23 2007/01/03 14:54:41 brian Exp $
+% @(#) $Id: strinet.texi,v 0.9.2.24 2007/02/28 06:31:02 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/01/03 14:54:41 $ by $Author: brian $
+% Last Modified $Date: 2007/02/28 06:31:02 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -411,6 +411,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strinet.texi,v $
+Revision 0.9.2.24  2007/02/28 06:31:02  brian
+- updates and corrections, #ifdef instead of #if
+
 Revision 0.9.2.23  2007/01/03 14:54:41  brian
 - documentation updates for release
 
@@ -488,7 +491,7 @@ Revision 0.9  2004/04/03 12:44:16  brian
 @unnumberedsubsec ISO 9000 Compliance
 
 Only the @TeX{}, texinfo, or roff source for this manual is controlled.  An opaque (printed,
-postscript or portable manual format) version of this manual is an @strong{UNCONTROLLED
+postscript or portable document format) version of this manual is an @strong{UNCONTROLLED
 VERSION}.
 
 @node Disclaimer
@@ -714,7 +717,7 @@ drivers written for the @file{strss7-@value{VERSION_STRSS7}} @file{sigtran-@valu
 and @file{strvoip-@value{VERSION_STRVOIP}} packages under the @cite{OpenSS7 Project}, as well as to
 provide ISO over TCP capabilities for the @file{striso-@value{VERSION_STRISO}} package.
 
-The intial approach to implementing INET drivers was to provide an in-kernel @dfn{STREAMS} over
+The initial approach to implementing INET drivers was to provide an in-kernel @dfn{STREAMS} over
 @dfn{Socket} approach.  Under this approach, the @dfn{STREAMS} @manpage{inet(4)} driver converts
 between TPI primitives received from the Stream head and in-kernel calls to an internally opened
 socket of the appropriate type.  While this provided an adequate mechanism for providing Internet
@@ -724,8 +727,8 @@ The second approach that is available in this release is a complete @dfn{STREAMS
 the @manpage{udp(4)} and @manpage{rawip(4)} drivers, as well as the start of a skeleton for a fully
 @dfn{STREAMS}-based @manpage{tcp(4)} driver.  Performance tests using the
 @file{netperf-@value{VERSION_NETPERF}} package shows that these second generation implementations of
-@manpage{udp(4)} and @manpage{rawip(4)} compete for peformance with @cite{Linux} native sockets.
-The ablity to link these Streams underneath multiplexing drivers or pushed beneath modules for
+@manpage{udp(4)} and @manpage{rawip(4)} compete for performance with @cite{Linux} native sockets.
+The ability to link these Streams underneath multiplexing drivers or pushed beneath modules for
 protocols such as @manref{rtp(4)} is very beneficial.
 
 The result is stable, production grade, 64-bit clean TPI implementations of Internet Protocols for
@@ -850,7 +853,7 @@ Following are user utilities for manipulating @dfn{INET}:
 @pgindex /usr/sbin/strinet_mknod
 
 Make special device nodes for @dfn{INET}.
-@manpage{strinet_mknod(8)} is a @cite{@value{PACKAGE_TITLE}} specific adminstrative utility.
+@manpage{strinet_mknod(8)} is a @cite{@value{PACKAGE_TITLE}} specific administrative utility.
 
 The @manpage{strinet_mknod(8)} C-language program can be used to make (or remove) the special
 device nodes under the @file{/dev} directory required by @command{@value{PACKAGE}-@value{VERSION}}
@@ -862,7 +865,7 @@ See @manref{strinet_mknod(8)} for more information.
 @item @manpage{inet_mkdev(8)} (@file{/usr/sbin/inet_mkdev})
 
 Make special @cite{iBCS} device nodes for @dfn{INET}.
-@manpage{inet_mkdev(8)} is a @cite{@value{PACKAGE_TITLE}} specific adminstrative utility.
+@manpage{inet_mkdev(8)} is a @cite{@value{PACKAGE_TITLE}} specific administrative utility.
 
 The @manpage{inet_mkdev(8)} script can be used to make the special @cite{iBCS} device nodes under
 the @file{/dev} directory required by @command{@value{PACKAGE}-@value{VERSION}} package drivers.
@@ -872,7 +875,7 @@ the @file{/dev} directory required by @command{@value{PACKAGE}-@value{VERSION}} 
 @item @manpage{inet_rmdev(8)} (@file{/usr/sbin/inet_rmdev})
 
 Remove special @cite{iBCS} device nodes for @dfn{INET}.
-@manpage{inet_rmdev(8)} is a @cite{@value{PACKAGE_TITLE}} specific adminstrative utility.
+@manpage{inet_rmdev(8)} is a @cite{@value{PACKAGE_TITLE}} specific administrative utility.
 
 The @manpage{inet_rmdev(8)} script can be used to remove the special @cite{iBCS} device nodes under
 the @file{/dev} directory used by @command{@value{PACKAGE}-@value{VERSION}} package drivers.
@@ -1067,7 +1070,7 @@ may also be required.  The @cite{xti.h} header file is for interacting with the 
 
 @subsection Kernel Space Drivers and Modules
 
-Typeical include files for writing @dfn{STREAMS} module and drivers implementing transport providers
+Typical include files for writing @dfn{STREAMS} module and drivers implementing transport providers
 in kernels space include @cite{xti.h} and @cite{xti_inet.h}.  The header files provide access to
 definitions for the TPI interface and additional XTI definitions for use by @dfn{STREAMS} drivers
 and modules.  Additional header files for interacting with specific drivers or modules may also be
@@ -1123,7 +1126,7 @@ compiler that was used to compile the kernel and @dfn{STREAMS} base package.
 kernel and @dfn{STREAMS} base package.  @command{kbuild} can be used to accomplish this.
 
 @item The @command{gcc} command line must define several important kernel defines including
-@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.  Again, @command{kbuild}
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the base name of the module.  Again, @command{kbuild}
 can be used to accomplish this.
 
 @item The @command{gcc} command line must include several important files directly on the command
@@ -1173,10 +1176,10 @@ The following manual pages are installed in Section 4 of the manual (in the subd
 @item @manref{rip(4)} -- @tab User Datagram Protocol Stream.
 @item @manref{tcp(4)} -- @tab Transmission Control Protocol (TCP).
 @item @manref{tcp2(4)} -- @tab Transmission Control Protocol (TCP).
-@item @manref{ticlts(4)} -- @tab connectionless loopback transport provider.
-@item @manref{ticots(4)} -- @tab connection oriented loopback provider.
-@item @manref{ticots_ord(4)} -- @tab connection oriented orderly release loopback provider.
-@item @manref{ticotsord(4)} -- @tab connection oriented orderly release loopback provider.
+@item @manref{ticlts(4)} -- @tab connectionless loop back transport provider.
+@item @manref{ticots(4)} -- @tab connection oriented loop back provider.
+@item @manref{ticots_ord(4)} -- @tab connection oriented orderly release loop back provider.
+@item @manref{ticotsord(4)} -- @tab connection oriented orderly release loop back provider.
 @item @manref{udp(4)} -- @tab User Datagram Protocol Stream.
 @item @manref{udp2(4)} -- @tab User Datagram Protocol Stream.
 

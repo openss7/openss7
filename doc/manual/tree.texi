@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.4 2007/01/08 11:10:06 brian Exp $
+@c @(#) $Id: tree.texi,v 0.9.2.5 2007/02/28 06:30:07 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/08 11:10:06 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:30:07 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -125,7 +125,7 @@ See @manref{specfs(5)} for more information.
 
 @item streams
 
-This kernel module contians the @dfn{STREAMS} scheduler, utility functions, and @dfn{STREAMS} Device
+This kernel module contains the @dfn{STREAMS} scheduler, utility functions, and @dfn{STREAMS} Device
 Driver Interface/Driver Kernel Interface (DDI/DKI).
 See @manref{STREAMS(9)} for more information.
 
@@ -723,13 +723,13 @@ See @manref{sdl_sctp(4)} for more information.
 
 This kernel module provides the @dfn{STREAMS} @file{sdt} module.  This module provide a
 @cite{Signalling Data Terminal} interface to any modules providing the @cite{Signalling Data Link}
-inteface.
+interface.
 See @manref{sdt(4)} for more information.
 
 @ignore
 @item streams-sdt_sctp
 
-This kernel module provides the @dfn{STREAMS} @file{sdt_sctp} module.  This module provies @cite{SS7
+This kernel module provides the @dfn{STREAMS} @file{sdt_sctp} module.  This module provides @cite{SS7
 over IP} by directly passing @cite{Signalling Data Terminal} message on the @cite{Stream Control
 Transmission Protocol (SCTP)}.
 See @manref{sdt_sctp(4)} for more information.
@@ -746,7 +746,7 @@ See @manref{sl_mux(4)} for more information.
 
 This kernel module provides the @dfn{STREAMS} @file{sl} module.  This module provides a
 @cite{Signalling Link} interface to any modules providing a @cite{Signalling Data Terminal}
-interace.  This module implements a @cite{Signalling System No. 7 (SS7) Message Transfer Part (MTP)
+interface.  This module implements a @cite{Signalling System No. 7 (SS7) Message Transfer Part (MTP)
 Level 2} state machine.
 See @manref{sl(4)} for more information.
 
@@ -768,7 +768,7 @@ See @manref{sm_mod(4)} for more information.
 
 @item streams-spm
 
-This kernel module proides the @dfn{STREAMS} @file{spm} module.
+This kernel module provides the @dfn{STREAMS} @file{spm} module.
 See @manref{spm(4)} for more information.
 
 @item streams-x100p-ss7
@@ -826,7 +826,7 @@ See @manref{sdl_sctp(4)} for more information.
 
 @item streams-sdt_sctp
 
-This kernel module provides the @dfn{STREAMS} @file{sdt_sctp} module.  This module provies @cite{SS7
+This kernel module provides the @dfn{STREAMS} @file{sdt_sctp} module.  This module provides @cite{SS7
 over IP} by directly passing @cite{Signalling Data Terminal} message on the @cite{Stream Control
 Transmission Protocol (SCTP)}.
 See @manref{sdt_sctp(4)} for more information.

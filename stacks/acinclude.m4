@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2006/12/29 05:51:03 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/02/28 06:30:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/29 05:51:03 $ by $Author: brian $
+# Last Modified $Date: 2007/02/28 06:30:34 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.60  2007/02/28 06:30:34  brian
+# - updates and corrections, #ifdef instead of #if
+#
 # Revision 0.9.2.59  2006/12/29 05:51:03  brian
 # - changes for successful master build
 #

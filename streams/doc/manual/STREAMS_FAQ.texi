@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: STREAMS_FAQ.texi,v 0.9.2.7 2006/09/18 01:06:59 brian Exp $
+% @(#) $Id: STREAMS_FAQ.texi,v 0.9.2.8 2007/02/28 06:30:55 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/09/18 01:06:59 $ by $Author: brian $
+% Last Modified $Date: 2007/02/28 06:30:55 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -321,7 +321,7 @@ system or feature listed herein.
 @cindex document audience
 
 This document is intended for a highly technical audience.  The reader should already be familiar
-with @cite{Linux} kernel programming, the @cite{Linux} filesystem, character devices, driver input
+with @cite{Linux} kernel programming, the @cite{Linux} file system, character devices, driver input
 and output, interrupts, software interrupt handling, scheduling, process contexts, multiprocessor
 locks, etc.
 
@@ -347,6 +347,9 @@ package.
 @smallexample
 
 $Log: STREAMS_FAQ.texi,v $
+Revision 0.9.2.8  2007/02/28 06:30:55  brian
+- updates and corrections, #ifdef instead of #if
+
 Revision 0.9.2.7  2006/09/18 01:06:59  brian
 - updated manuals and release texi docs
 
@@ -507,7 +510,7 @@ Two open source @dfn{STREAMS} implementations are available for @b{Linux}: @cite
 @cindex Linux STREAMS (LiS)
 
 @cite{Linux STREAMS (LiS)} is a @dfn{STREAMS} implementation for @b{Linux} originally released and
-maintained by @uref{http://www.gcom.com/,GCOM Inc.}, and recently rereleased under @dfn{GPL} by
+maintained by @uref{http://www.gcom.com/,GCOM Inc.}, and recently re-released under @dfn{GPL} by
 @uref{http://www.openss7.org/,The OpenSS7 Project}.
 
 A number of attempts were made to move the @cite{Linux STREAMS (LiS)} project into the @b{Linux}
@@ -516,7 +519,7 @@ Arguments against do not appear to be based on valid technical argument.  This i
 the next section (@pxref{Why STREAMS?}).
 
 Nevertheless, the @cite{Linux STREAMS (LiS)} does not conform to @b{Linux} kernel coding standards
-and practices and could likely be rejected out of hand for mainline support on that basis.  Also,
+and practises and could likely be rejected out of hand for mainline support on that basis.  Also,
 @cite{Linux STREAMS (LiS)} also has a number of problems with conformance and recent releases have
 bugs and races that make its production use questionable.@footnote{One of the major shortcomings of
 @cite{LiS} in the author's opinion is that, because the code was intendended on being portable, it
@@ -534,7 +537,7 @@ the @uref{http://www.openss7.org/, OpenSS7 Project} and with development princip
 this manual.
 
 @cite{@value{PACKAGE_TITLE}} was developed as a production replacement for @cite{LiS} that was both
-mantainable and suitable for mainline adoption.  The principal behind the implementation was that
+maintainable and suitable for mainline adoption.  The principal behind the implementation was that
 portability was secondary to performance, conformance, maintainability and suitability for mainline
 adoption.
 
@@ -552,7 +555,7 @@ If there is sufficient interest, it would be possible to port @cite{@value{PACKA
 Perhaps we should have called @cite{@value{PACKAGE_TITLE}} @b{OpenSTREAMS}; however, as there
 already exists suitable @dfn{STREAMS} packages for all @cite{UNIX} and @cite{UNIX}-based systems
 (with the possible exception of BSD variants) and even other operating systems (many RTOS also
-support @dfn{STREAMS}) conformance, compatibilty, maintainability and mainline adoption for
+support @dfn{STREAMS}) conformance, compatibility, maintainability and mainline adoption for
 @b{Linux} have taken a higher priority than portability.
 
 
@@ -592,7 +595,7 @@ A basic question that is sometimes asked is: "Why use @dfn{STREAMS} when you can
 @b{Linux}'s NET4 BSD Sockets instead?"
 
 The answer to this question is that @dfn{STREAMS} provides capabilities for specialized protocols
-and streamed input/output requirements (such as media) that are not ameniable to the sockets
+and streamed input/output requirements (such as media) that are not amenable to the sockets
 interface or queue mechanisms.
 
 Two examples are SS7 (Signalling System Number 7) which is a specialized Telecommunications protocol
@@ -606,7 +609,7 @@ vendors also deliver @cite{UNIX} and even @cite{RTOS} SS7 products on @dfn{STREA
 Although the BSD Sockets framework was established to permit arbitrary protocols to be implemented
 within the framework, it is seldom that BSD Sockets is actually used in this fashion.  One reason
 for this is the tight coupling (function call interface) between layers in BSD sockets.  @b{Linux}
-has an even tighter coubpling between protocol layers and removes entire layers from the BSD model.
+has an even tighter coupling between protocol layers and removes entire layers from the BSD model.
 
 @quotation
 The @cite{4.2BSD} version of @cite{UNIX} introduced @dfn{sockets}
@@ -833,7 +836,7 @@ supports @dfn{HDLC} functions, @dfn{Signalling Data Terminal} functions or even 
 Link} functions in firmware can use an integrated driver as illustrated on the right side of
 @figref{204}.
 
-Although, in practice, the performance cost of breaking a protocol layer into independent protocol
+Although, in practise, the performance cost of breaking a protocol layer into independent protocol
 modules within @dfn{STREAMS} is low, a firmware implementation as that shown on the right performs
 somewhat better, but typically at a higher monetary cost.  @dfn{STREAMS} provides a wide range of
 scalable cost/performance options to the system designer in this regard.
@@ -897,7 +900,7 @@ Several oddities appear because time spent in server routines cannot be assigned
 user or process.  It is impossible, for example, for devices to support privileged @command{ioctl}
 calls, because the device has no idea who generated the message.  Accounting and scheduling becomes
 less accurate; a short census of several systems showed that between 4 and 8 per cent of non-idle
-CPU time was being spent in server routines.  Finally, the annonimity for server processing most
+CPU time was being spent in server routines.  Finally, the anonimity for server processing most
 certainly makes it more difficult to measure the performance of the new I/O system.
 @end quotation
 
@@ -975,7 +978,7 @@ The design of the networking facilities for 4.2BSD took a different approach, ba
 @dfn{socket} interface and a flexible multilayer network architecture.  This design allows a single
 system to support multiple sets of networking protocols with stream datagram, and other types of
 access.  Protocol modules may deal with multiplexing of data from different connection onto a single
-transport medium, as well as with demultiplexing of data for different protocols and connection
+transport medium, as well as with de-multiplexing of data for different protocols and connection
 received from each network device.  The 4.4BSD release made small extensions to the socket interface
 to allow the implementation of the @cite{ISO} networking protocols.
 @footnote{@cite{The Design and Implementation of the 4.4BSD Operating System, McKusick, et. al.,
@@ -1118,7 +1121,7 @@ caches and other techniques.
 
 Due to its initial objective to be portable to a number of environments, @cite{LiS} has a large
 volume of source code that never gets executed in the @b{Linux} environment.  Also, coding style
-does not seem to follow any mainstream practices.  Aside from log messages and a few debugging flag
+does not seem to follow any mainstream practises.  Aside from log messages and a few debugging flag
 facilities, @cite{LiS} does not provide any debugging facilities.
 
 @cite{@value{PACKAGE_TITLE}} provides a fully functional @dfn{STREAMS} logging facility and
@@ -1184,7 +1187,7 @@ Because it is as compatible as possible with other @dfn{STREAMS} implementations
 drivers and modules developed on @dfn{@value{PACKAGE_TITLE}} can easily be ported to other
 implementations if a set of compatibility and portability guidelines are followed.  This allows
 @dfn{STREAMS} drivers and modules developed on the @b{Linux} operating system to be used on branded
-@cite{UNIX} systems (or commercially available @dfn{RTOS} ssytems) with minimal porting and
+@cite{UNIX} systems (or commercially available @dfn{RTOS} systems) with minimal porting and
 modification.
 
 @item @i{Standardization:}
@@ -1228,7 +1231,7 @@ kernel level interfaces.
 @cindex compliance, UNIX 03
 
 @dfn{UNIX 03} compliance to @cite{Open Group Extensions} requires that XTI/TLI networking support be
-provided.  (See @cite{XNS 5.2}).  As the @dfn{iBCS} has proven, this does not require full
+provided.  (See @cite{XNS 5.2}).  As the @dfn{iBCS} has proved, this does not require full
 @dfn{STREAMS} support, however, it is an easier thing to accomplish with @dfn{STREAMS} support.
 Even though the @cite{XNS 5.2} specification does not describe @dfn{STREAMS}, the @cite{SUSv3} does.
 The @url{http://www.opengroup.org/, OpenGroup} has never defined the internals of the @dfn{STREAMS}
@@ -1240,7 +1243,7 @@ facilities and system calls are completely defined and described.
 @cindex compliance, UNIX 98
 
 @dfn{UNIX 98} compliance to @cite{X/Open Extensions} requires that XTI/TLI networking support be
-provided.  (See @cite{XNS 5}).  As the @dfn{iBCS} has proven, this does not require full
+provided.  (See @cite{XNS 5}).  As the @dfn{iBCS} has proved, this does not require full
 @dfn{STREAMS} support, however, it is an easier thing to accomplish with @dfn{STREAMS} support.
 Even though the @cite{XNS 5} specification does not describe @dfn{STREAMS}, the @cite{XSI 5} and
 @cite{SUSv2} does.  The @url{http://www.opengroup.org/, OpenGroup} has never defined the internals
@@ -1252,7 +1255,7 @@ user-space facilities and system calls are completely defined and described.
 @cindex compliance, UNIX 95
 
 @dfn{UNIX 95} compliance to @cite{X/Open Extensions} requires that XTI/TLI networking support be
-provided.  (See @cite{XNS 4.2}).  As the @dfn{iBCS} has proven, this does not require full
+provided.  (See @cite{XNS 4.2}).  As the @dfn{iBCS} has proved, this does not require full
 @dfn{STREAMS} support, however, it is an easier thing to accomplish with @dfn{STREAMS} support.
 Even though the @cite{XNS 4.2} specification does not describe @dfn{STREAMS}, the @cite{XSI 4.2} and
 @cite{SUS} does.  The @url{http://www.opengroup.org/, OpenGroup} has never defined the internals of
@@ -1468,7 +1471,7 @@ hardware emulation module.
 
 @item @dfn{push} @tab
 @cindex push
-A term used when a muodule is inserted in a @dfn{Stream} immediately below the @dfn{Stream head}.
+A term used when a module is inserted in a @dfn{Stream} immediately below the @dfn{Stream head}.
 
 @item @dfn{pushable module} @tab
 @cindex pushable module
@@ -1575,7 +1578,7 @@ A @dfn{Stream} component closest to the user process.  It provides the interface
 @item @dfn{STREAMS} @tab
 @cindex STREAMS
 A kernel mechanism that provides the framework for network services and data communication.  It
-defines interface standards for character intput/output within the kernel, and between the kernel
+defines interface standards for character input/output within the kernel, and between the kernel
 and user level.  The @dfn{STREAMS} mechanism includes integral functions, utility routines, kernel
 facilities, and a set of structures.
 
@@ -1603,7 +1606,7 @@ are reduced to the low-water mark value, the other queue is unblocked by @dfn{ST
 
 @item @dfn{write queue} @tab
 @cindex write queue
-A message qeuue in a module or driver containing messages moving downstream.  Associated with the
+A message queue in a module or driver containing messages moving downstream.  Associated with the
 @manref{write(2)} system call and output from a user process.
 
 @item @dfn{write-side} @tab

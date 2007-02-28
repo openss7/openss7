@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strcompat.texi,v 0.9.2.14 2007/01/03 14:57:17 brian Exp $
+% @(#) $Id: strcompat.texi,v 0.9.2.15 2007/02/28 06:30:45 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/01/03 14:57:17 $ by $Author: brian $
+% Last Modified $Date: 2007/02/28 06:30:45 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -405,6 +405,9 @@ package.
 @smallexample
 
 $Log: strcompat.texi,v $
+Revision 0.9.2.15  2007/02/28 06:30:45  brian
+- updates and corrections, #ifdef instead of #if
+
 Revision 0.9.2.14  2007/01/03 14:57:17  brian
 - documentation updates for release
 
@@ -455,7 +458,7 @@ file strcompat.texi was initially added on branch OpenSS7-0_9_2.
 @unnumberedsubsec ISO 9000 Compliance
 
 Only the @TeX{}, texinfo, or roff source for this manual is controlled.  An opaque (printed,
-postscript or portable manual format) version of this manual is an @strong{UNCONTROLLED
+postscript or portable document format) version of this manual is an @strong{UNCONTROLLED
 VERSION}.
 
 @node Disclaimer
@@ -773,7 +776,7 @@ Fast-STREAMS} is a far superior production replacement for @cite{LiS} and @cite{
 deprecated.  Although, at one time, the @cite{@value{PACKAGE_TITLE}} package worked with @cite{LiS},
 it is no longer supported on @cite{LiS} and is only tested and validated for @cite{Linux
 Fast-STREAMS}.  Even when it was supported, @cite{LiS} has so many bugs, deficiencies and
-incompatibilities in the Strema head, that it was not possible to obtain usable compatibility in
+incompatibilities in the Stream head, that it was not possible to obtain usable compatibility in
 conjunction with @cite{LiS}.  @cite{Linux Fast-STREAMS} does not have these problems.
 
 @node Use with Linux Fast-STREAMS
@@ -1182,7 +1185,7 @@ command line as a preprocessor option.  This is true regardless of whether user 
 programs are being compiled.
 
 In general, @samp{-I} include directives on the @command{gcc} command line should be ordered in the
-reverse order of the dependencies between add-on p[ackages.  So, for example, if the include files
+reverse order of the dependencies between add-on packages.  So, for example, if the include files
 from all add-on packages are required, the order of these directives would be:
 @samp{-I/usr/include/strcompat -I/usr/include/streams}.
 
@@ -1210,7 +1213,7 @@ A replacement @file{sunddi.h} file
 
 @subsubsection User Space Programs
 
-Typicaly include files for interacting with @dfn{STREAMS} from user space include the
+Typically include files for interacting with @dfn{STREAMS} from user space include the
 @file{stropts.h} header file.  Additional files for interacting with specific drivers or module may
 also be required.  The @cite{@value{PACKAGE_TITLE}} package does not provide any user space header
 files.
@@ -1262,7 +1265,7 @@ kernel.
 
 @item
 The @command{gcc} command line must define several important kernel defines including
-@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the base name of the module.
 
 @item
 The @command{gcc} command line must include several important include files directly on the command
@@ -1279,7 +1282,7 @@ version @samp{@value{_kversion}} if just an example.  For the running kernel, us
 @subsection Manual Pages
 
 The @command{@value{PACKAGE}-@value{VERSION}} package installs a number of manual pages.  The number
-of manual pages isntalled totals several hundred manual pages.
+of manual pages installed totals several hundred manual pages.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -1298,7 +1301,7 @@ the manual page for the specific function.
 
 The porting information is organized by the operating system from which porting is being attempted.
 Note that, aside from configuration details, any system not listed here that is based on @cite{SVR
-4.2 MP} or on another of ther implementations, should start with that implmeentation's portability
+4.2 MP} or on another of the implementations, should start with that implementation's portability
 information.
 
 Porting information is organized into sections as follows:
@@ -1412,7 +1415,7 @@ system from which you are porting more closely fits one of the other portability
 see that section.
 For the most part, porting from @cite{SVR 3.2} to @cite{@value{PACKAGE_TITLE}} is not much different
 than porting forward from @cite{SVR 3.2} to @cite{SVR 4.2 MP}.  If you wish to be able to access
-some backwards compatible @cite{SVR 3.2} functions, use the @cite{SVR 3.2} Compatibility Module.
+some backward compatible @cite{SVR 3.2} functions, use the @cite{SVR 3.2} Compatibility Module.
 Therefore, it is recommended that @dfn{STREAMS} modules and drivers for @cite{SVR 3.2} be ported
 forward to @cite{SVR 4.2 MP} before being ported to @cite{@value{PACKAGE_TITLE}}.
 
@@ -1426,7 +1429,7 @@ queue open and close routine entry points.  Some @dfn{STREAMS} implementations s
 @cite{@value{PACKAGE_TITLE}} only supports the @cite{SVR 4.2 MP} style entry points.
 @cite{SVR 3.2} was not MP-safe.  @cite{@value{PACKAGE_TITLE}} is MP-safe.
 
-A significant number of utilities were implmented in @cite{SVR 3.2} as architecture dependent
+A significant number of utilities were implemented in @cite{SVR 3.2} as architecture dependent
 macros.  In @cite{SVR 4.2 MP} these became architecture independent function calls.
 In general, @cite{@value{PACKAGE_TITLE}} is different from @cite{SVR 3.2} in any way that @cite{SVR
 3.2} is different from @cite{SVR 4.2 MP}.
@@ -1504,9 +1507,9 @@ from the @file{strcompat} package.
 
 @item Preemptive
 
-At this priority leve, software and hardware interrrupts are enabled and the kernel is executing
+At this priority level, software and hardware interrupts are enabled and the kernel is executing
 with preemption enabled.  This means that the currently executing kernel thread could preempt and
-sleep in favor of another thread of kernel execution.
+sleep in favour of another thread of kernel execution.
 
 This priority level only exist on preemptive (mostly 2.6) kernels.
 
@@ -1531,11 +1534,11 @@ This priority level exists in all kernels.
 
 @item Interrupt Service Routines Disabled
 
-At this priority level, hardware interrupts are disbaled and the kernel is executing with preemption
+At this priority level, hardware interrupts are disabled and the kernel is executing with preemption
 disabled.  This means that the currently executing kernel thread will not be interrupted.
 
 This is the case when the executing thread is processing a hardware interrupt, or when the currently
-executing thread has disabled hardware interrups.
+executing thread has disabled hardware interrupts.
 
 This priority level exists in all kernels.
 
@@ -2540,11 +2543,11 @@ to be present on the system.}
 @item @manpage{mi_mpprintf_nr(9)} @tab -- continue to print a formatted string to a message buffer.
 @item @manpage{mi_next_dev_ptr(9)} @tab -- obtain next device instance pointer.
 @item @manpage{mi_next_ptr(9)} @tab -- @dfn{STREAMS} minor device list traversal.
-@item @manpage{mi_offset_param(9)} @tab -- obtain parameter localtion within @dfn{STREAMS} message block.
-@item @manpage{mi_offset_paramc(9)} @tab -- obtain parameter localtion within @dfn{STREAMS} message block chain.
+@item @manpage{mi_offset_param(9)} @tab -- obtain parameter location within @dfn{STREAMS} message block.
+@item @manpage{mi_offset_paramc(9)} @tab -- obtain parameter location within @dfn{STREAMS} message block chain.
 @item @manpage{mi_open_alloc(9)} @tab -- allocate a @dfn{STREAMS} driver or module instance.
 @item @manpage{mi_open_alloc_sleep(9)} @tab -- allocate a @dfn{STREAMS} driver or module instance (may sleep).
-@item @manpage{mi_open_comm(9)} @tab -- @dfn{STREAMS} common minor device open utiltiy.
+@item @manpage{mi_open_comm(9)} @tab -- @dfn{STREAMS} common minor device open utility.
 @item @manpage{mi_open_detached(9)} @tab -- @dfn{STREAMS} create detached instance data.
 @item @manpage{mi_open_link(9)} @tab -- link a @dfn{STREAMS} driver or module instance on open.
 @item @manpage{mi_prev_ptr(9)} @tab -- @dfn{STREAMS} minor device list traversal.
@@ -2605,7 +2608,7 @@ prototypes, see the individual variant sections.
 @item @manpage{mi_bufcall(9)} @tab -- reliable alternative to @manpage{bufcall(9)}.
 @item @manpage{mi_close_comm(9)} @tab -- @dfn{STREAMS} common minor device close utility.
 @item @manpage{mi_next_ptr(9)} @tab -- @dfn{STREAMS} minor device list traversal.
-@item @manpage{mi_open_comm(9)} @tab -- @dfn{STREAMS} common minor device open utiltiy.
+@item @manpage{mi_open_comm(9)} @tab -- @dfn{STREAMS} common minor device open utility.
 @item @manpage{putctl2(9)} @tab --
 @item @manpage{splstr(9)} @tab -- set software priority level for STREAMS.
 @item @manpage{splx(9)} @tab --

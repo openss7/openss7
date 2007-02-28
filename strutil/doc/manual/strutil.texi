@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strutil.texi,v 0.9.2.11 2006/09/18 01:07:22 brian Exp $
+% @(#) $Id: strutil.texi,v 0.9.2.12 2007/02/28 06:31:35 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/09/18 01:07:22 $ by $Author: brian $
+% Last Modified $Date: 2007/02/28 06:31:35 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -403,6 +403,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strutil.texi,v $
+Revision 0.9.2.12  2007/02/28 06:31:35  brian
+- updates and corrections, #ifdef instead of #if
+
 Revision 0.9.2.11  2006/09/18 01:07:22  brian
 - updated manuals and release texi docs
 
@@ -441,7 +444,7 @@ file strutil.texi was initially added on branch OpenSS7-0_9_2.
 @unnumberedsubsec ISO 9000 Compliance
 
 Only the @TeX{}, texinfo, or roff source for this manual is controlled.  An opaque (printed,
-postscript or portable manual format) version of this manual is an @strong{UNCONTROLLED
+postscript or portable document format) version of this manual is an @strong{UNCONTROLLED
 VERSION}.
 
 @node Disclaimer

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strsctp.texi,v 0.9.2.25 2007/01/05 06:25:06 brian Exp $
+% @(#) $Id: strsctp.texi,v 0.9.2.26 2007/02/28 06:31:25 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/01/05 06:25:06 $ by $Author: brian $
+% Last Modified $Date: 2007/02/28 06:31:25 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -413,6 +413,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strsctp.texi,v $
+Revision 0.9.2.26  2007/02/28 06:31:25  brian
+- updates and corrections, #ifdef instead of #if
+
 Revision 0.9.2.25  2007/01/05 06:25:06  brian
 - doc updates
 
@@ -507,7 +510,7 @@ branches:  0.9.2;
 @unnumberedsubsec ISO 9000 Compliance
 
 Only the @TeX{}, texinfo, or roff source for this manual is controlled.  An opaque (printed,
-postscript or portable manual format) version of this manual is an @strong{UNCONTROLLED
+postscript or portable document format) version of this manual is an @strong{UNCONTROLLED
 VERSION}.
 
 @node Disclaimer
@@ -1038,7 +1041,7 @@ compiler that was used to compile the kernel and @dfn{STREAMS} base package.
 kernel and @dfn{STREAMS} base package.  @command{kbuild} can be used to accomplish this.
 
 @item The @command{gcc} command line must define several important kernel defines including
-@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.  Again, @command{kbuild}
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the base name of the module.  Again, @command{kbuild}
 can be used to accomplish this.
 
 @item The @command{gcc} command line must include several important files directly on the command
@@ -1151,7 +1154,7 @@ To assist in the development of user programs and @cite{STREAMS} driver or modul
 @item sys/npi_sctp.h
 The @header{sys/npi_sctp.h} header file provides the Network Provider Interface (NPI) definitions for
 Stream Control Transmission Protocol (SCTP) that are common to the kernel and user space programs.
-Include this file in kernel or user space programs immediatetly after including @header{sys/npi.h}.
+Include this file in kernel or user space programs immediately after including @header{sys/npi.h}.
 
 This header file is normally installed in the @file{/usr/include/strsctp} directory, so remember to
 add @samp{-I/usr/include/strsctp} to your compile line.
@@ -1160,7 +1163,7 @@ add @samp{-I/usr/include/strsctp} to your compile line.
 The @header{sys/npi_sctp.h} header file provides the Transport Provider Interface (TPI) definitions for
 Stream Control Transmission Protocol (SCTP) that are common to the kernel and user space programs.
 Include this file in kernel space programs immediately after including @header{sys/tihdr.h}, or user
-space programs immediatetly after including @header{sys/tiuser.h}.
+space programs immediately after including @header{sys/tiuser.h}.
 
 This header file is normally installed in the @file{/usr/include/strsctp} directory, so remember to
 add @samp{-I/usr/include/strsctp} to your compile line.
@@ -1205,7 +1208,7 @@ The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{Network Provider I
 Revision 2.0.0} as released by @cite{UNIX International}.  A copy of the original document is
 available from @uref{http://www.openss7.org/docs/npi.pdf, The OpenSS7 Project Website}.
 A reprint of the document specifying this version of the protocol is available as part of the
-@samp{strxns} package available online in @uref{http://www.openss7.org/specs/npi.pdf, PDF format},
+@samp{strxns} package available on line in @uref{http://www.openss7.org/specs/npi.pdf, PDF format},
 or also in simple @uref{http://www.openss7.org/specs/npi.html, HTML format}.
 
 @node TPI Interface Conformance
@@ -1216,7 +1219,7 @@ The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{Transport Provider
 Revision 2.0.0} as released by @cite{UNIX International}.  A copy of the original document is
 available from @uref{http://www.openss7.org/docs/tpi.pdf, The OpenSS7 Project Website}.
 A reprint of the document specifying this version of the protocol is available as part of the
-@samp{strxnet} package available online in @uref{http://www.openss7.org/specs/tpi.pdf, PDF format},
+@samp{strxnet} package available on line in @uref{http://www.openss7.org/specs/tpi.pdf, PDF format},
 or also in simple @uref{http://www.openss7.org/specs/tpi.html, HTML format}.
 
 @node XTI Interface Conformance
@@ -1229,7 +1232,7 @@ OpenGroup}.  A copy of the original document is available from @uref{http://www.
 OpenGroup website}.
 Reprints of the document are not available from The OpenSS7 Project website due to copyright
 restrictions.  Similar information is available in the manual pages that accompany the
-@samp{strxnet} package.  These can be viewed online starting at
+@samp{strxnet} package.  These can be viewed on line starting at
 @uref{http://www.openss7.org/man2html?3+xti, XTI/TLI manpage}.
 
 @node IETF Conformance
@@ -1268,17 +1271,17 @@ address, and so on, until the maximum number of init retries is reached.
 
 @item Section 4.5 SCTP chunk size
 @emph{CONFORMS}:
-The driver segments DATA chunks to fit into the associaiton PMTU (which is the minimum of the MTUs
+The driver segments DATA chunks to fit into the association PMTU (which is the minimum of the MTUs
 of all paths).  The driver's INIT chunks fit into the minimum IP MTU.
 
 @item Section 4.6 Addressing methods
 @emph{CONFORMS}:
-The driver supports IPv4.  Hostname is not supported and is rejected as stated.  For single-homed
+The driver supports IPv4.  Host name is not supported and is rejected as stated.  For single-homed
 associations, the driver does not place addresses in the INIT or INIT-ACK chunks.
 
 @item Section 4.7 Path supervision
 @emph{CONFORMS}:
-The hearbeat mechanism is supported and enabled by default.
+The heartbeat mechanism is supported and enabled by default.
 
 @item Section 4.8 User data size
 @emph{CONFORMS}:

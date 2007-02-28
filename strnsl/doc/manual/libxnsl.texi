@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: libxnsl.texi,v 0.9.2.2 2007/01/08 16:24:22 brian Exp $
+% @(#) $Id: libxnsl.texi,v 0.9.2.3 2007/02/28 06:31:21 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/01/08 16:24:22 $ by $Author: brian $
+% Last Modified $Date: 2007/02/28 06:31:21 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -321,18 +321,18 @@ error by the @manpage{nc_perror(3)} subroutine.
 @subsubheading Description
 
 @cite{UNIX} has traditionally provided three components of the Network
-Services Library, @file{libnsl}, that are associated with the Trasnport
+Services Library, @file{libnsl}, that are associated with the Transport
 Provider Interface (TPI), @manpage{tpi(7)}, @dfn{STREAMS} network
 pseudo-device drivers, and that are not currently part of the @cite{Linux}
 Network Services Library.  These components are:
 
 @enumerate
 @item Network Configuration database access, @manpage{netconfig(3)},
-@item Netowrk Path access, @manpage{netpath(3)}, and,
+@item Network Path access, @manpage{netpath(3)}, and,
 @item Network Directory and address mapping, @manpage{netdir(3)}.
 @end enumerate
 
-These are often collectively refered to as the Network Selection facility of
+These are often collectively referred to as the Network Selection facility of
 the Network Services Library.
 
 @manpage{setnetconfig(3)}, @manpage{getnetconfig(3)},
@@ -378,7 +378,7 @@ Configuration database entries by network identification name strings.
 
 @table @manpage
 @item getnetconfigent(3)
-Returns a pointer to the @type{netconfig} struture corresponding to the
+Returns a pointer to the @type{netconfig} structure corresponding to the
 network configuration entry with the same network identification name as that
 supplied in the @var{netid} argument.
 
@@ -490,7 +490,7 @@ provider supports multicast addresses, and in particular, the
 @end table
 
 @item nc_protofmly
-The protocol family string assigned by the system adminstrator.
+The protocol family string assigned by the system administrator.
 
 @item nc_proto
 The protocol string assigned by the system administrator.
@@ -525,7 +525,7 @@ pointer for use in the @manpage{getnetconfig(3)} call.  Otherwise,
 
 Upon successful completion, @manpage{endnetconfig(3)} returns @samp{0}.  Otherwise,
 @samp{-1} is returned and @manpage{nc_error(3)} is set to indicate the error.
-A diagnostic string can be printed to standard error or accesed using the
+A diagnostic string can be printed to standard error or accessed using the
 @manpage{nc_perror(3)} or @manpage{nc_sperror(3)} subroutines.
 
 Upon successful completion, @manpage{nc_sperror(3)} returns a pointer to a
@@ -615,7 +615,7 @@ exhausted the entries in the @file{/etc/netconfig} file.
 
 @item (unknown)
 "@i{unknown error}" @*
-An internal error occured in the @manpage{libxnsl(3)} library.
+An internal error occurred in the @manpage{libxnsl(3)} library.
 @end vtable
 
 An error string associated with the error number can be obtained using
@@ -687,7 +687,7 @@ therefore, @cite{@value{PACKAGE_TITLE}} renames the library to
 
 @end itemize
 
-See @manref{libxnsl(3)} for additional compatiblity information.
+See @manref{libxnsl(3)} for additional compatibility information.
 
 @subsubheading Conforming To
 
@@ -749,14 +749,14 @@ Of these, @manpage{setnetconfig(3)}, @manpage{getnetconfig(3)},
 @manpage{endnetconfig(3)}, provide a mechanism to sequentially access each
 entry in the Network Configuration database.
 
-@manpage{setnetconfig(3)} returns a pointer to an oqaque datastructure used as
+@manpage{setnetconfig(3)} returns a pointer to an opaque data structure used as
 a handle to the @manpage{getnetconfig(3)} subroutine.
 @manpage{setnetconfig(3)} is used to initialize client access to the database
 entries and set the access point to the first entry.
 
 @manpage{nc_perror(3)} and @manpage{nc_sperror(3)} provide a mechanism for
 providing diagnostic messages upon failure.  These subroutines can be used for
-this @strong{setnetconfig} subrouting, as well as the @manpage{netpath(3)}
+this @strong{setnetconfig} subroutine, as well as the @manpage{netpath(3)}
 subroutines.
 
 @subsubheading File Format
@@ -778,7 +778,7 @@ is returned and @manpage{nc_error(3)} is set to indicate the error.
 
 @subsubheading Errors
 
-When @manpage{setnetconfig(3)} failes, it returns @var{NULL} and sets
+When @manpage{setnetconfig(3)} fails, it returns @var{NULL} and sets
 @manpage{nc_error(3)} to one of the following error numbers:
 
 @vtable @error
@@ -819,7 +819,7 @@ exhausted the entries in the @file{/etc/netconfig} file.
 
 @item (unknown)
 "@i{unknown error}" @*
-An internal error occured in the @manpage{libxnsl(3)} library.
+An internal error occurred in the @manpage{libxnsl(3)} library.
 @end vtable
 
 An error string associated with the error number can be obtained using
@@ -904,7 +904,7 @@ See @manref{libxnsl(3)} for additional compatibility information.
 
 @subsubheading History
 
-The Network Selection subroutines furst appeared in @cite{SVR 4.2}.  These
+The Network Selection subroutines first appeared in @cite{SVR 4.2}.  These
 subroutines are related to the @cite{UNIX} @dfn{STREAMS} implementation of
 network transport providers.
 
@@ -1134,7 +1134,7 @@ The following are @cite{Solaris} TI-RPC 2.3 options:
 
 @table @var
 @item ND_SET_BROADCAST
-Permit use of broadcast address on trasnport endpoint.
+Permit use of broadcast address on transport endpoint.
 
 @item ND_SET_RESERVED_PORT
 Bind to a reserved port on transport endpoint.
@@ -1163,7 +1163,7 @@ Prohibit use of broadcast address on transport endpoint.
 Permit reuse of local addresses for transport endpoint.
 
 @item ND_CLEAR_REUSEADDR
-Prohibit reuse of local addresses for tansport endpoint.
+Prohibit reuse of local addresses for transport endpoint.
 
 @end table
 
@@ -1174,7 +1174,7 @@ The following are @cite{OpenSS7} extensions:
 Do not route packets from transport endpoint.
 
 @item ND_CLEAR_DONTROUTE
-Route packets from trasnport endpoint.
+Route packets from transport endpoint.
 
 @item ND_SET_KEEPALIVE
 Set keepalive on transport endpoint.
@@ -1225,7 +1225,7 @@ colon).
 
 @cite{UNIX} has traditionally provided three components of the Network
 Services Library, @file{libnsl}, that are associated with Transport Provider
-Interface, @manpage{tpi(7)}, @dfn{STREAMS} network pseudo-evice drivers, and
+Interface, @manpage{tpi(7)}, @dfn{STREAMS} network pseudo-device drivers, and
 that are not currently part of the @cite{Linux} Network Services Library.
 These components are:
 
@@ -1488,7 +1488,7 @@ systems based on @cite{SVR 4.2}, including @cite{AIX}, @cite{Solaris} and
 @itemize --
 @item
 @cite{Solaris} and @cite{UnixWare} describe the @manpage{nc_sperror(3)}
-subrouting as returning a pointer to thread-specific data and that the buffer
+subroutine as returning a pointer to thread-specific data and that the buffer
 could change at any point.  While the error value is saved as thread-specific
 data, this implementation of @manpage{nc_sperror(3)} returns a pointer to a
 shared read-only string that is valid for the duration of the calling process.
@@ -1557,7 +1557,7 @@ struct nd_addrlist *_netdir_getbyname(struct netconfig *@var{config},
 @table @var
 
 @item config
-A pointer to a @type{netconfig} structure describing the network trasnport
+A pointer to a @type{netconfig} structure describing the network transport
 provider returned by @manpage{getnetconfig(3)} or @manpage{getnetpath(3)}.
 
 @item service
@@ -1574,7 +1574,7 @@ address(es).
 
 @cite{UNIX} has traditionally provided three components of the Network
 Services Library, @file{libnsl}, that are associated with Transport Provider
-Interface, @manpage{tpi(7)}, @dfn{STREAMS} network pseudo-evice drivers, and
+Interface, @manpage{tpi(7)}, @dfn{STREAMS} network pseudo-device drivers, and
 that are not currently part of the @cite{Linux} Network Services Library.
 These components are:
 
@@ -1588,12 +1588,12 @@ These are often referred to collectively as the Network Selection facility of
 the Network Services Library.
 
 @manpage{netdir_getbyname(3)} provides a forward directory name service for
-the network trasnport protocol specified with a pointer to a @type{netconfig}
+the network transport protocol specified with a pointer to a @type{netconfig}
 structure, @var{config}.  The @var{config} pointer is acquired using the
 @manpage{getnetconfig(3)}, @manpage{getnetconfigent(3)} or
 @manpage{getnetpath(3)} subroutines and describes a particular transport
 protocol from the @manpage{netconfig(5)} network configuration database.  The
-host and service name tupe to forward lookup is specified as a pointer to a
+host and service name type to forward lookup is specified as a pointer to a
 @type{hd_hostserv} structure, @var{service}, that contains the host and
 service name tuple (the structure is described below).
 @manpage{netdir_getbyname(3)} returns into the pointer referenced by
@@ -1776,7 +1776,7 @@ insight into the error.
 
 @item other
 "@i{n2a: unknown error %d}" @*
-An internal error occured in the @manpage{libxnsl(3)} library or a loaded
+An internal error occurred in the @manpage{libxnsl(3)} library or a loaded
 shared object.  @samp{%d} is the decimal number of the error number that was
 contained in @manpage{_nderror}.
 
@@ -1795,7 +1795,7 @@ formulate and return host-based addresses only.
 immediately after the failed network configuration subroutine fails.
 Otherwise, the error condition in @manpage{_nderror(3)} may be lost.
 
-The poinoter returned to the pointer referenced by the @var{addrs} argument
+The pointer returned to the pointer referenced by the @var{addrs} argument
 must eventually be released by passing it to @manpage{netdir_free(3)} with a
 @var{struct_type} argument of @var{ND_ADDRLIST}.
 
