@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: drivers.texi,v 0.9.2.4 2006/10/21 10:31:31 brian Exp $
+@c @(#) $Id: drivers.texi,v 0.9.2.5 2007/02/28 06:30:55 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/21 10:31:31 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:30:55 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -269,7 +269,7 @@ effects, care should be taken to not create @command{clone} device nodes in the 
 minor device numbers that do not correspond to major device numbers of @dfn{STREAMS} devices.
 
 Super cloning (see
-@manpage{nsdev(4)}) and use of the @file{specfs} filesystem (see
+@manpage{nsdev(4)}) and use of the @file{specfs} file system (see
 @manref{specfs(5)}) are other possible solutions to avoid undesirable side effects.
 
 Because a minor device number is assigned to the Shadow Special Filesystem inode (see
@@ -526,12 +526,12 @@ return @errno{ENXIO} in
 @manpage{errno(3)}.
 
 @item
-@command{fifo} character special device files and @dfn{FIFO} special files cannnot be mounted with
+@command{fifo} character special device files and @dfn{FIFO} special files cannot be mounted with
 @manpage{fattach(2)}.  This is because a @dfn{FIFO} as already mounted at the point that the
-character or @dfn{FIFO} special file appears within a filesystem.
+character or @dfn{FIFO} special file appears within a file system.
 
 @item
-@command{fifo} character special device files, once opened, are indistiguishable from system-based
+@command{fifo} character special device files, once opened, are indistinguishable from system-based
 @dfn{FIFO}s:
 @manpage{fstat(2)} will report the file as a @dfn{FIFO} special device.
 
@@ -636,10 +636,10 @@ operation.
 @item
 By default, when an asynchronous write error occurs, and a write or write-like operation is
 performed, @dfn{FIFO}s will generate @signal{SIGPIPE} to the caller in addition to returning the
-error from the asynchronous write error message.  This behavior can be suppressed by clearing the
+error from the asynchronous write error message.  This behaviour can be suppressed by clearing the
 @var{SNDPIPE} write option flag using the
 @manpage{I_SWROPT(7)} input-output control.  This is the
-reverse of the default behavior for regular @dfn{STREAMS} character special files.
+reverse of the default behaviour for regular @dfn{STREAMS} character special files.
 
 @item
 By default, attempting to write a zero-length data message to a @dfn{FIFO} with
@@ -699,18 +699,18 @@ kernel modules are loaded.
 
 @ftable @file
 @item /dev/fifo
-An instance of an external filesystem @dfn{STREAMS} @dfn{FIFO} character device.  This @dfn{FIFO}
+An instance of an external file system @dfn{STREAMS} @dfn{FIFO} character device.  This @dfn{FIFO}
 device instance is provided for testing, primarily by the
 @manpage{test-fifo(8)} conformance
 verification test suite.
 
 @item /dev/streams/fifo
 The
-@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} @dfn{FIFO} device.
+@manpage{specfs(5)} shadow special file system @dfn{STREAMS} @dfn{FIFO} device.
 
 @item /dev/streams/fifo/nnn
 Instances of
-@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} @dfn{FIFO} devices.
+@manpage{specfs(5)} shadow special file system @dfn{STREAMS} @dfn{FIFO} devices.
 
 @end ftable
 
@@ -781,7 +781,7 @@ the sense of
 @item
 Some @dfn{STREAMS} implementations do not permit @dfn{STREAMS}-based pipes or @dfn{FIFO}s to be
 linked beneath a multiplexing driver.  This may be due to an inability to represent a @dfn{FIFO} as
-a regular Stream within the traditional VFS filesystem.  @cite{@value{PACKAGE_TITLE}} permits
+a regular Stream within the traditional VFS file system.  @cite{@value{PACKAGE_TITLE}} permits
 @dfn{STREAMS}-based pipes and @dfn{FIFO}s to be linked beneath a multiplexing driver for testing and
 other special purposes.  The @cite{@value{PACKAGE_TITLE}} implementation of @dfn{FIFO}s permit them
 to be treated as any other @dfn{Stream} with regards to linking.
@@ -1063,7 +1063,7 @@ The @command{strlog} driver only supports
 @manpage{I_STR(7)} input output
 controls.  @var{TRANSPARENT} input output controls are not supported and will result in a return
 value of @errno{ENXIO}.  The @command{strlog} drivers supports the following streamio(7)
-@manpage{I_STR(7)} input ouput controls:
+@manpage{I_STR(7)} input-output controls:
 
 @subsubheading I_TRCLOG
 Indicates a trace logger.  A data buffer consisting of an array of one or more @var{trace_ids}
@@ -1154,12 +1154,12 @@ The external file system console log device.
 @itemx /dev/streams/clone/log
 @itemx /devices/strlog
 The
-@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} log device.
+@manpage{specfs(5)} shadow special file system @dfn{STREAMS} log device.
 
 @item /dev/streams/log/conslog
 @itemx /devices/conslog
 The
-@manpage{specfs(5)} shadow special filesystem console log device.
+@manpage{specfs(5)} shadow special file system console log device.
 
 @end ftable
 
@@ -1248,7 +1248,7 @@ UNIX System Laboratories, Inc., Prentice Hall.}}
 The @command{loop} psuedo-device multiplexing driver is an implementation of the loop-around driver
 described in the @cite{UNIX@registeredsymbol{} System V Release 4 -- STREAMS Programmer's Guide},@footnote{@cite{SVR
 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T
-UNIX System Laboratories, Inc., Prentice Hall.}} with a number of exceptions and enhancments.  The
+UNIX System Laboratories, Inc., Prentice Hall.}} with a number of exceptions and enhancements.  The
 primary purposes of the @command{loop} pseudo-device driver are: to provide a capability to the
 @manpage{test-streams(8)} conformance and verification test program, for testing passing of
 @dfn{STREAMS} file descriptors across a pipe-like driver; and to provide an example of a pipe-like
@@ -1331,11 +1331,11 @@ System Laboratories, Inc., Prentice Hall.}}
 @ftable @file
 
 @item /dev/sloop
-The external filesystem @dfn{STREAMS} @command{loop} device.
+The external file system @dfn{STREAMS} @command{loop} device.
 
 @item /dev/streams/loop, /devices/loop
 The
-@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} @command{loop} device.
+@manpage{specfs(5)} shadow special file system @dfn{STREAMS} @command{loop} device.
 
 @end ftable
 
@@ -1393,10 +1393,10 @@ Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}}
 @command{mux} -- @dfn{STREAMS} multiplexing pseudo-device driver
 
 @subheading Description
-The @command{mux} psuedo-device multiplexing driver is an implementation of the multplexing driver
+The @command{mux} psuedo-device multiplexing driver is an implementation of the multiplexing driver
 described in the @cite{UNIX@registeredsymbol{} System V Release 4 -- STREAMS Programmer's Guide},@footnote{@cite{SVR
 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990, (Englewood Cliffs, New Jersey), AT&T
-UNIX System Laboratories, Inc., Prentice Hall.}} with a number of exceptions and enhancments.  The
+UNIX System Laboratories, Inc., Prentice Hall.}} with a number of exceptions and enhancements.  The
 primary purposes of the @command{mux} pseudo-device driver are: to provide a capability to the
 @manpage{test-streams(8)} conformance and verification test program, for testing linking and
 unlinking of @dfn{STREAMS} across a multiplexing driver; and to provide an example of a multiplexing
@@ -1448,7 +1448,7 @@ back-enabled.
 
 @item @ioctlref{I_UNLINK}, @ioctlref{I_PUNLINK}
 When a lower multiplex @dfn{Stream} is removed using @ioctlref{I_UNLINK} or @ioctlref{I_PUNLINK},
-the lower multiplex @dfn{Stream} is no longer availble for data transfer and returns to its original
+the lower multiplex @dfn{Stream} is no longer available for data transfer and returns to its original
 @dfn{Stream head}.  If the unlinked @dfn{Stream} is connected to an upper multiplex @dfn{Stream}
 (with @var{MUX_DOWN}), the connection is broken and an
 @manpage{M_HANGUP(9)} message is sent to the
@@ -1461,13 +1461,13 @@ When an upper multiplex @dfn{Stream} is closed using the
 the closing @dfn{Stream} with @ioctlref{I_LINK} will be unlinked automatically by the @dfn{Stream
 head} before the upper multiplex @dfn{Stream} is closed.  If the upper @dfn{Stream} remains connected
 to a lower multiplex @dfn{Stream} (due to a previous call to @var{MUX_UP}), the connection will be
-broken and the lower multiplex @dfn{Stream} will begin queuing read data pending a subsequent
+broken and the lower multiplex @dfn{Stream} will begin queueing read data pending a subsequent
 connection or unlink operation.
 
 @end table
 
 @subheading Usage
-The @command{mux} pseudo-device multiplexing driver is an implementation of the multplexing
+The @command{mux} pseudo-device multiplexing driver is an implementation of the multiplexing
 driver described in the @cite{UNIX@registeredsymbol{} System V Release 4 -- STREAMS Programmer's
 Guide},@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990,
 (Englewood Cliffs, New Jersey), AT&T UNIX System Laboratories, Inc., Prentice Hall.}} with a number
@@ -1581,11 +1581,11 @@ System Laboratories, Inc., Prentice Hall.}}
 @ftable @file
 
 @item /dev/mux
-The external filesystem @dfn{STREAMS} @command{mux} device.
+The external file system @dfn{STREAMS} @command{mux} device.
 
 @item /dev/streams/mux, /devices/mux
 The
-@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} @command{mux} device.
+@manpage{specfs(5)} shadow special file system @dfn{STREAMS} @command{mux} device.
 
 @end ftable
 
@@ -1725,7 +1725,7 @@ Fast-STREAMS (LfS) @value{VERSION} Source Code, Brian Bidulock, ed., OpenSS7 Cor
 <@url{http://www.openss7.org/}>}} @cite{@value{PACKAGE_TITLE}} shadow special device nodes call
 @code{nsdev_open()} from @code{cdev_open()} instead of @code{spec_open()} permitting the
 @command{nsdev} device to intercept and redirect the open call to the appropriate device.  This is
-consitent with the descriptions for the internal @code{clone_open()} under @cite{SVR
+consistent with the descriptions for the internal @code{clone_open()} under @cite{SVR
 4}.@footnote{@cite{Magic Garden, The Magic Garden Explained: The Internals of UNIX@registeredsymbol{} System V
 Release 4 / An Open Systems Design, 1994, (Australia), B. Goodheart, J. Cox, Prentice Hall.  [ISBN
 0-13-098138-9]}}
@@ -1786,11 +1786,11 @@ technique using the @dfn{Named STREAMS Device}, see
 @ftable @file
 
 @item /dev/nsdev
-The external filesystem @dfn{Named STREAMS Device}.
+The external file system @dfn{Named STREAMS Device}.
 
 @item /dev/streams/nsdev, /devices/nsdev
 The
-@manpage{specfs(5)} shadow special filesystem @dfn{Named STREAMS Device}.
+@manpage{specfs(5)} shadow special file system @dfn{Named STREAMS Device}.
 
 @end ftable
 
@@ -1946,12 +1946,12 @@ related system call emulation for
 @ftable @file
 
 @item /dev/nuls
-The external filesystem null @dfn{STREAMS} device.
+The external file system null @dfn{STREAMS} device.
 
 @item /dev/streams/nuls
 @itemx /devices/nuls
 The
-@manpage{specfs(5)} shadow special filesystem null @dfn{STREAMS} device.
+@manpage{specfs(5)} shadow special file system null @dfn{STREAMS} device.
 
 @end ftable
 
@@ -2336,13 +2336,13 @@ and then downgrade its credentials for security, but still have the ability to m
 @subheading Devices
 @ftable @file
 @item /dev/sad
-Systems other than @cite{Solaris@registeredsymbol{}} use this external filesystem device.  This may be a symbolic
+Systems other than @cite{Solaris@registeredsymbol{}} use this external file system device.  This may be a symbolic
 link to the
 @manpage{specfs(5)} device.
 
 @item /dev/sad/admin
 @itemx /dev/sad/user
-@cite{Solaris@registeredsymbol{}} uses these two external filesystem devices.  This (or @file{/dev/sad}) may be a
+@cite{Solaris@registeredsymbol{}} uses these two external file system devices.  This (or @file{/dev/sad}) may be a
 symbolic link to a
 @manpage{specfs(5)} device.
 
@@ -2353,7 +2353,7 @@ symbolic link to a
 @itemx /devices/sad/admin
 @itemx /devices/sad/user
 These are the
-@manpage{specfs(5)} special shadow filesystem nodes for the @dfn{STREAMS}
+@manpage{specfs(5)} special shadow file system nodes for the @dfn{STREAMS}
 administrative device.
 
 @end ftable
@@ -2476,9 +2476,9 @@ write or write-like operations fail, generate a @signal{SIGPIPE} signal to the c
 @item
 By default, when an asynchronous write error occurs, and a write or write-like operation is
 performed, @dfn{FIFO}s will generate @signal{SIGPIPE} to the caller in addition to returning the
-error from the asynchronous write error message.  This behavior can be suppressed by clearing the
+error from the asynchronous write error message.  This behaviour can be suppressed by clearing the
 @var{SNDPIPE} write option flag using the @ioctlref{I_SWROPT} input-output control.  This is the
-reverse of the default behavior for regular @dfn{STREAMS} character special files.
+reverse of the default behaviour for regular @dfn{STREAMS} character special files.
 
 @item
 By default, attempting to write a zero-length data message to a @dfn{FIFO} with
@@ -2557,10 +2557,10 @@ pipes and @dfn{FIFO}s to be linked beneath a multiplexing driver.
 
 @item /dev/fifo
 @itemx /dev/sfx
-The external filesystem @dfn{STREAMS} @dfn{FIFO} devices.
+The external file system @dfn{STREAMS} @dfn{FIFO} devices.
 
 @item /dev/fifo
-An instance of an external filesystem @dfn{STREAMS} @dfn{FIFO} character device.  This @dfn{FIFO}
+An instance of an external file system @dfn{STREAMS} @dfn{FIFO} character device.  This @dfn{FIFO}
 device instance is provided for testing, primarily by the
 @manpage{test-fifo(8)} conformance
 verification suite.
@@ -2568,11 +2568,11 @@ verification suite.
 @item /dev/streams/sfx
 @itemx /devices/sfx
 The
-@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} @command{fifo} device.
+@manpage{specfs(5)} shadow special file system @dfn{STREAMS} @command{fifo} device.
 
 @item /dev/streams/fifo/nnn
 Instances of
-@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} @dfn{FIFO} devices.
+@manpage{specfs(5)} shadow special file system @dfn{STREAMS} @dfn{FIFO} devices.
 
 @end ftable
 
@@ -2680,9 +2680,9 @@ Stream, such as @ioctlref{I_FDINSERT}.
 @item
 By default, when an asynchronous write error occurs, and a write or write-like operation is
 performed, @dfn{STREAMS}-based pipes will generate @signal{SIGPIPE} to the caller in addition to
-returning the error from the asynchronous write error message.  This behavior can be suppressed by
+returning the error from the asynchronous write error message.  This behaviour can be suppressed by
 clearing the @var{SNDPIPE} option using the @ioctlref{I_SWROPT} input-output control.  This is the
-reverse of the default behavior for regular @dfn{STREAMS} character special files.
+reverse of the default behaviour for regular @dfn{STREAMS} character special files.
 
 @item
 By default, attempting to write a zero-length data message to a @dfn{STREAMS}-based pipe with
@@ -2841,12 +2841,13 @@ spipe(int *fd)
 @ftable @file
 
 @item /dev/spx
-The external filesystem @dfn{STREAMS} @command{pipe} device.
+The external file system @dfn{STREAMS} @command{pipe} device.
 
 @item /dev/streams/spx
 @itemx /devices/spx
 The
-@manpage{specfs(5)} shadow special filesystem @dfn{STREAMS} @command{pipe} deivce.
+@manpage{specfs(5)} shadow special file system @dfn{STREAMS} @command{pipe}
+device.
 
 @end ftable
 

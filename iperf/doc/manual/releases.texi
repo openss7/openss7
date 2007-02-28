@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.5 2007/01/08 16:22:55 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.6 2007/02/28 06:30:18 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/08 16:22:55 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:30:18 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -91,7 +91,7 @@ compatibility information of OpenSS7 release to the original UI DAST releases of
 @include prerequisites.texi
 
 If you need to rebuild the package from sources with modifications, you will need a larger GNU
-toolchain as described in @xrefman{Downloading from CVS}.
+tool chain as described in @xrefman{Downloading from CVS}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -147,7 +147,7 @@ DAST} releases of @cite{@value{PACKAGE}}.
 
 @subsubheading @value{PACKAGE}-@value{VERSION} and Iperf Compatibility
 
-OpenSS7 modifications to support SCTP does not alter the datastructures nor fundamental operation.
+OpenSS7 modifications to support SCTP does not alter the data structures nor fundamental operation.
 New structures and test definitions have been added for SCTP that are largely consistent with those
 of TCP.
 
@@ -210,7 +210,7 @@ The @cite{OpenSS7 Project} adheres to the following release philosophy:
 
 @dfn{Pre-alpha} releases are releases that have received no testing whatsoever.  Code in the release
 is not even known to configure or compile.  The purpose of a pre-alpha release is to make code and
-documenation available for insepection only, and to solicit comments on the design approach or other
+documentation available for inspection only, and to solicit comments on the design approach or other
 characteristics of the software package.
 
 @dfn{Pre-alpha} release packages ship containing warnings recommending that the user not even
@@ -222,7 +222,7 @@ execute the contained code.
 @dfn{Alpha} releases are releases that have received little to no testing, or that have been tested
 and contains known bugs or defects that make the package unsuitable even for testing.  The purpose
 for an @dfn{alpha} release are the same as for the pre-alpha release, with the additional purpose
-that it is an earily release of partially functional code that has problems that an external
+that it is an early release of partially functional code that has problems that an external
 developer might be willing to fix themselves and contribute back to the project.
 
 @dfn{Alpha} release packages ship containing warnings that executing the code can crash machines and
@@ -263,7 +263,7 @@ on target systems before considering production use.
 validated on specific distributions and architectures.  @dfn{Production} release packages do not
 ship with known defects.  Please remember that there is NO WARRANTY on public release packages.
 
-@dfn{Production} packages ship containig a list of validated distributions and architecutres.
+@dfn{Production} packages ship containing a list of validated distributions and architectures.
 Full regression testing of any maintenance changes is performed.  Suitability of software in this
 category for production use on the specified target distributions and architectures is at the
 discretion of the user.  It should not be necessary to preform validation tests on the set of
@@ -275,10 +275,10 @@ supported target systems before considering production use.
 @dfn{Unstable} releases are releases that have received extensive testing within the project and
 validated on a a wide range of distributions and architectures; however, is has tested unstable and
 found to be suffering from critical problems and issues that cannot be resolved.  Maintenance of the
-package has proven impossible.  @dfn{Unstable} release packages ship with known defects (and loud
+package has proved impossible.  @dfn{Unstable} release packages ship with known defects (and loud
 warnings).  Suitability of software in this category for production use is at the discretion of the
 user of the software.  @dfn{The OpenSS7 Project} recommends that the problems and issues be closely
-examined before this software is used even in a non-production evironment.  Each failing test
+examined before this software is used even in a non-production environment.  Each failing test
 scenario should be completely avoided by the application.  @cite{OpenSS7} beta software is more
 stable that software in this category.
 
@@ -415,7 +415,7 @@ software.  YOU HAVE BEEN WARNED.}
 @cindex known bugs
 @cindex bugs, known
 
-With the exception of packages not originaly created by the @cite{OpenSS7 Project}, the
+With the exception of packages not originally created by the @cite{OpenSS7 Project}, the
 @cite{OpenSS7 Project} software does not ship with known bugs in any release stage except
 @dfn{pre-alpha}.  @dfn{@value{PACKAGE_TITLE}} had no known bugs at the time of release.
 

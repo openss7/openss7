@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: modules.texi,v 0.9.2.3 2006/10/21 10:31:32 brian Exp $
+@c @(#) $Id: modules.texi,v 0.9.2.4 2007/02/28 06:30:55 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/21 10:31:32 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:30:55 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -106,7 +106,7 @@ only @var{FLUSHW} are specified.
 
 @command{pipemod} corrects this problem for pushed modules by swapping the read and write side flush
 flags across the module.  @command{pipemod} should be pushed over one end of the pipe before any
-other modules are pushed so that the reversal is performed accross the twist at the midpoint in a
+other modules are pushed so that the reversal is performed across the twist at the midpoint in a
 @dfn{STREAMS}-based
 @manpage{pipe(4)}.
 
@@ -126,7 +126,7 @@ Because the @dfn{Stream head} does not queue on the write-side queue, @var{FLUSH
 effect as @var{FLUSHRW}, and @var{FLUSHW} has no effect.  When @command{pipemod} is pushed on a bare
 pipe, @var{FLUSHR} flushes only the near read-side queue and @var{FLUSHW} flushes only the far
 read-side queue.  Due to this difference in the @dfn{Stream head} flushing behaviour when
-@command{pipemod} is pushed or not, it is good practice to always flush pipes with @var{FLUSHRW}.
+@command{pipemod} is pushed or not, it is good practise to always flush pipes with @var{FLUSHRW}.
 
 @subheading Notices
 It is not necessary to use @command{pipemod} if all flushes flush both read and write queues at the
@@ -235,9 +235,9 @@ int ioctl(pfds[1], I_RECVFD, struct strfdinsert *fdi);
 
 @subheading Description
 @command{connld} is a @dfn{STREAMS} module that can be pushed over a @dfn{STREAMS}-based
-bi-drectional software pipe (see
+bi-directional software pipe (see
 @manpage{spx(4)}) to provide automatic generation of new
-@dfn{STREAMS}-based bi-drectional software pipes between a client and server process.
+@dfn{STREAMS}-based bi-directional software pipes between a client and server process.
 
 When
 @manpage{open(2s)} is called on the end of a pipe upon which @command{connld} has been pushed
@@ -742,7 +742,7 @@ int ioctl(fd, I_PUSH, "testmod");
 Aside from being a @dfn{STREAMS} module, @command{testmod} performs no actions on the data path.  All
 messages passed from the @dfn{Stream head} toward the @command{testmod} module are passed on downstream
 from the @command{testmod} write-side put procedure (with
-@manpage{putnext(9)}); all messaes received
+@manpage{putnext(9)}); all messages received
 from the driver, are passed on upstream from the read-side put procedure.  The @command{testmod}
 module has no write- or read-side service procedure.
 
@@ -843,7 +843,7 @@ applications.
 @end itemize
 
 See
-@manpage{STREAMS(9)} for additional compatiblity information.
+@manpage{STREAMS(9)} for additional compatibility information.
 
 @subheading Conformance
 @cite{SVR 4.0}.@footnote{@cite{SVR 4, UNIX@registeredsymbol{} System V Release 4 STREAMS Programmer's Guide, 1990,

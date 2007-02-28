@@ -1,12 +1,16 @@
 2007-02-28  Brian Bidulock  <bidulock@openss7.org>
 
-	* doc/manual/configure.texi: updates for OSR61 subpackage
-	* doc/manual/descrip.texi: updates for OSR61 subpackage
-	* doc/manual/news.texi: updates for OSR61 subpackage
-	* doc/manual/openss7.texi: updates for OSR61 subpackage
-	* doc/manual/rpm.texi: updates for OSR61 subpackage
-	* doc/manual/tree.texi: updates for OSR61 subpackage
-	* scripts/texi/versions.texi: updates for OSR61 subpackage
+	* doc/manual/configure.texi: updates and corrections
+	* doc/manual/descrip.texi: updates and corrections
+	* doc/manual/install.texi: updates and corrections
+	* doc/manual/news.texi: updates and corrections
+	* doc/manual/openss7.texi: updates and corrections
+	* doc/manual/prerequisites.texi: updates and corrections
+	* doc/manual/releases.texi: updates and corrections
+	* doc/manual/rpm.texi: updates and corrections
+	* doc/manual/todo.texi: updates and corrections
+	* doc/manual/tree.texi: updates and corrections
+	* scripts/texi/versions.texi: updates and corrections
 
 2007-02-27  Brian Bidulock  <bidulock@openss7.org>
 

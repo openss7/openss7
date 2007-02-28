@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: sctp.7.texi,v 0.9.2.3 2006/04/26 10:44:54 brian Exp $
+@c @(#) $Id: sctp.7.texi,v 0.9.2.4 2007/02/28 06:30:29 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/04/26 10:44:54 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:30:29 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -174,7 +174,7 @@ sockets wait for sufficient room to buffer the entire sent packet before returni
 @samp{SOCK_SEQPACKET} and @samp{SOCK_STREAM} sockets will segment large data writes in to smaller
 segments for delivery to the peer.
 
-@emph{SCTP} provides a mechanism for receiving positive and negative acknowledgments of sent data on
+@emph{SCTP} provides a mechanism for receiving positive and negative acknowledgements of sent data on
 @samp{SOCK_SEQPACKET} and @samp{SOCK_RDM} sockets.  When the socket option @samp{SCTP_DISPOSITION}
 is set to @samp{SCTP_DISPOSITION_ACKED}, or when data is sent using the @samp{MSG_CONFIRM} flag to
 @manref{send(2)}, @manref{sendto(2)} or @manref{sendmsg(2)}, message confirmation or delivery
@@ -263,7 +263,7 @@ As a result of binding to @samp{INADDR_ANY} or the @b{ADD-IP} extension, subsequ
 @manref{getsockname(2)} may return different addresses depending on the state of the connection or
 resulting from the exchange of ASCONF control chunks.  This list of transport addresses returned by
 @manref{getsockname(2)} represents the current list of local transport addresses bound to the
-endpoint.  When the connection is multi-homed or supports @b{ADD-IP}, this behavior is different
+endpoint.  When the connection is multi-homed or supports @b{ADD-IP}, this behaviour is different
 from @manref{tcp(7)} and other connection-oriented protocols, whose bound address does not change
 during the lifespan of a connection.
 
@@ -278,7 +278,7 @@ As a result of connecting to multiple transport addresses using @manref{connect(
 @b{ADD-IP} extension, the membership of the list of transport addresses returned by
 @manref{getpeername(2)} may change due to the state of the socket or resulting from the exchange of
 ASCONF control chunks.  When the @emph{SCTP} connection is multi-homed or supports @b{ADD-IP}, this
-behavior is different from @manref{tcp(7)} and other connection-oriented protocol, whose peer
+behaviour is different from @manref{tcp(7)} and other connection-oriented protocol, whose peer
 address does not change during the lifespan of a connection.
 @end table
 
@@ -287,7 +287,7 @@ address does not change during the lifespan of a connection.
 
 Socket calls for @samp{SOCK_STREAM}, @samp{SOCK_SEQPACKET} and @samp{SOCK_RDM} sockets are different
 in some respects (addressing and options) than their @manref{tcp(7)} or @manref{udp(7)}
-counterparts.  These differences are described here.  For common behavior, please see the indicated
+counterparts.  These differences are described here.  For common behaviour, please see the indicated
 manual page in Section 2.
 
 @table @asis
@@ -316,7 +316,7 @@ unchanged.
 A call to @manref{connect(2)} can provide multiple destination transport addresses if the peer host
 is multi-homed.  If an INIT chunk sent to the first destination transport address is not
 acknowledged, the next INIT chunk will be sent to the next address in the list.  This will occur
-until an acknowledgment is received from one of the addresses or the connection attempt times out.
+until an acknowledgement is received from one of the addresses or the connection attempt times out.
 Each address will be retried @b{sctp_max_init_retries} times before the connection process is
 considered to have timed out.  Broadcast and multicast addresses are permitted for the call to
 @manref{connect(2)} but will not form an endpoint address in the association.  This feature permits
@@ -360,7 +360,7 @@ and @samp{SOCK_SEQPACKET} sockets.
 @item MSG_CONFIRM
 @emph{SCTP} supports the use of the @samp{MSG_CONFIRM} flag to @manref{recv(2)},
 @manref{recvfrom(2)} and @manref{recvmsg(2)}.  Data read with the @samp{MSG_CONFIRM} flag set will
-return messages receipt acknowledgments as well as messages which have exceeded their life-times,
+return messages receipt acknowledgements as well as messages which have exceeded their life-times,
 messages which have been dropped by @b{PR-SCTP}, and messages held for retrieval after abort or
 shutdown.
 
@@ -410,7 +410,7 @@ association and then a shutdown initiated.
 @item MSG_CONFIRM
 @emph{SCTP} supports the use of the @samp{MSG_CONFIRM} flag to @manref{send(2)} @manref{sendto(2)}
 and @manref{sendmsg(2)} for @samp{SOCK_SEQPACKET} and @samp{SOCK_RDM} sockets.  Records or packets
-written with the @samp{MSG_CONFIRM} flag set are marked for acknowledgment.  Acknowledgments can be
+written with the @samp{MSG_CONFIRM} flag set are marked for acknowledgement.  Acknowledgements can be
 received with the @samp{MSG_CONFIRM} flag to @manref{recv(2)}, @manref{recvfrom(2)} and
 @manref{recvmsg(2)} as described above.  See also @samp{SCTP_DISPOSITION} under @b{SOCKET OPTIONS}.
 @end table
@@ -451,7 +451,7 @@ presented by Minshall in
 @uref{http://www.ietf.org/internet-drafts/draft-minshall-tsvwg-nagle-01.txt,
 <draft-minshall-tsvwg-nagle-01.txt>}.
 @item Message disposition and retrieval on connection shutdown or abort, lifetime expiry, and
-receipt confirmation acknowledgment.
+receipt confirmation acknowledgement.
 @item Support for hardware assisted checksum for drivers which support @samp{NETIF_F_HW_CSUM}.
 @item Support for hardware assisted scatter/gather and fragmentation for devices which support
 @samp{NETIF_F_SG} and @samp{NETIF_F_FRAGLIST}.
@@ -459,7 +459,7 @@ receipt confirmation acknowledgment.
 secret keys after the key's first cookie lifetime to provide for maximum security for HMACs.
 @item High performance routing algorithm alters multi-homed routes on a per-packet basis.
 @item Wide range of settings for timers and protocol parameters permitting fast (average 5ms with
-100Hz tick clock; 0.5ms with 1000Hz tick clock) failover between failed destination addresses on
+100Hz tick clock; 0.5ms with 1000Hz tick clock) fail-over between failed destination addresses on
 high-speed networks.
 @item Deferral of checksum calculation until after socket lookup for protection from software
 checksum DoS attacks.
@@ -710,7 +710,7 @@ destinations have been deemed inactive.
 
 @item sctp_max_sack_delay
 Defines the default interval of time (in milliseconds) that the sending endpoint is permitted to
-delay an acknowledgment of received data.  Valid values are in the range from zero (0) to 500
+delay an acknowledgement of received data.  Valid values are in the range from zero (0) to 500
 milliseconds.  (@uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} forbids setting this value
 larger than 500 milliseconds.) The default value is the value recommended in
 @uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} (200 milliseconds).  This system control
@@ -729,7 +729,8 @@ socket is connected or a destination transport address has been added, the desti
 value can be changed using the socket option @samp{SCTP_RTO} as described under @b{SOCKET OPTIONS}.
 
 In general, @b{sctp_rto_min} should not be less than the peer's @b{sctp_max_sack_delay}.  Otherwise,
-excessive retransmissions might occur while the peer is delaying acknowledgments.
+excessive retransmissions might occur while the peer is delaying
+acknowledgements.
 
 @item sctp_rto_initial
 Defines the default time interval (in milliseconds) that will be used as an initial RTO
@@ -744,7 +745,8 @@ destination transport address has been added, the destination-specific value can
 the socket option @samp{SCTP_RTO} as described under @b{SOCKET OPTIONS}.
 
 In general, @b{sctp_rto_initial} should not be less than the peer's @b{sctp_max_sack_delay}.
-Otherwise, excessive retransmissions might occur while the peer is delaying acknowledgments.
+Otherwise, excessive retransmissions might occur while the peer is delaying
+acknowledgements.
 
 @item sctp_rto_max
 Defines the default time interval (in milliseconds) that will be used as a maximum RTO
@@ -759,7 +761,8 @@ destination transport address has been added, the destination-specific value can
 the socket option @samp{SCTP_RTO} as described under @b{SOCKET OPTIONS}.
 
 In general, @b{sctp_rto_initial} should not be less than the peer's @b{sctp_max_sack_delay}.
-Otherwise, excessive retransmissions might occur while the peer is delaying acknowledgments.
+Otherwise, excessive retransmissions might occur while the peer is delaying
+acknowledgements.
 
 @item sctp_path_max_retrans
 Defines the default number of times that @emph{SCTP} will attempt retransmitting a packet on to a
@@ -769,7 +772,7 @@ in @uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960} (5 retries).  This syste
 the default maximum for new sockets.  The actual value used can be changed with the socket option
 @samp{SCTP_PATH_MAX_RETRANS} before a call to @manref{connect(2)} or @manref{accept(2)} or before a
 new destination transport address is added by the peer.  After a socket is connected or a
-destination transport address has ben added, the destination-specific value can be changed using the
+destination transport address has been added, the destination-specific value can be changed using the
 socket option @samp{SCTP_RTO} as described under @b{SOCKET OPTIONS}.
 
 Adjusting this value has an effect on the period of time taken to fail-over between destinations for
@@ -1141,7 +1144,7 @@ The @b{sctp_rtoval} structure has the following fields:
 
 @table @samp
 @item dest
-is a @b{sockaddr_in} structure that contains the destination address to which the rto parameter
+is a @b{sockaddr_in} structure that contains the destination address to which the RTO parameter
 setting applies.
 
 @item rto_initial
@@ -1307,7 +1310,7 @@ be changed at any time during the life of the socket.
 
 @item SCTP_SACK_DELAY
 Set or get the maximum SACK delay as the interval of time (in milliseconds) that the sending
-endpoint will delay an acknowledgment of a received data chunk.  Valid values are in the range from
+endpoint will delay an acknowledgement of a received data chunk.  Valid values are in the range from
 0 to @code{INT_MAX}, however, the value of the maximum SACK delay should not exceed 500 milliseconds
 (setting this value to greater than 500 milliseconds is forbidden by
 @uref{http://www.ietf.org/rfcs/rfc2960.txt,RFC 2960}) for Internet Applications.  The default value
@@ -1317,7 +1320,7 @@ during the life of the socket.
 @item SCTP_DISPOSITION
 Gets or sets a flag that determines whether @emph{SCTP} will retain and deliver messages that were
 not successfully acknowledged by the peer for retrieval, or will deliver confirmation of
-acknowledgment for messages successfully acknowledged by the peer.  If @samp{SCTP_DISPOSITION} is
+acknowledgement for messages successfully acknowledged by the peer.  If @samp{SCTP_DISPOSITION} is
 return in a control message from a call to @manref{recvmsg(2)} with the @samp{MSG_CONFIRM} flag set,
 then the read packet represents a packet that was held for retrieval, exceeded its life-time, was
 dropped by @b{PR-SCTP} or had message confirmation set and was successfully acknowledged.  In
@@ -1327,7 +1330,7 @@ in a call to @manref{recv(2)}, @manref{recvfrom(2)} or @manref{recvmsg(2)}.  Val
 @table @code
 @item SCTP_DISPOSITION_NONE
 When this option is set to @samp{SCTP_DISPOSITION_NONE}, messages will not be retained for retrieval
-and acknowledgments will not be provided for messages unless overridden with the @samp{MSG_CONFIRM}
+and acknowledgements will not be provided for messages unless overridden with the @samp{MSG_CONFIRM}
 flag to @manref{send(2)}, @manref{sendto(2)} or @manref{sendmsg(2)}.
 
 @item SCTP_DISPOSITION_UNSENT
@@ -1358,7 +1361,7 @@ that was dropped by @b{PR-SCTP} will be delivered before shut down or abort.
 
 @item SCTP_DISPOSITION_ACKED
 When set to @samp{SCTP_DISPOSITION_ACKED}, @emph{SCTP} will retain and provide for retrieval
-acknowledgments for all messages that were confirmed delivered (by cumulative ack).  When set to
+acknowledgements for all messages that were confirmed delivered (by cumulative ack).  When set to
 @samp{SCTP_DISPOSITION_ACKED} in the ancillary message return by @manref{recvmsg(2)} called with the
 @samp{MSG_CONFIRM} flag set, then the read data was a packet that was sent and acknowledged (with a
 cumulative ack) before the connection was shut down gracefully or at any time before shut down or
@@ -1383,7 +1386,7 @@ ancillary data message before shutdown.  @emph{SCTP} must have been compiled wit
 Alternatively, if the socket option @samp{SCTP_DISPOSITION} is set to @samp{SCTP_DISPOSITION_ACKED}
 or messages were sent with the @samp{MSG_CONFIRM} flag set to @manref{send(2)}, @manref{sendto(2)}
 or @manref{sendmsg(2)}, then a call to @manref{recv(2)}, @manref{recvfrom(2)} or @manref{recvmsg(2)}
-with the @samp{MSG_CONFIRM} flag set will return acknowledgments with a @samp{SCTP_DISPOSITION}
+with the @samp{MSG_CONFIRM} flag set will return acknowledgements with a @samp{SCTP_DISPOSITION}
 control message set to @samp{SCTP_DISPOSITION_ACKED} for all acknowledged messages a the time of the
 call.  Care should be taken when using this receipt confirmation service as the message will be held
 in the transmit buffers until confirmation has been received by the user. Receipt confirmation also
@@ -1394,7 +1397,7 @@ Get or set the SCTP lifetime or @b{PR-SCTP} timed reliability lifetime associate
 which are sent on this socket.  When this option is included as an control message to
 @manref{sendmsg(2)}, the specified lifetime is associated with the written message.
 
-Ordered messages waiting for acknowledgment beyond this lifetime will cause subsequent writes to the
+Ordered messages waiting for acknowledgement beyond this lifetime will cause subsequent writes to the
 same stream to fail until all failed messages have been retrieved with @manref{recvmsg(2)} with the
 @samp{MSG_CONFIRM} flag set.  Subsequent unordered writes to the stream will succeed, although
 unordered data can also be collected by setting both @samp{MSG_OOB} and @samp{MSG_CONFIRM} in a call

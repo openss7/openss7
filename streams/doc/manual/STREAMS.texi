@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 0.9.2.35 2007/01/02 16:32:03 brian Exp $
+% @(#) $Id: STREAMS.texi,v 0.9.2.36 2007/02/28 06:30:55 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/01/02 16:32:03 $ by $Author: brian $
+% Last Modified $Date: 2007/02/28 06:30:55 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -426,6 +426,9 @@ package.
 @smallexample
 
 $Log: STREAMS.texi,v $
+Revision 0.9.2.36  2007/02/28 06:30:55  brian
+- updates and corrections, #ifdef instead of #if
+
 Revision 0.9.2.35  2007/01/02 16:32:03  brian
 - updates for release, disable streams-bcm by default
 
@@ -536,7 +539,7 @@ Revision 0.9.2.1  2004/03/13 05:46:34  brian
 @unnumberedsubsec ISO 9000 Compliance
 
 Only the @TeX{}, texinfo, or roff source for this manual is controlled.  An opaque (printed,
-postscript or portable manual format) version of this manual is an @strong{UNCONTROLLED
+postscript or portable document format) version of this manual is an @strong{UNCONTROLLED
 VERSION}.
 
 @node Disclaimer
@@ -781,7 +784,7 @@ the notable exception of @cite{Berkeley System Distribution} releases, variants 
 STREAMS is a flexible framework for communication between a user level process and a kernel resident
 driver.  It encompasses a set of kernel system calls providing a user-kernel interface that is
 backward compatible with the traditional character device driver interface, as well as a set of
-STREAMS driver and module entry points fomring a driver-kernel interface.  STREAMS also provides a
+STREAMS driver and module entry points forming a driver-kernel interface.  STREAMS also provides a
 rich set of kernel utility functions for the development and implementation of kernel-resident
 drivers and modules.  STREAMS prompted the specification of the DDI/DKI which is an architecture
 independent driver-kernel interface that provides a standardized set of kernel functions (beyond
@@ -801,7 +804,7 @@ the upstream direction to the kernel-user interface; or downstream, the kernel-d
 At the kernel-user end of the Stream is a component called the @dfn{Stream head}.  As with all
 components of a Stream, the Stream head consists of a queue pair and a specialized set of
 procedures.  The Stream head procedures are responsible for converting between the system call
-interface preseted to users and the message passing mechanism within the Stream.
+interface presented to users and the message passing mechanism within the Stream.
 
 At the kernel-driver end of the Stream is the @dfn{Stream end}.  The Stream end also contains a
 queue pair and a set of procedures.  The Stream end (or simply driver) procedures are responsible
@@ -822,7 +825,7 @@ controls provide the user with the ability to configure a Multiplexing driver.
 @node Why STREAMS?
 @section Why STREAMS?
 
-With the ability to open multiple Streams to a driver, push and pop moudles to and from the module
+With the ability to open multiple Streams to a driver, push and pop modules to and from the module
 stack on a Stream, and to link any Stream under a multiplexing driver--all under user control using
 standardized input-output controls--allows STREAMS to configure complex topologies to form protocol
 stacks.
@@ -859,15 +862,15 @@ The @cite{Linux} kernel was not developed with STREAMS in mind.  For @acronym{TP
 implementation of @acronym{TCP/IP} in the @cite{Linux} kernel has long departed from the classical
 @acronym{BSD} organization and exhibits characteristics unique to the @cite{GNU/Linux} operating
 system.  For character device and terminal input-output, @cite{Linux} follows closely the
-@acronym{SVR 3} pre-STREAMS approach to pipes, FIFOs and temrinal subsystem.  The terminal subsystem
+@acronym{SVR 3} pre-STREAMS approach to pipes, FIFOs and terminal subsystem.  The terminal subsystem
 implementation, too, has become unique to @cite{GNU/Linux}.
 
 Therefore, from the perspective of @acronym{TCP/IP} networking and @acronym{Terminal I/O}, there
 would be little reason to provide STREAMS for @cite{Linux}.  That is, if it were not for the body of
-software supporting @acronym{OSI} and telecommunications protoocls based solely on STREAMS, for
+software supporting @acronym{OSI} and telecommunications protocols based solely on STREAMS, for
 which @cite{Linux} has little or no support.
 
-So, the answer to the questtion, "Why STREAMS for Linux?" is: so that a @cite{GNU/Linux} platform
+So, the answer to the question, "Why STREAMS for Linux?" is: so that a @cite{GNU/Linux} platform
 can enjoy the same wealth of telecommunications and @acronym{OSI} protocol stacks otherwise only
 available to big-iron @cite{UNIX@registeredsymbol{}}.  Without STREAMS, @cite{Linux} is probably
 just another @acronym{BSD}, and probably not a very good one.
@@ -878,11 +881,11 @@ just another @acronym{BSD}, and probably not a very good one.
 In the mid-90's, @uref{http://www.gcom.com/,,  GCOM, @abbr{Inc.}} embarked on development on an open
 source implementation of STREAMS called @cite{Linux STREAMS (LiS)}, likely driven by its use for
 porting existing @acronym{OSI} protocol stacks to @cite{Linux}.  In 2000,
-@uref{http://www.openss7.org/,, The OpenSS7 Project} abandonned using the @cite{Linux} networkig
-model for implementation of the @cite{Signalling System No. 7} protocol (primarly due to the lack of
+@uref{http://www.openss7.org/,, The OpenSS7 Project} abandoned using the @cite{Linux} networking
+model for implementation of the @cite{Signalling System No. 7} protocol (primarily due to the lack of
 support for the full @acronym{BSD} networking model under @cite{Linux}) and switched to using
 STREAMS as the basis for all future development.  The @cite{GCOM LiS} release (2.2 at the time) was
-used as the STREAMS package.  Over the span of the next 5 years, (and not suprisingly given the body
+used as the STREAMS package.  Over the span of the next 5 years, (and not surprisingly given the body
 of software), almost all @cite{Signalling System No. 7} products released on @cite{Linux} used
 @cite{LiS} for STREAMS.  In 2005, Dave Grothe (the @dfn{G} in @cite{GCOM}) announced that he would
 no longer be maintaining or developing @cite{LiS} subsequent to the 2.18.0 release, stranding many
@@ -892,10 +895,10 @@ Later in 2005, after briefly maintaining two GPL'ed releases of @cite{LiS}, (2.1
 @uref{http://wwww.openss7.org/,, The OpenSS7 Project} release (after two years of development) the
 @file{streams-0.7a.4} package: a reimplementation of @cite{SVR 4.2 STREAMS} with compatibility
 modules for all major @cite{UNIX@registeredsymbol{}} releases, called @cite{@value{PACKAGE_TITLE}}.
-@cite{@value{PACKAGE_TITLE}} was intended as a @cite{POSIX/SUSv3 XSR} conforming, high perofrmance,
+@cite{@value{PACKAGE_TITLE}} was intended as a @cite{POSIX/SUSv3 XSR} conforming, high performance,
 production grade, replacement for @cite{LiS}, suitable for mainline @cite{Linux} adoption, and a
 better foundation on which to base @acronym{SIGTRAN}, @acronym{VoIP}, @acronym{ISDN} and
-@acronym{SS7} protocol stakcs developed under the @uref{http://www.openss7.org/,, The OpenSS7
+@acronym{SS7} protocol stacks developed under the @uref{http://www.openss7.org/,, The OpenSS7
 Project}, as well as a better foundation for porting commercial @cite{UNIX@registeredsymbol{}}
 @acronym{OEM} implementations to @cite{Linux}.  It is the @file{@value{PACKAGE}-@value{VERSION}}
 package that contains the documentation you are reading now.
@@ -909,12 +912,12 @@ replacement for @cite{LiS}, because of a number of shortcomings of the @cite{LiS
 
 @enumerate a
 @item unsuitable for mainline kernel adoption due to coding style and organization;
-@item pooly adapted to distribution production kernels;
+@item poorly adapted to distribution production kernels;
 @item is unsuitable for packaging and repeatability;
-@item protability objective unsuitable for mainline kernel adoption;
+@item portability objective unsuitable for mainline kernel adoption;
 @item ports form the same baseline obfuscate the code;
 @item performs poorly due to portability and coding style;
-@item code bloat and oversized memory footprint;
+@item code bloat and over sized memory footprint;
 @item redundant debug statements obscuring defects and obfuscating code;
 @item overuse of semaphores;
 @item contains serious races and not suitable for threaded applications;
@@ -936,15 +939,15 @@ by the initial @samp{streams-0.7a.4} release, was:
 @item designed and implemented specifically for @cite{GNU/Linux};
 @item no ports considered;
 @item over twice the performance;
-@item less than one-eigth of the memory footprint;
+@item less than one-eighth of the memory footprint;
 @item proper programming by assertion;
-@item proper use of lightweight spinlocks;
+@item proper use of lightweight spin locks;
 @item race free locking strategies and synchronization;
 @item compatible with all mainstream @cite{UNIX@registeredsymbol{}} implementations;
 @item conforms to @cite{POSIX/SUSv3 XSR};
 @item complete set of standard drivers and modules;
 @item complete set of diagnostic and administrative utilities;
-@item integrated set of conformance testsuites;
+@item integrated set of conformance test suites;
 @item fully documented.
 @end enumerate
 
@@ -967,8 +970,8 @@ are contained in the @dfn{COMPATIBILITY} section of most of the manual pages.
 @item Promotes mainstream kernel adoption.
 @tab Places portability concerns before mainstream kernel adoption.
 @item @  @tab @ 
-@item Lindented and follows normal kernel formatting and coding practices.
-@tab Non-lindented, does not follow normal kernel formatting and coding practices.
+@item Lindented and follows normal kernel formatting and coding practises.
+@tab Non-lindented, does not follow normal kernel formatting and coding practises.
 @item @  @tab @ 
 @item Provides compatibility modes for AIX, HPUX, OSF, Solaris, UnixWare, SVR 4.2 and LiS.  Supports
 all major SVR 4.2 variants.
@@ -978,20 +981,20 @@ all major SVR 4.2 variants.
 @tab Dubiously licensed under LGPL (yet parts are GPL).
 @item @  @tab @ 
 @item Supports full SVR 4.2 ES/MP synchronization models.
-@tab Supports only single, Linux derived sychronization models.
+@tab Supports only single, Linux derived synchronization models.
 @item @  @tab @ 
 @item Runs at SoftIRQ.  By running at SoftIRQ, @cite{@value{PACKAGE_TITLE}} ensures that its place within the
 scheduling network-based events is appropriate for the Linux kernel.
 @tab Separate kernel threads.
 @item @  @tab @ 
 @item Provides common SVR 4.2 system tunable parameters and system controls as well as /proc
-filesystem for support and debugging.
+file system for support and debugging.
 @tab Provides only log-based debugging.
 @item @  @tab @ 
 @item Provides support for SVR 4.2 STREAMS and other utilities.
 @tab Provides limited set of LiS only Linux-derived utilities.
 @item @  @tab @ 
-@item Provides full named-streams device and device filesystem support.
+@item Provides full named-streams device and device file system support.
 @tab Provides only character-based node support. @*
 @end multitable
 @end ignore
@@ -1036,7 +1039,7 @@ See @manref{specfs(5)} for more information.
 @item @file{streams}
 @pgindex streams
 
-This kernel module contians the @dfn{STREAMS} scheduler, utility functions, and @dfn{STREAMS} Device
+This kernel module contains the @dfn{STREAMS} scheduler, utility functions, and @dfn{STREAMS} Device
 Driver Interface/Driver Kernel Interface (DDI/DKI).
 See @manref{STREAMS(9)} for more information.
 
@@ -1203,7 +1206,7 @@ See @manref{clone(4)} for more information.
 Echo (loopback) device driver.
 This is a commonly implemented @dfn{STREAMS} driver.  It is implemented by @cite{HP-UX@registeredsymbol{}} and
 @cite{OSF/1@registeredsymbol{}}.  The @manpage{echo(4)} driver provides a simple FIFO-like device without full
-@cite{POSIX} FIFO semantics.  Its primary purpose is for the @dfn{STREAMS} Verficiation function,
+@cite{POSIX} FIFO semantics.  Its primary purpose is for the @dfn{STREAMS} Verification function,
 @manref{strvf(8)}, and the @manref{test-streams(8)} validation test suite.
 
 See @manref{echo(4)} for more information.
@@ -1244,7 +1247,7 @@ See @manref{log(4)} for more information.
 Loop device driver.
 This is a standard @cite{SVR 4.2 @dfn{STREAMS}} driver.
 The @command{loop} driver is detailed in the @cite{UNIX System V Release 4 Programmer's Manual -- STREAMS}.
-The @manpage{loop(4)} driver provides capabilities used primarly for validation test programs (see
+The @manpage{loop(4)} driver provides capabilities used primarily for validation test programs (see
 @manref{test-streams(8)}) as well as serving as an example driver.
 
 See @manref{loop(4)} for more information.
@@ -1371,7 +1374,7 @@ See @manref{pipemod(4)} for more information.
 
 Connection Line Discipline module.
 This is a standard @cite{SVR 4.2 @dfn{STREAMS}} module.
-The @manpage{connld(4)} module can be pushed over a pipe end that has been attached to a filesystem
+The @manpage{connld(4)} module can be pushed over a pipe end that has been attached to a file system
 file using @manref{fattach(3)} and will then create a new pipe instance on each @manpage{open(2s)}
 of the attached file and pass the new remove file pointer to the remove end using
 @manpage{M_PASSFP(9)} to be received with @manpage{I_RECVFD(7)}.  This allows servers to be created
@@ -1733,7 +1736,7 @@ Change @dfn{Stream} configuration.
 @manpage{strchg(1)} is a C-language user program that can be used to alter the configuration of the
 @dfn{Stream} associated with the caller's standard input.  The @manpage{strchg(1)} command pushes
 modules on the @dfn{Stream}, pops modules off of the @dfn{Stream}, or both.  Only the superuser or
-owner of the @dfn{STREAMS} device can alter the configruation of that @dfn{Stream}.  If another user
+owner of the @dfn{STREAMS} device can alter the configuration of that @dfn{Stream}.  If another user
 attempts to alter the configuration, the @manpage{strconf(1)} command will fail.
 
 @manpage{strchg(1)} is useful from the shell and, when standard input is redirected from an open
@@ -1768,10 +1771,10 @@ See @manref{strconf(1)} for more information.
 Reset a @dfn{Stream}.
 @manpage{strreset(1)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} user utility.
 
-@manpage{strreset(1)}is a C-language user progrm that resets an open @dfn{Stream} by generating an
+@manpage{strreset(1)}is a C-language user program that resets an open @dfn{Stream} by generating an
 @manpage{M_FLUSH(9)} message to the @dfn{Stream head}.  It is used mainly to reset blocked
 @dfn{Streams}.  Wehn it is impossible to reopen the @dfn{Stream}, issue an @manref{I_FLUSH} or
-equivalent command.  This situtation may happen with a process sleeping in a module's close routine,
+equivalent command.  This situation may happen with a process sleeping in a module's close routine,
 when signals can not be sent to the process (a zombie process exiting, for example).
 
 See @manref{strreset(1)} for more information.
@@ -1782,7 +1785,7 @@ See @manref{strreset(1)} for more information.
 @subsection Administrative Utilities
 @cindex administrative utilities
 
-Following are adminstrative utilities for manipulating and examining the @dfn{STREAMS} subsystem:
+Following are administrative utilities for manipulating and examining the @dfn{STREAMS} subsystem:
 
 @table @asis
 
@@ -1791,7 +1794,7 @@ Following are adminstrative utilities for manipulating and examining the @dfn{ST
 @pgindex /usr/sbin/autopush
 
 Control the @dfn{autopush} module list for a @dfn{STREAMS} device.
-@manpage{autopush(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} adminstrative utility.
+@manpage{autopush(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} administrative utility.
 
 @manpage{autopush(8)} is a C-language program that can be used to manipulate and examine which
 @dfn{STREAMS} modules are automatically pushed over a device when it is opened.  It is also possible
@@ -1807,7 +1810,7 @@ See @manref{autopush(8)} for more information.
 
 Name a @dfn{STREAMS} file.
 @manpage{fattach(8)} is an @cite{LiS} utility.  Although @cite{OSF/1} documentation mentions an
-@command{fattach} manpage in section 8, one does not exist.
+@command{fattach} manual page in section 8, one does not exist.
 
 @manpage{fattach(8)} opens a @manpage{pipe(4)} and attaches one end of the pipe to a file using
 @manpage{fattach(3)}, and optionally pushes the @manpage{connld(4)} module on the side of the pipe
@@ -1828,7 +1831,7 @@ Unlink a named @dfn{STREAMS} file.
 @manpage{fdetach(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} administrative utility.
 
 @manpage{fdetach(8)} is a C-language program that detaches or disassociates a file descriptor for an
-oepn @dfn{STREAMS} device or pipe from its filename in the file system.
+open @dfn{STREAMS} device or pipe from its filename in the file system.
 
 See @manref{fdetach(8)} for more information.
 
@@ -1863,11 +1866,11 @@ See @manref{scls(8)} for more information.
 @pgindex /usr/sbin/strace
 
 Write @dfn{STREAMS} event trace messages to the standard output.
-@manpage{strace(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} adminstrative utility.
+@manpage{strace(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} administrative utility.
 
-The @manpage{strace(8)} C-language program receies trace event messages from the @dfn{STREAMS} log
+The @manpage{strace(8)} C-language program receives trace event messages from the @dfn{STREAMS} log
 driver (@manpage{log(4)}) and writes these messages to the standard output.  When run as a daemon,
-@manpage{strace(8)} appens these messages to a log file.
+@manpage{strace(8)} appends these messages to a log file.
 
 Messages that appear in the trace log are intended to report debugging information that assists with
 troubleshooting a running @dfn{STREAMS} module or driver.
@@ -1879,7 +1882,7 @@ See @manref{strace(8)} for more information.
 @pgindex /usr/sbin/strclean
 
 Clean up after the @dfn{STREAMS} error logger.
-@manpage{strclean(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} adminstrative utility.
+@manpage{strclean(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} administrative utility.
 
 The @manpage{strclean(8)} utility is a bash script that can be used to delete aged log files
 generated by the @dfn{STREAMS} error logger, @manpage{strerr(8)}.
@@ -1891,7 +1894,7 @@ See @manref{strclean(8)} for more information.
 @pgindex /usr/sbin/streams_mknod
 
 Make special device nodes for @dfn{STREAMS}.
-@manpage{streams_mknod(8)} is a @cite{@value{PACKAGE_TITLE}} specific adminstrative utility.
+@manpage{streams_mknod(8)} is a @cite{@value{PACKAGE_TITLE}} specific administrative utility.
 
 The @manpage{streams_mknod(8)} C-language program can be used to make (or remove) the special
 device nodes under the @file{/dev} directory required by @command{@value{PACKAGE}-@value{VERSION}}
@@ -1905,10 +1908,10 @@ See @manref{streams_mknod(8)} for more information.
 @pgindex /usr/sbin/strerr
 
 Receive error log messages from the @dfn{STREAMS} @manpage{log(4)} driver.
-@manpage{strerr(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} adminstrative utility.
+@manpage{strerr(8)} is a standard @cite{SVR 4.2 @dfn{STREAMS}} administrative utility.
 
 The @manpage{strerr(8)} utility is a C-language program, run as a daemon, that receives error log
-messages from the @dfn{STREAMS} log driver (@manpage{log(4)}) and writes these messsage to a log
+messages from the @dfn{STREAMS} log driver (@manpage{log(4)}) and writes these message to a log
 file.  By default, @manpage{strerr(8)} logs all @dfn{STREAM} error messages from all drivers and
 modules.
 
@@ -1922,7 +1925,7 @@ See @manref{strerr(8)} for more information.
 @pgindex /usr/sbin/strinfo
 
 List @dfn{Stream} information.
-@manpage{strinfo(8)} is a rather useful @cite{AIX} adminstrative utility that is also implemented by
+@manpage{strinfo(8)} is a rather useful @cite{AIX} administrative utility that is also implemented by
 @cite{@value{PACKAGE_TITLE}}.
 
 The @manpage{strinfo(8)} C-language program can be used to list @dfn{Stream} instance information as
@@ -2137,7 +2140,7 @@ See @manref{test-sc(8)} for more information.
 
 The @manpage{test-streams(8)} C-language program is a conformance and validation test program, in the
 OpenSS7 Project style, for the
-@manpage{STREAMS(9)} subsystem and primarly the @manpage{sth(4)} @dfn{Stream head}.
+@manpage{STREAMS(9)} subsystem and primarily the @manpage{sth(4)} @dfn{Stream head}.
 
 See @manref{test-streams(8)} for more information.
 
@@ -2233,22 +2236,22 @@ This is the system specific kernel header file for the @manref{cmn_err(9)} utili
 @pgindex /usr/include/streams/sys/ddi.h
 
 This is the system specific kernel header file for various @dfn{STREAMS} @manref{DDI(9)} utilities.
-It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
 See @manref{DDI(9)} for more information.
 
 @item @file{sys/debug.h}
 @pgindex sys/debug.h
 @pgindex /usr/include/streams/sys/debug.h
 
-This is the system specific kernel header file for kernel debuggin macros.
-It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+This is the system specific kernel header file for kernel debugging macros.
+It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
 
 @item @file{sys/dki.h}
 @pgindex sys/dki.h
 @pgindex /usr/include/streams/sys/dki.h
 
 This is the system specific kernel header file for various @dfn{STREAMS} @manref{DKI(9)} utilities.
-It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
 See @manref{DKI(9)} for more information.
 
 @item @file{sys/kmem.h}
@@ -2256,7 +2259,7 @@ See @manref{DKI(9)} for more information.
 @pgindex /usr/include/streams/sys/kmem.h
 
 This is the system specific kernel header file for @manref{kmem_alloc(9)} and related utilities.
-It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
 See @manref{kmem_alloc(9)} for more information.
 
 @item @file{sys/strconf.h}
@@ -2264,21 +2267,21 @@ See @manref{kmem_alloc(9)} for more information.
 @pgindex /usr/include/streams/sys/strconf.h
 
 This is the system specific kernel header file for @dfn{STREAMS} driver and module configuration.
-It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
 
 @item @file{sys/strdebug.h}
 @pgindex sys/strdebug.h
 @pgindex /usr/include/streams/sys/strdebug.h
 
 This is the system specific kernel header file for @dfn{STREAMS} driver and module debugging macros.
-It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
 
 @item @file{sys/stream.h}
 @pgindex sys/stream.h
 @pgindex /usr/include/streams/sys/stream.h
 
 This is the system specific kernel header file for @dfn{STREAMS} drivers and modules.
-It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
 See @manref{STREAMS(9)} for more information.
 
 @item @file{sys/strlog.h}
@@ -2310,7 +2313,7 @@ See @manref{sth(4)} for more information.
 @pgindex /usr/include/streams/sys/strsubr.h
 
 This is the system specific kernel header file for @dfn{STREAMS} private definitions.
-It is normall only included by kernel space @dfn{STREAMS} modules and drivers.
+It is normal only included by kernel space @dfn{STREAMS} modules and drivers.
 See @manref{STREAMS(9)} for more information.
 
 @item @file{sys/log.h}
@@ -2414,7 +2417,7 @@ kernel.
 
 @item
 The @command{gcc} command line must define several important kernel defines including
-@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the base name of the module.
 
 @item
 The @command{gcc} command line must include several important include files directly on the command
@@ -2583,7 +2586,7 @@ The following manual pages are installed in Section 8 of the manual (in the subd
 @item @manref{autopush(8)} -- @tab control the autopush module list for a @dfn{STREAMS} device.
 @item @manref{fattach(8)} -- @tab name a @dfn{STREAMS} file.
 @item @manref{fdetach(8)} -- @tab unname a @dfn{STREAMS} file.
-@item @manref{insf(8)} -- @tab instal special device files.
+@item @manref{insf(8)} -- @tab install special device files.
 @item @manref{perftest(8)} -- @tab @dfn{STREAMS} benchmark performance tests on a pipe.
 @item @manref{perftestn(8)} -- @tab @dfn{STREAMS} benchmark performance tests on a pipe.
 @item @manref{scls(8)} -- @tab produce a list of @dfn{STREAMS} module and driver names.
@@ -2779,7 +2782,7 @@ The following manual pages are installed in Section 9 of the manual (in the subd
 @item @manref{getminor(9)} -- @tab get the extended minor device number for a device.
 @item @manref{getq(9)} -- @tab get a message from a @dfn{STREAMS} message queue.
 @item @manref{insq(9)} -- @tab insert a message into a @dfn{STREAMS} message queue.
-@item @manref{iocblk(9)} -- @tab @dfn{STREAMS} intout-output control block structure.
+@item @manref{iocblk(9)} -- @tab @dfn{STREAMS} input-output control block structure.
 @item @manref{isdatablk(9)} -- @tab test a @dfn{STREAMS} data block for data type.
 @item @manref{isdatamsg(9)} -- @tab test a @dfn{STREAMS} data block for data type.
 @item @manref{kmem_alloc(9)} -- @tab allocate kernel memory.
@@ -2804,7 +2807,7 @@ The following manual pages are installed in Section 9 of the manual (in the subd
 @item @manref{msgdsize(9)} -- @tab calculate the size of the data in a @dfn{STREAMS} message.
 @item @manref{msgpullup(9)} -- @tab pull up bytes in a @dfn{STREAMS} message.
 @item @manref{msgsize(9)} -- @tab calculate the size of the message blocks in a @dfn{STREAMS} message.
-@item @manref{noenable(9)} -- @tab disable a @dfn{STREAMS} message queue fom being scheduled.
+@item @manref{noenable(9)} -- @tab disable a @dfn{STREAMS} message queue from being scheduled.
 @item @manref{pcmsg(9)} -- @tab test a data block message type for priority control.
 @item @manref{pullupmsg(9)} -- @tab pull up the bytes in a @dfn{STREAMS} message.
 @item @manref{put(9)} -- @tab invoke the put procedure for a @dfn{STREAMS} driver of module with a @dfn{STREAMS} message.
@@ -2886,7 +2889,7 @@ The following manual pages are installed in Section 9 of the manual (in the subd
 @item @manref{strioctl(9)} -- @tab perform a @manpage{ioctl(2s)} operation on a Stream head.
 @item @manref{strlog(9)} -- @tab pass a message to the @dfn{STREAMS} logger.
 @item @manref{strm_f_ops(9)} -- @tab file operations for Stream heads.
-@item @manref{stroptions(9)} -- @tab @dfn{STREAMS} Strema head options structure.
+@item @manref{stroptions(9)} -- @tab @dfn{STREAMS} Stream head options structure.
 @item @manref{strpoll(9)} -- @tab perform a @manpage{poll(2s)} operation on a Stream head.
 @item @manref{strputpmsg(9)} -- @tab perform a @manpage{putpmsg(2s)} operation on a Stream head.
 @item @manref{strqget(9)} -- @tab get attributes of a @dfn{STREAMS} message queue.
@@ -3010,7 +3013,7 @@ integers, interrupt suppression, bus access and memory mapping functions.
 
 @item Binary Modules
 When @dfn{STREAMS} drivers or modules are released as binary objects and source code is not
-availble, it is still possible to convert the binary module for use with
+available, it is still possible to convert the binary module for use with
 @cite{@value{PACKAGE_TITLE}}.  The facility to convert binary modules for use with
 @cite{@value{PACKAGE_TITLE}} is not, however, part of the base package and is not part of the
 @cite{STREAMS Compatibility} package.  A separate add-on package, the @cite{Binary Compatibility

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi tw=100
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.5 2007/01/08 16:24:28 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.6 2007/02/28 06:31:28 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/08 16:24:28 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:31:28 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -128,7 +128,7 @@ The @file{libsocklib} library implements the following library calls:
 @item @tab @manref{getsockopt(3)}	@tab @manref{sendmsg(3)}	@tab
 @end multitable
 
-The @file{libsocklib} library is the older compatiblity library approach to providing sockets for
+The @file{libsocklib} library is the older compatibility library approach to providing sockets for
 @dfn{STREAMS} and implements the system calls as library calls for @dfn{STREAMS} devices, while
 calling the @file{glibc} versions for true sockets.
 

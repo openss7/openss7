@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: configure.texi,v 1.1.4.5 2005/12/30 12:21:15 brian Exp $
+@c @(#) $Id: configure.texi,v 1.1.4.6 2007/02/28 06:30:13 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2005/12/30 12:21:15 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:30:13 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -80,7 +80,7 @@ This option defaults to @samp{disabled}.
 This option is new to @cite{LiS-2.18.2}.
 Disable reporting of source code path traces in debug logs.  @value{PACKAGE_TITLE} passes file name
 and line number arguments to many of the exported functions.  This is exhaustive of stack resources
-and requires the passing of more than three arguments on the stack in many circumnstances.  Note
+and requires the passing of more than three arguments on the stack in many circumstances.  Note
 that disabling code path traces breaks binary compatibility.  The default is perform source code
 path traces, unless optimized for size or speed, in which case, the default is to not perform source
 code path traces.  This option defaults to @samp{enabled}.
@@ -93,7 +93,7 @@ kernel caching on timer structures.  This option defaults to @samp{disabled}.
 
 @item --enable-k-cache
 @opindex k-cache
-Invoke Linux kernel caching on primary structures.  This incresase speed and efficiency.  The
+Invoke Linux kernel caching on primary structures.  This increases speed and efficiency.  The
 default is to @strong{not} perform kernel caching on primary structures.  This option defaults to
 @samp{disabled}.
 

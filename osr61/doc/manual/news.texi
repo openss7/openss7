@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.1 2007/02/25 12:45:12 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.2 2007/02/28 06:30:25 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/02/25 12:45:12 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:30:25 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -84,7 +84,7 @@ This release is the initial public release.
 
 @itemize -
 @item
-In this inital release, the package already supports a wide range of production distributions as it
+In this initial release, the package already supports a wide range of production distributions as it
 uses the same build environment as other OpenSS7 Project packages.
 
 @item
@@ -94,7 +94,7 @@ Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode diet 
 @emph{This is the initial public alpha release of the package.  Please see @file{README-alpha} in
 the release, or @refman{Maturity}.}
 
-This is the inital public alpha release of the package.  This package is complete but untested.  It
+This is the initial public alpha release of the package.  This package is complete but untested.  It
 is being released for testing by the community.  If you are interested in testing of this package,
 contact @email{info@@openss7.com}.
 

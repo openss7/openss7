@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: netperf.texi,v 0.9.2.14 2006/09/18 01:06:18 brian Exp $
+% @(#) $Id: netperf.texi,v 0.9.2.15 2007/02/28 06:30:21 brian Exp $
 %
 % =========================================================================
 %
@@ -55,7 +55,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/09/18 01:06:18 $ by $Author: brian $
+% Last Modified $Date: 2007/02/28 06:30:21 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -473,6 +473,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: netperf.texi,v $
+Revision 0.9.2.15  2007/02/28 06:30:21  brian
+- updates and corrections, #ifdef instead of #if
+
 Revision 0.9.2.14  2006/09/18 01:06:18  brian
 - updated manuals and release texi docs
 
@@ -520,7 +523,7 @@ file netperf.texi was initially added on branch HP.
 @unnumberedsubsec ISO 9000 Compliance
 
 Only the @TeX{}, texinfo, or roff source for this manual is controlled.  An opaque (printed,
-postscript or portable manual format) version of this manual is an @strong{UNCONTROLLED
+postscript or portable document format) version of this manual is an @strong{UNCONTROLLED
 VERSION}.
 
 @node Disclaimer
@@ -748,10 +751,10 @@ one or two netperf parameters.  If you wish to set both parameters to separate v
 be separated by a comma, for example: "@code{parm1, parm2}".  If you wish to set the first parameter
 without altering the value of the second, you should follow the first item with a comma, for
 example: "@code{parm1,}".  Likewise, precede the item with a comma if you wish to set only the
-second parameter, for example "@code{,parm2}".  An item without a commal will set both parameters.
+second parameter, for example "@code{,parm2}".  An item without a comma will set both parameters.
 This last mode is the one most frequently used.
 
-Netperf has two types of command line options.  The first are global command line opoptions.  They
+Netperf has two types of command line options.  The first are global command line options.  They
 are essentially any option that is not tied to a particular test, or group of tests.  An example of
 a global command line option is the test type.  The second options are test specific options.  These
 are options that are only applicable to a particular test.  An example of a test specific option
@@ -909,7 +912,7 @@ utilization is indicated by the letter code "L".
 @b{NOTE:} For accurate CPU utilization on MP systems, it is @strong{crucial}
 that @command{netperf} and @command{netserver} know the number of processors
 on the system.  For some systems (@cite{HP-UX}) this can be determined
-programmatically.  Other systems require the use of the "@code{-n}" gloabl
+programmatically.  Other systems require the use of the "@code{-n}" global
 command line argument.
 
 @cite{HP-UX 10.X} offers a zero additional overhead, very accurate CPU
@@ -1053,7 +1056,7 @@ DLPI Connection-Oriented (@code{DLCO})
 @item Datagram
 This is a connectionless unreliable unidirectional bulk data transfer
 regarding message boundaries.
-Protocols supporting this type of data trasnfer are UDP, UNIX CL and DLPI CL.
+Protocols supporting this type of data transfer are UDP, UNIX CL and DLPI CL.
 Interfaces supporting this type of data transfer are Sockets, XTI, IPv6, UNIX
 and DLPI.
 
@@ -1074,7 +1077,7 @@ Supported tests are:
 
 @item Packet
 This is a connection-oriented reliable unidirectional bulk data transfer
-regarding message boudnaries.
+regarding message boundaries.
 Protocols supporting this type of data transfer are SCTP, and DLPI CO.
 Interfaces supporting this type of data transfer are Sockets, XTI, IPv6 and
 DLPI.
@@ -1098,7 +1101,7 @@ SCTP BSD/POSIX IPv6 Sockets Interface (@code{SOCK_SEQPACKET})
 
 The intent of the @var{MAERTS} performance tests is to test reverse
 unidirectional bulk data transfer in the direction from server to client.
-This is simlar to the @var{STREAM} tests, with the exception that the data
+This is similar to the @var{STREAM} tests, with the exception that the data
 transfer is in the opposite direction.  The basic test sequence is as follows:
 
 @example
@@ -1127,7 +1130,7 @@ IPv4 TCP BSD/POSIX Sockets Interface
 
 The intent of the @var{SENDFILE} performance tests is to test paged
 unidirectional stream bulk data transfer in the direction from client to
-server.  This is simlar to the @var{STREAM} tests with the variation that the
+server.  This is similar to the @var{STREAM} tests with the variation that the
 BSD-style @command{sendfile()} system call is used to transfer data directly
 from a @command{mmap}'ed file to the connection.  The basic test sequence is
 as follows:
@@ -1146,7 +1149,7 @@ server: close()
 test complete
 @end example
 
-This test has tranditionally only been available for @emph{TCP} under
+This test has traditionally only been available for @emph{TCP} under
 @command{netperf}; however, OpenSS7 has added @emph{SCTP} as another protocol
 for @var{SENDFILE} testing.  These tests only used the BSD/POSIX IPv4 Sockets
 interface.  Supported tests are:
@@ -1163,7 +1166,7 @@ IPv4 TCP BSD/POSIX Sockets Interface
 
 The most common use of @command{netperf} is measuring bulk data transfer
 performance.  This is also referred to as "stream" or "unidirectional stream"
-performance.  Essentially, these tests will measure how fast one ssystem can
+performance.  Essentially, these tests will measure how fast one system can
 send data to another and/or how fast the other system can receive it.
 
 @menu
@@ -1208,7 +1211,7 @@ send data to another and/or how fast the other system can receive it.
 @cindex Tests Stream TCP Sockets Forward
 
 The TCP stream performance test is the default test for the @command{netperf}
-program.  The simplest test is peformed by entering the command:
+program.  The simplest test is performed by entering the command:
 @example
 $ netperf -H @var{remotehost}
 @end example
@@ -1224,7 +1227,7 @@ and @file{tcp_range_script}.  @file{tcp_stream_script} will invoke
 @command{netperf} based on the setting of script variables controlling socket
 and send sizes.  @file{tcp_range_script} will perform a similar set of tests,
 with the difference being that where @file{tcp_stream_script} tests specific
-datapoints, @file{tcp_range_script} will perform tests at points within a
+data points, @file{tcp_range_script} will perform tests at points within a
 specified range.
 
 If you would like to perform tests other than those done by the scripts, you
@@ -1291,7 +1294,7 @@ $ netperf -H @var{remotehost} -t @var{UDP_STREAM} -- -m 1024
 
 There is a script provided that performs various UDP stream performance tests.
 It is called @file{udp_stream_script}.   As with TCP stream performance, you
-can use the script provided, or perform tests yourself to get datapoints not
+can use the script provided, or perform tests yourself to get data points not
 covered by the script.
 
 @b{NOTE:} UDP is an unreliable protocol.  It is important that you examine the
@@ -1421,7 +1424,7 @@ specify the local and/or remote DLPI device file name(s) (fully qualified).
 Syntax is the same as that of @var{sizespec}.
 
 @item -m @var{value}
-sepcify the send size, in bytes, for the local system.  This must be less than
+specify the send size, in bytes, for the local system.  This must be less than
 or equal to the link MTU.
 
 @item -M @var{value}
@@ -1438,7 +1441,7 @@ specify the request size, in bytes, for the test.
 specify the response size, in bytes, for the test.
 
 @item -s @var{value}
-sepcify the 802.2 SAP for the test.  This shouold not conflict with any
+specify the 802.2 SAP for the test.  This should not conflict with any
 assigned SAPs.
 
 @item -w @var{sizespec}
@@ -1481,7 +1484,7 @@ specify the local and/or remote DLPI device file name(s) (fully qualified).
 Syntax is the same as that of @var{sizespec}.
 
 @item -m @var{value}
-sepcify the send size, in bytes, for the local system.  This must be less than
+specify the send size, in bytes, for the local system.  This must be less than
 or equal to the link MTU.
 
 @item -M @var{value}
@@ -1498,7 +1501,7 @@ specify the request size, in bytes, for the test.
 specify the response size, in bytes, for the test.
 
 @item -s @var{value}
-sepcify the 802.2 SAP for the test.  This shouold not conflict with any
+specify the 802.2 SAP for the test.  This should not conflict with any
 assigned SAPs.
 
 @item -w @var{sizespec}
@@ -1515,7 +1518,7 @@ specify the remote sned/recv window sizes in frames (where available).
 @cindex Tests Stream CO UNIX Sockets
 
 @b{NOTE:} Unix Domain Socket tests are not compiled into @command{netperf} by
-default.  If you wish to measusre the performance of Unix Domain Sockets, you
+default.  If you wish to measure the performance of Unix Domain Sockets, you
 must recompile @command{netperf} and @command{netserver} with @code{-DDO_UNIX}
 added to the @file{makefile}.
 
@@ -1613,7 +1616,7 @@ ATM API, you must recompile @command{netperf} and @command{netserver} with
 A Fore ATM API stream test (@var{FORE_STREAM}) is very much like a
 @var{UDP_STREAM} test.
 
-@b{NOTE:} The Fore ATM API expores an unreliable protocol.  It is important
+@b{NOTE:} The Fore ATM API explores an unreliable protocol.  It is important
 that you examine the results carefully as the reported send rate can be much
 higher than the actual receive rate.  Great care should be taken when
 reporting @var{FORE_STREAM} test results to make sure they are not misleading.
@@ -1633,7 +1636,7 @@ Here are some of the test specific command line options applicable to a
 @table @code
 @item -a @var{AAL}
 use the ATM Adaptation Layer number @var{AAL} to encapsulate packets.
-Specifying 3 or 4 will yeild AAL3/4, and 5 will yeild AAL5.  [Default: 5 ->
+Specifying 3 or 4 will yield AAL3/4, and 5 will yield AAL5.  [Default: 5 ->
 AAL5]
 
 @item -b @var{sizespec}
@@ -1713,7 +1716,7 @@ Request/response performance is the second test that can be investigated with
 performance is quoted as "transactions/s" for a given request and response
 size.  A transaction is defined as the exchange of a single request and a
 single response.  From a transaction rate, one can infer one way and
-route-tripi average latency.
+route-trip average latency.
 
 
 @menu
@@ -1837,7 +1840,7 @@ request/response pair.  The test-specific parameters are the same as the
 set the minimum or maximum port numbers used by the client side.
 @end table
 It is important that this test run for a reasonable length of time -- at least
-two minutes.  This is related to the behavior of various TCP implementations.
+two minutes.  This is related to the behaviour of various TCP implementations.
 If you run the test for shorter periods of time, the results could be higher
 than seen in a steady-state condition.  So, a good @var{TCP_CRR} command line
 to simulate a web-server might look like:
@@ -1870,7 +1873,7 @@ $ netperf -H @var{remotehost} -t UDP_RR
 @end example
 @noindent
 Again, a script is provided which will generate results for some of the more
-common datapoints.  It is named @file{udp_rr_scrip}.
+common data points.  It is named @file{udp_rr_scrip}.
 
 @node XTI_SCTP_RR
 @subsubsection XTI SCTP Request/Response Performance

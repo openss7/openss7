@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi tw=100
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.4 2007/01/08 16:24:25 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.5 2007/02/28 06:31:25 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/08 16:24:25 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:31:25 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -81,7 +81,7 @@ The @manpage{sctp(4)} @dfn{STREAMS} driver is the primary @dfn{STREAMS} pseudo-d
 implements the Stream Control Transmission Protocol (SCTP) described in RFC 2960 and RFC 4460.
 
 @item tpiperf(4)
-The @manpage{tpiperf(4)} @dfn{STREAMS} module contians the TPI performance test module.  This
+The @manpage{tpiperf(4)} @dfn{STREAMS} module contains the TPI performance test module.  This
 @dfn{STREAMS} module is primarily for performance testing of the TPI interface of the
 @manpage{sctp(4)} driver.
 

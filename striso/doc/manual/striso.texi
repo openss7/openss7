@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: striso.texi,v 0.9.2.10 2007/01/05 06:26:20 brian Exp $
+% @(#) $Id: striso.texi,v 0.9.2.11 2007/02/28 06:31:18 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/01/05 06:26:20 $ by $Author: brian $
+% Last Modified $Date: 2007/02/28 06:31:18 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -412,6 +412,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: striso.texi,v $
+Revision 0.9.2.11  2007/02/28 06:31:18  brian
+- updates and corrections, #ifdef instead of #if
+
 Revision 0.9.2.10  2007/01/05 06:26:20  brian
 - doc updates for release
 
@@ -447,7 +450,7 @@ Revision 0.9  2006-04-07 15:56:41 -0600  brian
 @unnumberedsubsec ISO 9000 Compliance
 
 Only the @TeX{}, texinfo, or roff source for this manual is controlled.  An opaque (printed,
-postscript or portable manual format) version of this manual is an @strong{UNCONTROLLED
+postscript or portable document format) version of this manual is an @strong{UNCONTROLLED
 VERSION}.
 
 @node Disclaimer
@@ -880,7 +883,7 @@ may also be required.  The @cite{xti.h} header file is for interacting with the 
 
 @subsection Kernel Space Drivers and Modules
 
-Typeical include files for writing @dfn{STREAMS} module and drivers implementing transport providers
+Typical include files for writing @dfn{STREAMS} module and drivers implementing transport providers
 in kernels space include @cite{xti.h} and @cite{xti_sctp.h}.  The header files provide access to
 definitions for the TPI interface and additional XTI definitions for use by @dfn{STREAMS} drivers
 and modules.  Additional header files for interacting with specific drivers or modules may also be
@@ -936,7 +939,7 @@ compiler that was used to compile the kernel and @dfn{STREAMS} base package.
 kernel and @dfn{STREAMS} base package.  @command{kbuild} can be used to accomplish this.
 
 @item The @command{gcc} command line must define several important kernel defines including
-@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the basename of the module.  Again, @command{kbuild}
+@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the base name of the module.  Again, @command{kbuild}
 can be used to accomplish this.
 
 @item The @command{gcc} command line must include several important files directly on the command
@@ -1000,7 +1003,7 @@ The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{Network Provider I
 Revision 2.0.0} as released by @cite{UNIX International}.  A copy of the original document is
 available from @uref{http://www.openss7.org/docs/npi.pdf, The OpenSS7 Project Website}.
 A reprint of the document specifying this version of the protocol is available as part of the
-@samp{strxns} package available online in @uref{http://www.openss7.org/specs/npi.pdf, PDF format},
+@samp{strxns} package available on line in @uref{http://www.openss7.org/specs/npi.pdf, PDF format},
 or also in simple @uref{http://www.openss7.org/specs/npi.html, HTML format}.
 
 @node TPI Interface Conformance
@@ -1011,7 +1014,7 @@ The @cite{@value{PACKAGE_TITLE}} drivers conform to the @cite{Transport Provider
 Revision 2.0.0} as released by @cite{UNIX International}.  A copy of the original document is
 available from @uref{http://www.openss7.org/docs/tpi.pdf, The OpenSS7 Project Website}.
 A reprint of the document specifying this version of the protocol is available as part of the
-@samp{strxnet} package available online in @uref{http://www.openss7.org/specs/tpi.pdf, PDF format},
+@samp{strxnet} package available on line in @uref{http://www.openss7.org/specs/tpi.pdf, PDF format},
 or also in simple @uref{http://www.openss7.org/specs/tpi.html, HTML format}.
 
 @node XTI Interface Conformance
@@ -1024,7 +1027,7 @@ OpenGroup}.  A copy of the original document is available from @uref{http://www.
 OpenGroup website}.
 Reprints of the document are not available from The OpenSS7 Project website due to copyright
 restrictions.  Similar information is available in the manual pages that accompany the
-@samp{strxnet} package.  These can be viewed online starting at
+@samp{strxnet} package.  These can be viewed on line starting at
 @uref{http://www.openss7.org/man2html?3+xti, XTI/TLI manpage}.
 
 @node IETF Conformance

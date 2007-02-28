@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.4.27 2006/08/28 10:15:22 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.4.28 2007/02/28 06:30:14 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/28 10:15:22 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:30:14 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -155,7 +155,7 @@ With any luck, these constants will never have to change again.
 The second major compatibility issue concerns the major device numbers that LiS assigns to STREAMS
 devices.  In the past LiS based these device numbers at 50, since the Linux kernel did not
 pre-define many major device numbers.  As of kernel version 2.3.x there are major device numbers
-defined up to 220 and beyone! So starting with LiS-2.12, we have used the major number of 240 as the
+defined up to 220 and beyond! So starting with LiS-2.12, we have used the major number of 240 as the
 base for STREAMS device files.  This range is supposed to be reserved for "experimental drivers"
 which should make it safe to use.
 
@@ -221,7 +221,7 @@ structure to be compatible with the 2.6 method for some time.
 @item
 The 2.6 kernel changed the approach to building and installing kernel modules.  This affects LiS as
 a whole and also affects how you install separate loadable STREAMS drivers.  LiS provides a
-mechanism that allows STREAMS drivers and moduels to be easily installed.
+mechanism that allows STREAMS drivers and modules to be easily installed.
 @item
 The 2.6 kernel offers an option to compile the kernel using machine registers to pass parameters to
 functions.  LiS takes this into account.
@@ -334,11 +334,11 @@ on the use of these locks.  @xrefman{LiS Spin Locks}.
 This version of LiS also contains a rewrite of the flushing code and tests added to strtst for
 flushing.  In particular the details of the rules for flushing queue bands are now adhered to.
 @xrefman{Flushing Queue Bands}.  Be advised, however, that Solaris STREAMS does not adhere strictly to
-these rules so there may be some subtle differences in behavior between LiS and Solaris when
+these rules so there may be some subtle differences in behaviour between LiS and Solaris when
 flushing queue bands.
 
 Speaking of queue bands, the queue band handling code has been debugged a bit more and a test added
-to strtst to illustrate its correct behavior.
+to strtst to illustrate its correct behaviour.
 
 @node LiS-2.10 Kernel and Driver Compatibility
 @subsubsection LiS-2.10 Kernel and Driver Compatibility
@@ -350,7 +350,7 @@ If you have drivers that worked with LiS-2.8 or earlier, you must recompile your
 context of the LiS-2.10 header files.  The queue_t structure has changed in size since LiS-2.8 which
 means that the old RD and WR macros will not compute the correct addresses.
 
-LiS-2.10 contains features that are intended to greately reduce the necessity of recompiling STREAMS
+LiS-2.10 contains features that are intended to greatly reduce the necessity of recompiling STREAMS
 driver code in future versions of LiS or future versions of the kernel.  The goal is to be able to
 compile STREAMS drivers against LiS-2.10 header files and use the resulting object code on both
 2.2.x kernels and 2.4.x kernels.
@@ -409,7 +409,7 @@ The @cite{OpenSS7 Project} adheres to the following release philosophy:
 
 @dfn{Pre-alpha} releases are releases that have received no testing whatsoever.  Code in the release
 is not even known to configure or compile.  The purpose of a pre-alpha release is to make code and
-documenation available for insepection only, and to solicit comments on the design approach or other
+documentation available for inspection only, and to solicit comments on the design approach or other
 characteristics of the software package.
 
 @dfn{Pre-alpha} release packages ship containing warnings recommending that the user not even
@@ -421,7 +421,7 @@ execute the contained code.
 @dfn{Alpha} release are releases that have received little to no testing, or that have been tested
 and contains known bugs or defects that make the package unsuitable even for testing.  The purpose
 for an @dfn{alpha} release are the same as for the pre-alpha release, with the additional purpose
-that it is an earily release of partially functional code that has problems that an external
+that it is an early release of partially functional code that has problems that an external
 developer might be willing to fix themselves and contribute back to the project.
 
 @dfn{Alpha} release packages ship containing warnings that executing the code can crash machines and
@@ -462,7 +462,7 @@ on target systems before considering production use.
 validated on specific distributions and architectures.  @dfn{Production} release packages do not
 ship with known defects.  Please remember that there is NO WARRANTY on public release packages.
 
-@dfn{Production} packages ship containig a list of validated distributions and architecutres.
+@dfn{Production} packages ship containing a list of validated distributions and architectures.
 Full regression testing of any maintenance changes is performed.  Suitability of software in this
 category for production use on the specified target distributions and architectures is at the
 discretion of the user.  It should not be necessary to preform validation tests on the set of
@@ -474,10 +474,10 @@ supported target systems before considering production use.
 @dfn{Unstable} releases are releases that have received extensive testing within the project and
 validated on a a wide range of distributions and architectures; however, is has tested unstable and
 found to be suffering from critical problems and issues that cannot be resolved.  Maintenance of the
-package has proven impossible.  @dfn{Unstable} release packages ship with known defects (and loud
+package has proved impossible.  @dfn{Unstable} release packages ship with known defects (and loud
 warnings).  Suitability of software in this category for production use is at the discretion of the
 user of the software.  @dfn{The OpenSS7 Project} recommends that the problems and issues be closely
-examined before this software is used even in a non-production evironment.  Each failing test
+examined before this software is used even in a non-production environment.  Each failing test
 scenario should be completely avoided by the application.  @cite{OpenSS7} beta software is more
 stable that software in this category.
 
@@ -621,7 +621,7 @@ software.  YOU HAVE BEEN WARNED.}
 @cindex known bugs
 @cindex bugs, known
 
-With the exception of packages not originaly created by the @cite{OpenSS7 Project}, the
+With the exception of packages not originally created by the @cite{OpenSS7 Project}, the
 @cite{OpenSS7 Project} software does not ship with known bugs in any release stage except
 @dfn{pre-alpha}.  @dfn{@value{PACKAGE_TITLE}} had many known bugs at the time of release.
 
@@ -647,7 +647,7 @@ modules for measurement) will cause the kernel to lock.
 @item
 A large number of test cases fail when running under an SMP kernel, regardless of the number of
 processors on the test system.  These test cases cause the kernel to lock.  The kernel locks are
-apparentlhy due to locking defects in the implementation.  None of these implementation defects have
+apparently due to locking defects in the implementation.  None of these implementation defects have
 been repaired.
 @item
 The original @file{LiS-2.18.0} release from @cite{GCOM} has a large number of defects that were
@@ -662,7 +662,7 @@ the @cite{OpenSS7} @file{LiS-2.18.1} and @file{LiS-2.18.2} releases.  LiS is lar
 
 The work-around for these defects is to not use LiS at all: use the @cite{OpenSS7 Linux
 Fast-STREAMS} release instead.  The @cite{OpenSS7 Linux Fast-STREAMS}, being a completely
-independent implemenation, does not suffer from this extensive set of LiS defects.
+independent implementation, does not suffer from this extensive set of LiS defects.
 
 @node Historical Defects
 @subsection Defect History

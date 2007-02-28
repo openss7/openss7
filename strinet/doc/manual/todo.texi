@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.4 2007/01/03 12:30:27 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.5 2007/02/28 06:31:02 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/03 12:30:27 $ by $Author: brian $
+@c Last Modified $Date: 2007/02/28 06:31:02 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -61,7 +61,7 @@ Things to do:
 
 @itemize @minus
 @item
-Loopback devices (ticlts, ticots, ticotsord) are currently implemented in the @manpage{inet(4)}
+Loop back devices (ticlts, ticots, ticotsord) are currently implemented in the @manpage{inet(4)}
 driver using UNIX domain sockets and the XTI over sockets approach.  It should be straightforward to
 implement these loopback devices directly in @dfn{STREAMS} without involving sockets.  These second
 generation loopback drivers need to be written yet.
@@ -71,7 +71,7 @@ generation loopback drivers need to be written yet.
 @item
 Implement pseudo-connection oriented modes in INET(4) driver as well as udp2(4) and rawip2(4)
 drivers.  Document use of pseudo-connection oriented modes for UDP and RAWIP.  Pseudo-connection
-oriented modes permit a connectionless (T_CLTS) provider such as udp to provide the apprearance of
+oriented modes permit a connectionless (T_CLTS) provider such as udp to provide the appearance of
 connection oriented service.  This makes conversion from the Sockets API to XTI API easier.
 
 Note that this is also very applicable to MTP (quasi-associated signalling such as ISUP) and
