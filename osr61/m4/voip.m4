@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: voip.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.3 $) $Date: 2006-12-28 08:32:32 $
+# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/28 11:51:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006-12-28 08:32:32 $ by $Author: brian $
+# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: voip.m4,v $
+# Revision 0.9.2.4  2007/02/28 11:51:32  brian
+# - make sure build directory exists
+#
 # Revision 0.9.2.3  2006-12-28 08:32:32  brian
 # - use cache names for master src and build directories
 #
@@ -176,23 +179,22 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    voip_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strvoip/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strvoip/src/include}"
-	    for voip_dir in $voip_search_path ; do
-		if test -d "$voip_dir" ; then
-		    AC_MSG_CHECKING([for voip include directory... $voip_dir])
-		    if test -r "$voip_dir/$voip_what" ; then
-			voip_cv_includes="$voip_search_path"
-			voip_cv_ldadd= # "$os7_cv_master_builddir/strvoip/libvoip.la"
-			voip_cv_ldadd32= # "$os7_cv_master_builddir/strvoip/lib32/libvoip.la"
-			voip_cv_modmap= # "$os7_cv_master_builddir/strvoip/Modules.map"
-			voip_cv_symver= # "$os7_cv_master_builddir/strvoip/Module.symvers"
-			voip_cv_manpath="$os7_cv_master_builddir/strvoip/doc/man"
-			AC_MSG_RESULT([yes])
-			break
-		    fi
+	    voip_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strvoip/src/include}"
+	    voip_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/strvoip/src/include}"
+	    if test -d "$voip_dir" ; then
+		AC_MSG_CHECKING([for voip include directory... $voip_dir $voip_bld])
+		if test -d "$voip_bld" -a -r "$voip_dir/$voip_what" ; then
+		    voip_cv_includes="$voip_dir $voip_bld"
+		    #voip_cv_ldadd= # "$os7_cv_master_builddir/strvoip/libvoip.la"
+		    #voip_cv_ldadd32= # "$os7_cv_master_builddir/strvoip/lib32/libvoip.la"
+		    #voip_cv_modmap="$os7_cv_master_builddir/strvoip/Modules.map"
+		    #voip_cv_symver="$os7_cv_master_builddir/strvoip/Module.symvers"
+		    #voip_cv_manpath="$os7_cv_master_builddir/strvoip/doc/man"
+		    AC_MSG_RESULT([yes])
+		else
 		    AC_MSG_RESULT([no])
 		fi
-	    done
+	    fi
 	    AC_MSG_CHECKING([for voip include directory])
 	fi
 	if test :"${voip_cv_includes:-no}" = :no ; then
@@ -209,14 +211,14 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 		if test -d "$voip_dir" ; then
 		    voip_bld=`echo $voip_dir | sed -e "s|^$srcdir/|$voip_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    voip_dir=`(cd $voip_dir; pwd)`
-		    AC_MSG_CHECKING([for voip include directory... $voip_dir])
-		    if test -r "$voip_dir/$voip_what" ; then
+		    AC_MSG_CHECKING([for voip include directory... $voip_dir $voip_bld])
+		    if test -d "$voip_bld" -a -r "$voip_dir/$voip_what" ; then
 			voip_cv_includes="$voip_dir $voip_bld"
-			voip_cv_ldadd= # `echo "$voip_bld/../../libvoip.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			voip_cv_ldadd32= # `echo "$voip_bld/../../lib32/libvoip.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			voip_cv_modmap= # `echo "$voip_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			voip_cv_symver= # `echo "$voip_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			voip_cv_manpath=`echo "$voip_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#voip_cv_ldadd= # `echo "$voip_bld/../../libvoip.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#voip_cv_ldadd32= # `echo "$voip_bld/../../lib32/libvoip.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#voip_cv_modmap=`echo "$voip_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#voip_cv_symver=`echo "$voip_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#voip_cv_manpath=`echo "$voip_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -279,9 +281,9 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for voip include directory... $voip_dir])
 		    if test -r "$voip_dir/$voip_what" ; then
 			voip_cv_includes="$voip_dir"
-			voip_cv_modmap=
-			voip_cv_symver=
-			voip_cv_manpath=
+			#voip_cv_modmap=
+			#voip_cv_symver=
+			#voip_cv_manpath=
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -291,7 +293,8 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for voip include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for voip ldadd native],[voip_cv_ldadd],[dnl
+    AC_CACHE_CHECK([for voip ldadd native], [voip_cv_ldadd], [dnl
+	voip_cv_ldadd=
 	for voip_dir in $voip_cv_includes ; do
 	    if test -f "$voip_dir/../../libvoip.la" ; then
 		voip_cv_ldadd=`echo "$voip_dir/../../libvoip.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -299,14 +302,16 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for voip ldflags],[voip_cv_ldflags],[dnl
+    AC_CACHE_CHECK([for voip ldflags], [voip_cv_ldflags], [dnl
+	voip_cv_ldflags=
 	if test -z "$voip_cv_ldadd" ; then
 	    voip_cv_ldflags= # '-lvoip'
 	else
 	    voip_cv_ldflags= # "-L$(dirname $voip_cv_ldadd)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for voip ldadd 32-bit],[voip_cv_ldadd32],[dnl
+    AC_CACHE_CHECK([for voip ldadd 32-bit], [voip_cv_ldadd32], [dnl
+	voip_cv_ldadd32=
 	for voip_dir in $voip_cv_includes ; do
 	    if test -f "$voip_dir/../../libvoip.la" ; then
 		voip_cv_ldadd32=`echo "$voip_dir/../../lib32/libvoip.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -314,14 +319,16 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for voip ldflags 32-bit],[voip_cv_ldflags32],[dnl
+    AC_CACHE_CHECK([for voip ldflags 32-bit], [voip_cv_ldflags32], [dnl
+	voip_cv_ldflags32=
 	if test -z "$voip_cv_ldadd32" ; then
 	    voip_cv_ldflags32= # '-lvoip'
 	else
 	    voip_cv_ldflags32= # "-L$(dirname $voip_cv_ldadd32)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for voip modmap],[voip_cv_modmap],[dnl
+    AC_CACHE_CHECK([for voip modmap], [voip_cv_modmap], [dnl
+	voip_cv_modmap=
 	for voip_dir in $voip_cv_includes ; do
 	    if test -f "$voip_dir/../../Modules.map" ; then
 		voip_cv_modmap=`echo "$voip_dir/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -329,7 +336,8 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for voip symver],[voip_cv_symver],[dnl
+    AC_CACHE_CHECK([for voip symver], [voip_cv_symver], [dnl
+	voip_cv_symver=
 	for voip_dir in $voip_cv_includes ; do
 	    if test -f "$voip_dir/../../Module.symvers" ; then
 		voip_cv_symver=`echo "$voip_dir/../../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -337,7 +345,8 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for voip manpath],[voip_cv_manpath],[dnl
+    AC_CACHE_CHECK([for voip manpath], [voip_cv_manpath], [dnl
+	voip_cv_manpath=
 	for voip_dir in $voip_cv_includes ; do
 	    if test -d "$voip_dir/../../doc/man" ; then
 		voip_cv_manpath=`echo "$voip_dir/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

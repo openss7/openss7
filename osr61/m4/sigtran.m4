@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.3 $) $Date: 2006-12-28 08:32:32 $
+# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/28 11:51:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006-12-28 08:32:32 $ by $Author: brian $
+# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sigtran.m4,v $
+# Revision 0.9.2.4  2007/02/28 11:51:32  brian
+# - make sure build directory exists
+#
 # Revision 0.9.2.3  2006-12-28 08:32:32  brian
 # - use cache names for master src and build directories
 #
@@ -176,23 +179,22 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    sigtran_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/sigtran/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/sigtran/src/include}"
-	    for sigtran_dir in $sigtran_search_path ; do
-		if test -d "$sigtran_dir" ; then
-		    AC_MSG_CHECKING([for sigtran include directory... $sigtran_dir])
-		    if test -r "$sigtran_dir/$sigtran_what" ; then
-			sigtran_cv_includes="$sigtran_search_path"
-			sigtran_cv_ldadd= # "$os7_cv_master_builddir/sigtran/libsigtran.la"
-			sigtran_cv_ldadd32= # "$os7_cv_master_builddir/sigtran/lib32/libsigtran.la"
-			sigtran_cv_modmap= # "$os7_cv_master_builddir/sigtran/Modules.map"
-			sigtran_cv_symver= # "$os7_cv_master_builddir/sigtran/Module.symvers"
-			sigtran_cv_manpath="$os7_cv_master_builddir/sigtran/doc/man"
-			AC_MSG_RESULT([yes])
-			break
-		    fi
+	    sigtran_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/sigtran/src/include}"
+	    sigtran_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/sigtran/src/include}"
+	    if test -d "$sigtran_dir" ; then
+		AC_MSG_CHECKING([for sigtran include directory... $sigtran_dir $sigtran_bld])
+		if test -d "$sigtran_bld" -a -r "$sigtran_dir/$sigtran_what" ; then
+		    sigtran_cv_includes="$sigtran_dir $sigtran_bld"
+		    #sigtran_cv_ldadd= # "$os7_cv_master_builddir/sigtran/libsigtran.la"
+		    #sigtran_cv_ldadd32= # "$os7_cv_master_builddir/sigtran/lib32/libsigtran.la"
+		    #sigtran_cv_modmap="$os7_cv_master_builddir/sigtran/Modules.map"
+		    #sigtran_cv_symver="$os7_cv_master_builddir/sigtran/Module.symvers"
+		    #sigtran_cv_manpath="$os7_cv_master_builddir/sigtran/doc/man"
+		    AC_MSG_RESULT([yes])
+		else
 		    AC_MSG_RESULT([no])
 		fi
-	    done
+	    fi
 	    AC_MSG_CHECKING([for sigtran include directory])
 	fi
 	if test :"${sigtran_cv_includes:-no}" = :no ; then
@@ -209,14 +211,14 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 		if test -d "$sigtran_dir" ; then
 		    sigtran_bld=`echo $sigtran_dir | sed -e "s|^$srcdir/|$sigtran_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    sigtran_dir=`(cd $sigtran_dir; pwd)`
-		    AC_MSG_CHECKING([for sigtran include directory... $sigtran_dir])
-		    if test -r "$sigtran_dir/$sigtran_what" ; then
+		    AC_MSG_CHECKING([for sigtran include directory... $sigtran_dir $sigtran_bld])
+		    if test -d "$sigtran_bld" -a -r "$sigtran_dir/$sigtran_what" ; then
 			sigtran_cv_includes="$sigtran_dir $sigtran_bld"
-			sigtran_cv_ldadd= # `echo "$sigtran_bld/../../libsigtran.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			sigtran_cv_ldadd32= # `echo "$sigtran_bld/../../lib32/libsigtran.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			sigtran_cv_modmap= # `echo "$sigtran_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			sigtran_cv_symver= # `echo "$sigtran_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			sigtran_cv_manpath=`echo "$sigtran_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#sigtran_cv_ldadd= # `echo "$sigtran_bld/../../libsigtran.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#sigtran_cv_ldadd32= # `echo "$sigtran_bld/../../lib32/libsigtran.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#sigtran_cv_modmap=`echo "$sigtran_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#sigtran_cv_symver=`echo "$sigtran_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#sigtran_cv_manpath=`echo "$sigtran_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -279,9 +281,9 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for sigtran include directory... $sigtran_dir])
 		    if test -r "$sigtran_dir/$sigtran_what" ; then
 			sigtran_cv_includes="$sigtran_dir"
-			sigtran_cv_modmap=
-			sigtran_cv_symver=
-			sigtran_cv_manpath=
+			#sigtran_cv_modmap=
+			#sigtran_cv_symver=
+			#sigtran_cv_manpath=
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -291,7 +293,8 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for sigtran include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for sigtran ldadd native],[sigtran_cv_ldadd],[dnl
+    AC_CACHE_CHECK([for sigtran ldadd native], [sigtran_cv_ldadd], [dnl
+	sigtran_cv_ldadd=
 	for sigtran_dir in $sigtran_cv_includes ; do
 	    if test -f "$sigtran_dir/../../libsigtran.la" ; then
 		sigtran_cv_ldadd=`echo "$sigtran_dir/../../libsigtran.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -299,14 +302,16 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for sigtran ldflags],[sigtran_cv_ldflags],[dnl
+    AC_CACHE_CHECK([for sigtran ldflags], [sigtran_cv_ldflags], [dnl
+	sigtran_cv_ldflags=
 	if test -z "$sigtran_cv_ldadd" ; then
 	    sigtran_cv_ldflags= # '-lsigtran'
 	else
 	    sigtran_cv_ldflags= # "-L$(dirname $sigtran_cv_ldadd)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for sigtran ldadd 32-bit],[sigtran_cv_ldadd32],[dnl
+    AC_CACHE_CHECK([for sigtran ldadd 32-bit], [sigtran_cv_ldadd32], [dnl
+	sigtran_cv_ldadd32=
 	for sigtran_dir in $sigtran_cv_includes ; do
 	    if test -f "$sigtran_dir/../../libsigtran.la" ; then
 		sigtran_cv_ldadd32=`echo "$sigtran_dir/../../lib32/libsigtran.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -314,14 +319,16 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for sigtran ldflags 32-bit],[sigtran_cv_ldflags32],[dnl
+    AC_CACHE_CHECK([for sigtran ldflags 32-bit], [sigtran_cv_ldflags32], [dnl
+	sigtran_cv_ldflags32=
 	if test -z "$sigtran_cv_ldadd32" ; then
 	    sigtran_cv_ldflags32= # '-lsigtran'
 	else
 	    sigtran_cv_ldflags32= # "-L$(dirname $sigtran_cv_ldadd32)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for sigtran modmap],[sigtran_cv_modmap],[dnl
+    AC_CACHE_CHECK([for sigtran modmap], [sigtran_cv_modmap], [dnl
+	sigtran_cv_modmap=
 	for sigtran_dir in $sigtran_cv_includes ; do
 	    if test -f "$sigtran_dir/../../Modules.map" ; then
 		sigtran_cv_modmap=`echo "$sigtran_dir/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -329,7 +336,8 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for sigtran symver],[sigtran_cv_symver],[dnl
+    AC_CACHE_CHECK([for sigtran symver], [sigtran_cv_symver], [dnl
+	sigtran_cv_symver=
 	for sigtran_dir in $sigtran_cv_includes ; do
 	    if test -f "$sigtran_dir/../../Module.symvers" ; then
 		sigtran_cv_symver=`echo "$sigtran_dir/../../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -337,7 +345,8 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for sigtran manpath],[sigtran_cv_manpath],[dnl
+    AC_CACHE_CHECK([for sigtran manpath], [sigtran_cv_manpath], [dnl
+	sigtran_cv_manpath=
 	for sigtran_dir in $sigtran_cv_includes ; do
 	    if test -d "$sigtran_dir/../../doc/man" ; then
 		sigtran_cv_manpath=`echo "$sigtran_dir/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
