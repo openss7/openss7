@@ -245,6 +245,16 @@ The default is to include the
 @cite{STREAMS VoIP Stacks} (@command{strvoip-@value{VERSION_STRVOIP}})
 add-on package in the build.
 
+@item --without-OSR61
+@opindex OSR61
+
+When disabled, excludes the @command{osr61-@value{VERSION_OSR}} add-on package from the build.
+When the @command{osr61} add-on package is excluded, none of the packages which depend upon it
+can be built unless the @command{osr61} package was otherwise installed on the build system.
+The default is to include the
+@cite{Dialogic Open System Release 6.1} (@command{osr61-@value{VERSION_OSR}})
+add-on package in the build.
+
 @item --with-LIS
 @opindex LIS
 

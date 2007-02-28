@@ -81,7 +81,12 @@ describe some of the kernel modules installed by add-on packages in the @value{P
 * strinet Kernel Modules::
 * strsctp Kernel Modules::
 * striso Kernel Modules::
+* strchan Kernel Modules::
+* strisdn Kernel Modules::
 * strss7 Kernel Modules::
+* sigtran Kernel Modules::
+* strvoip Kernel Modules::
+* osr61 Kernel Modules::
 * LiS Kernel Modules::
 @end menu
 
@@ -859,6 +864,69 @@ Kernel modules installed by @command{strvoip-@value{VERSION_STRVOIP}} are as fol
 
 This add-on package currently installs no kernel modules.  Modules will be added from the commercial
 release of @command{strss7} as they are re-validated on @cite{Linux Fast-STREAMS}.
+
+@end table
+
+@node osr61 Kernel Modules
+@subsubsection osr61
+
+The @command{osr61-@value{VERSION_OSR}} add-on package provides a range of @dfn{STREAMS} drivers
+and modules as kernel modules.  The drivers and modules implement various device drivers and
+components for the @cite{Dialogic Open System Release 6.1} supported devices.
+All of these drivers and modules cam from the @url{http://www.opensystemrelease.com/,Dialogic} Open
+System Release 6.1 version 239 GPL drivers release.
+
+Kernel modules installed by @command{osr61-@value{VERSION_OSR}} are as follows:
+
+@table @asis
+
+@item streams-dlgn
+
+This kernel module contains the @file{dlgn} @dfn{STREAMS} driver.
+This driver supports the Dialogic@registeredsymbol{} Springware boards and the Antares boards.
+See @manref{dlgn(4)} for more information.
+
+@item streams-dvbm
+
+This kernel module contains the @file{dvbm} @dfn{STREAMS} module.
+This driver supports the Dialogic@registeredsymbol{} Springware boards and the Antares boards.
+See @manref{dvbm(4)} for more information.
+
+@item streams-gncfd
+
+This kernel module contains the @file{gncfd} @dfn{STREAMS} driver.
+This driver supports the Dialogic@registeredsymbol{} Springware boards and the Antares boards.
+See @manref{gncfd(4)} for more information.
+
+@item streams-gpio
+
+This kernel module contains the @file{gpio} @dfn{STREAMS} driver.
+This driver supports the Dialogic@registeredsymbol{} Springware boards and the Antares boards.
+See @manref{gpio(4)} for more information.
+
+@item streams-sctmr
+
+This kernel module contains the @file{sctmr} @dfn{STREAMS} module.
+This driver supports the Dialogic@registeredsymbol{} Springware boards and the Antares boards.
+See @manref{sctmr(4)} for more information.
+
+@item streams-mercd
+
+This kernel module contains the @file{mercd} @dfn{STREAMS} driver.
+This driver supports the Dialogic@registeredsymbol{} DM3 boards.
+See @manref{mercd(4)} for more information.
+
+@item pmacd
+
+This kernel module contains the @file{pmacd} driver.
+This driver supports the Dialogic@registeredsymbol{} IPT boards.
+See @manref{pmacd(4)} for more information.
+
+@item ctimod
+
+This kernel module contains the @file{ctimod} kernel module.
+This kernel module supports the @manpage{pmacd(4)} driver.
+See @manref{ctimod(4)} for more information.
 
 @end table
 
