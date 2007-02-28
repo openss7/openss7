@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2007/02/27 08:38:37 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2007/02/28 11:51:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/27 08:38:37 $ by $Author: brian $
+# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -295,22 +295,22 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	if test :"${streams_cv_lis_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    streams_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/LiS/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/LiS/include}"
-	    for streams_dir in $streams_search_path ; do
-		if test -d "$streams_dir" ; then
-		    AC_MSG_CHECKING([for streams lis include directory... $streams_dir])
-		    if test -r "$streams_dir/$streams_what" ; then
-			streams_cv_lis_includes="$streams_search_path"
-			streams_cv_lis_ldadd="$os7_cv_master_builddir/LiS/libLiS.la"
-			streams_cv_lis_ldadd32="$os7_cv_master_builddir/LiS/lib32/libLiS.la"
-			streams_cv_lis_modmap="$os7_cv_master_builddir/LiS/Modules.map"
-			streams_cv_lis_symver="$os7_cv_master_builddir/LiS/Module.symvers"
-			streams_cv_lis_manpath="$os7_cv_master_builddir/LiS/man"
-			AC_MSG_RESULT([yes])
-			break
-		    fi
+	    streams_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/LiS/include}"
+	    streams_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/LiS/include}"
+	    if test -d "$streams_dir" ; then
+		AC_MSG_CHECKING([for streams lis include directory... $streams_dir $streams_bld])
+		if test -d "streams_bld" -a -r "$streams_dir/$streams_what" ; then
+		    streams_cv_lis_includes="$streams_dir $streams_bld"
+		    #streams_cv_lis_ldadd="$os7_cv_master_builddir/LiS/libLiS.la"
+		    #streams_cv_lis_ldadd32="$os7_cv_master_builddir/LiS/lib32/libLiS.la"
+		    #streams_cv_lis_modmap="$os7_cv_master_builddir/LiS/Modules.map"
+		    #streams_cv_lis_symver="$os7_cv_master_builddir/LiS/Module.symvers"
+		    #streams_cv_lis_manpath="$os7_cv_master_builddir/LiS/man"
+		    AC_MSG_RESULT([yes])
+		else
+		    AC_MSG_RESULT([no])
 		fi
-	    done
+	    fi
 	    AC_MSG_CHECKING([for streams lis include directory])
 	fi
 	if test :"${streams_cv_lis_includes:-no}" = :no ; then
@@ -327,14 +327,14 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		if test -d "$streams_dir" ; then
 		    streams_bld=`echo $streams_dir | sed -e "s|^$srcdir/|$streams_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    streams_dir=`(cd $streams_dir; pwd)`
-		    AC_MSG_CHECKING([for streams lis include directory... $streams_dir])
-		    if test -r "$streams_dir/$streams_what" ; then
+		    AC_MSG_CHECKING([for streams lis include directory... $streams_dir $streams_bld])
+		    if test -d "$streams_bld" -a -r "$streams_dir/$streams_what" ; then
 			streams_cv_lis_includes="$streams_dir $streams_bld"
-			streams_cv_lis_ldadd=`echo "$streams_bld/../libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			streams_cv_lis_ldadd32=`echo "$streams_bld/../lib32/libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			streams_cv_lis_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			streams_cv_lis_symver=`echo "$streams_bld/../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			streams_cv_lis_manpath=`echo "$streams_bld/../man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#streams_cv_lis_ldadd=`echo "$streams_bld/../libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#streams_cv_lis_ldadd32=`echo "$streams_bld/../lib32/libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#streams_cv_lis_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#streams_cv_lis_symver=`echo "$streams_bld/../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#streams_cv_lis_manpath=`echo "$streams_bld/../man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -363,9 +363,9 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for streams lis include directory... $streams_dir])
 		    if test -r "$streams_dir/$streams_what" ; then
 			streams_cv_lis_includes="$streams_dir"
-			streams_cv_lis_modmap=
-			streams_cv_lis_symver=
-			streams_cv_lis_manpath=
+			#streams_cv_lis_modmap=
+			#streams_cv_lis_symver=
+			#streams_cv_lis_manpath=
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -375,7 +375,8 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for streams lis include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for streams lis ldadd],[streams_cv_lis_ldadd],[dnl
+    AC_CACHE_CHECK([for streams lis ldadd], [streams_cv_lis_ldadd], [dnl
+	streams_cv_lis_ldadd=
 	for streams_dir in $streams_cv_lis_includes ; do
 	    if test -f $streams_dir/../libLiS.la ; then
 		streams_cv_lis_ldadd=`echo "$streams_dir/../libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -383,14 +384,16 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for streams lis ldflags],[streams_cv_lis_ldflags],[dnl
+    AC_CACHE_CHECK([for streams lis ldflags], [streams_cv_lis_ldflags], [dnl
+	streams_cv_lis_ldflags=
 	if test -z "$streams_cv_lis_ldadd" ; then
 	    streams_cv_lis_ldflags="-lLIS"
 	else
 	    streams_cv_lis_ldflags="-L$(dirname $streams_cv_lis_ldadd)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for streams lis ldadd 32-bit],[streams_cv_lis_ldadd32],[dnl
+    AC_CACHE_CHECK([for streams lis ldadd 32-bit], [streams_cv_lis_ldadd32], [dnl
+	streams_cv_lis_ldadd32=
 	for streams_dir in $streams_cv_lis_includes ; do
 	    if test -f $streams_dir/../lib32/libLiS.la ; then
 		streams_cv_lis_ldadd32=`echo "$streams_dir/../lib32/libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -398,14 +401,16 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for streams lis ldflags 32-bit],[streams_cv_lis_ldflags32],[dnl
+    AC_CACHE_CHECK([for streams lis ldflags 32-bit], [streams_cv_lis_ldflags32], [dnl
+	streams_cv_lis_ldflags32=
 	if test -z "$streams_cv_lis_ldadd32" ; then
 	    streams_cv_lis_ldflags32="-lLIS"
 	else
 	    streams_cv_lis_ldflags32="-L$(dirname $streams_cv_lis_ldadd32)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for streams lis modmap],[streams_cv_lis_modmap],[dnl
+    AC_CACHE_CHECK([for streams lis modmap], [streams_cv_lis_modmap], [dnl
+	streams_cv_lis_modmap=
 	for streams_dir in $streams_cv_lis_includes ; do
 	    if test -f $streams_dir/../Modules.map ; then
 		streams_cv_lis_modmap=`echo "$streams_dir/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -413,7 +418,8 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_MSG_CHECKING([for streams lis symver],[streams_cv_lis_symver],[dnl
+    AC_CACHE_CHECK([for streams lis symver], [streams_cv_lis_symver], [dnl
+	streams_cv_lis_symver=
 	for streams_dir in $streams_cv_lis_includes ; do
 	    if test -f $streams_dir/../Module.symvers ; then
 		streams_cv_lis_symver=`echo "$streams_dir/../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -421,7 +427,8 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_MSG_CHECKING([for streams lis manpath],[streams_cv_lis_manpath],[dnl
+    AC_CACHE_CHECK([for streams lis manpath], [streams_cv_lis_manpath], [dnl
+	streams_cv_lis_manpath=
 	for streams_dir in $streams_cv_lis_includes ; do
 	    if test -d $streams_dir/../man ; then
 		streams_cv_lis_manpath=`echo "$streams_dir/../man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -429,7 +436,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${streams_cv_lis_includes:-no}" = :no ; then
+    if test :"${streams_cv_lis_includes:-no}" = :no -a false ; then
 	AC_MSG_WARN([
 *** 
 *** Configure could not find the LiS STREAMS include directories.  If
@@ -440,7 +447,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 *** Perhaps you just forgot to load the LiS STREAMS package?  The LiS
 *** STREAMS package is available from The OpenSS7 Project download page
 *** at http://www.openss7.org/ and comes in a tarball named something
-*** like "LiS-2.18.3.tar.gz".
+*** like "LiS-2.18.5.tar.gz".
 *** ])
     fi
     streams_what="sys/LiS/config.h"
@@ -567,22 +574,22 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	if test :"${streams_cv_lfs_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    streams_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/streams/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/streams/include}"
-	    for streams_dir in $streams_search_path ; do
-		if test -d "$streams_dir" ; then
-		    AC_MSG_CHECKING([for streams lfs include directory... $streams_dir])
-		    if test -r "$streams_dir/$streams_what" ; then
-			streams_cv_lfs_includes="$streams_search_path"
-			streams_cv_lfs_ldadd="$os7_cv_master_builddir/streams/libstreams.la"
-			streams_cv_lfs_ldadd32="$os7_cv_master_builddir/streams/lib32/libstreams.la"
-			streams_cv_lfs_modmap="$os7_cv_master_builddir/streams/Modules.map"
-			streams_cv_lfs_symver="$os7_cv_master_builddir/streams/Module.symvers"
-			streams_cv_lfs_manpath="$os7_cv_master_builddir/streams/doc/man"
-			AC_MSG_RESULT([yes])
-			break
-		    fi
+	    streams_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/streams/include}"
+	    streams_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/streams/include}"
+	    if test -d "$streams_dir" ; then
+		AC_MSG_CHECKING([for streams lfs include directory... $streams_dir $streams_bld])
+		if test -d "$streams_bld" -a -r "$streams_dir/$streams_what" ; then
+		    streams_cv_lfs_includes="$streams_dir $streams_bld"
+		    #streams_cv_lfs_ldadd="$os7_cv_master_builddir/streams/libstreams.la"
+		    #streams_cv_lfs_ldadd32="$os7_cv_master_builddir/streams/lib32/libstreams.la"
+		    #streams_cv_lfs_modmap="$os7_cv_master_builddir/streams/Modules.map"
+		    #streams_cv_lfs_symver="$os7_cv_master_builddir/streams/Module.symvers"
+		    #streams_cv_lfs_manpath="$os7_cv_master_builddir/streams/doc/man"
+		    AC_MSG_RESULT([yes])
+		else
+		    AC_MSG_RESULT([no])
 		fi
-	    done
+	    fi
 	    AC_MSG_CHECKING([for streams lfs include directory])
 	fi
 	if test :"${streams_cv_lfs_includes:-no}" = :no ; then
@@ -599,14 +606,14 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		if test -d "$streams_dir" ; then
 		    streams_bld=`echo $streams_dir | sed -e "s|^$srcdir/|$streams_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    streams_dir=`(cd $streams_dir; pwd)`
-		    AC_MSG_CHECKING([for streams lfs include directory... $streams_dir])
-		    if test -r "$streams_dir/$streams_what" ; then
+		    AC_MSG_CHECKING([for streams lfs include directory... $streams_dir $streams_bld])
+		    if test -d "$streams_bld" -a -r "$streams_dir/$streams_what" ; then
 			streams_cv_lfs_includes="$streams_dir $streams_bld"
-			streams_cv_lfs_ldadd=`echo "$streams_bld/../libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			streams_cv_lfs_ldadd32=`echo "$streams_bld/../lib32/libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			streams_cv_lfs_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			streams_cv_lfs_symver=`echo "$streams_bld/../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			streams_cv_lfs_manpath=`echo "$streams_bld/../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#streams_cv_lfs_ldadd=`echo "$streams_bld/../libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#streams_cv_lfs_ldadd32=`echo "$streams_bld/../lib32/libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#streams_cv_lfs_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#streams_cv_lfs_symver=`echo "$streams_bld/../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#streams_cv_lfs_manpath=`echo "$streams_bld/../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -635,9 +642,9 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for streams lfs include directory... $streams_dir])
 		    if test -r "$streams_dir/$streams_what" ; then
 			streams_cv_lfs_includes="$streams_dir"
-			streams_cv_lfs_modmap=
-			streams_cv_lfs_symver=
-			streams_cv_lfs_manpath=
+			#streams_cv_lfs_modmap=
+			#streams_cv_lfs_symver=
+			#streams_cv_lfs_manpath=
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -647,7 +654,8 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for streams lfs include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for streams lfs ldadd native],[streams_cv_lfs_ldadd],[dnl
+    AC_CACHE_CHECK([for streams lfs ldadd native], [streams_cv_lfs_ldadd], [dnl
+	streams_cv_lfs_ldadd=
 	for streams_dir in $streams_cv_lfs_includes ; do
 	    if test -f $streams_dir/../libstreams.la ; then
 		streams_cv_lfs_ldadd=`echo "$streams_dir/../libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -655,14 +663,16 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for streams lfs ldflags],[streams_cv_lfs_ldflags],[dnl
+    AC_CACHE_CHECK([for streams lfs ldflags], [streams_cv_lfs_ldflags], [dnl
+	streams_cv_lfs_ldflags=
 	if test -z "$streams_cv_lfs_ldadd" ; then
 	    streams_cv_lfs_ldflags="-lstreams"
 	else
 	    streams_cv_lfs_ldflags="-L$(dirname $streams_cv_lfs_ldadd)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for streams lfs ldadd 32-bit],[streams_cv_lfs_ldadd32],[dnl
+    AC_CACHE_CHECK([for streams lfs ldadd 32-bit], [streams_cv_lfs_ldadd32], [dnl
+	streams_cv_lfs_ldadd32=
 	for streams_dir in $streams_cv_lfs_includes ; do
 	    if test -f $streams_dir/../lib32/libstreams.la ; then
 		streams_cv_lfs_ldadd32=`echo "$streams_dir/../lib32/libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -670,14 +680,16 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for streams lfs ldflags 32-bit],[streams_cv_lfs_ldflags32],[dnl
+    AC_CACHE_CHECK([for streams lfs ldflags 32-bit], [streams_cv_lfs_ldflags32], [dnl
+	streams_cv_lfs_ldflags32=
 	if test -z "$streams_cv_lfs_ldadd32" ; then
 	    streams_cv_lfs_ldflags32="-lstreams"
 	else
 	    streams_cv_lfs_ldflags32="-L$(dirname $streams_cv_lfs_ldadd32)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for streams lfs modmap],[streams_cv_lfs_modmap],[dnl
+    AC_CACHE_CHECK([for streams lfs modmap], [streams_cv_lfs_modmap], [dnl
+	streams_cv_lfs_modmap=
 	for streams_dir in $streams_cv_lfs_includes ; do
 	    if test -f $streams_dir/../Modules.map ; then
 		streams_cv_lfs_modmap=`echo "$streams_dir/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -685,7 +697,8 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_MSG_CHECKING([for streams lfs symver],[streams_cv_lfs_symver],[dnl
+    AC_CACHE_CHECK([for streams lfs symver], [streams_cv_lfs_symver], [dnl
+	streams_cv_lfs_symver=
 	for streams_dir in $streams_cv_lfs_includes ; do
 	    if test -f $streams_dir/../Module.symvers ; then
 		streams_cv_lfs_symver=`echo "$streams_dir/../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -693,7 +706,8 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_MSG_CHECKING([for streams lfs manpath],[streams_cv_lfs_manpath],[dnl
+    AC_CACHE_CHECK([for streams lfs manpath], [streams_cv_lfs_manpath], [dnl
+	streams_cv_lfs_manpath=
 	for streams_dir in $streams_cv_lfs_includes ; do
 	    if test -d $streams_dir/../doc/man ; then
 		streams_cv_lfs_manpath=`echo "$streams_dir/../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -712,7 +726,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 *** Perhaps you just forgot to load the LfS STREAMS package?  The LfS
 *** STREAMS package is available from The OpenSS7 Project download page
 *** at http://www.openss7.org/ and comes in a tarball named something
-*** like "streams-0.9.2.1-1.tar.gz".
+*** like "streams-0.9.2.2.tar.gz".
 *** ])
     fi
     streams_what="sys/config.h"

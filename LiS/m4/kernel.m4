@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2007/02/22 08:36:38 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.152 $) $Date: 2007/02/28 11:51:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
+# Last Modified $Date: 2007/02/28 11:51:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -388,7 +388,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_TOOLS], [dnl
 # directory.  Therefore, this directory does not need to exist.
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
-    AC_CACHE_CHECK([for kernel modules directory], [linux_cv_k_modules_eval], [dnl
+    AC_CACHE_CHECK([for kernel modules install directory], [linux_cv_k_modules_eval], [dnl
 	AC_ARG_WITH([k-modules],
 	    AS_HELP_STRING([--with-k-modules=DIR],
 		[specify the directory to which kernel modules will be installed.
@@ -402,10 +402,53 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
 	    linux_cv_k_modules='${rootdir}/lib/modules/${kversion}'
 	fi
 	eval "linux_cv_k_modules_eval=\"$linux_cv_k_modules\"" ])
-    AC_CACHE_CHECK([for kernel module compression], [linux_cv_k_compress], [dnl
-	if test -r $linux_cv_k_modules_eval/modules.dep
+    AC_CACHE_CHECK([for kernel modules directory], [linux_cv_k_moddir], [dnl
+	AC_MSG_RESULT([searching...])
+	if test :"${with_k_modules:-no}" != :no
 	then
-	    if ( egrep -q '\.(k)?o\.gz:' $linux_cv_k_modules_eval/modules.dep )
+	    linux_cv_k_moddir="$with_k_modules"
+	else
+	    eval "k_moddir_search_path=\"
+		${DESTDIR}${rootdir}/lib/modules/${kversion}
+		${DESTDIR}/lib/modules/${kversion}\""
+	    k_moddir_search_path=`echo "$k_moddir_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    linux_cv_k_moddir=
+	    for linux_dir in $k_moddir_search_path
+	    do
+		AC_MSG_CHECKING([for kernel modules directory... $linux_dir])
+		if test -d "$linux_dir" -a -f "$linux_dir/modules.dep"
+		then
+		    linux_cv_k_moddir="$linux_dir"
+		    AC_MSG_RESULT([yes])
+		    break;
+		fi
+		AC_MSG_RESULT([no])
+	    done
+	fi
+	if test :"${linux_cv_k_moddir:-no}" = :no -o ! -d "$linux_cv_k_moddir"
+	then
+	    AC_MSG_WARN([
+***
+*** Strange, the modules directory is $linux_cv_k_modules_eval
+*** but the file modules.dep could not be found in
+***	"$with_k_modules"
+***	"$k_moddir_search_path"
+***
+*** Check the settings of the following options before repeating:
+***	--with-k-release ${kversion:-no}
+***	--with-k-modules ${kmoduledir:-no}
+***
+*** This could cause some problems later.
+*** ])
+	fi
+	AC_MSG_CHECKING([for kernel modules directory])
+    ])
+    kmoddir="$linux_cv_k_moddir"
+    AC_SUBST([kmoddir])dnl
+    AC_CACHE_CHECK([for kernel module compression], [linux_cv_k_compress], [dnl
+	if test -r $linux_cv_k_moddir/modules.dep
+	then
+	    if ( egrep -q '\.(k)?o\.gz:' $linux_cv_k_moddir/modules.dep )
 	    then
 		linux_cv_k_compress='yes'
 	    else
@@ -420,8 +463,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
 	(unknown|*)	COMPRESS_KERNEL_MODULES= ; kzip=
 		AC_MSG_WARN([
 *** 
-*** Strange, the modules directory is $linux_cv_k_modules_eval
-*** but the file $linux_cv_k_modules_eval/modules.dep
+*** Strange, the modules directory is $linux_cv_k_moddir
+*** but the file $linux_cv_k_moddir/modules.dep
 *** does not exist.  This could cause some problems later.
 *** ])
 	    ;;

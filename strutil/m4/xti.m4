@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/02/22 08:36:39 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/02/28 11:51:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/22 08:36:39 $ by $Author: brian $
+# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.45  2007/02/28 11:51:32  brian
+# - make sure build directory exists
+#
 # Revision 0.9.2.44  2007/02/22 08:36:39  brian
 # - balance parentheses
 #
@@ -202,23 +205,22 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    xti_search_path="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strxnet/src/include} ${os7_cv_master_builddir:+$os7_cv_master_builddir/strxnet/src/include}"
-	    for xti_dir in $xti_search_path ; do
-		if test -d "$xti_dir" ; then
-		    AC_MSG_CHECKING([for xti include directory... $xti_dir])
-		    if test -r "$xti_dir/$xti_what" ; then
-			xti_cv_includes="$xti_search_path"
-			xti_cv_ldadd="$os7_cv_master_builddir/strxnet/libxnet.la"
-			xti_cv_ldadd32="$os7_cv_master_builddir/strxnet/lib32/libxnet.la"
-			xti_cv_modmap= # "$os7_cv_master_builddir/strxnet/Modules.map"
-			xti_cv_symver= # "$os7_cv_master_builddir/strxnet/Module.symvers"
-			xti_cv_manpath="$os7_cv_master_builddir/strxnet/doc/man"
-			AC_MSG_RESULT([yes])
-			break
-		    fi
-		    AC_MSG_RESULT([no])
+	    xti_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strxnet/src/include}"
+	    xti_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/strxnet/src/include}"
+	    if test -d "$xti_dir" ; then
+		AC_MSG_CHECKING([for xti include directory... $xti_dir $xti_bld])
+		if test -d "$xti_bld" -a -r "$xti_dir/$xti_what" ; then
+		    xti_cv_includes="$xti_dir $xti_bld"
+		    #xti_cv_ldadd="$os7_cv_master_builddir/strxnet/libxnet.la"
+		    #xti_cv_ldadd32="$os7_cv_master_builddir/strxnet/lib32/libxnet.la"
+		    #xti_cv_modmap="$os7_cv_master_builddir/strxnet/Modules.map"
+		    #xti_cv_symver="$os7_cv_master_builddir/strxnet/Module.symvers"
+		    #xti_cv_manpath="$os7_cv_master_builddir/strxnet/doc/man"
+		    AC_MSG_RESULT([yes])
+		    break
 		fi
-	    done
+		AC_MSG_RESULT([no])
+	    fi
 	    AC_MSG_CHECKING([for xti include directory])
 	fi
 	if test :"${xti_cv_includes:-no}" = :no ; then
@@ -235,14 +237,14 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		if test -d "$xti_dir" ; then
 		    xti_bld=`echo $xti_dir | sed -e "s|^$srcdir/|$xti_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    xti_dir=`(cd $xti_dir; pwd)`
-		    AC_MSG_CHECKING([for xti include directory... $xti_dir])
-		    if test -r "$xti_dir/$xti_what" ; then
+		    AC_MSG_CHECKING([for xti include directory... $xti_dir $xti_bld])
+		    if test -d "$xti_bld" -a -r "$xti_dir/$xti_what" ; then
 			xti_cv_includes="$xti_dir $xti_bld"
-			xti_cv_ldadd=`echo "$xti_bld/../../libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xti_cv_ldadd32=`echo "$xti_bld/../../lib32/libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xti_cv_modmap= # `echo "$xti_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xti_cv_symver= # `echo "$xti_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xti_cv_manpath=`echo "$xti_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#xti_cv_ldadd=`echo "$xti_bld/../../libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#xti_cv_ldadd32=`echo "$xti_bld/../../lib32/libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#xti_cv_modmap=`echo "$xti_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#xti_cv_symver=`echo "$xti_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			#xti_cv_manpath=`echo "$xti_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -314,9 +316,9 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for xti include directory... $xti_dir])
 		    if test -r "$xti_dir/$xti_what" ; then
 			xti_cv_includes="$xti_dir"
-			xti_cv_modmap=
-			xti_cv_symver=
-			xti_cv_manpath=
+			#xti_cv_modmap=
+			#xti_cv_symver=
+			#xti_cv_manpath=
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -326,7 +328,8 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for xti include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for xti xnet ldadd native],[xti_cv_ldadd],[dnl
+    AC_CACHE_CHECK([for xti xnet ldadd native], [xti_cv_ldadd], [dnl
+	xti_cv_ldadd=
 	for xti_dir in $xti_cv_includes ; do
 	    if test -f "$xti_dir/../../libxnet.la" ; then
 		xti_cv_ldadd=`echo "$xti_dir/../../libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -334,14 +337,16 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for xti xnet ldflags],[xti_cv_ldflags],[dnl
+    AC_CACHE_CHECK([for xti xnet ldflags], [xti_cv_ldflags], [dnl
+	xti_cv_ldflags=
 	if test -z "$xti_cv_ldadd" ; then
 	    xti_cv_ldflags="-lxnet"
 	else
 	    xti_cv_ldflags="-L$(dirname $xti_cv_ldadd)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for xti xnet ldadd 32-bit],[xti_cv_ldadd32],[dnl
+    AC_CACHE_CHECK([for xti xnet ldadd 32-bit], [xti_cv_ldadd32], [dnl
+	xti_cv_ldadd32=
 	for xti_dir in $xti_cv_includes ; do
 	    if test -f "$xti_dir/../../lib32/libxnet.la" ; then
 		xti_cv_ldadd32=`echo "$xti_dir/../../lib32/libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -349,14 +354,16 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for xti xnet ldflags 32-bit],[xti_cv_ldflags32],[dnl
+    AC_CACHE_CHECK([for xti xnet ldflags 32-bit], [xti_cv_ldflags32], [dnl
+	xti_cv_ldflags32=
 	if test -z "$xti_cv_ldadd32" ; then
 	    xti_cv_ldflags32="-lxnet"
 	else
 	    xti_cv_ldflags32="-L$(dirname $xti_cv_ldadd32)/.libs/"
 	fi
     ])
-    AC_CACHE_CHECK([for xti modmap],[xti_cv_modmap],[dnl
+    AC_CACHE_CHECK([for xti modmap], [xti_cv_modmap], [dnl
+	xti_cv_modmap=
 	for xti_dir in $xti_cv_includes ; do
 	    if test -f "$xti_dir/../../Modules.map" ; then
 		xti_cv_modmap=`echo "$xti_dir/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -364,7 +371,8 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for xti symver],[xti_cv_symver],[dnl
+    AC_CACHE_CHECK([for xti symver], [xti_cv_symver], [dnl
+	xti_cv_symver=
 	for xti_dir in $xti_cv_includes ; do
 	    if test -f "$xti_dir/../../Module.symvers" ; then
 		xti_cv_symver=`echo "$xti_dir/../../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -372,7 +380,8 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    AC_CACHE_CHECK([for xti manpath],[xti_cv_manpath],[dnl
+    AC_CACHE_CHECK([for xti manpath], [xti_cv_manpath], [dnl
+	xti_cv_manpath=
 	for xti_dir in $xti_cv_includes ; do
 	    if test -d "$xti_dir/../../doc/man" ; then
 		xti_cv_manpath=`echo "$xti_dir/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
