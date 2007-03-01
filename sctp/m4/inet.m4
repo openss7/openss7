@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/01 00:10:18 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/01 01:45:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 01:45:15 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: inet.m4,v $
+# Revision 0.9.2.36  2007/03/01 01:45:15  brian
+# - updating build process
+#
 # Revision 0.9.2.35  2007/03/01 00:10:18  brian
 # - update to build process for 2.4 kernels
 #
@@ -441,22 +444,30 @@ dnl		    this will just not be set
     AC_CACHE_CHECK([for inet $inet_what], [inet_cv_config], [dnl
 	inet_cv_config=
 	if test -n "$inet_cv_includes" ; then
+	    AC_MSG_RESULT([(searching $inet_cv_includes)])
 	    for inet_dir in $inet_cv_includes ; do
 		# old place for config
+		AC_MSG_CHECKING([for inet $inet_what... $inet_dir])
 		if test -f "$inet_dir/$inet_what" ; then
 		    inet_cv_config="$inet_dir/$inet_what"
+		    AC_MSG_RESULT([yes])
 		    break
 		fi
+		AC_MSG_RESULT([no])
 		# new place for config
 		if test -n "$linux_cv_k_release" ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
 dnl		    this will just not be set
+		    AC_MSG_CHECKING([for inet $inet_what... $inet_dir/$linux_cv_k_release/$target_cpu])
 		    if test -f "$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what" ; then
 			inet_cv_config="$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for inet $inet_what])
 	fi
     ])
     inet_what="sys/strinet/modversions.h"
@@ -466,23 +477,31 @@ dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we
 dnl	assume normal objects
 	if test :"${linux_cv_k_ko_modules:-no}" = :no ; then
 	    if test -n "$inet_cv_includes" ; then
+		AC_MSG_RESULT([(searching $inet_cv_includes)])
 		for inet_dir in $inet_cv_includes ; do
 		    # old place for modversions
+		    AC_MSG_CHECKING([for inet $inet_what... $inet_dir])
 		    if test -f "$inet_dir/$inet_what" ; then
 			inet_cv_modversions="$inet_dir/$inet_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		    # new place for modversions
 		    if test -n "$linux_cv_k_release" ; then
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
+			AC_MSG_CHECKING([for inet $inet_what... $inet_dir/$linux_cv_k_release/$target_cpu])
 			if test "$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what" ; then
 			    inet_cv_includes="$inet_dir/$linux_cv_k_release/$target_cpu $inet_cv_includes"
 			    inet_cv_modversions="$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what"
+			    AC_MSG_RESULT([yes])
 			    break
 			fi
+			AC_MSG_RESULT([no])
 		    fi
 		done
+		AC_MSG_CHECKING([for inet $inet_what])
 	    fi
 	fi
     ])

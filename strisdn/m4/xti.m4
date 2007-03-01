@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/03/01 00:10:19 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/03/01 01:45:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 00:10:19 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 01:45:16 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.47  2007/03/01 01:45:16  brian
+# - updating build process
+#
 # Revision 0.9.2.46  2007/03/01 00:10:19  brian
 # - update to build process for 2.4 kernels
 #
@@ -436,22 +439,30 @@ dnl		    this will just not be set
     AC_CACHE_CHECK([for xti $xti_what], [xti_cv_config], [dnl
 	xti_cv_config=
 	if test -n "$xti_cv_includes" ; then
+	    AC_MSG_RESULT([(searching $xti_cv_includes)])
 	    for xti_dir in $xti_cv_includes ; do
 		# old place for config
+		AC_MSG_CHECKING([for xti $xti_what... $xti_dir])
 		if test -f "$xti_dir/$xti_what" ; then
 		    xti_cv_config="$xti_dir/$xti_what"
+		    AC_MSG_RESULT([yes])
 		    break
 		fi
+		AC_MSG_RESULT([no])
 		# new place for config
 		if test -n "$linux_cv_k_release" ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
 dnl		    this will just not be set
+		    AC_MSG_CHECKING([for xti $xti_what... $xti_dir/$linux_cv_k_release/$target_cpu])
 		    if test -f "$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what" ; then
 			xti_cv_config="$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for xti $xti_what])
 	fi
     ])
     xti_what="sys/strxnet/modversions.h"
@@ -461,23 +472,31 @@ dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we
 dnl	assume normal objects
 	if test :"${linux_cv_k_ko_modules:-no}" = :no ; then
 	    if test -n "$xti_cv_includes" ; then
+		AC_MSG_RESULT([(searching $xti_cv_includes)])
 		for xti_dir in $xti_cv_includes ; do
 		    # old place for modversions
+		    AC_MSG_CHECKING([for xti $xti_what... $xti_dir])
 		    if test -f "$xti_dir/$xti_what" ; then
 			xti_cv_modversions="$xti_dir/$xti_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		    # new place for modversions
 		    if test -n "$linux_cv_k_release" ; then
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
+			AC_MSG_CHECKING([for xti $xti_what... $xti_dir/$linux_cv_k_release/$target_cpu])
 			if test "$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what" ; then
 			    xti_cv_includes="$xti_dir/$linux_cv_k_release/$target_cpu $xti_cv_includes"
 			    xti_cv_modversions="$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what"
+			    AC_MSG_RESULT([yes])
 			    break
 			fi
+			AC_MSG_RESULT([no])
 		    fi
 		done
+		AC_MSG_CHECKING([for xti $xti_what])
 	    fi
 	fi
     ])
