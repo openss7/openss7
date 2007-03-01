@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/01 00:10:18 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/01 01:45:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 01:45:15 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sctp.m4,v $
+# Revision 0.9.2.35  2007/03/01 01:45:15  brian
+# - updating build process
+#
 # Revision 0.9.2.34  2007/03/01 00:10:18  brian
 # - update to build process for 2.4 kernels
 #
@@ -457,22 +460,30 @@ dnl		    this will just not be set
     AC_CACHE_CHECK([for sctp $sctp_what], [sctp_cv_config], [dnl
 	sctp_cv_config=
 	if test -n "$sctp_cv_includes" ; then
+	    AC_MSG_RESULT([(searching $sctp_cv_includes)])
 	    for sctp_dir in $sctp_cv_includes ; do
 		# old place for config
+		AC_MSG_CHECKING([for sctp $sctp_what... $sctp_dir])
 		if test -f "$sctp_dir/$sctp_what" ; then
 		    sctp_cv_config="$sctp_dir/$sctp_what"
+		    AC_MSG_RESULT([yes])
 		    break
 		fi
+		AC_MSG_RESULT([no])
 		# new place for config
 		if test -n "$linux_cv_k_release" ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
 dnl		    this will just not be set
+		    AC_MSG_CHECKING([for sctp $sctp_what... $sctp_dir/$linux_cv_k_release/$target_cpu])
 		    if test -f "$sctp_dir/$linux_cv_k_release/$target_cpu/$sctp_what" ; then
 			sctp_cv_config="$sctp_dir/$linux_cv_k_release/$target_cpu/$sctp_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for sctp $sctp_what])
 	fi
     ])
     sctp_what="sys/strsctp/modversions.h"
@@ -482,23 +493,31 @@ dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we
 dnl	assume normal objects
 	if test :"${linux_cv_k_ko_modules:-no}" = :no ; then
 	    if test -n "$sctp_cv_includes" ; then
+		AC_MSG_RESULT([(searching $sctp_cv_includes)])
 		for sctp_dir in $sctp_cv_includes ; do
 		    # old place for modversions
+		    AC_MSG_CHECKING([for sctp $sctp_what... $sctp_dir])
 		    if test -f "$sctp_dir/$sctp_what" ; then
 			sctp_cv_modversions="$sctp_dir/$sctp_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		    # new place for modversions
 		    if test -n "$linux_cv_k_release" ; then
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
+			AC_MSG_CHECKING([for sctp $sctp_what... $sctp_dir/$linux_cv_k_release/$target_cpu])
 			if test "$sctp_dir/$linux_cv_k_release/$target_cpu/$sctp_what" ; then
 			    sctp_cv_includes="$sctp_dir/$linux_cv_k_release/$target_cpu $sctp_cv_includes"
 			    sctp_cv_modversions="$sctp_dir/$linux_cv_k_release/$target_cpu/$sctp_what"
+			    AC_MSG_RESULT([yes])
 			    break
 			fi
+			AC_MSG_RESULT([no])
 		    fi
 		done
+		AC_MSG_CHECKING([for sctp $sctp_what])
 	    fi
 	fi
     ])

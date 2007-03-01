@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/01 00:10:18 $
+# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/01 01:45:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 01:45:15 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.12  2007/03/01 01:45:15  brian
+# - updating build process
+#
 # Revision 0.9.2.11  2007/03/01 00:10:18  brian
 # - update to build process for 2.4 kernels
 #
@@ -450,22 +453,30 @@ dnl		    this will just not be set
     AC_CACHE_CHECK([for nsl $nsl_what], [nsl_cv_config], [dnl
 	nsl_cv_config=
 	if test -n "$nsl_cv_includes" ; then
+	    AC_MSG_RESULT([(searching $nsl_cv_includes)])
 	    for nsl_dir in $nsl_cv_includes ; do
 		# old place for config
+		AC_MSG_CHECKING([for nsl $nsl_what... $nsl_dir])
 		if test -f "$nsl_dir/$nsl_what" ; then
 		    nsl_cv_config="$nsl_dir/$nsl_what"
+		    AC_MSG_RESULT([yes])
 		    break
 		fi
+		AC_MSG_RESULT([no])
 		# new place for config
 		if test -n "$linux_cv_k_release" ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
 dnl		    this will just not be set
+		    AC_MSG_CHECKING([for nsl $nsl_what... $nsl_dir/$linux_cv_k_release/$target_cpu])
 		    if test -f "$nsl_dir/$linux_cv_k_release/$target_cpu/$nsl_what" ; then
 			nsl_cv_config="$nsl_dir/$linux_cv_k_release/$target_cpu/$nsl_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for nsl $nsl_what])
 	fi
     ])
     nsl_what="sys/strnsl/modversions.h"
@@ -475,23 +486,31 @@ dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we
 dnl	assume normal objects
 	if test :"${linux_cv_k_ko_modules:-no}" = :no ; then
 	    if test -n "$nsl_cv_includes" ; then
+		AC_MSG_RESULT([(searching $nsl_cv_includes)])
 		for nsl_dir in $nsl_cv_includes ; do
 		    # old place for modversions
+		    AC_MSG_CHECKING([for nsl $nsl_what... $nsl_dir])
 		    if test -f "$nsl_dir/$nsl_what" ; then
 			nsl_cv_modversions="$nsl_dir/$nsl_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		    # new place for modversions
 		    if test -n "$linux_cv_k_release" ; then
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
+			AC_MSG_CHECKING([for nsl $nsl_what... $nsl_dir/$linux_cv_k_release/$target_cpu])
 			if test "$nsl_dir/$linux_cv_k_release/$target_cpu/$nsl_what" ; then
 			    nsl_cv_includes="$nsl_dir/$linux_cv_k_release/$target_cpu $nsl_cv_includes"
 			    nsl_cv_modversions="$nsl_dir/$linux_cv_k_release/$target_cpu/$nsl_what"
+			    AC_MSG_RESULT([yes])
 			    break
 			fi
+			AC_MSG_RESULT([no])
 		    fi
 		done
+		AC_MSG_CHECKING([for nsl $nsl_what])
 	    fi
 	fi
     ])

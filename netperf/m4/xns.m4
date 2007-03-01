@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/01 00:10:19 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/03/01 01:45:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 00:10:19 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 01:45:16 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xns.m4,v $
+# Revision 0.9.2.41  2007/03/01 01:45:16  brian
+# - updating build process
+#
 # Revision 0.9.2.40  2007/03/01 00:10:19  brian
 # - update to build process for 2.4 kernels
 #
@@ -475,22 +478,30 @@ dnl		    this will just not be set
     AC_CACHE_CHECK([for xns $xns_what], [xns_cv_config], [dnl
 	xns_cv_config=
 	if test -n "$xns_cv_includes" ; then
+	    AC_MSG_RESULT([(searching $xns_cv_includes)])
 	    for xns_dir in $xns_cv_includes ; do
 		# old place for config
+		AC_MSG_CHECKING([for xns $xns_what... $xns_dir])
 		if test -f "$xns_dir/$xns_what" ; then
 		    xns_cv_config="$xns_dir/$xns_what"
+		    AC_MSG_RESULT([yes])
 		    break
 		fi
+		AC_MSG_RESULT([no])
 		# new place for config
 		if test -n "$linux_cv_k_release" ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
 dnl		    this will just not be set
+		    AC_MSG_CHECKING([for xns $xns_what... $xns_dir/$linux_cv_k_release/$target_cpu])
 		    if test -f "$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what" ; then
 			xns_cv_config="$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for xns $xns_what])
 	fi
     ])
     xns_what="sys/strxns/modversions.h"
@@ -500,23 +511,31 @@ dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we
 dnl	assume normal objects
 	if test :"${linux_cv_k_ko_modules:-no}" = :no ; then
 	    if test -n "$xns_cv_includes" ; then
+		AC_MSG_RESULT([(searching $xns_cv_includes)])
 		for xns_dir in $xns_cv_includes ; do
 		    # old place for modversions
+		    AC_MSG_CHECKING([for xns $xns_what... $xns_dir])
 		    if test -f "$xns_dir/$xns_what" ; then
 			xns_cv_modversions="$xns_dir/$xns_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		    # new place for modversions
 		    if test -n "$linux_cv_k_release" ; then
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
+			AC_MSG_CHECKING([for xns $xns_what... $xns_dir/$linux_cv_k_release/$target_cpu])
 			if test "$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what" ; then
 			    xns_cv_includes="$xns_dir/$linux_cv_k_release/$target_cpu $xns_cv_includes"
 			    xns_cv_modversions="$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what"
+			    AC_MSG_RESULT([yes])
 			    break
 			fi
+			AC_MSG_RESULT([no])
 		    fi
 		done
+		AC_MSG_CHECKING([for xns $xns_what])
 	    fi
 	fi
     ])

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/01 00:10:18 $
+# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/01 01:45:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 01:45:15 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: ss7.m4,v $
+# Revision 0.9.2.13  2007/03/01 01:45:15  brian
+# - updating build process
+#
 # Revision 0.9.2.12  2007/03/01 00:10:18  brian
 # - update to build process for 2.4 kernels
 #
@@ -423,22 +426,30 @@ dnl		    this will just not be set
     AC_CACHE_CHECK([for ss7 $ss7_what], [ss7_cv_config], [dnl
 	ss7_cv_config=
 	if test -n "$ss7_cv_includes" ; then
+	    AC_MSG_RESULT([(searching $ss7_cv_includes)])
 	    for ss7_dir in $ss7_cv_includes ; do
 		# old place for config
+		AC_MSG_CHECKING([for ss7 $ss7_what... $ss7_dir])
 		if test -f "$ss7_dir/$ss7_what" ; then
 		    ss7_cv_config="$ss7_dir/$ss7_what"
+		    AC_MSG_RESULT([yes])
 		    break
 		fi
+		AC_MSG_RESULT([no])
 		# new place for config
 		if test -n "$linux_cv_k_release" ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
 dnl		    this will just not be set
+		    AC_MSG_CHECKING([for ss7 $ss7_what... $ss7_dir/$linux_cv_k_release/$target_cpu])
 		    if test -f "$ss7_dir/$linux_cv_k_release/$target_cpu/$ss7_what" ; then
 			ss7_cv_config="$ss7_dir/$linux_cv_k_release/$target_cpu/$ss7_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for ss7 $ss7_what])
 	fi
     ])
     ss7_what="sys/strss7/modversions.h"
@@ -448,23 +459,31 @@ dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we
 dnl	assume normal objects
 	if test :"${linux_cv_k_ko_modules:-no}" = :no ; then
 	    if test -n "$ss7_cv_includes" ; then
+		AC_MSG_RESULT([(searching $ss7_cv_includes)])
 		for ss7_dir in $ss7_cv_includes ; do
 		    # old place for modversions
+		    AC_MSG_CHECKING([for ss7 $ss7_what... $ss7_dir])
 		    if test -f "$ss7_dir/$ss7_what" ; then
 			ss7_cv_modversions="$ss7_dir/$ss7_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		    # new place for modversions
 		    if test -n "$linux_cv_k_release" ; then
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
+			AC_MSG_CHECKING([for ss7 $ss7_what... $ss7_dir/$linux_cv_k_release/$target_cpu])
 			if test "$ss7_dir/$linux_cv_k_release/$target_cpu/$ss7_what" ; then
 			    ss7_cv_includes="$ss7_dir/$linux_cv_k_release/$target_cpu $ss7_cv_includes"
 			    ss7_cv_modversions="$ss7_dir/$linux_cv_k_release/$target_cpu/$ss7_what"
+			    AC_MSG_RESULT([yes])
 			    break
 			fi
+			AC_MSG_RESULT([no])
 		    fi
 		done
+		AC_MSG_CHECKING([for ss7 $ss7_what])
 	    fi
 	fi
     ])

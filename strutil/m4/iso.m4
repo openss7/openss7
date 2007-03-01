@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/01 00:10:18 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/01 01:45:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 01:45:15 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.8  2007/03/01 01:45:15  brian
+# - updating build process
+#
 # Revision 0.9.2.7  2007/03/01 00:10:18  brian
 # - update to build process for 2.4 kernels
 #
@@ -402,22 +405,30 @@ dnl		    this will just not be set
     AC_CACHE_CHECK([for iso $iso_what], [iso_cv_config], [dnl
 	iso_cv_config=
 	if test -n "$iso_cv_includes" ; then
+	    AC_MSG_RESULT([(searching $iso_cv_includes)])
 	    for iso_dir in $iso_cv_includes ; do
 		# old place for config
+		AC_MSG_CHECKING([for iso $iso_what... $iso_dir])
 		if test -f "$iso_dir/$iso_what" ; then
 		    iso_cv_config="$iso_dir/$iso_what"
+		    AC_MSG_RESULT([yes])
 		    break
 		fi
+		AC_MSG_RESULT([no])
 		# new place for config
 		if test -n "$linux_cv_k_release" ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
 dnl		    this will just not be set
+		    AC_MSG_CHECKING([for iso $iso_what... $iso_dir/$linux_cv_k_release/$target_cpu])
 		    if test -f "$iso_dir/$linux_cv_k_release/$target_cpu/$iso_what" ; then
 			iso_cv_config="$iso_dir/$linux_cv_k_release/$target_cpu/$iso_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for iso $iso_what])
 	fi
     ])
     iso_what="sys/striso/modversions.h"
@@ -427,23 +438,31 @@ dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we
 dnl	assume normal objects
 	if test :"${linux_cv_k_ko_modules:-no}" = :no ; then
 	    if test -n "$iso_cv_includes" ; then
+		AC_MSG_RESULT([(searching $iso_cv_includes)])
 		for iso_dir in $iso_cv_includes ; do
 		    # old place for modversions
+		    AC_MSG_CHECKING([for iso $iso_what... $iso_dir])
 		    if test -f "$iso_dir/$iso_what" ; then
 			iso_cv_modversions="$iso_dir/$iso_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		    # new place for modversions
 		    if test -n "$linux_cv_k_release" ; then
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
+			AC_MSG_CHECKING([for iso $iso_what... $iso_dir/$linux_cv_k_release/$target_cpu])
 			if test "$iso_dir/$linux_cv_k_release/$target_cpu/$iso_what" ; then
 			    iso_cv_includes="$iso_dir/$linux_cv_k_release/$target_cpu $iso_cv_includes"
 			    iso_cv_modversions="$iso_dir/$linux_cv_k_release/$target_cpu/$iso_what"
+			    AC_MSG_RESULT([yes])
 			    break
 			fi
+			AC_MSG_RESULT([no])
 		    fi
 		done
+		AC_MSG_CHECKING([for iso $iso_what])
 	    fi
 	fi
     ])
