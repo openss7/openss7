@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/02/28 11:51:32 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/03/01 00:10:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 00:10:19 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.46  2007/03/01 00:10:19  brian
+# - update to build process for 2.4 kernels
+#
 # Revision 0.9.2.45  2007/02/28 11:51:32  brian
 # - make sure build directory exists
 #
@@ -429,14 +432,14 @@ dnl		    this will just not be set
 	    xti_cv_version=`grep '#define.*\<STRXNET_VERSION\>' $xti_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    xti_what="sys/config.h"
+    xti_what="sys/strxnet/config.h"
     AC_CACHE_CHECK([for xti $xti_what], [xti_cv_config], [dnl
 	xti_cv_config=
 	if test -n "$xti_cv_includes" ; then
 	    for xti_dir in $xti_cv_includes ; do
 		# old place for config
 		if test -f "$xti_dir/$xti_what" ; then
-		    xti_cv_config="$xti_dir/$xti-what"
+		    xti_cv_config="$xti_dir/$xti_what"
 		    break
 		fi
 		# new place for config

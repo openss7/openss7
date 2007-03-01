@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/02/28 11:51:32 $
+# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/01 00:10:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.11  2007/03/01 00:10:18  brian
+# - update to build process for 2.4 kernels
+#
 # Revision 0.9.2.10  2007/02/28 11:51:32  brian
 # - make sure build directory exists
 #
@@ -443,7 +446,7 @@ dnl		    this will just not be set
 	    nsl_cv_version=`grep '#define.*\<STRNSL_VERSION\>' $nsl_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    nsl_what="sys/config.h"
+    nsl_what="sys/strnsl/config.h"
     AC_CACHE_CHECK([for nsl $nsl_what], [nsl_cv_config], [dnl
 	nsl_cv_config=
 	if test -n "$nsl_cv_includes" ; then

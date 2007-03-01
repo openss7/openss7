@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/02/28 11:51:31 $
+# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/01 00:10:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 11:51:31 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.6  2007/03/01 00:10:18  brian
+# - update to build process for 2.4 kernels
+#
 # Revision 0.9.2.5  2007/02/28 11:51:31  brian
 # - make sure build directory exists
 #
@@ -390,7 +393,7 @@ dnl		    this will just not be set
 	    chan_cv_version=`grep '#define.*\<STRCHAN_VERSION\>' $chan_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    chan_what="sys/config.h"
+    chan_what="sys/strchan/config.h"
     AC_CACHE_CHECK([for chan $chan_what], [chan_cv_config], [dnl
 	chan_cv_config=
 	if test -n "$chan_cv_includes" ; then

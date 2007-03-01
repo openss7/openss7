@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/28 11:51:32 $
+# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/01 00:10:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sigtran.m4,v $
+# Revision 0.9.2.5  2007/03/01 00:10:18  brian
+# - update to build process for 2.4 kernels
+#
 # Revision 0.9.2.4  2007/02/28 11:51:32  brian
 # - make sure build directory exists
 #
@@ -394,14 +397,14 @@ dnl		    this will just not be set
 	    sigtran_cv_version=`grep '#define.*\<SIGTRAN_VERSION\>' $sigtran_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    sigtran_what="sys/config.h"
+    sigtran_what="sys/sigtran/config.h"
     AC_CACHE_CHECK([for sigtran $sigtran_what], [sigtran_cv_config], [dnl
 	sigtran_cv_config=
 	if test -n "$sigtran_cv_includes" ; then
 	    for sigtran_dir in $sigtran_cv_includes ; do
 		# old place for config
 		if test -f "$sigtran_dir/$sigtran_what" ; then
-		    sigtran_cv_config="$sigtran_dir/$sigtran-what"
+		    sigtran_cv_config="$sigtran_dir/$sigtran_what"
 		    break
 		fi
 		# new place for config

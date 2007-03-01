@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2007/02/28 11:51:32 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2007/03/01 00:10:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -729,7 +729,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 *** like "streams-0.9.2.2.tar.gz".
 *** ])
     fi
-    streams_what="sys/config.h"
+    streams_what="sys/streams/config.h"
     AC_CACHE_CHECK([for streams lfs $streams_what], [streams_cv_lfs_config], [dnl
 	streams_cv_lfs_config=no
 	if test -n "$streams_cv_lfs_includes" ; then

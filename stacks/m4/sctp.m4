@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/02/28 11:51:32 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/01 00:10:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sctp.m4,v $
+# Revision 0.9.2.34  2007/03/01 00:10:18  brian
+# - update to build process for 2.4 kernels
+#
 # Revision 0.9.2.33  2007/02/28 11:51:32  brian
 # - make sure build directory exists
 #
@@ -450,14 +453,14 @@ dnl		    this will just not be set
 	    sctp_cv_version=`grep '#define.*\<STRSCTP_VERSION\>' $sctp_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    sctp_what="sys/config.h"
+    sctp_what="sys/strsctp/config.h"
     AC_CACHE_CHECK([for sctp $sctp_what], [sctp_cv_config], [dnl
 	sctp_cv_config=
 	if test -n "$sctp_cv_includes" ; then
 	    for sctp_dir in $sctp_cv_includes ; do
 		# old place for config
 		if test -f "$sctp_dir/$sctp_what" ; then
-		    sctp_cv_config="$sctp_dir/$sctp-what"
+		    sctp_cv_config="$sctp_dir/$sctp_what"
 		    break
 		fi
 		# new place for config

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/02/28 11:51:32 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/01 00:10:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 00:10:19 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xns.m4,v $
+# Revision 0.9.2.40  2007/03/01 00:10:19  brian
+# - update to build process for 2.4 kernels
+#
 # Revision 0.9.2.39  2007/02/28 11:51:32  brian
 # - make sure build directory exists
 #
@@ -468,14 +471,14 @@ dnl		    this will just not be set
 	    xns_cv_version=`grep '#define.*\<STRXNS_VERSION\>' $xns_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    xns_what="sys/config.h"
+    xns_what="sys/strxns/config.h"
     AC_CACHE_CHECK([for xns $xns_what], [xns_cv_config], [dnl
 	xns_cv_config=
 	if test -n "$xns_cv_includes" ; then
 	    for xns_dir in $xns_cv_includes ; do
 		# old place for config
 		if test -f "$xns_dir/$xns_what" ; then
-		    xns_cv_config="$xns_dir/$xns-what"
+		    xns_cv_config="$xns_dir/$xns_what"
 		    break
 		fi
 		# new place for config

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/02/28 11:51:32 $
+# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/01 00:10:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.12  2007/03/01 00:10:18  brian
+# - update to build process for 2.4 kernels
+#
 # Revision 0.9.2.11  2007/02/28 11:51:32  brian
 # - make sure build directory exists
 #
@@ -426,7 +429,7 @@ dnl		    this will just not be set
 	    sock_cv_version=`grep '#define.*\<STRSOCK_VERSION\>' $sock_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    sock_what="sys/config.h"
+    sock_what="sys/strsock/config.h"
     AC_CACHE_CHECK([for sock $sock_what], [sock_cv_config], [dnl
 	sock_cv_config=
 	if test -n "$sock_cv_includes" ; then

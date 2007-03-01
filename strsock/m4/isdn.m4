@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/28 11:51:31 $
+# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/01 00:10:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 11:51:31 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: isdn.m4,v $
+# Revision 0.9.2.5  2007/03/01 00:10:18  brian
+# - update to build process for 2.4 kernels
+#
 # Revision 0.9.2.4  2007/02/28 11:51:31  brian
 # - make sure build directory exists
 #
@@ -394,14 +397,14 @@ dnl		    this will just not be set
 	    isdn_cv_version=`grep '#define.*\<STRISDN_VERSION\>' $isdn_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    isdn_what="sys/config.h"
+    isdn_what="sys/strisdn/config.h"
     AC_CACHE_CHECK([for isdn $isdn_what], [isdn_cv_config], [dnl
 	isdn_cv_config=
 	if test -n "$isdn_cv_includes" ; then
 	    for isdn_dir in $isdn_cv_includes ; do
 		# old place for config
 		if test -f "$isdn_dir/$isdn_what" ; then
-		    isdn_cv_config="$isdn_dir/$isdn-what"
+		    isdn_cv_config="$isdn_dir/$isdn_what"
 		    break
 		fi
 		# new place for config
