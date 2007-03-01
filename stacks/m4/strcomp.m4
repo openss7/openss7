@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/02/28 11:51:32 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/01 00:10:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strcomp.m4,v $
+# Revision 0.9.2.24  2007/03/01 00:10:18  brian
+# - update to build process for 2.4 kernels
+#
 # Revision 0.9.2.23  2007/02/28 11:51:32  brian
 # - make sure build directory exists
 #
@@ -392,7 +395,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 *** named something like "strcompat-0.9.2.3.tar.gz".
 *** ])
     fi
-    AC_CACHE_CHECK([for strcompat version], [strcomp_cv_version], [dnl
+    AC_CACHE_CHECK([for compat version], [strcomp_cv_version], [dnl
 	strcomp_what="sys/strcompat/version.h"
 	strcomp_file=
 	if test -n "$strcomp_cv_includes" ; then
@@ -417,52 +420,68 @@ dnl		    this will just not be set
 	    strcomp_cv_version=`grep '#define.*\<STRCOMPAT_VERSION\>' $strcomp_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    strcomp_what="sys/config.h"
-    AC_CACHE_CHECK([for strcompat $strcomp_what], [strcomp_cv_config], [dnl
+    strcomp_what="sys/strcompat/config.h"
+    AC_CACHE_CHECK([for compat $strcomp_what], [strcomp_cv_config], [dnl
 	strcomp_cv_config=
 	if test -n "$strcomp_cv_includes" ; then
+	    AC_MSG_RESULT([(searching $strcomp_cv_includes)])
 	    for strcomp_dir in $strcomp_cv_includes ; do
 		# old place for config
+		AC_MSG_CHECKING([for compat $strcomp_what... $strcomp_dir])
 		if test -f "$strcomp_dir/$strcomp_what" ; then
 		    strcomp_cv_config="$strcomp_dir/$strcomp_what"
+		    AC_MSG_RESULT([yes])
 		    break
 		fi
+		AC_MSG_RESULT([no])
 		# new place for config
 		if test -n "$linux_cv_k_release" ; then
 dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
 dnl		    this will just not be set
+		    AC_MSG_CHECKING([for compat $strcomp_what... $strcomp_dir/$linux_cv_k_release/$target_cpu])
 		    if test -f "$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what" ; then
 			strcomp_cv_config="$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		fi
 	    done
+	    AC_MSG_CHECKING([for compat $strcomp_what])
 	fi
     ])
     strcomp_what="sys/strcompat/modversions.h"
-    AC_CACHE_CHECK([for strcompat $strcomp_what], [strcomp_cv_modversions], [dnl
+    AC_CACHE_CHECK([for compat $strcomp_what], [strcomp_cv_modversions], [dnl
 	strcomp_cv_modversions=
 dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we
 dnl	assume normal objects
 	if test :"${linux_cv_k_ko_modules:-no}" = :no ; then
 	    if test -n "$strcomp_cv_includes" ; then
+		AC_MSG_RESULT([(searching $strcomp_cv_includes)])
 		for strcomp_dir in $strcomp_cv_includes ; do
 		    # old place for modversions
+		    AC_MSG_CHECKING([for compat $strcomp_what... $strcomp_dir])
 		    if test -f "$strcomp_dir/$strcomp_what" ; then
 			strcomp_cv_modversions="$strcomp_dir/$strcomp_what"
+			AC_MSG_RESULT([yes])
 			break
 		    fi
+		    AC_MSG_RESULT([no])
 		    # new place for modversions
 		    if test -n "$linux_cv_k_release" ; then
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
+			AC_MSG_CHECKING([for compat $strcomp_what... $strcomp_dir/$linux_cv_k_release/$target_cpu])
 			if test -f "$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what" ; then
 			    strcomp_cv_includes="$strcomp_dir/$linux_cv_k_release/$target_cpu $strcomp_cv_includes"
 			    strcomp_cv_modversions="$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what"
+			    AC_MSG_RESULT([yes])
 			    break
 			fi
+			AC_MSG_RESULT([no])
 		    fi
 		done
+		AC_MSG_CHECKING([for compat $strcomp_what])
 	    fi
 	fi
     ])

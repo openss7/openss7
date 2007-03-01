@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/02/28 11:51:31 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/01 00:10:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 11:51:31 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: inet.m4,v $
+# Revision 0.9.2.35  2007/03/01 00:10:18  brian
+# - update to build process for 2.4 kernels
+#
 # Revision 0.9.2.34  2007/02/28 11:51:31  brian
 # - make sure build directory exists
 #
@@ -434,14 +437,14 @@ dnl		    this will just not be set
 	    inet_cv_version=`grep '#define.*\<STRINET_VERSION\>' $inet_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    inet_what="sys/config.h"
+    inet_what="sys/strinet/config.h"
     AC_CACHE_CHECK([for inet $inet_what], [inet_cv_config], [dnl
 	inet_cv_config=
 	if test -n "$inet_cv_includes" ; then
 	    for inet_dir in $inet_cv_includes ; do
 		# old place for config
 		if test -f "$inet_dir/$inet_what" ; then
-		    inet_cv_config="$inet_dir/$inet-what"
+		    inet_cv_config="$inet_dir/$inet_what"
 		    break
 		fi
 		# new place for config

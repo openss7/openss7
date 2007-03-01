@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/02/28 11:51:32 $
+# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/01 00:10:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: ss7.m4,v $
+# Revision 0.9.2.12  2007/03/01 00:10:18  brian
+# - update to build process for 2.4 kernels
+#
 # Revision 0.9.2.11  2007/02/28 11:51:32  brian
 # - make sure build directory exists
 #
@@ -416,14 +419,14 @@ dnl		    this will just not be set
 	    ss7_cv_version=`grep '#define.*\<STRSS7_VERSION\>' $ss7_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    ss7_what="sys/config.h"
+    ss7_what="sys/strss7/config.h"
     AC_CACHE_CHECK([for ss7 $ss7_what], [ss7_cv_config], [dnl
 	ss7_cv_config=
 	if test -n "$ss7_cv_includes" ; then
 	    for ss7_dir in $ss7_cv_includes ; do
 		# old place for config
 		if test -f "$ss7_dir/$ss7_what" ; then
-		    ss7_cv_config="$ss7_dir/$ss7-what"
+		    ss7_cv_config="$ss7_dir/$ss7_what"
 		    break
 		fi
 		# new place for config

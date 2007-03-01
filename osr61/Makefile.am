@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/02/27 08:38:33 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/01 00:10:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/27 08:38:33 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 00:10:16 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2007/03/01 00:10:16  brian
+# - update to build process for 2.4 kernels
+#
 # Revision 0.9.2.3  2007/02/27 08:38:33  brian
 # - release corrections for 2.4 kernel builds
 #
@@ -251,7 +254,7 @@ if WITH_ANTARES
 libOSRdlgn_a_SOURCES		+= $(EXTRA_libOSRdlgn_a_SOURCES)
 endif
 libOSRdlgn_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libOSRdlgn_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB) \
+libOSRdlgn_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME_STR=\"dlgn\" \
 				  -I./src/drivers/dlgn/include -I$(srcdir)/src/drivers/dlgn/include \
 				  -I./src/drivers/dvbm/include -I$(srcdir)/src/drivers/dvbm/include \
@@ -262,17 +265,14 @@ libOSRdlgn_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOSRdlgn_a_OBJECTS):	$(libOSRdlgn_a_DEPENDENCIES)
 
-if WITH_KO_MODULES
-streams_dlgn.o: $(libOSRdlgn_a_OBJECTS)
-	$(LD) -r -o $@ $^
-streams_dlgn.ver: dlgn.ver
+$(kpre)dlgnDriver.o: stamp-verobjs
+	@list=`$(ECHO) " $(libOSRdlgn_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
+	$(ECHO) "$(LD) -r -o $@ $$list" ; \
+	$(LD) -r -o $@ $$list
+$(kpre)dlgnDriver.ver: dlgn.ver
 	cat $^ > $@
-ADDON_MODS			+= streams_dlgn.o
-else
-streams-dlgn.o: $(libOSRdlgn_a_OBJECTS)
-	$(LD) -r -o $@ $^
-ADDON_MODS			+= streams-dlgn.o
-endif
+ADDON_MODS			+= $(kpre)dlgnDriver.o
+ADDON_OBJS			+= $(libOSRdlgn_a_OBJECTS)
 
 EXTRA_libOSRdvbm_a_SOURCES	= 
 libOSRdvbm_a_SOURCES		= \
@@ -283,7 +283,7 @@ if WITH_LFS
 libOSRdvbm_a_SOURCES		+=  $(EXTRA_libOSRdvbm_a_SOURCES)
 endif
 libOSRdvbm_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libOSRdvbm_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB) \
+libOSRdvbm_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME_STR=\"dvbm\" \
 				  -I./src/drivers/dlgn/include -I$(srcdir)/src/drivers/dlgn/include \
 				  -I./src/drivers/dvbm/include -I$(srcdir)/src/drivers/dvbm/include \
@@ -294,15 +294,12 @@ libOSRdvbm_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOSRdvbm_a_OBJECTS):	$(libOSRdvbm_a_DEPENDENCIES)
 
-if WITH_KO_MODULES
-streams_dvbm.o: $(libOSRdvbm_a_OBJECTS)
-	$(LD) -r -o $@ $^
-ADDON_MODS			+= streams_dvbm.o
-else
-streams-dvbm.o: $(libOSRdvbm_a_OBJECTS)
-	$(LD) -r -o $@ $^
-ADDON_MODS			+= streams-dvbm.o
-endif
+$(kpre)dvbmDriver.o: stamp-verobjs
+	@list=`$(ECHO) " $(libOSRdvbm_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
+	$(ECHO) "$(LD) -r -o $@ $$list" ; \
+	$(LD) -r -o $@ $$list
+ADDON_MODS			+= $(kpre)dvbmDriver.o
+ADDON_OBJS			+= $(libOSRdvbm_a_OBJECTS)
 
 EXTRA_libOSRgncfd_a_SOURCES	= 
 libOSRgncfd_a_SOURCES		= \
@@ -318,7 +315,7 @@ if WITH_LFS
 libOSRgncfd_a_SOURCES		+= $(EXTRA_libOSRgncfd_a_SOURCES)
 endif
 libOSRgncfd_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libOSRgncfd_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB) \
+libOSRgncfd_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME_STR=\"gncfd\" \
 				  -I./src/drivers/dlgn/include -I$(srcdir)/src/drivers/dlgn/include \
 				  -I./src/drivers/dvbm/include -I$(srcdir)/src/drivers/dvbm/include \
@@ -329,15 +326,12 @@ libOSRgncfd_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOSRgncfd_a_OBJECTS):	$(libOSRgncfd_a_DEPENDENCIES)
 
-if WITH_KO_MODULES
-streams_gncfd.o: $(libOSRgncfd_a_OBJECTS)
-	$(LD) -r -o $@ $^
-ADDON_MODS			+= streams_gncfd.o
-else
-streams-gncfd.o: $(libOSRgncfd_a_OBJECTS)
-	$(LD) -r -o $@ $^
-ADDON_MODS			+= streams-gncfd.o
-endif
+$(kpre)gncfdDriver.o: stamp-verobjs
+	@list=`$(ECHO) " $(libOSRgncfd_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
+	$(ECHO) "$(LD) -r -o $@ $$list" ; \
+	$(LD) -r -o $@ $$list
+ADDON_MODS			+= $(kpre)gncfdDriver.o
+ADDON_OBJS			+= $(libOSRgncfd_a_OBJECTS)
 
 EXTRA_libOSRgpio_a_SOURCES	= 
 libOSRgpio_a_SOURCES		= \
@@ -355,15 +349,12 @@ libOSRgpio_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOSRgpio_a_OBJECTS):	$(libOSRgpio_a_SOURCES) $(libOSRgpio_a_DEPENDENCIES)
 
-if WITH_KO_MODULES
-streams_gpio.o: $(libOSRgpio_a_OBJECTS)
-	$(LD) -r -o $@ $^
-ADDON_MODS			+= streams_gpio.o
-else
-streams-gpio.o: $(libOSRgpio_a_OBJECTS)
-	$(LD) -r -o $@ $^
-ADDON_MODS			+= streams-gpio.o
-endif
+$(kpre)gpioDriver.o: stamp-verobjs
+	@list=`$(ECHO) " $(libOSRgpio_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
+	$(ECHO) "$(LD) -r -o $@ $$list" ; \
+	$(LD) -r -o $@ $$list
+ADDON_MODS			+= $(kpre)gpioDriver.o
+ADDON_OBJS			+= $(libOSRgpio_a_OBJECTS)
 
 EXTRA_libOSRsctmr_a_SOURCES	=
 libOSRsctmr_a_SOURCES		= src/drivers/sctmr/source/scttimer.c \
@@ -378,7 +369,7 @@ if WITH_LFS
 libOSRsctmr_a_SOURCES		+= $(EXTRA_libOSRsctmr_a_SOURCES)
 endif
 libOSRsctmr_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libOSRsctmr_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB) \
+libOSRsctmr_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME_STR=\"sctmr\" \
 				  -I./src/drivers/dlgn/include -I$(srcdir)/src/drivers/dlgn/include \
 				  -I./src/drivers/dvbm/include -I$(srcdir)/src/drivers/dvbm/include \
@@ -389,15 +380,12 @@ libOSRsctmr_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOSRsctmr_a_OBJECTS):	$(libOSRsctmr_a_DEPENDENCIES)
 
-if WITH_KO_MODULES
-streams_sctmr.o: $(libOSRsctmr_a_OBJECTS)
-	$(LD) -r -o $@ $^
-ADDON_MODS			+= streams_sctmr.o
-else
-streams-sctmr.o: $(libOSRsctmr_a_OBJECTS)
-	$(LD) -r -o $@ $^
-ADDON_MODS			+= streams-sctmr.o
-endif
+$(kpre)sctmrDriver.o: stamp-verobjs
+	@list=`$(ECHO) " $(libOSRsctmr_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
+	$(ECHO) "$(LD) -r -o $@ $$list" ; \
+	$(LD) -r -o $@ $$list
+ADDON_MODS			+= $(kpre)sctmrDriver.o
+ADDON_OBJS			+= $(libOSRsctmr_a_OBJECTS)
 
 ## WITH_DLGN
 endif
@@ -407,7 +395,7 @@ libOSRctimod_a_SOURCES		= \
 				src/drivers/ctimod/ctimod.c
 
 libOSRctimod_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libOSRctimod_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB) \
+libOSRctimod_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME_STR=\"ctimod\" \
 				  -I./src/drivers/dlgn/include -I$(srcdir)/src/drivers/dlgn/include \
 				  -I./src/drivers/dvbm/include -I$(srcdir)/src/drivers/dvbm/include \
@@ -418,10 +406,13 @@ libOSRctimod_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOSRctimod_a_OBJECTS): $(libOSRctimod_a_DEPENDENCIES)
 
-ctimod.o: $(libOSRctimod_a_OBJECTS)
-	$(LD) -r -o $@ $^
+ctimod.o: stamp-verobjs
+	@list=`$(ECHO) " $(libOSRctimod_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
+	$(ECHO) "$(LD) -r -o $@ $$list" ; \
+	$(LD) -r -o $@ $$list
 
 ADDON_MODS			+= ctimod.o
+ADDON_OBJS			+= $(libOSRctimod_a_OBJECTS)
 
 if WITH_MERC
 ## WITH_MERC
@@ -506,7 +497,7 @@ libOSRmercd_a_SOURCES		= \
 				src/drivers/mercd/source/msdversion.ver
 
 libOSRmercd_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libOSRmercd_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB) \
+libOSRmercd_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME_STR=\"mercd\" \
 				  -I./src/drivers/dlgn/include -I$(srcdir)/src/drivers/dlgn/include \
 				  -I./src/drivers/dvbm/include -I$(srcdir)/src/drivers/dvbm/include \
@@ -518,15 +509,12 @@ libOSRmercd_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOSRmercd_a_OBJECTS):	$(libOSRmercd_a_DEPENDENCIES)
 
-if WITH_KO_MODULES
-streams_mercd.o: $(libOSRmercd_a_OBJECTS)
-	$(LD) -r -o $@ $^
-ADDON_MODS			+= streams_mercd.o
-else
-streams-mercd.o: $(libOSRmercd_a_OBJECTS)
-	$(LD) -r -o $@ $^
-ADDON_MODS			+= streams-mercd.o
-endif
+$(kpre)mercdDriver.o: stamp-verobjs
+	@list=`$(ECHO) " $(libOSRmercd_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
+	$(ECHO) "$(LD) -r -o $@ $$list" ; \
+	$(LD) -r -o $@ $$list
+ADDON_MODS			+= $(kpre)mercdDriver.o
+ADDON_OBJS			+= $(libOSRmercd_a_OBJECTS)
 
 ## WITH_MERC
 endif
@@ -562,7 +550,7 @@ libOSRpmacd_a_SOURCES		= \
 				src/drivers/pmacd/include/pmacd_proc.h \
 				src/drivers/pmacd/include/pmacd_stream.h
 libOSRpmacd_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
-libOSRpmacd_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB) \
+libOSRpmacd_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME_STR=\"pmacd\" \
 				  -I./src/drivers/dlgn/include -I$(srcdir)/src/drivers/dlgn/include \
 				  -I./src/drivers/dvbm/include -I$(srcdir)/src/drivers/dvbm/include \
@@ -575,10 +563,13 @@ libOSRpmacd_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOSRpmacd_a_OBJECTS):	$(libOSRpmacd_a_DEPENDENCIES)
 
-pmacd.o: $(libOSRpmacd_a_OBJECTS)
-	$(LD) -r -o $@ $^
+pmacd.o: stamp-verobjs
+	@list=`$(ECHO) " $(libOSRpmacd_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
+	$(ECHO) "$(LD) -r -o $@ $$list" ; \
+	$(LD) -r -o $@ $$list
 
 ADDON_MODS			+= pmacd.o
+ADDON_OBJS			+= $(libOSRpmacd_a_OBJECTS)
 
 ## WITH_PMAC
 endif

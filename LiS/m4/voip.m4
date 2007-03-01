@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/28 11:51:32 $
+# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/01 00:10:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 11:51:32 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 00:10:19 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: voip.m4,v $
+# Revision 0.9.2.5  2007/03/01 00:10:19  brian
+# - update to build process for 2.4 kernels
+#
 # Revision 0.9.2.4  2007/02/28 11:51:32  brian
 # - make sure build directory exists
 #
@@ -394,14 +397,14 @@ dnl		    this will just not be set
 	    voip_cv_version=`grep '#define.*\<STRVOIP_VERSION\>' $voip_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    voip_what="sys/config.h"
+    voip_what="sys/strvoip/config.h"
     AC_CACHE_CHECK([for voip $voip_what], [voip_cv_config], [dnl
 	voip_cv_config=
 	if test -n "$voip_cv_includes" ; then
 	    for voip_dir in $voip_cv_includes ; do
 		# old place for config
 		if test -f "$voip_dir/$voip_what" ; then
-		    voip_cv_config="$voip_dir/$voip-what"
+		    voip_cv_config="$voip_dir/$voip_what"
 		    break
 		fi
 		# new place for config

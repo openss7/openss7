@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/02/28 11:51:31 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/01 00:10:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 11:51:31 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.7  2007/03/01 00:10:18  brian
+# - update to build process for 2.4 kernels
+#
 # Revision 0.9.2.6  2007/02/28 11:51:31  brian
 # - make sure build directory exists
 #
@@ -395,7 +398,7 @@ dnl		    this will just not be set
 	    iso_cv_version=`grep '#define.*\<STRISO_VERSION\>' $iso_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    iso_what="sys/config.h"
+    iso_what="sys/striso/config.h"
     AC_CACHE_CHECK([for iso $iso_what], [iso_cv_config], [dnl
 	iso_cv_config=
 	if test -n "$iso_cv_includes" ; then
