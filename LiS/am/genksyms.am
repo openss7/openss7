@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/07/11 01:57:55 $
+# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/03/02 02:03:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/07/11 01:57:55 $ by $Author: brian $
+## Last Modified $Date: 2007/03/02 02:03:35 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: genksyms.am,v $
+## Revision 0.9.2.42  2007/03/02 02:03:35  brian
+## - need unique header file define
+##
 ## Revision 0.9.2.41  2006/07/11 01:57:55  brian
 ## - nexusware build fixes
 ##
@@ -289,8 +292,8 @@ $(MODVERSIONS_H): $(EXPORT_SRCFILES) $(EXPORT_VERFILES)
 	v=`$(ECHO) "$(MODVERSIONS_H)" | sed -e s'|/[^/]*$$||'`/versions ; \
 	$(mkdir_p) $$v ; \
 	( \
-		$(ECHO) "#ifndef _SYS_MODVERSIONS_H" ; \
-		$(ECHO) "#define _SYS_MODVERSIONS_H" ; \
+		$(ECHO) "#ifndef _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H" ; \
+		$(ECHO) "#define _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H" ; \
 		vers='' ; \
 		list='$(EXPORT_SRCFILES)'; \
 		for s in $$list ; do \
@@ -302,7 +305,7 @@ $(MODVERSIONS_H): $(EXPORT_SRCFILES) $(EXPORT_VERFILES)
 				vers="$${vers}$${vers:+ }$$v/$$r.ver" ; \
 			fi ; \
 		done ; \
-		$(ECHO) "#endif /* _SYS_MODVERSIONS_H */" ; \
+		$(ECHO) "#endif /* _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H */" ; \
 	) >$(MODVERSIONS_H).tmp || { rm -f $(MODVERSIONS_H).tmp ; exit 1 ; } ; \
 	mv -f $(MODVERSIONS_H).tmp $@
 
@@ -358,9 +361,9 @@ else
 
 $(MODVERSIONS_H):
 	$(mkdir_p) $(PKGINCL) ; \
-	$(ECHO) "#ifndef _SYS_MODVERSIONS_H"	>  $(MODVERSIONS_H) ; \
-	$(ECHO) "#define _SYS_MODVERSIONS_H"	>> $(MODVERSIONS_H) ; \
-	$(ECHO) "#endif /* _SYS_MODVERSIONS_H */"	>> $(MODVERSIONS_H)
+	$(ECHO) "#ifndef _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H"	>  $(MODVERSIONS_H) ; \
+	$(ECHO) "#define _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H"	>> $(MODVERSIONS_H) ; \
+	$(ECHO) "#endif /* _SYS_$(PACKAGE_UCNAME)_MODVERSIONS_H */"	>> $(MODVERSIONS_H)
 
 BUILD_SPECIFIC_FILES = $(AUTOCONFIG_H) $(MODVERSIONS_H)
 

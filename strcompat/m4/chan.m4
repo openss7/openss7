@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/01 01:45:15 $
+# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/01 07:17:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 01:45:15 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.9  2007/03/01 07:17:25  brian
+# - updating common build process
+#
+# Revision 0.9.2.8  2007/03/01 06:38:15  brian
+# - updates to common build process
+#
 # Revision 0.9.2.7  2007/03/01 01:45:15  brian
 # - updating build process
 #
@@ -193,12 +199,12 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 	    if test -d "$chan_dir" ; then
 		AC_MSG_CHECKING([for chan include directory... $chan_dir $chan_bld])
 		if test -d "$chan_bld" -a -r "$chan_dir/$chan_what" ; then
-		    chan_cv_includes="$chan_dir $chan_bld"
-		    #chan_cv_ldadd= # "$os7_cv_master_builddir/strchan/libchan.la"
-		    #chan_cv_ldadd32= # "$os7_cv_master_builddir/strchan/lib32/libchan.la"
-		    #chan_cv_modmap="$os7_cv_master_builddir/strchan/Modules.map"
-		    #chan_cv_symver="$os7_cv_master_builddir/strchan/Module.symvers"
-		    #chan_cv_manpath="$os7_cv_master_builddir/strchan/doc/man"
+		    chan_cv_includes="$chan_bld $chan_dir"
+		    chan_cv_ldadd= # "$os7_cv_master_builddir/strchan/libchan.la"
+		    chan_cv_ldadd32= # "$os7_cv_master_builddir/strchan/lib32/libchan.la"
+		    chan_cv_modmap="$os7_cv_master_builddir/strchan/Modules.map"
+		    chan_cv_symver="$os7_cv_master_builddir/strchan/Module.symvers"
+		    chan_cv_manpath="$os7_cv_master_builddir/strchan/doc/man"
 		    AC_MSG_RESULT([yes])
 		else
 		    AC_MSG_RESULT([no])
@@ -222,12 +228,12 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 		    chan_dir=`(cd $chan_dir; pwd)`
 		    AC_MSG_CHECKING([for chan include directory... $chan_dir $chan_bld])
 		    if test -d "$chan_bld" -a -r "$chan_dir/$chan_what" ; then
-			chan_cv_includes="$chan_dir $chan_bld"
-			#chan_cv_ldadd= # `echo "$chan_bld/../../libchan.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#chan_cv_ldadd32= # `echo "$chan_bld/../../lib32/libchan.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#chan_cv_modmap=`echo "$chan_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#chan_cv_symver=`echo "$chan_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#chan_cv_manpath=`echo "$chan_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			chan_cv_includes="$chan_bld $chan_dir"
+			chan_cv_ldadd= # `echo "$chan_bld/../../libchan.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			chan_cv_ldadd32= # `echo "$chan_bld/../../lib32/libchan.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			chan_cv_modmap=`echo "$chan_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			chan_cv_symver=`echo "$chan_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			chan_cv_manpath=`echo "$chan_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -283,6 +289,8 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for chan include directory... $chan_dir])
 		    if test -r "$chan_dir/$chan_what" ; then
 			chan_cv_includes="$chan_dir"
+			#chan_cv_ldadd=
+			#chan_cv_ldadd32=
 			#chan_cv_modmap=
 			#chan_cv_symver=
 			#chan_cv_manpath=

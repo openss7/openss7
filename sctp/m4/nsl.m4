@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/01 01:45:15 $
+# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/01 07:17:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 01:45:15 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.14  2007/03/01 07:17:25  brian
+# - updating common build process
+#
+# Revision 0.9.2.13  2007/03/01 06:38:15  brian
+# - updates to common build process
+#
 # Revision 0.9.2.12  2007/03/01 01:45:15  brian
 # - updating build process
 #
@@ -219,12 +225,12 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	    if test -d "$nsl_dir" ; then
 		AC_MSG_CHECKING([for nsl include directory... $nsl_dir $nsl_bld])
 		if test -d "$nsl_bld" -a -r "$nsl_dir/$nsl_what" ; then
-		    nsl_cv_includes="$nsl_dir $nsl_bld"
-		    #nsl_cv_ldadd="$os7_cv_master_builddir/strnsl/libxnsl.la"
-		    #nsl_cv_ldadd32="$os7_cv_master_builddir/strnsl/lib32/libxnsl.la"
-		    #nsl_cv_modmap= # "$os7_cv_master_builddir/strnsl/Modules.map"
-		    #nsl_cv_symver= # "$os7_cv_master_builddir/strnsl/Module.symvers"
-		    #nsl_cv_manpath="$os7_cv_master_builddir/strnsl/doc/man"
+		    nsl_cv_includes="$nsl_bld $nsl_dir"
+		    nsl_cv_ldadd="$os7_cv_master_builddir/strnsl/libxnsl.la"
+		    nsl_cv_ldadd32="$os7_cv_master_builddir/strnsl/lib32/libxnsl.la"
+		    nsl_cv_modmap= # "$os7_cv_master_builddir/strnsl/Modules.map"
+		    nsl_cv_symver= # "$os7_cv_master_builddir/strnsl/Module.symvers"
+		    nsl_cv_manpath="$os7_cv_master_builddir/strnsl/doc/man"
 		    AC_MSG_RESULT([yes])
 		else
 		    AC_MSG_RESULT([no])
@@ -248,12 +254,12 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 		    nsl_dir=`(cd $nsl_dir; pwd)`
 		    AC_MSG_CHECKING([for nsl include directory... $nsl_dir $nsl_bld])
 		    if test -d "$nsl_bld" -a -r "$nsl_dir/$nsl_what" ; then
-			nsl_cv_includes="$nsl_dir $nsl_bld"
-			#nsl_cv_ldadd=`echo "$nsl_bld/../../libxnsl.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#nsl_cv_ldadd32=`echo "$nsl_bld/../../lib32/libxnsl.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#nsl_cv_modmap= # `echo "$nsl_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#nsl_cv_symver= # `echo "$nsl_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#nsl_cv_manpath=`echo "$nsl_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			nsl_cv_includes="$nsl_bld $nsl_dir"
+			nsl_cv_ldadd=`echo "$nsl_bld/../../libxnsl.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			nsl_cv_ldadd32=`echo "$nsl_bld/../../lib32/libxnsl.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			nsl_cv_modmap= # `echo "$nsl_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			nsl_cv_symver= # `echo "$nsl_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			nsl_cv_manpath=`echo "$nsl_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -336,6 +342,8 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for nsl include directory... $nsl_dir])
 		    if test -r "$nsl_dir/$nsl_what" ; then
 			nsl_cv_includes="$nsl_dir"
+			#nsl_cv_ldadd=
+			#nsl_cv_ldadd32=
 			#nsl_cv_modmap=
 			#nsl_cv_symver=
 			#nsl_cv_manpath=

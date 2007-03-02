@@ -79,7 +79,7 @@ sort-adjacent-labels
 .\"
 .TH GNCFD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
 .SH NAME
-.B gncfd
+.B gncfd, gncfdDriver
 \- Dialogic \fISTREAMS\fR device driver
 .\"
 .\"
@@ -157,6 +157,14 @@ worrisome.
 .SH COMPATIBILITY
 .PP
 These drivers should be compatible with OSR 6.1 Release 239.
+.PP
+The device driver name,
+.BR streams_gncfdDriver.ko ,
+is somewhat non-standard for
+.I Linux Fast-STREAMS
+drivers, but is also aliased to
+.BR streams-gncfd " and " gncfd .
+The non-standard name is for compatibility with the original OSR 6.1 from Dialogic.
 .\"
 .\"
 .SH CONFORMANCE

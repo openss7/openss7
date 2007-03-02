@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/01 00:10:18 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/01 07:17:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 00:10:18 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strcomp.m4,v $
+# Revision 0.9.2.26  2007/03/01 07:17:25  brian
+# - updating common build process
+#
+# Revision 0.9.2.25  2007/03/01 06:38:15  brian
+# - updates to common build process
+#
 # Revision 0.9.2.24  2007/03/01 00:10:18  brian
 # - update to build process for 2.4 kernels
 #
@@ -208,12 +214,12 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    if test -d "$strcomp_dir" ; then
 		AC_MSG_CHECKING([for compat include directory... $strcomp_dir $strcomp_bld])
 		if test -d "$strcomp_bld" -a -r "$strcomp_dir/$strcomp_what" ; then
-		    strcomp_cv_includes="$strcomp_dir $strcomp_bld"
-		    #strcomp_cv_ldadd="$os7_cv_master_builddir/strcompat/libcompat.la"
-		    #strcomp_cv_ldadd32="$os7_cv_master_builddir/strcompat/lib32/libcompat.la"
-		    #strcomp_cv_modmap="$os7_cv_master_builddir/strcompat/Modules.map"
-		    #strcomp_cv_symver="$os7_cv_master_builddir/strcompat/Module.symvers"
-		    #strcomp_cv_manpath="$os7_cv_master_builddir/strcompat/doc/man"
+		    strcomp_cv_includes="$strcomp_bld $strcomp_dir"
+		    strcomp_cv_ldadd= # "$os7_cv_master_builddir/strcompat/libcompat.la"
+		    strcomp_cv_ldadd32= # "$os7_cv_master_builddir/strcompat/lib32/libcompat.la"
+		    strcomp_cv_modmap="$os7_cv_master_builddir/strcompat/Modules.map"
+		    strcomp_cv_symver="$os7_cv_master_builddir/strcompat/Module.symvers"
+		    strcomp_cv_manpath="$os7_cv_master_builddir/strcompat/doc/man"
 		    AC_MSG_RESULT([yes])
 		else
 		    AC_MSG_RESULT([no])
@@ -237,12 +243,12 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 		    strcomp_dir=`(cd $strcomp_dir; pwd)`
 		    AC_MSG_CHECKING([for compat include directory... $strcomp_dir $strcomp_bld])
 		    if test -d "$strcomp_bld" -a -r "$strcomp_dir/$strcomp_what" ; then
-			strcomp_cv_includes="$strcomp_dir $strcomp_bld"
-			#strcomp_cv_ldadd=`echo "$strcomp_bld/../../libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#strcomp_cv_ldadd32=`echo "$strcomp_bld/../../lib32/libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#strcomp_cv_modmap=`echo "$strcomp_bld/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#strcomp_cv_symver=`echo "$strcomp_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#strcomp_cv_manpath=`echo "$strcomp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			strcomp_cv_includes="$strcomp_bld $strcomp_dir"
+			strcomp_cv_ldadd= # `echo "$strcomp_bld/../../libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			strcomp_cv_ldadd32= # `echo "$strcomp_bld/../../lib32/libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			strcomp_cv_modmap=`echo "$strcomp_bld/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			strcomp_cv_symver=`echo "$strcomp_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			strcomp_cv_manpath=`echo "$strcomp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -307,6 +313,8 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for compat include directory... $strcomp_dir])
 		    if test -r "$strcomp_dir/$strcomp_what" ; then
 			strcomp_cv_includes="$strcomp_dir"
+			#strcomp_cv_ldadd=
+			#strcomp_cv_ldadd32=
 			#strcomp_cv_modmap=
 			#strcomp_cv_symver=
 			#strcomp_cv_manpath=

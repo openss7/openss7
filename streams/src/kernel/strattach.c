@@ -214,7 +214,7 @@ do_fattach(const struct file *file, const char *file_name)
 	return err;
 }
 
-EXPORT_SYMBOL_NOVERS(do_fattach);
+EXPORT_SYMBOL_GPL(do_fattach);
 
 streams_fastcall long
 do_fdetach(const char *file_name)
@@ -256,6 +256,6 @@ do_fdetach(const char *file_name)
 	return err;
 }
 
-EXPORT_SYMBOL_NOVERS(do_fdetach);
+EXPORT_SYMBOL_GPL(do_fdetach);
 
 #endif				/* defined HAVE_KERNEL_FATTACH_SUPPORT */

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/01 01:45:15 $
+# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/01 07:17:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 01:45:15 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: isdn.m4,v $
+# Revision 0.9.2.8  2007/03/01 07:17:25  brian
+# - updating common build process
+#
+# Revision 0.9.2.7  2007/03/01 06:38:15  brian
+# - updates to common build process
+#
 # Revision 0.9.2.6  2007/03/01 01:45:15  brian
 # - updating build process
 #
@@ -190,12 +196,12 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 	    if test -d "$isdn_dir" ; then
 		AC_MSG_CHECKING([for isdn include directory... $isdn_dir $isdn_bld])
 		if test -d "$isdn_bld" -a -r "$isdn_dir/$isdn_what" ; then
-		    isdn_cv_includes="$isdn_dir $isdn_bld"
-		    #isdn_cv_ldadd= # "$os7_cv_master_builddir/strisdn/libisdn.la"
-		    #isdn_cv_ldadd32= # "$os7_cv_master_builddir/strisdn/lib32/libisdn.la"
-		    #isdn_cv_modmap="$os7_cv_master_builddir/strisdn/Modules.map"
-		    #isdn_cv_symver="$os7_cv_master_builddir/strisdn/Module.symvers"
-		    #isdn_cv_manpath="$os7_cv_master_builddir/strisdn/doc/man"
+		    isdn_cv_includes="$isdn_bld $isdn_dir"
+		    isdn_cv_ldadd= # "$os7_cv_master_builddir/strisdn/libisdn.la"
+		    isdn_cv_ldadd32= # "$os7_cv_master_builddir/strisdn/lib32/libisdn.la"
+		    isdn_cv_modmap="$os7_cv_master_builddir/strisdn/Modules.map"
+		    isdn_cv_symver="$os7_cv_master_builddir/strisdn/Module.symvers"
+		    isdn_cv_manpath="$os7_cv_master_builddir/strisdn/doc/man"
 		    AC_MSG_RESULT([yes])
 		else
 		    AC_MSG_RESULT([no])
@@ -219,12 +225,12 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 		    isdn_dir=`(cd $isdn_dir; pwd)`
 		    AC_MSG_CHECKING([for isdn include directory... $isdn_dir $isdn_bld])
 		    if test -d "$isdn_bld" -a -r "$isdn_dir/$isdn_what" ; then
-			isdn_cv_includes="$isdn_dir $isdn_bld"
-			#isdn_cv_ldadd= # `echo "$isdn_bld/../../libisdn.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#isdn_cv_ldadd32= # `echo "$isdn_bld/../../lib32/libisdn.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#isdn_cv_modmap=`echo "$isdn_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#isdn_cv_symver=`echo "$isdn_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#isdn_cv_manpath=`echo "$isdn_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			isdn_cv_includes="$isdn_bld $isdn_dir"
+			isdn_cv_ldadd= # `echo "$isdn_bld/../../libisdn.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			isdn_cv_ldadd32= # `echo "$isdn_bld/../../lib32/libisdn.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			isdn_cv_modmap=`echo "$isdn_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			isdn_cv_symver=`echo "$isdn_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			isdn_cv_manpath=`echo "$isdn_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -287,6 +293,8 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for isdn include directory... $isdn_dir])
 		    if test -r "$isdn_dir/$isdn_what" ; then
 			isdn_cv_includes="$isdn_dir"
+			#isdn_cv_ldadd=
+			#isdn_cv_ldadd32=
 			#isdn_cv_modmap=
 			#isdn_cv_symver=
 			#isdn_cv_manpath=

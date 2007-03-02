@@ -110,10 +110,10 @@ BIG_STATIC ulong sysctl_str_max_strmod = MAX_STRMOD;/* max no streams modules */
 BIG_STATIC ulong sysctl_str_max_mblk = 10;	/* max no of headers on free list */
 BIG_STATIC int sysctl_str_msg_priority = 0;	/* use priority on allocation if true */
 
-EXPORT_SYMBOL_NOVERS(sysctl_str_strmsgsz);	/* always needed for drv_getparm */
+EXPORT_SYMBOL_GPL(sysctl_str_strmsgsz);	/* always needed for drv_getparm */
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL_NOVERS(sysctl_str_strctlsz);
-EXPORT_SYMBOL_NOVERS(sysctl_str_nstrpush);
+EXPORT_SYMBOL_GPL(sysctl_str_strctlsz);
+EXPORT_SYMBOL_GPL(sysctl_str_nstrpush);
 #endif
 
 STATIC struct ctl_table_header *streams_sysctl_handle;

@@ -874,8 +874,28 @@ retval = do_settimeofday(&ts);]]) ],
 # _UTIL_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_UTIL_OUTPUT], [dnl
-    _UTIL_STRCONF
+    _UTIL_CONFIG
+    _UTIL_STRCONF dnl
 ])# _UTIL_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _UTIL_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_UTIL_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    util_cv_config="${pkg_bld}/src/include/sys/strutil/config.h"
+    util_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    util_cv_ldadd= # "${pkg_bld}/libutil.la"
+    util_cv_ldflags= # "-L${pkg_bld}/.libs/"
+    util_cv_ldadd32= # "${pkg_bld}/lib32/libutil.la"
+    util_cv_ldflags32= # "-L${pkg_bld}/lib32/.libs/"
+    util_cv_manpath="${pkg_bld}/doc/man"
+    util_cv_modmap="${pkg_bld}/Modules.map"
+    util_cv_symver="${pkg_bld}/Module.symvers"
+    util_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+])# _UTIL_CONFIG
 # =============================================================================
 
 # =============================================================================

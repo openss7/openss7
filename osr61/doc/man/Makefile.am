@@ -143,10 +143,15 @@ ctimod_mans = \
 
 dlgn_mans = \
 	man4/dlgn.4 \
+	man4/dlgnDriver.4 \
 	man4/dvbm.4 \
+	man4/dvbmDriver.4 \
 	man4/gncfd.4 \
+	man4/gncfdDriver.4 \
 	man4/gpio.4 \
+	man4/gpioDriver.4 \
 	man4/sctmr.4  \
+	man4/sctmrDriver.4  \
 	man9/cf_cmpstr.9 \
 	man9/cf_ioccopy.9 \
 	man9/cf_iocput.9 \
@@ -179,7 +184,8 @@ dlgn_mans = \
 	man9/st_uselock.9
 
 merc_mans = \
-	man4/mercd.4
+	man4/mercd.4 \
+	man4/mercdDriver.4
 
 pmac_mans = \
 	man4/pmacd.4
@@ -206,12 +212,17 @@ endif
 dist_noinst_MANS = \
 	man4/ctimod.4.man \
 	man4/dlgn.4.man \
+	man4/dlgnDriver.4.man \
 	man4/dvbm.4.man \
+	man4/dvbmDriver.4.man \
 	man4/gncfd.4.man \
+	man4/gncfdDriver.4.man \
 	man4/gpio.4.man \
+	man4/gpioDriver.4.man \
 	man4/mercd.4.man \
+	man4/mercdDriver.4.man \
 	man4/pmacd.4.man \
-	man4/sctmr.4.man  \
+	man4/sctmrDriver.4.man  \
 	man5/osr61.5.man \
 	man8/osr61_mknod.8.man \
 	man8/test-osr61.8.man \

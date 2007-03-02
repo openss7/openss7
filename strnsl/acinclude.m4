@@ -200,8 +200,28 @@ dnl _GENKSYMS
 # _XNSL_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNSL_OUTPUT], [dnl
+    _XNSL_CONFIG
 dnl _XNSL_STRCONF
 ])# _XNSL_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _XNSL_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XNSL_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    nsl_cv_config="${pkg_bld}/src/include/sys/strnsl/config.h"
+    nsl_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    nsl_cv_ldadd="${pkg_bld}/libxnsl.la"
+    nsl_cv_ldflags="${pkg_bld}/lib32/libxnsl.la"
+    nsl_cv_ldadd32="-L${pkg_bld}/.libs/"
+    nsl_cv_ldflags32="${pkg_bld}/lib32/.libs/"
+    nsl_cv_manpath="${pkg_bld}/doc/man"
+    nsl_cv_modmap= # "${pkg_bld}/Modules.map"
+    nsl_cv_symver= # "${pkg_bld}/Module.symvers"
+    nsl_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+])# _XNSL_CONFIG
 # =============================================================================
 
 # =============================================================================

@@ -79,7 +79,7 @@ sort-adjacent-labels
 .\"
 .TH DVBM 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
 .SH NAME
-.B dvbm
+.B dvbm, dvbmDriver
 \- Dialogic \fISTREAMS\fR module
 .\"
 .\"
@@ -153,6 +153,14 @@ worrisome.
 .SH COMPATIBILITY
 .PP
 These drivers should be compatible with OSR 6.1 Release 239.
+.PP
+The module name,
+.BR streams_dvbmDriver.ko ,
+is somewhat non-standard for
+.I Linux Fast-STREAMS
+drivers, but is also aliased to
+.BR streams-dvbm .
+The non-standard name is for compatibility with the original OSR 6.1 from Dialogic.
 .\"
 .\"
 .SH CONFORMANCE

@@ -261,6 +261,34 @@ AC_DEFUN([_ISDN_CONFIG_KERNEL], [dnl
 # _ISDN_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISDN_OUTPUT], [dnl
+    _ISDN_CONFIG
+    _ISDN_STRCONF dnl
+])# _ISDN_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _ISDN_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_ISDN_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    isdn_cv_config="${pkg_bld}/src/include/sys/strisdn/config.h"
+    isdn_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    isdn_cv_ldadd= # "${pkg_bld}/libisdn.la"
+    isdn_cv_ldflags= # "${pkg_bld}/lib32/libisdn.la"
+    isdn_cv_ldadd32= # "-L${pkg_bld}/.libs/"
+    isdn_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
+    isdn_cv_manpath="${pkg_bld}/doc/man"
+    isdn_cv_modmap="${pkg_bld}/Modules.map"
+    isdn_cv_symver="${pkg_bld}/Module.symvers"
+    isdn_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+])# _ISDN_CONFIG
+# =============================================================================
+
+# =============================================================================
+# _ISDN_STRCONF
+# -----------------------------------------------------------------------------
+AC_DEFUN([_ISDN_STRCONF], [dnl
     strconf_cv_stem='Config'
     strconf_cv_input='Config.master'
     strconf_cv_majbase=204
@@ -289,7 +317,7 @@ dnl
     strconf_cv_package=${streams_cv_package:-LiS}
     strconf_cv_minorbits="${linux_cv_minorbits:-8}"
     _STRCONF dnl
-])# _ISDN_OUTPUT
+])# _ISDN_STRCONF
 # =============================================================================
 
 # =============================================================================

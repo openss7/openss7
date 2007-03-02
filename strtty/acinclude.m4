@@ -186,8 +186,28 @@ AC_DEFUN([_TTY_SETUP], [dnl
 # _TTY_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_TTY_OUTPUT], [dnl
+    _TTY_CONFIG
     _TTY_STRCONF
 ])# _TTY_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _TTY_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_TTY_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    tty_cv_config="${pkg_bld}/src/include/sys/strtty/config.h"
+    tty_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    tty_cv_ldadd="${pkg_bld}/libtty.la"
+    tty_cv_ldflags="-L${pkg_bld}/.libs/"
+    tty_cv_ldadd32="${pkg_bld}/lib32/libtty.la"
+    tty_cv_ldflags32="-L${pkg_bld}/lib32/.libs/"
+    tty_cv_manpath="${pkg_bld}/doc/man"
+    tty_cv_modmap="${pkg_bld}/Modules.map"
+    tty_cv_symver="${pkg_bld}/Module.symvers"
+    tty_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+])# _TTY_CONFIG
 # =============================================================================
 
 # =============================================================================

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/01 01:45:15 $
+# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/01 07:17:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 01:45:15 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.15  2007/03/01 07:17:25  brian
+# - updating common build process
+#
+# Revision 0.9.2.14  2007/03/01 06:38:15  brian
+# - updates to common build process
+#
 # Revision 0.9.2.13  2007/03/01 01:45:15  brian
 # - updating build process
 #
@@ -213,12 +219,12 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    if test -d "$sock_dir" ; then
 		AC_MSG_CHECKING([for sock include directory... $sock_dir $sock_bld])
 		if test -d "$sock_bld" -a -r "$sock_dir/$sock_what" ; then
-		    sock_cv_includes="$sock_dir $sock_bld"
-		    #sock_cv_ldadd="$os7_cv_master_builddir/strsock/libsocket.la"
-		    #sock_cv_ldadd32="$os7_cv_master_builddir/strsock/lib32/libsocket.la"
-		    #sock_cv_modmap="$os7_cv_master_builddir/strsock/Modules.map"
-		    #sock_cv_symver="$os7_cv_master_builddir/strsock/Module.symvers"
-		    #sock_cv_manpath="$os7_cv_master_builddir/strsock/doc/man"
+		    sock_cv_includes="$sock_bld $sock_dir"
+		    sock_cv_ldadd="$os7_cv_master_builddir/strsock/libsocket.la"
+		    sock_cv_ldadd32="$os7_cv_master_builddir/strsock/lib32/libsocket.la"
+		    sock_cv_modmap="$os7_cv_master_builddir/strsock/Modules.map"
+		    sock_cv_symver="$os7_cv_master_builddir/strsock/Module.symvers"
+		    sock_cv_manpath="$os7_cv_master_builddir/strsock/doc/man"
 		    AC_MSG_RESULT([yes])
 		else
 		    AC_MSG_RESULT([no])
@@ -242,12 +248,12 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 		    sock_dir=`(cd $sock_dir; pwd)`
 		    AC_MSG_CHECKING([for sock include directory... $sock_dir $sock_bld])
 		    if test -d "$sock_bld" -a -r "$sock_dir/$sock_what" ; then
-			sock_cv_includes="$sock_dir $sock_bld"
-			#sock_cv_ldadd=`echo "$sock_bld/../../libsocket.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#sock_cv_ldadd32=`echo "$sock_bld/../../lib32/libsocket.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#sock_cv_modmap=`echo "$sock_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#sock_cv_symver=`echo "$sock_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#sock_cv_manpath=`echo "$sock_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sock_cv_includes="$sock_bld $sock_dir"
+			sock_cv_ldadd=`echo "$sock_bld/../../libsocket.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sock_cv_ldadd32=`echo "$sock_bld/../../lib32/libsocket.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sock_cv_modmap=`echo "$sock_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sock_cv_symver=`echo "$sock_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sock_cv_manpath=`echo "$sock_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -319,6 +325,8 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for sock include directory... $sock_dir])
 		    if test -r "$sock_dir/$sock_what" ; then
 			sock_cv_includes="$sock_dir"
+			#sock_cv_ldadd=
+			#sock_cv_ldadd32=
 			#sock_cv_modmap=
 			#sock_cv_symver=
 			#sock_cv_manpath=

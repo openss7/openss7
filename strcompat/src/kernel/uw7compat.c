@@ -127,7 +127,7 @@ allocb_physreq(size_t size, uint priority, physreq_t * prp)
 #endif
 }
 
-EXPORT_SYMBOL_NOVERS(allocb_physreq);	/* uw7/ddi.h */
+EXPORT_SYMBOL(allocb_physreq);	/* uw7/ddi.h */
 mblk_t *
 msgphysreq(mblk_t *mp, physreq_t * prp)
 {
@@ -142,7 +142,7 @@ msgphysreq(mblk_t *mp, physreq_t * prp)
 	return (mp);
 }
 
-EXPORT_SYMBOL_NOVERS(msgphysreq);	/* uw7/ddi.h */
+EXPORT_SYMBOL(msgphysreq);	/* uw7/ddi.h */
 mblk_t *
 msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp)
 {
@@ -157,14 +157,14 @@ msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp)
 	return msgpullup(mp, len);
 }
 
-EXPORT_SYMBOL_NOVERS(msgpullup_physreq);	/* uw7/ddi.h */
+EXPORT_SYMBOL(msgpullup_physreq);	/* uw7/ddi.h */
 mblk_t *
 msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp)
 {
 	return (NULL);
 }
 
-EXPORT_SYMBOL_NOVERS(msgscgth);	/* uw7/ddi.h */
+EXPORT_SYMBOL(msgscgth);	/* uw7/ddi.h */
 
 int printf_UW7(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 int
@@ -181,35 +181,35 @@ printf_UW7(char *fmt, ...)
 	return (n);
 }
 
-EXPORT_SYMBOL_NOVERS(printf_UW7);	/* uw7/ddi.h */
+EXPORT_SYMBOL(printf_UW7);	/* uw7/ddi.h */
 
 __UW7_EXTERN_INLINE void ATOMIC_INT_ADD(atomic_int_t * counter, int value);
 
-EXPORT_SYMBOL_NOVERS(ATOMIC_INT_ADD);	/* uw7/ddi.h */
+EXPORT_SYMBOL(ATOMIC_INT_ADD);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE atomic_int_t *ATOMIC_INT_ALLOC(int flag);
 
-EXPORT_SYMBOL_NOVERS(ATOMIC_INT_ALLOC);	/* uw7/ddi.h */
+EXPORT_SYMBOL(ATOMIC_INT_ALLOC);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE void ATOMIC_INT_DEALLOC(atomic_int_t * counter);
 
-EXPORT_SYMBOL_NOVERS(ATOMIC_INT_DEALLOC);	/* uw7/ddi.h */
+EXPORT_SYMBOL(ATOMIC_INT_DEALLOC);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE int ATOMIC_INT_DECR(atomic_int_t * counter);
 
-EXPORT_SYMBOL_NOVERS(ATOMIC_INT_DECR);	/* uw7/ddi.h */
+EXPORT_SYMBOL(ATOMIC_INT_DECR);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE void ATOMIC_INT_INCR(atomic_int_t * counter);
 
-EXPORT_SYMBOL_NOVERS(ATOMIC_INT_INCR);	/* uw7/ddi.h */
+EXPORT_SYMBOL(ATOMIC_INT_INCR);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE void ATOMIC_INT_INIT(atomic_int_t * counter, int value);
 
-EXPORT_SYMBOL_NOVERS(ATOMIC_INT_INIT);	/* uw7/ddi.h */
+EXPORT_SYMBOL(ATOMIC_INT_INIT);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE int ATOMIC_INT_READ(atomic_int_t * counter);
 
-EXPORT_SYMBOL_NOVERS(ATOMIC_INT_READ);	/* uw7/ddi.h */
+EXPORT_SYMBOL(ATOMIC_INT_READ);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE void ATOMIC_INT_SUB(atomic_int_t * counter, int value);
 
-EXPORT_SYMBOL_NOVERS(ATOMIC_INT_SUB);	/* uw7/ddi.h */
+EXPORT_SYMBOL(ATOMIC_INT_SUB);	/* uw7/ddi.h */
 __UW7_EXTERN_INLINE void ATOMIC_INT_WRITE(atomic_int_t * counter, int value);
 
-EXPORT_SYMBOL_NOVERS(ATOMIC_INT_WRITE);	/* uw7/ddi.h */
+EXPORT_SYMBOL(ATOMIC_INT_WRITE);	/* uw7/ddi.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_UW7_MODULE
 static

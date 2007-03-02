@@ -724,8 +724,28 @@ AC_DEFUN([_OSR61_CHECKS], [dnl
 # _OSR61_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OSR61_OUTPUT], [dnl
-    _OSR61_STRCONF
+    _OSR61_CONFIG
+    _OSR61_STRCONF dnl
 ])# _OSR61_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _OSR61_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OSR61_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    osr_cv_config="${pkg_bld}/src/include/sys/osr61/config.h"
+    osr_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    osr_cv_ldadd= # "${pkg_bld}/libosr.la"
+    osr_cv_ldflags= # "${pkg_bld}/lib32/libosr.la"
+    osr_cv_ldadd32= # "-L${pkg_bld}/.libs/"
+    osr_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
+    osr_cv_manpath="${pkg_bld}/doc/man"
+    osr_cv_modmap="${pkg_bld}/Modules.map"
+    osr_cv_symver="${pkg_bld}/Module.symvers"
+    osr_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+])# _OSR61_CONFIG
 # =============================================================================
 
 # =============================================================================

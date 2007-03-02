@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/01 01:45:15 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/03/01 07:17:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 01:45:15 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sctp.m4,v $
+# Revision 0.9.2.37  2007/03/01 07:17:25  brian
+# - updating common build process
+#
+# Revision 0.9.2.36  2007/03/01 06:38:15  brian
+# - updates to common build process
+#
 # Revision 0.9.2.35  2007/03/01 01:45:15  brian
 # - updating build process
 #
@@ -208,12 +214,12 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	    if test -d "$sctp_dir" ; then
 		AC_MSG_CHECKING([for sctp include directory... $sctp_dir $sctp_bld])
 		if test -d "$sctp_bld" -a -r "$sctp_dir/$sctp_what" ; then
-		    sctp_cv_includes="$sctp_dir $sctp_bld"
-		    #sctp_cv_ldadd= # "$os7_cv_master_builddir/strsctp/libsctp.la"
-		    #sctp_cv_ldadd32= # "$os7_cv_master_builddir/strsctp/lib32/libsctp.la"
-		    #sctp_cv_modmap="$os7_cv_master_builddir/strsctp/Modules.map"
-		    #sctp_cv_symver="$os7_cv_master_builddir/strsctp/Module.symvers"
-		    #sctp_cv_manpath="$os7_cv_master_builddir/strsctp/doc/man"
+		    sctp_cv_includes="$sctp_bld $sctp_dir"
+		    sctp_cv_ldadd= # "$os7_cv_master_builddir/strsctp/libsctp.la"
+		    sctp_cv_ldadd32= # "$os7_cv_master_builddir/strsctp/lib32/libsctp.la"
+		    sctp_cv_modmap="$os7_cv_master_builddir/strsctp/Modules.map"
+		    sctp_cv_symver="$os7_cv_master_builddir/strsctp/Module.symvers"
+		    sctp_cv_manpath="$os7_cv_master_builddir/strsctp/doc/man"
 		    AC_MSG_RESULT([yes])
 		else
 		    AC_MSG_RESULT([no])
@@ -237,12 +243,12 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 		    sctp_dir=`(cd $sctp_dir; pwd)`
 		    AC_MSG_CHECKING([for sctp include directory... $sctp_dir $sctp_bld])
 		    if test -d "$sctp_bld" -a -r "$sctp_dir/$sctp_what" ; then
-			sctp_cv_includes="$sctp_dir $sctp_bld"
-			#sctp_cv_ldadd= # `echo "$sctp_bld/../../libsctp.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#sctp_cv_ldadd32= # `echo "$sctp_bld/../../lib32/libsctp.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#sctp_cv_modmap=`echo "$sctp_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#sctp_cv_symver=`echo "$sctp_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#sctp_cv_manpath=`echo "$sctp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sctp_cv_includes="$sctp_bld $sctp_dir"
+			sctp_cv_ldadd= # `echo "$sctp_bld/../../libsctp.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sctp_cv_ldadd32= # `echo "$sctp_bld/../../lib32/libsctp.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sctp_cv_modmap=`echo "$sctp_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sctp_cv_symver=`echo "$sctp_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sctp_cv_manpath=`echo "$sctp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -343,6 +349,8 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for sctp include directory... $sctp_dir])
 		    if test -r "$sctp_dir/$sctp_what" ; then
 			sctp_cv_includes="$sctp_dir"
+			sctp_cv_ldadd=
+			#sctp_cv_ldadd32=
 			#sctp_cv_modmap=
 			#sctp_cv_symver=
 			#sctp_cv_manpath=

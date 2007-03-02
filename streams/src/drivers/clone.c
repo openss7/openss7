@@ -373,7 +373,7 @@ register_clone(struct cdevsw *cdev)
 	return (err);
 }
 
-EXPORT_SYMBOL_NOVERS(register_clone);
+EXPORT_SYMBOL_GPL(register_clone);
 
 streams_fastcall int
 unregister_clone(struct cdevsw *cdev)
@@ -391,7 +391,7 @@ unregister_clone(struct cdevsw *cdev)
 	return (err);
 }
 
-EXPORT_SYMBOL_NOVERS(unregister_clone);
+EXPORT_SYMBOL_GPL(unregister_clone);
 
 /**
  *  register_strdev: - register a STREAMS device against a device major number
@@ -442,7 +442,7 @@ register_strdev(struct cdevsw *cdev, major_t major)
 	return (err);
 }
 
-EXPORT_SYMBOL_NOVERS(register_strdev);
+EXPORT_SYMBOL(register_strdev);
 
 /**
  *  unregister_strdev: - unregister previously registered STREAMS device
@@ -482,7 +482,7 @@ unregister_strdev(struct cdevsw *cdev, major_t major)
 	return unregister_cmajor(cdev, major);
 }
 
-EXPORT_SYMBOL_NOVERS(unregister_strdev);
+EXPORT_SYMBOL(unregister_strdev);
 
 /* 
  *  -------------------------------------------------------------------------

@@ -244,7 +244,9 @@ current_context(void)
 BIG_STATIC int strsched_init(void);
 BIG_STATIC void strsched_exit(void);
 
+#if 0
 #if defined CONFIG_STREAMS_SYNCQS
 BIG_STATIC void streams_fastcall sqsched(syncq_t *sq);
+#endif
 #endif
 #endif				/* __LOCAL_STRSCHED_H__ */

@@ -970,6 +970,18 @@ AC_DEFUN([_INET_OUTPUT], [dnl
 # _INET_CONFIG
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    inet_cv_config="${pkg_bld}/src/include/sys/strinet/config.h"
+    inet_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    inet_cv_ldadd= # "${pkg_bld}/libinet.la"
+    inet_cv_ldflags= # "${pkg_bld}/lib32/libinet.la"
+    inet_cv_ldadd32= # "-L${pkg_bld}/.libs/"
+    inet_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
+    inet_cv_manpath="${pkg_bld}/doc/man"
+    inet_cv_modmap="${pkg_bld}/Modules.map"
+    inet_cv_symver="${pkg_bld}/Module.symvers"
+    inet_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
 ])# _INET_CONFIG
 # =============================================================================
 

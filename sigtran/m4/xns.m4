@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/03/01 01:45:16 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/01 07:17:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 01:45:16 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xns.m4,v $
+# Revision 0.9.2.43  2007/03/01 07:17:25  brian
+# - updating common build process
+#
+# Revision 0.9.2.42  2007/03/01 06:38:15  brian
+# - updates to common build process
+#
 # Revision 0.9.2.41  2007/03/01 01:45:16  brian
 # - updating build process
 #
@@ -208,12 +214,12 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    if test -d "$xns_dir" ; then
 		AC_MSG_CHECKING([for xns include directory... $xns_dir $xns_bld])
 		if test -d "$xns_bld" -a -r "$xns_dir/$xns_what" ; then
-		    xns_cv_includes="$xns_dir $xns_bld"
-		    #xns_cv_ldadd= # "$os7_cv_master_builddir/strxns/libxns.la"
-		    #xns_cv_ldadd32= # "$os7_cv_master_builddir/strxns/lib32/libxns.la"
-		    #xns_cv_modmap="$os7_cv_master_builddir/strxns/Modules.map"
-		    #xns_cv_symver="$os7_cv_master_builddir/strxns/Module.symvers"
-		    #xns_cv_manpath="$os7_cv_master_builddir/strxns/doc/man"
+		    xns_cv_includes="$xns_bld $xns_dir"
+		    xns_cv_ldadd= # "$os7_cv_master_builddir/strxns/libxns.la"
+		    xns_cv_ldadd32= # "$os7_cv_master_builddir/strxns/lib32/libxns.la"
+		    xns_cv_modmap="$os7_cv_master_builddir/strxns/Modules.map"
+		    xns_cv_symver="$os7_cv_master_builddir/strxns/Module.symvers"
+		    xns_cv_manpath="$os7_cv_master_builddir/strxns/doc/man"
 		    AC_MSG_RESULT([yes])
 		else
 		    AC_MSG_RESULT([no])
@@ -237,12 +243,12 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 		    xns_dir=`(cd $xns_dir; pwd)`
 		    AC_MSG_CHECKING([for xns include directory... $xns_dir $xns_bld])
 		    if test -d "$xns_bld" -a -r "$xns_dir/$xns_what" ; then
-			xns_cv_includes="$xns_dir $xns_bld"
-			#xns_cv_ldadd= # `echo "$xns_bld/../../libxns.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#xns_cv_ldadd32= # `echo "$xns_bld/../../lib32/libxns.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#xns_cv_modmap=`echo "$xns_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#xns_cv_symver=`echo "$xns_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#xns_cv_manpath=`echo "$xns_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xns_cv_includes="$xns_bld $xns_dir"
+			xns_cv_ldadd= # `echo "$xns_bld/../../libxns.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xns_cv_ldadd32= # `echo "$xns_bld/../../lib32/libxns.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xns_cv_modmap=`echo "$xns_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xns_cv_symver=`echo "$xns_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xns_cv_manpath=`echo "$xns_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi

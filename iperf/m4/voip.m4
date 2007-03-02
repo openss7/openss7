@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/01 01:45:16 $
+# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/01 07:17:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 01:45:16 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: voip.m4,v $
+# Revision 0.9.2.8  2007/03/01 07:17:25  brian
+# - updating common build process
+#
+# Revision 0.9.2.7  2007/03/01 06:38:15  brian
+# - updates to common build process
+#
 # Revision 0.9.2.6  2007/03/01 01:45:16  brian
 # - updating build process
 #
@@ -190,12 +196,12 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 	    if test -d "$voip_dir" ; then
 		AC_MSG_CHECKING([for voip include directory... $voip_dir $voip_bld])
 		if test -d "$voip_bld" -a -r "$voip_dir/$voip_what" ; then
-		    voip_cv_includes="$voip_dir $voip_bld"
-		    #voip_cv_ldadd= # "$os7_cv_master_builddir/strvoip/libvoip.la"
-		    #voip_cv_ldadd32= # "$os7_cv_master_builddir/strvoip/lib32/libvoip.la"
-		    #voip_cv_modmap="$os7_cv_master_builddir/strvoip/Modules.map"
-		    #voip_cv_symver="$os7_cv_master_builddir/strvoip/Module.symvers"
-		    #voip_cv_manpath="$os7_cv_master_builddir/strvoip/doc/man"
+		    voip_cv_includes="$voip_bld $voip_dir"
+		    voip_cv_ldadd= # "$os7_cv_master_builddir/strvoip/libvoip.la"
+		    voip_cv_ldadd32= # "$os7_cv_master_builddir/strvoip/lib32/libvoip.la"
+		    voip_cv_modmap="$os7_cv_master_builddir/strvoip/Modules.map"
+		    voip_cv_symver="$os7_cv_master_builddir/strvoip/Module.symvers"
+		    voip_cv_manpath="$os7_cv_master_builddir/strvoip/doc/man"
 		    AC_MSG_RESULT([yes])
 		else
 		    AC_MSG_RESULT([no])
@@ -219,12 +225,12 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 		    voip_dir=`(cd $voip_dir; pwd)`
 		    AC_MSG_CHECKING([for voip include directory... $voip_dir $voip_bld])
 		    if test -d "$voip_bld" -a -r "$voip_dir/$voip_what" ; then
-			voip_cv_includes="$voip_dir $voip_bld"
-			#voip_cv_ldadd= # `echo "$voip_bld/../../libvoip.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#voip_cv_ldadd32= # `echo "$voip_bld/../../lib32/libvoip.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#voip_cv_modmap=`echo "$voip_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#voip_cv_symver=`echo "$voip_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#voip_cv_manpath=`echo "$voip_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			voip_cv_includes="$voip_bld $voip_dir"
+			voip_cv_ldadd= # `echo "$voip_bld/../../libvoip.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			voip_cv_ldadd32= # `echo "$voip_bld/../../lib32/libvoip.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			voip_cv_modmap=`echo "$voip_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			voip_cv_symver=`echo "$voip_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			voip_cv_manpath=`echo "$voip_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -287,6 +293,8 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for voip include directory... $voip_dir])
 		    if test -r "$voip_dir/$voip_what" ; then
 			voip_cv_includes="$voip_dir"
+			#voip_cv_ldadd=
+			#voip_cv_ldadd32=
 			#voip_cv_modmap=
 			#voip_cv_symver=
 			#voip_cv_manpath=
