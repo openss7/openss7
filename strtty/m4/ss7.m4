@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/01 01:45:15 $
+# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/01 07:17:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 01:45:15 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: ss7.m4,v $
+# Revision 0.9.2.15  2007/03/01 07:17:25  brian
+# - updating common build process
+#
+# Revision 0.9.2.14  2007/03/01 06:38:15  brian
+# - updates to common build process
+#
 # Revision 0.9.2.13  2007/03/01 01:45:15  brian
 # - updating build process
 #
@@ -208,12 +214,12 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    if test -d "$ss7_dir" ; then
 		AC_MSG_CHECKING([for ss7 include directory... $ss7_dir $ss7_bld])
 		if test -d "$ss7_bld" -a -r "$ss7_dir/$ss7_what" ; then
-		    ss7_cv_includes="$ss7_dir $ss7_bld"
-		    #ss7_cv_ldadd= # "$os7_cv_master_builddir/stacks/libss7.la"
-		    #ss7_cv_ldadd32= # "$os7_cv_master_builddir/stacks/lib32/libss7.la"
-		    #ss7_cv_modmap="$os7_cv_master_builddir/stacks/Modules.map"
-		    #ss7_cv_symver="$os7_cv_master_builddir/stacks/Module.symvers"
-		    #ss7_cv_manpath="$os7_cv_master_builddir/stacks/doc/man"
+		    ss7_cv_includes="$ss7_bld $ss7_dir"
+		    ss7_cv_ldadd= # "$os7_cv_master_builddir/stacks/libss7.la"
+		    ss7_cv_ldadd32= # "$os7_cv_master_builddir/stacks/lib32/libss7.la"
+		    ss7_cv_modmap="$os7_cv_master_builddir/stacks/Modules.map"
+		    ss7_cv_symver="$os7_cv_master_builddir/stacks/Module.symvers"
+		    ss7_cv_manpath="$os7_cv_master_builddir/stacks/doc/man"
 		    AC_MSG_RESULT([yes])
 		else
 		    AC_MSG_RESULT([no])
@@ -241,12 +247,12 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 		    ss7_dir=`(cd $ss7_dir; pwd)`
 		    AC_MSG_CHECKING([for ss7 include directory... $ss7_dir $ss7_bld])
 		    if test -d "$ss7_bld" -a -r "$ss7_dir/$ss7_what" ; then
-			ss7_cv_includes="$ss7_dir $ss7_bld"
-			#ss7_cv_ldadd= # `echo "$ss7_bld/../../libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#ss7_cv_ldadd32= # `echo "$ss7_bld/../../lib32/libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#ss7_cv_modmap=`echo "$ss7_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#ss7_cv_symver=`echo "$ss7_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#ss7_cv_manpath=`echo "$ss7_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			ss7_cv_includes="$ss7_bld $ss7_dir"
+			ss7_cv_ldadd= # `echo "$ss7_bld/../../libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			ss7_cv_ldadd32= # `echo "$ss7_bld/../../lib32/libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			ss7_cv_modmap=`echo "$ss7_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			ss7_cv_symver=`echo "$ss7_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			ss7_cv_manpath=`echo "$ss7_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -309,6 +315,8 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for ss7 include directory... $ss7_dir])
 		    if test -r "$ss7_dir/$ss7_what" ; then
 			ss7_cv_includes="$ss7_dir"
+			#ss7_cv_ldadd=
+			#ss7_cv_ldadd32=
 			#ss7_cv_modmap=
 			#ss7_cv_symver=
 			#ss7_cv_manpath=

@@ -194,8 +194,28 @@ AC_DEFUN([_BCM_SETUP], [dnl
 # _BCM_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BCM_OUTPUT], [dnl
-    _BCM_STRCONF
+    _BCM_CONFIG
+    _BCM_STRCONF dnl
 ])# _BCM_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _BCM_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BCM_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    bcm_cv_config="${pkg_bld}/src/include/sys/strbcm/config.h"
+    bcm_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    bcm_cv_ldadd= # "${pkg_bld}/libbcm.la"
+    bcm_cv_ldflags= # "${pkg_bld}/lib32/libbcm.la"
+    bcm_cv_ldadd32= # "-L${pkg_bld}/.libs/"
+    bcm_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
+    bcm_cv_manpath="${pkg_bld}/doc/man"
+    bcm_cv_modmap="${pkg_bld}/Modules.map"
+    bcm_cv_symver="${pkg_bld}/Module.symvers"
+    bcm_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+])# _BCM_CONFIG
 # =============================================================================
 
 # =============================================================================

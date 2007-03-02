@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/03/01 01:45:16 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/03/01 07:17:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 01:45:16 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.49  2007/03/01 07:17:25  brian
+# - updating common build process
+#
+# Revision 0.9.2.48  2007/03/01 06:38:15  brian
+# - updates to common build process
+#
 # Revision 0.9.2.47  2007/03/01 01:45:16  brian
 # - updating build process
 #
@@ -216,12 +222,12 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    if test -d "$xti_dir" ; then
 		AC_MSG_CHECKING([for xti include directory... $xti_dir $xti_bld])
 		if test -d "$xti_bld" -a -r "$xti_dir/$xti_what" ; then
-		    xti_cv_includes="$xti_dir $xti_bld"
-		    #xti_cv_ldadd="$os7_cv_master_builddir/strxnet/libxnet.la"
-		    #xti_cv_ldadd32="$os7_cv_master_builddir/strxnet/lib32/libxnet.la"
-		    #xti_cv_modmap="$os7_cv_master_builddir/strxnet/Modules.map"
-		    #xti_cv_symver="$os7_cv_master_builddir/strxnet/Module.symvers"
-		    #xti_cv_manpath="$os7_cv_master_builddir/strxnet/doc/man"
+		    xti_cv_includes="$xti_bld $xti_dir"
+		    xti_cv_ldadd="$os7_cv_master_builddir/strxnet/libxnet.la"
+		    xti_cv_ldadd32="$os7_cv_master_builddir/strxnet/lib32/libxnet.la"
+		    xti_cv_modmap="$os7_cv_master_builddir/strxnet/Modules.map"
+		    xti_cv_symver="$os7_cv_master_builddir/strxnet/Module.symvers"
+		    xti_cv_manpath="$os7_cv_master_builddir/strxnet/doc/man"
 		    AC_MSG_RESULT([yes])
 		    break
 		fi
@@ -245,12 +251,12 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		    xti_dir=`(cd $xti_dir; pwd)`
 		    AC_MSG_CHECKING([for xti include directory... $xti_dir $xti_bld])
 		    if test -d "$xti_bld" -a -r "$xti_dir/$xti_what" ; then
-			xti_cv_includes="$xti_dir $xti_bld"
-			#xti_cv_ldadd=`echo "$xti_bld/../../libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#xti_cv_ldadd32=`echo "$xti_bld/../../lib32/libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#xti_cv_modmap=`echo "$xti_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#xti_cv_symver=`echo "$xti_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#xti_cv_manpath=`echo "$xti_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xti_cv_includes="$xti_bld $xti_dir"
+			xti_cv_ldadd=`echo "$xti_bld/../../libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xti_cv_ldadd32=`echo "$xti_bld/../../lib32/libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xti_cv_modmap=`echo "$xti_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xti_cv_symver=`echo "$xti_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xti_cv_manpath=`echo "$xti_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -322,6 +328,8 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for xti include directory... $xti_dir])
 		    if test -r "$xti_dir/$xti_what" ; then
 			xti_cv_includes="$xti_dir"
+			#xti_cv_ldadd=
+			#xti_cv_ldadd32=
 			#xti_cv_modmap=
 			#xti_cv_symver=
 			#xti_cv_manpath=

@@ -851,6 +851,18 @@ AC_DEFUN([_XNS_OUTPUT], [dnl
 # _XNS_CONFIG
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    xns_cv_config="${pkg_bld}/src/include/sys/strxns/config.h"
+    xns_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    xns_cv_ldadd=""
+    xns_cv_ldflags=""
+    xns_cv_ldadd32=""
+    xns_cv_ldflags32=""
+    xns_cv_manpath="${pkg_bld}/doc/man"
+    xns_cv_modmap="${pkg_bld}/Modules.map"
+    xns_cv_symver="${pkg_bld}/Module.symvers"
+    xns_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
 ])# _XNS_CONFIG
 # =============================================================================
 

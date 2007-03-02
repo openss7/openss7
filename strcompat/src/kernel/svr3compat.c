@@ -102,14 +102,14 @@ MODULE_ALIAS("streams-svr3compat");
 
 __SVR3_EXTERN_INLINE major_t emajor(dev_t dev);
 
-EXPORT_SYMBOL_NOVERS(emajor);		/* uw7/ddi.h */
+EXPORT_SYMBOL(emajor);		/* uw7/ddi.h */
 __SVR3_EXTERN_INLINE minor_t eminor(dev_t dev);
 
-EXPORT_SYMBOL_NOVERS(eminor);		/* uw7/ddi.h */
+EXPORT_SYMBOL(eminor);		/* uw7/ddi.h */
 
 __SVR3_EXTERN_INLINE mblk_t *alloc_proto(size_t psize, size_t bsize, int type, uint bpri);
 
-EXPORT_SYMBOL_NOVERS(alloc_proto);	/* svr3/ddi.h */
+EXPORT_SYMBOL(alloc_proto);	/* svr3/ddi.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_SVR3_MODULE
 static

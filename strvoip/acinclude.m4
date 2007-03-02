@@ -287,6 +287,34 @@ AC_DEFUN([_VOIP_CONFIG_KERNEL], [dnl
 # _VOIP_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_VOIP_OUTPUT], [dnl
+    _VOIP_CONFIG
+    _VOIP_STRCONF dnl
+])# _VOIP_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _VOIP_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_VOIP_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    voip_cv_config="${pkg_bld}/src/include/sys/strvoip/config.h"
+    voip_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    voip_cv_ldadd= # "${pkg_bld}/libvoip.la"
+    voip_cv_ldflags= # "-L${pkg_bld}/.libs/"
+    voip_cv_ldadd32= # "${pkg_bld}/lib32/libvoip.la"
+    voip_cv_ldflags32= # "-L${pkg_bld}/lib32/.libs/"
+    voip_cv_manpath="${pkg_bld}/doc/man"
+    voip_cv_modmap="${pkg_bld}/Modules.map"
+    voip_cv_symver="${pkg_bld}/Module.symvers"
+    voip_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+])# _VOIP_CONFIG
+# =============================================================================
+
+# =============================================================================
+# _VOIP_STRCONF
+# -----------------------------------------------------------------------------
+AC_DEFUN([_VOIP_STRCONF], [dnl
     strconf_cv_stem='Config'
     strconf_cv_input='Config.master'
     strconf_cv_majbase=164
@@ -315,7 +343,7 @@ dnl
     strconf_cv_package=${streams_cv_package:-LiS}
     strconf_cv_minorbits="${linux_cv_minorbits:-8}"
     _STRCONF dnl
-])# _VOIP_OUTPUT
+])# _VOIP_STRCONF
 # =============================================================================
 
 # =============================================================================

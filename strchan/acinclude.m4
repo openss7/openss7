@@ -278,6 +278,34 @@ AC_DEFUN([_CHAN_CONFIG_KERNEL], [dnl
 # _CHAN_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_CHAN_OUTPUT], [dnl
+    _CHAN_CONFIG
+    _CHAN_STRCONF dnl
+])# _CHAN_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _CHAN_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_CHAN_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    chan_cv_config="${pkg_bld}/src/include/sys/strchan/config.h"
+    chan_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    chan_cv_ldadd= # "${pkg_bld}/libchan.la"
+    chan_cv_ldflags= # "${pkg_bld}/lib32/libchan.la"
+    chan_cv_ldadd32= # "-L${pkg_bld}/.libs/"
+    chan_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
+    chan_cv_manpath="${pkg_bld}/doc/man"
+    chan_cv_modmap="${pkg_bld}/Modules.map"
+    chan_cv_symver="${pkg_bld}/Module.symvers"
+    chan_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+])# _CHAN_CONFIG
+# =============================================================================
+
+# =============================================================================
+# _CHAN_STRCONF
+# -----------------------------------------------------------------------------
+AC_DEFUN([_CHAN_STRCONF], [dnl
     strconf_cv_stem='Config'
     strconf_cv_input='Config.master'
     strconf_cv_majbase=211
@@ -305,8 +333,8 @@ dnl
     AC_REQUIRE([_LINUX_STREAMS])
     strconf_cv_package=${streams_cv_package:-LiS}
     strconf_cv_minorbits="${linux_cv_minorbits:-8}"
-    _STRCONF
-])# _CHAN_OUTPUT
+    _STRCONF dnl
+])# _CHAN_STRCONF
 # =============================================================================
 
 # =============================================================================

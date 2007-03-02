@@ -1263,6 +1263,7 @@ dnl
 dnl Acutally generating output files is last.  We don't want to generate a
 dnl thing until we have performed all the checks and balances.
 dnl
+    _LIS_CONFIG
     _LIS_STRCONF
     LIS_MAJOR_BASE="$STRCONF_MAJBASE"
     _LIS_OUTPUT_CONFIG_IN dnl
@@ -1701,6 +1702,36 @@ dnl -----------------------------------		-----------------------
     AC_SUBST([LIS_MAKE_DIRS])			dnl LIS_MAKE_DIRS
 dnl -----------------------------------		-----------------------
 ])#_LIS_OUTPUT_CONFIG_IN
+# =============================================================================
+
+# =============================================================================
+# _LIS_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LIS_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    streams_cv_lis_config="${pkg_bld}/include/sys/LiS/config.h"
+    streams_cv_lis_includes="${pkg_bld}/include ${pkg_src}/include"
+    streams_cv_lis_ldadd="${pkg_bld}/libstreams.la"
+    streams_cv_lis_ldflags="-L${pkg_bld}/.libs/"
+    streams_cv_lis_ldadd32="${pkg_bld}/lib32/libstreams.la"
+    streams_cv_lis_ldflags32="-L${pkg_bld}/lib32/.libs/"
+    streams_cv_lis_manpath="${pkg_bld}/doc/man"
+    streams_cv_lis_modmap="${pkg_bld}/Modules.map"
+    streams_cv_lis_symver="${pkg_bld}/Module.symvers"
+    streams_cv_lis_version="${PACKAGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    streams_cv_config="$streams_cv_lis_config"
+    streams_cv_includes="$streams_cv_lis_includes"
+    streams_cv_ldadd="$streams_cv_lis_ldadd"
+    streams_cv_ldadd32="$streams_cv_lis_ldadd32"
+    streams_cv_ldflags="$streams_cv_lis_ldflags"
+    streams_cv_ldflags32="$streams_cv_lis_ldflags32"
+    streams_cv_manpath="$streams_cv_lis_manpath"
+    streams_cv_modmap="$streams_cv_lis_modmap"
+    streams_cv_symver="$streams_cv_lis_symver"
+    streams_cv_version="$streams_cv_lis_version"
+    streams_cv_package="LiS"
+])#_LIS_CONFIG
 # =============================================================================
 
 # =============================================================================

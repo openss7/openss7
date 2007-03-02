@@ -131,27 +131,27 @@ The package builds and installs the following
 .I STREAMS
 kernel modules and drivers:
 .IP \(en \w'\(en\(em'u
-.B streams_dlgn.ko
+.B streams_dlgnDriver.ko
 driver
 .PD 0
 .IP \(en
-.B streams_dvbm.ko
+.B streams_dvbmDriver.ko
 module
 .RI \(lq dvbm \(rq.
 .IP \(en
-.B streams_gncfd.ko
+.B streams_gncfdDriver.ko
 driver
 .RB \(lq /dev/streams/clone/gncfd \(rq
 .IP \(en
-.B streams_gpio.ko
+.B streams_gpioDriver.ko
 driver
 .RB \(lq /dev/streams/clone/gpio \(rq
 .IP \(en
-.B streams_sctmr.ko
+.B streams_sctmrDriver.ko
 module
 .RI \(lq sctmr \(rq.
 .IP \(en
-.B streams_mercd.ko
+.B streams_mercdDriver.ko
 driver
 .RB \(lq /dev/streams/clone/mercd \(rq
 .IP \(en

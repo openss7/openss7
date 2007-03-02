@@ -409,7 +409,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 
 #if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_CLONE_MODULE || defined CONFIG_STREAMS_NSDEV_MODULE \
          || !defined CONFIG_STREAMS_STH || !defined CONFIG_STREAMS_CLONE || !defined CONFIG_STREAMS_NSDEV
-EXPORT_SYMBOL_NOVERS(spec_reparent);
+EXPORT_SYMBOL_GPL(spec_reparent);
 #endif
 
 streams_fastcall int
@@ -446,7 +446,7 @@ spec_open(struct file *file, struct cdevsw *cdev, dev_t dev, int sflag)
 
 #if defined CONFIG_STREAMS_STH_MODULE || defined CONFIG_STREAMS_CLONE_MODULE || defined CONFIG_STREAMS_NSDEV_MODULE \
          || !defined CONFIG_STREAMS_STH || !defined CONFIG_STREAMS_CLONE || !defined CONFIG_STREAMS_NSDEV
-EXPORT_SYMBOL_NOVERS(spec_open);
+EXPORT_SYMBOL_GPL(spec_open);
 #endif
 
 /* 
@@ -1308,7 +1308,7 @@ specfs_mount(void)
 	return (mntget(specfs_mnt));
 }
 
-EXPORT_SYMBOL_NOVERS(specfs_mount);
+EXPORT_SYMBOL_GPL(specfs_mount);
 
 #if ! defined HAVE_KFUNC_KERN_UMOUNT
 #undef kern_umount
@@ -1329,7 +1329,7 @@ specfs_umount(void)
 	}
 }
 
-EXPORT_SYMBOL_NOVERS(specfs_umount);
+EXPORT_SYMBOL_GPL(specfs_umount);
 
 /**
  *  specfs_term_cache: - terminate the snode cache.

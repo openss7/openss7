@@ -119,11 +119,11 @@ streams_get_sleep_lock(caddr_t event)
 	return &sleep_lock;
 }
 
-EXPORT_SYMBOL_NOVERS(streams_get_sleep_lock);	/* hpux/ddi.h */
+EXPORT_SYMBOL(streams_get_sleep_lock);	/* hpux/ddi.h */
 
 lock_t *get_sleep_lock(caddr_t event) __attribute__ ((alias("streams_get_sleep_lock")));
 
-EXPORT_SYMBOL_NOVERS(get_sleep_lock);	/* hpux/ddi.h */
+EXPORT_SYMBOL(get_sleep_lock);	/* hpux/ddi.h */
 
 #ifdef LFS
 /**
@@ -153,7 +153,7 @@ streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv)
 	__strfunc(func, q, mp, priv);
 }
 
-EXPORT_SYMBOL_NOVERS(streams_put);	/* hpux/ddi.h */
+EXPORT_SYMBOL(streams_put);	/* hpux/ddi.h */
 #endif
 
 int
@@ -282,7 +282,7 @@ str_install_HPUX(struct stream_inst *inst)
 #endif
 }
 
-EXPORT_SYMBOL_NOVERS(str_install_HPUX);
+EXPORT_SYMBOL(str_install_HPUX);
 
 int
 str_uninstall(struct stream_inst *inst)
@@ -327,7 +327,7 @@ str_uninstall(struct stream_inst *inst)
 #endif
 }
 
-EXPORT_SYMBOL_NOVERS(str_uninstall);
+EXPORT_SYMBOL(str_uninstall);
 
 #ifdef CONFIG_STREAMS_COMPAT_HPUX_MODULE
 static

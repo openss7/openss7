@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/01 01:45:15 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/01 07:17:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 01:45:15 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: inet.m4,v $
+# Revision 0.9.2.38  2007/03/01 07:17:25  brian
+# - updating common build process
+#
+# Revision 0.9.2.37  2007/03/01 06:38:15  brian
+# - updates to common build process
+#
 # Revision 0.9.2.36  2007/03/01 01:45:15  brian
 # - updating build process
 #
@@ -208,12 +214,12 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    if test -d "$inet_dir" ; then
 		AC_MSG_CHECKING([for inet include directory... $inet_dir $inet_bld])
 		if test -d "$inet_bld" -a -r "$inet_dir/$inet_what" ; then
-		    inet_cv_includes="$inet_dir $inet_bld"
-		    #inet_cv_ldadd= # "$os7_cv_master_builddir/strinet/libinet.la"
-		    #inet_cv_ldadd32= # "$os7_cv_master_builddir/strinet/lib32/libinet.la"
-		    #inet_cv_modmap="$os7_cv_master_builddir/strinet/Modules.map"
-		    #inet_cv_symver="$os7_cv_master_builddir/strinet/Module.symvers"
-		    #inet_cv_manpath="$os7_cv_master_builddir/strinet/doc/man"
+		    inet_cv_includes="$inet_bld $inet_dir"
+		    inet_cv_ldadd= # "$os7_cv_master_builddir/strinet/libinet.la"
+		    inet_cv_ldadd32= # "$os7_cv_master_builddir/strinet/lib32/libinet.la"
+		    inet_cv_modmap="$os7_cv_master_builddir/strinet/Modules.map"
+		    inet_cv_symver="$os7_cv_master_builddir/strinet/Module.symvers"
+		    inet_cv_manpath="$os7_cv_master_builddir/strinet/doc/man"
 		    AC_MSG_RESULT([yes])
 		else
 		    AC_MSG_RESULT([no])
@@ -237,12 +243,12 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 		    inet_dir=`(cd $inet_dir; pwd)`
 		    AC_MSG_CHECKING([for inet include directory... $inet_dir $inet_bld])
 		    if test -d "$inet_bld" -a -r "$inet_dir/$inet_what" ; then
-			inet_cv_includes="$inet_dir $inet_bld"
-			#inet_cv_ldadd= # `echo "$inet_bld/../../libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#inet_cv_ldadd32= # `echo "$inet_bld/../../lib32/libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#inet_cv_modmap=`echo "$inet_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#inet_cv_symver=`echo "$inet_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#inet_cv_manpath=`echo "$inet_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			inet_cv_includes="$inet_bld $inet_dir"
+			inet_cv_ldadd= # `echo "$inet_bld/../../libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			inet_cv_ldadd32= # `echo "$inet_bld/../../lib32/libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			inet_cv_modmap=`echo "$inet_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			inet_cv_symver=`echo "$inet_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			inet_cv_manpath=`echo "$inet_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi

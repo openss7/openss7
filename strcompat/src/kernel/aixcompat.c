@@ -127,7 +127,7 @@ wantio(queue_t *q, struct wantio *w)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(wantio);	/* aix/ddi.h */
+EXPORT_SYMBOL(wantio);	/* aix/ddi.h */
 
 /* 
  *  WANTMSG
@@ -135,7 +135,7 @@ EXPORT_SYMBOL_NOVERS(wantio);	/* aix/ddi.h */
  */
 __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int streamscall (*func) (mblk_t *));
 
-EXPORT_SYMBOL_NOVERS(wantmsg);	/* aix/ddi.h */
+EXPORT_SYMBOL(wantmsg);	/* aix/ddi.h */
 #endif
 
 /* 
@@ -341,7 +341,7 @@ str_install_AIX(int cmd, strconf_t * sc)
 	return (EINVAL);
 }
 
-EXPORT_SYMBOL_NOVERS(str_install_AIX);	/* strconf.h */
+EXPORT_SYMBOL(str_install_AIX);	/* strconf.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_AIX_MODULE
 static

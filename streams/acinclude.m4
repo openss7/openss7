@@ -1617,10 +1617,42 @@ AC_DEFUN([_LFS_CONFIG_LFS], [dnl
 # _LFS_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_OUTPUT], [dnl
+    _LFS_CONFIG
     _LFS_STRCONF
     AM_CONDITIONAL(WITH_LFS, true)dnl
     AM_CONDITIONAL(WITH_LIS, false)dnl
 ])# _LFS_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _LFS_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LFS_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    streams_cv_lfs_config="${pkg_bld}/include/sys/streams/config.h"
+    streams_cv_lfs_includes="${pkg_bld}/include ${pkg_src}/include"
+    streams_cv_lfs_ldadd="${pkg_bld}/libstreams.la"
+    streams_cv_lfs_ldflags="-L${pkg_bld}/.libs/"
+    streams_cv_lfs_ldadd32="${pkg_bld}/lib32/libstreams.la"
+    streams_cv_lfs_ldflags32="-L${pkg_bld}/lib32/.libs/"
+    streams_cv_lfs_manpath="${pkg_bld}/doc/man"
+    streams_cv_lfs_modmap="${pkg_bld}/Modules.map"
+    streams_cv_lfs_symver="${pkg_bld}/Module.symvers"
+    streams_cv_lfs_version="${PACKAGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    streams_cv_config="$streams_cv_lfs_config"
+    streams_cv_includes="$streams_cv_lfs_includes"
+    streams_cv_ldadd="$streams_cv_lfs_ldadd"
+    streams_cv_ldadd32="$streams_cv_lfs_ldadd32"
+    streams_cv_ldflags="$streams_cv_lfs_ldflags"
+    streams_cv_ldflags32="$streams_cv_lfs_ldflags32"
+    streams_cv_manpath="$streams_cv_lfs_manpath"
+    streams_cv_modversions="$streams_cv_lfs_modversions"
+    streams_cv_modmap="$streams_cv_lfs_modmap"
+    streams_cv_symver="$streams_cv_lfs_symver"
+    streams_cv_version="$streams_cv_lfs_version"
+    streams_cv_package="LfS"
+])# _LFS_CONFIG
 # =============================================================================
 
 # =============================================================================

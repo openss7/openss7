@@ -1463,6 +1463,18 @@ AC_DEFUN([_SS7_CONFIG], [dnl
 	    with the SCTP module.])dnl
     fi
     AC_MSG_RESULT([$ss7_cv_error_generator])
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    ss7_cv_config="${pkg_bld}/src/include/sys/strss7/config.h"
+    ss7_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    ss7_cv_ldadd= # "${pkg_bld}/libss7.la"
+    ss7_cv_ldflags= # "${pkg_bld}/lib32/libss7.la"
+    ss7_cv_ldadd32= # "-L${pkg_bld}/.libs/"
+    ss7_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
+    ss7_cv_manpath="${pkg_bld}/doc/man"
+    ss7_cv_modmap="${pkg_bld}/Modules.map"
+    ss7_cv_symver="${pkg_bld}/Module.symvers"
+    ss7_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
 ])# _SS7_CONFIG
 # =============================================================================
 

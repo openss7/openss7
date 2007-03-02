@@ -228,8 +228,28 @@ AC_DEFUN([_SOCK_SETUP], [dnl
 # _SOCK_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SOCK_OUTPUT], [dnl
-    _SOCK_STRCONF
+    _SOCK_CONFIG
+    _SOCK_STRCONF dnl
 ])# _SOCK_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _SOCK_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SOCK_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    sock_cv_config="${pkg_bld}/src/include/sys/strsock/config.h"
+    sock_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    sock_cv_ldadd="${pkg_bld}/libsocket.la"
+    sock_cv_ldflags="-L${pkg_bld}/.libs/"
+    sock_cv_ldadd32="${pkg_bld}/lib32/libsocket.la"
+    sock_cv_ldflags32="-L${pkg_bld}/lib32/.libs/"
+    sock_cv_manpath="${pkg_bld}/doc/man"
+    sock_cv_modmap="${pkg_bld}/Modules.map"
+    sock_cv_symver="${pkg_bld}/Module.symvers"
+    sock_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+])# _SOCK_CONFIG
 # =============================================================================
 
 # =============================================================================

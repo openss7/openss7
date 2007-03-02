@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/01 01:45:15 $
+# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/01 07:17:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 01:45:15 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sigtran.m4,v $
+# Revision 0.9.2.8  2007/03/01 07:17:25  brian
+# - updating common build process
+#
+# Revision 0.9.2.7  2007/03/01 06:38:15  brian
+# - updates to common build process
+#
 # Revision 0.9.2.6  2007/03/01 01:45:15  brian
 # - updating build process
 #
@@ -190,12 +196,12 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	    if test -d "$sigtran_dir" ; then
 		AC_MSG_CHECKING([for sigtran include directory... $sigtran_dir $sigtran_bld])
 		if test -d "$sigtran_bld" -a -r "$sigtran_dir/$sigtran_what" ; then
-		    sigtran_cv_includes="$sigtran_dir $sigtran_bld"
-		    #sigtran_cv_ldadd= # "$os7_cv_master_builddir/sigtran/libsigtran.la"
-		    #sigtran_cv_ldadd32= # "$os7_cv_master_builddir/sigtran/lib32/libsigtran.la"
-		    #sigtran_cv_modmap="$os7_cv_master_builddir/sigtran/Modules.map"
-		    #sigtran_cv_symver="$os7_cv_master_builddir/sigtran/Module.symvers"
-		    #sigtran_cv_manpath="$os7_cv_master_builddir/sigtran/doc/man"
+		    sigtran_cv_includes="$sigtran_bld $sigtran_dir"
+		    sigtran_cv_ldadd= # "$os7_cv_master_builddir/sigtran/libsigtran.la"
+		    sigtran_cv_ldadd32= # "$os7_cv_master_builddir/sigtran/lib32/libsigtran.la"
+		    sigtran_cv_modmap="$os7_cv_master_builddir/sigtran/Modules.map"
+		    sigtran_cv_symver="$os7_cv_master_builddir/sigtran/Module.symvers"
+		    sigtran_cv_manpath="$os7_cv_master_builddir/sigtran/doc/man"
 		    AC_MSG_RESULT([yes])
 		else
 		    AC_MSG_RESULT([no])
@@ -219,12 +225,12 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 		    sigtran_dir=`(cd $sigtran_dir; pwd)`
 		    AC_MSG_CHECKING([for sigtran include directory... $sigtran_dir $sigtran_bld])
 		    if test -d "$sigtran_bld" -a -r "$sigtran_dir/$sigtran_what" ; then
-			sigtran_cv_includes="$sigtran_dir $sigtran_bld"
-			#sigtran_cv_ldadd= # `echo "$sigtran_bld/../../libsigtran.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#sigtran_cv_ldadd32= # `echo "$sigtran_bld/../../lib32/libsigtran.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#sigtran_cv_modmap=`echo "$sigtran_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#sigtran_cv_symver=`echo "$sigtran_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#sigtran_cv_manpath=`echo "$sigtran_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sigtran_cv_includes="$sigtran_bld $sigtran_dir"
+			sigtran_cv_ldadd= # `echo "$sigtran_bld/../../libsigtran.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sigtran_cv_ldadd32= # `echo "$sigtran_bld/../../lib32/libsigtran.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sigtran_cv_modmap=`echo "$sigtran_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sigtran_cv_symver=`echo "$sigtran_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sigtran_cv_manpath=`echo "$sigtran_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi

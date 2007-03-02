@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/01 01:45:15 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/01 07:17:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 01:45:15 $ by $Author: brian $
+# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.10  2007/03/01 07:17:25  brian
+# - updating common build process
+#
+# Revision 0.9.2.9  2007/03/01 06:38:15  brian
+# - updates to common build process
+#
 # Revision 0.9.2.8  2007/03/01 01:45:15  brian
 # - updating build process
 #
@@ -198,12 +204,12 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 	    if test -d "$iso_dir" ; then
 		AC_MSG_CHECKING([for iso include directory... $iso_dir $iso_bld])
 		if test -d "$iso_bld" -a -r "$iso_dir/$iso_what" ; then
-		    iso_cv_includes="$iso_dir $iso_bld"
-		    #iso_cv_ldadd= # "$os7_cv_master_builddir/striso/libiso.la"
-		    #iso_cv_ldadd32= # "$os7_cv_master_builddir/striso/lib32/libiso.la"
-		    #iso_cv_modmap="$os7_cv_master_builddir/striso/Modules.map"
-		    #iso_cv_symver="$os7_cv_master_builddir/striso/Module.symvers"
-		    #iso_cv_manpath="$os7_cv_master_builddir/striso/doc/man"
+		    iso_cv_includes="$iso_bld $iso_dir"
+		    iso_cv_ldadd= # "$os7_cv_master_builddir/striso/libiso.la"
+		    iso_cv_ldadd32= # "$os7_cv_master_builddir/striso/lib32/libiso.la"
+		    iso_cv_modmap="$os7_cv_master_builddir/striso/Modules.map"
+		    iso_cv_symver="$os7_cv_master_builddir/striso/Module.symvers"
+		    iso_cv_manpath="$os7_cv_master_builddir/striso/doc/man"
 		    AC_MSG_RESULT([yes])
 		else
 		    AC_MSG_RESULT([no])
@@ -227,12 +233,12 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 		    iso_dir=`(cd $iso_dir; pwd)`
 		    AC_MSG_CHECKING([for iso include directory... $iso_dir $iso_bld])
 		    if test -d "$iso_bld" -a -r "$iso_dir/$iso_what" ; then
-			iso_cv_includes="$iso_dir $iso_bld"
-			#iso_cv_ldadd= # `echo "$iso_bld/../../libiso.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#iso_cv_ldadd32= # `echo "$iso_bld/../../lib32/libiso.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#iso_cv_modmap=`echo "$iso_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#iso_cv_symver=`echo "$iso_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			#iso_cv_manpath=`echo "$iso_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			iso_cv_includes="$iso_bld $iso_dir"
+			iso_cv_ldadd= # `echo "$iso_bld/../../libiso.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			iso_cv_ldadd32= # `echo "$iso_bld/../../lib32/libiso.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			iso_cv_modmap=`echo "$iso_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			iso_cv_symver=`echo "$iso_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			iso_cv_manpath=`echo "$iso_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -288,6 +294,8 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for iso include directory... $iso_dir])
 		    if test -r "$iso_dir/$iso_what" ; then
 			iso_cv_includes="$iso_dir"
+			#iso_cv_ldadd=
+			#iso_cv_ldadd32=
 			#iso_cv_modmap=
 			#iso_cv_symver=
 			#iso_cv_manpath=

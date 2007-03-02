@@ -102,10 +102,10 @@ MODULE_ALIAS("streams-suncompat");
 
 __SUN_EXTERN_INLINE void freezestr_SUN(queue_t *q);
 
-EXPORT_SYMBOL_NOVERS(freezestr_SUN);
+EXPORT_SYMBOL(freezestr_SUN);
 __SUN_EXTERN_INLINE void unfreezestr_SUN(queue_t *q);
 
-EXPORT_SYMBOL_NOVERS(unfreezestr_SUN);
+EXPORT_SYMBOL(unfreezestr_SUN);
 
 #ifdef LFS
 /**
@@ -127,7 +127,7 @@ qwait(queue_t *rq)
 	remove_wait_queue(&qu->qu_qwait, &wait);
 }
 
-EXPORT_SYMBOL_NOVERS(qwait);		/* sun/ddi.h */
+EXPORT_SYMBOL(qwait);		/* sun/ddi.h */
 #endif
 
 #ifdef LFS
@@ -154,7 +154,7 @@ qwait_sig(queue_t *rq)
 	return (ret);
 }
 
-EXPORT_SYMBOL_NOVERS(qwait_sig);	/* sun/ddi.h */
+EXPORT_SYMBOL(qwait_sig);	/* sun/ddi.h */
 #endif
 
 #ifdef LFS
@@ -174,7 +174,7 @@ qbufcall(queue_t *q, size_t size, int priority, void streamscall (*function) (vo
 	return __bufcall(q, size, priority, (void streamscall (*)(long)) function, (long) arg);
 }
 
-EXPORT_SYMBOL_NOVERS(qbufcall);	/* sun/ddi.h */
+EXPORT_SYMBOL(qbufcall);	/* sun/ddi.h */
 timeout_id_t
 qtimeout(queue_t *q, void streamscall (*timo_fcn) (void *), void *arg, long ticks)
 {
@@ -183,7 +183,7 @@ qtimeout(queue_t *q, void streamscall (*timo_fcn) (void *), void *arg, long tick
 	return __timeout(q, (timo_fcn_t *) timo_fcn, (caddr_t) arg, ticks, 0, smp_processor_id());
 }
 
-EXPORT_SYMBOL_NOVERS(qtimeout);	/* sun/ddi.h */
+EXPORT_SYMBOL(qtimeout);	/* sun/ddi.h */
 #endif
 /**
  *  qunbufcall: - cancel a buffer callout
@@ -197,19 +197,19 @@ qunbufcall(queue_t *q, bufcall_id_t bcid)
 	unbufcall(bcid);
 }
 
-EXPORT_SYMBOL_NOVERS(qunbufcall);	/* sun/ddi.h */
+EXPORT_SYMBOL(qunbufcall);	/* sun/ddi.h */
 clock_t
 quntimeout(queue_t *q, timeout_id_t toid)
 {
 	return untimeout(toid);
 }
 
-EXPORT_SYMBOL_NOVERS(quntimeout);	/* sun/ddi.h */
+EXPORT_SYMBOL(quntimeout);	/* sun/ddi.h */
 #ifdef LFS
 /* LIS already has queclass defined */
 __SUN_EXTERN_INLINE unsigned char queclass(mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(queclass);	/* sun/ddi.h */
+EXPORT_SYMBOL(queclass);	/* sun/ddi.h */
 #endif
 #ifdef LFS
 /**
@@ -233,29 +233,29 @@ qwriter(queue_t *qp, mblk_t *mp, void streamscall (*func) (queue_t *qp, mblk_t *
 	__strwrit(qp, mp, func, perimeter);
 }
 
-EXPORT_SYMBOL_NOVERS(qwriter);		/* sun/ddi.h */
+EXPORT_SYMBOL(qwriter);		/* sun/ddi.h */
 __SUN_EXTERN_INLINE cred_t *ddi_get_cred(void);
 
-EXPORT_SYMBOL_NOVERS(ddi_get_cred);	/* sun/ddi.h */
+EXPORT_SYMBOL(ddi_get_cred);	/* sun/ddi.h */
 #endif
 __SUN_EXTERN_INLINE clock_t ddi_get_lbolt(void);
 
-EXPORT_SYMBOL_NOVERS(ddi_get_lbolt);	/* sun/ddi.h */
+EXPORT_SYMBOL(ddi_get_lbolt);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE pid_t ddi_get_pid(void);
 
-EXPORT_SYMBOL_NOVERS(ddi_get_pid);	/* sun/ddi.h */
+EXPORT_SYMBOL(ddi_get_pid);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE time_t ddi_get_time(void);
 
-EXPORT_SYMBOL_NOVERS(ddi_get_time);	/* sun/ddi.h */
+EXPORT_SYMBOL(ddi_get_time);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE unsigned short ddi_getiminor(dev_t dev);
 
-EXPORT_SYMBOL_NOVERS(ddi_getiminor);	/* sun/ddi.h */
+EXPORT_SYMBOL(ddi_getiminor);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE void *ddi_umem_alloc(size_t size, int flag, ddi_umem_cookie_t * cookiep);
 
-EXPORT_SYMBOL_NOVERS(ddi_umem_alloc);	/* sun/ddi.h */
+EXPORT_SYMBOL(ddi_umem_alloc);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE void *ddi_umem_free(ddi_umem_cookie_t * cookiep);
 
-EXPORT_SYMBOL_NOVERS(ddi_umem_free);
+EXPORT_SYMBOL(ddi_umem_free);
 
 #if 0
 extern int ddi_add_intr(void);
@@ -527,70 +527,70 @@ extern int ddi_unmap_regs(void);
  */
 __SUN_EXTERN_INLINE unsigned char *DB_BASE(mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(DB_BASE);
+EXPORT_SYMBOL(DB_BASE);
 __SUN_EXTERN_INLINE unsigned char *DB_LIM(mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(DB_LIM);
+EXPORT_SYMBOL(DB_LIM);
 __SUN_EXTERN_INLINE size_t DB_REF(mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(DB_REF);
+EXPORT_SYMBOL(DB_REF);
 __SUN_EXTERN_INLINE int DB_TYPE(mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(DB_TYPE);
+EXPORT_SYMBOL(DB_TYPE);
 __SUN_EXTERN_INLINE long MBLKL(mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(MBLKL);
+EXPORT_SYMBOL(MBLKL);
 __SUN_EXTERN_INLINE long MBLKSIZE(mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(MBLKSIZE);
+EXPORT_SYMBOL(MBLKSIZE);
 __SUN_EXTERN_INLINE long MBLKHEAD(mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(MBLKHEAD);
+EXPORT_SYMBOL(MBLKHEAD);
 __SUN_EXTERN_INLINE long MBLKTAIL(mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(MBLKTAIL);
+EXPORT_SYMBOL(MBLKTAIL);
 __SUN_EXTERN_INLINE long MBLKIN(mblk_t *mp, ssize_t off, size_t len);
 
-EXPORT_SYMBOL_NOVERS(MBLKIN);
+EXPORT_SYMBOL(MBLKIN);
 __SUN_EXTERN_INLINE long OFFSET(void *p, void *base);
 
-EXPORT_SYMBOL_NOVERS(OFFSET);
+EXPORT_SYMBOL(OFFSET);
 __SUN_EXTERN_INLINE void merror(queue_t *q, mblk_t *mp, int error);
 
-EXPORT_SYMBOL_NOVERS(merror);
+EXPORT_SYMBOL(merror);
 __SUN_EXTERN_INLINE void mioc2ack(mblk_t *mp, mblk_t *db, size_t count, int rval);
 
-EXPORT_SYMBOL_NOVERS(mioc2ack);
+EXPORT_SYMBOL(mioc2ack);
 __SUN_EXTERN_INLINE void miocack(queue_t *q, mblk_t *mp, int count, int rval);
 
-EXPORT_SYMBOL_NOVERS(miocack);
+EXPORT_SYMBOL(miocack);
 __SUN_EXTERN_INLINE void miocnak(queue_t *q, mblk_t *mp, int count, int error);
 
-EXPORT_SYMBOL_NOVERS(miocnak);
+EXPORT_SYMBOL(miocnak);
 __SUN_EXTERN_INLINE mblk_t *mexchange(queue_t *q, mblk_t *mp, size_t size, int type,
 				      uint32_t primtype);
-EXPORT_SYMBOL_NOVERS(mexchange);
+EXPORT_SYMBOL(mexchange);
 __SUN_EXTERN_INLINE mblk_t *mexpandb(mblk_t *mp, int i1, int i2);
 
-EXPORT_SYMBOL_NOVERS(mexpandb);
+EXPORT_SYMBOL(mexpandb);
 __SUN_EXTERN_INLINE int miocpullup(mblk_t *mp, size_t len);
 
-EXPORT_SYMBOL_NOVERS(miocpullup);
+EXPORT_SYMBOL(miocpullup);
 #if 0
 /* contained in the base package */
 __SUN_EXTERN_INLINE size_t msgsize(mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(msgsize);
+EXPORT_SYMBOL(msgsize);
 #endif
 __SUN_EXTERN_INLINE void mcopymsg(mblk_t *mp, unsigned char *buf);
 
-EXPORT_SYMBOL_NOVERS(mcopymsg);
+EXPORT_SYMBOL(mcopymsg);
 __SUN_EXTERN_INLINE void mcopyin(mblk_t *mp, void *priv, size_t size, void *uaddr);
 
-EXPORT_SYMBOL_NOVERS(mcopyin);
+EXPORT_SYMBOL(mcopyin);
 __SUN_EXTERN_INLINE void mcopyout(mblk_t *mp, void *priv, size_t size, void *uaddr, mblk_t *dp);
 
-EXPORT_SYMBOL_NOVERS(mcopyout);
+EXPORT_SYMBOL(mcopyout);
 
 /* 
  *  Configuration
@@ -598,20 +598,20 @@ EXPORT_SYMBOL_NOVERS(mcopyout);
 
 __SUN_EXTERN_INLINE int nodev(void);
 
-EXPORT_SYMBOL_NOVERS(nodev);		/* strconf.h */
+EXPORT_SYMBOL(nodev);		/* strconf.h */
 __SUN_EXTERN_INLINE int nulldev(void);
 
-EXPORT_SYMBOL_NOVERS(nulldev);		/* strconf.h */
+EXPORT_SYMBOL(nulldev);		/* strconf.h */
 __SUN_EXTERN_INLINE int nochpoll(void);
 
-EXPORT_SYMBOL_NOVERS(nochpoll);	/* strconf.h */
+EXPORT_SYMBOL(nochpoll);	/* strconf.h */
 __SUN_EXTERN_INLINE int ddi_prop_op(void);
 
-EXPORT_SYMBOL_NOVERS(ddi_prop_op);
+EXPORT_SYMBOL(ddi_prop_op);
 
 struct mod_ops mod_strmops = { MODREV_1, 0, };
 
-EXPORT_SYMBOL_NOVERS(mod_strmops);	/* strconf.h */
+EXPORT_SYMBOL(mod_strmops);	/* strconf.h */
 
 int
 mod_install(struct modlinkage *ml)
@@ -702,7 +702,7 @@ mod_install(struct modlinkage *ml)
 	return (ENOMEM);
 }
 
-EXPORT_SYMBOL_NOVERS(mod_install);	/* strconf.h */
+EXPORT_SYMBOL(mod_install);	/* strconf.h */
 
 int
 mod_remove(struct modlinkage *ml)
@@ -766,7 +766,7 @@ mod_remove(struct modlinkage *ml)
 	return (ENXIO);
 }
 
-EXPORT_SYMBOL_NOVERS(mod_remove);	/* strconf.h */
+EXPORT_SYMBOL(mod_remove);	/* strconf.h */
 
 int
 mod_info(struct modlinkage *ml, struct modinfo *mi)
@@ -774,7 +774,7 @@ mod_info(struct modlinkage *ml, struct modinfo *mi)
 	return (0);		/* never called */
 }
 
-EXPORT_SYMBOL_NOVERS(mod_info);	/* strconf.h */
+EXPORT_SYMBOL(mod_info);	/* strconf.h */
 
 #ifdef CONFIG_STREAMS_COMPAT_SUN_MODULE
 static

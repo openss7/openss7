@@ -331,6 +331,18 @@ AC_DEFUN([_ISO_OUTPUT], [dnl
 # _ISO_CONFIG
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISO_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    iso_cv_config="${pkg_bld}/src/include/sys/striso/config.h"
+    iso_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    iso_cv_ldadd= # "${pkg_bld}/libiso.la"
+    iso_cv_ldflags= # "${pkg_bld}/lib32/libiso.la"
+    iso_cv_ldadd32= # "-L${pkg_bld}/.libs/"
+    iso_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
+    iso_cv_manpath="${pkg_bld}/doc/man"
+    iso_cv_modmap="${pkg_bld}/Modules.map"
+    iso_cv_symver="${pkg_bld}/Module.symvers"
+    iso_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
 ])# _ISO_CONFIG
 # =============================================================================
 

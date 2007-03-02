@@ -338,7 +338,7 @@ adjmsg(mblk_t *mp, register ssize_t length)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(adjmsg);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(adjmsg);		/* include/sys/streams/stream.h */
 
 STATIC streamscall __hot_get void
 freeb_skb(caddr_t arg)
@@ -387,7 +387,7 @@ skballoc(struct sk_buff *skb, uint priority)
 	return (NULL);
 }
 
-EXPORT_SYMBOL_NOVERS(skballoc);
+EXPORT_SYMBOL_GPL(skballoc);
 
 /**
  *  esballoc:	- allocate a message block with an external buffer
@@ -429,7 +429,7 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 	return (NULL);
 }
 
-EXPORT_SYMBOL_NOVERS(esballoc);
+EXPORT_SYMBOL(esballoc);
 
 /**
  *  allocb_skb:	- allocate a message block with a socket buffer
@@ -543,7 +543,7 @@ allocb(size_t size, uint priority)
 	return ((*alloc_func) (size, priority & 0xff));
 }
 
-EXPORT_SYMBOL_NOVERS(allocb);
+EXPORT_SYMBOL(allocb);
 
 /**
  *  copyb:	- copy a message block
@@ -573,7 +573,7 @@ copyb(register mblk_t *mp)
 	return (b);
 }
 
-EXPORT_SYMBOL_NOVERS(copyb);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(copyb);		/* include/sys/streams/stream.h */
 
 /**
  *  copymsg:	- copy a message
@@ -583,7 +583,7 @@ EXPORT_SYMBOL_NOVERS(copyb);		/* include/sys/streams/stream.h */
  */
 __STRUTIL_EXTERN_INLINE mblk_t *copymsg(register mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(copymsg);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(copymsg);		/* include/sys/streams/stream.h */
 
 /**
  *  ctlmsg:	- test for control message type
@@ -598,7 +598,7 @@ ctlmsg(unsigned char type)
 	return (((1 << mod) & ((1 << M_DATA) | (1 << M_PROTO) | (1 << (M_PCPROTO & ~QPCTL)))) == 0);
 }
 
-EXPORT_SYMBOL_NOVERS(ctlmsg);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(ctlmsg);		/* include/sys/streams/stream.h */
 
 /**
  *  datamsg:	- test for data message type
@@ -615,7 +615,7 @@ datamsg(unsigned char type)
 		0);
 }
 
-EXPORT_SYMBOL_NOVERS(datamsg);
+EXPORT_SYMBOL(datamsg);
 
 /**
  *  dupb:	- duplicates a message block
@@ -654,7 +654,7 @@ dupb(mblk_t *bp)
 	return (NULL);
 }
 
-EXPORT_SYMBOL_NOVERS(dupb);
+EXPORT_SYMBOL(dupb);
 
 /**
  *  dupmsg:	- duplicate a message
@@ -665,7 +665,7 @@ EXPORT_SYMBOL_NOVERS(dupb);
  */
 __STRUTIL_EXTERN_INLINE mblk_t *dupmsg(mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(dupmsg);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(dupmsg);		/* include/sys/streams/stream.h */
 
 /**
  *  freeb:	- free a message block
@@ -722,7 +722,7 @@ freeb(mblk_t *mp)
 	return;
 }
 
-EXPORT_SYMBOL_NOVERS(freeb);
+EXPORT_SYMBOL(freeb);
 
 /**
  *  freemsg:	- free a message
@@ -730,7 +730,7 @@ EXPORT_SYMBOL_NOVERS(freeb);
  */
 __STRUTIL_EXTERN_INLINE void freemsg(mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(freemsg);
+EXPORT_SYMBOL(freemsg);
 
 /**
  *  isdatablk:	- test data block for data type
@@ -738,7 +738,7 @@ EXPORT_SYMBOL_NOVERS(freemsg);
  */
 __STRUTIL_EXTERN_INLINE int isdatablk(dblk_t *dp);
 
-EXPORT_SYMBOL_NOVERS(isdatablk);
+EXPORT_SYMBOL(isdatablk);
 
 /**
  *  isdatamsg:	- test a message block for data type
@@ -746,7 +746,7 @@ EXPORT_SYMBOL_NOVERS(isdatablk);
  */
 __STRUTIL_EXTERN_INLINE int isdatamsg(mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(isdatamsg);
+EXPORT_SYMBOL(isdatamsg);
 
 /**
  *  pcmsg:	- data block type for priority
@@ -754,7 +754,7 @@ EXPORT_SYMBOL_NOVERS(isdatamsg);
  */
 __STRUTIL_EXTERN_INLINE int pcmsg(unsigned char type);
 
-EXPORT_SYMBOL_NOVERS(pcmsg);
+EXPORT_SYMBOL(pcmsg);
 
 /**
  *  linkb:	- link message block onto message
@@ -763,7 +763,7 @@ EXPORT_SYMBOL_NOVERS(pcmsg);
  */
 __STRUTIL_EXTERN_INLINE void linkb(register mblk_t *mp1, register mblk_t *mp2);
 
-EXPORT_SYMBOL_NOVERS(linkb);
+EXPORT_SYMBOL(linkb);
 
 /**
  *  linkmsg:	- link messages
@@ -772,7 +772,7 @@ EXPORT_SYMBOL_NOVERS(linkb);
  */
 __STRUTIL_EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
 
-EXPORT_SYMBOL_NOVERS(linkmsg);
+EXPORT_SYMBOL_GPL(linkmsg);
 
 /**
  *  msgdsize:	- calculate size of data in message
@@ -780,7 +780,7 @@ EXPORT_SYMBOL_NOVERS(linkmsg);
  */
 __STRUTIL_EXTERN_INLINE size_t msgdsize(register mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(msgdsize);
+EXPORT_SYMBOL(msgdsize);
 
 /**
  *  msgpullup:	- pull up bytes into a message
@@ -852,7 +852,7 @@ msgpullup(mblk_t *mp, ssize_t length)
 	return (msg);
 }
 
-EXPORT_SYMBOL_NOVERS(msgpullup);
+EXPORT_SYMBOL(msgpullup);
 
 /**
  *  msgsize:	- calculate size of a message
@@ -860,7 +860,7 @@ EXPORT_SYMBOL_NOVERS(msgpullup);
  */
 __STRUTIL_EXTERN_INLINE size_t msgsize(mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(msgsize);
+EXPORT_SYMBOL(msgsize);
 
 /**
  *  pullupmsg:	- pull up bytes into first data block in message
@@ -977,7 +977,7 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(pullupmsg);
+EXPORT_SYMBOL(pullupmsg);
 
 /**
  *  rmvb:   - remove a message block from a message
@@ -986,7 +986,7 @@ EXPORT_SYMBOL_NOVERS(pullupmsg);
  */
 __STRUTIL_EXTERN_INLINE mblk_t *rmvb(register mblk_t *mp, register mblk_t *bp);
 
-EXPORT_SYMBOL_NOVERS(rmvb);
+EXPORT_SYMBOL(rmvb);
 
 /**
  *  testb:	- test allocate of a message block
@@ -1004,7 +1004,7 @@ testb(register size_t size, uint priority)
 	return (mp != NULL);
 }
 
-EXPORT_SYMBOL_NOVERS(testb);
+EXPORT_SYMBOL(testb);
 
 /**
  *  unlinkb:	- unlink first block of message
@@ -1012,11 +1012,11 @@ EXPORT_SYMBOL_NOVERS(testb);
  */
 __STRUTIL_EXTERN_INLINE mblk_t *unlinkb(register mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(unlinkb);
+EXPORT_SYMBOL(unlinkb);
 
 __STRUTIL_EXTERN_INLINE mblk_t *unlinkmsg(register mblk_t *mp, register mblk_t *bp);
 
-EXPORT_SYMBOL_NOVERS(unlinkmsg);
+EXPORT_SYMBOL_GPL(unlinkmsg);
 
 /**
  *  xmsgsize:	- calculate size in message of same type as first data block
@@ -1050,7 +1050,7 @@ xmsgsize(mblk_t *mp)
 	return (size);
 }
 
-EXPORT_SYMBOL_NOVERS(xmsgsize);
+EXPORT_SYMBOL(xmsgsize);
 
 /**
  *  backq:	- find the queue upstream from this one
@@ -1060,7 +1060,7 @@ EXPORT_SYMBOL_NOVERS(xmsgsize);
  */
 __STRUTIL_EXTERN_INLINE queue_t *backq(register queue_t *q);
 
-EXPORT_SYMBOL_NOVERS(backq);
+EXPORT_SYMBOL(backq);
 
 STATIC struct qband *__get_qband(queue_t *q, unsigned char band);
 
@@ -1121,7 +1121,7 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 	prunlock(sd);
 }
 
-EXPORT_SYMBOL_NOVERS(qbackenable);
+EXPORT_SYMBOL_GPL(qbackenable);
 
 /*
  *  bcangetany:		- check whether messages are in any (non-zero) band
@@ -1155,7 +1155,7 @@ bcangetany(queue_t *q)
 	return (found);
 }
 
-EXPORT_SYMBOL_NOVERS(bcangetany);
+EXPORT_SYMBOL_GPL(bcangetany);
 
 /**
  *  bcanget:	- check whether messages are on a queue
@@ -1199,7 +1199,7 @@ bcanget(queue_t *q, unsigned char band)
 	return (found);
 }
 
-EXPORT_SYMBOL_NOVERS(bcanget);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_GPL(bcanget);		/* include/sys/streams/stream.h */
 
 STATIC streams_inline streams_fastcall __hot int
 __bcanputany(queue_t *q)
@@ -1243,7 +1243,7 @@ bcanputany(queue_t *q)
 	return (result);
 }
 
-EXPORT_SYMBOL_NOVERS(bcanputany);	/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_GPL(bcanputany);	/* include/sys/streams/stream.h */
 
 /**
  *  bcanputnextany:	- check whether a mesage can be put to any (non-zero) band on the next queue
@@ -1277,7 +1277,7 @@ bcanputnextany(queue_t *q)
 	return (result);
 }
 
-EXPORT_SYMBOL_NOVERS(bcanputnextany);	/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_GPL(bcanputnextany);	/* include/sys/streams/stream.h */
 
 /*
  *  __find_qband:
@@ -1461,7 +1461,7 @@ bcanput(register queue_t *q, unsigned char band)
 	return (result);
 }
 
-EXPORT_SYMBOL_NOVERS(bcanput);
+EXPORT_SYMBOL(bcanput);
 
 /**
  *  bcanputnext: - check whether messages can be put to queue after this one
@@ -1516,7 +1516,7 @@ bcanputnext(register queue_t *q, unsigned char band)
 	return (result);
 }
 
-EXPORT_SYMBOL_NOVERS(bcanputnext);
+EXPORT_SYMBOL(bcanputnext);
 
 /**
  *  canenable:	- check whether service procedure will run
@@ -1524,7 +1524,7 @@ EXPORT_SYMBOL_NOVERS(bcanputnext);
  */
 __STRUTIL_EXTERN_INLINE int canenable(queue_t *q);
 
-EXPORT_SYMBOL_NOVERS(canenable);
+EXPORT_SYMBOL(canenable);
 
 /**
  *  canget:	- check whether normal band zero (0) messages are on queue
@@ -1536,7 +1536,7 @@ EXPORT_SYMBOL_NOVERS(canenable);
  */
 __STRUTIL_EXTERN_INLINE int canget(queue_t *q);
 
-EXPORT_SYMBOL_NOVERS(canget);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_GPL(canget);		/* include/sys/streams/stream.h */
 
 /**
  *  canput:		- check wheter message can be put to a queue
@@ -1550,7 +1550,7 @@ EXPORT_SYMBOL_NOVERS(canget);		/* include/sys/streams/stream.h */
  */
 __STRUTIL_EXTERN_INLINE int canput(queue_t *q);
 
-EXPORT_SYMBOL_NOVERS(canput);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(canput);		/* include/sys/streams/stream.h */
 
 /**
  *  canputnext:		- check whether messages can be put to the queue after this one
@@ -1564,7 +1564,7 @@ EXPORT_SYMBOL_NOVERS(canput);		/* include/sys/streams/stream.h */
  */
 __STRUTIL_EXTERN_INLINE int canputnext(register queue_t *q);
 
-EXPORT_SYMBOL_NOVERS(canputnext);
+EXPORT_SYMBOL(canputnext);
 
 /**
  *  freezestr:	- freeze a stream for direct queue access
@@ -1594,7 +1594,7 @@ freezestr(queue_t *q)
 	return (pl);
 }
 
-EXPORT_SYMBOL_NOVERS(freezestr);
+EXPORT_SYMBOL(freezestr);
 
 /**
  *  getadmin: - get the administrative function associated with a module identifier
@@ -1627,7 +1627,7 @@ getadmin(modID_t modid)
 	return (qadmin);
 }
 
-EXPORT_SYMBOL_NOVERS(getadmin);
+EXPORT_SYMBOL(getadmin);
 
 /**
  *  getmid: - get the module identifier associated with a module name
@@ -1663,7 +1663,7 @@ getmid(const char *name)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(getmid);
+EXPORT_SYMBOL(getmid);
 
 /**
  *  OTHERQ:	- find the other queue in a queue pair
@@ -1671,7 +1671,7 @@ EXPORT_SYMBOL_NOVERS(getmid);
  */
 __STRUTIL_EXTERN_INLINE queue_t *OTHERQ(queue_t *q);
 
-EXPORT_SYMBOL_NOVERS(OTHERQ);
+EXPORT_SYMBOL(OTHERQ);
 
 /**
  *  qready:	- test if queue procedures are scheduled
@@ -1684,7 +1684,7 @@ qready(void)
 	return (test_bit(qrunflag, &t->flags) != 0);
 }
 
-EXPORT_SYMBOL_NOVERS(qready);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_GPL(qready);		/* include/sys/streams/stream.h */
 
 /**
  *  setqsched:	- schedule execution of queue procedures
@@ -1698,7 +1698,7 @@ setqsched(void)
 		__raise_streams();
 }
 
-EXPORT_SYMBOL_NOVERS(setqsched);	/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_GPL(setqsched);	/* include/sys/streams/stream.h */
 
 /**
  *  qschedule:	- schedule a queue for service
@@ -1739,7 +1739,7 @@ qenable(register queue_t *q)
 		qschedule(q);
 }
 
-EXPORT_SYMBOL_NOVERS(qenable);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(qenable);		/* include/sys/streams/stream.h */
 
 /**
  *  enableq:	- enable a queue service procedure
@@ -1759,7 +1759,7 @@ enableq(queue_t *q)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(enableq);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(enableq);		/* include/sys/streams/stream.h */
 
 /**
  *  enableok:	- permit scheduling of a queue service procedure
@@ -1787,7 +1787,7 @@ enableok(queue_t *q)
 	zrunlock(sd, pl);
 }
 
-EXPORT_SYMBOL_NOVERS(enableok);	/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(enableok);	/* include/sys/streams/stream.h */
 
 /**
  *  noenable:	- defer scheduling of a queue service procedure
@@ -1814,7 +1814,7 @@ noenable(queue_t *q)
 	zrunlock(sd, pl);
 }
 
-EXPORT_SYMBOL_NOVERS(noenable);	/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(noenable);	/* include/sys/streams/stream.h */
 
 /*
  *  __putbq:
@@ -1936,7 +1936,7 @@ putbq(register queue_t *q, register mblk_t *mp)
 	return putbq_result(q, result);
 }
 
-EXPORT_SYMBOL_NOVERS(putbq);
+EXPORT_SYMBOL(putbq);
 
 /**
  *  putctl:	- put a control message to a queue
@@ -1957,7 +1957,7 @@ putctl(queue_t *q, int type)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(putctl);
+EXPORT_SYMBOL(putctl);
 
 /**
  *  putctl1:	- put a 1-byte control message to a queue
@@ -1981,7 +1981,7 @@ putctl1(queue_t *q, int type, int param)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(putctl1);
+EXPORT_SYMBOL(putctl1);
 
 /**
  *  putctl2:	- put a 2-byte control message to a queue
@@ -2008,7 +2008,7 @@ putctl2(queue_t *q, int type, int param1, int param2)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(putctl2);
+EXPORT_SYMBOL(putctl2);
 
 /**
  *  putnextctl:	- put a control message to the queue after this one
@@ -2030,7 +2030,7 @@ putnextctl(queue_t *q, int type)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(putnextctl);
+EXPORT_SYMBOL(putnextctl);
 
 /**
  *  putnextctl1: - put a 1-byte control message to the queue after this one
@@ -2055,7 +2055,7 @@ putnextctl1(queue_t *q, int type, int param)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(putnextctl1);
+EXPORT_SYMBOL(putnextctl1);
 
 /**
  *  putnextctl2: - put a 2-byte control message to the queue after this one
@@ -2083,7 +2083,7 @@ putnextctl2(queue_t *q, int type, int param1, int param2)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(putnextctl2);
+EXPORT_SYMBOL(putnextctl2);
 
 /*
  *  __putq_pri - put a priority message block to a queue
@@ -2281,7 +2281,7 @@ putq(register queue_t *q, register mblk_t *mp)
 	return putq_result(q, mp, result);
 }
 
-EXPORT_SYMBOL_NOVERS(putq);
+EXPORT_SYMBOL(putq);
 
 /*
  *  __insq:
@@ -2414,7 +2414,7 @@ insq(register queue_t *q, register mblk_t *emp, register mblk_t *nmp)
 	return insq_result(q, result);
 }
 
-EXPORT_SYMBOL_NOVERS(insq);
+EXPORT_SYMBOL(insq);
 
 /**
  *  appq:	- append a message onto a queue
@@ -2449,7 +2449,7 @@ appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	return insq_result(q, result);
 }
 
-EXPORT_SYMBOL_NOVERS(appq);
+EXPORT_SYMBOL_GPL(appq);
 
 STATIC int __setsq(queue_t *q, struct fmodsw *fmod);
 STATIC void __setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
@@ -2559,7 +2559,7 @@ qattach(struct stdata *sd, struct fmodsw *fmod, dev_t *devp, int oflag, int sfla
 	return (err);
 }
 
-EXPORT_SYMBOL_NOVERS(qattach);
+EXPORT_SYMBOL(qattach);
 
 /**
  *  qdelete:	- delete a queue pair from a stream
@@ -2603,7 +2603,7 @@ qdelete(queue_t *q)
 	_ctrace(qput(&q));	/* cancel initial allocation reference */
 }
 
-EXPORT_SYMBOL_NOVERS(qdelete);
+EXPORT_SYMBOL(qdelete);
 
 /**
  *  qdetach:	- detach a queue pair from a stream
@@ -2646,7 +2646,7 @@ qdetach(queue_t *q, int flags, cred_t *crp)
 	return (err);
 }
 
-EXPORT_SYMBOL_NOVERS(qdetach);
+EXPORT_SYMBOL(qdetach);
 
 /**
  *  qinsert:	- insert a queue pair below another in a stream
@@ -2691,7 +2691,7 @@ qinsert(struct stdata *sd, queue_t *irq)
 	prunlock(sd);
 }
 
-EXPORT_SYMBOL_NOVERS(qinsert);
+EXPORT_SYMBOL(qinsert);
 
 /**
  *  qprocsoff:	- turn off qi_putp and qi_srvp procedures for a queue pair
@@ -2781,7 +2781,7 @@ qprocsoff(queue_t *q)
 	}
 }
 
-EXPORT_SYMBOL_NOVERS(qprocsoff);
+EXPORT_SYMBOL(qprocsoff);
 
 /**
  *  qprocson:	- trun on qi_putp and qi_srvp procedure for a queeu pair
@@ -2849,7 +2849,7 @@ qprocson(queue_t *q)
 	}
 }
 
-EXPORT_SYMBOL_NOVERS(qprocson);
+EXPORT_SYMBOL(qprocson);
 
 /**
  *  qreply:	- reply with a message
@@ -2858,7 +2858,7 @@ EXPORT_SYMBOL_NOVERS(qprocson);
  */
 __STRUTIL_EXTERN_INLINE void qreply(register queue_t *q, mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(qreply);
+EXPORT_SYMBOL(qreply);
 
 /**
  *  qsize:	- calculate number of messages on a queue
@@ -2866,7 +2866,7 @@ EXPORT_SYMBOL_NOVERS(qreply);
  */
 __STRUTIL_EXTERN_INLINE ssize_t qsize(register queue_t *q);
 
-EXPORT_SYMBOL_NOVERS(qsize);
+EXPORT_SYMBOL(qsize);
 
 /**
  *  qcountstrm:	- count the numer of messages along a stream
@@ -2901,7 +2901,7 @@ qcountstrm(queue_t *q)
 	return (count);
 }
 
-EXPORT_SYMBOL_NOVERS(qcountstrm);
+EXPORT_SYMBOL(qcountstrm);
 
 /**
  *  RD:		- find read queue from write queu
@@ -2909,7 +2909,7 @@ EXPORT_SYMBOL_NOVERS(qcountstrm);
  */
 __STRUTIL_EXTERN_INLINE queue_t *RD(queue_t *q);
 
-EXPORT_SYMBOL_NOVERS(RD);
+EXPORT_SYMBOL(RD);
 
 /*
  *  __rmvq_band	- remove a banded message from a queue
@@ -3086,7 +3086,7 @@ rmvq(register queue_t *q, register mblk_t *mp)
 	qbackenable(q, mp->b_band, NULL);
 }
 
-EXPORT_SYMBOL_NOVERS(rmvq);
+EXPORT_SYMBOL(rmvq);
 
 /*
  *  __flushband: - flush messages from a queue band
@@ -3243,7 +3243,7 @@ flushband(register queue_t *q, int band, int flag)
 		freechain(mp, mpp);
 }
 
-EXPORT_SYMBOL_NOVERS(flushband);
+EXPORT_SYMBOL(flushband);
 
 /*
  *  __flushq:	- flush messages from a queue
@@ -3366,7 +3366,7 @@ flushq(register queue_t *q, int flag)
 		freechain(mp, mpp);
 }
 
-EXPORT_SYMBOL_NOVERS(flushq);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(flushq);		/* include/sys/streams/stream.h */
 
 /*
  *  __getq:	- get next message off a queue
@@ -3485,7 +3485,7 @@ getq(register queue_t *q)
 	return (mp);
 }
 
-EXPORT_SYMBOL_NOVERS(getq);
+EXPORT_SYMBOL(getq);
 
 /**
  *  SAMESTR:	- check whether this and next queue have the same stream head
@@ -3498,7 +3498,7 @@ EXPORT_SYMBOL_NOVERS(getq);
  */
 __STRUTIL_EXTERN_INLINE int SAMESTR(queue_t *q);
 
-EXPORT_SYMBOL_NOVERS(SAMESTR);
+EXPORT_SYMBOL(SAMESTR);
 
 /*
  *  __setq:
@@ -3557,7 +3557,7 @@ setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 	zwunlock(sd, pl);
 }
 
-EXPORT_SYMBOL_NOVERS(setq);
+EXPORT_SYMBOL(setq);
 
 #if defined CONFIG_STREAMS_SYNCQS
 struct syncq *global_syncq = NULL;
@@ -3730,7 +3730,7 @@ setsq(queue_t *q, struct fmodsw *fmod)
 	return (result);
 }
 
-EXPORT_SYMBOL_NOVERS(setsq);		/* for stream head include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_GPL(setsq);		/* for stream head include/sys/streams/strsubr.h */
 
 /**
  *  strqget:	- get characteristics of a queue
@@ -3823,7 +3823,7 @@ strqget(register queue_t *q, qfields_t what, register unsigned char band, long *
 	return (-err);
 }
 
-EXPORT_SYMBOL_NOVERS(strqget);
+EXPORT_SYMBOL(strqget);
 
 /**
  *  strqset:	- set characteristics of a queue
@@ -3908,7 +3908,7 @@ strqset(register queue_t *q, qfields_t what, register unsigned char band, long v
 	return (-err);
 }
 
-EXPORT_SYMBOL_NOVERS(strqset);
+EXPORT_SYMBOL(strqset);
 
 STATIC spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
 STATIC char str_err_buf[LOGMSGSZ];
@@ -3985,7 +3985,7 @@ register_strlog(vstrlog_t newlog)
 	return (oldlog);
 }
 
-EXPORT_SYMBOL_NOVERS(register_strlog);
+EXPORT_SYMBOL_GPL(register_strlog);
 
 /**
  *  vstrlog:	- log a STREAMS message
@@ -4009,7 +4009,7 @@ vstrlog(short mid, short sid, char level, unsigned short flag, char *fmt, va_lis
 	return (result);
 }
 
-EXPORT_SYMBOL_NOVERS(vstrlog);
+EXPORT_SYMBOL_GPL(vstrlog);
 
 /**
  *  strlog:	- log a STREAMS message
@@ -4043,7 +4043,7 @@ strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 	return (result);
 }
 
-EXPORT_SYMBOL_NOVERS(strlog);
+EXPORT_SYMBOL(strlog);
 
 /**
  *  unfreezestr:	- thaw a stream frozen with freezestr()
@@ -4063,7 +4063,7 @@ unfreezestr(queue_t *q, unsigned long flags)
 	zwunlock(sd, flags);
 }
 
-EXPORT_SYMBOL_NOVERS(unfreezestr);
+EXPORT_SYMBOL(unfreezestr);
 
 /**
  *  WR:		- get write queue in queue pair
@@ -4071,7 +4071,7 @@ EXPORT_SYMBOL_NOVERS(unfreezestr);
  */
 __STRUTIL_EXTERN_INLINE queue_t *WR(queue_t *q);
 
-EXPORT_SYMBOL_NOVERS(WR);
+EXPORT_SYMBOL(WR);
 
 /*
  *  vcmn_err:
@@ -4114,7 +4114,7 @@ vcmn_err(int err_lvl, const char *fmt, va_list args)
 	return;
 }
 
-EXPORT_SYMBOL_NOVERS(vcmn_err);
+EXPORT_SYMBOL_GPL(vcmn_err);
 
 /**
  *  cmn_err:	- print a command error
@@ -4133,19 +4133,19 @@ cmn_err(int err_lvl, const char *fmt, ...)
 	return;
 }
 
-EXPORT_SYMBOL_NOVERS(cmn_err);
+EXPORT_SYMBOL(cmn_err);
 
 __STRUTIL_EXTERN_INLINE int copyin(const void *from, void *to, size_t len);
 
-EXPORT_SYMBOL_NOVERS(copyin);
+EXPORT_SYMBOL(copyin);
 
 __STRUTIL_EXTERN_INLINE int copyout(const void *from, void *to, size_t len);
 
-EXPORT_SYMBOL_NOVERS(copyout);
+EXPORT_SYMBOL(copyout);
 
 __STRUTIL_EXTERN_INLINE void delay(unsigned long ticks);
 
-EXPORT_SYMBOL_NOVERS(delay);
+EXPORT_SYMBOL(delay);
 
 streams_fastcall int
 drv_getparm(const unsigned int parm, void *value_p)
@@ -4206,40 +4206,40 @@ drv_getparm(const unsigned int parm, void *value_p)
 	return (-1);
 }
 
-EXPORT_SYMBOL_NOVERS(drv_getparm);
+EXPORT_SYMBOL(drv_getparm);
 
 __STRUTIL_EXTERN_INLINE unsigned long drv_hztomsec(unsigned long hz);
 
-EXPORT_SYMBOL_NOVERS(drv_hztomsec);
+EXPORT_SYMBOL(drv_hztomsec);
 
 __STRUTIL_EXTERN_INLINE unsigned long drv_hztousec(unsigned long hz);
 
-EXPORT_SYMBOL_NOVERS(drv_hztousec);
+EXPORT_SYMBOL(drv_hztousec);
 
 __STRUTIL_EXTERN_INLINE unsigned long drv_msectohz(unsigned long msec);
 
-EXPORT_SYMBOL_NOVERS(drv_msectohz);
+EXPORT_SYMBOL(drv_msectohz);
 
 __STRUTIL_EXTERN_INLINE int drv_priv(cred_t *crp);
 
-EXPORT_SYMBOL_NOVERS(drv_priv);
+EXPORT_SYMBOL(drv_priv);
 
 __STRUTIL_EXTERN_INLINE unsigned long drv_usectohz(unsigned long usec);
 
-EXPORT_SYMBOL_NOVERS(drv_usectohz);
+EXPORT_SYMBOL(drv_usectohz);
 
 __STRUTIL_EXTERN_INLINE void drv_usecwait(unsigned long usec);
 
-EXPORT_SYMBOL_NOVERS(drv_usecwait);
+EXPORT_SYMBOL(drv_usecwait);
 
 __STRUTIL_EXTERN_INLINE major_t getmajor(dev_t dev);
 
-EXPORT_SYMBOL_NOVERS(getmajor);
+EXPORT_SYMBOL(getmajor);
 
 __STRUTIL_EXTERN_INLINE minor_t getminor(dev_t dev);
 
-EXPORT_SYMBOL_NOVERS(getminor);
+EXPORT_SYMBOL(getminor);
 
 __STRUTIL_EXTERN_INLINE dev_t makedevice(major_t major, minor_t minor);
 
-EXPORT_SYMBOL_NOVERS(makedevice);
+EXPORT_SYMBOL(makedevice);

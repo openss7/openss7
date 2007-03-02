@@ -1113,6 +1113,18 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
 	    with the SCTP module.])dnl
     fi
     AC_MSG_RESULT([$sctp_cv_error_generator])
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    sctp_cv_config="${pkg_bld}/src/include/sys/strsctp/config.h"
+    sctp_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    sctp_cv_ldadd= # "${pkg_bld}/libsctp.la"
+    sctp_cv_ldflags= # "-L${pkg_bld}/.libs/"
+    sctp_cv_ldadd32= # "${pkg_bld}/lib32/libsctp.la"
+    sctp_cv_ldflags32= # "-L${pkg_bld}/lib32/.libs/"
+    sctp_cv_manpath="${pkg_bld}/doc/man"
+    sctp_cv_modmap="${pkg_bld}/Modules.map"
+    sctp_cv_symver="${pkg_bld}/Module.symvers"
+    sctp_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
 ])# _SCTP_CONFIG
 # =============================================================================
 

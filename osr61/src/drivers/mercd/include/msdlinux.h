@@ -42,8 +42,10 @@
  * UNIX includes
  */
 #ifndef __VMODULE__
+#ifndef LFS
 #define __NO_VERSION__
 //#include <linux/module.h>
+#endif
 #endif /* __VMODULE__ */
 
 #include "msdnative.h"

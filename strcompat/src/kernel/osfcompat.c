@@ -102,16 +102,16 @@ MODULE_ALIAS("streams-osfcompat");
 
 __OSF_EXTERN_INLINE void puthere(queue_t *q, mblk_t *mp);
 
-EXPORT_SYMBOL_NOVERS(puthere);
+EXPORT_SYMBOL(puthere);
 __OSF_EXTERN_INLINE time_t lbolt(void);
 
-EXPORT_SYMBOL_NOVERS(lbolt);
+EXPORT_SYMBOL(lbolt);
 __OSF_EXTERN_INLINE time_t time(void);
 
-EXPORT_SYMBOL_NOVERS(time);
+EXPORT_SYMBOL(time);
 __OSF_EXTERN_INLINE void DELAY(time_t);
 
-EXPORT_SYMBOL_NOVERS(DELAY);
+EXPORT_SYMBOL(DELAY);
 
 struct str_comm {
 	struct str_comm **prev;		/* must be first */
@@ -204,7 +204,7 @@ streams_open_comm(unsigned int size, queue_t *q, dev_t *devp, int oflag, int sfl
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(streams_open_comm);
+EXPORT_SYMBOL(streams_open_comm);
 
 /* 
  *  STREAMS_OPEN_OCOMM
@@ -224,7 +224,7 @@ streams_open_ocomm(dev_t dev, unsigned int size, queue_t *q, dev_t *devp, int of
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(streams_open_ocomm);
+EXPORT_SYMBOL(streams_open_ocomm);
 
 /* 
  *  STREAMS_CLOSE_COMM
@@ -253,7 +253,7 @@ streams_close_comm(queue_t *q, int oflag, cred_t *crp)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(streams_close_comm);
+EXPORT_SYMBOL(streams_close_comm);
 
 #ifndef NODEV
 #define NODEV (makedevice(0, 0))
@@ -394,7 +394,7 @@ strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 #endif
 }
 
-EXPORT_SYMBOL_NOVERS(strmod_add);
+EXPORT_SYMBOL(strmod_add);
 
 /*
  *  STRMOD_DEL
@@ -443,7 +443,7 @@ strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa)
 #endif
 }
 
-EXPORT_SYMBOL_NOVERS(strmod_del);
+EXPORT_SYMBOL(strmod_del);
 
 int uprintf(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 int
@@ -460,7 +460,7 @@ uprintf(const char *fmt, ...)
 	return (n);
 }
 
-EXPORT_SYMBOL_NOVERS(uprintf);
+EXPORT_SYMBOL(uprintf);
 
 #ifdef CONFIG_STREAMS_COMPAT_OSF_MODULE
 static

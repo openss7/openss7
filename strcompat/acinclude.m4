@@ -106,12 +106,12 @@ AC_DEFUN([AC_COMPAT], [dnl
     _COMPAT_SETUP
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/${STRCONF_CONFIG}'
-    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
     if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
 	PKG_MODFLAGS='$(STREAMS_MODFLAGS) -include $(top_builddir)/$(MODVERSIONS_H)'
 	PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/include'
     fi
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/src/include -I${top_srcdir}/src/include'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
 dnl Just check config.log if you want to see these...
 dnl AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
 dnl AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
@@ -1027,8 +1027,28 @@ AC_DEFUN([_COMPAT_CONFIG_LFS], [dnl
 # _COMPAT_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_COMPAT_OUTPUT], [dnl
+    _COMPAT_CONFIG
     _COMPAT_STRCONF
 ])# _COMPAT_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _COMPAT_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_COMPAT_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    strcomp_cv_config="${pkg_bld}/src/include/sys/strcompat/config.h"
+    strcomp_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    strcomp_cv_ldadd= # "${pkg_bld}/libcompat.la"
+    strcomp_cv_ldflags= # "${pkg_bld}/lib32/libcompat.la"
+    strcomp_cv_ldadd32= # "-L${pkg_bld}/.libs/"
+    strcomp_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
+    strcomp_cv_manpath="${pkg_bld}/doc/man"
+    strcomp_cv_modmap="${pkg_bld}/Modules.map"
+    strcomp_cv_symver="${pkg_bld}/Module.symvers"
+    strcomp_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+])# _COMPAT_CONFIG
 # =============================================================================
 
 # =============================================================================

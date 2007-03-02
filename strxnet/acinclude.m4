@@ -182,8 +182,28 @@ AC_DEFUN([_XNET_SETUP], [dnl
 # _XNET_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNET_OUTPUT], [dnl
+    _XNET_CONFIG
     _XNET_STRCONF dnl
 ])# _XNET_OUTPUT
+# =============================================================================
+
+# =============================================================================
+# _XNET_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XNET_CONFIG], [dnl
+    pkg_src=`(cd $srcdir ; /bin/pwd)`
+    pkg_bld=`(cd . ; /bin/pwd)`
+    xti_cv_config="${pkg_bld}/src/include/sys/strxnet/config.h"
+    xti_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    xti_cv_ldadd="${pkg_bld}/libxnet.la"
+    xti_cv_ldflags="-L${pkg_bld}/.libs/"
+    xti_cv_ldadd32="${pkg_bld}/lib32/libxnet.la"
+    xti_cv_ldflags32="-L${pkg_bld}/lib32/.libs/"
+    xti_cv_manpath="${pkg_bld}/doc/man"
+    xti_cv_modmap="${pkg_bld}/Modules.map"
+    xti_cv_symver="${pkg_bld}/Module.symvers"
+    xti_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+])# _XNET_CONFIG
 # =============================================================================
 
 # =============================================================================

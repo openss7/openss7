@@ -3747,7 +3747,7 @@ strunlink(struct stdata *stp)
 #if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \
  || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE \
  || defined CONFIG_STREAMS_SOCK_MODULE || !defined CONFIG_STREAMS_SOCK
-EXPORT_SYMBOL_NOVERS(strwsrv);
+EXPORT_SYMBOL(strwsrv);
 #endif
 
 #if !defined HAVE_KILL_SL_EXPORT
@@ -4070,7 +4070,7 @@ strpoll(struct file *file, struct poll_table_struct *poll)
 	return strpoll_slow(file, poll);
 }
 
-EXPORT_SYMBOL_NOVERS(strpoll);
+EXPORT_SYMBOL(strpoll);
 
 STATIC __hot_in unsigned int
 _strpoll(struct file *file, struct poll_table_struct *poll)
@@ -4958,7 +4958,7 @@ strread(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 	return strread_slow(file, buf, nbytes, ppos);
 }
 
-EXPORT_SYMBOL_NOVERS(strread);
+EXPORT_SYMBOL(strread);
 
 #if !defined HAVE_UNLOCKED_IOCTL
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
@@ -5224,7 +5224,7 @@ strwrite(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 	return strwrite_slow(file, buf, nbytes, ppos);
 }
 
-EXPORT_SYMBOL_NOVERS(strwrite);
+EXPORT_SYMBOL(strwrite);
 
 #if !defined HAVE_UNLOCKED_IOCTL
 #if !defined HAVE_PUTPMSG_GETPMSG_SYS_CALLS || defined LFS_GETMSG_PUTMSG_ULEN
@@ -5461,7 +5461,7 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 	return (-ESPIPE);
 }
 
-EXPORT_SYMBOL_NOVERS(strsendpage);
+EXPORT_SYMBOL(strsendpage);
 
 STATIC __unlikely ssize_t
 _strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_t *ppos, int more)
@@ -5632,7 +5632,7 @@ strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 	return strputpmsg_slow(file, ctlp, datp, band, flags);
 }
 
-EXPORT_SYMBOL_NOVERS(strputpmsg);
+EXPORT_SYMBOL(strputpmsg);
 
 STATIC streams_fastcall __hot_put int
 _strputpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp, int band,
@@ -6022,7 +6022,7 @@ strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *
 	return strgetpmsg_slow(file, ctlp, datp, bandp, flagsp);
 }
 
-EXPORT_SYMBOL_NOVERS(strgetpmsg);
+EXPORT_SYMBOL(strgetpmsg);
 
 STATIC streams_fastcall __hot_get int
 _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user *datp,
@@ -9904,7 +9904,7 @@ strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	return strioctl_slow(file, cmd, arg);
 }
 
-EXPORT_SYMBOL_NOVERS(strioctl);
+EXPORT_SYMBOL(strioctl);
 
 streams_noinline __hot long
 _strioctl(struct file *file, unsigned int cmd, unsigned long arg)
@@ -10358,7 +10358,7 @@ struct file_operations strm_f_ops ____cacheline_aligned = {
 #endif
 };
 
-EXPORT_SYMBOL_NOVERS(strm_f_ops);
+EXPORT_SYMBOL(strm_f_ops);
 
 /**
  *  strwput: - stream head write queue put procedure
@@ -10422,7 +10422,7 @@ strwput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(strwput);
+EXPORT_SYMBOL(strwput);
 
 /**
  *  strwsrv: - STREAM head write queue service procedure
@@ -11048,7 +11048,7 @@ strrput(queue_t *q, mblk_t *mp)
 #if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \
  || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE \
  || defined CONFIG_STREAMS_SOCK_MODULE || !defined CONFIG_STREAMS_SOCK
-EXPORT_SYMBOL_NOVERS(strrput);
+EXPORT_SYMBOL(strrput);
 #endif
 
 /* 
@@ -11134,7 +11134,7 @@ str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	return (err > 0 ? -err : err);
 }
 
-EXPORT_SYMBOL_NOVERS(str_open);
+EXPORT_SYMBOL(str_open);
 
 /**
  *  str_close: - STREAMS qclose procedure for stream heads
@@ -11154,7 +11154,7 @@ str_close(queue_t *q, int oflag, cred_t *crp)
 	return (0);
 }
 
-EXPORT_SYMBOL_NOVERS(str_close);
+EXPORT_SYMBOL(str_close);
 
 /* 
  *  -------------------------------------------------------------------------

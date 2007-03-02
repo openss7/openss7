@@ -456,7 +456,7 @@ do_spipe(int *fds)
 #endif
 
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
-EXPORT_SYMBOL_NOVERS(do_spipe);
+EXPORT_SYMBOL_GPL(do_spipe);
 #endif
 
 #endif				/* defined HAVE_KERNEL_PIPE_SUPPORT */
