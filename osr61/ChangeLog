@@ -1,5 +1,8 @@
 2007-03-02  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/ctimod/ctimod.c: change exports to GPL
+	* src/drivers/dlgn/source/dlgn.c: change exports to GPL
+
 	* acinclude.m4: improvements to common build environment
 	* doc/man/Makefile.am: added manula pages
 	* doc/man/man4/dlgn.4.man: updated with *Driver name

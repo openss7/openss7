@@ -4248,7 +4248,38 @@ int rc;
    return (0);
 }
 
-#if defined LINUX26 || defined LFS
+#ifdef LFS
+EXPORT_SYMBOL_GPL(dlgn_msg);
+EXPORT_SYMBOL_GPL(dlgn_copymp);
+EXPORT_SYMBOL_GPL(dlgn_getpeak);
+EXPORT_SYMBOL_GPL(intmod_lock);
+EXPORT_SYMBOL_GPL(dlgn_wqreply);
+EXPORT_SYMBOL_GPL(Gn_Endp);
+EXPORT_SYMBOL_GPL(Gn_Boardp);
+EXPORT_SYMBOL_GPL(pmswtbl);
+EXPORT_SYMBOL_GPL(cf_ioccopy);
+EXPORT_SYMBOL_GPL(cf_cmpstr);
+EXPORT_SYMBOL_GPL(Gn_Numpms);
+EXPORT_SYMBOL_GPL(cf_iocput);
+EXPORT_SYMBOL_GPL(Gn_Freep);
+EXPORT_SYMBOL_GPL(Gn_Logdevp);
+EXPORT_SYMBOL_GPL(Gn_Headerp);
+EXPORT_SYMBOL_GPL(Gn_Maxpm);
+EXPORT_SYMBOL_GPL(Gn_Memsz);
+EXPORT_SYMBOL_GPL(dlgn_drvstop);
+EXPORT_SYMBOL_GPL(Gn_Msglvl);
+EXPORT_SYMBOL_GPL(dlgn_drvstart);
+EXPORT_SYMBOL_GPL(NumOfVoiceBoards);
+EXPORT_SYMBOL_GPL(index);
+EXPORT_SYMBOL_GPL(dl_setintr);
+EXPORT_SYMBOL_GPL(GpControlBlock);
+EXPORT_SYMBOL_GPL(st_sctlock);
+EXPORT_SYMBOL_GPL(st_freelock);
+EXPORT_SYMBOL_GPL(st_uselock);
+EXPORT_SYMBOL_GPL(StatisticsMonitoring);
+EXPORT_SYMBOL_GPL(DriverStats);
+#else				/* LFS */
+#ifdef LINUX26
 EXPORT_SYMBOL(dlgn_msg);
 EXPORT_SYMBOL(dlgn_copymp);
 EXPORT_SYMBOL(dlgn_getpeak);
@@ -4279,3 +4310,4 @@ EXPORT_SYMBOL(st_uselock);
 EXPORT_SYMBOL(StatisticsMonitoring);
 EXPORT_SYMBOL(DriverStats);
 #endif
+#endif				/* LFS */
