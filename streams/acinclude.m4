@@ -1,12 +1,13 @@
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin fo+=tcqlor
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2007/02/28 06:30:47 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2007/03/02 09:23:19 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -47,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 06:30:47 $ by $Author: brian $
+# Last Modified $Date: 2007/03/02 09:23:19 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.134  2007/03/02 09:23:19  brian
+# - build updates and esballoc() feature
+#
 # Revision 0.9.2.133  2007/02/28 06:30:47  brian
 # - updates and corrections, #ifdef instead of #if
 #
@@ -1106,6 +1110,12 @@ dnl using i_pipe when an external inode is being reused for character device
 dnl based FIFOS.  2.6.18 does not export tasklist_lock
 dnl
     _LINUX_KERNEL_SYMBOLS([cd_forget, tasklist_lock])
+dnl
+dnl When the module_text_address() symbol is available, we can pull some
+dnl sneaky tricks in the esballoc() and freeb() functions to do proper module
+dnl reference counting for the free routine callback function.
+dnl
+    _LINUX_KERNEL_SYMBOLS([module_text_address])
     _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
 			process_group cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \
@@ -1690,9 +1700,10 @@ AC_DEFUN([_LFS_], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin fo+=tcqlor
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn

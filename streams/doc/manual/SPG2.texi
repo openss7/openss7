@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG2.texi,v 0.9.2.13 2007/02/28 06:30:54 brian Exp $
+% @(#) $Id: SPG2.texi,v 0.9.2.14 2007/03/02 09:23:23 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2007  OpenSS7 Corporation <www.openss7.com>
 % Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/02/28 06:30:54 $ by $Author: brian $
+% Last Modified $Date: 2007/03/02 09:23:23 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -82,7 +82,7 @@ This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2005  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -128,7 +128,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2005  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2001-2007  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -215,6 +215,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Reference::
 * Conformance::
 * Portability::
+* Development::
 * Data Structures::
 * Message Types::
 * Utilities::
@@ -329,20 +330,17 @@ Terminal Subsystem
 Synchronization
 
 * MT Configuration::		MP STREAMS MT Configuration
-* Asynchronous Entry Points::	MP STREAMS Asynchronous Entry Points
-* Asynchronous Callbacks::	MP STREAMS Asynchronous Callbacks
 * Synchronous Entry Points::	MP STREAMS Synchronous Entry Points
 * Synchronous Callbacks::	MP STREAMS Synchronous Callbacks
+* Synchronous Callouts::	MP STREAMS Synchronous Callouts
+* Asynchronous Entry Points::	MP STREAMS Asynchronous Entry Points
+* Asynchronous Callbacks::	MP STREAMS Asynchronous Callbacks
+* Asynchronous Callouts::	MP STREAMS Asynchronous Callouts
 
 * STREAMS Framework Integrity::
 * MP Message Ordering::
 * MP-UNSAFE Modules::
-* MP Put and Service Procedures::
-* MP Timeout and Buffer Callbacks::
-* MP Open and Close Procedures::
-* MP Module Unloading::
-* MP Locking::
-* MP Asynchronous Callbacks::
+* MP-SAFE Modules::
 * Stream Integrity::
 
 Reference
@@ -385,6 +383,22 @@ Portability
 * SUX Portability::		Porting from Super/UX
 * UXP Portability::		Porting from UXP/V
 * LiS Portability::		Porting from LiS 2.18.4
+
+Development
+
+* Memory Allocation::
+* Alignment of Message Buffers::
+* Disabling and Enabling Queue Procedures::
+* Freezing and Unfreezing Streams::
+* Passing Messages from Interrupt Service Routines::
+* Timeout Call Back and Link Identifiers::
+* Synchronization with Timeouts and Callback Functions::
+* Synchronization with Callout Functions::
+* Synchronization of Drivers and Modules::
+* Special STREAMS Message Types::
+* Use of Message Allocation Priorities::
+* Device Numbering::
+* Registration and Deregistration::
 
 Data Structures
 
@@ -538,6 +552,9 @@ package.
 @smallexample
 
 $Log: SPG2.texi,v $
+Revision 0.9.2.14  2007/03/02 09:23:23  brian
+- build updates and esballoc() feature
+
 Revision 0.9.2.13  2007/02/28 06:30:54  brian
 - updates and corrections, #ifdef instead of #if
 
@@ -686,6 +703,7 @@ This document is organized as follows:
 * Reference::
 * Conformance::
 * Portability::
+* Development::
 * Data Structures::
 * Message Types::
 * Utilities::
@@ -757,6 +775,8 @@ Conformance of the @cite{@value{PACKAGE_TITLE}} package to other @cite{UNIX} imp
 Portability of @dfn{STREAMS} modules and drivers written for other @cite{UNIX} implementations of
 @dfn{STREAMS} and how they can most easily be ported into @cite{@value{PACKAGE_TITLE}}; but, for
 more details on this topic, see the @cite{@value{PACKAGE_TITLE} - @dfn{STREAMS} Portability Guide}.
+@item @ref{Development}
+Development guidelines for developing portable @dfn{STREAMS} modules and drivers.
 @item @ref{Data Structures}
 Primary @dfn{STREAMS} Data Structures, descriptions of their members, flags, constants and use.
 Summarizes data structures commonly used by @dfn{STREAMS} modules and drivers.
@@ -5214,67 +5234,579 @@ Including @header{sys/stream.h} also exposes the following constants for use wit
 @chapter Synchronization
 @menu
 * MT Configuration::		MP STREAMS MT Configuration
-* Asynchronous Entry Points::	MP STREAMS Asynchronous Entry Points
-* Asynchronous Callbacks::	MP STREAMS Asynchronous Callbacks
 * Synchronous Entry Points::	MP STREAMS Synchronous Entry Points
 * Synchronous Callbacks::	MP STREAMS Synchronous Callbacks
+* Synchronous Callouts::	MP STREAMS Synchronous Callouts
+* Asynchronous Entry Points::	MP STREAMS Asynchronous Entry Points
+* Asynchronous Callbacks::	MP STREAMS Asynchronous Callbacks
+* Asynchronous Callouts::	MP STREAMS Asynchronous Callouts
+
 * STREAMS Framework Integrity::
 * MP Message Ordering::
 * MP-UNSAFE Modules::
+* MP-SAFE Modules::
+* Stream Integrity::
+@end menu
+
+This chapter describes how to multi-thread a @dfn{STREAMS} driver or module.  It covers the
+necessary conversion topics so that new and existing @dfn{STREAMS} modules and drivers will run in
+a symmetrical multi-processor kernel.  This chapter covers primarily @dfn{STREAMS} specific
+multiprocessor issues and techniques.
+
+@cite{Linux} is a fully @dfn{SMP} capable operating system able to make effective use of the
+available parallelism of the symmetric shared-memory multiprocessor computer.  All kernel subsystems
+are multiprocessor safe: scheduler, virtual memory, file systems, block, character, STREAMS input
+and output, networking protocols and device drivers.
+
+@dfn{STREAMS} in an @dfn{MP} environment introduces some new concepts and terminology as follows:
+
+@table @dfn
+
+@item Thread
+sequence of instructions executed within the context of a process
+
+@item Lock
+mechanism for restricting access to data structures
+
+@item Single Threaded
+restricting access to a single thread
+
+@item Multi-Threaded
+allowing two or more threads access
+
+@item Multiprocessing
+two or more CPUs concurrently executing the operating system
+
+@end table
+
+The @b{Linux} 2.6 kernel is multi-threaded to make effective use of symmetric shared-memory
+multiprocessor computers.  All parts of the kernel, including @dfn{STREAMS} modules and drivers,
+must ensure data integrity in a multiprocessing environment.  For the most part, developers must
+ensure that concurrently running kernel threads do not attempt to manipulate the same data at the
+same time.  The @dfn{STREAMS} framework provides multiprocessing @dfn{Syncrhonization Levels},
+which allows the developer control over the level of concurrency allowed in a module.  The @cite{SVR
+4.2 MP DDI/DKI}
+@cindex DDI/DKI
+@cindex SVR 4.2 MP DDI/DKI
+also provides locking mechanisms for protecting data.
+
+There are two types of entry points, callbacks and callouts in the @dfn{@value{PACKAGE_TITLE}}
+subsystem:
+
+@enumerate
+
+@item @emph{Synchronous.}
+These entry points (callouts) and callbacks are referenced against a @dfn{STREAMS} queue structure.
+That is, they were invoked using a @dfn{STREAMS} queue structure as an argument.  These procedures
+are as follows:
+
+@multitable @columnfractions .30 .70
+@item @manpage{put(9)} @tab --
+@item @manpage{srv(9)} @tab --
+@item @manpage{qopen(9)} @tab --
+@item @manpage{qclose(9)} @tab --
+@item @manpage{qbufcall(9)} @tab --
+@item @manpage{qtimeout(9)} @tab --
+@item @manpage{mi_bufcall(9)} @tab --
+@item @manpage{putq(9)} @tab --
+@item @manpage{putbq(9)} @tab --
+@item @manpage{putnext(9)} @tab --
+@item @manpage{qreply(9)} @tab --
+@end multitable
+
+@item @emph{Asynchronous.}
+These callbacks are @emph{not} referenced against a @dfn{STREAMS} queue structure.  That is, they
+were invoked without a specific @dfn{STREAMS} queue structure as an argument (known to
+@dfn{STREAMS}).  These procedures are as follows:
+
+@multitable @columnfractions .30 .70
+@item @manpage{bufcall(9)} @tab --
+@item @manpage{esbbufcall(9)} @tab --
+@item @manpage{timeout(9)} @tab --
+@item @manpage{esballoc(9)} @tab (free routine)
+@end multitable
+
+@end enumerate
+
+
+@node MT Configuration
+@section MT Configuration
+@cindex configuration
+@cindex STREAMS, configuration
+@cindex configuration, STREAMS
+
+@cite{SVR 4.2 MP}
+@cindex SVR 4.2 MP
+specifies a synchronization mechanism that can be used during configuration of a @dfn{STREAMS}
+driver or module to specify the level of synchronization required by a module.  The @cite{SVR 4}
+synchronization levels are as follows:
+
+@multitable @columnfractions .30 .70
+@item @constant{SQLVL_DEFAULT}
+@cindex synchronization, default
+@tab @emph{Default level synchronization.}
+Specifies that the module uses the default synchronization scheme.  This is the same as specifying
+@constant{SQLVL_MODULE}.
+
+@item @constant{SQLVL_GLOBAL}
+@cindex synchronization, global
+@tab @emph{Global (@dfn{STREAMS} scheduler) level synchronization.}
+Specifies that all of @dfn{STREAMS} can be access by only one thread at the same time.  The module
+is run with global synchronization.  This means that only one @dfn{STREAMS} executive thread will be
+permitted to enter any module.  This makes the entire @dfn{STREAMS} executive single threaded and is
+useful primarily for debugging.  This is the same as "Uniprocessor Emulation" on some systems, and
+reduces the @dfn{STREAMS} executive to running on a single processor at a time.  This option should
+normally be used only for debugging.
+
+@item @constant{SQLVL_ELSEWHERE}
+@cindex synchronization, elsewhere
+@tab @emph{Module group level synchronization.}
+Specifies that the module is run with synchronization within a group of modules.  Only one thread of
+execution will be within the group of modules at a time.  The group is separately specified as a
+character string name.  This permits a group of modules to run single threaded as though they are
+running on a single processor, without interfering with the concurrency of other modules outside the
+group.  This can be important for testing and for modules that implicitly share unprotected data
+structures.
+
+@item @constant{SQLVL_MODULE}
+@cindex synchronization, module
+@tab @emph{Module level synchronization.}
+Specifies that all instances of a module can be accessed by only one thread at the same time.  This
+is the default value.
+The module is run with synchronization at the module.  Only one thread of execution will be
+permitted within the module.  Where the module does not share data structures between modules, this
+has a similar effect on running on a uniprocessor system.  This is the default and works best for
+non-multiprocessor-safe modules written in accordance with @dfn{STREAMS} guidelines.
+This level is roughly equivalent to @cite{Solaris} @constant{D_MTPERMOD}
+perimeters.
+
+@item @constant{SQLVL_QUEUEPAIR}
+@cindex synchronization, queue pair
+@tab @emph{Queue pair level synchronization.}
+Specifies that each queue pair can be accessed by only one thread at the same time.  Only one thread
+will be permitted to enter a given queue's procedures within a given queue pair.  Where the read and
+write side of the queue pair share the same private structure (@samp{q->q_ptr}), this provides
+multiprocessor protection of the common data structure to all synchronous entry points without an
+external lock.
+This level is roughly equivalent to @cite{Solaris} @constant{D_MTAPAIR}
+perimeters.
+
+@item @constant{SQLVL_QUEUE}
+@cindex synchronization, queue
+@tab @emph{Queue level synchronization.}
+Specifies that each queue can be accessed by only one thread at the same time.  The module is run
+with synchronization at the queue.  Only one thread of execution will be permitted to enter a given
+queue's procedures, however, another thread will be permitted to enter procedures of the other queue
+in the queue pair.  This is useful when the read and write side of a module are largely independent
+and do not require synchronization between sides of the queue pair.
+This level is roughly equivalent to @cite{Solaris} @constant{D_MTPERQ}
+perimeters.
+
+@item @constant{SQLVL_NOP}
+@cindex synchronization, none
+@tab @emph{No synchronization.}
+Specifies that each queue can be accessed by more than one thread at a the same time.  The
+protection of internal data and of @manpage{put(9)}
+and @manpage{srv(9)}
+procedures against @manpage{timeout(9)}
+or @manpage{bufcall(9)}
+is done by the module or driver itself.  This synchronization level should be used essentially for
+multiprocessor-efficient modules.
+This level is roughly equivalent to @cite{Solaris} @constant{D_MP}
+flag.
+@end multitable
+
+@node Synchronous Entry Points
+@section Synchronous Entry Points
+@cindex synchronous entry points
+
+@dfn{Synchronous Entry Points} are those entry points into the @dfn{STREAMS} driver or module that
+will be synchronized according to the specified synchronization level.
+
+@multitable @columnfractions .30 .70
+@item @manpage{put(9)} @tab @emph{Queue put procedure.}
+If the module has any synchronization level other than @constant{SQLVL_NOP},
+the put procedure will be exclusive.  Attempts to enter the put procedure while another thread is
+running within the synchronization level will result in the call being postponed until the thread
+currently in the synchronization level exits.
+
+@item @manpage{srv(9)} @tab If the module has any synchronization level other than @constant{SQLVL_NOP},
+@emph{Queue service procedure.}
+the service procedure will be exclusive.  Attempts to enter the service procedure while another
+thread is running within the synchronization level will result in the service procedure being
+postponed until the thread currently in the synchronization level exits.
+
+@item @manpage{qopen(9)} @tab @emph{Queue open procedure.}
+The queue open procedure is synchronous and exclusive before the call to @manpage{qprocson(9)},
+or in any event, until return from the procedure.  If the module has synchronization level of
+global, elsewhere or per-module; the call to the @manref{qopen(9)} procedure is exclusive.
+
+@item @manpage{qclose(9)} @tab @emph{Queue close procedure.}
+The queue close procedure is synchronous and exclusive after the call to @manpage{qprocsoff(9)},
+or in any event, after return from the procedure.  If the module has synchronization level of
+global, elsewhere or per-module; the call to the @manref{qclose(9)} procedure is exclusive.
+
+@item @manpage{qprocson(9)} @tab @emph{Queue procedures on.}
+@item @manpage{qprocsoff(9)} @tab @emph{Queue procedures off.}
+@item @manpage{freezestr(9)} @tab @emph{Freeze stream.}
+@item @manpage{unfreezestr(9)} @tab @emph{Thaw stream.}
+@item @manpage{qwriter(9)} @tab @emph{Queue writer.}
+@end multitable
+
+@node Synchronous Callbacks
+@section Synchronous Callbacks
+@cindex synchronous callbacks
+
+@dfn{Synchronous Callbacks} are those callbacks into the @dfn{STREAMS} driver or module that
+will be synchronized according to the specified synchronization level.  Synchronous callbacks are an
+extension to the @cite{UNIX System V Release 4.2}
+@cindex UNIX System V Release 4.2
+specifications of @dfn{STREAMS}.  Synchronous callback extensions include @cite{Solaris} extensions
+and @cite{AIX}
+@cindex AIX
+extensions.
+
+These include:
+
+@multitable @columnfractions .30 .70
+@item @manpage{qbufcall(9)} @tab -- queue referenced buffer call
+@item @manpage{qtimeout(9)} @tab -- queue referenced timeout
+@item @manpage{qunbufcall(9)} @tab -- queue referenced buffer call cancel
+@item @manpage{quntimeout(9)} @tab -- queue referenced timeout cancel
+@item @manpage{mi_bufcall(9)} @tab -- queue reference buffer call
+@end multitable
+
+@node Synchronous Callouts
+@section Synchronous Callouts
+@cindex synchronous callouts
+
+@multitable @columnfractions .30 .70
+@item @manpage{putnext(9)} @tab --
+@item @manpage{qreply(9)} @tab --
+@end multitable
+
+@node Asynchronous Entry Points
+@section Asynchronous Entry Points
+@cindex asynchronous entry points
+
+@node Asynchronous Callbacks
+@section Asynchronous Callbacks
+@cindex asynchronous callbacks
+
+@dfn{Asynchronous Callbacks} are those callbacks into the @dfn{STREAMS} driver or module that will
+@emph{not} be synchronized according to the specified synchronization level.  Asynchronous callbacks
+are the basic @cite{UNIX System V Release 4.2} callbacks.
+
+@node Asynchronous Callouts
+@section Asynchronous Callouts
+@cindex asynchronous callouts
+
+@node STREAMS Framework Integrity
+@section STREAMS Framework Integrity
+@cindex STREAMS, framework integrity
+@cindex framework integrity, STREAMS
+
+The @dfn{STREAMS} framework guarantees the integrity of the @dfn{STREAMS} scheduler and related data
+structures, such as the @mantype{queue(9)}, @mantype{msgb(9)}, and @mantype{datab(9)} structures,
+assuming that the module properly accesses global operating system data structures, utilities and
+facilities.
+
+The @member{q_next} and @member{q_ptr} members of the @mantype{queue(9)} structure will not be
+modified by the system while a thread is actively executing within a synchronous entry point.  The
+@member{q_next} member of the @mantype{queue(9)} structure could change while a thread is executing
+within an asynchronous entry point.
+
+A @dfn{STREAMS} module or driver must not call another module's @command{put} or @command{service}
+procedure directly.  The @dfn{STREAMS} utilities @manref{putnext(9)}, @manref{put(9)} and others
+described in @ref{Utilities} must be used to pass messages to another queue.  Calling another
+@dfn{STREAMS} module or driver directly circumvents the @dfn{MP-STREAMS} framework.@footnote{The
+practise of calling a neighbouring module's put or service procedure directly using the
+@member{qi_putp} or @member{qi_srvp} members of the @mantype{qinit(9)} structure is long deprecated
+and has not been seen in drivers since SVR 3.}
+
+To make a @dfn{STREAMS} module or driver @dfn{MP-SAFE} requires that the integrity of private module
+data structures be protected by the module itself.  The integrity of private module data structures
+can be maintained either by using the @dfn{MP-STREAMS} framework to control concurrency and
+synchronize access to private data structures, or by the use of private locks within the module, or a
+combination of the two.
+
+@node MP Message Ordering
+@section MP Message Ordering
+@cindex message ordering
+
+@dfn{STREAMS} guarantees the ordering of messages along a @dfn{Stream} if all the modules in the
+@dfn{Stream} preserve message ordering internally.  This ordering guarantee only applies to message
+that are sent along the same @dfn{Stream} and produced by the same source.
+
+@dfn{STREAMS} does not guarantee that a message has been seen by the next @command{put} procedure
+by the time that @manref{putnext(9)} or @manref{qreply(9)} return.  Under some circumstances,
+invocation of the next module's @command{put} procedure might be deferred until after an exclusive
+thread leaves a synchronization boundary.
+
+Regardless of @dfn{STREAMS} integrity protection, or the presence of synchronization barriers, at
+most one thread will be executing a given module's @command{service} procedure.
+
+@node MP-UNSAFE Modules
+@section MP-UNSAFE Modules
+
+@dfn{STREAMS} supports modules that are not MP-SAFE and that are expecting to run in a uniprocessor
+environment.
+
+By default, all @dfn{STREAMS} modules and drivers are considered @dfn{MP-UNSAFE} unless configured
+into the system as @dfn{MP-SAFE}.
+
+Unsafe drivers run with only the minimum of modification.  Unsafe drivers are synchronized, by
+default, at the level @constant{SQLVL_MODULE}, which implies that, at any time, only one processor
+in the entire system is executing the module's @dfn{STREAMS} code.  @dfn{MP-UNSAFE} modules might
+not gain any performance advantage by being run in a multiprocessor environment.
+
+@dfn{MP-UNSAFE} modules that access data structures private to other @dfn{STREAMS} modules must be
+synchronized at a broader level of synchronization.  All such cooperating modules must be run with
+synchronization at the level @constant{SQLVL_ELSEWHERE}, with a synchronization queue that is shared
+across all the pertinent modules.
+
+@dfn{MP-UNSAFE} modules that do not share data between Stream instances but do shared Stream private
+data between the read and write put and service procedures can be synchronized at level
+@constant{SQLVL_QUEUEPAIR} and will gain some advantage in the multiprocessor environment.
+
+@dfn{MP-UNSAFE} modules that do not share data between Stream instances and do not share data
+between read and write side put and service procedures, but do share data between put and service
+procedure on the same side, can be synchronized at level @constant{SQLVL_QUEUE} and will gain some
+advantage in the multiprocessor environment.
+
+@dfn{MP-UNSAFE} modules that shared data between Stream instances, but only in the open and close
+routines, can still assign @constant{SQLVL_QUEUEPAIR} or @constant{SQLVL_QUEUE}, provided that an
+outer barrier is also established using the @cite{Solaris@registeredsymbol{}}-style outer perimeter
+(with the @constant{D_MTOCEXCL} flag).
+
+@subsection MP-UNSAFE Open and Close Routines
+
+@dfn{MP-UNSAFE} modules are still responsible for cancelling all outstanding callbacks in their
+@member{qi_qclose} procedure.
+
+@dfn{MP-UNSAFE} modules that are synchronized at @constant{SQLVL_QUEUEPAIR}  or
+@constant{SQLVL_QUEUE}, that do not have an exclusive outer perimited established with
+@constant{D_MTOCEXCL}, must call @manref{qprocsoff(9)} in the @member{qi_qclose} routine, in
+addition to cancelling all oustanding callbacks, before deallocating Stream private structures or
+altering @member{q_qptr} pointers.
+
+@subsection MP-UNSAFE Put and Service Procedures
+
+@subsection MP-UNSAFE Interrupt Service Routines
+
+@dfn{MP-UNSAFE} modules synchronized at synchronization level @constant{SQLVL_MODULE},
+@constant{SQLVL_ELSEWHERE}, or @constant{SQLVL_GLOBAL} are singly threaded within the @dfn{STREAMS}
+framework.  However, interrupt service routines exist outside the @dfn{STREAMS} framework.
+Interrupt service routines that invoke @dfn{STREAMS} utilities will have execution of those
+utilities deferred until after all threads have left the synchronization barrier.
+
+@subsection MP-UNSAFE Shared Data Structures
+
+Modules that share data structure(s), and that are to be protected by @dfn{STREAMS} synchronization,
+must be configured at the same level of synchronization.
+
+@subsection MP-UNSAFE Sleeping
+
+An @dfn{MP-UNSAFE} module that must wait in its @command{open} or @command{close} procedure for a
+message from another @dfn{STREAMS} module must wait outside of all synchronization barriers;
+otherwise the responding thread might never be allowed to enter the synchronization barrier to invoke
+the module's @command{put} or @command{service} procedure.  Sleeping outside the synchronization
+barriers is accomplished by using @manref{qwait(9)} or @manref{qwait_sig(9)}.
+
+Modules using @dfn{STREAMS} synchronization barriers, either explicitly by configuration, or by
+default, must use @manref{qwait(9)} and @manref{qwait_sig(9)} instead of @manref{CV_WAIT(9)} or
+@manref{CV_WAIT_SIG(9)} from within @member{qi_qopen} and @member{qi_qclose}
+procedures.@footnote{Modules are not permitted to sleep outside of their queue open and close
+procedures.  Attempting to sleep in a @command{put} or @command{service} procedure will panic most
+kernels.}
+
+@node MP-SAFE Modules
+@section MP-SAFE Modules
+@menu
 * MP Put and Service Procedures::
 * MP Timeout and Buffer Callbacks::
 * MP Open and Close Procedures::
 * MP Module Unloading::
 * MP Locking::
 * MP Asynchronous Callbacks::
-* Stream Integrity::
 @end menu
 
-
-@node MT Configuration
-@section MT Configuration
-
-@node Asynchronous Entry Points
-@section Asynchronous Entry Points
-
-@node Asynchronous Callbacks
-@section Asynchronous Callbacks
-
-@node Synchronous Entry Points
-@section Synchronous Entry Points
-
-@node Synchronous Callbacks
-@section Synchronous Callbacks
-
-@node STREAMS Framework Integrity
-@section STREAMS Framework Integrity
-
-@node MP Message Ordering
-@section MP Message Ordering
-
-@node MP-UNSAFE Modules
-@section MP-UNSAFE Modules
-
 @node MP Put and Service Procedures
-@section MP Put and Service Procedures
+@subsection MP Put and Service Procedures
+
+The @dfn{STREAMS} utilities @manref{qprocson(9)} and @manref{qprocsoff(9)} enable and disable the
+@command{put} and @command{service} procedures of a queue pair.  Prior to a call to
+@manref{qprocson(9)} and after a call to @manref{qprocsoff(9)}, the module's @command{put} and
+@command{service} procedures are disabled.  Messages flow around the module as if it were not
+present in the @dfn{Stream}.
+
+@manref{qprocson(9)} must be called by the first @manref{open(2)} of a module, but only after
+allocation and initialization of any module resources or private data structures upon which the
+@command{put} and @command{service} procedures depend.  @manref{qprocsoff(9)} must be called by the
+@manref{close(2)} routine of a module before deallocating any resources on which the @command{put}
+and @command{service} procedures depend.
+
+For example, it is typical for a module's @member{qi_qopen} procedure to allocate a private data
+structure and associate it with the read- and write-queue @member{q_ptr} pointer for use by both the
+@command{put} and @command{service} procedure.  It is typical for a module's @member{qi_qclose}
+procedure to free the private data structure.  In this case, @manref{qprocson(9)} should not be
+called until @emph{after} the private data structure has been allocated, initialized and attached to the
+@member{q_ptr} pointers.  @manref{qprocsoff(9)} should be called @emph{before} deallocating the
+private data structure and invalidating the @member{q_ptr} pointers.
 
 @node MP Timeout and Buffer Callbacks
-@section MP Timeout and Buffer Callbacks
+@subsection MP Timeout and Buffer Callbacks
+
+The @manref{timeout(9)}, @manref{bufcall(9)} and @manref{esbbcall(9)} callbacks are asynchronous
+when invoked from outside the @dfn{STREAMS} framework.  The means that the @manref{timeout(9)},
+@manref{bufcall(9)}, or @manref{esbbcall(9)} callback functions might execute concurrent with module
+procedures.
+
+In contrast, under @cite{@value{PACKAGE_TITLE}}, when @manref{timeout(9)}, @manref{bufcall(9)}, and
+@manref{esbbcall(9)} are invoked from within the @dfn{STREAMS} framework,@footnote{That is, they are
+invoked from a module's @command{put} or @command{service} procedure, or from within another
+synchronous callback, but not within a module's @command{open} or @command{close} procedures.} they
+are equivalent to a call to @manref{qtimeout(9)}, @manref{qbufcall(9)} with the current
+synchronization queue used as the @var{q} argument.  This is possible because @dfn{STREAMS} always
+knows what queue's synchronous
+procedures or callbacks it is running.
+
+To provide for synchronous callbacks that can be invoked from outside the @dfn{STREAMS} framework,
+the @manref{qtimeout(9)}, @manref{quntimeout(9)} @manref{qbufcall(9)}, and @manref{qunbufcall(9)}
+@dfn{STREAMS} utilities are provided.  When using these utilities, the callback function is executed
+inside any synchronization barrier associated with the queue that is passed to the function.
+
+There are some restrictions on which queue pointer the @manref{qtimeout(9)} and @manref{qbufcall(9)}
+can be passed when called from a module's @command{open} or @command{close} procedure, or when
+called from outside @dfn{STREAMS} (at soft or hard interrupt).  The caller is responsible for the
+validity of the queue pointer.  That is, the queue must be allocated and have procedures enabled
+across the call.  The queue pointer argument of a module's @command{open}, @command{close},
+@command{put}, or @command{service} procedure can always be passed as an argument to these functions
+without any special consideration.  They should not be passed a @var{q->q_next} pointer, unless the
+@dfn{Stream} is first frozen by the caller with @manref{freezestr(9)}.  They may be passed a
+driver's read-side queue pointer, or a lower multiplexed @dfn{Stream}'s write-side queue pointer,
+provided that the caller can ensure that the driver is not closed and the multiplexed @dfn{Stream}
+is not unlinked across the call.  Reference to interior queue pairs must not be performed unless the
+@dfn{Stream} has first been frozen by the caller with @manref{freezestre(9)}.
 
 @node MP Open and Close Procedures
-@section MP Open and Close Procedures
+@subsection MP Open and Close Procedures
+
+@dfn{STREAMS} modules are permitted to sleep in their @member{qi_qopen} and @member{qi_qclose}
+procedures.  However, MP-UNSAFE modules that use synchronization of these procedures against
+@command{put} and @command{service} procedures must leave the synchronization barrier before
+sleeping.  This is accomplished by using the @manref{qwait(9)} and @manref{qwait_sig(9)}
+@dfn{STREAMS} utilities.  These utilities are similar to @manref{CV_WAIT(9)} and
+@manref{CV_WAIT_SIG(9)}, however, they release the synchronization barrier before sleeping.  These
+MP-UNSAFE utilities may also be used by MP-SAFE modules; however, MP-SAFE modules may also use
+@manref{CV_WAIT(9)} or @manref{CV_WAIT_SIG(9)}.
+
+Because callback functions can be asynchronous with respect to the @dfn{STREAMS} framework, they
+might execute concurrent with a module's @command{close} procedure.  It is the responsibility of the
+module to cancel all outstanding callbacks before deallocating or invalidating references to data
+structures upon which those callbacks depend, and before returning from the @command{close}
+procedure.
+
+A callback function scheduled with @manref{timeout(9)} or @manref{bufcall(9)} are guaranteed to have
+been cancelled by the time that the corresponding @manref{untimeout(9)} or @manref{unbufcall(9)}
+utilities return.  The same is true for @manref{qtimeout(9)}, @manref{qbufcall(9)},
+@manref{quntimeout(9)} and @manref{qunbufcall(9)}.
+
+The Mentat Portable Streams (MPS@registeredsymbol{}) framework provided by the @cite{STREAMS
+Compatibility Modules} package for @cite{Linux Fast-STREAMS} also provides an @manref{mi_bufcall(9)}
+function and @manref{mi_timer(9)} function that can be used to manage buffer callbacks and timeouts
+as well as converting these asyncrhonous events into @dfn{STREAMS} synchronous events.
 
 @node MP Module Unloading
-@section MP Module Unloading
+@subsection MP Module Unloading
+
+@dfn{STREAMS} tracks kernel module references and prohibits a kernel module from unloading while
+there is a reference to a statically allocated data structure contained within the kernel module.
+If a @dfn{STREAMS} module does not cancel all callbacks in the module @command{close} procedure, the
+associated kernel module must not be permitted to be unloaded.  @dfn{STREAMS} handles all references
+with the exception of references to the free routine provided to @manref{esballoc(9)}.
+
+@dfn{STREAMS} loadable kernel modules that pass free routines to @manref{esballoc(9)} are
+responsible for incrementing their own module counts upon the call to @manref{esballoc(9)} and
+decrementing them when the @member{free_rtn} function exits.@footnote{It is only true for Linux 2.4
+kernels that it is necessary for the module to keep track of these things.  Under recent Linux 2.6
+kernels, it is possible for the @dfn{STREAMS} executive to determine the module owner of the
+callback function and @cite{Linux Fast-STREAMS} performs the necessary module reference counting.}
 
 @node MP Locking
-@section MP Locking
+@subsection MP Locking
+
+Basic spin locks or reader/writer locks can be used by @dfn{MP-SAFE} modules to protect module
+private data structures.  When using locks, however, the following guidelines should be followed:
+
+@itemize @bullet
+
+@item Avoid holding module private locks across calls to @manref{putnext(9)}, @manref{qreply(9)}, or
+other @dfn{STREAMS} utilities that invoke a @command{put} procedure, unless re-entrancy is provided.
+Otherwise, the calling thread might reenter the same queue procedure and attempt to take the same
+lock twice, causing a single-party deadlock scenario.
+
+@item Do no hold module private locks, acquired in @command{put} or @command{service} procedures,
+across the calls to @manref{qprocson(9)} or @manref{qprocsoff(9)}.  These utilities spin waiting for
+all @command{put} and @command{service} procedures to exit, causing a single-party deadlock
+scenario.
+
+@item Do not hold locks, acquired in the @manref{timeout(9)} or @manref{bufcall(9)} callback
+functions across calls to @manref{untimeout(9)} or @manref{unbufcall(9)}.  These utilities spin
+waiting for the callback function to exit, causing a single-party deadlock scenario.
+
+@end itemize
 
 @node MP Asynchronous Callbacks
-@section MP Asynchronous Callbacks
+@subsection MP Asynchronous Callbacks
+
+Interrupt service routines and other asynchronous callback functions require special care by the
+@dfn{STREAMS} driver writer, because they can execute asynchronous to threads executing within the
+@dfn{STREAMS} framework.
+
+MP-SAFE modules, or modules using synchronization barriers can use the @manref{qtimeout(9)} and
+@manref{qbufcall(9)} callbacks that are synchronous with respect to the @dfn{STREAMS} framework.
+Under @cite{@value{PACKAGE_TITLE}}, even @manref{timeout(9)} and @manref{bufcall(9)} utilities are
+synchronous with respect to the @dfn{STREAMS} framework when invoked from within a @member{qi_putp}
+procedure, @member{qi_srvp} procedure, or a synchronous callback.  However, when invoked from
+outside a @dfn{STREAMS} module procedure (or from within @member{qi_qopen} or @member{qi_qclose}
+procedures, these functions generate asynchronous callbacks.
+
+Because an asynchronous thread from outside of @dfn{STREAMS}can enter the driver at any time, the
+driver writer is responsible for ensuring that the asynchronous callback function acquires the
+necessary private locks before accessing private module data structures and releases those locks
+before returning.  It is also the responsibility of the module to cancel any outstanding callback
+functions (see @manref{untimeout(9)} and @manref{unbufcall(9)}) before the data structures upon
+which they depend are deallocated and the module closed.
+
+The following guidelines must be followed:
+
+@itemize @bullet
+
+@item Interrupt service routines must be disabled by the callback if the interrupt service routine
+is accessing shared data structures with the callback function.
+
+@item Outstanding callbacks from @manref{timeout(9)} and @manref{bufcall(9)} must be cancelled with
+a call to @manref{untimeout(9)} or @manref{unbufcall(9)}.
+
+@item Outstanding callbacks from @manref{esballoc(9)}, must be allowed to complete before the kernel
+module is permitted to be unloaded.
+
+@end itemize
 
 @node Stream Integrity
 @section Stream Integrity
+
+The @member{q_next} field of the @mantype{queue(9)} structure can be dereferenced in that queue's
+@member{qi_qopen}, @member{qi_qclose}, @member{qi_putp}, and @member{qi_srvp} procedures as well as
+within any other synchronous procedure or callback (such as @manref{qtimeout(9)},
+@manref{qbufcall(9)}, @manref{qwriter(9)}) predicated on a queue in the same @dfn{Stream}.
+
+All code executing outside the @dfn{STREAMS} framework, such as interrupt service routines,
+tasklets, network bottom halves, asynchronous @manref{timeout(9)}, @manref{bufcall(9)}, and
+@manref{esballoc(9)} callback routines, are not permitted to dereference @member{q_next} for any
+queue pair in any @dfn{Stream}.  Asynchronous procedures must use the @samp{next} version of all
+functions (e.g, @samp{canputnext(q)} instead of @samp{canput(q->q_next)}).
 
 @c ============================================================================
 @node Reference
@@ -5398,32 +5930,1151 @@ Including @header{sys/stream.h} also exposes the following constants for use wit
 @node Core Function Support
 @section Core Function Support
 
+@menu
+* Core Message Functions::
+* Core UP Queue Functions::
+* Core MP Queue Functions::
+* Core DDI/DKI Functions::
+* Some Common Extension Functions::
+* Some Internal Functions::
+* Some Oddball Functions::
+@end menu
+
+@node Core Message Functions
+@subsection Core Message Functions
+@cindex core message functions
+
+@multitable @columnfractions .30 .70
+@item @manpage{adjmsg(9)} @tab trim bytes from the front or back of a @dfn{STREAMS} message
+@item @manpage{allocb(9)} @tab allocate a @dfn{STREAMS} message and data block
+@item @manpage{bufcall(9)} @tab install a buffer callback
+@item @manpage{copyb(9)} @tab copy a @dfn{STREAMS} message block
+@item @manpage{copymsg(9)} @tab copy a @dfn{STREAMS} message
+@item @manpage{datamsg(9)} @tab tests a @dfn{STREAMS} message type for data
+@item @manpage{dupb(9)} @tab duplicate a @dfn{STREAMS} message block
+@item @manpage{dupmsg(9)} @tab duplicate a @dfn{STREAMS} message
+@item @manpage{esballoc(9)} @tab allocate a @dfn{STREAMS} message and data block with a caller supplied data buffer
+@item @manpage{freeb(9)} @tab frees a @dfn{STREAMS} message block
+@item @manpage{freemsg(9)} @tab frees a @dfn{STREAMS} message
+@item @manpage{linkb(9)} @tab link a message block to a @dfn{STREAMS} message
+@item @manpage{msgdsize(9)} @tab calculate the size of the data in a @dfn{STREAMS} message
+@item @manpage{msgpullup(9)} @tab pull up bytes in a @dfn{STREAMS} message
+@item @manpage{pcmsg(9)} @tab test a data block message type for priority control
+@item @manpage{pullupmsg(9)} @tab pull up the bytes in a @dfn{STREAMS} message
+@item @manpage{rmvb(9)} @tab remove a message block from a @dfn{STREAMS} message
+@item @manpage{testb(9)} @tab test if a @dfn{STREAMS} message can be allocated
+@item @manpage{unbufcall(9)} @tab remove a @dfn{STREAMS} buffer callback
+@item @manpage{unlinkb(9)} @tab unlink a message block from a @dfn{STREAMS} message
+@end multitable
+
+@node Core UP Queue Functions
+@subsection Core UP Queue Functions
+@cindex core queue functions, UP
+
+@multitable @columnfractions .30 .70
+@item @manpage{backq(9)} @tab find the upstream or downstream queue
+@item @manpage{bcanput(9)} @tab test flow control on a @dfn{STREAMS} message queue
+@item @manpage{canenable(9)} @tab test whether a @dfn{STREAMS} message queue can be scheduled
+@item @manpage{enableok(9)} @tab allow a @dfn{STREAMS} message queue to be scheduled
+@item @manpage{flushband(9)} @tab flushes band @dfn{STREAMS} messages from a message queue
+@item @manpage{flushq(9)} @tab flushes messages from a @dfn{STREAMS} message queue
+@item @manpage{getq(9)} @tab gets a message from a @dfn{STREAMS} message queue
+@item @manpage{insq(9)} @tab inserts a message into a @dfn{STREAMS} message queue
+@item @manpage{noenable(9)} @tab disable a @dfn{STREAMS} message queue from being scheduled
+@item @manpage{OTHERQ(9)} @tab return the other queue of a @dfn{STREAMS} queue pair
+@item @manpage{putbq(9)} @tab put a message back on a @dfn{STREAMS} message queue
+@item @manpage{putctl(9)} @tab put a control message on a @dfn{STREAMS} message queue
+@item @manpage{putctl1(9)} @tab put a 1 byte control message on a @dfn{STREAMS} message queue
+@item @manpage{putq(9)} @tab put a message on a @dfn{STREAMS} message queue
+@item @manpage{qenable(9)} @tab schedules a @dfn{STREAMS} message queue service routine
+@item @manpage{qreply(9)} @tab replies to a message from a @dfn{STREAMS} message queue
+@item @manpage{qsize(9)} @tab return the number of message on a queue
+@item @manpage{RD(9)} @tab return the read queue of a @dfn{STREAMS} queue pair
+@item @manpage{rmvq(9)} @tab remove a message from a @dfn{STREAMS} message queue
+@item @manpage{SAMESTR(9)} @tab test for @dfn{STREAMS} pipe or @dfn{FIFO}
+@item @manpage{WR(9)} @tab return the write queue of a @dfn{STREAMS} queue pair
+@end multitable
+
+@node Core MP Queue Functions
+@subsection Core MP Queue Functions
+@cindex core queue functions, MP
+
+@multitable @columnfractions .30 .70
+@item @manpage{canputnext(9)} @tab test flow control on a message queue
+@item @manpage{canputnext(9)} @tab test flow control on a message queue
+@item @manpage{freezestr(9)} @tab freeze the state of a stream queue
+@item @manpage{put(9)} @tab invoke the put procedure for a @dfn{STREAMS} module or driver with a @dfn{STREAMS} message
+@item @manpage{putnext(9)} @tab put a message on the downstream @dfn{STREAMS} message queue
+@item @manpage{putnextctl1(9)} @tab put a 1 byte control message on the downstream @dfn{STREAMS} message queue
+@item @manpage{putnextctl(9)} @tab put a control message on the downstream @dfn{STREAMS} message queue
+@item @manpage{qprocsoff(9)} @tab disables @dfn{STREAMS} message queue processing for multi-processing
+@item @manpage{qprocson(9)} @tab enables @dfn{STREAMS} message queue processing for multi-processing
+@item @manpage{strqget(9)} @tab gets information about a @dfn{STREAMS} message queue
+@item @manpage{strqset(9)} @tab sets attributes of a @dfn{STREAMS} message queue
+@item @manpage{unfreezestr(9)} @tab thaw the state of a stream queue
+@end multitable
+
+@node Core DDI/DKI Functions
+@subsection Core DDI/DKI Functions
+@cindex core ddi/dki functions
+@cindex DDI/DKI
+
+@multitable @columnfractions .30 .70
+@item @manpage{kmem_alloc(9)} @tab allocate kernel memory
+@item @manpage{kmem_free(9)} @tab deallocates kernel memory
+@item @manpage{kmem_zalloc(9)} @tab allocate and zero kernel memory
+@item @manpage{cmn_err(9)} @tab print a kernel command error
+@item @manpage{bcopy(9)} @tab copy byte strings
+@item @manpage{bzero(9)} @tab zero a byte string
+@item @manpage{copyin(9)} @tab copy user data in from user space to kernel space
+@item @manpage{copyout(9)} @tab copy user data in from kernel space to user space
+@item @manpage{delay(9)} @tab postpone the calling process for a number of clock ticks
+@item @manpage{drv_getparm(9)} @tab driver retrieve kernel parameter
+@item @manpage{drv_hztomsec(9)} @tab convert kernel tick time between microseconds or milliseconds
+@item @manpage{drv_htztousec(9)} @tab convert kernel tick time between microseconds or milliseconds
+@item @manpage{drv_msectohz(9)} @tab convert kernel tick time between microseconds or milliseconds
+@item @manpage{drv_priv(9)} @tab check if the current process is privileged
+@item @manpage{drv_usectohz(9)} @tab convert kernel tick time between microseconds or milliseconds
+@item @manpage{drv_usecwait(9)} @tab delay for a number of microseconds
+@item @manpage{min(9)} @tab determine the minimum of two integers
+@item @manpage{max(9)} @tab determine the maximum of two integers
+@item @manpage{getmajor(9)} @tab get the internal major device number for a device
+@item @manpage{getminor(9)} @tab get the extended minor device number for a device
+@item @manpage{makedevice(9)} @tab create a device from a major and minor device numbers
+@item @manpage{strlog(9)} @tab pass a message to the @dfn{STREAMS} logger
+@item @manpage{timeout(9)} @tab start a timer
+@item @manpage{untimeout(9)} @tab stop a timer
+@end multitable
+
+@multitable @columnfractions .30 .70
+@item @manpage{mknod(9)} @tab make block or character special files
+@item @manpage{mount(9)} @tab mount and unmount file systems
+@item @manpage{umount(9)} @tab mount and unmount file systems
+@item @manpage{unlink(9)} @tab remove a file
+@end multitable
+
+@node Some Common Extension Functions
+@subsection Some Common Extension Functions
+@cindex common extension functions
+
+@multitable @columnfractions .30 .70
+@item @manpage{linkmsg(9)} @tab link a message block to a @dfn{STREAMS} message
+@item @manpage{putctl2(9)} @tab put a two byte control message on a @dfn{STREAMS} message queue
+@item @manpage{putnextctl2(9)} @tab put a two byte control message on the downstream @dfn{STREAMS} message queue
+@item @manpage{weldq(9)} @tab weld two (or four) queues together
+@item @manpage{unweldq(9)} @tab unweld two (or four) queues
+@end multitable
+
+@node Some Internal Functions
+@subsection Some Internal Functions
+@cindex internal functions
+
+@multitable @columnfractions .30 .70
+@item @manpage{allocq(9)} @tab allocate a @dfn{STREAMS} queue pair
+@item @manpage{bcanget(9)} @tab test for message arrival on a band on a stream
+@item @manpage{canget(9)} @tab test for message arrival on a stream
+@item @manpage{freeq(9)} @tab deallocate a @dfn{STREAMS} queue pair
+@item @manpage{qattach(9)} @tab attach a module onto a @dfn{STREAMS} file
+@item @manpage{qclose(9)} @tab close a @dfn{STREAMS} module or driver
+@item @manpage{qdetach(9)} @tab detach a module from a @dfn{STREAMS} file
+@item @manpage{qopen(9)} @tab call a @dfn{STREAMS} module or driver open routine
+@item @manpage{setq(9)} @tab set sizes and procedures associated with a @dfn{STREAMS} message queue
+@end multitable
+
+@node Some Oddball Functions
+@subsection Some Oddball Functions
+@cindex oddball functions
+
+@multitable @columnfractions .30 .70
+@item @manpage{appq(9)} @tab append one @dfn{STREAMS} message after another @*
+@item @manpage{esbbcall(9)} @tab install a buffer callback for an extended @dfn{STREAMS} message block @*
+@item @manpage{isdatablk(9)} @tab test a @dfn{STREAMS} data block for data type @*
+@item @manpage{isdatamsg(9)} @tab test a @dfn{STREAMS} data block for data type @*
+@item @manpage{kmem_zalloc_node(9)} @tab allocate and zero memory on a node @*
+@item @manpage{msgsize(9)} @tab calculate the size of the message blocks in a @dfn{STREAMS} message @*
+@item @manpage{qcountstrm(9)} @tab add all counts on all @dfn{STREAMS} message queues in a stream @*
+@item @manpage{xmsgsize(9)} @tab calculate the size of message blocks in a @dfn{STREAMS} message @*
+@end multitable
+
 @node SVR 4.2 Portability
 @section SVR 4.2 Portability
+@cindex porting, SVR 4.2 MP
+@cindex SVR 4.2 MP, portability
+@cindex SVR 4.2 MP
+
+This section captures portability information for @cite{SVR 4.2 MP} based systems.  If the operating system
+from which you are porting more closely fits one of the other portability sections, please see that
+section.
+
+@menu
+* Differences from SVR 4.2 MP::
+* Commonalities with SVR 4.2 MP::
+* Compatibility functions for SVR 4.2 MP::
+* Configuration ala SVR 4.2 MP::
+@end menu
+
+@node Differences from SVR 4.2 MP
+@subsection Differences from SVR 4.2 MP
+@cindex differences, SVR 4.2 MP
+@cindex SVR 4.2 MP, differences
+@cindex SVR 4.2 MP
+
+@dfn{@value{PACKAGE_TITLE}} has very few differences from @cite{SVR 4.2 MP}.
+@cindex SVR 4.2 MP
+Not all @cite{SVR 4.2 MP}
+@cindex SVR 4.2 MP
+functions are implemented in the base @dfn{@value{PACKAGE_TITLE}} kernel modules.  Some functions are
+included in the @cite{SVR 4.2 MP} compatibility module, @file{streams-svr4compat.o}.
+
+@node Commonalities with SVR 4.2 MP
+@subsection Commonalities with SVR 4.2 MP
+@cindex commonalities, SVR 4.2 MP
+@cindex SVR 4.2 MP, commonalities
+@cindex SVR 4.2 MP
+
+@node Compatibility functions for SVR 4.2 MP
+@subsection Compatibility functions for SVR 4.2 MP
+@cindex compatibility functions, SVR 4.2 MP
+@cindex SVR 4.2 MP, compatibility functions
+@cindex SVR 4.2 MP
+
+@multitable @columnfractions .30 .70
+@item @manpage{itimeout(9)} @tab Perform a timeout at an interrupt level.
+@item @manpage{lbolt(9)} @tab Time in ticks since reboot.
+@item @manpage{sleep(9)} @tab Put a process to sleep.
+@item @manpage{wakeup(9)} @tab Wake a process.
+@item @manpage{vtop(9)} @tab Convert virtual to physical address.
+@end multitable
+
+@subsubsection Priority Levels
+
+@b{Linux} has a different concept of priority levels than @cite{SVR 4.2 MP}.
+@cindex SVR 4.2 MP
+@b{Linux} has basically 4 priority levels as follows:
+
+@enumerate
+
+@item Preemptive
+
+At this priority level, software and hardware interrupts are enabled and the kernel is executing
+with preemption enabled.  This means that the currently executing kernel thread could preempt and
+sleep in favour of another thread of kernel execution.
+
+This priority level only exists on preemptive (mostly 2.6) kernels.
+
+@item Non-Preemptive
+
+At this priority level, software and hardware interrupts are enabled and the kernel is executing
+with preemption disabled.  This means that the currently executing kernel thread will only be
+interrupted by software or hardware interrupts.
+
+This priority level exists in all kernels.
+
+@item Software Interrupts Disabled
+
+At this priority level, software interrupts are disabled and the kernel is executing with preemption
+disabled.  This means that the currently executing kernel thread will only be interrupted by
+hardware interrupts.
+
+This is the case when the executing thread is processing a software interrupt, or when the currently
+executing thread has disabled software interrupts.
+
+This priority level exists in all kernels.
+
+@item Interrupt Service Routines Disabled
+
+At this priority level, hardware interrupts are disabled and the kernel is executing with preemption
+disabled.  This means that the currently executing kernel thread will not be interrupted.
+
+This is the case when the executing thread is processing a hardware interrupt, or when the currently
+executing thread has disabled hardware interrupts.
+
+This priority level exists in all kernels.
+
+@end enumerate
+
+@multitable @columnfractions .30 .70
+@item @manpage{spl0(9)} @tab Set priority level 0.
+@item @manpage{spl1(9)} @tab Set priority level 1.
+@item @manpage{spl2(9)} @tab Set priority level 2.
+@item @manpage{spl3(9)} @tab Set priority level 3.
+@item @manpage{spl4(9)} @tab Set priority level 4.
+@item @manpage{spl5(9)} @tab Set priority level 5.
+@item @manpage{spl7(9)} @tab Set priority level 6.
+@item @manpage{spl7(9)} @tab Set priority level 7.
+@item @manpage{spl(9)} @tab Set priority level.
+@item @manpage{splx(9)} @tab Set priority level x.
+@end multitable
+
+@subsubsection Atomic Integers
+
+@multitable @columnfractions .30 .70
+@item @manpage{ATOMIC_INT_ADD(9)} @tab Add an integer value to an atomic integer.
+@item @manpage{ATOMIC_INT_ALLOC(9)} @tab Allocate and initialize an atomic integer.
+@item @manpage{ATOMIC_INT_DEALLOC(9)} @tab Deallocate an atomic integer.
+@item @manpage{ATOMIC_INT_DECR(9)} @tab Decrement and test an atomic integer.
+@item @manpage{ATOMIC_INT_INCR(9)} @tab Increment an atomic integer.
+@item @manpage{ATOMIC_INT_INIT(9)} @tab Initialize an atomic integer.
+@item @manpage{ATOMIC_INT_READ(9)} @tab Read an atomic integer.
+@item @manpage{ATOMIC_INT_SUB(9)} @tab Subtract and integer value from an atomic integer.
+@item @manpage{ATOMIC_INT_WRITE(9)} @tab Write an integer value to an atomic integer.
+@end multitable
+
+@subsubsection Basic Locks
+
+@multitable @columnfractions .30 .70
+@item @manpage{LOCK(9)} @tab Lock a basic lock.
+@item @manpage{LOCK_ALLOC(9)} @tab Allocate a basic lock.
+@item @manpage{LOCK_DEALLOC(9)} @tab Deallocate a basic lock.
+@item @manpage{LOCK_OWNED(9)} @tab Determine whether a basic lock is head by the caller.
+@item @manpage{TRYLOCK(9)} @tab Try to lock a basic lock.
+@item @manpage{UNLOCK(9)} @tab Unlock a basic lock.
+@end multitable
+
+@subsubsection STREAMS Locks
+
+@multitable @columnfractions .30 .70
+@item @manpage{MPSTR_QLOCK(9)} @tab Release a queue from exclusive access.
+@item @manpage{MPSTR_QRELE(9)} @tab Acquire a queue for exclusive access.
+@item @manpage{MPSTR_STPLOCK(9)} @tab Acquire a stream head for exclusive access.
+@item @manpage{MPSTR_STPRELE(9)} @tab Release a stream head from exclusive access.
+@end multitable
+
+@subsubsection Read/Write Locks
+
+@multitable @columnfractions .30 .70
+@item @manpage{RW_ALLOC(9)} @tab Allocate and initialize a read/write lock.
+@item @manpage{RW_DEALLOC(9)} @tab Deallocate a read/write lock.
+@item @manpage{RW_RDLOCK(9)} @tab Acquire a read/write lock in read mode.
+@item @manpage{RW_TRYRDLOCK(9)} @tab Attempt to acquire a read/write lock in read mode.
+@item @manpage{RW_TRYWRLOCK(9)} @tab Attempt to acquire a read/write lock in write mode.
+@item @manpage{RW_UNLOCK(9)} @tab Release a read/write lock.
+@item @manpage{RW_WRLOCK(9)} @tab Acquire a read/write lock in write mode.
+@end multitable
+
+@subsubsection Sleep Locks
+
+@multitable @columnfractions .30 .70
+@item @manpage{SLEEP_ALLOC(9)} @tab Allocate a sleep lock.
+@item @manpage{SLEEP_DEALLOC(9)} @tab Deallocate a sleep lock.
+@item @manpage{SLEEP_LOCK(9)} @tab Acquire a sleep lock.
+@item @manpage{SLEEP_LOCKAVAIL(9)} @tab Determine whether a sleep lock is available.
+@item @manpage{SLEEP_LOCKOWNED(9)} @tab Determine whether a sleep lock is held by the caller.
+@item @manpage{SLEEP_LOCK_SIG(9)} @tab Acquire a sleep lock.
+@item @manpage{SLEEP_TRYLOCK(9)} @tab Attempt to acquire a sleep lock.
+@item @manpage{SLEEP_UNLOCK(9)} @tab Release a sleep lock.
+@end multitable
+
+@subsubsection Synchronization Variables
+
+@multitable @columnfractions .30 .70
+@item @manpage{SV_ALLOC(9)} @tab Allocate a basic condition variable.
+@item @manpage{SV_BROADCAST(9)} @tab Broadcast a basic condition variable.
+@item @manpage{SV_DEALLOC(9)} @tab Deallocate a basic condition variable.
+@item @manpage{SV_SIGNAL(9)} @tab Signal a basic condition variable.
+@item @manpage{SV_WAIT(9)} @tab Wait on a basic condition variable.
+@item @manpage{SV_WAIT_SIG(9)} @tab Interruptible wait on a basic condition variable.
+@end multitable
+
+@subsubsection Resource Allocation
+
+@multitable @columnfractions .30 .70
+@item @manpage{rmalloc(9)} @tab Allocate a number of units from a resource map.
+@item @manpage{rmallocmap(9)} @tab Allocated a resource map.
+@item @manpage{rmallocmap_wait(9)} @tab Allocated a resource map.
+@item @manpage{rmalloc_wait(9)} @tab Allocate a number of units from a resource map.
+@item @manpage{rmfree(9)} @tab Free a number of units from a resource map.
+@item @manpage{rmfreemap(9)} @tab Free a resource map.
+@item @manpage{rmget(9)} @tab Allocated a number of units from a resource map.
+@item @manpage{rminit(9)} @tab Initialize a resource map.
+@item @manpage{rmsetwant(9)} @tab Wait for resources on a resource map.
+@item @manpage{rmwanted(9)} @tab Waiters on a resource map.
+@end multitable
+
+@subsubsection Device Numbering
+
+@multitable @columnfractions .30 .70
+@item @manpage{major(9)} @tab Get the internal major number of a device.
+@item @manpage{makedev(9)} @tab Make a device number from internal major and minor device numbers.
+@item @manpage{minor(9)} @tab Get the internal minor number of a device.
+@end multitable
+
+@node Configuration ala SVR 4.2 MP
+@subsection Configuration ala SVR 4.2 MP
+@cindex configuration, SVR 4.2 MP
+@cindex SVR 4.2 MP, configuration
+@cindex SVR 4.2 MP
 
 @node AIX Portability
 @section AIX Portability
+@cindex porting, AIX 5L Version 5.1
+@cindex AIX 5L Version 5.1, portability
+@cindex AIX 5L Version 5.1
+@cindex AIX PSE
+
+@menu
+* Differences from AIX 5L Version 5.1::
+* Commonalities with AIX 5L Version 5.1::
+* Compatibility Functions for AIX 5L Version 5.1::
+* Configuration ala AIX 5L Version 5.1::
+@end menu
+
+@node Differences from AIX 5L Version 5.1
+@subsection Differences from AIX 5L Version 5.1
+@cindex differences, AIX 5L Version 5.1
+@cindex AIX 5L Version 5.1, differences
+@cindex AIX 5L Version 5.1
+@cindex AIX PSE
+
+@node Commonalities with AIX 5L Version 5.1
+@subsection Commonalities with AIX 5L Version 5.1
+@cindex commonalities, AIX 5L Version 5.1
+@cindex AIX 5L Version 5.1, commonalities
+@cindex AIX 5L Version 5.1
+@cindex AIX PSE
+
+@node Compatibility Functions for AIX 5L Version 5.1
+@subsection Compatibility Functions for AIX 5L Version 5.1
+@cindex compatibility functions, AIX 5L Version 5.1
+@cindex AIX 5L Version 5.1, compatibility functions
+@cindex AIX 5L Version 5.1
+@cindex AIX PSE
+
+@subsubsection Core Extensions
+
+@multitable @columnfractions .30 .70
+@item @manpage{putctl2(9)} @tab Put a 2 byte control message on a @dfn{STREAMS} message queue.  @manpage{putctl2(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
+@item @manpage{splstr(9)} @tab Set or restore priority levels.  @manpage{splstr(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
+@item @manpage{splx(9)} @tab Set or restore priority levels.  @manpage{splx(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
+@item @manpage{weldq(9)} @tab Weld together two pairs of @dfn{STREAMS} message queues.  @manpage{weldq(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
+@item @manpage{unweldq(9)} @tab Unweld two pairs of @dfn{STREAMS} message queues.  @manpage{unweldq(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
+@end multitable
+
+@subsubsection Common Module Utilities
+
+@multitable @columnfractions .30 .70
+@item @manpage{mi_bufcall(9)} @tab Reliable alternative to @manpage{buffcall(9)}.
+@item @manpage{mi_close_comm(9)} @tab @dfn{STREAMS} common minor device close utility.
+@item @manpage{mi_next_ptr(9)} @tab @dfn{STREAMS} minor device list traversal.
+@item @manpage{mi_open_comm(9)} @tab @dfn{STREAMS} common minor device open utility.
+@item @manpage{mi_prev_ptr(9)} @tab @dfn{STREAMS} minor device list traversal.
+@end multitable
+
+@subsubsection Registration
+
+@multitable @columnfractions .30 .70
+@item @manpage{str_install(9)} @tab Install a @dfn{STREAMS} module or driver.
+@end multitable
+
+@subsubsection Message Filtering
+
+@multitable @columnfractions .30 .70
+@item @manpage{wantio(9)} @tab Perform direct I/O from a @dfn{STREAMS} driver.
+@item @manpage{wantmsg(9)} @tab Provide a filter of wanted messages from a @dfn{STREAMS} module.
+@end multitable
+
+@node Configuration ala AIX 5L Version 5.1
+@subsection Configuration ala AIX 5L Version 5.1
+@cindex configuration, AIX 5L Version 5.1
+@cindex AIX 5L Version 5.1, configuration
+@cindex AIX PSE
 
 @node HP-UX Portability
 @section HP-UX Portability
+@cindex porting, HP-UX 11.0i v2
+@cindex HP-UX 11.0i v2, portability
+@cindex HP-UX 11.0i v2
+@cindex HP-UX
+
+@menu
+* Differences from HP-UX 11.0i v2::
+* Commonalities with HP-UX 11.0i v2::
+* Compatibility Functions for HP-UX 11.0i v2::
+* Configuration ala HP-UX 11.0i v2::
+@end menu
+
+@node Differences from HP-UX 11.0i v2
+@subsection Differences from HP-UX 11.0i v2
+@cindex differences, HP-UX 11.0i v2
+@cindex HP-UX 11.0i v2, differences
+@cindex HP-UX 11.0i v2
+@cindex HP-UX
+
+@node Commonalities with HP-UX 11.0i v2
+@subsection Commonalities with HP-UX 11.0i v2
+@cindex commonalities, HP-UX 11.0i v2
+@cindex HP-UX 11.0i v2, commonalities
+@cindex HP-UX 11.0i v2
+@cindex HP-UX
+
+@node Compatibility Functions for HP-UX 11.0i v2
+@subsection Compatibility Functions for HP-UX 11.0i v2
+@cindex compatibility functions, HP-UX 11.0i v2
+@cindex HP-UX 11.0i v2, compatibility functions
+@cindex HP-UX 11.0i v2
+@cindex HP-UX
+
+@subsubsection Core Extensions
+
+@multitable @columnfractions .30 .70
+@item @manpage{streams_put(9)} @tab Invoke the put procedure for a @dfn{STREAMS} module or driver with a @dfn{STREAMS} message.  @manpage{streams_put(9)} is implemented using @manpage{put(9)}.  @manpage{put(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
+@item @manpage{putctl2(9)} @tab Put a 2 byte control message on a @dfn{STREAMS} message queue.  @manpage{putctl2(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
+@item @manpage{putnextctl2(9)} @tab Put a 2 byte control message on the downstream @dfn{STREAMS} message queue.  @manpage{putnextctl2(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
+@item @manpage{unweldq(9)} @tab Unweld two pairs of streams queues.  @manpage{unweldq(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
+@item @manpage{weldq(9)} @tab Weld together two pairs of streams queues.  @manpage{weldq(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
+@end multitable
+
+@subsubsection Registration
+
+@multitable @columnfractions .30 .70
+@item @manpage{str_install(9)} @tab Install a @dfn{STREAMS} module or driver.
+@item @manpage{str_uninstall(9)} @tab Uninstall a @dfn{STREAMS} module or driver.
+@end multitable
+
+@subsubsection Sleeping
+
+@multitable @columnfractions .30 .70
+@item @manpage{streams_get_sleep_lock(9)} @tab Provide access to the global sleep lock.
+@end multitable
+
+@node Configuration ala HP-UX 11.0i v2
+@subsection Configuration ala HP-UX 11.0i v2
+@cindex configuration, HP-UX 11.0i v2
+@cindex HP-UX 11.0i v2, configuration
+@cindex HP-UX 11.0i v2
+@cindex HP-UX
 
 @node OSF/1 Portability
 @section OSF/1 Portability
+@cindex porting, OSF/1 1.2/Digital UNIX
+@cindex OSF/1 1.2/Digital UNIX, portability
+@cindex OSF/1 1.2/Digital UNIX
+@cindex OSF/1
+
+@menu
+* Differences from OSF/1 1.2/Digital UNIX::
+* Commonalities with OSF/1 1.2/Digital UNIX::
+* Compatibility Functions for OSF/1 1.2/Digital UNIX::
+* Configuration ala OSF/1 1.2/Digital UNIX::
+@end menu
+
+@node Differences from OSF/1 1.2/Digital UNIX
+@subsection Differences from OSF/1 1.2/Digital UNIX
+@cindex differences, OSF/1 1.2/Digital UNIX
+@cindex OSF/1 1.2/Digital UNIX, differences
+@cindex OSF/1 1.2/Digital UNIX
+@cindex OSF/1
+
+@node Commonalities with OSF/1 1.2/Digital UNIX
+@subsection Commonalities with OSF/1 1.2/Digital UNIX
+@cindex commonalities, OSF/1 1.2/Digital UNIX
+@cindex OSF/1 1.2/Digital UNIX, commonalities
+@cindex OSF/1 1.2/Digital UNIX
+@cindex OSF/1
+
+@node Compatibility Functions for OSF/1 1.2/Digital UNIX
+@subsection Compatibility Functions for OSF/1 1.2/Digital UNIX
+@cindex compatibility functions, OSF/1 1.2/Digital UNIX
+@cindex OSF/1 1.2/Digital UNIX, compatibility functions
+@cindex OSF/1 1.2/Digital UNIX
+@cindex OSF/1
+
+@subsubsection Core Extensions
+
+@multitable @columnfractions .30 .70
+@item @manpage{lbolt(9)} @tab Time in ticks since reboot @manpage{lbolt(9)} is a  @dfn{@value{PACKAGE_TITLE}} core function.
+@item @manpage{puthere(9)} @tab Invoke the put procedure for a @dfn{STREAMS} module or driver with a @dfn{STREAMS} message.  @manpage{puthere(9)} is implemented using @manpage{put(9)}.  @manpage{put(9)} is a  @dfn{@value{PACKAGE_TITLE}} core function.
+@item @manpage{weldq(9)} @tab Weld together two pairs of streams queues.  @manpage{weldq(9)} is a  @dfn{@value{PACKAGE_TITLE}} core function.
+@item @manpage{unweldq(9)} @tab Unweld two pairs of streams queues.  @manpage{unweldq(9)} is a  @dfn{@value{PACKAGE_TITLE}} core function.
+@end multitable
+
+@subsubsection Common Module Utilities
+
+@multitable @columnfractions .30 .70
+@item @manpage{streams_close_comm(9)} @tab Common minor device close utility.
+@item @manpage{streams_open_comm(9)} @tab Common minor device open utility.
+@item @manpage{streams_open_ocomm(9)} @tab Common minor device open utility.
+@end multitable
+
+@subsubsection Registration
+
+@multitable @columnfractions .30 .70
+@item @manpage{strmod_add(9)} @tab Add a @dfn{STREAMS} module.
+@item @manpage{strmod_del(9)} @tab Delete a @dfn{STREAMS} module or driver from the kernel.
+@end multitable
+
+@subsubsection Others
+
+@multitable @columnfractions .30 .70
+@item @manpage{time(9)} @tab (undoc).
+@end multitable
+
+@node Configuration ala OSF/1 1.2/Digital UNIX
+@subsection Configuration ala OSF/1 1.2/Digital UNIX
+@cindex configuration, OSF/1 1.2/Digital UNIX
+@cindex OSF/1 1.2/Digital UNIX, configuration
+@cindex OSF/1 1.2/Digital UNIX
+@cindex OSF/1
 
 @node UnixWare Portability
 @section UnixWare Portability
+@cindex porting, UnixWare 7.1.3 (OpenUnix 8)
+@cindex UnixWare 7.1.3 (OpenUnix 8), portability
+@cindex UnixWare 7.1.3 (OpenUnix 8)
+@cindex UnixWare
+
+@menu
+* Differences from UnixWare 7.1.3 (OpenUnix 8)::
+* Commonalities with UnixWare 7.1.3 (OpenUnix 8)::
+* Compatibility Functions for UnixWare 7.1.3 (OpenUnix 8)::
+* Configuration ala UnixWare 7.1.3 (OpenUnix 8)::
+@end menu
+
+@node Differences from UnixWare 7.1.3 (OpenUnix 8)
+@subsection Differences from UnixWare 7.1.3 (OpenUnix 8)
+@cindex differences, UnixWare 7.1.3 (OpenUnix 8)
+@cindex UnixWare 7.1.3 (OpenUnix 8), differences
+@cindex UnixWare 7.1.3 (OpenUnix 8)
+@cindex UnixWare
+
+@node Commonalities with UnixWare 7.1.3 (OpenUnix 8)
+@subsection Commonalities with UnixWare 7.1.3 (OpenUnix 8)
+@cindex commonalities, UnixWare 7.1.3 (OpenUnix 8)
+@cindex UnixWare 7.1.3 (OpenUnix 8), commonalities
+@cindex UnixWare 7.1.3 (OpenUnix 8)
+@cindex UnixWare
+
+@cite{UnixWare} provides most of the core functions provide by @cite{@value{PACKAGE_TITLE}} along with
+all of the compatibility functions provided by the @cite{SVR 4.2 MP}
+@cindex SVR 4.2 MP
+compatibility module.  In addition the functions provided here in the @cite{UnixWare} compatibility
+module are provided.
+
+@node Compatibility Functions for UnixWare 7.1.3 (OpenUnix 8)
+@subsection Compatibility Functions for UnixWare 7.1.3 (OpenUnix 8)
+@cindex compatibility functions, UnixWare 7.1.3 (OpenUnix 8)
+@cindex UnixWare 7.1.3 (OpenUnix 8), compatibility functions
+@cindex UnixWare 7.1.3 (OpenUnix 8)
+@cindex UnixWare
+
+The following compatibility functions are in addition to all @cite{SVR 4.2}
+@cindex SVR 4.2
+compatibility functions.
+
+@subsubsection Device Numbering
+
+Device numbering has evolved since @cite{UNIX Sytem V Release 3.0} and provides internal, external
+and extended device numbering.  These functions are provided for backward compatibility with some
+drivers that were written for the older system.  These are core functions in the
+@dfn{@value{PACKAGE_TITLE}} implementation.
+
+@multitable @columnfractions .30 .70
+@item @manpage{emajor(9)} @tab Get the external (real) major device number from the device number.
+@item @manpage{eminor(9)} @tab Get the external extended minor device number from the device number.
+@item @manpage{etoimajor(9)} @tab Convert an external major device number to an internal major device number.
+@item @manpage{getemajor(9)} @tab Get the external (real) major device number.
+@item @manpage{geteminor(9)} @tab Get the external minor device number.
+@item @manpage{itoemajor(9)} @tab Convert an internal major device number to an external major device number.
+@end multitable
+
+@subsubsection Memory Alignment
+
+In attempting to unify several disparaging @cite{UNIX}-based systems (in particular @cite{XENIX}
+@cindex XENIX
+and @cite{UnixWare},
+@cindex UnixWare
+it became necessary to sometimes address the alignment of data buffers.  Certainly a better way to
+accomplish this would be to allocate data buffers using other allocators that provide the required
+alignment and other buffer characteristics and then allocating a message and data block with a call
+to @manpage{esballoc(9)}.
+Nevertheless, these functions were provided for making message blocks, data blocks and data buffers
+meet specific physical requirements.
+
+@dfn{@value{PACKAGE_TITLE}} provides these functions for compatibility, however, most of the physical
+requirements provided are ignored.
+
+@multitable @columnfractions .30 .70
+@item @manpage{allocb_physreq(9)} @tab Allocate a @dfn{STREAMS} message and data block.
+@item @manpage{msgphysreq(9)} @tab Cause a message block to meet physical requirements.
+@item @manpage{msgpullup_physreq(9)} @tab Pull up bytes in a @dfn{STREAMS} message.
+@item @manpage{msgscgth(9)} @tab (undoc).
+@end multitable
+
+@subsubsection Direct @dfn{STREAMS} Input-Output Controls
+
+@multitable @columnfractions .30 .70
+@item @manpage{strioccall(9)} @tab (undoc).
+@end multitable
+
+@node Configuration ala UnixWare 7.1.3 (OpenUnix 8)
+@subsection Configuration ala UnixWare 7.1.3 (OpenUnix 8)
+@cindex configuration, UnixWare 7.1.3 (OpenUnix 8)
+@cindex UnixWare 7.1.3 (OpenUnix 8), configuration
+@cindex UnixWare 7.1.3 (OpenUnix 8)
+@cindex UnixWare
 
 @node Solaris Portability
 @section Solaris Portability
+@cindex porting, Solaris 9/SunOS 5.9
+@cindex Solaris 9/SunOS 5.9, portability
+@cindex Solaris 9/SunOS 5.9
+@cindex Solaris
+@cindex SunOS
+
+@menu
+* Differences from Solaris 9/SunOS 5.9::
+* Commonalities with Solaris 9/SunOS 5.9::
+* Compatibility Functions for Solaris 9/SunOS 5.9::
+* Configuration ala Solaris 9/SunOS 5.9::
+@end menu
+
+@node Differences from Solaris 9/SunOS 5.9
+@subsection Differences from Solaris 9/SunOS 5.9
+@cindex differences, Solaris 9/SunOS 5.9
+@cindex Solaris 9/SunOS 5.9, differences
+@cindex Solaris 9/SunOS 5.9
+@cindex Solaris
+@cindex SunOS
+
+@node Commonalities with Solaris 9/SunOS 5.9
+@subsection Commonalities with Solaris 9/SunOS 5.9
+@cindex commonalities, Solaris 9/SunOS 5.9
+@cindex Solaris 9/SunOS 5.9, commonalities
+@cindex Solaris 9/SunOS 5.9
+@cindex Solaris
+@cindex SunOS
+
+@node Compatibility Functions for Solaris 9/SunOS 5.9
+@subsection Compatibility Functions for Solaris 9/SunOS 5.9
+@cindex compatibility functions, Solaris 9/SunOS 5.9
+@cindex Solaris 9/SunOS 5.9, compatibility functions
+@cindex Solaris 9/SunOS 5.9
+@cindex Solaris
+@cindex SunOS
+
+@subsubsection STREAMS Queue Referenced Callbacks
+
+@multitable @columnfractions .30 .70
+@item @manpage{qbufcall(9)} @tab Install a @dfn{STREAMS} buffer callback.
+@item @manpage{qunbufcall(9)} @tab Cancel a @dfn{STREAMS} buffer callback.
+@item @manpage{qtimeout(9)} @tab Start a timer associated with a queue.
+@item @manpage{quntimeout(9)} @tab Stop a timer associated with a queue.
+@item @manpage{qwait(9)} @tab Wait for a queue message.
+@item @manpage{qwait_sig(9)} @tab Wait for a queue message or signal.
+@item @manpage{queclass(9)} @tab Return the class of a @dfn{STREAMS} message.
+@item @manpage{qwriter(9)} @tab @dfn{STREAMS} mutex upgrade.
+@end multitable
+
+@subsubsection STREAMS Registration
+
+@multitable @columnfractions .30 .70
+@item @manpage{install_driver(9)} @tab Install a device driver.
+@item @manpage{mod_info(9)} @tab Provides information on a loadable kernel module to the @dfn{STREAMS} executive.
+@item @manpage{mod_install(9)} @tab Installs a loadable kernel module in the @dfn{STREAMS} executive.
+@item @manpage{mod_remove(9)} @tab Removes a loadable module from the @dfn{STREAMS} executive.
+@end multitable
+
+@subsubsection DDI
+@cindex DDI/DKI
+
+@cite{Solaris} provides a wide array of Device Driver Interface functions available for use by device
+drivers.  Many of these functions are useful for @dfn{STREAMS} device and pseudo-device drivers and
+modules.  Almost all of these functions, however, are @cite{Solaris}-specific and are completely
+non-portable to other @cite{UNIX}-based operating systems.  To make matters worse for portability,
+many of these functions have no @cite{SVR 4.2 MP}
+@cindex SVR 4.2 MP
+equivalents.
+
+@multitable @columnfractions .40 .60
+@item @manpage{ddi_create_minor_node(9)} @tab Create a minor node for this device.
+@item @manpage{ddi_remove_minor_node(9)} @tab Remove a minor node for a device.
+@item @manpage{ddi_driver_major(9)} @tab Find the major device number associated with a driver.
+@item @manpage{ddi_getiminor(9)} @tab Get the internal minor device number.
+@item @manpage{ddi_driver_name(9)} @tab Return normalized driver name.
+@item @manpage{ddi_get_cred(9)} @tab Get a reference to the credentials of the current user.
+@item @manpage{ddi_get_instance(9)} @tab Get device instance number.
+@item @manpage{ddi_get_lbolt(9)} @tab Get the current value of the system tick clock.
+@item @manpage{ddi_get_pid(9)} @tab Get the process id of the current process.
+@item @manpage{ddi_get_time(9)} @tab Get the current time in seconds since the epoch.
+@item @manpage{ddi_removing_power(9)} @tab
+@item @manpage{ddi_get_soft_state(9)} @tab
+@item @manpage{ddi_soft_state(9)} @tab
+@item @manpage{ddi_soft_state_fini(9)} @tab
+@item @manpage{ddi_soft_state_free(9)} @tab
+@item @manpage{ddi_soft_state_init(9)} @tab
+@item @manpage{ddi_soft_state_zalloc(9)} @tab
+@item @manpage{ddi_umem_alloc(9)} @tab Allocate page aligned kernel memory.
+@item @manpage{ddi_umem_free(9)} @tab Free page aligned kernel memory.
+@end multitable
+
+@subsubsection Loadable Module Interface
+
+@multitable @columnfractions .30 .70
+@item @manpage{_fini(9)} @tab
+@item @manpage{_info(9)} @tab
+@item @manpage{_init(9)} @tab
+@item @manpage{attach(9)} @tab Attach a device to the system or resume a suspended device.
+@item @manpage{getinfo(9)} @tab
+@item @manpage{identify(9)} @tab Determine if a driver is associated with a device.
+@item @manpage{detach(9)} @tab Detach a device from the system or suspend a device.
+@item @manpage{power(9)} @tab Power a device attached to the system.
+@item @manpage{probe(9)} @tab
+@end multitable
+
+@node Configuration ala Solaris 9/SunOS 5.9
+@subsection Configuration ala Solaris 9/SunOS 5.9
+@cindex configuration, Solaris 9/SunOS 5.9
+@cindex Solaris 9/SunOS 5.9, configuration
+@cindex Solaris 9/SunOS 5.9
+@cindex Solaris
+@cindex SunOS
 
 @node SUX Portability
 @section SUX Portability
+@cindex porting, Super/UX
+@cindex Super/UX, portability
+@cindex Super/UX
+
+@menu
+* Differences from Super/UX::
+* Commonalities with Super/UX::
+* Compatibility Functions for Super/UX::
+* Configuration ala Super/UX::
+@end menu
+
+@node Differences from Super/UX
+@subsection Differences from Super/UX
+@cindex differences, Super/UX
+@cindex Super/UX, differences
+@cindex Super/UX
+
+@node Commonalities with Super/UX
+@subsection Commonalities with Super/UX
+@cindex commonalities, Super/UX
+@cindex Super/UX, commonalities
+@cindex Super/UX
+
+@node Compatibility Functions for Super/UX
+@subsection Compatibility Functions for Super/UX
+@cindex compatibility functions, Super/UX
+@cindex Super/UX, compatibilty functions
+@cindex Super/UX
+
+@multitable @columnfractions .30 .70
+@item @manpage{lbolt(9)} @tab time in ticks since reboot
+@end multitable
+
+@node Configuration ala Super/UX
+@subsection Configuration ala Super/UX
+@cindex configuration, Super/UX
+@cindex Super/UX, configuration
+@cindex Super/UX
 
 @node UXP Portability
 @section UXP Portability
+@cindex porting, UXP/V
+@cindex UXP/V, portability
+@cindex UXP/V
+
+@menu
+* Differences from UXP/V::
+* Commonalities with UXP/V::
+* Compatibility Functions for UXP/V::
+* Configuration ala UXP/V::
+@end menu
+
+@node Differences from UXP/V
+@subsection Differences from UXP/V
+@cindex differences, UXP/V
+@cindex UXP/V, differences
+@cindex UXP/V
+
+@node Commonalities with UXP/V
+@subsection Commonalities with UXP/V
+@cindex commonalities, UXP/V
+@cindex UXP/V, commonalities
+@cindex UXP/V
+
+@node Compatibility Functions for UXP/V
+@subsection Compatibility Functions for UXP/V
+@cindex compatibility functions, UXP/V
+@cindex UXP/V, compatibility functions
+@cindex UXP/V
+
+@node Configuration ala UXP/V
+@subsection Configuration ala UXP/V
+@cindex configuration, UXP/V
+@cindex UXP/V, configuration
+@cindex UXP/V
 
 @node LiS Portability
 @section LiS Portability
+@cindex porting, LiS 2.18.4
+@cindex LiS 2.18.4, portability
+@cindex LiS 2.18.4
+@cindex LiS
+@cindex Linux STREAMS (LiS)
+
+@menu
+* Differences from LiS 2.18.4::
+* Commonalities with LiS 2.18.4::
+* Compatibility Functions for LiS 2.18.4::
+* Configuration ala LiS 2.18.4::
+@end menu
+
+@node Differences from LiS 2.18.4
+@subsection Differences from LiS 2.18.4
+@cindex differences, LiS 2.18.4
+@cindex LiS 2.18.4, differences
+@cindex LiS 2.18.4
+@cindex LiS
+@cindex Linux STREAMS (LiS)
+
+@node Commonalities with LiS 2.18.4
+@subsection Commonalities with LiS 2.18.4
+@cindex commonalities, LiS 2.18.4
+@cindex LiS 2.18.4, commonalities
+@cindex LiS 2.18.4
+@cindex LiS
+@cindex Linux STREAMS (LiS)
+
+@node Compatibility Functions for LiS 2.18.4
+@subsection Compatibility Functions for LiS 2.18.4
+@cindex compatibility functions, LiS 2.18.4
+@cindex LiS 2.18.4, compatibility functions
+@cindex LiS 2.18.4
+@cindex LiS
+@cindex Linux STREAMS (LiS)
+
+@subsubsection Extensions
+
+@multitable @columnfractions .40 .60
+@item @manpage{lis_appq(9)} @tab Append one @dfn{STREAMS} message after another.
+@item @manpage{lis_date(9)} @tab
+@item @manpage{lis_esbbcall(9)} @tab Install a buffer callback for an extended @dfn{STREAMS} message block.
+@item @manpage{lis_find_strdev(9)} @tab
+@item @manpage{lis_OTHER(9)} @tab Return the other queue of a @dfn{STREAMS} queue pair..  This function is intended to accommodate a common miss-spelling of @manpage{OTHERQ(9)}.
+@item @manpage{lis_version(9)} @tab
+@item @manpage{lis_xmsgsize(9)} @tab Calculate the size of message blocks in a @dfn{STREAMS} message.
+@end multitable
+
+@subsubsection Device Creation and Deletion
+
+@multitable @columnfractions .40 .60
+@item @manpage{lis_mknod(9)} @tab Make block or character special files.
+@item @manpage{lis_unlink(9)} @tab Remove a file.
+@item @manpage{lis_mount(9)} @tab Mount a file system.
+@item @manpage{lis_umount2(9)} @tab Unmount a file system.
+@item @manpage{lis_umount(9)} @tab Unmount a file system.
+@end multitable
+
+@subsubsection Registration
+
+@multitable @columnfractions .40 .60
+@item @manpage{lis_register_strdev(9)} @tab Register a @dfn{STREAMS} device.
+@item @manpage{lis_register_strmod(9)} @tab Register a @dfn{STREAMS} module.
+@item @manpage{lis_unregister_strdev(9)} @tab Unregister a @dfn{STREAMS} device.
+@item @manpage{lis_unregsiter_strmod(9)} @tab Unregister a @dfn{STREAMS} module.
+@end multitable
+
+@node Configuration ala LiS 2.18.4
+@subsection Configuration ala LiS 2.18.4
+@cindex configuration, LiS 2.18.4
+@cindex LiS 2.18.4, configuration
+@cindex LiS 2.18.4
+@cindex LiS
+@cindex Linux STREAMS (LiS)
+
+@multitable @columnfractions .40 .60
+@end multitable
+
+@c ============================================================================
+@node Development
+@chapter Developing Portable STREAMS Modules
+@cindex developing portable streams modules
+
+In the process of creating the @dfn{@value{PACKAGE_TITLE}} subsystem in such a way so as to facilitate
+portability of @dfn{STREAMS} drivers and modules from a wide range of @cite{UNIX} operating system
+variants, a number of guidelines for the development of portable @dfn{STREAMS} drivers and modules
+have been developed.  These guidelines, when adhered to, will allow the resulting driver or module
+to be ported to another @dfn{STREAMS} implementation with minimal effort.  These portability
+guidelines are collected here.
+
+@menu
+* Memory Allocation::
+* Alignment of Message Buffers::
+* Disabling and Enabling Queue Procedures::
+* Freezing and Unfreezing Streams::
+* Passing Messages from Interrupt Service Routines::
+* Timeout Call Back and Link Identifiers::
+* Synchronization with Timeouts and Callback Functions::
+* Synchronization with Callout Functions::
+* Synchronization of Drivers and Modules::
+* Special STREAMS Message Types::
+* Use of Message Allocation Priorities::
+* Device Numbering::
+* Registration and Deregistration::
+@end menu
+
+@node Memory Allocation
+@section Memory Allocation
+
+Portable @dfn{STREAMS} modules and drivers will always allocate memory using the @cite{SVR4}
+@cindex SVR4
+memory allocators/deallocators: @manpage{kmem_alloc(9)}, @manpage{kmem_zalloc(9)} and
+@manpage{kmem_free(9)}.
+
+Additional eligible allocators are:
+
+@manpage{rmallocmap(9)}
+@manpage{rmfreemap(9)}
+@manpage{rmalloc(9)}
+@manpage{rmalloc_wait(9)}
+@manpage{rmfree(9)}
+@manpage{rminit(9)}
+@manpage{rmsetwant(9)}
+@manpage{rmwanted(9)}
+
+Unfortunately, these resource map allocators are not available on @cite{AIX}
+@cindex AIX
+so, if portability to the @cite{AIX}
+@cindex AIX
+is important, then do not use these allocators.
+
+Additional eligible allocators are:
+
+@manpage{kmem_fast_alloc(9)}
+@manpage{kmem_fast_free(9)}
+
+@node Alignment of Message Buffers
+@section Alignment of Message Buffers
+
+@node Disabling and Enabling Queue Procedures
+@section Disabling and Enabling Queue Procedures
+
+Portable @dfn{STREAMS} modules and drivers will always call @manpage{qprocson(9)} before returning
+from its queue open procedure (see @manpage{qopen(9)}.
+
+Portable @dfn{STREAMS} modules and drivers will always call @manpage{qprocsoff(9)} upon entering
+its queue close procedure (see @manpage{qclose(9)}).
+
+@node Freezing and Unfreezing Streams
+@section Freezing and Unfreezing Streams
+
+@node Passing Messages from Interrupt Service Routines
+@section Passing Messages from Interrupt Service Routines
+
+@node Timeout Call Back and Link Identifiers
+@section Timeout Call Back and Link Identifiers
+
+Although buffer callbacks identifiers (see @manpage{bufcall(9)}), timeout identifiers (see
+@manpage{timeout(9)}), and multiplexing driver link identifiers (see @streamio{I_LINK}
+and @streamio{I_PLINK} under
+@manpage{streamio(7)}), are often illustrated as small integer numbers, with some @dfn{STREAMS}
+implementations, including @dfn{@value{PACKAGE_TITLE}}, these identifiers are kernel addresses
+(pointers) and are never small integer values like 1, 2, or 3.
+
+Also, there is no guarantee that the identifier will be positive.  It is guaranteed that the
+returned identifier will not be zero (0).  Zero is used by these function as a return value to
+indicate an error.
+
+Portable @dfn{STREAMS} drivers and modules will not depend upon the returned identifier from
+@manpage{bufcall(9)}, @manpage{timeout(9)} or @manpage{streamio(7)} as being any specific range of
+value.  Portable drivers and modules will save any returned identifiers in data types that will not
+loose the precision of the identifier.
+
+@node Synchronization with Timeouts and Callback Functions
+@section Synchronization with Timeouts and Callback Functions
+
+@node Synchronization with Callout Functions
+@section Synchronization with Callout Functions
+
+@node Synchronization of Drivers and Modules
+@section Synchronization of Drivers and Modules
+
+@node Special STREAMS Message Types
+@section Special @dfn{STREAMS} Message Types
+
+@node Use of Message Allocation Priorities
+@section Use of Message Allocation Priorities
+
+@node Registration and Deregistration
+@section Registration and Deregistration
+
+@node Device Numbering
+@section Device Numbering
+
+@subsection UNIX Device Numbering
+
+@quotation
+In versions of @cite{UNIX System V} previous to @cite{Release 4}, the major and minor device numbers
+were each 8 bit, and they were packed into a 16 bit word (usually a C Language @var{short}
+variable).  Under @cite{UNIX System V Release 4}, the device numbers are held in a @type{dev_t}
+variable, which is often implemented as a 32 bit integer.  The minor device number is held as 14
+bits, and a further 8 bits are used for the major device number.  @type{dev_t}
+is ofter referred to as the "expanded device type", since it allows many more minor devices than
+before.
+
+Many drivers were written for earlier releases, an may eventually be ported to @cite{UNIX System V
+Release 4}.  In earlier releases, some manufacturers got around the 256 minor device number limit by
+using multiple major device numbers for a device.  Devices were created with different major device
+numbers (the external major device number) but they all mapped to the same device driver entry in
+the device switch tables (the internal device number).  Even under this scheme, each major device
+could only support 256 minor devices, but the driver could support many more.  This has been
+recognized in @cite{UNIX System V Release 4}, and functions are provided to do this mapping; for
+example, the function @manref{etoimajor(9)} and so on, give a machine independent interface to the
+device number mapping.@footnote{@cite{The Magic Garden Explained}}
+@end quotation
+
+@subsection Linux Device Numbering
+
+Versions of the @b{Linux} kernel in the 2.4 kernel series and prior to 2.6 also provided an 8 bit
+major device number and an 8 bit minor device number grouped into a 16-bit combined device number.
+Linux 2.6 kernels (and some patched 2.4 kernels) now have larger device numbers.  These extended
+device numbers are 12 bits for major device number and 20 bits for minor device number, with 32 bits
+for the combined device number.
+
+@subsection LiS Device Numbering
+@cindex Linux STREAMS (LiS)
+
+@cite{LiS}
+@cindex Linux STREAMS (LiS)
+prior to the 2.18.0 release was incapable of providing an internal representation of the device
+number and the number of minor device numbers for a device driver was restricted to 256, just as in
+@cite{UNIX System V Release 3.2}.@footnote{Actually, 255 as the kernel reserved minor device number
+255 for expansion.}  Many @url{http://www.openss7.org/, OpenSS7} device drivers written for
+@cite{LiS}
+@cindex Linux STREAMS (LiS)
+would allocate additional major device numbers if required.  Good examples of devices that require
+more than 255 minor device numbers are @dfn{INET} clone devices, @dfn{SCTP} streams, @dfn{SS7} signalling link
+streams, MG media channels, etc.  These streams are often @streamio{I_PLINK}ed
+under a multiplexing driver and do not even consume a system file descriptor.
+
+@subsection @value{PACKAGE_TITLE} Device Numbering
+
+@dfn{@value{PACKAGE_TITLE}} began with extended device numbering.  The @file{specfs} shadow special
+character device file system used by @dfn{@value{PACKAGE_TITLE}} uses the @samp{inode} number to hold the
+@type{dev_t}
+device number instead of the @samp{inode->i_rdev}, which on older kernels is only a 16-bit
+@var{short}.
+
+In earlier versions of @dfn{@value{PACKAGE_TITLE}}, the internal device numbering is 16-bits for major
+device number and 16-bits for minor device number.  This will soon be changed to 12-bits for major
+device number and 20-bits for minor device number to accommodate the newer @b{Linux} scheme.
+
+On 2.6 @b{Linux} kernels that support the newer extended device numbers, external device numbers and
+internal device numbers will be the same.  On 2.4 @b{Linux} kernels with the older 16-bit device
+numbers, external device number and internal device numbers will differ.  In some situations, an
+internal device number can exists with no corresponding external device number (accessed only via a
+clone device or direct access to the mounted @file{specfs} shadow special character device
+file system).
+
+@multitable @columnfractions .30 .70
+@item @manpage{etoimajor(9)} @tab change external to internal major device number
+@item @manpage{getemajor(9)} @tab get external major device number
+@item @manpage{geteminor(9)} @tab get external minor device number
+@item @manpage{itoemajor(9)} @tab change internal to external major device number
+@end multitable
 
 @c ============================================================================
 @node Data Structures
