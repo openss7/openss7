@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/02 10:03:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/02 12:12:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/02 10:03:27 $ by $Author: brian $
+# Last Modified $Date: 2007/03/02 12:12:33 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.5  2007/03/02 12:12:33  brian
+# - correction
+#
 # Revision 0.9.2.4  2007/03/02 10:03:27  brian
 # - updates to common build process and versions for all exported symbols
 #
@@ -225,6 +228,7 @@ dist_noinst_MANS = \
 	man4/mercd.4.man \
 	man4/mercdDriver.4.man \
 	man4/pmacd.4.man \
+	man4/sctmr.4.man  \
 	man4/sctmrDriver.4.man  \
 	man5/osr61.5.man \
 	man8/osr61_mknod.8.man \
