@@ -1,0 +1,1 @@
+.so man4/gncfd.4.man

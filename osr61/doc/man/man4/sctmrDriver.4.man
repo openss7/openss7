@@ -1,0 +1,1 @@
+.so man4/sctmr.4.man
