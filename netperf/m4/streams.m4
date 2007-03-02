@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2007/03/01 07:17:25 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2007/03/02 23:10:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
+# Last Modified $Date: 2007/03/02 23:10:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -363,6 +363,8 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for streams lis include directory... $streams_dir])
 		    if test -r "$streams_dir/$streams_what" ; then
 			streams_cv_lis_includes="$streams_dir"
+			#streams_cv_lis_ldadd=
+			#streams_cv_lis_ldadd32=
 			#streams_cv_lis_modmap=
 			#streams_cv_lis_symver=
 			#streams_cv_lis_manpath=
@@ -375,7 +377,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for streams lis include directory])
 	fi
     ])
-    AC_CACHE_CHECK([for streams lis ldadd], [streams_cv_lis_ldadd], [dnl
+    AC_CACHE_CHECK([for streams lis ldadd native], [streams_cv_lis_ldadd], [dnl
 	streams_cv_lis_ldadd=
 	for streams_dir in $streams_cv_lis_includes ; do
 	    if test -f $streams_dir/../libLiS.la ; then
@@ -383,11 +385,32 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		break
 	    fi
 	done
+	if test -z "$streams_cv_lis_ldadd" ; then
+	    streams_what="libLiS.la"
+	    eval "streams_search_path=\"
+		${DESTDIR}${rootdir}${libdir}
+		${DESTDIR}${libdir}\""
+	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for streams_dir in $streams_search_path ; do
+		if test -d "$streams_dir" ; then
+		    AC_MSG_CHECKING([for streams lis ldadd native... $streams_dir])
+		    if test -r "$streams_dir/$streams_what" ; then
+			streams_cv_lis_ldadd="$streams_dir/$streams_what"
+			streams_cv_lis_ldflags=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for streams lis ldadd native])
+	fi
     ])
-    AC_CACHE_CHECK([for streams lis ldflags], [streams_cv_lis_ldflags], [dnl
+    AC_CACHE_CHECK([for streams lis ldflags native], [streams_cv_lis_ldflags], [dnl
 	streams_cv_lis_ldflags=
 	if test -z "$streams_cv_lis_ldadd" ; then
-	    streams_cv_lis_ldflags="-lLIS"
+	    streams_cv_lis_ldflags='-L$(DESTDIR)$(rootdir)$(libdir) -lLIS'
 	else
 	    streams_cv_lis_ldflags="-L$(dirname $streams_cv_lis_ldadd)/.libs/"
 	fi
@@ -400,11 +423,32 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		break
 	    fi
 	done
+	if test -z "$streams_cv_lis_ldadd32" ; then
+	    streams_what="libLiS.la"
+	    eval "streams_search_path=\"
+		${DESTDIR}${rootdir}${lib32dir}
+		${DESTDIR}${lib32dir}\""
+	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for streams_dir in $streams_search_path ; do
+		if test -d "$streams_dir" ; then
+		    AC_MSG_CHECKING([for streams lis ldadd 32-bit... $streams_dir])
+		    if test -r "$streams_dir/$streams_what" ; then
+			streams_cv_lis_ldadd32="$streams_dir/$streams_what"
+			streams_cv_lis_ldflags32=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for streams lis ldadd 32-bit])
+	fi
     ])
     AC_CACHE_CHECK([for streams lis ldflags 32-bit], [streams_cv_lis_ldflags32], [dnl
 	streams_cv_lis_ldflags32=
 	if test -z "$streams_cv_lis_ldadd32" ; then
-	    streams_cv_lis_ldflags32="-lLIS"
+	    streams_cv_lis_ldflags32='-L$(DESTDIR)$(rootdir)$(libdir) -lLIS'
 	else
 	    streams_cv_lis_ldflags32="-L$(dirname $streams_cv_lis_ldadd32)/.libs/"
 	fi
@@ -642,6 +686,8 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for streams lfs include directory... $streams_dir])
 		    if test -r "$streams_dir/$streams_what" ; then
 			streams_cv_lfs_includes="$streams_dir"
+			#streams_cv_lfs_ldadd=
+			#streams_cv_lfs_ldadd32=
 			#streams_cv_lfs_modmap=
 			#streams_cv_lfs_symver=
 			#streams_cv_lfs_manpath=
@@ -662,11 +708,32 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		break
 	    fi
 	done
+	if test -z "$streams_cv_lfs_ldadd" ; then
+	    streams_what="libstreams.la"
+	    eval "streams_search_path=\"
+		${DESTDIR}${rootdir}${libdir}
+		${DESTDIR}${libdir}\""
+	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for streams_dir in $streams_search_path ; do
+		if test -d "$streams_dir" ; then
+		    AC_MSG_CHECKING([for streams lfs ldadd native... $streams_dir])
+		    if test -r "$streams_dir/$streams_what" ; then
+			streams_cv_lfs_ldadd="$streams_dir/$streams_what"
+			streams_cv_lfs_ldflags=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for streams lfs ldadd native])
+	fi
     ])
-    AC_CACHE_CHECK([for streams lfs ldflags], [streams_cv_lfs_ldflags], [dnl
+    AC_CACHE_CHECK([for streams lfs ldflags native], [streams_cv_lfs_ldflags], [dnl
 	streams_cv_lfs_ldflags=
 	if test -z "$streams_cv_lfs_ldadd" ; then
-	    streams_cv_lfs_ldflags="-lstreams"
+	    streams_cv_lfs_ldflags='-L$(DESTDIR)$(rootdir)$(libdir) -lstreams'
 	else
 	    streams_cv_lfs_ldflags="-L$(dirname $streams_cv_lfs_ldadd)/.libs/"
 	fi
@@ -679,11 +746,32 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		break
 	    fi
 	done
+	if test -z "$streams_cv_lfs_ldadd32" ; then
+	    streams_what="libstreams.la"
+	    eval "streams_search_path=\"
+		${DESTDIR}${rootdir}${lib32dir}
+		${DESTDIR}${lib32dir}\""
+	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for streams_dir in $streams_search_path ; do
+		if test -d "$streams_dir" ; then
+		    AC_MSG_CHECKING([for streams lfs ldadd 32-bit... $streams_dir])
+		    if test -r "$streams_dir/$streams_what" ; then
+			streams_cv_lfs_ldadd32="$streams_dir/$streams_what"
+			streams_cv_lfs_ldflags32=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for streams lfs ldadd 32-bit])
+	fi
     ])
     AC_CACHE_CHECK([for streams lfs ldflags 32-bit], [streams_cv_lfs_ldflags32], [dnl
 	streams_cv_lfs_ldflags32=
 	if test -z "$streams_cv_lfs_ldadd32" ; then
-	    streams_cv_lfs_ldflags32="-lstreams"
+	    streams_cv_lfs_ldflags32='-L$(DESTDIR)$(rootdir)$(lib32dir) -lstreams'
 	else
 	    streams_cv_lfs_ldflags32="-L$(dirname $streams_cv_lfs_ldadd32)/.libs/"
 	fi
