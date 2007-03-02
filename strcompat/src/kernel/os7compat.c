@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/08 05:08:24 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/02 10:04:07 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:08:24 $ by $Author: brian $
+ Last Modified $Date: 2007/03/02 10:04:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.27  2007/03/02 10:04:07  brian
+ - updates to common build process and versions for all exported symbols
+
  Revision 0.9.2.26  2006/12/08 05:08:24  brian
  - some rework resulting from testing and inspection
 
@@ -134,10 +137,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/08 05:08:24 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/02 10:04:07 $"
 
 static char const ident[] =
-    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/08 05:08:24 $";
+    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/02 10:04:07 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -158,7 +161,7 @@ static char const ident[] =
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2006/12/08 05:08:24 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/02 10:04:07 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"

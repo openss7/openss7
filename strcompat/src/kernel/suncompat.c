@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/11/03 10:39:28 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/02 10:04:08 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 10:39:28 $ by $Author: brian $
+ Last Modified $Date: 2007/03/02 10:04:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: suncompat.c,v $
+ Revision 0.9.2.31  2007/03/02 10:04:08  brian
+ - updates to common build process and versions for all exported symbols
+
  Revision 0.9.2.30  2006/11/03 10:39:28  brian
  - updated headers, correction to mi_timer_expiry type
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/11/03 10:39:28 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/02 10:04:08 $"
 
-static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/11/03 10:39:28 $";
+static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/02 10:04:08 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -78,7 +81,7 @@ static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/11/03 10:39:28 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/02 10:04:08 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"

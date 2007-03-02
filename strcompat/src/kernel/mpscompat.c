@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/02/21 01:09:17 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/02 10:04:06 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/21 01:09:17 $ by $Author: brian $
+ Last Modified $Date: 2007/03/02 10:04:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.39  2007/03/02 10:04:06  brian
+ - updates to common build process and versions for all exported symbols
+
  Revision 0.9.2.38  2007/02/21 01:09:17  brian
  - updating mtp.c driver, better mi_open allocators
 
@@ -169,10 +172,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/02/21 01:09:17 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/02 10:04:06 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/02/21 01:09:17 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/02 10:04:06 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -200,7 +203,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/02/21 01:09:17 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/02 10:04:06 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"

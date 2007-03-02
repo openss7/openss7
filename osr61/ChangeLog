@@ -1,5 +1,17 @@
 2007-03-02  Brian Bidulock  <bidulock@openss7.org>
 
+	* acinclude.m4: improvements to common build environment
+	* doc/man/Makefile.am: added manula pages
+	* doc/man/man4/dlgn.4.man: updated with *Driver name
+	* doc/man/man4/dvbm.4.man: updated with *Driver name
+	* doc/man/man4/gncfd.4.man: updated with *Driver name
+	* doc/man/man4/gpio.4.man: updated with *Driver name
+	* doc/man/man4/mercd.4.man: updated with *Driver name
+	* doc/man/man4/sctmr.4.man: updated with *Driver name
+	* doc/man/man5/osr61.5.man: updated with *Driver name
+	* src/drivers/mercd/include/msdlinux.h (__NO_VERSION__): do not redefine
+	* doc/manual/news.texi: updated for release
+
 	* doc/man/man4/dlgnDriver.4.man: added manual page
 	* doc/man/man4/dvbmDriver.4.man: added manual page
 	* doc/man/man4/gncfdDriver.4.man: added manual page
