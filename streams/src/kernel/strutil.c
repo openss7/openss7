@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/12/30 22:06:25 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2007/03/02 09:23:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/30 22:06:25 $ by $Author: brian $
+ Last Modified $Date: 2007/03/02 09:23:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.138  2007/03/02 09:23:29  brian
+ - build updates and esballoc() feature
+
  Revision 0.9.2.137  2006/12/30 22:06:25  brian
  - fix to flushband from John Wolthuis
 
@@ -98,10 +101,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/12/30 22:06:25 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2007/03/02 09:23:29 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2006/12/30 22:06:25 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2007/03/02 09:23:29 $";
 
 #include <linux/autoconf.h>
 #ifdef HAVE_KINC_LINUX_COMPILE_H
@@ -177,8 +180,8 @@ db_inc_slow(register dblk_t *db)
 STATIC streams_inline streams_fastcall __hot_get void
 db_inc(register dblk_t *db)
 {
-	/* When the number of references is 1 the buffer is exclusive to the
-	   caller and locking is not required. */
+	/* When the number of references is 1 the buffer is exclusive to the caller and locking is
+	   not required. */
 	if (likely(db->db_ref == 1))
 		return (void) (db->db_ref = 2);
 	return db_inc_slow(db);
@@ -349,6 +352,14 @@ freeb_skb(caddr_t arg)
 	kfree_skb(skb);
 }
 
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+/* unfortunately, this function is not exported */
+struct module *module_text_address(ulong addr);
+
+#define module_text_address(__arg) \
+	((typeof(&module_text_address)) HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+
 /**
  *  skballoc:	- allocate a message block with a socket buffer
  *  @skb:	socket buffer
@@ -366,6 +377,9 @@ skballoc(struct sk_buff *skb, uint priority)
 
 		frtnp->free_func = &freeb_skb;
 		frtnp->free_arg = (caddr_t) skb;
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+		*(struct module **) (frtnp + 1) = NULL;
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 		/* set up data block */
 		db->db_frtnp = frtnp;
 		db->db_base = skb->head;
@@ -395,6 +409,13 @@ EXPORT_SYMBOL_GPL(skballoc);
  *  @size:	size of the message buffer
  *  @priority:	priority of message block header allocation
  *  @freeinfo:	free routine callback
+ *
+ *  For kernels that support module_text_address() this includes the sneaky trick that we can
+ *  determine whether a module owns the callback function and increment that module's reference
+ *  count (if it is not this module).  A pointer to the module that was incremented is placed
+ *  immediately after the free routine structure.  (Hopefully nobody makes any assumptions about
+ *  this space being available.  Another option would be to add a void pointer to the frtn_t
+ *  structure, but then it would not be binary compatible with SVR4.)
  */
 streams_fastcall __hot_write mblk_t *
 esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
@@ -406,8 +427,19 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 		dblk_t *db = &md->datablk.d_dblock;
 		struct free_rtn *frtnp = (struct free_rtn *) md->databuf;
 
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+		struct module *kmod;
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+
 		frtnp->free_func = freeinfo->free_func;
 		frtnp->free_arg = freeinfo->free_arg;
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+		*(struct module **) (frtnp + 1) = NULL;
+		if ((kmod = module_text_address((ulong) frtnp->free_func)))
+			if (kmod != THIS_MODULE)
+				if (try_module_get(kmod))
+					*(struct module **) (frtnp + 1) = kmod;
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 		/* set up data block */
 		db->db_frtnp = frtnp;
 		db->db_base = base;
@@ -670,6 +702,11 @@ EXPORT_SYMBOL(dupmsg);		/* include/sys/streams/stream.h */
 /**
  *  freeb:	- free a message block
  *  @mp:	message block to free
+ *
+ *  This function is cognizant of the fact that there is a module pointer after the free routine
+ *  structure when the kernel can determine the module owner of the callback function.  When
+ *  non-NULL, this is a pointer to the module whose reference count to decrement once the callback
+ *  function returns.
  */
 streams_fastcall __hot void
 freeb(mblk_t *mp)
@@ -703,8 +740,16 @@ freeb(mblk_t *mp)
 			if ((frtnp = db->db_frtnp)) {
 				register void streamscall (*free_func) (caddr_t);
 
-				if ((free_func = frtnp->free_func))
+				if ((free_func = frtnp->free_func)) {
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+					struct module *kmod;
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 					free_func(frtnp->free_arg);
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+					if ((kmod = *(struct module **) (frtnp + 1)))
+						module_put(kmod);
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+				}
 			} else
 				kmem_free(db->db_base, db->db_size);
 		}
@@ -869,6 +914,11 @@ EXPORT_SYMBOL(msgsize);
  *
  *  Pulls up @length  bytes into the initial data block in message @mp.  This is for handling headers
  *  as a contiguous range of bytes.
+ *
+ *  This function is cognizant of the fact that there is a module pointer after the free routine
+ *  structure when the kernel can determine the module owner of the callback function.  When
+ *  non-NULL, this is a pointer to the module whose reference count to decrement once the callback
+ *  function returns.
  */
 streams_fastcall __unlikely int
 pullupmsg(mblk_t *mp, register ssize_t len)
@@ -939,9 +989,16 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 			if ((frtnp = db->db_frtnp)) {
 				register void streamscall (*free_func) (caddr_t);
 
-				if ((free_func = frtnp->free_func))
+				if ((free_func = frtnp->free_func)) {
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+					struct module *kmod;
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 					free_func(frtnp->free_arg);
-
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+					if ((kmod = *(struct module **) (frtnp + 1)))
+						module_put(kmod);
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+				}
 			} else
 				kmem_free(db->db_base, db->db_size);
 		}
@@ -1199,7 +1256,7 @@ bcanget(queue_t *q, unsigned char band)
 	return (found);
 }
 
-EXPORT_SYMBOL_GPL(bcanget);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_GPL(bcanget);	/* include/sys/streams/stream.h */
 
 STATIC streams_inline streams_fastcall __hot int
 __bcanputany(queue_t *q)
@@ -1536,7 +1593,7 @@ EXPORT_SYMBOL(canenable);
  */
 __STRUTIL_EXTERN_INLINE int canget(queue_t *q);
 
-EXPORT_SYMBOL_GPL(canget);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_GPL(canget);	/* include/sys/streams/stream.h */
 
 /**
  *  canput:		- check wheter message can be put to a queue
@@ -1684,7 +1741,7 @@ qready(void)
 	return (test_bit(qrunflag, &t->flags) != 0);
 }
 
-EXPORT_SYMBOL_GPL(qready);		/* include/sys/streams/stream.h */
+EXPORT_SYMBOL_GPL(qready);	/* include/sys/streams/stream.h */
 
 /**
  *  setqsched:	- schedule execution of queue procedures
@@ -1821,7 +1878,7 @@ EXPORT_SYMBOL(noenable);	/* include/sys/streams/stream.h */
  */
 STATIC streams_fastcall int
 __putbq(queue_t *q, mblk_t *mp)
-{ /* IRQ DISABLED */
+{				/* IRQ DISABLED */
 	int enable = 0;
 	mblk_t *b_next, *b_prev;
 
@@ -2119,7 +2176,7 @@ __putq_pri(queue_t *q, mblk_t *mp)
 	if (unlikely((mp->b_prev = b_prev) != NULL))
 		b_prev->b_next = mp;
 	/* always enable on high priority */
-	return (1 + 2);	/* success */
+	return (1 + 2);		/* success */
 }
 
 /*
@@ -3067,7 +3124,7 @@ __rmvq(queue_t *q, mblk_t *mp)
  */
 streams_fastcall __hot_read void
 rmvq(register queue_t *q, register mblk_t *mp)
-{ /* IRQ DISABLED */
+{				/* IRQ DISABLED */
 	bool backenable;
 	unsigned long pl;
 
@@ -3730,7 +3787,7 @@ setsq(queue_t *q, struct fmodsw *fmod)
 	return (result);
 }
 
-EXPORT_SYMBOL_GPL(setsq);		/* for stream head include/sys/streams/strsubr.h */
+EXPORT_SYMBOL_GPL(setsq);	/* for stream head include/sys/streams/strsubr.h */
 
 /**
  *  strqget:	- get characteristics of a queue

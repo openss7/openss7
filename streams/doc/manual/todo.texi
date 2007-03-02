@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.5 2007/02/28 06:30:56 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.6 2007/03/02 09:23:24 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/02/28 06:30:56 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/02 09:23:24 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -108,6 +108,19 @@ Wrote the manual pages and added them to the build.  Placed function skeletons t
 @errno{EOPNOTSUPP} for these functions in the Stream head.
 @item TODO:
 Implement @manpage{I_EGETSIG(7)} and @manpage{I_ESETSIG(7)}.
+@end table
+
+@item
+It is possible on 2.6 kernels to use the ability to determine the module that owns a function to
+perform module reference counting for @manref{esballoc(9)} callback functions.  That is, when
+@manpage{esballoc(9)} (and friends) are called, the module owning the callback function has its
+module reference count incremented.  When the block is freed and the callback function returns, the
+module has its module reference count decremented.  The pertinent kernel function is
+module_text_address() that returns the module in which a text address resides.
+
+@table @emph
+@item DONE:
+Module reference counting performed when module_text_address() is available.
 @end table
 
 @item

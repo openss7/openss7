@@ -1,3 +1,29 @@
+2007-03-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: new common build approach, added check for module_text_address
+	* doc/man/man9/esballoc.9.man: documentation for automatic moudule
+	  reference counting under 2.6 kernels 
+	* doc/manual/SPG2.texi: strapped in MP-STREAMS documentation (but the
+	  mp-streams(9) manual page is still better)
+	* doc/manual/todo.texi: documented completion of module reference
+	  counting for esballoc(9)
+	* src/drivers/clone.c: versioning of exported symbols
+	* src/kernel/strattach.c: versioning of exported symbols
+	* src/kernel/strlookup.c: versioning of exported symbols
+	* src/kernel/strpipe.c: versioning of exported symbols
+	* src/kernel/strreg.c: versioning of exported symbols
+	* src/kernel/strsad.c: versioning of exported symbols
+	* src/kernel/strsched.c: versioning of exported symbols
+	* src/kernel/strsched.c (sqsched): strapped out unused sqsched() function
+	* src/kernel/strsched.h (sqsched): strapped out unused sqsched() function
+	* src/kernel/strspecfs.c: versioning of exported symbols
+	* src/kernel/strsysctl.c: versioning of exported symbols
+	* src/kernel/strutil.c: versioning of exported symbols
+	* src/kernel/strutil.c (esballoc, freeb, pullupmsg): added automatic
+	  reference counting of modules for esballoc free routines
+	* src/modules/sth.c: versioning of exported symbols
+	* doc/manual/news.texi: updated for release
+
 2007-02-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: #ifdef instead of #if

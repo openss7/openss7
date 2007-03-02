@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.174 $) $Date: 2007/02/10 15:53:11 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.175 $) $Date: 2007/03/02 09:23:32 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/10 15:53:11 $ by $Author: brian $
+ Last Modified $Date: 2007/03/02 09:23:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.175  2007/03/02 09:23:32  brian
+ - build updates and esballoc() feature
+
  Revision 0.9.2.174  2007/02/10 15:53:11  brian
  - PR: openss7/4734 fixed missing spinlock symbols on ubuntu i386 UP kernels
 
@@ -181,10 +184,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.174 $) $Date: 2007/02/10 15:53:11 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.175 $) $Date: 2007/03/02 09:23:32 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.174 $) $Date: 2007/02/10 15:53:11 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.175 $) $Date: 2007/03/02 09:23:32 $";
 
 //#define __NO_VERSION__
 
@@ -285,7 +288,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.174 $) $Date: 2007/02/10 15:53:11 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.175 $) $Date: 2007/03/02 09:23:32 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"

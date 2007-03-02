@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/18 10:08:59 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/03/02 09:23:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 10:08:59 $ by $Author: brian $
+ Last Modified $Date: 2007/03/02 09:23:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strpipe.c,v $
+ Revision 0.9.2.30  2007/03/02 09:23:28  brian
+ - build updates and esballoc() feature
+
  Revision 0.9.2.29  2006/12/18 10:08:59  brian
  - updated headers for release
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/18 10:08:59 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/03/02 09:23:28 $"
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2006/12/18 10:08:59 $";
+static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/03/02 09:23:28 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
