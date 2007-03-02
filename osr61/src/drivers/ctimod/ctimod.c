@@ -668,7 +668,87 @@ static void __exit ctimod_cleanup_module(void)
 }
 module_exit(ctimod_cleanup_module);
 
-
+#ifdef LFS
+EXPORT_SYMBOL_GPL(ctimod_printk);
+EXPORT_SYMBOL_GPL(ctimod_kmalloc);
+EXPORT_SYMBOL_GPL(ctimod_free_irq);
+EXPORT_SYMBOL_GPL(ctimod_remove_wait_queue);
+EXPORT_SYMBOL_GPL(ctimod_do_gettimeofday);
+EXPORT_SYMBOL_GPL(ctimod_init_timer);
+EXPORT_SYMBOL_GPL(ctimod_debug_print);
+EXPORT_SYMBOL_GPL(ctimod_memcpy);
+EXPORT_SYMBOL_GPL(ctimod_pci_read_config_byte);
+EXPORT_SYMBOL_GPL(ctimod_debug_off);
+EXPORT_SYMBOL_GPL(ctimod_vsprintf);
+EXPORT_SYMBOL_GPL(ctimod_sprintf);
+#if 0
+#ifndef LINUX24
+EXPORT_SYMBOL_GPL(ctimod_wake_up_process);
+#endif
+#endif
+EXPORT_SYMBOL_GPL(ctimod_spin_unlock);
+EXPORT_SYMBOL_GPL(ctimod_spin_unlock_bh);
+EXPORT_SYMBOL_GPL(ctimod_add_timer);
+EXPORT_SYMBOL_GPL(ctimod_spin_lock);
+EXPORT_SYMBOL_GPL(ctimod_spin_lock_bh);
+EXPORT_SYMBOL_GPL(ctimod_spin_lock_irq);
+EXPORT_SYMBOL_GPL(ctimod_wake_up_interruptible);
+EXPORT_SYMBOL_GPL(ctimod_pcibios_present);
+EXPORT_SYMBOL_GPL(ctimod_pci_find_device);
+#if 0
+#ifndef LINUX24
+EXPORT_SYMBOL_GPL(ctimod_queue_work);
+#endif
+#endif
+EXPORT_SYMBOL_GPL(ctimod_spin_lock_init);
+EXPORT_SYMBOL_GPL(ctimod_tasklet_init);
+EXPORT_SYMBOL_GPL(ctimod_tasklet_kill);
+EXPORT_SYMBOL_GPL(ctimod_udelay);
+EXPORT_SYMBOL_GPL(ctimod_pci_register_driver);
+EXPORT_SYMBOL_GPL(ctimod_pci_unregister_driver);
+EXPORT_SYMBOL_GPL(ctimod_request_irq);
+EXPORT_SYMBOL_GPL(ctimod_pci_module_init);
+EXPORT_SYMBOL_GPL(ctimod_add_wait_queue);
+EXPORT_SYMBOL_GPL(ctimod_pci_write_config_word);
+EXPORT_SYMBOL_GPL(ctimod_debug_toggle);
+EXPORT_SYMBOL_GPL(ctimod_spin_unlock_irq);
+EXPORT_SYMBOL_GPL(ctimod_del_timer);
+EXPORT_SYMBOL_GPL(ctimod_pci_read_config_dword);
+#if 0
+#ifndef LINUX24
+EXPORT_SYMBOL_GPL(ctimod_create_workqueue);
+#endif
+#endif
+EXPORT_SYMBOL_GPL(ctimod_iounmap);
+EXPORT_SYMBOL_GPL(ctimod_pci_read_config_word);
+EXPORT_SYMBOL_GPL(ctimod_schedule_timeout);
+EXPORT_SYMBOL_GPL(ctimod_ioremap);
+EXPORT_SYMBOL_GPL(ctimod_remap_page_range);
+EXPORT_SYMBOL_GPL(ctimod_poll_wait);
+EXPORT_SYMBOL_GPL(ctimod_schedule);
+EXPORT_SYMBOL_GPL(ctimod_pci_write_config_byte);
+EXPORT_SYMBOL_GPL(ctimod_debug_on);
+EXPORT_SYMBOL_GPL(ctimod_jiffies);
+EXPORT_SYMBOL_GPL(ctimod_kfree);
+EXPORT_SYMBOL_GPL(ctimod_register_chrdev);
+EXPORT_SYMBOL_GPL(ctimod_debug_clear);
+EXPORT_SYMBOL_GPL(ctimod_pci_write_config_dword);
+EXPORT_SYMBOL_GPL(ctimod_unregister_chrdev);
+EXPORT_SYMBOL_GPL(ctimod_bzero);
+EXPORT_SYMBOL_GPL(ctimod_init_waitqueue_head);
+EXPORT_SYMBOL_GPL(ctimod_spin_trylock);
+EXPORT_SYMBOL_GPL(ctimod_copy_to_user);
+EXPORT_SYMBOL_GPL(ctimod_copy_from_user);
+EXPORT_SYMBOL_GPL(ctimod_virt_to_page);
+EXPORT_SYMBOL_GPL(ctimod_free_pages);
+EXPORT_SYMBOL_GPL(ctimod_get_free_pages);
+EXPORT_SYMBOL_GPL(ctimod_check_rh);
+EXPORT_SYMBOL_GPL(ctimod_memset);
+EXPORT_SYMBOL_GPL(ctimod_remove_proc_entry);
+EXPORT_SYMBOL_GPL(ctimod_create_proc_entry);
+EXPORT_SYMBOL_GPL(ctimod_spin_lock_irqsave);
+EXPORT_SYMBOL_GPL(ctimod_spin_unlock_irqrestore);
+#else				/* LFS */
 EXPORT_SYMBOL(ctimod_printk);
 EXPORT_SYMBOL(ctimod_kmalloc);
 EXPORT_SYMBOL(ctimod_free_irq);
@@ -748,4 +828,5 @@ EXPORT_SYMBOL(ctimod_remove_proc_entry);
 EXPORT_SYMBOL(ctimod_create_proc_entry);
 EXPORT_SYMBOL(ctimod_spin_lock_irqsave);
 EXPORT_SYMBOL(ctimod_spin_unlock_irqrestore);
+#endif				/* LFS */
 
