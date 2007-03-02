@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/01 00:10:16 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/02 10:03:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 00:10:16 $ by $Author: brian $
+# Last Modified $Date: 2007/03/02 10:03:26 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.6  2007/03/02 10:03:26  brian
+# - updates to common build process and versions for all exported symbols
+#
 # Revision 0.9.2.5  2007/03/01 00:10:16  brian
 # - update to build process for 2.4 kernels
 #

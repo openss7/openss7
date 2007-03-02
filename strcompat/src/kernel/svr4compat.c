@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/11/03 10:39:28 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/02 10:04:08 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/03 10:39:28 $ by $Author: brian $
+ Last Modified $Date: 2007/03/02 10:04:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: svr4compat.c,v $
+ Revision 0.9.2.34  2007/03/02 10:04:08  brian
+ - updates to common build process and versions for all exported symbols
+
  Revision 0.9.2.33  2006/11/03 10:39:28  brian
  - updated headers, correction to mi_timer_expiry type
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/11/03 10:39:28 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/02 10:04:08 $"
 
-static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/11/03 10:39:28 $";
+static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/02 10:04:08 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -78,7 +81,7 @@ static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/11/03 10:39:28 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/02 10:04:08 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"

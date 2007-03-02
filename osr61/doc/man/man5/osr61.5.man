@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: osr61.5.man,v 0.9.2.2 2007/02/27 01:35:57 brian Exp $
+.\" @(#) $Id: osr61.5.man,v 0.9.2.3 2007/03/02 10:03:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/02/27 01:35:57 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/02 10:03:31 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: osr61.5.man,v $
+.\" Revision 0.9.2.3  2007/03/02 10:03:31  brian
+.\" - updates to common build process and versions for all exported symbols
+.\"
 .\" Revision 0.9.2.2  2007/02/27 01:35:57  brian
 .\" - documentation updates
 .\"

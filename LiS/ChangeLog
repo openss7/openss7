@@ -1,3 +1,9 @@
+2007-03-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: improvements to common build environment
+	* head/linux/exports.c: verion all symbols and make LiS symbol GPL export
+	* manual/news.texi: updates for release
+
 2007-02-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: #ifdef instead of #if
