@@ -1,3 +1,9 @@
+strchan (0.9.2.2-0) experimental; urgency=low
+
+  * Second (separate) public release.
+
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Sat,  3 Mar 2007 02:48:00 -0700
+
 strchan (0.9.2.1-0) experimental; urgency=low
 
   * First (separate) public release.
