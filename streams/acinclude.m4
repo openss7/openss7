@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2007/03/02 09:23:19 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2007/03/03 08:39:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/02 09:23:19 $ by $Author: brian $
+# Last Modified $Date: 2007/03/03 08:39:55 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.135  2007/03/03 08:39:55  brian
+# - corrections for STREAMS_VERSION
+#
 # Revision 0.9.2.134  2007/03/02 09:23:19  brian
 # - build updates and esballoc() feature
 #
@@ -1652,14 +1655,14 @@ AC_DEFUN([_LFS_CONFIG], [dnl
     streams_cv_lfs_version="${PACKAGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
     streams_cv_config="$streams_cv_lfs_config"
     streams_cv_includes="$streams_cv_lfs_includes"
-    streams_cv_ldadd="$streams_cv_lfs_ldadd"
-    streams_cv_ldadd32="$streams_cv_lfs_ldadd32"
-    streams_cv_ldflags="$streams_cv_lfs_ldflags"
-    streams_cv_ldflags32="$streams_cv_lfs_ldflags32"
-    streams_cv_manpath="$streams_cv_lfs_manpath"
+dnl streams_cv_ldadd="$streams_cv_lfs_ldadd"
+dnl streams_cv_ldadd32="$streams_cv_lfs_ldadd32"
+dnl streams_cv_ldflags="$streams_cv_lfs_ldflags"
+dnl streams_cv_ldflags32="$streams_cv_lfs_ldflags32"
+dnl streams_cv_manpath="$streams_cv_lfs_manpath"
     streams_cv_modversions="$streams_cv_lfs_modversions"
-    streams_cv_modmap="$streams_cv_lfs_modmap"
-    streams_cv_symver="$streams_cv_lfs_symver"
+dnl streams_cv_modmap="$streams_cv_lfs_modmap"
+dnl streams_cv_symver="$streams_cv_lfs_symver"
     streams_cv_version="$streams_cv_lfs_version"
     streams_cv_package="LfS"
 ])# _LFS_CONFIG
