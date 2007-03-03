@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/03/01 07:17:25 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/03 05:42:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
+# Last Modified $Date: 2007/03/03 05:42:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.50  2007/03/03 05:42:46  brian
+# - better standalong library detection
+#
 # Revision 0.9.2.49  2007/03/01 07:17:25  brian
 # - updating common build process
 #
@@ -343,35 +346,77 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	fi
     ])
     AC_CACHE_CHECK([for xti xnet ldadd native], [xti_cv_ldadd], [dnl
+	xti_what="libxnet.la"
 	xti_cv_ldadd=
 	for xti_dir in $xti_cv_includes ; do
-	    if test -f "$xti_dir/../../libxnet.la" ; then
-		xti_cv_ldadd=`echo "$xti_dir/../../libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$xti_dir/../../$xti_what" ; then
+		xti_cv_ldadd=`echo "$xti_dir/../../$xti_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$xti_cv_ldadd" ; then
+	    eval "xti_search_path =\"
+		${DESTDIR}${rootdir}${libdir}
+		${DESTDIR}${libdir}\""
+	    xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([searching])
+	    for xti_dir in $xti_search_path ; do
+		if test -d "$xti_dir" ; then
+		    AC_MSG_CHECKING([for xti xnet ldadd native... $xti_dir])
+		    if test -r "$xti_dir/$xti_what" ; then
+			xti_cv_ldadd="$xti_dir/$xti_what"
+			xti_cv_ldflags=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for xti xnet ldadd native])
+	fi
     ])
     AC_CACHE_CHECK([for xti xnet ldflags], [xti_cv_ldflags], [dnl
 	xti_cv_ldflags=
 	if test -z "$xti_cv_ldadd" ; then
-	    xti_cv_ldflags="-lxnet"
+	    xti_cv_ldflags='-L$(DESTDIR)$(rootdir)$(libdir) -lxnet'
 	else
 	    xti_cv_ldflags="-L$(dirname $xti_cv_ldadd)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for xti xnet ldadd 32-bit], [xti_cv_ldadd32], [dnl
+	xti_what="libxnet.la"
 	xti_cv_ldadd32=
 	for xti_dir in $xti_cv_includes ; do
-	    if test -f "$xti_dir/../../lib32/libxnet.la" ; then
-		xti_cv_ldadd32=`echo "$xti_dir/../../lib32/libxnet.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$xti_dir/../../lib32/$xti_what" ; then
+		xti_cv_ldadd32=`echo "$xti_dir/../../lib32/$xti_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$xti_cv_ldadd32" ; then
+	    eval "xti_search_path =\"
+		${DESTDIR}${rootdir}${lib32dir}
+		${DESTDIR}${lib32dir}\""
+	    xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([searching])
+	    for xti_dir in $xti_search_path ; do
+		if test -d "$xti_dir" ; then
+		    AC_MSG_CHECKING([for xti xnet ldadd 32-bit... $xti_dir])
+		    if test -r "$xti_dir/$xti_what" ; then
+			xti_cv_ldadd32="$xti_dir/$xti_what"
+			xti_cv_ldflags32=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for xti xnet ldadd 32-bit])
+	fi
     ])
     AC_CACHE_CHECK([for xti xnet ldflags 32-bit], [xti_cv_ldflags32], [dnl
 	xti_cv_ldflags32=
 	if test -z "$xti_cv_ldadd32" ; then
-	    xti_cv_ldflags32="-lxnet"
+	    xti_cv_ldflags32='-L$(DESTDIR)$(rootdir)$(lib32dir) -lxnet'
 	else
 	    xti_cv_ldflags32="-L$(dirname $xti_cv_ldadd32)/.libs/"
 	fi
