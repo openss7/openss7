@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/01 07:17:25 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/03 08:01:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
+# Last Modified $Date: 2007/03/03 08:01:20 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xns.m4,v $
+# Revision 0.9.2.44  2007/03/03 08:01:20  brian
+# - corrections
+#
 # Revision 0.9.2.43  2007/03/01 07:17:25  brian
 # - updating common build process
 #
@@ -511,7 +514,7 @@ dnl		    this will just not be set
 	fi
     ])
     xns_what="sys/strxns/modversions.h"
-    AC_CACHE_CHECK([for xns $xns_what], [xns_cv_config], [dnl
+    AC_CACHE_CHECK([for xns $xns_what], [xns_cv_modversions], [dnl
 	xns_cv_modversions=
 dnl	if linux_cv_k_ko_modules is not defined (no _LINUX_KERNEL) then we
 dnl	assume normal objects
