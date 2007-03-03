@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/03 05:42:46 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/03 08:01:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/03 05:42:46 $ by $Author: brian $
+# Last Modified $Date: 2007/03/03 08:01:20 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.51  2007/03/03 08:01:20  brian
+# - corrections
+#
 # Revision 0.9.2.50  2007/03/03 05:42:46  brian
 # - better standalong library detection
 #
@@ -355,7 +358,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$xti_cv_ldadd" ; then
-	    eval "xti_search_path =\"
+	    eval "xti_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
 	    xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
@@ -393,7 +396,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$xti_cv_ldadd32" ; then
-	    eval "xti_search_path =\"
+	    eval "xti_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
 	    xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
