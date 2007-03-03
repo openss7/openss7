@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/01 07:17:25 $
+# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/03 05:42:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
+# Last Modified $Date: 2007/03/03 05:42:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.16  2007/03/03 05:42:46  brian
+# - better standalong library detection
+#
 # Revision 0.9.2.15  2007/03/01 07:17:25  brian
 # - updating common build process
 #
@@ -340,35 +343,77 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	fi
     ])
     AC_CACHE_CHECK([for sock ldadd native], [sock_cv_ldadd], [dnl
+	sock_what="libsocket.la"
 	sock_cv_ldadd=
 	for sock_dir in $sock_cv_includes ; do
-	    if test -f "$sock_dir/../../libsocket.la" ; then
-		sock_cv_ldadd=`echo "$sock_dir/../../libsocket.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$sock_dir/../../$sock_what" ; then
+		sock_cv_ldadd=`echo "$sock_dir/../../$sock_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$sock_cv_ldadd" ; then
+	    eval "sock_search_path =\"
+		${DESTDIR}${rootdir}${libdir}
+		${DESTDIR}${libdir}\""
+	    sock_search_path=`echo "$sock_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([searching])
+	    for sock_dir in $sock_search_path ; do
+		if test -d "$sock_dir" ; then
+		    AC_MSG_CHECKING([for sock ldadd native... $sock_dir])
+		    if test -r "$sock_dir/$sock_what" ; then
+			sock_cv_ldadd="$sock_dir/$sock_what"
+			sock_cv_ldflags=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for sock ldadd native])
+	fi
     ])
     AC_CACHE_CHECK([for sock ldflags], [sock_cv_ldflags], [dnl
 	sock_cv_ldflags=
 	if test -z "$sock_cv_ldadd" ; then
-	    sock_cv_ldflags="-lsocket"
+	    sock_cv_ldflags='-L$(DESTDIR)$(rootdir)$(libdir) -lsocket'
 	else
 	    sock_cv_ldflags="-L$(dirname $sock_cv_ldadd)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for sock ldadd 32-bit], [sock_cv_ldadd32], [dnl
+	sock_what="libsocket.la"
 	sock_cv_ldadd32=
 	for sock_dir in $sock_cv_includes ; do
-	    if test -f "$sock_dir/../../lib32/libsocket.la" ; then
-		sock_cv_ldadd32=`echo "$sock_dir/../../lib32/libsocket.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$sock_dir/../../lib32/$sock_what" ; then
+		sock_cv_ldadd32=`echo "$sock_dir/../../lib32/$sock_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$sock_cv_ldadd32" ; then
+	    eval "sock_search_path =\"
+		${DESTDIR}${rootdir}${lib32dir}
+		${DESTDIR}${lib32dir}\""
+	    sock_search_path=`echo "$sock_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([searching])
+	    for sock_dir in $sock_search_path ; do
+		if test -d "$sock_dir" ; then
+		    AC_MSG_CHECKING([for sock ldadd 32-bit... $sock_dir])
+		    if test -r "$sock_dir/$sock_what" ; then
+			sock_cv_ldadd32="$sock_dir/$sock_what"
+			sock_cv_ldflags32=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for sock ldadd 32-bit])
+	fi
     ])
     AC_CACHE_CHECK([for sock ldflags 32-bit], [sock_cv_ldflags32], [dnl
 	sock_cv_ldflags32=
 	if test -z "$sock_cv_ldadd32" ; then
-	    sock_cv_ldflags32="-lsocket"
+	    sock_cv_ldflags32='-L$(DESTDIR)$(rootdir)$(lib32dir) -lsocket'
 	else
 	    sock_cv_ldflags32="-L$(dirname $sock_cv_ldadd32)/.libs/"
 	fi

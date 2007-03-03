@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/01 07:17:25 $
+# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/03 05:42:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
+# Last Modified $Date: 2007/03/03 05:42:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.15  2007/03/03 05:42:46  brian
+# - better standalong library detection
+#
 # Revision 0.9.2.14  2007/03/01 07:17:25  brian
 # - updating common build process
 #
@@ -357,35 +360,77 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	fi
     ])
     AC_CACHE_CHECK([for nsl ldadd native], [nsl_cv_ldadd], [dnl
+	nsl_what="libxnsl.la"
 	nsl_cv_ldadd=
 	for nsl_dir in $nsl_cv_includes ; do
-	    if test -f "$nsl_dir/../../libxnsl.la" ; then
-		nsl_cv_ldadd=`echo "$nsl_dir/../../libxnsl.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$nsl_dir/../../$nsl_what" ; then
+		nsl_cv_ldadd=`echo "$nsl_dir/../../$nsl_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$nsl_cv_ldadd" ; then
+	    eval "nsl_search_path =\"
+		${DESTDIR}${rootdir}${libdir}
+		${DESTDIR}${libdir}\""
+	    nsl_search_path=`echo "$nsl_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([searching])
+	    for nsl_dir in $nsl_search_path ; do
+		if test -d "$nsl_dir" ; then
+		    AC_MSG_CHECKING([for nsl ldadd native... $nsl_dir])
+		    if test -r "$nsl_dir/$nsl_what" ; then
+			nsl_cv_ldadd="$nsl_dir/$nsl_what"
+			nsl_cv_ldflags=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for nsl ldadd native])
+	fi
     ])
     AC_CACHE_CHECK([for nsl ldflags], [nsl_cv_ldflags], [dnl
 	nsl_cv_ldflags=
 	if test -z "$nsl_cv_ldadd" ; then
-	    nsl_cv_ldflags="-lxnsl"
+	    nsl_cv_ldflags='-L$(DESTDIR)$(rootdir)$(libdir) -lxnsl'
 	else
 	    nsl_cv_ldflags="-L$(dirname $nsl_cv_ldadd)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for nsl ldadd 32-bit], [nsl_cv_ldadd32], [dnl
+	nsl_what="libxnsl.la"
 	nsl_cv_ldadd32=
 	for nsl_dir in $nsl_cv_includes ; do
-	    if test -f "$nsl_dir/../../lib32/libxnsl.la" ; then
-		nsl_cv_ldadd32=`echo "$nsl_dir/../../lib32/libxnsl.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$nsl_dir/../../lib32/$nsl_what" ; then
+		nsl_cv_ldadd32=`echo "$nsl_dir/../../lib32/$nsl_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$nsl_cv_ldadd32" ; then
+	    eval "nsl_search_path =\"
+		${DESTDIR}${rootdir}${lib32dir}
+		${DESTDIR}${lib32dir}\""
+	    nsl_search_path=`echo "$nsl_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([searching])
+	    for nsl_dir in $nsl_search_path ; do
+		if test -d "$nsl_dir" ; then
+		    AC_MSG_CHECKING([for nsl ldadd 32-bit... $nsl_dir])
+		    if test -r "$nsl_dir/$nsl_what" ; then
+			nsl_cv_ldadd32="$nsl_dir/$nsl_what"
+			nsl_cv_ldflags32=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for nsl ldadd 32-bit])
+	fi
     ])
     AC_CACHE_CHECK([for nsl ldflags 32-bit], [nsl_cv_ldflags32], [dnl
 	nsl_cv_ldflags32=
 	if test -z "$nsl_cv_ldadd32" ; then
-	    nsl_cv_ldflags32="-lxnsl"
+	    nsl_cv_ldflags32='-L$(DESTDIR)$(rootdir)$(lib32dir) -lxnsl'
 	else
 	    nsl_cv_ldflags32="-L$(dirname $nsl_cv_ldadd32)/.libs/"
 	fi
