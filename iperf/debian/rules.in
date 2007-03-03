@@ -2,7 +2,7 @@
 # @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/03 11:38:42 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/03 12:04:53 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/03/03 11:38:42 $ by $Author: brian $
+## Last Modified $Date: 2007/03/03 12:04:53 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -55,11 +55,6 @@ CC = @CC@
 CPP = @CPP@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
-
-CFLAGS = @USER_CFLAGS@
-LDFLAGS = @USER_LDFLAGS@
-CPPFLAGS = @USER_CPPFLAGS@
-CXXFLAGS = @CXXFLAGS@
 
 PACKAGE = @PACKAGE@
 PACKAGE_LCNAME = @PACKAGE_LCNAME@
@@ -235,14 +230,14 @@ build:
 	[ ! -f Makefile ] || $(MAKE) distclean
 	rm -f $(control)
 	./configure \
-		CC='$(CC)' \
-		CFLAGS='$(CFLAGS)' \
-		LDFLAGS='$(LDFLAGS)' \
-		CPPFLAGS='$(CPPFLAGS)' \
-		CPP='$(CPP)' \
-		CXX='$(CXX)' \
-		CXXFLAGS='$(CXXFLAGS)' \
-		CXXCPP='$(CXXCPP)' \
+		`test -z '$(CC)'       || CC='$(CC)'` \
+		`test -z '$(CPP)'      || CPP='$(CPP)'` \
+		`test -z '$(CFLAGS)'   || CFLAGS='$(CFLAGS)'` \
+		`test -z '$(LDFLAGS)'  || LDFLAGS='$(LDFLAGS)'` \
+		`test -z '$(CPPFLAGS)' || CPPFLAGS='$(CPPFLAGS)'` \
+		`test -z '$(CXX)'      || CXX='$(CXX)'` \
+		`test -z '$(CXXCPP)'   || CXXCPP='$(CXXCPP)'` \
+		`test -z '$(CXXFLAGS)' || CXXFLAGS='$(CXXFLAGS)'` \
 		CONFIG_SITE="$(csite_file)" \
 		--cache-file="$(cache_file)" \
 		--host="$(DEB_HOST_GNU_ARCH)" \
@@ -383,6 +378,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 0.9.2.21  2007/03/03 12:04:53  brian
+# - do not propagate empty flags
+#
 # Revision 0.9.2.20  2007/03/03 11:38:42  brian
 # - pass user flags along
 #

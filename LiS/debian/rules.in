@@ -2,7 +2,7 @@
 # @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.21 $) $Date: 2007/03/03 11:38:44 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.22 $) $Date: 2007/03/03 12:04:58 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/03/03 11:38:44 $ by $Author: brian $
+## Last Modified $Date: 2007/03/03 12:04:58 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -55,11 +55,6 @@ CC = @CC@
 CPP = @CPP@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
-
-CFLAGS = @USER_CFLAGS@
-LDFLAGS = @USER_LDFLAGS@
-CPPFLAGS = @USER_CPPFLAGS@
-CXXFLAGS = @CXXFLAGS@
 
 PACKAGE = @PACKAGE@
 PACKAGE_LCNAME = @PACKAGE_LCNAME@
@@ -311,14 +306,14 @@ build:
 		(*) rm -f $(cache_file) $(csite_file) $(mpost_file) ;; \
 	esac
 	./configure \
-		CC='$(CC)' \
-		CFLAGS='$(CFLAGS)' \
-		LDFLAGS='$(LDFLAGS)' \
-		CPPFLAGS='$(CPPFLAGS)' \
-		CPP='$(CPP)' \
-		CXX='$(CXX)' \
-		CXXFLAGS='$(CXXFLAGS)' \
-		CXXCPP='$(CXXCPP)' \
+		`test -z '$(CC)'       || CC='$(CC)'` \
+		`test -z '$(CPP)'      || CPP='$(CPP)'` \
+		`test -z '$(CFLAGS)'   || CFLAGS='$(CFLAGS)'` \
+		`test -z '$(LDFLAGS)'  || LDFLAGS='$(LDFLAGS)'` \
+		`test -z '$(CPPFLAGS)' || CPPFLAGS='$(CPPFLAGS)'` \
+		`test -z '$(CXX)'      || CXX='$(CXX)'` \
+		`test -z '$(CXXCPP)'   || CXXCPP='$(CXXCPP)'` \
+		`test -z '$(CXXFLAGS)' || CXXFLAGS='$(CXXFLAGS)'` \
 		CONFIG_SITE="$(csite_file)" \
 		MODPOST_CACHE="$(mpost_file)" \
 		--cache-file="$(cache_file)" \
@@ -467,6 +462,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.4.22  2007/03/03 12:04:58  brian
+# - do not propagate empty flags
+#
 # Revision 1.1.4.21  2007/03/03 11:38:44  brian
 # - pass user flags along
 #
