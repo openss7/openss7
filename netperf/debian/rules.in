@@ -221,13 +221,13 @@ build:
 	[ ! -f Makefile ] || $(MAKE) distclean
 	rm -f $(control)
 	./configure \
-		`test -z '$(CC)'       || CC='$(CC)'` \
-		`test -z '$(CPP)'      || CPP='$(CPP)'` \
-		`test -z '$(CFLAGS)'   || CFLAGS='$(CFLAGS)'` \
-		`test -z '$(LDFLAGS)'  || LDFLAGS='$(LDFLAGS)'` \
+		`test -z '$(CC)' || CC='$(CC)'` \
+		`test -z '$(CPP)' || CPP='$(CPP)'` \
+		`test -z '$(CFLAGS)' || CFLAGS='$(CFLAGS)'` \
+		`test -z '$(LDFLAGS)' || LDFLAGS='$(LDFLAGS)'` \
 		`test -z '$(CPPFLAGS)' || CPPFLAGS='$(CPPFLAGS)'` \
-		`test -z '$(CXX)'      || CXX='$(CXX)'` \
-		`test -z '$(CXXCPP)'   || CXXCPP='$(CXXCPP)'` \
+		`test -z '$(CXX)' || CXX='$(CXX)'` \
+		`test -z '$(CXXCPP)' || CXXCPP='$(CXXCPP)'` \
 		`test -z '$(CXXFLAGS)' || CXXFLAGS='$(CXXFLAGS)'` \
 		CONFIG_SITE="$(csite_file)" \
 		--cache-file="$(cache_file)" \
