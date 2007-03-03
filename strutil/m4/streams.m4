@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2007/03/02 23:10:01 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2007/03/03 08:39:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/02 23:10:01 $ by $Author: brian $
+# Last Modified $Date: 2007/03/03 08:39:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -539,7 +539,7 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 	    streams_cv_lis_version=`grep '#define.*\<LIS_VERSION\>' $streams_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    LIS_VERSION="${streams_cv_lis_version:-0:2.18.1}"
+    LIS_VERSION="${streams_cv_lis_version:-0:2.18.5-1}"
     AC_SUBST([LIS_VERSION])
     streams_what="sys/LiS/modversions.h"
     AC_CACHE_CHECK([for streams lis $streams_what], [streams_cv_lis_modversions], [dnl
@@ -871,7 +871,7 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 	    streams_cv_lfs_version=`grep '#define.*\<STREAMS_VERSION\>' $streams_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	fi
     ])
-    LFS_VERSION="${streams_cv_lfs_version:-0:0.9.2.1}"
+    LFS_VERSION="${streams_cv_lfs_version:-0:0.9.2.2-1}"
     AC_SUBST([LFS_VERSION])
     streams_what="sys/streams/modversions.h"
     AC_CACHE_CHECK([for streams lfs $streams_what], [streams_cv_lfs_modversions], [dnl
@@ -1085,7 +1085,7 @@ dnl
     STREAMS_MODMAP="$streams_cv_lis_modmap"
     STREAMS_SYMVER="$streams_cv_lis_symver"
     STREAMS_MANPATH="$streams_cv_lis_manpath"
-    STREAMS_VERSION="$streams_cv_lis_version"
+    STREAMS_VERSION=`echo "$streams_cv_lis_version" | sed -e 's|^.*:||;s|-.*$||'`
     MODPOST_INPUTS="${MODPOST_INPUTS}${STREAMS_SYMVER:+${MODPOST_INPUTS:+ }${STREAMS_SYMVER}}"
 ])# _LINUX_STREAMS_LIS_DEFINES
 # =============================================================================
@@ -1107,7 +1107,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_DEFINES], [dnl
     STREAMS_MODMAP="$streams_cv_lfs_modmap"
     STREAMS_SYMVER="$streams_cv_lfs_symver"
     STREAMS_MANPATH="$streams_cv_lfs_manpath"
-    STREAMS_VERSION="$streams_cv_lfs_version"
+    STREAMS_VERSION=`echo "$streams_cv_lfs_version" | sed -e 's|^.*:||;s|-.*$||'`
     MODPOST_INPUTS="${MODPOST_INPUTS}${STREAMS_SYMVER:+${MODPOST_INPUTS:+ }${STREAMS_SYMVER}}"
     AC_DEFINE_UNQUOTED([HAVE_BCID_T], [1], [Linux Fast-STREAMS has this type.])
     AC_DEFINE_UNQUOTED([HAVE_BUFCALL_ID_T], [1], [Linux Fast-STREAMS has this type.])

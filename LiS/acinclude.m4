@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.53 $) $Date: 2007/03/02 10:03:20 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.54 $) $Date: 2007/03/03 08:39:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/02 10:03:20 $ by $Author: brian $
+# Last Modified $Date: 2007/03/03 08:39:53 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.6.54  2007/03/03 08:39:53  brian
+# - corrections for STREAMS_VERSION
+#
 # Revision 1.1.6.53  2007/03/02 10:03:20  brian
 # - updates to common build process and versions for all exported symbols
 #
@@ -1726,13 +1729,14 @@ AC_DEFUN([_LIS_CONFIG], [dnl
     streams_cv_lis_version="${PACKAGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
     streams_cv_config="$streams_cv_lis_config"
     streams_cv_includes="$streams_cv_lis_includes"
-    streams_cv_ldadd="$streams_cv_lis_ldadd"
-    streams_cv_ldadd32="$streams_cv_lis_ldadd32"
-    streams_cv_ldflags="$streams_cv_lis_ldflags"
-    streams_cv_ldflags32="$streams_cv_lis_ldflags32"
-    streams_cv_manpath="$streams_cv_lis_manpath"
-    streams_cv_modmap="$streams_cv_lis_modmap"
-    streams_cv_symver="$streams_cv_lis_symver"
+dnl streams_cv_ldadd="$streams_cv_lis_ldadd"
+dnl streams_cv_ldadd32="$streams_cv_lis_ldadd32"
+dnl streams_cv_ldflags="$streams_cv_lis_ldflags"
+dnl streams_cv_ldflags32="$streams_cv_lis_ldflags32"
+dnl streams_cv_manpath="$streams_cv_lis_manpath"
+    streams_cv_modversions="$streams_cv_lis_modversions"
+dnl streams_cv_modmap="$streams_cv_lis_modmap"
+dnl streams_cv_symver="$streams_cv_lis_symver"
     streams_cv_version="$streams_cv_lis_version"
     streams_cv_package="LiS"
 ])#_LIS_CONFIG
