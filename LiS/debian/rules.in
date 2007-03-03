@@ -2,7 +2,7 @@
 # @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.19 $) $Date: 2007/02/12 16:55:49 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.20 $) $Date: 2007/03/03 11:30:46 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/02/12 16:55:49 $ by $Author: brian $
+## Last Modified $Date: 2007/03/03 11:30:46 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -55,6 +55,11 @@ CC = @CC@
 CPP = @CPP@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
+
+CFLAGS = @CFLAGS@
+LDFLAGS = @LDFLAGS@
+CPPFLAGS = @CPPFLAGS@
+CXXFLAGS = @CXXFLAGS@
 
 PACKAGE = @PACKAGE@
 PACKAGE_LCNAME = @PACKAGE_LCNAME@
@@ -462,6 +467,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.4.20  2007/03/03 11:30:46  brian
+# - pass flags along
+#
 # Revision 1.1.4.19  2007/02/12 16:55:49  brian
 # - more autoconf 2.61 support
 #
