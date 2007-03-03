@@ -541,14 +541,16 @@ fi
 %define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')
 
 ./configure \
-    CC="${CC}" \
+    ${CC+CC="${CC}"} \
     CFLAGS="${CFLAGS:-$preferred_cflags}" \
-    LDFLAGS="${LDFLAGS}" \
-    CPPFLAGS="${CPPFLAGS}" \
-    CPP="${CPP}" \
-    CXX="${CXX:-$CC}" \
+    ${LDFLAGS+LDFLAGS="${LDFLAGS}"} \
+    ${CPPFLAGS+CPPFLAGS="${CPPFLAGS}"} \
+    ${CPP+CPP="${CPP}"} \
+    ${CXX+CXX="${CXX:-$CC}"} \
+    ${CXX-${CC+CXX="$CC"}} \
     CXXFLAGS="${CXXFLAGS:-$preferred_cflags}" \
-    CXXCPP="${CXXCPP:-$CPP}" \
+    ${CXXCPP+CXXCPP="${CXXCPP:-$CPP}"} \
+    ${CXXCPP-${CPP+CXXCPP="$CPP"}} \
     CONFIG_SITE="%{csite_file}" \
     MODPOST_CACHE="%{mpost_file}" \
     --cache-file="%{cache_file}" \
@@ -1889,9 +1891,10 @@ fi
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: strisdn.spec.in,v $
-# Revision 0.9.2.4  2007/02/12 16:56:20  brian
-# - more autoconf 2.61 support
-#
+
+* Mon Feb 12 2007 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.4  2007/02/12 16:56:20  brian
+- more autoconf 2.61 support
 
 * Fri Dec 29 2006 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.3  2006/12/29 12:18:38  brian
