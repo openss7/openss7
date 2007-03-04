@@ -115,18 +115,21 @@ include am/pr.am
 master-dist-hook:
 	@(cd $(distdir) ; \
 		list='$(DIST_SUBDIRS)' ; for subdir in $$list ; do \
-			if test "$$subdir" = . ; then :; else \
-				if test -d "$$subdir" ; then \
+			case "$$subdir" in \
+			(.) 	continue ;; \
+			(doc) 	continue ;; \
+			(*) 	if test -d "$$subdir" ; then \
 					case " $(REMOVE_SUBDIRS) " in \
 					(*" $$subdir "*) \
 						$(ECHO) "rm -fr $$subdir" ; \
 						rm -fr $$subdir ;; \
 					(*) \
-						$(ECHO) "mv -f $$subdir $$subdir-0.9.2" ; \
-						mv -f "$$subdir" "$$subdir-0.9.2" ;; \
+						version=`cat $$subdir/.version` ; \
+						$(ECHO) "mv -f $$subdir $$subdir-$${version:-$(VERSION)}" ; \
+						mv -f "$$subdir" "$$subdir-$${version:-$(VERSION)}" ;; \
 					esac ; \
-				fi ; \
-			fi ; \
+				fi ;; \
+			esac ; \
 		done ; \
 	)
 

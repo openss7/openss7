@@ -188,8 +188,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_sctp_dir:-no}" = :no ; then
 	with_SCTP='no'
     else
-	if test :"${os7_cv_sctp_dir:-no}" != :sctp -a -L "$srcdir/sctp" ; then
-	    ( cd $srcdir ; rm -f sctp ; ln -sf $os7_cv_sctp_dir sctp )
+	if test :"${os7_cv_sctp_dir:-no}" != :sctp ; then
+	    if test -L $srcdir/sctp ; then rm -f $srcdir/sctp ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_sctp_dir sctp )
 	fi
     fi
     AC_ARG_WITH([IPERF],
@@ -208,8 +209,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_iperf_dir:-no}" = :no ; then
 	with_IPERF='no'
     else
-	if test :"${os7_cv_iperf_dir:-no}" != :iperf -a -L "$srcdir/iperf" ; then
-	    ( cd $srcdir ; rm -f iperf ; ln -sf $os7_cv_iperf_dir iperf )
+	if test :"${os7_cv_iperf_dir:-no}" != :iperf ; then
+	    if test -L $srcdir/iperf ; then rm -f $srcdir/iperf ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_iperf_dir iperf )
 	fi
     fi
     AC_ARG_WITH([LIS],
@@ -228,8 +230,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_LiS_dir:-no}" = :no ; then
 	with_LIS='no'
     else
-	if test :"${os7_cv_LiS_dir:-no}" != :LiS -a -L "$srcdir/LiS" ; then
-	    ( cd $srcdir ; rm -f LiS ; ln -sf $os7_cv_LiS_dir LiS )
+	if test :"${os7_cv_LiS_dir:-no}" != :LiS ; then
+	    if test -L $srcdir/LiS ; then rm -f $srcdir/LiS ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_LiS_dir LiS )
 	fi
     fi
     AC_ARG_WITH([STREAMS],
@@ -248,8 +251,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_streams_dir:-no}" = :no ; then
 	with_STREAMS='no'
     else
-	if test :"${os7_cv_streams_dir:-no}" != :streams -a -L "$srcdir/streams" ; then
-	    ( cd $srcdir ; rm -f streams ; ln -sf $os7_cv_streams_dir streams )
+	if test :"${os7_cv_streams_dir:-no}" != :streams ; then
+	    if test -L $srcdir/streams ; then rm -f $srcdir/streams ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_streams_dir streams )
 	fi
     fi
     AC_ARG_WITH([STRCOMPAT],
@@ -268,8 +272,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_strcompat_dir:-no}" = :no ; then
 	with_STRCOMPAT='no'
     else
-	if test :"${os7_cv_strcompat_dir:-no}" != :strcompat -a -L "$srcdir/strcompat" ; then
-	    ( cd $srcdir ; rm -f strcompat ; ln -sf $os7_cv_strcompat_dir strcompat )
+	if test :"${os7_cv_strcompat_dir:-no}" != :strcompat ; then
+	    if test -L $srcdir/strcompat ; then rm -f $srcdir/strcompat ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_strcompat_dir strcompat )
 	fi
     fi
     AC_ARG_WITH([STRUTIL],
@@ -288,8 +293,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_strutil_dir:-no}" = :no ; then
 	with_STRUTIL='no'
     else
-	if test :"${os7_cv_strutil_dir:-no}" != :strutil -a -L "$srcdir/strutil" ; then
-	    ( cd $srcdir ; rm -f strutil ; ln -sf $os7_cv_strutil_dir strutil )
+	if test :"${os7_cv_strutil_dir:-no}" != :strutil ; then
+	    if test -L $srcdir/strutil ; then rm -f $srcdir/strutil ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_strutil_dir strutil )
 	fi
     fi
     AC_ARG_WITH([STRBCM],
@@ -308,8 +314,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_strbcm_dir:-no}" = :no ; then
 	with_STRBCM='no'
     else
-	if test :"${os7_cv_strbcm_dir:-no}" != :strbcm -a -L "$srcdir/strbcm" ; then
-	    ( cd $srcdir ; rm -f strbcm ; ln -sf $os7_cv_strbcm_dir strbcm )
+	if test :"${os7_cv_strbcm_dir:-no}" != :strbcm ; then
+	    if test -L $srcdir/strbcm ; then rm -f $srcdir/strbcm ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_strbcm_dir strbcm )
 	fi
     fi
     AC_ARG_WITH([STRTTY],
@@ -328,8 +335,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_strtty_dir:-no}" = :no ; then
 	with_STRTTY='no'
     else
-	if test :"${os7_cv_strtty_dir:-no}" != :strtty -a -L "$srcdir/strtty" ; then
-	    ( cd $srcdir ; rm -f strtty ; ln -sf $os7_cv_strtty_dir strtty )
+	if test :"${os7_cv_strtty_dir:-no}" != :strtty ; then
+	    if test -L $srcdir/strtty ; then rm -f $srcdir/strtty ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_strtty_dir strtty )
 	fi
     fi
     AC_ARG_WITH([STRXNS],
@@ -348,8 +356,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_strxns_dir:-no}" = :no ; then
 	with_STRXNS='no'
     else
-	if test :"${os7_cv_strxns_dir:-no}" != :strxns -a -L "$srcdir/strxns" ; then
-	    ( cd $srcdir ; rm -f strxns ; ln -sf $os7_cv_strxns_dir strxns )
+	if test :"${os7_cv_strxns_dir:-no}" != :strxns ; then
+	    if test -L $srcdir/strxns ; then rm -f $srcdir/strxns ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_strxns_dir strxns )
 	fi
     fi
     AC_ARG_WITH([STRXNET],
@@ -368,8 +377,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_strxnet_dir:-no}" = :no ; then
 	with_STRXNET='no'
     else
-	if test :"${os7_cv_strxnet_dir:-no}" != :strxnet -a -L "$srcdir/strxnet" ; then
-	    ( cd $srcdir ; rm -f strxnet ; ln -sf $os7_cv_strxnet_dir strxnet )
+	if test :"${os7_cv_strxnet_dir:-no}" != :strxnet ; then
+	    if test -L $srcdir/strxnet ; then rm -f $srcdir/strxnet ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_strxnet_dir strxnet )
 	fi
     fi
     AC_ARG_WITH([STRNSL],
@@ -388,8 +398,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_strnsl_dir:-no}" = :no ; then
 	with_STRNSL='no'
     else
-	if test :"${os7_cv_strnsl_dir:-no}" != :strnsl -a -L "$srcdir/strnsl" ; then
-	    ( cd $srcdir ; rm -f strnsl ; ln -sf $os7_cv_strnsl_dir strnsl )
+	if test :"${os7_cv_strnsl_dir:-no}" != :strnsl ; then
+	    if test -L $srcdir/strnsl ; then rm -f $srcdir/strnsl ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_strnsl_dir strnsl )
 	fi
     fi
     AC_ARG_WITH([STRSOCK],
@@ -408,8 +419,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_strsock_dir:-no}" = :no ; then
 	with_STRSOCK='no'
     else
-	if test :"${os7_cv_strsock_dir:-no}" != :strsock -a -L "$srcdir/strsock" ; then
-	    ( cd $srcdir ; rm -f strsock ; ln -sf $os7_cv_strsock_dir strsock )
+	if test :"${os7_cv_strsock_dir:-no}" != :strsock ; then
+	    if test -L $srcdir/strsock ; then rm -f $srcdir/strsock ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_strsock_dir strsock )
 	fi
     fi
     AC_ARG_WITH([STRINET],
@@ -427,8 +439,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_strinet_dir:-no}" = :no ; then
 	with_STRINET='no'
     else
-	if test :"${os7_cv_strinet_dir:-no}" != :strinet -a -L "$srcdir/strinet" ; then
-	    ( cd $srcdir ; rm -f strinet ; ln -sf $os7_cv_strinet_dir strinet )
+	if test :"${os7_cv_strinet_dir:-no}" != :strinet ; then
+	    if test -L $srcdir/strinet ; then rm -f $srcdir/strinet ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_strinet_dir strinet )
 	fi
     fi
     AC_ARG_WITH([STRSCTP],
@@ -444,11 +457,12 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		fi
 	    done
 	])
-    if test :"${os7_cv_sctp_dir:-no}" = :no ; then
+    if test :"${os7_cv_strsctp_dir:-no}" = :no ; then
 	with_STRSCTP='no'
     else
-	if test :"${os7_cv_strsctp_dir:-no}" != :strsctp -a -L "$srcdir/strsctp" ; then
-	    ( cd $srcdir ; rm -f strsctp ; ln -sf $os7_cv_strsctp_dir strsctp )
+	if test :"${os7_cv_strsctp_dir:-no}" != :strsctp ; then
+	    if test -L $srcdir/strsctp ; then rm -f $srcdir/strsctp ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_strsctp_dir strsctp )
 	fi
     fi
     AC_ARG_WITH([STRCHAN],
@@ -466,8 +480,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_strchan_dir:-no}" = :no ; then
 	with_STRCHAN='no'
     else
-	if test :"${os7_cv_strchan_dir:-no}" != :strchan -a -L "$srcdir/strchan" ; then
-	    ( cd $srcdir ; rm -f strchan ; ln -sf $os7_cv_strchan_dir strchan )
+	if test :"${os7_cv_strchan_dir:-no}" != :strchan ; then
+	    if test -L $srcdir/strchan ; then rm -f $srcdir/strchan ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_strchan_dir strchan )
 	fi
     fi
     AC_ARG_WITH([STRISO],
@@ -486,8 +501,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_striso_dir:-no}" = :no ; then
 	with_STRISO='no'
     else
-	if test :"${os7_cv_striso_dir:-no}" != :striso -a -L "$srcdir/striso" ; then
-	    ( cd $srcdir ; rm -f striso ; ln -sf $os7_cv_striso_dir striso )
+	if test :"${os7_cv_striso_dir:-no}" != :striso ; then
+	    if test -L $srcdir/striso ; then rm -f $srcdir/striso ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_striso_dir striso )
 	fi
     fi
     AC_ARG_WITH([NETPERF],
@@ -506,8 +522,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_netperf_dir:-no}" = :no ; then
 	with_NETPERF='no'
     else
-	if test :"${os7_cv_netperf_dir:-no}" != :netperf -a -L "$srcdir/netperf" ; then
-	    ( cd $srcdir ; rm -f netperf ; ln -sf $os7_cv_netperf_dir netperf )
+	if test :"${os7_cv_netperf_dir:-no}" != :netperf ; then
+	    if test -L $srcdir/netperf ; then rm -f $srcdir/netperf ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_netperf_dir netperf )
 	fi
     fi
     AC_ARG_WITH([STRISDN],
@@ -526,8 +543,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_strisdn_dir:-no}" = :no ; then
 	with_STRISDN='no'
     else
-	if test :"${os7_cv_strisdn_dir:-no}" != :strisdn -a -L "$srcdir/strisdn" ; then
-	    ( cd $srcdir ; rm -f strisdn ; ln -sf $os7_cv_strisdn_dir strisdn )
+	if test :"${os7_cv_strisdn_dir:-no}" != :strisdn ; then
+	    if test -L $srcdir/strisdn ; then rm -f $srcdir/strisdn ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_strisdn_dir strisdn )
 	fi
     fi
     AC_ARG_WITH([STACKS],
@@ -546,8 +564,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_strss7_dir:-no}" = :no ; then
 	with_STACKS='no'
     else
-	if test :"${os7_cv_strss7_dir:-no}" != :stacks -a -L "$srcdir/stacks" ; then
-	    ( cd $srcdir ; rm -f stacks ; ln -sf $os7_cv_strss7_dir stacks )
+	if test :"${os7_cv_strss7_dir:-no}" != :stacks ; then
+	    if test -L $srcdir/strss7 ; then rm -f $srcdir/strss7 ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_strss7_dir stacks )
 	fi
     fi
     AC_ARG_WITH([SIGTRAN],
@@ -566,8 +585,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_sigtran_dir:-no}" = :no ; then
 	with_SIGTRAN='no'
     else
-	if test :"${os7_cv_sigtran_dir:-no}" != :sigtran -a -L "$srcdir/sigtran" ; then
-	    ( cd $srcdir ; rm -f sigtran ; ln -sf $os7_cv_sigtran_dir sigtran )
+	if test :"${os7_cv_sigtran_dir:-no}" != :sigtran ; then
+	    if test -L $srcdir/sigtran ; then rm -f $srcdir/sigtran ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_sigtran_dir sigtran )
 	fi
     fi
     AC_ARG_WITH([STRVOIP],
@@ -586,8 +606,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_strvoip_dir:-no}" = :no ; then
 	with_STRVOIP='no'
     else
-	if test :"${os7_cv_strvoip_dir:-no}" != :strvoip -a -L "$srcdir/strvoip" ; then
-	    ( cd $srcdir ; rm -f strvoip ; ln -sf $os7_cv_strvoip_dir strvoip )
+	if test :"${os7_cv_strvoip_dir:-no}" != :strvoip ; then
+	    if test -L $srcdir/strvoip ; then rm -f $srcdir/strvoip ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_strvoip_dir strvoip )
 	fi
     fi
     AC_ARG_WITH([OSR61],
@@ -606,8 +627,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     if test :"${os7_cv_osr61_dir:-no}" = :no ; then
 	with_OSR61='no'
     else
-	if test :"${os7_cv_osr61_dir:-no}" != :osr61 -a -L "$srcdir/osr61" ; then
-	    ( cd $srcdir ; rm -f osr61 ; ln -sf $os7_cv_osr61_dir osr61 )
+	if test :"${os7_cv_osr61_dir:-no}" != :osr61 ; then
+	    if test -L $srcdir/osr61 ; then rm -f $srcdir/osr61 ; fi
+	    ( cd $srcdir ; ln -sf $os7_cv_osr61_dir osr61 )
 	fi
     fi
 ])# _OS7_OPTIONS
