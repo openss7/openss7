@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
 .\"
-.\" @(#) $Id: mi_allocb.9.man,v 0.9.2.1 2007/02/14 14:08:03 brian Exp $
+.\" @(#) $Id: mi_allocb.9.man,v 0.9.2.2 2007/03/04 21:20:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/02/14 14:08:03 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/04 21:20:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_allocb.9.man,v $
+.\" Revision 0.9.2.2  2007/03/04 21:20:45  brian
+.\" - completed documentation
+.\"
 .\" Revision 0.9.2.1  2007/02/14 14:08:03  brian
 .\" - added new files
 .\"
@@ -102,18 +105,28 @@ sort-adjacent-labels
 .PP
 .TP
 .I q
-.PD 0
+the queue to reschedule when a buffer becomes available (if one is not immediately available).
 .TP
 .I size
+the size of the buffer to allocate, in the same manner as the
+.I size
+argument to
+.BR allocb (9).
 .TP
 .I priority
-.PD
+the priority of the allocation request, in the same manner as the
+.I priority
+argument to
+.BR allocb (9).
 .\"
 .\"
 .SH INTERFACE
 .PP
 .IR MPS \(rg-specific
 DDI.
+.PP
+.I "Linux Fast-STREAMS"
+specific.
 .\"
 .\"
 .SH DESCRIPTION
@@ -122,18 +135,160 @@ DDI.
 is a reliable buffer allocation function that can be used with the functions from the
 .BR mi_open_comm (9)
 family.
+.PP
+In contrast to the DDI/DKI function,
+.BR allocb (9),
+.BR mi_allocb ()
+takes an extra argument,
+.IR q ,
+a pointer to the queue to schedule (with
+.BR qenable (9))
+when a buffer of size,
+.IR size ,
+and priority,
+.IR priority ,
+becomes available.
 .\"
 .\"
 .SH USAGE
 .PP
+.BR mi_allocb ()
+is used to simplify and make more efficient the handling of buffer callbacks when allocating message
+blocks within a
+.I STREAMS
+module or driver.
+.BR mi_allocb ()
+can be used throughout the driver or module from the
+.I STREAMS
+synchronous environment, whenever a message block would otherwise be allocated using
+.BR allocb (9).
+.BR mi_allocb ()
+is called instead, an passed the queue,
+.IR q ,
+for which an active message is being processed by a put or service procedure.
+.PP
+When
+.BR mi_allocb ()
+fails to allocate a message block, it returns
+.B NULL
+and schedules a buffer callback that will enable queue,
+.IR q ,
+when a buffer becomes available.
+The caller can then simply place the message being processed on its receiving queue,
+.IR q ,
+and return.  The queue,
+.IR q ,
+service procedure will be invoked when a buffer is available and the message taken off of the queue
+for processing once again.
 .\"
 .\"
 .SH RETURN
 .PP
+When the buffer allocation is successful,
+.BR mi_allocb ()
+functions identical to
+.BR allocb (9),
+and returns a pointer to the newly allocated buffer.
+When the buffer allocation fails,
+.BR mi_allocb ()
+returns
+.B NULL
+and generates a buffer callback for the queue,
+.IR q .
+When the buffer callback is executed, the queue,
+.IR q ,
+is enabled using
+.BR qenable (9).
 .\"
 .\"
 .SH ERRORS
 .PP
+.BR mi_allocb (9)
+always succeeds; however, whether a buffer was immediately allocated depends on the return value.
+.\"
+.\"
+.SH EXAMPLE
+.PP
+Following is an example of the use of
+.BR mi_allocb ().
+In the example, a zero-length
+.BR M_PROTO (9)
+message block is appended to all
+.BR M_DATA (9)
+message blocks received on a Stream.
+.nf
+\fC\s-2
+  1  int streamscall
+  2  xxx_rput(queue_t *q, mblk_t *mp)
+  3  {
+  4      mblk_t *pp;
+  5  
+  6      if (!pcmsg(DB_TYPE(mp)) && (q->q_first || (q->q_flag & QSVCBUSY))) {
+  7          putq(q, mp);
+  8          return (0);
+  9      }
+ 10  
+ 11      switch (DB_TYPE(mp)) {
+ 12      case M_DATA:
+ 13          if (!(pp = mi_allocb(q, 0, BPRI_MED))) {
+ 14              putq(q, mp);
+ 15              break;
+ 16          }
+ 17          if (!canpuntext(q)) {
+ 18              freeb(pp);
+ 19              putq(q, mp);
+ 20              break;
+ 21          }
+ 22          DB_TYPE(pp) = M_PROTO;
+ 23          pp->b_cont = mp;
+ 24          putnext(q, pp);
+ 25          break;
+ 26      case...:
+ 27          ...;
+ 28      }
+ 29      return (0);
+ 30  }
+
+ 31  int streamscall
+ 32  xxx_rsrv(queue_t *q)
+ 33  {
+ 34      mblk_t *mp;
+ 35  
+ 36      while ((mp = getq(q))) {
+ 37          switch (DB_TYPE(mp)) {
+ 38          case M_DATA:
+ 39              if (!(pp = mi_allocb(q, 0, BPRI_MED))) {
+ 40                  putbq(q, mp);
+ 41                  break;
+ 42              }
+ 43              if (!canputnext(q)) {
+ 44                  freeb(pp);
+ 45                  putbq(q, mp);
+ 46                  break;
+ 47              }
+ 48              DB_TYPE(pp) = M_PROTO;
+ 49              pp->b_cont = mp;
+ 50              putnext(q, pp);
+ 51              break;
+ 52              case...;
+ 53              ...;
+ 54          }
+ 55          break;
+ 56      }
+ 57      return (0);
+ 58  }
+\s+2\fP
+.fi
+.PP
+In the example, when a buyffer cannot be immediately allocated with
+.BR mi_allocb (),
+the caller simply places the message to be processed on the queue,
+.IR q ,
+and returns.  The queue,
+.IR q ,
+will have its service procedured scheduled, using
+.BR qenable (9),
+when a buffer is available and processing of the message can continue.
 .\"
 .\"
 .SH CONTEXT
@@ -153,10 +308,58 @@ is MP-safe, however, see
 .\"
 .SH NOTICES
 .PP
+.BR mi_allocb ()
+is an
+.IR MPS \(rg-specific
+function:
+.BR _MPS_SOURCE ", " _AIX_SOURCE ", " _MAC_SOURCE " or _SUN_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B @PACKAGE_TITLE@
+must also have been compiled with
+.BR CONFIG_STREAMS_COMPAT_MPS ", " CONFIG_STREAMS_COMPAT_MPS_MODULE ", "
+.BR CONFIG_STREAMS_COMPAT_AIX ", " CONFIG_STREAMS_COMPAT_AIX_MODULE ", "
+.BR CONFIG_STREAMS_COMPAT_MAC ", " CONFIG_STREAMS_COMPAT_MAC_MODULE ", "
+.BR CONFIG_STREAMS_COMPAT_SUN " or " CONFIG_STREAMS_COMPAT_SUN_MODULE
+defined.
+.PP
+Because
+.BR mi_allocb ()
+store a buffer callback identifier in the module private structure for queue,
+.IR q ,
+.BR mi_allocb ()
+cannot be called for a queue pair that has not had its private structure allocated with one of the
+.BR mi_open_comm (9)
+family of functions.
+.PP
+Because
+.BR mi_allocb ()
+utilizes
+.BR allocb (9)
+and
+.BR bufcall (9),
+many of the caveats that apply to those functions also apply to
+.BR mi_allocb ().
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+The
+.BR mi_allocb ()
+function is implemented with a rather direct call to
+.BR allocb (9)
+and a call to
+.BR bufcall (9)
+with the queue pointer,
+.IR q ,
+upon failure of the call to
+.BR allocb (9)
+to immediately allocate a buffer.
+Because the buffer callback must be cancelled before returning from the STREAM close procedure, the
+buffer callback identifier is saved in the module private structure.  Because this is automatic,
+.BR mi_allocb ()
+can only be called on Streams that have their private data structures allocated with one of the
+.BR mi_open_comm (9)
+family of functions.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -164,6 +367,7 @@ is MP-safe, however, see
 .BR allocb (9),
 .BR bufcall (9),
 .BR mi_bufcall (9),
+.BR mi_open_comm (9),
 .BR mpscompat (9),
 .BR aixcompat (9),
 .BR maccompat (9),
@@ -188,6 +392,31 @@ and
 .IR Solaris \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.BR mi_allocb ()
+is an OpenSS7 Project specific implemetnation of an
+.IR MPS \(rg-compatible
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+.IP \(em
+.BR mi_allocb ()
+is provided for use with SS7 drivers and modules that need some automatic handling of buffer
+callbacks for speed and efficiency.
+.IP \(em
+.BR mi_allocb ()
+does not exist in any other
+.IR MPS \(rg
+implementation other than
+.IR "Linux Fast-STREAMS" .
+.PP
+See
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+.BR suncompat (9),
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE
