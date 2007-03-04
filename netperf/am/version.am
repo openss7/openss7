@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: version.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/03/04 00:18:08 $
+# @(#) $RCSfile: version.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/04 06:22:10 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/03/04 00:18:08 $ by $Author: brian $
+## Last Modified $Date: 2007/03/04 06:22:10 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: version.am,v $
+## Revision 0.9.2.2  2007/03/04 06:22:10  brian
+## - disclean files instead of local
+##
 ## Revision 0.9.2.1  2007/03/04 00:18:08  brian
 ## - version makefile fragment
 ##
@@ -64,7 +67,7 @@
 	echo "$(VERSION)" > $@
 
 ALL_LOCAL += .version
-DISTCLEAN_LOCAL += .version
+DISTCLEANFILES += .version
 EXTRA_DIST += .version
 
 
