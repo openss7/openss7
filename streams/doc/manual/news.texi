@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.19 2007/03/02 10:30:18 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.20 2007/03/04 12:21:00 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/02 10:30:18 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/04 12:21:00 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -84,26 +84,29 @@ The sections that follow provide information on OpenSS7 releases of the
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This is the eleventh @cite{OpenSS7 Project} release of @cite{Linux Fast-STREAMS}.  @cite{LiS} was
-fully deprecated as of the previous release and @cite{Linux Fast-STREAMS} is now the only STREAMS
-package contained in the OpenSS7 Master Package (since @file{openss7-0.9.2.D}).
+This is the eleventh @cite{OpenSS7 Project} release of @cite{Linux
+Fast-STREAMS}.  @cite{LiS} was fully deprecated as of the previous release and
+@cite{Linux Fast-STREAMS} is now the only STREAMS package contained in the
+OpenSS7 Master Package (since @file{openss7-0.9.2.D}).
 
-This release is a stable, production grade release for @cite{Linux Fast-STREAMS}.  The release is
-primarily a maintenance release to support recent distributions and tool chain.
+This release is a stable, production grade release for @cite{Linux
+Fast-STREAMS}.  The release is primarily a maintenance release to support recent
+distributions and tool chain.
 
 Major features since the last public release are as follows:
 
 @itemize -
 @item
-Added feature to perform automatic reference counting of modules for the @manpage{esballoc(9)} free
-routines on Linux 2.6 kernels.  See new @manref{esballoc(9)}.
+Added feature to perform automatic reference counting of modules for the
+@manpage{esballoc(9)} free routines on Linux 2.6 kernels.  See new
+@manref{esballoc(9)}.
 
 @item
 Added versions to all exported symbols.  Made LFS unique functions GPL export.
 
 @item
-Improvements to the common build environment with better support for standalone package builds on
-2.4 kernels.
+Improvements to the common build environment with better support for standalone
+package builds on 2.4 kernels.
 
 @item
 Support for autoconf 2.61 and gettext 0.16.
@@ -112,6 +115,34 @@ Support for autoconf 2.61 and gettext 0.16.
 Support for Ubuntu 6.10 distribution and bug fixes for i386 kernels.
 
 @end itemize
+
+@emph{This is a public stable production grade release of the package: it
+deprecates previous releases.  Please upgrade to the current release before
+reporting bugs.}
+
+As with other OpenSS7 releases, this release configures, compiles, installs
+and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6 RPM- and
+DPKG-based distributions, and can be used on production kernels without
+patching or recompiling the kernel.
+
+This package is publicly released under the @cite{GNU General Public License
+Version 2}.  The release is available as an @command{autoconf} tarball, SRPM,
+DSC, and set of binary RPMs and DEBs.  See the
+@uref{http://www.openss7.org/download.html,downloads page} for the
+@command{autoconf} tarballs, SRPMs and DSCs.  For tarballs, SRPMs, DSCs and
+binary RPMs and DEBs, see the
+@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html,@value{PACKAGE} package
+page}.
+
+See
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog}
+and
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS}
+in the release for more information.  Also, see the @file{STREAMS.pdf} manual
+in the release (also in html
+@uref{http://www.openss7.org/STREAMS_manual.html}).
+
+For the news release, see @uref{http://www.openss7.org/rel20070305_K.html}.
 
 @c ----------------------------------------------------------------------------
 
@@ -207,6 +238,7 @@ The package will now build doxygen(1) html documentation with the 'doxy'
 make target.  See 'make help' or README-make in the distribution for more
 information.
 @end itemize
+@ignore
 
 @emph{This is a public stable production grade release of the package: it deprecates previous
 releases.  Please upgrade to the current release before reporting bugs.}
@@ -227,6 +259,7 @@ information.  Also, see the @file{STREAMS.pdf} manual in the release (also in ht
 @uref{http://www.openss7.org/STREAMS_manual.html}).
 
 For the news release, see @uref{http://www.openss7.org/rel20070108_K.html}.
+@end ignore
 
 @c ----------------------------------------------------------------------------
 

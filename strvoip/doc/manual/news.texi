@@ -1,7 +1,7 @@
-@c -*- texinfo -*- vim: ft=texinfo
+@c -*- texinfo -*- vim: ft=texinfo nosi nocin
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.9 2007/03/02 10:04:54 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.10 2007/03/04 12:21:25 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/02 10:04:54 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/04 12:21:25 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: news.texi,v $
+@c Revision 0.9.2.10  2007/03/04 12:21:25  brian
+@c - updated news for release
+@c
 @c Revision 0.9.2.9  2007/03/02 10:04:54  brian
 @c - updates to common build process and versions for all exported symbols
 @c
@@ -105,28 +108,33 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This is the second open source release of the @cite{@value{PACKAGE_TITLE}} package.  This release
-contains modules and drivers formerly only available with Commercial releases of the @cite{strss7}
-package and which are only recently available as open source with the release of this package.
+This is the second open source release of the @cite{@value{PACKAGE_TITLE}}
+package.  This release contains modules and drivers formerly only available with
+Commercial releases of the @cite{strss7} package and which are only recently
+available as open source with the release of this package.
 
-With OpenSS7 Master Package release @file{openss7-0.9.2.D}, the VOIP components were separated from
-the @file{strss7} package and placed in this package.  Not all of the VOIP components previously
-part of the @file{strss7} package have been strapped into this release.  Components will be
-re-validated against @cite{Linux Fast-STREAMS} on a module-by-module and driver-by-driver basis.
-See @file{TODO} in the release, or @refman{Schedule}, for information about the release schedule.
+With OpenSS7 Master Package release @file{openss7-0.9.2.D}, the VOIP components
+were separated from the @file{strss7} package and placed in this package.  Not
+all of the VOIP components previously part of the @file{strss7} package have
+been strapped into this release.  Components will be re-validated against
+@cite{Linux Fast-STREAMS} on a module-by-module and driver-by-driver basis.  See
+@file{TODO} in the release, or @refman{Schedule}, for information about the
+release schedule.
 
-This is a beta grade release of H.323 for @cite{Linux Fast-STREAMS}.  It deprecates previous VOIP
-component releases from the @file{strss7} package.  Please upgrade to the most current release of
-these components before reporting bugs.
+This is a beta grade release of H.323 for @cite{Linux Fast-STREAMS}.  It
+deprecates previous VOIP component releases from the @file{strss7} package.
+Please upgrade to the most current release of these components before reporting
+bugs.
 
-This release is a maintenance release providing support for recent distributions and tool chains.
+This release is a maintenance release providing support for recent distributions
+and tool chains.
 
 Major features since the last public release are as follows:
 
 @itemize -
 @item
-Improvements to the common build environment with better support for standalone package builds on
-2.4 kernels.
+Improvements to the common build environment with better support for standalone
+package builds on 2.4 kernels.
 
 @item
 Support for autoconf 2.61 and gettext 0.16.
@@ -135,9 +143,37 @@ Support for autoconf 2.61 and gettext 0.16.
 Support for Ubuntu 6.10 distribution and bug fixes for i386 kenels.
 
 @item
-The package now looks for other subpackages with a version number as unpacked by separate tarball.
+The package now looks for other subpackages with a version number as unpacked by
+separate tarball.
 
 @end itemize
+
+@emph{This is a public beta release of the package: it deprecates previous
+releases.  Please upgrade to the current release before reporting bugs.  Please
+see @file{README-alpha} in the release, or @refman{Maturity}.}
+
+As with other OpenSS7 releases, this release configures, compiles, installs and
+builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based
+distributions, and can be used on production kernels without patching or
+recompiling the kernel.
+
+This package is publicly released under the @cite{GNU General Public License
+Version 2}.  The release is available as an @command{autoconf} tarball, SRPM,
+DSC, and set of binary RPMs and DEBs.  See the
+@uref{http://www.openss7.org/download.html,downloads page} for the
+@command{autoconf} tarballs, SRPMs and DSCs.  For tarballs, SRPMs, DSCs and
+binary RPMs and DEBs, see the
+@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html,@value{PACKAGE} package
+page}.
+
+See
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog}
+and @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS}
+in the release for more information.  Also, see the @file{@value{PACKAGE}.pdf}
+manual in the release (also in html
+@uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
+
+For the news release, see @uref{http://www.openss7.org/rel20070305_3.html}.
 
 @c ----------------------------------------------------------------------------
 
@@ -176,6 +212,7 @@ reporting bugs.
 Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode
 diet patch set).
 @end itemize
+@ignore
 
 @emph{This is the initial public beta release of the package: it
 deprecates previous releases.  Please upgrade to the current release before
@@ -198,6 +235,7 @@ information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the release (al
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
 
 For the news release, see @uref{http://www.openss7.org/rel20070108_3.html}.
+@end ignore
 
 
 @c ----------------------------------------------------------------------------

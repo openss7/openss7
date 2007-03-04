@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.14 2007/03/02 10:04:38 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.15 2007/03/04 12:21:18 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/02 10:04:38 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/04 12:21:18 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -76,21 +76,23 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @cindex release @value{PACKAGE}-@value{VERSION}
 
 This @cite{OpenSS7 Project} release is the second separate release of the
-@cite{@value{PACKAGE_TITLE}} package whose components were formerly part of the @file{strss7},
-@file{strxnet} and @file{streams} packages.  These networking modules provide the Sockets library.
-The package contains all the necessary manual pages and other documentation.  The package is packaged
-as an OpenSS7 style autoconf tarball.
+@cite{@value{PACKAGE_TITLE}} package whose components were formerly part of the
+@file{strss7}, @file{strxnet} and @file{streams} packages.  These networking
+modules provide the Sockets library.  The package contains all the necessary
+manual pages and other documentation.  The package is packaged as an OpenSS7
+style autoconf tarball.
 
-This is the second alpha release for @cite{Linux Fast-STREAMS} and is part of the OpenSS7 Master
-Package (@file{openss7-@value{VERSION_OPENSS7}}).  This release is primarily a maintenance release
-supporting recent distributions and tool chains.
+This is the second alpha release for @cite{Linux Fast-STREAMS} and is part of
+the OpenSS7 Master Package (@file{openss7-@value{VERSION_OPENSS7}}).  This
+release is primarily a maintenance release supporting recent distributions and
+tool chains.
 
 Major features since the last public release are as follows:
 
 @itemize -
 @item
-Improvements to the common build environment with better support for standalone package builds on
-2.4 kernels.
+Improvements to the common build environment with better support for standalone
+package builds on 2.4 kernels.
 
 @item
 Support for autoconf 2.61 and gettext 0.16.
@@ -99,9 +101,36 @@ Support for autoconf 2.61 and gettext 0.16.
 Support for Ubuntu 6.10 distribution and bug fixes for i386 kenels.
 
 @item
-The package now looks for other subpackages with a version number as unpacked by separate tarball.
+The package now looks for other subpackages with a version number as unpacked by
+separate tarball.
 
 @end itemize
+
+@emph{This is a public alpha release of the package.  Please see
+@file{README-alpha} in the release or @refman{Maturity}.}
+
+As with other OpenSS7 releases, this release configures, compiles, installs and
+builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based
+distributions, and can be used on production kernels without patching or
+recompiling the kernel.
+
+This package is publicly released under the @cite{GNU General Public License
+Version 2}.  The release is available as an @command{autoconf} tarball, SRPM,
+DSC, and set of binary RPMs and DEBs.  See the
+@uref{http://www.openss7.org/download.html,downloads page} for the
+@command{autoconf} tarballs, SRPMs and DSCs.  For tarballs, SRPMs, DSCs and
+binary RPMs and DEBs, see the
+@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html,@value{PACKAGE} package
+page}.
+
+See
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog}
+and @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS}
+in the release for more information.  Also, see the @file{@value{PACKAGE}.pdf}
+manual in the release (also in html
+@uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
+
+For the news release, see @uref{http://www.openss7.org/rel20070305_C.html}.
 
 @c ----------------------------------------------------------------------------
 
@@ -125,6 +154,7 @@ This release is the initial public release.
 Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode
 diet patchset).
 @end itemize
+@ignore
 
 @emph{This is a public alpha release of the package.  Please see
 @file{README-alpha} in the release or @refman{Maturity}.}
@@ -145,4 +175,5 @@ information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the release (al
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
 
 For the news release, see @uref{http://www.openss7.org/rel20070108_C.html}.
+@end ignore
 
