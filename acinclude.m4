@@ -784,7 +784,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 			       [do not include OSR61 in master pack @<:@included@:>@]),
 		[with_OSR61="$withval"],
 		[with_OSR61='yes'])
-    AC_CACHE_CHECK([for sub-package osr61],[os7_cvs_osr61_dir],[dnl
+    AC_CACHE_CHECK([for sub-package osr61],[os7_cv_osr61_dir],[dnl
 	    os7_cv_osr61_dir=''
 	    for dir in $srcdir/osr61 $srcdir/osr61-* ; do
 		if test -d "$dir" -a -e "$dir/configure.ac" -a -r "$dir/configure.ac" ; then
