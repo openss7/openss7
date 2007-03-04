@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: rpm.texi,v 0.9.2.2 2007/02/28 06:30:25 brian Exp $
+@c @(#) $Id: rpm.texi,v 0.9.2.3 2007/03/04 10:00:31 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/02/28 06:30:25 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/04 10:00:31 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: rpm.texi,v $
+@c Revision 0.9.2.3  2007/03/04 10:00:31  brian
+@c - updates for release, do not propagate empty flags, build improvements
+@c
 @c Revision 0.9.2.2  2007/02/28 06:30:25  brian
 @c - updates and corrections, #ifdef instead of #if
 @c
@@ -76,7 +79,7 @@ In addition, the following @command{rpm} options, specific to the
 Disable build of the @manpage{dlgn(4)} related Dialogic@registeredsymbol{} Springware based firmware
 boards.  The default is to build the @manpage{dlgn(4)}, and related drivers and modules, for the
 Springware based boards (the interface based on @cite{Linux Fast-STREAMS} only).  Normally the
-@manpage{dlgn(4)} driver @file{streams-dlgn} is built, however, building and installing the driver
+@manpage{dlgn(4)} driver @file{streams-dlgnDriver} is built, however, building and installing the driver
 can be disabled with this option.
 
 @item --without dlgn-bri
@@ -146,7 +149,7 @@ this option.
 Disable build of the @manpage{mercd(4)} Dialogic@registeredsymbol{} Media III (DM3) based firmware
 boards.  The default is to build the @manpage{mercd(4)} driver for the DM3 boards (the interface
 based on @cite{Linux Fast-STREAMS} only).  Normally the @manpage{mercd(4)} driver
-@file{streams-mercd} is built, however, building and installing the driver can be disabled with this
+@file{streams-mercdDriver} is built, however, building and installing the driver can be disabled with this
 option.
 
 @item --without mercd-pps

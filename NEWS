@@ -1,5 +1,5 @@
-OpenSS7 Master Package -- history of user visible changes.  2007-02-13
-$Id: NEWS,v 0.9.2.30 2007/02/21 01:08:13 brian Exp $
+OpenSS7 Master Package -- history of user visible changes.  2007-03-04
+$Id: NEWS,v 0.9.2.31 2007/03/04 09:59:38 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -25,9 +25,15 @@ release provides support for recent distributions and tool chains.
 
 Major features since the last public release are as follows:
 
+   - Addition of the `osr61' sub-package that contains Dialogic(R) Open
+     System Release 6.1 version 239 GPL drivers.
+
+   - A few minor corrections to the common build process.
+
    - Support for autoconf 2.61 and gettext 0.16.
 
-   - Support for Ubuntu 6.10 distribution and bug fixes for i386 kenels.
+   - Support for Ubuntu 6.10 distribution and bug fixes for i386
+     kernels.
 
    - The package now looks for subpackages with a version number as
      unpacked by separate tarball.
@@ -84,7 +90,7 @@ The release provides the following enhancements and fixes:
      will now automatically test both 64-bit native and 32-bit
      compatibility versions, one after the other, on 64-bit platforms.
 
-   - Added versioning of all library symbols.
+   - Added versions to all library symbols.
 
    - Many documentation updates for all OpenSS7 packages.
 
@@ -107,13 +113,13 @@ The release provides the following enhancements and fixes:
      `gcc' compilers and some idiosyncratic beahviour for some
      distributions (primarily SuSE).
 
-   - Oprimized compilation is now available also for user level
+   - Optimized compilation is now available also for user level
      programs in addition to kernel programs.  Added new
      `--with-optimize' option to `configure' to accomplish this.
 
-   - Added `--disable-devel' `configure' option to supress building and
-     installing development environment.  This feature is for embedded
-     or pure runtime targets that do not need the development
+   - Added `--disable-devel' `configure' option to suppress building
+     and installing development environment.  This feature is for
+     embedded or pure runtime targets that do not need the development
      environment (static libraries, manual pages, documentation).
 
    - Added `send-pr' script for automatic problem report generation.
@@ -261,7 +267,7 @@ This master package contains all other OpenSS7 releases.
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.

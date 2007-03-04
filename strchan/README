@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Channels -- read me first file.  2007-02-13
-$Id: README,v 0.9.2.8 2007/02/21 01:08:19 brian Exp $
+OpenSS7 STREAMS Channels -- read me first file.  2007-03-04
+$Id: README,v 0.9.2.9 2007/03/04 10:01:32 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS Channels
 =========================
 
-Package strchan-0.9.2.2 was released under GPLv2 2007-02-13.
+Package strchan-0.9.2.2 was released under GPLv2 2007-03-04.
 
 The `OpenSS7 STREAMS Channels' package provides "STREAMS" modules and
 drivers, libraries, programs, init scripts, and daemons that implement
@@ -55,12 +55,12 @@ and drivers:
 
 `mx(4)'
      The `mx(4)' multiplexing pseudo-device driver is a fully
-     functional matrix swithing device capable of switching, performing
-     rate adaption, echo cancellation, digital padding, conferencing,
-     tones, announcements, detection of tones, detection of speech,
-     continuity tests, progress tones, A-law/mu-law conversion,
-     decompression/compression, comb filtering, and other functions of
-     a digital switching matrix.
+     functional matrix switching device capable of switching,
+     performing rate adaption, echo cancellation, digital padding,
+     conferencing, tones, announcements, detection of tones, detection
+     of speech, continuity tests, progress tones, A-law/mu-law
+     conversion, decompression/compression, comb filtering, and other
+     functions of a digital switching matrix.
 
 `mg(4)'
      The `mg(4)' multiplexing pseudo-device driver is a fully
@@ -84,7 +84,7 @@ and drivers:
 
 `cd_hdlc(4)'
      The `cd_hdlc(4)' module is a pushable "STREAMS" module that
-     provides the capabilties of the High-Level Data Link Control and
+     provides the capabilities of the High-Level Data Link Control and
      can be pushed over a raw `ch(4)' channel to provide a
      Communications Device Interface (CDI) or Data Link Provider
      Interface (DLPI) suitable for use with ISO/OSI protocols, X.25,
@@ -117,7 +117,7 @@ well.
  Release
 --------
 
-This is the `strchan-0.9.2.2' package, released 2007-02-13.  This
+This is the `strchan-0.9.2.2' package, released 2007-03-04.  This
 `0.9.2.2' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -164,7 +164,7 @@ Prerequisites for the OpenSS7 STREAMS Channels package are as follows:
   1. `Linux' distribution, somewhat `Linux Standards Base' compliant,
      with a 2.4 or 2.6 kernel and the appropriate tool chain for
      compiling out-of-tree kernel modules.  Most recent `Linux'
-     distributions are okay out of the box, but some development
+     distributions are usable out of the box, but some development
      packages must be installed.  For more information, see
      `Compatibility', in the manual.
 
@@ -371,3 +371,56 @@ deprecated and unsupported.
 in the release directory for more information on filing a proper
 "Problem Report".
 
+-----
+
+=========================================================================
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

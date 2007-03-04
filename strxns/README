@@ -1,5 +1,5 @@
-OpenSS7 XNS Networking -- read me first file.  2007-02-13
-$Id: README,v 0.9.2.23 2007/02/21 01:08:37 brian Exp $
+OpenSS7 XNS Networking -- read me first file.  2007-03-04
+$Id: README,v 0.9.2.24 2007/03/04 10:04:08 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 XNS Networking
 =======================
 
-Package strxns-0.9.2.5 was released under GPLv2 2007-02-13.
+Package strxns-0.9.2.5 was released under GPLv2 2007-03-04.
 
 The `OpenSS7 XNS Networking' package is an implementation of X/Open
 Network Services (XNS 5.2) for Linux Fast-STREAMS and provides OSI
@@ -15,7 +15,7 @@ conforming CDI, DLPI and NPI header files as well as several DLPI and
 NPI modules and drivers that convert between Linux Native IP interface
 and the STREAMS DLPI and NPI interface.  One allows DLPI drivers to be
 added to Linux as IP interfaces, another provides DLPI access to native
-Linux IP interfaces, and a thrid provides NPI access to the Linux IP
+Linux IP interfaces, and a third provides NPI access to the Linux IP
 subsystem.
 
 The package contains the following standard `Open Systems Interconnect
@@ -92,7 +92,7 @@ well.
  Release
 --------
 
-This is the `strxns-0.9.2.5' package, released 2007-02-13.  This
+This is the `strxns-0.9.2.5' package, released 2007-03-04.  This
 `0.9.2.5' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -139,7 +139,7 @@ Prerequisites for the OpenSS7 XNS Networking package are as follows:
   1. `Linux' distribution, somewhat `Linux Standards Base' compliant,
      with a 2.4 or 2.6 kernel and the appropriate tool chain for
      compiling out-of-tree kernel modules.  Most recent `Linux'
-     distributions are okay out of the box, but some development
+     distributions are usable out of the box, but some development
      packages must be installed.  For more information, see
      `Compatibility', in the manual.
 
@@ -347,7 +347,7 @@ in the release directory for more information on filing a proper
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -395,3 +395,4 @@ in the release directory for more information on filing a proper
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

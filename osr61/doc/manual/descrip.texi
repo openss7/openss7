@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi tw=100
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.2 2007/02/27 08:38:35 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.3 2007/03/04 10:00:31 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/02/27 08:38:35 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/04 10:00:31 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -73,12 +73,12 @@ Dialogic@registeredsymbol{} OSR 6.1 drivers for @cite{Linux}.
 The package builds and installs the following @dfn{STREAMS} kernel modules and drivers:
 
 @multitable @columnfractions .05 .95
-@item @tab @minus{} @file{streams_dlgn.ko} driver @dfn{/dev/streams/dlgn}
-@item @tab @minus{} @file{streams_gncfd.ko} driver @dfn{/dev/streams/gncfd}
-@item @tab @minus{} @file{streams_gpio.ko} driver @dfn{/dev/streams/gpio}
-@item @tab @minus{} @file{streams_mercd.ko} driver @dfn{/dev/streams/mercd}
-@item @tab @minus{} @file{streams_dvbm.ko} module @dfn{dvbm}
-@item @tab @minus{} @file{streams_sctmr.ko} module @dfn{sctmr}
+@item @tab @minus{} @file{streams_dlgnDriver.ko} driver @dfn{/dev/streams/dlgn}
+@item @tab @minus{} @file{streams_gncfdDriver.ko} driver @dfn{/dev/streams/gncfd}
+@item @tab @minus{} @file{streams_gpioDriver.ko} driver @dfn{/dev/streams/gpio}
+@item @tab @minus{} @file{streams_mercdDriver.ko} driver @dfn{/dev/streams/mercd}
+@item @tab @minus{} @file{streams_dvbmDriver.ko} module @dfn{dvbm}
+@item @tab @minus{} @file{streams_sctmrDriver.ko} module @dfn{sctmr}
 @item @tab @minus{} @file{pmacd.ko} driver
 @item @tab @minus{} @file{ctimod.ko} module
 @end multitable

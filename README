@@ -1,5 +1,5 @@
-OpenSS7 Master Package -- read me first file.  2007-02-13
-$Id: README,v 0.9.2.20 2007/02/21 01:08:13 brian Exp $
+OpenSS7 Master Package -- read me first file.  2007-03-04
+$Id: README,v 0.9.2.21 2007/03/04 09:59:38 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 Master Package
 =======================
 
-Package openss7-0.9.2.E was released under GPLv2 2007-02-13.
+Package openss7-0.9.2.E was released under GPLv2 2007-03-04.
 
 This is the `OpenSS7 Master Package' package.  It consists of a master
 package that contains all other OpenSS7 Project package releases.  Use
@@ -34,7 +34,8 @@ The `OpenSS7 Master Package' package contains:
 `strisdn-0.9.2.2' (`STREAMS ISDN Stack'),
 `strss7-0.9a.6' (`STREAMS SS7 Stacks'),
 `sigtran-0.9.2.2' (`STREAMS SIGTRAN Stack'),
-`strvoip-0.9.2.2' (`STREAMS VoIP Stacks') and
+`strvoip-0.9.2.2' (`STREAMS VoIP Stacks'),
+`osr61-0.9.2.1' (`Dialogic Open System Release 6.1') and
 `LiS-2.18.5' (`Linux STREAMS').
 
 If you need to build an install a significant number of these packages,
@@ -48,7 +49,7 @@ well.
  Release
 --------
 
-This is the `openss7-0.9.2.E' package, released 2007-02-13.  This
+This is the `openss7-0.9.2.E' package, released 2007-03-04.  This
 `0.9.2.E' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -94,8 +95,8 @@ Prerequisites for the OpenSS7 Master Package package are as follows:
 
   1. `Linux' distribution, somewhat `Linux Standards Base' compliant,
      with a 2.4 or 2.6 kernel and the appropriate tool chain for
-     compiling out-of-tree kenrel modules.  Most recent `Linux'
-     distributions are okay out of the box, but some development
+     compiling out-of-tree kernel modules.  Most recent `Linux'
+     distributions are usable out of the box, but some development
      packages must be installed.  For more information, see
      `Compatibility', in the manual.
 
@@ -289,7 +290,7 @@ in the release directory for more information on filing a proper
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/02 10:03:16 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/03/04 09:59:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/02 10:03:16 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 09:59:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -993,6 +993,44 @@ AC_DEFUN([_OS7_CONFIG_KERNEL], [dnl
 # =============================================================================
 
 # =============================================================================
+# _OS7_REQUIRE([package], [version], [build])
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OS7_REQUIRE], [dnl
+    os7_mc='$1'
+    os7_uc=`echo "$1" | sed -e 'y,abcdefghijklmnopqrstuvwxyz,ABCDEFGHIJKLMNOPQRSTUVWXYZ,'`
+    os7_bc=`echo "$3" | sed -e 'y,abcdefghijklmnopqrstuvwxyz,ABCDEFGHIJKLMNOPQRSTUVWXYZ,'`
+    if test :$os7_mc = :strss7 ; then os7_uc='STACKS' ; fi
+    os7_with="with_${os7_uc}"
+    os7_dir="os7_cv_${os7_mc}_dir"
+    os7_srcdir=`(cd $srcdir; pwd)`
+    if eval "test :\${$os7_dir:-no} == :no" ; then
+	AC_MSG_ERROR([
+***
+*** Sub-package $3 requires sub-package $1-$2 (or better)
+*** to build.  Please download package $1-$2 from
+***
+***   http://www.openss7.org/tarballs/$1-$2.tar.bz2
+***
+*** and unpack it in the source directory
+*** 
+***   $os7_srcdir
+***
+*** and call configure again, or specificy the configuration
+*** option --without-$os7_bc and configure again.
+*** ])
+    fi
+    if eval "test :\${$os7_with:-yes} != :yes" ; then
+	AC_MSG_ERROR([
+***
+*** Sub-package $3 requires sub-package $1-$2 (or better)
+*** to build.  Please specify --with-$os7_uc or --without-$os7_bc
+*** and configure again.
+*** ])
+    fi
+])# _OS7_REQUIRE
+# =============================================================================
+
+# =============================================================================
 # _OS7_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OS7_OUTPUT], [dnl
@@ -1016,69 +1054,118 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
     if test :${with_SCTP:-yes} = :yes -a :${os7_cv_sctp_dir:-no} != :no ; then
 	AC_CONFIG_SUBDIRS([sctp])
     fi
+    AM_CONDITIONAL([WITH_SCTP], [test :${with_SCTP:-yes} = :yes -a :${os7_cv_sctp_dir:-no} != :no])dnl
     if test :${with_IPERF:-yes} = :yes -a :${os7_cv_iperf_dir:-no} != :no ; then
+	_OS7_REQUIRE([sctp], [0.2.25], [iperf])
 	AC_CONFIG_SUBDIRS([iperf])
     fi
+    AM_CONDITIONAL([WITH_IPERF], [test :${with_IPERF:-yes} = :yes -a :${os7_cv_iperf_dir:-no} != :no])dnl
     if test :${with_LIS:-yes} = :yes -a :${os7_cv_LiS_dir:-no} != :no ; then
 	AC_CONFIG_SUBDIRS([LiS])
     fi
+    AM_CONDITIONAL([WITH_LIS], [test :${with_LIS:-yes} = :yes -a :${os7_cv_LiS_dir:-no} != :no])dnl
     if test :${with_STREAMS:-yes} = :yes -a :${os7_cv_streams_dir:-no} != :no ; then
 	AC_CONFIG_SUBDIRS([streams])
     fi
+    AM_CONDITIONAL([WITH_STREAMS], [test :${with_STREAMS:-yes} = :yes -a :${os7_cv_streams_dir:-no} != :no])dnl
     if test :${with_STRCOMPAT:-yes} = :yes -a :${os7_cv_strcompat_dir:-no} != :no ; then
+	_OS7_REQUIRE([streams], [0.9.2.2], [strcompat])
 	AC_CONFIG_SUBDIRS([strcompat])
     fi
+    AM_CONDITIONAL([WITH_STRCOMPAT], [test :${with_STRCOMPAT:-yes} = :yes -a :${os7_cv_strcompat_dir:-no} != :no])dnl
     if test :${with_STRUTIL:-yes} = :yes -a :${os7_cv_strutil_dir:-no} != :no ; then
+	_OS7_REQUIRE([strcompat], [0.9.2.5], [strutil])
 	AC_CONFIG_SUBDIRS([strutil])
     fi
+    AM_CONDITIONAL([WITH_STRUTIL], [test :${with_STRUTIL:-yes} = :yes -a :${os7_cv_strutil_dir:-no} != :no])dnl
     if test :${with_STRBCM:-yes} = :yes -a :${os7_cv_strbcm_dir:-no} != :no ; then
+	_OS7_REQUIRE([strcompat], [0.9.2.5], [strbcm])
 	AC_CONFIG_SUBDIRS([strbcm])
     fi
+    AM_CONDITIONAL([WITH_STRBCM], [test :${with_STRBCM:-yes} = :yes -a :${os7_cv_strbcm_dir:-no} != :no])dnl
     if test :${with_STRTTY:-yes} = :yes -a :${os7_cv_strtty_dir:-no} != :no ; then
+	_OS7_REQUIRE([strcompat], [0.9.2.5], [strtty])
 	AC_CONFIG_SUBDIRS([strtty])
     fi
+    AM_CONDITIONAL([WITH_STRTTY], [test :${with_STRTTY:-yes} = :yes -a :${os7_cv_strtty_dir:-no} != :no])dnl
     if test :${with_STRXNS:-yes} = :yes -a :${os7_cv_strxns_dir:-no} != :no ; then
+	_OS7_REQUIRE([strcompat], [0.9.2.5], [strxns])
 	AC_CONFIG_SUBDIRS([strxns])
     fi
+    AM_CONDITIONAL([WITH_STRXNS], [test :${with_STRXNS:-yes} = :yes -a :${os7_cv_strxns_dir:-no} != :no])dnl
     if test :${with_STRXNET:-yes} = :yes -a :${os7_cv_strxnet_dir:-no} != :no ; then
+	_OS7_REQUIRE([strxns], [0.9.2.5], [strxnet])
 	AC_CONFIG_SUBDIRS([strxnet])
     fi
+    AM_CONDITIONAL([WITH_STRXNET], [test :${with_STRXNET:-yes} = :yes -a :${os7_cv_strxnet_dir:-no} != :no])dnl
     if test :${with_STRNSL:-yes} = :yes -a :${os7_cv_strnsl_dir:-no} != :no ; then
+	_OS7_REQUIRE([strxnet], [0.9.2.10], [strnsl])
 	AC_CONFIG_SUBDIRS([strnsl])
     fi
+    AM_CONDITIONAL([WITH_STRNSL], [test :${with_STRNSL:-yes} = :yes -a :${os7_cv_strnsl_dir:-no} != :no])dnl
     if test :${with_STRSOCK:-yes} = :yes -a :${os7_cv_strsock_dir:-no} != :no ; then
+	_OS7_REQUIRE([strnsl], [0.9.2.2], [strsock])
 	AC_CONFIG_SUBDIRS([strsock])
     fi
+    AM_CONDITIONAL([WITH_STRSOCK], [test :${with_STRSOCK:-yes} = :yes -a :${os7_cv_strsock_dir:-no} != :no])dnl
     if test :${with_STRINET:-yes} = :yes -a :${os7_cv_strinet_dir:-no} != :no ; then
+	_OS7_REQUIRE([strxnet], [0.9.2.10], [strinet])
 	AC_CONFIG_SUBDIRS([strinet])
     fi
+    AM_CONDITIONAL([WITH_STRINET], [test :${with_STRINET:-yes} = :yes -a :${os7_cv_strinet_dir:-no} != :no])dnl
     if test :${with_STRSCTP:-yes} = :yes -a :${os7_cv_strsctp_dir:-no} != :no ; then
+	_OS7_REQUIRE([strxnet], [0.9.2.10], [strsctp])
 	AC_CONFIG_SUBDIRS([strsctp])
     fi
+    AM_CONDITIONAL([WITH_STRSCTP], [test :${with_STRSCTP:-yes} = :yes -a :${os7_cv_strsctp_dir:-no} != :no])dnl
     if test :${with_STRCHAN:-yes} = :yes -a :${os7_cv_strchan_dir:-no} != :no ; then
+	_OS7_REQUIRE([strxns], [0.9.2.5], [strchan])
 	AC_CONFIG_SUBDIRS([strchan])
     fi
+    AM_CONDITIONAL([WITH_STRCHAN], [test :${with_STRCHAN:-yes} = :yes -a :${os7_cv_strchan_dir:-no} != :no])dnl
     if test :${with_STRISO:-yes} = :yes -a :${os7_cv_striso_dir:-no} != :no ; then
+	_OS7_REQUIRE([strxnet], [0.9.2.10], [striso])
 	AC_CONFIG_SUBDIRS([striso])
     fi
+    AM_CONDITIONAL([WITH_STRISO], [test :${with_STRISO:-yes} = :yes -a :${os7_cv_striso_dir:-no} != :no])dnl
     if test :${with_NETPERF:-yes} = :yes -a :${os7_cv_netperf_dir:-no} != :no ; then
+	_OS7_REQUIRE([strxnet], [0.9.2.10], [netperf])
+	_OS7_REQUIRE([strinet], [0.9.2.5], [netperf])
+	_OS7_REQUIRE([strsctp], [0.9.2.7], [netperf])
+	_OS7_REQUIRE([striso], [0.9.2.2], [netperf])
 	AC_CONFIG_SUBDIRS([netperf])
     fi
+    AM_CONDITIONAL([WITH_NETPERF], [test :${with_NETPERF:-yes} = :yes -a :${os7_cv_netperf_dir:-no} != :no])dnl
     if test :${with_STRISDN:-yes} = :yes -a :${os7_cv_strisdn_dir:-no} != :no ; then
+	_OS7_REQUIRE([strxnet], [0.9.2.10], [strisdn])
 	AC_CONFIG_SUBDIRS([strisdn])
     fi
+    AM_CONDITIONAL([WITH_STRISDN], [test :${with_STRISDN:-yes} = :yes -a :${os7_cv_strisdn_dir:-no} != :no])dnl
     if test :${with_STACKS:-yes} = :yes -a :${os7_cv_strss7_dir:-no} != :no ; then
+	_OS7_REQUIRE([strxnet], [0.9.2.10], [strss7])
+	_OS7_REQUIRE([strinet], [0.9.2.5], [strss7])
+	_OS7_REQUIRE([strsctp], [0.9.2.7], [strss7])
+	_OS7_REQUIRE([striso], [0.9.2.2], [strss7])
+	_OS7_REQUIRE([strisdn], [0.9.2.2], [strss7])
 	AC_CONFIG_SUBDIRS([stacks])
     fi
+    AM_CONDITIONAL([WITH_STACKS], [test :${with_STACKS:-yes} = :yes -a :${os7_cv_strss7_dir:-no} != :no])dnl
     if test :${with_SIGTRAN:-yes} = :yes -a :${os7_cv_sigtran_dir:-no} != :no ; then
+	_OS7_REQUIRE([strsctp], [0.9.2.7], [sigtran])
+	_OS7_REQUIRE([strss7], [0.9a.6], [sigtran])
 	AC_CONFIG_SUBDIRS([sigtran])
     fi
+    AM_CONDITIONAL([WITH_SIGTRAN], [test :${with_SIGTRAN:-yes} = :yes -a :${os7_cv_sigtran_dir:-no} != :no])dnl
     if test :${with_STRVOIP:-yes} = :yes -a :${os7_cv_strvoip_dir:-no} != :no ; then
+	_OS7_REQUIRE([strss7], [0.9a.6], [strvoip])
 	AC_CONFIG_SUBDIRS([strvoip])
     fi
+    AM_CONDITIONAL([WITH_STRVOIP], [test :${with_STRVOIP:-yes} = :yes -a :${os7_cv_strvoip_dir:-no} != :no])dnl
     if test :${with_OSR61:-yes} = :yes -a :${os7_cv_osr61_dir:-no} != :no ; then
+	_OS7_REQUIRE([strxnet], [0.9.2.10], [osr61])
 	AC_CONFIG_SUBDIRS([osr61])
     fi
+    AM_CONDITIONAL([WITH_OSR61], [test :${with_OSR61:-yes} = :yes -a :${os7_cv_osr61_dir:-no} != :no])dnl
 ])# _OS7_OUTPUT
 # =============================================================================
 

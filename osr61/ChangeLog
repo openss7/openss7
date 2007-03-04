@@ -1,3 +1,20 @@
+2007-03-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* THANKS: updates for release
+	* debian/copyright: updates for release
+
+	* osr61.spec.in: do not propagate empty flags
+	* debian/rules.in: do not propagate empty flags
+
+	* doc/manual/configure.texi: change driver names
+	* doc/manual/descrip.texi: change driver names
+	* doc/manual/osr61.texi: change driver names
+	* doc/manual/rpm.texi: change driver names
+	* doc/manual/tree.texi: change driver names
+
 2007-03-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/ctimod/ctimod.c: change exports to GPL

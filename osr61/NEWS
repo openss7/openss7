@@ -1,5 +1,5 @@
-Dialogic Open Systems Release 6.1 -- history of user visible changes.  2007-02-24
-$Id: NEWS,v 0.9.2.1 2007/02/25 12:26:05 brian Exp $
+Dialogic Open Systems Release 6.1 -- history of user visible changes.  2007-03-04
+$Id: NEWS,v 0.9.2.2 2007/03/04 10:00:20 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -19,9 +19,15 @@ documentation for components in an autoconf tarball.
 
 This release is the initial public release.
 
-   - In this inital release, the package already supports a wide range
+   - In this initial release, the package already supports a wide range
      of production distributions as it uses the same build environment
      as other OpenSS7 Project packages.
+
+   - Added versions to all exported symbols.  Made LFS unique functions
+     GPL export.
+
+   - Improvements to the common build environment with better support
+     for standalone package builds on 2.4 kernels.
 
    - Support for most recent 2.6.18 kernels (including Fedora Core 5
      with inode diet patchset).
@@ -29,7 +35,7 @@ This release is the initial public release.
 _This is the initial public alpha release of the package.  Please see
 `README-alpha' in the release, or `Maturity', in the manual._
 
-This is the inital public alpha release of the package.  This package
+This is the initial public alpha release of the package.  This package
 is complete but untested.  It is being released for testing by the
 community.  If you are interested in testing of this package, contact
 <info@openss7.com>.
