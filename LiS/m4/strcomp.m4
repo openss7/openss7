@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/01 07:17:25 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/04 22:16:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 22:16:20 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strcomp.m4,v $
+# Revision 0.9.2.27  2007/03/04 22:16:20  brian
+# - preparing for eventual library
+#
 # Revision 0.9.2.26  2007/03/01 07:17:25  brian
 # - updating common build process
 #
@@ -328,13 +331,34 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	fi
     ])
     AC_CACHE_CHECK([for compat ldadd native], [strcomp_cv_ldadd], [dnl
+	strcomp_what="libcompat.la"
 	strcomp_cv_ldadd=
 	for strcomp_dir in $strcomp_cv_includes ; do
-	    if test -f "$strcomp_dir/../../libcompat.la" ; then
-		strcomp_cv_ldadd=`echo "$strcomp_dir/../../libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$strcomp_dir/../../$strcomp_what" ; then
+		strcomp_cv_ldadd=`echo "$strcomp_dir/../../$strcomp_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$strcomp_cv_ldadd" ; then
+	    eval "strcomp_search_path =\"
+		${DESTDIR}${rootdir}${libdir}
+		${DESTDIR}${libdir}\""
+	    strcomp_search_path=`echo "$strcomp_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([searching])
+	    for strcomp_dir in $strcomp_search_path ; do
+		if test -d "$strcomp_dir" ; then
+		    AC_MSG_CHECKING([for compat ldadd native... $strcomp_dir])
+		    if test -r "$strcomp_dir/$strcomp_what" ; then
+			strcomp_cv_ldadd="$strcomp_dir/$strcomp_what"
+			strcomp_cv_ldflags=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for compat ldadd native])
+	fi
     ])
     AC_CACHE_CHECK([for compat ldflags], [strcomp_cv_ldflags], [dnl
 	strcomp_cv_ldflags=
@@ -345,13 +369,34 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	fi
     ])
     AC_CACHE_CHECK([for compat ldadd 32-bit], [strcomp_cv_ldadd32], [dnl
+	strcomp_what="libcompat.la"
 	strcomp_cv_ldadd32=
 	for strcomp_dir in $strcomp_cv_includes ; do
-	    if test -f "$strcomp_dir/../../lib32/libcompat.la" ; then
-		strcomp_cv_ldadd32=`echo "$strcomp_dir/../../lib32/libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$strcomp_dir/../../lib32/$strcomp_what" ; then
+		strcomp_cv_ldadd32=`echo "$strcomp_dir/../../lib32/$strcomp_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$strcomp_cv_ldadd32" ; then
+	    eval "strcomp_search_path =\"
+		${DESTDIR}${rootdir}${lib32dir}
+		${DESTDIR}${lib32dir}\""
+	    strcomp_search_path=`echo "$strcomp_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([searching])
+	    for strcomp_dir in $strcomp_search_path ; do
+		if test -d "$strcomp_dir" ; then
+		    AC_MSG_CHECKING([for compat ldadd 32-bit... $strcomp_dir])
+		    if test -r "$strcomp_dir/$strcomp_what" ; then
+			strcomp_cv_ldadd32="$strcomp_dir/$strcomp_what"
+			strcomp_cv_ldflags32=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for compat ldadd 32-bit])
+	fi
     ])
     AC_CACHE_CHECK([for compat ldflags 32-bit], [strcomp_cv_ldflags32], [dnl
 	strcomp_cv_ldflags32=
