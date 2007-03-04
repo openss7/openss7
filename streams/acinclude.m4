@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2007/03/03 08:39:55 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.136 $) $Date: 2007/03/04 23:14:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/03 08:39:55 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:14:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.136  2007/03/04 23:14:25  brian
+# - better search for modversions
+#
 # Revision 0.9.2.135  2007/03/03 08:39:55  brian
 # - corrections for STREAMS_VERSION
 #
@@ -178,11 +181,12 @@ AC_DEFUN([AC_LFS], [dnl
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/${STRCONF_CONFIG}'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_srcdir}'
-    if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
-	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
+    if test :${linux_cv_ko_modules:-no} = :no ; then
+	if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
+	    PKG_MODFLAGS='-include ${top_builddir}/${MODVERSIONS_H}'
+	fi
     fi
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/include -I${top_srcdir}/include'
-dnl PKG_MODFLAGS='$(STREAMS_MODFLAGS)'
 dnl Just check config.log if you want to see these...
 dnl AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
 dnl AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
@@ -1650,6 +1654,7 @@ AC_DEFUN([_LFS_CONFIG], [dnl
     streams_cv_lfs_ldadd32="${pkg_bld}/lib32/libstreams.la"
     streams_cv_lfs_ldflags32="-L${pkg_bld}/lib32/.libs/"
     streams_cv_lfs_manpath="${pkg_bld}/doc/man"
+    streams_cv_lfs_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
     streams_cv_lfs_modmap="${pkg_bld}/Modules.map"
     streams_cv_lfs_symver="${pkg_bld}/Module.symvers"
     streams_cv_lfs_version="${PACKAGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"

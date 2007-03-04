@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/03 05:42:46 $
+# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/04 23:14:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/03 05:42:46 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:14:42 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.17  2007/03/04 23:14:42  brian
+# - better search for modversions
+#
 # Revision 0.9.2.16  2007/03/03 05:42:46  brian
 # - better standalong library detection
 #
@@ -225,6 +228,7 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 		    sock_cv_includes="$sock_bld $sock_dir"
 		    sock_cv_ldadd="$os7_cv_master_builddir/strsock/libsocket.la"
 		    sock_cv_ldadd32="$os7_cv_master_builddir/strsock/lib32/libsocket.la"
+		    sock_cv_modversions="$os7_cv_master_builddir/strsock/include/$linux_cv_k_release/$target_cpu/sys/strsock/modversions.h"
 		    sock_cv_modmap="$os7_cv_master_builddir/strsock/Modules.map"
 		    sock_cv_symver="$os7_cv_master_builddir/strsock/Module.symvers"
 		    sock_cv_manpath="$os7_cv_master_builddir/strsock/doc/man"
@@ -254,6 +258,7 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 			sock_cv_includes="$sock_bld $sock_dir"
 			sock_cv_ldadd=`echo "$sock_bld/../../libsocket.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sock_cv_ldadd32=`echo "$sock_bld/../../lib32/libsocket.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sock_cv_modversions=`echo "$sock_bld/../../include/$linux_cv_k_release/$target_cpu/sys/strsock/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sock_cv_modmap=`echo "$sock_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sock_cv_symver=`echo "$sock_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sock_cv_manpath=`echo "$sock_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

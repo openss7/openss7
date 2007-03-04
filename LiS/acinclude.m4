@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.54 $) $Date: 2007/03/03 08:39:53 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.55 $) $Date: 2007/03/04 23:14:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/03 08:39:53 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:14:18 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.6.55  2007/03/04 23:14:18  brian
+# - better search for modversions
+#
 # Revision 1.1.6.54  2007/03/03 08:39:53  brian
 # - corrections for STREAMS_VERSION
 #
@@ -1724,6 +1727,7 @@ AC_DEFUN([_LIS_CONFIG], [dnl
     streams_cv_lis_ldadd32="${pkg_bld}/lib32/libstreams.la"
     streams_cv_lis_ldflags32="-L${pkg_bld}/lib32/.libs/"
     streams_cv_lis_manpath="${pkg_bld}/doc/man"
+    streams_cv_lis_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
     streams_cv_lis_modmap="${pkg_bld}/Modules.map"
     streams_cv_lis_symver="${pkg_bld}/Module.symvers"
     streams_cv_lis_version="${PACKAGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"

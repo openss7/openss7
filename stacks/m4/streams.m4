@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2007/03/03 08:39:57 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2007/03/04 23:16:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/03 08:39:57 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:16:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -303,6 +303,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 		    streams_cv_lis_includes="$streams_dir $streams_bld"
 		    streams_cv_lis_ldadd="$os7_cv_master_builddir/LiS/libLiS.la"
 		    streams_cv_lis_ldadd32="$os7_cv_master_builddir/LiS/lib32/libLiS.la"
+		    streams_cv_lis_modversions="$os7_cv_master_builddir/LiS/include/$linux_cv_k_release/$target_cpu/sys/LiS/modversions.h"
 		    streams_cv_lis_modmap="$os7_cv_master_builddir/LiS/Modules.map"
 		    streams_cv_lis_symver="$os7_cv_master_builddir/LiS/Module.symvers"
 		    streams_cv_lis_manpath="$os7_cv_master_builddir/LiS/man"
@@ -332,6 +333,7 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 			streams_cv_lis_includes="$streams_bld $streams_dir"
 			streams_cv_lis_ldadd=`echo "$streams_bld/../libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lis_ldadd32=`echo "$streams_bld/../lib32/libLiS.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			streams_cv_lis_modversions=`echo "$streams_bld/../include/$linux_cv_k_release/$target_cpu/sys/LiS/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lis_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lis_symver=`echo "$streams_bld/../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lis_manpath=`echo "$streams_bld/../man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -626,6 +628,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		    streams_cv_lfs_includes="$streams_bld $streams_dir"
 		    streams_cv_lfs_ldadd="$os7_cv_master_builddir/streams/libstreams.la"
 		    streams_cv_lfs_ldadd32="$os7_cv_master_builddir/streams/lib32/libstreams.la"
+		    streams_cv_lfs_modversions="$os7_cv_master_builddir/streams/include/$linux_cv_k_release/$target_cpu/sys/streams/modversions.h"
 		    streams_cv_lfs_modmap="$os7_cv_master_builddir/streams/Modules.map"
 		    streams_cv_lfs_symver="$os7_cv_master_builddir/streams/Module.symvers"
 		    streams_cv_lfs_manpath="$os7_cv_master_builddir/streams/doc/man"
@@ -655,6 +658,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 			streams_cv_lfs_includes="$streams_dir $streams_bld"
 			streams_cv_lfs_ldadd=`echo "$streams_bld/../libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lfs_ldadd32=`echo "$streams_bld/../lib32/libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			streams_cv_lfs_modversions=`echo "$streams_bld/../include/$linux_cv_k_release/$target_cpu/sys/streams/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lfs_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lfs_symver=`echo "$streams_bld/../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lfs_manpath=`echo "$streams_bld/../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

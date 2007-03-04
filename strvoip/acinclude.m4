@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/02 10:04:53 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/04 23:14:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/02 10:04:53 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:14:40 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.6  2007/03/04 23:14:40  brian
+# - better search for modversions
+#
 # Revision 0.9.2.5  2007/03/02 10:04:53  brian
 # - updates to common build process and versions for all exported symbols
 #
@@ -153,11 +156,14 @@ AC_DEFUN([AC_VOIP], [dnl
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SS7_CPPFLAGS:+ }}${SS7_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STRCOMP_CPPFLAGS:+ }}${STRCOMP_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
+    if test :${linux_cv_ko_modules:-no} = :no ; then
+	PKG_MODFLAGS='$(STREAMS_MODFLAGS) $(STRCOMP_MODFLAGS)'
+dnl	if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
+dnl	    PKG_MODFLAGS="${PKG_MODFLAGS}${PKG_MODFLAGS:+ }"'-include ${top_builddir}/${MODVERSIONS_H}'
+dnl	    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/include'
+dnl	fi
+    fi
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/src/include -I${top_srcdir}/src/include'
-dnl if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
-dnl	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
-dnl fi
-    PKG_MODFLAGS='$(STREAMS_MODFLAGS) $(STRCOMP_MODFLAGS)'
 dnl Just check config.log if you want to see these...
 dnl AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
 dnl AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
@@ -308,6 +314,7 @@ AC_DEFUN([_VOIP_CONFIG], [dnl
     voip_cv_ldadd32= # "${pkg_bld}/lib32/libvoip.la"
     voip_cv_ldflags32= # "-L${pkg_bld}/lib32/.libs/"
     voip_cv_manpath="${pkg_bld}/doc/man"
+    voip_cv_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
     voip_cv_modmap="${pkg_bld}/Modules.map"
     voip_cv_symver="${pkg_bld}/Module.symvers"
     voip_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"

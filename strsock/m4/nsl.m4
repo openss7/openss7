@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/03 05:42:46 $
+# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/04 23:14:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/03 05:42:46 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:14:42 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.16  2007/03/04 23:14:42  brian
+# - better search for modversions
+#
 # Revision 0.9.2.15  2007/03/03 05:42:46  brian
 # - better standalong library detection
 #
@@ -231,6 +234,7 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 		    nsl_cv_includes="$nsl_bld $nsl_dir"
 		    nsl_cv_ldadd="$os7_cv_master_builddir/strnsl/libxnsl.la"
 		    nsl_cv_ldadd32="$os7_cv_master_builddir/strnsl/lib32/libxnsl.la"
+		    nsl_cv_modversions= # "$os7_cv_master_builddir/strnsl/include/$linux_cv_k_release/$target_cpu/sys/strnsl/modversions.h"
 		    nsl_cv_modmap= # "$os7_cv_master_builddir/strnsl/Modules.map"
 		    nsl_cv_symver= # "$os7_cv_master_builddir/strnsl/Module.symvers"
 		    nsl_cv_manpath="$os7_cv_master_builddir/strnsl/doc/man"
@@ -260,6 +264,7 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 			nsl_cv_includes="$nsl_bld $nsl_dir"
 			nsl_cv_ldadd=`echo "$nsl_bld/../../libxnsl.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			nsl_cv_ldadd32=`echo "$nsl_bld/../../lib32/libxnsl.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			nsl_cv_modversions= # `echo "$nsl_bld/../../include/$linux_cv_k_release/$target_cpu/sys/strnsl/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			nsl_cv_modmap= # `echo "$nsl_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			nsl_cv_symver= # `echo "$nsl_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			nsl_cv_manpath=`echo "$nsl_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

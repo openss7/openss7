@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/02 10:04:56 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/03/04 23:14:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/02 10:04:56 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:14:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -116,11 +116,14 @@ AC_DEFUN([AC_XNET], [dnl
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SS7_CPPFLAGS:+ }}${SS7_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STRCOMP_CPPFLAGS:+ }}${STRCOMP_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
+    if test :${linux_cv_ko_modules:-no} = :no ; then
+	PKG_MODFLAGS='$(STREAMS_MODFLAGS) $(STRCOMP_MODFLAGS)'
+dnl	if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
+dnl	    PKG_MODFLAGS="${PKG_MODFLAGS}${PKG_MODFLAGS:+ }"'-include ${top_builddir}/${MODVERSIONS_H}'
+dnl	    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/include'
+dnl	fi
+    fi
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/src/include -I${top_srcdir}/src/include'
-dnl if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
-dnl	PKG_MODFLAGS='-include $(top_builddir)/$(MODVERSIONS_H)'
-dnl fi
-    PKG_MODFLAGS='$(STREAMS_MODFLAGS) $(STRCOMP_MODFLAGS)'
 dnl Just check config.log if you want to see these...
 dnl AC_MSG_NOTICE([final user    CPPFLAGS  = $USER_CPPFLAGS])
 dnl AC_MSG_NOTICE([final user    CFLAGS    = $USER_CFLAGS])
@@ -201,6 +204,7 @@ AC_DEFUN([_XNET_CONFIG], [dnl
     xti_cv_ldadd32="${pkg_bld}/lib32/libxnet.la"
     xti_cv_ldflags32="-L${pkg_bld}/lib32/.libs/"
     xti_cv_manpath="${pkg_bld}/doc/man"
+    xti_cv_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
     xti_cv_modmap="${pkg_bld}/Modules.map"
     xti_cv_symver="${pkg_bld}/Module.symvers"
     xti_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"

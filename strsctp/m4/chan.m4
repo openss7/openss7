@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/01 07:17:25 $
+# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/04 23:14:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:14:42 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.10  2007/03/04 23:14:42  brian
+# - better search for modversions
+#
 # Revision 0.9.2.9  2007/03/01 07:17:25  brian
 # - updating common build process
 #
@@ -202,6 +205,7 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 		    chan_cv_includes="$chan_bld $chan_dir"
 		    chan_cv_ldadd= # "$os7_cv_master_builddir/strchan/libchan.la"
 		    chan_cv_ldadd32= # "$os7_cv_master_builddir/strchan/lib32/libchan.la"
+		    chan_cv_modversions="$os7_cv_master_builddir/strchan/include/$linux_cv_k_release/$target_cpu/sys/strchan/modversions.h"
 		    chan_cv_modmap="$os7_cv_master_builddir/strchan/Modules.map"
 		    chan_cv_symver="$os7_cv_master_builddir/strchan/Module.symvers"
 		    chan_cv_manpath="$os7_cv_master_builddir/strchan/doc/man"
@@ -231,6 +235,7 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 			chan_cv_includes="$chan_bld $chan_dir"
 			chan_cv_ldadd= # `echo "$chan_bld/../../libchan.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			chan_cv_ldadd32= # `echo "$chan_bld/../../lib32/libchan.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			chan_cv_modversions=`echo "$chan_bld/../../include/$linux_cv_k_release/$target_cpu/sys/strchan/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			chan_cv_modmap=`echo "$chan_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			chan_cv_symver=`echo "$chan_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			chan_cv_manpath=`echo "$chan_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
