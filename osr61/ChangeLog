@@ -5,6 +5,7 @@
 	* README: updates for release
 	* THANKS: updates for release
 	* debian/copyright: updates for release
+	* doc/manual/news.texi: updates for release
 
 	* osr61.spec.in: do not propagate empty flags
 	* debian/rules.in: do not propagate empty flags

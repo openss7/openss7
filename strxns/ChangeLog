@@ -6,6 +6,7 @@
 	* README-cvs: updates for release
 	* THANKS: updates for release
 	* debian/copyright: updates for release
+	* doc/manual/news.texi: updates for release
 
 	* strxns.spec.in: do not propagate empty flags
 	* debian/rules.in: do not propagate empty flags

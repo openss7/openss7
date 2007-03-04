@@ -5,6 +5,7 @@
 	* README: updates for release
 	* README-cvs: updates for release
 	* THANKS: updates for release
+	* doc/manual/news.texi: updates for release
 
 	* Makefile.am: added hook to move or remove subdirectories
 	* acinclude.m4: better checking for subpackages and dependency checks
