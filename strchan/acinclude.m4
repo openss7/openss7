@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/04 23:30:00 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/04 23:41:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:30:00 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:41:34 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.11  2007/03/04 23:41:34  brian
+# - additional include path
+#
 # Revision 0.9.2.10  2007/03/04 23:30:00  brian
 # - corrected modversions directory
 #
@@ -302,7 +305,7 @@ AC_DEFUN([_CHAN_CONFIG], [dnl
     pkg_src=`(cd $srcdir ; /bin/pwd)`
     pkg_bld=`(cd . ; /bin/pwd)`
     chan_cv_config="${pkg_bld}/src/include/sys/strchan/config.h"
-    chan_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    chan_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     chan_cv_ldadd= # "${pkg_bld}/libchan.la"
     chan_cv_ldflags= # "${pkg_bld}/lib32/libchan.la"
     chan_cv_ldadd32= # "-L${pkg_bld}/.libs/"

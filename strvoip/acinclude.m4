@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/04 23:30:29 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/04 23:41:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:30:29 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:41:50 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.8  2007/03/04 23:41:50  brian
+# - additional include path
+#
 # Revision 0.9.2.7  2007/03/04 23:30:29  brian
 # - corrected modversions directory
 #
@@ -311,7 +314,7 @@ AC_DEFUN([_VOIP_CONFIG], [dnl
     pkg_src=`(cd $srcdir ; /bin/pwd)`
     pkg_bld=`(cd . ; /bin/pwd)`
     voip_cv_config="${pkg_bld}/src/include/sys/strvoip/config.h"
-    voip_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    voip_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     voip_cv_ldadd= # "${pkg_bld}/libvoip.la"
     voip_cv_ldflags= # "-L${pkg_bld}/.libs/"
     voip_cv_ldadd32= # "${pkg_bld}/lib32/libvoip.la"

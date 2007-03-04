@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/04 23:30:08 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/04 23:41:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:30:08 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:41:38 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.8  2007/03/04 23:41:38  brian
+# - additional include path
+#
 # Revision 0.9.2.7  2007/03/04 23:30:08  brian
 # - corrected modversions directory
 #
@@ -285,7 +288,7 @@ AC_DEFUN([_ISDN_CONFIG], [dnl
     pkg_src=`(cd $srcdir ; /bin/pwd)`
     pkg_bld=`(cd . ; /bin/pwd)`
     isdn_cv_config="${pkg_bld}/src/include/sys/strisdn/config.h"
-    isdn_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    isdn_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     isdn_cv_ldadd= # "${pkg_bld}/libisdn.la"
     isdn_cv_ldflags= # "${pkg_bld}/lib32/libisdn.la"
     isdn_cv_ldadd32= # "-L${pkg_bld}/.libs/"

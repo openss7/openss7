@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/03/04 23:29:57 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2007/03/04 23:41:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:29:57 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:41:31 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.64  2007/03/04 23:41:31  brian
+# - additional include path
+#
 # Revision 0.9.2.63  2007/03/04 23:29:57  brian
 # - corrected modversions directory
 #
@@ -1478,7 +1481,7 @@ AC_DEFUN([_SS7_CONFIG], [dnl
     pkg_src=`(cd $srcdir ; /bin/pwd)`
     pkg_bld=`(cd . ; /bin/pwd)`
     ss7_cv_config="${pkg_bld}/src/include/sys/strss7/config.h"
-    ss7_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    ss7_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     ss7_cv_ldadd= # "${pkg_bld}/libss7.la"
     ss7_cv_ldflags= # "${pkg_bld}/lib32/libss7.la"
     ss7_cv_ldadd32= # "-L${pkg_bld}/.libs/"

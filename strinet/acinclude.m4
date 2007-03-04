@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2007/03/04 23:30:06 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2007/03/04 23:41:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:30:06 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:41:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -977,7 +977,7 @@ AC_DEFUN([_INET_CONFIG], [dnl
     pkg_src=`(cd $srcdir ; /bin/pwd)`
     pkg_bld=`(cd . ; /bin/pwd)`
     inet_cv_config="${pkg_bld}/src/include/sys/strinet/config.h"
-    inet_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    inet_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     inet_cv_ldadd= # "${pkg_bld}/libinet.la"
     inet_cv_ldflags= # "${pkg_bld}/lib32/libinet.la"
     inet_cv_ldadd32= # "-L${pkg_bld}/.libs/"

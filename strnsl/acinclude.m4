@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/04 23:30:23 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/04 23:41:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:30:23 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:41:39 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.7  2007/03/04 23:41:39  brian
+# - additional include path
+#
 # Revision 0.9.2.6  2007/03/04 23:30:23  brian
 # - corrected modversions directory
 #
@@ -225,7 +228,7 @@ AC_DEFUN([_XNSL_CONFIG], [dnl
     pkg_src=`(cd $srcdir ; /bin/pwd)`
     pkg_bld=`(cd . ; /bin/pwd)`
     nsl_cv_config="${pkg_bld}/src/include/sys/strnsl/config.h"
-    nsl_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    nsl_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     nsl_cv_ldadd="${pkg_bld}/libxnsl.la"
     nsl_cv_ldflags="${pkg_bld}/lib32/libxnsl.la"
     nsl_cv_ldadd32="-L${pkg_bld}/.libs/"

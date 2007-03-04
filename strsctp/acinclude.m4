@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2007/03/04 23:30:24 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2007/03/04 23:41:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:30:24 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:41:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1120,7 +1120,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     pkg_src=`(cd $srcdir ; /bin/pwd)`
     pkg_bld=`(cd . ; /bin/pwd)`
     sctp_cv_config="${pkg_bld}/src/include/sys/strsctp/config.h"
-    sctp_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    sctp_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     sctp_cv_ldadd= # "${pkg_bld}/libsctp.la"
     sctp_cv_ldflags= # "-L${pkg_bld}/.libs/"
     sctp_cv_ldadd32= # "${pkg_bld}/lib32/libsctp.la"
