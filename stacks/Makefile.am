@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2007/02/21 01:09:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2007/03/04 00:23:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/21 01:09:04 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 00:23:35 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.87  2007/03/04 00:23:35  brian
+# - add version file creation
+#
 # Revision 0.9.2.86  2007/02/21 01:09:04  brian
 # - updating mtp.c driver, better mi_open allocators
 #
@@ -140,6 +143,11 @@
 ## General rules
 ##
 include am/openss7.am
+
+##
+## Version file
+##
+include am/version.am
 
 ##
 ## Help

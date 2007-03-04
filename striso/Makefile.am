@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/29 05:51:34 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/04 00:23:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/29 05:51:34 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 00:23:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -53,6 +53,11 @@
 ## General rules
 ##
 include am/openss7.am
+
+##
+## Version file
+##
+include am/version.am
 
 ##
 ## Help
@@ -428,6 +433,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.11  2007/03/04 00:23:57  brian
+# - add version file creation
+#
 # Revision 0.9.2.10  2006/12/29 05:51:34  brian
 # - changes for successful master build
 #

@@ -72,6 +72,11 @@ endif
 include am/openss7.am
 
 ##
+## Version file
+##
+include am/version.am
+
+##
 ## Help
 ##
 include am/help.am

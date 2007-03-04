@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/03 13:51:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/04 00:23:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:51:39 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 00:23:39 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.13  2007/03/04 00:23:39  brian
+# - add version file creation
+#
 # Revision 0.9.2.12  2006/10/03 13:51:39  brian
 # - changes to pass make check target
 # - added some package config.h files
@@ -104,6 +107,11 @@
 ## General rules
 ##
 include am/openss7.am
+
+##
+## Version file
+##
+include am/version.am
 
 ##
 ## Help

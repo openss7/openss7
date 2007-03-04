@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/01/08 09:37:09 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/04 00:25:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,17 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/01/08 09:37:09 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 00:25:51 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.29  2007/03/04 00:25:51  brian
+# - move directories
+#
+# Revision 0.9.2.28  2007/03/04 00:23:11  brian
+# - add version file creation
+#
 # Revision 0.9.2.27  2007/01/08 09:37:09  brian
 # - got manual pages building and instaling separately
 #
@@ -88,6 +94,11 @@
 include am/openss7.am
 
 ##
+## Version file
+##
+include am/version.am
+
+##
 ## Help
 ##
 include am/help.am
@@ -96,6 +107,31 @@ include am/help.am
 ## Problem Reports
 ##
 include am/pr.am
+
+#
+# This is a little hook to move the distribution subdirectories out of the way
+# so that a package can be overloaded later.
+#
+master-dist-hook:
+	@(cd $(distdir) ; \
+		list='$(DIST_SUBDIRS)' ; for subdir in $$list ; do \
+			if test "$$subdir" = . ; then :; else \
+				if test -d "$$subdir" ; then \
+					case " $(REMOVE_SUBDIRS) " in \
+					(*" $$subdir "*) \
+						$(ECHO) "rm -fr $$subdir" ; \
+						rm -fr $$subdir ;; \
+					(*) \
+						$(ECHO) "mv -f $$subdir $$subdir-0.9.2" ; \
+						mv -f "$$subdir" "$$subdir-0.9.2" ;; \
+					esac ; \
+				fi ; \
+			fi ; \
+		done ; \
+	)
+
+
+DIST_HOOK += master-dist-hook
 
 export RPMXOPTS="--nodeps"
 export DEBXOPTS="-d"
