@@ -1,5 +1,5 @@
-OpenSS7 NETPERF Utility -- read me first file.  2007-02-13
-$Id: README,v 1.1.1.19 2007/02/21 01:08:16 brian Exp $
+OpenSS7 NETPERF Utility -- read me first file.  2007-03-04
+$Id: README,v 1.1.1.20 2007/03/04 10:00:10 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 NETPERF Utility
 ========================
 
-Package netperf-2.3.5 was released under GPLv2 2007-02-13.
+Package netperf-2.3.5 was released under GPLv2 2007-03-04.
 
 `Netperf' is a general purpose tool for benchmarking bandwidth and
 performance of the `Internet Protocol' suite.  The `OpenSS7 Modified
@@ -59,7 +59,7 @@ well.
  Release
 --------
 
-This is the `netperf-2.3.5' package, released 2007-02-13.  This `2.3.5'
+This is the `netperf-2.3.5' package, released 2007-03-04.  This `2.3.5'
 release, and the latest version, can be obtained from the download area
 (http://www.openss7.org/download.html) of The OpenSS7 Project website
 using a command such as:
@@ -105,8 +105,8 @@ Prerequisites for the OpenSS7 NETPERF Utility package are as follows:
 
   1. `Linux' distribution, somewhat `Linux Standards Base' compliant,
      with a 2.4 or 2.6 kernel and the appropriate tool chain for
-     compiling out-of-tree kenrel modules.  Most recent `Linux'
-     distributions are okay out of the box, but some development
+     compiling out-of-tree kernel modules.  Most recent `Linux'
+     distributions are usable out of the box, but some development
      packages must be installed.  For more information, see
      `Compatibility', in the manual.
 
@@ -329,7 +329,7 @@ in the release directory for more information on filing a proper
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.

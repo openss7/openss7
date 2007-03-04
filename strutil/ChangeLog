@@ -1,3 +1,12 @@
+2007-03-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* README: updates for release
+	* debian/copyright: updates for release
+
+	* strutil.spec.in: do not propagate empty flags
+	* debian/rules.in: do not propagate empty flags
+
 2007-03-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: improvements to common build environment

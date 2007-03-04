@@ -1,5 +1,5 @@
-Dialogic Open Systems Release 6.1 -- authors.  2007-02-24
-$Id: AUTHORS,v 0.9.2.1 2007/02/25 12:26:05 brian Exp $
+Dialogic Open Systems Release 6.1 -- authors.  2007-03-04
+$Id: AUTHORS,v 0.9.2.2 2007/03/04 10:00:20 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -20,8 +20,8 @@ cross-index of authors to sections of this manual.
  Maintainer
 ===========
 
-The maintainer of the `OpenSS7 Dialogic Open Systems Release 6.1'
-package is:
+The maintainer of this modified `OpenSS7 Dialogic Open Systems Release
+6.1' package is:
 
      - Brian Bidulock <bidulock@openss7.org>
 

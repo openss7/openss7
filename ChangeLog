@@ -1,3 +1,17 @@
+2007-03-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+
+	* Makefile.am: added hook to move or remove subdirectories
+	* acinclude.m4: better checking for subpackages and dependency checks
+	* openss7.spec.in: do not propagate empty flags
+	* debian/copyright: update for release
+	* debian/rules.in: do not propagate empty flags
+
 2007-03-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: improvements to common build environment

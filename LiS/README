@@ -1,5 +1,5 @@
 Linux STREAMS (LiS) -- read me first file.  2006-12-28
-$Id: README,v 1.1.1.2.12.16 2006/12/28 10:42:06 brian Exp $
+$Id: README,v 1.1.1.2.12.17 2007/03/04 09:59:49 brian Exp $
 Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -294,7 +294,7 @@ in the release directory for more information on filing a proper
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -342,3 +342,4 @@ in the release directory for more information on filing a proper
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

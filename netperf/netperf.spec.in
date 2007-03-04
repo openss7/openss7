@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/02/12 16:55:53 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/03/04 10:00:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/12 16:55:53 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 10:00:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -836,6 +836,9 @@ better to use the tarball or source rpm release.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 0.9.2.62  2007/03/04 10:00:10  brian
+# - updates for release, do not propagate empty flags, build improvements
+#
 
 * Mon Feb 12 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.61  2007/02/12 16:55:53  brian

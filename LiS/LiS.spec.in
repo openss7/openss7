@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.66 $) $Date: 2007/02/12 16:55:48 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.67 $) $Date: 2007/03/04 09:59:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/12 16:55:48 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 09:59:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1960,6 +1960,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
+# Revision 1.1.6.67  2007/03/04 09:59:49  brian
+# - updates for release, do not propagate empty flags, build improvements
+#
 
 * Mon Feb 12 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.66  2007/02/12 16:55:48  brian
