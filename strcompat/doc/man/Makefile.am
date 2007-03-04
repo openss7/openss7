@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/12/31 13:31:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/04 17:58:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/31 13:31:46 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 17:58:34 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.24  2007/03/04 17:58:34  brian
+# - add missing manpages
+#
 # Revision 0.9.2.23  2006/12/31 13:31:46  brian
 # - updated documentation for release
 #
@@ -162,7 +165,9 @@ mps_unimpl_pages = \
 
 mps_compat_pages = \
 	man9/mpscompat.9 \
+	man9/mps_become_writer.9 \
 	man9/mi_alloc.9 \
+	man9/mi_allocb.9 \
 	man9/mi_allocq.9 \
 	man9/mi_alloc_sleep.9 \
 	man9/mi_attach.9 \
@@ -171,6 +176,9 @@ mps_compat_pages = \
 	man9/mi_close_comm.9 \
 	man9/mi_close_detached.9 \
 	man9/mi_close_free.9 \
+	man9/mi_close_free_cache.9 \
+	man9/mi_close_obj.9 \
+	man9/mi_close_size.9 \
 	man9/mi_close_unlink.9 \
 	man9/mi_copy_done.9 \
 	man9/mi_copyin.9 \
@@ -191,10 +199,13 @@ mps_compat_pages = \
 	man9/mi_offset_param.9 \
 	man9/mi_offset_paramc.9 \
 	man9/mi_open_alloc.9 \
+	man9/mi_open_alloc_cache.9 \
 	man9/mi_open_alloc_sleep.9 \
 	man9/mi_open_comm.9 \
 	man9/mi_open_detached.9 \
 	man9/mi_open_link.9 \
+	man9/mi_open_obj.9 \
+	man9/mi_open_size.9 \
 	man9/mi_prev_ptr.9 \
 	man9/mi_reallocb.9 \
 	man9/mi_reuse_proto.9 \
@@ -203,26 +214,29 @@ mps_compat_pages = \
 	man9/mi_set_sth_lowat.9 \
 	man9/mi_set_sth_maxblk.9 \
 	man9/mi_set_sth_wroff.9 \
+	man9/mi_sleeplock.9 \
 	man9/mi_sprintf.9 \
+	man9/mi_sprintf_putc.9 \
 	man9/mi_strcmp.9 \
 	man9/mi_strlen.9 \
 	man9/mi_strlog.9 \
 	man9/mi_strtol.9 \
 	man9/mi_timer.9 \
-	man9/mi_timer_MAC.9 \
-	man9/mi_timer_SUN.9 \
 	man9/mi_timer_alloc.9 \
 	man9/mi_timer_alloc_MAC.9 \
 	man9/mi_timer_alloc_SUN.9 \
 	man9/mi_timer_cancel.9 \
 	man9/mi_timer_free.9 \
+	man9/mi_timer_MAC.9 \
 	man9/mi_timer_move.9 \
 	man9/mi_timer_q_switch.9 \
 	man9/mi_timer_stop.9 \
+	man9/mi_timer_SUN.9 \
 	man9/mi_timer_valid.9 \
+	man9/mi_trylock.9 \
+	man9/mi_unlock.9 \
 	man9/mi_zalloc.9 \
 	man9/mi_zalloc_sleep.9 \
-	man9/mps_become_writer.9 \
 	man9/mps_intr_disable.9 \
 	man9/mps_intr_enable.9 \
 	$(mps_unimpl_pages)
@@ -1228,6 +1242,7 @@ dist_noinst_mps_unimpl_pages = \
 dist_noinst_mps_compat_pages = \
 	man9/mpscompat.9.man \
 	man9/mi_alloc.9.man \
+	man9/mi_allocb.9.man \
 	man9/mi_allocq.9.man \
 	man9/mi_alloc_sleep.9.man \
 	man9/mi_attach.9.man \
@@ -1236,6 +1251,9 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_close_comm.9.man \
 	man9/mi_close_detached.9.man \
 	man9/mi_close_free.9.man \
+	man9/mi_close_free_cache.9.man \
+	man9/mi_close_obj.9.man \
+	man9/mi_close_size.9.man \
 	man9/mi_close_unlink.9.man \
 	man9/mi_copy_done.9.man \
 	man9/mi_copyin.9.man \
@@ -1256,10 +1274,13 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_offset_param.9.man \
 	man9/mi_offset_paramc.9.man \
 	man9/mi_open_alloc.9.man \
+	man9/mi_open_alloc_cache.9.man \
 	man9/mi_open_alloc_sleep.9.man \
 	man9/mi_open_comm.9.man \
 	man9/mi_open_detached.9.man \
 	man9/mi_open_link.9.man \
+	man9/mi_open_obj.9.man \
+	man9/mi_open_size.9.man \
 	man9/mi_prev_ptr.9.man \
 	man9/mi_reallocb.9.man \
 	man9/mi_reuse_proto.9.man \
@@ -1268,23 +1289,27 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_set_sth_lowat.9.man \
 	man9/mi_set_sth_maxblk.9.man \
 	man9/mi_set_sth_wroff.9.man \
+	man9/mi_sleeplock.9.man \
 	man9/mi_sprintf.9.man \
+	man9/mi_sprintf_putc.9.man \
 	man9/mi_strcmp.9.man \
 	man9/mi_strlen.9.man \
 	man9/mi_strlog.9.man \
 	man9/mi_strtol.9.man \
 	man9/mi_timer.9.man \
-	man9/mi_timer_MAC.9.man \
-	man9/mi_timer_SUN.9.man \
 	man9/mi_timer_alloc.9.man \
 	man9/mi_timer_alloc_MAC.9.man \
 	man9/mi_timer_alloc_SUN.9.man \
 	man9/mi_timer_cancel.9.man \
 	man9/mi_timer_free.9.man \
+	man9/mi_timer_MAC.9.man \
 	man9/mi_timer_move.9.man \
 	man9/mi_timer_q_switch.9.man \
 	man9/mi_timer_stop.9.man \
+	man9/mi_timer_SUN.9.man \
 	man9/mi_timer_valid.9.man \
+	man9/mi_trylock.9.man \
+	man9/mi_unlock.9.man \
 	man9/mi_zalloc.9.man \
 	man9/mi_zalloc_sleep.9.man \
 	man9/mps_become_writer.9.man \
