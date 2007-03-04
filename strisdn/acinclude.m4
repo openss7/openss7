@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/04 23:14:27 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/04 23:30:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:27 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:30:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.7  2007/03/04 23:30:08  brian
+# - corrected modversions directory
+#
 # Revision 0.9.2.6  2007/03/04 23:14:27  brian
 # - better search for modversions
 #
@@ -289,7 +292,7 @@ AC_DEFUN([_ISDN_CONFIG], [dnl
     isdn_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
     isdn_cv_manpath="${pkg_bld}/doc/man"
     isdn_cv_modmap="${pkg_bld}/Modules.map"
-    isdn_cv_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
+    isdn_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     isdn_cv_symver="${pkg_bld}/Module.symvers"
     isdn_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
 ])# _ISDN_CONFIG

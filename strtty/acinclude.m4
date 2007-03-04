@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/04 23:14:32 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/04 23:30:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:32 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:30:27 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.7  2007/03/04 23:30:27  brian
+# - corrected modversions directory
+#
 # Revision 0.9.2.6  2007/03/04 23:14:32  brian
 # - better search for modversions
 #
@@ -214,7 +217,7 @@ AC_DEFUN([_TTY_CONFIG], [dnl
     tty_cv_ldadd32="${pkg_bld}/lib32/libtty.la"
     tty_cv_ldflags32="-L${pkg_bld}/lib32/.libs/"
     tty_cv_manpath="${pkg_bld}/doc/man"
-    tty_cv_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
+    tty_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     tty_cv_modmap="${pkg_bld}/Modules.map"
     tty_cv_symver="${pkg_bld}/Module.symvers"
     tty_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"

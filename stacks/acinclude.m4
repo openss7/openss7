@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/03/04 23:14:21 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/03/04 23:29:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:21 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:29:57 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.63  2007/03/04 23:29:57  brian
+# - corrected modversions directory
+#
 # Revision 0.9.2.62  2007/03/04 23:14:21  brian
 # - better search for modversions
 #
@@ -1481,7 +1484,7 @@ AC_DEFUN([_SS7_CONFIG], [dnl
     ss7_cv_ldadd32= # "-L${pkg_bld}/.libs/"
     ss7_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
     ss7_cv_manpath="${pkg_bld}/doc/man"
-    ss7_cv_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
+    ss7_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     ss7_cv_modmap="${pkg_bld}/Modules.map"
     ss7_cv_symver="${pkg_bld}/Module.symvers"
     ss7_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"

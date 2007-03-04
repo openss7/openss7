@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/03/04 23:14:43 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/03/04 23:26:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:43 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.53  2007/03/04 23:26:40  brian
+# - corrected modversions directory
+#
 # Revision 0.9.2.52  2007/03/04 23:14:43  brian
 # - better search for modversions
 #
@@ -234,7 +237,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 		    xti_cv_includes="$xti_bld $xti_dir"
 		    xti_cv_ldadd="$os7_cv_master_builddir/strxnet/libxnet.la"
 		    xti_cv_ldadd32="$os7_cv_master_builddir/strxnet/lib32/libxnet.la"
-		    xti_cv_modversions="$os7_cv_master_builddir/strxnet/include/$linux_cv_k_release/$target_cpu/sys/strxnet/modversions.h"
+		    xti_cv_modversions="$os7_cv_master_builddir/strxnet/include/sys/strxnet/modversions.h"
 		    xti_cv_modmap="$os7_cv_master_builddir/strxnet/Modules.map"
 		    xti_cv_symver="$os7_cv_master_builddir/strxnet/Module.symvers"
 		    xti_cv_manpath="$os7_cv_master_builddir/strxnet/doc/man"
@@ -264,7 +267,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 			xti_cv_includes="$xti_bld $xti_dir"
 			xti_cv_ldadd=`echo "$xti_bld/../../libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xti_cv_ldadd32=`echo "$xti_bld/../../lib32/libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xti_cv_modversions=`echo "$xti_bld/../../include/$linux_cv_k_release/$target_cpu/sys/strxnet/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xti_cv_modversions=`echo "$xti_bld/../../include/sys/strxnet/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xti_cv_modmap=`echo "$xti_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xti_cv_symver=`echo "$xti_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xti_cv_manpath=`echo "$xti_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

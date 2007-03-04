@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/04 23:14:42 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/04 23:26:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:42 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sctp.m4,v $
+# Revision 0.9.2.39  2007/03/04 23:26:40  brian
+# - corrected modversions directory
+#
 # Revision 0.9.2.38  2007/03/04 23:14:42  brian
 # - better search for modversions
 #
@@ -220,7 +223,7 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 		    sctp_cv_includes="$sctp_bld $sctp_dir"
 		    sctp_cv_ldadd= # "$os7_cv_master_builddir/strsctp/libsctp.la"
 		    sctp_cv_ldadd32= # "$os7_cv_master_builddir/strsctp/lib32/libsctp.la"
-		    sctp_cv_modversions="$os7_cv_master_builddir/strsctp/include/$linux_cv_k_release/$target_cpu/sys/strsctp/modversions.h"
+		    sctp_cv_modversions="$os7_cv_master_builddir/strsctp/include/sys/strsctp/modversions.h"
 		    sctp_cv_modmap="$os7_cv_master_builddir/strsctp/Modules.map"
 		    sctp_cv_symver="$os7_cv_master_builddir/strsctp/Module.symvers"
 		    sctp_cv_manpath="$os7_cv_master_builddir/strsctp/doc/man"
@@ -250,7 +253,7 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 			sctp_cv_includes="$sctp_bld $sctp_dir"
 			sctp_cv_ldadd= # `echo "$sctp_bld/../../libsctp.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sctp_cv_ldadd32= # `echo "$sctp_bld/../../lib32/libsctp.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			sctp_cv_modversions=`echo "$sctp_bld/../../include/$linux_cv_k_release/$target_cpu/sys/strsctp/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sctp_cv_modversions=`echo "$sctp_bld/../../include/sys/strsctp/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sctp_cv_modmap=`echo "$sctp_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sctp_cv_symver=`echo "$sctp_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sctp_cv_manpath=`echo "$sctp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

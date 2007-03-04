@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/04 23:14:31 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/04 23:30:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:31 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:30:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.13  2007/03/04 23:30:25  brian
+# - corrected modversions directory
+#
 # Revision 0.9.2.12  2007/03/04 23:14:31  brian
 # - better search for modversions
 #
@@ -256,7 +259,7 @@ AC_DEFUN([_SOCK_CONFIG], [dnl
     sock_cv_ldadd32="${pkg_bld}/lib32/libsocket.la"
     sock_cv_ldflags32="-L${pkg_bld}/lib32/.libs/"
     sock_cv_manpath="${pkg_bld}/doc/man"
-    sock_cv_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
+    sock_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     sock_cv_modmap="${pkg_bld}/Modules.map"
     sock_cv_symver="${pkg_bld}/Module.symvers"
     sock_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/03/04 23:14:41 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/03/04 23:30:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:41 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:30:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -864,7 +864,7 @@ AC_DEFUN([_XNS_CONFIG], [dnl
     xns_cv_ldadd32=""
     xns_cv_ldflags32=""
     xns_cv_manpath="${pkg_bld}/doc/man"
-    xns_cv_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
+    xns_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     xns_cv_modmap="${pkg_bld}/Modules.map"
     xns_cv_symver="${pkg_bld}/Module.symvers"
     xns_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"

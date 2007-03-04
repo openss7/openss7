@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2007/03/04 23:14:29 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2007/03/04 23:30:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:29 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:30:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1126,7 +1126,7 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
     sctp_cv_ldadd32= # "${pkg_bld}/lib32/libsctp.la"
     sctp_cv_ldflags32= # "-L${pkg_bld}/lib32/.libs/"
     sctp_cv_manpath="${pkg_bld}/doc/man"
-    sctp_cv_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
+    sctp_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     sctp_cv_modmap="${pkg_bld}/Modules.map"
     sctp_cv_symver="${pkg_bld}/Module.symvers"
     sctp_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
