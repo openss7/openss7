@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/04 17:58:34 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/04 18:53:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 17:58:34 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 18:53:42 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.25  2007/03/04 18:53:42  brian
+# - added manpage
+#
 # Revision 0.9.2.24  2007/03/04 17:58:34  brian
 # - add missing manpages
 #
@@ -230,6 +233,7 @@ mps_compat_pages = \
 	man9/mi_timer_MAC.9 \
 	man9/mi_timer_move.9 \
 	man9/mi_timer_q_switch.9 \
+	man9/mi_timer_remain.9 \
 	man9/mi_timer_stop.9 \
 	man9/mi_timer_SUN.9 \
 	man9/mi_timer_valid.9 \
@@ -1305,6 +1309,7 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_timer_MAC.9.man \
 	man9/mi_timer_move.9.man \
 	man9/mi_timer_q_switch.9.man \
+	man9/mi_timer_remain.9.man \
 	man9/mi_timer_stop.9.man \
 	man9/mi_timer_SUN.9.man \
 	man9/mi_timer_valid.9.man \
