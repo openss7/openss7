@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_timer.9.man,v 0.9.2.8 2006/10/06 12:13:04 brian Exp $
+.\" @(#) $Id: mi_timer.9.man,v 0.9.2.9 2007/03/04 19:13:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:13:04 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/04 19:13:02 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_timer.9.man,v $
+.\" Revision 0.9.2.9  2007/03/04 19:13:02  brian
+.\" - corrections
+.\"
 .\" Revision 0.9.2.8  2006/10/06 12:13:04  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -254,7 +257,7 @@ procedure,
 .BR mi_timer_valid (9)
 is called to ensure that the timer is still valid and the timeout action is
 otherwise performed.
-Timers fan be freed,
+Timers can be freed,
 .BR mi_timer_free (9),
 moved between target queues,
 .BR mi_timer_move (9),
