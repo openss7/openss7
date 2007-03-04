@@ -1,5 +1,6 @@
 2007-03-04  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/Makefile.am: added manpages, removed duplicates
 	* src/kernel/hpuxcompat.c: correction for 2.4 modversions
 	* doc/man/man9/mi_timer.9.man: correction
 	* src/include/sys/mps/stream.h: correction

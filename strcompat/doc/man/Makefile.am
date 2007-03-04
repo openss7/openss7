@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/04 18:53:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/04 19:45:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 18:53:42 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 19:45:53 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.26  2007/03/04 19:45:53  brian
+# - added missing manpages, removed duplicates
+#
 # Revision 0.9.2.25  2007/03/04 18:53:42  brian
 # - added manpage
 #
@@ -219,7 +222,6 @@ mps_compat_pages = \
 	man9/mi_set_sth_wroff.9 \
 	man9/mi_sleeplock.9 \
 	man9/mi_sprintf.9 \
-	man9/mi_sprintf_putc.9 \
 	man9/mi_strcmp.9 \
 	man9/mi_strlen.9 \
 	man9/mi_strlog.9 \
@@ -1295,7 +1297,6 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_set_sth_wroff.9.man \
 	man9/mi_sleeplock.9.man \
 	man9/mi_sprintf.9.man \
-	man9/mi_sprintf_putc.9.man \
 	man9/mi_strcmp.9.man \
 	man9/mi_strlen.9.man \
 	man9/mi_strlog.9.man \
