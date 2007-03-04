@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/04 23:14:28 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/04 23:30:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:28 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:30:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -344,7 +344,7 @@ AC_DEFUN([_ISO_CONFIG], [dnl
     iso_cv_ldadd32= # "-L${pkg_bld}/.libs/"
     iso_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
     iso_cv_manpath="${pkg_bld}/doc/man"
-    iso_cv_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
+    iso_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     iso_cv_modmap="${pkg_bld}/Modules.map"
     iso_cv_symver="${pkg_bld}/Module.symvers"
     iso_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"

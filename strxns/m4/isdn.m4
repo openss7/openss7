@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/04 23:14:42 $
+# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/04 23:26:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:42 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: isdn.m4,v $
+# Revision 0.9.2.10  2007/03/04 23:26:40  brian
+# - corrected modversions directory
+#
 # Revision 0.9.2.9  2007/03/04 23:14:42  brian
 # - better search for modversions
 #
@@ -202,7 +205,7 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 		    isdn_cv_includes="$isdn_bld $isdn_dir"
 		    isdn_cv_ldadd= # "$os7_cv_master_builddir/strisdn/libisdn.la"
 		    isdn_cv_ldadd32= # "$os7_cv_master_builddir/strisdn/lib32/libisdn.la"
-		    isdn_cv_modversions="$os7_cv_master_builddir/strisdn/include/$linux_cv_k_release/$target_cpu/sys/strisdn/modversions.h"
+		    isdn_cv_modversions="$os7_cv_master_builddir/strisdn/include/sys/strisdn/modversions.h"
 		    isdn_cv_modmap="$os7_cv_master_builddir/strisdn/Modules.map"
 		    isdn_cv_symver="$os7_cv_master_builddir/strisdn/Module.symvers"
 		    isdn_cv_manpath="$os7_cv_master_builddir/strisdn/doc/man"
@@ -232,7 +235,7 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 			isdn_cv_includes="$isdn_bld $isdn_dir"
 			isdn_cv_ldadd= # `echo "$isdn_bld/../../libisdn.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			isdn_cv_ldadd32= # `echo "$isdn_bld/../../lib32/libisdn.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			isdn_cv_modversions=`echo "$isdn_bld/../../include/$linux_cv_k_release/$target_cpu/sys/strisdn/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			isdn_cv_modversions=`echo "$isdn_bld/../../include/sys/strisdn/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			isdn_cv_modmap=`echo "$isdn_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			isdn_cv_symver=`echo "$isdn_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			isdn_cv_manpath=`echo "$isdn_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

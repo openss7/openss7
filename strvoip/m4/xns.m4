@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/04 23:14:43 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/03/04 23:26:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:43 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xns.m4,v $
+# Revision 0.9.2.46  2007/03/04 23:26:40  brian
+# - corrected modversions directory
+#
 # Revision 0.9.2.45  2007/03/04 23:14:43  brian
 # - better search for modversions
 #
@@ -223,7 +226,7 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 		    xns_cv_includes="$xns_bld $xns_dir"
 		    xns_cv_ldadd= # "$os7_cv_master_builddir/strxns/libxns.la"
 		    xns_cv_ldadd32= # "$os7_cv_master_builddir/strxns/lib32/libxns.la"
-		    xns_cv_modversions="$os7_cv_master_builddir/strxns/include/$linux_cv_k_release/$target_cpu/sys/strxns/modversions.h"
+		    xns_cv_modversions="$os7_cv_master_builddir/strxns/include/sys/strxns/modversions.h"
 		    xns_cv_modmap="$os7_cv_master_builddir/strxns/Modules.map"
 		    xns_cv_symver="$os7_cv_master_builddir/strxns/Module.symvers"
 		    xns_cv_manpath="$os7_cv_master_builddir/strxns/doc/man"
@@ -253,7 +256,7 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 			xns_cv_includes="$xns_bld $xns_dir"
 			xns_cv_ldadd= # `echo "$xns_bld/../../libxns.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xns_cv_ldadd32= # `echo "$xns_bld/../../lib32/libxns.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xns_cv_modversions=`echo "$xns_bld/../../include/$linux_cv_k_release/$target_cpu/sys/strxns/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xns_cv_modversions=`echo "$xns_bld/../../include/sys/strxns/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xns_cv_modmap=`echo "$xns_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xns_cv_symver=`echo "$xns_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xns_cv_manpath=`echo "$xns_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

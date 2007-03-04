@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/04 23:14:40 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/04 23:30:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:40 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:30:29 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.7  2007/03/04 23:30:29  brian
+# - corrected modversions directory
+#
 # Revision 0.9.2.6  2007/03/04 23:14:40  brian
 # - better search for modversions
 #
@@ -314,7 +317,7 @@ AC_DEFUN([_VOIP_CONFIG], [dnl
     voip_cv_ldadd32= # "${pkg_bld}/lib32/libvoip.la"
     voip_cv_ldflags32= # "-L${pkg_bld}/lib32/.libs/"
     voip_cv_manpath="${pkg_bld}/doc/man"
-    voip_cv_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
+    voip_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     voip_cv_modmap="${pkg_bld}/Modules.map"
     voip_cv_symver="${pkg_bld}/Module.symvers"
     voip_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/04 23:14:43 $
+# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/04 23:26:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:43 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: ss7.m4,v $
+# Revision 0.9.2.17  2007/03/04 23:26:40  brian
+# - corrected modversions directory
+#
 # Revision 0.9.2.16  2007/03/04 23:14:43  brian
 # - better search for modversions
 #
@@ -220,7 +223,7 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 		    ss7_cv_includes="$ss7_bld $ss7_dir"
 		    ss7_cv_ldadd= # "$os7_cv_master_builddir/stacks/libss7.la"
 		    ss7_cv_ldadd32= # "$os7_cv_master_builddir/stacks/lib32/libss7.la"
-		    ss7_cv_modversions="$os7_cv_master_builddir/stacks/include/$linux_cv_k_release/$target_cpu/sys/strss7/modversions.h"
+		    ss7_cv_modversions="$os7_cv_master_builddir/stacks/include/sys/strss7/modversions.h"
 		    ss7_cv_modmap="$os7_cv_master_builddir/stacks/Modules.map"
 		    ss7_cv_symver="$os7_cv_master_builddir/stacks/Module.symvers"
 		    ss7_cv_manpath="$os7_cv_master_builddir/stacks/doc/man"
@@ -254,7 +257,7 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 			ss7_cv_includes="$ss7_bld $ss7_dir"
 			ss7_cv_ldadd= # `echo "$ss7_bld/../../libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_ldadd32= # `echo "$ss7_bld/../../lib32/libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			ss7_cv_modversions=`echo "$ss7_bld/../../include/$linux_cv_k_release/$target_cpu/sys/strss7/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			ss7_cv_modversions=`echo "$ss7_bld/../../include/sys/strss7/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_modmap=`echo "$ss7_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_symver=`echo "$ss7_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_manpath=`echo "$ss7_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

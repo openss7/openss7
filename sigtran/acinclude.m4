@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/04 23:14:20 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/04 23:29:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:20 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:29:56 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.7  2007/03/04 23:29:56  brian
+# - corrected modversions directory
+#
 # Revision 0.9.2.6  2007/03/04 23:14:20  brian
 # - better search for modversions
 #
@@ -310,7 +313,7 @@ AC_DEFUN([_SIGTRAN_CONFIG], [dnl
     sigtran_cv_ldadd32= # "-L${pkg_bld}/.libs/"
     sigtran_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
     sigtran_cv_manpath="${pkg_bld}/doc/man"
-    sigtran_cv_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
+    sigtran_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     sigtran_cv_modmap="${pkg_bld}/Modules.map"
     sigtran_cv_symver="${pkg_bld}/Module.symvers"
     sigtran_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"

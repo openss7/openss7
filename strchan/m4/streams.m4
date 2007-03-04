@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2007/03/04 23:16:07 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2007/03/04 23:26:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:16:07 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -628,7 +628,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 		    streams_cv_lfs_includes="$streams_bld $streams_dir"
 		    streams_cv_lfs_ldadd="$os7_cv_master_builddir/streams/libstreams.la"
 		    streams_cv_lfs_ldadd32="$os7_cv_master_builddir/streams/lib32/libstreams.la"
-		    streams_cv_lfs_modversions="$os7_cv_master_builddir/streams/include/$linux_cv_k_release/$target_cpu/sys/streams/modversions.h"
+		    streams_cv_lfs_modversions="$os7_cv_master_builddir/streams/include/sys/streams/modversions.h"
 		    streams_cv_lfs_modmap="$os7_cv_master_builddir/streams/Modules.map"
 		    streams_cv_lfs_symver="$os7_cv_master_builddir/streams/Module.symvers"
 		    streams_cv_lfs_manpath="$os7_cv_master_builddir/streams/doc/man"
@@ -658,7 +658,7 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 			streams_cv_lfs_includes="$streams_dir $streams_bld"
 			streams_cv_lfs_ldadd=`echo "$streams_bld/../libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lfs_ldadd32=`echo "$streams_bld/../lib32/libstreams.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			streams_cv_lfs_modversions=`echo "$streams_bld/../include/$linux_cv_k_release/$target_cpu/sys/streams/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			streams_cv_lfs_modversions=`echo "$streams_bld/../include/sys/streams/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lfs_modmap=`echo "$streams_bld/../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lfs_symver=`echo "$streams_bld/../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lfs_manpath=`echo "$streams_bld/../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

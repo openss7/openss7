@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/04 23:14:43 $
+# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/04 23:26:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:43 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: voip.m4,v $
+# Revision 0.9.2.10  2007/03/04 23:26:40  brian
+# - corrected modversions directory
+#
 # Revision 0.9.2.9  2007/03/04 23:14:43  brian
 # - better search for modversions
 #
@@ -202,7 +205,7 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 		    voip_cv_includes="$voip_bld $voip_dir"
 		    voip_cv_ldadd= # "$os7_cv_master_builddir/strvoip/libvoip.la"
 		    voip_cv_ldadd32= # "$os7_cv_master_builddir/strvoip/lib32/libvoip.la"
-		    voip_cv_modversions="$os7_cv_master_builddir/strvoip/include/$linux_cv_k_release/$target_cpu/sys/strvoip/modversions.h"
+		    voip_cv_modversions="$os7_cv_master_builddir/strvoip/include/sys/strvoip/modversions.h"
 		    voip_cv_modmap="$os7_cv_master_builddir/strvoip/Modules.map"
 		    voip_cv_symver="$os7_cv_master_builddir/strvoip/Module.symvers"
 		    voip_cv_manpath="$os7_cv_master_builddir/strvoip/doc/man"
@@ -232,7 +235,7 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 			voip_cv_includes="$voip_bld $voip_dir"
 			voip_cv_ldadd= # `echo "$voip_bld/../../libvoip.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			voip_cv_ldadd32= # `echo "$voip_bld/../../lib32/libvoip.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			voip_cv_modversions=`echo "$voip_bld/../../include/$linux_cv_k_release/$target_cpu/sys/strvoip/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			voip_cv_modversions=`echo "$voip_bld/../../include/sys/strvoip/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			voip_cv_modmap=`echo "$voip_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			voip_cv_symver=`echo "$voip_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			voip_cv_manpath=`echo "$voip_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

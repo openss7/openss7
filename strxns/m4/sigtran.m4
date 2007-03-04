@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/04 23:14:42 $
+# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/04 23:26:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:42 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sigtran.m4,v $
+# Revision 0.9.2.10  2007/03/04 23:26:40  brian
+# - corrected modversions directory
+#
 # Revision 0.9.2.9  2007/03/04 23:14:42  brian
 # - better search for modversions
 #
@@ -202,7 +205,7 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 		    sigtran_cv_includes="$sigtran_bld $sigtran_dir"
 		    sigtran_cv_ldadd= # "$os7_cv_master_builddir/sigtran/libsigtran.la"
 		    sigtran_cv_ldadd32= # "$os7_cv_master_builddir/sigtran/lib32/libsigtran.la"
-		    sigtran_cv_modversions="$os7_cv_master_builddir/sigtran/include/$linux_cv_k_release/$target_cpu/sys/sigtran/modversions.h"
+		    sigtran_cv_modversions="$os7_cv_master_builddir/sigtran/include/sys/sigtran/modversions.h"
 		    sigtran_cv_modmap="$os7_cv_master_builddir/sigtran/Modules.map"
 		    sigtran_cv_symver="$os7_cv_master_builddir/sigtran/Module.symvers"
 		    sigtran_cv_manpath="$os7_cv_master_builddir/sigtran/doc/man"
@@ -232,7 +235,7 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 			sigtran_cv_includes="$sigtran_bld $sigtran_dir"
 			sigtran_cv_ldadd= # `echo "$sigtran_bld/../../libsigtran.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sigtran_cv_ldadd32= # `echo "$sigtran_bld/../../lib32/libsigtran.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			sigtran_cv_modversions=`echo "$sigtran_bld/../../include/$linux_cv_k_release/$target_cpu/sys/sigtran/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sigtran_cv_modversions=`echo "$sigtran_bld/../../include/sys/sigtran/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sigtran_cv_modmap=`echo "$sigtran_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sigtran_cv_symver=`echo "$sigtran_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sigtran_cv_manpath=`echo "$sigtran_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

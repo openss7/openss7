@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/04 23:14:24 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/04 23:30:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:24 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:30:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1049,7 +1049,7 @@ AC_DEFUN([_COMPAT_CONFIG], [dnl
     strcomp_cv_ldadd32= # "-L${pkg_bld}/.libs/"
     strcomp_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
     strcomp_cv_manpath="${pkg_bld}/doc/man"
-    strcomp_cv_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
+    strcomp_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     strcomp_cv_modmap="${pkg_bld}/Modules.map"
     strcomp_cv_symver="${pkg_bld}/Module.symvers"
     strcomp_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"

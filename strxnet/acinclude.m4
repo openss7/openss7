@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/03/04 23:14:41 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/03/04 23:30:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:14:41 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:30:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -204,7 +204,7 @@ AC_DEFUN([_XNET_CONFIG], [dnl
     xti_cv_ldadd32="${pkg_bld}/lib32/libxnet.la"
     xti_cv_ldflags32="-L${pkg_bld}/lib32/.libs/"
     xti_cv_manpath="${pkg_bld}/doc/man"
-    xti_cv_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
+    xti_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     xti_cv_modmap="${pkg_bld}/Modules.map"
     xti_cv_symver="${pkg_bld}/Module.symvers"
     xti_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
