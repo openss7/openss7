@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/04 23:30:27 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/04 23:41:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:30:27 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:41:48 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.8  2007/03/04 23:41:48  brian
+# - additional include path
+#
 # Revision 0.9.2.7  2007/03/04 23:30:27  brian
 # - corrected modversions directory
 #
@@ -211,7 +214,7 @@ AC_DEFUN([_TTY_CONFIG], [dnl
     pkg_src=`(cd $srcdir ; /bin/pwd)`
     pkg_bld=`(cd . ; /bin/pwd)`
     tty_cv_config="${pkg_bld}/src/include/sys/strtty/config.h"
-    tty_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    tty_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     tty_cv_ldadd="${pkg_bld}/libtty.la"
     tty_cv_ldflags="-L${pkg_bld}/.libs/"
     tty_cv_ldadd32="${pkg_bld}/lib32/libtty.la"

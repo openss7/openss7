@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/04 23:30:28 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/04 23:41:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:30:28 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:41:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -890,7 +890,7 @@ AC_DEFUN([_UTIL_CONFIG], [dnl
     pkg_src=`(cd $srcdir ; /bin/pwd)`
     pkg_bld=`(cd . ; /bin/pwd)`
     util_cv_config="${pkg_bld}/src/include/sys/strutil/config.h"
-    util_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    util_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     util_cv_ldadd= # "${pkg_bld}/libutil.la"
     util_cv_ldflags= # "-L${pkg_bld}/.libs/"
     util_cv_ldadd32= # "${pkg_bld}/lib32/libutil.la"

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/04 23:29:56 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/04 23:41:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:29:56 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:41:30 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.8  2007/03/04 23:41:30  brian
+# - additional include path
+#
 # Revision 0.9.2.7  2007/03/04 23:29:56  brian
 # - corrected modversions directory
 #
@@ -307,7 +310,7 @@ AC_DEFUN([_SIGTRAN_CONFIG], [dnl
     pkg_src=`(cd $srcdir ; /bin/pwd)`
     pkg_bld=`(cd . ; /bin/pwd)`
     sigtran_cv_config="${pkg_bld}/src/include/sys/sigtran/config.h"
-    sigtran_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    sigtran_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     sigtran_cv_ldadd= # "${pkg_bld}/libsigtran.la"
     sigtran_cv_ldflags= # "${pkg_bld}/lib32/libsigtran.la"
     sigtran_cv_ldadd32= # "-L${pkg_bld}/.libs/"

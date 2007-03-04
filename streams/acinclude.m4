@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2007/03/04 23:30:04 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2007/03/04 23:41:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:30:04 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:41:36 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.138  2007/03/04 23:41:36  brian
+# - additional include path
+#
 # Revision 0.9.2.137  2007/03/04 23:30:04  brian
 # - corrected modversions directory
 #
@@ -1651,7 +1654,7 @@ AC_DEFUN([_LFS_CONFIG], [dnl
     pkg_src=`(cd $srcdir ; /bin/pwd)`
     pkg_bld=`(cd . ; /bin/pwd)`
     streams_cv_lfs_config="${pkg_bld}/include/sys/streams/config.h"
-    streams_cv_lfs_includes="${pkg_bld}/include ${pkg_src}/include"
+    streams_cv_lfs_includes="${pkg_bld}/include ${pkg_bld}/include ${pkg_src}/include"
     streams_cv_lfs_ldadd="${pkg_bld}/libstreams.la"
     streams_cv_lfs_ldflags="-L${pkg_bld}/.libs/"
     streams_cv_lfs_ldadd32="${pkg_bld}/lib32/libstreams.la"

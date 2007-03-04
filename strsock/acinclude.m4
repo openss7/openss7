@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/04 23:30:25 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/04 23:41:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:30:25 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:41:41 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.14  2007/03/04 23:41:41  brian
+# - additional include path
+#
 # Revision 0.9.2.13  2007/03/04 23:30:25  brian
 # - corrected modversions directory
 #
@@ -253,7 +256,7 @@ AC_DEFUN([_SOCK_CONFIG], [dnl
     pkg_src=`(cd $srcdir ; /bin/pwd)`
     pkg_bld=`(cd . ; /bin/pwd)`
     sock_cv_config="${pkg_bld}/src/include/sys/strsock/config.h"
-    sock_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    sock_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     sock_cv_ldadd="${pkg_bld}/libsocket.la"
     sock_cv_ldflags="-L${pkg_bld}/.libs/"
     sock_cv_ldadd32="${pkg_bld}/lib32/libsocket.la"

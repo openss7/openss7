@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/04 23:29:59 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/04 23:41:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:29:59 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:41:33 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.11  2007/03/04 23:41:33  brian
+# - additional include path
+#
 # Revision 0.9.2.10  2007/03/04 23:29:59  brian
 # - corrected modversions directory
 #
@@ -219,7 +222,7 @@ AC_DEFUN([_BCM_CONFIG], [dnl
     pkg_src=`(cd $srcdir ; /bin/pwd)`
     pkg_bld=`(cd . ; /bin/pwd)`
     bcm_cv_config="${pkg_bld}/src/include/sys/strbcm/config.h"
-    bcm_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    bcm_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     bcm_cv_ldadd= # "${pkg_bld}/libbcm.la"
     bcm_cv_ldflags= # "${pkg_bld}/lib32/libbcm.la"
     bcm_cv_ldadd32= # "-L${pkg_bld}/.libs/"

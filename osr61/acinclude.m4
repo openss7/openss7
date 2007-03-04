@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/04 23:29:55 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/04 23:41:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:29:55 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:41:30 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.9  2007/03/04 23:41:30  brian
+# - additional include path
+#
 # Revision 0.9.2.8  2007/03/04 23:29:55  brian
 # - corrected modversions directory
 #
@@ -748,7 +751,7 @@ AC_DEFUN([_OSR61_CONFIG], [dnl
     pkg_src=`(cd $srcdir ; /bin/pwd)`
     pkg_bld=`(cd . ; /bin/pwd)`
     osr_cv_config="${pkg_bld}/src/include/sys/osr61/config.h"
-    osr_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    osr_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     osr_cv_ldadd= # "${pkg_bld}/libosr.la"
     osr_cv_ldflags= # "${pkg_bld}/lib32/libosr.la"
     osr_cv_ldadd32= # "-L${pkg_bld}/.libs/"

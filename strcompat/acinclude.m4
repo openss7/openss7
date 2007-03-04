@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/04 23:30:02 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/04 23:41:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:30:02 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:41:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1043,7 +1043,7 @@ AC_DEFUN([_COMPAT_CONFIG], [dnl
     pkg_src=`(cd $srcdir ; /bin/pwd)`
     pkg_bld=`(cd . ; /bin/pwd)`
     strcomp_cv_config="${pkg_bld}/src/include/sys/strcompat/config.h"
-    strcomp_cv_includes="${pkg_bld}/src/include ${pkg_src}/src/include"
+    strcomp_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     strcomp_cv_ldadd= # "${pkg_bld}/libcompat.la"
     strcomp_cv_ldflags= # "${pkg_bld}/lib32/libcompat.la"
     strcomp_cv_ldadd32= # "-L${pkg_bld}/.libs/"
