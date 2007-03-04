@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/02 10:04:06 $
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/04 19:36:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/02 10:04:06 $ by $Author: brian $
+ Last Modified $Date: 2007/03/04 19:36:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: hpuxcompat.c,v $
+ Revision 0.9.2.26  2007/03/04 19:36:24  brian
+ - correction for 2.4 modversions
+
  Revision 0.9.2.25  2007/03/02 10:04:06  brian
  - updates to common build process and versions for all exported symbols
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/02 10:04:06 $"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/04 19:36:24 $"
 
-static char const ident[] = "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/02 10:04:06 $";
+static char const ident[] = "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/04 19:36:24 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -81,7 +84,7 @@ static char const ident[] = "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/02 10:04:06 $"
+#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/04 19:36:24 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL"
@@ -124,7 +127,7 @@ streams_get_sleep_lock(caddr_t event)
 
 EXPORT_SYMBOL(streams_get_sleep_lock);	/* hpux/ddi.h */
 
-lock_t *get_sleep_lock(caddr_t event) __attribute__ ((alias("streams_get_sleep_lock")));
+lock_t *get_sleep_lock(caddr_t event) __attribute__ ((alias(__stringify(streams_get_sleep_lock))));
 
 EXPORT_SYMBOL(get_sleep_lock);	/* hpux/ddi.h */
 
