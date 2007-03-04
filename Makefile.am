@@ -126,7 +126,9 @@ master-dist-hook:
 					(*) \
 						version=`cat $$subdir/.version` ; \
 						$(ECHO) "mv -f $$subdir $$subdir-$${version:-$(VERSION)}" ; \
-						mv -f "$$subdir" "$$subdir-$${version:-$(VERSION)}" ;; \
+						mv -f "$$subdir" "$$subdir-$${version:-$(VERSION)}" ; \
+						$(ECHO) "ln -sf $$subdir-$${version:-$(VERSION)} $$subdir" ; \
+						ln -sf $$subdir-$${version:-$(VERSION)} $$subdir ;; \
 					esac ; \
 				fi ;; \
 			esac ; \
