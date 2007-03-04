@@ -1,5 +1,8 @@
 2007-03-04  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man9/mi_timer.9.man: correction
+	* src/include/sys/mps/stream.h: correction
+
 	* AUTHORS: updates for release
 	* NEWS: updates for release
 	* README: updates for release
