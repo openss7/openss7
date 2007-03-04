@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
 .\"
-.\" @(#) $Id: mi_trylock.9.man,v 0.9.2.1 2007/02/14 14:08:03 brian Exp $
+.\" @(#) $Id: mi_trylock.9.man,v 0.9.2.2 2007/03/04 21:20:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/02/14 14:08:03 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/04 21:20:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_trylock.9.man,v $
+.\" Revision 0.9.2.2  2007/03/04 21:20:45  brian
+.\" - completed documentation
+.\"
 .\" Revision 0.9.2.1  2007/02/14 14:08:03  brian
 .\" - added new files
 .\"
@@ -110,6 +113,9 @@ locked.
 .PP
 .IR MPS \(rg-specific
 DDI.
+.PP
+.I "Linux Fast-STREAMS"
+specific.
 .\"
 .\"
 .SH DESCRIPTION
@@ -151,11 +157,11 @@ state variables).
 When
 .BR mi_trylock ()
 fails, the caller should cause any message that was to be processed under the
-lock to be place (back) onto message queue,
+lock to be placed (back) onto message queue,
 .IR q .
-When the lock is released, the message queue,
+When the lock is released by the current lock holder, the message queue,
 .IR q ,
-will be enabled after the lock has been released.
+will be enabled.
 .\"
 .\"
 .SH RETURN
@@ -238,6 +244,12 @@ put and service procedures which are seldomly written with reentrancy in mind.
 .\"
 .SH IMPLEMENTATION
 .PP
+.BR mi_trylock ()
+is implemented using basic lock functions.  See
+.BR LOCK (9)
+and
+.BR TRYLOCK (9)
+for more information.
 .\"
 .\"
 .SH EXAMPLES
@@ -305,6 +317,8 @@ do_rsrv(queue_t *q)
 .\"
 .SH "SEE ALSO"
 .PP
+.BR mi_sleeplock (9),
+.BR mi_unlock (9),
 .BR TRYLOCK (9),
 .BR mpscompat (9),
 .BR aixcompat (9),
@@ -330,6 +344,31 @@ and
 .IR Solaris \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.BR mi_trylock ()
+is an OpenSS7 Project specific implementation of an
+.IR MPS \(rg-compatible
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+.IP \(em
+.BR mi_trylock ()
+is provided for use with SS7 drivers and modules that need some automatic locking of queue pair
+private structure for speed and efficiency.
+.IP \(em
+.BR mi_trylock ()
+does not exist in any other
+.IR MPS \(rg
+implementation other than
+.IR "Linux Fast-STREAMS" .
+.PP
+See
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+.BR suncompat (9),
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE

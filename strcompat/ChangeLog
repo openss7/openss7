@@ -1,5 +1,10 @@
 2007-03-04  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man9/mi_allocb.9.man: completed documentation
+	* doc/man/man9/mi_sleeplock.9.man: completed documentation
+	* doc/man/man9/mi_trylock.9.man: completed documentation
+	* doc/man/man9/mi_unlock.9.man: completed documentation
+
 	* doc/man/Makefile.am: added manpages, removed duplicates
 	* src/kernel/hpuxcompat.c: correction for 2.4 modversions
 	* doc/man/man9/mi_timer.9.man: correction
