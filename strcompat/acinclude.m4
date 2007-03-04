@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/02 10:04:01 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/04 23:14:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/02 10:04:01 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:14:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -107,9 +107,12 @@ AC_DEFUN([AC_COMPAT], [dnl
     _COMPAT_SETUP
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/${STRCONF_CONFIG}'
-    if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
-	PKG_MODFLAGS='$(STREAMS_MODFLAGS) -include $(top_builddir)/$(MODVERSIONS_H)'
-	PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/include'
+    if test :${linux_cv_ko_modules:-no} = :no ; then
+	PKG_MODFLAGS='$(STREAMS_MODFLAGS)'
+	if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
+	    PKG_MODFLAGS="${PKG_MODFLAGS}${PKG_MODFLAGS:+ }"'-include ${top_builddir}/${MODVERSIONS_H}'
+	    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/include'
+	fi
     fi
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/src/include -I${top_srcdir}/src/include'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
@@ -1046,6 +1049,7 @@ AC_DEFUN([_COMPAT_CONFIG], [dnl
     strcomp_cv_ldadd32= # "-L${pkg_bld}/.libs/"
     strcomp_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
     strcomp_cv_manpath="${pkg_bld}/doc/man"
+    strcomp_cv_modversions="${pkg_bld}/include/$linux_cv_k_release/$target_cpu/sys/${PACKAGE}/modversions.h"
     strcomp_cv_modmap="${pkg_bld}/Modules.map"
     strcomp_cv_symver="${pkg_bld}/Module.symvers"
     strcomp_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"

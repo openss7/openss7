@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/01 07:17:25 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/04 23:14:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:14:42 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.11  2007/03/04 23:14:42  brian
+# - better search for modversions
+#
 # Revision 0.9.2.10  2007/03/01 07:17:25  brian
 # - updating common build process
 #
@@ -207,6 +210,7 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 		    iso_cv_includes="$iso_bld $iso_dir"
 		    iso_cv_ldadd= # "$os7_cv_master_builddir/striso/libiso.la"
 		    iso_cv_ldadd32= # "$os7_cv_master_builddir/striso/lib32/libiso.la"
+		    iso_cv_modversions="$os7_cv_master_builddir/striso/include/$linux_cv_k_release/$target_cpu/sys/striso/modversions.h"
 		    iso_cv_modmap="$os7_cv_master_builddir/striso/Modules.map"
 		    iso_cv_symver="$os7_cv_master_builddir/striso/Module.symvers"
 		    iso_cv_manpath="$os7_cv_master_builddir/striso/doc/man"
@@ -236,6 +240,7 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 			iso_cv_includes="$iso_bld $iso_dir"
 			iso_cv_ldadd= # `echo "$iso_bld/../../libiso.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			iso_cv_ldadd32= # `echo "$iso_bld/../../lib32/libiso.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			iso_cv_modversions=`echo "$iso_bld/../../include/$linux_cv_k_release/$target_cpu/sys/striso/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			iso_cv_modmap=`echo "$iso_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			iso_cv_symver=`echo "$iso_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			iso_cv_manpath=`echo "$iso_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

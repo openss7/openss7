@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/01 07:17:25 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/04 23:14:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/01 07:17:25 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:14:42 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: inet.m4,v $
+# Revision 0.9.2.39  2007/03/04 23:14:42  brian
+# - better search for modversions
+#
 # Revision 0.9.2.38  2007/03/01 07:17:25  brian
 # - updating common build process
 #
@@ -217,6 +220,7 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 		    inet_cv_includes="$inet_bld $inet_dir"
 		    inet_cv_ldadd= # "$os7_cv_master_builddir/strinet/libinet.la"
 		    inet_cv_ldadd32= # "$os7_cv_master_builddir/strinet/lib32/libinet.la"
+		    inet_cv_modversions="$os7_cv_master_builddir/strinet/include/$linux_cv_k_release/$target_cpu/sys/strinet/modversions.h"
 		    inet_cv_modmap="$os7_cv_master_builddir/strinet/Modules.map"
 		    inet_cv_symver="$os7_cv_master_builddir/strinet/Module.symvers"
 		    inet_cv_manpath="$os7_cv_master_builddir/strinet/doc/man"
@@ -246,6 +250,7 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 			inet_cv_includes="$inet_bld $inet_dir"
 			inet_cv_ldadd= # `echo "$inet_bld/../../libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			inet_cv_ldadd32= # `echo "$inet_bld/../../lib32/libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			inet_cv_modversions=`echo "$inet_bld/../../include/$linux_cv_k_release/$target_cpu/sys/strinet/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			inet_cv_modmap=`echo "$inet_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			inet_cv_symver=`echo "$inet_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			inet_cv_manpath=`echo "$inet_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

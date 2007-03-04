@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/04 22:16:20 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/04 23:14:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 22:16:20 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 23:14:43 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strcomp.m4,v $
+# Revision 0.9.2.28  2007/03/04 23:14:43  brian
+# - better search for modversions
+#
 # Revision 0.9.2.27  2007/03/04 22:16:20  brian
 # - preparing for eventual library
 #
@@ -220,6 +223,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 		    strcomp_cv_includes="$strcomp_bld $strcomp_dir"
 		    strcomp_cv_ldadd= # "$os7_cv_master_builddir/strcompat/libcompat.la"
 		    strcomp_cv_ldadd32= # "$os7_cv_master_builddir/strcompat/lib32/libcompat.la"
+		    strcomp_cv_modversions="$os7_cv_master_builddir/strcompat/include/$linux_cv_k_release/$target_cpu/sys/strcompat/modversions.h"
 		    strcomp_cv_modmap="$os7_cv_master_builddir/strcompat/Modules.map"
 		    strcomp_cv_symver="$os7_cv_master_builddir/strcompat/Module.symvers"
 		    strcomp_cv_manpath="$os7_cv_master_builddir/strcompat/doc/man"
@@ -249,6 +253,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 			strcomp_cv_includes="$strcomp_bld $strcomp_dir"
 			strcomp_cv_ldadd= # `echo "$strcomp_bld/../../libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			strcomp_cv_ldadd32= # `echo "$strcomp_bld/../../lib32/libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			strcomp_cv_modversions=`echo "$strcomp_bld/../../include/$linux_cv_k_release/$target_cpu/sys/strcompat/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			strcomp_cv_modmap=`echo "$strcomp_bld/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			strcomp_cv_symver=`echo "$strcomp_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			strcomp_cv_manpath=`echo "$strcomp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
