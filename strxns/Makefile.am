@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/01/25 20:47:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2007/03/04 00:24:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/01/25 20:47:24 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 00:24:24 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.58  2007/03/04 00:24:24  brian
+# - add version file creation
+#
 # Revision 0.9.2.57  2007/01/25 20:47:24  brian
 # - hooks.h files should not be distributed
 #
@@ -122,6 +125,11 @@
 ## General rules
 ##
 include am/openss7.am
+
+##
+## Version file
+##
+include am/version.am
 
 ##
 ## Help

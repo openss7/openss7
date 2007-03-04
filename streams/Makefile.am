@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2006/11/26 15:27:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2007/03/04 00:23:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/11/26 15:27:32 $ by $Author: brian $
+# Last Modified $Date: 2007/03/04 00:23:48 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.143  2007/03/04 00:23:48  brian
+# - add version file creation
+#
 # Revision 0.9.2.142  2006/11/26 15:27:32  brian
 # - testing and corrections to strlog capabilities
 #
@@ -110,6 +113,11 @@
 ## General rules
 ##
 include am/openss7.am
+
+##
+## Version file
+##
+include am/version.am
 
 ##
 ## Help
