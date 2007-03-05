@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.124 $) $Date: 2007/03/04 10:02:06 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2007/03/05 08:59:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 10:02:06 $ by $Author: brian $
+# Last Modified $Date: 2007/03/05 08:59:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -116,8 +116,8 @@
 %{expand: %%global have_sock2path   %{?sock2path:1}%{!?sock2path:0}}
 
 %if %{without_ko_modules}
-# assume devs for older kernels
-%global NEED_devs     1
+# assume devs for older kernels (except for strinet which has conflict with dev package)
+%global NEED_devs     0
 %global NEED_init     1
 %else
 # assume no devs for newer kernels
@@ -2013,6 +2013,9 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
+# Revision 0.9.2.125  2007/03/05 08:59:10  brian
+# - do not build devices for strinet
+#
 
 * Sun Mar  4 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.124  2007/03/04 10:02:06  brian

@@ -2,6 +2,9 @@
 
 	* acinclude.m4: correct version numbers
 	* strinet.spec.in: do not release source package
+	* strinet.spec.in: do not build devices due to conflict with iBCS
+	  devices in the dev package on 2.4 kernels, let the init script do its
+	  job
 
 2007-03-04  Brian Bidulock  <bidulock@openss7.org>
 
