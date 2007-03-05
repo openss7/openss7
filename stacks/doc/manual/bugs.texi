@@ -58,7 +58,10 @@
 @c =========================================================================
 
 @table @code
-@item (no items)
+@item 2007-03-05T15:58:14-0700
+For some reason the package was always building and installing the @file{libxnet} texinfo document
+which was keeping the RPM from installing after the @file{strxnet} package.
+
 @end table
 
 

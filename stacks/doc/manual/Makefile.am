@@ -83,7 +83,13 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		+= strss7.texi libxnet.texi
+info_TEXINFOS		+= strss7.texi
+
+if WITH_XNET
+## WITH_XNET
+info_TEXINFOS		+= libxnet.texi
+## WITH_XNET
+endif
 
 EXTRA_info_TEXINFOS	= \
 			  configure.texi \
