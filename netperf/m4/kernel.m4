@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.152 $) $Date: 2007/02/28 11:51:31 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.153 $) $Date: 2007/03/05 08:43:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/28 11:51:31 $ by $Author: brian $
+# Last Modified $Date: 2007/03/05 08:43:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1226,7 +1226,12 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_COMPILER], [dnl
     AC_CACHE_CHECK([for kernel compiler], [linux_cv_k_compiler_match], [dnl
 	if test :"$linux_cv_k_running" = :yes
 	then
-	    linux_cv_k_compiler=`cat /proc/version | sed -e 's|^.*(gcc version|gcc version|;s|)[[^)]]*[$]||' 2>/dev/null`
+dnl
+dnl Ubuntu stuck some more paretheses into their /proc/version string.
+dnl Instead of keying off of the last parentheses in the string, use the key
+dnl string containing two parentheses: this is common to all.
+dnl
+	    linux_cv_k_compiler=`cat /proc/version | sed -e 's,^.*(gcc version,gcc version,;s,)).*[$],),' 2>/dev/null`
 	else
 dnl
 dnl	    not all distros leave this hanging around
@@ -1237,7 +1242,7 @@ dnl
 		linux_file="$linux_dir/include/linux/compile.h"
 		if test -f $linux_file
 		then
-		    linux_cv_k_compiler=`grep LINUX_COMPILER $linux_file | sed -e 's|^.*gcc version|gcc version|;s|"[[^"]]*[$]||' 2>/dev/null`
+		    linux_cv_k_compiler=`grep LINUX_COMPILER $linux_file | sed -e 's,^.*gcc version,gcc version,;s,"[[^"]]*[$],,' 2>/dev/null`
 		    break
 		else
 		    eval "linux_dir=\"$kmoduledir/kernel/arch\""
@@ -1256,7 +1261,7 @@ dnl
 				fi
 				if echo "$linux_com" | grep '^GCC: (GNU) ' >/dev/null 2>&1
 				then
-				    linux_cv_k_compiler=`echo "$linux_com" | sed -e 's|^GCC: (GNU) |gcc version |'`
+				    linux_cv_k_compiler=`echo "$linux_com" | sed -e 's,^GCC: (GNU) ,gcc version ,'`
 				    break
 				fi
 			    fi
@@ -1281,10 +1286,10 @@ dnl
 		linux_cv_k_compiler_vmatch=yes
 	    else
 		linux_cv_k_compiler_match=no
-		linux_c1=`echo "$linux_cv_k_compiler" | sed -e 's|gcc version ||;s|[[[:space:]]].*[$]||'`
-		case "$linux_c1" in ([[34]].*.*) linux_c1=`echo $linux_c1 | sed -e 's|\.[[^\.]]*[$]||'` ;; esac
-		linux_c2=`echo "$linux_cv_compiler" | sed -e 's|gcc version ||;s|[[[:space:]]].*[$]||'`
-		case "$linux_c2" in ([[34]].*.*) linux_c2=`echo $linux_c2 | sed -e 's|\.[[^\.]]*[$]||'` ;; esac
+		linux_c1=`echo "$linux_cv_k_compiler" | sed -e 's,gcc version ,,;s,[[[:space:]]].*[$],,'`
+		case "$linux_c1" in ([[34]].*.*) linux_c1=`echo $linux_c1 | sed -e 's,\.[[^\.]]*[$],,'` ;; esac
+		linux_c2=`echo "$linux_cv_compiler" | sed -e 's,gcc version ,,;s,[[[:space:]]].*[$],,'`
+		case "$linux_c2" in ([[34]].*.*) linux_c2=`echo $linux_c2 | sed -e 's,\.[[^\.]]*[$],,'` ;; esac
 		if test "$linux_c1" = "$linux_c2"
 		then
 		    linux_cv_k_compiler_vmatch=yes

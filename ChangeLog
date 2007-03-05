@@ -1,3 +1,9 @@
+2007-03-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4 (linux_cv_k_compiler_match): fix up sed expression for
+	  /proc/version for Ubuntu which sticks extra parentheses into its
+	  version string
+
 2007-03-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release
