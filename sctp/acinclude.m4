@@ -1,12 +1,13 @@
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
 # @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/02/28 06:30:27 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -829,31 +830,43 @@ if (s3 < s4 + s5 - s2 - s6) {
 **** ])
 	    ;;
     esac
+dnl
+dnl Use to complain about these but they were meaningless complaints.
+dnl
+    _LINUX_KERNEL_EXPORTS([
+	    alloc_skb,
+	    __generic_copy_to_user,
+	    inetdev_lock,
+	    inet_family_ops,
+	    inet_getsockopt,
+	    inet_recvmsg,
+	    inet_setsockopt,
+	    irq_stat,
+	    __lock_sock,
+	    __out_of_line_bug,
+	    __pollwait,
+	    __release_sock,
+	    skb_linearize,
+	    sysctl_ip_default_ttl
+    ])
     _LINUX_KERNEL_EXPORTS([
 	    add_wait_queue,
 	    add_wait_queue_exclusive,
-	    alloc_skb,
 	    create_proc_entry,
 	    del_timer,
 	    dev_base_lock,
 	    dev_base,
 	    do_softirq,
 	    free_pages,
-	    __generic_copy_to_user,
 	    __get_free_pages,
 	    __get_user_4,
 	    inet_accept,
 	    inet_add_protocol,
 	    inet_addr_type,
 	    inet_del_protocol,
-	    inetdev_lock,
-	    inet_family_ops,
-	    inet_getsockopt,
-	    inet_recvmsg,
 	    inet_register_protosw,
 	    inet_release,
 	    inet_sendmsg,
-	    inet_setsockopt,
 	    inet_shutdown,
 	    inet_stream_connect,
 	    inet_unregister_protosw,
@@ -862,7 +875,6 @@ if (s3 < s4 + s5 - s2 - s6) {
 	    ip_route_output_key,
 	    __ip_select_ident,
 	    ip_send_check,
-	    irq_stat,
 	    jiffies,
 	    kfree,
 	    __kfree_skb,
@@ -873,15 +885,12 @@ if (s3 < s4 + s5 - s2 - s6) {
 	    kmem_cache_destroy,
 	    kmem_cache_free,
 	    kmem_find_general_cachep,
-	    __lock_sock,
 	    mod_timer,
 	    net_statistics,
 	    nf_hooks,
 	    nf_hook_slow,
 	    num_physpages,
-	    __out_of_line_bug,
 	    panic,
-	    __pollwait,
 	    printk,
 	    proc_dointvec_jiffies,
 	    proc_dointvec_minmax,
@@ -891,7 +900,6 @@ if (s3 < s4 + s5 - s2 - s6) {
 	    ___pskb_trim,
 	    put_cmsg,
 	    register_sysctl_table,
-	    __release_sock,
 	    remove_proc_entry,
 	    remove_wait_queue,
 	    schedule_timeout,
@@ -900,7 +908,6 @@ if (s3 < s4 + s5 - s2 - s6) {
 	    sk_alloc,
 	    skb_clone,
 	    skb_copy_datagram_iovec,
-	    skb_linearize,
 	    skb_over_panic,
 	    skb_realloc_headroom,
 	    skb_under_panic,
@@ -913,7 +920,6 @@ if (s3 < s4 + s5 - s2 - s6) {
 	    sock_wfree,
 	    sprintf,
 	    sysctl_intvec,
-	    sysctl_ip_default_ttl,
 	    sysctl_jiffies,
 	    sysctl_local_port_range,
 	    unregister_sysctl_table,
@@ -1232,9 +1238,10 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
 
 # =============================================================================
 # 
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
-# ENDING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocin nosi
+# ENDING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
+# vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
