@@ -1,3 +1,8 @@
+2007-03-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: correct version numbers
+	* strcompat.spec.in: do not release source package
+
 2007-03-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/mi_allocb.9.man: completed documentation

@@ -760,7 +760,7 @@ AC_DEFUN([_OSR61_CONFIG], [dnl
     osr_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     osr_cv_modmap="${pkg_bld}/Modules.map"
     osr_cv_symver="${pkg_bld}/Module.symvers"
-    osr_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    osr_cv_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
 ])# _OSR61_CONFIG
 # =============================================================================
 

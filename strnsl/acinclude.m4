@@ -237,7 +237,7 @@ AC_DEFUN([_XNSL_CONFIG], [dnl
     nsl_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     nsl_cv_modmap= # "${pkg_bld}/Modules.map"
     nsl_cv_symver= # "${pkg_bld}/Module.symvers"
-    nsl_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    nsl_cv_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
 ])# _XNSL_CONFIG
 # =============================================================================
 

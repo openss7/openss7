@@ -319,7 +319,7 @@ AC_DEFUN([_SIGTRAN_CONFIG], [dnl
     sigtran_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     sigtran_cv_modmap="${pkg_bld}/Modules.map"
     sigtran_cv_symver="${pkg_bld}/Module.symvers"
-    sigtran_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    sigtran_cv_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
 ])# _SIGTRAN_CONFIG
 # =============================================================================
 

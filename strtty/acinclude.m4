@@ -223,7 +223,7 @@ AC_DEFUN([_TTY_CONFIG], [dnl
     tty_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     tty_cv_modmap="${pkg_bld}/Modules.map"
     tty_cv_symver="${pkg_bld}/Module.symvers"
-    tty_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    tty_cv_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
 ])# _TTY_CONFIG
 # =============================================================================
 

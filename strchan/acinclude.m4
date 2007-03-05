@@ -314,7 +314,7 @@ AC_DEFUN([_CHAN_CONFIG], [dnl
     chan_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     chan_cv_modmap="${pkg_bld}/Modules.map"
     chan_cv_symver="${pkg_bld}/Module.symvers"
-    chan_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    chan_cv_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
 ])# _CHAN_CONFIG
 # =============================================================================
 

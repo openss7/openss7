@@ -1490,7 +1490,7 @@ AC_DEFUN([_SS7_CONFIG], [dnl
     ss7_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     ss7_cv_modmap="${pkg_bld}/Modules.map"
     ss7_cv_symver="${pkg_bld}/Module.symvers"
-    ss7_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    ss7_cv_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
 ])# _SS7_CONFIG
 # =============================================================================
 

@@ -231,7 +231,7 @@ AC_DEFUN([_BCM_CONFIG], [dnl
     bcm_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     bcm_cv_modmap="${pkg_bld}/Modules.map"
     bcm_cv_symver="${pkg_bld}/Module.symvers"
-    bcm_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    bcm_cv_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
 ])# _BCM_CONFIG
 # =============================================================================
 

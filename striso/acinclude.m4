@@ -347,7 +347,7 @@ AC_DEFUN([_ISO_CONFIG], [dnl
     iso_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     iso_cv_modmap="${pkg_bld}/Modules.map"
     iso_cv_symver="${pkg_bld}/Module.symvers"
-    iso_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    iso_cv_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
 ])# _ISO_CONFIG
 # =============================================================================
 
