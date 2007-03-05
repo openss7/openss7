@@ -187,7 +187,7 @@ AC_DEFUN([AC_LFS], [dnl
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/${STRCONF_CONFIG}'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_srcdir}'
-    if test :${linux_cv_ko_modules:-no} = :no ; then
+    if test :${linux_cv_k_ko_modules:-no} = :no ; then
 	if echo "$KERNEL_MODFLAGS" | grep 'modversions\.h' >/dev/null 2>&1 ; then
 	    PKG_MODFLAGS='-include ${top_builddir}/${MODVERSIONS_H}'
 	fi
