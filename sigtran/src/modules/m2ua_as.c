@@ -110,9 +110,8 @@ static char const ident[] =
 #undef mi_timer
 #define mi_timer mi_timer_MAC
 
-#ifndef DB_TYPE
+#undef DB_TYPE
 #define DB_TYPE(mp) mp->b_datap->db_type
-#endif
 
 #include <stdbool.h>
 
