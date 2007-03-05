@@ -99,6 +99,51 @@ sort-adjacent-labels
 is an implementation of the Link Access Procedure\(emD-channel (LAPD) as
 defined in ITU-T Recommendation Q.921.
 .[
-q.921
+q921
 .]
-
+.\"
+.\"
+.SH DEVICES
+.PP
+Various.
+.\"
+.\"
+.SH MODULES
+.PP
+Various.
+.\"
+.\"
+.SH IOCTLS
+.PP
+Undocumented.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+These devices and modules need a manual page.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+Unknown.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Unknown.
+.\"
+.\"
+.SH HISTORY
+.PP
+Unknown.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
