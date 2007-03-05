@@ -115,7 +115,7 @@ provides call control of telephone calls over the ISDN.
 .B ISDN
 uses the services of the Q.921 Data Link,
 .[
-q921e
+q921
 .]
 .BR dl (4),
 or ISDN Q.921 User Adaptation Layer,
