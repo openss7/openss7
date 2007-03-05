@@ -867,7 +867,7 @@ AC_DEFUN([_XNS_CONFIG], [dnl
     xns_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     xns_cv_modmap="${pkg_bld}/Modules.map"
     xns_cv_symver="${pkg_bld}/Module.symvers"
-    xns_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    xns_cv_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
 ])# _XNS_CONFIG
 # =============================================================================
 

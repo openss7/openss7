@@ -265,7 +265,7 @@ AC_DEFUN([_SOCK_CONFIG], [dnl
     sock_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     sock_cv_modmap="${pkg_bld}/Modules.map"
     sock_cv_symver="${pkg_bld}/Module.symvers"
-    sock_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    sock_cv_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
 ])# _SOCK_CONFIG
 # =============================================================================
 

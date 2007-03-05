@@ -986,7 +986,7 @@ AC_DEFUN([_INET_CONFIG], [dnl
     inet_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     inet_cv_modmap="${pkg_bld}/Modules.map"
     inet_cv_symver="${pkg_bld}/Module.symvers"
-    inet_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    inet_cv_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
 ])# _INET_CONFIG
 # =============================================================================
 

@@ -1,3 +1,12 @@
+2007-03-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+	* sctp.spec.in: updated changelog
+
 2007-03-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

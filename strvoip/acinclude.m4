@@ -323,7 +323,7 @@ AC_DEFUN([_VOIP_CONFIG], [dnl
     voip_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     voip_cv_modmap="${pkg_bld}/Modules.map"
     voip_cv_symver="${pkg_bld}/Module.symvers"
-    voip_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    voip_cv_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
 ])# _VOIP_CONFIG
 # =============================================================================
 

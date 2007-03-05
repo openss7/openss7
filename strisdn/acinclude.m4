@@ -297,7 +297,7 @@ AC_DEFUN([_ISDN_CONFIG], [dnl
     isdn_cv_modmap="${pkg_bld}/Modules.map"
     isdn_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     isdn_cv_symver="${pkg_bld}/Module.symvers"
-    isdn_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    isdn_cv_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
 ])# _ISDN_CONFIG
 # =============================================================================
 

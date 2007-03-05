@@ -1052,7 +1052,7 @@ AC_DEFUN([_COMPAT_CONFIG], [dnl
     strcomp_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     strcomp_cv_modmap="${pkg_bld}/Modules.map"
     strcomp_cv_symver="${pkg_bld}/Module.symvers"
-    strcomp_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    strcomp_cv_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
 ])# _COMPAT_CONFIG
 # =============================================================================
 

@@ -1663,7 +1663,7 @@ AC_DEFUN([_LFS_CONFIG], [dnl
     streams_cv_lfs_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     streams_cv_lfs_modmap="${pkg_bld}/Modules.map"
     streams_cv_lfs_symver="${pkg_bld}/Module.symvers"
-    streams_cv_lfs_version="${PACKAGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    streams_cv_lfs_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
     streams_cv_config="$streams_cv_lfs_config"
     streams_cv_includes="$streams_cv_lfs_includes"
 dnl streams_cv_ldadd="$streams_cv_lfs_ldadd"
@@ -1674,7 +1674,7 @@ dnl streams_cv_manpath="$streams_cv_lfs_manpath"
     streams_cv_modversions="$streams_cv_lfs_modversions"
 dnl streams_cv_modmap="$streams_cv_lfs_modmap"
 dnl streams_cv_symver="$streams_cv_lfs_symver"
-    streams_cv_version="$streams_cv_lfs_version"
+    streams_cv_version="${VERSION}"
     streams_cv_package="LfS"
 ])# _LFS_CONFIG
 # =============================================================================

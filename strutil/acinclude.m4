@@ -899,7 +899,7 @@ AC_DEFUN([_UTIL_CONFIG], [dnl
     util_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     util_cv_modmap="${pkg_bld}/Modules.map"
     util_cv_symver="${pkg_bld}/Module.symvers"
-    util_cv_version="${PACAKGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    util_cv_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
 ])# _UTIL_CONFIG
 # =============================================================================
 

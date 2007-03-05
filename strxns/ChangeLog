@@ -1,3 +1,10 @@
+2007-03-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* NEWS: updates for release
+	* README-cvs: updates for release
+	* acinclude.m4: correct version numbers
+	* strxns.spec.in: do not release source package
+
 2007-03-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

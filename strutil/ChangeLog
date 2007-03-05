@@ -1,3 +1,8 @@
+2007-03-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: correct version numbers
+	* strutil.spec.in: do not release source package
+
 2007-03-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

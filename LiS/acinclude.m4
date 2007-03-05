@@ -1734,7 +1734,7 @@ AC_DEFUN([_LIS_CONFIG], [dnl
     streams_cv_lis_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     streams_cv_lis_modmap="${pkg_bld}/Modules.map"
     streams_cv_lis_symver="${pkg_bld}/Module.symvers"
-    streams_cv_lis_version="${PACKAGE_EPOCH}:${PACKAGE_VERSION}-${PACKAGE_RELEASE}"
+    streams_cv_lis_version="${PACKAGE_RPMEPOCH}:${VERSION}-${PACKAGE_RPMRELEASE}"
     streams_cv_config="$streams_cv_lis_config"
     streams_cv_includes="$streams_cv_lis_includes"
 dnl streams_cv_ldadd="$streams_cv_lis_ldadd"
@@ -1745,7 +1745,7 @@ dnl streams_cv_manpath="$streams_cv_lis_manpath"
     streams_cv_modversions="$streams_cv_lis_modversions"
 dnl streams_cv_modmap="$streams_cv_lis_modmap"
 dnl streams_cv_symver="$streams_cv_lis_symver"
-    streams_cv_version="$streams_cv_lis_version"
+    streams_cv_version="${VERSION}"
     streams_cv_package="LiS"
 ])#_LIS_CONFIG
 # =============================================================================
