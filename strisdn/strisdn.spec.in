@@ -115,10 +115,14 @@
 # assume devs for older kernels
 %global NEED_devs     1
 %global NEED_init     1
+%{expand: %%global have_oldmods  %{?modules:1}%{!?modules:0}}
+%{expand: %%global have_newmods  0}
 %else
 # assume no devs for newer kernels
 %global NEED_devs     0
 %global NEED_init     0
+%{expand: %%global have_oldmods  0}
+%{expand: %%global have_newmods  %{?modules:1}%{!?modules:0}}
 %endif
 
 # define new autoconf 2.60, 2.61 stuff
@@ -1496,7 +1500,7 @@ Group:          System Environment/Base
 Prefix:         %{_configdir}
 Prefix:         %{_initrddir}
 Prefix:         %{_sysconfdir}
-%if %{without_ko_modules}
+%if %{have_oldmods}
 Prefix:         %{_modutildir}
 %endif
 Requires:       strcompat-init = %version_of_or strcompat-init @STRCOMP_VERSION@%{?extrarelease2}
@@ -1521,6 +1525,7 @@ apply system configuration customizations at boot.
 %pre init
 # ---------------------------------------------------------------------------
 arg="$1"
+%if %{have_modules}
 function remove_depmods() {
     local t
     [ $# -gt 0 ] || return 0
@@ -1530,10 +1535,12 @@ function remove_depmods() {
         eval "remove_depmods \$$prereq"
     done
 }
+%endif
 # This is an initial installation of the init subpackage.  We need to check for non-rpm
 # installations on the host and remove any entries that might later conflict with our entries.  We
 # treat every fresh installation like an upgrade from non-deb/rpm install.
 if [ $arg = 1 ] ; then : # fresh install
+%if %{have_modules}
     # When performing a fresh install we want to go looking for non-rpm installations of LiS or
     # STREAMS or supplementary packages and perform what would otherwise have been the preun or
     # postun actions.
@@ -1610,11 +1617,14 @@ if [ $arg = 1 ] ; then : # fresh install
             rm -f -- $conf_new
         fi
     done
-%if %{without_ko_modules}
+%endif
+%if %{have_oldmods}
     prel_old=%_sysconfdir/modules
-%else
+%endif
+%if %{have_newmods}
     prel_old=%_sysconfdir/modprobe.preload
 %endif
+%if %{have_modules}
     if [ -f $prel_old ] ; then
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
@@ -1625,6 +1635,7 @@ if [ $arg = 1 ] ; then : # fresh install
         cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
         rm -f -- $prel_new
     fi
+%endif
     # Fresh install, go looking for non-rpm initscripts and remove them.
     list='%{initfiles}' ; for i in $list ; do
         if [ -f %_initrddir/$i ] ; then
@@ -1634,6 +1645,7 @@ if [ $arg = 1 ] ; then : # fresh install
             [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue
         fi
     done
+%if %{have_modules}
     # remove conflicting and dependent modules
     if [ -n "$modl_mods" ] ; then
         rm -f -- $modl_mods
@@ -1644,6 +1656,7 @@ if [ $arg = 1 ] ; then : # fresh install
             rm -f -- $modl_deps
         done
     fi
+%endif
 fi
 if [ $arg = 2 ] ; then : # upgrade
     # Because we are doing an upgrade, the preun and postun scriplets for the old rpm are going to
@@ -1653,7 +1666,7 @@ fi
 %post init
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then : # fresh install
-%if %{without_ko_modules}
+%if %{have_oldmods}
     # At the end of a fresh install we need to add our lines to the modules.conf file if it exists,
     # and it is necessary to use a modconf file (2.4 and pre 2.5.48 kernel), an even if the line is
     # already there (in which case we remove the existing line).
@@ -1670,9 +1683,10 @@ if [ $1 = 1 ] ; then : # fresh install
         rm -f -- $conf_new
     fi
 %endif
-%if %{without_ko_modules}
+%if %{have_oldmods}
     prel_old=%_sysconfdir/modules
-%else
+%endif
+%if %{have_newmods}
     prel_old=%_sysconfdir/modprobe.preload
 %endif
 %if %{have_preloads}
@@ -1695,7 +1709,7 @@ if [ $1 = 1 ] ; then : # fresh install
 %endif
 fi
 if [ $1 = 2 ] ; then : # upgrade
-%if %{without_ko_modules}
+%if %{have_oldmods}
     # At the end of an upgrade we place our new lines in the modules.conf file.
     conf_old=%_sysconfdir/modules.conf
     if [ -f $conf_old ] ; then
@@ -1710,9 +1724,10 @@ if [ $1 = 2 ] ; then : # upgrade
         rm -f -- $conf_new
     fi
 %endif
-%if %{without_ko_modules}
+%if %{have_oldmods}
     prel_old=%_sysconfdir/modules
-%else
+%endif
+%if %{have_newmods}
     prel_old=%_sysconfdir/modprobe.preload
 %endif
 %if %{have_preloads}
@@ -1744,7 +1759,7 @@ fi
 %preun init
 # ---------------------------------------------------------------------------
 if [ $1 = 0 ] ; then : # final removal
-%if %{without_ko_modules}
+%if %{have_oldmods}
     # When we are going away altogether we want to remove any lines whatsoever from the modules.conf
     # file.
     conf_old=%_sysconfdir/modules.conf
@@ -1759,9 +1774,10 @@ if [ $1 = 0 ] ; then : # final removal
         rm -f -- $conf_new
     fi
 %endif
-%if %{without_ko_modules}
+%if %{have_oldmods}
     prel_old=%_sysconfdir/modules
-%else
+%endif
+%if %{have_newmods}
     prel_old=%_sysconfdir/modprobe.preload
 %endif
 %if %{have_preloads}
@@ -1795,7 +1811,7 @@ if [ $1 = 0 ] ; then : # final removal
 %endif
 fi
 if [ $1 = 1 ] ; then : # upgrade
-%if %{without_ko_modules}
+%if %{have_oldmods}
     # At the end of the upgrade (when _this_package_ is upgraded from) we remove our lines from the
     # modules.conf file that we placed in them in the post scriptlet.  We only adjust our line and
     # leave any lines added by the new package post scriptlet.
@@ -1820,9 +1836,10 @@ b loop' $conf_new > $conf_tmp
         rm -f -- $conf_new
     fi
 %endif
-%if %{without_ko_modules}
+%if %{have_oldmods}
     prel_old=%_sysconfdir/modules
-%else
+%endif
+%if %{have_newmods}
     prel_old=%_sysconfdir/modprobe.preload
 %endif
 %if %{have_preloads}
