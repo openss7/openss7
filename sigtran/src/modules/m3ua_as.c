@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 05:19:34 $
+ @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/05 23:01:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/28 05:19:34 $ by $Author: brian $
+ Last Modified $Date: 2007/03/05 23:01:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.4  2007/03/05 23:01:42  brian
+ - checking in release changes
+
  Revision 0.9.2.3  2006/12/28 05:19:34  brian
  - minor changes
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 05:19:34 $"
+#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/05 23:01:42 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 05:19:34 $";
+    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/05 23:01:42 $";
 
 /*
  *  This is the AS side of M3UA implemented as a pushable module that pushes over an SCTP NPI
@@ -143,7 +146,7 @@ static char const ident[] =
 /* ======================= */
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP MESSAGE TRANSFER PART (MTP) STREAMS MODULE."
-#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 05:19:34 $"
+#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/05 23:01:42 $"
 #define M3UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

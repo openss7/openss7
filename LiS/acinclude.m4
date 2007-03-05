@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.56 $) $Date: 2007/03/04 23:29:53 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.57 $) $Date: 2007/03/05 23:01:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:29:53 $ by $Author: brian $
+# Last Modified $Date: 2007/03/05 23:01:29 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.6.57  2007/03/05 23:01:29  brian
+# - checking in release changes
+#
 # Revision 1.1.6.56  2007/03/04 23:29:53  brian
 # - corrected modversions directory
 #
