@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/06 23:13:57 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/06 23:39:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:13:57 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 23:39:54 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.14  2007/03/06 23:39:54  brian
+# - more corrections
+#
 # Revision 0.9.2.13  2007/03/06 23:13:57  brian
 # - master build correction
 #
@@ -248,7 +251,7 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 			iso_cv_includes="$iso_inc $iso_bld $iso_dir"
 			iso_cv_ldadd= # `echo "$iso_bld/../../libiso.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			iso_cv_ldadd32= # `echo "$iso_bld/../../lib32/libiso.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			iso_cv_modversions=`echo "$iso_inc/include/sys/striso/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			iso_cv_modversions=`echo "$iso_inc/sys/striso/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			iso_cv_modmap=`echo "$iso_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			iso_cv_symver=`echo "$iso_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			iso_cv_manpath=`echo "$iso_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

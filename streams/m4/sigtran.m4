@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/04 23:26:40 $
+# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/06 23:39:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 23:39:54 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sigtran.m4,v $
+# Revision 0.9.2.11  2007/03/06 23:39:54  brian
+# - more corrections
+#
 # Revision 0.9.2.10  2007/03/04 23:26:40  brian
 # - corrected modversions directory
 #
@@ -197,12 +200,13 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    sigtran_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/sigtran/src/include}"
 	    sigtran_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/sigtran/src/include}"
+	    sigtran_inc="${os7_cv_master_builddir:+$os7_cv_master_builddir/sigtran/include}"
+	    sigtran_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/sigtran/src/include}"
 	    if test -d "$sigtran_dir" ; then
 		AC_MSG_CHECKING([for sigtran include directory... $sigtran_dir $sigtran_bld])
-		if test -d "$sigtran_bld" -a -r "$sigtran_dir/$sigtran_what" ; then
-		    sigtran_cv_includes="$sigtran_bld $sigtran_dir"
+		if test -r "$sigtran_dir/$sigtran_what" ; then
+		    sigtran_cv_includes="$sigtran_inc $sigtran_bld $sigtran_dir"
 		    sigtran_cv_ldadd= # "$os7_cv_master_builddir/sigtran/libsigtran.la"
 		    sigtran_cv_ldadd32= # "$os7_cv_master_builddir/sigtran/lib32/libsigtran.la"
 		    sigtran_cv_modversions="$os7_cv_master_builddir/sigtran/include/sys/sigtran/modversions.h"
@@ -229,13 +233,14 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	    do
 		if test -d "$sigtran_dir" ; then
 		    sigtran_bld=`echo $sigtran_dir | sed -e "s|^$srcdir/|$sigtran_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		    sigtran_inc=`echo $sigtran_bld/../../include |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    sigtran_dir=`(cd $sigtran_dir; pwd)`
 		    AC_MSG_CHECKING([for sigtran include directory... $sigtran_dir $sigtran_bld])
 		    if test -d "$sigtran_bld" -a -r "$sigtran_dir/$sigtran_what" ; then
-			sigtran_cv_includes="$sigtran_bld $sigtran_dir"
+			sigtran_cv_includes="$sigtran_inc $sigtran_bld $sigtran_dir"
 			sigtran_cv_ldadd= # `echo "$sigtran_bld/../../libsigtran.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sigtran_cv_ldadd32= # `echo "$sigtran_bld/../../lib32/libsigtran.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			sigtran_cv_modversions=`echo "$sigtran_bld/../../include/sys/sigtran/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sigtran_cv_modversions=`echo "$sigtran_inc/sys/sigtran/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sigtran_cv_modmap=`echo "$sigtran_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sigtran_cv_symver=`echo "$sigtran_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sigtran_cv_manpath=`echo "$sigtran_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
