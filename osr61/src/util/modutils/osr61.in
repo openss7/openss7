@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: osr61.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/25 12:45:38 $
+# @(#) $RCSfile: osr61.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/06 23:31:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/25 12:45:38 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 23:31:45 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: osr61.in,v $
+# Revision 0.9.2.2  2007/03/06 23:31:45  brian
+# - correct naming of aliases
+#
 # Revision 0.9.2.1  2007/02/25 12:45:38  brian
 # - added new files for release package
 #
@@ -58,11 +61,12 @@
 prune modules.@PACKAGE_LCNAME@
 if -f /lib/modules/`uname -r`/modules.@PACKAGE_LCNAME@
 include /lib/modules/`uname -r`/modules.@PACKAGE_LCNAME@
-alias streams-dlgnDriver streams-dlgn
-alias streams-gncdfDriver streams-gncfd
-alias streams-gpioDriver streams-gpio
-alias streams-mercdDriver streams-mercd
-alias streams-dvbmDriver streams-dvbm
-alias streams-sctmrDriver streams-sctmr
+alias streams-dvbm streams-dvbmDriver
+alias streams-sctmr streams-sctmrDriver
+alias streams-dlgn streams-dlgnDriver
+alias streams-gncdf streams-gncfdDriver
+alias streams-gpio streams-gpioDriver
+alias streams-mercd streams-mercdDriver
+alias mercd streams-mercdDriver
 endif
 
