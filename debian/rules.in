@@ -117,8 +117,8 @@ stitle = @PACKAGE_SHORTTITLE@
 kernel_version=@kversion@
 kernel_number=$(shell echo $(kversion) | sed -e s',-.*$,,')
 kernel_release=$(shell echo $(kversion) | sed -e s',-,.,g')
-core_name = core-$(VERSION)
-info_name = info-$(VERSION)
+core_name = core-$(kernel_version)
+info_name = info-$(kernel_version)
 majbase = @STRCONF_MAJBASE@
 makedev = @STRCONF_MAKEDEV@
 
@@ -237,7 +237,7 @@ binary-common:
 	dh_makeshlibs -v
 	dh_installdeb -v
 	dh_shlibdeps -v -X.ko -X.o
-	dh_gencontrol -v $(dversion)
+	dh_gencontrol -v
 	dh_md5sums -v
 	dh_builddeb -v
 
@@ -277,7 +277,7 @@ binary-$(PACKAGE_LCNAME)-%: install
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-$* binary-common
 
 get-orig-source:
-	wget http://www.openss7.org/tarballs/$(PACKAGE)-$(VERSION).tar.bz
+	wget http://www.openss7.org/tarballs/$(PACKAGE)-$(VERSION).tar.bz2
 
 .PHONY: build clean \
 	binary-indep binary-arch binary binary-lis binary-lfs binary-indep \

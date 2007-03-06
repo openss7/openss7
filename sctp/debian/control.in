@@ -8,13 +8,13 @@ Build-Depends: @kernel_source@-@kmajor@.@kminor@ | @kernel_headers@-@kmajor@.@km
  gzip (>= 1.3.2), texinfo (>= 4.0), tetex-base (>=1.0),
  tetex-bin (>=1.0), tetex-extra (>=1.0), gs (>= 6.51)
 
-Package: @PACKAGE_LCNAME@-core-@VERSION@
+Package: @PACKAGE_LCNAME@-core-@kversion@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-core, SCTP-core, SCTP-core-@VERSION@
-Conflicts: SCTP-core, SCTP-core-@VERSION@
-Replaces: SCTP-core, SCTP-core-@VERSION@
+Provides: @PACKAGE_LCNAME@-core, SCTP-core, SCTP-core-@kversion@
+Conflicts: SCTP-core, SCTP-core-@kversion@
+Replaces: SCTP-core, SCTP-core-@kversion@
 Depends: @kernel_image@-@kversion@ (= @krelease@),
  @PACKAGE_LCNAME@-init (= @VERSION@-@PACKAGE_DEBRELEASE@)
 Pre-Depends: @kernel_image@-@kversion@ (= @krelease@)
@@ -24,7 +24,7 @@ Description: Core kernel modules for @PACKAGE_TITLE@
  the kernel for which they were compiled: applies to kernel version
  @kversion@.
 
-Package: @PACKAGE_LCNAME@-info-@VERSION@
+Package: @PACKAGE_LCNAME@-info-@kversion@
 Architecture: any
 Section: base
 Priority: optional
