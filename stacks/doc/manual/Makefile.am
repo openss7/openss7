@@ -87,13 +87,17 @@ info_TEXINFOS		+= strss7.texi
 
 if WITH_XNET
 ## WITH_XNET
-info_TEXINFOS		+= libxnet.texi
+my_tex_infos		= libxnet.texi
 ## WITH_XNET
 endif
 
+info_TEXINFOS		+= $(my_tex_infos)
+
 EXTRA_info_TEXINFOS	= \
 			  strss7.texi \
-			  libxnet.texi \
+			  libxnet.texi
+
+strss7_TEXINFOS		= \
 			  configure.texi \
 			  descrip.texi \
 			  news.texi \
@@ -115,6 +119,16 @@ EXTRA_info_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/compat.texi \
 			  $(top_srcdir)/scripts/texi/mail.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
+
+libxnet_TEXINFOS	= \
+			  texi/args.texi \
+			  texi/fdl.texi \
+			  texi/gpl.texi \
+			  texi/lesser.texi \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/funding.texi
+			
 
 ## DEVELOPMENT
 endif
