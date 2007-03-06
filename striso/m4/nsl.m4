@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/04 23:26:40 $
+# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/06 23:13:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 23:13:57 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.18  2007/03/06 23:13:57  brian
+# - master build correction
+#
 # Revision 0.9.2.17  2007/03/04 23:26:40  brian
 # - corrected modversions directory
 #
@@ -229,11 +232,12 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    nsl_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strnsl/src/include}"
 	    nsl_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/strnsl/src/include}"
+	    nsl_inc="${os7_cv_master_builddir:+$os7_cv_master_builddir/strnsl/include}"
+	    nsl_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strnsl/src/include}"
 	    if test -d "$nsl_dir" ; then
 		AC_MSG_CHECKING([for nsl include directory... $nsl_dir $nsl_bld])
-		if test -d "$nsl_bld" -a -r "$nsl_dir/$nsl_what" ; then
+		if test -r "$nsl_dir/$nsl_what" ; then
 		    nsl_cv_includes="$nsl_bld $nsl_dir"
 		    nsl_cv_ldadd="$os7_cv_master_builddir/strnsl/libxnsl.la"
 		    nsl_cv_ldadd32="$os7_cv_master_builddir/strnsl/lib32/libxnsl.la"
@@ -261,13 +265,14 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	    do
 		if test -d "$nsl_dir" ; then
 		    nsl_bld=`echo $nsl_dir | sed -e "s|^$srcdir/|$nsl_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		    nsl_inc=`echo $nsl_bld/../../include |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    nsl_dir=`(cd $nsl_dir; pwd)`
 		    AC_MSG_CHECKING([for nsl include directory... $nsl_dir $nsl_bld])
 		    if test -d "$nsl_bld" -a -r "$nsl_dir/$nsl_what" ; then
-			nsl_cv_includes="$nsl_bld $nsl_dir"
+			nsl_cv_includes="$nsl_inc $nsl_bld $nsl_dir"
 			nsl_cv_ldadd=`echo "$nsl_bld/../../libxnsl.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			nsl_cv_ldadd32=`echo "$nsl_bld/../../lib32/libxnsl.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			nsl_cv_modversions= # `echo "$nsl_bld/../../include/sys/strnsl/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			nsl_cv_modversions= # `echo "$nsl_inc/include/sys/strnsl/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			nsl_cv_modmap= # `echo "$nsl_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			nsl_cv_symver= # `echo "$nsl_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			nsl_cv_manpath=`echo "$nsl_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

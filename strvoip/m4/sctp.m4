@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/04 23:26:40 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/06 23:13:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 23:13:57 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sctp.m4,v $
+# Revision 0.9.2.40  2007/03/06 23:13:57  brian
+# - master build correction
+#
 # Revision 0.9.2.39  2007/03/04 23:26:40  brian
 # - corrected modversions directory
 #
@@ -215,12 +218,13 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    sctp_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strsctp/src/include}"
 	    sctp_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/strsctp/src/include}"
+	    sctp_inc="${os7_cv_master_builddir:+$os7_cv_master_builddir/strsctp/include}"
+	    sctp_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strsctp/src/include}"
 	    if test -d "$sctp_dir" ; then
 		AC_MSG_CHECKING([for sctp include directory... $sctp_dir $sctp_bld])
-		if test -d "$sctp_bld" -a -r "$sctp_dir/$sctp_what" ; then
-		    sctp_cv_includes="$sctp_bld $sctp_dir"
+		if test -r "$sctp_dir/$sctp_what" ; then
+		    sctp_cv_includes="$sctp_inc $sctp_bld $sctp_dir"
 		    sctp_cv_ldadd= # "$os7_cv_master_builddir/strsctp/libsctp.la"
 		    sctp_cv_ldadd32= # "$os7_cv_master_builddir/strsctp/lib32/libsctp.la"
 		    sctp_cv_modversions="$os7_cv_master_builddir/strsctp/include/sys/strsctp/modversions.h"
@@ -247,13 +251,14 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	    do
 		if test -d "$sctp_dir" ; then
 		    sctp_bld=`echo $sctp_dir | sed -e "s|^$srcdir/|$sctp_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		    sctp_inc=`echo $sctp_bld/../../include |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    sctp_dir=`(cd $sctp_dir; pwd)`
 		    AC_MSG_CHECKING([for sctp include directory... $sctp_dir $sctp_bld])
 		    if test -d "$sctp_bld" -a -r "$sctp_dir/$sctp_what" ; then
-			sctp_cv_includes="$sctp_bld $sctp_dir"
+			sctp_cv_includes="$sctp_inc $sctp_bld $sctp_dir"
 			sctp_cv_ldadd= # `echo "$sctp_bld/../../libsctp.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sctp_cv_ldadd32= # `echo "$sctp_bld/../../lib32/libsctp.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			sctp_cv_modversions=`echo "$sctp_bld/../../include/sys/strsctp/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sctp_cv_modversions=`echo "$sctp_inc/sys/strsctp/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sctp_cv_modmap=`echo "$sctp_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sctp_cv_symver=`echo "$sctp_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sctp_cv_manpath=`echo "$sctp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

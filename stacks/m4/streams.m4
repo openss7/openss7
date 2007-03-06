@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2007/03/04 23:26:40 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2007/03/06 23:13:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 23:13:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -295,11 +295,11 @@ AC_DEFUN([_LINUX_STREAMS_LIS_CHECK_HEADERS], [dnl
 	if test :"${streams_cv_lis_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    streams_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/LiS/include}"
 	    streams_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/LiS/include}"
+	    streams_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/LiS/include}"
 	    if test -d "$streams_dir" ; then
 		AC_MSG_CHECKING([for streams lis include directory... $streams_dir $streams_bld])
-		if test -d "streams_bld" -a -r "$streams_dir/$streams_what" ; then
+		if test -r "$streams_dir/$streams_what" ; then
 		    streams_cv_lis_includes="$streams_dir $streams_bld"
 		    streams_cv_lis_ldadd="$os7_cv_master_builddir/LiS/libLiS.la"
 		    streams_cv_lis_ldadd32="$os7_cv_master_builddir/LiS/lib32/libLiS.la"
@@ -620,11 +620,11 @@ AC_DEFUN([_LINUX_STREAMS_LFS_CHECK_HEADERS], [dnl
 	if test :"${streams_cv_lfs_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    streams_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/streams/include}"
 	    streams_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/streams/include}"
+	    streams_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/streams/include}"
 	    if test -d "$streams_dir" ; then
 		AC_MSG_CHECKING([for streams lfs include directory... $streams_dir $streams_bld])
-		if test -d "$streams_bld" -a -r "$streams_dir/$streams_what" ; then
+		if test -r "$streams_dir/$streams_what" ; then
 		    streams_cv_lfs_includes="$streams_bld $streams_dir"
 		    streams_cv_lfs_ldadd="$os7_cv_master_builddir/streams/libstreams.la"
 		    streams_cv_lfs_ldadd32="$os7_cv_master_builddir/streams/lib32/libstreams.la"

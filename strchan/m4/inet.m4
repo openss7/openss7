@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/04 23:26:40 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/03/06 23:13:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 23:13:56 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: inet.m4,v $
+# Revision 0.9.2.41  2007/03/06 23:13:56  brian
+# - master build correction
+#
 # Revision 0.9.2.40  2007/03/04 23:26:40  brian
 # - corrected modversions directory
 #
@@ -215,12 +218,13 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    inet_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strinet/src/includes}"
-	    inet_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/strinet/src/includes}"
+	    inet_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/strinet/src/include}"
+	    inet_inc="${os7_cv_master_builddir:+$os7_cv_master_builddir/strinet/include}"
+	    inet_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strinet/src/include}"
 	    if test -d "$inet_dir" ; then
 		AC_MSG_CHECKING([for inet include directory... $inet_dir $inet_bld])
-		if test -d "$inet_bld" -a -r "$inet_dir/$inet_what" ; then
-		    inet_cv_includes="$inet_bld $inet_dir"
+		if test -r "$inet_dir/$inet_what" ; then
+		    inet_cv_includes="$inet_inc $inet_bld $inet_dir"
 		    inet_cv_ldadd= # "$os7_cv_master_builddir/strinet/libinet.la"
 		    inet_cv_ldadd32= # "$os7_cv_master_builddir/strinet/lib32/libinet.la"
 		    inet_cv_modversions="$os7_cv_master_builddir/strinet/include/sys/strinet/modversions.h"
@@ -247,13 +251,14 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    do
 		if test -d "$inet_dir" ; then
 		    inet_bld=`echo $inet_dir | sed -e "s|^$srcdir/|$inet_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		    inet_inc=`echo $inet_bld/../../include |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    inet_dir=`(cd $inet_dir; pwd)`
 		    AC_MSG_CHECKING([for inet include directory... $inet_dir $inet_bld])
 		    if test -d "$inet_bld" -a -r "$inet_dir/$inet_what" ; then
-			inet_cv_includes="$inet_bld $inet_dir"
+			inet_cv_includes="$inet_inc $inet_bld $inet_dir"
 			inet_cv_ldadd= # `echo "$inet_bld/../../libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			inet_cv_ldadd32= # `echo "$inet_bld/../../lib32/libinet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			inet_cv_modversions=`echo "$inet_bld/../../include/sys/strinet/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			inet_cv_modversions=`echo "$inet_inc/sys/strinet/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			inet_cv_modmap=`echo "$inet_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			inet_cv_symver=`echo "$inet_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			inet_cv_manpath=`echo "$inet_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

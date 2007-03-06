@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/04 23:26:40 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/06 23:13:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 23:13:57 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.13  2007/03/06 23:13:57  brian
+# - master build correction
+#
 # Revision 0.9.2.12  2007/03/04 23:26:40  brian
 # - corrected modversions directory
 #
@@ -205,12 +208,13 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    iso_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/striso/src/include}"
 	    iso_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/striso/src/include}"
+	    iso_inc="${os7_cv_master_builddir:+$os7_cv_master_builddir/striso/include}"
+	    iso_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/striso/src/include}"
 	    if test -d "$iso_dir" ; then
 		AC_MSG_CHECKING([for iso include directory... $iso_dir $iso_bld])
-		if test -d "$iso_bld" -a -r "$iso_dir/$iso_what" ; then
-		    iso_cv_includes="$iso_bld $iso_dir"
+		if test -r "$iso_dir/$iso_what" ; then
+		    iso_cv_includes="$iso_inc $iso_bld $iso_dir"
 		    iso_cv_ldadd= # "$os7_cv_master_builddir/striso/libiso.la"
 		    iso_cv_ldadd32= # "$os7_cv_master_builddir/striso/lib32/libiso.la"
 		    iso_cv_modversions="$os7_cv_master_builddir/striso/include/sys/striso/modversions.h"
@@ -237,13 +241,14 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 	    do
 		if test -d "$iso_dir" ; then
 		    iso_bld=`echo $iso_dir | sed -e "s|^$srcdir/|$iso_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		    iso_inc=`echo $iso_bld/../../include |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    iso_dir=`(cd $iso_dir; pwd)`
 		    AC_MSG_CHECKING([for iso include directory... $iso_dir $iso_bld])
 		    if test -d "$iso_bld" -a -r "$iso_dir/$iso_what" ; then
-			iso_cv_includes="$iso_bld $iso_dir"
+			iso_cv_includes="$iso_inc $iso_bld $iso_dir"
 			iso_cv_ldadd= # `echo "$iso_bld/../../libiso.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			iso_cv_ldadd32= # `echo "$iso_bld/../../lib32/libiso.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			iso_cv_modversions=`echo "$iso_bld/../../include/sys/striso/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			iso_cv_modversions=`echo "$iso_inc/include/sys/striso/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			iso_cv_modmap=`echo "$iso_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			iso_cv_symver=`echo "$iso_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			iso_cv_manpath=`echo "$iso_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

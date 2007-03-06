@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/04 23:26:40 $
+# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/06 23:13:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 23:13:56 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.12  2007/03/06 23:13:56  brian
+# - master build correction
+#
 # Revision 0.9.2.11  2007/03/04 23:26:40  brian
 # - corrected modversions directory
 #
@@ -200,12 +203,13 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    chan_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strchan/src/include}"
 	    chan_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/strchan/src/include}"
+	    chan_inc="${os7_cv_master_builddir:+$os7_cv_master_builddir/strchan/include}"
+	    chan_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strchan/src/include}"
 	    if test -d "$chan_dir" ; then
 		AC_MSG_CHECKING([for chan include directory... $chan_dir $chan_bld])
-		if test -d "$chan_bld" -a -r "$chan_dir/$chan_what" ; then
-		    chan_cv_includes="$chan_bld $chan_dir"
+		if test -r "$chan_dir/$chan_what" ; then
+		    chan_cv_includes="$chan_inc $chan_bld $chan_dir"
 		    chan_cv_ldadd= # "$os7_cv_master_builddir/strchan/libchan.la"
 		    chan_cv_ldadd32= # "$os7_cv_master_builddir/strchan/lib32/libchan.la"
 		    chan_cv_modversions="$os7_cv_master_builddir/strchan/include/sys/strchan/modversions.h"
@@ -232,13 +236,14 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 	    do
 		if test -d "$chan_dir" ; then
 		    chan_bld=`echo $chan_dir | sed -e "s|^$srcdir/|$chan_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		    chan_inc=`echo $chan_bld/../../include |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    chan_dir=`(cd $chan_dir; pwd)`
 		    AC_MSG_CHECKING([for chan include directory... $chan_dir $chan_bld])
 		    if test -d "$chan_bld" -a -r "$chan_dir/$chan_what" ; then
-			chan_cv_includes="$chan_bld $chan_dir"
+			chan_cv_includes="$chan_inc $chan_bld $chan_dir"
 			chan_cv_ldadd= # `echo "$chan_bld/../../libchan.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			chan_cv_ldadd32= # `echo "$chan_bld/../../lib32/libchan.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			chan_cv_modversions=`echo "$chan_bld/../../include/sys/strchan/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			chan_cv_modversions=`echo "$chan_inc/include/sys/strchan/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			chan_cv_modmap=`echo "$chan_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			chan_cv_symver=`echo "$chan_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			chan_cv_manpath=`echo "$chan_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
