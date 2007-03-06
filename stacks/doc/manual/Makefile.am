@@ -93,10 +93,6 @@ endif
 
 info_TEXINFOS		+= $(my_tex_infos)
 
-EXTRA_info_TEXINFOS	= \
-			  strss7.texi \
-			  libxnet.texi
-
 strss7_TEXINFOS		= \
 			  configure.texi \
 			  descrip.texi \
@@ -129,6 +125,10 @@ libxnet_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 			
+
+EXTRA_info_TEXINFOS	= \
+			  $(strss7_TEXINFOS) \
+			  $(libxnet_TEXINFOS)
 
 ## DEVELOPMENT
 endif
