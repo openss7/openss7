@@ -2,7 +2,7 @@
 # @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/04 10:02:23 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/06 21:23:50 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/03/04 10:02:23 $ by $Author: brian $
+## Last Modified $Date: 2007/03/06 21:23:50 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -470,6 +470,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.9  2007/03/06 21:23:50  brian
+# - final updates and corrections to build process for release
+#
 # Revision 0.9.2.8  2007/03/04 10:02:23  brian
 # - updates for release, do not propagate empty flags, build improvements
 #
