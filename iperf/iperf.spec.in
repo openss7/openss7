@@ -318,7 +318,6 @@ and install well for other architectures.  This SRPM builds the
 following binary packages:
 - %{name}-openss7 -- %{title} for OpenSS7 SCTP
 - %{name}-lib -- run-time libraries.
-- %{name}-util -- admin utilities.
 - %{name}-devel -- headers, libs and docs.
 - %{name}-test -- test utilities.
 - %{name}-doc -- manpages, manuals and docs.
@@ -513,7 +512,6 @@ should build and install for other architectures as well.
 Summary:        %{title} test utilities.
 Group:          System Environment/Base
 Prefix:         %{_pkglibexecdir}
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-tests
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
