@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/09/18 01:18:35 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -45,34 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:18:35 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.31  2006/09/18 01:18:35  brian
-# - updated documentation and include file makefiles
-#
-# Revision 0.9.2.30  2006/08/27 12:26:38  brian
-# - finalizing auto release files
-#
-# Revision 0.9.2.29  2006/08/26 14:46:32  brian
-# - update todo documentation
-#
-# Revision 0.9.2.28  2006/08/26 09:16:47  brian
-# - better release file generation
-#
-# Revision 0.9.2.27  2006/08/22 12:44:09  brian
-# - documentation updates
-#
-# Revision 0.9.2.26  2006/03/20 13:50:26  brian
-# - get automake to run clean
-#
-# Revision 0.9.2.25  2006/03/20 13:36:25  brian
-# - added checks for Development
-#
-# Revision 0.9.2.24  2006/03/06 11:38:13  brian
-# - updated headers
+# Last Modified $Date$ by $Author$
 #
 # =============================================================================
 
@@ -127,4 +100,32 @@ endif
 
 include ../../am/info.am
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.31  2006/09/18 01:18:35  brian
+# - updated documentation and include file makefiles
+#
+# Revision 0.9.2.30  2006/08/27 12:26:38  brian
+# - finalizing auto release files
+#
+# Revision 0.9.2.29  2006/08/26 14:46:32  brian
+# - update todo documentation
+#
+# Revision 0.9.2.28  2006/08/26 09:16:47  brian
+# - better release file generation
+#
+# Revision 0.9.2.27  2006/08/22 12:44:09  brian
+# - documentation updates
+#
+# Revision 0.9.2.26  2006/03/20 13:50:26  brian
+# - get automake to run clean
+#
+# Revision 0.9.2.25  2006/03/20 13:36:25  brian
+# - added checks for Development
+#
+# Revision 0.9.2.24  2006/03/06 11:38:13  brian
+# - updated headers
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

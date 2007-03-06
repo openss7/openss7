@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2006/10/02 11:32:23 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -45,9 +45,62 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/02 11:32:23 $ by $Author: brian $
+# Last Modified $Date$ by $Author$
 #
-# -----------------------------------------------------------------------------
+# =============================================================================
+
+include ../../am/openss7.am
+
+info_TEXINFOS		=
+
+if DEVELOPMENT
+## DEVELOPMENT
+
+info_TEXINFOS		+= strxnet.texi libxnet.texi
+
+strxnet_TEXINFOS	= \
+			  configure.texi \
+			  descrip.texi \
+			  news.texi \
+			  prerequisites.texi \
+			  releases.texi \
+			  rpm.texi \
+			  todo.texi \
+			  tree.texi \
+			  bugs.texi \
+			  texi/args.texi \
+			  texi/fdl.texi \
+			  texi/gpl.texi \
+			  texi/uitpi.texi \
+			  texi/quick.texi \
+			  texi/install.texi \
+			  texi/testsuite.texi \
+			  texi/lesser.texi \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/compat.texi \
+			  $(top_srcdir)/scripts/texi/mail.texi \
+			  $(top_srcdir)/scripts/texi/funding.texi
+
+libxnet_TEXINFOS	= \
+			  texi/args.texi \
+			  texi/fdl.texi \
+			  texi/lesser.texi \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/funding.texi
+
+EXTRA_info_TEXINFOS	= \
+			  $(info_TEXINFOS) \
+			  $(strxnet_TEXINFOS) \
+			  $(libxnet_TEXINFOS)
+
+## DEVELOPMENT
+endif
+
+include ../../am/info.am
+
+# =============================================================================
 #
 # $Log: Makefile.am,v $
 # Revision 0.9.2.28  2006/10/02 11:32:23  brian
@@ -96,43 +149,4 @@
 # - updated headers
 #
 # =============================================================================
-
-include ../../am/openss7.am
-
-info_TEXINFOS		=
-
-if DEVELOPMENT
-## DEVELOPMENT
-
-info_TEXINFOS		+= strxnet.texi libxnet.texi
-
-EXTRA_info_TEXINFOS	= \
-			  configure.texi \
-			  descrip.texi \
-			  news.texi \
-			  prerequisites.texi \
-			  releases.texi \
-			  rpm.texi \
-			  todo.texi \
-			  tree.texi \
-			  bugs.texi \
-			  texi/args.texi \
-			  texi/fdl.texi \
-			  texi/gpl.texi \
-			  texi/uitpi.texi \
-			  texi/quick.texi \
-			  texi/install.texi \
-			  texi/testsuite.texi \
-			  texi/lesser.texi \
-			  $(top_srcdir)/scripts/texi/macros.texi \
-			  $(top_srcdir)/scripts/texi/versions.texi \
-			  $(top_srcdir)/scripts/texi/compat.texi \
-			  $(top_srcdir)/scripts/texi/mail.texi \
-			  $(top_srcdir)/scripts/texi/funding.texi
-
-## DEVELOPMENT
-endif
-
-include ../../am/info.am
-
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/08/26 09:17:13 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -45,9 +45,44 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/26 09:17:13 $ by $Author: brian $
+# Last Modified $Date$ by $Author$
 #
-# -----------------------------------------------------------------------------
+# =============================================================================
+
+include ../../../am/openss7.am
+
+info_TEXINFOS		=
+
+if DEVELOPMENT
+## DEVELOPMENT
+
+info_TEXINFOS		+= mapi.texi
+
+mapi_TEXINFOS	= \
+			  texi/args.texi \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/fdl.texi
+
+EXTRA_info_TEXINFOS	= \
+			  $(info_TEXINFOS) \
+			  $(mapi_TEXINFOS)
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
+FIG_FIGS		= \
+			mapi_fig.fig
+
+## PKG_BUILD_INDEP
+endif
+
+## DEVELOPMENT
+endif
+
+include ../../../am/info.am
+
+# =============================================================================
 #
 # $Log: Makefile.am,v $
 # Revision 0.9.2.13  2006/08/26 09:17:13  brian
@@ -66,34 +101,4 @@
 # - updated headers
 #
 # =============================================================================
-
-include ../../../am/openss7.am
-
-info_TEXINFOS		=
-
-if DEVELOPMENT
-## DEVELOPMENT
-
-info_TEXINFOS		+= mapi.texi
-
-EXTRA_info_TEXINFOS	= \
-			  texi/args.texi \
-			  $(top_srcdir)/scripts/texi/macros.texi \
-			  $(top_srcdir)/scripts/texi/versions.texi \
-			  $(top_srcdir)/scripts/texi/fdl.texi
-
-if PKG_BUILD_INDEP
-## PKG_BUILD_INDEP
-
-FIG_FIGS		= \
-			mapi_fig.fig
-
-## PKG_BUILD_INDEP
-endif
-
-## DEVELOPMENT
-endif
-
-include ../../../am/info.am
-
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

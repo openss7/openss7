@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/08/26 09:16:55 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -45,34 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/26 09:16:55 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.15  2006/08/26 09:16:55  brian
-# - better release file generation
-#
-# Revision 0.9.2.14  2006/08/22 12:44:10  brian
-# - documentation updates
-#
-# Revision 0.9.2.13  2006/05/01 14:19:22  brian
-# - updating LAB document
-#
-# Revision 0.9.2.12  2006/04/30 15:26:27  brian
-# - updated LAB document
-#
-# Revision 0.9.2.11  2006/04/29 21:30:19  brian
-# - added UNT lab project documentation
-#
-# Revision 0.9.2.10  2006/03/20 13:50:27  brian
-# - get automake to run clean
-#
-# Revision 0.9.2.9  2006/03/20 13:36:26  brian
-# - added checks for Development
-#
-# Revision 0.9.2.8  2006/03/06 11:38:14  brian
-# - updated headers
+# Last Modified $Date$ by $Author$
 #
 # =============================================================================
 
@@ -85,11 +58,27 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= lab.texi hlr.texi voip.texi
 
-EXTRA_info_TEXINFOS	= \
+lab_TEXINFOS		= \
 			  texi/args.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
-			  $(top_srcdir)/scripts/texi/versions.texi \
-			  $(top_srcdir)/scripts/texi/fdl.texi
+			  $(top_srcdir)/scripts/texi/versions.texi
+
+hlr_TEXINFOS		= \
+			  texi/args.texi \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi
+
+voip_TEXINFOS		= \
+			  texi/args.texi \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi
+
+EXTRA_info_TEXINFOS	= \
+			  $(info_TEXINFOS) \
+			  $(lab_TEXINFOS) \
+			  $(hlr_TEXINFOS) \
+			  $(voip_TEXINFOS)
+
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
@@ -207,4 +196,32 @@ endif
 
 include ../../am/info.am
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.15  2006/08/26 09:16:55  brian
+# - better release file generation
+#
+# Revision 0.9.2.14  2006/08/22 12:44:10  brian
+# - documentation updates
+#
+# Revision 0.9.2.13  2006/05/01 14:19:22  brian
+# - updating LAB document
+#
+# Revision 0.9.2.12  2006/04/30 15:26:27  brian
+# - updated LAB document
+#
+# Revision 0.9.2.11  2006/04/29 21:30:19  brian
+# - added UNT lab project documentation
+#
+# Revision 0.9.2.10  2006/03/20 13:50:27  brian
+# - get automake to run clean
+#
+# Revision 0.9.2.9  2006/03/20 13:36:26  brian
+# - added checks for Development
+#
+# Revision 0.9.2.8  2006/03/06 11:38:14  brian
+# - updated headers
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

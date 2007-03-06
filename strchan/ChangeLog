@@ -1,3 +1,7 @@
+2007-03-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/Makefile.am: attempt proper texinfo dependencies
+
 2007-03-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/zaptel.9.man: updates to pass check target

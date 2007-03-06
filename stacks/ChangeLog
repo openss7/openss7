@@ -1,3 +1,15 @@
+2007-03-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/Makefile.am: attempt proper texinfo dependencies
+	* doc/projects/Makefile.am: attempt proper texinfo dependencies
+	* doc/specs/cci/Makefile.am: attempt proper texinfo dependencies
+	* doc/specs/dlpi/Makefile.am: attempt proper texinfo dependencies
+	* doc/specs/mapi/Makefile.am: attempt proper texinfo dependencies
+	* doc/specs/npi/Makefile.am: attempt proper texinfo dependencies
+	* doc/specs/tci/Makefile.am: attempt proper texinfo dependencies
+	* doc/specs/tpi/Makefile.am: attempt proper texinfo dependencies
+	* doc/specs/tri/Makefile.am: attempt proper texinfo dependencies
+
 2007-03-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/Makefile.am: try to correct libxnet inclusion

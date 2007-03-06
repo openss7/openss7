@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.16 $) $Date: 2006/09/18 01:18:30 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -45,9 +45,54 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:18:30 $ by $Author: brian $
+# Last Modified $Date$ by $Author$
 #
-# -----------------------------------------------------------------------------
+# =============================================================================
+
+
+include ../am/openss7.am
+
+info_TEXINFOS		=
+
+if DEVELOPMENT
+## DEVELOPMENT
+
+info_TEXINFOS		+= LiS.texi
+
+LiS_TEXINFOS		= \
+			  configure.texi \
+			  descrip.texi \
+			  install.texi \
+			  news.texi \
+			  prerequisites.texi \
+			  releases.texi \
+			  rpm.texi \
+			  todo.texi \
+			  tree.texi \
+			  bugs.texi \
+			  texi/args.texi \
+			  texi/fdl.texi \
+			  texi/gpl.texi \
+			  texi/quick.texi \
+			  texi/install.texi \
+			  texi/lesser.texi \
+			  texi/testsuite.texi \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/compat.texi \
+			  $(top_srcdir)/scripts/texi/mail.texi \
+			  $(top_srcdir)/scripts/texi/funding.texi
+
+EXTRA_info_TEXINFOS	= \
+			  $(info_TEXINFOS) \
+			  $(LiS_TEXINFOS)
+
+## DEVELOPMENT
+endif
+
+include ../am/info.am
+
+# =============================================================================
 #
 # $Log: Makefile.am,v $
 # Revision 1.1.6.16  2006/09/18 01:18:30  brian
@@ -81,43 +126,4 @@
 # - updated headers
 #
 # =============================================================================
-
-include ../am/openss7.am
-
-info_TEXINFOS		=
-
-if DEVELOPMENT
-## DEVELOPMENT
-
-info_TEXINFOS		+= LiS.texi
-
-EXTRA_info_TEXINFOS	= \
-			  configure.texi \
-			  descrip.texi \
-			  install.texi \
-			  news.texi \
-			  prerequisites.texi \
-			  releases.texi \
-			  rpm.texi \
-			  todo.texi \
-			  tree.texi \
-			  bugs.texi \
-			  texi/args.texi \
-			  texi/fdl.texi \
-			  texi/gpl.texi \
-			  texi/quick.texi \
-			  texi/install.texi \
-			  texi/lesser.texi \
-			  texi/testsuite.texi \
-			  $(top_srcdir)/scripts/texi/macros.texi \
-			  $(top_srcdir)/scripts/texi/versions.texi \
-			  $(top_srcdir)/scripts/texi/compat.texi \
-			  $(top_srcdir)/scripts/texi/mail.texi \
-			  $(top_srcdir)/scripts/texi/funding.texi
-
-## DEVELOPMENT
-endif
-
-include ../am/info.am
-
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

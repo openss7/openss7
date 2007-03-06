@@ -1,3 +1,8 @@
+2007-03-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/Makefile.am: attempt proper texinfo dependencies
+	* doc/specs/tpi/Makefile.am: attempt proper texinfo dependencies
+
 2007-03-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: correct version numbers

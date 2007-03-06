@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/13 07:57:35 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -45,13 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/13 07:57:35 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.1  2006/10/13 07:57:35  brian
-# - added initial STREAMS Channel package
+# Last Modified $Date$ by $Author$
 #
 # =============================================================================
 
@@ -64,7 +58,7 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= strchan.texi
 
-EXTRA_info_TEXINFOS	= \
+strchan_TEXINFOS	= \
 			  configure.texi \
 			  descrip.texi \
 			  news.texi \
@@ -88,9 +82,20 @@ EXTRA_info_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/mail.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
+EXTRA_info_TEXINFOS	= \
+			  $(info_TEXINFOS) \
+			  $(strchan_TEXINFOS)
+
 ## DEVELOPMENT
 endif
 
 include ../../am/info.am
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.1  2006/10/13 07:57:35  brian
+# - added initial STREAMS Channel package
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
