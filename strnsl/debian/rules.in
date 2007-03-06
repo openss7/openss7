@@ -117,8 +117,8 @@ stitle = @PACKAGE_SHORTTITLE@
 kernel_version=@kversion@
 kernel_number=$(shell echo $(kversion) | sed -e s',-.*$,,')
 kernel_release=$(shell echo $(kversion) | sed -e s',-,.,g')
-core_name = core-$(VERSION)
-info_name = info-$(VERSION)
+core_name = core-$(kernel_version)
+info_name = info-$(kernel_version)
 majbase = @STRCONF_MAJBASE@
 makedev = @STRCONF_MAKEDEV@
 
@@ -263,7 +263,7 @@ debian/$(PACKAGE_LCNAME)-devel.install:
 	  [ ! -d $(debtmpdir)$(libdir) ] 	|| echo '$(debtmpdir)$(libdir)/*.a' ) \
 	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
-control	+= debian/$(PACKAGE_LCNAME)-source.install
+#control	+= debian/$(PACKAGE_LCNAME)-source.install
 
 debian/$(PACKAGE_LCNAME)-source.install:
 	echo './$(PACKAGE)-$(VERSION)/ usr/src' > $@;
@@ -395,22 +395,22 @@ binary-common:
 	dh_makeshlibs -v
 	dh_installdeb -v
 	dh_shlibdeps -v -X.ko -X.o -L strnsl-lib -l debian/strnsl-lib/usr/lib
-	dh_gencontrol -v $(dversion)
+	dh_gencontrol -v
 	dh_md5sums -v
 	dh_builddeb -v
 
 binary-lis:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-#	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-$(core_name) dversion='-- -v$(krelease)' binary-common
-#@WITH_KO_MODULES_FALSE@	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-$(info_name) dversion='-- -v$(krelease)' binary-common
+#	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-$(core_name) binary-common
+#@WITH_KO_MODULES_FALSE@	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-$(info_name) binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-util binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-lib binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-devel binary-common
 
 binary-lfs:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-#	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-$(core_name) dversion='-- -v$(krelease)' binary-common
-#@WITH_KO_MODULES_FALSE@	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-$(info_name) dversion='-- -v$(krelease)' binary-common
+#	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-$(core_name) binary-common
+#@WITH_KO_MODULES_FALSE@	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-$(info_name) binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-util binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-lib binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-devel binary-common
@@ -460,7 +460,7 @@ binary-$(PACKAGE_LCNAME)-%: install
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-$* binary-common
 
 get-orig-source:
-	wget http://www.openss7.org/tarballs/$(PACKAGE)-$(VERSION).tar.bz
+	wget http://www.openss7.org/tarballs/$(PACKAGE)-$(VERSION).tar.bz2
 
 .PHONY: build clean \
 	binary-indep binary-arch binary binary-lis binary-lfs binary-indep \
