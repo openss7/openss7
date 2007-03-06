@@ -8,16 +8,16 @@ Build-Depends: @kernel_source@-@kmajor@.@kminor@ | @kernel_headers@-@kmajor@.@km
  gzip (>= 1.3.2), texinfo (>= 4.0), tetex-base (>=1.0),
  tetex-bin (>=1.0), tetex-extra (>=1.0), gs (>= 6.51)
 
-Package: @PACKAGE_LCNAME@-lis-core-@VERSION@
+Package: @PACKAGE_LCNAME@-lis-core-@kversion@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-core-@VERSION@
-Conflicts: @PACKAGE_LCNAME@-core-@VERSION@
-Replaces: @PACKAGE_LCNAME@-core-@VERSION@
-Depends: @kernel_image@-@kversion@ (= @krelease@), lis-core-@STREAMS_VERSION@ (= @krelease@),
+Provides: @PACKAGE_LCNAME@-core-@kversion@
+Conflicts: @PACKAGE_LCNAME@-core-@kversion@
+Replaces: @PACKAGE_LCNAME@-core-@kversion@
+Depends: @kernel_image@-@kversion@ (= @krelease@), lis-core-@kversion@ (= @STREAMS_VERSION@),
  @PACKAGE_LCNAME@-init (= @VERSION@-@PACKAGE_DEBRELEASE@)
-Pre-Depends: @kernel_image@-@kversion@ (= @krelease@), lis-core-@STREAMS_VERSION@ (= @krelease@)
+Pre-Depends: @kernel_image@-@kversion@ (= @krelease@), lis-core-@kversion@ (= @STREAMS_VERSION@)
 Description: Core Linux Fast-STREAMS kernel modules for @PACKAGE_TITLE@
  Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for Linux
  Fast-STREAMS.  Includes assorted Linux Fast-STREAMS drivers and
@@ -26,16 +26,16 @@ Description: Core Linux Fast-STREAMS kernel modules for @PACKAGE_TITLE@
  version @kversion@ and requires an Linux Fast-STREAMS package
  compiled for the same kernel.
 
-Package: @PACKAGE_LCNAME@-streams-core-@VERSION@
+Package: @PACKAGE_LCNAME@-streams-core-@kversion@
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-core-@VERSION@
-Conflicts: @PACKAGE_LCNAME@-core-@VERSION@
-Replaces: @PACKAGE_LCNAME@-core-@VERSION@
-Depends: @kernel_image@-@kversion@ (= @krelease@), streams-core-@STREAMS_VERSION@ (= @krelease@),
+Provides: @PACKAGE_LCNAME@-core-@kversion@
+Conflicts: @PACKAGE_LCNAME@-core-@kversion@
+Replaces: @PACKAGE_LCNAME@-core-@kversion@
+Depends: @kernel_image@-@kversion@ (= @krelease@), streams-core-@kversion@ (= @STREAMS_VERSION@),
  @PACKAGE_LCNAME@-init (= @VERSION@-@PACKAGE_DEBRELEASE@)
-Pre-Depends: @kernel_image@-@kversion@ (= @krelease@), streams-core-@STREAMS_VERSION@ (= @krelease@)
+Pre-Depends: @kernel_image@-@kversion@ (= @krelease@), streams-core-@kversion@ (= @STREAMS_VERSION@)
 Description: Core STREAMS kernel modules for @PACKAGE_TITLE@
  Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for STREAMS.
  Includes assorted STREAMS drivers and modules for
@@ -43,6 +43,36 @@ Description: Core STREAMS kernel modules for @PACKAGE_TITLE@
  kernel for which they were compiled: applies to kernel version
  @kversion@ and requires an STREAMS package compiled for the same
  kernel.
+
+Package: @PACKAGE_LCNAME@-lis-info-@kversion@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_LCNAME@-info-@kversion@
+Conflicts: @PACKAGE_LCNAME@-info-@kversion@
+Replaces: @PACKAGE_LCNAME@-info-@kversion@
+Depends: @kernel_image@-@kversion@ (= @krelease@)
+Description: Kernel module versions for @PACKAGE_TITLE@
+ Kernel modules symbol information for development of kernel modules
+ against the core kernel modules included in the @PACKAGE_LCNAME@-core package.
+ Symbol information is tied to the core kernel modules and kernel for
+ which they were compiled:  these apply to core kernel modules
+ @PACKAGE_LCNAME@-core-@kversion@ for kernel version @kversion@.
+
+Package: @PACKAGE_LCNAME@-streams-info-@kversion@
+Architecture: any
+Section: base
+Priority: optional
+Provides: @PACKAGE_LCNAME@-info-@kversion@
+Conflicts: @PACKAGE_LCNAME@-info-@kversion@
+Replaces: @PACKAGE_LCNAME@-info-@kversion@
+Depends: @kernel_image@-@kversion@ (= @krelease@)
+Description: Kernel module versions for @PACKAGE_TITLE@
+ Kernel modules symbol information for development of kernel modules
+ against the core kernel modules included in the @PACKAGE_LCNAME@-core package.
+ Symbol information is tied to the core kernel modules and kernel for
+ which they were compiled:  these apply to core kernel modules
+ @PACKAGE_LCNAME@-core-@kversion@ for kernel version @kversion@.
 
 Package: @PACKAGE_LCNAME@-lis-util
 Architecture: any
