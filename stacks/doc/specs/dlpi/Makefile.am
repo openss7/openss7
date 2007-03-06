@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/06 21:26:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/06 22:08:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 21:26:14 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 22:08:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,11 +58,10 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= dlpi.texi
 
-dlpi_TEXINFOS	= \
+dlpi_TEXINFOS		= \
 			  texi/args.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
-			  $(top_srcdir)/scripts/texi/versions.texi \
-			  $(top_srcdir)/scripts/texi/fdl.texi
+			  $(top_srcdir)/scripts/texi/versions.texi
 
 EXTRA_info_TEXINFOS	= \
 			  $(info_TEXINFOS) \
@@ -141,6 +140,12 @@ include ../../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.12  2007/03/06 22:08:10  brian
+# - fix merge
+#
+# Revision 0.9.2.11  2007/03/06 21:47:18  brian
+# - final updates and corrections to build process for release
+#
 # Revision 0.9.2.10  2007/03/06 21:26:14  brian
 # - final updates and corrections to build process for release
 #
