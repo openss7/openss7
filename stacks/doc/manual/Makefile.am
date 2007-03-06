@@ -92,6 +92,8 @@ info_TEXINFOS		+= libxnet.texi
 endif
 
 EXTRA_info_TEXINFOS	= \
+			  strss7.texi \
+			  libxnet.texi \
 			  configure.texi \
 			  descrip.texi \
 			  news.texi \
