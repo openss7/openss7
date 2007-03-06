@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/02/17 02:49:06 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/06 21:26:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/17 02:49:06 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 21:26:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.40  2007/03/06 21:26:10  brian
+# - final updates and corrections to build process for release
+#
 # Revision 0.9.2.39  2007/02/17 02:49:06  brian
 # - first clean recompile of MTP modules on LFS
 #
