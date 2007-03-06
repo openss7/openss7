@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/08/26 09:17:20 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -45,25 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/26 09:17:20 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.13  2006/08/26 09:17:20  brian
-# - better release file generation
-#
-# Revision 0.9.2.12  2006/08/22 12:44:19  brian
-# - documentation updates
-#
-# Revision 0.9.2.11  2006/03/20 13:50:30  brian
-# - get automake to run clean
-#
-# Revision 0.9.2.10  2006/03/20 13:36:29  brian
-# - added checks for Development
-#
-# Revision 0.9.2.9  2006/03/06 11:38:19  brian
-# - updated headers
+# Last Modified $Date$ by $Author$
 #
 # =============================================================================
 
@@ -76,11 +58,15 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= tci.texi
 
-EXTRA_info_TEXINFOS	= \
+tci_TEXINFOS		= \
 			  texi/args.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/fdl.texi
+
+EXTRA_info_TEXINFOS	= \
+			  $(info_TEXINFOS) \
+			  $(tci_TEXINFOS)
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
@@ -114,4 +100,23 @@ endif
 
 include ../../../am/info.am
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.13  2006/08/26 09:17:20  brian
+# - better release file generation
+#
+# Revision 0.9.2.12  2006/08/22 12:44:19  brian
+# - documentation updates
+#
+# Revision 0.9.2.11  2006/03/20 13:50:30  brian
+# - get automake to run clean
+#
+# Revision 0.9.2.10  2006/03/20 13:36:29  brian
+# - added checks for Development
+#
+# Revision 0.9.2.9  2006/03/06 11:38:19  brian
+# - updated headers
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

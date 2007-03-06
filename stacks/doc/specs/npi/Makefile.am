@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/08/26 09:17:16 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -45,31 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/26 09:17:16 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.13  2006/08/26 09:17:16  brian
-# - better release file generation
-#
-# Revision 0.9.2.12  2006/08/22 12:44:18  brian
-# - documentation updates
-#
-# Revision 0.9.2.11  2006/03/20 13:50:39  brian
-# - get automake to run clean
-#
-# Revision 0.9.2.10  2006/03/20 13:36:38  brian
-# - added checks for Development
-#
-# Revision 0.9.2.9  2006/03/07 00:44:54  brian
-# - removed double log lists
-#
-# Revision 0.9.2.8  2006/03/07 00:42:38  brian
-# - added log to headers
-#
-# Revision 0.9.2.7  2006/03/06 11:38:18  brian
-# - updated headers
+# Last Modified $Date$ by $Author$
 #
 # =============================================================================
 
@@ -82,11 +58,15 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= npi.texi
 
-EXTRA_info_TEXINFOS	= \
+npi_TEXINFOS		= \
 			  texi/args.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/fdl.texi
+
+EXTRA_info_TEXINFOS	= \
+			  $(info_TEXINFOS) \
+			  $(npi_TEXINFOS)
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
@@ -145,4 +125,29 @@ endif
 
 include ../../../am/info.am
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.13  2006/08/26 09:17:16  brian
+# - better release file generation
+#
+# Revision 0.9.2.12  2006/08/22 12:44:18  brian
+# - documentation updates
+#
+# Revision 0.9.2.11  2006/03/20 13:50:39  brian
+# - get automake to run clean
+#
+# Revision 0.9.2.10  2006/03/20 13:36:38  brian
+# - added checks for Development
+#
+# Revision 0.9.2.9  2006/03/07 00:44:54  brian
+# - removed double log lists
+#
+# Revision 0.9.2.8  2006/03/07 00:42:38  brian
+# - added log to headers
+#
+# Revision 0.9.2.7  2006/03/06 11:38:18  brian
+# - updated headers
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

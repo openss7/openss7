@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/09/18 01:18:40 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:18:40 $ by $Author: brian $
+# Last Modified $Date$ by $Author$
 #
 # =============================================================================
 
@@ -59,7 +59,7 @@ if DEVELOPMENT
 ## this must be literal
 info_TEXINFOS		+= striso.texi
 
-EXTRA_info_TEXINFOS	= \
+striso_TEXINFOS		= \
 			  configure.texi \
 			  descrip.texi \
 			  news.texi \
@@ -81,6 +81,10 @@ EXTRA_info_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/compat.texi \
 			  $(top_srcdir)/scripts/texi/mail.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
+
+EXTRA_info_TEXINFOS	= \
+			  $(info_TEXINFOS) \
+			  $(striso_TEXINFOS)
 
 ## DEVELOPMENT
 endif

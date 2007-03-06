@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/25 12:45:11 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,13 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/25 12:45:11 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.1  2007/02/25 12:45:11  brian
-# - added new files for release package
+# Last Modified $Date$ by $Author$
 #
 # =============================================================================
 
@@ -64,7 +58,7 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= osr61.texi
 
-EXTRA_info_TEXINFOS	= \
+osr61_TEXINFOS		= \
 			  configure.texi \
 			  descrip.texi \
 			  news.texi \
@@ -88,9 +82,20 @@ EXTRA_info_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/mail.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
+EXTRA_info_TEXINFOS	= \
+			  $(info_TEXINFOS) \
+			  $(osr61_TEXINFOS)
+
 ## DEVELOPMENT
 endif
 
 include ../../am/info.am
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.1  2007/02/25 12:45:11  brian
+# - added new files for release package
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

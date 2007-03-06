@@ -1,3 +1,10 @@
+2007-03-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* manual/Makefile.am: attempt proper texinfo dependencies
+
+2007-03-06  Brian Bidulock  <bidulock@openss7.org>
+
+
 2007-03-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* LiS.spec.in: do not build source package anymore

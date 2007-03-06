@@ -1,18 +1,17 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/10/02 11:31:15 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/02 11:31:15 $ by $Author: brian $
+# Last Modified $Date$ by $Author$
 #
 # =============================================================================
 
@@ -54,7 +53,12 @@ include ../../am/openss7.am
 
 info_TEXINFOS		=
 
-EXTRA_info_TEXINFOS	= \
+if DEVELOPMENT
+## DEVELOPMENT
+
+info_TEXINFOS		+= openss7.texi
+
+openss7_TEXINFOS	= \
 			  configure.texi \
 			  descrip.texi \
 			  install.texi \
@@ -85,10 +89,9 @@ EXTRA_info_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/mail.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
-if DEVELOPMENT
-## DEVELOPMENT
-
-info_TEXINFOS		+= openss7.texi
+EXTRA_info_TEXINFOS	= \
+			  $(info_TEXINFOS) \
+			  $(openss7_TEXINFOS)
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
@@ -103,4 +106,8 @@ endif
 
 include ../../am/info.am
 
+# =============================================================================
+#
+# $Log$
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

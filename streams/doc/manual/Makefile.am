@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/01/02 11:10:57 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -45,40 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/01/02 11:10:57 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.49  2007/01/02 11:10:57  brian
-# - removed porting manual from build (see strcompat)
-#
-# Revision 0.9.2.48  2006/09/18 01:18:38  brian
-# - updated documentation and include file makefiles
-#
-# Revision 0.9.2.47  2006/08/29 11:51:26  brian
-# - removed useless files
-#
-# Revision 0.9.2.46  2006/08/27 12:26:44  brian
-# - finalizing auto release files
-#
-# Revision 0.9.2.45  2006/08/26 14:46:37  brian
-# - update todo documentation
-#
-# Revision 0.9.2.44  2006/08/26 09:18:10  brian
-# - better release file generation
-#
-# Revision 0.9.2.43  2006/08/22 12:36:45  brian
-# - udpates to documentation, tweaks to Stream head
-#
-# Revision 0.9.2.42  2006/03/20 13:50:32  brian
-# - get automake to run clean
-#
-# Revision 0.9.2.41  2006/03/20 13:36:31  brian
-# - added checks for Development
-#
-# Revision 0.9.2.40  2006/03/06 11:38:36  brian
-# - updated headers
+# Last Modified $Date$ by $Author$
 #
 # =============================================================================
 
@@ -91,7 +58,7 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= STREAMS.texi STREAMS_FAQ.texi SPG2.texi # SPG.texi porting.texi
 
-EXTRA_info_TEXINFOS	= \
+STREAMS_TEXINFOS	= \
 			  configure.texi \
 			  descrip.texi \
 			  install.texi \
@@ -117,6 +84,48 @@ EXTRA_info_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/compat.texi \
 			  $(top_srcdir)/scripts/texi/mail.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
+
+STREAMS_FAQ_TEXINFOS	= \
+			  texi/args.texi \
+			  texi/gpl.texi \
+			  texi/fdl.texi \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/funding.texi
+
+
+SPG2_TEXINFOS		= \
+			  texi/args.texi \
+			  texi/gpl.texi \
+			  texi/fdl.texi \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/funding.texi
+
+SPG_TEXINFOS		= \
+			  texi/args.texi \
+			  texi/gpl.texi \
+			  texi/fdl.texi \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/funding.texi
+
+porting_TEXINFOS	= \
+			  texi/args.texi \
+			  texi/gpl.texi \
+			  texi/fdl.texi \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/funding.texi
+
+
+EXTRA_info_TEXINFOS	= \
+			  $(info_TEXINFOS) \
+			  $(STREAMS_TEXINFOS) \
+			  $(STREAMS_FAQ_TEXINFOS) \
+			  $(SPG2_TEXINFOS) \
+			  $(SPG_TEXINFOS) \
+			  $(porting_TEXINFOS)
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
@@ -189,4 +198,38 @@ endif
 
 include ../../am/info.am
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.49  2007/01/02 11:10:57  brian
+# - removed porting manual from build (see strcompat)
+#
+# Revision 0.9.2.48  2006/09/18 01:18:38  brian
+# - updated documentation and include file makefiles
+#
+# Revision 0.9.2.47  2006/08/29 11:51:26  brian
+# - removed useless files
+#
+# Revision 0.9.2.46  2006/08/27 12:26:44  brian
+# - finalizing auto release files
+#
+# Revision 0.9.2.45  2006/08/26 14:46:37  brian
+# - update todo documentation
+#
+# Revision 0.9.2.44  2006/08/26 09:18:10  brian
+# - better release file generation
+#
+# Revision 0.9.2.43  2006/08/22 12:36:45  brian
+# - udpates to documentation, tweaks to Stream head
+#
+# Revision 0.9.2.42  2006/03/20 13:50:32  brian
+# - get automake to run clean
+#
+# Revision 0.9.2.41  2006/03/20 13:36:31  brian
+# - added checks for Development
+#
+# Revision 0.9.2.40  2006/03/06 11:38:36  brian
+# - updated headers
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

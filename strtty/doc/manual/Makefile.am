@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/18 01:18:44 $
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -45,26 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/18 01:18:44 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.5  2006/09/18 01:18:44  brian
-# - updated documentation and include file makefiles
-#
-# Revision 0.9.2.4  2006/08/27 12:27:14  brian
-# - finalizing auto release files
-#
-# Revision 0.9.2.3  2006/08/26 14:46:46  brian
-# - update todo documentation
-#
-# Revision 0.9.2.2  2006/08/26 09:19:32  brian
-# - better release file generation
-#
-# Revision 0.9.2.1  2006/08/23 09:53:14  brian
-# - started STREAMS Terminals package
-#
+# Last Modified $Date$ by $Author$
 #
 # =============================================================================
 
@@ -77,7 +58,7 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= strtty.texi
 
-EXTRA_info_TEXINFOS	= \
+strtty_TEXINFOS		= \
 			  configure.texi \
 			  descrip.texi \
 			  news.texi \
@@ -101,9 +82,32 @@ EXTRA_info_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/mail.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
+EXTRA_info_TEXINFOS	= \
+			  $(info_TEXINFOS) \
+			  $(strtty_TEXINFOS)
+
 ## DEVELOPMENT
 endif
 
 include ../../am/info.am
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.5  2006/09/18 01:18:44  brian
+# - updated documentation and include file makefiles
+#
+# Revision 0.9.2.4  2006/08/27 12:27:14  brian
+# - finalizing auto release files
+#
+# Revision 0.9.2.3  2006/08/26 14:46:46  brian
+# - update todo documentation
+#
+# Revision 0.9.2.2  2006/08/26 09:19:32  brian
+# - better release file generation
+#
+# Revision 0.9.2.1  2006/08/23 09:53:14  brian
+# - started STREAMS Terminals package
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
