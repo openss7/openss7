@@ -61,7 +61,7 @@
 @item 2007-03-05T01:21:21-0700
 RPMs built on 2.4 kernels install the @samp{include strnsl} line to @file{modules.conf} when there
 is no such directory installed by any of the rpms.  This means that @command{depmod} complains
-loudly about the missing directory.
+loudly about the missing directory.  This was fixed for the current release.
 
 @end table
 
