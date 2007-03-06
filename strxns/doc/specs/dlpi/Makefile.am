@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/06 21:47:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2007/03/06 21:47:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -62,6 +62,10 @@ dlpi_TEXINFOS		= \
 			  texi/args.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
+
+EXTRA_info_TEXINFOS	= \
+			  $(info_TEXINFOS) \
+			  $(dlpi_TEXINFOS)
 
 EXTRA_info_TEXINFOS	= \
 			  $(info_TEXINFOS) \
@@ -140,6 +144,12 @@ include ../../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.11  2007/03/06 21:47:18  brian
+# - final updates and corrections to build process for release
+#
+# Revision 0.9.2.10  2007/03/06 21:26:14  brian
+# - final updates and corrections to build process for release
+#
 # Revision 0.9.2.9  2006/08/26 09:17:11  brian
 # - better release file generation
 #
