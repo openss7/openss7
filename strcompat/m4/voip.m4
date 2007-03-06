@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/04 23:26:40 $
+# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/06 23:39:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 23:39:54 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: voip.m4,v $
+# Revision 0.9.2.11  2007/03/06 23:39:54  brian
+# - more corrections
+#
 # Revision 0.9.2.10  2007/03/04 23:26:40  brian
 # - corrected modversions directory
 #
@@ -197,12 +200,13 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    voip_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strvoip/src/include}"
 	    voip_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/strvoip/src/include}"
+	    voip_inc="${os7_cv_master_builddir:+$os7_cv_master_builddir/strvoip/include}"
+	    voip_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strvoip/src/include}"
 	    if test -d "$voip_dir" ; then
 		AC_MSG_CHECKING([for voip include directory... $voip_dir $voip_bld])
-		if test -d "$voip_bld" -a -r "$voip_dir/$voip_what" ; then
-		    voip_cv_includes="$voip_bld $voip_dir"
+		if test -r "$voip_dir/$voip_what" ; then
+		    voip_cv_includes="$voip_inc $voip_bld $voip_dir"
 		    voip_cv_ldadd= # "$os7_cv_master_builddir/strvoip/libvoip.la"
 		    voip_cv_ldadd32= # "$os7_cv_master_builddir/strvoip/lib32/libvoip.la"
 		    voip_cv_modversions="$os7_cv_master_builddir/strvoip/include/sys/strvoip/modversions.h"
@@ -229,13 +233,14 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 	    do
 		if test -d "$voip_dir" ; then
 		    voip_bld=`echo $voip_dir | sed -e "s|^$srcdir/|$voip_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		    voip_inc=`echo $voip_bld/../../include |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    voip_dir=`(cd $voip_dir; pwd)`
 		    AC_MSG_CHECKING([for voip include directory... $voip_dir $voip_bld])
 		    if test -d "$voip_bld" -a -r "$voip_dir/$voip_what" ; then
-			voip_cv_includes="$voip_bld $voip_dir"
+			voip_cv_includes="$voip_inc $voip_bld $voip_dir"
 			voip_cv_ldadd= # `echo "$voip_bld/../../libvoip.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			voip_cv_ldadd32= # `echo "$voip_bld/../../lib32/libvoip.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			voip_cv_modversions=`echo "$voip_bld/../../include/sys/strvoip/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			voip_cv_modversions=`echo "$voip_inc/sys/strvoip/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			voip_cv_modmap=`echo "$voip_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			voip_cv_symver=`echo "$voip_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			voip_cv_manpath=`echo "$voip_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

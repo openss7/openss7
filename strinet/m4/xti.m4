@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/03/06 23:13:58 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/03/06 23:39:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:13:58 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 23:39:54 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.55  2007/03/06 23:39:54  brian
+# - more corrections
+#
 # Revision 0.9.2.54  2007/03/06 23:13:58  brian
 # - master build correction
 #
@@ -272,7 +275,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 			xti_cv_includes="$xti_inc $xti_bld $xti_dir"
 			xti_cv_ldadd=`echo "$xti_bld/../../libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xti_cv_ldadd32=`echo "$xti_bld/../../lib32/libxnet.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xti_cv_modversions=`echo "$xti_inc/include/sys/strxnet/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xti_cv_modversions=`echo "$xti_inc/sys/strxnet/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xti_cv_modmap=`echo "$xti_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xti_cv_symver=`echo "$xti_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xti_cv_manpath=`echo "$xti_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

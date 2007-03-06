@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/06 23:13:56 $
+# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/06 23:39:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:13:56 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 23:39:53 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.13  2007/03/06 23:39:53  brian
+# - more corrections
+#
 # Revision 0.9.2.12  2007/03/06 23:13:56  brian
 # - master build correction
 #
@@ -243,7 +246,7 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 			chan_cv_includes="$chan_inc $chan_bld $chan_dir"
 			chan_cv_ldadd= # `echo "$chan_bld/../../libchan.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			chan_cv_ldadd32= # `echo "$chan_bld/../../lib32/libchan.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			chan_cv_modversions=`echo "$chan_inc/include/sys/strchan/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			chan_cv_modversions=`echo "$chan_inc/sys/strchan/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			chan_cv_modmap=`echo "$chan_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			chan_cv_symver=`echo "$chan_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			chan_cv_manpath=`echo "$chan_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
