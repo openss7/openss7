@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/06 21:46:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2007/03/06 21:46:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -103,6 +103,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.29  2007/03/06 21:46:36  brian
+# - final updates and corrections to build process for release
+#
 # Revision 0.9.2.28  2006/10/02 11:32:23  brian
 # - changes to get master builds working for RPM and DEB
 # - added outside licenses to package documentation
