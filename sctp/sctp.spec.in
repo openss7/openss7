@@ -1206,24 +1206,24 @@ fi
 %endif
 
 %if %{FILES_tools32}
-#files util
+%files util
 # ---------------------------------------------------------------------------
 #defattr(-,root,root)
 #{_bindir}/*
 #{_sbindir}/*
-#{_pkglibexecdir}/*test*
+%{_pkglibexecdir}/*test*
 #{_pkglibexecdir}/*tst
-#{_pkglibexec32dir}/*test*
+%{_pkglibexec32dir}/*test*
 #{_pkglibexec32dir}/*tst
 %endif
 
 %if %{FILES_tools}
-#files util
+%files util
 # ---------------------------------------------------------------------------
 #defattr(-,root,root)
 #{_bindir}/*
 #{_sbindir}/*
-#{_pkglibexecdir}/*test*
+%{_pkglibexecdir}/*test*
 #{_pkglibexecdir}/*tst
 %endif
 

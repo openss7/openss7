@@ -644,7 +644,7 @@ fi
 Summary:        %{title} test utilities.
 Group:          System Environment/Base
 Prefix:         %{_pkglibexecdir}
-Requires:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease2}
+#Requires:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-tests
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
