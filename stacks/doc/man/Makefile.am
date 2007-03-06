@@ -461,10 +461,6 @@ ss7_man_MANS = \
 	man8/test-q781.8 \
 	man8/test-q781-pipe.8 \
 	man8/test-q784.8 \
-	man8/test-tcpc.8 \
-	man8/test-tcps.8 \
-	man8/test-udpc.8 \
-	man8/test-udps.8 \
 	man8/test-x100p.8 \
 	man8/test-x400p.8 \
 	man8/test-x400p-cap2.8 \
@@ -569,6 +565,10 @@ sctp_man_MANS = \
 	man4/sctp_ioctl.4 \
 	man7/npi_sctp.7 \
 	man7/tpi_sctp.7 \
+	man8/test-tcpc.8 \
+	man8/test-tcps.8 \
+	man8/test-udpc.8 \
+	man8/test-udps.8 \
 	man8/sctp.8
 
 xns_man_MANS = \
@@ -1990,10 +1990,6 @@ ss7_dist_noinst_MANS = \
 	man8/test-q781.8.man \
 	man8/test-q781-pipe.8.man \
 	man8/test-q784.8.man \
-	man8/test-tcpc.8.man \
-	man8/test-tcps.8.man \
-	man8/test-udpc.8.man \
-	man8/test-udps.8.man \
 	man8/test-x100p.8.man \
 	man8/test-x400p.8.man \
 	man8/test-x400p-cap2.8.man \
@@ -2101,6 +2097,10 @@ sctp_dist_noinst_MANS = \
 	man4/sctp_ioctl.4.man \
 	man7/npi_sctp.7.man \
 	man7/tpi_sctp.7.man \
+	man8/test-tcpc.8.man \
+	man8/test-tcps.8.man \
+	man8/test-udpc.8.man \
+	man8/test-udps.8.man \
 	man8/sctp.8.man
 
 xns_dist_noinst_MANS = \
