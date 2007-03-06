@@ -1,5 +1,6 @@
 2007-03-06  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/Makefile.am: move conflicting manual pages
 	* doc/manual/Makefile.am: attempt proper texinfo dependencies
 	* doc/projects/Makefile.am: attempt proper texinfo dependencies
 	* doc/specs/cci/Makefile.am: attempt proper texinfo dependencies
