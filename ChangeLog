@@ -1,5 +1,18 @@
 2007-03-06  Brian Bidulock  <bidulock@openss7.org>
 
+	* m4/chan.m4: build directory might not exist yet for master builds
+	* m4/inet.m4: build directory might not exist yet for master builds
+	* m4/isdn.m4: build directory might not exist yet for master builds
+	* m4/iso.m4: build directory might not exist yet for master builds
+	* m4/nsl.m4: build directory might not exist yet for master builds
+	* m4/sctp.m4: build directory might not exist yet for master builds
+	* m4/sock.m4: build directory might not exist yet for master builds
+	* m4/ss7.m4: build directory might not exist yet for master builds
+	* m4/strcomp.m4: build directory might not exist yet for master builds
+	* m4/streams.m4: build directory might not exist yet for master builds
+	* m4/xns.m4: build directory might not exist yet for master builds
+	* m4/xti.m4: build directory might not exist yet for master builds
+
 	* doc/manual/Makefile.am: attempt proper texinfo dependencies
 
 2007-03-05  Brian Bidulock  <bidulock@openss7.org>

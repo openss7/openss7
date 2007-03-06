@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/04 23:26:40 $
+# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/06 23:13:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 23:13:57 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.19  2007/03/06 23:13:57  brian
+# - master build correction
+#
 # Revision 0.9.2.18  2007/03/04 23:26:40  brian
 # - corrected modversions directory
 #
@@ -223,12 +226,13 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    sock_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strsock/src/include}"
 	    sock_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/strsock/src/include}"
+	    sock_inc="${os7_cv_master_builddir:+$os7_cv_master_builddir/strsock/include}"
+	    sock_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/strsock/src/include}"
 	    if test -d "$sock_dir" ; then
 		AC_MSG_CHECKING([for sock include directory... $sock_dir $sock_bld])
-		if test -d "$sock_bld" -a -r "$sock_dir/$sock_what" ; then
-		    sock_cv_includes="$sock_bld $sock_dir"
+		if test -r "$sock_dir/$sock_what" ; then
+		    sock_cv_includes="$sock_inc $sock_bld $sock_dir"
 		    sock_cv_ldadd="$os7_cv_master_builddir/strsock/libsocket.la"
 		    sock_cv_ldadd32="$os7_cv_master_builddir/strsock/lib32/libsocket.la"
 		    sock_cv_modversions="$os7_cv_master_builddir/strsock/include/sys/strsock/modversions.h"
@@ -255,13 +259,14 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    do
 		if test -d "$sock_dir" ; then
 		    sock_bld=`echo $sock_dir | sed -e "s|^$srcdir/|$sock_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		    sock_inc=`echo $sock_bld/../../include |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    sock_dir=`(cd $sock_dir; pwd)`
 		    AC_MSG_CHECKING([for sock include directory... $sock_dir $sock_bld])
 		    if test -d "$sock_bld" -a -r "$sock_dir/$sock_what" ; then
-			sock_cv_includes="$sock_bld $sock_dir"
+			sock_cv_includes="$sock_inc $sock_bld $sock_dir"
 			sock_cv_ldadd=`echo "$sock_bld/../../libsocket.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sock_cv_ldadd32=`echo "$sock_bld/../../lib32/libsocket.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			sock_cv_modversions=`echo "$sock_bld/../../include/sys/strsock/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			sock_cv_modversions=`echo "$sock_inc/include/sys/strsock/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sock_cv_modmap=`echo "$sock_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sock_cv_symver=`echo "$sock_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			sock_cv_manpath=`echo "$sock_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`

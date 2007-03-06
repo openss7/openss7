@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/04 23:26:40 $
+# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/06 23:13:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 23:26:40 $ by $Author: brian $
+# Last Modified $Date: 2007/03/06 23:13:57 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: ss7.m4,v $
+# Revision 0.9.2.18  2007/03/06 23:13:57  brian
+# - master build correction
+#
 # Revision 0.9.2.17  2007/03/04 23:26:40  brian
 # - corrected modversions directory
 #
@@ -215,12 +218,13 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    # The next place to look is under the master source and build
 	    # directory, if any.
 	    AC_MSG_RESULT([(searching $os7_cv_master_srcdir $os7_cv_master_builddir)])
-	    ss7_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/stacks/src/include}"
 	    ss7_bld="${os7_cv_master_builddir:+$os7_cv_master_builddir/stacks/src/include}"
+	    ss7_inc="${os7_cv_master_builddir:+$os7_cv_master_builddir/stacks/include}"
+	    ss7_dir="${os7_cv_master_srcdir:+$os7_cv_master_srcdir/stacks/src/include}"
 	    if test -d "$ss7_dir" ; then
 		AC_MSG_CHECKING([for ss7 include directory... $ss7_dir $ss7_bld])
-		if test -d "$ss7_bld" -a -r "$ss7_dir/$ss7_what" ; then
-		    ss7_cv_includes="$ss7_bld $ss7_dir"
+		if test -r "$ss7_dir/$ss7_what" ; then
+		    ss7_cv_includes="$ss7_inc $ss7_bld $ss7_dir"
 		    ss7_cv_ldadd= # "$os7_cv_master_builddir/stacks/libss7.la"
 		    ss7_cv_ldadd32= # "$os7_cv_master_builddir/stacks/lib32/libss7.la"
 		    ss7_cv_modversions="$os7_cv_master_builddir/stacks/include/sys/strss7/modversions.h"
@@ -251,13 +255,14 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    do
 		if test -d "$ss7_dir" ; then
 		    ss7_bld=`echo $ss7_dir | sed -e "s|^$srcdir/|$ss7_here/|;"'s|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+		    ss7_inc=`echo $ss7_bld/../../include |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		    ss7_dir=`(cd $ss7_dir; pwd)`
 		    AC_MSG_CHECKING([for ss7 include directory... $ss7_dir $ss7_bld])
 		    if test -d "$ss7_bld" -a -r "$ss7_dir/$ss7_what" ; then
-			ss7_cv_includes="$ss7_bld $ss7_dir"
+			ss7_cv_includes="$ss7_inc $ss7_bld $ss7_dir"
 			ss7_cv_ldadd= # `echo "$ss7_bld/../../libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_ldadd32= # `echo "$ss7_bld/../../lib32/libss7.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			ss7_cv_modversions=`echo "$ss7_bld/../../include/sys/strss7/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			ss7_cv_modversions=`echo "$ss7_inc/sys/strss7/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_modmap=`echo "$ss7_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_symver=`echo "$ss7_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			ss7_cv_manpath=`echo "$ss7_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
