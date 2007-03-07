@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/03/07 09:24:08 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2007/03/07 10:12:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 10:12:59 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.58  2007/03/07 10:12:59  brian
+# - more corrections
+#
 # Revision 0.9.2.57  2007/03/07 09:24:08  brian
 # - further corrections
 #
@@ -535,10 +538,10 @@ dnl		    this will just not be set
 			xti_version=`cat $xti_dir/../../.version`
 		    fi
 		    if test -z "$xti_version" -a -s "$xti_dir/../configure" ; then
-			xti_version=`grep '^PACKAGE_VERSION=' $xti_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			xti_version=`grep -m 1 '^PACKAGE_VERSION=' $xti_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$xti_version" -a -s "$xti_dir/../../configure" ; then
-			xti_version=`grep '^PACKAGE_VERSION=' $xti_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			xti_version=`grep -m 1 '^PACKAGE_VERSION=' $xti_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$xti_package" -a -s "$xti_dir/../.pkgrelease" ; then
 			xti_package=`cat $xti_dir/../.pkgrelease`

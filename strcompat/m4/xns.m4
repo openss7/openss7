@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/07 09:24:08 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/07 10:12:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 10:12:59 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xns.m4,v $
+# Revision 0.9.2.51  2007/03/07 10:12:59  brian
+# - more corrections
+#
 # Revision 0.9.2.50  2007/03/07 09:24:08  brian
 # - further corrections
 #
@@ -527,10 +530,10 @@ dnl		    this will just not be set
 			xns_version=`cat $xns_dir/../../.version`
 		    fi
 		    if test -z "$xns_version" -a -s "$xns_dir/../configure" ; then
-			xns_version=`grep '^PACKAGE_VERSION=' $xns_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			xns_version=`grep -m 1 '^PACKAGE_VERSION=' $xns_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$xns_version" -a -s "$xns_dir/../../configure" ; then
-			xns_version=`grep '^PACKAGE_VERSION=' $xns_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			xns_version=`grep -m 1 '^PACKAGE_VERSION=' $xns_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$xns_package" -a -s "$xns_dir/../.pkgrelease" ; then
 			xns_package=`cat $xns_dir/../.pkgrelease`

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/07 09:24:08 $
+# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/07 10:12:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 10:12:59 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.23  2007/03/07 10:12:59  brian
+# - more corrections
+#
 # Revision 0.9.2.22  2007/03/07 09:24:08  brian
 # - further corrections
 #
@@ -529,10 +532,10 @@ dnl		    this will just not be set
 			sock_version=`cat $sock_dir/../../.version`
 		    fi
 		    if test -z "$sock_version" -a -s "$sock_dir/../configure" ; then
-			sock_version=`grep '^PACKAGE_VERSION=' $sock_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$sock_version" -a -s "$sock_dir/../../configure" ; then
-			sock_version=`grep '^PACKAGE_VERSION=' $sock_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$sock_package" -a -s "$sock_dir/../.pkgrelease" ; then
 			sock_package=`cat $sock_dir/../.pkgrelease`

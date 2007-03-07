@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/07 09:24:07 $
+# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/07 10:12:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 09:24:07 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 10:12:58 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.16  2007/03/07 10:12:58  brian
+# - more corrections
+#
 # Revision 0.9.2.15  2007/03/07 09:24:07  brian
 # - further corrections
 #
@@ -448,10 +451,10 @@ dnl		    this will just not be set
 			chan_version=`cat $chan_dir/../../.version`
 		    fi
 		    if test -z "$chan_version" -a -s "$chan_dir/../configure" ; then
-			chan_version=`grep '^PACKAGE_VERSION=' $chan_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			chan_version=`grep -m 1 '^PACKAGE_VERSION=' $chan_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$chan_version" -a -s "$chan_dir/../../configure" ; then
-			chan_version=`grep '^PACKAGE_VERSION=' $chan_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			chan_version=`grep -m 1 '^PACKAGE_VERSION=' $chan_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$chan_package" -a -s "$chan_dir/../.pkgrelease" ; then
 			chan_package=`cat $chan_dir/../.pkgrelease`

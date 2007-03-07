@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/03/07 09:24:08 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/07 10:12:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 10:12:59 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sctp.m4,v $
+# Revision 0.9.2.43  2007/03/07 10:12:59  brian
+# - more corrections
+#
 # Revision 0.9.2.42  2007/03/07 09:24:08  brian
 # - further corrections
 #
@@ -505,10 +508,10 @@ dnl		    this will just not be set
 			sctp_version=`cat $sctp_dir/../../.version`
 		    fi
 		    if test -z "$sctp_version" -a -s "$sctp_dir/../configure" ; then
-			sctp_version=`grep '^PACKAGE_VERSION=' $sctp_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			sctp_version=`grep -m 1 '^PACKAGE_VERSION=' $sctp_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$sctp_version" -a -s "$sctp_dir/../../configure" ; then
-			sctp_version=`grep '^PACKAGE_VERSION=' $sctp_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			sctp_version=`grep -m 1 '^PACKAGE_VERSION=' $sctp_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$sctp_package" -a -s "$sctp_dir/../.pkgrelease" ; then
 			sctp_package=`cat $sctp_dir/../.pkgrelease`
