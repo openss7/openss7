@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/09/25 20:16:02 $
+# @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/07 23:49:22 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -45,7 +45,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/09/25 20:16:02 $ by $Author: brian $
+## Last Modified $Date: 2007/03/07 23:49:22 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -111,7 +111,7 @@ node	/dev/ticots_ord	     c	0666	inet		42
 node	/dev/ticots	     c	0666	inet		43
 node	/dev/ticlts	     c	0666	inet		44
 @WITH_OPENSS7_SCTP_TRUE@node	/dev/sctp	     c	0666	inet		45
-node	/dev/udp2	     c	0666	230		udp2
-node	/dev/rawip2	     c	0666	230		rawip2
-node	/dev/tcp2	     c	0666	230		tcp2
+node	/dev/udp2	     c	0666	clone		udp2
+node	/dev/rawip2	     c	0666	clone		rawip2
+node	/dev/tcp2	     c	0666	clone		tcp2
 

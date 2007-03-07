@@ -1,3 +1,8 @@
+2007-03-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* texi/install.texi: added locations on website of tools to README-cvs
+	* scripts/strconf-sh: clone device by name instead of number
+
 2007-03-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/kernel.m4: add options for kernel source package

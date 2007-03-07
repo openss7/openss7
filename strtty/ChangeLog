@@ -1,3 +1,7 @@
+2007-03-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/Config.in: clone device by name instead of number
+
 2007-03-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/Makefile.am: attempt proper texinfo dependencies
