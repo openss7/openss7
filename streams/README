@@ -1,4 +1,4 @@
-Linux Fast-STREAMS -- read me first file.  2007-03-04
+Linux Fast-STREAMS -- read me first file.  2007-03-06
 $Id: README,v 0.9.2.29 2007/03/04 10:01:54 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  Linux Fast-STREAMS
 ===================
 
-Package streams-0.9.2.2 was released under GPLv2 2007-03-04.
+Package streams-0.9.2.2 was released under GPLv2 2007-03-06.
 
 The `OpenSS7 Linux Fast-STREAMS' package is a High-Performance
 "STREAMS" framework for `Linux' that is compatible with `SVR 4.2 MP'
@@ -37,7 +37,7 @@ well.
  Release
 --------
 
-This is the `streams-0.9.2.2' package, released 2007-03-04.  This
+This is the `streams-0.9.2.2' package, released 2007-03-06.  This
 `0.9.2.2' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
