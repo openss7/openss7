@@ -1,5 +1,6 @@
 2007-03-06  Brian Bidulock  <bidulock@openss7.org>
 
+	* m4/kernel.m4 (linux_cv_k_modver): cache check variable correction
 	* m4/chan.m4: build directory might not exist yet for master builds
 	* m4/inet.m4: build directory might not exist yet for master builds
 	* m4/isdn.m4: build directory might not exist yet for master builds

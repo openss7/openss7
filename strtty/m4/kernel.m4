@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.153 $) $Date: 2007/03/05 08:43:38 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2007/03/07 04:19:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/05 08:43:38 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 04:19:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -930,7 +930,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 # _LINUX_CHECK_KERNEL_MODVER
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
-    AC_CACHE_CHECK([for kernel module ver], [linux_cv_modver], [dnl
+    AC_CACHE_CHECK([for kernel module ver], [linux_cv_k_modver], [dnl
 	AC_MSG_RESULT([searching...])
 	AC_ARG_WITH([k-modver],
 	    AS_HELP_STRING([--with-k-modver=MAP],
