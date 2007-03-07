@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2007/03/07 04:19:56 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2007/03/07 11:27:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 04:19:56 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 11:27:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -155,6 +155,13 @@ dnl         [specify whether kernel modules will be installed.
 dnl         @<:@default=yes@:>@]),
 dnl     [enable_k_install="$enableval"],
 dnl     [enable_k_install='yes'])
+    AC_ARG_ENABLE([k-package],
+	AS_HELP_STRING([--enable-k-package],
+	    [specify whether kernel source packages will be generated.
+	     @<:@default=disabled@:>@]),
+	[enable_k_package="$enableval"],
+	[enable_k_package='no'])
+    AM_CONDITIONAL([WITH_K_PACKAGE], [test :"${enable_k_package:-no}" != :no])
 ])# _LINUX_KERNEL_OPTIONS
 # =============================================================================
 
