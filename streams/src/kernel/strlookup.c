@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/07 22:51:08 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/07 23:15:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/07 22:51:08 $ by $Author: brian $
+ Last Modified $Date: 2007/03/07 23:15:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/07 22:51:08 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/07 23:15:11 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/07 22:51:08 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/07 23:15:11 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -797,6 +797,24 @@ cmin_search(struct cdevsw *cdev, const char *name, int load)
 		do {
 			char devname[96];
 
+			if (strcmp(cdev->d_name, "clone") == 0) {
+				if ((cmin = __cmin_search(cdev, name)))
+					break;
+				if (!load)
+					break;
+				read_unlock(&cdevsw_lock);
+				snprintf(devname, sizeof(devname), "streams-%s", name);
+				request_module(devname);
+				read_lock(&cdevsw_lock);
+#if defined CONFIG_DEVFS || 1
+				if ((cmin = __cmin_search(cdev, name)))
+					break;
+				read_unlock(&cdevsw_lock);
+				snprintf(devname, sizeof(devname), "/dev/streams/%s", name);
+				request_module(devname);
+				read_lock(&cdevsw_lock);
+#endif				/* CONFIG_DEVFS */
+			}
 			if ((cmin = __cmin_search(cdev, name)))
 				break;
 			if (!load)
@@ -814,22 +832,6 @@ cmin_search(struct cdevsw *cdev, const char *name, int load)
 			request_module(devname);
 			read_lock(&cdevsw_lock);
 #endif				/* CONFIG_DEVFS */
-			if (strcmp(cdev->d_name, "clone") == 0) {
-				if ((cmin = __cmin_search(cdev, name)))
-					break;
-				read_unlock(&cdevsw_lock);
-				snprintf(devname, sizeof(devname), "streams-%s", name);
-				request_module(devname);
-				read_lock(&cdevsw_lock);
-#if defined CONFIG_DEVFS || 1
-				if ((cmin = __cmin_search(cdev, name)))
-					break;
-				read_unlock(&cdevsw_lock);
-				snprintf(devname, sizeof(devname), "/dev/streams/%s", name);
-				request_module(devname);
-				read_lock(&cdevsw_lock);
-#endif				/* CONFIG_DEVFS */
-			}
 		} while (0);
 	}
 #else				/* CONFIG_KMOD */
