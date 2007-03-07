@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/03/02 09:23:28 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/07 22:51:08 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/02 09:23:28 $ by $Author: brian $
+ Last Modified $Date: 2007/03/07 22:51:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/03/02 09:23:28 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/07 22:51:08 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/03/02 09:23:28 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/07 22:51:08 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -779,7 +779,9 @@ fmod_search(const char *name, int load)
  *  to demand load the kernel module "streams-%s-%s" and then "/dev/streams/%s/%s".
  *
  *  Demand loading modules by minor device names is primarily for minor device names under the clone
- *  device.
+ *  device.  There was a problem that this is the first check for unloaded clone minors and the
+ *  apporpriate module was not being demand loaded, therefore, the additional check was made that if
+ *  the major device is named 'clone' then streams-%s and /dev/streams/%s is also attempted.
  */
 STATIC struct devnode *
 cmin_search(struct cdevsw *cdev, const char *name, int load)
@@ -807,10 +809,27 @@ cmin_search(struct cdevsw *cdev, const char *name, int load)
 			if ((cmin = __cmin_search(cdev, name)))
 				break;
 			read_unlock(&cdevsw_lock);
-			snprintf(devname, sizeof(devname), "/dev/streams/%s/%s", cdev->d_name, name);
+			snprintf(devname, sizeof(devname), "/dev/streams/%s/%s", cdev->d_name,
+				 name);
 			request_module(devname);
 			read_lock(&cdevsw_lock);
 #endif				/* CONFIG_DEVFS */
+			if (strcmp(cdev->d_name, "clone") == 0) {
+				if ((cmin = __cmin_search(cdev, name)))
+					break;
+				read_unlock(&cdevsw_lock);
+				snprintf(devname, sizeof(devname), "streams-%s", name);
+				request_module(devname);
+				read_lock(&cdevsw_lock);
+#if defined CONFIG_DEVFS || 1
+				if ((cmin = __cmin_search(cdev, name)))
+					break;
+				read_unlock(&cdevsw_lock);
+				snprintf(devname, sizeof(devname), "/dev/streams/%s", name);
+				request_module(devname);
+				read_lock(&cdevsw_lock);
+#endif				/* CONFIG_DEVFS */
+			}
 		} while (0);
 	}
 #else				/* CONFIG_KMOD */
