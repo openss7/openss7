@@ -1,11 +1,56 @@
-Linux STREAMS (LiS) -- history of user visible changes.  2006-12-28
-$Id: NEWS,v 1.1.6.30 2006/12/28 10:42:06 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
+Linux STREAMS (LiS) -- history of user visible changes.  2007-03-07
+$Id: NEWS,v 1.1.6.31 2007/03/07 14:20:13 brian Exp $
+Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The sections that follow provide information on OpenSS7 releases of the
 Linux STREAMS (LiS) package.
+
+ Major changes for release LiS-2.18.5
+-------------------------------------
+
+This is an internal release of LiS.  There are too many packages now
+that cannot build against LiS because it is lacking fundamental
+capabilities in the Stream head.
+
+Do not use this release.  Port to Linux Fast-STREAMS.  Do not report
+bugs on this release.  (Yup, there are lots of 'em, but that's LiS.)
+
+Major features since the last public release are as follows:
+
+   - Added versions to all exported symbols.  Made LiS functions GPL
+     export.
+
+   - Improvements to the common build environment with better support
+     for standalone package builds on 2.4 kernels.
+
+   - Support for autoconf 2.61 and gettext 0.16.
+
+   - Support for Ubuntu 6.10 distribution and bug fixes for i386 kenels.
+
+
+_This is an unstable release: do not report bugs for this release.
+Please see `README-alpha' in the release or `Maturity', in the manual._
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM- and DPKG-based distributions, and can be used on production
+kernels without patching or recompiling the kernel.
+
+This package is publicly released under the `GNU General Public License
+Version 2'.  The release is available as an `autoconf' tarball, SRPM,
+DSC, and set of binary RPMs and DEBs.  See the downloads page
+(http://www.openss7.org/download.html) for the `autoconf' tarballs,
+SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
+see the LiS package page (http://www.openss7.org/LiS_pkg.html).
+
+See `http://www.openss7.org/codefiles/LiS-2.18.5/ChangeLog' and
+`http://www.openss7.org/codefiles/LiS-2.18.5/NEWS' in the release for
+more information.  Also, see the `LiS.pdf' manual in the release (also
+in html `http://www.openss7.org/LiS_manual.html').
+
+For the news release, see `http://www.openss7.org/rel20070306_0.html'.
 
  Major changes for release LiS-2.18.4
 -------------------------------------
@@ -21,100 +66,103 @@ ability to sustain any form of 32-bit compatibility on most 64-bit
 architectures.  Test suites now run first 64-bit native and then 32-bit
 compatibility tests to demonstrate LiS' dismal failure in this regard.
 
+Do not use this release.  Port to Linux Fast-STREAMS.  Do not report
+bugs on this release.  (Yup, there are lots of 'em, but that's LiS.)
+
 Major features since the last public release are as follows:
 
-   * Support for most recent 2.6.18 kernels (including Fedora Core 5
+   - Support for most recent 2.6.18 kernels (including Fedora Core 5
      with inode diet patchset).
 
-   * Added `send-pr' scripts for automatic problem report generation.
+   - Added `send-pr' scripts for automatic problem report generation.
      (Please do not report bugs on LiS.)
 
-   * Added `--disable-devel' `configure' option to suppress building
+   - Added `--disable-devel' `configure' option to suppress building
      and installing development environment.  This feature is for
      embedded or pure runtime targets that do not need the development
      environment (static libraries, manual pages, documentation).
 
-   * Corrected start of assignment of major devices numbers (back to
+   - Corrected start of assignment of major devices numbers (back to
      230).
 
-   * Improved compiler flag generation and optimizations for recent
+   - Improved compiler flag generation and optimizations for recent
      `gcc' compilers and some idiosyncratic behaviour for some
      distributions (primarily SUSE).
 
-   * Optimized compilation is now available also for user level
+   - Optimized compilation is now available also for user level
      programs in addition to kernel programs.  Added new
      `--with-optimize' option to `configure' to accomplish this.
 
-   * Better detection of SUSE distributions, release numbers and SLES
+   - Better detection of SUSE distributions, release numbers and SLES
      distributions: support for additional `SuSE' distributions on
      `ix86' as well as `x86_64'.  Added distribution support includes
      `SLES 9', `SLES 9 SP2', `SLES 9 SP3', `SLES 10', `SuSE 10.1'.
 
-   * Many documentation updates for all OpenSS7 packages.  Automated
+   - Many documentation updates for all OpenSS7 packages.  Automated
      release file generation making for vastly improved and timely text
      documentation present in the release directory.
 
-   * Bug fixes to STREAMS library for proper asynchronous thread
-     cancellation handling.  Versioning of all library symbols.
+   - Bug fixes to STREAMS library for proper asynchronous thread
+     cancellation handling.  Versions for all library symbols.
 
-   * Now builds 32-bit compatibility libraries and tests them against
+   - Now builds 32-bit compatibility libraries and tests them against
      64-bit kernel modules and drivers.  The `make installcheck' target
      will now automatically test both 64-bit native and 32-bit
      compatibility versions, one after the other, on 64-bit platforms.
 
-   * The package will now build doxygen(1) html documentation with the
+   - The package will now build doxygen(1) html documentation with the
      'doxy' make target.  See 'make help' or README-make in the
      distribution for more information.
 
  Major changes for release LiS-2.18.4.rc3
 -----------------------------------------
 
-Third release candidiate.
+Third release candidate.
 
 LiS is really not supported any longer.  Use Linux Fast-STREAMS instead.
 The purpose of this release is to demonstrate the inability of the
 LiS package to properly support 32-bit compatibility on 64-bit
 architectures.
 
-   * Minor bug fixes to STREAMS library.  isastream(3) and fattach(3)
+   - Minor bug fixes to STREAMS library.  isastream(3) and fattach(3)
      must not contain an asynchronous thread cancellation point, but
      they could.  Added asynchronous thread cancellation protection to
      these functions to remove any thread cancellation points.
 
-   * The package will now build doxygen(1) html documentation with the
+   - The package will now build doxygen(1) html documentation with the
      'doxy' make target.  See 'make help' or README-make in the
      distribution for more information.
 
-   * Now builds 32-bit compatibility libraries and tests them against
+   - Now builds 32-bit compatibility libraries and tests them against
      64-bit kernel modules and drivers.  The `make installcheck' target
      will now automatically test both 64-bit native and 32-bit
      compatibility versions, one after the other, on 64-bit platforms.
 
-   * Added versioning of all library symbols.
+   - Added versions for all library symbols.
 
-   * Automated release file generation making for vastly improved and
+   - Automated release file generation making for vastly improved and
      timely text documentation present in the release directory.
 
-   * Many documentation updates for all OpenSS7 packages.
+   - Many documentation updates for all OpenSS7 packages.
 
-   * This release candidate includes the changes made to the strsctp
+   - This release candidate includes the changes made to the strsctp
      drivers at the `2006 SCTP Interop' at the `University of British
      Columbia'.  This version was interoperability tested with all
      implementations present.
 
-   * This release candidate provides support for additional `SuSE'
+   - This release candidate provides support for additional `SuSE'
      distributions on `ix86' as well as `x86_64'.  Added distribution
      support includes `SLES 9', `SLES 9 SP2', `SLES 9 SP3', `SLES 10',
      `SuSE 10.1'.
 
-   * Better detection of SUSE distributions, release numbers and SLES
+   - Better detection of SUSE distributions, release numbers and SLES
      distributions.
 
-   * Optimized compilation is now available also for user level
+   - Optimized compilation is now available also for user level
      programs in addition to kernel programs.  Added new
      `--with-optimize' option to `configure' to accomplish this.
 
-   * Improved compiler flag generation and optimizations for recent
+   - Improved compiler flag generation and optimizations for recent
      `gcc' compilers and some idiosyncratic behaviour for some
      distributions (primarily SUSE):
 
@@ -131,13 +179,13 @@ architectures.
        command line for some reason.  `configure' script watches out for
        this now.
 
-   * Updated `init' scripts for proper addition and removal of modules.
+   - Updated `init' scripts for proper addition and removal of modules.
 
-   * Start assigning majors at major device number 231 instead of major
+   - Start assigning majors at major device number 231 instead of major
      device number 230.  Assign major device number 230 explicitly to
      the clone device.
 
-   * `Linux Fast-STREAMS' now supports expanded addressable minor device
+   - `Linux Fast-STREAMS' now supports expanded addressable minor device
      numbers, permitting 2^16 addressable minor devices per major
      device number on 2.6 kernels: `LiS' cannot support this change.
 
@@ -150,9 +198,9 @@ sponsors of the OpenSS7 Project.
 
 Second release candidate.
 
-   * Added `--enable-devel' `configure' option for embedded targets.
+   - Added `--enable-devel' `configure' option for embedded targets.
 
-   * Added `send-pr' script for automatic problem report generation.
+   - Added `send-pr' script for automatic problem report generation.
 
 This was an internal alpha test release candidate and was not released
 publicly.  This release was only available to subscribers to and
@@ -317,7 +365,7 @@ caching of detected ksyms.
  Major changes for release LiS-2.16.18-17
 -----------------------------------------
 
-Added option `--disable-k-modversions' to supress versioning of LiS
+Added option `--disable-k-modversions' to suppress versions for LiS
 exported symbols.
 
 A couple of corrections to the build process reported by Gurol.
@@ -337,12 +385,12 @@ statements.
 Added HP patches.  There are a couple of questionable components in the
 HP patches that I reversed.  They include;
 
-   * modification of `lis_msgsize' to `lis_msgdsize'.  This would change
+   - modification of `lis_msgsize' to `lis_msgdsize'.  This would change
      the calculation of queue counts.  Queue counts aren't `M_DATA'
      counts, they are "data" message counts.  LiS probably doesn't have
      this the right way, but `lis_msgdsize' is not correct either.
 
-   * addition of `qi_mstat->ms_pcnt' increment on `lis_safe_putmsg'.
+   - addition of `qi_mstat->ms_pcnt' increment on `lis_safe_putmsg'.
      Same for `ms_scnt', `ms_ocnt', `ms_ccnt'.  STREAMS is not supposed
      to increment counts.  It is the module writer's responsibility to
      increment counts in their own queue procedures.
@@ -351,7 +399,7 @@ Added HP `ldl' patches.
 
 Made modifications to `putq()', `putbq()', `insq()' and `appq()'
 discussed on linux-streams mailing list.  These do not free messages on
-failure.  Modified all occurences internal to LiS to free the message
+failure.  Modified all occurrences internal to LiS to free the message
 on error to ensure old behaviour.
 
 Added HP dejagnu patches to `strtst' and added dejagnu testsuite
@@ -422,8 +470,8 @@ Added defaults for SK_WMEM_MAX and SK_RMEM_MAX for lastest 2.4.25 and
 
 Enhanced build process.
 
-All kernel symbols exported by LiS are versioned on kernels that have
-versioned symbols.  This makes it safer to compile kernel modules
+All kernel symbols exported by LiS have versions on kernels that have
+versions on symbols.  This makes it safer to compile kernel modules
 against kernel/LiS combinations.  This is in preparation for splitting
 off the strxnet package, and the technique was imported from the Linux
 Fast-STREAMS build.
@@ -472,11 +520,11 @@ Many changes to the inet.c INET driver.  Wildcard IP addresses can now
 be bound and wildcard addresses will be assigned with no address is
 passed to most providers.  (/dev/rawip still requires an address or
 TNOADDR is returned.)  Option management has been extensively rewritten
-to be more conformant to XNS documentation.  Test programs
-test-inet_raw, test-inet_udp, test-inet_tcp have been upgraded and
-converted to multiple child processes.  A number of fixes to SMP lock
-behavior and M_FLUSH have beend added as reported by Dave Grothe.
-Corrected all level and TBADOPT behaviour on negotiation.
+to closer conform to XNS documentation.  Test programs test-inet_raw,
+test-inet_udp, test-inet_tcp have been upgraded and converted to
+multiple child processes.  A number of fixes to SMP lock behaviour and
+M_FLUSH have been added as reported by Dave Grothe.  Corrected all
+level and TBADOPT behaviour on negotiation.
 
 Although this driver is now closer to expected behaviour, it has not
 been tested for XNS 5.2 compliance, nor will it be until someone has
@@ -547,7 +595,7 @@ rpm release to the latest LiS-2.16 release level.
 This OpenSS7 release of LiS-2.16.16 includes autoconf for
 configuration, complete manual pages and documentation, and packaging in
 source and binary RPMs for ease and repeatability of installation.  The
-package also builds and installs properly versioned LiS shared object
+package also builds and installs properly versions LiS shared object
 libraries.
 
 Before the OpenSS7 release of LiS, it was necessary to have a
@@ -569,44 +617,44 @@ refuse to configure for older or newer kernels.
 
 Following are the new features of the OpenSS7 release of LiS:
 
-   * adds configuration using the GNU tools, autoconf, automake and
+   - adds configuration using the GNU tools, autoconf, automake and
      autotest.
 
      These tools greatly enhance the ability to maintain a repeatable
      and testable release cycle as well as being compatible with most
      major package managers such as Redhat's RPM.
 
-   * adds long options to all LiS utilities.
+   - adds long options to all LiS utilities.
 
      This change was necessitated because we use GNITS (the strictest
      level) of configuration with autoconf that requires for
      distribution checking that all utility programs support the
      `--help' and `--version' long options without side-effects.
 
-   * provides a source and binary release mechanism using both autoconf
+   - provides a source and binary release mechanism using both autoconf
      distributions as well as RedHat source and binary RPMs.
 
      Use of the RPM mechanism for release permits add-on packages to
-     ensure that they have sufficient level of support and verionsing
-     of the LiS load during their build and installation process.  It
-     is now also possible to ensure that add on binaries are compatible
+     ensure that they have sufficient level of support and versions for
+     the LiS load during their build and installation process.  It is
+     now also possible to ensure that add on binaries are compatible
      with a loaded LiS during installation.
 
-   * includes a complete set of kernel programmer manual pages for all
+   - includes a complete set of kernel programmer manual pages for all
      LiS exported kernel functions for use by STREAMS module and driver
      developers.
 
-   * includes a complete set of user manual pages for all libLiS
+   - includes a complete set of user manual pages for all libLiS
      functions and separate administrative utilities.
 
-   * includes the OpenSS7 strinet driver providing XTI/TLI access to
+   - includes the OpenSS7 strinet driver providing XTI/TLI access to
      the Linux native NET4 IP stack including TCP, UDP, IP and (and
      OpenSS7 SCTP if your kernel is so equipped).
 
-   * includes functional `tirdwr' and `timod' modules for use with the
+   - includes functional `tirdwr' and `timod' modules for use with the
      included XTI/TLI library.(1)
 
-   * includes complete, thread-safe XNS 5.2 XTI/TLI library support
+   - includes complete, thread-safe XNS 5.2 XTI/TLI library support
      with the `libxnet' library, complete manual pages and
      documentation released under the LGPL (*note GNU Lesser General
      Public License::).
@@ -623,7 +671,7 @@ replaced in entirety.
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian Bidulock  <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -671,3 +719,4 @@ replaced in entirety.
  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 
 =========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn
