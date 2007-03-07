@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/07 07:29:21 $
+# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/07 09:24:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: ss7.m4,v $
+# Revision 0.9.2.20  2007/03/07 09:24:08  brian
+# - further corrections
+#
 # Revision 0.9.2.19  2007/03/07 07:29:21  brian
 # - search harder for versions
 #
@@ -455,20 +458,35 @@ dnl		    this will just not be set
 	    ss7_release=
 	    if test -n "$ss7_cv_includes" ; then
 		for ss7_dir in $ss7_cv_includes ; do
-		    if test -z "$ss7_epoch" -a -s "$ss7_dir/.rpmepoch" ; then
-			ss7_epoch=`cat $ss7_dir/.rpmepoch`
+		    if test -z "$ss7_epoch" -a -s "$ss7_dir/../.rpmepoch" ; then
+			ss7_epoch=`cat $ss7_dir/../.rpmepoch`
 		    fi
-		    if test -z "$ss7_version" -a -s "$ss7_dir/.version" ; then
-			ss7_version=`cat $ss7_dir/.version`
+		    if test -z "$ss7_epoch" -a -s "$ss7_dir/../../.rpmepoch" ; then
+			ss7_epoch=`cat $ss7_dir/../../.rpmepoch`
 		    fi
-		    if test -z "$ss7_version" -a -s "$ss7_dir/configure" ; then
-			ss7_version=`grep '^PACKAGE_VERSION=' $ss7_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    if test -z "$ss7_version" -a -s "$ss7_dir/../.version" ; then
+			ss7_version=`cat $ss7_dir/../.version`
 		    fi
-		    if test -z "$ss7_package" -a -s "$ss7_dir/.pkgrelease" ; then
-			ss7_package=`cat $ss7_dir/.pkgrelease`
+		    if test -z "$ss7_version" -a -s "$ss7_dir/../../.version" ; then
+			ss7_version=`cat $ss7_dir/../../.version`
 		    fi
-		    if test -z "$ss7_release" -a -s "$ss7_dir/.rpmrelease" ; then
-			ss7_release=`cat $ss7_dir/.rpmrelease`
+		    if test -z "$ss7_version" -a -s "$ss7_dir/../configure" ; then
+			ss7_version=`grep '^PACKAGE_VERSION=' $ss7_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$ss7_version" -a -s "$ss7_dir/../../configure" ; then
+			ss7_version=`grep '^PACKAGE_VERSION=' $ss7_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$ss7_package" -a -s "$ss7_dir/../.pkgrelease" ; then
+			ss7_package=`cat $ss7_dir/../.pkgrelease`
+		    fi
+		    if test -z "$ss7_package" -a -s "$ss7_dir/../../.pkgrelease" ; then
+			ss7_package=`cat $ss7_dir/../../.pkgrelease`
+		    fi
+		    if test -z "$ss7_release" -a -s "$ss7_dir/../.rpmrelease" ; then
+			ss7_release=`cat $ss7_dir/../.rpmrelease`
+		    fi
+		    if test -z "$ss7_release" -a -s "$ss7_dir/../../.rpmrelease" ; then
+			ss7_release=`cat $ss7_dir/../../.rpmrelease`
 		    fi
 		done
 	    fi

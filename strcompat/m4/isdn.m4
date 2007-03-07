@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/07 07:29:21 $
+# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/07 09:24:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: isdn.m4,v $
+# Revision 0.9.2.14  2007/03/07 09:24:08  brian
+# - further corrections
+#
 # Revision 0.9.2.13  2007/03/07 07:29:21  brian
 # - search harder for versions
 #
@@ -436,20 +439,35 @@ dnl		    this will just not be set
 	    isdn_release=
 	    if test -n "$isdn_cv_includes" ; then
 		for isdn_dir in $isdn_cv_includes ; do
-		    if test -z "$isdn_epoch" -a -s "$isdn_dir/.rpmepoch" ; then
-			isdn_epoch=`cat $isdn_dir/.rpmepoch`
+		    if test -z "$isdn_epoch" -a -s "$isdn_dir/../.rpmepoch" ; then
+			isdn_epoch=`cat $isdn_dir/../.rpmepoch`
 		    fi
-		    if test -z "$isdn_version" -a -s "$isdn_dir/.version" ; then
-			isdn_version=`cat $isdn_dir/.version`
+		    if test -z "$isdn_epoch" -a -s "$isdn_dir/../../.rpmepoch" ; then
+			isdn_epoch=`cat $isdn_dir/../../.rpmepoch`
 		    fi
-		    if test -z "$isdn_version" -a -s "$isdn_dir/configure" ; then
-			isdn_version=`grep '^PACKAGE_VERSION=' $isdn_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    if test -z "$isdn_version" -a -s "$isdn_dir/../.version" ; then
+			isdn_version=`cat $isdn_dir/../.version`
 		    fi
-		    if test -z "$isdn_package" -a -s "$isdn_dir/.pkgrelease" ; then
-			isdn_package=`cat $isdn_dir/.pkgrelease`
+		    if test -z "$isdn_version" -a -s "$isdn_dir/../../.version" ; then
+			isdn_version=`cat $isdn_dir/../../.version`
 		    fi
-		    if test -z "$isdn_release" -a -s "$isdn_dir/.rpmrelease" ; then
-			isdn_release=`cat $isdn_dir/.rpmrelease`
+		    if test -z "$isdn_version" -a -s "$isdn_dir/../configure" ; then
+			isdn_version=`grep '^PACKAGE_VERSION=' $isdn_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$isdn_version" -a -s "$isdn_dir/../../configure" ; then
+			isdn_version=`grep '^PACKAGE_VERSION=' $isdn_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$isdn_package" -a -s "$isdn_dir/../.pkgrelease" ; then
+			isdn_package=`cat $isdn_dir/../.pkgrelease`
+		    fi
+		    if test -z "$isdn_package" -a -s "$isdn_dir/../../.pkgrelease" ; then
+			isdn_package=`cat $isdn_dir/../../.pkgrelease`
+		    fi
+		    if test -z "$isdn_release" -a -s "$isdn_dir/../.rpmrelease" ; then
+			isdn_release=`cat $isdn_dir/../.rpmrelease`
+		    fi
+		    if test -z "$isdn_release" -a -s "$isdn_dir/../../.rpmrelease" ; then
+			isdn_release=`cat $isdn_dir/../../.rpmrelease`
 		    fi
 		done
 	    fi

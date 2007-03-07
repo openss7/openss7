@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/07 07:29:21 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/07 09:24:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.16  2007/03/07 09:24:08  brian
+# - further corrections
+#
 # Revision 0.9.2.15  2007/03/07 07:29:21  brian
 # - search harder for versions
 #
@@ -437,20 +440,35 @@ dnl		    this will just not be set
 	    iso_release=
 	    if test -n "$iso_cv_includes" ; then
 		for iso_dir in $iso_cv_includes ; do
-		    if test -z "$iso_epoch" -a -s "$iso_dir/.rpmepoch" ; then
-			iso_epoch=`cat $iso_dir/.rpmepoch`
+		    if test -z "$iso_epoch" -a -s "$iso_dir/../.rpmepoch" ; then
+			iso_epoch=`cat $iso_dir/../.rpmepoch`
 		    fi
-		    if test -z "$iso_version" -a -s "$iso_dir/.version" ; then
-			iso_version=`cat $iso_dir/.version`
+		    if test -z "$iso_epoch" -a -s "$iso_dir/../../.rpmepoch" ; then
+			iso_epoch=`cat $iso_dir/../../.rpmepoch`
 		    fi
-		    if test -z "$iso_version" -a -s "$iso_dir/configure" ; then
-			iso_version=`grep '^PACKAGE_VERSION=' $iso_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    if test -z "$iso_version" -a -s "$iso_dir/../.version" ; then
+			iso_version=`cat $iso_dir/../.version`
 		    fi
-		    if test -z "$iso_package" -a -s "$iso_dir/.pkgrelease" ; then
-			iso_package=`cat $iso_dir/.pkgrelease`
+		    if test -z "$iso_version" -a -s "$iso_dir/../../.version" ; then
+			iso_version=`cat $iso_dir/../../.version`
 		    fi
-		    if test -z "$iso_release" -a -s "$iso_dir/.rpmrelease" ; then
-			iso_release=`cat $iso_dir/.rpmrelease`
+		    if test -z "$iso_version" -a -s "$iso_dir/../configure" ; then
+			iso_version=`grep '^PACKAGE_VERSION=' $iso_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$iso_version" -a -s "$iso_dir/../../configure" ; then
+			iso_version=`grep '^PACKAGE_VERSION=' $iso_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$iso_package" -a -s "$iso_dir/../.pkgrelease" ; then
+			iso_package=`cat $iso_dir/../.pkgrelease`
+		    fi
+		    if test -z "$iso_package" -a -s "$iso_dir/../../.pkgrelease" ; then
+			iso_package=`cat $iso_dir/../../.pkgrelease`
+		    fi
+		    if test -z "$iso_release" -a -s "$iso_dir/../.rpmrelease" ; then
+			iso_release=`cat $iso_dir/../.rpmrelease`
+		    fi
+		    if test -z "$iso_release" -a -s "$iso_dir/../../.rpmrelease" ; then
+			iso_release=`cat $iso_dir/../../.rpmrelease`
 		    fi
 		done
 	    fi

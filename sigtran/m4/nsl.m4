@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/07 07:29:21 $
+# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/07 09:24:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.21  2007/03/07 09:24:08  brian
+# - further corrections
+#
 # Revision 0.9.2.20  2007/03/07 07:29:21  brian
 # - search harder for versions
 #
@@ -530,20 +533,35 @@ dnl		    this will just not be set
 	    nsl_release=
 	    if test -n "$nsl_cv_includes" ; then
 		for nsl_dir in $nsl_cv_includes ; do
-		    if test -z "$nsl_epoch" -a -s "$nsl_dir/.rpmepoch" ; then
-			nsl_epoch=`cat $nsl_dir/.rpmepoch`
+		    if test -z "$nsl_epoch" -a -s "$nsl_dir/../.rpmepoch" ; then
+			nsl_epoch=`cat $nsl_dir/../.rpmepoch`
 		    fi
-		    if test -z "$nsl_version" -a -s "$nsl_dir/.version" ; then
-			nsl_version=`cat $nsl_dir/.version`
+		    if test -z "$nsl_epoch" -a -s "$nsl_dir/../../.rpmepoch" ; then
+			nsl_epoch=`cat $nsl_dir/../../.rpmepoch`
 		    fi
-		    if test -z "$nsl_version" -a -s "$nsl_dir/configure" ; then
-			nsl_version=`grep '^PACKAGE_VERSION=' $nsl_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    if test -z "$nsl_version" -a -s "$nsl_dir/../.version" ; then
+			nsl_version=`cat $nsl_dir/../.version`
 		    fi
-		    if test -z "$nsl_package" -a -s "$nsl_dir/.pkgrelease" ; then
-			nsl_package=`cat $nsl_dir/.pkgrelease`
+		    if test -z "$nsl_version" -a -s "$nsl_dir/../../.version" ; then
+			nsl_version=`cat $nsl_dir/../../.version`
 		    fi
-		    if test -z "$nsl_release" -a -s "$nsl_dir/.rpmrelease" ; then
-			nsl_release=`cat $nsl_dir/.rpmrelease`
+		    if test -z "$nsl_version" -a -s "$nsl_dir/../configure" ; then
+			nsl_version=`grep '^PACKAGE_VERSION=' $nsl_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$nsl_version" -a -s "$nsl_dir/../../configure" ; then
+			nsl_version=`grep '^PACKAGE_VERSION=' $nsl_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$nsl_package" -a -s "$nsl_dir/../.pkgrelease" ; then
+			nsl_package=`cat $nsl_dir/../.pkgrelease`
+		    fi
+		    if test -z "$nsl_package" -a -s "$nsl_dir/../../.pkgrelease" ; then
+			nsl_package=`cat $nsl_dir/../../.pkgrelease`
+		    fi
+		    if test -z "$nsl_release" -a -s "$nsl_dir/../.rpmrelease" ; then
+			nsl_release=`cat $nsl_dir/../.rpmrelease`
+		    fi
+		    if test -z "$nsl_release" -a -s "$nsl_dir/../../.rpmrelease" ; then
+			nsl_release=`cat $nsl_dir/../../.rpmrelease`
 		    fi
 		done
 	    fi

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/03/07 07:29:22 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/07 09:24:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 07:29:22 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xns.m4,v $
+# Revision 0.9.2.50  2007/03/07 09:24:08  brian
+# - further corrections
+#
 # Revision 0.9.2.49  2007/03/07 07:29:22  brian
 # - search harder for versions
 #
@@ -511,20 +514,35 @@ dnl		    this will just not be set
 	    xns_release=
 	    if test -n "$xns_cv_includes" ; then
 		for xns_dir in $xns_cv_includes ; do
-		    if test -z "$xns_epoch" -a -s "$xns_dir/.rpmepoch" ; then
-			xns_epoch=`cat $xns_dir/.rpmepoch`
+		    if test -z "$xns_epoch" -a -s "$xns_dir/../.rpmepoch" ; then
+			xns_epoch=`cat $xns_dir/../.rpmepoch`
 		    fi
-		    if test -z "$xns_version" -a -s "$xns_dir/.version" ; then
-			xns_version=`cat $xns_dir/.version`
+		    if test -z "$xns_epoch" -a -s "$xns_dir/../../.rpmepoch" ; then
+			xns_epoch=`cat $xns_dir/../../.rpmepoch`
 		    fi
-		    if test -z "$xns_version" -a -s "$xns_dir/configure" ; then
-			xns_version=`grep '^PACKAGE_VERSION=' $xns_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    if test -z "$xns_version" -a -s "$xns_dir/../.version" ; then
+			xns_version=`cat $xns_dir/../.version`
 		    fi
-		    if test -z "$xns_package" -a -s "$xns_dir/.pkgrelease" ; then
-			xns_package=`cat $xns_dir/.pkgrelease`
+		    if test -z "$xns_version" -a -s "$xns_dir/../../.version" ; then
+			xns_version=`cat $xns_dir/../../.version`
 		    fi
-		    if test -z "$xns_release" -a -s "$xns_dir/.rpmrelease" ; then
-			xns_release=`cat $xns_dir/.rpmrelease`
+		    if test -z "$xns_version" -a -s "$xns_dir/../configure" ; then
+			xns_version=`grep '^PACKAGE_VERSION=' $xns_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$xns_version" -a -s "$xns_dir/../../configure" ; then
+			xns_version=`grep '^PACKAGE_VERSION=' $xns_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$xns_package" -a -s "$xns_dir/../.pkgrelease" ; then
+			xns_package=`cat $xns_dir/../.pkgrelease`
+		    fi
+		    if test -z "$xns_package" -a -s "$xns_dir/../../.pkgrelease" ; then
+			xns_package=`cat $xns_dir/../../.pkgrelease`
+		    fi
+		    if test -z "$xns_release" -a -s "$xns_dir/../.rpmrelease" ; then
+			xns_release=`cat $xns_dir/../.rpmrelease`
+		    fi
+		    if test -z "$xns_release" -a -s "$xns_dir/../../.rpmrelease" ; then
+			xns_release=`cat $xns_dir/../../.rpmrelease`
 		    fi
 		done
 	    fi

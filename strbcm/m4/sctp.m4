@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/03/07 07:29:21 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/03/07 09:24:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sctp.m4,v $
+# Revision 0.9.2.42  2007/03/07 09:24:08  brian
+# - further corrections
+#
 # Revision 0.9.2.41  2007/03/07 07:29:21  brian
 # - search harder for versions
 #
@@ -489,20 +492,35 @@ dnl		    this will just not be set
 	    sctp_release=
 	    if test -n "$sctp_cv_includes" ; then
 		for sctp_dir in $sctp_cv_includes ; do
-		    if test -z "$sctp_epoch" -a -s "$sctp_dir/.rpmepoch" ; then
-			sctp_epoch=`cat $sctp_dir/.rpmepoch`
+		    if test -z "$sctp_epoch" -a -s "$sctp_dir/../.rpmepoch" ; then
+			sctp_epoch=`cat $sctp_dir/../.rpmepoch`
 		    fi
-		    if test -z "$sctp_version" -a -s "$sctp_dir/.version" ; then
-			sctp_version=`cat $sctp_dir/.version`
+		    if test -z "$sctp_epoch" -a -s "$sctp_dir/../../.rpmepoch" ; then
+			sctp_epoch=`cat $sctp_dir/../../.rpmepoch`
 		    fi
-		    if test -z "$sctp_version" -a -s "$sctp_dir/configure" ; then
-			sctp_version=`grep '^PACKAGE_VERSION=' $sctp_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    if test -z "$sctp_version" -a -s "$sctp_dir/../.version" ; then
+			sctp_version=`cat $sctp_dir/../.version`
 		    fi
-		    if test -z "$sctp_package" -a -s "$sctp_dir/.pkgrelease" ; then
-			sctp_package=`cat $sctp_dir/.pkgrelease`
+		    if test -z "$sctp_version" -a -s "$sctp_dir/../../.version" ; then
+			sctp_version=`cat $sctp_dir/../../.version`
 		    fi
-		    if test -z "$sctp_release" -a -s "$sctp_dir/.rpmrelease" ; then
-			sctp_release=`cat $sctp_dir/.rpmrelease`
+		    if test -z "$sctp_version" -a -s "$sctp_dir/../configure" ; then
+			sctp_version=`grep '^PACKAGE_VERSION=' $sctp_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$sctp_version" -a -s "$sctp_dir/../../configure" ; then
+			sctp_version=`grep '^PACKAGE_VERSION=' $sctp_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$sctp_package" -a -s "$sctp_dir/../.pkgrelease" ; then
+			sctp_package=`cat $sctp_dir/../.pkgrelease`
+		    fi
+		    if test -z "$sctp_package" -a -s "$sctp_dir/../../.pkgrelease" ; then
+			sctp_package=`cat $sctp_dir/../../.pkgrelease`
+		    fi
+		    if test -z "$sctp_release" -a -s "$sctp_dir/../.rpmrelease" ; then
+			sctp_release=`cat $sctp_dir/../.rpmrelease`
+		    fi
+		    if test -z "$sctp_release" -a -s "$sctp_dir/../../.rpmrelease" ; then
+			sctp_release=`cat $sctp_dir/../../.rpmrelease`
 		    fi
 		done
 	    fi

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/03/07 07:29:22 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/03/07 09:24:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 07:29:22 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.57  2007/03/07 09:24:08  brian
+# - further corrections
+#
 # Revision 0.9.2.56  2007/03/07 07:29:22  brian
 # - search harder for versions
 #
@@ -519,20 +522,35 @@ dnl		    this will just not be set
 	    xti_release=
 	    if test -n "$xti_cv_includes" ; then
 		for xti_dir in $xti_cv_includes ; do
-		    if test -z "$xti_epoch" -a -s "$xti_dir/.rpmepoch" ; then
-			xti_epoch=`cat $xti_dir/.rpmepoch`
+		    if test -z "$xti_epoch" -a -s "$xti_dir/../.rpmepoch" ; then
+			xti_epoch=`cat $xti_dir/../.rpmepoch`
 		    fi
-		    if test -z "$xti_version" -a -s "$xti_dir/.version" ; then
-			xti_version=`cat $xti_dir/.version`
+		    if test -z "$xti_epoch" -a -s "$xti_dir/../../.rpmepoch" ; then
+			xti_epoch=`cat $xti_dir/../../.rpmepoch`
 		    fi
-		    if test -z "$xti_version" -a -s "$xti_dir/configure" ; then
-			xti_version=`grep '^PACKAGE_VERSION=' $xti_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    if test -z "$xti_version" -a -s "$xti_dir/../.version" ; then
+			xti_version=`cat $xti_dir/../.version`
 		    fi
-		    if test -z "$xti_package" -a -s "$xti_dir/.pkgrelease" ; then
-			xti_package=`cat $xti_dir/.pkgrelease`
+		    if test -z "$xti_version" -a -s "$xti_dir/../../.version" ; then
+			xti_version=`cat $xti_dir/../../.version`
 		    fi
-		    if test -z "$xti_release" -a -s "$xti_dir/.rpmrelease" ; then
-			xti_release=`cat $xti_dir/.rpmrelease`
+		    if test -z "$xti_version" -a -s "$xti_dir/../configure" ; then
+			xti_version=`grep '^PACKAGE_VERSION=' $xti_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$xti_version" -a -s "$xti_dir/../../configure" ; then
+			xti_version=`grep '^PACKAGE_VERSION=' $xti_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$xti_package" -a -s "$xti_dir/../.pkgrelease" ; then
+			xti_package=`cat $xti_dir/../.pkgrelease`
+		    fi
+		    if test -z "$xti_package" -a -s "$xti_dir/../../.pkgrelease" ; then
+			xti_package=`cat $xti_dir/../../.pkgrelease`
+		    fi
+		    if test -z "$xti_release" -a -s "$xti_dir/../.rpmrelease" ; then
+			xti_release=`cat $xti_dir/../.rpmrelease`
+		    fi
+		    if test -z "$xti_release" -a -s "$xti_dir/../../.rpmrelease" ; then
+			xti_release=`cat $xti_dir/../../.rpmrelease`
 		    fi
 		done
 	    fi
