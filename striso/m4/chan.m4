@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/07 07:29:21 $
+# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/07 09:24:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 09:24:07 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.15  2007/03/07 09:24:07  brian
+# - further corrections
+#
 # Revision 0.9.2.14  2007/03/07 07:29:21  brian
 # - search harder for versions
 #
@@ -432,20 +435,35 @@ dnl		    this will just not be set
 	    chan_release=
 	    if test -n "$chan_cv_includes" ; then
 		for chan_dir in $chan_cv_includes ; do
-		    if test -z "$chan_epoch" -a -s "$chan_dir/.rpmepoch" ; then
-			chan_epoch=`cat $chan_dir/.rpmepoch`
+		    if test -z "$chan_epoch" -a -s "$chan_dir/../.rpmepoch" ; then
+			chan_epoch=`cat $chan_dir/../.rpmepoch`
 		    fi
-		    if test -z "$chan_version" -a -s "$chan_dir/.version" ; then
-			chan_version=`cat $chan_dir/.version`
+		    if test -z "$chan_epoch" -a -s "$chan_dir/../../.rpmepoch" ; then
+			chan_epoch=`cat $chan_dir/../../.rpmepoch`
 		    fi
-		    if test -z "$chan_version" -a -s "$chan_dir/configure" ; then
-			chan_version=`grep '^PACKAGE_VERSION=' $chan_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    if test -z "$chan_version" -a -s "$chan_dir/../.version" ; then
+			chan_version=`cat $chan_dir/../.version`
 		    fi
-		    if test -z "$chan_package" -a -s "$chan_dir/.pkgrelease" ; then
-			chan_package=`cat $chan_dir/.pkgrelease`
+		    if test -z "$chan_version" -a -s "$chan_dir/../../.version" ; then
+			chan_version=`cat $chan_dir/../../.version`
 		    fi
-		    if test -z "$chan_release" -a -s "$chan_dir/.rpmrelease" ; then
-			chan_release=`cat $chan_dir/.rpmrelease`
+		    if test -z "$chan_version" -a -s "$chan_dir/../configure" ; then
+			chan_version=`grep '^PACKAGE_VERSION=' $chan_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$chan_version" -a -s "$chan_dir/../../configure" ; then
+			chan_version=`grep '^PACKAGE_VERSION=' $chan_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$chan_package" -a -s "$chan_dir/../.pkgrelease" ; then
+			chan_package=`cat $chan_dir/../.pkgrelease`
+		    fi
+		    if test -z "$chan_package" -a -s "$chan_dir/../../.pkgrelease" ; then
+			chan_package=`cat $chan_dir/../../.pkgrelease`
+		    fi
+		    if test -z "$chan_release" -a -s "$chan_dir/../.rpmrelease" ; then
+			chan_release=`cat $chan_dir/../.rpmrelease`
+		    fi
+		    if test -z "$chan_release" -a -s "$chan_dir/../../.rpmrelease" ; then
+			chan_release=`cat $chan_dir/../../.rpmrelease`
 		    fi
 		done
 	    fi

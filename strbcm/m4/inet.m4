@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/03/07 07:29:21 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/07 09:24:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 09:24:07 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: inet.m4,v $
+# Revision 0.9.2.43  2007/03/07 09:24:07  brian
+# - further corrections
+#
 # Revision 0.9.2.42  2007/03/07 07:29:21  brian
 # - search harder for versions
 #
@@ -471,20 +474,35 @@ dnl		    this will just not be set
 	    inet_release=
 	    if test -n "$inet_cv_includes" ; then
 		for inet_dir in $inet_cv_includes ; do
-		    if test -z "$inet_epoch" -a -s "$inet_dir/.rpmepoch" ; then
-			inet_epoch=`cat $inet_dir/.rpmepoch`
+		    if test -z "$inet_epoch" -a -s "$inet_dir/../.rpmepoch" ; then
+			inet_epoch=`cat $inet_dir/../.rpmepoch`
 		    fi
-		    if test -z "$inet_version" -a -s "$inet_dir/.version" ; then
-			inet_version=`cat $inet_dir/.version`
+		    if test -z "$inet_epoch" -a -s "$inet_dir/../../.rpmepoch" ; then
+			inet_epoch=`cat $inet_dir/../../.rpmepoch`
 		    fi
-		    if test -z "$inet_version" -a -s "$inet_dir/configure" ; then
-			inet_version=`grep '^PACKAGE_VERSION=' $inet_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    if test -z "$inet_version" -a -s "$inet_dir/../.version" ; then
+			inet_version=`cat $inet_dir/../.version`
 		    fi
-		    if test -z "$inet_package" -a -s "$inet_dir/.pkgrelease" ; then
-			inet_package=`cat $inet_dir/.pkgrelease`
+		    if test -z "$inet_version" -a -s "$inet_dir/../../.version" ; then
+			inet_version=`cat $inet_dir/../../.version`
 		    fi
-		    if test -z "$inet_release" -a -s "$inet_dir/.rpmrelease" ; then
-			inet_release=`cat $inet_dir/.rpmrelease`
+		    if test -z "$inet_version" -a -s "$inet_dir/../configure" ; then
+			inet_version=`grep '^PACKAGE_VERSION=' $inet_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$inet_version" -a -s "$inet_dir/../../configure" ; then
+			inet_version=`grep '^PACKAGE_VERSION=' $inet_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$inet_package" -a -s "$inet_dir/../.pkgrelease" ; then
+			inet_package=`cat $inet_dir/../.pkgrelease`
+		    fi
+		    if test -z "$inet_package" -a -s "$inet_dir/../../.pkgrelease" ; then
+			inet_package=`cat $inet_dir/../../.pkgrelease`
+		    fi
+		    if test -z "$inet_release" -a -s "$inet_dir/../.rpmrelease" ; then
+			inet_release=`cat $inet_dir/../.rpmrelease`
+		    fi
+		    if test -z "$inet_release" -a -s "$inet_dir/../../.rpmrelease" ; then
+			inet_release=`cat $inet_dir/../../.rpmrelease`
 		    fi
 		done
 	    fi

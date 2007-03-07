@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/07 07:29:22 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/03/07 09:24:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 07:29:22 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strcomp.m4,v $
+# Revision 0.9.2.33  2007/03/07 09:24:08  brian
+# - further corrections
+#
 # Revision 0.9.2.32  2007/03/07 07:29:22  brian
 # - search harder for versions
 #
@@ -501,20 +504,35 @@ dnl		    this will just not be set
 	    strcomp_release=
 	    if test -n "$strcomp_cv_includes" ; then
 		for strcomp_dir in $strcomp_cv_includes ; do
-		    if test -z "$strcomp_epoch" -a -s "$strcomp_dir/.rpmepoch" ; then
-			strcomp_epoch=`cat $strcomp_dir/.rpmepoch`
+		    if test -z "$strcomp_epoch" -a -s "$strcomp_dir/../.rpmepoch" ; then
+			strcomp_epoch=`cat $strcomp_dir/../.rpmepoch`
 		    fi
-		    if test -z "$strcomp_version" -a -s "$strcomp_dir/.version" ; then
-			strcomp_version=`cat $strcomp_dir/.version`
+		    if test -z "$strcomp_epoch" -a -s "$strcomp_dir/../../.rpmepoch" ; then
+			strcomp_epoch=`cat $strcomp_dir/../../.rpmepoch`
 		    fi
-		    if test -z "$strcomp_version" -a -s "$strcomp_dir/configure" ; then
-			strcomp_version=`grep '^PACKAGE_VERSION=' $strcomp_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    if test -z "$strcomp_version" -a -s "$strcomp_dir/../.version" ; then
+			strcomp_version=`cat $strcomp_dir/../.version`
 		    fi
-		    if test -z "$strcomp_package" -a -s "$strcomp_dir/.pkgrelease" ; then
-			strcomp_package=`cat $strcomp_dir/.pkgrelease`
+		    if test -z "$strcomp_version" -a -s "$strcomp_dir/../../.version" ; then
+			strcomp_version=`cat $strcomp_dir/../../.version`
 		    fi
-		    if test -z "$strcomp_release" -a -s "$strcomp_dir/.rpmrelease" ; then
-			strcomp_release=`cat $strcomp_dir/.rpmrelease`
+		    if test -z "$strcomp_version" -a -s "$strcomp_dir/../configure" ; then
+			strcomp_version=`grep '^PACKAGE_VERSION=' $strcomp_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$strcomp_version" -a -s "$strcomp_dir/../../configure" ; then
+			strcomp_version=`grep '^PACKAGE_VERSION=' $strcomp_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$strcomp_package" -a -s "$strcomp_dir/../.pkgrelease" ; then
+			strcomp_package=`cat $strcomp_dir/../.pkgrelease`
+		    fi
+		    if test -z "$strcomp_package" -a -s "$strcomp_dir/../../.pkgrelease" ; then
+			strcomp_package=`cat $strcomp_dir/../../.pkgrelease`
+		    fi
+		    if test -z "$strcomp_release" -a -s "$strcomp_dir/../.rpmrelease" ; then
+			strcomp_release=`cat $strcomp_dir/../.rpmrelease`
+		    fi
+		    if test -z "$strcomp_release" -a -s "$strcomp_dir/../../.rpmrelease" ; then
+			strcomp_release=`cat $strcomp_dir/../../.rpmrelease`
 		    fi
 		done
 	    fi

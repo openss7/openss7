@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/07 07:29:21 $
+# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/07 09:24:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.22  2007/03/07 09:24:08  brian
+# - further corrections
+#
 # Revision 0.9.2.21  2007/03/07 07:29:21  brian
 # - search harder for versions
 #
@@ -513,20 +516,35 @@ dnl		    this will just not be set
 	    sock_release=
 	    if test -n "$sock_cv_includes" ; then
 		for sock_dir in $sock_cv_includes ; do
-		    if test -z "$sock_epoch" -a -s "$sock_dir/.rpmepoch" ; then
-			sock_epoch=`cat $sock_dir/.rpmepoch`
+		    if test -z "$sock_epoch" -a -s "$sock_dir/../.rpmepoch" ; then
+			sock_epoch=`cat $sock_dir/../.rpmepoch`
 		    fi
-		    if test -z "$sock_version" -a -s "$sock_dir/.version" ; then
-			sock_version=`cat $sock_dir/.version`
+		    if test -z "$sock_epoch" -a -s "$sock_dir/../../.rpmepoch" ; then
+			sock_epoch=`cat $sock_dir/../../.rpmepoch`
 		    fi
-		    if test -z "$sock_version" -a -s "$sock_dir/configure" ; then
-			sock_version=`grep '^PACKAGE_VERSION=' $sock_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    if test -z "$sock_version" -a -s "$sock_dir/../.version" ; then
+			sock_version=`cat $sock_dir/../.version`
 		    fi
-		    if test -z "$sock_package" -a -s "$sock_dir/.pkgrelease" ; then
-			sock_package=`cat $sock_dir/.pkgrelease`
+		    if test -z "$sock_version" -a -s "$sock_dir/../../.version" ; then
+			sock_version=`cat $sock_dir/../../.version`
 		    fi
-		    if test -z "$sock_release" -a -s "$sock_dir/.rpmrelease" ; then
-			sock_release=`cat $sock_dir/.rpmrelease`
+		    if test -z "$sock_version" -a -s "$sock_dir/../configure" ; then
+			sock_version=`grep '^PACKAGE_VERSION=' $sock_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$sock_version" -a -s "$sock_dir/../../configure" ; then
+			sock_version=`grep '^PACKAGE_VERSION=' $sock_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$sock_package" -a -s "$sock_dir/../.pkgrelease" ; then
+			sock_package=`cat $sock_dir/../.pkgrelease`
+		    fi
+		    if test -z "$sock_package" -a -s "$sock_dir/../../.pkgrelease" ; then
+			sock_package=`cat $sock_dir/../../.pkgrelease`
+		    fi
+		    if test -z "$sock_release" -a -s "$sock_dir/../.rpmrelease" ; then
+			sock_release=`cat $sock_dir/../.rpmrelease`
+		    fi
+		    if test -z "$sock_release" -a -s "$sock_dir/../../.rpmrelease" ; then
+			sock_release=`cat $sock_dir/../../.rpmrelease`
 		    fi
 		done
 	    fi

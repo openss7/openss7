@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2007/03/07 07:29:22 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2007/03/07 09:24:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 07:29:22 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -550,20 +550,20 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 	    streams_release=
 	    if test -n "$streams_cv_lis_includes" ; then
 		for streams_dir in $streams_cv_lis_includes ; do
-		    if test -z "$streams_epoch" -a -s "$streams_dir/.rpmepoch" ; then
-			streams_epoch=`cat $streams_dir/.rpmepoch`
+		    if test -z "$streams_epoch" -a -s "$streams_dir/../.rpmepoch" ; then
+			streams_epoch=`cat $streams_dir/../.rpmepoch`
 		    fi
-		    if test -z "$streams_version" -a -s "$streams_dir/.version" ; then
-			streams_version=`cat $streams_dir/.version`
+		    if test -z "$streams_version" -a -s "$streams_dir/../.version" ; then
+			streams_version=`cat $streams_dir/../.version`
 		    fi
-		    if test -z "$streams_version" -a -s "$streams_dir/configure" ; then
-			streams_version=`grep '^PACKAGE_VERSION=' $streams_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    if test -z "$streams_version" -a -s "$streams_dir/../configure" ; then
+			streams_version=`grep '^PACKAGE_VERSION=' $streams_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
-		    if test -z "$streams_package" -a -s "$streams_dir/.pkgrelease" ; then
-			streams_package=`cat $streams_dir/.pkgrelease`
+		    if test -z "$streams_package" -a -s "$streams_dir/../.pkgrelease" ; then
+			streams_package=`cat $streams_dir/../.pkgrelease`
 		    fi
-		    if test -z "$streams_release" -a -s "$streams_dir/.rpmrelease" ; then
-			streams_release=`cat $streams_dir/.rpmrelease`
+		    if test -z "$streams_release" -a -s "$streams_dir/../.rpmrelease" ; then
+			streams_release=`cat $streams_dir/../.rpmrelease`
 		    fi
 		done
 	    fi
@@ -915,20 +915,20 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 	    streams_release=
 	    if test -n "$streams_cv_lfs_includes" ; then
 		for streams_dir in $streams_cv_lfs_includes ; do
-		    if test -z "$streams_epoch" -a -s "$streams_dir/.rpmepoch" ; then
-			streams_epoch=`cat $streams_dir/.rpmepoch`
+		    if test -z "$streams_epoch" -a -s "$streams_dir/../.rpmepoch" ; then
+			streams_epoch=`cat $streams_dir/../.rpmepoch`
 		    fi
-		    if test -z "$streams_version" -a -s "$streams_dir/.version" ; then
-			streams_version=`cat $streams_dir/.version`
+		    if test -z "$streams_version" -a -s "$streams_dir/../.version" ; then
+			streams_version=`cat $streams_dir/../.version`
 		    fi
-		    if test -z "$streams_version" -a -s "$streams_dir/configure" ; then
-			streams_version=`grep '^PACKAGE_VERSION=' $streams_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    if test -z "$streams_version" -a -s "$streams_dir/../configure" ; then
+			streams_version=`grep '^PACKAGE_VERSION=' $streams_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
-		    if test -z "$streams_package" -a -s "$streams_dir/.pkgrelease" ; then
-			streams_package=`cat $streams_dir/.pkgrelease`
+		    if test -z "$streams_package" -a -s "$streams_dir/../.pkgrelease" ; then
+			streams_package=`cat $streams_dir/../.pkgrelease`
 		    fi
-		    if test -z "$streams_release" -a -s "$streams_dir/.rpmrelease" ; then
-			streams_release=`cat $streams_dir/.rpmrelease`
+		    if test -z "$streams_release" -a -s "$streams_dir/../.rpmrelease" ; then
+			streams_release=`cat $streams_dir/../.rpmrelease`
 		    fi
 		done
 	    fi

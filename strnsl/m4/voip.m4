@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/07 07:29:22 $
+# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/07 09:24:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 07:29:22 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: voip.m4,v $
+# Revision 0.9.2.13  2007/03/07 09:24:08  brian
+# - further corrections
+#
 # Revision 0.9.2.12  2007/03/07 07:29:22  brian
 # - search harder for versions
 #
@@ -433,20 +436,35 @@ dnl		    this will just not be set
 	    voip_release=
 	    if test -n "$voip_cv_includes" ; then
 		for voip_dir in $voip_cv_includes ; do
-		    if test -z "$voip_epoch" -a -s "$voip_dir/.rpmepoch" ; then
-			voip_epoch=`cat $voip_dir/.rpmepoch`
+		    if test -z "$voip_epoch" -a -s "$voip_dir/../.rpmepoch" ; then
+			voip_epoch=`cat $voip_dir/../.rpmepoch`
 		    fi
-		    if test -z "$voip_version" -a -s "$voip_dir/.version" ; then
-			voip_version=`cat $voip_dir/.version`
+		    if test -z "$voip_epoch" -a -s "$voip_dir/../../.rpmepoch" ; then
+			voip_epoch=`cat $voip_dir/../../.rpmepoch`
 		    fi
-		    if test -z "$voip_version" -a -s "$voip_dir/configure" ; then
-			voip_version=`grep '^PACKAGE_VERSION=' $voip_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    if test -z "$voip_version" -a -s "$voip_dir/../.version" ; then
+			voip_version=`cat $voip_dir/../.version`
 		    fi
-		    if test -z "$voip_package" -a -s "$voip_dir/.pkgrelease" ; then
-			voip_package=`cat $voip_dir/.pkgrelease`
+		    if test -z "$voip_version" -a -s "$voip_dir/../../.version" ; then
+			voip_version=`cat $voip_dir/../../.version`
 		    fi
-		    if test -z "$voip_release" -a -s "$voip_dir/.rpmrelease" ; then
-			voip_release=`cat $voip_dir/.rpmrelease`
+		    if test -z "$voip_version" -a -s "$voip_dir/../configure" ; then
+			voip_version=`grep '^PACKAGE_VERSION=' $voip_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$voip_version" -a -s "$voip_dir/../../configure" ; then
+			voip_version=`grep '^PACKAGE_VERSION=' $voip_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$voip_package" -a -s "$voip_dir/../.pkgrelease" ; then
+			voip_package=`cat $voip_dir/../.pkgrelease`
+		    fi
+		    if test -z "$voip_package" -a -s "$voip_dir/../../.pkgrelease" ; then
+			voip_package=`cat $voip_dir/../../.pkgrelease`
+		    fi
+		    if test -z "$voip_release" -a -s "$voip_dir/../.rpmrelease" ; then
+			voip_release=`cat $voip_dir/../.rpmrelease`
+		    fi
+		    if test -z "$voip_release" -a -s "$voip_dir/../../.rpmrelease" ; then
+			voip_release=`cat $voip_dir/../../.rpmrelease`
 		    fi
 		done
 	    fi

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/07 07:29:21 $
+# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/07 09:24:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sigtran.m4,v $
+# Revision 0.9.2.13  2007/03/07 09:24:08  brian
+# - further corrections
+#
 # Revision 0.9.2.12  2007/03/07 07:29:21  brian
 # - search harder for versions
 #
@@ -431,20 +434,35 @@ dnl		    this will just not be set
 	    sigtran_release=
 	    if test -n "$sigtran_cv_includes" ; then
 		for sigtran_dir in $sigtran_cv_includes ; do
-		    if test -z "$sigtran_epoch" -a -s "$sigtran_dir/.rpmepoch" ; then
-			sigtran_epoch=`cat $sigtran_dir/.rpmepoch`
+		    if test -z "$sigtran_epoch" -a -s "$sigtran_dir/../.rpmepoch" ; then
+			sigtran_epoch=`cat $sigtran_dir/../.rpmepoch`
 		    fi
-		    if test -z "$sigtran_version" -a -s "$sigtran_dir/.version" ; then
-			sigtran_version=`cat $sigtran_dir/.version`
+		    if test -z "$sigtran_epoch" -a -s "$sigtran_dir/../../.rpmepoch" ; then
+			sigtran_epoch=`cat $sigtran_dir/../../.rpmepoch`
 		    fi
-		    if test -z "$sigtran_version" -a -s "$sigtran_dir/configure" ; then
-			sigtran_version=`grep '^PACKAGE_VERSION=' $sigtran_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    if test -z "$sigtran_version" -a -s "$sigtran_dir/../.version" ; then
+			sigtran_version=`cat $sigtran_dir/../.version`
 		    fi
-		    if test -z "$sigtran_package" -a -s "$sigtran_dir/.pkgrelease" ; then
-			sigtran_package=`cat $sigtran_dir/.pkgrelease`
+		    if test -z "$sigtran_version" -a -s "$sigtran_dir/../../.version" ; then
+			sigtran_version=`cat $sigtran_dir/../../.version`
 		    fi
-		    if test -z "$sigtran_release" -a -s "$sigtran_dir/.rpmrelease" ; then
-			sigtran_release=`cat $sigtran_dir/.rpmrelease`
+		    if test -z "$sigtran_version" -a -s "$sigtran_dir/../configure" ; then
+			sigtran_version=`grep '^PACKAGE_VERSION=' $sigtran_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$sigtran_version" -a -s "$sigtran_dir/../../configure" ; then
+			sigtran_version=`grep '^PACKAGE_VERSION=' $sigtran_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$sigtran_package" -a -s "$sigtran_dir/../.pkgrelease" ; then
+			sigtran_package=`cat $sigtran_dir/../.pkgrelease`
+		    fi
+		    if test -z "$sigtran_package" -a -s "$sigtran_dir/../../.pkgrelease" ; then
+			sigtran_package=`cat $sigtran_dir/../../.pkgrelease`
+		    fi
+		    if test -z "$sigtran_release" -a -s "$sigtran_dir/../.rpmrelease" ; then
+			sigtran_release=`cat $sigtran_dir/../.rpmrelease`
+		    fi
+		    if test -z "$sigtran_release" -a -s "$sigtran_dir/../../.rpmrelease" ; then
+			sigtran_release=`cat $sigtran_dir/../../.rpmrelease`
 		    fi
 		done
 	    fi
