@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/06 23:39:54 $
+# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/07 07:29:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:39:54 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.20  2007/03/07 07:29:21  brian
+# - search harder for versions
+#
 # Revision 0.9.2.19  2007/03/06 23:39:54  brian
 # - more corrections
 #
@@ -494,28 +497,59 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 *** ])
     fi
     AC_CACHE_CHECK([for nsl version], [nsl_cv_version], [dnl
-	nsl_what="sys/strnsl/version.h"
-	nsl_file=
-	if test -n "$nsl_cv_includes" ; then
-	    for nsl_dir in $nsl_cv_includes ; do
-		# old place for version
-		if test -f "$nsl_dir/$nsl_what" ; then
-		    nsl_file="$nsl_dir/$nsl_what"
-		    break
-		fi
-		# new place for version
-		if test -n "$linux_cv_k_release" ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
-dnl		    this will just not be set
-		    if test -f "$nsl_dir/$linux_cv_k_release/$target_cpu/$nsl_what" ; then
-			nsl_file="$nsl_dir/$linux_cv_k_release/$target_cpu/$nsl_what"
+	nsl_cv_version=
+	if test -z "$nsl_cv_version" ; then
+	    nsl_what="sys/strnsl/version.h"
+	    nsl_file=
+	    if test -n "$nsl_cv_includes" ; then
+		for nsl_dir in $nsl_cv_includes ; do
+		    # old place for version
+		    if test -f "$nsl_dir/$nsl_what" ; then
+			nsl_file="$nsl_dir/$nsl_what"
 			break
 		    fi
-		fi
-	    done
+		    # new place for version
+		    if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+			if test -f "$nsl_dir/$linux_cv_k_release/$target_cpu/$nsl_what" ; then
+			    nsl_file="$nsl_dir/$linux_cv_k_release/$target_cpu/$nsl_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	    if test :${nsl_file:-no} != :no ; then
+		nsl_cv_version=`grep '#define.*\<STRNSL_VERSION\>' $nsl_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	    fi
 	fi
-	if test :${nsl_file:-no} != :no ; then
-	    nsl_cv_version=`grep '#define.*\<STRNSL_VERSION\>' $nsl_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	if test -z "$nsl_cv_version" ; then
+	    nsl_epoch=
+	    nsl_version=
+	    nsl_package=
+	    nsl_release=
+	    if test -n "$nsl_cv_includes" ; then
+		for nsl_dir in $nsl_cv_includes ; do
+		    if test -z "$nsl_epoch" -a -s "$nsl_dir/.rpmepoch" ; then
+			nsl_epoch=`cat $nsl_dir/.rpmepoch`
+		    fi
+		    if test -z "$nsl_version" -a -s "$nsl_dir/.version" ; then
+			nsl_version=`cat $nsl_dir/.version`
+		    fi
+		    if test -z "$nsl_version" -a -s "$nsl_dir/configure" ; then
+			nsl_version=`grep '^PACKAGE_VERSION=' $nsl_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$nsl_package" -a -s "$nsl_dir/.pkgrelease" ; then
+			nsl_package=`cat $nsl_dir/.pkgrelease`
+		    fi
+		    if test -z "$nsl_release" -a -s "$nsl_dir/.rpmrelease" ; then
+			nsl_release=`cat $nsl_dir/.rpmrelease`
+		    fi
+		done
+	    fi
+	    if test -n "$nsl_epoch" -a -n "$nsl_version" -a -n "$nsl_package" -a -n "$nsl_release" ; then
+		nsl_cv_version="$nsl_epoch:$nsl_version.$nsl_package-$nsl_release"
+	    fi
 	fi
     ])
     nsl_what="sys/strnsl/config.h"

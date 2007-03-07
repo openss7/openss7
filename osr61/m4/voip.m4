@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/06 23:39:54 $
+# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/07 07:29:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:39:54 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 07:29:22 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: voip.m4,v $
+# Revision 0.9.2.12  2007/03/07 07:29:22  brian
+# - search harder for versions
+#
 # Revision 0.9.2.11  2007/03/06 23:39:54  brian
 # - more corrections
 #
@@ -397,28 +400,59 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 *** ])
     fi
     AC_CACHE_CHECK([for voip version], [voip_cv_version], [dnl
-	voip_what="sys/strvoip/version.h"
-	voip_file=
-	if test -n "$voip_cv_includes" ; then
-	    for voip_dir in $voip_cv_includes ; do
-		# old place for version
-		if test -f "$voip_dir/$voip_what" ; then
-		    voip_file="$voip_dir/$voip_what"
-		    break
-		fi
-		# new place for version
-		if test -n "$linux_cv_k_release" ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
-dnl		    this will just not be set
-		    if test -f "$voip_dir/$linux_cv_k_release/$target_cpu/$voip_what" ; then
-			voip_file="$voip_dir/$linux_cv_k_release/$target_cpu/$voip_what"
+	voip_cv_version=
+	if test -z "$voip_cv_version" ; then
+	    voip_what="sys/strvoip/version.h"
+	    voip_file=
+	    if test -n "$voip_cv_includes" ; then
+		for voip_dir in $voip_cv_includes ; do
+		    # old place for version
+		    if test -f "$voip_dir/$voip_what" ; then
+			voip_file="$voip_dir/$voip_what"
 			break
 		    fi
-		fi
-	    done
+		    # new place for version
+		    if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+			if test -f "$voip_dir/$linux_cv_k_release/$target_cpu/$voip_what" ; then
+			    voip_file="$voip_dir/$linux_cv_k_release/$target_cpu/$voip_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	    if test :"${voip_file:-no}" != :no ; then
+		voip_cv_version=`grep '#define.*\<STRVOIP_VERSION\>' $voip_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	    fi
 	fi
-	if test :"${voip_file:-no}" != :no ; then
-	    voip_cv_version=`grep '#define.*\<STRVOIP_VERSION\>' $voip_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	if test -z "$voip_cv_version" ; then
+	    voip_epoch=
+	    voip_version=
+	    voip_package=
+	    voip_release=
+	    if test -n "$voip_cv_includes" ; then
+		for voip_dir in $voip_cv_includes ; do
+		    if test -z "$voip_epoch" -a -s "$voip_dir/.rpmepoch" ; then
+			voip_epoch=`cat $voip_dir/.rpmepoch`
+		    fi
+		    if test -z "$voip_version" -a -s "$voip_dir/.version" ; then
+			voip_version=`cat $voip_dir/.version`
+		    fi
+		    if test -z "$voip_version" -a -s "$voip_dir/configure" ; then
+			voip_version=`grep '^PACKAGE_VERSION=' $voip_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$voip_package" -a -s "$voip_dir/.pkgrelease" ; then
+			voip_package=`cat $voip_dir/.pkgrelease`
+		    fi
+		    if test -z "$voip_release" -a -s "$voip_dir/.rpmrelease" ; then
+			voip_release=`cat $voip_dir/.rpmrelease`
+		    fi
+		done
+	    fi
+	    if test -n "$voip_epoch" -a -n "$voip_version" -a -n "$voip_package" -a -n "$voip_release" ; then
+		voip_cv_version="$voip_epoch:$voip_version.$voip_package-$voip_release"
+	    fi
 	fi
     ])
     voip_what="sys/strvoip/config.h"

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/06 23:39:53 $
+# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/07 07:29:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:39:53 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.14  2007/03/07 07:29:21  brian
+# - search harder for versions
+#
 # Revision 0.9.2.13  2007/03/06 23:39:53  brian
 # - more corrections
 #
@@ -396,28 +399,59 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 *** ])
     fi
     AC_CACHE_CHECK([for chan version], [chan_cv_version], [dnl
-	chan_what="sys/strchan/version.h"
-	chan_file=
-	if test -n "$chan_cv_includes" ; then
-	    for chan_dir in $chan_cv_includes ; do
-		# old place for version
-		if test -f "$chan_dir/$chan_what" ; then
-		    chan_file="$chan_dir/$chan_what"
-		    break
-		fi
-		# new place for version
-		if test -n "$linux_cv_k_release" ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
-dnl		    this will just not be set
-		    if test -f "$chan_dir/$linux_cv_k_release/$target_cpu/$chan_what" ; then
-			chan_file="$chan_dir/$linux_cv_k_release/$target_cpu/$chan_what"
+	chan_cv_version=
+	if test -z "$chan_cv_version" ; then
+	    chan_what="sys/strchan/version.h"
+	    chan_file=
+	    if test -n "$chan_cv_includes" ; then
+		for chan_dir in $chan_cv_includes ; do
+		    # old place for version
+		    if test -f "$chan_dir/$chan_what" ; then
+			chan_file="$chan_dir/$chan_what"
 			break
 		    fi
-		fi
-	    done
+		    # new place for version
+		    if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+			if test -f "$chan_dir/$linux_cv_k_release/$target_cpu/$chan_what" ; then
+			    chan_file="$chan_dir/$linux_cv_k_release/$target_cpu/$chan_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	    if test :${chan_file:-no} != :no ; then
+		chan_cv_version=`grep '#define.*\<STRCHAN_VERSION\>' $chan_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	    fi
 	fi
-	if test :${chan_file:-no} != :no ; then
-	    chan_cv_version=`grep '#define.*\<STRCHAN_VERSION\>' $chan_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	if test -z "$chan_cv_version" ; then
+	    chan_epoch=
+	    chan_version=
+	    chan_package=
+	    chan_release=
+	    if test -n "$chan_cv_includes" ; then
+		for chan_dir in $chan_cv_includes ; do
+		    if test -z "$chan_epoch" -a -s "$chan_dir/.rpmepoch" ; then
+			chan_epoch=`cat $chan_dir/.rpmepoch`
+		    fi
+		    if test -z "$chan_version" -a -s "$chan_dir/.version" ; then
+			chan_version=`cat $chan_dir/.version`
+		    fi
+		    if test -z "$chan_version" -a -s "$chan_dir/configure" ; then
+			chan_version=`grep '^PACKAGE_VERSION=' $chan_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$chan_package" -a -s "$chan_dir/.pkgrelease" ; then
+			chan_package=`cat $chan_dir/.pkgrelease`
+		    fi
+		    if test -z "$chan_release" -a -s "$chan_dir/.rpmrelease" ; then
+			chan_release=`cat $chan_dir/.rpmrelease`
+		    fi
+		done
+	    fi
+	    if test -n "$chan_epoch" -a -n "$chan_version" -a -n "$chan_package" -a -n "$chan_release" ; then
+		chan_cv_version="$chan_epoch:$chan_version.$chan_package-$chan_release"
+	    fi
 	fi
     ])
     chan_what="sys/strchan/config.h"

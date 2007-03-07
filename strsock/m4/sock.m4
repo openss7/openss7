@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/06 23:39:54 $
+# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/07 07:29:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:39:54 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.21  2007/03/07 07:29:21  brian
+# - search harder for versions
+#
 # Revision 0.9.2.20  2007/03/06 23:39:54  brian
 # - more corrections
 #
@@ -477,28 +480,59 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 *** ])
     fi
     AC_CACHE_CHECK([for sock version], [sock_cv_version], [dnl
-	sock_what="sys/strsock/version.h"
-	sock_file=
-	if test -n "$sock_cv_includes" ; then
-	    for sock_dir in $sock_cv_includes ; do
-		# old place for version
-		if test -f "$sock_dir/$sock_what" ; then
-		    sock_file="$sock_dir/$sock_what"
-		    break
-		fi
-		# new place for version
-		if test -n "$linux_cv_k_release" ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
-dnl		    this will just not be set
-		    if test -f "$sock_dir/$linux_cv_k_release/$target_cpu/$sock_what" ; then
-			sock_file="$sock_dir/$linux_cv_k_release/$target_cpu/$sock_what"
+	sock_cv_version=
+	if test -z "$sock_cv_version" ; then
+	    sock_what="sys/strsock/version.h"
+	    sock_file=
+	    if test -n "$sock_cv_includes" ; then
+		for sock_dir in $sock_cv_includes ; do
+		    # old place for version
+		    if test -f "$sock_dir/$sock_what" ; then
+			sock_file="$sock_dir/$sock_what"
 			break
 		    fi
-		fi
-	    done
+		    # new place for version
+		    if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+			if test -f "$sock_dir/$linux_cv_k_release/$target_cpu/$sock_what" ; then
+			    sock_file="$sock_dir/$linux_cv_k_release/$target_cpu/$sock_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	    if test :${sock_file:-no} != :no ; then
+		sock_cv_version=`grep '#define.*\<STRSOCK_VERSION\>' $sock_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	    fi
 	fi
-	if test :${sock_file:-no} != :no ; then
-	    sock_cv_version=`grep '#define.*\<STRSOCK_VERSION\>' $sock_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	if test -z "$sock_cv_version" ; then
+	    sock_epoch=
+	    sock_version=
+	    sock_package=
+	    sock_release=
+	    if test -n "$sock_cv_includes" ; then
+		for sock_dir in $sock_cv_includes ; do
+		    if test -z "$sock_epoch" -a -s "$sock_dir/.rpmepoch" ; then
+			sock_epoch=`cat $sock_dir/.rpmepoch`
+		    fi
+		    if test -z "$sock_version" -a -s "$sock_dir/.version" ; then
+			sock_version=`cat $sock_dir/.version`
+		    fi
+		    if test -z "$sock_version" -a -s "$sock_dir/configure" ; then
+			sock_version=`grep '^PACKAGE_VERSION=' $sock_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$sock_package" -a -s "$sock_dir/.pkgrelease" ; then
+			sock_package=`cat $sock_dir/.pkgrelease`
+		    fi
+		    if test -z "$sock_release" -a -s "$sock_dir/.rpmrelease" ; then
+			sock_release=`cat $sock_dir/.rpmrelease`
+		    fi
+		done
+	    fi
+	    if test -n "$sock_epoch" -a -n "$sock_version" -a -n "$sock_package" -a -n "$sock_release" ; then
+		sock_cv_version="$sock_epoch:$sock_version.$sock_package-$sock_release"
+	    fi
 	fi
     ])
     sock_what="sys/strsock/config.h"

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/06 23:39:54 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/07 07:29:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:39:54 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 07:29:22 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strcomp.m4,v $
+# Revision 0.9.2.32  2007/03/07 07:29:22  brian
+# - search harder for versions
+#
 # Revision 0.9.2.31  2007/03/06 23:39:54  brian
 # - more corrections
 #
@@ -465,28 +468,59 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 *** ])
     fi
     AC_CACHE_CHECK([for compat version], [strcomp_cv_version], [dnl
-	strcomp_what="sys/strcompat/version.h"
-	strcomp_file=
-	if test -n "$strcomp_cv_includes" ; then
-	    for strcomp_dir in $strcomp_cv_includes ; do
-		# old place for version
-		if test -f "$strcomp_dir/$strcomp_what" ; then
-		    strcomp_file="$strcomp_dir/$strcomp_what"
-		    break
-		fi
-		# new place for version
-		if test -n "$linux_cv_k_release" ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
-dnl		    this will just not be set
-		    if test -f "$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what" ; then
-			strcomp_file="$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what"
+	strcomp_cv_version=
+	if test -z "$strcomp_cv_version" ; then
+	    strcomp_what="sys/strcompat/version.h"
+	    strcomp_file=
+	    if test -n "$strcomp_cv_includes" ; then
+		for strcomp_dir in $strcomp_cv_includes ; do
+		    # old place for version
+		    if test -f "$strcomp_dir/$strcomp_what" ; then
+			strcomp_file="$strcomp_dir/$strcomp_what"
 			break
 		    fi
-		fi
-	    done
+		    # new place for version
+		    if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+			if test -f "$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what" ; then
+			    strcomp_file="$strcomp_dir/$linux_cv_k_release/$target_cpu/$strcomp_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	    if test :${strcomp_file:-no} != :no ; then
+		strcomp_cv_version=`grep '#define.*\<STRCOMPAT_VERSION\>' $strcomp_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	    fi
 	fi
-	if test :${strcomp_file:-no} != :no ; then
-	    strcomp_cv_version=`grep '#define.*\<STRCOMPAT_VERSION\>' $strcomp_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	if test -z "$strcomp_version" ; then
+	    strcomp_epoch=
+	    strcomp_version=
+	    strcomp_package=
+	    strcomp_release=
+	    if test -n "$strcomp_cv_includes" ; then
+		for strcomp_dir in $strcomp_cv_includes ; do
+		    if test -z "$strcomp_epoch" -a -s "$strcomp_dir/.rpmepoch" ; then
+			strcomp_epoch=`cat $strcomp_dir/.rpmepoch`
+		    fi
+		    if test -z "$strcomp_version" -a -s "$strcomp_dir/.version" ; then
+			strcomp_version=`cat $strcomp_dir/.version`
+		    fi
+		    if test -z "$strcomp_version" -a -s "$strcomp_dir/configure" ; then
+			strcomp_version=`grep '^PACKAGE_VERSION=' $strcomp_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$strcomp_package" -a -s "$strcomp_dir/.pkgrelease" ; then
+			strcomp_package=`cat $strcomp_dir/.pkgrelease`
+		    fi
+		    if test -z "$strcomp_release" -a -s "$strcomp_dir/.rpmrelease" ; then
+			strcomp_release=`cat $strcomp_dir/.rpmrelease`
+		    fi
+		done
+	    fi
+	    if test -n "$strcomp_epoch" -a -n "$strcomp_version" -a -n "$strcomp_package" -a -n "$strcomp_release" ; then
+		strcomp_cv_version="$strcomp_epoch:$strcomp_version.$strcomp_package-$strcomp_release"
+	    fi
 	fi
     ])
     strcomp_what="sys/strcompat/config.h"

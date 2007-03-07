@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/06 23:39:54 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/07 07:29:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:39:54 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.15  2007/03/07 07:29:21  brian
+# - search harder for versions
+#
 # Revision 0.9.2.14  2007/03/06 23:39:54  brian
 # - more corrections
 #
@@ -401,28 +404,59 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 *** ])
     fi
     AC_CACHE_CHECK([for iso version], [iso_cv_version], [dnl
-	iso_what="sys/striso/version.h"
-	iso_file=
-	if test -n "$iso_cv_includes" ; then
-	    for iso_dir in $iso_cv_includes ; do
-		# old place for version
-		if test -f "$iso_dir/$iso_what" ; then
-		    iso_file="$iso_dir/$iso_what"
-		    break
-		fi
-		# new place for version
-		if test -n "$linux_cv_k_release" ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
-dnl		    this will just not be set
-		    if test -f "$iso_dir/$linux_cv_k_release/$target_cpu/$iso_what" ; then
-			iso_file="$iso_dir/$linux_cv_k_release/$target_cpu/$iso_what"
+	iso_cv_version=
+	if test -z "$iso_cv_version" ; then
+	    iso_what="sys/striso/version.h"
+	    iso_file=
+	    if test -n "$iso_cv_includes" ; then
+		for iso_dir in $iso_cv_includes ; do
+		    # old place for version
+		    if test -f "$iso_dir/$iso_what" ; then
+			iso_file="$iso_dir/$iso_what"
 			break
 		    fi
-		fi
-	    done
+		    # new place for version
+		    if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+			if test -f "$iso_dir/$linux_cv_k_release/$target_cpu/$iso_what" ; then
+			    iso_file="$iso_dir/$linux_cv_k_release/$target_cpu/$iso_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	    if test :${iso_file:-no} != :no ; then
+		iso_cv_version=`grep '#define.*\<STRISO_VERSION\>' $iso_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	    fi
 	fi
-	if test :${iso_file:-no} != :no ; then
-	    iso_cv_version=`grep '#define.*\<STRISO_VERSION\>' $iso_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	if test -z "$iso_cv_version" ; then
+	    iso_epoch=
+	    iso_version=
+	    iso_package=
+	    iso_release=
+	    if test -n "$iso_cv_includes" ; then
+		for iso_dir in $iso_cv_includes ; do
+		    if test -z "$iso_epoch" -a -s "$iso_dir/.rpmepoch" ; then
+			iso_epoch=`cat $iso_dir/.rpmepoch`
+		    fi
+		    if test -z "$iso_version" -a -s "$iso_dir/.version" ; then
+			iso_version=`cat $iso_dir/.version`
+		    fi
+		    if test -z "$iso_version" -a -s "$iso_dir/configure" ; then
+			iso_version=`grep '^PACKAGE_VERSION=' $iso_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$iso_package" -a -s "$iso_dir/.pkgrelease" ; then
+			iso_package=`cat $iso_dir/.pkgrelease`
+		    fi
+		    if test -z "$iso_release" -a -s "$iso_dir/.rpmrelease" ; then
+			iso_release=`cat $iso_dir/.rpmrelease`
+		    fi
+		done
+	    fi
+	    if test -n "$iso_epoch" -a -n "$iso_version" -a -n "$iso_package" -a -n "$iso_release" ; then
+		iso_cv_version="$iso_epoch:$iso_version.$iso_package-$iso_release"
+	    fi
 	fi
     ])
     iso_what="sys/striso/config.h"
