@@ -203,12 +203,23 @@ EXTRA_PROGRAMS			+= \
 
 pkglibexec_PROGRAMS		= \
 				  test-q781 \
+				  test-x100p \
+				  test-x400p
+
+if WITH_SCTP
+pkglibexec_PROGRAMS		+= \
 				  test-tcpc \
 				  test-tcps \
 				  test-udpc \
-				  test-udps \
-				  test-x100p \
-				  test-x400p
+				  test-udps
+endif
+if WITH_SCTP2
+pkglibexec_PROGRAMS		+= \
+				  test-tcpc \
+				  test-tcps \
+				  test-udpc \
+				  test-udps
+endif
 
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod \
@@ -504,10 +515,6 @@ pkglibexec_PROGRAMS		= \
 				  test-q781 \
 				  test-q781-pipe \
 				  test-q784 \
-				  test-tcpc \
-				  test-tcps \
-				  test-udpc \
-				  test-udps \
 				  test-x100p \
 				  test-x400p \
 				  test-x400p-cap \
@@ -518,6 +525,21 @@ pkglibexec_PROGRAMS		= \
 				  test-x400p-sdt \
 				  test-x400p-sdt2 \
 				  test-x400p-sl
+
+if WITH_SCTP
+pkglibexec_PROGRAMS		+= \
+				  test-tcpc \
+				  test-tcps \
+				  test-udpc \
+				  test-udps
+endif
+if WITH_SCTP2
+pkglibexec_PROGRAMS		+= \
+				  test-tcpc \
+				  test-tcps \
+				  test-udpc \
+				  test-udps
+endif
 
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod \
