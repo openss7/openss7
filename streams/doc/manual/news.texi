@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.20 2007/03/04 12:21:00 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.21 2007/03/07 07:31:27 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/04 12:21:00 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/07 07:31:27 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -142,7 +142,7 @@ in the release for more information.  Also, see the @file{STREAMS.pdf} manual
 in the release (also in html
 @uref{http://www.openss7.org/STREAMS_manual.html}).
 
-For the news release, see @uref{http://www.openss7.org/rel20070305_K.html}.
+For the news release, see @uref{http://www.openss7.org/rel20070306_K.html}.
 
 @c ----------------------------------------------------------------------------
 
