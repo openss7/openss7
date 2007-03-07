@@ -2,7 +2,7 @@
 # @configure_input@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/06 21:23:34 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/07 11:35:40 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/03/06 21:23:34 $ by $Author: brian $
+## Last Modified $Date: 2007/03/07 11:35:40 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -263,7 +263,7 @@ debian/$(PACKAGE_LCNAME)-devel.install:
 	  [ ! -d $(debtmpdir)$(libdir) ] 	|| echo '$(debtmpdir)$(libdir)/*.a' ) \
 	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
-#control	+= debian/$(PACKAGE_LCNAME)-source.install
+@WITH_K_PACKAGE_TRUE@control	+= debian/$(PACKAGE_LCNAME)-source.install
 
 debian/$(PACKAGE_LCNAME)-source.install:
 	echo './$(PACKAGE)-$(VERSION)/ usr/src' > $@;
@@ -429,7 +429,11 @@ binary-nos:
 binary-indep: DH_OPTIONS = -i
 binary-indep: install
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-init binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-dev binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-doc binary-common
+@WITH_K_PACKAGE_TRUE@	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-source binary-common
+#	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
 
 binary-arch: DH_OPTIONS = -s
 binary-arch: install
@@ -470,6 +474,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.10  2007/03/07 11:35:40  brian
+# - make source package optional
+#
 # Revision 0.9.2.9  2007/03/06 21:23:34  brian
 # - final updates and corrections to build process for release
 #

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.68 $) $Date: 2007/03/05 23:01:28 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.69 $) $Date: 2007/03/07 11:35:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/05 23:01:28 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 11:35:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -145,28 +145,30 @@
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
 # version, we accept the --with[out] options "modules" and "tools"
-%{?_without_modules: %{expand: %%global BUILD_modules 0}}
-%{?_without_devel:   %{expand: %%global BUILD_devel   0}}
-%{?_without_tools:   %{expand: %%global BUILD_tools   0}}
-%{?_without_indep:   %{expand: %%global BUILD_noarch  0}}
-%{?_without_arch:    %{expand: %%global BUILD_arch    0}}
-%{?_without_public:  %{expand: %%global BUILD_source  0}}
-#{?_without_lis:     %{expand: %%global BUILD_lis     0}}
-#{?_without_lis:     %{expand: %%global BUILD_lfs     1}}
-#{?_without_lfs:     %{expand: %%global BUILD_lfs     0}}
-#{?_without_lfs:     %{expand: %%global BUILD_lis     1}}
+%{?_without_modules:  %{expand: %%global BUILD_modules 0}}
+%{?_without_devel:    %{expand: %%global BUILD_devel   0}}
+%{?_without_tools:    %{expand: %%global BUILD_tools   0}}
+%{?_without_indep:    %{expand: %%global BUILD_noarch  0}}
+%{?_without_arch:     %{expand: %%global BUILD_arch    0}}
+%{?_without_public:   %{expand: %%global BUILD_source  0}}
+%{?_without_k_package:%{expand: %%global BUILD_source  0}}
+#{?_without_lis:      %{expand: %%global BUILD_lis     0}}
+#{?_without_lis:      %{expand: %%global BUILD_lfs     1}}
+#{?_without_lfs:      %{expand: %%global BUILD_lfs     0}}
+#{?_without_lfs:      %{expand: %%global BUILD_lis     1}}
 
-%{?_with_devfs:      %{expand: %%global NEED_devs     0}}
-%{?_with_modules:    %{expand: %%global BUILD_modules 1}}
-%{?_with_devel:      %{expand: %%global BUILD_devel   1}}
-%{?_with_tools:      %{expand: %%global BUILD_tools   1}}
-%{?_with_indep:      %{expand: %%global BUILD_noarch  1}}
-%{?_with_arch:       %{expand: %%global BUILD_arch    1}}
-%{?_with_public:     %{expand: %%global BUILD_source  1}}
-#{?_with_lis:        %{expand: %%global BUILD_lis     1}}
-#{?_with_lis:        %{expand: %%global BUILD_lfs     0}}
-#{?_with_lfs:        %{expand: %%global BUILD_lfs     1}}
-#{?_with_lfs:        %{expand: %%global BUILD_lis     0}}
+%{?_with_devfs:       %{expand: %%global NEED_devs     0}}
+%{?_with_modules:     %{expand: %%global BUILD_modules 1}}
+%{?_with_devel:       %{expand: %%global BUILD_devel   1}}
+%{?_with_tools:       %{expand: %%global BUILD_tools   1}}
+%{?_with_indep:       %{expand: %%global BUILD_noarch  1}}
+%{?_with_arch:        %{expand: %%global BUILD_arch    1}}
+%{?_with_public:      %{expand: %%global BUILD_source  1}}
+%{?_with_k_package:   %{expand: %%global BUILD_source  1}}
+#{?_with_lis:         %{expand: %%global BUILD_lis     1}}
+#{?_with_lis:         %{expand: %%global BUILD_lfs     0}}
+#{?_with_lfs:         %{expand: %%global BUILD_lfs     1}}
+#{?_with_lfs:         %{expand: %%global BUILD_lis     0}}
 
 # need manpage references unless otherwise specified
 %global NEED_manrefs  1
@@ -592,6 +594,8 @@ fi
     %{?_without_cooked_manpages: '%_without_cooked_manpages'} \
     %{?_with_public:             '%enable %_with_public'} \
     %{?_without_public:          '%disable %_without_public'} \
+    %{?_with_k_package:          '%enable %_with_k_package'} \
+    %{?_without_k_package:       '%disable %_without_k_package'} \
     %{?_with_k_optimize:         '%_with_k_optimize'} \
     %{?_with_k_debug:            '%enable %_with_k_debug'} \
     %{?_without_k_debug:         '%disable %_without_k_debug'} \
@@ -1977,9 +1981,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.68  2007/03/05 23:01:28  brian
-# - checking in release changes
+# Revision 1.1.6.69  2007/03/07 11:35:29  brian
+# - make source package optional
 #
+
+* Mon Mar  5 2007 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.68  2007/03/05 23:01:28  brian
+- checking in release changes
 
 * Sun Mar  4 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.67  2007/03/04 09:59:49  brian
