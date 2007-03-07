@@ -1,3 +1,8 @@
+2007-03-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/mtp_npi.4.man: fixed empty manual page sections
+	* doc/man/man7/npi_sccp.7.man: fixed empty manual page sections
+
 2007-03-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: move conflicting manual pages

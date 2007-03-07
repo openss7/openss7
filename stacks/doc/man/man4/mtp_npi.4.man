@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
 .\"
-.\" @(#) $Id: mtp_npi.4.man,v 0.9.2.2 2007/02/17 02:49:08 brian Exp $
+.\" @(#) $Id: mtp_npi.4.man,v 0.9.2.3 2007/03/07 20:36:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/02/17 02:49:08 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/07 20:36:29 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mtp_npi.4.man,v $
+.\" Revision 0.9.2.3  2007/03/07 20:36:29  brian
+.\" - fixed empty manual page sections
+.\"
 .\" Revision 0.9.2.2  2007/02/17 02:49:08  brian
 .\" - first clean recompile of MTP modules on LFS
 .\"
@@ -160,8 +163,8 @@ utility,
 to provide a Network Provider Interface (NPI) to the MTPI Stream.
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH FILES
