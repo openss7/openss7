@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-#@WITH_INET_TRUE@ @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/25 20:15:49 $
+#@WITH_INET_TRUE@ @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/07 23:49:02 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -45,11 +45,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/09/25 20:15:49 $ by $Author: brian $
+## Last Modified $Date: 2007/03/07 23:49:02 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: lis.conf.in,v $
+## Revision 0.9.2.3  2007/03/07 23:49:02  brian
+## - use clone major device by name
+##
 ## Revision 0.9.2.2  2006/09/25 20:15:49  brian
 ## - rationalized to strinet and strxnet
 ##
@@ -120,7 +123,7 @@
 @WITH_INET_TRUE@@WITH_INET_TRUE@node	/dev/ticots	     c	0666	inet		43
 @WITH_INET_TRUE@@WITH_INET_TRUE@node	/dev/ticlts	     c	0666	inet		44
 @WITH_INET_TRUE@@WITH_INET_TRUE@@WITH_OPENSS7_SCTP_TRUE@node	/dev/sctp	     c	0666	inet		45
-@WITH_INET_TRUE@@WITH_INET_TRUE@node	/dev/udp2	     c	0666	230		udp2
-@WITH_INET_TRUE@@WITH_INET_TRUE@node	/dev/rawip2	     c	0666	230		rawip2
-@WITH_INET_TRUE@@WITH_INET_TRUE@node	/dev/tcp2	     c	0666	230		tcp2
+@WITH_INET_TRUE@@WITH_INET_TRUE@node	/dev/udp2	     c	0666	clone		udp2
+@WITH_INET_TRUE@@WITH_INET_TRUE@node	/dev/rawip2	     c	0666	clone		rawip2
+@WITH_INET_TRUE@@WITH_INET_TRUE@node	/dev/tcp2	     c	0666	clone		tcp2
 
