@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/07 09:24:08 $
+# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/07 10:12:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 10:12:59 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: isdn.m4,v $
+# Revision 0.9.2.15  2007/03/07 10:12:59  brian
+# - more corrections
+#
 # Revision 0.9.2.14  2007/03/07 09:24:08  brian
 # - further corrections
 #
@@ -452,10 +455,10 @@ dnl		    this will just not be set
 			isdn_version=`cat $isdn_dir/../../.version`
 		    fi
 		    if test -z "$isdn_version" -a -s "$isdn_dir/../configure" ; then
-			isdn_version=`grep '^PACKAGE_VERSION=' $isdn_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			isdn_version=`grep -m 1 '^PACKAGE_VERSION=' $isdn_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$isdn_version" -a -s "$isdn_dir/../../configure" ; then
-			isdn_version=`grep '^PACKAGE_VERSION=' $isdn_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			isdn_version=`grep -m 1 '^PACKAGE_VERSION=' $isdn_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$isdn_package" -a -s "$isdn_dir/../.pkgrelease" ; then
 			isdn_package=`cat $isdn_dir/../.pkgrelease`

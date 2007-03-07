@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/03/07 09:24:08 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/07 10:12:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 10:12:59 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strcomp.m4,v $
+# Revision 0.9.2.34  2007/03/07 10:12:59  brian
+# - more corrections
+#
 # Revision 0.9.2.33  2007/03/07 09:24:08  brian
 # - further corrections
 #
@@ -517,10 +520,10 @@ dnl		    this will just not be set
 			strcomp_version=`cat $strcomp_dir/../../.version`
 		    fi
 		    if test -z "$strcomp_version" -a -s "$strcomp_dir/../configure" ; then
-			strcomp_version=`grep '^PACKAGE_VERSION=' $strcomp_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			strcomp_version=`grep -m 1 '^PACKAGE_VERSION=' $strcomp_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$strcomp_version" -a -s "$strcomp_dir/../../configure" ; then
-			strcomp_version=`grep '^PACKAGE_VERSION=' $strcomp_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			strcomp_version=`grep -m 1 '^PACKAGE_VERSION=' $strcomp_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$strcomp_package" -a -s "$strcomp_dir/../.pkgrelease" ; then
 			strcomp_package=`cat $strcomp_dir/../.pkgrelease`

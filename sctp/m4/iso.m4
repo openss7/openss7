@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/07 09:24:08 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/07 10:12:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 09:24:08 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 10:12:59 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.17  2007/03/07 10:12:59  brian
+# - more corrections
+#
 # Revision 0.9.2.16  2007/03/07 09:24:08  brian
 # - further corrections
 #
@@ -453,10 +456,10 @@ dnl		    this will just not be set
 			iso_version=`cat $iso_dir/../../.version`
 		    fi
 		    if test -z "$iso_version" -a -s "$iso_dir/../configure" ; then
-			iso_version=`grep '^PACKAGE_VERSION=' $iso_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			iso_version=`grep -m 1 '^PACKAGE_VERSION=' $iso_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$iso_version" -a -s "$iso_dir/../../configure" ; then
-			iso_version=`grep '^PACKAGE_VERSION=' $iso_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			iso_version=`grep -m 1 '^PACKAGE_VERSION=' $iso_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$iso_package" -a -s "$iso_dir/../.pkgrelease" ; then
 			iso_package=`cat $iso_dir/../.pkgrelease`
