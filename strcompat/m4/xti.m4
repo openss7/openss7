@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/03/06 23:39:54 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/03/07 07:29:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:39:54 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 07:29:22 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.56  2007/03/07 07:29:22  brian
+# - search harder for versions
+#
 # Revision 0.9.2.55  2007/03/06 23:39:54  brian
 # - more corrections
 #
@@ -483,28 +486,59 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 *** ])
     fi
     AC_CACHE_CHECK([for xti version], [xti_cv_version], [dnl
-	xti_what="sys/strxnet/version.h"
-	xti_file=
-	if test -n "$xti_cv_includes" ; then
-	    for xti_dir in $xti_cv_includes ; do
-		# old place for version
-		if test -f "$xti_dir/$xti_what" ; then
-		    xti_file="$xti_dir/$xti_what"
-		    break
-		fi
-		# new place for version
-		if test -n "$linux_cv_k_release" ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
-dnl		    this will just not be set
-		    if test -f "$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what" ; then
-			xti_file="$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what"
+	xti_cv_version=
+	if test -z "$xti_cv_version" ; then
+	    xti_what="sys/strxnet/version.h"
+	    xti_file=
+	    if test -n "$xti_cv_includes" ; then
+		for xti_dir in $xti_cv_includes ; do
+		    # old place for version
+		    if test -f "$xti_dir/$xti_what" ; then
+			xti_file="$xti_dir/$xti_what"
 			break
 		    fi
-		fi
-	    done
+		    # new place for version
+		    if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+			if test -f "$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what" ; then
+			    xti_file="$xti_dir/$linux_cv_k_release/$target_cpu/$xti_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	    if test :${xti_file:-no} != :no ; then
+		xti_cv_version=`grep '#define.*\<STRXNET_VERSION\>' $xti_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	    fi
 	fi
-	if test :${xti_file:-no} != :no ; then
-	    xti_cv_version=`grep '#define.*\<STRXNET_VERSION\>' $xti_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	if test -z "$xti_cv_version" ; then
+	    xti_epoch=
+	    xti_version=
+	    xti_package=
+	    xti_release=
+	    if test -n "$xti_cv_includes" ; then
+		for xti_dir in $xti_cv_includes ; do
+		    if test -z "$xti_epoch" -a -s "$xti_dir/.rpmepoch" ; then
+			xti_epoch=`cat $xti_dir/.rpmepoch`
+		    fi
+		    if test -z "$xti_version" -a -s "$xti_dir/.version" ; then
+			xti_version=`cat $xti_dir/.version`
+		    fi
+		    if test -z "$xti_version" -a -s "$xti_dir/configure" ; then
+			xti_version=`grep '^PACKAGE_VERSION=' $xti_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$xti_package" -a -s "$xti_dir/.pkgrelease" ; then
+			xti_package=`cat $xti_dir/.pkgrelease`
+		    fi
+		    if test -z "$xti_release" -a -s "$xti_dir/.rpmrelease" ; then
+			xti_release=`cat $xti_dir/.rpmrelease`
+		    fi
+		done
+	    fi
+	    if test -n "$xti_epoch" -a -n "$xti_version" -a -n "$xti_package" -a -n "$xti_release" ; then
+		xti_cv_version="$xti_epoch:$xti_version.$xti_package-$xti_release"
+	    fi
 	fi
     ])
     xti_what="sys/strxnet/config.h"

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/06 23:13:57 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/03/07 07:29:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:13:57 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sctp.m4,v $
+# Revision 0.9.2.41  2007/03/07 07:29:21  brian
+# - search harder for versions
+#
 # Revision 0.9.2.40  2007/03/06 23:13:57  brian
 # - master build correction
 #
@@ -453,28 +456,59 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 *** ])
     fi
     AC_CACHE_CHECK([for sctp version], [sctp_cv_version], [dnl
-	sctp_what="sys/strsctp/version.h"
-	sctp_file=
-	if test -n "$sctp_cv_includes" ; then
-	    for sctp_dir in $sctp_cv_includes ; do
-		# old place for version
-		if test -f "$sctp_dir/$sctp_what" ; then
-		    sctp_file="$sctp_dir/$sctp_what"
-		    break
-		fi
-		# new place for version
-		if test -n "$linux_cv_k_release" ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
-dnl		    this will just not be set
-		    if test -f "$sctp_dir/$linux_cv_k_release/$target_cpu/$sctp_what" ; then
-			sctp_file="$sctp_dir/$linux_cv_k_release/$target_cpu/$sctp_what"
+	sctp_cv_version=
+	if test -z "$sctp_cv_version" ; then
+	    sctp_what="sys/strsctp/version.h"
+	    sctp_file=
+	    if test -n "$sctp_cv_includes" ; then
+		for sctp_dir in $sctp_cv_includes ; do
+		    # old place for version
+		    if test -f "$sctp_dir/$sctp_what" ; then
+			sctp_file="$sctp_dir/$sctp_what"
 			break
 		    fi
-		fi
-	    done
+		    # new place for version
+		    if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+			if test -f "$sctp_dir/$linux_cv_k_release/$target_cpu/$sctp_what" ; then
+			    sctp_file="$sctp_dir/$linux_cv_k_release/$target_cpu/$sctp_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	    if test :${sctp_file:-no} != :no ; then
+		sctp_cv_version=`grep '#define.*\<STRSCTP_VERSION\>' $sctp_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	    fi
 	fi
-	if test :${sctp_file:-no} != :no ; then
-	    sctp_cv_version=`grep '#define.*\<STRSCTP_VERSION\>' $sctp_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	if test -z "$sctp_cv_version" ; then
+	    sctp_epoch=
+	    sctp_version=
+	    sctp_package=
+	    sctp_release=
+	    if test -n "$sctp_cv_includes" ; then
+		for sctp_dir in $sctp_cv_includes ; do
+		    if test -z "$sctp_epoch" -a -s "$sctp_dir/.rpmepoch" ; then
+			sctp_epoch=`cat $sctp_dir/.rpmepoch`
+		    fi
+		    if test -z "$sctp_version" -a -s "$sctp_dir/.version" ; then
+			sctp_version=`cat $sctp_dir/.version`
+		    fi
+		    if test -z "$sctp_version" -a -s "$sctp_dir/configure" ; then
+			sctp_version=`grep '^PACKAGE_VERSION=' $sctp_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$sctp_package" -a -s "$sctp_dir/.pkgrelease" ; then
+			sctp_package=`cat $sctp_dir/.pkgrelease`
+		    fi
+		    if test -z "$sctp_release" -a -s "$sctp_dir/.rpmrelease" ; then
+			sctp_release=`cat $sctp_dir/.rpmrelease`
+		    fi
+		done
+	    fi
+	    if test -n "$sctp_epoch" -a -n "$sctp_version" -a -n "$sctp_package" -a -n "$sctp_release" ; then
+		sctp_cv_version="$sctp_epoch:$sctp_version.$sctp_package-$sctp_release"
+	    fi
 	fi
     ])
     sctp_what="sys/strsctp/config.h"

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/06 23:39:54 $
+# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/07 07:29:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:39:54 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: isdn.m4,v $
+# Revision 0.9.2.13  2007/03/07 07:29:21  brian
+# - search harder for versions
+#
 # Revision 0.9.2.12  2007/03/06 23:39:54  brian
 # - more corrections
 #
@@ -400,28 +403,59 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 *** ])
     fi
     AC_CACHE_CHECK([for isdn version], [isdn_cv_version], [dnl
-	isdn_what="sys/strisdn/version.h"
-	isdn_file=
-	if test -n "$isdn_cv_includes" ; then
-	    for isdn_dir in $isdn_cv_includes ; do
-		# old place for version
-		if test -f "$isdn_dir/$isdn_what" ; then
-		    isdn_file="$isdn_dir/$isdn_what"
-		    break
-		fi
-		# new place for version
-		if test -n "$linux_cv_k_release" ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
-dnl		    this will just not be set
-		    if test -f "$isdn_dir/$linux_cv_k_release/$target_cpu/$isdn_what" ; then
-			isdn_file="$isdn_dir/$linux_cv_k_release/$target_cpu/$isdn_what"
+	isdn_cv_version=
+	if test -z "$isdn_cv_version" ; then
+	    isdn_what="sys/strisdn/version.h"
+	    isdn_file=
+	    if test -n "$isdn_cv_includes" ; then
+		for isdn_dir in $isdn_cv_includes ; do
+		    # old place for version
+		    if test -f "$isdn_dir/$isdn_what" ; then
+			isdn_file="$isdn_dir/$isdn_what"
 			break
 		    fi
-		fi
-	    done
+		    # new place for version
+		    if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+			if test -f "$isdn_dir/$linux_cv_k_release/$target_cpu/$isdn_what" ; then
+			    isdn_file="$isdn_dir/$linux_cv_k_release/$target_cpu/$isdn_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	    if test :"${isdn_file:-no}" != :no ; then
+		isdn_cv_version=`grep '#define.*\<STRISDN_VERSION\>' $isdn_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	    fi
 	fi
-	if test :"${isdn_file:-no}" != :no ; then
-	    isdn_cv_version=`grep '#define.*\<STRISDN_VERSION\>' $isdn_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	if test -z "$isdn_cv_version" ; then
+	    isdn_epoch=
+	    isdn_version=
+	    isdn_package=
+	    isdn_release=
+	    if test -n "$isdn_cv_includes" ; then
+		for isdn_dir in $isdn_cv_includes ; do
+		    if test -z "$isdn_epoch" -a -s "$isdn_dir/.rpmepoch" ; then
+			isdn_epoch=`cat $isdn_dir/.rpmepoch`
+		    fi
+		    if test -z "$isdn_version" -a -s "$isdn_dir/.version" ; then
+			isdn_version=`cat $isdn_dir/.version`
+		    fi
+		    if test -z "$isdn_version" -a -s "$isdn_dir/configure" ; then
+			isdn_version=`grep '^PACKAGE_VERSION=' $isdn_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$isdn_package" -a -s "$isdn_dir/.pkgrelease" ; then
+			isdn_package=`cat $isdn_dir/.pkgrelease`
+		    fi
+		    if test -z "$isdn_release" -a -s "$isdn_dir/.rpmrelease" ; then
+			isdn_release=`cat $isdn_dir/.rpmrelease`
+		    fi
+		done
+	    fi
+	    if test -n "$isdn_epoch" -a -n "$isdn_version" -a -n "$isdn_package" -a -n "$isdn_release" ; then
+		isdn_cv_version="$isdn_epoch:$isdn_version.$isdn_package-$isdn_release"
+	    fi
 	fi
     ])
     isdn_what="sys/strisdn/config.h"

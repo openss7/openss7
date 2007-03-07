@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2007/03/06 23:13:57 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2007/03/07 07:29:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:13:57 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 07:29:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -518,27 +518,58 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 	fi
     ])
     AC_CACHE_CHECK([for streams lis version], [streams_cv_lis_version], [dnl
-	streams_what="sys/LiS/version.h"
-	streams_file=
-	if test -n "$streams_cv_lis_includes" ; then
-	    for streams_dir in $streams_cv_lis_includes ; do
-		# old place for version
-		if test -f "$streams_dir/$streams_what" ; then
-		    streams_file="$streams_dir/$streams_what"
-		    break
-		fi
-		# new place for version
-		if test -n "$linux_cv_k_release" ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
-		    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
-			streams_file="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
+	streams_cv_lis_version=
+	if test -z "$streams_cv_lis_version" ; then
+	    streams_what="sys/LiS/version.h"
+	    streams_file=
+	    if test -n "$streams_cv_lis_includes" ; then
+		for streams_dir in $streams_cv_lis_includes ; do
+		    # old place for version
+		    if test -f "$streams_dir/$streams_what" ; then
+			streams_file="$streams_dir/$streams_what"
 			break
 		    fi
-		fi
-	    done
+		    # new place for version
+		    if test -n "$linux_cv_k_release" ; then
+    dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
+			if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
+			    streams_file="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
+			    break
+			fi
+		    fi
+		done
+	    fi
+	    if test :${streams_file:-no} != :no ; then
+		streams_cv_lis_version=`grep '#define.*\<LIS_VERSION\>' $streams_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	    fi
 	fi
-	if test :${streams_file:-no} != :no ; then
-	    streams_cv_lis_version=`grep '#define.*\<LIS_VERSION\>' $streams_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	if test -z "$streams_cv_lis_version" ; then
+	    streams_epoch=
+	    streams_version=
+	    streams_package=
+	    streams_release=
+	    if test -n "$streams_cv_lis_includes" ; then
+		for streams_dir in $streams_cv_lis_includes ; do
+		    if test -z "$streams_epoch" -a -s "$streams_dir/.rpmepoch" ; then
+			streams_epoch=`cat $streams_dir/.rpmepoch`
+		    fi
+		    if test -z "$streams_version" -a -s "$streams_dir/.version" ; then
+			streams_version=`cat $streams_dir/.version`
+		    fi
+		    if test -z "$streams_version" -a -s "$streams_dir/configure" ; then
+			streams_version=`grep '^PACKAGE_VERSION=' $streams_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$streams_package" -a -s "$streams_dir/.pkgrelease" ; then
+			streams_package=`cat $streams_dir/.pkgrelease`
+		    fi
+		    if test -z "$streams_release" -a -s "$streams_dir/.rpmrelease" ; then
+			streams_release=`cat $streams_dir/.rpmrelease`
+		    fi
+		done
+	    fi
+	    if test -n "$streams_epoch" -a -n "$streams_version" -a -n "$streams_package" -a -n "$streams_release" ; then
+		streams_cv_lis_version="$streams_epoch:$streams_version.$streams_package-$streams_release"
+	    fi
 	fi
     ])
     LIS_VERSION="${streams_cv_lis_version:-0:2.18.5-1}"
@@ -852,27 +883,58 @@ dnl		    this will just not be set
 	fi
     ])
     AC_CACHE_CHECK([for streams lfs version], [streams_cv_lfs_version], [dnl
-	streams_what="sys/streams/version.h"
-	streams_file=
-	if test -n "$streams_cv_lfs_includes" ; then
-	    for streams_dir in $streams_cv_lfs_includes ; do
-		# old place for version
-		if test -f "$streams_dir/$streams_what" ; then
-		    streams_file="$streams_dir/$streams_what"
-		    break
-		fi
-		# new place for version
-		if test -n "$linux_cv_k_release" ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
-		    if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
-			streams_file="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
+	streams_cv_lfs_version=
+	if test -z "$streams_cv_lfs_version" ; then
+	    streams_what="sys/streams/version.h"
+	    streams_file=
+	    if test -n "$streams_cv_lfs_includes" ; then
+		for streams_dir in $streams_cv_lfs_includes ; do
+		    # old place for version
+		    if test -f "$streams_dir/$streams_what" ; then
+			streams_file="$streams_dir/$streams_what"
 			break
 		    fi
-		fi
-	    done
+		    # new place for version
+		    if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will just not be set
+			if test -f "$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" ; then
+			    streams_file="$streams_dir/$linux_cv_k_release/$target_cpu/$streams_what" 
+			    break
+			fi
+		    fi
+		done
+	    fi
+	    if test :${streams_file:-no} != :no ; then
+		streams_cv_lfs_version=`grep '#define.*\<STREAMS_VERSION\>' $streams_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	    fi
 	fi
-	if test :${streams_file:-no} != :no ; then
-	    streams_cv_lfs_version=`grep '#define.*\<STREAMS_VERSION\>' $streams_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	if test -z "$streams_cv_lfs_version" ; then
+	    streams_epoch=
+	    streams_version=
+	    streams_package=
+	    streams_release=
+	    if test -n "$streams_cv_lfs_includes" ; then
+		for streams_dir in $streams_cv_lfs_includes ; do
+		    if test -z "$streams_epoch" -a -s "$streams_dir/.rpmepoch" ; then
+			streams_epoch=`cat $streams_dir/.rpmepoch`
+		    fi
+		    if test -z "$streams_version" -a -s "$streams_dir/.version" ; then
+			streams_version=`cat $streams_dir/.version`
+		    fi
+		    if test -z "$streams_version" -a -s "$streams_dir/configure" ; then
+			streams_version=`grep '^PACKAGE_VERSION=' $streams_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$streams_package" -a -s "$streams_dir/.pkgrelease" ; then
+			streams_package=`cat $streams_dir/.pkgrelease`
+		    fi
+		    if test -z "$streams_release" -a -s "$streams_dir/.rpmrelease" ; then
+			streams_release=`cat $streams_dir/.rpmrelease`
+		    fi
+		done
+	    fi
+	    if test -n "$streams_epoch" -a -n "$streams_version" -a -n "$streams_package" -a -n "$streams_release" ; then
+		streams_cv_lfs_version="$streams_epoch:$streams_version.$streams_package-$streams_release"
+	    fi
 	fi
     ])
     LFS_VERSION="${streams_cv_lfs_version:-0:0.9.2.2-1}"

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/06 23:39:54 $
+# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/07 07:29:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:39:54 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sigtran.m4,v $
+# Revision 0.9.2.12  2007/03/07 07:29:21  brian
+# - search harder for versions
+#
 # Revision 0.9.2.11  2007/03/06 23:39:54  brian
 # - more corrections
 #
@@ -395,28 +398,59 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 *** ])
     fi
     AC_CACHE_CHECK([for sigtran version], [sigtran_cv_version], [dnl
-	sigtran_what="sys/sigtran/version.h"
-	sigtran_file=
-	if test -n "$sigtran_cv_includes" ; then
-	    for sigtran_dir in $sigtran_cv_includes ; do
-		# old place for version
-		if test -f "$sigtran_dir/$sigtran_what" ; then
-		    sigtran_file="$sigtran_dir/$sigtran_what"
-		    break
-		fi
-		# new place for version
-		if test -n "$linux_cv_k_release" ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
-dnl		    this will just not be set
-		    if test -f "$sigtran_dir/$linux_cv_k_release/$target_cpu/$sigtran_what" ; then
-			sigtran_file="$sigtran_dir/$linux_cv_k_release/$target_cpu/$sigtran_what"
+	sigtran_cv_version=
+	if test -z "$sigtran_cv_version" ; then
+	    sigtran_what="sys/sigtran/version.h"
+	    sigtran_file=
+	    if test -n "$sigtran_cv_includes" ; then
+		for sigtran_dir in $sigtran_cv_includes ; do
+		    # old place for version
+		    if test -f "$sigtran_dir/$sigtran_what" ; then
+			sigtran_file="$sigtran_dir/$sigtran_what"
 			break
 		    fi
-		fi
-	    done
+		    # new place for version
+		    if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+			if test -f "$sigtran_dir/$linux_cv_k_release/$target_cpu/$sigtran_what" ; then
+			    sigtran_file="$sigtran_dir/$linux_cv_k_release/$target_cpu/$sigtran_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	    if test :"${sigtran_file:-no}" != :no ; then
+		sigtran_cv_version=`grep '#define.*\<SIGTRAN_VERSION\>' $sigtran_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	    fi
 	fi
-	if test :"${sigtran_file:-no}" != :no ; then
-	    sigtran_cv_version=`grep '#define.*\<SIGTRAN_VERSION\>' $sigtran_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	if test -z "$sigtran_cv_version" ; then
+	    sigtran_epoch=
+	    sigtran_version=
+	    sigtran_package=
+	    sigtran_release=
+	    if test -n "$sigtran_cv_includes" ; then
+		for sigtran_dir in $sigtran_cv_includes ; do
+		    if test -z "$sigtran_epoch" -a -s "$sigtran_dir/.rpmepoch" ; then
+			sigtran_epoch=`cat $sigtran_dir/.rpmepoch`
+		    fi
+		    if test -z "$sigtran_version" -a -s "$sigtran_dir/.version" ; then
+			sigtran_version=`cat $sigtran_dir/.version`
+		    fi
+		    if test -z "$sigtran_version" -a -s "$sigtran_dir/configure" ; then
+			sigtran_version=`grep '^PACKAGE_VERSION=' $sigtran_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$sigtran_package" -a -s "$sigtran_dir/.pkgrelease" ; then
+			sigtran_package=`cat $sigtran_dir/.pkgrelease`
+		    fi
+		    if test -z "$sigtran_release" -a -s "$sigtran_dir/.rpmrelease" ; then
+			sigtran_release=`cat $sigtran_dir/.rpmrelease`
+		    fi
+		done
+	    fi
+	    if test -n "$sigtran_epoch" -a -n "$sigtran_version" -a -n "$sigtran_package" -a -n "$sigtran_release" ; then
+		sigtran_cv_version="$sigtran_epoch:$sigtran_version.$sigtran_package-$sigtran_release"
+	    fi
 	fi
     ])
     sigtran_what="sys/sigtran/config.h"

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/03/06 23:13:56 $
+# @(#) $RCSfile: inet.m4,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/03/07 07:29:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:13:56 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: inet.m4,v $
+# Revision 0.9.2.42  2007/03/07 07:29:21  brian
+# - search harder for versions
+#
 # Revision 0.9.2.41  2007/03/06 23:13:56  brian
 # - master build correction
 #
@@ -435,28 +438,59 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 *** ])
     fi
     AC_CACHE_CHECK([for inet version], [inet_cv_version], [dnl
-	inet_what="sys/strinet/version.h"
-	inet_file=
-	if test -n "$inet_cv_includes" ; then
-	    for inet_dir in $inet_cv_includes ; do
-		# old place for version
-		if test -f "$inet_dir/$inet_what" ; then
-		    inet_file="$inet_dir/$inet_what"
-		    break
-		fi
-		# new place for version
-		if test -n "$linux_cv_k_release" ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
-dnl		    this will just not be set
-		    if test -f "$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what" ; then
-			inet_file="$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what"
+	inet_cv_version=
+	if test -z "$inet_cv_version" ; then
+	    inet_what="sys/strinet/version.h"
+	    inet_file=
+	    if test -n "$inet_cv_includes" ; then
+		for inet_dir in $inet_cv_includes ; do
+		    # old place for version
+		    if test -f "$inet_dir/$inet_what" ; then
+			inet_file="$inet_dir/$inet_what"
 			break
 		    fi
-		fi
-	    done
+		    # new place for version
+		    if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+			if test -f "$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what" ; then
+			    inet_file="$inet_dir/$linux_cv_k_release/$target_cpu/$inet_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	    if test :${inet_file:-no} != :no ; then
+		inet_cv_version=`grep '#define.*\<STRINET_VERSION\>' $inet_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	    fi
 	fi
-	if test :${inet_file:-no} != :no ; then
-	    inet_cv_version=`grep '#define.*\<STRINET_VERSION\>' $inet_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	if test -z "$inet_cv_version" ; then
+	    inet_epoch=
+	    inet_version=
+	    inet_package=
+	    inet_release=
+	    if test -n "$inet_cv_includes" ; then
+		for inet_dir in $inet_cv_includes ; do
+		    if test -z "$inet_epoch" -a -s "$inet_dir/.rpmepoch" ; then
+			inet_epoch=`cat $inet_dir/.rpmepoch`
+		    fi
+		    if test -z "$inet_version" -a -s "$inet_dir/.version" ; then
+			inet_version=`cat $inet_dir/.version`
+		    fi
+		    if test -z "$inet_version" -a -s "$inet_dir/configure" ; then
+			inet_version=`grep '^PACKAGE_VERSION=' $inet_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$inet_package" -a -s "$inet_dir/.pkgrelease" ; then
+			inet_package=`cat $inet_dir/.pkgrelease`
+		    fi
+		    if test -z "$inet_release" -a -s "$inet_dir/.rpmrelease" ; then
+			inet_release=`cat $inet_dir/.rpmrelease`
+		    fi
+		done
+	    fi
+	    if test -n "$inet_epoch" -a -n "$inet_version" -a -n "$inet_package" -a -n "$inet_release" ; then
+		inet_cv_version="$inet_epoch:$inet_version.$inet_package-$inet_release"
+	    fi
 	fi
     ])
     inet_what="sys/strinet/config.h"

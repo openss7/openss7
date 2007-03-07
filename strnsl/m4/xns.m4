@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/03/06 23:39:54 $
+# @(#) $RCSfile: xns.m4,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/03/07 07:29:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:39:54 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 07:29:22 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: xns.m4,v $
+# Revision 0.9.2.49  2007/03/07 07:29:22  brian
+# - search harder for versions
+#
 # Revision 0.9.2.48  2007/03/06 23:39:54  brian
 # - more corrections
 #
@@ -475,28 +478,59 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 *** ])
     fi
     AC_CACHE_CHECK([for xns version], [xns_cv_version], [dnl
-	xns_what="sys/strxns/version.h"
-	xns_file=
-	if test -n "$xns_cv_includes" ; then
-	    for xns_dir in $xns_cv_includes ; do
-		# old place for version
-		if test -f "$xns_dir/$xns_what" ; then
-		    xns_file="$xns_dir/$xns_what"
-		    break
-		fi
-		# new place for version
-		if test -n "$linux_cv_k_release" ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
-dnl		    this will just not be set
-		    if test -f "$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what" ; then
-			xns_file="$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what"
+	xns_cv_version=
+	if test -z "$xns_cv_version" ; then
+	    xns_what="sys/strxns/version.h"
+	    xns_file=
+	    if test -n "$xns_cv_includes" ; then
+		for xns_dir in $xns_cv_includes ; do
+		    # old place for version
+		    if test -f "$xns_dir/$xns_what" ; then
+			xns_file="$xns_dir/$xns_what"
 			break
 		    fi
-		fi
-	    done
+		    # new place for version
+		    if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+			if test -f "$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what" ; then
+			    xns_file="$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	    if test :${xns_file:-no} != :no ; then
+		xns_cv_version=`grep '#define.*\<STRXNS_VERSION\>' $xns_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	    fi
 	fi
-	if test :${xns_file:-no} != :no ; then
-	    xns_cv_version=`grep '#define.*\<STRXNS_VERSION\>' $xns_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	if test -z "$xns_cv_version" ; then
+	    xns_epoch=
+	    xns_version=
+	    xns_package=
+	    xns_release=
+	    if test -n "$xns_cv_includes" ; then
+		for xns_dir in $xns_cv_includes ; do
+		    if test -z "$xns_epoch" -a -s "$xns_dir/.rpmepoch" ; then
+			xns_epoch=`cat $xns_dir/.rpmepoch`
+		    fi
+		    if test -z "$xns_version" -a -s "$xns_dir/.version" ; then
+			xns_version=`cat $xns_dir/.version`
+		    fi
+		    if test -z "$xns_version" -a -s "$xns_dir/configure" ; then
+			xns_version=`grep '^PACKAGE_VERSION=' $xns_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$xns_package" -a -s "$xns_dir/.pkgrelease" ; then
+			xns_package=`cat $xns_dir/.pkgrelease`
+		    fi
+		    if test -z "$xns_release" -a -s "$xns_dir/.rpmrelease" ; then
+			xns_release=`cat $xns_dir/.rpmrelease`
+		    fi
+		done
+	    fi
+	    if test -n "$xns_epoch" -a -n "$xns_version" -a -n "$xns_package" -a -n "$xns_release" ; then
+		xns_cv_version="$xns_epoch:$xns_version.$xns_package-$xns_release"
+	    fi
 	fi
     ])
     xns_what="sys/strxns/config.h"

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/06 23:13:57 $
+# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/07 07:29:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:13:57 $ by $Author: brian $
+# Last Modified $Date: 2007/03/07 07:29:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: ss7.m4,v $
+# Revision 0.9.2.19  2007/03/07 07:29:21  brian
+# - search harder for versions
+#
 # Revision 0.9.2.18  2007/03/06 23:13:57  brian
 # - master build correction
 #
@@ -419,28 +422,59 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 *** ])
     fi
     AC_CACHE_CHECK([for ss7 version], [ss7_cv_version], [dnl
-	ss7_what="sys/strss7/version.h"
-	ss7_file=
-	if test -n "$ss7_cv_includes" ; then
-	    for ss7_dir in $ss7_cv_includes ; do
-		# old place for version
-		if test -f "$ss7_dir/$ss7_what" ; then
-		    ss7_file="$ss7_dir/$ss7_what"
-		    break
-		fi
-		# new place for version
-		if test -n "$linux_cv_k_release" ; then
-dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
-dnl		    this will just not be set
-		    if test -f "$ss7_dir/$linux_cv_k_release/$target_cpu/$ss7_what" ; then
-			ss7_file="$ss7_dir/$linux_cv_k_release/$target_cpu/$ss7_what"
+	ss7_cv_version=
+	if test -z "$ss7_cv_version" ; then
+	    ss7_what="sys/strss7/version.h"
+	    ss7_file=
+	    if test -n "$ss7_cv_includes" ; then
+		for ss7_dir in $ss7_cv_includes ; do
+		    # old place for version
+		    if test -f "$ss7_dir/$ss7_what" ; then
+			ss7_file="$ss7_dir/$ss7_what"
 			break
 		    fi
-		fi
-	    done
+		    # new place for version
+		    if test -n "$linux_cv_k_release" ; then
+dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then
+dnl		    this will just not be set
+			if test -f "$ss7_dir/$linux_cv_k_release/$target_cpu/$ss7_what" ; then
+			    ss7_file="$ss7_dir/$linux_cv_k_release/$target_cpu/$ss7_what"
+			    break
+			fi
+		    fi
+		done
+	    fi
+	    if test :"${ss7_file:-no}" != :no ; then
+		ss7_cv_version=`grep '#define.*\<STRSS7_VERSION\>' $ss7_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	    fi
 	fi
-	if test :"${ss7_file:-no}" != :no ; then
-	    ss7_cv_version=`grep '#define.*\<STRSS7_VERSION\>' $ss7_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
+	if test -z "$ss7_cv_version" ; then
+	    ss7_epoch=
+	    ss7_version=
+	    ss7_package=
+	    ss7_release=
+	    if test -n "$ss7_cv_includes" ; then
+		for ss7_dir in $ss7_cv_includes ; do
+		    if test -z "$ss7_epoch" -a -s "$ss7_dir/.rpmepoch" ; then
+			ss7_epoch=`cat $ss7_dir/.rpmepoch`
+		    fi
+		    if test -z "$ss7_version" -a -s "$ss7_dir/.version" ; then
+			ss7_version=`cat $ss7_dir/.version`
+		    fi
+		    if test -z "$ss7_version" -a -s "$ss7_dir/configure" ; then
+			ss7_version=`grep '^PACKAGE_VERSION=' $ss7_dir/configure | sed -e "s,^.*',,;s,'.*[$],,"`
+		    fi
+		    if test -z "$ss7_package" -a -s "$ss7_dir/.pkgrelease" ; then
+			ss7_package=`cat $ss7_dir/.pkgrelease`
+		    fi
+		    if test -z "$ss7_release" -a -s "$ss7_dir/.rpmrelease" ; then
+			ss7_release=`cat $ss7_dir/.rpmrelease`
+		    fi
+		done
+	    fi
+	    if test -n "$ss7_epoch" -a -n "$ss7_version" -a -n "$ss7_package" -a -n "$ss7_release" ; then
+		ss7_cv_version="$ss7_epoch:$ss7_version.$ss7_package-$ss7_release"
+	    fi
 	fi
     ])
     ss7_what="sys/strss7/config.h"
