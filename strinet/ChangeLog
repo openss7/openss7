@@ -1,5 +1,6 @@
 2007-03-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/lis.conf.in: proper driver names
 	* src/test/test-inet_raw.c: print primitives at default verbosity
 	* src/test/test-inet_sctp.c: print primitives at default verbosity
 	* src/test/test-inet_tcp.c: print primitives at default verbosity
