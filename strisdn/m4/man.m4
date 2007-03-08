@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: man.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/03/11 09:49:51 $
+# @(#) $RCSfile: man.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/08 04:28:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/11 09:49:51 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 04:28:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -109,16 +109,16 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 	    GZIP='-f9v'
 	fi
 	AC_ARG_VAR([GZIP_CMD], [Gzip compression command @<:@default=gzip@:>@])
-	AC_PATH_PROGS([GZIP_CMD], [gzip], [/usr/bin/gzip], [$PATH:/usr/local/bin:/usr/bin:/bin])
+	AC_PATH_PROG([GZIP_CMD], [gzip], [/usr/bin/gzip], [$PATH:/usr/local/bin:/usr/bin:/bin])
 	AC_ARG_VAR([BZIP2], [Bzip2 default compression options @<:@default=@:>@])
 	if test -z "$BZIP2"; then
 	    BZIP2='-f9v'
 	fi
 	AC_ARG_VAR([BZIP2_CMD], [Bzip2 compression command @<:@default=bzip2@:>@])
-	AC_PATH_PROGS([BZIP2_CMD], [bzip2], [/usr/bin/bzip2], [$PATH:/usr/local/bin:/usr/bin:/bin])
+	AC_PATH_PROG([BZIP2_CMD], [bzip2], [/usr/bin/bzip2], [$PATH:/usr/local/bin:/usr/bin:/bin])
     fi
     AC_ARG_VAR([MAKEWHATIS], [Makewhatis command])
-    AC_PATH_PROGS([MAKEWHATIS], [makewhatis], [/usr/sbin/makewhatis], [$PATH:/usr/local/sbin:/usr/sbin:/sbin])
+    AC_PATH_PROG([MAKEWHATIS], [makewhatis], [/usr/sbin/makewhatis], [$PATH:/usr/local/sbin:/usr/sbin:/sbin])
 ])# _MAN_CONVERSION_SETUP
 # =========================================================================
 

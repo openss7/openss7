@@ -1,5 +1,6 @@
 2007-03-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* tests/atlocal.in: tool substitutions changed
 	* src/drivers/lis.conf.in: loadable takes object name not driver name
 	* src/drivers/lis.conf.in: clone device by name instead of number
 

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/02/22 08:36:38 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/03/08 04:28:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 04:28:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -314,7 +314,7 @@ AC_DEFUN([_OPENSS7_OPTIONS_CHECK], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS_GPG], [dnl
     AC_ARG_VAR([GPG], [GPG signature command])
-    AC_PATH_TOOL([GPG], [gpg pgp], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_PROG([GPG], [gpg pgp], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${GPG:-no}" = :no ; then
 	AC_MSG_WARN([Could not find gpg program in PATH.])
 	GPG=/usr/bin/gpg
@@ -584,6 +584,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.42  2007/03/08 04:28:49  brian
+# - substituions changed for program checking macros
+#
 # Revision 0.9.2.41  2007/02/22 08:36:38  brian
 # - balance parentheses
 #
