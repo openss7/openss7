@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/08 04:28:48 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/08 04:54:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 04:28:48 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 04:54:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -124,13 +124,13 @@ dnl
 dnl This is a weird place to put these I know, but genksyms.am needs it
 dnl
     AC_ARG_VAR([OBJDUMP], [Dump object files])
-    AC_PATH_TARGET_TOOL([OBJDUMP], [objdump], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_TOOL([OBJDUMP], [objdump], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${OBJDUMP:-no}" = :no ; then
 	AC_MSG_WARN([Could not find executable objdump program in $PATH.])
 	OBJDUMP=/usr/bin/objdump
     fi
     AC_ARG_VAR([NM], [List object file symbols])
-    AC_PATH_TARGET_TOOL([NM], [nm], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_TOOL([NM], [nm], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${NM:-no}" = :no ; then
 	AC_MSG_WARN([Could not find executable nm program in $PATH.])
 	NM=/usr/bin/nm
