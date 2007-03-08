@@ -2,7 +2,7 @@
 ## vim: ft=conf sw=4
 ## =============================================================================
 ## 
-# @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/28 05:33:00 $
+# @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 11:39:05 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/12/28 05:33:00 $ by $Author: brian $
+## Last Modified $Date: 2007/03/08 11:39:05 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -75,17 +75,17 @@ driver	dl-gsma	    dl_gsma	*
 ## -----------------------------------------------------------
 ##	type	name	    object name
 objname	driver	dl	    dl
-@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@objname	driver	dl-dua	    dl-dua
-@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@objname	driver	dl-gr303    dl-gr303
-@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@objname	driver	dl-gr303ua  dl-gr303ua
-objname	driver	dl-gsma	    dl-gsma
-@WITH_VOIP_TRUE@@WITH_VOIP_TRUE@objname	driver	dl-h225	    dl-h225
-@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@objname	driver	dl-iua	    dl-iua
-@WITH_ISO_TRUE@@WITH_ISO_TRUE@objname	driver	dl-lapb	    dl-lapb
-@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@objname	driver	dl-lapd	    dl-lapd
-@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@objname	driver	dl-lapf	    dl-lapf
-@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@objname	driver	dl-v52	    dl-v52
-@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@objname	driver	dl-v5ua     dl-v5ua
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@objname	driver	dl-dua	    dl_dua
+@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@objname	driver	dl-gr303    dl_gr303
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@objname	driver	dl-gr303ua  dl_gr303ua
+objname	driver	dl-gsma	    dl_gsma
+@WITH_VOIP_TRUE@@WITH_VOIP_TRUE@objname	driver	dl-h225	    dl_h225
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@objname	driver	dl-iua	    dl_iua
+@WITH_ISO_TRUE@@WITH_ISO_TRUE@objname	driver	dl-lapb	    dl_lapb
+@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@objname	driver	dl-lapd	    dl_lapd
+@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@objname	driver	dl-lapf	    dl_lapf
+@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@objname	driver	dl-v52	    dl_v52
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@objname	driver	dl-v5ua     dl_v5ua
 
 
 ##
@@ -93,17 +93,17 @@ objname	driver	dl-gsma	    dl-gsma
 ## -----------------------------------------------------------
 ##		name
 loadable	dl
-@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@loadable	dl-dua
-@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@loadable	dl-gr303
-@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@loadable	dl-gr303ua
-loadable	dl-gsma
-@WITH_VOIP_TRUE@@WITH_VOIP_TRUE@loadable	dl-h225
-@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@loadable	dl-iua
-@WITH_ISO_TRUE@@WITH_ISO_TRUE@loadable	dl-lapb
-@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@loadable	dl-lapd
-@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@loadable	dl-lapf
-@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@loadable	dl-v52
-@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@loadable	dl-v5ua
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@loadable	dl_dua
+@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@loadable	dl_gr303
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@loadable	dl_gr303ua
+loadable	dl_gsma
+@WITH_VOIP_TRUE@@WITH_VOIP_TRUE@loadable	dl_h225
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@loadable	dl_iua
+@WITH_ISO_TRUE@@WITH_ISO_TRUE@loadable	dl_lapb
+@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@loadable	dl_lapd
+@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@loadable	dl_lapf
+@WITH_ISDN_TRUE@@WITH_ISDN_TRUE@loadable	dl_v52
+@WITH_SIGTRAN_TRUE@@WITH_SIGTRAN_TRUE@loadable	dl_v5ua
 
 ##   Node specifications
 ## -----------------------------------------------------------
