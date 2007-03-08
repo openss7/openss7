@@ -1,5 +1,7 @@
 2007-03-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/test/test-ip.c: print primitives at default verbosity
+	* src/test/test-np_ip.c: print primitives at default verbosity
 	* doc/man/Makefile.am (link_driver.4): renamed for 2.6
 	* doc/man/man4/link-driver.4.man: rename to
 	* doc/man/man4/link_driver.4.man: for 2.6

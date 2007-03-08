@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/01/23 10:00:48 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/08 08:26:22 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/23 10:00:48 $ by $Author: brian $
+ Last Modified $Date: 2007/03/08 08:26:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.10  2007/03/08 08:26:22  brian
+ - print primitives at default verbosity
+
  Revision 0.9.2.9  2007/01/23 10:00:48  brian
  - added test program and m2ua-as updates
 
@@ -111,9 +114,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/01/23 10:00:48 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/08 08:26:22 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/01/23 10:00:48 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/08 08:26:22 $";
 
 #define TEST_M2PA   1
 #define TEST_X400   0
@@ -4225,7 +4228,7 @@ print_tx_prim(int child, const char *command)
 		"                    |         %-16s          |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 1)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -4239,7 +4242,7 @@ print_rx_prim(int child, const char *command)
 		"                    |         <%16s>        |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 1)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -4368,7 +4371,7 @@ print_ack_prim(int child, const char *command)
 		"                    |         <%16s>        |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 1)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 

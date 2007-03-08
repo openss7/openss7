@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/12/18 07:40:15 $
+ @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/08 08:29:55 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 07:40:15 $ by $Author: brian $
+ Last Modified $Date: 2007/03/08 08:29:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-np_ip.c,v $
+ Revision 0.9.2.17  2007/03/08 08:29:55  brian
+ - print primitives at default verbosity
+
  Revision 0.9.2.16  2006/12/18 07:40:15  brian
  - device number resolution, updated test programs
 
@@ -120,9 +123,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/12/18 07:40:15 $"
+#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/08 08:29:55 $"
 
-static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/12/18 07:40:15 $";
+static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/08 08:29:55 $";
 
 /*
  *  Simple test program for NPI-IP streams.
@@ -2703,7 +2706,7 @@ print_tx_prim(int child, const char *command)
 		"                    |                                |  |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 1)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -2717,7 +2720,7 @@ print_rx_prim(int child, const char *command)
 		"                    |         <%16s>     |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -2731,7 +2734,7 @@ print_ack_prim(int child, const char *command)
 		"                    |         <%16s>     |  |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 1)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 

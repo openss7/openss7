@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/01/28 01:10:23 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/08 08:27:01 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/28 01:10:23 $ by $Author: brian $
+ Last Modified $Date: 2007/03/08 08:27:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.50  2007/03/08 08:27:01  brian
+ - print primitives at default verbosity
+
  Revision 0.9.2.49  2007/01/28 01:10:23  brian
  - updated test programs and working up m2ua-as driver
 
@@ -244,9 +247,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/01/28 01:10:23 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/08 08:27:01 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/01/28 01:10:23 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/08 08:27:01 $";
 
 /*
  *  Simple test program for INET streams.
@@ -3168,7 +3171,7 @@ print_tx_prim(int child, const char *command)
 		"                    |                                |  |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 1)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -3182,7 +3185,7 @@ print_rx_prim(int child, const char *command)
 		"                    |         <%16s>     |  |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 1)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -3196,7 +3199,7 @@ print_ack_prim(int child, const char *command)
 		"                    |         <%16s>        |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 1)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 07:57:44 $
+ @(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/08 08:27:26 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 07:57:44 $ by $Author: brian $
+ Last Modified $Date: 2007/03/08 08:27:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-etsi_t.c,v $
+ Revision 0.9.2.8  2007/03/08 08:27:26  brian
+ - print primitives at default verbosity
+
  Revision 0.9.2.7  2006/12/18 07:57:44  brian
  - resolve device numbering
 
@@ -93,9 +96,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 07:57:44 $"
+#ident "@(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/08 08:27:26 $"
 
-static char const ident[] = "$RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/12/18 07:57:44 $";
+static char const ident[] = "$RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/08 08:27:26 $";
 
 /*
  *  This file is for testing the sctp_t module.  It is provided for the
@@ -3202,7 +3205,7 @@ print_tx_prim(int child, const char *command)
 		"                    |  |                                |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 1)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -3216,7 +3219,7 @@ print_rx_prim(int child, const char *command)
 		"                    |  |      <%16s>        |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 1)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -3230,7 +3233,7 @@ print_ack_prim(int child, const char *command)
 		"                    |  |      <%16s>        |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 1)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 

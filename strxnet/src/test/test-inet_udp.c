@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/01/28 01:11:24 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/08 08:27:50 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/28 01:11:24 $ by $Author: brian $
+ Last Modified $Date: 2007/03/08 08:27:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.12  2007/03/08 08:27:50  brian
+ - print primitives at default verbosity
+
  Revision 0.9.2.11  2007/01/28 01:11:24  brian
  - updated test programs and working up m2ua-as driver
 
@@ -142,9 +145,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/01/28 01:11:24 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/08 08:27:50 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/01/28 01:11:24 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/08 08:27:50 $";
 
 /*
  *  Simple test program for INET streams.
@@ -2887,7 +2890,7 @@ print_ack_prim(int child, const char *command)
 		"                    |         <%16s>        |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 1)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
