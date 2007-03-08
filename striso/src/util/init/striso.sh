@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: striso.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/08 20:24:50 $
+# @(#) $RCSfile: striso.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 22:08:04 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -78,7 +78,7 @@ RETVAL=0
 
 umask 077
 
-if [ "${VERBOSE:-0}" -ne 0 ] ; then
+if [ "${VERBOSE:-0}" -eq 0 ] ; then
     redir='>/dev/null 2>&1'
 else
     redir=
@@ -218,7 +218,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: striso.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/08 20:24:50 $
+# @(#) $RCSfile: striso.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 22:08:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -263,7 +263,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 20:24:50 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:08:04 $ by $Author: brian $
 #
 # =============================================================================
 
