@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strisdn.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:49:12 $
+# @(#) $RCSfile: strisdn.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/08 20:25:28 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -23,6 +23,22 @@
 #		ISDN character devices are present in the /dev directory and \
 #		that the STREAMS ISDN kernel modules are configured and loaded.
 #
+# LSB init script conventions
+#
+### BEGIN INIT INFO
+# Provides: strisdn
+# Required-Start: streams strcompat $network
+# Required-Stop: streams strcompat $network
+# Default-Start: 3 4 5
+# Default-Stop: 0 1 2 6
+# X-UnitedLinux-Default-Enabled: yes
+# Short-Description: start and stop STREAMS Binary Compatibility Modules
+# License: GPL
+# Description:	This STREAMS ISDN init script is part of Linux Fast-STREAMS.
+#	It is reponsible for ensuring that the necessary STREAMS ISDN character
+#	devices are present in the /dev directory and that the STREAMS ISDN
+#	kernel modules are configured and loaded.
+### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='strisdn'
@@ -202,7 +218,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strisdn.sh,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 10:49:12 $
+# @(#) $RCSfile: strisdn.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/08 20:25:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -247,11 +263,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 10:49:12 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 20:25:28 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strisdn.sh,v $
+# Revision 0.9.2.2  2007/03/08 20:25:28  brian
+# - ubuntu looks for lsb info in init scripts
+#
 # Revision 0.9.2.1  2006/10/16 10:49:12  brian
 # - added new package files
 #

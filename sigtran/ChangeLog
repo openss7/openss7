@@ -1,3 +1,7 @@
+2007-03-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/util/init/sigtran.sh: ubuntu looks for lsb info in init scripts
+
 2007-03-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/sigtran.refs: remove duplicate reference

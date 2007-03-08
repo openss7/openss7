@@ -1,3 +1,10 @@
+2007-03-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/util/init/specfs.sh: ubuntu looks for lsb info in init scripts
+	* src/util/init/strace.sh: ubuntu looks for lsb info in init scripts
+	* src/util/init/streams.sh: ubuntu looks for lsb info in init scripts
+	* src/util/init/strerr.sh: ubuntu looks for lsb info in init scripts
+
 2007-03-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/bugs.texi: document clone loading bug that was fixed

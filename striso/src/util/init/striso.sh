@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: striso.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/08 05:25:48 $
+# @(#) $RCSfile: striso.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/08 20:24:50 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -23,6 +23,22 @@
 #		character devices are present in the /dev directory and \
 #		that the STREAMS ISO subsystem is configured and loaded.
 #
+# LSB init script conventions
+#
+### BEGIN INIT INFO
+# Provides: striso
+# Required-Start: streams $network
+# Required-Stop: streams $network
+# Default-Start: 3 4 5
+# Default-Stop: 0 1 2 6
+# X-UnitedLinux-Default-Enabled: yes
+# Short-Description: start and stop STREAMS ISO subsystem
+# License: GPL
+# Description:	This STREAMS ISO init script is part of Linux Fast-STREAMS.
+#	It is reponsible for ensuring that the necessary STREAMS ISO character
+#	devices are present in the /dev directory and that the STREAMS ISO
+#	subsystem is configured and loaded.
+### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='striso'
@@ -202,7 +218,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: striso.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/08 05:25:48 $
+# @(#) $RCSfile: striso.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/08 20:24:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -247,7 +263,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/08 05:25:48 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 20:24:50 $ by $Author: brian $
 #
 # =============================================================================
 
