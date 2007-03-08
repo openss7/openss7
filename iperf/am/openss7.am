@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2007/03/04 00:14:18 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2007/03/08 05:15:09 $
 #
 #! -----------------------------------------------------------------------------
 #!
@@ -46,11 +46,14 @@
 #!
 #! -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/03/04 00:14:18 $ by $Author: brian $
+## Last Modified $Date: 2007/03/08 05:15:09 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.110  2007/03/08 05:15:09  brian
+## - try to shift ordering when uninstalling
+##
 ## Revision 0.9.2.109  2007/03/04 00:14:18  brian
 ## - revert that
 ##
@@ -133,6 +136,7 @@ INSTALL_DATA_LOCAL	=
 INSTALL_DATA_HOOK	=
 INSTALL_EXEC_LOCAL	=
 INSTALL_EXEC_HOOK	=
+UNINSTALL_AM		=
 UNINSTALL_LOCAL		=
 UNINSTALL_HOOK		=
 MOSTLYCLEAN_LOCAL	=
@@ -555,6 +559,10 @@ pre-uninstall-am: $(PRE_UNINSTALL_AM)
 
 MY_REVERSIVE_TARGETS	+= pre-uninstall-recursive
 MY_PHONY		+= pre-uninstall pre-uninstall-am
+
+UNINSTALL_AM		+= uninstall-am
+
+$(UNINSTALL_AM): pre-uninstall-am
 
 uninstall-local: pre-uninstall-am $(UNINSTALL_LOCAL)
 
