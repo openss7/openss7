@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/08/16 07:40:45 $
+# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 20:23:59 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -26,6 +26,24 @@
 #		exceptional circumstances and this init script not activated \
 #		automatically.
 #
+# LSB init script conventions
+#
+### BEGIN INIT INFO
+# Provides: strace
+# Required-Start: streams
+# Required-Stop: streams
+# Should-Start: strerr
+# Should-Stop: strerr
+# Default-Start: 
+# Default-Stop: 0 1 2 3 4 5 6
+# X-UnitedLinux-Default-Enabled: no
+# Short-Description: start and stop strace
+# License: GPL
+# Description:	This STREAMS init script is part of Linux Fast-STREAMS.  It is
+#	responsible for starting and stopping the STREAMS trace logger.  The
+#	STREAMS trace logger should only be run under exceptional circumstances
+#	and this init script is not activated in any run level by default.
+### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='strace'
@@ -154,7 +172,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/08/16 07:40:45 $
+# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 20:23:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -199,7 +217,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/16 07:40:45 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 20:23:59 $ by $Author: brian $
 #
 # =============================================================================
 

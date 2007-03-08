@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/08 05:18:50 $
+# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/08 20:24:45 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -23,6 +23,22 @@
 #		character devices are present in the /dev directory and \
 #		that the STREAMS XNS subsystem is configured and loaded.
 #
+# LSB init script conventions
+#
+### BEGIN INIT INFO
+# Provides: strxns
+# Required-Start: streams $network
+# Required-Stop: streams $network
+# Default-Start: 3 4 5
+# Default-Stop: 0 1 2 6
+# X-UnitedLinux-Default-Enabled: yes
+# Short-Description: start and stop STREAMS XNS subsystem
+# License: GPL
+# Description:	This STREAMS XNS init script is part of Linux Fast-STREAMS.
+#	It is reponsible for ensuring that the necessary STREAMS XNS character
+#	devices are present in the /dev directory and that the STREAMS XNS
+#	subsystem is configured and loaded.
+### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='strxns'
@@ -202,7 +218,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/08 05:18:50 $
+# @(#) $RCSfile: strxns.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/08 20:24:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -247,7 +263,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/08 05:18:50 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 20:24:45 $ by $Author: brian $
 #
 # =============================================================================
 

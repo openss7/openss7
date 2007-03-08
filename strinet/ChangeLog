@@ -1,3 +1,7 @@
+2007-03-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/util/init/strinet.sh: ubuntu looks for lsb info in init scripts
+
 2007-03-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/lis.conf.in: proper driver names

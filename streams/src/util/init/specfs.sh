@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/08/22 12:36:57 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/08 20:24:21 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -24,6 +24,22 @@
 #		it is, to configure and load the kernel module associated with \
 #		the special filesystem.
 #
+# LSB init script conventions
+#
+### BEGIN INIT INFO
+# Provides: specfs
+# Required-Start: $local_fs
+# Required-Stop: $local_fs
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# X-UnitedLinux-Default-Enabled: yes
+# Short-Description: mount and unmount specfs
+# License: GPL
+# Description:	The SPECFS is a special shadow filesystem used for Linux
+#	Fast-STREAMS.  The purpose of this init script is to detect whether the
+#	specfs is supported for the running kernel, and if it is, to configure
+#	and load the kernel module associated with the special filesystem.
+### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='specfs'
@@ -170,7 +186,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/08/22 12:36:57 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/08 20:24:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -216,7 +232,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/08/22 12:36:57 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 20:24:21 $ by $Author: brian $
 #
 # =============================================================================
 

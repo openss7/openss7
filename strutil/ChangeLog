@@ -1,3 +1,9 @@
+2007-03-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/util/init/strace.sh: ubuntu looks for lsb info in init scripts
+	* src/util/init/strerr.sh: ubuntu looks for lsb info in init scripts
+	* src/util/init/strlogd.sh: ubuntu looks for lsb info in init scripts
+
 2007-03-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am (modutil_DATA): should not be distributed

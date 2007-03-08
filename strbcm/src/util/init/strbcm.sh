@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/16 00:21:16 $
+# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/08 20:25:15 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -23,6 +23,22 @@
 #		BCM character devices are present in the /dev directory and \
 #		that the STREAMS BCM kernel modules are configured and loaded.
 #
+# LSB init script conventions
+#
+### BEGIN INIT INFO
+# Provides: strbcm
+# Required-Start: streams strcompat $network
+# Required-Stop: streams strcompat $network
+# Default-Start: 3 4 5
+# Default-Stop: 0 1 2 6
+# X-UnitedLinux-Default-Enabled: yes
+# Short-Description: start and stop STREAMS Binary Compatibility Modules
+# License: GPL
+# Description:	This STREAMS BCM init script is part of Linux Fast-STREAMS.
+#	It is reponsible for ensuring that the necessary STREAMS BCM character
+#	devices are present in the /dev directory and that the STREAMS BCM
+#	kernel modules are configured and loaded.
+### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='strbcm'
@@ -202,7 +218,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/16 00:21:16 $
+# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/08 20:25:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -247,11 +263,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/16 00:21:16 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 20:25:15 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strbcm.sh,v $
+# Revision 0.9.2.6  2007/03/08 20:25:15  brian
+# - ubuntu looks for lsb info in init scripts
+#
 # Revision 0.9.2.5  2006/10/16 00:21:16  brian
 # - do not load too many kernel modules on init
 #
