@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/08 22:42:24 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/08 22:48:47 $
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -171,7 +171,7 @@ stop() {
     done
     for module in $modules ; do
 	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
-	if eval "grep '^$modrex\>'/proc/modules $redir" ; then
+	if eval "grep '^$modrex\>' /proc/modules $redir" ; then
 	    echo -n "$module "
 	    eval "modprobe -r -q -- $module $redir"
 	    if [ $? -ne 0 ] ; then
@@ -220,7 +220,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/08 22:42:24 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/08 22:48:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -265,7 +265,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 22:42:24 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:48:47 $ by $Author: brian $
 #
 # =============================================================================
 
