@@ -1,5 +1,6 @@
 2007-03-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/Config.in: wrote strconf file for drivers
 	* Makefile.am (modutil_DATA): should not be distributed
 	* tests/atlocal.in: tool substitutions changed
 
