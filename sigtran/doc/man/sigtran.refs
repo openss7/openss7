@@ -546,19 +546,6 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2ua-09.txt
 
-%L M3UABIS05
-%K m3ua-bis-05
-%A Javier Pastor
-%A Ken Morneault
-%E Javier Pastor
-%Q Internet Engineering Task Force \(em Signalling Transport Working Group
-%T Signaling System 7 (SS7) Message Transfer Part 3 (MTP3)-User Adaptation Layer (M3UA)
-%R draft-ietf-sigtran-rfc3332bis-05.txt
-%D October 2005
-%O Work In Progress
-%I Internet Engineering Task Force \(em Signalling Transport Working Group
-%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-rfc3332bis-05.txt
-
 %K m2uaig04
 %L M3UAIG04
 %A Javier Pastor

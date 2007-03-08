@@ -1,5 +1,9 @@
 2007-03-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/sigtran.refs: remove duplicate reference
+	* src/test/test-m2pa.c: print primitives at default verbosity
+	* src/test/test-m2ua_as.c: print primitives at default verbosity
+	* src/test/test-sigtran.c: print primitives at default verbosity
 	* Makefile.am (modutil_DATA): should not be distributed
 	* tests/atlocal.in: tool substitutions changed
 
