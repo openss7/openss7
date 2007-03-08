@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/08 10:52:19 $
+# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/08 11:00:42 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -45,7 +45,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/03/08 10:52:19 $ by $Author: brian $
+## Last Modified $Date: 2007/03/08 11:00:42 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -69,12 +69,12 @@ module	sctmr		sctmr
 ## Object name specifications
 ## -----------------------------------------------------------
 ##	type	name	    object name
-object	driver	dlgn	    dlgnDriver
-object	driver	gncfd	    gncfdDriver
-object	driver	gpio	    gpioDriver
-object	driver	mercd	    mercdDriver
-object	module	dvbm	    dvbmDriver
-object	module	sctmr	    sctmrDriver
+objname	driver	dlgn	    dlgnDriver
+objname	driver	gncfd	    gncfdDriver
+objname	driver	gpio	    gpioDriver
+objname	driver	mercd	    mercdDriver
+objname	module	dvbm	    dvbmDriver
+objname	module	sctmr	    sctmrDriver
 
 ## Loadable specifications
 ## -----------------------------------------------------------
@@ -99,6 +99,9 @@ node	/dev/mercd	    c	0666	clone		mercd
 ## =============================================================================
 ##
 ## $Log: Config.in,v $
+## Revision 0.9.2.3  2007/03/08 11:00:42  brian
+## - objname not object
+##
 ## Revision 0.9.2.2  2007/03/08 10:52:19  brian
 ## - completed strconf file for this package
 ##
