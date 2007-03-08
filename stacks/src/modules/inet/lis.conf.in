@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-#@WITH_INET_TRUE@ @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/07 23:49:02 $
+#@WITH_INET_TRUE@ @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 00:17:17 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -45,11 +45,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/03/07 23:49:02 $ by $Author: brian $
+## Last Modified $Date: 2007/03/08 00:17:17 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: lis.conf.in,v $
+## Revision 0.9.2.4  2007/03/08 00:17:17  brian
+## - loadable takes object name not driver name
+##
 ## Revision 0.9.2.3  2007/03/07 23:49:02  brian
 ## - use clone major device by name
 ##
@@ -82,9 +85,9 @@
 ## -----------------------------------------------------------
 ##		name
 @WITH_INET_TRUE@@WITH_INET_TRUE@loadable	inet
-@WITH_INET_TRUE@@WITH_INET_TRUE@loadable	udp2
-@WITH_INET_TRUE@@WITH_INET_TRUE@loadable	rawip2
-@WITH_INET_TRUE@@WITH_INET_TRUE@loadable	tcp2
+@WITH_INET_TRUE@@WITH_INET_TRUE@loadable	udp
+@WITH_INET_TRUE@@WITH_INET_TRUE@loadable	rawip
+@WITH_INET_TRUE@@WITH_INET_TRUE@loadable	tcp
 
 ## Node specifications
 ## -----------------------------------------------------------
