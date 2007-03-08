@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/10/27 22:44:34 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/03/08 08:43:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 22:44:34 $ by $Author: brian $
+ Last Modified $Date: 2007/03/08 08:43:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/10/27 22:44:34 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/03/08 08:43:20 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/10/27 22:44:34 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/03/08 08:43:20 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -164,9 +164,9 @@ static char const ident[] =
 #include "include/linux/hooks.h"
 #include "include/netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.36 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.37 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2006/10/27 22:44:34 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/03/08 08:43:20 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2132,28 +2132,28 @@ sctp_init_caches(void)
 #if STREAMS
 	if (!sctp_sctp_cachep
 	    && !(sctp_sctp_cachep =
-		 kmem_cache_create("sctp_sctp_cachep", sizeof(struct sctp), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_cache_create("sock_sctp_sctp_cachep", sizeof(struct sctp), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL)))
 		panic("%s:Cannot alloc sctp_sctp_cachep.\n", __FUNCTION__);
 #endif				/* STREAMS */
 	if (!sctp_bind_cachep
 	    && !(sctp_bind_cachep =
-		 kmem_cache_create("sctp_bind_bucket", sizeof(struct sctp_bind_bucket), 0,
+		 kmem_cache_create("sock_sctp_bind_bucket", sizeof(struct sctp_bind_bucket), 0,
 				   SLAB_HWCACHE_ALIGN, NULL, NULL)))
 		panic("%s: Cannot alloc sctp_bind cache.\n", __FUNCTION__);
 	if (!sctp_dest_cachep
 	    && !(sctp_dest_cachep =
-		 kmem_cache_create("sctp_daddr", sizeof(struct sctp_daddr), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_cache_create("sock_sctp_daddr", sizeof(struct sctp_daddr), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL)))
 		panic("%s: Cannot alloc sctp_daddr cache.\n", __FUNCTION__);
 	if (!sctp_srce_cachep
 	    && !(sctp_srce_cachep =
-		 kmem_cache_create("sctp_saddr", sizeof(struct sctp_saddr), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_cache_create("sock_sctp_saddr", sizeof(struct sctp_saddr), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL)))
 		panic("%s: Cannot alloc sctp_saddr cache.\n", __FUNCTION__);
 	if (!sctp_strm_cachep
 	    && !(sctp_strm_cachep =
-		 kmem_cache_create("sctp_strm", sizeof(struct sctp_strm), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_cache_create("sock_sctp_strm", sizeof(struct sctp_strm), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL)))
 		panic("%s: Cannot alloc sctp_strm cache.\n", __FUNCTION__);
 	return;
