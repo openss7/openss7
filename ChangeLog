@@ -1,5 +1,6 @@
 2007-03-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* scripts/remove_initd: was not removing rc6.d links
 	* scripts/strconf-sh: also alias driver to object names in modules.conf
 	* m4/autotest.m4: use proper AC_PATH_PROG, AC_PATH_TARGET_TOOL, AC_PATH_TOOL
 	* m4/deb.m4: use proper AC_PATH_PROG, AC_PATH_TARGET_TOOL, AC_PATH_TOOL
