@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: osr61.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/06 23:31:45 $
+# @(#) $RCSfile: osr61.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/08 12:16:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 23:31:45 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 12:16:30 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: osr61.in,v $
+# Revision 0.9.2.3  2007/03/08 12:16:30  brian
+# - remove aliases
+#
 # Revision 0.9.2.2  2007/03/06 23:31:45  brian
 # - correct naming of aliases
 #
@@ -61,12 +64,5 @@
 prune modules.@PACKAGE_LCNAME@
 if -f /lib/modules/`uname -r`/modules.@PACKAGE_LCNAME@
 include /lib/modules/`uname -r`/modules.@PACKAGE_LCNAME@
-alias streams-dvbm streams-dvbmDriver
-alias streams-sctmr streams-sctmrDriver
-alias streams-dlgn streams-dlgnDriver
-alias streams-gncdf streams-gncfdDriver
-alias streams-gpio streams-gpioDriver
-alias streams-mercd streams-mercdDriver
-alias mercd streams-mercdDriver
 endif
 
