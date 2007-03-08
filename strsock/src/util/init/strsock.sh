@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/08 22:08:10 $
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/08 22:12:41 $
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -218,11 +218,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/08 22:08:10 $
+# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/08 22:12:41 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -263,11 +263,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 22:08:10 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:12:41 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strsock.sh,v $
+# Revision 0.9.2.7  2007/03/08 22:12:41  brian
+# - update headers
+#
 # Revision 0.9.2.6  2007/03/08 22:08:10  brian
 # - sense of VERBOSE reversed
 #

@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strvoip.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/08 22:08:26 $
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) $RCSfile: strvoip.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 22:12:52 $
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -218,11 +218,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strvoip.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/08 22:08:26 $
+# @(#) $RCSfile: strvoip.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 22:12:52 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -263,11 +263,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 22:08:26 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:12:52 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strvoip.sh,v $
+# Revision 0.9.2.4  2007/03/08 22:12:52  brian
+# - update headers
+#
 # Revision 0.9.2.3  2007/03/08 22:08:26  brian
 # - sense of VERBOSE reversed
 #

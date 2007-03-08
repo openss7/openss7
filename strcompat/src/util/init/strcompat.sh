@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/08 22:07:44 $
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/08 22:12:17 $
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -260,11 +260,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/08 22:07:44 $
+# @(#) $RCSfile: strcompat.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/08 22:12:17 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -305,7 +305,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 22:07:44 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:12:17 $ by $Author: brian $
 #
 # =============================================================================
 
