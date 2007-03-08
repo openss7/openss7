@@ -2,7 +2,7 @@
 ## vim: ft=conf sw=4
 ## =============================================================================
 ## 
-#@WITH_CHAN_TRUE@ @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/18 10:40:25 $
+#@WITH_CHAN_TRUE@ @(#) $RCSfile: lis.conf.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/08 11:39:04 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/12/18 10:40:25 $ by $Author: brian $
+## Last Modified $Date: 2007/03/08 11:39:04 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -66,15 +66,15 @@
 ## -----------------------------------------------------------
 ##	type	name	    object name
 @WITH_CHAN_TRUE@@WITH_CHAN_TRUE@objname	module	cd	    cd
-@WITH_CHAN_TRUE@@WITH_CHAN_TRUE@objname	module	cd-hdlc	    cd-hdlc
-@WITH_CHAN_TRUE@@WITH_CHAN_TRUE@objname	module	cd-daed	    cd-daed
+@WITH_CHAN_TRUE@@WITH_CHAN_TRUE@objname	module	cd-hdlc	    cd_hdlc
+@WITH_CHAN_TRUE@@WITH_CHAN_TRUE@objname	module	cd-daed	    cd_daed
 
 ## Loadable specifications
 ## -----------------------------------------------------------
 ##	    name
 @WITH_CHAN_TRUE@@WITH_CHAN_TRUE@loadable    cd
-@WITH_CHAN_TRUE@@WITH_CHAN_TRUE@loadable    cd-hdlc
-@WITH_CHAN_TRUE@@WITH_CHAN_TRUE@loadable    cd-daed
+@WITH_CHAN_TRUE@@WITH_CHAN_TRUE@loadable    cd_hdlc
+@WITH_CHAN_TRUE@@WITH_CHAN_TRUE@loadable    cd_daed
 
 ## Node specifications
 ## -----------------------------------------------------------

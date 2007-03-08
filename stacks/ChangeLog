@@ -1,5 +1,17 @@
 2007-03-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/modules/acb56/lis.conf: correct object names
+	* src/modules/cd/lis.conf.in: correct object names
+	* src/modules/dl/lis.conf.in: correct object names
+	* src/modules/m2pa/lis.conf.in: correct object names
+	* src/modules/mtp/lis.conf: correct object names
+	* src/modules/mx/lis.conf: correct object names
+	* src/modules/sdl/lis.conf: correct object names
+	* src/modules/sl/lis.conf: correct object names
+	* src/modules/ss7ip/lis.conf.in: correct object names
+	* src/modules/ss7sctp/lis.conf.in: correct object names
+	* src/modules/x400p-ss7/lis.conf: correct object names
+
 	* Makefile.am (modutil_DATA): should not be distributed
 	* tests/atlocal.in: tool substitutions changed
 
