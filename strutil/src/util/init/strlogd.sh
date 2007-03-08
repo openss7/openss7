@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strlogd.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 20:24:35 $
+# @(#) $RCSfile: strlogd.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/08 22:07:55 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -73,7 +73,7 @@ RETVAL=0
 
 umask 077
 
-if [ "${VERBOSE:-0}" -ne 0 ] ; then
+if [ "${VERBOSE:-0}" -eq 0 ] ; then
     redir='>/dev/null 2>&1'
 else
     redir=
@@ -170,7 +170,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strlogd.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 20:24:35 $
+# @(#) $RCSfile: strlogd.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/08 22:07:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -215,7 +215,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 20:24:35 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:07:55 $ by $Author: brian $
 #
 # =============================================================================
 

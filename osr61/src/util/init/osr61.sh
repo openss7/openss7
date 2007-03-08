@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: osr61.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/08 20:25:38 $
+# @(#) $RCSfile: osr61.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/08 22:08:30 $
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -78,7 +78,7 @@ RETVAL=0
 
 umask 077
 
-if [ "${VERBOSE:-0}" -ne 0 ] ; then
+if [ "${VERBOSE:-0}" -eq 0 ] ; then
     redir='>/dev/null 2>&1'
 else
     redir=
@@ -218,7 +218,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: osr61.sh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/08 20:25:38 $
+# @(#) $RCSfile: osr61.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/08 22:08:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -263,7 +263,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 20:25:38 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:08:30 $ by $Author: brian $
 #
 # =============================================================================
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/08 20:25:08 $
+# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/08 22:08:10 $
 # Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -78,7 +78,7 @@ RETVAL=0
 
 umask 077
 
-if [ "${VERBOSE:-0}" -ne 0 ] ; then
+if [ "${VERBOSE:-0}" -eq 0 ] ; then
     redir='>/dev/null 2>&1'
 else
     redir=
@@ -218,7 +218,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/08 20:25:08 $
+# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/08 22:08:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -263,11 +263,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 20:25:08 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:08:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strsock.sh,v $
+# Revision 0.9.2.6  2007/03/08 22:08:10  brian
+# - sense of VERBOSE reversed
+#
 # Revision 0.9.2.5  2007/03/08 20:25:08  brian
 # - ubuntu looks for lsb info in init scripts
 #
