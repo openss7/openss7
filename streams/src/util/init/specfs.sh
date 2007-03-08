@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/08 22:12:20 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/08 22:42:24 $
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -88,20 +88,20 @@ start() {
     if [ -n "$SPECFS_MOUNTPOINT" ] ; then
 	if ! grep -qc '[[:space:]]specfs\>' /proc/filesystems ; then
 	    echo -n "Loading SPECFS kernel modules: "
-	    modprobe -k -q -- specfs $redir
+	    eval "modprobe -k -q -- specfs $redir"
 	    RETVAL=$? ; if [ $RETVAL -ne 0 ] ; then echo "(failed.)" ; return $RETVAL ; fi
 	    echo "specfs."
 	fi
 	if [ ! -d "$SPECFS_MOUNTPOINT" ] ; then
 	    echo -n "Creating SPECFS mount point: "
-	    mkdir -p -- "$SPECFS_MOUNTPOINT" $redir
+	    eval "mkdir -p -- \"$SPECFS_MOUNTPOINT\" $redir"
 	    RETVAL=$? ; if [ $RETVAL -ne 0 ] ; then echo "(failed.)" ; return $RETVAL ; fi
 	    echo "$SPECFS_MOUNTPOINT."
 	fi
 	if ! mount | grep " on $SPECFS_MOUNTPOINT type specfs" >/dev/null 2>&1 ; then
 	    build_options
 	    echo -n "Mounting SPECFS filesystem: "
-	    mount -t specfs ${SPECFS_OPTIONS} -- specfs "$SPECFS_MOUNTPOINT" $redir
+	    eval "mount -t specfs ${SPECFS_OPTIONS} -- specfs \"$SPECFS_MOUNTPOINT\" $redir"
 	    RETVAL=$? ; if [ $RETVAL -ne 0 ] ; then echo "(failed.)" ; return $RETVAL ; fi
 	    echo "$SPECFS_MOUNTPOINT."
 	fi
@@ -116,19 +116,19 @@ stop() {
 	while read line ; do
 	    set $line
 	    echo -n "$3 "
-	    umount -- "$3" $redir
+	    eval "umount -- \"$3\" $redir"
 	    if [ $? -ne 0 ] ; then echo -n "(failed) " ; continue ; fi
 	done
 	echo "."
     fi
     if [ -n "$SPECFS_MOUNTPOINT" -a -d "$SPECFS_MOUNTPOINT" ] ; then
 	echo -n "Removing SPECFS mount point: "
-	rmdir -- "$SPECFS_MOUNTPOINT" $redir
+	eval "rmdir -- \"$SPECFS_MOUNTPOINT\" $redir"
 	if [ $? -ne 0 ] ; then echo -n "(failed) " ; else echo "$SPECFS_MOUNTPOINT." ; fi
     fi
     if grep -qc '[[:space:]]specfs\>' /proc/filesystems ; then
 	    echo -n "Removing SPECFS kernel modules: specfs "
-	    modprobe -r -q -- specfs $redir || :
+	    eval "modprobe -r -q -- specfs $redir" || :
 	    if grep -qc '[[:space:]]specfs\>' /proc/filesystems ; then
 		echo "(failed.)"
 		return 1
@@ -150,7 +150,7 @@ reload() {
     echo -n "Remounting SPECFS filesystem: "
     if mount | grep ' on [^[:space:]]* type specfs' 1>/dev/null 2>&1 ; then
 	build_options remount
-	mount -t specfs ${SPECFS_OPTIONS} -- specfs "$SPECFS_MOUNTPOINT" $redir
+	eval "mount -t specfs ${SPECFS_OPTIONS} -- specfs \"$SPECFS_MOUNTPOINT\" $redir"
 	RETVAL=$? ; if [ $RETVAL -ne 0 ] ; then echo "(failed.)" ; return $RETVAL ; fi
 	echo "$SPECFS_MOUNTPOINT."
 	return 0
@@ -186,7 +186,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/08 22:12:20 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/08 22:42:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -231,7 +231,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 22:12:20 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:42:24 $ by $Author: brian $
 #
 # =============================================================================
 

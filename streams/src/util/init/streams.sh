@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/08 22:12:20 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/08 22:42:24 $
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -100,9 +100,9 @@ start() {
     done
     for module in $modules ; do
 	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
-	if ! grep "^$modrex\>" /proc/modules $redir ; then
+	if ! eval "grep '^$modrex\>' /proc/modules $redir" ; then
 	    echo -n "$module "
-	    modprobe -k -q -- $module $redir
+	    eval "modprobe -k -q -- $module $redir"
 	    [ $? -eq 0 ] || echo -n "(failed)"
 	fi
     done
@@ -117,9 +117,9 @@ start() {
 	RETVAL=1
     fi
 
-    if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf $redir ; then
+    if eval "grep '^[[:space:]]*${name}[/.]' /etc/sysctl.conf $redir" ; then
 	echo -n "Reconfiguring kernel parameters: "
-	sysctl -p /etc/sysctl.conf $redir
+	eval "sysctl -p /etc/sysctl.conf $redir"
 	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
@@ -129,7 +129,7 @@ start() {
 
     if [ -f /etc/${name}.conf ] ; then
 	echo -n "Configuring STREAMS parameters: "
-	sysctl -p /etc/${name}.conf $redir
+	eval "sysctl -p /etc/${name}.conf $redir"
 	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
@@ -171,9 +171,9 @@ stop() {
     done
     for module in $modules ; do
 	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
-	if grep "^$modrex\>" /proc/modules $redir ; then
+	if eval "grep '^$modrex\>'/proc/modules $redir" ; then
 	    echo -n "$module "
-	    modprobe -r -q -- $module $redir
+	    eval "modprobe -r -q -- $module $redir"
 	    if [ $? -ne 0 ] ; then
 		echo -n "(failed) "
 		RETVAL=1
@@ -220,7 +220,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/08 22:12:20 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/08 22:42:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -265,7 +265,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 22:12:20 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:42:24 $ by $Author: brian $
 #
 # =============================================================================
 

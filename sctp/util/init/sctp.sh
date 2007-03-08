@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: sctp.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 22:12:10 $
+# @(#) $RCSfile: sctp.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/08 22:42:15 $
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -85,9 +85,9 @@ build_options() {
 start() {
     echo -n "Loading SCTP kernel modules: "
     for module in $SCTP_MODULES ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules $redir ; then
+	if ! eval "grep '^$module[[:space:]]' /proc/modules $redir" ; then
 	    echo -n "$module "
-	    modprobe -k -q -- $module $redir
+	    eval "modprobe -k -q -- $module $redir"
 	    [ $? -eq 0 ] || echo -n "(failed)"
 	fi
     done
@@ -101,9 +101,9 @@ start() {
     else
 	echo "(failed.)"
     fi
-    if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf $redir ; then
+    if eval "grep '^[[:space:]]*${name}[/.]' /etc/sysctl.conf $redir" ; then
 	echo -n "Reconfiguring kernel parameters: "
-	sysctl -p /etc/sysctl.conf $redir
+	eval "sysctl -p /etc/sysctl.conf $redir"
 	RETVAL=$?
 	if [ $RETVAL -eq 0 ] ; then
 	    echo "."
@@ -113,7 +113,7 @@ start() {
     fi
     if [ -f /etc/${name}.conf ] ; then
 	echo -n "Configuring SCTP parameters: "
-	sysctl -p /etc/${name}.conf $redir
+	eval "sysctl -p /etc/${name}.conf $redir"
 	RETVAL=$?
 	if [ $RETVAL -eq 0 ] ; then
 	    echo "."
@@ -197,7 +197,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 22:12:10 $
+# @(#) $RCSfile: sctp.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/08 22:42:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -242,7 +242,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 22:12:10 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:42:15 $ by $Author: brian $
 #
 # =============================================================================
 
