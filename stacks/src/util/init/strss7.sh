@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strss7.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/08 22:07:41 $
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) $RCSfile: strss7.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 22:12:13 $
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -218,11 +218,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strss7.sh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/08 22:07:41 $
+# @(#) $RCSfile: strss7.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 22:12:13 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -263,7 +263,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 22:07:41 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:12:13 $ by $Author: brian $
 #
 # =============================================================================
 

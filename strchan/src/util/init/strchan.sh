@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strchan.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 22:08:18 $
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) $RCSfile: strchan.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/08 22:12:45 $
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -218,11 +218,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strchan.sh,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/08 22:08:18 $
+# @(#) $RCSfile: strchan.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/08 22:12:45 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -263,11 +263,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 22:08:18 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:12:45 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strchan.sh,v $
+# Revision 0.9.2.5  2007/03/08 22:12:45  brian
+# - update headers
+#
 # Revision 0.9.2.4  2007/03/08 22:08:18  brian
 # - sense of VERBOSE reversed
 #

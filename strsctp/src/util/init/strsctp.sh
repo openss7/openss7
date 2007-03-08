@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/08 22:07:52 $
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/08 22:12:27 $
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -218,11 +218,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/08 22:07:52 $
+# @(#) $RCSfile: strsctp.sh,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/08 22:12:27 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -263,7 +263,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 22:07:52 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:12:27 $ by $Author: brian $
 #
 # =============================================================================
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/08 22:08:15 $
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/08 22:12:43 $
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -218,11 +218,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/08 22:08:15 $
+# @(#) $RCSfile: strbcm.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/08 22:12:43 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -263,11 +263,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 22:08:15 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:12:43 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strbcm.sh,v $
+# Revision 0.9.2.8  2007/03/08 22:12:43  brian
+# - update headers
+#
 # Revision 0.9.2.7  2007/03/08 22:08:15  brian
 # - sense of VERBOSE reversed
 #

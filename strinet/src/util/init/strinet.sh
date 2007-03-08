@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/08 22:07:50 $
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/08 22:12:22 $
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -252,11 +252,11 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/08 22:07:50 $
+# @(#) $RCSfile: strinet.sh,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/08 22:12:22 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -297,7 +297,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 22:07:50 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 22:12:22 $ by $Author: brian $
 #
 # =============================================================================
 
