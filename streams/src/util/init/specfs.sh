@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/08 20:24:21 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/08 20:32:22 $
 # Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -128,7 +128,7 @@ stop() {
     fi
     if grep -qc '[[:space:]]specfs\>' /proc/filesystems ; then
 	    echo -n "Removing SPECFS kernel modules: specfs "
-	    rmmod -r -- specfs $redir || :
+	    modprobe -r -q -- specfs $redir || :
 	    if grep -qc '[[:space:]]specfs\>' /proc/filesystems ; then
 		echo "(failed.)"
 		return 1
@@ -186,7 +186,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/08 20:24:21 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/08 20:32:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -232,7 +232,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 20:24:21 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 20:32:22 $ by $Author: brian $
 #
 # =============================================================================
 
