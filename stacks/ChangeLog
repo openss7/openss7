@@ -1,5 +1,6 @@
 2007-03-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/modules/tcap/lis.conf: tcap is a driver not a module
 	* src/modules/inet/lis.conf.in: loadable takes object name not driver name
 	* src/modules/inet/lis.conf.in: clone device by name instead of number
 	* doc/man/man4/mtp_npi.4.man: fixed empty manual page sections
