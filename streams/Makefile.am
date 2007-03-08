@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2007/03/04 00:23:48 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2007/03/08 06:08:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 00:23:48 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 06:08:48 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.144  2007/03/08 06:08:48  brian
+# - modutil_DATA should not be distributed (and it reorders uninstall)
+#
 # Revision 0.9.2.143  2007/03/04 00:23:48  brian
 # - add version file creation
 #
@@ -554,8 +557,8 @@ if WITH_KO_MODULES
 else
 if PKG_BUILD_INDEP
 if RPM_BUILD_USER
-dist_modutil_DATA		= \
-				src/util/modutils/streams
+nodist_modutil_DATA		= \
+				src/util/modutils/@PACKAGE_LCNAME@
 endif
 endif
 endif
