@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/02/22 08:36:38 $
+# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/08 04:28:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 04:28:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -243,7 +243,7 @@ AC_DEFUN([_DEB_DPKG_SETUP_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_SETUP_BUILD], [dnl
     AC_ARG_VAR([DPKG], [dpkg command])
-    AC_PATH_TOOL([DPKG], [dpkg], [], [$PATH:/usr/local/bin:/usr/bin])
+    AC_PATH_PROG([DPKG], [dpkg], [], [$PATH:/usr/local/bin:/usr/bin])
     if test :"${DPKG:-no}" = :no ; then
 	case "$target_vendor" in
 	    (debian|ubuntu)
@@ -252,7 +252,7 @@ AC_DEFUN([_DEB_DPKG_SETUP_BUILD], [dnl
 	esac
     fi
     AC_ARG_VAR([DPKG_SOURCE], [dpkg-source command])
-    AC_PATH_TOOL([DPKG_SOURCE], [dpkg-source], [], [$PATH:/usr/local/bin:/usr/bin])
+    AC_PATH_PROG([DPKG_SOURCE], [dpkg-source], [], [$PATH:/usr/local/bin:/usr/bin])
     if test :"${DPKG_SOURCE:-no}" = :no ; then
 	case "$target_vendor" in
 	    (debian|ubuntu)
@@ -261,7 +261,7 @@ AC_DEFUN([_DEB_DPKG_SETUP_BUILD], [dnl
 	esac
     fi
     AC_ARG_VAR([DPKG_BUILDPACKAGE], [dpkg-buildpackage command])
-    AC_PATH_TOOL([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [], [$PATH:/usr/local/bin:/usr/bin])
+    AC_PATH_PROG([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [], [$PATH:/usr/local/bin:/usr/bin])
     if test :"${DPKG_BUILDPACKAGE:-no}" = :no ; then
 	case "$target_vendor" in
 	    (debian|ubuntu)

@@ -1,5 +1,16 @@
 2007-03-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* m4/autotest.m4: use proper AC_PATH_PROG, AC_PATH_TARGET_TOOL, AC_PATH_TOOL
+	* m4/deb.m4: use proper AC_PATH_PROG, AC_PATH_TARGET_TOOL, AC_PATH_TOOL
+	* m4/doxy.m4: use proper AC_PATH_PROG, AC_PATH_TARGET_TOOL, AC_PATH_TOOL
+	* m4/genksyms.m4: use proper AC_PATH_PROG, AC_PATH_TARGET_TOOL, AC_PATH_TOOL
+	* m4/init.m4: use proper AC_PATH_PROG, AC_PATH_TARGET_TOOL, AC_PATH_TOOL
+	* m4/kernel.m4: use proper AC_PATH_PROG, AC_PATH_TARGET_TOOL, AC_PATH_TOOL
+	* m4/libraries.m4: use proper AC_PATH_PROG, AC_PATH_TARGET_TOOL, AC_PATH_TOOL
+	* m4/man.m4: use proper AC_PATH_PROG, AC_PATH_TARGET_TOOL, AC_PATH_TOOL
+	* m4/openss7.m4: use proper AC_PATH_PROG, AC_PATH_TARGET_TOOL, AC_PATH_TOOL
+	* m4/rpm.m4: use proper AC_PATH_PROG, AC_PATH_TARGET_TOOL, AC_PATH_TOOL
+
 	* texi/install.texi: added locations on website of tools to README-cvs
 	* scripts/strconf-sh: clone device by name instead of number
 

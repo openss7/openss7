@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: autotest.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006-03-11 09:49:50 $
+# @(#) $RCSfile: autotest.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/08 04:28:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,12 +48,15 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006-03-11 09:49:50 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 04:28:48 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: autotest.m4,v $
-# Revision 0.9.2.11  2006-03-11 09:49:50  brian
+# Revision 0.9.2.12  2007/03/08 04:28:48  brian
+# - substituions changed for program checking macros
+#
+# Revision 0.9.2.11  2006/03/11 09:49:50  brian
 # - a bit better checking
 #
 # =============================================================================
@@ -102,7 +105,7 @@ AC_DEFUN([_AUTOTEST_SETUP], [dnl
 # ---------------------------------------------------------------------------
 AC_DEFUN([_AUTOTEST_SETUP_AUTOM4TE], [dnl
     AC_ARG_VAR([AUTOM4TE], [Autom4te command])
-    AC_PATH_TOOL([AUTOM4TE], [autom4te], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_PROG([AUTOM4TE], [autom4te], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${AUTOM4TE:-no}" = :no ; then
 	AC_MSG_WARN([Could not find autom4te program in PATH.])
 	AUTOM4TE=/usr/bin/autom4te
@@ -115,9 +118,9 @@ AC_DEFUN([_AUTOTEST_SETUP_AUTOM4TE], [dnl
 # ---------------------------------------------------------------------------
 AC_DEFUN([_AUTOTEST_SETUP_AUTOTEST], [dnl
     AC_ARG_VAR([AUTOTEST], [Autotest macro build command])
-    AC_PATH_TOOL([AUTOTEST], [autotest], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_PROG([AUTOTEST], [autotest], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${AUTOTEST:-no}" = :no ; then
-	AC_MSG_WARN([Could not find autotest program in PATH.])
+dnl	AC_MSG_WARN([Could not find autotest program in PATH.])
 	AUTOTEST="$AUTOM4TE --language=autotest"
     fi
 ])# _AUTOTEST_SETUP_AUTOTEST

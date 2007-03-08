@@ -1,3 +1,7 @@
+2007-03-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/atlocal.in: tool substitutions changed
+
 2007-03-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* manual/Makefile.am: attempt proper texinfo dependencies

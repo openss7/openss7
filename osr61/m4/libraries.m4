@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: libraries.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006-09-27 12:14:17 $
+# @(#) $RCSfile: libraries.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/08 04:28:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006-09-27 12:14:17 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 04:28:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,7 +75,7 @@ AC_DEFUN([_LDCONFIG_SPEC_OPTIONS], [dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LDCONFIG_SPEC_SETUP], [dnl
     AC_ARG_VAR([LDCONFIG], [Configure loader command])
-    AC_PATH_TOOL([LDCONFIG], [ldconfig], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_TARGET_TOOL([LDCONFIG], [ldconfig], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${LDCONFIG:-no}" = :no ; then
 	AC_MSG_WARN([Could not find ldconfig program in PATH.])
 	LDCONFIG=/sbin/ldconfig

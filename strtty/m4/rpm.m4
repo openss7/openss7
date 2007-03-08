@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/02/22 08:36:38 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/03/08 04:28:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 04:28:49 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -501,13 +501,13 @@ AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_BUILD], [dnl
     AC_ARG_VAR([RPM], [Rpm command])
-    AC_PATH_TOOL([RPM], [rpm], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_PROG([RPM], [rpm], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${RPM:-no}" = :no ; then
 	AC_MSG_WARN([Could not find rpm program in PATH.])
 	RPM=/bin/rpm
     fi
     AC_ARG_VAR([RPMBUILD], [Build rpms command])
-    AC_PATH_TOOL([RPMBUILD], [rpmbuild], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_PROG([RPMBUILD], [rpmbuild], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${RPMBUILD:-${RPM:-no}}" = :no ; then
 	AC_MSG_WARN([Could not find rpmbuild program in PATH.])
 	RPMBUILD=/usr/bin/rpmbuild

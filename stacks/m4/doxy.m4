@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/02/22 08:36:38 $
+# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/08 04:28:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
+# Last Modified $Date: 2007/03/08 04:28:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -132,7 +132,7 @@ AC_DEFUN([_DOXY_CONFIG_INPUT], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DOXY_SETUP], [dnl
     AC_ARG_VAR([DOXYGEN], [doxygen command])
-    AC_PATH_TOOL([DOXYGEN], [doxygen], [], [$PATH:/usr/local/bin:/usr/bin])
+    AC_PATH_PROG([DOXYGEN], [doxygen], [], [$PATH:/usr/local/bin:/usr/bin])
     if test :"${DOXYGEN:-no}" = :no ; then
 	AC_MSG_WARN([Could not find doxygen program in PATH.])
     fi
