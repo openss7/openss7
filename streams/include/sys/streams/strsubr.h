@@ -503,7 +503,7 @@ struct queinfo {
 };
 
 #define rqstream(__rq) (((struct queinfo *)(__rq))->qu_str)
-#define wqstream(__wq) (((struct queinfo *)(_RD(__wq)))->q_str)
+#define wqstream(__wq) (((struct queinfo *)(_RD(__wq)))->qu_str)
 #define qstream(__q) rqstream(RD(__q))
 
 enum {

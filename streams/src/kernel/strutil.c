@@ -2801,7 +2801,7 @@ qprocsoff(queue_t *q)
 	/* only one qprocsoff() happens at a time */
 	if (!test_bit(QPROCS_BIT, &rq->q_flag)) {
 		struct stdata *sd2, *sd = rqstream(rq);
-		unsigned long pl, pl2;
+		unsigned long pl, pl2 = 0;
 
 		assert(sd);
 
@@ -2906,7 +2906,7 @@ qprocson(queue_t *q)
 	/* only one qprocson() happens at a time */
 	if (test_bit(QPROCS_BIT, &rq->q_flag)) {
 		struct stdata *sd2, *sd = rqstream(rq);
-		unsigned long pl, pl2;
+		unsigned long pl, pl2 = 0;
 
 		/* spin here waiting for queue procedures to exit */
 		pwlock(sd, pl);

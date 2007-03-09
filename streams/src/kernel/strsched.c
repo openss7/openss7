@@ -3375,7 +3375,7 @@ STATIC void
 do_weldq_synced(struct strevent *se)
 {
 	{
-		unsigned long pl1, pl3;
+		unsigned long pl1 = 0, pl3 = 0;
 		queue_t *qn1 = NULL, *qn3 = NULL;
 		queue_t *q1, *q2, *q3, *q4;
 		struct stdata *sd1, *sd3;
