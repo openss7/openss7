@@ -373,6 +373,7 @@ AC_DEFUN([_NETPERF_OUTPUT], [dnl
 	AC_DEFINE([DO_SCTP], [1], [
 	    Define to include code to test the SCTP implementation.
 	])
+	CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${srcdir}/../sctp/include"
     fi
     AC_MSG_RESULT([${netperf_cv_do_sctp:-no}])
     AC_MSG_CHECKING([for netperf do select])
