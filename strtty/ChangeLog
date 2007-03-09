@@ -1,3 +1,8 @@
+2007-03-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/Config.in: strapped out device entries for now
+	* doc/manual/bugs.texi: strapped out device entries for now
+
 2007-03-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/util/init/strtty.sh: ubuntu looks for lsb info in init scripts
