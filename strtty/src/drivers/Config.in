@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/07 23:51:29 $
+# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/09 22:34:35 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -45,11 +45,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/03/07 23:51:29 $ by $Author: brian $
+## Last Modified $Date: 2007/03/09 22:34:35 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Config.in,v $
+## Revision 0.9.2.5  2007/03/09 22:34:35  brian
+## - strapped out tty device entries
+##
 ## Revision 0.9.2.4  2007/03/07 23:51:29  brian
 ## - use clone major device by name
 ##
@@ -204,23 +207,25 @@ loadable    pty
 ##node	/dev/ticots_ord	     c	0666	inet		42
 ##node	/dev/ticots	     c	0666	inet		43
 ##node	/dev/ticlts	     c	0666	inet		44
-node	/dev/ptmx	     c	0666	clone		ptm
-node	/dev/pts/0	     c	0666	pts		0
-node	/dev/pts/1	     c	0666	pts		1
-node	/dev/pts/2	     c	0666	pts		2
-node	/dev/pts/3	     c	0666	pts		3
-node	/dev/pts/4	     c	0666	pts		4
-node	/dev/pts/5	     c	0666	pts		5
-node	/dev/pts/6	     c	0666	pts		6
-node	/dev/pts/7	     c	0666	pts		7
-node	/dev/pts/8	     c	0666	pts		8
-node	/dev/pts/9	     c	0666	pts		9
-node	/dev/pts/10	     c	0666	pts		10
-node	/dev/pts/11	     c	0666	pts		11
-node	/dev/pts/12	     c	0666	pts		12
-node	/dev/pts/13	     c	0666	pts		13
-node	/dev/pts/14	     c	0666	pts		14
-node	/dev/pts/15	     c	0666	pts		15
+##
+## These are destroying linux's entries (Hah!)
+#node	/dev/ptmx	     c	0666	clone		ptm
+#node	/dev/pts/0	     c	0666	pts		0
+#node	/dev/pts/1	     c	0666	pts		1
+#node	/dev/pts/2	     c	0666	pts		2
+#node	/dev/pts/3	     c	0666	pts		3
+#node	/dev/pts/4	     c	0666	pts		4
+#node	/dev/pts/5	     c	0666	pts		5
+#node	/dev/pts/6	     c	0666	pts		6
+#node	/dev/pts/7	     c	0666	pts		7
+#node	/dev/pts/8	     c	0666	pts		8
+#node	/dev/pts/9	     c	0666	pts		9
+#node	/dev/pts/10	     c	0666	pts		10
+#node	/dev/pts/11	     c	0666	pts		11
+#node	/dev/pts/12	     c	0666	pts		12
+#node	/dev/pts/13	     c	0666	pts		13
+#node	/dev/pts/14	     c	0666	pts		14
+#node	/dev/pts/15	     c	0666	pts		15
 
 # get strload to fill these out
 
