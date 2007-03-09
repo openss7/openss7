@@ -1056,7 +1056,7 @@ timod_pop(queue_t *q)
 			mp->b_datap->db_type = M_ERROR;
 			*(mp->b_wptr)++ = 0;
 			*(mp->b_wptr)++ = 0;
-			qreply(q, mp);
+			putnext(q, mp);
 		}
 #	    if defined M_ERROR_UNDOES_M_HANGUP
 		priv->flags &= ~(TIMOD_EPROTO | TIMOD_HANGUP);
@@ -1068,7 +1068,7 @@ timod_pop(queue_t *q)
 	if ((priv->flags & TIMOD_HANGUP)) {
 		if ((mp = allocb(0, BRPI_WAITOK))) {
 			mp->b_datap->db_type = M_UNHANGUP;
-			qreply(q, mp);
+			putnext(q, mp);
 		}
 		priv->flags &= ~TIMOD_HANGUP;
 	}

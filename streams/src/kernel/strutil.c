@@ -2529,10 +2529,9 @@ qalloc(struct stdata *sd, struct fmodsw *fmod)
 		(q + 1)->q_flag |= QPROCS | QNOENB;
 		if (!__setsq(q, fmod)) {
 			struct streamtab *st = fmod->f_str;
-			struct queinfo *qu = (typeof(qu)) q;
 
 			__setq(q, st->st_rdinit, st->st_wrinit);
-			_ctrace(qu->qu_str = sd_get(sd));
+			_ctrace(rqstream(q) = sd_get(sd));
 		} else {
 			(q + 0)->q_flag = QUSE | QREADR;
 			(q + 1)->q_flag = QUSE;
@@ -2644,7 +2643,7 @@ qdelete(queue_t *q)
 	unsigned long pl;
 
 	assert(q);
-	sd = qstream(q);
+	sd = rqstream(q);
 	assert(sd);
 
 	_ptrace(("final half-delete of stream %p queue pair %p\n", sd, q));
@@ -2695,7 +2694,7 @@ qdetach(queue_t *q, int flags, cred_t *crp)
 
 	assert(q);
 
-	_ptrace(("detaching stream %p queue pair %p\n", qstream(q), q));
+	_ptrace(("detaching stream %p queue pair %p\n", rqstream(q), q));
 
 	err = _ctrace(qclose(q, flags, crp));
 	_ctrace(qprocsoff(q));	/* in case qclose forgot */
@@ -2741,8 +2740,8 @@ qinsert(struct stdata *sd, queue_t *irq)
 
 	prlock(sd);
 	srq = sd->sd_rq;
-	iwq = OTHERQ(irq);
-	swq = OTHERQ(srq);
+	iwq = _WR(irq);
+	swq = _WR(srq);
 	irq->q_next = srq;
 	iwq->q_next = (swq->q_next != srq) ? swq->q_next : irq;
 	prunlock(sd);
@@ -2773,6 +2772,21 @@ EXPORT_SYMBOL(qinsert);
  *  all queue synchronous procedures must exit before the lock is acquired.  The Stream head is
  *  holding the STRCLOSE bit, so no other close can occur, and all other operations on the Stream
  *  will fail.
+ *
+ *  Note that because Streams may be welded together (pipes, pseudo-terminals), it is necessary to
+ *  lock both Streams when the write queue of the one Stream points to another Stream.  But, only
+ *  when the address of the second Stream is higher.  This way one side needs two locks and the
+ *  other side only needs one lock and deadlock is avoided.
+ *
+ *  In this way, queue procedures on both sides of the weld or pipe-twist can be assured that the
+ *  q->q_next pointer will not change while they are running (pluming read lock is held).
+ *
+ *  Never half-delete a Stream head: the only time that a Stream head is attached to something when
+ *  it gets here is when it is attached to another Stream head in a pipe'ish arrangement -- STREAMS
+ *  pipe, pseudo-terminal, welded queues -- in which case we do not want to fully break the pipe
+ *  yet: qdelete() will break the near side, but the far side needs to remain untouched until it is
+ *  dismantled from the far side.  The last reference to the Stream head will break the far side and
+ *  clean up its q_next pointers.
  */
 streams_fastcall __unlikely void
 qprocsoff(queue_t *q)
@@ -2786,9 +2800,8 @@ qprocsoff(queue_t *q)
 #endif
 	/* only one qprocsoff() happens at a time */
 	if (!test_bit(QPROCS_BIT, &rq->q_flag)) {
-		struct queinfo *qu = ((typeof(qu)) rq);
-		struct stdata *sd = qu->qu_str;
-		unsigned long pl;
+		struct stdata *sd2, *sd = rqstream(rq);
+		unsigned long pl, pl2;
 
 		assert(sd);
 
@@ -2820,16 +2833,24 @@ qprocsoff(queue_t *q)
 
 		_ptrace(("initial half-delete of stream %p queue pair %p\n", sd, q));
 
+		if ((sd2 = wq->q_next ? qstream(wq->q_next) : NULL) && sd2 > sd)
+			pwlock(sd2, pl2);
+
 		/* bypass this module: works for pipe, FIFO and other Stream heads queues too */
-		if ((bq = backq(rq)))
-			bq->q_next = rq->q_next;
-		if ((bq = backq(wq)))
-			bq->q_next = wq->q_next;
+		if (wq != sd->sd_wq) {
+			if ((bq = backq(rq)))
+				bq->q_next = rq->q_next;
+			if ((bq = backq(wq)))
+				bq->q_next = wq->q_next;
+		}
 		/* cache new packet sizes (next module or stream head) */
 		if ((wq = sd->sd_wq->q_next) || (wq = sd->sd_wq)) {
 			sd->sd_minpsz = wq->q_minpsz;
 			sd->sd_maxpsz = wq->q_maxpsz;
 		}
+
+		if (sd2 && sd2 > sd)
+			pwunlock(sd2, pl2);
 
 		pwunlock(sd, pl);
 
@@ -2863,6 +2884,14 @@ EXPORT_SYMBOL(qprocsoff);
  *  all queue synchronous procedures must exit before the lock is acquired.  The Stream head is
  *  holding STWOPEN bit, so no other open can occur.  Because the Stream head has not yet been
  *  published to a file pointer or inode, no other operation can occur on the Stream.
+ *
+ *  Note that because Streams may be welded together (pipes, pseudo-terminals), it is necessary to
+ *  lock both Streams when the write queue of the one Stream points to another Stream.  But, only
+ *  when the address of the second Stream is higher.  This way one side needs two locks and the
+ *  other side only needs one lock and deadlock is avoided.
+ *
+ *  In this way, queue procedures on both sides of the weld or pipe-twist can be assured that the
+ *  q->q_next pointer will not change while they are running (pluming read lock is held).
  */
 streams_fastcall __unlikely void
 qprocson(queue_t *q)
@@ -2876,9 +2905,8 @@ qprocson(queue_t *q)
 #endif
 	/* only one qprocson() happens at a time */
 	if (test_bit(QPROCS_BIT, &rq->q_flag)) {
-		struct queinfo *qu = ((typeof(qu)) rq);
-		struct stdata *sd = qu->qu_str;
-		unsigned long pl;
+		struct stdata *sd2, *sd = rqstream(rq);
+		unsigned long pl, pl2;
 
 		/* spin here waiting for queue procedures to exit */
 		pwlock(sd, pl);
@@ -2892,6 +2920,9 @@ qprocson(queue_t *q)
 		set_bit(QWANTR_BIT, &rq->q_flag);
 		set_bit(QWANTR_BIT, &wq->q_flag);
 
+		if ((sd2 = wq->q_next ? qstream(wq->q_next) : NULL) && sd2 > sd)
+			pwlock(sd2, pl2);
+
 		/* join this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq)))
 			bq->q_next = rq;
@@ -2901,6 +2932,9 @@ qprocson(queue_t *q)
 		/* cache new packet sizes (this module) */
 		sd->sd_minpsz = wq->q_minpsz;
 		sd->sd_maxpsz = wq->q_maxpsz;
+
+		if (sd2 && sd2 > sd)
+			pwunlock(sd2, pl2);
 
 		pwunlock(sd, pl);
 	}
@@ -3604,7 +3638,7 @@ setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 	assert(q);
 	assert(not_frozen_by_caller(q));
 
-	sd = qstream(q);
+	sd = rqstream(q);
 
 	assert(sd);
 
@@ -3777,7 +3811,7 @@ setsq(queue_t *q, struct fmodsw *fmod)
 	assert(q);
 	assert(not_frozen_by_caller(q));
 
-	sd = qstream(q);
+	sd = rqstream(q);
 
 	assert(sd);
 

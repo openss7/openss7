@@ -3362,6 +3362,9 @@ do_timeout_synced(struct strevent *se)
  *  operations until the queue has been welded.  We only take write locks on unique stream heads and
  *  we figure out uniqueness before taking the lock.  No other locking is required.
  *
+ *  Note that because of the pipe'ish nature of the weld operation, stream head write locks must be
+ *  taken in the same order as for handling pipes (that is
+ *
  *  The weld callback function is executed outside the locks.
  *
  *  Note that a reference is held for all queues, including the protection queue, so that these
@@ -3371,68 +3374,90 @@ do_timeout_synced(struct strevent *se)
 STATIC void
 do_weldq_synced(struct strevent *se)
 {
-	unsigned long flags;
-	queue_t *q, *qn1 = NULL, *qn3 = NULL;
-	queue_t *q1, *q2, *q3, *q4;
-	struct stdata *sd1, *sd3;
+	{
+		unsigned long pl1, pl3;
+		queue_t *qn1 = NULL, *qn3 = NULL;
+		queue_t *q1, *q2, *q3, *q4;
+		struct stdata *sd1, *sd3;
 
-	/* get all the queues */
-	q1 = se->x.w.q1;
-	q2 = se->x.w.q2;
-	q3 = se->x.w.q3;
-	q4 = se->x.w.q4;
-	/* get all the stream heads */
-	sd1 = q1 ? qstream(q1) : NULL;
-	sd3 = q2 ? qstream(q2) : NULL;
-	/* find the unique stream heads */
-	if (sd3 == sd1)
-		sd3 = NULL;
-	q = se->x.w.queue;
-	streams_local_save(flags);
-	if (sd1)
-		write_lock(&sd1->sd_plumb);
-	if (sd3)
-		write_lock(&sd3->sd_plumb);
-	if (q1)
-		_ctrace(qn1 = xchg(&q1->q_next, qget(q2)));
-	if (q3)
-		_ctrace(qn3 = xchg(&q3->q_next, qget(q4)));
-	if (sd3)
-		write_unlock(&sd3->sd_plumb);
-	if (sd1)
-		write_unlock(&sd1->sd_plumb);
-	streams_local_restore(flags);
-	_ctrace(qput(&q1));
-	_ctrace(qput(&q2));
-	_ctrace(qput(&q3));
-	_ctrace(qput(&q4));
-	_ctrace(qput(&qn1));
-	_ctrace(qput(&qn3));
-	if (se->x.w.func) {
-		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
-
-		if (safe) {
-			struct stdata *sd;
-
-			dassert(q);
-			sd = qstream(q);
-			dassert(sd);
-			zwlock(sd, flags);
+		/* get all the queues */
+		q1 = se->x.w.q1;
+		q2 = se->x.w.q2;
+		q3 = se->x.w.q3;
+		q4 = se->x.w.q4;
+		/* get all the stream heads */
+		sd1 = q1 ? qstream(q1) : NULL;
+		sd3 = q2 ? qstream(q2) : NULL;
+		/* find the unique stream heads */
+		if (sd3 == sd1)
+			sd3 = NULL;
+		if (sd1 && sd3) {
+			if (sd1 < sd3) {
+				pwlock(sd1, pl1);
+				pwlock(sd3, pl3);
+			} else {
+				pwlock(sd3, pl3);
+				pwlock(sd1, pl1);
+			}
+		} else if (sd1) {
+			pwlock(sd1, pl1);
+		} else if (sd3) {
+			pwlock(sd3, pl3);
 		}
-
-		se->x.w.func(se->x.w.arg);
-
-		if (safe) {
-			struct stdata *sd;
-
-			dassert(q);
-			sd = qstream(q);
-			dassert(sd);
-			zwunlock(sd, flags);
+		if (q1)
+			_ctrace(qn1 = xchg(&q1->q_next, qget(q2)));
+		if (q3)
+			_ctrace(qn3 = xchg(&q3->q_next, qget(q4)));
+		if (sd1 && sd3) {
+			if (sd1 < sd3) {
+				pwunlock(sd3, pl3);
+				pwunlock(sd1, pl1);
+			} else {
+				pwunlock(sd1, pl1);
+				pwunlock(sd3, pl3);
+			}
+		} else if (sd1) {
+			pwunlock(sd1, pl1);
+		} else if (sd3) {
+			pwunlock(sd3, pl3);
 		}
+		_ctrace(qput(&q1));
+		_ctrace(qput(&q2));
+		_ctrace(qput(&q3));
+		_ctrace(qput(&q4));
+		_ctrace(qput(&qn1));
+		_ctrace(qput(&qn3));
 	}
-	if (q)
-		_ctrace(qput(&q));
+	{
+		queue_t *q = se->x.w.queue;
+
+		if (se->x.w.func) {
+			int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
+			unsigned long flags;
+
+			if (safe) {
+				struct stdata *sd;
+
+				dassert(q);
+				sd = qstream(q);
+				dassert(sd);
+				zwlock(sd, flags);
+			}
+
+			se->x.w.func(se->x.w.arg);
+
+			if (safe) {
+				struct stdata *sd;
+
+				dassert(q);
+				sd = qstream(q);
+				dassert(sd);
+				zwunlock(sd, flags);
+			}
+		}
+		if (q)
+			_ctrace(qput(&q));
+	}
 }
 
 STATIC void
@@ -4462,7 +4487,7 @@ sd_free(struct stdata *sd)
 	assert(sd->sd_cdevsw == NULL);
 	assert(sd->sd_rq);
 	/* zero stream reference on queue pair to avoid double put on sd */
-	qstream(sd->sd_rq) = NULL;
+	rqstream(sd->sd_rq) = NULL;
 	/* these are left valid until last reference released */
 	assure(atomic_read(&((struct queinfo *) sd->sd_rq)->qu_refs) == 2);
 	_ptrace(("queue references qu_refs = %d\n",
