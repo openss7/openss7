@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/09 04:12:36 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/09 04:29:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/09 04:12:36 $ by $Author: brian $
+ Last Modified $Date: 2007/03/09 04:29:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.10  2007/03/09 04:29:17  brian
+ - never use bottom half locking
+
  Revision 0.9.2.9  2007/03/09 04:12:36  brian
  - fixed initial timeout value bug
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/09 04:12:36 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/09 04:29:17 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/09 04:12:36 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/09 04:29:17 $";
 
 #define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
@@ -108,7 +111,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/09 04:12:36 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/09 04:29:17 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -136,16 +139,6 @@ MODULE_ALIAS("streams-m2pa_sl");
 #ifdef LFS
 #define M2PA_SL_MOD_ID		CONFIG_STREAMS_M2PA_SL_MODID
 #define M2PA_SL_MOD_NAME	CONFIG_STREAMS_M2PA_SL_NAME
-#endif
-
-/* Lock debugging. */
-
-#ifdef _DEBUG
-#define spin_lock_m2pa(sl) (void)sl
-#define spin_unlock_m2pa(sl) (void)sl
-#else
-#define spin_lock_m2pa(sl) spin_lock_bh(&sl->lock)
-#define spin_unlock_m2pa(sl) spin_unlock_bh(&sl->lock)
 #endif
 
 /*
@@ -6417,12 +6410,13 @@ sl_iocgoptions(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->option;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6434,12 +6428,13 @@ sl_iocsoptions(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->option = *arg;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6451,12 +6446,13 @@ sl_iocgconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.config;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6468,12 +6464,13 @@ sl_iocsconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.config = *arg;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6485,13 +6482,14 @@ sl_ioctconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6503,13 +6501,14 @@ sl_ioccconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6521,12 +6520,13 @@ sl_iocgstatem(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.statem;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6538,12 +6538,13 @@ sl_ioccmreset(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			bzero(&sl->sl.statem, sizeof(sl->sl.statem));
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6555,12 +6556,13 @@ sl_iocgstatsp(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.statsp;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6572,12 +6574,13 @@ sl_iocsstatsp(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.statsp = *arg;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6589,12 +6592,13 @@ sl_iocgstats(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.stats;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6606,12 +6610,13 @@ sl_ioccstats(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			bzero(&sl->sl.stats, sizeof(sl->sl.stats));
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6623,12 +6628,13 @@ sl_iocgnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.notify;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6640,12 +6646,13 @@ sl_iocsnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.notify.events |= arg->events;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6657,12 +6664,13 @@ sl_ioccnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.notify.events &= ~(arg->events);
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6680,8 +6688,9 @@ STATIC int
 sdt_test_config(struct sl *sl, sdt_config_t * arg)
 {
 	int ret = 0;
+	unsigned long flags;
 
-	spin_lock_m2pa(sl);
+	spin_lock_irqsave(&sl->lock, flags);
 	do {
 		if (!arg->t8)
 			arg->t8 = sl->sdt.config.t8;
@@ -6708,18 +6717,20 @@ sdt_test_config(struct sl *sl, sdt_config_t * arg)
 		if (!arg->f)
 			arg->f = sl->sdt.config.f;
 	} while (0);
-	spin_unlock_m2pa(sl);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (ret);
 }
 STATIC int
 sdt_commit_config(struct sl *sl, sdt_config_t * arg)
 {
-	spin_lock_m2pa(sl);
+	unsigned long flags;
+
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		sdt_test_config(sl, arg);
 		sl->sdt.config = *arg;
 	}
-	spin_unlock_m2pa(sl);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (0);
 }
 STATIC int
@@ -6728,12 +6739,13 @@ sdt_iocgoptions(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->option;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6745,12 +6757,13 @@ sdt_iocsoptions(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->option = *arg;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6762,12 +6775,13 @@ sdt_iocgconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdt.config;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6779,12 +6793,13 @@ sdt_iocsconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdt.config = *arg;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6818,13 +6833,14 @@ sdt_iocgstatem(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdt_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6836,13 +6852,14 @@ sdt_ioccmreset(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdt_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6854,13 +6871,14 @@ sdt_iocgstatsp(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6872,13 +6890,14 @@ sdt_iocsstatsp(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6890,13 +6909,14 @@ sdt_iocgstats(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6908,13 +6928,14 @@ sdt_ioccstats(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6926,13 +6947,14 @@ sdt_iocgnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6944,13 +6966,14 @@ sdt_iocsnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6962,13 +6985,14 @@ sdt_ioccnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -6980,13 +7004,14 @@ sdt_ioccabort(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		void *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7006,12 +7031,13 @@ sdl_iocgoptions(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->option;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7023,12 +7049,13 @@ sdl_iocsoptions(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->option = *arg;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7040,12 +7067,13 @@ sdl_iocgconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdl.config;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7057,12 +7085,13 @@ sdl_iocsconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdl.config = *arg;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7074,13 +7103,14 @@ sdl_ioctconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7092,13 +7122,14 @@ sdl_ioccconfig(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7110,13 +7141,14 @@ sdl_iocgstatem(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7128,13 +7160,14 @@ sdl_ioccmreset(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7146,13 +7179,14 @@ sdl_iocgstatsp(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7164,13 +7198,14 @@ sdl_iocsstatsp(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7182,13 +7217,14 @@ sdl_iocgstats(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7200,13 +7236,14 @@ sdl_ioccstats(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7218,13 +7255,14 @@ sdl_iocgnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7236,13 +7274,14 @@ sdl_iocsnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7254,13 +7293,14 @@ sdl_ioccnotify(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int ret = 0;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+		unsigned long flags;
 
-		spin_lock_m2pa(sl);
+		spin_lock_irqsave(&sl->lock, flags);
 		{
 			(void) arg;
 			ret = -EOPNOTSUPP;
 		}
-		spin_unlock_m2pa(sl);
+		spin_unlock_irqrestore(&sl->lock, flags);
 		return (ret);
 	}
 	rare();
@@ -7270,24 +7310,26 @@ STATIC int
 sdl_ioccdisctx(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int ret = 0;
+	unsigned long flags;
 
-	spin_lock_m2pa(sl);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		ret = -EOPNOTSUPP;
 	}
-	spin_unlock_m2pa(sl);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (ret);
 }
 STATIC int
 sdl_ioccconntx(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	int ret = 0;
+	unsigned long flags;
 
-	spin_lock_m2pa(sl);
+	spin_lock_irqsave(&sl->lock, flags);
 	{
 		ret = -EOPNOTSUPP;
 	}
-	spin_unlock_m2pa(sl);
+	spin_unlock_irqrestore(&sl->lock, flags);
 	return (ret);
 }
 
@@ -8130,7 +8172,6 @@ sl_free_priv(queue_t *q)
 	struct sl *sl = SL_PRIV(q);
 
 	ensure(sl, return);
-	spin_lock_m2pa(sl);
 	{
 		ss7_unbufcall((str_t *) sl);
 		sl_free_timers(sl);
@@ -8162,7 +8203,6 @@ sl_free_priv(queue_t *q)
 			atomic_set(&sl->refcnt, 1);
 		}
 	}
-	spin_unlock_m2pa(sl);
 	sl_put(sl);		/* final put */
 	return;
 }
@@ -8204,25 +8244,26 @@ sl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		minor_t cminor = getminor(*devp);
 		struct sl *sl;
 		mblk_t *mp;
+		unsigned long flags;
 
 		if ((mp = allocb(sizeof(N_info_req_t), BPRI_WAITOK)) == NULL)
 			return (ENOSR);
 
-		spin_lock_bh(&sl_lock);
+		spin_lock_irqsave(&sl_lock, flags);
 		/* test for multiple push */
 		for (sl = sl_list; sl; sl = sl->next)
 			if (sl->u.dev.cmajor == cmajor && sl->u.dev.cminor == cminor) {
-				spin_unlock_bh(&sl_lock);
+				spin_unlock_irqrestore(&sl_lock, flags);
 				freemsg(mp);
 				return (ENXIO);
 			}
 
 		if (!(sl_alloc_priv(q, &sl_list, devp, crp))) {
-			spin_unlock_bh(&sl_lock);
+			spin_unlock_irqrestore(&sl_lock, flags);
 			freemsg(mp);
 			return (ENOMEM);
 		}
-		spin_unlock_bh(&sl_lock);
+		spin_unlock_irqrestore(&sl_lock, flags);
 
 		mp->b_datap->db_type = M_PCPROTO;
 		((N_info_req_t *)mp->b_wptr)->PRIM_type = N_INFO_REQ;
@@ -8237,14 +8278,15 @@ sl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 STATIC streamscall int
 sl_close(queue_t *q, int flag, cred_t *crp)
 {
+	unsigned long flags;
 	(void) flag;
 	(void) crp;
 
 	qprocsoff(q);
 
-	spin_lock_bh(&sl_lock);
+	spin_lock_irqsave(&sl_lock, flags);
 	sl_free_priv(q);
-	spin_unlock_bh(&sl_lock);
+	spin_unlock_irqrestore(&sl_lock, flags);
 	return (0);
 }
 
