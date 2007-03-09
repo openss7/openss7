@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nosi nocin
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.12 2007/03/07 07:31:42 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.13 2007/03/09 05:59:42 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/07 07:31:42 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/09 05:59:42 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: news.texi,v $
+@c Revision 0.9.2.13  2007/03/09 05:59:42  brian
+@c - changes for release
+@c
 @c Revision 0.9.2.12  2007/03/07 07:31:42  brian
 @c - update news release dates
 @c
@@ -136,6 +139,16 @@ provides support for recent distributions and tool chains.
 Major features since the last public release are as follows:
 
 @itemize -
+@item
+A number of SIGTRAN AS drivers (M2UA, M3UA, SUA, TUA) are present in the
+release (that have not been fully tested and do not have testsuites just yet).
+Consider these as alpha until the next release.
+
+@item
+Corrections for several non-testsuite affecting bugs discovered in the M2PA
+module. (See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/BUGS}
+in the release for more information.)
+
 @item
 Improvements to the common build environment with better support for standalone
 package builds on 2.4 kernels.

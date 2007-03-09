@@ -1,5 +1,10 @@
 2007-03-09  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/news.texi: documented bug fixes
+	* src/test/test-m2pa.c: don't display primitives non-verbose
+	* tests/Makefile.am: strap out m2ua-as testsuite for release
+	* tests/testsuite.at: strap out m2ua-as testsuite for release
+
 	* doc/man/man4/sua-as.4.man: added for release checks
 	* doc/man/man4/tua-as.4.man: added for release checks
 
