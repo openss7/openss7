@@ -2794,16 +2794,21 @@ qprocsoff(queue_t *q)
 	queue_t *bq;
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
+	struct stdata *sd = rqstream(q);
 
 #if 0
 	assert(current_context() <= CTX_STREAMS);
 #endif
+	assert(sd);
+
+	if (wq == sd->sd_wq)
+		/* Never qprocsoff a Stream head. */
+		return;
+
 	/* only one qprocsoff() happens at a time */
 	if (!test_bit(QPROCS_BIT, &rq->q_flag)) {
-		struct stdata *sd2, *sd = rqstream(rq);
 		unsigned long pl, pl2 = 0;
-
-		assert(sd);
+		struct stdata *sd2;
 
 		/* spin here waiting for queue procedures to exit */
 		pwlock(sd, pl);
@@ -2837,12 +2842,10 @@ qprocsoff(queue_t *q)
 			pwlock(sd2, pl2);
 
 		/* bypass this module: works for pipe, FIFO and other Stream heads queues too */
-		if (wq != sd->sd_wq) {
-			if ((bq = backq(rq)))
-				bq->q_next = rq->q_next;
-			if ((bq = backq(wq)))
-				bq->q_next = wq->q_next;
-		}
+		if ((bq = backq(rq)))
+			bq->q_next = rq->q_next;
+		if ((bq = backq(wq)))
+			bq->q_next = wq->q_next;
 		/* cache new packet sizes (next module or stream head) */
 		if ((wq = sd->sd_wq->q_next) || (wq = sd->sd_wq)) {
 			sd->sd_minpsz = wq->q_minpsz;
