@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.1 2006/10/16 10:42:45 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.2 2007/03/09 04:12:32 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/16 10:42:45 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/09 04:12:32 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: bugs.texi,v $
+@c Revision 0.9.2.2  2007/03/09 04:12:32  brian
+@c - fixed initial timeout value bug
+@c
 @c Revision 0.9.2.1  2006/10/16 10:42:45  brian
 @c - added new package files
 @c
@@ -67,7 +70,15 @@ This package is not completely implemented yet, so the bugs are still being
 designed and will not be available until a later date.
 
 @table @code
-@item (no items)
+@item 001.  2007-03-08T21:09:59-0700
+
+The inital timeout values associated with a freshly pushed M2PA module were
+being set to HZ based values instead of milliseconds.  This did not affect the
+test program (which explicitly sets the values), but could have affected
+applications programs on systems where the tick clock is 100 Hz.
+
+@emph{*fixed*} in @command{sigtran-0.9.2.2}
+
 @end table
 
 

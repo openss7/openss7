@@ -1,3 +1,8 @@
+2007-03-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/bugs.texi: documented initial timeout bug
+	* src/modules/m2pa_sl.c: fixed initial timeout bug
+
 2007-03-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/util/init/sigtran.sh: ubuntu looks for lsb info in init scripts
