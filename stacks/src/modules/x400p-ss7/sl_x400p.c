@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/12/21 11:14:43 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/09 04:09:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/21 11:14:43 $ by $Author: brian $
+ Last Modified $Date: 2007/03/09 04:09:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.31  2007/03/09 04:09:33  brian
+ - fixed timer bug in x400p driver
+
  Revision 0.9.2.30  2006/12/21 11:14:43  brian
  - documentation updates for release, and moved tali
 
@@ -100,10 +103,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/12/21 11:14:43 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/09 04:09:33 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/12/21 11:14:43 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/09 04:09:33 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -156,7 +159,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/12/21 11:14:43 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/09 04:09:33 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1574,16 +1577,16 @@ STATIC lmi_option_t lmi_default_j1_span = {
 	.popt = SS7_POPT_MPLEV | SS7_POPT_HSL | SS7_POPT_XSN,
 };
 STATIC sl_config_t sl_default_e1_chan = {
-	.t1 = 45 * HZ,
-	.t2 = 5 * HZ,
-	.t2l = 20 * HZ,
-	.t2h = 100 * HZ,
-	.t3 = 1 * HZ,
-	.t4n = 8 * HZ,
-	.t4e = 500 * HZ / 1000,
-	.t5 = 100 * HZ / 1000,
-	.t6 = 4 * HZ,
-	.t7 = 1 * HZ,
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 100,
+	.t6 = 4 * 1000,
+	.t7 = 1 * 1000,
 	.rb_abate = 3,
 	.rb_accept = 6,
 	.rb_discard = 9,
@@ -1601,16 +1604,16 @@ STATIC sl_config_t sl_default_e1_chan = {
 	.M = 5,
 };
 STATIC sl_config_t sl_default_e1_span = {
-	.t1 = 45 * HZ,
-	.t2 = 5 * HZ,
-	.t2l = 20 * HZ,
-	.t2h = 100 * HZ,
-	.t3 = 1 * HZ,
-	.t4n = 8 * HZ,
-	.t4e = 500 * HZ / 1000,
-	.t5 = 100 * HZ / 1000,
-	.t6 = 4 * HZ,
-	.t7 = 1 * HZ,
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 100,
+	.t6 = 4 * 1000,
+	.t7 = 1 * 1000,
 	.rb_abate = 3,
 	.rb_accept = 6,
 	.rb_discard = 9,
@@ -1628,16 +1631,16 @@ STATIC sl_config_t sl_default_e1_span = {
 	.M = 5,
 };
 STATIC sl_config_t sl_default_t1_chan = {
-	.t1 = 45 * HZ,
-	.t2 = 5 * HZ,
-	.t2l = 20 * HZ,
-	.t2h = 100 * HZ,
-	.t3 = 1 * HZ,
-	.t4n = 8 * HZ,
-	.t4e = 500 * HZ / 1000,
-	.t5 = 100 * HZ / 1000,
-	.t6 = 4 * HZ,
-	.t7 = 1 * HZ,
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 100,
+	.t6 = 4 * 1000,
+	.t7 = 1 * 1000,
 	.rb_abate = 3,
 	.rb_accept = 6,
 	.rb_discard = 9,
@@ -1655,16 +1658,16 @@ STATIC sl_config_t sl_default_t1_chan = {
 	.M = 5,
 };
 STATIC sl_config_t sl_default_t1_span = {
-	.t1 = 45 * HZ,
-	.t2 = 5 * HZ,
-	.t2l = 20 * HZ,
-	.t2h = 100 * HZ,
-	.t3 = 1 * HZ,
-	.t4n = 8 * HZ,
-	.t4e = 500 * HZ / 1000,
-	.t5 = 100 * HZ / 1000,
-	.t6 = 4 * HZ,
-	.t7 = 1 * HZ,
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 100,
+	.t6 = 4 * 1000,
+	.t7 = 1 * 1000,
 	.rb_abate = 3,
 	.rb_accept = 6,
 	.rb_discard = 9,
@@ -1682,16 +1685,16 @@ STATIC sl_config_t sl_default_t1_span = {
 	.M = 5,
 };
 STATIC sl_config_t sl_default_j1_chan = {
-	.t1 = 45 * HZ,
-	.t2 = 5 * HZ,
-	.t2l = 20 * HZ,
-	.t2h = 100 * HZ,
-	.t3 = 1 * HZ,
-	.t4n = 8 * HZ,
-	.t4e = 500 * HZ / 1000,
-	.t5 = 100 * HZ / 1000,
-	.t6 = 4 * HZ,
-	.t7 = 1 * HZ,
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 100,
+	.t6 = 4 * 1000,
+	.t7 = 1 * 1000,
 	.rb_abate = 3,
 	.rb_accept = 6,
 	.rb_discard = 9,
@@ -1709,16 +1712,16 @@ STATIC sl_config_t sl_default_j1_chan = {
 	.M = 5,
 };
 STATIC sl_config_t sl_default_j1_span = {
-	.t1 = 45 * HZ,
-	.t2 = 5 * HZ,
-	.t2l = 20 * HZ,
-	.t2h = 100 * HZ,
-	.t3 = 1 * HZ,
-	.t4n = 8 * HZ,
-	.t4e = 500 * HZ / 1000,
-	.t5 = 100 * HZ / 1000,
-	.t6 = 4 * HZ,
-	.t7 = 1 * HZ,
+	.t1 = 45 * 1000,
+	.t2 = 5 * 1000,
+	.t2l = 20 * 1000,
+	.t2h = 100 * 1000,
+	.t3 = 1 * 1000,
+	.t4n = 8 * 1000,
+	.t4e = 500,
+	.t5 = 100,
+	.t6 = 4 * 1000,
+	.t7 = 1 * 1000,
 	.rb_abate = 3,
 	.rb_accept = 6,
 	.rb_discard = 9,
@@ -1740,7 +1743,7 @@ STATIC sdt_config_t sdt_default_e1_span = {
 	.Tie = 1,
 	.T = 64,
 	.D = 256,
-	.t8 = 100 * HZ / 1000,
+	.t8 = 100,
 	.Te = 793544,
 	.De = 11328000,
 	.Ue = 198384000,
@@ -1754,7 +1757,7 @@ STATIC sdt_config_t sdt_default_t1_span = {
 	.Tie = 1,
 	.T = 64,
 	.D = 256,
-	.t8 = 100 * HZ / 1000,
+	.t8 = 100,
 	.Te = 577169,
 	.De = 9308000,
 	.Ue = 144292000,
@@ -1768,7 +1771,7 @@ STATIC sdt_config_t sdt_default_j1_span = {
 	.Tie = 1,
 	.T = 64,
 	.D = 256,
-	.t8 = 100 * HZ / 1000,
+	.t8 = 100,
 	.Te = 577169,
 	.De = 9308000,
 	.Ue = 144292000,
@@ -1782,7 +1785,7 @@ STATIC sdt_config_t sdt_default_e1_chan = {
 	.Tie = 1,
 	.T = 64,
 	.D = 256,
-	.t8 = 100 * HZ / 1000,
+	.t8 = 100,
 	.Te = 793544,
 	.De = 11328000,
 	.Ue = 198384000,
@@ -1796,7 +1799,7 @@ STATIC sdt_config_t sdt_default_t1_chan = {
 	.Tie = 1,
 	.T = 64,
 	.D = 256,
-	.t8 = 100 * HZ / 1000,
+	.t8 = 100,
 	.Te = 577169,
 	.De = 9308000,
 	.Ue = 144292000,
@@ -1810,7 +1813,7 @@ STATIC sdt_config_t sdt_default_j1_chan = {
 	.Tie = 1,
 	.T = 64,
 	.D = 256,
-	.t8 = 100 * HZ / 1000,
+	.t8 = 100,
 	.Te = 577169,
 	.De = 9308000,
 	.Ue = 144292000,
@@ -2675,8 +2678,8 @@ xp_stop_timer_t1(struct xp *xp)
 static noinline fastcall void
 xp_start_timer_t1(struct xp *xp)
 {
-	printd(("%s: %p: -> T1 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
-		xp->sl.config.t1, drv_hztomsec(xp->sl.config.t1), (uint) HZ));
+	printd(("%s: %p: -> T1 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
+		drv_msectohz(xp->sl.config.t1), xp->sl.config.t1, (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t1, xp->sl.config.t1);
 }
 static noinline fastcall void
@@ -2688,8 +2691,8 @@ xp_stop_timer_t2(struct xp *xp)
 static noinline fastcall void
 xp_start_timer_t2(struct xp *xp)
 {
-	printd(("%s: %p: -> T2 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
-		xp->sl.config.t2, drv_hztomsec(xp->sl.config.t2), (uint) HZ));
+	printd(("%s: %p: -> T2 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
+		drv_msectohz(xp->sl.config.t2), xp->sl.config.t2, (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t2, xp->sl.config.t2);
 }
 static noinline fastcall void
@@ -2701,8 +2704,8 @@ xp_stop_timer_t3(struct xp *xp)
 static noinline fastcall void
 xp_start_timer_t3(struct xp *xp)
 {
-	printd(("%s: %p: -> T3 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
-		xp->sl.config.t3, drv_hztomsec(xp->sl.config.t3), (uint) HZ));
+	printd(("%s: %p: -> T3 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
+		drv_msectohz(xp->sl.config.t3), xp->sl.config.t3, (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t3, xp->sl.config.t3);
 }
 static noinline fastcall void
@@ -2714,8 +2717,8 @@ xp_stop_timer_t4(struct xp *xp)
 static noinline fastcall void
 xp_start_timer_t4(struct xp *xp)
 {
-	printd(("%s: %p: -> T4 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
-		xp->sl.statem.t4v, drv_hztomsec(xp->sl.statem.t4v), (uint) HZ));
+	printd(("%s: %p: -> T4 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
+		drv_msectohz(xp->sl.statem.t4v), xp->sl.statem.t4v, (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t4, xp->sl.statem.t4v);
 }
 static inline fastcall __hot_out void
@@ -2727,8 +2730,8 @@ xp_stop_timer_t5(struct xp *xp)
 static inline fastcall __hot_out void
 xp_start_timer_t5(struct xp *xp)
 {
-	printd(("%s: %p: -> T5 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
-		xp->sl.config.t5, drv_hztomsec(xp->sl.config.t5), (uint) HZ));
+	printd(("%s: %p: -> T5 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
+		drv_msectohz(xp->sl.config.t5), xp->sl.config.t5, (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t5, xp->sl.config.t5);
 }
 static inline fastcall __hot_in void
@@ -2740,8 +2743,8 @@ xp_stop_timer_t6(struct xp *xp)
 static inline fastcall __hot_in void
 xp_start_timer_t6(struct xp *xp)
 {
-	printd(("%s: %p: -> T6 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
-		xp->sl.config.t6, drv_hztomsec(xp->sl.config.t6), (uint) HZ));
+	printd(("%s: %p: -> T6 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
+		drv_msectohz(xp->sl.config.t6), xp->sl.config.t6, (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t6, xp->sl.config.t6);
 }
 static inline fastcall __hot_in void
@@ -2753,8 +2756,8 @@ xp_stop_timer_t7(struct xp *xp)
 static inline fastcall __hot_in void
 xp_start_timer_t7(struct xp *xp)
 {
-	printd(("%s: %p: -> T7 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
-		xp->sl.config.t7, drv_hztomsec(xp->sl.config.t7), (uint) HZ));
+	printd(("%s: %p: -> T7 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
+		drv_msectohz(xp->sl.config.t7), xp->sl.config.t7, (uint) HZ));
 	mi_timer_MAC(xp->sl.timers.t7, xp->sl.config.t7);
 }
 static inline fastcall __hot_in void
@@ -2766,8 +2769,8 @@ xp_stop_timer_t8(struct xp *xp)
 static inline fastcall __hot_in void
 xp_start_timer_t8(struct xp *xp)
 {
-	printd(("%s: %p: -> T8 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
-		xp->sdt.config.t8, drv_hztomsec(xp->sdt.config.t8), (uint) HZ));
+	printd(("%s: %p: -> T8 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
+		drv_msectohz(xp->sdt.config.t8), xp->sdt.config.t8, (uint) HZ));
 	mi_timer_MAC(xp->sdt.timers.t8, xp->sdt.config.t8);
 }
 
@@ -2781,8 +2784,8 @@ xp_stop_timer_t9(struct xp *xp)
 static void
 xp_start_timer_t9(struct xp *xp)
 {
-	printd(("%s: %p: -> T9 START <- (%u hz, %lu msec, HZ is %u)\n", DRV_NAME, xp,
-		xp->sdl.config.t9, drv_hztomsec(xp->sdl.config.t9), (uint) HZ));
+	printd(("%s: %p: -> T9 START <- (%lu hz, %u msec, HZ is %u)\n", DRV_NAME, xp,
+		drv_msectohz(xp->sdl.config.t9), xp->sdl.config.t9, (uint) HZ));
 	mi_timer_MAC(xp->sdl.timers.t9, xp->sdl.config.t9);
 }
 #endif
@@ -7997,18 +8000,6 @@ sl_iocgconfig(queue_t *q, mblk_t *mp)
 		}
 		spin_unlock_irqrestore(&xp->lock, flags);
 
-		/* convert HZ to milliseconds for output */
-		arg->t1 = drv_hztomsec(arg->t1);
-		arg->t2 = drv_hztomsec(arg->t2);
-		arg->t2l = drv_hztomsec(arg->t2l);
-		arg->t2h = drv_hztomsec(arg->t2h);
-		arg->t3 = drv_hztomsec(arg->t3);
-		arg->t4n = drv_hztomsec(arg->t4n);
-		arg->t4e = drv_hztomsec(arg->t4e);
-		arg->t5 = drv_hztomsec(arg->t5);
-		arg->t6 = drv_hztomsec(arg->t6);
-		arg->t7 = drv_hztomsec(arg->t7);
-
 		return (ret);
 	}
 	rare();
@@ -8022,18 +8013,6 @@ sl_iocsconfig(queue_t *q, mblk_t *mp)
 		struct xp *xp = XP_PRIV(q);
 		int ret = 0;
 		psw_t flags = 0;
-
-		/* convert milliseconds to HZ for input */
-		arg->t1 = drv_msectohz(arg->t1);
-		arg->t2 = drv_msectohz(arg->t2);
-		arg->t2l = drv_msectohz(arg->t2l);
-		arg->t2h = drv_msectohz(arg->t2h);
-		arg->t3 = drv_msectohz(arg->t3);
-		arg->t4n = drv_msectohz(arg->t4n);
-		arg->t4e = drv_msectohz(arg->t4e);
-		arg->t5 = drv_msectohz(arg->t5);
-		arg->t6 = drv_msectohz(arg->t6);
-		arg->t7 = drv_msectohz(arg->t7);
 
 		spin_lock_irqsave(&xp->lock, flags);
 		{
@@ -8305,8 +8284,6 @@ sdt_commit_config(struct xp *xp, sdt_config_t * arg)
 {
 	psw_t flags = 0;
 
-	arg->t8 = drv_msectohz(arg->t8);
-
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		sdt_test_config(xp, arg);
@@ -8366,8 +8343,6 @@ sdt_iocgconfig(queue_t *q, mblk_t *mp)
 		}
 		spin_unlock_irqrestore(&xp->lock, flags);
 
-		arg->t8 = drv_hztomsec(arg->t8);
-
 		return (0);
 	}
 	rare();
@@ -8380,8 +8355,6 @@ sdt_iocsconfig(queue_t *q, mblk_t *mp)
 		struct xp *xp = XP_PRIV(q);
 		psw_t flags = 0;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
-
-		arg->t8 = drv_msectohz(arg->t8);
 
 		spin_lock_irqsave(&xp->lock, flags);
 		{
