@@ -3318,7 +3318,7 @@ strirput(queue_t *q, mblk_t *mp)
 	assert(q);
 	assert(mp);
 
-	sd = _qstream(q);
+	sd = rqstream(q);
 
 	assert(sd);
 
@@ -11080,7 +11080,7 @@ str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	struct stdata *sd;
 	int err = 0;
 
-	if (!(sd = _qstream(q)))
+	if (!(sd = rqstream(q)))
 		return (-EIO);
 
 	/* Linux cannot currently specify no read-write open flags.  O_RDONLY is defined as zero
