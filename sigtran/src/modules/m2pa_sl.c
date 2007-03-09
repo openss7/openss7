@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/01/26 21:54:36 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/09 04:12:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/26 21:54:36 $ by $Author: brian $
+ Last Modified $Date: 2007/03/09 04:12:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.9  2007/03/09 04:12:36  brian
+ - fixed initial timeout value bug
+
  Revision 0.9.2.8  2007/01/26 21:54:36  brian
  - working up AS drivers and docs
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/01/26 21:54:36 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/09 04:12:36 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/01/26 21:54:36 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/09 04:12:36 $";
 
 #define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
@@ -105,7 +108,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/01/26 21:54:36 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/09 04:12:36 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -8070,7 +8073,7 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 		sl->sdt.config.Tie = 1;
 		sl->sdt.config.T = 64;
 		sl->sdt.config.D = 256;
-		sl->sdt.config.t8 = 100 * HZ / 1000;
+		sl->sdt.config.t8 = 100;
 		sl->sdt.config.Te = 577169;
 		sl->sdt.config.De = 9308000;
 		sl->sdt.config.Ue = 144292000;
@@ -8080,16 +8083,16 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 		sl->sdt.config.f = SDT_FLAGS_ONE;
 
 		/* SL configuration defaults */
-		sl->sl.config.t1 = 45 * HZ;
-		sl->sl.config.t2 = 5 * HZ;
-		sl->sl.config.t2l = 20 * HZ;
-		sl->sl.config.t2h = 100 & HZ;
-		sl->sl.config.t3 = 1 * HZ;
-		sl->sl.config.t4n = 8 * HZ;
-		sl->sl.config.t4e = 500 * HZ / 1000;
-		sl->sl.config.t5 = 100 * HZ / 1000;
-		sl->sl.config.t6 = 4 * HZ;
-		sl->sl.config.t7 = 1 * HZ;
+		sl->sl.config.t1 = 45 * 1000;
+		sl->sl.config.t2 = 5 * 1000;
+		sl->sl.config.t2l = 20 * 1000;
+		sl->sl.config.t2h = 100 & 1000;
+		sl->sl.config.t3 = 1 * 1000;
+		sl->sl.config.t4n = 8 * 1000;
+		sl->sl.config.t4e = 500;
+		sl->sl.config.t5 = 100;
+		sl->sl.config.t6 = 4 * 1000;
+		sl->sl.config.t7 = 1 * 1000;
 		sl->sl.config.rb_abate = 3;
 		sl->sl.config.rb_accept = 6;
 		sl->sl.config.rb_discard = 9;
