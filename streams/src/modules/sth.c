@@ -3963,6 +3963,9 @@ strlastclose(struct stdata *sd, int oflag)
 		   rather than generating the message we perform the actions on the other stream
 		   head directly. */
 		strhangup(sd->sd_other);
+		/* we do not free the stream head (or stream head queue pair) until the other
+		   stream head does this too */
+		_ctrace(sd_put(&sd->sd_other));
 	}
 
 	/* 1st step: unlink any (temporary) linked streams */
@@ -3971,10 +3974,6 @@ strlastclose(struct stdata *sd, int oflag)
 	/* 2nd step: call the close routine of each module and pop the module. */
 	/* 3rd step: call the close routine of the driver and qdetach the driver */
 	_ctrace(strwaitclose(sd, oflag));
-
-	/* we do not free the stream head (or stream head queue pair) until the other stream head
-	   does this too */
-	_ctrace(sd_put(&sd->sd_other));
 
 	/* this balances holding the module in stralloc() and stropen() */
 	_ctrace(cdrv_put(sd->sd_cdevsw));
