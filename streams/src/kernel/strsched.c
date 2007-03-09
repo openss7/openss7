@@ -3433,7 +3433,7 @@ do_weldq_synced(struct strevent *se)
 
 		if (se->x.w.func) {
 			int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
-			unsigned long flags;
+			unsigned long flags = 0;
 
 			if (safe) {
 				struct stdata *sd;
