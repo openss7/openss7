@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: sigtran.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/08 22:42:54 $
+# @(#) $RCSfile: sigtran.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/09 04:39:14 $
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -61,8 +61,8 @@ fi
 # Specify defaults
 
 [ -n "$SIGTRAN_PRELOAD"       ] || SIGTRAN_PRELOAD=""
-[ -n "$SIGTRAN_DRIVERS"       ] || SIGTRAN_DRIVERS=""
-[ -n "$SIGTRAN_MODULES"       ] || SIGTRAN_MODULES=""
+[ -n "$SIGTRAN_DRIVERS"       ] || SIGTRAN_DRIVERS="streams-ua_as streams-m2ua_as streams-m3ua_as streams-sua_as streams-tua_as streams-isua_as"
+[ -n "$SIGTRAN_MODULES"       ] || SIGTRAN_MODULES="streams-m2pa_sl streams-sdl_sctp streams-sdt_sctp streams-sdt_tpi streams-sl_tpi streams-sl_sctp streams-m2tp"
 [ -n "$SIGTRAN_MAKEDEVICES"   ] || SIGTRAN_MAKEDEVICES="yes"
 [ -n "$SIGTRAN_REMOVEDEVICES" ] || SIGTRAN_REMOVEDEVICES="yes"
 
@@ -218,7 +218,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/08 22:42:54 $
+# @(#) $RCSfile: sigtran.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/09 04:39:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -263,11 +263,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 22:42:54 $ by $Author: brian $
+# Last Modified $Date: 2007/03/09 04:39:14 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sigtran.sh,v $
+# Revision 0.9.2.6  2007/03/09 04:39:14  brian
+# - update module list
+#
 # Revision 0.9.2.5  2007/03/08 22:42:54  brian
 # - correct redirect
 #

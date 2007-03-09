@@ -1,5 +1,9 @@
 2007-03-09  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/util/init/sigtran: update module list
+	* src/util/init/sigtran.sh: update module list
+	* src/util/sysconfig/sigtran.in: update module list
+
 	* doc/manual/bugs.texi: documented initial timeout bug
 	* src/modules/m2pa_sl.c: fixed initial timeout bug
 
