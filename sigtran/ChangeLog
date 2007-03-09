@@ -1,5 +1,8 @@
 2007-03-09  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man4/sua-as.4.man: added for release checks
+	* doc/man/man4/tua-as.4.man: added for release checks
+
 	* src/util/init/sigtran: update module list
 	* src/util/init/sigtran.sh: update module list
 	* src/util/sysconfig/sigtran.in: update module list
