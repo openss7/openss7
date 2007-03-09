@@ -3318,7 +3318,7 @@ strirput(queue_t *q, mblk_t *mp)
 	assert(q);
 	assert(mp);
 
-	sd = qstream(q);
+	sd = _qstream(q);
 
 	assert(sd);
 
@@ -3963,9 +3963,6 @@ strlastclose(struct stdata *sd, int oflag)
 		   rather than generating the message we perform the actions on the other stream
 		   head directly. */
 		strhangup(sd->sd_other);
-		_ctrace(sd_put(&sd->sd_other));
-		/* we do not free the stream head (or stream head queue pair) until the other
-		   stream head does this too */
 	}
 
 	/* 1st step: unlink any (temporary) linked streams */
@@ -3974,6 +3971,10 @@ strlastclose(struct stdata *sd, int oflag)
 	/* 2nd step: call the close routine of each module and pop the module. */
 	/* 3rd step: call the close routine of the driver and qdetach the driver */
 	_ctrace(strwaitclose(sd, oflag));
+
+	/* we do not free the stream head (or stream head queue pair) until the other stream head
+	   does this too */
+	_ctrace(sd_put(&sd->sd_other));
 
 	/* this balances holding the module in stralloc() and stropen() */
 	_ctrace(cdrv_put(sd->sd_cdevsw));
@@ -10386,7 +10387,7 @@ strwput(queue_t *q, mblk_t *mp)
 	assert(q);
 	assert(mp);
 
-	sd = qstream(q);
+	sd = wqstream(q);
 
 	assert(sd);
 
@@ -10455,7 +10456,7 @@ strwsrv(queue_t *q)
 
 	assert(q);
 
-	sd = qstream(q);
+	sd = wqstream(q);
 
 	assert(sd);
 
@@ -10949,7 +10950,7 @@ str_m_other(struct stdata *sd, queue_t *q, mblk_t *mp)
 streams_noinline streams_fastcall __unlikely int
 strrput_slow(queue_t *q, mblk_t *mp)
 {
-	struct stdata *sd = qstream(q);
+	struct stdata *sd = rqstream(q);
 	int err;
 
 	switch (mp->b_datap->db_type) {
@@ -11040,7 +11041,7 @@ strrput_slow(queue_t *q, mblk_t *mp)
 streamscall __hot_in int
 strrput(queue_t *q, mblk_t *mp)
 {
-	struct stdata *sd = qstream(q);
+	struct stdata *sd = rqstream(q);
 
 	/* data fast path */
 	if (likely((mp->b_datap->db_type & ~1) == 0))	/* PROFILED */
@@ -11079,7 +11080,7 @@ str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	struct stdata *sd;
 	int err = 0;
 
-	if (!(sd = qstream(q)))
+	if (!(sd = _qstream(q)))
 		return (-EIO);
 
 	/* Linux cannot currently specify no read-write open flags.  O_RDONLY is defined as zero
