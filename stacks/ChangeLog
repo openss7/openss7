@@ -1,5 +1,6 @@
 2007-03-09  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/news.texi: documented bug fix in release notes
 	* doc/manual/bugs.texi: documented timer bug
 	* src/modules/x400p-ss7/sl_x400p.c: fixed timer bug
 
