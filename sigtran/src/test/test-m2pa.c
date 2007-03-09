@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/08 08:26:22 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/09 05:59:45 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/08 08:26:22 $ by $Author: brian $
+ Last Modified $Date: 2007/03/09 05:59:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.11  2007/03/09 05:59:45  brian
+ - changes for release
+
  Revision 0.9.2.10  2007/03/08 08:26:22  brian
  - print primitives at default verbosity
 
@@ -114,9 +117,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/08 08:26:22 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/09 05:59:45 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/08 08:26:22 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/09 05:59:45 $";
 
 #define TEST_M2PA   1
 #define TEST_X400   0
@@ -4228,7 +4231,7 @@ print_tx_prim(int child, const char *command)
 		"                    |         %-16s          |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, command);
 }
 
@@ -4242,7 +4245,7 @@ print_rx_prim(int child, const char *command)
 		"                    |         <%16s>        |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, command);
 }
 
@@ -4371,7 +4374,7 @@ print_ack_prim(int child, const char *command)
 		"                    |         <%16s>        |                    [%d:%03d]\n",
 	};
 
-	if (show && verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, command);
 }
 

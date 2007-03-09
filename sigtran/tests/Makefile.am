@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/01/23 10:00:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/09 05:59:55 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/01/23 10:00:53 $ by $Author: brian $
+## Last Modified $Date: 2007/03/09 05:59:55 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.4  2007/03/09 05:59:55  brian
+## - changes for release
+##
 ## Revision 0.9.2.3  2007/01/23 10:00:53  brian
 ## - added test program and m2ua-as updates
 ##
@@ -70,7 +73,8 @@ TESTSUITE_DEPS		+= \
 			local.at \
 			kernel.at \
 			$(TESTSUITE)-m2pa.at \
-			$(TESTSUITE)-m2ua_as.at \
 			$(TESTSUITE).at
+
+#			$(TESTSUITE)-m2ua_as.at
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
