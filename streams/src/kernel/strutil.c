@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2007/03/02 09:23:29 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.139 $) $Date: 2007/03/10 13:52:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/02 09:23:29 $ by $Author: brian $
+ Last Modified $Date: 2007/03/10 13:52:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.139  2007/03/10 13:52:51  brian
+ - checking in latest corrections for release
+
  Revision 0.9.2.138  2007/03/02 09:23:29  brian
  - build updates and esballoc() feature
 
@@ -101,10 +104,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2007/03/02 09:23:29 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.139 $) $Date: 2007/03/10 13:52:51 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.138 $) $Date: 2007/03/02 09:23:29 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.139 $) $Date: 2007/03/10 13:52:51 $";
 
 #include <linux/autoconf.h>
 #ifdef HAVE_KINC_LINUX_COMPILE_H
