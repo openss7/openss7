@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/12/15 00:22:00 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/03/10 13:53:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/15 00:22:00 $ by $Author: brian $
+ Last Modified $Date: 2007/03/10 13:53:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.59  2007/03/10 13:53:04  brian
+ - checking in latest corrections for release
+
  Revision 0.9.2.58  2006/12/15 00:22:00  brian
  - bufq locking changes and test suite upgrade
 
@@ -109,10 +112,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/12/15 00:22:00 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/03/10 13:53:04 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/12/15 00:22:00 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/03/10 13:53:04 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -134,7 +137,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2006/12/15 00:22:00 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/03/10 13:53:04 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
