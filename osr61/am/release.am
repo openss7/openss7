@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: release.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.13 $) $Date: 2007-02-13 14:40:31 $
+# @(#) $RCSfile: release.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/02/13 14:40:31 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,12 +46,12 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007-02-13 14:40:31 $ by $Author: brian $
+## Last Modified $Date: 2007/02/13 14:40:31 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: release.am,v $
-## Revision 0.9.2.13  2007-02-13 14:40:31  brian
+## Revision 0.9.2.13  2007/02/13 14:40:31  brian
 ## - do not touch source directory when not in maintainer mode
 ##
 ## Revision 0.9.2.12  2006/12/28 09:22:18  brian

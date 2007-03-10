@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modsyms.sh,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.5 $) $Date: 2006-11-03 10:39:13 $
+# @(#) $RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 10:39:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006-11-03 10:39:13 $ by $Author: brian $
+# Last Modified $Date: 2006/11/03 10:39:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,7 +77,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modsyms.sh,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.5 $) $Date: 2006-11-03 10:39:13 $'
+ident='$RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 10:39:13 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
