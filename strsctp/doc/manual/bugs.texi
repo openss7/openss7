@@ -58,6 +58,15 @@
 @c =========================================================================
 
 @table @code
+@item 003.  2007-03-10T05:59:10-0700
+
+One serious locking problem discovered.  sctp_cleanup_read() was suppressing IRQs across calls to
+putnext() when delivering data and acknowledgements.  Recent kernels on Fedora and Ubuntu were
+complaining about IRQs suppressed across calls to local_bh_enable() in M2PA and that is what lead to
+the discovery.
+
+@emph{*fixed*} in @command{strsctp-0.9.2.7}
+
 @item test-sctp_n -o 9.1 Sun, 29 Oct 2006 16:27:35 -0700
 @itemx test-sctp_n -o 9.2 Sun, 29 Oct 2006 16:27:35 -0700
 When the number of test packets is set to 300, we are crashing on high speed SMP HT box.  This seems
