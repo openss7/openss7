@@ -1,3 +1,7 @@
+2007-03-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/test-m2pa_sl.c: fixed delicate timing on test case 8.14
+
 2007-03-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: documented bug fixes
