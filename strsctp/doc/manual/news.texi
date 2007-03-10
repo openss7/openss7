@@ -88,6 +88,12 @@ Major features since the last public release are as follows:
 
 @itemize -
 @item
+Fixed a rather noxious locking bug in sctp_cleanup_read() that was suppressing
+interrupts across a putnext() call.  See
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/BUGS} in
+the release for more information.
+
+@item
 Improvements to the common build environment with better support for standalone
 package builds on 2.4 kernels.
 

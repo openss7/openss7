@@ -13498,60 +13498,50 @@ STATIC streamscall void
 sctp_cleanup_read(struct sctp *sp)
 {
 	mblk_t *mp;
-	unsigned long flags;
 
 	assert(sp);
-#if 1
-	flags = bufq_lock(&sp->ackq);
-	while ((mp = bufq_head(&sp->ackq))) {
+
+	/* converted to work without locks head across putnext */
+	while ((mp = bufq_dequeue(&sp->ackq))) {
 		sctp_tcb_t *cb = SCTP_TCB(mp);
 
 		if (!sctp_datack_ind(sp, cb->ppi, cb->sid, cb->ssn, cb->tsn)) {
-			freemsg(__bufq_unlink(&sp->ackq, mp));
+			freemsg(mp);
 			continue;
 		}
+		bufq_queue_head(&sp->ackq, mp);
 		break;		/* error on delivery (ENOBUFS, EBUSY) */
 	}
-	bufq_unlock(&sp->ackq, flags);
-#endif
 	if (bufq_head(&sp->rcvq) || bufq_head(&sp->expq)) {
 		int need_sack = (sp->a_rwnd <= bufq_size(&sp->oooq)
 				 + bufq_size(&sp->dupq)
 				 + bufq_size(&sp->rcvq)
 				 + bufq_size(&sp->expq));
 
-		local_irq_save(flags);
-		spin_lock(&sp->expq.q_lock);
-		spin_lock(&sp->rcvq.q_lock);
-		while ((mp = bufq_head(&sp->expq)) || (mp = bufq_head(&sp->rcvq))) {
+		/* converted to work without locks head across putnext */
+		while ((mp = bufq_dequeue(&sp->expq)) || (mp = bufq_dequeue(&sp->rcvq))) {
 			sctp_tcb_t *cb = SCTP_TCB(mp);
 			struct sctp_strm *st = cb->st;
 			int ord = !(cb->flags & SCTPCB_FLAG_URG);
 			int more = (!(cb->flags & SCTPCB_FLAG_LAST_FRAG)) ? SCTP_STRMF_MORE : 0;
 
-			ensure(st, return);
-			if (!sctp_data_ind
-			    (sp, cb->ppi, cb->sid, cb->ssn, cb->tsn, ord, more, mp->b_cont)) {
+			assert(st != NULL);
+			if (!sctp_data_ind(sp, cb->ppi, cb->sid, cb->ssn, cb->tsn, ord, more, mp->b_cont)) {
 				if (ord) {
 					if (!more)
 						st->n.more &= ~SCTP_STRMF_MORE;
 					else
 						st->n.more |= SCTP_STRMF_MORE;
 					st->ssn = cb->ssn;
-					mp->b_cont = NULL;
-					sp->rcvq.q_count -= cb->dlen;
-					freeb(__bufq_unlink(&sp->rcvq, mp));
 					SCTP_INC_STATS(SctpInOrderChunks);
 				} else {
 					if (!more)
 						st->x.more &= ~SCTP_STRMF_MORE;
 					else
 						st->x.more |= SCTP_STRMF_MORE;
-					mp->b_cont = NULL;
-					sp->expq.q_count -= cb->dlen;
-					freeb(__bufq_unlink(&sp->expq, mp));
 					SCTP_INC_STATS(SctpInUnorderChunks);
 				}
+				freeb(mp);
 				if (!need_sack)
 					continue;
 				/* Should really do SWS here.  */
@@ -13559,11 +13549,9 @@ sctp_cleanup_read(struct sctp *sp)
 				need_sack = 0;
 				continue;
 			}
+			bufq_queue_head(ord ? &sp->rcvq : &sp->expq , mp);
 			break;	/* error on delivery (ENOBUFS, EBUSY, EPROTO) */
 		}
-		spin_unlock(&sp->rcvq.q_lock);
-		spin_unlock(&sp->expq.q_lock);
-		local_irq_restore(flags);
 	}
 	if (sp->origin && sp->reason) {
 		/* This is, I believe, the source of a lot of out of state disconnect indication
