@@ -18736,6 +18736,8 @@ test_8_14_ptu(int child)
 		if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 			goto failure;
 		state++;
+		test_msleep(child, NORMAL_WAIT); /* let iut timeout */
+		state++;
 		break;
 	default:
 		if (expect(child, INFINITE_WAIT, __STATUS_OUT_OF_SERVICE))
