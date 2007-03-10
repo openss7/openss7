@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: rmux.h,v 1.1.2.1 2007/02/03 03:05:22 brian Exp $
+ @(#) $Id: rmux.h,v 0.9.2.1 2007/02/03 03:05:22 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@
  -----------------------------------------------------------------------------
 
  $Log: rmux.h,v $
- Revision 1.1.2.1  2007/02/03 03:05:22  brian
+ Revision 0.9.2.1  2007/02/03 03:05:22  brian
  - added new files
 
  *****************************************************************************/
@@ -58,7 +58,7 @@
 #ifndef __SYS_RMUX_H__
 #define __SYS_RMUX_H__
 
-#ident "@(#) $RCSfile: rmux.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: rmux.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  *  R_OPEN_IND	- indicate a remote open request
