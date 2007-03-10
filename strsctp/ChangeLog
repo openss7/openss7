@@ -1,3 +1,9 @@
+2007-03-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/bugs.texi: noted locking bugfix
+	* doc/manual/news.texi: noted locking bugfix
+	* src/drivers/sctp2.c: fixed sctp_cleanup_read() lock bug (see BUGS)
+
 2007-03-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/util/init/strsctp.sh: ubuntu looks for lsb info in init scripts
