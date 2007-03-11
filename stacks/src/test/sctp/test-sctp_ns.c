@@ -145,10 +145,10 @@ N_qos_sel_info_sctp_t qos_info = {
 	0,				/* sid */
 	12,				/* max_inits */
 	12,				/* max_retrans */
-	-1UL,				/* ck_life */
-	-1UL,				/* ck_inc */
-	-1UL,				/* hmac */
-	-1UL,				/* throttle */
+	-1,				/* ck_life */
+	-1,				/* ck_inc */
+	-1,				/* hmac */
+	-1,				/* throttle */
 	20,				/* max_sack */
 	100,				/* rto_ini */
 	20,				/* rto_min */
@@ -423,6 +423,12 @@ static addr_t rem_addr = { 0, {{INADDR_ANY}} };
 
 int len = 32;
 
+#ifdef LFS
+static const char sctpname[] = "/dev/streams/clone/sctp_n";
+#else
+static const char sctpname[] = "/dev/sctp_n";
+#endif
+
 int
 test_sctps(void)
 {
@@ -434,7 +440,7 @@ test_sctps(void)
 
 	fprintf(stderr, "Opening stream\n");
 
-	if ((lfd = open("/dev/sctp_n", O_NONBLOCK | O_RDWR)) < 0) {
+	if ((lfd = open(sctpname, O_NONBLOCK | O_RDWR)) < 0) {
 		perror("open");
 		close(lfd);
 		exit(2);
@@ -445,7 +451,7 @@ test_sctps(void)
 		exit(2);
 	}
 	fprintf(stderr, "--> STREAM listener opened\n");
-	if ((fd = open("/dev/sctp_n", O_NONBLOCK | O_RDWR)) < 0) {
+	if ((fd = open(sctpname, O_NONBLOCK | O_RDWR)) < 0) {
 		perror("open");
 		goto dead;
 	}
@@ -539,7 +545,7 @@ splash(int argc, char *argv[])
 	fprintf(stdout, "\
 RFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Suite\n\
 \n\
-Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -593,7 +599,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2003-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -629,28 +635,28 @@ Arguments:\n\
     (none)\n\
 Options:\n\
     -p, --port=PORT\n\
-        Specifies both the local and remote PORT number\n\
+        specifies both the local and remote PORT number\n\
     -l, --loc_host=LOCAL-HOST\n\
-        Specifies the  LOCAL-HOST (bind) for the SCTP socket with optional\n\
+        specifies the  LOCAL-HOST (bind) for the SCTP socket with optional\n\
         local port number\n\
     -r, --rem_host=REMOTE-HOST\n\
-        Specifies the REMOTE-HOST (connect) address for the SCTP socket\n\
+        specifies the REMOTE-HOST (connect) address for the SCTP socket\n\
         with optional remote port number\n\
     -t, --rep_time=REPORT-TIME\n\
-        Specifies the REPORT-TIME in seconds between reports\n\
+        specifies the REPORT-TIME in seconds between reports\n\
     -w, --length=LENGTH\n\
-        Specifies the message LENGTH\n\
+        specifies the message LENGTH\n\
     -q, --quiet\n\
-        Suppress normal output (equivalent to --verbose=0)\n\
+        suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
-        Increase verbosity or set to LEVEL [default: 1]\n\
-        This option may be repeated.\n\
+        increase verbosity or set to LEVEL [default: 1]\n\
+        this option may be repeated.\n\
     -h, --help, -?, --?\n\
-        Prints this usage message and exits\n\
+        print this usage message and exit\n\
     -V, --version\n\
-        Prints the version and exits\n\
+        print the version and exit\n\
     -C, --copying\n\
-        Prints copyright and permission and exits\n\
+        print copying permissions and exit\n\
 ", argv[0]);
 }
 

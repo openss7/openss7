@@ -97,7 +97,9 @@ static char const ident[] =
 #include <stdlib.h>
 #include <string.h>
 
-#define MSG_LEN 64
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif
 
 #define HOST_BUF_LEN 256
 
@@ -341,7 +343,7 @@ splash(int argc, char *argv[])
 %1$s: TCP Performance Test Program\n\
 %2$s\n\
 \n\
-Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -396,7 +398,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -431,31 +433,30 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
-    -l, --loc_host\n\
-        Local host (bind) address            [default: 0.0.0.0]\n\
-    -r, --rem_host\n\
-        Remote host (connect) address        [default: 127.0.0.2]\n\
-    -p, --port PORTNUM\n\
-        Remote port (connect) number         [default: 10000]\n\
-    -w, --length LENGTH\n\
-        Length of message in bytes           [default: %2$d]\n\
-    -n, --nagle\n\
-        Suppress Nagle algorithm\n\
-    -t, --rep_time INTERVAL\n\
-        Sets the report time INTERVAL (secs) [default: 1]\n\
+    -p, --port PORT           (default: 10000)\n\
+        port specifies both the local and remote port number\n\
+    -l, --loc_host LOC_HOST   (default: 127.0.0.1)\n\
+        specifies the LOC_HOST (bind) host for the TCP\n\
+        socket with optional local port number\n\
+    -r, --rem_host REM_HOST   (default: 127.0.0.2)\n\
+        specifies the REM_HOST (sendto) address for the TCP\n\
+        socket with optional remote port number\n\
+    -t, --rep_time TIME       (default: 1 second)\n\
+        specify the TIME in seconds between reports\n\
+    -w, --length LENGTH       (default: 32 bytes)\n\
+        specify the LENGTH of messages\n\
     -q, --quiet\n\
-        Suppress normal output\n\
-        (equivalent to --verbose=0)\n\
+        suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
-        Increase verbosity or set to LEVEL   [default 1]\n\
-        This option may be repeated\n\
-    -h, --help\n\
-        Prints this usage message and exists\n\
+        increase verbosity or set to LEVEL [default: 1]\n\
+	this option may be repeated.\n\
+    -h, --help, -?, --?\n\
+        print this usage message and exit\n\
     -V, --version\n\
-        Prints the version and exits\n\
+        print the version and exit\n\
     -C, --copying\n\
-	Prints copyright and copying information and exits\n\
-", argv[0], MSG_LEN);
+        print copying permissions and exit\n\
+", argv[0]);
 }
 
 int
@@ -536,8 +537,8 @@ main(int argc, char **argv)
 				goto bad_option;
 			verbose = val;
 			break;
-		case 'H':
-		case 'h':
+		case 'H':	/* -H */
+		case 'h':	/* -h, --help */
 			help(argc, argv);
 			exit(0);
 		case 'V':

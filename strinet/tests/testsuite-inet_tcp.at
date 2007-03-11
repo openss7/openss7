@@ -174,7 +174,7 @@ function test_inet_tcp() {
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     if test $at_arg_given_sync = : ; then sync || : ; fi
-    if test-inet_tcp $options -e -o $1
+    if test-inet_tcp $options -o $1
     then
 	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS
 	then

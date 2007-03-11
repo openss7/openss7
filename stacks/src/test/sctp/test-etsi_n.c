@@ -222,7 +222,11 @@ static const char *lpkgname = "OpenSS7 SCTP Driver";
 static const char *lstdname = "RFC 2960, SCTP-IG, ETSI TS 102 144";
 static const char *sstdname = "RFC2960/TS102144";
 static const char *shortname = "SCTP";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/sctp_t";
+#else
 static char devname[256] = "/dev/sctp_t";
+#endif
 static char modname[256] = "sctp_t";
 
 static const int test_level = T_INET_SCTP;
@@ -5848,12 +5852,21 @@ Checks that the IUT makes a complete association procedure."
 int
 test_case_1_1_1_top(int child)
 {
+	/* Issue an N_CONN_REQ with the address of the PT */
+	/* Expect an N_CONN_CON followed by an N_DISCON_IND */
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_1_1_bot(int child)
 {
+	/* expect an N_CONN_IND with the INIT */
+	/* check the coding of the INIT */
+	/* respond with an INIT-ACK one address with a bogus cookie */
+	/* expect a COOKIE-ECHO */
+	/* check the coding of the COOKIE-ECHO */
+	/* send a COOKIE-ACK */
+	/* send an ABORT */
 	return (__RESULT_SKIPPED);
 }
 
@@ -5883,12 +5896,21 @@ an INIT from the PT."
 int
 test_case_1_1_2_top(int child)
 {
+	/* Issue an N_BIND_REQ that listens on the IUT address */
+	/* Expect an N_CONN_IND */
+	/* Accept the N_CONN_IND with an N_CONN_RES */
+	/* Expect an N_DISCON_IND */
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_1_2_bot(int child)
 {
+	/* Send an INIT to the tester (N_CONN_REQ) */
+	/* expect an INIT-ACK (N_CONN_CON) */
+	/* Send an COOKIE-ECHO to the tester with the cookie (N_DATA_REQ) */
+	/* expect a COOKIE-ACK (N_DATA_IND) */
+	/* Send an ABORT (N_DISCON_REQ) */
 	return (__RESULT_SKIPPED);
 }
 
@@ -5919,12 +5941,17 @@ again."
 int
 test_case_1_2_1_top(int child)
 {
+	/* Issue an N_CONN_REQ */
+	/* Expect an N_DISCON_IND */
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_2_1_bot(int child)
 {
+	/* expect an INIT (N_CONN_IND) and discard (N_DISCON_REQ) */
+	/* expect an INIT (N_CONN_IND) and refuse with ABORT (N_DISCON_REQ) */
+	/* check T1 between INITs */
 	return (__RESULT_SKIPPED);
 }
 
@@ -5955,12 +5982,19 @@ message again."
 int
 test_case_1_2_2_top(int child)
 {
+	/* Issue an N_CONN_REQ */
+	/* Expect an N_DISCON_IND */
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_2_2_bot(int child)
 {
+	/* expect an INIT (N_CONN_IND) and reply with INIT-ACK (N_DISCON_REQ) */
+	/* expect a COOKIE-ECHO (N_CONN_IND) and discard (N_DISCON_REQ) */
+	/* expect a COOKIE-ECHO (N_CONN_IND) and reject w/ ABORT (N_DISCON_REQ) */
+	/* check T1 between COOKIE-ECHOs */
+
 	return (__RESULT_SKIPPED);
 }
 
@@ -5991,12 +6025,18 @@ stops the initialization process."
 int
 test_case_1_3_1_top(int child)
 {
+	/* Issue an N_CONN_REQ */
+	/* Expect an N_DISCON_IND */
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_3_1_bot(int child)
 {
+	/* expect an INIT (N_CONN_IND) and discard (N_DISCON_REQ) */
+	/* expect an INIT (N_CONN_IND) and discard (N_DISCON_REQ) */
+	/* ... */
+	/* check T1 between INITs and number of INITs attempted */
 	return (__RESULT_SKIPPED);
 }
 
@@ -6027,12 +6067,19 @@ MAX.INIT.RETRANS times, stops the initialization process."
 int
 test_case_1_3_2_top(int child)
 {
+	/* Issue an N_CONN_REQ */
+	/* Expect an N_DISCON_IND */
 	return (__RESULT_SKIPPED);
 }
 
 int
 test_case_1_3_2_bot(int child)
 {
+	/* expect an INIT (N_CONN_IND) and reply with INIT-ACK (N_DISCON_REQ) */
+	/* expect a COOKIE-ECHO (N_CONN_IND) and discard (N_DISCON_REQ) */
+	/* expect a COOKIE-ECHO (N_CONN_IND) and discard (N_DISCON_REQ) */
+	/* ... */
+	/* check T1 between COOKIE-ECHOs and number of COOKIE-ECHOs attempted */
 	return (__RESULT_SKIPPED);
 }
 

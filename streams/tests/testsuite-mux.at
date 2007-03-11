@@ -123,7 +123,7 @@ function test_mux() {
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     if test $at_arg_given_sync = : ; then sync || : ; fi
-    if test-mux $options -e -o $1
+    if test-mux $options -o $1
     then
         # check for leaks
 	if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1

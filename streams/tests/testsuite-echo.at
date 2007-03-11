@@ -123,7 +123,7 @@ function test_echo() {
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     if test $at_arg_given_sync = : ; then sync || : ; fi
-    if test-echo $options -e -o $1
+    if test-echo $options -o $1
     then
         # check for leaks
 	if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1

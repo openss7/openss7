@@ -1,3 +1,12 @@
+2007-03-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/testsuite-inet_raw2.at: reworking test programs and suites
+	* tests/testsuite-inet_raw.at: reworking test programs and suites
+	* tests/testsuite-inet_sctp.at: reworking test programs and suites
+	* tests/testsuite-inet_tcp.at: reworking test programs and suites
+	* tests/testsuite-inet_udp2.at: reworking test programs and suites
+	* tests/testsuite-inet_udp.at: reworking test programs and suites
+
 2007-03-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/util/init/strinet.sh: ubuntu looks for lsb info in init scripts

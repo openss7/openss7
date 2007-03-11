@@ -181,7 +181,7 @@ When used in combination with
 this option will print more or less information about each test case.
 Note that all options specified following this option are ignored.
 .TP
-\fB-h\fR, \fB--help\fR
+\fB-h\fR, \fB--help\fR, \fB-?\fR, \fB--?\fR
 When this option is encountered,
 print usage information to
 .I stdout
@@ -237,6 +237,15 @@ the manner in which test cases are executed or test case results reported.
 Specifies the device name to open for the tests.  Because this test program uses pipes, this option
 is ineffective.
 .TP
+\fB-w\fR, \fB--wait\fR
+Specifies that the client or server is to wait indefinitely.  Normally a test
+case guard timer is started (40 seconds) that will fire and cause the test
+case to fail if the test cases waits indefinitely for an event to start or
+continue.  This option suppresses the test cause guard timer and allows the 
+client or server to wait indefinitely from some event to occur.  This is
+paricularly useful when one side of the test case (client or server) is being
+run manually.
+.TP
 \fB-e\fR, \fB--exit\fR
 Specifies that the first test case run that is not successful will cause all remaining test cases to
 be skipped and the return code will reflect the result of the failed test case.
@@ -247,6 +256,25 @@ This is used by the
 .B @PACKAGE@-@VERSION@
 test suite to run individual tests under
 .BR autotest .
+.TP
+\fB-a\fR, \fB--again\fR
+Specifies that the selected test cases are to be repeated in verbose mode if
+they fail in non-verbose mode.  This option is useful for use with autotest
+test suites.
+.TP
+\fB-R\fR, \fB--repeat\fR
+Repeat the selected test cases on success or failure.  This option causes the
+executable to loop through the selected test cases, one after the other,
+regardless of whether an individual test case succeeds or fails.
+This option is useful in conjunction with \fB--onetest\fR and \fB--client\fR
+or \fB--server\fR when the other end of the test is being executed manually.
+.TP
+\fB-r\fR, \fB--repeat-fail\fR
+Repeat the selected test cases on failure.  This option caues the executable
+to loop individual test cases when they fail, but allows the test sequence to
+continue when an individual test case succeeds.
+This option is useful in conjunction with \fB--onetest\fR and \fB--client\fR
+or \fB--server\fR when the other end of the test is being executed manually.
 .TP
 \fB-f\fR, \fB--fast\fR [\fISCALE\fR]
 When this option is present, test cases are run faster by the integer scaling factor
@@ -399,7 +427,7 @@ tab(:);
 lb|lb|lb
 l|l|l.
 _
-POSIX 1003.3:test-fifo\fR[\fB_thr\fR]:autotest
+POSIX 1003.3:test-fifo:autotest
 _
 PASS:PASS(0):PASS
 FAIL:FAIL(1):FAIL

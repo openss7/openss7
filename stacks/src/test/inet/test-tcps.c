@@ -71,7 +71,8 @@
 
 #ident "@(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:28 $"
 
-static char const ident[] = "$RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:28 $";
+static char const ident[] =
+    "$RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:28 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -97,17 +98,20 @@ static char const ident[] = "$RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.
 int verbose = 1;
 static int timer_timeout = 0;
 
-static void timer_handler(int signum)
+static void
+timer_handler(int signum)
 {
 	if (signum == SIGALRM)
 		timer_timeout = 1;
 	return;
 }
 
-static int timer_sethandler(void)
+static int
+timer_sethandler(void)
 {
 	sigset_t mask;
 	struct sigaction act;
+
 	act.sa_handler = timer_handler;
 	act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_restorer = NULL;
@@ -120,9 +124,11 @@ static int timer_sethandler(void)
 	return 0;
 }
 
-static int start_timer(void)
+static int
+start_timer(void)
 {
 	struct itimerval setting = { {0, 0}, {1, 0} };
+
 	if (timer_sethandler())
 		return -1;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
@@ -134,12 +140,14 @@ static int start_timer(void)
 static struct sockaddr_in loc_addr = { AF_INET, 0, {INADDR_ANY}, };
 static struct sockaddr_in rem_addr = { AF_INET, 0, {INADDR_ANY}, };
 
-int test_tcps(void)
+int
+test_tcps(void)
 {
 	int lfd, fd;
 	int len = 0;
 	long inp_count = 0, out_count = 0;
 	struct pollfd pfd[1] = { {0, POLLIN | POLLOUT | POLLERR | POLLHUP, 0} };
+
 //      unsigned char my_msg[] = "This is a good short test message that has some 64 bytes in it.";
 	unsigned char ur_msg[4096];
 
@@ -362,7 +370,8 @@ Options:\n\
 ", argv[0]);
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
 	char *hostl = "127.0.0.2";
 	char *hostr = "127.0.0.1";
@@ -373,8 +382,10 @@ int main(int argc, char **argv)
 	short port = 10000;
 	int time;
 	struct hostent *haddr;
+
 	for (;;) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		/* *INDENT-OFF* */
 		int option_index = 0;

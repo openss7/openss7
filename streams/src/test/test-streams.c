@@ -33,7 +33,8 @@
 
  As an exception to the above, this software may be distributed under the GNU
  General Public License (GPL) Version 2, so long as the software is distributed
- with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -15807,12 +15808,12 @@ test_case_3_5_12_x(int child, int flags)
 		return (__RESULT_FAILURE);
 	state++;
 	if (gctl.len != sizeof(pcbuf)) {
-		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		printf("gctl.len = %d, sizeof(pcbuf) = %zu\n", gctl.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
 	if (gdat.len != sizeof(pdbuf)) {
-		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		printf("gdat.len = %d, sizeof(pdbuf) = %zu\n", gdat.len, sizeof(pdbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -15905,7 +15906,7 @@ test_case_3_5_13_x(int child, int flags)
 		return (__RESULT_FAILURE);
 	state++;
 	if (gctl.len != sizeof(gcbuf)) {
-		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		printf("gctl.len = %d, sizeof(pcbuf) = %zu\n", gctl.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -15916,7 +15917,7 @@ test_case_3_5_13_x(int child, int flags)
 		}
 	state++;
 	if (gdat.len != sizeof(gdbuf)) {
-		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		printf("gdat.len = %d, sizeof(pdbuf) = %zu\n", gdat.len, sizeof(pdbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -15933,7 +15934,7 @@ test_case_3_5_13_x(int child, int flags)
 		return (__RESULT_FAILURE);
 	state++;
 	if (gctl.len != sizeof(gcbuf)) {
-		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		printf("gctl.len = %d, sizeof(pcbuf) = %zu\n", gctl.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -16020,7 +16021,7 @@ test_case_3_5_14_x(int child, int flags)
 		return (__RESULT_FAILURE);
 	state++;
 	if (gctl.len != sizeof(gcbuf)) {
-		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		printf("gctl.len = %d, sizeof(pcbuf) = %zu\n", gctl.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -16031,7 +16032,7 @@ test_case_3_5_14_x(int child, int flags)
 		}
 	state++;
 	if (gdat.len != sizeof(gdbuf)) {
-		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		printf("gdat.len = %d, sizeof(pdbuf) = %zu\n", gdat.len, sizeof(pdbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -16049,7 +16050,7 @@ test_case_3_5_14_x(int child, int flags)
 		return (__RESULT_FAILURE);
 	state++;
 	if (gdat.len != sizeof(gdbuf)) {
-		printf("gdat.len = %d, sizeof(pcbuf) = %u\n", gdat.len, sizeof(pcbuf));
+		printf("gdat.len = %d, sizeof(pcbuf) = %zu\n", gdat.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -16136,12 +16137,12 @@ test_case_3_5_15_x(int child, int flags)
 		return (__RESULT_FAILURE);
 	state++;
 	if (gctl.len != sizeof(gcbuf)) {
-		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		printf("gctl.len = %d, sizeof(pcbuf) = %zu\n", gctl.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
 	if (gdat.len != sizeof(gdbuf)) {
-		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		printf("gdat.len = %d, sizeof(pdbuf) = %zu\n", gdat.len, sizeof(pdbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -16164,7 +16165,7 @@ test_case_3_5_15_x(int child, int flags)
 		return (__RESULT_FAILURE);
 	state++;
 	if (gctl.len != sizeof(gcbuf)) {
-		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		printf("gctl.len = %d, sizeof(pcbuf) = %zu\n", gctl.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -16175,7 +16176,7 @@ test_case_3_5_15_x(int child, int flags)
 		}
 	state++;
 	if (gdat.len != sizeof(gdbuf)) {
-		printf("gdat.len = %d, sizeof(pcbuf) = %u\n", gdat.len, sizeof(pcbuf));
+		printf("gdat.len = %d, sizeof(pcbuf) = %zu\n", gdat.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -17211,12 +17212,12 @@ test_case_3_6_16_x(int child, int flags)
 		return (__RESULT_FAILURE);
 	state++;
 	if (gctl.len != sizeof(pcbuf)) {
-		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		printf("gctl.len = %d, sizeof(pcbuf) = %zu\n", gctl.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
 	if (gdat.len != sizeof(pdbuf)) {
-		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		printf("gdat.len = %d, sizeof(pdbuf) = %zu\n", gdat.len, sizeof(pdbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -17327,7 +17328,7 @@ test_case_3_6_17_x(int child, int flags)
 		return (__RESULT_FAILURE);
 	state++;
 	if (gctl.len != sizeof(gcbuf)) {
-		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		printf("gctl.len = %d, sizeof(pcbuf) = %zu\n", gctl.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -17338,7 +17339,7 @@ test_case_3_6_17_x(int child, int flags)
 		}
 	state++;
 	if (gdat.len != sizeof(gdbuf)) {
-		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		printf("gdat.len = %d, sizeof(pdbuf) = %zu\n", gdat.len, sizeof(pdbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -17357,7 +17358,7 @@ test_case_3_6_17_x(int child, int flags)
 		return (__RESULT_FAILURE);
 	state++;
 	if (gctl.len != sizeof(gcbuf)) {
-		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		printf("gctl.len = %d, sizeof(pcbuf) = %zu\n", gctl.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -17462,7 +17463,7 @@ test_case_3_6_18_x(int child, int flags)
 		return (__RESULT_FAILURE);
 	state++;
 	if (gctl.len != sizeof(gcbuf)) {
-		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		printf("gctl.len = %d, sizeof(pcbuf) = %zu\n", gctl.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -17473,7 +17474,7 @@ test_case_3_6_18_x(int child, int flags)
 		}
 	state++;
 	if (gdat.len != sizeof(gdbuf)) {
-		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		printf("gdat.len = %d, sizeof(pdbuf) = %zu\n", gdat.len, sizeof(pdbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -17492,7 +17493,7 @@ test_case_3_6_18_x(int child, int flags)
 		return (__RESULT_FAILURE);
 	state++;
 	if (gdat.len != sizeof(gdbuf)) {
-		printf("gdat.len = %d, sizeof(pcbuf) = %u\n", gdat.len, sizeof(pcbuf));
+		printf("gdat.len = %d, sizeof(pcbuf) = %zu\n", gdat.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -17597,12 +17598,12 @@ test_case_3_6_19_x(int child, int flags)
 		return (__RESULT_FAILURE);
 	state++;
 	if (gctl.len != sizeof(gcbuf)) {
-		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		printf("gctl.len = %d, sizeof(pcbuf) = %zu\n", gctl.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
 	if (gdat.len != sizeof(gdbuf)) {
-		printf("gdat.len = %d, sizeof(pdbuf) = %u\n", gdat.len, sizeof(pdbuf));
+		printf("gdat.len = %d, sizeof(pdbuf) = %zu\n", gdat.len, sizeof(pdbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -17625,7 +17626,7 @@ test_case_3_6_19_x(int child, int flags)
 		return (__RESULT_FAILURE);
 	state++;
 	if (gctl.len != sizeof(gcbuf)) {
-		printf("gctl.len = %d, sizeof(pcbuf) = %u\n", gctl.len, sizeof(pcbuf));
+		printf("gctl.len = %d, sizeof(pcbuf) = %zu\n", gctl.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -17636,7 +17637,7 @@ test_case_3_6_19_x(int child, int flags)
 		}
 	state++;
 	if (gdat.len != sizeof(gdbuf)) {
-		printf("gdat.len = %d, sizeof(pcbuf) = %u\n", gdat.len, sizeof(pcbuf));
+		printf("gdat.len = %d, sizeof(pcbuf) = %zu\n", gdat.len, sizeof(pcbuf));
 		return (__RESULT_FAILURE);
 	}
 	state++;
@@ -21868,7 +21869,7 @@ do_tests(int num_tests)
 	show = 0;
 	if (verbose > 0) {
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "\nUsing device %s\n\n", devname);
+		fprintf(stdout, "\nUsing device %s, %s, %s\n\n", devname, muxname, fifoname);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}

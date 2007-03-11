@@ -128,7 +128,11 @@ static const char *lpkgname = "OpenSS7 XTI/TLI Library";
 static const char *lstdname = "XNS 5.2";
 static const char *sstdname = "XNS";
 static const char *shortname = "XNET";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/echo";
+#else
 static char devname[256] = "/dev/echo";
+#endif
 
 static int exit_on_failure = 0;
 

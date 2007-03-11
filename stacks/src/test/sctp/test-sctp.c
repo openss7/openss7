@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -316,16 +316,16 @@ print_qos(char *qos_ptr, size_t add_len)
 	switch (qos->n_qos_type) {
 	case N_QOS_SEL_CONN_SCTP:
 		printf("CONN:");
-		printf(" i_streams = %ld,", qos->n_qos_conn.i_streams);
-		printf(" o_streams = %ld", qos->n_qos_conn.o_streams);
+		printf(" i_streams = %ld,", (long) qos->n_qos_conn.i_streams);
+		printf(" o_streams = %ld", (long) qos->n_qos_conn.o_streams);
 		break;
 
 	case N_QOS_SEL_DATA_SCTP:
 		printf("DATA: ");
-		printf(" ppi = %lu,", qos->n_qos_data.ppi);
-		printf(" sid = %ld,", qos->n_qos_data.sid);
-		printf(" ssn = %ld,", qos->n_qos_data.ssn);
-		printf(" more = %ld", qos->n_qos_data.more);
+		printf(" ppi = %lu,", (ulong) qos->n_qos_data.ppi);
+		printf(" sid = %ld,", (long) qos->n_qos_data.sid);
+		printf(" ssn = %ld,", (long) qos->n_qos_data.ssn);
+		printf(" more = %ld", (long) qos->n_qos_data.more);
 		break;
 
 	case N_QOS_SEL_INFO_SCTP:
@@ -337,7 +337,7 @@ print_qos(char *qos_ptr, size_t add_len)
 		break;
 
 	default:
-		printf("(unknown qos structure %lu)\n", qos->n_qos_type);
+		printf("(unknown qos structure %lu)\n", (ulong) qos->n_qos_type);
 		break;
 	}
 	printf("\n");
@@ -639,13 +639,19 @@ put_and_get(int fd, int flags)
 	get_only(fd, 10);
 }
 
+#ifdef LFS
+static const char sctpname[] = "/dev/streams/clone/sctp_n";
+#else
+static const char sctpname[] = "/dev/sctp_n";
+#endif
+
 int
 sctp_n_open(void)
 {
 	int fd;
 
 	printf("\nOPEN: sctp_n\n");
-	if ((fd = open("/dev/sctp_n", O_NONBLOCK | O_RDWR)) < 0) {
+	if ((fd = open(sctpname, O_NONBLOCK | O_RDWR)) < 0) {
 		printf("ERROR: open: [%d] %s\n", errno, strerror(errno));
 		exit(2);
 	}
@@ -801,14 +807,14 @@ do_tests(void)
 }
 
 void
-splash(int argc, char *argv[])
+copying(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
 RFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Suite\n\
 \n\
-Copyright (c) 2001-2006 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2007 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -834,9 +840,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -848,7 +853,7 @@ herein (the license  rights customarily  provided to non-Government  users).  If
 the Software is supplied to any unit or agency of the Government other than DoD,\n\
 it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
 in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
-Regulations (\"FAR\") (or any successor regulations) or, in the  cases of NASA, in\n\
+Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
 ");
@@ -862,7 +867,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -898,16 +903,16 @@ Arguments:\n\
     (none)\n\
 Options:\n\
     -q, --quiet\n\
-        Suppress normal output (equivalent to --verbose=0)\n\
+        suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
-        Increase verbosity or set to LEVEL [default: 1]\n\
-	This option may be repeated.\n\
+        increase verbosity or set to LEVEL [default: 1]\n\
+        this option may be repeated.\n\
     -h, --help, -?, --?\n\
-        Prints this usage message and exits\n\
+        print this usage message and exit\n\
     -V, --version\n\
-        Prints the version and exits\n\
+        print the version and exit\n\
     -C, --copying\n\
-        Prints copyright and permission and exits\n\
+        print copying permissions and exit\n\
 ", argv[0]);
 }
 
@@ -955,7 +960,7 @@ main(int argc, char *argv[])
 			version(argc, argv);
 			exit(0);
 		case 'C':
-			splash(argc, argv);
+			copying(argc, argv);
 			exit(0);
 		case '?':
 		default:
@@ -978,7 +983,7 @@ main(int argc, char *argv[])
 	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	splash(argc, argv);
+	copying(argc, argv);
 	do_tests();
 	exit(0);
 }

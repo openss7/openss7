@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,9 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ General Public License (GPL) Version 2, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -142,10 +142,10 @@ N_qos_sel_info_sctp_t qos_info = {
 	0,				/* sid */
 	12,				/* max_inits */
 	12,				/* max_retrans */
-	-1UL,				/* ck_life */
-	-1UL,				/* ck_inc */
-	-1UL,				/* hmac */
-	-1UL,				/* throttle */
+	-1,				/* ck_life */
+	-1,				/* ck_inc */
+	-1,				/* hmac */
+	-1,				/* throttle */
 	20,				/* max_sack */
 	100,				/* rto_ini */
 	20,				/* rto_min */
@@ -172,6 +172,7 @@ timer_sethandler(void)
 {
 	sigset_t mask;
 	struct sigaction act;
+
 	act.sa_handler = timer_handler;
 	act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_restorer = NULL;
@@ -188,6 +189,7 @@ static int
 start_timer(void)
 {
 	struct itimerval setting = { {0, 0}, {1, 0} };
+
 	if (timer_sethandler())
 		return -1;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
@@ -201,6 +203,7 @@ sctp_get(int fd, int wait)
 {
 	int ret;
 	int flags = 0;
+
 	while ((ret = getmsg(fd, &ctrl, &data, &flags)) < 0) {
 		switch (errno) {
 		default:
@@ -225,6 +228,7 @@ sctp_get(int fd, int wait)
 	}
 	do {
 		struct pollfd pfd[] = { {fd, POLLIN | POLLPRI, 0} };
+
 		if (!(ret = poll(pfd, 1, wait))) {
 			perror("sctp_get: poll");
 			return -1;
@@ -251,6 +255,7 @@ int
 sctp_options(int fd, ulong flags, N_qos_sel_info_sctp_t * qos)
 {
 	int ret;
+
 	ctrl.len = sizeof(cmd.npi.optmgmt_req) + sizeof(*qos);
 	cmd.prim = N_OPTMGMT_REQ;
 	cmd.npi.optmgmt_req.OPTMGMT_flags = flags;
@@ -277,6 +282,7 @@ int
 sctp_bind(int fd, addr_t * addr, int coninds)
 {
 	int ret;
+
 	ctrl.len = sizeof(cmd.npi.bind_req) + sizeof(*addr);
 	cmd.prim = N_BIND_REQ;
 	cmd.npi.bind_req.ADDR_length = sizeof(*addr);
@@ -306,6 +312,7 @@ int
 sctp_connect(int fd, addr_t * addr, N_qos_sel_conn_sctp_t * qos)
 {
 	int ret;
+
 	ctrl.len = sizeof(cmd.npi.conn_req) + sizeof(*addr) + sizeof(*qos);
 	cmd.prim = N_CONN_REQ;
 	cmd.npi.conn_req.DEST_length = sizeof(*addr);
@@ -335,6 +342,7 @@ int
 sctp_accept(int fd, int fd2, int tok)
 {
 	int ret, seq;
+
 	if ((ret = sctp_get(fd, -1)) < 0) {
 		fprintf(stderr, "sctp_accept: couldn't get message on listener\n");
 		return -1;
@@ -391,6 +399,7 @@ int
 sctp_read(int fd, void *msg, size_t len)
 {
 	int ret;
+
 	data.buf = msg;
 	data.len = 0;
 	data.maxlen = len;
@@ -411,6 +420,12 @@ static addr_t rem_addr = { 0, {{INADDR_ANY}} };
 
 int len = 32;
 
+#ifdef LFS
+static const char sctpname[] = "/dev/streams/clone/sctp_n";
+#else
+static const char sctpname[] = "/dev/sctp_n";
+#endif
+
 int
 test_sctps(void)
 {
@@ -422,7 +437,7 @@ test_sctps(void)
 
 	fprintf(stderr, "Opening stream\n");
 
-	if ((lfd = open("/dev/sctp_n", O_NONBLOCK | O_RDWR)) < 0) {
+	if ((lfd = open(sctpname, O_NONBLOCK | O_RDWR)) < 0) {
 		perror("open");
 		close(lfd);
 		exit(2);
@@ -433,7 +448,7 @@ test_sctps(void)
 		exit(2);
 	}
 	fprintf(stderr, "--> STREAM listener opened\n");
-	if ((fd = open("/dev/sctp_n", O_NONBLOCK | O_RDWR)) < 0) {
+	if ((fd = open(sctpname, O_NONBLOCK | O_RDWR)) < 0) {
 		perror("open");
 		goto dead;
 	}
@@ -473,9 +488,7 @@ test_sctps(void)
 		pfd[0].events = POLLIN | POLLOUT;
 		pfd[0].revents = 0;
 		if (timer_timeout) {
-			printf("Msgs sent: %5ld, recv: %5ld, tot: %5ld, dif: %5ld, tput: %10ld\n",
-			       inp_count, out_count, inp_count + out_count, out_count - inp_count,
-			       8 * (42 + len) * (inp_count + out_count));
+			printf("Msgs sent: %5ld, recv: %5ld, tot: %5ld, dif: %5ld, tput: %10ld\n", inp_count, out_count, inp_count + out_count, out_count - inp_count, 8 * (42 + len) * (inp_count + out_count));
 			inp_count = 0;
 			out_count = 0;
 			if (start_timer()) {
@@ -522,14 +535,14 @@ test_sctps(void)
 }
 
 void
-copying(int argc, char *argv[])
+splash(int argc, char *argv[])
 {
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
 RFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Suite\n\
 \n\
-Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -569,7 +582,7 @@ herein (the license  rights customarily  provided to non-Government  users).  If
 the Software is supplied to any unit or agency of the Government other than DoD,\n\
 it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
 in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
-Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
+Regulations (\"FAR\") (or any successor regulations) or, in the  cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
 ");
@@ -583,7 +596,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -647,7 +660,6 @@ Options:\n\
 int
 main(int argc, char **argv)
 {
-	int c;
 	char *hostl = "127.0.0.1";
 	char *hostr = "127.0.0.1";
 	char hostbufl[HOST_BUF_LEN];
@@ -658,8 +670,10 @@ main(int argc, char **argv)
 	short portr = 10000;
 	int time;
 	struct hostent *haddr;
+
 	for (;;) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -675,9 +689,10 @@ main(int argc, char **argv)
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
-			{ 0, }
+			{NULL, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long(argc, argv, "l:r:t:p:w:qvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "l:r:t:p:w:qvhVC?");
@@ -724,7 +739,7 @@ main(int argc, char **argv)
 			version(argc, argv);
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			splash(argc, argv);
 			exit(0);
 		case '?':
 		default:
@@ -738,6 +753,7 @@ main(int argc, char **argv)
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
+			goto bad_usage;
 		      bad_usage:
 			usage(argc, argv);
 			exit(2);

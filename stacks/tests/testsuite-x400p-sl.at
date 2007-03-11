@@ -89,7 +89,7 @@ function test_x400p_sl() {
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     if test $at_arg_given_wait = : ; then options="$options --wait" ; fi
     if test $at_arg_given_sync = : ; then sync || : ; fi
-    if test-x400p $options -d /dev/x400p-sl -e -o $1
+    if test-x400p $options -d /dev/x400p-sl -o $1
     then
 	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS
 	then

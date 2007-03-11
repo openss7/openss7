@@ -1,3 +1,12 @@
+2007-03-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/test-sctp.c: reworking test programs and suites
+	* src/test/test-sctp_ns.c: reworking test programs and suites
+	* tests/testsuite-sctp.at: reworking test programs and suites
+	* tests/testsuite-sctp_n2.at: reworking test programs and suites
+	* tests/testsuite-sctp_n.at: reworking test programs and suites
+	* tests/testsuite-sctp_t.at: reworking test programs and suites
+
 2007-03-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/bugs.texi: noted locking bugfix

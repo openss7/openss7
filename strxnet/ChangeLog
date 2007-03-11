@@ -1,3 +1,16 @@
+2007-03-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/test-inet_raw.c: reworking test programs and suites
+	* src/test/test-inet_tcp.c: reworking test programs and suites
+	* src/test/test-inet_udp.c: reworking test programs and suites
+	* src/test/test-timod.c: reworking test programs and suites
+	* src/test/test-tirdwr.c: reworking test programs and suites
+	* src/test/test-xnet.c: reworking test programs and suites
+	* tests/testsuite-timod.at: reworking test programs and suites
+	* tests/testsuite-tirdwr.at: reworking test programs and suites
+	* tests/testsuite-xnet.at: reworking test programs and suites
+	* tests/testsuite-xnet_thr.at: reworking test programs and suites
+
 2007-03-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/timod.c: discovered error by inspection in timod_pop()

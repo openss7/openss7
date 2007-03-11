@@ -1,3 +1,10 @@
+2007-03-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/test-m2pa.8.man: rework test programs and suites
+	* src/test/test-m2pa.c: rework test programs and suites
+	* tests/testsuite-m2pa.at: rework test programs and suites
+	* tests/testsuite-m2ua_as.at: rework test programs and suites
+
 2007-03-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/test/test-m2pa_sl.c: fixed delicate timing on test case 8.14

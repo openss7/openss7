@@ -1,3 +1,36 @@
+2007-03-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/test-clone.8.man: rework test programs and suites
+	* doc/man/man8/test-connld.8.man: rework test programs and suites
+	* doc/man/man8/test-echo.8.man: rework test programs and suites
+	* doc/man/man8/test-fifo.8.man: rework test programs and suites
+	* doc/man/man8/test-log.8.man: rework test programs and suites
+	* doc/man/man8/test-loop.8.man: rework test programs and suites
+	* doc/man/man8/test-mux.8.man: rework test programs and suites
+	* doc/man/man8/test-nsdev.8.man: rework test programs and suites
+	* doc/man/man8/test-nuls.8.man: rework test programs and suites
+	* doc/man/man8/test-pipe.8.man: rework test programs and suites
+	* doc/man/man8/test-pipemod.8.man: rework test programs and suites
+	* doc/man/man8/test-sad.8.man: rework test programs and suites
+	* doc/man/man8/test-sc.8.man: rework test programs and suites
+	* doc/man/man8/test-streams.8.man: rework test programs and suites
+	* src/test/test-sad.c: rework test programs and suites
+	* src/test/test-streams.c: rework test programs and suites
+	* tests/testsuite-clone.at: rework test programs and suites
+	* tests/testsuite-connld.at: rework test programs and suites
+	* tests/testsuite-echo.at: rework test programs and suites
+	* tests/testsuite-fifo.at: rework test programs and suites
+	* tests/testsuite-log.at: rework test programs and suites
+	* tests/testsuite-loop.at: rework test programs and suites
+	* tests/testsuite-mux.at: rework test programs and suites
+	* tests/testsuite-nsdev.at: rework test programs and suites
+	* tests/testsuite-nuls.at: rework test programs and suites
+	* tests/testsuite-pipe.at: rework test programs and suites
+	* tests/testsuite-pipemod.at: rework test programs and suites
+	* tests/testsuite-sad.at: rework test programs and suites
+	* tests/testsuite-sc.at: rework test programs and suites
+	* tests/testsuite-streams.at: rework test programs and suites
+
 2007-03-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* include/sys/streams/strsubr.h (qstream): add queue specific stream
