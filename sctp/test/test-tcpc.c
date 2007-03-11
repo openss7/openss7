@@ -97,6 +97,7 @@ static char const ident[] =
 #include <stdlib.h>
 #include <string.h>
 
+#define MSG_LEN 64
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
