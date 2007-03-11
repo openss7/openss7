@@ -245,7 +245,7 @@ static int verbose = 1;
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
-static int show_data = 1;
+//static int show_data = 1;
 
 static int last_prim = 0;
 static int last_event = 0;
@@ -277,6 +277,8 @@ int test_fd[3] = { 0, 0, 0 };
 #define TEST_DURATION	20000
 #define INFINITE_WAIT	-1
 
+static ulong test_duration = TEST_DURATION;	/* wait on other side */
+
 ulong seq[10] = { 0, };
 ulong tok[10] = { 0, };
 ulong tsn[10] = { 0, };
@@ -295,6 +297,7 @@ static int test_pflags = MSG_BAND;	/* MSG_BAND | MSG_HIPRI */
 static int test_pband = 0;
 static int test_gflags = 0;		/* MSG_BAND | MSG_HIPRI */
 static int test_gband = 0;
+
 static int test_bufsize = 256;
 static int test_tidu = 256;
 static int test_mgmtflags = T_NEGOTIATE;
@@ -507,7 +510,14 @@ check_time(const char *t, long i, long lo, long hi)
 static int
 time_event(int child, int event)
 {
-	if (verbose > 4) {
+	static const char *msgs[] = {
+		"                    ! %11.6g                |                    <%d:%03d>\n",
+		"                    |                %11.6g !                    <%d:%03d>\n",
+		"                    |             %11.6g !  |                    <%d:%03d>\n",
+		"                    !        %11.6g         !                    <%d:%03d>\n",
+	};
+
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg)) {
 		float t, m;
 		struct timeval now;
 
@@ -518,8 +528,9 @@ time_event(int child, int event)
 		m = now.tv_usec;
 		m = m / 1000000;
 		t += m;
+
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    | %11.6g                    |  |                    <%d:%03d>\n", t, child, state);
+		fprintf(stdout, msgs[child], t, child, state);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -527,30 +538,49 @@ time_event(int child, int event)
 }
 
 static int timer_timeout = 0;
+static int last_signum = 0;
 
 static void
-timer_handler(int signum)
+signal_handler(int signum)
 {
+	last_signum = signum;
 	if (signum == SIGALRM)
 		timer_timeout = 1;
 	return;
 }
 
 static int
-timer_sethandler(void)
+start_signals(void)
 {
 	sigset_t mask;
 	struct sigaction act;
 
-	act.sa_handler = timer_handler;
-	act.sa_flags = SA_RESTART | SA_ONESHOT;
+	act.sa_handler = signal_handler;
+//      act.sa_flags = SA_RESTART | SA_ONESHOT;
+	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
 		return __RESULT_FAILURE;
+	if (sigaction(SIGPOLL, &act, NULL))
+		return __RESULT_FAILURE;
+	if (sigaction(SIGURG, &act, NULL))
+		return __RESULT_FAILURE;
+	if (sigaction(SIGPIPE, &act, NULL))
+		return __RESULT_FAILURE;
+	if (sigaction(SIGHUP, &act, NULL))
+		return __RESULT_FAILURE;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGPOLL);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGHUP);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
 	siginterrupt(SIGALRM, 1);
+	siginterrupt(SIGPOLL, 1);
+	siginterrupt(SIGURG, 1);
+	siginterrupt(SIGPIPE, 1);
+	siginterrupt(SIGHUP, 1);
 	return __RESULT_SUCCESS;
 }
 
@@ -565,7 +595,9 @@ start_tt(long duration)
 		{duration / 1000, (duration % 1000) * 1000}
 	};
 
-	if (timer_sethandler())
+	if (duration == (long) INFINITE_WAIT)
+		return __RESULT_SUCCESS;
+	if (start_signals())
 		return __RESULT_FAILURE;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
 		return __RESULT_FAILURE;
@@ -584,24 +616,47 @@ start_st(long duration)
 #endif
 
 static int
-stop_tt(void)
+stop_signals(void)
 {
-	struct itimerval setting = { {0, 0}, {0, 0} };
+	int result = __RESULT_SUCCESS;
 	sigset_t mask;
 	struct sigaction act;
 
-	if (setitimer(ITIMER_REAL, &setting, NULL))
-		return __RESULT_FAILURE;
 	act.sa_handler = SIG_DFL;
 	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
-		return __RESULT_FAILURE;
-	timer_timeout = 0;
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGPOLL, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGURG, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGPIPE, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGHUP, &act, NULL))
+		result = __RESULT_FAILURE;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGPOLL);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGHUP);
 	sigprocmask(SIG_BLOCK, &mask, NULL);
-	return __RESULT_SUCCESS;
+	return (result);
+}
+
+static int
+stop_tt(void)
+{
+	struct itimerval setting = { {0, 0}, {0, 0} };
+	int result = __RESULT_SUCCESS;
+
+	if (setitimer(ITIMER_REAL, &setting, NULL))
+		return __RESULT_FAILURE;
+	if (stop_signals() != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	timer_timeout = 0;
+	return (result);
 }
 
 /*
@@ -1459,7 +1514,7 @@ etype_string(t_uscalar_t etype)
 }
 
 const char *
-event_string(int event)
+event_string(int child, int event)
 {
 	switch (event) {
 	case __EVENT_NO_MSG:
@@ -1708,6 +1763,163 @@ ioctl_string(int cmd, intptr_t arg)
 	default:
 		return ("(unexpected)");
 	}
+}
+
+const char *
+signal_string(int signum)
+{
+	switch (signum) {
+	case SIGHUP:
+		return ("SIGHUP");
+	case SIGINT:
+		return ("SIGINT");
+	case SIGQUIT:
+		return ("SIGQUIT");
+	case SIGILL:
+		return ("SIGILL");
+	case SIGABRT:
+		return ("SIGABRT");
+	case SIGFPE:
+		return ("SIGFPE");
+	case SIGKILL:
+		return ("SIGKILL");
+	case SIGSEGV:
+		return ("SIGSEGV");
+	case SIGPIPE:
+		return ("SIGPIPE");
+	case SIGALRM:
+		return ("SIGALRM");
+	case SIGTERM:
+		return ("SIGTERM");
+	case SIGUSR1:
+		return ("SIGUSR1");
+	case SIGUSR2:
+		return ("SIGUSR2");
+	case SIGCHLD:
+		return ("SIGCHLD");
+	case SIGCONT:
+		return ("SIGCONT");
+	case SIGSTOP:
+		return ("SIGSTOP");
+	case SIGTSTP:
+		return ("SIGTSTP");
+	case SIGTTIN:
+		return ("SIGTTIN");
+	case SIGTTOU:
+		return ("SIGTTOU");
+	case SIGBUS:
+		return ("SIGBUS");
+	case SIGPOLL:
+		return ("SIGPOLL");
+	case SIGPROF:
+		return ("SIGPROF");
+	case SIGSYS:
+		return ("SIGSYS");
+	case SIGTRAP:
+		return ("SIGTRAP");
+	case SIGURG:
+		return ("SIGURG");
+	case SIGVTALRM:
+		return ("SIGVTALRM");
+	case SIGXCPU:
+		return ("SIGXCPU");
+	case SIGXFSZ:
+		return ("SIGXFSZ");
+	default:
+		return ("unknown");
+	}
+}
+
+const char *
+poll_string(short events)
+{
+	if (events & POLLIN)
+		return ("POLLIN");
+	if (events & POLLPRI)
+		return ("POLLPRI");
+	if (events & POLLOUT)
+		return ("POLLOUT");
+	if (events & POLLRDNORM)
+		return ("POLLRDNORM");
+	if (events & POLLRDBAND)
+		return ("POLLRDBAND");
+	if (events & POLLWRNORM)
+		return ("POLLWRNORM");
+	if (events & POLLWRBAND)
+		return ("POLLWRBAND");
+	if (events & POLLERR)
+		return ("POLLERR");
+	if (events & POLLHUP)
+		return ("POLLHUP");
+	if (events & POLLNVAL)
+		return ("POLLNVAL");
+	if (events & POLLMSG)
+		return ("POLLMSG");
+	return ("none");
+}
+
+const char *
+poll_events_string(short events)
+{
+	static char string[256] = "";
+	int offset = 0, size = 256, len = 0;
+
+	if (events & POLLIN) {
+		len = snprintf(string + offset, size, "POLLIN|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLPRI) {
+		len = snprintf(string + offset, size, "POLLPRI|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLOUT) {
+		len = snprintf(string + offset, size, "POLLOUT|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLRDNORM) {
+		len = snprintf(string + offset, size, "POLLRDNORM|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLRDBAND) {
+		len = snprintf(string + offset, size, "POLLRDBAND|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLWRNORM) {
+		len = snprintf(string + offset, size, "POLLWRNORM|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLWRBAND) {
+		len = snprintf(string + offset, size, "POLLWRBAND|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLERR) {
+		len = snprintf(string + offset, size, "POLLERR|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLHUP) {
+		len = snprintf(string + offset, size, "POLLHUP|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLNVAL) {
+		len = snprintf(string + offset, size, "POLLNVAL|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLMSG) {
+		len = snprintf(string + offset, size, "POLLMSG|");
+		offset += len;
+		size -= len;
+	}
+	return (string);
 }
 
 const char *
@@ -2489,41 +2701,6 @@ t_errno_string(t_scalar_t err, t_scalar_t syserr)
 }
 
 void
-print_less(int child)
-{
-	if (verbose < 1 || !show)
-		return;
-	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	switch (child) {
-	case 0:
-		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
-		fprintf(stdout, " .  (more) .  <---->|               .               :  :                     [%d:%03d]\n", child, state);
-		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
-		break;
-	case 1:
-		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
-		fprintf(stdout, "                    :               .               :  |<-->  . (more)  .    [%d:%03d]\n", child, state);
-		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
-		break;
-	case 2:
-		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
-		fprintf(stdout, "                    :               .               |<-:--->  . (more)  .    [%d:%03d]\n", child, state);
-		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
-		break;
-	}
-	fflush(stdout);
-	dummy = lockf(fileno(stdout), F_ULOCK, 0);
-	show = 0;
-	return;
-}
-
-void
-print_more(void)
-{
-	show = 1;
-}
-
-void
 print_simple(int child, const char *msgs[])
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -2569,6 +2746,47 @@ print_simple_string(int child, const char *msgs[], const char *string)
 }
 
 void
+print_string_state(int child, const char *msgs[], const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_triple_string(int child, const char *msgs[], const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], "", child, state);
+	fprintf(stdout, msgs[child], string, child, state);
+	fprintf(stdout, msgs[child], "", child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_more(int child)
+{
+	show = 1;
+}
+
+void
+print_less(int child)
+{
+	static const char *msgs[] = {
+		"         . %1$6.6s . | <------         .         ------> :                    [%2$d:%3$03d]\n",
+		"                    : <------         .         ------> | . %1$-6.6s .         [%2$d:%3$03d]\n",
+		"                    : <------         .      ------> |  : . %1$-6.6s .         [%2$d:%3$03d]\n",
+		"         . %1$6.6s . : <------         .      ------> :> : . %1$-6.6s .         [%2$d:%3$03d]\n",
+	};
+
+	if (show && verbose > 0)
+		print_triple_string(child, msgs, "(more)");
+	show = 0;
+}
+
+void
 print_pipe(int child)
 {
 	static const char *msgs[] = {
@@ -2577,22 +2795,22 @@ print_pipe(int child)
 		"                    .  .                                .                   \n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_simple(child, msgs);
 }
 
 void
-print_open(int child)
+print_open(int child, const char *name)
 {
 	static const char *msgs[] = {
-		"  open()      ----->v                                   .                   \n",
-		"                    |                                   v<-----     open()  \n",
-		"                    |                                v<-+------     open()  \n",
-		"                    .                                .  .                   \n",
+		"  open()      ----->v %-30.30s    .                   \n",
+		"                    | %-30.30s    v<-----     open()  \n",
+		"                    | %-30.30s v<-+------     open()  \n",
+		"                    . %-30.30s .  .                   \n",
 	};
 
-	if (verbose > 3)
-		print_simple(child, msgs);
+	if (show && verbose > 3)
+		print_simple_string(child, msgs, name);
 }
 
 void
@@ -2605,7 +2823,7 @@ print_close(int child)
 		"                    .                                .  .                   \n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_simple(child, msgs);
 }
 
@@ -2622,8 +2840,6 @@ print_preamble(int child)
 	if (verbose > 0)
 		print_simple(child, msgs);
 }
-
-void print_string_state(int child, const char *msgs[], const char *string);
 
 void
 print_failure(int child, const char *string)
@@ -2809,7 +3025,7 @@ print_timeout(int child)
 		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
 	};
 
-	if (show_timeout || verbose > 0) {
+	if (show_timeout || verbose > 1) {
 		print_double_int(child, msgs, child, state);
 		show_timeout--;
 	}
@@ -2825,17 +3041,8 @@ print_nothing(int child)
 		"- - - - - - - - - - |- - - - - - -nothing! - - - - - | -|- - - - - - - - - - [%d:%03d]\n",
 	};
 
-	if (verbose > 1)
+	if (show && verbose > 1)
 		print_double_int(child, msgs, child, state);
-}
-
-void
-print_string_state(int child, const char *msgs[], const char *string)
-{
-	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child], string, child, state);
-	fflush(stdout);
-	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void
@@ -2848,7 +3055,7 @@ print_syscall(int child, const char *command)
 		"                    |          %-14s        |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if ((verbose && show) || (verbose > 5 && show_msg))
 		print_string_state(child, msgs, command);
 }
 
@@ -2862,7 +3069,7 @@ print_tx_prim(int child, const char *command)
 		"                    |                                |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -2876,7 +3083,7 @@ print_rx_prim(int child, const char *command)
 		"                    |         <%16s>     |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -3078,7 +3285,7 @@ print_ioctl(int child, int cmd, intptr_t arg)
 }
 
 void
-print_ti_poll(int child, int cmd, intptr_t arg)
+print_ti_poll(int child, short events)
 {
 	static const char *msgs[] = {
 		"--poll(2)---------->|       %16s            |                    [%d:%03d]\n",
@@ -3088,14 +3295,14 @@ print_ti_poll(int child, int cmd, intptr_t arg)
 	};
 
 	if (show && verbose > 1)
-		print_string_state(child, msgs, poll_string(cmd, arg));
+		print_string_state(child, msgs, poll_string(events));
 }
 
 void
 print_poll(int child, short events)
 {
 	if (verbose > 3)
-		print_ti_poll(child, cmd, arg);
+		print_ti_poll(child, events);
 }
 
 void
@@ -3931,7 +4138,7 @@ stream_start(int child, int index)
 		addrs[child].sin_family = AF_INET;
 		addrs[child].sin_port = htons(ports[child] + offset);
 		inet_aton(addr_strings[child], &addrs[child].sin_addr);
-		if (test_open(child, devname, O_RDWR) != __RESULT_SUCCESS)
+		if (test_open(child, devname, O_RDWR | O_NONBLOCK) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
 		if (test_ioctl(child, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
@@ -3954,24 +4161,6 @@ stream_stop(int child)
 	default:
 		return __RESULT_FAILURE;
 	}
-}
-
-void
-test_sleep(int child, unsigned long t)
-{
-	print_waiting(child, t);
-	sleep(t);
-}
-
-void
-test_msleep(int child, unsigned long m)
-{
-	struct timespec time;
-
-	time.tv_sec = m / 1000;
-	time.tv_nsec = (m % 1000) * 1000000;
-	print_mwaiting(child, &time);
-	nanosleep(&time, NULL);
 }
 
 /*
@@ -29693,7 +29882,7 @@ test_case_7_2_conn(int child)
 		MORE_flag = T_MORE;
 		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS) {
 			state++;
-			print_more();
+			print_more(child);
 			test_msleep(child, LONG_WAIT);
 			test_data = "Hi Threre.";
 			MORE_flag = 0;
@@ -29714,7 +29903,7 @@ test_case_7_2_conn(int child)
 	snd_bytes += 10;
 	s++;
 	state++;
-	print_more();
+	print_more(child);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -29722,7 +29911,7 @@ test_case_7_2_conn(int child)
 	fprintf(stdout, "Sent %3d messages making %6lu bytes.\n", s, (ulong) snd_bytes);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
-	print_more();
+	print_more(child);
 	return (__RESULT_FAILURE);
 }
 
@@ -29755,7 +29944,7 @@ test_case_7_2_resp(int child)
 	if (!joined)
 		goto failure;
 	state++;
-	print_more();
+	print_more(child);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -29763,7 +29952,7 @@ test_case_7_2_resp(int child)
 	fprintf(stdout, "Rcvd %3d messages making %6lu bytes.\n", r, (ulong) rcv_bytes);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
-	print_more();
+	print_more(child);
 	return (__RESULT_FAILURE);
 }
 
@@ -41600,173 +41789,173 @@ struct test_case {
 		numb_case_2_2_6, tgrp_case_2_2_6, NULL, name_case_2_2_6, NULL, desc_case_2_2_6, sref_case_2_2_6, {
 	&test_2_2_6_conn, &test_2_2_6_resp, &test_2_2_6_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
 		numb_case_3_1, tgrp_case_3_1, NULL, name_case_3_1, NULL, desc_case_3_1, sref_case_3_1, {
-	&test_3_1_conn, &test_3_1_resp, &test_3_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_3_1_conn, &test_3_1_resp, &test_3_1_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_3_2, tgrp_case_3_2, NULL, name_case_3_2, NULL, desc_case_3_2, sref_case_3_2, {
-	&test_3_2_conn, &test_3_2_resp, &test_3_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_3_2_conn, &test_3_2_resp, &test_3_2_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_3_3, tgrp_case_3_3, NULL, name_case_3_3, NULL, desc_case_3_3, sref_case_3_3, {
-	&test_3_3_conn, &test_3_3_resp, &test_3_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_3_3_conn, &test_3_3_resp, &test_3_3_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_3_4, tgrp_case_3_4, NULL, name_case_3_4, NULL, desc_case_3_4, sref_case_3_4, {
-	&test_3_4_conn, &test_3_4_resp, &test_3_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_3_4_conn, &test_3_4_resp, &test_3_4_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_3_5, tgrp_case_3_5, NULL, name_case_3_5, NULL, desc_case_3_5, sref_case_3_5, {
-	&test_3_5_conn, &test_3_5_resp, &test_3_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_3_5_conn, &test_3_5_resp, &test_3_5_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_3_6, tgrp_case_3_6, NULL, name_case_3_6, NULL, desc_case_3_6, sref_case_3_6, {
-	&test_3_6_conn, &test_3_6_resp, &test_3_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_3_6_conn, &test_3_6_resp, &test_3_6_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_1_1, tgrp_case_4_1_1, NULL, name_case_4_1_1, NULL, desc_case_4_1_1, sref_case_4_1_1, {
-	&test_4_1_1_conn, &test_4_1_1_resp, &test_4_1_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_1_conn, &test_4_1_1_resp, &test_4_1_1_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_1_2, tgrp_case_4_1_2, NULL, name_case_4_1_2, NULL, desc_case_4_1_2, sref_case_4_1_2, {
-	&test_4_1_2_conn, &test_4_1_2_resp, &test_4_1_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_2_conn, &test_4_1_2_resp, &test_4_1_2_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_1_3, tgrp_case_4_1_3, NULL, name_case_4_1_3, NULL, desc_case_4_1_3, sref_case_4_1_3, {
-	&test_4_1_3_conn, &test_4_1_3_resp, &test_4_1_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_3_conn, &test_4_1_3_resp, &test_4_1_3_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_1_4, tgrp_case_4_1_4, NULL, name_case_4_1_4, NULL, desc_case_4_1_4, sref_case_4_1_4, {
-	&test_4_1_4_conn, &test_4_1_4_resp, &test_4_1_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_4_conn, &test_4_1_4_resp, &test_4_1_4_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_1_5, tgrp_case_4_1_5, NULL, name_case_4_1_5, NULL, desc_case_4_1_5, sref_case_4_1_5, {
-	&test_4_1_5_conn, &test_4_1_5_resp, &test_4_1_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_5_conn, &test_4_1_5_resp, &test_4_1_5_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_1_6, tgrp_case_4_1_6, NULL, name_case_4_1_6, NULL, desc_case_4_1_6, sref_case_4_1_6, {
-	&test_4_1_6_conn, &test_4_1_6_resp, &test_4_1_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_6_conn, &test_4_1_6_resp, &test_4_1_6_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_1_7, tgrp_case_4_1_7, NULL, name_case_4_1_7, NULL, desc_case_4_1_7, sref_case_4_1_7, {
-	&test_4_1_7_conn, &test_4_1_7_resp, &test_4_1_7_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_7_conn, &test_4_1_7_resp, &test_4_1_7_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_1_8, tgrp_case_4_1_8, NULL, name_case_4_1_8, NULL, desc_case_4_1_8, sref_case_4_1_8, {
-	&test_4_1_8_conn, &test_4_1_8_resp, &test_4_1_8_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_8_conn, &test_4_1_8_resp, &test_4_1_8_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_1_9, tgrp_case_4_1_9, NULL, name_case_4_1_9, NULL, desc_case_4_1_9, sref_case_4_1_9, {
-	&test_4_1_9_conn, &test_4_1_9_resp, &test_4_1_9_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_1_9_conn, &test_4_1_9_resp, &test_4_1_9_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_2_1, tgrp_case_4_2_1, NULL, name_case_4_2_1, NULL, desc_case_4_2_1, sref_case_4_2_1, {
-	&test_4_2_1_conn, &test_4_2_1_resp, &test_4_2_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_2_1_conn, &test_4_2_1_resp, &test_4_2_1_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_2_2, tgrp_case_4_2_2, NULL, name_case_4_2_2, NULL, desc_case_4_2_2, sref_case_4_2_2, {
-	&test_4_2_2_conn, &test_4_2_2_resp, &test_4_2_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_2_2_conn, &test_4_2_2_resp, &test_4_2_2_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_1_1, tgrp_case_4_3_1_1, NULL, name_case_4_3_1_1, NULL, desc_case_4_3_1_1, sref_case_4_3_1_1, {
-	&test_4_3_1_1_conn, &test_4_3_1_1_resp, &test_4_3_1_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_1_1_conn, &test_4_3_1_1_resp, &test_4_3_1_1_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_1_2, tgrp_case_4_3_1_2, NULL, name_case_4_3_1_2, NULL, desc_case_4_3_1_2, sref_case_4_3_1_2, {
-	&test_4_3_1_2_conn, &test_4_3_1_2_resp, &test_4_3_1_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_1_2_conn, &test_4_3_1_2_resp, &test_4_3_1_2_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_1_3, tgrp_case_4_3_1_3, NULL, name_case_4_3_1_3, NULL, desc_case_4_3_1_3, sref_case_4_3_1_3, {
-	&test_4_3_1_3_conn, &test_4_3_1_3_resp, &test_4_3_1_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_1_3_conn, &test_4_3_1_3_resp, &test_4_3_1_3_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_1_4, tgrp_case_4_3_1_4, NULL, name_case_4_3_1_4, NULL, desc_case_4_3_1_4, sref_case_4_3_1_4, {
-	&test_4_3_1_4_conn, &test_4_3_1_4_resp, &test_4_3_1_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_1_4_conn, &test_4_3_1_4_resp, &test_4_3_1_4_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_1_5, tgrp_case_4_3_1_5, NULL, name_case_4_3_1_5, NULL, desc_case_4_3_1_5, sref_case_4_3_1_5, {
-	&test_4_3_1_5_conn, &test_4_3_1_5_resp, &test_4_3_1_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_1_5_conn, &test_4_3_1_5_resp, &test_4_3_1_5_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_1_6, tgrp_case_4_3_1_6, NULL, name_case_4_3_1_6, NULL, desc_case_4_3_1_6, sref_case_4_3_1_6, {
-	&test_4_3_1_6_conn, &test_4_3_1_6_resp, &test_4_3_1_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_1_6_conn, &test_4_3_1_6_resp, &test_4_3_1_6_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_2_1, tgrp_case_4_3_2_1, NULL, name_case_4_3_2_1, NULL, desc_case_4_3_2_1, sref_case_4_3_2_1, {
-	&test_4_3_2_1_conn, &test_4_3_2_1_resp, &test_4_3_2_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_2_1_conn, &test_4_3_2_1_resp, &test_4_3_2_1_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_2_2, tgrp_case_4_3_2_2, NULL, name_case_4_3_2_2, NULL, desc_case_4_3_2_2, sref_case_4_3_2_2, {
-	&test_4_3_2_2_conn, &test_4_3_2_2_resp, &test_4_3_2_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_2_2_conn, &test_4_3_2_2_resp, &test_4_3_2_2_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_2_3, tgrp_case_4_3_2_3, NULL, name_case_4_3_2_3, NULL, desc_case_4_3_2_3, sref_case_4_3_2_3, {
-	&test_4_3_2_3_conn, &test_4_3_2_3_resp, &test_4_3_2_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_2_3_conn, &test_4_3_2_3_resp, &test_4_3_2_3_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_2_4, tgrp_case_4_3_2_4, NULL, name_case_4_3_2_4, NULL, desc_case_4_3_2_4, sref_case_4_3_2_4, {
-	&test_4_3_2_4_conn, &test_4_3_2_4_resp, &test_4_3_2_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_2_4_conn, &test_4_3_2_4_resp, &test_4_3_2_4_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_2_5, tgrp_case_4_3_2_5, NULL, name_case_4_3_2_5, NULL, desc_case_4_3_2_5, sref_case_4_3_2_5, {
-	&test_4_3_2_5_conn, &test_4_3_2_5_resp, &test_4_3_2_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_2_5_conn, &test_4_3_2_5_resp, &test_4_3_2_5_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_3_1, tgrp_case_4_3_3_1, NULL, name_case_4_3_3_1, NULL, desc_case_4_3_3_1, sref_case_4_3_3_1, {
-	&test_4_3_3_1_conn, &test_4_3_3_1_resp, &test_4_3_3_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_3_1_conn, &test_4_3_3_1_resp, &test_4_3_3_1_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_4_1, tgrp_case_4_3_4_1, NULL, name_case_4_3_4_1, NULL, desc_case_4_3_4_1, sref_case_4_3_4_1, {
-	&test_4_3_4_1_conn, &test_4_3_4_1_resp, &test_4_3_4_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_1_conn, &test_4_3_4_1_resp, &test_4_3_4_1_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_4_2, tgrp_case_4_3_4_2, NULL, name_case_4_3_4_2, NULL, desc_case_4_3_4_2, sref_case_4_3_4_2, {
-	&test_4_3_4_2_conn, &test_4_3_4_2_resp, &test_4_3_4_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_2_conn, &test_4_3_4_2_resp, &test_4_3_4_2_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_4_3, tgrp_case_4_3_4_3, NULL, name_case_4_3_4_3, NULL, desc_case_4_3_4_3, sref_case_4_3_4_3, {
-	&test_4_3_4_3_conn, &test_4_3_4_3_resp, &test_4_3_4_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_3_conn, &test_4_3_4_3_resp, &test_4_3_4_3_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_4_4, tgrp_case_4_3_4_4, NULL, name_case_4_3_4_4, NULL, desc_case_4_3_4_4, sref_case_4_3_4_4, {
-	&test_4_3_4_4_conn, &test_4_3_4_4_resp, &test_4_3_4_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_4_conn, &test_4_3_4_4_resp, &test_4_3_4_4_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_4_5, tgrp_case_4_3_4_5, NULL, name_case_4_3_4_5, NULL, desc_case_4_3_4_5, sref_case_4_3_4_5, {
-	&test_4_3_4_5_conn, &test_4_3_4_5_resp, &test_4_3_4_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_5_conn, &test_4_3_4_5_resp, &test_4_3_4_5_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_4_6, tgrp_case_4_3_4_6, NULL, name_case_4_3_4_6, NULL, desc_case_4_3_4_6, sref_case_4_3_4_6, {
-	&test_4_3_4_6_conn, &test_4_3_4_6_resp, &test_4_3_4_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_6_conn, &test_4_3_4_6_resp, &test_4_3_4_6_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_4_7, tgrp_case_4_3_4_7, NULL, name_case_4_3_4_7, NULL, desc_case_4_3_4_7, sref_case_4_3_4_7, {
-	&test_4_3_4_7_conn, &test_4_3_4_7_resp, &test_4_3_4_7_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_7_conn, &test_4_3_4_7_resp, &test_4_3_4_7_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_4_8, tgrp_case_4_3_4_8, NULL, name_case_4_3_4_8, NULL, desc_case_4_3_4_8, sref_case_4_3_4_8, {
-	&test_4_3_4_8_conn, &test_4_3_4_8_resp, &test_4_3_4_8_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_8_conn, &test_4_3_4_8_resp, &test_4_3_4_8_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_4_9, tgrp_case_4_3_4_9, NULL, name_case_4_3_4_9, NULL, desc_case_4_3_4_9, sref_case_4_3_4_9, {
-	&test_4_3_4_9_conn, &test_4_3_4_9_resp, &test_4_3_4_9_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_9_conn, &test_4_3_4_9_resp, &test_4_3_4_9_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_4_10, tgrp_case_4_3_4_10, NULL, name_case_4_3_4_10, NULL, desc_case_4_3_4_10, sref_case_4_3_4_10, {
-	&test_4_3_4_10_conn, &test_4_3_4_10_resp, &test_4_3_4_10_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_10_conn, &test_4_3_4_10_resp, &test_4_3_4_10_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_4_11, tgrp_case_4_3_4_11, NULL, name_case_4_3_4_11, NULL, desc_case_4_3_4_11, sref_case_4_3_4_11, {
-	&test_4_3_4_11_conn, &test_4_3_4_11_resp, &test_4_3_4_11_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_11_conn, &test_4_3_4_11_resp, &test_4_3_4_11_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_4_12, tgrp_case_4_3_4_12, NULL, name_case_4_3_4_12, NULL, desc_case_4_3_4_12, sref_case_4_3_4_12, {
-	&test_4_3_4_12_conn, &test_4_3_4_12_resp, &test_4_3_4_12_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_12_conn, &test_4_3_4_12_resp, &test_4_3_4_12_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_4_13, tgrp_case_4_3_4_13, NULL, name_case_4_3_4_13, NULL, desc_case_4_3_4_13, sref_case_4_3_4_13, {
-	&test_4_3_4_13_conn, &test_4_3_4_13_resp, &test_4_3_4_13_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_4_13_conn, &test_4_3_4_13_resp, &test_4_3_4_13_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_1, tgrp_case_4_3_5_1, NULL, name_case_4_3_5_1, NULL, desc_case_4_3_5_1, sref_case_4_3_5_1, {
-	&test_4_3_5_1_conn, &test_4_3_5_1_resp, &test_4_3_5_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_1_conn, &test_4_3_5_1_resp, &test_4_3_5_1_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_2, tgrp_case_4_3_5_2, NULL, name_case_4_3_5_2, NULL, desc_case_4_3_5_2, sref_case_4_3_5_2, {
-	&test_4_3_5_2_conn, &test_4_3_5_2_resp, &test_4_3_5_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_2_conn, &test_4_3_5_2_resp, &test_4_3_5_2_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_3, tgrp_case_4_3_5_3, NULL, name_case_4_3_5_3, NULL, desc_case_4_3_5_3, sref_case_4_3_5_3, {
-	&test_4_3_5_3_conn, &test_4_3_5_3_resp, &test_4_3_5_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_3_conn, &test_4_3_5_3_resp, &test_4_3_5_3_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_4, tgrp_case_4_3_5_4, NULL, name_case_4_3_5_4, NULL, desc_case_4_3_5_4, sref_case_4_3_5_4, {
-	&test_4_3_5_4_conn, &test_4_3_5_4_resp, &test_4_3_5_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_4_conn, &test_4_3_5_4_resp, &test_4_3_5_4_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_5, tgrp_case_4_3_5_5, NULL, name_case_4_3_5_5, NULL, desc_case_4_3_5_5, sref_case_4_3_5_5, {
-	&test_4_3_5_5_conn, &test_4_3_5_5_resp, &test_4_3_5_5_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_5_conn, &test_4_3_5_5_resp, &test_4_3_5_5_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_6, tgrp_case_4_3_5_6, NULL, name_case_4_3_5_6, NULL, desc_case_4_3_5_6, sref_case_4_3_5_6, {
-	&test_4_3_5_6_conn, &test_4_3_5_6_resp, &test_4_3_5_6_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_6_conn, &test_4_3_5_6_resp, &test_4_3_5_6_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_7, tgrp_case_4_3_5_7, NULL, name_case_4_3_5_7, NULL, desc_case_4_3_5_7, sref_case_4_3_5_7, {
-	&test_4_3_5_7_conn, &test_4_3_5_7_resp, &test_4_3_5_7_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_7_conn, &test_4_3_5_7_resp, &test_4_3_5_7_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_8, tgrp_case_4_3_5_8, NULL, name_case_4_3_5_8, NULL, desc_case_4_3_5_8, sref_case_4_3_5_8, {
-	&test_4_3_5_8_conn, &test_4_3_5_8_resp, &test_4_3_5_8_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_8_conn, &test_4_3_5_8_resp, &test_4_3_5_8_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_9, tgrp_case_4_3_5_9, NULL, name_case_4_3_5_9, NULL, desc_case_4_3_5_9, sref_case_4_3_5_9, {
-	&test_4_3_5_9_conn, &test_4_3_5_9_resp, &test_4_3_5_9_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_9_conn, &test_4_3_5_9_resp, &test_4_3_5_9_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_10, tgrp_case_4_3_5_10, NULL, name_case_4_3_5_10, NULL, desc_case_4_3_5_10, sref_case_4_3_5_10, {
-	&test_4_3_5_10_conn, &test_4_3_5_10_resp, &test_4_3_5_10_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_10_conn, &test_4_3_5_10_resp, &test_4_3_5_10_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_11, tgrp_case_4_3_5_11, NULL, name_case_4_3_5_11, NULL, desc_case_4_3_5_11, sref_case_4_3_5_11, {
-	&test_4_3_5_11_conn, &test_4_3_5_11_resp, &test_4_3_5_11_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_11_conn, &test_4_3_5_11_resp, &test_4_3_5_11_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_12, tgrp_case_4_3_5_12, NULL, name_case_4_3_5_12, NULL, desc_case_4_3_5_12, sref_case_4_3_5_12, {
-	&test_4_3_5_12_conn, &test_4_3_5_12_resp, &test_4_3_5_12_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_12_conn, &test_4_3_5_12_resp, &test_4_3_5_12_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_13, tgrp_case_4_3_5_13, NULL, name_case_4_3_5_13, NULL, desc_case_4_3_5_13, sref_case_4_3_5_13, {
-	&test_4_3_5_13_conn, &test_4_3_5_13_resp, &test_4_3_5_13_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_13_conn, &test_4_3_5_13_resp, &test_4_3_5_13_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_14, tgrp_case_4_3_5_14, NULL, name_case_4_3_5_14, NULL, desc_case_4_3_5_14, sref_case_4_3_5_14, {
-	&test_4_3_5_14_conn, &test_4_3_5_14_resp, &test_4_3_5_14_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_14_conn, &test_4_3_5_14_resp, &test_4_3_5_14_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_15, tgrp_case_4_3_5_15, NULL, name_case_4_3_5_15, NULL, desc_case_4_3_5_15, sref_case_4_3_5_15, {
-	&test_4_3_5_15_conn, &test_4_3_5_15_resp, &test_4_3_5_15_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_15_conn, &test_4_3_5_15_resp, &test_4_3_5_15_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_16, tgrp_case_4_3_5_16, NULL, name_case_4_3_5_16, NULL, desc_case_4_3_5_16, sref_case_4_3_5_16, {
-	&test_4_3_5_16_conn, &test_4_3_5_16_resp, &test_4_3_5_16_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_16_conn, &test_4_3_5_16_resp, &test_4_3_5_16_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_17, tgrp_case_4_3_5_17, NULL, name_case_4_3_5_17, NULL, desc_case_4_3_5_17, sref_case_4_3_5_17, {
-	&test_4_3_5_17_conn, &test_4_3_5_17_resp, &test_4_3_5_17_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_17_conn, &test_4_3_5_17_resp, &test_4_3_5_17_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_18, tgrp_case_4_3_5_18, NULL, name_case_4_3_5_18, NULL, desc_case_4_3_5_18, sref_case_4_3_5_18, {
-	&test_4_3_5_18_conn, &test_4_3_5_18_resp, &test_4_3_5_18_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_18_conn, &test_4_3_5_18_resp, &test_4_3_5_18_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_19, tgrp_case_4_3_5_19, NULL, name_case_4_3_5_19, NULL, desc_case_4_3_5_19, sref_case_4_3_5_19, {
-	&test_4_3_5_19_conn, &test_4_3_5_19_resp, &test_4_3_5_19_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_19_conn, &test_4_3_5_19_resp, &test_4_3_5_19_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_20, tgrp_case_4_3_5_20, NULL, name_case_4_3_5_20, NULL, desc_case_4_3_5_20, sref_case_4_3_5_20, {
-	&test_4_3_5_20_conn, &test_4_3_5_20_resp, &test_4_3_5_20_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_20_conn, &test_4_3_5_20_resp, &test_4_3_5_20_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_21, tgrp_case_4_3_5_21, NULL, name_case_4_3_5_21, NULL, desc_case_4_3_5_21, sref_case_4_3_5_21, {
-	&test_4_3_5_21_conn, &test_4_3_5_21_resp, &test_4_3_5_21_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_21_conn, &test_4_3_5_21_resp, &test_4_3_5_21_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_22, tgrp_case_4_3_5_22, NULL, name_case_4_3_5_22, NULL, desc_case_4_3_5_22, sref_case_4_3_5_22, {
-	&test_4_3_5_22_conn, &test_4_3_5_22_resp, &test_4_3_5_22_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_22_conn, &test_4_3_5_22_resp, &test_4_3_5_22_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_23, tgrp_case_4_3_5_23, NULL, name_case_4_3_5_23, NULL, desc_case_4_3_5_23, sref_case_4_3_5_23, {
-	&test_4_3_5_23_conn, &test_4_3_5_23_resp, &test_4_3_5_23_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_23_conn, &test_4_3_5_23_resp, &test_4_3_5_23_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_24, tgrp_case_4_3_5_24, NULL, name_case_4_3_5_24, NULL, desc_case_4_3_5_24, sref_case_4_3_5_24, {
-	&test_4_3_5_24_conn, &test_4_3_5_24_resp, &test_4_3_5_24_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_24_conn, &test_4_3_5_24_resp, &test_4_3_5_24_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_25, tgrp_case_4_3_5_25, NULL, name_case_4_3_5_25, NULL, desc_case_4_3_5_25, sref_case_4_3_5_25, {
-	&test_4_3_5_25_conn, &test_4_3_5_25_resp, &test_4_3_5_25_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_25_conn, &test_4_3_5_25_resp, &test_4_3_5_25_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_26, tgrp_case_4_3_5_26, NULL, name_case_4_3_5_26, NULL, desc_case_4_3_5_26, sref_case_4_3_5_26, {
-	&test_4_3_5_26_conn, &test_4_3_5_26_resp, &test_4_3_5_26_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_26_conn, &test_4_3_5_26_resp, &test_4_3_5_26_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_27, tgrp_case_4_3_5_27, NULL, name_case_4_3_5_27, NULL, desc_case_4_3_5_27, sref_case_4_3_5_27, {
-	&test_4_3_5_27_conn, &test_4_3_5_27_resp, &test_4_3_5_27_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_27_conn, &test_4_3_5_27_resp, &test_4_3_5_27_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_28, tgrp_case_4_3_5_28, NULL, name_case_4_3_5_28, NULL, desc_case_4_3_5_28, sref_case_4_3_5_28, {
-	&test_4_3_5_28_conn, &test_4_3_5_28_resp, &test_4_3_5_28_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_28_conn, &test_4_3_5_28_resp, &test_4_3_5_28_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_29, tgrp_case_4_3_5_29, NULL, name_case_4_3_5_29, NULL, desc_case_4_3_5_29, sref_case_4_3_5_29, {
-	&test_4_3_5_29_conn, &test_4_3_5_29_resp, &test_4_3_5_29_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_29_conn, &test_4_3_5_29_resp, &test_4_3_5_29_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_30, tgrp_case_4_3_5_30, NULL, name_case_4_3_5_30, NULL, desc_case_4_3_5_30, sref_case_4_3_5_30, {
-	&test_4_3_5_30_conn, &test_4_3_5_30_resp, &test_4_3_5_30_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_30_conn, &test_4_3_5_30_resp, &test_4_3_5_30_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_31, tgrp_case_4_3_5_31, NULL, name_case_4_3_5_31, NULL, desc_case_4_3_5_31, sref_case_4_3_5_31, {
-	&test_4_3_5_31_conn, &test_4_3_5_31_resp, &test_4_3_5_31_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_31_conn, &test_4_3_5_31_resp, &test_4_3_5_31_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_32, tgrp_case_4_3_5_32, NULL, name_case_4_3_5_32, NULL, desc_case_4_3_5_32, sref_case_4_3_5_32, {
-	&test_4_3_5_32_conn, &test_4_3_5_32_resp, &test_4_3_5_32_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_32_conn, &test_4_3_5_32_resp, &test_4_3_5_32_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_33, tgrp_case_4_3_5_33, NULL, name_case_4_3_5_33, NULL, desc_case_4_3_5_33, sref_case_4_3_5_33, {
-	&test_4_3_5_33_conn, &test_4_3_5_33_resp, &test_4_3_5_33_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_33_conn, &test_4_3_5_33_resp, &test_4_3_5_33_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_34, tgrp_case_4_3_5_34, NULL, name_case_4_3_5_34, NULL, desc_case_4_3_5_34, sref_case_4_3_5_34, {
-	&test_4_3_5_34_conn, &test_4_3_5_34_resp, &test_4_3_5_34_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_34_conn, &test_4_3_5_34_resp, &test_4_3_5_34_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_35, tgrp_case_4_3_5_35, NULL, name_case_4_3_5_35, NULL, desc_case_4_3_5_35, sref_case_4_3_5_35, {
-	&test_4_3_5_35_conn, &test_4_3_5_35_resp, &test_4_3_5_35_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_35_conn, &test_4_3_5_35_resp, &test_4_3_5_35_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_36, tgrp_case_4_3_5_36, NULL, name_case_4_3_5_36, NULL, desc_case_4_3_5_36, sref_case_4_3_5_36, {
-	&test_4_3_5_36_conn, &test_4_3_5_36_resp, &test_4_3_5_36_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_36_conn, &test_4_3_5_36_resp, &test_4_3_5_36_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_37, tgrp_case_4_3_5_37, NULL, name_case_4_3_5_37, NULL, desc_case_4_3_5_37, sref_case_4_3_5_37, {
-	&test_4_3_5_37_conn, &test_4_3_5_37_resp, &test_4_3_5_37_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_37_conn, &test_4_3_5_37_resp, &test_4_3_5_37_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_4_3_5_38, tgrp_case_4_3_5_38, NULL, name_case_4_3_5_38, NULL, desc_case_4_3_5_38, sref_case_4_3_5_38, {
-	&test_4_3_5_38_conn, &test_4_3_5_38_resp, &test_4_3_5_38_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_4_3_5_38_conn, &test_4_3_5_38_resp, &test_4_3_5_38_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_5_1, tgrp_case_5_1, NULL, name_case_5_1, NULL, desc_case_5_1, sref_case_5_1, {
-	&test_5_1_conn, &test_5_1_resp, &test_5_1_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_5_1_conn, &test_5_1_resp, &test_5_1_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_5_2, tgrp_case_5_2, NULL, name_case_5_2, NULL, desc_case_5_2, sref_case_5_2, {
-	&test_5_2_conn, &test_5_2_resp, &test_5_2_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_5_2_conn, &test_5_2_resp, &test_5_2_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_5_3, tgrp_case_5_3, NULL, name_case_5_3, NULL, desc_case_5_3, sref_case_5_3, {
-	&test_5_3_conn, &test_5_3_resp, &test_5_3_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_5_3_conn, &test_5_3_resp, &test_5_3_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 		numb_case_5_4, tgrp_case_5_4, NULL, name_case_5_4, NULL, desc_case_5_4, sref_case_5_4, {
-	&test_5_4_conn, &test_5_4_resp, &test_5_4_list}, &begin_tests, &end_tests, 0, __RESULT_NOTAPPL}, {
+	&test_5_4_conn, &test_5_4_resp, &test_5_4_list}, &begin_tests, &end_tests, 0, 0, __RESULT_NOTAPPL, __RESULT_NOTAPPL}, {
 #if 0
 		numb_case_5_5_1, tgrp_case_5_5_1, NULL, name_case_5_5_1, NULL, desc_case_5_5_1, sref_case_5_5_1, {
 	&test_5_5_1_conn, &test_5_5_1_resp, &test_5_5_1_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {

@@ -14955,8 +14955,8 @@ test_4_1a_11_ptu(int child)
 				}
 				goto failure;
 			}
-			/* (11) Send another data message to SP A and send a status "Ready"
-			   message from SP B to SP A with the appropriate sequence numbers. */
+			/* (11) Send another data message to SP A and send a status "Ready" message 
+			   from SP B to SP A with the appropriate sequence numbers. */
 			if (do_signal(child, __TEST_DATA))
 				goto failure;
 			fsn[0] = bsn[1];
@@ -18739,7 +18739,7 @@ test_8_14_ptu(int child)
 		if (expect(child, NORMAL_WAIT, __EVENT_NO_MSG))
 			goto failure;
 		state++;
-		test_msleep(child, NORMAL_WAIT); /* let iut timeout */
+		test_msleep(child, NORMAL_WAIT);	/* let iut timeout */
 		state++;
 		break;
 	default:

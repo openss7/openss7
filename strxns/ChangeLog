@@ -1,3 +1,8 @@
+2007-03-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/testsuite-ip.at: reworking test programs and suites
+	* tests/testsuite-np_ip.at: reworking test programs and suites
+
 2007-03-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/util/init/strxns.sh: ubuntu looks for lsb info in init scripts

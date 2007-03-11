@@ -78,7 +78,7 @@ function test_m2ua_as() {
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     if test $at_arg_given_sync = : ; then sync || : ; fi
-    if test-m2ua_as $options -e -o $1
+    if test-m2ua_as $options -o $1
     then
 	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS
 	then

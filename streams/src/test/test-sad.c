@@ -989,6 +989,12 @@ ioctl_string(int cmd, intptr_t arg)
 		return ("TM_IOC_PSIGNAL");
 	case TM_IOC_NSIGNAL:
 		return ("TM_IOC_NSIGNAL");
+	case SAD_VML:
+		return ("SAD_VML");
+	case SAD_GAP:
+		return ("SAD_GAP");
+	case SAD_SAP:
+		return ("SAD_SAP");
 	default:
 		return ("(unexpected)");
 	}

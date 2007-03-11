@@ -71,13 +71,15 @@
 
 #ident "@(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:28 $"
 
-static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:28 $";
+static char const ident[] =
+    "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:31:28 $";
 
 #include <stdio.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
@@ -85,6 +87,7 @@ static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.
 #include <sys/poll.h>
 #include <sys/time.h>
 #include <signal.h>
+#include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -94,22 +97,24 @@ static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.
 
 #define HOST_BUF_LEN 256
 
-int verbose = 1;
 int rep_time = 1;
 
 static int timer_timeout = 0;
 
-static void timer_handler(int signum)
+static void
+timer_handler(int signum)
 {
 	if (signum == SIGALRM)
 		timer_timeout = 1;
 	return;
 }
 
-static int timer_sethandler(void)
+static int
+timer_sethandler(void)
 {
 	sigset_t mask;
 	struct sigaction act;
+
 	act.sa_handler = timer_handler;
 	act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_restorer = NULL;
@@ -122,9 +127,11 @@ static int timer_sethandler(void)
 	return 0;
 }
 
-static int start_timer(void)
+static int
+start_timer(void)
 {
 	struct itimerval setting = { {0, 0}, {rep_time, 0} };
+
 	if (timer_sethandler())
 		return -1;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
@@ -136,26 +143,61 @@ static int start_timer(void)
 static struct sockaddr_in loc_addr = { AF_INET, 0, {INADDR_ANY}, };
 static struct sockaddr_in rem_addr = { AF_INET, 0, {INADDR_ANY}, };
 
-int len = 32;
+int len = MSG_LEN;
 
-int test_udpc(void)
+int nodelay = 1;
+
+int
+test_tcpc(void)
 {
 	int fd;
+	int out_offset = 0, inp_offset = 0;
+	long rtt_delay = 0;
 	long inp_count = 0, out_count = 0;
+	long inp_bytes = 0, out_bytes = 0;
 	struct pollfd pfd[1] = { {0, POLLIN | POLLOUT | POLLERR | POLLHUP, 0} };
-	unsigned char my_msg[] = "This is a good short test message that has some 64 bytes in it.";
-	unsigned char ur_msg[100];
+	unsigned char my_msg[] =
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.";
+	unsigned char ur_msg[2048];
 
 	fprintf(stderr, "Opening socket\n");
-
 	if ((fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
 		perror("socket");
 		goto dead;
 	}
-
 	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr),
 		ntohs(loc_addr.sin_port));
-
 	if (bind(fd, (struct sockaddr *) &loc_addr, sizeof(loc_addr)) < 0) {
 		perror("bind");
 		goto dead;
@@ -164,47 +206,111 @@ int test_udpc(void)
 		perror("connect");
 		goto dead;
 	}
-
+	if (fcntl(fd, F_SETFL, O_NONBLOCK) < 0) {
+		perror("fcntl");
+		goto dead;
+	}
+	if (setsockopt(fd, SOL_TCP, TCP_NODELAY, &nodelay, sizeof(nodelay)) < 0) {
+		perror("setsockopt");
+		goto dead;
+	}
 	if (start_timer()) {
 		perror("timer");
 		goto dead;
 	}
-
 	for (;;) {
 		pfd[0].fd = fd;
-		pfd[0].events = POLLIN | POLLOUT | POLLERR | POLLHUP;
+		pfd[0].events = POLLOUT | POLLIN | POLLERR | POLLHUP;
 		pfd[0].revents = 0;
 		if (timer_timeout) {
-			printf("Msgs sent: %5ld, recv: %5ld, tot: %5ld, dif: %5ld, tput: %10ld\n",
-			       inp_count, out_count, inp_count + out_count, out_count - inp_count,
-			       8 * (42 + len) * (inp_count + out_count));
+			printf
+			    ("Bytes sent: %7ld, recv: %7ld, tot: %7ld, dif: %8ld dly: %6ld\n",
+			     out_bytes, inp_bytes, out_bytes + inp_bytes,
+			     inp_bytes - out_bytes, inp_count ? rtt_delay / inp_count : 0);
 			inp_count = 0;
 			out_count = 0;
+			inp_bytes = 0;
+			out_bytes = 0;
+			rtt_delay = 0;
 			if (start_timer()) {
 				perror("timer");
 				goto dead;
 			}
+			continue;
 		}
 		if (poll(&pfd[0], 1, -1) < 0) {
-			if (errno == EINTR)
+			if (errno == EINTR || errno == EAGAIN)
 				continue;
 			perror("poll");
 			goto dead;
 		}
 		if (pfd[0].revents & POLLIN) {
-			if (recv(fd, ur_msg, sizeof(ur_msg), MSG_DONTWAIT) < 0) {
+			int rtn;
+
+			if ((rtn = recv(fd, ur_msg + inp_offset, len - inp_offset,
+					MSG_DONTWAIT)) < 0) {
+				if (errno == EINTR || errno == EAGAIN)
+					goto skip_pollin;
 				perror("recv");
 				goto dead;
 			}
-			inp_count++;
+			if (rtn) {
+				inp_bytes += rtn;
+				inp_offset += rtn;
+				if (inp_offset >= len) {
+					struct timeval tnow;
+					struct timeval *tv = (struct timeval *) ur_msg;
+
+					if (gettimeofday(&tnow, NULL) < 0) {
+						perror("gettimeofday");
+						goto dead;
+					}
+					if (tnow.tv_sec < tv->tv_sec
+					    || (tnow.tv_sec == tv->tv_sec
+						&& tnow.tv_usec < tv->tv_usec))
+						fprintf(stderr,
+							"time: %ld.%06ld before %ld.%06ld\n",
+							tnow.tv_sec, tnow.tv_usec,
+							tv->tv_sec, tv->tv_usec);
+					rtt_delay +=
+					    (tnow.tv_sec - tv->tv_sec) * 1000000 +
+					    tnow.tv_usec - tv->tv_usec;
+					inp_count++;
+					inp_offset = 0;
+				}
+			}
+			continue;
 		}
+	      skip_pollin:
 		if (pfd[0].revents & POLLOUT) {
-			if (send(fd, my_msg, len, MSG_DONTWAIT) < 0) {
+			int rtn;
+
+			if (!out_offset) {
+				struct timeval *tv = (struct timeval *) my_msg;
+
+				if (gettimeofday(tv, NULL) < 0) {
+					perror("gettimeofday");
+					goto dead;
+				}
+			}
+			if ((rtn = send(fd, my_msg + out_offset, len - out_offset,
+					MSG_DONTWAIT)) < 0) {
+				if (errno == EINTR || errno == EAGAIN)
+					goto skip_pollout;
 				perror("send");
 				goto dead;
 			}
-			out_count++;
+			if (rtn) {
+				out_bytes += rtn;
+				out_offset += rtn;
+				if (out_offset >= len) {
+					out_count++;
+					out_offset = 0;
+				}
+			}
+			continue;
 		}
+	      skip_pollout:
 		if (pfd[0].revents & POLLERR) {
 			perror("POLLERR");
 			goto dead;
@@ -215,19 +321,23 @@ int test_udpc(void)
 		}
 	}
       dead:
+	fprintf(stderr, "Error number: %d\n", errno);
 	close(fd);
 	return (0);
 }
 
+static int verbose = 1;
+
 void
-copying(int argc, char *argv[])
+splash(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
-OpenSS7 STREAMS INET - Conformanc Test Suite\n\
+%1$s: TCP Performance Test Program\n\
+%2$s\n\
 \n\
-Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2006 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -270,13 +380,14 @@ in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition
 Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
-");
+\n\
+", argv[0], ident);
 }
 
 void
 version(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
 %1$s:\n\
@@ -291,7 +402,7 @@ version(int argc, char *argv[])
 void
 usage(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stderr, "\
 Usage:\n\
@@ -305,7 +416,7 @@ Usage:\n\
 void
 help(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
 Usage:\n\
@@ -342,9 +453,10 @@ Options:\n\
 ", argv[0]);
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-	char *hostl = "127.0.0.1";
+	char *hostl = "0.0.0.0";
 	char *hostr = "127.0.0.2";
 	char hostbufl[HOST_BUF_LEN];
 	char hostbufr[HOST_BUF_LEN];
@@ -352,29 +464,33 @@ int main(int argc, char **argv)
 	char **hostrp = &hostr;
 	short port = 10000;
 	struct hostent *haddr;
-	for (;;) {
+
+	while (1) {
 		int c, val;
+
 #if defined _GNU_SOURCE
-		/* *INDENT-OFF* */
 		int option_index = 0;
+		/* *INDENT-OFF* */
 		static struct option long_options[] = {
 			{"loc_host",	required_argument,	NULL, 'l'},
 			{"rem_host",	required_argument,	NULL, 'r'},
 			{"rep_time",	required_argument,	NULL, 't'},
 			{"port",	required_argument,	NULL, 'p'},
 			{"length",	required_argument,	NULL, 'w'},
+			{"nagle",	no_argument,		NULL, 'n'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
-			{NULL, }
+			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "l:r:t:p:wqvhVC?:", long_options, &option_index);
+
+		c = getopt_long(argc, argv, "l:r:p:w:nt:qvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "l:r:t:p:w:qvhVC?");
+		c = getopt(argc, argv, "l:r:p:t:qvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -397,8 +513,14 @@ int main(int argc, char **argv)
 			break;
 		case 'w':
 			len = atoi(optarg);
-			if (len > 1024)
-				len = 1024;
+			if (len > 2048)
+				len = 2048;
+			break;
+		case 'n':
+			nodelay = 0;
+			break;
+		case 'q':
+			verbose = 0;
 			break;
 		case 'v':
 			if (optarg == NULL) {
@@ -417,7 +539,7 @@ int main(int argc, char **argv)
 			version(argc, argv);
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			splash(argc, argv);
 			exit(0);
 		case '?':
 		default:
@@ -431,22 +553,18 @@ int main(int argc, char **argv)
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
-			goto bad_usage;
-		      bad_usage:
 			usage(argc, argv);
 			exit(2);
 		}
 	}
-	/* 
-	 * dont' ignore non-option arguments
-	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	copying(argc, argv);
+
+	splash(argc, argv);
 
 	haddr = gethostbyname(*hostlp);
 	loc_addr.sin_family = AF_INET;
-	loc_addr.sin_port = htons(port);
+	loc_addr.sin_port = 0;
 	loc_addr.sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
 
 	haddr = gethostbyname(*hostrp);
@@ -454,6 +572,5 @@ int main(int argc, char **argv)
 	rem_addr.sin_port = htons(port);
 	rem_addr.sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
 
-	test_udpc();
-	exit(0);
+	return test_tcpc();
 }

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -33,7 +33,8 @@
 
  As an exception to the above, this software may be distributed under the GNU
  General Public License (GPL) Version 2, so long as the software is distributed
- with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -262,6 +263,9 @@ static char devname[256] = "/dev/streams/clone/echo";
 static char devname[256] = "/dev/echo";
 #endif
 
+static int repeat_verbose = 0;
+static int repeat_on_success = 0;
+static int repeat_on_failure = 0;
 static int exit_on_failure = 0;
 
 static int verbose = 1;
@@ -298,8 +302,11 @@ int test_fd[3] = { 0, 0, 0 };
 #define NORMAL_WAIT	 100	// 500 // 100
 #define LONG_WAIT	 500	// 5000 // 500
 #define LONGER_WAIT	1000	// 10000 // 5000
-#define INFINITE_WAIT	-1
+#define LONGEST_WAIT	5000	// 20000 // 10000
 #define TEST_DURATION	20000
+#define INFINITE_WAIT	-1
+
+static ulong test_duration = TEST_DURATION;	/* wait on other side */
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
@@ -460,7 +467,7 @@ enum {
 int show = 1;
 
 enum {
-	__TEST_CONN_REQ = 2, __TEST_CONN_RES, __TEST_DISCON_REQ,
+	__TEST_CONN_REQ = 100, __TEST_CONN_RES, __TEST_DISCON_REQ,
 	__TEST_DATA_REQ, __TEST_EXDATA_REQ, __TEST_INFO_REQ, __TEST_BIND_REQ,
 	__TEST_UNBIND_REQ, __TEST_UNITDATA_REQ, __TEST_OPTMGMT_REQ,
 	__TEST_ORDREL_REQ, __TEST_OPTDATA_REQ, __TEST_ADDR_REQ,
@@ -475,6 +482,7 @@ enum {
 	__TEST_DATA,
 	__TEST_DATACK_REQ, __TEST_DATACK_IND, __TEST_RESET_REQ,
 	__TEST_RESET_IND, __TEST_RESET_RES, __TEST_RESET_CON,
+	__TEST_PRIM_TOO_SHORT, __TEST_PRIM_WAY_TOO_SHORT,
 	__TEST_O_TI_GETINFO, __TEST_O_TI_OPTMGMT, __TEST_O_TI_BIND,
 	__TEST_O_TI_UNBIND,
 	__TEST__O_TI_GETINFO, __TEST__O_TI_OPTMGMT, __TEST__O_TI_BIND,
@@ -530,7 +538,12 @@ enum {
 
 long test_start = 0;
 
-static int state;
+static int state = 0;
+static const char *failure_string = NULL;
+
+#define __stringify_1(x) #x
+#define __stringify(x) __stringify_1(x)
+#define FAILURE_STRING(string) "[" __stringify(__LINE__) "] " string
 
 #if 1
 #undef lockf
@@ -624,7 +637,14 @@ check_time(const char *t, long i, long lo, long hi)
 static int
 time_event(int child, int event)
 {
-	if (verbose > 4) {
+	static const char *msgs[] = {
+		"                    ! %11.6g                |                    <%d:%03d>\n",
+		"                    |                %11.6g !                    <%d:%03d>\n",
+		"                    |             %11.6g !  |                    <%d:%03d>\n",
+		"                    !        %11.6g         !                    <%d:%03d>\n",
+	};
+
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg)) {
 		float t, m;
 		struct timeval now;
 
@@ -635,8 +655,9 @@ time_event(int child, int event)
 		m = now.tv_usec;
 		m = m / 1000000;
 		t += m;
+
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    |  | %11.6g                    |                    <%d:%03d>\n", t, child, state);
+		fprintf(stdout, msgs[child], t, child, state);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -644,30 +665,49 @@ time_event(int child, int event)
 }
 
 static int timer_timeout = 0;
+static int last_signum = 0;
 
 static void
-timer_handler(int signum)
+signal_handler(int signum)
 {
+	last_signum = signum;
 	if (signum == SIGALRM)
 		timer_timeout = 1;
 	return;
 }
 
 static int
-timer_sethandler(void)
+start_signals(void)
 {
 	sigset_t mask;
 	struct sigaction act;
 
-	act.sa_handler = timer_handler;
-	act.sa_flags = SA_RESTART | SA_ONESHOT;
+	act.sa_handler = signal_handler;
+//      act.sa_flags = SA_RESTART | SA_ONESHOT;
+	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
 		return __RESULT_FAILURE;
+	if (sigaction(SIGPOLL, &act, NULL))
+		return __RESULT_FAILURE;
+	if (sigaction(SIGURG, &act, NULL))
+		return __RESULT_FAILURE;
+	if (sigaction(SIGPIPE, &act, NULL))
+		return __RESULT_FAILURE;
+	if (sigaction(SIGHUP, &act, NULL))
+		return __RESULT_FAILURE;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGPOLL);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGHUP);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
 	siginterrupt(SIGALRM, 1);
+	siginterrupt(SIGPOLL, 1);
+	siginterrupt(SIGURG, 1);
+	siginterrupt(SIGPIPE, 1);
+	siginterrupt(SIGHUP, 1);
 	return __RESULT_SUCCESS;
 }
 
@@ -682,7 +722,9 @@ start_tt(long duration)
 		{duration / 1000, (duration % 1000) * 1000}
 	};
 
-	if (timer_sethandler())
+	if (duration == (long) INFINITE_WAIT)
+		return __RESULT_SUCCESS;
+	if (start_signals())
 		return __RESULT_FAILURE;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
 		return __RESULT_FAILURE;
@@ -701,24 +743,47 @@ start_st(long duration)
 #endif
 
 static int
-stop_tt(void)
+stop_signals(void)
 {
-	struct itimerval setting = { {0, 0}, {0, 0} };
+	int result = __RESULT_SUCCESS;
 	sigset_t mask;
 	struct sigaction act;
 
-	if (setitimer(ITIMER_REAL, &setting, NULL))
-		return __RESULT_FAILURE;
 	act.sa_handler = SIG_DFL;
 	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
-		return __RESULT_FAILURE;
-	timer_timeout = 0;
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGPOLL, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGURG, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGPIPE, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGHUP, &act, NULL))
+		result = __RESULT_FAILURE;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGPOLL);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGHUP);
 	sigprocmask(SIG_BLOCK, &mask, NULL);
-	return __RESULT_SUCCESS;
+	return (result);
+}
+
+static int
+stop_tt(void)
+{
+	struct itimerval setting = { {0, 0}, {0, 0} };
+	int result = __RESULT_SUCCESS;
+
+	if (setitimer(ITIMER_REAL, &setting, NULL))
+		return __RESULT_FAILURE;
+	if (stop_signals() != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	timer_timeout = 0;
+	return (result);
 }
 
 /*
@@ -793,7 +858,7 @@ find_option(int level, int name, const char *cmd_buf, size_t opt_ofs, size_t opt
  */
 
 char *
-errno_string(long err)
+errno_string(t_scalar_t err)
 {
 	switch (err) {
 	case 0:
@@ -1046,14 +1111,14 @@ errno_string(long err)
 	{
 		static char buf[32];
 
-		snprintf(buf, sizeof(buf), "[%ld]", err);
+		snprintf(buf, sizeof(buf), "[%ld]", (long) err);
 		return buf;
 	}
 	}
 }
 
 char *
-terrno_string(ulong terr, long uerr)
+terrno_string(t_uscalar_t terr, t_scalar_t uerr)
 {
 	switch (terr) {
 	case TBADADDR:
@@ -1118,7 +1183,7 @@ terrno_string(ulong terr, long uerr)
 	{
 		static char buf[32];
 
-		snprintf(buf, sizeof(buf), "[%lu]", terr);
+		snprintf(buf, sizeof(buf), "[%lu]", (ulong) terr);
 		return buf;
 	}
 	}
@@ -1379,7 +1444,164 @@ ioctl_string(int cmd, intptr_t arg)
 }
 
 const char *
-service_type(ulong type)
+signal_string(int signum)
+{
+	switch (signum) {
+	case SIGHUP:
+		return ("SIGHUP");
+	case SIGINT:
+		return ("SIGINT");
+	case SIGQUIT:
+		return ("SIGQUIT");
+	case SIGILL:
+		return ("SIGILL");
+	case SIGABRT:
+		return ("SIGABRT");
+	case SIGFPE:
+		return ("SIGFPE");
+	case SIGKILL:
+		return ("SIGKILL");
+	case SIGSEGV:
+		return ("SIGSEGV");
+	case SIGPIPE:
+		return ("SIGPIPE");
+	case SIGALRM:
+		return ("SIGALRM");
+	case SIGTERM:
+		return ("SIGTERM");
+	case SIGUSR1:
+		return ("SIGUSR1");
+	case SIGUSR2:
+		return ("SIGUSR2");
+	case SIGCHLD:
+		return ("SIGCHLD");
+	case SIGCONT:
+		return ("SIGCONT");
+	case SIGSTOP:
+		return ("SIGSTOP");
+	case SIGTSTP:
+		return ("SIGTSTP");
+	case SIGTTIN:
+		return ("SIGTTIN");
+	case SIGTTOU:
+		return ("SIGTTOU");
+	case SIGBUS:
+		return ("SIGBUS");
+	case SIGPOLL:
+		return ("SIGPOLL");
+	case SIGPROF:
+		return ("SIGPROF");
+	case SIGSYS:
+		return ("SIGSYS");
+	case SIGTRAP:
+		return ("SIGTRAP");
+	case SIGURG:
+		return ("SIGURG");
+	case SIGVTALRM:
+		return ("SIGVTALRM");
+	case SIGXCPU:
+		return ("SIGXCPU");
+	case SIGXFSZ:
+		return ("SIGXFSZ");
+	default:
+		return ("unknown");
+	}
+}
+
+const char *
+poll_string(short events)
+{
+	if (events & POLLIN)
+		return ("POLLIN");
+	if (events & POLLPRI)
+		return ("POLLPRI");
+	if (events & POLLOUT)
+		return ("POLLOUT");
+	if (events & POLLRDNORM)
+		return ("POLLRDNORM");
+	if (events & POLLRDBAND)
+		return ("POLLRDBAND");
+	if (events & POLLWRNORM)
+		return ("POLLWRNORM");
+	if (events & POLLWRBAND)
+		return ("POLLWRBAND");
+	if (events & POLLERR)
+		return ("POLLERR");
+	if (events & POLLHUP)
+		return ("POLLHUP");
+	if (events & POLLNVAL)
+		return ("POLLNVAL");
+	if (events & POLLMSG)
+		return ("POLLMSG");
+	return ("none");
+}
+
+const char *
+poll_events_string(short events)
+{
+	static char string[256] = "";
+	int offset = 0, size = 256, len = 0;
+
+	if (events & POLLIN) {
+		len = snprintf(string + offset, size, "POLLIN|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLPRI) {
+		len = snprintf(string + offset, size, "POLLPRI|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLOUT) {
+		len = snprintf(string + offset, size, "POLLOUT|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLRDNORM) {
+		len = snprintf(string + offset, size, "POLLRDNORM|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLRDBAND) {
+		len = snprintf(string + offset, size, "POLLRDBAND|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLWRNORM) {
+		len = snprintf(string + offset, size, "POLLWRNORM|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLWRBAND) {
+		len = snprintf(string + offset, size, "POLLWRBAND|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLERR) {
+		len = snprintf(string + offset, size, "POLLERR|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLHUP) {
+		len = snprintf(string + offset, size, "POLLHUP|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLNVAL) {
+		len = snprintf(string + offset, size, "POLLNVAL|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLMSG) {
+		len = snprintf(string + offset, size, "POLLMSG|");
+		offset += len;
+		size -= len;
+	}
+	return (string);
+}
+
+const char *
+service_type(t_uscalar_t type)
 {
 	switch (type) {
 	case T_CLTS:
@@ -1394,7 +1616,7 @@ service_type(ulong type)
 }
 
 const char *
-state_string(ulong state)
+state_string(t_uscalar_t state)
 {
 	switch (state) {
 	case TS_UNBND:
@@ -2010,7 +2232,7 @@ mgmtflag_string(t_uscalar_t flag)
 }
 
 char *
-size_string(ulong size)
+size_string(t_uscalar_t size)
 {
 	static char buf[128];
 
@@ -2022,12 +2244,12 @@ size_string(ulong size)
 	case T_UNSPEC:
 		return ("T_UNSPEC");
 	}
-	snprintf(buf, sizeof(buf), "%lu", size);
+	snprintf(buf, sizeof(buf), "%lu", (ulong) size);
 	return buf;
 }
 
 const char *
-prim_string(ulong prim)
+prim_string(t_uscalar_t prim)
 {
 	switch (prim) {
 	case T_CONN_REQ:
@@ -2096,7 +2318,7 @@ prim_string(ulong prim)
 }
 
 char *
-t_errno_string(long err, long syserr)
+t_errno_string(t_scalar_t err, t_scalar_t syserr)
 {
 	switch (err) {
 	case 0:
@@ -2163,7 +2385,7 @@ t_errno_string(long err, long syserr)
 	{
 		static char buf[32];
 
-		snprintf(buf, sizeof(buf), "[%ld]", err);
+		snprintf(buf, sizeof(buf), "[%ld]", (long) err);
 		return buf;
 	}
 	}
@@ -2201,41 +2423,6 @@ t_look_string(int look)
 		return buf;
 	}
 	}
-}
-
-void
-print_less(int child)
-{
-	if (verbose < 1 || !show)
-		return;
-	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	switch (child) {
-	case 0:
-		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
-		fprintf(stdout, " .  (more) .  <---->|               .               :  :                     [%d:%03d]\n", child, state);
-		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
-		break;
-	case 1:
-		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
-		fprintf(stdout, "                    :               .               :  |<-->  . (more)  .    [%d:%03d]\n", child, state);
-		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
-		break;
-	case 2:
-		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
-		fprintf(stdout, "                    :               .               |<-:--->  . (more)  .    [%d:%03d]\n", child, state);
-		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
-		break;
-	}
-	fflush(stdout);
-	dummy = lockf(fileno(stdout), F_ULOCK, 0);
-	show = 0;
-	return;
-}
-
-void
-print_more(void)
-{
-	show = 1;
 }
 
 void
@@ -2284,6 +2471,47 @@ print_simple_string(int child, const char *msgs[], const char *string)
 }
 
 void
+print_string_state(int child, const char *msgs[], const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_triple_string(int child, const char *msgs[], const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], "", child, state);
+	fprintf(stdout, msgs[child], string, child, state);
+	fprintf(stdout, msgs[child], "", child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_more(int child)
+{
+	show = 1;
+}
+
+void
+print_less(int child)
+{
+	static const char *msgs[] = {
+		"         . %1$6.6s . | <------         .         ------> :                    [%2$d:%3$03d]\n",
+		"                    : <------         .         ------> | . %1$-6.6s .         [%2$d:%3$03d]\n",
+		"                    :  | <------         .      ------> : . %1$-6.6s .         [%2$d:%3$03d]\n",
+		"         . %1$6.6s . : <: <------         .      ------> : . %1$-6.6s .         [%2$d:%3$03d]\n",
+	};
+
+	if (show && verbose > 0)
+		print_triple_string(child, msgs, "(more)");
+	show = 0;
+}
+
+void
 print_pipe(int child)
 {
 	static const char *msgs[] = {
@@ -2292,22 +2520,22 @@ print_pipe(int child)
 		"                    .  .                                .                   \n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_simple(child, msgs);
 }
 
 void
-print_open(int child)
+print_open(int child, const char *name)
 {
 	static const char *msgs[] = {
-		"  open()      ----->v  .                                .                   \n",
-		"                    |  v                                v<-----     open()  \n",
-		"                    |  v<-------------------------------.------     open()  \n",
-		"                    .  .                                .                   \n",
+		"  open()      ----->v  . %-30.30s .                   \n",
+		"                    |  v %-30.30s v<-----     open()  \n",
+		"                    |  v<%-30.30s-.------     open()  \n",
+		"                    .  . %-30.30s .                   \n",
 	};
 
-	if (verbose > 3)
-		print_simple(child, msgs);
+	if (show && verbose > 3)
+		print_simple_string(child, msgs, name);
 }
 
 void
@@ -2320,7 +2548,7 @@ print_close(int child)
 		"                    .  .                                .                   \n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_simple(child, msgs);
 }
 
@@ -2339,6 +2567,20 @@ print_preamble(int child)
 }
 
 void
+print_failure(int child, const char *string)
+{
+	static const char *msgs[] = {
+		"....................|   %-32.32s|                    [%d:%03d]\n",
+		"                    |   %-32.32s|................... [%d:%03d]\n",
+		"                    |..|%-32.32s|                    [%d:%03d]\n",
+		"....................|...%-32.32s|................... [%d:%03d]\n",
+	};
+
+	if (string && strnlen(string, 32) > 0 && verbose > 0)
+		print_string_state(child, msgs, string);
+}
+
+void
 print_notapplicable(int child)
 {
 	static const char *msgs[] = {
@@ -2350,6 +2592,7 @@ print_notapplicable(int child)
 
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -2364,6 +2607,7 @@ print_skipped(int child)
 
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -2378,6 +2622,7 @@ print_inconclusive(int child)
 
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -2406,6 +2651,7 @@ print_failed(int child)
 
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -2420,6 +2666,7 @@ print_script_error(int child)
 
 	if (verbose > 0)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -2434,6 +2681,7 @@ print_passed(int child)
 
 	if (verbose > 2)
 		print_double_int(child, msgs, child, state);
+	print_failure(child, failure_string);
 }
 
 void
@@ -2502,7 +2750,7 @@ print_timeout(int child)
 		"++++++++++++++++++++|++|+++++++++ TIMEOUT! +++++++++++++|+++++++++++++++++++ [%d:%03d]\n",
 	};
 
-	if (show_timeout || verbose > 0) {
+	if (show_timeout || verbose > 1) {
 		print_double_int(child, msgs, child, state);
 		show_timeout--;
 	}
@@ -2518,17 +2766,8 @@ print_nothing(int child)
 		"- - - - - - - - - - |- |- - - - - nothing! - - - - - - -|- - - - - - - - - - [%d:%03d]\n",
 	};
 
-	if (verbose > 1)
+	if (show && verbose > 1)
 		print_double_int(child, msgs, child, state);
-}
-
-void
-print_string_state(int child, const char *msgs[], const char *string)
-{
-	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child], string, child, state);
-	fflush(stdout);
-	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void
@@ -2536,12 +2775,12 @@ print_syscall(int child, const char *command)
 {
 	static const char *msgs[] = {
 		"  %-14s--->|  |                                |                    [%d:%03d]\n",
-		"                    |  |                                |<---%14s  [%d:%03d]\n",
-		"                    |  |                                |<---%14s  [%d:%03d]\n",
-		"                    |  |                                |                    [%d:%03d]\n",
+		"                    |  |                                |<---%-14s  [%d:%03d]\n",
+		"                    |  |                                |<---%-14s  [%d:%03d]\n",
+		"                    |  |       %-14s           |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if ((verbose && show) || (verbose > 5 && show_msg))
 		print_string_state(child, msgs, command);
 }
 
@@ -2552,10 +2791,10 @@ print_tx_prim(int child, const char *command)
 		"--%16s->|  |                                |                    [%d:%03d]\n",
 		"                    |  |<- - - - - - - - - - - - - - - -|<-%16s- [%d:%03d]\n",
 		"                    |  |<- - - - - - - - - - - - - - - -|<-%16s- [%d:%03d]\n",
-		"                    |  |                                |                    [%d:%03d]\n",
+		"                    |  |      %-16s          |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -2569,7 +2808,7 @@ print_rx_prim(int child, const char *command)
 		"                    |  |      <%16s>        |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -2583,7 +2822,7 @@ print_ack_prim(int child, const char *command)
 		"                    |  |      <%16s>        |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -2608,6 +2847,20 @@ print_no_prim(int child, long prim)
 
 	if (verbose > 0)
 		print_long_state(child, msgs, prim);
+}
+
+void
+print_signal(int child, int signum)
+{
+	static const char *msgs[] = {
+		">>>>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8.8s <<<<<<<<<<<<<|                    [%d:%03d]\n",
+		"                    |>>>>>>>>>>>> %-8.8s <<<<<<<<<<<<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
+		"                    |>>|>>>>>>>>> %-8.8s <<<<<<<<<<<<<|                    [%d:%03d]\n",
+		">>>>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8.8s <<<<<<<<<<<<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
+	};
+
+	if (verbose > 0)
+		print_string_state(child, msgs, signal_string(signum));
 }
 
 void
@@ -2643,7 +2896,7 @@ print_errno(int child, long error)
 		"                    |  |       [%14s]         |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 3)
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
 		print_string_state(child, msgs, errno_string(error));
 }
 
@@ -2657,7 +2910,7 @@ print_success(int child)
 		"                    |  |              ok                |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 4)
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
 		print_double_int(child, msgs, child, state);
 }
 
@@ -2671,8 +2924,31 @@ print_success_value(int child, int value)
 		"                    |  |         [%10d]           |                    [%d:%03d]\n",
 	};
 
-	if (verbose)
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
 		print_triple_int(child, msgs, value, child, state);
+}
+
+void
+print_int_string_state(int child, const char *msgs[], const int value, const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], value, string, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_poll_value(int child, int value, short revents)
+{
+	static const char *msgs[] = {
+		"  %1$10d  <----/|    %2$-30.30s |                    [%3$d:%4$03d]\n",
+		"                    |    %2$-30.30s |\\---->  %1$10d  [%3$d:%4$03d]\n",
+		"                    |  |\\%2$-30.30s-+----->  %1$10d  [%3$d:%4$03d]\n",
+		"                    | %2$-20.20s [%1$10d] |                    [%3$d:%4$03d]\n",
+	};
+
+	if (show && verbose > 3)
+		print_int_string_state(child, msgs, value, poll_events_string(revents));
 }
 
 void
@@ -2685,7 +2961,7 @@ print_ti_ioctl(int child, int cmd, intptr_t arg)
 		"                    |  |    %16s ioctl(2)   |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, ioctl_string(cmd, arg));
 }
 
@@ -2694,6 +2970,27 @@ print_ioctl(int child, int cmd, intptr_t arg)
 {
 	if (verbose > 3)
 		print_ti_ioctl(child, cmd, arg);
+}
+
+void
+print_ti_poll(int child, short events)
+{
+	static const char *msgs[] = {
+		"--poll(2)---------->|       %16s            |                    [%d:%03d]\n",
+		"                    |       %16s            |<---poll(2)-------  [%d:%03d]\n",
+		"                    |  |<---%16s------------+----poll(2)-------  [%d:%03d]\n",
+		"                    |       %16s poll(2)    |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 1)
+		print_string_state(child, msgs, poll_string(events));
+}
+
+void
+print_poll(int child, short events)
+{
+	if (verbose > 3)
+		print_ti_poll(child, events);
 }
 
 void
@@ -2720,7 +3017,7 @@ print_libcall(int child, const char *command)
 		"                    |  |     [%16s]         |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, command);
 }
 
@@ -2734,7 +3031,7 @@ print_terror(int child, long error, long terror)
 		"                    |  |       [%14s]         |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, t_errno_string(terror, error));
 }
 
@@ -2748,7 +3045,7 @@ print_tlook(int child, int tlook)
 		"                    |  |       [%14s]         |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 1)
 		print_string_state(child, msgs, t_look_string(tlook));
 }
 
@@ -2756,10 +3053,10 @@ void
 print_expect(int child, int want)
 {
 	static const char *msgs[] = {
-		" (%-16s) |  | - - - -[Expected]- - - - - - - |                     [%d:%03d]\n",
-		"                    |  | - - - -[Expected]- - - - - - - | (%-16s)  [%d:%03d]\n",
-		"                    |  | - - - -[Expected]- - - - - - - | (%-16s)  [%d:%03d]\n",
-		"                    |- |- [Expected %-16s ] -|                     [%d:%03d]\n",
+		" (%-16s) |  | - - - -[Expected]- - - - - - - |                    [%d:%03d]\n",
+		"                    |  | - - - -[Expected]- - - - - - - | (%-16s) [%d:%03d]\n",
+		"                    |  | - - - -[Expected]- - - - - - - | (%-16s) [%d:%03d]\n",
+		"                    |- |- [Expected %-16s ] -|                    [%d:%03d]\n",
 	};
 
 	if (verbose > 1 && show)
@@ -2776,8 +3073,40 @@ print_string(int child, const char *string)
 		"                    |  |    %-20s        |                    \n",
 	};
 
-	if (verbose > 1 && show)
+	if (show && verbose > 0)
 		print_simple_string(child, msgs, string);
+}
+
+void
+print_string_val(int child, const char *string, ulong val)
+{
+	static const char *msgs[] = {
+		"%1$20.20s|          %2$15u          |                    \n",
+		"                    |          %2$15u          |%1$-20.20s\n",
+		"                    |  |       %2$15u          |%1$-20.20s\n",
+		"                    |%1$-20.20s%2$15u|                    \n",
+	};
+
+	if (show && verbose > 0) {
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, msgs[child], string, val);
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
+}
+
+void
+print_command_state(int child, const char *string)
+{
+	static const char *msgs[] = {
+		"%20s|                                   |                    [%d:%03d]\n",
+		"                    |                                   |%-20s[%d:%03d]\n",
+		"                    |  |                                |%-20s[%d:%03d]\n",
+		"                    |       %-20s        |                    [%d:%03d]\n",
+	};
+
+	if (show && verbose > 0)
+		print_string_state(child, msgs, string);
 }
 
 void
@@ -2799,7 +3128,7 @@ print_waiting(int child, ulong time)
 		"/ / / / / / / / / / | /|/ / Waiting %03lu seconds / / / / | / / / / / / / / /  [%d:%03d]\n",
 	};
 
-	if (verbose > 0 && show)
+	if (verbose > 1 && show)
 		print_time_state(child, msgs, time);
 }
 
@@ -2822,7 +3151,7 @@ print_mwaiting(int child, struct timespec *time)
 		"/ / / / / / / / / / | /|/ Waiting %8.4f seconds / / /| / / / / / / / / /  [%d:%03d]\n",
 	};
 
-	if (verbose > 0 && show) {
+	if (verbose > 1 && show) {
 		float delay;
 
 		delay = time->tv_nsec;
@@ -2957,6 +3286,21 @@ print_info(int child, struct T_info_ack *info)
  *
  *  -------------------------------------------------------------------------
  */
+
+int
+test_waitsig(int child)
+{
+	int signum;
+	sigset_t set;
+
+	sigemptyset(&set);
+	while ((signum = last_signum) == 0)
+		sigsuspend(&set);
+	print_signal(child, signum);
+	return (__RESULT_SUCCESS);
+
+}
+
 int
 test_ioctl(int child, int cmd, intptr_t arg)
 {
@@ -2968,7 +3312,7 @@ test_ioctl(int child, int cmd, intptr_t arg)
 				continue;
 			return (__RESULT_FAILURE);
 		}
-		if (verbose > 3)
+		if (show && verbose > 3)
 			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	}
@@ -3000,51 +3344,89 @@ test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strb
 	fdi.flags = flags;
 	fdi.fildes = resfd;
 	fdi.offset = offset;
-	if (test_ioctl(child, I_FDINSERT, (intptr_t) & fdi) != __RESULT_SUCCESS)
+	if (show && verbose > 4) {
+		int i;
+
+		dummy = lockf(fileno(stdout), F_LOCK, 0);
+		fprintf(stdout, "fdinsert to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
+		fprintf(stdout, "[");
+		for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
+			fprintf(stdout, "%02X", (uint8_t) ctrl->buf[i]);
+		fprintf(stdout, "]\n");
+		fprintf(stdout, "[");
+		for (i = 0; i < (data ? data->len : 0); i++)
+			fprintf(stdout, "%02X", (uint8_t) data->buf[i]);
+		fprintf(stdout, "]\n");
+		fflush(stdout);
+		dummy = lockf(fileno(stdout), F_ULOCK, 0);
+	}
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
+}
+
+int
+test_putmsg(int child, struct strbuf *ctrl, struct strbuf *data, int flags)
+{
+	print_datcall(child, "putmsg(2)-----", data ? data->len : -1);
+	if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
+		print_errno(child, (last_errno = errno));
+		return (__RESULT_FAILURE);
+	}
+	print_success_value(child, last_retval);
+	return (__RESULT_SUCCESS);
 }
 
 int
 test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
 	if (flags & MSG_BAND || band) {
-		if (verbose > 3) {
+		if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
+			int i;
+
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
-			dummy = lockf(fileno(stdout), F_ULOCK, 0);
+			fprintf(stdout, "[");
+			for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
+				fprintf(stdout, "%02X", (uint8_t) ctrl->buf[i]);
+			fprintf(stdout, "]\n");
+			fprintf(stdout, "[");
+			for (i = 0; i < (data ? data->len : 0); i++)
+				fprintf(stdout, "%02X", (uint8_t) data->buf[i]);
+			fprintf(stdout, "]\n");
 			fflush(stdout);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (ctrl == NULL || data != NULL)
 			print_datcall(child, "putpmsg(2)----", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
-				print_errno(child, (last_errno = errno));
-				if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+				if (last_errno == EINTR || last_errno == ERESTART)
 					continue;
+				print_errno(child, (last_errno = errno));
 				return (__RESULT_FAILURE);
 			}
-			if (verbose > 3)
+			if ((verbose > 3 && show) || (verbose > 5 && show_msg))
 				print_success_value(child, last_retval);
 			return (__RESULT_SUCCESS);
 		}
 	} else {
-		if (verbose > 3) {
+		if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "putmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			fflush(stdout);
 		}
 		if (ctrl == NULL || data != NULL)
-			print_datcall(child, "putmsg(2)-----", data ? data->len : 0);
+			print_datcall(child, "M_DATA----------", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
-				print_errno(child, (last_errno = errno));
-				if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+				if (last_errno == EINTR || last_errno == ERESTART)
 					continue;
+				print_errno(child, (last_errno = errno));
 				return (__RESULT_FAILURE);
 			}
-			if (verbose > 3)
+			if ((verbose > 3 && show) || (verbose > 5 && show_msg))
 				print_success_value(child, last_retval);
 			return (__RESULT_SUCCESS);
 		}
@@ -3057,9 +3439,9 @@ test_write(int child, const void *buf, size_t len)
 	print_syscall(child, "write(2)------");
 	for (;;) {
 		if ((last_retval = write(test_fd[child], buf, len)) == -1) {
-			print_errno(child, (last_errno = errno));
-			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -3074,9 +3456,9 @@ test_writev(int child, const struct iovec *iov, int num)
 	print_syscall(child, "writev(2)-----");
 	for (;;) {
 		if ((last_retval = writev(test_fd[child], iov, num)) == -1) {
-			print_errno(child, (last_errno = errno));
-			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -3091,6 +3473,8 @@ test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 	print_syscall(child, "getmsg(2)-----");
 	for (;;) {
 		if ((last_retval = getmsg(test_fd[child], ctrl, data, flagp)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
@@ -3106,6 +3490,8 @@ test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, in
 	print_syscall(child, "getpmsg(2)----");
 	for (;;) {
 		if ((last_retval = getpmsg(test_fd[child], ctrl, data, bandp, flagp)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
@@ -3121,6 +3507,8 @@ test_read(int child, void *buf, size_t count)
 	print_syscall(child, "read(2)-------");
 	for (;;) {
 		if ((last_retval = read(test_fd[child], buf, count)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
@@ -3136,6 +3524,8 @@ test_readv(int child, const struct iovec *iov, int count)
 	print_syscall(child, "readv(2)------");
 	for (;;) {
 		if ((last_retval = readv(test_fd[child], iov, count)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
@@ -3161,16 +3551,16 @@ test_ti_ioctl(int child, int cmd, intptr_t arg)
 	print_ti_ioctl(child, cmd, arg);
 	for (;;) {
 		if ((last_retval = ioctl(test_fd[child], cmd, arg)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
-		if (verbose > 3)
+		if (show && verbose > 3)
 			print_success_value(child, last_retval);
 		break;
 	}
-	if (cmd == I_STR && verbose > 3) {
+	if (cmd == I_STR && show && verbose > 3) {
 		struct strioctl *icp = (struct strioctl *) arg;
 
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -3207,9 +3597,9 @@ test_nonblock(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -3218,9 +3608,9 @@ test_nonblock(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags | O_NONBLOCK)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -3237,9 +3627,9 @@ test_block(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -3248,12 +3638,53 @@ test_block(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags & ~O_NONBLOCK)) == -1) {
-			print_errno(child, (last_errno = errno));
 			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
+			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_isastream(int child)
+{
+	int result;
+
+	print_syscall(child, "isastream(2)--");
+	for (;;) {
+		if ((result = last_retval = isastream(test_fd[child])) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_success_value(child, last_retval);
+		break;
+	}
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_poll(int child, const short events, short *revents, long ms)
+{
+	struct pollfd pfd = {.fd = test_fd[child],.events = events,.revents = 0 };
+	int result;
+
+	print_poll(child, events);
+	for (;;) {
+		if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
+			if (last_errno == EINTR || last_errno == ERESTART)
+				continue;
+			print_errno(child, (last_errno = errno));
+			return (__RESULT_FAILURE);
+		}
+		print_poll_value(child, last_retval, pfd.revents);
+		if (last_retval == 1 && revents)
+			*revents = pfd.revents;
 		break;
 	}
 	return (__RESULT_SUCCESS);
@@ -3272,28 +3703,54 @@ test_pipe(int child)
 			print_success(child);
 			return (__RESULT_SUCCESS);
 		}
-		print_errno(child, (last_errno = errno));
-		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+		if (last_errno == EINTR || last_errno == ERESTART)
 			continue;
+		print_errno(child, (last_errno = errno));
 		return (__RESULT_FAILURE);
 	}
 }
 
 int
-test_open(int child, const char *name)
+test_fopen(int child, const char *name, int flags)
+{
+	int fd;
+
+	print_open(child, name);
+	if ((fd = open(name, flags)) >= 0) {
+		print_success(child);
+		return (fd);
+	}
+	print_errno(child, (last_errno = errno));
+	return (fd);
+}
+
+int
+test_fclose(int child, int fd)
+{
+	print_close(child);
+	if (close(fd) >= 0) {
+		print_success(child);
+		return __RESULT_SUCCESS;
+	}
+	print_errno(child, (last_errno = errno));
+	return __RESULT_FAILURE;
+}
+
+int
+test_open(int child, const char *name, int flags)
 {
 	int fd;
 
 	for (;;) {
-		print_open(child);
-		if ((fd = open(name, O_NONBLOCK | O_RDWR)) >= 0) {
+		print_open(child, name);
+		if ((fd = open(name, flags)) >= 0) {
 			test_fd[child] = fd;
 			print_success(child);
 			return (__RESULT_SUCCESS);
 		}
-		print_errno(child, (last_errno = errno));
-		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+		if (last_errno == EINTR || last_errno == ERESTART)
 			continue;
+		print_errno(child, (last_errno = errno));
 		return (__RESULT_FAILURE);
 	}
 }
@@ -3310,11 +3767,31 @@ test_close(int child)
 			print_success(child);
 			return __RESULT_SUCCESS;
 		}
-		print_errno(child, (last_errno = errno));
-		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+		if (last_errno == EINTR || last_errno == ERESTART)
 			continue;
+		print_errno(child, (last_errno = errno));
 		return __RESULT_FAILURE;
 	}
+}
+
+int
+test_push(int child, const char *name)
+{
+	if (show && verbose > 1)
+		print_command_state(child, ":push");
+	if (test_ioctl(child, I_PUSH, (intptr_t) name))
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
+}
+
+int
+test_pop(int child)
+{
+	if (show && verbose > 1)
+		print_command_state(child, ":pop");
+	if (test_ioctl(child, I_POP, (intptr_t) 0))
+		return __RESULT_FAILURE;
+	return __RESULT_SUCCESS;
 }
 
 /*
@@ -3330,24 +3807,36 @@ stream_start(int child, int index)
 {
 	switch (child) {
 	case 1:
+#if 1
+		/* set up the test harness */
 		if (test_pipe(0) != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
+			goto failure;
+		if (test_ioctl(0, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
+			goto failure;
 		if (test_ioctl(1, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
+			goto failure;
+		if (test_ioctl(0, I_SWROPT, (intptr_t) SNDZERO) != __RESULT_SUCCESS)
+			goto failure;
+		if (test_ioctl(1, I_SWROPT, (intptr_t) SNDZERO) != __RESULT_SUCCESS)
+			goto failure;
 		if (test_ioctl(1, I_PUSH, (intptr_t) "pipemod") != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
+			goto failure;
 		return __RESULT_SUCCESS;
+#endif
 	case 2:
+#if 1
 		return __RESULT_SUCCESS;
+#endif
 	case 0:
 #if 0
 		if (test_ioctl(0, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
+			goto failure;
 		if (test_ioctl(0, I_PUSH, (intptr_t) "timod") != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
+			goto failure;
 #endif
 		return __RESULT_SUCCESS;
 	default:
+	      failure:
 		return __RESULT_FAILURE;
 	}
 }
@@ -3357,15 +3846,19 @@ stream_stop(int child)
 {
 	switch (child) {
 	case 1:
+#if 1
 		if (test_ioctl(1, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS)
-			return __RESULT_FAILURE;
-		if (test_close(1) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
 		if (test_close(0) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
+		if (test_close(1) != __RESULT_SUCCESS)
+			return __RESULT_FAILURE;
 		return __RESULT_SUCCESS;
+#endif
 	case 2:
+#if 1
 		return __RESULT_SUCCESS;
+#endif
 	case 0:
 #if 0
 		if (test_ioctl(0, I_POP, (intptr_t) NULL) != __RESULT_SUCCESS)
@@ -3375,6 +3868,24 @@ stream_stop(int child)
 	default:
 		return __RESULT_FAILURE;
 	}
+}
+
+void
+test_sleep(int child, unsigned long t)
+{
+	print_waiting(child, t);
+	sleep(t);
+}
+
+void
+test_msleep(int child, unsigned long m)
+{
+	struct timespec time;
+
+	time.tv_sec = m / 1000;
+	time.tv_nsec = (m % 1000) * 1000000;
+	print_mwaiting(child, &time);
+	nanosleep(&time, NULL);
 }
 
 /*
@@ -3469,9 +3980,9 @@ do_signal(int child, int action)
 	}
 	switch (action) {
 	case __TEST_PUSH:
-		return test_ti_ioctl(child, I_PUSH, (intptr_t) "timod");
+		return test_push(child, "timod");
 	case __TEST_POP:
-		return test_ti_ioctl(child, I_POP, (intptr_t) NULL);
+		return test_pop(child);
 	case __TEST_O_NONBLOCK:
 		return test_nonblock(child);
 	case __TEST_O_BLOCK:
@@ -4280,6 +4791,24 @@ do_signal(int child, int action)
 		if (verbose > 3)
 			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
+#if 0
+	case __TEST_PRIM_TOO_SHORT:
+		ctrl->len = sizeof(p->type);
+		p->type = last_prim;
+		data = NULL;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+	case __TEST_PRIM_WAY_TOO_SHORT:
+		ctrl->len = sizeof(p->type) >> 1;
+		p->type = last_prim;
+		data = NULL;
+		test_pflags = MSG_BAND;
+		test_pband = 0;
+		print_tx_prim(child, prim_string(p->type));
+		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+#endif
 	case __TEST_O_TI_GETINFO:
 		ic.ic_cmd = O_TI_GETINFO;
 		ic.ic_len = sizeof(p->info_ack);
@@ -4968,24 +5497,6 @@ expect(int child, int wait, int want)
 		return (__RESULT_SUCCESS);
 	print_expect(child, want);
 	return (__RESULT_FAILURE);
-}
-
-void
-test_sleep(int child, unsigned long t)
-{
-	print_waiting(child, t);
-	sleep(t);
-}
-
-void
-test_msleep(int child, unsigned long m)
-{
-	struct timespec time;
-
-	time.tv_sec = m / 1000;
-	time.tv_nsec = (m % 1000) * 1000000;
-	print_mwaiting(child, &time);
-	nanosleep(&time, NULL);
 }
 
 /*
@@ -16579,6 +17090,7 @@ run_stream(int child, struct test_stream *stream)
 
 	print_preamble(child);
 	state = 100;
+	failure_string = NULL;
 	if (stream->preamble && (pre_result = stream->preamble(child)) != __RESULT_SUCCESS) {
 		switch (pre_result) {
 		case __RESULT_NOTAPPL:
@@ -16597,6 +17109,7 @@ run_stream(int child, struct test_stream *stream)
 	} else {
 		print_test(child);
 		state = 200;
+		failure_string = NULL;
 		switch (stream->testcase(child)) {
 		default:
 		case __RESULT_INCONCLUSIVE:
@@ -16626,6 +17139,7 @@ run_stream(int child, struct test_stream *stream)
 		}
 		print_postamble(child);
 		state = 300;
+		failure_string = NULL;
 		if (stream->postamble && (post_result = stream->postamble(child)) != __RESULT_SUCCESS) {
 			switch (post_result) {
 			case __RESULT_NOTAPPL:
@@ -16656,13 +17170,13 @@ run_stream(int child, struct test_stream *stream)
  */
 
 int
-test_run(struct test_stream *stream[])
+test_run(struct test_stream *stream[], ulong duration)
 {
 	int children = 0;
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
 
-	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
+	if (start_tt(duration) != __RESULT_SUCCESS)
 		goto inconclusive;
 	if (stream[2]) {
 		switch ((child[2] = fork())) {
@@ -16843,518 +17357,271 @@ test_run(struct test_stream *stream[])
 struct test_case {
 	const char *numb;		/* test case number */
 	const char *tgrp;		/* test case group */
+	const char *sgrp;		/* test case subgroup */
 	const char *name;		/* test case name */
+	const char *xtra;		/* test case extra information */
 	const char *desc;		/* test case description */
 	const char *sref;		/* test case standards section reference */
 	struct test_stream *stream[3];	/* test streams */
 	int (*start) (int);		/* start function */
 	int (*stop) (int);		/* stop function */
+	ulong duration;			/* maximum duration */
 	int run;			/* whether to run this test */
 	int result;			/* results of test */
+	int expect;			/* expected result */
 } tests[] = {
 	{
-		numb_case_0_1, tgrp_case_0_1, name_case_0_1, desc_case_0_1, sref_case_0_1, {
-	&test_0_1_conn, &test_0_1_resp, &test_0_1_list}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, sref_case_1_1, {
-	&test_1_1_top, &test_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_1_2_1, tgrp_case_1_2_1, name_case_1_2_1, desc_case_1_2_1, sref_case_1_2_1, {
-	&test_1_2_1_top, &test_1_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_1_2_2, tgrp_case_1_2_2, name_case_1_2_2, desc_case_1_2_2, sref_case_1_2_2, {
-	&test_1_2_2_top, &test_1_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_1_2_3, tgrp_case_1_2_3, name_case_1_2_3, desc_case_1_2_3, sref_case_1_2_3, {
-	&test_1_2_3_top, &test_1_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_1_1, tgrp_case_2_1_1, name_case_2_1_1, desc_case_2_1_1, sref_case_2_1_1, {
-	&test_2_1_1_top, &test_2_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_1_2, tgrp_case_2_1_2, name_case_2_1_2, desc_case_2_1_2, sref_case_2_1_2, {
-	&test_2_1_2_top, &test_2_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_1_3, tgrp_case_2_1_3, name_case_2_1_3, desc_case_2_1_3, sref_case_2_1_3, {
-	&test_2_1_3_top, &test_2_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_1_4, tgrp_case_2_1_4, name_case_2_1_4, desc_case_2_1_4, sref_case_2_1_4, {
-	&test_2_1_4_top, &test_2_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_1_5, tgrp_case_2_1_5, name_case_2_1_5, desc_case_2_1_5, sref_case_2_1_5, {
-	&test_2_1_5_top, &test_2_1_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_1_6, tgrp_case_2_1_6, name_case_2_1_6, desc_case_2_1_6, sref_case_2_1_6, {
-	&test_2_1_6_top, &test_2_1_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_1_7, tgrp_case_2_1_7, name_case_2_1_7, desc_case_2_1_7, sref_case_2_1_7, {
-	&test_2_1_7_top, &test_2_1_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_1_8, tgrp_case_2_1_8, name_case_2_1_8, desc_case_2_1_8, sref_case_2_1_8, {
-	&test_2_1_8_top, &test_2_1_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_2, tgrp_case_2_2, name_case_2_2, desc_case_2_2, sref_case_2_2, {
-	&test_2_2_top, &test_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_3_1, tgrp_case_2_3_1, name_case_2_3_1, desc_case_2_3_1, sref_case_2_3_1, {
-	&test_2_3_1_top, &test_2_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_3_2, tgrp_case_2_3_2, name_case_2_3_2, desc_case_2_3_2, sref_case_2_3_2, {
-	&test_2_3_2_top, &test_2_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_3_3, tgrp_case_2_3_3, name_case_2_3_3, desc_case_2_3_3, sref_case_2_3_3, {
-	&test_2_3_3_top, &test_2_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_3_4, tgrp_case_2_3_4, name_case_2_3_4, desc_case_2_3_4, sref_case_2_3_4, {
-	&test_2_3_4_top, &test_2_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_3_5, tgrp_case_2_3_5, name_case_2_3_5, desc_case_2_3_5, sref_case_2_3_5, {
-	&test_2_3_5_top, &test_2_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_3_6, tgrp_case_2_3_6, name_case_2_3_6, desc_case_2_3_6, sref_case_2_3_6, {
-	&test_2_3_6_top, &test_2_3_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_3_7, tgrp_case_2_3_7, name_case_2_3_7, desc_case_2_3_7, sref_case_2_3_7, {
-	&test_2_3_7_top, &test_2_3_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_3_8, tgrp_case_2_3_8, name_case_2_3_8, desc_case_2_3_8, sref_case_2_3_8, {
-	&test_2_3_8_top, &test_2_3_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_3_9, tgrp_case_2_3_9, name_case_2_3_9, desc_case_2_3_9, sref_case_2_3_9, {
-	&test_2_3_9_top, &test_2_3_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_4_1, tgrp_case_2_4_1, name_case_2_4_1, desc_case_2_4_1, sref_case_2_4_1, {
-	&test_2_4_1_top, &test_2_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_2_5_1, tgrp_case_2_5_1, name_case_2_5_1, desc_case_2_5_1, sref_case_2_5_1, {
-	&test_2_5_1_top, &test_2_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_1_1, tgrp_case_3_1_1, name_case_3_1_1, desc_case_3_1_1, sref_case_3_1_1, {
-	&test_3_1_1_top, &test_3_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_2_1, tgrp_case_3_2_1, name_case_3_2_1, desc_case_3_2_1, sref_case_3_2_1, {
-	&test_3_2_1_top, &test_3_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_3_1, tgrp_case_3_3_1, name_case_3_3_1, desc_case_3_3_1, sref_case_3_3_1, {
-	&test_3_3_1_top, &test_3_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_4_1, tgrp_case_3_4_1, name_case_3_4_1, desc_case_3_4_1, sref_case_3_4_1, {
-	&test_3_4_1_top, &test_3_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_4_2, tgrp_case_3_4_2, name_case_3_4_2, desc_case_3_4_2, sref_case_3_4_2, {
-	&test_3_4_2_top, &test_3_4_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_5_1, tgrp_case_3_5_1, name_case_3_5_1, desc_case_3_5_1, sref_case_3_5_1, {
-	&test_3_5_1_top, &test_3_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_5_2, tgrp_case_3_5_2, name_case_3_5_2, desc_case_3_5_2, sref_case_3_5_2, {
-	&test_3_5_2_top, &test_3_5_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_6_1, tgrp_case_3_6_1, name_case_3_6_1, desc_case_3_6_1, sref_case_3_6_1, {
-	&test_3_6_1_top, &test_3_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_3_7_1, tgrp_case_3_7_1, name_case_3_7_1, desc_case_3_7_1, sref_case_3_7_1, {
-	&test_3_7_1_top, &test_3_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_1_1, tgrp_case_4_1_1, name_case_4_1_1, desc_case_4_1_1, sref_case_4_1_1, {
-	&test_4_1_1_top, &test_4_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_1_2, tgrp_case_4_1_2, name_case_4_1_2, desc_case_4_1_2, sref_case_4_1_2, {
-	&test_4_1_2_top, &test_4_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_1, tgrp_case_4_2_1, name_case_4_2_1, desc_case_4_2_1, sref_case_4_2_1, {
-	&test_4_2_1_top, &test_4_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_2_2, tgrp_case_4_2_2, name_case_4_2_2, desc_case_4_2_2, sref_case_4_2_2, {
-	&test_4_2_2_top, &test_4_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_3_1, tgrp_case_4_3_1, name_case_4_3_1, desc_case_4_3_1, sref_case_4_3_1, {
-	&test_4_3_1_top, &test_4_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_4_1, tgrp_case_4_4_1, name_case_4_4_1, desc_case_4_4_1, sref_case_4_4_1, {
-	&test_4_4_1_top, &test_4_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_4_2, tgrp_case_4_4_2, name_case_4_4_2, desc_case_4_4_2, sref_case_4_4_2, {
-	&test_4_4_2_top, &test_4_4_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_4_3, tgrp_case_4_4_3, name_case_4_4_3, desc_case_4_4_3, sref_case_4_4_3, {
-	&test_4_4_3_top, &test_4_4_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_4_4, tgrp_case_4_4_4, name_case_4_4_4, desc_case_4_4_4, sref_case_4_4_4, {
-	&test_4_4_4_top, &test_4_4_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_4_5, tgrp_case_4_4_5, name_case_4_4_5, desc_case_4_4_5, sref_case_4_4_5, {
-	&test_4_4_5_top, &test_4_4_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_4_6, tgrp_case_4_4_6, name_case_4_4_6, desc_case_4_4_6, sref_case_4_4_6, {
-	&test_4_4_6_top, &test_4_4_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_4_7, tgrp_case_4_4_7, name_case_4_4_7, desc_case_4_4_7, sref_case_4_4_7, {
-	&test_4_4_7_top, &test_4_4_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_4_8, tgrp_case_4_4_8, name_case_4_4_8, desc_case_4_4_8, sref_case_4_4_8, {
-	&test_4_4_8_top, &test_4_4_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_5_1, tgrp_case_4_5_1, name_case_4_5_1, desc_case_4_5_1, sref_case_4_5_1, {
-	&test_4_5_1_top, &test_4_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_6_1, tgrp_case_4_6_1, name_case_4_6_1, desc_case_4_6_1, sref_case_4_6_1, {
-	&test_4_6_1_top, &test_4_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_6_2, tgrp_case_4_6_2, name_case_4_6_2, desc_case_4_6_2, sref_case_4_6_2, {
-	&test_4_6_2_top, &test_4_6_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_6_3, tgrp_case_4_6_3, name_case_4_6_3, desc_case_4_6_3, sref_case_4_6_3, {
-	&test_4_6_3_top, &test_4_6_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_6_4, tgrp_case_4_6_4, name_case_4_6_4, desc_case_4_6_4, sref_case_4_6_4, {
-	&test_4_6_4_top, &test_4_6_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_7_1, tgrp_case_4_7_1, name_case_4_7_1, desc_case_4_7_1, sref_case_4_7_1, {
-	&test_4_7_1_top, &test_4_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_7_2, tgrp_case_4_7_2, name_case_4_7_2, desc_case_4_7_2, sref_case_4_7_2, {
-	&test_4_7_2_top, &test_4_7_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_7_3, tgrp_case_4_7_3, name_case_4_7_3, desc_case_4_7_3, sref_case_4_7_3, {
-	&test_4_7_3_top, &test_4_7_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_7_4, tgrp_case_4_7_4, name_case_4_7_4, desc_case_4_7_4, sref_case_4_7_4, {
-	&test_4_7_4_top, &test_4_7_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_8_1, tgrp_case_4_8_1, name_case_4_8_1, desc_case_4_8_1, sref_case_4_8_1, {
-	&test_4_8_1_top, &test_4_8_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_8_2, tgrp_case_4_8_2, name_case_4_8_2, desc_case_4_8_2, sref_case_4_8_2, {
-	&test_4_8_2_top, &test_4_8_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_8_3, tgrp_case_4_8_3, name_case_4_8_3, desc_case_4_8_3, sref_case_4_8_3, {
-	&test_4_8_3_top, &test_4_8_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_4_9_1, tgrp_case_4_9_1, name_case_4_9_1, desc_case_4_9_1, sref_case_4_9_1, {
-	&test_4_9_1_top, &test_4_9_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_1, tgrp_case_5_1_1, name_case_5_1_1, desc_case_5_1_1, sref_case_5_1_1, {
-	&test_5_1_1_top, &test_5_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_2, tgrp_case_5_1_2, name_case_5_1_2, desc_case_5_1_2, sref_case_5_1_2, {
-	&test_5_1_2_top, &test_5_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_3, tgrp_case_5_1_3, name_case_5_1_3, desc_case_5_1_3, sref_case_5_1_3, {
-	&test_5_1_3_top, &test_5_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_4, tgrp_case_5_1_4, name_case_5_1_4, desc_case_5_1_4, sref_case_5_1_4, {
-	&test_5_1_4_top, &test_5_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_5, tgrp_case_5_1_5, name_case_5_1_5, desc_case_5_1_5, sref_case_5_1_5, {
-	&test_5_1_5_top, &test_5_1_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_6, tgrp_case_5_1_6, name_case_5_1_6, desc_case_5_1_6, sref_case_5_1_6, {
-	&test_5_1_6_top, &test_5_1_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_7, tgrp_case_5_1_7, name_case_5_1_7, desc_case_5_1_7, sref_case_5_1_7, {
-	&test_5_1_7_top, &test_5_1_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_8, tgrp_case_5_1_8, name_case_5_1_8, desc_case_5_1_8, sref_case_5_1_8, {
-	&test_5_1_8_top, &test_5_1_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_9, tgrp_case_5_1_9, name_case_5_1_9, desc_case_5_1_9, sref_case_5_1_9, {
-	&test_5_1_9_top, &test_5_1_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_10, tgrp_case_5_1_10, name_case_5_1_10, desc_case_5_1_10, sref_case_5_1_10, {
-	&test_5_1_10_top, &test_5_1_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_11, tgrp_case_5_1_11, name_case_5_1_11, desc_case_5_1_11, sref_case_5_1_11, {
-	&test_5_1_11_top, &test_5_1_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_12, tgrp_case_5_1_12, name_case_5_1_12, desc_case_5_1_12, sref_case_5_1_12, {
-	&test_5_1_12_top, &test_5_1_12_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_13, tgrp_case_5_1_13, name_case_5_1_13, desc_case_5_1_13, sref_case_5_1_13, {
-	&test_5_1_13_top, &test_5_1_13_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_14, tgrp_case_5_1_14, name_case_5_1_14, desc_case_5_1_14, sref_case_5_1_14, {
-	&test_5_1_14_top, &test_5_1_14_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_15, tgrp_case_5_1_15, name_case_5_1_15, desc_case_5_1_15, sref_case_5_1_15, {
-	&test_5_1_15_top, &test_5_1_15_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_16, tgrp_case_5_1_16, name_case_5_1_16, desc_case_5_1_16, sref_case_5_1_16, {
-	&test_5_1_16_top, &test_5_1_16_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_17, tgrp_case_5_1_17, name_case_5_1_17, desc_case_5_1_17, sref_case_5_1_17, {
-	&test_5_1_17_top, &test_5_1_17_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_18, tgrp_case_5_1_18, name_case_5_1_18, desc_case_5_1_18, sref_case_5_1_18, {
-	&test_5_1_18_top, &test_5_1_18_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_19, tgrp_case_5_1_19, name_case_5_1_19, desc_case_5_1_19, sref_case_5_1_19, {
-	&test_5_1_19_top, &test_5_1_19_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_20, tgrp_case_5_1_20, name_case_5_1_20, desc_case_5_1_20, sref_case_5_1_20, {
-	&test_5_1_20_top, &test_5_1_20_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_21, tgrp_case_5_1_21, name_case_5_1_21, desc_case_5_1_21, sref_case_5_1_21, {
-	&test_5_1_21_top, &test_5_1_21_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_22, tgrp_case_5_1_22, name_case_5_1_22, desc_case_5_1_22, sref_case_5_1_22, {
-	&test_5_1_22_top, &test_5_1_22_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_23, tgrp_case_5_1_23, name_case_5_1_23, desc_case_5_1_23, sref_case_5_1_23, {
-	&test_5_1_23_top, &test_5_1_23_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_24, tgrp_case_5_1_24, name_case_5_1_24, desc_case_5_1_24, sref_case_5_1_24, {
-	&test_5_1_24_top, &test_5_1_24_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_25, tgrp_case_5_1_25, name_case_5_1_25, desc_case_5_1_25, sref_case_5_1_25, {
-	&test_5_1_25_top, &test_5_1_25_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_26, tgrp_case_5_1_26, name_case_5_1_26, desc_case_5_1_26, sref_case_5_1_26, {
-	&test_5_1_26_top, &test_5_1_26_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_27, tgrp_case_5_1_27, name_case_5_1_27, desc_case_5_1_27, sref_case_5_1_27, {
-	&test_5_1_27_top, &test_5_1_27_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_1_28, tgrp_case_5_1_28, name_case_5_1_28, desc_case_5_1_28, sref_case_5_1_28, {
-	&test_5_1_28_top, &test_5_1_28_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_1, tgrp_case_5_2_1, name_case_5_2_1, desc_case_5_2_1, sref_case_5_2_1, {
-	&test_5_2_1_top, &test_5_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_2, tgrp_case_5_2_2, name_case_5_2_2, desc_case_5_2_2, sref_case_5_2_2, {
-	&test_5_2_2_top, &test_5_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_3, tgrp_case_5_2_3, name_case_5_2_3, desc_case_5_2_3, sref_case_5_2_3, {
-	&test_5_2_3_top, &test_5_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_4, tgrp_case_5_2_4, name_case_5_2_4, desc_case_5_2_4, sref_case_5_2_4, {
-	&test_5_2_4_top, &test_5_2_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_5, tgrp_case_5_2_5, name_case_5_2_5, desc_case_5_2_5, sref_case_5_2_5, {
-	&test_5_2_5_top, &test_5_2_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_6, tgrp_case_5_2_6, name_case_5_2_6, desc_case_5_2_6, sref_case_5_2_6, {
-	&test_5_2_6_top, &test_5_2_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_7, tgrp_case_5_2_7, name_case_5_2_7, desc_case_5_2_7, sref_case_5_2_7, {
-	&test_5_2_7_top, &test_5_2_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_8, tgrp_case_5_2_8, name_case_5_2_8, desc_case_5_2_8, sref_case_5_2_8, {
-	&test_5_2_8_top, &test_5_2_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_9, tgrp_case_5_2_9, name_case_5_2_9, desc_case_5_2_9, sref_case_5_2_9, {
-	&test_5_2_9_top, &test_5_2_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_10, tgrp_case_5_2_10, name_case_5_2_10, desc_case_5_2_10, sref_case_5_2_10, {
-	&test_5_2_10_top, &test_5_2_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_11, tgrp_case_5_2_11, name_case_5_2_11, desc_case_5_2_11, sref_case_5_2_11, {
-	&test_5_2_11_top, &test_5_2_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_12, tgrp_case_5_2_12, name_case_5_2_12, desc_case_5_2_12, sref_case_5_2_12, {
-	&test_5_2_12_top, &test_5_2_12_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_13, tgrp_case_5_2_13, name_case_5_2_13, desc_case_5_2_13, sref_case_5_2_13, {
-	&test_5_2_13_top, &test_5_2_13_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_14, tgrp_case_5_2_14, name_case_5_2_14, desc_case_5_2_14, sref_case_5_2_14, {
-	&test_5_2_14_top, &test_5_2_14_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_15, tgrp_case_5_2_15, name_case_5_2_15, desc_case_5_2_15, sref_case_5_2_15, {
-	&test_5_2_15_top, &test_5_2_15_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_16, tgrp_case_5_2_16, name_case_5_2_16, desc_case_5_2_16, sref_case_5_2_16, {
-	&test_5_2_16_top, &test_5_2_16_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_17, tgrp_case_5_2_17, name_case_5_2_17, desc_case_5_2_17, sref_case_5_2_17, {
-	&test_5_2_17_top, &test_5_2_17_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_18, tgrp_case_5_2_18, name_case_5_2_18, desc_case_5_2_18, sref_case_5_2_18, {
-	&test_5_2_18_top, &test_5_2_18_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_19, tgrp_case_5_2_19, name_case_5_2_19, desc_case_5_2_19, sref_case_5_2_19, {
-	&test_5_2_19_top, &test_5_2_19_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_20, tgrp_case_5_2_20, name_case_5_2_20, desc_case_5_2_20, sref_case_5_2_20, {
-	&test_5_2_20_top, &test_5_2_20_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_21, tgrp_case_5_2_21, name_case_5_2_21, desc_case_5_2_21, sref_case_5_2_21, {
-	&test_5_2_21_top, &test_5_2_21_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_22, tgrp_case_5_2_22, name_case_5_2_22, desc_case_5_2_22, sref_case_5_2_22, {
-	&test_5_2_22_top, &test_5_2_22_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_23, tgrp_case_5_2_23, name_case_5_2_23, desc_case_5_2_23, sref_case_5_2_23, {
-	&test_5_2_23_top, &test_5_2_23_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_24, tgrp_case_5_2_24, name_case_5_2_24, desc_case_5_2_24, sref_case_5_2_24, {
-	&test_5_2_24_top, &test_5_2_24_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_25, tgrp_case_5_2_25, name_case_5_2_25, desc_case_5_2_25, sref_case_5_2_25, {
-	&test_5_2_25_top, &test_5_2_25_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_26, tgrp_case_5_2_26, name_case_5_2_26, desc_case_5_2_26, sref_case_5_2_26, {
-	&test_5_2_26_top, &test_5_2_26_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_27, tgrp_case_5_2_27, name_case_5_2_27, desc_case_5_2_27, sref_case_5_2_27, {
-	&test_5_2_27_top, &test_5_2_27_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_2_28, tgrp_case_5_2_28, name_case_5_2_28, desc_case_5_2_28, sref_case_5_2_28, {
-	&test_5_2_28_top, &test_5_2_28_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_1, tgrp_case_5_3_1, name_case_5_3_1, desc_case_5_3_1, sref_case_5_3_1, {
-	&test_5_3_1_top, &test_5_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_2, tgrp_case_5_3_2, name_case_5_3_2, desc_case_5_3_2, sref_case_5_3_2, {
-	&test_5_3_2_top, &test_5_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_3, tgrp_case_5_3_3, name_case_5_3_3, desc_case_5_3_3, sref_case_5_3_3, {
-	&test_5_3_3_top, &test_5_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_4, tgrp_case_5_3_4, name_case_5_3_4, desc_case_5_3_4, sref_case_5_3_4, {
-	&test_5_3_4_top, &test_5_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_5, tgrp_case_5_3_5, name_case_5_3_5, desc_case_5_3_5, sref_case_5_3_5, {
-	&test_5_3_5_top, &test_5_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_6, tgrp_case_5_3_6, name_case_5_3_6, desc_case_5_3_6, sref_case_5_3_6, {
-	&test_5_3_6_top, &test_5_3_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_7, tgrp_case_5_3_7, name_case_5_3_7, desc_case_5_3_7, sref_case_5_3_7, {
-	&test_5_3_7_top, &test_5_3_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_8, tgrp_case_5_3_8, name_case_5_3_8, desc_case_5_3_8, sref_case_5_3_8, {
-	&test_5_3_8_top, &test_5_3_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_9, tgrp_case_5_3_9, name_case_5_3_9, desc_case_5_3_9, sref_case_5_3_9, {
-	&test_5_3_9_top, &test_5_3_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_10, tgrp_case_5_3_10, name_case_5_3_10, desc_case_5_3_10, sref_case_5_3_10, {
-	&test_5_3_10_top, &test_5_3_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_11, tgrp_case_5_3_11, name_case_5_3_11, desc_case_5_3_11, sref_case_5_3_11, {
-	&test_5_3_11_top, &test_5_3_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_12, tgrp_case_5_3_12, name_case_5_3_12, desc_case_5_3_12, sref_case_5_3_12, {
-	&test_5_3_12_top, &test_5_3_12_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_13, tgrp_case_5_3_13, name_case_5_3_13, desc_case_5_3_13, sref_case_5_3_13, {
-	&test_5_3_13_top, &test_5_3_13_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_14, tgrp_case_5_3_14, name_case_5_3_14, desc_case_5_3_14, sref_case_5_3_14, {
-	&test_5_3_14_top, &test_5_3_14_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_15, tgrp_case_5_3_15, name_case_5_3_15, desc_case_5_3_15, sref_case_5_3_15, {
-	&test_5_3_15_top, &test_5_3_15_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_16, tgrp_case_5_3_16, name_case_5_3_16, desc_case_5_3_16, sref_case_5_3_16, {
-	&test_5_3_16_top, &test_5_3_16_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_17, tgrp_case_5_3_17, name_case_5_3_17, desc_case_5_3_17, sref_case_5_3_17, {
-	&test_5_3_17_top, &test_5_3_17_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_18, tgrp_case_5_3_18, name_case_5_3_18, desc_case_5_3_18, sref_case_5_3_18, {
-	&test_5_3_18_top, &test_5_3_18_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_19, tgrp_case_5_3_19, name_case_5_3_19, desc_case_5_3_19, sref_case_5_3_19, {
-	&test_5_3_19_top, &test_5_3_19_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_20, tgrp_case_5_3_20, name_case_5_3_20, desc_case_5_3_20, sref_case_5_3_20, {
-	&test_5_3_20_top, &test_5_3_20_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_21, tgrp_case_5_3_21, name_case_5_3_21, desc_case_5_3_21, sref_case_5_3_21, {
-	&test_5_3_21_top, &test_5_3_21_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_22, tgrp_case_5_3_22, name_case_5_3_22, desc_case_5_3_22, sref_case_5_3_22, {
-	&test_5_3_22_top, &test_5_3_22_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_23, tgrp_case_5_3_23, name_case_5_3_23, desc_case_5_3_23, sref_case_5_3_23, {
-	&test_5_3_23_top, &test_5_3_23_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_24, tgrp_case_5_3_24, name_case_5_3_24, desc_case_5_3_24, sref_case_5_3_24, {
-	&test_5_3_24_top, &test_5_3_24_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_25, tgrp_case_5_3_25, name_case_5_3_25, desc_case_5_3_25, sref_case_5_3_25, {
-	&test_5_3_25_top, &test_5_3_25_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_26, tgrp_case_5_3_26, name_case_5_3_26, desc_case_5_3_26, sref_case_5_3_26, {
-	&test_5_3_26_top, &test_5_3_26_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_27, tgrp_case_5_3_27, name_case_5_3_27, desc_case_5_3_27, sref_case_5_3_27, {
-	&test_5_3_27_top, &test_5_3_27_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_5_3_28, tgrp_case_5_3_28, name_case_5_3_28, desc_case_5_3_28, sref_case_5_3_28, {
-	&test_5_3_28_top, &test_5_3_28_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_1_1, tgrp_case_6_1_1, name_case_6_1_1, desc_case_6_1_1, sref_case_6_1_1, {
-	&test_6_1_1_top, &test_6_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_1_2, tgrp_case_6_1_2, name_case_6_1_2, desc_case_6_1_2, sref_case_6_1_2, {
-	&test_6_1_2_top, &test_6_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_1_3, tgrp_case_6_1_3, name_case_6_1_3, desc_case_6_1_3, sref_case_6_1_3, {
-	&test_6_1_3_top, &test_6_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_1_4, tgrp_case_6_1_4, name_case_6_1_4, desc_case_6_1_4, sref_case_6_1_4, {
-	&test_6_1_4_top, &test_6_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_1_5, tgrp_case_6_1_5, name_case_6_1_5, desc_case_6_1_5, sref_case_6_1_5, {
-	&test_6_1_5_top, &test_6_1_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_1_6, tgrp_case_6_1_6, name_case_6_1_6, desc_case_6_1_6, sref_case_6_1_6, {
-	&test_6_1_6_top, &test_6_1_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_1_7, tgrp_case_6_1_7, name_case_6_1_7, desc_case_6_1_7, sref_case_6_1_7, {
-	&test_6_1_7_top, &test_6_1_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_1_8, tgrp_case_6_1_8, name_case_6_1_8, desc_case_6_1_8, sref_case_6_1_8, {
-	&test_6_1_8_top, &test_6_1_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_1_9, tgrp_case_6_1_9, name_case_6_1_9, desc_case_6_1_9, sref_case_6_1_9, {
-	&test_6_1_9_top, &test_6_1_9_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_1_10, tgrp_case_6_1_10, name_case_6_1_10, desc_case_6_1_10, sref_case_6_1_10, {
-	&test_6_1_10_top, &test_6_1_10_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_1_11, tgrp_case_6_1_11, name_case_6_1_11, desc_case_6_1_11, sref_case_6_1_11, {
-	&test_6_1_11_top, &test_6_1_11_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_1_12, tgrp_case_6_1_12, name_case_6_1_12, desc_case_6_1_12, sref_case_6_1_12, {
-	&test_6_1_12_top, &test_6_1_12_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_2_1, tgrp_case_6_2_1, name_case_6_2_1, desc_case_6_2_1, sref_case_6_2_1, {
-	&test_6_2_1_top, &test_6_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_2_2, tgrp_case_6_2_2, name_case_6_2_2, desc_case_6_2_2, sref_case_6_2_2, {
-	&test_6_2_2_top, &test_6_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_2_3, tgrp_case_6_2_3, name_case_6_2_3, desc_case_6_2_3, sref_case_6_2_3, {
-	&test_6_2_3_top, &test_6_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_2_4, tgrp_case_6_2_4, name_case_6_2_4, desc_case_6_2_4, sref_case_6_2_4, {
-	&test_6_2_4_top, &test_6_2_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_2_5, tgrp_case_6_2_5, name_case_6_2_5, desc_case_6_2_5, sref_case_6_2_5, {
-	&test_6_2_5_top, &test_6_2_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_2_6, tgrp_case_6_2_6, name_case_6_2_6, desc_case_6_2_6, sref_case_6_2_6, {
-	&test_6_2_6_top, &test_6_2_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_3_1, tgrp_case_6_3_1, name_case_6_3_1, desc_case_6_3_1, sref_case_6_3_1, {
-	&test_6_3_1_top, &test_6_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_3_2, tgrp_case_6_3_2, name_case_6_3_2, desc_case_6_3_2, sref_case_6_3_2, {
-	&test_6_3_2_top, &test_6_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_3_3, tgrp_case_6_3_3, name_case_6_3_3, desc_case_6_3_3, sref_case_6_3_3, {
-	&test_6_3_3_top, &test_6_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_3_4, tgrp_case_6_3_4, name_case_6_3_4, desc_case_6_3_4, sref_case_6_3_4, {
-	&test_6_3_4_top, &test_6_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_3_5, tgrp_case_6_3_5, name_case_6_3_5, desc_case_6_3_5, sref_case_6_3_5, {
-	&test_6_3_5_top, &test_6_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_3_6, tgrp_case_6_3_6, name_case_6_3_6, desc_case_6_3_6, sref_case_6_3_6, {
-	&test_6_3_6_top, &test_6_3_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_3_7, tgrp_case_6_3_7, name_case_6_3_7, desc_case_6_3_7, sref_case_6_3_7, {
-	&test_6_3_7_top, &test_6_3_7_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_3_8, tgrp_case_6_3_8, name_case_6_3_8, desc_case_6_3_8, sref_case_6_3_8, {
-	&test_6_3_8_top, &test_6_3_8_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_4_1, tgrp_case_6_4_1, name_case_6_4_1, desc_case_6_4_1, sref_case_6_4_1, {
-	&test_6_4_1_top, &test_6_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_4_2, tgrp_case_6_4_2, name_case_6_4_2, desc_case_6_4_2, sref_case_6_4_2, {
-	&test_6_4_2_top, &test_6_4_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_4_3, tgrp_case_6_4_3, name_case_6_4_3, desc_case_6_4_3, sref_case_6_4_3, {
-	&test_6_4_3_top, &test_6_4_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_4_4, tgrp_case_6_4_4, name_case_6_4_4, desc_case_6_4_4, sref_case_6_4_4, {
-	&test_6_4_4_top, &test_6_4_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_4_5, tgrp_case_6_4_5, name_case_6_4_5, desc_case_6_4_5, sref_case_6_4_5, {
-	&test_6_4_5_top, &test_6_4_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_4_6, tgrp_case_6_4_6, name_case_6_4_6, desc_case_6_4_6, sref_case_6_4_6, {
-	&test_6_4_6_top, &test_6_4_6_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_5_1, tgrp_case_6_5_1, name_case_6_5_1, desc_case_6_5_1, sref_case_6_5_1, {
-	&test_6_5_1_top, &test_6_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_5_2, tgrp_case_6_5_2, name_case_6_5_2, desc_case_6_5_2, sref_case_6_5_2, {
-	&test_6_5_2_top, &test_6_5_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_5_3, tgrp_case_6_5_3, name_case_6_5_3, desc_case_6_5_3, sref_case_6_5_3, {
-	&test_6_5_3_top, &test_6_5_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_5_4, tgrp_case_6_5_4, name_case_6_5_4, desc_case_6_5_4, sref_case_6_5_4, {
-	&test_6_5_4_top, &test_6_5_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_5_5, tgrp_case_6_5_5, name_case_6_5_5, desc_case_6_5_5, sref_case_6_5_5, {
-	&test_6_5_5_top, &test_6_5_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_6_1, tgrp_case_6_6_1, name_case_6_6_1, desc_case_6_6_1, sref_case_6_6_1, {
-	&test_6_6_1_top, &test_6_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_6_6_2, tgrp_case_6_6_2, name_case_6_6_2, desc_case_6_6_2, sref_case_6_6_2, {
-	&test_6_6_2_top, &test_6_6_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_1_1, tgrp_case_7_1_1, name_case_7_1_1, desc_case_7_1_1, sref_case_7_1_1, {
-	&test_7_1_1_top, &test_7_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_1_2, tgrp_case_7_1_2, name_case_7_1_2, desc_case_7_1_2, sref_case_7_1_2, {
-	&test_7_1_2_top, &test_7_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_1_3, tgrp_case_7_1_3, name_case_7_1_3, desc_case_7_1_3, sref_case_7_1_3, {
-	&test_7_1_3_top, &test_7_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_2_1, tgrp_case_7_2_1, name_case_7_2_1, desc_case_7_2_1, sref_case_7_2_1, {
-	&test_7_2_1_top, &test_7_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_3_1, tgrp_case_7_3_1, name_case_7_3_1, desc_case_7_3_1, sref_case_7_3_1, {
-	&test_7_3_1_top, &test_7_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_3_2, tgrp_case_7_3_2, name_case_7_3_2, desc_case_7_3_2, sref_case_7_3_2, {
-	&test_7_3_2_top, &test_7_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_3_3, tgrp_case_7_3_3, name_case_7_3_3, desc_case_7_3_3, sref_case_7_3_3, {
-	&test_7_3_3_top, &test_7_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_3_4, tgrp_case_7_3_4, name_case_7_3_4, desc_case_7_3_4, sref_case_7_3_4, {
-	&test_7_3_4_top, &test_7_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_3_5, tgrp_case_7_3_5, name_case_7_3_5, desc_case_7_3_5, sref_case_7_3_5, {
-	&test_7_3_5_top, &test_7_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_4_1, tgrp_case_7_4_1, name_case_7_4_1, desc_case_7_4_1, sref_case_7_4_1, {
-	&test_7_4_1_top, &test_7_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_4_2, tgrp_case_7_4_2, name_case_7_4_2, desc_case_7_4_2, sref_case_7_4_2, {
-	&test_7_4_2_top, &test_7_4_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_4_3, tgrp_case_7_4_3, name_case_7_4_3, desc_case_7_4_3, sref_case_7_4_3, {
-	&test_7_4_3_top, &test_7_4_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_5_1, tgrp_case_7_5_1, name_case_7_5_1, desc_case_7_5_1, sref_case_7_5_1, {
-	&test_7_5_1_top, &test_7_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_5_2, tgrp_case_7_5_2, name_case_7_5_2, desc_case_7_5_2, sref_case_7_5_2, {
-	&test_7_5_2_top, &test_7_5_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_5_3, tgrp_case_7_5_3, name_case_7_5_3, desc_case_7_5_3, sref_case_7_5_3, {
-	&test_7_5_3_top, &test_7_5_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_6_1, tgrp_case_7_6_1, name_case_7_6_1, desc_case_7_6_1, sref_case_7_6_1, {
-	&test_7_6_1_top, &test_7_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_6_2, tgrp_case_7_6_2, name_case_7_6_2, desc_case_7_6_2, sref_case_7_6_2, {
-	&test_7_6_2_top, &test_7_6_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_6_3, tgrp_case_7_6_3, name_case_7_6_3, desc_case_7_6_3, sref_case_7_6_3, {
-	&test_7_6_3_top, &test_7_6_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_7_1, tgrp_case_7_7_1, name_case_7_7_1, desc_case_7_7_1, sref_case_7_7_1, {
-	&test_7_7_1_top, &test_7_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_7_2, tgrp_case_7_7_2, name_case_7_7_2, desc_case_7_7_2, sref_case_7_7_2, {
-	&test_7_7_2_top, &test_7_7_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_7_3, tgrp_case_7_7_3, name_case_7_7_3, desc_case_7_7_3, sref_case_7_7_3, {
-	&test_7_7_3_top, &test_7_7_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_8_1, tgrp_case_7_8_1, name_case_7_8_1, desc_case_7_8_1, sref_case_7_8_1, {
-	&test_7_8_1_top, &test_7_8_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_8_2, tgrp_case_7_8_2, name_case_7_8_2, desc_case_7_8_2, sref_case_7_8_2, {
-	&test_7_8_2_top, &test_7_8_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_8_3, tgrp_case_7_8_3, name_case_7_8_3, desc_case_7_8_3, sref_case_7_8_3, {
-	&test_7_8_3_top, &test_7_8_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_9_1, tgrp_case_7_9_1, name_case_7_9_1, desc_case_7_9_1, sref_case_7_9_1, {
-	&test_7_9_1_top, &test_7_9_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_9_2, tgrp_case_7_9_2, name_case_7_9_2, desc_case_7_9_2, sref_case_7_9_2, {
-	&test_7_9_2_top, &test_7_9_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_9_3, tgrp_case_7_9_3, name_case_7_9_3, desc_case_7_9_3, sref_case_7_9_3, {
-	&test_7_9_3_top, &test_7_9_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_10_1, tgrp_case_7_10_1, name_case_7_10_1, desc_case_7_10_1, sref_case_7_10_1, {
-	&test_7_10_1_top, &test_7_10_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_10_2, tgrp_case_7_10_2, name_case_7_10_2, desc_case_7_10_2, sref_case_7_10_2, {
-	&test_7_10_2_top, &test_7_10_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_10_3, tgrp_case_7_10_3, name_case_7_10_3, desc_case_7_10_3, sref_case_7_10_3, {
-	&test_7_10_3_top, &test_7_10_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_11_1, tgrp_case_7_11_1, name_case_7_11_1, desc_case_7_11_1, sref_case_7_11_1, {
-	&test_7_11_1_top, &test_7_11_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_11_2, tgrp_case_7_11_2, name_case_7_11_2, desc_case_7_11_2, sref_case_7_11_2, {
-	&test_7_11_2_top, &test_7_11_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_11_3, tgrp_case_7_11_3, name_case_7_11_3, desc_case_7_11_3, sref_case_7_11_3, {
-	&test_7_11_3_top, &test_7_11_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_12_1, tgrp_case_7_12_1, name_case_7_12_1, desc_case_7_12_1, sref_case_7_12_1, {
-	&test_7_12_1_top, &test_7_12_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_12_2, tgrp_case_7_12_2, name_case_7_12_2, desc_case_7_12_2, sref_case_7_12_2, {
-	&test_7_12_2_top, &test_7_12_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_12_3, tgrp_case_7_12_3, name_case_7_12_3, desc_case_7_12_3, sref_case_7_12_3, {
-	&test_7_12_3_top, &test_7_12_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_13_1, tgrp_case_7_13_1, name_case_7_13_1, desc_case_7_13_1, sref_case_7_13_1, {
-	&test_7_13_1_top, &test_7_13_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_13_2, tgrp_case_7_13_2, name_case_7_13_2, desc_case_7_13_2, sref_case_7_13_2, {
-	&test_7_13_2_top, &test_7_13_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_13_3, tgrp_case_7_13_3, name_case_7_13_3, desc_case_7_13_3, sref_case_7_13_3, {
-	&test_7_13_3_top, &test_7_13_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_14_1, tgrp_case_7_14_1, name_case_7_14_1, desc_case_7_14_1, sref_case_7_14_1, {
-	&test_7_14_1_top, &test_7_14_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_14_2, tgrp_case_7_14_2, name_case_7_14_2, desc_case_7_14_2, sref_case_7_14_2, {
-	&test_7_14_2_top, &test_7_14_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_14_3, tgrp_case_7_14_3, name_case_7_14_3, desc_case_7_14_3, sref_case_7_14_3, {
-	&test_7_14_3_top, &test_7_14_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_15_1, tgrp_case_7_15_1, name_case_7_15_1, desc_case_7_15_1, sref_case_7_15_1, {
-	&test_7_15_1_top, &test_7_15_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_15_2, tgrp_case_7_15_2, name_case_7_15_2, desc_case_7_15_2, sref_case_7_15_2, {
-	&test_7_15_2_top, &test_7_15_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_15_3, tgrp_case_7_15_3, name_case_7_15_3, desc_case_7_15_3, sref_case_7_15_3, {
-	&test_7_15_3_top, &test_7_15_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_16_1, tgrp_case_7_16_1, name_case_7_16_1, desc_case_7_16_1, sref_case_7_16_1, {
-	&test_7_16_1_top, &test_7_16_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_16_2, tgrp_case_7_16_2, name_case_7_16_2, desc_case_7_16_2, sref_case_7_16_2, {
-	&test_7_16_2_top, &test_7_16_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_16_3, tgrp_case_7_16_3, name_case_7_16_3, desc_case_7_16_3, sref_case_7_16_3, {
-	&test_7_16_3_top, &test_7_16_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_7_17_1, tgrp_case_7_17_1, name_case_7_17_1, desc_case_7_17_1, sref_case_7_17_1, {
-	&test_7_17_1_top, &test_7_17_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_1_1, tgrp_case_8_1_1, name_case_8_1_1, desc_case_8_1_1, sref_case_8_1_1, {
-	&test_8_1_1_top, &test_8_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_1_2, tgrp_case_8_1_2, name_case_8_1_2, desc_case_8_1_2, sref_case_8_1_2, {
-	&test_8_1_2_top, &test_8_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_1_3, tgrp_case_8_1_3, name_case_8_1_3, desc_case_8_1_3, sref_case_8_1_3, {
-	&test_8_1_3_top, &test_8_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_1_4, tgrp_case_8_1_4, name_case_8_1_4, desc_case_8_1_4, sref_case_8_1_4, {
-	&test_8_1_4_top, &test_8_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_2_1, tgrp_case_8_2_1, name_case_8_2_1, desc_case_8_2_1, sref_case_8_2_1, {
-	&test_8_2_1_top, &test_8_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_2_2, tgrp_case_8_2_2, name_case_8_2_2, desc_case_8_2_2, sref_case_8_2_2, {
-	&test_8_2_2_top, &test_8_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_2_3, tgrp_case_8_2_3, name_case_8_2_3, desc_case_8_2_3, sref_case_8_2_3, {
-	&test_8_2_3_top, &test_8_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_3_1, tgrp_case_8_3_1, name_case_8_3_1, desc_case_8_3_1, sref_case_8_3_1, {
-	&test_8_3_1_top, &test_8_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_3_2, tgrp_case_8_3_2, name_case_8_3_2, desc_case_8_3_2, sref_case_8_3_2, {
-	&test_8_3_2_top, &test_8_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_4_1, tgrp_case_8_4_1, name_case_8_4_1, desc_case_8_4_1, sref_case_8_4_1, {
-	&test_8_4_1_top, &test_8_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_5_1, tgrp_case_8_5_1, name_case_8_5_1, desc_case_8_5_1, sref_case_8_5_1, {
-	&test_8_5_1_top, &test_8_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_5_2, tgrp_case_8_5_2, name_case_8_5_2, desc_case_8_5_2, sref_case_8_5_2, {
-	&test_8_5_2_top, &test_8_5_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_5_3, tgrp_case_8_5_3, name_case_8_5_3, desc_case_8_5_3, sref_case_8_5_3, {
-	&test_8_5_3_top, &test_8_5_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_5_4, tgrp_case_8_5_4, name_case_8_5_4, desc_case_8_5_4, sref_case_8_5_4, {
-	&test_8_5_4_top, &test_8_5_4_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_6_1, tgrp_case_8_6_1, name_case_8_6_1, desc_case_8_6_1, sref_case_8_6_1, {
-	&test_8_6_1_top, &test_8_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_6_2, tgrp_case_8_6_2, name_case_8_6_2, desc_case_8_6_2, sref_case_8_6_2, {
-	&test_8_6_2_top, &test_8_6_2_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_6_3, tgrp_case_8_6_3, name_case_8_6_3, desc_case_8_6_3, sref_case_8_6_3, {
-	&test_8_6_3_top, &test_8_6_3_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_7_1, tgrp_case_8_7_1, name_case_8_7_1, desc_case_8_7_1, sref_case_8_7_1, {
-	&test_8_7_1_top, &test_8_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
-		numb_case_8_8_1, tgrp_case_8_8_1, name_case_8_8_1, desc_case_8_8_1, sref_case_8_8_1, {
-	&test_8_8_1_top, &test_8_8_1_bot, NULL}, &begin_tests, &end_tests, 0, 0}, {
+	numb_case_0_1, tgrp_case_0_1, NULL, name_case_0_1, NULL, desc_case_0_1, sref_case_0_1, { &test_0_1_conn, &test_0_1_resp, &test_0_1_list}, &begin_tests, &end_tests, 5000, 0, 0, __RESULT_INCONCLUSIVE,}, {
+	numb_case_1_1, tgrp_case_1_1, NULL, name_case_1_1, NULL, desc_case_1_1, sref_case_1_1, { &test_1_1_top, &test_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_2_1, tgrp_case_1_2_1, NULL, name_case_1_2_1, NULL, desc_case_1_2_1, sref_case_1_2_1, { &test_1_2_1_top, &test_1_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_2_2, tgrp_case_1_2_2, NULL, name_case_1_2_2, NULL, desc_case_1_2_2, sref_case_1_2_2, { &test_1_2_2_top, &test_1_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_1_2_3, tgrp_case_1_2_3, NULL, name_case_1_2_3, NULL, desc_case_1_2_3, sref_case_1_2_3, { &test_1_2_3_top, &test_1_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_1_1, tgrp_case_2_1_1, NULL, name_case_2_1_1, NULL, desc_case_2_1_1, sref_case_2_1_1, { &test_2_1_1_top, &test_2_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_1_2, tgrp_case_2_1_2, NULL, name_case_2_1_2, NULL, desc_case_2_1_2, sref_case_2_1_2, { &test_2_1_2_top, &test_2_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_1_3, tgrp_case_2_1_3, NULL, name_case_2_1_3, NULL, desc_case_2_1_3, sref_case_2_1_3, { &test_2_1_3_top, &test_2_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_1_4, tgrp_case_2_1_4, NULL, name_case_2_1_4, NULL, desc_case_2_1_4, sref_case_2_1_4, { &test_2_1_4_top, &test_2_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_1_5, tgrp_case_2_1_5, NULL, name_case_2_1_5, NULL, desc_case_2_1_5, sref_case_2_1_5, { &test_2_1_5_top, &test_2_1_5_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_1_6, tgrp_case_2_1_6, NULL, name_case_2_1_6, NULL, desc_case_2_1_6, sref_case_2_1_6, { &test_2_1_6_top, &test_2_1_6_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_1_7, tgrp_case_2_1_7, NULL, name_case_2_1_7, NULL, desc_case_2_1_7, sref_case_2_1_7, { &test_2_1_7_top, &test_2_1_7_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_1_8, tgrp_case_2_1_8, NULL, name_case_2_1_8, NULL, desc_case_2_1_8, sref_case_2_1_8, { &test_2_1_8_top, &test_2_1_8_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_2, tgrp_case_2_2, NULL, name_case_2_2, NULL, desc_case_2_2, sref_case_2_2, { &test_2_2_top, &test_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_3_1, tgrp_case_2_3_1, NULL, name_case_2_3_1, NULL, desc_case_2_3_1, sref_case_2_3_1, { &test_2_3_1_top, &test_2_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_3_2, tgrp_case_2_3_2, NULL, name_case_2_3_2, NULL, desc_case_2_3_2, sref_case_2_3_2, { &test_2_3_2_top, &test_2_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_3_3, tgrp_case_2_3_3, NULL, name_case_2_3_3, NULL, desc_case_2_3_3, sref_case_2_3_3, { &test_2_3_3_top, &test_2_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_3_4, tgrp_case_2_3_4, NULL, name_case_2_3_4, NULL, desc_case_2_3_4, sref_case_2_3_4, { &test_2_3_4_top, &test_2_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_3_5, tgrp_case_2_3_5, NULL, name_case_2_3_5, NULL, desc_case_2_3_5, sref_case_2_3_5, { &test_2_3_5_top, &test_2_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_3_6, tgrp_case_2_3_6, NULL, name_case_2_3_6, NULL, desc_case_2_3_6, sref_case_2_3_6, { &test_2_3_6_top, &test_2_3_6_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_3_7, tgrp_case_2_3_7, NULL, name_case_2_3_7, NULL, desc_case_2_3_7, sref_case_2_3_7, { &test_2_3_7_top, &test_2_3_7_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_3_8, tgrp_case_2_3_8, NULL, name_case_2_3_8, NULL, desc_case_2_3_8, sref_case_2_3_8, { &test_2_3_8_top, &test_2_3_8_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_3_9, tgrp_case_2_3_9, NULL, name_case_2_3_9, NULL, desc_case_2_3_9, sref_case_2_3_9, { &test_2_3_9_top, &test_2_3_9_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_4_1, tgrp_case_2_4_1, NULL, name_case_2_4_1, NULL, desc_case_2_4_1, sref_case_2_4_1, { &test_2_4_1_top, &test_2_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_2_5_1, tgrp_case_2_5_1, NULL, name_case_2_5_1, NULL, desc_case_2_5_1, sref_case_2_5_1, { &test_2_5_1_top, &test_2_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_1_1, tgrp_case_3_1_1, NULL, name_case_3_1_1, NULL, desc_case_3_1_1, sref_case_3_1_1, { &test_3_1_1_top, &test_3_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_2_1, tgrp_case_3_2_1, NULL, name_case_3_2_1, NULL, desc_case_3_2_1, sref_case_3_2_1, { &test_3_2_1_top, &test_3_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_3_1, tgrp_case_3_3_1, NULL, name_case_3_3_1, NULL, desc_case_3_3_1, sref_case_3_3_1, { &test_3_3_1_top, &test_3_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_4_1, tgrp_case_3_4_1, NULL, name_case_3_4_1, NULL, desc_case_3_4_1, sref_case_3_4_1, { &test_3_4_1_top, &test_3_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_4_2, tgrp_case_3_4_2, NULL, name_case_3_4_2, NULL, desc_case_3_4_2, sref_case_3_4_2, { &test_3_4_2_top, &test_3_4_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_5_1, tgrp_case_3_5_1, NULL, name_case_3_5_1, NULL, desc_case_3_5_1, sref_case_3_5_1, { &test_3_5_1_top, &test_3_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_5_2, tgrp_case_3_5_2, NULL, name_case_3_5_2, NULL, desc_case_3_5_2, sref_case_3_5_2, { &test_3_5_2_top, &test_3_5_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_6_1, tgrp_case_3_6_1, NULL, name_case_3_6_1, NULL, desc_case_3_6_1, sref_case_3_6_1, { &test_3_6_1_top, &test_3_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_3_7_1, tgrp_case_3_7_1, NULL, name_case_3_7_1, NULL, desc_case_3_7_1, sref_case_3_7_1, { &test_3_7_1_top, &test_3_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_1_1, tgrp_case_4_1_1, NULL, name_case_4_1_1, NULL, desc_case_4_1_1, sref_case_4_1_1, { &test_4_1_1_top, &test_4_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_1_2, tgrp_case_4_1_2, NULL, name_case_4_1_2, NULL, desc_case_4_1_2, sref_case_4_1_2, { &test_4_1_2_top, &test_4_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_2_1, tgrp_case_4_2_1, NULL, name_case_4_2_1, NULL, desc_case_4_2_1, sref_case_4_2_1, { &test_4_2_1_top, &test_4_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_2_2, tgrp_case_4_2_2, NULL, name_case_4_2_2, NULL, desc_case_4_2_2, sref_case_4_2_2, { &test_4_2_2_top, &test_4_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_3_1, tgrp_case_4_3_1, NULL, name_case_4_3_1, NULL, desc_case_4_3_1, sref_case_4_3_1, { &test_4_3_1_top, &test_4_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_4_1, tgrp_case_4_4_1, NULL, name_case_4_4_1, NULL, desc_case_4_4_1, sref_case_4_4_1, { &test_4_4_1_top, &test_4_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_4_2, tgrp_case_4_4_2, NULL, name_case_4_4_2, NULL, desc_case_4_4_2, sref_case_4_4_2, { &test_4_4_2_top, &test_4_4_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_4_3, tgrp_case_4_4_3, NULL, name_case_4_4_3, NULL, desc_case_4_4_3, sref_case_4_4_3, { &test_4_4_3_top, &test_4_4_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_4_4, tgrp_case_4_4_4, NULL, name_case_4_4_4, NULL, desc_case_4_4_4, sref_case_4_4_4, { &test_4_4_4_top, &test_4_4_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_4_5, tgrp_case_4_4_5, NULL, name_case_4_4_5, NULL, desc_case_4_4_5, sref_case_4_4_5, { &test_4_4_5_top, &test_4_4_5_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_4_6, tgrp_case_4_4_6, NULL, name_case_4_4_6, NULL, desc_case_4_4_6, sref_case_4_4_6, { &test_4_4_6_top, &test_4_4_6_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_4_7, tgrp_case_4_4_7, NULL, name_case_4_4_7, NULL, desc_case_4_4_7, sref_case_4_4_7, { &test_4_4_7_top, &test_4_4_7_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_4_8, tgrp_case_4_4_8, NULL, name_case_4_4_8, NULL, desc_case_4_4_8, sref_case_4_4_8, { &test_4_4_8_top, &test_4_4_8_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_5_1, tgrp_case_4_5_1, NULL, name_case_4_5_1, NULL, desc_case_4_5_1, sref_case_4_5_1, { &test_4_5_1_top, &test_4_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_6_1, tgrp_case_4_6_1, NULL, name_case_4_6_1, NULL, desc_case_4_6_1, sref_case_4_6_1, { &test_4_6_1_top, &test_4_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_6_2, tgrp_case_4_6_2, NULL, name_case_4_6_2, NULL, desc_case_4_6_2, sref_case_4_6_2, { &test_4_6_2_top, &test_4_6_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_6_3, tgrp_case_4_6_3, NULL, name_case_4_6_3, NULL, desc_case_4_6_3, sref_case_4_6_3, { &test_4_6_3_top, &test_4_6_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_6_4, tgrp_case_4_6_4, NULL, name_case_4_6_4, NULL, desc_case_4_6_4, sref_case_4_6_4, { &test_4_6_4_top, &test_4_6_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_7_1, tgrp_case_4_7_1, NULL, name_case_4_7_1, NULL, desc_case_4_7_1, sref_case_4_7_1, { &test_4_7_1_top, &test_4_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_7_2, tgrp_case_4_7_2, NULL, name_case_4_7_2, NULL, desc_case_4_7_2, sref_case_4_7_2, { &test_4_7_2_top, &test_4_7_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_7_3, tgrp_case_4_7_3, NULL, name_case_4_7_3, NULL, desc_case_4_7_3, sref_case_4_7_3, { &test_4_7_3_top, &test_4_7_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_7_4, tgrp_case_4_7_4, NULL, name_case_4_7_4, NULL, desc_case_4_7_4, sref_case_4_7_4, { &test_4_7_4_top, &test_4_7_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_8_1, tgrp_case_4_8_1, NULL, name_case_4_8_1, NULL, desc_case_4_8_1, sref_case_4_8_1, { &test_4_8_1_top, &test_4_8_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_8_2, tgrp_case_4_8_2, NULL, name_case_4_8_2, NULL, desc_case_4_8_2, sref_case_4_8_2, { &test_4_8_2_top, &test_4_8_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_8_3, tgrp_case_4_8_3, NULL, name_case_4_8_3, NULL, desc_case_4_8_3, sref_case_4_8_3, { &test_4_8_3_top, &test_4_8_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_4_9_1, tgrp_case_4_9_1, NULL, name_case_4_9_1, NULL, desc_case_4_9_1, sref_case_4_9_1, { &test_4_9_1_top, &test_4_9_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_1, tgrp_case_5_1_1, NULL, name_case_5_1_1, NULL, desc_case_5_1_1, sref_case_5_1_1, { &test_5_1_1_top, &test_5_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_2, tgrp_case_5_1_2, NULL, name_case_5_1_2, NULL, desc_case_5_1_2, sref_case_5_1_2, { &test_5_1_2_top, &test_5_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_3, tgrp_case_5_1_3, NULL, name_case_5_1_3, NULL, desc_case_5_1_3, sref_case_5_1_3, { &test_5_1_3_top, &test_5_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_4, tgrp_case_5_1_4, NULL, name_case_5_1_4, NULL, desc_case_5_1_4, sref_case_5_1_4, { &test_5_1_4_top, &test_5_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_5, tgrp_case_5_1_5, NULL, name_case_5_1_5, NULL, desc_case_5_1_5, sref_case_5_1_5, { &test_5_1_5_top, &test_5_1_5_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_6, tgrp_case_5_1_6, NULL, name_case_5_1_6, NULL, desc_case_5_1_6, sref_case_5_1_6, { &test_5_1_6_top, &test_5_1_6_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_7, tgrp_case_5_1_7, NULL, name_case_5_1_7, NULL, desc_case_5_1_7, sref_case_5_1_7, { &test_5_1_7_top, &test_5_1_7_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_8, tgrp_case_5_1_8, NULL, name_case_5_1_8, NULL, desc_case_5_1_8, sref_case_5_1_8, { &test_5_1_8_top, &test_5_1_8_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_9, tgrp_case_5_1_9, NULL, name_case_5_1_9, NULL, desc_case_5_1_9, sref_case_5_1_9, { &test_5_1_9_top, &test_5_1_9_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_10, tgrp_case_5_1_10, NULL, name_case_5_1_10, NULL, desc_case_5_1_10, sref_case_5_1_10, { &test_5_1_10_top, &test_5_1_10_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_11, tgrp_case_5_1_11, NULL, name_case_5_1_11, NULL, desc_case_5_1_11, sref_case_5_1_11, { &test_5_1_11_top, &test_5_1_11_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_12, tgrp_case_5_1_12, NULL, name_case_5_1_12, NULL, desc_case_5_1_12, sref_case_5_1_12, { &test_5_1_12_top, &test_5_1_12_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_13, tgrp_case_5_1_13, NULL, name_case_5_1_13, NULL, desc_case_5_1_13, sref_case_5_1_13, { &test_5_1_13_top, &test_5_1_13_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_14, tgrp_case_5_1_14, NULL, name_case_5_1_14, NULL, desc_case_5_1_14, sref_case_5_1_14, { &test_5_1_14_top, &test_5_1_14_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_15, tgrp_case_5_1_15, NULL, name_case_5_1_15, NULL, desc_case_5_1_15, sref_case_5_1_15, { &test_5_1_15_top, &test_5_1_15_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_16, tgrp_case_5_1_16, NULL, name_case_5_1_16, NULL, desc_case_5_1_16, sref_case_5_1_16, { &test_5_1_16_top, &test_5_1_16_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_17, tgrp_case_5_1_17, NULL, name_case_5_1_17, NULL, desc_case_5_1_17, sref_case_5_1_17, { &test_5_1_17_top, &test_5_1_17_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_18, tgrp_case_5_1_18, NULL, name_case_5_1_18, NULL, desc_case_5_1_18, sref_case_5_1_18, { &test_5_1_18_top, &test_5_1_18_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_19, tgrp_case_5_1_19, NULL, name_case_5_1_19, NULL, desc_case_5_1_19, sref_case_5_1_19, { &test_5_1_19_top, &test_5_1_19_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_20, tgrp_case_5_1_20, NULL, name_case_5_1_20, NULL, desc_case_5_1_20, sref_case_5_1_20, { &test_5_1_20_top, &test_5_1_20_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_21, tgrp_case_5_1_21, NULL, name_case_5_1_21, NULL, desc_case_5_1_21, sref_case_5_1_21, { &test_5_1_21_top, &test_5_1_21_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_22, tgrp_case_5_1_22, NULL, name_case_5_1_22, NULL, desc_case_5_1_22, sref_case_5_1_22, { &test_5_1_22_top, &test_5_1_22_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_23, tgrp_case_5_1_23, NULL, name_case_5_1_23, NULL, desc_case_5_1_23, sref_case_5_1_23, { &test_5_1_23_top, &test_5_1_23_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_24, tgrp_case_5_1_24, NULL, name_case_5_1_24, NULL, desc_case_5_1_24, sref_case_5_1_24, { &test_5_1_24_top, &test_5_1_24_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_25, tgrp_case_5_1_25, NULL, name_case_5_1_25, NULL, desc_case_5_1_25, sref_case_5_1_25, { &test_5_1_25_top, &test_5_1_25_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_26, tgrp_case_5_1_26, NULL, name_case_5_1_26, NULL, desc_case_5_1_26, sref_case_5_1_26, { &test_5_1_26_top, &test_5_1_26_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_27, tgrp_case_5_1_27, NULL, name_case_5_1_27, NULL, desc_case_5_1_27, sref_case_5_1_27, { &test_5_1_27_top, &test_5_1_27_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_1_28, tgrp_case_5_1_28, NULL, name_case_5_1_28, NULL, desc_case_5_1_28, sref_case_5_1_28, { &test_5_1_28_top, &test_5_1_28_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_1, tgrp_case_5_2_1, NULL, name_case_5_2_1, NULL, desc_case_5_2_1, sref_case_5_2_1, { &test_5_2_1_top, &test_5_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_2, tgrp_case_5_2_2, NULL, name_case_5_2_2, NULL, desc_case_5_2_2, sref_case_5_2_2, { &test_5_2_2_top, &test_5_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_3, tgrp_case_5_2_3, NULL, name_case_5_2_3, NULL, desc_case_5_2_3, sref_case_5_2_3, { &test_5_2_3_top, &test_5_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_4, tgrp_case_5_2_4, NULL, name_case_5_2_4, NULL, desc_case_5_2_4, sref_case_5_2_4, { &test_5_2_4_top, &test_5_2_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_5, tgrp_case_5_2_5, NULL, name_case_5_2_5, NULL, desc_case_5_2_5, sref_case_5_2_5, { &test_5_2_5_top, &test_5_2_5_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_6, tgrp_case_5_2_6, NULL, name_case_5_2_6, NULL, desc_case_5_2_6, sref_case_5_2_6, { &test_5_2_6_top, &test_5_2_6_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_7, tgrp_case_5_2_7, NULL, name_case_5_2_7, NULL, desc_case_5_2_7, sref_case_5_2_7, { &test_5_2_7_top, &test_5_2_7_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_8, tgrp_case_5_2_8, NULL, name_case_5_2_8, NULL, desc_case_5_2_8, sref_case_5_2_8, { &test_5_2_8_top, &test_5_2_8_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_9, tgrp_case_5_2_9, NULL, name_case_5_2_9, NULL, desc_case_5_2_9, sref_case_5_2_9, { &test_5_2_9_top, &test_5_2_9_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_10, tgrp_case_5_2_10, NULL, name_case_5_2_10, NULL, desc_case_5_2_10, sref_case_5_2_10, { &test_5_2_10_top, &test_5_2_10_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_11, tgrp_case_5_2_11, NULL, name_case_5_2_11, NULL, desc_case_5_2_11, sref_case_5_2_11, { &test_5_2_11_top, &test_5_2_11_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_12, tgrp_case_5_2_12, NULL, name_case_5_2_12, NULL, desc_case_5_2_12, sref_case_5_2_12, { &test_5_2_12_top, &test_5_2_12_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_13, tgrp_case_5_2_13, NULL, name_case_5_2_13, NULL, desc_case_5_2_13, sref_case_5_2_13, { &test_5_2_13_top, &test_5_2_13_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_14, tgrp_case_5_2_14, NULL, name_case_5_2_14, NULL, desc_case_5_2_14, sref_case_5_2_14, { &test_5_2_14_top, &test_5_2_14_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_15, tgrp_case_5_2_15, NULL, name_case_5_2_15, NULL, desc_case_5_2_15, sref_case_5_2_15, { &test_5_2_15_top, &test_5_2_15_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_16, tgrp_case_5_2_16, NULL, name_case_5_2_16, NULL, desc_case_5_2_16, sref_case_5_2_16, { &test_5_2_16_top, &test_5_2_16_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_17, tgrp_case_5_2_17, NULL, name_case_5_2_17, NULL, desc_case_5_2_17, sref_case_5_2_17, { &test_5_2_17_top, &test_5_2_17_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_18, tgrp_case_5_2_18, NULL, name_case_5_2_18, NULL, desc_case_5_2_18, sref_case_5_2_18, { &test_5_2_18_top, &test_5_2_18_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_19, tgrp_case_5_2_19, NULL, name_case_5_2_19, NULL, desc_case_5_2_19, sref_case_5_2_19, { &test_5_2_19_top, &test_5_2_19_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_20, tgrp_case_5_2_20, NULL, name_case_5_2_20, NULL, desc_case_5_2_20, sref_case_5_2_20, { &test_5_2_20_top, &test_5_2_20_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_21, tgrp_case_5_2_21, NULL, name_case_5_2_21, NULL, desc_case_5_2_21, sref_case_5_2_21, { &test_5_2_21_top, &test_5_2_21_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_22, tgrp_case_5_2_22, NULL, name_case_5_2_22, NULL, desc_case_5_2_22, sref_case_5_2_22, { &test_5_2_22_top, &test_5_2_22_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_23, tgrp_case_5_2_23, NULL, name_case_5_2_23, NULL, desc_case_5_2_23, sref_case_5_2_23, { &test_5_2_23_top, &test_5_2_23_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_24, tgrp_case_5_2_24, NULL, name_case_5_2_24, NULL, desc_case_5_2_24, sref_case_5_2_24, { &test_5_2_24_top, &test_5_2_24_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_25, tgrp_case_5_2_25, NULL, name_case_5_2_25, NULL, desc_case_5_2_25, sref_case_5_2_25, { &test_5_2_25_top, &test_5_2_25_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_26, tgrp_case_5_2_26, NULL, name_case_5_2_26, NULL, desc_case_5_2_26, sref_case_5_2_26, { &test_5_2_26_top, &test_5_2_26_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_27, tgrp_case_5_2_27, NULL, name_case_5_2_27, NULL, desc_case_5_2_27, sref_case_5_2_27, { &test_5_2_27_top, &test_5_2_27_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_2_28, tgrp_case_5_2_28, NULL, name_case_5_2_28, NULL, desc_case_5_2_28, sref_case_5_2_28, { &test_5_2_28_top, &test_5_2_28_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_1, tgrp_case_5_3_1, NULL, name_case_5_3_1, NULL, desc_case_5_3_1, sref_case_5_3_1, { &test_5_3_1_top, &test_5_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_2, tgrp_case_5_3_2, NULL, name_case_5_3_2, NULL, desc_case_5_3_2, sref_case_5_3_2, { &test_5_3_2_top, &test_5_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_3, tgrp_case_5_3_3, NULL, name_case_5_3_3, NULL, desc_case_5_3_3, sref_case_5_3_3, { &test_5_3_3_top, &test_5_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_4, tgrp_case_5_3_4, NULL, name_case_5_3_4, NULL, desc_case_5_3_4, sref_case_5_3_4, { &test_5_3_4_top, &test_5_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_5, tgrp_case_5_3_5, NULL, name_case_5_3_5, NULL, desc_case_5_3_5, sref_case_5_3_5, { &test_5_3_5_top, &test_5_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_6, tgrp_case_5_3_6, NULL, name_case_5_3_6, NULL, desc_case_5_3_6, sref_case_5_3_6, { &test_5_3_6_top, &test_5_3_6_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_7, tgrp_case_5_3_7, NULL, name_case_5_3_7, NULL, desc_case_5_3_7, sref_case_5_3_7, { &test_5_3_7_top, &test_5_3_7_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_8, tgrp_case_5_3_8, NULL, name_case_5_3_8, NULL, desc_case_5_3_8, sref_case_5_3_8, { &test_5_3_8_top, &test_5_3_8_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_9, tgrp_case_5_3_9, NULL, name_case_5_3_9, NULL, desc_case_5_3_9, sref_case_5_3_9, { &test_5_3_9_top, &test_5_3_9_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_10, tgrp_case_5_3_10, NULL, name_case_5_3_10, NULL, desc_case_5_3_10, sref_case_5_3_10, { &test_5_3_10_top, &test_5_3_10_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_11, tgrp_case_5_3_11, NULL, name_case_5_3_11, NULL, desc_case_5_3_11, sref_case_5_3_11, { &test_5_3_11_top, &test_5_3_11_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_12, tgrp_case_5_3_12, NULL, name_case_5_3_12, NULL, desc_case_5_3_12, sref_case_5_3_12, { &test_5_3_12_top, &test_5_3_12_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_13, tgrp_case_5_3_13, NULL, name_case_5_3_13, NULL, desc_case_5_3_13, sref_case_5_3_13, { &test_5_3_13_top, &test_5_3_13_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_14, tgrp_case_5_3_14, NULL, name_case_5_3_14, NULL, desc_case_5_3_14, sref_case_5_3_14, { &test_5_3_14_top, &test_5_3_14_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_15, tgrp_case_5_3_15, NULL, name_case_5_3_15, NULL, desc_case_5_3_15, sref_case_5_3_15, { &test_5_3_15_top, &test_5_3_15_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_16, tgrp_case_5_3_16, NULL, name_case_5_3_16, NULL, desc_case_5_3_16, sref_case_5_3_16, { &test_5_3_16_top, &test_5_3_16_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_17, tgrp_case_5_3_17, NULL, name_case_5_3_17, NULL, desc_case_5_3_17, sref_case_5_3_17, { &test_5_3_17_top, &test_5_3_17_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_18, tgrp_case_5_3_18, NULL, name_case_5_3_18, NULL, desc_case_5_3_18, sref_case_5_3_18, { &test_5_3_18_top, &test_5_3_18_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_19, tgrp_case_5_3_19, NULL, name_case_5_3_19, NULL, desc_case_5_3_19, sref_case_5_3_19, { &test_5_3_19_top, &test_5_3_19_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_20, tgrp_case_5_3_20, NULL, name_case_5_3_20, NULL, desc_case_5_3_20, sref_case_5_3_20, { &test_5_3_20_top, &test_5_3_20_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_21, tgrp_case_5_3_21, NULL, name_case_5_3_21, NULL, desc_case_5_3_21, sref_case_5_3_21, { &test_5_3_21_top, &test_5_3_21_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_22, tgrp_case_5_3_22, NULL, name_case_5_3_22, NULL, desc_case_5_3_22, sref_case_5_3_22, { &test_5_3_22_top, &test_5_3_22_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_23, tgrp_case_5_3_23, NULL, name_case_5_3_23, NULL, desc_case_5_3_23, sref_case_5_3_23, { &test_5_3_23_top, &test_5_3_23_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_24, tgrp_case_5_3_24, NULL, name_case_5_3_24, NULL, desc_case_5_3_24, sref_case_5_3_24, { &test_5_3_24_top, &test_5_3_24_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_25, tgrp_case_5_3_25, NULL, name_case_5_3_25, NULL, desc_case_5_3_25, sref_case_5_3_25, { &test_5_3_25_top, &test_5_3_25_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_26, tgrp_case_5_3_26, NULL, name_case_5_3_26, NULL, desc_case_5_3_26, sref_case_5_3_26, { &test_5_3_26_top, &test_5_3_26_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_27, tgrp_case_5_3_27, NULL, name_case_5_3_27, NULL, desc_case_5_3_27, sref_case_5_3_27, { &test_5_3_27_top, &test_5_3_27_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_5_3_28, tgrp_case_5_3_28, NULL, name_case_5_3_28, NULL, desc_case_5_3_28, sref_case_5_3_28, { &test_5_3_28_top, &test_5_3_28_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_1_1, tgrp_case_6_1_1, NULL, name_case_6_1_1, NULL, desc_case_6_1_1, sref_case_6_1_1, { &test_6_1_1_top, &test_6_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_1_2, tgrp_case_6_1_2, NULL, name_case_6_1_2, NULL, desc_case_6_1_2, sref_case_6_1_2, { &test_6_1_2_top, &test_6_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_1_3, tgrp_case_6_1_3, NULL, name_case_6_1_3, NULL, desc_case_6_1_3, sref_case_6_1_3, { &test_6_1_3_top, &test_6_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_1_4, tgrp_case_6_1_4, NULL, name_case_6_1_4, NULL, desc_case_6_1_4, sref_case_6_1_4, { &test_6_1_4_top, &test_6_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_1_5, tgrp_case_6_1_5, NULL, name_case_6_1_5, NULL, desc_case_6_1_5, sref_case_6_1_5, { &test_6_1_5_top, &test_6_1_5_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_1_6, tgrp_case_6_1_6, NULL, name_case_6_1_6, NULL, desc_case_6_1_6, sref_case_6_1_6, { &test_6_1_6_top, &test_6_1_6_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_1_7, tgrp_case_6_1_7, NULL, name_case_6_1_7, NULL, desc_case_6_1_7, sref_case_6_1_7, { &test_6_1_7_top, &test_6_1_7_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_1_8, tgrp_case_6_1_8, NULL, name_case_6_1_8, NULL, desc_case_6_1_8, sref_case_6_1_8, { &test_6_1_8_top, &test_6_1_8_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_1_9, tgrp_case_6_1_9, NULL, name_case_6_1_9, NULL, desc_case_6_1_9, sref_case_6_1_9, { &test_6_1_9_top, &test_6_1_9_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_1_10, tgrp_case_6_1_10, NULL, name_case_6_1_10, NULL, desc_case_6_1_10, sref_case_6_1_10, { &test_6_1_10_top, &test_6_1_10_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_1_11, tgrp_case_6_1_11, NULL, name_case_6_1_11, NULL, desc_case_6_1_11, sref_case_6_1_11, { &test_6_1_11_top, &test_6_1_11_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_1_12, tgrp_case_6_1_12, NULL, name_case_6_1_12, NULL, desc_case_6_1_12, sref_case_6_1_12, { &test_6_1_12_top, &test_6_1_12_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_2_1, tgrp_case_6_2_1, NULL, name_case_6_2_1, NULL, desc_case_6_2_1, sref_case_6_2_1, { &test_6_2_1_top, &test_6_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_2_2, tgrp_case_6_2_2, NULL, name_case_6_2_2, NULL, desc_case_6_2_2, sref_case_6_2_2, { &test_6_2_2_top, &test_6_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_2_3, tgrp_case_6_2_3, NULL, name_case_6_2_3, NULL, desc_case_6_2_3, sref_case_6_2_3, { &test_6_2_3_top, &test_6_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_2_4, tgrp_case_6_2_4, NULL, name_case_6_2_4, NULL, desc_case_6_2_4, sref_case_6_2_4, { &test_6_2_4_top, &test_6_2_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_2_5, tgrp_case_6_2_5, NULL, name_case_6_2_5, NULL, desc_case_6_2_5, sref_case_6_2_5, { &test_6_2_5_top, &test_6_2_5_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_2_6, tgrp_case_6_2_6, NULL, name_case_6_2_6, NULL, desc_case_6_2_6, sref_case_6_2_6, { &test_6_2_6_top, &test_6_2_6_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_3_1, tgrp_case_6_3_1, NULL, name_case_6_3_1, NULL, desc_case_6_3_1, sref_case_6_3_1, { &test_6_3_1_top, &test_6_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_3_2, tgrp_case_6_3_2, NULL, name_case_6_3_2, NULL, desc_case_6_3_2, sref_case_6_3_2, { &test_6_3_2_top, &test_6_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_3_3, tgrp_case_6_3_3, NULL, name_case_6_3_3, NULL, desc_case_6_3_3, sref_case_6_3_3, { &test_6_3_3_top, &test_6_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_3_4, tgrp_case_6_3_4, NULL, name_case_6_3_4, NULL, desc_case_6_3_4, sref_case_6_3_4, { &test_6_3_4_top, &test_6_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_3_5, tgrp_case_6_3_5, NULL, name_case_6_3_5, NULL, desc_case_6_3_5, sref_case_6_3_5, { &test_6_3_5_top, &test_6_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_3_6, tgrp_case_6_3_6, NULL, name_case_6_3_6, NULL, desc_case_6_3_6, sref_case_6_3_6, { &test_6_3_6_top, &test_6_3_6_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_3_7, tgrp_case_6_3_7, NULL, name_case_6_3_7, NULL, desc_case_6_3_7, sref_case_6_3_7, { &test_6_3_7_top, &test_6_3_7_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_3_8, tgrp_case_6_3_8, NULL, name_case_6_3_8, NULL, desc_case_6_3_8, sref_case_6_3_8, { &test_6_3_8_top, &test_6_3_8_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_4_1, tgrp_case_6_4_1, NULL, name_case_6_4_1, NULL, desc_case_6_4_1, sref_case_6_4_1, { &test_6_4_1_top, &test_6_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_4_2, tgrp_case_6_4_2, NULL, name_case_6_4_2, NULL, desc_case_6_4_2, sref_case_6_4_2, { &test_6_4_2_top, &test_6_4_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_4_3, tgrp_case_6_4_3, NULL, name_case_6_4_3, NULL, desc_case_6_4_3, sref_case_6_4_3, { &test_6_4_3_top, &test_6_4_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_4_4, tgrp_case_6_4_4, NULL, name_case_6_4_4, NULL, desc_case_6_4_4, sref_case_6_4_4, { &test_6_4_4_top, &test_6_4_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_4_5, tgrp_case_6_4_5, NULL, name_case_6_4_5, NULL, desc_case_6_4_5, sref_case_6_4_5, { &test_6_4_5_top, &test_6_4_5_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_4_6, tgrp_case_6_4_6, NULL, name_case_6_4_6, NULL, desc_case_6_4_6, sref_case_6_4_6, { &test_6_4_6_top, &test_6_4_6_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_5_1, tgrp_case_6_5_1, NULL, name_case_6_5_1, NULL, desc_case_6_5_1, sref_case_6_5_1, { &test_6_5_1_top, &test_6_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_5_2, tgrp_case_6_5_2, NULL, name_case_6_5_2, NULL, desc_case_6_5_2, sref_case_6_5_2, { &test_6_5_2_top, &test_6_5_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_5_3, tgrp_case_6_5_3, NULL, name_case_6_5_3, NULL, desc_case_6_5_3, sref_case_6_5_3, { &test_6_5_3_top, &test_6_5_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_5_4, tgrp_case_6_5_4, NULL, name_case_6_5_4, NULL, desc_case_6_5_4, sref_case_6_5_4, { &test_6_5_4_top, &test_6_5_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_5_5, tgrp_case_6_5_5, NULL, name_case_6_5_5, NULL, desc_case_6_5_5, sref_case_6_5_5, { &test_6_5_5_top, &test_6_5_5_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_6_1, tgrp_case_6_6_1, NULL, name_case_6_6_1, NULL, desc_case_6_6_1, sref_case_6_6_1, { &test_6_6_1_top, &test_6_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_6_6_2, tgrp_case_6_6_2, NULL, name_case_6_6_2, NULL, desc_case_6_6_2, sref_case_6_6_2, { &test_6_6_2_top, &test_6_6_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_1_1, tgrp_case_7_1_1, NULL, name_case_7_1_1, NULL, desc_case_7_1_1, sref_case_7_1_1, { &test_7_1_1_top, &test_7_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_1_2, tgrp_case_7_1_2, NULL, name_case_7_1_2, NULL, desc_case_7_1_2, sref_case_7_1_2, { &test_7_1_2_top, &test_7_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_1_3, tgrp_case_7_1_3, NULL, name_case_7_1_3, NULL, desc_case_7_1_3, sref_case_7_1_3, { &test_7_1_3_top, &test_7_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_2_1, tgrp_case_7_2_1, NULL, name_case_7_2_1, NULL, desc_case_7_2_1, sref_case_7_2_1, { &test_7_2_1_top, &test_7_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_3_1, tgrp_case_7_3_1, NULL, name_case_7_3_1, NULL, desc_case_7_3_1, sref_case_7_3_1, { &test_7_3_1_top, &test_7_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_3_2, tgrp_case_7_3_2, NULL, name_case_7_3_2, NULL, desc_case_7_3_2, sref_case_7_3_2, { &test_7_3_2_top, &test_7_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_3_3, tgrp_case_7_3_3, NULL, name_case_7_3_3, NULL, desc_case_7_3_3, sref_case_7_3_3, { &test_7_3_3_top, &test_7_3_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_3_4, tgrp_case_7_3_4, NULL, name_case_7_3_4, NULL, desc_case_7_3_4, sref_case_7_3_4, { &test_7_3_4_top, &test_7_3_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_3_5, tgrp_case_7_3_5, NULL, name_case_7_3_5, NULL, desc_case_7_3_5, sref_case_7_3_5, { &test_7_3_5_top, &test_7_3_5_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_4_1, tgrp_case_7_4_1, NULL, name_case_7_4_1, NULL, desc_case_7_4_1, sref_case_7_4_1, { &test_7_4_1_top, &test_7_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_4_2, tgrp_case_7_4_2, NULL, name_case_7_4_2, NULL, desc_case_7_4_2, sref_case_7_4_2, { &test_7_4_2_top, &test_7_4_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_4_3, tgrp_case_7_4_3, NULL, name_case_7_4_3, NULL, desc_case_7_4_3, sref_case_7_4_3, { &test_7_4_3_top, &test_7_4_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_5_1, tgrp_case_7_5_1, NULL, name_case_7_5_1, NULL, desc_case_7_5_1, sref_case_7_5_1, { &test_7_5_1_top, &test_7_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_5_2, tgrp_case_7_5_2, NULL, name_case_7_5_2, NULL, desc_case_7_5_2, sref_case_7_5_2, { &test_7_5_2_top, &test_7_5_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_5_3, tgrp_case_7_5_3, NULL, name_case_7_5_3, NULL, desc_case_7_5_3, sref_case_7_5_3, { &test_7_5_3_top, &test_7_5_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_6_1, tgrp_case_7_6_1, NULL, name_case_7_6_1, NULL, desc_case_7_6_1, sref_case_7_6_1, { &test_7_6_1_top, &test_7_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_6_2, tgrp_case_7_6_2, NULL, name_case_7_6_2, NULL, desc_case_7_6_2, sref_case_7_6_2, { &test_7_6_2_top, &test_7_6_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_6_3, tgrp_case_7_6_3, NULL, name_case_7_6_3, NULL, desc_case_7_6_3, sref_case_7_6_3, { &test_7_6_3_top, &test_7_6_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_7_1, tgrp_case_7_7_1, NULL, name_case_7_7_1, NULL, desc_case_7_7_1, sref_case_7_7_1, { &test_7_7_1_top, &test_7_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_7_2, tgrp_case_7_7_2, NULL, name_case_7_7_2, NULL, desc_case_7_7_2, sref_case_7_7_2, { &test_7_7_2_top, &test_7_7_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_7_3, tgrp_case_7_7_3, NULL, name_case_7_7_3, NULL, desc_case_7_7_3, sref_case_7_7_3, { &test_7_7_3_top, &test_7_7_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_8_1, tgrp_case_7_8_1, NULL, name_case_7_8_1, NULL, desc_case_7_8_1, sref_case_7_8_1, { &test_7_8_1_top, &test_7_8_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_8_2, tgrp_case_7_8_2, NULL, name_case_7_8_2, NULL, desc_case_7_8_2, sref_case_7_8_2, { &test_7_8_2_top, &test_7_8_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_8_3, tgrp_case_7_8_3, NULL, name_case_7_8_3, NULL, desc_case_7_8_3, sref_case_7_8_3, { &test_7_8_3_top, &test_7_8_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_9_1, tgrp_case_7_9_1, NULL, name_case_7_9_1, NULL, desc_case_7_9_1, sref_case_7_9_1, { &test_7_9_1_top, &test_7_9_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_9_2, tgrp_case_7_9_2, NULL, name_case_7_9_2, NULL, desc_case_7_9_2, sref_case_7_9_2, { &test_7_9_2_top, &test_7_9_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_9_3, tgrp_case_7_9_3, NULL, name_case_7_9_3, NULL, desc_case_7_9_3, sref_case_7_9_3, { &test_7_9_3_top, &test_7_9_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_10_1, tgrp_case_7_10_1, NULL, name_case_7_10_1, NULL, desc_case_7_10_1, sref_case_7_10_1, { &test_7_10_1_top, &test_7_10_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_10_2, tgrp_case_7_10_2, NULL, name_case_7_10_2, NULL, desc_case_7_10_2, sref_case_7_10_2, { &test_7_10_2_top, &test_7_10_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_10_3, tgrp_case_7_10_3, NULL, name_case_7_10_3, NULL, desc_case_7_10_3, sref_case_7_10_3, { &test_7_10_3_top, &test_7_10_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_11_1, tgrp_case_7_11_1, NULL, name_case_7_11_1, NULL, desc_case_7_11_1, sref_case_7_11_1, { &test_7_11_1_top, &test_7_11_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_11_2, tgrp_case_7_11_2, NULL, name_case_7_11_2, NULL, desc_case_7_11_2, sref_case_7_11_2, { &test_7_11_2_top, &test_7_11_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_11_3, tgrp_case_7_11_3, NULL, name_case_7_11_3, NULL, desc_case_7_11_3, sref_case_7_11_3, { &test_7_11_3_top, &test_7_11_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_12_1, tgrp_case_7_12_1, NULL, name_case_7_12_1, NULL, desc_case_7_12_1, sref_case_7_12_1, { &test_7_12_1_top, &test_7_12_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_12_2, tgrp_case_7_12_2, NULL, name_case_7_12_2, NULL, desc_case_7_12_2, sref_case_7_12_2, { &test_7_12_2_top, &test_7_12_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_12_3, tgrp_case_7_12_3, NULL, name_case_7_12_3, NULL, desc_case_7_12_3, sref_case_7_12_3, { &test_7_12_3_top, &test_7_12_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_13_1, tgrp_case_7_13_1, NULL, name_case_7_13_1, NULL, desc_case_7_13_1, sref_case_7_13_1, { &test_7_13_1_top, &test_7_13_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_13_2, tgrp_case_7_13_2, NULL, name_case_7_13_2, NULL, desc_case_7_13_2, sref_case_7_13_2, { &test_7_13_2_top, &test_7_13_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_13_3, tgrp_case_7_13_3, NULL, name_case_7_13_3, NULL, desc_case_7_13_3, sref_case_7_13_3, { &test_7_13_3_top, &test_7_13_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_14_1, tgrp_case_7_14_1, NULL, name_case_7_14_1, NULL, desc_case_7_14_1, sref_case_7_14_1, { &test_7_14_1_top, &test_7_14_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_14_2, tgrp_case_7_14_2, NULL, name_case_7_14_2, NULL, desc_case_7_14_2, sref_case_7_14_2, { &test_7_14_2_top, &test_7_14_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_14_3, tgrp_case_7_14_3, NULL, name_case_7_14_3, NULL, desc_case_7_14_3, sref_case_7_14_3, { &test_7_14_3_top, &test_7_14_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_15_1, tgrp_case_7_15_1, NULL, name_case_7_15_1, NULL, desc_case_7_15_1, sref_case_7_15_1, { &test_7_15_1_top, &test_7_15_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_15_2, tgrp_case_7_15_2, NULL, name_case_7_15_2, NULL, desc_case_7_15_2, sref_case_7_15_2, { &test_7_15_2_top, &test_7_15_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_15_3, tgrp_case_7_15_3, NULL, name_case_7_15_3, NULL, desc_case_7_15_3, sref_case_7_15_3, { &test_7_15_3_top, &test_7_15_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_16_1, tgrp_case_7_16_1, NULL, name_case_7_16_1, NULL, desc_case_7_16_1, sref_case_7_16_1, { &test_7_16_1_top, &test_7_16_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_16_2, tgrp_case_7_16_2, NULL, name_case_7_16_2, NULL, desc_case_7_16_2, sref_case_7_16_2, { &test_7_16_2_top, &test_7_16_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_16_3, tgrp_case_7_16_3, NULL, name_case_7_16_3, NULL, desc_case_7_16_3, sref_case_7_16_3, { &test_7_16_3_top, &test_7_16_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_7_17_1, tgrp_case_7_17_1, NULL, name_case_7_17_1, NULL, desc_case_7_17_1, sref_case_7_17_1, { &test_7_17_1_top, &test_7_17_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_1_1, tgrp_case_8_1_1, NULL, name_case_8_1_1, NULL, desc_case_8_1_1, sref_case_8_1_1, { &test_8_1_1_top, &test_8_1_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_1_2, tgrp_case_8_1_2, NULL, name_case_8_1_2, NULL, desc_case_8_1_2, sref_case_8_1_2, { &test_8_1_2_top, &test_8_1_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_1_3, tgrp_case_8_1_3, NULL, name_case_8_1_3, NULL, desc_case_8_1_3, sref_case_8_1_3, { &test_8_1_3_top, &test_8_1_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_1_4, tgrp_case_8_1_4, NULL, name_case_8_1_4, NULL, desc_case_8_1_4, sref_case_8_1_4, { &test_8_1_4_top, &test_8_1_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_2_1, tgrp_case_8_2_1, NULL, name_case_8_2_1, NULL, desc_case_8_2_1, sref_case_8_2_1, { &test_8_2_1_top, &test_8_2_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_2_2, tgrp_case_8_2_2, NULL, name_case_8_2_2, NULL, desc_case_8_2_2, sref_case_8_2_2, { &test_8_2_2_top, &test_8_2_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_2_3, tgrp_case_8_2_3, NULL, name_case_8_2_3, NULL, desc_case_8_2_3, sref_case_8_2_3, { &test_8_2_3_top, &test_8_2_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_3_1, tgrp_case_8_3_1, NULL, name_case_8_3_1, NULL, desc_case_8_3_1, sref_case_8_3_1, { &test_8_3_1_top, &test_8_3_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_3_2, tgrp_case_8_3_2, NULL, name_case_8_3_2, NULL, desc_case_8_3_2, sref_case_8_3_2, { &test_8_3_2_top, &test_8_3_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_4_1, tgrp_case_8_4_1, NULL, name_case_8_4_1, NULL, desc_case_8_4_1, sref_case_8_4_1, { &test_8_4_1_top, &test_8_4_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_5_1, tgrp_case_8_5_1, NULL, name_case_8_5_1, NULL, desc_case_8_5_1, sref_case_8_5_1, { &test_8_5_1_top, &test_8_5_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_5_2, tgrp_case_8_5_2, NULL, name_case_8_5_2, NULL, desc_case_8_5_2, sref_case_8_5_2, { &test_8_5_2_top, &test_8_5_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_5_3, tgrp_case_8_5_3, NULL, name_case_8_5_3, NULL, desc_case_8_5_3, sref_case_8_5_3, { &test_8_5_3_top, &test_8_5_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_5_4, tgrp_case_8_5_4, NULL, name_case_8_5_4, NULL, desc_case_8_5_4, sref_case_8_5_4, { &test_8_5_4_top, &test_8_5_4_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_6_1, tgrp_case_8_6_1, NULL, name_case_8_6_1, NULL, desc_case_8_6_1, sref_case_8_6_1, { &test_8_6_1_top, &test_8_6_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_6_2, tgrp_case_8_6_2, NULL, name_case_8_6_2, NULL, desc_case_8_6_2, sref_case_8_6_2, { &test_8_6_2_top, &test_8_6_2_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_6_3, tgrp_case_8_6_3, NULL, name_case_8_6_3, NULL, desc_case_8_6_3, sref_case_8_6_3, { &test_8_6_3_top, &test_8_6_3_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_7_1, tgrp_case_8_7_1, NULL, name_case_8_7_1, NULL, desc_case_8_7_1, sref_case_8_7_1, { &test_8_7_1_top, &test_8_7_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
+	numb_case_8_8_1, tgrp_case_8_8_1, NULL, name_case_8_8_1, NULL, desc_case_8_8_1, sref_case_8_8_1, { &test_8_8_1_top, &test_8_8_1_bot, NULL}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS,}, {
 	NULL,}
 };
 
@@ -17383,6 +17650,8 @@ do_tests(int num_tests)
 	int skipped = 0;
 	int notselected = 0;
 	int aborted = 0;
+	int repeat = 0;
+	int oldverbose = verbose;
 
 	print_header();
 	show = 0;
@@ -17397,6 +17666,7 @@ do_tests(int num_tests)
 			end_tests(0);
 		show = 1;
 		for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
+		      rerun:
 			if (!tests[i].run) {
 				tests[i].result = __RESULT_INCONCLUSIVE;
 				notselected++;
@@ -17409,23 +17679,65 @@ do_tests(int num_tests)
 			}
 			if (verbose > 0) {
 				dummy = lockf(fileno(stdout), F_LOCK, 0);
-				if (verbose > 1)
+				if (verbose > 1 && tests[i].tgrp)
 					fprintf(stdout, "\nTest Group: %s", tests[i].tgrp);
-				fprintf(stdout, "\nTest Case %s-%s/%s: %s\n", sstdname, shortname, tests[i].numb, tests[i].name);
-				if (verbose > 1)
+				if (verbose > 1 && tests[i].sgrp)
+					fprintf(stdout, "\nTest Subgroup: %s", tests[i].sgrp);
+				if (tests[i].xtra)
+					fprintf(stdout, "\nTest Case %s-%s/%s: %s (%s)\n", sstdname, shortname, tests[i].numb, tests[i].name, tests[i].xtra);
+				else
+					fprintf(stdout, "\nTest Case %s-%s/%s: %s\n", sstdname, shortname, tests[i].numb, tests[i].name);
+				if (verbose > 1 && tests[i].sref)
 					fprintf(stdout, "Test Reference: %s\n", tests[i].sref);
-				if (verbose > 1)
+				if (verbose > 1 && tests[i].desc)
 					fprintf(stdout, "%s\n", tests[i].desc);
 				fprintf(stdout, "\n");
 				fflush(stdout);
 				dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			}
 			if ((result = tests[i].result) == 0) {
-				if ((result = (*tests[i].start) (i)) != __RESULT_SUCCESS)
-					goto inconclusive;
-				result = test_run(tests[i].stream);
-				(*tests[i].stop) (i);
+				ulong duration = test_duration;
+
+				if (duration > tests[i].duration) {
+					if (tests[i].duration && duration > tests[i].duration)
+						duration = tests[i].duration;
+					if ((result = (*tests[i].start) (i)) != __RESULT_SUCCESS)
+						goto inconclusive;
+					result = test_run(tests[i].stream, duration);
+					(*tests[i].stop) (i);
+				} else
+					result = __RESULT_SKIPPED;
+				if (result == tests[i].expect) {
+					switch (result) {
+					case __RESULT_SUCCESS:
+					case __RESULT_NOTAPPL:
+					case __RESULT_SKIPPED:
+						/* autotest can handle these */
+						break;
+					default:
+					case __RESULT_INCONCLUSIVE:
+					case __RESULT_FAILURE:
+						/* these are expected failures */
+						result = __RESULT_SUCCESS;
+						break;
+					}
+				}
 			} else {
+				if (result == tests[i].expect) {
+					switch (result) {
+					case __RESULT_SUCCESS:
+					case __RESULT_NOTAPPL:
+					case __RESULT_SKIPPED:
+						/* autotest can handle these */
+						break;
+					default:
+					case __RESULT_INCONCLUSIVE:
+					case __RESULT_FAILURE:
+						/* these are expected failures */
+						result = __RESULT_SUCCESS;
+						break;
+					}
+				}
 				switch (result) {
 				case __RESULT_SUCCESS:
 					print_passed(3);
@@ -17459,7 +17771,8 @@ do_tests(int num_tests)
 				}
 				break;
 			case __RESULT_FAILURE:
-				failures++;
+				if (!repeat_verbose || repeat)
+					failures++;
 				if (verbose > 0) {
 					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "\n");
@@ -17497,7 +17810,8 @@ do_tests(int num_tests)
 			default:
 			case __RESULT_INCONCLUSIVE:
 			      inconclusive:
-				inconclusive++;
+				if (!repeat_verbose || repeat)
+					inconclusive++;
 				if (verbose > 0) {
 					dummy = lockf(fileno(stdout), F_LOCK, 0);
 					fprintf(stdout, "\n");
@@ -17508,6 +17822,18 @@ do_tests(int num_tests)
 					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 				}
 				break;
+			}
+			if (repeat_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
+				goto rerun;
+			if (repeat_on_success && (result == __RESULT_SUCCESS))
+				goto rerun;
+			if (repeat) {
+				repeat = 0;
+				verbose = oldverbose;
+			} else if (repeat_verbose && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE)) {
+				repeat = 1;
+				verbose = 5;
+				goto rerun;
 			}
 			tests[i].result = result;
 			if (exit_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
@@ -17627,7 +17953,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -17682,7 +18008,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -17721,6 +18047,14 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
+    -a, --again\n\
+        repeat failed tests verbose.\n\
+    -w, --wait\n\
+        have server wait indefinitely.\n\
+    -r, --repeat\n\
+        repeat test cases on success or failure.\n\
+    -R, --repeat-fail\n\
+        repeat test cases on failure.\n\
     -d, --device DEVICE\n\
         device name to open [default: %2$s].\n\
     -e, --exit\n\
@@ -17773,6 +18107,10 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"again",	no_argument,		NULL, 'a'},
+			{"wait",	no_argument,		NULL, 'w'},
+			{"repeat",	no_argument,		NULL, 'r'},
+			{"repeat-fail",	no_argument,		NULL, 'R'},
 			{"device",	required_argument,	NULL, 'd'},
 			{"exit",	no_argument,		NULL, 'e'},
 			{"list",	optional_argument,	NULL, 'l'},
@@ -17791,13 +18129,26 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "d:el::f::so:t:mqvhVC?", long_options, &option_index);
+		c = getopt_long(argc, argv, "awrRd:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "d:el::f::so:t:mqvhVC?");
+		c = getopt(argc, argv, "awrRd:el::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
+		case 'a':	/* --again */
+			repeat_verbose = 1;
+			break;
+		case 'w':	/* --wait */
+			test_duration = INFINITE_WAIT;
+			break;
+		case 'r':	/* --repeat */
+			repeat_on_success = 1;
+			repeat_on_failure = 1;
+			break;
+		case 'R':	/* --repeat-fail */
+			repeat_on_failure = 1;
+			break;
 		case 'd':
 			if (optarg) {
 				snprintf(devname, sizeof(devname), "%s", optarg);
@@ -17813,12 +18164,17 @@ main(int argc, char *argv[])
 				fprintf(stdout, "\n");
 				for (n = 0, t = tests; t->numb; t++)
 					if (!strncmp(t->numb, optarg, l)) {
-						if (verbose > 2)
+						if (verbose > 2 && t->tgrp)
 							fprintf(stdout, "Test Group: %s\n", t->tgrp);
-						fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
-						if (verbose > 2)
+						if (verbose > 2 && t->sgrp)
+							fprintf(stdout, "Test Subgroup: %s\n", t->sgrp);
+						if (t->xtra)
+							fprintf(stdout, "Test Case %s-%s/%s: %s (%s)\n", sstdname, shortname, t->numb, t->name, t->xtra);
+						else
+							fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+						if (verbose > 2 && t->sref)
 							fprintf(stdout, "Test Reference: %s\n", t->sref);
-						if (verbose > 1)
+						if (verbose > 1 && t->desc)
 							fprintf(stdout, "%s\n\n", t->desc);
 						fflush(stdout);
 						n++;
@@ -17835,12 +18191,17 @@ main(int argc, char *argv[])
 			} else {
 				fprintf(stdout, "\n");
 				for (t = tests; t->numb; t++) {
-					if (verbose > 2)
+					if (verbose > 2 && t->tgrp)
 						fprintf(stdout, "Test Group: %s\n", t->tgrp);
-					fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
-					if (verbose > 2)
+					if (verbose > 2 && t->sgrp)
+						fprintf(stdout, "Test Subgroup: %s\n", t->sgrp);
+					if (t->xtra)
+						fprintf(stdout, "Test Case %s-%s/%s: %s (%s)\n", sstdname, shortname, t->numb, t->name, t->xtra);
+					else
+						fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+					if (verbose > 2 && t->sref)
 						fprintf(stdout, "Test Reference: %s\n", t->sref);
-					if (verbose > 1)
+					if (verbose > 1 && t->desc)
 						fprintf(stdout, "%s\n\n", t->desc);
 					fflush(stdout);
 				}
@@ -17855,7 +18216,7 @@ main(int argc, char *argv[])
 				timer_scale = atoi(optarg);
 			else
 				timer_scale = 50;
-			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", timer_scale);
+			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", (long) timer_scale);
 			break;
 		case 's':
 			summary = 1;

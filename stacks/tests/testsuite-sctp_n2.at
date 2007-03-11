@@ -97,12 +97,12 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_sctp_n2() {
-    if test $at_verbose = echo ; then options='--verbose=5' ; else options='--verbose=3' ; fi
+    if test $at_verbose = echo ; then options='--verbose=5' ; else options='--again' ; fi
     if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     if test $at_arg_given_sync = : ; then sync || : ; fi
-    if test-sctp_n2 $options -e -o $1
+    if test-sctp_n2 $options -o $1
     then
 	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS
 	then

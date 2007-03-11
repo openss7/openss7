@@ -140,7 +140,7 @@ dnl ==========================================================================
 m4_divert_push([DEFAULTS])
 at_SMP=
 at_MP=
-function test_fifo() {
+test_fifo() {
     case "$2" in
     (LIS)
 	# LiS crashes on many tests regardless of SMP
@@ -234,7 +234,7 @@ ACEOF
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     if test $at_arg_given_sync = : ; then sync || : ; fi
-    if test-fifo $options -e -o $1
+    if test-fifo $options -o $1
     then
 	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS
 	then
@@ -258,7 +258,7 @@ ACEOF
 	return $?
     fi
 }
-function test_fifo_root() {
+test_fifo_root() {
     if test `id -u` -ne 0 ; then return 77 ; fi
     test_fifo $1
     return $?

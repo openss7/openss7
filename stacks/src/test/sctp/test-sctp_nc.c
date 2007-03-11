@@ -145,10 +145,10 @@ N_qos_sel_info_sctp_t qos_info = {
 	0,				/* sid */
 	12,				/* max_inits */
 	12,				/* max_retrans */
-	-1UL,				/* ck_life */
-	-1UL,				/* ck_inc */
-	-1UL,				/* hmac */
-	-1UL,				/* throttle */
+	-1,				/* ck_life */
+	-1,				/* ck_inc */
+	-1,				/* hmac */
+	-1,				/* throttle */
 	20,				/* max_sack */
 	100,				/* rto_ini */
 	20,				/* rto_min */
@@ -466,6 +466,12 @@ static addr_t rem_addr = { 0, {{INADDR_ANY}} };
 
 int len = 32;
 
+#ifdef LFS
+static const char sctpname[] = "/dev/streams/clone/sctp_n";
+#else
+static const char sctpname[] = "/dev/sctp_n";
+#endif
+
 int
 test_sctpc(void)
 {
@@ -480,7 +486,7 @@ test_sctpc(void)
 
 	fprintf(stderr, "Opening stream\n");
 
-	if ((fd = open("/dev/sctp_n", O_NONBLOCK | O_RDWR)) < 0) {
+	if ((fd = open(sctpname, O_NONBLOCK | O_RDWR)) < 0) {
 		perror("open");
 		goto dead;
 	}

@@ -1,3 +1,46 @@
+2007-03-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/inet/test-inet_raw.c: rework test programs and suites
+	* src/test/inet/test-inet_sctp.c: rework test programs and suites
+	* src/test/inet/test-inet_tcp.c: rework test programs and suites
+	* src/test/inet/test-inet_udp.c: rework test programs and suites
+	* src/test/inet/test-sctp.c: rework test programs and suites
+	* src/test/inet/test-sctp_n.c: rework test programs and suites
+	* src/test/inet/test-sctp_nc.c: rework test programs and suites
+	* src/test/inet/test-sctp_ns.c: rework test programs and suites
+	* src/test/inet/test-sctp_t.c: rework test programs and suites
+	* src/test/inet/test-tcpc.c: rework test programs and suites
+	* src/test/inet/test-tcps.c: rework test programs and suites
+	* src/test/m2pa/test-m2pa.c: rework test programs and suites
+	* src/test/sctp/test-etsi_n.c: rework test programs and suites
+	* src/test/sctp/test-etsi_t.c: rework test programs and suites
+	* src/test/sctp/test-interop.c: rework test programs and suites
+	* src/test/sctp/test-sctp.c: rework test programs and suites
+	* src/test/sctp/test-sctp_n2.c: rework test programs and suites
+	* src/test/sctp/test-sctp_n.c: rework test programs and suites
+	* src/test/sctp/test-sctp_nc.c: rework test programs and suites
+	* src/test/sctp/test-sctp_ns.c: rework test programs and suites
+	* src/test/sctp/test-sctp_t.c: rework test programs and suites
+	* src/test/tli/test-timod.c: rework test programs and suites
+	* src/test/tli/test-tirdwr.c: rework test programs and suites
+	* src/test/xnet/test-xnet.c: rework test programs and suites
+	* tests/testsuite-inet_raw2.at: rework test programs and suites
+	* tests/testsuite-inet_raw.at: rework test programs and suites
+	* tests/testsuite-inet_sctp.at: rework test programs and suites
+	* tests/testsuite-inet_tcp.at: rework test programs and suites
+	* tests/testsuite-inet_udp2.at: rework test programs and suites
+	* tests/testsuite-inet_udp.at: rework test programs and suites
+	* tests/testsuite-m2pa.at: rework test programs and suites
+	* tests/testsuite-sctp.at: rework test programs and suites
+	* tests/testsuite-sctp_n2.at: rework test programs and suites
+	* tests/testsuite-sctp_n.at: rework test programs and suites
+	* tests/testsuite-sctp_t.at: rework test programs and suites
+	* tests/testsuite-timod.at: rework test programs and suites
+	* tests/testsuite-tirdwr.at: rework test programs and suites
+	* tests/testsuite-x400p-sl.at: rework test programs and suites
+	* tests/testsuite-xnet.at: rework test programs and suites
+	* tests/testsuite-xnet_thr.at: rework test programs and suites
+
 2007-03-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: documented bug fix in release notes

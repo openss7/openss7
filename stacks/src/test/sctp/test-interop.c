@@ -186,7 +186,11 @@ static const char *lpkgname = "OpenSS7 SCTP Driver";
 static const char *lstdname = "XNS 5.2/TPI Rev 2";
 static const char *sstdname = "XNS/TPI";
 static const char *shortname = "SCTP";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/sctp_t";
+#else
 static char devname[256] = "/dev/sctp_t";
+#endif
 
 static const int test_level = T_INET_SCTP;
 
@@ -227,9 +231,10 @@ static int DATA_flag = T_ODF_EX | T_ODF_MORE;
 
 int test_fd[3] = { 0, 0, 0 };
 
-#define BUFSIZE 5*4096
+#define BUFSIZE 32*4096
 
 #define FFLUSH(stream)
+// #define FFLUSH(stream) fflush((_stream))
 
 #define SHORT_WAIT	  20	// 100 // 10
 #define NORMAL_WAIT	 100	// 500 // 100
@@ -302,7 +307,7 @@ struct timeval when;
  *  -------------------------------------------------------------------------
  */
 enum {
-	__EVENT_NO_MSG = -6, __EVENT_TIMEOUT = -5, __EVENT_UNKNOWN = -4,
+	__EVENT_EOF = -7, __EVENT_NO_MSG = -6, __EVENT_TIMEOUT = -5, __EVENT_UNKNOWN = -4,
 	__RESULT_DECODE_ERROR = -3, __RESULT_SCRIPT_ERROR = -2,
 	__RESULT_INCONCLUSIVE = -1, __RESULT_SUCCESS = 0, __RESULT_FAILURE = 1,
 	__RESULT_NOTAPPL = 3, __RESULT_SKIPPED = 77,
@@ -472,7 +477,7 @@ check_time(const char *t, long i, long lo, long hi)
 static int
 time_event(int child, int event)
 {
-	if (verbose > 4) {
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg)) {
 		float t, m;
 		struct timeval now;
 
@@ -492,30 +497,49 @@ time_event(int child, int event)
 }
 
 static int timer_timeout = 0;
+static int last_signum = 0;
 
 static void
-timer_handler(int signum)
+signal_handler(int signum)
 {
+	last_signum = signum;
 	if (signum == SIGALRM)
 		timer_timeout = 1;
 	return;
 }
 
 static int
-timer_sethandler(void)
+start_signals(void)
 {
 	sigset_t mask;
 	struct sigaction act;
 
-	act.sa_handler = timer_handler;
-	act.sa_flags = SA_RESTART | SA_ONESHOT;
+	act.sa_handler = signal_handler;
+//	act.sa_flags = SA_RESTART | SA_ONESHOT;
+	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
 		return __RESULT_FAILURE;
+	if (sigaction(SIGPOLL, &act, NULL))
+		return __RESULT_FAILURE;
+	if (sigaction(SIGURG, &act, NULL))
+		return __RESULT_FAILURE;
+	if (sigaction(SIGPIPE, &act, NULL))
+		return __RESULT_FAILURE;
+	if (sigaction(SIGHUP, &act, NULL))
+		return __RESULT_FAILURE;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGPOLL);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGHUP);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
 	siginterrupt(SIGALRM, 1);
+	siginterrupt(SIGPOLL, 1);
+	siginterrupt(SIGURG, 1);
+	siginterrupt(SIGPIPE, 1);
+	siginterrupt(SIGHUP, 1);
 	return __RESULT_SUCCESS;
 }
 
@@ -532,7 +556,7 @@ start_tt(long duration)
 
 	if (duration == (long)INFINITE_WAIT)
 		return __RESULT_SUCCESS;
-	if (timer_sethandler())
+	if (start_signals())
 		return __RESULT_FAILURE;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
 		return __RESULT_FAILURE;
@@ -551,24 +575,47 @@ start_st(long duration)
 #endif
 
 static int
-stop_tt(void)
+stop_signals(void)
 {
-	struct itimerval setting = { {0, 0}, {0, 0} };
+	int result = __RESULT_SUCCESS;
 	sigset_t mask;
 	struct sigaction act;
 
-	if (setitimer(ITIMER_REAL, &setting, NULL))
-		return __RESULT_FAILURE;
 	act.sa_handler = SIG_DFL;
 	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
-		return __RESULT_FAILURE;
-	timer_timeout = 0;
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGPOLL, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGURG, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGPIPE, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGHUP, &act, NULL))
+		result = __RESULT_FAILURE;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGPOLL);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGHUP);
 	sigprocmask(SIG_BLOCK, &mask, NULL);
-	return __RESULT_SUCCESS;
+	return (result);
+}
+
+static int
+stop_tt(void)
+{
+	struct itimerval setting = { {0, 0}, {0, 0} };
+	int result = __RESULT_SUCCESS;
+
+	if (setitimer(ITIMER_REAL, &setting, NULL))
+		return __RESULT_FAILURE;
+	if (stop_signals() != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	timer_timeout = 0;
+	return (result);
 }
 
 /*
@@ -1685,6 +1732,163 @@ ioctl_string(int cmd, intptr_t arg)
 }
 
 const char *
+signal_string(int signum)
+{
+	switch (signum) {
+	case SIGHUP:
+		return ("SIGHUP");
+	case SIGINT:
+		return ("SIGINT");
+	case SIGQUIT:
+		return ("SIGQUIT");
+	case SIGILL:
+		return ("SIGILL");
+	case SIGABRT:
+		return ("SIGABRT");
+	case SIGFPE:
+		return ("SIGFPE");
+	case SIGKILL:
+		return ("SIGKILL");
+	case SIGSEGV:
+		return ("SIGSEGV");
+	case SIGPIPE:
+		return ("SIGPIPE");
+	case SIGALRM:
+		return ("SIGALRM");
+	case SIGTERM:
+		return ("SIGTERM");
+	case SIGUSR1:
+		return ("SIGUSR1");
+	case SIGUSR2:
+		return ("SIGUSR2");
+	case SIGCHLD:
+		return ("SIGCHLD");
+	case SIGCONT:
+		return ("SIGCONT");
+	case SIGSTOP:
+		return ("SIGSTOP");
+	case SIGTSTP:
+		return ("SIGTSTP");
+	case SIGTTIN:
+		return ("SIGTTIN");
+	case SIGTTOU:
+		return ("SIGTTOU");
+	case SIGBUS:
+		return ("SIGBUS");
+	case SIGPOLL:
+		return ("SIGPOLL");
+	case SIGPROF:
+		return ("SIGPROF");
+	case SIGSYS:
+		return ("SIGSYS");
+	case SIGTRAP:
+		return ("SIGTRAP");
+	case SIGURG:
+		return ("SIGURG");
+	case SIGVTALRM:
+		return ("SIGVTALRM");
+	case SIGXCPU:
+		return ("SIGXCPU");
+	case SIGXFSZ:
+		return ("SIGXFSZ");
+	default:
+		return ("unknown");
+	}
+}
+
+const char *
+poll_string(short events)
+{
+	if (events & POLLIN)
+		return ("POLLIN");
+	if (events & POLLPRI)
+		return ("POLLPRI");
+	if (events & POLLOUT)
+		return ("POLLOUT");
+	if (events & POLLRDNORM)
+		return ("POLLRDNORM");
+	if (events & POLLRDBAND)
+		return ("POLLRDBAND");
+	if (events & POLLWRNORM)
+		return ("POLLWRNORM");
+	if (events & POLLWRBAND)
+		return ("POLLWRBAND");
+	if (events & POLLERR)
+		return ("POLLERR");
+	if (events & POLLHUP)
+		return ("POLLHUP");
+	if (events & POLLNVAL)
+		return ("POLLNVAL");
+	if (events & POLLMSG)
+		return ("POLLMSG");
+	return ("none");
+}
+
+const char *
+poll_events_string(short events)
+{
+	static char string[256] = "";
+	int offset = 0, size = 256, len = 0;
+
+	if (events & POLLIN) {
+		len = snprintf(string + offset, size, "POLLIN|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLPRI) {
+		len = snprintf(string + offset, size, "POLLPRI|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLOUT) {
+		len = snprintf(string + offset, size, "POLLOUT|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLRDNORM) {
+		len = snprintf(string + offset, size, "POLLRDNORM|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLRDBAND) {
+		len = snprintf(string + offset, size, "POLLRDBAND|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLWRNORM) {
+		len = snprintf(string + offset, size, "POLLWRNORM|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLWRBAND) {
+		len = snprintf(string + offset, size, "POLLWRBAND|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLERR) {
+		len = snprintf(string + offset, size, "POLLERR|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLHUP) {
+		len = snprintf(string + offset, size, "POLLHUP|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLNVAL) {
+		len = snprintf(string + offset, size, "POLLNVAL|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLMSG) {
+		len = snprintf(string + offset, size, "POLLMSG|");
+		offset += len;
+		size -= len;
+	}
+	return (string);
+}
+
+const char *
 service_type(t_uscalar_t type)
 {
 	switch (type) {
@@ -2578,17 +2782,17 @@ print_pipe(int child)
 }
 
 void
-print_open(int child)
+print_open(int child, const char *name)
 {
 	static const char *msgs[] = {
-		"  open()      ----->v                                   .                   \n",
-		"                    |                                   v<-----     open()  \n",
-		"                    |                                v<-+------     open()  \n",
-		"                    .                                .  .                   \n",
+		"  open()      ----->v %-30.30s    .                   \n",
+		"                    | %-30.30s    v<-----     open()  \n",
+		"                    | %-30.30s v<-+------     open()  \n",
+		"                    . %-30.30s .  .                   \n",
 	};
 
 	if (verbose > 3)
-		print_simple(child, msgs);
+		print_simple_string(child, msgs, name);
 }
 
 void
@@ -2844,7 +3048,7 @@ print_syscall(int child, const char *command)
 		"                    |          %-14s        |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 4)
+	if ((verbose && show) || (verbose > 5 && show_msg))
 		print_string_state(child, msgs, command);
 }
 
@@ -2858,7 +3062,7 @@ print_tx_prim(int child, const char *command)
 		"                    |                                |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -2872,7 +3076,7 @@ print_rx_prim(int child, const char *command)
 		"                    |         <%16s>     |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -2886,7 +3090,7 @@ print_ack_prim(int child, const char *command)
 		"                    |         <%16s>     |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -2911,6 +3115,57 @@ print_no_prim(int child, long prim)
 
 	if (verbose > 0)
 		print_long_state(child, msgs, prim);
+}
+
+void
+print_signal(int child, int signum)
+{
+	static const char *msgs[] = {
+		">>>>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8s <<<<<<<<<<|<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
+		"  >>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8s <<<<<<<<<<|<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
+		"    >>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8s <<<<<<<<<<|<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
+		">>>>>>>>>>>>>>>>>>>>|>>>>>>>>>>>> %-8s <<<<<<<<<<|<<|<<<<<<<<<<<<<<<<<<< [%d:%03d]\n",
+	};
+
+	if (verbose > 0)
+		print_string_state(child, msgs, signal_string(signum));
+}
+
+void
+print_command(int child, const char *command)
+{
+	static const char *msgs[] = {
+		"%-14s----->|                                |  |                    [%d:%03d]\n",
+		"  %-14s--->|                                |  |                    [%d:%03d]\n",
+		"    %-14s->|                                |  |                    [%d:%03d]\n",
+		"                    |          %-14s        |  |                    [%d:%03d]\n",
+	};
+
+	if (verbose > 3)
+		print_string_state(child, msgs, command);
+}
+
+void
+print_double_string_state(int child, const char *msgs[], const char *string1, const char *string2)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string1, string2, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_command_info(int child, const char *command, const char *info)
+{
+	static const char *msgs[] = {
+		"%-14s----->|       %16s         |  |                    [%d:%03d]\n",
+		"  %-14s--->|       %16s         |  |                    [%d:%03d]\n",
+		"    %-14s->|       %16s         |  |                    [%d:%03d]\n",
+		"                    | %-14s %16s|  |                    [%d:%03d]\n",
+	};
+
+	if (verbose > 3)
+		print_double_string_state(child, msgs, command, info);
 }
 
 void
@@ -2946,7 +3201,7 @@ print_rx_data(int child, const char *command, size_t bytes)
 		"                    |- -%2$5d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
 	};
 
-	if ((verbose && show) || verbose > 4)
+	if ((verbose && show) || (verbose > 5 && show_msg))
 		print_string_int_state(child, msgs, command, bytes);
 }
 
@@ -2960,7 +3215,7 @@ print_errno(int child, long error)
 		"                    |          [%14s]      |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 4)
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
 		print_string_state(child, msgs, errno_string(error));
 }
 
@@ -2974,7 +3229,7 @@ print_success(int child)
 		"                    |                 ok             |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 4)
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
 		print_double_int(child, msgs, child, state);
 }
 
@@ -2988,8 +3243,31 @@ print_success_value(int child, int value)
 		"                    |            [%10d]        |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 4)
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
 		print_triple_int(child, msgs, value, child, state);
+}
+
+void
+print_int_string_state(int child, const char *msgs[], const int value, const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], value, string, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_poll_value(int child, int value, short revents)
+{
+	static const char *msgs[] = {
+		"%10d<--------/|%-32s|  |                    [%d:%03d]\n",
+		"  %10d<------/|%-32s|  |                    [%d:%03d]\n",
+		"    %10d<----/|%-32s|  |                    [%d:%03d]\n",
+		"          %10d|%-32s|  |                    [%d:%03d]\n",
+	};
+
+	if (verbose > 3)
+		print_int_string_state(child, msgs, value, poll_events_string(revents));
 }
 
 void
@@ -3014,6 +3292,12 @@ print_ioctl(int child, int cmd, intptr_t arg)
 }
 
 void
+print_poll(int child, short events)
+{
+	print_command_info(child, "poll(2)-------", poll_string(events));
+}
+
+void
 print_datcall(int child, const char *command, size_t bytes)
 {
 	static const char *msgs[] = {
@@ -3023,7 +3307,7 @@ print_datcall(int child, const char *command, size_t bytes)
 		"                    |- -%2$5d bytes %1$16s |  |                    [%3$d:%4$03d]\n",
 	};
 
-	if (verbose > 4)
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg))
 		print_string_int_state(child, msgs, command, bytes);
 }
 
@@ -3067,7 +3351,7 @@ print_expect(int child, int want)
 		"                    |- [Expected %-16s ] -|- |                    [%d:%03d]\n",
 	};
 
-	if ((verbose && show) || verbose > 4)
+	if (verbose > 1 && show)
 		print_string_state(child, msgs, event_string(want));
 }
 
@@ -3081,8 +3365,22 @@ print_string(int child, const char *string)
 		"                    |       %-20s     |  |                    \n",
 	};
 
-	if ((verbose && show) || verbose > 4)
+	if (verbose > 1 && show)
 		print_simple_string(child, msgs, string);
+}
+
+void
+print_command_state(int child, const char *string)
+{
+	static const char *msgs[] = {
+		"%20s|                                |  |                    [%d:%03d]\n",
+		"                    |                                |  |%-20s[%d:%03d]\n",
+		"                    |                                |   %-20s[%d:%03d]\n",
+		"                    |       %-20s     |  |                    [%d:%03d]\n",
+	};
+
+	if (verbose > 1 && show)
+		print_string_state(child, msgs, string);
 }
 
 void
@@ -3104,7 +3402,7 @@ print_waiting(int child, ulong time)
 		"/ / / / / / / / / / | / / / Waiting %03lu seconds / / /|/ | / / / / / / / / /  [%d:%03d]\n",
 	};
 
-	if ((verbose && show) || verbose > 4)
+	if (verbose > 0 && show)
 		print_time_state(child, msgs, time);
 }
 
@@ -3127,7 +3425,7 @@ print_mwaiting(int child, struct timespec *time)
 		"/ / / / / / / / / / | / / Waiting %8.4f seconds / |/ | / / / / / / / / /  [%d:%03d]\n",
 	};
 
-	if ((verbose && show) || verbose > 4) {
+	if (verbose > 0 && show) {
 		float delay;
 
 		delay = time->tv_nsec;
@@ -3269,6 +3567,21 @@ print_info(int child, struct T_info_ack *info)
  *
  *  -------------------------------------------------------------------------
  */
+
+int
+test_waitsig(int child)
+{
+	int signum;
+	sigset_t set;
+
+	sigemptyset(&set);
+	while ((signum = last_signum) == 0)
+		sigsuspend(&set);
+	print_signal(child, signum);
+	return (__RESULT_SUCCESS);
+
+}
+
 int
 test_ioctl(int child, int cmd, intptr_t arg)
 {
@@ -3280,7 +3593,8 @@ test_ioctl(int child, int cmd, intptr_t arg)
 				continue;
 			return (__RESULT_FAILURE);
 		}
-		print_success_value(child, last_retval);
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		return (__RESULT_SUCCESS);
 	}
 }
@@ -3336,7 +3650,7 @@ int
 test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
 	if (flags & MSG_BAND || band) {
-		if (verbose > 4) {
+		if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
 			int i;
 
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -3353,34 +3667,36 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (ctrl == NULL || data != NULL)
-			print_datcall(child, "putpmsg(2)----", data ? data->len : 0);
+			print_datcall(child, "M_DATA----------", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
-				if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+				if (last_errno == EINTR || last_errno == ERESTART)
 					continue;
 				print_errno(child, (last_errno = errno));
 				return (__RESULT_FAILURE);
 			}
-			print_success_value(child, last_retval);
+			if ((verbose > 3 && show) || (verbose > 5 && show_msg))
+				print_success_value(child, last_retval);
 			return (__RESULT_SUCCESS);
 		}
 	} else {
-		if (verbose > 5) {
+		if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
 			fprintf(stdout, "putmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 			fflush(stdout);
 		}
 		if (ctrl == NULL || data != NULL)
-			print_datcall(child, "putmsg(2)-----", data ? data->len : 0);
+			print_datcall(child, "M_DATA----------", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
-				if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+				if (last_errno == EINTR || last_errno == ERESTART)
 					continue;
 				print_errno(child, (last_errno = errno));
 				return (__RESULT_FAILURE);
 			}
-			print_success_value(child, last_retval);
+			if ((verbose > 3 && show) || (verbose > 5 && show_msg))
+				print_success_value(child, last_retval);
 			return (__RESULT_SUCCESS);
 		}
 	}
@@ -3392,7 +3708,7 @@ test_write(int child, const void *buf, size_t len)
 	print_syscall(child, "write(2)------");
 	for (;;) {
 		if ((last_retval = write(test_fd[child], buf, len)) == -1) {
-			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
@@ -3409,7 +3725,7 @@ test_writev(int child, const struct iovec *iov, int num)
 	print_syscall(child, "writev(2)-----");
 	for (;;) {
 		if ((last_retval = writev(test_fd[child], iov, num)) == -1) {
-			if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+			if (last_errno == EINTR || last_errno == ERESTART)
 				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
@@ -3485,7 +3801,7 @@ test_ti_ioctl(int child, int cmd, intptr_t arg)
 {
 	int tpi_error;
 
-	if (cmd == I_STR && verbose > 4) {
+	if (cmd == I_STR && verbose > 3) {
 		struct strioctl *icp = (struct strioctl *) arg;
 
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -3501,10 +3817,11 @@ test_ti_ioctl(int child, int cmd, intptr_t arg)
 				continue;
 			return (__RESULT_FAILURE);
 		}
-		print_success_value(child, last_retval);
+		if (verbose > 3)
+			print_success_value(child, last_retval);
 		break;
 	}
-	if (cmd == I_STR && verbose > 4) {
+	if (cmd == I_STR && verbose > 3) {
 		struct strioctl *icp = (struct strioctl *) arg;
 
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -3594,6 +3911,37 @@ test_block(int child)
 }
 
 int
+test_isastream(int child)
+{
+	int result;
+
+	print_syscall(child, "isastream(2)--");
+	if ((result = last_retval = isastream(test_fd[child])) == -1) {
+		print_errno(child, (last_errno = errno));
+		return (__RESULT_FAILURE);
+	}
+	print_success_value(child, last_retval);
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_poll(int child, const short events, short *revents, long ms)
+{
+	struct pollfd pfd = { .fd = test_fd[child], .events = events, .revents = 0 };
+	int result;
+
+	print_poll(child, events);
+	if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
+		print_errno(child, (last_errno = errno));
+		return (__RESULT_FAILURE);
+	}
+	print_poll_value(child, last_retval, pfd.revents);
+	if (last_retval == 1 && revents)
+		*revents = pfd.revents;
+	return (__RESULT_SUCCESS);
+}
+
+int
 test_pipe(int child)
 {
 	int fds[2];
@@ -3606,7 +3954,7 @@ test_pipe(int child)
 			print_success(child);
 			return (__RESULT_SUCCESS);
 		}
-		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+		if (last_errno == EINTR || last_errno == ERESTART)
 			continue;
 		print_errno(child, (last_errno = errno));
 		return (__RESULT_FAILURE);
@@ -3614,18 +3962,44 @@ test_pipe(int child)
 }
 
 int
-test_open(int child, const char *name)
+test_fopen(int child, const char *name, int flags)
+{
+	int fd;
+
+	print_open(child, name);
+	if ((fd = open(name, flags)) >= 0) {
+		print_success(child);
+		return (fd);
+	}
+	print_errno(child, (last_errno = errno));
+	return (fd);
+}
+
+int
+test_fclose(int child, int fd)
+{
+	print_close(child);
+	if (close(fd) >= 0) {
+		print_success(child);
+		return __RESULT_SUCCESS;
+	}
+	print_errno(child, (last_errno = errno));
+	return __RESULT_FAILURE;
+}
+
+int
+test_open(int child, const char *name, int flags)
 {
 	int fd;
 
 	for (;;) {
-		print_open(child);
-		if ((fd = open(name, O_NONBLOCK | O_RDWR)) >= 0) {
+		print_open(child, name);
+		if ((fd = open(name, flags)) >= 0) {
 			test_fd[child] = fd;
 			print_success(child);
 			return (__RESULT_SUCCESS);
 		}
-		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+		if (last_errno == EINTR || last_errno == ERESTART)
 			continue;
 		print_errno(child, (last_errno = errno));
 		return (__RESULT_FAILURE);
@@ -3644,7 +4018,7 @@ test_close(int child)
 			print_success(child);
 			return __RESULT_SUCCESS;
 		}
-		if (last_errno == EAGAIN || last_errno == EINTR || last_errno == ERESTART)
+		if (last_errno == EINTR || last_errno == ERESTART)
 			continue;
 		print_errno(child, (last_errno = errno));
 		return __RESULT_FAILURE;
@@ -3652,9 +4026,9 @@ test_close(int child)
 }
 
 int
-test_push(int child)
+test_push(int child, const char *name)
 {
-	if (test_ioctl(child, I_PUSH, (intptr_t) "tpiperf") != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_PUSH, (intptr_t) name) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
@@ -3711,7 +4085,7 @@ stream_start(int child, int index)
 				inet_aton(addr_strings[i], &addrs[child][i].sin_addr);
 #endif				/* SCTP_VERSION_2 */
 		}
-		if (test_open(child, devname) != __RESULT_SUCCESS)
+		if (test_open(child, devname, O_NONBLOCK | O_RDWR) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
 		if (test_ioctl(child, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
 			return __RESULT_FAILURE;
@@ -3734,6 +4108,24 @@ stream_stop(int child)
 	default:
 		return __RESULT_FAILURE;
 	}
+}
+
+void
+test_sleep(int child, unsigned long t)
+{
+	print_waiting(child, t);
+	sleep(t);
+}
+
+void
+test_msleep(int child, unsigned long m)
+{
+	struct timespec time;
+
+	time.tv_sec = m / 1000;
+	time.tv_nsec = (m % 1000) * 1000000;
+	print_mwaiting(child, &time);
+	nanosleep(&time, NULL);
 }
 
 /*
@@ -3787,13 +4179,13 @@ begin_tests_p(int index)
 	if (begin_tests(index) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (test_push(0) != __RESULT_SUCCESS)
+	if (test_push(0, "tpiperf") != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (test_push(1) != __RESULT_SUCCESS)
+	if (test_push(1, "tpiperf") != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (test_push(2) != __RESULT_SUCCESS)
+	if (test_push(2, "tpiperf") != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return __RESULT_SUCCESS;
@@ -4631,7 +5023,7 @@ do_signal(int child, int action)
  */
 
 static int
-do_decode_data(int child, struct strbuf *data)
+do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
 
@@ -4884,7 +5276,7 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			break;
 		}
 		if (data && data->len >= 0)
-			if (do_decode_data(child, data) != __TEST_DATA)
+			if (do_decode_data(child, ctrl, data) != __TEST_DATA)
 				event = __RESULT_FAILURE;
 	}
 	return ((last_event = event));
@@ -4897,7 +5289,7 @@ do_decode_msg(int child, struct strbuf *ctrl, struct strbuf *data)
 		if ((last_event = do_decode_ctrl(child, ctrl, data)) != __EVENT_UNKNOWN)
 			return time_event(child, last_event);
 	} else if (data->len > 0) {
-		if ((last_event = do_decode_data(child, data)) != __EVENT_UNKNOWN)
+		if ((last_event = do_decode_data(child, ctrl, data)) != __EVENT_UNKNOWN)
 			return time_event(child, last_event);
 	}
 	return ((last_event = __EVENT_NO_MSG));
@@ -4946,7 +5338,7 @@ wait_event(int child, int wait)
 				data.buf = dbuf;
 				flags = 0;
 				for (;;) {
-					if (verbose > 4)
+					if ((verbose > 3 && show) || (verbose > 5 && show_msg))
 						print_syscall(child, "getmsg()");
 					if ((ret = getmsg(test_fd[child], &ctrl, &data, &flags)) >= 0)
 						break;
@@ -4960,9 +5352,9 @@ wait_event(int child, int wait)
 				if (ret < 0)
 					break;
 				if (ret == 0) {
-					if (verbose > 4)
+					if ((verbose > 3 && show) || (verbose > 5 && show_msg))
 						print_success(child);
-					if (verbose > 4) {
+					if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
 						int i;
 
 						dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -5062,24 +5454,6 @@ expect(int child, int wait, int want)
 	return (__RESULT_FAILURE);
 }
 
-void
-test_sleep(int child, unsigned long t)
-{
-	print_waiting(child, t);
-	sleep(t);
-}
-
-void
-test_msleep(int child, unsigned long m)
-{
-	struct timespec time;
-
-	time.tv_sec = m / 1000;
-	time.tv_nsec = (m % 1000) * 1000000;
-	print_mwaiting(child, &time);
-	nanosleep(&time, NULL);
-}
-
 /*
  *  -------------------------------------------------------------------------
  *
@@ -5153,6 +5527,19 @@ preamble_1(int child)
 	return (__RESULT_FAILURE);
 }
 
+int
+preamble_1s(int child)
+{
+	if (preamble_1(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, LONG_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+}
+
 static int
 postamble_1(int child)
 {
@@ -5199,6 +5586,45 @@ postamble_1(int child)
 	failure_string = (failure_string == NULL) ? fail_string : failure_string;
 	return (__RESULT_FAILURE);
 }
+
+#if 0
+static int
+postamble_1e(int child)
+{
+	int failed = -1;
+
+	while (1) {
+		expect(child, SHORT_WAIT, __EVENT_NO_MSG);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			break;
+		case __RESULT_FAILURE:
+			break;
+		default:
+			failed = (failed == -1) ? state : failed;
+			state++;
+			continue;
+		}
+		break;
+	}
+	state++;
+	if (do_signal(child, __TEST_UNBIND_REQ) == __RESULT_SUCCESS || last_errno != EPROTO) {
+		expect(child, SHORT_WAIT, __TEST_OK_ACK);
+		failed = (failed == -1) ? state : failed;
+	}
+	state++;
+	if (stop_tt() != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (failed != -1)
+		goto failure;
+	return (__RESULT_SUCCESS);
+      failure:
+	state = failed;
+	return (__RESULT_FAILURE);
+}
+#endif
 
 static int
 preamble_2_conn(int child)
@@ -5399,6 +5825,7 @@ postamble_2_list(int child)
 	return (__RESULT_FAILURE);
 }
 
+#if 1
 static int
 preamble_2b_conn(int child)
 {
@@ -5731,6 +6158,8 @@ preamble_8_resp(int child)
 	opt_optm.mac_val = T_SCTP_HMAC_MD5;
 	return preamble_1(child);
 }
+#endif
+
 /*
  *  =========================================================================
  *
@@ -10359,8 +10788,7 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options,
-				&option_index);
+		c = getopt_long(argc, argv, "cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "cSwp:P:i:I:rRd:el::f::so:t:mqvhVC?");
 #endif				/* defined _GNU_SOURCE */
@@ -10420,22 +10848,17 @@ main(int argc, char *argv[])
 				for (n = 0, t = tests; t->numb; t++)
 					if (!strncmp(t->numb, optarg, l)) {
 						if (verbose > 2)
-							fprintf(stdout, "Test Group: %s\n",
-								t->tgrp);
-						fprintf(stdout, "Test Case %s-%s/%s: %s\n",
-							sstdname, shortname, t->numb, t->name);
+							fprintf(stdout, "Test Group: %s\n", t->tgrp);
+						fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
 						if (verbose > 2)
-							fprintf(stdout, "Test Reference: %s\n",
-								t->sref);
+							fprintf(stdout, "Test Reference: %s\n", t->sref);
 						if (verbose > 1)
 							fprintf(stdout, "%s\n\n", t->desc);
 						fflush(stdout);
 						n++;
 					}
 				if (!n) {
-					fprintf(stderr,
-						"WARNING: specification `%s' matched no test\n",
-						optarg);
+					fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
 					fflush(stderr);
 					goto bad_option;
 				}
@@ -10448,8 +10871,7 @@ main(int argc, char *argv[])
 				for (t = tests; t->numb; t++) {
 					if (verbose > 2)
 						fprintf(stdout, "Test Group: %s\n", t->tgrp);
-					fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname,
-						shortname, t->numb, t->name);
+					fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
 					if (verbose > 2)
 						fprintf(stdout, "Test Reference: %s\n", t->sref);
 					if (verbose > 1)
@@ -10467,8 +10889,7 @@ main(int argc, char *argv[])
 				timer_scale = atoi(optarg);
 			else
 				timer_scale = 50;
-			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n",
-				timer_scale);
+			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", (long)timer_scale);
 			break;
 		case 's':
 			summary = 1;
@@ -10490,9 +10911,7 @@ main(int argc, char *argv[])
 						// }
 					}
 				if (!n) {
-					fprintf(stderr,
-						"WARNING: specification `%s' matched no test\n",
-						optarg);
+					fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
 					fflush(stderr);
 					goto bad_option;
 				}
@@ -10528,8 +10947,7 @@ main(int argc, char *argv[])
 					// }
 				}
 			if (!n) {
-				fprintf(stderr, "WARNING: specification `%s' matched no test\n",
-					optarg);
+				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
 				fflush(stderr);
 				goto bad_option;
 			}

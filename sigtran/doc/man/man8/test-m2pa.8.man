@@ -624,7 +624,7 @@ condition.
 .PP
 .B test-m2pa
 is normally invoked from the
-.RI \(lq "@PACKAGE@-@VERSION@" \(rq
+.B @PACKAGE@-@VERSION@
 test suite.
 .\"
 .\"
@@ -726,7 +726,7 @@ manual pages.
 .PP
 .B test-m2pa
 is provided with the
-.RI \(lq "@PACKAGE_TITLE@" \(rq
+.I @PACKAGE_TITLE@
 package.
 .\"
 .\"

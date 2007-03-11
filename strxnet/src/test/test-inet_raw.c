@@ -233,7 +233,7 @@ static int verbose = 1;
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
-static int show_data = 1;
+//static int show_data = 1;
 
 static int last_prim = 0;
 static int last_event = 0;
@@ -265,6 +265,8 @@ int test_fd[3] = { 0, 0, 0 };
 #define TEST_DURATION	20000
 #define INFINITE_WAIT	-1
 
+static ulong test_duration = TEST_DURATION;	/* wait on other side */
+
 ulong seq[10] = { 0, };
 ulong tok[10] = { 0, };
 ulong tsn[10] = { 0, };
@@ -283,6 +285,7 @@ static int test_pflags = MSG_BAND;	/* MSG_BAND | MSG_HIPRI */
 static int test_pband = 0;
 static int test_gflags = 0;		/* MSG_BAND | MSG_HIPRI */
 static int test_gband = 0;
+
 static int test_bufsize = 256;
 static int test_tidu = 256;
 static int test_mgmtflags = T_NEGOTIATE;
@@ -495,7 +498,14 @@ check_time(const char *t, long i, long lo, long hi)
 static int
 time_event(int child, int event)
 {
-	if (verbose > 4) {
+	static const char *msgs[] = {
+		"                    ! %11.6g                |                    <%d:%03d>\n",
+		"                    |                %11.6g !                    <%d:%03d>\n",
+		"                    |             %11.6g !  |                    <%d:%03d>\n",
+		"                    !        %11.6g         !                    <%d:%03d>\n",
+	};
+
+	if ((verbose > 4 && show) || (verbose > 5 && show_msg)) {
 		float t, m;
 		struct timeval now;
 
@@ -506,8 +516,9 @@ time_event(int child, int event)
 		m = now.tv_usec;
 		m = m / 1000000;
 		t += m;
+
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    | %11.6g                    |  |                    <%d:%03d>\n", t, child, state);
+		fprintf(stdout, msgs[child], t, child, state);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -515,30 +526,49 @@ time_event(int child, int event)
 }
 
 static int timer_timeout = 0;
+static int last_signum = 0;
 
 static void
-timer_handler(int signum)
+signal_handler(int signum)
 {
+	last_signum = signum;
 	if (signum == SIGALRM)
 		timer_timeout = 1;
 	return;
 }
 
 static int
-timer_sethandler(void)
+start_signals(void)
 {
 	sigset_t mask;
 	struct sigaction act;
 
-	act.sa_handler = timer_handler;
-	act.sa_flags = SA_RESTART | SA_ONESHOT;
+	act.sa_handler = signal_handler;
+//      act.sa_flags = SA_RESTART | SA_ONESHOT;
+	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
 		return __RESULT_FAILURE;
+	if (sigaction(SIGPOLL, &act, NULL))
+		return __RESULT_FAILURE;
+	if (sigaction(SIGURG, &act, NULL))
+		return __RESULT_FAILURE;
+	if (sigaction(SIGPIPE, &act, NULL))
+		return __RESULT_FAILURE;
+	if (sigaction(SIGHUP, &act, NULL))
+		return __RESULT_FAILURE;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGPOLL);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGHUP);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
 	siginterrupt(SIGALRM, 1);
+	siginterrupt(SIGPOLL, 1);
+	siginterrupt(SIGURG, 1);
+	siginterrupt(SIGPIPE, 1);
+	siginterrupt(SIGHUP, 1);
 	return __RESULT_SUCCESS;
 }
 
@@ -553,7 +583,9 @@ start_tt(long duration)
 		{duration / 1000, (duration % 1000) * 1000}
 	};
 
-	if (timer_sethandler())
+	if (duration == (long) INFINITE_WAIT)
+		return __RESULT_SUCCESS;
+	if (start_signals())
 		return __RESULT_FAILURE;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
 		return __RESULT_FAILURE;
@@ -572,24 +604,47 @@ start_st(long duration)
 #endif
 
 static int
-stop_tt(void)
+stop_signals(void)
 {
-	struct itimerval setting = { {0, 0}, {0, 0} };
+	int result = __RESULT_SUCCESS;
 	sigset_t mask;
 	struct sigaction act;
 
-	if (setitimer(ITIMER_REAL, &setting, NULL))
-		return __RESULT_FAILURE;
 	act.sa_handler = SIG_DFL;
 	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
-		return __RESULT_FAILURE;
-	timer_timeout = 0;
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGPOLL, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGURG, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGPIPE, &act, NULL))
+		result = __RESULT_FAILURE;
+	if (sigaction(SIGHUP, &act, NULL))
+		result = __RESULT_FAILURE;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGPOLL);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGHUP);
 	sigprocmask(SIG_BLOCK, &mask, NULL);
-	return __RESULT_SUCCESS;
+	return (result);
+}
+
+static int
+stop_tt(void)
+{
+	struct itimerval setting = { {0, 0}, {0, 0} };
+	int result = __RESULT_SUCCESS;
+
+	if (setitimer(ITIMER_REAL, &setting, NULL))
+		return __RESULT_FAILURE;
+	if (stop_signals() != __RESULT_SUCCESS)
+		result = __RESULT_FAILURE;
+	timer_timeout = 0;
+	return (result);
 }
 
 /*
@@ -1447,7 +1502,7 @@ etype_string(t_uscalar_t etype)
 }
 
 const char *
-event_string(int event)
+event_string(int child, int event)
 {
 	switch (event) {
 	case __EVENT_NO_MSG:
@@ -1696,6 +1751,163 @@ ioctl_string(int cmd, intptr_t arg)
 	default:
 		return ("(unexpected)");
 	}
+}
+
+const char *
+signal_string(int signum)
+{
+	switch (signum) {
+	case SIGHUP:
+		return ("SIGHUP");
+	case SIGINT:
+		return ("SIGINT");
+	case SIGQUIT:
+		return ("SIGQUIT");
+	case SIGILL:
+		return ("SIGILL");
+	case SIGABRT:
+		return ("SIGABRT");
+	case SIGFPE:
+		return ("SIGFPE");
+	case SIGKILL:
+		return ("SIGKILL");
+	case SIGSEGV:
+		return ("SIGSEGV");
+	case SIGPIPE:
+		return ("SIGPIPE");
+	case SIGALRM:
+		return ("SIGALRM");
+	case SIGTERM:
+		return ("SIGTERM");
+	case SIGUSR1:
+		return ("SIGUSR1");
+	case SIGUSR2:
+		return ("SIGUSR2");
+	case SIGCHLD:
+		return ("SIGCHLD");
+	case SIGCONT:
+		return ("SIGCONT");
+	case SIGSTOP:
+		return ("SIGSTOP");
+	case SIGTSTP:
+		return ("SIGTSTP");
+	case SIGTTIN:
+		return ("SIGTTIN");
+	case SIGTTOU:
+		return ("SIGTTOU");
+	case SIGBUS:
+		return ("SIGBUS");
+	case SIGPOLL:
+		return ("SIGPOLL");
+	case SIGPROF:
+		return ("SIGPROF");
+	case SIGSYS:
+		return ("SIGSYS");
+	case SIGTRAP:
+		return ("SIGTRAP");
+	case SIGURG:
+		return ("SIGURG");
+	case SIGVTALRM:
+		return ("SIGVTALRM");
+	case SIGXCPU:
+		return ("SIGXCPU");
+	case SIGXFSZ:
+		return ("SIGXFSZ");
+	default:
+		return ("unknown");
+	}
+}
+
+const char *
+poll_string(short events)
+{
+	if (events & POLLIN)
+		return ("POLLIN");
+	if (events & POLLPRI)
+		return ("POLLPRI");
+	if (events & POLLOUT)
+		return ("POLLOUT");
+	if (events & POLLRDNORM)
+		return ("POLLRDNORM");
+	if (events & POLLRDBAND)
+		return ("POLLRDBAND");
+	if (events & POLLWRNORM)
+		return ("POLLWRNORM");
+	if (events & POLLWRBAND)
+		return ("POLLWRBAND");
+	if (events & POLLERR)
+		return ("POLLERR");
+	if (events & POLLHUP)
+		return ("POLLHUP");
+	if (events & POLLNVAL)
+		return ("POLLNVAL");
+	if (events & POLLMSG)
+		return ("POLLMSG");
+	return ("none");
+}
+
+const char *
+poll_events_string(short events)
+{
+	static char string[256] = "";
+	int offset = 0, size = 256, len = 0;
+
+	if (events & POLLIN) {
+		len = snprintf(string + offset, size, "POLLIN|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLPRI) {
+		len = snprintf(string + offset, size, "POLLPRI|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLOUT) {
+		len = snprintf(string + offset, size, "POLLOUT|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLRDNORM) {
+		len = snprintf(string + offset, size, "POLLRDNORM|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLRDBAND) {
+		len = snprintf(string + offset, size, "POLLRDBAND|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLWRNORM) {
+		len = snprintf(string + offset, size, "POLLWRNORM|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLWRBAND) {
+		len = snprintf(string + offset, size, "POLLWRBAND|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLERR) {
+		len = snprintf(string + offset, size, "POLLERR|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLHUP) {
+		len = snprintf(string + offset, size, "POLLHUP|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLNVAL) {
+		len = snprintf(string + offset, size, "POLLNVAL|");
+		offset += len;
+		size -= len;
+	}
+	if (events & POLLMSG) {
+		len = snprintf(string + offset, size, "POLLMSG|");
+		offset += len;
+		size -= len;
+	}
+	return (string);
 }
 
 const char *
@@ -2477,41 +2689,6 @@ t_errno_string(t_scalar_t err, t_scalar_t syserr)
 }
 
 void
-print_less(int child)
-{
-	if (verbose < 1 || !show)
-		return;
-	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	switch (child) {
-	case 0:
-		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
-		fprintf(stdout, " .  (more) .  <---->|               .               :  :                     [%d:%03d]\n", child, state);
-		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
-		break;
-	case 1:
-		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
-		fprintf(stdout, "                    :               .               :  |<-->  . (more)  .    [%d:%03d]\n", child, state);
-		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
-		break;
-	case 2:
-		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
-		fprintf(stdout, "                    :               .               |<-:--->  . (more)  .    [%d:%03d]\n", child, state);
-		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
-		break;
-	}
-	fflush(stdout);
-	dummy = lockf(fileno(stdout), F_ULOCK, 0);
-	show = 0;
-	return;
-}
-
-void
-print_more(void)
-{
-	show = 1;
-}
-
-void
 print_simple(int child, const char *msgs[])
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
@@ -2557,6 +2734,47 @@ print_simple_string(int child, const char *msgs[], const char *string)
 }
 
 void
+print_string_state(int child, const char *msgs[], const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], string, child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_triple_string(int child, const char *msgs[], const char *string)
+{
+	dummy = lockf(fileno(stdout), F_LOCK, 0);
+	fprintf(stdout, msgs[child], "", child, state);
+	fprintf(stdout, msgs[child], string, child, state);
+	fprintf(stdout, msgs[child], "", child, state);
+	fflush(stdout);
+	dummy = lockf(fileno(stdout), F_ULOCK, 0);
+}
+
+void
+print_more(int child)
+{
+	show = 1;
+}
+
+void
+print_less(int child)
+{
+	static const char *msgs[] = {
+		"         . %1$6.6s . | <------         .         ------> :                    [%2$d:%3$03d]\n",
+		"                    : <------         .         ------> | . %1$-6.6s .         [%2$d:%3$03d]\n",
+		"                    : <------         .      ------> |  : . %1$-6.6s .         [%2$d:%3$03d]\n",
+		"         . %1$6.6s . : <------         .      ------> :> : . %1$-6.6s .         [%2$d:%3$03d]\n",
+	};
+
+	if (show && verbose > 0)
+		print_triple_string(child, msgs, "(more)");
+	show = 0;
+}
+
+void
 print_pipe(int child)
 {
 	static const char *msgs[] = {
@@ -2565,22 +2783,22 @@ print_pipe(int child)
 		"                    .  .                                .                   \n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_simple(child, msgs);
 }
 
 void
-print_open(int child)
+print_open(int child, const char *name)
 {
 	static const char *msgs[] = {
-		"  open()      ----->v                                   .                   \n",
-		"                    |                                   v<-----     open()  \n",
-		"                    |                                v<-+------     open()  \n",
-		"                    .                                .  .                   \n",
+		"  open()      ----->v %-30.30s    .                   \n",
+		"                    | %-30.30s    v<-----     open()  \n",
+		"                    | %-30.30s v<-+------     open()  \n",
+		"                    . %-30.30s .  .                   \n",
 	};
 
-	if (verbose > 3)
-		print_simple(child, msgs);
+	if (show && verbose > 3)
+		print_simple_string(child, msgs, name);
 }
 
 void
@@ -2593,7 +2811,7 @@ print_close(int child)
 		"                    .                                .  .                   \n",
 	};
 
-	if (verbose > 3)
+	if (show && verbose > 3)
 		print_simple(child, msgs);
 }
 
@@ -2610,8 +2828,6 @@ print_preamble(int child)
 	if (verbose > 0)
 		print_simple(child, msgs);
 }
-
-void print_string_state(int child, const char *msgs[], const char *string);
 
 void
 print_failure(int child, const char *string)
@@ -2797,7 +3013,7 @@ print_timeout(int child)
 		"++++++++++++++++++++|++++++++++++ TIMEOUT! ++++++++++|++|+++++++++++++++++++ [%d:%03d]\n",
 	};
 
-	if (show_timeout || verbose > 0) {
+	if (show_timeout || verbose > 1) {
 		print_double_int(child, msgs, child, state);
 		show_timeout--;
 	}
@@ -2813,17 +3029,8 @@ print_nothing(int child)
 		"- - - - - - - - - - |- - - - - - -nothing! - - - - - | -|- - - - - - - - - - [%d:%03d]\n",
 	};
 
-	if (verbose > 1)
+	if (show && verbose > 1)
 		print_double_int(child, msgs, child, state);
-}
-
-void
-print_string_state(int child, const char *msgs[], const char *string)
-{
-	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child], string, child, state);
-	fflush(stdout);
-	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
 
 void
@@ -2836,7 +3043,7 @@ print_syscall(int child, const char *command)
 		"                    |          %-14s        |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if ((verbose && show) || (verbose > 5 && show_msg))
 		print_string_state(child, msgs, command);
 }
 
@@ -2850,7 +3057,7 @@ print_tx_prim(int child, const char *command)
 		"                    |                                |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -2864,7 +3071,7 @@ print_rx_prim(int child, const char *command)
 		"                    |         <%16s>     |  |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 0)
+	if (show && verbose > 0)
 		print_string_state(child, msgs, command);
 }
 
@@ -3066,7 +3273,7 @@ print_ioctl(int child, int cmd, intptr_t arg)
 }
 
 void
-print_ti_poll(int child, int cmd, intptr_t arg)
+print_ti_poll(int child, short events)
 {
 	static const char *msgs[] = {
 		"--poll(2)---------->|       %16s            |                    [%d:%03d]\n",
@@ -3076,14 +3283,14 @@ print_ti_poll(int child, int cmd, intptr_t arg)
 	};
 
 	if (show && verbose > 1)
-		print_string_state(child, msgs, poll_string(cmd, arg));
+		print_string_state(child, msgs, poll_string(events));
 }
 
 void
 print_poll(int child, short events)
 {
 	if (verbose > 3)
-		print_ti_poll(child, cmd, arg);
+		print_ti_poll(child, events);
 }
 
 void
@@ -3940,24 +4147,6 @@ stream_stop(int child)
 	default:
 		return __RESULT_FAILURE;
 	}
-}
-
-void
-test_sleep(int child, unsigned long t)
-{
-	print_waiting(child, t);
-	sleep(t);
-}
-
-void
-test_msleep(int child, unsigned long m)
-{
-	struct timespec time;
-
-	time.tv_sec = m / 1000;
-	time.tv_nsec = (m % 1000) * 1000000;
-	print_mwaiting(child, &time);
-	nanosleep(&time, NULL);
 }
 
 /*
@@ -29679,7 +29868,7 @@ test_case_7_2_conn(int child)
 		MORE_flag = T_MORE;
 		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS) {
 			state++;
-			print_more();
+			print_more(child);
 			test_msleep(child, LONG_WAIT);
 			test_data = "Hi Threre.";
 			MORE_flag = 0;
@@ -29700,7 +29889,7 @@ test_case_7_2_conn(int child)
 	snd_bytes += 10;
 	s++;
 	state++;
-	print_more();
+	print_more(child);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -29708,7 +29897,7 @@ test_case_7_2_conn(int child)
 	fprintf(stdout, "Sent %3d messages making %6lu bytes.\n", s, (ulong) snd_bytes);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
-	print_more();
+	print_more(child);
 	return (__RESULT_FAILURE);
 }
 
@@ -29741,7 +29930,7 @@ test_case_7_2_resp(int child)
 	if (!joined)
 		goto failure;
 	state++;
-	print_more();
+	print_more(child);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -29749,7 +29938,7 @@ test_case_7_2_resp(int child)
 	fprintf(stdout, "Rcvd %3d messages making %6lu bytes.\n", r, (ulong) rcv_bytes);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
-	print_more();
+	print_more(child);
 	return (__RESULT_FAILURE);
 }
 

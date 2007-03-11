@@ -143,7 +143,7 @@ dnl ==========================================================================
 m4_divert_push([DEFAULTS])
 at_SMP=
 at_MP=
-function test_pipe() {
+test_pipe() {
     case "$2" in
     (LIS)
 	# LiS crashes on many tests regardless of SMP
@@ -237,7 +237,7 @@ ACEOF
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
     if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
     if test $at_arg_given_sync = : ; then sync || : ; fi
-    if test-pipe $options -e -o $1
+    if test-pipe $options -o $1
     then
 	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS
 	then
@@ -261,7 +261,7 @@ ACEOF
 	return $?
     fi
 }
-function test_pipe_root() {
+test_pipe_root() {
     if test `id -u` -ne 0 ; then return 77 ; fi
     test_pipe $1
     return $?
