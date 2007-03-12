@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2007/03/08 06:03:28 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2007/03/12 22:20:27 $
 #
 #! -----------------------------------------------------------------------------
 #!
@@ -46,11 +46,14 @@
 #!
 #! -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/03/08 06:03:28 $ by $Author: brian $
+## Last Modified $Date: 2007/03/12 22:20:27 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.112  2007/03/12 22:20:27  brian
+## - may use automake 1.10
+##
 ## Revision 0.9.2.111  2007/03/08 06:03:28  brian
 ## - revert that
 ##
@@ -122,7 +125,7 @@
 ##
 ## =============================================================================
 
-AUTOMAKE_OPTIONS = gnits 1.8 dist-bzip2 std-options -Wall
+AUTOMAKE_OPTIONS = gnits 1.9 dist-bzip2 std-options -Wall
 
 ACLOCAL_AMFLAGS = -I m4
 
