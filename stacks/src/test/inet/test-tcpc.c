@@ -134,6 +134,8 @@ start_timer(void)
 static struct sockaddr_in loc_addr = { AF_INET, 0, {INADDR_ANY}, };
 static struct sockaddr_in rem_addr = { AF_INET, 0, {INADDR_ANY}, };
 
+#define MSG_LEN 64
+
 int len = MSG_LEN;
 
 int nodelay = 1;
