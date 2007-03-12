@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/02/14 14:08:55 $
+ @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/12 23:19:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/14 14:08:55 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 23:19:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua_as.c,v $
+ Revision 0.9.2.4  2007/03/12 23:19:44  brian
+ - changes for function type safety
+
  Revision 0.9.2.3  2007/02/14 14:08:55  brian
  - broad changes updating support for SS7 MTP and M3UA
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/02/14 14:08:55 $"
+#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/12 23:19:44 $"
 
 static char const ident[] =
-    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/02/14 14:08:55 $";
+    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/12 23:19:44 $";
 
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
@@ -135,7 +138,7 @@ static char const ident[] =
 /* ============================== */
 
 #define TUA_AS_DESCRIP		"TUA/SCTP AS TCAP STREAMS MULTIPLEXING DRIVER."
-#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2007/02/14 14:08:55 $"
+#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2007/03/12 23:19:44 $"
 #define TUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
