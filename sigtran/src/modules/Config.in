@@ -1,7 +1,7 @@
 ## vim: ft=config comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/02/10 22:32:17 $
+# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 11:15:33 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/02/10 22:32:17 $ by $Author: brian $
+## Last Modified $Date: 2007/03/12 11:15:33 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Config.in,v $
+## Revision 0.9.2.6  2007/03/12 11:15:33  brian
+## - correct last configruation files for dashes
+##
 ## Revision 0.9.2.5  2007/02/10 22:32:17  brian
 ## - working up sigtran drivers
 ##
@@ -88,28 +91,28 @@ module	m2tp	    m2tp
 ## Object name specifications
 ## -----------------------------------------------------------
 ##	type	name	    object name
-objname	module	m2pa-sl	    m2pa-sl
-#objname module	m2ua-as	    m2ua-as
-#objname module	m3ua-as	    m3ua-as
-objname	module	sdt-tpi	    sdt-tpi
-objname	module	sl-tpi	    sl-tpi
-objname	module	sdl-sctp    sdl-sctp
-objname	module	sdt-sctp    sdt-sctp
-objname	module	sl-sctp	    sl-sctp
+objname	module	m2pa-sl	    m2pa_sl
+#objname module	m2ua-as	    m2ua_as
+#objname module	m3ua-as	    m3ua_as
+objname	module	sdt-tpi	    sdt_tpi
+objname	module	sl-tpi	    sl_tpi
+objname	module	sdl-sctp    sdl_sctp
+objname	module	sdt-sctp    sdt_sctp
+objname	module	sl-sctp	    sl_sctp
 objname	module	m2tp	    m2tp
 
 ##
 ## Loadable specifications
 ## -----------------------------------------------------------
 ##		name
-loadable	m2pa-sl
-#loadable	m2ua-as
-#loadable	m3ua-as
-loadable	sdt-tpi
-loadable	sl-tpi
-loadable	sdl-sctp
-loadable	sdt-sctp
-loadable	sl-sctp
+loadable	m2pa_sl
+#loadable	m2ua_as
+#loadable	m3ua_as
+loadable	sdt_tpi
+loadable	sl_tpi
+loadable	sdl_sctp
+loadable	sdt_sctp
+loadable	sl_sctp
 loadable	m2tp
 
 ##   Node specifications

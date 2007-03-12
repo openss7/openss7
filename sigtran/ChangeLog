@@ -1,5 +1,8 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/modules/Config.in: correct for dashes
+	* src/drivers/Config.in: correct for dashes
+
 	* doc/man/man8/test-m2pa.8.man: boosted default port 10000->18000
 	* doc/man/man8/test-m2ua_as.8.man: boosted default port 10000->18000
 	* doc/man/man8/test-m3ua_as.8.man: boosted default port 10000->18000
