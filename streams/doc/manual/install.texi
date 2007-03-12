@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.36 2007/03/07 21:49:53 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.37 2007/03/12 21:39:57 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/07 21:49:53 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/12 21:39:57 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -669,7 +669,7 @@ The build host requires the following GNU tools:
 
 @itemize
 @item @command{autoconf 2.61}
-@item @command{automake 1.9.6}
+@item @command{automake 1.10}
 @item @command{libtool 1.5.22}
 @item @command{gettext 0.16}
 @end itemize
@@ -679,13 +679,13 @@ the free software directory, and also at the following locations:
 
 @itemize
 @item @url{http://www.openss7.org/tarballs/autoconf-2.61.tar.bz2,autoconf-2.61}
-@item @url{http://www.openss7.org/tarballs/automake-1.9.6.tar.gz,automake-1.9.6}
+@item @url{http://www.openss7.org/tarballs/automake-1.10.tar.bz2,automake-1.10}
 @item @url{http://www.openss7.org/tarballs/libtool-1.5.22.tar.gz,libtool-1.5.22}
 @item @url{http://www.openss7.org/tarballs/gettext-0.16.tar.gz,gettext-0.16}
 @end itemize
 
 It should be stressed that, in particular, the @manpage{autoconf(1)}, and @manpage{automake(1)},
-must be at version releases @command{2.61} and @command{1.9.6}.  @emph{The versions normally
+must be at version releases @command{2.60} and @command{1.9.6}.  @emph{The versions normally
 distributed in some mainstream GNU/Linux distributions are, in fact, much older than these
 versions.}@footnote{A notable exception is Debian.}  GNU version of these packages configured and
 installed to default directories will install in @file{/usr/local/} allowing them to coexist with
