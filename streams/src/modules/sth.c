@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.176 $) $Date: 2007/03/10 13:52:54 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.177 $) $Date: 2007/03/12 03:28:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/10 13:52:54 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 03:28:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.177  2007/03/12 03:28:24  brian
+ - remove old ms_acnt pegs
+
  Revision 0.9.2.176  2007/03/10 13:52:54  brian
  - checking in latest corrections for release
 
@@ -187,10 +190,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.176 $) $Date: 2007/03/10 13:52:54 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.177 $) $Date: 2007/03/12 03:28:24 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.176 $) $Date: 2007/03/10 13:52:54 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.177 $) $Date: 2007/03/12 03:28:24 $";
 
 //#define __NO_VERSION__
 
@@ -291,7 +294,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.176 $) $Date: 2007/03/10 13:52:54 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.177 $) $Date: 2007/03/12 03:28:24 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -724,7 +727,6 @@ strschedule_ioctl(void)
 STATIC streams_inline streams_fastcall __hot_in void
 strschedule_write(void)
 {
-	str_wstat.ms_acnt++;
 	/* NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run
 	   the STREAMS scheduler in process context here.  The reason is that if we avoid
 	   scheduling, the current process is blocked off other processors while it is running the
@@ -751,7 +753,6 @@ strschedule_write(void)
 STATIC streams_inline streams_fastcall __hot_in void
 strschedule_read(void)
 {
-	str_rstat.ms_acnt++;
 	/* NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run
 	   the STREAMS scheduler in process context here.  The reason is that if we avoid
 	   scheduling, the current process is blocked off other processors while it is running the
