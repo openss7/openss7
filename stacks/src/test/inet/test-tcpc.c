@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/12 10:19:26 $
+ @(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 11:17:55 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 10:19:26 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 11:17:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tcpc.c,v $
+ Revision 0.9.2.8  2007/03/12 11:17:55  brian
+ - rationalize sctp test programs
+
  Revision 0.9.2.7  2007/03/12 10:19:26  brian
  - corrections
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/12 10:19:26 $"
+#ident "@(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 11:17:55 $"
 
-static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/12 10:19:26 $";
+static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 11:17:55 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -88,6 +91,8 @@ static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
+
+#define MSG_LEN 64
 
 #define HOST_BUF_LEN 256
 
@@ -136,8 +141,6 @@ start_timer(void)
 
 static struct sockaddr_in loc_addr = { AF_INET, 0, {INADDR_ANY}, };
 static struct sockaddr_in rem_addr = { AF_INET, 0, {INADDR_ANY}, };
-
-#define MSG_LEN 64
 
 int len = MSG_LEN;
 

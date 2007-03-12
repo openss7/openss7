@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 09:33:21 $
+ @(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 11:17:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:33:21 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 11:17:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tcpc.c,v $
+ Revision 0.9.2.9  2007/03/12 11:17:53  brian
+ - rationalize sctp test programs
+
  Revision 0.9.2.8  2007/03/12 09:33:21  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -67,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 09:33:21 $"
+#ident "@(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 11:17:53 $"
 
-static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 09:33:21 $";
+static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 11:17:53 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -88,10 +91,11 @@ static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.
 #include <stdlib.h>
 #include <string.h>
 
-#define MSG_LEN 64
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
+
+#define MSG_LEN 64
 
 #define HOST_BUF_LEN 256
 

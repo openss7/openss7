@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:33:49 $
+ @(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/12 11:17:55 $
 
  -----------------------------------------------------------------------------
 
@@ -9,18 +9,32 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 2, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:33:49 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 11:17:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tcps.c,v $
+ Revision 0.9.2.7  2007/03/12 11:17:55  brian
+ - rationalize sctp test programs
+
  Revision 0.9.2.6  2007/03/12 09:33:49  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -61,15 +78,16 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:33:49 $"
+#ident "@(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/12 11:17:55 $"
 
-static char const ident[] = "$RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:33:49 $";
+static char const ident[] = "$RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/12 11:17:55 $";
 
 #include <stdio.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
@@ -84,9 +102,10 @@ static char const ident[] = "$RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.
 #include <getopt.h>
 #endif
 
+#define MSG_LEN 64
+
 #define HOST_BUF_LEN 256
 
-int verbose = 1;
 static int timer_timeout = 0;
 
 static void
@@ -129,18 +148,23 @@ start_timer(void)
 }
 
 static struct sockaddr_in loc_addr = { AF_INET, 0, {INADDR_ANY}, };
-static struct sockaddr_in rem_addr = { AF_INET, 0, {INADDR_ANY}, };
+
+int len = MSG_LEN;
+
+int nodelay = 1;
 
 int
 test_tcps(void)
 {
 	int lfd, fd;
-	int len = 0;
+	int offset = 0, mode = 0;
 	long inp_count = 0, out_count = 0;
+	long inp_bytes = 0, out_bytes = 0;
 	struct pollfd pfd[1] = { {0, POLLIN | POLLOUT | POLLERR | POLLHUP, 0} };
 
 //      unsigned char my_msg[] = "This is a good short test message that has some 64 bytes in it.";
-	unsigned char ur_msg[4096];
+	unsigned char ur_msg[len];
+	unsigned char *my_msg = ur_msg;
 
 	fprintf(stderr, "Opening socket\n");
 
@@ -164,7 +188,14 @@ test_tcps(void)
 		perror("accept");
 		goto dead1;
 	}
-
+	if (fcntl(fd, F_SETFL, O_NONBLOCK) < 0) {
+		perror("fcntl");
+		goto dead;
+	}
+	if (setsockopt(fd, SOL_TCP, TCP_NODELAY, &nodelay, sizeof(nodelay)) < 0) {
+		perror("setsockopt");
+		goto dead;
+	}
 	if (start_timer()) {
 		perror("timer");
 		goto dead;
@@ -172,54 +203,71 @@ test_tcps(void)
 
 	for (;;) {
 		pfd[0].fd = fd;
-		pfd[0].events = POLLIN | POLLERR | POLLHUP;
+		pfd[0].events = (mode ? POLLOUT : POLLIN) | POLLERR | POLLHUP;
 		pfd[0].revents = 0;
 		if (timer_timeout) {
-			printf("Msgs sent: %5ld, recv: %5ld, tot: %5ld, dif: %5ld, tput: %10ld\n",
-			       inp_count, out_count, inp_count + out_count, out_count - inp_count,
-			       8 * (42 + len) * (inp_count + out_count));
+			printf
+			    ("Bytes sent: %7ld, recv: %7ld, tot: %7ld, dif: %8ld\n",
+			     out_bytes, inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes);
 			inp_count = 0;
 			out_count = 0;
+			inp_bytes = 0;
+			out_bytes = 0;
 			if (start_timer()) {
 				perror("timer");
 				goto dead;
 			}
+			continue;
 		}
 		if (poll(&pfd[0], 1, -1) < 0) {
-			if (errno == EINTR)
+			if (errno == EINTR || errno == EAGAIN)
 				continue;
 			perror("poll");
 			goto dead;
 		}
+		if (mode) {
+			if (pfd[0].revents & POLLOUT) {
+				int rtn;
 
-		if (pfd[0].revents & POLLIN) {
-			if ((len = recv(fd, ur_msg, sizeof(ur_msg), MSG_DONTWAIT)) < 0) {
-				perror("recv");
-				goto dead;
-			}
-			inp_count++;
-			for (;;) {
-				pfd[0].fd = fd;
-				pfd[0].events = POLLOUT | POLLERR | POLLHUP;
-				pfd[0].revents = 0;
-				if (poll(&pfd[0], 1, -1) < 0) {
-					if (errno == EINTR)
+				if ((rtn = send(fd, my_msg, offset, MSG_DONTWAIT)) < 0) {
+					if (errno == EINTR || errno == EAGAIN)
 						continue;
-					perror("poll");
+					perror("send");
 					goto dead;
 				}
-				if (pfd[0].revents & POLLOUT) {
-					if (send(fd, ur_msg, len, MSG_DONTWAIT) < 0) {
-						perror("send");
-						goto dead;
+				if (rtn) {
+					out_bytes += rtn;
+					offset = offset > rtn ? offset - rtn : 0;
+					my_msg += rtn;
+					if (!offset) {
+						out_count++;
+						mode = 0;
 					}
-					out_count++;
-					break;
 				}
-				if (pfd[0].revents & POLLERR)
-					break;
-				if (pfd[0].revents & POLLHUP)
-					break;
+				continue;
+			}
+		} else {
+			if (pfd[0].revents & POLLIN) {
+				int rtn;
+
+				if ((rtn =
+				     recv(fd, ur_msg + offset,
+					  sizeof(ur_msg) - offset, MSG_DONTWAIT)) < 0) {
+					if (errno == EINTR || errno == EAGAIN)
+						continue;
+					perror("recv");
+					goto dead;
+				}
+				if (rtn) {
+					inp_bytes += rtn;
+					offset += rtn;
+					if (offset == len) {
+						my_msg = ur_msg;
+						inp_count++;
+						mode = 1;
+					}
+				}
+				continue;
 			}
 		}
 		if (pfd[0].revents & POLLERR) {
@@ -232,21 +280,25 @@ test_tcps(void)
 		}
 	}
       dead:
+	fprintf(stderr, "Error number: %d\n", errno);
 	close(fd);
       dead1:
 	close(lfd);
 	return (0);
 }
 
+static int verbose = 1;
+
 void
-copying(int argc, char *argv[])
+splash(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
-RFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Suite\n\
+%1$s: TCP Performance Test Program\n\
+%2$s\n\
 \n\
-Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2007 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -272,9 +324,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -289,18 +340,19 @@ in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition
 Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
-");
+\n\
+", argv[0], ident);
 }
 
 void
 version(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -310,7 +362,7 @@ version(int argc, char *argv[])
 void
 usage(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stderr, "\
 Usage:\n\
@@ -326,7 +378,7 @@ Usage:\n\
 void
 help(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
 Usage:\n\
@@ -337,69 +389,66 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
-    -p, --port PORT           (default: %2$d)\n\
-        port specifies both the local and remote port number\n\
-    -l, --loc_host LOC_HOST   (default: 127.0.0.1)\n\
-        specifies the LOC_HOST (bind) host for the TCP\n\
-        socket with optional local port number\n\
-    -r, --rem_host REM_HOST   (default: 127.0.0.2)\n\
-        specifies the REM_HOST (sendto) address for the TCP\n\
-        socket with optional remote port number\n\
-    -t, --rep_time TIME       (default: 1 second)\n\
-        specify the TIME in seconds between reports\n\
-    -w, --length LENGTH       (default: 32 bytes)\n\
-        specify the LENGTH of messages\n\
+    -l, --loc_host\n\
+        Local host (bind) address            [default: 0.0.0.0]\n\
+    -p, --port PORTNUM\n\
+        Remote port (connect) number         [default: %3$d]\n\
+    -w, --length LENGTH\n\
+        Length of message in bytes           [default: %2$d]\n\
+    -n, --nagle\n\
+        Suppress Nagle algorithm\n\
+    -t, --rep_time INTERVAL\n\
+        Sets the report time INTERVAL (secs) [default: 1]\n\
     -q, --quiet\n\
-        suppress normal output (equivalent to --verbose=0)\n\
+        Suppress normal output\n\
+        (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
-        increase verbosity or set to LEVEL [default: 1]\n\
-	this option may be repeated.\n\
-    -h, --help, -?, --?\n\
-        prints this usage message and exit\n\
+        Increase verbosity or set to LEVEL   [default 1]\n\
+        This option may be repeated\n\
+    -h, --help\n\
+        Prints this usage message and exists\n\
     -V, --version\n\
-        prints the version and exit\n\
+        Prints the version and exits\n\
     -C, --copying\n\
-        prints copying permissions and exit\n\
-", argv[0], TEST_PORT_NUMBER);
+	Prints copyright and copying information and exits\n\
+", argv[0], MSG_LEN, TEST_PORT_NUMBER);
 }
 
 int
 main(int argc, char **argv)
 {
-	char *hostl = "127.0.0.2";
-	char *hostr = "127.0.0.1";
+	char *hostl = "0.0.0.0";
 	char hostbufl[HOST_BUF_LEN];
-	char hostbufr[HOST_BUF_LEN];
 	char **hostlp = &hostl;
-	char **hostrp = &hostr;
 	short port = TEST_PORT_NUMBER;
 	int time;
 	struct hostent *haddr;
 
-	for (;;) {
+	while (1) {
 		int c, val;
 
 #if defined _GNU_SOURCE
-		/* *INDENT-OFF* */
 		int option_index = 0;
+		/* *INDENT-OFF* */
 		static struct option long_options[] = {
 			{"loc_host",	required_argument,	NULL, 'l'},
-			{"rem_host",	required_argument,	NULL, 'r'},
 			{"rep_time",	required_argument,	NULL, 't'},
 			{"port",	required_argument,	NULL, 'p'},
 			{"length",	required_argument,	NULL, 'w'},
+			{"nagle",	no_argument,		NULL, 'n'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
-			{ 0, }
+			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "l:r:t:p:wqvhVC?:", long_options, &option_index);
+
+		c = getopt_long(argc, argv, "l:r:p:w:nt:qvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "l:r:t:p:w:qvhVC?");
+		c = getopt(argc, argv, "l:r:p:t:qvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -409,16 +458,22 @@ main(int argc, char **argv)
 			hostl = hostbufl;
 			hostlp = &hostl;
 			break;
-		case 'r':
-			strncpy(hostbufr, optarg, HOST_BUF_LEN);
-			hostr = hostbufr;
-			hostrp = &hostr;
-			break;
 		case 't':
 			time = atoi(optarg);
 			break;
 		case 'p':
 			port = atoi(optarg);
+			break;
+		case 'w':
+			len = atoi(optarg);
+			if (len > 2048)
+				len = 2048;
+			break;
+		case 'n':
+			nodelay = 0;
+			break;
+		case 'q':
+			verbose = 0;
 			break;
 		case 'v':
 			if (optarg == NULL) {
@@ -429,15 +484,15 @@ main(int argc, char **argv)
 				goto bad_option;
 			verbose = val;
 			break;
-		case 'H':	/* -H */
-		case 'h':	/* -h, --help */
+		case 'H':
+		case 'h':
 			help(argc, argv);
 			exit(0);
 		case 'V':
 			version(argc, argv);
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			splash(argc, argv);
 			exit(0);
 		case '?':
 		default:
@@ -451,29 +506,19 @@ main(int argc, char **argv)
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
-			goto bad_usage;
-		      bad_usage:
 			usage(argc, argv);
 			exit(2);
 		}
 	}
-	/* 
-	 * dont' ignore non-option arguments
-	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	copying(argc, argv);
+
+	splash(argc, argv);
 
 	haddr = gethostbyname(*hostlp);
 	loc_addr.sin_family = AF_INET;
 	loc_addr.sin_port = htons(port);
 	loc_addr.sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
 
-	haddr = gethostbyname(*hostrp);
-	rem_addr.sin_family = AF_INET;
-	rem_addr.sin_port = htons(port);
-	rem_addr.sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
-
-	test_tcps();
-	exit(0);
+	return test_tcps();
 }

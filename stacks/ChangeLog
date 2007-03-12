@@ -1,5 +1,10 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/test/inet/test-tcpc.c: rationalize to sctp package
+	* src/test/inet/test-tcps.c: rationalize to sctp package
+	* src/test/inet/test-udpc.c: rationalize to sctp package
+	* src/test/inet/test-udps.c: rationalize to sctp package
+
 	* lib32/Makefile.am: corrections
 	* src/test/inet/test-tcpc.c: corrections
 	* src/test/x400p-ss7/test-x400p.c: corrections
