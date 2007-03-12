@@ -1,5 +1,9 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* lib32/Makefile.am: corrections
+	* src/test/inet/test-tcpc.c: corrections
+	* src/test/x400p-ss7/test-x400p.c: corrections
+
 	* doc/man/man8/test-m2pa.8.man: updates
 	* doc/man/man8/test-tcpc.8.man: updates
 	* doc/man/man8/test-tcps.8.man: updates
