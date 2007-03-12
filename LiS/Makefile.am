@@ -139,6 +139,7 @@ if PKG_BUILD_ARCH
 if RPM_BUILD_USER
 
 lib_LTLIBRARIES			= libLiSuser.la
+lib32_LTLIBRARIES		=
 
 libLiSuser_la_SOURCES		=
 libLiSuser_la_LIBADD		= drivers/str/libstr_user.la head/libhead_user.la
@@ -206,6 +207,7 @@ LIS_EXTRA_TOOLS			= fattach fdetach mkfifo strmakenodes
 LDADD				= libLiS.la
 
 lib_LTLIBRARIES			= libLiS.la libpLiS.la
+lib32_LTLIBRARIES		=
 
 ## RPM_BUILD_USER
 endif

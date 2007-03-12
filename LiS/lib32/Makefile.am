@@ -86,6 +86,7 @@ include ../am/openss7.am
 
 pkglibexec32_PROGRAMS		=
 
+lib_LTLIBRARIES			=
 lib32_LTLIBRARIES		=
 
 MACHINE_FLAGS			= -m32
