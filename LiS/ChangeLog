@@ -1,5 +1,10 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* man/man8/test-streams.8.man: updates
+	* man/man8/test-fifo.8.man: updates
+	* man/man8/test-pipe.8.man: updates
+	* man/man8/test-sad.8.man: updates
+
 	* tests/local.at: corrections for autotest 2.59b+
 
 2007-03-11  Brian Bidulock  <bidulock@openss7.org>

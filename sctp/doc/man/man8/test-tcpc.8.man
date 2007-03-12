@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-tcpc.8.man,v 0.9.2.4 2007/03/12 09:33:19 brian Exp $
+.\" @(#) $Id: test-tcpc.8.man,v 0.9.2.5 2007/03/12 09:47:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/12 09:33:19 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/12 09:47:09 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-tcpc.8.man,v $
+.\" Revision 0.9.2.5  2007/03/12 09:47:09  brian
+.\" - rationalized across packages
+.\"
 .\" Revision 0.9.2.4  2007/03/12 09:33:19  brian
 .\" - boosted default test port numbers from 10000 to 18000
 .\"
@@ -80,7 +83,7 @@ sort-adjacent-labels
 .so sctp.macros
 .\"
 .\"
-.TH TEST-TCPC 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Administration"
+.TH TEST-TCPC 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
 .\"
 .\"
 .SH NAME

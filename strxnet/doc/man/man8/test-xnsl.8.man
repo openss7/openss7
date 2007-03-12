@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-xnsl.8.man,v 0.9.2.2 2007/03/12 02:24:18 brian Exp $
+.\" @(#) $Id: test-xnsl.8.man,v 0.9.2.3 2007/03/12 09:47:13 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/12 02:24:18 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/12 09:47:13 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-xnsl.8.man,v $
+.\" Revision 0.9.2.3  2007/03/12 09:47:13  brian
+.\" - rationalized across packages
+.\"
 .\" Revision 0.9.2.2  2007/03/12 02:24:18  brian
 .\" - updating tests
 .\"
@@ -152,9 +155,7 @@ The
 package also provides an
 .B autotest
 based test suite that uses the
-.B test-xnsl
-and
-.B test-xnsl_thr
+.BR test-xnsl " and " test-xnsl_thr
 test case executables to invoke test cases.  This test suite can be used for development, diagnostic,
 regression or validation testing.
 See the
@@ -213,7 +214,7 @@ When used in combination with
 this option will print more or less information about each test case.
 Note that all options specified following this option are ignored.
 .TP
-\fB-h\fR, \fB--help\fR
+\fB-h\fR, \fB--help\fR, \fB-?\fR, \fB--?\fR
 When this option is encountered,
 print usage information to
 .I stdout

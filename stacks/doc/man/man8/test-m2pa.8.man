@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-m2pa.8.man,v 0.9.2.6 2007/03/12 09:33:32 brian Exp $
+.\" @(#) $Id: test-m2pa.8.man,v 0.9.2.7 2007/03/12 09:47:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/12 09:33:32 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/12 09:47:11 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-m2pa.8.man,v $
+.\" Revision 0.9.2.7  2007/03/12 09:47:11  brian
+.\" - rationalized across packages
+.\"
 .\" Revision 0.9.2.6  2007/03/12 09:33:32  brian
 .\" - boosted default test port numbers from 10000 to 18000
 .\"
@@ -91,7 +94,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B test-m2pa
-\- test suite executable for M2PA(4) STREAMS module
+\- test suite executable for \fBm2pa\fR(4) STREAMS module
 .\"
 .\"
 .SH SYNOPSIS
@@ -117,7 +120,7 @@ sort-adjacent-labels
 .PP
 .B test-m2pa
 is a test suite executable for the
-.BR M2PA (4)
+.BR m2pa (4)
 .I STREAMS
 module.
 The purpose of the
@@ -132,7 +135,7 @@ package also provides an
 .B autotest
 based test suite that uses the
 .B test-m2pa
-test case executable to invoke test cases.  The test suite can be used for development, diagnostic,
+test case executable to invoke test cases.  This test suite can be used for development, diagnostic,
 regression or validation testing.
 See the
 .I @PACKAGE_TITLE@ Installation and Reference Manual
@@ -241,9 +244,12 @@ is equivalent to
 The following options are only applicable if a test case command option is in effect.
 That is, these options are only effective if test cases are being executed and are used to modify
 the manner in which test cases are executed or test case results reported.
-.\".TP
-.\"\fB-d\fR, \fB--device\fR \fIDEVICE\fR
-.\"Specifies the device name to open for the tests.
+.TP
+\fB-d\fR, \fB--device\fR \fIDEVICE\fR
+Specifies the device name to open for the tests.  The default device name if
+.I DEVICE
+is not specified is
+.BR /dev/streams/clone/sctp_n .
 .TP
 \fB-w\fR, \fB--wait\fR
 Specifies that the client or server is to wait indefinitely.  Normally a test
@@ -264,6 +270,11 @@ This is used by the
 .B @PACKAGE@-@VERSION@
 test suite to run individual tests under
 .BR autotest .
+.TP
+\fB-a\fR, \fB--again\fR
+Specifies that the selected test cases are to be repeated in verbose mode if
+they fail in non-verbose mode.  This option is useful for use with autotest
+test suites.
 .TP
 \fB-R\fR, \fB--repeat\fR
 Repeat the selected test cases on success or failure.  This option causes the
@@ -314,15 +325,20 @@ mode, server mode or both.  The default (that is used by
 .BR autotest )
 is to execute both the client and server sides in a self-validation test.
 .TP
+\fB-u\fR, \fB--iut\fR
+Requests that test cases be executed to expect the IUT (Implementation Under
+Test) form the SCTP association.  The default if this option is not specified
+is for the PTU (Protocol Test Unit) to form the SCTP association.
+.TP
 \fB-c\fR, \fB--client\fR
-Requests that the client side of the test cases be executed (client mode).
+Requests that the client side (PTU) of the test cases be executed (client mode).
 The default if neither the \fB-c\fR or \fB-S\fR options are specified is to
 execute both the client and server side of the selected test cases.
 Specifying both \fB-S\fR and \fB-c\fR has the same effect as the default
 (specifying neither).
 .TP
 \fB-S\fR, \fB--server\fR
-Requests that the server side of the test cases be executed (server mode).
+Requests that the server side (IUT) of the test cases be executed (server mode).
 The default if neither the \fB-c\fR or \fB-S\fR options are specified is to
 execute both the client and server side of the selected test cases.
 Specifying both \fB-S\fR and \fB-c\fR has the same effect as the default
@@ -378,6 +394,181 @@ This option can be specified in both client and server mode.  In client mode
 it identies the remote host; in server mode, the local host.
 The default if a host name is not specified is the IP addresses
 \fB127.0.0.1\fR, \fB127.0.0.2\fR and \fB127.0.0.3\fR.
+.SS Test Suite Specific Options
+.PP
+The following options are specific to execution of M2PA test cases.  These
+options determine the draft or RFC version to which the PTU should test and
+the IUT should execute.
+.TP
+\fB-D\fR, \fB--decl-std\fR [\fISTANDARD\fR]
+Specifies the declared SS7 standard to which the Signalling Link Interface
+and protocol state machines are expected to conform.  This is the SS7 standard
+to which the IUT will conform and to which the PTU will test.
+.I STANDARD
+can be one of the following mnemonic values as a character string:
+.RS
+.TP \w'\fISS7_PVAR_ITUT_88\fR\(em'u
+.I SS7_PVAR_ITUT_88
+ITU-T Q.703 1988
+.PD 0
+.TP
+.I SS7_PVAR_ITUT_93
+ITU-T Q.703 1993
+.TP
+.I SS7_PVAR_ITUT_96
+ITU-T Q.703 1996
+.TP
+.I SS7_PVAR_ITUT_00
+ITU-T Q.703 2000
+.TP
+.I SS7_PVAR_ETSI_88
+ETSI EN 300 008-1 1988
+.TP
+.I SS7_PVAR_ETSI_93
+ETSI EN 300 008-1 1993
+.TP
+.I SS7_PVAR_ETSI_96
+ETSI EN 300 008-1 1996
+.TP
+.I SS7_PVAR_ETSI_00
+ETSI EN 300 008-1 200
+.TP
+.I SS7_PVAR_ANSI_92
+ANSI T1.111.3 1992
+.TP
+.I SS7_PVAR_ANSI_96
+ANSI T1.111.3 1996
+.TP
+.I SS7_PVAR_ANSI_00
+ANSI T1.111.3 2000
+.TP
+.I SS7_PVAR_JTTC_94
+TTC JT-Q.703 1994
+.TP
+.I SS7_PVAR_SING_88
+Singapore 1988
+.TP
+.I SS7_PVAR_SPAN_88
+Spain 1988
+.TP
+.I SS7_PVAR_CHIN_00
+China 2000
+.PD
+.PP
+The default standard when
+.I STANDARD
+is not specified is
+.BR SS7_PVAR_ITUT_00 .
+.RE
+.TP
+\fB-D\fR, \fB--draft\fR [\fIDRAFT\fR]
+Specifies the M2PA draft or RFC to which the IUT should conform and to which
+the PTU will test.
+.I DRAFT
+can be one of the following mnemonic values as a character string:
+.RS
+.TP \w'\fIM2PA_VERSION_DRAFT6_9\fR\(em'u
+.I M2PA_VERSION_DRAFT3
+draft-ietf-sigtran-m2pa-03.
+.[
+m2pa03
+.]
+.PD 0
+.TP
+.I M2PA_VERSION_DRAFT3_1
+draft-ietf-sigtran-m2pa-03
+.[
+m2pa03
+.]
+with corrections.
+.TP
+.I M2PA_VERSION_DRAFT4
+draft-ietf-sigtran-m2pa-04.
+.[
+m2pa04
+.]
+.TP
+.I M2PA_VERSION_DRAFT4_1
+draft-ietf-sigtran-m2pa-04
+.[
+m2pa04
+.]
+with corrections.
+.TP
+.I M2PA_VERSION_DRAFT4_9
+anticipated changes for draft-ietf-sigtran-m2pa-05.
+.[
+m2pa05
+.]
+.TP
+.I M2PA_VERSION_DRAFT5
+draft-ietf-sigtran-m2pa-05.
+.[
+m2pa05
+.]
+.TP
+.I M2PA_VERSION_DRAFT5_1
+draft-ietf-sigtran-m2pa-05
+.[
+m2pa05
+.]
+with corrections.
+.TP
+.I M2PA_VERSION_DRAFT6
+draft-ietf-sigtran-m2pa-06.
+.[
+m2pa06
+.]
+.TP
+.I M2PA_VERSION_DRAFT6_1
+draft-ietf-sigtran-m2pa-06
+.[
+m2pa06
+.]
+with corrections.
+.TP
+.I M2PA_VERSION_DRAFT6_9
+anticipated changes for draft-ietf-sigtran-m2pa-07.
+.[
+m2pa07
+.]
+.TP
+.I M2PA_VERSION_DRAFT7
+draft-ietf-sigtran-m2pa-07.
+.[
+m2pa07
+.]
+.TP
+.I M2PA_VERSION_DRAFT9
+draft-ietf-sigtran-m2pa-09.
+.[
+m2pa09
+.]
+.TP
+.I M2PA_VERSION_DRAFT10
+draft-ietf-sigtran-m2pa-10.
+.[
+m2pa10
+.]
+.TP
+.I M2PA_VERSION_DRAFT11
+draft-ietf-sigtran-m2pa-11.
+.[
+m2pa11
+.]
+.TP
+.I M2PA_VERSION_RFC4165
+rfc4165.
+.[
+rfc4165
+.]
+.PD
+.PP
+The default draft level when
+.I DRAFT
+is not specified is
+.BR M2PA_VERSION_RFC4165 .
+.RE
 .\"
 .\"
 .SH DIAGNOSTICS
@@ -506,7 +697,7 @@ tab(:);
 lb|lb|lb
 l|l|l.
 _
-POSIX 1003.3:test-sctp_n:autotest
+POSIX 1003.3:test-m2pa:autotest
 _
 PASS:PASS(0):PASS
 FAIL:FAIL(1):FAIL
