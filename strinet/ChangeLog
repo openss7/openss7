@@ -1,5 +1,7 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* tests/local.at: corrections for autotest 2.59b+
+
 	* doc/man/man8/test-inet_raw.8.man: test updates
 	* doc/man/man8/test-inet_sctp.8.man: test updates
 	* doc/man/man8/test-inet_tcp.8.man: test updates

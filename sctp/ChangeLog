@@ -1,5 +1,7 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* tests/local.at: corrections for autotest 2.59b+
+
 	* util/init/sctp: do not preload sctp
 	* util/init/sctp.sh: do not preload sctp
 	* util/sysconfig/sctp: do not preload sctp

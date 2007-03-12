@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: local.at,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/12 16:56:51 $
+dnl @(#) $RCSfile: local.at,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 08:47:10 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,7 +61,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2007/02/12 16:56:51 $ by $Author: brian $
+dnl Last Modified $Date: 2007/03/12 08:47:10 $ by $Author: brian $
 dnl
 dnl ==========================================================================
 
@@ -71,7 +71,7 @@ m4_divert_push([DEFAULTS])
 # Stand-alone testsuites are installed in the same directory as the test suite
 # executables, so we can find the autotest path from the executable path.
 #
-AUTOTEST_PATH=`echo "[$]0" | sed -e 's|/[[^/]]*[$]||'`
+AUTOTEST_PATH="$(dirname [$]0)/"
 
 # We normally install a copy of atlocal in the same file as the stand-alone
 # testsuite executable, so let's read that file if it exists for local values.
@@ -81,6 +81,18 @@ if test -r "$AUTOTEST_PATH/atlocal" ; then
 	echo "$as_me: error: invalid content: $AUTOTEST_PATH/atlocal" >&2
 	{ (exit 1); exit 1; };
     }
+fi
+# Variation for autoconf 2.59b+: allow embedded testsuite to be executed from
+# a directory other than the embedded directory.
+#
+if test -r "$AUTOTEST_PATH/atconfig" ; then
+    . "$AUTOTEST_PATH/atconfig" || {
+	echo "$as_me: error: invalid content: $AUTOTEST_PATH/atconfig" >&2
+	{ (exit 1); exit 1; };
+    }
+    unset at_testdir
+    at_top_build_prefix="$abs_top_builddir/"
+    AUTOTEST_PATH=".:$abs_top_builddir:$abs_top_srcdir"
 fi
 m4_divert_pop([DEFAULTS])
 
@@ -156,6 +168,9 @@ Corporation  at a fee.  See http://www.openss7.com/]
 dnl ==========================================================================
 dnl
 dnl $Log: local.at,v $
+dnl Revision 0.9.2.5  2007/03/12 08:47:10  brian
+dnl - corrections for autotest 2.59+
+dnl
 dnl Revision 0.9.2.4  2007/02/12 16:56:51  brian
 dnl - more autoconf 2.61 support
 dnl

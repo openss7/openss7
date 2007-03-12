@@ -1,5 +1,7 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* tests/local.at: corrections for autotest 2.59b+
+
 	* src/modules/sth.c: remove old ms_acnt pegs
 
 	* doc/man/man8/test-clone.8.man: test updates
