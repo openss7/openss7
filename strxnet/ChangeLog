@@ -1,3 +1,20 @@
+2007-03-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/test-timod.8.man: test updates
+	* doc/man/man8/test-tirdwr.8.man: test updates
+	* doc/man/man8/test-xnet.8.man: test updates
+	* doc/man/man8/test-xnsl.8.man: test updates
+	* src/test/test-inet_raw.c: test updates
+	* src/test/test-inet_tcp.c: test updates
+	* src/test/test-inet_udp.c: test updates
+	* src/test/test-timod.c: test updates
+	* src/test/test-tirdwr.c: test updates
+	* src/test/test-xnet.c: test updates
+	* tests/testsuite-timod.at: test updates
+	* tests/testsuite-tirdwr.at: test updates
+	* tests/testsuite-xnet.at: test updates
+	* tests/testsuite-xnet_thr.at: test updates
+
 2007-03-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/test/test-inet_raw.c: reworking test programs and suites

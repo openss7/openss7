@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-sigtran.8.man,v 0.9.2.2 2006/12/23 13:06:49 brian Exp $
+.\" @(#) $Id: test-sigtran.8.man,v 0.9.2.3 2007/03/12 02:22:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/23 13:06:49 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/12 02:22:52 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-sigtran.8.man,v $
+.\" Revision 0.9.2.3  2007/03/12 02:22:52  brian
+.\" - updating tests
+.\"
 .\" Revision 0.9.2.2  2006/12/23 13:06:49  brian
 .\" - manual page and other package updates for release
 .\"
@@ -132,7 +135,7 @@ package also provides an
 .B autotest
 based test suite that uses the
 .B test-sigtran
-test case executable to invoke test cases.  The test suite can be used for development, diagnostic,
+test case executable to invoke test cases.  This test suite can be used for development, diagnostic,
 regression or validation testing.
 See the
 .I @PACKAGE_TITLE@ Installation and Reference Manual
@@ -162,7 +165,7 @@ options.
 Specifies a single test case to run.
 .I TESTCASE
 is the individual test case number.  This option may be repeated and is accumulative: that is, each
-test case added with an occurence of this option will be added to the other test cases selected with
+test case added with an occurrence of this option will be added to the other test cases selected with
 .B --onetest
 or with
 .BR --tests .
@@ -272,7 +275,7 @@ regardless of whether an individual test case succeeds or fails.
 This option is useful in conjunction with \fB--onetest\fR and \fB--client\fR
 or \fB--server\fR when the other end of the test is being executed manually.
 .TP
-\fB-d\fR, \fB--repeat-fail\fR
+\fB-r\fR, \fB--repeat-fail\fR
 Repeat the selected test cases on failure.  This option caues the executable
 to loop individual test cases when they fail, but allows the test sequence to
 continue when an individual test case succeeds.
@@ -433,7 +436,7 @@ condition.
 .PP
 .B test-sigtran
 is normally invoked from the
-.RI \(lq "@PACKAGE@-@VERSION@" \(rq
+.B @PACKAGE@-@VERSION@
 test suite.
 .\"
 .\"
@@ -453,7 +456,7 @@ provided by the
 .B test-sigtran
 executable.
 .TP
-\f(CB\)test-sigtran\f(CR\) --versbose=5 --onetest 0.1\fR
+\f(CB\)test-sigtran\f(CR\) --verbose=5 --onetest 0.1\fR
 Verbosely executes test case
 .BR 0.1 ,
 and provides a diagnostic return code.
@@ -532,7 +535,7 @@ manual pages.
 .PP
 .B test-sigtran
 is provided with the
-.RI \(lq "@PACKAGE_TITLE@" \(rq
+.I @PACKAGE_TITLE@
 package.
 .\"
 .\"

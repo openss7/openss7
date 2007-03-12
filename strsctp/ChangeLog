@@ -1,3 +1,18 @@
+2007-03-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/test-etsi_n.8.man: test updates
+	* doc/man/man8/test-etsi_t.8.man: test updates
+	* doc/man/man8/test-interop.8.man: test updates
+	* doc/man/man8/test-sctp_n.8.man: test updates
+	* doc/man/man8/test-sctp_n2.8.man: test updates
+	* doc/man/man8/test-sctp_t.8.man: test updates
+	* src/test/test-sctp.c: test updates
+	* src/test/test-sctp_ns.c: test updates
+	* tests/testsuite-sctp.at: test updates
+	* tests/testsuite-sctp_n.at: test updates
+	* tests/testsuite-sctp_n2.at: test updates
+	* tests/testsuite-sctp_t.at: test updates
+
 2007-03-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/test/test-sctp.c: reworking test programs and suites

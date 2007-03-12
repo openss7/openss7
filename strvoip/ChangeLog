@@ -1,3 +1,7 @@
+2007-03-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/test-voip.8.man: test updates
+
 2007-03-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/util/init/strvoip.sh: ubuntu looks for lsb info in init scripts

@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-sctp_t.8.man,v 0.9.2.4 2006/10/22 04:17:17 brian Exp $
+.\" @(#) $Id: test-sctp_t.8.man,v 0.9.2.5 2007/03/12 02:24:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/22 04:17:17 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/12 02:24:09 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-sctp_t.8.man,v $
+.\" Revision 0.9.2.5  2007/03/12 02:24:09  brian
+.\" - updating tests
+.\"
 .\" Revision 0.9.2.4  2006/10/22 04:17:17  brian
 .\" - documented client server options
 .\"
@@ -129,7 +132,7 @@ package also provides an
 .B autotest
 based test suite that uses the
 .B test-sctp_t
-test case executable to invoke test cases.  The test suite can be used for development, diagnostic,
+test case executable to invoke test cases.  This test suite can be used for development, diagnostic,
 regression or validation testing.
 See the
 .I @PACKAGE_TITLE@ Installation and Reference Manual
@@ -187,7 +190,7 @@ When used in combination with
 this option will print more or less information about each test case.
 Note that all options specified following this option are ignored.
 .TP
-\fB-h\fR, \fB--help\fR
+\fB-h\fR, \fB--help\fR, \fB-?\fR, \fB--?\fR
 When this option is encountered,
 print usage information to
 .I stdout
@@ -262,6 +265,11 @@ This is used by the
 test suite to run individual tests under
 .BR autotest .
 .TP
+\fB-a\fR, \fB--again\fR
+Specifies that the selected test cases are to be repeated in verbose mode if
+they fail in non-verbose mode.  This option is useful for use with autotest
+test suites.
+.TP
 \fB-R\fR, \fB--repeat\fR
 Repeat the selected test cases on success or failure.  This option causes the
 executable to loop through the selected test cases, one after the other,
@@ -269,7 +277,7 @@ regardless of whether an individual test case succeeds or fails.
 This option is useful in conjunction with \fB--onetest\fR and \fB--client\fR
 or \fB--server\fR when the other end of the test is being executed manually.
 .TP
-\fB-d\fR, \fB--repeat-fail\fR
+\fB-r\fR, \fB--repeat-fail\fR
 Repeat the selected test cases on failure.  This option caues the executable
 to loop individual test cases when they fail, but allows the test sequence to
 continue when an individual test case succeeds.
@@ -435,6 +443,7 @@ test suite.
 .\"
 .\"
 .SH EXAMPLES
+.PP
 .TP
 \f(CB\)test-sctp_t\f(CR\) --list 0.1\fR
 Generates a list of all test cases

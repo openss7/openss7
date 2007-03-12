@@ -1,3 +1,36 @@
+2007-03-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/test-clone.8.man: test updates
+	* doc/man/man8/test-connld.8.man: test updates
+	* doc/man/man8/test-echo.8.man: test updates
+	* doc/man/man8/test-fifo.8.man: test updates
+	* doc/man/man8/test-log.8.man: test updates
+	* doc/man/man8/test-loop.8.man: test updates
+	* doc/man/man8/test-mux.8.man: test updates
+	* doc/man/man8/test-nsdev.8.man: test updates
+	* doc/man/man8/test-nuls.8.man: test updates
+	* doc/man/man8/test-pipe.8.man: test updates
+	* doc/man/man8/test-pipemod.8.man: test updates
+	* doc/man/man8/test-sad.8.man: test updates
+	* doc/man/man8/test-sc.8.man: test updates
+	* doc/man/man8/test-streams.8.man: test updates
+	* src/test/test-sad.c: test updates
+	* src/test/test-streams.c: test updates
+	* tests/testsuite-clone.at: test updates
+	* tests/testsuite-connld.at: test updates
+	* tests/testsuite-echo.at: test updates
+	* tests/testsuite-fifo.at: test updates
+	* tests/testsuite-log.at: test updates
+	* tests/testsuite-loop.at: test updates
+	* tests/testsuite-mux.at: test updates
+	* tests/testsuite-nsdev.at: test updates
+	* tests/testsuite-nuls.at: test updates
+	* tests/testsuite-pipe.at: test updates
+	* tests/testsuite-pipemod.at: test updates
+	* tests/testsuite-sad.at: test updates
+	* tests/testsuite-sc.at: test updates
+	* tests/testsuite-streams.at: test updates
+
 2007-03-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man8/test-clone.8.man: rework test programs and suites
