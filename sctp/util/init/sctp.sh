@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: sctp.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/08 22:42:15 $
+# @(#) $RCSfile: sctp.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 04:14:16 $
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -42,22 +42,27 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='sctp'
 config="/etc/default/$name"
 desc="the SCTP subsystem"
+mknod="${name}_mknod"
 
 [ -e /proc/modules ] || exit 0
 
-for SCTP_MKNOD in /sbin/${name}_mknod /usr/sbin/${name}_mknod /bin/${name}_mknod /usr/bin/${name}_mknod ; do
-    if [ -x $SCTP_MKNOD ] ; then
-	break
-    else
-	SCTP_MKNOD=
-    fi
-done
+if test -z "$SCTP_MKNOD" ; then
+    for SCTP_MKNOD in /sbin/${mknod} /usr/sbin/${mknod} /bin/${mknod} /usr/bin/${mknod} ; do
+	if [ -x $SCTP_MKNOD ] ; then
+	    break
+	else
+	    SCTP_MKNOD=
+	fi
+    done
+fi
 
 # Specify defaults
 
-SCTP_MODULES="sctp"
-SCTP_MAKEDEVICES="no"
-SCTP_REMOVEDEVICES="no"
+[ -n "$SCTP_PRELOAD"       ] || SCTP_PRELOAD=""
+[ -n "$SCTP_DRIVERS"       ] || SCTP_DRIVERS=""
+[ -n "$SCTP_MODULES"       ] || SCTP_MODULES="sctp"
+[ -n "$SCTP_MAKEDEVICES"   ] || SCTP_MAKEDEVICES="no"
+[ -n "$SCTP_REMOVEDEVICES" ] || SCTP_REMOVEDEVICES="no"
 
 # Source config file
 for file in $config ; do
@@ -84,8 +89,14 @@ build_options() {
 
 start() {
     echo -n "Loading SCTP kernel modules: "
-    for module in $SCTP_MODULES ; do
-	if ! eval "grep '^$module[[:space:]]' /proc/modules $redir" ; then
+    RETVAL=0
+    modules=
+    for module in $SCTP_PRELOAD ; do
+	modules="${modules:+$modules }$module"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if ! eval "grep '^$modrex\>' /proc/modules $redir" ; then
 	    echo -n "$module "
 	    eval "modprobe -k -q -- $module $redir"
 	    [ $? -eq 0 ] || echo -n "(failed)"
@@ -95,68 +106,76 @@ start() {
 
     echo -n "Starting $desc: $name "
     build_options
-    RETVAL=$?
-    if [ $RETVAL -eq 0 ] ; then
+    if [ $? -eq 0 ] ; then
 	echo "."
     else
 	echo "(failed.)"
+	RETVAL=1
     fi
+
     if eval "grep '^[[:space:]]*${name}[/.]' /etc/sysctl.conf $redir" ; then
 	echo -n "Reconfiguring kernel parameters: "
 	eval "sysctl -p /etc/sysctl.conf $redir"
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
+	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
 	fi
     fi
+
     if [ -f /etc/${name}.conf ] ; then
 	echo -n "Configuring SCTP parameters: "
 	eval "sysctl -p /etc/${name}.conf $redir"
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
+	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
+	    RETVAL=1
 	fi
     fi
+
     if [ -n "$STRINET_MKNOD" -a ":$STRINET_MAKEDEVICES" = ":yes" ] ; then
 	echo -n "Making SCTP devices: "
 	$SCTP_MKNOD
-	RETVAL=$?
-	if [ $RETVAL -eq 0 ] ; then
+	if [ $? -eq 0 ] ; then
 	    echo "."
 	else
 	    echo "(failed.)"
+	    RETVAL=1
 	fi
-    fi
-    return $RETVAL
-}
-
-remove_modules() {
-    modules=
-    while read -a module ; do
-	modules="${modules}${modules:+ }${module[0]}"
-    done
-    if [ -n "$modules" ] ; then
-	echo -n "Removing SCTP modules: "
-	rmmod $modules
-	RETVAL=$?
     fi
     return $RETVAL
 }
 
 stop() {
-    echo -n "Stopping $desc: $name "
-    RETVAL=$?
+    echo "Stopping $desc: $name "
+    RETVAL=0
     if [ -n "$SCTP_MKNOD" -a ":$SCTP_REMOVEDEVICES" = ":yes" ] ; then
 	echo -n "Removing SCTP devices: "
 	$SCTP_MKNOD --remove
-	RETVAL=$?
+	if [ $? -eq 0 ] ; then
+	    echo "."
+	else
+	    echo "(failed.)"
+	    RETVAL=1
+	fi
     fi
-    [ $RETVAL -eq 0 ] && egrep '^sctp' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
+    echo -n "Unloading STREAMS kernel modules: "
+    modules=
+    for module in $SCTP_PRELOAD $SCTP_DRIVERS $SCTP_MODULES ; do
+	modules="$module${modules:+ $modules}"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if eval "grep '^$modrex\>' /proc/modules $redir" ; then
+	    echo -n "$module "
+	    eval "modprobe -r -q -- $module $redir"
+	    if [ $? -ne 0 ] ; then
+		echo -n "(failed) "
+		RETVAL=1
+	    fi
+	fi
+    done
     if [ $RETVAL -eq 0 ] ; then
 	echo "."
     else
@@ -197,7 +216,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/08 22:42:15 $
+# @(#) $RCSfile: sctp.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 04:14:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -242,7 +261,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 22:42:15 $ by $Author: brian $
+# Last Modified $Date: 2007/03/12 04:14:16 $ by $Author: brian $
 #
 # =============================================================================
 
