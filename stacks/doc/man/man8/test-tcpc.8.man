@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-tcpc.8.man,v 0.9.2.4 2006/12/27 16:36:02 brian Exp $
+.\" @(#) $Id: test-tcpc.8.man,v 0.9.2.5 2007/03/12 09:47:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/27 16:36:02 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/12 09:47:11 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-tcpc.8.man,v $
+.\" Revision 0.9.2.5  2007/03/12 09:47:11  brian
+.\" - rationalized across packages
+.\"
 .\" Revision 0.9.2.4  2006/12/27 16:36:02  brian
 .\" - added slpmod module and fixups for make check target
 .\"
@@ -84,166 +87,277 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B test-tcpc
-\- test suite executable for M2PA(4) STREAMS module
+.B test-tcpc, test-tcps
+\- client and server TCP test programs
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-.HP 12
+.HP
 \fBtest-tcpc\fR [\fIoptions\fR]
 .PD 0
-.HP 12
-\fBtest-tcpc\fR {\fB-h\fR, \fB--help\fR}
-.HP 12
-\fBtest-tcpc\fR {\fB-V\fR, \fB--version\fR}
-.HP 12
-\fBtest-tcpc\fR {\fB-C\fR, \fB--copying\fR}
+.HP
+\fBtest-tcpc\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBtest-tcpc\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBtest-tcpc\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.HP
+\fBtest-tcps\fR [\fIoptions\fR]
+.PD 0
+.HP
+\fBtest-tcps\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBtest-tcps\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBtest-tcps\fR {\fB-C\fR|\fB--copying\fR}
 .PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.B test-tcpc
-is a test suite executable for the
-.BR M2PA (4)
-.I STREAMS
-module.
+These commands are client
+.RB ( test-tcpc )
+and server
+.RB ( test-tcps )
+programs for transferring test data between server and client.  These programs are written in the
+same fashion as a pair of test programs for both
+.BR tcp (7)
+and
+.BR udp (7)
+that are documented in the
+.BR test-sctpc (8),
+.BR test-sctps (8),
+.BR test-udpc (8)
+and
+.BR test-udps (8)
+manual pages.
+The purpose of this set of 6 programs is to perform comparison tests between SCTP, TCP and UDP.
+.PP
+When the server
+.RB ( test-tcps )
+is started, it listens on a specified port number (or port
+.B 18000
+if no port number is specified) for incoming connections.  When a connection arrives, as a result of
+the client
+.RB ( test-tcpc )
+being started, the server polls for received packets and sends them back to their source.
+.PP
+Then the client
+.RB ( test-tcpc )
+is started, it connects to a specified port number (or port
+.B 18000
+if no port number is specified) and beings sending data at a specified length as fast as possible.
+.PP
+Both the server
+.RB ( test-tcps )
+and the client
+.RB ( test-tcpc )
+report the number of bytes transmitted on an interval
+.RB ( 1
+second if not specified).
+Both programs run continuously until they are killed.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+These commands do not take non-option arguments.
 .\"
 .\"
 .SH OPTIONS
 .PP
+The following options are applicable to both
+.B test-tcpc
+and
+.BR test-tcps :
 .TP
-\fB-f\fR, \fB--fast\fR [\fISCALE\fR]
-When this option is present, test cases are run faster by the integer scaling factor
-.IR SCALE .
-If
-.I SCALE
-is not provided, then the default scale factor is
-.BR 50 .
-This has the effect of scaling timers both in the implementation under test as well as in the test
-suite.  If the scale factor,
-.IR SCALE ,
-is too large, test cases may fail that would otherwise pass.  This option is useful for long test
-suite runs that would otherwise take an inordinate amount of time to execute.  Timers can be scaled
-for development, diagnostic or regression testing, however, for full validation testing this option
-should not be used.
+\fB-l\fR, \fB--loc_host\fR \fIADDRESS\fR
+Specify the local host (bind address).  The default is
+.BR 0.0.0.0 .
 .TP
-\fB-s\fR, \fB--summary\fR
-Print a test case summary with each test case result at the end of the test suite run.  The default
-if this option is not present is to not print a summary.
+\fB-p\fR, \fB--port\fR \fIPORTNUM\fR
+Specify the port number.  For
+.B test-tcpc
+this is the remote port number to which to connect.  For
+.B test-tcps
+this is the local port number to which to bind.
+The default is
+.BR 18000 .
 .TP
-\fB-o\fR, \fB--onetest\fR [\fITESTCASE\fR]
-Specifies a single test case to run.
-.I TESTCASE
-is the individual test case number.  This option may be repeated and is accumulative: that is, each
-test case added with an occurence of this option will be added to the other test cases selected with
-.B --onetest
-or with
-.BR --tests .
+\fB-w\fR, \fB--length\fR \fILENGTH\fR
+Specify the \fILENGTH\fR of sent messages in bytes.  The default is
+.BR 64 .
 .TP
-\fB-t\fR, \fB--test\fR [\fIRANGE\fR]
-Specifies a range of test cases to run.
-.I RANGE
-specifies the range of test cases and will match all test cases that have this string as an initial 
-substring of the test case number.  If
-.I RANGE
-is not specified, all test cases are assumed.
+\fB-n\fR, \fB--nagle\fR
+Suppress Nagle's algorithm.
 .TP
-\fB-m\fR, \fB--messages\fR
-Indicates whether messages, in hexadecimal, should be included in the test case output.  This is
-independent of any \fB--verbose\fR setting.
+\fB-t\fR, \fB--rep_time\fR \fIINTERVAL\fR
+Specify the report time \fIINTERVAL\fR in seconds.  The default is
+.BR 1 .
 .TP
 \fB-q\fR, \fB--quiet\fR
-Specifies that the caller is interested only in the return code and that normal output should be
-suppressed.  This option is equivalent to
-.BR --verbose=0 .
+Suppress normal output.  This option is equivalent to \fB--verbose\fR=\fI0\fR.
 .TP
 \fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
-Increases or sets the verbosity level.  When this option is given without the
-.I LEVEL
-argument, it specifies that the verbosity level should be increased by one.  If the
-.I LEVEL
-argument is specified, the verbosity level is set to that integer value.  This option can be
-repeated.  For example,
-.B -vvvvv
-is equivalent to
-.BR --verbose=5 .
+Increase or set (to \fILEVEL\fR) the output verbosity.  This option may be repeated.  If not
+specified, the verbosity level is
+.BR 1 .
 .TP
-\fB-h\fR, \fB--help\fR, \fB-?\fR, \fB--?\fR
-When this option is encountered, print usage information to
+\fB-h\fR, \fB--help\fR
+When this option is encountered,
+.B command
+displays usage information on
 .I stdout
-and exit.
+and exits.
 .TP
 \fB-V\fR, \fB--version\fR
-When this option is encountered, print version information to
+When this option is encountered,
+.B command
+displays version information on
 .I stdout
-and exit.
+and exits.
 .TP
 \fB-C\fR, \fB--copying\fR
-When this option is encountered, print copying information to
+When this option is encountered,
+.B command
+displays copying information on
 .I stdout
-and exit.
+and exits.
+.\"
+.SS test-tcpc Options
+.PP
+The following options are applicable only to
+.BR test-tcpc :
+.TP
+\fB-r\fR, \fB--rem_host\fR \fIADDRESS\fR
+Specify the remote host (connect address).  The default is
+.BR 127.0.0.2 .
+.\"
+.SS test-tcps Options
+.PP
+The following options are applicable only to
+.BR test-tcps :
 .\"
 .\"
 .SH DIAGNOSTICS
 .PP
-When
+When an error occurs,
 .B test-tcpc
-fails, it prints a diagnostic message to
+and
+.B test-tcps
+will print a diagnostic message to
 .I stderr
-and exits with a non-zero return code.
+and exit with a non-zero exit code.
+Errors result from an error of a system call on the TCP socket, or an error in the option arguments
+passed to the command.  The exit status will be
+.B 1
+in the case of a socket error and
+.B 2
+in the case of a option argument error.
 .\"
 .\"
 .SH NOTICES
 .PP
-.B test-tcpc
-is normally invoked from the @PACKAGE@-@VERSION@ testsuite.
+These are crude programs and were only used for adhoc checkout testing.  They will be eventually
+dropped from the
+.B @PACKAGE_TITLE@
+release.
 .\"
 .\"
-.\".SH EXAMPLES
-.\".PP
-.\"
-.\"
-.SH MODULES
+.SH EXAMPLES
 .PP
-.BR tcpc (4).
+At one terminal type:
+.RS
+.nf
+\fC\s-1
+test-tcps -l 127.0.0.2 -p 18000 -w 64 -n -t 5
+\s+1\fP
+.fi
+.RE
+to start the server program.  In another terminal type:
+.RS
+.nf
+\fC\s-1
+test-tcpc -r 127.0.0.2 -p 18000 -w 64 -n -t 5
+\s+1\fP
+.fi
+.RE
+Each command will display the number of bytes and messages sent and a total count of the number of
+bytes and messages sent every 5 seconds.
 .\"
 .\"
 .SH FILES
 .PP
-.TP /usr/libexec/@PACKAGE@/test-tcpc
-contains the
+.TP
+.B /usr/libexec/sctp/test-tcpc
+The
 .B test-tcpc
-command.
+test program.
+.TP
+.B /usr/libexec/sctp/test-tcps
+The
+.B test-tcps
+test program.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR tcpc (4).
+.BR tcp (7),
+.BR test-sctpc (8),
+.BR test-sctps (8),
+.BR sctp (7),
+.BR test-udpc (8),
+.BR test-udps (8),
+.BR udp (7).
 .\"
 .\"
 .SH BUGS
 .PP
-.B test-tcpc
-has no known bugs.
+These test programs do not function very well and will often hang.
 .\"
 .\"
-.\".SH COMPATIBILITY
-.\".PP
-.\"
-.\"
-.\".SH CONFORMANCE
-.\".PP
-.\"
-.\"
-.SH HISTORY
+.SH COMPATIBILITY
 .PP
-.B test-tcpc
-is provided with the \(lq@PACKAGE_TITLE@\(rq package.
+See
+.BR sctp (7),
+.BR tcp (7)
+and
+.BR udp (7),
+for addiitonal compatibiltiy considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH VERSIONS
+.PP
+Many of these test programs were new for Linux 2.2.
+.\"
+.\"
+.XX
+.[
+rfc2960
+.]
+.[
+rfc1122
+.]
+.[
+rfc3309
+.]
+.[
+rfc3168
+.]
+.[
+rfc3758
+.]
 .\"
 .\"
 .[
 $LIST$
 .]
+.\"
+.\"
 .TI

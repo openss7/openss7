@@ -1,5 +1,7 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man8/test-xnsl.8.man: updates
+
 	* src/test/test-inet_tcp.c: boosted default port 10000->18000
 	* src/test/test-inet_udp.c: boosted default port 10000->18000
 

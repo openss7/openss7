@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-sad.8.man,v 0.9.2.3 2007/03/11 05:15:38 brian Exp $
+.\" @(#) $Id: test-sad.8.man,v 0.9.2.4 2007/03/12 09:47:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/11 05:15:38 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/12 09:47:07 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-sad.8.man,v $
+.\" Revision 0.9.2.4  2007/03/12 09:47:07  brian
+.\" - rationalized across packages
+.\"
 .\" Revision 0.9.2.3  2007/03/11 05:15:38  brian
 .\" - rationalized test cases back to Linux Fast-STREAMS
 .\"
@@ -110,7 +113,7 @@ sort-adjacent-labels
 .SH DESCRIPTION
 .PP
 .B test-sad
-is a test stuite executable for the
+is a test suite executable for the
 .BR sad (4)
 .I STREAMS
 driver.
@@ -363,6 +366,7 @@ test suite.
 .\"
 .\"
 .SH EXAMPLES
+.PP
 .TP
 \f(CB\)test-sad\f(CR\) --list 0.1\fR
 Generates a list of all test cases
