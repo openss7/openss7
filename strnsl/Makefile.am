@@ -103,6 +103,7 @@ include am/help.am
 include am/pr.am
 
 lib_LTLIBRARIES			= 
+lib32_LTLIBRARIES		=
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH

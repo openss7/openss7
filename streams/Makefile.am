@@ -289,6 +289,7 @@ endif
 lib_LTLIBRARIES			= libstreams.la \
 				  libLiS.la \
 				  libpLiS.la
+lib32_LTLIBRARIES		=
 
 ## RPM_BUILD_USER
 endif

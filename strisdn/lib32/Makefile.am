@@ -61,6 +61,7 @@
 ##
 include ../am/openss7.am
 
+lib_LTLIBRARIES			=
 lib32_LTLIBRARIES		=
 
 pkglibexec32_PROGRAMS		=
