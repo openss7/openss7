@@ -85,7 +85,7 @@ void gn_init(void);
 int  gn_start(void);
 int  streamscall gn_open(queue_t *, dev_t *, int, int, cred_t *);
 int  streamscall gn_close(queue_t *, int, cred_t *);
-int  gn_wput(queue_t *, mblk_t *);
+int  streamscall gn_wput(queue_t *, mblk_t *);
 #else
 void gn_init();
 int  gn_start();

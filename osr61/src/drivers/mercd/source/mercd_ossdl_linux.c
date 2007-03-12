@@ -136,7 +136,7 @@ void linux_timeout(void *rcvPtr)
 	//MSD_FUNCTION_TRACE("linux_timeout", ONE_PARAMETER, (size_t)rcvPtr);
 
 #if defined LiS || defined LIS || defined LFS
-	*ptimeout->Handle = (size_t)timeout((void (*)(caddr_t))ptimeout->Function, 
+	*ptimeout->Handle = (size_t)timeout(ptimeout->Function, 
 	                                    (caddr_t)ptimeout->Context, 
 	                                    hz_wait);
 #else

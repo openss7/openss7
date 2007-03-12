@@ -80,10 +80,16 @@ md_status_t time_set_host_ram_sem_timer(pmercd_adapter_block_sT padapter)
  *				  out of service.
  * Additional comments		:
  ****************************************************************************/
+#ifdef LFS
+streamscall void time_host_ram_timeout(caddr_t data)
+#else
 void time_host_ram_timeout(pmercd_adapter_block_sT padapter)
+#endif
 {
 
-#ifndef LFS
+#ifdef LFS
+    pmercd_adapter_block_sT padapter = (pmercd_adapter_block_sT) data;
+#else
     mercd_osal_timeout_start_sT timeoutinfo = { 0 };
 #endif
 

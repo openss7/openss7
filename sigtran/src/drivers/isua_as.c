@@ -1933,6 +1933,12 @@ sp_lm_release(struct up *lm)
  *  =========================================================================
  */
 
+static streamscall void ua_qenable(long data)
+{
+	queue_t *q = (queue_t *) data;
+	qenable(q);
+}
+
 static mblk_t *
 ua_allocb(queue_t *q, size_t len, int priority)
 {
@@ -1942,7 +1948,7 @@ ua_allocb(queue_t *q, size_t len, int priority)
 		struct bc *bc = BC_PRIV(q);
 		bcid_t bid, *bidp = (q->q_flag & QREADR) ? &bc->rbid : &bc->wbid;
 
-		if ((bid = bufcall(len, priority, (void (*)(long)) &qenable, (long) q)))
+		if ((bid = bufcall(len, priority, &ua_qenable, (long) q)))
 			unbufcall(xchg(bidp, bid));
 		else
 			qenable(q);
