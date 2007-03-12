@@ -1036,6 +1036,8 @@ static int oldret = 0;
 static int cntret = 0;
 #endif				/* TEST_X400 */
 
+#define TEST_PORT_NUMBER 18000
+
 #if TEST_M2PA
 /*
  *  M2PA Message Definitions
@@ -1089,7 +1091,6 @@ struct sockaddr_in addrs[4][3];
 struct sockaddr_in addrs[4];
 #endif
 int anums[4] = { 3, 3, 3, 3 };
-#define TEST_PORT_NUMBER 18000
 unsigned short ports[4] = { TEST_PORT_NUMBER+0, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
