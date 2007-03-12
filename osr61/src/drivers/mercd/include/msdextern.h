@@ -1395,7 +1395,11 @@ md_status_t time_ww_chk_snd_timer(pmercd_adapter_block_sT padapter);
 #else
 
 extern md_status_t time_set_host_ram_sem_timer(pmercd_adapter_block_sT AdapterBlock);
+#ifdef LFS
+extern void streamscall time_host_ram_timeout(caddr_t data);
+#else
 extern void time_host_ram_timeout(pmercd_adapter_block_sT AdapterBlock);
+#endif
 extern md_status_t time_chk_snd_timer(pmercd_adapter_block_sT AdapterBlock);
 extern md_status_t time_ww_chk_snd_timer(pmercd_adapter_block_sT padapter);
 

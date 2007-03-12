@@ -1,3 +1,14 @@
+2007-03-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/dvbm/source/dvbm.c: function pointer type safety
+	* src/drivers/gncfd/source/cfd.c: function pointer type safety
+	* src/drivers/gpio/source/gpiodrv.c: function pointer type safety
+	* src/drivers/mercd/include/msdextern.h: function pointer type safety
+	* src/drivers/mercd/include/msdtypes.h: function pointer type safety
+	* src/drivers/mercd/source/mercd_ossdl_linux.c: function pointer type safety
+	* src/drivers/mercd/source/msdsupp.c: function pointer type safety
+	* src/drivers/mercd/source/msdtime.c: function pointer type safety
+
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: corrections for autotest 2.59b+

@@ -87,7 +87,11 @@ md_status_t supp_wait4Buf(merc_uint_t Size, merc_int_t (*Func)(pmerc_void_t), si
 #if   defined( __sparcv9 )
 	bufcall(Size, BPRI_MED, (FUNCTION)Func, (pmerc_void_t) Arg);
 #else
+#ifdef LFS
+	abstract_bufcall(Size, BPRI_MED, (void *)Func, Arg);
+#else
 	abstract_bufcall(Size, BPRI_MED, (FUNCTION)Func, Arg);
+#endif
 #endif
 	return(MD_SUCCESS);
 }

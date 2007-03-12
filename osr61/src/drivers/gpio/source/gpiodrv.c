@@ -88,10 +88,18 @@ MODULE_ALIAS("streams-gpioDriver");
 #define LINUX26
 #endif
 /* Prototypes for STREAMS functions */
+#ifdef LFS
+VOID gpioinit(void);
+int streamscall gpioopen(queue_t *, dev_t *, int, int, cred_t *);
+int streamscall gpioclose(queue_t *, int, cred_t *);
+int streamscall gpiowput(queue_t *, mblk_t *);
+#else
+#define streamscall
 VOID gpioinit(void);
 INT  gpioopen(queue_t *, dev_t *, int, int, cred_t *),
      gpioclose(queue_t *, int, cred_t *);
 int  gpiowput(queue_t *, mblk_t *);
+#endif
 
 
 /* PRIVATE Function Prototypes */
@@ -452,7 +460,7 @@ void gpioinit(void)
  *       CALLS: kseg() (SVR3) or kmem_zalloc()
  *    CAUTIONS: none.
  ***************************************************************************/
-INT gpioopen(queue_t *rq, dev_t *devp, int flag, int sflag, cred_t *credp)
+streamscall INT gpioopen(queue_t *rq, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
    dev_t    dev;
    queue_t *wq = WR(rq);       /* Get a pointer to the write queue */
@@ -523,7 +531,7 @@ INT gpioopen(queue_t *rq, dev_t *devp, int flag, int sflag, cred_t *credp)
  *       CALLS: unkseg() (SVR3) or kmem_free()
  *    CAUTIONS: none.
  ***************************************************************************/
-INT gpioclose(queue_t *rq, int flag, cred_t *credp)
+streamscall INT gpioclose(queue_t *rq, int flag, cred_t *credp)
 {
    qprocsoff(rq);
 
@@ -564,7 +572,7 @@ INT gpioclose(queue_t *rq, int flag, cred_t *credp)
 #ifdef LFS
 int _gpio_getboardpowerstatus(GPIO_DATA *, UINT);
 #endif
-INT gpiowput(queue_t *wq, mblk_t *mp)
+streamscall INT gpiowput(queue_t *wq, mblk_t *mp)
 {
    IOCBLK *iocblkp;
    UCHAR  *datap = NULL;

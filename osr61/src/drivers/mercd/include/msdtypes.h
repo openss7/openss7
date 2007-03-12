@@ -70,8 +70,8 @@ typedef ULONG		KAW_HANDLE;
 
 /* Duplicate for Library */
 #ifdef LFS
-typedef ULONG		(*PMD_FUNCTION)(void);
-typedef ULONG		(*PMSD_FUNCTION)(void);
+typedef timo_fcn_t *PMD_FUNCTION;
+typedef timo_fcn_t *PMSD_FUNCTION;
 #else
 typedef ULONG		(*PMD_FUNCTION)();
 typedef ULONG		(*PMSD_FUNCTION)();

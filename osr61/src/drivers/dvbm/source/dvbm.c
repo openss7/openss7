@@ -72,13 +72,17 @@ MODULE_ALIAS("streams-dvbmDriver");
 #endif
 #endif
 
+#ifndef LFS
+#define streamscall
+#endif
+
 /* PRIVATE FUNCTION DECLARATIONS */
-int dvbmopen(queue_t *, dev_t *, int, int, cred_t *);
-int dvbmclose(queue_t*, int, cred_t *);
-int dvbmrput(queue_t *, mblk_t *);       /* Read Side Put routine. */
-int dvbmwput(queue_t *, mblk_t *);       /* Write Side Put routine */
-int dvbmrsrv(queue_t *);                 /* Read Side Service routine. */
-int dvbmwsrv(queue_t *);                 /* Read Side Service routine. */
+streamscall int dvbmopen(queue_t *, dev_t *, int, int, cred_t *);
+streamscall int dvbmclose(queue_t*, int, cred_t *);
+streamscall int dvbmrput(queue_t *, mblk_t *);       /* Read Side Put routine. */
+streamscall int dvbmwput(queue_t *, mblk_t *);       /* Write Side Put routine */
+streamscall int dvbmrsrv(queue_t *);                 /* Read Side Service routine. */
+streamscall int dvbmwsrv(queue_t *);                 /* Read Side Service routine. */
 
 /*
  * Set the low/high water marks to allow only one message to be queued
@@ -208,7 +212,7 @@ void cleanup_module(void)
  *    CAUTIONS:
  **********************************************************************/
 int init_bulkparam(GN_BULKPARM *);
-int dvbmopen(q, dev, flag, sflag, crp)
+streamscall int dvbmopen(q, dev, flag, sflag, crp)
 queue_t  *q;
 dev_t *dev;
 int      flag;
@@ -258,7 +262,7 @@ cred_t	*crp;
  *       CALLS: bzero() freemsg() DLGC_MSG() init_bulkparam()
  *    CAUTIONS:
  **********************************************************************/
-int
+streamscall int
 dvbmclose(queue_t *q, int dummy, cred_t *crp)
 {
 #ifndef LFS
@@ -341,7 +345,7 @@ int queue_data(mblk_t **, mblk_t *, int *);
 int send_more2pm(queue_t *, BDM_INFO *, mblk_t *, int);
 int send_last2pm(queue_t *, BDM_INFO *, mblk_t *, int, int);
 #endif
-int dvbmwput(q, mp)
+streamscall int dvbmwput(q, mp)
 queue_t  *q;
 mblk_t   *mp;
 {
@@ -871,7 +875,7 @@ int      *cnt;
  *       CALLS: DLGC_MSG() getq()
  *    CAUTIONS:
  **********************************************************************/
-int dvbmwsrv(q)
+streamscall int dvbmwsrv(q)
 queue_t * q;
 {
    mblk_t      *mp;
@@ -905,7 +909,7 @@ queue_t * q;
 int send_more2usr(queue_t *, BDM_INFO *, mblk_t *, int);
 int send_last2usr(queue_t *, BDM_INFO *, mblk_t *, int);
 #endif
-int dvbmrput(q, mp)
+streamscall int dvbmrput(q, mp)
 queue_t  *q;
 mblk_t   *mp;
 {
@@ -1206,7 +1210,7 @@ mblk_t   *mp;
  *       CALLS:
  *    CAUTIONS:
  ***********************************************************************/
-int dvbmrsrv(q)
+streamscall int dvbmrsrv(q)
 queue_t *q;
 {
    mblk_t *mp;

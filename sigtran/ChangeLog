@@ -1,3 +1,12 @@
+2007-03-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/isua_as.c: function pointer type safety
+	* src/drivers/m2ua_as.c: function pointer type safety
+	* src/drivers/m3ua_as.c: function pointer type safety
+	* src/drivers/sua_as.c: function pointer type safety
+	* src/drivers/tua_as.c: function pointer type safety
+	* src/drivers/ua_as.c: function pointer type safety
+
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/Config.in: correct for dashes
