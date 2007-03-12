@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:33:49 $
+ @(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/12 10:19:26 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:33:49 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 10:19:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tcpc.c,v $
+ Revision 0.9.2.7  2007/03/12 10:19:26  brian
+ - corrections
+
  Revision 0.9.2.6  2007/03/12 09:33:49  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:33:49 $"
+#ident "@(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/12 10:19:26 $"
 
-static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:33:49 $";
+static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/12 10:19:26 $";
 
 #include <stdio.h>
 #include <errno.h>

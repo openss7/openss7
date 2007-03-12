@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 10:50:58 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 10:19:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/18 10:50:58 $ by $Author: brian $
+# Last Modified $Date: 2007/03/12 10:19:25 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.6  2007/03/12 10:19:25  brian
+# - corrections
+#
 # Revision 0.9.2.5  2006/12/18 10:50:58  brian
 # - subpackaging changes for release
 #
@@ -73,7 +76,7 @@
 # =============================================================================
 
 ##
-##  General rules.
+## General rules
 ##
 include ../am/openss7.am
 
@@ -104,8 +107,8 @@ test_tirdwr_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 if WITH_TLI
 ## WITH_TLI
 pkglibexec32_PROGRAMS		+= \
-				   test-timod \
-				   test-tirdwr
+				  test-timod \
+				  test-tirdwr
 ## WITH_TLI
 endif
 
@@ -168,13 +171,14 @@ test_inet_sctp_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 if WITH_INET
 ## WITH_INET
 pkglibexec32_PROGRAMS		+= \
-				   test-inet_raw \
-				   test-inet_tcp \
-				   test-inet_udp
+				  test-inet_raw \
+				  test-inet_tcp \
+				  test-inet_udp
 if WITH_OPENSS7_SCTP
 pkglibexec32_PROGRAMS		+= \
-				   test-inet_sctp
+				  test-inet_sctp
 endif
+
 ## WITH_INET
 endif
 
@@ -196,21 +200,53 @@ test_sctp_t_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_sctp_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sctp_t_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
+test_tcpc_SOURCES		= $(top_srcdir)/src/test/inet/test-tcpc.c
+test_tcpc_LDADD			= $(STREAMS_LDADD32)
+test_tcpc_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
+test_tcpc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_tcpc_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+
+test_tcps_SOURCES		= $(top_srcdir)/src/test/inet/test-tcps.c
+test_tcps_LDADD			= $(STREAMS_LDADD32)
+test_tcps_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
+test_tcps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_tcps_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+
+test_udpc_SOURCES		= $(top_srcdir)/src/test/inet/test-udpc.c
+test_udpc_LDADD			= $(STREAMS_LDADD32)
+test_udpc_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
+test_udpc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_udpc_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+
+test_udps_SOURCES		= $(top_srcdir)/src/test/inet/test-udps.c
+test_udps_LDADD			= $(STREAMS_LDADD32)
+test_udps_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
+test_udps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_udps_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+
 if WITH_SCTP
 ## WITH_SCTP
 pkglibexec32_PROGRAMS		+= \
-				   test-sctp_n \
-				   test-sctp_n2 \
-				   test-sctp_t
+				  test-sctp_n \
+				  test-sctp_n2 \
+				  test-sctp_t \
+				  test-tcpc \
+				  test-tcps \
+				  test-udpc \
+				  test-udps
 ## WITH_SCTP
 endif
 
 if WITH_SCTP2
 ## WITH_SCTP2
 pkglibexec32_PROGRAMS		+= \
-				   test-sctp_n \
-				   test-sctp_n2 \
-				   test-sctp_t
+				  test-sctp_n \
+				  test-sctp_n2 \
+				  test-sctp_t \
+				  test-tcpc \
+				  test-tcps \
+				  test-udpc \
+				  test-udps
 ## WITH_SCTP2
 endif
 
@@ -223,7 +259,7 @@ test_m2pa_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 if WITH_SIGTRAN
 ## WITH_SIGTRAN
 pkglibexec32_PROGRAMS		+= \
-				   test-m2pa
+				  test-m2pa
 ## WITH_SIGTRAN
 endif
 
@@ -234,38 +270,6 @@ test_q781_LDADD			= $(STREAMS_LDADD32)
 test_q781_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
 test_q781_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_q781_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-
-pkglibexec32_PROGRAMS		+= test-tcpc
-
-test_tcpc_SOURCES		= $(top_srcdir)/src/test/inet/test-tcpc.c
-test_tcpc_LDADD			= $(STREAMS_LDADD32)
-test_tcpc_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_tcpc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-test_tcpc_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-
-pkglibexec32_PROGRAMS		+= test-tcps
-
-test_tcps_SOURCES		= $(top_srcdir)/src/test/inet/test-tcps.c
-test_tcps_LDADD			= $(STREAMS_LDADD32)
-test_tcps_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_tcps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-test_tcps_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-
-pkglibexec32_PROGRAMS		+= test-udpc
-
-test_udpc_SOURCES		= $(top_srcdir)/src/test/inet/test-udpc.c
-test_udpc_LDADD			= $(STREAMS_LDADD32)
-test_udpc_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_udpc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-test_udpc_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
-
-pkglibexec32_PROGRAMS		+= test-udps
-
-test_udps_SOURCES		= $(top_srcdir)/src/test/inet/test-udps.c
-test_udps_LDADD			= $(STREAMS_LDADD32)
-test_udps_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_udps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-test_udps_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 pkglibexec32_PROGRAMS		+= test-x100p
 
