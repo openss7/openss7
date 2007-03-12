@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# @(#) $RCSfile: sctp,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/29 11:27:59 $
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# @(#) $RCSfile: sctp,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/12 04:14:16 $
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -83,23 +83,28 @@ esac
 name='sctp'
 lockfile="/var/lock/subsys/$name"
 config="/etc/sysconfig/$name"
+mknod="${name}_mknod"
 
 if [ ! -e /proc/modules ] ; then if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi ; fi
 
-for SCTP_MKNOD in \
-    ./${name}_mknod /sbin/${name}_mknod /usr/sbin/${name}_mknod /bin/${name}_mknod /usr/bin/${name}_mknod ; do
-    if [ -x $SCTP_MKNOD ] ; then
-	break
-    else
-	SCTP_MKNOD=
-    fi
-done
+if test -z "$SCTP_MKNOD" ; then
+    for SCTP_MKNOD in \
+	./${mknod} /sbin/${mknod} /usr/sbin/${mknod} /bin/${mknod} /usr/bin/${mknod}; do
+	if [ -x $SCTP_MKNOD ] ; then
+	    break
+	else
+	    SCTP_MKNOD=
+	fi
+    done
+fi
 
 # Specify defaults
 
-SCTP_MODULES="sctp"
-SCTP_MAKEDEVICES="yes"
-SCTP_REMOVEDEVICES="yes"
+[ -n "$SCTP_PRELOADS"      ] || SCTP_PRELOADS=""
+[ -n "$SCTP_DRIVERS"       ] || SCTP_DRIVERS=""
+[ -n "$SCTP_MODULES"       ] || SCTP_MODULES="sctp"
+[ -n "$SCTP_MAKEDEVICES"   ] || SCTP_MAKEDEVICES="yes"
+[ -n "$SCTP_REMOVEDEVICES" ] || SCTP_REMOVEDEVICES="yes"
 
 # Source redhat and/or debian config file
 for file in $config ; do
@@ -114,8 +119,13 @@ RETVAL=0
 umask 077
 
 start() {
-    for module in $SCTP_MODULES ; do
-	if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+    modules=
+    for module in $SCTP_PRELOAD ; do
+	modules="${modules:+$modules }$module"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if ! grep "^$modrex\>" /proc/modules >/dev/null 2>&1 ; then
 	    action $"Loading kernel module $module: " \
 		modprobe -k -q -- $module
 	    RETVAL=$?
@@ -130,31 +140,13 @@ start() {
 	action $"Configuring SCTP parameters: " \
 	    sysctl -e -p /etc/${name}.conf || :
     fi
-    if [ -n "$SCTP_MKNOD" ] ; then
-	if [ ":$SCTP_MAKEDEVICES" = ":yes" ] ; then
-	    if [ -n "$SCTP_MKNOD" ] ; then
-		action $"Making SCTP devices: " \
-		    $SCTP_MKNOD
-		RETVAL=$?
-	    fi
-	fi
+    if [ -n "$SCTP_MKNOD" -a ":$SCTP_MAKEDEVICES" = ":yes" ] ; then
+	action $"Making SCTP devices: " \
+	    $SCTP_MKNOD
+	RETVAL=$?
     fi
     [ $RETVAL -eq 0 ] && touch $lockfile
     RETVAL=$?
-    return $RETVAL
-}
-
-remove_modules() {
-    modules=
-    while read -a module ; do
-	modules="${modules}${modules:+ }${module[0]}"
-    done
-    if [ -n "$modules" ] ; then
-	action $"Removing SCTP modules: " \
-		rmmod $modules
-	RETVAL=$?
-    fi
-    RETVAL=0
     return $RETVAL
 }
 
@@ -164,8 +156,19 @@ stop() {
 	    $SCTP_MKNOD --remove
 	RETVAL=$?
     fi
-    [ $RETVAL -eq 0 ] && egrep '^sctp' /proc/modules 2>/dev/null | remove_modules
-    RETVAL=$?
+    modules=
+    for module in $SCTP_PRELOAD $SCTP_DRIVERS $SCTP_MODULES ; do
+	modules="${module}${modules:+ $modules}"
+    done
+    for module in $modules ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if grep "^$modrex\>" /proc/modules >/dev/null 2>&1 ; then
+	    action $"Unloading kernel module $module: " \
+		modprobe -r -q -- $module
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || return $RETVAL
+	fi
+    done
     [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     RETVAL=$?
     return $RETVAL
@@ -189,7 +192,7 @@ case "$1" in
 	;;
     (status)
 	LOADED='yes'
-	for module in $SCTP_MODULES ; do
+	for module in $SCTP_PRELOAD $SCTP_DRIVERS $SCTP_MODULES ; do
 	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 		LOADED='no'
 		break
@@ -215,7 +218,7 @@ case "$1" in
 	;;
     (probe)
 	LOADED='yes'
-	for module in $SCTP_MODULES ; do
+	for module in $SCTP_PRELOAD $SCTP_DRIVERS $SCTP_MODULES ; do
 	    if ! grep "^$module"'[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 		LOADED='no'
 		break
@@ -231,7 +234,7 @@ case "$1" in
 		    # loaded and subsystem locked
 		    for file in $config /etc/$name.conf ; do
 			if [ -f $file -a $file -nt $lockfile ] ; then
-			    # configuration file updeated, need to reload
+			    # configuration file updated, need to reload
 			    echo 'reload'
 			    break
 			fi
@@ -265,7 +268,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/29 11:27:59 $
+# @(#) $RCSfile: sctp,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/12 04:14:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -310,7 +313,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/29 11:27:59 $ by $Author: brian $
+# Last Modified $Date: 2007/03/12 04:14:16 $ by $Author: brian $
 #
 # =============================================================================
 
