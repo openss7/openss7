@@ -1,3 +1,12 @@
+2007-03-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/test-socket.8.man: test updates
+	* doc/man/man8/test-socklib.8.man: test updates
+	* doc/man/man8/test-sockmod.8.man: test updates
+	* doc/man/man8/test-sockpath.8.man: test updates
+	* doc/man/man8/test-socksys.8.man: test updates
+	* doc/man/man8/test-xxx.8.man: test updates
+
 2007-03-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/util/init/strsock.sh: ubuntu looks for lsb info in init scripts

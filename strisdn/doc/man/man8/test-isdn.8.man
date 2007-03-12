@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-isdn.8.man,v 0.9.2.1 2006/12/23 13:03:56 brian Exp $
+.\" @(#) $Id: test-isdn.8.man,v 0.9.2.2 2007/03/12 02:23:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/23 13:03:56 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/12 02:23:56 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-isdn.8.man,v $
+.\" Revision 0.9.2.2  2007/03/12 02:23:56  brian
+.\" - updating tests
+.\"
 .\" Revision 0.9.2.1  2006/12/23 13:03:56  brian
 .\" - added missing manpages
 .\"
@@ -88,7 +91,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B test-isdn
-\- test suite executable for ch(4) STREAMS module
+\- a test suite executable for ch(4) STREAMS module
 .\"
 .\"
 .SH SYNOPSIS
@@ -129,7 +132,7 @@ package also provides an
 .B autotest
 based test suite that uses the
 .B test-isdn
-test case executable to invoke test cases.  The test suite can be used for development, diagnostic,
+test case executable to invoke test cases.  This test suite can be used for development, diagnostic,
 regression or validation testing.
 See the
 .I @PACKAGE_TITLE@ Installation and Reference Manual
@@ -159,7 +162,7 @@ options.
 Specifies a single test case to run.
 .I TESTCASE
 is the individual test case number.  This option may be repeated and is accumulative: that is, each
-test case added with an occurence of this option will be added to the other test cases selected with
+test case added with an occurrence of this option will be added to the other test cases selected with
 .B --onetest
 or with
 .BR --tests .
@@ -262,6 +265,11 @@ This is used by the
 test suite to run individual tests under
 .BR autotest .
 .TP
+\fB-a\fR, \fB--again\fR
+Specifies that the selected test cases are to be repeated in verbose mode if
+they fail in non-verbose mode.  This option is useful for use with autotest
+test suites.
+.TP
 \fB-R\fR, \fB--repeat\fR
 Repeat the selected test cases on success or failure.  This option causes the
 executable to loop through the selected test cases, one after the other,
@@ -269,7 +277,7 @@ regardless of whether an individual test case succeeds or fails.
 This option is useful in conjunction with \fB--onetest\fR and \fB--client\fR
 or \fB--server\fR when the other end of the test is being executed manually.
 .TP
-\fB-d\fR, \fB--repeat-fail\fR
+\fB-r\fR, \fB--repeat-fail\fR
 Repeat the selected test cases on failure.  This option caues the executable
 to loop individual test cases when they fail, but allows the test sequence to
 continue when an individual test case succeeds.
@@ -430,11 +438,12 @@ condition.
 .PP
 .B test-isdn
 is normally invoked from the
-.RI \(lq "@PACKAGE@-@VERSION@" \(rq
+.B @PACKAGE@-@VERSION@
 test suite.
 .\"
 .\"
 .SH EXAMPLES
+.PP
 .TP
 \f(CB\)test-isdn\f(CR\) --list 0.1\fR
 Generates a list of all test cases
@@ -529,7 +538,7 @@ manual pages.
 .PP
 .B test-isdn
 is provided with the
-.RI \(lq "@PACKAGE_TITLE@" \(rq
+.I @PACKAGE_TITLE@
 package.
 .\"
 .\"

@@ -1,3 +1,12 @@
+2007-03-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/test-m2pa.8.man: test updates
+	* doc/man/man8/test-m3ua_as.8.man: test updates
+	* doc/man/man8/test-sigtran.8.man: test updates
+	* src/test/test-m2pa.c: test updates
+	* tests/testsuite-m2pa.at: test updates
+	* tests/testsuite-m2ua_as.at: test updates
+
 2007-03-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man8/test-m2pa.8.man: rework test programs and suites

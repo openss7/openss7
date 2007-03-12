@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:54 $
+ @(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/12 02:24:06 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/25 12:30:54 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 02:24:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnsl.c,v $
+ Revision 0.9.2.2  2007/03/12 02:24:06  brian
+ - updating tests
+
  Revision 0.9.2.1  2006/09/25 12:30:54  brian
  - added files for new strnsl package
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:54 $"
+#ident "@(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/12 02:24:06 $"
 
-static char const ident[] = "$RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:54 $";
+static char const ident[] = "$RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/12 02:24:06 $";
 
 /*
  *  This is a basic test program for the Network Services Library, libxnsl,

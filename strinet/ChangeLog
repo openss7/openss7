@@ -1,3 +1,16 @@
+2007-03-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/test-inet_raw.8.man: test updates
+	* doc/man/man8/test-inet_sctp.8.man: test updates
+	* doc/man/man8/test-inet_tcp.8.man: test updates
+	* doc/man/man8/test-inet_udp.8.man: test updates
+	* tests/testsuite-inet_raw.at: test updates
+	* tests/testsuite-inet_raw2.at: test updates
+	* tests/testsuite-inet_sctp.at: test updates
+	* tests/testsuite-inet_tcp.at: test updates
+	* tests/testsuite-inet_udp.at: test updates
+	* tests/testsuite-inet_udp2.at: test updates
+
 2007-03-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/testsuite-inet_raw2.at: reworking test programs and suites

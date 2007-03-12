@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/31 21:04:56 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/12 02:23:34 $
 
  -----------------------------------------------------------------------------
 
@@ -9,32 +9,18 @@
 
  All Rights Reserved.
 
- Unauthorized distribution or duplication is prohibited.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
 
- This software and related documentation is protected by copyright and
- distributed under licenses restricting its use, copying, distribution and
- decompilation.  No part of this software or related documentation may be
- reproduced in any form by any means without the prior written authorization
- of the copyright holder, and licensors, if any.
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
 
- The recipient of this document, by its retention and use, warrants that the
- recipient will protect this information and keep it confidential, and will
- not disclose the information contained in this document without the written
- permission of its owner.
-
- The author reserves the right to revise this software and documentation for
- any reason, including but not limited to, conformity with standards
- promulgated by various agencies, utilization of advances in the state of the
- technical arts, or the reflection of changes in the design of any techniques,
- or procedures embodied, described, or referred to herein.  The author is
- under no obligation to provide any feature listed herein.
-
- -----------------------------------------------------------------------------
-
- As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
- with, and only used for the testing of, OpenSS7 modules, drivers, and
- libraries.
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/31 21:04:56 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 02:23:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 0.9.2.11  2007/03/12 02:23:34  brian
+ - updating tests
+
  Revision 0.9.2.10  2006/10/31 21:04:56  brian
  - changes for 32-bit compatibility and remove HZ dependency
 
@@ -81,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/31 21:04:56 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/12 02:23:34 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/31 21:04:56 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/12 02:23:34 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
