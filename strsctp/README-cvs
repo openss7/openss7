@@ -1,4 +1,4 @@
-OpenSS7 STREAMS SCTP -- read me CVS file.  2007-03-07
+OpenSS7 STREAMS SCTP -- read me CVS file.  2007-03-12
 $Id: README-cvs,v 0.9.2.20 2007/03/04 10:02:52 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -40,7 +40,7 @@ The build host requires the following GNU tools:
 
    * `autoconf 2.61'
 
-   * `automake 1.9.6'
+   * `automake 1.10'
 
    * `libtool 1.5.22'
 
@@ -52,8 +52,8 @@ in the free software directory, and also at the following locations:
    * autoconf-2.61
      (http://www.openss7.org/tarballs/autoconf-2.61.tar.bz2)
 
-   * automake-1.9.6
-     (http://www.openss7.org/tarballs/automake-1.9.6.tar.gz)
+   * automake-1.10
+     (http://www.openss7.org/tarballs/automake-1.10.tar.bz2)
 
    * libtool-1.5.22
      (http://www.openss7.org/tarballs/libtool-1.5.22.tar.gz)
@@ -61,7 +61,7 @@ in the free software directory, and also at the following locations:
    * gettext-0.16 (http://www.openss7.org/tarballs/gettext-0.16.tar.gz)
 
 It should be stressed that, in particular, the `autoconf(1)', and `automake(1)',
-must be at version releases `2.61' and `1.9.6'.  _The versions normally
+must be at version releases `2.60' and `1.9.6'.  _The versions normally
 distributed in some mainstream GNU/Linux distributions are, in fact,
 much older than these versions._(1)  GNU version of these packages
 configured and installed to default directories will install in
