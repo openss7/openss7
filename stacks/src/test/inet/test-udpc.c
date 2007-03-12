@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 09:33:49 $
+ @(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 11:17:56 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:33:49 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 11:17:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-udpc.c,v $
+ Revision 0.9.2.6  2007/03/12 11:17:56  brian
+ - rationalize sctp test programs
+
  Revision 0.9.2.5  2007/03/12 09:33:49  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -72,9 +75,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 09:33:49 $"
+#ident "@(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 11:17:56 $"
 
-static char const ident[] = "$RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 09:33:49 $";
+static char const ident[] =
+    "$RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 11:17:56 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -95,24 +99,28 @@ static char const ident[] = "$RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.
 #include <getopt.h>
 #endif
 
+#define MSG_LEN 32
+
 #define HOST_BUF_LEN 256
 
-int verbose = 1;
 int rep_time = 1;
 
 static int timer_timeout = 0;
 
-static void timer_handler(int signum)
+static void
+timer_handler(int signum)
 {
 	if (signum == SIGALRM)
 		timer_timeout = 1;
 	return;
 }
 
-static int timer_sethandler(void)
+static int
+timer_sethandler(void)
 {
 	sigset_t mask;
 	struct sigaction act;
+
 	act.sa_handler = timer_handler;
 	act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_restorer = NULL;
@@ -125,9 +133,11 @@ static int timer_sethandler(void)
 	return 0;
 }
 
-static int start_timer(void)
+static int
+start_timer(void)
 {
 	struct itimerval setting = { {0, 0}, {rep_time, 0} };
+
 	if (timer_sethandler())
 		return -1;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
@@ -139,9 +149,10 @@ static int start_timer(void)
 static struct sockaddr_in loc_addr = { AF_INET, 0, {INADDR_ANY}, };
 static struct sockaddr_in rem_addr = { AF_INET, 0, {INADDR_ANY}, };
 
-int len = 32;
+int len = MSG_LEN;
 
-int test_udpc(void)
+int
+test_udpc(void)
 {
 	int fd;
 	long inp_count = 0, out_count = 0;
@@ -156,8 +167,8 @@ int test_udpc(void)
 		goto dead;
 	}
 
-	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr),
-		ntohs(loc_addr.sin_port));
+	fprintf(stderr, "Binding socket to %s:%d\n",
+		inet_ntoa(loc_addr.sin_addr), ntohs(loc_addr.sin_port));
 
 	if (bind(fd, (struct sockaddr *) &loc_addr, sizeof(loc_addr)) < 0) {
 		perror("bind");
@@ -219,15 +230,18 @@ int test_udpc(void)
 	return (0);
 }
 
+static int verbose = 1;
+
 void
-copying(int argc, char *argv[])
+splash(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
-OpenSS7 STREAMS INET - Conformanc Test Suite\n\
+%1$s: UDP Performance Test Program\n\
+%2$s\n\
 \n\
-Copyright (c) 2001-2005 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -253,9 +267,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -270,18 +283,19 @@ in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition
 Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
 paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
 regulations).\n\
-");
+\n\
+", argv[0], ident);
 }
 
 void
 version(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -291,7 +305,7 @@ version(int argc, char *argv[])
 void
 usage(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stderr, "\
 Usage:\n\
@@ -307,7 +321,7 @@ Usage:\n\
 void
 help(int argc, char *argv[])
 {
-	if (!verbose)
+	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
 Usage:\n\
@@ -318,33 +332,35 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
-    -p, --port PORT           (default: %2$d)\n\
-        port specifies both the local and remote port number\n\
-    -l, --loc_host LOC_HOST   (default: 127.0.0.1)\n\
-        specifies the LOC_HOST (bind) host for the TCP\n\
-        socket with optional local port number\n\
-    -r, --rem_host REM_HOST   (default: 127.0.0.2)\n\
-        specifies the REM_HOST (sendto) address for the TCP\n\
-        socket with optional remote port number\n\
-    -t, --rep_time TIME       (default: 1 second)\n\
-        specify the TIME in seconds between reports\n\
-    -w, --length LENGTH       (default: 32 bytes)\n\
-        specify the LENGTH of messages\n\
+    -l, --loc_host\n\
+        Local host (bind) address            [default: 0.0.0.0]\n\
+    -r, --rem_host\n\
+        Remote host (connect) address        [default: 127.0.0.2]\n\
+    -p, --port PORTNUM\n\
+        Remote port (connect) number         [default: %3$d]\n\
+    -w, --length LENGTH\n\
+        Length of message in bytes           [default: %2$d]\n\
+    -n, --nagle\n\
+        Suppress Nagle algorithm\n\
+    -t, --rep_time INTERVAL\n\
+        Sets the report time INTERVAL (secs) [default: 1]\n\
     -q, --quiet\n\
-        suppress normal output (equivalent to --verbose=0)\n\
+        Suppress normal output\n\
+        (equivalent to --verbose=0)\n\
     -v, --verbose [LEVEL]\n\
-        increase verbosity or set to LEVEL [default: 1]\n\
-	this option may be repeated.\n\
-    -h, --help, -?, --?\n\
-        print this usage message and exit\n\
+        Increase verbosity or set to LEVEL   [default 1]\n\
+        This option may be repeated\n\
+    -h, --help\n\
+        Prints this usage message and exists\n\
     -V, --version\n\
-        print the version and exit\n\
+        Prints the version and exits\n\
     -C, --copying\n\
-        print copying permissions and exit\n\
-", argv[0], TEST_PORT_NUMBER);
+	Prints copyright and copying information and exits\n\
+", argv[0], MSG_LEN, TEST_PORT_NUMBER);
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
 	char *hostl = "127.0.0.1";
 	char *hostr = "127.0.0.2";
@@ -354,29 +370,33 @@ int main(int argc, char **argv)
 	char **hostrp = &hostr;
 	short port = TEST_PORT_NUMBER;
 	struct hostent *haddr;
-	for (;;) {
+
+	while (1) {
 		int c, val;
+
 #if defined _GNU_SOURCE
-		/* *INDENT-OFF* */
 		int option_index = 0;
+		/* *INDENT-OFF* */
 		static struct option long_options[] = {
 			{"loc_host",	required_argument,	NULL, 'l'},
 			{"rem_host",	required_argument,	NULL, 'r'},
 			{"rep_time",	required_argument,	NULL, 't'},
 			{"port",	required_argument,	NULL, 'p'},
 			{"length",	required_argument,	NULL, 'w'},
+			{"nagle",	no_argument,		NULL, 'n'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
 			{"version",	no_argument,		NULL, 'V'},
 			{"copying",	no_argument,		NULL, 'C'},
 			{"?",		no_argument,		NULL, 'h'},
-			{ 0, }
+			{NULL,		0,			NULL,  0 }
 		};
 		/* *INDENT-ON* */
-		c = getopt_long(argc, argv, "l:r:t:p:wqvhVC?:", long_options, &option_index);
+
+		c = getopt_long(argc, argv, "l:r:p:w:nt:qvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "l:r:t:p:w:qvhVC?");
+		c = getopt(argc, argv, "l:r:p:t:qvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -402,6 +422,9 @@ int main(int argc, char **argv)
 			if (len > 1024)
 				len = 1024;
 			break;
+		case 'q':
+			verbose = 0;
+			break;
 		case 'v':
 			if (optarg == NULL) {
 				verbose++;
@@ -411,15 +434,15 @@ int main(int argc, char **argv)
 				goto bad_option;
 			verbose = val;
 			break;
-		case 'H':	/* -H */
-		case 'h':	/* -h, --help */
+		case 'H':
+		case 'h':
 			help(argc, argv);
 			exit(0);
 		case 'V':
 			version(argc, argv);
 			exit(0);
 		case 'C':
-			copying(argc, argv);
+			splash(argc, argv);
 			exit(0);
 		case '?':
 		default:
@@ -433,22 +456,18 @@ int main(int argc, char **argv)
 				fprintf(stderr, "\n");
 				fflush(stderr);
 			}
-			goto bad_usage;
-		      bad_usage:
 			usage(argc, argv);
 			exit(2);
 		}
 	}
-	/* 
-	 * dont' ignore non-option arguments
-	 */
 	if (optind < argc)
 		goto bad_nonopt;
-	copying(argc, argv);
+
+	splash(argc, argv);
 
 	haddr = gethostbyname(*hostlp);
 	loc_addr.sin_family = AF_INET;
-	loc_addr.sin_port = htons(port);
+	loc_addr.sin_port = 0;
 	loc_addr.sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
 
 	haddr = gethostbyname(*hostrp);
@@ -456,6 +475,5 @@ int main(int argc, char **argv)
 	rem_addr.sin_port = htons(port);
 	rem_addr.sin_addr.s_addr = *(uint32_t *) (haddr->h_addr);
 
-	test_udpc();
-	exit(0);
+	return test_udpc();
 }

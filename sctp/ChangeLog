@@ -1,5 +1,10 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* test/test-tcpc.c: rationalize to stacks
+	* test/test-tcps.c: rationalize to stacks
+	* test/test-udpc.c: rationalize to stacks
+	* test/test-udps.c: rationalize to stacks
+
 	* doc/man/man8/test-tcpc.8.man: updates
 	* doc/man/man8/test-udpc.8.man: updates
 
