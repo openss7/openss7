@@ -1,3 +1,7 @@
+2007-03-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/openss7.am: bump automake requirement to 1.9 from 1.8
+
 2007-03-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/remove_initd: was not removing rc6.d links
