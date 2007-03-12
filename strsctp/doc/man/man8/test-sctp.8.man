@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-sctp.8.man,v 0.9.2.3 2006/10/10 10:46:18 brian Exp $
+.\" @(#) $Id: test-sctp.8.man,v 0.9.2.4 2007/03/12 09:34:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/10 10:46:18 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/12 09:34:59 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-sctp.8.man,v $
+.\" Revision 0.9.2.4  2007/03/12 09:34:59  brian
+.\" - boosted default test port numbers from 10000 to 18000
+.\"
 .\" Revision 0.9.2.3  2006/10/10 10:46:18  brian
 .\" - updates for release
 .\"
@@ -127,9 +130,9 @@ executes, it opens two SCTP NPI Streams,
 by opening device
 .BR /dev/sctp_n .
 It binds one Stream to address
-.B 127.0.0.1:10000
+.B 127.0.0.1:18000
 and the other to
-.B 127.0.0.1:10001
+.B 127.0.0.1:18001
 as a listener.
 It then collects information from both Streams.
 It then connects the first Stream to the second Stream.

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 02:23:14 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:33:45 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 02:23:14 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 09:33:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n.c,v $
+ Revision 0.9.2.6  2007/03/12 09:33:45  brian
+ - boosted default test port numbers from 10000 to 18000
+
  Revision 0.9.2.5  2007/03/12 02:23:14  brian
  - updating tests
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 02:23:14 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:33:45 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 02:23:14 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:33:45 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -639,7 +642,8 @@ struct sockaddr_in addrs[4][3];
 struct sockaddr_in addrs[4];
 #endif
 int anums[4] = { 3, 3, 3, 3 };
-unsigned short ports[4] = { 10000, 10001, 10002, 10003 };
+#define TEST_PORT_NUMBER 18000
+unsigned short ports[4] = { TEST_PORT_NUMBER, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -4933,7 +4937,7 @@ postamble_1_unbnd(int child)
 int
 preamble_1_idle_clns(int child)
 {
-	unsigned short port = htons(10000 + child);
+	unsigned short port = htons(TEST_PORT_NUMBER + child);
 	unsigned char proto = TEST_PROTOCOL;
 	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
 	unsigned char prot[] = { proto };
@@ -8973,10 +8977,10 @@ Options:\n\
     -R, --repeat-fail\n\
         repeat test cases on failure.\n\
     -p, --client-port [PORT]\n\
-        port number from which to connect [default: 10000+index*3]\n\
+        port number from which to connect [default: %3$d+index*3]\n\
     -P, --server-port [PORT]\n\
         port number to which to connect or upon which to listen\n\
-        [default: 10000+index*3+2]\n\
+        [default: %3$d+index*3+2]\n\
     -i, --client-host [HOSTNAME[,HOSTNAME]*]\n\
         client host names(s) or IP numbers\n\
         [default: 127.0.0.1,127.0.0.2,127.0.0.3]\n\
@@ -9011,7 +9015,7 @@ Options:\n\
     -C, --copying\n\
         print copying permission and exit\n\
 \n\
-", argv[0], devname);
+", argv[0], devname, TEST_PORT_NUMBER);
 }
 
 #define HOST_BUF_LEN 128

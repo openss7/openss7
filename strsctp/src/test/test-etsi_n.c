@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 07:57:43 $
+ @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:35:00 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 07:57:43 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 09:35:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-etsi_n.c,v $
+ Revision 0.9.2.6  2007/03/12 09:35:00  brian
+ - boosted default test port numbers from 10000 to 18000
+
  Revision 0.9.2.5  2006/12/18 07:57:43  brian
  - resolve device numbering
 
@@ -93,9 +96,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 07:57:43 $"
+#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:35:00 $"
 
-static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 07:57:43 $";
+static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:35:00 $";
 
 /*
  *  This file is for testing the sctp_t module.  It is provided for the
@@ -627,7 +630,8 @@ addr_t addrs[4];
 #else				/* SCTP_VERSION_2 */
 struct sockaddr_in addrs[4][3];
 #endif				/* SCTP_VERSION_2 */
-unsigned short ports[4] = { 10000, 10001, 10002, 10003 };
+#define TEST_PORT_NUMBER 18000
+unsigned short ports[4] = { TEST_PORT_NUMBER+0, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*

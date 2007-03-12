@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/12 02:23:15 $
+ @(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 09:33:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 02:23:15 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 09:33:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_nc.c,v $
+ Revision 0.9.2.5  2007/03/12 09:33:46  brian
+ - boosted default test port numbers from 10000 to 18000
+
  Revision 0.9.2.4  2007/03/12 02:23:15  brian
  - updating tests
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/12 02:23:15 $"
+#ident "@(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 09:33:46 $"
 
-static char const ident[] = "$RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/12 02:23:15 $";
+static char const ident[] = "$RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 09:33:46 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -659,6 +662,8 @@ Options:\n\
 ", argv[0]);
 }
 
+#define TEST_PORT_NUMBER 18000
+
 int
 main(int argc, char **argv)
 {
@@ -668,8 +673,8 @@ main(int argc, char **argv)
 	char hostbufr[HOST_BUF_LEN];
 	char **hostlp = &hostl;
 	char **hostrp = &hostr;
-	short portl = 10000;
-	short portr = 10001;
+	short portl = TEST_PORT_NUMBER;
+	short portr = TEST_PORT_NUMBER + 1;
 	struct hostent *haddr;
 
 	for (;;) {

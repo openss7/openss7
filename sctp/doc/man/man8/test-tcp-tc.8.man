@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-tcp-tc.8.man,v 0.9.2.3 2006/04/05 09:42:55 brian Exp $
+.\" @(#) $Id: test-tcp-tc.8.man,v 0.9.2.4 2007/03/12 09:33:19 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:42:55 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/12 09:33:19 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-tcp-tc.8.man,v $
+.\" Revision 0.9.2.4  2007/03/12 09:33:19  brian
+.\" - boosted default test port numbers from 10000 to 18000
+.\"
 .\" Revision 0.9.2.3  2006/04/05 09:42:55  brian
 .\" - moved .so line and updated headers
 .\"
@@ -132,7 +135,7 @@ The purpose of this set of 6 programs is to perform comparison tests between SCT
 When the server
 .RB ( test-tcp-ts )
 is started, it listens on a specified port number (or port
-.B 10000
+.B 18000
 if no port number is specified) for incoming connections.  When a connection arrives, as a result of
 the client
 .RB ( test-tcp-tc )
@@ -141,7 +144,7 @@ being started, the server polls for received packets and sends them back to thei
 Then the client
 .RB ( test-tcp-tc )
 is started, it connects to a specified port number (or port
-.B 10000
+.B 18000
 if no port number is specified) and beings sending data at a specified length as fast as possible.
 .PP
 Both the server
@@ -177,7 +180,7 @@ this is the remote port number to which to connect.  For
 .B test-tcp-ts
 this is the local port number to which to bind.
 The default is
-.BR 10000 .
+.BR 18000 .
 .TP
 \fB-w\fR, \fB--length\fR \fILENGTH\fR
 Specify the \fILENGTH\fR of sent messages in bytes.  The default is
@@ -265,7 +268,7 @@ At one terminal type:
 .RS
 .nf
 \fC\s-1
-test-tcp-ts -l 127.0.0.2 -p 10000 -w 64 -n -t 5
+test-tcp-ts -l 127.0.0.2 -p 18000 -w 64 -n -t 5
 \s+1\fP
 .fi
 .RE
@@ -273,7 +276,7 @@ to start the server program.  In another terminal type:
 .RS
 .nf
 \fC\s-1
-test-tcp-tc -r 127.0.0.2 -p 10000 -w 64 -n -t 5
+test-tcp-tc -r 127.0.0.2 -p 18000 -w 64 -n -t 5
 \s+1\fP
 .fi
 .RE
