@@ -120,6 +120,7 @@ netperf/README
 netperf/README-alpha
 netperf/README-cvs
 netperf/README-nexusware
+netperf/scripts/compile
 netperf/scripts/config.guess
 netperf/scripts/config.sub
 netperf/scripts/depcomp
@@ -136,6 +137,7 @@ README
 README-alpha
 README-cvs
 README-nexusware
+scripts/compile
 scripts/config.guess
 scripts/config.sub
 scripts/install-sh
