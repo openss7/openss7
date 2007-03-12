@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 08:59:35 $
+# @(#) $RCSfile: Config.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/12 11:15:31 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -45,11 +45,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/12/18 08:59:35 $ by $Author: brian $
+## Last Modified $Date: 2007/03/12 11:15:31 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Config.in,v $
+## Revision 0.9.2.4  2007/03/12 11:15:31  brian
+## - correct last configruation files for dashes
+##
 ## Revision 0.9.2.3  2006/12/18 08:59:35  brian
 ## - working up strchan package
 ##
@@ -76,8 +79,8 @@ module	cd-daed	    cd_daed
 ## -----------------------------------------------------------
 ##	type	name	    object name
 objname	module	cd	    cd
-objname	module	cd-hdlc	    cd-hdlc
-objname	module	cd-daed	    cd-daed
+objname	module	cd-hdlc	    cd_hdlc
+objname	module	cd-daed	    cd_daed
 objname	module	zaptel	    zaptel
 
 ##
@@ -85,8 +88,8 @@ objname	module	zaptel	    zaptel
 ## -----------------------------------------------------------
 ##		name
 loadable	cd
-loadable	cd-hdlc
-loadable	cd-daed
+loadable	cd_hdlc
+loadable	cd_daed
 loadable	zaptel
 
 ##   Node specifications

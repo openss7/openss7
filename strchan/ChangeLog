@@ -1,5 +1,7 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/modules/Config.in: correct for dashes
+
 	* doc/man/man8/test-chan.8.man: boosted default port 10000->18000
 
 	* tests/local.at: corrections for autotest 2.59b+
