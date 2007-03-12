@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 02:24:10 $
+ @(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 09:35:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 02:24:10 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 09:35:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp.c,v $
+ Revision 0.9.2.9  2007/03/12 09:35:02  brian
+ - boosted default test port numbers from 10000 to 18000
+
  Revision 0.9.2.8  2007/03/12 02:24:10  brian
  - updating tests
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 02:24:10 $"
+#ident "@(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 09:35:02 $"
 
-static char const ident[] = "$RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 02:24:10 $";
+static char const ident[] = "$RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 09:35:02 $";
 
 /* 
  *  This file is for testing the sctp_n driver.
@@ -745,6 +748,8 @@ sctp_wait(int fd)
 	get_only(fd, 1);
 }
 
+#define TEST_PORT_NUMBER 18000
+
 int
 do_tests(void)
 {
@@ -753,10 +758,10 @@ do_tests(void)
 
 	printf("Simple test program for streams-sctp driver.\n");
 
-	addr1.port = 10000;
+	addr1.port = TEST_PORT_NUMBER + 0;
 	inet_aton("127.0.0.1", addr1.addr);
 
-	addr2.port = 10001;
+	addr2.port = TEST_PORT_NUMBER + 1;
 	inet_aton("127.0.0.1", addr2.addr);
 
 	fd1 = sctp_n_open();

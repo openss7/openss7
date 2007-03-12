@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/08 08:27:26 $
+ @(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 09:35:00 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/08 08:27:26 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 09:35:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-etsi_t.c,v $
+ Revision 0.9.2.9  2007/03/12 09:35:00  brian
+ - boosted default test port numbers from 10000 to 18000
+
  Revision 0.9.2.8  2007/03/08 08:27:26  brian
  - print primitives at default verbosity
 
@@ -96,9 +99,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/08 08:27:26 $"
+#ident "@(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 09:35:00 $"
 
-static char const ident[] = "$RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/08 08:27:26 $";
+static char const ident[] = "$RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 09:35:00 $";
 
 /*
  *  This file is for testing the sctp_t module.  It is provided for the
@@ -756,7 +759,8 @@ struct sockaddr_in addrs[4][3];
 struct sockaddr_in addrs[4];
 #endif
 int anums[4] = { 3, 3, 3, 3 };
-unsigned short ports[4] = { 10000, 10001, 10002, 10003 };
+#define TEST_PORT_NUMBER 18000
+unsigned short ports[4] = { TEST_PORT_NUMBER+0, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -12128,10 +12132,10 @@ Options:\n\
     -R, --repeat-fail\n\
         repeat test cases on failure.\n\
     -p, --client-port [PORT]\n\
-        port number from which to connect [default: 10000+index*3]\n\
+        port number from which to connect [default: %4$d+index*3]\n\
     -P, --server-port [PORT]\n\
         port number to which to connect or upon which to listen\n\
-        [default: 10000+index*3+2]\n\
+        [default: %4$d+index*3+2]\n\
     -i, --client-host [HOSTNAME[,HOSTNAME]*]\n\
         client host names(s) or IP numbers\n\
         [default: 127.0.0.1,127.0.0.2,127.0.0.3]\n\
@@ -12168,7 +12172,7 @@ Options:\n\
     -C, --copying\n\
         print copying permission and exit\n\
 \n\
-", argv[0], devname, modname);
+", argv[0], devname, modname, TEST_PORT_NUMBER);
 }
 
 #define HOST_BUF_LEN 128

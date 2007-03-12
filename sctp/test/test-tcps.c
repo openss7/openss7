@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 11:56:35 $
+ @(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 09:33:21 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 11:56:35 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 09:33:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tcps.c,v $
+ Revision 0.9.2.8  2007/03/12 09:33:21  brian
+ - boosted default test port numbers from 10000 to 18000
+
  Revision 0.9.2.7  2005/07/18 11:56:35  brian
  - standard indentation
 
@@ -75,10 +78,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 11:56:35 $"
+#ident "@(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 09:33:21 $"
 
 static char const ident[] =
-    "$RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/18 11:56:35 $";
+    "$RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 09:33:21 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -369,6 +372,8 @@ Usage:\n\
 ", argv[0]);
 }
 
+#define TEST_PORT_NUMBER 18000
+
 void
 help(int argc, char *argv[])
 {
@@ -386,7 +391,7 @@ Options:\n\
     -l, --loc_host\n\
         Local host (bind) address            [default: 0.0.0.0]\n\
     -p, --port PORTNUM\n\
-        Remote port (connect) number         [default: 10000]\n\
+        Remote port (connect) number         [default: %3$d]\n\
     -w, --length LENGTH\n\
         Length of message in bytes           [default: %2$d]\n\
     -n, --nagle\n\
@@ -405,7 +410,7 @@ Options:\n\
         Prints the version and exits\n\
     -C, --copying\n\
 	Prints copyright and copying information and exits\n\
-", argv[0], MSG_LEN);
+", argv[0], MSG_LEN, TEST_PORT_NUMBER);
 }
 
 int
@@ -414,7 +419,7 @@ main(int argc, char **argv)
 	char *hostl = "0.0.0.0";
 	char hostbufl[HOST_BUF_LEN];
 	char **hostlp = &hostl;
-	short port = 10000;
+	short port = TEST_PORT_NUMBER;
 	int time;
 	struct hostent *haddr;
 

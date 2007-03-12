@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/12 02:23:19 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/12 09:33:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 02:23:19 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 09:33:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.23  2007/03/12 09:33:53  brian
+ - boosted default test port numbers from 10000 to 18000
+
  Revision 0.9.2.22  2007/03/12 02:23:19  brian
  - updating tests
 
@@ -91,9 +94,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/12 02:23:19 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/12 09:33:53 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/12 02:23:19 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/12 09:33:53 $";
 
 #define TEST_M2PA   1
 #define TEST_X400   0
@@ -1065,7 +1068,8 @@ struct sockaddr_in addrs[4][3];
 struct sockaddr_in addrs[4];
 #endif
 int anums[4] = { 3, 3, 3, 3 };
-unsigned short ports[4] = { 10000, 10001, 10002, 10003 };
+#define TEST_PORT_NUMBER 18000
+unsigned short ports[4] = { TEST_PORT_NUMBER, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -21445,10 +21449,10 @@ Options:\n\
     -R, --repeat-fail\n\
         repeat test cases on failure.\n\
     -p, --client-port [PORT]\n\
-        port number from which to connect [default: 10000+index*3]\n\
+        port number from which to connect [default: %3$d+index*3]\n\
     -P, --server-port [PORT]\n\
         port number to which to connect or upon which to listen\n\
-        [default: 10000+index*3+2]\n\
+        [default: %3$d+index*3+2]\n\
     -i, --client-host [HOSTNAME[,HOSTNAME]*]\n\
         client host names(s) or IP numbers\n\
         [default: 127.0.0.1,127.0.0.2,127.0.0.3]\n\
@@ -21496,7 +21500,7 @@ Symbols:\n\
 	M2PA_VERSION_DRAFT7   M2PA_VERSION_DRAFT9     M2PA_VERSION_DRAFT10\n\
 	M2PA_VERSION_DRAFT11  M2PA_VERSION_RFC4165\n\
 \n\
-", argv[0], devname);
+", argv[0], devname, TEST_PORT_NUMBER);
 }
 
 #define HOST_BUF_LEN 128

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 02:23:17 $
+ @(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:33:49 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 02:23:17 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 09:33:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tcpc.c,v $
+ Revision 0.9.2.6  2007/03/12 09:33:49  brian
+ - boosted default test port numbers from 10000 to 18000
+
  Revision 0.9.2.5  2007/03/12 02:23:17  brian
  - updating tests
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 02:23:17 $"
+#ident "@(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:33:49 $"
 
-static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 02:23:17 $";
+static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:33:49 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -401,6 +404,8 @@ Usage:\n\
 ", argv[0]);
 }
 
+#define TEST_PORT_NUMBER 18000
+
 void
 help(int argc, char *argv[])
 {
@@ -415,7 +420,7 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
-    -p, --port PORT           (default: 10000)\n\
+    -p, --port PORT           (default: %2$d)\n\
         port specifies both the local and remote port number\n\
     -l, --loc_host LOC_HOST   (default: 127.0.0.1)\n\
         specifies the LOC_HOST (bind) host for the TCP\n\
@@ -438,7 +443,7 @@ Options:\n\
         print the version and exit\n\
     -C, --copying\n\
         print copying permissions and exit\n\
-", argv[0]);
+", argv[0], TEST_PORT_NUMBER);
 }
 
 int
@@ -450,7 +455,7 @@ main(int argc, char **argv)
 	char hostbufr[HOST_BUF_LEN];
 	char **hostlp = &hostl;
 	char **hostrp = &hostr;
-	short port = 10000;
+	short port = TEST_PORT_NUMBER;
 	struct hostent *haddr;
 
 	while (1) {

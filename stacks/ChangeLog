@@ -1,5 +1,31 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man8/test-m2pa.8.man: boosted default port 10000->18000
+
+	* src/test/inet/test-inet_tcp.c: boosted default port 10000->18000
+	* src/test/inet/test-inet_udp.c: boosted default port 10000->18000
+	* src/test/inet/test-inet_sctp.c: boosted default port 10000->18000
+	* src/test/inet/test-sctp.c: boosted default port 10000->18000
+	* src/test/inet/test-sctp_n.c: boosted default port 10000->18000
+	* src/test/inet/test-sctp_nc.c: boosted default port 10000->18000
+	* src/test/inet/test-sctp_ns.c: boosted default port 10000->18000
+	* src/test/inet/test-sctp_t.c: boosted default port 10000->18000
+	* src/test/inet/test-tcpc.c: boosted default port 10000->18000
+	* src/test/inet/test-tcps.c: boosted default port 10000->18000
+	* src/test/inet/test-udpc.c: boosted default port 10000->18000
+	* src/test/inet/test-udps.c: boosted default port 10000->18000
+	* src/test/m2pa/test-m2pa.c: boosted default port 10000->18000
+	* src/test/sctp/test-sctp_n.c: boosted default port 10000->18000
+	* src/test/sctp/test-sctp.c: boosted default port 10000->18000
+	* src/test/sctp/test-sctp_nc.c: boosted default port 10000->18000
+	* src/test/sctp/test-sctp_ns.c: boosted default port 10000->18000
+	* src/test/sctp/test-sctp_t.c: boosted default port 10000->18000
+	* src/test/sctp/test-etsi_n.c: boosted default port 10000->18000
+	* src/test/sctp/test-etsi_t.c: boosted default port 10000->18000
+	* src/test/sctp/test-interop.c: boosted default port 10000->18000
+	* src/test/sctp/test-sctp_n2.c: boosted default port 10000->18000
+	* src/test/x400p-ss7/test-x400p.c: boosted default port 10000->18000
+
 	* tests/local.at: corrections for autotest 2.59b+
 
 	* doc/man/man8/test-m2pa.8.man: test updates

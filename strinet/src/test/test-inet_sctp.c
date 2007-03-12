@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/08 08:26:51 $
+ @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/03/12 09:34:17 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/08 08:26:51 $ by $Author: brian $
+ Last Modified $Date: 2007/03/12 09:34:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_sctp.c,v $
+ Revision 0.9.2.30  2007/03/12 09:34:17  brian
+ - boosted default test port numbers from 10000 to 18000
+
  Revision 0.9.2.29  2007/03/08 08:26:51  brian
  - print primitives at default verbosity
 
@@ -214,9 +217,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/08 08:26:51 $"
+#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/03/12 09:34:17 $"
 
-static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/08 08:26:51 $";
+static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/03/12 09:34:17 $";
 
 /*
  *  Simple test program for INET streams.
@@ -738,7 +741,8 @@ struct sockaddr_in addrs[4][3];
 #else
 struct sockaddr_in addrs[4];
 #endif
-unsigned short ports[4] = { 10000, 10001, 10002, 10003 };
+#define TEST_PORT_BASE 18000
+unsigned short ports[4] = { TEST_PORT_BASE, TEST_PORT_BASE+1, TEST_PORT_BASE+2, TEST_PORT_BASE+3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*

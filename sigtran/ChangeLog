@@ -1,5 +1,14 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man8/test-m2pa.8.man: boosted default port 10000->18000
+	* doc/man/man8/test-m2ua_as.8.man: boosted default port 10000->18000
+	* doc/man/man8/test-m3ua_as.8.man: boosted default port 10000->18000
+	* doc/man/man8/test-sigtran.8.man: boosted default port 10000->18000
+
+	* src/test/test-m2pa.c: boosted default port 10000->18000
+	* src/test/test-m2ua_as.c: boosted default port 10000->18000
+	* src/test/test-sigtran.c: boosted default port 10000->18000
+
 	* tests/local.at: corrections for autotest 2.59b+
 
 	* doc/man/man8/test-m2pa.8.man: test updates

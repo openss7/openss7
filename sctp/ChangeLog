@@ -1,5 +1,31 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man8/test-sctp-dc.8.man: boosted default port 10000->18000
+	* doc/man/man8/test-sctp-sc.8.man: boosted default port 10000->18000
+	* doc/man/man8/test-sctp-tc.8.man: boosted default port 10000->18000
+	* doc/man/man8/test-sctpc.8.man: boosted default port 10000->18000
+	* doc/man/man8/test-tcp-dc.8.man: boosted default port 10000->18000
+	* doc/man/man8/test-tcp-tc.8.man: boosted default port 10000->18000
+	* doc/man/man8/test-tcpc.8.man: boosted default port 10000->18000
+	* doc/man/man8/test-udpc.8.man: boosted default port 10000->18000
+
+	* test/test-sctp-dc.c: boosted default port 10000->18000
+	* test/test-tcpc.c: boosted default port 10000->18000
+	* test/test-sctp-ds.c: boosted default port 10000->18000
+	* test/test-sctp-sc.c: boosted default port 10000->18000
+	* test/test-sctp-ss.c: boosted default port 10000->18000
+	* test/test-sctp-tc.c: boosted default port 10000->18000
+	* test/test-sctp-ts.c: boosted default port 10000->18000
+	* test/test-sctpc.c: boosted default port 10000->18000
+	* test/test-sctps.c: boosted default port 10000->18000
+	* test/test-tcp-dc.c: boosted default port 10000->18000
+	* test/test-tcp-ds.c: boosted default port 10000->18000
+	* test/test-tcp-tc.c: boosted default port 10000->18000
+	* test/test-tcp-ts.c: boosted default port 10000->18000
+	* test/test-tcps.c: boosted default port 10000->18000
+	* test/test-udpc.c: boosted default port 10000->18000
+	* test/test-udps.c: boosted default port 10000->18000
+
 	* tests/local.at: corrections for autotest 2.59b+
 
 	* util/init/sctp: do not preload sctp

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-interop.8.man,v 0.9.2.3 2007/03/12 02:24:09 brian Exp $
+.\" @(#) $Id: test-interop.8.man,v 0.9.2.4 2007/03/12 09:34:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/12 02:24:09 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/12 09:34:59 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-interop.8.man,v $
+.\" Revision 0.9.2.4  2007/03/12 09:34:59  brian
+.\" - boosted default test port numbers from 10000 to 18000
+.\"
 .\" Revision 0.9.2.3  2007/03/12 02:24:09  brian
 .\" - updating tests
 .\"
@@ -340,7 +343,7 @@ The following four options determine the IP addresses and port numbers that
 are used on the client and server sides of the test.  The defaults (used by
 .BR autotest )
 are localnet addresses 127.0.0.1, 127.0.0.2 and 127.0.0.3 and test case
-unique port numbers in the range beginning at port number 10000 (to avoid
+unique port numbers in the range beginning at port number 18000 (to avoid
 timed waits and connections that have otherwise not yet been shut down).
 .TP
 \fB-p\fR, \fB--client-port\fR [\fIPORT\fR]
@@ -349,11 +352,11 @@ mode) or from which to accept connections (server mode).
 This option can be specified in both client and server mode.  In client mode
 it identifies the local port; in server mode, the remote port.
 The default if a port number is not specified is for the client to connect
-from port number \fB10000\fR, offset by the index of the test case time three
+from port number \fB18000\fR, offset by the index of the test case time three
 (one for connecting, one for listening and one for responding), resulting in a
 unique port number for each device file descriptor invoved in each test.  So,
-for example, the first test case will connect from port \fB10000\fR, the
-second from port \fB10003\fR, and so on.
+for example, the first test case will connect from port \fB18000\fR, the
+second from port \fB18003\fR, and so on.
 .TP
 \fB-P\fR, \fB--server-port\fR [\fIPORT\fR]
 Specify the server port number, \fIPORT\fR, upon which to listen (server mode)
@@ -361,11 +364,11 @@ or to which to connect (client mode).
 This option can be specified in both client and server mode.  In client mode
 it identifies the remote port; in server mode, the local port.
 The default if a port number is not specified is for the sever to listen on
-port number \fB10002\fR, offset by the index of the test case times three (one
+port number \fB18002\fR, offset by the index of the test case times three (one
 for connecting, one for listening and one for responding), resulting in a
 unique port number for each device file descriptor invoked in each test.  So,
-for example, the first test case will listen on port \fB10002\fR, the second
-on port \fB10005\fR, and so on.
+for example, the first test case will listen on port \fB18002\fR, the second
+on port \fB18005\fR, and so on.
 .TP
 \fB-i\fR, \fB--client-host\fR [\fIHOSTNAME\fR[\fB,\fIHOSTNAME\fR]*]
 Specify the client hostnames, \fIHOSTNAME\fR, from which to connect (client

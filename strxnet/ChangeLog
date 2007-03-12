@@ -1,5 +1,8 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/test/test-inet_tcp.c: boosted default port 10000->18000
+	* src/test/test-inet_udp.c: boosted default port 10000->18000
+
 	* tests/local.at: corrections for autotest 2.59b+
 
 	* doc/man/man8/test-timod.8.man: test updates
