@@ -1,5 +1,7 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* tests/local.at: corrections for autotest 2.59b+
+
 	* doc/man/man8/test-timod.8.man: test updates
 	* doc/man/man8/test-tirdwr.8.man: test updates
 	* doc/man/man8/test-xnet.8.man: test updates
