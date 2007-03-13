@@ -1,5 +1,5 @@
-OpenSS7 NETPERF Utility -- read me first file.  2007-03-12
-$Id: README,v 1.1.1.21 2007/03/12 23:17:57 brian Exp $
+OpenSS7 NETPERF Utility -- read me first file.  2007-03-13
+$Id: README,v 1.1.1.22 2007/03/13 19:50:59 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 NETPERF Utility
 ========================
 
-Package netperf-2.3.5 was released under GPLv2 2007-03-12.
+Package netperf-2.3.5 was released under GPLv2 2007-03-13.
 
 `Netperf' is a general purpose tool for benchmarking bandwidth and
 performance of the `Internet Protocol' suite.  The `OpenSS7 Modified
@@ -59,7 +59,7 @@ well.
  Release
 --------
 
-This is the `netperf-2.3.5' package, released 2007-03-12.  This `2.3.5'
+This is the `netperf-2.3.5' package, released 2007-03-13.  This `2.3.5'
 release, and the latest version, can be obtained from the download area
 (http://www.openss7.org/download.html) of The OpenSS7 Project website
 using a command such as:

@@ -1,5 +1,5 @@
-OpenSS7 SS7 Stack -- read me first file.  2007-03-12
-$Id: README,v 0.9.2.21 2007/03/12 23:18:02 brian Exp $
+OpenSS7 SS7 Stack -- read me first file.  2007-03-13
+$Id: README,v 0.9.2.22 2007/03/13 19:51:07 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 SS7 Stack
 ==================
 
-Package strss7-0.9a.6 was released under GPLv2 2007-03-12.
+Package strss7-0.9a.6 was released under GPLv2 2007-03-13.
 
 The `OpenSS7 SS7 Stack' package includes a wide array of kernel
 modules, `SVR 4.2' "STREAMS" drivers, modules, libraries, utilities,
@@ -30,7 +30,7 @@ well.
  Release
 --------
 
-This is the `strss7-0.9a.6' package, released 2007-03-12.  This
+This is the `strss7-0.9a.6' package, released 2007-03-13.  This
 `0.9a.6' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
