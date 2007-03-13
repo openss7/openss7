@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/13 11:29:16 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/13 19:12:22 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/13 11:29:16 $ by $Author: brian $
+ Last Modified $Date: 2007/03/13 19:12:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.35  2007/03/13 19:12:22  brian
+ - add support for DS2156 chip
+
  Revision 0.9.2.34  2007/03/13 11:29:16  brian
  - remove extraneous newlines
 
@@ -112,10 +115,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/13 11:29:16 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/13 19:12:22 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/13 11:29:16 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/13 19:12:22 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -168,7 +171,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/13 11:29:16 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/13 19:12:22 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -193,7 +196,8 @@ MODULE_LICENSE(SL_X400P_LICENSE);
 MODULE_ALIAS("streams-sl_x400p");
 #endif
 #if defined MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE "-"
+	       PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 
@@ -543,11 +547,11 @@ static struct {
 #define XP_DEV_DS2154	0x00
 #define XP_DEV_DS21354	0x01
 #define XP_DEV_DS21554	0x02
-#define XP_DEV_DS2155E	0x03
 #define XP_DEV_DS2152	0x08
 #define XP_DEV_DS21352	0x09
 #define XP_DEV_DS21552	0x0a
-#define XP_DEV_DS2155T	0x0b
+#define XP_DEV_DS2155	0x0b
+#define XP_DEV_DS2156	0x0c
 
 STATIC struct {
 	char *name;
@@ -556,7 +560,7 @@ STATIC struct {
 	{ "DS2154 (E1)",	1 },
 	{ "DS21354 (E1)",	1 },
 	{ "DS21554 (E1)",	1 },
-	{ "DS2155 (E1/T1/J1)",	1 },
+	{ "Unknown ID 0011",	0 },
 	{ "Unknown ID 0100",	0 },
 	{ "Unknown ID 0101",	0 },
 	{ "Unknown ID 0110",	0 },
@@ -564,8 +568,8 @@ STATIC struct {
 	{ "DS2152 (T1)",	1 },
 	{ "DS21352 (T1)",	1 },
 	{ "DS21552 (T1)",	1 },
-	{ "DS2155 (T1/J1/E1)",	1 },
-	{ "Unknown ID 1100",	0 },
+	{ "DS2155 (E1/T1/J1)",	1 },
+	{ "DS2156 (E1/T1/J1)",	1 },
 	{ "Unknown ID 1101",	0 },
 	{ "Unknown ID 1110",	0 },
 	{ "Unknown ID 1111",	0 }
@@ -1356,7 +1360,8 @@ lmi_ok_ack(struct xp *xp, queue_t *q, sl_ulong state, sl_long prim)
  *  -----------------------------------
  */
 STATIC noinline fastcall __unlikely int
-lmi_error_ack(struct xp *xp, queue_t *q, sl_ulong state, sl_long prim, sl_ulong errno, sl_ulong reason)
+lmi_error_ack(struct xp *xp, queue_t *q, sl_ulong state, sl_long prim, sl_ulong errno,
+	      sl_ulong reason)
 {
 	mblk_t *mp;
 	lmi_error_ack_t *p;
@@ -2067,7 +2072,15 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 
 		xlb[0x79] = 0x98;	/* JACLK on for E1 */
 		xlb[0x7b] = 0x0f;	/* 120 Ohm term, MCLK 2.048 MHz */
-		xlb[0x7d] = 0x00;	/* Automatic gain control */
+
+		switch (cd->device) {
+		case XP_DEV_DS2155:
+			xlb[0x7d] = 0x00;	/* Automatic gain control */
+			break;
+		case XP_DEV_DS2156:
+			/* DS2156 does not have Tx AGC register */
+			break;
+		}
 
 		/* We use TX levels to determine LBO, impedance, CSU operation, or monitoring
 		   operation.  During monitoring operation, the transmitters are powered off. */
@@ -2282,7 +2295,15 @@ xp_span_config(struct cd *cd, int span, bool timeouts)
 		}
 #endif
 		xlb[0x79] = 0x18;	/* JACLK on for T1 */
-		xlb[0x7d] = 0x00;	/* Automatic gain control */
+
+		switch (cd->device) {
+		case XP_DEV_DS2155:
+			xlb[0x7d] = 0x00;	/* Automatic gain control */
+			break;
+		case XP_DEV_DS2156:
+			/* DS2156 does not have Tx AGC register */
+			break;
+		}
 
 		if (sp->config.iftxlevel < 8) {
 			reg7a = 0x00;	/* no gain */
@@ -11865,7 +11886,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	printd(("%s: xlb region %lx reserved %ld bytes\n", DRV_NAME, cd->xlb_region,
 		cd->xlb_length));
 	cmn_err(CE_NOTE, "%s: card detected %s at 0x%lx/0x%lx irq %d", DRV_NAME,
-		  cd->config.ifname, cd->xll_region, cd->xlb_region, dev->irq);
+		cd->config.ifname, cd->xll_region, cd->xlb_region, dev->irq);
 #ifdef X400P_DOWNLOAD_FIRMWARE
 	if (xp_download_fw(cd, board) != 0)
 		goto error_remove;
@@ -11924,8 +11945,8 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			cd->board = -1;
 			break;
 		}
-	case XP_DEV_DS2155E:
-	case XP_DEV_DS2155T:
+	case XP_DEV_DS2155:
+	case XP_DEV_DS2156:
 		switch (board) {
 		case V401PE:
 			cd->board = V401PE;
@@ -11947,8 +11968,8 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	cd->hw_flags |= xp_device_info[cd->device].hw_flags;
 
 	cmn_err(CE_NOTE, "%s: %s (%s Rev. %c)", DRV_NAME,
-		  xp_board_info[cd->board].name,
-		  xp_device_info[cd->device].name, (char) (cd->devrev + 65));
+		xp_board_info[cd->board].name,
+		xp_device_info[cd->device].name, (char) (cd->devrev + 65));
 
 	{
 		int word, idle_word = xp_board_info[cd->board].idle_word;
