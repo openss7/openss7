@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/13 05:46:00 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/03/13 08:50:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/13 05:46:00 $ by $Author: brian $
+ Last Modified $Date: 2007/03/13 08:50:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.33  2007/03/13 08:50:04  brian
+ - bug fixes for PR x400p-ss7/5766
+
  Revision 0.9.2.32  2007/03/13 05:46:00  brian
  - more info
 
@@ -106,10 +109,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/13 05:46:00 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/03/13 08:50:04 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/13 05:46:00 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/03/13 08:50:04 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -162,7 +165,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/13 05:46:00 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/03/13 08:50:04 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -537,10 +540,11 @@ static struct {
 #define XP_DEV_DS2154	0x00
 #define XP_DEV_DS21354	0x01
 #define XP_DEV_DS21554	0x02
+#define XP_DEV_DS2155E	0x03
 #define XP_DEV_DS2152	0x08
 #define XP_DEV_DS21352	0x09
 #define XP_DEV_DS21552	0x0a
-#define XP_DEV_DS2155	0x0b
+#define XP_DEV_DS2155T	0x0b
 
 STATIC struct {
 	char *name;
@@ -549,7 +553,7 @@ STATIC struct {
 	{ "DS2154 (E1)",	1 },
 	{ "DS21354 (E1)",	1 },
 	{ "DS21554 (E1)",	1 },
-	{ "Unknown ID 0011",	0 },
+	{ "DS2155 (E1/T1/J1)",	1 },
 	{ "Unknown ID 0100",	0 },
 	{ "Unknown ID 0101",	0 },
 	{ "Unknown ID 0110",	0 },
@@ -557,31 +561,24 @@ STATIC struct {
 	{ "DS2152 (T1)",	1 },
 	{ "DS21352 (T1)",	1 },
 	{ "DS21552 (T1)",	1 },
-	{ "DS2155 (E1/T1/J1)",	1 },
+	{ "DS2155 (T1/J1/E1)",	1 },
 	{ "Unknown ID 1100",	0 },
 	{ "Unknown ID 1101",	0 },
 	{ "Unknown ID 1110",	0 },
 	{ "Unknown ID 1111",	0 }
 };
-/* *INDENT-ON* */
 
 STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
-	{PCI_VENDOR_ID_PLX, 0x9030, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
-	 PLX9030},
-	{PCI_VENDOR_ID_PLX, 0x3001, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
-	 PLXDEVBRD},
-	{PCI_VENDOR_ID_PLX, 0xD00D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
-	 X400P},
-	{PCI_VENDOR_ID_PLX, 0x0557, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
-	 X400PSS7},
-	{PCI_VENDOR_ID_PLX, 0x4000, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
-	 V400P},
-	{PCI_VENDOR_ID_PLX, 0xD33D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
-	 V401PT},
-	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
-	 V401PE},
+	{PCI_VENDOR_ID_PLX, 0x9030, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, PLX9030},
+	{PCI_VENDOR_ID_PLX, 0x3001, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, PLXDEVBRD},
+	{PCI_VENDOR_ID_PLX, 0xD00D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, X400P},
+	{PCI_VENDOR_ID_PLX, 0x0557, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, X400PSS7},
+	{PCI_VENDOR_ID_PLX, 0x4000, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V400P},
+	{PCI_VENDOR_ID_PLX, 0xD33D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PT},
+	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PE},
 	{0,}
 };
+/* *INDENT-ON* */
 
 #ifdef MODULE_DEVICE_TABLE
 MODULE_DEVICE_TABLE(pci, xp_pci_tbl);
@@ -11924,7 +11921,8 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			cd->board = -1;
 			break;
 		}
-	case XP_DEV_DS2155:
+	case XP_DEV_DS2155E:
+	case XP_DEV_DS2155T:
 		switch (board) {
 		case V401PE:
 			cd->board = V401PE;
