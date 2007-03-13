@@ -1,5 +1,7 @@
 2007-03-13  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/test/x400p-ss7/test-x400p.c: test case timing tweaks
+
 	* src/modules/x400p-ss7/sl_x400p.c: add support for DS2156 chip
 	* src/modules/x400p-ss7/sl_x400p.c: remove extraneous newlines
 	* src/modules/x400p-ss7/sl_x400p.c: bug fixes for PR x400p-ss7/5766

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/12 09:33:25 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/13 19:49:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:33:25 $ by $Author: brian $
+ Last Modified $Date: 2007/03/13 19:49:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.15  2007/03/13 19:49:34  brian
+ - test case timing tweaks
+
  Revision 0.9.2.14  2007/03/12 09:33:25  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -112,9 +115,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/12 09:33:25 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/13 19:49:34 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/12 09:33:25 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/13 19:49:34 $";
 
 #define TEST_M2PA   1
 #define TEST_X400   0
