@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2007/03/08 06:08:29 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2007/03/13 06:17:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 06:08:29 $ by $Author: brian $
+# Last Modified $Date: 2007/03/13 06:17:00 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.89  2007/03/13 06:17:00  brian
+# - suppress errors when building 32-bit libs
+#
 # Revision 0.9.2.88  2007/03/08 06:08:29  brian
 # - modutil_DATA should not be distributed (and it reorders uninstall)
 #

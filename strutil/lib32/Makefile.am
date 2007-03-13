@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/09/29 11:51:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/13 06:17:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/09/29 11:51:08 $ by $Author: brian $
+# Last Modified $Date: 2007/03/13 06:17:28 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2007/03/13 06:17:28  brian
+# - suppress errors when building 32-bit libs
+#
 # Revision 0.9.2.2  2006/09/29 11:51:08  brian
 # - libtool library tweaks in Makefile.am
 # - better rpm spec handling in *.spec.in

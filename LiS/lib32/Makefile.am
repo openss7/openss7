@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/03 13:51:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/13 06:16:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:51:25 $ by $Author: brian $
+# Last Modified $Date: 2007/03/13 06:16:54 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.6  2007/03/13 06:16:54  brian
+# - suppress errors when building 32-bit libs
+#
 # Revision 0.9.2.5  2006/10/03 13:51:25  brian
 # - changes to pass make check target
 # - added some package config.h files
