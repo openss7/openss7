@@ -2,7 +2,7 @@
 # vim: ft=sh sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
 # 
-# @(#) $RCSfile: send-pr,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/21 09:17:40 $
+# @(#) $RCSfile: send-pr,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/13 06:18:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/21 09:17:40 $ by $Author: brian $
+# Last Modified $Date: 2007/03/13 06:18:41 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: send-pr,v $
+# Revision 0.9.2.12  2007/03/13 06:18:41  brian
+# - collect more information for send-pr
+#
 # Revision 0.9.2.11  2006/10/21 09:17:40  brian
 # - bumped streams version number
 #
@@ -120,14 +123,14 @@ dir=`dirname $0`
 path=`(cd $dir ; pwd)`
 errors=0
 warnings=0
-revision='$Revision: 0.9.2.11 $'
+revision='$Revision: 0.9.2.12 $'
 
 exec 5>${top_builddir}${top_builddir+/}$me.log
 
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: send-pr,v $ $Nam$($Revision: 0.9.2.11 $) $Date: 2006/10/21 09:17:40 $'
+ident='$RCSfile: send-pr,v $ $Nam$($Revision: 0.9.2.12 $) $Date: 2007/03/13 06:18:41 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -1359,6 +1362,7 @@ stsubsys_procs="/proc/streams/strinfo /proc/streams/cdevsw /proc/streams/fmodsw"
 
 function targetpr()
 {
+    if test `id -u` -ne 0 ; then SUDO='sudo' ; else SUDO='' ; fi
     target=$1
     case $1 in
     (configure.log)
@@ -1367,7 +1371,7 @@ function targetpr()
 	class=install
 	severity=serious
 	files="configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envcmnds=("lspci -n" "lspci -v -b" "lsmod" "scls -b" "strinfo -m" "strsetup -c");
+	envcmnds=("lspci -n" "lspci -v -b" "lspci -vv" "lsmod" "scls -b" "strinfo -m" "strsetup -c" "$SUDO tail -120 /var/log/messages");
 	envfiles="$hardware_procs $stsubsys_procs $ap_kconfig $ap_ksyms $ap_kallsyms $ap_ksysmap"
 	;;
     (compile.log)
@@ -1376,7 +1380,7 @@ function targetpr()
 	class=software
 	severity=serious
 	files="compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envcmnds=("lspci -n" "lspci -v -b" "lsmod" "scls -b" "strinfo -m" "strsetup -c");
+	envcmnds=("lspci -n" "lspci -v -b" "lspci -vv" "lsmod" "scls -b" "strinfo -m" "strsetup -c" "$SUDO tail -120 /var/log/messages");
 	envfiles="$hardware_procs $stsubsys_procs $ap_kconfig $ap_ksyms $ap_kallsyms $ap_ksysmap"
 	;;
     (check.log)
@@ -1385,7 +1389,7 @@ function targetpr()
 	class=install
 	severity=annoyance
 	files="check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envcmnds=("lspci -n" "lspci -v -b" "lsmod" "scls -b" "strinfo -m" "strsetup -c");
+	envcmnds=("lspci -n" "lspci -v -b" "lspci -vv" "lsmod" "scls -b" "strinfo -m" "strsetup -c" "$SUDO tail -120 /var/log/messages");
 	envfiles="$hardware_procs $stsubsys_procs $ap_kconfig $ap_ksyms $ap_kallsyms $ap_ksysmap"
 	;;
     (install.log)
@@ -1394,7 +1398,7 @@ function targetpr()
 	class=install
 	severity=serious
 	files="install.log check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envcmnds=("lspci -n" "lspci -v -b" "lsmod" "scls -b" "strinfo -m" "strsetup -c");
+	envcmnds=("lspci -n" "lspci -v -b" "lspci -vv" "lsmod" "scls -b" "strinfo -m" "strsetup -c" "$SUDO tail -120 /var/log/messages");
 	envfiles="$hardware_procs $software_procs $stsubsys_procs $ap_kconfig $ap_ksyms $ap_kallsyms $ap_ksysmap"
 	;;
     (installcheck.log)
@@ -1403,7 +1407,7 @@ function targetpr()
 	class=software
 	severity=critical
 	files="*/tests/testsuite.log */testsuite.log testsuite.log installcheck.log install.log check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envcmnds=("lspci -n" "lspci -v -b" "lsmod" "scls -b" "strinfo -m" "strsetup -c");
+	envcmnds=("lspci -n" "lspci -v -b" "lspci -vv" "lsmod" "scls -b" "strinfo -m" "strsetup -c" "$SUDO tail -120 /var/log/messages");
 	envfiles="$hardware_procs $software_procs $stsubsys_procs $ap_kconfig $ap_ksyms $ap_kallsyms $ap_ksysmap"
 	;;
     (uninstall.log)
@@ -1412,7 +1416,7 @@ function targetpr()
 	class=install
 	severity=annoyance
 	files="uninstall.log */tests/testsuite.log */testsuite.log testsuite.log installcheck.log install.log check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envcmnds=("lspci -n" "lspci -v -b" "lsmod" "scls -b" "strinfo -m" "strsetup -c");
+	envcmnds=("lspci -n" "lspci -v -b" "lspci -vv" "lsmod" "scls -b" "strinfo -m" "strsetup -c" "$SUDO tail -120 /var/log/messages");
 	envfiles="$hardware_procs $software_procs $stsubsys_procs $ap_kconfig $ap_ksyms $ap_kallsyms $ap_ksysmap"
 	;;
     (remove.log)
@@ -1421,7 +1425,7 @@ function targetpr()
 	class=install
 	severity=annoyance
 	files="remove.log */tests/testsuite.log */testsuite.log testsuite.log installcheck.log install.log check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envcmnds=("lspci -n" "lspci -v -b" "lsmod" "scls -b" "strinfo -m" "strsetup -c");
+	envcmnds=("lspci -n" "lspci -v -b" "lspci -vv" "lsmod" "scls -b" "strinfo -m" "strsetup -c" "$SUDO tail -120 /var/log/messages");
 	envfiles="$hardware_procs $software_procs $stsubsys_procs $ap_kconfig $ap_ksyms $ap_kallsyms $ap_ksysmap"
 	;;
     (dist.log|distcheck.log|rpms.log|debs.log|sign.log|csig.log|rebuild.log|resign.log|sigs.log|release.log|release-sign.log|srpm.log|dsc.log)
@@ -1430,7 +1434,7 @@ function targetpr()
 	class=install
 	severity=annoyance
 	files="$1 remove.log uninstall.log */tests/testsuite.log */testsuite.log testsuite.log installcheck.log install.log check.log compile.log configure.log config.log */config.log $ap_cache_file $ap_CONFIG_SITE"
-	envcmnds=("lspci -n" "lspci -v -b" "lsmod" "scls -b" "strinfo -m" "strsetup -c");
+	envcmnds=("lspci -n" "lspci -v -b" "lspci -vv" "lsmod" "scls -b" "strinfo -m" "strsetup -c" "$SUDO tail -120 /var/log/messages");
 	envfiles="$hardware_procs $software_procs $stsubsys_procs $ap_kconfig $ap_ksyms $ap_kallsyms $ap_ksysmap"
 	;;
     (none|*)
@@ -1439,7 +1443,7 @@ function targetpr()
 	class=software
 	severity=serious
 	files="config.log */config.log */tests/testsuite.log tests/testsuite.log ${targets[*]} $ap_cache_file $ap_CONFIG_SITE"
-	envcmnds=("lspci -n" "lspci -v -b" "lsmod" "scls -b" "strinfo -m" "strsetup -c");
+	envcmnds=("lspci -n" "lspci -v -b" "lspci -vv" "lsmod" "scls -b" "strinfo -m" "strsetup -c" "$SUDO tail -120 /var/log/messages");
 	envfiles="$hardware_procs $software_procs $stsubsys_procs $ap_kconfig $ap_ksyms $ap_kallsyms $ap_ksysmap"
 	;;
     esac
