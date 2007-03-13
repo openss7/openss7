@@ -1,7 +1,11 @@
+2007-03-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: changes to pass check maintenance target
+	* doc/manual/news.texi: updates for release
+
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: corrections for autotest 2.59b+
-
 	* doc/man/man8/test-tty.8.man: test updates
 
 2007-03-09  Brian Bidulock  <bidulock@openss7.org>

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/03 13:53:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/13 23:54:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/03 13:53:22 $ by $Author: brian $
+# Last Modified $Date: 2007/03/13 23:54:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2007/03/13 23:54:32  brian
+# - changes to pass check maintenance target
+#
 # Revision 0.9.2.3  2006/10/03 13:53:22  brian
 # - changes to pass make check target
 # - added some package config.h files
@@ -121,6 +124,7 @@ MANS_UNUSED = \
 	man3/unlockpt.3tty \
 	man4/ptc.4 \
 	man4/ptm.4 \
+	man4/ptmx.4tty \
 	man4/pts.4tty \
 	man5/strtty.5
 

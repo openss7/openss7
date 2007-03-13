@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.17 2007/03/12 21:40:13 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.18 2007/03/13 23:54:33 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/12 21:40:13 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/13 23:54:33 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -133,7 +133,7 @@ in the release for more information.  Also, see the @file{@value{PACKAGE}.pdf}
 manual in the release (also in html
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
 
-For the news release, see @uref{http://www.openss7.org/rel20070306_G.html}.
+For the news release, see @uref{http://www.openss7.org/rel20070314_G.html}.
 
 @c ----------------------------------------------------------------------------
 
@@ -153,11 +153,13 @@ This release is the initial public release.
 
 @itemize -
 @item
-In this initial release, the package already supports a wide range of production distributions as it
-uses the same build environment as other OpenSS7 Project packages.
+In this initial release, the package already supports a wide range of production
+distributions as it uses the same build environment as other OpenSS7 Project
+packages.
 
 @item
-Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode diet patch set).
+Support for most recent 2.6.18 kernels (including Fedora Core 5 with inode diet
+patch set).
 @end itemize
 @ignore
 
@@ -169,19 +171,25 @@ currently incomplete.  It is being released as a reference point for the
 community.  If you are interested in completion of this package, contact
 @email{info@@openss7.com}.
 
-As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
-for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based distributions, and can be used on
-production kernels without patching or recompiling the kernel.
+As with other OpenSS7 releases, this release configures, compiles, installs and
+builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based
+distributions, and can be used on production kernels without patching or
+recompiling the kernel.
 
-This package is publicly released under the @cite{GNU General Public License Version 2}.
-The release is available as an @command{autoconf} tarball, SRPM, DSC, and set of binary RPMs and
-DEBs.  See the @uref{http://www.openss7.org/download.html,downloads page} for the @command{autoconf}
-tarballs, SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see the
-@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html,@value{PACKAGE} package page}.
+This package is publicly released under the @cite{GNU General Public License
+Version 2}.  The release is available as an @command{autoconf} tarball, SRPM,
+DSC, and set of binary RPMs and DEBs.  See the
+@uref{http://www.openss7.org/download.html,downloads page} for the
+@command{autoconf} tarballs, SRPMs and DSCs.  For tarballs, SRPMs, DSCs and
+binary RPMs and DEBs, see the
+@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html,@value{PACKAGE} package
+page}.
 
-See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog} and
-@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS} in the release for more
-information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the release (also in html
+See
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog}
+and @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS}
+in the release for more information.  Also, see the @file{@value{PACKAGE}.pdf}
+manual in the release (also in html
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
 
 For the news release, see @uref{http://www.openss7.org/rel20070108_G.html}.
