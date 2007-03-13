@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/12 10:19:27 $
+ @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/13 19:49:40 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 10:19:27 $ by $Author: brian $
+ Last Modified $Date: 2007/03/13 19:49:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p.c,v $
+ Revision 0.9.2.18  2007/03/13 19:49:40  brian
+ - test case timing tweaks
+
  Revision 0.9.2.17  2007/03/12 10:19:27  brian
  - corrections
 
@@ -108,9 +111,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/12 10:19:27 $"
+#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/13 19:49:40 $"
 
-static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/12 10:19:27 $";
+static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/13 19:49:40 $";
 
 #define TEST_M2PA   0
 #define TEST_X400   1
@@ -672,8 +675,8 @@ struct test_config {
 		    .t2h = 100 * 1000,	/* t2h - timer t2h duration (milliseconds) */
 		    .t3 = 1 * 1000,	/* t3 - timer t3 duration (milliseconds) */
 		    .t4n = 8 * 1000,	/* t4n - timer t4n duration (milliseconds) */
-		    .t4e = 500 * 1000 / 1000,	/* t4e - timer t4e duration (milliseconds) */
-		    .t5 = 125 * 1000 / 1000,	/* t5 - timer t5 duration (milliseconds) */
+		    .t4e = 500,		/* t4e - timer t4e duration (milliseconds) */
+		    .t5 = 125,		/* t5 - timer t5 duration (milliseconds) */
 		    .t6 = 4 * 1000,	/* t6 - timer t6 duration (milliseconds) */
 		    .t7 = 2 * 1000,	/* t7 - timer t7 duration (milliseconds) */
 		    .rb_abate = 3,	/* rb_abate - RB cong abatement (#msgs) */
@@ -19862,7 +19865,7 @@ test_10_2a_ptu(int child)
 				goto failure;
 			}
 			bsn[0] = fsn[0] = 0x7f;
-			if (start_tt(config->sl.t5))
+			if (start_tt(config->sl.t5 - 3))
 				goto failure;
 			if (do_signal(child, __TEST_SIB))
 				goto failure;
@@ -19884,7 +19887,7 @@ test_10_2a_ptu(int child)
 				goto failure;
 			count++;
 			if (count != n) {
-				if (start_tt(config->sl.t5))
+				if (start_tt(config->sl.t5 - 3))
 					goto failure;
 				bsn[0] = fsn[0] = 0x7f;
 				if (do_signal(child, __TEST_FISU_S))
@@ -20093,7 +20096,7 @@ test_10_3_ptu(int child)
 				goto failure;
 			}
 			bsn[0] = fsn[0] = 0x7f;
-			if (start_tt(config->sl.t5))
+			if (start_tt(config->sl.t5 - 3))
 				goto failure;
 			if (do_signal(child, __TEST_SIB))
 				goto failure;
@@ -20112,7 +20115,7 @@ test_10_3_ptu(int child)
 								goto failure;
 						goto failure;
 					}
-					if (start_tt(config->sl.t5))
+					if (start_tt(config->sl.t5 - 3))
 						goto failure;
 				case __TEST_FISU:
 					bsn[0] = fsn[0] = 0x7f;

@@ -1,5 +1,7 @@
 2007-03-13  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/test/test-m2pa.c: test case timing tweaks
+
 	* src/drivers/isua_as.c: function pointer type safety
 	* src/drivers/m2ua_as.c: function pointer type safety
 	* src/drivers/m3ua_as.c: function pointer type safety
