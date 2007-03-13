@@ -15,17 +15,17 @@ STRACE_OUTFILE=""
 # Error file name (default $BASENAME.error).
 STRACE_ERRFILE=""
 # Log device (default /dev/strlog, /dev/streams/log, /dev/log).
-STRACE_LOGDEVICE="/dev/streams/log"
+STRACE_LOGDEVICE="/dev/streams/clone/log"
 # Modules: triplets of <mod> <sub> <pri>, see strace(8)
 STRACE_MODULES=""
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/05/08 03:35:04 $
+# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/13 06:53:30 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -66,7 +66,7 @@ STRACE_MODULES=""
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/05/08 03:35:04 $ by $Author: brian $
+# Last Modified $Date: 2007/03/13 06:53:30 $ by $Author: brian $
 #
 # =============================================================================
 # vim ft=sh sw=4
