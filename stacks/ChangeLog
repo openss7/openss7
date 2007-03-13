@@ -1,3 +1,7 @@
+2007-03-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/x400p-ss7/sl_x400p.c: bug fixes for PR x400p-ss7/5766
+
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/x400p-ss7/sl_x400p.c: print more info on errors

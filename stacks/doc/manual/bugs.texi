@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.3 2007/03/09 04:09:29 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.4 2007/03/13 08:50:08 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,23 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/09 04:09:29 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/13 08:50:08 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 003.  2007-03-13T02:40:38-0600 (@command{x400p-ss7/5766})
+
+It appears that V401PE cards were almost loading (configuring, mapping, downloading firmware) but
+were failing to configure at the final stage of the process (matching device id to board type).
+The device id for the 2155 is supposed to be b4 regardless of E1 or T1, but I just guess that the
+card is reporting 34 instead of b4 for E1 (it might be the firmware setting or unsetting the high
+bit as was done for the other devices).  I changed the sl_x400p.c driver to print error messages
+when loading if such mismatches occur and set the device ids to accept 0x3X as an E1 2155 device and
+0bX as a T1/J1 2155 device (even though they are all the same).
+
+@emph{*fixed*} in @command{strss7-0.9a.6}
+
 @item 002.  2007-03-08T21:05:47-0700
 
 Timers were message up (using HZ instead of milliseconds) on the X400P driver.  This did not affect
