@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.4 2007/03/13 08:50:08 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.5 2007/03/13 19:12:25 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/13 08:50:08 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/13 19:12:25 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -67,6 +67,11 @@ card is reporting 34 instead of b4 for E1 (it might be the firmware setting or u
 bit as was done for the other devices).  I changed the sl_x400p.c driver to print error messages
 when loading if such mismatches occur and set the device ids to accept 0x3X as an E1 2155 device and
 0bX as a T1/J1 2155 device (even though they are all the same).
+
+As it turns out, the V401PE cards have a DS2156 chip instead of a DS2155 chip.  The only difference
+is the lack of Tx fixed gain control (register 0x7d) and the DS2156 supports a UTOPIA II bus that is
+not used on the V401PE.  I changed the driver to recognize the DS2156 and skip register 0x7d when it
+exists.  The DS2156 chip will work for both V401T (D33D) and V401E (D44D) cards.
 
 @emph{*fixed*} in @command{strss7-0.9a.6}
 
