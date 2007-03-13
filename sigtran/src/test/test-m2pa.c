@@ -14866,6 +14866,7 @@ Forward direction\
 static int
 test_4_1a_11_ptu(int child)
 {
+	uint32_t fsn_ack = -2U;
 	int dat = 0, ack = 0;
 	int origin = state;
 
@@ -14891,6 +14892,7 @@ test_4_1a_11_ptu(int child)
 					dat++;
 					if (do_signal(child, __TEST_DATA))
 						goto failure;
+					fsn_ack = bsn[1];
 					/* first data message, acknowledge it */
 					bsn[0] = fsn[1];
 					if (do_signal(child, __TEST_ACK))
@@ -14905,7 +14907,7 @@ test_4_1a_11_ptu(int child)
 					goto failure;
 				break;
 			case __TEST_ACK:
-				if (bsn[1] != fsn[0])
+				if (fsn_ack != fsn[0])
 					continue;
 				if (ack == 0) {
 					ack++;
@@ -17559,7 +17561,10 @@ test_8_4_ptu(int child)
 	for (;;) {
 		switch (state - origin) {
 		case 0:
+#if 0
+			/* this was discarding an event */
 			wait_event(child, 0);
+#endif
 			if (do_signal(child, __TEST_ACK))
 				goto failure;
 			state++;
@@ -18483,11 +18488,14 @@ test_8_12a_ptu(int child)
 	for (;;) {
 		switch (state - origin) {
 		case 0:
+#if 0
+			/* already fully in service */
 			if (expect(child, 0, __EVENT_NO_MSG))
 				if (last_event != __STATUS_IN_SERVICE)
 					goto failure;
 			if (do_signal(child, __STATUS_IN_SERVICE))
 				goto failure;
+#endif
 			state++;
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_DATA)) {
