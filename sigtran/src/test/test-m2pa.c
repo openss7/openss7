@@ -14866,7 +14866,6 @@ Forward direction\
 static int
 test_4_1a_11_ptu(int child)
 {
-	uint32_t fsn_ack = -2U;
 	int dat = 0, ack = 0;
 	int origin = state;
 
@@ -14892,7 +14891,6 @@ test_4_1a_11_ptu(int child)
 					dat++;
 					if (do_signal(child, __TEST_DATA))
 						goto failure;
-					fsn_ack = bsn[1];
 					/* first data message, acknowledge it */
 					bsn[0] = fsn[1];
 					if (do_signal(child, __TEST_ACK))
@@ -14907,8 +14905,6 @@ test_4_1a_11_ptu(int child)
 					goto failure;
 				break;
 			case __TEST_ACK:
-				if (fsn_ack != fsn[0])
-					continue;
 				if (ack == 0) {
 					ack++;
 					if (dat != 2)
