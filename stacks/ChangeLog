@@ -1,5 +1,7 @@
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/modules/x400p-ss7/sl_x400p.c: print more info on errors
+
 	* src/test/inet/test-tcpc.c: rationalize to sctp package
 	* src/test/inet/test-tcps.c: rationalize to sctp package
 	* src/test/inet/test-udpc.c: rationalize to sctp package
