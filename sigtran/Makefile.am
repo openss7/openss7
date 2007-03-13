@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/08 06:08:28 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/13 06:16:58 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/03/08 06:08:28 $ by $Author: brian $
+## Last Modified $Date: 2007/03/13 06:16:58 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.11  2007/03/13 06:16:58  brian
+## - suppress errors when building 32-bit libs
+##
 ## Revision 0.9.2.10  2007/03/08 06:08:28  brian
 ## - modutil_DATA should not be distributed (and it reorders uninstall)
 ##
