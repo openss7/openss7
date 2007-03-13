@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/09 04:09:33 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/13 05:46:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/09 04:09:33 $ by $Author: brian $
+ Last Modified $Date: 2007/03/13 05:46:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.32  2007/03/13 05:46:00  brian
+ - more info
+
  Revision 0.9.2.31  2007/03/09 04:09:33  brian
  - fixed timer bug in x400p driver
 
@@ -103,10 +106,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/09 04:09:33 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/13 05:46:00 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/09 04:09:33 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/13 05:46:00 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -159,7 +162,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/09 04:09:33 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/13 05:46:00 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -11764,14 +11767,14 @@ xp_download_fw(struct cd *cd, enum xp_board board)
 	timeout = jiffies + 20 * HZ / 1000;
 	while (jiffies < timeout) ;
 	if (!(*data & GPIO_INIT)) {
-		ptrace(("%s: ERROR: Xilinx Firmware Load: Failed\n", DRV_NAME));
+		cmn_err(CE_WARN, "%s: ERROR: Xilinx Firmware Load: Failed\n", DRV_NAME);
 		return (-EIO);
 	}
 	if (!(*data & GPIO_DONE)) {
-		ptrace(("%s: ERROR: Xilinx Firmware Load: Failed\n", DRV_NAME));
+		cmn_err(CE_WARN, "%s: ERROR: Xilinx Firmware Load: Failed\n", DRV_NAME);
 		return (-EIO);
 	}
-	__printd(("%s: Xilinx Firmware Load: Successful\n", DRV_NAME));
+	cmn_err(CE_NOTE, "%s: Xilinx Firmware Load: Successful\n", DRV_NAME);
 	return (0);
 }
 #endif
@@ -11792,23 +11795,23 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	unsigned long timeout;
 
 	if (!dev || !id) {
-		ptrace(("%s: ERROR: Device or id is null!\n", DRV_NAME));
+		cmn_err(CE_WARN, "%s: ERROR: Device or id is null!\n", DRV_NAME);
 		return (-ENXIO);
 	}
 	board = id->driver_data;
 	name = xp_board_info[board].name;
 
 	if (!(xp_board_info[board].hw_flags & XPF_SUPPORTED)) {
-		ptrace(("%s: ERROR: Driver does not support %s card.\n", DRV_NAME, name));
+		cmn_err(CE_WARN, "%s: ERROR: Driver does not support %s card.\n", DRV_NAME, name);
 		return (-ENXIO);
 	}
 	if (dev->irq < 1) {
-		ptrace(("%s: ERROR: No IRQ allocated for %s card.\n", DRV_NAME, name));
+		cmn_err(CE_WARN, "%s: ERROR: No IRQ allocated for %s card.\n", DRV_NAME, name);
 		return (-ENXIO);
 	}
 	printd(("%s: card %s allocated IRQ %d\n", DRV_NAME, name, dev->irq));
 	if (pci_enable_device(dev)) {
-		ptrace(("%s: ERROR: Could not enable %s pci card\n", DRV_NAME, name));
+		cmn_err(CE_WARN, "%s: ERROR: Could not enable %s pci card\n", DRV_NAME, name);
 		return (-ENODEV);
 	}
 	printd(("%s: enabled %s pci card type %ld\n", DRV_NAME, name, id->driver_data));
@@ -11819,7 +11822,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	    || !(cd->plx_region = pci_resource_start(dev, 0))
 	    || !(cd->plx_length = pci_resource_len(dev, 0))
 	    || !(cd->plx = ioremap(cd->plx_region, cd->plx_length))) {
-		ptrace(("%s: ERROR: Invalid PLX 9030 base resource\n", DRV_NAME));
+		cmn_err(CE_WARN, "%s: ERROR: Invalid PLX 9030 base resource\n", DRV_NAME);
 		goto error_remove;
 	}
 	printd(("%s: plx region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->plx_length,
@@ -11828,7 +11831,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	    || !(cd->xll_region = pci_resource_start(dev, 2))
 	    || !(cd->xll_length = pci_resource_len(dev, 2))
 	    || !(cd->xll = ioremap(cd->xll_region, cd->xll_length))) {
-		ptrace(("%s: ERROR: Invalid Xilinx 32-bit base resource\n", DRV_NAME));
+		cmn_err(CE_WARN, "%s: ERROR: Invalid Xilinx 32-bit base resource\n", DRV_NAME);
 		goto error_remove;
 	}
 	printd(("%s: xll region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->xll_length,
@@ -11837,32 +11840,32 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	    || !(cd->xlb_region = pci_resource_start(dev, 3))
 	    || !(cd->xlb_length = pci_resource_len(dev, 3))
 	    || !(cd->xlb = ioremap(cd->xlb_region, cd->xlb_length))) {
-		ptrace(("%s: ERROR: Invalid Xilinx 8-bit base resource\n", DRV_NAME));
+		cmn_err(CE_WARN, "%s: ERROR: Invalid Xilinx 8-bit base resource\n", DRV_NAME);
 		goto error_remove;
 	}
 	printd(("%s: xlb region %ld bytes at %lx, remapped %p\n", DRV_NAME, cd->xlb_length,
 		cd->xlb_region, cd->xlb));
 	cd->config.ifname = xp_board_info[id->driver_data].name;
 	if (!request_mem_region(cd->plx_region, cd->plx_length, cd->config.ifname)) {
-		ptrace(("%s: ERROR: Unable to reserve PLX memory\n", DRV_NAME));
+		cmn_err(CE_WARN, "%s: ERROR: Unable to reserve PLX memory\n", DRV_NAME);
 		goto error_remove;
 	}
 	printd(("%s: plx region %lx reserved %ld bytes\n", DRV_NAME, cd->plx_region,
 		cd->plx_length));
 	if (!request_mem_region(cd->xll_region, cd->xll_length, cd->config.ifname)) {
-		ptrace(("%s: ERROR: Unable to reserve Xilinx 32-bit memory\n", DRV_NAME));
+		cmn_err(CE_WARN, "%s: ERROR: Unable to reserve Xilinx 32-bit memory\n", DRV_NAME);
 		goto error_remove;
 	}
 	printd(("%s: xll region %lx reserved %ld bytes\n", DRV_NAME, cd->xll_region,
 		cd->xll_length));
 	if (!request_mem_region(cd->xlb_region, cd->xlb_length, cd->config.ifname)) {
-		ptrace(("%s: ERROR: Unable to reserve Xilinx 8-bit memory\n", DRV_NAME));
+		cmn_err(CE_WARN, "%s: ERROR: Unable to reserve Xilinx 8-bit memory\n", DRV_NAME);
 		goto error_remove;
 	}
 	printd(("%s: xlb region %lx reserved %ld bytes\n", DRV_NAME, cd->xlb_region,
 		cd->xlb_length));
-	__printd(("%s: card detected %s at 0x%lx/0x%lx irq %d\n", DRV_NAME,
-		  cd->config.ifname, cd->xll_region, cd->xlb_region, dev->irq));
+	cmn_err(CE_NOTE, "%s: card detected %s at 0x%lx/0x%lx irq %d\n", DRV_NAME,
+		  cd->config.ifname, cd->xll_region, cd->xlb_region, dev->irq);
 #ifdef X400P_DOWNLOAD_FIRMWARE
 	if (xp_download_fw(cd, board) != 0)
 		goto error_remove;
@@ -11882,8 +11885,8 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	cd->devrev &= XP_DEV_REVMASK;
 
 	if (!(xp_device_info[cd->device].hw_flags & XPF_SUPPORTED)) {
-		printd(("%s: Usupported framer device %s\n", DRV_NAME,
-			xp_device_info[cd->device].name));
+		cmn_err(CE_WARN, "%s: Usupported framer device %s\n", DRV_NAME,
+			xp_device_info[cd->device].name);
 		goto error_remove;
 	}
 	switch (cd->device) {
@@ -11935,16 +11938,16 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		}
 	}
 	if (cd->board == -1) {
-		printd(("%s: Device %s not supported for card %s\n", DRV_NAME,
-			xp_board_info[cd->board].name, xp_board_info[cd->device].name));
+		cmn_err(CE_WARN, "%s: Device %s not supported for card %s\n", DRV_NAME,
+			xp_device_info[cd->device].name, xp_board_info[board].name);
 		goto error_remove;
 	}
 	cd->hw_flags = xp_board_info[cd->board].hw_flags;
 	cd->hw_flags |= xp_device_info[cd->device].hw_flags;
 
-	__printd(("%s: %s (%s Rev. %c)\n", DRV_NAME,
+	cmn_err(CE_NOTE, "%s: %s (%s Rev. %c)\n", DRV_NAME,
 		  xp_board_info[cd->board].name,
-		  xp_device_info[cd->device].name, (char) (cd->devrev + 65)));
+		  xp_device_info[cd->device].name, (char) (cd->devrev + 65));
 
 	{
 		int word, idle_word = xp_board_info[cd->board].idle_word;
@@ -12099,7 +12102,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		goto error_remove;
 	}
 	if (request_irq(dev->irq, cd->isr, SA_INTERRUPT | SA_SHIRQ, DRV_NAME, cd)) {
-		ptrace(("%s: ERROR: Unable to request IRQ %d\n", DRV_NAME, dev->irq));
+		cmn_err(CE_WARN, "%s: ERROR: Unable to request IRQ %d\n", DRV_NAME, dev->irq);
 		goto error_remove;
 	}
 	cd->irq = dev->irq;
