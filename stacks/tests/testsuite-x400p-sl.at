@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl =========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-x400p-sl.at,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 02:23:37 $
+dnl @(#) $RCSfile: testsuite-x400p-sl.at,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/14 06:52:01 $
 dnl
 dnl -------------------------------------------------------------------------
 dnl
@@ -47,11 +47,14 @@ dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl -------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2007/03/12 02:23:37 $ by $Author: brian $
+dnl Last Modified $Date: 2007/03/14 06:52:01 $ by $Author: brian $
 dnl
 dnl -------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite-x400p-sl.at,v $
+dnl Revision 0.9.2.6  2007/03/14 06:52:01  brian
+dnl - fix lspci expression for older cards
+dnl
 dnl Revision 0.9.2.5  2007/03/12 02:23:37  brian
 dnl - updating tests
 dnl
@@ -71,7 +74,7 @@ dnl =========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_x400p_sl() {
-    if !(lspci -n -d 0x10b5: | egrep -q ':(930|3001D00D|0557|4000|d33d|d44d)' >/dev/null) ; then return 77; fi
+    if !(lspci -n -d 0x10b5: | egrep -q ':(9030|3001|d00d|0557|4000|d33d|d44d)' >/dev/null) ; then return 77; fi
     if test $at_verbose = echo ; then options='--verbose=5' ; else options='--again' ; fi
     if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
