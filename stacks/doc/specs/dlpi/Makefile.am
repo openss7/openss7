@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/14 04:23:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/14 04:28:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/14 04:23:16 $ by $Author: brian $
+# Last Modified $Date: 2007/03/14 04:28:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -62,7 +62,7 @@ dlpi_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
-if MAINTAINTER_MODE
+if MAINTAINER_MODE
 dlpi_TEXINFOS		+= \
 			  texi/args.texi
 endif
@@ -145,6 +145,9 @@ include ../../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.14  2007/03/14 04:28:05  brian
+# - typo
+#
 # Revision 0.9.2.13  2007/03/14 04:23:16  brian
 # - do not depend on args.texi or discheck target fails
 #

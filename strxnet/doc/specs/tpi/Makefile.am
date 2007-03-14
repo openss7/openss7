@@ -67,7 +67,7 @@ tpi_tcap_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/fdl.texi
 
-if MAINTAINTER_MODE
+if MAINTAINER_MODE
 tpi_TEXINFOS		+= \
 			  texi/args.texi
 tpi_tcap_TEXINFOS	+= \

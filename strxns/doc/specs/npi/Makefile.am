@@ -62,7 +62,7 @@ npi_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
-if MAINTAINTER_MODE
+if MAINTAINER_MODE
 npi_TEXINFOS		+= \
 			  texi/args.texi
 endif
