@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/06 21:23:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/14 04:23:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 21:23:43 $ by $Author: brian $
+# Last Modified $Date: 2007/03/14 04:23:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,7 +68,6 @@ strcompat_TEXINFOS	= \
 			  todo.texi \
 			  tree.texi \
 			  bugs.texi \
-			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
 			  texi/quick.texi \
@@ -80,7 +79,13 @@ strcompat_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/mail.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
+if MAINTAINTER_MODE
+strcompat_TEXINFOS	+= \
+			  texi/args.texi
+endif
+
 EXTRA_info_TEXINFOS	= \
+			  texi/args.texi \
 			  $(info_TEXINFOS) \
 			  $(strcompat_TEXINFOS)
 
@@ -92,6 +97,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.14  2007/03/14 04:23:02  brian
+# - do not depend on args.texi or discheck target fails
+#
 # Revision 0.9.2.13  2007/03/06 21:23:43  brian
 # - final updates and corrections to build process for release
 #
