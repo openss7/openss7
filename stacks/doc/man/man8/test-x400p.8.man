@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-x400p.8.man,v 0.9.2.7 2007/03/12 02:22:59 brian Exp $
+.\" @(#) $Id: test-x400p.8.man,v 0.9.2.8 2007/03/14 06:38:00 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/12 02:22:59 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/14 06:38:00 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-x400p.8.man,v $
+.\" Revision 0.9.2.8  2007/03/14 06:38:00  brian
+.\" - add missing options
+.\"
 .\" Revision 0.9.2.7  2007/03/12 02:22:59  brian
 .\" - updating tests
 .\"
@@ -246,7 +249,10 @@ That is, these options are only effective if test cases are being executed and a
 the manner in which test cases are executed or test case results reported.
 .TP
 \fB-d\fR, \fB--device\fR \fIDEVICE\fR
-Specifies the device name to open for the tests.
+Specifies the device name to open for the tests.  The default device name if
+.I DEVICE
+is not specified is
+.BR /dev/streams/clone/x400p-sl .
 .TP
 \fB-w\fR, \fB--wait\fR
 Specifies that the client or server is to wait indefinitely.  Normally a test
@@ -311,6 +317,100 @@ Indicates whether messages, in hexadecimal, should be included in the test case 
 independent of any
 .B --verbose
 setting.
+.SS Client Server Options
+.PP
+The following options are applicable to all command options.  These options
+determine whether the test case executes in client mode, server mode, or both
+and the addresses and port numbers associated with the client and server.
+.PP
+The following two options determine whether the test cases execute in client
+mode, server mode or both.  The default (that is used by
+.BR autotest )
+is to execute both the client and server sides in a self-validation test.
+.TP
+\fB-u\fR, \fB--iut\fR
+Requests that test cases be executed to expect the IUT (Implementation Under
+Test) form the SCTP association.  The default if this option is not specified
+is for the PTU (Protocol Test Unit) to form the SCTP association.
+.TP
+\fB-c\fR, \fB--client\fR
+Requests that the client side (PTU) of the test cases be executed (client mode).
+The default if neither the \fB-c\fR or \fB-S\fR options are specified is to
+execute both the client and server side of the selected test cases.
+Specifying both \fB-S\fR and \fB-c\fR has the same effect as the default
+(specifying neither).
+.TP
+\fB-S\fR, \fB--server\fR
+Requests that the server side (IUT) of the test cases be executed (server mode).
+The default if neither the \fB-c\fR or \fB-S\fR options are specified is to
+execute both the client and server side of the selected test cases.
+Specifying both \fB-S\fR and \fB-c\fR has the same effect as the default
+(specifying neither).
+.PP
+The following options are specific to execution of X400P test cases.  These
+options determine the SS7 standard version to which the PTU should test and
+the IUT should execute.
+.TP
+\fB-D\fR, \fB--decl-std\fR [\fISTANDARD\fR]
+Specifies the declared SS7 standard to which the Signalling Link Interface
+and protocol state machines are expected to conform.  This is the SS7 standard
+to which the IUT will conform and to which the PTU will test.
+.I STANDARD
+can be one of the following mnemonic values as a character string:
+.RS
+.TP \w'\fISS7_PVAR_ITUT_88\fR\(em'u
+.I SS7_PVAR_ITUT_88
+ITU-T Q.703 1988
+.PD 0
+.TP
+.I SS7_PVAR_ITUT_93
+ITU-T Q.703 1993
+.TP
+.I SS7_PVAR_ITUT_96
+ITU-T Q.703 1996
+.TP
+.I SS7_PVAR_ITUT_00
+ITU-T Q.703 2000
+.TP
+.I SS7_PVAR_ETSI_88
+ETSI EN 300 008-1 1988
+.TP
+.I SS7_PVAR_ETSI_93
+ETSI EN 300 008-1 1993
+.TP
+.I SS7_PVAR_ETSI_96
+ETSI EN 300 008-1 1996
+.TP
+.I SS7_PVAR_ETSI_00
+ETSI EN 300 008-1 200
+.TP
+.I SS7_PVAR_ANSI_92
+ANSI T1.111.3 1992
+.TP
+.I SS7_PVAR_ANSI_96
+ANSI T1.111.3 1996
+.TP
+.I SS7_PVAR_ANSI_00
+ANSI T1.111.3 2000
+.TP
+.I SS7_PVAR_JTTC_94
+TTC JT-Q.703 1994
+.TP
+.I SS7_PVAR_SING_88
+Singapore 1988
+.TP
+.I SS7_PVAR_SPAN_88
+Spain 1988
+.TP
+.I SS7_PVAR_CHIN_00
+China 2000
+.PD
+.PP
+The default standard when
+.I STANDARD
+is not specified is
+.BR SS7_PVAR_ITUT_00 .
+.RE
 .\"
 .\"
 .SH DIAGNOSTICS
