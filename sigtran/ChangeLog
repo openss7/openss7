@@ -1,5 +1,30 @@
 2007-03-13  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man4/isua-as.4.man: added manpages
+	* doc/man/man4/isua_as.4.man: added manpages
+	* doc/man/man4/sua_as.4.man: added manpages
+	* doc/man/man4/tua_as.4.man: added manpages
+	* doc/man/man4/ua-as.4.man: added manpages
+	* doc/man/man4/ua_as.4.man: added manpages
+
+	* doc/man/Makefile.am: manpage updates for check target
+	* doc/man/man4/iua-as.4.man: manpage updates for check target
+	* doc/man/man4/m2ua-as.4.man: manpage updates for check target
+	* doc/man/man4/m2ua_as_ioctl.4.man: manpage updates for check target
+	* doc/man/man4/m3ua-as.4.man: manpage updates for check target
+	* doc/man/man4/sua-as.4.man: manpage updates for check target
+	* doc/man/man4/tua-as.4.man: manpage updates for check target
+	* doc/man/man4/ua_as_ioctl.4.man: manpage updates for check target
+	* doc/man/man4/ua_sg_ioctl.4.man: manpage updates for check target
+	* doc/man/man5/sigtran.conf.5.man: manpage updates for check target
+	* doc/man/man7/ua_as_lm.7.man: manpage updates for check target
+	* doc/man/man8/iuaasconf.8.man: manpage updates for check target
+	* doc/man/man8/m2paconf.8.man: manpage updates for check target
+	* doc/man/man8/m2uaasconf.8.man: manpage updates for check target
+	* doc/man/man8/m2uaasd.8.man: manpage updates for check target
+	* doc/man/man8/m2uaconf.8.man: manpage updates for check target
+	* doc/manual/news.texi: updates for release
+
 	* src/test/test-m2pa.c: test case timing tweaks
 
 	* src/drivers/isua_as.c: function pointer type safety

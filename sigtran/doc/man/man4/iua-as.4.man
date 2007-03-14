@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
 .\"
-.\" @(#) $Id: iua-as.4.man,v 0.9.2.1 2007/01/21 20:20:06 brian Exp $
+.\" @(#) $Id: iua-as.4.man,v 0.9.2.2 2007/03/14 00:54:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/01/21 20:20:06 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/14 00:54:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: iua-as.4.man,v $
+.\" Revision 0.9.2.2  2007/03/14 00:54:27  brian
+.\" - manpages for check maintenance target
+.\"
 .\" Revision 0.9.2.1  2007/01/21 20:20:06  brian
 .\" - added documetation
 .\"
@@ -85,6 +88,25 @@ sort-adjacent-labels
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <stropts.h>
+.br
+.B #include <ss7/lmi.h>
+.br
+.B #include <ss7/lmi_ioctl.h>
+.br
+.B #include <ss7/dlpi.h>
+.br
+.B #include <ss7/dlpi_ioctl.h>
+.br
+.B #include <sys/iua_ioctl.h>
+.HP 12
+\fBint \fIiua_stream\fB = open(\fB\(lq\fI/dev/iua-sg1\fB\(rq, O_RDWR);
+.PD 0
+.HP
+\fBint \fIsctp_stream\fB = open(\fB\(lq\fI/dev/sctp_t\fB\(rq, O_RDWR);
+.HP
+\fBint \fImuxid\fB = ioctl(I_PLINK, (intptr_t) \fIsctp_stream\fB);
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -228,64 +250,250 @@ The IAU-AS driver provider several input-output controls for configuring the dri
 .PP
 .\"
 .\"
-.SH SYNOPSIS
+.SH NOTICES
 .PP
+The
+.B IUA-AS
+driver only directly supports the ASP-side of the IUA protocol.  For the SG-side of the protocol,
+see
+.BR iua-sg (4).
 .\"
 .\"
-.SH SYNOPSIS
+.SH IMPLEMENTATION
 .PP
+The
+.B IUA-AS
+driver is implemented as a
+.I STREAMS
+multiplexing driver.
 .\"
 .\"
-.SH SYNOPSIS
+.SH DEVICES
 .PP
+.TP
+.B /dev/iua-sg\fIn
+The
+.IR n 'th
+SG device.
+.TP
+.B /dev/streams/iua-sg/\fIn
+The
+.IR n 'th
+SG device.
 .\"
 .\"
-.SH SYNOPSIS
+.SH FILES
 .PP
+.TP
+.RB < ss7/lmi.h >
+Header file that defines the
+.BR lmi (7)
+interface used by signalling link streams opened on the upper multiplex.
+.TP
+.RB < ss7/lmi_ioctl.h >
+Header file that defines the
+.BR lmi_ioctl (7)
+input-output controls used by signalling link streams opened on the upper multiplex.
+.TP
+.RB < ss7/sli.h >
+Header file that defines the
+.BR sli (7)
+interface used by signalling link streams opened on the upper multiplex.
+.TP
+.RB < ss7/sli_ioctl.h >
+Header file that defines the
+.BR sli_ioctl (7)
+input-output controls used by signalling link streams opened on the upper multiplex.
+.TP
+.RB < sys/iua_ioctl.h >
+Header file that defines the
+.BR iua (4)
+input-output controls used by control streams opened on the upper multiplex.
 .\"
 .\"
-.SH SYNOPSIS
+.SH "SEE ALSO"
 .PP
+.BR iua (4),
+.BR SIGTRAN (4),
+.BR iua_ioctl (4),
+.BR iua_as_ioctl (4).
 .\"
 .\"
-.SH SYNOPSIS
+.SH BUGS
 .PP
-.\"
-.\"
-.SH SYNOPSIS
+The
+.B iua-as
+driver has no known bugs.  Report problems to
+.RB < bugs@openss7.org >.
 .PP
+The
+.B @PACKAGE@
+package has been tested with a wide array of production Linux distributions, kernels and target
+architectures, and is considered production grade by The OpenSS7 Project.  At the time of release,
+the
+.B @PACKAGE@
+package had no known bugs.  Problems can be reported to
+.RB < bugs@openss7.org >.
+Please, however, use the included
+.B send-pr
+script for generating actionable problem reports.  Please see the file \(lqPROBLEMS\(rq in the
+release for problem reporting guidelines.
 .\"
 .\"
-.SH SYNOPSIS
+.SH COMPATIBILITY
 .PP
+.B IUA-AS
+is compatible with implementations based on
+RFC 3331
+.[
+rfc3331
+.]
+and
+ETSI TS 102 141,
+.[
+ts 102 141
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+The
+.B IUA-AS
+driver supports integer and text Interface Identifiers.  Due to the nature of the Signalling Link
+Interface that the driver presents, it does not support range Interface Identifiers.
+.IP ""
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+does not support text Interface Identifiers.  When the
+.I version
+is set to
+.BR TS102141 ,
+all text interface identifiers are ignored and treated as null.
+.IP \(em
+The
+.B IUA-AS
+driver supports dynamic registration of Link Keys.
+.IP ""
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+does not permit use of dynamic registration.  Applications using the
+.B IUA-AS
+driver in an ETSI TS 102 141 environment should not invoke the dynamic registration procedures and
+should configure the SG for appropriate operation using input-output controls.  Setting a
+.I version
+of
+.B TS102141
+suppresses the ability to request dynamic registration and causes the driver to return
+\(lqUnsupported Message Class\(rq to any RKMM class message received.  Because this also suppresses
+text interface identifiers, all Keys specified must have a non-zero integer IID value.
+.IP \(em
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+does not support the broadcast AS traffic mode.  When
+.I version
+is set to
+.BR TS102141 ,
+the Broadcast traffic mode is treated as an unsupported value.
+.IP \(em
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+requires that a timer be set on the Establish Request and the request retransmitted if an Establish
+Confirm or Release Indication MAUP message is not received before the timer expires.  The timer is
+set to T1+T2+T3+T4 of Q.703.
+.[
+q703
+.]
+This behaviour is only occurs when
+.I version
+is set to
+.BR TS102141 .
+.IP \(em
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+cannot support the
+.B SL_LOCAL_PROCESSOR_OUTAGE_REQ
+and
+.B SL_LOCAL_PROCESSOR_RECOVERED_REQ
+primitives.  These primitives generate an error when
+.I version
+is set to
+.BR TS102141 .
+.IP \(em
+.B IUA-AS
+supports, as an option, the ASP Extensions defined in ASPEXT.
+.[
+draft-bidulock-sigtran-aspext-04.txt
+.]
+See
+.BR iua_as_ioctl (4)
+for more information on enabling this extension.
+.IP \(em
+.B IUA-AS
+supports, as an option, the SG Information extensions defined in SGINFO.
+.[
+draft-bidulock-sigtran-sginfo-05.txt
+.]
+See
+.BR iua_as_ioctl (4)
+for more information on enabling this extension.
 .\"
 .\"
-.SH SYNOPSIS
+.SH CONFORMANCE
 .PP
-.\"
-.\"
-.SH SYNOPSIS
+.IR "RFC 3331" ,
+.[
+rfc3331
+.]
+.IR "ETSI TS 102 141" ,
+.[
+ts 102 141
+.]
+.IR "ETSI TS 102 380" .
+.[
+ts 102 380
+.]
 .PP
-.\"
-.\"
-.SH SYNOPSIS
+Conformance to
+.IR "ETSI TS 102 141"
+.[
+ts 102 141
+.]
+per tests specified by
+.IR "ETSI TS 102 380" ,
+.[
+ts 102 380
+.]
+is validated using the
+.BR test-iua_as (8)
+test case executable and the package
+.B autotest
+test suite.
 .PP
+Conformance to
+.IR "RFC 3331" ,
+.[
+rfc3331
+.]
+is validated using the
+.BR test-iua (8)
+test case executable and the package
+.B autotest
+test suite.
 .\"
 .\"
-.SH SYNOPSIS
+.SH HISTORY
 .PP
-.\"
-.\"
-.SH SYNOPSIS
-.PP
-.\"
-.\"
-.SH SYNOPSIS
-.PP
-.\"
-.\"
-.SH SYNOPSIS
-.PP
+The
+.B IUA-AS
+driver was intially released for sigtran 0.9.2.2.
 .\"
 .\"
 .[

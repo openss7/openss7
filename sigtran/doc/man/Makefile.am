@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/01/23 10:00:40 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/14 00:54:26 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/01/23 10:00:40 $ by $Author: brian $
+## Last Modified $Date: 2007/03/14 00:54:26 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.6  2007/03/14 00:54:26  brian
+## - manpages for check maintenance target
+##
 ## Revision 0.9.2.5  2007/01/23 10:00:40  brian
 ## - added test program and m2ua-as updates
 ##
@@ -89,10 +92,14 @@ MANS_UNUSED = \
 	man4/isua.4 \
 	man4/isua_ioctl.4 \
 	man4/iua.4 \
+	man4/iua-as.4 \
 	man4/iua_ioctl.4 \
+	man4/m2pa_cd.4 \
+	man4/m2pa_dl.4 \
 	man4/m2ua.4 \
 	man4/m2ua_as.4 \
 	man4/m2ua-as.4 \
+	man4/m2ua_as_ioctl.4 \
 	man4/m2ua_ioctl.4 \
 	man4/m3pa.4 \
 	man4/m3tp.4 \
@@ -114,37 +121,56 @@ MANS_UNUSED = \
 	man4/tali-sccp.4 \
 	man4/tua.4 \
 	man4/tua_ioctl.4 \
+	man4/ua_as_ioctl.4 \
 	man4/ua_ioctl.4 \
+	man4/ua_sg_ioctl.4 \
 	man4/v5ua.4 \
 	man4/v5ua_ioctl.4 \
 	man8/bua.8 \
 	man8/isua.8 \
 	man8/iua.8 \
+	man8/iuaasconf.8 \
 	man8/m2pa.8 \
+	man8/m2paconf.8 \
 	man8/m2tp.8 \
 	man8/m2ua.8 \
+	man8/m2uaasconf.8 \
+	man8/m2uaasd.8 \
+	man8/m2uaconf.8 \
 	man8/m3tp.8 \
 	man8/m3ua.8 \
 	man8/sigtran.8 \
 	man8/sua.8 \
+	man8/test-m3ua_as.8 \
 	man8/tua.8 \
 	man8/uaconfd.8
 
 man_MANS = \
 	$(MANS_UNUSED) \
+	man4/isua-as.4 \
+	man4/isua_as.4 \
 	man4/m2pa.4 \
 	man4/m2pa_sl.4 \
 	man4/m2tp.4 \
+	man4/m3ua-as.4 \
 	man4/sdl_sctp.4 \
 	man4/sdt_sctp.4 \
 	man4/sdt_tpi.4 \
 	man4/sl_sctp.4 \
 	man4/sl_tpi.4 \
+	man4/sua-as.4 \
+	man4/sua_as.4 \
+	man4/tua-as.4 \
+	man4/tua_as.4 \
+	man4/ua-as.4 \
+	man4/ua_as.4 \
 	man5/sigtran.5 \
+	man5/sigtran.conf.5 \
 	man7/dlpi_dua.7 \
 	man7/dlpi_gr303ua.7 \
 	man7/dlpi_iua.7 \
 	man7/dlpli_gr303ua.7 \
+	man7/ua_as_lm.7 \
 	man8/sigtran_mknod.8 \
 	man8/test-m2pa.8 \
 	man8/test-m2ua_as.8 \
@@ -162,20 +188,27 @@ dist_noinst_MANS = \
 	man4/gr303ua.4.man \
 	man4/gr303ua_ioctl.4.man \
 	man4/isua.4.man \
+	man4/isua-as.4.man \
+	man4/isua_as.4.man \
 	man4/isua_ioctl.4.man \
 	man4/iua.4.man \
+	man4/iua-as.4.man \
 	man4/iua_ioctl.4.man \
 	man4/m2pa.4.man \
+	man4/m2pa_cd.4.man \
+	man4/m2pa_dl.4.man \
 	man4/m2pa_sl.4.man \
 	man4/m2tp.4.man \
 	man4/m2ua.4.man \
 	man4/m2ua_as.4.man \
 	man4/m2ua-as.4.man \
+	man4/m2ua_as_ioctl.4.man \
 	man4/m2ua_ioctl.4.man \
 	man4/m3pa.4.man \
 	man4/m3tp.4.man \
 	man4/m3ua.4.man \
 	man4/m3ua_as.4.man \
+	man4/m3ua-as.4.man \
 	man4/m3ua_ioctl.4.man \
 	man4/sdl_sctp.4.man \
 	man4/sdt_sctp.4.man \
@@ -184,6 +217,8 @@ dist_noinst_MANS = \
 	man4/sl_sctp.4.man \
 	man4/sl_tpi.4.man \
 	man4/sua.4.man \
+	man4/sua-as.4.man \
+	man4/sua_as.4.man \
 	man4/sua-gtt.4.man \
 	man4/sua_ioctl.4.man \
 	man4/sua-mgmt.4.man \
@@ -196,21 +231,34 @@ dist_noinst_MANS = \
 	man4/tali-mtp.4.man \
 	man4/tali-sccp.4.man \
 	man4/tua.4.man \
+	man4/tua-as.4.man \
+	man4/tua_as.4.man \
 	man4/tua_ioctl.4.man \
+	man4/ua-as.4.man \
+	man4/ua_as.4.man \
+	man4/ua_as_ioctl.4.man \
 	man4/ua_ioctl.4.man \
+	man4/ua_sg_ioctl.4.man \
 	man4/v5ua.4.man \
 	man4/v5ua_ioctl.4.man \
 	man5/sigtran.5.man \
+	man5/sigtran.conf.5.man \
 	man7/dlpi_dua.7.man \
 	man7/dlpi_gr303ua.7.man \
 	man7/dlpi_iua.7.man \
 	man7/dlpli_gr303ua.7.man \
+	man7/ua_as_lm.7.man \
 	man8/bua.8.man \
 	man8/isua.8.man \
 	man8/iua.8.man \
+	man8/iuaasconf.8.man \
 	man8/m2pa.8.man \
+	man8/m2paconf.8.man \
 	man8/m2tp.8.man \
 	man8/m2ua.8.man \
+	man8/m2uaasconf.8.man \
+	man8/m2uaasd.8.man \
+	man8/m2uaconf.8.man \
 	man8/m3tp.8.man \
 	man8/m3ua.8.man \
 	man8/sigtran.8.man \
@@ -218,6 +266,7 @@ dist_noinst_MANS = \
 	man8/sua.8.man \
 	man8/test-m2pa.8.man \
 	man8/test-m2ua_as.8.man \
+	man8/test-m3ua_as.8.man \
 	man8/test-sigtran.8.man \
 	man8/tua.8.man \
 	man8/uaconfd.8.man

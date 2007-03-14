@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tua-as.4.man,v 0.9.2.1 2007/03/09 05:56:25 brian Exp $
+.\" @(#) $Id: tua-as.4.man,v 0.9.2.2 2007/03/14 00:54:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/09 05:56:25 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/14 00:54:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tua-as.4.man,v $
+.\" Revision 0.9.2.2  2007/03/14 00:54:27  brian
+.\" - manpages for check maintenance target
+.\"
 .\" Revision 0.9.2.1  2007/03/09 05:56:25  brian
 .\" - added manual pages
 .\"
@@ -226,3 +229,108 @@ The steps 1 through 3 above are repeated for each entry in the configuration fil
 .IP 5.
 The utility can also open and attach TCAP Streams and link them under an TCAP-User multiplexing
 driver.
+.\"
+.\"
+.SH NOTICES
+.PP
+The TUA-AS
+driver only directly supports the ASP-side of the TUA protocol.  For the
+SG-side of the protocol, see
+.BR tua-sg (4).
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+The
+.B TUA-AS
+driver is implemented as a
+.I STREAMS
+multiplexing driver.
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/tua-sg\fIn
+The
+.IR n 'th
+SG device.
+.TP
+.B /dev/streams/tua-sg/\fIn
+The
+.IR n 'th
+SG device.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.TP
+.RB < ss7/tcapi.h >
+Header file that defines the TCAP interface,
+.RB tcapi (7).
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR tua_as_ioctl (4),
+.BR tua_ioctl (4).
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B tua-as
+driver has no known bugs.  Report problems to
+.RB < bugs@openss7.org >.
+.PP
+The
+.B @PACKAGE@
+package has been tested with a wide array of production Linux distributions, kernels and target
+architectures, and is considered production grade by The OpenSS7 Project.  At the time of release,
+the
+.B @PACKAGE@
+package had no known bugs.  Problems can be reported to
+.RB < bugs@openss7.org >.
+Please, however, use the included
+.B send-pr
+script for generating actionable problem reports.  Please see the file \(lqPROBLEMS\(rq in the
+release for problem reporting guidelines.
+.\"
+.\"
+.SH COMPATIBLITY
+.PP
+.B TUA-AS
+is compatible with implementations based on
+draft-bidulock-sigtran-tua-05.
+.[
+tua05
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+draft-bidulock-sigtran-tua-05
+.[
+tua05
+.]
+is not a standard.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "draft-bidulock-sigtran-tua-05" .
+.[
+tua05
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B TUA-AS
+driver was intially released for sigtran 0.9.2.2.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

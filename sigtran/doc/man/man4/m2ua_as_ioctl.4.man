@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
 .\"
-.\" @(#) $Id: m2ua_as_ioctl.4.man,v 0.9.2.1 2007/01/26 21:53:43 brian Exp $
+.\" @(#) $Id: m2ua_as_ioctl.4.man,v 0.9.2.2 2007/03/14 00:54:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/01/26 21:53:43 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/14 00:54:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: m2ua_as_ioctl.4.man,v $
+.\" Revision 0.9.2.2  2007/03/14 00:54:27  brian
+.\" - manpages for check maintenance target
+.\"
 .\" Revision 0.9.2.1  2007/01/26 21:53:43  brian
 .\" - working up AS drivers and docs
 .\"
@@ -1124,34 +1127,217 @@ driver.
 .\"
 .SH NOTICES
 .PP
+The
+.B M2UA-AS
+driver only directly supports the ASP-side of the M2UA protocol.  For the SG-side of the protocol,
+see
+.BR m2ua-sg (4).
+For a peer to peer link protocol, see
+.BR m2pa_sl (4).
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+The
+.B M2UA-AS
+driver is implemented as a
+.I STREAMS
+multiplexing driver.
 .\"
 .\"
-.SH EXAMPLES
-.PP
+.\".SH EXAMPLES
+.\".PP
 .\"
 .\"
 .SH BUGS
 .PP
+The
+.B m2ua-as
+driver has no known bugs.  Report problems to
+.RB < bugs@openss7.org >.
+.PP
+The
+.B @PACKAGE@
+package has been tested with a wide array of production Linux distributions, kernels and target
+architectures, and is considered production grade by The OpenSS7 Project.  At the time of release,
+the
+.B @PACKAGE@
+package had no known bugs.  Problems can be reported to
+.RB < bugs@openss7.org >.
+Please, however, use the included
+.B send-pr
+script for generating actionable problem reports.  Please see the file \(lqPROBLEMS\(rq in the
+release for problem reporting guidelines.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR m2ua-as (4).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B M2UA-AS
+is compatible with implementations based on
+RFC 3331
+.[
+rfc3331
+.]
+and
+ETSI TS 102 141,
+.[
+ts 102 141
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+The
+.B M2UA-AS
+driver supports integer and text Interface Identifiers.  Due to the nature of the Signalling Link
+Interface that the driver presents, it does not support range Interface Identifiers.
+.IP ""
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+does not support text Interface Identifiers.  When the
+.I version
+is set to
+.BR TS102141 ,
+all text interface identifiers are ignored and treated as null.
+.IP \(em
+The
+.B M2UA-AS
+driver supports dynamic registration of Link Keys.
+.IP ""
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+does not permit use of dynamic registration.  Applications using the
+.B M2UA-AS
+driver in an ETSI TS 102 141 environment should not invoke the dynamic registration procedures and
+should configure the SG for appropriate operation using input-output controls.  Setting a
+.I version
+of
+.B TS102141
+suppresses the ability to request dynamic registration and causes the driver to return
+\(lqUnsupported Message Class\(rq to any RKMM class message received.  Because this also suppresses
+text interface identifiers, all Keys specified must have a non-zero integer IID value.
+.IP \(em
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+does not support the broadcast AS traffic mode.  When
+.I version
+is set to
+.BR TS102141 ,
+the Broadcast traffic mode is treated as an unsupported value.
+.IP \(em
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+requires that a timer be set on the Establish Request and the request retransmitted if an Establish
+Confirm or Release Indication MAUP message is not received before the timer expires.  The timer is
+set to T1+T2+T3+T4 of Q.703.
+.[
+q703
+.]
+This behaviour is only occurs when
+.I version
+is set to
+.BR TS102141 .
+.IP \(em
+ETSI TS 102 141
+.[
+ts 102 141
+.]
+cannot support the
+.B SL_LOCAL_PROCESSOR_OUTAGE_REQ
+and
+.B SL_LOCAL_PROCESSOR_RECOVERED_REQ
+primitives.  These primitives generate an error when
+.I version
+is set to
+.BR TS102141 .
+.IP \(em
+.B M2UA-AS
+supports, as an option, the ASP Extensions defined in ASPEXT.
+.[
+draft-bidulock-sigtran-aspext-04.txt
+.]
+See
+.BR m2ua_as_ioctl (4)
+for more information on enabling this extension.
+.IP \(em
+.B M2UA-AS
+supports, as an option, the SG Information extensions defined in SGINFO.
+.[
+draft-bidulock-sigtran-sginfo-05.txt
+.]
+See
+.BR m2ua_as_ioctl (4)
+for more information on enabling this extension.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR "RFC 3331" ,
+.[
+rfc3331
+.]
+.IR "ETSI TS 102 141" ,
+.[
+ts 102 141
+.]
+.IR "draft-bidulock-sigtran-m2ua-ss7test" ,
+.[
+draft-bidulock-sigtran-m2ua-ss7test-02
+.]
+.IR "ETSI TS 102 380" .
+.[
+ts 102 380
+.]
+.PP
+Conformance to
+.IR "ETSI TS 102 141"
+.[
+ts 102 141
+.]
+per tests specified by
+.IR "ETSI TS 102 380" ,
+.[
+ts 102 380
+.]
+is validated using the
+.BR test-m2ua_as (8)
+test case executable and the package
+.B autotest
+test suite.
+.PP
+Conformance to
+.IR "RFC 3331" ,
+.[
+rfc3331
+.]
+per tests specified by
+.IR "draft-bidulock-sigtran-m2ua-ss7test" ,
+.[
+draft-bidulock-sigtran-m2ua-ss7test-02
+.]
+is validated using the
+.BR test-m2ua (8)
+test case executable and the package
+.B autotest
+test suite.
 .\"
 .\"
 .SH HISTORY
 .PP
+The
+.B M2UA-AS
+driver was intially released for sigtran 0.9.2.1.
 .\"
 .\"
 .[
