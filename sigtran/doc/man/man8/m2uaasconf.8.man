@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
 .\"
-.\" @(#) $Id: m2uaasconf.8.man,v 0.9.2.2 2007/01/26 21:54:31 brian Exp $
+.\" @(#) $Id: m2uaasconf.8.man,v 0.9.2.3 2007/03/14 00:54:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/01/26 21:54:31 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/14 00:54:32 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: m2uaasconf.8.man,v $
+.\" Revision 0.9.2.3  2007/03/14 00:54:32  brian
+.\" - manpages for check maintenance target
+.\"
 .\" Revision 0.9.2.2  2007/01/26 21:54:31  brian
 .\" - working up AS drivers and docs
 .\"
@@ -444,6 +447,11 @@ multiplexing driver with a global PPA and CLEI.
 .\"
 .SH SIGNALS
 .PP
+.TP
+.RI { SIGHUP }
+This signal causes the
+.B m2uaasconf
+utility to reread the configuration file.
 .\"
 .\"
 .SH DIAGNOSTICS
@@ -525,8 +533,8 @@ List one entry:
 .RE
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH BUGS
@@ -552,10 +560,15 @@ transparent to the SL-User opening SL streams, compatibility is not an issue.
 .\"
 .SH CONFORMANCE
 .PP
+Configuration is not subject to standardization.
+The utility conforms to OpenSS7 project specifications, coding and options standards.
 .\"
 .\"
 .SH HISTORY
 .PP
+The
+.B m2uaasconf
+configuration utility was first released in sigtran 0.9.2.2.
 .\"
 .\"
 .[

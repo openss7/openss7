@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: sua-as.4.man,v 0.9.2.2 2007/03/14 00:54:27 brian Exp $
+.\" @(#) $Id: ua-as.4.man,v 0.9.2.1 2007/03/14 00:53:48 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,13 +53,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/14 00:54:27 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/14 00:53:48 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: sua-as.4.man,v $
-.\" Revision 0.9.2.2  2007/03/14 00:54:27  brian
-.\" - manpages for check maintenance target
+.\" $Log: ua-as.4.man,v $
+.\" Revision 0.9.2.1  2007/03/14 00:53:48  brian
+.\" - added manual pages
 .\"
 .\" Revision 0.9.2.1  2007/03/09 05:56:25  brian
 .\" - added manual pages
@@ -80,23 +80,23 @@ sort-adjacent-labels
 .so sigtran.macros
 .\"
 .\"
-.TH SUA-AS 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.TH UA-AS 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
 .SH NAME
-.B sua-as
-\- SS7 SCCP User Adaptation Layer (SUA) Application Server (AS)
+.B ua-as
+\- SS7 SS7 User Adaptation Layer (UA) Application Server (AS)
 .\"
 .\"
 .SH SYNOPSIS
 .PP
 .B #include <stropts.h>
 .br
-.B #include <ss7/sccpi.h>
+.B #include <ss7/lmi.h>
 .br
-.B #include <ss7/sccpi_ioctl.h>
+.B #include <ss7/lmi_ioctl.h>
 .br
-.B #include <sys/sua_ioct.h>
+.B #include <sys/ua_ioct.h>
 .HP 12
-\fBint \fIsua_stream\fB = open(\fB\(lq\fI/dev/sua-sg1\fB\(rq, O_RDWR);
+\fBint \fIua_stream\fB = open(\fB\(lq\fI/dev/ua-sg1\fB\(rq, O_RDWR);
 .PD 0
 .HP
 \fBint \fIsctp_stream\fB = open(\fB\(lq\fI/dev/sctp_t\fB\(rq, O_RDWR);
@@ -107,45 +107,45 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
-The SUA-AS is a multipelxing driver that implements the ASP side of the SUA
+The UA-AS is a multipelxing driver that implements the ASP side of the UA
 .[
 rfc3868
 .]
 protocol.
 Streams opened on the upper multipelx provide the
-.IR "Signalling Connection Control Part Interface (SCCPI)" ,
-.BR sccpi (7).
+.IR "Local Management Interface (LMI)" ,
+.BR lmi (7).
 Streams linked under the lower multiplex provide the SCTP transport interface,
 .BR sctp_t (4).
 .\"
 .SS Configuration
 .PP
-When the SUA-AS driver is configured, SCTP Streams are opened and linked under the multiplexing
+When the UA-AS driver is configured, SCTP Streams are opened and linked under the multiplexing
 driver. Each SCTP Stream represents an association between a local ASP and a remote Signalling
 Gateway Process (SGP) on the same Signalling Gateway (SG).  Input-output ocntrols are used to
-configure each lower multiplex Stream.  Once a lower multiplex Stream is configured, the SUA-AS
-driver attempts to form an SCTP association with the remote SGP, and to bring each SUA association
+configure each lower multiplex Stream.  Once a lower multiplex Stream is configured, the UA-AS
+driver attempts to form an SCTP association with the remote SGP, and to bring each UA association
 into the ASP Up state.  Should the association be dropped, the ASP-SGP relation is moved tot he ASP
-Down state and the SUA-AS driver attempts to reconnect the association and bring it to the ASP Up
+Down state and the UA-AS driver attempts to reconnect the association and bring it to the ASP Up
 state and activate all active interfaces.
 .PP
-Once configured, SCCP Streams can be opened on the upper multiplex.  These SCCP Streams are not
+Once configured, SS7 Streams can be opened on the upper multiplex.  These SS7 Streams are not
 associated with an ASP-SGP association until they are bound or connected.  When the
 .BR N_BIND_REQ "(7) or " N_CONN_REQ (7)
 primitive is issued, the address contained in the request is composed of an SG identifier, and
-either an SCCP address (if the SG supports dynamic configuration), or a Routing Context (if the SG
-supports static configuration).  This information is sufficient for the SUA-AS driver to determine
+either an SS7 address (if the SG supports dynamic configuration), or a Routing Context (if the SG
+supports static configuration).  This information is sufficient for the UA-AS driver to determine
 the association (set) and Routing Key that is to be used to register the interface (AS).  When the
 .BR N_BIND_REQ "(7) or " N_CONN_REQ (7)
 primitive is issued, the registered or assigned Routing Context is used to activate the interface
 with each SGP for the remote SG.
 .PP
-After the SCCP-User has been boun dor connected with
+After the SS7-User has been boun dor connected with
 .BR N_BIND_REQ "(7) or " N_CONN_REQ (7)
-it can be linked beneath a SCCP-User multiplexing device driver (such as TCAP,
+it can be linked beneath a SS7-User multiplexing device driver (such as TCAP,
 .BR tcap (4)).
 .PP
-Configuration is performed using an SUA-AS driver configuration utility.  This utility reads a
+Configuration is performed using an UA-AS driver configuration utility.  This utility reads a
 configuration file used to define the objects necessary for configuration.  The configuration file
 contains entries that define ASP-SG relationships as follows:
 .TP
@@ -174,8 +174,8 @@ consisting of a single star,
 .RB ` * ',
 can be used to indicate a wildcard address.  If the port or service is not specified, then a dynamic
 port will be allocated.  If the service is specified as
-.BR sua ,
-then the SUA well-known port number will be used.
+.BR ua ,
+then the UA well-known port number will be used.
 .TP
 .I remote-endpoint
 The remote endpoint addess to which an SCTP association will connect to communicate with the remote
@@ -184,7 +184,7 @@ SG.  This can take the form:
 or the form:
 \fIipaddress\fR[\fB,\fIipaddress\fR][\fB:\fIservice\fR]
 or combinations of hostnames and IP addresses and either port or service.  If the port or service is
-not specified, the SUA well-known port number will be used.
+not specified, the UA well-known port number will be used.
 .TP
 .I options
 Contains a comma separated list of SG options, with no embedded whitespace.  The following options
@@ -203,43 +203,43 @@ The utility opens an SCTP association by opening the
 .B /dev/sctp_t
 device.
 .IP 2.
-The utility opens a Stream on the SUA-AS driver using the
-.B /dev/sua-as
-device and links the Stream for the SCTP association under the SUA-AS multiplexing driver using the
+The utility opens a Stream on the UA-AS driver using the
+.B /dev/ua-as
+device and links the Stream for the SCTP association under the UA-AS multiplexing driver using the
 .IR I_LINK (7)
 or
 .IR I_PLINK (7)
 input-output control.
 .IP 3.
-The utility uses a single specialized SUA-AS input-output control to associate the lower multiplex
+The utility uses a single specialized UA-AS input-output control to associate the lower multiplex
 Stream with an SG (and local ASP).  The input-output control takes the information provided in the
 configuration file line entry, and the mulltiplexer identifier returned from the
 .IR I_LINK (7)
 or
 .IR I_PLINK (7)
-input-output control operation.  The SUA-AS driver then creates a new ASP object if necessary and
+input-output control operation.  The UA-AS driver then creates a new ASP object if necessary and
 completes the SG object information as part of the lower multiplex Stream private structure.  The
-SUA-AS driver also binds and connects the SCTP association and attempts to bring the ASP to the ASP
+UA-AS driver also binds and connects the SCTP association and attempts to bring the ASP to the ASP
 Up state with the remote SG.
 .IP 4.
 The steps 1 through 3 above are repeated for each entry in the configuration file.
 .IP 5.
-The utility can also open and attach SCCP Streams and link them under an SCCP-User multiplexing
+The utility can also open and attach SS7 Streams and link them under an SS7-User multiplexing
 driver.
 .\"
 .\"
 .SH NOTICES
 .PP
-The SUA-AS
-driver only directly supports the ASP-side of the SUA protocol.  For the
+The UA-AS
+driver only directly supports the ASP-side of the UA protocol.  For the
 SG-side of the protocol, see
-.BR sua-sg (4).
+.BR ua-sg (4).
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
 The
-.B SUA-AS
+.B UA-AS
 driver is implemented as a
 .I STREAMS
 multiplexing driver.
@@ -248,12 +248,12 @@ multiplexing driver.
 .SH DEVICES
 .PP
 .TP
-.B /dev/sua-sg\fIn
+.B /dev/ua-sg\fIn
 The
 .IR n 'th
 SG device.
 .TP
-.B /dev/streams/sua-sg/\fIn
+.B /dev/streams/ua-sg/\fIn
 The
 .IR n 'th
 SG device.
@@ -263,21 +263,21 @@ SG device.
 .PP
 .TP
 .TP
-.RB < ss7/sccpi.h >
-Header file that defines the SCCP interface,
-.RB sccpi (7).
+.RB < ss7/lmi.h >
+Header file that defines the Local Management interface,
+.RB lmi (7).
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR sua_as_ioctl (4),
-.BR sua_ioctl (4).
+.BR ua_as_ioctl (4),
+.BR ua_ioctl (4).
 .\"
 .\"
 .SH BUGS
 .PP
 The
-.B sua-as
+.B ua-as
 driver has no known bugs.  Report problems to
 .RB < bugs@openss7.org >.
 .PP
@@ -297,33 +297,18 @@ release for problem reporting guidelines.
 .\"
 .SH COMPATIBLITY
 .PP
-.B SUA-AS
-is compatible with implementations based on
-RFC 3868.
-.[
-rfc3868
-.]
-with the following compatibility considerations:
-.IP \(em \w'\(em\(em'u
-RFC 3868
-.[
-rfc3868
-.]
-is not a standard.
+Various.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-.IR "RFC 3868" .
-.[
-rfc3868
-.]
+None.
 .\"
 .\"
 .SH HISTORY
 .PP
 The
-.B SUA-AS
+.B UA-AS
 driver was intially released for sigtran 0.9.2.2.
 .\"
 .\"

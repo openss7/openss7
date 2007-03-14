@@ -1,0 +1,1 @@
+.so man4/sua-as.4.man
