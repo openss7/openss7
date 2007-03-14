@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.17 $) $Date: 2007/03/06 21:23:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.18 $) $Date: 2007/03/14 04:22:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 21:23:20 $ by $Author: brian $
+# Last Modified $Date: 2007/03/14 04:22:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,7 +70,6 @@ LiS_TEXINFOS		= \
 			  todo.texi \
 			  tree.texi \
 			  bugs.texi \
-			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
 			  texi/quick.texi \
@@ -83,7 +82,13 @@ LiS_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/mail.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
+if MAINTAINER_MODE
+LiS_TEXINFOS		+= \
+			  texi/args.texi
+endif
+
 EXTRA_info_TEXINFOS	= \
+			  texi/args.texi \
 			  $(info_TEXINFOS) \
 			  $(LiS_TEXINFOS)
 
@@ -95,6 +100,9 @@ include ../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.6.18  2007/03/14 04:22:53  brian
+# - do not depend on args.texi or discheck target fails
+#
 # Revision 1.1.6.17  2007/03/06 21:23:20  brian
 # - final updates and corrections to build process for release
 #

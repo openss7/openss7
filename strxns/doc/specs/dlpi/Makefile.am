@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/06 22:08:10 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/14 04:23:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 22:08:10 $ by $Author: brian $
+# Last Modified $Date: 2007/03/14 04:23:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,11 +59,16 @@ if DEVELOPMENT
 info_TEXINFOS		+= dlpi.texi
 
 dlpi_TEXINFOS		= \
-			  texi/args.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
+if MAINTAINTER_MODE
+dlpi_TEXINFOS		+= \
+			  texi/args.texi
+endif
+
 EXTRA_info_TEXINFOS	= \
+			  texi/args.texi \
 			  $(info_TEXINFOS) \
 			  $(dlpi_TEXINFOS)
 
@@ -140,6 +145,9 @@ include ../../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.13  2007/03/14 04:23:16  brian
+# - do not depend on args.texi or discheck target fails
+#
 # Revision 0.9.2.12  2007/03/06 22:08:10  brian
 # - fix merge
 #

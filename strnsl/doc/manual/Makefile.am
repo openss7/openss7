@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/06 21:23:58 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/14 04:23:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 21:23:58 $ by $Author: brian $
+# Last Modified $Date: 2007/03/14 04:23:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,7 +68,6 @@ strnsl_TEXINFOS		= \
 			  todo.texi \
 			  tree.texi \
 			  bugs.texi \
-			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
 			  texi/sunrpc.texi \
@@ -83,14 +82,21 @@ strnsl_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 libxnsl_TEXINFOS	= \
-			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
+if MAINTAINTER_MODE
+strnsl_TEXINFOS		+= \
+			  texi/args.texi
+libxnsl_TEXINFOS	+= \
+			  texi/args.texi
+endif
+
 EXTRA_info_TEXINFOS	= \
+			  texi/args.texi \
 			  $(info_TEXINFOS) \
 			  $(strnsl_TEXINFOS) \
 			  $(libxnsl_TEXINFOS)
@@ -103,6 +109,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2007/03/14 04:23:06  brian
+# - do not depend on args.texi or discheck target fails
+#
 # Revision 0.9.2.3  2007/03/06 21:23:58  brian
 # - final updates and corrections to build process for release
 #

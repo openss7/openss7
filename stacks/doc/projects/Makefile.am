@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/06 21:26:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/14 04:22:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 21:26:12 $ by $Author: brian $
+# Last Modified $Date: 2007/03/14 04:22:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,21 +59,28 @@ if DEVELOPMENT
 info_TEXINFOS		+= lab.texi hlr.texi voip.texi
 
 lab_TEXINFOS		= \
-			  texi/args.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
 hlr_TEXINFOS		= \
-			  texi/args.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
 voip_TEXINFOS		= \
-			  texi/args.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
+if MAINTAINTER_MODE
+lab_TEXINFOS		+= \
+			  texi/args.texi
+hlr_TEXINFOS		+= \
+			  texi/args.texi
+voip_TEXINFOS		+= \
+			  texi/args.texi
+endif
+
 EXTRA_info_TEXINFOS	= \
+			  texi/args.texi \
 			  $(info_TEXINFOS) \
 			  $(lab_TEXINFOS) \
 			  $(hlr_TEXINFOS) \
@@ -199,6 +206,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.17  2007/03/14 04:22:59  brian
+# - do not depend on args.texi or discheck target fails
+#
 # Revision 0.9.2.16  2007/03/06 21:26:12  brian
 # - final updates and corrections to build process for release
 #

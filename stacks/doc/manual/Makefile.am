@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/06 21:26:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/03/14 04:22:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 21:26:12 $ by $Author: brian $
+# Last Modified $Date: 2007/03/14 04:22:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,7 +68,6 @@ strss7_TEXINFOS		= \
 			  todo.texi \
 			  tree.texi \
 			  bugs.texi \
-			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
 			  texi/quick.texi \
@@ -82,7 +81,6 @@ strss7_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 libxnet_TEXINFOS	= \
-			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
 			  texi/lesser.texi \
@@ -90,7 +88,15 @@ libxnet_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
+if MAINTAINTER_MODE
+strss7_TEXINFOS		+= \
+			  texi/args.texi
+libxnet_TEXINFOS	+= \
+			  texi/args.texi
+endif
+
 EXTRA_info_TEXINFOS	= \
+			  texi/args.texi \
 			  $(info_TEXINFOS) \
 			  $(strss7_TEXINFOS) \
 			  $(libxnet_TEXINFOS)
@@ -103,6 +109,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.33  2007/03/14 04:22:59  brian
+# - do not depend on args.texi or discheck target fails
+#
 # Revision 0.9.2.32  2007/03/06 21:26:12  brian
 # - final updates and corrections to build process for release
 #

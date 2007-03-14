@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/06 21:23:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/14 04:23:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 21:23:46 $ by $Author: brian $
+# Last Modified $Date: 2007/03/14 04:23:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -72,7 +72,6 @@ STREAMS_TEXINFOS	= \
 			  modules.texi \
 			  utilities.texi \
 			  bugs.texi \
-			  texi/args.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
 			  texi/quick.texi \
@@ -86,7 +85,6 @@ STREAMS_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 STREAMS_FAQ_TEXINFOS	= \
-			  texi/args.texi \
 			  texi/gpl.texi \
 			  texi/fdl.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
@@ -95,7 +93,6 @@ STREAMS_FAQ_TEXINFOS	= \
 
 
 SPG2_TEXINFOS		= \
-			  texi/args.texi \
 			  texi/gpl.texi \
 			  texi/fdl.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
@@ -103,7 +100,6 @@ SPG2_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 SPG_TEXINFOS		= \
-			  texi/args.texi \
 			  texi/gpl.texi \
 			  texi/fdl.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
@@ -111,15 +107,28 @@ SPG_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 porting_TEXINFOS	= \
-			  texi/args.texi \
 			  texi/gpl.texi \
 			  texi/fdl.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
+if MAINTAINTER_MODE
+STREAMS_TEXINFOS	+= \
+			  texi/args.texi
+STREAMS_FAQ_TEXINFOS	+= \
+			  texi/args.texi
+SPG2_TEXINFOS		+= \
+			  texi/args.texi
+SPG_TEXINFOS		+= \
+			  texi/args.texi
+porting_TEXINFOS	+= \
+			  texi/args.texi
+endif
+
 
 EXTRA_info_TEXINFOS	= \
+			  texi/args.texi \
 			  $(info_TEXINFOS) \
 			  $(STREAMS_TEXINFOS) \
 			  $(STREAMS_FAQ_TEXINFOS) \
@@ -201,6 +210,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.51  2007/03/14 04:23:03  brian
+# - do not depend on args.texi or discheck target fails
+#
 # Revision 0.9.2.50  2007/03/06 21:23:46  brian
 # - final updates and corrections to build process for release
 #

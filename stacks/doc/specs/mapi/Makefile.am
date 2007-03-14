@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/06 21:26:15 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/14 04:23:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 21:26:15 $ by $Author: brian $
+# Last Modified $Date: 2007/03/14 04:23:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,12 +59,17 @@ if DEVELOPMENT
 info_TEXINFOS		+= mapi.texi
 
 mapi_TEXINFOS	= \
-			  texi/args.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/fdl.texi
 
+if MAINTAINTER_MODE
+mapi_TEXINFOS		+= \
+			  texi/args.texi
+endif
+
 EXTRA_info_TEXINFOS	= \
+			  texi/args.texi \
 			  $(info_TEXINFOS) \
 			  $(mapi_TEXINFOS)
 
@@ -85,6 +90,9 @@ include ../../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.15  2007/03/14 04:23:13  brian
+# - do not depend on args.texi or discheck target fails
+#
 # Revision 0.9.2.14  2007/03/06 21:26:15  brian
 # - final updates and corrections to build process for release
 #
