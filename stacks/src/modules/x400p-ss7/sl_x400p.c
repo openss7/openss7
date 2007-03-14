@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/13 19:12:22 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/14 05:39:22 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/13 19:12:22 $ by $Author: brian $
+ Last Modified $Date: 2007/03/14 05:39:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.36  2007/03/14 05:39:22  brian
+ - corrected support for older Dallas chips
+
  Revision 0.9.2.35  2007/03/13 19:12:22  brian
  - add support for DS2156 chip
 
@@ -115,10 +118,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/13 19:12:22 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/14 05:39:22 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/13 19:12:22 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/14 05:39:22 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -171,7 +174,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/13 19:12:22 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/14 05:39:22 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -544,12 +547,12 @@ static struct {
 #define XP_DEV_IDMASK	0xf0
 #define XP_DEV_SHIFT	4
 #define XP_DEV_REVMASK	0x0f
-#define XP_DEV_DS2154	0x00
-#define XP_DEV_DS21354	0x01
-#define XP_DEV_DS21554	0x02
-#define XP_DEV_DS2152	0x08
-#define XP_DEV_DS21352	0x09
-#define XP_DEV_DS21552	0x0a
+#define XP_DEV_DS2152	0x00
+#define XP_DEV_DS21352	0x01
+#define XP_DEV_DS21552	0x02
+#define XP_DEV_DS2154	0x08
+#define XP_DEV_DS21354	0x09
+#define XP_DEV_DS21554	0x0a
 #define XP_DEV_DS2155	0x0b
 #define XP_DEV_DS2156	0x0c
 
@@ -557,17 +560,17 @@ STATIC struct {
 	char *name;
 	uint32_t hw_flags;
 } xp_device_info[] __devinitdata = {
-	{ "DS2154 (E1)",	1 },
-	{ "DS21354 (E1)",	1 },
-	{ "DS21554 (E1)",	1 },
+	{ "DS2152 (T1)",	1 },
+	{ "DS21352 (T1)",	1 },
+	{ "DS21552 (T1)",	1 },
 	{ "Unknown ID 0011",	0 },
 	{ "Unknown ID 0100",	0 },
 	{ "Unknown ID 0101",	0 },
 	{ "Unknown ID 0110",	0 },
 	{ "Unknown ID 0111",	0 },
-	{ "DS2152 (T1)",	1 },
-	{ "DS21352 (T1)",	1 },
-	{ "DS21552 (T1)",	1 },
+	{ "DS2154 (E1)",	1 },
+	{ "DS21354 (E1)",	1 },
+	{ "DS21554 (E1)",	1 },
 	{ "DS2155 (E1/T1/J1)",	1 },
 	{ "DS2156 (E1/T1/J1)",	1 },
 	{ "Unknown ID 1101",	0 },
@@ -11928,6 +11931,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			cd->board = -1;
 			break;
 		}
+		break;
 	case XP_DEV_DS2152:
 	case XP_DEV_DS21352:
 	case XP_DEV_DS21552:
@@ -11945,6 +11949,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			cd->board = -1;
 			break;
 		}
+		break;
 	case XP_DEV_DS2155:
 	case XP_DEV_DS2156:
 		switch (board) {
@@ -11958,6 +11963,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 			cd->board = -1;
 			break;
 		}
+		break;
 	}
 	if (cd->board == -1) {
 		cmn_err(CE_WARN, "%s: Device %s not supported for card %s", DRV_NAME,
