@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/14 04:23:03 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/03/14 04:27:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/14 04:23:03 $ by $Author: brian $
+# Last Modified $Date: 2007/03/14 04:27:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -113,7 +113,7 @@ porting_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
-if MAINTAINTER_MODE
+if MAINTAINER_MODE
 STREAMS_TEXINFOS	+= \
 			  texi/args.texi
 STREAMS_FAQ_TEXINFOS	+= \
@@ -210,6 +210,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.52  2007/03/14 04:27:32  brian
+# - typo
+#
 # Revision 0.9.2.51  2007/03/14 04:23:03  brian
 # - do not depend on args.texi or discheck target fails
 #

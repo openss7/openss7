@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/14 04:22:55 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/14 04:27:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/14 04:22:55 $ by $Author: brian $
+# Last Modified $Date: 2007/03/14 04:27:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -83,7 +83,7 @@ netperf_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/mail.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
-if MAINTAINTER_MODE
+if MAINTAINER_MODE
 netperf_TEXINFOS	+= \
 			  texi/args.texi
 endif
@@ -101,6 +101,9 @@ include ../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.16  2007/03/14 04:27:22  brian
+# - typo
+#
 # Revision 0.9.2.15  2007/03/14 04:22:55  brian
 # - do not depend on args.texi or discheck target fails
 #

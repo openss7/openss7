@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/14 04:23:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/14 04:27:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/14 04:23:12 $ by $Author: brian $
+# Last Modified $Date: 2007/03/14 04:27:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@ strxns_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/mail.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
-if MAINTAINTER_MODE
+if MAINTAINER_MODE
 strxns_TEXINFOS		+= \
 			  texi/args.texi
 endif
@@ -100,6 +100,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.29  2007/03/14 04:27:58  brian
+# - typo
+#
 # Revision 0.9.2.28  2007/03/14 04:23:12  brian
 # - do not depend on args.texi or discheck target fails
 #
