@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.19 2007/03/15 10:23:54 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.20 2007/03/15 22:36:12 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/15 10:23:54 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/15 22:36:12 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -104,10 +104,10 @@ separate tarball.
 
 @end itemize
 
-@emph{This is the initial public alpha release of the package.  Please see
+@emph{This is a public alpha release of the package.  Please see
 @file{README-alpha} in the release, or @refman{Maturity}.}
 
-This is the initial public alpha release of the package.  This package is
+This is a public alpha release of the package.  This package is
 currently incomplete.  It is being released as a reference point for the
 community.  If you are interested in completion of this package, contact
 @email{info@@openss7.com}.
