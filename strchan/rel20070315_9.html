@@ -1,0 +1,87 @@
+% # vim: ft=mason sw=4
+<%flags>
+    inherit	=> 'whatsnew.html'
+    package	=> 'strchan'
+    date	=> 'Mar 15, 2007'
+    rel		=> '0.9.2 Release 2'
+    file	=> 'strchan-0.9.2.2'
+    approved	=> 'Approved for Immediate Release'
+    where	=> 'Edmonton, Alberta'
+    headline	=> 'strchan 0.9.2.2 Released'
+</%flags><%attr>
+    revision	=> '$Id: rel20070108_9.html,v 0.9.2.2 2007/01/08 16:00:33 brian Exp $'
+    label	=> 'Mar 15, 2007'
+    heading	=> 'strchan 0.9.2.2 Released'
+</%attr><%method description>
+This is the second separate release from The OpenSS7 Project of the <cite>OpenSS7 STREAMS
+Channels</cite> package.  The package provides components that were previously part of the
+<tt>strss7</tt> package.
+This package contains all the necessary manual pages and other documentation.  The package is
+packaged as an OpenSS7 style autoconf tarball.
+</p><p style="margin-bottom:0in">
+This is the second pre-alpha release for Linux Fast-STREAMS and is an optional part of the OpenSS7
+Master Package (as of <tt>openss7-0.9.2.D</tt>).
+</p><p style="margin-bottom:0in">
+This release is a maintenance release providing support for recent distributions and tool chains.
+</p><p style="margin-bottom:0in">
+<em>This is the second public pre-alpha release of the package.  Please see
+    <a href="codefiles/strchan-0.9.2.2/README-alpha">README-alpha</a> in the release or
+    <a href="strchan_manual.html#Maturity">Maturity</a>, in the manual.</em>
+</p><p style="margin-bottom:0in">
+This package is currently incomplete.  It is being released as a reference point for the community.
+If you are interested in completion of this package, contact
+<a href="mailto:info@openss7.com">info@openss7.com</a>.
+</p><p style="margin-bottom:0in">
+Major features since the last public release are as follows:
+</p><ul style="margin-bottom:0in">
+<li>Improvements to the common build environment with better support for standalone package builds
+on 2.4 kernels.<bdo/></li>
+<li>Support for autoconf 2.61, automake 1.10 and gettext 0.16.<bdo/></li>
+<li>Support for Ubuntu 6.10 distribution and bug fixes for i386 kernels.<bdo/></li>
+<li>The package now looks for other subpackages with a version number as unpacked by separate
+tarball.<bdo/></li>
+</ul><p style="margin-bottom:0in">
+</%method><%method abstract>
+OpenSS7 today announced Release 0.9.2.2 of the STREAMS Channels (CHAN) <em>strchan</em> package.
+</%method><%method news>
+<& SELF:abstract &>
+The OpenSS7 STREAMS Channels package provides STREAMS modules and drivers, libraries, programs,
+init scripts, and daemons that implement the OpenSS7 STREAMS isochronous channels for the
+purpose of implementing data transmission links, or for carrying voice or other media, such as
+channelization of T1 carrier facilities, or ATM AAL3.  This package also includes pseudo-isochronous
+channels such as those provided by RTP.
+</p><p style="margin-bottom:0in">
+Included are hardware device drivers and pseudo-device drivers that provide implementations of
+specific channels.  A pseudo-device driver is planned to link into the Linux OSS (Open Sound
+System) and ALS (Advanced Linux Sound).  Specific E1/T1 cards such as the V401P are supported by
+this package.
+</p><p style="margin-bottom:0in">
+This package also supports data channel protocols for data communication over isochronous channels
+such as HDLC and SS7 DAEDR/DAEDT/AERM/SUERM.  Upper layer link protocols, such as LAPB, LAPF, LAPM
+and LLC are supported by separate packages.  These modules are provided here because they work
+directly over an isochronous channel and are therefore designed to work with them.  These data links
+provide support for the OpenSS7 STREAMS ISO/OSI as well as the OpenSS7 STREAMS ISDN Stacks and
+OpenSS7 STREAMS SS7 Stack packages.
+</p><p style="margin-bottom:0in">
+<& SELF:description &>
+</p><p style="margin-bottom:0in">
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based distributions,
+and can be used on production kernels without patching or recompiling the kernel.
+</p><p style="margin-bottom:0in">
+This package is publicly released under the
+<a href="license_gpl.html">GNU Public License Version 2</a>.<bdo/>
+The release is available as an autoconf tarball, SRPM, DSC, and set of binary RPMs and DEBs.
+See the <a href="download.html">downloads page</a> for the autoconf tarballs, SRPMs and DSCs.
+See the <a href="strchan_pkg.html"><em>strchan</em> package page</a> for tarballs, SRPMs, DSCs, and
+binary RPMs and DEBs.
+</p><p style="margin-bottom:0in">
+See <a href="codefiles/strchan-0.9.2.2/ChangeLog">ChangeLog</a> and
+<a href="codefiles/strchan-0.9.2.2/NEWS">NEWS</a> in the release for
+more information.  Also, see the
+<a href="codefiles/strchan-0.9.2.2/doc/manual/strchan.pdf">strchan.pdf</a>
+manual in the release (also in html <a href="strchan_manual.html">here</a>).<bdo/>
+</p>
+</%method><%method body>
+<& SELF:newsitem, comp => $m->base_comp &>
+</%method>

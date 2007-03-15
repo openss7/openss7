@@ -1,0 +1,72 @@
+% # vim: ft=mason sw=4
+<%flags>
+    inherit	=> 'whatsnew.html'
+    package	=> 'strsock'
+    date	=> 'Mar 15, 2007'
+    rel		=> '0.9.2 Release 2'
+    file	=> 'strsock-0.9.2.2'
+    approved	=> 'Approved for Immediate Release'
+    where	=> 'Edmonton, Alberta'
+    headline	=> 'strsock 0.9.2.2 Released'
+</%flags><%attr>
+    revision	=> '$Id: rel20070108_C.html,v 0.9.2.2 2007/01/08 16:00:43 brian Exp $'
+    label	=> 'Mar 15, 2007'
+    heading	=> 'strsock 0.9.2.2 Released'
+</%attr><%method description>
+This OpenSS7 Project release is the second separate release of the OpenSS7 STREAMS Sockets package
+whose components were formerly part of the <tt>strss7</tt>, <tt>strxnet</tt> and <tt>streams</tt>
+packages.  These networking modules provide the Sockets library.  The package contains all the
+necessary manual pages and other doumentation.  The package is packaged as an OpenSS7 style autoconf
+tarball.
+</p><p style="margin-bottom:0in">
+This is the second alpha release for Linux Fast-STREAMS and is part of
+the OpenSS7 Master Package (openss7-0.9.2.E).  This release is
+primarily a maintenance release supporting recent distributions and
+tool chains.
+</p><p style="margin-bottom:0in">
+Major features since the last public release are as follows:
+</p><ul style="margin-bottom:0in">
+<li>Improvements to the common build environment with better support for standalone package builds
+on 2.4 kernels.<bdo/></li>
+<li>Support for autoconf 2.61, automake 1.10 and gettext 0.16.<bdo/></li>
+<li>Support for Ubuntu 6.10 distribution and bug fixes for i386 kenels.<bdo/></li>
+<li>The package now looks for other subpackages with a version number as unpacked by separate
+tarball.<bdo/></li>
+</ul><p style="margin-bottom:0in">
+<em>This is a public alpha release of the package.  This package is currently incomplete.
+    It is being released as a reference point for the community.  If you are interested in
+    completion of this package, contact <a href="mailto:info@openss7.com">info@openss7.com</a>.</em>
+</p><p style="margin-bottom:0in">
+</%method><%method abstract>
+OpenSS7 today announced Release 0.9.2.2 of the STREAMS Socket Library (SOCK) <em>strsock</em> package.
+</%method><%method news>
+<& SELF:abstract &>
+The OpenSS7 STREAMS Sockets package provides STREAMS modules and drivers, libraries, programs,
+initialization scripts, and daemons.
+</p><p style="margin-bottom:0in">
+The OpenSS7 STREAMS Sockets package contains header files and a number of modules and drivers and
+the associated documentation originally contained in the Linux Fast-STREAMS release, but not
+contained in the Linux STREAMS (LiS) releases.
+</p><p style="margin-bottom:0in">
+<& SELF:description &>
+</p><p style="margin-bottom:0in">
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based distributions,
+and can be used on production kernels without patching or recompiling the kernel.
+</p><p style="margin-bottom:0in">
+This package is publicly released under the
+<a href="license_gpl.html">GNU Public License Version 2</a>.<bdo/>
+The release is available as an autoconf tarball, SRPM, DSC, and set of binary RPMs and DEBs.
+See the <a href="download.html">downloads page</a> for the autoconf tarballs, SRPMs and DSCs.
+See the <a href="strsock_pkg.html"><em>strsock</em> package page</a> for tarballs, SRPMs, DSCs, and
+binary RPMs and DEBs.
+</p><p style="margin-bottom:0in">
+See <a href="codefiles/strsock-0.9.2.2/ChangeLog">ChangeLog</a> and
+<a href="codefiles/strsock-0.9.2.2/NEWS">NEWS</a> in the release for
+more information.  Also, see the
+<a href="codefiles/strsock-0.9.2.2/doc/manual/strsock.pdf">strsock.pdf</a>
+manual in the release (also in html <a href="strsock_manual.html">here</a>).<bdo/>
+</p>
+</%method><%method body>
+<& SELF:newsitem, comp => $m->base_comp &>
+</%method>
