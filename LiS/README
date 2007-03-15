@@ -1,5 +1,5 @@
-Linux STREAMS (LiS) -- read me first file.  2007-03-07
-$Id: README,v 1.1.1.2.12.18 2007/03/07 14:20:14 brian Exp $
+Linux STREAMS (LiS) -- read me first file.  2007-03-15
+$Id: README,v 1.1.1.2.12.19 2007/03/15 20:10:06 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  Linux STREAMS (LiS)
 ====================
 
-Package LiS-2.18.5 was released under GPLv2 2007-03-07.
+Package LiS-2.18.5 was released under GPLv2 2007-03-15.
 
 The `OpenSS7 Linux STREAMS (LiS)' package is an OpenSS7 modified
 version of the `LiS-2.18' package formerly from `GCOM', and formerly
@@ -60,7 +60,7 @@ well.
  Release
 --------
 
-This is the `LiS-2.18.5' package, released 2007-03-07.  This `2.18.5'
+This is the `LiS-2.18.5' package, released 2007-03-15.  This `2.18.5'
 release, and the latest version, can be obtained from the download area
 (http://www.openss7.org/download.html) of The OpenSS7 Project website
 using a command such as:

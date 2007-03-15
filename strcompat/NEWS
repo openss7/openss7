@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Compatibility -- history of user visible changes.  2007-03-13
-$Id: NEWS,v 0.9.2.29 2007/03/13 19:51:12 brian Exp $
+OpenSS7 STREAMS Compatibility -- history of user visible changes.  2007-03-15
+$Id: NEWS,v 0.9.2.30 2007/03/15 20:10:35 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -66,7 +66,7 @@ release for more information.  Also, see the `strcompat.pdf' manual in
 the release (also in html
 `http://www.openss7.org/strcompat_manual.html').
 
-For the news release, see `http://www.openss7.org/rel20070306_J.html'.
+For the news release, see `http://www.openss7.org/rel20070315_J.html'.
 
  Major changes for release strcompat-0.9.2.4
 --------------------------------------------
