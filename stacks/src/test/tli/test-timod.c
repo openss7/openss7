@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/12 02:23:32 $
+ @(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/15 10:15:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 02:23:32 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:15:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-timod.c,v $
+ Revision 0.9.2.12  2007/03/15 10:15:09  brian
+ - test case reporting and release date
+
  Revision 0.9.2.11  2007/03/12 02:23:32  brian
  - updating tests
 
@@ -70,9 +73,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/12 02:23:32 $"
+#ident "@(#) $RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/15 10:15:09 $"
 
-static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/12 02:23:32 $";
+static char const ident[] = "$RCSfile: test-timod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/15 10:15:09 $";
 
 /*
  *  These is a ferry-clip TIMOD conformance test program for testing the

@@ -1,5 +1,7 @@
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/news.texi: pulled release date
+	* po/de.po: sometimes I hate gnu gettext
 	* src/test/inet/test-inet_raw.c: report failed expectations on test cases
 	* src/test/inet/test-inet_sctp.c: report failed expectations on test cases
 	* src/test/inet/test-inet_tcp.c: report failed expectations on test cases

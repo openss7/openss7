@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/12 02:23:34 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/15 10:15:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 02:23:34 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:15:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 0.9.2.12  2007/03/15 10:15:15  brian
+ - test case reporting and release date
+
  Revision 0.9.2.11  2007/03/12 02:23:34  brian
  - updating tests
 
@@ -70,9 +73,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/12 02:23:34 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/15 10:15:15 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/12 02:23:34 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/15 10:15:15 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
