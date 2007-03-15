@@ -1,5 +1,6 @@
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/news.texi: pulled release date
 	* doc/man/man8/test-m2pa.8.man: report failed expectations on test cases
 	* src/test/test-m2pa.c: report failed expectations on test cases
 	* src/test/test-m2ua_as.c: report failed expectations on test cases

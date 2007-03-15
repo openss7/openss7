@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/13 19:49:34 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/15 10:08:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/13 19:49:34 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:08:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.16  2007/03/15 10:08:53  brian
+ - updates for release
+
  Revision 0.9.2.15  2007/03/13 19:49:34  brian
  - test case timing tweaks
 
@@ -115,9 +118,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/13 19:49:34 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/15 10:08:53 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/13 19:49:34 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/15 10:08:53 $";
 
 #define TEST_M2PA   1
 #define TEST_X400   0
