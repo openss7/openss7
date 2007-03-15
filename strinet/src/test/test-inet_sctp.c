@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/03/12 09:34:17 $
+ @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/15 10:22:35 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:34:17 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:22:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_sctp.c,v $
+ Revision 0.9.2.31  2007/03/15 10:22:35  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.30  2007/03/12 09:34:17  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -217,9 +220,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/03/12 09:34:17 $"
+#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/15 10:22:35 $"
 
-static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/03/12 09:34:17 $";
+static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/15 10:22:35 $";
 
 /*
  *  Simple test program for INET streams.

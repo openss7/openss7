@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-chan.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:37 $
+ @(#) $RCSfile: test-chan.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/15 10:22:06 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 08:59:37 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:22:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-chan.c,v $
+ Revision 0.9.2.3  2007/03/15 10:22:06  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.2  2006/12/18 08:59:37  brian
  - working up strchan package
 
@@ -72,9 +75,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-chan.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:37 $"
+#ident "@(#) $RCSfile: test-chan.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/15 10:22:06 $"
 
-static char const ident[] = "$RCSfile: test-chan.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:59:37 $";
+static char const ident[] = "$RCSfile: test-chan.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/15 10:22:06 $";
 
 #include <sys/types.h>
 #include <stropts.h>

@@ -1,5 +1,6 @@
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/news.texi: pushed release date
 	* src/test/test-voip.c: report failed expectations
 
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>

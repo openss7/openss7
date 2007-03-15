@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/15 02:02:05 $
+ @(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/15 10:23:31 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 02:02:05 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:23:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-interop.c,v $
+ Revision 0.9.2.7  2007/03/15 10:23:31  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.6  2007/03/15 02:02:05  brian
  - last known bug fixes, report failed expectations
 
@@ -114,9 +117,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/15 02:02:05 $"
+#ident "@(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/15 10:23:31 $"
 
-static char const ident[] = "$RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/15 02:02:05 $";
+static char const ident[] = "$RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/15 10:23:31 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -10600,7 +10603,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -10655,7 +10658,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.177 $) $Date: 2007/03/12 03:28:24 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.178 $) $Date: 2007/03/15 10:22:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 03:28:24 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:22:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.178  2007/03/15 10:22:10  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.177  2007/03/12 03:28:24  brian
  - remove old ms_acnt pegs
 
@@ -190,10 +193,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.177 $) $Date: 2007/03/12 03:28:24 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.178 $) $Date: 2007/03/15 10:22:10 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.177 $) $Date: 2007/03/12 03:28:24 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.178 $) $Date: 2007/03/15 10:22:10 $";
 
 //#define __NO_VERSION__
 
@@ -294,7 +297,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.177 $) $Date: 2007/03/12 03:28:24 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.178 $) $Date: 2007/03/15 10:22:10 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -4279,7 +4282,7 @@ stropen(struct inode *inode, struct file *file)
 				_ptrace(("Error path taken for sd %p\n", sd));
 				/* should be qclose instead */
 				qdetach(sd->sd_rq, oflag, crp);
-				goto up_put_error;
+				goto put_error;
 			}
 			/* we need a new snode (inode in the device shadow directory) */
 			/* qattach() should have already cleaned up the stream head and queue pairs 
@@ -4289,7 +4292,7 @@ stropen(struct inode *inode, struct file *file)
 				/* should be qclose instead */
 				qdetach(sd->sd_rq, oflag, crp);
 				_ctrace(cdrv_put(cdev));
-				goto up_put_error;
+				goto put_error;
 			}
 			sd->sd_dev = dev;
 			_ctrace(cdrv_put(sd->sd_cdevsw));

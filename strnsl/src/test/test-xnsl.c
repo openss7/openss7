@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:21:19 $
+ @(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/15 10:23:26 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 08:21:19 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:23:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnsl.c,v $
+ Revision 0.9.2.3  2007/03/15 10:23:26  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.2  2006/12/18 08:21:19  brian
  - resolve device numbering
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:21:19 $"
+#ident "@(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/15 10:23:26 $"
 
-static char const ident[] = "$RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:21:19 $";
+static char const ident[] = "$RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/15 10:23:26 $";
 
 /*
  *  This is a basic test program for the Network Services Library, libxnsl,

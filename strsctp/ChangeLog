@@ -1,5 +1,7 @@
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/news.texi: pushed release date
+
 	* doc/manual/bugs.texi: last known bugs fixes
 	* doc/manual/news.texi: last known bugs fixes
 	* src/drivers/sctp2.c: last known bugs fixes

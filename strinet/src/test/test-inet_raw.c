@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/03/08 08:26:42 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/03/15 10:22:25 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/08 08:26:42 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:22:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.54  2007/03/15 10:22:25  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.53  2007/03/08 08:26:42  brian
  - print primitives at default verbosity
 
@@ -259,9 +262,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/03/08 08:26:42 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/03/15 10:22:25 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/03/08 08:26:42 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/03/15 10:22:25 $";
 
 /*
  *  Simple test program for INET streams.

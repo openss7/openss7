@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 09:35:05 $
+ @(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/15 10:23:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:35:05 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:23:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_ns.c,v $
+ Revision 0.9.2.10  2007/03/15 10:23:34  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.9  2007/03/12 09:35:05  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -67,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 09:35:05 $"
+#ident "@(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/15 10:23:34 $"
 
-static char const ident[] = "$RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 09:35:05 $";
+static char const ident[] = "$RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/15 10:23:34 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -540,7 +543,7 @@ splash(int argc, char *argv[])
 	fprintf(stdout, "\
 RFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Suite\n\
 \n\
-Copyright (c) 2001-2006 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2007 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -594,7 +597,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

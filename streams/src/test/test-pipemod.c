@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/12/18 07:32:45 $
+ @(#) $RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/15 10:22:17 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 07:32:45 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:22:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-pipemod.c,v $
+ Revision 0.9.2.24  2007/03/15 10:22:17  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.23  2006/12/18 07:32:45  brian
  - lfs device names, autoload clone minors, device numbering, missing manpages
 
@@ -144,9 +147,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/12/18 07:32:45 $"
+#ident "@(#) $RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/15 10:22:17 $"
 
-static char const ident[] = "$RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2006/12/18 07:32:45 $";
+static char const ident[] = "$RCSfile: test-pipemod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/15 10:22:17 $";
 
 #include <sys/types.h>
 #include <stropts.h>

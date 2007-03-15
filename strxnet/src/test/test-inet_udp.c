@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/12 09:35:26 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/15 10:24:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:35:26 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:24:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.15  2007/03/15 10:24:16  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.14  2007/03/12 09:35:26  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -137,9 +140,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/12 09:35:26 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/15 10:24:16 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/12 09:35:26 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/15 10:24:16 $";
 
 /*
  *  Simple test program for INET streams.

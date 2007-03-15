@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/10 07:24:17 $
+ @(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/15 10:24:01 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/10 07:24:17 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:24:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-pipe.c,v $
+ Revision 0.9.2.10  2007/03/15 10:24:01  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.9  2006/03/10 07:24:17  brian
  - rationalized streams and strutil package sources
 
@@ -102,9 +105,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/10 07:24:17 $"
+#ident "@(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/15 10:24:01 $"
 
-static char const ident[] = "$RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/10 07:24:17 $";
+static char const ident[] = "$RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/15 10:24:01 $";
 
 #include <sys/types.h>
 #include <stropts.h>

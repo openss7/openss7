@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/12/18 07:32:45 $
+ @(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/15 10:22:18 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 07:32:45 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:22:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sc.c,v $
+ Revision 0.9.2.25  2007/03/15 10:22:18  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.24  2006/12/18 07:32:45  brian
  - lfs device names, autoload clone minors, device numbering, missing manpages
 
@@ -146,9 +149,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/12/18 07:32:45 $"
+#ident "@(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/15 10:22:18 $"
 
-static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/12/18 07:32:45 $";
+static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/15 10:22:18 $";
 
 #include <sys/types.h>
 #include <stropts.h>

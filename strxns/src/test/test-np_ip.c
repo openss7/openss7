@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/12 09:35:32 $
+ @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/15 10:24:31 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:35:32 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:24:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-np_ip.c,v $
+ Revision 0.9.2.19  2007/03/15 10:24:31  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.18  2007/03/12 09:35:32  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -126,9 +129,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/12 09:35:32 $"
+#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/15 10:24:31 $"
 
-static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/12 09:35:32 $";
+static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/15 10:24:31 $";
 
 /*
  *  Simple test program for NPI-IP streams.
