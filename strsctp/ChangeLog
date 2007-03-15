@@ -1,3 +1,16 @@
+2007-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/bugs.texi: last known bugs fixes
+	* doc/manual/news.texi: last known bugs fixes
+	* src/drivers/sctp2.c: last known bugs fixes
+
+	* src/test/test-etsi_n.c: report failed expectations
+	* src/test/test-etsi_t.c: report failed expectations
+	* src/test/test-interop.c: report failed expectations
+	* src/test/test-sctp_n.c: report failed expectations
+	* src/test/test-sctp_n2.c: report failed expectations
+	* src/test/test-sctp_t.c: report failed expectations
+
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man8/test-sctp_n.8.man: boosted default port 10000->18000

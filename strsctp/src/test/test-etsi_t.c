@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 09:35:00 $
+ @(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/15 02:02:04 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:35:00 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 02:02:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-etsi_t.c,v $
+ Revision 0.9.2.10  2007/03/15 02:02:04  brian
+ - last known bug fixes, report failed expectations
+
  Revision 0.9.2.9  2007/03/12 09:35:00  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -99,9 +102,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 09:35:00 $"
+#ident "@(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/15 02:02:04 $"
 
-static char const ident[] = "$RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 09:35:00 $";
+static char const ident[] = "$RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/15 02:02:04 $";
 
 /*
  *  This file is for testing the sctp_t module.  It is provided for the
@@ -3499,7 +3502,7 @@ print_expect(int child, int want)
 		"                    |- |- [Expected %-16s ] -|                     [%d:%03d]\n",
 	};
 
-	if (verbose > 1 && show)
+	if (verbose > 0 && show)
 		print_string_state(child, msgs, event_string(child, want));
 }
 

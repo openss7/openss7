@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 09:35:02 $
+ @(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/15 02:02:05 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:35:02 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 02:02:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-interop.c,v $
+ Revision 0.9.2.6  2007/03/15 02:02:05  brian
+ - last known bug fixes, report failed expectations
+
  Revision 0.9.2.5  2007/03/12 09:35:02  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -111,9 +114,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 09:35:02 $"
+#ident "@(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/15 02:02:05 $"
 
-static char const ident[] = "$RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/12 09:35:02 $";
+static char const ident[] = "$RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/15 02:02:05 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -3361,7 +3364,7 @@ print_expect(int child, int want)
 		"                    |- [Expected %-16s ] -|- |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 1 && show)
+	if (verbose > 0 && show)
 		print_string_state(child, msgs, event_string(want));
 }
 

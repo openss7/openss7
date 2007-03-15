@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/03/10 13:53:04 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/03/15 02:01:49 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/10 13:53:04 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 02:01:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.60  2007/03/15 02:01:49  brian
+ - last known bug fixes, report failed expectations
+
  Revision 0.9.2.59  2007/03/10 13:53:04  brian
  - checking in latest corrections for release
 
@@ -112,10 +115,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/03/10 13:53:04 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/03/15 02:01:49 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/03/10 13:53:04 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/03/15 02:01:49 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -137,7 +140,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/03/10 13:53:04 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/03/15 02:01:49 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2365,7 +2368,7 @@ sctp_dput(struct sctp_daddr *sd)
  *  structures will not be deallocated until the buffer calls are complete.
  */
 
-STATIC void streamscall
+STATIC streamscall __unlikely void
 sctp_bufsrv(long data)
 {
 	struct sctp *sp = (struct sctp *) data;
@@ -2378,7 +2381,7 @@ sctp_bufsrv(long data)
 		sctp_put(sp);
 	}
 }
-STATIC void
+STATIC noinline fastcall __unlikely void
 sctp_unbufcall(struct sctp *sp)
 {
 	int bcid;
@@ -2388,7 +2391,7 @@ sctp_unbufcall(struct sctp *sp)
 		sctp_put(sp);
 	}
 }
-STATIC void
+STATIC noinline fastcall __unlikely void
 sctp_bufcall(struct sctp *sp, size_t size, int prior)
 {
 	int bcid;
@@ -2401,7 +2404,7 @@ sctp_bufcall(struct sctp *sp, size_t size, int prior)
 		sctp_put(sp);
 	}
 }
-STATIC mblk_t *
+STATIC INLINE fastcall __unlikely mblk_t *
 sctp_allocb(struct sctp *sp, size_t size, int prior)
 {
 	mblk_t *mp;
@@ -2410,7 +2413,7 @@ sctp_allocb(struct sctp *sp, size_t size, int prior)
 		sctp_bufcall(sp, size, prior);
 	return (mp);
 }
-STATIC mblk_t *
+STATIC INLINE fastcall __unlikely mblk_t *
 sctp_dupmsg(struct sctp *sp, mblk_t *bp)
 {
 	mblk_t *mp;
@@ -2419,7 +2422,7 @@ sctp_dupmsg(struct sctp *sp, mblk_t *bp)
 		sctp_bufcall(sp, FASTBUF, BPRI_MED);
 	return (mp);
 }
-STATIC mblk_t *
+STATIC INLINE fastcall __unlikely mblk_t *
 sctp_dupb(struct sctp *sp, mblk_t *bp)
 {
 	mblk_t *mp;
@@ -2638,9 +2641,9 @@ sctp_ostrm_find(sctp_t * sp, uint16_t sid, int *errp)
  *  Allocate a Destination Address
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
-STATIC void streamscall sctp_heartbeat_timeout(caddr_t data);
-STATIC void streamscall sctp_retrans_timeout(caddr_t data);
-STATIC void streamscall sctp_idle_timeout(caddr_t data);
+STATIC streamscall void sctp_heartbeat_timeout(caddr_t data);
+STATIC streamscall void sctp_retrans_timeout(caddr_t data);
+STATIC streamscall void sctp_idle_timeout(caddr_t data);
 STATIC struct sctp_daddr *
 __sctp_daddr_alloc(sctp_t * sp, uint32_t daddr, int *errp)
 {
@@ -6698,7 +6701,7 @@ sctp_assoc_timedout(struct sctp *sp,	/* association */
  *  T1-init.  This means that we should attempt to retransmit the INIT until we have attempted
  *  Max.Init.Retrans times.
  */
-STATIC void streamscall
+STATIC streamscall void
 sctp_init_timeout(caddr_t data)
 {
 	struct sctp *sp = (typeof(sp)) data;
@@ -6749,7 +6752,7 @@ sctp_init_timeout(caddr_t data)
  *  T1-cookie.  This means that we should attempt to retransmit the COOKIE ECHO until we have
  *  attempted Path.Max.Retrans times.
  */
-STATIC void streamscall
+STATIC streamscall void
 sctp_cookie_timeout(caddr_t data)
 {
 	sctp_t *sp = (typeof(sp)) data;
@@ -6837,7 +6840,7 @@ sctp_send_forward_tsn(struct sctp *sp)
  *  that we should mark all outstanding DATA chunks for retransmission and start a retransmission
  *  cycle.
  */
-STATIC void streamscall
+STATIC streamscall void
 sctp_retrans_timeout(caddr_t data)
 {
 	mblk_t *mp;
@@ -6924,7 +6927,7 @@ sctp_retrans_timeout(caddr_t data)
  *  an unacknoweldged DATA chunk.  When an unacknowledged DATA chunks i receive and the timer is not
  *  running, the timer is set.  Whenever a DATA chunks(s) are acknowledged, the timer is stopped.
  */
-STATIC void streamscall
+STATIC streamscall void
 sctp_sack_timeout(caddr_t data)
 {
 	struct sctp *sp;
@@ -6966,7 +6969,7 @@ sctp_sack_timeout(caddr_t data)
  *  calculation is done.  While this timer is stopped, heartbeats will be sent until they are
  *  acknowledged.
  */
-STATIC void streamscall
+STATIC streamscall void
 sctp_idle_timeout(caddr_t data)
 {
 	struct sctp_daddr *sd = (typeof(sd)) data;
@@ -7010,7 +7013,7 @@ sctp_idle_timeout(caddr_t data)
  *  (Well!  That's not really true, is it?)
  */
 STATIC void sctp_reset_idle(struct sctp_daddr *sd);
-STATIC void streamscall
+STATIC streamscall void
 sctp_heartbeat_timeout(caddr_t data)
 {
 	struct sctp_daddr *sd = (typeof(sd)) data;
@@ -7060,7 +7063,7 @@ sctp_heartbeat_timeout(caddr_t data)
  *  This means that we have timedout on sending a SHUTDOWN or a SHUTDOWN ACK message.  We simply
  *  resend the message.
  */
-STATIC void streamscall
+STATIC streamscall void
 sctp_shutdown_timeout(caddr_t data)
 {
 	struct sctp *sp = (typeof(sp)) data;
@@ -7110,7 +7113,7 @@ sctp_shutdown_timeout(caddr_t data)
  *  per SCTP IG 2.12.
  */
 STATIC void sctp_send_abort(struct sctp *sp);
-STATIC void streamscall
+STATIC streamscall void
 sctp_guard_timeout(caddr_t data)
 {
 	struct sctp *sp = (typeof(sp)) data;
@@ -7155,7 +7158,7 @@ sctp_guard_timeout(caddr_t data)
  *  -------------------------------------------------------------------------
  *  This means that we have timedout on sending a ASCONF message.  We simply resend the message.
  */
-STATIC void streamscall
+STATIC streamscall void
 sctp_asconf_timeout(caddr_t data)
 {
 	struct sctp *sp = (typeof(sp)) data;
@@ -7213,7 +7216,7 @@ sctp_asconf_timeout(caddr_t data)
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
 STATIC INLINE void sctp_send_forward_tsn(struct sctp *sp);
 #endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
-STATIC void streamscall
+STATIC streamscall void
 sctp_life_timeout(caddr_t data)
 {
 	struct sctp *sp = (typeof(sp)) data;
@@ -11885,7 +11888,7 @@ sctp_recv_forward_tsn(struct sctp *sp, mblk_t *mp)
  *  RECV SCTP MESSAGE
  *  -------------------------------------------------------------------------
  */
-STATIC int sctp_rcv_ootb(mblk_t *mp);
+STATIC void sctp_rcv_ootb(mblk_t *mp);
 STATIC int
 sctp_recv_msg(struct sctp *sp, mblk_t *mp)
 {
@@ -11916,7 +11919,8 @@ sctp_recv_msg(struct sctp *sp, mblk_t *mp)
 #if 0
 			icmp_send(skb, ICMP_DEST_UNREACH, ICMP_PORT_UNREACH, 0);
 #endif
-			return sctp_rcv_ootb(mp);
+			sctp_rcv_ootb(mp);
+			return (0);
 		}
 	}
 	do {
@@ -13454,8 +13458,12 @@ sctp_free_priv(queue_t *q)
 	ensure(q, return);
 	sp = SCTP_PRIV(q);
 	ensure(sp, return);
+#if 0
+	/* This causes really big problems on SMP for some reason: just drop the Stream and let the 
+	   protocol module respond with an abort. */
 	if ((1 << sp->state) & SCTPF_NEEDABORT)	/* SCTP IG 2.21 */
 		sctp_send_abort_error(sp, SCTP_CAUSE_USER_INITIATED, NULL, 0);
+#endif
 	qprocsoff(sp->rq);
 	/* cancel bufcalls */
 	sctp_unbufcall(sp);
@@ -16567,7 +16575,8 @@ sctp_n_init(void)
 
 	if ((err = register_strdev(&sctp_n_cdev, n_major)) < 0)
 		return (err);
-	n_major = err;
+	if (n_major == 0)
+		n_major = err;
 #ifdef WITH_NPI_IP_DRV
 	if ((err = register_strmod(&sctp_n_fmod)) < 0) {
 		unregister_strdev(&sctp_n_cdev, n_major);
@@ -27776,14 +27785,16 @@ sctp_t_init(void)
 {
 	int err;
 
-	if ((err = register_strdev(&sctp_cdev, CMAJOR_0)) < 0)
+	if ((err = register_strdev(&sctp_cdev, t_major)) < 0)
 		return (err);
+	if (t_major == 0)
+		t_major = err;
 	return (0);
 }
 STATIC void
 sctp_t_term(void)
 {
-	unregister_strdev(&sctp_cdev, CMAJOR_0);
+	unregister_strdev(&sctp_cdev, t_major);
 }
 #endif				/* LFS */
 
@@ -28191,7 +28202,7 @@ sctp_t_term(void)
  *
  *  --------------------------------------------------------------------------
  */
-STATIC int
+STATIC void
 sctp_rcv_ootb(mblk_t *mp)
 {
 	struct iphdr *iph = SCTP_IPH(mp);
@@ -28200,11 +28211,9 @@ sctp_rcv_ootb(mblk_t *mp)
 	int sat = inet_addr_type(iph->saddr);
 	struct sctp *sp;
 
-	ensure(mp, return (-EFAULT));
 	if (sat != RTN_UNICAST && sat != RTN_LOCAL) {
 		/* RFC 2960 8.4(1). */
-		freemsg(mp);
-		return (0);
+		return;
 	}
 #if 0
 	/* We shouldn't have to range check the chunk header here because it the first chunk header 
@@ -28215,8 +28224,7 @@ sctp_rcv_ootb(mblk_t *mp)
 		ch = (typeof(ch)) mp->b_rptr;
 		if (sizeof(*ch) > skb->len || (clen = ntohs(ch->len)) < sizeof(*ch)
 		    || PADC(clen) + mp->b_rptr > mp->b_wptr) {
-			freemsg(mp);
-			return (0);
+			return;
 		}
 	}
 #endif
@@ -28299,8 +28307,7 @@ sctp_rcv_ootb(mblk_t *mp)
 		}
 		break;
 	}
-	freemsg(mp);
-	return (0);
+	return;
 }
 
 /*
@@ -28405,7 +28412,7 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
  *  checksum on the packet.  If the Adler-32 checksum fails then we should silently discard the
  *  packet per RFC 2960.
  */
-STATIC void streamscall
+STATIC streamscall __hot_get void
 sctp_free(caddr_t data)
 {
 	struct sk_buff *skb = (struct sk_buff *) data;
@@ -28518,7 +28525,9 @@ sctp_v4_rcv(struct sk_buff *skb)
 #ifndef SCTP_CONFIG_DISCARD_OOTB
 	icmp_send(skb, ICMP_DEST_UNREACH, ICMP_PORT_UNREACH, 0);
 	/* RFC 2960 Section 8.4 */
-	return sctp_rcv_ootb(mp);
+	sctp_rcv_ootb(mp);
+	freemsg(mp);
+	return (0);
 #endif				/* SCTP_CONFIG_DISCARD_OOTB */
 	goto free_it;
       free_it:
