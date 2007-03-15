@@ -1,3 +1,10 @@
+2007-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man9/str_install.9.man: some documentation updates
+	* doc/man/man9/str_install_AIX.9.man: some documentation updates
+	* doc/man/man9/str_install_HPUX.9.man: some documentation updates
+	* doc/man/man9/strmod_add.9.man: some documentation updates
+
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: corrections for autotest 2.59b+

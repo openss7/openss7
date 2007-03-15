@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: str_install_HPUX.9.man,v 0.9.2.3 2006/10/06 12:13:06 brian Exp $
+.\" @(#) $Id: str_install_HPUX.9.man,v 0.9.2.4 2007/03/15 09:05:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:13:06 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/15 09:05:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: str_install_HPUX.9.man,v $
+.\" Revision 0.9.2.4  2007/03/15 09:05:45  brian
+.\" - some documentation updates
+.\"
 .\" Revision 0.9.2.3  2006/10/06 12:13:06  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -142,7 +145,7 @@ structure is formatted as follows:
 typedef struct stream_inst {
     char *name;                         /* name of driver or module */
     int inst_major;                     /* major number for driver (-1 dynamic or module) */
-    struct streamtab inst_str_tab;      /* current streamstabe entry */
+    struct streamtab inst_str_tab;      /* current streams table entry */
     unsigned int inst_flags;            /* flags, e.g. STR_SVR4_OPEN, STR_IS_MODULE */
     int inst_sync_level;                /* sync level defined by stream.h */
     char inst_sysc_info[FMNAMESZ + 1];  /* elsewhere sync param described in MP */
@@ -293,16 +296,52 @@ For further details on synchronization, see
 .PP
 When
 .BR str_install ()
-succeeds, it returns 
-.BR DDI_SUCCESS ;
+succeeds, it returns zero (0);
 when it fails, it returns
-.BR DDI_FAILURE .
+a non-zero (positive) error code.
 .\"
 .\"
 .SH ERRORS
 .PP
+When
 .BR str_install ()
-fails when 
+fails, it returns one of the following (positive) error codes:
+.TP \w'[ENOMEM]\(em'u
+.RB [ EINVAL ]
+An argument contains an invalid value.  The requested device type,
+.IR inst_flags ,
+did not contain one and only one of
+.BR STR_IS_DEVICE " or " STR_IS_MODULE ,
+or the character major device number,
+.IR inst_major ,
+is invalid,
+or the name of the driver or module,
+.IR name ,
+is invalid.
+.TP
+.RB [ EPERM ]
+The requested character major device number,
+.IR inst_major ,
+already has a
+.I STREAMS
+device registered against it.
+.TP
+.RB [ EBUSY ]
+The requested character major device number,
+.IR inst_major ,
+already has a
+.RI non- STREAMS
+(legacy character)
+device registered against it.
+.TP
+.RB [ ENXIO ]
+The requested character major device number,
+.IR inst_major ,
+was minus one (-1) requesting dynamic allocation of a character major device number and no character
+major device numbers are available for allocation.
+.TP
+.RB [ ENOMEM ]
+The necessary device structures could not be allocated due to memory shortage.
 .\"
 .\"
 .SH CONTEXT
@@ -362,7 +401,21 @@ structure are compatible with
 usldk
 .]
 .IP \(em
+The flag
+.B STR_SYSV4_OPEN
+is always implied as
+.B Linux Fast-STREAMS
+does not support SVR3 open and close prototypes.
 .IP \(em
+The flag
+.B STR_IS_SECURE
+is ignored as
+.B Linux Fast-STREAMS
+does not support C3 or Orange Book security.
+.IP \(em
+The
+.B STR_QSAFETY
+flag is honoured, but possibly not in precisely the same fashion as HPUX.
 .IP \(em
 .BR str_install ()
 is provided for source level compatibility with
