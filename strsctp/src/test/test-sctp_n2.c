@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 09:35:03 $
+ @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/15 02:02:07 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:35:03 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 02:02:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n2.c,v $
+ Revision 0.9.2.9  2007/03/15 02:02:07  brian
+ - last known bug fixes, report failed expectations
+
  Revision 0.9.2.8  2007/03/12 09:35:03  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -96,9 +99,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 09:35:03 $"
+#ident "@(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/15 02:02:07 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 09:35:03 $";
+static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/15 02:02:07 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -3028,7 +3031,7 @@ print_expect(int child, int want)
 		"                    |- [Expected %-16s ] -|- |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 1 && show)
+	if (verbose > 0 && show)
 		print_string_state(child, msgs, event_string(child, want));
 }
 

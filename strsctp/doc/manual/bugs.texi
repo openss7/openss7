@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.4 2007/03/10 13:53:01 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.5 2007/03/15 02:01:47 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,37 +53,50 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/10 13:53:01 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/15 02:01:47 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 004.  2007-03-14T17:36:31-0600
+
+Another bug found, a double buffer free in sctp_recv_msg() when calling
+sctp_rcv_ootb().  This bug was discovered during verification testing on a high
+speed SMP machine.
+
+@emph{*fixed*} in @command{strsctp-0.9.2.7}
+
 @item 003.  2007-03-10T05:59:10-0700
 
-One serious locking problem discovered.  sctp_cleanup_read() was suppressing IRQs across calls to
-putnext() when delivering data and acknowledgements.  Recent kernels on Fedora and Ubuntu were
-complaining about IRQs suppressed across calls to local_bh_enable() in M2PA and that is what lead to
-the discovery.
+One serious locking problem discovered.  sctp_cleanup_read() was suppressing
+IRQs across calls to putnext() when delivering data and acknowledgements.
+Recent kernels on Fedora and Ubuntu were complaining about IRQs suppressed
+across calls to local_bh_enable() in M2PA and that is what lead to the
+discovery.
 
 @emph{*fixed*} in @command{strsctp-0.9.2.7}
 
 @item test-sctp_n -o 9.1 Sun, 29 Oct 2006 16:27:35 -0700
 @itemx test-sctp_n -o 9.2 Sun, 29 Oct 2006 16:27:35 -0700
-When the number of test packets is set to 300, we are crashing on high speed SMP HT box.  This seems
-to be a locking problem of sorts, or some flow control race condition.  For now, the number of test
-packets, TEST_PACKETS has been reduced from 300 to 30 to avoid the crash.  Again, packet tests at IP
-level should reveal this problem.
 
-Note that there does not seem to be a problem with similar TPI tests, so the problem might be NPI
-interface related after all.
+When the number of test packets is set to 300, we are crashing on high speed SMP
+HT box.  This seems to be a locking problem of sorts, or some flow control race
+condition.  For now, the number of test packets, TEST_PACKETS has been reduced
+from 300 to 30 to avoid the crash.  Again, packet tests at IP level should
+reveal this problem.
+
+Note that there does not seem to be a problem with similar TPI tests, so the
+problem might be NPI interface related after all.
 
 @item test-sctp_n -o 7.1 Sun, 15 Oct 2006 06:22:05 -0600
-I notice that when the message size in this test is larger than the receive window size on the
-receiver, the receiver aborts the association after its window fills.  If the message size is
-reduced to just beneath the receive window size, the test case succeeds.  So, it looks like we are
-not handling zero window probes very well at all.  For now I have just reduced the message size as
-this is for interface testing not packet testing.  Packet tests at IP level should reveal this
-problem.
+
+I notice that when the message size in this test is larger than the receive
+window size on the receiver, the receiver aborts the association after its
+window fills.  If the message size is reduced to just beneath the receive window
+size, the test case succeeds.  So, it looks like we are not handling zero window
+probes very well at all.  For now I have just reduced the message size as this
+is for interface testing not packet testing.  Packet tests at IP level should
+reveal this problem.
 
 @end table
 
