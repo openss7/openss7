@@ -141,3 +141,39 @@ Copying-policy:		GPL
 End
 
 
+From bidulock@openss7.org Thu Mar 15 12:41:51 2007
+Date: Thu, 15 Mar 2007 12:41:51 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@execpc.com>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:			iperf
+Version:		2.0.6
+Entered-date:		2007-03-15
+Description:		OpenSS7 IPERF Utility.
+			OpenSS7 Modified Iperf.
+			iperf is an OpenSS7 release of the DAST iperf
+			package configured to run with OpenSS7 Linux Native
+			Stream Control Transmission Protocol (SCTP).
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		SCTP, Iperf
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			1M iperf-2.0.6.tar.gz
+			1M iperf-2.0.6.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			1M iperf-2.0.6-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4,
+			sctp-0.2.24
+Copying-policy:		GPL
+End
+

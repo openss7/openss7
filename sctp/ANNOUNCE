@@ -151,3 +151,39 @@ Copying-policy:		GPL
 End
 
 
+From bidulock@openss7.org Thu Mar 15 12:41:51 2007
+Date: Thu, 15 Mar 2007 12:41:51 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@execpc.com>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:			sctp
+Version:		0.2.25
+Entered-date:		2007-03-15
+Description:		OpenSS7 Linux Native SCTP.
+			OpenSS7 Linux Native SCTP (Stream Control Transmission
+			Protocol).
+			sctp is the OpenSS7 Linux Native (Sockets) Kernel
+			implementation of Stream Control Transmission Protocol
+			(SCTP).
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		SCTP, SIGTRAN, OpenSS7, Sockets, Telecommunications
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			3M sctp-0.2.25.tar.gz
+			2M sctp-0.2.25.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			2M sctp-0.2.25-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4
+Copying-policy:		GPL
+End
+
