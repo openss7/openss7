@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/12 09:33:58 $
+ @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:14:57 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:33:58 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:14:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-etsi_n.c,v $
+ Revision 0.9.2.4  2007/03/15 10:14:57  brian
+ - test case reporting and release date
+
  Revision 0.9.2.3  2007/03/12 09:33:58  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -82,9 +85,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/12 09:33:58 $"
+#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:14:57 $"
 
-static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/12 09:33:58 $";
+static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:14:57 $";
 
 /*
  *  This file is for testing the sctp_t module.  It is provided for the

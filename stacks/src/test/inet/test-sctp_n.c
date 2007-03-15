@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:33:45 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/15 10:14:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:33:45 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:14:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n.c,v $
+ Revision 0.9.2.7  2007/03/15 10:14:42  brian
+ - test case reporting and release date
+
  Revision 0.9.2.6  2007/03/12 09:33:45  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:33:45 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/15 10:14:42 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 09:33:45 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/15 10:14:42 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
