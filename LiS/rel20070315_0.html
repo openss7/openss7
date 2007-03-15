@@ -1,0 +1,93 @@
+% # vim: ft=mason sw=4
+<%flags>
+    inherit	=> 'whatsnew.html'
+    package	=> 'LiS'
+    date	=> 'Mar 15, 2007'
+    rel		=> '2.18 Release 5'
+    file	=> 'LiS-2.18.5'
+    approved	=> 'Approved for Immediate Release'
+    where	=> 'Edmonton, Alberta'
+    headline	=> 'LiS 2.18.5 Released'
+</%flags><%attr>
+    revision	=> '$Id: rel20070108_0.html,v 0.9.2.1 2007/01/08 16:00:25 brian Exp $'
+    label	=> 'Mar 15, 2007'
+    heading	=> 'LiS 2.18.5 Released'
+</%attr><%method description>
+This is an internal release of LiS.  There are too many packages now that cannot build against LiS
+because it is lacking fundamental capabilities in the Stream head.
+</p><p style="margin-bottom:0in">
+Do not use this release.  Port to Linux Fast-STREAMS.  Do not report bugs on this release.  (Yup,
+there are lots of 'em, but that's LiS.)
+</p><p style="margin-bottom:0in">
+Major changes for release LiS-2.18.5
+</p><ul style="margin-bottom:0in">
+<li>Added versions to all exported symbols.  Made LiS functions GPL export.<bdo/></li>
+<li>Improvements to the common build environment with better support for standalone package builds
+on 2.4 kernels.<bdo/></li>
+<li>Support for autoconf 2.61, automake 2.10 and gettext 0.16.<bdo/></li>
+<li>Support for Ubuntu 6.10 distribution and bug fixes for i386 kenels.<bdo/></li>
+</ul><p style="margin-bottom:0in">
+<em>This is an unstable public alpha release of the package.  Please see
+    <a href="codefiles/LiS-2.18.5/README-alpha">README-alpha</a> in the release.
+    information.  Do not report bugs on this package.</em>
+</p><p style="margin-bottom:0in">
+A large number of additional tests cases were found to fail on x86_64 and SMP architectures making
+the LiS packages largely unusable, especially on 64-bit or SMP kernels.
+</p><p style="margin-bottom:0in">
+<em>Deprecated and unmaintained. Download the <a href="streams_pkg.html">latest <em>streams</em>
+    package version</a> instead.</em>
+</%method><%method abstract>
+OpenSS7 today announced Release 2.18.5 of the Linux STREAMS <em>LiS</em> package.
+</%method><%method news>
+<& SELF:abstract &>
+The OpenSS7 Linux STREAMS (LiS) package is an OpenSS7 modified version of the LiS-2.18 package
+formerly from GCOM, and formerly maintained by David Grothe.
+</p><p style="margin-bottom:0in">
+<em>Note</em>: The original LiS package from GCOM is no longer actively maintained by either GCOM or
+the OpenSS7 Project: use the <a href="http://www.openss7.org/STREAMS.html"> OpenSS7 Linux
+Fast-STREAMS</a> package instead.
+</p><p style="margin-bottom:0in">
+The following are claims made by its authors and original maintainer:
+</p><p style="margin-bottom:0in">
+<blockquote>
+The OpenSS7 Modified Linux STREAMS (LiS) package is as STREAMS framework that is compatible with SVR
+4 STREAMS.  It has lots of debugging features not found in other STREAMS packages.  Good to do
+networking and other things.  It allows for installation of binary drivers.
+</blockquote>
+</p><p style="margin-bottom:0in">
+Linux STREAMS (LiS) aims to provide SVR 4 compatible STREAMS implementation for Linux and claims to
+have special debugging facilities; however, the package suffers from the major failings that it is:
+</p><ul style="margin-bottom:0in">
+<li>no longer maintained;</li>
+<li>full of bugs;</li>
+<li>incompatible with POSIX;</li>
+<li>implements SVR 4 STREAMS rather than the more popular SVR 4.2 MP/ES STREAMS;</li>
+<li>portions dubiously licensed under the LGPL;</li>
+<li>unsuitable for mainline adoption;</li>
+<li>adapts poorly to production kernels;</li>
+<li>many SMP races and lockups;</li>
+<li>broken 32-bit over 64-bit compatibility;</li>
+<li>no <a href="http://www.openss7.org/man2html?strlog(9)">strlog(9)</a> STREAMS logger;</li>
+</ul><p style="margin-bottom:0in">
+<& SELF:description &>
+</p><p style="margin-bottom:0in">
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based distributions,
+and can be used on production kernels without patching or recompiling the kernel.
+</p><p style="margin-bottom:0in">
+This package is publicly released under the
+<a href="license_gpl.html">GNU Public License Version 2</a>.<bdo/>
+The release is available as an autoconf tarball, SRPM, DSC, and set of binary RPMs and DEBs.
+See the <a href="download.html">downloads page</a> for the autoconf tarballs, SRPMs and DSCs.
+See the <a href="LiS_pkg.html"><em>LiS</em> package page</a> for tarballs, SRPMs, DSCs, and
+binary RPMs and DEBs.
+</p><p style="margin-bottom:0in">
+See <a href="codefiles/LiS-2.18.5/ChangeLog">ChangeLog</a> and
+<a href="codefiles/LiS-2.18.5/NEWS">NEWS</a> in the release for
+more information.  Also, see the
+<a href="codefiles/LiS-2.18.5/doc/manual/LiS.pdf">LiS.pdf</a>
+manual in the release (also in html <a href="LiS_manual.html">here</a>).<bdo/>
+</p>
+</%method><%method body>
+<& SELF:newsitem, comp => $m->base_comp &>
+</%method>

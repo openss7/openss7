@@ -1,0 +1,85 @@
+% # vim: ft=mason sw=4
+<%flags>
+    inherit	=> 'whatsnew.html'
+    package	=> 'strvoip'
+    date	=> 'Mar 15, 2007'
+    rel		=> '0.9.2 Release 2'
+    file	=> 'strvoip-0.9.2.2'
+    approved	=> 'Approved for Immediate Release'
+    where	=> 'Edmonton, Alberta'
+    headline	=> 'strvoip 0.9.2.2 Released'
+</%flags><%attr>
+    revision	=> '$Id: rel20070108_3.html,v 0.9.2.2 2007/01/08 16:00:47 brian Exp $'
+    label	=> 'Mar 15, 2007'
+    heading	=> 'strvoip 0.9.2.2 Released'
+</%attr><%method description>
+This is the second open source release of the OpenSS7 STREAMS VOIP package.  This release
+contains modules and drivers formerly only available with Commercial releases of the <tt>strss7</tt>
+package and which are only recently available as open source with the release of this package.
+</p><p style="margin-bottom:0in">
+With OpenSS7 Master Package release openss7-0.9.2.D, the VOIP components were
+separated from the <tt>strss7</tt> package and placed in this package.  Not all of the VOIP components
+previously part of the <tt>strss7</tt> package have been strapped into this release.  Components will be
+re-validated against Linux Fast-STREAMS on a module-by-module and driver-by-driver basis.  See
+TODO in the release, or <em>Schedule</em>, in the manual, for information about the release schedule.
+</p><p style="margin-bottom:0in">
+The major component first available is H.323 call control.  h323(4) is a STREAMS multiplexing driver
+that links tcp(4) or sctp(4) streams to form an H.323 Gatekeeper.
+</p><p style="margin-bottom:0in">
+Subsequent releases in 1Q 2007 will include the additional full H.323, SIP-T and GCP
+drivers with conformance test suites.
+</p><p style="margin-bottom:0in">
+This package is currently incomplete.  It is being released as a reference point for the community.
+If you are interested in completion of this package, contact
+<a href="mailto:info@openss7.com">info@openss7.com</a>.
+This release is a maintenance release providing support for recent
+distributions and tool chains.
+</p><p style="margin-bottom:0in">
+Major features since the last public release are as follows:
+</p><ul style="margin-bottom:0in">
+<li>Improvements to the common build environment with better support for standalone package builds on 2.4 kernels.<bdo/></li>
+<li>Support for autoconf 2.61, automake 1.10 and gettext 0.16.<bdo/></li>
+<li>Support for Ubuntu 6.10 distribution and bug fixes for i386 kenels.<bdo/></li>
+<li>The package now looks for other subpackages with a version number as unpacked by separate tarball.<bdo/></li>
+</ul><p style="margin-bottom:0in">
+<em>This is a public beta release of the package: it deprecates previous releases.  Please upgrade
+    to the current release before reporting bugs.
+    Please see <a href="codefiles/strvoip-0.9.2.2/README-alpha">README-alpha</a> in the
+    release.</em>
+</p><p style="margin-bottom:0in">
+</%method><%method abstract>
+OpenSS7 today announced Release 0.9.2.2 of the OpenSS7 ISDN Stacks <em>strvoip</em> package.
+</%method><%method news>
+<& SELF:abstract &>
+This release is the second separate release of the OpenSS7 STREAMS VOIP package.  Some of the
+components in this package were formerly present in the <tt>strss7</tt> package.  Various networking
+drivers are provided as well as CDI, DLPI, NPI, TPI and CCI header files for VOIP operation.  The
+package contains the necessary manual pages and other documentation for VOIP components in a
+separate autoconf tarball.
+</p><p style="margin-bottom:0in">
+The OpenSS7 STREAMS VOIP package includes kernel modules, SVR 4.2 STREAMS drivers, modules,
+libraries, utilities, test programs, daemons, and development environment for the development and
+execution of OpenSS7 STREAMS VOIP applications for the SVR 4.2 STREAMS environment.
+</p><p style="margin-bottom:0in">
+<& SELF:description &>
+</p><p style="margin-bottom:0in">
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based distributions,
+and can be used on production kernels without patching or recompiling the kernel.
+</p><p style="margin-bottom:0in">
+This package is publicly released under the
+<a href="license_gpl.html">GNU Public License Version 2</a>.<bdo/>
+The release is available as an autoconf tarball, SRPM, DSC, and set of binary RPMs and DEBs.
+See the <a href="download.html">downloads page</a> for the autoconf tarballs, SRPMs and DSCs.
+See the <a href="strvoip_pkg.html"><em>strvoip</em> package page</a> for tarballs, SRPMs, DSCs, and
+binary RPMs and DEBs.
+</p><p style="margin-bottom:0in">
+See <a href="codefiles/strvoip-0.9.2.2/ChangeLog">ChangeLog</a> and
+<a href="codefiles/strvoip-0.9.2.2/NEWS">NEWS</a> in the release for
+more information.  Also, see the
+<a href="codefiles/strvoip-0.9.2.2/doc/manual/strvoip.pdf">strvoip.pdf</a>
+manual in the release (also in html <a href="strvoip_manual.html">here</a>).<bdo/>
+</p>
+</%method><%method body>
+<& SELF:newsitem, comp => $m->base_comp &>
+</%method>
