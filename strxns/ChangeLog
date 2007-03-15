@@ -1,3 +1,8 @@
+2007-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/test-ip.c: report failed expectations
+	* src/test/test-np_ip.c: report failed expectations
+
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/test/test-ip.c: boosted default port 10000->18000

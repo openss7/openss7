@@ -3327,7 +3327,7 @@ print_expect(int child, int want)
 		"                    |- [Expected %-16s ] - - |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 1 && show)
+	if (verbose > 0 && show)
 		print_string_state(child, msgs, event_string(child, want));
 }
 

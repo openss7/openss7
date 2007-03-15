@@ -1,3 +1,10 @@
+2007-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/test-m2pa.8.man: report failed expectations on test cases
+	* src/test/test-m2pa.c: report failed expectations on test cases
+	* src/test/test-m2ua_as.c: report failed expectations on test cases
+	* src/test/test-sigtran.c: report failed expectations on test cases
+
 2007-03-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man4/isua-as.4.man: added manpages

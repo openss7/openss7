@@ -1,3 +1,10 @@
+2007-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* util/test-fifo.c: report failed expectations on test cases
+	* util/test-pipe.c: report failed expectations on test cases
+	* util/test-sad.c: report failed expectations on test cases
+	* util/test-streams.c: report failed expectations on test cases
+
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* man/man8/test-streams.8.man: updates

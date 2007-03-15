@@ -1,3 +1,7 @@
+2007-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/test-tty.c: report failed expectations
+
 2007-03-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: changes to pass check maintenance target

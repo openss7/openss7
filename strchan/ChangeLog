@@ -1,3 +1,7 @@
+2007-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/test-chan.c: report failed expectations
+
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/Config.in: correct for dashes

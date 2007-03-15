@@ -1,3 +1,23 @@
+2007-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/inet/test-inet_raw.c: report failed expectations on test cases
+	* src/test/inet/test-inet_sctp.c: report failed expectations on test cases
+	* src/test/inet/test-inet_tcp.c: report failed expectations on test cases
+	* src/test/inet/test-inet_udp.c: report failed expectations on test cases
+	* src/test/inet/test-sctp_n.c: report failed expectations on test cases
+	* src/test/inet/test-sctp_t.c: report failed expectations on test cases
+	* src/test/m2pa/test-m2pa.c: report failed expectations on test cases
+	* src/test/sctp/test-etsi_n.c: report failed expectations on test cases
+	* src/test/sctp/test-etsi_t.c: report failed expectations on test cases
+	* src/test/sctp/test-interop.c: report failed expectations on test cases
+	* src/test/sctp/test-sctp_n.c: report failed expectations on test cases
+	* src/test/sctp/test-sctp_n2.c: report failed expectations on test cases
+	* src/test/sctp/test-sctp_t.c: report failed expectations on test cases
+	* src/test/tli/test-timod.c: report failed expectations on test cases
+	* src/test/tli/test-tirdwr.c: report failed expectations on test cases
+	* src/test/x400p-ss7/test-x400p.c: report failed expectations on test cases
+	* src/test/xnet/test-xnet.c: report failed expectations on test cases
+
 2007-03-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/x400p-ss7/sl_x400p.c: corrections for older chips

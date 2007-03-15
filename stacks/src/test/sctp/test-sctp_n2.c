@@ -3002,7 +3002,7 @@ print_expect(int child, int want)
 		"                    |- [Expected %-16s ] -|- |                    [%d:%03d]\n",
 	};
 
-	if (verbose > 1 && show)
+	if (verbose > 0 && show)
 		print_string_state(child, msgs, event_string(child, want));
 }
 
@@ -11774,7 +11774,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -11829,7 +11829,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
