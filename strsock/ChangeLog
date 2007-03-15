@@ -1,3 +1,12 @@
+2007-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/test-sock.c: report failed expectations
+	* src/test/test-socket.c: report failed expectations
+	* src/test/test-socklib.c: report failed expectations
+	* src/test/test-sockmod.c: report failed expectations
+	* src/test/test-sockpath.c: report failed expectations
+	* src/test/test-socksys.c: report failed expectations
+
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: corrections for autotest 2.59b+

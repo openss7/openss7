@@ -1,3 +1,7 @@
+2007-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/test-isdn.c: report failed expectations
+
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man8/test-isdn.8.man: boosted default port 10000->18000

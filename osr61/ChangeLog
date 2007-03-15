@@ -1,3 +1,7 @@
+2007-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* ChangeLog: report failed expectations on test cases
+
 2007-03-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/dvbm/source/dvbm.c: function pointer type safety

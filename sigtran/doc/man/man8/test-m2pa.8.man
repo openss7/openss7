@@ -635,6 +635,7 @@ test suite.
 .\"
 .\"
 .SH EXAMPLES
+.PP
 .TP
 \f(CB\)test-m2pa\f(CR\) --list 0.1\fR
 Generates a list of all test cases

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/11 05:15:48 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/15 02:33:22 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/11 05:15:48 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 02:33:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.8  2007/03/15 02:33:22  brian
+ - report failed expectations on test cases
+
  Revision 0.9.2.7  2007/03/11 05:15:48  brian
  - rationalized test cases back to Linux Fast-STREAMS
 
@@ -258,9 +261,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/11 05:15:48 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/15 02:33:22 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/11 05:15:48 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/15 02:33:22 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -1760,7 +1763,7 @@ print_expect(int child, int want)
 		"                    |- - -[Expected %-14s] - - |                     [%d:%03d]\n",
 	};
 
-	if (verbose > 1 && show)
+	if (verbose > 0 && show)
 		print_string_state(child, msgs, event_string(want));
 }
 
@@ -22152,7 +22155,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -22207,7 +22210,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

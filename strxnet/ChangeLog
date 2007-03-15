@@ -1,3 +1,13 @@
+2007-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/test-inet_raw.c: report failed expectations
+	* src/test/test-inet_tcp.c: report failed expectations
+	* src/test/test-inet_udp.c: report failed expectations
+	* src/test/test-timod.c: report failed expectations
+	* src/test/test-tirdwr.c: report failed expectations
+	* src/test/test-xnet.c: report failed expectations
+	* src/test/test-xnsl.c: report failed expectations
+
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man8/test-xnsl.8.man: updates

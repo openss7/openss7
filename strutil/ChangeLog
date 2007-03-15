@@ -1,3 +1,18 @@
+2007-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/test-clone.c: report failed expectations
+	* src/test/test-connld.c: report failed expectations
+	* src/test/test-echo.c: report failed expectations
+	* src/test/test-fifo.c: report failed expectations
+	* src/test/test-log.c: report failed expectations
+	* src/test/test-nsdev.c: report failed expectations
+	* src/test/test-nuls.c: report failed expectations
+	* src/test/test-pipe.c: report failed expectations
+	* src/test/test-pipemod.c: report failed expectations
+	* src/test/test-sad.c: report failed expectations
+	* src/test/test-sc.c: report failed expectations
+	* src/test/test-streams.c: report failed expectations
+
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: corrections for autotest 2.59b+
