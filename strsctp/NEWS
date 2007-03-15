@@ -1,5 +1,5 @@
-OpenSS7 STREAMS SCTP -- history of user visible changes.  2007-03-13
-$Id: NEWS,v 0.9.2.36 2007/03/13 19:51:22 brian Exp $
+OpenSS7 STREAMS SCTP -- history of user visible changes.  2007-03-15
+$Id: NEWS,v 0.9.2.37 2007/03/15 20:10:45 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -15,6 +15,11 @@ This release is primarily a maintenance release to support recent
 distributions and tool chains.
 
 Major features since the last public release are as follows:
+
+   - Fixed a buffer double-free bug when out-of-the-blue messages were
+     being processed on non-listening Streams.  See
+     `http://www.openss7.org/codefiles/strsctp-0.9.2.7/BUGS' in the
+     release for more information.
 
    - Fixed a rather noxious locking bug in sctp_cleanup_read() that was
      suppressing interrupts across a putnext() call.  See
@@ -53,7 +58,7 @@ See `http://www.openss7.org/codefiles/strsctp-0.9.2.7/ChangeLog' and
 for more information.  Also, see the `strsctp.pdf' manual in the
 release (also in html `http://www.openss7.org/strsctp_manual.html').
 
-For the news release, see `http://www.openss7.org/rel20070306_A.html'.
+For the news release, see `http://www.openss7.org/rel20070315_A.html'.
 
  Major changes for release strsctp-0.9.2.6
 ------------------------------------------
