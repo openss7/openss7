@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/12 09:33:28 $
+ @(#) $RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:08:56 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:33:28 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:08:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2ua_as.c,v $
+ Revision 0.9.2.4  2007/03/15 10:08:56  brian
+ - updates for release
+
  Revision 0.9.2.3  2007/03/12 09:33:28  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -75,9 +78,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/12 09:33:28 $"
+#ident "@(#) $RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:08:56 $"
 
-static char const ident[] = "$RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/12 09:33:28 $";
+static char const ident[] = "$RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:08:56 $";
 
 #define TEST_M2PA   0
 #define TEST_X400   0
