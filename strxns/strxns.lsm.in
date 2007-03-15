@@ -20,7 +20,7 @@ Keywords:		XNS, CDI, DLPI, NPI, DL
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ tarballs/
-			5M @PACKAGE@-@VERSION@.tar.gz
+			4M @PACKAGE@-@VERSION@.tar.gz
 			4M @PACKAGE@-@VERSION@.tar.bz2
 Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
 			4M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
