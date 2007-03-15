@@ -1,5 +1,6 @@
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
+	* manual/news.texi: pushed release date
 	* util/test-fifo.c: report failed expectations on test cases
 	* util/test-pipe.c: report failed expectations on test cases
 	* util/test-sad.c: report failed expectations on test cases

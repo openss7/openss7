@@ -1,6 +1,7 @@
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: pull release date
+
 	* src/test/test-osr61.c: report failed expectations on test cases
 
 2007-03-13  Brian Bidulock  <bidulock@openss7.org>

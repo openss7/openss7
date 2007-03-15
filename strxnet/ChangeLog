@@ -1,5 +1,6 @@
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
+	* po/de.po: hate gnu gettext for this
 	* doc/manual/news.texi: pushed release date
 	* src/test/test-inet_raw.c: report failed expectations
 	* src/test/test-inet_tcp.c: report failed expectations

@@ -1,3 +1,7 @@
+2007-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* manual/news.texi: pushed release date
+
 2007-03-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* netperf/acinclude.m4: includes for linux 2.4 
