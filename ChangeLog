@@ -1,3 +1,7 @@
+2007-03-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/news.texi: pushed release date
+
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/openss7.am: bump automake requirement to 1.9 from 1.8
