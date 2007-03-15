@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nosmartindent nocindent
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.19 2007/03/14 04:16:11 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.20 2007/03/15 10:23:12 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/14 04:16:11 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/15 10:23:12 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -147,7 +147,7 @@ in the release for more information.  Also, see the @file{@value{PACKAGE}.pdf}
 manual in the release (also in html
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
 
-For the news release, see @uref{http://www.openss7.org/rel20070314_8.html}.
+For the news release, see @uref{http://www.openss7.org/rel20070315_8.html}.
 
 @c ----------------------------------------------------------------------------
 

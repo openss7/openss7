@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/11/26 15:27:39 $
+ @(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/15 10:22:16 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/26 15:27:39 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:22:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-nsdev.c,v $
+ Revision 0.9.2.23  2007/03/15 10:22:16  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.22  2006/11/26 15:27:39  brian
  - testing and corrections to strlog capabilities
 
@@ -141,9 +144,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/11/26 15:27:39 $"
+#ident "@(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/15 10:22:16 $"
 
-static char const ident[] = "$RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/11/26 15:27:39 $";
+static char const ident[] = "$RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/15 10:22:16 $";
 
 #include <sys/types.h>
 #include <stropts.h>

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/15 02:02:06 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/15 10:23:32 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 02:02:06 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:23:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n.c,v $
+ Revision 0.9.2.27  2007/03/15 10:23:32  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.26  2007/03/15 02:02:06  brian
  - last known bug fixes, report failed expectations
 
@@ -108,9 +111,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/15 02:02:06 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/15 10:23:32 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/15 02:02:06 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/15 10:23:32 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -5155,15 +5158,18 @@ postamble_1_data_xfer(int child)
 	DATA_buffer = NULL;
 	DATA_length = 0;
 
-	if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT * (1 + child), __TEST_DISCON_IND) == __RESULT_SUCCESS)
 		goto cannot_disconnect;
 	state++;
 	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto cannot_disconnect;
 	state++;
 	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS) {
-		if (last_event != __TEST_ERROR_ACK || NPI_error != NOUTSTATE)
-			failed = (failed == -1) ? state : failed;
+		/* Note: disconnect indication could have flushed our
+		 * disconnect request before acknowledgement */
+		if (last_event != __TEST_DISCON_IND)
+			if (last_event != __TEST_ERROR_ACK || NPI_error != NOUTSTATE)
+				failed = (failed == -1) ? state : failed;
 	}
       cannot_disconnect:
 	state++;
@@ -5182,7 +5188,7 @@ postamble_1_refuse(int child)
 
 	if (child != 2)
 		goto cannot_refuse;
-	if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT * (1 + child), __TEST_DISCON_IND) == __RESULT_SUCCESS)
 		goto cannot_refuse;
 	state++;
 	ADDR_buffer = NULL;
@@ -5194,8 +5200,11 @@ postamble_1_refuse(int child)
 		goto cannot_refuse;
 	state++;
 	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS) {
-		if (last_event != __TEST_ERROR_ACK || NPI_error != NOUTSTATE)
-			failed = (failed == -1) ? state : failed;
+		/* Note: disconnect indication could have flushed our
+		 * disconnect request before acknowledgement */
+		if (last_event != __TEST_DISCON_IND)
+			if (last_event != __TEST_ERROR_ACK || NPI_error != NOUTSTATE)
+				failed = (failed == -1) ? state : failed;
 	}
       cannot_refuse:
 	state++;
@@ -8914,7 +8923,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -8969,7 +8978,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\

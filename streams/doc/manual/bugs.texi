@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.5 2007/03/08 08:26:40 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.6 2007/03/15 10:22:09 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,19 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/08 08:26:40 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/15 10:22:09 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 006.  2007-03-14T23:48:26-0600
+
+There appears to be an inode lock imbalance that occurred for several clone error paths in stropen.
+If the returned major device number does not correspond to a driver, or an snode cannot be acquired
+for the new entry and the stream head reparented.
+
+@emph{*fixed*} in @command{streams-0.9.2.2}
+
 @item 005.  2007-03-07T15:53:06-0700
 
 Demand loading of kernel modules for clone devices opened, for example, as /dev/streams/clone/mux

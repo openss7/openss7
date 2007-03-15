@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sockmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:14:08 $
+ @(#) $RCSfile: test-sockmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/15 10:23:51 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 08:14:08 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:23:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sockmod.c,v $
+ Revision 0.9.2.3  2007/03/15 10:23:51  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.2  2006/12/18 08:14:08  brian
  - resolve device numbering
 
@@ -76,9 +79,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sockmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:14:08 $"
+#ident "@(#) $RCSfile: test-sockmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/15 10:23:51 $"
 
-static char const ident[] = "$RCSfile: test-sockmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 08:14:08 $";
+static char const ident[] = "$RCSfile: test-sockmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/15 10:23:51 $";
 
 #include <sys/types.h>
 #include <stropts.h>

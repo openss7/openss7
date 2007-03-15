@@ -1,5 +1,6 @@
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
+	* strbcm/doc/manual/news.texi: pushed release date
 	* src/test/test-bcm.c: report failed expectations on test cases
 
 2007-03-12  Brian Bidulock  <bidulock@openss7.org>

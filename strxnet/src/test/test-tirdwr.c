@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/12 02:24:28 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/15 10:24:21 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 02:24:28 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:24:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tirdwr.c,v $
+ Revision 0.9.2.29  2007/03/15 10:24:21  brian
+ - test case reporting and pushed release date one day
+
  Revision 0.9.2.28  2007/03/12 02:24:28  brian
  - updating tests
 
@@ -122,9 +125,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/12 02:24:28 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/15 10:24:21 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/12 02:24:28 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/15 10:24:21 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
