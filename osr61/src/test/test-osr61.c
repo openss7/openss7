@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-osr61.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/25 12:45:32 $
+ @(#) $RCSfile: test-osr61.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/15 10:49:14 $
 
  -----------------------------------------------------------------------------
 
@@ -59,19 +59,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/25 12:45:32 $ by $Author: brian $
+ Last Modified $Date: 2007/03/15 10:49:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-osr61.c,v $
+ Revision 0.9.2.2  2007/03/15 10:49:14  brian
+ - changes for release
+
  Revision 0.9.2.1  2007/02/25 12:45:32  brian
  - added new files for release package
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-osr61.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/25 12:45:32 $"
+#ident "@(#) $RCSfile: test-osr61.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/15 10:49:14 $"
 
-static char const ident[] = "$RCSfile: test-osr61.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/25 12:45:32 $";
+static char const ident[] = "$RCSfile: test-osr61.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/15 10:49:14 $";
 
 #include <sys/types.h>
 #include <stropts.h>
