@@ -128,7 +128,7 @@ in the release for more information.  Also, see the @file{@value{PACKAGE}.pdf}
 manual in the release (also in html
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
 
-For the news release, see @uref{http://www.openss7.org/rel20070314_2.html}.
+For the news release, see @uref{http://www.openss7.org/rel20070315_2.html}.
 
 @c ----------------------------------------------------------------------------
 
