@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: str_install.9.man,v 0.9.2.3 2006/10/05 12:15:46 brian Exp $
+.\" @(#) $Id: str_install.9.man,v 0.9.2.4 2007/03/15 09:05:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:15:46 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/15 09:05:44 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: str_install.9.man,v $
+.\" Revision 0.9.2.4  2007/03/15 09:05:44  brian
+.\" - some documentation updates
+.\"
 .\" Revision 0.9.2.3  2006/10/05 12:15:46  brian
 .\" - updates for release
 .\"
@@ -98,7 +101,17 @@ sort-adjacent-labels
 .br
 .B #include <sys/ddi.h>
 .HP
-.BI "int str_install(int " cmd ", strconf_t *" conf );
+int \fBstr_install\fR(int \fIcmd\fR, strconf_t *\fIconf\fR);
+.PP
+.B #define _HPUX_SOURCE
+.br
+.B #include <sys/streams.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+int \fBstr_install\fR(streams_info_t *\fIinst\fR);
+.HP
+int \fBstr_uninstall\fR(streams_info_t *\fIinst\fR);
 .\"
 .\"
 .SH ARGUMENTS
@@ -106,125 +119,125 @@ sort-adjacent-labels
 .TP
 .I cmd
 specifies the action to perform.
-.I cmd
-can be one of the following values:
-.sp
-.TS
-tab(:);
-lbw(12)2lssss.
-STR_LOAD_DEV:T{
-add a device
-T}
-STR_UNLOAD_DEV:T{
-remove a device
-T}
-STR_LOAD_MOD:T{
-load a module
-T}
-STR_UNLOAD_MOD:T{
-unload a module
-T}
-.TE
 .TP
 .I conf
 a pointer to a
 .BR strconf_t (9)
 structure specifying the characteristics of the driver or module upon which to
 perform the action.
+.TP
+.I inst
+A pointer to module information
+.B streams_info_t
+structure
+containing the
+.I STREAMS
+.BR streamtab (9)
+structure.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-.\"
-.\"
+There are two functions with different prototypes defined for
+.BR str_install (),
+each defined by
+.IR AIX \(rg
+.[
+aixspg
+.]
+and
+.IR HPUX \(rg,
+.[
+hpuxspg
+.]
+with somewhat different behaviour and requirements.
 .PP
-.I conf
-points to a
-.BR strconf_t (9)
-structure contains the following members:
-.sp
-.nf
-\fC\s-2\
-typedef struct {
-        char *sc_name;
-        struct streamtab *sc_str;
-        int sc_open_stylesc_flags;
-        int sc_major;
-        int sc_sqlevel;
-        caddr_t sc_sqinfo;
-} strconf_t;
-\s+2\fP
-.fi
-.TP
-.I sc_name
-.TP
-.I sc_str
-.TP
-.I sc_open_stylesc_flags
-xxx
-.sp
-.TS
-tab(:);
-lbw(14n)2lssss.
-STR_OLD_OPEN:SVR3 qi_qopen semantics
-STR_NEW_OPEN:SVR4 qi_qopen semantics
-.TE
-.TP
-.I sc_major
-.TP
-.I sc_sqlevel
-.TP
-.I sc_sqinfo
-.\"
-.\"
-.TP
-.B STR_LOAD_DEV
-.\"
-.\"
-.TP
-.B STR_UNLOAD_DEV
-.\"
-.\"
-.TP
-.B STR_LOAD_MOD
-.\"
-.\"
-.TP
-.B STR_UNLOAD_MOD
-.\"
-.\"
+When
+.B _AIX_SOURCE
+is defined before including header files, the
+.IR AIX \(rg
+version is used by definining symbol
+.BR str_install ()
+to
+.BR str_install_AIX (9).
+When
+.B _HPUX_SOURCE
+is defined before including header files, the
+.IR HPUX \(rg
+version is used by definining symbol
+.BR str_install ()
+to
+.BR str_install_HPUX (9).
 .\"
 .\"
 .SH RETURN
 .PP
+Both versions of
+.BR str_install ()
+return zero (0) upon success and a non-zero (positive) error code upon
+failure.
 .\"
 .\"
 .SH ERRORS
 .PP
+When either version of
+.BR str_install ()
+fails, it returns a positive error code.  See
+.BR str_install_AIX (9)
+or
+.BR str_install_HPUX (9)
+for error codes pertaining to each version of the function.
 .\"
 .\"
 .SH CONTEXT
 .PP
+.BR str_install ()
+should be called from User (process) Context.
+.BR str_install ()
+is intended to be called by kernel module initialization routines.
 .\"
 .\"
 .SH MP-STREAMS
 .PP
+.BR str_install ()
+is MP-safe.
 .\"
 .\"
 .SH NOTICES
 .PP
+.BR str_install ()
+is an
+.IR AIX \(rg-
+or
+.IR HPUX \(rg-specific
+function:
+.BR _AIX_SOURCE " or " _HPUX_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B @PACKAGE_TITLE@
+must also have been compiled with
+.BR CONFIGE_STREAMS_COMPAT_AIX ", " CONFIG_STREAMS_COMPAT_HPUX ", " CONFIG_STREAMS_COMPAT_AIX_MODULE " or " CONFIG_STREAMS_COMPAT_HPUX_MODULE
+defined.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR str_install_AIX (9),
+.BR str_install_HPUX (9),
+.BR STREAMS (9).
 .\"
 .\"
 .SH BUGS
 .PP
+.BR str_install ()
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+For specific compatibility of each version of the function, see
+.BR str_install_AIX (9)
+or
+.BR str_install_HPUX (9).
 .PP
 See
 .BR STREAMS (9)
@@ -233,10 +246,31 @@ for additional compatibility considerations.
 .\"
 .SH CONFORMANCE
 .PP
+.IR AIX \(rg
+DDI documentation,
+.[
+aixspg
+.]
+.[
+aixdoc
+.]
+.IR HPUX \(rg
+DDI documentation.
+.[
+hpuxspg
+.]
+.[
+hpuxdoc
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR str_install ()
+appeared both in
+.IR AIX \(rg
+and
+.IR HPUX \(rg.
 .\"
 .\"
 .[

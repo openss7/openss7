@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strmod_add.9.man,v 0.9.2.4 2006/10/06 12:13:07 brian Exp $
+.\" @(#) $Id: strmod_add.9.man,v 0.9.2.5 2007/03/15 09:05:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:13:07 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/15 09:05:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strmod_add.9.man,v $
+.\" Revision 0.9.2.5  2007/03/15 09:05:45  brian
+.\" - some documentation updates
+.\"
 .\" Revision 0.9.2.4  2006/10/06 12:13:07  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -358,22 +361,46 @@ A pointer to synchronization data.  This field is relevant only if
 is set to
 .BR SQLVL_ELSEWHERE
 and specifies the arbitrary scope of synchronization.
+.IP
+The value of this member is a character string providing the name of the
+external synchronization.  The registration function matches this name against
+all existing external synchronization names.  If a match is found, that
+synchronization queue is shared with this module.  If no match is found, a new
+synchronization queue with the provided name is created.
 .\"
 .\"
 .SH RETURN
 .PP
 When
 .BR strmod_add ()
-succeeds, it returns 
-.BR DDI_SUCCESS ;
-when it fails, it returns
-.BR DDI_FAILURE .
+succeeds,
+and
+.I sa_flags
+has
+.B STR_IS_DEVICE
+set, the return value is the character device number assigned to the driver.
+When
+.BR strmod_add ()
+succeeds,
+and
+.I sa_flags
+has
+.B STR_IS_MODULE
+set, the return value is the the module identifier assigned to the module.
+When either call fails,
+the return value is
+.BR NODEV .
 .\"
 .\"
 .SH ERRORS
 .PP
+When
 .BR strmod_add ()
-fails when 
+fails, it returns
+.BR NODEV .
+.BR strmod_add ()
+can fail because of failure to allocate the necessary structures, invalid parameters, or the
+unavailability of the requested name or major device number.
 .\"
 .\"
 .SH CONTEXT
@@ -479,8 +506,6 @@ setting in the
 field, whereas,
 .IR OSF/1 \(rg
 does not document this level.
-.IP \(em
-.IP \(em
 .IP \(em
 .BR strmod_add ()
 is provided for source level compatibility with
