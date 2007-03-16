@@ -218,3 +218,105 @@ Platforms:	Linux
 Copying-policy:	GPL
 End
 
+From bidulock@openss7.org Thu Mar 15 12:41:51 2007
+Date: Thu, 15 Mar 2007 12:41:51 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@openss7.org>
+Subject: LiS 2.18.5 Released - SVR 4 STREAMS for Linux
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package LiS-2.18.5 was released under GPLv2 2007-03-15.
+
+The OpenSS7 Linux STREAMS (LiS) package is an OpenSS7 modified version
+of the LiS-2.18 package formerly from GCOM, and formerly maintained by
+David Grothe.
+
+Note: The original LiS package from GCOM is no longer actively
+maintained by either GCOM or the OpenSS7 Project: use the OpenSS7 Linux
+Fast-STREAMS package instead.
+
+The following are claims made by its authors and original maintainer:
+
+ The OpenSS7 Modified Linux STREAMS (LiS) package is as STREAMS
+ framework that is compatible with SVR 4 STREAMS.  It has lots of
+ debugging features not found in other STREAMS packages.  Good to do
+ networking and other things.  It allows for installation of binary
+ drivers.
+
+Linux STREAMS (LiS) aims to provide SVR 4 compatible STREAMS
+implementation for Linux and claims to have special debugging
+facilities; however, the package suffers from the major failings that it
+is:
+
+ - no longer maintained;
+ - full of bugs;
+ - incompatible with POSIX;
+ - implements SVR 4 STREAMS rather than the more popular SVR 4.2 MP/ES
+   STREAMS;
+ - portions dubiously licensed under the LGPL;
+ - unsuitable for mainline adoption;
+ - adapts poorly to production kernels;
+ - many SMP races and lockups;
+ - broken 32-bit over 64-bit compatibility;
+ - no strlog(9) STREAMS logger;
+
+This is an internal release of LiS.  There are too many packages now
+that cannot build against LiS because it is lacking fundamental
+capabilities in the Stream head.
+
+Do not use this release.  Port to Linux Fast-STREAMS.  Do not report
+bugs on this release.  (Yup, there are lots of 'em, but that's LiS.)
+
+Major changes for release LiS-2.18.5
+
+ - Added versions to all exported symbols.  Made LiS functions GPL
+   export.
+
+ - Improvements to the common build environment with better support for
+   standalone package builds on 2.4 kernels.
+
+ - Support for autoconf 2.61, automake 2.10 and gettext 0.16.
+
+ - Support for Ubuntu 6.10 distribution and bug fixes for i386 kenels.
+
+This is an unstable public alpha release of the package.  Please see
+README-alpha in the release.  information.  Do not report bugs on this
+package.
+
+A large number of additional tests cases were found to fail on x86_64
+and SMP architectures making the LiS packages largely unusable,
+especially on 64-bit or SMP kernels.
+
+Deprecated and unmaintained.  Download the latest streams package
+version instead.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM- and DPKG-based distributions, and can be used on production kernels
+without patching or recompiling the kernel.
+
+This package is publicly released under the `GNU General Public
+License Version 2'.  The release is available as an autoconf tarball,
+SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
+(http://www.openss7.org/download.html) for the autoconf tarballs, SRPMs
+and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see the
+LiS package page (http://www.openss7.org/LiS_pkg.html).
+
+See http://www.openss7.org/codefiles/LiS-2.18.5/ChangeLog and
+http://www.openss7.org/codefiles/LiS-2.18.5/NEWS in the release for
+more information.  Also, see the `LiS.pdf' manual in the release
+(also in html http://www.openss7.org/LiS_manual.html).
+
+For the news release, see `http://www.openss7.org/rel20070315_0.html'.
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+

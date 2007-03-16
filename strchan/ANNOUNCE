@@ -259,3 +259,163 @@ Platforms:		Linux
 Copying-policy:		GPL
 End
 
+From bidulock@openss7.org Thu Mar 15 12:41:51 2007
+Date: Thu, 15 Mar 2007 12:41:51 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@openss7.org>
+Subject: strchan 0.9.2.2 Released - OpenSS7 Channels for Linux Fast-STREAMS
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package strchan-0.9.2.2 was released under GPLv2 2007-03-15.
+
+The OpenSS7 STREAMS Channels package provides STREAMS modules and
+drivers, libraries, programs, init scripts, and daemons that implement
+the OpenSS7 STREAMS isochronous channels for the purpose of implementing
+data transmission links, or for carrying voice or other media, such as
+channelization of T1 carrier facilities, or ATM AAL3.  This package also
+includes pseudo-isochronous channels such as those provided by RTP.
+
+Included are hardware device drivers and pseudo-device drivers that
+provide implementations of specific channels.  A pseudo-device driver is
+planned to link into the Linux OSS (Open Sound System) and ALS (Advanced
+Linux Sound).  Specific E1/T1 cards such as the V401P are supported by
+this package.
+
+This package also supports data channel protocols for data communication
+over isochronous channels such as HDLC and SS7 DAEDR/DAEDT/AERM/SUERM.
+Upper layer link protocols, such as LAPB, LAPF, LAPM and LLC are
+supported by separate packages.  These modules are provided here because
+they work directly over an isochronous channel and are therefore
+designed to work with them.  These data links provide support for the
+OpenSS7 STREAMS ISO/OSI as well as the OpenSS7 STREAMS ISDN Stacks and
+OpenSS7 STREAMS SS7 Stack packages.
+
+This is the second separate release from The OpenSS7 Project of the
+OpenSS7 STREAMS Channels package.  The package provides components that
+were previously part of the strss7 package.  This package contains all
+the necessary manual pages and other documentation.  The package is
+packaged as an OpenSS7 style autoconf tarball.
+
+This package builds and installs the following STREAMS kernel modules
+and drivers:
+
+     - streams_ch.ko driver "/dev/ch" "/dev/ch_mg"
+     - streams_mx.ko driver "/dev/mx" "/dev/mx_mg"
+     - streams_mg.ko driver "/dev/mg" "/dev/mg_mg"
+     - streams_pwe3.ko module "pwe3"
+     - streams_zaptel.ko module "zaptel"
+     - streams_cd_hdlc.ko module "cd_hdlc"
+     - streams_cd_daed.ko module "cd_daed"
+
+ch(4)
+     The ch(4) multiplexing pseudo-device driver is a fully functional
+     channel device capable of channelized, fractional or full-span
+     E1/T1/J1 statistically multiplexed channels.  Streams opened on
+     this device driver support delivery of the raw octet streams
+     associated with the multiplexed channel.
+
+mx(4)
+     The mx(4) multiplexing pseudo-device driver is a fully functional
+     matrix swithing device capable of switching, performing rate
+     adaption, echo cancellation, digital padding, conferencing, tones,
+     announcements, detection of tones, detection of speech, continuity
+     tests, progress tones, A-law/mu-law conversion,
+     decompression/compression, comb filtering, and other functions of a
+     digital switching matrix.
+
+mg(4)
+     The mg(4) multiplexing pseudo-device driver is a fully functional
+     media gateway device capable of providing conversion between
+     Circuit Switched Network connections (via the mx(4) driver) and
+     Ephemeral RTP streams (via the rtp(4) module and udp(4) driver).
+     This device also supports Media Gateway Control Protocol
+     communications of several forms over tcp(4) and sctp(4).
+
+pwe3(4)
+     The pwe3(4) module is a pushable STREAMS module that is pushed over
+     a tcp(4) or sctp(4) Stream to provide pseudo-wire emulation
+     end-to-end.  This device appears as though it is a channel device.
+
+zaptel(4)
+     The zaptel(4) multiplexing pseudo-device driver is a STREAMS driver
+     that provides the historical zaptel(4) interface for asterisk and
+     other open-PBX packages.  mx(4) streams are linked under the driver
+     and represent spans that can be managed by zaptel(4).
+
+cd_hdlc(4)
+     The cd_hdlc(4) module is a pushable STREAMS module that provides
+     the capabilties of the High-Level Data Link Control and can be
+     pushed over a raw ch(4) channel to provide a Communications Device
+     Interface (CDI) or Data Link Provider Interface (DLPI) suitable for
+     use with ISO/OSI protocols, X.25, ISDN or Frame Relay.
+
+cd_daed(4)
+     The cd_daed(4) module is a pushable STREAMS module that provides th
+     capabilities of SS7 High-Level Data Link Control (Q.702) and can be
+     pushed over a raw ch(4) channel to provide a Communications Device
+     Interface (CDI) or Signalling Data Terminal Interface (SDTI)
+     suitable for use with SS7 protocols.
+
+
+The OpenSS7 STREAMS Channels package includes kernel modules, SVR 4.2
+STREAMS drivers, modules, libraries, utilities, test programs, daemons,
+and development environment for the development and execution of OpenSS7
+STREAMS Channels applications for the SVR 4.2 STREAMS environment.
+
+This package is currently incomplete.  It is being released as a
+reference point for the community.  If you are interested in completion
+of this package, sponsor the OpenSS7 Project.  To sponsor the project,
+contact <info@openss7.com>.
+
+This is the second pre-alpha release for Linux Fast-STREAMS and is an
+optional part of the OpenSS7 Master Package (as of openss7-0.9.2.D).
+
+This release is a maintenance release providing support for recent
+distributions and tool chains.
+
+This package is currently incomplete.  It is being released as a
+reference point for the community.  If you are interested in completion
+of this package, contact info@openss7.com.
+
+Major features since the last public release are as follows:
+
+ - Improvements to the common build environment with better support for
+   standalone package builds on 2.4 kernels.
+
+ - Support for autoconf 2.61, automake 1.10 and gettext 0.16.
+
+ - Support for Ubuntu 6.10 distribution and bug fixes for i386 kernels.
+
+ - The package now looks for other subpackages with a version number as
+   unpacked by separate tarball.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM- and DPKG-based distributions, and can be used on production kernels
+without patching or recompiling the kernel.
+
+This package is publicly released under the `GNU General Public License
+Version 2'.  The release is available as an autoconf tarball, SRPM, DSC,
+and set of binary RPMs and DEBs.  See the downloads page
+(http://www.openss7.org/download.html) for the autoconf tarballs, SRPMs
+and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see the
+strchan package page (http://www.openss7.org/strchan_pkg.html).
+
+See http://www.openss7.org/codefiles/strchan-0.9.2.2/ChangeLog and
+http://www.openss7.org/codefiles/strchan-0.9.2.2/NEWS in the release for
+more information.  Also, see the `strchan.pdf' manual in the release
+(also in html http://www.openss7.org/strchan_manual.html).
+
+For the news release, see `http://www.openss7.org/rel20070315_9.html'.
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+
