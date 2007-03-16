@@ -227,10 +227,10 @@ Keywords:		STREAMS, SCTP, SVR 4.2 MP, SS7, SIGTRAN, VoIP, ISDN
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ tarballs/
-			158M openss7-0.9.2.E.tar.gz
-			132M openss7-0.9.2.E.tar.bz2
+			76M openss7-0.9.2.E.tar.gz
+			64M openss7-0.9.2.E.tar.bz2
 Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
-			132M openss7-0.9.2.E-1.src.rpm
+			64M openss7-0.9.2.E-1.src.rpm
 Original-site:		
 Platforms:		Linux
 			Requires: Linux kernel 2.4 or 2.6

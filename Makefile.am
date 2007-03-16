@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/03/04 09:59:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/16 10:30:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 09:59:38 $ by $Author: brian $
+# Last Modified $Date: 2007/03/16 10:30:16 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.31  2007/03/16 10:30:16  brian
+# - final changes from release
+#
 # Revision 0.9.2.30  2007/03/04 09:59:38  brian
 # - updates for release, do not propagate empty flags, build improvements
 #
@@ -117,24 +120,21 @@ include am/pr.am
 #
 master-dist-hook:
 	@(cd $(distdir) ; \
-		list='$(DIST_SUBDIRS)' ; for subdir in $$list ; do \
-			case "$$subdir" in \
-			(.) 	continue ;; \
-			(doc) 	continue ;; \
-			(*) 	if test -d "$$subdir" ; then \
-					case " $(REMOVE_SUBDIRS) " in \
-					(*" $$subdir "*) \
-						$(ECHO) "rm -fr $$subdir" ; \
-						rm -fr $$subdir ;; \
-					(*) \
-						version=`cat $$subdir/.version` ; \
-						$(ECHO) "mv -f $$subdir $$subdir-$${version:-$(VERSION)}" ; \
-						mv -f "$$subdir" "$$subdir-$${version:-$(VERSION)}" ; \
-						$(ECHO) "ln -sf $$subdir-$${version:-$(VERSION)} $$subdir" ; \
-						ln -sf $$subdir-$${version:-$(VERSION)} $$subdir ;; \
-					esac ; \
-				fi ;; \
-			esac ; \
+		list='$(subdirs)' ; for s in $$list ; do \
+			if test -d "$$s" ; then \
+				case " $(REMOVE_SUBDIRS) " in \
+				(*" $$s "*) \
+					$(ECHO) "rm -fr $$s" ; \
+					rm -fr $$s ;; \
+				(*) \
+					if test $$s = stacks ; then d=strss7 ; else d="$$s" ; fi ; \
+					version=`cat $$s/.version` ; \
+					$(ECHO) "mv -f $$s $$d-$${version:-$(VERSION)}" ; \
+					mv -f "$$s" "$$d-$${version:-$(VERSION)}" ; \
+					$(ECHO) "ln -sf $$d-$${version:-$(VERSION)} $$s" ; \
+					ln -sf $$d-$${version:-$(VERSION)} $$s ;; \
+				esac ; \
+			fi ; \
 		done ; \
 	)
 
