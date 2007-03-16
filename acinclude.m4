@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/03/06 21:23:01 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/03/16 10:30:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 21:23:01 $ by $Author: brian $
+# Last Modified $Date: 2007/03/16 10:30:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -832,6 +832,10 @@ dnl
     master_builddir="$os7_cv_master_builddir"
     AC_SUBST([master_srcdir])
     AC_SUBST([master_builddir])
+dnl
+dnl we have symbolic links in the master tarball, remove the h from chof
+dnl
+    am__tar='${AMTAR} cof - "$$tardir"'
 dnl
 dnl LiS or LFS.
 dnl

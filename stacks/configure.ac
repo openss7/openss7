@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/02/22 08:47:00 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/03/16 10:30:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/22 08:47:00 $ by $Author: brian $
+# Last Modified $Date: 2007/03/16 10:30:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.60])
 AC_INIT([strss7],[0.9a],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.40 $) $Date: 2007/02/22 08:47:00 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.41 $) $Date: 2007/03/16 10:30:28 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -176,7 +176,6 @@ AC_CONFIG_FILES([Makefile
 		 scripts/texi/args.texi
 		 intl/Makefile
 		 po/Makefile.in
-		 m4/Makefile
 		 src/include/Makefile
 		 src/Makefile
 		 lib32/Makefile
@@ -213,6 +212,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.41  2007/03/16 10:30:28  brian
+# - final changes from release
+#
 # Revision 0.9.2.40  2007/02/22 08:47:00  brian
 # - updated required autoconf to 2.60
 #

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/13 06:17:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/16 10:30:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/13 06:17:20 $ by $Author: brian $
+# Last Modified $Date: 2007/03/16 10:30:38 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2007/03/16 10:30:38  brian
+# - final changes from release
+#
 # Revision 0.9.2.7  2007/03/13 06:17:20  brian
 # - suppress errors when building 32-bit libs
 #
@@ -321,7 +324,7 @@ if RPM_BUILD_USER
 SUBDIRS = src
 
 if PKG_BUILD_ARCH
-SUBDIRS += intl m4 po
+SUBDIRS += intl po
 CLEANFILES += po/stamp-po
 endif
 
