@@ -221,3 +221,95 @@ Platforms:		Linux
 Copying-policy:		GPL
 End
 
+From bidulock@openss7.org Thu Mar 15 12:41:51 2007
+Date: Thu, 15 Mar 2007 12:41:51 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@openss7.org>
+Subject: strss7 0.9a.6 Released - STREAMS SS7 stack for Linux Fast-STREAMS
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package strss7-0.9a.6 was released under GPLv2 2007-03-15.
+
+The OpenSS7 SS7 Stack package includes a wide array of kernel modules,
+SVR 4.2 STREAMS drivers, modules, libraries, utilities, test programs,
+daemons, and development environment for the development and execution
+of Signalling System Number 7 (SS7), Signalling Transport (SIGTRAN),
+Integrated Services Digital Network (ISDN) and Voice over IP (VoIP)
+protocol stack components and applications for the Linux Fast-STREAMS
+environment.
+
+However, the current package has had ISDN components moved to the
+strisdn package, SIGTRAN components moved to the sigtran package, and
+VoIP components moved to the strvoip package.  Only SS7 components
+remain in the strss7 package.
+
+The OpenSS7 SS7 Stack package contains a wide array of SS7 drivers and
+components for Linux Fast-STREAMS.  This is the public release package
+which has most of the components removed.  Subscribers and sponsors of
+the OpenSS7 Project have access to the full array of components.
+
+This is the sixth release of the OpenSS7 SS7 Stack strss7 package that
+contains SS7 (Signalling System No.  7) signalling stack components for
+Linux Fast-STREAMS.  The package contains the necessary header files,
+manual pages and other documentation for SS7 components in a separate
+autoconf tarball.
+
+This release is primarily to support recent compilers, kernels and
+distributions.
+
+Major features since the last public release are as follows:
+
+ - Corrected support for the DS2152/21352/21552/2154/21352/21555 chips
+   present in older V400P cards.  (See BUGS in the release for more
+   information.)
+
+ - Support for the DS2156 chip present in recent V401PE cards.  (See
+   BUGS in the release for more information.)
+
+ - Corrections for timer bugs in the X400P-SS7 driver.  (See BUGS in the
+   release for more information.)
+
+ - Improvements to the common build environment with better support for
+   standalone package builds on 2.4 kernels.
+
+ - Support for autoconf 2.61, automake 1.10 and gettext 0.16.
+
+ - Support for Ubuntu 6.10 distribution and bug fixes for i386 kernels.
+
+ - The package now looks for other subpackages with a version number as
+   unpacked by separate tarball.
+
+This is a public stable production grade release of the package: it
+deprecates previous releases.  Please upgrade to the current release
+before reporting bugs.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM- and DPKG-based distributions, and can be used on production kernels
+without patching or recompiling the kernel.
+
+This package is publicly released under the `GNU General Public License
+Version 2'.  The release is available as an autoconf tarball, SRPM, DSC,
+and set of binary RPMs and DEBs.  See the downloads page
+(http://www.openss7.org/download.html) for the autoconf tarballs, SRPMs
+and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see the
+strss7 package page (http://www.openss7.org/strss7_pkg.html).
+
+See http://www.openss7.org/codefiles/strss7-0.9a.6/ChangeLog and
+http://www.openss7.org/codefiles/strss7-0.9a.6/NEWS in the release for
+more information.  Also, see the `strss7.pdf' manual in the release
+(also in html http://www.openss7.org/strss7_manual.html).
+
+For the news release, see `http://www.openss7.org/rel20070315_5.html'.
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+

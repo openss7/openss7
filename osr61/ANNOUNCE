@@ -44,3 +44,142 @@ Platforms:		Linux
 Copying-policy:		GPL
 End
 
+From bidulock@openss7.org Thu Mar 15 12:41:51 2007
+Date: Thu, 15 Mar 2007 12:41:51 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@openss7.org>
+Subject: osr61 0.9.2.1 Released - OpenSS7 Dialogic Open System Release 6.1
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package osr61-0.9.2.1 was released under GPLv2 2007-03-15.
+
+The Dialogic Open Systems Release 6.1 package provides STREAMS modules
+and drivers, libraries, programs, init scripts, and daemons that
+implement the Dialogic(R) Open System Release 6.1 drivers for Linux
+Fast-STREAMS.
+
+This is an OpenSS7 Project modified relase of the GPL Dialogic(R) OSR
+6.1 Release 239 drivers modified for use with Linux Fast-STREAMS.
+
+The Dialogic Open Systems Release 6.1 package includes kernel modules,
+SVR 4.2 STREAMS drivers, modules, libraries, utilities, test programs,
+daemons, and development environment for the development and execution
+of Dialogic Open Systems Release 6.1 components and applications for the
+SVR 4.2 STREAMS environment.  It provides true STREAMS-based Dialogic(R)
+OSR 6.1 drivers for Linux.
+
+The package builds and installs the following STREAMS kernel modules and
+drivers:
+
+     - streams_dlgnDriver.ko driver /dev/streams/dlgn
+     - streams_gncfdDriver.ko driver /dev/streams/gncfd
+     - streams_gpioDriver.ko driver /dev/streams/gpio
+     - streams_mercdDriver.ko driver /dev/streams/mercd
+     - streams_dvbmDriver.ko module dvbm
+     - streams_sctmrDriver.ko module sctmr
+     - pmacd.ko driver
+     - ctimod.ko module
+
+The Springware device drivers support the ability to run the older
+Springware legacy platform.  These are STREAMS based and use STREAMS
+functionality provided by Linux Fast-STREAMS.  Unlike DM3 or PMAC, a
+common library interface to access these drivers does no exist which
+makes their removal difficult.  All User Interfaces are provided by
+Linux Fast-STREAMS, based on the STREAMS protocol.
+
+dlgn(4)
+     The dlgn(4) driver is a device driver that provides access to the
+     Dialogic(R) SpringWare and Antares boards.
+
+gncfd(4)
+     The gncfd(4) driver is a generic configuration driver that is used
+     by the Dialogic(R) runtime libraries to perform configuration for
+     Dialogic(R) SpringWare and Antares boards.
+
+gpio(4)
+     The gpio(4) driver is the generic input-output interface for
+     downloading firmware.
+
+mercd(4)
+     The mercd(4) driver is a device driver for the Dialogic(R) DM3
+     family of boards including the Mercury board (after which it is
+     named).
+
+dvbm(4)
+     The dvbm(4) module is a device access module that is pushed over a
+     dlgn(4) driver Stream.
+
+sctmr(4)
+     The sctmr(4) module is a timer module that is pushed over a dlgn(4)
+     driver Stream (but may also be pushed over a null Stream such as
+     nuls(4)).
+
+pmacd(4)
+     The pmacd(4) driver is a non-STREAMS driver for the Dialogic(R) IPT
+     family of boards.
+
+ctimod(4)
+     The ctimod(4) kernel module is a CTI wrapper module that provides
+     wrappers of kernel functions for use principally by the pmacd(4)
+     driver.
+
+The Dialogic Open Systems Release 6.1 package includes kernel modules,
+SVR 4.2 STREAMS drivers, modules, libraries, utilities, test programs,
+daemons, and development environment for the development and execution
+of Dialogic Open Systems Release 6.1 components and applications for the
+SVR 4.2 STREAMS environment.
+
+This distribution is only currently applicable to Linux 2.4 and 2.6
+kernels and was targeted at ix86, x86_64, ppc and ppc64 architectures,
+but should build and install for other architectures as well.
+
+This release is the initial public release.
+
+Major features are as follows:
+
+ - In this initial release, the package already supports a wide range of
+   production distributions as it uses the same build environment as
+   other OpenSS7 Project packages.
+
+ - Added versions to all exported symbols.  Made LFS unique functions
+   GPL export.
+
+ - Improvements to the common build environment with better support for
+   standalone package builds on 2.4 kernels.
+
+ - Support for most recent 2.6.18 kernels (including Fedora Core 5 with
+   inode diet patchset).
+
+This is the initial public alpha release of the package.  Please see
+README-alpha in the release, or Maturity, in the manual.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM- and DPKG-based distributions, and can be used on production kernels
+without patching or recompiling the kernel.
+
+This package is publicly released under the `GNU General Public License
+Version 2'.  The release is available as an autoconf tarball, SRPM, DSC,
+and set of binary RPMs and DEBs.  See the downloads page
+(http://www.openss7.org/download.html) for the autoconf tarballs, SRPMs
+and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see the
+osr61 package page (http://www.openss7.org/osr61_pkg.html).
+
+See http://www.openss7.org/codefiles/osr61-0.9.2.1/ChangeLog and
+http://www.openss7.org/codefiles/osr61-0.9.2.1/NEWS in the release for
+more information.  Also, see the `osr61.pdf' manual in the release (also
+in html http://www.openss7.org/osr61_manual.html).
+
+For the news release, see `http://www.openss7.org/rel20070315_M.html'.
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+

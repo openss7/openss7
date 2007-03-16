@@ -145,3 +145,66 @@ Platforms:		Linux
 Copying-policy:		GPL
 End
 
+From bidulock@openss7.org Thu Mar 15 12:41:51 2007
+Date: Thu, 15 Mar 2007 12:41:51 -0700
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@gsyc.escet.urjc.es>
+Subject: strbcm 0.9.2.3 Released - STREAMS Terminals for Linux
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package strbcm-0.9.2.3 was released under GPLv2 2007-03-15.
+
+The OpenSS7 STREAMS Binary Compatibility Modules package provides
+STREAMS modules and drivers, programs and daemons for the compilation of
+externally supplied source and binary STREAMS modules.
+
+This is an internal alpha release of the package.
+
+Major changes for release strbcm-0.9.2.3:
+
+ - Improvements to the common build environment with better support for
+   standalone package builds on 2.4 kernels.
+
+ - Support for autoconf 2.61, automake 1.10 and gettext 0.16.
+
+ - Support for Ubuntu 6.10 distribution and bug fixes for i386 kenels.
+
+ - The package now looks for other subpackages with a version number as
+   unpacked by separate tarball.
+
+This release is the initial public release.
+
+This is public alpha release of the package: it deprecates previous
+releases.  Please upgrade before reporting problems with previous
+releases.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM- and DPKG-based distributions, and can be used on production kernels
+without patching or recompiling the kernel.
+
+This package is publicly released under the `GNU General Public License
+Version 2'.  The release is available as an autoconf tarball, SRPM, DSC,
+and set of binary RPMs and DEBs.  See the downloads page
+(http://www.openss7.org/download.html) for the autoconf tarballs, SRPMs
+and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see the
+strbcm package page (http://www.openss7.org/strbcm_pkg.html).
+
+See http://www.openss7.org/codefiles/strbcm-0.9.2.3/ChangeLog and
+http://www.openss7.org/codefiles/strbcm-0.9.2.3/NEWS in the release
+for more information.  Also, see the `strbcm.pdf' manual in the
+release (also in html http://www.openss7.org/strbcm_manual.html).
+
+For the news release, see `http://www.openss7.org/rel20070315_I.html'.
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+
