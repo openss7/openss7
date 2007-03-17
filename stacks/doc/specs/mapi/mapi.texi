@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: mapi.texi,v 0.9.2.7 2006/08/26 09:17:14 brian Exp $
+% @(#) $Id: mapi.texi,v 0.9.2.8 2007/03/17 08:31:39 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/26 09:17:14 $ by $Author: brian $
+% Last Modified $Date: 2007/03/17 08:31:39 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -325,6 +325,9 @@ A printed (or postscript) version of this document is an UNCONTROLLED version.
 @smallexample
 
 $Log: mapi.texi,v $
+Revision 0.9.2.8  2007/03/17 08:31:39  brian
+- corrected formatting problems
+
 Revision 0.9.2.7  2006/08/26 09:17:14  brian
 - better release file generation
 
@@ -440,7 +443,7 @@ that the event has occurred.  @emph{Figure 1} shows the model of the MAPI.
 
 @cartouche
 @center Figure 1 -- @emph{Module of the MAP Interface}
-@image{mapi_fig,4in}
+@center @image{mapi_fig,4in}
 @end cartouche
 
 The MAPI allows the MAP provider to be configured with any MAP user (such as an HLR, MSC or SGSN application) that also
@@ -8664,7 +8667,6 @@ Release 6.6.0.
 @item @code{MAP_UABORT_IND}	@tab MAP-U-ABORT @b{ind}
 @item @code{MAP_PABORT_IND}	@tab MAP-P-ABORT @b{ind}
 @item @code{MAP_NOTICE_IND}	@tab MAP-NOTICE @b{ind}
-
 @item @code{MAP_STC1_REQ}	@tab MAP-SECURE-TRANSPORT-CLASS-1 @b{req}
 @item @code{MAP_STC1_IND}	@tab MAP-SECURE-TRANSPORT-CLASS-1 @b{ind}
 @item @code{MAP_STC2_REQ}	@tab MAP-SECURE-TRANSPORT-CLASS-2 @b{req}
@@ -8673,7 +8675,6 @@ Release 6.6.0.
 @item @code{MAP_STC3_IND}	@tab MAP-SECURE-TRANSPORT-CLASS-3 @b{ind}
 @item @code{MAP_STC4_REQ}	@tab MAP-SECURE-TRANSPORT-CLASS-4 @b{req}
 @item @code{MAP_STC4_IND}	@tab MAP-SECURE-TRANSPORT-CLASS-4 @b{ind}
-
 @item @code{MAP_ACTSS_REQ}	@tab MAP-ACTIVATE-SS @b{req}
 @item @code{MAP_ACTSS_IND}	@tab MAP-ACTIVATE-SS @b{ind}
 @item @code{MAP_ACTSS_RES}	@tab MAP-ACTIVATE-SS @b{rsp}
@@ -8982,7 +8983,6 @@ Release 6.6.0.
 @item @code{MAP_USSDREQ_IND}	@tab MAP-UNSTRUCTURED-SS-REQUEST @b{ind}
 @item @code{MAP_USSDREQ_RES}	@tab MAP-UNSTRUCTURED-SS-REQUEST @b{rsp}
 @item @code{MAP_USSDREQ_CON}	@tab MAP-UNSTRUCTURED-SS-REQUEST @b{cnf}
-
 @end multitable
 
 @section Application Contexts

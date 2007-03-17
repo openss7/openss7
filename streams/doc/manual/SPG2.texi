@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG2.texi,v 0.9.2.14 2007/03/02 09:23:23 brian Exp $
+% @(#) $Id: SPG2.texi,v 0.9.2.15 2007/03/17 08:31:55 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/03/02 09:23:23 $ by $Author: brian $
+% Last Modified $Date: 2007/03/17 08:31:55 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -552,6 +552,9 @@ package.
 @smallexample
 
 $Log: SPG2.texi,v $
+Revision 0.9.2.15  2007/03/17 08:31:55  brian
+- corrected formatting problems
+
 Revision 0.9.2.14  2007/03/02 09:23:23  brian
 - build updates and esballoc() feature
 
@@ -5341,16 +5344,16 @@ specifies a synchronization mechanism that can be used during configuration of a
 driver or module to specify the level of synchronization required by a module.  The @cite{SVR 4}
 synchronization levels are as follows:
 
-@multitable @columnfractions .30 .70
+@table @asis
 @item @constant{SQLVL_DEFAULT}
 @cindex synchronization, default
-@tab @emph{Default level synchronization.}
+@emph{Default level synchronization.}
 Specifies that the module uses the default synchronization scheme.  This is the same as specifying
 @constant{SQLVL_MODULE}.
 
 @item @constant{SQLVL_GLOBAL}
 @cindex synchronization, global
-@tab @emph{Global (@dfn{STREAMS} scheduler) level synchronization.}
+@emph{Global (@dfn{STREAMS} scheduler) level synchronization.}
 Specifies that all of @dfn{STREAMS} can be access by only one thread at the same time.  The module
 is run with global synchronization.  This means that only one @dfn{STREAMS} executive thread will be
 permitted to enter any module.  This makes the entire @dfn{STREAMS} executive single threaded and is
@@ -5360,7 +5363,7 @@ normally be used only for debugging.
 
 @item @constant{SQLVL_ELSEWHERE}
 @cindex synchronization, elsewhere
-@tab @emph{Module group level synchronization.}
+@emph{Module group level synchronization.}
 Specifies that the module is run with synchronization within a group of modules.  Only one thread of
 execution will be within the group of modules at a time.  The group is separately specified as a
 character string name.  This permits a group of modules to run single threaded as though they are
@@ -5370,7 +5373,7 @@ structures.
 
 @item @constant{SQLVL_MODULE}
 @cindex synchronization, module
-@tab @emph{Module level synchronization.}
+@emph{Module level synchronization.}
 Specifies that all instances of a module can be accessed by only one thread at the same time.  This
 is the default value.
 The module is run with synchronization at the module.  Only one thread of execution will be
@@ -5382,7 +5385,7 @@ perimeters.
 
 @item @constant{SQLVL_QUEUEPAIR}
 @cindex synchronization, queue pair
-@tab @emph{Queue pair level synchronization.}
+@emph{Queue pair level synchronization.}
 Specifies that each queue pair can be accessed by only one thread at the same time.  Only one thread
 will be permitted to enter a given queue's procedures within a given queue pair.  Where the read and
 write side of the queue pair share the same private structure (@samp{q->q_ptr}), this provides
@@ -5393,7 +5396,7 @@ perimeters.
 
 @item @constant{SQLVL_QUEUE}
 @cindex synchronization, queue
-@tab @emph{Queue level synchronization.}
+@emph{Queue level synchronization.}
 Specifies that each queue can be accessed by only one thread at the same time.  The module is run
 with synchronization at the queue.  Only one thread of execution will be permitted to enter a given
 queue's procedures, however, another thread will be permitted to enter procedures of the other queue
@@ -5404,7 +5407,7 @@ perimeters.
 
 @item @constant{SQLVL_NOP}
 @cindex synchronization, none
-@tab @emph{No synchronization.}
+@emph{No synchronization.}
 Specifies that each queue can be accessed by more than one thread at a the same time.  The
 protection of internal data and of @manpage{put(9)}
 and @manpage{srv(9)}
@@ -5414,7 +5417,7 @@ is done by the module or driver itself.  This synchronization level should be us
 multiprocessor-efficient modules.
 This level is roughly equivalent to @cite{Solaris} @constant{D_MP}
 flag.
-@end multitable
+@end table
 
 @node Synchronous Entry Points
 @section Synchronous Entry Points
@@ -5423,35 +5426,40 @@ flag.
 @dfn{Synchronous Entry Points} are those entry points into the @dfn{STREAMS} driver or module that
 will be synchronized according to the specified synchronization level.
 
-@multitable @columnfractions .30 .70
-@item @manpage{put(9)} @tab @emph{Queue put procedure.}
+@table @manpage
+@item put(9)
+@emph{Queue put procedure.}
 If the module has any synchronization level other than @constant{SQLVL_NOP},
 the put procedure will be exclusive.  Attempts to enter the put procedure while another thread is
 running within the synchronization level will result in the call being postponed until the thread
 currently in the synchronization level exits.
-
-@item @manpage{srv(9)} @tab If the module has any synchronization level other than @constant{SQLVL_NOP},
+@item srv(9)
+If the module has any synchronization level other than @constant{SQLVL_NOP},
 @emph{Queue service procedure.}
 the service procedure will be exclusive.  Attempts to enter the service procedure while another
 thread is running within the synchronization level will result in the service procedure being
 postponed until the thread currently in the synchronization level exits.
-
-@item @manpage{qopen(9)} @tab @emph{Queue open procedure.}
+@item qopen(9)
+@emph{Queue open procedure.}
 The queue open procedure is synchronous and exclusive before the call to @manpage{qprocson(9)},
 or in any event, until return from the procedure.  If the module has synchronization level of
 global, elsewhere or per-module; the call to the @manref{qopen(9)} procedure is exclusive.
-
-@item @manpage{qclose(9)} @tab @emph{Queue close procedure.}
+@item qclose(9)
+@emph{Queue close procedure.}
 The queue close procedure is synchronous and exclusive after the call to @manpage{qprocsoff(9)},
 or in any event, after return from the procedure.  If the module has synchronization level of
 global, elsewhere or per-module; the call to the @manref{qclose(9)} procedure is exclusive.
-
-@item @manpage{qprocson(9)} @tab @emph{Queue procedures on.}
-@item @manpage{qprocsoff(9)} @tab @emph{Queue procedures off.}
-@item @manpage{freezestr(9)} @tab @emph{Freeze stream.}
-@item @manpage{unfreezestr(9)} @tab @emph{Thaw stream.}
-@item @manpage{qwriter(9)} @tab @emph{Queue writer.}
-@end multitable
+@item qprocson(9)
+@emph{Queue procedures on.}
+@item qprocsoff(9)
+@emph{Queue procedures off.}
+@item freezestr(9)
+@emph{Freeze stream.}
+@item unfreezestr(9)
+@emph{Thaw stream.}
+@item qwriter(9)
+@emph{Queue writer.}
+@end table
 
 @node Synchronous Callbacks
 @section Synchronous Callbacks
@@ -7196,148 +7204,148 @@ file system).
 @node Glossary
 @unnumbered Glossary
 
-@multitable @columnfractions .30 .70
+@table @dfn
 
-@item @dfn{anchor} @tab
+@item anchor
 @cindex anchor
 A @dfn{STREAMS} locking mechanism that prevents the removal of @dfn{STREAMS} modules with the
 @streamio{I_POP} @command{ioctl}.  Anchors are placed on @dfn{STREAMS} modules by adding the
 @samp{[anchor]} flag to @manref{autopush(8)} configuration files or directly with the
 @streamio{I_ANCHOR} @command{ioctl}.
 
-@item @dfn{autopush} @tab
+@item autopush
 @cindex autopush
 A @dfn{STREAMS} mechanism that enables a pre-specified list of modules to be pushed automatically
 onto a @dfn{Stream} when a @dfn{STREAMS} device is opened.  This mechanism is used only for
 administrative purposes.
 
-@item @dfn{back-enable} @tab
+@item back-enable
 @cindex back-enable
 To enable (by @dfn{STREAMS}) a preceding blocked queue's @command{service} procedure when
 @dfn{STREAMS} determines that a succeeding queue has reached its low-water mark.
 
-@item @dfn{blocked} @tab
+@item blocked
 @cindex blocked
 A queue's @command{service} procedure that cannot be enabled due to flow control.
 
-@item @dfn{clone device} @tab
+@item clone device
 @cindex clone device
 A @dfn{STREAMS} device that returns an unused major/minor device number when initially opened,
 rather than requiring the minor device to be specified by name in the @command{open} call.
 
-@item @dfn{close procedure} @tab
+@item close procedure
 @cindex close procedure
 A routine that is called when a module is popped from a @dfn{Stream} or when a driver is closed.
 A pointer to this procedure is specified in the @member{qi_qopen} member of the @mantype{queue(9)}
 structure associated with the read side of the module's queue pair.
 
-@item @dfn{control Stream} @tab
+@item control Stream
 @cindex control Stream
 A @dfn{Stream} above a multiplexing driver used to establish lower multiplexer connections.
 Multiplexed @dfn{Stream} configurations are maintained through the controlling @dfn{Stream} to a
 multiplexing driver.
 
-@item @dfn{Device Driver Interface} @tab
+@item Device Driver Interface
 @cindex Device Driver Interface
 An interface that facilitates driver portability across different @cite{UNIX} system versions.
 
-@item @dfn{device driver} @tab
+@item device driver
 @cindex device driver
 A @dfn{Stream} component whose principle functions are handling an associated physical device and
 transforming data and information between the external interface and the @dfn{Stream}.
 
-@item @dfn{Driver Kernel Interface} @tab
+@item Driver Kernel Interface
 @cindex Driver Kernel Interface
 An interface between the @cite{UNIX} system kernel and different types of drivers.  It consists of a
 set of driver defined functions that are called by the kernel.  These functions are entry points
 into a driver.
 
-@item @dfn{downstream} @tab
+@item downstream
 @cindex downstream
 A direction of data flow going from the @dfn{Stream head} toward a driver.  Also called the
 @dfn{write-side} and @dfn{output-side}.
 
-@item @dfn{driver} @tab
+@item driver
 @cindex driver
 A module that forms the @dfn{Stream end}.  It can be a device driver or a pseudo-device driver.  It
 is a required component in @dfn{STREAMS} (except in @dfn{STREAMS}-based pipes and FIFOs), and is
 physically identical to a module.  It typically handles data transfer between the kernel and a
 device and does little or no processing of data.
 
-@item @dfn{enable} @tab
+@item enable
 @cindex enable
 A term used to describe scheduling of a queue's @command{service} procedure.
 
-@item @dfn{FIFO} @tab
+@item FIFO
 @cindex FIFO
 @dfn{First In, First Out}.  A term used in @dfn{STREAMS} for named pipes.  This term is also used in
 queue scheduling.
 
-@item @dfn{flow control} @tab
+@item flow control
 @cindex flow control
 A @dfn{STREAMS} mechanism that regulates the rate of message transfer within a @dfn{Strema} and from
 user space into a @dfn{Stream}.
 
-@item @dfn{hardware emulation module} @tab
+@item hardware emulation module
 @cindex hardware emulation module
 A module required when the terminal line discipline is on a @dfn{Stream} but there is no terminal
 driver at the @dfn{Stream end}.  This module recognizes all @manref{termio(7)} @command{ioctl}s
 necessary to support terminal semantics specified by @mantype{termio(9)} and @mantype{termios(9)}.
 
-@item @dfn{input side} @tab
+@item input side
 @cindex input side
 A direction of data flow going from a driver toward the @dfn{Stream head}.  Also called
 @dfn{read-side} and @dfn{upstream}.
 
-@item @dfn{line discipline} @tab
+@item line discipline
 @cindex line discipline
 A @dfn{STREAMS} module that performs @manref{termio(7)} canonical and non-canonical processing.  It
 shares some @manref{termio(7)} processing with a driver in a @dfn{STREAMS} terminal subsystem.
 
-@item @dfn{lower Stream} @tab
+@item lower Stream
 @cindex lower Stream
 A @dfn{Stream} connected beneath a multiplexing pseudo-device driver, by means of an
 @streamio{I_LINK} or @streamio{I_PLINK} @command{ioctl}.  The far end of a lower @dfn{Stream}
 terminates at a device driver or another multiplexer driver.
 
-@item @dfn{master driver} @tab
+@item master driver
 @cindex master driver
 A @dfn{STREAMS}-based device supported by the pseudo-terminal subsystem.  It is the controlling part
 of the pseudo-terminal subsystem (also called @samp{ptm}).
 
-@item @dfn{message} @tab
+@item message
 @cindex message
 One or more linked message blocks.  A message is referenced by its first message block and its type
 is defined by the message type of that block.
 
-@item @dfn{message block} @tab
+@item message block
 @cindex message block
 A triplet consisting of a data buffer and associated control structures, a @mantype{msgb(9)}
 structure, a @mantype{datab(9)} structure.  It carries data or information, as identified by its
 message type, in a @dfn{Stream}.
 
-@item @dfn{message queue} @tab
+@item message queue
 @cindex message queue
 A linked list of zero or more messages connected together.
 
-@item @dfn{message type} @tab
+@item message type
 @cindex message type
 A enumerated set of values identifying the contents of a message.
 
-@item @dfn{module} @tab
+@item module
 @cindex module
 A defined set of kernel-level routines and data structure used to process data, status, and control
 information on a @dfn{Stream}.  It is an optional element, but there can be many modules in one
 @dfn{Stream}.  It consists of a pair of queues (read queue and write queue), and it communicates to
 other components in a @dfn{Stream} by passing messages.
 
-@item @dfn{multiplexer} @tab
+@item multiplexer
 @cindex multiplexer
 A @dfn{STREAMS} mechanism that allows message to be routed among multiple @dfn{Streams} in the
 kernel.  A multiplexing configuration includes at least one multiplexing pseudo-device driver
 connected to one or more upper @dfn{Streams} and one or more lower @dfn{Streams}.
 
-@item @dfn{named Stream} @tab
+@item named Stream
 @cindex named Stream
 A @dfn{Stream}, typically a pipe, with a name associated with it by way of a call to
 @manref{fattach(3)} (that is, a @manref{mount(2)} operation).  This is different from a named pipe
@@ -7345,52 +7353,52 @@ A @dfn{Stream}, typically a pipe, with a name associated with it by way of a cal
 bidirectional; a name @dfn{Stream} need not refer to a pipe, but can be another type of
 @dfn{Stream}.
 
-@item @dfn{open routine} @tab
+@item open routine
 @cindex open routine
 A procedure in each @dfn{STREAMS} driver and module called by @dfn{STREAMS} on each @command{open}
 system call made on the @dfn{Stream}.  A module's @command{open} procedure is also called when the
 module is pushed.
 
-@item @dfn{packet mode} @tab
+@item packet mode
 @cindex packet mode
 A feature supported by the @dfn{STREAMS}-based pseudo-terminal subsystem.  It is used to inform a
 process on the master side when state changes occur on the slave side of a pseudo-TTY.  It is
 enabled by pushing a module called @samp{pckt} on the master side.
 
-@item @dfn{persistent link} @tab
+@item persistent link
 @cindex persistent link
 A connection below a multiplexer that can exist without having an open controlling @dfn{Stream}
 associated with it.
 
-@item @dfn{pipe} @tab
+@item pipe
 @cindex pipe
 See @dfn{STREAMS}-based pipe.
 
-@item @dfn{pop} @tab
+@item pop
 @cindex pop
 A term used when a module that is immediately below the @dfn{Stream} head is removed.
 
-@item @dfn{pseudo-device driver} @tab
+@item pseudo-device driver
 @cindex pseudo-device driver
 A software driver, not directly associated with a physical device, that performs functions internal
 to a @dfn{Stream} such as a multiplexer or @manref{log(4)} driver.
 
-@item @dfn{pseudo-terminal subsystem} @tab
+@item pseudo-terminal subsystem
 @cindex pseudo-terminal subsystem
 A user interface identical to a terminal subsystem except that there is a process in place of a
 hardware device.  It consists of at least a master device, slave device, line discipline module, and
 hardware emulation module.
 
-@item @dfn{push} @tab
+@item push
 @cindex push
 A term used when a module is inserted in a @dfn{Stream} immediately below the @dfn{Stream head}.
 
-@item @dfn{pushable module} @tab
+@item pushable module
 @cindex pushable module
 A module put between the @dfn{Stream head} and driver.  It performs intermediate transformations on
 messages flowing between the @dfn{Stream head} and driver.  A driver is a non-pushable module.
 
-@item @dfn{put procedure} @tab
+@item put procedure
 @cindex put procedure
 A routine in a module or driver associated with a queue that receives messages from the preceding
 queue.  It is the single entry point into a queue from a preceding queue.  It may perform processing
@@ -7398,40 +7406,40 @@ on the message and will then generally either queue the message for subsequent p
 queue's @command{service} procedure, or will pass the message to the @command{put} procedure of the
 following queue (using @manref{putnext(9)}).
 
-@item @dfn{queue} @tab
+@item queue
 @cindex queue
 A data structure that contains status information, a pointer to routines processing message, and
 pointers for administering a @dfn{Stream}.  It typically contains pointer to @command{put} and
 @command{service} procedures, a message queue, and private data.
 
-@item @dfn{read-side} @tab
+@item read-side
 @cindex read-side
 A direction of data flow going from a driver toward the @dfn{Stream head}.  Also called
 @dfn{upstream} and @dfn{input-side}.
 
-@item @dfn{read queue} @tab
+@item read queue
 @cindex read queue
 A message queue in a module or driver containing messages moving @dfn{upstream}.  Associated with
 the @manref{read(2)} system call and input from a driver.
 
-@item @dfn{remote mode} @tab
+@item remote mode
 @cindex remote mode
 A feature available with the pseudo-terminal subsystem.  It is used for applications that perform
 the canonical and echoing functions normally done by line discipline module and TTY driver.  It
 enables applications on the master side to turn off the canonical processing.
 
-@item @dfn{STREAMS Administrative Driver} @tab
+@item STREAMS Administrative Driver
 @cindex STREAMS Administrative Driver
 A @dfn{STREAMS} Administrative Driver that provides an interface to the @manref{autopush(8)}
 mechanism.
 
-@item @dfn{schedule} @tab
+@item schedule
 @cindex schedule
 To place a queue on the internal list of queues that will subsequently have their service procedure
 called by the @dfn{STREAMS} scheduler.  @dfn{STREAMS} scheduling is independent of @cite{Linux}
 process scheduling.
 
-@item @dfn{service interface} @tab
+@item service interface
 @cindex service interface
 A set of primitives that define a service at the boundary between a service user and a service
 provider and the rules (typically represented by a state machine) for allowable sequences of the
@@ -7439,76 +7447,76 @@ primitives across the boundary.  At a @dfn{Stream}/user boundary, the primitives
 contained in the control part of a message; within a @dfn{Stream}, in @msg{M_PROTO} or
 @msg{M_PCPROTO} message blocks.
 
-@item @dfn{service procedure} @tab
+@item service procedure
 @cindex service procedure
 A module or driver routine associated with a queue that receives messages queue for it by the
 @command{put} procedure is called by the @dfn{STREAMS} scheduler.  It may perform processing on the
 message and generally passes the message to the @command{put} procedure of the following queue.
 
-@item @dfn{service provider} @tab
+@item service provider
 @cindex service provider
 An entity in a service interface that responds to request primitives from the service user with
 response and event primitives.
 
-@item @dfn{service user} @tab
+@item service user
 @cindex service user
 An entity in a service interface that generates request primitives for the service provider and
 consumes response and event primitives.
 
-@item @dfn{slave driver} @tab
+@item slave driver
 @cindex slave driver
 A @dfn{STREAMS}-based device supported by the pseudo-terminal subsystem.  It is also called
 @samp{pts} and works with a line discipline module and hardware emulation module to provide an
 interface to a user process.
 
-@item @dfn{standard pipe} @tab
+@item standard pipe
 @cindex standard pipe
 A mechanism for the unidirectional flow of data between two processes where data written by one
 process becomes data read by the other process.
 
-@item @dfn{Stream} @tab
+@item Stream
 @cindex Stream
 A kernel level aggregate created by connecting @dfn{STREAMS} components, resulting from an
 application of the @dfn{STREAMS} mechanism.  The primary components are the @dfn{Stream head}, the
 driver (or @dfn{Stream end}), and zero or more pushable modules between the @dfn{Stream head} and
 driver.
 
-@item @dfn{STREAMS-based pipe} @tab
+@item STREAMS-based pipe
 @cindex STREAMS-based pipe
 A mechanism used for bidirectional data transfer implemented using @dfn{STREAMS}, and sharing the
 properties of @dfn{STREAMS}-based devices.
 
-@item @dfn{Stream end} @tab
+@item Stream end
 @cindex Stream end
 A @dfn{Stream} component furthest from the user process that contains a driver.
 
-@item @dfn{Stream head} @tab
+@item Stream head
 @cindex Stream head
 A @dfn{Stream} component closest to the user process.  It provides the interface between the
 @dfn{Stream} and the user process.
 
-@item @dfn{STREAMS} @tab
+@item STREAMS
 @cindex STREAMS
 A kernel mechanism that provides the framework for network services and data communication.  It
 defines interface standards for character input/output within the kernel, and between the kernel
 and user level.  The @dfn{STREAMS} mechanism includes integral functions, utility routines, kernel
 facilities, and a set of structures.
 
-@item @dfn{TTY driver} @tab
+@item TTY driver
 @cindex TTY driver
 A @dfn{STREAMS}-based device used in a terminal subsystem.
 
-@item @dfn{upper stream} @tab
+@item upper stream
 @cindex upper stream
 A @dfn{Stream} that terminates above a multiplexing driver.  The beginning of an upper @dfn{Stream}
 originates at the @dfn{Stream head} or another multiplexing driver.
 
-@item @dfn{upstream} @tab
+@item upstream
 @cindex upstream
 A direction of data flow going from a driver toward the @dfn{Stream head}.  Also called
 @dfn{read-side} and @dfn{input side}.
 
-@item @dfn{water mark} @tab
+@item water mark
 @cindex water mark
 A limit value used in flow control.  Each queue has a high-water mark and a low-water mark.  The
 high-water mark value indicates the upper limit related to the number of bytes contained on the
@@ -7516,17 +7524,17 @@ queue.  When the queued character reaches its high water mark, @dfn{STREAMS} cau
 that attempts to send a message to this queue to become blocked.  When the characters in this queue
 are reduced to the low-water mark value, the other queue is unblocked by @dfn{STREAMS}.
 
-@item @dfn{write queue} @tab
+@item write queue
 @cindex write queue
 A message queue in a module or driver containing messages moving downstream.  Associated with the
 @manref{write(2)} system call and output from a user process.
 
-@item @dfn{write-side} @tab
+@item write-side
 @cindex write-side
 A direction of data flow going from the @dfn{Stream head} toward a driver.  Also called downstream
 and output side.
 
-@end multitable
+@end table
 
 @c ============================================================================
 @ifnotinfo

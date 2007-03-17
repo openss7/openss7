@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: tci.texi,v 0.9.2.10 2006/08/26 09:17:21 brian Exp $
+% @(#) $Id: tci.texi,v 0.9.2.11 2007/03/17 08:31:42 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/26 09:17:21 $ by $Author: brian $
+% Last Modified $Date: 2007/03/17 08:31:42 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -403,7 +403,7 @@ user that the event has occurred.  @emph{Figure 1} shows the model of the TCI.
 
 @cartouche
 @center Figure 1@strong{@emph{.  Model of the TCI}}
-@image{tci_fig,3.5in}
+@center @image{tci_fig,3.5in}
 @end cartouche
 
 The TCI allows the TC provider to be configured with any component sub-layer
@@ -548,17 +548,11 @@ completeness of the data transmission.
 @subsection Component Handling
 
 @multitable @columnfractions .6 .1 .1 .1 .1
-
 @item TC-Invoke @tab 1 @tab 2  @tab 3  @tab 4
-
 @item TC-Result @tab 1 @tab -- @tab 3  @tab --
-
 @item TC-Error  @tab 1 @tab 2  @tab -- @tab --
-
 @item TC-Cancel @tab 1 @tab 2  @tab 3  @tab --
-
 @item TC-Reject @tab 1 @tab 2  @tab -- @tab 4
-
 @end multitable
 
 @subsection Local Management
@@ -573,67 +567,52 @@ service.
 @center Table 1@strong{@emph{.  Service Primitives for Operation Classes 1, 2 and 3}}
 
 @multitable @columnfractions .20 .20 .60
-
 @item @b{STATE}
 @tab @b{SERVICE}
 @tab @b{PRIMITIVES}
-
 @item Local@*Management
 @tab Information@*Reporting
 @tab TC_INFO_REQ, TC_INFO_ACK,@*TC_ERROR_ACK
-
 @item
 @tab Bind
 @tab TC_BIND_REQ, TC_BIND_ACK,@*TC_UNBIND_REQ, TC_OK_ACK,@*TC_ERROR_ACK
-
 @item
 @tab Options@*Management
 @tab TC_OPTMGMT_REQ, TC_OK_ACK,@*TC_ERROR_ACK
-
 @item Transaction@*Initiation
 @tab Transaction@*Begin
 @tab TC_BEGIN_REQ, TC_BEGIN_IND,@*TC_BEGIN_RES, TC_BEGIN_CON,@*TC_TOKEN_REQ,
 TC_TOKEN_ACK,@*TC_OK_ACK, TC_ERROR_ACK
-
 @item Transaction@*Data Transfer
 @tab Transaction@*Continue
 @tab TC_CONT_REQ, TC_CONT_IND
-
 @item Transaction@*Release
 @tab Transaction@*End
 @tab TC_END_REQ, TC_END_IND
-
 @item
 @tab Transaction@*Abort
 @tab TC_ABORT_REQ, TC_ABORT_IND
-
 @end multitable
 
 @sp 1
 @center Table 2@strong{@emph{.  Service Primitives for Operation Class 4}}
 
 @multitable @columnfractions .20 .20 .60
-
 @item @b{STATE}
 @tab @b{SERVICE}
 @tab @b{PRIMITIVES}
-
 @item Local@*Management
 @tab Information@*Reporting
 @tab TC_INFO_REQ, TC_INFO_ACK,@*TC_ERROR_ACK
-
 @item
 @tab Bind
 @tab TC_BIND_REQ, TC_BIND_ACK,@*TC_UNBIND_REQ, TC_OK_ACK,@*TC_ERROR_ACK
-
 @item
 @tab Options@*Management
 @tab TC_OPTMGMT_REQ, TC_OK_ACK,@*TC_ERROR_ACK
-
 @item Transaction@*Unitdata
 @tab Transaction@*Unidirectional
 @tab TC_UNI_REQ, TC_UNI_IND
-
 @end multitable
 
 @node TCI Services Definition
@@ -694,7 +673,7 @@ The sequence of primitives for transaction information management is shown in
 @cartouche
 @center Figure 2@strong{@emph{.  Sequence of Primitives}}
 @center @strong{@emph{Transaction Information Reporting Service}}
-@image{tci_fig1,3.5in}
+@center @image{tci_fig1,3.5in}
 @end cartouche
 
 @node TC User Bind Service Definition
@@ -731,7 +710,7 @@ The sequence of primitives for the TC user bind service is shown in @emph{Figure
 @cartouche
 @center Figure 3@strong{@emph{.  Sequence of Primitives}}
 @center @strong{@emph{TC User Bind Service}}
-@image{tci_fig2,3.5in}
+@center @image{tci_fig2,3.5in}
 @end cartouche
 
 @node TC User Unbind Service Definition
@@ -754,7 +733,7 @@ The sequence of primitives for the TC user unbind service is shown in
 @cartouche
 @center Figure 4@strong{@emph{.  Sequence of Primitives}}
 @center @strong{@emph{TC User Unbind &amp; Receipt Acknowledgement Services}}
-@image{tci_fig3,3.5in}
+@center @image{tci_fig3,3.5in}
 @end cartouche
 
 @node Receipt Acknowledgement Service Definition
@@ -798,7 +777,7 @@ management.
 @cartouche
 @center Figure 5@strong{@emph{.  Sequence of Primitives}}
 @center @strong{@emph{Options Management Service}}
-@image{tci_fig4,3.5in}
+@center @image{tci_fig4,3.5in}
 @end cartouche
 
 @node Error Acknowledgement Service Definition
@@ -819,7 +798,7 @@ the last TC user originated request or response primitive (listed in
 @cartouche
 @center Figure 6@strong{@emph{.  Sequence of Primitives}}
 @center @strong{@emph{Error Acknowledgement Service}}
-@image{tci_fig5,3.5in}
+@center @image{tci_fig5,3.5in}
 @end cartouche
 
 @node Operation Class 1 through 3 Transaction Services Definition
@@ -885,29 +864,18 @@ destructive with respect to all other objects.
 @center Table 3@strong{@emph{.  Ordering Relationships Between Queue Model Objects}}
 
 @multitable @columnfractions .20 .20 .20 .20 .20
-
 @item @strong{Object X} @tab @strong{BEGIN} @tab @strong{CONT} @tab @strong{END} @tab @strong{ABORT}
-
 @item @strong{Object Y}
-
 @item BEGIN @tab N/A @tab - @tab - @tab DES
-
 @item CONT @tab N/A @tab - @tab - @tab DES
-
 @item END @tab N/A @tab N/A @tab - @tab -
-
 @end multitable
 
 @multitable @columnfractions .09 .91
-
 @item AA @tab Indicates that Object X is defined to be able to advance ahead of preceding Object Y
-
 @item DES @tab Indicates that Object X is defined to be destructive with respect to the preceding Object Y.
-
 @item - @tab Indicates that Object X is neither destructive with respect to Object Y, nor able to advance ahead of Object Y
-
 @item N/A @tab Indicates that Object X will not occur in a position succeeding Object Y in a valid state of a queue.
-
 @end multitable
 
 @node Transaction Initiation
@@ -983,7 +951,7 @@ the time sequence diagrams as shown in @emph{Figure 7}.
 @cartouche
 @center Figure 7@strong{@emph{.  Sequence of Primitives:}}
 @center @strong{@emph{Successful Transaction Initiation}}
-@image{tci_fig6,3.5in}
+@center @image{tci_fig6,3.5in}
 @end cartouche
 
 The sequence of primitives for the transaction initiation response token value
@@ -994,7 +962,7 @@ response token value determination are discussed in @ref{TC_BIND_REQ}, and
 @cartouche
 @center Figure 8@strong{@emph{.  Sequence of Primitives:}}
 @center @strong{@emph{Transaction Response Token Value Determination}}
-@image{tci_fig7,3.5in}
+@center @image{tci_fig7,3.5in}
 @end cartouche
 
 @node Transaction Component Transfer
@@ -1036,7 +1004,7 @@ primitive occurs.
 @cartouche
 @center Figure 9@strong{@emph{.  Sequence of Primitives:}}
 @center @strong{@emph{Component Transfer}}
-@image{tci_fig8,3.5in}
+@center @image{tci_fig8,3.5in}
 @end cartouche
 
 @node Transaction Termination
@@ -1109,25 +1077,25 @@ figures that follow:
 @cartouche
 @center Figure 10@strong{@emph{.  Sequence of Primitives:}}
 @center @strong{@emph{TC User Invoked Termination}}
-@image{tci_fig9,3.5in}
+@center @image{tci_fig9,3.5in}
 @end cartouche
 
 @cartouche
 @center Figure 11@strong{@emph{.  Sequence of Primitives:}}
 @center @strong{@emph{Simultaneous TC User Invoked Termination}}
-@image{tci_fi10,3.5in}
+@center @image{tci_fi10,3.5in}
 @end cartouche
 
 @cartouche
 @center Figure 12@strong{@emph{.  Sequence of Primitives:}}
 @center @strong{@emph{TC Provider Invoked Termination}}
-@image{tci_fi11,3.5in}
+@center @image{tci_fi11,3.5in}
 @end cartouche
 
 @cartouche
 @center Figure 13@strong{@emph{.  Sequence of Primitives:}}
 @center @strong{@emph{Simultaneous TC User and TC Provider Invoked Termination}}
-@image{tci_fi12,3.5in}
+@center @image{tci_fi12,3.5in}
 @end cartouche
 
 A TC user may reject a transaction initiation attempt by issuing a
@@ -1141,7 +1109,7 @@ in @emph{Figure 14}.
 @cartouche
 @center Figure 14@strong{@emph{.  Sequence of Primitives:}}
 @center @strong{@emph{TC User Rejection of a Transaction Initiation Attempt}}
-@image{tci_fi13,3.5in}
+@center @image{tci_fi13,3.5in}
 @end cartouche
 
 If the TC provider is unable to establish a transaction, it indicates this to
@@ -1153,7 +1121,7 @@ is shown in @emph{Figure 15}.
 @cartouche
 @center Figure 15@strong{@emph{.  Sequence of Primitives:}}
 @center @strong{@emph{TC Provider Rejection of a Transaction Initiation Attempt}}
-@image{tci_fi14,3.5in}
+@center @image{tci_fi14,3.5in}
 @end cartouche
 
 @node Operation Class 4 Transaction Services Definition
@@ -1197,7 +1165,7 @@ of transfer.
 @cartouche
 @center Figure 16@strong{@emph{.  Sequence of Primitives:}}
 @center @strong{@emph{Operation Class 4 Component Transfer}}
-@image{tci_fi15,3.5in}
+@center @image{tci_fi15,3.5in}
 @end cartouche
 
 @itemize 
@@ -1216,7 +1184,7 @@ error management primitive.
 @cartouche
 @center Figure 17@strong{@emph{.  Sequence of Primitives:}}
 @center @strong{@emph{Operation Class 4 Error Indication Service}}
-@image{tci_fi16,3.5in}
+@center @image{tci_fi16,3.5in}
 @end cartouche
 
 @node Component Handling Services Definition
@@ -1308,57 +1276,41 @@ provide a summary of the TC primitives and their parameters.
 @center Table 4@strong{@emph{.  Transaction Initiation Transaction Service Primitives}}
 
 @multitable @columnfractions .23 .27 .50
-
 @item @strong{SERVICE} @tab @strong{PRIMITIVE} @tab @strong{PARAMETERS}
-
 @item TC Initiation @tab @code{TC_BEGIN_REQ} @tab ()
 @prindex TC_BEGIN_REQ
-
 @item @tab @code{TC_BEGIN_IND} @tab ()
 @prindex TC_BEGIN_IND
-
 @item @tab @code{TC_BEGIN_RES} @tab ()
 @prindex TC_BEGIN_RES
-
 @item @tab @code{TC_BEGIN_CON} @tab ()
 @prindex TC_BEGIN_CON
-
 @end multitable
 
 @sp 1
 @center Table 5@strong{@emph{.  Transaction Continuation Transaction Service Primitives}}
 
 @multitable @columnfractions .23 .27 .50
-
 @item @strong{SERVICE} @tab @strong{PRIMITIVE} @tab @strong{PARAMETERS}
-
 @item TC Initiation @tab @code{TC_CONT_REQ} @tab ()
 @prindex TC_CONT_REQ
-
 @item @tab @code{TC_CONT_IND} @tab ()
 @prindex TC_CONT_IND
-
 @end multitable
 
 @sp 1
 @center Table 6@strong{@emph{.  Transaction Termination Transaction Service Primitives}}
 
 @multitable @columnfractions .23 .27 .50
-
 @item @strong{SERVICE} @tab @strong{PRIMITIVE} @tab @strong{PARAMETERS}
-
 @item TC Initiation @tab @code{TC_END_REQ} @tab ()
 @prindex TC_END_REQ
-
 @item @tab @code{TC_END_IND} @tab ()
 @prindex TC_END_IND
-
 @item @tab @code{TC_ABORT_REQ} @tab ()
 @prindex TC_ABORT_REQ
-
 @item @tab @code{TC_ABORT_IND} @tab ()
 @prindex TC_ABORT_IND
-
 @end multitable
 
 @page
@@ -4155,38 +4107,24 @@ An identifier of a particular physical medium over which communication transpire
 @unnumbered Acronyms
 
 @multitable {SDL SDU}{International Telecommunication Union - Telecom Sector}
-
 @item SDLI @tab Signalling Data Link Interface
-
 @item SDL @tab Signalling Data Link
-
 @item SDL SDU @tab Signalling Data Link Service Data Unit
-
 @item ITU-T @tab International Telecommunications Union - Telecom Sector
-
 @item PPA @tab Physical Point of Attachment
-
 @end multitable
 
 @node References
 @unnumbered References
 
 @multitable {000}{Geoffrey Gerrien, ``CDI - Application Program Interface Guide,'' Gcom, Inc., March 1999.}
-
 @item [1] @tab ITU-T Recommendation Q.700
-
 @item [2] @tab ITU-T Recommendation Q.701
-
 @item [3] @tab ITU-T Recommendation Q.702
-
 @item [4] @tab ITU-T Recommendation Q.703
-
 @item [5] @tab ITU-T Recommendation Q.704
-
 @item [6] @tab Geoffrey Gerrien, ``CDI - Application Program Interface Guide,'' Gcom, Inc., March 1999.
-
 @item [7] @tab ITU-T Recommendation Q.771
-
 @end multitable
 
 @node Indices
