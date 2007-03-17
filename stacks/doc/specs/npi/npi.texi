@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: npi.texi,v 0.9.2.12 2006/09/18 01:06:26 brian Exp $
+% @(#) $Id: npi.texi,v 0.9.2.13 2007/03/17 08:32:33 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/09/18 01:06:26 $ by $Author: brian $
+% Last Modified $Date: 2007/03/17 08:32:33 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -535,7 +535,8 @@ NS provider are either confirmations of a request or are indications to the NS
 user that the event has occurred.  Figure 1 shows the model of the NPI.
 
 @cartouche
-@image{npi_fig1,4in} @center @b{Figure 1.  Model of the NPI}
+@center @image{npi_fig1,4in}
+@center @b{Figure 1.  Model of the NPI}
 @end cartouche
 
 The NPI allows the NS provider to be configured with any network layer user
@@ -618,11 +619,13 @@ significance only.
 Tables 1 and 2 summarizes the NPI service primitives by their state and service.
 
 @cartouche
-@image{npi_tab1} @center @b{Table 1.  Service Primitives for Connection Mode Data Transfer}
+@center @image{npi_tab1}
+@center @b{Table 1.  Service Primitives for Connection Mode Data Transfer}
 @end cartouche
 
 @cartouche
-@image{npi_tab2} @center @b{Table 2.  Service Primitives for Connectionless Mode Data Transfer}
+@center @image{npi_tab2}
+@center @b{Table 2.  Service Primitives for Connectionless Mode Data Transfer}
 @end cartouche
 
 @node NPI Services Definition
@@ -677,7 +680,8 @@ and returns the values of the supported protocol parameters to the NS user.
 The sequence of primitives for network information management is shown in Figure 2.
 
 @cartouche
-@image{npi_fig2,4in} @center @b{Figure 2.  Sequence of Primitives; Network Information Reporting Service}
+@center @image{npi_fig2,4in}
+@center @b{Figure 2.  Sequence of Primitives; Network Information Reporting Service}
 @end cartouche
 
 @node NS User Bind Service
@@ -706,7 +710,8 @@ address.
 The sequence of primitives for NS user bind service is shown in Figure 3.
 
 @cartouche
-@image{npi_fig3,4in} @center @b{Figure 3.  Sequence of Primitives; NS User Bind Service}
+@center @image{npi_fig3,4in}
+@center @b{Figure 3.  Sequence of Primitives; NS User Bind Service}
 @end cartouche
 
 @node NS User Unbind Service
@@ -724,7 +729,8 @@ the network address that it had previously been bound to.
 The sequence of primitives for NS user unbind service is shown in Figure 4.
 
 @cartouche
-@image{npi_fig4,4in} @center @b{Figure 4.  Sequence of Primitives; NS User Unbind & Receipt Acknowledgement}
+@center @image{npi_fig4,4in}
+@center @b{Figure 4.  Sequence of Primitives; NS User Unbind & Receipt Acknowledgement}
 @end cartouche
 
 @node Receipt Acknowledgement Service
@@ -757,7 +763,8 @@ indicate the default selection of receipt confirmation.
 Figure 5 shows the sequence of primitives for network options management.
 
 @cartouche
-@image{npi_fig5,4in} @center @b{Figure 5.  Sequence of Primitives; Options Management Service}
+@center @image{npi_fig5,4in}
+@center @b{Figure 5.  Sequence of Primitives; Options Management Service}
 @end cartouche
 
 @node Error Acknowledgement Service
@@ -774,7 +781,8 @@ error has occurred in the last NS user originated request or response primitive
 Figure 6 shows the sequence of primitives for the error management primitive.
 
 @cartouche
-@image{npi_fig6,4in} @center @b{Figure 6.  Sequence of Primitives; Error Acknowledgement Service}
+@center @image{npi_fig6,4in}
+@center @b{Figure 6.  Sequence of Primitives; Error Acknowledgement Service}
 @end cartouche
 
 @page
@@ -838,7 +846,8 @@ other ``reset'' objects.
 Table 3 shows the ordering relationships among the queue model objects.
 
 @cartouche
-@image{npi_tab3} @center @b{Table 3.  Ordering Relationships Between Queue Model Objects}
+@center @image{npi_tab3}
+@center @b{Table 3.  Ordering Relationships Between Queue Model Objects}
 @end cartouche
 
 @node Connection Establishment Phase
@@ -891,11 +900,13 @@ NC response token value determination is shown in Figure 8 (procedures for NC
 response token value determination are discussed in sections 4.1.3 and 4.1.4.).
 
 @cartouche
-@image{npi_fig7,4in} @center @b{Figure 7.  Sequence of Primitives; Successful NC Establishment}
+@center @image{npi_fig7,4in}
+@center @b{Figure 7.  Sequence of Primitives; Successful NC Establishment}
 @end cartouche
 
 @cartouche
-@image{npi_fig8,4in} @center @b{Figure 8.  Sequence of Primitives; NC Response Token Value Determination}
+@center @image{npi_fig8,4in}
+@center @b{Figure 8.  Sequence of Primitives; NC Response Token Value Determination}
 @end cartouche
 
 @node Data Transfer Phase
@@ -906,7 +917,8 @@ allowing objects of certain types to be inserted to the queues, as shown in
 Table 4.
 
 @cartouche
-@image{npi_tab4} @center @b{Table 4.  Flow Control Relationships Between Queue Model Objects}
+@center @image{npi_tab4}
+@center @b{Table 4.  Flow Control Relationships Between Queue Model Objects}
 @end cartouche
 
 @subsubsection User Primitives for Data Transfer
@@ -949,14 +961,16 @@ The sequence of primitives may remain incomplete if a N_RESET or N_DISCON
 primitive occurs.
 
 @cartouche
-@image{npi_fig9,4in} @center @b{Figure 9.  Sequence of Primitives; Data Transfer}
+@center @image{npi_fig9,4in}
+@center @b{Figure 9.  Sequence of Primitives; Data Transfer}
 @end cartouche
 
 The sequence of primitives in a successful confirmation of receipt is defined in
 the time sequence diagram as shown in Figure 10.
 
 @cartouche
-@image{npi_fi10,4in} @center @b{Figure 10.  Sequence of Primitives; Successful Confirmation of Receipt}
+@center @image{npi_fi10,4in}
+@center @b{Figure 10.  Sequence of Primitives; Successful Confirmation of Receipt}
 @end cartouche
 
 The sequence of primitives as shown above may remain incomplete if an N_RESET
@@ -975,7 +989,8 @@ sequence diagram in Figure 11.  This sequence of primitives may remain incomplet
 if a N_RESET or N_DISCON primitive is issued.
 
 @cartouche
-@image{npi_fi11,4in} @center @b{Figure 11.  Sequence of Primitives; Expedited Data Transfer}
+@center @image{npi_fi11,4in}
+@center @b{Figure 11.  Sequence of Primitives; Expedited Data Transfer}
 @end cartouche
 
 @node Reset Operation Primitives
@@ -1068,19 +1083,23 @@ The sequence of primitives as shown in Figures 12, 13, 14, and 15 may
 remain in complete if a N_DISCON primitive occurs.
 
 @cartouche
-@image{npi_fi12,4in} @center @b{Figure 12.  Sequence of Primitives; NS User Invoked Reset}
+@center @image{npi_fi12,4in}
+@center @b{Figure 12.  Sequence of Primitives; NS User Invoked Reset}
 @end cartouche
 
 @cartouche
-@image{npi_fi13,4in} @center @b{Figure 13.  Sequence of Primitives; Simultaneous NS User Invoked Reset}
+@center @image{npi_fi13,4in}
+@center @b{Figure 13.  Sequence of Primitives; Simultaneous NS User Invoked Reset}
 @end cartouche
 
 @cartouche
-@image{npi_fi14,4in} @center @b{Figure 14.  Sequence of Primitives; NS Provider Invoked Reset}
+@center @image{npi_fi14,4in}
+@center @b{Figure 14.  Sequence of Primitives; NS Provider Invoked Reset}
 @end cartouche
 
 @cartouche
-@image{npi_fi15,4in} @center @b{Figure 15.  Sequence of Primitives; Simultaneous NS User & NS Provider}
+@center @image{npi_fi15,4in}
+@center @b{Figure 15.  Sequence of Primitives; Simultaneous NS User & NS Provider}
 @end cartouche
 
 @node Connection Termination Phase
@@ -1136,19 +1155,23 @@ The sequence of primitives are shown in the time sequence diagrams in Figures
 16, 17, 18, and 19.
 
 @cartouche
-@image{npi_fi16,4in} @center @b{Figure 16.  Sequence of Primitives; NS User Invoked Release}
+@center @image{npi_fi16,4in}
+@center @b{Figure 16.  Sequence of Primitives; NS User Invoked Release}
 @end cartouche
 
 @cartouche
-@image{npi_fi17,4in} @center @b{Figure 17.  Sequence of Primitives; Simultaneous NS User Invoked Release}
+@center @image{npi_fi17,4in}
+@center @b{Figure 17.  Sequence of Primitives; Simultaneous NS User Invoked Release}
 @end cartouche
 
 @cartouche
-@image{npi_fi18,4in} @center @b{Figure 18.  Sequence of Primitives; NS Provider Invoked Release}
+@center @image{npi_fi18,4in}
+@center @b{Figure 18.  Sequence of Primitives; NS Provider Invoked Release}
 @end cartouche
 
 @cartouche
-@image{npi_fi19,4in} @center @b{Figure 19.  Sequence of Primitives; Simultaneous NS User & NS Provider}
+@center @image{npi_fi19,4in}
+@center @b{Figure 19.  Sequence of Primitives; Simultaneous NS User & NS Provider}
 @end cartouche
 
 A NS user may reject an NC establishment attempt by issuing a N_DISCON_REQ.
@@ -1156,7 +1179,8 @@ The originator parameter in the N_DISCON primitives will indicate NS user invoke
 release.  The sequence of events is shown in Figure 20.
 
 @cartouche
-@image{npi_fi20,4in} @center @b{Figure 20.  Sequence of Primitives; NS User Rejection of an NC}
+@center @image{npi_fi20,4in}
+@center @b{Figure 20.  Sequence of Primitives; NS User Rejection of an NC}
 @center @b{Establishment Attempt}
 @end cartouche
 
@@ -1165,7 +1189,8 @@ requester by an N_DISCON_IND.  The originator in this primitive indicates an NS
 provider invoked release.  This is shown in Figure 21.
 
 @cartouche
-@image{npi_fi21,4in} @center @b{Figure 21.  Sequence of Primitives; NS Provider Rejection of an NC}
+@center @image{npi_fi21,4in}
+@center @b{Figure 21.  Sequence of Primitives; NS Provider Rejection of an NC}
 @center @b{Establishment Attempt}
 @end cartouche
 
@@ -1207,7 +1232,8 @@ Figure 22 shows the sequence of primitives for the connectionless mode of data
 transfer.
 
 @cartouche
-@image{npi_fi22,4in} @center @b{Figure 22.  Sequence of Primitives; Connectionless Data Transfer}
+@center @image{npi_fi22,4in}
+@center @b{Figure 22.  Sequence of Primitives; Connectionless Data Transfer}
 @end cartouche
 
 @itemize @bullet
@@ -1222,7 +1248,8 @@ Figure 23 shows the sequence of primitives for the CLNS error management
 primitive.
 
 @cartouche
-@image{npi_fi23,4in} @center @b{Figure 23.  Sequence of Primitives; CLNS Error Indication Service}
+@center @image{npi_fi23,4in}
+@center @b{Figure 23.  Sequence of Primitives; CLNS Error Indication Service}
 @end cartouche
 
 @node NPI Primitives
@@ -1245,15 +1272,18 @@ conformance are described in Addendum 1 to this document.
 Tables 5, 6, and 7 provide a summary of the NS primitives and their parameters.
 
 @cartouche
-@image{npi_tab5} @center @b{Table 5.  NC Establishment Network Service Primitives}
+@center @image{npi_tab5}
+@center @b{Table 5.  NC Establishment Network Service Primitives}
 @end cartouche
 
 @cartouche
-@image{npi_tab6} @center @b{Table 6.  Data Transfer Network Service Primitives}
+@center @image{npi_tab6}
+@center @b{Table 6.  Data Transfer Network Service Primitives}
 @end cartouche
 
 @cartouche
-@image{npi_tab7} @center @b{Table 7.  NC Release Network Service Primitives}
+@center @image{npi_tab7}
+@center @b{Table 7.  NC Release Network Service Primitives}
 @end cartouche
 
 @page
@@ -4042,7 +4072,8 @@ and connectionless network service.  For more details on the definition of the
 QOS parameters, refer to CCITT X.213 [1] and ISO 8348 [2].
 
 @cartouche
-@image{npi_tab8} @center @b{Figure 8.  Supported QoS Parameters}
+@center @image{npi_tab8}
+@center @b{Figure 8.  Supported QoS Parameters}
 @end cartouche
 
 @subsection QOS Parameter Formats
@@ -5571,7 +5602,8 @@ Table A-1 shows a mapping of the NPI primitives to the OSI network service
 definition primitives.
 
 @cartouche
-@image{npi_taba1} @center @b{Table A-1.  Mapping NPI Primitives to OSI NS}
+@center @image{npi_taba1}
+@center @b{Table A-1.  Mapping NPI Primitives to OSI NS}
 @end cartouche
 
 @node State/Event Tables
@@ -5587,17 +5619,20 @@ issued by the NS user when a local acknowledgement to a previously issued
 primitive is pending.
 
 @cartouche
-@image{npi_tabb1} @center @b{Table B-1.  Kernel Level NPI States}
+@center @image{npi_tabb1}
+@center @b{Table B-1.  Kernel Level NPI States}
 @end cartouche
 
 Tables B-2 and B-3 describe the variables and outputs used in the state tables.
 
 @cartouche
-@image{npi_tabb2} @center @b{Table B-2.  State Table Variables}
+@center @image{npi_tabb2}
+@center @b{Table B-2.  State Table Variables}
 @end cartouche
 
 @cartouche
-@image{npi_tabb3} @center @b{Table B-3.  State Table Outputs}
+@center @image{npi_tabb3}
+@center @b{Table B-3.  State Table Outputs}
 @end cartouche
 
 Table B-4 shows outgoing events that are initiated by the network-user entity.
@@ -5605,7 +5640,8 @@ These events are either requests to the network provider or responses to an
 event of the network provider.
 
 @cartouche
-@image{npi_tabb4} @center @b{Table B-4.  Kernel Level NPI Outgoing Events}
+@center @image{npi_tabb4}
+@center @b{Table B-4.  Kernel Level NPI Outgoing Events}
 @end cartouche
 
 Table B-5 shows incoming events that are initiated by the network provider.
@@ -5613,7 +5649,8 @@ These events are either confirmations of a request, or are indications to the NS
 user entity that an event has occurred.
 
 @cartouche
-@image{npi_tabb5} @center @b{Table B-5.  Kernel Level NPI Incoming Events}
+@center @image{npi_tabb5}
+@center @b{Table B-5.  Kernel Level NPI Incoming Events}
 @end cartouche
 
 Tables B-6 and B-7 describe the possible events the NPI may enter given a
@@ -5624,15 +5661,18 @@ next state, each box may include an action.  The network provider must take
 specific actions in the order specified in the state table.
 
 @cartouche
-@image{npi_tabb6} @center @b{Table B-6.  Data Transfer State Table for CLNS}
+@center @image{npi_tabb6}
+@center @b{Table B-6.  Data Transfer State Table for CLNS}
 @end cartouche
 
 @cartouche
-@image{npi_tabb7} @center @b{Table B-7.  Initialization State Table for CONS}
+@center @image{npi_tabb7}
+@center @b{Table B-7.  Initialization State Table for CONS}
 @end cartouche
 
 @cartouche
-@image{npi_tabb8} @center @b{Table B-8.  State Table for CONS for Connection/Release/Data Transfer States}
+@center @image{npi_tabb8}
+@center @b{Table B-8.  State Table for CONS for Connection/Release/Data Transfer States}
 @end cartouche
 
 @node Primitive Precedence Tables
@@ -5646,11 +5686,13 @@ network provider initiated primitives.  The column headings are a shorthand
 notation for the row headings.
 
 @cartouche
-@image{npi_tabc1} @center @b{Table C-1.  STREAM Write Queue Precedence Table}
+@center @image{npi_tabc1}
+@center @b{Table C-1.  STREAM Write Queue Precedence Table}
 @end cartouche
 
 @cartouche
-@image{npi_tabc2} @center @b{Table C-2.  STREAM Read Queue Precedence Table}
+@center @image{npi_tabc2}
+@center @b{Table C-2.  STREAM Read Queue Precedence Table}
 @end cartouche
 
 @node NPI Header File Listing

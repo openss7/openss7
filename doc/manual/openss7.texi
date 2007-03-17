@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 0.9.2.13 2007/02/28 06:30:07 brian Exp $
+% @(#) $Id: openss7.texi,v 0.9.2.14 2007/03/17 08:31:22 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/02/28 06:30:07 $ by $Author: brian $
+% Last Modified $Date: 2007/03/17 08:31:22 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -402,6 +402,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: openss7.texi,v $
+Revision 0.9.2.14  2007/03/17 08:31:22  brian
+- corrected formatting problems
+
 Revision 0.9.2.13  2007/02/28 06:30:07  brian
 - updates and corrections, #ifdef instead of #if
 
@@ -1457,14 +1460,12 @@ the coordinated build and installation of the contained sub-packages.
 @tab For more information, see @manref{sfx(4)}.
 @item @file{streams_spx.ko}
 @tab For more information, see @manref{spx(4)}.
-
 @item @file{streams_ip_to_dlpi.ko}
 @tab For more information, see @manref{ip_to_dlpi(4)}.
 @item @file{streams_ldl.ko}
 @tab For more information, see @manref{ldl(4)}.
 @item @file{streams_np_ip.ko}
 @tab For more information, see @manref{np_ip(4)}.
-
 @item @file{streams_inet.ko}
 @tab For more information, see @manref{inet(4)}.
 @item @file{streams_rawip.ko}
@@ -1473,10 +1474,8 @@ the coordinated build and installation of the contained sub-packages.
 @tab For more information, see @manref{tcp(4)}.
 @item @file{streams_udp.ko}
 @tab For more information, see @manref{udp(4)}.
-
 @item @file{streams_sctp.ko}
 @tab For more information, see @manref{sctp(4)}.
-
 @item @file{streams_sdlm.ko}
 @tab For more information, see @manref{sdlm(4)}.
 @item @file{streams_sl_mux.ko}
@@ -1485,7 +1484,6 @@ the coordinated build and installation of the contained sub-packages.
 @tab For more information, see @manref{x100p-ss7(4)}.
 @item @file{streams_x400p-ss7.ko}
 @tab For more information, see @manref{x400p-ss7(4)}.
-
 @item @file{streams_dlgn.ko}
 @tab For more information, see @manref{dlgn(4)}.
 @item @file{streams_gncfd.ko}
@@ -1496,7 +1494,6 @@ the coordinated build and installation of the contained sub-packages.
 @tab For more information, see @manref{mercd(4)}.
 @item @file{pmacd.ko}
 @tab For more information, see @manref{pmacd(4)}.
-
 @end multitable
 
 @c ----------------------------------------------------------------------------
@@ -1512,7 +1509,6 @@ the coordinated build and installation of the contained sub-packages.
 @dfn{STREAMS} modules contained in sub-packages consist of the following:
 
 @multitable @columnfractions .35 .65
-
 @item @file{streams_sth.ko}
 @tab For more information, see @manref{sth(4)}.
 @item @file{streams_bufmod.ko}
@@ -1527,18 +1523,14 @@ the coordinated build and installation of the contained sub-packages.
 @tab For more information, see @manref{sc(4)}.
 @item @file{streams_testmod.ko}
 @tab For more information, see @manref{testmod(4)}.
-
 @item @file{streams_ip_strm_mod.ko}
 @tab For more information, see @manref{ip_strm_mod(4)}.
-
 @item @file{streams_timod.ko}
 @tab For more information, see @manref{timod(4)}.
 @item @file{streams_tirdwr.ko}
 @tab For more information, see @manref{tirdwr(4)}.
-
 @item @file{streams_tpiperf.ko}
 @tab For more information, see @manref{tpiperf(4)}.
-
 @item @file{streams_m2pa_sl.ko}
 @tab For more information, see @manref{m2pa_sl(4)}.
 @item @file{streams_sdl.ko}
@@ -1557,14 +1549,12 @@ the coordinated build and installation of the contained sub-packages.
 @tab For more information, see @manref{sm_mod(4)}.
 @item @file{streams_spm.ko}
 @tab For more information, see @manref{spm(4)}.
-
 @item @file{streams_dvbm.ko}
 @tab For more information, see @manref{dvbm(4)}.
 @item @file{streams_sctmr.ko}
 @tab For more information, see @manref{sctmr(4)}.
 @item @file{ctimod.ko}
 @tab For more information, see @manref{ctimod(4)}.
-
 @end multitable
 
 @c ----------------------------------------------------------------------------

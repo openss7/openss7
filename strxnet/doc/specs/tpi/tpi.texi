@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: tpi.texi,v 0.9.2.13 2006/09/18 01:06:28 brian Exp $
+% @(#) $Id: tpi.texi,v 0.9.2.14 2007/03/17 08:32:24 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/09/18 01:06:28 $ by $Author: brian $
+% Last Modified $Date: 2007/03/17 08:32:24 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -288,7 +288,7 @@ provider via a full duplex path known as a @dfn{stream} (see figure 1). This
 transport provider from the transport user and vice versa.
 
 @cartouche
-@image{tpi_fig1}
+@center @image{tpi_fig1}
 @center @b{Figure 1. Example of a stream from a user to a transport provider}
 @end cartouche
 
@@ -1959,7 +1959,7 @@ provider to the @dfn{STREAMS} message types used to realize the primitives and
 to the ISO IS 8072 and IS8072/DAD1 transport service definition primitives.
 
 @cartouche
-@image{tpi_fig2}
+@center @image{tpi_fig2}
 @center @b{Figure 2.   Mapping ISO IS 8072 and IS 8072/DAD1 to}
 @center @b{Kernel-level Transport Service Primitives}
 @end cartouche
@@ -1973,7 +1973,7 @@ interface may enter due to an event. The events map directly to the transport
 service interface primitives as described in section 2.
 
 @cartouche
-@image{tpi_fig3}
+@center @image{tpi_fig3}
 @center @b{Figure 3.  Kernel Level Transport Interface States}
 @end cartouche
 
@@ -1983,12 +1983,12 @@ service interface primitives as described in section 2.
 The following describes the variables and outputs used in the state tables.
 
 @cartouche
-@image{tpi_fig4}
+@center @image{tpi_fig4}
 @center @b{Figure 4.  State table Variables}
 @end cartouche
 
 @cartouche
-@image{tpi_fig5}
+@center @image{tpi_fig5}
 @center @b{Figure 5. State Table Outputs}
 @end cartouche
 
@@ -2000,7 +2000,7 @@ service user. They either make requests of the transport provider or respond to
 an event of the transport provider.
 
 @cartouche
-@image{tpi_fig6}
+@center @image{tpi_fig6}
 @center @b{Figure 6.  Kernel Level Transport Interface Outgoing Events}
 @end cartouche
 
@@ -2012,7 +2012,7 @@ provider.  They are either confirmations of a request or are indications to the
 transport user that an event has occurred.
 
 @cartouche
-@image{tpi_fig7}
+@center @image{tpi_fig7}
 @center @b{Figure 7.  Kernel Level Transport Interface Incoming Events}
 @end cartouche
 
@@ -2029,19 +2029,19 @@ each box may include an action.  The transport provider must take the specific
 actions in the order specified in the state table.
 
 @cartouche
-@image{tpi_fig8}
+@center @image{tpi_fig8}
 @center @b{Figure 8.  Initialization State Table}
 @end cartouche
 
 @page
 @cartouche
-@image{tpi_fig9}
+@center @image{tpi_fig9}
 @center @b{Figure 9.  Connection/Release/Data-Transfer State Table}
 @center @b{for Connection Oriented Service}
 @end cartouche
 
 @cartouche
-@image{tpi_fi10}
+@center @image{tpi_fi10}
 @center @b{Figure 10.  Data-Transfer State Table for Connectionless Service}
 @end cartouche
 
@@ -2055,13 +2055,13 @@ contains the transport provider initiated primitives is referred to as the
 stream read queue.} write and read queues.
 
 @cartouche
-@image{tpi_fi11}
+@center @image{tpi_fi11}
 @center @b{Figure 11.  Stream Write Queue Precedence Table}
 @end cartouche
 
 @page
 @cartouche
-@image{tpi_fi12}
+@center @image{tpi_fi12}
 @center @b{Figure 12.  Stream Read Queue Precedence Table}
 @end cartouche
 

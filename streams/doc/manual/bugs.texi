@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.6 2007/03/15 10:22:09 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.7 2007/03/17 08:31:56 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,24 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/15 10:22:09 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/17 08:31:56 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 007.  2007-03-16T17:33:20-0600
+
+@iftex
+J@'er@'emy
+@end iftex
+@ifnottex
+Jérémy
+@end ifnottex
+Compostella pointed out an error in strallocpmsg() where it was always assigining M_PCPROTO to
+messages created with I_FDINSERT.
+
+@emph{*fixed*} in @command{streams-0.9.2.3}
+
 @item 006.  2007-03-14T23:48:26-0600
 
 There appears to be an inode lock imbalance that occurred for several clone error paths in stropen.
@@ -82,7 +95,7 @@ J@'er@'emy
 @ifnottex
 Jérémy
 @end ifnottex
-Composte pointed out error in clone.c.  When an automatic clone minor device was unregistered,
+Compostella pointed out error in clone.c.  When an automatic clone minor device was unregistered,
 it was unregistering the modid instead of the major number.  This was not noticed because all
 OpenSS7 drivers have the same modid as major number (strconf does this automatically).
 
@@ -96,7 +109,7 @@ J@'er@'emy
 @ifnottex
 Jérémy
 @end ifnottex
-Composte pointed out syntax error in strsched.c that kept synqs from compiling properly.
+Compostella pointed out syntax error in strsched.c that kept synqs from compiling properly.
 
 @emph{*fixed*} in @command{streams-0.9.2.2}
 
