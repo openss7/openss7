@@ -1,5 +1,5 @@
-OpenSS7 IPERF Utility -- read me first file.  2007-03-15
-$Id: README,v 1.1.1.2.2.22 2007/03/15 20:10:23 brian Exp $
+OpenSS7 IPERF Utility -- read me first file.  2007-03-13
+$Id: README,v 1.1.1.2.2.23 2007/03/17 09:01:48 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 IPERF Utility
 ======================
 
-Package iperf-2.0.6 was released under GPLv2 2007-03-15.
+Package iperf-2.0.6 was released under GPLv2 2007-03-13.
 
 `Iperf' is a general purpose tool for measuring bandwidth and
 performance of the `Internet Protocol' suite.  The `OpenSS7 Modified
@@ -56,7 +56,7 @@ but should build and install for other architectures as well.
  Release
 --------
 
-This is the `iperf-2.0.6' package, released 2007-03-15.  This `2.0.6'
+This is the `iperf-2.0.6' package, released 2007-03-13.  This `2.0.6'
 release, and the latest version, can be obtained from the download area
 (http://www.openss7.org/download.html) of The OpenSS7 Project website
 using a command such as:
@@ -101,17 +101,18 @@ Package', `openss7-0.9.2.E', instead of separately.
 Prerequisites for the OpenSS7 IPERF Utility package are as follows:
 
   1. `Linux' distribution, somewhat `Linux Standards Base' compliant,
-     with a 2.4 kernel and the appropriate tool chain for compiling
-     out-of-tree kernel modules.  Most recent `Linux' distributions are
-     usable out of the box, but some development packages must be
-     installed.  For more information, see `Compatibility', in the
-     manual.
+     with a 2.4 or 2.6 kernel and the appropriate tool chain for
+     compiling out-of-tree kernel modules.  Most recent `Linux'
+     distributions are usable out of the box, but some development
+     packages must be installed.  For more information, see
+     `Compatibility', in the manual.
 
-         - A fairly LSB compliant GNU/Linux distribution.  (1)
-         - Linux 2.4 kernel (2.4.10 - 2.4.27).
+         - A fairly LSB compliant GNU/Linux distribution.(1)
+         - Linux 2.4 kernel (2.4.10 - 2.4.27), or
+         - Linux 2.6 kernel (2.6.3 - 2.6.18);
          - glibc2 or better.
          - GNU info (for info files).
-         - GNU groff (for man pages).  (2)
+         - GNU groff (for man pages).(2)
 
 (Note that although the original `University of Illinois DAST' `Iperf'
 builds and installs on a number of operating systems, the OpenSS7

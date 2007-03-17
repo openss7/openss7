@@ -1,5 +1,5 @@
-OpenSS7 XNS Networking -- read me first file.  2007-03-15
-$Id: README,v 0.9.2.27 2007/03/15 20:10:54 brian Exp $
+OpenSS7 XNS Networking -- read me first file.  2007-03-13
+$Id: README,v 0.9.2.28 2007/03/17 09:03:02 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 XNS Networking
 =======================
 
-Package strxns-0.9.2.5 was released under GPLv2 2007-03-15.
+Package strxns-0.9.2.5 was released under GPLv2 2007-03-13.
 
 The `OpenSS7 XNS Networking' package is an implementation of X/Open
 Network Services (XNS 5.2) for Linux Fast-STREAMS and provides OSI
@@ -92,7 +92,7 @@ well.
  Release
 --------
 
-This is the `strxns-0.9.2.5' package, released 2007-03-15.  This
+This is the `strxns-0.9.2.5' package, released 2007-03-13.  This
 `0.9.2.5' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -143,12 +143,12 @@ Prerequisites for the OpenSS7 XNS Networking package are as follows:
      packages must be installed.  For more information, see
      `Compatibility', in the manual.
 
-         - A fairly LSB compliant GNU/Linux distribution.  (1)
+         - A fairly LSB compliant GNU/Linux distribution.(1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
          - Linux 2.6 kernel (2.6.3 - 2.6.18);
          - glibc2 or better.
          - GNU info (for info files).
-         - GNU groff (for man pages).  (2)
+         - GNU groff (for man pages).(2)
 
 (Note: If you acquired `strxns' a part of the `OpenSS7 Master Package',
 then the dependencies listed below will already have been met by

@@ -1,5 +1,5 @@
-OpenSS7 NETPERF Utility -- read me first file.  2007-03-15
-$Id: README,v 1.1.1.23 2007/03/15 20:10:25 brian Exp $
+OpenSS7 NETPERF Utility -- read me first file.  2007-03-13
+$Id: README,v 1.1.1.24 2007/03/17 09:01:51 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 NETPERF Utility
 ========================
 
-Package netperf-2.3.5 was released under GPLv2 2007-03-15.
+Package netperf-2.3.5 was released under GPLv2 2007-03-13.
 
 `Netperf' is a general purpose tool for benchmarking bandwidth and
 performance of the `Internet Protocol' suite.  The `OpenSS7 Modified
@@ -59,7 +59,7 @@ well.
  Release
 --------
 
-This is the `netperf-2.3.5' package, released 2007-03-15.  This `2.3.5'
+This is the `netperf-2.3.5' package, released 2007-03-13.  This `2.3.5'
 release, and the latest version, can be obtained from the download area
 (http://www.openss7.org/download.html) of The OpenSS7 Project website
 using a command such as:
@@ -110,12 +110,12 @@ Prerequisites for the OpenSS7 NETPERF Utility package are as follows:
      packages must be installed.  For more information, see
      `Compatibility', in the manual.
 
-         - A fairly LSB compliant GNU/Linux distribution.  (1)
+         - A fairly LSB compliant GNU/Linux distribution.(1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
          - Linux 2.6 kernel (2.6.3 - 2.6.18);
          - glibc2 or better.
          - GNU info (for info files).
-         - GNU groff (for man pages).  (2)
+         - GNU groff (for man pages).(2)
 
 (Note: If you acquired `netperf' a part of the `OpenSS7 Master
 Package', then the dependencies listed below will already have been met
@@ -134,14 +134,33 @@ by unpacking the master package.)
   5. `OpenSS7 STREAMS XTI/TLI', strxnet-0.9.2.10
      (http://www.openss7.org/tarballs/strxnet-0.9.2.10.tar.bz2).
 
-  6. `OpenSS7 STREAMS INET', strinet-0.9.2.5
+  6. `OpenSS7 STREAM Network Services Library', strnsl-0.9.2.2
+     (http://www.openss7.org/tarballs/strnsl-0.9.2.2.tar.bz2).
+     (Optional.)
+
+  7. `OpenSS7 STREAMS INET', strinet-0.9.2.5
      (http://www.openss7.org/tarballs/strinet-0.9.2.5.tar.bz2).
 
-  7. `OpenSS7 STREAMS SCTP', strsctp-0.9.2.7
+  8. `OpenSS7 STREAMS SCTP', strsctp-0.9.2.7
      (http://www.openss7.org/tarballs/strsctp-0.9.2.7.tar.bz2).
 
-  8. `OpenSS7 STREAMS ISO', striso-0.9.2.2
+  9. `OpenSS7 STREAMS Channels', striso-0.9.2.2
+     (http://www.openss7.org/tarballs/strchan-0.9.2.2.tar.bz2).
+
+ 10. `OpenSS7 STREAMS ISO', striso-0.9.2.2
      (http://www.openss7.org/tarballs/striso-0.9.2.2.tar.bz2).
+
+ 11. `OpenSS7 STREAMS ISDN', strisdn-0.9.2.2
+     (http://www.openss7.org/tarballs/strisdn-0.9.2.2.tar.bz2).
+
+ 12. `OpenSS7 STREAMS SS7', strss7-0.9a.6
+     (http://www.openss7.org/tarballs/strss7-0.9a.6.tar.bz2).
+
+ 13. `OpenSS7 STREAMS SIGTRAN', sigtran-0.9.2.2
+     (http://www.openss7.org/tarballs/sigtran-0.9.2.2.tar.bz2).
+
+ 14. `OpenSS7 STREAMS VoIP', strvoip-0.9.2.2
+     (http://www.openss7.org/tarballs/strvoip-0.9.2.2.tar.bz2).
 
 When configuring and building multiple `OpenSS7 Project' release
 packages, place all of the source packages (unpacked tarballs) at the
