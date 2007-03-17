@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.19 2007/03/15 10:37:36 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.20 2007/03/17 08:28:59 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/15 10:37:36 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/17 08:28:59 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -66,6 +66,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release @value{PACKAGE}-0.9.2.E::		Release E
 * Release @value{PACKAGE}-0.9.2.D::		Release D
 * Release @value{PACKAGE}-0.9.2.D.rc3::		Release D Candidate 3
 * Release @value{PACKAGE}-0.9.2.D.rc2::		Release D Candidate 2
@@ -83,6 +84,33 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @node Release @value{PACKAGE}-@value{VERSION}
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+This is the fifth public release of the @value{PACKAGE_TITLE}.  See
+@file{README} in the release for a sub-package listing.  Most of the
+sub-packages in the release are production grade for @cite{Linux Fast-STREAMS}.
+All existing validation test suites run clean on supported distributions and
+architectures.
+
+The @cite{@value{PACKAGE_TITLE}} is not released as often as the sub-packages.
+As sub-packages are released more often, to rebuild the master package with a
+new sub-package release, simply replace the directory to which the sub-package
+belongs with the unpacked sub-package release and then rebuild the master
+package.  This release provides support for recent distributions and tool
+chains.
+
+Major features since the last public release are as follows:
+
+@itemize -
+@item
+Support for recent distributions and tool chains.
+
+@end itemize
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-0.9.2.E
+@unnumberedsubsec Major changes for release @value{PACKAGE}-0.9.2.E
+@cindex release @value{PACKAGE}-0.9.2.E
 
 This is the fourth public release of the @value{PACKAGE_TITLE}.  See
 @file{README} in the release for a sub-package listing.  Most of the
@@ -118,6 +146,7 @@ The package now looks for subpackages with a version number as unpacked by
 separate tarball.
 
 @end itemize
+@ignore
 
 @emph{This is a public stable production grade release of the package: it
 deprecates previous releases.  Please upgrade to the current release before
@@ -145,6 +174,7 @@ manual in the release (also in html
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
 
 For the news release, see @uref{http://www.openss7.org/rel20070315_L.html}.
+@end ignore
 
 @c ----------------------------------------------------------------------------
 

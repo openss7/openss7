@@ -1,6 +1,12 @@
+strutil (0.9.2.6-0) experimental; urgency=low
+
+  * Sixth public release.
+
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Sat, 17 Mar 2007 00:03:04 -0600
+
 strutil (0.9.2.5-0) experimental; urgency=low
 
-  * Fifrth release.
+  * Fifth release.
 
  -- Brian F. G. Bidulock <bidulock@openss7.org>  Sat,  3 Mar 2007 02:51:00 -0700
 

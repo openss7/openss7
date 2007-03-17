@@ -1,3 +1,9 @@
+sctp (0.2.26-0) experimental; urgency=low
+
+  * Twenty-sixth public release.
+
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Sat, 17 Mar 2007 00:03:04 -0600
+
 sctp (0.2.25-0) experimental; urgency=low
 
   * Twenty-fifth public release.
