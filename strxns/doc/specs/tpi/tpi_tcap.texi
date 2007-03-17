@@ -289,13 +289,8 @@ The TCAP interface uses protocol level T_SS7_SCCP for options at the SCCP level.
 parameters are communicated to the underlying transport using the option name T_SCCP_QOS.  There are
 three QOS structures which can be used in this fashion are listed in @emph{Table 7} as follows:
 
-<<<<<<< tpi_tcap.texi
-@image{tpi_tabx}
-@center Table 7@strong{@emph{.  SCCP QOS Option Values}}
-=======
 @center @image{tpi_tabx}
 @center Table 7@strong{@emph{.  SCCP QOS Option Values}}
->>>>>>> 0.9.2.9
 
 Quality of service structure @code{N_qos_sel_sccp_t} has the following fields:
 
@@ -551,34 +546,19 @@ Connection rejected, no common version.
 @subsection State Mapping
 
 @cartouche
-<<<<<<< tpi_tcap.texi
-@image{tpi_ne17,4in}
-@center Figure 18@strong{@emph{.  TR Sub-Layer State Machine}}
-=======
 @center @image{tpi_ne17,4in}
 @center Figure 18@strong{@emph{.  TR Sub-Layer State Machine}}
->>>>>>> 0.9.2.9
 @end cartouche
 
 @cartouche
-<<<<<<< tpi_tcap.texi
-@image{tpi_ne18,4in}
-@center Figure 19@strong{@emph{.  TR Sub-Layer State Machine}}
-=======
 @center @image{tpi_ne18,4in}
 @center Figure 19@strong{@emph{.  TR Sub-Layer State Machine}}
->>>>>>> 0.9.2.9
 @end cartouche
 
 @subsection Primitive Mapping
 
-<<<<<<< tpi_tcap.texi
-@image{tpi_tab8}
-@center Table 8@strong{@emph{.  Primitive Mapping}}
-=======
 @center @image{tpi_tab8}
 @center Table 8@strong{@emph{.  Primitive Mapping}}
->>>>>>> 0.9.2.9
 
 @subsubsection TR-UNI
 
