@@ -1,11 +1,32 @@
-OpenSS7 Linux Native SCTP -- history of user visible changes.  2007-03-15
-$Id: NEWS,v 0.9.2.35 2007/03/15 20:10:28 brian Exp $
+OpenSS7 Linux Native SCTP -- history of user visible changes.  2007-03-13
+$Id: NEWS,v 0.9.2.36 2007/03/17 09:01:59 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The sections that follow provide information on OpenSS7 releases of the
 OpenSS7 Linux Native SCTP package.
+
+ Major changes for release sctp-0.2.25
+--------------------------------------
+
+This is the twenty-sixth release of the Linux Native (Sockets) SCTP
+from the OpenSS7 Project.  This release, as with other releases, on
+builds and installs on 2.4 kernels.  This package is not as important
+to the OpenSS7 Project as the STREAMS version of SCTP, which provides
+the basis for all of the SIGTRAN components for the OpenSS7 stacks.
+Also, the STREAMS version runs on both 2.4 and 2.6 kernels.
+
+This is a stable production release: it deprecates previous releases.
+Please upgrade to the current release before reporting bugs.
+
+This is primarily a maintenance release correcting reported bugs, but
+also includes the latest packaging improvements.
+
+Major features since the last public release are as follows:
+
+   - Support for recent distributions and tool chains.
+
 
  Major changes for release sctp-0.2.25
 --------------------------------------
@@ -30,29 +51,6 @@ Major features since the last public release are as follows:
    - Support for Ubuntu 6.10 distribution and bug fixes for i386
      kernels.
 
-
-_This is a public stable production grade release of the package: it
-deprecates previous releases.  Please upgrade to the current release
-before reporting bugs._
-
-As with other OpenSS7 releases, this release configures, compiles,
-installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
-RPM- and DPKG-based distributions, and can be used on production
-kernels without patching or recompiling the kernel.
-
-This package is publicly released under the `GNU General Public License
-Version 2'.  The release is available as an `autoconf' tarball, SRPM,
-DSC, and set of binary RPMs and DEBs.  See the downloads page
-(http://www.openss7.org/download.html) for the `autoconf' tarballs,
-SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
-see the sctp package page (http://www.openss7.org/sctp_pkg.html).
-
-See `http://www.openss7.org/codefiles/sctp-0.2.25/ChangeLog' and
-`http://www.openss7.org/codefiles/sctp-0.2.25/NEWS' in the release for
-more information.  Also, see the `sctp.pdf' manual in the release (also
-in html `http://www.openss7.org/sctp_manual.html').
-
-For the news release, see `http://www.openss7.org/rel20070315_2.html'.
 
  Major changes for release sctp-0.2.24
 --------------------------------------
