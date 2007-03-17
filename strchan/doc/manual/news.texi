@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nosi nocin
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.14 2007/03/15 10:22:05 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.15 2007/03/17 08:29:21 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,52 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/15 10:22:05 $ by $Author: brian $
-@c
-@c =========================================================================
-@c
-@c $Log: news.texi,v $
-@c Revision 0.9.2.14  2007/03/15 10:22:05  brian
-@c - test case reporting and pushed release date one day
-@c
-@c Revision 0.9.2.13  2007/03/14 04:16:07  brian
-@c - updates for release
-@c
-@c Revision 0.9.2.12  2007/03/12 21:39:54  brian
-@c - may use automake 1.10
-@c
-@c Revision 0.9.2.11  2007/03/07 07:31:40  brian
-@c - update news release dates
-@c
-@c Revision 0.9.2.10  2007/03/04 12:20:56  brian
-@c - updated news for release
-@c
-@c Revision 0.9.2.9  2007/03/02 10:03:58  brian
-@c - updates to common build process and versions for all exported symbols
-@c
-@c Revision 0.9.2.8  2007/02/28 06:30:41  brian
-@c - updates and corrections, #ifdef instead of #if
-@c
-@c Revision 0.9.2.7  2007/02/12 10:40:32  brian
-@c - added support for autoconf 2.61
-@c
-@c Revision 0.9.2.6  2007/01/09 22:20:52  brian
-@c - bumped version number for next release
-@c
-@c Revision 0.9.2.5  2007/01/09 11:25:35  brian
-@c - final post-release updates
-@c
-@c Revision 0.9.2.4  2007/01/08 16:23:14  brian
-@c - final updates for release
-@c
-@c Revision 0.9.2.3  2006/10/29 02:03:00  brian
-@c - mentioned FC5 against 2.6.18 kernel
-@c
-@c Revision 0.9.2.2  2006/10/27 23:58:32  brian
-@c - added 2.6.18 compatibility
-@c
-@c Revision 0.9.2.1  2006/10/13 07:57:35  brian
-@c - added initial STREAMS Channel package
+@c Last Modified $Date: 2007/03/17 08:29:21 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -109,6 +64,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release @value{PACKAGE}-0.9.2.2::		Release 2
 * Release @value{PACKAGE}-0.9.2.1::		Release 1
 @end menu
 @end ifnothtml
@@ -119,6 +75,39 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @node Release @value{PACKAGE}-@value{VERSION}
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+This is the third separate release from @cite{The OpenSS7 Project} of the
+@cite{@value{PACKAGE_TITLE}} package.  The package provides components that were
+previously part of the @file{strss7} package.
+
+With OpenSS7 Master Package release @file{openss-0.9.2.D}, the Channel
+components were separated from the @file{strss7} package and placed in this
+package.  Not all of the Channel components previously part of the @file{strss7}
+package have been strapped into this release.  Components will be re-validated
+against @cite{Linux Fast-STREAMS} on a module-by-module and driver-by-driver
+basis.@footnote{Note that no component in this package can be supported by
+@cite{LiS}: @cite{LiS} is simply too slow to allow these drivers to acheive any
+degree of efficiency necessary for proper operation.} See @file{TODO} in the
+release, or @refman{Schedule}, for more information about the release schedule.
+
+This is the second pre-alpha release for @cite{Linux Fast-STREAMS} and is an
+optional part of the OpenSS7 Master Package (as of @file{openss7-0.9.2.D}).
+This release is a maintenance release providing support for recent distributions
+and tool chains.
+
+Major features since the last public release are as follows:
+
+@itemize -
+@item
+Support for recent distributions and tool chains.
+
+@end itemize
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-0.9.2.2
+@unnumberedsubsec Major changes for release @value{PACKAGE}-0.9.2.2
+@cindex release @value{PACKAGE}-0.9.2.2
 
 This is the second separate release from @cite{The OpenSS7 Project} of the
 @cite{@value{PACKAGE_TITLE}} package.  The package provides components that were
@@ -157,6 +146,7 @@ The package now looks for other subpackages with a version number as unpacked by
 separate tarball.
 
 @end itemize
+@ignore
 
 @emph{This is a public pre-alpha release of the package.  Please see
 @file{README-alpha} in the release or @refman{Maturity}.}
@@ -187,6 +177,7 @@ manual in the release (also in html
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
 
 For the news release, see @uref{http://www.openss7.org/rel20070315_9.html}.
+@end ignore
 
 @c ----------------------------------------------------------------------------
 

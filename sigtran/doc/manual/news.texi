@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nosi nocin
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.16 2007/03/15 10:08:52 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.17 2007/03/17 08:29:13 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,58 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/15 10:08:52 $ by $Author: brian $
-@c
-@c =========================================================================
-@c
-@c $Log: news.texi,v $
-@c Revision 0.9.2.16  2007/03/15 10:08:52  brian
-@c - updates for release
-@c
-@c Revision 0.9.2.15  2007/03/14 00:54:33  brian
-@c - manpages for check maintenance target
-@c
-@c Revision 0.9.2.14  2007/03/12 21:39:50  brian
-@c - may use automake 1.10
-@c
-@c Revision 0.9.2.13  2007/03/09 05:59:42  brian
-@c - changes for release
-@c
-@c Revision 0.9.2.12  2007/03/07 07:31:42  brian
-@c - update news release dates
-@c
-@c Revision 0.9.2.11  2007/03/04 12:20:33  brian
-@c - updated news for release
-@c
-@c Revision 0.9.2.10  2007/03/02 10:03:36  brian
-@c - updates to common build process and versions for all exported symbols
-@c
-@c Revision 0.9.2.9  2007/02/28 06:30:32  brian
-@c - updates and corrections, #ifdef instead of #if
-@c
-@c Revision 0.9.2.8  2007/02/12 10:40:22  brian
-@c - added support for autoconf 2.61
-@c
-@c Revision 0.9.2.7  2007/01/09 22:20:47  brian
-@c - bumped version number for next release
-@c
-@c Revision 0.9.2.6  2007/01/09 11:25:22  brian
-@c - final post-release updates
-@c
-@c Revision 0.9.2.5  2007/01/08 16:23:06  brian
-@c - final updates for release
-@c
-@c Revision 0.9.2.4  2006/11/04 11:35:25  brian
-@c - open source release of commercial package
-@c
-@c Revision 0.9.2.3  2006/10/29 02:02:46  brian
-@c - mentioned FC5 against 2.6.18 kernel
-@c
-@c Revision 0.9.2.2  2006/10/27 23:58:34  brian
-@c - added 2.6.18 compatibility
-@c
-@c Revision 0.9.2.1  2006/10/16 10:42:45  brian
-@c - added new package files
+@c Last Modified $Date: 2007/03/17 08:29:13 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -115,6 +64,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release @value{PACKAGE}-0.9.2.2::		Release 2
 * Release @value{PACKAGE}-0.9.2.1::		Release 1
 @end menu
 @end ifnothtml
@@ -125,6 +75,39 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @node Release @value{PACKAGE}-@value{VERSION}
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+This is the third open source release of the @cite{@value{PACKAGE_TITLE}}
+package.  This release contains modules and drivers formerly only available with
+Commercial releases of the @file{strss7} package and which are only recently
+available as open source with the release of this package.
+
+With OpenSS7 Master Package release @file{openss7-0.9.2.D}, the SIGTRAN and SS7
+over IP components were separated from the @file{strss7} package and placed in
+this package.  Not all of the SIGTRAN components previously part of the
+@file{strss7} package have been strapped into this release.  Components will be
+re-validated against @cite{Linux Fast-STREAMS} on a module-by-module and
+driver-by-driver basis.  See @file{TODO} in the release, or @refman{Schedule},
+for information about the release schedule.
+
+This is a stable, production grade release of M2PA.  It deprecates previous
+SIGTRAN component releases from the @file{strss7} package.  Please upgrade to
+the most current release of these components before reporting bugs.  This
+release is a maintenance release and provides support for recent distributions
+and tool chains.
+
+Major features since the last public release are as follows:
+
+@itemize -
+@item
+Support for recent distributions and tool chains.
+
+@end itemize
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-0.9.2.2
+@unnumberedsubsec Major changes for release @value{PACKAGE}-0.9.2.2
+@cindex release @value{PACKAGE}-0.9.2.2
 
 This is the second open source release of the @cite{@value{PACKAGE_TITLE}}
 package.  This release contains modules and drivers formerly only available with
@@ -173,6 +156,7 @@ The package now looks for other subpackages with a version number as unpacked by
 separate tarball.
 
 @end itemize
+@ignore
 
 @emph{This is a public stable production grade release of the package: it
 deprecates previous releases.  Please upgrade to the current release before
@@ -200,6 +184,7 @@ manual in the release (also in html
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
 
 For the news release, see @uref{http://www.openss7.org/rel20070315_4.html}.
+@end ignore
 
 @c ----------------------------------------------------------------------------
 

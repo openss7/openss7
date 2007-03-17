@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.14 2007/03/15 10:37:39 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.15 2007/03/17 08:29:02 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/15 10:37:39 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/17 08:29:02 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -66,6 +66,7 @@ as well as compatibility information of OpenSS7 releases to the original
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release @value{PACKAGE}-2.0.6::		Release 6
 * Release @value{PACKAGE}-2.0.5::		Release 5
 * Release @value{PACKAGE}-2.0.5.rc3::		Release 5 Candidate 3
 * Release @value{PACKAGE}-2.0.5.rc2::		Release 5 Candidate 2
@@ -83,6 +84,28 @@ as well as compatibility information of OpenSS7 releases to the original
 @node Release @value{PACKAGE}-@value{VERSION}
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+This is the seventh full release of the @cite{@value{PACKAGE_TITLE}} package.
+This is a stable, production grade release: it deprecates previous releases.
+Please upgrade to the most current release before reporting bugs.
+
+This release is largely a maintenance release that provides support for more
+distributions an architectures as well as tracking feature updates on related
+packages (i.e. @file{sctp-@value{VERSION_SCTP}}).
+
+Major features since the last public release are as follows:
+
+@itemize -
+@item
+Support for recent distributions and tool chains.
+
+@end itemize
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-2.0.6
+@unnumberedsubsec Major changes for release @value{PACKAGE}-2.0.6
+@cindex release @value{PACKAGE}-2.0.6
 
 This is the sixth full release of the @cite{@value{PACKAGE_TITLE}} package.
 This is a stable, production grade release: it deprecates previous releases.
@@ -106,6 +129,7 @@ The package now looks for other subpackages with a version number as unpacked by
 separate tarball.
 
 @end itemize
+@ignore
 
 @emph{This is a public stable production grade release of the package: it
 deprecates previous releases.  Please upgrade to the current release before
@@ -134,6 +158,7 @@ manual in the release (also in html
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
 
 For the news release, see @uref{http://www.openss7.org/rel20070315_1.html}.
+@end ignore
 
 @c ----------------------------------------------------------------------------
 

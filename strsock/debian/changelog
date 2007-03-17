@@ -1,3 +1,9 @@
+strsock (0.9.2.3-0) experimental; urgency=low
+
+  * Third public release.
+
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Sat, 17 Mar 2007 00:03:04 -0600
+
 strsock (0.9.2.2-0) experimental; urgency=low
 
   * Second public release.
