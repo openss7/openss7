@@ -1,3 +1,7 @@
+2007-03-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: don't include strconf.am
+
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: pushed release date

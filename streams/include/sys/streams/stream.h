@@ -805,7 +805,7 @@ typedef enum {
 // #define D_FIFO (1<<2) /* fifo */
 // #define D_PIPE (1<<3) /* pipe */
 // #define D_SOCK (1<<4) /* socket */
-// #define D_LIS (1<<5) /* LiS compatible */
+#define D_LIS		(1<<5)	/* LiS compatible */
 // #define D_HEAD (1<<6) /* stream head */
 // #define D_NSDEV (1<<7) /* named streams device */
 /* Solaris perimeter flags */

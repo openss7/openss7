@@ -133,6 +133,11 @@ extern int streamscall lis_unregister_strdev(major_t major);
 extern modID_t streamscall lis_register_strmod(struct streamtab *strtab, const char *name);
 extern int streamscall lis_unregister_strmod(struct streamtab *strtab);
 
+#define LIS_QLOCK_NONE		0
+#define LIS_QLOCK_QUEUE		1
+#define LIS_QLOCK_QUEUE_PAIR	2
+#define LIS_QLOCK_GLOBAL	3
+
 extern int streamscall lis_register_module_qlock_option(modID_t id, int qlock_option);
 extern int streamscall lis_register_driver_qlock_option(major_t major, int qlock_option);
 

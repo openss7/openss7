@@ -103,10 +103,12 @@ __STREAMS_EXTERN int register_strnod(struct cdevsw *cdev, struct devnode *cmin, 
 __STREAMS_EXTERN int register_strdev(struct cdevsw *cdev, major_t major);
 __STREAMS_EXTERN int register_strdrv(struct cdevsw *cdev);
 __STREAMS_EXTERN int register_strmod(struct fmodsw *fmod);
+__STREAMS_EXTERN int register_strsync(struct fmodsw *fmod);
 __STREAMS_EXTERN int unregister_strnod(struct cdevsw *cdev, minor_t minor);
 __STREAMS_EXTERN int unregister_strdev(struct cdevsw *cdev, major_t major);
 __STREAMS_EXTERN int unregister_strdrv(struct cdevsw *cdev);
 __STREAMS_EXTERN int unregister_strmod(struct fmodsw *fmod);
+__STREAMS_EXTERN void unregister_strsync(struct fmodsw *fmod);
 
 __STREAMS_EXTERN int autopush_add(struct strapush *sap);
 __STREAMS_EXTERN int autopush_del(struct strapush *sap);

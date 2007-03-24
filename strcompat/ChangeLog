@@ -1,5 +1,15 @@
 2007-03-24  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/include/sys/lfs/strconf.h:
+	  - define D_LIS flag again
+	  - provide register_strsync/unregister_strsync
+	* src/include/sys/lis/strconf.h: define qlock constants
+	* src/kernel/aixcompat.c: perform elsewhere synchronization correctly
+	* src/kernel/hpuxcompat.c: perform elsewhere synchronization correctly
+	* src/kernel/lfscompat.c: export (un)register_strsync
+	* src/kernel/liscompat.c: remove GPL exports from LiS symbols
+	* src/kernel/osfcompat.c: perform elsewhere synchronization correctly
+
 	* src/include/sys/lfs/strconf.h: add sqinfo members
 	* src/include/sys/lis/strconf.h: add missing qlock functions
 	* src/kernel/liscompat.c: add missing qlock functions (still needs

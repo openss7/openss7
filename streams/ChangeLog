@@ -1,5 +1,15 @@
 2007-03-24  Brian Bidulock  <bidulock@openss7.org>
 
+	* include/sys/streams/strconf.h: export (un)register_strsync
+	* include/sys/streams/stream.h: define D_LIS flag again
+	* include/sys/streams/strsubr.h: add sq_info member to syncq
+	* src/kernel/strreg.c: correct and export register_strsync
+	* src/kernel/strsad.c: correct som GPL exports
+	* src/kernel/strsched.c: add sq_locate for elsewhere lookup
+	  - clean up synchronization functions
+	* src/kernel/strsched.h: add sq_locate, correct in_streams()
+	* src/kernel/strutil.c: GPL export
+
 	* doc/man/man9/cdevsw.9.man: document sqinfo member
 	* doc/man/man9/devnode.9.man: document sqinfo member
 	* doc/man/man9/fmodsw.9.man: document sqinfo member
