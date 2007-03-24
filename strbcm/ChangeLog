@@ -1,3 +1,14 @@
+2007-03-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: corrections for beta release
+	* am/kernel.am: maintain original module path
+	* am/packages.am: working packages makefile fragment
+	* am/strconf.am: generic rules to build packages
+	* m4/strconf.m4: option file to contain make rules
+	* pkg/Config: add test configuration
+	* scripts/modpost.sh: write mod.c files to same location as object
+	* scripts/strconf-sh: corrections to wrapper generation, generate make rules
+
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* strbcm/doc/manual/news.texi: pushed release date

@@ -99,7 +99,7 @@ if AMDEP
 ## AMDEP
 sinclude $(DEPDIR)/modules.Pk
 
-$(DEPDIR)/modules.Pk:
+$(DEPDIR)/modules.Pk: Makefile
 	@$(ECHO) "Creating $@ dependencies..." ; \
 	( \
 		srcs=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.c |g'` ; \
@@ -107,9 +107,9 @@ $(DEPDIR)/modules.Pk:
 		objs=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.o |g'` ; \
 		$(ECHO) "stamp-kobjects: $$objs" ; $(ECHO) "" ; \
 		mods=`$(ECHO) " $(KERNEL_MODULES) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g'` ; \
-		for m in $$mods ; do \
-			$(ECHO) "sinclude $(DEPDIR)/$$m.mod.Po" ; \
-			$(ECHO) "sinclude $(DEPDIR)/$$m.Pko" ; \
+		for m in $$mods ; do b=`basename $$m` ; \
+			$(ECHO) "sinclude $(DEPDIR)/$$b.mod.Po" ; \
+			$(ECHO) "sinclude $(DEPDIR)/$$b.Pko" ; \
 		done \
 	) >$(DEPDIR)/modules.Tpk || { rm -f $(DEPDIR)/modules.Tpk ; exit 1 ; } ; \
 	mv -f $(DEPDIR)/modules.Tpk $@
@@ -128,12 +128,12 @@ if am__fastdepCC
 ## am__fastdepCC
 stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
 	@mods=`$(ECHO) " $? " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
-	for m in $$mods ; do \
+	for m in $$mods ; do b=`basename $$m` ; \
 		test :$$m != :stamp-modpost || continue ; \
-		$(ECHO) "if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$m.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
-		then mv -f $(DEPDIR)/$$m.mod.Tpo $(DEPDIR)/$$m.mod.Po ; else rm -f $(DEPDIR)/$$m.mod.Tpo ; exit 1 ; fi" ; \
-		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$m.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
-		then mv -f $(DEPDIR)/$$m.mod.Tpo $(DEPDIR)/$$m.mod.Po ; else rm -f $(DEPDIR)/$$m.mod.Tpo ; exit 1 ; fi ; \
+		$(ECHO) "if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$b.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
+		then mv -f $(DEPDIR)/$$b.mod.Tpo $(DEPDIR)/$$b.mod.Po ; else rm -f $(DEPDIR)/$$b.mod.Tpo ; exit 1 ; fi" ; \
+		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$b.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
+		then mv -f $(DEPDIR)/$$b.mod.Tpo $(DEPDIR)/$$b.mod.Po ; else rm -f $(DEPDIR)/$$b.mod.Tpo ; exit 1 ; fi ; \
 	done ; \
 	touch stamp-mobjects
 ## am__fastdepCC
@@ -170,9 +170,9 @@ endif
 if AMDEP
 ## AMDEP
 .o.ko:
-	@m=`$(ECHO) "$<" | sed -r -e 's|(\.mod)?\.o$$||'` ; \
-	$(ECHO) "if $(LD) -r -o $@ $$m.o $$m.mod.o ; then $(ECHO) \"$@: $$m.o $$m.mod.o\" > $(DEPDIR)/$$m.Pko ; fi" ; \
-	if $(LD) -r -o $@ $$m.o $$m.mod.o ; then $(ECHO) "$@: $$m.o $$m.mod.o" > $(DEPDIR)/$$m.Pko ; fi
+	@m=`$(ECHO) "$<" | sed -r -e 's|(\.mod)?\.o$$||'` ; b=`basename $$m` ; \
+	$(ECHO) "if $(LD) -r -o $@ $$m.o $$m.mod.o ; then $(ECHO) \"$@: $$m.o $$m.mod.o\" > $(DEPDIR)/$$b.Pko ; fi" ; \
+	if $(LD) -r -o $@ $$m.o $$m.mod.o ; then $(ECHO) "$@: $$m.o $$m.mod.o" > $(DEPDIR)/$$b.Pko ; fi
 ## AMDEP
 else
 ## !AMDEP
@@ -189,10 +189,10 @@ if AMDEP
 ## AMDEP
 stamp-kobjects: stamp-mobjects $(KERNEL_MODULES)
 	@mods=`$(ECHO) " $? " | sed -r -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|(\.mod)?\.o | |g'` ; \
-	for m in $$mods ; do \
+	for m in $$mods ; do b=`basename $$m` ; \
 		test :$$m != :stamp-mobjects || continue ; \
-		$(ECHO) "if $(LD) -r -o $$m.ko $$m.o $$m.mod.o ; then $(ECHO) \"$$m.ko: $$m.o $$m.mod.o\" > $(DEPDIR)/$$m.Pko ; fi" ; \
-		if $(LD) -r -o $$m.ko $$m.o $$m.mod.o ; then $(ECHO) "$$m.ko: $$m.o $$m.mod.o" > $(DEPDIR)/$$m.Pko ; fi ; \
+		$(ECHO) "if $(LD) -r -o $$m.ko $$m.o $$m.mod.o ; then $(ECHO) \"$$m.ko: $$m.o $$m.mod.o\" > $(DEPDIR)/$$b.Pko ; fi" ; \
+		if $(LD) -r -o $$m.ko $$m.o $$m.mod.o ; then $(ECHO) "$$m.ko: $$m.o $$m.mod.o" > $(DEPDIR)/$$b.Pko ; fi ; \
 	done ; \
 	touch stamp-kobjects
 ## AMDEP

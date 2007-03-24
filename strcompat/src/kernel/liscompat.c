@@ -2787,6 +2787,34 @@ lis_unregister_strmod(struct streamtab *strtab)
 
 EXPORT_SYMBOL_GPL(lis_unregister_strmod);
 
+/**
+ *  lis_register_driver_qlock_option - emulation of LiS STREAMS driver synchronization
+ *  @major: major device number of driver
+ *  @qlock_option: synchronization level
+ */
+_RP int
+lis_register_driver_qlock_option(major_t major, int qlock_option)
+{
+	/* for now */
+	return (-EOPNOTSUPP);
+}
+
+EXPORT_SYMBOL_GPL(lis_register_driver_qlock_option);
+
+/**
+ *  lis_register_module_qlock_option - emulation of LiS STREAMS module synchronization
+ *  @modid: module id
+ *  @qlock_option: synchronization level
+ */
+_RP int
+lis_register_module_qlock_option(modID_t modid, int qlock_option)
+{
+	/* for now */
+	return (-EOPNOTSUPP);
+}
+
+EXPORT_SYMBOL_GPL(lis_register_module_qlock_option);
+
 #ifdef CONFIG_STREAMS_COMPAT_LIS_MODULE
 static
 #endif

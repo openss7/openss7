@@ -708,6 +708,7 @@ struct fmodsw {
 	uint f_modid;			/* module id */
 	atomic_t f_count;		/* open count */
 	int f_sqlvl;			/* q sychronization level */
+	const char *f_sqinfo;		/* elsewhere synchornization info */
 	struct syncq *f_syncq;		/* synchronization queue */
 	struct module *f_kmod;		/* kernel module */
 };
@@ -723,6 +724,7 @@ struct cdevsw {
 	uint d_modid;			/* driver moidule id */
 	atomic_t d_count;		/* open count */
 	int d_sqlvl;			/* q sychronization level */
+	const char *d_sqinfo;		/* elsewhere synchornization info */
 	struct syncq *d_syncq;		/* synchronization queue */
 	struct module *d_kmod;		/* kernel module */
 	/* above must match fmodsw */
@@ -748,6 +750,7 @@ struct devnode {
 	uint n_modid;			/* node module id */
 	atomic_t n_count;		/* open count */
 	int n_sqlvl;			/* q sychronization level */
+	const char *n_sqinfo;		/* elsewhere synchornization info */
 	struct syncq *n_syncq;		/* synchronization queue */
 	struct module *n_kmod;		/* kernel module */
 	/* above must match fmodsw */

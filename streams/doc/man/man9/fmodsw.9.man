@@ -101,6 +101,7 @@ struct fmodsw {
         uint f_modid;                   /* module id */
         atomic_t f_count;               /* open count */
         int f_sqlvl;                    /* q sychronization level */
+        const char *f_sqinfo;           /* elsewhere sychronization info */
         struct syncq *f_syncq;          /* synchronization queue */
         struct module *f_kmod;          /* kernel module */
 };
@@ -223,6 +224,23 @@ which is the same as
 .BR SQLVL_DEFAULT .
 Synchronization should, instead, be specified using the
 .I f_flag
+member.
+An exception to this rule is when a synchronization level of
+.BR SQLVL_GLOBAL " or " SQLVL_ELSEWHERE
+is desired, which are not supported by the flags in the
+.I f_flag
+member.
+.TP
+.I f_sqinfo
+When member
+.I d_sqlvl
+is set to
+.BR SQLVL_ELSEWHERE ,
+this member specifies the character string name of the external synchronization to use.  It is
+ignored otherwise.
+This field is populated by the caller of the registration function to communicate to it which
+synchronization queue to populate against the
+.I f_syncq
 member.
 .TP
 .I f_syncq

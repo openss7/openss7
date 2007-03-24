@@ -235,11 +235,13 @@ EXTRA_DIST			+= $(EXTRA_TEX)
 dist_noinst_SCRIPTS		+= configure.nexusware
 EXTRA_SCRIPTS			+= configure.nexusware
 
+include am/packages.am
+
 ##
 ## Rules for building kernel objects
 ##
-KERNEL_OBJECTS			= $(libBCMlink_a_OBJECTS) $(libBCMmods_a_OBJECTS) $(libBCMdrvs_a_OBJECTS) $(ADDON_OBJS)
-KERNEL_MODULES			= $(libBCMmods_a_OBJECTS) $(libBCMdrvs_a_OBJECTS) $(ADDON_MODS)
+KERNEL_OBJECTS			= $(libBCMlink_a_OBJECTS) $(libBCMmods_a_OBJECTS) $(libBCMdrvs_a_OBJECTS) $(libBCMpkgs_a_OBJECTS) $(PACKAGE_OBJECTS) $(ADDON_OBJS)
+KERNEL_MODULES			= $(libBCMmods_a_OBJECTS) $(libBCMdrvs_a_OBJECTS) $(libBCMpkgs_a_OBJECTS) $(PACKAGE_MODULES) $(ADDON_MODS)
 KERNEL_PRELOADS			=
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
