@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: packages.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/18 17:53:47 $
+# @(#) $RCSfile: packages.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/24 01:06:38 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/04/18 17:53:47 $ by $Author: brian $
+## Last Modified $Date: 2007/03/24 01:06:38 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: packages.am,v $
+## Revision 0.9.2.2  2007/03/24 01:06:38  brian
+## - updates to common files for strbcm package
+##
 ## Revision 0.9.2.1  2006/04/18 17:53:47  brian
 ## - new automake fragment for packages
 ##
@@ -61,26 +64,34 @@
 ## compatibility packages.
 ##
 
+sinclude $(STRCONF_PKGRULE)
+
+DISTCLEANFILES		+= $(PACKAGE_WRAPPERS)
+
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 if RPM_BUILD_KERNEL
 ## RPM_BUILD_KERNEL
+##
+noinst_LIBRARIES		+= libBCMpkgs.a
 
 if AMDEP
 ## AMDEP
-@am__include@ @am__quote@./$(DEPDIR)/packages.Ph@am__quote@
+sinclude $(DEPDIR)/packages.Ph
 
-$(DEPDIR)/packages.Ph:
+$(DEPDIR)/packages.Ph: Makefile
 	@$(ECHO) "Creating $@ dependencies..." ; \
 	( \
 		objs= ; \
 		list="$(PACKAGE_OBJECTS)" ; for obj in $$list ; do \
-			a=`$(ECHO) "$$obj" | sed -e 's|^lib.*_a-|$(kpre)|'` ; \
-			s=`$(ECHO) "$$obj" | sed -e 's|^lib.*_a-||;s|^$(kpre)||;s|\.o$$||'` ; \
+			a=`$(ECHO) "$$obj" | sed -e 's,\<lib.*_a-,$(kpre),'` ; \
+			s=`$(ECHO) "$$obj" | sed -e 's,\<lib.*_a-,,;s,\<$(kpre),,;s,\.o$$,,'` ; \
+			if test -f "$$s" ; then d= ; else d="$(srcdir)/" ; fi ; \
+			if test -f "$$d$$s" ; then s="$$s.c" ; else s= ; fi ; \
 			if test "$$a" = "$$obj" ; then \
-				$(ECHO) "$$a: $$s.c" ; $(ECHO) "" ; \
+				$(ECHO) "$$a: $$s" ; $(ECHO) "" ; \
 			else \
-				$(ECHO) "$$a: $$obj $$s.c" ; $(ECHO) "" ; \
+				$(ECHO) "$$a: $$obj $$s" ; $(ECHO) "" ; \
 			fi ; \
 			objs="$${objs:+$${objs} }$$obj" ; \
 		done ; \
@@ -92,7 +103,7 @@ endif
 
 libBCMpkgs_a_SOURCES		= $(PACKAGE_SRCFILES)
 libBCMpkgs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG) $(AUTOCONFIG_H)
-libBCMpkgs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
+libBCMpkgs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libBCMpkgs_a_CFLAGS		= $(KERNEL_CFLAGS)
 $(libBCMpkgs_a_OBJECTS):	$(libBCMpkgs_a_SOURCES) $(libBCMpkgs_a_DEPENDENCIES)
 
@@ -101,7 +112,7 @@ if am__fastdepCC
 stamp-pkgobjs: $(PACKAGE_SRCFILES)
 	@list="$(PACKAGE_SRCFILES)" ; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
-		r=`$(ECHO) "$$s" | sed -e 's|^.*/||;s|\.c$$||'` ; \
+		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
 		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(libBCMpkgs_a_CPPFLAGS) $(CPPFLAGS) $(libBCMpkgs_a_CFLAGS) $(CFLAGS) -MT libBCMpkgs_a-$$r.o -MD -MP -MF "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" -c -o libBCMpkgs_a-$$r.o $$d$$s ; \
 		then mv -f "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" "$(DEPDIR)/libBCMpkgs_a-$$r.Po" ; else rm -f "$(DEPDIR)/libBCMpkgs_a-$$r.Tpo" ; exit 1 ; fi ; \
 	done ; \
@@ -114,7 +125,7 @@ if AMDEP
 stamp-pkgobjs: $(PACKAGE_SRCFILES)
 	@list"$(PACKAGE_SRCFILES)" ; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
-		r=`$(ECHO) "$$s" | sed -e 's|^.*/||;s|\.c$$||'` ; \
+		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
 		source="$$s" object="libBCMpkgs_a-$$r.o" libtool=no \
 		DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(libBCMpkgs_a_CPPFLAGS) $(CPPFLAGS) $(libBCMpkgs_a_CFLAGS) $(CFLAGS) -c -o libBCMpkgs_a-$$r.o $$d$$s ; \
@@ -126,7 +137,7 @@ else
 stamp-pkgobjs: $(PACKAGE_SRCFILES)
 	@list"$(PACKAGE_SRCFILES)" ; for s in $$list ; do \
 		if test -f "$$s" ; then d=; else d="$(srcdir)/" ; fi ; \
-		r=`$(ECHO) "$$s" | sed -e 's|^.*/||;s|\.c$$||'` ; \
+		r=`$(ECHO) "$$s" | sed -e 's,^.*/,,;s,\.c$$,,'` ; \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) -DKBUILD_BASENAME=$$r $(libBCMpkgs_a_CPPFLAGS) $(CPPFLAGS) $(libBCMpkgs_a_CFLAGS) $(CFLAGS) -c -o libBCMpkgs_a-$$r.o $$d$$s ; \
 	done ; \
 	touch stamps-pkgobjs
@@ -136,7 +147,7 @@ endif
 endif
 
 clean-pkgobjs:
-	@objs=`$(ECHO) " $(PACKAGE_SRCFILES) " | sed -e 's| *  | |g;s| [^[:space:]]*/| libBCMpkgs_a-|g;s|\.c |.o |g'` ; \
+	@objs=`$(ECHO) " $(PACKAGE_SRCFILES) " | sed -e 's, *  , ,g;s, [^[:space:]]*/, libBCMpkgs_a-,g;s,\.c ,.o ,g'` ; \
 	$(ECHO) "rm -f -- stamp-pkgobjs $$objs" ; \
 	rm -f -- stamp-pkgobjs $$objs
 
