@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/16 10:30:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/24 01:46:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/16 10:30:16 $ by $Author: brian $
+# Last Modified $Date: 2007/03/24 01:46:45 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.32  2007/03/24 01:46:45  brian
+# - add dummy.c to invoke libtool and C compiler checks
+#
 # Revision 0.9.2.31  2007/03/16 10:30:16  brian
 # - final changes from release
 #
@@ -113,6 +116,13 @@ include am/help.am
 ## Problem Reports
 ##
 include am/pr.am
+
+#
+# Just to force depcomp and libtool
+#
+lib_LTLIBRARIES =
+EXTRA_LTLIBRARIES = libdummy.la
+libdummy_la_SOURCES = dummy.c
 
 #
 # This is a little hook to move the distribution subdirectories out of the way

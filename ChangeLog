@@ -1,3 +1,8 @@
+2007-03-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: add dummy library to invoke libtool and C compiler checks
+	* dummy.c: add dummy C source file
+
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: pushed release date
