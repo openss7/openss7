@@ -316,7 +316,7 @@ include am/genksyms.am
 ##
 ## Rules for generating STREAMS configuration
 ##
-include am/strconf.am
+##include am/strconf.am
 
 if RPM_BUILD_USER
 ## RPM_BUILD_USER

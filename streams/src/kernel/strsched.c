@@ -734,7 +734,7 @@ allocq(void)
 	return (rq);
 }
 
-EXPORT_SYMBOL(allocq);	/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(allocq);		/* include/sys/streams/stream.h */
 
 streams_noinline streams_fastcall void sd_put_slow(struct stdata **sdp);
 
@@ -803,7 +803,7 @@ freeq(queue_t *rq)
 	freeq_fast(rq);
 }
 
-EXPORT_SYMBOL(freeq);	/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(freeq);		/* include/sys/streams/stream.h */
 
 /* queue gets and puts */
 BIG_STATIC streams_fastcall __hot_out queue_t *
@@ -969,6 +969,7 @@ mdbblock_alloc_slow(uint priority, void *func)
 		return (mp);
 	}
 }
+
 /* The put and write side of the Stream head lives in this function */
 STATIC streams_fastcall __hot_write mblk_t *
 mdbblock_alloc(uint priority, void *func)
@@ -1361,13 +1362,51 @@ sq_alloc(void)
 	   user context with no locks held, therefore we use SLAB_KERNEL instead of SLAB_ATOMIC. */
 	if (likely((sq = kmem_cache_alloc(si->si_cache, SLAB_KERNEL)) != NULL)) {
 		_ptrace(("syncq %p is allocated\n", sq));
+		atomic_set(&sq->sq_refs, 1);
 		write_lock(&si->si_rwlock);
 		list_add_tail((struct list_head *) &sq->sq_next, &si->si_head);
 		write_unlock(&si->si_rwlock);
 		atomic_inc(&si->si_cnt);
 		if (atomic_read(&si->si_cnt) > si->si_hwl)
 			si->si_hwl = atomic_read(&si->si_cnt);
-		atomic_set(&sq->sq_refs, 1);
+	}
+	return (sq);
+}
+BIG_STATIC streams_fastcall __unlikely struct syncq *
+sq_locate(const char *sq_info)
+{
+	struct syncq *sq, *sq_try = NULL;
+	struct strinfo *si = &Strinfo[DYN_SYNCQ];
+	struct list_head *pos;
+
+	// strblocking(); /* before we sleep */
+	/* Note: sq_locate() is only called by qattach() that is only called by the STREAM head at
+	   user context with no locks held, therefore we use SLAB_KERNEL instead of SLAB_ATOMIC. */
+	if (likely((sq = kmem_cache_alloc(si->si_cache, SLAB_KERNEL)) != NULL)) {
+		_ptrace(("syncq %p is allocated\n", sq));
+		write_lock(&si->si_rwlock);
+		for (pos = si->si_head.next; pos != &si->si_head; pos = pos->next, sq_try = NULL) {
+			sq_try = (struct syncq *)
+			    ((caddr_t) pos - (ulong) &((struct syncq *) 0)->sq_next);
+			if (sq_info == NULL || strncmp(sq_try->sq_info, sq_info, FMNAMESZ) == 0)
+				break;
+		}
+		if (sq_try == NULL) {
+			atomic_set(&sq->sq_refs, 1);
+			if (sq_info)
+				strncpy(sq->sq_info, sq_info, FMNAMESZ);
+			list_add_tail((struct list_head *) &sq->sq_next, &si->si_head);
+		} else {
+			kmem_cache_free(si->si_cache, sq);
+			sq = sq_try;
+			atomic_inc(&sq->sq_refs);
+		}
+		write_unlock(&si->si_rwlock);
+		if (sq_try == NULL) {
+			atomic_inc(&si->si_cnt);
+			if (atomic_read(&si->si_cnt) > si->si_hwl)
+				si->si_hwl = atomic_read(&si->si_cnt);
+		}
 	}
 	return (sq);
 }
@@ -1381,6 +1420,9 @@ sq_free(struct syncq *sq)
 	write_lock(&si->si_rwlock);
 	list_del_init((struct list_head *) &sq->sq_next);
 	write_unlock(&si->si_rwlock);
+
+	bzero(sq->sq_info, FMNAMESZ + 1);
+
 	/* clean it up before puting it back in the cache */
 	sq_put(&sq->sq_outer);	/* recurse once */
 
@@ -1564,6 +1606,7 @@ EXPORT_SYMBOL_GPL(sefree);	/* include/sys/streams/strsubr.h */
  *  -------------------------------------------------------------------------
  */
 
+#ifdef CONFIG_STREAMS_SYNCQS
 STATIC streams_fastcall void
 strsched_mfunc_fast(mblk_t *mp)
 {
@@ -1590,6 +1633,18 @@ strsched_mfunc(mblk_t *mp)
 {
 	strsched_mfunc_fast(mp);
 }
+
+streams_noinline streams_fastcall void
+strdefer_mfunc(void *func, queue_t *q, mblk_t *mp, void *arg)
+{
+	struct mbinfo *m = (typeof(m)) mp;
+
+	m->m_func = func;
+	m->m_queue = qget(q);
+	m->m_private = arg;
+	strsched_mfunc(mp);
+}
+#endif				/* CONFIG_STREAMS_SYNCQS */
 
 /*
  * strsched_event:	- schedule an event for the STREAMS scheduler
@@ -1857,7 +1912,7 @@ bufcall(unsigned size, int priority, void streamscall streamscall (*function) (l
 	return __bufcall(NULL, size, priority, function, arg);
 }
 
-EXPORT_SYMBOL(bufcall);	/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(bufcall);		/* include/sys/streams/stream.h */
 
 /**
  *  esbbcall:	- schedule a buffer callout
@@ -1921,7 +1976,7 @@ timeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks)
 	return __timeout(NULL, timo_fcn, arg, ticks, 0, smp_processor_id());
 }
 
-EXPORT_SYMBOL(timeout);	/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(timeout);		/* include/sys/streams/stream.h */
 
 /**
  *  untimeout:	- cancel a timeout callback
@@ -2022,7 +2077,7 @@ weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_
 	return __weldq(q1, q2, q3, q4, func, arg, protq);
 }
 
-EXPORT_SYMBOL(weldq);	/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(weldq);		/* include/sys/streams/stream.h */
 
 /**
  *  unweldq:	- unweld two queue pairs from each other
@@ -2061,7 +2116,7 @@ unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, wel
 	return __unweldq(q1, NULL, q3, NULL, func, arg, protq);
 }
 
-EXPORT_SYMBOL(unweldq);	/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(unweldq);		/* include/sys/streams/stream.h */
 
 /* 
  *  DEFERRAL FUNCTION ON SYNCH QUEUES
@@ -2078,8 +2133,8 @@ EXPORT_SYMBOL(unweldq);	/* include/sys/streams/stream.h */
  *  @mp:	the message to pass to the function
  *  @func:	the function
  */
-STATIC void
-strwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *))
+STATIC streams_inline streams_fastcall void
+strwrit_fast(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *))
 {
 #ifdef CONFIG_SMP
 	struct stdata *sd;
@@ -2100,6 +2155,11 @@ strwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *))
 	prunlock(sd);
 #endif
 }
+STATIC void
+strwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *))
+{
+	strwrit_fast(q, mp, func);
+}
 
 /*
  *  strfunc:	- execute a function like a queue's put procedure
@@ -2114,7 +2174,7 @@ strwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *))
  *  - strfunc() returns void
  *  - strfunc() does not perform any synchronization
  */
-STATIC streams_fastcall void
+STATIC streams_inline streams_fastcall void
 strfunc_fast(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 #ifdef CONFIG_SMP
@@ -2460,10 +2520,6 @@ enter_syncq_shared(struct syncq_cookie *sc)
 STATIC int
 enter_outer_syncq_exclus(struct syncq_cookie *sc)
 {
-	/* fast path for MP modules */
-	if (likely(sc->sc_q->q_syncq == NULL))
-		return (1);
-
 	if (find_syncq(sc) && (sc->sc_sq = sc->sc_osq))
 		return enter_syncq_exclus(sc);
 	return (1);
@@ -2473,10 +2529,6 @@ enter_outer_syncq_exclus(struct syncq_cookie *sc)
 STATIC int
 enter_outer_syncq_shared(struct syncq_cookie *sc)
 {
-	/* fast path for MP modules */
-	if (likely(sc->sc_q->q_syncq == NULL))
-		return (1);
-
 	if (find_syncq(sc) && (sc->sc_sq = sc->sc_osq))
 		return enter_syncq_shared(sc);
 	return (1);
@@ -2485,10 +2537,6 @@ enter_outer_syncq_shared(struct syncq_cookie *sc)
 STATIC int
 enter_inner_syncq_exclus(struct syncq_cookie *sc)
 {
-	/* fast path for MP modules */
-	if (likely(sc->sc_q->q_syncq == NULL))
-		return (1);
-
 	if (find_syncqs(sc)) {
 		if ((sc->sc_sq = sc->sc_osq)) {
 			int rval;
@@ -2506,10 +2554,6 @@ enter_inner_syncq_exclus(struct syncq_cookie *sc)
 STATIC int
 enter_inner_syncq_shared(struct syncq_cookie *sc)
 {
-	/* fast path for MP modules */
-	if (likely(sc->sc_q->q_syncq == NULL))
-		return (1);
-
 	if (find_syncqs(sc)) {
 		if ((sc->sc_sq = sc->sc_osq)) {
 			int rval;
@@ -2545,10 +2589,6 @@ enter_inner_syncq_asputp(struct syncq_cookie *sc)
 STATIC int
 enter_inner_syncq_asopen(struct syncq_cookie *sc)
 {
-	/* fast path for MP modules */
-	if (likely(sc->sc_q->q_syncq == NULL))
-		return (1);
-
 	if (find_syncqs(sc)) {
 		if ((sc->sc_sq = sc->sc_osq)) {
 			if (sc->sc_sq->sq_flag & SQ_EXCLUS)
@@ -2572,10 +2612,6 @@ enter_syncq_writer(struct syncq_cookie *sc, void streamscall (*func) (queue_t *,
 {
 	struct mbinfo *m = (typeof(m)) sc->sc_mp;
 
-	/* fast path for MP modules */
-	if (likely(sc->sc_q->q_syncq == NULL))
-		return (1);
-
 	m->m_func = (void *) &strwrit;
 	_ctrace(m->m_queue = qget(sc->sc_q));
 	m->m_private = (void *) func;
@@ -2595,10 +2631,6 @@ enter_inner_syncq_func(struct syncq_cookie *sc, void streamscall (*func) (void *
 {
 	struct mbinfo *m = (typeof(m)) sc->sc_mp;
 
-	/* fast path for MP modules */
-	if (likely(sc->sc_q->q_syncq == NULL))
-		return (1);
-
 	m->m_func = (void *) func;
 	_ctrace(m->m_queue = qget(sc->sc_q));
 	m->m_private = arg;
@@ -2611,10 +2643,6 @@ enter_inner_syncq_putp(struct syncq_cookie *sc)
 {
 	struct mbinfo *m = (typeof(m)) sc->sc_mp;
 
-	/* fast path for MP modules */
-	if (likely(sc->sc_q->q_syncq == NULL))
-		return (1);
-
 	m->m_func = (void *) &putp;
 	_ctrace(m->m_queue = qget(sc->sc_q));
 	m->m_private = NULL;
@@ -2625,10 +2653,6 @@ enter_inner_syncq_putp(struct syncq_cookie *sc)
 STATIC int
 enter_inner_syncq_srvp(struct syncq_cookie *sc)
 {
-	/* fast path for MP modules */
-	if (likely(sc->sc_q->q_syncq == NULL))
-		return (1);
-
 	return enter_inner_syncq_exclus(sc);
 }
 
@@ -2654,25 +2678,31 @@ clear_backlog(syncq_t *sq)
 STATIC void
 leave_syncq(struct syncq_cookie *sc)
 {
-	syncq_t *sq;
+	syncq_t *sq = sc->sc_sq;
 
-	/* fast path for MP modules */
-	if (likely((sq = sc->sc_sq) == NULL))
-		return;
-
-	{
-		spin_lock(&sq->sq_lock);
-		if ((sq->sq_count < 0 && sq->sq_owner == current && --sq->sq_nest < 0)
-		    || (sq->sq_count >= 0 && --sq->sq_count <= 0)) {
-			sq->sq_nest = 0;
-			sq->sq_owner = current;
-			sq->sq_count = -1;
-			clear_backlog(sq);
-		}
-		spin_unlock(&sq->sq_lock);
+	spin_lock(&sq->sq_lock);
+	if ((sq->sq_count < 0 && sq->sq_owner == current && --sq->sq_nest < 0)
+	    || (sq->sq_count >= 0 && --sq->sq_count <= 0)) {
+		sq->sq_nest = 0;
+		sq->sq_owner = current;
+		sq->sq_count = -1;
+		clear_backlog(sq);
 	}
+	spin_unlock(&sq->sq_lock);
 }
 #endif
+
+#ifdef CONFIG_STREAMS_SYNCQS
+STATIC streams_fastcall void
+qstrwrit_sync(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *), int perim)
+{
+	struct syncq_cookie ck = {.sc_q = q,.sc_mp = mp, }, *sc = &ck;
+
+	if (unlikely(enter_syncq_writer(sc, func, perim) == 0))
+		return;
+	strwrit(q, mp, func);
+	leave_syncq(sc);
+}
 
 /**
  *  qstrwrit:	- call a function after gaining exclusive access to a perimeter
@@ -2700,26 +2730,26 @@ leave_syncq(struct syncq_cookie *sc)
  *
  */
 STATIC streams_fastcall void
-qstrwrit_fast(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *), int perim)
-{
-#ifdef CONFIG_STREAMS_SYNCQS
-	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
-		struct syncq_cookie ck = {.sc_q = q,.sc_mp = mp, }, *sc = &ck;
-
-		if (unlikely(enter_syncq_writer(sc, func, perim) == 0))
-			return;
-		strwrit(q, mp, func);
-		leave_syncq(sc);
-		return;
-	}
-#endif
-	strwrit(q, mp, func);
-}
-
-STATIC void
 qstrwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *), int perim)
 {
-	return qstrwrit_fast(q, mp, func, perim);
+	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
+		if (in_streams())
+			qstrwrit_sync(q, mp, func, perim);
+		else
+			strdefer_mfunc(&strwrit, q, mp, func);
+	} else
+		strwrit_fast(q, mp, func);
+}
+
+STATIC streams_fastcall void
+qstrfunc_sync(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
+{
+	struct syncq_cookie ck = {.sc_q = q,.sc_mp = mp, }, *sc = &ck;
+
+	if (unlikely(enter_inner_syncq_func(sc, func, arg) == 0))
+		return;
+	strfunc(func, q, mp, arg);
+	leave_syncq(sc);
 }
 
 /**
@@ -2734,26 +2764,26 @@ qstrwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *),
  *  against which to synchronize.
  */
 STATIC streams_fastcall void
-qstrfunc_fast(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
-{
-#ifdef CONFIG_STREAMS_SYNCQS
-	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
-		struct syncq_cookie ck = {.sc_q = q,.sc_mp = mp, }, *sc = &ck;
-
-		if (unlikely(enter_inner_syncq_func(sc, func, arg) == 0))
-			return;
-		strfunc(func, q, mp, arg);
-		leave_syncq(sc);
-		return;
-	}
-#endif
-	strfunc(func, q, mp, arg);
-}
-
-STATIC void
 qstrfunc(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
-	return qstrfunc_fast(func, q, mp, arg);
+	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
+		if (in_streams())
+			qstrfunc_sync(func, q, mp, arg);
+		else
+			strdefer_mfunc(func, q, mp, arg);
+	} else
+		strfunc_fast(func, q, mp, arg);
+}
+
+STATIC streams_fastcall __hot_out void
+qputp_sync(queue_t *q, mblk_t *mp)
+{
+	struct syncq_cookie ck = {.sc_q = q,.sc_mp = mp, }, *sc = &ck;
+
+	if (unlikely(enter_inner_syncq_putp(sc) == 0))
+		return;
+	putp(q, mp);
+	leave_syncq(sc);
 }
 
 /**
@@ -2775,26 +2805,15 @@ qstrfunc(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, vo
 STATIC streams_fastcall void
 qputp(queue_t *q, mblk_t *mp)
 {
-#ifdef CONFIG_STREAMS_SYNCQS
 	if (test_bit(QSYNCH_BIT, &q->q_flag)) {
-		struct syncq_cookie ck = {.sc_q = q,.sc_mp = mp, }, *sc = &ck;
-
-		if (unlikely(enter_inner_syncq_putp(sc) == 0))
-			return;
+		if (in_streams())
+			qputp_sync(q, mp);
+		else
+			strdefer_mfunc(&putp, q, mp, NULL);
+	} else
 		putp_fast(q, mp);
-		leave_syncq(sc);
-		return;
-	}
-#endif
-	_ctrace(putp_fast(q, mp));
-	_trace();
 }
-
-streams_noinline streams_fastcall void
-qputp_slow(queue_t *q, mblk_t *mp)
-{
-	qputp(q, mp);
-}
+#endif				/* CONFIG_STREAMS_SYNCQS */
 
 streams_noinline streams_fastcall __unlikely int
 put_filter(queue_t **qp, mblk_t *mp)
@@ -2869,56 +2888,38 @@ put(queue_t *q, mblk_t *mp)
 
 	/* All of STREAMS is irq-safe now.  If your module or driver isn't, pass mp to a service
 	   procedure. */
-#if 0
-	if (!in_irq()) {
-#endif
 #ifdef CONFIG_SMP
-		/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on 
-		   a Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for 
-		   that matter) on the stack.  Note that these are a no-op on UP. */
-		{
-			struct stdata *sd;
+	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
+	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
+	   matter) on the stack.  Note that these are a no-op on UP. */
+	{
+		struct stdata *sd;
 
-			sd = qstream(q);
-			dassert(sd);
-			prlock(sd);
-		}
+		sd = qstream(q);
+		dassert(sd);
+		prlock(sd);
+	}
 #endif
 
-		if (unlikely(q->q_ftmsg != NULL))
-			goto filter_it;
-	      put_it:
+	if (unlikely(q->q_ftmsg != NULL))
+		goto filter_it;
+      put_it:
 #ifdef CONFIG_STREAMS_SYNCQS
-		_ctrace(qputp(q, mp));
+	qputp(q, mp);
 #else
-		putp_fast(q, mp);
+	putp_fast(q, mp);
 #endif
-	      done:
+      done:
 #ifdef CONFIG_SMP
-		/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on 
-		   a Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for 
-		   that matter) on the stack.  Note that these are a no-op on UP. */
-		{
-			struct stdata *sd;
+	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
+	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
+	   matter) on the stack.  Note that these are a no-op on UP. */
+	{
+		struct stdata *sd;
 
-			sd = qstream(q);
-			dassert(sd);
-			prunlock(sd);
-		}
-#endif
-#if 0
-	} else {
-		/* defer for execution inside STREAMS */
-		struct mbinfo *m = (typeof(m)) mp;
-
-		/* XXX: Because the context is !in_interrupt(), and because the STREAMS softirq is
-		   at the bottom of the softirq stack, deferring at this point will execute at the
-		   earliest opportunity anyway. */
-		m->m_func = (void *) &putp;
-		_ctrace(m->m_queue = qget(q));	/* don't let it get away */
-		m->m_private = NULL;
-		/* schedule for execution inside STREAMS */
-		strsched_mfunc(mp);
+		sd = qstream(q);
+		dassert(sd);
+		prunlock(sd);
 	}
 #endif
 	return;
@@ -2986,7 +2987,7 @@ putnext(queue_t *q, mblk_t *mp)
 	}
 #endif
 #ifdef CONFIG_STREAMS_SYNCQS
-	_ctrace(qputp(q->q_next, mp));
+	qputp(q->q_next, mp);
 #else
 	putp_fast(q->q_next, mp);
 #endif
@@ -3005,7 +3006,7 @@ putnext(queue_t *q, mblk_t *mp)
 	_trace();
 }
 
-EXPORT_SYMBOL(putnext);	/* include/sys/streams/stream.h */
+EXPORT_SYMBOL(putnext);		/* include/sys/streams/stream.h */
 
 #ifdef CONFIG_STREAMS_SYNCQS
 /**
@@ -3160,17 +3161,11 @@ EXPORT_SYMBOL_GPL(qclose);
 void
 __strwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *), int perim)
 {
-	if (!in_irq())
-		qstrwrit(q, mp, func, perim);
-	else {
-		struct mbinfo *m = (typeof(m)) mp;
-
-		m->m_func = (void *) &strwrit;
-		_ctrace(m->m_queue = qget(q));	/* don't let it get away */
-		m->m_private = (void *) func;
-		/* schedule for execution inside STREAMS */
-		strsched_mfunc(mp);
-	}
+#ifdef CONFIG_STREAMS_SYNCQS
+	qstrwrit(q, mp, func, perim);
+#else
+	strwrit_fast(q, mp, func);
+#endif
 }
 
 EXPORT_SYMBOL_GPL(__strwrit);
@@ -3195,17 +3190,11 @@ EXPORT_SYMBOL_GPL(__strwrit);
 void
 __strfunc(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
-	if (!in_irq())
-		qstrfunc(func, q, mp, arg);
-	else {
-		struct mbinfo *m = (typeof(m)) mp;
-
-		m->m_func = (void *) func;
-		_ctrace(m->m_queue = qget(q));	/* don't let it get away */
-		m->m_private = arg;
-		/* schedule for execution inside STREAMS */
-		strsched_mfunc(mp);
-	}
+#ifdef CONFIG_STREAMS_SYNCQS
+	qstrfunc(func, q, mp, arg);
+#else
+	strfunc_fast(func, q, mp, arg);
+#endif
 }
 
 EXPORT_SYMBOL_GPL(__strfunc);
@@ -3228,7 +3217,7 @@ sq_doput_synced(mblk_t *mp)
 
 	if (m_func == (void *) &putp)
 		/* deferred function is a qputp function */
-		(void) putp(m_queue, mp);
+		putp(m_queue, mp);
 	else if (m_func == (void *) &strwrit)
 		/* deferred function is a qstrwrit function */
 		strwrit(m_queue, mp, m_private);
@@ -3509,15 +3498,15 @@ do_mblk_func(mblk_t *b)
 
 	if (m_func == (void *) &putp)
 		/* deferred function is a qputp function */
-		qputp_slow(m_queue, b);
+		qputp_sync(m_queue, b);
 	else if (m_func == (void *) &strwrit)
 		/* deferred function is a qstrwrit function */
 		/* only unfortunate thing is that we have lost the original perimeter request, so
 		   we upgrade it to outer */
-		(void) qstrwrit(m_queue, b, m_private, PERIM_OUTER);
+		qstrwrit_sync(m_queue, b, m_private, PERIM_OUTER);
 	else
 		/* deferred function is a qstrfunc function */
-		(void) qstrfunc(m_func, m_queue, b, m_private);
+		qstrfunc_sync(m_func, m_queue, b, m_private);
 	if (m_queue)
 		_ctrace(qput(&m_queue));
 }
@@ -3742,6 +3731,7 @@ EXPORT_SYMBOL(kmem_zalloc_node);	/* include/sys/streams/kmem.h */
  *  -------------------------------------------------------------------------
  */
 
+#ifdef CONFIG_STREAMS_SYNCQS
 /*
  *  domfuncs:	- process message functions deferred from hardirq
  *  @t:		STREAMS execution thread
@@ -3773,6 +3763,7 @@ domfuncs(struct strthread *t)
 		}
 	} while (unlikely(test_bit(strmfuncs, &t->flags) != 0));
 }
+#endif				/* CONFIG_STREAMS_SYNCQS */
 
 /*
  *  timeouts:	- process timeouts
@@ -4057,6 +4048,7 @@ runsyncq(struct syncq *sq)
 		sq->sq_count = 0;
 }
 
+#if 0
 /*
  *  backlog:	- process message backlog
  *  @t:		STREAMS execution thread
@@ -4095,6 +4087,7 @@ backlog(struct strthread *t)
 		}
 	} while (unlikely(test_bit(qsyncflag, &t->flags) != 0));
 }
+#endif
 #endif
 
 /*
@@ -4270,13 +4263,17 @@ __runqueues_slow(struct strthread *t)
 	if (unlikely(test_bit(freeblks, &t->flags) != 0))
 		_ctrace(freeblocks(t));
 #endif
+#ifdef CONFIG_STREAMS_SYNCQS
 	/* do deferred m_func's first */
 	if (unlikely(test_bit(strmfuncs, &t->flags) != 0))
 		_ctrace(domfuncs(t));
+#endif
+#if 0
 #if defined CONFIG_STREAMS_SYNCQS
 	/* catch up on backlog first */
 	if (unlikely(test_bit(qsyncflag, &t->flags) != 0))
 		_ctrace(backlog(t));
+#endif
 #endif
 	/* do timeouts */
 	if (unlikely(test_bit(strtimout, &t->flags) != 0))
@@ -4336,7 +4333,8 @@ __runqueues(struct softirq_action *unused)
 	} while (unlikely((t->flags & (QRUNFLAGS)) != 0 && runs < 10));
 
 	if (runs >= 10)
-		printd(("CPU#%d: STREAMS scheduler looping: flags = 0x%08lx\n", smp_processor_id(), t->flags));
+		printd(("CPU#%d: STREAMS scheduler looping: flags = 0x%08lx\n", smp_processor_id(),
+			t->flags));
 
 	atomic_dec(&t->lock);
 
@@ -4478,7 +4476,7 @@ __freestr(struct stdata *sd)
 	kmem_cache_free(si->si_cache, sh);
 }
 
-EXPORT_SYMBOL(freestr);	/* include/sys/streams/strsubr.h */
+EXPORT_SYMBOL(freestr);		/* include/sys/streams/strsubr.h */
 
 STATIC __unlikely void
 sd_free(struct stdata *sd)
@@ -4698,10 +4696,12 @@ STATIC int
 kstreamd(void *__bind_cpu)
 {
 	struct strthread *t = this_thread;
+
 #ifndef HAVE_KTHREAD_SHOULD_STOP_EXPORT
 #ifdef HAVE_KTHREAD_SHOULD_STOP_ADDR
 	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
-	static const typeof(&kthread_should_stop) kthread_should_stop_funcp = (void *) HAVE_KTHREAD_SHOULD_STOP_ADDR;
+	static const typeof(&kthread_should_stop) kthread_should_stop_funcp =
+	    (void *) HAVE_KTHREAD_SHOULD_STOP_ADDR;
 #define kthread_should_stop (*kthread_should_stop_funcp)
 #endif
 #endif
@@ -4821,10 +4821,12 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 	int cpu = (long) hcpu;
 	struct strthread *t = &strthreads[cpu];
 	struct task_struct *p = t->proc;
+
 #ifndef HAVE_KTHREAD_CREATE_EXPORT
 #ifdef HAVE_KTHREAD_CREATE_ADDR
 	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
-	static const typeof(&kthread_create) kthread_create_funcp = (void *) HAVE_KTHREAD_CREATE_ADDR;
+	static const typeof(&kthread_create) kthread_create_funcp =
+	    (void *) HAVE_KTHREAD_CREATE_ADDR;
 #define kthread_create(w, x, y, z) (*kthread_create_funcp)(w, x, y, z)
 #endif
 #endif
@@ -4832,6 +4834,7 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 #ifdef HAVE_KTHREAD_BIND_ADDR
 	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
 	static const typeof(&kthread_bind) kthread_bind_funcp = (void *) HAVE_KTHREAD_BIND_ADDR;
+
 #define kthread_bind(x, y) (*kthread_bind_funcp)(x, y)
 #endif
 #endif
@@ -4840,6 +4843,7 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 #ifdef HAVE_KTHREAD_STOP_ADDR
 	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
 	static const typeof(&kthread_stop) kthread_stop_funcp = (void *) HAVE_KTHREAD_STOP_ADDR;
+
 #define kthread_stop(x) (*kthread_stop_funcp)(x)
 #endif
 #endif
@@ -4903,10 +4907,12 @@ STATIC __unlikely void
 kill_kstreamd(void)
 {
 	int cpu;
+
 #ifndef HAVE_KTHREAD_BIND_EXPORT
 #ifdef HAVE_KTHREAD_BIND_ADDR
 	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
 	static const typeof(&kthread_bind) kthread_bind_funcp = (void *) HAVE_KTHREAD_BIND_ADDR;
+
 #define kthread_bind(x, y) (*kthread_bind_funcp)(x, y)
 #endif
 #endif
@@ -4914,6 +4920,7 @@ kill_kstreamd(void)
 #ifdef HAVE_KTHREAD_STOP_ADDR
 	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
 	static const typeof(&kthread_stop) kthread_stop_funcp = (void *) HAVE_KTHREAD_STOP_ADDR;
+
 #define kthread_stop(x) (*kthread_stop_funcp)(x)
 #endif
 #endif

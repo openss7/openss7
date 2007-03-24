@@ -210,11 +210,10 @@ str_install_AIX(int cmd, strconf_t * sc)
 				cdev->d_flag |= D_MTPERMOD;
 				break;
 			case SQLVL_ELSEWHERE:
-				cdev->d_flag |= D_MTOUTPERIM;
+				cdev->d_sqinfo = sc->sc_sqinfo;
 				break;
 			case SQLVL_GLOBAL:
 				/* can't really support this, but its only used for debug anyway */
-				cdev->d_flag &= ~D_MP;
 				break;
 			case SQLVL_DEFAULT:
 				cdev->d_flag |= D_MTPERMOD;
@@ -307,11 +306,10 @@ str_install_AIX(int cmd, strconf_t * sc)
 				fmod->f_flag |= D_MTPERMOD;
 				break;
 			case SQLVL_ELSEWHERE:
-				fmod->f_flag |= D_MTOUTPERIM;
+				fmod->f_sqinfo = sc->sc_sqinfo;
 				break;
 			case SQLVL_GLOBAL:
 				/* can't really support this, but its only used for debug anyway */
-				fmod->f_flag &= ~D_MP;
 				break;
 			case SQLVL_DEFAULT:
 				fmod->f_flag |= D_MTPERMOD;

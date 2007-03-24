@@ -2509,7 +2509,7 @@ appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	return insq_result(q, result);
 }
 
-EXPORT_SYMBOL_GPL(appq);
+EXPORT_SYMBOL(appq);
 
 STATIC int __setsq(queue_t *q, struct fmodsw *fmod);
 STATIC void __setq(queue_t *q, struct qinit *rinit, struct qinit *winit);
@@ -3763,7 +3763,7 @@ __setsq(queue_t *q, struct fmodsw *fmod)
 			/* The registration function is responsible for finding and allocating the
 			   external synchronization queue and attaching it to the module structure */
 			if (!(sqr = sq_get(fmod->f_syncq))) {
-				if (!(sqr = sq_alloc())) {
+				if (!(sqr = sq_locate(fmod->f_sqinfo))) {
 					sq_put(&sqo);
 					goto enomem;
 				}

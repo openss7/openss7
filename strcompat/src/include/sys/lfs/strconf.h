@@ -162,7 +162,7 @@ struct devnode {
 // #define D_FIFO (1<<2) /* fifo */
 // #define D_PIPE (1<<3) /* pipe */
 // #define D_SOCK (1<<4) /* socket */
-// #define D_LIS (1<<5) /* LiS compatible */
+#define D_LIS		(1<<5)	/* LiS compatible */
 // #define D_HEAD (1<<6) /* stream head */
 // #define D_NSDEV (1<<7) /* named streams device */
 /* Solaris perimeter flags */
@@ -178,8 +178,10 @@ struct devnode {
 
 #undef register_strdev
 #undef register_strmod
+#undef register_strsync
 #undef unregister_strdev
 #undef unregister_strmod
+#undef unregister_strsync
 
 __LFS_EXTERN_INLINE int
 register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor)
@@ -206,6 +208,11 @@ register_strmod(struct _fmodsw *fmod)
 	return lis_register_strmod(fmod->f_str, fmod->f_name);
 }
 __LFS_EXTERN_INLINE int
+register_strsync(struct _fmodsw *fmod)
+{
+	return (-EOPNOTSUPP);
+}
+__LFS_EXTERN_INLINE int
 unregister_strnod(struct cdevsw *cdev, minor_t minor)
 {
 	return (-EOPNOTSUPP);
@@ -224,6 +231,11 @@ __LFS_EXTERN_INLINE int
 unregister_strmod(struct _fmodsw *fmod)
 {
 	return lis_unregister_strmod(fmod->f_str);
+}
+__LFS_EXTERN_INLINE int
+unregister_strsync(struct _fmodsw *fmod)
+{
+	return (-EOPNOTSUPP);
 }
 
 __LFS_EXTERN_INLINE int

@@ -105,10 +105,10 @@ static char const ident[] =
  *  -------------------------------------------------------------------------
  */
 
-#if defined CONFIG_STREAMS_SYNCQS
-STATIC int
+streams_fastcall int
 register_strsync(struct fmodsw *fmod)
 {
+#if defined CONFIG_STREAMS_SYNCQS
 	int sqlvl = SQLVL_DEFAULT;
 
 	/* propagate flags to f_sqlvl */
@@ -147,11 +147,21 @@ register_strsync(struct fmodsw *fmod)
 		switch (sqlvl) {
 		case SQLVL_DEFAULT:
 		case SQLVL_MODULE:	/* default */
-		case SQLVL_ELSEWHERE:
 			if (!fmod->f_syncq) {
 				struct syncq *sq;
 
 				if (!(sq = sq_alloc()))
+					return (-ENOMEM);
+				fmod->f_syncq = sq;
+				sq->sq_level = sqlvl;
+				sq->sq_flag = (SQ_OUTER | SQ_EXCLUS);
+			}
+			break;
+		case SQLVL_ELSEWHERE:
+			if (!fmod->f_syncq) {
+				struct syncq *sq;
+
+				if (!(sq = sq_locate(fmod->f_sqinfo)))
 					return (-ENOMEM);
 				fmod->f_syncq = sq;
 				sq->sq_level = sqlvl;
@@ -171,16 +181,22 @@ register_strsync(struct fmodsw *fmod)
 		}
 	}
 	fmod->f_sqlvl = sqlvl;
+#endif
 	return (0);
 }
 
-STATIC void
+EXPORT_SYMBOL_GPL(register_strsync);
+
+streams_fastcall void
 unregister_strsync(struct fmodsw *fmod)
 {
+#if defined CONFIG_STREAMS_SYNCQS
 	/* always delete if it exists */
 	sq_put(&fmod->f_syncq);
-}
 #endif
+}
+
+EXPORT_SYMBOL_GPL(unregister_strsync);
 
 /**
  *  register_strmod: - register STREAMS module
@@ -205,12 +221,10 @@ register_strmod(struct fmodsw *fmod)
 			return (-EINVAL);
 		}
 	}
-#if defined CONFIG_STREAMS_SYNCQS
 	if ((err = register_strsync(fmod))) {
 		_ptrace(("Error path taken!\n"));
 		return (err);
 	}
-#endif
 	write_lock(&fmodsw_lock);
 	{
 		modID_t modid;
@@ -261,9 +275,7 @@ register_strmod(struct fmodsw *fmod)
 	err = -ENXIO;
 	goto unregister_exit;
       unregister_exit:
-#if defined CONFIG_STREAMS_SYNCQS
 	unregister_strsync(fmod);
-#endif
       unlock_exit:
 	write_unlock(&fmodsw_lock);
 	return (err);
@@ -286,9 +298,7 @@ unregister_strmod(struct fmodsw *fmod)
 	if (!fmod->f_list.next || list_empty(&fmod->f_list))
 		goto enxio;
 	fmod_del(fmod);
-#if defined CONFIG_STREAMS_SYNCQS
 	unregister_strsync(fmod);
-#endif
       unlock_exit:
 	write_unlock(&fmodsw_lock);
 	return (err);
@@ -331,12 +341,10 @@ register_strdrv(struct cdevsw *cdev)
 			return (-EINVAL);
 		}
 	}
-#if defined CONFIG_STREAMS_SYNCQS
 	if ((err = register_strsync((struct fmodsw *) cdev))) {
 		_ptrace(("Error path taken!\n"));
 		return (err);
 	}
-#endif
 	write_lock(&cdevsw_lock);
 	{
 		modID_t modid;
@@ -410,9 +418,7 @@ register_strdrv(struct cdevsw *cdev)
       release_exit:
 	sdev_rel(cdev);
       unregister_exit:
-#if defined CONFIG_STREAMS_SYNCQS
 	unregister_strsync((struct fmodsw *) cdev);
-#endif
 	return (err);
 }
 
@@ -460,9 +466,7 @@ unregister_strdrv(struct cdevsw *cdev)
 		_ptrace(("Error path taken!\n"));
 		goto ebusy;
 	}
-#if defined CONFIG_STREAMS_SYNCQS
 	unregister_strsync((struct fmodsw *) cdev);
-#endif
 	sdev_del(cdev);
 	write_unlock(&cdevsw_lock);
 	sdev_rel(cdev);

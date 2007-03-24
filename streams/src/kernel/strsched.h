@@ -156,6 +156,7 @@ BIG_STATIC_STH void streams_fastcall freelk(struct linkblk *l);
 
 #if defined CONFIG_STREAMS_SYNCQS
 /* ctors and dtors for syncq */
+BIG_STATIC struct syncq *streams_fastcall sq_locate(const char *sq_info);
 BIG_STATIC struct syncq *streams_fastcall sq_alloc(void);
 BIG_STATIC struct syncq *streams_fastcall sq_get(struct syncq *sq);
 BIG_STATIC void streams_fastcall sq_put(struct syncq **sqp);
@@ -186,7 +187,11 @@ typedef enum {
 	CTX_ISR,			/* hard interrupt context */
 } context_t;
 
+#ifdef CONFIG_STREAMS_KTHREADS
+#define in_streams() (!in_interrupt() && atomic_read(&this_thread->lock) != 0)
+#else				/* CONFIG_STREAMS_KTHREADS */
 #define in_streams() (!in_irq() && atomic_read(&this_thread->lock) != 0)
+#endif				/* CONFIG_STREAMS_KTHREADS */
 
 #define can_enter_streams() (atomic_read(&this_thread->lock) == 0 || !in_interrupt())
 

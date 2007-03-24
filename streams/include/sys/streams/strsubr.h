@@ -195,6 +195,7 @@ typedef struct syncq {
 	unsigned int sq_flag;		/* synch queue flags */
 	unsigned int sq_level;		/* synch queue level */
 	struct syncq *sq_link;		/* synch queue schedule list */
+	char sq_info[FMNAMESZ + 1];	/* synch queue info */
 	atomic_t sq_refs;		/* structure references */
 	struct syncq *sq_next;		/* list of all structures */
 	struct syncq *sq_prev;		/* list of all structures */

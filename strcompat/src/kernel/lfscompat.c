@@ -202,11 +202,11 @@ MODULE_ALIAS("streams-lfscompat");
 /* Strangely, LiS 2.18.0 defined lis_appq, but no longer appq */
 __LFS_EXTERN_INLINE int appq(queue_t *q, mblk_t *emp, mblk_t *nmp);
 
-EXPORT_SYMBOL_GPL(appq);
+EXPORT_SYMBOL(appq);
 
 __LFS_EXTERN_INLINE int bcmp(const void *s1, const void *s2, size_t len);
 
-EXPORT_SYMBOL_GPL(bcmp);
+EXPORT_SYMBOL(bcmp);
 
 int
 bcanget(queue_t *q, int band)
@@ -604,6 +604,10 @@ __LFS_EXTERN_INLINE int register_strmod(struct _fmodsw *fmod);
 
 EXPORT_SYMBOL(register_strmod);
 
+__LFS_EXTERN_INLINE int register_strsync(struct _fmodsw *fmod);
+
+EXPORT_SYMBOL_GPL(register_strsync);
+
 __LFS_EXTERN_INLINE int unregister_strnod(struct cdevsw *cdev, minor_t minor);
 
 EXPORT_SYMBOL_GPL(unregister_strnod);
@@ -620,17 +624,21 @@ __LFS_EXTERN_INLINE int unregister_strmod(struct _fmodsw *fmod);
 
 EXPORT_SYMBOL(unregister_strmod);
 
+__LFS_EXTERN_INLINE void unregister_strsync(struct _fmodsw *fmod);
+
+EXPORT_SYMBOL_GPL(unregister_strsync);
+
 __LFS_EXTERN_INLINE int apush_get(struct strapush *sap);
 
-EXPORT_SYMBOL_GPL(apush_get);
+EXPORT_SYMBOL(apush_get);
 
 __LFS_EXTERN_INLINE int apush_set(struct strapush *sap);
 
-EXPORT_SYMBOL_GPL(apush_set);
+EXPORT_SYMBOL(apush_set);
 
 __LFS_EXTERN_INLINE int apush_vml(struct str_list *slp);
 
-EXPORT_SYMBOL_GPL(apush_vml);
+EXPORT_SYMBOL(apush_vml);
 
 __LFS_EXTERN_INLINE int autopush_del(struct strapush *sap);
 

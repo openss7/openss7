@@ -331,11 +331,10 @@ strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 			cdev->d_flag |= D_MTPERMOD;
 			break;
 		case SQLVL_ELSEWHERE:
-			cdev->d_flag |= D_MTOUTPERIM;
+			cdev->d_sqinfo = sa->sa_sync_info;
 			break;
 		case SQLVL_GLOBAL:
 			/* can't really support this, but its only used for debug anyway */
-			cdev->d_flag &= ~D_MP;
 			break;
 		case SQLVL_DEFAULT:
 			cdev->d_flag |= D_MTPERMOD;
@@ -375,11 +374,10 @@ strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 			fmod->f_flag |= D_MTPERMOD;
 			break;
 		case SQLVL_ELSEWHERE:
-			fmod->f_flag |= D_MTOUTPERIM;
+			fmod->f_sqinfo = sa->sa_sync_info;
 			break;
 		case SQLVL_GLOBAL:
 			/* can't really support this, but its only used for debug anyway */
-			fmod->f_flag &= ~D_MP;
 			break;
 		case SQLVL_DEFAULT:
 			fmod->f_flag |= D_MTPERMOD;
