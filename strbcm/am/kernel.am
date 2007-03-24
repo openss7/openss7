@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2006/10/16 04:30:47 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2007/03/24 01:06:37 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/16 04:30:47 $ by $Author: brian $
+## Last Modified $Date: 2007/03/24 01:06:37 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: kernel.am,v $
+## Revision 0.9.2.71  2007/03/24 01:06:37  brian
+## - updates to common files for strbcm package
+##
 ## Revision 0.9.2.70  2006/10/16 04:30:47  brian
 ## - missing a few normal uninstalls
 ##
