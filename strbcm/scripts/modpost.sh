@@ -707,8 +707,10 @@ write_sources() {
     if test :"$my_mod_names" != : ; then
 	command_info "writing module source files"
 	for name in $my_mod_names ; do
-	    command_info "writing module source file $name.mod.c"
-	    write_modsrc $name >$name.mod.c
+	    tok=`echo "$name" | $modpost_tokenize`
+	    eval "path=\"\$mod_${tok}_path\""
+	    command_info "writing module source file $path.mod.c"
+	    write_modsrc $name >$path.mod.c
 	done
     fi
 }

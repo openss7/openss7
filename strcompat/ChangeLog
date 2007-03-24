@@ -1,3 +1,11 @@
+2007-03-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/lfs/strconf.h: add sqinfo members
+	* src/include/sys/lis/strconf.h: add missing qlock functions
+	* src/kernel/liscompat.c: add missing qlock functions (still needs
+	  implementation)
+
+
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: pushed release date

@@ -101,6 +101,7 @@ struct cdevsw {
         uint d_modid;                   /* driver module id */
         atomic_t d_count;               /* open count */
         int d_sqlvl;                    /* q synchronization level */
+        const char *d_sqinfo;           /* elsewhere syncrhonization info */
         struct syncq *d_syncq;          /* synchronization queue */
         struct module *d_kmod;          /* kernel module */
         /* above matches fmodsw */
@@ -231,6 +232,23 @@ which is the same as
 .BR SQLVL_DEFAULT .
 Synchronization should, instead, be specified using the
 .I d_flag
+member.
+An exception to this rule is when a synchronization level of
+.BR SQLVL_GLOBAL " or " SQLVL_ELSEWHERE
+is desired, which are not supported by the flags in the
+.I d_flag
+member.
+.TP
+.I d_sqinfo
+When member
+.I d_sqlvl
+is set to
+.BR SQLVL_ELSEWHERE ,
+this member specifies the character string name of the external sychronization to use.  It is
+ignored otherwise.
+This field is populated by the caller of the registration function to communicate to it which
+synchronization queue to populate against the
+.I d_syncq
 member.
 .TP
 .I d_syncq

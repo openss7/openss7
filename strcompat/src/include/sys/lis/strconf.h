@@ -133,6 +133,9 @@ extern int streamscall lis_unregister_strdev(major_t major);
 extern modID_t streamscall lis_register_strmod(struct streamtab *strtab, const char *name);
 extern int streamscall lis_unregister_strmod(struct streamtab *strtab);
 
+extern int streamscall lis_register_module_qlock_option(modID_t id, int qlock_option);
+extern int streamscall lis_register_driver_qlock_option(major_t major, int qlock_option);
+
 extern int _RP lis_apush_get(struct lis_strapush *ap);
 extern int _RP lis_apush_set(struct lis_strapush *ap);
 extern int _RP lis_apush_vml(struct str_list *slp);

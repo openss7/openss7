@@ -101,6 +101,7 @@ struct devnode {
         uint n_modid;                   /* node module id */
         atomic_t n_count;               /* open count */
         int n_sqlvl;                    /* q sychronization level */
+        const char *n_sqinfo;           /* elsewhere sychronization info */
         struct syncq *n_syncq;          /* synchronization queue */
         struct module *n_kmod;          /* kernel module */
         /* above matches fmodsw */
@@ -176,6 +177,18 @@ Ignored by device nodes, always set to zero
 .TP
 .I n_sqlvl
 Synchronization queue level.
+Ignored for device nodes, a cached copy of the driver's
+.BR cdevsw (9)
+member.
+.TP
+.I n_sqinfo
+Synchronization info.
+Ignored for device nodes, a cached copy of the driver's
+.BR cdevsw (9)
+member.
+.TP
+.I n_syncq
+Synchronization queue.
 Ignored for device nodes, a cached copy of the driver's
 .BR cdevsw (9)
 member.

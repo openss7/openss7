@@ -1,3 +1,12 @@
+2007-03-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man9/cdevsw.9.man: document sqinfo member
+	* doc/man/man9/devnode.9.man: document sqinfo member
+	* doc/man/man9/fmodsw.9.man: document sqinfo member
+	* doc/man/man9/register_strdev.9.man: document sqlvl and sqinfo member
+	* doc/man/man9/register_strmod.9.man: document sqlvl and sqinfo member
+	* include/sys/streams/stream.h: add sqinfo member
+
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/bugs.texi: documented bug fixes

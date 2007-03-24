@@ -116,7 +116,7 @@ structure, pointed to by
 .IR cdev ,
 are significant:
 .RS
-.TP
+.TP \w'd_sqinfo\(em'u
 .I d_name
 the name of the driver.  This name is used to register the character major
 device number.
@@ -130,6 +130,16 @@ device.
 .TP
 .I d_flag
 flags indicating options associated with the device.  See
+.BR cdevsw (9)
+for more information.
+.TP
+.I d_sqlvl
+synchronization queue level.  See
+.BR cdevsw (9)
+for more information.
+.TP
+.I d_sqinfo
+synchronization queue info.  See
 .BR cdevsw (9)
 for more information.
 .TP

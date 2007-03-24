@@ -110,7 +110,7 @@ structure, pointed to by
 .IR fmod ,
 are significant:
 .RS
-.TP \w'f_name\(em'u
+.TP \w'f_sqinfo\(em'u
 .I f_name
 the name of the module.  This name is use to register the
 .I STREAMS
@@ -125,6 +125,16 @@ module.
 .TP
 .I f_flag
 flags indicating options associated with the module.  See
+.BR fmodsw (9)
+for more information.
+.TP
+.I f_sqlvl
+synchronization queue level.  See
+.BR fmodsw (9)
+for more information.
+.TP
+.I f_sqinfo
+synchronization queue info.  See
 .BR fmodsw (9)
 for more information.
 .TP
