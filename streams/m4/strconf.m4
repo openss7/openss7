@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/24 01:06:39 $
+# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/24 06:50:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/24 01:06:39 $ by $Author: brian $
+# Last Modified $Date: 2007/03/24 06:50:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -250,6 +250,7 @@ dnl
     fi
     AC_MSG_RESULT([$strconf_cv_packagedir])
     STRCONF_BPKGDIR="$strconf_cv_packagedir"
+    AM_CONDITIONAL([WITH_PACKAGES], [test :${strconf_cv_packagedir:-no} != :no])dnl
     AC_ARG_WITH([strconf-pkgrules],
 	AS_HELP_STRING([--with-strconf-pkgrules=FILENAME],
 	    [specify the file name to which package make rules are written
