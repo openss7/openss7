@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/11/03 10:39:13 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/24 01:06:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/11/03 10:39:13 $ by $Author: brian $
+# Last Modified $Date: 2007/03/24 01:06:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,7 +81,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/11/03 10:39:13 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/24 01:06:40 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
