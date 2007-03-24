@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2006/12/18 10:28:53 $
+# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/24 01:06:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/18 10:28:53 $ by $Author: brian $
+# Last Modified $Date: 2007/03/24 01:06:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -198,7 +198,7 @@ dnl
 	     @<:@default=pkg@:>@]),
 	[with_strconf_pkgdir="$withval"],
 	[with_strconf_pkgdir=''])
-    AC_MSG_CHECKING([for strconf binary package direcotries])
+    AC_MSG_CHECKING([for strconf binary package directories])
     strconf_cv_packagedir=
     strconf_dir="$with_strconf_pkgdir"
     # clean it up
@@ -250,6 +250,18 @@ dnl
     fi
     AC_MSG_RESULT([$strconf_cv_packagedir])
     STRCONF_BPKGDIR="$strconf_cv_packagedir"
+    AC_ARG_WITH([strconf-pkgrules],
+	AS_HELP_STRING([--with-strconf-pkgrules=FILENAME],
+	    [specify the file name to which package make rules are written
+	     @<:@default=pkgrules@:>@]),
+	[with_strconf_pkgrules="$withval"],
+	[with_strconf_pkgrules=''])
+    AC_CACHE_CHECK([for strconf rules file], [strconf_cv_pkgrules], [dnl
+	if test "${with_strconf_pkgrules:-no}" != :no ; then
+	    strconf_cv_pkgrules="$with_strconf_pkgrules"
+	fi
+    ])
+    STRCONF_PKGRULE="${strconf_cv_pkgrules:-pkgrules}"
 ])# _STRCONF_SETUP
 # =============================================================================
 
@@ -407,11 +419,21 @@ AC_DEFUN([_STRCONF_OUTPUT_CONFIG_COMMANDS], [dnl
 	fi
 	if test :"${STRCONF_BPKGDIR:+set}" = :set ; then
 	    AC_MSG_NOTICE([creating $STRCONF_BPKGDIR from $STRCONF_INPUT])
-	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} -i${STRCONF_MIDBASE} --packagedir=$STRCONF_BPKGDIR $STRCONF_INPUT" 2>&1 | \
+	    eval "$STRCONF --package=${STRCONF_PACKAGE} -B${STRCONF_MINORSZ} -b${STRCONF_MAJBASE} -i${STRCONF_MIDBASE} --packagedir=$STRCONF_BPKGDIR --pkgrules=${STRCONF_PKGRULE}.in $STRCONF_INPUT" 2>&1 | \
 	    while read line ; do
 		echo "$as_me:$LINENO: $line" >&5
 		echo "$as_me: $line" >&2
 	    done
+	    subcmd=
+	    for sub in $tmp/subs-[[0-9]].sed ; do
+		if test -f $sub ; then
+		    subcmd="$subcmd"'| sed -f "'"$sub"'" '
+		fi
+	    done
+	    if test -n "$subcmd" ; then
+		AC_MSG_NOTICE([creating $STRCONF_PKGRULE])
+		eval "cat \${STRCONF_PKGRULE}.in $subcmd >\${STRCONF_PKGRULE}"
+	    fi
 	fi
     fi
 ])# _STRCONF_OUTPUT_CONFIG_COMMANDS
@@ -444,6 +466,7 @@ STRCONF_MAKEDEV="$STRCONF_MAKEDEV"
 STRCONF_STSETUP="$STRCONF_STSETUP"
 STRCONF_STRLOAD="$STRCONF_STRLOAD"
 STRCONF_BPKGDIR="$STRCONF_BPKGDIR"
+STRCONF_PKGRULE="$STRCONF_PKGRULE"
 STRCONF_PACKAGE="$STRCONF_PACKAGE"
 STRCONF_MINORSZ="$STRCONF_MINORSZ"
     ])
@@ -470,6 +493,7 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
 	AC_SUBST([STRCONF_STSETUP])dnl
 	AC_SUBST([STRCONF_STRLOAD])dnl
 	AC_SUBST([STRCONF_BPKGDIR])dnl
+	AC_SUBST([STRCONF_PKGRULE])dnl
 	AC_SUBST([STRCONF_PACKAGE])dnl
 	AC_SUBST([STRCONF_MINORSZ])dnl
 	AC_SUBST([STRMAKENODES])dnl
