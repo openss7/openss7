@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.26 2006/12/08 05:08:22 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.27 2007/03/25 03:15:19 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:08:22 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 03:15:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.27  2007/03/25 03:15:19  brian
+ - somewhat more workable RW_UNLOCK
+
  Revision 0.9.2.26  2006/12/08 05:08:22  brian
  - some rework resulting from testing and inspection
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_SVR4_DDI_H__
 #define __SYS_SVR4_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.26 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.27 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -250,12 +253,7 @@ RW_RDLOCK(rwlock_t *lockp, pl_t pl)
 }
 extern pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl);
 extern pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl);
-__SVR4_EXTERN_INLINE void
-RW_UNLOCK(rwlock_t *lockp, pl_t pl)
-{
-	read_unlock(lockp);
-	splx(pl);
-}
+extern void RW_UNLOCK(rwlock_t *lockp, pl_t pl);
 
 __SVR4_EXTERN_INLINE pl_t
 RW_WRLOCK(rwlock_t *lockp, pl_t pl)
