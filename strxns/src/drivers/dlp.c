@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/12 20:36:03 $
+ @(#) $RCSfile: dlp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:53:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/12 20:36:03 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:53:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlp.c,v $
+ Revision 0.9.2.2  2007/03/25 00:53:47  brian
+ - synchronization updates
+
  Revision 0.9.2.1  2006/04/12 20:36:03  brian
  - added some experimental drivers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dlp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/12 20:36:03 $"
+#ident "@(#) $RCSfile: dlp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:53:47 $"
 
-static char const ident[] = "$RCSfile: dlp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/04/12 20:36:03 $";
+static char const ident[] = "$RCSfile: dlp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:53:47 $";
 
 /*
  *  This module is a master device driver for Data Link Provider Streams presenting a Data Link

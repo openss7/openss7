@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2007/03/10 13:52:50 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.152 $) $Date: 2007/03/25 00:52:45 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/10 13:52:50 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:52:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.152  2007/03/25 00:52:45  brian
+ - synchronization updates
+
  Revision 0.9.2.151  2007/03/10 13:52:50  brian
  - checking in latest corrections for release
 
@@ -137,10 +140,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2007/03/10 13:52:50 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.152 $) $Date: 2007/03/25 00:52:45 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2007/03/10 13:52:50 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.152 $) $Date: 2007/03/25 00:52:45 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>

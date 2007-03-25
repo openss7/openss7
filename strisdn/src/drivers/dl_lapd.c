@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:56:12 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:53:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/17 11:56:12 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:53:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_lapd.c,v $
+ Revision 0.9.2.2  2007/03/25 00:53:10  brian
+ - synchronization updates
+
  Revision 0.9.2.1  2006/10/17 11:56:12  brian
  - copied files into new packages from strss7 package
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:56:12 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:53:10 $"
 
 static char const ident[] =
-    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:56:12 $";
+    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:53:10 $";
 
 #include <sys/os7/compat.h>
 
@@ -79,7 +82,7 @@ static char const ident[] =
 
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
 				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:56:12 $"
+#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:53:10 $"
 #define DL_LAPD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

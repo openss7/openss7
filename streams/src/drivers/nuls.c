@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/12/18 07:32:40 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 00:52:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 07:32:40 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:52:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/12/18 07:32:40 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 00:52:44 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/12/18 07:32:40 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 00:52:44 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -73,7 +73,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2006/12/18 07:32:40 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 00:52:44 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"

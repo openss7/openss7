@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:01:10 $
+ @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:08 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 11:01:10 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:52:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sm_mod.c,v $
+ Revision 0.9.2.15  2007/03/25 00:52:08  brian
+ - synchronization updates
+
  Revision 0.9.2.14  2006/05/08 11:01:10  brian
  - new compilers mishandle postincrement of cast pointers
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:01:10 $"
+#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:08 $"
 
 static char const ident[] =
-    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:01:10 $";
+    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:08 $";
 
 #include <sys/os7/compat.h>
 
@@ -69,7 +72,7 @@ static char const ident[] =
 #include <ss7/mtpi.h>
 
 #define SM_MOD_DESCRIP		"SIMPLE SINGLE LINK MTP."
-#define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/05/08 11:01:10 $"
+#define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:08 $"
 #define SM_MOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SM_MOD_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SM_MOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

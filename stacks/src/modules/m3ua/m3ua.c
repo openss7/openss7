@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:10:17 $
+ @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:51:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:10:17 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:51:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua.c,v $
+ Revision 0.9.2.12  2007/03/25 00:51:52  brian
+ - synchronization updates
+
  Revision 0.9.2.11  2006/03/07 01:10:17  brian
  - updated headers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:10:17 $"
+#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:51:52 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:10:17 $";
+    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:51:52 $";
 
 #include <sys/os7/compat.h>
 
@@ -80,7 +83,7 @@ static char const ident[] =
  */
 
 #define M3UA_DESCRIP	"M3UA STREAMS MULTIPLEXING DRIVER."
-#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:10:17 $"
+#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:51:52 $"
 #define M3UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corp.  All Rights Reserved."
 #define M3UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

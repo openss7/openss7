@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/12/27 16:35:55 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 00:52:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/27 16:35:55 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:52:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl.c,v $
+ Revision 0.9.2.18  2007/03/25 00:52:07  brian
+ - synchronization updates
+
  Revision 0.9.2.17  2006/12/27 16:35:55  brian
  - added slpmod module and fixups for make check target
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/12/27 16:35:55 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 00:52:07 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/12/27 16:35:55 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 00:52:07 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -85,7 +88,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/12/27 16:35:55 $"
+#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 00:52:07 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

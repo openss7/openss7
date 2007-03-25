@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:08:22 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:51:21 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:08:22 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:51:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: hdlc.c,v $
+ Revision 0.9.2.14  2007/03/25 00:51:21  brian
+ - synchronization updates
+
  Revision 0.9.2.13  2006/03/07 01:08:22  brian
  - binary compatible callouts
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:08:22 $"
+#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:51:21 $"
 
 static char const ident[] =
-    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:08:22 $";
+    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:51:21 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -87,7 +90,7 @@ static char const ident[] =
 #include <ss7/hdlc_ioctl.h>
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:08:22 $"
+#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:51:21 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/10 13:53:29 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/25 00:53:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/10 13:53:29 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:53:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: timod.c,v $
+ Revision 0.9.2.29  2007/03/25 00:53:44  brian
+ - synchronization updates
+
  Revision 0.9.2.28  2007/03/10 13:53:29  brian
  - checking in latest corrections for release
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/10 13:53:29 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/25 00:53:44 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/10 13:53:29 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/25 00:53:44 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -116,7 +119,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/10 13:53:29 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/25 00:53:44 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"

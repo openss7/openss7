@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_sg.c,v 0.9.2.1 2006/10/17 11:55:42 brian Exp $
+ @(#) $Id: m3ua_sg.c,v 0.9.2.2 2007/03/25 00:51:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -22,11 +22,14 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2006/10/17 11:55:42 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:51:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_sg.c,v $
+ Revision 0.9.2.2  2007/03/25 00:51:06  brian
+ - synchronization updates
+
  Revision 0.9.2.1  2006/10/17 11:55:42  brian
  - copied files into new packages from strss7 package
 
@@ -77,7 +80,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:42 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:51:06 $";
 
 #include <sys/os7/compat.h>
 

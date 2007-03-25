@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/05/08 11:00:47 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 11:00:47 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:51:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 0.9.2.16  2007/03/25 00:51:44  brian
+ - synchronization updates
+
  Revision 0.9.2.15  2006/05/08 11:00:47  brian
  - new compilers mishandle postincrement of cast pointers
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/05/08 11:00:47 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:44 $"
 
 static char const ident[] =
-    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/05/08 11:00:47 $";
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:44 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -94,7 +97,7 @@ static char const ident[] =
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/05/08 11:00:47 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:44 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

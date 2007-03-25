@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/10 10:44:16 $
+ @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:53:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/10 10:44:16 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:53:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcpns.c,v $
+ Revision 0.9.2.3  2007/03/25 00:53:13  brian
+ - synchronization updates
+
  Revision 0.9.2.2  2006/10/10 10:44:16  brian
  - updates for release, lots of additions and workup
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/10 10:44:16 $"
+#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:53:13 $"
 
 static char const ident[] =
-    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/10 10:44:16 $";
+    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:53:13 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
@@ -97,7 +100,7 @@ static char const ident[] =
 
 #define TCPNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCPNS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2006/10/10 10:44:16 $"
+#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:53:13 $"
 #define TCPNS_DEVICE	"SVR 4.2 STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCPNS_LICENSE	"GPL"

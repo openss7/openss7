@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/08 11:01:14 $
+ @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 00:52:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 11:01:14 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:52:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_x400p.c,v $
+ Revision 0.9.2.17  2007/03/25 00:52:19  brian
+ - synchronization updates
+
  Revision 0.9.2.16  2006/05/08 11:01:14  brian
  - new compilers mishandle postincrement of cast pointers
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/08 11:01:14 $"
+#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 00:52:19 $"
 
 static char const ident[] =
-    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2006/05/08 11:01:14 $";
+    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 00:52:19 $";
 
 #include <sys/os7/compat.h>
 
@@ -77,7 +80,7 @@ static char const ident[] =
 
 #define MX_SDL_DESCRIP		"X400P-SS7 MULTIPLEX (MX) STREAMS MODULE."
 #define MX_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define MX_SDL_REVISION		"OpenSS7 $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2006/05/08 11:01:14 $"
+#define MX_SDL_REVISION		"OpenSS7 $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2007/03/25 00:52:19 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define MX_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/26 00:52:35 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/26 00:52:35 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:52:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: timod.c,v $
+ Revision 0.9.2.15  2007/03/25 00:52:17  brian
+ - synchronization updates
+
  Revision 0.9.2.14  2006/09/26 00:52:35  brian
  - rationalized to embedded packages
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/26 00:52:35 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:17 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/26 00:52:35 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:17 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -88,7 +91,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2006/09/26 00:52:35 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:17 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"

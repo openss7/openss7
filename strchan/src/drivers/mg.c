@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:23:10 $
+ @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:52:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/16 00:23:10 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:52:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mg.c,v $
+ Revision 0.9.2.3  2007/03/25 00:52:29  brian
+ - synchronization updates
+
  Revision 0.9.2.2  2006/10/16 00:23:10  brian
  - update manpages and driver comments
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:23:10 $"
+#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:52:29 $"
 
 static char const ident[] =
-    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:23:10 $";
+    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:52:29 $";
 
 #include <sys/os7/compat.h>
 
@@ -82,7 +85,7 @@ static char const ident[] =
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/16 00:23:10 $"
+#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:52:29 $"
 #define MG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

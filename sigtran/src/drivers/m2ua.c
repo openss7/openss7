@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/04 11:35:25 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:51:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/04 11:35:25 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:51:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua.c,v $
+ Revision 0.9.2.3  2007/03/25 00:51:04  brian
+ - synchronization updates
+
  Revision 0.9.2.2  2006/11/04 11:35:25  brian
  - open source release of commercial package
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/04 11:35:25 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:51:04 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/04 11:35:25 $";
+    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:51:04 $";
 
 #define _LFS_SOURCE 1
 
@@ -87,7 +90,7 @@ static char const ident[] =
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/11/04 11:35:25 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:51:04 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

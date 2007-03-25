@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:13:08 $
+ @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:13:08 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:52:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop2.c,v $
+ Revision 0.9.2.12  2007/03/25 00:52:12  brian
+ - synchronization updates
+
  Revision 0.9.2.11  2006/03/07 01:13:08  brian
  - updated headers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:13:08 $"
+#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:12 $"
 
 static char const ident[] =
-    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:13:08 $";
+    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:12 $";
 
 #include <sys/os7/compat.h>
 

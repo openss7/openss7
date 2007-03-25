@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 20:25:39 $
+ @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 20:25:39 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:53:36 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 20:25:39 $"
+#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:36 $"
 
 static char const ident[] =
-    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 20:25:39 $";
+    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:36 $";
 
 /*
  *  SOCKMOD - A socket module for Linux Fast-STREAMS.
@@ -119,7 +119,7 @@ static char const ident[] =
 
 #define SMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 20:25:39 $"
+#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:36 $"
 #define SMOD_DEVICE	"SVR 3.2 STREAMS Socket Module for TPI Devices (SOCKMOD)"
 #define SMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SMOD_LICENSE	"GPL"
