@@ -16678,6 +16678,11 @@ sctp_n_init(void)
 	}
 	if (!n_major && err > 0)
 		n_major = err;
+	if ((err = lis_register_driver_qlock_option(n_major, LIS_QLOCK_NONE)) < 0) {
+		lis_unregister_strdev(n_major);
+		cmn_err(CE_PANIC, "%s: cannot register driver\n", DRV_NAME);
+		return;
+	}
 	return;
 }
 STATIC void
@@ -27629,6 +27634,11 @@ sctp_t_init(void)
 	}
 	if (!t_major && err > 0)
 		t_major = err;
+	if ((err = lis_register_driver_qlock_option(t_major, LIS_QLOCK_NONE)) < 0) {
+		lis_unregister_strdev(t_major);
+		cmn_err(CE_PANIC, "%s: cannot register driver\n", DRV_NAME);
+		return;
+	}
 	return;
 }
 STATIC void

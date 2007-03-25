@@ -389,6 +389,12 @@ nuls_init(void)
 #endif
 	if (major == 0 && err > 0)
 		major = err;
+#ifdef LIS
+	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
+		lis_unregister_strdev(major);
+		return (err);
+	}
+#endif
 	return (0);
 };
 

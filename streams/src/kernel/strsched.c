@@ -1348,7 +1348,11 @@ syncq_ctor(void *obj, kmem_cache_t *cachep, unsigned long flags)
 		sq->sq_mhead = NULL;
 		sq->sq_mtail = &sq->sq_mhead;
 		atomic_set(&sq->sq_refs, 0);
-		INIT_LIST_HEAD((struct list_head *) &sq->sq_next);
+		sq->sq_next = NULL;
+		sq->sq_prev = &sq->sq_next;
+#if defined _DEBUG
+		INIT_LIST_HEAD(&sq->sq_list);
+#endif
 	}
 }
 BIG_STATIC streams_fastcall __unlikely struct syncq *
@@ -1363,45 +1367,58 @@ sq_alloc(void)
 	if (likely((sq = kmem_cache_alloc(si->si_cache, SLAB_KERNEL)) != NULL)) {
 		_ptrace(("syncq %p is allocated\n", sq));
 		atomic_set(&sq->sq_refs, 1);
+#if defined _DEBUG
 		write_lock(&si->si_rwlock);
-		list_add_tail((struct list_head *) &sq->sq_next, &si->si_head);
+		list_add_tail(&sq->sq_list, &si->si_head);
 		write_unlock(&si->si_rwlock);
+#endif
 		atomic_inc(&si->si_cnt);
 		if (atomic_read(&si->si_cnt) > si->si_hwl)
 			si->si_hwl = atomic_read(&si->si_cnt);
 	}
 	return (sq);
 }
+
+static struct syncq *elsewhere_list = NULL;
+static spinlock_t elsewhere_lock = SPIN_LOCK_UNLOCKED;
+
 BIG_STATIC streams_fastcall __unlikely struct syncq *
 sq_locate(const char *sq_info)
 {
-	struct syncq *sq, *sq_try = NULL;
+	struct syncq *sq, *sq_try;
 	struct strinfo *si = &Strinfo[DYN_SYNCQ];
-	struct list_head *pos;
 
 	// strblocking(); /* before we sleep */
 	/* Note: sq_locate() is only called by qattach() that is only called by the STREAM head at
 	   user context with no locks held, therefore we use SLAB_KERNEL instead of SLAB_ATOMIC. */
 	if (likely((sq = kmem_cache_alloc(si->si_cache, SLAB_KERNEL)) != NULL)) {
 		_ptrace(("syncq %p is allocated\n", sq));
-		write_lock(&si->si_rwlock);
-		for (pos = si->si_head.next; pos != &si->si_head; pos = pos->next, sq_try = NULL) {
-			sq_try = (struct syncq *)
-			    ((caddr_t) pos - (ulong) &((struct syncq *) 0)->sq_next);
+
+		spin_lock(&elsewhere_lock);
+
+		for (sq_try = elsewhere_list; sq_try; sq_try = sq_try->sq_next)
 			if (sq_info == NULL || strncmp(sq_try->sq_info, sq_info, FMNAMESZ) == 0)
 				break;
-		}
 		if (sq_try == NULL) {
 			atomic_set(&sq->sq_refs, 1);
 			if (sq_info)
 				strncpy(sq->sq_info, sq_info, FMNAMESZ);
-			list_add_tail((struct list_head *) &sq->sq_next, &si->si_head);
+			/* place on list of elsewheres */
+			if ((sq->sq_next = elsewhere_list))
+				sq->sq_next->sq_prev = &sq->sq_next;
+			sq->sq_prev = &elsewhere_list;
+			elsewhere_list = sq;
+#if defined _DEBUG
+			write_lock(&si->si_rwlock);
+			list_add_tail(&sq->sq_list, &si->si_head);
+			write_unlock(&si->si_rwlock);
+#endif
 		} else {
 			kmem_cache_free(si->si_cache, sq);
 			sq = sq_try;
 			atomic_inc(&sq->sq_refs);
 		}
-		write_unlock(&si->si_rwlock);
+		spin_unlock(&elsewhere_lock);
 		if (sq_try == NULL) {
 			atomic_inc(&si->si_cnt);
 			if (atomic_read(&si->si_cnt) > si->si_hwl)
@@ -1418,7 +1435,9 @@ sq_free(struct syncq *sq)
 	_ptrace(("syncq %p is being deleted\n", sq));
 
 	write_lock(&si->si_rwlock);
-	list_del_init((struct list_head *) &sq->sq_next);
+#if defined _DEBUG
+	list_del_init(&sq->sq_list);
+#endif
 	write_unlock(&si->si_rwlock);
 
 	bzero(sq->sq_info, FMNAMESZ + 1);
@@ -1440,6 +1459,12 @@ sq_free(struct syncq *sq)
 	assert(sq->sq_mhead == NULL);
 	sq->sq_mhead = NULL;
 	sq->sq_mtail = &sq->sq_mhead;
+
+	/* remove from list */
+	if ((*sq->sq_prev = sq->sq_next))
+		sq->sq_next->sq_prev = sq->sq_prev;
+	sq->sq_next = NULL;
+	sq->sq_prev = &sq->sq_next;
 
 	assert(!waitqueue_active(&sq->sq_waitq));
 	wake_up_all(&sq->sq_waitq);
@@ -2446,7 +2471,11 @@ defer_syncq(struct syncq_cookie *sc, int exclus)
 STATIC int
 find_syncq(struct syncq_cookie *sc)
 {
-	if (sc->sc_q && (sc->sc_osq = sc->sc_q->q_syncq) && !(sc->sc_osq->sq_flag & SQ_OUTER)) {
+	if (global_syncq != NULL) {
+		sc->sc_isq = global_syncq;
+		sc->sc_osq = NULL;
+	} else
+	    if (sc->sc_q && (sc->sc_osq = sc->sc_q->q_syncq) && !(sc->sc_osq->sq_flag & SQ_OUTER)) {
 		sc->sc_isq = sc->sc_osq;
 		sc->sc_osq = sc->sc_isq->sq_outer;
 	}
@@ -2455,7 +2484,11 @@ find_syncq(struct syncq_cookie *sc)
 STATIC int
 find_syncqs(struct syncq_cookie *sc)
 {
-	if (sc->sc_q && (sc->sc_osq = sc->sc_q->q_syncq) && !(sc->sc_osq->sq_flag & SQ_OUTER)) {
+	if (global_syncq != NULL) {
+		sc->sc_isq = global_syncq;
+		sc->sc_osq = NULL;
+	} else
+	    if (sc->sc_q && (sc->sc_osq = sc->sc_q->q_syncq) && !(sc->sc_osq->sq_flag & SQ_OUTER)) {
 		sc->sc_isq = sc->sc_osq;
 		sc->sc_osq = sc->sc_isq->sq_outer;
 	}
@@ -4768,11 +4801,18 @@ takeover_strsched(unsigned int cpu)
 		o->qhead = NULL;
 		o->qtail = &o->qhead;
 	}
+#ifdef CONFIG_STREAMS_SYNCQS
+	if (o->sqhead) {
+		*XCHG(&t->sqtail, o->sqtail) = o->sqhead;
+		o->sqhead = NULL;
+		o->sqtail = &o->sqhead;
+	}
 	if (o->strmfuncs_head) {
 		*XCHG(&t->strmfuncs_tail, o->strmfuncs_tail) = o->strmfuncs_head;
 		o->strmfuncs_head = NULL;
 		o->strmfuncs_tail = &o->strmfuncs_head;
 	}
+#endif				/* CONFIG_STREAMS_SYNCQS */
 	if (o->strbcalls_head) {
 		*XCHG(&t->strbcalls_tail, o->strbcalls_tail) = o->strbcalls_head;
 		o->strbcalls_head = NULL;
@@ -5116,11 +5156,13 @@ strsched_init(void)
 
 	if ((result = str_init_caches()) < 0)
 		return (result);
+#if 0
 #if defined CONFIG_STREAMS_SYNCQS
 	if (!(global_syncq = sq_alloc())) {
 		str_term_caches();
 		return (-ENOMEM);
 	}
+#endif
 #endif
 	for (i = 0; i < NR_CPUS; i++) {
 		struct strthread *t = &strthreads[i];

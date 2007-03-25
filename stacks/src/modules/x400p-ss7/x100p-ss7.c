@@ -9976,6 +9976,12 @@ xp_register_strdev(major_t major)
 	int err;
 	if ((err = lis_register_strdev(major, &x100pinfo, UNITS, DRV_NAME)) < 0)
 		return (err);
+	if (major == 0)
+		major = err;
+	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
+		lis_unregister_strdev(major);
+		return (err);
+	}
 	return (0);
 }
 

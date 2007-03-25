@@ -2275,6 +2275,10 @@ sdl_register_strmod(void)
 
 	if ((err = lis_register_strmod(&sdlinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
+	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
+		lis_unregister_strmod(&sdlinfo);
+		return (err);
+	}
 	return (0);
 }
 

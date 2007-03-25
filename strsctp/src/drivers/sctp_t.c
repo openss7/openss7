@@ -4136,6 +4136,13 @@ sctp_t_init(void)
 		cmn_err(CE_NOTE, "sctp: couldn't register driver\n");
 		return;
 	}
+	if (lis_register_driver_qlock_option(cmajor, LIS_QLOCK_NONE) < 0) {
+		lis_unregister_strdev(cmajor);
+		sctp_t_minfo.mi_idnum = 0;
+		rare();
+		cmn_err(CE_NOTE, "sctp: couldn't register driver\n");
+		return;
+	}
 	sctp_t_minfo.mi_idnum = cmajor;
 }
 

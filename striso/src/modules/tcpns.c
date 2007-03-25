@@ -508,6 +508,10 @@ tcpns_register_strmod(void)
 
 	if ((err = lis_register_strmod(&tcpnsinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
+	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
+		lis_unregister_strmod(&tcpnsinfo);
+		return (err);
+	}
 	return (0);
 }
 

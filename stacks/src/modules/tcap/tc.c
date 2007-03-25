@@ -2213,6 +2213,8 @@ __initfunc(int tc_init(void))
 #ifndef LIS_REGISTERED
 	if ((err = lis_register_strmod(&tc_info, tc_minfo.ni_name)) < 0)
 		cmn_err(CE_WARN "tc: couldn't register module!\n");
+	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0)
+		lis_unregister_strmod(&tc_info);
 	return (err);
 #endif
 }

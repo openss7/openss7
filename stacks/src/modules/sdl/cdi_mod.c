@@ -162,6 +162,12 @@ cd_init(void)
 		cmn_err(CE_NOTE, "cdi-sdl: couldn't register module\n");
 		return;
 	}
+	if (lis_register_module_qlock_option(modnum, LIS_QLOCK_NONE) < 0) {
+		lis_unregister_strmod(&cd_info);
+		cd_minfo.mi_idnum = 0;
+		cmn_err(CE_NOTE, "cdi-sdl: couldn't register module\n");
+		return;
+	}
 	cd_minfo.mi_idnum = modnum;
 	return;
 }

@@ -2204,6 +2204,10 @@ sscop_register_strmod(void)
 	int err;
 	if ((err = lis_register_strmod(&sscop_npiinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
+	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
+		lis_unregister_strmod(&sscop_npiinfo);
+		return (err);
+	}
 	return (0);
 }
 

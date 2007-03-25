@@ -1,3 +1,71 @@
+2007-03-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/acb56/sdt_acb56.c: register qlock option
+	* src/modules/cd/cd_daed.c: register qlock option
+	* src/modules/cd/cd_hdlc.c: register qlock option
+	* src/modules/dl/dl.c: register qlock option
+	* src/modules/dl/dl_lapd.c: register qlock option
+	* src/modules/h225/h225.c: register qlock option
+	* src/modules/hdlc/hdlc.c: register qlock option
+	* src/modules/inet/inet.c: register qlock option
+	* src/modules/inet/rawip.c: register qlock option
+	* src/modules/inet/tcp.c: register qlock option
+	* src/modules/inet/udp.c: register qlock option
+	* src/modules/isdn/isdn.c: register qlock option
+	* src/modules/isup/isup.c: register qlock option
+	* src/modules/m2tp/m2tp.c: register qlock option
+	* src/modules/m2ua/m2ua.c: register qlock option
+	* src/modules/m3ua/m3ua.c: register qlock option
+	* src/modules/m3ua/m3ua_as.c: register qlock option
+	* src/modules/m3ua/m3ua_sg.c: register qlock option
+	* src/modules/mg/mg.c: register qlock option
+	* src/modules/mx/mx_sdl.c: register qlock option
+	* src/modules/rtp/rtp.c: register qlock option
+	* src/modules/sctp/sctp2.c: register qlock option
+	* src/modules/sctp/sctp_n.c: register qlock option
+	* src/modules/sctp/sctp_t.c: register qlock option
+	* src/modules/sdl/cdi_mod.c: register qlock option
+	* src/modules/sdl/sdl.c: register qlock option
+	* src/modules/sdl/sdlm.c: register qlock option
+	* src/modules/sdl/spm.c: register qlock option
+	* src/modules/sdt/sdt.c: register qlock option
+	* src/modules/sl/sl.c: register qlock option
+	* src/modules/sl/sl_mux.c: register qlock option
+	* src/modules/sl/sl_mux.new.c: register qlock option
+	* src/modules/sl/slm.c: register qlock option
+	* src/modules/sl/sm_mod.c: register qlock option
+	* src/modules/ss7ip/sdt_tpi.c: register qlock option
+	* src/modules/ss7ip/sl_tpi.c: register qlock option
+	* src/modules/ss7sctp/sdl_sctp.c: register qlock option
+	* src/modules/ss7sctp/sdt_sctp.c: register qlock option
+	* src/modules/sscop/sscop.c: register qlock option
+	* src/modules/sscop/sscop2.c: register qlock option
+	* src/modules/sscop/sscop_n.c: register qlock option
+	* src/modules/sscop/sscop_t.c: register qlock option
+	* src/modules/sua/sua.c: register qlock option
+	* src/modules/tali/tali.c: register qlock option
+	* src/modules/tcap/tc.c: register qlock option
+	* src/modules/tcap/tcap.c: register qlock option
+	* src/modules/tcap/tr.c: register qlock option
+	* src/modules/ti/timod.c: register qlock option
+	* src/modules/ti/tirdwr.c: register qlock option
+	* src/modules/tua/tua.c: register qlock option
+	* src/modules/x400p-ss7/ch_x400p.c: register qlock option
+	* src/modules/x400p-ss7/mx_x400p.c: register qlock option
+	* src/modules/x400p-ss7/sdl_x400p.c: register qlock option
+	* src/modules/x400p-ss7/sdt_x400p.c: register qlock option
+	* src/modules/x400p-ss7/sl_v400p.c: register qlock option
+	* src/modules/x400p-ss7/sl_x100p.c: register qlock option
+	* src/modules/x400p-ss7/sl_x400p.c: register qlock option
+	* src/modules/x400p-ss7/sl_x400p.new.c: register qlock option
+	* src/modules/x400p-ss7/sl_x400p.old.c: register qlock option
+	* src/modules/x400p-ss7/sl_x400p.older.c: register qlock option
+	* src/modules/x400p-ss7/sp_x400p.older.c: register qlock option
+	* src/modules/x400p-ss7/tmp.c: register qlock option
+	* src/modules/x400p-ss7/x100p-ss7.c: register qlock option
+	* src/modules/x400p-ss7/x400p-ss7.c: register qlock option
+	* src/modules/x400p-ss7/x400p_mx.c: register qlock option
+
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: pulled release date
