@@ -197,8 +197,11 @@ typedef struct syncq {
 	struct syncq *sq_link;		/* synch queue schedule list */
 	char sq_info[FMNAMESZ + 1];	/* synch queue info */
 	atomic_t sq_refs;		/* structure references */
-	struct syncq *sq_next;		/* list of all structures */
-	struct syncq *sq_prev;		/* list of all structures */
+	struct syncq *sq_next;		/* list of all elsewhere structures */
+	struct syncq **sq_prev;		/* list of all elsewhere structures */
+#if defined CONFIG_STREAMS_DEBUG
+	struct list_head *sq_list;	/* Strinfo list linkage */
+#endif
 } syncq_t;
 
 /* we _really_ need our own flags here... */
@@ -219,7 +222,8 @@ enum {
 #define SQ_WAITERS	(1<<SQ_WAITERS_BIT)	/* this syncq has waiters */
 #define SQ_BACKLOG	(1<<SQ_BACKLOG_BIT)	/* this syncq has a backlog left by non-waiters */
 #define SQ_SCHED	(1<<SQ_SCHED_BIT)	/* this syncq is scheduled for backlog clearing */
-#endif
+
+#endif				/* defined CONFIG_STREAMS_SYNCQS */
 
 /* stream head private structure */
 struct stdata {
@@ -434,9 +438,9 @@ struct strthread {
 #if defined CONFIG_STREAMS_SYNCQS
 	syncq_t *sqhead;		/* first syncq in scheduled syncqs */
 	syncq_t **sqtail;		/* last sycnq in scheduled sycnqs */
-#endif
 	mblk_t *strmfuncs_head;		/* head of m_func pending exec */
 	mblk_t **strmfuncs_tail;	/* tail of m_func pending exec */
+#endif
 	struct strevent *freeevnt_head;	/* head of free stream events cached */
 	struct strevent **freeevnt_tail;	/* tail of free stream events cached */
 	struct strevent *strbcalls_head;	/* head of bufcalls pending exec */

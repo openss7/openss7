@@ -2793,6 +2793,9 @@ EXPORT_SYMBOL(lis_unregister_strmod);
  *  lis_register_driver_qlock_option - emulation of LiS STREAMS driver synchronization
  *  @major: major device number of driver
  *  @qlock_option: synchronization level
+ *
+ *  Note that LiS does not perform true SQLVL_GLOBAL synchronization, but is only SQLVL_ELSEWHERE
+ *  with a common syncrhonization queue.
  */
 _RP int
 lis_register_driver_qlock_option(major_t major, int qlock_option)
@@ -2823,7 +2826,8 @@ lis_register_driver_qlock_option(major_t major, int qlock_option)
 			cdev->d_flag |= D_MTQPAIR;
 			break;
 		case LIS_QLOCK_GLOBAL:
-			cdev->d_sqlvl = SQLVL_GLOBAL;
+			cdev->d_sqlvl = SQLVL_ELSEWHERE;
+			cdev->d_sqinfo = "LiS";
 			cdev->d_flag &= ~(D_MP|D_UP|D_MTPERQ|D_MTQPAIR|D_MTPERMOD|D_MTOUTPERIM|D_MTOCEXCL|D_MTPUTSHARED);
 			cdev->d_flag |= 0;
 			err = register_strsync((struct fmodsw *)cdev);
@@ -2840,6 +2844,9 @@ EXPORT_SYMBOL(lis_register_driver_qlock_option);
  *  lis_register_module_qlock_option - emulation of LiS STREAMS module synchronization
  *  @modid: module id
  *  @qlock_option: synchronization level
+ *
+ *  Note that LiS does not perform true SQLVL_GLOBAL synchronization, but is only SQLVL_ELSEWHERE
+ *  with a common syncrhonization queue.
  */
 _RP int
 lis_register_module_qlock_option(modID_t modid, int qlock_option)
@@ -2870,7 +2877,8 @@ lis_register_module_qlock_option(modID_t modid, int qlock_option)
 			fmod->f_flag |= D_MTQPAIR;
 			break;
 		case LIS_QLOCK_GLOBAL:
-			fmod->f_sqlvl = SQLVL_GLOBAL;
+			fmod->f_sqlvl = SQLVL_ELSEWHERE;
+			fmod->f_sqinfo = "LiS";
 			fmod->f_flag &= ~(D_MP|D_UP|D_MTPERQ|D_MTQPAIR|D_MTPERMOD|D_MTOUTPERIM|D_MTOCEXCL|D_MTPUTSHARED);
 			fmod->f_flag |= 0;
 			err = register_strsync(fmod);

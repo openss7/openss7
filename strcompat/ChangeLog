@@ -1,3 +1,7 @@
+2007-03-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/liscompat.c: correct LiS global synchronization
+
 2007-03-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/lfs/strconf.h:
