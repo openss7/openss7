@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:37 $
+ @(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/20 23:07:37 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx.c,v $
+ Revision 0.9.2.4  2007/03/25 06:00:09  brian
+ - flush corrections
+
  Revision 0.9.2.3  2006/12/20 23:07:37  brian
  - updates for release and current development
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:37 $"
+#ident "@(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:09 $"
 
 static char const ident[] =
-    "$RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:37 $";
+    "$RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:09 $";
 
 /*
  *  This is an MX multiplexing driver.  Its purpose is to allow a single device /dev/streams/matrix
@@ -87,7 +90,7 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_MUX_DESCRIP		"MX MULTIPLEX (MX-MUX) STREAMS MULTIPLEXING DRIVER."
-#define MX_MUX_REVISION		"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:37 $"
+#define MX_MUX_REVISION		"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:09 $"
 #define MX_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -373,9 +376,9 @@ mx_uwput(queue_t *q, mblk_t *mp)
 	{
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 		}
 		read_lock_bh(&mx_lock);
 		if (mx->other) {
@@ -391,9 +394,9 @@ mx_uwput(queue_t *q, mblk_t *mp)
 
 		if (mp->b_rptr[0] & FLUSHR) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+				flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(RD(q), FLUSHALL);
+				flushq(RD(q), FLUSHDATA);
 			mp->b_rptr[0] &= ~FLUSHW;
 			qreply(q, mp);
 			return (0);

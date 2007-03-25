@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/25 02:23:44 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/25 06:01:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:44 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:01:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/25 02:23:44 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/25 06:01:04 $"
 
 static char const ident[] =
-    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/25 02:23:44 $";
+    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/25 06:01:04 $";
 
 #include <sys/os7/compat.h>
 
@@ -75,7 +75,7 @@ static char const ident[] =
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.25 $) $Date: 2007/03/25 02:23:44 $"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.26 $) $Date: 2007/03/25 06:01:04 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"
@@ -421,13 +421,19 @@ ip2xinet_uwput(queue_t *q, mblk_t *mp)
 
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
-		if (*mp->b_rptr & FLUSHW) {
-			flushq(q, FLUSHALL);
+		if (mp->b_rptr[0] & FLUSHW) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(q, FLUSHDATA);
 			qenable(q);
-			*mp->b_rptr &= ~FLUSHW;
+			mp->b_rptr[0] &= ~FLUSHW;
 		}
-		if (*mp->b_rptr & FLUSHR) {
-			flushq(RD(q), FLUSHALL);
+		if (mp->b_rptr[0] & FLUSHR) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(RD(q), FLUSHDATA);
 			if (!putq(RD(q), mp))
 				freemsg(mp);
 		} else
@@ -869,13 +875,19 @@ ip2xinet_lrput(queue_t *q, mblk_t *mp)
 		break;
 
 	case M_FLUSH:
-		if (*mp->b_rptr & FLUSHR) {
-			flushq(q, FLUSHALL);
+		if (mp->b_rptr[0] & FLUSHR) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(q, FLUSHDATA);
 			qenable(q);
 		}
-		if (*mp->b_rptr & FLUSHW) {
-			*mp->b_rptr &= ~FLUSHR;
-			flushq(WR(q), FLUSHALL);
+		if (mp->b_rptr[0] & FLUSHW) {
+			mp->b_rptr[0] &= ~FLUSHR;
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(WR(q), mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(WR(q), FLUSHDATA);
 			qenable(WR(q));
 			if (!putq(WR(q), mp))
 				freemsg(mp);

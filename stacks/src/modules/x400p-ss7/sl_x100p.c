@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:23:10 $
+ @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 05:59:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:10 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x100p.c,v $
+ Revision 0.9.2.20  2007/03/25 05:59:58  brian
+ - flush corrections
+
  Revision 0.9.2.19  2007/03/25 02:23:10  brian
  - add D_MP and D_MTPERQ flags
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:23:10 $"
+#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 05:59:58 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:23:10 $";
+    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 05:59:58 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -111,7 +114,7 @@ static char const ident[] =
 
 #define SL_X100P_DESCRIP	"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:23:10 $"
+#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2007/03/25 05:59:58 $"
 #define SL_X100P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define SL_X100P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -9119,9 +9122,9 @@ xp_w_flush(queue_t *q, mblk_t *mp)
 			spin_unlock_irqrestore(&xp->lock, flags);
 		}
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 		*mp->b_rptr &= ~FLUSHW;
 	}
 	if (*mp->b_rptr & FLUSHR) {
@@ -9136,9 +9139,9 @@ xp_w_flush(queue_t *q, mblk_t *mp)
 			spin_unlock_irqrestore(&xp->lock, flags);
 		}
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHALL);
+			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(OTHERQ(q), FLUSHALL);
+			flushq(OTHERQ(q), FLUSHDATA);
 		qreply(q, mp);
 		return (QR_ABSORBED);
 	}

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 10:24:51 $
+ @(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 10:24:51 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: itot.c,v $
+ Revision 0.9.2.4  2007/03/25 06:00:33  brian
+ - flush corrections
+
  Revision 0.9.2.3  2006/10/12 10:24:51  brian
  - removed redundant debug flags, and got itot compiling
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 10:24:51 $"
+#ident "@(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:33 $"
 
 static char const ident[] =
-    "$RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 10:24:51 $";
+    "$RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:33 $";
 
 /*
  *  ISO Transport over TCP (ITOT)
@@ -90,7 +93,7 @@ static char const ident[] =
 
 #define ITOT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ITOT_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 10:24:51 $"
+#define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:33 $"
 #define ITOT_DEVICE	"SVR 4.2 STREAMS ITOT Module for RFC 2126 (ITOT)"
 #define ITOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ITOT_LICENSE	"GPL"
@@ -368,9 +371,9 @@ itot_r_flush(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_rptr[0] & FLUSHR) {
 		if (mp->b_rptr[0] & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 	}
 	putnext(q, mp);
 	return (0);
@@ -457,9 +460,9 @@ itot_w_flush(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_rptr[0] & FLUSHW) {
 		if (mp->b_rptr[0] & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 	}
 	putnext(q, mp);
 	return (0);

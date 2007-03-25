@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $
+ @(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:57 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 09:37:42 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ptem.c,v $
+ Revision 0.9.2.4  2007/03/25 06:00:57  brian
+ - flush corrections
+
  Revision 0.9.2.3  2006/10/12 09:37:42  brian
  - completed much of the strtty package
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $"
+#ident "@(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:57 $"
 
 static char const ident[] =
-    "$RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $";
+    "$RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:57 $";
 
 /*
  * PTEM - Pseudo Terminal Emulation Module.
@@ -137,7 +140,7 @@ References
 
 #define PTEM_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTEM_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PTEM_REVISION		"OpenSS7 $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $"
+#define PTEM_REVISION		"OpenSS7 $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:57 $"
 #define PTEM_DEVICE		"SVR 4.2 STREAMS Pseudo-Terminal Emulation Module (PTEM)"
 #define PTEM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PTEM_LICENSE		"GPL"
@@ -519,9 +522,9 @@ ptem_w_msg(queue_t *q, mblk_t *mp)
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 		}
 		putnext(q, mp);
 		break;

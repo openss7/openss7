@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 07:37:00 $
+ @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 07:37:00 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pty.c,v $
+ Revision 0.9.2.5  2007/03/25 06:00:56  brian
+ - flush corrections
+
  Revision 0.9.2.4  2006/12/18 07:37:00  brian
  - resolve device numbering
 
@@ -71,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 07:37:00 $"
+#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:56 $"
 
 static char const ident[] =
-    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 07:37:00 $";
+    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:56 $";
 
 /*
  *  This is the start of a STREAMS pseudo-terminal (pty) driver for Linux.  It
@@ -99,7 +102,7 @@ static char const ident[] =
 
 #define PTY_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTY_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 07:37:00 $"
+#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:56 $"
 #define PTY_DEVICE	"SVR 4.2 STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PTY_LICENSE	"GPL"
@@ -562,9 +565,9 @@ pty_m_flush(queue_t *wq, mblk_t *mp, queue_t *rq)
 {
 	if (mp->b_rptr[0] & FLUSHW) {
 		if (mp->b_rptr[0] & FLUSHBAND)
-			flushband(wq, mp->b_rptr[1], FLUSHALL);
+			flushband(wq, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(wq, FLUSHALL);
+			flushq(wq, FLUSHDATA);
 	}
 	if (rq) {
 		/* switch sense of flush flags and pass to other end */
@@ -582,9 +585,9 @@ pty_m_flush(queue_t *wq, mblk_t *mp, queue_t *rq)
 		   other end */
 		if (mp->b_rptr[0] & FLUSHR) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(RD(wq), mp->b_rptr[1], FLUSHALL);
+				flushband(RD(wq), mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(RD(wq), FLUSHALL);
+				flushq(RD(wq), FLUSHDATA);
 			mp->b_rptr[0] &= ~FLUSHW;
 			putnext(RD(wq), mp);
 		} else {

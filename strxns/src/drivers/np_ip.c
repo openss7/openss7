@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/03/25 00:53:48 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/25 06:01:05 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:53:48 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:01:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.38  2007/03/25 06:01:05  brian
+ - flush corrections
+
  Revision 0.9.2.37  2007/03/25 00:53:48  brian
  - synchronization updates
 
@@ -181,10 +184,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/03/25 00:53:48 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/25 06:01:05 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/03/25 00:53:48 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/25 06:01:05 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -245,7 +248,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.37 $) $Date: 2007/03/25 00:53:48 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.38 $) $Date: 2007/03/25 06:01:05 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -5451,16 +5454,16 @@ np_w_flush(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_rptr[0] & FLUSHW) {
 		if (mp->b_rptr[0] & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 		mp->b_rptr[0] &= ~FLUSHW;
 	}
 	if (mp->b_rptr[0] & FLUSHR) {
 		if (mp->b_rptr[0] & FLUSHBAND)
-			flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+			flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(RD(q), FLUSHALL);
+			flushq(RD(q), FLUSHDATA);
 		qreply(q, mp);
 		return (QR_ABSORBED);
 	}
@@ -5614,9 +5617,9 @@ np_r_flush(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_rptr[0] & FLUSHR) {
 		if (mp->b_rptr[0] & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 		putnext(q, mp);
 		return (QR_ABSORBED);
 	}

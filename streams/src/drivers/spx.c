@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/12/18 07:32:40 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/03/25 06:00:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 07:32:40 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/12/18 07:32:40 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/03/25 06:00:17 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/12/18 07:32:40 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/03/25 06:00:17 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2006/12/18 07:32:40 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/03/25 06:00:17 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -169,9 +169,9 @@ spx_rput(queue_t *q, mblk_t *mp)
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHR) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 		}
 		break;
 	}
@@ -188,9 +188,9 @@ spx_wput(queue_t *q, mblk_t *mp)
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 			if (q->q_next) {
 				putnext(q, mp);
 				break;
@@ -203,9 +203,9 @@ spx_wput(queue_t *q, mblk_t *mp)
 				break;
 			}
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+				flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(RD(q), FLUSHALL);
+				flushq(RD(q), FLUSHDATA);
 			qreply(q, mp);
 			break;
 		}

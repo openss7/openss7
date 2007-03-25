@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:22:45 $
+ @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 05:59:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:22:45 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2tp.c,v $
+ Revision 0.9.2.14  2007/03/25 05:59:29  brian
+ - flush corrections
+
  Revision 0.9.2.13  2007/03/25 02:22:45  brian
  - add D_MP and D_MTPERQ flags
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:22:45 $"
+#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 05:59:29 $"
 
-static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:22:45 $";
+static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 05:59:29 $";
 
 /*
  *  This is a M2TP/SCTP driver.  This simulates one or more SS7 links using an
@@ -86,7 +89,7 @@ static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.13 
 #include <ss7/m2tp_ioctl.h>
 
 #define M2TP_DESCRIP	"M2TP/SCTP MTP2 TUNNELING PROTOCOL (SL) STREAMS MODULE."
-#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Data$"
+#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Data$"
 #define M2TP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1673,16 +1676,22 @@ m2tp_w_ioctl(queue_t *q, mblk_t *mp)
 static inline void
 m2tp_w_flush(queue_t *q, mblk_t *mp)
 {
-	if (*mp->b_rptr & FLUSHW) {
-		flushq(q, FLUSHALL);
+	if (mp->b_rptr[0] & FLUSHW) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(q, FLUSHDATA);
 		if (q->q_next) {
 			putnext(q, mp);
 			return;
 		}
-		*mp->b_rptr &= ~FLUSHW;
+		mp->b_rptr[0] &= ~FLUSHW;
 	}
-	if (*mp->b_rptr & FLUSHR) {
-		flushq(RD(q), FLUSHALL);
+	if (mp->b_rptr[0] & FLUSHR) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(RD(q), FLUSHDATA);
 		qreply(q, mp);
 		return;
 	}

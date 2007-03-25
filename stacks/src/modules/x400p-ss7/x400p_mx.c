@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:23:13 $
+ @(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 06:00:03 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:13 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x400p_mx.c,v $
+ Revision 0.9.2.20  2007/03/25 06:00:03  brian
+ - flush corrections
+
  Revision 0.9.2.19  2007/03/25 02:23:13  brian
  - add D_MP and D_MTPERQ flags
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:23:13 $"
+#ident "@(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 06:00:03 $"
 
 static char const ident[] =
-    "$RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:23:13 $";
+    "$RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 06:00:03 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -111,7 +114,7 @@ static char const ident[] =
 
 #define MX_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define MX_X400P_EXTRA		"Part of the OpenSS7 Stack for Linx Fast-STREAMS."
-#define MX_X400P_REVISION	"OpenSS7 $RCSfile: x400p_mx.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:23:13 $"
+#define MX_X400P_REVISION	"OpenSS7 $RCSfile: x400p_mx.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2007/03/25 06:00:03 $"
 #define MX_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define MX_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -9126,9 +9129,9 @@ xp_w_flush(queue_t *q, mblk_t *mp)
 			spin_unlock_irqrestore(&xp->lock, flags);
 		}
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 		*mp->b_rptr &= ~FLUSHW;
 	}
 	if (*mp->b_rptr & FLUSHR) {
@@ -9143,9 +9146,9 @@ xp_w_flush(queue_t *q, mblk_t *mp)
 			spin_unlock_irqrestore(&xp->lock, flags);
 		}
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHALL);
+			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(OTHERQ(q), FLUSHALL);
+			flushq(OTHERQ(q), FLUSHDATA);
 		qreply(q, mp);
 		return (QR_ABSORBED);
 	}

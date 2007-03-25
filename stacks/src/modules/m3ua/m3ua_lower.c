@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/13 12:01:32 $
+ @(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/25 05:59:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:32 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/13 12:01:32 $"
+#ident "@(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/25 05:59:30 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2005/07/13 12:01:32 $";
+    "$RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/25 05:59:30 $";
 
 #define __NO_VERSION__
 
@@ -142,18 +142,18 @@ static int ss7_r_ctl(queue_t * q, mblk_t * mp)
  */
 static int xxx_r_flush(queue_t * q, mblk_t * mp)
 {
-	if (*mp->b_rptr & FLUSHR) {
-		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+	if (mp->b_rptr[0] & FLUSHR) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushall(q, FLUSHALL);
-		*mp->b_rptr &= ~FLUSHR;
+			flushall(q, FLUSHDATA);
+		mp->b_rptr[0] &= ~FLUSHR;
 	}
-	if ((*mp->b_rptr & FLUSHW) && !(mp->b_flags & MSGNOLOOP)) {
-		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+	if ((mp->b_rptr[0] & FLUSHW) && !(mp->b_flags & MSGNOLOOP)) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushall(q, FLUSHALL);
+			flushall(q, FLUSHDATA);
 		mp->b_flag |= MSGNOLOOP;
 		qreply(q, mp);	/* flush all the way back down */
 	}

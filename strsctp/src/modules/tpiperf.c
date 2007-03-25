@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:35 $
+ @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:35 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpiperf.c,v $
+ Revision 0.9.2.5  2007/03/25 06:00:54  brian
+ - flush corrections
+
  Revision 0.9.2.4  2007/03/25 02:23:35  brian
  - add D_MP and D_MTPERQ flags
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:35 $"
+#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:54 $"
 
-static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:35 $";
+static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:54 $";
 
 /*
  *  This is a TPI performance testing  module for SCTP that provides some specialized intput-output
@@ -86,7 +89,7 @@ static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define TPIPERF_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TPIPERF_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:35 $"
+#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:54 $"
 #define TPIPERF_DEVICE		"SVR 4.2 STREAMS TPI Performance Module (TPIPERF)"
 #define TPIPERF_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TPIPERF_LICENSE		"GPL"
@@ -297,9 +300,9 @@ tpiperf_wput(queue_t *q, mblk_t *mp)
 		} else {
 			if (mp->b_rptr[0] & FLUSHR) {
 				if (mp->b_rptr[0] & FLUSHBAND)
-					flushband(q, mp->b_rptr[1], FLUSHALL);
+					flushband(q, mp->b_rptr[1], FLUSHDATA);
 				else
-					flushq(q, FLUSHALL);
+					flushq(q, FLUSHDATA);
 				mp->b_rptr[0] &= ~FLUSHR;
 			}
 			putnext(q, mp);
@@ -600,9 +603,9 @@ tpiperf_rput(queue_t *q, mblk_t *mp)
 		} else {
 			if (mp->b_rptr[0] & FLUSHR) {
 				if (mp->b_rptr[0] & FLUSHBAND)
-					flushband(q, mp->b_rptr[1], FLUSHALL);
+					flushband(q, mp->b_rptr[1], FLUSHDATA);
 				else
-					flushq(q, FLUSHALL);
+					flushq(q, FLUSHDATA);
 				mp->b_rptr[0] &= ~FLUSHR;
 			}
 			putnext(q, mp);

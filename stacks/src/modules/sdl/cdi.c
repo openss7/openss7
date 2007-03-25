@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/14 06:58:11 $
+ @(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/25 05:59:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/14 06:58:11 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/14 06:58:11 $"
+#ident "@(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/25 05:59:40 $"
 
-static char const ident[] = "$RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2006/05/14 06:58:11 $";
+static char const ident[] = "$RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/25 05:59:40 $";
 
 #define __NO_VERSION__
 
@@ -1014,9 +1014,9 @@ cdi_m_flush(queue_t *q, mblk_t *mp, const uint8_t mflag)
 {
 	if (*mp->b_rptr & mflag) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 	}
 	return (QR_PASSALONG);
 }

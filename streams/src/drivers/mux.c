@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/18 10:08:58 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 06:00:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 10:08:58 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mux.c,v $
+ Revision 0.9.2.23  2007/03/25 06:00:17  brian
+ - flush corrections
+
  Revision 0.9.2.22  2006/12/18 10:08:58  brian
  - updated headers for release
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/18 10:08:58 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 06:00:17 $"
 
-static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/18 10:08:58 $";
+static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 06:00:17 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -87,7 +90,7 @@ static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.22 $
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2006/12/18 10:08:58 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 06:00:17 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -452,9 +455,9 @@ mux_uwput(queue_t *q, mblk_t *mp)
 	{
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 		}
 
 		read_lock_str(&mux_lock, flags);
@@ -471,9 +474,9 @@ mux_uwput(queue_t *q, mblk_t *mp)
 
 		if (mp->b_rptr[0] & FLUSHR) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+				flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(RD(q), FLUSHALL);
+				flushq(RD(q), FLUSHDATA);
 			mp->b_rptr[0] &= ~FLUSHW;
 			qreply(q, mp);
 			return (0);
@@ -519,9 +522,9 @@ mux_lrput(queue_t *q, mblk_t *mp)
 	{
 		if (mp->b_rptr[0] & FLUSHR) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 		}
 
 		read_lock_str(&mux_lock, flags);
@@ -539,9 +542,9 @@ mux_lrput(queue_t *q, mblk_t *mp)
 		if (!(mp->b_flag & MSGNOLOOP)) {
 			if (mp->b_rptr[0] & FLUSHW) {
 				if (mp->b_rptr[0] & FLUSHBAND)
-					flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+					flushband(WR(q), mp->b_rptr[1], FLUSHDATA);
 				else
-					flushq(WR(q), FLUSHALL);
+					flushq(WR(q), FLUSHDATA);
 				mp->b_rptr[0] &= ~FLUSHR;
 				/* pretend to be STREAM head */
 				mp->b_flag |= MSGNOLOOP;

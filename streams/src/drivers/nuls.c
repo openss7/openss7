@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 00:52:44 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/03/25 06:00:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:44 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 00:52:44 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/03/25 06:00:17 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 00:52:44 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/03/25 06:00:17 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -73,7 +73,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 00:52:44 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/03/25 06:00:17 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -203,18 +203,18 @@ nuls_put(queue_t *q, mblk_t *mp)
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 			mp->b_rptr[0] &= ~FLUSHW;
 		}
 		if (mp->b_rptr[0] & FLUSHR) {
 			queue_t *rq = RD(q);
 
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(rq, mp->b_rptr[1], FLUSHALL);
+				flushband(rq, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(rq, FLUSHALL);
+				flushq(rq, FLUSHDATA);
 			qreply(q, mp);
 			return (0);
 		}

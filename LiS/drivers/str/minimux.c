@@ -483,15 +483,25 @@ mmux_wput(queue_t *q, mblk_t *mp)
 		break;
 
 	case M_FLUSH:		/* flush upper queue */
-		if (*mp->b_rptr & FLUSHW)
-			flushq(q, FLUSHDATA);
+		if (*mp->b_rptr & FLUSHW) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(q, FLUSHDATA);
+		}
 
 		if (muxp->othermux != NULL && muxp->othermux->outq != NULL) {	/* if connected,
 										   pass downstream */
-			flushq(muxp->othermux->outq, FLUSHDATA);	/* lwr write q */
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(muxp->othermux->outq, mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(muxp->othermux->outq, FLUSHDATA);	/* lwr write q */
 			putnext(muxp->othermux->outq, mp);
 		} else /* not connected */ if (*mp->b_rptr & FLUSHR) {
-			flushq(RD(q), FLUSHDATA);
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(RD(q), FLUSHDATA);
 			*mp->b_rptr &= ~FLUSHW;
 			qreply(q, mp);	/* reply as lowest driver */
 		} else
@@ -652,15 +662,25 @@ mmux_lrput(queue_t *q, mblk_t *mp)
 		break;
 
 	case M_FLUSH:		/* flush lower queue */
-		if (*mp->b_rptr & FLUSHR)
-			flushq(q, FLUSHDATA);
+		if (*mp->b_rptr & FLUSHR) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(q, FLUSHDATA);
+		}
 
 		if (muxp->othermux != NULL && muxp->othermux->outq != NULL) {	/* if connected,
 										   pass upstream */
-			flushq(muxp->othermux->outq, FLUSHDATA);	/* upper rd queue */
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(muxp->othermux->outq, mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(muxp->othermux->outq, FLUSHDATA);	/* upper rd queue */
 			putnext(muxp->othermux->outq, mp);
 		} else /* not connected */ if (*mp->b_rptr & FLUSHW) {
-			flushq(WR(q), FLUSHDATA);
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(WR(q), mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(WR(q), FLUSHDATA);
 			*mp->b_rptr &= ~FLUSHR;
 			qreply(q, mp);	/* reply as highest driver */
 		} else

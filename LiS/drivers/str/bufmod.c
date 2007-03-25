@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/25 00:51:02 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 05:59:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:51:02 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/25 00:51:02 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 05:59:12 $"
 
-static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/25 00:51:02 $";
+static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 05:59:12 $";
 
 
 /*
@@ -81,7 +81,7 @@ static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.8
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/25 00:51:02 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 05:59:12 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"
@@ -161,9 +161,9 @@ bufmod_wput(queue_t *q, mblk_t *mp)
 	if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, FLUSHALL, mp->b_rptr[1]);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 		}
 	}
 	if (likely(mp->b_datap->db_type >= QPCTL
@@ -186,9 +186,9 @@ bufmod_rput(queue_t *q, mblk_t *mp)
 	if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
 		if (mp->b_rptr[0] & FLUSHR) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, FLUSHALL, mp->b_rptr[1]);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 		}
 	}
 	if (likely(mp->b_datap->db_type >= QPCTL

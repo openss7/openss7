@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/03/25 00:53:16 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/03/25 06:00:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:53:16 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.62  2007/03/25 06:00:36  brian
+ - flush corrections
+
  Revision 0.9.2.61  2007/03/25 00:53:16  brian
  - synchronization updates
 
@@ -118,10 +121,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/03/25 00:53:16 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/03/25 06:00:36 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/03/25 00:53:16 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/03/25 06:00:36 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -143,7 +146,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/03/25 00:53:16 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/03/25 06:00:36 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -13677,16 +13680,16 @@ sctp_m_flush(queue_t *q, mblk_t *mp)
 {
 	if (*mp->b_rptr & FLUSHW) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 		*mp->b_rptr &= ~FLUSHW;
 	}
 	if (*mp->b_rptr & FLUSHR) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHALL);
+			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(OTHERQ(q), FLUSHALL);
+			flushq(OTHERQ(q), FLUSHDATA);
 		qreply(q, mp);
 		return (QR_ABSORBED);
 	}
@@ -13699,9 +13702,9 @@ sctp_r_flush(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_rptr[0] & FLUSHR) {
 		if (mp->b_rptr[0] & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 		putnext(q, mp);
 		return (QR_ABSORBED);
 	}

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_as.c,v 0.9.2.11 2007/03/25 02:22:50 brian Exp $
+ @(#) $Id: m3ua_as.c,v 0.9.2.12 2007/03/25 05:59:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -22,11 +22,14 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2007/03/25 02:22:50 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.12  2007/03/25 05:59:30  brian
+ - flush corrections
+
  Revision 0.9.2.11  2007/03/25 02:22:50  brian
  - add D_MP and D_MTPERQ flags
 
@@ -80,7 +83,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 02:22:50 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 05:59:30 $";
 
 #include <sys/os7/compat.h>
 
@@ -767,16 +770,22 @@ m3ua_wput(queue_t *q, mblk_t *mp)
 			break;
 		return;
 	case M_FLUSH:
-		if (*mp->b_wptr & FLUSHW) {
-			flushq(q, FLUSHALL);
+		if (mp->b_rptr[0] & FLUSHW) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(q, FLUSHDATA);
 			if (q->q_next) {
 				putnext(q, mp);
 				return;
 			}
-			*mp->b_rptr &= ~FLUSHW;
+			mp->b_rptr[0] &= ~FLUSHW;
 		}
-		if (*mp->b_rptr & FLUSHR) {
-			flushq(RD(q), FLUSHALL);
+		if (mp->b_rptr[0] & FLUSHR) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(RD(1), mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(RD(q), FLUSHDATA);
 			qreply(q, mp);
 		} else
 			break;

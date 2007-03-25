@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 00:52:08 $
+ @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 05:59:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:08 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:41 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 00:52:08 $"
+#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 05:59:41 $"
 
 static char const ident[] =
-    "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 00:52:08 $";
+    "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 05:59:41 $";
 
 /*
  *  This is an SLM (Signalling Link Management) multiplexing driver which also
@@ -97,7 +97,7 @@ static char const ident[] =
 #include <ss7/ua_lm_ioctl.h>
 
 #define SLM_DESCRIP	"SLM: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 00:52:08 $"
+#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 05:59:41 $"
 #define SLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SLM_DEVICE	"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -3716,9 +3716,9 @@ slm_w_flush(queue_t *q, mblk_t *mp)
 			spin_unlock_irqrestore(&pp->lock, flags);
 		}
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 		*mp->b_rptr &= ~FLUSHW;
 	}
 	if (*mp->b_rptr & FLUSHR) {
@@ -3733,9 +3733,9 @@ slm_w_flush(queue_t *q, mblk_t *mp)
 			spin_unlock_irqrestore(&pp->lock, flags);
 		}
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHALL);
+			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(OTHERQ(q), FLUSHALL);
+			flushq(OTHERQ(q), FLUSHDATA);
 		qreply(q, mp);
 		return (QR_ABSORBED);
 	}

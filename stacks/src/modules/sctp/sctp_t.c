@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:04 $
+ @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 05:59:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:04 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:39 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:04 $"
+#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 05:59:39 $"
 
-static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:04 $";
+static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 05:59:39 $";
 
 #define __NO_VERSION__
 
@@ -3778,16 +3778,16 @@ sctp_t_w_flush(queue_t *q, mblk_t *mp)
 {
 	if (*mp->b_rptr & FLUSHW) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 		*mp->b_rptr &= ~FLUSHW;
 	}
 	if (*mp->b_rptr & FLUSHR) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHALL);
+			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(OTHERQ(q), FLUSHALL);
+			flushq(OTHERQ(q), FLUSHDATA);
 		qreply(q, mp);
 		return (QR_ABSORBED);
 	}
