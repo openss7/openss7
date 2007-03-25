@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:14 $
+ @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:14 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua.c,v $
+ Revision 0.9.2.13  2007/03/25 02:23:04  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.12  2007/03/25 00:52:14  brian
  - synchronization updates
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:14 $"
+#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:04 $"
 
 static char const ident[] =
-    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:14 $";
+    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:04 $";
 
 #include <sys/os7/compat.h>
 
@@ -249,7 +252,7 @@ MODULE_PARM_DESC(major, "Device number for the SUA driver. (0 for allocation.)")
 STATIC struct cdevsw sua_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &suainfo,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,

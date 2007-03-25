@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:30 $
+ @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:30 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd_daed.c,v $
+ Revision 0.9.2.13  2007/03/25 02:23:17  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.12  2007/03/25 00:52:30  brian
  - synchronization updates
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:30 $"
+#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:17 $"
 
 static char const ident[] =
-    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:30 $";
+    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:17 $";
 
 #include <sys/os7/compat.h>
 
@@ -77,7 +80,7 @@ static char const ident[] =
 
 #define CD_DAED_DESCRIP		"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS MODULE."
 #define CD_DAED_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:30 $"
+#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:17 $"
 #define CD_DAED_DEVICE		"SVR 4.2 STREAMS CDI DAED Module for SS7 Channel Devices (DAED)."
 #define CD_DAED_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CD_DAED_LICENSE		"GPL"
@@ -248,7 +251,7 @@ MODULE_PARM_DESC(modid, "Module ID for the CD-DAED module. (0 for allocation.)")
 STATIC struct fmodsw daed_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &cd_daedinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 

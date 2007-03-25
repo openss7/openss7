@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 00:51:55 $
+ @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 02:22:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:51:55 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:22:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_sdl.c,v $
+ Revision 0.9.2.14  2007/03/25 02:22:54  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.13  2007/03/25 00:51:55  brian
  - synchronization updates
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 00:51:55 $"
+#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 02:22:54 $"
 
 static char const ident[] =
-    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 00:51:55 $";
+    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 02:22:54 $";
 
 /*
  *  This module converts and SDL interface provided by (for example) the
@@ -91,7 +94,7 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_SDL_DESCRIP	"SDL MULTIPLEX (MX) STREAMS MODULE."
-#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 00:51:55 $"
+#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 02:22:54 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_SDL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2758,7 +2761,7 @@ MODULE_PARM_DESC(modid, "Module ID for the MX-SDL module. (0 for allocation.)");
 STATIC struct fmodsw mx_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &mx_sdlinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 

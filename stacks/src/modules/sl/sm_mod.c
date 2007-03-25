@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:08 $
+ @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:22:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:08 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:22:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sm_mod.c,v $
+ Revision 0.9.2.16  2007/03/25 02:22:58  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.15  2007/03/25 00:52:08  brian
  - synchronization updates
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:08 $"
+#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:22:58 $"
 
 static char const ident[] =
-    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:08 $";
+    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:22:58 $";
 
 #include <sys/os7/compat.h>
 
@@ -72,7 +75,7 @@ static char const ident[] =
 #include <ss7/mtpi.h>
 
 #define SM_MOD_DESCRIP		"SIMPLE SINGLE LINK MTP."
-#define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:08 $"
+#define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:22:58 $"
 #define SM_MOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SM_MOD_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SM_MOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -323,7 +326,7 @@ MODULE_PARM_DESC(modid, "Module ID for the SM-MOD module. (0 for allocation.)");
 STATIC struct fmodsw sm_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &sm_modinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 

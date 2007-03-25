@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:53:13 $
+ @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:53:13 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcpns.c,v $
+ Revision 0.9.2.4  2007/03/25 02:23:33  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.3  2007/03/25 00:53:13  brian
  - synchronization updates
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:53:13 $"
+#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:33 $"
 
 static char const ident[] =
-    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:53:13 $";
+    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:33 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
@@ -100,7 +103,7 @@ static char const ident[] =
 
 #define TCPNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCPNS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:53:13 $"
+#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:33 $"
 #define TCPNS_DEVICE	"SVR 4.2 STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCPNS_LICENSE	"GPL"
@@ -473,7 +476,7 @@ MODULE_PARM_DESC(modid, "Module ID for TCPNS module. (0 for allocation.)");
 STATIC struct fmodsw tcpns_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &tcpnsinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 

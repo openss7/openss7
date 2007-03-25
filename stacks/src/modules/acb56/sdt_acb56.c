@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:51:14 $
+ @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:22:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:51:14 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:22:34 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:51:14 $"
+#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:22:34 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:51:14 $";
+    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:22:34 $";
 
 /*
  *  This is an implementation of the Signalling Data Terminal for the SeaLevel
@@ -79,7 +79,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define ACB56_DESCRIP	"ACB56: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
-#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:51:14 $"
+#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:22:34 $"
 #define ACB56_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corpoation.  All Rights Reserved."
 #define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards."
 #define ACB56_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4723,7 +4723,7 @@ MODULE_PARM_DESC(modid, "Module ID for the SDT-ACB56 module. (0 for allocation.)
 STATIC struct fmodsw sdt_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &sdt_acb56info,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 

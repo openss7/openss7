@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 00:52:23 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/25 02:23:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:23 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x100p-ss7.c,v $
+ Revision 0.9.2.24  2007/03/25 02:23:12  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.23  2007/03/25 00:52:23  brian
  - synchronization updates
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 00:52:23 $"
+#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/25 02:23:12 $"
 
 static char const ident[] =
-    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 00:52:23 $";
+    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/25 02:23:12 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -97,7 +100,7 @@ static char const ident[] =
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.23 $) $Date: 2007/03/25 00:52:23 $"
+#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.24 $) $Date: 2007/03/25 02:23:12 $"
 #define X100P_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -9941,7 +9944,7 @@ MODULE_PARM_DESC(major, "Device number for the X100P driver. (0 for allocation.)
 STATIC struct cdevsw xp_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &x100pinfo,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 00:52:07 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:22:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:07 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:22:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl.c,v $
+ Revision 0.9.2.19  2007/03/25 02:22:58  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.18  2007/03/25 00:52:07  brian
  - synchronization updates
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 00:52:07 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:22:58 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 00:52:07 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:22:58 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -88,7 +91,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 00:52:07 $"
+#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:22:58 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -5961,7 +5964,7 @@ MODULE_PARM_DESC(modid, "Module ID for the SL module. (0 for allocation.)");
 STATIC struct fmodsw sl_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &slinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 

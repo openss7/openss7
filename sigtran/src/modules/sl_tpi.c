@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:51:12 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:22:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:51:12 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:22:31 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:51:12 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:22:31 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:51:12 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:22:31 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -8510,7 +8510,7 @@ MODULE_PARM_DESC(modid, "Module ID for the SL-TPI module. (0 for allocation.)");
 STATIC struct fmodsw sl_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &sl_tpiinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 

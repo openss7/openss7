@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:49 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 02:22:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:51:49 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:22:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua.c,v $
+ Revision 0.9.2.17  2007/03/25 02:22:47  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.16  2007/03/25 00:51:49  brian
  - synchronization updates
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:49 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 02:22:47 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:49 $";
+    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 02:22:47 $";
 
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
@@ -82,7 +85,7 @@ static char const ident[] =
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:49 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 02:22:47 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -16873,7 +16876,7 @@ MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)"
 STATIC struct cdevsw m2ua_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &m2uainfo,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,

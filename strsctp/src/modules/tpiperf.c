@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:53:34 $
+ @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:35 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:53:34 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpiperf.c,v $
+ Revision 0.9.2.4  2007/03/25 02:23:35  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.3  2007/03/25 00:53:34  brian
  - synchronization updates
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:53:34 $"
+#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:35 $"
 
-static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:53:34 $";
+static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:35 $";
 
 /*
  *  This is a TPI performance testing  module for SCTP that provides some specialized intput-output
@@ -83,7 +86,7 @@ static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define TPIPERF_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TPIPERF_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:53:34 $"
+#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:35 $"
 #define TPIPERF_DEVICE		"SVR 4.2 STREAMS TPI Performance Module (TPIPERF)"
 #define TPIPERF_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TPIPERF_LICENSE		"GPL"
@@ -728,7 +731,7 @@ MODULE_PARM_DESC(modid, "Module ID for the TIMOD module. (0 for allocation.)");
 STATIC struct fmodsw tpiperf_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &tpiperfinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 

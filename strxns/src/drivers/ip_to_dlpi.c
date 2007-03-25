@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/03/03 11:27:47 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/25 02:23:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 11:27:47 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:44 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/03/03 11:27:47 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/25 02:23:44 $"
 
 static char const ident[] =
-    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/03/03 11:27:47 $";
+    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/25 02:23:44 $";
 
 #include <sys/os7/compat.h>
 
@@ -75,7 +75,7 @@ static char const ident[] =
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.24 $) $Date: 2006/03/03 11:27:47 $"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.25 $) $Date: 2007/03/25 02:23:44 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"
@@ -1431,7 +1431,7 @@ MODULE_PARM_DESC(major, "Major device number for IP2XINET driver (0 for allocati
 STATIC struct cdevsw ip2xinet_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &ip2xinet_info,
-	.d_flag = 0,
+	.d_flag = D_MTPERQ,		/* consistent with LiS */
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,

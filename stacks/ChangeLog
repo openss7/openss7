@@ -1,5 +1,59 @@
 2007-03-25  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/modules/acb56/sdt_acb56.c: add D_MP flag
+	* src/modules/cd/cd_daed.c: add D_MP flag
+	* src/modules/cd/cd_hdlc.c: add D_MP flag
+	* src/modules/dl/dl.c: add D_MP flag
+	* src/modules/dl/dl_lapd.c: add D_MP flag
+	* src/modules/h225/h225.c: add D_MP flag
+	* src/modules/hdlc/hdlc.c: add D_MP flag
+	* src/modules/isdn/isdn.c: add D_MP flag
+	* src/modules/m2tp/m2tp.c: add D_MP flag
+	* src/modules/m2ua/m2ua.c: add D_MP flag
+	* src/modules/m3ua/m3ua.c: add D_MP flag
+	* src/modules/m3ua/m3ua_as.c: add D_MP flag
+	* src/modules/m3ua/m3ua_sg.c: add D_MP flag
+	* src/modules/mg/mg.c: add D_MP flag
+	* src/modules/mtp/mtp_npi.c: add D_MP flag
+	* src/modules/mtp/mtp_tpi.c: add D_MP flag
+	* src/modules/mx/mx_sdl.c: add D_MP flag
+	* src/modules/sdl/sdl.c: add D_MP flag
+	* src/modules/sdl/sdlm.c: add D_MP flag
+	* src/modules/sdl/spm.c: add D_MP flag
+	* src/modules/sdt/sdt.c: add D_MP flag
+	* src/modules/sl/sl.c: add D_MP flag
+	* src/modules/sl/sl_mux.c: add D_MP flag
+	* src/modules/sl/sl_mux.new.c: add D_MP flag
+	* src/modules/sl/sm_mod.c: add D_MP flag
+	* src/modules/ss7ip/sdt_tpi.c: add D_MP flag
+	* src/modules/ss7ip/sl_tpi.c: add D_MP flag
+	* src/modules/ss7sctp/sdl_sctp.c: add D_MP flag
+	* src/modules/ss7sctp/sdt_sctp.c: add D_MP flag
+	* src/modules/sscop/sscop.c: add D_MP flag
+	* src/modules/sscop/sscop2.c: add D_MP flag
+	* src/modules/sscop/sscop_n.c: add D_MP flag
+	* src/modules/sscop/sscop_t.c: add D_MP flag
+	* src/modules/sua/sua.c: add D_MP flag
+	* src/modules/tali/tali.c: add D_MP flag
+	* src/modules/tcap/tcap.c: add D_MP flag
+	* src/modules/ti/timod.c: add D_MP flag
+	* src/modules/ti/tirdwr.c: add D_MP flag
+	* src/modules/tua/tua.c: add D_MP flag
+	* src/modules/x400p-ss7/ch_x400p.c: add D_MP flag
+	* src/modules/x400p-ss7/mx_x400p.c: add D_MP flag
+	* src/modules/x400p-ss7/sdl_x400p.c: add D_MP flag
+	* src/modules/x400p-ss7/sdt_x400p.c: add D_MP flag
+	* src/modules/x400p-ss7/sl_v400p.c: add D_MP flag
+	* src/modules/x400p-ss7/sl_x100p.c: add D_MP flag
+	* src/modules/x400p-ss7/sl_x400p.new.c: add D_MP flag
+	* src/modules/x400p-ss7/sl_x400p.old.c: add D_MP flag
+	* src/modules/x400p-ss7/sl_x400p.older.c: add D_MP flag
+	* src/modules/x400p-ss7/sp_x400p.older.c: add D_MP flag
+	* src/modules/x400p-ss7/tmp.c: add D_MP flag
+	* src/modules/x400p-ss7/x100p-ss7.c: add D_MP flag
+	* src/modules/x400p-ss7/x400p-ss7.c: add D_MP flag
+	* src/modules/x400p-ss7/x400p_mx.c: add D_MP flag
+
 	* src/modules/acb56/sdt_acb56.c: register qlock option
 	* src/modules/cd/cd_daed.c: register qlock option
 	* src/modules/cd/cd_hdlc.c: register qlock option

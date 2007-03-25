@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:15 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:06 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:15 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcap.c,v $
+ Revision 0.9.2.16  2007/03/25 02:23:06  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.15  2007/03/25 00:52:15  brian
  - synchronization updates
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:15 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:06 $"
 
 static char const ident[] =
-    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:15 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:06 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -103,7 +106,7 @@ static char const ident[] =
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:15 $"
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:06 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -10144,7 +10147,7 @@ MODULE_PARM_DESC(major, "Device number for the TCAP driver. (0 for allocation.)"
 STATIC struct cdevsw tcap_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &tcapinfo,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,
