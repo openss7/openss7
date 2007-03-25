@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 00:53:47 $
+ @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:02:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:53:47 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np.c,v $
+ Revision 0.9.2.11  2007/03/25 19:02:47  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.10  2007/03/25 00:53:47  brian
  - synchronization updates
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 00:53:47 $"
+#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:02:47 $"
 
 static char const ident[] =
-    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 00:53:47 $";
+    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:02:47 $";
 
 /*
  *  This multiplexing driver is a master device driver for Network Provider streams presenting a
@@ -124,7 +127,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2007/03/25 00:53:47 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:02:47 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -314,9 +317,9 @@ enum {
 typedef streamscall int (*np_event_t) (queue_t *, struct np *, union ne_event *);
 typedef streamscall int (*dl_event_t) (queue_t *, struct dl *, union dl_event *);
 
-STATIC kmem_cache_t *np_priv_cachep;
-STATIC kmem_cache_t *np_link_cachep;
-STATIC kmem_cache_t *np_prot_cachep;
+STATIC kmem_cachep_t np_priv_cachep;
+STATIC kmem_cachep_t np_link_cachep;
+STATIC kmem_cachep_t np_prot_cachep;
 
 struct np {
 	STR_DECLARATION (struct np);	/* Stream declaration */
@@ -426,7 +429,7 @@ np_alloc(void)
 {
 	struct np *np;
 
-	if ((np = kmem_cache_alloc(np_priv_cachep, SLAB_ATOMIC))) {
+	if ((np = kmem_cache_alloc(np_priv_cachep, GFP_ATOMIC))) {
 		bzero(np, sizeof(*np));
 		atomic_set(&np->refcnt, 1);
 		spin_lock_init(&np->lock);	/* "np-lock" */
@@ -459,7 +462,7 @@ dl_alloc(void)
 {
 	struct dl *dl;
 
-	if ((dl = kmem_cache_alloc(np_link_cachep, SLAB_ATOMIC))) {
+	if ((dl = kmem_cache_alloc(np_link_cachep, GFP_ATOMIC))) {
 		bzero(dl, sizeof(*dl));
 		atomic_set(&dl->refcnt, 1);
 		spin_lock_init(&dl->lock);	/* "dl-lock" */
@@ -2982,7 +2985,7 @@ np_ip_bind(struct np *np)
 	for (i = 0; i < np->PROTOID_length; i++) {
 		struct np_prot *bp;
 
-		if (likely((bp = kmem_cache_alloc(np_proto_cachep, SLAB_ATOMIC)) != NULL)) {
+		if (likely((bp = kmem_cache_alloc(np_proto_cachep, GFP_ATOMIC)) != NULL)) {
 			bzero(bp, sizeof(*bp));
 			bp->np = np;
 			bp->protoid = np->PROTOID_buffer[i];
@@ -3043,7 +3046,7 @@ np_ip_conn(struct np *np)
 	for (i = 0; i < np->PROTOID_length; i++) {
 		struct np_prot *bp;
 
-		if (likely((bp = kmem_cache_alloc(np_proto_cachep, SLAB_ATOMIC)) != NULL)) {
+		if (likely((bp = kmem_cache_alloc(np_proto_cachep, GFP_ATOMIC)) != NULL)) {
 			bzero(bp, sizeof(*bp));
 			bp->np = np;
 			bp->protoid = np->PROTOID_buffer[i];
@@ -4443,6 +4446,7 @@ np_term_caches(void)
 {
 	err = 0;
 	if (np_priv_cachep != NULL) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(np_priv_cachep)) {
 			strlog(DRV_ID, 0, LOG_ERR, SL_ERROR | SL_CONSOLE,
 			       "could not destroy np_priv_cachep");
@@ -4450,8 +4454,12 @@ np_term_caches(void)
 		} else {
 			strlog(DRV_ID, 0, LOG_DEBUG, SL_TRACE, "destroyed np_priv_cachep");
 		}
+#else
+		kmem_cache_destroy(np_priv_cachep);
+#endif
 	}
 	if (np_link_cachep != NULL) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(np_link_cachep)) {
 			strlog(DRV_ID, 0, LOG_ERR, SL_ERROR | SL_CONSOLE,
 			       "could not destroy np_link_cachep");
@@ -4459,6 +4467,9 @@ np_term_caches(void)
 		} else {
 			strlog(DRV_ID, 0, LOG_DEBUG, SL_TRACE, "destroyed np_link_cachep");
 		}
+#else
+		kmem_cache_destroy(np_link_cachep);
+#endif
 	}
 	return (err);
 }
@@ -4762,7 +4773,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_parm
 MODULE_PARM(modid, "h");
 #else				/* module_parm */
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif				/* module_parm */
 MODULE_PARM_DESC(modid, "Module ID number for NP driver (0 for allocation).");
 
@@ -4771,7 +4782,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else				/* module_param */
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(major, "Major device number for NP driver (0 for allocation).");
 

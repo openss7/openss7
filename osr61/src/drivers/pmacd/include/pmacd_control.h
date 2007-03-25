@@ -81,7 +81,8 @@ typedef struct{
   UINT8_T successState; // Upon a successful response what state to move to.
   UINT8_T errorState;   // Upon an errored response what state to move to.
   struct timer_list responseTimer;     // Timer for waiting for response.
-#ifdef LINUX24
+//#ifdef LINUX24
+#if 1
 #ifdef LFS
   struct tasklet_struct handleResponseTask; // Task to process responses when they arrive.
 #else

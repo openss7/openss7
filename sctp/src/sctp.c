@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/08 12:38:24 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 18:58:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/08 12:38:24 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:58:27 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/08 12:38:24 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 18:58:27 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/08 12:38:24 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 18:58:27 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -164,9 +164,9 @@ static char const ident[] =
 #include "include/linux/hooks.h"
 #include "include/netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.38 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.39 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/08 12:38:24 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 18:58:27 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2122,10 +2122,10 @@ skb_init_cksum(struct sk_buff *skb)
  *  contained inside the sock structure on the Linux Natvie (Sockets) version.
  */
 
-STATIC kmem_cache_t *sctp_bind_cachep = NULL;
-STATIC kmem_cache_t *sctp_dest_cachep = NULL;
-STATIC kmem_cache_t *sctp_srce_cachep = NULL;
-STATIC kmem_cache_t *sctp_strm_cachep = NULL;
+STATIC kmem_cachep_t sctp_bind_cachep = NULL;
+STATIC kmem_cachep_t sctp_dest_cachep = NULL;
+STATIC kmem_cachep_t sctp_srce_cachep = NULL;
+STATIC kmem_cachep_t sctp_strm_cachep = NULL;
 STATIC void
 sctp_init_caches(void)
 {
@@ -2189,7 +2189,7 @@ sctp_get(void)
 {
 	sctp_t *sp;
 
-	if ((sp = kmem_cache_alloc(sctp_sctp_cachep, SLAB_ATOMIC))) {
+	if ((sp = kmem_cache_alloc(sctp_sctp_cachep, GFP_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		atomic_set(&sp->refcnt, 1);
 	}
@@ -2214,7 +2214,7 @@ sctp_dget(void)
 {
 	struct sctp_daddr *sd;
 
-	if ((sd = kmem_cache_alloc(sctp_dest_cachep, SLAB_ATOMIC))) {
+	if ((sd = kmem_cache_alloc(sctp_dest_cachep, GFP_ATOMIC))) {
 		bzero(sd, sizeof(*sd));
 		atomic_set(&sd->refcnt, 1);
 	}
@@ -2855,7 +2855,7 @@ __sctp_saddr_alloc(sctp_t * sp, uint32_t saddr, int *errp)
 		return (NULL);
 	}
 #endif				/* sysctl_ip_nonlocal_bind */
-	if ((ss = kmem_cache_alloc(sctp_srce_cachep, SLAB_ATOMIC))) {
+	if ((ss = kmem_cache_alloc(sctp_srce_cachep, GFP_ATOMIC))) {
 		printd(("INFO: Allocating source address %d.%d.%d.%d for sp = %p\n",
 			(saddr >> 0) & 0xff, (saddr >> 8) & 0xff, (saddr >> 16) & 0xff,
 			(saddr >> 24) & 0xff, sp));
@@ -3013,7 +3013,7 @@ sctp_strm_alloc(struct sctp_strm **stp, uint16_t sid, int *errp)
 {
 	struct sctp_strm *st;
 
-	if ((st = kmem_cache_alloc(sctp_strm_cachep, SLAB_ATOMIC))) {
+	if ((st = kmem_cache_alloc(sctp_strm_cachep, GFP_ATOMIC))) {
 		bzero(st, sizeof(*st));
 		if ((st->next = (*stp)))
 			st->next->prev = &st->next;
@@ -3423,7 +3423,7 @@ __sctp_bindb_create(unsigned short snum)
 {
 	struct sctp_bind_bucket *sb;
 
-	if ((sb = kmem_cache_alloc(sctp_bind_cachep, SLAB_ATOMIC))) {
+	if ((sb = kmem_cache_alloc(sctp_bind_cachep, GFP_ATOMIC))) {
 		struct sctp_bhash_bucket *hp = &sctp_bhash[sctp_bhashfn(snum)];
 
 		printd(("INFO: Allocating bind bucket for port = %d\n", snum));

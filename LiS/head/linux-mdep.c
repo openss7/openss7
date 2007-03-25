@@ -394,15 +394,15 @@ typedef struct lis_free_passfp_tg {
 static lis_free_passfp_t free_passfp;
 
 #if defined(USE_KMEM_CACHE)
-kmem_cache_t *lis_msgb_cachep = NULL;
-kmem_cache_t *lis_queue_cachep = NULL;
-kmem_cache_t *lis_qsync_cachep = NULL;
-kmem_cache_t *lis_qband_cachep = NULL;
-kmem_cache_t *lis_head_cachep = NULL;
+kmem_cachep_t lis_msgb_cachep = NULL;
+kmem_cachep_t lis_queue_cachep = NULL;
+kmem_cachep_t lis_qsync_cachep = NULL;
+kmem_cachep_t lis_qband_cachep = NULL;
+kmem_cachep_t lis_head_cachep = NULL;
 #endif
 
 #if defined(USE_KMEM_TIMER)
-kmem_cache_t *lis_timer_cachep = NULL;
+kmem_cachep_t lis_timer_cachep = NULL;
 struct lis_timer {
 	struct timer_list lt;
 	timo_fcn_t *func;
@@ -463,7 +463,7 @@ extern lis_atomic_t lis_putnext_flag;
 extern lis_atomic_t lis_runq_req_cnt;
 extern lis_spin_lock_t lis_qhead_lock;
 
-extern void lis_cache_destroy(kmem_cache_t *p, lis_atomic_t *c, char *label);
+extern void lis_cache_destroy(kmem_cachep_t p, lis_atomic_t *c, char *label);
 
 /*  -------------------------------------------------------------------  */
 
@@ -5040,7 +5040,7 @@ lis_terminate_msg(void)
 ************************************************************************/
 
 void
-lis_cache_destroy(kmem_cache_t *p, lis_atomic_t *c, char *label)
+lis_cache_destroy(kmem_cachep_t p, lis_atomic_t *c, char *label)
 {
 	int n = K_ATOMIC_READ(c);
 

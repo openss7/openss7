@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:14 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/25 19:02:30 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:51:14 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:30 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:14 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/25 19:02:30 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:14 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/25 19:02:30 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
@@ -70,7 +70,7 @@ static char const ident[] =
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2006/09/29 11:51:14 $"
+#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/25 19:02:30 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"
@@ -106,7 +106,7 @@ modID_t modid = CONFIG_STREAMS_CONNLD_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for CONNLD.");
 

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/05 23:01:54 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/03/25 19:00:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/05 23:01:54 $ by $Author: brian $
+# Last Modified $Date: 2007/03/25 19:00:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -659,6 +659,7 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -672,7 +673,7 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 ])
     AC_SUBST([EXPOSED_SYMBOLS])dnl
     _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
-			process_group cpu_raise_softirq check_region pcibios_init \
+			process_group process_session cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \
 			pcibios_read_config_byte pcibios_read_config_dword \
 			pcibios_read_config_word pcibios_write_config_byte \
@@ -683,8 +684,8 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 			pci_dac_page_to_dma pci_dac_dma_to_page \
 			pci_dac_dma_to_offset vmalloc vfree \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
-			read_trylock write_trylock \
-			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti path_lookup], [:], [
+			read_trylock write_trylock atomic_add_return path_lookup \
+			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti], [:], [
 			case "$lk_func" in
 			    pcibios_*)
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
@@ -700,6 +701,7 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -709,6 +711,9 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#ifdef HAVE_KINC_LINUX_CPUMASK_H
+#include <linux/cpumask.h>
+#endif
 #include <linux/sched.h>
 #include <linux/wait.h>
 #ifdef HAVE_KINC_LINUX_KDEV_T_H
@@ -727,14 +732,24 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 #ifdef HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_interrupt */
 #endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
 #include <linux/ioport.h>	/* for check_region */
 #include <linux/pci.h>		/* for pci checks */
+#ifdef HAVE_KINC_ASM_UACCESS_H
+#include <asm/uaccess.h>
+#endif
+#ifdef HAVE_KINC_LINUX_COMPAT_H
+#include <linux/compat.h>
+#endif
 ])
     _LINUX_CHECK_MACROS([MOD_DEC_USE_COUNT MOD_INC_USE_COUNT \
 			 read_trylock write_trylock], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -761,11 +776,15 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 #include <linux/interrupt.h>	/* for cpu_raise_softirq */
 #include <linux/ioport.h>	/* for check_region */
 #include <linux/pci.h>		/* for pci checks */
+#ifdef HAVE_KINC_ASM_UACCESS_H
+#include <asm/uaccess.h>
+#endif
 ])
-    _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
+    _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -790,8 +809,19 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 #ifdef HAVE_KINC_LINUX_HARDIRQ_H
 #include <linux/hardirq.h>	/* for in_interrupt */
 #endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
 #include <linux/time.h>		/* for struct timespec */
 ])
+    AH_TEMPLATE([kmem_cachep_t], [This kmem_cache_t is deprecated in recent
+	2.6.20 kernels.  When it is deprecated, define this to struct
+	kmem_cache *.])
+    if test :"${linux_cv_type_kmem_cache_t_p:-no}" = :no ; then
+	AC_DEFINE_UNQUOTED([kmem_cachep_t], [struct kmem_cache *])
+    else
+	AC_DEFINE_UNQUOTED([kmem_cachep_t], [kmem_cache_t *])
+    fi
 dnl 
 dnl In later kernels, the super_block.u.geneic_sbp and the filesystem specific
 dnl union u itself have been removed and a simple void pointer for filesystem
@@ -810,6 +840,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -819,6 +850,7 @@ dnl
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
+#include <linux/file.h>
 #include <linux/sched.h>
 #include <linux/wait.h>
 #ifdef HAVE_KINC_LINUX_STATFS_H
@@ -840,6 +872,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -874,6 +907,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H

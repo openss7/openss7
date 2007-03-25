@@ -370,12 +370,17 @@ int    ctimod_remap_page_range(struct vm_area_struct *, ulong, ulong, ulong, pgp
 int    ctimod_register_chrdev(uint, const char *, struct file_operations *);
 void   ctimod_remove_proc_entry(const char *,  struct proc_dir_entry *);
 void   ctimod_remove_wait_queue(wait_queue_head_t *,  wait_queue_t *);
-#ifdef LINUX24
-int    ctimod_request_irq(uint, void (*handler)(int, void *, struct pt_regs *),
-	       				   	  ulong, const char *, void *);
+#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+int	ctimod_request_irq(uint irq, irq_handler_t handler,
+	       				  ulong flag, const char *dev, void *id);
 #else
+#ifdef HAVE_KTYPE_IRQRETURN_T
 int    ctimod_request_irq(uint, irqreturn_t (*handler)(int, void *, struct pt_regs *),
 	       				   	  ulong, const char *, void *);
+#else
+int    ctimod_request_irq(uint, void (*handler)(int, void *, struct pt_regs *),
+	       				   	  ulong, const char *, void *);
+#endif
 #endif
 void   ctimod_schedule(void);
 void   ctimod_schedule_timeout(signed long);

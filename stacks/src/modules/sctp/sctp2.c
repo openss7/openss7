@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 05:59:33 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 18:59:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 05:59:33 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.23  2007/03/25 18:59:59  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.22  2007/03/25 05:59:33  brian
  - flush corrections
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 05:59:33 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 18:59:59 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 05:59:33 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 18:59:59 $";
 
 #include "sctp_compat.h"
 
@@ -82,7 +85,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 05:59:33 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 18:59:59 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2416,11 +2419,11 @@ skb_init_cksum(mblk_t *mp)
  *  Note that the STREAMS version has an extra cache for the SCTP private structure.  This is
  *  contained inside the sock structure on the Linux Natvie (Sockets) version.
  */
-STATIC kmem_cache_t *sctp_sctp_cachep = NULL;
-STATIC kmem_cache_t *sctp_bind_cachep = NULL;
-STATIC kmem_cache_t *sctp_dest_cachep = NULL;
-STATIC kmem_cache_t *sctp_srce_cachep = NULL;
-STATIC kmem_cache_t *sctp_strm_cachep = NULL;
+STATIC kmem_cachep_t sctp_sctp_cachep = NULL;
+STATIC kmem_cachep_t sctp_bind_cachep = NULL;
+STATIC kmem_cachep_t sctp_dest_cachep = NULL;
+STATIC kmem_cachep_t sctp_srce_cachep = NULL;
+STATIC kmem_cachep_t sctp_strm_cachep = NULL;
 STATIC void
 sctp_init_caches(void)
 {
@@ -2460,21 +2463,41 @@ sctp_term_caches(void)
 {
 #if STREAMS
 	if (sctp_sctp_cachep)
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sctp_sctp_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy sctp_sctp_cachep", __FUNCTION__);
+#else
+		kmem_cache_destroy(sctp_sctp_cachep);
+#endif
 #endif				/* STREAMS */
 	if (sctp_bind_cachep)
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sctp_bind_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy sctp_bind_cachep", __FUNCTION__);
+#else
+		kmem_cache_destroy(sctp_bind_cachep);
+#endif
 	if (sctp_dest_cachep)
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sctp_dest_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy sctp_dest_cachep", __FUNCTION__);
+#else
+		kmem_cache_destroy(sctp_dest_cachep);
+#endif
 	if (sctp_srce_cachep)
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sctp_srce_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy sctp_srce_cachep", __FUNCTION__);
+#else
+		kmem_cache_destroy(sctp_srce_cachep);
+#endif
 	if (sctp_strm_cachep)
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sctp_strm_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy sctp_strm_cachep", __FUNCTION__);
+#else
+		kmem_cache_destroy(sctp_strm_cachep);
+#endif
 	return;
 }
 #endif				/* defined SCTP_CONFIG_MODULE */
@@ -2484,7 +2507,7 @@ sctp_get(void)
 {
 	sctp_t *sp;
 
-	if ((sp = kmem_cache_alloc(sctp_sctp_cachep, SLAB_ATOMIC))) {
+	if ((sp = kmem_cache_alloc(sctp_sctp_cachep, GFP_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		atomic_set(&sp->refcnt, 1);
 	}
@@ -2511,7 +2534,7 @@ sctp_dget(void)
 {
 	struct sctp_daddr *sd;
 
-	if ((sd = kmem_cache_alloc(sctp_dest_cachep, SLAB_ATOMIC))) {
+	if ((sd = kmem_cache_alloc(sctp_dest_cachep, GFP_ATOMIC))) {
 		bzero(sd, sizeof(*sd));
 		atomic_set(&sd->refcnt, 1);
 	}
@@ -3186,7 +3209,7 @@ __sctp_saddr_alloc(sctp_t * sp, uint32_t saddr, int *errp)
 		return (NULL);
 	}
 #endif				/* sysctl_ip_nonlocal_bind */
-	if ((ss = kmem_cache_alloc(sctp_srce_cachep, SLAB_ATOMIC))) {
+	if ((ss = kmem_cache_alloc(sctp_srce_cachep, GFP_ATOMIC))) {
 		printd(("INFO: Allocating source address %d.%d.%d.%d for sp = %p\n",
 			(saddr >> 0) & 0xff, (saddr >> 8) & 0xff, (saddr >> 16) & 0xff,
 			(saddr >> 24) & 0xff, sp));
@@ -3341,7 +3364,7 @@ sctp_strm_alloc(struct sctp_strm **stp, uint16_t sid, int *errp)
 {
 	struct sctp_strm *st;
 
-	if ((st = kmem_cache_alloc(sctp_strm_cachep, SLAB_ATOMIC))) {
+	if ((st = kmem_cache_alloc(sctp_strm_cachep, GFP_ATOMIC))) {
 		bzero(st, sizeof(*st));
 		if ((st->next = (*stp)))
 			st->next->prev = &st->next;
@@ -3751,7 +3774,7 @@ __sctp_bindb_create(unsigned short snum)
 {
 	struct sctp_bind_bucket *sb;
 
-	if ((sb = kmem_cache_alloc(sctp_bind_cachep, SLAB_ATOMIC))) {
+	if ((sb = kmem_cache_alloc(sctp_bind_cachep, GFP_ATOMIC))) {
 		struct sctp_bhash_bucket *hp = &sctp_bhash[sctp_bhashfn(snum)];
 
 		printd(("INFO: Allocating bind bucket for port = %d\n", snum));
@@ -16583,7 +16606,7 @@ unsigned short n_modid = SCTP_N_DRV_ID;
 #ifndef module_param
 MODULE_PARM(n_modid, "h");
 #else
-module_param(n_modid, ushort, 0);
+module_param(n_modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(n_modid, "Module ID number for STREAMS SCTP NPI driver (0 for allocation).");
 
@@ -16592,7 +16615,7 @@ major_t n_major = SCTP_N_CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(n_major, "h");
 #else
-module_param(n_major, uint, 0);
+module_param(n_major, uint, 0444);
 #endif
 MODULE_PARM_DESC(n_major, "Major device number for STREAMS SCTP NPI driver (0 for allocation).");
 

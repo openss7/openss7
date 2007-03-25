@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:33 $
+ @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:01:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:33 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcpns.c,v $
+ Revision 0.9.2.5  2007/03/25 19:01:53  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.4  2007/03/25 02:23:33  brian
  - add D_MP and D_MTPERQ flags
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:33 $"
+#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:01:53 $"
 
 static char const ident[] =
-    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:33 $";
+    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:01:53 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
@@ -103,7 +106,7 @@ static char const ident[] =
 
 #define TCPNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCPNS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:33 $"
+#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:01:53 $"
 #define TCPNS_DEVICE	"SVR 4.2 STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCPNS_LICENSE	"GPL"
@@ -202,7 +205,7 @@ struct tcpns {
 	ulong cons;			/* outstanding connection indications */
 };
 
-static kmem_cache_t *tcpns_priv_cachep = NULL;
+static kmem_cachep_t tcpns_priv_cachep = NULL;
 
 static int
 tcpns_init_caches(void)
@@ -222,11 +225,15 @@ static int
 tcpns_term_caches(void)
 {
 	if (tcpns_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(tcpns_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: %s: did not destroy tcpns_priv_cachep", MOD_NAME,
 				__FUNCTION__);
 			return (-EBUSY);
 		}
+#else
+		kmem_cache_destroy(tcpns_priv_cachep);
+#endif
 	}
 	return (0);
 }
@@ -236,7 +243,7 @@ tcpns_alloc_priv(queue_t *q)
 {
 	struct tcpns *priv;
 
-	if ((priv = kmem_cache_alloc(tcpns_priv_cachep, SLAB_ATOMIC))) {
+	if ((priv = kmem_cache_alloc(tcpns_priv_cachep, GFP_ATOMIC))) {
 		bzero(priv, sizeof(*priv));
 		priv->rq = q;
 		priv->wq = WR(q);
@@ -464,7 +471,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for TCPNS module. (0 for allocation.)");
 

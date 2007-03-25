@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 05:59:45 $
+ @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:22 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 05:59:45 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop.c,v $
+ Revision 0.9.2.14  2007/03/25 19:00:22  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.13  2007/03/25 05:59:45  brian
  - flush corrections
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 05:59:45 $"
+#ident "@(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:22 $"
 
 static char const ident[] =
-    "$RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 05:59:45 $";
+    "$RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:22 $";
 
 /*
  *  This driver provides the functionality of SSCOP-MCE over a connectionless
@@ -89,7 +92,7 @@ static char const ident[] =
 //#include "sscop_input.h"
 
 #define SSCOP_DESCRIP	"SSCOPMCE/IP STREAMS DRIVER."
-#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 05:59:45 $"
+#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:22 $"
 #define SSCOP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2643,7 +2646,7 @@ sscop_rsrv(q)
  *  aligned cache here for speedy access to information contained in the
  *  private data structure.
  */
-kmem_cache_t *sscop_cachep = NULL;
+kmem_cachep_t sscop_cachep = NULL;
 
 STATIC sscop_t *
 sscop_alloc_priv(queue_t *q)
@@ -2726,7 +2729,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SSCOP module. (0 for allocation.)");
 

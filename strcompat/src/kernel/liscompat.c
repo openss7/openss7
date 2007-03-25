@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/25 00:52:34 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:01:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:34 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: liscompat.c,v $
+ Revision 0.9.2.44  2007/03/25 19:01:04  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.43  2007/03/25 00:52:34  brian
  - synchronization updates
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/25 00:52:34 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:01:04 $"
 
-static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/25 00:52:34 $";
+static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:01:04 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -88,7 +91,7 @@ static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/25 00:52:34 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:01:04 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -1397,6 +1400,14 @@ lis_request_dma(unsigned int dma_nr, const char *device_id)
 }
 
 EXPORT_SYMBOL(lis_request_dma);
+#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+_RP int
+lis_request_irq(unsigned int irq, irq_handler_t handler,
+		unsigned long flags, const char *device, void *dev_id)
+{
+	return WARN(request_irq(irq, handler, flags, device, dev_id));
+}
+#else
 #ifdef HAVE_KTYPE_IRQRETURN_T
 _RP int
 lis_request_irq(unsigned int irq, irqreturn_t(*handler) (int, void *, struct pt_regs *),
@@ -1411,6 +1422,7 @@ lis_request_irq(unsigned int irq, void (*handler) (int, void *, struct pt_regs *
 {
 	return WARN(request_irq(irq, handler, flags, device, dev_id));
 }
+#endif
 #endif
 
 EXPORT_SYMBOL(lis_request_irq);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 02:23:09 $
+ @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 19:00:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:09 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_x400p.c,v $
+ Revision 0.9.2.19  2007/03/25 19:00:38  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.18  2007/03/25 02:23:09  brian
  - add D_MP and D_MTPERQ flags
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 02:23:09 $"
+#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 19:00:38 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 02:23:09 $";
+    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 19:00:38 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides all of
@@ -102,7 +105,7 @@ static char const ident[] =
 
 #define SDL_X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS DRIVER."
 #define SDL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2007/03/25 02:23:09 $"
+#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2007/03/25 19:00:38 $"
 #define SDL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2586,10 +2589,10 @@ xp_close(queue_t *q, int flag, cred_t *crp)
  *  ==========================================================================
  */
 
-STATIC kmem_cache_t *xp_priv_cachep = NULL;
-STATIC kmem_cache_t *xp_span_cachep = NULL;
-STATIC kmem_cache_t *xp_card_cachep = NULL;
-STATIC kmem_cache_t *xp_xbuf_cachep = NULL;
+STATIC kmem_cachep_t xp_priv_cachep = NULL;
+STATIC kmem_cachep_t xp_span_cachep = NULL;
+STATIC kmem_cachep_t xp_card_cachep = NULL;
+STATIC kmem_cachep_t xp_xbuf_cachep = NULL;
 
 /*
  *  Cache allocation
@@ -2642,32 +2645,48 @@ xp_term_caches(void)
 {
 	int err = 0;
 	if (xp_xbuf_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(xp_xbuf_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_xbuf_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("X400P-SS7: destroyed xp_xbuf_cache\n"));
+#else
+		kmem_cache_destroy(xp_xbuf_cachep);
+#endif
 	}
 	if (xp_card_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(xp_card_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_card_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("X400P-SS7: destroyed xp_card_cache\n"));
+#else
+		kmem_cache_destroy(xp_card_cachep);
+#endif
 	}
 	if (xp_span_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(xp_span_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_span_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("X400P-SS7: destroyed xp_span_cache\n"));
+#else
+		kmem_cache_destroy(xp_span_cachep);
+#endif
 	}
 	if (xp_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(xp_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_priv_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("X400P-SS7: destroyed xp_priv_cache\n"));
+#else
+		kmem_cache_destroy(xp_priv_cachep);
+#endif
 	}
 	return (err);
 }
@@ -2680,7 +2699,7 @@ STATIC struct xp *
 xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t *crp)
 {
 	struct xp *xp;
-	if ((xp = kmem_cache_alloc(xp_priv_cachep, SLAB_ATOMIC))) {
+	if ((xp = kmem_cache_alloc(xp_priv_cachep, GFP_ATOMIC))) {
 		printd(("X400P-SS7: allocated device private structure\n"));
 		bzero(xp, sizeof(*xp));
 		xp_get(xp);	/* first get */
@@ -2786,7 +2805,7 @@ STATIC struct sp *
 xp_alloc_sp(struct cd *cd, uint8_t span)
 {
 	struct sp *sp;
-	if ((sp = kmem_cache_alloc(xp_span_cachep, SLAB_ATOMIC))) {
+	if ((sp = kmem_cache_alloc(xp_span_cachep, GFP_ATOMIC))) {
 		printd(("X400P-SS7: allocated span private structure\n"));
 		bzero(sp, sizeof(*sp));
 		cd_get(cd);	/* first get */
@@ -2869,16 +2888,16 @@ STATIC struct cd *
 xp_alloc_cd(void)
 {
 	struct cd *cd;
-	if ((cd = kmem_cache_alloc(xp_card_cachep, SLAB_ATOMIC))) {
+	if ((cd = kmem_cache_alloc(xp_card_cachep, GFP_ATOMIC))) {
 		uint32_t *wbuf;
 		uint32_t *rbuf;
 		printd(("X400P-SS7: allocated card private structure\n"));
-		if (!(wbuf = kmem_cache_alloc(xp_xbuf_cachep, SLAB_ATOMIC))) {
+		if (!(wbuf = kmem_cache_alloc(xp_xbuf_cachep, GFP_ATOMIC))) {
 			ptrace(("X400P-SS7: could not allocate write buffer\n"));
 			kmem_cache_free(xp_card_cachep, cd);
 			return (NULL);
 		}
-		if (!(rbuf = kmem_cache_alloc(xp_xbuf_cachep, SLAB_ATOMIC))) {
+		if (!(rbuf = kmem_cache_alloc(xp_xbuf_cachep, GFP_ATOMIC))) {
 			ptrace(("X400P-SS7: could not allocate read buffer\n"));
 			kmem_cache_free(xp_xbuf_cachep, wbuf);
 			kmem_cache_free(xp_card_cachep, cd);
@@ -3293,7 +3312,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the X400-SDL driver. (0 for allocation.)");
 
@@ -3301,7 +3320,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the X400-SDL driver. (0 for allocation.)");
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:53:42 $
+ @(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:35 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:53:42 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rtp.c,v $
+ Revision 0.9.2.3  2007/03/25 19:02:35  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.2  2007/03/25 00:53:42  brian
  - synchronization updates
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:53:42 $"
+#ident "@(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:35 $"
 
-static char const ident[] = "$RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:53:42 $";
+static char const ident[] = "$RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:35 $";
 
 /*
  *  This driver provides the functionality of an RTP (Realtime Transport
@@ -107,7 +110,7 @@ static char const ident[] = "$RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.2 $)
 #define RTP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RTP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define RTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define RTP_REVISION	"OpenSS7 $RCSfile: rtp.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:53:42 $"
+#define RTP_REVISION	"OpenSS7 $RCSfile: rtp.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:35 $"
 #define RTP_DEVICE	"SVR 4.2 STREAMS RTP Driver"
 #define RTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RTP_LICENSE	"GPL"
@@ -274,8 +277,8 @@ STATIC struct df master;
  *  approach comes from a paper writen by someone working for Sun.)  Therefore,
  *  at least there aren't many GPL issues here...
  */
-STATIC kmem_cache_t *rtp_open_cachep = NULL;
-STATIC kmem_cache_t *rtp_link_cachep = NULL;
+STATIC kmem_cachep_t rtp_open_cachep = NULL;
+STATIC kmem_cachep_t rtp_link_cachep = NULL;
 
 /**
  * rtp_term_caches: - terminate memory caches for private structures
@@ -286,18 +289,26 @@ rtp_term_caches(void)
 	int err = 0;
 
 	if (rtp_link_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(rtp_link_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy rtp_link_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed rtp_link_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(rtp_link_cachep);
+#endif
 	}
 	if (rtp_open_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(rtp_open_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy rtp_open_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed rtp_open_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(rtp_open_cachep);
+#endif
 	}
 	return (err);
 }
@@ -370,7 +381,7 @@ rtp_alloc_open(queue_t *q, struct rtp **rtpp, dev_t *devp, cred_t *crp)
 
 	printd(("%s: %s: create rtp dev = %d:%d\n", DRV_NAME, __FUNCTION__, getmajor(*devp),
 		getminor(*devp)));
-	if ((rtp = kmem_cache_alloc(rtp_open_cachep, SLAB_ATOMIC))) {
+	if ((rtp = kmem_cache_alloc(rtp_open_cachep, GFP_ATOMIC))) {
 		bzero(rtp, sizeof(*rtp));
 		rtp_get(rtp);	/* first get */
 		rtp->u.dev.cmajor = getmajor(*devp);
@@ -489,7 +500,7 @@ rtp_alloc_link(queue_t *q, struct nip **nipp, ulong index, cred_t *crp)
 	pl_t pl;
 
 	printd(("%s: %s: create nip index = %lu\n", DRV_NAME, __FUNCTION__, index));
-	if ((nip = kmem_cache_alloc(rtp_link_cachep, SLAB_ATOMIC))) {
+	if ((nip = kmem_cache_alloc(rtp_link_cachep, GFP_ATOMIC))) {
 		bzero(nip, sizeof(*nip));
 		nip_get(nip);	/* first get */
 		nip->u.mux.index = index;
@@ -1454,7 +1465,7 @@ modID_t modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else				/* module_param */
-module_param(modid, modID_t, 0);
+module_param(modid, modID_t, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for the RTP driver. (0 for allocation.)");
 
@@ -1463,7 +1474,7 @@ major_t major = DRV_ID;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else				/* module_param */
-module_param(major, major_t, 0);
+module_param(major, major_t, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Device number for the RTP driver. (0 for allocation.)");
 

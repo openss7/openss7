@@ -85,7 +85,7 @@
 
 typedef struct {
 	const char *name;
-	kmem_cache_t *cache_struct;
+	kmem_cachep_t cache_struct;
 	int size;
 	int kflags;
 
@@ -391,8 +391,8 @@ lis_free_all_pages(void)
 ************************************************************************/
 
 typedef struct {
-	kmem_cache_t *slab_ptr;
-	unsigned char __pad[SMP_CACHE_BYTES - (sizeof(kmem_cache_t *) % SMP_CACHE_BYTES)];
+	kmem_cachep_t slab_ptr;
+	unsigned char __pad[SMP_CACHE_BYTES - (sizeof(kmem_cachep_t) % SMP_CACHE_BYTES)];
 
 } mem_hdr_t;
 
@@ -406,7 +406,7 @@ lis__kmalloc(int nbytes, int class, int use_cache)
 {
 	mem_hdr_space_t *p;
 	lis_slab_table_t *tp;
-	kmem_cache_t *cp = NULL;
+	kmem_cachep_t cp = NULL;
 
 	nbytes += sizeof(mem_hdr_space_t);
 

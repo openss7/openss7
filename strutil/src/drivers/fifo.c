@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/10/12 10:27:36 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/25 19:02:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 10:27:36 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/10/12 10:27:36 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/25 19:02:29 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/10/12 10:27:36 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/25 19:02:29 $";
 
 #define _LFS_SOURCE
 
@@ -75,7 +75,7 @@ extern struct file_operations strm_f_ops;
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/10/12 10:27:36 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/25 19:02:29 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -115,7 +115,7 @@ modID_t modid = CONFIG_STREAMS_FIFO_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module identification number for STREAMS-based FIFOs");
 
@@ -129,7 +129,7 @@ major_t major = CONFIG_STREAMS_FIFO_MAJOR;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for STREAMS-based FIFOs.");
 

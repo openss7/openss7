@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:36 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:22:36 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl.c,v $
+ Revision 0.9.2.16  2007/03/25 18:59:15  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.15  2007/03/25 02:22:36  brian
  - add D_MP and D_MTPERQ flags
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:36 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:15 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:36 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:15 $";
 
 #include <sys/os7/compat.h>
 #include <linux/kmod.h>
@@ -74,8 +77,8 @@ static char const ident[] =
  *  obviates the need for this driver.
  */
 
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.15 $)"
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:36 $"
+#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.16 $)"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:15 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -314,7 +317,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the DL driver. (0 for allocation.)");
 
@@ -322,7 +325,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the DL driver. (0 for allocation.)");
 

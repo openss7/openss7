@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 23:19:37 $
+ @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 23:19:37 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:58:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.7  2007/03/25 18:58:41  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.6  2007/03/12 23:19:37  brian
  - changes for function type safety
 
@@ -115,10 +118,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 23:19:37 $"
+#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:41 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 23:19:37 $";
+    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:41 $";
 
 /*
  *  This is an M3UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -151,6 +154,10 @@ static char const ident[] =
  *
  */
 
+#ifndef HAVE_KTYPE_BOOL
+#include <stdbool.h>
+#endif
+
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
@@ -159,7 +166,6 @@ static char const ident[] =
 #define _DEBUG	1
 //#undef    _DEBUG
 
-#include <stdbool.h>
 #include <sys/os7/compat.h>
 #include <sys/strsun.h>
 
@@ -220,7 +226,7 @@ static char const ident[] =
 /* ============================== */
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2007/03/12 23:19:37 $"
+#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:41 $"
 #define M3UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -18301,7 +18307,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the M3UA-AS driver. (0 for allocation.)");
 
@@ -18310,7 +18316,7 @@ unsigned short major = DRV_CMAJOR;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else				/* module_param */
-module_param(major, ushort, DRV_CMAJOR);
+module_param(major, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(major, "Major device number for M3UA-AS driver.  (0 for allocation.)");
 

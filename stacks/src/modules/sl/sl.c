@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:22:58 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 19:00:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:22:58 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl.c,v $
+ Revision 0.9.2.20  2007/03/25 19:00:15  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.19  2007/03/25 02:22:58  brian
  - add D_MP and D_MTPERQ flags
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:22:58 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 19:00:15 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:22:58 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 19:00:15 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -91,7 +94,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:22:58 $"
+#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 19:00:15 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -5824,7 +5827,7 @@ sl_close(queue_t *q, int flag, cred_t *crp)
  *
  *  =========================================================================
  */
-STATIC kmem_cache_t *sl_priv_cachep = NULL;
+STATIC kmem_cachep_t sl_priv_cachep = NULL;
 STATIC int
 sl_init_caches(void)
 {
@@ -5842,11 +5845,15 @@ STATIC int
 sl_term_caches(void)
 {
 	if (sl_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sl_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sl_priv_cachep", __FUNCTION__);
 			return (-EBUSY);
 		} else
 			printd(("%s: destroyed sl_priv_cachep\n", MOD_NAME));
+#else
+		kmem_cache_destroy(sl_priv_cachep);
+#endif
 	}
 	return (0);
 }
@@ -5854,7 +5861,7 @@ STATIC struct sl *
 sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 {
 	struct sl *sl;
-	if ((sl = kmem_cache_alloc(sl_priv_cachep, SLAB_ATOMIC))) {
+	if ((sl = kmem_cache_alloc(sl_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: allocated module private structure\n", MOD_NAME));
 		bzero(sl, sizeof(*sl));
 		sl_get(sl);	/* first get */
@@ -5951,7 +5958,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SL module. (0 for allocation.)");
 

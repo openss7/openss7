@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/25 02:23:40 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/25 19:02:39 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:40 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tirdwr.c,v $
+ Revision 0.9.2.29  2007/03/25 19:02:39  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.28  2007/03/25 02:23:40  brian
  - add D_MP and D_MTPERQ flags
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/25 02:23:40 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/25 19:02:39 $"
 
-static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/25 02:23:40 $";
+static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/25 19:02:39 $";
 
 #include <sys/os7/compat.h>
 
@@ -81,7 +84,7 @@ static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.2
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/25 02:23:40 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/25 19:02:39 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -184,7 +187,7 @@ typedef struct tirdwr {
 	bcid_t eproto_bcid;		/* bufcall id for sending M_ERROR */
 } tirdwr_t;
 
-static kmem_cache_t *tirdwr_priv_cachep = NULL;
+static kmem_cachep_t tirdwr_priv_cachep = NULL;
 
 static int
 tirdwr_init_caches(void)
@@ -204,11 +207,15 @@ static int
 tirdwr_term_caches(void)
 {
 	if (tirdwr_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(tirdwr_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: %s: did not destroy tirdwr_priv_cachep", MOD_NAME,
 				__FUNCTION__);
 			return (-EBUSY);
 		}
+#else
+		kmem_cache_destroy(tirdwr_priv_cachep);
+#endif
 	}
 	return (0);
 }
@@ -218,7 +225,7 @@ tirdwr_alloc_priv(queue_t *q)
 {
 	tirdwr_t *priv;
 
-	if ((priv = kmem_cache_alloc(tirdwr_priv_cachep, SLAB_ATOMIC))) {
+	if ((priv = kmem_cache_alloc(tirdwr_priv_cachep, GFP_ATOMIC))) {
 		priv->rq = q;
 		priv->wq = WR(q);
 		priv->hq = q->q_next;
@@ -827,7 +834,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the TIMOD module. (0 for allocation.)");
 

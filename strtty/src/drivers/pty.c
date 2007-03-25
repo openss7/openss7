@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:56 $
+ @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:00:56 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pty.c,v $
+ Revision 0.9.2.6  2007/03/25 19:02:24  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.5  2007/03/25 06:00:56  brian
  - flush corrections
 
@@ -74,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:56 $"
+#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:24 $"
 
 static char const ident[] =
-    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:56 $";
+    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:24 $";
 
 /*
  *  This is the start of a STREAMS pseudo-terminal (pty) driver for Linux.  It
@@ -102,7 +105,7 @@ static char const ident[] =
 
 #define PTY_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTY_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:56 $"
+#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:24 $"
 #define PTY_DEVICE	"SVR 4.2 STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PTY_LICENSE	"GPL"
@@ -306,7 +309,7 @@ struct ptc {
 STATIC int ptm_majors[PTM_CMAJORS] = { PTM_CMAJOR_0, };
 STATIC int pts_majors[PTS_CMAJORS] = { PTS_CMAJOR_0, };
 
-STATIC kmem_cache_t *ptc_priv_cachep = NULL;
+STATIC kmem_cachep_t ptc_priv_cachep = NULL;
 
 STATIC rwlock_t pty_lock = RW_LOCK_UNLOCKED;
 
@@ -324,7 +327,7 @@ ptc_alloc_priv(queue_t *q, struct ptc **ptcp, int mindex, dev_t *devp, int oflag
 {
 	struct ptc *ptc;
 
-	if (likely((ptc = kmem_cache_alloc(ptc_priv_cachep, SLAB_ATOMIC)) != NULL)) {
+	if (likely((ptc = kmem_cache_alloc(ptc_priv_cachep, GFP_ATOMIC)) != NULL)) {
 		bzero(ptc, sizeof(*ptc));
 
 		rwlock_init(&ptc->lock);
@@ -1083,6 +1086,7 @@ pty_term_caches(void)
 	int err = 0;
 
 	if (ptc_priv_cachep != NULL) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(ptc_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ptc_priv_cachep", __FUNCTION__);
 			err = -EBUSY;
@@ -1090,6 +1094,9 @@ pty_term_caches(void)
 			_printd(("%s: destroyed ptc_priv_cachep\n", PTM_DRV_NAME));
 			ptc_priv_cachep = NULL;
 		}
+#else
+		kmem_cache_destroy(ptc_priv_cachep);
+#endif
 	}
 	return (err);
 }
@@ -1127,8 +1134,8 @@ unsigned short pts_modid = PTS_DRV_ID;
 MODULE_PARM(ptm_modid, "h");
 MODULE_PARM(pts_modid, "h");
 #else
-module_param(ptm_modid, ushort, 0);
-module_param(pts_modid, ushort, 0);
+module_param(ptm_modid, ushort, 0444);
+module_param(pts_modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(ptm_modid, "Module ID for the PTM driver. (0 for allocation.)");
 MODULE_PARM_DESC(pts_modid, "Module ID for the PTS driver. (0 for allocation.)");
@@ -1140,8 +1147,8 @@ major_t pts_major = PTS_CMAJOR_0;
 MODULE_PARM(ptm_major, "h");
 MODULE_PARM(pts_major, "h");
 #else
-module_param(ptm_major, uint, 0);
-module_param(pts_major, uint, 0);
+module_param(ptm_major, uint, 0444);
+module_param(pts_major, uint, 0444);
 #endif
 MODULE_PARM_DESC(ptm_major, "Device number for the PTM driver. (0 for allocation.)");
 MODULE_PARM_DESC(pts_major, "Device number for the PTS driver. (0 for allocation.)");

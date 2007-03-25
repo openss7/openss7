@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:01:05 $
+ @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/30 13:01:05 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch.c,v $
+ Revision 0.9.2.2  2007/03/25 19:00:54  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.1  2006/11/30 13:01:05  brian
  - added working files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:01:05 $"
+#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:54 $"
 
-static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:01:05 $";
+static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:54 $";
 
 /*
  *  This is a CH module.  The purpose of the module is for it to be pushed over a (circuit-based) MX
@@ -97,7 +100,7 @@ static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
 
 #define CH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CH_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define CH_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:01:05 $"
+#define CH_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:54 $"
 #define CH_DEVICE	"SVR 4.2 STREAMS Channel Module (CH)"
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CH_LICENSE	"GPL"
@@ -2529,7 +2532,7 @@ struct streamtab chinfo = {
  */
 
 #ifdef module_param
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #else				/* module_param */
 MODULE_PARM(modid, "h");
 #endif				/* module_param */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.26 2006/12/08 05:08:11 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.27 2007/03/25 19:00:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:08:11 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.27  2007/03/25 19:00:59  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.26  2006/12/08 05:08:11  brian
  - some rework resulting from testing and inspection
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_LIS_DDI_H__
 #define __SYS_LIS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.26 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.27 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -293,6 +296,10 @@ extern const char *_RP lis_queue_name(queue_t *q);
 extern void _RP lis_release_region(unsigned int from, unsigned int extent);
 extern int _RP lis_request_dma(unsigned int dma_nr, const char *device_id);
 
+#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+extern int _RP lis_request_irq(unsigned int irq, irq_handler_t handler,
+			       unsigned long flags, const char *device, void *dev_id);
+#else
 #ifdef HAVE_KTYPE_IRQRETURN_T
 extern int _RP lis_request_irq(unsigned int irq,
 			       irqreturn_t(*handler) (int, void *, struct pt_regs *),
@@ -300,6 +307,7 @@ extern int _RP lis_request_irq(unsigned int irq,
 #else
 extern int _RP lis_request_irq(unsigned int irq, void (*handler) (int, void *, struct pt_regs *),
 			       unsigned long flags, const char *device, void *dev_id);
+#endif
 #endif
 extern void _RP lis_request_region(unsigned int from, unsigned int extent, const char *name);
 extern lis_rw_lock_t *_RP lis_rw_lock_alloc_fcn(const char *name, char *file, int line);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/19 10:39:02 $
+ @(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/19 10:39:02 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pckt.c,v $
+ Revision 0.9.2.5  2007/03/25 19:02:25  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.4  2006/10/19 10:39:02  brian
  - corrections for compile on SuSE 10.0
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/19 10:39:02 $"
+#ident "@(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:25 $"
 
 static char const ident[] =
-    "$RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/19 10:39:02 $";
+    "$RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:25 $";
 
 /*
  * This is the pckt(4) STREAMS module, a Packet Mode module to be pushed on the
@@ -249,7 +252,7 @@ static char const ident[] =
 
 #define PCKT_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PCKT_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PCKT_REVISION		"OpenSS7 $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/19 10:39:02 $"
+#define PCKT_REVISION		"OpenSS7 $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:25 $"
 #define PCKT_DEVICE		"SVR 4.2 STREAMS Packet Mode Module (PCKT)"
 #define PCKT_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PCKT_LICENSE		"GPL"
@@ -284,7 +287,7 @@ modID_t modid = CONFIG_STREAMS_PCKT_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for SC.");
 

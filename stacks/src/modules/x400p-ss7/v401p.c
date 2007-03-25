@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/11/30 13:25:46 $
+ @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 19:00:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/30 13:25:46 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: v401p.c,v $
+ Revision 0.9.2.4  2007/03/25 19:00:43  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.3  2006/11/30 13:25:46  brian
  - working up driver
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/11/30 13:25:46 $"
+#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 19:00:43 $"
 
 static char const ident[] =
-    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/11/30 13:25:46 $";
+    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 19:00:43 $";
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
@@ -2438,9 +2441,9 @@ vp_pci_cleanup(void)
  *  Linux registration
  */
 #ifdef module_param
-module_param(modid, modID_t, 0);
-module_param(major, major_t, 0);
-module_param(loadfw, ushort, 0);
+module_param(modid, modID_t, 0444);
+module_param(major, major_t, 0444);
+module_param(loadfw, ushort, 0444);
 #else				/* module_param */
 MODULE_PARM(modid, "h");
 MODULE_PARM(major, "d");

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/23 13:06:56 $
+ @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:08 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/23 13:06:56 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_as.c,v $
+ Revision 0.9.2.3  2007/03/25 18:59:08  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.2  2006/12/23 13:06:56  brian
  - manual page and other package updates for release
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/23 13:06:56 $"
+#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:08 $"
 
 static char const ident[] =
-    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/23 13:06:56 $";
+    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:08 $";
 
 /*
  *  This is the AS side of SUA implemented as a pushable module that pushes over an SCTP NPI
@@ -95,6 +98,10 @@ static char const ident[] =
  *  into SCCP-primitives and sent upstream.
  */
 
+#ifndef HAVE_KTYPE_BOOL
+#include <stdbool.h>
+#endif
+
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
@@ -111,8 +118,6 @@ static char const ident[] =
 #ifndef DB_TYPE
 #define DB_TYPE(mp) mp->b_datap->db_type
 #endif
-
-#include <stdbool.h>
 
 #include <linux/socket.h>
 #include <net/ip.h>
@@ -138,7 +143,7 @@ static char const ident[] =
 /* ======================= */
 
 #define SUA_AS_DESCRIP		"SUA/SCTP SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MODULE."
-#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/23 13:06:56 $"
+#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:08 $"
 #define SUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define SUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

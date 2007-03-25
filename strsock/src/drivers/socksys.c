@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:35 $
+ @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 19:02:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:53:35 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socksys.c,v $
+ Revision 0.9.2.7  2007/03/25 19:02:20  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.6  2007/03/25 00:53:35  brian
  - synchronization updates
 
@@ -82,9 +85,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:35 $"
+#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 19:02:20 $"
 
-static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:35 $";
+static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 19:02:20 $";
 
 /*
  *  A Socket System (SOCKSYS) Driver.
@@ -133,7 +136,7 @@ static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:35 $"
+#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 19:02:20 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"
@@ -297,14 +300,14 @@ struct ssys {
 
 #define SOCKSYS_PRIV(__q) ((struct ssys *)((__q)->q_ptr))
 
-static kmem_cache_t *ssys_priv_cachep = NULL;
+static kmem_cachep_t ssys_priv_cachep = NULL;
 
 static __unlikely int
 ssys_alloc_priv(queue_t *q, struct ssys **sp, int type, dev_t *devp, cred_t *crp)
 {
 	struct ssys *ss;
 
-	if ((ss = kmem_cache_alloc(ssys_priv_cachep, SLAB_ATOMIC))) {
+	if ((ss = kmem_cache_alloc(ssys_priv_cachep, GFP_ATOMIC))) {
 		bzero(ss, sizeof(*ss));
 		ss->dev.cmajor = getmajor(*devp);
 		ss->dev.cminor = getminor(*devp);
@@ -996,10 +999,14 @@ STATIC __unlikely int
 ssys_term_caches(void)
 {
 	if (ssys_priv_cachep != NULL) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(ssys_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ssys_priv_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
+#else
+		kmem_cache_destroy(ssys_priv_cachep);
+#endif
 		_printd(("%s: destroyed ssys_priv_cachep\n", DRV_NAME));
 		ssys_priv_cachep = NULL;
 	}
@@ -1034,7 +1041,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SOCKSYS driver. (0 for allocation.)");
 
@@ -1043,7 +1050,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the SOCKSYS driver. (0 for allocation.)");
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:16 $
+ @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:16 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mg.c,v $
+ Revision 0.9.2.5  2007/03/25 19:00:51  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.4  2007/03/25 02:23:16  brian
  - add D_MP and D_MTPERQ flags
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:16 $"
+#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:51 $"
 
 static char const ident[] =
-    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:16 $";
+    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:51 $";
 
 #include <sys/os7/compat.h>
 
@@ -88,7 +91,7 @@ static char const ident[] =
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 02:23:16 $"
+#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:51 $"
 #define MG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -6421,13 +6424,13 @@ mg_close(queue_t *q, int flag, cred_t *crp)
  *
  *  =========================================================================
  */
-STATIC kmem_cache_t *mg_priv_cachep = NULL;
-STATIC kmem_cache_t *se_priv_cachep = NULL;
-STATIC kmem_cache_t *lg_priv_cachep = NULL;
-STATIC kmem_cache_t *cn_priv_cachep = NULL;
-STATIC kmem_cache_t *ac_priv_cachep = NULL;
-STATIC kmem_cache_t *ch_priv_cachep = NULL;
-STATIC kmem_cache_t *mx_priv_cachep = NULL;
+STATIC kmem_cachep_t mg_priv_cachep = NULL;
+STATIC kmem_cachep_t se_priv_cachep = NULL;
+STATIC kmem_cachep_t lg_priv_cachep = NULL;
+STATIC kmem_cachep_t cn_priv_cachep = NULL;
+STATIC kmem_cachep_t ac_priv_cachep = NULL;
+STATIC kmem_cachep_t ch_priv_cachep = NULL;
+STATIC kmem_cachep_t mx_priv_cachep = NULL;
 
 STATIC int
 mg_init_caches(void)
@@ -6511,53 +6514,81 @@ mg_term_caches(void)
 	int err = 0;
 
 	if (mg_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(mg_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mg_priv_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed mg_priv_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(mg_priv_cachep);
+#endif
 	}
 	if (se_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(se_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy se_priv_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed se_priv_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(se_priv_cachep);
+#endif
 	}
 	if (lg_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(lg_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy lg_priv_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed lg_priv_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(lg_priv_cachep);
+#endif
 	}
 	if (cn_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(cn_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy cn_priv_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed cn_priv_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(cn_priv_cachep);
+#endif
 	}
 	if (ac_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(ac_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ac_priv_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed ac_priv_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(ac_priv_cachep);
+#endif
 	}
 	if (ch_priv_cachep) {
 		if (kmem_cache_destroy(ch_priv_cachep)) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 			cmn_err(CE_WARN, "%s: did not destroy ch_priv_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed ch_priv_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(ch_priv_cachep);
+#endif
 	}
 	if (mx_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(mx_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mx_priv_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed mx_priv_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(mx_priv_cachep);
+#endif
 	}
 	return (err);
 }
@@ -6571,7 +6602,7 @@ mg_alloc_priv(queue_t *q, struct mg **mgp, dev_t *devp, cred_t *crp)
 {
 	struct mg *mg;
 
-	if ((mg = kmem_cache_alloc(mg_priv_cachep, SLAB_ATOMIC))) {
+	if ((mg = kmem_cache_alloc(mg_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated mg private structure %d:%d\n", DRV_NAME, mg,
 			getmajor(*devp), getminor(*devp)));
 		bzero(mg, sizeof(*mg));
@@ -6697,7 +6728,7 @@ se_alloc_priv(ulong id, struct mg *mg)
 {
 	struct se *se, **sep;
 
-	if ((se = kmem_cache_alloc(se_priv_cachep, SLAB_ATOMIC))) {
+	if ((se = kmem_cache_alloc(se_priv_cachep, GFP_ATOMIC))) {
 		bzero(se, sizeof(*se));
 		spin_lock_init(&se->lock);	/* "se-lock" */
 		se_get(se);	/* first get */
@@ -6820,7 +6851,7 @@ lg_alloc_priv(ulong id, struct se *se)
 {
 	struct lg *lg;
 
-	if ((lg = kmem_cache_alloc(lg_priv_cachep, SLAB_ATOMIC))) {
+	if ((lg = kmem_cache_alloc(lg_priv_cachep, GFP_ATOMIC))) {
 		bzero(lg, sizeof(*lg));
 		spin_lock_init(&lg->lock);	/* "lg-lock" */
 		lg_get(lg);	/* first get */
@@ -6960,7 +6991,7 @@ cn_alloc_priv(struct ch *ic, struct ch *og, ulong pad)
 	   Form a connection between in an incoming and outgoing leg */
 	struct cn *cn;
 
-	if ((cn = kmem_cache_alloc(cn_priv_cachep, SLAB_ATOMIC))) {
+	if ((cn = kmem_cache_alloc(cn_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated cn private structure\n", DRV_NAME, cn));
 		bzero(cn, sizeof(*cn));
 		cn->state = MGS_WCON_CREQ;
@@ -7035,7 +7066,7 @@ ac_alloc_priv(ulong id, ulong type, ulong flags, ulong duration, struct ch *ch, 
 {
 	struct ac *ac;
 
-	if ((ac = kmem_cache_alloc(ac_priv_cachep, SLAB_ATOMIC))) {
+	if ((ac = kmem_cache_alloc(ac_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated ac private structure\n", DRV_NAME, ac));
 		bzero(ac, sizeof(*ac));
 		ac->id = ac_get_id(id);
@@ -7103,7 +7134,7 @@ ch_alloc_priv(ulong id, struct mx *mx, ulong slot, ulong type)
 {
 	struct ch *ch;
 
-	if ((ch = kmem_cache_alloc(ch_priv_cachep, SLAB_ATOMIC))) {
+	if ((ch = kmem_cache_alloc(ch_priv_cachep, GFP_ATOMIC))) {
 		bzero(ch, sizeof(*ch));
 		spin_lock_init(&ch->lock);	/* "ch-lock" */
 		ch_get(ch);	/* first get */
@@ -7290,7 +7321,7 @@ mx_alloc_link(queue_t *q, struct mx **mxp, ulong index, cred_t *crp)
 {
 	struct mx *mx;
 
-	if ((mx = kmem_cache_alloc(mx_priv_cachep, SLAB_ATOMIC))) {
+	if ((mx = kmem_cache_alloc(mx_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated mx private structure %lu\n", DRV_NAME, mx, index));
 		bzero(mx, sizeof(*mx));
 		mx_get(mx);	/* first get */
@@ -7426,7 +7457,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
 
@@ -7435,7 +7466,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)");
 

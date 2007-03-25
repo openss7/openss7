@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/20 23:07:37 $
+ @(#) $RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/20 23:07:37 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: zapmux.c,v $
+ Revision 0.9.2.3  2007/03/25 19:00:52  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.2  2006/12/20 23:07:37  brian
  - updates for release and current development
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/20 23:07:37 $"
+#ident "@(#) $RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:52 $"
 
-static char const ident[] = "$RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/20 23:07:37 $";
+static char const ident[] = "$RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:52 $";
 
 /*
  *  MX Primitives issued down to MX provider.
@@ -1342,8 +1345,8 @@ static modID_t modid = DRV_ID;
 static major_t major = CMAJOR_0;
 
 #ifdef module_param
-module_param(modid, modID_t, 0);
-module_param(major, major_t, 0);
+module_param(modid, modID_t, 0444);
+module_param(major, major_t, 0444);
 #else
 MODULE_PARM(modid, "h");
 MODULE_PARM(major, "h");

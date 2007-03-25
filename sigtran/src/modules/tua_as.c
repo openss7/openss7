@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:17:57 $
+ @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:08 $
 
  -----------------------------------------------------------------------------
 
@@ -45,31 +45,36 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/30 13:17:57 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua_as.c,v $
+ Revision 0.9.2.2  2007/03/25 18:59:08  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.1  2006/11/30 13:17:57  brian
  - added files from strss7 package
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:17:57 $"
+#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:08 $"
 
-static char const ident[] = "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:17:57 $";
+static char const ident[] = "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:08 $";
 
 /*
  *  This is the AS side of TUA implemented as a pushable module that pushes over an SCTP NPI
  *  stream.
  */
 
+#ifndef HAVE_KTYPE_BOOL
+#include <stdbool.h>
+#endif
+
 #define _LFS_SOURCE 1
 #define _DEBUG 1
 
 #include <sys/os7/compat.h>
-
-#include <stdbool.h>
 
 #include <linux/socket.h>
 #include <net/ip.h>
@@ -81,7 +86,7 @@ static char const ident[] = "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.1
 #include <sys/tpi_tcap.h>
 
 #define TUA_AS_DESCRIP		"TUA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/30 13:17:57 $"
+#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:08 $"
 #define TUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

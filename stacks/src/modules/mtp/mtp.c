@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/02/26 07:25:33 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/26 07:25:33 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 0.9.2.18  2007/03/25 18:59:40  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.17  2007/02/26 07:25:33  brian
  - synchronizing changes
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/02/26 07:25:33 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:40 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/02/26 07:25:33 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:40 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -117,7 +120,7 @@ static char const ident[] =
 #define STRLOGDA	6	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/02/26 07:25:33 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:40 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -21936,18 +21939,18 @@ mtp_qclose(queue_t *q, int flag, cred_t *crp)
  *
  *  =========================================================================
  */
-static kmem_cache_t *mtp_mt_cachep = NULL;	/* MTP User cache */
-static kmem_cache_t *mtp_na_cachep = NULL;	/* Network Appearance cache */
-static kmem_cache_t *mtp_sp_cachep = NULL;	/* Signalling Point cache */
-static kmem_cache_t *mtp_rs_cachep = NULL;	/* Route Set cache */
-static kmem_cache_t *mtp_cr_cachep = NULL;	/* Controlled Rerouting Buffer cache 
+static kmem_cachep_t mtp_mt_cachep = NULL;	/* MTP User cache */
+static kmem_cachep_t mtp_na_cachep = NULL;	/* Network Appearance cache */
+static kmem_cachep_t mtp_sp_cachep = NULL;	/* Signalling Point cache */
+static kmem_cachep_t mtp_rs_cachep = NULL;	/* Route Set cache */
+static kmem_cachep_t mtp_cr_cachep = NULL;	/* Controlled Rerouting Buffer cache 
 						 */
-static kmem_cache_t *mtp_rl_cachep = NULL;	/* Route List cache */
-static kmem_cache_t *mtp_rt_cachep = NULL;	/* Route cache */
-static kmem_cache_t *mtp_cb_cachep = NULL;	/* Changeback Buffer cache */
-static kmem_cache_t *mtp_ls_cachep = NULL;	/* (Combined) Link Set cache */
-static kmem_cache_t *mtp_lk_cachep = NULL;	/* Link (Set) cache */
-static kmem_cache_t *mtp_sl_cachep = NULL;	/* Signalling Link cache */
+static kmem_cachep_t mtp_rl_cachep = NULL;	/* Route List cache */
+static kmem_cachep_t mtp_rt_cachep = NULL;	/* Route cache */
+static kmem_cachep_t mtp_cb_cachep = NULL;	/* Changeback Buffer cache */
+static kmem_cachep_t mtp_ls_cachep = NULL;	/* (Combined) Link Set cache */
+static kmem_cachep_t mtp_lk_cachep = NULL;	/* Link (Set) cache */
+static kmem_cachep_t mtp_sl_cachep = NULL;	/* Signalling Link cache */
 static int
 mtp_init_caches(void)
 {
@@ -22072,92 +22075,136 @@ mtp_term_caches(void)
 	int err = 0;
 
 	if (mtp_mt_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(mtp_mt_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_mt_cachep",
 				__FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed mtp_mt_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(mtp_mt_cachep);
+#endif
 	}
 	if (mtp_na_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(mtp_na_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_na_cachep",
 				__FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed mtp_na_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(mtp_na_cachep);
+#endif
 	}
 	if (mtp_sp_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(mtp_sp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_sp_cachep",
 				__FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed mtp_sp_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(mtp_sp_cachep);
+#endif
 	}
 	if (mtp_rs_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(mtp_rs_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_rs_cachep",
 				__FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed mtp_rs_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(mtp_rs_cachep);
+#endif
 	}
 	if (mtp_cr_cachep) {
 		if (kmem_cache_destroy(mtp_cr_cachep)) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 			cmn_err(CE_WARN, "%s: did not destroy mtp_cr_cachep",
 				__FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed mtp_cr_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(mtp_cr_cachep);
+#endif
 	}
 	if (mtp_rl_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(mtp_rl_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_rl_cachep",
 				__FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed mtp_rl_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(mtp_rl_cachep);
+#endif
 	}
 	if (mtp_rt_cachep) {
 		if (kmem_cache_destroy(mtp_rt_cachep)) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 			cmn_err(CE_WARN, "%s: did not destroy mtp_rt_cachep",
 				__FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed mtp_rt_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(mtp_rt_cachep);
+#endif
 	}
 	if (mtp_cb_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(mtp_cb_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_cb_cachep",
 				__FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed mtp_cb_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(mtp_cb_cachep);
+#endif
 	}
 	if (mtp_ls_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(mtp_ls_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_ls_cachep",
 				__FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed mtp_ls_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(mtp_ls_cachep);
+#endif
 	}
 	if (mtp_lk_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(mtp_lk_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_lk_cachep",
 				__FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed mtp_lk_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(mtp_lk_cachep);
+#endif
 	}
 	if (mtp_sl_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(mtp_sl_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mtp_sl_cachep",
 				__FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed mtp_sl_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(mtp_sl_cachep);
+#endif
 	}
 	return (err);
 }
@@ -22189,7 +22236,7 @@ mtp_alloc_priv(queue_t *q, dev_t *devp, cred_t *crp, minor_t bminor)
 {
 	struct mtp *mt;
 
-	if ((mt = (struct mtp *) mi_open_alloc_cache(mtp_mt_cachep, SLAB_ATOMIC))) {
+	if ((mt = (struct mtp *) mi_open_alloc_cache(mtp_mt_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated mt private structure\n", DRV_NAME, mt));
 		bzero(mt, sizeof(*mt));
 		mt->rq = RD(q);
@@ -22302,7 +22349,7 @@ mtp_alloc_link(queue_t *q, int index, cred_t *crp, minor_t unit)
 	struct sl *sl;
 	struct mtp_timer *t;
 
-	if ((sl = (struct sl *) mi_open_alloc_cache(mtp_sl_cachep, SLAB_ATOMIC))) {
+	if ((sl = (struct sl *) mi_open_alloc_cache(mtp_sl_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated sl private structure %lu\n", DRV_NAME, sl,
 			index));
 		bzero(sl, sizeof(*sl));
@@ -22524,7 +22571,7 @@ mtp_alloc_cb(uint id, struct lk *lk, struct sl *from, struct sl *onto, uint inde
 {
 	struct cb *cb;
 
-	if ((cb = kmem_cache_alloc(mtp_cb_cachep, SLAB_ATOMIC))) {
+	if ((cb = kmem_cache_alloc(mtp_cb_cachep, GFP_ATOMIC))) {
 		bzero(cb, sizeof(*cb));
 		bufq_init(&cb->buf);
 		/* add to master list */
@@ -22623,7 +22670,7 @@ mtp_alloc_lk(uint id, struct ls *ls, struct sp *loc, struct rs *adj,
 	struct mtp_timer *t;
 	struct lk *lk;
 
-	if ((lk = kmem_cache_alloc(mtp_lk_cachep, SLAB_ATOMIC))) {
+	if ((lk = kmem_cache_alloc(mtp_lk_cachep, GFP_ATOMIC))) {
 		bzero(lk, sizeof(*lk));
 		/* add to master list */
 		if ((lk->next = master.lk.list))
@@ -22832,7 +22879,7 @@ mtp_alloc_ls(uint id, struct sp *sp, struct mtp_conf_ls *c)
 {
 	struct ls *ls;
 
-	if ((ls = kmem_cache_alloc(mtp_ls_cachep, SLAB_ATOMIC))) {
+	if ((ls = kmem_cache_alloc(mtp_ls_cachep, GFP_ATOMIC))) {
 		bzero(ls, sizeof(*ls));
 		/* add to master list */
 		if ((ls->next = master.ls.list))
@@ -22970,7 +23017,7 @@ mtp_alloc_cr(uint id, struct rl *rl, struct rt *from, struct rt *onto, uint inde
 	struct mtp_timer *t;
 	struct cr *cr;
 
-	if ((cr = kmem_cache_alloc(mtp_cr_cachep, SLAB_ATOMIC))) {
+	if ((cr = kmem_cache_alloc(mtp_cr_cachep, GFP_ATOMIC))) {
 		bzero(cr, sizeof(*cr));
 		bufq_init(&cr->buf);
 		/* add to master list */
@@ -23115,7 +23162,7 @@ mtp_alloc_rt(uint id, struct rl *rl, struct lk *lk, struct mtp_conf_rt *c)
 	struct mtp_timer *t;
 	struct rt *rt;
 
-	if ((rt = kmem_cache_alloc(mtp_rt_cachep, SLAB_ATOMIC))) {
+	if ((rt = kmem_cache_alloc(mtp_rt_cachep, GFP_ATOMIC))) {
 		bzero(rt, sizeof(*rt));
 		/* add to master list */
 		if ((rt->next = master.rt.list))
@@ -23237,7 +23284,7 @@ mtp_alloc_rl(uint id, struct rs *rs, struct ls *ls, struct mtp_conf_rl *c)
 	struct rl *rl;
 
 	ensure(rs && ls, return (NULL));
-	if ((rl = kmem_cache_alloc(mtp_rl_cachep, SLAB_ATOMIC))) {
+	if ((rl = kmem_cache_alloc(mtp_rl_cachep, GFP_ATOMIC))) {
 		struct rl **rlp;
 
 		bzero(rl, sizeof(*rl));
@@ -23373,7 +23420,7 @@ mtp_alloc_rs(uint id, struct sp *sp, struct mtp_conf_rs *c)
 	struct mtp_timer *t;
 	struct rs *rs;
 
-	if ((rs = kmem_cache_alloc(mtp_rs_cachep, SLAB_ATOMIC))) {
+	if ((rs = kmem_cache_alloc(mtp_rs_cachep, GFP_ATOMIC))) {
 		bzero(rs, sizeof(*rs));
 		/* add to master list */
 		if ((rs->next = master.rs.list))
@@ -23517,7 +23564,7 @@ mtp_alloc_sp(uint id, struct na *na, struct mtp_conf_sp *c)
 	struct mtp_timer *t;
 	struct sp *sp;
 
-	if ((sp = kmem_cache_alloc(mtp_sp_cachep, SLAB_ATOMIC))) {
+	if ((sp = kmem_cache_alloc(mtp_sp_cachep, GFP_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		/* add to master list */
 		if ((sp->next = master.sp.list))
@@ -23709,7 +23756,7 @@ mtp_alloc_na(uint id, uint32_t member, uint32_t cluster, uint32_t network,
 {
 	struct na *na;
 
-	if ((na = kmem_cache_alloc(mtp_na_cachep, SLAB_ATOMIC))) {
+	if ((na = kmem_cache_alloc(mtp_na_cachep, GFP_ATOMIC))) {
 		bzero(na, sizeof(*na));
 		/* add to master list */
 		if ((na->next = master.na.list))
@@ -23912,7 +23959,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the MTP driver. (0 for allocation.)");
 
@@ -23921,7 +23968,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the MTP driver. (0 for allocation.)");
 

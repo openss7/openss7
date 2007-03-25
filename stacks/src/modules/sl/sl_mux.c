@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 02:22:58 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 19:00:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:22:58 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.c,v $
+ Revision 0.9.2.22  2007/03/25 19:00:15  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.21  2007/03/25 02:22:58  brian
  - add D_MP and D_MTPERQ flags
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 02:22:58 $"
+#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 19:00:15 $"
 
 char const ident[] =
-    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 02:22:58 $";
+    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 19:00:15 $";
 
 #include <sys/os7/compat.h>
 
@@ -78,7 +81,7 @@ char const ident[] =
 #include <ss7/sli.h>
 
 #define SL_MUX_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 02:22:58 $"
+#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 19:00:15 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -252,26 +255,34 @@ STATIC struct df master;
  *  -------------------------------------------------------------------------
  */
 
-STATIC kmem_cache_t *slm_sl_cachep = NULL;
-STATIC kmem_cache_t *slm_ls_cachep = NULL;
+STATIC kmem_cachep_t slm_sl_cachep = NULL;
+STATIC kmem_cachep_t slm_ls_cachep = NULL;
 
 STATIC int
 slm_term_caches(void)
 {
 	int err = 0;
 	if (slm_ls_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(slm_ls_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy slm_ls_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed slm_ls_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(slm_ls_cachep);
+#endif
 	}
 	if (slm_sl_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(slm_sl_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy slm_sl_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed slm_sl_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(slm_sl_cachep);
+#endif
 	}
 	return (err);
 }
@@ -329,7 +340,7 @@ slm_alloc_sl(queue_t *q, struct sl **spp, major_t cmajor, minor_t cminor, cred_t
 {
 	struct sl *sl;
 	printd(("%s: %s: create sl device = %hu:%hu\n", DRV_NAME, __FUNCTION__, cmajor, cminor));
-	if ((sl = kmem_cache_alloc(slm_sl_cachep, SLAB_ATOMIC))) {
+	if ((sl = kmem_cache_alloc(slm_sl_cachep, GFP_ATOMIC))) {
 		bzero(sl, sizeof(*sl));
 		sl_get(sl);	/* first get */
 		sl->u.dev.cmajor = cmajor;
@@ -422,7 +433,7 @@ slm_alloc_ls(queue_t *q, struct ls **lpp, ulong index, cred_t *crp)
 {
 	struct ls *ls;
 	printd(("%s: %s: create ls index = %lu\n", DRV_NAME, __FUNCTION__, index));
-	if ((ls = kmem_cache_alloc(slm_ls_cachep, SLAB_ATOMIC))) {
+	if ((ls = kmem_cache_alloc(slm_ls_cachep, GFP_ATOMIC))) {
 		bzero(ls, sizeof(*ls));
 		ls_get(ls);	/* first get */
 		ls->u.mux.index = index;
@@ -999,7 +1010,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SDL-MUX driver. (0 for allocation.)");
 
@@ -1007,7 +1018,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the SDL-MUX driver. (0 for allocation.)");
 

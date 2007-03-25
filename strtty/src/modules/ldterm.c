@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/12 09:37:42 $
+ @(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 09:37:42 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldterm.c,v $
+ Revision 0.9.2.3  2007/03/25 19:02:25  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.2  2006/10/12 09:37:42  brian
  - completed much of the strtty package
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/12 09:37:42 $"
+#ident "@(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:25 $"
 
 static char const ident[] =
-    "$RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/12 09:37:42 $";
+    "$RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:25 $";
 
 /*
  * This is ldterm (line discipline terminal) module.
@@ -156,7 +159,7 @@ static char const ident[] =
 
 #define LDTERM_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDTERM_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define LDTERM_REVISION		"OpenSS7 $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/12 09:37:42 $"
+#define LDTERM_REVISION		"OpenSS7 $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:25 $"
 #define LDTERM_DEVICE		"SVR 4.2 STREAMS Line Discipline Module (LDTERM)"
 #define LDTERM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LDTERM_LICENSE		"GPL"
@@ -192,7 +195,7 @@ modID_t modid = CONFIG_STREAMS_LDTERM_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else				/* module_param */
-module_param(modid, short, 0);
+module_param(modid, short, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module Id for LDTERM (0 for allocation).");
 

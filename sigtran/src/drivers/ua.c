@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 02:22:26 $
+ @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:49 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:22:26 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:58:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua.c,v $
+ Revision 0.9.2.7  2007/03/25 18:58:49  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.6  2007/03/25 02:22:26  brian
  - add D_MP and D_MTPERQ flags
 
@@ -70,13 +73,13 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 02:22:26 $"
+#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:49 $"
 
 static char const ident[] =
-    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 02:22:26 $";
+    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:49 $";
 
 #define UA_DESCRIP	"SIGTRAN USER ADAPTATION (UA) STREAMS MULTIPLEXING DRIVER."
-#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 02:22:26 $"
+#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:49 $"
 #define UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -21134,14 +21137,14 @@ ua_close(queue_t *q, int flag, cred_t *crp)
  *
  *  =========================================================================
  */
-STATIC kmem_cache_t *ua_priv_cachep = NULL;
-STATIC kmem_cache_t *ua_link_cachep = NULL;
-STATIC kmem_cache_t *ua_as_cachep = NULL;
-STATIC kmem_cache_t *ua_ap_cachep = NULL;
-STATIC kmem_cache_t *ua_spp_cachep = NULL;
-STATIC kmem_cache_t *ua_sp_cachep = NULL;
-STATIC kmem_cache_t *ua_np_cachep = NULL;
-STATIC kmem_cache_t *ua_gp_cachep = NULL;
+STATIC kmem_cachep_t ua_priv_cachep = NULL;
+STATIC kmem_cachep_t ua_link_cachep = NULL;
+STATIC kmem_cachep_t ua_as_cachep = NULL;
+STATIC kmem_cachep_t ua_ap_cachep = NULL;
+STATIC kmem_cachep_t ua_spp_cachep = NULL;
+STATIC kmem_cachep_t ua_sp_cachep = NULL;
+STATIC kmem_cachep_t ua_np_cachep = NULL;
+STATIC kmem_cachep_t ua_gp_cachep = NULL;
 
 STATIC int
 ua_term_caches(void)
@@ -21149,60 +21152,92 @@ ua_term_caches(void)
 	int err = 0;
 
 	if (ua_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(ua_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ua_priv_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed ua_priv_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(ua_priv_cachep);
+#endif
 	}
 	if (ua_link_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(ua_link_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ua_link_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed ua_link_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(ua_link_cachep);
+#endif
 	}
 	if (ua_as_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(ua_as_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ua_as_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed ua_as_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(ua_as_cachep);
+#endif
 	}
 	if (ua_ap_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(ua_ap_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ua_ap_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed ua_ap_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(ua_ap_cachep);
+#endif
 	}
 	if (ua_gp_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(ua_gp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ua_gp_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed ua_gp_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(ua_gp_cachep);
+#endif
 	}
 	if (ua_sp_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(ua_sp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ua_sp_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed ua_sp_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(ua_sp_cachep);
+#endif
 	}
 	if (ua_np_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(ua_np_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ua_np_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed ua_np_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(ua_np_cachep);
+#endif
 	}
 	if (ua_spp_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(ua_spp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ua_spp_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed ua_spp_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(ua_spp_cachep);
+#endif
 	}
 	return (err);
 }
@@ -21282,7 +21317,7 @@ ua_alloc_ap(struct as *as_u, struct as *as_p)
 	struct ap *ap;
 
 	printd(("%s: %s: ap graph as %ld:%ld\n", DRV_NAME, __FUNCTION__, as_u->id, as_p->id));
-	if ((ap = kmem_cache_alloc(ua_ap_cachep, SLAB_ATOMIC))) {
+	if ((ap = kmem_cache_alloc(ua_ap_cachep, GFP_ATOMIC))) {
 		bzero(ap, sizeof(*ap));
 		ap_set_state(ap, 0);
 		/* link to AS-U */
@@ -21340,7 +21375,7 @@ ua_alloc_np(struct sp *sp, struct sp *sg)
 	struct np *np;
 
 	printd(("%s: %s: np graph sp %ld:%ld\n", DRV_NAME, __FUNCTION__, sp->id, sg->id));
-	if ((np = kmem_cache_alloc(ua_np_cachep, SLAB_ATOMIC))) {
+	if ((np = kmem_cache_alloc(ua_np_cachep, GFP_ATOMIC))) {
 		bzero(np, sizeof(*np));
 		np_set_state(np, 0);
 		/* link to AS-U */
@@ -21398,7 +21433,7 @@ ua_alloc_gp(struct as *as, struct spp *spp)
 	struct gp *gp;
 
 	printd(("%s: %s: gp graph as %ld spp %lu\n", DRV_NAME, __FUNCTION__, as->id, spp->id));
-	if ((gp = kmem_cache_alloc(ua_gp_cachep, SLAB_ATOMIC))) {
+	if ((gp = kmem_cache_alloc(ua_gp_cachep, GFP_ATOMIC))) {
 		bzero(gp, sizeof(gp));
 		gp_set_state(gp, 0);
 		/* link to AS */
@@ -21462,7 +21497,7 @@ ua_alloc_priv(queue_t *q, union priv **pp, dev_t *devp, cred_t *crp, minor_t bmi
 
 	printd(("%s: %s: create priv dev = %d:%d\n", DRV_NAME, __FUNCTION__, getmajor(*devp),
 		getminor(*devp)));
-	if ((p = kmem_cache_alloc(ua_priv_cachep, SLAB_ATOMIC))) {
+	if ((p = kmem_cache_alloc(ua_priv_cachep, GFP_ATOMIC))) {
 		str_t *s = (str_t *) p, **sp = (str_t **) pp;
 
 		bzero(p, sizeof(*p));
@@ -21581,7 +21616,7 @@ ua_alloc_as(int id, int type, struct sp *sp, uint32_t iid, ua_addr_t * add)
 	struct as *as, **p;
 
 	printd(("%s: %s: create as->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((as = kmem_cache_alloc(ua_as_cachep, SLAB_ATOMIC))) {
+	if ((as = kmem_cache_alloc(ua_as_cachep, GFP_ATOMIC))) {
 		struct spp *spp;
 		struct np *np;
 
@@ -21756,7 +21791,7 @@ ua_alloc_sp(int id, int type, struct sp *osp, int cost, int tmode)
 	struct sp *sp, **p;
 
 	printd(("%s: %s: create sp->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((sp = kmem_cache_alloc(ua_sp_cachep, SLAB_ATOMIC))) {
+	if ((sp = kmem_cache_alloc(ua_sp_cachep, GFP_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		sp_get(sp);	/* first get */
 		spin_lock_init(&sp->lock);	/* "sp-lock" */
@@ -21879,7 +21914,7 @@ ua_alloc_spp(int id, int type, struct sp *sp, int aspid, int cost)
 	struct spp *spp, **p;
 
 	printd(("%s: %s: create spp->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((spp = kmem_cache_alloc(ua_spp_cachep, SLAB_ATOMIC))) {
+	if ((spp = kmem_cache_alloc(ua_spp_cachep, GFP_ATOMIC))) {
 		struct as *as;
 
 		bzero(spp, sizeof(*spp));
@@ -22182,7 +22217,7 @@ ua_alloc_rp(struct gp *gp, struct pp *pp)
 	struct rp *rp;
 
 	printd(("%s: %s: rp graph gp %ld pp %lu\n", DRV_NAME, __FUNCTION__, gp->id, pp->id));
-	if ((rp = kmem_cache_alloc(ua_rp_cachep, SLAB_ATOMIC))) {
+	if ((rp = kmem_cache_alloc(ua_rp_cachep, GFP_ATOMIC))) {
 		bzero(rp, sizeof(rp));
 		rp_set_state(rp, AS_DOWN);
 
@@ -22271,7 +22306,7 @@ ua_alloc_pp(struct spp *spp, struct xp *xp)
 	struct pp *pp;
 
 	printd(("%s: %s: pp graph spp %ld xp %lu\n", DRV_NAME, __FUNCTION__, spp->id, xp->id));
-	if ((pp = kmem_cache_alloc(ua_pp_cachep, SLAB_ATOMIC))) {
+	if ((pp = kmem_cache_alloc(ua_pp_cachep, GFP_ATOMIC))) {
 		bzero(pp, sizeof(pp));
 		pp_set_state(pp, ASP_DOWN);
 
@@ -22571,7 +22606,7 @@ ua_alloc_link(queue_t *q, union link **lkp, int index, cred_t *crp)
 	union link *lk;
 
 	printd(("%s: %s: create link index = %lu\n", DRV_NAME, __FUNCTION__, index));
-	if ((lk = kmem_cache_alloc(ua_link_cachep, SLAB_ATOMIC))) {
+	if ((lk = kmem_cache_alloc(ua_link_cachep, GFP_ATOMIC))) {
 		bzero(lk, sizeof(*lk));
 		link_get(lk);	/* first get */
 		lk->str.u.mux.index = index;
@@ -22706,7 +22741,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
 
@@ -22715,7 +22750,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)");
 

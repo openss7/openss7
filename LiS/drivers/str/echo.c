@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 05:59:12 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 18:58:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 05:59:12 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:58:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 05:59:12 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 18:58:11 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 05:59:12 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 18:58:11 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -73,7 +73,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 05:59:12 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 18:58:11 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -129,7 +129,7 @@ modID_t modid = CONFIG_STREAMS_ECHO_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for ECHO driver. (0 for auto allocation)");
 
@@ -143,7 +143,7 @@ major_t major = CONFIG_STREAMS_ECHO_MAJOR;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for ECHO driver. (0 for auto allocation)");
 

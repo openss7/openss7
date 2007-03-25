@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.178 $) $Date: 2007/03/15 10:22:10 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.179 $) $Date: 2007/03/25 19:01:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:22:10 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.179  2007/03/25 19:01:18  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.178  2007/03/15 10:22:10  brian
  - test case reporting and pushed release date one day
 
@@ -193,14 +196,16 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.178 $) $Date: 2007/03/15 10:22:10 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.179 $) $Date: 2007/03/25 19:01:18 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.178 $) $Date: 2007/03/15 10:22:10 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.179 $) $Date: 2007/03/25 19:01:18 $";
+
+#ifndef HAVE_KTYPE_BOOL
+#include <stdbool.h>		/* for bool type, true and false */
+#endif
 
 //#define __NO_VERSION__
-
-#include <stdbool.h>		/* for bool type, true and false */
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -297,7 +302,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.178 $) $Date: 2007/03/15 10:22:10 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.179 $) $Date: 2007/03/25 19:01:18 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -334,7 +339,7 @@ modID_t sth_modid = CONFIG_STREAMS_STH_MODID;
 #ifndef module_param
 MODULE_PARM(sth_modid, "h");
 #else
-module_param(sth_modid, ushort, 0);
+module_param(sth_modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(sth_modid, "Module identification number for STH module.");
 
@@ -843,26 +848,34 @@ strcopyin(const void __user *from, void *to, size_t len)
  */
 
 STATIC streams_fastcall pid_t
-task_session(struct task_struct *t)
+str_task_session(struct task_struct *t)
 {
+#if defined HAVE_KFUNC_PROCESS_SESSION
+	return (process_session(t));
+#else
 #if !defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
 	return (t->signal->session);
 #else
 	return (t->session);
 #endif
+#endif
 }
 
 STATIC streams_fastcall pid_t
-task_pgrp(struct task_struct *t)
+str_task_pgrp(struct task_struct *t)
 {
+#if defined HAVE_KFUNC_PROCESS_GROUP
+	return (process_group(t));
+#else
 #if !defined HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
 	return (t->signal->pgrp);
 #else
 	return (t->pgrp);
 #endif
+#endif
 }
 
-STATIC streams_fastcall pid_t
+STATIC streams_fastcall __unlikely pid_t
 pgrp_session(pid_t pgrp)
 {
 #if defined HAVE_SESSION_OF_PGRP_ADDR
@@ -951,7 +964,7 @@ straccess_slow(struct stdata *sd, const register int access, const register int 
 		return (0);
 	if (likely((access & (FREAD | FWRITE | FEXCL)) != 0)) {	/* PROFILED */
 		/* POSIX semantics for controlling terminals */
-		pid_t pgrp = task_pgrp(current);
+		pid_t pgrp = str_task_pgrp(current);
 
 		if (likely(pgrp == sd->sd_pgrp))
 			return (0);
@@ -1379,7 +1392,7 @@ str_find_file_descriptor(const struct task_struct *procp, const struct file *fil
 #else
 #ifdef HAVE_KMEMB_STRUCT_FILES_STRUCT_FDTAB
 	spin_lock(&files->file_lock);
-	max = files->fdtab.max_fdset;
+	max = files->fdtab.max_fds;
 	for (fd = 0; fd <= max && files->fdtab.fd[fd] != file; fd++) ;
 	if (fd > max)
 		fd = ~0;
@@ -4555,7 +4568,14 @@ strfasync(int fd, struct file *file, int on)
 				if (file->f_owner.pid == 0) {
 					struct task_struct *c = current;
 
+#ifdef HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
+					file->f_owner.pid =
+					    sd->sd_pgrp ? task_pgrp(c) : task_pid(c);
+					file->f_owner.pid_type =
+					    sd->sd_pgrp ? PIDTYPE_PGID : PIDTYPE_PID;
+#else				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
 					file->f_owner.pid = (-sd->sd_pgrp) ? : c->pid;
+#endif				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
 					file->f_owner.uid = c->uid;
 					file->f_owner.euid = c->euid;
 				}
@@ -6192,7 +6212,7 @@ tty_tiocspgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 	/* processes can set this on a non-controlling tty */
 	if (!test_bit(STRISTTY_BIT, &sd->sd_flag))
 		return (-ENOTTY);
-	if (sd->sd_session != task_session(current))
+	if (sd->sd_session != str_task_session(current))
 		return (-ENOTTY);
 #endif
 	if (get_user(pgrp, (pid_t *) arg))
@@ -6200,7 +6220,7 @@ tty_tiocspgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 	if (pgrp < 0)
 		return (-EINVAL);
 	/* signals cannot be sent to other process groups */
-	if (pgrp_session(pgrp) != task_session(current))
+	if (pgrp_session(pgrp) != str_task_session(current))
 		return (-EPERM);
 	if ((err = straccess_wlock(sd, FEXCL)) == 0) {
 		sd->sd_pgrp = pgrp;
@@ -6289,7 +6309,7 @@ sock_siocspgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 	if (pgrp < 0)
 		return (-EINVAL);
 	/* signals cannot be sent to other process groups */
-	if (pgrp_session(pgrp) != task_session(current))
+	if (pgrp_session(pgrp) != str_task_session(current))
 		return (-EPERM);
 	if ((err = straccess_wlock(sd, FEXCL)) == 0) {
 		sd->sd_pgrp = pgrp;
@@ -6320,10 +6340,16 @@ file_fiogetown(const struct file *file, struct stdata *sd, unsigned long arg)
 		if ((err = straccess_rlock(sd, FREAD)) == 0) {
 			pid_t owner;
 
+#ifdef HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
+			if (file->f_owner.pid_type == PIDTYPE_PGID)
+				owner = (pid_task(file->f_owner.pid, PIDTYPE_PGID))->pid;
+			else
+				owner = 0;
+#else				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
 			owner = file->f_owner.pid;
-			srunlock(sd);
-
 			owner = (owner < 0) ? -owner : 0;
+#endif				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
+			srunlock(sd);
 
 			err = put_user(owner, (pid_t *) arg);
 		}
@@ -6354,12 +6380,19 @@ file_fiosetown(struct file *file, struct stdata *sd, unsigned long arg)
 		if (get_user(owner, (pid_t *) arg))
 			return (-EFAULT);
 		if ((err = straccess_wlock(sd, FEXCL))) {
+			struct task_struct *c = current;
+
 			sd->sd_pgrp = (owner < 0) ? -owner : 0;
 			swunlock(sd);
 
-			file->f_owner.pid = owner;
-			file->f_owner.uid = current->uid;
-			file->f_owner.euid = current->euid;
+#ifdef HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
+			file->f_owner.pid = sd->sd_pgrp ? task_pgrp(c) : task_pid(c);
+			file->f_owner.pid_type = sd->sd_pgrp ? PIDTYPE_PGID : PIDTYPE_PID;
+#else				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
+			file->f_owner.pid = (-sd->sd_pgrp) ? : owner;
+#endif				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
+			file->f_owner.uid = c->uid;
+			file->f_owner.euid = c->euid;
 		}
 		return (err);
 	}
@@ -8058,8 +8091,8 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 						   O_NOCTTY was set in oflag on open. */
 						/* This is also where sd_session and sd_pgrp
 						   members are initialized to appropriate values */
-						sd->sd_session = task_session(current);
-						sd->sd_pgrp = task_pgrp(current);
+						sd->sd_session = str_task_session(current);
+						sd->sd_pgrp = str_task_pgrp(current);
 					}
 				} else {
 					/* POSIX says ENXIO on module open function failure. (And
@@ -8602,7 +8635,7 @@ str_i_anchor(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head of the open stream
  *  @arg: ioctl argument, pointer to a &struct strsigset structure
  */
-streams_noinline streams_fastcall int
+streams_noinline streams_fastcall __unlikely int
 str_i_esetsig(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err = EOPNOTSUPP;
@@ -8617,7 +8650,7 @@ str_i_esetsig(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head of the open stream
  *  @arg: ioctl argument, pointer to a &struct strsigset structure
  */
-streams_noinline streams_fastcall int
+streams_noinline streams_fastcall __unlikely int
 str_i_esetsig32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err = EOPNOTSUPP;
@@ -8632,7 +8665,7 @@ str_i_esetsig32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head of the open stream
  *  @arg: ioctl argument, pointer to a &struct strsigset structure
  */
-streams_noinline streams_fastcall int
+streams_noinline streams_fastcall __unlikely int
 str_i_egetsig(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err = EOPNOTSUPP;
@@ -8647,7 +8680,7 @@ str_i_egetsig(const struct file *file, struct stdata *sd, unsigned long arg)
  *  @sd: stream head of the open stream
  *  @arg: ioctl argument, pointer to a &struct strsigset structure
  */
-streams_noinline streams_fastcall int
+streams_noinline streams_fastcall __unlikely int
 str_i_egetsig32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int err = EOPNOTSUPP;

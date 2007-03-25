@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/05 23:01:42 $
+ @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:59:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/05 23:01:42 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.5  2007/03/25 18:59:07  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.4  2007/03/05 23:01:42  brian
  - checking in release changes
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/05 23:01:42 $"
+#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:59:07 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/05 23:01:42 $";
+    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:59:07 $";
 
 /*
  *  This is the AS side of M3UA implemented as a pushable module that pushes over an SCTP NPI
@@ -104,6 +107,10 @@ static char const ident[] =
  *  driver.  I will probably abandon this module.
  */
 
+#ifndef HAVE_KTYPE_BOOL
+#include <stdbool.h>
+#endif
+
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
@@ -119,8 +126,6 @@ static char const ident[] =
 
 #undef DB_TYPE
 #define DB_TYPE(mp) mp->b_datap->db_type
-
-#include <stdbool.h>
 
 #include <linux/socket.h>
 #include <net/ip.h>
@@ -146,7 +151,7 @@ static char const ident[] =
 /* ======================= */
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP MESSAGE TRANSFER PART (MTP) STREAMS MODULE."
-#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/05 23:01:42 $"
+#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:59:07 $"
 #define M3UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -3550,7 +3555,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the M3UA-AS module. (0 for allocation.)");
 

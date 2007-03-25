@@ -1,5 +1,13 @@
 2007-03-25  Brian Bidulock  <bidulock@openss7.org>
 
+	* acinclude.m4: support for 2.6.20-1.2307.fc5
+	* doc/manual/news.texi: support for 2.6.20-1.2307.fc5
+	* src/include/sys/lis/ddi.h: support for 2.6.20-1.2307.fc5
+	* src/include/sys/mps/stream.h: support for 2.6.20-1.2307.fc5
+	* src/include/sys/strcompat/config.h.in: support for 2.6.20-1.2307.fc5
+	* src/kernel/liscompat.c: support for 2.6.20-1.2307.fc5
+	* src/kernel/mpscompat.c: support for 2.6.20-1.2307.fc5
+
 	* src/kernel/os7compat.c: flush corrections
 
 	* src/include/sys/svr4/ddi.h: somewhat more workable RW_UNLOCK

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 06:00:17 $
+ @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 19:01:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:00:17 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: vf.c,v $
+ Revision 0.9.2.12  2007/03/25 19:01:13  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.11  2007/03/25 06:00:17  brian
  - flush corrections
 
@@ -85,9 +88,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 06:00:17 $"
+#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 19:01:13 $"
 
-static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 06:00:17 $";
+static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 19:01:13 $";
 
 /*
  *  This driver provides some capabilities for testing Linux Fast-STREAMS.  It functions as a Null
@@ -115,7 +118,7 @@ static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.11 $)
 
 #define VF_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define VF_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2007/03/25 06:00:17 $"
+#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2007/03/25 19:01:13 $"
 #define VF_DEVICE	"SVR 4.2 STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define VF_LICENSE	"GPL"
@@ -152,7 +155,7 @@ modID_t modid = CONFIG_STREAMS_VF_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for STREAMS-vf driver.");
 
@@ -166,7 +169,7 @@ major_t major = CONFIG_STREAMS_VF_MAJOR;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for STREAMS-vf driver.");
 

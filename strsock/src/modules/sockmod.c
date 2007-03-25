@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:36 $
+ @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 19:02:21 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:53:36 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:21 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:36 $"
+#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 19:02:21 $"
 
 static char const ident[] =
-    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:36 $";
+    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 19:02:21 $";
 
 /*
  *  SOCKMOD - A socket module for Linux Fast-STREAMS.
@@ -119,7 +119,7 @@ static char const ident[] =
 
 #define SMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:36 $"
+#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 19:02:21 $"
 #define SMOD_DEVICE	"SVR 3.2 STREAMS Socket Module for TPI Devices (SOCKMOD)"
 #define SMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SMOD_LICENSE	"GPL"
@@ -234,7 +234,7 @@ struct smod {
  *
  *  -------------------------------------------------------------------------
  */
-static kmem_cache_t *smod_priv_cachep = NULL;
+static kmem_cachep_t smod_priv_cachep = NULL;
 static __unlikely int
 smod_init_caches(void)
 {
@@ -253,11 +253,15 @@ static __unlikely int
 smod_term_caches(void)
 {
 	if (smod_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(smod_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: %s: did not destroy smod_priv_cachep", MOD_NAME,
 				__FUNCTION__);
 			return (-EBUSY);
 		}
+#else
+		kmem_cache_destroy(smod_priv_cachep);
+#endif
 	}
 	return (0);
 }
@@ -267,7 +271,7 @@ smod_alloc_priv(queue_t *q)
 {
 	struct smod *priv;
 
-	if ((priv = kmem_cache_alloc(smod_priv_cachep, SLAB_ATOMIC))) {
+	if ((priv = kmem_cache_alloc(smod_priv_cachep, GFP_ATOMIC))) {
 		bzero(priv, sizeof(*priv));
 		priv->rq = q;
 		priv->wq = WR(q);
@@ -898,7 +902,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SOCKMOD module. (0 for allocation.)");
 #endif				/* CONFIG_STREAMS_SOCKMOD_MODULE */

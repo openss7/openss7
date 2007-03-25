@@ -33,10 +33,14 @@
  *                 
  *      Comments:  
  */
-#ifdef LINUX24
-void pmacd_handleInterrupt(int irq, void *pBoard, struct pt_regs *regs)
+#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+irqreturn_t pmacd_handleInterrupt(int irq, void *pBoard)
 #else
+#ifdef HAVE_KTYPE_IRQRETURN_T
 irqreturn_t pmacd_handleInterrupt(int irq, void *pBoard, struct pt_regs *regs)
+#else
+void pmacd_handleInterrupt(int irq, void *pBoard, struct pt_regs *regs)
+#endif
 #endif
 {
   pmacd_board_t *board = (pmacd_board_t *)pBoard;
@@ -76,7 +80,8 @@ irqreturn_t pmacd_handleInterrupt(int irq, void *pBoard, struct pt_regs *regs)
     if(pmacd_isControlCommandActive(control)){
       // Clear timeout timer.
       del_timer(&(control->responseTimer));
-#ifdef LINUX24
+//#ifdef LINUX24
+#if 1
       tasklet_hi_schedule(&(control->handleResponseTask));
 #else
       schedule_work(&(control->handleResponseTask));
@@ -115,7 +120,8 @@ irqreturn_t pmacd_handleInterrupt(int irq, void *pBoard, struct pt_regs *regs)
 #else
     writew(flags, baseAddr+I2O_OUTBOUND_POST_IRQ_MASK_REG);
 #endif
-#ifdef LINUX24
+//#ifdef LINUX24
+#if 1
     tasklet_hi_schedule(&(board->getMessagesTask));
 #else
     schedule_work(&(board->getMessagesTask));

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 05:59:40 $
+ @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 19:00:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 05:59:40 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 05:59:40 $"
+#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 19:00:11 $"
 
 static char const ident[] =
-    "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 05:59:40 $";
+    "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 19:00:11 $";
 
 /*
  *  This is an SDL pipemod driver for testing and use with pipes.  This module
@@ -72,7 +72,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 05:59:40 $"
+#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 19:00:11 $"
 #define SPM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -228,7 +228,7 @@ typedef struct spm {
  *
  *  ========================================================================
  */
-STATIC kmem_cache_t *spm_priv_cachep = NULL;
+STATIC kmem_cachep_t spm_priv_cachep = NULL;
 
 /*
  *  Cache allocation
@@ -250,11 +250,15 @@ STATIC int
 spm_term_caches(void)
 {
 	if (spm_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(spm_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy spm_priv_cachep.", __FUNCTION__);
 			return (-EBUSY);
 		} else
 			printd(("spm: destroyed spm_priv_cachep\n"));
+#else
+		kmem_cache_destroy(spm_priv_cachep);
+#endif
 	}
 	return (0);
 }
@@ -268,7 +272,7 @@ spm_alloc_priv(queue_t *q, spm_t ** sp, major_t cmajor, minor_t cminor)
 {
 	spm_t *s;
 
-	if ((s = kmem_cache_alloc(spm_priv_cachep, SLAB_ATOMIC))) {
+	if ((s = kmem_cache_alloc(spm_priv_cachep, GFP_ATOMIC))) {
 		printd(("spm: allocated module private structure\n"));
 		bzero(s, sizeof(*s));
 		if ((s->next = *sp))
@@ -1408,7 +1412,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SPM module. (0 for allocation.)");
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 06:00:17 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 19:01:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:00:17 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: loop.c,v $
+ Revision 0.9.2.16  2007/03/25 19:01:12  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.15  2007/03/25 06:00:17  brian
  - flush corrections
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 06:00:17 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 19:01:12 $"
 
-static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 06:00:17 $";
+static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 19:01:12 $";
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
@@ -87,7 +90,7 @@ static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.15 
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 06:00:17 $"
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 19:01:12 $"
 #define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"
@@ -124,7 +127,7 @@ modID_t modid = CONFIG_STREAMS_LOOP_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for LOOP driver. (0 for auto allocation)");
 
@@ -138,7 +141,7 @@ major_t major = CONFIG_STREAMS_LOOP_MAJOR;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for LOOP driver. (0 for auto allocation)");
 

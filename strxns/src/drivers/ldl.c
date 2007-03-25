@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 06:01:05 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/25 19:02:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:01:05 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.c,v $
+ Revision 0.9.2.36  2007/03/25 19:02:47  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.35  2007/03/25 06:01:05  brian
  - flush corrections
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 06:01:05 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/25 19:02:47 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 06:01:05 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/25 19:02:47 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -109,7 +112,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.35 $) $Date: 2007/03/25 06:01:05 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.36 $) $Date: 2007/03/25 19:02:47 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -4892,7 +4895,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID number for LDL driver (0 for allocation).");
 
@@ -4901,7 +4904,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for LDL driver (0 for allocation).");
 #endif				/* LINUX */

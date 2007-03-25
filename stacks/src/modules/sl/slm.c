@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 05:59:41 $
+ @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 19:00:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 05:59:41 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 05:59:41 $"
+#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 19:00:15 $"
 
 static char const ident[] =
-    "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 05:59:41 $";
+    "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 19:00:15 $";
 
 /*
  *  This is an SLM (Signalling Link Management) multiplexing driver which also
@@ -97,7 +97,7 @@ static char const ident[] =
 #include <ss7/ua_lm_ioctl.h>
 
 #define SLM_DESCRIP	"SLM: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 05:59:41 $"
+#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 19:00:15 $"
 #define SLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SLM_DEVICE	"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -389,11 +389,11 @@ typedef sp_t sg_t;
  *
  *  -------------------------------------------------------------------------
  */
-STATIC kmem_cache_t *slm_pp_cachep = NULL;
-STATIC kmem_cache_t *slm_gp_cachep = NULL;
-STATIC kmem_cache_t *slm_np_cachep = NULL;
-STATIC kmem_cache_t *slm_sp_cachep = NULL;
-STATIC kmem_cache_t *slm_xp_cachep = NULL;
+STATIC kmem_cachep_t slm_pp_cachep = NULL;
+STATIC kmem_cachep_t slm_gp_cachep = NULL;
+STATIC kmem_cachep_t slm_np_cachep = NULL;
+STATIC kmem_cachep_t slm_sp_cachep = NULL;
+STATIC kmem_cachep_t slm_xp_cachep = NULL;
 
 /*
  *  Cache allocation
@@ -403,34 +403,54 @@ STATIC int
 slm_term_caches(void)
 {
 	if (slm_pp_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(slm_pp_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy slm_pp_cachep", __FUNCTION__);
 		else
 			printd(("SLM: destroyed slm_pp_cache\n"));
+#else
+		kmem_cache_destroy(slm_pp_cachep);
+#endif
 	}
 	if (slm_gp_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(slm_gp_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy slm_gp_cachep", __FUNCTION__);
 		else
 			printd(("SLM: destroyed slm_gp_cache\n"));
+#else
+		kmem_cache_destroy(slm_gp_cachep);
+#endif
 	}
 	if (slm_np_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(slm_np_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy slm_np_cachep", __FUNCTION__);
 		else
 			printd(("SLM: destroyed slm_np_cache\n"));
+#else
+		kmem_cache_destroy(slm_np_cachep);
+#endif
 	}
 	if (slm_sp_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(slm_sp_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy slm_sp_cachep", __FUNCTION__);
 		else
 			printd(("SLM: destroyed slm_sp_cache\n"));
+#else
+		kmem_cache_destroy(slm_sp_cachep);
+#endif
 	}
 	if (slm_xp_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(slm_xp_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy slm_xp_cachep", __FUNCTION__);
 		else
 			printd(("SLM: destroyed slm_xp_cache\n"));
+#else
+		kmem_cache_destroy(slm_xp_cachep);
+#endif
 	}
 	return;
 }
@@ -493,7 +513,7 @@ STATIC pp_t *
 slm_alloc_priv(queue_t *q, queue_t *mq, pp_t ** ppp, uint index, cred_t *crp, uint type)
 {
 	pp_t *pp;
-	if ((pp = kmem_cache_alloc(slm_pp_cachep, SLAB_ATOMIC))) {
+	if ((pp = kmem_cache_alloc(slm_pp_cachep, GFP_ATOMIC))) {
 		printd(("SLM: allocated device private structure\n"));
 		bzero(pp, sizeof(*pp));
 		pp->id.mux = index;
@@ -571,7 +591,7 @@ STATIC np_t *
 slm_alloc_np(sp_t * as, sp_t * sg)
 {
 	np_t *mp;
-	if ((np = kmem_cache_alloc(slm_np_cachep, SLAB_ATOMIC))) {
+	if ((np = kmem_cache_alloc(slm_np_cachep, GFP_ATOMIC))) {
 		printd(("M2UA: allocated np structure\n"));
 		bzero(np, sizeof(*np));
 		if ((np->as.next = as->np)) {
@@ -642,7 +662,7 @@ STATIC gp_t *
 slm_alloc_gp(sp_t * sp, xp_t * xp)
 {
 	gp_t *mp;
-	if ((gp = kmem_cache_alloc(slm_gp_cachep, SLAB_ATOMIC))) {
+	if ((gp = kmem_cache_alloc(slm_gp_cachep, GFP_ATOMIC))) {
 		printd(("SLM: allocated gp structure\n"));
 		bzero(gp, sizeof(*gp));
 		if ((gp->xp.next = xp->gp)) {
@@ -713,7 +733,7 @@ STATIC sp_t *
 slm_alloc_sp(sp_t ** spp)
 {
 	sp_t *sp;
-	if ((sp = kmem_cache_alloc(slm_sp_cachep, SLAB_ATOMIC))) {
+	if ((sp = kmem_cache_alloc(slm_sp_cachep, GFP_ATOMIC))) {
 		printd(("SLM: allocated sp structure\n"));
 		bzero(sp, sizeof(*sp));
 		if ((sp->next = *spp)) {
@@ -772,7 +792,7 @@ STATIC xp_t *
 slm_alloc_xp(sp_t * sp)
 {
 	xp_t *xp;
-	if ((xp = kmem_cache_alloc(slm_xp_cachep, SLAB_ATOMIC))) {
+	if ((xp = kmem_cache_alloc(slm_xp_cachep, GFP_ATOMIC))) {
 		printd(("SLM: allocated xp structure\n"));
 		bzero(xp, sizeof(*xp));
 		if ((xp->next = *xpp)) {

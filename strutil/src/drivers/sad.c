@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 06:01:00 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:02:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:01:00 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 06:01:00 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:02:29 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 06:01:00 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:02:29 $";
 
 /*
  * STREAMS Administrative Driver (SAD) for Linux Fast-STREAMS.  Note that this driver also acts as a
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 06:01:00 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:02:29 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -120,7 +120,7 @@ modID_t modid = CONFIG_STREAMS_SAD_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for STREAMS-administrative driver.");
 
@@ -134,7 +134,7 @@ major_t major = CONFIG_STREAMS_SAD_MAJOR;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for STREAMS-administrative driver.");
 

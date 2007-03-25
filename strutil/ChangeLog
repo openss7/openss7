@@ -1,5 +1,21 @@
 2007-03-25  Brian Bidulock  <bidulock@openss7.org>
 
+	* acinclude.m4: support for 2.6.20-1.2307.fc5
+	* doc/manual/news.texi: support for 2.6.20-1.2307.fc5
+	* src/drivers/clone.c: support for 2.6.20-1.2307.fc5
+	* src/drivers/echo.c: support for 2.6.20-1.2307.fc5
+	* src/drivers/fifo.c: support for 2.6.20-1.2307.fc5
+	* src/drivers/log.c: support for 2.6.20-1.2307.fc5
+	* src/drivers/nsdev.c: support for 2.6.20-1.2307.fc5
+	* src/drivers/nuls.c: support for 2.6.20-1.2307.fc5
+	* src/drivers/pipe.c: support for 2.6.20-1.2307.fc5
+	* src/drivers/sad.c: support for 2.6.20-1.2307.fc5
+	* src/drivers/sfx.c: support for 2.6.20-1.2307.fc5
+	* src/drivers/spx.c: support for 2.6.20-1.2307.fc5
+	* src/modules/connld.c: support for 2.6.20-1.2307.fc5
+	* src/modules/pipemod.c: support for 2.6.20-1.2307.fc5
+	* src/modules/sc.c: support for 2.6.20-1.2307.fc5
+
 	* src/drivers/echo.c: flush corrections
 	* src/drivers/log.c: flush corrections
 	* src/drivers/nuls.c: flush corrections

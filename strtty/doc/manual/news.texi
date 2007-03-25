@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.21 2007/03/17 08:29:46 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.22 2007/03/25 19:02:23 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/17 08:29:46 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/25 19:02:23 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -89,6 +89,9 @@ and tool chains.
 Major features since the last public release are as follows:
 
 @itemize -
+@item
+Changes to support build on 2.6.20-1.2307.fc5 kernel.
+
 @item
 Support for recent distributions and tool chains.
 

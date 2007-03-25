@@ -85,7 +85,7 @@
 #endif				/* KERNEL_2_5 */
 
 #if defined(USE_KMEM_CACHE)
-kmem_cache_t *lis_locks_cachep;
+kmem_cachep_t lis_locks_cachep;
 #endif
 
 #define FL	char *file, int line

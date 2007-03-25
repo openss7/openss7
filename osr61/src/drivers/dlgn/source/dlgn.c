@@ -330,14 +330,14 @@ static int sba_address = 0;
 static int r4_feature  = 1;
 static int dlgn_opencount = 1;
 #ifdef LINUX26
-module_param(blt_irq,int,0);
-module_param(sba_irq,int,0);
-module_param(ft_dl, int,0);
-module_param(ft_pc, int,0);
-module_param(blt_address,int,0);
-module_param(sba_address,int,0);
-module_param(r4_feature, int,0);
-module_param(dlgn_opencount, int,0);
+module_param(blt_irq,int,0444);
+module_param(sba_irq,int,0444);
+module_param(ft_dl, int,0444);
+module_param(ft_pc, int,0444);
+module_param(blt_address,int,0444);
+module_param(sba_address,int,0444);
+module_param(r4_feature, int,0444);
+module_param(dlgn_opencount, int,0444);
 #else
 MODULE_PARM(blt_irq,"i");
 MODULE_PARM(sba_irq,"i");

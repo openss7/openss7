@@ -114,7 +114,8 @@ pmacd_board_t *pmacd_allocateBoard(UINT8_T boardId,
   pBoard->resetBoardTimer.function = pmacd_hardResetBoardComplete;
   pBoard->resetBoardTimer.data     = (ULONG_T)pBoard;
 
-#ifdef LINUX24
+//#ifdef LINUX24
+#if 1
   tasklet_init(&(pBoard->getMessagesTask), (void *)pmacd_routeBoardMessages, (unsigned long)pBoard);
 #else
   INIT_WORK(&pBoard->getMessagesTask, (void (*)(void *))pmacd_routeBoardMessages, pBoard);

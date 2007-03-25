@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/05 23:02:31 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/25 19:02:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/05 23:02:31 $ by $Author: brian $
+# Last Modified $Date: 2007/03/25 19:02:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -603,6 +603,7 @@ AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -616,7 +617,7 @@ AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
 ])
     AC_SUBST([EXPOSED_SYMBOLS])dnl
     _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
-			process_group cpu_raise_softirq check_region pcibios_init \
+			process_group process_session cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \
 			pcibios_read_config_byte pcibios_read_config_dword \
 			pcibios_read_config_word pcibios_write_config_byte \
@@ -644,6 +645,7 @@ AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -686,6 +688,7 @@ AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -716,10 +719,11 @@ AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
 #include <asm/uaccess.h>
 #endif
 ])
-    _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
+    _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -767,6 +771,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -798,6 +803,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -832,6 +838,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H

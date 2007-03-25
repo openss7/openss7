@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/20 23:07:07 $
+ @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/20 23:07:07 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch.c,v $
+ Revision 0.9.2.2  2007/03/25 19:00:51  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.1  2006/12/20 23:07:07  brian
  - new working files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/20 23:07:07 $"
+#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:51 $"
 
-static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/20 23:07:07 $";
+static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:51 $";
 
 /*
  * This is a CH multiplexing driver.  MX stream are linked beneath the lower multiplex and CH
@@ -66,6 +69,10 @@ static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
  * via this driver.  Modules are then pushed on CH streams to provide HDLC or SS7 and LAPB, LAPF,
  * LAPD or LAPM procedures.
  */
+
+#ifndef HAVE_KTYPE_BOOL
+#include <stdbool.h>
+#endif
 
 #define _DEBUG 1
 // #undef _DEBUG
@@ -76,8 +83,6 @@ static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
 
 #include <sys/os7/compat.h>
 
-#include <stdbool.h>
-
 #include <sys/chi.h>
 #include <sys/chi_ioctl.h>
 #include <sys/mxi.h>
@@ -85,7 +90,7 @@ static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
 
 #define CHMUX_DESCRIP	"CH (Channel) STREAMS MULTIPLEXING DRIVER."
 #define CHMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define CHMUX_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/20 23:07:07 $"
+#define CHMUX_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:51 $"
 #define CHMUX_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define CHMUX_DEVICE	"Supports MX devices."
 #define CHMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

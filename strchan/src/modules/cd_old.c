@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/12/18 08:59:35 $
+ @(#) $RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 19:00:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 08:59:35 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd_old.c,v $
+ Revision 0.9.2.13  2007/03/25 19:00:54  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.12  2006/12/18 08:59:35  brian
  - working up strchan package
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/12/18 08:59:35 $"
+#ident "@(#) $RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 19:00:54 $"
 
 static char const ident[] =
-    "$RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/12/18 08:59:35 $";
+    "$RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 19:00:54 $";
 
 //#define EXPORT_SYMTAB
 
@@ -85,7 +88,7 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"OpenSS7 $RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/12/18 08:59:35 $"
+#define HDLC_REVISION	"OpenSS7 $RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 19:00:54 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICES	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -187,7 +190,7 @@ struct cd {
  *
  *  -------------------------------------------------------------------------
  */
-STATIC kmem_cache_t *hdlc_priv_cachep = NULL;
+STATIC kmem_cachep_t hdlc_priv_cachep = NULL;
 STATIC int
 hdlc_init_caches(void)
 {
@@ -205,10 +208,14 @@ STATIC void
 hdlc_free_caches(void)
 {
 	if (hdlc_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(hdlc_priv_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy hdlc_priv_cachep.", __FUNCTION__);
 		else
 			printd(("cd: destroyed hdlc_priv_cachep\n"));
+#else
+		kmem_cache_destroy(hdlc_priv_cachep);
+#endif
 	}
 	return;
 }
@@ -271,7 +278,7 @@ cd_alloc_priv(queue_t *q, struct str **stp, dev_t *devp, cred_t *crp, ulong type
 	struct cd *cd;
 	struct cd **cdp = (struct cd **) stp;
 
-	if ((cd = kmem_cache_alloc(hdlc_priv_cachep, SLAB_ATOMIC))) {
+	if ((cd = kmem_cache_alloc(hdlc_priv_cachep, GFP_ATOMIC))) {
 		int flags =
 		    (type ==
 		     CD_DAED) ? (CD_OCTET_COUNTING | CD_SU_COMPRESSION | CD_SU_REPEATING) : 0;

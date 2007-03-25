@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.18 2007/03/04 19:13:02 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.19 2007/03/25 19:01:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/04 19:13:02 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.19  2007/03/25 19:01:01  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.18  2007/03/04 19:13:02  brian
  - corrections
 
@@ -109,7 +112,7 @@
 #ifndef __SYS_MPS_STREAM_H__
 #define __SYS_MPS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.18 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.19 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mps/stream.h directly, include sys/stream.h instead."
@@ -148,7 +151,7 @@ extern size_t mi_close_size(caddr_t ptr);
 extern caddr_t mi_open_obj(void *obj, size_t size);
 extern caddr_t mi_open_alloc(size_t size);
 extern caddr_t mi_open_alloc_sleep(size_t size);
-extern caddr_t mi_open_alloc_cache(kmem_cache_t *cachep, int flag);
+extern caddr_t mi_open_alloc_cache(kmem_cachep_t cachep, int flag);
 extern caddr_t mi_first_ptr(caddr_t *mi_head);
 extern caddr_t mi_first_dev_ptr(caddr_t *mi_head);
 extern caddr_t mi_next_ptr(caddr_t ptr);
@@ -157,7 +160,7 @@ extern caddr_t mi_prev_ptr(caddr_t ptr);
 extern int mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag,
 			cred_t *credp);
 extern void mi_close_free(caddr_t ptr);
-extern void mi_close_free_cache(kmem_cache_t *cachep, caddr_t ptr);
+extern void mi_close_free_cache(kmem_cachep_t cachep, caddr_t ptr);
 
 __MPS_EXTERN_INLINE caddr_t
 mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp)

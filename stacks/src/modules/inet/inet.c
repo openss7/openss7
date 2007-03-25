@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 05:59:20 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 18:59:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 05:59:20 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:20 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 05:59:20 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 18:59:20 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 05:59:20 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 18:59:20 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -357,7 +357,7 @@ static char const ident[] =
 #ifndef tcp_openreq_cachep
 #ifdef HAVE_TCP_OPENREQ_CACHEP_ADDR
 #include <linux/slab.h>
-static kmem_cache_t **const _tcp_openreq_cachep_location =
+static kmem_cachep_t *const _tcp_openreq_cachep_location =
     (typeof(_tcp_openreq_cachep_location)) (HAVE_TCP_OPENREQ_CACHEP_ADDR);
 
 #define tcp_openreq_cachep (*_tcp_openreq_cachep_location)
@@ -541,7 +541,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 05:59:20 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 18:59:20 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -15874,7 +15874,7 @@ ss_wsrv(queue_t *q)
  *
  *  =========================================================================
  */
-STATIC kmem_cache_t *ss_priv_cachep = NULL;
+STATIC kmem_cachep_t ss_priv_cachep = NULL;
 STATIC int
 ss_init_caches(void)
 {
@@ -15892,11 +15892,15 @@ STATIC int
 ss_term_caches(void)
 {
 	if (ss_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(ss_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ss_priv_cachep", __FUNCTION__);
 			return (-EBUSY);
 		} else
 			printd(("%s: destroyed ss_priv_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(ss_priv_cachep);
+#endif
 	}
 	return (0);
 }
@@ -15906,7 +15910,7 @@ ss_alloc_priv(queue_t *q, ss_t **slp, major_t cmajor, minor_t cminor, cred_t *cr
 {
 	ss_t *ss;
 
-	if ((ss = kmem_cache_alloc(ss_priv_cachep, SLAB_ATOMIC))) {
+	if ((ss = kmem_cache_alloc(ss_priv_cachep, GFP_ATOMIC))) {
 #if 0
 		printd(("%s: allocated module private structure\n", DRV_NAME));
 #endif
@@ -16213,7 +16217,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
 
@@ -16222,7 +16226,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)");
 

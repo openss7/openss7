@@ -51,7 +51,8 @@ typedef struct{
   pmacd_streamgroup_t streams;         // streams for this board
   struct timer_list sendMessagesTimer; // Timer used for sending msgs to the board
   struct timer_list resetBoardTimer;   // Timer for hard reseting the board
-#ifdef LINUX24
+//#ifdef LINUX24
+#if 1
 #ifdef LFS
   struct tasklet_struct getMessagesTask;    // Task for retrieving messages
 #else

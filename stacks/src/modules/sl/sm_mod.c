@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:22:58 $
+ @(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:00:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:22:58 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sm_mod.c,v $
+ Revision 0.9.2.17  2007/03/25 19:00:16  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.16  2007/03/25 02:22:58  brian
  - add D_MP and D_MTPERQ flags
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:22:58 $"
+#ident "@(#) $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:00:16 $"
 
 static char const ident[] =
-    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:22:58 $";
+    "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:00:16 $";
 
 #include <sys/os7/compat.h>
 
@@ -75,7 +78,7 @@ static char const ident[] =
 #include <ss7/mtpi.h>
 
 #define SM_MOD_DESCRIP		"SIMPLE SINGLE LINK MTP."
-#define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:22:58 $"
+#define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:00:16 $"
 #define SM_MOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SM_MOD_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SM_MOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -313,7 +316,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SM-MOD module. (0 for allocation.)");
 

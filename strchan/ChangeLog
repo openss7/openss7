@@ -1,5 +1,21 @@
 2007-03-25  Brian Bidulock  <bidulock@openss7.org>
 
+	* acinclude.m4: support for 2.6.20-1.2307.fc5
+	* doc/manual/news.texi: support for 2.6.20-1.2307.fc5
+	* src/drivers/ch.c: support for 2.6.20-1.2307.fc5
+	* src/drivers/hdlc.c: support for 2.6.20-1.2307.fc5
+	* src/drivers/mg.c: support for 2.6.20-1.2307.fc5
+	* src/drivers/mx.c: support for 2.6.20-1.2307.fc5
+	* src/drivers/v401p.c: support for 2.6.20-1.2307.fc5
+	* src/drivers/zapmux.c: support for 2.6.20-1.2307.fc5
+	* src/modules/cd.c: support for 2.6.20-1.2307.fc5
+	* src/modules/cd_daed.c: support for 2.6.20-1.2307.fc5
+	* src/modules/cd_hdlc.c: support for 2.6.20-1.2307.fc5
+	* src/modules/cd_old.c: support for 2.6.20-1.2307.fc5
+	* src/modules/ch.c: support for 2.6.20-1.2307.fc5
+	* src/modules/chmod.c: support for 2.6.20-1.2307.fc5
+	* src/modules/lapb.c: support for 2.6.20-1.2307.fc5
+
 	* src/drivers/mx.c: flush corrections
 	* src/modules/cd.c: flush corrections
 	* src/modules/lapb.c: flush corrections

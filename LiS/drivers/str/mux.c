@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 05:59:12 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 18:58:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 05:59:12 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:58:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mux.c,v $
+ Revision 0.9.2.12  2007/03/25 18:58:11  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.11  2007/03/25 05:59:12  brian
  - flush corrections
 
@@ -58,15 +61,17 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 05:59:12 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 18:58:11 $"
 
-static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 05:59:12 $";
+static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 18:58:11 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
  */
 
+#ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
+#endif
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -90,7 +95,7 @@ static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.11 $
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 05:59:12 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 18:58:11 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -146,7 +151,7 @@ modID_t modid = CONFIG_STREAMS_MUX_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for STREAMS-mux driver.");
 
@@ -160,7 +165,7 @@ major_t major = CONFIG_STREAMS_MUX_MAJOR;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for STREAMS-mux driver.");
 

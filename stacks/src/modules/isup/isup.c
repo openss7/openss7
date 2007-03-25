@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 05:59:25 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 05:59:25 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 0.9.2.18  2007/03/25 18:59:28  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.17  2007/03/25 05:59:25  brian
  - flush corrections
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 05:59:25 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:28 $"
 
 static char const ident[] =
-    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 05:59:25 $";
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:28 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -100,7 +103,7 @@ static char const ident[] =
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 05:59:25 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:28 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -25316,13 +25319,13 @@ isup_close(queue_t *q, int flag, cred_t *crp)
  *
  *  =========================================================================
  */
-STATIC kmem_cache_t *isup_cc_cachep = NULL;
-STATIC kmem_cache_t *isup_tg_cachep = NULL;
-STATIC kmem_cache_t *isup_cg_cachep = NULL;
-STATIC kmem_cache_t *isup_ct_cachep = NULL;
-STATIC kmem_cache_t *isup_sr_cachep = NULL;
-STATIC kmem_cache_t *isup_sp_cachep = NULL;
-STATIC kmem_cache_t *isup_mtp_cachep = NULL;
+STATIC kmem_cachep_t isup_cc_cachep = NULL;
+STATIC kmem_cachep_t isup_tg_cachep = NULL;
+STATIC kmem_cachep_t isup_cg_cachep = NULL;
+STATIC kmem_cachep_t isup_ct_cachep = NULL;
+STATIC kmem_cachep_t isup_sr_cachep = NULL;
+STATIC kmem_cachep_t isup_sp_cachep = NULL;
+STATIC kmem_cachep_t isup_mtp_cachep = NULL;
 
 STATIC int
 isup_init_caches(void)
@@ -25411,53 +25414,81 @@ isup_term_caches(void)
 {
 	int err = 0;
 	if (isup_cc_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isup_cc_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isup_cc_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isup_cc_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isup_cc_cachep);
+#endif
 	}
 	if (isup_tg_cachep) {
 		if (kmem_cache_destroy(isup_tg_cachep)) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 			cmn_err(CE_WARN, "%s: did not destroy isup_tg_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isup_tg_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isup_tg_cachep);
+#endif
 	}
 	if (isup_cg_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isup_cg_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isup_cg_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isup_cg_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isup_cg_cachep);
+#endif
 	}
 	if (isup_ct_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isup_ct_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isup_ct_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isup_ct_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isup_ct_cachep);
+#endif
 	}
 	if (isup_sr_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isup_sr_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isup_sr_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isup_sr_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isup_sr_cachep);
+#endif
 	}
 	if (isup_sp_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isup_sp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isup_sp_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isup_sp_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isup_sp_cachep);
+#endif
 	}
 	if (isup_mtp_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isup_mtp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isup_mtp_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isup_mtp_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isup_mtp_cachep);
+#endif
 	}
 	return (err);
 }
@@ -25473,7 +25504,7 @@ isup_alloc_cc(queue_t *q, struct cc **ccp, dev_t *devp, cred_t *crp)
 	struct cc *cc;
 	printd(("%s: %s: create cc dev = %d:%d\n", DRV_NAME, __FUNCTION__, getmajor(*devp),
 		getminor(*devp)));
-	if ((cc = kmem_cache_alloc(isup_cc_cachep, SLAB_ATOMIC))) {
+	if ((cc = kmem_cache_alloc(isup_cc_cachep, GFP_ATOMIC))) {
 		bzero(cc, sizeof(*cc));
 		cc_get(cc);	/* first get */
 		cc->u.dev.cmajor = getmajor(*devp);
@@ -25633,7 +25664,7 @@ isup_alloc_ct(ulong id, struct tg *tg, struct cg *cg, ulong cic)
 	struct sp *sp = sr->sp.sp;
 	assure(sr == cg->sr.sr);
 	printd(("%s: %s: create ct->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((ct = kmem_cache_alloc(isup_ct_cachep, SLAB_ATOMIC))) {
+	if ((ct = kmem_cache_alloc(isup_ct_cachep, GFP_ATOMIC))) {
 		bzero(ct, sizeof(*ct));
 		ct_get(ct);	/* first get */
 		spin_lock_init(&ct->lock);	/* "ct-lock" */
@@ -25935,7 +25966,7 @@ isup_alloc_cg(ulong id, struct sr *sr)
 {
 	struct cg *cg, **cgp;
 	printd(("%s: %s: create cg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((cg = kmem_cache_alloc(isup_cg_cachep, SLAB_ATOMIC))) {
+	if ((cg = kmem_cache_alloc(isup_cg_cachep, GFP_ATOMIC))) {
 		bzero(cg, sizeof(*cg));
 		cg_get(cg);	/* first get */
 		spin_lock_init(&cg->lock);	/* "cg-lock" */
@@ -26148,7 +26179,7 @@ isup_alloc_tg(ulong id, struct sr *sr)
 {
 	struct tg *tg, **tgp;
 	printd(("%s: %s: create tg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((tg = kmem_cache_alloc(isup_tg_cachep, SLAB_ATOMIC))) {
+	if ((tg = kmem_cache_alloc(isup_tg_cachep, GFP_ATOMIC))) {
 		bzero(tg, sizeof(*tg));
 		tg_get(tg);	/* first get */
 		spin_lock_init(&tg->lock);	/* "tg-lock" */
@@ -26322,7 +26353,7 @@ isup_alloc_sr(ulong id, struct sp *sp, mtp_addr_t * add)
 {
 	struct sr *sr, **srp;
 	printd(("%s: %s: create sr->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((sr = kmem_cache_alloc(isup_sr_cachep, SLAB_ATOMIC))) {
+	if ((sr = kmem_cache_alloc(isup_sr_cachep, GFP_ATOMIC))) {
 		bzero(sr, sizeof(*sr));
 		sr_get(sr);	/* first get */
 		spin_lock_init(&sr->lock);	/* "sr-lock" */
@@ -26512,7 +26543,7 @@ isup_alloc_sp(ulong id, mtp_addr_t * add)
 {
 	struct sp *sp, **spp;
 	printd(("%s: %s: create sp->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((sp = kmem_cache_alloc(isup_sp_cachep, SLAB_ATOMIC))) {
+	if ((sp = kmem_cache_alloc(isup_sp_cachep, GFP_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		sp_get(sp);	/* first get */
 		spin_lock_init(&sp->lock);	/* "sp-lock" */
@@ -26669,7 +26700,7 @@ isup_alloc_mtp(queue_t *q, struct mtp **mpp, ulong index, cred_t *crp)
 {
 	struct mtp *mtp;
 	printd(("%s: %s: create mtp index = %lu\n", DRV_NAME, __FUNCTION__, index));
-	if ((mtp = kmem_cache_alloc(isup_mtp_cachep, SLAB_ATOMIC))) {
+	if ((mtp = kmem_cache_alloc(isup_mtp_cachep, GFP_ATOMIC))) {
 		bzero(mtp, sizeof(*mtp));
 		mtp_get(mtp);	/* first get */
 		mtp->u.mux.index = index;
@@ -26828,7 +26859,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the ISUP driver. (0 for allocation.)");
 
@@ -26836,7 +26867,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the ISUP driver. (0 for allocation.)");
 

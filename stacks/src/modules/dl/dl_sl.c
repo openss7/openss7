@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/23 13:03:58 $
+ @(#) $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/23 13:03:58 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_sl.c,v $
+ Revision 0.9.2.2  2007/03/25 18:59:15  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.1  2006/12/23 13:03:58  brian
  - added new conversion module
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/23 13:03:58 $"
+#ident "@(#) $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:15 $"
 
-static char const ident[] = "$RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/23 13:03:58 $";
+static char const ident[] = "$RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:15 $";
 
 /*
  *  This is a simple conversion module that converts between the OpenSS7 Signalling Link Interface
@@ -67,7 +70,7 @@ static char const ident[] = "$RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.1 
 #include <sys/os7/compat.h>
 
 #define DL_SL_DESCRIP	"DLPI/SLI CONVERSION STREAMS MODULE."
-#define DL_SL_REVISION	"OpenSS7 $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/12/23 13:03:58 $"
+#define DL_SL_REVISION	"OpenSS7 $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:15 $"
 #define DL_SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define DL_SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define DL_SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -3063,7 +3066,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else				/* module_param */
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for the DL-SL module. (0 for allocation.)");
 

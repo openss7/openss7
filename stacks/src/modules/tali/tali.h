@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tali.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:31:13 $
+ @(#) $RCSfile: tali.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:13 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:25 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __TALI_H__
 #define __TALI_H__
 
-#ident "@(#) $RCSfile: tali.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:31:13 $"
+#ident "@(#) $RCSfile: tali.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:25 $"
 
 extern int tali_reuseb(tali_t *, size_t, int, mblk_t *);
 
@@ -83,12 +83,12 @@ extern drv_t tali_sccp_driver;
 extern drv_t tali_isup_driver;
 extern drv_t tali_mtp_driver;
 
-extern kmem_cache_t *tali_pp_cachep;
-extern kmem_cache_t *tali_xp_cachep;
-extern kmem_cache_t *tali_gp_cachep;
-extern kmem_cache_t *tali_as_cachep;
-extern kmem_cache_t *tali_ap_cachep;
-extern kmem_cache_t *tali_sp_cachep;
-extern kmem_cache_t *tali_np_cachep;
+extern kmem_cachep_t tali_pp_cachep;
+extern kmem_cachep_t tali_xp_cachep;
+extern kmem_cachep_t tali_gp_cachep;
+extern kmem_cachep_t tali_as_cachep;
+extern kmem_cachep_t tali_ap_cachep;
+extern kmem_cachep_t tali_sp_cachep;
+extern kmem_cachep_t tali_np_cachep;
 
 #endif				/* __TALI_H__ */

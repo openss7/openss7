@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:52:56 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:01:22 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:56 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 0.9.2.17  2007/03/25 19:01:22  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.16  2007/03/25 00:52:56  brian
  - synchronization updates
 
@@ -101,10 +104,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:52:56 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:01:22 $"
 
 static char const ident[] =
-    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:52:56 $";
+    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:01:22 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -133,7 +136,7 @@ static char const ident[] =
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:52:56 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:01:22 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"
@@ -179,7 +182,7 @@ modID_t modid = CONFIG_STREAMS_TESTMOD_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for TESTMOD.");
 

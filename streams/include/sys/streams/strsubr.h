@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.76 2007/03/25 00:52:43 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.77 2007/03/25 19:01:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:43 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 0.9.2.77  2007/03/25 19:01:10  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.76  2007/03/25 00:52:43  brian
  - synchronization updates
 
@@ -88,7 +91,7 @@
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.76 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.77 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -405,7 +408,7 @@ enum {
 #endif
 
 struct strinfo {
-	kmem_cache_t *si_cache;		/* memory cache */
+	kmem_cachep_t si_cache;		/* memory cache */
 	rwlock_t si_rwlock;		/* lock for these entries */
 	atomic_t si_cnt;		/* count of entries in the list */
 	int si_hwl;			/* high water level for entries */

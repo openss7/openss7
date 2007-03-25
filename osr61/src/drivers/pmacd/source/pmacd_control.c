@@ -54,7 +54,8 @@ BOOLEAN_T pmacd_initControl(pmacd_control_t *control){
   init_timer(&(control->responseTimer));
   control->responseTimer.function = pmacd_handleControlResponseTimeout;
   control->responseTimer.data     = (ULONG_T)control;
-#ifdef LINUX24
+//#ifdef LINUX24
+#if 1
   tasklet_init(&(((pmacd_control_t *)control)->handleResponseTask), (void *)pmacd_handleControlResponse, (unsigned long)control);
 #else
   INIT_WORK(&control->handleResponseTask, (void (*)(void *))pmacd_handleControlResponse, control);
@@ -212,7 +213,8 @@ int pmacd_sendSimpleControlCommand(pmacd_control_t *control,
 void pmacd_handleControlResponseTimeout(ULONG_T control){
   // Just schedule the bottom half. This way forcing a wake up,
   // whether an interrupt occured or not.
-#ifdef LINUX24
+//#ifdef LINUX24
+#if 1
   tasklet_hi_schedule(&(((pmacd_control_t *)control)->handleResponseTask));
 #else
   schedule_work(&(((pmacd_control_t *)control)->handleResponseTask));

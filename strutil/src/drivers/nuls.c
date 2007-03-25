@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/03/25 06:01:00 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/03/25 19:02:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:01:00 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/03/25 06:01:00 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/03/25 19:02:29 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/03/25 06:01:00 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/03/25 19:02:29 $";
 
 #define _LFS_SOURCE
 
@@ -66,7 +66,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/03/25 06:01:00 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/03/25 19:02:29 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -122,7 +122,7 @@ modID_t modid = CONFIG_STREAMS_NULS_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for NULS driver. (0 for auto allocation)");
 
@@ -136,7 +136,7 @@ major_t major = CONFIG_STREAMS_NULS_MAJOR;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for NULS driver. (0 for auto allocation)");
 

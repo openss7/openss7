@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:13 $
+ @(#) $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:02:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/10 22:33:13 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi_conv.c,v $
+ Revision 0.9.2.2  2007/03/25 19:02:50  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.1  2007/02/10 22:33:13  brian
  - added new working files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:13 $"
+#ident "@(#) $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:02:50 $"
 
-static char const ident[] = "$RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:13 $";
+static char const ident[] = "$RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:02:50 $";
 
 /*
  *  DLPI-CONV is a simple endian conversion module for use with the RMUX driver.  It converts
@@ -71,7 +74,7 @@ static char const ident[] = "$RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 0.9.
 
 #define DLPI_CONV_DESCRIP	"DLPI ENDIAN CONVERSION (DLPI-CONV) FOR LINUX FAST-STREAMS"
 #define DLPI_CONV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define DLPI_CONV_REVISION	"OpenSS7 $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/02/10 22:33:13 $"
+#define DLPI_CONV_REVISION	"OpenSS7 $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:02:50 $"
 #define DLPI_CONV_DEVICE	"SVR 4.2 DLPI Endian Conversion (DLPI-CONV) for STREAMS"
 #define DLPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DLPI_CONV_LICENSE	"GPL"
@@ -239,7 +242,7 @@ modID_t modid = CONFIG_STREAMS_DLPI_CONV_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else				/* module_param */
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for DLPI-CONV module.");
 

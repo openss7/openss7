@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:41 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:22:41 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: hdlc.c,v $
+ Revision 0.9.2.16  2007/03/25 18:59:19  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.15  2007/03/25 02:22:41  brian
  - add D_MP and D_MTPERQ flags
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:41 $"
+#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:19 $"
 
 static char const ident[] =
-    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:41 $";
+    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:19 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -93,7 +96,7 @@ static char const ident[] =
 #include <ss7/hdlc_ioctl.h>
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:41 $"
+#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:19 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -252,7 +255,7 @@ struct cd {
  *
  *  -------------------------------------------------------------------------
  */
-STATIC kmem_cache_t *hdlc_priv_cachep = NULL;
+STATIC kmem_cachep_t hdlc_priv_cachep = NULL;
 STATIC int
 hdlc_init_caches(void)
 {
@@ -270,11 +273,15 @@ STATIC int
 hdlc_term_caches(void)
 {
 	if (hdlc_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(hdlc_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy hdlc_priv_cachep.", __FUNCTION__);
 			return (-EBUSY);
 		} else
 			printd(("cd: destroyed hdlc_priv_cachep\n"));
+#else
+		kmem_cache_destroy(hdlc_priv_cachep);
+#endif
 	}
 	return (0);
 }
@@ -330,7 +337,7 @@ STATIC struct cd *
 hdlc_alloc_priv(queue_t *q, struct cd **hpp, dev_t *devp, cred_t *crp)
 {
 	struct cd *cd;
-	if ((cd = kmem_cache_alloc(hdlc_priv_cachep, SLAB_ATOMIC))) {
+	if ((cd = kmem_cache_alloc(hdlc_priv_cachep, GFP_ATOMIC))) {
 		printd(("cd: allocated module private structure\n"));
 		bzero(cd, sizeof(*cd));
 		cd->priv_put = &cd_put;	/* set put method */
@@ -3799,7 +3806,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the HDLC module. (0 for allocation.)");
 

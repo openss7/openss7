@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/02 10:04:50 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:02:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/02 10:04:50 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clone.c,v $
+ Revision 0.9.2.44  2007/03/25 19:02:29  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.43  2007/03/02 10:04:50  brian
  - updates to common build process and versions for all exported symbols
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/02 10:04:50 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:02:29 $"
 
-static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/02 10:04:50 $";
+static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:02:29 $";
 
 #define _LFS_SOURCE
 
@@ -80,7 +83,7 @@ static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.43
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/02 10:04:50 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:02:29 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -120,7 +123,7 @@ modID_t clone_modid = CONFIG_STREAMS_CLONE_MODID;
 #ifndef module_param
 MODULE_PARM(clone_modid, "h");
 #else
-module_param(clone_modid, ushort, 0);
+module_param(clone_modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(clone_modid, "Module id number for CLONE driver.");
 
@@ -134,7 +137,7 @@ major_t major = CONFIG_STREAMS_CLONE_MAJOR;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for CLONE driver.");
 

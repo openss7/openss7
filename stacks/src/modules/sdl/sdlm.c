@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 02:22:55 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 19:00:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:22:55 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 02:22:55 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 19:00:10 $"
 
 static char const ident[] =
-    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 02:22:55 $";
+    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 19:00:10 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -78,7 +78,7 @@ static char const ident[] =
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 02:22:55 $"
+#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 19:00:10 $"
 #define SDLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -273,8 +273,8 @@ STATIC struct df master;
  *  -------------------------------------------------------------------------
  */
 
-STATIC kmem_cache_t *sdlm_dl_cachep = NULL;
-STATIC kmem_cache_t *sdlm_sd_cachep = NULL;
+STATIC kmem_cachep_t sdlm_dl_cachep = NULL;
+STATIC kmem_cachep_t sdlm_sd_cachep = NULL;
 
 STATIC int
 sdlm_term_caches(void)
@@ -282,18 +282,26 @@ sdlm_term_caches(void)
 	int err = 0;
 
 	if (sdlm_sd_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sdlm_sd_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sdlm_sd_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed sdlm_sd_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(sdlm_sd_cachep);
+#endif
 	}
 	if (sdlm_dl_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sdlm_dl_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sdlm_dl_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed sdlm_dl_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(sdlm_dl_cachep);
+#endif
 	}
 	return (err);
 }
@@ -347,7 +355,7 @@ sdlm_alloc_dl(queue_t *q, struct dl **dpp, major_t cmajor, minor_t cminor, cred_
 	struct dl *dl;
 
 	printd(("%s: %s: create dl device = %hu:%hu\n", DRV_NAME, __FUNCTION__, cmajor, cminor));
-	if ((dl = kmem_cache_alloc(sdlm_dl_cachep, SLAB_ATOMIC))) {
+	if ((dl = kmem_cache_alloc(sdlm_dl_cachep, GFP_ATOMIC))) {
 		bzero(dl, sizeof(*dl));
 		dl_get(dl);	/* first get */
 		dl->u.dev.cmajor = cmajor;
@@ -445,7 +453,7 @@ sdlm_alloc_sd(queue_t *q, struct sd **spp, ulong index, cred_t *crp)
 	struct sd *sd;
 
 	printd(("%s: %s: create sd index = %lu\n", DRV_NAME, __FUNCTION__, index));
-	if ((sd = kmem_cache_alloc(sdlm_sd_cachep, SLAB_ATOMIC))) {
+	if ((sd = kmem_cache_alloc(sdlm_sd_cachep, GFP_ATOMIC))) {
 		bzero(sd, sizeof(*sd));
 		sdlm_get(sd);	/* first get */
 		sd->u.mux.index = index;
@@ -998,7 +1006,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SDL-MUX driver. (0 for allocation.)");
 
@@ -1007,7 +1015,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the SDL-MUX driver. (0 for allocation.)");
 

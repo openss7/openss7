@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 02:23:09 $
+ @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 19:00:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:09 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_x400p.c,v $
+ Revision 0.9.2.19  2007/03/25 19:00:38  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.18  2007/03/25 02:23:09  brian
  - add D_MP and D_MTPERQ flags
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 02:23:09 $"
+#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 19:00:38 $"
 
 static char const ident[] =
-    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 02:23:09 $";
+    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 19:00:38 $";
 
 #include <sys/os7/compat.h>
 
@@ -83,7 +86,7 @@ static char const ident[] =
 
 #define MX_SDL_DESCRIP		"X400P-SS7 MULTIPLEX (MX) STREAMS MODULE."
 #define MX_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define MX_SDL_REVISION		"OpenSS7 $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2007/03/25 02:23:09 $"
+#define MX_SDL_REVISION		"OpenSS7 $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2007/03/25 19:00:38 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define MX_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2581,7 +2584,7 @@ mx_close(queue_t *q, int flag, cred_t *crp)
  *
  *  =========================================================================
  */
-STATIC kmem_cache_t *mx_priv_cachep = NULL;
+STATIC kmem_cachep_t mx_priv_cachep = NULL;
 STATIC int
 mx_init_caches(void)
 {
@@ -2599,11 +2602,15 @@ STATIC int
 mx_term_caches(void)
 {
 	if (mx_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(mx_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mx_priv_cachep", __FUNCTION__);
 			return (-EBUSY);
 		} else
 			printd(("%s: destroyed mx_priv_cachep\n", MOD_NAME));
+#else
+		kmem_cache_destroy(mx_priv_cachep);
+#endif
 	}
 	return (0);
 }
@@ -2616,7 +2623,7 @@ STATIC struct mx *
 mx_alloc_priv(queue_t *q, struct mx **chp, dev_t *devp, cred_t *crp)
 {
 	struct mx *mx;
-	if ((mx = kmem_cache_alloc(mx_priv_cachep, SLAB_ATOMIC))) {
+	if ((mx = kmem_cache_alloc(mx_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated mx private structure\n", MOD_NAME, mx));
 		bzero(mx, sizeof(*mx));
 		mx->u.dev.cmajor = getmajor(*devp);
@@ -2699,7 +2706,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SSCOP module. (0 for allocation.)");
 

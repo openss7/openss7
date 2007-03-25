@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 05:59:29 $
+ @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 18:59:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 05:59:29 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2tp.c,v $
+ Revision 0.9.2.15  2007/03/25 18:59:34  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.14  2007/03/25 05:59:29  brian
  - flush corrections
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 05:59:29 $"
+#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 18:59:34 $"
 
-static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 05:59:29 $";
+static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 18:59:34 $";
 
 /*
  *  This is a M2TP/SCTP driver.  This simulates one or more SS7 links using an
@@ -89,7 +92,7 @@ static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.14 
 #include <ss7/m2tp_ioctl.h>
 
 #define M2TP_DESCRIP	"M2TP/SCTP MTP2 TUNNELING PROTOCOL (SL) STREAMS MODULE."
-#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Data$"
+#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Data$"
 #define M2TP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2007,7 +2010,7 @@ m2tp_wsrv(queue_t *q)
  *  We use Linux hardware aligned cache here for speedy access to information
  *  contained in the private data structure.
  */
-kmem_cache_t *m2tp_cachep = NULL;
+kmem_cachep_t m2tp_cachep = NULL;
 
 static m2tp_t *
 m2tp_alloc_priv(queue_t *q)
@@ -2119,7 +2122,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the M2PA-SL module. (0 for allocation.)");
 

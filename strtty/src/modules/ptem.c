@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:57 $
+ @(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:00:57 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ptem.c,v $
+ Revision 0.9.2.5  2007/03/25 19:02:25  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.4  2007/03/25 06:00:57  brian
  - flush corrections
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:57 $"
+#ident "@(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:25 $"
 
 static char const ident[] =
-    "$RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:57 $";
+    "$RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:25 $";
 
 /*
  * PTEM - Pseudo Terminal Emulation Module.
@@ -140,7 +143,7 @@ References
 
 #define PTEM_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTEM_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PTEM_REVISION		"OpenSS7 $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:57 $"
+#define PTEM_REVISION		"OpenSS7 $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:25 $"
 #define PTEM_DEVICE		"SVR 4.2 STREAMS Pseudo-Terminal Emulation Module (PTEM)"
 #define PTEM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PTEM_LICENSE		"GPL"
@@ -178,7 +181,7 @@ modID_t modid = CONFIG_STREAMS_PTEM_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else				/* module_param */
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for PTEM (0 for allocation).");
 

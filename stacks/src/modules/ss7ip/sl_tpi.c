@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/25 05:59:42 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/25 19:00:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 05:59:42 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/25 05:59:42 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/25 19:00:17 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/25 05:59:42 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/25 19:00:17 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -8250,7 +8250,7 @@ sl_wsrv(queue_t *q)
  *
  *  =========================================================================
  */
-STATIC kmem_cache_t *sl_priv_cachep = NULL;
+STATIC kmem_cachep_t sl_priv_cachep = NULL;
 STATIC int
 sl_init_caches(void)
 {
@@ -8268,11 +8268,15 @@ STATIC int
 sl_term_caches(void)
 {
 	if (sl_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sl_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sl_priv_cachep", __FUNCTION__);
 			return (-EBUSY);
 		} else
 			printd(("%s: destroyed sl_priv_cachep\n", SL_TPI_MOD_NAME));
+#else
+		kmem_cache_destroy(sl_priv_cachep);
+#endif
 	}
 	return (0);
 }
@@ -8280,7 +8284,7 @@ STATIC sl_t *
 sl_alloc_priv(queue_t *q, sl_t ** slp, major_t cmajor, minor_t cminor)
 {
 	sl_t *sl;
-	if ((sl = kmem_cache_alloc(sl_priv_cachep, SLAB_ATOMIC))) {
+	if ((sl = kmem_cache_alloc(sl_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: allocated module private structure\n", SL_TPI_MOD_NAME));
 		bzero(sl, sizeof(*sl));
 		sl->cmajor = cmajor;
@@ -8497,7 +8501,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SL-TPI module. (0 for allocation.)");
 

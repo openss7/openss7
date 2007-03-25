@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:56 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 19:01:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:56 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nullmod.c,v $
+ Revision 0.9.2.13  2007/03/25 19:01:18  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.12  2007/03/25 00:52:56  brian
  - synchronization updates
 
@@ -90,10 +93,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:56 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 19:01:18 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:56 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 19:01:18 $";
 
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -125,7 +128,7 @@ static char const ident[] =
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:56 $"
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 19:01:18 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"
@@ -171,7 +174,7 @@ modID_t modid = CONFIG_STREAMS_NULLMOD_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for NULLMOD.");
 
