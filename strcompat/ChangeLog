@@ -1,5 +1,8 @@
 2007-03-25  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/include/sys/svr4/ddi.h: somewhat more workable RW_UNLOCK
+	* src/kernel/svr4compat.c: somewhat more workable RW_UNLOCK
+
 	* src/kernel/liscompat.c: correct LiS global synchronization
 
 2007-03-24  Brian Bidulock  <bidulock@openss7.org>

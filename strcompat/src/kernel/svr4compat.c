@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/02 10:04:08 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 03:15:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/02 10:04:08 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 03:15:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: svr4compat.c,v $
+ Revision 0.9.2.35  2007/03/25 03:15:20  brian
+ - somewhat more workable RW_UNLOCK
+
  Revision 0.9.2.34  2007/03/02 10:04:08  brian
  - updates to common build process and versions for all exported symbols
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/02 10:04:08 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 03:15:20 $"
 
-static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/02 10:04:08 $";
+static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 03:15:20 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -81,7 +84,7 @@ static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/02 10:04:08 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 03:15:20 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -557,7 +560,22 @@ RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
 }
 
 EXPORT_SYMBOL(RW_TRYWRLOCK);	/* svr4/ddi.h */
-__SVR4_EXTERN_INLINE void RW_UNLOCK(rwlock_t *lockp, pl_t pl);
+void
+RW_UNLOCK(rwlock_t *lockp, pl_t pl)
+{
+#if defined CONFIG_SMP && (defined HAVE_KFUNC_READ_TRYLOCK || defined HAVE_KMACRO_READ_TRYLOCK)
+	if (read_trylock(lockp)) {
+		read_unlock(lockp);
+		read_unlock(lockp);
+	} else {
+		write_unlock(lockp);
+	}
+#else
+	/* this is not really workable */
+	read_unlock(lockp);
+#endif
+	splx(pl);
+}
 
 EXPORT_SYMBOL(RW_UNLOCK);	/* svr4/ddi.h */
 __SVR4_EXTERN_INLINE pl_t RW_WRLOCK(rwlock_t *, pl_t pl);
