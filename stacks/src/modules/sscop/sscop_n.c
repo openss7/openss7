@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:12 $
+ @(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:03 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:12 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_n.c,v $
+ Revision 0.9.2.13  2007/03/25 02:23:03  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.12  2007/03/25 00:52:12  brian
  - synchronization updates
 
@@ -58,15 +61,15 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:12 $"
+#ident "@(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:03 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:12 $";
+    "$RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:03 $";
 
 #include <sys/os7/compat.h>
 
 #define SSCOP_NPI_DESCRIP	"SSCOP/IP STREAMS DRIVER."
-#define SSCOP_NPI_REVISION	"OpenSS7 $RCSfile: sscop_n.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:12 $"
+#define SSCOP_NPI_REVISION	"OpenSS7 $RCSfile: sscop_n.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:03 $"
 #define SSCOP_NPI_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_NPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2171,7 +2174,7 @@ MODULE_PARM_DESC(modid, "Module ID for the SSCOP module. (0 for allocation.)");
 STATIC struct fmodsw sscop_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &sscop_npiinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 

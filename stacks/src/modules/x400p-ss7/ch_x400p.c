@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:19 $
+ @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:19 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch_x400p.c,v $
+ Revision 0.9.2.16  2007/03/25 02:23:09  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.15  2007/03/25 00:52:19  brian
  - synchronization updates
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:19 $"
+#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:09 $"
 
 static char const ident[] =
-    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:19 $";
+    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:09 $";
 
 #include <sys/os7/compat.h>
 
@@ -80,7 +83,7 @@ static char const ident[] =
 
 #define CH_SDL_DESCRIP		"X400P-SS7 CHANNEL (CH) STREAMS MODULE."
 #define CH_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:19 $"
+#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:09 $"
 #define CH_SDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define CH_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define CH_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2680,7 +2683,7 @@ MODULE_PARM_DESC(modid, "Module ID for the CH-SDL module. (0 for allocation.)");
 STATIC struct fmodsw ch_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &ch_sdlinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 

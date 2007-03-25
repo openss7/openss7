@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:30 $
+ @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:30 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd_hdlc.c,v $
+ Revision 0.9.2.13  2007/03/25 02:23:17  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.12  2007/03/25 00:52:30  brian
  - synchronization updates
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:30 $"
+#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:17 $"
 
 static char const ident[] =
-    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:30 $";
+    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:17 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -89,7 +92,7 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define CD_HDLC_DESCRIP		"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define CD_HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:30 $"
+#define CD_HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:17 $"
 #define CD_HDLC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define CD_HDLC_DEVICES		"Supports OpenSS7 Channel Drivers."
 #define CD_HDLC_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -260,7 +263,7 @@ MODULE_PARM_DESC(modid, "Module ID for the CD-HDLC module. (0 for allocation.)")
 STATIC struct fmodsw hdlc_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &cd_hdlcinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 

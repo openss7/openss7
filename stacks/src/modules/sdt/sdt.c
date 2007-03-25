@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:52:06 $
+ @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:06 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:22:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:52:06 $"
+#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:56 $"
 
 static char const ident[] =
-    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:52:06 $";
+    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:56 $";
 
 /*
  *  This is a SDT (Signalling Data Terminal) kernel module.  It provides the
@@ -75,7 +75,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:52:06 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:56 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4345,7 +4345,7 @@ MODULE_PARM_DESC(modid, "Module ID for the SDT module. (0 for allocation.)");
 STATIC struct fmodsw sdt_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &sdtinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 

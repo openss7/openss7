@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:53:10 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:23:30 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:53:10 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isdn.c,v $
+ Revision 0.9.2.3  2007/03/25 02:23:30  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.2  2007/03/25 00:53:10  brian
  - synchronization updates
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:53:10 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:23:30 $"
 
 static char const ident[] =
-    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:53:10 $";
+    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:23:30 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -93,7 +96,7 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:53:10 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:23:30 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -16493,7 +16496,7 @@ MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)"
 STATIC struct cdevsw isdn_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &isdn_info,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,

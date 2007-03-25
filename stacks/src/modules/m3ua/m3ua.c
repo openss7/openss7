@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:51:52 $
+ @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:22:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:51:52 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:22:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua.c,v $
+ Revision 0.9.2.13  2007/03/25 02:22:50  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.12  2007/03/25 00:51:52  brian
  - synchronization updates
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:51:52 $"
+#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:22:50 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:51:52 $";
+    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:22:50 $";
 
 #include <sys/os7/compat.h>
 
@@ -83,7 +86,7 @@ static char const ident[] =
  */
 
 #define M3UA_DESCRIP	"M3UA STREAMS MULTIPLEXING DRIVER."
-#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:51:52 $"
+#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:22:50 $"
 #define M3UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corp.  All Rights Reserved."
 #define M3UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -242,7 +245,7 @@ MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)"
 STATIC struct cdevsw m3ua_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &m3uainfo,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,

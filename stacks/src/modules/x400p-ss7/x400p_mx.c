@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 00:52:24 $
+ @(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:23:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:24 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x400p_mx.c,v $
+ Revision 0.9.2.19  2007/03/25 02:23:13  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.18  2007/03/25 00:52:24  brian
  - synchronization updates
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 00:52:24 $"
+#ident "@(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:23:13 $"
 
 static char const ident[] =
-    "$RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 00:52:24 $";
+    "$RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:23:13 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -108,7 +111,7 @@ static char const ident[] =
 
 #define MX_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define MX_X400P_EXTRA		"Part of the OpenSS7 Stack for Linx Fast-STREAMS."
-#define MX_X400P_REVISION	"OpenSS7 $RCSfile: x400p_mx.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2007/03/25 00:52:24 $"
+#define MX_X400P_REVISION	"OpenSS7 $RCSfile: x400p_mx.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2007/03/25 02:23:13 $"
 #define MX_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define MX_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -10019,7 +10022,7 @@ MODULE_PARM_DESC(major, "Device number for the X400P-MX driver. (0 for allocatio
 STATIC struct cdevsw xp_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &mx_x400pinfo,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,

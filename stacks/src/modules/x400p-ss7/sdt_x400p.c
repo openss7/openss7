@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 00:52:20 $
+ @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 02:23:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:20 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_x400p.c,v $
+ Revision 0.9.2.20  2007/03/25 02:23:10  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.19  2007/03/25 00:52:20  brian
  - synchronization updates
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 00:52:20 $"
+#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 02:23:10 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 00:52:20 $";
+    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 02:23:10 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) kernel module which
@@ -104,7 +107,7 @@ static char const ident[] =
 
 #define SDT_X400P_DESCRIP	"E/T400P-SS7: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
 #define SDT_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2007/03/25 00:52:20 $"
+#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2007/03/25 02:23:10 $"
 #define SDT_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDT_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -6463,7 +6466,7 @@ MODULE_PARM_DESC(major, "Device number for the X400-SDL driver. (0 for allocatio
 STATIC struct cdevsw xp_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &sdt_x400pinfo,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,

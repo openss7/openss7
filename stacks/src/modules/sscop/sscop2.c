@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:12 $
+ @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:03 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:12 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop2.c,v $
+ Revision 0.9.2.13  2007/03/25 02:23:03  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.12  2007/03/25 00:52:12  brian
  - synchronization updates
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:12 $"
+#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:03 $"
 
 static char const ident[] =
-    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:12 $";
+    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:03 $";
 
 #include <sys/os7/compat.h>
 
@@ -668,7 +671,7 @@ MODULE_PARM_DESC(modid, "Module ID for the SSCOP module. (0 for allocation.)");
 STATIC struct fmodsw aa_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &sscopinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 

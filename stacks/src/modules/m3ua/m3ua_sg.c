@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_sg.c,v 0.9.2.10 2007/03/25 00:51:52 brian Exp $
+ @(#) $Id: m3ua_sg.c,v 0.9.2.11 2007/03/25 02:22:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -22,11 +22,14 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2007/03/25 00:51:52 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:22:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_sg.c,v $
+ Revision 0.9.2.11  2007/03/25 02:22:50  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.10  2007/03/25 00:51:52  brian
  - synchronization updates
 
@@ -77,7 +80,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 00:51:52 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 02:22:50 $";
 
 #include <sys/os7/compat.h>
 
@@ -1023,7 +1026,7 @@ MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)"
 STATIC struct cdevsw m3ua_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &m3uainfo,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,

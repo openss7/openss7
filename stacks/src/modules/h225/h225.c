@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:51:18 $
+ @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:51:18 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:22:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: h225.c,v $
+ Revision 0.9.2.15  2007/03/25 02:22:38  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.14  2007/03/25 00:51:18  brian
  - synchronization updates
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:51:18 $"
+#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:38 $"
 
 static char const ident[] =
-    "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:51:18 $";
+    "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:38 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -85,7 +88,7 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:51:18 $"
+#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:38 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -15987,7 +15990,7 @@ MODULE_PARM_DESC(major, "Device number for the H225 driver. (0 for allocation.)"
 STATIC struct cdevsw h225_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &h225info,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_mode = S_IFCHR,
 	.d_fop = NULL,
 	.d_kmod = THIS_MODULE,

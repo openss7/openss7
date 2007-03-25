@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 00:52:08 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 02:22:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:08 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:22:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.c,v $
+ Revision 0.9.2.21  2007/03/25 02:22:58  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.20  2007/03/25 00:52:08  brian
  - synchronization updates
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 00:52:08 $"
+#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 02:22:58 $"
 
 char const ident[] =
-    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 00:52:08 $";
+    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 02:22:58 $";
 
 #include <sys/os7/compat.h>
 
@@ -75,7 +78,7 @@ char const ident[] =
 #include <ss7/sli.h>
 
 #define SL_MUX_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 00:52:08 $"
+#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 02:22:58 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1017,7 +1020,7 @@ MODULE_PARM_DESC(major, "Device number for the SDL-MUX driver. (0 for allocation
 STATIC struct cdevsw slm_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &sl_muxinfo,
-	.d_flag = 0,
+	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,

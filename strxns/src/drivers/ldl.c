@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/07/16 12:46:52 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/25 02:23:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/07/16 12:46:52 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.c,v $
+ Revision 0.9.2.34  2007/03/25 02:23:44  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.33  2006/07/16 12:46:52  brian
  - handle skb_linearize with 1 arg on recent kernels
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/07/16 12:46:52 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/25 02:23:44 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2006/07/16 12:46:52 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/25 02:23:44 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -103,7 +106,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.33 $) $Date: 2006/07/16 12:46:52 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.34 $) $Date: 2007/03/25 02:23:44 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -4898,7 +4901,7 @@ MODULE_PARM_DESC(major, "Major device number for LDL driver (0 for allocation)."
 STATIC struct cdevsw ldl_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &ldl_info,
-	.d_flag = 0,
+	.d_flag = D_MTPERQ,		/* consistent with LiS */
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
 	.d_kmod = THIS_MODULE,

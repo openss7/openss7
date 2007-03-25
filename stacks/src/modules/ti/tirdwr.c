@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:52:17 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:23:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:17 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tirdwr.c,v $
+ Revision 0.9.2.15  2007/03/25 02:23:07  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.14  2007/03/25 00:52:17  brian
  - synchronization updates
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:52:17 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:23:07 $"
 
-static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:52:17 $";
+static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:23:07 $";
 
 #include <sys/os7/compat.h>
 
@@ -78,7 +81,7 @@ static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.1
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:52:17 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:23:07 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -837,7 +840,7 @@ MODULE_PARM_DESC(modid, "Module ID for the TIMOD module. (0 for allocation.)");
 STATIC struct fmodsw tirdwr_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &tirdwrinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 

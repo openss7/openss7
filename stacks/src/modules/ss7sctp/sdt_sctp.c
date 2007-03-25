@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:11 $
+ @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:11 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 02:23:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_sctp.c,v $
+ Revision 0.9.2.16  2007/03/25 02:23:02  brian
+ - add D_MP and D_MTPERQ flags
+
  Revision 0.9.2.15  2007/03/25 00:52:11  brian
  - synchronization updates
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:11 $"
+#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:02 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:11 $";
+    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:02 $";
 
 #include <sys/os7/compat.h>
 
@@ -78,7 +81,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDT) STREAMS MODULE."
-#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 00:52:11 $"
+#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:02 $"
 #define SDT_SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2228,7 +2231,7 @@ MODULE_PARM_DESC(modid, "Module ID for the SDT module. (0 for allocation.)");
 STATIC struct fmodsw sdt_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &sdt_sctpinfo,
-	.f_flag = 0,
+	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,
 };
 
