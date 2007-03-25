@@ -137,6 +137,9 @@ STATIC struct module_info bufmod_minfo = {
 	.mi_lowat = 1024,
 };
 
+STATIC struct module_stat bufmod_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat bufmod_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+
 #ifndef unlikely
 #define unlikely(__x) (__x)
 #endif
@@ -268,12 +271,14 @@ STATIC struct qinit bufmod_rinit = {
 	.qi_qopen = bufmod_open,
 	.qi_qclose = bufmod_close,
 	.qi_minfo = &bufmod_minfo,
+	.qi_mstat = &bufmod_rstat,
 };
 
 STATIC struct qinit bufmod_winit = {
 	.qi_putp = bufmod_wput,
 	.qi_srvp = bufmod_srv,
 	.qi_minfo = &bufmod_minfo,
+	.qi_mstat = &bufmod_wstat,
 };
 
 STATIC struct streamtab bufmod_info = {
@@ -299,6 +304,10 @@ bufmod_init(void)
 		return (err);
 	if (modid == 0 && err > 0)
 		modid = err;
+	if ((err = lis_register_module_qlock_option(modid, LIS_QLOCK_NONE)) < 0) {
+		lis_unregister_strmod(&bufmod_info);
+		return (err);
+	}
 	return (0);
 }
 

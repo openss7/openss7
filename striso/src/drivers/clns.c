@@ -1743,6 +1743,14 @@ np_init(void)
 		major = err;
 		np_initialized = 2;
 	}
+	if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
+		lis_unregister_strdev(major);
+		strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,
+		       "cannot register major %d", major);
+		np_initialized = err;
+		np_term_caches();
+		return;
+	}
 	return;
 }
 STATIC void

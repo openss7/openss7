@@ -1,3 +1,8 @@
+2007-03-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/timod.c: register qlock option
+	* src/modules/tirdwr.c: register qlock option
+
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* po/de.po: hate gnu gettext for this

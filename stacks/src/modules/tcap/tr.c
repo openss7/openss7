@@ -2216,6 +2216,8 @@ __initfunc(int tr_init(void))
 #ifndef LIS_REGISTERED
 	if ((err = lis_register_strmod(&tr_info, tr_minfo.ni_name)) < 0)
 		cmn_err(CE_WARN "tr: couldn't register module!\n");
+	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0)
+		lis_unregister_strmod(&tr_info);
 	return (err);
 #endif
 }

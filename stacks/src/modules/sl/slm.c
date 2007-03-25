@@ -3897,7 +3897,7 @@ STATIC int slm_majors[SLM_CMAJORS] = { 0, };
 STATIC void
 slm_init(void)
 {
-	int err, major;
+	int err, mindex, major;
 	unless(slm_initialized, return);
 	cmn_err(CE_NOTE, SLM_BANNER);	/* console splash */
 	if ((err = slm_init_caches())) {
@@ -3905,19 +3905,26 @@ slm_init(void)
 		slm_initialized = err;
 		return;
 	}
-	for (major = 0; major < SLM_CMAJORS; major++) {
-		if ((err =
-		     lis_register_strdev(SLM_CMAJOR_0 + major, &slm_info, UNITS,
-					 DRV_NAME)) <= 0) {
-			cmn_err(CE_WARN, "SLM: ERROR: couldn't register driver for major %d",
-				major + SLM_CMAJOR_0);
+	for (mindex = 0; mindex < SLM_CMAJORS; mindex++) {
+		major = SLM_CMAJOR_0 + mindex;
+		if ((err = lis_register_strdev(major, &slm_info, UNITS, DRV_NAME)) <= 0) {
+			cmn_err(CE_WARN, "SLM: ERROR: couldn't register driver for major %d", major);
 			slm_initialized = err;
-			for (major -= 1; major >= 0; major--)
-				lis_unregister_strdev(slm_majors[major]);
+			for (mindex -= 1; mindex >= 0; mindex--)
+				lis_unregister_strdev(slm_majors[mindex]);
 			slm_term_caches();
 			return;
-		} else
-			slm_majors[major] = err;
+		}
+		if ((err = lis_register_driver_qlock_option(major, LIS_QLOCK_NONE)) < 0) {
+			lis_unregister_strdev(major);
+			cmn_err(CE_WARN, "SLM: ERROR: couldn't register driver for major %d", major);
+			slm_initialized = err;
+			for (mindex -= 1; mindex >= 0; mindex--)
+				lis_unregister_strdev(slm_majors[mindex]);
+			slm_term_caches();
+			return;
+		}
+		slm_majors[mindex] = major;
 	}
 	slm_initialized = SLM_CMAJOR_0;
 	return;
@@ -3925,15 +3932,15 @@ slm_init(void)
 STATIC void
 slm_terminate(void)
 {
-	int err, major;
+	int err, mindex;
 	ensure(slm_initialized, return);
-	for (major = 0; major < SLM_CMAJORS; major++) {
-		if (slm_majors[major]) {
-			if ((err = lis_unregister_strdev(slm_majors[major])))
+	for (mindex = 0; mindex < SLM_CMAJORS; mindex++) {
+		if (slm_majors[mindex]) {
+			if ((err = lis_unregister_strdev(slm_majors[mindex])))
 				cmn_err(CE_PANIC, "SLM: couldn't unregister driver for major %d\n",
-					slm_majors[major]);
+					slm_majors[mindex]);
 			else
-				slm_majors[major] = err;
+				slm_majors[mindex] = err;
 		}
 	}
 	slm_initialized = 0;

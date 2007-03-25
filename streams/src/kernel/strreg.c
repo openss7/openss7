@@ -139,9 +139,9 @@ register_strsync(struct fmodsw *fmod)
 
 			if (!(sq = sq_alloc()))
 				return (-ENOMEM);
-			fmod->f_syncq = sq;
 			sq->sq_level = sqlvl;
 			sq->sq_flag = SQ_OUTER | ((fmod->f_flag & D_MTOCEXCL) ? SQ_EXCLUS : 0);
+			fmod->f_syncq = sq;
 		}
 	} else {
 		switch (sqlvl) {
@@ -152,9 +152,9 @@ register_strsync(struct fmodsw *fmod)
 
 				if (!(sq = sq_alloc()))
 					return (-ENOMEM);
-				fmod->f_syncq = sq;
 				sq->sq_level = sqlvl;
 				sq->sq_flag = (SQ_OUTER | SQ_EXCLUS);
+				fmod->f_syncq = sq;
 			}
 			break;
 		case SQLVL_ELSEWHERE:
@@ -163,19 +163,25 @@ register_strsync(struct fmodsw *fmod)
 
 				if (!(sq = sq_locate(fmod->f_sqinfo)))
 					return (-ENOMEM);
-				fmod->f_syncq = sq;
 				sq->sq_level = sqlvl;
 				sq->sq_flag = (SQ_OUTER | SQ_EXCLUS);
+				fmod->f_syncq = sq;
 			}
 			break;
 		case SQLVL_GLOBAL:	/* for testing */
 			if (!fmod->f_syncq) {
 				struct syncq *sq;
 
-				sq = sq_get(global_syncq);
+				if (!(sq = sq_get(global_syncq))) {
+					if (!(sq = sq_alloc()))
+						return (-ENOMEM);
+					/* Note that the global synchronization queue will exist
+					   until STREAMS is unloaded. */
+					sq->sq_level = sqlvl;
+					sq->sq_flag = (SQ_OUTER | SQ_EXCLUS);
+					global_syncq = sq_get(sq);
+				}
 				fmod->f_syncq = sq;
-				sq->sq_level = sqlvl;
-				sq->sq_flag = (SQ_OUTER | SQ_EXCLUS);
 			}
 			break;
 		}
