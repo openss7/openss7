@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/25 06:01:02 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 19:02:31 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:01:02 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.c,v $
+ Revision 0.9.2.35  2007/03/25 19:02:31  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.34  2007/03/25 06:01:02  brian
  - flush corrections
 
@@ -69,10 +72,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/25 06:01:02 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 19:02:31 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/25 06:01:02 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 19:02:31 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -93,7 +96,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/25 06:01:02 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 19:02:31 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -127,7 +130,7 @@ modID_t modid = CONFIG_STREAMS_SC_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for SC.");
 

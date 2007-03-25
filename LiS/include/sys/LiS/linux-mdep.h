@@ -821,11 +821,11 @@ extern lis_atomic_t lis_head_cnt;
 extern lis_atomic_t lis_qband_cnt;
 extern lis_atomic_t lis_queue_cnt;
 
-void lis_cache_destroy(kmem_cache_t *p, lis_atomic_t *c, char *label);
+void lis_cache_destroy(kmem_cachep_t p, lis_atomic_t *c, char *label);
 #endif
 
 static inline void *
-lis_cache_alloc(kmem_cache_t *cp, lis_atomic_t *cntr)
+lis_cache_alloc(kmem_cachep_t cp, lis_atomic_t *cntr)
 {
 	void *p = kmem_cache_alloc(cp, GFP_ATOMIC);
 
@@ -1123,12 +1123,12 @@ extern struct inode *igrab(struct inode *inode);
 
 #define freehdr(a) lis_msgb_cache_freehdr((a))
 #ifdef __LIS_INTERNAL__
-extern kmem_cache_t *lis_msgb_cachep;
-extern kmem_cache_t *lis_queue_cachep;
-extern kmem_cache_t *lis_qsync_cachep;
-extern kmem_cache_t *lis_qband_cachep;
-extern kmem_cache_t *lis_head_cachep;
-extern kmem_cache_t *lis_locks_cachep;
+extern kmem_cachep_t lis_msgb_cachep;
+extern kmem_cachep_t lis_queue_cachep;
+extern kmem_cachep_t lis_qsync_cachep;
+extern kmem_cachep_t lis_qband_cachep;
+extern kmem_cachep_t lis_head_cachep;
+extern kmem_cachep_t lis_locks_cachep;
 extern struct mdbblock *lis_kmem_cache_allochdr(void);
 extern void lis_msgb_cache_freehdr(void *);
 extern void lis_terminate_msg(void);	/* in linux-mdep.c */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:51:39 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:23 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:51:39 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.3  2007/03/25 18:59:23  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.2  2007/03/25 00:51:39  brian
  - synchronization updates
 
@@ -101,9 +104,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:51:39 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:23 $"
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:51:39 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:23 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -182,7 +185,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $)
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:51:39 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:23 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -513,7 +516,7 @@ tpi_chashfn(uint16_t dport, uint16_t sport)
 	return ((tpi_chash_size - 1) & (dport + (sport << 4)));
 }
 
-STATIC kmem_cache_t *tpi_priv_cachep;
+STATIC kmem_cachep_t tpi_priv_cachep;
 
 STATIC INLINE struct tpi *
 tpi_get(struct tpi *tpi)
@@ -538,7 +541,7 @@ tpi_alloc(void)
 {
 	struct tpi *tpi;
 
-	if ((tpi = kmem_cache_alloc(tpi_priv_cachep, SLAB_ATOMIC))) {
+	if ((tpi = kmem_cache_alloc(tpi_priv_cachep, GFP_ATOMIC))) {
 		bzero(tpi, sizeof(*tpi));
 		atomic_set(&tpi->refcnt, 1);
 		spin_lock_init(&tpi->lock);	/* "tpi-lock" */
@@ -6799,10 +6802,14 @@ STATIC void
 tpi_term_caches(void)
 {
 	if (tpi_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(tpi_priv_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy tpi_priv_cachep", __FUNCTION__);
 		else
 			tpi_priv_cachep = NULL;
+#else
+		kmem_cache_destroy(tpi_priv_cachep);
+#endif
 	}
 	return;
 }
@@ -6918,7 +6925,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, short, 0);
+module_param(modid, short, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the driver. (0 for allocation.)");
 
@@ -6927,7 +6934,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the driver. (0 for allocation.)");
 

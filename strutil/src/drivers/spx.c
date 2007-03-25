@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/25 06:01:00 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/03/25 19:02:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:01:00 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/25 06:01:00 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/03/25 19:02:29 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/25 06:01:00 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/03/25 19:02:29 $";
 
 #define _LFS_SOURCE
 #include <sys/os7/compat.h>
@@ -65,7 +65,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/25 06:01:00 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/03/25 19:02:29 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"
@@ -105,7 +105,7 @@ modID_t modid = CONFIG_STREAMS_SPX_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for STREAMS-pipe driver (0 for allocation).");
 
@@ -119,7 +119,7 @@ major_t major = CONFIG_STREAMS_SPX_MAJOR;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for STREAMS-pipe driver (0 for allocation).");
 

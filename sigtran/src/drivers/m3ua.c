@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:22:26 $
+ @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:58:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:22:26 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:58:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua.c,v $
+ Revision 0.9.2.4  2007/03/25 18:58:41  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.3  2007/03/25 02:22:26  brian
  - add D_MP and D_MTPERQ flags
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:22:26 $"
+#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:58:41 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:22:26 $";
+    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:58:41 $";
 
 #include <sys/os7/compat.h>
 
@@ -89,7 +92,7 @@ static char const ident[] =
  */
 
 #define M3UA_DESCRIP	"M3UA STREAMS MULTIPLEXING DRIVER."
-#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:22:26 $"
+#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:58:41 $"
 #define M3UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corp.  All Rights Reserved."
 #define M3UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -227,7 +230,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
 
@@ -235,7 +238,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)");
 

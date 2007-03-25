@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 06:00:20 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:01:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:00:20 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufmod.c,v $
+ Revision 0.9.2.11  2007/03/25 19:01:18  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.10  2007/03/25 06:00:20  brian
  - flush corrections
 
@@ -83,9 +86,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 06:00:20 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:01:18 $"
 
-static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 06:00:20 $";
+static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:01:18 $";
 
 
 /*
@@ -114,7 +117,7 @@ static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.1
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 06:00:20 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:01:18 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"
@@ -150,7 +153,7 @@ modID_t modid = CONFIG_STREAMS_BUFMOD_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for BUFMOD.");
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/02/17 02:49:19 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 18:59:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/17 02:49:19 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp.c,v $
+ Revision 0.9.2.19  2007/03/25 18:59:54  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.18  2007/02/17 02:49:19  brian
  - first clean recompile of MTP modules on LFS
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/02/17 02:49:19 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 18:59:54 $"
 
-static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/02/17 02:49:19 $";
+static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 18:59:54 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver which can have MTP
@@ -103,7 +106,7 @@ static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.18 
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/02/17 02:49:19 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 18:59:54 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -19942,14 +19945,14 @@ sccp_qclose(queue_t *q, int flag, cred_t *crp)
  *
  *  =========================================================================
  */
-static kmem_cache_t *sccp_sc_cachep = NULL;	/* SCCP User cache */
-static kmem_cache_t *sccp_na_cachep = NULL;	/* Network Appearance cache */
-static kmem_cache_t *sccp_cp_cachep = NULL;	/* Coupling */
-static kmem_cache_t *sccp_sp_cachep = NULL;	/* Signalling Point cache */
-static kmem_cache_t *sccp_sr_cachep = NULL;	/* Route Set cache */
-static kmem_cache_t *sccp_ss_cachep = NULL;	/* Controlled Rerouting Buffer cache */
-static kmem_cache_t *sccp_rs_cachep = NULL;	/* Route List cache */
-static kmem_cache_t *sccp_mt_cachep = NULL;	/* Route cache */
+static kmem_cachep_t sccp_sc_cachep = NULL;	/* SCCP User cache */
+static kmem_cachep_t sccp_na_cachep = NULL;	/* Network Appearance cache */
+static kmem_cachep_t sccp_cp_cachep = NULL;	/* Coupling */
+static kmem_cachep_t sccp_sp_cachep = NULL;	/* Signalling Point cache */
+static kmem_cachep_t sccp_sr_cachep = NULL;	/* Route Set cache */
+static kmem_cachep_t sccp_ss_cachep = NULL;	/* Controlled Rerouting Buffer cache */
+static kmem_cachep_t sccp_rs_cachep = NULL;	/* Route List cache */
+static kmem_cachep_t sccp_mt_cachep = NULL;	/* Route cache */
 static int
 sccp_init_caches(void)
 {
@@ -20043,60 +20046,92 @@ sccp_term_caches(void)
 	int err = 0;
 
 	if (sccp_sc_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sccp_sc_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_sc_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed sccp_sc_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(sccp_sc_cachep);
+#endif
 	}
 	if (sccp_na_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sccp_na_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_na_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed sccp_na_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(sccp_na_cachep);
+#endif
 	}
 	if (sccp_sp_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sccp_sp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_sp_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed sccp_sp_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(sccp_sp_cachep);
+#endif
 	}
 	if (sccp_cp_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sccp_cp_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_cp_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed sccp_cp_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(sccp_cp_cachep);
+#endif
 	}
 	if (sccp_sr_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sccp_sr_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_sr_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed sccp_sr_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(sccp_sr_cachep);
+#endif
 	}
 	if (sccp_ss_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sccp_ss_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_ss_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed sccp_ss_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(sccp_ss_cachep);
+#endif
 	}
 	if (sccp_rs_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sccp_rs_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_rs_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed sccp_rs_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(sccp_rs_cachep);
+#endif
 	}
 	if (sccp_mt_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sccp_mt_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sccp_mt_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed sccp_mt_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(sccp_mt_cachep);
+#endif
 	}
 	return (err);
 }
@@ -20110,7 +20145,7 @@ sccp_alloc_priv(queue_t *q, struct sc **scp, dev_t *devp, cred_t *crp, minor_t b
 {
 	struct sc *sc;
 
-	if ((sc = kmem_cache_alloc(sccp_sc_cachep, SLAB_ATOMIC))) {
+	if ((sc = kmem_cache_alloc(sccp_sc_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated sc private structure\n", DRV_NAME, sc));
 		bzero(sc, sizeof(*sc));
 		sc->priv_put = &sccp_put;
@@ -20254,7 +20289,7 @@ sccp_alloc_na(ulong id, struct lmi_option *proto)
 {
 	struct na *na;
 
-	if ((na = kmem_cache_alloc(sccp_na_cachep, SLAB_ATOMIC))) {
+	if ((na = kmem_cache_alloc(sccp_na_cachep, GFP_ATOMIC))) {
 		bzero(na, sizeof(*na));
 		na->priv_put = &na_put;
 		spin_lock_init(&na->lock);	/* "na-lock" */
@@ -20358,7 +20393,7 @@ sccp_alloc_cp(ulong id, struct sp *sp, ulong slr0, ulong slr1)
 {
 	struct cp *cp;
 
-	if ((cp = kmem_cache_alloc(sccp_cp_cachep, SLAB_ATOMIC))) {
+	if ((cp = kmem_cache_alloc(sccp_cp_cachep, GFP_ATOMIC))) {
 		bzero(cp, sizeof(*cp));
 		cp->priv_put = &cp_put;
 		spin_lock_init(&cp->lock);	/* "cp-lock" */
@@ -20476,7 +20511,7 @@ sccp_alloc_ss(ulong id, struct sp *sp, ulong ssn)
 {
 	struct ss *ss;
 
-	if ((ss = kmem_cache_alloc(sccp_ss_cachep, SLAB_ATOMIC))) {
+	if ((ss = kmem_cache_alloc(sccp_ss_cachep, GFP_ATOMIC))) {
 		bzero(ss, sizeof(*ss));
 		ss->priv_put = &ss_put;
 		spin_lock_init(&ss->lock);	/* "ss-lock" */
@@ -20590,7 +20625,7 @@ sccp_alloc_rs(ulong id, struct sr *sr, ulong ssn)
 {
 	struct rs *rs;
 
-	if ((rs = kmem_cache_alloc(sccp_rs_cachep, SLAB_ATOMIC))) {
+	if ((rs = kmem_cache_alloc(sccp_rs_cachep, GFP_ATOMIC))) {
 		bzero(rs, sizeof(*rs));
 		rs->priv_put = &rs_put;
 		spin_lock_init(&rs->lock);	/* "rs-lock" */
@@ -20720,7 +20755,7 @@ sccp_alloc_sr(ulong id, struct sp *sp, ulong pc)
 	struct sr *sr, **srp;
 
 	printd(("%s: %s: create sr->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((sr = kmem_cache_alloc(sccp_sr_cachep, SLAB_ATOMIC))) {
+	if ((sr = kmem_cache_alloc(sccp_sr_cachep, GFP_ATOMIC))) {
 		bzero(sr, sizeof(*sr));
 		sr_get(sr);	/* first get */
 		spin_lock_init(&sr->lock);	/* "sr-lock" */
@@ -20865,7 +20900,7 @@ sccp_alloc_sp(ulong id, struct na *na, mtp_addr_t * add)
 	struct sp *sp, **spp;
 
 	printd(("%s: %s: create sp->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((sp = kmem_cache_alloc(sccp_sp_cachep, SLAB_ATOMIC))) {
+	if ((sp = kmem_cache_alloc(sccp_sp_cachep, GFP_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		sp_get(sp);	/* first get */
 		spin_lock_init(&sp->lock);	/* "sp-lock" */
@@ -21012,7 +21047,7 @@ sccp_alloc_link(queue_t *q, struct mt **mpp, ulong index, cred_t *crp)
 	struct mt *mt;
 
 	printd(("%s: %s: create mt index = %lu\n", DRV_NAME, __FUNCTION__, index));
-	if ((mt = kmem_cache_alloc(sccp_mt_cachep, SLAB_ATOMIC))) {
+	if ((mt = kmem_cache_alloc(sccp_mt_cachep, GFP_ATOMIC))) {
 		bzero(mt, sizeof(*mt));
 		mtp_get(mt);	/* first get */
 		mt->u.mux.index = index;
@@ -21253,7 +21288,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SCCP driver. (0 for allocation.)");
 
@@ -21262,7 +21297,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the SCCP driver. (0 for allocation.)");
 

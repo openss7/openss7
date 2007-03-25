@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 00:52:05 $
+ @(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 19:00:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:05 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdi_mod.c,v $
+ Revision 0.9.2.10  2007/03/25 19:00:10  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.9  2007/03/25 00:52:05  brian
  - synchronization updates
 
@@ -58,16 +61,16 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 00:52:05 $"
+#ident "@(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 19:00:10 $"
 
-static char const ident[] = "$RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 00:52:05 $";
+static char const ident[] = "$RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 19:00:10 $";
 
 #include <sys/os7/compat.h>
 
 #include <sys/cdi.h>
 
 #define CDI_DESCRIP	"CDI SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define CDI_REVISION	"OpenSS7 $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 00:52:05 $"
+#define CDI_REVISION	"OpenSS7 $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 19:00:10 $"
 #define CDI_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define CDI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define CDI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -99,7 +102,7 @@ MODULE_ALIAS("streams-cdi_mod");
  *
  *  =======================================================================
  */
-STATIC kmem_cache_t *cd_cachep = NULL;
+STATIC kmem_cachep_t cd_cachep = NULL;
 STATIC INLINE void
 cd_init_caches(void)
 {
@@ -121,7 +124,7 @@ extern cdi_t *
 cd_alloc_priv(queue_t *q)
 {
 	cdi_t *cd;
-	if ((cd = kmem_cache_alloc(cd_cachep, SLAB_ATOMIC))) {
+	if ((cd = kmem_cache_alloc(cd_cachep, GFP_ATOMIC))) {
 		MOD_INC_USE_COUNT;
 		bzero(cd, sizeof(*cd));
 		RD(q)->q_ptr = WR(q)->q_ptr = cd;

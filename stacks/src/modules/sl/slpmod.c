@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/29 12:18:14 $
+ @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/29 12:18:14 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slpmod.c,v $
+ Revision 0.9.2.3  2007/03/25 19:00:15  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.2  2006/12/29 12:18:14  brian
  - old rpms hate nested ifs, release updates
 
@@ -58,9 +61,13 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/29 12:18:14 $"
+#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:15 $"
 
-static char const ident[] = "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/29 12:18:14 $";
+static char const ident[] = "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:15 $";
+
+#ifndef HAVE_KTYPE_BOOL
+#include <stdbool.h>
+#endif
 
 /*
  *  This is SLPMOD, an SL module that is pushed over a pipe end to form an internal
@@ -75,8 +82,6 @@ static char const ident[] = "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.2
 #define _MPS_SOURCE	1
 
 #include <sys/os7/compat.h>
-
-#include <stdbool.h>
 
 #ifndef mi_timer
 #define mi_timer mi_timer_MAC
@@ -95,7 +100,7 @@ static char const ident[] = "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.2
 #include <ss7/sli_ioctl.h>
 
 #define SLPMOD_DESCRIP		"Signalling Link (SL) Pipe Module (SLPMOD) STREAMS MODULE."
-#define SLPMOD_REVISION		"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/29 12:18:14 $"
+#define SLPMOD_REVISION		"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:15 $"
 #define SLPMOD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SLPMOD_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SLPMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1728,7 +1733,7 @@ static unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id for SLPMOD module.  (0 for allocation.)");
 

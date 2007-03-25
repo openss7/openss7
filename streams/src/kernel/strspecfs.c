@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2007/03/02 09:23:29 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2007/03/25 19:01:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/02 09:23:29 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strspecfs.c,v $
+ Revision 0.9.2.78  2007/03/25 19:01:15  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.77  2007/03/02 09:23:29  brian
  - build updates and esballoc() feature
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2007/03/02 09:23:29 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2007/03/25 19:01:15 $"
 
-static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2007/03/02 09:23:29 $";
+static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2007/03/25 19:01:15 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -111,7 +114,7 @@ static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2007/03/02 09:23:29 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2007/03/25 19:01:15 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1129,7 +1132,7 @@ spec_umount_begin(struct super_block *sb)
 }
 #endif
 
-STATIC kmem_cache_t *snode_cachep = NULL;
+STATIC kmem_cachep_t snode_cachep = NULL;
 
 /**
  *  spec_alloc_inode: - allocate an inode for the special shadow filesystem.
@@ -1150,7 +1153,7 @@ STATIC struct inode *
 spec_alloc_inode(struct super_block *sb)
 {
 
-	return ((struct inode *) kmem_cache_alloc(snode_cachep, SLAB_KERNEL));
+	return ((struct inode *) kmem_cache_alloc(snode_cachep, GFP_KERNEL));
 }
 
 /**
@@ -1341,10 +1344,14 @@ static void
 specfs_term_cache(void)
 {
 	if (snode_cachep != NULL) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(snode_cachep)) {
 			printk(KERN_WARNING "%s: did not destroy snode_cachep\n", __FUNCTION__);
 			return;
 		}
+#else				/* HAVE_KTYPE_KMEM_CACHE_T_P */
+		kmem_cache_destroy(snode_cachep);
+#endif				/* HAVE_KTYPE_KMEM_CACHE_T_P */
 		printk(KERN_DEBUG "%s: destroyed snode cache\n", __FUNCTION__);
 		snode_cachep = NULL;
 	}
@@ -1352,7 +1359,7 @@ specfs_term_cache(void)
 }
 
 static void
-snode_init_once(void *data, kmem_cache_t *cachep, unsigned long flags)
+snode_init_once(void *data, kmem_cachep_t cachep, unsigned long flags)
 {
 	struct inode *inode = (struct inode *) data;
 

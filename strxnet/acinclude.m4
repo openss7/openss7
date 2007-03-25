@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/03/05 23:02:37 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/25 19:02:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/05 23:02:37 $ by $Author: brian $
+# Last Modified $Date: 2007/03/25 19:02:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -171,6 +171,8 @@ AC_DEFUN([_XNET_SETUP], [dnl
     _LINUX_KERNEL
     _LINUX_DEVFS
     _GENKSYMS
+    # here we have our flags set and can perform preprocessor and compiler
+    # checks on the kernel
     _LINUX_STREAMS
     _STRCOMP
     with_tli='yes'
@@ -179,7 +181,107 @@ AC_DEFUN([_XNET_SETUP], [dnl
     with_sock='no'
     _XOPEN
     _XNS
+    # here we have our flags set and can perform preprocessor and compiler
+    # checks on the kernel
+    _XNET_SETUP_MODULE
+    _XNET_CONFIG_KERNEL
 ])# _XNET_SETUP
+# =============================================================================
+
+# =============================================================================
+# _XNET_SETUP_MODULE
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XNET_SETUP_MODULE], [dnl
+    if test :"${linux_cv_k_linkage:-loadable}" = :loadable ; then
+	AC_DEFINE_UNQUOTED([XNET_CONFIG_MODULE], [], [When defined, XNET is
+			    being compiled as a loadable kernel module.])
+    else
+	AC_DEFINE_UNQUOTED([XNET_CONFIG], [], [When defined, XNET is being
+			    compiled as a kernel linkable object.])
+    fi
+    AM_CONDITIONAL([XNET_CONFIG_MODULE], [test :${linux_cv_k_linkage:-loadable} = :loadable])
+    AM_CONDITIONAL([XNET_CONFIG], [test :${linux_cv_k_linkage:-loadable} = :linkable])
+])
+# =============================================================================
+
+# =============================================================================
+# _XNET_CONFIG_KERNEL
+# -----------------------------------------------------------------------------
+# These are a bunch of kernel configuration checks primarily in support of 2.5
+# and 2.6 kernels.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XNET_CONFIG_KERNEL], [dnl
+    _LINUX_CHECK_HEADERS([linux/namespace.h linux/kdev_t.h linux/statfs.h linux/namei.h \
+			  linux/locks.h asm/softirq.h linux/brlock.h \
+			  linux/slab.h linux/security.h linux/snmp.h net/xfrm.h net/dst.h \
+			  net/request_sock.h], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/socket.h>
+#include <net/sock.h>
+#include <net/protocol.h>
+#include <net/inet_common.h>
+#ifdef HAVE_KINC_NET_XFRM_H
+#include <net/xfrm.h>
+#endif
+#ifdef HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
+#include <linux/sched.h>
+    ])
+    _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *], [:], [:], [
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#include <linux/wait.h>
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#ifdef HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
+#include <linux/time.h>		/* for struct timespec */
+#include <net/sock.h>
+#include <net/protocol.h>
+])
+    AH_TEMPLATE([kmem_cachep_t], [This kmem_cache_t is deprecated in recent
+	2.6.20 kernels.  When it is deprecated, define this to struct
+	kmem_cache *.])
+    if test :"${linux_cv_type_kmem_cache_t_p:-no}" = :no ; then
+	AC_DEFINE_UNQUOTED([kmem_cachep_t], [struct kmem_cache *])
+    else
+	AC_DEFINE_UNQUOTED([kmem_cachep_t], [kmem_cache_t *])
+    fi
+])# _XNET_CONFIG_KERNEL
 # =============================================================================
 
 # =============================================================================

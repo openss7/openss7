@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/02 10:04:06 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:01:05 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/02 10:04:06 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.40  2007/03/25 19:01:05  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.39  2007/03/02 10:04:06  brian
  - updates to common build process and versions for all exported symbols
 
@@ -172,10 +175,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/02 10:04:06 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:01:05 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/02 10:04:06 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:01:05 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -203,7 +206,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/02 10:04:06 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:01:05 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -387,7 +390,7 @@ mi_close_size(caddr_t ptr)
 EXPORT_SYMBOL(mi_close_size);
 
 caddr_t
-mi_open_alloc_cache(kmem_cache_t *cachep, int flag)
+mi_open_alloc_cache(kmem_cachep_t cachep, int flag)
 {
 	struct mi_comm *mi;
 
@@ -399,7 +402,7 @@ mi_open_alloc_cache(kmem_cache_t *cachep, int flag)
 EXPORT_SYMBOL(mi_open_alloc_cache);
 
 void
-mi_close_free_cache(kmem_cache_t *cachep, caddr_t ptr)
+mi_close_free_cache(kmem_cachep_t cachep, caddr_t ptr)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
 

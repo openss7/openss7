@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/25 00:53:47 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 19:02:45 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:53:47 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl.c,v $
+ Revision 0.9.2.9  2007/03/25 19:02:45  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.8  2007/03/25 00:53:47  brian
  - synchronization updates
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/25 00:53:47 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 19:02:45 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/25 00:53:47 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 19:02:45 $";
 
 /*
  *  This multiplexing driver is a master device driver for Data Link Provider streams prsenting a
@@ -113,7 +116,7 @@ static char const ident[] =
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2007/03/25 00:53:47 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2007/03/25 19:02:45 $"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI OSI Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"
@@ -300,8 +303,8 @@ enum {
 typedef streamscall int (*dl_event_t) (queue_t *, struct dl *, union dl_event *);
 typedef streamscall int (*cd_event_t) (queue_t *, struct cd *, union cd_event *);
 
-STATIC kmem_cache_t *dl_priv_cachep;
-STATIC kmem_cache_t *dl_link_cachep;
+STATIC kmem_cachep_t dl_priv_cachep;
+STATIC kmem_cachep_t dl_link_cachep;
 
 struct dl {
 	STR_DECLARATION (struct dl);	/* Stream declaration */
@@ -358,7 +361,7 @@ dl_alloc(void)
 {
 	struct dl *dl;
 
-	if ((dl = kmem_cache_alloc(dl_priv_cachep, SLAB_ATOMIC))) {
+	if ((dl = kmem_cache_alloc(dl_priv_cachep, GFP_ATOMIC))) {
 		bzero(dl, sizeof(*dl));
 		atomic_set(&dl->refcnt, 1);
 		spin_lock_init(&dl->lock);	/* "dl-lock" */
@@ -391,7 +394,7 @@ cd_alloc(void)
 {
 	struct cd *cd;
 
-	if ((cd = kmem_cache_alloc(dl_link_cachep, SLAB_ATOMIC))) {
+	if ((cd = kmem_cache_alloc(dl_link_cachep, GFP_ATOMIC))) {
 		bzero(cd, sizeof(*cd));
 		atomic_set(&cd->refcnt, 1);
 		spin_lock_init(&cd->lock);	/* "cd-lock" */
@@ -3916,11 +3919,15 @@ STATIC int
 dl_term_caches(void)
 {
 	if (dl_priv_cachep != NULL) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(dl_priv_cachep)) {
 			strlog(DRV_ID, 0, LOG_ERR, SL_ERROR | SL_CONSOLE,
 			       "could not destroy dl_priv_cachep");
 			return (-EBUSY);
 		}
+#else
+		kmem_cache_destroy(dl_priv_cachep);
+#endif
 		strlog(DRV_ID, 0, LOG_DEBUG, SL_TRACE, "destroyed dl_priv_cachep");
 	}
 	return (0);
@@ -4156,7 +4163,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else				/* module_param */
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID number for DL driver (0-for allocation).");
 
@@ -4165,7 +4172,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else				/* module_param */
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(major, "Major device number for DL driver (0 for allocation).");
 

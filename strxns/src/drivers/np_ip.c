@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/25 06:01:05 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 19:02:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:01:05 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.39  2007/03/25 19:02:47  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.38  2007/03/25 06:01:05  brian
  - flush corrections
 
@@ -184,10 +187,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/25 06:01:05 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 19:02:47 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/25 06:01:05 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 19:02:47 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -248,7 +251,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.38 $) $Date: 2007/03/25 06:01:05 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.39 $) $Date: 2007/03/25 19:02:47 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -507,8 +510,8 @@ struct np_prot_bucket {
 STATIC rwlock_t np_prot_lock = RW_LOCK_UNLOCKED;
 STATIC struct np_prot_bucket *np_prots[256];
 
-STATIC kmem_cache_t *np_ip_prot_cachep;
-STATIC kmem_cache_t *np_ip_priv_cachep;
+STATIC kmem_cachep_t np_ip_prot_cachep;
+STATIC kmem_cachep_t np_ip_priv_cachep;
 
 static INLINE struct np *
 np_get(struct np *np)
@@ -539,7 +542,7 @@ np_alloc(void)
 {
 	struct np *np;
 
-	if ((np = kmem_cache_alloc(np_ip_priv_cachep, SLAB_ATOMIC))) {
+	if ((np = kmem_cache_alloc(np_ip_priv_cachep, GFP_ATOMIC))) {
 		bzero(np, sizeof(*np));
 		atomic_set(&np->refcnt, 1);
 		spin_lock_init(&np->lock);	/* "np-lock" */
@@ -952,7 +955,7 @@ np_init_nproto(unsigned char proto, unsigned int type)
 			swerr();
 			break;
 		}
-	} else if ((pb = kmem_cache_alloc(np_ip_prot_cachep, SLAB_ATOMIC))) {
+	} else if ((pb = kmem_cache_alloc(np_ip_prot_cachep, GFP_ATOMIC))) {
 		bzero(pb, sizeof(*pb));
 		pb->refs = 1;
 		switch (type) {
@@ -1341,7 +1344,7 @@ np_skb_destructor(struct sk_buff *skb)
 
 #undef skbuff_head_cache
 #ifdef HAVE_SKBUFF_HEAD_CACHE_ADDR
-#define skbuff_head_cache (*((kmem_cache_t **) HAVE_SKBUFF_HEAD_CACHE_ADDR))
+#define skbuff_head_cache (*((kmem_cachep_t *) HAVE_SKBUFF_HEAD_CACHE_ADDR))
 #endif
 
 /**
@@ -6739,18 +6742,26 @@ STATIC __unlikely int
 np_term_caches(void)
 {
 	if (np_ip_prot_cachep != NULL) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(np_ip_prot_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy np_ip_prot_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
+#else
+		kmem_cache_destroy(np_ip_prot_cachep);
+#endif
 		_printd(("%s: destroyed np_ip_prot_cachep\n", DRV_NAME));
 		np_ip_prot_cachep = NULL;
 	}
 	if (np_ip_priv_cachep != NULL) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(np_ip_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy np_ip_priv_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
+#else
+		kmem_cache_destroy(np_ip_priv_cachep);
+#endif
 		_printd(("%s: destroyed np_ip_priv_cachep\n", DRV_NAME));
 		np_ip_priv_cachep = NULL;
 	}
@@ -6854,7 +6865,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the IP driver. (0 for allocation.)");
 
@@ -6863,7 +6874,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the IP driver. (0 for allocation.)");
 

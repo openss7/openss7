@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2007/03/05 23:01:36 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/03/25 18:58:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/05 23:01:36 $ by $Author: brian $
+# Last Modified $Date: 2007/03/25 18:58:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -240,6 +240,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 		AC_LANG_PROGRAM([[
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <net/ip.h>
 #include <net/icmp.h>
 #include <net/route.h>]],
@@ -259,6 +260,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_SLAB_H
@@ -312,7 +314,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #endif
 #include <linux/inetdevice.h>
     ])
-    _LINUX_CHECK_TYPES([irqreturn_t,
+    _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *,
 			struct inet_protocol,
 			struct net_protocol], [:], [:], [
 #include <linux/compiler.h>
@@ -321,11 +323,15 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #ifdef HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
 #include <linux/sched.h>
+#include <linux/wait.h>
 #ifdef HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
 #endif
@@ -336,14 +342,29 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <linux/namespace.h>
 #endif
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
 #include <linux/time.h>		/* for struct timespec */
 #include <net/sock.h>
 #include <net/protocol.h>
     ])
+    AH_TEMPLATE([kmem_cachep_t], [This kmem_cache_t is deprecated in recent
+	2.6.20 kernels.  When it is deprecated, define this to struct
+	kmem_cache *.])
+    if test :"${linux_cv_type_kmem_cache_t_p:-no}" = :no ; then
+	AC_DEFINE_UNQUOTED([kmem_cachep_t], [struct kmem_cache *])
+    else
+	AC_DEFINE_UNQUOTED([kmem_cachep_t], [kmem_cache_t *])
+    fi
     _LINUX_CHECK_MACROS([rcu_read_lock], [], [], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_SLAB_H
@@ -445,6 +466,7 @@ dnl 	])
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_SLAB_H

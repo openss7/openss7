@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:09 $
+ @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:00:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:09 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch_x400p.c,v $
+ Revision 0.9.2.17  2007/03/25 19:00:38  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.16  2007/03/25 02:23:09  brian
  - add D_MP and D_MTPERQ flags
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:09 $"
+#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:00:38 $"
 
 static char const ident[] =
-    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:09 $";
+    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:00:38 $";
 
 #include <sys/os7/compat.h>
 
@@ -83,7 +86,7 @@ static char const ident[] =
 
 #define CH_SDL_DESCRIP		"X400P-SS7 CHANNEL (CH) STREAMS MODULE."
 #define CH_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2007/03/25 02:23:09 $"
+#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:00:38 $"
 #define CH_SDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define CH_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define CH_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2548,7 +2551,7 @@ ch_close(queue_t *q, int flag, cred_t *crp)
  *
  *  =========================================================================
  */
-STATIC kmem_cache_t *ch_priv_cachep = NULL;
+STATIC kmem_cachep_t ch_priv_cachep = NULL;
 STATIC int
 ch_init_caches(void)
 {
@@ -2566,11 +2569,15 @@ STATIC int
 ch_term_caches(void)
 {
 	if (ch_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(ch_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy ch_priv_cachep", __FUNCTION__);
 			return (-EBUSY);
 		} else
 			printd(("%s: destroyed ch_priv_cachep\n", MOD_NAME));
+#else
+		kmem_cache_destroy(ch_priv_cachep);
+#endif
 	}
 	return (0);
 }
@@ -2583,7 +2590,7 @@ STATIC struct ch *
 ch_alloc_priv(queue_t *q, struct ch **chp, dev_t *devp, cred_t *crp)
 {
 	struct ch *ch;
-	if ((ch = kmem_cache_alloc(ch_priv_cachep, SLAB_ATOMIC))) {
+	if ((ch = kmem_cache_alloc(ch_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated ch private structure\n", MOD_NAME, ch));
 		bzero(ch, sizeof(*ch));
 		ch_get(ch);	/* first get */
@@ -2670,7 +2677,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the CH-SDL module. (0 for allocation.)");
 

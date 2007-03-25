@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:12 $
+ @(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:00:12 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lapb.c,v $
+ Revision 0.9.2.5  2007/03/25 19:00:54  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.4  2007/03/25 06:00:12  brian
  - flush corrections
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:12 $"
+#ident "@(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $"
 
 static char const ident[] =
-    "$RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:12 $";
+    "$RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $";
 
 /*
  *  This is a pushable STREAMS module that provides the Link Access Procedure
@@ -94,7 +97,7 @@ static char const ident[] =
 
 #define LAPB_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LAPB_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:12 $"
+#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $"
 #define LAPB_DEVICE	"SVR 4.2 STREAMS Link Access Procedure Balanced (LAPB)"
 #define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LAPB_LICENSE	"GPL"
@@ -3377,21 +3380,21 @@ dl_unregsiter_strdev(major_t major)
  *  ===================
  */
 #ifdef module_param
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #else				/* module_param */
 MODULE_PARM(modid, "h");
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for the LAPB module. (0 for allocation.)");
 
 #ifdef module_param
-module_param(drvid, ushort, 0);
+module_param(drvid, ushort, 0444);
 #else				/* module_param */
 MODULE_PARM(drvid, "h");
 #endif				/* module_param */
 MODULE_PARM_DESC(drvid, "Module ID for the LAPB driver. (0 for allocation.)");
 
 #ifdef module_param
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #else				/* module_param */
 MODULE_PARM(major, "h");
 #endif				/* module_param */

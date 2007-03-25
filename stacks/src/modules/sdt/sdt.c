@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:56 $
+ @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 19:00:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:22:56 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:56 $"
+#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 19:00:13 $"
 
 static char const ident[] =
-    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:56 $";
+    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 19:00:13 $";
 
 /*
  *  This is a SDT (Signalling Data Terminal) kernel module.  It provides the
@@ -75,7 +75,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2007/03/25 02:22:56 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2007/03/25 19:00:13 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4201,7 +4201,7 @@ sdt_close(queue_t *q, int flag, cred_t *crp)
  *
  *  ========================================================================
  */
-STATIC kmem_cache_t *sdt_priv_cachep = NULL;
+STATIC kmem_cachep_t sdt_priv_cachep = NULL;
 STATIC int
 sdt_init_caches(void)
 {
@@ -4219,11 +4219,15 @@ STATIC int
 sdt_term_caches(void)
 {
 	if (sdt_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sdt_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sdt_priv_cachep.", __FUNCTION__);
 			return (-EBUSY);
 		} else
 			printd(("sdt: destroyed sdt_priv_cachep\n"));
+#else
+		kmem_cache_destroy(sdt_priv_cachep);
+#endif
 	}
 	return (0);
 }
@@ -4231,7 +4235,7 @@ STATIC struct sdt *
 sdt_alloc_priv(queue_t *q, struct sdt **sp, dev_t *devp, cred_t *crp)
 {
 	struct sdt *s;
-	if ((s = kmem_cache_alloc(sdt_priv_cachep, SLAB_ATOMIC))) {
+	if ((s = kmem_cache_alloc(sdt_priv_cachep, GFP_ATOMIC))) {
 		printd(("sdt: allocated module private structure\n"));
 		bzero(s, sizeof(*s));
 		sdt_get(s);	/* first get */
@@ -4332,7 +4336,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SDT module. (0 for allocation.)");
 

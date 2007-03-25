@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 05:59:44 $
+ @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 19:00:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 05:59:44 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_sctp.c,v $
+ Revision 0.9.2.18  2007/03/25 19:00:20  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.17  2007/03/25 05:59:44  brian
  - flush corrections
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 05:59:44 $"
+#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 19:00:20 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 05:59:44 $";
+    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 19:00:20 $";
 
 #include <sys/os7/compat.h>
 
@@ -84,7 +87,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDT) STREAMS MODULE."
-#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 05:59:44 $"
+#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 19:00:20 $"
 #define SDT_SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2121,7 +2124,7 @@ sdt_rsrv(queue_t *q)
  *
  *  =========================================================================
  */
-kmem_cache_t *sdt_cachep = NULL;
+kmem_cachep_t sdt_cachep = NULL;
 
 STATIC int
 sdt_init_caches(void)
@@ -2136,10 +2139,14 @@ STATIC int
 sdt_term_caches(void)
 {
 	if (sdt_cachep)
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sdt_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sdt_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
+#else
+		kmem_cache_destroy(sdt_cachep);
+#endif
 	return (0);
 }
 
@@ -2149,7 +2156,7 @@ sdt_alloc_priv(queue_t *q)
 	sdt_t *sp;
 	ensure(q, return (NULL));
 
-	if ((sp = kmem_cache_alloc(sdt_cachep, SLAB_ATOMIC))) {
+	if ((sp = kmem_cache_alloc(sdt_cachep, GFP_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		RD(q)->q_ptr = WR(q)->q_ptr = sp;
 		sp->iq = RD(q);
@@ -2221,7 +2228,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SDT module. (0 for allocation.)");
 

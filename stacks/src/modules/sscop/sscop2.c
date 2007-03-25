@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:03 $
+ @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:22 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:03 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop2.c,v $
+ Revision 0.9.2.14  2007/03/25 19:00:22  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.13  2007/03/25 02:23:03  brian
  - add D_MP and D_MTPERQ flags
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:03 $"
+#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:22 $"
 
 static char const ident[] =
-    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:03 $";
+    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:22 $";
 
 #include <sys/os7/compat.h>
 
@@ -566,7 +569,7 @@ s_rput(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-kmem_cache_t *s_cachep = NULL;
+kmem_cachep_t s_cachep = NULL;
 
 static void
 s_init_caches(void)
@@ -581,15 +584,19 @@ static void
 s_term_caches(void)
 {
 	if (s_cachep)
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(s_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy s_cache", __FUNCTION__);
+#else
+		kmem_cache_destroy(s_cachep);
+#endif
 	return;
 }
 static sscop_t *
 s_alloc_priv(queue_t *q)
 {
 	sscop_t *sp;
-	if ((sp = kmem_cache_alloc(s_cachep, SLAB_ATOMIC))) {
+	if ((sp = kmem_cache_alloc(s_cachep, GFP_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		RD(q)->q_ptr = WR(q)->q_ptr = sp;
 		sp->rq = RD(q);
@@ -658,7 +665,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SSCOP module. (0 for allocation.)");
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 23:19:47 $
+ @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 23:19:47 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:58:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua_as.c,v $
+ Revision 0.9.2.7  2007/03/25 18:58:53  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.6  2007/03/12 23:19:47  brian
  - changes for function type safety
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 23:19:47 $"
+#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:53 $"
 
 static char const ident[] =
-    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 23:19:47 $";
+    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:53 $";
 
 /*
  *  This is an UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -106,6 +109,10 @@ static char const ident[] =
  *
  */
 
+#ifndef HAVE_KTYPE_BOOL
+#include <stdbool.h>
+#endif
+
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
@@ -114,7 +121,6 @@ static char const ident[] =
 #define _DEBUG	1
 //#undef    _DEBUG
 
-#include <stdbool.h>
 #include <sys/os7/compat.h>
 #include <sys/strsun.h>
 
@@ -175,7 +181,7 @@ static char const ident[] =
 /* ============================== */
 
 #define UA_AS_DESCRIP	"UA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2007/03/12 23:19:47 $"
+#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:53 $"
 #define UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define UA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -18257,7 +18263,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the UA-AS driver. (0 for allocation.)");
 
@@ -18266,7 +18272,7 @@ unsigned short major = DRV_CMAJOR;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else				/* module_param */
-module_param(major, ushort, DRV_CMAJOR);
+module_param(major, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(major, "Major device number for UA-AS driver.  (0 for allocation.)");
 

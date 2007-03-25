@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:23:29 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 19:01:39 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:29 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_lapd.c,v $
+ Revision 0.9.2.4  2007/03/25 19:01:39  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.3  2007/03/25 02:23:29  brian
  - add D_MP and D_MTPERQ flags
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:23:29 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 19:01:39 $"
 
 static char const ident[] =
-    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:23:29 $";
+    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 19:01:39 $";
 
 #include <sys/os7/compat.h>
 
@@ -85,7 +88,7 @@ static char const ident[] =
 
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
 				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:23:29 $"
+#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 19:01:39 $"
 #define DL_LAPD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -3435,14 +3438,15 @@ recv_msg(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-STATIC kmem_cache_t *dl_priv_cachep = NULL;
-STATIC kmem_cache_t *dl_link_cachep = NULL;
+STATIC kmem_cachep_t dl_priv_cachep = NULL;
+STATIC kmem_cachep_t dl_link_cachep = NULL;
 
 STATIC int
 lapd_term_caches(void)
 {
 	int err = 0;
 	if (dl_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(dl_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy dl_priv_cachep", DRV_NAME);
 			err = -EBUSY;
@@ -3450,8 +3454,12 @@ lapd_term_caches(void)
 			printd(("%s: destroyed dl_priv_cachep\n", DRV_NAME));
 			dl_priv_cachep = NULL;
 		}
+#else
+		kmem_cache_destroy(dl_priv_cachep);
+#endif
 	}
 	if (dl_link_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(dl_link_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy dl_link_cachep", DRV_NAME);
 			err = -EBUSY;
@@ -3459,6 +3467,9 @@ lapd_term_caches(void)
 			printd(("%s: destroyed dl_link_cachep\n", DRV_NAME));
 			dl_link_cachep = NULL;
 		}
+#else
+		kmem_cache_destroy(dl_link_cachep);
+#endif
 	}
 	return (err);
 }
@@ -3544,7 +3555,7 @@ dl_alloc_priv(queue_t *q, struct dl **dlp, dev_t *devp, cred_t *crp, int style)
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 	printd(("%s: create dl dev = %d:%d\n", DRV_NAME, cmajor, cminor));
-	if ((dl = kmem_cache_alloc(dl_priv_cachep, SLAB_ATOMIC))) {
+	if ((dl = kmem_cache_alloc(dl_priv_cachep, GFP_ATOMIC))) {
 		bzero(dl, sizeof(*dl));
 		dl_get(dl);	/* first get */
 		dl->u.dev.cmajor = cmajor;
@@ -3705,7 +3716,7 @@ dl_alloc_link(queue_t *q, struct cd **cdp, ulong index, cred_t *crp)
 {
 	struct cd *cd;
 	printd(("%s: create cd mux = %lu\n", DRV_NAME, index));
-	if ((cd = kmem_cache_alloc(dl_link_cachep, SLAB_ATOMIC))) {
+	if ((cd = kmem_cache_alloc(dl_link_cachep, GFP_ATOMIC))) {
 		bzero(cd, sizeof(*cd));
 		cd_get(cd);	/* first get */
 		cd->u.mux.index = index;
@@ -6598,7 +6609,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the DL driver. (0 for allocation.)");
 
@@ -6606,7 +6617,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the DL driver. (0 for allocation.)");
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/12 10:24:50 $
+ @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 19:01:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 10:24:50 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tp.c,v $
+ Revision 0.9.2.13  2007/03/25 19:01:51  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.12  2006/10/12 10:24:50  brian
  - removed redundant debug flags, and got itot compiling
 
@@ -95,10 +98,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/12 10:24:50 $"
+#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 19:01:51 $"
 
 static char const ident[] =
-    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/10/12 10:24:50 $";
+    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 19:01:51 $";
 
 /*
  *  This file provides both a module and a multiplexing driver for the ISO/OSI X.224
@@ -150,7 +153,7 @@ typedef unsigned int socklen_t;
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2006/10/12 10:24:50 $"
+#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2007/03/25 19:01:51 $"
 #define TP_DEVICE	"SVR 4.2 STREAMS TPI OSI Transport Provider Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@opens7.org>"
 #define TP_LICENSE	"GPL"
@@ -727,8 +730,8 @@ typedef struct df {
 
 struct df master;
 
-STATIC kmem_cache_t *tp_priv_cachep;
-STATIC kmem_cache_t *tp_link_cachep;
+STATIC kmem_cachep_t tp_priv_cachep;
+STATIC kmem_cachep_t tp_link_cachep;
 
 STATIC struct tp *
 tp_get(struct tp *tp)
@@ -760,7 +763,7 @@ tp_alloc(void)
 {
 	struct tp *tp;
 
-	if ((tp = kmem_cache_alloc(tp_priv_cachep, SLAB_ATOMIC))) {
+	if ((tp = kmem_cache_alloc(tp_priv_cachep, GFP_ATOMIC))) {
 		bzero(tp, sizeof(*tp));
 		atomic_set(&tp->refcnt, 1);
 		spin_lock_init(&tp->lock);	/* "tp-lock" */
@@ -800,7 +803,7 @@ np_alloc(void)
 {
 	struct np *np;
 
-	if ((np = kmem_cache_alloc(tp_link_cachep, SLAB_ATOMIC))) {
+	if ((np = kmem_cache_alloc(tp_link_cachep, GFP_ATOMIC))) {
 		bzero(np, sizeof(*np));
 		atomic_set(&np->refcnt, 1);
 		spin_lock_init(&np->lock);	/* "np-lock" */
@@ -4589,17 +4592,25 @@ STATIC int
 tp_term_caches(void)
 {
 	if (tp_priv_cachep != NULL) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(tp_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy tp_priv_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
+#else
+		kmem_cache_destroy(tp_priv_cachep);
+#endif
 		printd(("%s: destroyed tp_priv_cachep\n", DRV_NAME));
 	}
 	if (tp_link_cachep != NULL) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(tp_link_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy tp_link_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
+#else
+		kmem_cache_destroy(tp_link_cachep);
+#endif
 		printd(("%s: destroyed tp_link_cachep\n", DRV_NAME));
 	}
 	return (0);

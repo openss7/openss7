@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:12 $
+ @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:00:12 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd.c,v $
+ Revision 0.9.2.5  2007/03/25 19:00:54  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.4  2007/03/25 06:00:12  brian
  - flush corrections
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:12 $"
+#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $"
 
-static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:12 $";
+static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $";
 
 /*
  *  This is a pushable STREAMS module that provides the High-Level Data Link
@@ -107,7 +110,7 @@ static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) 
 
 #define CD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMD FOR LINUX"
 #define CD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:12 $"
+#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $"
 #define CD_DEVICE	"SVR 4.2 STREAMS Communications Device (CD)"
 #define CD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CD_LICENSE	"GPL"
@@ -2882,7 +2885,7 @@ cd_register_strmod(void)
 modID_t modid = MOD_ID;
 
 #ifdef module_param
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #else				/* module_param */
 MODULE_PARM(modid, "h");
 #endif				/* module_param */

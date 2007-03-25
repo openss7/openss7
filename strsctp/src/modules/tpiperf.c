@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:54 $
+ @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:00:54 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpiperf.c,v $
+ Revision 0.9.2.6  2007/03/25 19:02:16  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.5  2007/03/25 06:00:54  brian
  - flush corrections
 
@@ -67,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:54 $"
+#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:16 $"
 
-static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:54 $";
+static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:16 $";
 
 /*
  *  This is a TPI performance testing  module for SCTP that provides some specialized intput-output
@@ -89,7 +92,7 @@ static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define TPIPERF_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TPIPERF_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 06:00:54 $"
+#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:16 $"
 #define TPIPERF_DEVICE		"SVR 4.2 STREAMS TPI Performance Module (TPIPERF)"
 #define TPIPERF_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TPIPERF_LICENSE		"GPL"
@@ -200,7 +203,7 @@ struct tpiperf {
 	bcid_t bcid;		/* bufcall */
 };
 
-static kmem_cache_t *tpiperf_priv_cachep = NULL;
+static kmem_cachep_t tpiperf_priv_cachep = NULL;
 
 static int
 tpiperf_init_caches(void)
@@ -220,11 +223,15 @@ static int
 tpiperf_term_caches(void)
 {
 	if (tpiperf_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(tpiperf_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: %s: did not destroy tpiperf_priv_cachep", MOD_NAME,
 				__FUNCTION__);
 			return (-EBUSY);
 		}
+#else
+		kmem_cache_destroy(tpiperf_priv_cachep);
+#endif
 	}
 	return (0);
 }
@@ -234,7 +241,7 @@ tpiperf_alloc_priv(queue_t *q)
 {
 	struct tpiperf *priv;
 
-	if ((priv = kmem_cache_alloc(tpiperf_priv_cachep, SLAB_ATOMIC))) {
+	if ((priv = kmem_cache_alloc(tpiperf_priv_cachep, GFP_ATOMIC))) {
 		priv->rq = q;
 		priv->wq = WR(q);
 		priv->mode = 0;
@@ -721,7 +728,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the TIMOD module. (0 for allocation.)");
 

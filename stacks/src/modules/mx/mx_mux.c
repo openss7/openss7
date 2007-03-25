@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 05:59:31 $
+ @(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:59:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 05:59:31 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_mux.c,v $
+ Revision 0.9.2.4  2007/03/25 18:59:51  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.3  2007/03/25 05:59:31  brian
  - flush corrections
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 05:59:31 $"
+#ident "@(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:59:51 $"
 
-static char const ident[] = "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 05:59:31 $";
+static char const ident[] = "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:59:51 $";
 
 /*
  *  This is an MX multiplexing driver.  Its purpose is to allow a single device /dev/streams/matrix
@@ -82,7 +85,7 @@ static char const ident[] = "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.3
 #include <ss7/mxi_ioctl.h>
 
 #define MX_MUX_DESCRIP		"MX MULTIPLEX (MX-MUX) STREAMS MULTIPLEXING DRIVER."
-#define MX_MUX_REVISION		"LfS $RCSfile: mx_mux.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2007/03/25 05:59:31 $"
+#define MX_MUX_REVISION		"LfS $RCSfile: mx_mux.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:59:51 $"
 #define MX_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -137,7 +140,7 @@ modID_t modid = CONFIG_STREAMS_MX_MUX_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else				/* module_param */
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module id number for STREAMS MX-MUX driver.");
 
@@ -151,7 +154,7 @@ major_t major = CONFIG_STREAMS_MX_MUX_MAJOR;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else				/* module_param */
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(major, "Major device number for STREAMS MX-MUX driver.");
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:05 $
+ @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:05 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:05 $"
+#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:25 $"
 
 static char const ident[] =
-    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:05 $";
+    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:25 $";
 
 #include <sys/os7/compat.h>
 
@@ -71,7 +71,7 @@ static char const ident[] =
 
 #define TALI_DESCRIP	"TALI STREAMS MULTIPLEXING DRIVER." "\n" \
 			"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:05 $"
+#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:25 $"
 #define TALI_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TALI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TALI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -232,13 +232,13 @@ MODULE_STATIC struct streamtab tali_info = {
  *  =========================================================================
  */
 
-extern kmem_cache_t *tali_pp_cachep = NULL;
-extern kmem_cache_t *tali_xp_cachep = NULL;
-extern kmem_cache_t *tali_gp_cachep = NULL;
-extern kmem_cache_t *tali_as_cachep = NULL;
-extern kmem_cache_t *tali_ap_cachep = NULL;
-extern kmem_cache_t *tali_sp_cachep = NULL;
-extern kmem_cache_t *tali_np_cachep = NULL;
+extern kmem_cachep_t tali_pp_cachep = NULL;
+extern kmem_cachep_t tali_xp_cachep = NULL;
+extern kmem_cachep_t tali_gp_cachep = NULL;
+extern kmem_cachep_t tali_as_cachep = NULL;
+extern kmem_cachep_t tali_ap_cachep = NULL;
+extern kmem_cachep_t tali_sp_cachep = NULL;
+extern kmem_cachep_t tali_np_cachep = NULL;
 
 STATIC tali_pp_cache_allocated = 0;
 STATIC tali_xp_cache_allocated = 0;
@@ -453,7 +453,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the TALI driver. (0 for allocation.)");
 
@@ -461,7 +461,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the TALI driver. (0 for allocation.)");
 

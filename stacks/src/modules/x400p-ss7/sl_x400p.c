@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/25 05:59:59 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 19:00:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 05:59:59 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.39  2007/03/25 19:00:41  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.38  2007/03/25 05:59:59  brian
  - flush corrections
 
@@ -124,16 +127,20 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/25 05:59:59 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 19:00:41 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/25 05:59:59 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 19:00:41 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
  *  capabilities of the SLI for the E400P-SS7 and T400P-SS7 cards.  This is a
  *  complete SS7 MTP Level 2 OpenSS7 implementation.
  */
+
+#ifndef HAVE_KTYPE_BOOL
+#include <stdbool.h>
+#endif
 
 //#define _DEBUG 1
 #undef _DEBUG
@@ -145,8 +152,6 @@ static char const ident[] =
 #define X400P_DOWNLOAD_FIRMWARE 1
 
 #include <sys/os7/compat.h>
-
-#include <stdbool.h>
 
 #ifdef LINUX
 #include <linux/ioport.h>
@@ -180,7 +185,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/25 05:59:59 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 19:00:41 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -407,7 +412,11 @@ typedef struct cd {
 	ulong irq;			/* card irq */
 	ulong iobase;			/* card iobase */
 	struct tasklet_struct tasklet;	/* card tasklet */
-	 irqreturn_t(*isr) (int, void *, struct pt_regs *);	/* interrupt service routine */
+#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+	irq_handler_t isr;		/* interrupt service routine */
+#else
+	irqreturn_t (*isr) (int, void *, struct pt_regs *);	/* interrupt service routine */
+#endif
 	sdl_config_t config;		/* card configuration */
 } cd_t;
 
@@ -9945,7 +9954,11 @@ xp_e1_txrx_burst(struct cd *cd)
  *  languages.
  */
 STATIC __hot irqreturn_t
+#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+xp_e400_interrupt(int irq, void *dev_id)
+#else
 xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
+#endif
 {
 	struct cd *cd = (struct cd *) dev_id;
 
@@ -10067,7 +10080,11 @@ xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
  *  operation is key in controlling the DS2155 with higher order languages.  
  */
 STATIC __hot irqreturn_t
+#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+xp_e401_interrupt(int irq, void *dev_id)
+#else
 xp_e401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
+#endif
 {
 	struct cd *cd = (struct cd *) dev_id;
 
@@ -10246,7 +10263,11 @@ xp_t1_txrx_burst(struct cd *cd)
  *  languages.
  */
 STATIC __hot irqreturn_t
+#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+xp_t400_interrupt(int irq, void *dev_id)
+#else
 xp_t400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
+#endif
 {
 	struct cd *cd = (struct cd *) dev_id;
 
@@ -10402,7 +10423,11 @@ xp_t400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
  *  operation is key in controlling the DS2155 with higher order languages.  
  */
 STATIC __hot irqreturn_t
+#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+xp_t401_interrupt(int irq, void *dev_id)
+#else
 xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
+#endif
 {
 	struct cd *cd = (struct cd *) dev_id;
 
@@ -11265,10 +11290,10 @@ xp_close(queue_t *q, int flag, cred_t *crp)
  *  ==========================================================================
  */
 
-STATIC kmem_cache_t *xp_priv_cachep = NULL;
-STATIC kmem_cache_t *xp_span_cachep = NULL;
-STATIC kmem_cache_t *xp_card_cachep = NULL;
-STATIC kmem_cache_t *xp_xbuf_cachep = NULL;
+STATIC kmem_cachep_t xp_priv_cachep = NULL;
+STATIC kmem_cachep_t xp_span_cachep = NULL;
+STATIC kmem_cachep_t xp_card_cachep = NULL;
+STATIC kmem_cachep_t xp_xbuf_cachep = NULL;
 
 /*
  *  Cache allocation
@@ -11280,32 +11305,48 @@ xp_term_caches(void)
 	int err = 0;
 
 	if (xp_xbuf_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(xp_xbuf_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_xbuf_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: shrunk xp_xbuf_cache to zero\n", DRV_NAME));
+#else
+		kmem_cache_destroy(xp_xbuf_cachep);
+#endif
 	}
 	if (xp_card_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(xp_card_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_card_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: shrunk xp_card_cache to zero\n", DRV_NAME));
+#else
+		kmem_cache_destroy(xp_card_cachep);
+#endif
 	}
 	if (xp_span_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(xp_span_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_span_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: shrunk xp_span_cache to zero\n", DRV_NAME));
+#else
+		kmem_cache_destroy(xp_span_cachep);
+#endif
 	}
 	if (xp_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(xp_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_priv_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: shrunk xp_priv_cache to zero\n", DRV_NAME));
+#else
+		kmem_cache_destroy(xp_priv_cachep);
+#endif
 	}
 	return (err);
 }
@@ -11359,7 +11400,7 @@ xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t *crp)
 {
 	struct xp *xp;
 
-	if ((xp = kmem_cache_alloc(xp_priv_cachep, SLAB_ATOMIC))) {
+	if ((xp = kmem_cache_alloc(xp_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: allocated device private structure\n", DRV_NAME));
 		bzero(xp, sizeof(*xp));
 		xp_get(xp);	/* first get */
@@ -11514,7 +11555,7 @@ xp_alloc_sp(struct cd *cd, uint8_t span)
 {
 	struct sp *sp;
 
-	if ((sp = kmem_cache_alloc(xp_span_cachep, SLAB_ATOMIC))) {
+	if ((sp = kmem_cache_alloc(xp_span_cachep, GFP_ATOMIC))) {
 		printd(("%s: allocated span private structure\n", DRV_NAME));
 		bzero(sp, sizeof(*sp));
 		sp_get(sp);	/* first get */
@@ -11591,17 +11632,17 @@ xp_alloc_cd(void)
 {
 	struct cd *cd;
 
-	if ((cd = kmem_cache_alloc(xp_card_cachep, SLAB_ATOMIC))) {
+	if ((cd = kmem_cache_alloc(xp_card_cachep, GFP_ATOMIC))) {
 		uint32_t *wbuf;
 		uint32_t *rbuf;
 
 		printd(("%s: allocated card private structure\n", DRV_NAME));
-		if (!(wbuf = kmem_cache_alloc(xp_xbuf_cachep, SLAB_ATOMIC))) {
+		if (!(wbuf = kmem_cache_alloc(xp_xbuf_cachep, GFP_ATOMIC))) {
 			ptrace(("%s: could not allocate write buffer\n", DRV_NAME));
 			kmem_cache_free(xp_card_cachep, cd);
 			return (NULL);
 		}
-		if (!(rbuf = kmem_cache_alloc(xp_xbuf_cachep, SLAB_ATOMIC))) {
+		if (!(rbuf = kmem_cache_alloc(xp_xbuf_cachep, GFP_ATOMIC))) {
 			ptrace(("%s: could not allocate read buffer\n", DRV_NAME));
 			kmem_cache_free(xp_xbuf_cachep, wbuf);
 			kmem_cache_free(xp_card_cachep, cd);
@@ -12248,7 +12289,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SL-X400P driver. (0 for allocation.)");
 
@@ -12257,7 +12298,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the SL-X400P driver. (0 for allocation.)");
 

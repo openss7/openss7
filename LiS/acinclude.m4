@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.57 $) $Date: 2007/03/05 23:01:29 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.58 $) $Date: 2007/03/25 18:58:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/05 23:01:29 $ by $Author: brian $
+# Last Modified $Date: 2007/03/25 18:58:10 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.6.58  2007/03/25 18:58:10  brian
+# - changes to support 2.6.20-1.2307.fc5 kernel
+#
 # Revision 1.1.6.57  2007/03/05 23:01:29  brian
 # - checking in release changes
 #
@@ -500,6 +503,7 @@ AC_DEFUN([_LIS_CHECK_KERNEL], [dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -518,7 +522,7 @@ dnl  I've seen from a distro yet.  SLES takes the prize for this stupidity.
 dnl
     _LINUX_KERNEL_SYMBOLS([kthread_create, kthread_should_stop, kthread_stop, kthread_bind])
     _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
-			process_group cpu_raise_softirq check_region pcibios_init \
+			process_group process_session cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \
 			pcibios_read_config_byte pcibios_read_config_dword \
 			pcibios_read_config_word pcibios_write_config_byte \
@@ -551,6 +555,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -599,6 +604,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -629,10 +635,11 @@ dnl
 #include <asm/uaccess.h>
 #endif
 ])
-    _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
+    _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -662,6 +669,14 @@ dnl
 #endif
 #include <linux/time.h>		/* for struct timespec */
 ])
+    AH_TEMPLATE([kmem_cachep_t], [This kmem_cache_t is deprecated in recent
+	2.6.20 kernels.  When it is deprecated, define this to struct
+	kmem_cache *.])
+    if test :"${linux_cv_type_kmem_cache_t_p:-no}" = :no ; then
+	AC_DEFINE_UNQUOTED([kmem_cachep_t], [struct kmem_cache *])
+    else
+	AC_DEFINE_UNQUOTED([kmem_cachep_t], [kmem_cache_t *])
+    fi
 dnl 
 dnl In later kernels, the super_block.u.geneic_sbp and the filesystem specific
 dnl union u itself have been removed and a simple void pointer for filesystem
@@ -691,6 +706,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -730,6 +746,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -764,6 +781,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -798,6 +816,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -832,6 +851,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -866,6 +886,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -1099,6 +1120,7 @@ AC_DEFUN([_LIS_SIGMASKLOCK], [dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/slab.h>
@@ -1220,6 +1242,7 @@ AC_DEFUN([_LIS_SET_CPUS_ALLOWED], [dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/slab.h>

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/05 23:01:41 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:59:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/05 23:01:41 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 0.9.2.7  2007/03/25 18:59:07  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.6  2007/03/05 23:01:41  brian
  - checking in release changes
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/05 23:01:41 $"
+#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:59:07 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/05 23:01:41 $";
+    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:59:07 $";
 
 /*
  *  This is the AS side of M2UA implemented as a pushable module that pushes over an SCTP NPI
@@ -100,6 +103,10 @@ static char const ident[] =
  *  into SL-primitives and set upstream.
  */
 
+#ifndef HAVE_KTYPE_BOOL
+#include <stdbool.h>
+#endif
+
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
@@ -115,8 +122,6 @@ static char const ident[] =
 
 #undef DB_TYPE
 #define DB_TYPE(mp) mp->b_datap->db_type
-
-#include <stdbool.h>
 
 #include <linux/socket.h>
 #include <net/ip.h>
@@ -146,7 +151,7 @@ static char const ident[] =
 /* ======================= */
 
 #define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/05 23:01:41 $"
+#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:59:07 $"
 #define M2UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -5044,7 +5049,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the M2UA-AS module. (0 for allocation.)");
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 22:57:18 $
+ @(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 19:00:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 22:57:18 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:07 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 22:57:18 $"
+#ident "@(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 19:00:07 $"
 
-static char const ident[] = "$RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/27 22:57:18 $";
+static char const ident[] = "$RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 19:00:07 $";
 
 #define __NO_VERSION__
 
@@ -226,10 +226,10 @@ size_t sctp_default_heartbeat_itvl = SCTP_DEFAULT_HEARTBEAT_ITVL;
  *  Cache pointers
  *  -------------------------------------------------------------------------
  */
-kmem_cache_t *sctp_sctp_cachep = NULL;
-kmem_cache_t *sctp_dest_cachep = NULL;
-kmem_cache_t *sctp_srce_cachep = NULL;
-kmem_cache_t *sctp_strm_cachep = NULL;
+kmem_cachep_t sctp_sctp_cachep = NULL;
+kmem_cachep_t sctp_dest_cachep = NULL;
+kmem_cachep_t sctp_srce_cachep = NULL;
+kmem_cachep_t sctp_strm_cachep = NULL;
 
 void
 sctp_init_caches(void)
@@ -261,17 +261,33 @@ void
 sctp_term_caches(void)
 {
 	if (sctp_sctp_cachep)
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sctp_sctp_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy sctp_sctp_cachep");
+#else
+		kmem_cache_destroy(sctp_sctp_cachep);
+#endif
 	if (sctp_dest_cachep)
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sctp_dest_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy sctp_dest_cachep");
+#else
+		kmem_cache_destroy(sctp_dest_cachep);
+#endif
 	if (sctp_srce_cachep)
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sctp_srce_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy sctp_srce_cachep");
+#else
+		kmem_cache_destroy(sctp_srce_cachep);
+#endif
 	if (sctp_strm_cachep)
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sctp_strm_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy sctp_strm_cachep");
+#else
+		kmem_cache_destroy(sctp_strm_cachep);
+#endif
 	return;
 }
 
@@ -308,7 +324,7 @@ __sctp_daddr_alloc(sp, daddr, errp)
 	 *  TODO: need to check permissions (TACCES) for broadcast or multicast addresses
 	 *  and whether host addresses are valid (TBADADDR).
 	 */
-	if ((sd = kmem_cache_alloc(sctp_dest_cachep, SLAB_ATOMIC))) {
+	if ((sd = kmem_cache_alloc(sctp_dest_cachep, GFP_ATOMIC))) {
 		bzero(sd, sizeof(*sd));
 		if ((sd->next = sp->daddr))
 			sd->next->prev = &sd->next;
@@ -476,7 +492,7 @@ __sctp_saddr_alloc(sp, saddr, errp)
 		rare();
 		return (NULL);
 	}
-	if ((ss = kmem_cache_alloc(sctp_srce_cachep, SLAB_ATOMIC))) {
+	if ((ss = kmem_cache_alloc(sctp_srce_cachep, GFP_ATOMIC))) {
 		bzero(ss, sizeof(*ss));
 		if ((ss->next = sp->saddr))
 			ss->next->prev = &ss->next;
@@ -606,7 +622,7 @@ sctp_strm_alloc(stp, sid, errp)
 {
 	sctp_strm_t *st;
 
-	if ((st = kmem_cache_alloc(sctp_strm_cachep, SLAB_ATOMIC))) {
+	if ((st = kmem_cache_alloc(sctp_strm_cachep, GFP_ATOMIC))) {
 		bzero(st, sizeof(*st));
 		if ((st->next = (*stp)))
 			st->next->prev = &st->next;
@@ -693,7 +709,7 @@ sctp_alloc_priv(q, spp, cmajor, cminor, ops)
 	assure(cmajor);
 	assure(cminor);
 
-	if ((sp = kmem_cache_alloc(sctp_sctp_cachep, SLAB_ATOMIC))) {
+	if ((sp = kmem_cache_alloc(sctp_sctp_cachep, GFP_ATOMIC))) {
 		MOD_INC_USE_COUNT;
 		bzero(sp, sizeof(*sp));
 

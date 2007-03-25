@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/03/25 06:00:29 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/03/25 19:01:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:00:29 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.55  2007/03/25 19:01:33  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.54  2007/03/25 06:00:29  brian
  - flush corrections
 
@@ -233,10 +236,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/03/25 06:00:29 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/03/25 19:01:33 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/03/25 06:00:29 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/03/25 19:01:33 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -318,7 +321,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/03/25 06:00:29 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/03/25 19:01:33 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -650,8 +653,8 @@ struct tp_prot_bucket {
 STATIC rwlock_t tp_prot_lock = RW_LOCK_UNLOCKED;
 STATIC struct tp_prot_bucket *tp_prots[256];
 
-STATIC kmem_cache_t *udp_prot_cachep;
-STATIC kmem_cache_t *udp_priv_cachep;
+STATIC kmem_cachep_t udp_prot_cachep;
+STATIC kmem_cachep_t udp_priv_cachep;
 
 static INLINE struct tp *
 tp_get(struct tp *tp)
@@ -682,7 +685,7 @@ tp_alloc(void)
 {
 	struct tp *tp;
 
-	if ((tp = kmem_cache_alloc(udp_priv_cachep, SLAB_ATOMIC))) {
+	if ((tp = kmem_cache_alloc(udp_priv_cachep, GFP_ATOMIC))) {
 		bzero(tp, sizeof(*tp));
 		atomic_set(&tp->refcnt, 1);
 		spin_lock_init(&tp->lock);	/* "tp-lock" */
@@ -3821,7 +3824,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 			swerr();
 			break;
 		}
-	} else if ((pb = kmem_cache_alloc(udp_prot_cachep, SLAB_ATOMIC))) {
+	} else if ((pb = kmem_cache_alloc(udp_prot_cachep, GFP_ATOMIC))) {
 		bzero(pb, sizeof(*pb));
 		pb->refs = 1;
 		switch (type) {
@@ -4223,7 +4226,7 @@ tp_skb_destructor(struct sk_buff *skb)
 
 #undef skbuff_head_cache
 #ifdef HAVE_SKBUFF_HEAD_CACHE_ADDR
-#define skbuff_head_cache (*((kmem_cache_t **) HAVE_SKBUFF_HEAD_CACHE_ADDR))
+#define skbuff_head_cache (*((kmem_cachep_t *) HAVE_SKBUFF_HEAD_CACHE_ADDR))
 #endif
 
 /**
@@ -8777,6 +8780,10 @@ tp_free(caddr_t data)
 }
 #endif
 
+#ifndef CHECKSUM_HW
+#define CHECKSUM_HW CHECKSUM_COMPLETE
+#endif
+
 /**
  * tp_v4_rcv - receive IPv4 protocol packets
  * @skb: socket buffer containing IP packet
@@ -9348,18 +9355,26 @@ STATIC __unlikely int
 tp_term_caches(void)
 {
 	if (udp_prot_cachep != NULL) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(udp_prot_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy udp_prot_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
+#else
+		kmem_cache_destroy(udp_prot_cachep);
+#endif
 		_printd(("%s: destroyed udp_prot_cachep\n", DRV_NAME));
 		udp_prot_cachep = NULL;
 	}
 	if (udp_priv_cachep != NULL) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(udp_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy udp_priv_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
+#else
+		kmem_cache_destroy(udp_priv_cachep);
+#endif
 		_printd(("%s: destroyed udp_priv_cachep\n", DRV_NAME));
 		udp_priv_cachep = NULL;
 	}
@@ -9463,7 +9478,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the UDP driver. (0 for allocation.)");
 
@@ -9472,7 +9487,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the UDP driver. (0 for allocation.)");
 

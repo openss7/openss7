@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_cache.h,v 0.9.2.4 2005/07/18 12:53:08 brian Exp $
+ @(#) $Id: sctp_cache.h,v 0.9.2.5 2007/03/25 19:02:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,23 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:53:08 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:13 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SCTP_CACHE_H__
 #define __SCTP_CACHE_H__
 
-#ident "@(#) $RCSfile: sctp_cache.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/18 12:53:08 $"
+#ident "@(#) $RCSfile: sctp_cache.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:13 $"
 
 /*
  *  Cache pointers
  *  -------------------------------------------------------------------------
  */
-extern kmem_cache_t *sctp_sctp_cachep;
-extern kmem_cache_t *sctp_dest_cachep;
-extern kmem_cache_t *sctp_srce_cachep;
-extern kmem_cache_t *sctp_strm_cachep;
+extern kmem_cachep_t sctp_sctp_cachep;
+extern kmem_cachep_t sctp_dest_cachep;
+extern kmem_cachep_t sctp_srce_cachep;
+extern kmem_cachep_t sctp_strm_cachep;
 
 extern void sctp_init_caches(void);
 extern void sctp_term_caches(void);

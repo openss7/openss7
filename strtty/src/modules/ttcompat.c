@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $
+ @(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 19:02:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 09:37:42 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ttcompat.c,v $
+ Revision 0.9.2.4  2007/03/25 19:02:25  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.3  2006/10/12 09:37:42  brian
  - completed much of the strtty package
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $"
+#ident "@(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 19:02:25 $"
 
 static char const ident[] =
-    "$RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $";
+    "$RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 19:02:25 $";
 
 /*
  * Terminal compatibility module.  Provides ioctl inteface to user.  Provides
@@ -491,7 +494,7 @@ struct ltchars {
 
 #define TTCOMPAT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TTCOMPAT_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TTCOMPAT_REVISION	"OpenSS7 $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/12 09:37:42 $"
+#define TTCOMPAT_REVISION	"OpenSS7 $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 19:02:25 $"
 #define TTCOMPAT_DEVICE		"SVR 4.2 STREAMS Packet Mode Module (TTCOMPAT)"
 #define TTCOMPAT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TTCOMPAT_LICENSE	"GPL"
@@ -526,7 +529,7 @@ modID_t modid = CONFIG_STREAMS_TTCOMPAT_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for SC.");
 

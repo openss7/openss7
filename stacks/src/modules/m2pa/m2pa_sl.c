@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/18 10:51:10 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 18:59:32 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 10:51:10 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.22  2007/03/25 18:59:32  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.21  2006/12/18 10:51:10  brian
  - subpackaging changes for release
 
@@ -61,10 +64,14 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/18 10:51:10 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 18:59:32 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/18 10:51:10 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 18:59:32 $";
+
+#ifndef HAVE_KTYPE_BOOL
+#include <stdbool.h>
+#endif
 
 #define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
@@ -74,8 +81,6 @@ static char const ident[] =
 #undef _DEBUG
 
 #include <sys/os7/compat.h>
-
-#include <stdbool.h>
 
 #include <linux/socket.h>
 #include <net/ip.h>
@@ -93,7 +98,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2006/12/18 10:51:10 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 18:59:32 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -7981,7 +7986,7 @@ sl_w_prim(queue_t *q, mblk_t *mp)
  *
  *  =========================================================================
  */
-kmem_cache_t *sl_priv_cachep = NULL;
+kmem_cachep_t sl_priv_cachep = NULL;
 STATIC int
 sl_init_caches(void)
 {
@@ -7999,11 +8004,15 @@ STATIC int
 sl_term_caches(void)
 {
 	if (sl_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sl_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy sl_priv_cachep", __FUNCTION__);
 			return (-EBUSY);
 		} else
 			printd(("%s: destroyed sl_priv_cachep\n", MOD_NAME));
+#else
+		kmem_cache_destroy(sl_priv_cachep);
+#endif
 	}
 	return (0);
 }
@@ -8012,7 +8021,7 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp)
 {
 	struct sl *sl;
 
-	if ((sl = kmem_cache_alloc(sl_priv_cachep, SLAB_ATOMIC))) {
+	if ((sl = kmem_cache_alloc(sl_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated module private structure\n", MOD_NAME, sl));
 		bzero(sl, sizeof(*sl));
 
@@ -8304,7 +8313,7 @@ unsigned short modid = MOD_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the M2PA-SL module. (0 for allocation.)");
 

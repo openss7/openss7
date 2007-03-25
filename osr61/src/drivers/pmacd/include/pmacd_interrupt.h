@@ -18,10 +18,14 @@
 #include "pmacd.h"
 #include "pmacd_board.h"
 
-#ifdef LINUX24
-void pmacd_handleInterrupt(int irq, void *pBoard, struct pt_regs *regs);
+#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+irqreturn_t pmacd_handleInterrupt(int irq, void *pBoard);
 #else
+#ifdef HAVE_KTYPE_IRQRETURN_T
 irqreturn_t pmacd_handleInterrupt(int irq, void *pBoard, struct pt_regs *regs);
+#else
+void pmacd_handleInterrupt(int irq, void *pBoard, struct pt_regs *regs);
+#endif
 #endif
 BOOLEAN_T pmacd_enableInterrupts(pmacd_board_t *board);
 void pmacd_disableInterrupts(pmacd_board_t *board);

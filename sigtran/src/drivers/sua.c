@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:22:26 $
+ @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:58:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:22:26 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:58:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua.c,v $
+ Revision 0.9.2.4  2007/03/25 18:58:44  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.3  2007/03/25 02:22:26  brian
  - add D_MP and D_MTPERQ flags
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:22:26 $"
+#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:58:44 $"
 
 static char const ident[] =
-    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:22:26 $";
+    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:58:44 $";
 
 #include <sys/os7/compat.h>
 
@@ -234,7 +237,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the SUA driver. (0 for allocation.)");
 
@@ -242,7 +245,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the SUA driver. (0 for allocation.)");
 

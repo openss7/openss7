@@ -61,14 +61,14 @@ MODULE_PARM(pmacd_streams_per_board,   "l");
 MODULE_PARM(pmacd_buffers_per_stream,  "l");
 MODULE_PARM(pmacd_stream_buffer_size,  "l");
 #else
-module_param(pmacd_major_number,int,0);
-module_param(pmacd_driver_name,charp,0);
-module_param(pmacd_msg_size,long,0);
-module_param(pmacd_mf_pull_option,long,0);
-module_param(pmacd_queue_size,long,0);
-module_param(pmacd_streams_per_board,long,0);
-module_param(pmacd_buffers_per_stream,long,0);
-module_param(pmacd_stream_buffer_size,long,0);
+module_param(pmacd_major_number,int,0444);
+module_param(pmacd_driver_name,charp,0444);
+module_param(pmacd_msg_size,long,0444);
+module_param(pmacd_mf_pull_option,long,0444);
+module_param(pmacd_queue_size,long,0444);
+module_param(pmacd_streams_per_board,long,0444);
+module_param(pmacd_buffers_per_stream,long,0444);
+module_param(pmacd_stream_buffer_size,long,0444);
 #endif
 MODULE_PARM_DESC(pmacd_driver_name, "PMAC driver name");
 MODULE_LICENSE("GPL");

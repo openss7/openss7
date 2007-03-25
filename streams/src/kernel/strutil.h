@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strutil.h,v 0.9.2.51 2006/12/18 10:09:00 brian Exp $
+ @(#) $Id: strutil.h,v 0.9.2.52 2007/03/25 19:01:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 10:09:00 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.h,v $
+ Revision 0.9.2.52  2007/03/25 19:01:17  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.51  2006/12/18 10:09:00  brian
  - updated headers for release
 
@@ -58,7 +61,11 @@
 #ifndef __LOCAL_STRUTIL_H__
 #define __LOCAL_STRUTIL_H__
 
-#ident "@(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.51 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.52 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+
+#ifndef HAVE_KTYPE_BOOL
+#include <stdbool.h>
+#endif
 
 #ifndef BIG_STATIC
 #define BIG_STATIC
@@ -67,8 +74,6 @@
 #ifndef BIG_STATIC_INLINE
 #define BIG_STATIC_INLINE
 #endif
-
-#include <stdbool.h>
 
 /* global synchq */
 extern struct syncq *global_syncq;

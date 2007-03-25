@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slmux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/21 20:20:11 $
+ @(#) $RCSfile: slmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/21 20:20:11 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slmux.c,v $
+ Revision 0.9.2.2  2007/03/25 19:00:15  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.1  2007/01/21 20:20:11  brian
  - added documetation
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slmux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/21 20:20:11 $"
+#ident "@(#) $RCSfile: slmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:15 $"
 
-static char const ident[] = "$RCSfile: slmux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/21 20:20:11 $";
+static char const ident[] = "$RCSfile: slmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:15 $";
 
 #define SL_SL_MINOR	0	/* /dev/streams/sl/sl */
 #define SL_ADM_MINOR	1	/* /dev/streams/sl/sl-admin */
@@ -2319,7 +2322,7 @@ static struct devnode sl_mon_node = {
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else				/* module_param */
-module_param(major, ushort, DRV_CMAJOR);
+module_param(major, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(major, "Major device number for SLMUX driver. (0 for allocation.)");
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 02:22:43 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 18:59:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:22:43 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isdn.c,v $
+ Revision 0.9.2.21  2007/03/25 18:59:25  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.20  2007/03/25 02:22:43  brian
  - add D_MP and D_MTPERQ flags
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 02:22:43 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 18:59:25 $"
 
 static char const ident[] =
-    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 02:22:43 $";
+    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 18:59:25 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -93,7 +96,7 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 02:22:43 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 18:59:25 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -14583,15 +14586,15 @@ isdn_close(queue_t *q, int flag, cred_t *crp)
  *
  *  =========================================================================
  */
-STATIC kmem_cache_t *isdn_cc_cachep = NULL;
-STATIC kmem_cache_t *isdn_cr_cachep = NULL;
-STATIC kmem_cache_t *isdn_ch_cachep = NULL;
-STATIC kmem_cache_t *isdn_tg_cachep = NULL;
-STATIC kmem_cache_t *isdn_fg_cachep = NULL;
-STATIC kmem_cache_t *isdn_eg_cachep = NULL;
-STATIC kmem_cache_t *isdn_xg_cachep = NULL;
-STATIC kmem_cache_t *isdn_dc_cachep = NULL;
-STATIC kmem_cache_t *isdn_dl_cachep = NULL;
+STATIC kmem_cachep_t isdn_cc_cachep = NULL;
+STATIC kmem_cachep_t isdn_cr_cachep = NULL;
+STATIC kmem_cachep_t isdn_ch_cachep = NULL;
+STATIC kmem_cachep_t isdn_tg_cachep = NULL;
+STATIC kmem_cachep_t isdn_fg_cachep = NULL;
+STATIC kmem_cachep_t isdn_eg_cachep = NULL;
+STATIC kmem_cachep_t isdn_xg_cachep = NULL;
+STATIC kmem_cachep_t isdn_dc_cachep = NULL;
+STATIC kmem_cachep_t isdn_dl_cachep = NULL;
 
 STATIC int
 isdn_init_caches(void)
@@ -14695,67 +14698,103 @@ isdn_term_caches(void)
 {
 	int err = 0;
 	if (isdn_cc_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isdn_cc_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_cc_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isdn_cc_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isdn_cc_cachep);
+#endif
 	}
 	if (isdn_cr_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isdn_cr_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_cr_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isdn_cr_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isdn_cr_cachep);
+#endif
 	}
 	if (isdn_ch_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isdn_ch_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_ch_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isdn_ch_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isdn_ch_cachep);
+#endif
 	}
 	if (isdn_tg_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isdn_tg_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_tg_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isdn_tg_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isdn_tg_cachep);
+#endif
 	}
 	if (isdn_fg_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isdn_fg_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_fg_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isdn_fg_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isdn_fg_cachep);
+#endif
 	}
 	if (isdn_eg_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isdn_eg_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_eg_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isdn_eg_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isdn_eg_cachep);
+#endif
 	}
 	if (isdn_xg_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isdn_xg_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_xg_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isdn_xg_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isdn_xg_cachep);
+#endif
 	}
 	if (isdn_dc_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isdn_dc_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_dc_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isdn_dc_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isdn_dc_cachep);
+#endif
 	}
 	if (isdn_dl_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isdn_dl_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isdn_dl_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("%s: destroyed isdn_dl_cachep\n", DRV_NAME));
+#else
+		kmem_cache_destroy(isdn_dl_cachep);
+#endif
 	}
 	return (err);
 }
@@ -14771,7 +14810,7 @@ isdn_alloc_cc(queue_t *q, struct cc **ccp, dev_t *devp, cred_t *crp)
 	struct cc *cc;
 	printd(("%s: %s: create cc dev = %d:%d\n", DRV_NAME, __FUNCTION__, getmajor(*devp),
 		getminor(*devp)));
-	if ((cc = kmem_cache_alloc(isdn_cc_cachep, SLAB_ATOMIC))) {
+	if ((cc = kmem_cache_alloc(isdn_cc_cachep, GFP_ATOMIC))) {
 		bzero(cc, sizeof(*cc));
 		cc_get(cc);	/* first get */
 		cc->u.dev.cmajor = getmajor(*devp);
@@ -14938,7 +14977,7 @@ isdn_alloc_cr(ulong id, struct cc *cc, struct fg *fg, struct ch **chp, size_t nc
 	   create a call reference with a list of channels and user reference */
 	struct cr *cr, **crp;
 	printd(("%s: %s: create cr->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((cr = kmem_cache_alloc(isdn_cr_cachep, SLAB_ATOMIC))) {
+	if ((cr = kmem_cache_alloc(isdn_cr_cachep, GFP_ATOMIC))) {
 		bzero(cr, sizeof(*cr));
 		cr_get(cr);	/* first get */
 		spin_lock_init(&cr->lock);	/* "cr-lock" */
@@ -15174,7 +15213,7 @@ isdn_alloc_ch(ulong id, struct fg *fg, struct tg *tg, ulong ts)
 	assure(eg == tg->eg.eg);
 #endif
 	printd(("%s: %s: create ch->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((ch = kmem_cache_alloc(isdn_ch_cachep, SLAB_ATOMIC))) {
+	if ((ch = kmem_cache_alloc(isdn_ch_cachep, GFP_ATOMIC))) {
 		bzero(ch, sizeof(*ch));
 		ch_get(ch);	/* first get */
 		spin_lock_init(&ch->lock);	/* "ch-lock" */
@@ -15395,7 +15434,7 @@ isdn_alloc_tg(ulong id, struct eg *eg)
 {
 	struct tg *tg, **tgp;
 	printd(("%s: %s: create tg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((tg = kmem_cache_alloc(isdn_tg_cachep, SLAB_ATOMIC))) {
+	if ((tg = kmem_cache_alloc(isdn_tg_cachep, GFP_ATOMIC))) {
 		bzero(tg, sizeof(*tg));
 		tg_get(tg);	/* first get */
 		spin_lock_init(&tg->lock);	/* "tg-lock" */
@@ -15602,7 +15641,7 @@ isdn_alloc_fg(ulong id, struct eg *eg)
 {
 	struct fg *fg, **fgp;
 	printd(("%s: %s: create fg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((fg = kmem_cache_alloc(isdn_fg_cachep, SLAB_ATOMIC))) {
+	if ((fg = kmem_cache_alloc(isdn_fg_cachep, GFP_ATOMIC))) {
 		bzero(fg, sizeof(*fg));
 		fg_get(fg);	/* first get */
 		spin_lock_init(&fg->lock);	/* "fg-lock" */
@@ -15802,7 +15841,7 @@ isdn_alloc_eg(ulong id, struct xg *xg)
 {
 	struct eg *eg, **egp;
 	printd(("%s: %s: create eg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((eg = kmem_cache_alloc(isdn_eg_cachep, SLAB_ATOMIC))) {
+	if ((eg = kmem_cache_alloc(isdn_eg_cachep, GFP_ATOMIC))) {
 		bzero(eg, sizeof(*eg));
 		eg_get(eg);	/* first get */
 		spin_lock_init(&eg->lock);	/* "eg-lock" */
@@ -15996,7 +16035,7 @@ isdn_alloc_xg(ulong id)
 	struct xg *xg, **xgp;
 	struct df *df = &master;
 	printd(("%s: %s: create xg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((xg = kmem_cache_alloc(isdn_xg_cachep, SLAB_ATOMIC))) {
+	if ((xg = kmem_cache_alloc(isdn_xg_cachep, GFP_ATOMIC))) {
 		bzero(xg, sizeof(*xg));
 		xg_get(xg);	/* first get */
 		spin_lock_init(&xg->lock);	/* "xg-lock" */
@@ -16168,7 +16207,7 @@ isdn_alloc_dc(ulong id, struct fg *fg, struct tg *tg)
 {
 	struct dc *dc;
 	printd(("%s: %s: create dc->id = %ld\n", DRV_NAME, __FUNCTION__, id));
-	if ((dc = kmem_cache_alloc(isdn_dc_cachep, SLAB_ATOMIC))) {
+	if ((dc = kmem_cache_alloc(isdn_dc_cachep, GFP_ATOMIC))) {
 		struct dc **dcp;
 		bzero(dc, sizeof(*dc));
 		dc_get(dc);	/* first get */
@@ -16315,7 +16354,7 @@ isdn_alloc_dl(queue_t *q, struct dl **mpp, ulong index, cred_t *crp)
 {
 	struct dl *dl;
 	printd(("%s: %s: create dl index = %lu\n", DRV_NAME, __FUNCTION__, index));
-	if ((dl = kmem_cache_alloc(isdn_dl_cachep, SLAB_ATOMIC))) {
+	if ((dl = kmem_cache_alloc(isdn_dl_cachep, GFP_ATOMIC))) {
 		bzero(dl, sizeof(*dl));
 		dl_get(dl);	/* first get */
 		dl->u.mux.index = index;
@@ -16472,7 +16511,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the ISDN driver. (0 for allocation.)");
 
@@ -16480,7 +16519,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)");
 

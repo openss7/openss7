@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: queue.h,v 0.9.2.1 2004/08/21 10:53:58 brian Exp $
+ @(#) $Id: queue.h,v 0.9.2.2 2007/03/25 19:02:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:53:58 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:15 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -74,18 +74,18 @@ ss7_w_flush(queue_t *q, mblk_t *mp)
 {
 	if (*mp->b_rptr & FLUSHW) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+			flushband(WR(q), mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(WR(q), FLUSHALL);
+			flushq(WR(q), FLUSHDATA);
 		if (q->q_next)
 			return (QR_PASSALONG);
 		*mp->b_rptr &= ~FLUSHW;
 	}
 	if (*mp->b_rptr & FLUSHR) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+			flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(RD(q), FLUSHALL);
+			flushq(RD(q), FLUSHDATA);
 		if (!q->q_next)
 			return (QR_LOOP);
 		*mp->b_rptr &= ~FLUSHR;
@@ -97,18 +97,18 @@ ss7_r_flush(queue_t *q, mblk_t *mp)
 {
 	if (*mp->b_rptr & FLUSHR) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+			flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(RD(q), FLUSHALL);
+			flushq(RD(q), FLUSHDATA);
 		if (q->q_next)
 			return (QR_PASSALONG);
 		*mp->b_rptr &= ~FLUSHR;
 	}
 	if (*mp->b_rptr & FLUSHW) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+			flushband(WR(q), mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(WR(q), FLUSHALL);
+			flushq(WR(q), FLUSHDATA);
 		if (!q->q_next)
 			return (QR_LOOP);
 		*mp->b_rptr &= ~FLUSHW;

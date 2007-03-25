@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 05:59:57 $
+ @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 19:00:39 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 05:59:57 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_x400p.c,v $
+ Revision 0.9.2.22  2007/03/25 19:00:39  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.21  2007/03/25 05:59:57  brian
  - flush corrections
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 05:59:57 $"
+#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 19:00:39 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 05:59:57 $";
+    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 19:00:39 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) kernel module which
@@ -110,7 +113,7 @@ static char const ident[] =
 
 #define SDT_X400P_DESCRIP	"E/T400P-SS7: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
 #define SDT_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2007/03/25 05:59:57 $"
+#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.22 $) $Date: 2007/03/25 19:00:39 $"
 #define SDT_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDT_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -511,10 +514,10 @@ STATIC xp_card_t *x400p_cards;
  *  ==========================================================================
  */
 
-STATIC kmem_cache_t *xp_priv_cachep = NULL;
-STATIC kmem_cache_t *xp_span_cachep = NULL;
-STATIC kmem_cache_t *xp_card_cachep = NULL;
-STATIC kmem_cache_t *xp_xbuf_cachep = NULL;
+STATIC kmem_cachep_t xp_priv_cachep = NULL;
+STATIC kmem_cachep_t xp_span_cachep = NULL;
+STATIC kmem_cachep_t xp_card_cachep = NULL;
+STATIC kmem_cachep_t xp_xbuf_cachep = NULL;
 
 /*
  *  Cache allocation
@@ -568,32 +571,48 @@ xp_term_caches(void)
 {
 	int err = 0;
 	if (xp_xbuf_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(xp_xbuf_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_xbuf_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("X400P-SS7: shrunk xp_xbuf_cache to zero\n"));
+#else
+		kmem_cache_destroy(xp_xbuf_cachep);
+#endif
 	}
 	if (xp_card_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(xp_card_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_card_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("X400P-SS7: shrunk xp_card_cache to zero\n"));
+#else
+		kmem_cache_destroy(xp_card_cachep);
+#endif
 	}
 	if (xp_span_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(xp_span_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_span_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("X400P-SS7: shrunk xp_span_cache to zero\n"));
+#else
+		kmem_cache_destroy(xp_span_cachep);
+#endif
 	}
 	if (xp_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(xp_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy xp_priv_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
 			printd(("X400P-SS7: shrunk xp_priv_cache to zero\n"));
+#else
+		kmem_cache_destroy(xp_priv_cachep);
+#endif
 	}
 	return (0);
 }
@@ -606,7 +625,7 @@ STATIC xp_t *
 xp_alloc_priv(queue_t *q, xp_t ** xpp, major_t cmajor, minor_t cminor)
 {
 	xp_t *xp;
-	if ((xp = kmem_cache_alloc(xp_priv_cachep, SLAB_ATOMIC))) {
+	if ((xp = kmem_cache_alloc(xp_priv_cachep, GFP_ATOMIC))) {
 		printd(("X400P-SS7: allocated device private structure\n"));
 		bzero(xp, sizeof(*xp));
 		xp->cmajor = cmajor;
@@ -706,7 +725,7 @@ STATIC xp_span_t *
 xp_alloc_span(xp_card_t * cp, uint8_t span)
 {
 	xp_span_t *sp;
-	if ((sp = kmem_cache_alloc(xp_span_cachep, SLAB_ATOMIC))) {
+	if ((sp = kmem_cache_alloc(xp_span_cachep, GFP_ATOMIC))) {
 		printd(("X400P-SS7: allocated span private structure\n"));
 		bzero(sp, sizeof(*sp));
 		/* create linkage */
@@ -784,16 +803,16 @@ STATIC xp_card_t *
 xp_alloc_card(void)
 {
 	xp_card_t *cp;
-	if ((cp = kmem_cache_alloc(xp_card_cachep, SLAB_ATOMIC))) {
+	if ((cp = kmem_cache_alloc(xp_card_cachep, GFP_ATOMIC))) {
 		uint32_t *wbuf;
 		uint32_t *rbuf;
 		printd(("X400P-SS7: allocated card private structure\n"));
-		if (!(wbuf = kmem_cache_alloc(xp_xbuf_cachep, SLAB_ATOMIC))) {
+		if (!(wbuf = kmem_cache_alloc(xp_xbuf_cachep, GFP_ATOMIC))) {
 			ptrace(("X400P-SS7: could not allocate write buffer\n"));
 			kmem_cache_free(xp_card_cachep, cp);
 			return (NULL);
 		}
-		if (!(rbuf = kmem_cache_alloc(xp_xbuf_cachep, SLAB_ATOMIC))) {
+		if (!(rbuf = kmem_cache_alloc(xp_xbuf_cachep, GFP_ATOMIC))) {
 			ptrace(("X400P-SS7: could not allocate read buffer\n"));
 			kmem_cache_free(xp_xbuf_cachep, wbuf);
 			kmem_cache_free(xp_card_cachep, cp);
@@ -6448,7 +6467,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the X400-SDL driver. (0 for allocation.)");
 
@@ -6456,7 +6475,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the X400-SDL driver. (0 for allocation.)");
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lmi.h,v 0.9.2.7 2007/01/28 01:09:50 brian Exp $
+ @(#) $Id: lmi.h,v 0.9.2.8 2007/03/25 18:59:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/28 01:09:50 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lmi.h,v $
+ Revision 0.9.2.8  2007/03/25 18:59:12  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.7  2007/01/28 01:09:50  brian
  - updated test programs and working up m2ua-as driver
 
@@ -58,7 +61,7 @@
 #ifndef __LMI_H__
 #define __LMI_H__
 
-#ident "@(#) $RCSfile: lmi.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: lmi.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -273,6 +276,8 @@ typedef struct {
 	lmi_ulong lmi_opt_offset;
 	lmi_ulong lmi_mgmt_flags;
 } lmi_optmgmt_ack_t;
+
+#undef LMI_DEFAULT
 
 #define LMI_NEGOTIATE		0x0004
 #define LMI_CHECK		0x0008

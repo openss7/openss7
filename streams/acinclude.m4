@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2007/03/25 03:27:28 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2007/03/25 19:01:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/25 03:27:28 $ by $Author: brian $
+# Last Modified $Date: 2007/03/25 19:01:07 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.141  2007/03/25 19:01:07  brian
+# - changes to support 2.6.20-1.2307.fc5 kernel
+#
 # Revision 0.9.2.140  2007/03/25 03:27:28  brian
 # - enable syncrhonization and stats by default
 #
@@ -1084,7 +1087,7 @@ AC_DEFUN([_LFS_CHECK_KERNEL], [dnl
 # =============================================================================
 # _LFS_CONFIG_KERNEL
 # -----------------------------------------------------------------------------
-# These are a bunch of kernel configuraiton checks primarily in support of 2.5
+# These are a bunch of kernel configuration checks primarily in support of 2.5
 # and 2.6 kernels.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
@@ -1097,6 +1100,7 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -1127,7 +1131,7 @@ dnl reference counting for the free routine callback function.
 dnl
     _LINUX_KERNEL_SYMBOLS([module_text_address])
     _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
-			process_group cpu_raise_softirq check_region pcibios_init \
+			process_group process_session cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \
 			pcibios_read_config_byte pcibios_read_config_dword \
 			pcibios_read_config_word pcibios_write_config_byte \
@@ -1135,7 +1139,8 @@ dnl
 			pci_dac_dma_sync_single pci_dac_dma_sync_single_for_cpu \
 			pci_dac_dma_sync_single_for_device pci_dac_set_dma_mask \
 			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
-			pci_dac_page_to_dma pci_dac_dma_to_page pci_dac_dma_to_offset \
+			pci_dac_page_to_dma pci_dac_dma_to_page \
+			pci_dac_dma_to_offset vmalloc vfree \
 			sleep_on interruptible_sleep_on sleep_on_timeout \
 			cpumask_scnprintf __symbol_get __symbol_put \
 			read_trylock write_trylock atomic_add_return path_lookup \
@@ -1153,13 +1158,14 @@ dnl
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_osif_${lk_func}"
 				;;
-			    *sleep_on*)
+			    *sleep_on*|vmalloc|vfree)
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
 				;;
 			esac ], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -1208,6 +1214,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -1238,11 +1245,13 @@ dnl
 #include <asm/uaccess.h>
 #endif
 ])
-    _LINUX_CHECK_TYPES([irqreturn_t], [:], [:], [
+    _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
+#include <linux/types.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
 #include <linux/locks.h>
@@ -1271,6 +1280,14 @@ dnl
 #endif
 #include <linux/time.h>		/* for struct timespec */
 ])
+    AH_TEMPLATE([kmem_cachep_t], [This kmem_cache_t is deprecated in recent
+	2.6.20 kernels.  When it is deprecated, define this to struct
+	kmem_cache *.])
+    if test :"${linux_cv_type_kmem_cache_t_p:-no}" = :no ; then
+	AC_DEFINE_UNQUOTED([kmem_cachep_t], [struct kmem_cache *])
+    else
+	AC_DEFINE_UNQUOTED([kmem_cachep_t], [kmem_cache_t *])
+    fi
 dnl 
 dnl In later kernels, the super_block.u.geneic_sbp and the filesystem specific
 dnl union u itself have been removed and a simple void pointer for filesystem
@@ -1296,10 +1313,12 @@ dnl
 			  struct files_struct.max_fdset,
 			  struct files_struct.fdtab,
 			  struct inode.i_private,
-			  struct inode.i_blksize], [:], [:], [
+			  struct inode.i_blksize,
+			  struct fown_struct.pid_type], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -1339,6 +1358,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -1373,6 +1393,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -1407,6 +1428,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -1441,6 +1463,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H
@@ -1475,6 +1498,7 @@ dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
+#include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
 #ifdef HAVE_KINC_LINUX_LOCKS_H

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:08 $
+ @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:08 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:00:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua.c,v $
+ Revision 0.9.2.14  2007/03/25 19:00:37  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.13  2007/03/25 02:23:08  brian
  - add D_MP and D_MTPERQ flags
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:08 $"
+#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:37 $"
 
 static char const ident[] =
-    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:08 $";
+    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:37 $";
 
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
@@ -100,7 +103,7 @@ static char const ident[] =
 
 #define TUA_DESCRIP	"TUA STREAMS MULTIPLEXING DRIVER."
 #define TUA_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:23:08 $"
+#define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:37 $"
 #define TUA_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_DEVICE	"Supports OpenSS7 TCAP TCI/TRI Interface Pseudo-Device Drivers."
 #define TUA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -645,7 +648,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the TUA driver. (0 for allocation.)");
 
@@ -653,7 +656,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for the TUA driver. (0 for allocation.)");
 

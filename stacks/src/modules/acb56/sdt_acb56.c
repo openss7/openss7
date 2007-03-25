@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:22:34 $
+ @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:22:34 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:12 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:22:34 $"
+#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:12 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:22:34 $";
+    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:12 $";
 
 /*
  *  This is an implementation of the Signalling Data Terminal for the SeaLevel
@@ -79,7 +79,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define ACB56_DESCRIP	"ACB56: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
-#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 02:22:34 $"
+#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:12 $"
 #define ACB56_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corpoation.  All Rights Reserved."
 #define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards."
 #define ACB56_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4475,7 +4475,7 @@ sdt_wsrv(queue_t *q)
  *
  *  =========================================================================
  */
-STATIC kmem_cache_t *sdt_priv_cachep = NULL;
+STATIC kmem_cachep_t sdt_priv_cachep = NULL;
 STATIC int
 sdt_init_caches(void)
 {
@@ -4493,10 +4493,14 @@ STATIC void
 sdt_term_caches(void)
 {
 	if (sdt_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(sdt_priv_cachep))
 			cmn_err(CE_WARN, "%s: did not destroy sdt_priv_cachep", __FUNCTION__);
 		else
 			printd(("%s: destroyed sdt_priv_cachep\n", MOD_NAME));
+#else
+		kmem_cache_destroy(sdt_priv_cachep);
+#endif
 	}
 	return;
 }
@@ -4521,7 +4525,7 @@ STATIC sdt_t *
 sdt_alloc_priv(queue_t *q, sdt_t ** sdtp, major_t cmajor, minor_t cminor)
 {
 	sdt_t *sdt;
-	if ((sdt = kmem_cache_alloc(sdt_priv_cachep, SLAB_ATOMIC))) {
+	if ((sdt = kmem_cache_alloc(sdt_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: allocated module private structure\n", MOD_NAME));
 		bzero(sdt, sizeof(*sdt));
 		sdt_get(sdt);	/* first get */

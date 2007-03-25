@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/25 06:00:17 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 19:01:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:00:17 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sad.c,v $
+ Revision 0.9.2.51  2007/03/25 19:01:13  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.50  2007/03/25 06:00:17  brian
  - flush corrections
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/25 06:00:17 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 19:01:13 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/25 06:00:17 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 19:01:13 $";
 
 /*
  * STREAMS Administrative Driver (SAD) for Linux Fast-STREAMS.  Note that this driver also acts as a
@@ -110,7 +113,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/25 06:00:17 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 19:01:13 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -147,7 +150,7 @@ modID_t modid = CONFIG_STREAMS_SAD_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module id number for STREAMS-administrative driver.");
 
@@ -161,7 +164,7 @@ major_t major = CONFIG_STREAMS_SAD_MAJOR;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Major device number for STREAMS-administrative driver.");
 

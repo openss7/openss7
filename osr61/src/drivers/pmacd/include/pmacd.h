@@ -33,15 +33,22 @@
  *
  **********************************/
 
-typedef int   bool, BOOLEAN_T;
+#ifndef HAVE_KTYPE_BOOL
+typedef int   bool;
+#else
+#include <linux/types.h>
+#endif
+typedef bool BOOLEAN_T;
 typedef unsigned long pmacd_memaddress_t;
 
+#ifndef HAVE_KTYPE_BOOL
 #ifndef true
 #define true  (1)
 #endif
 
 #ifndef false
 #define false (0)
+#endif
 #endif
 
 #ifndef TRUE

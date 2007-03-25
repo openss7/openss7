@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/20 23:11:01 $
+ @(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/20 23:11:01 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:02:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_ip.c,v $
+ Revision 0.9.2.5  2007/03/25 19:02:46  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.4  2006/12/20 23:11:01  brian
  - current development
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/20 23:11:01 $"
+#ident "@(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:46 $"
 
 static char const ident[] =
-    "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/20 23:11:01 $";
+    "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:46 $";
 
 /*
  *  This is a DLPI driver for the IP subsystem.  The purpose of the driver is to directly access the
@@ -94,7 +97,7 @@ static char const ident[] =
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl_ip.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2006/12/20 23:11:01 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl_ip.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:46 $"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI DL_IP Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"
@@ -2150,7 +2153,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, ushort, 0);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the IP driver. (0 for allocation.)");
 
@@ -2159,7 +2162,7 @@ major_t major = CMAJOR_0;
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0);
+module_param(major, uint, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the IP driver. (0 for allocation.)");
 

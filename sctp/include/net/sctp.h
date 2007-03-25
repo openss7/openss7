@@ -505,10 +505,10 @@ __strace(struct sock *sk)
  *  Cache pointers
  *  -------------------------------------------------------------------------
  */
-extern kmem_cache_t *__os7_sctp_dest_cachep;
-extern kmem_cache_t *__os7_sctp_srce_cachep;
-extern kmem_cache_t *__os7_sctp_bind_cachep;
-extern kmem_cache_t *__os7_sctp_strm_cachep;
+extern kmem_cachep_t __os7_sctp_dest_cachep;
+extern kmem_cachep_t __os7_sctp_srce_cachep;
+extern kmem_cachep_t __os7_sctp_bind_cachep;
+extern kmem_cachep_t __os7_sctp_strm_cachep;
 
 extern struct sock *__os7_sctp_protolist;
 extern atomic_t __os7_sctp_orphan_count;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/27 22:50:40 $
+ @(#) $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 22:50:40 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 18:59:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_dl.c,v $
+ Revision 0.9.2.2  2007/03/25 18:59:07  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.1  2006/10/27 22:50:40  brian
  - working up modules and testsuite
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/27 22:50:40 $"
+#ident "@(#) $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:07 $"
 
-static char const ident[] = "$RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/27 22:50:40 $";
+static char const ident[] = "$RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:07 $";
 
 /*
  * This is a simple SL to DL conversion module that converst between the
@@ -71,7 +74,7 @@ static char const ident[] = "$RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.1 
 #include <sys/os7/compat.h>
 
 #define SL_DL_DESCRIP		"SIGNALLING LINK (SL) DATA LINK (DL) STREAMS MODULE"
-#define SL_DL_REVISION		"OpenSS7 $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/27 22:50:40 $"
+#define SL_DL_REVISION		"OpenSS7 $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:07 $"
 
 #define SL_DL_COPYRIGHT		"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS"
@@ -3557,7 +3560,7 @@ modID_t modid = MOD_ID;
 #ifdef LINUX
 
 #ifdef module_param
-module_param(modid, modID_t, 0);
+module_param(modid, modID_t, 0444);
 #else				/* module_param */
 MODULE_PARAM(modid, "h");
 #endif				/* module_param */

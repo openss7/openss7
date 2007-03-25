@@ -166,10 +166,10 @@ struct sctp_mib sctp_statistics[NR_CPUS * 2];
  *  kmem cache pointers are never deleted between module loading and
  *  unloading, they are just shrunk.
  */
-kmem_cache_t *sctp_bind_cachep = NULL;
-kmem_cache_t *sctp_dest_cachep = NULL;
-kmem_cache_t *sctp_srce_cachep = NULL;
-kmem_cache_t *sctp_strm_cachep = NULL;
+kmem_cachep_t sctp_bind_cachep = NULL;
+kmem_cachep_t sctp_dest_cachep = NULL;
+kmem_cachep_t sctp_srce_cachep = NULL;
+kmem_cachep_t sctp_strm_cachep = NULL;
 
 struct sock *sctp_protolist = NULL;
 atomic_t sctp_orphan_count = ATOMIC_INIT(0);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2007/03/25 00:52:54 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2007/03/25 19:01:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:54 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 19:01:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.141  2007/03/25 19:01:16  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
  Revision 0.9.2.140  2007/03/25 00:52:54  brian
  - synchronization updates
 
@@ -107,10 +110,14 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2007/03/25 00:52:54 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2007/03/25 19:01:16 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2007/03/25 00:52:54 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2007/03/25 19:01:16 $";
+
+#ifndef HAVE_KTYPE_BOOL
+#include <stdbool.h>		/* for bool, true and false */
+#endif
 
 #include <linux/autoconf.h>
 #ifdef HAVE_KINC_LINUX_COMPILE_H
@@ -138,8 +145,6 @@ static char const ident[] =
 #include <linux/skbuff.h>	/* for sk_buffs */
 
 #include <asm/cache.h>		/* for L1_CACHE_BYTES */
-
-#include <stdbool.h>		/* for bool, true and false */
 
 #if defined HAVE_KINC_LINUX_SECURITY_H
 #include <linux/security.h>	/* avoid ptrace conflict */
@@ -1139,7 +1144,7 @@ STATIC struct qband *__get_qband(queue_t *q, unsigned char band);
  *  takes a Stream head read lock.  This is a little bit overkill for intermediate modules, so we
  *  now only take a Stream head read lock if the queue is a Stream end (i.e., no q->q_next pointer).
  */
-streams_noinline streams_fastcall void
+streams_noinline streams_fastcall __hot_in void
 qbackenable(queue_t *q, const unsigned char band, const char bands[])
 {
 	queue_t *q_back;
@@ -3565,7 +3570,7 @@ __getq(queue_t *q, bool *be)
  *  MP-STREAMS: Note that qbackenable() will take its own Stream head read lock for Stream ends
  *  making this function safe to be called from outside of STREAMS for Stream ends only.
  */
-streams_fastcall __hot mblk_t *
+streams_fastcall __hot_in mblk_t *
 getq(register queue_t *q)
 {
 	mblk_t *mp;
@@ -4272,10 +4277,14 @@ drv_getparm(const unsigned int parm, void *value_p)
 		*(pid_t *) value_p = current->pid;
 		return (0);
 	case PSID:
+#if defined HAVE_KFUNC_PROCESS_SESSION
+		*(pid_t *) value_p = process_session(current);
+#else
 #if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
 		*(pid_t *) value_p = current->session;
 #else
 		*(pid_t *) value_p = current->signal->session;
+#endif
 #endif
 		return (0);
 	case TIME:

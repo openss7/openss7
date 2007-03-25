@@ -410,12 +410,17 @@ void ctimod_remove_wait_queue(wait_queue_head_t *head,  wait_queue_t *q) {
 	return;
 }
 
-#ifdef LINUX24
-int ctimod_request_irq(uint irq, void (*handler)(int, void *, struct pt_regs *),
+#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+int ctimod_request_irq(uint irq, irq_handler_t handler,
 	       				  ulong flag, const char *dev, void *id) {
 #else
+#ifdef HAVE_KTYPE_IRQRETURN_T
 int ctimod_request_irq(uint irq, irqreturn_t (*handler)(int, void *, struct pt_regs *),
 	       				  ulong flag, const char *dev, void *id) {
+#else
+int ctimod_request_irq(uint irq, void (*handler)(int, void *, struct pt_regs *),
+	       				  ulong flag, const char *dev, void *id) {
+#endif
 #endif
 	ctimod_dbg("ctimod: request_irq \n");
 
