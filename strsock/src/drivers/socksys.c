@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 10:26:38 $
+ @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:35 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 10:26:38 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:53:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socksys.c,v $
+ Revision 0.9.2.6  2007/03/25 00:53:35  brian
+ - synchronization updates
+
  Revision 0.9.2.5  2006/10/12 10:26:38  brian
  - removed redundant debug flags
 
@@ -79,9 +82,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 10:26:38 $"
+#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:35 $"
 
-static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 10:26:38 $";
+static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:35 $";
 
 /*
  *  A Socket System (SOCKSYS) Driver.
@@ -130,7 +133,7 @@ static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/12 10:26:38 $"
+#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 00:53:35 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"

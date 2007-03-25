@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsched.h,v 0.9.2.31 2007/03/02 09:23:29 brian Exp $
+ @(#) $Id: strsched.h,v 0.9.2.32 2007/03/25 00:52:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/02 09:23:29 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:52:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.h,v $
+ Revision 0.9.2.32  2007/03/25 00:52:47  brian
+ - synchronization updates
+
  Revision 0.9.2.31  2007/03/02 09:23:29  brian
  - build updates and esballoc() feature
 
@@ -61,7 +64,7 @@
 #ifndef __LOCAL_STRSCHED_H__
 #define __LOCAL_STRSCHED_H__
 
-#ident "@(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.31 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.32 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __EXTERN
 #define __EXTERN extern

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/03 03:07:46 $
+ @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 00:51:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/03 03:07:46 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:51:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua.c,v $
+ Revision 0.9.2.5  2007/03/25 00:51:07  brian
+ - synchronization updates
+
  Revision 0.9.2.4  2007/02/03 03:07:46  brian
  - working up drivers
 
@@ -64,13 +67,13 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/03 03:07:46 $"
+#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 00:51:07 $"
 
 static char const ident[] =
-    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/03 03:07:46 $";
+    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 00:51:07 $";
 
 #define UA_DESCRIP	"SIGTRAN USER ADAPTATION (UA) STREAMS MULTIPLEXING DRIVER."
-#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/02/03 03:07:46 $"
+#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 00:51:07 $"
 #define UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

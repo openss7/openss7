@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:07:25 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:51:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:07:25 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:51:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl.c,v $
+ Revision 0.9.2.14  2007/03/25 00:51:16  brian
+ - synchronization updates
+
  Revision 0.9.2.13  2006/03/07 01:07:25  brian
  - binary compatible callouts
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:07:25 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:51:16 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:07:25 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:51:16 $";
 
 #include <sys/os7/compat.h>
 #include <linux/kmod.h>
@@ -68,8 +71,8 @@ static char const ident[] =
  *  obviates the need for this driver.
  */
 
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.13 $)"
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2006/03/07 01:07:25 $"
+#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.14 $)"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 00:51:16 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

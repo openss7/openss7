@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/30 10:44:22 $
+ @(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:51:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/30 10:44:22 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:51:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rtp.c,v $
+ Revision 0.9.2.2  2007/03/25 00:51:56  brian
+ - synchronization updates
+
  Revision 0.9.2.1  2006/03/30 10:44:22  brian
  - added first cut of RTP driver
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/30 10:44:22 $"
+#ident "@(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:51:56 $"
 
-static char const ident[] = "$RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/03/30 10:44:22 $";
+static char const ident[] = "$RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:51:56 $";
 
 /*
  *  This driver provides the functionality of an RTP (Realtime Transport
@@ -101,7 +104,7 @@ static char const ident[] = "$RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.1 $)
 #define RTP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RTP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define RTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define RTP_REVISION	"OpenSS7 $RCSfile: rtp.c,v $ $Name:  $ ($Revision: 0.9.2.1 $) $Date: 2006/03/30 10:44:22 $"
+#define RTP_REVISION	"OpenSS7 $RCSfile: rtp.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2007/03/25 00:51:56 $"
 #define RTP_DEVICE	"SVR 4.2 STREAMS RTP Driver"
 #define RTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RTP_LICENSE	"GPL"

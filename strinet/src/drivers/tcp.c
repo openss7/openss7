@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/02/10 15:53:23 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:53:05 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/10 15:53:23 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:53:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.16  2007/03/25 00:53:05  brian
+ - synchronization updates
+
  Revision 0.9.2.15  2007/02/10 15:53:23  brian
  - PR: openss7/4734 fixed missing spinlock symbols on ubuntu i386 UP kernels
 
@@ -98,9 +101,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/02/10 15:53:23 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:53:05 $"
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/02/10 15:53:23 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:53:05 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -179,7 +182,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.15 $
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/02/10 15:53:23 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:53:05 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"

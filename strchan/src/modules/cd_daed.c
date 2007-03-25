@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:07:05 $
+ @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:30 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:07:05 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:52:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd_daed.c,v $
+ Revision 0.9.2.12  2007/03/25 00:52:30  brian
+ - synchronization updates
+
  Revision 0.9.2.11  2006/03/07 01:07:05  brian
  - binary compatible callouts
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:07:05 $"
+#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:30 $"
 
 static char const ident[] =
-    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:07:05 $";
+    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:30 $";
 
 #include <sys/os7/compat.h>
 
@@ -74,7 +77,7 @@ static char const ident[] =
 
 #define CD_DAED_DESCRIP		"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS MODULE."
 #define CD_DAED_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:07:05 $"
+#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:30 $"
 #define CD_DAED_DEVICE		"SVR 4.2 STREAMS CDI DAED Module for SS7 Channel Devices (DAED)."
 #define CD_DAED_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CD_DAED_LICENSE		"GPL"

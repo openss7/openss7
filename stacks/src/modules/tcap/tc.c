@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/07 01:14:07 $
+ @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 00:52:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:14:07 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:52:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tc.c,v $
+ Revision 0.9.2.10  2007/03/25 00:52:15  brian
+ - synchronization updates
+
  Revision 0.9.2.9  2006/03/07 01:14:07  brian
  - updated headers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/07 01:14:07 $"
+#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 00:52:15 $"
 
 static char const ident[] =
-    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/07 01:14:07 $";
+    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 00:52:15 $";
 
 /*
  *  This is a TC (Transaction Capabilities) mulitplexing driver for SS7 TCAP.

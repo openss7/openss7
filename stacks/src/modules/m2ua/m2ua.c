@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/05/08 11:00:53 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:49 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/08 11:00:53 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:51:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua.c,v $
+ Revision 0.9.2.16  2007/03/25 00:51:49  brian
+ - synchronization updates
+
  Revision 0.9.2.15  2006/05/08 11:00:53  brian
  - new compilers mishandle postincrement of cast pointers
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/05/08 11:00:53 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:49 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/05/08 11:00:53 $";
+    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:49 $";
 
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
@@ -79,7 +82,7 @@ static char const ident[] =
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2006/05/08 11:00:53 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:49 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:13:47 $
+ @(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,25 +45,28 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:13:47 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 00:52:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_t.c,v $
+ Revision 0.9.2.12  2007/03/25 00:52:12  brian
+ - synchronization updates
+
  Revision 0.9.2.11  2006/03/07 01:13:47  brian
  - updated headers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:13:47 $"
+#ident "@(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:12 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:13:47 $";
+    "$RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:12 $";
 
 #include <sys/os7/compat.h>
 
 #define SSCOP_TPI_DESCRIP	"SSCOP-MCE/IP STREAMS DRIVER."
-#define SSCOP_TPI_REVISION	"OpenSS7 $RCSfile: sscop_t.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2006/03/07 01:13:47 $"
+#define SSCOP_TPI_REVISION	"OpenSS7 $RCSfile: sscop_t.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2007/03/25 00:52:12 $"
 #define SSCOP_TPI_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
