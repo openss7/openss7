@@ -4385,12 +4385,18 @@ dl_wput(queue_t *q, mblk_t *mp)
 				return (0);
 			break;
 		case M_FLUSH:
-			if (*mp->b_rptr & FLUSHW) {
-				flushq(q, FLUSHALL);
-				*mp->b_rptr &= ~FLUSHW;
+			if (mp->b_rptr[0] & FLUSHW) {
+				if (mp->b_rptr[0] & FLUSHBAND)
+					flushband(q, mp->b_rptr[1], FLUSHDATA);
+				else
+					flushq(q, FLUSHDATA);
+				mp->b_rptr[0] &= ~FLUSHW;
 			}
-			if (*mp->b_rptr & FLUSHR) {
-				flushq(RD(q), FLUSHALL);
+			if (mp->b_rptr[0] & FLUSHR) {
+				if (mp->b_rptr[0] & FLUSHBAND)
+					flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
+				else
+					flushq(RD(q), FLUSHDATA);
 				qreply(q, mp);
 			} else
 				freemsg(mp);

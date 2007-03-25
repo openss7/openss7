@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:44 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 05:59:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:51:44 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 0.9.2.17  2007/03/25 05:59:25  brian
+ - flush corrections
+
  Revision 0.9.2.16  2007/03/25 00:51:44  brian
  - synchronization updates
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:44 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 05:59:25 $"
 
 static char const ident[] =
-    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:44 $";
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 05:59:25 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -97,7 +100,7 @@ static char const ident[] =
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 00:51:44 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 05:59:25 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1908,7 +1911,7 @@ typedef struct isup_msg {
  *  -----------------------------------
  */
 STATIC int
-m_flush(queue_t *q, queue_t *pq, int band, int flags, int what)
+m_flush(queue_t *q, queue_t *pq, int band, int flags)
 {
 	mblk_t *mp;
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
@@ -2953,7 +2956,7 @@ cc_call_failure_ind(queue_t *q, struct cc *cc, struct ct *ct, ulong reason, ulon
 	int err;
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
-	if (!(err = m_flush(q, cc->oq, 0, FLUSHR | FLUSHW, FLUSHDATA))) {
+	if (!(err = m_flush(q, cc->oq, 0, FLUSHR | FLUSHW))) {
 		mblk_t *mp;
 		struct CC_call_failure_ind *p;
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
@@ -2985,7 +2988,7 @@ cc_release_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 	int err;
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
-	if (!(err = m_flush(q, cc->oq, 0, FLUSHR, FLUSHDATA))) {
+	if (!(err = m_flush(q, cc->oq, 0, FLUSHR))) {
 		mblk_t *mp;
 		struct CC_release_ind *p;
 		size_t opt_len = m ? (m->opt.len + (sizeof(ulong) - 1)) & (sizeof(ulong) - 1) : 0;

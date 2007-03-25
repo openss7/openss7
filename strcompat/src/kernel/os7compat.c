@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/02 10:04:07 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/25 06:00:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/02 10:04:07 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.28  2007/03/25 06:00:15  brian
+ - flush corrections
+
  Revision 0.9.2.27  2007/03/02 10:04:07  brian
  - updates to common build process and versions for all exported symbols
 
@@ -137,10 +140,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/02 10:04:07 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/25 06:00:15 $"
 
 static char const ident[] =
-    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/02 10:04:07 $";
+    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/25 06:00:15 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -161,7 +164,7 @@ static char const ident[] =
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/02 10:04:07 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/25 06:00:15 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -454,9 +457,9 @@ ss7_flushq(queue_t *q, mblk_t *mp, const unsigned char flag)
 {
 	if (mp->b_rptr[0] & flag) {
 		if (mp->b_rptr[0] & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 	}
 	if ((mp->b_rptr[0] & (FLUSHR | FLUSHW))) {
 		if (q->q_next) {

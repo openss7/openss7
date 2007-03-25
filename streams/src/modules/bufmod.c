@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/18 10:09:01 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 06:00:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 10:09:01 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufmod.c,v $
+ Revision 0.9.2.10  2007/03/25 06:00:20  brian
+ - flush corrections
+
  Revision 0.9.2.9  2006/12/18 10:09:01  brian
  - updated headers for release
 
@@ -80,9 +83,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/18 10:09:01 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 06:00:20 $"
 
-static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/18 10:09:01 $";
+static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 06:00:20 $";
 
 
 /*
@@ -111,7 +114,7 @@ static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.9
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/12/18 10:09:01 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 06:00:20 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"
@@ -184,9 +187,9 @@ bufmod_wput(queue_t *q, mblk_t *mp)
 	if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, FLUSHALL, mp->b_rptr[1]);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 		}
 	}
 	if (likely(mp->b_datap->db_type >= QPCTL
@@ -209,9 +212,9 @@ bufmod_rput(queue_t *q, mblk_t *mp)
 	if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
 		if (mp->b_rptr[0] & FLUSHR) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, FLUSHALL, mp->b_rptr[1]);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 		}
 	}
 	if (likely(mp->b_datap->db_type >= QPCTL

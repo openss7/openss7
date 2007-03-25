@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:22:31 $
+ @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 05:59:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:22:31 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_sctp.c,v $
+ Revision 0.9.2.4  2007/03/25 05:59:17  brian
+ - flush corrections
+
  Revision 0.9.2.3  2007/03/25 02:22:31  brian
  - add D_MP and D_MTPERQ flags
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:22:31 $"
+#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 05:59:17 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:22:31 $";
+    "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 05:59:17 $";
 
 #include <sys/os7/compat.h>
 
@@ -82,7 +85,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 02:22:31 $"
+#define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 05:59:17 $"
 #define SDL_SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDL_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1798,9 +1801,9 @@ sdl_m_flush(queue_t *q, mblk_t *mp, const uint8_t mflag)
 	ensure(mp, return (-EFAULT));
 	if (*mp->b_rptr & mflag) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 	}
 	putnext(q, mp);
 	return (1);

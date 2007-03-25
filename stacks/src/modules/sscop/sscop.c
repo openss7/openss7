@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 02:23:03 $
+ @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 05:59:45 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:03 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop.c,v $
+ Revision 0.9.2.13  2007/03/25 05:59:45  brian
+ - flush corrections
+
  Revision 0.9.2.12  2007/03/25 02:23:03  brian
  - add D_MP and D_MTPERQ flags
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 02:23:03 $"
+#ident "@(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 05:59:45 $"
 
 static char const ident[] =
-    "$RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 02:23:03 $";
+    "$RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 05:59:45 $";
 
 /*
  *  This driver provides the functionality of SSCOP-MCE over a connectionless
@@ -86,7 +89,7 @@ static char const ident[] =
 //#include "sscop_input.h"
 
 #define SSCOP_DESCRIP	"SSCOPMCE/IP STREAMS DRIVER."
-#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 02:23:03 $"
+#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 05:59:45 $"
 #define SSCOP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2462,16 +2465,22 @@ sscop_w_ioctl(queue_t *q, mblk_t *mp)
 STATIC inline void
 sscop_w_flush(queue_t *q, mblk_t *mp)
 {
-	if (*mp->b_rptr & M_FLUSHW) {
-		flushq(q, FLUSHALL);
+	if (mp->b_rptr[0] & FLUSHW) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(q, FLUSHDATA);
 		if (q->q_next) {
 			putnext(q, mp);
 			return;
 		}
-		*mp->b_rptr &= ~FLUSHW;
+		mp->b_rptr[0] &= ~FLUSHW;
 	}
-	if (*mp->b_rptr & FLUSHR) {
-		flushq(RD(q), FLUSHALL);
+	if (mp->b_rptr[0] & FLUSHR) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(RD(q), FLUSHDATA);
 		qreply(q, mp);
 		return;
 	}

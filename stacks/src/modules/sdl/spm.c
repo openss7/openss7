@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 02:22:55 $
+ @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 05:59:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:22:55 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 02:22:55 $"
+#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 05:59:40 $"
 
 static char const ident[] =
-    "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 02:22:55 $";
+    "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 05:59:40 $";
 
 /*
  *  This is an SDL pipemod driver for testing and use with pipes.  This module
@@ -72,7 +72,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 02:22:55 $"
+#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 05:59:40 $"
 #define SPM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1235,9 +1235,9 @@ spm_m_flush(queue_t *q, mblk_t *mp, const uint8_t mflag)
 {
 	if (*mp->b_rptr & mflag) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 	}
 	return (QR_LOOP);
 }

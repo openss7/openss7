@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/18 10:08:58 $
+ @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 06:00:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 10:08:58 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: vf.c,v $
+ Revision 0.9.2.11  2007/03/25 06:00:17  brian
+ - flush corrections
+
  Revision 0.9.2.10  2006/12/18 10:08:58  brian
  - updated headers for release
 
@@ -82,9 +85,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/18 10:08:58 $"
+#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 06:00:17 $"
 
-static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/12/18 10:08:58 $";
+static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 06:00:17 $";
 
 /*
  *  This driver provides some capabilities for testing Linux Fast-STREAMS.  It functions as a Null
@@ -112,7 +115,7 @@ static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.10 $)
 
 #define VF_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define VF_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2006/12/18 10:08:58 $"
+#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2007/03/25 06:00:17 $"
 #define VF_DEVICE	"SVR 4.2 STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define VF_LICENSE	"GPL"
@@ -513,9 +516,9 @@ vf_uwput(queue_t *q, mblk_t *mp)
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 		}
 		spin_lock_str(&vf_lock, flags);
 		if (vf->lower) {
@@ -543,9 +546,9 @@ vf_uwput(queue_t *q, mblk_t *mp)
 			spin_unlock_str(&vf_lock, flags);
 			if (mp->b_rptr[0] & FLUSHR) {
 				if (mp->b_rptr[0] & FLUSHBAND)
-					flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+					flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
 				else
-					flushq(RD(q), FLUSHALL);
+					flushq(RD(q), FLUSHDATA);
 				mp->b_rptr[0] &= ~FLUSHW;
 				qreply(q, mp);
 				break;
@@ -654,9 +657,9 @@ vf_lrput(queue_t *q, mblk_t *mp)
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHR) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], fLUSHALL);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 		}
 		spin_lock_str(&vf_lock, flags);
 		if (vf->upper) {
@@ -685,9 +688,9 @@ vf_lrput(queue_t *q, mblk_t *mp)
 			if (!(mp->b_flags & MSGNOLOOP)) {
 				if (mp->b_rptr[0] & FLUSHW) {
 					if (mp->b_rptr[0] & FLUSHBAND)
-						flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+						flushband(WR(q), mp->b_rptr[1], FLUSHDATA);
 					else
-						flushq(WR(q), FLUSHALL);
+						flushq(WR(q), FLUSHDATA);
 					mp->b_rptr[0] &= ~FLUSHR;
 					mp->b_flag |= MSGNOLOOP;
 					qreply(q, mp);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/12/18 07:32:40 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/03/25 06:00:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 07:32:40 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:17 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/12/18 07:32:40 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/03/25 06:00:17 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/12/18 07:32:40 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/03/25 06:00:17 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -95,7 +95,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2006/12/18 07:32:40 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/03/25 06:00:17 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -365,17 +365,17 @@ log_wput(queue_t *q, mblk_t *mp)
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 		}
 		if (mp->b_rptr[0] & FLUSHR) {
 			queue_t *rq = RD(q);
 
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(rq, mp->b_rptr[1], FLUSHALL);
+				flushband(rq, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(rq, FLUSHALL);
+				flushq(rq, FLUSHDATA);
 			qreply(q, mp);
 			return (0);
 		}

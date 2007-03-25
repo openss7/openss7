@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/03/25 00:53:06 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/03/25 06:00:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:53:06 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.54  2007/03/25 06:00:29  brian
+ - flush corrections
+
  Revision 0.9.2.53  2007/03/25 00:53:06  brian
  - synchronization updates
 
@@ -230,10 +233,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/03/25 00:53:06 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/03/25 06:00:29 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/03/25 00:53:06 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/03/25 06:00:29 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -315,7 +318,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/03/25 00:53:06 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/03/25 06:00:29 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -7987,16 +7990,16 @@ tp_w_flush(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_rptr[0] & FLUSHW) {
 		if (mp->b_rptr[0] & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 		mp->b_rptr[0] &= ~FLUSHW;
 	}
 	if (mp->b_rptr[0] & FLUSHR) {
 		if (mp->b_rptr[0] & FLUSHBAND)
-			flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+			flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(RD(q), FLUSHALL);
+			flushq(RD(q), FLUSHDATA);
 		qreply(q, mp);
 		return (QR_ABSORBED);
 	}
@@ -8152,9 +8155,9 @@ tp_r_flush(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_rptr[0] & FLUSHR) {
 		if (mp->b_rptr[0] & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 		putnext(q, mp);
 		return (QR_ABSORBED);
 	}

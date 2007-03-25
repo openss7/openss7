@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 10:51:15 $
+ @(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 05:59:31 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 10:51:15 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_mux.c,v $
+ Revision 0.9.2.3  2007/03/25 05:59:31  brian
+ - flush corrections
+
  Revision 0.9.2.2  2006/12/18 10:51:15  brian
  - subpackaging changes for release
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 10:51:15 $"
+#ident "@(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 05:59:31 $"
 
-static char const ident[] = "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 10:51:15 $";
+static char const ident[] = "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 05:59:31 $";
 
 /*
  *  This is an MX multiplexing driver.  Its purpose is to allow a single device /dev/streams/matrix
@@ -79,7 +82,7 @@ static char const ident[] = "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.2
 #include <ss7/mxi_ioctl.h>
 
 #define MX_MUX_DESCRIP		"MX MULTIPLEX (MX-MUX) STREAMS MULTIPLEXING DRIVER."
-#define MX_MUX_REVISION		"LfS $RCSfile: mx_mux.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2006/12/18 10:51:15 $"
+#define MX_MUX_REVISION		"LfS $RCSfile: mx_mux.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2007/03/25 05:59:31 $"
 #define MX_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -365,9 +368,9 @@ mx_uwput(queue_t *q, mblk_t *mp)
 	{
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 		}
 		read_lock_bh(&mx_lock);
 		if (mx->other) {
@@ -383,9 +386,9 @@ mx_uwput(queue_t *q, mblk_t *mp)
 
 		if (mp->b_rptr[0] & FLUSHR) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+				flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(RD(q), FLUSHALL);
+				flushq(RD(q), FLUSHDATA);
 			mp->b_rptr[0] &= ~FLUSHW;
 			qreply(q, mp);
 			return (0);

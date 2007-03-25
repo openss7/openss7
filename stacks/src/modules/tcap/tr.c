@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 00:52:16 $
+ @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 05:59:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:16 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:56 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 00:52:16 $"
+#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 05:59:56 $"
 
 static char const ident[] =
-    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 00:52:16 $";
+    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 05:59:56 $";
 
 /*
  *  This is a TR (Transaction Sub-Layer) mulitplexing driver for SS7 TCAP.
@@ -69,7 +69,7 @@ static char const ident[] =
 #include <sys/os7/compat.h>
 
 #define TR_DESCRIP	"TCAP TR STREAMS MULTIPLEXING DRIVER."
-#define TR_REVISION	"LfS $RCSfile: tr.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date"
+#define TR_REVISION	"LfS $RCSfile: tr.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date"
 #define TR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TR_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1677,9 +1677,9 @@ static int tr_r_flush(queue_t * q, mblk_t * pdu)
 	int err;
 	if (*mp->b_rptr & FLUSHR) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 		/* flush all TR-Users upwards */
 		m_flush_all(q, NULL, mp->b_rptr[0], mp->b_rptr[1]);
 		*mp->b_rptr &= ~FLUSHR;
@@ -1687,9 +1687,9 @@ static int tr_r_flush(queue_t * q, mblk_t * pdu)
 	if (!(mp->b_flag & MSGNOLOOP)) {
 		if (*mp->b_rptr & FLUSHW) {
 			if (*mp->b_rptr & FLUSHBAND)
-				flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+				flushband(WR(q), mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(WR(q), FLUSHALL);
+				flushq(WR(q), FLUSHDATA);
 			mp->b_flag |= MSGNOLOOP;
 			qreply(q, mp);	/* flush all the way back down */
 			return (0);
@@ -1709,17 +1709,17 @@ static int tr_w_flush(queue_t * q, mblk_t * pdu)
 {
 	if (*mp->b_rptr & FLUSHW) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 		*mp->b_rptr &= ~FLUSHW;
 	}
 	if (!(mp->b_flag & MSGNOLOOP)) {
 		if (*mp->b_rptr & FLUSHR) {
 			if (*mp->b_rptr & FLUSHBAND)
-				flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+				flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(RD(q), FLUSHALL);
+				flushq(RD(q), FLUSHDATA);
 			mp->b_flag |= MSGNOLOOP;
 			qreply(q, mp);	/* flush all the way back up */
 			return (0);
@@ -1737,9 +1737,9 @@ static int tr_i_flush(queue_t * q, mblk_t * pdu)
 {
 	if (*mp->b_rptr & FLUSHR) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 	}
 	putnext(q, mp);
 }
@@ -1752,9 +1752,9 @@ static int tr_o_flush(queue_t * q, mblk_t * pdu)
 {
 	if (*mp->b_rptr & FLUSHW) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 	}
 	putnext(q, mp);
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 00:52:15 $
+ @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 05:59:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:15 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tc.c,v $
+ Revision 0.9.2.11  2007/03/25 05:59:56  brian
+ - flush corrections
+
  Revision 0.9.2.10  2007/03/25 00:52:15  brian
  - synchronization updates
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 00:52:15 $"
+#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 05:59:56 $"
 
 static char const ident[] =
-    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 00:52:15 $";
+    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 05:59:56 $";
 
 /*
  *  This is a TC (Transaction Capabilities) mulitplexing driver for SS7 TCAP.
@@ -1677,9 +1680,9 @@ static int tc_r_flush(queue_t * q, mblk_t * pdu)
 	int err;
 	if (*mp->b_rptr & FLUSHR) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 		/* flush all TC-Users upwards */
 		m_flush_all(q, NULL, mp->b_rptr[0], mp->b_rptr[1]);
 		*mp->b_rptr &= ~FLUSHR;
@@ -1687,9 +1690,9 @@ static int tc_r_flush(queue_t * q, mblk_t * pdu)
 	if (!(mp->b_flag & MSGNOLOOP)) {
 		if (*mp->b_rptr & FLUSHW) {
 			if (*mp->b_rptr & FLUSHBAND)
-				flushband(WR(q), mp->b_rptr[1], FLUSHALL);
+				flushband(WR(q), mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(WR(q), FLUSHALL);
+				flushq(WR(q), FLUSHDATA);
 			mp->b_flag |= MSGNOLOOP;
 			qreply(q, mp);	/* flush all the way back down */
 			return (0);
@@ -1709,17 +1712,17 @@ static int tc_w_flush(queue_t * q, mblk_t * pdu)
 {
 	if (*mp->b_rptr & FLUSHW) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 		*mp->b_rptr &= ~FLUSHW;
 	}
 	if (!(mp->b_flag & MSGNOLOOP)) {
 		if (*mp->b_rptr & FLUSHR) {
 			if (*mp->b_rptr & FLUSHBAND)
-				flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+				flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(RD(q), FLUSHALL);
+				flushq(RD(q), FLUSHDATA);
 			mp->b_flag |= MSGNOLOOP;
 			qreply(q, mp);	/* flush all the way back up */
 			return (0);
@@ -1737,9 +1740,9 @@ static int tc_i_flush(queue_t * q, mblk_t * pdu)
 {
 	if (*mp->b_rptr & FLUSHR) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 	}
 	putnext(q, mp);
 }
@@ -1752,9 +1755,9 @@ static int tc_o_flush(queue_t * q, mblk_t * pdu)
 {
 	if (*mp->b_rptr & FLUSHW) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 	}
 	putnext(q, mp);
 }

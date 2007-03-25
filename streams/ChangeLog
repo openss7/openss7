@@ -1,5 +1,16 @@
 2007-03-25  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/echo.c: flush corrections
+	* src/drivers/log.c: flush corrections
+	* src/drivers/loop.c: flush corrections
+	* src/drivers/mux.c: flush corrections
+	* src/drivers/nuls.c: flush corrections
+	* src/drivers/sad.c: flush corrections
+	* src/drivers/spx.c: flush corrections
+	* src/drivers/vf.c: flush corrections
+	* src/modules/bufmod.c: flush corrections
+	* src/modules/sc.c: flush corrections
+
 	* acinclude.m4: always enable syncrhonization and stats by default
 
 	* include/sys/streams/strsubr.h: correct synchronization queue lists

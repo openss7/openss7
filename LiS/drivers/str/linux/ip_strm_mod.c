@@ -544,13 +544,19 @@ ip_to_streams_wput(queue_t *q, mblk_t *mp)
 		break;
 
 	case M_FLUSH:
-		if (*mp->b_rptr & FLUSHW) {
-			flushq(q, FLUSHDATA);
+		if (mp->b_rptr[0] & FLUSHW) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(q, FLUSHDATA);
 		}
 
-		if (*mp->b_rptr & FLUSHR) {
-			flushq(RD(q), FLUSHDATA);
-			*mp->b_rptr &= ~FLUSHW;
+		if (mp->b_rptr[0] & FLUSHR) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(RD(q), FLUSHDATA);
+			mp->b_rptr[0] &= ~FLUSHW;
 			qreply(q, mp);
 		} else
 			freemsg(mp);
@@ -1075,13 +1081,19 @@ ip_to_streams_rput(queue_t *q, mblk_t *mp)
 
 	case M_FLUSH:
 	{
-		if (*mp->b_rptr & FLUSHR) {
-			flushq(q, FLUSHDATA);
+		if (mp->b_rptr[0] & FLUSHR) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(q, FLUSHDATA);
 		}
 
-		if (*mp->b_rptr & FLUSHW) {
-			flushq(WR(q), FLUSHDATA);
-			*mp->b_rptr &= ~FLUSHR;
+		if (mp->b_rptr[0] & FLUSHW) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(WR(q), mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(WR(q), FLUSHDATA);
+			mp->b_rptr[0] &= ~FLUSHR;
 
 			qreply(q, mp);
 		} else

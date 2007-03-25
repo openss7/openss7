@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/12/18 08:16:52 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 06:01:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 08:16:52 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:01:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/12/18 08:16:52 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 06:01:00 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/12/18 08:16:52 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 06:01:00 $";
 
 /*
  * STREAMS Administrative Driver (SAD) for Linux Fast-STREAMS.  Note that this driver also acts as a
@@ -83,7 +83,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2006/12/18 08:16:52 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 06:01:00 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -218,18 +218,18 @@ sad_put(queue_t *q, mblk_t *mp)
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 			mp->b_rptr[0] &= ~FLUSHW;
 		}
 		if (mp->b_rptr[0] & FLUSHR) {
 			queue_t *rq = RD(q);
 
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(rq, mp->b_rptr[1], FLUSHALL);
+				flushband(rq, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(rq, FLUSHALL);
+				flushq(rq, FLUSHDATA);
 			qreply(q, mp);
 			return (0);
 		}

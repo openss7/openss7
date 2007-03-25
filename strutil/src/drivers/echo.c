@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/25 00:53:38 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 06:00:59 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:53:38 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/25 00:53:38 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 06:00:59 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/25 00:53:38 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 06:00:59 $";
 
 #define _LFS_SOURCE
 
@@ -66,7 +66,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/03/25 00:53:38 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 06:00:59 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -220,17 +220,17 @@ echo_wput(queue_t *q, mblk_t *mp)
 		if (mp->b_rptr[0] & FLUSHW) {
 			_trace();
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 			mp->b_rptr[0] &= ~FLUSHW;
 		}
 		if (mp->b_rptr[0] & FLUSHR) {
 			_trace();
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(RD(q), mp->b_rptr[1], FLUSHALL);
+				flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(RD(q), FLUSHALL);
+				flushq(RD(q), FLUSHDATA);
 			_ctrace(qreply(q, mp));
 			/* never makes it here */
 			_trace();

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:42 $
+ @(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 05:59:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/17 11:55:42 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 05:59:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:42 $"
+#ident "@(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 05:59:16 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:42 $";
+    "$RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 05:59:16 $";
 
 #define __NO_VERSION__
 
@@ -144,16 +144,16 @@ static int xxx_r_flush(queue_t * q, mblk_t * mp)
 {
 	if (*mp->b_rptr & FLUSHR) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushall(q, FLUSHALL);
+			flushall(q, FLUSHDATA);
 		*mp->b_rptr &= ~FLUSHR;
 	}
 	if ((*mp->b_rptr & FLUSHW) && !(mp->b_flags & MSGNOLOOP)) {
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushall(q, FLUSHALL);
+			flushall(q, FLUSHDATA);
 		mp->b_flag |= MSGNOLOOP;
 		qreply(q, mp);	/* flush all the way back down */
 	}

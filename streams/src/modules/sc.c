@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/27 23:19:40 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/25 06:00:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:40 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.c,v $
+ Revision 0.9.2.50  2007/03/25 06:00:20  brian
+ - flush corrections
+
  Revision 0.9.2.49  2006/10/27 23:19:40  brian
  - changes for 2.6.18 kernel
 
@@ -74,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/27 23:19:40 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/25 06:00:20 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/27 23:19:40 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/25 06:00:20 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -104,7 +107,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2006/10/27 23:19:40 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/03/25 06:00:20 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -508,18 +511,18 @@ sc_wput(queue_t *q, mblk_t *mp)
 		/* canonical flushing */
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHALL);
+				flushq(q, FLUSHDATA);
 			mp->b_rptr[0] &= ~FLUSHW;
 		}
 		if (mp->b_rptr[0] & FLUSHR) {
 			queue_t *rq = RD(q);
 
 			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(rq, mp->b_rptr[1], FLUSHALL);
+				flushband(rq, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(rq, FLUSHALL);
+				flushq(rq, FLUSHDATA);
 			qreply(q, mp);
 			return (0);
 		}

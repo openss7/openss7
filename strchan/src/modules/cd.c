@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:40 $
+ @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/20 23:07:40 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:00:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd.c,v $
+ Revision 0.9.2.4  2007/03/25 06:00:12  brian
+ - flush corrections
+
  Revision 0.9.2.3  2006/12/20 23:07:40  brian
  - updates for release and current development
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:40 $"
+#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:12 $"
 
-static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:40 $";
+static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:12 $";
 
 /*
  *  This is a pushable STREAMS module that provides the High-Level Data Link
@@ -104,7 +107,7 @@ static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.3 $) 
 
 #define CD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMD FOR LINUX"
 #define CD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/20 23:07:40 $"
+#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:12 $"
 #define CD_DEVICE	"SVR 4.2 STREAMS Communications Device (CD)"
 #define CD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CD_LICENSE	"GPL"
@@ -2550,7 +2553,7 @@ ch_r_msg_slow(queue_t *q, mblk_t *mp)
 			if (mp->b_rptr[0] & FLUSHBAND)
 				flushband(q, mp->b_rptr[1], FLUSHDATA);
 			else
-				flushq(q, FLUSHBAND);
+				flushq(q, FLUSHDATA);
 		}
 		putnext(q, mp);
 		return (0);

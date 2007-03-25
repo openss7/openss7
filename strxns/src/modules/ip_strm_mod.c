@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 02:23:43 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 06:01:08 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:43 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:01:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_strm_mod.c,v $
+ Revision 0.9.2.21  2007/03/25 06:01:08  brian
+ - flush corrections
+
  Revision 0.9.2.20  2007/03/25 02:23:43  brian
  - add D_MP and D_MTPERQ flags
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 02:23:43 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 06:01:08 $"
 
-static char const ident[] = "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 02:23:43 $";
+static char const ident[] = "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 06:01:08 $";
 
 #include <sys/os7/compat.h>
 
@@ -91,7 +94,7 @@ static char const ident[] = "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2007/03/25 02:23:43 $"
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2007/03/25 06:01:08 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"
@@ -606,13 +609,19 @@ ip_to_streams_wput(queue_t *q, mblk_t *mp)
 		break;
 
 	case M_FLUSH:
-		if (*mp->b_rptr & FLUSHW) {
-			flushq(q, FLUSHDATA);
+		if (mp->b_rptr[0] & FLUSHW) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(q, FLUSHDATA);
 		}
 
-		if (*mp->b_rptr & FLUSHR) {
-			flushq(RD(q), FLUSHDATA);
-			*mp->b_rptr &= ~FLUSHW;
+		if (mp->b_rptr[0] & FLUSHR) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(RD(q), FLUSHDATA);
+			mp->b_rptr[0] &= ~FLUSHW;
 			qreply(q, mp);
 		} else
 			freemsg(mp);
@@ -1140,13 +1149,19 @@ ip_to_streams_rput(queue_t *q, mblk_t *mp)
 
 	case M_FLUSH:
 	{
-		if (*mp->b_rptr & FLUSHR) {
-			flushq(q, FLUSHDATA);
+		if (mp->b_rptr[0] & FLUSHR) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(q, mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(q, FLUSHDATA);
 		}
 
-		if (*mp->b_rptr & FLUSHW) {
-			flushq(WR(q), FLUSHDATA);
-			*mp->b_rptr &= ~FLUSHR;
+		if (mp->b_rptr[0] & FLUSHW) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(WR(q), mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(WR(q), FLUSHDATA);
+			mp->b_rptr[0] &= ~FLUSHR;
 
 			qreply(q, mp);
 		} else
@@ -1548,7 +1563,7 @@ MODULE_PARM_DESC(modid, "Module ID for IP_STRMS.");
 STATIC struct fmodsw ip_to_streams_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &ip_to_streams_info,
-	.d_flag = D_MTPERQ,		/* consistent with LiS */
+	.f_flag = D_MTPERQ,		/* consistent with LiS */
 	.f_kmod = THIS_MODULE,
 };
 

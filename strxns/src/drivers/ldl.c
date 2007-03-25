@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/25 02:23:44 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 06:01:05 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 02:23:44 $ by $Author: brian $
+ Last Modified $Date: 2007/03/25 06:01:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.c,v $
+ Revision 0.9.2.35  2007/03/25 06:01:05  brian
+ - flush corrections
+
  Revision 0.9.2.34  2007/03/25 02:23:44  brian
  - add D_MP and D_MTPERQ flags
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/25 02:23:44 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 06:01:05 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/25 02:23:44 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 06:01:05 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -106,7 +109,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.34 $) $Date: 2007/03/25 02:23:44 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.35 $) $Date: 2007/03/25 06:01:05 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -4795,12 +4798,18 @@ ldl_wput(queue_t *q, mblk_t *mp)
 				return (0);
 			break;
 		case M_FLUSH:
-			if (*mp->b_rptr & FLUSHW) {
-				flushq(q, FLUSHALL);
-				*mp->b_rptr &= ~FLUSHW;
+			if (mp->b_rptr[0] & FLUSHW) {
+				if (mp->b_rptr[0] & FLUSHBAND)
+					flushband(q, mp->b_rptr[1], FLUSHDATA);
+				else
+					flushq(q, FLUSHDATA);
+				mp->b_rptr[0] &= ~FLUSHW;
 			}
-			if (*mp->b_rptr & FLUSHR) {
-				flushq(RD(q), FLUSHALL);
+			if (mp->b_rptr[0] & FLUSHR) {
+				if (mp->b_rptr[0] & FLUSHBAND)
+					flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
+				else
+					flushq(RD(q), FLUSHDATA);
 				qreply(q, mp);
 			} else
 				freemsg(mp);
