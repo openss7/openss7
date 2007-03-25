@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.139 $) $Date: 2007/03/05 23:01:56 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.140 $) $Date: 2007/03/25 03:27:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/05 23:01:56 $ by $Author: brian $
+# Last Modified $Date: 2007/03/25 03:27:28 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.140  2007/03/25 03:27:28  brian
+# - enable syncrhonization and stats by default
+#
 # Revision 0.9.2.139  2007/03/05 23:01:56  brian
 # - checking in release changes
 #
@@ -337,14 +340,14 @@ AC_DEFUN([_LFS_SETUP_IRQ], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_STATS], [dnl
     AC_ARG_ENABLE([streams-stats],
-	AS_HELP_STRING([--enable-streams-stats],
-	    [enable STREAMS stats counting.
-	     @<:@default=disabled@:>@]),
+	AS_HELP_STRING([--disable-streams-stats],
+	    [disable STREAMS stats counting.
+	     @<:@default=enabled@:>@]),
 	    [enable_streams_stats="$enableval"],
-	    [enable_streams_stats='no'])
+	    [enable_streams_stats='yes'])
     AC_CACHE_CHECK([for STREAMS stats counting], [lfs_streams_stats], [dnl
-	lfs_streams_stats="${enable_streams_stats:-no}"])
-    case ${lfs_streams_stats:-no} in
+	lfs_streams_stats="${enable_streams_stats:-yes}"])
+    case ${lfs_streams_stats:-yes} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DO_STATS], [1], [When defined]
 	    AC_PACKAGE_TITLE [will perform STREAMS entry point counting in the
@@ -352,7 +355,7 @@ AC_DEFUN([_LFS_SETUP_STATS], [dnl
 	    driver.  This is a low cost item and is enabled by default.])
 	    ;;
     esac
-    AM_CONDITIONAL([CONFIG_STREAMS_DO_STATS], [test :${lfs_streams_stats:-no} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_DO_STATS], [test :${lfs_streams_stats:-yes} = :yes])
 ])# _LFS_SETUP_STATS
 # =============================================================================
 
@@ -361,19 +364,13 @@ AC_DEFUN([_LFS_SETUP_STATS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_SYNCQS], [dnl
     AC_ARG_ENABLE([streams-syncqs],
-	AS_HELP_STRING([--enable-streams-syncqs],
-	    [enable STREAMS synchronization queues.
-	    @<:@default=disabled@:>@]),
+	AS_HELP_STRING([--disable-streams-syncqs],
+	    [disable STREAMS synchronization queues.
+	    @<:@default=enabled@:>@]),
 	    [enable_streams_syncqs="$enableval"],
-	    [enable_streams_syncqs='no'])
-    _LINUX_CHECK_KERNEL_CONFIG([for STREAMS smp kernel], [CONFIG_SMP])dnl
+	    [enable_streams_syncqs='yes'])
     AC_CACHE_CHECK([for STREAMS synchronization], [lfs_streams_syncqs], [dnl
-	if test :${linux_cv_CONFIG_SMP:-no} = :yes
-	then
-	    lfs_streams_syncqs="${enable_streams_syncqs:-no}"
-	else
-	    lfs_streams_syncqs='no'
-	fi])
+	lfs_streams_syncqs="${enable_streams_syncqs:-yes}"])
     case ${lfs_streams_syncqs:-yes} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SYNCQS], [1], [When defined]
@@ -396,8 +393,7 @@ AC_DEFUN([_LFS_SETUP_KTHREADS], [dnl
 	    [enable_streams_kthreads="$enableval"],
 	    [enable_streams_kthreads='yes'])
     AC_CACHE_CHECK([for STREAMS kernel threads], [lfs_streams_kthreads], [dnl
-	lfs_streams_kthreads="${enable_streams_kthreads:-no}"
-	])
+	lfs_streams_kthreads="${enable_streams_kthreads:-yes}"])
     case ${lfs_streams_kthreads:-yes} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_KTHREADS], [1], [When defined]
@@ -421,8 +417,7 @@ AC_DEFUN([_LFS_SETUP_UTILS], [dnl
 	    [enable_streams_utils="$enableval"],
 	    [enable_streams_utils='yes'])
     AC_CACHE_CHECK([for STREAMS utilities], [lfs_streams_utils], [dnl
-	lfs_streams_utils="${enable_streams_utils:-yes}"
-	])
+	lfs_streams_utils="${enable_streams_utils:-yes}"])
     case ${lfs_streams_utils:-yes} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTILS], [1], [When defined,]
@@ -444,8 +439,7 @@ AC_DEFUN([_LFS_SETUP_COMPILE], [dnl
 	    [enable_big_compile="$enableval"],
 	    [enable_big_comiple='yes'])
     AC_CACHE_CHECK([for STREAMS big compile], [lfs_big_compile], [dnl
-	lfs_big_compile="${enable_big_compile:-yes}"
-	])
+	lfs_big_compile="${enable_big_compile:-yes}"])
     case ${lfs_big_compile:-yes} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SEPARATE_COMPILE], [1], [When defined,]
