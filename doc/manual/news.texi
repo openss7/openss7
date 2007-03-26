@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.21 2007/03/25 18:58:08 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.22 2007/03/26 08:45:44 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/25 18:58:08 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/26 08:45:44 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -101,6 +101,9 @@ chains.
 Major features since the last public release are as follows:
 
 @itemize -
+@item
+Updated to gettext 0.16.1.
+
 @item
 Changes to support build on 2.6.20-1.2307.fc5 kernel.
 
