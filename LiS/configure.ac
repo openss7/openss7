@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.6.13 $) $Date: 2007/03/26 07:56:15 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.6.14 $) $Date: 2007/03/26 08:26:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/26 07:56:15 $ by $Author: brian $
+# Last Modified $Date: 2007/03/26 08:26:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([LiS],[2.18],[bugs@openss7.org],[LiS])
-AC_REVISION([$Name:  $($Revision: 1.1.6.13 $) $Date: 2007/03/26 07:56:15 $])
+AC_REVISION([$Name:  $($Revision: 1.1.6.14 $) $Date: 2007/03/26 08:26:11 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -101,7 +101,7 @@ AC_PROG_YACC
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
-dnl AM_GNU_GETTEXT_VERSION([0.14.5])
+dnl AM_GNU_GETTEXT_VERSION([0.16.1])
 
 dnl
 dnl Checks for libraries.
@@ -184,6 +184,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 1.1.6.14  2007/03/26 08:26:11  brian
+# - need gnu gettext version 0.16.1 for autoconf 2.61
+#
 # Revision 1.1.6.13  2007/03/26 07:56:15  brian
 # - install html images properly, needs autoconf 2.61 and automake 2.10
 #

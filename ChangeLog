@@ -1,5 +1,6 @@
 2007-03-26  Brian Bidulock  <bidulock@openss7.org>
 
+	* configure.ac: need GNU gettext version 0.16.1 cause it is built for autoconf 2.61
 	* am/info.am: updated to install html images properly (needs autoconf 2.61 and automake 1.10)
 	* am/openss7.am: updated to install html images properly (needs autoconf 2.61 and automake 1.10)
 	* scripts/texi/install.texi: require autoconf 2.61 and automake 1.10
