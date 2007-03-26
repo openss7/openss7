@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.4.25 2007/03/12 21:39:41 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.4.26 2007/03/26 08:45:42 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/12 21:39:41 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/26 08:45:42 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -671,7 +671,7 @@ The build host requires the following GNU tools:
 @item @command{autoconf 2.61}
 @item @command{automake 1.10}
 @item @command{libtool 1.5.22}
-@item @command{gettext 0.16}
+@item @command{gettext 0.16.1}
 @end itemize
 
 These tools can be acquired from the @url{http://www.fsf.org/,FSF website} in
@@ -681,11 +681,11 @@ the free software directory, and also at the following locations:
 @item @url{http://www.openss7.org/tarballs/autoconf-2.61.tar.bz2,autoconf-2.61}
 @item @url{http://www.openss7.org/tarballs/automake-1.10.tar.bz2,automake-1.10}
 @item @url{http://www.openss7.org/tarballs/libtool-1.5.22.tar.gz,libtool-1.5.22}
-@item @url{http://www.openss7.org/tarballs/gettext-0.16.tar.gz,gettext-0.16}
+@item @url{http://www.openss7.org/tarballs/gettext-0.16.1.tar.gz,gettext-0.16.1}
 @end itemize
 
 It should be stressed that, in particular, the @manpage{autoconf(1)}, and @manpage{automake(1)},
-must be at version releases @command{2.60} and @command{1.9.6}.  @emph{The versions normally
+must be at version releases @command{2.61} and @command{1.10}.  @emph{The versions normally
 distributed in some mainstream GNU/Linux distributions are, in fact, much older than these
 versions.}@footnote{A notable exception is Debian.}  GNU version of these packages configured and
 installed to default directories will install in @file{/usr/local/} allowing them to coexist with
