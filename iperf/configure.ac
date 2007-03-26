@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.1.1.2.21 $) $Date: 2007/02/22 08:46:38 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.1.1.2.22 $) $Date: 2007/03/26 07:56:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/22 08:46:38 $ by $Author: brian $
+# Last Modified $Date: 2007/03/26 07:56:14 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: configure.ac,v $
+# Revision 1.1.1.1.2.22  2007/03/26 07:56:14  brian
+# - install html images properly, needs autoconf 2.61 and automake 2.10
+#
 # Revision 1.1.1.1.2.21  2007/02/22 08:46:38  brian
 # - updated required autoconf to 2.60
 #
@@ -67,9 +70,9 @@
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_PREREQ([2.60])
+AC_PREREQ([2.61])
 AC_INIT([Iperf],[2.0],[bugs@openss7.org],[iperf])
-AC_REVISION([$Name:  $($Revision: 1.1.1.1.2.21 $) $Date: 2007/02/22 08:46:38 $])
+AC_REVISION([$Name:  $($Revision: 1.1.1.1.2.22 $) $Date: 2007/03/26 07:56:14 $])
 
 _OPENSS7_DIRCHANGE
 
