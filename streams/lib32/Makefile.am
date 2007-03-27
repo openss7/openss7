@@ -80,6 +80,9 @@
 ##
 include ../am/openss7.am
 
+AUTOMAKE_OPTIONS += nostdinc
+AM_CPPFLAGS = -I. -I$(top_builddir) -I$(srcdir)
+
 lib_LTLIBRARIES			=
 lib32_LTLIBRARIES		=
 
@@ -98,7 +101,7 @@ pkglibexec32_PROGRAMS		+= testlog
 testlog_SOURCES			= $(top_srcdir)/src/test/testlog.c
 testlog_LDFLAGS			= $(MACHINE_FLAGS)
 testlog_LDADD			= libstreams.la
-testlog_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+testlog_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 testlog_CFLAGS			= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 if CONFIG_STREAMS_STH
@@ -111,7 +114,7 @@ endif
 test_streams_SOURCES		= $(top_srcdir)/src/test/test-streams.c
 test_streams_LDFLAGS		= $(MACHINE_FLAGS)
 test_streams_LDADD		= libstreams.la
-test_streams_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_streams_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_streams_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 if CONFIG_STREAMS_CLONE
@@ -124,7 +127,7 @@ endif
 test_clone_SOURCES		= $(top_srcdir)/src/test/test-clone.c
 test_clone_LDFLAGS		= $(MACHINE_FLAGS)
 test_clone_LDADD		= libstreams.la
-test_clone_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_clone_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_clone_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 if CONFIG_STREAMS_CONNLD
@@ -137,7 +140,7 @@ endif
 test_connld_SOURCES		= $(top_srcdir)/src/test/test-connld.c
 test_connld_LDFLAGS		= $(MACHINE_FLAGS)
 test_connld_LDADD		= libstreams.la
-test_connld_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_connld_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_connld_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 if CONFIG_STREAMS_ECHO
@@ -150,7 +153,7 @@ endif
 test_echo_SOURCES		= $(top_srcdir)/src/test/test-echo.c
 test_echo_LDFLAGS		= $(MACHINE_FLAGS)
 test_echo_LDADD			= libstreams.la
-test_echo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_echo_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_echo_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 if CONFIG_STREAMS_FIFO
@@ -163,7 +166,7 @@ endif
 test_fifo_SOURCES		= $(top_srcdir)/src/test/test-fifo.c
 test_fifo_LDFLAGS		= $(MACHINE_FLAGS)
 test_fifo_LDADD			= libstreams.la
-test_fifo_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_fifo_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_fifo_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 if CONFIG_STREAMS_LOG
@@ -176,7 +179,7 @@ endif
 test_log_SOURCES		= $(top_srcdir)/src/test/test-log.c
 test_log_LDFLAGS		= $(MACHINE_FLAGS)
 test_log_LDADD			= libstreams.la
-test_log_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_log_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_log_CFLAGS			= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 if CONFIG_STREAMS_LOOP
@@ -189,7 +192,7 @@ endif
 test_loop_SOURCES		= $(top_srcdir)/src/test/test-loop.c
 test_loop_LDFLAGS		= $(MACHINE_FLAGS)
 test_loop_LDADD			= libstreams.la
-test_loop_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_loop_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_loop_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 if CONFIG_STREAMS_NSDEV
@@ -202,7 +205,7 @@ endif
 test_nsdev_SOURCES		= $(top_srcdir)/src/test/test-nsdev.c
 test_nsdev_LDFLAGS		= $(MACHINE_FLAGS)
 test_nsdev_LDADD		= libstreams.la
-test_nsdev_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_nsdev_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_nsdev_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 if CONFIG_STREAMS_MUX
@@ -215,7 +218,7 @@ endif
 test_mux_SOURCES		= $(top_srcdir)/src/test/test-mux.c
 test_mux_LDFLAGS		= $(MACHINE_FLAGS)
 test_mux_LDADD			= libstreams.la
-test_mux_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_mux_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_mux_CFLAGS			= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 if CONFIG_STREAMS_NULS
@@ -228,7 +231,7 @@ endif
 test_nuls_SOURCES		= $(top_srcdir)/src/test/test-nuls.c
 test_nuls_LDFLAGS		= $(MACHINE_FLAGS)
 test_nuls_LDADD			= libstreams.la
-test_nuls_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_nuls_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_nuls_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 if CONFIG_STREAMS_PIPE
@@ -241,7 +244,7 @@ endif
 test_pipe_SOURCES		= $(top_srcdir)/src/test/test-pipe.c
 test_pipe_LDFLAGS		= $(MACHINE_FLAGS)
 test_pipe_LDADD			= libstreams.la
-test_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_pipe_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipe_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 if CONFIG_STREAMS_PIPEMOD
@@ -254,7 +257,7 @@ endif
 test_pipemod_SOURCES		= $(top_srcdir)/src/test/test-pipemod.c
 test_pipemod_LDFLAGS		= $(MACHINE_FLAGS)
 test_pipemod_LDADD		= libstreams.la
-test_pipemod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_pipemod_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_pipemod_CFLAGS		= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 if CONFIG_STREAMS_SAD
@@ -267,7 +270,7 @@ endif
 test_sad_SOURCES		= $(top_srcdir)/src/test/test-sad.c
 test_sad_LDFLAGS		= $(MACHINE_FLAGS)
 test_sad_LDADD			= libstreams.la
-test_sad_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_sad_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sad_CFLAGS			= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 if CONFIG_STREAMS_SC
@@ -280,7 +283,7 @@ endif
 test_sc_SOURCES			= $(top_srcdir)/src/test/test-sc.c
 test_sc_LDFLAGS			= $(MACHINE_FLAGS)
 test_sc_LDADD			= libstreams.la
-test_sc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_sc_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_sc_CFLAGS			= $(LFS_CFLAGS) $(MACHINE_FLAGS)
 
 lib32_LTLIBRARIES		+= libstreams.la
@@ -299,7 +302,7 @@ libstreams_la_SOURCES		= $(top_srcdir)/lib/libc/testcancel.c \
 libstreams_la_DEPENDENCIES	= $(top_srcdir)/lib/libc/streams.VERSION
 libstreams_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION \
 				  $(MACHINE_FLAGS)
-libstreams_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+libstreams_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libstreams_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 libstreams_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
 
@@ -319,7 +322,7 @@ libLiS_la_SOURCES		= $(top_srcdir)/lib/libc/testcancel.c \
 libLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
 libLiS_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION \
 				  $(MACHINE_FLAGS)
-libLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+libLiS_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libLiS_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 libLiS_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
 
@@ -338,7 +341,7 @@ libpLiS_la_SOURCES		= $(top_srcdir)/lib/libc/testcancel.c \
 libpLiS_la_DEPENDENCIES		= $(top_srcdir)/lib/libc/streams.VERSION
 libpLiS_la_LDFLAGS		= -Wl,--version-script -Wl,$(lib_abs_srcdir)/lib/libc/streams.VERSION \
 				  $(MACHINE_FLAGS)
-libpLiS_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+libpLiS_la_CPPFLAGS		= $(AM_CPPFLAGS) $(PKG_INCLUDES) $(USER_CPPFLAGS)
 libpLiS_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 libpLiS_la_LDFLAGS		+= -version-info 0:1:0 -export-dynamic
 
