@@ -63,7 +63,14 @@
 #define _POSIX_VDISABLE	    0
 
 #define CTRL(c)	    ((c)&037)
+
+#ifdef IBSHIFT
+/* XXX: strangely new asm/termbits.h defines IBSHIFT as 8 */
+#define O_IBSHIFT   16
+#else
 #define IBSHIFT	    16
+#endif
+
 #define NCC	    8
 #define NCCS	    19
 
