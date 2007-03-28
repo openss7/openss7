@@ -221,11 +221,13 @@ str_install_HPUX(struct stream_inst *inst)
 		case SQLVL_QUEUE:
 			cdev->d_flag |= D_MTPERQ | D_MTOCEXCL;
 			break;
+		case SQLVL_DEFAULT:
+			/* Note that the default level for HPUX is queue pair instead of module
+			   like other implementations. */
+			cdev->d_sqlvl = SQLVL_QUEUEPAIR;
 		case SQLVL_QUEUEPAIR:
 			cdev->d_flag |= D_MTQPAIR | D_MTOCEXCL;
 			break;
-		case SQLVL_DEFAULT:
-			cdev->d_sqlvl = SQLVL_MODULE;
 		case SQLVL_MODULE:
 			cdev->d_flag |= D_MTPERMOD | D_MTOCEXCL;
 			break;
@@ -278,11 +280,13 @@ str_install_HPUX(struct stream_inst *inst)
 		case SQLVL_QUEUE:
 			fmod->f_flag |= D_MTPERQ | D_MTOCEXCL;
 			break;
+		case SQLVL_DEFAULT:
+			/* Note that the default level for HPUX is queue pair instead of module
+			   like other implementations. */
+			fmod->f_sqlvl = SQLVL_QUEUEPAIR;
 		case SQLVL_QUEUEPAIR:
 			fmod->f_flag |= D_MTQPAIR | D_MTOCEXCL;
 			break;
-		case SQLVL_DEFAULT:
-			fmod->f_sqlvl = SQLVL_MODULE;
 		case SQLVL_MODULE:
 			fmod->f_flag |= D_MTPERMOD | D_MTOCEXCL;
 			break;

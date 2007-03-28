@@ -1,3 +1,10 @@
+2007-03-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man9/str_install_HPUX.9.man: updated syncrhonization
+	* doc/man/strcompat.refs: add recent HPUX references
+	* doc/manual/todo.texi: updated more todo items
+	* src/kernel/hpuxcompat.c: corrected default syncrhonization
+
 2007-03-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/str_install_HPUX.9.man: cleaning up syncrhonization

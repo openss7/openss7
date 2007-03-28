@@ -1067,6 +1067,8 @@ man_MANS = \
 	man9/M_BACKDONE.9 \
 	man9/M_BACKWASH.9 \
 	man9/M_BREAK.9 \
+	man9/M_CLOSE.9 \
+	man9/M_CLOSE_REPL.9 \
 	man9/M_COPYIN.9 \
 	man9/M_COPYOUT.9 \
 	man9/M_CTL.9 \
@@ -1091,6 +1093,7 @@ man_MANS = \
 	man9/M_PCRSE.9 \
 	man9/M_PCSETOPTS.9 \
 	man9/M_PCSIG.9 \
+	man9/M_PCTTY.9 \
 	man9/M_PROTO.9 \
 	man9/M_READ.9 \
 	man9/M_RSE.9 \
@@ -2195,6 +2198,8 @@ dist_noinst_MANS = \
 	man9/M_BACKDONE.9.man \
 	man9/M_BACKWASH.9.man \
 	man9/M_BREAK.9.man \
+	man9/M_CLOSE.9.man \
+	man9/M_CLOSE_REPL.9.man \
 	man9/M_COPYIN.9.man \
 	man9/M_COPYOUT.9.man \
 	man9/M_CTL.9.man \
@@ -2219,6 +2224,7 @@ dist_noinst_MANS = \
 	man9/M_PCRSE.9.man \
 	man9/M_PCSETOPTS.9.man \
 	man9/M_PCSIG.9.man \
+	man9/M_PCTTY.9.man \
 	man9/M_PROTO.9.man \
 	man9/M_READ.9.man \
 	man9/M_RSE.9.man \

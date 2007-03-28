@@ -943,9 +943,8 @@ straccess_slow(struct stdata *sd, const register int access, const register int 
 	if (likely(access & (FREAD | FWRITE))) {
 		if (likely((flags & STRISPIPE) != 0)) {
 			if (likely((access & (FREAD | FWRITE)) != 0))
-				if (unlikely
-				    (sd->sd_other == NULL
-				     || (sd->sd_other->sd_flag & STRCLOSE) != 0))
+				if (unlikely(sd->sd_other == NULL
+					     || (sd->sd_other->sd_flag & STRCLOSE) != 0))
 					goto estrpipe;
 		} else if ((unlikely(flags & STRISFIFO) != 0)) {
 			if (likely((access & FREAD) != 0))
@@ -1014,8 +1013,21 @@ straccess_slow(struct stdata *sd, const register int access, const register int 
 			   hangup or error occured during the open()." */
 			if ((access & FWRITE) != 0)
 				return (-ENXIO);	/* for TTY's too? */
-			if ((access & FCREAT) != 0)
-				return (-EIO);
+			if ((access & FCREAT) != 0) {
+				if ((flags & STRISPIPE))
+					return (-EIO);
+				if ((flags & STRISTTY) != 0 && sd->sd_session != current->pid)
+					return (-EIO);
+			}
+			/* There was a little problem above: the SVR4 SPG says: "When a Stream head 
+			   receives an M_HANGUP message, it is marked as hung-up. Streams that are
+			   marked as hung-up are allowed to be reopened by their session leader if
+			   they are allocated as a controlling terminal, and by any process if they
+			   are not allocated as a controlling terminal.  This way, the hangup error
+			   can be cleared without forcing all file descriptors to be closed first.
+			   If the reopen is successful, the hung-up condition is cleared." The
+			   above used to always returns EIO on such a reopen.  Note that a hangup on 
+			   a pipe is permanent. */
 			if ((access & FREAD) == 0)
 				return (-ENXIO);
 			if ((access & FNDELAY) == 0)
@@ -4330,6 +4342,7 @@ stropen(struct inode *inode, struct file *file)
 		/* FIXME: Push existing stream open stuff down to str_open() (again). */
 		queue_t *wq, *wq_next;
 		dev_t dev;
+		int was_hungup;
 
 		_printd(("%s: unlocking inode %p\n", __FUNCTION__, inode));
 		stri_unlock(inode);
@@ -4338,6 +4351,7 @@ stropen(struct inode *inode, struct file *file)
 			_ptrace(("Error path taken for sd %p\n", sd));
 			goto put_error;
 		}
+		was_hungup = (test_bit(STRHUP_BIT, &sd->sd_flag) != 0);
 		dev = strinccounts(file, sd, oflag);
 		swunlock(sd);
 		/* already open: we walk down the queue chain calling open on each of the modules
@@ -4355,6 +4369,14 @@ stropen(struct inode *inode, struct file *file)
 				break;
 			}
 		}
+		/* SVR4 SPG says: "When a Stream head receives an M_HANGUP message, it is marked
+		   as hung-up.  Streams that are marked as hung-up are allowed to be reopened by
+		   their session leader if they are allocated as a controlling terminal, and by any 
+		   process if they are not allocated as a controlling terminal.  This way, the
+		   hangup error can be cleared without forcing all file descriptors to be closed
+		   first. If the reopen is successful, the hung-up condition is cleared." */
+		if (was_hungup && !err)
+			clear_bit(STRHUP_BIT, &sd->sd_flag);
 	}
       wake_error:
 	_ptrace(("performing strwakeopen() on sd %p\n", sd));

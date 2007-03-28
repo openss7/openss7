@@ -62,6 +62,24 @@ Things to do:
 @itemize @minus
 
 @item
+Implement the AIX strtune() command.
+
+@emph{*todo*}
+
+@item
+I would really really like a set of rmallocmap(), rmalloc(), rmalloc_wait(), rmfree(), rmfreemap()
+functions so that drivers could stop using the kmem_cache functions but could acheive similar
+effect.
+
+@emph{*todo*}
+
+@item
+Work in MUTEX_ALLOC(), MUTEX_DESTROY(), MUTEX_LOCK(), MUTEX_MINE(), MUTEX_OWNED(), MUTEX_TRYLOCK(),
+MUTEX_UNLOCK() from IRIX into irixcompat.c.
+
+@emph{*todo*}
+
+@item
 Work in streams_interrupt() and STREAMS_TIMEOUT() from IRIX into irixcompat.c.
 
 @emph{*todo*}

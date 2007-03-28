@@ -132,7 +132,7 @@ typedef enum msg_type {
 	M_IOCTL = 0x0e,			/* v S U O(0x16) A H M L(0x05) */
 	M_SETOPTS = 0x10,		/* ^ S U O(0x20) A H M L(0x08) */
 	M_RSE = 0x11,			/* | S U O(0x21) A H M L(0x07) */
-	M_TRAIL = 0x12,			/* ? U */
+	M_TRAIL = 0x12,			/* ^ U H */
 	M_BACKWASH = 0x13,		/* v A */
 	QPCTL = 0x80,			/* - S U O A H M L(0x0a) */
 	M_IOCACK = 0x81,		/* ^ S U O A H M L(0x0f) */

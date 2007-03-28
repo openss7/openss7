@@ -1,3 +1,7 @@
+2007-03-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/pty.c (pts_qopen):  correct return value when slave locked
+
 2007-03-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/termios.h (IBSHIFT): corrections for 2.6.20-1.2933.fc6

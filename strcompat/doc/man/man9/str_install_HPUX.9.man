@@ -225,7 +225,8 @@ as follows:
 Default level of synchronization.
 Specifies that the module uses the default synchronization scheme.  This is
 the same as specifying
-.BR SQLVL_MODULE .
+.BR SQLVL_QUEUEPAIR .
+.\".BR SQLVL_MODULE .
 .TP
 .B SQLVL_GLOBAL
 .I STREAMS
@@ -259,10 +260,7 @@ Module level synchronization. (Default)
 Specifies that the module is run with synchronization at the module.  Only one
 thread of execution will be permitted within the module.  Where the module
 does not share data structures between modules, this has a similar effect to
-running on a UP system.  This is the default and works best for non-MP-safe
-modules written in accordance with
-.I STREAMS
-guidelines.
+running on a UP system.
 .TP
 .B SQLVL_QUEUEPAIR
 Queue pair level synchronization.
@@ -273,6 +271,10 @@ same private structure
 .IR ( q->q_ptr ),
 this provides MP protection of the common data structure to all synchronous
 entry points without an external semaphore.
+This is the default and works best for non-MP-safe modules written in
+accordance with
+.I STREAMS
+guidelines.
 .TP
 .B SQLVL_QUEUE
 Queue level synchronization.
@@ -283,7 +285,8 @@ queue pair.  This is useful when the read and write side of a module are
 largely independent and do no require synchronization between sides of the
 queue pair.
 .TP
-.B SQLVL_NOP
+.B SQLVL_NOSYNC
+.\".B SQLVL_NOP
 No synchronization.
 Specifies that the module is run without synchronization.  All synchronous
 module entry points, call-outs and callbacks become asynchronous.  It is the
@@ -402,6 +405,45 @@ structure are compatible with
 .[
 usldk
 .]
+.IP \(em
+The default syncrhonization,
+.BR SQLVL_DEFAULT ,
+for
+.IR HPUX \(rg
+.[
+hpuxspg
+.]
+is documented as
+.BR SQLVL_QUEUEPAIR
+instead of
+.BR SQLVL_MODULE
+as is defined for other syncrhonization implementations.
+.IP ""
+Although specifying any sycnrhonization is inherently non-portable,
+portable
+.I STREAMS
+modules and drivers will not use
+.BR SQLVL_DEFAULT ,
+but will specify the required level of syncrhonization explicitly.
+.IP \(em
+.IR HPUX \(rg
+.[
+hpuxspg
+.]
+specifies the level for no syncrhonization as
+.BR SQLVL_NOSYNC
+instead of
+.BR SQLVL_NOP
+as is specified for other synchronization implementations.
+.IP ""
+Although
+.B @PACKAGE_TITLE@
+provides both,
+.I STREAMS
+modules and drivers using this registration function should specify
+.B SQLVL_NOSYNC
+for MP-SAFE operation instead of
+.BR SQLVL_NOP .
 .IP \(em
 When this registration function is used, specifying
 .B SQLVL_GLOBAL

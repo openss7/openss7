@@ -1,0 +1,425 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: M_PCTTY.9.man,v 0.9.2.1 2007/03/28 13:36:33 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/03/28 13:36:33 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: M_PCTTY.9.man,v $
+.\" Revision 0.9.2.1  2007/03/28 13:36:33  brian
+.\" - added manpages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so streams.macros
+.\"
+.\"
+.TH M_PCTTY 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B M_PCTTY
+\- \fISTREAMS\fP interrupt message
+.\"
+.\"
+.SH FORMAT
+.PP
+The
+.B M_PCTTY
+message block is a
+.BR datab (9)
+structure and associated data buffer that contains structured data.
+.PP
+An
+.B M_PCTTY
+message is a high priority message that consists of a single
+.B M_TRAIL
+message block.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+implementation extension.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B M_PCTTY
+message is a high priority message type used for communication between the
+.BR ldterm (4)
+module and the
+Stream head under
+.IR AIX \(rg.
+.[
+aixspg
+.]
+Used by the
+.IR AIX \(rg
+Stream head to inform the
+.BR ldterm (4)
+module when an event, such as
+.BR read (2s)
+or
+.BR ioctl (2s)
+has been aborted by user signal (timer or break).  The
+.BR ldterm (4)
+module must remove message blocks representing aborted read or ioctl from the
+queue and free it.  A pointer to the original message block that was aborted
+is included in this message.
+.PP
+Any module or driver that can defer procesing on an
+.BR M_IOCTL (9)
+or
+.BR M_READ (9)
+message (a
+.I TCSETAW
+input-output control, for example) must be prepared to release that deferred
+message when the associated system call is interrupted.  A typical scenario is
+as follows:
+.IP 1. \w'0.\(em'u
+An application starts a short duration timer.
+.IP 2.
+The application issues a "wait for drain" input-output control which takes
+some time to complete.
+.IP 3.
+The timer expires, interrupting the "wait for drain" input-output control.
+.IP 4.
+The application loops back up to restart the timer and reissue the
+input-output control, repeating this loop until most of the system memory is
+used by
+.BR M_IOCTL (9)
+messages.
+.PP
+To prevent this situation, each time a
+.BR read (2s)
+or
+.BR ioctl (2s)
+system call is interrupted, the
+.IR AIX \(rg
+Stream head sends a
+.B M_PCTTY
+message downstream with a pointer to the message block associated with the
+interrupted system call.
+Any module or driver must compare that pointer to any queued message block and
+release the message block it it matches.
+.PP
+The
+.B M_PCTTY
+message will be formatted as a
+.B ttyblk
+structure, defined in the
+.RB < sys/stream.h >
+header file.  The
+.I tty_op
+field corresponds tot he tyupe of system call interrupted: either
+.BR S_IOCTLGONE " or " S_READGONE .
+The
+.I b_rptr
+field of the message block contains the address of the message block to be
+released.  Example code is as follows:
+.sp
+.RS
+.nf
+\fC\s-1\
+switch (mp->b_datap->db_type) {
+case M_PCTTY:
+    tb = (struct ttyblk *) mp->b_rptr;
+    switch (tb->tty_op) {
+    case S_IOCTLGONE:
+        mp->b_rptr += sizeof(struct ttyblk);
+        if (tp->t_qioctl == *((mblk_t **) mp->b_rptr)) {
+            rmvq(q, tp->t_qioctl);
+            freemsg(tp->t_qioctl);
+            tp->t_qioctl = NULL;
+            freemsg(mp);
+            qenable(q);
+        } else
+            putnext(q, mp);
+    }
+}
+\fP
+.fi
+.RE
+.PP
+A module that is pushed above the
+.BR ldterm (4)
+module and processes
+.BR M_DATA (9)
+messages received from the
+.BR ldterm (4)
+module should send an
+.BR M_READ (9)
+message downstream to the
+.BR ldterm (4)
+module if more data is required.  The
+.BR ldterm (4)
+module only sends
+.BR M_DATA (9)
+message upstream when an
+.BR M_READ (9)
+is outstanding, so the pushed module must simulate the interaction between the
+Stream head and the
+.BR ldterm (4)
+module.  This module should also be prepared to receive an
+.B M_PCTTY
+message from the Stream head, indicating the termination of an outstanding
+read.
+.PP
+.B M_PCTTY
+messages are generated by the Stream head.
+.B M_PCTTY
+messages cannot be generated directly by a user level process (but indirectly
+upon receipt of a signal).
+.B M_PCTTY
+messages arriving at the Stream head are discarded (ignored and freed).
+.B M_PCTTY
+messages should not be geenrated by drivers or modules.
+.B M_PCTTY
+messages are consumed by the driver or module responding to them.
+.\"
+.\"
+.SH USAGE
+.PP
+This message is supposedly necessary because an indefinite number of
+.BR M_IOCTL (9)
+or
+.BR M_READ (9)
+messages could be otherwise queued.  This is hard to support and probably just
+reflects a poorly designed
+.BR ldterm (4)
+module.
+Only one (unabandonned)
+.BR M_IOCTL (9)
+message can be outstanding at a time.  The following put procedure code would
+do the same function as that above:
+.sp
+.RS
+.nf
+\fC\s-1\
+switch (mp->b_datap->db_type) {
+case M_IOCTL:
+    if (tp->t_qioctl != NULL) {
+        rmvq(q, tp->t_qioctl);
+        freemsg(tp->t_quioctl);
+        tp->t_qioctl = mp;
+    }
+    putq(q, mp);
+}
+\fP
+.fi
+.RE
+.sp
+Although multiple
+.BR M_READ (9)
+messages can be outstanding, the messages never need
+to be queued as they simply contain a count.  (Note also that
+.BR M_READ (9)
+messages are high priority messages.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B M_PCSETOPTS
+message is documented only by
+.IR AIX \(rg.
+.[
+aixspg
+.]
+It is provided to assist porting of drivers and modules written for
+.IR AIX \(rg
+to
+.BR Linux .
+It might be necessary to define
+.B _AIX_SOURCE
+before including
+.RB < sys/stream.h >
+to expose this symbol.
+Binary compatibility is not guaranteed.
+.PP
+The following guidelines are for processing of the
+.B M_PCTTY
+message at drivers and modules:
+.IP \(bu \w'\(bu\(em'u
+If an intermediate module recognizes, but is not deferring
+.BR M_IOCTL (9)
+or
+.BR M_READ (9)
+messages, it passes it downstream.  As a high priority message,
+.B M_PCTTY
+messages are not subject to flow control and should not be queued.
+.IP \(bu
+If an intermediate module does not recognize the
+.B M_PCTTY
+message, it passes it along the Stream as with any unrecognized high priority
+message: it is not subject to flow control and should not be queued.
+.IP \(bu
+If a driver receives an
+.B M_PCTTY
+message and does not recognize the message, it is discarded (ignored and
+freed).  If the driver is not deferring
+.BR M_IOCTL (9)
+or
+.BR M_READ (9)
+messages, the message is discarded (ignored and freed).
+.IP \(bu
+If an intermediate module or the driver recognizes the
+.B M_PCTTY
+mesage and is deferring
+.BR M_IOCTL (9)
+or
+.BR M_READ (9)
+messages, it treats the message as an indication that the deferred
+.BR M_IOCTL (9)
+or
+.BR M_READ (9)
+message belongs to an aborted attempt and consumes the message.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR M_IOCTL (9),
+.BR M_READ (9),
+.BR datab (9),
+.BR msgb (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B M_PCTTY
+.I STREAMS
+message is compatible with
+.IR "SVR 4.2 MP STREAMS" ,
+and implementations based on
+.IR "SVR 4" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Only
+.IR AIX \(rg
+.[
+aixspg
+.]
+documents the
+.B M_PCTTY
+data block type.  This data block type is provided for source compatibility
+with drivers written for
+.IR AIX \(rg
+and should not be used by portable
+.I STREAMS
+drivers and modules.  It might be necessary to define
+.B _AIX_SOURCE
+before including
+.RB < sys/stream.h >
+to expost this symbol.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use the
+.BR M_PCTTY
+data block type.
+.IP \(em
+The
+.B @PACKAGE_TITLE@
+Stream head never generates one of these messages.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use this message.
+.IP \(em
+Binary compatibility is not guaranteed.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR AIX \(rg
+documentation.
+.[
+aixspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B M_TRAIL
+message first appeared in
+.IR AIX \(rg.
+.[
+aixspg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

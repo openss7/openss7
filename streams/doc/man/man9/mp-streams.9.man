@@ -1832,7 +1832,7 @@ allows all
 .I STREAMS
 utility functions to be called for a Stream end.
 .IP \(em
-Some implemetnations do not permit some
+Some implementations do not permit some
 .I STREAMS
 utility functions to be called on a Stream frozen by the caller with
 .BR freezestr (9),
@@ -1844,7 +1844,18 @@ allows all
 utility functions to be called on a Stream frozen by the caller with
 .BR freezestr (9).
 .IP \(em
-Some implementations do not permit some
+Some implementations (e.g.
+.IR HPUX \(rg,
+.[
+hpuxspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+and
+.IR IRIX \(rg)
+do not permit some (or all)
 .I STREAMS
 utility functions to be called from interrupt.
 .IP ""
@@ -1866,6 +1877,32 @@ protable
 modules and drivers will not assume that all utility functions are permitted
 in all contexts.
 .IP \(em
+.I STREAMS
+syncrhonization is poorly documented for most systems and is treated uniquely
+on most.  Some implementations do not support
+.I STREAMS
+syncrhonization at all.  (For example,
+.I LiS 2.16
+did not support any synchronization and
+.I LiS 2.18
+does not support per-module, per-Stream or elsewhere synchronization levels.
+Also,
+.IR IRIX \(rg
+.[
+irixspg
+.]
+does not support
+.I STREAMS
+synchronization at all: all modules are required to be MT-SAFE and must set
+.B D_MP
+in
+.IB pfx devflag \fR.)
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not require syncrhonization and will be written to be
+MT- and MP-SAFE.
+.IP \(em
 .IR AIX \(rg
 .[
 aixspg
@@ -1874,6 +1911,10 @@ states that syncrhonization level
 .B SQLVL_GLOBAL
 reduces STREAMS to be single threaded (regardless of the setting of other
 modules).
+.IR MacOT \(rg,
+.[
+macspg
+.]
 .IR OSF/1 \(rg
 .[
 osfspg
@@ -1883,12 +1924,39 @@ and
 .[
 hpuxspg
 .]
-state that syncrhonization level
+state that,
+and
+.IR LiS
+.[
+lis
+.]
+implements so that,
+syncrhonization level
 .B SQLVL_GLOBAL
 only single threads the modules that are syncrhonized under that level (making
 it, however, little different than
 .B SQLVL_ELSEWHERE
 with a common name).
+Therefore,
+.B @PACKAGE_TITLE@
+implements
+.B SQLVL_GLOBAL
+specified to the corresponding registration functions as
+.B SQLVL_ELSEWHERE
+with the common name
+.RB \(lq global \(rq,
+whereas when the
+.IR AIX \(rg
+registration function specifies
+.BR SQLVL_GLOBAL ,
+it is treated as
+.BR SQLVL_GLOBAL .
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not specify
+.B SQLVL_GLOBAL
+for synchronization.
 .IP \(em
 .IR HPUX \(rg
 .[
@@ -1910,7 +1978,7 @@ routines for drivers and modules registered using
 compatible registration functions.
 .IP \(em
 .IR VxWorks \(rg
-stats that only one open and close routine associated with a module executes
+states that only one open and close routine associated with a module executes
 at any given point in time (regardless of whether
 .BR SQLVL_QUEUEPAIR " or " SQLVL_QUEUE
 is set) and that special sleep functions must be called if a thread sleeps in
@@ -1944,7 +2012,9 @@ of the module.
 does not support the syncrhonization level
 .BR SQLVL_SPLITMODULE .
 .IP ""
-Portable STREAMS modules and drivers will not use the
+Portable
+.I STREAMS
+modules and drivers will not use the
 .B SQLVL_SPLITMODULE
 synchronization level.
 .IP \(em

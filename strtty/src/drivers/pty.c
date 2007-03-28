@@ -1015,7 +1015,8 @@ pts_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				   EPERM. */
 				write_unlock_str(&c->lock, flags);
 				read_unlock(&pty_lock);
-				return (EPERM);
+				/* But, conversely, POSIX open(2) says EAGAIN. */
+				return (EAGAIN);
 			}
 
 			/* its unlocked, but check your permissions */

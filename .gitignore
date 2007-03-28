@@ -155,6 +155,7 @@ README-nexusware
 scripts/compile
 scripts/config.guess
 scripts/config.sub
+scripts/depcomp
 scripts/install-sh
 scripts/ltmain.sh
 scripts/missing

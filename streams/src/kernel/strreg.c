@@ -105,12 +105,30 @@ static char const ident[] =
  *  -------------------------------------------------------------------------
  */
 
+/**
+ * register_strsync: - register syncrhonization queueso
+ * @fmod: pointer to module structure (whether module or driver)
+ *
+ * This function is responsible for registering non-queue specific syncrhonization queues.  Normally
+ * there is an inner barrier and an optional outer barrier.  The inner barrier is specified by the
+ * syncrhonization level.  An outer barrier only need exist at a sycnchronization level wider than
+ * the inner barrier.  The outer barrier depends upon the flavor.  Solaris uses and outer barrier
+ * that is shared or exclusive (to open and close) that is always at the module level.  HPUX always
+ * uses an outer barrier exclusive to open and close that is global.  MacOT (and presumably AIX) use
+ * an outer barrier exclusive to open and close that is no smaller than a queue pair.  That is, when
+ * SQLVL_QUEUE is set for the inner barrier, an SQLVL_QUEUEPAIR exclusive to open and close outer
+ * barrier exists.  (Note that IRIX requires all STREAMS drivers and modules to be D_MP.)
+ */
 streams_fastcall int
 register_strsync(struct fmodsw *fmod)
 {
 #if defined CONFIG_STREAMS_SYNCQS
 	int sqlvl = SQLVL_DEFAULT;
 	struct syncq *sq;
+
+	/* Make sure none is allocated because LiS emulation calls this function repeatedly for the
+	   same module or driver. */
+	sq_put(&fmod->f_syncq);
 
 	/* propagate flags to f_sqlvl */
 	if (fmod->f_sqlvl == SQLVL_DEFAULT) {
