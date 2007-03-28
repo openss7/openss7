@@ -108,7 +108,7 @@ Major features since the last public release are as follows:
 Updated to gettext 0.16.1.
 
 @item
-Changes to support build on 2.6.20-1.2307.fc5 kernel.
+Changes to support build on 2.6.20-1.2307.fc5 and 2.6.20-1.2933.fc6 kernel.
 
 @item
 Support for recent distribuations and tool chains.
