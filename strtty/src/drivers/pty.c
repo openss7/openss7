@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:24 $
+ @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/28 13:44:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:02:24 $ by $Author: brian $
+ Last Modified $Date: 2007/03/28 13:44:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pty.c,v $
+ Revision 0.9.2.7  2007/03/28 13:44:46  brian
+ - updates to syncrhonization, release notes and documentation
+
  Revision 0.9.2.6  2007/03/25 19:02:24  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -77,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:24 $"
+#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/28 13:44:46 $"
 
 static char const ident[] =
-    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:24 $";
+    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/28 13:44:46 $";
 
 /*
  *  This is the start of a STREAMS pseudo-terminal (pty) driver for Linux.  It
@@ -105,7 +108,7 @@ static char const ident[] =
 
 #define PTY_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTY_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:24 $"
+#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/28 13:44:46 $"
 #define PTY_DEVICE	"SVR 4.2 STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PTY_LICENSE	"GPL"

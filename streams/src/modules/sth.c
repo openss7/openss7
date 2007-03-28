@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.179 $) $Date: 2007/03/25 19:01:18 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.180 $) $Date: 2007/03/28 13:44:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:01:18 $ by $Author: brian $
+ Last Modified $Date: 2007/03/28 13:44:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.180  2007/03/28 13:44:20  brian
+ - updates to syncrhonization, release notes and documentation
+
  Revision 0.9.2.179  2007/03/25 19:01:18  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -196,10 +199,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.179 $) $Date: 2007/03/25 19:01:18 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.180 $) $Date: 2007/03/28 13:44:20 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.179 $) $Date: 2007/03/25 19:01:18 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.180 $) $Date: 2007/03/28 13:44:20 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -302,7 +305,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.179 $) $Date: 2007/03/25 19:01:18 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.180 $) $Date: 2007/03/28 13:44:20 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: termios.h,v 0.9.2.1 2006/10/12 09:30:56 brian Exp $
+ @(#) $Id: termios.h,v 0.9.2.2 2007/03/28 13:44:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/12 09:30:56 $ by $Author: brian $
+ Last Modified $Date: 2007/03/28 13:44:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: termios.h,v $
+ Revision 0.9.2.2  2007/03/28 13:44:47  brian
+ - updates to syncrhonization, release notes and documentation
+
  Revision 0.9.2.1  2006/10/12 09:30:56  brian
  - added header files for package
 
@@ -58,7 +61,7 @@
 #ifndef __SYS_TERMIOS_H__
 #define __SYS_TERMIOS_H__
 
-#ident "@(#) $RCSfile: termios.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: termios.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define _POSIX_VDISABLE	    0
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:01:04 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/28 13:44:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:01:04 $ by $Author: brian $
+ Last Modified $Date: 2007/03/28 13:44:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: liscompat.c,v $
+ Revision 0.9.2.45  2007/03/28 13:44:02  brian
+ - updates to syncrhonization, release notes and documentation
+
  Revision 0.9.2.44  2007/03/25 19:01:04  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:01:04 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/28 13:44:02 $"
 
-static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:01:04 $";
+static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/28 13:44:02 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -91,7 +94,7 @@ static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:01:04 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/28 13:44:02 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
