@@ -481,6 +481,43 @@ routine should call
 with
 .BR STR_UNLOAD_MOD .
 .IP \(em
+For
+.IR AIX \(rg
+.[
+aixspg
+.]
+the treatment of
+.B SQLVL_GLOBAL
+is different than others.  When
+.B SQLVL_GLOBAL
+is specified using this registration function, only one thread is allowed in all of STREAMS an
+Uniprocessor Emulation is effected.  Because
+.B SQLVL_GLOBAL
+is only used for testing, this should not present an incompatibility.
+.IP \(em
+.IR AIX \(rg
+.[
+aixspg
+.]
+does not provide much special exclusion for open and close routines beyond that provided by
+synchronization levels
+.BR SQLVL_MODULE ", " SQLVL_ELSEWHERE " or " SQLVL_GLOBAL .
+At
+.BR SQLVL_QUEUEPAIR " and " SQLVL_QUEUE ,
+.IR MacOT \(rg
+documentation indicates that the open or close routine is excluded at a minimum syncrhonization of
+.BR SQLVL_QUEUEPAIR
+regardless of whether the synchronization is at the granularity of a queue.
+The temptation was to have
+.B @PACKAGE_TITLE@
+effect this by setting an outer perimeter in these cases and making the outer perimeter exclusive
+for open and close.  This would set the granularity at the level of a module which could have a negative
+impact if one open routine sleeps waiting for another to wake it.
+Therefore, for
+.B @PACKAGE_TITLE@
+a special exclusive outer perimeter at the level of the queue pair is established when the inner
+perimeter is at the level of the queue.
+.IP \(em
 Use of
 .BR str_install ()
 requires different include file sequences on
