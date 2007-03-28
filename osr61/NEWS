@@ -1,4 +1,4 @@
-Dialogic Open Systems Release 6.1 -- history of user visible changes.  2007-03-13
+Dialogic Open Systems Release 6.1 -- history of user visible changes.  2007-03-27
 $Id: NEWS,v 0.9.2.8 2007/03/17 09:01:55 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
 The sections that follow provide information on OpenSS7 releases of the
 Dialogic Open Systems Release 6.1 package.
 
- Major changes for release osr61-0.9.2.1
+ Major changes for release osr61-0.9.2.2
 ----------------------------------------
 
 This is the second release from `The OpenSS7 Project' of the
@@ -18,6 +18,8 @@ The package contains all the necessary manual pages and other
 documentation for components in an autoconf tarball.
 
 This release is the initial public release.
+
+   - Changes to support build on 2.6.20-1.2307.fc5 kernel.
 
    - Support for recent distributions and tool chains.
 

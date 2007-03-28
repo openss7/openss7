@@ -1,4 +1,4 @@
-Linux Fast-STREAMS -- history of user visible changes.  2007-03-13
+Linux Fast-STREAMS -- history of user visible changes.  2007-03-27
 $Id: NEWS,v 0.9.2.48 2007/03/17 09:02:21 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
 The sections that follow provide information on OpenSS7 releases of the
 `Linux Fast-STREAMS' package.
 
- Major changes for release streams-0.9.2.2
+ Major changes for release streams-0.9.2.3
 ------------------------------------------
 
 This is the twelveth  `OpenSS7 Project' release of `Linux
@@ -20,6 +20,10 @@ primarily a maintenance release to support recent distributions and
 tool chain.
 
 Major features since the last public release are as follows:
+
+   - Updated to gettext 0.16.1.
+
+   - Changes to support build on 2.6.20-1.2307.fc5 kernel.
 
    - Support for recent distributions and tool chains.
 
@@ -41,7 +45,7 @@ Major features since the last public release are as follows:
    - Fix for clone open failure locking problems, demand loading of
      clone minors, an error in clone minor device deregistration, and
      an error in queue syncrhornization.  See
-     `http://www.openss7.org/codefiles/streams-0.9.2.2/BUGS' in the
+     `http://www.openss7.org/codefiles/streams-0.9.2.3/BUGS' in the
      release for more information.
 
    - Added feature to perform automatic reference counting of modules
