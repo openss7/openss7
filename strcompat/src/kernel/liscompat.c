@@ -2811,6 +2811,11 @@ EXPORT_SYMBOL(lis_unregister_strmod);
  *
  *  Note that LiS does not perform true SQLVL_GLOBAL synchronization, but is only SQLVL_ELSEWHERE
  *  with a common syncrhonization queue.
+ *
+ *  Of course there is a horrible race in these LiS functions: if a Stream is opened between
+ *  lis_register_strdev() and lis_register_driver_qlock_option() then it will be opened with the
+ *  wrong synchronization (SQLVL_QUEUE) and great difficulties with result unless SQLVL_NOP is
+ *  requested..
  */
 _RP int
 lis_register_driver_qlock_option(major_t major, int qlock_option)
@@ -2842,7 +2847,7 @@ lis_register_driver_qlock_option(major_t major, int qlock_option)
 			break;
 		case LIS_QLOCK_GLOBAL:
 			cdev->d_sqlvl = SQLVL_ELSEWHERE;
-			cdev->d_sqinfo = "LiS";
+			cdev->d_sqinfo = "global";
 			cdev->d_flag &= ~(D_MP|D_UP|D_MTPERQ|D_MTQPAIR|D_MTPERMOD|D_MTOUTPERIM|D_MTOCEXCL|D_MTPUTSHARED);
 			cdev->d_flag |= 0;
 			err = register_strsync((struct fmodsw *)cdev);
@@ -2862,6 +2867,11 @@ EXPORT_SYMBOL(lis_register_driver_qlock_option);
  *
  *  Note that LiS does not perform true SQLVL_GLOBAL synchronization, but is only SQLVL_ELSEWHERE
  *  with a common syncrhonization queue.
+ *
+ *  Of course there is a horrible race in these LiS functions: if a module is pushed between
+ *  lis_register_strmod() and lis_register_module_qlock_option() then it will be opened with the
+ *  wrong synchronization (SQLVL_QUEUE) and great difficulties with result unless SQLVL_NOP is
+ *  requested..
  */
 _RP int
 lis_register_module_qlock_option(modID_t modid, int qlock_option)
@@ -2893,7 +2903,7 @@ lis_register_module_qlock_option(modID_t modid, int qlock_option)
 			break;
 		case LIS_QLOCK_GLOBAL:
 			fmod->f_sqlvl = SQLVL_ELSEWHERE;
-			fmod->f_sqinfo = "LiS";
+			fmod->f_sqinfo = "global";
 			fmod->f_flag &= ~(D_MP|D_UP|D_MTPERQ|D_MTQPAIR|D_MTPERMOD|D_MTOUTPERIM|D_MTOCEXCL|D_MTPUTSHARED);
 			fmod->f_flag |= 0;
 			err = register_strsync(fmod);

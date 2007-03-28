@@ -1866,6 +1866,96 @@ protable
 modules and drivers will not assume that all utility functions are permitted
 in all contexts.
 .IP \(em
+.IR AIX \(rg
+.[
+aixspg
+.]
+states that syncrhonization level
+.B SQLVL_GLOBAL
+reduces STREAMS to be single threaded (regardless of the setting of other
+modules).
+.IR OSF/1 \(rg
+.[
+osfspg
+.]
+and
+.IR HPUX \(rg
+.[
+hpuxspg
+.]
+state that syncrhonization level
+.B SQLVL_GLOBAL
+only single threads the modules that are syncrhonized under that level (making
+it, however, little different than
+.B SQLVL_ELSEWHERE
+with a common name).
+.IP \(em
+.IR HPUX \(rg
+.[
+hpuxspg
+.]
+states that open and close routines associated with a Stream a synchronized
+(with put and service procedures) at minimum an queue pair synchronization.
+Also, it states that only one open or close routine runs at a time (there is
+not concurrency between open and close for any Stream).  Because of this, if a
+thread sleeps in an open or close routine, it must use a special sleep
+function to release the sycnhronization before sleeping.
+.IP ""
+For compatibility with
+.IR HPUX \(rg,
+.B @PACKAGE_TITLE@
+implements a global outer barrier that is entered exclusive by open and close
+routines for drivers and modules registered using
+.IR HPUX \(rg
+compatible registration functions.
+.IP \(em
+.IR VxWorks \(rg
+stats that only one open and close routine associated with a module executes
+at any given point in time (regardless of whether
+.BR SQLVL_QUEUEPAIR " or " SQLVL_QUEUE
+is set) and that special sleep functions must be called if a thread sleeps in
+an open or close routine.  This is similar to
+.IR Solaris \(rg
+with flag
+.BR D_MTOUTPERIM " and " D_MTOCEXCL
+set in addition to
+.BR D_MTPERQ " or " D_MTQPAIR .
+.IP \(em
+.IR MacOT \(rg
+.[
+macspg
+.]
+does not support
+.B SQLVL_ELSEWHERE
+but supports a buddy mechanism for
+.B SQLVL_MODULE
+modules that is similar.
+.IR MacOT \(rg
+.[
+macspg
+.]
+also supports specialized level
+.BR SQLVL_SPLITMODULE ,
+which is similar to
+.BR SQLVL_MODULE ,
+but which allows on thread on the read side and one thread on the write side
+of the module.
+.B @PACKAGE_TITLE@
+does not support the syncrhonization level
+.BR SQLVL_SPLITMODULE .
+.IP ""
+Portable STREAMS modules and drivers will not use the
+.B SQLVL_SPLITMODULE
+synchronization level.
+.IP \(em
+Nowhere is it documented what syncrhonization is applied to lower multiplex
+queue pairs and Streams.
+.B @PACKAGE_TITLE@
+applies the synchronization required of the upper multiplex Stream to the
+lower multiplex Stream when it is linked.  That is, the linked lower multiplex
+queue pair is treated the same as any upper multiplex queue pair in the
+module.
+.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See

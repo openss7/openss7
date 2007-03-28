@@ -3665,7 +3665,8 @@ setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 EXPORT_SYMBOL(setq);
 
 #if defined CONFIG_STREAMS_SYNCQS
-struct syncq *global_syncq = NULL;
+struct syncq *global_inner_syncq = NULL;
+struct syncq *global_outer_syncq = NULL;
 #endif
 
 /*
@@ -3674,31 +3675,28 @@ struct syncq *global_syncq = NULL;
  *
  *  This function establishes the links to the necessary syncrhonization queues for a newly created
  *  queue pair.  Both outer and inner perimiters are established.  D_MP modules have no perimiters.
- *  SQLVL_NOP modules have no inner perimeter.  D_MTOUTPERIM modules have an outer perimeter.
- *  Modules cannot have an outer perimeter and an inner perimeter of D_MTPERMOD or SQLVL_MODULE or
- *  wider.
+ *  SQLVL_NOP modules have no inner perimeter.  D_MTOUTPERIM or D_MTOCEXCL modules have an outer
+ *  perimeter.  Modules cannot have an outer perimeter (other than a global one) and an inner
+ *  perimeter of D_MTPERMOD or SQLVL_MODULE or wider.
  *
- *  If the inner perimeter is SQLVL_MODULE or SQLVL_ELSEWHERE, then it is the responsibility of the
- *  registration function to find or allocate a synchronization queue and attach it to fmod->f_syncq
- *  for use by this function.  This makes the algorithm for locating an "elsewhere" module
- *  independent of this function.  Although this function could allocate synchronization queues for
- *  the SQLVL_MODULE case, to avoid races it should only be performed in the registration functions.
+ *  If the inner perimeter is SQLVL_MODULE, SQLVL_ELSEWHERE or SQLVL_GLOBAL, then it is the
+ *  responsibility of the registration function to find or allocate a synchronization queue and
+ *  attach it to fmod->f_syncq for use by this function.  This makes the algorithm for locating an
+ *  "elsewhere" module independent of this function.  Although this function could allocate
+ *  synchronization queues for the SQLVL_MODULE and SQLVL_GLOBAL case, to avoid races it should only
+ *  be performed in the registration functions.
+ *
+ *  If there is an outer perimeter, it is the responsibility of the registration function to locate
+ *  or allocate an outer perimeter and either attach it to the inner perimeter at fmod->f_syncq, or
+ *  attach it directly to fmod->f_syncq.
  */
 STATIC __unlikely int
 __setsq(queue_t *q, struct fmodsw *fmod)
 {
 #if defined CONFIG_STREAMS_SYNCQS
-	struct syncq *sqr, *sqw, *sqo;
-
 	/* make sure there is none to start */
-	if ((sqr = (q + 0)->q_syncq)) {
-		sq_put(&sqr->sq_outer);
-		sq_put(&(q + 0)->q_syncq);
-	}
-	if ((sqw = (q + 1)->q_syncq)) {
-		sq_put(&sqw->sq_outer);
-		sq_put(&(q + 1)->q_syncq);
-	}
+	sq_put(&(q + 0)->q_syncq);
+	sq_put(&(q + 1)->q_syncq);
 	if (fmod == NULL) {
 #endif
 		/* just clear them */
@@ -3708,88 +3706,40 @@ __setsq(queue_t *q, struct fmodsw *fmod)
 #if defined CONFIG_STREAMS_SYNCQS
 	}
 	if (!(fmod->f_flag & D_MP)) {
-		if (fmod->f_flag & D_MTOUTPERIM)
-			sqo = sq_get(fmod->f_syncq);
-		else
-			sqo = NULL;
+		struct syncq *sqr, *sqw;
 
 		switch (fmod->f_sqlvl) {
-		case SQLVL_NOP:	/* none */
-			sqr = sqo;
-			sqw = sq_get(sqr);
-			break;
 		case SQLVL_QUEUE:
 			/* allocate one syncq for each queue */
-			if (!(sqr = sq_alloc())) {
-				sq_put(&sqo);
-				goto enomem;
-			}
-			if (!(sqw = sq_alloc())) {
-				sq_put(&sqo);
+			if (!(sqr = sq_alloc()) || !(sqw = sq_alloc())) {
 				sq_put(&sqr);
 				goto enomem;
 			}
 			sqr->sq_level = fmod->f_sqlvl;
 			sqr->sq_flag = SQ_INNER | ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
-			sqr->sq_outer = sqo;
+			sqr->sq_outer = sq_get(fmod->f_syncq);
 			sqw->sq_level = fmod->f_sqlvl;
 			sqw->sq_flag = SQ_INNER | ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
-			sqw->sq_outer = sq_get(sqo);
+			sqw->sq_outer = sq_get(fmod->f_syncq);
 			break;
 		case SQLVL_QUEUEPAIR:
 			/* allocate one syncq for the queue pair */
 			if (!(sqr = sq_alloc())) {
-				sq_put(&sqo);
 				goto enomem;
 			}
 			sqr->sq_level = fmod->f_sqlvl;
 			sqr->sq_flag = SQ_INNER | ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
-			sqr->sq_outer = sqo;
+			sqr->sq_outer = sq_get(fmod->f_syncq);
 			sqw = sq_get(sqr);
 			break;
 		default:
+		case SQLVL_NOP:	/* none */
 		case SQLVL_DEFAULT:
 		case SQLVL_MODULE:	/* default */
-			/* find the module and use its syncq */
-			/* The registration function is responsible for allocating the module
-			   synchronization queue and attaching it to the module structure */
-			if (!(sqr = sq_get(fmod->f_syncq))) {
-				if (!(sqr = sq_alloc())) {
-					sq_put(&sqo);
-					goto enomem;
-				}
-				fmod->f_syncq = sqr;
-				sqr->sq_level = fmod->f_sqlvl;
-				sqr->sq_flag =
-				    SQ_INNER | ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
-				sqr->sq_outer = sqo;
-			}
-			sqw = sq_get(sqr);
-			break;
 		case SQLVL_ELSEWHERE:
-			/* find the elsewhere syncq and use it */
-			/* The registration function is responsible for finding and allocating the
-			   external synchronization queue and attaching it to the module structure */
-			if (!(sqr = sq_get(fmod->f_syncq))) {
-				if (!(sqr = sq_locate(fmod->f_sqinfo))) {
-					sq_put(&sqo);
-					goto enomem;
-				}
-				fmod->f_syncq = sqr;
-				sqr->sq_level = fmod->f_sqlvl;
-				sqr->sq_flag =
-				    SQ_INNER | ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
-			}
-			sqw = sq_get(sqr);
-			/* cannot have outer perimeter at this level */
-			sq_put(&sqo);
-			break;
 		case SQLVL_GLOBAL:	/* for testing */
-			/* use the global syncq */
-			sqr = sq_get(global_syncq);
-			sqw = sq_get(global_syncq);
-			/* cannot have outer perimeter at this level */
-			sq_put(&sqo);
+			sqr = sq_get(fmod->f_syncq);
+			sqw = sq_get(sqr);
 			break;
 		}
 		(q + 0)->q_syncq = sqr;

@@ -1,5 +1,12 @@
 2007-03-27  Brian Bidulock  <bidulock@openss7.org>
 
+	* include/sys/streams/strconf.h: cleaning up syncrhonization
+	* src/kernel/strreg.c: cleaning up syncrhonization
+	* src/kernel/strsched.c: cleaning up syncrhonization
+	* src/kernel/strsched.h: cleaning up syncrhonization
+	* src/kernel/strutil.c: cleaning up syncrhonization
+	* src/kernel/strutil.h: cleaning up syncrhonization
+
 	* Makefile.am: corrections to in-place build (stropts.h conflict)
 	* lib32/Makefile.am: corrections to in-place build (stropts.h conflict)
 
