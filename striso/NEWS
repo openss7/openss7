@@ -1,4 +1,4 @@
-OpenSS7 ISO Stack -- history of user visible changes.  2007-03-13
+OpenSS7 ISO Stack -- history of user visible changes.  2007-03-27
 $Id: NEWS,v 0.9.2.24 2007/03/17 09:02:32 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
 The sections that follow provide information on OpenSS7 releases of the
 OpenSS7 ISO Stack package.
 
- Initial release striso-0.9.2.2
+ Initial release striso-0.9.2.3
 -------------------------------
 
 This is the second open source release of the `OpenSS7 ISO Stack'
@@ -35,6 +35,10 @@ X.25< CONS, CLNS, and TP0 through TP4, drivers with conformance test
 suites.
 
 Major features since the last public release are as follows:
+
+   - Updated to gettext 0.16.1.
+
+   - Changes to support build on 2.6.20-1.2307.fc5 kernel.
 
    - Support for recent distribuations and tool chains.
 
