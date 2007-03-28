@@ -330,6 +330,8 @@ strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 		case SQLVL_QUEUEPAIR:
 			cdev->d_flag |= D_MTQPAIR;
 			break;
+		case SQLVL_DEFAULT:
+			cdev->d_sqlvl = SQLVL_MODULE;
 		case SQLVL_MODULE:
 			cdev->d_flag |= D_MTPERMOD;
 			break;
@@ -337,11 +339,15 @@ strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 			cdev->d_sqinfo = sa->sa_sync_info;
 			break;
 		case SQLVL_GLOBAL:
-			/* can't really support this, but its only used for debug anyway */
+			/* Note that the OSF/1 SQLVL_GLOBAL only guarantees one thread within
+			   modules also set to SQLVL_GLOBAL in stark contrast to descriptions for
+			   AIX.  This is really SQLVL_ELSEWHERE with a well-known common barrier. */
+			cdev->d_sqinfo = "global";
+			cdev->d_sqlvl = SQLVL_ELSEWHERE;
 			break;
-		case SQLVL_DEFAULT:
-			cdev->d_flag |= D_MTPERMOD;
-			break;
+		default:
+			kmem_free(cdev, sizeof(*cdev));
+			return (NODEV);
 		}
 		if ((err = register_strdev(cdev, getmajor(dev))) < 0) {
 			kmem_free(cdev, sizeof(*cdev));
@@ -373,6 +379,8 @@ strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 		case SQLVL_QUEUEPAIR:
 			fmod->f_flag |= D_MTQPAIR;
 			break;
+		case SQLVL_DEFAULT:
+			fmod->f_sqlvl = SQLVL_MODULE;
 		case SQLVL_MODULE:
 			fmod->f_flag |= D_MTPERMOD;
 			break;
@@ -380,11 +388,15 @@ strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 			fmod->f_sqinfo = sa->sa_sync_info;
 			break;
 		case SQLVL_GLOBAL:
-			/* can't really support this, but its only used for debug anyway */
+			/* Note that the OSF/1 SQLVL_GLOBAL only guarantees one thread within
+			   modules also set to SQLVL_GLOBAL in stark contrast to descriptions for
+			   AIX.  This is really SQLVL_ELSEWHERE with a well-known common barrier. */
+			fmod->f_sqinfo = "global";
+			fmod->f_sqlvl = SQLVL_ELSEWHERE;
 			break;
-		case SQLVL_DEFAULT:
-			fmod->f_flag |= D_MTPERMOD;
-			break;
+		default:
+			kmem_free(fmod, sizeof(*fmod));
+			return (NODEV);
 		}
 		if ((err = register_strmod(fmod)) < 0) {
 			kmem_free(fmod, sizeof(*fmod));

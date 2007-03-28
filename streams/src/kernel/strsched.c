@@ -1504,6 +1504,22 @@ sq_put(struct syncq **sqp)
 			_ptrace(("syncq %p count is now %d\n", sq, atomic_read(&sq->sq_refs)));
 	}
 }
+BIG_STATIC streams_fastcall __unlikely void
+sq_release(struct syncq **sqp)
+{
+	struct syncq *sq;
+
+	dassert(sqp != NULL);
+	sq = *sqp;
+	prefetchw(sq);
+	if (sq != NULL) {
+		if (unlikely(atomic_dec_and_test(&sq->sq_refs) != 0)) {
+			*sqp = NULL;
+			sq_free(sq);
+		} else
+			_ptrace(("syncq %p count is now %d\n", sq, atomic_read(&sq->sq_refs)));
+	}
+}
 #endif
 
 /* 
@@ -2479,9 +2495,9 @@ defer_syncq(struct syncq_cookie *sc)
 STATIC int
 find_syncq(struct syncq_cookie *sc)
 {
-	if (global_syncq != NULL) {
-		sc->sc_isq = global_syncq;
-		sc->sc_osq = NULL;
+	if (global_inner_syncq != NULL) {
+		sc->sc_isq = global_inner_syncq;
+		sc->sc_osq = sc->sc_isq->sq_outer;
 	} else
 	    if (sc->sc_q && (sc->sc_osq = sc->sc_q->q_syncq) && !(sc->sc_osq->sq_flag & SQ_OUTER)) {
 		sc->sc_isq = sc->sc_osq;
@@ -2492,9 +2508,9 @@ find_syncq(struct syncq_cookie *sc)
 STATIC streams_fastcall __hot int
 find_syncqs(struct syncq_cookie *sc)
 {
-	if (global_syncq != NULL) {
-		sc->sc_isq = global_syncq;
-		sc->sc_osq = NULL;
+	if (global_inner_syncq != NULL) {
+		sc->sc_isq = global_inner_syncq;
+		sc->sc_osq = sc->sc_isq->sq_outer;
 	} else
 	    if (sc->sc_q && (sc->sc_osq = sc->sc_q->q_syncq) && !(sc->sc_osq->sq_flag & SQ_OUTER)) {
 		sc->sc_isq = sc->sc_osq;
@@ -2663,6 +2679,19 @@ enter_inner_syncq_exclus(struct syncq_cookie *sc)
 	return (1);
 }
 
+/**
+ * enter_inner_syncq_asputp: - enter inner synchornization queue as put procedure
+ * @sc: syncrhonization cookie
+ *
+ * The purpose of the syncrhonization cookie is to avoid passing umpteen arguments.
+ *
+ * This function enters the outer barrier shared and the intter barrier either shared or exclusive.
+ * For normal SVR4-like syncrhonization, there is no outer barrier and the inner barrier is always
+ * entered exclusive.  The purpose of the outer barrier and possible shared put procedure access to
+ * the inner barrier is to support Solaris-like barriers (D_MTPUTSHARED and D_MTOUTPERIM).
+ *
+ * Note that for this barrier the caller must not be blocked.
+ */
 STATIC streams_fastcall __hot int
 enter_inner_syncq_asputp(struct syncq_cookie *sc)
 {
@@ -2688,6 +2717,15 @@ enter_inner_syncq_asputp(struct syncq_cookie *sc)
 	}
 	return (1);
 }
+
+/**
+ * enter_inner_syncq_asopen: - enter inner syncrhonization queue as open/close procedure
+ * @sq: syncrhonization cookie
+ *
+ * The purpose of the sychronization cookie is to avoid passing umpteen arguments.
+ *
+ * This function
+ */
 STATIC int
 enter_inner_syncq_asopen(struct syncq_cookie *sc)
 {
@@ -5243,7 +5281,11 @@ strsched_init(void)
 		return (result);
 #if 0
 #if defined CONFIG_STREAMS_SYNCQS
-	if (!(global_syncq = sq_alloc())) {
+	if (!(global_inner_syncq = sq_alloc())) {
+		str_term_caches();
+		return (-ENOMEM);
+	}
+	if (!(global_outer_syncq = sq_alloc())) {
 		str_term_caches();
 		return (-ENOMEM);
 	}
@@ -5289,7 +5331,8 @@ strsched_exit(void)
 	term_freemblks();
 #endif
 #if defined CONFIG_STREAMS_SYNCQS
-	sq_put(&global_syncq);
+	sq_put(&global_inner_syncq);
+	sq_put(&global_outer_syncq);
 #endif
 	str_term_caches();
 }

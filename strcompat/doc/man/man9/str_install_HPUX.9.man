@@ -240,7 +240,9 @@ same as
 .RI \(lq "Uniprocessor Emulation" \(rq
 on some systems, and reduces the
 .I STREAMS
-executive to running on a single processor at a time.
+executive to running on a single processor at a time.  (But see
+.RI \(lq COMPATIBILITY \(rq,
+below.)
 .TP
 .B SQLVL_ELSEWHERE
 Module group level synchronization.
@@ -400,6 +402,42 @@ structure are compatible with
 .[
 usldk
 .]
+.IP \(em
+When this registration function is used, specifying
+.B SQLVL_GLOBAL
+has the expected effect as under
+.IR HPUX \(rg.
+.[
+hpuxspg
+.]
+That is, only drivers and modules that have specified
+.B SQLVL_GLOBAL
+will be single threaded as a group.  Under
+.B @PACKAGE_TITLE@
+this is the same as
+.B SQLVL_ELSEWHERE
+with a
+.I inst_sysc_info
+value of
+.RB \(lq global \(rq.
+.IP \(em
+The queue open and close routines are syncrhonized differently under
+.IR HPUX \(rg.
+.[
+hpuxspg
+.]
+When this registration function is used, open and close routines are
+synchronized exclusive at a global outer perimeter.  That is, only one open or
+close routine will be allowed to execute within a synchronized driver or
+module in the entire system.
+Because of this strict syncrhonization, open or close routines that sleep
+during the routine will have to use the
+.BR streams_get_sleep_lock "(9) and " streams_mpsleep (9)
+versions of the sleeping functions.  Note that
+.BR SV_WAIT "(9) and " SV_WAIT_SIG (9)
+may not be used; however,
+.BR qwait "(9) and " qwait_sig (9)
+may be used.
 .IP \(em
 The flag
 .B STR_SYSV4_OPEN

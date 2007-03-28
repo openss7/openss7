@@ -1,3 +1,11 @@
+2007-03-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man9/str_install_HPUX.9.man: cleaning up syncrhonization
+	* src/kernel/aixcompat.c: cleaning up syncrhonization
+	* src/kernel/hpuxcompat.c: cleaning up syncrhonization
+	* src/kernel/liscompat.c: cleaning up syncrhonization
+	* src/kernel/osfcompat.c: cleaning up syncrhonization
+
 2007-03-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: support for 2.6.20-1.2307.fc5

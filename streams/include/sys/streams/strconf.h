@@ -99,7 +99,9 @@ typedef enum {
 	SQLVL_QUEUEPAIR = 4,		/* queue pair level */
 	SQLVL_QUEUE = 5,		/* queue level */
 	SQLVL_NOP = 6,			/* no synchronization */
+	SQLVL_NOSYNC = 6,		/* HPUX has a different name */
 	SQLVL_PERSTREAM = 7,		/* per-stream synchronization */
+	SQLVL_SPLITMODULE = 8,		/* split module level (MacOT) */
 } sqlvl_t;
 
 __STREAMS_EXTERN int register_strnod(struct cdevsw *cdev, struct devnode *cmin, minor_t minor);

@@ -163,6 +163,7 @@ BIG_STATIC struct syncq *streams_fastcall sq_locate(const char *sq_info);
 BIG_STATIC struct syncq *streams_fastcall sq_alloc(void);
 BIG_STATIC struct syncq *streams_fastcall sq_get(struct syncq *sq);
 BIG_STATIC void streams_fastcall sq_put(struct syncq **sqp);
+BIG_STATIC void streams_fastcall sq_release(struct syncq **sqp);
 #endif
 
 /* freeing chains of message blocks */

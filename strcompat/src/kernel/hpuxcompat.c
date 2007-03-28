@@ -213,24 +213,37 @@ str_install_HPUX(struct stream_inst *inst)
 		case SQLVL_NOP:
 			cdev->d_flag |= D_MP;
 			break;
+			/* Note that HPUX does not allow more than one thread in _any_ open or
+			   close procedure.  We signal this to the LFS registration function by
+			   setting D_MTOCEXCL without setting D_MTOUTPERIM when synchronization is
+			   beneath a module and by setting D_MTOCEXCL without setting D_MTOUTPERIM
+			   when sycncrhonization is at the module or above. */
 		case SQLVL_QUEUE:
-			cdev->d_flag |= D_MTPERQ;
+			cdev->d_flag |= D_MTPERQ | D_MTOCEXCL;
 			break;
 		case SQLVL_QUEUEPAIR:
-			cdev->d_flag |= D_MTQPAIR;
+			cdev->d_flag |= D_MTQPAIR | D_MTOCEXCL;
 			break;
+		case SQLVL_DEFAULT:
+			cdev->d_sqlvl = SQLVL_MODULE;
 		case SQLVL_MODULE:
-			cdev->d_flag |= D_MTPERMOD;
+			cdev->d_flag |= D_MTPERMOD | D_MTOCEXCL;
 			break;
 		case SQLVL_ELSEWHERE:
+			cdev->d_flag |= D_MTOCEXCL;
 			cdev->d_sqinfo = inst->inst_sync_info;
 			break;
 		case SQLVL_GLOBAL:
-			/* can't really support this, but its only used for debug anyway */
+			/* Note that the HPUX SQLVL_GLOBAL only guarantees one thread within
+			   modules also set to SQLVL_GLOBAL in stark contrast to descriptions for
+			   AIX.  This is really SQLVL_ELSEWHERE with a well-known common barrier. */
+			cdev->d_flag |= D_MTOCEXCL;
+			cdev->d_sqinfo = "global";
+			cdev->d_sqlvl = SQLVL_ELSEWHERE;
 			break;
-		case SQLVL_DEFAULT:
-			cdev->d_flag |= D_MTPERMOD;
-			break;
+		default:
+			kmem_free(cdev, sizeof(*cdev));
+			return (EINVAL);
 		}
 		if ((err = register_strdev(cdev, inst->inst_major)) < 0) {
 			kmem_free(cdev, sizeof(*cdev));
@@ -257,24 +270,37 @@ str_install_HPUX(struct stream_inst *inst)
 		case SQLVL_NOP:
 			fmod->f_flag |= D_MP;
 			break;
+			/* Note that HPUX does not allow more than one thread in _any_ open or
+			   close procedure.  We signal this to the LFS registration function by
+			   setting D_MTOCEXCL without setting D_MTOUTPERIM when synchronization is
+			   beneath a module and by setting D_MTOCEXCL without setting D_MTOUTPERIM
+			   when sycncrhonization is at the module or above. */
 		case SQLVL_QUEUE:
-			fmod->f_flag |= D_MTPERQ;
+			fmod->f_flag |= D_MTPERQ | D_MTOCEXCL;
 			break;
 		case SQLVL_QUEUEPAIR:
-			fmod->f_flag |= D_MTQPAIR;
+			fmod->f_flag |= D_MTQPAIR | D_MTOCEXCL;
 			break;
+		case SQLVL_DEFAULT:
+			fmod->f_sqlvl = SQLVL_MODULE;
 		case SQLVL_MODULE:
-			fmod->f_flag |= D_MTPERMOD;
+			fmod->f_flag |= D_MTPERMOD | D_MTOCEXCL;
 			break;
 		case SQLVL_ELSEWHERE:
+			fmod->f_flag |= D_MTOCEXCL;
 			fmod->f_sqinfo = inst->inst_sync_info;
 			break;
 		case SQLVL_GLOBAL:
-			/* can't really support this, but its only used for debug anyway */
+			/* Note that the HPUX SQLVL_GLOBAL only guarantees one thread within
+			   modules also set to SQLVL_GLOBAL in stark contrast to descriptions for
+			   AIX.  This is really SQLVL_ELSEWHERE with a well-known common barrier. */
+			fmod->f_flag |= D_MTOCEXCL;
+			fmod->f_sqinfo = "global";
+			fmod->f_sqlvl = SQLVL_ELSEWHERE;
 			break;
-		case SQLVL_DEFAULT:
-			fmod->f_flag |= D_MTPERMOD;
-			break;
+		default:
+			kmem_free(fmod, sizeof(*fmod));
+			return (EINVAL);
 		}
 		if ((err = register_strmod(fmod)) < 0) {
 			kmem_free(fmod, sizeof(*fmod));

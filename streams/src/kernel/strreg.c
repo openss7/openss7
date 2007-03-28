@@ -94,7 +94,7 @@ static char const ident[] =
 #include "sys/config.h"
 #include "src/modules/sth.h"	/* for stream operations */
 #include "src/kernel/strsched.h"	/* for sq_alloc */
-#include "src/kernel/strutil.h"	/* for global_syncq */
+#include "src/kernel/strutil.h"	/* for global_inner_syncq */
 #include "src/kernel/strlookup.h"	/* cdevsw_list, etc. */
 #include "src/kernel/strreg.h"	/* extern verification */
 /* 
@@ -110,6 +110,7 @@ register_strsync(struct fmodsw *fmod)
 {
 #if defined CONFIG_STREAMS_SYNCQS
 	int sqlvl = SQLVL_DEFAULT;
+	struct syncq *sq;
 
 	/* propagate flags to f_sqlvl */
 	if (fmod->f_sqlvl == SQLVL_DEFAULT) {
@@ -135,55 +136,92 @@ register_strsync(struct fmodsw *fmod)
 			return (-EINVAL);
 		}
 		if (!fmod->f_syncq) {
-			struct syncq *sq;
-
 			if (!(sq = sq_alloc()))
 				return (-ENOMEM);
-			sq->sq_level = sqlvl;
+			sq->sq_level = SQLVL_MODULE;
 			sq->sq_flag = SQ_OUTER | ((fmod->f_flag & D_MTOCEXCL) ? SQ_EXCLUS : 0);
 			fmod->f_syncq = sq;
 		}
 	} else {
 		switch (sqlvl) {
+		case SQLVL_NOP:
+			break;
+		case SQLVL_QUEUE:
+		case SQLVL_QUEUEPAIR:
+			/* Note that HPUX registration function sets D_MTOCEXCL without setting
+			   D_MTOUTPERIM meaning that a global outer perimeter exists. */
+			if (fmod->f_flag & D_MTOCEXCL) {
+				if (!(sq = sq_get(fmod->f_syncq))) {
+					if (!(sq = sq_get(global_outer_syncq))) {
+						if (!(sq = sq_alloc()))
+							return (-ENOMEM);
+						/* Note that the global outer synchronization queue 
+						   will exist until STREAMS is unloaded. */
+						sq->sq_level = SQLVL_GLOBAL;
+						sq->sq_flag = SQ_OUTER | SQ_EXCLUS;
+						global_outer_syncq = sq_get(sq);
+					}
+					fmod->f_syncq = sq;
+				}
+			}
+			break;
 		case SQLVL_DEFAULT:
 		case SQLVL_MODULE:	/* default */
-			if (!fmod->f_syncq) {
-				struct syncq *sq;
-
+			if (!(sq = sq_get(fmod->f_syncq))) {
 				if (!(sq = sq_alloc()))
 					return (-ENOMEM);
 				sq->sq_level = sqlvl;
-				sq->sq_flag = (SQ_OUTER | SQ_EXCLUS);
+				sq->sq_flag = SQ_INNER |
+				    ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
 				fmod->f_syncq = sq;
 			}
-			break;
+			goto get_outer;
 		case SQLVL_ELSEWHERE:
-			if (!fmod->f_syncq) {
-				struct syncq *sq;
-
+			if (!(sq = sq_get(fmod->f_syncq))) {
 				if (!(sq = sq_locate(fmod->f_sqinfo)))
 					return (-ENOMEM);
 				sq->sq_level = sqlvl;
-				sq->sq_flag = (SQ_OUTER | SQ_EXCLUS);
+				sq->sq_flag = SQ_INNER |
+				    ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
 				fmod->f_syncq = sq;
+			}
+		      get_outer:
+			/* Note that HPUX registration function sets D_MTOCEXCL without setting
+			   D_MTOUTPERIM meaning that a global outer perimeter exists. */
+			if (fmod->f_flag & D_MTOCEXCL) {
+				if (!(sq = fmod->f_syncq->sq_outer)) {
+					if (!(sq = sq_get(global_outer_syncq))) {
+						if (!(sq = sq_alloc())) {
+							sq_release(&fmod->f_syncq);
+							return (-ENOMEM);
+						}
+						/* Note that the global outer synchronization queue 
+						   will exist until STREAMS is unloaded. */
+						sq->sq_level = SQLVL_GLOBAL;
+						sq->sq_flag = SQ_OUTER | SQ_EXCLUS;
+						global_outer_syncq = sq_get(sq);
+					}
+					fmod->f_syncq->sq_outer = sq;
+				}
 			}
 			break;
 		case SQLVL_GLOBAL:	/* for testing */
-			if (!fmod->f_syncq) {
-				struct syncq *sq;
-
-				if (!(sq = sq_get(global_syncq))) {
+			if (!(sq = sq_get(fmod->f_syncq))) {
+				if (!(sq = sq_get(global_inner_syncq))) {
 					if (!(sq = sq_alloc()))
 						return (-ENOMEM);
-					/* Note that the global synchronization queue will exist
-					   until STREAMS is unloaded. */
+					/* Note that the global inner synchronization queue will
+					   exist until STREAMS is unloaded. */
 					sq->sq_level = sqlvl;
-					sq->sq_flag = (SQ_OUTER | SQ_EXCLUS);
-					global_syncq = sq_get(sq);
+					sq->sq_flag = SQ_INNER |
+					    ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
+					global_inner_syncq = sq_get(sq);
 				}
 				fmod->f_syncq = sq;
 			}
 			break;
+		default:
+			return (-EINVAL);
 		}
 	}
 	fmod->f_sqlvl = sqlvl;
@@ -197,8 +235,8 @@ streams_fastcall void
 unregister_strsync(struct fmodsw *fmod)
 {
 #if defined CONFIG_STREAMS_SYNCQS
-	/* always delete if it exists */
-	sq_put(&fmod->f_syncq);
+	/* always release if it exists */
+	sq_release(&fmod->f_syncq);
 #endif
 }
 

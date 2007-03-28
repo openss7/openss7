@@ -203,12 +203,18 @@ str_install_AIX(int cmd, strconf_t * sc)
 			case SQLVL_NOP:
 				cdev->d_flag |= D_MP;
 				break;
+				/* Note that because AIX supports mps_become_writer(), that it must 
+				   have an outer perimeter when SQLVL_QUEUE or SQLVL_QUEUEPAIR is
+				   set.  mps_become_writer() is like qwriter() for the outer
+				   perimeter. */
 			case SQLVL_QUEUE:
-				cdev->d_flag |= D_MTPERQ;
+				cdev->d_flag |= D_MTPERQ | D_MTOUTPERIM;
 				break;
 			case SQLVL_QUEUEPAIR:
-				cdev->d_flag |= D_MTQPAIR;
+				cdev->d_flag |= D_MTQPAIR | D_MTOUTPERIM;
 				break;
+			case SQLVL_DEFAULT:
+				cdev->d_sqlvl = SQLVL_MODULE;
 			case SQLVL_MODULE:
 				cdev->d_flag |= D_MTPERMOD;
 				break;
@@ -216,10 +222,8 @@ str_install_AIX(int cmd, strconf_t * sc)
 				cdev->d_sqinfo = sc->sc_sqinfo;
 				break;
 			case SQLVL_GLOBAL:
-				/* can't really support this, but its only used for debug anyway */
-				break;
-			case SQLVL_DEFAULT:
-				cdev->d_flag |= D_MTPERMOD;
+				/* This is true global synchronization, reducing all modules
+				   performing sycnrhonization to single threaded. */
 				break;
 			}
 			if ((err = register_strdev(cdev, sc->sc_major)) < 0)
@@ -299,12 +303,18 @@ str_install_AIX(int cmd, strconf_t * sc)
 			case SQLVL_NOP:
 				fmod->f_flag |= D_MP;
 				break;
+				/* Note that because AIX supports mps_become_writer(), that it must 
+				   have an outer perimeter when SQLVL_QUEUE or SQLVL_QUEUEPAIR is
+				   set.  mps_become_writer() is like qwriter() for the outer
+				   perimeter. */
 			case SQLVL_QUEUE:
-				fmod->f_flag |= D_MTPERQ;
+				fmod->f_flag |= D_MTPERQ | D_MTOUTPERIM;
 				break;
 			case SQLVL_QUEUEPAIR:
-				fmod->f_flag |= D_MTQPAIR;
+				fmod->f_flag |= D_MTQPAIR | D_MTOUTPERIM;
 				break;
+			case SQLVL_DEFAULT:
+				fmod->f_sqlvl = SQLVL_MODULE;
 			case SQLVL_MODULE:
 				fmod->f_flag |= D_MTPERMOD;
 				break;
@@ -312,10 +322,8 @@ str_install_AIX(int cmd, strconf_t * sc)
 				fmod->f_sqinfo = sc->sc_sqinfo;
 				break;
 			case SQLVL_GLOBAL:
-				/* can't really support this, but its only used for debug anyway */
-				break;
-			case SQLVL_DEFAULT:
-				fmod->f_flag |= D_MTPERMOD;
+				/* This is true global synchronization, reducing all modules
+				   performing sycnrhonization to single threaded. */
 				break;
 			}
 			if ((err = register_strmod(fmod)) < 0)

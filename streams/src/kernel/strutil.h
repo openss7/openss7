@@ -76,7 +76,8 @@
 #endif
 
 /* global synchq */
-extern struct syncq *global_syncq;
+extern struct syncq *global_inner_syncq;
+extern struct syncq *global_outer_syncq;
 
 #if 0
 extern bool __rmvq(queue_t *q, mblk_t *mp);
