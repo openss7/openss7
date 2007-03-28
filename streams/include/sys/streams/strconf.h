@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.24 2007/03/25 00:52:43 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.25 2007/03/28 13:44:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:43 $ by $Author: brian $
+ Last Modified $Date: 2007/03/28 13:44:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strconf.h,v $
+ Revision 0.9.2.25  2007/03/28 13:44:15  brian
+ - updates to syncrhonization, release notes and documentation
+
  Revision 0.9.2.24  2007/03/25 00:52:43  brian
  - synchronization updates
 
@@ -60,7 +63,7 @@
 #ifndef __SYS_STREAMS_STRCONF_H__
 #define __SYS_STREAMS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.24 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.25 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do no include sys/streams/strconf.h directly, include sys/strconf.h instead."

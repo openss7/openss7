@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/13 06:17:15 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/28 13:44:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/13 06:17:15 $ by $Author: brian $
+# Last Modified $Date: 2007/03/28 13:44:16 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.7  2007/03/28 13:44:16  brian
+# - updates to syncrhonization, release notes and documentation
+#
 # Revision 0.9.2.6  2007/03/13 06:17:15  brian
 # - suppress errors when building 32-bit libs
 #
