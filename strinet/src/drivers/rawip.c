@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:01:31 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/29 12:10:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:01:31 $ by $Author: brian $
+ Last Modified $Date: 2007/03/29 12:10:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.45  2007/03/29 12:10:42  brian
+ - add T_SNDZERO for UDP and RAWIP per XNS 5.2
+
  Revision 0.9.2.44  2007/03/25 19:01:31  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -203,10 +206,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:01:31 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/29 12:10:42 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:01:31 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/29 12:10:42 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -287,7 +290,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/03/25 19:01:31 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/29 12:10:42 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -8729,7 +8732,7 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 		tp->info.TIDU_size = 65535 - sizeof(struct iphdr);
 		tp->info.SERV_type = type ? : T_CLTS;
 		tp->info.CURRENT_state = TS_UNBND;
-		tp->info.PROVIDER_flag = T_XPG4_1 & ~T_SNDZERO;
+		tp->info.PROVIDER_flag = T_XPG4_1 | T_SNDZERO;
 		bufq_init(&tp->conq);
 		/* option defaults */
 		tp->options.xti.linger = xti_default_linger;

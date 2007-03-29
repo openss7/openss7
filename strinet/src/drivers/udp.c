@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/03/25 19:01:33 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/03/29 12:10:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:01:33 $ by $Author: brian $
+ Last Modified $Date: 2007/03/29 12:10:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.56  2007/03/29 12:10:46  brian
+ - add T_SNDZERO for UDP and RAWIP per XNS 5.2
+
  Revision 0.9.2.55  2007/03/25 19:01:33  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -236,10 +239,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/03/25 19:01:33 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/03/29 12:10:46 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/03/25 19:01:33 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/03/29 12:10:46 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -321,7 +324,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/03/25 19:01:33 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/03/29 12:10:46 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -9100,7 +9103,7 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 		tp->info.TIDU_size = 65535 - sizeof(struct iphdr) - sizeof(struct udphdr);
 		tp->info.SERV_type = type ? : T_CLTS;
 		tp->info.CURRENT_state = TS_UNBND;
-		tp->info.PROVIDER_flag = T_XPG4_1 & ~T_SNDZERO;
+		tp->info.PROVIDER_flag = T_XPG4_1 | T_SNDZERO;
 		bufq_init(&tp->conq);
 		/* option defaults */
 		tp->options.xti.linger = xti_default_linger;
