@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/04 19:45:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/30 15:15:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 19:45:53 $ by $Author: brian $
+# Last Modified $Date: 2007/03/30 15:15:38 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.27  2007/03/30 15:15:38  brian
+# - added missing manpages
+#
 # Revision 0.9.2.26  2007/03/04 19:45:53  brian
 # - added missing manpages, removed duplicates
 #
@@ -778,6 +781,8 @@ lis_compat_pages = \
 	man9/lis_qprocson.9 \
 	man9/lis_qsize.9 \
 	man9/lis_queue_name.9 \
+	man9/lis_register_driver_qlock_option.9 \
+	man9/lis_register_module_qlock_option.9 \
 	man9/lis_register_strdev.9 \
 	man9/lis_register_strmod.9 \
 	man9/lis_release_region.9 \
@@ -1851,6 +1856,8 @@ dist_noinst_lis_compat_pages = \
 	man9/lis_qprocson.9.man \
 	man9/lis_qsize.9.man \
 	man9/lis_queue_name.9.man \
+	man9/lis_register_driver_qlock_option.9.man \
+	man9/lis_register_module_qlock_option.9.man \
 	man9/lis_register_strdev.9.man \
 	man9/lis_register_strmod.9.man \
 	man9/lis_release_region.9.man \
