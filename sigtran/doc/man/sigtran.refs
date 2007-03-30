@@ -345,7 +345,7 @@ Part 1: Protocol Specification
 %I European Telecommunications Standards Institute
 %U http://www.etsi.org/
 
-%K isupv4-1
+%K isupv41
 %L ISUPv4-1
 %A ETSI
 %R ETSI EN 300 356-1-V4.2.1 (2001-07)
@@ -546,7 +546,7 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2ua-09.txt
 
-%K m2uaig04
+%K m3uaig04
 %L M3UAIG04
 %A Javier Pastor
 %A Ken Morneault
@@ -559,7 +559,7 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-3ua-implementors-guide-04.txt
 
-%K m2uaig03
+%K m3uaig03
 %L M3UAIG03
 %A Javier Pastor
 %A Ken Morneault
@@ -1058,7 +1058,7 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-bidulock-sigtran-tua-01.txt
 
-%K tua-00
+%K tua00
 %L TUA00
 %A Brian Bidulock
 %E Brian Bidulock
@@ -1215,7 +1215,7 @@ Part 1: Protocol Specification
 %U http://www.ietf.org/rfc/rfc3807.txt
 %O (Updates RFC 3057)
 
-%K v5ua-03
+%K v5ua03
 %L V5UA03
 %A Eva Weilandt
 %A Neeraj Khanchandani
@@ -1228,7 +1228,7 @@ Part 1: Protocol Specification
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-v5ua-03.txt
 
-%K v5ua-01
+%K v5ua01
 %L V5UA01
 %A Eva Weilandt
 %A Neeraj Khanchandani
@@ -3665,12 +3665,22 @@ Part 1: Protocol Specification
 %C Mountainview, California
 %U http://techpubs.sgi.com/
 
-%L HPUXSPG
+%L HPUXDDI
 %R STREAMS/UX
-%K hpuxspg
+%K hpuxddi
 %T STREAMS/UX for the HP 9000 Reference Manual
 %D 1995
 %Q Hewlett-Packard Company
+%I HP
+%C Palo Alto, California
+%U http://docs.hp.com/
+
+%L HPUXSPG
+%R HP-UX STREAMS
+%K hpuxspg
+%T STREAMS Programmer's Guide -- HP 9000 and Integrity Server Computer Systems
+%D October 2005
+%Q Hewlett-Packard Development Company L.P.
 %I HP
 %C Palo Alto, California
 %U http://docs.hp.com/
@@ -3743,6 +3753,16 @@ Part 1: Protocol Specification
 %D 1997
 %Q Fujitsu Limited
 %I Fujitsu
+
+%L VXWSPG
+%R VxWorks\(rg 5.4 Tornado\(tm II
+%K vxwspg
+%T WindNet STREAMS for Tornado, Component Release Supplement
+%D 1998
+%Q Wind River Systems, Inc.
+%I Wind River
+%C Almeda, California
+%U http://www.windriver.com/
 
 %L XSTRAPG
 %R xSTRa
@@ -3840,7 +3860,7 @@ Part 1: Protocol Specification
 %Q Fujitsu Limited
 %I Fujitsu
 
-%K sctp-mib-10
+%K sctpmib10
 %L SCTPMIB10
 %A Javier Pastor-Balbas
 %A Maria-Carmen Belinchon
@@ -3853,7 +3873,7 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-sctp-mib-10.txt
 
-%K prsctp-00
+%K prsctp00
 %L PRSCTP00
 %A Randall R. Stewart
 %A Michael A. Ramalho
@@ -3869,7 +3889,7 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-prsctp-00.txt
 
-%K addip-07
+%K addip07
 %L ADDIP07
 %A Randall R. Stewart
 %A Michael A. Ramalho
@@ -3886,7 +3906,7 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-addip-sctp-07.txt
 
-%K addip-08
+%K addip08
 %L ADDIP08
 %A Randall R. Stewart
 %A Michael A. Ramalho
@@ -3903,7 +3923,7 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-addip-sctp-08.txt
 
-%K sctpig-08
+%K sctpig08
 %L SCTPIG08
 %A Randall R. Stewart
 %A Lyndon Ong
@@ -3921,7 +3941,7 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-08.txt
 
-%K sctpig-10
+%K sctpig10
 %L SCTPIG10
 %A Randall R. Stewart
 %A Ivan Arias-Rodriguez
@@ -3937,7 +3957,7 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %U http://www.ietf.org/internet-drafts/draft-ietf-tsvwg-sctpimpguide-10.txt
 
-%K sctpsock-07
+%K sctpsock07
 %L SCTPSOCK07
 %A Randall R. Stewart
 %A Qiaobing Xie
@@ -4015,7 +4035,7 @@ Part 1: Protocol Specification
 %R LIS 2.18
 %A OpenSS7
 %Q OpenSS7
-%T Linux STREAMS (LiS) 2.18.4 Source Code
+%T Linux STREAMS (LiS) 2.18.6 Source Code
 %E Brian Bidulock
 %I OpenSS7 Corporation
 %U http://www.openss7.org/
@@ -4025,7 +4045,7 @@ Part 1: Protocol Specification
 %R streams-0.9.2
 %A OpenSS7
 %Q OpenSS7
-%T Linux Fast-STREAMS (LfS) 0.9.2.1 Source Code
+%T Linux Fast-STREAMS (LfS) 0.9.2 Source Code
 %E Brian Bidulock
 %I OpenSS7 Corporation
 %U http://www.openss7.org/
@@ -4807,7 +4827,7 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2078.txt
 
-%K GSS-API
+%K GSSAPI
 %K rfc2743
 %L RFC2743
 %R RFC 2743
@@ -6014,7 +6034,7 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3361.txt
 
-%K SIPT-RFC
+%K SIPTRFC
 %K rfc3372
 %K bcp63
 %L BCP 63
@@ -6175,7 +6195,7 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3758.txt
 
-%K SCTP-MIB
+%K SCTPMIB
 %K rfc3873
 %L RFC3873
 %R RFC 3873
