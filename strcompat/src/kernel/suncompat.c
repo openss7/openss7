@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/02 10:04:08 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/30 11:59:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/02 10:04:08 $ by $Author: brian $
+ Last Modified $Date: 2007/03/30 11:59:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: suncompat.c,v $
+ Revision 0.9.2.32  2007/03/30 11:59:24  brian
+ - heavy rework of MP syncrhonization
+
  Revision 0.9.2.31  2007/03/02 10:04:08  brian
  - updates to common build process and versions for all exported symbols
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/02 10:04:08 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/30 11:59:24 $"
 
-static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/02 10:04:08 $";
+static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/30 11:59:24 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -81,7 +84,7 @@ static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/03/02 10:04:08 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/30 11:59:24 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -121,11 +124,13 @@ qwait(queue_t *rq)
 	struct queinfo *qu = (typeof(qu)) rq;
 
 	DECLARE_WAITQUEUE(wait, current);
-	assert(!in_interrupt());
+	dassert(!in_interrupt());
 	ensure(!test_bit(QHLIST_BIT, &rq->q_flag), qprocson(rq));
 	add_wait_queue(&qu->qu_qwait, &wait);
 	set_current_state(TASK_UNINTERRUPTIBLE);
-	schedule();
+
+	streams_schedule();
+
 	set_current_state(TASK_RUNNING);
 	remove_wait_queue(&qu->qu_qwait, &wait);
 }
@@ -141,20 +146,21 @@ EXPORT_SYMBOL(qwait);		/* sun/ddi.h */
 int
 qwait_sig(queue_t *rq)
 {
-	int ret = 0;
 	struct queinfo *qu = (typeof(qu)) rq;
+	bool interrupted;
 
 	DECLARE_WAITQUEUE(wait, current);
-	assert(!in_interrupt());
+	dassert(!in_interrupt());
 	ensure(!test_bit(QHLIST_BIT, &rq->q_flag), qprocson(rq));
 	add_wait_queue(&qu->qu_qwait, &wait);
-	set_current_state(TASK_INTERRUPTIBLE);
-	schedule();
-	if (signal_pending(current))
-		ret = 1;
+	set_current_state(TASK_UNINTERRUPTIBLE);
+
+	streams_schedule();
+	interrupted = (signal_pending(current) != 0);
+
 	set_current_state(TASK_RUNNING);
 	remove_wait_queue(&qu->qu_qwait, &wait);
-	return (ret);
+	return (interrupted ? 1 : 0);
 }
 
 EXPORT_SYMBOL(qwait_sig);	/* sun/ddi.h */

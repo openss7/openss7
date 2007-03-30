@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2007/03/28 13:44:17 $
+ @(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2007/03/30 11:59:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/28 13:44:17 $ by $Author: brian $
+ Last Modified $Date: 2007/03/30 11:59:11 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2007/03/28 13:44:17 $"
+#ident "@(#) $RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2007/03/30 11:59:11 $"
 
 static char const ident[] =
-    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2007/03/28 13:44:17 $";
+    "$RCSfile: strreg.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2007/03/30 11:59:11 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -243,6 +243,17 @@ register_strsync(struct fmodsw *fmod)
 		}
 	}
 	fmod->f_sqlvl = sqlvl;
+#endif
+#if !defined CONFIG_STREAMS_SYNCQS
+	/* If there is no synchonization support compiled in, simply refuse to load modules or
+	   drivers that are not specified as fully MP-safe.  But for LiS style registration, permit 
+	   it.  This is because of the broken registration procedures of LiS. */
+	if (fmod->f_sqlvl == SQLVL_DEFAULT) {
+		if (fmod->f_flag & D_MP)
+			fmod->f_sqlvl = SQLVL_NOP;
+	}
+	if (!(fmod->f_flag & (D_MP | D_LIS)) && fmod->f_sqlvl != SQLVL_NOP)
+		return (-ENOSYS);
 #endif
 	return (0);
 }

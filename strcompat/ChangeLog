@@ -1,3 +1,21 @@
+2007-03-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strcompat.refs: added VxWorks documentation reference
+	* doc/man/man9/SV_WAIT.9.man: documentation updates
+	* doc/man/man9/hpuxcompat.9.man: documentation updates
+	* doc/man/man9/irixcompat.9.man: documentation updates
+	* doc/man/man9/mpscompat.9.man: documentation updates
+	* doc/man/man9/qwait.9.man: documentation updates
+	* doc/man/man9/sleep.9.man: documentation updates
+	* src/include/sys/svr4/ddi.h: move SV_WAIT and SV_WAIT_SIG to compat file
+	* src/kernel/aixcompat.c: handle STR_QSAFETY and STR_Q_NOTTOSPEC flags
+	* src/kernel/suncompat.c: rework qwait() and qwait_sig() to leave barriers
+	* src/kernel/svr4compat.c: SV_WAIT(_SIG) must leave barriers, also
+	  corrected locking: these functions must leave the lock unlocked on
+	  exit
+	* doc/man/man9/GetOTInstallInfo.9.man: added manual page
+	* doc/man/man9/vxwcompat.9.man: added manual page
+
 2007-03-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/str_install_HPUX.9.man: updated syncrhonization

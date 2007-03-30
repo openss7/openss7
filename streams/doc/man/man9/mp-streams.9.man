@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mp-streams.9.man,v 0.9.2.28 2007/03/28 13:44:12 brian Exp $
+.\" @(#) $Id: mp-streams.9.man,v 0.9.2.29 2007/03/30 11:59:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/28 13:44:12 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/30 11:59:08 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mp-streams.9.man,v $
+.\" Revision 0.9.2.29  2007/03/30 11:59:08  brian
+.\" - heavy rework of MP syncrhonization
+.\"
 .\" Revision 0.9.2.28  2007/03/28 13:44:12  brian
 .\" - updates to syncrhonization, release notes and documentation
 .\"
@@ -133,11 +136,190 @@ svr4
 also provide a synchronization framework based on perimeters for compatibility
 with the
 .IR Solaris \(rg
-implementation of
-.IR STREAMS .
 .[
 solspg
 .]
+implementation of
+.IR STREAMS .
+.B @PACKAGE_TITLE@
+also provides a synchronization frameworks based on syncrhonization level for
+compatibility with the
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR HPUX \(rg,
+.[
+hpuxspg
+.]
+.IR VxWorks \(rg,
+.[
+vxwspg
+.]
+implementations of
+.IR STREAMS ,
+and other implementations based on the
+.I Mentat Portable Streams
+model.
+.PP
+There are three prevalent models for synchronization in
+.IR STREAMS :
+.IP (1) \w'(0)\(em'u
+The
+.I SVR 4.2 MP STREAMS
+model.
+This is the model followed by
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+.IR SUPER/UX \(rg,
+.[
+suxspg
+.]
+.IR UXP/V \(rg,
+.[
+uxpspg
+.]
+.IR IRIX \(rg,
+.[
+irixspg
+.]
+and other implementations based on the classical
+.I SVR 4.2 MP
+implementation.
+.IP ""
+Under this model, each module or driver exports a
+.IB pfx devflag
+flags variable that either contains the
+.B D_MP
+flag, or does not contain the
+.B D_MP
+flag.
+On a symmetrical multiprocessor system,
+.I STREAMS
+drivers and modules that do not advertise the
+.B D_MP
+flag in their
+.IB pfx devflags
+variable, that load on a UP system, simply refuse to load on an MP system.
+.IP (2)
+The
+.I OSF/1 STREAMS
+model.
+This is the model followed by
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR HPUX \(rg,
+.[
+hpuxspg
+.]
+.IR MacOT \(rg,
+.[
+macspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR VxWorks \(rg,
+.[
+vxwspg
+.]
+and to some degree
+.IR "LiS 2.18" ,
+.[
+lis
+.]
+and other implementations based on the neo-classical
+.I Mentat Portable Streams
+implementation.
+.IP ""
+Under this model, each module or driver registers with the
+.I STREAMS
+executive and advertises a
+.B STR_MPSAFE
+flag when they are fully MP-SAFE, and do not advertise the flag when they are
+not.  Drivers and modules may also select one of a number of syncrhonization levels.
+Drivers and modules that are not MP-SAFE (do not advertise the
+.B STR_MPSAFE
+flag) and do not specify a sychronization level will by default be run at
+per-module synchronization.  (Per-module syncrhonization provides the most
+appropriate protection for drivers or modules written to UP specifications,
+yet following SVR 4.2 STREAMS programming guidelines.)
+.IP (3)
+The
+.I Solaris STREAMS
+model.
+This is the model followed by
+.IR Solaris \(rg.
+.[
+solspg
+.]
+.IP ""
+Under this model, each module or driver registers with the
+.I STREAMS
+executive and advertises a
+.B D_MP
+flag when they are fully MP-SAFE, and do not advertise the flag when they are
+not.  Drivers and modules may also select from a number of syncrhonization
+perimeter features using additional flags.  Drivers and modules that are not
+MP-SAFE (do not advertise the
+.B D_MP
+flag) and do not specify perimeter flags, will by default be run at per-module
+syncrhonization.
+Flags provide additional control over the behaviour of put procedures and
+open and close routines.
+.PP
+.B @PACKAGE_TITLE@
+provides a syncrhonization framework that supports all three models
+simultaneously in a single
+.I STREAMS
+executive.  This is accomplished by using syncrhonization queues that provides
+syncrhonization at barriers that threads of execution attempt to enter.
+.B @PACKAGE_TITLE@
+can have at most two barriers per module.  These barriers roughly correspond to
+.IR Solaris \(rg
+perimeters.  Each driver or module can have an outer barrier and an inner
+barrier.
+.PP
+Threads of execution predicated on a queue (put and service procedures, and
+functions behaving like a put or service procedure) must enter both barriers.
+Normally these procedures enter the outer barrier shared and the inner barrier
+exclusive; however, some
+.IR Solaris \(rg
+compatible controls can affect whether the inner barrier is entered shared or
+exclusive.  The
+.B D_MTPUTSHARED
+flag can cause put procedures (or functions behaving as a put procedure) to
+enter the inner barrier shared instead of exclusive.
+.PP
+Threads of execution not predicated on a queue (open and close routines)
+enter only the outer barrier.  Normally these procedures enter the outer
+barrier shared; however, some
+.IR Solaris \(rg
+compatible controls and
+.IR OSF/1 \(rg
+implementations specifics cause the outer barrier to be entered exclusive by
+these routines.
+.PP
+Registration functions specific to the emulated implementation provided by the
+.I STREAMS Compatibility Modules
+package
+.RB ( strcompat )
+.[
+strcompat
+.]
+handle the setting of barrier specifics for the flavor of the implementation
+automatically and the user is not required to understand the internals of the
+.B @PACKAGE_TITLE@
+implementation.
 .\"
 .SS Configuration
 .PP
@@ -146,19 +328,27 @@ Synchronization is specified by the module writer during configuration of a
 module.
 This is accomplished using flags and synchronization level definitions to the
 module installation or registration function.  For compatibility with other
-registration mechanisms based on
-.I SVR 4 MP
-.IR STREAMS ,
+.I STREAMS
+registration mechanisms,
 .B @PACKAGE_TITLE@
-provides the following flags and synchronization levels:
+provides both
+.I Solaris \(rg
+style syncrhonization flags and
+.I OSF/1 \(rg
+style configuration flags and synchronization levels.
 .\"
 .\"
 .PP
 .B Synchronization Flags
+.PP
+.B @PACKAGE_TITLE@
+provides the following
+.IR Solaris \(rg
+compatible syncrhonization flags:
 .TP
 .B D_MP
-Specifies that the module is MP-safe and observes a synchronization model
-specified by the following flags.
+Specifies that the module is MP-SAFE and does not require a synchronization model.
+Additional synchronization flags are ignored.
 The queue
 .IR qi_qopen (9),
 .IR qi_qclose (9),
@@ -168,12 +358,28 @@ and
 procedures, as well as asynchronous callbacks and call-outs of all kinds
 can run concurrent, particularly in a multiprocessor environment.
 Modules that set this flag must normally perform their own mutual exclusion or
-critical section protections, and all procedures must be fully MP-safe.
+critical section protections, and all procedures must be fully MP-SAFE (and
+reentrant).
 .IP ""
 Modules that do not specify
 .B D_MP
-are not MP-safe and will be run by default with synchronization at the module
+are not MP-SAFE and will be run by default with synchronization at the module
 level (single threaded).
+(For most systems supporting syncrhonization, the default level is at the
+level of the module,
+.BR SQLVL_MODULE ;
+however, note that
+.IR HPUX \(rg
+.[
+hpuxspg
+.]
+specifies that the default syncrhonization level is at the level of the queue
+pair,
+.BR SQLVL_QUEUEPAIR ;
+.IR "LiS 2.18" ,
+the level of the individual queue,
+.BR SQLVL_QUEUE .)
+
 .TP
 .B D_MTPERQ
 Specifies that the module has an inner perimeter and that synchronization at the
@@ -279,56 +485,72 @@ mechanism.
 .\"
 .PP
 .B Configuration Flags
+.PP
+.B @PACKAGE_TITLE@
+provides the following
+.IR OSF/1 \(rg
+(and derivative) compatible configuration flags:
 .TP
 .B STR_MPSAFE
 Same as the
 .B D_MP
 flag, above.
+When specified the module or driver is fully MP-SAFE and reentrant and
+additional synchronization is ignored.
 .TP
 .B STR_QSAFETY
 Specifies that interrupt-safe callbacks are required.
 .TP
 .B STR_PERSTREAM
-Specifies that the module agrees to per-Stream synchronization for non MP-safe
+Specifies that the module agrees to per-Stream synchronization for non MP-SAFE
 modules.
-.TP
-.B STR_Q_NOTTOSPEC
-Specifies that the module is not to specification and runs under a process
-context.  The module might sleep in its procedures.
-.PP
-Normally when modules are not MP-safe, the default is to use per-module synchronization for the
+.IP ""
+Normally when modules are not MP-SAFE, the default is to use per-module synchronization for the
 module (see
 .B SQLVL_DEFAULT
 below).  This means that only one thread is permitted into the entire module.  That is rather
-restrictive and can cause difficulties when MP-safe modules are in the Stream.  (MP-safe modules
+restrictive and can cause difficulties when MP-SAFE modules are in the Stream.  (MP-SAFE modules
 will run more aggressive and are likely to out-pace per-module synchronized modules, impairing the
 performance of all Streams in which the module is included.)
-.PP
-Another solution is to run each of the non-MP-safe module's Streams at per-Stream synchronization,
+.IP ""
+Another solution is to run each of the non-MP-SAFE module's Streams at per-Stream synchronization,
 where only a single thread is permitted per Stream, but multiple threads are permitted per module.
-Unfortunately, other MP-safe modules in the Stream must be prepared to accept this situation, as
+Unfortunately, other MP-SAFE modules in the Stream must be prepared to accept this situation, as
 they may be relying on a different synchronization model within their modules.  Setting the
 .B STR_PERSTREAM
-flag for a driver or module indicates that, regardless of whether the driver or module is MP-safe or
-not, that it accepts being run in per-Stream synchronization when a non-MP-safe driver or module is
-in the same Stream.  As a Stream is built up and includes a non-MP-safe module, if all of the
+flag for a driver or module indicates that, regardless of whether the driver or module is MP-SAFE or
+not, that it accepts being run in per-Stream synchronization when a non-MP-SAFE driver or module is
+in the same Stream.  As a Stream is built up and includes a non-MP-SAFE module, if all of the
 modules and driver on the Stream have the
 .B STR_PERSTREAM
 flag set, then the Stream will be run with per-Stream synchronization.  If any driver or module on
 the Stream does not have the
 .B STR_PERSTREAM
-flag set, the all non-MP-safe modules on the Stream (and any of their instances in other Streams)
+flag set, then all non-MP-SAFE modules on the Stream (and any of their instances in other Streams)
 will be forced to run in per-module synchronization.
+.TP
+.B STR_Q_NOTTOSPEC
+Specifies that the module is not to specification and runs under a process
+context.  The module might sleep in its procedures.
 .\"
 .\"
 .PP
 .B Synchronization Levels
 .TP
-.B SQLVL_NOP
+.BR SQLVL_NOP ", " SQLVL_NOSYNC
 Specifies that the module is run without synchronization.  All synchronous
 module entry points, call-outs and callbacks become asynchronous.  It is the
 module's responsibility to provide synchronization or serialization as
 required.
+(Note that
+.IR HPUX \(rg
+.[
+hpuxspg
+.]
+calls this option
+.B SQLVL_NOSYNC
+instead of
+.BR SQLVL_NOP .)
 .TP
 .B SQLVL_QUEUE
 Specifies that the module is run with synchronization at the queue.  Only one
@@ -362,13 +584,33 @@ Specifies that the module is run with synchronization at the module.  Only one
 thread of execution will be permitted within the module.  Where the module
 does not share data structures between modules, this has a similar effect to
 running on a UP system.
-This is the default and works best for non-MP-safe modules written in
+This is the default and works best for non-MP-SAFE modules written in
 accordances with
 .I STREAMS
 guidelines.
 This level is equivalent to the
 .B D_MTPERMOD
-flag, above.
+flag, above. (Except for
+.IR HPUX \(rg,
+.[
+hpuxspg
+.]
+where the default is equivalent to
+.BR SQLVL_QUEUEPAIR .)
+.TP
+.B SQLVL_SPLITMODULE
+Specifies that at most two threads are permitted inside the module: at most
+one thread executing a read-side queue procedure and at modst one thread
+executing a write-size queue procedure.  This syncrhonization level is
+specific to
+.IR MacOT \(rg,
+.[
+macspg
+.]
+and was invented to handle a specific problem with the implementation of
+.BR mps_become_writer (9)
+in that implementation.  No other operating system provides this
+syncrhonization level.
 .TP
 .B SQLVL_ELSEWHERE
 Specifies that the module is run with synchronization within a group of
@@ -453,9 +695,9 @@ and
 .IR qi_qclose (9)
 procedures, at soft interrupt other than STREAMS_SOFTIRQ and from within
 interrupt service routines)
-will never be synchronized with the
+will not be synchronized with the
 .I STREAMS
-framework.
+framework until they call a syncrhonous function.
 .PP
 .\"
 .SS "Asynchronous Callback Cancellation"
@@ -531,17 +773,40 @@ and
 can run concurrent with
 other synchronous entry points for the same Stream (once
 .BR qprocson (9)
+is called and before
+.BR qprocsoff (9)
 is called) and both synchronous and asynchronous callbacks.
 .IP \(bu
+Without syncrhonization,
 .IR qi_qopen (9)
 and
 .IR qi_qclose (9),
-can, however, run concurrent with any synchronous entry point
+can run concurrent with any synchronous entry point
 .RI ( qi_qopen (9),
 .IR qi_qclose (9)
 .IR qi_putp (9),
 .IR qi_srvp (9)),
 synchronous or asynchronous callback function, belonging to a separate Stream.
+.IP \(bu
+With syncrhonization, when the syncrhonization level is at the level of the
+module or greater, only one thread will be permitted in
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+routines in the same manner as
+.IR qi_putp (9)
+or
+.IR qi_srvp (9)
+procedures.  However, when the syncrhonization level is at the level of a
+queue pair or individual queue, syncrhonization of
+.IR qi_qopen (9)
+or
+.IR qi_qclose (9)
+will only be performed if an outer barrier exists and that barrier is set for
+exclusive access.  (An exception is
+.IR MacOT \(rg
+which places an outer barrier at the queue pair when synchronization is at the
+level of the individual queue.)
 .\"
 .\"
 .SS "Synchronous Callbacks"
@@ -568,6 +833,37 @@ untimeout\fR(9):\ \-\ :the \fBtoid_t\fP
 unbufcall\fR(9):\ \-\ :the \fBbcid_t\fP
 freeb\fR(9):\ \-\ :the message block
 .TE
+.PP
+.B @PACKAGE_TITLE@
+provides the following assurances with regard to asyncrhonous callback
+cancellation:
+.IP \(bu \w'\(bu\(em'u
+When
+.BR untimeout (9)
+is called, control will not return to the caller until either the timeout has
+been cancelled or the timeout callback has completed execution.  That is, if
+the timeout function was not yet called at the time that
+.BR untimeout (9)
+was called, but the timeout function gets executed before cancellation can be
+effected,
+.BR untimeout (9)
+will spin until the timeout function returns.
+.IP \(bu
+When
+.BR unbufcall (9)
+is called, control will not return to the caller until either the bufcall has
+been cancelled or the buffer callback has completed execution.  That is, if
+the buffer callback function was not yet called at the time that
+.BR unbufcall (9)
+was called, but the buffer callback function gets executed before cancellation
+can be effected,
+.BR unbufcall (9)
+will spin until the buffer callback function returns.
+.IP \(bu
+When
+.BR freeb (9)
+is called, control will not return to the caller until the free routine has
+completed execution.
 .\"
 .\"
 .SS "Synchronous Callback Cancellation"
@@ -578,6 +874,16 @@ lbw(14n)0c0ls.
 quntimeout\fR(9):\ \-\ :the \fBtimeout_id_t\fR
 qunbufcall\fR(9):\ \-\ :the \fBbufcall_id_t\fR
 .TE
+.PP
+.B @PACKAGE_TITLE@
+provides the same assurances for
+.BR quntimeout (9)
+and
+.BR qunbufcall (9)
+as are provided for
+.BR untimeout (9)
+and
+.BR unbufcall (9).
 .\"
 .\"
 .SH CONTEXT
@@ -821,7 +1127,7 @@ or
 .BR bcanputnext (9)
 however, does dereference a
 .I q_next
-pointer and are not MP-safe from an asynchronous context.
+pointer and are not MP-SAFE from an asynchronous context.
 Drivers using these variations must define a put procedure and invoke it with
 .BR put (9)
 to enter a
@@ -941,7 +1247,7 @@ in the same fashion as a service procedure would.  Under
 .BR flushq (9),
 .BR flushband (9),
 are safe to be called asynchronously on a Stream end.  The difference with this approach, however,
-is that the method is only applicable to MP-safe drivers, because synchronization with the framework
+is that the method is only applicable to MP-SAFE drivers, because synchronization with the framework
 is not peformed for an interrupt service routine.
 .PP
 This method relies on
@@ -1697,7 +2003,7 @@ synchronization is a complex and difficult part of any
 implementation.  Performance and implementation specifics can cause the behaviour of modules or
 drivers invoking synchronization to differ from implementation to implementation.  Portable
 .I STREAMS
-drivers and modules will, and all new projects should, be written to be fully MP-safe and will set
+drivers and modules will, and all new projects should, be written to be fully MP-SAFE and will set
 the
 .B D_MP
 flag.
@@ -1825,6 +2131,38 @@ with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 See the text for discussion of issues.
 .IP \(em
+Some implementations do not support syncrhonization: under these
+implementations (e.g.
+.IR UnixWare \(rg,
+.[
+uw7spg
+.]
+.IR IRIX \(Rg,
+.[
+irixspg
+.]
+.IR SUX \(rg,
+.[
+suxspg
+.]
+.IR UXP/V \(rg)
+.[
+uxpspg
+.]
+all
+.I STREAMS
+modules and drivers that run on an MP system must be fully MP-SAFE.
+.IP ""
+.B @PACKAGE_TITLE@
+allows the use of synchronization; however, the package might have to have
+been compiled with compile option
+.B CONFIG_STREAMS_SYNCQS
+defined.
+However, portable
+.I STREAMS
+modules and drivers will be written (or converted) to be fully MP-SAFE an will
+not use syncrhonization.
+.IP \(em
 Some implementations do not permit some
 .I STREAMS
 utility functions to be called for a Stream end,
@@ -1858,6 +2196,9 @@ osfspg
 .]
 and
 .IR IRIX \(rg)
+.[
+irixspg
+.]
 do not permit some (or all)
 .I STREAMS
 utility functions to be called from interrupt.
@@ -1950,6 +2291,9 @@ with the common name
 .RB \(lq global \(rq,
 whereas when the
 .IR AIX \(rg
+.[
+aixspg
+.]
 registration function specifies
 .BR SQLVL_GLOBAL ,
 it is treated as
@@ -1978,15 +2322,53 @@ For compatibility with
 implements a global outer barrier that is entered exclusive by open and close
 routines for drivers and modules registered using
 .IR HPUX \(rg
+.[
+hpuxspg
+.]
 compatible registration functions.
 .IP \(em
+.IR MacOT \(rg
+.[
+macspg
+.]
+states that when the syncrhonization level is
+.B SQLVL_QUEUE
+that an outer exclusive barrier exists at the queue pair level for open and
+close routines.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not rely upon exclusive syncrhonization at an outer
+barrier.
+.IP \(em
+.I LiS 2.18
+.[
+lis
+.]
+provides no outer barrier and no (effective) syncrhonization of open and close
+routines.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not use
+.I LiS
+and will use the superior
+.B @PACKAGE_TITLE@
+in its stead.
+.IP \(em
 .IR VxWorks \(rg
+.[
+vxwspg
+.]
 states that only one open and close routine associated with a module executes
 at any given point in time (regardless of whether
 .BR SQLVL_QUEUEPAIR " or " SQLVL_QUEUE
 is set) and that special sleep functions must be called if a thread sleeps in
 an open or close routine.  This is similar to
 .IR Solaris \(rg
+.[
+solspg
+.]
 with flag
 .BR D_MTOUTPERIM " and " D_MTOCEXCL
 set in addition to
@@ -2029,6 +2411,68 @@ lower multiplex Stream when it is linked.  That is, the linked lower multiplex
 queue pair is treated the same as any upper multiplex queue pair in the
 module.
 .IP \(em
+The flag
+.B STR_Q_NOTTOSPEC
+is an
+.IR AIX \(rg
+.[
+aixspg
+.]
+concept.
+.B @PACKAGE_TITLE@
+can normally execute procedures, callouts and callbacks in any context
+(including hard interrupt context on the ICS), setting this flag causes all
+entry points to the module or driver to be run at process context only.
+Procedures or routines attempted at non-blocking context will be deferred.
+.IP ""
+Note that some
+.IR OSF/1 \(rg
+based implementations, such as
+.IR HPUX \(rg,
+and even some
+.I SVR 4.2
+based implementations, such as
+.IR IRIX \(rg,
+never permit
+.I STREAMS
+to run a put procedure at hard interrupt context.
+.B @PACKAGE_TITLE@
+also does not run a sychronized queue pair put procedure at hard interrupt;
+the
+.B STR_Q_NOTTOSPEC
+flag also prohibits running the synchronized queue pair put procedure at soft
+interrupt.
+.IP ""
+However, sleeping in put or service procedure, or sleeping in a function
+run as a put procedure, has a serious negative impact on the performance of all
+.I STREAMS
+modules and drivers and should be avoided.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not set the
+.BR STR_Q_NOTTOSPEC
+flag and will not sleep in put or service procedures, nor functions executed
+as put or service procedures.
+.IP \(em
+The flag
+.B STR_PERSTREAM
+is another
+.IR AIX \(rg
+.[
+aixspg
+.]
+concept.
+Although the mechanism is described above,
+.B @PACKAGE_TITLE@
+does not support per-Stream synchronization and such modules will always be
+run with module syncrhonization.
+.IP ""
+Portable
+.I STREAMS
+modules and drivers will not specify nor expect to run under per-Stream
+syncrhonization.
+.IP \(em
 Binary compatibility is not guaranteed.
 .PP
 See
@@ -2050,6 +2494,39 @@ Synchronization mechanisms for
 .I STREAMS
 first appeared in
 .IR "SVR 4.1 MP" .
+.PP
+Historically, the first sychcronization framework to appear in UNIX was the
+perimeters provided by
+.IR Solaris \(rg.
+.[
+solspg
+.]
+It appears that UNIX International and Mentat came up with their own mechanism
+that is widespread across
+.IR "Mentat Portable STREAMS (MPS)" \(rg
+implementations such as those that appear in
+.IR AIX \(rg,
+.[
+aixspg
+.]
+.IR HPUX \(rg,
+.[
+hpuxspg
+.]
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
+.IR MacOT \(rg
+.[
+macspg
+.]
+and
+.IR VxWorks \(rg,
+.[
+vxwspg
+.]
+for example.
 .\"
 .\"
 .[

@@ -1,3 +1,19 @@
+2007-03-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/streams.refs: added VxWorks documentation reference
+	* doc/man/man9/M_TRAIL.9.man: typo
+	* doc/man/man9/mp-streams.9.man: many documentation updates
+	* doc/manual/news.texi: release notes
+	* doc/manual/todo.texi: release notes
+	* include/sys/streams/stream.h: added flag for AIX blocking modules and drivers
+	* include/sys/streams/strsubr.h (strthread): added operational syncq_cookie pointer
+	* include/sys/streams/strsubr.h (syncq_t): removed sq_nest member
+	* include/sys/streams/strsubr.h (streams_schedule): added barrier leaving schedule()
+	* src/kernel/strreg.c: refuse to load non-MP-safe modules and drivers
+	  when synchronization queues are disabled
+	* src/kernel/strsched.c: big rework of syncrhonization
+	* src/kernel/strutil.c: handle QUP, QSAFE and QBLKING bits
+
 2007-03-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/mp-streams.9.man: updated syncrhonization compatibility

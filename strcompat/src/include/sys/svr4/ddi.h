@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.27 2007/03/25 03:15:19 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.28 2007/03/30 11:59:22 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 03:15:19 $ by $Author: brian $
+ Last Modified $Date: 2007/03/30 11:59:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.28  2007/03/30 11:59:22  brian
+ - heavy rework of MP syncrhonization
+
  Revision 0.9.2.27  2007/03/25 03:15:19  brian
  - somewhat more workable RW_UNLOCK
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_SVR4_DDI_H__
 #define __SYS_SVR4_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.27 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.28 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -338,49 +341,8 @@ SV_DEALLOC(sv_t * svp)
 	kmem_free(svp, sizeof(*svp));
 }
 extern void SV_SIGNAL(sv_t * svp);
-__SVR4_EXTERN_INLINE void
-SV_WAIT(sv_t * svp, int priority, lock_t * lkp)
-{
-	DECLARE_WAITQUEUE(wait, current);
-	add_wait_queue(&svp->sv_waitq, &wait);
-	for (;;) {
-		set_current_state(TASK_INTERRUPTIBLE);
-		if (!svp->sv_condv--)
-			break;
-		svp->sv_condv++;
-		if (lkp)
-			spin_unlock(lkp);
-		schedule();
-		if (lkp)
-			spin_lock(lkp);
-	}
-	set_current_state(TASK_RUNNING);
-	remove_wait_queue(&svp->sv_waitq, &wait);
-}
-__SVR4_EXTERN_INLINE int
-SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp)
-{
-	int signal = 0;
-
-	DECLARE_WAITQUEUE(wait, current);
-	add_wait_queue(&svp->sv_waitq, &wait);
-	for (;;) {
-		set_current_state(TASK_INTERRUPTIBLE);
-		signal = 1;
-		if (signal_pending(current) || --svp->sv_condv == 0)
-			break;
-		svp->sv_condv++;
-		if (lkp)
-			spin_unlock(lkp);
-		schedule();
-		if (lkp)
-			spin_lock(lkp);
-		signal = 0;
-	}
-	set_current_state(TASK_RUNNING);
-	remove_wait_queue(&svp->sv_waitq, &wait);
-	return signal;
-}
+extern void SV_WAIT(sv_t * svp, int priority, lock_t * lkp);
+extern int SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp);
 
 extern int sleep(caddr_t event, pl_t pl);
 extern void wakeup(caddr_t event);

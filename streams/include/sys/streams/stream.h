@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.94 2007/03/28 13:44:15 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.95 2007/03/30 11:59:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/28 13:44:15 $ by $Author: brian $
+ Last Modified $Date: 2007/03/30 11:59:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.95  2007/03/30 11:59:10  brian
+ - heavy rework of MP syncrhonization
+
  Revision 0.9.2.94  2007/03/28 13:44:15  brian
  - updates to syncrhonization, release notes and documentation
 
@@ -101,7 +104,7 @@
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.94 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.95 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -538,6 +541,7 @@ typedef struct queue {
 #define QSVCBUSY_BIT	15	/* L(14) S(16) U(17) */
 #define QWCLOSE_BIT	16	/* L(10) L(12) S(17) */
 #define QPROCS_BIT	17	/* */
+#define QBLKING_BIT	18	/* */
 
 #if 0
 /* paraphenalia */
@@ -587,10 +591,10 @@ typedef struct queue {
 #define QSVCBUSY	(1<<QSVCBUSY_BIT	)	/* service procedure running */
 #define QWCLOSE		(1<<QWCLOSE_BIT		)	/* q in close wait */
 #define QPROCS		(1<<QPROCS_BIT		)	/* putp, srvp disabled */
+#define QBLKING		(1<<QBLKING_BIT		)	/* queue procedure can block */
 
 #if 0
 /* different names for the same things */
-#define QBLKING		(1<<QUP_BIT		)	/* queue can block (up emulation) */
 #define QUPMODE		(1<<QUP_BIT		)	/* flag for UP emulation queues */
 #define QPROCSOFF	(1<<QPROCS_BIT		)	/* putp, srvp disabled (LiS only) */
 #define QPROCSON	(1<<QMLIST_BIT		)	/* procs are enabled */
@@ -811,6 +815,7 @@ typedef enum {
 // #define D_FIFO (1<<2) /* fifo */
 // #define D_PIPE (1<<3) /* pipe */
 // #define D_SOCK (1<<4) /* socket */
+#define D_BLKING	(1<<4)	/* queue procedure might block */
 #define D_LIS		(1<<5)	/* LiS compatible */
 // #define D_HEAD (1<<6) /* stream head */
 // #define D_NSDEV (1<<7) /* named streams device */

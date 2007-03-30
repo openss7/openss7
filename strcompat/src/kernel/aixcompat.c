@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/28 13:44:02 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/30 11:59:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/28 13:44:02 $ by $Author: brian $
+ Last Modified $Date: 2007/03/30 11:59:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: aixcompat.c,v $
+ Revision 0.9.2.29  2007/03/30 11:59:24  brian
+ - heavy rework of MP syncrhonization
+
  Revision 0.9.2.28  2007/03/28 13:44:02  brian
  - updates to syncrhonization, release notes and documentation
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/28 13:44:02 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/30 11:59:24 $"
 
-static char const ident[] = "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/28 13:44:02 $";
+static char const ident[] = "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/30 11:59:24 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -87,7 +90,7 @@ static char const ident[] = "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/28 13:44:02 $"
+#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/30 11:59:24 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL"
@@ -181,9 +184,6 @@ str_install_AIX(int cmd, strconf_t * sc)
 			/* We don't do old-style opens */
 			if (!(sc->sc_open_stylesc_flags & STR_NEW_OPEN))
 				return (ENOSYS);
-			if (sc->sc_open_stylesc_flags & STR_Q_NOTTOSPEC) {
-				/* Modules can always sleep because we are running at soft IRQ. */
-			}
 			if (!(cdev = kmem_zalloc(sizeof(*cdev), KM_NOSLEEP)))
 				return (ENOMEM);
 			cdev->d_name = sc->sc_name;
@@ -193,11 +193,14 @@ str_install_AIX(int cmd, strconf_t * sc)
 			if (sc->sc_open_stylesc_flags & STR_MPSAFE) {
 				cdev->d_flag |= D_MP;
 			}
-			if (sc->sc_open_stylesc_flags & STR_QSAFETY) {
-				cdev->d_flag |= D_SAFE;
-			}
 			if (sc->sc_open_stylesc_flags & STR_PERSTREAM) {
 				cdev->d_flag |= D_UP;
+			}
+			if (sc->sc_open_stylesc_flags & STR_Q_NOTTOSPEC) {
+				cdev->d_flag |= D_BLKING;
+			}
+			if (sc->sc_open_stylesc_flags & STR_QSAFETY) {
+				cdev->d_flag |= D_SAFE;
 			}
 			if (sc->sc_open_stylesc_flags & STR_NEWCLONING) {
 				cdev->d_flag |= D_CLONE;
@@ -293,8 +296,7 @@ str_install_AIX(int cmd, strconf_t * sc)
 				fmod->f_flag |= D_UP;
 			}
 			if (sc->sc_open_stylesc_flags & STR_Q_NOTTOSPEC) {
-				/* Modules can always sleep because we are running at soft IRQ;
-				   however, it has a horrendous impact.  We just ignore it. */
+				fmod->f_flag |= D_BLKING;
 			}
 			if (sc->sc_open_stylesc_flags & STR_QSAFETY) {
 				fmod->f_flag |= D_SAFE;

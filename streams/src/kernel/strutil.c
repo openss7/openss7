@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2007/03/28 13:44:18 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2007/03/30 11:59:14 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/28 13:44:18 $ by $Author: brian $
+ Last Modified $Date: 2007/03/30 11:59:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.143  2007/03/30 11:59:14  brian
+ - heavy rework of MP syncrhonization
+
  Revision 0.9.2.142  2007/03/28 13:44:18  brian
  - updates to syncrhonization, release notes and documentation
 
@@ -113,10 +116,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2007/03/28 13:44:18 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2007/03/30 11:59:14 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2007/03/28 13:44:18 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2007/03/30 11:59:14 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */
@@ -3692,21 +3695,33 @@ struct syncq *global_outer_syncq = NULL;
  *  If there is an outer perimeter, it is the responsibility of the registration function to locate
  *  or allocate an outer perimeter and either attach it to the inner perimeter at fmod->f_syncq, or
  *  attach it directly to fmod->f_syncq.
+ *
+ *  Note that the only time that this function is called with a %NULL @fmod argument is when the
+ *  Stream head is unlinking a queue pair from a lower multiplex.  In that case we not only want to
+ *  clear the syncrhonization bits, but also the uniprocessor emulation (%QUP), queue safety
+ *  (%QSAFE) and queue blocking (%QBLKING) bits because the Stream head performs no synchronization
+ *  (is fully MP-SAFE) and does not use any of the other features.
  */
 STATIC __unlikely int
 __setsq(queue_t *q, struct fmodsw *fmod)
 {
 #if defined CONFIG_STREAMS_SYNCQS
+	queue_t *rq = (q + 0);
+	queue_t *wq = (q + 1);
+
 	/* make sure there is none to start */
-	sq_put(&(q + 0)->q_syncq);
-	sq_put(&(q + 1)->q_syncq);
+	sq_put(&rq->q_syncq);
+	sq_put(&wq->q_syncq);
 	if (fmod == NULL) {
-#endif
-		/* just clear them */
-		clear_bit(QSYNCH_BIT, &(q + 0)->q_flag);
-		clear_bit(QSYNCH_BIT, &(q + 1)->q_flag);
+		clear_bit(QUP_BIT, &rq->q_flag);
+		clear_bit(QUP_BIT, &wq->q_flag);
+		clear_bit(QSAFE_BIT, &rq->q_flag);
+		clear_bit(QSAFE_BIT, &wq->q_flag);
+		clear_bit(QBLKING_BIT, &rq->q_flag);
+		clear_bit(QBLKING_BIT, &wq->q_flag);
+		clear_bit(QSYNCH_BIT, &rq->q_flag);
+		clear_bit(QSYNCH_BIT, &wq->q_flag);
 		return (0);
-#if defined CONFIG_STREAMS_SYNCQS
 	}
 	if (!(fmod->f_flag & D_MP)) {
 		struct syncq *sqr, *sqw;
@@ -3716,7 +3731,7 @@ __setsq(queue_t *q, struct fmodsw *fmod)
 			/* allocate one syncq for each queue */
 			if (!(sqr = sq_alloc()) || !(sqw = sq_alloc())) {
 				sq_put(&sqr);
-				goto enomem;
+				return (-ENOMEM);	/* XXX: probably ENOSR or EAGAIN. */
 			}
 			sqr->sq_level = fmod->f_sqlvl;
 			sqr->sq_flag = SQ_INNER | ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
@@ -3728,7 +3743,7 @@ __setsq(queue_t *q, struct fmodsw *fmod)
 		case SQLVL_QUEUEPAIR:
 			/* allocate one syncq for the queue pair */
 			if (!(sqr = sq_alloc())) {
-				goto enomem;
+				return (-ENOMEM);	/* XXX: probably ENOSR or EAGAIN. */
 			}
 			sqr->sq_level = fmod->f_sqlvl;
 			sqr->sq_flag = SQ_INNER | ((fmod->f_flag & D_MTPUTSHARED) ? SQ_SHARED : 0);
@@ -3745,13 +3760,24 @@ __setsq(queue_t *q, struct fmodsw *fmod)
 			sqw = sq_get(sqr);
 			break;
 		}
-		(q + 0)->q_syncq = sqr;
-		(q + 1)->q_syncq = sqw;
+		rq->q_syncq = sqr;
+		wq->q_syncq = sqw;
+
+		if (fmod->f_flag & D_UP) {
+			set_bit(QUP_BIT, &rq->q_flag);
+			set_bit(QUP_BIT, &wq->q_flag);
+		}
+		if (fmod->f_flag & D_SAFE) {
+			set_bit(QSAFE_BIT, &rq->q_flag);
+			set_bit(QSAFE_BIT, &wq->q_flag);
+		}
+		if (fmod->f_flag & D_BLKING) {
+			set_bit(QBLKING_BIT, &rq->q_flag);
+			set_bit(QBLKING_BIT, &wq->q_flag);
+		}
 	}
-	return (0);
-      enomem:
-	return (-ENOMEM);	/* XXX: This should probably be ENOSR or EAGAIN. */
 #endif
+	return (0);
 }
 
 /**
@@ -3771,6 +3797,7 @@ __setsq(queue_t *q, struct fmodsw *fmod)
 streams_fastcall __unlikely int
 setsq(queue_t *q, struct fmodsw *fmod)
 {
+#if defined CONFIG_STREAMS_SYNCQS
 	int result;
 	struct stdata *sd;
 	unsigned long pl;
@@ -3786,6 +3813,9 @@ setsq(queue_t *q, struct fmodsw *fmod)
 	result = __setsq(q, fmod);
 	zwunlock(sd, pl);
 	return (result);
+#else
+	return (0);
+#endif
 }
 
 EXPORT_SYMBOL_GPL(setsq);	/* for stream head include/sys/streams/strsubr.h */
