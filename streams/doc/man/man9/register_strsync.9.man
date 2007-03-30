@@ -1,0 +1,332 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: register_strsync.9.man,v 0.9.2.1 2007/03/30 14:50:41 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/03/30 14:50:41 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: register_strsync.9.man,v $
+.\" Revision 0.9.2.1  2007/03/30 14:50:41  brian
+.\" - added new manpages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so streams.macros
+.\"
+.\"
+.TH REGISTER_STRSYNC 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B register_strsync, unregister_strsync
+\- register or unregister \fISTREAMS\fR module or driver syncrhonization
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR "STREAMS" ,
+implementation specific.
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.br
+.B #include <sys/strconf.h>
+.HP
+.BI "int register_strsync(struct fmodsw *" fmod );
+.HP
+.BI "int unregister_strsync(struct fmodsw *" fmod );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'major\(em'u
+.I fmod
+a pointer to a
+.BR cdevsw (9)
+or
+.BR fmodsw (9)
+structure indicating the characteristics of the driver or module.
+The following members of the
+.BR fmodsw (9)
+structure, pointed to by
+.IR fmod ,
+are significant:
+.RS
+.TP \w'f_sqinfo\(em'u
+.I f_flag
+flags indicating options associated with the device.  See
+.BR fmodsw (9)
+for more information.
+.TP
+.I f_sqlvl
+synchronization queue level.  See
+.BR fmodsw (9)
+for more information.
+.TP
+.I f_sqinfo
+synchronization queue info.  See
+.BR fmodsw (9)
+for more information.
+.RE
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR register_strsync ()
+registers the MP syncrhonization scheme specified in the
+.BR cdevsw (9)
+or
+.BR fmodsw (9)
+structure indicated by
+.IR fmod .
+.BR unregister_strsync ()
+deregisters MP syncrhonization from the
+.I STREAMS
+driver or module specified by
+.IR fmod .
+.\"
+.\"
+.SH USAGE
+.PP
+This is probably not the function that you want.  See
+.BR register_strdev "(9), " unregister_strdev "(9), " regsiter_strmod "(9) and " unregister_strmod (9).
+.PP
+The
+.B register_strsync "() and " unregister_strsync ()
+functions are only exported for use by the
+.I STREAMS Compatibility Modules
+to support deprecated and broken
+.I LiS
+.[
+lis
+.]
+registration functions
+.BR lis_register_driver_qlock_option (9)
+and
+.BR lis_register_module_qlock_option (9).
+These functions are not intended on being called directly by the
+.I STREAMS
+module and driver writer.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.BR register_strsync ()
+registers the syncrhonization against the
+.I STREAMS
+module or driver described by
+.I fmod
+and returns zero
+.RB ( 0 ).
+Upon failure,
+.BR register_strsync ()
+does not effect registration of synchronization and returns a negative error number.
+.PP
+Upon success,
+.BR unregister_strsync ()
+deregisters the syncrhonization from the
+.I STREAMS
+module or driver described by
+.I fmod
+and returns zero
+.RB ( 0 ).
+Upon failure,
+.BR unregister_strsync ()
+does not remove synchronization and returns a negative error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR register_strsync "() or " unregister_strsync ()
+fail to register or deregister the specified
+.I STREAMS
+driver or module syncrhonization, it returns an appropriate negative error number as follows:
+.TP \w'[\fBENOMEM\fR]\(em'u
+.RB [ ENOMEM ]
+the necessary data structures could not be allocated due to memory shortage.
+.TP
+.RB [ ENOSYS ]
+MP syncrhonization was requested but is not supported.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR register_strsync "() and " unregister_strsync ()
+can be called from any blocking context.  Consideration for impact on
+performance and latency should be given before calling
+.BR register_strsync "() or " unregister_strsync ()
+from soft or hard interrupt context.
+Typically,
+.BR register_strsync "() and " unregister_strsync ()
+are intended to be called from the
+.BR module_init "() and " module_exit ()
+procedure of a kernel module associated with the
+.I STREAMS
+module or driver.
+.BR register_strsync ()
+may be called from the
+.IR qi_qopen (9)
+routine of the
+.I STREAMS
+module or driver.
+.BR unregister_strsync ()
+may be called from the
+.IR qi_qclose (9)
+routine of the
+.I STREAMS
+module or driver.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR register_strsync "() and " unregister_strsync ()
+are MP-safe when called from the correct context.
+.\"
+.\"
+.SH NOTICES
+.PP
+Loadable kernel modules that call
+.BR register_strsync ()
+when loading
+must call
+.BR unregister_strsync ()
+before unloading.
+.BR unregister_strsync ()
+must be called with the same value of
+.I fmod
+with which
+.BR register_strsync ()
+was called.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR fmodsw (9),
+.BR streamtab (9),
+.IR qi_qopen (9),
+.BR register_strdev (9),
+.BR unregister_strdev (9),
+.BR register_strmod (9),
+.BR unregister_strmod (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR register_strsync "() and " unregister_strsync ()
+have no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR register_strsync "() and " unregister_strsync ()
+are
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE_TITLE@
+.]
+implementation specific functions.
+Registration of
+.I STREAMS
+drivers and modules is inherently implementation specific and non-portable.
+Different implementation provide different mechanisms.
+See
+.BR STREAMS (9)
+for mechanisms compatible with other implementations
+and additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Registration and de-registration of \fISTREAMS\fR module and driver synchronization is
+implementation specific and not subject to standardization.
+.BR register_strsync "() and " unregister_strsync ()
+are
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE_TITLE@
+.]
+implementation specific functions.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR register_strsync "() and " unregister_strsync ()
+first appeared in
+.BR "@PACKAGE_TITLE@" .
+.[
+@PACKAGE_TITLE@
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

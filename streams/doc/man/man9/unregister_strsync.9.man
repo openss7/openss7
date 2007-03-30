@@ -1,0 +1,1 @@
+.so man9/register_strsync.9.man
