@@ -3160,6 +3160,16 @@ Part 1: Protocol Specification
 %Q Fujitsu Limited
 %I Fujitsu
 
+%L VXWSPG
+%R VxWorks\(rg 5.4 Tornado\(tm II
+%K vxwspg
+%T WindNet STREAMS for Tornado, Component Release Supplement
+%D 1998
+%Q Wind River Systems, Inc.
+%I Wind River
+%C Almeda, California
+%U http://www.windriver.com/
+
 %L XSTRAPG
 %R xSTRa
 %K xstrapg

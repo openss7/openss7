@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2007/03/28 13:44:17 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2007/03/30 11:59:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/28 13:44:17 $ by $Author: brian $
+ Last Modified $Date: 2007/03/30 11:59:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.155  2007/03/30 11:59:12  brian
+ - heavy rework of MP syncrhonization
+
  Revision 0.9.2.154  2007/03/28 13:44:17  brian
  - updates to syncrhonization, release notes and documentation
 
@@ -146,10 +149,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2007/03/28 13:44:17 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2007/03/30 11:59:12 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2007/03/28 13:44:17 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2007/03/30 11:59:12 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -1721,7 +1724,7 @@ strdefer_mfunc(void *func, queue_t *q, mblk_t *mp, void *arg)
  *   the STREAMS event will be queued against the barrier.  Events queued against barriers are
  *   processed once the threads raising the barrier exit.  When processed in this way, the events
  *   are processed by the exiting thread.  For the most part, threads exiting barriers are STREAMS
- *   scheduler threads.  Process context threads exiting the outer perimeter will pass the
+ *   scheduler threads.  Process context threads exiting the outer barrier will pass the
  *   synchronization queue back to the STREAMS scheduler for backlog processing.
  */
 STATIC streams_fastcall long
@@ -1981,6 +1984,14 @@ EXPORT_SYMBOL(esbbcall);	/* include/sys/streams/stream.h */
  *  unbufcall:	- cancel a buffer callout
  *  @bcid:	buffer call id returned by bufcall() or esbbcall()
  *  Notices:	Don't ever call this function with an expired bufcall id.
+ *
+ *  FIXME: This is not completely correct.  The SVR 4.2 MP assurance is that this function will not
+ *  return until the callback is either cancelled or has completed running.  The way things stand,
+ *  this function will return before a buffer callback on another processor completes, even when it
+ *  has not been successfully cancelled.
+ *
+ *  Of course, there is also the problem that unbufcall() might be called at interrupt on the same
+ *  processor as is executing the buffer callback.
  */
 streams_fastcall void
 unbufcall(register bcid_t bcid)
@@ -2005,6 +2016,9 @@ EXPORT_SYMBOL(unbufcall);	/* include/sys/streams/stream.h */
  *  Notices: Note that, for MP safety, timeouts are always raised against the same processor that
  *  invoked the timeout callback.  This means that the callback function will not execute until
  *  after the caller exists the calling function or hits a pre-emption point.
+ *
+ *  When syncrhonization queues are enabled, we track the current queue whose procedures are being
+ *  executed.
  */
 streams_fastcall toid_t
 __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks, unsigned long pl, int cpu)
@@ -2033,6 +2047,11 @@ EXPORT_SYMBOL(timeout);		/* include/sys/streams/stream.h */
 /**
  *  untimeout:	- cancel a timeout callback
  *  @toid:	timeout identifier
+ *
+ *  FIXME: This is not completely correct.  The SVR 4.2 MP assurance is that this function will not
+ *  return until the callback is either cancelled or has completed running.  The way things stand,
+ *  this function will return before a timer callback on another processor completes, even when it
+ *  has not been successfully cancelled.
  */
 streams_fastcall clock_t
 untimeout(toid_t toid)
@@ -2176,6 +2195,19 @@ EXPORT_SYMBOL(unweldq);		/* include/sys/streams/stream.h */
  */
 
 /*
+ *  qwakeup:	- wake waiters on a queue pair
+ *  @q:		one queue of the queue pair to wake
+ */
+STATIC streams_fastcall __hot void
+qwakeup(queue_t *q)
+{
+	struct queinfo *qu = ((struct queinfo *) RD(q));
+
+	if (unlikely(waitqueue_active(&qu->qu_qwait)))
+		wake_up_all(&qu->qu_qwait);
+}
+
+/*
  *  Immediate event processing.
  */
 
@@ -2189,29 +2221,30 @@ STATIC streams_inline streams_fastcall void
 strwrit_fast(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *))
 {
 #ifdef CONFIG_SMP
-	struct stdata *sd;
-
 	dassert(func);
 	dassert(q);
-	sd = qstream(q);
-	dassert(sd);
-	prlock(sd);
+	dassert(qstream(q));
+	prlock(qstream(q));
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
 #endif
 		func(q, mp);
+		qwakeup(q);
 #ifdef CONFIG_SMP
 	} else {
 		freemsg(mp);
 		swerr();
 	}
-	prunlock(sd);
+	prunlock(qstream(q));
 #endif
 }
+
+#ifdef CONFIG_STREAMS_SYNCQS
 STATIC streams_fastcall void
 strwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *))
 {
 	strwrit_fast(q, mp, func);
 }
+#endif
 
 /*
  *  strfunc:	- execute a function like a queue's put procedure
@@ -2230,43 +2263,30 @@ STATIC streams_inline streams_fastcall void
 strfunc_fast(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 #ifdef CONFIG_SMP
-	struct stdata *sd;
-
 	dassert(func);
 	dassert(q);
-	sd = qstream(q);
-	dassert(sd);
-	prlock(sd);
+	dassert(qstream(q));
+	prlock(qstream(q));
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
 #endif
 		func(arg, mp);
+		qwakeup(q);
 #ifdef CONFIG_SMP
 	} else {
 		freemsg(mp);
 		swerr();
 	}
-	prunlock(sd);
+	prunlock(qstream(q));
 #endif
 }
 
+#ifdef CONFIG_STREAMS_SYNCQS
 STATIC void
 strfunc(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 	strfunc_fast(func, q, mp, arg);
 }
-
-/*
- *  qwakeup:	- wake waiters on a queue pair
- *  @q:		one queue of the queue pair to wake
- */
-STATIC streams_fastcall __hot void
-qwakeup(queue_t *q)
-{
-	struct queinfo *qu = ((struct queinfo *) RD(q));
-
-	if (unlikely(waitqueue_active(&qu->qu_qwait)))
-		wake_up_all(&qu->qu_qwait);
-}
+#endif
 
 #if 0
 /*
@@ -2289,14 +2309,14 @@ freezechk(queue_t *q)
 #endif
 
 /*
- *  putp:	- execute a queue's put procedure
+ *  putp_fast:	- execute a queue's put procedure
  *  @q:		the queue onto which to put the message
  *  @mp:	the message to put
  *
- *  putp() is similar to put(9) with the following exceptions:
+ *  putp_fast() is similar to put(9) with the following exceptions:
  *
- *  - putp() returns the integer result from the modules put procedure.
- *  - putp() does not perform any synchronization
+ *  - putp_fast() returns the integer result from the modules put procedure.
+ *  - putp_fast() does not perform any synchronization
  */
 STATIC streams_inline streams_fastcall __hot_out void
 putp_fast(queue_t *q, mblk_t *mp)
@@ -2308,6 +2328,12 @@ putp_fast(queue_t *q, mblk_t *mp)
 #ifdef CONFIG_SMP
 	/* spin here if Stream frozen by other than caller */
 	freeze_barrier(q);
+
+	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
+	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
+	   matter) on the stack.  Note that these are a no-op on UP. */
+	dassert(qstream(q));
+	prlock(qstream(q));
 
 	/* procs can't be turned off */
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
@@ -2331,20 +2357,28 @@ putp_fast(queue_t *q, mblk_t *mp)
 #endif
 		/* some weirdness in older compilers */
 		(*q->q_qinfo->qi_putp) (q, mp);
-		qwakeup(q);
 	}
 #ifdef CONFIG_SMP
 	else {
 		freemsg(mp);
 		swerr();
 	}
+	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
+	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
+	   matter) on the stack.  Note that these are a no-op on UP. */
+	dassert(qstream(q));
+	prunlock(qstream(q));
 #endif
+	qwakeup(q);
 }
+
+#ifdef CONFIG_STREAMS_SYNCQS
 STATIC streams_fastcall __hot_out void
 putp(queue_t *q, mblk_t *mp)
 {
 	putp_fast(q, mp);
 }
+#endif
 
 /**
  *  srvp:	- execute a queue's service procedure
@@ -2386,15 +2420,11 @@ srvp_fast(queue_t *q)
 	if (likely(test_and_clear_bit(QENAB_BIT, &q->q_flag) != 0)) {
 
 #ifdef CONFIG_SMP
-		struct stdata *sd;
-
 		/* spin here if Stream frozen by other than caller */
 		freeze_barrier(q);
 
-		sd = qstream(q);
-
-		dassert(sd);
-		prlock(sd);
+		dassert(qstream(q));
+		prlock(qstream(q));
 		/* check if procs are turned off */
 		if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
 #endif
@@ -2402,19 +2432,19 @@ srvp_fast(queue_t *q)
 			/* prefetch private structure */
 			prefetch(q->q_ptr);
 
-			set_bit(QSVCBUSY_BIT, &q->q_flag);
 			dassert(q->q_qinfo);
 			dassert(q->q_qinfo->qi_srvp);
 #ifdef CONFIG_STREAMS_DO_STATS
 			if (unlikely(q->q_qinfo->qi_mstat != NULL))
 				q->q_qinfo->qi_mstat->ms_scnt++;
 #endif
+			set_bit(QSVCBUSY_BIT, &q->q_flag);
 			/* some weirdness in older compilers */
 			(*q->q_qinfo->qi_srvp) (q);
 			clear_bit(QSVCBUSY_BIT, &q->q_flag);
 		}
 #ifdef CONFIG_SMP
-		prunlock(sd);
+		prunlock(qstream(q));
 #endif
 		qwakeup(q);
 	}
@@ -2545,13 +2575,40 @@ clear_backlog(syncq_t *sq)
 }
 #endif
 
-BIG_STATIC streams_fastcall void sqsched(syncq_t *sq);
+/**
+ *  sqsched - schedule a synchronization queue
+ *  @sq: the synchronization queue to schedule
+ *
+ *  sqsched() schedules the synchronization queue @sq to have its backlog of events serviced, if
+ *  necessary.  sqsched() is called when the last thread leaves a sychronization queue (barrier) and
+ *  is unable to perform its own backlog clearing (e.g. we are at hard irq).
+ *
+ *  MP-STREAMS: Note that because we are just pushing the tail, the atomic exchange takes care of
+ *  concurrency and other exclusion measures are not necessary here.  This function must be called
+ *  with the syncrhonization queue spin lock held and interrupts disabled.
+ */
+BIG_STATIC streams_fastcall void
+sqsched(syncq_t *sq)
+{
+	/* called with sq locked */
+	if (!sq->sq_link) {
+		struct strthread *t = this_thread;
+		unsigned long flags;
+
+		/* put ourselves on the run list */
+		streams_local_save(flags);
+		*XCHG(&t->sqtail, &sq->sq_link) = sq_get(sq);	/* MP-SAFE */
+		streams_local_restore(flags);
+		if (!test_and_set_bit(qsyncflag, &t->flags))
+			__raise_streams();
+	}
+}
 
 /**
  * leave_syncq:		- leave a synchronization barrier
- * @sc:			synchronization cookie
+ * @sq:			synchronization queue
  *
- * Leaves a synchronization barrier that was entered by any of the syncrhoniation enter_ functions.
+ * Leaves a synchronization barrier that was entered by any of the syncrhonization enter_ functions.
  * When the barrier was entered exclusive and we are now exiting, or the barrier was entered shared
  * and this is the last thread to exit the barrier, we leave the suchronization queue locked for
  * exclusive access and schedule the queue for processing within the STREAMS scheduler.  Note that
@@ -2562,20 +2619,17 @@ BIG_STATIC streams_fastcall void sqsched(syncq_t *sq);
  * NOTICES: It is unlikely that there is any backlog.
  */
 STATIC streams_fastcall __hot void
-leave_syncq(struct syncq_cookie *sc)
+leave_syncq(syncq_t *sq)
 {
-	syncq_t *sq = sc->sc_sq;
 	unsigned long flags;
 
 	spin_lock_irqsave(&sq->sq_lock, flags);
-	if ((sq->sq_count < 0 && sq->sq_owner == current && --sq->sq_nest < 0)
+	if ((sq->sq_count < 0 && sq->sq_owner == current)
 	    || (sq->sq_count >= 0 && --sq->sq_count <= 0)) {
 		if (likely(!sq->sq_ehead) && likely(!sq->sq_qhead) && likely(!sq->sq_mhead)) {
-			sq->sq_nest = 0;
 			sq->sq_owner = NULL;
 			sq->sq_count = 0;
 		} else {
-			sq->sq_nest = 0;
 			sq->sq_owner = current;
 			sq->sq_count = -1;
 #if 0
@@ -2601,6 +2655,10 @@ leave_syncq(struct syncq_cookie *sc)
  *  preserve message/event ordering.  Note also that is it least likely that there is an event
  *  waiting, next likely that there is a queue service waiting and most likely that there is a
  *  message waiting.
+ *
+ *  Note also that, for compatibility with most syncrhonization models, exclusive barriers are
+ *  non-recursive.  That is a barrier that has already been entered exclusive cannot be reentered.
+ *  This means that exclusive procedures do not have to be reentrant.
  */
 STATIC streams_fastcall __hot int
 enter_syncq_exclus(struct syncq_cookie *sc)
@@ -2610,19 +2668,15 @@ enter_syncq_exclus(struct syncq_cookie *sc)
 	unsigned long flags;
 
 	spin_lock_irqsave(&sq->sq_lock, flags);
-	if (likely(!sq->sq_ehead) && likely(!sq->sq_qhead) && likely(!sq->sq_mhead)) {
-		if (sq->sq_owner == current) {
-			sq->sq_nest++;
-			goto done;
-		} else if (sq->sq_count == 0) {
-			sq->sq_owner = current;
-			--sq->sq_count;
-			goto done;
-		}
+	/* Note that syncrhonization queues are always left exclusively locked when there is a
+	   backlog. */
+	if (likely(sq->sq_count == 0)) {
+		sq->sq_count = -1;
+		sq->sq_owner = current;
+	} else {
+		/* defer if we cannot acquire lock, or if there is already a backlog */
+		rval = defer_syncq(sc);
 	}
-	/* defer if we cannot acquire lock, or if there is already a backlog */
-	rval = defer_syncq(sc);
-      done:
 	spin_unlock_irqrestore(&sq->sq_lock, flags);
 	return (rval);
 }
@@ -2630,6 +2684,9 @@ enter_syncq_exclus(struct syncq_cookie *sc)
 /*
  *  enter_syncq_shared: - enter a syncrhonization barrier shared
  *  @sc:	synchronization state cookie pointer
+ *
+ *  Note that if a barrier has already been entered shared, it is permitted to reenter the same
+ *  barrier shared.
  */
 STATIC streams_fastcall __hot int
 enter_syncq_shared(struct syncq_cookie *sc)
@@ -2639,16 +2696,14 @@ enter_syncq_shared(struct syncq_cookie *sc)
 	unsigned long flags;
 
 	spin_lock_irqsave(&sq->sq_lock, flags);
-	/* must defer if there is already a backlog :XXX */
-	if (sq->sq_link)
-		rval = defer_syncq(sc);
-	else if (sq->sq_owner == current)
-		sq->sq_nest++;
-	else if (sq->sq_count >= 0)
+	/* Note that syncrhonization queues are always left exclusively locked when there is a
+	   backlog. */
+	if (likely(sq->sq_count >= 0)) {
 		sq->sq_count++;
-	else
-		/* defer if we cannot acquire lock */
+	} else {
+		/* defer if we cannot acquire lock, or if there is already a backlog */
 		rval = defer_syncq(sc);
+	}
 	spin_unlock_irqrestore(&sq->sq_lock, flags);
 	return (rval);
 }
@@ -2674,7 +2729,7 @@ enter_inner_syncq_exclus(struct syncq_cookie *sc)
 		if ((sc->sc_sq = sc->sc_isq)) {
 			if ((rval = enter_syncq_exclus(sc)) <= 0) {
 				if ((sc->sc_sq = sc->sc_osq))
-					leave_syncq(sc);
+					leave_syncq(sc->sc_sq);
 				return (rval);
 			}
 		}
@@ -2691,9 +2746,11 @@ enter_inner_syncq_exclus(struct syncq_cookie *sc)
  * This function enters the outer barrier shared and the intter barrier either shared or exclusive.
  * For normal SVR4-like syncrhonization, there is no outer barrier and the inner barrier is always
  * entered exclusive.  The purpose of the outer barrier and possible shared put procedure access to
- * the inner barrier is to support Solaris-like barriers (D_MTPUTSHARED and D_MTOUTPERIM).
+ * the inner barrier is to support Solaris-like perimeters (D_MTPUTSHARED and D_MTOUTPERIM).
  *
- * Note that for this barrier the caller must not be blocked.
+ * Note that for this barrier the caller must not be blocked.  There is a wrinkle here: if the
+ * topmost module of a Stream is syncrhonized, it's put procedure might not be called a process
+ * context (which is okay as no synchronization model provides this assurance).
  */
 STATIC streams_fastcall __hot int
 enter_inner_syncq_asputp(struct syncq_cookie *sc)
@@ -2713,38 +2770,7 @@ enter_inner_syncq_asputp(struct syncq_cookie *sc)
 
 			if (rval <= 0) {
 				if ((sc->sc_sq = sc->sc_osq))
-					leave_syncq(sc);
-				return (rval);
-			}
-		}
-	}
-	return (1);
-}
-
-/**
- * enter_inner_syncq_asopen: - enter inner syncrhonization queue as open/close procedure
- * @sq: syncrhonization cookie
- *
- * The purpose of the sychronization cookie is to avoid passing umpteen arguments.
- *
- * This function
- */
-STATIC int
-enter_inner_syncq_asopen(struct syncq_cookie *sc)
-{
-	if (find_syncqs(sc)) {
-		int rval;
-
-		if ((sc->sc_sq = sc->sc_osq)) {
-			if (sc->sc_sq->sq_flag & SQ_EXCLUS)
-				return enter_syncq_exclus(sc);
-			else if ((rval = enter_syncq_shared(sc)) <= 0)
-				return (rval);
-		}
-		if ((sc->sc_sq = sc->sc_isq)) {
-			if ((rval = enter_syncq_exclus(sc)) <= 0) {
-				if ((sc->sc_sq = sc->sc_osq))
-					leave_syncq(sc);
+					leave_syncq(sc->sc_sq);
 				return (rval);
 			}
 		}
@@ -2801,7 +2827,201 @@ enter_inner_syncq_srvp(struct syncq_cookie *sc)
 {
 	return enter_inner_syncq_exclus(sc);
 }
+
+/**
+ * enter_syncq_shared_blocking_slow: - enter outer barrier shared, inner barrier exclusive with blocking
+ * @sc:	    synchronization queue cookie
+ *
+ * This is slow version: we have hit locks and will need to block on one of the barriers.
+ */
+streams_noinline streams_fastcall __unlikely void
+enter_syncq_shared_blocking_slow(struct syncq_cookie *sc)
+{
+	syncq_t *osq = sc->sc_osq;
+	syncq_t *isq = sc->sc_isq;
+	unsigned long flags;
+
+	DECLARE_WAITQUEUE(outer, current);
+	DECLARE_WAITQUEUE(inner, current);
+	isq = sc->sc_isq;
+	set_current_state(TASK_UNINTERRUPTIBLE);
+	add_wait_queue(&osq->sq_waitq, &outer);
+	add_wait_queue(&isq->sq_waitq, &inner);
+	spin_lock_irqsave(&osq->sq_lock, flags);
+	for (;;) {
+		if (likely(osq->sq_count >= 0)) {
+			/* Now try to get through second barrier. */
+			spin_lock(&isq->sq_lock);
+			if (isq->sq_count == 0 || (isq->sq_count == -1 && isq->sq_owner == NULL)) {
+				isq->sq_count = -1;
+				isq->sq_owner = current;
+				spin_unlock(&isq->sq_lock);
+				osq->sq_count++;
+				sc->sc_sq = isq;
+				break;
+			}
+			spin_unlock(&isq->sq_lock);
+		}
+		if (likely(osq->sq_count == -1 && osq->sq_owner == NULL)) {
+			/* Note that an exclusive lock on the outer is better than a shared lock on 
+			   the outer and an exclusive lock on the inner. */
+			osq->sq_count = -1;
+			osq->sq_owner = current;
+			break;
+		}
+		spin_unlock_irqrestore(&osq->sq_lock, flags);
+		schedule();
+		spin_lock_irqsave(&osq->sq_lock, flags);
+		set_current_state(TASK_UNINTERRUPTIBLE);
+	}
+	spin_unlock_irqrestore(&osq->sq_lock, flags);
+	set_current_state(TASK_RUNNING);
+	remove_wait_queue(&osq->sq_waitq, &outer);
+	remove_wait_queue(&isq->sq_waitq, &outer);
+}
+
+/**
+ * enter_syncq_shared_blocking: - enter outer barrier shared, inner barrier exclusive with blocking
+ * @sc:	    synchronization queue cookie
+ *
+ * This is for open and close when there is an outer barrier and the outer barrier is shared.  The
+ * call must also enter the inner barrier exclusive.  This function blocks on both the outer and
+ * inner barriers when it fails to acquire the lock, but it first attempts the lock without setting
+ * up any wait queues.
+ */
+STATIC streams_fastcall void
+enter_syncq_shared_blocking(struct syncq_cookie *sc)
+{
+	syncq_t *osq = sc->sc_osq;
+	syncq_t *isq = sc->sc_isq;
+	unsigned long flags;
+
+	local_irq_save(flags);
+	spin_lock(&osq->sq_lock);
+	if (likely(osq->sq_count >= 0)) {
+		spin_lock(&isq->sq_lock);
+		if (likely(isq->sq_count == 0)) {
+			isq->sq_count = -1;
+			isq->sq_owner = current;
+			spin_unlock(&isq->sq_lock);
+			osq->sq_count++;
+			spin_unlock(&osq->sq_lock);
+			sc->sc_sq = isq;
+			local_irq_restore(flags);
+			return;
+		}
+		spin_unlock(&isq->sq_lock);
+	}
+	spin_unlock(&osq->sq_lock);
+	local_irq_restore(flags);
+	enter_syncq_shared_blocking_slow(sc);
+}
+
+streams_noinline streams_fastcall __unlikely void
+enter_syncq_exclus_blocking_slow(struct syncq_cookie *sc)
+{
+	syncq_t *sq = sc->sc_sq;
+	unsigned long flags;
+
+	DECLARE_WAITQUEUE(wait, current);
+	set_current_state(TASK_UNINTERRUPTIBLE);
+	add_wait_queue(&sq->sq_waitq, &wait);
+	spin_lock_irqsave(&sq->sq_lock, flags);
+	for (;;) {
+		if (sq->sq_count == 0 || (sq->sq_count == -1 && sq->sq_owner == NULL)) {
+			sq->sq_count = -1;
+			sq->sq_owner = current;
+			break;
+		}
+		spin_unlock_irqrestore(&sq->sq_lock, flags);
+		schedule();
+		spin_lock_irqsave(&sq->sq_lock, flags);
+		set_current_state(TASK_UNINTERRUPTIBLE);
+	}
+	spin_unlock_irqrestore(&sq->sq_lock, flags);
+	set_current_state(TASK_RUNNING);
+	remove_wait_queue(&sq->sq_waitq, &wait);
+}
+
+STATIC streams_fastcall void
+enter_syncq_exclus_blocking(struct syncq_cookie *sc)
+{
+	syncq_t *sq = sc->sc_sq;
+	unsigned long flags;
+
+	spin_lock_irqsave(&sq->sq_lock, flags);
+	if (likely(sq->sq_count == 0)) {
+		sq->sq_count = -1;
+		sq->sq_owner = current;
+		spin_unlock_irqrestore(&sq->sq_lock, flags);
+		return;
+	}
+	spin_unlock_irqrestore(&sq->sq_lock, flags);
+	enter_syncq_exclus_blocking_slow(sc);
+}
+
+/**
+ * enter_inner_syncq_asopen: - enter inner syncrhonization queue as open/close procedure
+ * @sq: syncrhonization cookie
+ *
+ * The purpose of the sychronization cookie is to avoid passing umpteen arguments.
+ *
+ * This function is a little different than the others because it is permitted to block whereas the
+ * other sycnrhonization barrier entry functions defer.
+ */
+STATIC void
+enter_inner_syncq_asopen(struct syncq_cookie *sc)
+{
+	if (find_syncqs(sc)) {
+		if ((sc->sc_sq = sc->sc_osq)) {
+			if (sc->sc_sq->sq_flag & SQ_EXCLUS)
+				enter_syncq_exclus_blocking(sc);
+			else
+				enter_syncq_shared_blocking(sc);
+		}
+		if ((sc->sc_sq = sc->sc_isq))
+			enter_syncq_exclus_blocking(sc);
+	}
+}
+
 #endif
+
+/**
+ * streams_schedule: - STREAMS sleep function
+ *
+ * This is a STREAMS version of schedule().  The primary difference is that when called from a
+ * syncrhonized queue's qi_qopen or qi_qclose procedure, this function will first leave
+ * syncrhonization barriers.  Once it returns from the sleep, it will reenter any syncrhonization
+ * barriers appropriate for qi_qopen() or qi_qclose().
+ *
+ * This function depends on the ability of Linux Fast-STREAMS to detect at any given point in time
+ * whether it is inside a qi_qopen() or qi_qclose() procedure.  This is accomplished by checking a
+ * member of the per-CPU thread structure for NULL or for a queue pointer.  It is not necessary to
+ * set the queue pointer when the qi_qopen() or qi_qclose() procedure was called with a
+ * non-syncrhonized queue.
+ *
+ * This function is used by qwait(9), qwait_sig(9), SV_WAIT(9) and SV_WAIT_SIG(9).
+ */
+streams_fastcall void
+streams_schedule(void)
+{
+#ifdef CONFIG_STREAMS_SYNCQS
+	struct strthread *t = this_thread;
+	struct syncq_cookie *sc = t->syncq_cookie;
+
+	if (sc)
+		leave_syncq(sc->sc_sq);
+#endif
+
+	schedule();
+
+#ifdef CONFIG_STREAMS_SYNCQS
+	if (sc)
+		enter_inner_syncq_asopen(sc);
+#endif
+}
+
+EXPORT_SYMBOL(streams_schedule);
 
 #ifdef CONFIG_STREAMS_SYNCQS
 /**
@@ -2837,7 +3057,7 @@ qstrwrit_sync(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_
 	if (unlikely(enter_syncq_writer(sc, func, perim) == 0))
 		return;
 	strwrit(q, mp, func);
-	leave_syncq(sc);
+	leave_syncq(sc->sc_sq);
 }
 
 /**
@@ -2848,16 +3068,20 @@ qstrwrit_sync(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_
  *  @perim:	the perimeter to which to gain access
  *
  *  If the queue is not synchronized, this simply executes the function immediately.  When the queue
- *  is synchronized, and we are at hard interrupt, the function call is deferred to the STREAMS
- *  scheduler.  When not at hard interrupt, an attempt is made to enter the syncrhonization barriers
- *  and execute the function immediately.  The reason for deferring at hard interrupt is to avoid
- *  blowing over the ICS.
+ *  is synchronized, and we are at hard interrupt, the function call is always deferred to the
+ *  STREAMS scheduler.  When at soft interrupt, the function is deferred to the STREAMS scheduler if
+ *  the queue procedure could block (QBLKING set).  When not at interrupt, an attempt is made to
+ *  enter the syncrhonization barriers and execute the function immediately.  The reason for
+ *  deferring at hard interrupt is to avoid blowing over the ICS.  The reason for deferring if the
+ *  queue procedure could block and at soft interrupt is so kernel panics do not result if the
+ *  procedure calls a fuction that might block.
  */
 STATIC streams_inline streams_fastcall void
 qstrwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *), int perim)
 {
 	if (unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
-		if (likely(!in_irq()))
+		if (likely(!in_interrupt()) || likely(!test_bit(QBLKING_BIT, &q->q_flag))
+		    || likely(!in_irq()))
 			qstrwrit_sync(q, mp, func, perim);
 		else
 			strdefer_mfunc(&strwrit, q, mp, func);
@@ -2884,7 +3108,7 @@ qstrfunc_sync(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *m
 	if (unlikely(enter_inner_syncq_func(sc, func, arg) == 0))
 		return;
 	strfunc(func, q, mp, arg);
-	leave_syncq(sc);
+	leave_syncq(sc->sc_sq);
 }
 
 /**
@@ -2895,16 +3119,20 @@ qstrfunc_sync(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *m
  *  @arg:	the first argument to pass to the function
  *
  *  If the queue is not synchronized, this simply executes the function immediately.  When the queue
- *  is synchronized, and we are at hard interrupt, the function call is deferred to the STREAMS
- *  scheduler.  When not at hard interrupt, an attempt is made to enter the syncrhonization barriers
- *  and execute the function immediately.  The reason for deferring at hard interrupt is to avoid
- *  blowing over the ICS.
+ *  is synchronized, and we are at hard interrupt, the function call is always deferred to the
+ *  STREAMS scheduler.  When at soft interrupt, the function is deferred to the STREAMS scheduler if
+ *  the queue procedure could block (QBLKING set).  When not at interrupt, an attempt is made to
+ *  enter the syncrhonization barriers and execute the function immediately.  The reason for
+ *  deferring at hard interrupt is to avoid blowing over the ICS.  The reason for deferring if the
+ *  queue procedure could block and at soft interrupt is so kernel panics do not result if the
+ *  procedure calls a fuction that might block.
  */
 STATIC streams_inline streams_fastcall void
 qstrfunc(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
 	if (unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
-		if (likely(!in_irq()))
+		if (likely(!in_interrupt()) || likely(!test_bit(QBLKING_BIT, &q->q_flag))
+		    || likely(!in_irq()))
 			qstrfunc_sync(func, q, mp, arg);
 		else
 			strdefer_mfunc(func, q, mp, arg);
@@ -2917,11 +3145,11 @@ qstrfunc(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, vo
  *  @q:		the queue whose put procedure is to be executed
  *  @mp:	the message to pass to the put procedure
  *
- *  Put procedures enter the outer perimeter shared and the inner perimeter exclusive, unless the
- *  %SQ_SHARED flag is set, in which case they enter the inner perimeter shared. If the outer
- *  perimeter does not exist, only the inner perimeter will be entered.  If the inner perimeter does
+ *  Put procedures enter the outer barrier shared and the inner barrier exclusive, unless the
+ *  %SQ_SHARED flag is set, in which case they enter the inner barrier shared. If the outer
+ *  barrier does not exist, only the inner barrier will be entered.  If the inner barrier does
  *  not exist, the put procedure is executed without synchronization.  If the event cannot enter a
- *  perimeter (is blocked) it is deferred against the synchronization queue.  Put procedures always
+ *  barrier (is blocked) it is deferred against the synchronization queue.  Put procedures always
  *  have a valid queue reference against which to synchronize.
  *  
  *  If this function is called from process context, and the barrier is raised, the calling process
@@ -2936,25 +3164,29 @@ qputp_sync(queue_t *q, mblk_t *mp)
 	if (unlikely(enter_inner_syncq_putp(sc) == 0))
 		return;
 	putp(q, mp);
-	leave_syncq(sc);
+	leave_syncq(sc->sc_sq);
 }
 
 /**
- *  qputp_sync:	- execute a queue's put procedure, possibly synchronized
+ *  qputp:	- execute a queue's put procedure, possibly synchronized
  *  @q:		the queue whose put procedure is to be executed
  *  @mp:	the message to pass to the put procedure
  *
  *  If the queue is not synchronized, this simply executes the function immediately.  When the queue
- *  is synchronized, and we are at hard interrupt, the function call is deferred to the STREAMS
- *  scheduler.  When not at hard interrupt, an attempt is made to enter the syncrhonization barriers
- *  and execute the function immediately.  The reason for deferring at hard interrupt is to avoid
- *  blowing over the ICS.
+ *  is synchronized, and we are at hard interrupt, the function call is always deferred to the
+ *  STREAMS scheduler.  When at soft interrupt, the function is deferred to the STREAMS scheduler if
+ *  the queue procedure could block (QBLKING set).  When not at interrupt, an attempt is made to
+ *  enter the syncrhonization barriers and execute the function immediately.  The reason for
+ *  deferring at hard interrupt is to avoid blowing over the ICS.  The reason for deferring if the
+ *  queue procedure could block and at soft interrupt is so kernel panics do not result if the
+ *  procedure calls a fuction that might block.
  */
 STATIC streams_inline streams_fastcall __hot void
 qputp(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
-		if (likely(!in_irq()))
+		if (likely(!in_interrupt()) || likely(!test_bit(QBLKING_BIT, &q->q_flag))
+		    || likely(!in_irq()))
 			qputp_sync(q, mp);
 		else
 			strdefer_mfunc(&putp, q, mp, NULL);
@@ -3034,47 +3266,14 @@ put(queue_t *q, mblk_t *mp)
 	dassert(q->q_qinfo);
 	dassert(q->q_qinfo->qi_putp);
 
-	/* All of STREAMS is irq-safe now.  If your module or driver isn't, pass mp to a service
-	   procedure. */
-#ifdef CONFIG_SMP
-	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
-	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
-	   matter) on the stack.  Note that these are a no-op on UP. */
-	{
-		struct stdata *sd;
-
-		sd = qstream(q);
-		dassert(sd);
-		prlock(sd);
-	}
-#endif
-
-	if (unlikely(q->q_ftmsg != NULL))
-		goto filter_it;
-      put_it:
+	if (likely(q->q_ftmsg == NULL) || likely(!put_filter(&q, mp))) {
 #ifdef CONFIG_STREAMS_SYNCQS
-	qputp(q, mp);
+		qputp(q, mp);
 #else
-	putp_fast(q, mp);
+		putp_fast(q, mp);
 #endif
-      done:
-#ifdef CONFIG_SMP
-	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
-	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
-	   matter) on the stack.  Note that these are a no-op on UP. */
-	{
-		struct stdata *sd;
-
-		sd = qstream(q);
-		dassert(sd);
-		prunlock(sd);
 	}
-#endif
 	return;
-      filter_it:
-	if (put_filter(&q, mp))
-		goto done;
-	goto put_it;
 }
 
 EXPORT_SYMBOL(put);
@@ -3126,13 +3325,8 @@ putnext(queue_t *q, mblk_t *mp)
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
-	{
-		struct stdata *sd;
-
-		sd = qstream(q);
-		dassert(sd);
-		prlock(sd);
-	}
+	dassert(qstream(q));
+	prlock(qstream(q));
 #endif
 #ifdef CONFIG_STREAMS_SYNCQS
 	qputp(q->q_next, mp);
@@ -3143,13 +3337,8 @@ putnext(queue_t *q, mblk_t *mp)
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
-	{
-		struct stdata *sd;
-
-		sd = qstream(q);
-		dassert(sd);
-		prunlock(sd);
-	}
+	dassert(qstream(q));
+	prunlock(qstream(q));
 #endif
 	_trace();
 }
@@ -3178,7 +3367,7 @@ qsrvp_sync(queue_t *q)
 	if (unlikely(enter_inner_syncq_srvp(sc) == 0))
 		return;
 	srvp(q);
-	leave_syncq(sc);
+	leave_syncq(sc->sc_sq);
 }
 STATIC streams_inline streams_fastcall __hot_in void
 qsrvp(queue_t *q)
@@ -3222,14 +3411,15 @@ qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	if (unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
 		struct syncq_cookie ck = {.sc_q = q, }, *sc = &ck;
 
-		if (unlikely((err = enter_inner_syncq_asopen(sc)) <= 0))
-			return (err);
+		enter_inner_syncq_asopen(sc);
 #ifdef CONFIG_STREAMS_DO_STATS
 		if (unlikely(q->q_qinfo->qi_mstat != NULL))
 			q->q_qinfo->qi_mstat->ms_ocnt++;
 #endif
+		this_thread->syncq_cookie = sc;
 		err = q_open(q, devp, oflag, sflag, crp);
-		leave_syncq(sc);
+		this_thread->syncq_cookie = NULL;
+		leave_syncq(sc->sc_sq);
 	} else
 #endif
 	{
@@ -3274,14 +3464,15 @@ qclose(queue_t *q, int oflag, cred_t *crp)
 	if (unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
 		struct syncq_cookie ck = {.sc_q = q, }, *sc = &ck;
 
-		if (unlikely((err = enter_inner_syncq_asopen(sc)) <= 0))
-			return (err);
+		enter_inner_syncq_asopen(sc);
 #ifdef CONFIG_STREAMS_DO_STATS
 		if (unlikely(q->q_qinfo->qi_mstat != NULL))
 			q->q_qinfo->qi_mstat->ms_ccnt++;
 #endif
+		this_thread->syncq_cookie = sc;
 		err = q_close(q, oflag, crp);
-		leave_syncq(sc);
+		this_thread->syncq_cookie = NULL;
+		leave_syncq(sc->sc_sq);
 	} else
 #endif
 	{
@@ -3435,6 +3626,8 @@ do_bufcall_synced(struct strevent *se)
 			prlock(qstream(q));
 #endif
 		func(se->x.b.arg);
+		if (likely(q != NULL))
+			qwakeup(q);
 #ifdef CONFIG_SMP
 		if (likely(q != NULL))
 			prunlock(qstream(q));
@@ -3487,6 +3680,8 @@ do_timeout_synced(struct strevent *se)
 			prlock(qstream(q));
 #endif
 		func(se->x.t.arg);
+		if (likely(q != NULL))
+			qwakeup(q);
 #ifdef CONFIG_SMP
 		if (likely(q != NULL))
 			prunlock(qstream(q));
@@ -3692,7 +3887,7 @@ do_bufcall_event(struct strevent *se)
 		if (unlikely(enter_inner_syncq_exclus(sc) == 0))
 			return;
 		do_bufcall_synced(se);
-		leave_syncq(sc);
+		leave_syncq(sc->sc_sq);
 	} else
 #endif
 		do_bufcall_synced(se);
@@ -3715,7 +3910,7 @@ do_timeout_event(struct strevent *se)
 		if (unlikely(enter_inner_syncq_exclus(sc) == 0))
 			return;
 		do_timeout_synced(se);
-		leave_syncq(sc);
+		leave_syncq(sc->sc_sq);
 	} else
 #endif
 		do_timeout_synced(se);
@@ -3740,7 +3935,7 @@ do_weldq_event(struct strevent *se)
 		if (unlikely(enter_outer_syncq_exclus(sc) == 0))
 			return;
 		do_weldq_synced(se);
-		leave_syncq(sc);
+		leave_syncq(sc->sc_sq);
 	} else
 #endif
 		do_weldq_synced(se);
@@ -3765,7 +3960,7 @@ do_unweldq_event(struct strevent *se)
 		if (unlikely(enter_outer_syncq_exclus(sc) == 0))
 			return;
 		do_unweldq_synced(se);
-		leave_syncq(sc);
+		leave_syncq(sc->sc_sq);
 	} else
 #endif
 		do_unweldq_synced(se);
@@ -4126,13 +4321,13 @@ runsyncq(struct syncq *sq)
 	   the backlog now, later when the syncrhonization queue is serviced, it could be found
 	   empty and not requiring any service. */
 
-	sq->sq_nest = 0;
 	sq->sq_owner = current;
 	sq->sq_count = -1;
 	/* We are now in the barrier exclusive.  Just run them all exclusive.  Anything that wanted
 	   to enter the outer perimeter shared and the inner perimeter exclusive will run nicely
 	   with just the outer perimeter exclusive; this is because the outer perimeter is always
-	   more restrictive than the inner perimeter. */
+	   more restrictive than the inner perimeter.  If there is only one perimeter, then it is
+	   exclusive anyway. */
 
 	do {
 		{
@@ -4194,7 +4389,6 @@ runsyncq(struct syncq *sq)
 		}
 	} while (sq->sq_mhead || sq->sq_qhead || sq->sq_ehead);
 
-	dassert(sq->sq_nest = 0);
 	dassert(sq->sq_owner == current);
 	dassert(sq->sq_count == -1);
 
@@ -4321,37 +4515,6 @@ queuerun(struct strthread *t)
 		}
 	} while (unlikely(test_bit(qrunflag, &t->flags) != 0));
 }
-
-#if defined CONFIG_STREAMS_SYNCQS
-/**
- *  sqsched - schedule a synchronization queue
- *  @sq: the synchronization queue to schedule
- *
- *  sqsched() schedules the synchronization queue @sq to have its backlog of events serviced, if
- *  necessary.  sqsched() is called when the last thread leaves a sychronization queue (barrier) and
- *  is unable to perform its own backlog clearing (e.g. we are at hard irq).
- *
- *  MP-STREAMS: Note that because we are just pushing the tail, the atomic exchange takes care of
- *  concurrency and other exclusion measures are not necessary here.  This function must be called
- *  with the syncrhonization queue spin lock held and interrupts disabled.
- */
-BIG_STATIC streams_fastcall void
-sqsched(syncq_t *sq)
-{
-	/* called with sq locked */
-	if (!sq->sq_link) {
-		struct strthread *t = this_thread;
-		unsigned long flags;
-
-		/* put ourselves on the run list */
-		streams_local_save(flags);
-		*XCHG(&t->sqtail, &sq->sq_link) = sq_get(sq);	/* MP-SAFE */
-		streams_local_restore(flags);
-		if (!test_and_set_bit(qsyncflag, &t->flags))
-			__raise_streams();
-	}
-}
-#endif
 
 /*
  *  freechains:	- free chains of message blocks
@@ -5301,7 +5464,10 @@ strsched_init(void)
 		atomic_set(&t->lock, 0);
 		/* initialize all the list tails */
 		t->qtail = &t->qhead;
+#if defined CONFIG_STREAMS_SYNCQS
+		t->sqtail = &t->sqhead;
 		t->strmfuncs_tail = &t->strmfuncs_head;
+#endif
 		t->strbcalls_tail = &t->strbcalls_head;
 		t->strtimout_tail = &t->strtimout_head;
 		t->strevents_tail = &t->strevents_head;

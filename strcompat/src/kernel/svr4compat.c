@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 03:15:20 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/30 11:59:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 03:15:20 $ by $Author: brian $
+ Last Modified $Date: 2007/03/30 11:59:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: svr4compat.c,v $
+ Revision 0.9.2.36  2007/03/30 11:59:24  brian
+ - heavy rework of MP syncrhonization
+
  Revision 0.9.2.35  2007/03/25 03:15:20  brian
  - somewhat more workable RW_UNLOCK
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 03:15:20 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/30 11:59:24 $"
 
-static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 03:15:20 $";
+static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/30 11:59:24 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -84,7 +87,7 @@ static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 03:15:20 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/30 11:59:24 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -634,10 +637,64 @@ SV_SIGNAL(sv_t * svp)
 }
 
 EXPORT_SYMBOL(SV_SIGNAL);	/* svr4/ddi.h */
-__SVR4_EXTERN_INLINE void SV_WAIT(sv_t * svp, int priority, lock_t * lkp);
+
+#ifdef LFS
+#undef schedule
+#define schedule() streams_schedule()
+#endif
+
+void
+SV_WAIT(sv_t * svp, int priority, lock_t * lkp)
+{
+	DECLARE_WAITQUEUE(wait, current);
+	set_current_state(TASK_UNINTERRUPTIBLE);
+	add_wait_queue(&svp->sv_waitq, &wait);
+	for (;;) {
+		if (!svp->sv_condv--)
+			break;
+		svp->sv_condv++;
+		if (lkp)
+			spin_unlock(lkp);
+		schedule();
+		if (lkp)
+			spin_lock(lkp);
+		set_current_state(TASK_UNINTERRUPTIBLE);
+	}
+	set_current_state(TASK_RUNNING);
+	remove_wait_queue(&svp->sv_waitq, &wait);
+	if (lkp)
+		spin_unlock(lkp);
+}
 
 EXPORT_SYMBOL(SV_WAIT);		/* svr4/ddi.h */
-__SVR4_EXTERN_INLINE int SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp);
+
+int
+SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp)
+{
+	int signal = 0;
+
+	DECLARE_WAITQUEUE(wait, current);
+	set_current_state(TASK_INTERRUPTIBLE);
+	add_wait_queue(&svp->sv_waitq, &wait);
+	for (;;) {
+		signal = 1;
+		if (signal_pending(current) || --svp->sv_condv == 0)
+			break;
+		svp->sv_condv++;
+		if (lkp)
+			spin_unlock(lkp);
+		schedule();
+		if (lkp)
+			spin_lock(lkp);
+		set_current_state(TASK_INTERRUPTIBLE);
+		signal = 0;
+	}
+	set_current_state(TASK_RUNNING);
+	remove_wait_queue(&svp->sv_waitq, &wait);
+	if (lkp)
+		spin_unlock(lkp);
+	return signal;
+}
 
 EXPORT_SYMBOL(SV_WAIT_SIG);	/* svr4/ddi.h */
 

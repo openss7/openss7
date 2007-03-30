@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: hpuxcompat.9.man,v 0.9.2.9 2006/10/06 12:13:01 brian Exp $
+.\" @(#) $Id: hpuxcompat.9.man,v 0.9.2.10 2007/03/30 11:59:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:13:01 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/30 11:59:20 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: hpuxcompat.9.man,v $
+.\" Revision 0.9.2.10  2007/03/30 11:59:20  brian
+.\" - heavy rework of MP syncrhonization
+.\"
 .\" Revision 0.9.2.9  2006/10/06 12:13:01  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -563,10 +566,10 @@ thaw the state of a stream queue
 expects that the apporpriate level of synchronization be used instead.
 Because of this, it is recommended that
 .IR HP-UX \(rg
-drivers and modules port directly to the
+drivers and modules that port directly to the
 .B @PACKAGE_TITLE@
 environment, not be run at synchronization level
-.BR SQLVL_NOP .
+.BR SQLVL_NOSYNC " (" SQLVL_NOP ).
 See
 .BR str_install_HPUX (9).
 .\"

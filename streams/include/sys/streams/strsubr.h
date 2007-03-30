@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.77 2007/03/25 19:01:10 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.78 2007/03/30 11:59:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:01:10 $ by $Author: brian $
+ Last Modified $Date: 2007/03/30 11:59:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 0.9.2.78  2007/03/30 11:59:10  brian
+ - heavy rework of MP syncrhonization
+
  Revision 0.9.2.77  2007/03/25 19:01:10  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -91,7 +94,7 @@
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.77 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.78 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -189,7 +192,9 @@ typedef struct syncq {
 	spinlock_t sq_lock;		/* spin lock for this structure */
 	int sq_count;			/* no of threads inside (negative for exclusive) */
 	struct task_struct *sq_owner;	/* exclusive owner */
+#if 0
 	int sq_nest;			/* lock nesting */
+#endif
 	wait_queue_head_t sq_waitq;	/* qopen/qclose waiters */
 	struct strevent *sq_ehead;	/* head of event queue */
 	struct strevent **sq_etail;	/* tail of event queue */
@@ -436,12 +441,15 @@ struct strthread {
 	unsigned long flags;		/* flags */
 	struct task_struct *proc;	/* task */
 	atomic_t lock;			/* thread lock */
+#if !defined CONFIG_STREAMS_NORECYCLE
 	mblk_t *freemblk_head;		/* head of free mdbblocks cached */
 	mblk_t **freemblk_tail;		/* tail of free mdbblocks cached */
 	int freemblks;			/* number of mblks on the free list */
+#endif
 	queue_t *qhead;			/* first queue in scheduled queues */
 	queue_t **qtail;		/* last queue in scheduled queues */
 #if defined CONFIG_STREAMS_SYNCQS
+	struct syncq_cookie *syncq_cookie;	/* open/close syncrhonization queue cookie */
 	syncq_t *sqhead;		/* first syncq in scheduled syncqs */
 	syncq_t **sqtail;		/* last sycnq in scheduled sycnqs */
 	mblk_t *strmfuncs_head;		/* head of m_func pending exec */
@@ -637,6 +645,7 @@ struct mdbblock {
 };
 
 /* from strsched.c */
+__STREAMS_EXTERN void streams_schedule(void);
 __STREAMS_EXTERN bcid_t __bufcall(queue_t *q, unsigned size, int priority,
 				  void streamscall (*function) (long), long arg);
 __STREAMS_EXTERN toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg, long ticks,

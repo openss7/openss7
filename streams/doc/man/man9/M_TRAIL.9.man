@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: M_TRAIL.9.man,v 0.9.2.8 2007/03/28 13:44:12 brian Exp $
+.\" @(#) $Id: M_TRAIL.9.man,v 0.9.2.9 2007/03/30 11:59:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/28 13:44:12 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/30 11:59:07 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: M_TRAIL.9.man,v $
+.\" Revision 0.9.2.9  2007/03/30 11:59:07  brian
+.\" - heavy rework of MP syncrhonization
+.\"
 .\" Revision 0.9.2.8  2007/03/28 13:44:12  brian
 .\" - updates to syncrhonization, release notes and documentation
 .\"
@@ -120,7 +123,7 @@ and
 specific message.
 The
 .B M_TRAIL
-message is generated an sent upstream by a driver or module after an
+message is generated and sent upstream by a driver or module after an
 .BR M_HANGUP (9)
 message to mark the end of data in the Stream.
 .PP
