@@ -1,5 +1,8 @@
 2007-03-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man9/register_strdev.9.man: documentation updates
+	* doc/man/man9/register_strmod.9.man: documentation updates
+
 	* doc/man/streams.refs: added VxWorks documentation reference
 	* doc/man/man9/M_TRAIL.9.man: typo
 	* doc/man/man9/mp-streams.9.man: many documentation updates
