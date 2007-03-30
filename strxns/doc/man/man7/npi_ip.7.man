@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: npi_ip.7.man,v 0.9.2.6 2006/05/06 10:22:24 brian Exp $
+.\" @(#) $Id: npi_ip.7.man,v 0.9.2.7 2007/03/30 14:17:40 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/05/06 10:22:24 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/30 14:17:40 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: npi_ip.7.man,v $
+.\" Revision 0.9.2.7  2007/03/30 14:17:40  brian
+.\" - documentation corrections
+.\"
 .\" Revision 0.9.2.6  2006/05/06 10:22:24  brian
 .\" - added test suite for NPI-IP driver
 .\"
@@ -1912,8 +1915,14 @@ it might be possible to make the
 .I OpenSS7 Project
 RTP and SCTP drivers immediately portable to other operating systems with STREAMS such as
 .IR Solaris \(rg,
+.[
+solspg
+.]
 .IR pSOS \(rg,
-.IR vxWorks \(rg,
+.IR VxWorks \(rg,
+.[
+vxwspg
+.]
 .IR LynxOS \(rg,
 etc. by simply porting the NPI-IP driver instead of each protocol driver.
 .\"
