@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2007/03/30 11:59:12 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2007/03/30 14:51:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/30 11:59:12 $ by $Author: brian $
+ Last Modified $Date: 2007/03/30 14:51:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.156  2007/03/30 14:51:41  brian
+ - updated manual pages and missing symbol
+
  Revision 0.9.2.155  2007/03/30 11:59:12  brian
  - heavy rework of MP syncrhonization
 
@@ -149,10 +152,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2007/03/30 11:59:12 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2007/03/30 14:51:41 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2007/03/30 11:59:12 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2007/03/30 14:51:41 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -1627,7 +1630,6 @@ find_event(int event_id)
 	return (*sep);
 }
 
-#if 0
 /**
  *  sealloc:	- allocate a stream event structure
  */
@@ -1638,7 +1640,6 @@ sealloc(void)
 }
 
 EXPORT_SYMBOL_GPL(sealloc);	/* include/sys/streams/strsubr.h */
-#endif
 
 /**
  *  sefree:	- deallocate a stream event structure
