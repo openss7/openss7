@@ -1,5 +1,8 @@
 2007-03-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man9/register_strdev.9.man: documentation updates
+	* doc/man/man9/register_strmod.9.man: documentation updates
+
 	* doc/man/strcompat.refs: added VxWorks documentation reference
 	* doc/man/man9/SV_WAIT.9.man: documentation updates
 	* doc/man/man9/hpuxcompat.9.man: documentation updates

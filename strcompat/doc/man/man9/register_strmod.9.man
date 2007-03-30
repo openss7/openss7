@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: register_strmod.9.man,v 0.9.2.11 2006/10/06 12:13:06 brian Exp $
+.\" @(#) $Id: register_strmod.9.man,v 0.9.2.12 2007/03/30 12:08:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:13:06 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/30 12:08:46 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: register_strmod.9.man,v $
+.\" Revision 0.9.2.12  2007/03/30 12:08:46  brian
+.\" - documentation updates
+.\"
 .\" Revision 0.9.2.11  2006/10/06 12:13:06  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -118,7 +121,7 @@ structure, pointed to by
 .IR fmod ,
 are significant:
 .RS
-.TP \w'f_name\(em'u
+.TP \w'f_sqinfo\(em'u
 .I f_name
 the name of the module.  This name is use to register the
 .I STREAMS
@@ -133,6 +136,16 @@ module.
 .TP
 .I f_flag
 flags indicating options associated with the module.  See
+.BR fmodsw (9)
+for more information.
+.TP
+.I f_sqlvl
+synchronization queue level.  See
+.BR fmodsw (9)
+for more information.
+.TP
+.I f_sqinfo
+synchronization queue info.  See
 .BR fmodsw (9)
 for more information.
 .TP
@@ -245,6 +258,9 @@ registered against it.
 .I modid
 was zero (0) requesting dynamic allocation of a module identification number
 and no module identification numbers are available for allocation.
+.TP
+.RB [ ENOSYS ]
+MP syncrhonization was requested but is not supported.
 .\"
 .\"
 .SH CONTEXT
@@ -318,7 +334,7 @@ has no known bugs.
 is a
 .B "@PACKAGE_TITLE@"
 .[
-@PACKAGE@
+lfs
 .]
 implementation specific function, with the following compatibility
 considerations:
@@ -378,7 +394,7 @@ modules is implementation specific and not subject to standardization.
 is a
 .B @PACKAGE_TITLE@
 .[
-@PACKAGE@
+lfs
 .]
 implementation specific function.
 .\"
@@ -389,7 +405,7 @@ implementation specific function.
 first appeared in
 .BR "@PACKAGE_TITLE@" .
 .[
-@PACKAGE@
+lfs
 .]
 .\"
 .\"
