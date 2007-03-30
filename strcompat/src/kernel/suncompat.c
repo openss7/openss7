@@ -147,7 +147,7 @@ int
 qwait_sig(queue_t *rq)
 {
 	struct queinfo *qu = (typeof(qu)) rq;
-	bool interrupted;
+	int interrupted;
 
 	DECLARE_WAITQUEUE(wait, current);
 	dassert(!in_interrupt());
