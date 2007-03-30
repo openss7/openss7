@@ -1,0 +1,559 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: GetOTInstallInfo.9.man,v 0.9.2.1 2007/03/30 11:57:07 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/03/30 11:57:07 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: GetOTInstallInfo.9.man,v $
+.\" Revision 0.9.2.1  2007/03/30 11:57:07  brian
+.\" - new manual pages
+.\"
+.\" Revision 0.9.2.7  2006/10/06 12:13:05  brian
+.\" - updated manual pages to pass make check and for release
+.\" - updated release files for release
+.\" - added missing MacOT OSF/1 and MPS compatibility functions
+.\"
+.\" Revision 0.9.2.6  2006/10/05 12:15:44  brian
+.\" - updates for release
+.\"
+.\" Revision 0.9.2.5  2006/04/05 09:43:33  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strcompat.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strcompat.macros
+.\"
+.\"
+.TH GetOTInstallInfo 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B GetOTInstallInfo
+\- \fISTREAMS\fR Open Transport Install Information
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MAC_SOURCE
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/macddi.h>
+.HP
+.B struct install_info *GetOTInstallInfo(void);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+None.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B GetOTInstallInfo
+returns a pointer to the module's or driver's
+.B install_info
+structure.  The
+.B install_info
+structure is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+struct install_info {
+    struct streamtab *install_str;
+    uint32_t install_flags;
+    uint32_t install_sqlvl;
+    char *install_buddy;
+    void *ref_load;
+    uint32_t ref_count;
+};
+\fP
+.fi
+.PP
+The
+.B install_info
+structure contains the following members:
+.TP
+.I install_str
+A pointer to the
+.BR streamtab (9)
+structure definining the
+.I STREAMS
+driver or module.
+.TP
+.I install_flags
+Provides a means for the module or driver to specify flags given specifics
+aboud the module or driver.  The defined flags are as follows:
+.sp
+.RS
+.TP
+.B kOTModIsDriver
+Specifies that the
+.I STREAMS
+module is (pseudo-)device driver.
+.PD 0
+.TP
+.B kOTModIsModule
+Sepcifies taht the
+.I STREAMS
+module is a pushable module.
+.TP
+.B kOTModUpperIsTPI
+Specifies that the upper service interface supports the Transport Provider Interface
+(TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.TP
+.B kOTModUpperIsDLPI
+Specifies that the upper service interface supports the Data Link Provider Interface
+(DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
+.TP
+.B kOTModLowerIsTPI
+Specifies that the lower service interface supports the Transport Provider Interface
+(TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.TP
+.B kOTModLowerIsDLPI
+Specifies that the lower service interface supports the Data Link Provider Interface
+(DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
+.TP
+.B kOTModGlobalContext
+Specifies that the module requires that variables global within the module be
+exported outside the module (to other modules, for example).
+.TP
+.B kOTModUsesInterrupts
+Only valid if
+.B kOTModISDriver
+is also set, this flag indicates that the driver uses interrupts.
+.TP
+.B kOTModIsComplexDriver
+Only valid if
+.B kOTModISDriver
+is also set, this flag indicates that the driver follows a complex model.
+.TP
+.B kOTModIsFilter
+Only valid if
+.B kOTModISModule
+is also set, this flag indicates that the module simply filters messages.
+.PD
+.RE
+.TP
+.I install_sqlvl
+The syncrhonization level applicable to the driver or module.  The
+syncrhoniation level can be one of the following values:
+.RS
+.TP
+.B SQLVL_QUEUE
+Each Stream that is an instance of the module can only have one execution
+thread associated with the read queue (executing a queue put or service
+procedure) and one execution thread associated with the write queue (executing
+a queue put or service procedure).
+.IP ""
+Although the
+.IR MacOT \(rg
+documentation
+.[
+macspg
+.]
+says that
+.BR mps_become_writer (9)
+is very expensive at this level of syncrhonization,
+.B @PACKAGE_TITLE@
+implements a outer barrier that is entered shared by each thread and
+.BR mps_become_writer (9)
+simply enters this outer barrier exclusive, without hardly any expense at all.
+.TP
+.B SQLVL_QUEUEPAIR
+.IP ""
+Although the
+.IR MacOT \(rg
+documentation
+.[
+macspg
+.]
+says that
+.BR mps_become_writer (9)
+is very expensive at this level of syncrhonization,
+.B @PACKAGE_TITLE@
+implements a outer barrier that is entered shared by each thread and
+.BR mps_become_writer (9)
+simply enters this outer barrier exclusive, without hardly any expense at all.
+.TP
+.B SQLVL_MODULE
+The module can only be entered once by one thread of execution.
+.IP ""
+.BR mp_become_writer (9)
+is not needed at this level.
+.TP
+.B SQLVL_GLOBAL
+Only one thread of execution can exist within all modules specifying this
+level of synchronization.  (This is in contrast with
+.IR AIX \(rg
+.[
+aixspg
+.]
+that single threads all of streams if
+.I any
+module implements this level.)
+.IP ""
+.BR mp_become_writer (9)
+is not needed at this level.
+.TP
+.B SQLVL_SPLITMODULE
+Only one thread of execution is allowed to enter the entire module for the
+read queue of any Stream in the module, and another thread of execution is
+allowed to enter the entire module for the write queue of any Stream in the
+modue.  The original purpose of this sycnrhonization mode was to simlulate
+.B SQLVL_QUEUE
+synchronization without the attendant limitations of the
+.IR MacOT \(rg
+.[
+macspg
+.]
+inefficient
+.BR mps_become_writer (9)
+implementation.
+.IP ""
+Although the
+.IR MacOT \(rg
+documentation
+.[
+macspg
+.]
+says that
+.BR mps_become_writer (9)
+is less expensive at this level of syncrhonization,
+.B @PACKAGE_TITLE@
+implements a outer barrier that is entered shared by each thread and
+.BR mps_become_writer (9)
+simply enters this outer barrier exclusive, without hardly any expense at all.
+.PP
+Note that the syncrhonization levels of
+.BR SQLVL_ELSEWHERE
+are not fully supported: see
+.IR install_buddy ,
+below.
+.RE
+.TP
+.I install_buddy
+In a fashion similar to the
+.BR SQLVL_ELSEWHERE
+syncrhonization provided by other implementations,
+.I MacOT
+permits two or more modules to share syncrhonization.  The
+.I install_sqlvl
+is set to
+.BR SQLVL_MODULE
+and then each module specifies another of the modules in the group in a ring.
+For example, if modules A, B and C are to be grouped together, A specifies B
+as a buddy, B specifies C as a buddy and C specifies A as a buddy.  In this
+fashion, arbitrary numbers of modules can be grouped into a group.
+.TP
+.I ref_load
+Used by Open Transport, initialize to zero.
+.TP
+.I ref_count
+Used by Open Transport, initialize to zero.
+.\"
+.\"
+.SH USAGE
+.PP
+Registration of kernel modules or loadable
+.I STREAMS
+drivers an modules takes to distinct approaches:
+.IP (a) \w'(m)\(em'u
+When the module loads, the kernel calls a general purpose initialization
+function provided by the module that then calls kernel registration functions
+as necessary and returns success or failure.
+When the module is to be unloaded, the kernel calls a general purpose
+termination function provided by the module than then calls kernel
+deregistration function as necessary and then returns.
+.IP ""
+This approach is characterized by the kernel providing specific purpose
+registration and deregistration functions and the module only providing a
+general purpose initialization and termination function.
+This approach is also characterized by the fact that if a specific
+registration function changes, in most cases every driver must also change.
+.IP (b)
+When the module loads, the kernel calls specific purpose functions to achieve
+its purposes in loading the module.
+When the module is to be unloaded, the kernel calls specific purpose functions
+to achieve termination before unloading the module.
+.IP ""
+This approach is characterized by the kernel providing a general purpose
+initialization and termination function and the module providing specific
+functions invoked by the kernel to achieve the kernel's purposes in loading
+modules of a specific type.
+This approach is also characterized by the fact that if a specific
+initialization function changes, in most cases only the kernel need change.
+.PP
+.IR MacOT \(rg,
+similar to
+.IR Solaris \(rg
+in this respect,
+follows approach "(b)" above.
+The
+.BR GetOTInstallInfo ()
+or
+.BI GetOT xxxxxxxx InstallInfo \fR()
+function (where
+.I xxxxxxxx
+is the name of the module or driver) is provided by the
+.I STREAMS
+module or driver.  The
+.I STREAMS
+executive invokes this entry point into the module or driver when the object
+associated with the module or driver is loaded, the result of which is used to
+register the module or driver.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR GetOTInstallInfo ()
+succeeds, it returns 
+a pointer to the
+.I STREAMS
+module or driver
+.BR install_info
+structure; when it fails, it
+returns
+.BR NULL .
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR GetOTInstallInfo ()
+fails when corresponding driver or module does not exist or resources could
+not be allocated to initialize the module or driver.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR GetOTInstallInfo ()
+can be called from any context, but is normally called when a kernel module is
+loaded (i.e. at process context).
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR msp_become_writer ()
+is MP-safe and was intended to support MP-safe operation in the SMP
+environment.
+.PP
+Considerations should be given when writing the call-out function that the
+function may execute in parallel with asynchronous entry points, callbacks,
+call-outs and interrupt service procedures.
+.PP
+However, in
+.BR "@PACKAGE_TITLE@" ,
+the call-out function is scheduled on the same CPU and the CPU which called
+.BR GetOTInstallInfo ().
+This means that
+.BR GetOTInstallInfo ()
+will return before the call-out function executes when called on the ICS.
+Also, when called on the ICS, the call-out function will not execute before
+the calling function returns or the next preemption point is encountered.
+.PP
+When called from any other context, the call-out function will execute before
+the call returns.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR GetOTInstallInfo ()
+is a
+.IR MacOT \(rg-specific
+function:
+.B _MAC_SOURCE
+must be defined before including DDI/DKI include files to expose this symbol.
+.B @PACKAGE_TITLE@
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_MAC
+or
+.B CONFIG_STREAMS_COMPAT_MAC_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B @PACKAGE_TITLE@
+uses
+a single mechanism,
+.BR register_strdev (9)
+and
+.BR register_strmod (9),
+for supporting all registration functions such as
+.BR GetOTInstallInfo ().
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR register_strdev (9),
+.BR register_strmod (9),
+.BR maccompat (9),
+.BR mp-streams (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR GetOTInstallInfo ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR GetOTInstallInfo ()
+is compatible with
+.IR MacOT \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR GetOTInstallInfo ()
+is an
+.IR MacOT \(rg-specific
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+.IP \(em
+.BR GetOTInstallInfo ()
+is provided for source level compatibility with
+.IR MacOT \(rg
+for the purpose of porting
+.IR MacOT \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR MacOT \(rg,
+binaries are incompatible.
+.IP \(em
+.BR GetOTInstallInfo ()
+only provides functionality comparable to
+.IR MacOT \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+.BR GetOTInstallInfo ()
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR maccompat (9)
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR MacOT \(rg
+DDI documentation.
+.[
+macotr
+.]
+.[
+macspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR GetOTInstallInfo ()
+first appeared in
+.IR MacOT \(rg.
+.BR GetOTInstallInfo ()
+is probably a Mentat, Inc. function that goes all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
