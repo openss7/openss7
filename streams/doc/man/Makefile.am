@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2007/03/28 13:44:11 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2007/03/30 14:51:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/28 13:44:11 $ by $Author: brian $
+# Last Modified $Date: 2007/03/30 14:51:39 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.84  2007/03/30 14:51:39  brian
+# - updated manual pages and missing symbol
+#
 # Revision 0.9.2.83  2007/03/28 13:44:11  brian
 # - updates to syncrhonization, release notes and documentation
 #
@@ -1293,6 +1296,7 @@ man_MANS = \
 	man9/register_strmod.9 \
 	man9/register_strnod.9 \
 	man9/register_strlog.9 \
+	man9/register_strsync.9 \
 	man9/rmvb.9 \
 	man9/rmvq.9 \
 	man9/runqueues.9 \
@@ -1314,6 +1318,7 @@ man_MANS = \
 	man9/spec_reparent.9 \
 	man9/specfs_mount.9 \
 	man9/specfs_umount.9 \
+	man9/streams_schedule.9 \
 	man9/streamtab.9 \
 	man9/streamtab_t.9 \
 	man9/strgetpmsg.9 \
@@ -1349,6 +1354,7 @@ man_MANS = \
 	man9/unregister_strdrv.9 \
 	man9/unregister_strmod.9 \
 	man9/unregister_strnod.9 \
+	man9/unregister_strsync.9 \
 	man9/untimeout.9 \
 	man9/unweldq.9 \
 	man9/vcmn_err.9 \
@@ -2425,6 +2431,7 @@ dist_noinst_MANS = \
 	man9/register_strmod.9.man \
 	man9/register_strnod.9.man \
 	man9/register_strlog.9.man \
+	man9/register_strsync.9.man \
 	man9/rmvb.9.man \
 	man9/rmvq.9.man \
 	man9/runqueues.9.man \
@@ -2446,6 +2453,7 @@ dist_noinst_MANS = \
 	man9/spec_reparent.9.man \
 	man9/specfs_mount.9.man \
 	man9/specfs_umount.9.man \
+	man9/streams_schedule.9.man \
 	man9/streamtab.9.man \
 	man9/streamtab_t.9.man \
 	man9/strgetpmsg.9.man \
@@ -2481,6 +2489,7 @@ dist_noinst_MANS = \
 	man9/unregister_strdrv.9.man \
 	man9/unregister_strmod.9.man \
 	man9/unregister_strnod.9.man \
+	man9/unregister_strsync.9.man \
 	man9/untimeout.9.man \
 	man9/unweldq.9.man \
 	man9/vcmn_err.9.man \

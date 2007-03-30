@@ -1,5 +1,12 @@
 2007-03-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man9/register_strsync.9.man: added new manual pages
+	* doc/man/man9/streams_schedule.9.man: added new manual pages
+	* doc/man/man9/unregister_strsync.9.man: added new manual pages
+	* doc/man/Makefile.am: added new manual pages
+	* doc/man/man9/register_strdev.9.man: corrected manpage typo
+	* src/kernel/strsched.c (sealloc): corrected missing symbol
+
 	* doc/man/man9/register_strdev.9.man: documentation updates
 	* doc/man/man9/register_strmod.9.man: documentation updates
 
