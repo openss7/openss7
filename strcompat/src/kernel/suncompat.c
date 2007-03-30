@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/30 11:59:24 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/03/30 23:29:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/30 11:59:24 $ by $Author: brian $
+ Last Modified $Date: 2007/03/30 23:29:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: suncompat.c,v $
+ Revision 0.9.2.33  2007/03/30 23:29:13  brian
+ - change bool to int
+
  Revision 0.9.2.32  2007/03/30 11:59:24  brian
  - heavy rework of MP syncrhonization
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/30 11:59:24 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/03/30 23:29:13 $"
 
-static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/30 11:59:24 $";
+static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/03/30 23:29:13 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -84,7 +87,7 @@ static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/03/30 11:59:24 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/03/30 23:29:13 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
