@@ -1,0 +1,418 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: vxwcompat.9.man,v 0.9.2.1 2007/03/30 11:57:08 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/03/30 11:57:08 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: vxwcompat.9.man,v $
+.\" Revision 0.9.2.1  2007/03/30 11:57:08  brian
+.\" - new manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strcompat.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strcompat.macros
+.\"
+.\"
+.TH VXWCOMPAT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B vxwcompat
+\- VxWorks WindNET \fISTREAMS\fR Compatibility
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _VXW_SOURCE
+.br
+.B #include <sys/ddi.h>
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.B @PACKAGE_TITLE@
+provides a compatibility module,
+.BR streams-vxwcompat.o ,
+that provide compatibility fuctions that smooth porting of driver from the
+.I VxWorks 5.4 Tornado II
+.I WindNET STREAMS 1.0
+environment to
+.BR "@PACKAGE_TITLE@" .
+The functions provided by this compatiblity module are described here.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Many of the functions that are provided by
+.IR VxWorks \(rg
+are also provided by the core
+.B streams.o
+kernel module of
+.BR "@PACKAGE_TITLE@" ,
+or by the
+.IR "SVR 4.2 MP"
+compatible
+.B streams-svr4compat.o
+kernel module of
+.BR "@PACKAGE_TITLE@" .
+Other
+.IR VxWorks \(rg-specific
+functions are provided by the
+.B streams-vxwcompat.o
+compatiblity kernel module.
+.PP
+Note that
+.IR VxWorks \(rg
+.I STREAMS
+was originally from a
+.B Mentat
+implemetnation and many of the same concepts apply.
+See
+.BR mpscompat (9).
+.\"
+.\"
+.SS "Core Functions"
+.PP
+Functions that are already available in
+.B Linux Fast-STREAMS
+are as follows:
+.HP
+.BR adjmsg (9)\ \-\ \c
+.PD 0
+.HP
+.BR allocb (9)\ \-\ \c
+.HP
+.BR backq (9)\ \-\ \c
+.HP
+.BR bcanput (9)\ \-\ \c
+.HP
+.BR bcanputnext (9)\ \-\ \c
+.HP
+.BR bufcall (9)\ \-\ \c
+.HP
+.BR canput (9)\ \-\ \c
+.HP
+.BR canputnext (9)\ \-\ \c
+.HP
+.BR copyb (9)\ \-\ \c
+.HP
+.BR copymsg (9)\ \-\ \c
+.HP
+.BR datamsg (9)\ \-\ \c
+.HP
+.BR dupb (9)\ \-\ \c
+.HP
+.BR dupmsg (9)\ \-\ \c
+.HP
+.BR enableok (9)\ \-\ \c
+.HP
+.BR esballoc (9)\ \-\ \c
+.HP
+.BR flushband (9)\ \-\ \c
+.HP
+.BR flushq (9)\ \-\ \c
+.HP
+.BR freeb (9)\ \-\ \c
+.HP
+.BR freemsg (9)\ \-\ \c
+.HP
+.BR freezestr (9)\ \-\ \c
+.HP
+.BR getadmin (9)\ \-\ \c
+.HP
+.BR getmid (9)\ \-\ \c
+.HP
+.BR getq (9)\ \-\ \c
+.HP
+.BR insq (9)\ \-\ \c
+.HP
+.BR linkb (9)\ \-\ \c
+.HP
+.BR msgdsize (9)\ \-\ \c
+.HP
+.BR msgpullup (9)\ \-\ \c
+.HP
+.BR noenable (9)\ \-\ \c
+.HP
+.BR OTHERQ (9)\ \-\ \c
+.HP
+.BR pullupmsg (9)\ \-\ \c
+.HP
+.BR putbq (9)\ \-\ \c
+.HP
+.BR putctl (9)\ \-\ \c
+.HP
+.BR putctl1 (9)\ \-\ \c
+.HP
+.BR putctl2 (9)\ \-\ \c
+.HP
+.BR putnext (9)\ \-\ \c
+.HP
+.BR putnextctl (9)\ \-\ \c
+.HP
+.BR putnextctl1 (9)\ \-\ \c
+.HP
+.BR putq (9)\ \-\ \c
+.HP
+.BR qenable (9)\ \-\ \c
+.HP
+.BR qprocson (9)\ \-\ \c
+.HP
+.BR qprocsoff (9)\ \-\ \c
+.HP
+.BR qreply (9)\ \-\ \c
+.HP
+.BR qsize (9)\ \-\ \c
+.HP
+.BR RD (9)\ \-\ \c
+.HP
+.BR rmvb (9)\ \-\ \c
+.HP
+.BR rmvq (9)\ \-\ \c
+.HP
+.BR strlog (9)\ \-\ \c
+.HP
+.BR strqget (9)\ \-\ \c
+.HP
+.BR strqset (9)\ \-\ \c
+.HP
+.BR testb (9)\ \-\ \c
+.HP
+.BR unbufcall (9)\ \-\ \c
+.HP
+.BR unlinkb (9)\ \-\ \c
+.HP
+.BR unfreezestr (9)\ \-\ \c
+.HP
+.BR WR (9)\ \-\ \c
+.PD
+.\"
+.SS "Specific Functions"
+.PP
+Functions that are available in the
+.B @PACKAGE_TITLE@
+.IR VxWorks \(rg
+compatibility module,
+.BR streams-vxwcompat.o ,
+are as follows:
+.HP
+.BR strmDriverAdd (9)\ \-\ \c
+Configure a \fISTREAMS\fP driver.
+.PD 0
+.HP
+.BR strmModuleAdd (9)\ \-\ \c
+Configure a \fISTREAMS\fP module.
+.PD
+.\"
+.SS "Transport Functions"
+.PP
+.PD 0
+.PD
+.\"
+.\"
+.SH USAGE
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+.\"
+.\"
+.SH ERRORS
+.PP
+.\"
+.\"
+.SH CONTEXT
+.PP
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+These are
+.IR VxWorks \(rg-specific
+functions:
+.B _VXW_SOURCE
+must be defined before including DDI/DKI include files to expose these symbols.
+.B @PACKAGE_TITLE@
+must also have been compiled with
+.B CONFIG_STREAMS_COMPAT_VXW
+or
+.B CONFIG_STREAMS_COMPAT_VXW_MODULE
+defined.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.SH IOCTLS
+.PP
+.\"
+.\"
+.SH SYSCTLS
+.PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+Core functions:
+.PP
+Compatibility functions:
+.PP
+Transport functions:
+.PP
+General:
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+These functions are compatible with
+.IR VxWorks \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.IP \(em
+These are
+.IR VxWorks \(rg-specific
+functions and should not be used by portable
+.I STREAMS
+drivers and modules.
+The more common
+.I SVR 4.2 MP
+functions should be used in their stead.
+.IP \(em
+These functions
+are provided for source level compatibility with
+.IR VxWorks \(rg
+for the purpose of porting
+.IR VxWorks \(rg
+drivers to
+.BR Linux .
+Because internal structures and definitions for
+.B @PACKAGE_TITLE@
+.[
+@PACKAGE@
+.]
+differ from that of
+.IR VxWorks \(rg,
+binaries are incompatible.
+.IP \(em
+These functions
+only provide functionality comparable to
+.IR VxWorks \(rg
+for use by
+.I STREAMS
+drivers and modules.
+Any and all functionality provided by
+these functions
+in support of
+.RI non- STREAMS
+devices are not supported.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR VxWorks \(rg
+documentation.
+.[
+vxwspg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+Most of these functions
+first appeared in
+.IR VxWorks \(rg.
+.[
+vxwspg
+.]
+Functions with name starting with
+.I mi_
+are probably Mentat, Inc. functions that goe all the way back to the
+.RI pre- OSF/1
+.I Mentat
+implementations.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
