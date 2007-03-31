@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2007/03/30 11:59:14 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2007/03/31 07:23:59 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/30 11:59:14 $ by $Author: brian $
+ Last Modified $Date: 2007/03/31 07:23:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.144  2007/03/31 07:23:59  brian
+ - only prlock midstream on SMP
+
  Revision 0.9.2.143  2007/03/30 11:59:14  brian
  - heavy rework of MP syncrhonization
 
@@ -116,10 +119,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2007/03/30 11:59:14 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2007/03/31 07:23:59 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2007/03/30 11:59:14 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2007/03/31 07:23:59 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */
@@ -1154,12 +1157,13 @@ streams_noinline streams_fastcall __hot_in void
 qbackenable(queue_t *q, const unsigned char band, const char bands[])
 {
 	queue_t *q_back;
-	struct stdata *sd;
 
 	dassert(q);
-	sd = qstream(q);
-	dassert(sd);
-	prlock(sd);
+#ifdef CONFIG_SMP
+	dassert(qstream(q));
+	if (q->q_next == NULL)
+		prlock(qstream(q));
+#endif
 
 	for (q_back = backq(q); (q = q_back) && (q_back = backq(q)) && !q->q_qinfo->qi_srvp;) ;
 
@@ -1192,7 +1196,10 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 		   control */
 		qenable(q);	/* always enable if a service procedure exists */
 	}
-	prunlock(sd);
+#ifdef CONFIG_SMP
+	if (q->q_next == NULL)
+		prunlock(qstream(q));
+#endif
 }
 
 EXPORT_SYMBOL_GPL(qbackenable);
@@ -1521,17 +1528,24 @@ streams_fastcall __hot_in int
 bcanput(register queue_t *q, unsigned char band)
 {
 	register int result;
-	struct stdata *sd;
+#ifdef CONFIG_SMP
+	int stream_end = (backq(q) == NULL);
+#endif
 
 	dassert(q);
-	sd = qstream(q);
+	dassert(qstream(q));
 
-	dassert(sd);
-	prlock(sd);
+#ifdef CONFIG_SMP
+	if (unlikely(stream_end))
+		prlock(qstream(q));
+#endif
 
 	result = __bcanput(q, band);
 
-	prunlock(sd);
+#ifdef CONFIG_SMP
+	if (unlikely(stream_end))
+		prunlock(qstream(q));
+#endif
 	return (result);
 }
 
@@ -1574,18 +1588,25 @@ streams_fastcall __hot int
 bcanputnext(register queue_t *q, unsigned char band)
 {
 	register int result;
-	struct stdata *sd;
-
-	dassert(q);
-	sd = qstream(q);
-	dassert(sd);
-	prlock(sd);
+#ifdef CONFIG_SMP
+	int stream_end = (backq(q) == NULL);
+#endif
 
 	dassert(q);
 	dassert(q->q_next);
+	dassert(qstream(q));
+
+#ifdef CONFIG_SMP
+	if (stream_end)
+		prlock(qstream(q));
+#endif
+
 	result = __bcanput(q->q_next, band);
 
-	prunlock(sd);
+#ifdef CONFIG_SMP
+	if (stream_end)
+		prunlock(qstream(q));
+#endif
 
 	return (result);
 }
@@ -2998,16 +3019,21 @@ qcountstrm(queue_t *q)
 	ssize_t count = 0;
 
 	if (q) {
-		struct stdata *sd;
+#ifdef CONFIG_SMP
+		int stream_end = (backq(q) == NULL);
 
-		sd = qstream(q);
-		assert(sd);
-		prlock(sd);
+		dassert(qstream(q));
+		if (stream_end)
+			prlock(qstream(q));
+#endif
 
 		for (; q && SAMESTR(q); q = q->q_next)
 			count += q->q_count;
 
-		prunlock(sd);
+#ifdef CONFIG_SMP
+		if (stream_end)
+			prunlock(qstream(q));
+#endif
 	}
 	return (count);
 }

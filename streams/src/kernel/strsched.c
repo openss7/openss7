@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2007/03/30 14:51:41 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2007/03/31 07:23:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/30 14:51:41 $ by $Author: brian $
+ Last Modified $Date: 2007/03/31 07:23:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.157  2007/03/31 07:23:58  brian
+ - only prlock midstream on SMP
+
  Revision 0.9.2.156  2007/03/30 14:51:41  brian
  - updated manual pages and missing symbol
 
@@ -152,10 +155,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2007/03/30 14:51:41 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2007/03/31 07:23:58 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2007/03/30 14:51:41 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2007/03/31 07:23:58 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -2221,9 +2224,9 @@ qwakeup(queue_t *q)
 STATIC streams_inline streams_fastcall void
 strwrit_fast(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *))
 {
-#ifdef CONFIG_SMP
 	dassert(func);
 	dassert(q);
+#ifdef CONFIG_SMP
 	dassert(qstream(q));
 	prlock(qstream(q));
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
@@ -2263,9 +2266,9 @@ strwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *))
 STATIC streams_inline streams_fastcall void
 strfunc_fast(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
-#ifdef CONFIG_SMP
 	dassert(func);
 	dassert(q);
+#ifdef CONFIG_SMP
 	dassert(qstream(q));
 	prlock(qstream(q));
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
@@ -2333,8 +2336,11 @@ putp_fast(queue_t *q, mblk_t *mp)
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
+	/* Note that this locking is only really required on a Stream end. All other queues are
+	   referenced from within the STREAMS framework. */
 	dassert(qstream(q));
-	prlock(qstream(q));
+	if (unlikely(backq(q) == NULL))
+		prlock(qstream(q));
 
 	/* procs can't be turned off */
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
@@ -2368,7 +2374,8 @@ putp_fast(queue_t *q, mblk_t *mp)
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
 	dassert(qstream(q));
-	prunlock(qstream(q));
+	if (unlikely(backq(q) == NULL))
+		prunlock(qstream(q));
 #endif
 	qwakeup(q);
 }
@@ -3267,6 +3274,16 @@ put(queue_t *q, mblk_t *mp)
 	dassert(q->q_qinfo);
 	dassert(q->q_qinfo->qi_putp);
 
+#ifdef CONFIG_SMP
+	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
+	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
+	   matter) on the stack.  Note that these are a no-op on UP. */
+	/* Note that this locking is only really required on a Stream end. All other queues are
+	   referenced from within the STREAMS framework. */
+	dassert(qstream(q));
+	if (unlikely(backq(q) == NULL))
+		prlock(qstream(q));
+#endif
 	if (likely(q->q_ftmsg == NULL) || likely(!put_filter(&q, mp))) {
 #ifdef CONFIG_STREAMS_SYNCQS
 		qputp(q, mp);
@@ -3274,6 +3291,14 @@ put(queue_t *q, mblk_t *mp)
 		putp_fast(q, mp);
 #endif
 	}
+#ifdef CONFIG_SMP
+	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
+	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
+	   matter) on the stack.  Note that these are a no-op on UP. */
+	dassert(qstream(q));
+	if (unlikely(backq(q) == NULL))
+		prunlock(qstream(q));
+#endif
 	return;
 }
 
@@ -3326,8 +3351,11 @@ putnext(queue_t *q, mblk_t *mp)
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
+	/* Note that this locking is only really required on a Stream end. All other queues are
+	   referenced from within the STREAMS framework. */
 	dassert(qstream(q));
-	prlock(qstream(q));
+	if (unlikely(backq(q) == NULL))
+		prlock(qstream(q));
 #endif
 #ifdef CONFIG_STREAMS_SYNCQS
 	qputp(q->q_next, mp);
@@ -3339,7 +3367,8 @@ putnext(queue_t *q, mblk_t *mp)
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
 	dassert(qstream(q));
-	prunlock(qstream(q));
+	if (unlikely(backq(q) == NULL))
+		prunlock(qstream(q));
 #endif
 	_trace();
 }
