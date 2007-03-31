@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: putq.9.man,v 0.9.2.31 2006/10/05 12:17:07 brian Exp $
+.\" @(#) $Id: putq.9.man,v 0.9.2.32 2007/03/31 15:50:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:17:07 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/31 15:50:12 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: putq.9.man,v $
+.\" Revision 0.9.2.32  2007/03/31 15:50:12  brian
+.\" - flow control corrections
+.\"
 .\" Revision 0.9.2.31  2006/10/05 12:17:07  brian
 .\" - updates for release
 .\"
@@ -493,7 +496,7 @@ flag on the queue or queue band that was full, indicating to
 .BR getq (9)
 and
 .BR rmvq (9)
-that backenabling is required when the queue falls to its low water mark.
+that back-enabling is required when the queue falls to its low water mark.
 .PP
 When
 .BR getq (9)

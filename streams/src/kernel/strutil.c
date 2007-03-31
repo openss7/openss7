@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2007/03/31 07:23:59 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2007/03/31 15:50:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/31 07:23:59 $ by $Author: brian $
+ Last Modified $Date: 2007/03/31 15:50:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.145  2007/03/31 15:50:15  brian
+ - flow control corrections
+
  Revision 0.9.2.144  2007/03/31 07:23:59  brian
  - only prlock midstream on SMP
 
@@ -119,10 +122,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2007/03/31 07:23:59 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2007/03/31 15:50:15 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2007/03/31 07:23:59 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2007/03/31 15:50:15 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */
@@ -1156,18 +1159,26 @@ STATIC struct qband *__get_qband(queue_t *q, unsigned char band);
 streams_noinline streams_fastcall __hot_in void
 qbackenable(queue_t *q, const unsigned char band, const char bands[])
 {
-	queue_t *q_back;
+	register queue_t *q_back, *qt;
+
+#ifdef CONFIG_SMP
+	queue_t *q_next;
+	struct stdata *sd;
+#endif
 
 	dassert(q);
 #ifdef CONFIG_SMP
+	q_next = q->q_next;
 	dassert(qstream(q));
-	if (q->q_next == NULL)
-		prlock(qstream(q));
+	sd = qstream(q);
+	if (unlikely(q_next == NULL))
+		prlock(sd);
 #endif
 
-	for (q_back = backq(q); (q = q_back) && (q_back = backq(q)) && !q->q_qinfo->qi_srvp;) ;
+	for (qt = q, q_back = backq(qt);
+	     (qt = q_back) && (q_back = backq(qt)) && !qt->q_qinfo->qi_srvp;) ;
 
-	if (likely(q != NULL)) {
+	if (likely(qt != NULL)) {
 		/* If we are backenabling a Stream end queue then we will be specific about why it
 		   was backenabled, this gives the Stream head or driver information about for
 		   which specific bands flow control has subsided. */
@@ -1175,30 +1186,30 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 			unsigned long pl;
 			struct qband *qb;
 
-			qwlock(q, pl);
+			qwlock(qt, pl);
 			if (likely(bands == NULL)) {
 				if (band == 0)
-					set_bit(QBACK_BIT, &q->q_flag);
-				else if ((qb = __get_qband(q, band)))
+					set_bit(QBACK_BIT, &qt->q_flag);
+				else if ((qb = __get_qband(qt, band)))
 					set_bit(QB_BACK_BIT, &qb->qb_flag);
 			} else {
 				int bnum;
 
 				if (bands[0])
-					set_bit(QBACK_BIT, &q->q_flag);
+					set_bit(QBACK_BIT, &qt->q_flag);
 				for (bnum = band; bnum > 0; bnum--)
-					if (bands[bnum] && (qb = __get_qband(q, bnum)))
+					if (bands[bnum] && (qb = __get_qband(qt, bnum)))
 						set_bit(QB_BACK_BIT, &qb->qb_flag);
 			}
-			qwunlock(q, pl);
+			qwunlock(qt, pl);
 		}
 		/* SVR4 SPG - noenable() does not prevent a queue from being back enabled by flow
 		   control */
-		qenable(q);	/* always enable if a service procedure exists */
+		qenable(qt);	/* always enable if a service procedure exists */
 	}
 #ifdef CONFIG_SMP
-	if (q->q_next == NULL)
-		prunlock(qstream(q));
+	if (unlikely(q_next == NULL))
+		prunlock(sd);
 #endif
 }
 
@@ -1528,6 +1539,7 @@ streams_fastcall __hot_in int
 bcanput(register queue_t *q, unsigned char band)
 {
 	register int result;
+
 #ifdef CONFIG_SMP
 	int stream_end = (backq(q) == NULL);
 #endif
@@ -1588,6 +1600,7 @@ streams_fastcall __hot int
 bcanputnext(register queue_t *q, unsigned char band)
 {
 	register int result;
+
 #ifdef CONFIG_SMP
 	int stream_end = (backq(q) == NULL);
 #endif
@@ -1934,8 +1947,8 @@ __putbq(queue_t *q, mblk_t *mp)
 			b_prev = b_next;
 			b_next = b_prev->b_next;
 		}
+		enable = test_bit(QWANTR_BIT, &q->q_flag);
 		if (likely(mp->b_band == 0)) {
-			enable = test_bit(QWANTR_BIT, &q->q_flag) ? 1 : 0;
 		      hipri:
 			if ((q->q_count += msgsize(mp)) > q->q_hiwat)
 				set_bit(QFULL_BIT, &q->q_flag);
@@ -1955,7 +1968,6 @@ __putbq(queue_t *q, mblk_t *mp)
 
 			if (unlikely((qb = __get_qband(q, mp->b_band)) == NULL))
 				return (0);
-			enable = (test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
 			if (qb->qb_last == b_prev || qb->qb_last == NULL)
 				qb->qb_last = mp;
 			if (qb->qb_first == b_next || qb->qb_first == NULL)
@@ -2247,8 +2259,7 @@ __putq_band(queue_t *q, mblk_t *mp)
 		b_next = b_prev->b_next;
 	}
 	/* enable if will be first message in queue, or requested by getq() */
-	enable = ((q->q_first == b_next)
-		  || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
+	enable = ((q->q_first == b_next) || test_bit(QWANTR_BIT, &q->q_flag));
 	if (likely(qb->qb_last == b_prev || qb->qb_last == NULL))
 		qb->qb_last = mp;
 	if (unlikely(qb->qb_first == b_next || qb->qb_first == NULL))
@@ -2301,11 +2312,8 @@ __putq(queue_t *q, mblk_t *mp)
 
 			b_prev = q->q_last;
 			b_next = NULL;
-			/* enable if will be first message in queue, or requested by getq() */
-			if (likely(q->q_first == NULL))
-				enable = 1;
-			else
-				enable = (test_bit(QWANTR_BIT, &q->q_flag) != 0);
+			/* enable if requested by getq() */
+			enable = (q->q_first == NULL || test_bit(QWANTR_BIT, &q->q_flag));
 			if (unlikely((q->q_count += msgsize(mp)) > q->q_hiwat))
 				set_bit(QFULL_BIT, &q->q_flag);
 			if (likely(q->q_last == b_prev))
@@ -2390,8 +2398,8 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 
 	if (likely(emp == NULL))
 		goto putq;
-	/* ingnore message class for insq() */
-	enable = ((q->q_first == emp) || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
+	/* ignore message class for insq() */
+	enable = ((q->q_first == emp) || test_bit(QWANTR_BIT, &q->q_flag));
 	/* insert before emp */
 	if (nmp->b_datap->db_type >= QPCTL) {
 		if (emp->b_prev && emp->b_prev->b_datap->db_type < QPCTL)
@@ -2407,8 +2415,7 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		if (unlikely(nmp->b_band)) {
 			if (!(qb = __get_qband(q, nmp->b_band)))
 				goto enomem;
-			enable = ((q->q_first == emp)
-				  || test_bit(QWANTR_BIT, &q->q_flag)) ? 1 : 0;
+			enable = ((q->q_first == emp) || test_bit(QWANTR_BIT, &q->q_flag));
 			if (qb->qb_last == emp || qb->qb_last == NULL)
 				qb->qb_last = nmp;
 			if (qb->qb_first == emp->b_next || qb->qb_first == NULL)
@@ -3101,19 +3108,17 @@ __rmvq_band(queue_t *q, mblk_t *mp)
 	qb->qb_count -= msgsize(mp);
 	assert(qb->qb_count >= 0);
 	{
-		bool backenable;
+		bool backenable = false;
 
-		if (qb->qb_count == 0 || qb->qb_count < qb->qb_lowat) {
+		if (likely(qb->qb_count <= qb->qb_lowat)) {
 			if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
 				q->q_blocked--;
 			if (test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag))
 				backenable = true;
-			else
-				backenable = false;
-		} else
-			backenable = false;
-		/* no longer want to read */
-		clear_bit(QWANTR_BIT, &q->q_flag);
+		} else if (likely(qb->qb_count < qb->qb_hiwat)) {
+			if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
+				q->q_blocked--;
+		}
 		return (backenable);
 	}
 }
@@ -3168,18 +3173,14 @@ __rmvq(queue_t *q, mblk_t *mp)
 		q->q_count -= msgsize(mp);
 		assert(q->q_count >= 0);
 		{
-			bool backenable;
+			bool backenable = false;
 
-			if (q->q_count == 0 || q->q_count < q->q_lowat) {
+			if (likely(q->q_count <= q->q_lowat)) {
 				clear_bit(QFULL_BIT, &q->q_flag);
 				if (test_and_clear_bit(QWANTW_BIT, &q->q_flag))
 					backenable = true;
-				else
-					backenable = false;
-			} else
-				backenable = false;
-			/* no longer want to read band zero */
-			clear_bit(QWANTR_BIT, &q->q_flag);
+			} else if (likely(q->q_count < q->q_hiwat))
+				clear_bit(QFULL_BIT, &q->q_flag);
 			return (backenable);
 		}
 	}
@@ -3404,7 +3405,11 @@ EXPORT_SYMBOL(flushband);
  *  messages on the queue if other messages are arriving.  We backenable and free buffer chains
  *  later outside the locks.  We are much faster for FLUSHALL of deep queues.
  *
- *  Note that the putq() deferral chain is flushed as well.
+ *  For __getq() we had the problem that backenabling an empty queue was a bad idea.  It turns out
+ *  that it is a bad idea for flushing as well as it causes false backenables to occur.  This can
+ *  mess with proper flow control indications at the Stream head and was causing two test cases to
+ *  fail will less restrictive locking.  So now we only backenable when a QWANTW or QB_WANTW flag
+ *  was set in the same fashion as __getq().
  */
 streams_noinline streams_fastcall __unlikely bool
 __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
@@ -3414,6 +3419,7 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
 
 	if ((b = q->q_first)) {
 		if (likely(flag == FLUSHALL)) {
+			unsigned char q_nband;
 			struct qband *qb;
 
 			/* This is fast! For flushall, we link the whole chain onto the free list
@@ -3425,22 +3431,24 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
 			q->q_count = 0;
 			q->q_msgs = 0;
 			clear_bit(QFULL_BIT, &q->q_flag);
-			clear_bit(QWANTW_BIT, &q->q_flag);
-			set_bit(QWANTR_BIT, &q->q_flag);
-			for (qb = q->q_bandp; qb; qb = qb->qb_next) {
+			if (test_and_clear_bit(QWANTW_BIT, &q->q_flag)) {
+				backenable = true;
+				if (bands)
+					bands[0] = true;
+			}
+			for (q_nband = q->q_nband, qb = q->q_bandp; qb; qb = qb->qb_next, --q_nband) {
 				qb->qb_first = qb->qb_last = NULL;
 				qb->qb_count = 0;
 				qb->qb_msgs = 0;
 				if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
-					--q->q_blocked;
-				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
+					q->q_blocked--;
+				if (test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag)) {
+					backenable = true;
+					if (bands)
+						bands[q_nband] = true;
+				}
 			}
 			q->q_blocked = 0;
-			backenable = true;	/* always backenable when queue empty */
-			if (bands)
-				do {
-					bands[b->b_band] = true;
-				} while ((b = b->b_next));
 		} else if (likely(flag == FLUSHDATA)) {
 			mblk_t *b_next;
 
@@ -3517,12 +3525,12 @@ EXPORT_SYMBOL(flushq);		/* include/sys/streams/stream.h */
 STATIC streams_inline streams_fastcall __hot mblk_t *
 __getq(queue_t *q, bool *be)
 {
+	bool backenable = false;
 	mblk_t *mp;
 
 	if (likely((mp = q->q_first) != NULL)) {
 		mblk_t *b_next;
 
-		*be = false;
 		/* hand optimized version of above */
 		if ((b_next = mp->b_next))
 			b_next->b_prev = NULL;
@@ -3535,39 +3543,17 @@ __getq(queue_t *q, bool *be)
 		if (likely(mp->b_band == 0)) {
 			q->q_count -= msgsize(mp);
 			assert(q->q_count >= 0);
-#if 0
-			/* This turns out to be a really bad policy: empty queues are backenabling
-			   way too fast, running the upstream service procedure which causes it to
-			   backenable further.  This is a waste.  Remember to change the
-			   documentation too! My case was the case of a receive buffer too small,
-			   putting this back. */
-			if (q->q_count == 0) {
-				clear_bit(QFULL_BIT, &q->q_flag);
-				clear_bit(QWANTW_BIT, &q->q_flag);
-				*be = true;
-			} else if (q->q_count < q->q_lowat) {
+			if (likely(q->q_count <= q->q_lowat)) {
 				clear_bit(QFULL_BIT, &q->q_flag);
 				if (test_and_clear_bit(QWANTW_BIT, &q->q_flag))
-					*be = true;
-			}
-#else
-			if (q->q_count == 0 || q->q_count < q->q_lowat) {
+					backenable = true;
+			} else if (likely(q->q_count < q->q_hiwat)) {
 				clear_bit(QFULL_BIT, &q->q_flag);
-				if (test_and_clear_bit(QWANTW_BIT, &q->q_flag))
-					*be = true;
 			}
-#endif
-			/* no longer want to read band zero */
-			clear_bit(QWANTR_BIT, &q->q_flag);
 		} else {
 			struct qband *qb;
 
-			{
-				unsigned char q_nband, band;
-
-				for (band = mp->b_band, q_nband = q->q_nband, qb = q->q_bandp;
-				     qb && q_nband > band; qb = qb->qb_next, --q_nband) ;
-			}
+			qb = __find_qband(q, mp->b_band);
 			assert(qb);
 			qb->qb_first = b_next;
 			if (qb->qb_last == mp)
@@ -3576,20 +3562,22 @@ __getq(queue_t *q, bool *be)
 			assert(qb->qb_msgs >= 0);
 			qb->qb_count -= msgsize(mp);
 			assert(qb->qb_count >= 0);
-			if (qb->qb_count == 0 || qb->qb_count < qb->qb_lowat) {
+			if (likely(qb->qb_count <= qb->qb_lowat)) {
 				if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
 					q->q_blocked--;
 				if (test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag))
-					*be = true;
+					backenable = true;
+			} else if (likely(qb->qb_count < qb->qb_hiwat)) {
+				if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
+					q->q_blocked--;
 			}
-			/* including band zero */
-			clear_bit(QWANTR_BIT, &q->q_flag);
 		}
+		/* successful read, clear want read bit */
+		clear_bit(QWANTR_BIT, &q->q_flag);
 	} else {
-		*be = false;
-		if (!test_and_set_bit(QWANTR_BIT, &q->q_flag))
-			*be = true;
+		set_bit(QWANTR_BIT, &q->q_flag);
 	}
+	*be = backenable;
 	return (mp);
 }
 
@@ -3997,7 +3985,7 @@ strqset(register queue_t *q, qfields_t what, register unsigned char band, long v
 				q->q_minpsz = val;
 				break;
 			case QHIWAT:
-				qb->qb_lowat = val;
+				qb->qb_hiwat = val;
 				break;
 			case QLOWAT:
 				qb->qb_lowat = val;

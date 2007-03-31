@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: M_SETOPTS.9.man,v 0.9.2.14 2006/07/13 12:55:46 brian Exp $
+.\" @(#) $Id: M_SETOPTS.9.man,v 0.9.2.15 2007/03/31 15:50:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/07/13 12:55:46 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/31 15:50:11 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: M_SETOPTS.9.man,v $
+.\" Revision 0.9.2.15  2007/03/31 15:50:11  brian
+.\" - flow control corrections
+.\"
 .\" Revision 0.9.2.14  2006/07/13 12:55:46  brian
 .\" - updated documentation for sk_buffs
 .\"
@@ -434,7 +437,7 @@ determines when the read side of the Stream is full.
 Sets the low water mark,
 .IR q_lowat ,
 for the Stream head read queue.  This watermark is important to read side flow control and
-determines when the read side of the Stream should be backenabled.
+determines when the read side of the Stream should be back-enabled.
 .\"
 .\"
 .SS SO_MREADON

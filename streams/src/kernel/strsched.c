@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2007/03/31 07:23:58 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.158 $) $Date: 2007/03/31 15:50:14 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/31 07:23:58 $ by $Author: brian $
+ Last Modified $Date: 2007/03/31 15:50:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.158  2007/03/31 15:50:14  brian
+ - flow control corrections
+
  Revision 0.9.2.157  2007/03/31 07:23:58  brian
  - only prlock midstream on SMP
 
@@ -155,10 +158,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2007/03/31 07:23:58 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.158 $) $Date: 2007/03/31 15:50:14 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2007/03/31 07:23:58 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.158 $) $Date: 2007/03/31 15:50:14 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -4992,10 +4995,10 @@ str_term_caches(void)
 #ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(cache) == 0)
 			continue;
+		printk(KERN_ERR "%s: could not destroy %s cache\n", __FUNCTION__, ci->name);
 #else				/* HAVE_KTYPE_KMEM_CACHE_T_P */
 		kmem_cache_destroy(cache);
 #endif				/* HAVE_KTYPE_KMEM_CACHE_T_P */
-		printk(KERN_ERR "%s: could not destroy %s cache\n", __FUNCTION__, ci->name);
 	}
 }
 

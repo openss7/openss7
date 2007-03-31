@@ -1,5 +1,24 @@
 2007-03-31  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man9/M_SETOPTS.9.man: doc updates for flow control corrections
+	* doc/man/man9/bcanput.9.man: doc updates for flow control corrections
+	* doc/man/man9/bcanputnext.9.man: doc updates for flow control corrections
+	* doc/man/man9/canenable.9.man: doc updates for flow control corrections
+	* doc/man/man9/canputnext.9.man: doc updates for flow control corrections
+	* doc/man/man9/flushband.9.man: doc updates for flow control corrections
+	* doc/man/man9/flushq.9.man: doc updates for flow control corrections
+	* doc/man/man9/getq.9.man: doc updates for flow control corrections
+	* doc/man/man9/insq.9.man: doc updates for flow control corrections
+	* doc/man/man9/putq.9.man: doc updates for flow control corrections
+	* doc/man/man9/queue.9.man: doc updates for flow control corrections
+	* doc/manual/bugs.texi: mentioned false back-enable bug
+	* src/kernel/strsched.c: correct hanging printk()
+	* src/kernel/strutil.c:
+	  - only lock when necessary
+	  - correct QWANTR flag handling
+	  - correct QWANTW and QFULL flag handling
+	  - correct QHIWAT in strqset
+	* src/modules/sth.c: use i_mutex instead of i_lock
 	* src/modules/sth.c: get getown setown proper for struct pid
 	* src/kernel/strsched.c: only prlock midstream on SMP
 	* src/kernel/strutil.c: only prlock midstream on SMP

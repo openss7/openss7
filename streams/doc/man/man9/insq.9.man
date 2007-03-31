@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: insq.9.man,v 0.9.2.32 2006/04/05 09:44:13 brian Exp $
+.\" @(#) $Id: insq.9.man,v 0.9.2.33 2007/03/31 15:50:12 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:13 $ by $Author: brian $
+.\" Last Modified $Date: 2007/03/31 15:50:12 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: insq.9.man,v $
+.\" Revision 0.9.2.33  2007/03/31 15:50:12  brian
+.\" - flow control corrections
+.\"
 .\" Revision 0.9.2.32  2006/04/05 09:44:13  brian
 .\" - moved .so line and updated headers
 .\"
@@ -395,7 +398,7 @@ or the message was placed with
 .\".IR qi_srvp (9)
 .\"procedure.
 .\".BR noenable (9)
-.\"doesnot prevent the queue from being scheduled by a flow control back-enable.  The inverse of
+.\"does not prevent the queue from being scheduled by a flow control back-enable.  The inverse of
 .\".BR noenable (9)
 .\"is
 .\".BR enableok (9).

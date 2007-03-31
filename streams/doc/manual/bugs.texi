@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.7 2007/03/17 08:31:56 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.8 2007/03/31 15:50:13 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,23 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/17 08:31:56 $ by $Author: brian $
+@c Last Modified $Date: 2007/03/31 15:50:13 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 008.  2007-03-31T05:33:29-0600
+
+When loosening SMP locking, found a bug in the QWANTR handling in getq() and back-enabling in
+flushq() and flushband().  Both of these were generating false back-enables.  The getq() was
+generating a @emph{lot} of false back-enables.  Whenever getq() found an empty queue it was not
+only setting QWANTR, but it was back-enabling the queue.  The result is that if service procedures
+are used exclusively (that is, qi_put() always does a putq()), getq() would generate a false
+back-enable for each message.  Also, the enabled queue would generate another false back-enable.
+Significant performance gains should be noticed.
+
+@emph{*fixed*} in @command{streams-0.9.2.3}
+
 @item 007.  2007-03-16T17:33:20-0600
 
 @iftex
