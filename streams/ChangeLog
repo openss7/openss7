@@ -1,3 +1,8 @@
+2007-03-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/strsched.c: only prlock midstream on SMP
+	* src/kernel/strutil.c: only prlock midstream on SMP
+
 2007-03-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/register_strsync.9.man: added new manual pages
