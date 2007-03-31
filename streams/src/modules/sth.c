@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.181 $) $Date: 2007/03/31 07:25:49 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.182 $) $Date: 2007/03/31 15:50:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/31 07:25:49 $ by $Author: brian $
+ Last Modified $Date: 2007/03/31 15:50:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.182  2007/03/31 15:50:17  brian
+ - flow control corrections
+
  Revision 0.9.2.181  2007/03/31 07:25:49  brian
  - get getown setown proper for struct pid
 
@@ -202,10 +205,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.181 $) $Date: 2007/03/31 07:25:49 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.182 $) $Date: 2007/03/31 15:50:17 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.181 $) $Date: 2007/03/31 07:25:49 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.182 $) $Date: 2007/03/31 15:50:17 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -308,7 +311,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.181 $) $Date: 2007/03/31 07:25:49 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.182 $) $Date: 2007/03/31 15:50:17 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -402,10 +405,20 @@ struct streamtab str_info = {
 
 #define stri_lookup(__f) (__f)->private_data
 
+#if 0
+/* Unfortunately we cannot use the spin lock.  In stropen() we need to call qopen() (that can sleep)
+ * with the lock held.  Therefore, use the more efficient mutex if available, otherwise, the big old
+ * semaphore. */
 #if defined HAVE_KMEMB_STRUCT_INODE_I_LOCK
 #define stri_trylock(__i)   (int)({ spin_lock(&(__i)->i_lock); 0; })
 #define stri_lock(__i)	    spin_lock(&(__i)->i_lock)
 #define stri_unlock(__i)    spin_unlock(&(__i)->i_lock);
+#endif
+#endif
+#if defined HAVE_KMEMB_STRUCT_INODE_I_MUTEX
+#define stri_trylock(__i)   mutex_lock_interruptible(&(__i)->i_mutex)
+#define stri_lock(__i)	    mutex_lock(&(__i)->i_mutex)
+#define stri_unlock(__i)    mutex_unlock(&(__i)->i_mutex)
 #else
 #define stri_trylock(__i)   down_interruptible(&(__i)->i_sem)
 #define stri_lock(__i)	    down(&(__i)->i_sem)
@@ -4265,7 +4278,6 @@ stropen(struct inode *inode, struct file *file)
 	_printd(("%s: locking inode %p\n", __FUNCTION__, inode));
 	if ((err = stri_trylock(inode)))
 		goto error;
-	// spin_lock(&inode->i_lock);
 	/* first find out of we already have a stream head, or we need a new one anyway */
 	if (sflag != CLONEOPEN) {
 		_ptrace(("driver open in effect\n"));
