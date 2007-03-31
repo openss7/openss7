@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.180 $) $Date: 2007/03/28 13:44:20 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.181 $) $Date: 2007/03/31 07:25:49 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/28 13:44:20 $ by $Author: brian $
+ Last Modified $Date: 2007/03/31 07:25:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.181  2007/03/31 07:25:49  brian
+ - get getown setown proper for struct pid
+
  Revision 0.9.2.180  2007/03/28 13:44:20  brian
  - updates to syncrhonization, release notes and documentation
 
@@ -199,10 +202,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.180 $) $Date: 2007/03/28 13:44:20 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.181 $) $Date: 2007/03/31 07:25:49 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.180 $) $Date: 2007/03/28 13:44:20 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.181 $) $Date: 2007/03/31 07:25:49 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -305,7 +308,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.180 $) $Date: 2007/03/28 13:44:20 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.181 $) $Date: 2007/03/31 07:25:49 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -4590,20 +4593,15 @@ strfasync(int fd, struct file *file, int on)
 	else if (likely((sd = stri_acquire(file)) != NULL)) {
 		if (likely((err = straccess_rlock(sd, FNDELAY)) == 0)) {
 			if ((err = fasync_helper(fd, file, on, &sd->sd_fasync)) >= 0 && on) {
-				if (file->f_owner.pid == 0) {
-					struct task_struct *c = current;
-
 #ifdef HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
-					file->f_owner.pid =
-					    sd->sd_pgrp ? task_pgrp(c) : task_pid(c);
-					file->f_owner.pid_type =
-					    sd->sd_pgrp ? PIDTYPE_PGID : PIDTYPE_PID;
+				f_setown(file, sd->sd_pgrp, 0);
 #else				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
-					file->f_owner.pid = (-sd->sd_pgrp) ? : c->pid;
-#endif				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
-					file->f_owner.uid = c->uid;
-					file->f_owner.euid = c->euid;
+				if (file->f_owner.pid == 0) {
+					file->f_owner.pid = (-sd->sd_pgrp) ? : current->pid;
+					file->f_owner.uid = current->uid;
+					file->f_owner.euid = current->euid;
 				}
+#endif				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
 				srunlock(sd);
 				sd_put(&sd);
 			      exit:
@@ -6353,7 +6351,7 @@ sock_siocspgrp32(const struct file *file, struct stdata *sd, unsigned long arg)
 #endif				/* WITH_32BIT_CONVERSION */
 
 streams_noinline streams_fastcall __unlikely int
-file_fiogetown(const struct file *file, struct stdata *sd, unsigned long arg)
+file_fiogetown(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	if (test_bit(STRISTTY_BIT, &sd->sd_flag))
 		return tty_tiocspgrp(file, sd, arg);
@@ -6366,10 +6364,12 @@ file_fiogetown(const struct file *file, struct stdata *sd, unsigned long arg)
 			pid_t owner;
 
 #ifdef HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
+			read_lock(&file->f_owner.lock);
 			if (file->f_owner.pid_type == PIDTYPE_PGID)
-				owner = (pid_task(file->f_owner.pid, PIDTYPE_PGID))->pid;
+				owner = pid_nr(file->f_owner.pid);
 			else
 				owner = 0;
+			read_unlock(&file->f_owner.lock);
 #else				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
 			owner = file->f_owner.pid;
 			owner = (owner < 0) ? -owner : 0;
@@ -6384,7 +6384,7 @@ file_fiogetown(const struct file *file, struct stdata *sd, unsigned long arg)
 
 #ifdef WITH_32BIT_CONVERSION
 streams_noinline streams_fastcall __unlikely int
-file_fiogetown32(const struct file *file, struct stdata *sd, unsigned long arg)
+file_fiogetown32(struct file *file, struct stdata *sd, unsigned long arg)
 {
 	/* XXX is (pid_t *) compatible? */
 	return file_fiogetown(file, sd, (unsigned long) compat_ptr(arg));
@@ -6405,19 +6405,15 @@ file_fiosetown(struct file *file, struct stdata *sd, unsigned long arg)
 		if (get_user(owner, (pid_t *) arg))
 			return (-EFAULT);
 		if ((err = straccess_wlock(sd, FEXCL))) {
-			struct task_struct *c = current;
-
 			sd->sd_pgrp = (owner < 0) ? -owner : 0;
 			swunlock(sd);
-
 #ifdef HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
-			file->f_owner.pid = sd->sd_pgrp ? task_pgrp(c) : task_pid(c);
-			file->f_owner.pid_type = sd->sd_pgrp ? PIDTYPE_PGID : PIDTYPE_PID;
+			f_setown(file, owner, 1);
 #else				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
 			file->f_owner.pid = (-sd->sd_pgrp) ? : owner;
+			file->f_owner.uid = current->uid;
+			file->f_owner.euid = current->euid;
 #endif				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
-			file->f_owner.uid = c->uid;
-			file->f_owner.euid = c->euid;
 		}
 		return (err);
 	}
