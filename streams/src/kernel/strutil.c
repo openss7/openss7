@@ -2241,7 +2241,6 @@ __putq_pri(queue_t *q, mblk_t *mp)
 streams_noinline streams_fastcall int
 __putq_band(queue_t *q, mblk_t *mp)
 {
-	int enable;
 	mblk_t *b_prev, *b_next;
 	struct qband *qb;
 
@@ -2259,8 +2258,6 @@ __putq_band(queue_t *q, mblk_t *mp)
 		b_prev = b_next;
 		b_next = b_prev->b_next;
 	}
-	/* enable if will be first message in queue, or requested by getq() */
-	enable = ((q->q_first == b_next) || test_bit(QWANTR_BIT, &q->q_flag));
 	if (likely(qb->qb_last == b_prev || qb->qb_last == NULL))
 		qb->qb_last = mp;
 	if (unlikely(qb->qb_first == b_next || qb->qb_first == NULL))
@@ -2271,6 +2268,31 @@ __putq_band(queue_t *q, mblk_t *mp)
 	if ((qb->qb_count += msgsize(mp)) > qb->qb_hiwat)
 		if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
 			q->q_blocked++;
+	if (likely(q->q_last == b_prev))
+		q->q_last = mp;
+	if (likely(q->q_first == b_next))
+		q->q_first = mp;
+	q->q_msgs++;
+	if (unlikely((mp->b_next = b_next) != NULL))
+		b_next->b_prev = mp;
+	if (unlikely((mp->b_prev = b_prev) != NULL))
+		b_prev->b_next = mp;
+	/* success - always enable if not noenabled */
+	return (1 + 1);
+}
+
+STATIC streams_inline streams_fastcall __hot_out int
+__putq_norm(queue_t *q, mblk_t *mp)
+{
+	int enable;
+	mblk_t *b_prev, *b_next;
+
+	b_prev = q->q_last;
+	b_next = NULL;
+	/* enable if requested by getq() */
+	enable = (q->q_first == NULL || test_bit(QWANTR_BIT, &q->q_flag));
+	if (unlikely((q->q_count += msgsize(mp)) > q->q_hiwat))
+		set_bit(QFULL_BIT, &q->q_flag);
 	if (likely(q->q_last == b_prev))
 		q->q_last = mp;
 	if (likely(q->q_first == b_next))
@@ -2307,27 +2329,8 @@ __putq(queue_t *q, mblk_t *mp)
 {
 	/* fast path for normal messages */
 	if (likely(mp->b_datap->db_type < QPCTL)) {
-		if (likely(mp->b_band == 0)) {
-			int enable;
-			mblk_t *b_prev, *b_next;
-
-			b_prev = q->q_last;
-			b_next = NULL;
-			/* enable if requested by getq() */
-			enable = (q->q_first == NULL || test_bit(QWANTR_BIT, &q->q_flag));
-			if (unlikely((q->q_count += msgsize(mp)) > q->q_hiwat))
-				set_bit(QFULL_BIT, &q->q_flag);
-			if (likely(q->q_last == b_prev))
-				q->q_last = mp;
-			if (likely(q->q_first == b_next))
-				q->q_first = mp;
-			q->q_msgs++;
-			if (unlikely((mp->b_next = b_next) != NULL))
-				b_next->b_prev = mp;
-			if (unlikely((mp->b_prev = b_prev) != NULL))
-				b_prev->b_next = mp;
-			return (1 + enable);	/* success */
-		}
+		if (likely(mp->b_band == 0))
+			return __putq_norm(q, mp);
 		return __putq_band(q, mp);
 	}
 	return __putq_pri(q, mp);
