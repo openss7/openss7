@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2007/03/31 15:50:15 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2007/04/01 12:29:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/31 15:50:15 $ by $Author: brian $
+ Last Modified $Date: 2007/04/01 12:29:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.146  2007/04/01 12:29:25  brian
+ - performance tuning (QWANTR/QWANTW corrections)
+
  Revision 0.9.2.145  2007/03/31 15:50:15  brian
  - flow control corrections
 
@@ -122,10 +125,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2007/03/31 15:50:15 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2007/04/01 12:29:25 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2007/03/31 15:50:15 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2007/04/01 12:29:25 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */

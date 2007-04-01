@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/18 07:32:42 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/04/01 12:29:30 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 07:32:42 $ by $Author: brian $
+ Last Modified $Date: 2007/04/01 12:29:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 0.9.2.12  2007/04/01 12:29:30  brian
+ - performance tuning (QWANTR/QWANTW corrections)
+
  Revision 0.9.2.11  2006/12/18 07:32:42  brian
  - lfs device names, autoload clone minors, device numbering, missing manpages
 
@@ -103,10 +106,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/18 07:32:42 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/04/01 12:29:30 $"
 
 static char const ident[] =
-    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/18 07:32:42 $";
+    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/04/01 12:29:30 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -201,9 +204,9 @@ start_timer(void)
 int
 test_sync(int fds[])
 {
-	int tbytcnt = 0, tavg_msgs = 0, tavg_tput = 0;
-	int rbytcnt = 0, ravg_msgs = 0, ravg_tput = 0;
-	int report_count = 0;
+	size_t tbytcnt = 0, tavg_msgs = 0, tavg_tput = 0;
+	size_t rbytcnt = 0, ravg_msgs = 0, ravg_tput = 0;
+	size_t report_count = 0;
 
 	if (verbose > 1)
 		fprintf(stderr, "Starting timer\n");
@@ -217,25 +220,23 @@ test_sync(int fds[])
 	for (;;) {
 		if (timer_timeout) {
 			{
-				int thrput = rbytcnt / report;
-				int msgcnt = thrput / msgsize;
+				size_t thrput = rbytcnt / report;
+				size_t msgcnt = thrput / msgsize;
 
-				tavg_msgs = (2 * tavg_msgs + msgcnt) / 3;
-				tavg_tput = (2 * tavg_tput + thrput) / 3;
-				fprintf(stdout, "%d Msgs sent: %ld (%ld), throughput: %ld (%ld)\n",
-					fds[1], (long) msgcnt, (long) tavg_msgs, (long) thrput,
-					(long) tavg_tput);
+				tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
+				tavg_tput = (3 * tavg_tput + thrput) / 4;
+				fprintf(stdout, "%zu Msgs sent: %zu (%zu), throughput: %zu (%zu)\n",
+					fds[1], msgcnt, tavg_msgs, thrput, tavg_tput);
 				fflush(stdout);
 			}
 			{
-				int thrput = rbytcnt / report;
-				int msgcnt = thrput / msgsize;
+				size_t thrput = rbytcnt / report;
+				size_t msgcnt = thrput / msgsize;
 
-				ravg_msgs = (2 * ravg_msgs + msgcnt) / 3;
-				ravg_tput = (2 * ravg_tput + thrput) / 3;
-				fprintf(stdout, "%d Msgs read: %ld (%ld), throughput: %ld (%ld)\n",
-					fds[0], (long) msgcnt, (long) ravg_msgs, (long) thrput,
-					(long) ravg_tput);
+				ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
+				ravg_tput = (3 * ravg_tput + thrput) / 4;
+				fprintf(stdout, "%zu Msgs read: %zu (%zu), throughput: %zu (%zu)\n",
+					fds[0], msgcnt, ravg_msgs, thrput, ravg_tput);
 				fflush(stdout);
 			}
 			tbytcnt -= rbytcnt;
@@ -336,7 +337,7 @@ test_sync(int fds[])
 int
 read_child(int fd)
 {
-	int bytcnt = 0, avg_msgs = 0, avg_tput = 0;
+	size_t bytcnt = 0, avg_msgs = 0, avg_tput = 0;
 	struct pollfd pfd = { fd, POLLIN | POLLERR | POLLHUP, 0 };
 	int report_count = 0;
 
@@ -351,13 +352,13 @@ read_child(int fd)
 		fprintf(stderr, "--> Timer started\n");
 	for (;;) {
 		if (timer_timeout) {
-			int thrput = bytcnt / report;
-			int msgcnt = thrput / msgsize;
+			size_t thrput = bytcnt / report;
+			size_t msgcnt = thrput / msgsize;
 
-			avg_msgs = (2 * avg_msgs + msgcnt) / 3;
-			avg_tput = (2 * avg_tput + thrput) / 3;
-			fprintf(stdout, "%d Msgs read: %ld (%ld), throughput: %ld (%ld)\n", fd,
-				(long) msgcnt, (long) avg_msgs, (long) thrput, (long) avg_tput);
+			avg_msgs = (3 * avg_msgs + msgcnt) / 4;
+			avg_tput = (3 * avg_tput + thrput) / 4;
+			fprintf(stdout, "%zu Msgs read: %zu (%zu), throughput: %zu (%zu)\n", fd,
+				msgcnt, avg_msgs, thrput, avg_tput);
 			fflush(stdout);
 			bytcnt = 0;
 			report_count++;
@@ -434,7 +435,7 @@ read_child(int fd)
 int
 write_child(int fd)
 {
-	int bytcnt = 0, avg_msgs = 0, avg_tput = 0;
+	size_t bytcnt = 0, avg_msgs = 0, avg_tput = 0;
 	struct pollfd pfd = { fd, POLLOUT | POLLERR | POLLHUP, 0 };
 	int report_count = 0;
 
@@ -449,13 +450,13 @@ write_child(int fd)
 		fprintf(stderr, "--> Timer started\n");
 	for (;;) {
 		if (timer_timeout) {
-			int thrput = bytcnt / report;
-			int msgcnt = thrput / msgsize;
+			size_t thrput = bytcnt / report;
+			size_t msgcnt = thrput / msgsize;
 
-			avg_msgs = (2 * avg_msgs + msgcnt) / 3;
-			avg_tput = (2 * avg_tput + thrput) / 3;
-			fprintf(stdout, "%d Msgs sent: %ld (%ld), throughput: %ld (%ld)\n", fd,
-				(long) msgcnt, (long) avg_msgs, (long) thrput, (long) avg_tput);
+			avg_msgs = (3 * avg_msgs + msgcnt) / 4;
+			avg_tput = (3 * avg_tput + thrput) / 4;
+			fprintf(stdout, "%zu Msgs sent: %zu (%zu), throughput: %zu (%zu)\n", fd,
+				msgcnt, avg_msgs, thrput, avg_tput);
 			fflush(stdout);
 			bytcnt = 0;
 			report_count++;
