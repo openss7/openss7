@@ -196,7 +196,7 @@ db_inc_slow(register dblk_t *db)
 	unsigned long flags;
 
 	streams_spin_lock(&db_ref_lock, flags);
-	++db->db_ref;
+	db->db_ref++;
 	streams_spin_unlock(&db_ref_lock, flags);
 }
 
@@ -1383,7 +1383,7 @@ __find_qband(queue_t *q, unsigned char band)
 	unsigned char q_nband;
 
 	for (q_nband = q->q_nband, qb = q->q_bandp; qb && q_nband > band;
-	     qb = qb->qb_next, --q_nband) ;
+	     qb = qb->qb_next, q_nband--) ;
 	return (qb);
 }
 
@@ -1421,7 +1421,7 @@ __get_qband(queue_t *q, unsigned char band)
 			q->q_bandp = qb;
 			qb->qb_hiwat = q->q_hiwat;
 			qb->qb_lowat = q->q_lowat;
-			++q->q_nband;
+			q->q_nband++;
 		} while (band > q->q_nband);
 	}
 	return (qb);
@@ -1977,7 +1977,7 @@ __putbq(queue_t *q, mblk_t *mp)
 			qb->qb_msgs++;
 			if ((qb->qb_count += msgsize(mp)) > qb->qb_hiwat)
 				if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
-					++q->q_blocked;
+					q->q_blocked++;
 			goto banded;
 		}
 	} else {
@@ -2197,8 +2197,8 @@ EXPORT_SYMBOL(putnextctl2);
  *  @q:		queue to which to put the message
  *  @mp:	message to put
  *
- *  __putq_band() handles the less common case of placing a priority message on the queue.
- *  Still optimize for arriving at an empty queue.
+ *  __putq_pri() handles the less common case of placing a high priority message on the queue.
+ *  Still optimized for arriving at an empty queue.
  */
 streams_noinline streams_fastcall int
 __putq_pri(queue_t *q, mblk_t *mp)
@@ -2234,8 +2234,9 @@ __putq_pri(queue_t *q, mblk_t *mp)
  *  @q:		queue to which to put the message
  *  @mp:	message to put
  *
- *  __putq_band() handles the less common case of placing a banded message on the queue.
- *  Still optimize for arriving at an empty queue.
+ *  __putq_band() handles the less common case of placing a banded message on the queue.  Still
+ *  optimized for arriving at an empty queue.  Magic Garden and the SVR4 SPG say that a priority
+ *  (banded) message can always enable the queue (when not noenabled).
  */
 streams_noinline streams_fastcall int
 __putq_band(queue_t *q, mblk_t *mp)
@@ -2269,7 +2270,7 @@ __putq_band(queue_t *q, mblk_t *mp)
 	qb->qb_msgs++;
 	if ((qb->qb_count += msgsize(mp)) > qb->qb_hiwat)
 		if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
-			++q->q_blocked;
+			q->q_blocked++;
 	if (likely(q->q_last == b_prev))
 		q->q_last = mp;
 	if (likely(q->q_first == b_next))
@@ -2440,13 +2441,10 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		qb->qb_msgs++;
 		if ((qb->qb_count += size) > qb->qb_hiwat) {
 			if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
-				++q->q_blocked;
+				q->q_blocked++;
 		}
 	}
 	return (1 + enable);	/* success */
-#if 0
-      bug:
-#endif
       enomem:
 	/* couldn't allocate a band structure! */
 	goto failure;
@@ -3091,7 +3089,7 @@ __rmvq_band(queue_t *q, mblk_t *mp)
 			unsigned char q_nband, band;
 
 			for (band = mp->b_band, q_nband = q->q_nband, qb = q->q_bandp;
-			     qb && q_nband > band; qb = qb->qb_next, --q_nband) ;
+			     qb && q_nband > band; qb = qb->qb_next, q_nband--) ;
 		}
 		assert(qb);
 		if (qb->qb_first == mp && qb->qb_last == mp)
@@ -3297,7 +3295,7 @@ __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 				qb->qb_msgs = 0;
 				qb->qb_first = qb->qb_last = NULL;
 				if (test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))
-					--q->q_blocked;
+					q->q_blocked--;
 				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
 				backenable = true;	/* always backenable when band empty */
 			}
@@ -3436,7 +3434,7 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
 				if (bands)
 					bands[0] = true;
 			}
-			for (q_nband = q->q_nband, qb = q->q_bandp; qb; qb = qb->qb_next, --q_nband) {
+			for (q_nband = q->q_nband, qb = q->q_bandp; qb; qb = qb->qb_next, q_nband--) {
 				qb->qb_first = qb->qb_last = NULL;
 				qb->qb_count = 0;
 				qb->qb_msgs = 0;
