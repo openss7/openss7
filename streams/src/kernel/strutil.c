@@ -1860,7 +1860,7 @@ EXPORT_SYMBOL(qenable);		/* include/sys/streams/stream.h */
 streams_fastcall int
 enableq(queue_t *q)
 {
-	if (likely(q->q_qinfo->qi_srvp && !test_bit(QNOENB_BIT, &q->q_flag))) {
+	if (likely(q->q_qinfo->qi_srvp && likely(!test_bit(QNOENB_BIT, &q->q_flag)))) {
 		qenable(q);
 		return (1);
 	}
@@ -1946,7 +1946,7 @@ __putbq_pri(queue_t *q, mblk_t *mp)
 	if ((mp->b_next = q->q_first))
 		mp->b_next->b_prev = mp;
 	mp->b_prev = NULL;
-	return (1 + 2);
+	return (1 + 1);
 }
 
 /*
@@ -1998,7 +1998,8 @@ __putbq_band(queue_t *q, mblk_t *mp)
 		b_next->b_prev = mp;
 	if (unlikely((mp->b_prev = b_prev) != NULL))
 		b_prev->b_next = mp;
-	return (1 + test_bit(QWANTR_BIT, &q->q_flag));
+	return (1 +
+		(likely(!test_bit(QNOENB_BIT, &q->q_flag)) && test_bit(QWANTR_BIT, &q->q_flag)));
 }
 
 /*
@@ -2043,7 +2044,8 @@ __putbq_norm(queue_t *q, mblk_t *mp)
 		if (unlikely((mp->b_prev = b_prev) != NULL))
 			b_prev->b_next = mp;
 
-		return (1 + test_bit(QWANTR_BIT, &q->q_flag));
+		return (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag))
+			     && test_bit(QWANTR_BIT, &q->q_flag)));
 	}
 	return __putbq_band(q, mp);
 }
@@ -2058,34 +2060,6 @@ __putbq(queue_t *q, mblk_t *mp)
 	if (likely(mp->b_datap->db_type < QPCTL))
 		return __putbq_norm(q, mp);
 	return __putbq_pri(q, mp);
-}
-
-streams_noinline streams_fastcall int
-putbq_result(queue_t *q, const int result)
-{
-	switch (result) {
-	case 3:		/* success - high priority enable */
-		qenable(q);
-		break;
-	case 2:		/* success - enable if not noenabled */
-		enableq(q);
-		break;
-	case 1:		/* success - don't enable */
-		break;
-	default:
-		assert(result == 0);
-	case 0:		/* failure */
-		assert(0);
-		/* This should never happen, because it takes a qband structure allocation failure
-		   to get here, and since we are putting the message back on the queue, there
-		   should already be a qband structure. Unless, however, putbq() is just used to
-		   insert messages ahead of others rather than really putting them back.
-		   Nevertheless, a way to avoid this error is to always ensure that a qband
-		   structure exists (e.g., with strqset) before calling putbq on a band for the
-		   first time. */
-		return (0);
-	}
-	return (1);
 }
 
 /**
@@ -2107,9 +2081,11 @@ putbq(register queue_t *q, register mblk_t *mp)
 	qwlock(q, pl);
 	result = __putbq(q, mp);
 	qwunlock(q, pl);
-	if (likely(result == 1))
-		return (1);
-	return putbq_result(q, result);
+
+	if (likely(result < 2))
+		return (result);
+	qenable(q);
+	return (1);
 }
 
 EXPORT_SYMBOL(putbq);
@@ -2265,12 +2241,13 @@ EXPORT_SYMBOL(putnextctl2);
  *  __putq_pri - put a priority message block to a queue
  *  @q:		queue to which to put the message
  *  @mp:	message to put
+ *  @insq:	called for insq
  *
  *  __putq_pri() handles the less common case of placing a high priority message on the queue.
  *  Still optimized for arriving at an empty queue.
  */
 streams_noinline streams_fastcall int
-__putq_pri(queue_t *q, mblk_t *mp)
+__putq_pri(queue_t *q, mblk_t *mp, bool insq)
 {
 	mblk_t *b_prev, *b_next;
 
@@ -2294,8 +2271,8 @@ __putq_pri(queue_t *q, mblk_t *mp)
 		b_next->b_prev = mp;
 	if (unlikely((mp->b_prev = b_prev) != NULL))
 		b_prev->b_next = mp;
-	/* always enable on high priority */
-	return (1 + 2);		/* success */
+	/* success - always enable on high priority, except insq */
+	return (1 + (likely(!insq) || likely(!test_bit(QNOENB_BIT, &q->q_flag))));
 }
 
 /*
@@ -2347,20 +2324,17 @@ __putq_band(queue_t *q, mblk_t *mp)
 	if (unlikely((mp->b_prev = b_prev) != NULL))
 		b_prev->b_next = mp;
 	/* success - always enable if not noenabled */
-	return (1 + 1);
+	return (1 + likely(!test_bit(QNOENB_BIT, &q->q_flag)));
 }
 
 STATIC streams_inline streams_fastcall __hot_out int
 __putq_norm(queue_t *q, mblk_t *mp)
 {
 	if (likely(mp->b_band == 0)) {
-		int enable;
 		mblk_t *b_prev, *b_next;
 
 		b_prev = q->q_last;
 		b_next = NULL;
-		/* enable if requested by getq() */
-		enable = (q->q_first == NULL || test_bit(QWANTR_BIT, &q->q_flag));
 		if (unlikely((q->q_count += msgsize(mp)) > q->q_hiwat))
 			set_bit(QFULL_BIT, &q->q_flag);
 		if (likely(q->q_last == b_prev))
@@ -2373,7 +2347,8 @@ __putq_norm(queue_t *q, mblk_t *mp)
 		if (unlikely((mp->b_prev = b_prev) != NULL))
 			b_prev->b_next = mp;
 		/* success */
-		return (1 + enable);
+		return (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag))
+			     && test_bit(QWANTR_BIT, &q->q_flag)));
 	}
 	return __putq_band(q, mp);
 }
@@ -2403,32 +2378,16 @@ __putq(queue_t *q, mblk_t *mp)
 	/* fast path for normal messages */
 	if (likely(mp->b_datap->db_type < QPCTL))
 		return __putq_norm(q, mp);
-	return __putq_pri(q, mp);
+	return __putq_pri(q, mp, false);
 }
 
 streams_noinline streams_fastcall int
-putq_result(queue_t *q, mblk_t *mp, const int result)
+__putq_insq(queue_t *q, mblk_t *mp)
 {
-	switch (result) {
-	case 3:		/* success - high priority enable */
-		qenable(q);
-		break;
-	case 2:		/* success - enable if not noenabled */
-		enableq(q);
-		break;
-	case 1:		/* success - don't enable */
-		break;
-	default:
-		assert(result == 0);
-	case 0:		/* failure */
-		assert(mp->b_band != 0);
-		/* This can happen and it is bad.  We use the return value to putq but it is
-		   typically ignored by the module.  One way to ensure that this never happens is
-		   to call strqset() for the band before calling putq on the band for the first
-		   time. (See also putbq()) */
-		return (0);
-	}
-	return (1);
+	/* fast path for normal messages */
+	if (likely(mp->b_datap->db_type < QPCTL))
+		return __putq_norm(q, mp);
+	return __putq_pri(q, mp, true);
 }
 
 /**
@@ -2453,9 +2412,10 @@ putq(register queue_t *q, register mblk_t *mp)
 	qwlock(q, pl);
 	result = __putq(q, mp);
 	qwunlock(q, pl);
-	if (likely(result == 1))
-		return (1);
-	return putq_result(q, mp, result);
+	if (likely(result < 2))
+		return (result);
+	qenable(q);
+	return (1);
 }
 
 EXPORT_SYMBOL(putq);
@@ -2466,14 +2426,12 @@ EXPORT_SYMBOL(putq);
 STATIC streams_fastcall int
 __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
-	int enable = 0;
 	struct qband *qb = NULL;
 	size_t size;
 
 	if (likely(emp == NULL))
-		goto putq;
-	/* ignore message class for insq() */
-	enable = ((q->q_first == emp) || test_bit(QWANTR_BIT, &q->q_flag));
+		/* insert at end */
+		return __putq_insq(q, nmp);
 	/* insert before emp */
 	if (nmp->b_datap->db_type >= QPCTL) {
 		if (emp->b_prev && emp->b_prev->b_datap->db_type < QPCTL)
@@ -2489,7 +2447,6 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		if (unlikely(nmp->b_band)) {
 			if (!(qb = __get_qband(q, nmp->b_band)))
 				goto enomem;
-			enable = ((q->q_first == emp) || test_bit(QWANTR_BIT, &q->q_flag));
 			if (qb->qb_last == emp || qb->qb_last == NULL)
 				qb->qb_last = nmp;
 			if (qb->qb_first == emp->b_next || qb->qb_first == NULL)
@@ -2498,7 +2455,7 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 			dassert(qb->qb_last != NULL);
 		}
 	}
-	if (q->q_first == emp)
+	if (likely(q->q_first == emp))
 		q->q_first = nmp;
 	if ((nmp->b_prev = emp->b_prev))
 		nmp->b_prev->b_next = nmp;
@@ -2518,7 +2475,8 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		}
 	}
 	/* success - ignore message class for insq() */
-	return (1 + enable);
+	return (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag))
+		     && test_bit(QWANTR_BIT, &q->q_flag)));
 
       enomem:
 	/* couldn't allocate a band structure! */
@@ -2528,32 +2486,6 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	goto failure;
       failure:
 	return (0);		/* failure */
-      putq:
-	/* insert at end */
-	if ((enable = __putq(q, nmp)) == 3)
-		enable = 2;
-	return (enable);
-}
-
-streams_noinline streams_fastcall int
-insq_result(queue_t *q, const int result)
-{
-	switch (result) {
-	case 3:		/* success - high priority enable */
-		assert(0);
-		qenable(q);
-		break;
-	case 2:		/* success - enable if not noenabled */
-		enableq(q);
-		break;
-	case 1:		/* success - don't enable */
-		break;
-	default:
-		never();
-	case 0:		/* failure */
-		return (0);
-	}
-	return (1);
 }
 
 /**
@@ -2580,9 +2512,10 @@ insq(register queue_t *q, register mblk_t *emp, register mblk_t *nmp)
 	qwlock(q, pl);
 	result = __insq(q, emp, nmp);
 	qwunlock(q, pl);
-	if (likely(result == 1))
-		return (1);
-	return insq_result(q, result);
+	if (likely(result < 2))
+		return (result);
+	qenable(q);
+	return (1);
 }
 
 EXPORT_SYMBOL(insq);
@@ -2615,9 +2548,10 @@ appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	result = __insq(q, emp ? emp->b_next : emp, nmp);
 	qwunlock(q, pl);
 	/* do enabling outside the locks */
-	if (likely(result == 1))
-		return (1);
-	return insq_result(q, result);
+	if (likely(result < 2))
+		return (result);
+	qenable(q);
+	return (1);
 }
 
 EXPORT_SYMBOL(appq);
