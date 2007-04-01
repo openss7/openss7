@@ -1044,9 +1044,9 @@ straccess_slow(struct stdata *sd, const register int access, const register int 
 			   they are allocated as a controlling terminal, and by any process if they
 			   are not allocated as a controlling terminal.  This way, the hangup error
 			   can be cleared without forcing all file descriptors to be closed first.
-			   If the reopen is successful, the hung-up condition is cleared." The
-			   above used to always returns EIO on such a reopen.  Note that a hangup on 
-			   a pipe is permanent. */
+			   If the reopen is successful, the hung-up condition is cleared." The above 
+			   used to always returns EIO on such a reopen.  Note that a hangup on a
+			   pipe is permanent. */
 			if ((access & FREAD) == 0)
 				return (-ENXIO);
 			if ((access & FNDELAY) == 0)
@@ -1356,6 +1356,7 @@ static rwlock_t tasklist_lock = RW_LOCK_UNLOCKED;
 #endif
 #endif				/* HAVE_TASKLIST_LOCK_ADDR */
 static rwlock_t *tasklist_lock_p = (typeof(&tasklist_lock)) HAVE_TASKLIST_LOCK_ADDR;
+
 #define tasklist_lock (*tasklist_lock_p)
 #endif				/* HAVE_TASKLIST_LOCK_EXPORT */
 
@@ -1593,6 +1594,17 @@ strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
  *  @events:	bitwise OR of events to signal
  *  @band:	band number for S_RDBAND and S_WRBAND signals
  *
+ *  I don't know that this is particularly correct.  POSIX doesn't define POLLSIG (but has POLL_SIG
+ *  as an si_code in siginfo_t), but Linux does (it is marked in the headers as __USE_GNU and a
+ *  Linux-specific extension), so it is not that clear the order of things. For M_PCSIG, we execute
+ *  strevent directly and any process sleeping in poll(2s) will get a SIGPOLL here with POLL_SIG.
+ *  If SIGPOLL is not caught, however, the POLLSIG bit is not set (because we don't set STRMSG bit)
+ *  and perhaps the poll(2s) will not even return. For M_SIG we set STRMSG bit when the message
+ *  reaches the head of the read queue, but reset it after this function, meaning that SIGPOLL has
+ *  the POLL_MSG bit code, but poll(2s) still might not return.  I need some test cases for this to
+ *  make sure that things work as expected for the Linux extension, but the POSIX behaviour seesm to
+ *  be correct.
+ *
  *  LOCKING: Call this function with a STREAM head read or write lock held across the call.
  *
  *  Note the oddity that S_OUTPUT and S_WRNORM and the same bit.
@@ -1620,26 +1632,10 @@ strevent(struct stdata *sd, const int events, unsigned char band)
 		return;
 	}
 	/* check cache */
-	if (likely((sd->sd_sigflags & events) == 0)) {	/* PROFILED */
-		/* XXX: I don't know that this is particularly correct.  POSIX doesn't define
-		   POLLSIG (but has POLL_SIG as an si_code in siginfo_t), but Linux does (it is
-		   marked in the headers as __USE_GNU and a Linux-specific extension), so it is not 
-		   that clear the order of things. For M_PCSIG, we execute strevent directly and
-		   any process sleeping in poll(2s) will get a SIGPOLL here with POLL_SIG.  If
-		   SIGPOLL is not caught, however, the POLLSIG bit is not set (because we don't set 
-		   STRMSG bit) and perhaps the poll(2s) will not even return. For M_SIG we set
-		   STRMSG bit when the message reaches the head of the read queue, but reset it
-		   after this function, meaning that SIGPOLL has the POLL_MSG bit code, but
-		   poll(2s) still might not return.  I need some test cases for this to make sure
-		   that things work as expected for the Linux extension, but the POSIX behaviour
-		   seesm to be correct. */
-		/* do the BSD O_ASYNC list too */
-	      async:
-		kill_fasync(&sd->sd_fasync, SIGPOLL, code);
-		return;
-	}
-	strsiglist(sd, events, band, code);
-	goto async;
+	if (likely((sd->sd_sigflags & events) != 0)) 	/* PROFILED */
+		strsiglist(sd, events, band, code);
+	/* do the BSD O_ASYNC list too */
+	kill_fasync(&sd->sd_fasync, SIGPOLL, code);
 }
 
 /**
@@ -1918,7 +1914,7 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 		}
 		if (likely((mp = strgetq_wakeup(sd, q, flags, band)) != NULL))
 			break;
-		set_bit(RSLEEP_BIT, &sd->sd_flag);
+		//set_bit(RSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
 
 		strschedule_read();	/* save context switch */
@@ -2188,7 +2184,7 @@ __strwaitgetfp(struct stdata *sd, queue_t *q)
 		}
 		if (likely((mp = strgetfp_slow(sd, q)) != NULL))
 			break;
-		set_bit(RSLEEP_BIT, &sd->sd_flag);
+		//set_bit(RSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
 
 		strschedule_read();	/* save context switch */
@@ -2282,7 +2278,7 @@ __strwaitband(struct stdata *sd, const int f_flags, int band, const int flags)
 		/* have read lock and access is ok */
 		if (likely(bcanputnext(sd->sd_wq, band)))
 			break;
-		set_bit(WSLEEP_BIT, &sd->sd_flag);
+		//set_bit(WSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
 
 		strschedule_write();	/* save context switch */
@@ -2420,7 +2416,7 @@ strwakeopen_swunlock(struct stdata *sd)
 	/* release open bit */
 	clear_bit(STWOPEN_BIT, &sd->sd_flag);
 	if (!(detached = strdetached(sd))
-	    && waitqueue_active(&sd->sd_owaitq))
+	    && waitqueue_active(&sd->sd_owaitq) != 0)
 		wake_up_interruptible(&sd->sd_owaitq);
 	swunlock(sd);
 	if (detached) {
@@ -2444,16 +2440,15 @@ strwakeopen(struct stdata *sd)
 STATIC streams_inline streams_fastcall __hot void
 strwakepoll(struct stdata *sd)
 {
-	if (likely(waitqueue_active(&sd->sd_polllist) == 0))	/* PROFILED */
-		return;
-	wake_up_interruptible(&sd->sd_polllist);
+	if (unlikely(waitqueue_active(&sd->sd_polllist) != 0))	/* PROFILED */
+		wake_up_interruptible(&sd->sd_polllist);
 }
 
 STATIC streams_inline streams_fastcall __hot_out void
 strwakeread(struct stdata *sd)
 {
 	if (likely(waitqueue_active(&sd->sd_rwaitq) != 0)) {	/* PROFILED */
-		clear_bit(RSLEEP_BIT, &sd->sd_flag);
+		//clear_bit(RSLEEP_BIT, &sd->sd_flag);
 		wake_up_interruptible(&sd->sd_rwaitq);
 	}
 	strwakepoll(sd);
@@ -2463,7 +2458,7 @@ STATIC streams_inline streams_fastcall __hot_in void
 strwakewrite(struct stdata *sd)
 {
 	if (unlikely(waitqueue_active(&sd->sd_wwaitq) != 0)) {	/* PROFILED */
-		clear_bit(WSLEEP_BIT, &sd->sd_flag);
+		//clear_bit(WSLEEP_BIT, &sd->sd_flag);
 		wake_up_interruptible(&sd->sd_wwaitq);
 	}
 	strwakepoll(sd);
@@ -2481,11 +2476,11 @@ STATIC streams_fastcall void
 strwakeall(struct stdata *sd)
 {
 	if (unlikely(waitqueue_active(&sd->sd_rwaitq) != 0)) {
-		clear_bit(RSLEEP_BIT, &sd->sd_flag);
+		//clear_bit(RSLEEP_BIT, &sd->sd_flag);
 		wake_up_interruptible_all(&sd->sd_rwaitq);
 	}
 	if (unlikely(waitqueue_active(&sd->sd_wwaitq) != 0)) {
-		clear_bit(WSLEEP_BIT, &sd->sd_flag);
+		//clear_bit(WSLEEP_BIT, &sd->sd_flag);
 		wake_up_interruptible_all(&sd->sd_wwaitq);
 	}
 	if (unlikely(waitqueue_active(&sd->sd_iwaitq) != 0))
@@ -2754,7 +2749,7 @@ strwakeioctl(struct stdata *sd)
 		_ctrace(freemsg(mp));
 	}
 	clear_bit(IOCWAIT_BIT, &sd->sd_flag);
-	if (waitqueue_active(&sd->sd_iwaitq))
+	if (waitqueue_active(&sd->sd_iwaitq) != 0)
 		wake_up(&sd->sd_iwaitq);
 	srunlock(sd);		/* to balance strwaitioctl */
 }
@@ -2868,7 +2863,7 @@ strwakeiocack(struct stdata *sd, mblk_t *mp)
 				_ctrace(freemsg(db));
 			}
 			/* might not be sleeping yet */
-			if (waitqueue_active(&sd->sd_iwaitq))
+			if (waitqueue_active(&sd->sd_iwaitq) != 0)
 				wake_up(&sd->sd_iwaitq);
 			return (true);
 		} else
@@ -4387,9 +4382,9 @@ stropen(struct inode *inode, struct file *file)
 				break;
 			}
 		}
-		/* SVR4 SPG says: "When a Stream head receives an M_HANGUP message, it is marked
-		   as hung-up.  Streams that are marked as hung-up are allowed to be reopened by
-		   their session leader if they are allocated as a controlling terminal, and by any 
+		/* SVR4 SPG says: "When a Stream head receives an M_HANGUP message, it is marked as 
+		   hung-up.  Streams that are marked as hung-up are allowed to be reopened by their 
+		   session leader if they are allocated as a controlling terminal, and by any
 		   process if they are not allocated as a controlling terminal.  This way, the
 		   hangup error can be cleared without forcing all file descriptors to be closed
 		   first. If the reopen is successful, the hung-up condition is cleared." */
@@ -5456,7 +5451,7 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 				}
 				if (likely(bcanputnext(sd->sd_wq, band) != 0))
 					break;
-				set_bit(WSLEEP_BIT, &sd->sd_flag);
+				//set_bit(WSLEEP_BIT, &sd->sd_flag);
 				srunlock(sd);
 
 				strschedule_write();	/* save context switch */
