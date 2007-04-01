@@ -1,3 +1,10 @@
+2007-04-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* drivers/str/bufmod.c: corrections to module loading
+	* drivers/str/nullmod.c: corrections to module loading
+	* drivers/str/nuls.c: corrections to module loading
+	* drivers/str/testmod.c: corrections to module loading
+
 2007-03-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* include/sys/strmsg.h: M_TRAIL also belongs to HPUX
