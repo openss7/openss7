@@ -1925,70 +1925,139 @@ noenable(queue_t *q)
 EXPORT_SYMBOL(noenable);	/* include/sys/streams/stream.h */
 
 /*
- *  __putbq:
+ *  __putbq_pri: - put a high priority message back onto a queue
+ *  @q:		queue to which to return the message
+ *  @mp:	message to return
+ *
+ *  __putbq_pri() handles the less common case of placing a high priority message on the queue.
  */
-STATIC streams_fastcall int
-__putbq(queue_t *q, mblk_t *mp)
-{				/* IRQ DISABLED */
-	int enable = 0;
+streams_noinline streams_fastcall int
+__putbq_pri(queue_t *q, mblk_t *mp)
+{
+	/* SVR 4 SPG says to zero b_band when hipri messages placed on queue */
+	mp->b_band = 0;
+
+	if ((q->q_count += msgsize(mp)) > q->q_hiwat)
+		set_bit(QFULL_BIT, &q->q_flag);
+	if (q->q_last == NULL)
+		q->q_last = mp;
+	q->q_first = mp;
+	q->q_msgs++;
+	if ((mp->b_next = q->q_first))
+		mp->b_next->b_prev = mp;
+	mp->b_prev = NULL;
+	return (1 + 2);
+}
+
+/*
+ *  __putbq_band: - put a priority message back onto a queue
+ *  @q:		queue to which to return the message
+ *  @mp:	message to return
+ *
+ *  __putbq_band() handles the less common case of placing a priority message on the queue.  This is
+ *  optimized for placing a message back on and empty queue as should normally be the case.
+ */
+streams_noinline streams_fastcall int
+__putbq_band(queue_t *q, mblk_t *mp)
+{
+	mblk_t *b_next, *b_prev;
+	struct qband *qb;
+
+	b_prev = NULL;
+	b_next = q->q_first;
+	/* skip high priority */
+	while (unlikely(b_next && b_next->b_datap->db_type >= QPCTL)) {
+		b_prev = b_next;
+		b_next = b_prev->b_next;
+	}
+	/* skip higher bands */
+	while (unlikely(b_next && b_next->b_band > mp->b_band)) {
+		b_prev = b_next;
+		b_next = b_prev->b_next;
+	}
+
+	if (unlikely((qb = __get_qband(q, mp->b_band)) == NULL))
+		return (0);
+	if (likely(qb->qb_last == b_prev) || likely(qb->qb_last == NULL))
+		qb->qb_last = mp;
+	if (likely(qb->qb_first == b_next) || likely(qb->qb_first == NULL))
+		qb->qb_first = mp;
+	assert(qb->qb_first != NULL);
+	assert(qb->qb_last != NULL);
+	qb->qb_msgs++;
+	if ((qb->qb_count += msgsize(mp)) > qb->qb_hiwat)
+		if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
+			q->q_blocked++;
+
+	if (likely(q->q_last == b_prev))
+		q->q_last = mp;
+	if (likely(q->q_first == b_next))
+		q->q_first = mp;
+	q->q_msgs++;
+	if (unlikely((mp->b_next = b_next) != NULL))
+		b_next->b_prev = mp;
+	if (unlikely((mp->b_prev = b_prev) != NULL))
+		b_prev->b_next = mp;
+	return (1 + test_bit(QWANTR_BIT, &q->q_flag));
+}
+
+/*
+ *  __putbq_norm: - put a normal message back onto a queue
+ *  @q:		queue to which to return the message
+ *  @mp:	message to return
+ *
+ *  __putbq_norm() handles the less common case of placing a normal message on the queue.
+ */
+STATIC streams_inline streams_fastcall __hot_out int
+__putbq_norm(queue_t *q, mblk_t *mp)
+{
 	mblk_t *b_next, *b_prev;
 
+	b_prev = NULL;
+	b_next = q->q_first;
+
+	/* skip high priority */
+	while (unlikely(b_next && b_next->b_datap->db_type >= QPCTL)) {
+		b_prev = b_next;
+		b_next = b_prev->b_next;
+	}
+	/* skip higher bands */
+	while (unlikely(b_next && b_next->b_band > mp->b_band)) {
+		b_prev = b_next;
+		b_next = b_prev->b_next;
+	}
+
+	if ((q->q_count += msgsize(mp)) > q->q_hiwat)
+		set_bit(QFULL_BIT, &q->q_flag);
+
+	if (likely(q->q_last == b_prev))
+		q->q_last = mp;
+	if (likely(q->q_first == b_next))
+		q->q_first = mp;
+
+	q->q_msgs++;
+
+	if (unlikely((mp->b_next = b_next) != NULL))
+		b_next->b_prev = mp;
+	if (unlikely((mp->b_prev = b_prev) != NULL))
+		b_prev->b_next = mp;
+
+	return (1 + test_bit(QWANTR_BIT, &q->q_flag));
+}
+
+/*
+ *  __putbq:
+ */
+STATIC streams_inline streams_fastcall int
+__putbq(queue_t *q, mblk_t *mp)
+{				/* IRQ DISABLED */
 	/* fast path for normal messages */
 	if (likely(mp->b_datap->db_type < QPCTL)) {
-		b_prev = NULL;
-		b_next = q->q_first;
-		/* skip high priority */
-		while (unlikely(b_next && b_next->b_datap->db_type >= QPCTL)) {
-			b_prev = b_next;
-			b_next = b_prev->b_next;
-		}
-		/* skip higher bands */
-		while (unlikely(b_next && b_next->b_band > mp->b_band)) {
-			b_prev = b_next;
-			b_next = b_prev->b_next;
-		}
-		enable = test_bit(QWANTR_BIT, &q->q_flag);
-		if (likely(mp->b_band == 0)) {
-		      hipri:
-			if ((q->q_count += msgsize(mp)) > q->q_hiwat)
-				set_bit(QFULL_BIT, &q->q_flag);
-		      banded:
-			if (q->q_last == b_prev)
-				q->q_last = mp;
-			if (q->q_first == b_next)
-				q->q_first = mp;
-			q->q_msgs++;
-			if ((mp->b_next = b_next))
-				b_next->b_prev = mp;
-			if ((mp->b_prev = b_prev))
-				b_prev->b_next = mp;
-			return (1 + enable);
-		} else {
-			struct qband *qb;
-
-			if (unlikely((qb = __get_qband(q, mp->b_band)) == NULL))
-				return (0);
-			if (qb->qb_last == b_prev || qb->qb_last == NULL)
-				qb->qb_last = mp;
-			if (qb->qb_first == b_next || qb->qb_first == NULL)
-				qb->qb_first = mp;
-			assert(qb->qb_first != NULL);
-			assert(qb->qb_last != NULL);
-			qb->qb_msgs++;
-			if ((qb->qb_count += msgsize(mp)) > qb->qb_hiwat)
-				if (!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag))
-					q->q_blocked++;
-			goto banded;
-		}
-	} else {
-		b_prev = NULL;
-		b_next = q->q_first;
-		/* modules should never put priority messages back on a queue */
-		enable = 2;	/* and this is why */
-		/* SVR 4 SPG says to zero b_band when hipri messages placed on queue */
-		mp->b_band = 0;
-		goto hipri;
+		if (likely(mp->b_band == 0))
+			return __putbq_norm(q, mp);
+		return __putbq_band(q, mp);
 	}
+	return __putbq_pri(q, mp);
 }
 
 streams_noinline streams_fastcall int
@@ -2302,7 +2371,8 @@ __putq_norm(queue_t *q, mblk_t *mp)
 		b_next->b_prev = mp;
 	if (unlikely((mp->b_prev = b_prev) != NULL))
 		b_prev->b_next = mp;
-	return (1 + enable);	/* success */
+	/* success */
+	return (1 + enable);
 }
 
 /*
@@ -2447,7 +2517,9 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 				q->q_blocked++;
 		}
 	}
-	return (1 + enable);	/* success */
+	/* success - ignore message class for insq() */
+	return (1 + enable);
+
       enomem:
 	/* couldn't allocate a band structure! */
 	goto failure;
@@ -2457,14 +2529,10 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
       failure:
 	return (0);		/* failure */
       putq:
-	{
-		int be;
-
-		/* insert at end */
-		if ((be = __putq(q, nmp)) == 3)
-			be = 2;
-		return (be);
-	}
+	/* insert at end */
+	if ((enable = __putq(q, nmp)) == 3)
+		enable = 2;
+	return (enable);
 }
 
 streams_noinline streams_fastcall int
