@@ -10589,22 +10589,18 @@ str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
 STATIC streams_inline streams_fastcall __hot_out int
 str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	int enable;
 #ifdef BIG_COMPILE
 	unsigned long pl;
 
 	qwlock(q, pl);
-	enable = __putq(q, mp);
+	__putq(q, mp);	    /* just a little quicker */
 	qwunlock(q, pl);
 #else
 	putq(q, mp);
-	enable =  1 + (mp == q->q_first);
 #endif
 
-	if (likely(enable > 1)) {	/* PROFILED */
-		strwakeread(sd);
-		strevent(sd, (S_INPUT | (mp->b_band ? S_RDBAND : S_RDNORM)), mp->b_band);
-	}
+	strwakeread(sd);
+	strevent(sd, (S_INPUT | (mp->b_band ? S_RDBAND : S_RDNORM)), mp->b_band);
 	return (0);
 }
 
