@@ -1589,7 +1589,7 @@ strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
 }
 
 /**
- *  strevent:	- signal events to requesting processes
+ *  strevent_slow:	- signal events to requesting processes
  *  @sd:	the stream head
  *  @events:	bitwise OR of events to signal
  *  @band:	band number for S_RDBAND and S_WRBAND signals
@@ -1604,13 +1604,9 @@ strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
  *  the POLL_MSG bit code, but poll(2s) still might not return.  I need some test cases for this to
  *  make sure that things work as expected for the Linux extension, but the POSIX behaviour seesm to
  *  be correct.
- *
- *  LOCKING: Call this function with a STREAM head read or write lock held across the call.
- *
- *  Note the oddity that S_OUTPUT and S_WRNORM and the same bit.
  */
-STATIC streams_inline streams_fastcall __hot void
-strevent(struct stdata *sd, const int events, unsigned char band)
+streams_noinline streams_fastcall __hot void
+strevent_slow(struct stdata *sd, const int events, unsigned char band)
 {
 	int code;
 
@@ -1635,7 +1631,26 @@ strevent(struct stdata *sd, const int events, unsigned char band)
 	if (likely((sd->sd_sigflags & events) != 0)) 	/* PROFILED */
 		strsiglist(sd, events, band, code);
 	/* do the BSD O_ASYNC list too */
-	kill_fasync(&sd->sd_fasync, SIGPOLL, code);
+	if (sd->sd_fasync != NULL)
+		kill_fasync(&sd->sd_fasync, SIGPOLL, code);
+}
+
+/**
+ *  strevent:	- signal events to requesting processes
+ *  @sd:	the stream head
+ *  @events:	bitwise OR of events to signal
+ *  @band:	band number for S_RDBAND and S_WRBAND signals
+ *
+ *  LOCKING: Call this function with a STREAM head read or write lock held across the call.
+ *
+ *  Note the oddity that S_OUTPUT and S_WRNORM and the same bit.  Also, any Stream that uses this
+ *  capability deserves to run a bit slower.
+ */
+STATIC streams_inline streams_fastcall __hot void
+strevent(struct stdata *sd, const int events, unsigned char band)
+{
+	if (unlikely((sd->sd_sigflags & events) != 0) || unlikely(sd->sd_fasync != NULL))
+		return strevent_slow(sd, events, band);
 }
 
 /**
@@ -10571,50 +10586,27 @@ str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-#ifdef BIG_COMPILE
 STATIC streams_inline streams_fastcall __hot_out int
 str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	unsigned long pl;
 	int enable;
+#ifdef BIG_COMPILE
+	unsigned long pl;
 
 	qwlock(q, pl);
 	enable = __putq(q, mp);
 	qwunlock(q, pl);
-	if (likely(enable > 1)) {	/* PROFILED */
-		int band, flags;
-
-		strwakeread(sd);
-		if (likely((band = mp->b_band) == 0)) {
-			flags = (S_INPUT | S_RDNORM);
-			strevent(sd, flags, band);
-			return (0);
-		}
-		flags = (S_INPUT | S_RDBAND);
-		strevent(sd, flags, band);
-	}
-	return (0);
-}
 #else
-STATIC streams_inline streams_fastcall __hot_out int
-str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
-{
 	putq(q, mp);
-	if (likely(mp == q->q_first)) {
-		int band, flags;
+	enable =  1 + (mp == q->q_first);
+#endif
 
+	if (likely(enable > 1)) {	/* PROFILED */
 		strwakeread(sd);
-		if (likely((band = mp->b_band) == 0)) {
-			flags = (S_INPUT | S_RDNORM);
-			strevent(sd, flags, band);
-			return (0);
-		}
-		flags = (S_INPUT | S_RDBAND);
-		strevent(sd, flags, band);
+		strevent(sd, (S_INPUT | (mp->b_band ? S_RDBAND : S_RDNORM)), mp->b_band);
 	}
 	return (0);
 }
-#endif
 
 streams_noinline streams_fastcall int
 str_m_flush(struct stdata *sd, queue_t *q, mblk_t *mp)
