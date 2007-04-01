@@ -10593,7 +10593,7 @@ str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 	unsigned long pl;
 
 	qwlock(q, pl);
-	__putq(q, mp);	    /* just a little quicker */
+	__putq_norm(q, mp);	/* just a little quicker */
 	qwunlock(q, pl);
 #else
 	putq(q, mp);
