@@ -1,3 +1,9 @@
+2007-04-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/strutil.c: performance tuning (QWANTR/QWANTW corrections)
+	* src/modules/sth.c: performance tuning (QWANTR/QWANTW corrections)
+	* src/test/perftest.c: performance tuning (QWANTR/QWANTW corrections)
+
 2007-03-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/M_SETOPTS.9.man: doc updates for flow control corrections
