@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 18:58:11 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/04/01 12:22:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:58:11 $ by $Author: brian $
+ Last Modified $Date: 2007/04/01 12:22:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 18:58:11 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/04/01 12:22:00 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 18:58:11 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/04/01 12:22:00 $";
 
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -84,7 +84,7 @@ static char const ident[] =
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 18:58:11 $"
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/04/01 12:22:00 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"
@@ -500,7 +500,6 @@ nullmod_init(void)
 #ifdef LIS
 	if ((err = lis_register_module_qlock_option(modid, LIS_QLOCK_NONE)) < 0) {
 		lis_unregister_strmod(&nullmod_info);
-		nullmod_unregister_ioctl32();
 		return (err);
 	}
 #endif

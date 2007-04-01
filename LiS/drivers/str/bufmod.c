@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 18:58:11 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/04/01 12:22:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:58:11 $ by $Author: brian $
+ Last Modified $Date: 2007/04/01 12:22:00 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 18:58:11 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/04/01 12:22:00 $"
 
-static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 18:58:11 $";
+static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/04/01 12:22:00 $";
 
 
 /*
@@ -81,7 +81,7 @@ static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.1
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 18:58:11 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/04/01 12:22:00 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"
@@ -92,6 +92,10 @@ static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.1
 				BUFMOD_CONTACT		"\n"
 #define BUFMOD_SPLASH		BUFMOD_DEVICE		" - " \
 				BUFMOD_REVISION		"\n"
+
+#if defined LIS && defined MODULE
+#define CONFIG_STREAMS_BUFMOD_MODULE MODULE
+#endif
 
 #ifdef CONFIG_STREAMS_BUFMOD_MODULE
 MODULE_AUTHOR(BUFMOD_CONTACT);
