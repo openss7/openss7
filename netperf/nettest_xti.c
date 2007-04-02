@@ -4659,6 +4659,24 @@ bytes   bytes    secs            #      #   %s/sec %% %c%c     us/KB\n\n";
   unsigned int         addr;
   
   struct t_unitdata unitdata;
+
+#define TPI_DIRECT 1
+
+#ifdef TPI_DIRECT
+#include <sys/stropts.h>
+#include <sys/tihdr.h>
+
+  struct {
+	  struct T_unitdata_req prim;
+	  struct sockaddr_in addr;
+  } tpi_request;
+  struct T_unitdata_req tpi_prim;
+  struct strbuf tpi_ctrl, *tpi_ctrlp;
+#if 0
+  struct strbuf tpi_ctrl2;
+#endif
+  struct strbuf tpi_data;
+#endif
    
   struct xti_udp_stream_request_struct	*xti_udp_stream_request;
   struct xti_udp_stream_response_struct	*xti_udp_stream_response;
@@ -4905,6 +4923,33 @@ bytes   bytes    secs            #      #   %s/sec %% %c%c     us/KB\n\n";
     unitdata.udata.len    = send_size;
     unitdata.udata.buf    = send_ring->buffer_ptr;
 
+#ifdef TPI_DIRECT
+    tpi_request.prim.PRIM_type = T_UNITDATA_REQ;
+    tpi_request.prim.DEST_length = sizeof(tpi_request.addr);
+    tpi_request.prim.DEST_offset = sizeof(tpi_request.prim);
+    tpi_request.prim.OPT_length = 0;
+    tpi_request.prim.OPT_offset = 0;
+    tpi_request.addr = server;
+    tpi_ctrl.maxlen = 0;
+    tpi_ctrl.len = sizeof(tpi_request);
+    tpi_ctrl.buf = (char *)&tpi_request;
+    tpi_prim.PRIM_type = T_UNITDATA_REQ;
+    tpi_prim.DEST_length = 0;
+    tpi_prim.DEST_offset = 0;
+    tpi_prim.OPT_length = 0;
+    tpi_prim.OPT_offset = 0;
+#if 0
+    tpi_ctrl2.maxlen = 0;
+    tpi_ctrl2.len = sizeof(tpi_prim);
+    tpi_ctrl2.buf = (char *)&tpi_prim;
+#endif
+    tpi_data.maxlen = 0;
+    tpi_data.len = send_size;
+    tpi_data.buf = send_ring->buffer_ptr;
+    tpi_ctrlp = &tpi_ctrl;
+#endif
+
+
     /* set up the timer to call us after test_time. one of these days, */
     /* it might be nice to figure-out a nice reliable way to have the */
     /* test controlled by a byte count as well, but since UDP is not */
@@ -4971,6 +5016,15 @@ bytes   bytes    secs            #      #   %s/sec %% %c%c     us/KB\n\n";
       HIST_timestamp(&time_one);
 #endif /* HISTOGRAM */
       
+#ifdef TPI_DIRECT
+      if (putmsg(data_socket, tpi_ctrlp, &tpi_data, 0) != 0) {
+	perror("xti_udp_send: data send error");
+	exit(1);
+      }
+#if 0
+      tpi_ctrlp = &tpi_ctrl2; /* only send address with first request */
+#endif
+#else
       if ((t_sndudata(data_socket,
 		      &unitdata))  != 0) {
 	if (t_errno == TSYSERR && errno == EINTR)
@@ -4983,13 +5037,18 @@ bytes   bytes    secs            #      #   %s/sec %% %c%c     us/KB\n\n";
 	t_error("xti_udp_send: data send error");
 	exit(1);
       }
+#endif
       messages_sent++;          
       
       /* now we want to move our pointer to the next position in the */
       /* data buffer...and update the unitdata structure */
       
       send_ring          = send_ring->next;
+#ifdef TPI_DIRECT
+      tpi_data.buf = send_ring->buffer_ptr;
+#else
       unitdata.udata.buf = send_ring->buffer_ptr;
+#endif
       
 #ifdef HISTOGRAM
       /* get the second timestamp */
@@ -5479,6 +5538,10 @@ recv_xti_udp_stream()
   unitdata.udata.buf    = recv_ring->buffer_ptr;
 
   send_response();
+
+#ifdef TPI_DIRECT
+  ioctl(s_data, I_SRDOPT, RMSGD|RPROTDIS);
+#endif
   
   /* Now it's time to start receiving data on the connection. We will */
   /* first grab the apropriate counters and then start grabbing. */
@@ -5518,6 +5581,13 @@ recv_xti_udp_stream()
       fflush(where);
     }
 #endif /* RAJ_DEBUG */
+#ifdef TPI_DIRECT
+    if (read(s_data, recv_ring->buffer_ptr, message_size) == -1 && errno != EINTR) {
+	netperf_response.content.serv_errno = errno;
+	send_response();
+	exit(1);
+    }
+#else
     if (t_rcvudata(s_data, 
 		   &unitdata,
 		   &flags) != 0) {
@@ -5531,9 +5601,12 @@ recv_xti_udp_stream()
       }
       break;
     }
+#endif
     messages_recvd++;
     recv_ring = recv_ring->next;
+#ifndef TPI_DIRECT
     unitdata.udata.buf = recv_ring->buffer_ptr;
+#endif
   }
   
   if (debug) {

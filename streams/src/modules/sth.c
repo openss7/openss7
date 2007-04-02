@@ -5962,12 +5962,12 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 
 				dlen = (part->len > 0) ? part->maxlen - part->len : part->maxlen;
 
-				if (part->maxlen == -1 || (blen && !dlen)) {
+				if (unlikely(part->maxlen == -1 || (blen && !dlen))) { /* PROFILED */
 					/* no room - leave in tail */
 					retval |= data ? MOREDATA : MORECTL;
 					bp = &b->b_cont;
 					continue;	/* leave in tail */
-				} else if ((dlen = min(blen, dlen)) == blen) {
+				} else if (likely((dlen = min(blen, dlen)) == blen)) { /* PROFILED */
 					/* full block - remove from tail */
 					if (((*bp) = b->b_cont))
 						b->b_cont = NULL;
@@ -5994,10 +5994,10 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 				/* move full block or duplicate partial to head */
 				(**head) = b;
 				(*head) = &b->b_cont;
-				if ((part->len += dlen) < dlen)
+				if (likely((part->len += dlen) < dlen)) /* PROFILED */
 					part->len = dlen;
 			}
-			if (mp) {
+			if (unlikely(mp != NULL)) {
 				/* put tail back on queue */
 				/* restore first block flags */
 				mp->b_flag = (mp->b_flag & ~(MSGMARK | MSGDELIM)) | b_flag;
@@ -6016,7 +6016,7 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 	      unlock_error:
 		srunlock(sd);
 
-		switch (err) {
+		switch (__builtin_expect(err, 0)) { /* PROFILED */
 		case -EAGAIN:
 			if (likely(!test_bit(STRNDEL_BIT, &sd->sd_flag)))
 				goto error;
@@ -6068,7 +6068,7 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 				put_user(ctl.len, &ctlp->len);
 			if (likely(datp != NULL))
 				put_user(dat.len, &datp->len);
-			if (likely(bandp != NULL))
+			if (unlikely(bandp != NULL))
 				put_user(band, bandp);
 			if (likely(flagsp != NULL))
 				put_user(flags, flagsp);
