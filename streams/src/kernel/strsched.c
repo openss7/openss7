@@ -2329,8 +2329,7 @@ STATIC streams_inline streams_fastcall __hot_out void
 putp_fast(queue_t *q, mblk_t *mp)
 {
 	dassert(q);
-	dassert(q->q_qinfo);
-	dassert(q->q_qinfo->qi_putp);
+	dassert(q->q_putp);
 
 #ifdef CONFIG_SMP
 	/* spin here if Stream frozen by other than caller */
@@ -2358,15 +2357,15 @@ putp_fast(queue_t *q, mblk_t *mp)
 		prefetch(mp->b_rptr);
 		prefetch(mp->b_cont);
 #endif
-		dassert(q->q_qinfo != NULL);
-		dassert(q->q_qinfo->qi_putp != NULL);
+		dassert(q->q_putp != NULL);
 #ifdef CONFIG_STREAMS_DO_STATS
+		dassert(q->q_qinfo != NULL);
 		/* if we enabled this capability, it is likely it will be used */
 		if (likely(q->q_qinfo->qi_mstat != NULL))
 			q->q_qinfo->qi_mstat->ms_pcnt++;
 #endif
 		/* some weirdness in older compilers */
-		(*q->q_qinfo->qi_putp) (q, mp);
+		(*q->q_putp) (q, mp);
 	}
 #ifdef CONFIG_SMP
 	else {
@@ -2443,15 +2442,15 @@ srvp_fast(queue_t *q)
 			/* prefetch private structure */
 			prefetch(q->q_ptr);
 
-			dassert(q->q_qinfo);
-			dassert(q->q_qinfo->qi_srvp);
+			dassert(q->q_srvp);
 #ifdef CONFIG_STREAMS_DO_STATS
+			dassert(q->q_qinfo);
 			if (unlikely(q->q_qinfo->qi_mstat != NULL))
 				q->q_qinfo->qi_mstat->ms_scnt++;
 #endif
 			set_bit(QSVCBUSY_BIT, &q->q_flag);
 			/* some weirdness in older compilers */
-			(*q->q_qinfo->qi_srvp) (q);
+			(*q->q_srvp) (q);
 			clear_bit(QSVCBUSY_BIT, &q->q_flag);
 		}
 #ifdef CONFIG_SMP
@@ -3274,8 +3273,6 @@ put(queue_t *q, mblk_t *mp)
 
 	dassert(mp);
 	dassert(q);
-	dassert(q->q_qinfo);
-	dassert(q->q_qinfo->qi_putp);
 
 #ifdef CONFIG_SMP
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
@@ -3751,7 +3748,7 @@ do_weldq_synced(struct strevent *se)
 	{
 		unsigned long pl1 = 0, pl3 = 0;
 		queue_t *qn1 = NULL, *qn3 = NULL;
-		queue_t *q1, *q2, *q3, *q4;
+		queue_t *q1, *q2, *q3, *q4, *qs;
 		struct stdata *sd1, *sd3;
 
 		/* get all the queues */
@@ -3778,10 +3775,52 @@ do_weldq_synced(struct strevent *se)
 		} else if (sd3) {
 			pwlock(sd3, pl3);
 		}
-		if (q1)
-			_ctrace(qn1 = xchg(&q1->q_next, qget(q2)));
-		if (q3)
-			_ctrace(qn3 = xchg(&q3->q_next, qget(q4)));
+		if (q1) {
+			qn1 = xchg(&q1->q_next, qget(q2));
+
+			if (q2) {
+				/* attaching */
+				q1->q_nfsrv = test_bit(QSRVP_BIT, &q2->q_flag) ? q2 : q2->q_nfsrv;
+				q2->q_nbsrv = test_bit(QSRVP_BIT, &q1->q_flag) ? q1 : q1->q_nbsrv;
+
+				for (qs = q1->q_nbsrv; qs && qs != q1; qs = qs->q_next)
+					qs->q_nfsrv = q1->q_nfsrv;
+				for (qs = q2->q_nfsrv; qs && qs != q2; qs = backq(qs))
+					qs->q_nbsrv = q2->q_nbsrv;
+			} else if (qn1) {
+				/* detaching */
+				q1->q_nfsrv = NULL;
+				qn1->q_nbsrv = NULL;
+
+				for (qs = q1->q_nbsrv; qs && qs != q1; qs = qs->q_next)
+					qs->q_nfsrv = q1;
+				for (qs = qn1->q_nfsrv; qs && qs != qn1; qs = backq(qs))
+					qs->q_nbsrv = qn1;
+			}
+		}
+		if (q3) {
+			qn3 = xchg(&q3->q_next, qget(q4));
+
+			if (q3) {
+				/* attaching */
+				q3->q_nfsrv = test_bit(QSRVP_BIT, &q4->q_flag) ? q4 : q4->q_nfsrv;
+				q4->q_nbsrv = test_bit(QSRVP_BIT, &q3->q_flag) ? q3 : q3->q_nbsrv;
+
+				for (qs = q3->q_nbsrv; qs && qs != q3; qs = qs->q_next)
+					qs->q_nfsrv = q3->q_nfsrv;
+				for (qs = q4->q_nfsrv; qs && qs != q4; qs = backq(qs))
+					qs->q_nbsrv = q4->q_nbsrv;
+			} else if (qn3) {
+				/* detaching */
+				q3->q_nfsrv = NULL;
+				qn3->q_nbsrv = NULL;
+
+				for (qs = q3->q_nbsrv; qs && qs != q3; qs = qs->q_next)
+					qs->q_nfsrv = q3;
+				for (qs = qn3->q_nfsrv; qs && qs != qn3; qs = backq(qs))
+					qs->q_nbsrv = qn3;
+			}
+		}
 		if (sd1 && sd3) {
 			if (sd1 < sd3) {
 				pwunlock(sd3, pl3);

@@ -1162,7 +1162,7 @@ STATIC struct qband *__get_qband(queue_t *q, unsigned char band);
 streams_noinline streams_fastcall __hot_in void
 qbackenable(queue_t *q, const unsigned char band, const char bands[])
 {
-	register queue_t *q_back, *qt;
+	register queue_t *q_nbsrv;
 
 #ifdef CONFIG_SMP
 	queue_t *q_next;
@@ -1177,38 +1177,35 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 	if (unlikely(q_next == NULL))
 		prlock(sd);
 #endif
-
-	for (qt = q, q_back = backq(qt);
-	     (qt = q_back) && (q_back = backq(qt)) && !qt->q_qinfo->qi_srvp;) ;
-
-	if (likely(qt != NULL)) {
+	if (likely((q_nbsrv = q->q_nbsrv) != NULL)) {
 		/* If we are backenabling a Stream end queue then we will be specific about why it
 		   was backenabled, this gives the Stream head or driver information about for
 		   which specific bands flow control has subsided. */
-		if (unlikely(q_back == NULL)) {
+		/* Well, just the Stream head ... */
+		if (!test_bit(QREADR_BIT, &q_nbsrv->q_flag) && backq(q_nbsrv) == NULL) {
 			unsigned long pl;
 			struct qband *qb;
 
-			qwlock(qt, pl);
+			qwlock(q_nbsrv, pl);
 			if (likely(bands == NULL)) {
 				if (band == 0)
-					set_bit(QBACK_BIT, &qt->q_flag);
-				else if ((qb = __get_qband(qt, band)))
+					set_bit(QBACK_BIT, &q_nbsrv->q_flag);
+				else if ((qb = __get_qband(q_nbsrv, band)))
 					set_bit(QB_BACK_BIT, &qb->qb_flag);
 			} else {
 				int bnum;
 
 				if (bands[0])
-					set_bit(QBACK_BIT, &qt->q_flag);
+					set_bit(QBACK_BIT, &q_nbsrv->q_flag);
 				for (bnum = band; bnum > 0; bnum--)
-					if (bands[bnum] && (qb = __get_qband(qt, bnum)))
+					if (bands[bnum] && (qb = __get_qband(q_nbsrv, bnum)))
 						set_bit(QB_BACK_BIT, &qb->qb_flag);
 			}
-			qwunlock(qt, pl);
+			qwunlock(q_nbsrv, pl);
 		}
 		/* SVR4 SPG - noenable() does not prevent a queue from being back enabled by flow
 		   control */
-		qenable(qt);	/* always enable if a service procedure exists */
+		qenable(q_nbsrv);	/* always enable if a service procedure exists */
 	}
 #ifdef CONFIG_SMP
 	if (unlikely(q_next == NULL))
@@ -1302,9 +1299,6 @@ __bcanputany(queue_t *q)
 	bool result;
 	unsigned long pl;
 
-	/* find first queue with service procedure or no q_next pointer */
-	for (; !q->q_qinfo->qi_srvp && q->q_next; q = q->q_next) ;
-
 	qrlock(q, pl);
 	result = (q->q_blocked < q->q_nband);
 	_ptrace(("queue bands blocked %d, available %d\n", q->q_blocked, q->q_nband));
@@ -1313,32 +1307,12 @@ __bcanputany(queue_t *q)
 	return (result);
 }
 
-/**
- *  bcanputany:		- check whether a message can be put to any (non-zero) band on a queue
- *  @q:			the queue to check
- *
- *  CONTEXT: Any.
- *
- *  LOCKING: Takes a Stream head read lock.
- */
-streams_fastcall int
-bcanputany(queue_t *q)
+STATIC streams_inline streams_fastcall __hot int
+__bcanputnextany(queue_t *q)
 {
-	bool result;
-	struct stdata *sd;
-
-	dassert(q);
-	sd = qstream(q);
-	dassert(sd);
-
-	prlock(sd);
-	result = __bcanputany(q);
-	prunlock(sd);
-
-	return (result);
+	dassert(q->q_nfsrv != NULL);
+	return __bcanputany(q->q_nfsrv);
 }
-
-EXPORT_SYMBOL_GPL(bcanputany);	/* include/sys/streams/stream.h */
 
 /**
  *  bcanputnextany:	- check whether a mesage can be put to any (non-zero) band on the next queue
@@ -1366,13 +1340,43 @@ bcanputnextany(queue_t *q)
 	dassert(sd);
 
 	prlock(sd);
-	result = __bcanputany(q->q_next);
+	result = __bcanputnextany(q);
 	prunlock(sd);
 
 	return (result);
 }
 
 EXPORT_SYMBOL_GPL(bcanputnextany);	/* include/sys/streams/stream.h */
+
+/**
+ *  bcanputany:		- check whether a message can be put to any (non-zero) band on a queue
+ *  @q:			the queue to check
+ *
+ *  CONTEXT: Any.
+ *
+ *  LOCKING: Takes a Stream head read lock.
+ */
+streams_fastcall int
+bcanputany(queue_t *q)
+{
+	bool result;
+	struct stdata *sd;
+
+	dassert(q);
+	sd = qstream(q);
+	dassert(sd);
+
+	prlock(sd);
+	if (unlikely(!test_bit(QSRVP_BIT, &q->q_flag) && q->q_next != NULL))
+		result = __bcanputnextany(q);
+	else
+		result = __bcanputany(q);
+	prunlock(sd);
+
+	return (result);
+}
+
+EXPORT_SYMBOL_GPL(bcanputany);	/* include/sys/streams/stream.h */
 
 /*
  *  __find_qband:
@@ -1475,14 +1479,6 @@ STATIC streams_inline streams_fastcall __hot_write int
 __bcanput(queue_t *q, unsigned char band)
 {
 	unsigned long pl;
-	queue_t *q_next;
-
-	/* It might be an idea to cache the forward queue with a service procedure as Solaris does.
-	   Solaris uses a q_nfsrv pointer for this that is adjusted when the driver is attached and
-	   when modules are pushed or popped.  It's just so much trouble to go to... */
-
-	/* find first queue with service procedure or no q_next pointer */
-	for (q_next = q; !q->q_qinfo->qi_srvp && (q_next = q->q_next); q = q_next) ;
 
 	if (likely(band == 0)) {
 		qrlock(q, pl);
@@ -1496,6 +1492,77 @@ __bcanput(queue_t *q, unsigned char band)
 	}
 	return __bcanput_slow(q, band);
 }
+
+STATIC streams_inline streams_fastcall __hot_write int
+__bcanputnext(queue_t *q, unsigned char band)
+{
+	dassert(q->q_nfsrv != NULL);
+	return __bcanput(q->q_nfsrv, band);
+}
+
+/**
+ *  bcanputnext: - check whether messages can be put to queue after this one
+ *  @q:		this queue
+ *  @band:	band to check
+ *
+ *  CONTEXT: Any.
+ *
+ *  NOTICES: The caller is responsible for ensuring that q->q_next is not NULL across the call.  A
+ *  module can be sure that both its q->q_next pointers are non-NULL, a driver can be sure that its
+ *  RD(q)->q_next pointer is non-NULL and that its WR(q)->q_next pointer is NULL, a Stream head
+ *  which is not hanged up can be sure that its WR(q)->q_next pointer is non-NULL.
+ *
+ *  MP-STREAMS: If called from outside the STREAMS context, the caller is responsible for taking
+ *  a Stream head read lock across the call.  (This is what the Stream head does.)  In general, this
+ *  function should only be called from outside the STREAMS context by the Stream head.  Drivers
+ *  should use bcanput().
+ *
+ *  CONTEXT: bcanputnext() can only be called from within a queue or module procedure, and must be
+ *  passed a queue in that queue pair.
+ *
+ *  MP-STREAMS: The caller is responsible for the validity of the passed in q pointer.  A reference
+ *  to a queue is generally valid from after qprocson(9) returns until qprocsoff(9) is called for q.
+ *  Note that, when called from outside of the STREAMS context, the result might not reflect the
+ *  state of the Stream.  From outside the STREAMS context, the caller an bracket freezestr(q) and
+ *  unfreezestr(q) around the call.  The result will reflect the actual state of the Stream until
+ *  unfreezestr(q) is called.
+ *
+ *  Again.
+ *
+ *  Solaris allows bcanputnext() to be called from an asyncrhonous context.  HP-UX does not.  For
+ *  compatibility there is little choice but to make bcanputnext() safe from an asynchronous
+ *  context by taking a plumb read lock.
+ */
+streams_fastcall __hot int
+bcanputnext(register queue_t *q, unsigned char band)
+{
+	register int result;
+
+#ifdef CONFIG_SMP
+	int stream_end = (backq(q) == NULL);
+#endif
+
+	dassert(q);
+	dassert(q->q_next);
+	dassert(qstream(q));
+
+#ifdef CONFIG_SMP
+	if (stream_end)
+		prlock(qstream(q));
+#endif
+
+	result = __bcanputnext(q, band);
+
+#ifdef CONFIG_SMP
+	if (stream_end)
+		prunlock(qstream(q));
+#endif
+
+	return (result);
+}
+
+EXPORT_SYMBOL(bcanputnext);
+
 
 /**
  *  bcanput:		- check whether message of a given band can be put to a queue
@@ -1555,7 +1622,10 @@ bcanput(register queue_t *q, unsigned char band)
 		prlock(qstream(q));
 #endif
 
-	result = __bcanput(q, band);
+	if (unlikely(!test_bit(QSRVP_BIT, &q->q_flag) && q->q_next != NULL))
+		result = __bcanputnext(q, band);
+	else
+		result = __bcanput(q, band);
 
 #ifdef CONFIG_SMP
 	if (unlikely(stream_end))
@@ -1565,69 +1635,6 @@ bcanput(register queue_t *q, unsigned char band)
 }
 
 EXPORT_SYMBOL(bcanput);
-
-/**
- *  bcanputnext: - check whether messages can be put to queue after this one
- *  @q:		this queue
- *  @band:	band to check
- *
- *  CONTEXT: Any.
- *
- *  NOTICES: The caller is responsible for ensuring that q->q_next is not NULL across the call.  A
- *  module can be sure that both its q->q_next pointers are non-NULL, a driver can be sure that its
- *  RD(q)->q_next pointer is non-NULL and that its WR(q)->q_next pointer is NULL, a Stream head
- *  which is not hanged up can be sure that its WR(q)->q_next pointer is non-NULL.
- *
- *  MP-STREAMS: If called from outside the STREAMS context, the caller is responsible for taking
- *  a Stream head read lock across the call.  (This is what the Stream head does.)  In general, this
- *  function should only be called from outside the STREAMS context by the Stream head.  Drivers
- *  should use bcanput().
- *
- *  CONTEXT: bcanputnext() can only be called from within a queue or module procedure, and must be
- *  passed a queue in that queue pair.
- *
- *  MP-STREAMS: The caller is responsible for the validity of the passed in q pointer.  A reference
- *  to a queue is generally valid from after qprocson(9) returns until qprocsoff(9) is called for q.
- *  Note that, when called from outside of the STREAMS context, the result might not reflect the
- *  state of the Stream.  From outside the STREAMS context, the caller an bracket freezestr(q) and
- *  unfreezestr(q) around the call.  The result will reflect the actual state of the Stream until
- *  unfreezestr(q) is called.
- *
- *  Again.
- *
- *  Solaris allows bcanputnext() to be called from an asyncrhonous context.  HP-UX does not.  For
- *  compatibility there is little choice but to make bcanputnext() safe from an asynchronous
- *  context by taking a plumb read lock.
- */
-streams_fastcall __hot int
-bcanputnext(register queue_t *q, unsigned char band)
-{
-	register int result;
-
-#ifdef CONFIG_SMP
-	int stream_end = (backq(q) == NULL);
-#endif
-
-	dassert(q);
-	dassert(q->q_next);
-	dassert(qstream(q));
-
-#ifdef CONFIG_SMP
-	if (stream_end)
-		prlock(qstream(q));
-#endif
-
-	result = __bcanput(q->q_next, band);
-
-#ifdef CONFIG_SMP
-	if (stream_end)
-		prunlock(qstream(q));
-#endif
-
-	return (result);
-}
-
-EXPORT_SYMBOL(bcanputnext);
 
 /**
  *  canenable:	- check whether service procedure will run
@@ -1846,7 +1853,7 @@ qschedule(queue_t *q)
 streams_fastcall void
 qenable(register queue_t *q)
 {
-	if (likely(q->q_qinfo->qi_srvp != NULL))
+	if (likely(test_bit(QSRVP_BIT, &q->q_flag)))
 		qschedule(q);
 }
 
@@ -1863,7 +1870,7 @@ EXPORT_SYMBOL(qenable);		/* include/sys/streams/stream.h */
 streams_fastcall int
 enableq(queue_t *q)
 {
-	if (likely(q->q_qinfo->qi_srvp && likely(!test_bit(QNOENB_BIT, &q->q_flag)))) {
+	if (likely(test_bit(QSRVP_BIT, &q->q_flag) && likely(!test_bit(QNOENB_BIT, &q->q_flag)))) {
 		qenable(q);
 		return (1);
 	}
@@ -2702,7 +2709,11 @@ qdelete(queue_t *q)
 	pwlock(sd, pl);
 
 	(q + 0)->q_next = NULL;
+	(q + 0)->q_nfsrv = NULL;
+	(q + 0)->q_nbsrv = NULL;
 	(q + 1)->q_next = NULL;
+	(q + 1)->q_nfsrv = NULL;
+	(q + 1)->q_nbsrv = NULL;
 
 	pwunlock(sd, pl);
 
@@ -2794,7 +2805,17 @@ qinsert(struct stdata *sd, queue_t *irq)
 	iwq = _WR(irq);
 	swq = _WR(srq);
 	irq->q_next = srq;
-	iwq->q_next = (swq->q_next != srq) ? swq->q_next : irq;
+	irq->q_nfsrv = srq;
+	iwq->q_nbsrv = swq;
+	if (likely(swq->q_next != srq)) {
+		iwq->q_next = swq->q_next;
+		iwq->q_nfsrv = swq->q_nfsrv;
+		irq->q_nbsrv = srq->q_nbsrv;
+	} else {
+		iwq->q_next = irq;
+		iwq->q_nfsrv = test_bit(QSRVP_BIT, &irq->q_flag) ? irq : srq;
+		irq->q_nbsrv = test_bit(QSRVP_BIT, &iwq->q_flag) ? iwq : swq;
+	}
 	prunlock(sd);
 }
 
@@ -2892,11 +2913,26 @@ qprocsoff(queue_t *q)
 		if ((sd2 = wq->q_next ? qstream(wq->q_next) : NULL) && sd2 > sd)
 			pwlock(sd2, pl2);
 
+		/* bypass service procedures */
+		if (test_bit(QSRVP_BIT, &rq->q_flag) || rq->q_next == NULL) {
+			for (bq = rq->q_nbsrv; bq && bq != rq; bq = bq->q_next)
+				bq->q_nfsrv = rq->q_nfsrv;
+			for (bq = rq->q_nfsrv; bq && bq != rq; bq = backq(bq))
+				bq->q_nbsrv = rq->q_nbsrv;
+		}
+		if (test_bit(QSRVP_BIT, &wq->q_flag) || wq->q_next == NULL) {
+			for (bq = wq->q_nbsrv; bq && bq != wq; bq = bq->q_next)
+				bq->q_nfsrv = wq->q_nfsrv;
+			for (bq = wq->q_nfsrv; bq && bq != wq; bq = backq(bq))
+				bq->q_nbsrv = wq->q_nbsrv;
+		}
+
 		/* bypass this module: works for pipe, FIFO and other Stream heads queues too */
 		if ((bq = backq(rq)))
 			bq->q_next = rq->q_next;
 		if ((bq = backq(wq)))
 			bq->q_next = wq->q_next;
+
 		/* cache new packet sizes (next module or stream head) */
 		if ((wq = sd->sd_wq->q_next) || (wq = sd->sd_wq)) {
 			sd->sd_minpsz = wq->q_minpsz;
@@ -2982,6 +3018,20 @@ qprocson(queue_t *q)
 			bq->q_next = rq;
 		if ((bq = backq(wq)))
 			bq->q_next = wq;
+
+		/* fix up service procedure cache pointers */
+		if (test_bit(QSRVP_BIT, &rq->q_flag) || rq->q_next == NULL) {
+			for (bq = rq->q_nbsrv; bq && bq != rq; bq = bq->q_next)
+				bq->q_nfsrv = rq;
+			for (bq = rq->q_nfsrv; bq && bq != rq; bq = backq(bq))
+				bq->q_nbsrv = rq;
+		}
+		if (test_bit(QSRVP_BIT, &wq->q_flag) || wq->q_next == NULL) {
+			for (bq = wq->q_nbsrv; bq && bq != wq; bq = bq->q_next)
+				bq->q_nfsrv = wq;
+			for (bq = wq->q_nfsrv; bq && bq != wq; bq = backq(bq))
+				bq->q_nbsrv = wq;
+		}
 
 		/* cache new packet sizes (this module) */
 		sd->sd_minpsz = wq->q_minpsz;
@@ -3642,6 +3692,11 @@ __setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 	q->q_minpsz = rinit->qi_minfo->mi_minpsz;
 	q->q_hiwat = rinit->qi_minfo->mi_hiwat;
 	q->q_lowat = rinit->qi_minfo->mi_lowat;
+	q->q_putp = rinit->qi_putp;
+	if ((q->q_srvp = rinit->qi_srvp))
+		set_bit(QSRVP_BIT, &q->q_flag);
+	else
+		clear_bit(QSRVP_BIT, &q->q_flag);
 #if defined CONFIG_STREAMS_SYNCQS
 	if (q->q_syncq)
 		set_bit(QSYNCH_BIT, &q->q_flag);
@@ -3652,6 +3707,11 @@ __setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 	q->q_minpsz = winit->qi_minfo->mi_minpsz;
 	q->q_hiwat = winit->qi_minfo->mi_hiwat;
 	q->q_lowat = winit->qi_minfo->mi_lowat;
+	q->q_putp = winit->qi_putp;
+	if ((q->q_srvp = winit->qi_srvp))
+		set_bit(QSRVP_BIT, &q->q_flag);
+	else
+		clear_bit(QSRVP_BIT, &q->q_flag);
 #if defined CONFIG_STREAMS_SYNCQS
 	if (q->q_syncq)
 		set_bit(QSYNCH_BIT, &q->q_flag);
