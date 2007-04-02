@@ -1,5 +1,8 @@
 2007-04-02  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/bugs.texi: documented option handling bug fix in ldltest
+	* src/test/ldltest.c: option handling bug fix in ldltest
+
 	* doc/manual/bugs.texi: documented bugs fixed in ldl
 	* src/drivers/ldl.c: fixed MKDEV bug in ldl and added missing MODULE_ALIAS's
 
