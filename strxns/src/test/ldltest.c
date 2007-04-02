@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/18 07:40:14 $
+ @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/04/02 13:07:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 07:40:14 $ by $Author: brian $
+ Last Modified $Date: 2007/04/02 13:07:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldltest.c,v $
+ Revision 0.9.2.12  2007/04/02 13:07:56  brian
+ - fixed option handilng bug in ldltest
+
  Revision 0.9.2.11  2006/12/18 07:40:14  brian
  - device number resolution, updated test programs
 
@@ -91,10 +94,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/18 07:40:14 $"
+#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/04/02 13:07:56 $"
 
 static char const ident[] =
-    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/12/18 07:40:14 $";
+    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/04/02 13:07:56 $";
 
 /*
  *  ldltest: Test program for dlpi driver
@@ -2773,7 +2776,7 @@ main(int argc, char *argv[])
 	/* 
 	 * don't ignore non-option arguments 
 	 */
-	if (optind < argc)
+	if (optind < argc - 2)
 		goto bad_nonopt;
 
 	/* 
