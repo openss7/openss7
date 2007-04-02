@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.8 2007/03/31 15:50:13 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.9 2007/04/02 12:01:50 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,20 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/31 15:50:13 $ by $Author: brian $
+@c Last Modified $Date: 2007/04/02 12:01:50 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 009.  2007-04-02T11:57:35+0000
+
+@file{ldl} was using an incorrect MKDEV command, but when the Stream head attempted to redirect the
+open to the new (mangled) major device number, it properly returned ENXIO, but did not release a
+reference to the module.  Need to check code paths for this to see where the reference needed to be
+released.
+
+@emph{*known bug*}
+
 @item 008.  2007-03-31T05:33:29-0600
 
 When loosening SMP locking, found a bug in the QWANTR handling in getq() and back-enabling in
