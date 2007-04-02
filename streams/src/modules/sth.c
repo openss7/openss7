@@ -3394,7 +3394,7 @@ strirput(queue_t *q, mblk_t *mp)
 		if (_ctrace(strwakeiocack(sd, mp)))
 			return (0);
 	}
-	return ((*sd->sd_muxinit->qi_putp) (q, mp));
+	return ((*q->q_qinfo->qi_putp) (q, mp));
 }
 
 /**
@@ -3414,7 +3414,6 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 	union ioctypes *ioc;
 	struct linkblk *lbp;
 	mblk_t *mb, *db;
-	struct qinit qi, *qi_old;
 
 #ifdef CONFIG_STREAMS_LIS_BCM
 	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
@@ -3460,17 +3459,13 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 
 	ioc->iocblk.ioc_id = sd->sd_iocid;
 
-	qi_old = sd->sd_rq->q_qinfo;
 	if (test_bit(STPLEX_BIT, &sd->sd_flag)) {
 		/* When multiplexed, there is no strrput procedure on the STREAM head read queue
 		   pair to respond to a message.  It is, therefore, necessary to intercept ioctl
 		   response messages (M_IOCACK, M_IOCNAK, M_COPYIN and M_COPYOUT) from the
-		   multiplexed read queue.  This is done by taking a copy of the read queue qinit
-		   structure, overwriting our strirput() procedure and jamming the q_qinfo pointer
-		   on the queue. */
-		qi.qi_putp = &strirput;	/* intercept, above */
-		sd->sd_muxinit = qi_old;
-		sd->sd_rq->q_qinfo = &qi;
+		   multiplexed read queue.  This is done by overwriting our strirput() procedure
+		   to the put procedure cache pointer on the queue. */
+		sd->sd_rq->q_putp = &strirput;	/* intercept */
 	}
 
 	do {
@@ -3505,7 +3500,7 @@ strdoioctl_unlink(struct stdata *sd, struct linkblk *l)
 		break;
 	} while (1);
       abort:
-	sd->sd_rq->q_qinfo = qi_old;
+	sd->sd_rq->q_putp = sd->sd_rq->q_qinfo->qi_putp;
 	strwakeioctl(sd);
 	return;
 }
@@ -8971,6 +8966,12 @@ str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 							sd->sd_wq->q_next = sd2->sd_rq;
 							sd2->sd_wq->q_next = sd->sd_rq;
 
+							sd->sd_wq->q_nfsrv = sd2->sd_rq;
+							sd2->sd_wq->q_nfsrv = sd->sd_rq;
+
+							sd->sd_rq->q_nbsrv = sd2->sd_wq;
+							sd2->sd_rq->q_nbsrv = sd->sd_wq;
+
 							/* always unlock 'em in the same order */
 							if (sd < sd2) {
 								pwunlock(sd2, pl2);
@@ -11168,6 +11169,8 @@ str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			return (-ENXIO);
 		/* start off life as a fifo: named pipe */
 		_WR(q)->q_next = q;
+		_WR(q)->q_nfsrv = q;
+		q->q_nbsrv = _WR(q);
 	} else if (sd->sd_flag & STRISPIPE) {
 		static int pipe_minor = 0;
 		static spinlock_t pipe_lock = SPIN_LOCK_UNLOCKED;
@@ -11183,6 +11186,8 @@ str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 		/* start off life as a fifo: unidirectional unnamed pipe */
 		_WR(q)->q_next = q;
+		_WR(q)->q_nfsrv = q;
+		q->q_nbsrv = _WR(q);
 
 		*devp = makedevice(getmajor(*devp), minor);
 		/* don't worry, if we wrap we will reuse inodes but not Stream heads */

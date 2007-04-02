@@ -395,6 +395,12 @@ do_spipe(int *fds)
 		sdr->sd_wq->q_next = sdw->sd_rq;
 		sdw->sd_wq->q_next = sdr->sd_rq;
 
+		sdr->sd_wq->q_nfsrv = sdw->sd_rq;
+		sdw->sd_wq->q_nfsrv = sdr->sd_rq;
+
+		sdr->sd_rq->q_nbsrv = sdw->sd_wq;
+		sdw->sd_rq->q_nbsrv = sdr->sd_wq;
+
 		sdr->sd_other = sdw;
 		sdw->sd_other = sdr;
 	}

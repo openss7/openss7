@@ -296,7 +296,6 @@ struct stdata {
 	struct stdata *sd_link_next;	/* next linked stream */
 	struct linkblk *sd_linkblk;	/* link block for this stream */
 	struct wantio *sd_directio;	/* direct io for this stream head */
-	struct qinit *sd_muxinit;	/* oopy of read side qinit for intercept */
 };
 
 typedef struct stdata stdata_t;

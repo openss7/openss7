@@ -476,6 +476,14 @@ enum {
 
 #define NBAND	    256		/* UnixWare/Solaris */
 
+struct queue;
+
+typedef int streamscall (*qi_putp_t) (struct queue *, mblk_t *);
+typedef int streamscall (*qi_srvp_t) (struct queue *);
+typedef int streamscall (*qi_qopen_t) (struct queue *, dev_t *, int, int, cred_t *);
+typedef int streamscall (*qi_qclose_t) (struct queue *, int, cred_t *);
+typedef int streamscall (*qi_qadmin_t) (void);
+
 /* 
  *  This queue structure corresponds to the Expanded Fundamental Type queue
  *  structure.
@@ -502,6 +510,10 @@ typedef struct queue {
 	rwlock_t q_lock;		/* lock for this queue structure */
 	int streamscall (*q_ftmsg) (mblk_t *);	/* message filter ala AIX */
 	struct syncq *q_syncq;		/* synchronization queues */
+	struct queue *q_nfsrv;		/* next forward queue with qi_srvp */
+	struct queue *q_nbsrv;		/* next backward queue with qi_srvp */
+	qi_putp_t q_putp;		/* put procedure cache pointer */
+	qi_srvp_t q_srvp;		/* srv procedure cache pointer */
 #if 0
 	/* these are just a waste of space */
 	struct queue *q_other;		/* LiS, OSF */
@@ -542,6 +554,7 @@ typedef struct queue {
 #define QWCLOSE_BIT	16	/* L(10) L(12) S(17) */
 #define QPROCS_BIT	17	/* */
 #define QBLKING_BIT	18	/* */
+#define QSRVP_BIT	19	/* */
 
 #if 0
 /* paraphenalia */
@@ -592,6 +605,7 @@ typedef struct queue {
 #define QWCLOSE		(1<<QWCLOSE_BIT		)	/* q in close wait */
 #define QPROCS		(1<<QPROCS_BIT		)	/* putp, srvp disabled */
 #define QBLKING		(1<<QBLKING_BIT		)	/* queue procedure can block */
+#define QSRVP		(1<<QSRVP_BIT		)	/* queue has service procedure */
 
 #if 0
 /* different names for the same things */
@@ -659,12 +673,6 @@ typedef struct module_stat {
 	short ms_xsize;			/* len of private stats */
 	uint ms_flags;			/* bool stats -- for future use */
 } module_stat_t;
-
-typedef int streamscall (*qi_putp_t) (queue_t *, mblk_t *);
-typedef int streamscall (*qi_srvp_t) (queue_t *);
-typedef int streamscall (*qi_qopen_t) (queue_t *, dev_t *, int, int, cred_t *);
-typedef int streamscall (*qi_qclose_t) (queue_t *, int, cred_t *);
-typedef int streamscall (*qi_qadmin_t) (void);
 
 struct qinit {
 	qi_putp_t qi_putp;		/* put procedure */
