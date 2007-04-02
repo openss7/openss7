@@ -1,3 +1,7 @@
+2007-04-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* streams/doc/manual/bugs.texi: documented ldl reference counting bug
+
 2007-04-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/kernel/strutil.c: performance tuning (QWANTR/QWANTW corrections)
