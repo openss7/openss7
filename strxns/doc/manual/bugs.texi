@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.1 2006/08/27 12:02:36 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.2 2007/04/02 12:01:46 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,12 +53,22 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/27 12:02:36 $ by $Author: brian $
+@c Last Modified $Date: 2007/04/02 12:01:46 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
-@item (no items)
+@item 001.  2007-04-02T11:52:59+0000
+
+@file{ldl} was not demand loading for 2.6 kernels due to missing MODULE_ALIAS declarations.  Also,
+@file{ldl} had an incorrect SVR 3 style @samp{MKDEV(MAJOR(*devp), i)} construct in it that was using
+Linux utilities instead of Linux Fast-STREAMS utilities, causing the Stream head to attempt to
+redirect the major device.  Unfortunalely, this was failing.  Changed to the correct SVR 4 style
+@samp{makedevice(getmajor(*devp), i)}.  (There must still be a bad major redirection path in the
+Stream head.)
+
+@emph{*fixed*} in @command{strxns-0.9.2.6}
+
 @end table
 
 

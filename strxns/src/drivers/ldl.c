@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/25 19:02:47 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/04/02 12:01:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:02:47 $ by $Author: brian $
+ Last Modified $Date: 2007/04/02 12:01:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.c,v $
+ Revision 0.9.2.37  2007/04/02 12:01:47  brian
+ - fixed bugs in ldl
+
  Revision 0.9.2.36  2007/03/25 19:02:47  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/25 19:02:47 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/04/02 12:01:47 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/25 19:02:47 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/04/02 12:01:47 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -112,7 +115,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.36 $) $Date: 2007/03/25 19:02:47 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.37 $) $Date: 2007/04/02 12:01:47 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -134,6 +137,8 @@ MODULE_LICENSE(LDL_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-ldl");
+MODULE_ALIAS("streams-link-driver");
+MODULE_ALIAS("streams-link-dri");
 #endif
 #endif				/* LINUX */
 
@@ -144,6 +149,24 @@ MODULE_ALIAS("streams-ldl");
 #define LDL_CMAJOR_0	CONFIG_STREAMS_LDL_MAJOR
 #define LDL_UNITS	CONFIG_STREAMS_LDL_NMINORS
 #endif				/* LFS */
+
+#ifdef LINUX
+#ifdef MODULE_ALIAS
+#ifdef LFS
+MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_LDL_MODID));
+MODULE_ALIAS("streams-driver-link-driver");
+MODULE_ALIAS("streams-driver-link-dri");
+MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_LDL_MAJOR));
+MODULE_ALIAS("/dev/streams/link-dri");
+MODULE_ALIAS("/dev/streams/link-dri/*");
+MODULE_ALIAS("/dev/streams/clone/link-dri");
+#endif				/* LFS */
+MODULE_ALIAS("char-major-" __stringify(LDL_CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(LDL_CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(LDL_CMAJOR_0) "-0");
+MODULE_ALIAS("/dev/ldl");
+#endif				/* MODULE_ALIAS */
+#endif				/* LINUX */
 
 #define DRV_ID		LDL_DRV_ID
 #define DRV_NAME	LDL_DRV_NAME
@@ -4498,8 +4521,7 @@ ldl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 			return EBUSY;
 		}
 	}
-	/* *devp = makedevice(major(*devp), i); */
-	*devp = MKDEV(MAJOR(*devp), i);
+	*devp = makedevice(getmajor(*devp), i);
 
 	if (q->q_ptr != NULL) {
 		spin_unlock(&first_open_lock);
@@ -4967,6 +4989,7 @@ ldl_init(void)
 	if ((err = ldl_register_ioctl32()) < 0)
 		return (err);
 	if ((err = register_strdev(&ldl_cdev, major)) < 0) {
+		cmn_err(CE_WARN, "%s: Cannot register major %d, err = %d\n", DRV_NAME, (int)major, -err);
 		ldl_unregister_ioctl32();
 		return (err);
 	}
