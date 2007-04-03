@@ -1058,7 +1058,7 @@ raise_local_bufcalls(void)
 {
 	struct strthread *t = this_thread;
 
-	if (unlikely(test_bit(strbcwait, &t->flags) != 0))
+	if (unlikely((STRBCWAIT & t->flags) != 0))
 		if (!test_and_set_bit(strbcflag, &t->flags))
 			__raise_streams();
 }
@@ -1092,7 +1092,7 @@ raise_bufcalls(void)
 		register int cpu = 0;
 
 		do {
-			if (unlikely(test_bit(strbcwait, &t->flags) != 0))
+			if (unlikely((STRBCWAIT & t->flags) != 0))
 				if (!test_and_set_bit(strbcflag, &t->flags))
 					cpu_raise_streams(cpu);
 			t++;
@@ -2141,11 +2141,11 @@ weldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, weld_
 {
 	if (!q1)
 		return (EINVAL);
-	if (q1->q_next != NULL || test_bit(QWELDED_BIT, &q1->q_flag))
+	if (q1->q_next != NULL || (QWELDED & q1->q_flag))
 		return (EINVAL);
 	if (!q3)
 		goto onepair;
-	if (q3->q_next != NULL || test_bit(QWELDED_BIT, &q3->q_flag))
+	if (q3->q_next != NULL || (QWELDED & q3->q_flag))
 		return (EINVAL);
       onepair:
 	if (q1)
@@ -2180,11 +2180,11 @@ unweldq(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t func, wel
 {
 	if (!q1)
 		return (EINVAL);
-	if (q1->q_next != q2 || !test_bit(QWELDED_BIT, &q1->q_flag))
+	if (q1->q_next != q2 || !(QWELDED & q1->q_flag))
 		return (EINVAL);
 	if (!q3)
 		goto onepair;
-	if (q3->q_next != q4 || !test_bit(QWELDED_BIT, &q3->q_flag))
+	if (q3->q_next != q4 || !(QWELDED & q3->q_flag))
 		return (EINVAL);
       onepair:
 	if (q1)
@@ -2232,7 +2232,7 @@ strwrit_fast(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t
 #ifdef CONFIG_SMP
 	dassert(qstream(q));
 	prlock(qstream(q));
-	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
+	if (likely((QPROCS & q->q_flag) == 0)) {
 #endif
 		func(q, mp);
 		qwakeup(q);
@@ -2274,7 +2274,7 @@ strfunc_fast(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp
 #ifdef CONFIG_SMP
 	dassert(qstream(q));
 	prlock(qstream(q));
-	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
+	if (likely((QPROCS & q->q_flag) == 0)) {
 #endif
 		func(arg, mp);
 		qwakeup(q);
@@ -2345,7 +2345,7 @@ putp_fast(queue_t *q, mblk_t *mp)
 		prlock(qstream(q));
 
 	/* procs can't be turned off */
-	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
+	if (likely((QPROCS & q->q_flag) == 0))
 #endif
 	{
 		/* prefetch private structure */
@@ -2440,7 +2440,7 @@ srvp_fast(queue_t *q)
 
 #ifdef CONFIG_SMP
 		/* check if procs are turned off */
-		if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
+		if (likely((QPROCS & q->q_flag) == 0))
 #endif
 		{
 			/* prefetch private structure */
@@ -3093,8 +3093,8 @@ qstrwrit_sync(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_
 STATIC streams_inline streams_fastcall void
 qstrwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *), int perim)
 {
-	if (unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
-		if (likely(!in_interrupt()) || likely(!test_bit(QBLKING_BIT, &q->q_flag))
+	if (unlikely((QSYNCH & q->q_flag))) {
+		if (likely(!in_interrupt()) || likely(!(QBLKING & q->q_flag))
 		    || likely(!in_irq()))
 			qstrwrit_sync(q, mp, func, perim);
 		else
@@ -3144,8 +3144,8 @@ qstrfunc_sync(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *m
 STATIC streams_inline streams_fastcall void
 qstrfunc(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
-	if (unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
-		if (likely(!in_interrupt()) || likely(!test_bit(QBLKING_BIT, &q->q_flag))
+	if (unlikely((QSYNCH & q->q_flag))) {
+		if (likely(!in_interrupt()) || likely(!(QBLKING & q->q_flag))
 		    || likely(!in_irq()))
 			qstrfunc_sync(func, q, mp, arg);
 		else
@@ -3198,8 +3198,8 @@ qputp_sync(queue_t *q, mblk_t *mp)
 STATIC streams_inline streams_fastcall __hot void
 qputp(queue_t *q, mblk_t *mp)
 {
-	if (unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
-		if (likely(!in_interrupt()) || likely(!test_bit(QBLKING_BIT, &q->q_flag))
+	if (unlikely((QSYNCH & q->q_flag))) {
+		if (likely(!in_interrupt()) || likely(!(QBLKING & q->q_flag))
 		    || likely(!in_irq()))
 			qputp_sync(q, mp);
 		else
@@ -3406,7 +3406,7 @@ qsrvp_sync(queue_t *q)
 STATIC streams_inline streams_fastcall __hot_in void
 qsrvp(queue_t *q)
 {
-	if (unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
+	if (unlikely((QSYNCH & q->q_flag))) {
 		qsrvp_sync(q);
 	} else
 		srvp_fast(q);
@@ -3442,7 +3442,7 @@ qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		return (-ENOPKG);
 
 #ifdef CONFIG_STREAMS_SYNCQS
-	if (unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
+	if (unlikely((QSYNCH & q->q_flag))) {
 		struct syncq_cookie ck = {.sc_q = q, }, *sc = &ck;
 
 		enter_inner_syncq_asopen(sc);
@@ -3495,7 +3495,7 @@ qclose(queue_t *q, int oflag, cred_t *crp)
 		return (-ENXIO);
 
 #ifdef CONFIG_STREAMS_SYNCQS
-	if (unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
+	if (unlikely((QSYNCH & q->q_flag))) {
 		struct syncq_cookie ck = {.sc_q = q, }, *sc = &ck;
 
 		enter_inner_syncq_asopen(sc);
@@ -3651,7 +3651,7 @@ do_bufcall_synced(struct strevent *se)
 	q = se->x.b.queue;
 	if (likely((func = se->x.b.func) != NULL)) {
 		unsigned long flags = 0;
-		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
+		int safe = (q && (QSAFE & q->q_flag));
 
 		if (unlikely(safe))
 			streams_local_save(flags);
@@ -3705,7 +3705,7 @@ do_timeout_synced(struct strevent *se)
 	q = se->x.t.queue;
 	if (likely((func = se->x.t.func) != NULL)) {
 		unsigned long flags = 0;
-		int safe = (se->x.t.pl != 0 || (q && test_bit(QSAFE_BIT, &q->q_flag)));
+		int safe = (se->x.t.pl != 0 || (q && (QSAFE & q->q_flag)));
 
 		if (unlikely(safe))
 			streams_local_save(flags);
@@ -3784,8 +3784,8 @@ do_weldq_synced(struct strevent *se)
 
 			if (q2) {
 				/* attaching */
-				q1->q_nfsrv = test_bit(QSRVP_BIT, &q1->q_flag) ? q2 : q2->q_nfsrv;
-				q2->q_nbsrv = test_bit(QSRVP_BIT, &q2->q_flag) ? q1 : q1->q_nbsrv;
+				q1->q_nfsrv = (QSRVP & q1->q_flag) ? q2 : q2->q_nfsrv;
+				q2->q_nbsrv = (QSRVP & q2->q_flag) ? q1 : q1->q_nbsrv;
 
 				for (qs = q1->q_nbsrv; qs && qs != q1; qs = qs->q_next)
 					qs->q_nfsrv = q1->q_nfsrv;
@@ -3807,8 +3807,8 @@ do_weldq_synced(struct strevent *se)
 
 			if (q3) {
 				/* attaching */
-				q3->q_nfsrv = test_bit(QSRVP_BIT, &q3->q_flag) ? q4 : q4->q_nfsrv;
-				q4->q_nbsrv = test_bit(QSRVP_BIT, &q4->q_flag) ? q3 : q3->q_nbsrv;
+				q3->q_nfsrv = (QSRVP & q3->q_flag) ? q4 : q4->q_nfsrv;
+				q4->q_nbsrv = (QSRVP & q4->q_flag) ? q3 : q3->q_nbsrv;
 
 				for (qs = q3->q_nbsrv; qs && qs != q3; qs = qs->q_next)
 					qs->q_nfsrv = q3->q_nfsrv;
@@ -3849,7 +3849,7 @@ do_weldq_synced(struct strevent *se)
 		queue_t *q = se->x.w.queue;
 
 		if (se->x.w.func) {
-			int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
+			int safe = (q && (QSAFE & q->q_flag));
 			unsigned long flags = 0;
 
 			if (safe) {
@@ -3957,7 +3957,7 @@ do_bufcall_event(struct strevent *se)
 #ifdef CONFIG_STREAMS_SYNCQS
 	queue_t *q = se->x.b.queue;
 
-	if (q && unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
+	if (q && unlikely((QSYNCH & q->q_flag))) {
 		struct syncq_cookie ck = {.sc_q = q,.sc_se = se, }, *sc = &ck;
 
 		if (unlikely(enter_inner_syncq_exclus(sc) == 0))
@@ -3980,7 +3980,7 @@ do_timeout_event(struct strevent *se)
 #ifdef CONFIG_STREAMS_SYNCQS
 	queue_t *q = se->x.t.queue;
 
-	if (q && unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
+	if (q && unlikely((QSYNCH & q->q_flag))) {
 		struct syncq_cookie ck = {.sc_q = se->x.t.queue,.sc_se = se, }, *sc = &ck;
 
 		if (unlikely(enter_inner_syncq_exclus(sc) == 0))
@@ -4005,7 +4005,7 @@ do_weldq_event(struct strevent *se)
 #ifdef CONFIG_STREAMS_SYNCQS
 	queue_t *q = se->x.w.queue;
 
-	if (q && unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
+	if (q && unlikely((QSYNCH & q->q_flag))) {
 		struct syncq_cookie ck = {.sc_q = se->x.w.queue,.sc_se = se, }, *sc = &ck;
 
 		if (unlikely(enter_outer_syncq_exclus(sc) == 0))
@@ -4030,7 +4030,7 @@ do_unweldq_event(struct strevent *se)
 #ifdef CONFIG_STREAMS_SYNCQS
 	queue_t *q = se->x.w.queue;
 
-	if (q && unlikely(test_bit(QSYNCH_BIT, &q->q_flag))) {
+	if (q && unlikely((QSYNCH & q->q_flag))) {
 		struct syncq_cookie ck = {.sc_q = se->x.w.queue,.sc_se = se, }, *sc = &ck;
 
 		if (unlikely(enter_outer_syncq_exclus(sc) == 0))
@@ -4192,7 +4192,7 @@ domfuncs(struct strthread *t)
 				prefetchw(b_next);
 			} while (unlikely((b = b_next) != NULL));
 		}
-	} while (unlikely(test_bit(strmfuncs, &t->flags) != 0));
+	} while (unlikely((STRMFUNCS & t->flags) != 0));
 }
 #endif				/* CONFIG_STREAMS_SYNCQS */
 
@@ -4222,7 +4222,7 @@ timeouts(struct strthread *t)
 				prefetchw(se_next);
 			} while (unlikely((se = se_next) != NULL));
 		}
-	} while (unlikely(test_bit(strtimout, &t->flags) != 0));
+	} while (unlikely((STRTIMOUT & t->flags) != 0));
 }
 
 STATIC __unlikely void
@@ -4308,7 +4308,7 @@ scanqueues(struct strthread *t)
 			if (q)
 				t->scanqhead = q;
 		}
-	} while (unlikely(test_bit(scanqflag, &t->flags) != 0));
+	} while (unlikely((SCANQFLAG & t->flags) != 0));
 }
 
 /*
@@ -4362,7 +4362,7 @@ doevents(struct strthread *t)
 				}
 			} while (unlikely((se = se_next) != NULL));
 		}
-	} while (unlikely(test_bit(strevents, &t->flags) != 0));
+	} while (unlikely((STREVENTS & t->flags) != 0));
 }
 
 #if defined CONFIG_STREAMS_SYNCQS
@@ -4515,7 +4515,7 @@ backlog(struct strthread *t)
 				runsyncq(sq);
 			} while (unlikely((sq = sq_link) != NULL));
 		}
-	} while (unlikely(test_bit(qsyncflag, &t->flags) != 0));
+	} while (unlikely((QSYNCFLAG & t->flags) != 0));
 }
 #endif
 
@@ -4553,7 +4553,7 @@ bufcalls(struct strthread *t)
 				do_bufcall_event(se);
 			} while (unlikely((se = se_next) != NULL));
 		}
-	} while (unlikely(test_bit(strbcwait, &t->flags) != 0));
+	} while (unlikely((STRBCWAIT & t->flags) != 0));
 }
 
 /**
@@ -4589,7 +4589,7 @@ queuerun(struct strthread *t)
 			} while (unlikely((q = q_link) != NULL));
 			prefetchw(t->qhead);
 		}
-	} while (unlikely(test_bit(qrunflag, &t->flags) != 0));
+	} while (unlikely((QRUNFLAG & t->flags) != 0));
 }
 
 /*
@@ -4652,34 +4652,34 @@ streams_noinline streams_fastcall __unlikely void
 __runqueues_slow(struct strthread *t)
 {
 	/* free flush chains if necessary */
-	if (unlikely(test_bit(flushwork, &t->flags) != 0))
+	if (unlikely((FLUSHWORK & t->flags) != 0))
 		_ctrace(freechains(t));
 #if !defined CONFIG_STREAMS_NORECYCLE
 	/* free mdbblocks to cache, if memory needed */
-	if (unlikely(test_bit(freeblks, &t->flags) != 0))
+	if (unlikely((FREEBLKS & t->flags) != 0))
 		_ctrace(freeblocks(t));
 #endif
 #if defined CONFIG_STREAMS_SYNCQS
 	/* do deferred m_func's first */
-	if (unlikely(test_bit(strmfuncs, &t->flags) != 0))
+	if (unlikely((STRMFUNCS & t->flags) != 0))
 		_ctrace(domfuncs(t));
 #endif
 #if defined CONFIG_STREAMS_SYNCQS
 	/* catch up on backlog first */
-	if (unlikely(test_bit(qsyncflag, &t->flags) != 0))
+	if (unlikely((QSYNCFLAG & t->flags) != 0))
 		_ctrace(backlog(t));
 #endif
 	/* do timeouts */
-	if (unlikely(test_bit(strtimout, &t->flags) != 0))
+	if (unlikely((STRTIMOUT & t->flags) != 0))
 		_ctrace(timeouts(t));
 	/* do stream head write queue scanning */
-	if (unlikely(test_bit(scanqflag, &t->flags) != 0))
+	if (unlikely((SCANQFLAG & t->flags) != 0))
 		_ctrace(scanqueues(t));
 	/* do pending events */
-	if (unlikely(test_bit(strevents, &t->flags) != 0))
+	if (unlikely((STREVENTS & t->flags) != 0))
 		_ctrace(doevents(t));
 	/* do buffer calls if necessary */
-	if (unlikely(test_bit(strbcflag, &t->flags) || test_bit(strbcwait, &t->flags)))
+	if (unlikely((STRBCFLAG & t->flags) || (STRBCWAIT & t->flags)))
 		_ctrace(bufcalls(t));
 }
 
@@ -4717,7 +4717,7 @@ __runqueues(struct softirq_action *unused)
 	do {
 		++runs;
 		/* run queue service procedures if necessary */
-		if (likely(test_bit(qrunflag, &t->flags) != 0))	/* PROFILED */
+		if (likely((QRUNFLAG & t->flags) != 0))	/* PROFILED */
 			_ctrace(queuerun(t));
 		if (unlikely((t->flags & (FLUSHWORK | FREEBLKS | STRMFUNCS | QSYNCFLAG |
 					  STRTIMOUT | SCANQFLAG | STREVENTS | STRBCFLAG |
