@@ -1710,12 +1710,12 @@ dnl
 	case "${with_k_optimize:-auto}" in
 	    (size)
 		linux_cflags="$linux_cflags${linux_cflags:+ }-Os -g"
-		linux_cv_debug="_NONE"
+		linux_cv_debug_default="_NONE"
 		linux_cv_optimize='size'
 		;;
 	    (speed)
 		linux_cflags="$linux_cflags${linux_cflags:+ }-O3 -g"
-		linux_cv_debug="_NONE"
+		linux_cv_debug_default="_NONE"
 		linux_cv_optimize='speed'
 dnl
 dnl		Please don't inline everything at -O3.
@@ -1725,12 +1725,12 @@ dnl		linux_cflags="$linux_cflags${linux_cflags:+ }-fno-inline-functions-called-o
 		;;
 	    (normal)
 		linux_cflags="$linux_cflags${linux_cflags:+ }-O2 -g"
-		linux_cv_debug="_SAFE"
+		linux_cv_debug_default="_SAFE"
 		linux_cv_optimize='normal'
 		;;
 	    (quick)
 		linux_cflags="$linux_cflags${linux_cflags:+ }-O0 -g"
-		linux_cv_debug="_TEST"
+		linux_cv_debug_default="_TEST"
 		linux_cv_optimize='quick'
 dnl
 dnl		Linux kernel header files have some functions that are expected to "disappear" just
@@ -1746,7 +1746,7 @@ dnl		Try to pass through whatever optmization options are present.
 dnl
 		linux_cflags="$linux_cflags${linux_cflags:+ }"`echo " $linux_cv_k_cflags " | sed -e 's|^.* -O|-O|;s| .*$||'`
 		linux_cflags="$linux_cflags${linux_cflags:+ }"`echo " $linux_cv_k_cflags " | sed -e 's|^.* -g|-g|;s| .*$||'`
-		linux_cv_debug="_SAFE"
+		linux_cv_debug_default="_SAFE"
 		linux_cv_optimize='normal'
 		;;
 	esac
@@ -1978,6 +1978,18 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_DEBUG], [dnl
     if test :"${enable_k_debug:-no}" != :no 
     then
 	linux_cv_debug='_DEBUG'
+    fi
+    AC_ARG_ENABLE([k-none],
+	AS_HELP_STRING([--enable-k-none],
+	    [enable no kernel module run-time checks.  @<:@default=no@:>@]),
+	[enable_k_none="$enableval"],
+	[enable_k_none='no'])
+    if test :"${enable_k_none:-no}" != :no 
+    then
+	linux_cv_debug='_NONE'
+    fi
+    if test -z "$linux_cv_debug" ; then
+	linux_cv_debug="$linux_cv_debug_default"
     fi
     case "$linux_cv_debug" in
 	(_DEBUG)
