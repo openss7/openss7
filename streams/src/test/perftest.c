@@ -161,12 +161,17 @@ char modname[256] = "pipemod";
 int dummy = 0;
 
 volatile int timer_timeout = 0;
+volatile int alarm_signal = 0;
 
 void
 timer_handler(int signum)
 {
 	if (signum == SIGALRM)
 		timer_timeout = 1;
+	if (signum == SIGPIPE || signum == SIGHUP) {
+		alarm_signal = 1;
+		timer_timeout = 1;
+	}
 	return;
 }
 
@@ -182,9 +187,26 @@ timer_sethandler(void)
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
 		return -1;
+	if (sigaction(SIGPOLL, &act, NULL))
+		return -1;
+	if (sigaction(SIGURG, &act, NULL))
+		return -1;
+	if (sigaction(SIGPIPE, &act, NULL))
+		return -1;
+	if (sigaction(SIGHUP, &act, NULL))
+		return -1;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGPOLL);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGHUP);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
+	siginterrupt(SIGALRM, 1);
+	siginterrupt(SIGPOLL, 1);
+	siginterrupt(SIGURG, 1);
+	siginterrupt(SIGPIPE, 1);
+	siginterrupt(SIGHUP, 1);
 	return (0);
 }
 
@@ -195,9 +217,10 @@ start_timer(void)
 
 	if (timer_sethandler())
 		return (-1);
+	timer_timeout = 0;
+	alarm_signal = 0;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
 		return (-1);
-	timer_timeout = 0;
 	return 0;
 }
 
@@ -218,6 +241,8 @@ test_sync(int fds[])
 	if (verbose > 1)
 		fprintf(stderr, "--> Timer started\n");
 	for (;;) {
+		if (alarm_signal)
+			goto dead;
 		if (timer_timeout) {
 			{
 				size_t thrput = rbytcnt / report;
@@ -595,7 +620,8 @@ test_async(int fds[])
 				default:
 					goto dead;
 				}
-			}
+			} else
+				goto dead;
 		}
 	}
       dead:
