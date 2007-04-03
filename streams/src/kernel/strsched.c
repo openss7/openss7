@@ -1209,7 +1209,7 @@ freeblocks(struct strthread *t)
 		unsigned long flags;
 
 		streams_local_save(flags);
-		__test_and_clear_bit(freeblks, &t->flags);
+		clear_bit(freeblks, &t->flags);
 		if (likely((mp_next = t->freemblk_head) != NULL)) {
 			t->freemblk_head = NULL;
 			t->freemblk_tail = &t->freemblk_head;
@@ -4178,9 +4178,9 @@ domfuncs(struct strthread *t)
 
 		prefetchw(t);
 		streams_local_save(flags);
-		__test_and_clear_bit(strmfuncs, &t->flags);
-		if (likely((b_next = XCHG(&t->strmfuncs_head, NULL)) != NULL))
-			t->strmfuncs_tail = &t->strmfuncs_head;
+		clear_bit(strmfuncs, &t->flags);
+		b_next = XCHG(&t->strmfuncs_head, NULL);
+		t->strmfuncs_tail = &t->strmfuncs_head;
 		streams_local_restore(flags);
 		if (likely(b_next != NULL)) {
 			b = b_next;
@@ -4276,9 +4276,9 @@ scanqueues(struct strthread *t)
 
 		prefetchw(t);
 		streams_local_save(flags);
-		__test_and_clear_bit(scanqflag, &t->flags);
-		if (likely((q_link = XCHG(&t->scanqhead, NULL)) != NULL))
-			t->scanqtail = &t->scanqhead;
+		clear_bit(scanqflag, &t->flags);
+		q_link = XCHG(&t->scanqhead, NULL);
+		t->scanqtail = &t->scanqhead;
 		streams_local_restore(flags);
 		if (likely(q_link != NULL)) {
 			q = q_link;
@@ -4324,9 +4324,9 @@ doevents(struct strthread *t)
 	do {
 		prefetchw(t);
 		streams_local_save(flags);
-		__test_and_clear_bit(strevents, &t->flags);
-		if (likely((se_next = XCHG(&t->strevents_head, NULL)) != NULL))
-			t->strevents_tail = &t->strevents_head;
+		clear_bit(strevents, &t->flags);
+		se_next = XCHG(&t->strevents_head, NULL);
+		t->strevents_tail = &t->strevents_head;
 		streams_local_restore(flags);
 		if (likely(se_next != NULL)) {
 			se = se_next;
@@ -4411,8 +4411,8 @@ runsyncq(struct syncq *sq)
 
 			/* process messages */
 			for (;;) {
-				if (likely((b_next = XCHG(&sq->sq_mhead, NULL)) != NULL))
-					sq->sq_mtail = &sq->sq_mhead;
+				b_next = XCHG(&sq->sq_mhead, NULL);
+				sq->sq_mtail = &sq->sq_mhead;
 				if (unlikely(b_next == NULL))
 					break;
 				b = b_next;
@@ -4430,8 +4430,8 @@ runsyncq(struct syncq *sq)
 
 			/* process queue service */
 			for (;;) {
-				if (likely((q_link = XCHG(&sq->sq_qhead, NULL)) != NULL))
-					sq->sq_qtail = &sq->sq_qhead;
+				q_link = XCHG(&sq->sq_qhead, NULL);
+				sq->sq_qtail = &sq->sq_qhead;
 				if (unlikely(q_link == NULL))
 					break;
 				q = q_link;
@@ -4449,8 +4449,8 @@ runsyncq(struct syncq *sq)
 
 			/* process stream events */
 			for (;;) {
-				if (likely((se_next = XCHG(&sq->sq_ehead, NULL)) != NULL))
-					sq->sq_etail = &sq->sq_ehead;
+				se_next = XCHG(&sq->sq_ehead, NULL);
+				sq->sq_etail = &sq->sq_ehead;
 				if (unlikely(se_next == NULL))
 					break;
 				se = se_next;
@@ -4503,9 +4503,9 @@ backlog(struct strthread *t)
 	do {
 		prefetchw(t);
 		streams_local_save(flags);
-		__test_and_clear_bit(qsyncflag, &t->flags);
-		if (likely((sq_link = XCHG(&t->sqhead, NULL)) != NULL))
-			t->sqtail = &t->sqhead;
+		clear_bit(qsyncflag, &t->flags);
+		sq_link = XCHG(&t->sqhead, NULL);
+		t->sqtail = &t->sqhead;
 		streams_local_restore(flags);
 		if (likely(sq_link != NULL)) {
 			sq = sq_link;
@@ -4540,9 +4540,9 @@ bufcalls(struct strthread *t)
 	do {
 		prefetchw(t);
 		streams_local_save(flags);
-		__test_and_clear_bit(strbcwait, &t->flags);
-		if (likely((se_next = XCHG(&t->strbcalls_head, NULL)) != NULL))
-			t->strbcalls_tail = &t->strbcalls_head;
+		clear_bit(strbcwait, &t->flags);
+		se_next = XCHG(&t->strbcalls_head, NULL);
+		t->strbcalls_tail = &t->strbcalls_head;
 		streams_local_restore(flags);
 		if (likely(se_next != NULL)) {
 			se = se_next;
@@ -4571,9 +4571,9 @@ queuerun(struct strthread *t)
 	do {
 		prefetchw(t);
 		streams_local_save(flags);
-		__test_and_clear_bit(qrunflag, &t->flags);
-		if (likely((q_link = XCHG(&t->qhead, NULL)) != NULL))
-			t->qtail = &t->qhead;
+		clear_bit(qrunflag, &t->flags);
+		q_link = XCHG(&t->qhead, NULL);
+		t->qtail = &t->qhead;
 		streams_local_restore(flags);
 		if (likely(q_link != NULL)) {
 			q = q_link;
@@ -4607,9 +4607,9 @@ freechains(struct strthread *t)
 
 	prefetchw(t);
 	streams_local_save(flags);
-	__test_and_clear_bit(flushwork, &t->flags);
-	if (likely((mp_next = XCHG(&t->freemsg_head, NULL)) != NULL))
-		t->freemsg_tail = &t->freemsg_head;
+	clear_bit(flushwork, &t->flags);
+	mp_next = XCHG(&t->freemsg_head, NULL);
+	t->freemsg_tail = &t->freemsg_head;
 	streams_local_restore(flags);
 
 	if (likely(mp_next != NULL)) {
