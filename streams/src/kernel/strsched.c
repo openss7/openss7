@@ -3780,8 +3780,8 @@ do_weldq_synced(struct strevent *se)
 
 			if (q2) {
 				/* attaching */
-				q1->q_nfsrv = test_bit(QSRVP_BIT, &q2->q_flag) ? q2 : q2->q_nfsrv;
-				q2->q_nbsrv = test_bit(QSRVP_BIT, &q1->q_flag) ? q1 : q1->q_nbsrv;
+				q1->q_nfsrv = q1->q_srvp ? q2 : q2->q_nfsrv;
+				q2->q_nbsrv = q2->q_srvp ? q1 : q1->q_nbsrv;
 
 				for (qs = q1->q_nbsrv; qs && qs != q1; qs = qs->q_next)
 					qs->q_nfsrv = q1->q_nfsrv;
@@ -3803,8 +3803,8 @@ do_weldq_synced(struct strevent *se)
 
 			if (q3) {
 				/* attaching */
-				q3->q_nfsrv = test_bit(QSRVP_BIT, &q4->q_flag) ? q4 : q4->q_nfsrv;
-				q4->q_nbsrv = test_bit(QSRVP_BIT, &q3->q_flag) ? q3 : q3->q_nbsrv;
+				q3->q_nfsrv = q3->q_srvp ? q4 : q4->q_nfsrv;
+				q4->q_nbsrv = q4->q_srvp ? q3 : q3->q_nbsrv;
 
 				for (qs = q3->q_nbsrv; qs && qs != q3; qs = qs->q_next)
 					qs->q_nfsrv = q3->q_nfsrv;
