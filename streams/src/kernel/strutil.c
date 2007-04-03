@@ -1367,7 +1367,7 @@ bcanputany(queue_t *q)
 	dassert(sd);
 
 	prlock(sd);
-	if (likely(q->q_srvp || q->q_next == NULL))
+	if (likely(test_bit(QSRVP_BIT, &q->q_flag) || q->q_next == NULL))
 		result = __bcanputany(q);
 	else
 		result = __bcanputnextany(q);
@@ -1622,7 +1622,7 @@ bcanput(register queue_t *q, unsigned char band)
 		prlock(qstream(q));
 #endif
 
-	if (likely(q->q_srvp || q->q_next == NULL))
+	if (likely(test_bit(QSRVP_BIT, &q->q_flag) || q->q_next == NULL))
 		result = __bcanput(q, band);
 	else
 		result = __bcanputnext(q, band);
@@ -1853,7 +1853,7 @@ qschedule(queue_t *q)
 streams_fastcall void
 qenable(register queue_t *q)
 {
-	if (likely(q->q_srvp != NULL))
+	if (likely(test_bit(QSRVP_BIT, &q->q_flag)))
 		qschedule(q);
 }
 
@@ -1870,7 +1870,7 @@ EXPORT_SYMBOL(qenable);		/* include/sys/streams/stream.h */
 streams_fastcall int
 enableq(queue_t *q)
 {
-	if (likely(q->q_srvp && likely(!test_bit(QNOENB_BIT, &q->q_flag)))) {
+	if (likely(test_bit(QSRVP_BIT, &q->q_flag) && likely(!test_bit(QNOENB_BIT, &q->q_flag)))) {
 		qenable(q);
 		return (1);
 	}
@@ -2813,8 +2813,8 @@ qinsert(struct stdata *sd, queue_t *irq)
 		irq->q_nbsrv = srq->q_nbsrv;
 	} else {
 		iwq->q_next = irq;
-		iwq->q_nfsrv = irq->q_srvp ? irq : srq;
-		irq->q_nbsrv = iwq->q_srvp ? iwq : swq;
+		iwq->q_nfsrv = test_bit(QSRVP_BIT, &irq->q_flag) ? irq : srq;
+		irq->q_nbsrv = test_bit(QSRVP_BIT, &iwq->q_flag) ? iwq : swq;
 	}
 	prunlock(sd);
 }
@@ -2914,13 +2914,13 @@ qprocsoff(queue_t *q)
 			pwlock(sd2, pl2);
 
 		/* bypass service procedures */
-		if (rq->q_srvp || rq->q_next == NULL) {
+		if (test_bit(QSRVP_BIT, &rq->q_flag) || rq->q_next == NULL) {
 			for (bq = rq->q_nbsrv; bq && bq != rq; bq = bq->q_next)
 				bq->q_nfsrv = rq->q_nfsrv;
 			for (bq = rq->q_nfsrv; bq && bq != rq; bq = backq(bq))
 				bq->q_nbsrv = rq->q_nbsrv;
 		}
-		if (wq->q_srvp || wq->q_next == NULL) {
+		if (test_bit(QSRVP_BIT, &wq->q_flag) || wq->q_next == NULL) {
 			for (bq = wq->q_nbsrv; bq && bq != wq; bq = bq->q_next)
 				bq->q_nfsrv = wq->q_nfsrv;
 			for (bq = wq->q_nfsrv; bq && bq != wq; bq = backq(bq))
@@ -3020,13 +3020,13 @@ qprocson(queue_t *q)
 			bq->q_next = wq;
 
 		/* fix up service procedure cache pointers */
-		if (rq->q_srvp || rq->q_next == NULL) {
+		if (test_bit(QSRVP_BIT, &rq->q_flag) || rq->q_next == NULL) {
 			for (bq = rq->q_nbsrv; bq && bq != rq; bq = bq->q_next)
 				bq->q_nfsrv = rq;
 			for (bq = rq->q_nfsrv; bq && bq != rq; bq = backq(bq))
 				bq->q_nbsrv = rq;
 		}
-		if (wq->q_srvp || wq->q_next == NULL) {
+		if (test_bit(QSRVP_BIT, &wq->q_flag) || wq->q_next == NULL) {
 			for (bq = wq->q_nbsrv; bq && bq != wq; bq = bq->q_next)
 				bq->q_nfsrv = wq;
 			for (bq = wq->q_nfsrv; bq && bq != wq; bq = backq(bq))
@@ -3694,6 +3694,10 @@ __setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 	q->q_lowat = rinit->qi_minfo->mi_lowat;
 	q->q_putp = rinit->qi_putp;
 	q->q_srvp = rinit->qi_srvp;
+	if (q->q_srvp)
+		set_bit(QSRVP_BIT, &q->q_flag);
+	else
+		clear_bit(QSRVP_BIT, &q->q_flag);
 #if defined CONFIG_STREAMS_SYNCQS
 	if (q->q_syncq)
 		set_bit(QSYNCH_BIT, &q->q_flag);
@@ -3706,6 +3710,10 @@ __setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 	q->q_lowat = winit->qi_minfo->mi_lowat;
 	q->q_putp = winit->qi_putp;
 	q->q_srvp = winit->qi_srvp;
+	if (q->q_srvp)
+		set_bit(QSRVP_BIT, &q->q_flag);
+	else
+		clear_bit(QSRVP_BIT, &q->q_flag);
 #if defined CONFIG_STREAMS_SYNCQS
 	if (q->q_syncq)
 		set_bit(QSYNCH_BIT, &q->q_flag);

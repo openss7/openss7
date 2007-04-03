@@ -2366,6 +2366,7 @@ putp_fast(queue_t *q, mblk_t *mp)
 #endif
 		/* some weirdness in older compilers */
 		(*q->q_putp) (q, mp);
+		qwakeup(q);
 	}
 #ifdef CONFIG_SMP
 	else {
@@ -2379,7 +2380,6 @@ putp_fast(queue_t *q, mblk_t *mp)
 	if (unlikely(backq(q) == NULL))
 		prunlock(qstream(q));
 #endif
-	qwakeup(q);
 }
 
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -2426,15 +2426,21 @@ putp(queue_t *q, mblk_t *mp)
 STATIC streams_inline streams_fastcall __hot_in void
 srvp_fast(queue_t *q)
 {
+	unsigned long pl;
+
 	dassert(q);
+
+#ifdef CONFIG_SMP
+	/* spin here if Stream frozen by other than caller */
+	freeze_barrier(q);
+
+	dassert(qstream(q));
+	prlock(qstream(q));
+#endif
+
 	if (likely(test_and_clear_bit(QENAB_BIT, &q->q_flag) != 0)) {
 
 #ifdef CONFIG_SMP
-		/* spin here if Stream frozen by other than caller */
-		freeze_barrier(q);
-
-		dassert(qstream(q));
-		prlock(qstream(q));
 		/* check if procs are turned off */
 		if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
 #endif
@@ -2452,12 +2458,12 @@ srvp_fast(queue_t *q)
 			/* some weirdness in older compilers */
 			(*q->q_srvp) (q);
 			clear_bit(QSVCBUSY_BIT, &q->q_flag);
+			qwakeup(q);
 		}
-#ifdef CONFIG_SMP
-		prunlock(qstream(q));
-#endif
-		qwakeup(q);
 	}
+#ifdef CONFIG_SMP
+	prunlock(qstream(q));
+#endif
 	if (q)
 		_ctrace(qput(&q));	/* cancel qget from qschedule */
 }
@@ -3780,8 +3786,8 @@ do_weldq_synced(struct strevent *se)
 
 			if (q2) {
 				/* attaching */
-				q1->q_nfsrv = q1->q_srvp ? q2 : q2->q_nfsrv;
-				q2->q_nbsrv = q2->q_srvp ? q1 : q1->q_nbsrv;
+				q1->q_nfsrv = test_bit(QSRVP_BIT, &q1->q_flag) ? q2 : q2->q_nfsrv;
+				q2->q_nbsrv = test_bit(QSRVP_BIT, &q2->q_flag) ? q1 : q1->q_nbsrv;
 
 				for (qs = q1->q_nbsrv; qs && qs != q1; qs = qs->q_next)
 					qs->q_nfsrv = q1->q_nfsrv;
@@ -3803,8 +3809,8 @@ do_weldq_synced(struct strevent *se)
 
 			if (q3) {
 				/* attaching */
-				q3->q_nfsrv = q3->q_srvp ? q4 : q4->q_nfsrv;
-				q4->q_nbsrv = q4->q_srvp ? q3 : q3->q_nbsrv;
+				q3->q_nfsrv = test_bit(QSRVP_BIT, &q3->q_flag) ? q4 : q4->q_nfsrv;
+				q4->q_nbsrv = test_bit(QSRVP_BIT, &q4->q_flag) ? q3 : q3->q_nbsrv;
 
 				for (qs = q3->q_nbsrv; qs && qs != q3; qs = qs->q_next)
 					qs->q_nfsrv = q3->q_nfsrv;
