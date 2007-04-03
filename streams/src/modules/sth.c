@@ -636,7 +636,8 @@ strsyscall(void)
 	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
 	   the way out of a system call.  This allows queues to fill, flow control to function, and
 	   service procedures to run more efficiently. */
-#ifndef CONFIG_SMP
+//#ifndef CONFIG_SMP
+#if 1
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -654,7 +655,8 @@ strsyscall_ioctl(void)
 	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
 	   the way out of a system call.  This allows queues to fill, flow control to function, and
 	   service procedures to run more efficiently. */
-#ifndef CONFIG_SMP
+//#ifndef CONFIG_SMP
+#if 1
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -672,7 +674,8 @@ strsyscall_write(void)
 	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
 	   the way out of a system call.  This allows queues to fill, flow control to function, and
 	   service procedures to run more efficiently. */
-#ifndef CONFIG_SMP
+//#ifndef CONFIG_SMP
+#if 1
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -690,7 +693,8 @@ strsyscall_read(void)
 	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
 	   the way out of a system call.  This allows queues to fill, flow control to function, and
 	   service procedures to run more efficiently. */
-#ifndef CONFIG_SMP
+//#ifndef CONFIG_SMP
+#if 1
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -712,7 +716,8 @@ strschedule(void)
 	   another processor.  This does have a negative impact; however, on SMP kernels running on 
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
-#ifndef CONFIG_SMP
+//#ifndef CONFIG_SMP
+#if 1
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -735,7 +740,8 @@ strschedule_ioctl(void)
 	   another processor.  This does have a negative impact; however, on SMP kernels running on 
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
-#ifndef CONFIG_SMP
+//#ifndef CONFIG_SMP
+#if 1
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -758,7 +764,8 @@ strschedule_write(void)
 	   another processor.  This does have a negative impact; however, on SMP kernels running on 
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
-#ifndef CONFIG_SMP
+//#ifndef CONFIG_SMP
+#if 1
 	{
 		struct strthread *t = this_thread;
 
@@ -783,7 +790,8 @@ strschedule_read(void)
 	   another processor.  This does have a negative impact; however, on SMP kernels running on 
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
-#ifndef CONFIG_SMP
+//#ifndef CONFIG_SMP
+#if 1
 	{
 		struct strthread *t = this_thread;
 
@@ -2425,9 +2433,9 @@ strwakeopen_swunlock(struct stdata *sd)
 
 	/* release open bit */
 	clear_bit(STWOPEN_BIT, &sd->sd_flag);
-	if (!(detached = strdetached(sd))
-	    && waitqueue_active(&sd->sd_owaitq) != 0)
-		wake_up_interruptible(&sd->sd_owaitq);
+	if (!(detached = strdetached(sd)))
+		if (waitqueue_active(&sd->sd_owaitq) != 0)
+			wake_up_interruptible(&sd->sd_owaitq);
 	swunlock(sd);
 	if (detached) {
 		strremove(sd);

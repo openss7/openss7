@@ -2426,14 +2426,18 @@ putp(queue_t *q, mblk_t *mp)
 STATIC streams_inline streams_fastcall __hot_in void
 srvp_fast(queue_t *q)
 {
+#ifdef CONFIG_SMP
+	struct stdata *sd;
+#endif
 	dassert(q);
 
 #ifdef CONFIG_SMP
+	sd = qstream(q);
+	__assert(sd);
 	/* spin here if Stream frozen by other than caller */
 	freeze_barrier(q);
 
-	dassert(qstream(q));
-	prlock(qstream(q));
+	prlock(sd);
 #endif
 
 	if (likely(test_and_clear_bit(QENAB_BIT, &q->q_flag) != 0)) {
@@ -2446,7 +2450,7 @@ srvp_fast(queue_t *q)
 			/* prefetch private structure */
 			prefetch(q->q_ptr);
 
-			dassert(q->q_srvp);
+			__assert(q->q_srvp);
 #ifdef CONFIG_STREAMS_DO_STATS
 			dassert(q->q_qinfo);
 			if (unlikely(q->q_qinfo->qi_mstat != NULL))
@@ -2460,7 +2464,7 @@ srvp_fast(queue_t *q)
 		}
 	}
 #ifdef CONFIG_SMP
-	prunlock(qstream(q));
+	prunlock(sd);
 #endif
 	if (q)
 		_ctrace(qput(&q));	/* cancel qget from qschedule */

@@ -390,6 +390,8 @@ read_child(int fd)
 					bytcnt += ret;
 					if (bytcnt < 0)
 						goto dead;
+					if (blocking)
+						break;
 				}
 			} else {
 				int flags = 0;
@@ -401,6 +403,8 @@ read_child(int fd)
 					bytcnt += dbuf.len;
 					if (bytcnt < 0)
 						goto dead;
+					if (blocking)
+						break;
 				}
 			}
 			if (ret < 0) {
@@ -488,6 +492,8 @@ write_child(int fd)
 					bytcnt += ret;
 					if (bytcnt < 0)
 						goto dead;
+					if (blocking)
+						break;
 				}
 			} else {
 				struct strbuf dbuf = { 0, msgsize, my_msg };
@@ -496,6 +502,8 @@ write_child(int fd)
 					bytcnt += msgsize;
 					if (bytcnt < 0)
 						goto dead;
+					if (blocking)
+						break;
 				}
 			}
 			if (ret < 0) {
@@ -629,12 +637,12 @@ do_tests(void)
 			fprintf(stderr, "Opening fifo\n");
 			fflush(stderr);
 		}
-		if ((fds[0] = open(fifoname, O_RDONLY | O_NONBLOCK)) < 0) {
+		if ((fds[0] = open(fifoname, O_RDONLY | (blocking ? 0 : O_NONBLOCK))) < 0) {
 			if (verbose)
 				perror("open()");
 			goto dead;
 		}
-		if ((fds[1] = open(fifoname, O_WRONLY | O_NONBLOCK)) < 0) {
+		if ((fds[1] = open(fifoname, O_WRONLY | (blocking ? 0 : O_NONBLOCK))) < 0) {
 			if (verbose)
 				perror("open()");
 			goto dead;
