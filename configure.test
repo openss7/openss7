@@ -24,7 +24,7 @@ ${path}configure \
 	--with-STRINET \
 	--with-STRSCTP \
 	--without-STRCHAN \
-	--without-STRISO \
+	--with-STRISO \
 	--with-NETPERF \
 	--without-STRISDN \
 	--without-STACKS \
