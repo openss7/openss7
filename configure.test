@@ -25,7 +25,7 @@ ${path}configure \
 	--with-STRSCTP \
 	--without-STRCHAN \
 	--without-STRISO \
-	--without-NETPERF \
+	--with-NETPERF \
 	--without-STRISDN \
 	--without-STACKS \
 	--without-SIGTRAN \
