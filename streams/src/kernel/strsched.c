@@ -2426,8 +2426,6 @@ putp(queue_t *q, mblk_t *mp)
 STATIC streams_inline streams_fastcall __hot_in void
 srvp_fast(queue_t *q)
 {
-	unsigned long pl;
-
 	dassert(q);
 
 #ifdef CONFIG_SMP
