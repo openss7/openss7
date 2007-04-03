@@ -527,12 +527,13 @@ write_child(int fd)
 int
 test_async(int fds[])
 {
-	int children[2] = { 0, 0 };
+	int child[2] = { 0, 0 };
+	int children = 2;
 
 	if (verbose > 1) {
 		fprintf(stderr, "Starting read child on fd %d\n", fds[0]);
 	}
-	switch ((children[0] = fork())) {
+	switch ((child[0] = fork())) {
 	case 0:		/* child */
 		exit(read_child(fds[0]));
 	case -1:
@@ -544,7 +545,7 @@ test_async(int fds[])
 		fprintf(stderr, "--> Read child started.\n");
 		fprintf(stderr, "Starting write child on fd %d\n", fds[1]);
 	}
-	switch ((children[1] = fork())) {
+	switch ((child[1] = fork())) {
 	case 0:		/* child */
 		exit(write_child(fds[1]));
 	case -1:
@@ -556,33 +557,33 @@ test_async(int fds[])
 		fprintf(stderr, "--> Write child started.\n");
 	close(fds[0]);
 	close(fds[1]);
-	for (;;) {
-		int child;
-		int status;
+	for (; children; children--) {
+		int this_child;
+		int this_status;
 
-		if ((child = wait(&status)) > 0) {
-			if (WIFEXITED(status)) {
-				if (children[0] == child)
-					children[0] = 0;
-				if (children[1] == child)
-					children[1] = 0;
-				if (WEXITSTATUS(status) != 0)
+		if ((this_child = wait(&this_status)) > 0) {
+			if (WIFEXITED(this_status)) {
+				if (child[0] == this_child)
+					child[0] = 0;
+				if (child[1] == this_child)
+					child[1] = 0;
+				if (WEXITSTATUS(this_status) != 0)
 					goto dead;
-			} else if (WIFSIGNALED(status)) {
-				if (children[0] == child)
-					children[0] = 0;
-				if (children[1] == child)
-					children[1] = 0;
-				switch (WTERMSIG(status)) {
+			} else if (WIFSIGNALED(this_status)) {
+				if (child[0] == this_child)
+					child[0] = 0;
+				if (child[1] == this_child)
+					child[1] = 0;
+				switch (WTERMSIG(this_status)) {
 				default:
 					goto dead;
 				}
-			} else if (WIFSTOPPED(status)) {
-				if (children[0] == child)
-					children[0] = 0;
-				if (children[1] == child)
-					children[1] = 0;
-				switch (WSTOPSIG(status)) {
+			} else if (WIFSTOPPED(this_status)) {
+				if (child[0] == this_child)
+					child[0] = 0;
+				if (child[1] == this_child)
+					child[1] = 0;
+				switch (WSTOPSIG(this_status)) {
 				default:
 					goto dead;
 				}
@@ -590,10 +591,10 @@ test_async(int fds[])
 		}
 	}
       dead:
-	if (children[0] > 0)
-		kill(children[0], SIGTERM);
-	if (children[1] > 0)
-		kill(children[1], SIGTERM);
+	if (child[0] > 0)
+		kill(child[0], SIGKILL);
+	if (child[1] > 0)
+		kill(child[1], SIGKILL);
 	close(fds[0]);
 	close(fds[1]);
 	return (0);
