@@ -1350,7 +1350,7 @@ __STRUTIL_EXTERN_INLINE int
 canenable(queue_t *q)
 {
 	dassert(q);
-	return (!(q->q_flag & QNOENB));
+	return (!((volatile unsigned long)q->q_flag & QNOENB));
 }
 
 __STREAMS_EXTERN int enableq(queue_t *q);

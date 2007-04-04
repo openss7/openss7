@@ -1185,7 +1185,7 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 		   was backenabled, this gives the Stream head or driver information about for
 		   which specific bands flow control has subsided. */
 		/* Well, just the Stream head ... */
-		if (!(QREADR & q_nbsrv->q_flag) && backq(q_nbsrv) == NULL) {
+		if (!test_bit(QREADR_BIT, &q_nbsrv->q_flag) && backq(q_nbsrv) == NULL) {
 			unsigned long pl;
 			struct qband *qb;
 
@@ -1370,7 +1370,7 @@ bcanputany(queue_t *q)
 	dassert(sd);
 
 	prlock(sd);
-	if (likely((QSRVP & q->q_flag) || q->q_next == NULL))
+	if (likely(test_bit(QSRVP_BIT, &q->q_flag) || q->q_next == NULL))
 		result = __bcanputany(q);
 	else
 		result = __bcanputnextany(q);
@@ -1446,7 +1446,7 @@ __bcanput_slow(queue_t *q, unsigned char band)
 	if (likely(band <= q->q_nband && q->q_blocked > 0)) {
 		struct qband *qb;
 
-		if ((qb = __find_qband(q, band)) && (QB_FULL & qb->qb_flag)) {
+		if ((qb = __find_qband(q, band)) && test_bit(QB_FULL_BIT, &qb->qb_flag)) {
 			set_bit(QB_WANTW_BIT, &qb->qb_flag);
 			qrunlock(q, pl);
 			return (0);
@@ -1485,7 +1485,7 @@ __bcanput(queue_t *q, unsigned char band)
 
 	if (likely(band == 0)) {
 		qrlock(q, pl);
-		if (likely((QFULL & q->q_flag) == 0)) {
+		if (likely(test_bit(QFULL_BIT, &q->q_flag) == 0)) {
 			qrunlock(q, pl);
 			return (1);
 		}
@@ -1624,7 +1624,7 @@ bcanput(register queue_t *q, unsigned char band)
 		prlock(qstream(q));
 #endif
 
-	if (likely((QSRVP & q->q_flag) || q->q_next == NULL))
+	if (likely(test_bit(QSRVP_BIT, &q->q_flag) || q->q_next == NULL))
 		result = __bcanput(q, band);
 	else
 		result = __bcanputnext(q, band);
@@ -1801,7 +1801,7 @@ qready(void)
 {
 	struct strthread *t = this_thread;
 
-	return ((QRUNFLAG & t->flags) != 0);
+	return (test_bit(qrunflag, &t->flags) != 0);
 }
 
 EXPORT_SYMBOL_GPL(qready);	/* include/sys/streams/stream.h */
@@ -1855,7 +1855,7 @@ qschedule(queue_t *q)
 streams_fastcall void
 qenable(register queue_t *q)
 {
-	if (likely((QSRVP & q->q_flag)))
+	if (likely(test_bit(QSRVP_BIT, &q->q_flag)))
 		qschedule(q);
 }
 
@@ -1872,7 +1872,7 @@ EXPORT_SYMBOL(qenable);		/* include/sys/streams/stream.h */
 streams_fastcall int
 enableq(queue_t *q)
 {
-	if (likely((QSRVP & q->q_flag) && likely(!(QNOENB & q->q_flag)))) {
+	if (likely(test_bit(QSRVP_BIT, &q->q_flag) && likely(!test_bit(QNOENB_BIT, &q->q_flag)))) {
 		qenable(q);
 		return (1);
 	}
@@ -2010,7 +2010,7 @@ __putbq_band(queue_t *q, mblk_t *mp)
 		b_next->b_prev = mp;
 	if (unlikely((mp->b_prev = b_prev) != NULL))
 		b_prev->b_next = mp;
-	return (1 + (likely(!(QNOENB & q->q_flag)) && (QWANTR & q->q_flag)));
+	return (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag)) && test_bit(QWANTR_BIT, &q->q_flag)));
 }
 
 /*
@@ -2055,7 +2055,7 @@ __putbq_norm(queue_t *q, mblk_t *mp)
 		if (unlikely((mp->b_prev = b_prev) != NULL))
 			b_prev->b_next = mp;
 
-		return (1 + (likely(!(QNOENB & q->q_flag)) && (QWANTR & q->q_flag)));
+		return (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag)) && test_bit(QWANTR_BIT, &q->q_flag)));
 	}
 	return __putbq_band(q, mp);
 }
@@ -2282,7 +2282,7 @@ __putq_pri(queue_t *q, mblk_t *mp, bool insq)
 	if (unlikely((mp->b_prev = b_prev) != NULL))
 		b_prev->b_next = mp;
 	/* success - always enable on high priority, except insq */
-	return (1 + (likely(!insq) || likely(!(QNOENB & q->q_flag))));
+	return (1 + (likely(!insq) || likely(!test_bit(QNOENB_BIT, &q->q_flag))));
 }
 
 /*
@@ -2334,7 +2334,7 @@ __putq_band(queue_t *q, mblk_t *mp)
 	if (unlikely((mp->b_prev = b_prev) != NULL))
 		b_prev->b_next = mp;
 	/* success - always enable if not noenabled */
-	return (1 + likely(!(QNOENB & q->q_flag)));
+	return (1 + likely(!test_bit(QNOENB_BIT, &q->q_flag)));
 }
 
 STATIC streams_inline streams_fastcall __hot_out int
@@ -2357,7 +2357,7 @@ __putq_norm(queue_t *q, mblk_t *mp)
 		if (unlikely((mp->b_prev = b_prev) != NULL))
 			b_prev->b_next = mp;
 		/* success */
-		return (1 + (likely(!(QNOENB & q->q_flag)) && (QWANTR & q->q_flag)));
+		return (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag)) && test_bit(QWANTR_BIT, &q->q_flag)));
 	}
 	return __putq_band(q, mp);
 }
@@ -2484,7 +2484,7 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 		}
 	}
 	/* success - ignore message class for insq() */
-	return (1 + (likely(!(QNOENB & q->q_flag)) && (QWANTR & q->q_flag)));
+	return (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag)) && test_bit(QWANTR_BIT, &q->q_flag)));
 
       enomem:
 	/* couldn't allocate a band structure! */
@@ -2811,8 +2811,8 @@ qinsert(struct stdata *sd, queue_t *irq)
 		irq->q_nbsrv = srq->q_nbsrv;
 	} else {
 		iwq->q_next = irq;
-		iwq->q_nfsrv = (QSRVP & irq->q_flag) ? irq : srq;
-		irq->q_nbsrv = (QSRVP & iwq->q_flag) ? iwq : swq;
+		iwq->q_nfsrv = test_bit(QSRVP_BIT, &irq->q_flag) ? irq : srq;
+		irq->q_nbsrv = test_bit(QSRVP_BIT, &iwq->q_flag) ? iwq : swq;
 	}
 	prunlock(sd);
 }
@@ -2876,7 +2876,7 @@ qprocsoff(queue_t *q)
 		return;
 
 	/* only one qprocsoff() happens at a time */
-	if (!(QPROCS & rq->q_flag)) {
+	if (!test_bit(QPROCS_BIT, &rq->q_flag)) {
 		unsigned long pl, pl2 = 0;
 		struct stdata *sd2;
 
@@ -2912,13 +2912,13 @@ qprocsoff(queue_t *q)
 			pwlock(sd2, pl2);
 
 		/* bypass service procedures */
-		if ((QSRVP & rq->q_flag) || rq->q_next == NULL) {
+		if (test_bit(QSRVP_BIT, &rq->q_flag) || rq->q_next == NULL) {
 			for (bq = rq->q_nbsrv; bq && bq != rq; bq = bq->q_next)
 				bq->q_nfsrv = rq->q_nfsrv;
 			for (bq = rq->q_nfsrv; bq && bq != rq; bq = backq(bq))
 				bq->q_nbsrv = rq->q_nbsrv;
 		}
-		if ((QSRVP & wq->q_flag) || wq->q_next == NULL) {
+		if (test_bit(QSRVP_BIT, &wq->q_flag) || wq->q_next == NULL) {
 			for (bq = wq->q_nbsrv; bq && bq != wq; bq = bq->q_next)
 				bq->q_nfsrv = wq->q_nfsrv;
 			for (bq = wq->q_nfsrv; bq && bq != wq; bq = backq(bq))
@@ -2931,10 +2931,19 @@ qprocsoff(queue_t *q)
 		if ((bq = backq(wq)))
 			bq->q_next = wq->q_next;
 
+#ifndef SSIZE_MAX
+#ifdef _POSIX_SSIZE_MAX
+#define SSIZE_MAX _POSIX_SSIZE_MAX
+#else
+#define SSIZE_MAX INT_MAX
+#endif
+#endif
 		/* cache new packet sizes (next module or stream head) */
 		if ((wq = sd->sd_wq->q_next) || (wq = sd->sd_wq)) {
-			sd->sd_minpsz = wq->q_minpsz;
-			sd->sd_maxpsz = wq->q_maxpsz;
+			if ((sd->sd_minpsz = wq->q_minpsz) < 0)
+				sd->sd_minpsz = 0;
+			if ((sd->sd_maxpsz = wq->q_maxpsz) < 0)
+				sd->sd_maxpsz = SSIZE_MAX;
 		}
 
 		if (sd2 && sd2 > sd)
@@ -2992,7 +3001,7 @@ qprocson(queue_t *q)
 	assert(current_context() <= CTX_STREAMS);
 #endif
 	/* only one qprocson() happens at a time */
-	if ((QPROCS & rq->q_flag)) {
+	if (test_bit(QPROCS_BIT, &rq->q_flag)) {
 		struct stdata *sd2, *sd = rqstream(rq);
 		unsigned long pl, pl2 = 0;
 
@@ -3018,13 +3027,13 @@ qprocson(queue_t *q)
 			bq->q_next = wq;
 
 		/* fix up service procedure cache pointers */
-		if ((QSRVP & rq->q_flag) || rq->q_next == NULL) {
+		if (test_bit(QSRVP_BIT, &rq->q_flag) || rq->q_next == NULL) {
 			for (bq = rq->q_nbsrv; bq && bq != rq; bq = bq->q_next)
 				bq->q_nfsrv = rq;
 			for (bq = rq->q_nfsrv; bq && bq != rq; bq = backq(bq))
 				bq->q_nbsrv = rq;
 		}
-		if ((QSRVP & wq->q_flag) || wq->q_next == NULL) {
+		if (test_bit(QSRVP_BIT, &wq->q_flag) || wq->q_next == NULL) {
 			for (bq = wq->q_nbsrv; bq && bq != wq; bq = bq->q_next)
 				bq->q_nfsrv = wq;
 			for (bq = wq->q_nfsrv; bq && bq != wq; bq = backq(bq))
@@ -3032,8 +3041,10 @@ qprocson(queue_t *q)
 		}
 
 		/* cache new packet sizes (this module) */
-		sd->sd_minpsz = wq->q_minpsz;
-		sd->sd_maxpsz = wq->q_maxpsz;
+		if ((sd->sd_minpsz = wq->q_minpsz) < 0)
+			sd->sd_minpsz = 0;
+		if ((sd->sd_maxpsz = wq->q_maxpsz) < 0)
+			sd->sd_maxpsz = SSIZE_MAX;
 
 		if (sd2 && sd2 > sd)
 			pwunlock(sd2, pl2);
@@ -3940,7 +3951,7 @@ strqget(register queue_t *q, qfields_t what, register unsigned char band, long *
 			*val = (long) q->q_last;
 			break;
 		case QFLAG:
-			*val = q->q_flag;
+			*val = (volatile unsigned long)q->q_flag;
 			break;
 		default:
 			err = -EINVAL;
@@ -3975,7 +3986,7 @@ strqget(register queue_t *q, qfields_t what, register unsigned char band, long *
 				*val = (long) qb->qb_last;
 				break;
 			case QFLAG:
-				*val = q->q_flag;
+				*val = (volatile unsigned long)q->q_flag;
 				break;
 			default:
 				err = -EINVAL;

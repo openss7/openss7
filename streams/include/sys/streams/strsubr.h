@@ -245,16 +245,16 @@ struct stdata {
 	queue_t *sd_wq;			/* wr queue for stream head */
 	dev_t sd_dev;			/* device number of driver */
 	mblk_t *sd_iocblk;		/* message to return for ioctl */
-	struct stdata *sd_other;	/* other stream head for pipes */
+	struct stdata * volatile sd_other;	/* other stream head for pipes */
 //      struct streamtab *sd_strtab;    /* driver streamtab */
 	struct inode *sd_inode;		/* back pointer to inode */
 //      struct dentry *sd_dentry;       /* back pointer to dentry */
 	struct file *sd_file;		/* back pointer to (current) file */
-	ulong sd_flag;			/* stream head state */
-	ulong sd_rdopt;			/* read options */
-	ulong sd_wropt;			/* write options */
-	ulong sd_eropt;			/* error options */
-	ulong sd_iocid;			/* sequence id for active ioctl */
+	int sd_flag;			/* stream head state */
+	int sd_rdopt;			/* read options */
+	int sd_wropt;			/* write options */
+	int sd_eropt;			/* error options */
+	int sd_iocid;			/* sequence id for active ioctl */
 //      ushort sd_iocwait;              /* number of procs awaiting ioctl */
 	pid_t sd_session;		/* controlling session id */
 	pid_t sd_pgrp;			/* foreground process group */
@@ -440,7 +440,7 @@ enum {
 };
 
 struct strthread {
-	unsigned long flags;		/* flags */
+	volatile unsigned long flags;	/* flags */
 	struct task_struct *proc;	/* task */
 	atomic_t lock;			/* thread lock */
 #if !defined CONFIG_STREAMS_NORECYCLE

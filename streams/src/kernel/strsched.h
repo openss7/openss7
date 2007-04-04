@@ -213,7 +213,7 @@ do { \
 	struct strthread *t = this_thread; \
 	if (atomic_dec_and_test(&t->lock)) \
 		if (unlikely(test_and_clear_bit(qwantrun, &t->flags))) \
-			if (unlikely((t->flags & (QRUNFLAGS)) != 0)) \
+			if (unlikely(((volatile unsigned long)t->flags & (QRUNFLAGS)) != 0)) \
 				__raise_streams(); \
 } while (0)
 
