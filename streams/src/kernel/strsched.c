@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.158 $) $Date: 2007/03/31 15:50:14 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.159 $) $Date: 2007/04/04 01:15:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/31 15:50:14 $ by $Author: brian $
+ Last Modified $Date: 2007/04/04 01:15:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.159  2007/04/04 01:15:18  brian
+ - performance improvements (speeds up put and srv procedures)
+
  Revision 0.9.2.158  2007/03/31 15:50:14  brian
  - flow control corrections
 
@@ -158,10 +161,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.158 $) $Date: 2007/03/31 15:50:14 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.159 $) $Date: 2007/04/04 01:15:18 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.158 $) $Date: 2007/03/31 15:50:14 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.159 $) $Date: 2007/04/04 01:15:18 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>

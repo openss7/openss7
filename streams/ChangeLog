@@ -1,3 +1,23 @@
+2007-04-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* include/sys/streams/strdebug.h: quiet down _TEST
+	* include/sys/streams/stream.h: cache put and srv procedure pointers
+	* include/sys/streams/strsubr.h: remove sd_muxinit entry
+	* src/kernel/strpipe.c: calculate q_nfsrv and q_nbsrv
+	* src/kernel/strsched.c:
+	  - straighten out bit procedures
+	  - calculate q_nfsrv and q_nbsrv on weldq()
+	* src/kernel/strutil.c:
+	  - straighten out bit procedures
+	  - new bcanput(next)(any) implementation using q_nfsrv
+	  - new qbackenable using q_nbsrv
+	  - calculate q_nfsrv and q_nbsrv in qinsert(), qprocson(), qprocsoff()
+	* src/modules/sth.c:
+	  - straighten out bit procedures
+	  - use q_putp cache pointer when linking streams
+	  - set q_nfsrv and q_nbsrv when creating FIFOs and PIPEs.
+	* src/test/perftest.c: kill children on signal when running asyncrhonous
+
 2007-04-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* streams/doc/manual/bugs.texi: documented ldl reference counting bug
