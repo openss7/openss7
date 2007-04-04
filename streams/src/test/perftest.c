@@ -418,8 +418,6 @@ read_child(int fd)
 					bytcnt += ret;
 					if (bytcnt < 0)
 						goto dead;
-					if (blocking)
-						break;
 				}
 			} else {
 				int flags = 0;
@@ -431,8 +429,6 @@ read_child(int fd)
 					bytcnt += dbuf.len;
 					if (bytcnt < 0)
 						goto dead;
-					if (blocking)
-						break;
 				}
 			}
 			if (ret < 0) {
@@ -520,8 +516,6 @@ write_child(int fd)
 					bytcnt += ret;
 					if (bytcnt < 0)
 						goto dead;
-					if (blocking)
-						break;
 				}
 			} else {
 				struct strbuf dbuf = { 0, msgsize, my_msg };
@@ -530,8 +524,6 @@ write_child(int fd)
 					bytcnt += msgsize;
 					if (bytcnt < 0)
 						goto dead;
-					if (blocking)
-						break;
 				}
 			}
 			if (ret < 0) {
