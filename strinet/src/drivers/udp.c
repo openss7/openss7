@@ -400,9 +400,9 @@ STATIC struct module_info udp_minfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = (1 << 18),		/* Hi water mark */
-	.mi_lowat = 0,			/* Lo water mark */
+	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
+	.mi_hiwat = STRHIGH,		/* Hi water mark */
+	.mi_lowat = STRLOW,		/* Lo water mark */
 };
 
 STATIC struct module_stat udp_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
@@ -8414,6 +8414,7 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
+#if 1
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
 		udp_rstat.ms_acnt++;
 		if (unlikely(putq(q, mp) == 0))
@@ -8428,6 +8429,9 @@ tp_rput(queue_t *q, mblk_t *mp)
 		} else
 			tp_putq_slow(q, mp, rtn);
 	}
+#else
+	putq(q, mp);
+#endif
 	return (0);
 }
 
@@ -8452,6 +8456,7 @@ tp_rsrv(queue_t *q)
 streamscall __hot_in int
 tp_wput(queue_t *q, mblk_t *mp)
 {
+#if 0
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
 		udp_wstat.ms_acnt++;
 		if (unlikely(putq(q, mp) == 0))
@@ -8467,6 +8472,9 @@ tp_wput(queue_t *q, mblk_t *mp)
 		} else
 			tp_putq_slow(q, mp, rtn);
 	}
+#else
+	putq(q, mp);
+#endif
 	return (0);
 }
 
@@ -9314,9 +9322,9 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	so->so_flags |= SO_MAXPSZ;
 	so->so_maxpsz = udp_minfo.mi_maxpsz;
 	so->so_flags |= SO_HIWAT;
-	so->so_hiwat = udp_minfo.mi_hiwat;
+	so->so_hiwat = (1 << 18);
 	so->so_flags |= SO_LOWAT;
-	so->so_lowat = udp_minfo.mi_lowat;
+	so->so_lowat = (1 << 16);
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
 	putnext(q, mp);
