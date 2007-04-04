@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -x
+
+(
+	sudo killall netserver
+#	sudo nice -n -20 netserver >/dev/null </dev/null 2>/dev/null &
+	sudo netserver >/dev/null </dev/null 2>/dev/null &
+	sleep 3
+#	nice -n 19 netperf_udp_range -x /dev/udp2 \
+#		--testtime=10 --bufsizes=131071 --end=16384 ${1+"$@"}
+#	nice -n 19 netperf_udp_range \
+#		--testtime=10 --bufsizes=131071 --end=16384 ${1+"$@"}
+#	nice -n 19 netperf_udp_range -x /dev/udp \
+#		--testtime=10 --bufsizes=131071 --end=16384 ${1+"$@"}
+	netperf_udp_range -x /dev/udp2 \
+		--testtime=10 --bufsizes=131071 --end=16384 ${1+"$@"}
+	netperf_udp_range \
+		--testtime=10 --bufsizes=131071 --end=16384 ${1+"$@"}
+	netperf_udp_range -x /dev/udp \
+		--testtime=10 --bufsizes=131071 --end=16384 ${1+"$@"}
+	sudo killall netserver
+) \
+| cat -s | tee `hostname`.`date -uIminutes`.log
+

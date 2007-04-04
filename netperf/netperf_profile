@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -x
+
+session=`date -uIminutes`
+
+(
+	killall netserver
+	netserver >/dev/null </dev/null 2>/dev/null &
+	sleep 3
+	opcontrol --stop
+	opcontrol --dump
+	opcontrol --reset
+	opcontrol --start
+	netperf_udp_range -x /dev/udp2 \
+		--bufsizes=131071 --end=16384 ${1+"$@"}
+	opcontrol --stop
+	opcontrol --dump
+	opcontrol --save="$session"
+	killall netserver
+	opreport   -l -p /lib/modules/`uname -r` image:/usr/bin/netperf session:$session > netperf.$session.log
+	opreport   -l -p /lib/modules/`uname -r` image:/usr/sbin/netserver session:$session > netserver.$session.log
+	opannotate -a -p /lib/modules/`uname -r` image:/usr/bin/netperf session:$session > netperf.$session.S
+	opannotate -a -p /lib/modules/`uname -r` image:/usr/sbin/netserver session:$session > netserver.$session.S
+	opannotate -s -p /lib/modules/`uname -r` image:/usr/bin/netperf session:$session > netperf.$session.c
+	opannotate -s -p /lib/modules/`uname -r` image:/usr/sbin/netserver session:$session > netserver.$session.c
+) \
+| cat -s | tee `hostname`.$session.log

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -x
+
+interval=20
+testtime=1
+
+perftestn=
+perftest=
+
+if [ -x `pwd`/perftestn ] ; then
+	perftestn=`pwd`/perftestn
+	perftest=`pwd`/perftest
+elif [ -x /usr/lib/streams/perftestn ] ; then
+	perftestn=/usr/lib/streams/perftestn
+	perftest=/usr/lib/streams/perftest
+elif [ -x /usr/libexec/streams/perftestn ] ; then
+	perftestn=/usr/libexec/streams/perftestn
+	perftest=/usr/libexec/streams/perftest
+fi
+
+[ -n "$perftestn" ] || exit 1
+
+scls=/usr/sbin/scls
+
+if [ -x `pwd`/scls ] ; then
+	scls=`pwd`/scls
+fi
+
+(
+	set -x
+	$scls -a -c -r pipe pipemod
+	for size in 4 8 16 32 64 128 256 512 1024 2048 4096
+	do
+		$perftest  -q -r -t $testtime -i $interval -m nullmod -p 0 -s $size ${1+$@}
+		$perftestn -q -r -t $testtime -i $interval -m nullmod -p 0 -s $size ${1+$@}
+		$scls -a -c -r pipe pipemod
+	done
+) 2>&1 | tee `hostname`.perftest.`date -uIseconds`.log
