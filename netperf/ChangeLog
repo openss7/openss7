@@ -1,3 +1,8 @@
+2007-04-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* netbenchmark: corrections
+	* nettest_xti.c: use TPI directly for XTI UDP tests
+
 2007-03-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* manual/news.texi: pushed release date
