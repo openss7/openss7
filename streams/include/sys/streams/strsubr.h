@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.78 2007/03/30 11:59:10 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.79 2007/04/04 01:15:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/30 11:59:10 $ by $Author: brian $
+ Last Modified $Date: 2007/04/04 01:15:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 0.9.2.79  2007/04/04 01:15:17  brian
+ - performance improvements (speeds up put and srv procedures)
+
  Revision 0.9.2.78  2007/03/30 11:59:10  brian
  - heavy rework of MP syncrhonization
 
@@ -94,7 +97,7 @@
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.78 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.79 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
