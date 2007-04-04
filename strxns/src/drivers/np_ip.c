@@ -334,9 +334,9 @@ STATIC struct module_info np_minfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = (1 << 19),		/* Hi water mark */
-	.mi_lowat = (1 << 17),		/* Lo water mark */
+	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
+	.mi_hiwat = (1 << 18),		/* Hi water mark */
+	.mi_lowat = (1 << 16),		/* Lo water mark */
 };
 
 STATIC struct module_stat np_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
