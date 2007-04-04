@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -x
+
+session=`date -uIminutes`
+
+interval=20
+testtime=1
+
+perftestn=
+
+if [ -x `pwd`/perftestn ] ; then
+	perftestn=`pwd`/perftestn
+elif [ -x /usr/lib/streams/perftestn ] ; then
+	perftestn=/usr/lib/streams/perftestn
+elif [ -x /usr/libexec/streams/perftestn ] ; then
+	perftestn=/usr/libexec/streams/perftestn
+fi
+
+[ -n "$perftestn" ] || exit 1
+
+(
+	opcontrol --stop
+	opcontrol --dump
+	opcontrol --reset
+	opcontrol --start
+	for size in 1 2 4 8 16 32 64 128 256 512 1024 2048 4096
+	do
+		$perftestn -q -b -r -t $testtime -i $interval -s $size
+	done
+	opcontrol --stop
+	opcontrol --dump
+	opcontrol --save="$session"
+	opreport   -l -p /lib/modules/`uname -r` image:$perftestn session:$session > perftestn.$session.log
+	opannotate -a -p /lib/modules/`uname -r` image:$perftestn session:$session > perftestn.$session.S
+	opannotate -s -p /lib/modules/`uname -r` image:$perftestn session:$session > perftestn.$session.c
+) 2>&1 \
+| cat -s | tee `hostname`.perftestn.$session.log
+

@@ -209,12 +209,14 @@ case "$program" in
 	;;
     arr_script)
 	if test ":$program" = ":arr_script" ; then
-	    # These are for arr tesets
+	    : # These are for arr tesets
 	fi
 	;;
     *)
 	;;
 esac
+
+defaults='command port testtime stats bufsizes sndsizes rrsizes nettest warmtime hostname headers'
 
 function version()
 {
@@ -560,9 +562,12 @@ else
 fi
 
 # assign defaults to all unassigned variables
-for def in command port testtime bufsizes sndsizes hostname headers ; do
-    if test :`eval "\$$def"` = : ; then
+for def in $defaults ; do
+    val=`eval 'echo $'"$def"`
+    if test :${val:+set} != :set ; then
 	eval "$def=\$default_$def"
+    else
+	eval "$def=\"\$val\""
     fi
 done
 
