@@ -1,3 +1,9 @@
+2007-04-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4: provide --enable-k-none configure option to permit
+	  kernel debugging to be suppressed altogether (for optimization
+	  testing and profiling).
+
 2007-03-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: need GNU gettext version 0.16.1 cause it is built for autoconf 2.61
