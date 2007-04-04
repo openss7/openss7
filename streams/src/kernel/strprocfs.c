@@ -709,10 +709,10 @@ get_streams_stdata(char *page, int maxlen, struct stdata *sd)
 	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_other);
 //	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_strtab);
 //      len += snprintf(page + len, maxlen - len, ", %p", sd->sd_inode);
-	len += snprintf(page + len, maxlen - len, ", %#08lx", sd->sd_flag);
-	len += snprintf(page + len, maxlen - len, ", %#08lx", sd->sd_rdopt);
-	len += snprintf(page + len, maxlen - len, ", %#08lx", sd->sd_wropt);
-	len += snprintf(page + len, maxlen - len, ", %#08lx", sd->sd_eropt);
+	len += snprintf(page + len, maxlen - len, ", %#08x", sd->sd_flag);
+	len += snprintf(page + len, maxlen - len, ", %#08x", sd->sd_rdopt);
+	len += snprintf(page + len, maxlen - len, ", %#08x", sd->sd_wropt);
+	len += snprintf(page + len, maxlen - len, ", %#08x", sd->sd_eropt);
 	len += snprintf(page + len, maxlen - len, ", %lu", sd->sd_iocid);
 //      len += snprintf(page + len, maxlen - len, ", %hu", sd->sd_iocwait);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_session);
