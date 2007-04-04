@@ -6467,7 +6467,7 @@ test_case_1_2(int child)
 		if (last_info.CURRENT_state != TS_UNBND)
 			goto failure;
 		state++;
-		if (last_info.PROVIDER_flag != T_XPG4_1)
+		if (last_info.PROVIDER_flag != T_XPG4_1|T_SNDZERO)
 			goto failure;
 		break;
 	case T_INET_UDP:
@@ -6498,7 +6498,7 @@ test_case_1_2(int child)
 		if (last_info.CURRENT_state != TS_UNBND)
 			goto failure;
 		state++;
-		if (last_info.PROVIDER_flag != T_XPG4_1)
+		if (last_info.PROVIDER_flag != T_XPG4_1|T_SNDZERO)
 			goto failure;
 		break;
 	case T_INET_TCP:
@@ -6654,7 +6654,7 @@ test_case_1_3_1(int child)
 		if (last_info.CURRENT_state != TS_UNBND)
 			goto failure;
 		state++;
-		if (last_info.PROVIDER_flag != T_XPG4_1)
+		if (last_info.PROVIDER_flag != T_XPG4_1|T_SNDZERO)
 			goto failure;
 		break;
 	case T_INET_UDP:
@@ -6685,7 +6685,7 @@ test_case_1_3_1(int child)
 		if (last_info.CURRENT_state != TS_UNBND)
 			goto failure;
 		state++;
-		if (last_info.PROVIDER_flag != T_XPG4_1)
+		if (last_info.PROVIDER_flag != T_XPG4_1|T_SNDZERO)
 			goto failure;
 		break;
 	case T_INET_TCP:
