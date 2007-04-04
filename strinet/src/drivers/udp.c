@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/03/29 12:10:46 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/04/04 01:15:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/29 12:10:46 $ by $Author: brian $
+ Last Modified $Date: 2007/04/04 01:15:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.57  2007/04/04 01:15:43  brian
+ - T_SNDZERO ok for rawip and udp, cleanup of udp.c driver
+
  Revision 0.9.2.56  2007/03/29 12:10:46  brian
  - add T_SNDZERO for UDP and RAWIP per XNS 5.2
 
@@ -239,10 +242,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/03/29 12:10:46 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/04/04 01:15:43 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/03/29 12:10:46 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/04/04 01:15:43 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -324,7 +327,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/03/29 12:10:46 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/04/04 01:15:43 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -7026,15 +7029,25 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 	p = (typeof(p)) mp->b_rptr;
 	prefetch(p);
 	dassert(p->PRIM_type == T_UNITDATA_REQ);
-#if 0
 	if (unlikely(tp->info.SERV_type == T_COTS || tp->info.SERV_type == T_COTS_ORD))
 		goto go_slow;
-#endif
 	if (unlikely(tp->info.SERV_type != T_CLTS))
 		goto go_slow;
 	if (unlikely(tp_get_state(tp) != TS_IDLE))
 		goto go_slow;
-	if (unlikely(p->DEST_length != 0))
+	if (unlikely(p->DEST_length == 0))
+		goto go_slow;
+	if (unlikely((mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)))
+		goto go_slow;
+	if (unlikely(p->DEST_length != sizeof(struct sockaddr_in)))
+		goto go_slow;
+	/* avoid alignment problems */
+	bcopy(mp->b_rptr + p->DEST_offset, &dst_buf, p->DEST_length);
+	if (unlikely(dst_buf.sin_family != AF_INET))
+		goto go_slow;
+	if (unlikely(dst_buf.sin_addr.s_addr == INADDR_ANY))
+		goto go_slow;
+	if (unlikely(dst_buf.sin_port == 0))
 		goto go_slow;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto go_slow;
@@ -7047,6 +7060,8 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.TSDU_size))
 			goto go_slow;
 	}
+	tp->options.ip.daddr = dst_buf.sin_addr.s_addr;
+	tp->dport = dst_buf.sin_port;
 	if (unlikely((err = tp_senddata(tp, tp->dport, &tp->options, dp)) != QR_ABSORBED))
 		goto error;
 	return (QR_TRIMMED);
