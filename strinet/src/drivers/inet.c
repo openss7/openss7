@@ -752,9 +752,9 @@ STATIC struct module_info ss_minfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
-	.mi_maxpsz = 1 << 16,		/* Max packet size accepted */
-	.mi_hiwat = 1 << 15,		/* Hi water mark */
-	.mi_lowat = 1 << 10,		/* Lo water mark */
+	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
+	.mi_hiwat = (1 << 18),		/* Hi water mark */
+	.mi_lowat = (1 << 16),		/* Lo water mark */
 };
 
 STATIC struct module_stat ss_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));

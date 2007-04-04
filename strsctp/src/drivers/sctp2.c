@@ -14247,8 +14247,8 @@ STATIC struct module_info sctp_m_info = {
 	.mi_idname = "sctp_m",		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = 1 << 15,		/* Hi water mark */
-	.mi_lowat = 1 << 10,		/* Lo water mark */
+	.mi_hiwat = (1 << 18),		/* Hi water mark */
+	.mi_lowat = (1 << 16),		/* Lo water mark */
 };
 
 STATIC streamscall int sctp_m_open(queue_t *q, dev_t *, int, int, cred_t *);
