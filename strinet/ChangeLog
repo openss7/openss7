@@ -1,3 +1,11 @@
+2007-04-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/udp.c: minor locking adjustments and inline and fastcall declarations
+	* src/test/test-inet_raw.c: T_SENDZERO valid for IP and UDP providers
+	* src/test/test-inet_udp.c: T_SENDZERO valid for IP and UDP providers
+	* src/test/test-inet_tcp.c: T_SENDZERO valid for IP and UDP providers
+	* src/test/test-inet_sctp.c: T_SENDZERO valid for IP and UDP providers
+
 2007-03-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/inet.c: add T_SNDZERO for udp and rawip

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/03/15 10:22:57 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/04/04 01:15:55 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:22:57 $ by $Author: brian $
+ Last Modified $Date: 2007/04/04 01:15:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.54  2007/04/04 01:15:55  brian
+ - T_SNDZERO ok for rawip and udp, cleanup of udp.c driver
+
  Revision 0.9.2.53  2007/03/15 10:22:57  brian
  - test case reporting and pushed release date one day
 
@@ -271,9 +274,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/03/15 10:22:57 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/04/04 01:15:55 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/03/15 10:22:57 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/04/04 01:15:55 $";
 
 /*
  *  Simple test program for INET streams.
@@ -6467,7 +6470,7 @@ test_case_1_2(int child)
 		if (last_info.CURRENT_state != TS_UNBND)
 			goto failure;
 		state++;
-		if (last_info.PROVIDER_flag != T_XPG4_1|T_SNDZERO)
+		if (last_info.PROVIDER_flag != (T_XPG4_1|T_SNDZERO))
 			goto failure;
 		break;
 	case T_INET_UDP:
@@ -6498,7 +6501,7 @@ test_case_1_2(int child)
 		if (last_info.CURRENT_state != TS_UNBND)
 			goto failure;
 		state++;
-		if (last_info.PROVIDER_flag != T_XPG4_1|T_SNDZERO)
+		if (last_info.PROVIDER_flag != (T_XPG4_1|T_SNDZERO))
 			goto failure;
 		break;
 	case T_INET_TCP:
@@ -6529,7 +6532,7 @@ test_case_1_2(int child)
 		if (last_info.CURRENT_state != TS_UNBND)
 			goto failure;
 		state++;
-		if (last_info.PROVIDER_flag != T_XPG4_1)
+		if (last_info.PROVIDER_flag != (T_XPG4_1))
 			goto failure;
 		break;
 	case T_INET_SCTP:
@@ -6560,7 +6563,7 @@ test_case_1_2(int child)
 		if (last_info.CURRENT_state != TS_UNBND)
 			goto failure;
 		state++;
-		if (last_info.PROVIDER_flag != T_XPG4_1)
+		if (last_info.PROVIDER_flag != (T_XPG4_1))
 			goto failure;
 		break;
 	default:
@@ -6654,7 +6657,7 @@ test_case_1_3_1(int child)
 		if (last_info.CURRENT_state != TS_UNBND)
 			goto failure;
 		state++;
-		if (last_info.PROVIDER_flag != T_XPG4_1|T_SNDZERO)
+		if (last_info.PROVIDER_flag != (T_XPG4_1|T_SNDZERO))
 			goto failure;
 		break;
 	case T_INET_UDP:
@@ -6685,7 +6688,7 @@ test_case_1_3_1(int child)
 		if (last_info.CURRENT_state != TS_UNBND)
 			goto failure;
 		state++;
-		if (last_info.PROVIDER_flag != T_XPG4_1|T_SNDZERO)
+		if (last_info.PROVIDER_flag != (T_XPG4_1|T_SNDZERO))
 			goto failure;
 		break;
 	case T_INET_TCP:
@@ -6716,7 +6719,7 @@ test_case_1_3_1(int child)
 		if (last_info.CURRENT_state != TS_UNBND)
 			goto failure;
 		state++;
-		if (last_info.PROVIDER_flag != T_XPG4_1)
+		if (last_info.PROVIDER_flag != (T_XPG4_1))
 			goto failure;
 		break;
 	case T_INET_SCTP:
@@ -6747,7 +6750,7 @@ test_case_1_3_1(int child)
 		if (last_info.CURRENT_state != TS_UNBND)
 			goto failure;
 		state++;
-		if (last_info.PROVIDER_flag != T_XPG4_1)
+		if (last_info.PROVIDER_flag != (T_XPG4_1))
 			goto failure;
 		break;
 	default:
