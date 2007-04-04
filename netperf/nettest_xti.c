@@ -5018,6 +5018,8 @@ bytes   bytes    secs            #      #   %s/sec %% %c%c     us/KB\n\n";
       
 #ifdef TPI_DIRECT
       if (putmsg(data_socket, tpi_ctrlp, &tpi_data, 0) != 0) {
+	if (errno == EINTR)
+	  break;
 	perror("xti_udp_send: data send error");
 	exit(1);
       }
