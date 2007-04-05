@@ -709,7 +709,7 @@ function scls_show()
 	scls_modules="$scls_modules inet"
     fi
     if test :${device:-/dev/udp} = :/dev/udp2 ; then
-	scls_modules="$scls_modules udp2"
+	scls_modules="$scls_modules udp"
     fi
     if test ${verbose:-1} -gt 2 ; then
 	scls_options="-b -a -r"
