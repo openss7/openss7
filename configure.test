@@ -7,6 +7,7 @@ set -x
 ${path}configure \
 	--disable-devel \
 	--disable-32bit-libs \
+	--enable-maintainer-mode \
 	--enable-dependency-tracking \
 	--disable-checks \
 	--without-SCTP \
@@ -38,7 +39,7 @@ ${path}configure \
 	--enable-k-none \
 	--disable-streams-syncqs \
 	--enable-streams-irq \
-	--disable-streams-stats \
+	--enable-streams-stats \
 	--disable-streams-syncqs \
 	--enable-streams-kthreads \
 	--enable-autotest \
