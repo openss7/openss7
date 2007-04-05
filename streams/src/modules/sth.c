@@ -720,7 +720,31 @@ strschedule(void)
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
-#if 0
+#if 1
+	struct strthread *t = this_thread;
+
+	/* try to avoid context switch */
+	set_task_state(t->proc, TASK_INTERRUPTIBLE);
+	/* before every sleep -- saves a context switch */
+	if (likely(((volatile unsigned long)t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+		return;
+	// set_current_state(TASK_RUNNING);
+	runqueues();
+#endif
+}
+
+STATIC streams_inline streams_fastcall __hot void
+strschedule_poll(void)
+{
+	/* NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run
+	   the STREAMS scheduler in process context here.  The reason is that if we avoid
+	   scheduling, the current process is blocked off other processors while it is running the
+	   STREAMS scheduler.  If we do the task switch, the process can run concurrently on
+	   another processor.  This does have a negative impact; however, on SMP kernels running on 
+	   UP machines, so it would be better if we could quickly check the number of processors
+	   running.  We just decide by static kernel configuration for the moment. */
+//#ifndef CONFIG_SMP
+#if 1
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -744,7 +768,7 @@ strschedule_ioctl(void)
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
-#if 0
+#if 1
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -768,7 +792,7 @@ strschedule_write(void)
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
-#if 0
+#if 1
 	{
 		struct strthread *t = this_thread;
 
@@ -783,7 +807,7 @@ strschedule_write(void)
 #endif
 }
 
-STATIC streams_inline streams_fastcall __hot_in void
+STATIC streams_inline streams_fastcall __hot_out void
 strschedule_read(void)
 {
 	/* NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run
@@ -794,7 +818,7 @@ strschedule_read(void)
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
-#if 0
+#if 1
 	{
 		struct strthread *t = this_thread;
 
@@ -4140,7 +4164,7 @@ strpoll_fast(struct file *file, struct poll_table_struct *poll)
 		queue_t *q;
 		unsigned int flag;
 
-		strschedule();
+		strschedule_poll();
 		poll_wait(file, &sd->sd_polllist, poll);
 		flag = (volatile int)sd->sd_flag;
 		if (unlikely ((flag & (STRDERR | STWRERR | STRHUP | STRPRI | STRMSIG | STPLEX)) != 0))
