@@ -250,7 +250,7 @@ struct stdata {
 	struct inode *sd_inode;		/* back pointer to inode */
 //      struct dentry *sd_dentry;       /* back pointer to dentry */
 	struct file *sd_file;		/* back pointer to (current) file */
-	int sd_flag;			/* stream head state */
+	volatile unsigned long sd_flag;	/* stream head state */
 	int sd_rdopt;			/* read options */
 	int sd_wropt;			/* write options */
 	int sd_eropt;			/* error options */
