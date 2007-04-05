@@ -185,6 +185,13 @@ char	nettest_xti_id[]="\
 #include "hist.h"
 #endif /* HISTOGRAM */
 
+#define TPI_DIRECT 1
+
+#ifdef TPI_DIRECT
+#include <stropts.h>
+#include <sys/tihdr.h>
+#endif
+
 
 
  /* these variables are specific to the XTI sockets tests. declare */
@@ -4660,12 +4667,7 @@ bytes   bytes    secs            #      #   %s/sec %% %c%c     us/KB\n\n";
   
   struct t_unitdata unitdata;
 
-#define TPI_DIRECT 1
-
 #ifdef TPI_DIRECT
-#include <sys/stropts.h>
-#include <sys/tihdr.h>
-
   struct {
 	  struct T_unitdata_req prim;
 	  struct sockaddr_in addr;
@@ -5318,7 +5320,9 @@ recv_xti_udp_stream()
 
   struct t_bind bind_req, bind_resp;
   struct t_unitdata unitdata;
+#ifndef TPI_DIRECT
   int	            flags = 0;
+#endif
 
   struct sockaddr_in myaddr_in;
 #if 0
