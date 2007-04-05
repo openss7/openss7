@@ -706,7 +706,7 @@ function scls_show()
 	scls_modules="$scls_modules inet"
     fi
     if test :${device:-/dev/tcp} = :/dev/tcp2 ; then
-	scls_modules="$scls_modules tcp2"
+	scls_modules="$scls_modules tcp"
     fi
     if test ${verbose:-1} -gt 2 ; then
 	scls_options="-b -a -r"
