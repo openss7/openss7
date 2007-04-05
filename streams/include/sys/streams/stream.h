@@ -461,7 +461,7 @@ typedef struct qband {
 	struct msgb *qb_last;		/* last queued message in this band */
 	size_t qb_hiwat;		/* hi water mark for flow control */
 	size_t qb_lowat;		/* lo water mark for flow control */
-	unsigned long qb_flag;		/* flags */
+	volatile unsigned long qb_flag;	/* flags */
 	long qb_pad1;			/* OSF: reserved */
 } qband_t;
 
@@ -499,7 +499,7 @@ typedef struct queue {
 	struct queue *q_link;		/* next queue for scheduling */
 	void *q_ptr;			/* private data pointer */
 	size_t q_count;			/* number of bytes in queue */
-	unsigned long q_flag;		/* queue state */
+	volatile unsigned long q_flag;	/* queue state */
 	ssize_t q_minpsz;		/* min packet size accepted */
 	ssize_t q_maxpsz;		/* max packet size accepted */
 	size_t q_hiwat;			/* hi water mark for flow control */
