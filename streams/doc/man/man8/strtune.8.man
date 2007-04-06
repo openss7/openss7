@@ -1,0 +1,463 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database streams.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so streams.macros
+.\"
+.\"
+.TH STRTUNE 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B strtune
+\- display and tune STREAMS tunable parameters
+.\"
+.\"
+.SH SYNOPSIS
+.ad l
+.hy 0
+.PP
+.HP 12
+\fBstrtune\fR [\fIoptions\fR] [{\fB-n\fR|\fB--name\fR}\ \fINAME\fR|{\fB-q\fR|\fB--queue\fR}\ \fIADDR\fR]
+[{\fB-r\fR|\fB--rd\fR|\fB--read\fR}] [{\fB-w\fR|\fB--wr\fR|\fB--write\fR}] [{\fB-m\fR|\fB--mux\fR}]
+[{\fB-o\fR|\fB--option\fR}\ \fITUNABLE\fR[=\fIVALUE\fR] [...]]
+.PD 0
+.HP
+\fBstrtune\fR [\fIoptions\fR] [{\fB-n\fR|\fB--name\fR}\ \fINAME\fR|{\fB-q\fR|\fB--queue\fR}\ \fIADDR\fR]
+[{\fB-a\fR|\fB--all\fR}]
+[{\fB-o\fR|\fB--option\fR}\ \fBtrclevel\fR[=\fIVALUE\fR]]
+.HP
+\fBstrtune\fR [\fIoptions\fR] [{\fB-M\fR|\fB--modules\fR}
+.HP
+\fBstrtune\fR [\fIoptions\fR] [{\fB-Q\fR|\fB--queues\fR}
+.HP
+\fBstrtune\fR [\fIoptions\fR] [{\fB-f\fR|\fB--file\fR}\ \fIFILE\fR
+.HP
+\fBstrtune\fR {{\fB-h\fR|\fB--help\fR}|{\fB-V\fR|\fB--version\fR}|{\fB-C\fR|\fB--copying\fR}}
+.PD
+.ad b
+.hy 6
+.\"
+.\"
+.SH OPTIONS
+.PP
+When issued without anny command options,
+.B strtune
+will list all of the loaded STREAMS drivers and modules and active queues.
+Any user can interrogate the system with this command: only a privileged user
+can alter tunables or trace levels.
+.PP
+.TP
+\fB-n\fR, \fB--name\fR[=]\fINAME\fR
+Specifies the name,
+.IR NAME ,
+of a STREAMS module or driver that is to have its tunables listed or set.
+.TP
+\fB-q\fR, \fB--queue\fR[=]\fIADDR\fR
+Specifies the address,
+.IR ADDR ,
+of a STREAMS queue, queue pair, Stream or module that is to have its tunables
+listed or set.
+.TP
+\fB-M\fR, \fB--modules\fR
+List all of the loaded modules with their corresponding tunables.
+The
+.BR -o ", " -a ", and " -f
+options cannot be used with this command option.
+.TP
+\fB-Q\fR, \fB--queues\fR
+List all of the active queues with their corresponding tunables.
+The
+.BR -o ", " -a ", and " -f
+options cannot be used with this command option.
+.TP
+\fB-f\fR, \fB--file\fR[=]\fIFILE\fR
+Specifies that instead of reading options from the command, read then from
+file,
+.IR FILE .
+Each line in file,
+.IR FILE ,
+represents the options, as typed on the command line, to be passed to the
+.B strtune
+command, one line of options per invocation of
+.BR strtune .
+No other command options may be used with the
+.B -f
+option.  General options may be used.
+.TP
+\fB-o\fR, \fB--option\fR[=]\fITUNABLE\fR[=\fIVALUE\fR]
+The name of the tunable parameter,
+.IR TUNABLE ,
+can be one of:
+.RS
+.TP \w'\fBmaxpsz\fR\(em'u
+.I hiwat
+Sets or queries the high water mark for the queue or module.
+See the
+.I q_hiwat
+member in the
+.BR queue (9)
+structure and the
+.I mi_hiwat
+member in the
+.BR module_info (9)
+structure.
+.TP
+.I lowat
+Sets or queries the low water mark for the queue or module.
+See the
+.I q_lowat
+member in the
+.BR queue (9)
+structure and the
+.I mi_lowat
+member in the
+.BR module_info (9)
+structure.
+.TP
+.I maxpsz
+Sets or queries the maximum packet size for the queue or module.
+See the
+.I q_maxpsz
+member in the
+.BR queue (9)
+structure and the
+.I mi_maxpsz
+member in the
+.BR module_info (9)
+structure.
+.IP ""
+When the optional value,
+.IR VALUE ,
+is specified, the value will be set (if possible).  Otherwise, the value will
+be displayed.
+.TP
+.I minpsz
+Sets or queries the minimum packet size for the queue or module.
+See the
+.I q_minpsz
+member in the
+.BR queue (9)
+structure and the
+.I mi_minpsz
+member in the
+.BR module_info (9)
+structure.
+.RE
+.TP
+\fB-r\fR, \fB--rd\fR, \fB--read\fR
+When used in conjunction with the
+.BR -o " TUNABLE"
+option, it specifies that the tunable only applies to the read side of the
+queue or module (when read and write sizes are different for modules).
+.TP
+\fB-w\fR, \fB--wr\fR, \fB--write\fR
+When used in conjunction with the
+.BR -o " TUNABLE"
+option, it specifies that the tunable only applies to the write side of the
+queue or module (when read and write sizes are different for modules).
+.TP
+\fB-m\fR, \fB--mux\fR
+When used in conjunction with the
+.BR -o " TUNABLE"
+option, it specifies that the tunable only applies to the lower multiplex of
+a multiplexing driver (when different from the upper side fo the module).
+This option may also be used in conjunection with
+.BR -r " and " -w
+options to specify the lower read or lower write tunables (when read and write
+sizes are different for the lower multiplex).
+.TP
+\fB-o\fR, \fB--option\fR[=]\fBtrclevel\fR[=\fIVALUE\fR]
+The trace level tunable,
+.BR trclevel ,
+is a special tunable that can only be specified on its own and separate from
+other tunables with the
+.B -o
+option.
+.TP
+\fB-a\fR, \fB--all\fR
+When used in conjunction with the
+.B -o trclevel
+option, it specifies all queues in the Stream (when used with the
+.B -q
+option) or all queue pairs in the module (when used with the
+.B -n
+option).
+.TP
+\fB-s\fR, \fB--silent\fR, \fB--quiet\fR
+Suppresses normal output.
+.TP
+\fB-v\fR, \fB--verbose\fR [\fIlevel\fR]
+Increase or specify the verbosity level of the output.  This option may be
+repeated.
+.TP
+\fB-h\fR, \fB--help\fR
+When this options is encountered,
+.B strtune
+displays usage information on
+.I stdout
+and exits.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+.B strtune
+displays versions information on
+.I stdout
+and exits.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+.B strtune
+displays copying and copyright information on
+.I stdout
+and exits.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+None.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B strtune
+command provides a method for the caller to query or change the current
+.I STREAMS
+configuration and associated tunable parameters of queues, queue pairs, Streams and modules.
+.\"
+.\"
+.SH FORMAT
+.PP
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful;
+one (1) indicates that an error occurred and a diagnostic messages is 
+printed to
+.BR stderr ;
+two (2) indicates that the option syntax was in error and a diagnostic message
+is printed to
+.BR stderr .
+.PP
+Errors may result from inadequate permissions, inability to open the
+.BR nuls (4)
+driver, inability to push the
+.BR sc (4)
+module.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B strtune
+command requires the
+.BR sc (4)
+.I STREAMS
+module and the
+.BR nuls (4)
+.I STREAMS
+driver.
+If either one is not available, the
+.B strtune
+command will not be successful.
+See
+.BR sc (4),
+.BR scls (8),
+.BR module_info (9),
+.BR module_stat (9),
+.BR streamtab (9)
+for more information.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an example of the output of the
+.B strtune
+command without options:
+.PP
+Following is an example of setting the read side high and low water marks for
+the
+.BR udp (4)
+driver:
+.sp
+.nf
+\fC\s-1\
+  $> strtune -n udp -o hiwat=5192 -o lowat=1024
+\s+1\fP
+.fi
+.PP
+Following is the contents of an example configuration file for use with the
+.BI -f " FILE"
+option.
+.sp
+.nf
+\fC\s-1\
+  -s -n udp -w -o hiwat=5192 -o lowat=1024
+  -s -n udp -r -o hiwat=131764 -o lowat=16536
+  -s -n timod -o trclevel=3
+\s+1\fP
+.fi
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.BR sc (4)
+.I STREAMS
+configuration module.
+.TP
+.B /dev/nuls
+.I STREAMS
+null device, see
+.BR nuls (4).
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/strtune
+contains the
+.B strtune
+command.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sc (4),
+.BR nuls (4),
+.BR scls (8),
+.BR strinfo (8),
+.BR strload (8),
+.BR strsetup (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B strtune
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.IR AIX \(rg.
+This is an
+.IR AIX \(rg-specific
+command.
+.B strtune
+is provided in
+.I @PACKAGE_TITLE@
+for compatibility with
+.IR AIX \(rg
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR AIX \(rg
+does not document long options.
+.IP \(em
+.IR AIX \(rg
+does not document the
+.BR -r ", " -w ", " -m ", " -s ", " -v ", " -h ", " -V " or " -C
+options.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards;
+.BR --copying ,
+OpenSS7 coding standards.
+.IP \(em
+The format of the output from the
+.B strtune
+command may be different from that of
+.IR AIX \(rg.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR AIX \(rg
+documentation.
+.[
+aixdoc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B strtune
+first appeared in
+.IR AIX \(rg " 5.3" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

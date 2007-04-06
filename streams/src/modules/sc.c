@@ -120,7 +120,7 @@ static char const ident[] =
 			SC_DEVICE	"\n" \
 			SC_CONTACT	"\n"
 #define SC_SPLASH	SC_DEVICE	" - " \
-			SC_REVISION
+			SC_REVISION	"\n"
 
 #ifdef CONFIG_STREAMS_SC_MODULE
 MODULE_AUTHOR(SC_CONTACT);

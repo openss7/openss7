@@ -282,6 +282,121 @@ structure, see
 .BR module_stat (9).
 .RE
 .\"
+.SS SC_IOC_TUNE
+.PP
+.I arg is a pointer to an
+.B sc_tune
+structure in the user's address space.
+.PP
+The
+.B sc_tune
+structure contains the following members:
+.sp
+.RS
+.nf
+\fC\s-1\
+struct sc_tune {
+    long sc_addr;
+    char sc_name[FMNAMSZ + 1];
+    int sc_flags;
+    ssize_t sc_minpsz;
+    ssize_t sc_maxpsz;
+    size_t sc_hiwat;
+    size_t sc_lowat;
+    int sc_trclevel;
+};
+\s+1\fP
+.fi
+.TP \w'\fIsc_trclevel\fR\(em'u
+.I sc_addr
+Provides the address (in core) of the queue, queue pair or Stream to which the
+tunables are to be applied.  When unused, this field is set to zero (0).
+.TP
+.I sc_name
+Provides the name of the STREAMS module or driver to which tunables are to be
+applied.  When unused, the first character of this field is set to null (0).
+.TP
+.I sc_flags
+Flags that indicate which of the folllowing tunables are to be applied an to
+which queues they are to be applied.
+.I sc_flags
+can be a bitwize OR of zero or more of the following values:
+.sp
+.RS
+.TP \w'\fBSC_SET_LOWERMUX\fR\(em'u
+.B SC_SET_MINPSZ
+When set, the value in
+.I sc_minpsz
+will be applied.
+.PD 0
+.TP
+.B SC_SET_MAXPSZ
+When set, the value in
+.I sc_maxpsz
+will be applied.
+.TP
+.B SC_SET_HIWAT
+When set, the value in
+.I sc_hiwat
+will be applied.
+.TP
+.B SC_SET_LOWAT
+When set, the value in
+.I sc_lowat
+will be applied.
+.TP
+.B SC_SET_TRCLEVEL
+When set, the value in
+.I sc_trclevel
+will be applied.
+.TP
+.B SC_SET_RDQUEUE
+When set, tunables will apply to the read queue.
+.TP
+.B SC_SET_WRQUEUE
+When set, tunables will apply to the write queue.
+.TP
+.B SC_SET_LOWERMUX
+When set, tunables will apply to the lower multiplex.
+.PD
+.RE
+.TP
+.I sc_minpsz
+Provides the minimum packet size accepted by the queue.  This field is only
+significant if
+.B SC_SET_MINPSZ
+is set in
+.IR sc_flags .
+.TP
+.I sc_maxpsz
+Provides the maximum packet size accepted by the queue.  This field is only
+significant if
+.B SC_SET_MAXPSZ
+is set in
+.IR sc_flags .
+.TP
+.I sc_hiwat
+Provides the high water mark for the queue.  This field is only
+significant if
+.B SC_SET_HIWAT
+is set in
+.IR sc_flags .
+.TP
+.I sc_lowat
+Provides the low water mark for the queue.  This field is only
+significant if
+.B SC_SET_LOWAT
+is set in
+.IR sc_flags .
+.TP
+.I sc_trclevel
+Provides the trace level for the queue.  This field is only
+significant if
+.B SC_SET_TRCLEVEL
+is set in
+.IR sc_flags .
+.RE
+.\"
 .\"
 .SH NOTICES
 .PP
@@ -305,7 +420,7 @@ structure and the private statistics for a single module or driver.
 .SH EXAMPLES
 .PP
 See the source code for
-.BR scls (8).
+.BR scls "(8) and " strtune (8).
 .\"
 .\"
 .SH MODULES
@@ -323,9 +438,9 @@ module named
 .BR nuls (4),
 .BR sad (4)),
 .BR scls (8),
+.BR strtune (8),
 .BR streamio (7),
 .BR autopush (8),
-.BR scls (8),
 .BR streamtab (9),
 .BR module_info (9),
 .BR module_stat (9).
