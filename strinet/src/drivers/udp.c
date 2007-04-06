@@ -396,17 +396,17 @@ MODULE_ALIAS("/dev/udp2");
 #define DRV_BANNER	UDP_SPLASH
 #endif				/* MODULE */
 
-STATIC struct module_info udp_minfo = {
+STATIC struct module_info udp_rinfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
-	.mi_hiwat = STRHIGH,		/* Hi water mark */
-	.mi_lowat = STRLOW,		/* Lo water mark */
+	.mi_hiwat = SHEADHIWAT << 2,	/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
-STATIC struct module_stat udp_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-STATIC struct module_stat udp_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat udp_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat udp_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 /* Upper multiplex is a T provider following the TPI. */
 
@@ -421,8 +421,17 @@ STATIC struct qinit udp_rinit = {
 	.qi_srvp = tp_rsrv,		/* Read service procedure */
 	.qi_qopen = udp_qopen,		/* Each open */
 	.qi_qclose = udp_qclose,	/* Last close */
-	.qi_minfo = &udp_minfo,		/* Module information */
+	.qi_minfo = &udp_rinfo,		/* Module information */
 	.qi_mstat = &udp_rstat,		/* Module statistics */
+};
+
+STATIC struct module_info udp_winfo = {
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
+	.mi_hiwat = SHEADHIWAT<<1,	/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 streamscall int tp_wput(queue_t *, mblk_t *);
@@ -431,7 +440,7 @@ streamscall int tp_wsrv(queue_t *);
 STATIC struct qinit udp_winit = {
 	.qi_putp = tp_wput,		/* Write put procedure (message from above) */
 	.qi_srvp = tp_wsrv,		/* Write service procedure */
-	.qi_minfo = &udp_minfo,		/* Module information */
+	.qi_minfo = &udp_winfo,		/* Module information */
 	.qi_mstat = &udp_wstat,		/* Module statistics */
 };
 
@@ -4656,7 +4665,7 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 	_rare();
 	return (err);
       blocked:
-	udp_wstat.ms_ccnt++;
+	udp_wstat.ms_ocnt++;
 	tp->sndblk = 1;
       ebusy:
 	return (-EBUSY);
@@ -5158,7 +5167,7 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 		if ((t_scalar_t) (signed char) OPT_buffer->ip.ttl < 1)
 			goto error;
 #if 0
-		if ((t_scalar_t) (signed char)OPT_buffer->ip.ttl > 127)
+		if ((t_scalar_t) (signed char) OPT_buffer->ip.ttl > 127)
 			goto error;
 #endif
 	} else {
@@ -8414,7 +8423,7 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
-#if 1
+#if 0
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
 		udp_rstat.ms_acnt++;
 		if (unlikely(putq(q, mp) == 0))
@@ -8430,6 +8439,9 @@ tp_rput(queue_t *q, mblk_t *mp)
 			tp_putq_slow(q, mp, rtn);
 	}
 #else
+	/* Here's the theory why this works: if we stuff it all there, the stream head can
+	   backenable and backfill as required, allowing another processor to service the
+	   queue. */
 	putq(q, mp);
 #endif
 	return (0);
@@ -8473,6 +8485,8 @@ tp_wput(queue_t *q, mblk_t *mp)
 			tp_putq_slow(q, mp, rtn);
 	}
 #else
+	/* Here's the theory why this works: if we stuff it all there, the service procedure can
+	   backenable the stream head as required. */
 	putq(q, mp);
 #endif
 	return (0);
@@ -8914,6 +8928,7 @@ tp_v4_rcv(struct sk_buff *skb)
 #else
 	{
 		mblk_t *mp;
+
 #if 1
 		frtn_t fr = { &tp_free, (caddr_t) skb };
 		size_t plen = skb->len + (skb->data - skb->nh.raw);
@@ -9318,13 +9333,15 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	so->so_flags |= SO_WROFF;
 	so->so_wroff = MAX_HEADER;	/* this is too big */
 	so->so_flags |= SO_MINPSZ;
-	so->so_minpsz = udp_minfo.mi_minpsz;
+	so->so_minpsz = udp_winfo.mi_minpsz;
 	so->so_flags |= SO_MAXPSZ;
-	so->so_maxpsz = udp_minfo.mi_maxpsz;
+	so->so_maxpsz = udp_winfo.mi_maxpsz;
+#if 1
 	so->so_flags |= SO_HIWAT;
-	so->so_hiwat = (1 << 18);
+	so->so_hiwat = SHEADHIWAT << 2;
 	so->so_flags |= SO_LOWAT;
-	so->so_lowat = (1 << 16);
+	so->so_lowat = 0;
+#endif
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
 	putnext(q, mp);

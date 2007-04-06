@@ -748,13 +748,13 @@ MODULE_ALIAS("/dev/inet/sctp");
 #define DRV_BANNER	SS__SPLASH
 #endif				/* MODULE */
 
-STATIC struct module_info ss_minfo = {
+STATIC struct module_info ss_rinfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
-	.mi_hiwat = (1 << 18),		/* Hi water mark */
-	.mi_lowat = (1 << 16),		/* Lo water mark */
+	.mi_hiwat = SHEADHIWAT << 2,	/* Hi water mark */
+	.mi_lowat = SHEADLOWAT << 2,	/* Lo water mark */
 };
 
 STATIC struct module_stat ss_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
@@ -771,8 +771,17 @@ STATIC struct qinit ss_rinit = {
 	.qi_srvp = ss_rsrv,		/* Read queue service */
 	.qi_qopen = ss_open,		/* Each open */
 	.qi_qclose = ss_close,		/* Last close */
-	.qi_minfo = &ss_minfo,		/* Information */
+	.qi_minfo = &ss_rinfo,		/* Information */
 	.qi_mstat = &ss_rstat,		/* Statistics */
+};
+
+STATIC struct module_info ss_winfo = {
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
+	.mi_hiwat = SHEADHIWAT + STRHIGH,	/* Hi water mark */
+	.mi_lowat = SHEADLOWAT - STRLOW,	/* Lo water mark */
 };
 
 STATIC streamscall int ss_wput(queue_t *, mblk_t *);
@@ -781,7 +790,7 @@ STATIC streamscall int ss_wsrv(queue_t *);
 STATIC struct qinit ss_winit = {
 	.qi_putp = ss_wput,		/* Write put (msg from above) */
 	.qi_srvp = ss_wsrv,		/* Write queue service */
-	.qi_minfo = &ss_minfo,		/* Information */
+	.qi_minfo = &ss_winfo,		/* Information */
 	.qi_mstat = &ss_wstat,		/* Statistics */
 };
 
@@ -15914,8 +15923,10 @@ ss_rput(queue_t *q, mblk_t *mp)
 #if 0
 	return ss_putq(q, mp, &ss_r_prim);
 #else
-	if (unlikely(!putq(q, mp)))
-		freemsg(mp);
+	if (unlikely(!putq(q, mp))) {
+		mp->b_band = 0;
+		putq(q, mp);
+	}
 	return (0);
 #endif
 }
@@ -15929,7 +15940,15 @@ ss_rsrv(queue_t *q)
 STATIC streamscall __hot_out int
 ss_wput(queue_t *q, mblk_t *mp)
 {
+#if 0
 	return ss_putq(q, mp, &ss_w_prim);
+#else
+	if (unlikely(!putq(q, mp))) {
+		mp->b_band = 0;
+		putq(q, mp);
+	}
+	return (0);
+#endif
 }
 
 STATIC streamscall __hot_out int
