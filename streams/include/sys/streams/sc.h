@@ -130,6 +130,19 @@
   * Requests that the module reset the statistics associated with the requested
   * STREAMS(9) modules and drivers. */
 
+#define SC_IOC_TUNE	((SC_IOC_MAGIC << 8) | 0x03) /**< Set tunables.
+  * Request that the tunables in the associated str_tune structure be set and
+  * current values returned. */
+
+#define SC_SET_MINPSZ	(1<<0)	/**< Set minimum packet size. */
+#define SC_SET_MAXPSZ	(1<<1)	/**< Set maximum packet size. */
+#define SC_SET_HIWAT	(1<<2)	/**< Set high water mark. */
+#define SC_SET_LOWAT	(1<<3)	/**< Set low water mark. */
+#define SC_SET_TRCLEVEL	(1<<4)	/**< Set trace level. */
+#define SC_SET_RDQUEUE	(1<<5)	/**< Set read queues. */
+#define SC_SET_WRQUEUE	(1<<6)	/**< Set write queues. */
+#define SC_SET_LOWERMUX	(1<<7)	/**< Set lower multiplex queues. */
+
 /** @} */
 
 /** @struct sc_module_info include/sys/streams/sc.h <sys/sc.h>
@@ -207,6 +220,24 @@ struct sc_list {
 	struct sc_mlist *sc_mlist;	/**< Pointer to array of #sc_nmods elements. */
 };
 
+/** @struct sc_tune include/sys/streams/sc.h <sys/sc.h>
+  *
+  * STREAMS Tunables Structure.  Provides a specification structure for
+  * setting and querying tunables.  The #sc_minpsz, #sc_maxpz, #sc_hiwat,
+  * #sc_lowat and #sc_trclevel members always return the current value upon
+  * return to the input-output control.
+  */
+struct sc_tune {
+	long sc_addr;			/**< Address of queue. */
+	char sc_name[FMNAMESZ + 1];	/**< Module name. */
+	int sc_flags;			/**< Tunable flags. */
+	ssize_t sc_minpsz;		/**< Min packet size accepted. */
+	ssize_t sc_maxpsz;		/**< Max packet size accepted. */
+	size_t sc_hiwat;		/**< Hi water mark. */
+	size_t sc_lowat;		/**< Lo water mark. */
+	int sc_trclevel;		/**< Trace level. */
+};
+
 #ifdef __KERNEL__
 #ifdef __LP64__
 /* These are just to help the kernel with compatibility functions. */
@@ -243,6 +274,17 @@ struct sc_mlist32 {
 struct sc_list32 {
 	int32_t sc_nmods;
 	u_int32_t sc_mlist;
+};
+
+struct sc_tune32 {
+	int32_t sc_addr;		/**< Address of queue. */
+	char sc_name[FMNAMESZ + 1];	/**< Module name. */
+	int32_t sc_flags;		/**< Tunable flags. */
+	int32_t sc_minpsz;		/**< Min packet size accepted. */
+	int32_t sc_maxpsz;		/**< Max packet size accepted. */
+	u_int32_t sc_hiwat;		/**< Hi water mark. */
+	u_int32_t sc_lowat;		/**< Lo water mark. */
+	int32_t sc_trclevel;		/**< Trace level. */
 };
 #endif				/* __LP64__ */
 #endif				/* __KERNEL__ */
