@@ -157,6 +157,7 @@ int readwrite = 0;
 int fifo = 0;
 int push = 0;
 int blocking = 0;
+int strhold = 0;
 int asynchronous = 0;
 char my_msg[MAXMSGSIZE] = { 0, };
 char modname[256] = "pipemod";
@@ -682,6 +683,11 @@ do_tests(void)
 				perror("ioctl(I_SRDOPT)");
 			goto dead;
 		}
+		if (ioctl(fds[0], I_SWROPT, (SNDPIPE | SNDHOLD)) < 0) {
+			if (verbose)
+				perror("ioctl(I_SWROPT)");
+			goto dead;
+		}
 	}
 #endif
 	if (fcntl(fds[0], F_SETFL, blocking ? 0 : O_NONBLOCK) < 0) {
@@ -704,6 +710,13 @@ do_tests(void)
 		}
 	}
 #endif
+	if (strhold) {
+		if (ioctl(fds[1], I_SWROPT, (SNDPIPE | SNDHOLD)) < 0) {
+			if (verbose)
+				perror("ioctl(I_SWROPT)");
+			goto dead;
+		}
+	}
 	if (fcntl(fds[1], F_SETFL, blocking ? 0 : O_NONBLOCK) < 0) {
 		if (verbose)
 			perror("fcntl");
@@ -854,6 +867,8 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
+    -H, --hold\n\
+        Use SNDHOLD message coallescing\n\
     -a, --async\n\
         Perform asynchronous testing\n\
     -f, --fifo\n\
@@ -897,6 +912,7 @@ main(int argc, char *argv[])
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
 			{"module",	required_argument,	NULL, 'm'},
+			{"hold",	no_argument,		NULL, 'H'},
 			{"async",	no_argument,		NULL, 'a'},
 			{"fifo",	no_argument,		NULL, 'f'},
 			{"push",	required_argument,	NULL, 'p'},
@@ -915,9 +931,9 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "m:afp:bs:rt:i:qvhV?W:", long_options, &option_index);
+		c = getopt_long(argc, argv, "m:Hafp:bs:rt:i:qvhV?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "m:afp:bs:rt:i:qvhV?");
+		c = getopt(argc, argv, "m:Hafp:bs:rt:i:qvhV?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -930,6 +946,9 @@ main(int argc, char *argv[])
 			if (strnlen(optarg, FMNAMESZ + 1) > FMNAMESZ)
 				goto bad_option;
 			strncpy(modname, optarg, FMNAMESZ + 1);
+			break;
+		case 'H':
+			strhold = 1;
 			break;
 		case 'a':
 			asynchronous = 1;
@@ -980,7 +999,6 @@ main(int argc, char *argv[])
 				goto bad_option;
 			verbose = val;
 			break;
-		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
 			help(argc, argv);
 			exit(0);
