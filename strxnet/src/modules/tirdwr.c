@@ -66,7 +66,8 @@
 
 #ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/25 19:02:39 $"
 
-static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/25 19:02:39 $";
+static char const ident[] =
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/25 19:02:39 $";
 
 #include <sys/os7/compat.h>
 
@@ -108,13 +109,23 @@ MODULE_ALIAS("streams-tirdwr");
 #endif
 #endif				/* LINUX */
 
-#ifndef TIRDWR_MOD_NAME
-#define TIRDWR_MOD_NAME		"tirdwr"
-#endif				/* TIRDWR_MOD_NAME */
+#ifndef CONFIG_STREAMS_TIRDWR_NAME
+//#define CONFIG_STREAMS_TIRDWR_NAME "timod"
+#error "CONFIG_STREAMS_TIRDWR_NAME must be defined."
+#endif
+#ifndef CONFIG_STREAMS_TIRDWR_MODID
+//#define CONFIG_STREAMS_TIRDWR_MODID "5060"
+#error "CONFIG_STREAMS_TIRDWR_MODID must be defined."
+#endif
 
-#ifndef TIRDWR_MOD_ID
-#define TIRDWR_MOD_ID		0
-#endif				/* TIRDWR_MOD_ID */
+modID_t modid = CONFIG_STREAMS_TIRDWR_MODID;
+
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0444);
+#endif
+MODULE_PARM_DESC(modid, "Module ID for TIRDWR. (0 for allocation.)");
 
 /*
  *  =========================================================================
@@ -124,25 +135,19 @@ MODULE_ALIAS("streams-tirdwr");
  *  =========================================================================
  */
 
-#define MOD_ID		TIRDWR_MOD_ID
-#define MOD_NAME	TIRDWR_MOD_NAME
-#ifdef MODULE
-#define MOD_BANNER	TIRDWR_BANNER
-#else				/* MODULE */
-#define MOD_BANNER	TIRDWR_SPLASH
-#endif				/* MODULE */
+#define MOD_NAME	CONFIG_STREAMS_TIRDWR_NAME
 
 static struct module_info tirdwr_minfo = {
-	.mi_idnum = MOD_ID,		/* Module ID number */
-	.mi_idname = MOD_NAME,		/* Module name */
+	.mi_idnum = CONFIG_STREAMS_TIRDWR_MODID,	/* Module ID number */
+	.mi_idname = CONFIG_STREAMS_TIRDWR_NAME,	/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = 1,			/* Hi water mark */
+	.mi_hiwat = 0,			/* Hi water mark */
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
-static struct module_stat tirdwr_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat tirdwr_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat tirdwr_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat tirdwr_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 static streamscall int tirdwr_open(queue_t *, dev_t *, int, int, cred_t *);
 static streamscall int tirdwr_close(queue_t *, int, cred_t *);
@@ -829,15 +834,6 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
  *  -------------------------------------------------------------------------
  */
 
-unsigned short modid = MOD_ID;
-
-#ifndef module_param
-MODULE_PARM(modid, "h");
-#else
-module_param(modid, ushort, 0444);
-#endif
-MODULE_PARM_DESC(modid, "Module ID for the TIMOD module. (0 for allocation.)");
-
 /*
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -910,7 +906,11 @@ tirdwrinit(void)
 {
 	int err;
 
-	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+#ifdef CONFIG_STREAMS_TIRDWR_MODULE
+	cmn_err(CE_NOTE, TIRDWR_BANNER);	/* banner message */
+#else
+	cmn_err(CE_NOTE, TIRDWR_SPLASH);	/* banner message */
+#endif
 	if ((err = tirdwr_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
 		return (err);
