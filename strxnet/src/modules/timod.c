@@ -146,13 +146,23 @@ MODULE_ALIAS("streams-timod");
 #endif
 #endif				/* LINUX */
 
-#ifndef TIMOD_MOD_NAME
-#define TIMOD_MOD_NAME		"timod"
+#ifndef CONFIG_STREAMS_TIMOD_NAME
+//#define CONFIG_STREAMS_TIMOD_NAME "timod"
+#error "CONFIG_STREAMS_TIMOD_NAME must be defined."
+#endif
+#ifndef CONFIG_STREAMS_TIMOD_MODID
+//#define CONFIG_STREAMS_TIMOD_MODID "5060"
+#error "CONFIG_STREAMS_TIMOD_MODID must be defined."
 #endif
 
-#ifndef TIMOD_MOD_ID
-#define TIMOD_MOD_ID		0
+modID_t modid = CONFIG_STREAMS_TIMOD_MODID;
+
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0444);
 #endif
+MODULE_PARM_DESC(modid, "Module ID for TIMOD. (0 for allocation.)");
 
 /*
  *  =========================================================================
@@ -162,25 +172,19 @@ MODULE_ALIAS("streams-timod");
  *  =========================================================================
  */
 
-#define MOD_ID		TIMOD_MOD_ID
-#define MOD_NAME	TIMOD_MOD_NAME
-#ifdef MODULE
-#define MOD_BANNER	TIMOD_BANNER
-#else				/* MODULE */
-#define MOD_BANNER	TIMOD_SPLASH
-#endif				/* MODULE */
+#define MOD_NAME	CONFIG_STREAMS_TIMOD_NAME
 
 static struct module_info timod_minfo = {
-	.mi_idnum = MOD_ID,		/* Module ID number */
-	.mi_idname = MOD_NAME,		/* Module name */
+	.mi_idnum = CONFIG_STREAMS_TIMOD_MODID,	/* Module ID number */
+	.mi_idname = CONFIG_STREAMS_TIMOD_NAME,	/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = 1,			/* Hi water mark */
+	.mi_hiwat = 0,			/* Hi water mark */
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
-static struct module_stat timod_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat timod_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat timod_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat timod_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 static streamscall int timod_open(queue_t *, dev_t *, int, int, cred_t *);
 static streamscall int timod_close(queue_t *, int, cred_t *);
@@ -1165,15 +1169,6 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
  *  -------------------------------------------------------------------------
  */
 
-unsigned short modid = MOD_ID;
-
-#ifndef module_param
-MODULE_PARM(modid, "h");
-#else
-module_param(modid, ushort, 0444);
-#endif
-MODULE_PARM_DESC(modid, "Module ID for the TIMOD module. (0 for allocation.)");
-
 /*
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1310,7 +1305,11 @@ timodinit(void)
 {
 	int err;
 
-	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+#ifdef CONFIG_STREAMS_TIMOD_MODULE
+	cmn_err(CE_NOTE, TIMOD_BANNER);	/* banner message */
+#else
+	cmn_err(CE_NOTE, TIMOD_SPLASH);	/* banner message */
+#endif
 	if ((err = timod_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
 		return (err);
