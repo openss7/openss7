@@ -357,7 +357,11 @@ int test_fd[3] = { 0, 0, 0 };
 
 static int test_duration = TEST_DURATION;	/* wait on other side */
 
+#if 1
 #define INVALID_ADDRESS ((void *)(long)(-1))
+#else
+#define INVALID_ADDRESS ((void *)((char *)sbrk(0) + 4096))
+#endif
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
