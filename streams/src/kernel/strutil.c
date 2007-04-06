@@ -2871,10 +2871,6 @@ qprocsoff(queue_t *q)
 #endif
 	assert(sd);
 
-	if (wq == sd->sd_wq)
-		/* Never qprocsoff a Stream head. */
-		return;
-
 	/* only one qprocsoff() happens at a time */
 	if (!test_bit(QPROCS_BIT, &rq->q_flag)) {
 		unsigned long pl, pl2 = 0;
@@ -2905,6 +2901,10 @@ qprocsoff(queue_t *q)
 			for (qb = wq->q_bandp; qb; qb = qb->qb_next)
 				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
 		}
+
+		if (wq == sd->sd_wq)
+			/* Never half-delete a Stream head. */
+			goto stream_head;
 
 		_ptrace(("initial half-delete of stream %p queue pair %p\n", sd, q));
 
@@ -2948,6 +2948,8 @@ qprocsoff(queue_t *q)
 
 		if (sd2 && sd2 > sd)
 			pwunlock(sd2, pl2);
+
+	      stream_head:
 
 		pwunlock(sd, pl);
 

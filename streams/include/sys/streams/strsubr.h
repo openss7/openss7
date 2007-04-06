@@ -241,6 +241,7 @@ enum {
 
 /* stream head private structure */
 struct stdata {
+	volatile unsigned long sd_flag;	/* stream head state */
 	queue_t *sd_rq;			/* rd queue for stream head */
 	queue_t *sd_wq;			/* wr queue for stream head */
 	dev_t sd_dev;			/* device number of driver */
@@ -250,7 +251,10 @@ struct stdata {
 	struct inode *sd_inode;		/* back pointer to inode */
 //      struct dentry *sd_dentry;       /* back pointer to dentry */
 	struct file *sd_file;		/* back pointer to (current) file */
-	volatile unsigned long sd_flag;	/* stream head state */
+	rwlock_t sd_lock;		/* structure lock for this stream */
+	rwlock_t sd_plumb;		/* plumbing and procedure lock for this stream */
+	rwlock_t sd_freeze;		/* lock for freezing streams */
+	struct task_struct *sd_freezer;	/* thread holding freeze lock */
 	int sd_rdopt;			/* read options */
 	int sd_wropt;			/* write options */
 	int sd_eropt;			/* error options */
@@ -284,13 +288,10 @@ struct stdata {
 	wait_queue_head_t sd_owaitq;	/* waiters on open bit */
 //      mblk_t *sd_mark;                /* pointer to marked message */
 	ulong sd_closetime;		/* queue drain wait time on close */
-	ulong sd_rtime;			/* time to forward held message */
 	ulong sd_ioctime;		/* time to wait for ioctl() acknowledgement */
+	ulong sd_rtime;			/* time to forward held message */
+	struct stdata *sd_scanq;	/* next on scan list */
 //      klock_t sd_klock;               /* lock for queues under this stream */
-	rwlock_t sd_lock;		/* structure lock for this stream */
-	rwlock_t sd_plumb;		/* plumbing and procedure lock for this stream */
-	rwlock_t sd_freeze;		/* lock for freezing streams */
-	struct task_struct *sd_freezer;	/* thread holding freeze lock */
 	struct cdevsw *sd_cdevsw;	/* device entry */
 	struct list_head sd_list;	/* list against device */
 //      struct semaphore sd_mutex;      /* mutex for system calls */
@@ -465,8 +466,8 @@ struct strthread {
 	struct strevent **strtimout_tail;	/* tail of timeouts pending exec */
 	struct strevent *strevents_head;	/* head of strevent pending exec */
 	struct strevent **strevents_tail;	/* tail of strevent pending exec */
-	queue_t *scanqhead;		/* head of STREAMS scan queue */
-	queue_t **scanqtail;		/* tail of STREAMS scan queue */
+	struct stdata *scanqhead;		/* head of STREAMS scan queue */
+	struct stdata **scanqtail;		/* tail of STREAMS scan queue */
 	mblk_t *freemsg_head;		/* head of flushed messages to free */
 	mblk_t **freemsg_tail;		/* tail of flushed messages to free */
 } __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
@@ -526,8 +527,8 @@ struct queinfo {
 #endif
 };
 
-#define rqstream(__rq) (((struct queinfo *)(__rq))->qu_str)
-#define wqstream(__wq) (((struct queinfo *)(_RD(__wq)))->qu_str)
+#define rqstream(__rq) (*(struct stdata * volatile *)&(((struct queinfo *)(__rq))->qu_str))
+#define wqstream(__wq) (*(struct stdata * volatile *)&(((struct queinfo *)(_RD(__wq)))->qu_str))
 #define qstream(__q) rqstream(RD(__q))
 
 enum {
@@ -654,7 +655,7 @@ __STREAMS_EXTERN toid_t __timeout(queue_t *q, timo_fcn_t *timo_fcn, caddr_t arg,
 				  unsigned long pl, int cpu);
 
 __STREAMS_EXTERN int setsq(queue_t *q, struct fmodsw *fmod);
-__STREAMS_EXTERN void qscan(queue_t *q);
+__STREAMS_EXTERN void qscan(struct stdata *sd);
 
 /* from strlookup.c */
 extern struct list_head cdevsw_list;	/* Drivers go here */
