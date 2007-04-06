@@ -359,17 +359,17 @@ MODULE_ALIAS("/dev/rawip2");
 #define DRV_BANNER	RAW_SPLASH
 #endif				/* MODULE */
 
-STATIC struct module_info raw_minfo = {
+STATIC struct module_info raw_rinfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
-	.mi_hiwat = (1 << 18),		/* Hi water mark */
-	.mi_lowat = (1 << 16),		/* Lo water mark */
+	.mi_hiwat = SHEADHIWAT << 2,	/* Hi water mark */
+	.mi_lowat = SHEADLOWAT << 2,	/* Lo water mark */
 };
 
-STATIC struct module_stat raw_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-STATIC struct module_stat raw_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat raw_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat raw_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 /* Upper multiplex is a T provider following the TPI. */
 
@@ -384,8 +384,17 @@ STATIC struct qinit raw_rinit = {
 	.qi_srvp = tp_rsrv,		/* Read service procedure */
 	.qi_qopen = raw_qopen,		/* Each open */
 	.qi_qclose = raw_qclose,	/* Last close */
-	.qi_minfo = &raw_minfo,		/* Module information */
+	.qi_minfo = &raw_rinfo,		/* Module information */
 	.qi_mstat = &raw_rstat,		/* Module statistics */
+};
+
+STATIC struct module_info raw_winfo = {
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
+	.mi_hiwat = SHEADHIWAT + STRHIGH,	/* Hi water mark */
+	.mi_lowat = SHEADLOWAT - STRLOW,	/* Lo water mark */
 };
 
 streamscall int tp_wput(queue_t *, mblk_t *);
@@ -394,7 +403,7 @@ streamscall int tp_wsrv(queue_t *);
 STATIC struct qinit raw_winit = {
 	.qi_putp = tp_wput,		/* Write put procedure (message from above) */
 	.qi_srvp = tp_wsrv,		/* Write service procedure */
-	.qi_minfo = &raw_minfo,		/* Module information */
+	.qi_minfo = &raw_winfo,		/* Module information */
 	.qi_mstat = &raw_wstat,		/* Module statistics */
 };
 
@@ -4817,7 +4826,7 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 		if ((t_scalar_t) (signed char) OPT_buffer->ip.ttl < 1)
 			goto error;
 #if 0
-		if ((t_scalar_t) (signed char)OPT_buffer->ip.ttl > 127)
+		if ((t_scalar_t) (signed char) OPT_buffer->ip.ttl > 127)
 			goto error;
 #endif
 	} else {
@@ -8061,8 +8070,7 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
-	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY))))
-	{
+	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
 		raw_rstat.ms_acnt++;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
@@ -8110,8 +8118,7 @@ tp_rsrv(queue_t *q)
 streamscall __hot_in int
 tp_wput(queue_t *q, mblk_t *mp)
 {
-	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY))))
-	{
+	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
 		raw_wstat.ms_acnt++;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
@@ -8927,13 +8934,15 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	so->so_flags |= SO_WROFF;
 	so->so_wroff = MAX_HEADER;	/* this is too big */
 	so->so_flags |= SO_MINPSZ;
-	so->so_minpsz = raw_minfo.mi_minpsz;
+	so->so_minpsz = raw_winfo.mi_minpsz;
 	so->so_flags |= SO_MAXPSZ;
-	so->so_maxpsz = raw_minfo.mi_maxpsz;
+	so->so_maxpsz = raw_winfo.mi_maxpsz;
+#if 1
 	so->so_flags |= SO_HIWAT;
-	so->so_hiwat = raw_minfo.mi_hiwat;
+	so->so_hiwat = SHEADHIWAT << 3;
 	so->so_flags |= SO_LOWAT;
-	so->so_lowat = raw_minfo.mi_lowat;
+	so->so_lowat = SHEADLOWAT << 3;
+#endif
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
 	putnext(q, mp);
