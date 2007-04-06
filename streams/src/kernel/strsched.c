@@ -301,7 +301,7 @@ STATIC streams_fastcall void
 strblocking(void)
 {
 	/* before every system call return or sleep -- saves a context switch */
-	if (likely(((volatile unsigned long)this_thread->flags & (QRUNFLAGS)) != 0))
+	if (likely(((volatile unsigned long) this_thread->flags & (QRUNFLAGS)) != 0))
 		runqueues();
 }
 #endif
@@ -2335,6 +2335,7 @@ putp_fast(queue_t *q, mblk_t *mp)
 	dassert(q->q_putp);
 
 #ifdef CONFIG_SMP
+	dassert(qstream(q));
 	/* spin here if Stream frozen by other than caller */
 	freeze_barrier(q);
 
@@ -2343,7 +2344,6 @@ putp_fast(queue_t *q, mblk_t *mp)
 	   matter) on the stack.  Note that these are a no-op on UP. */
 	/* Note that this locking is only really required on a Stream end. All other queues are
 	   referenced from within the STREAMS framework. */
-	dassert(qstream(q));
 	if (unlikely(backq(q) == NULL))
 		prlock(qstream(q));
 
@@ -2429,23 +2429,22 @@ putp(queue_t *q, mblk_t *mp)
 STATIC streams_inline streams_fastcall __hot_in void
 srvp_fast(queue_t *q)
 {
-#ifdef CONFIG_SMP
-	struct stdata *sd;
-#endif
 	dassert(q);
 
-#ifdef CONFIG_SMP
-	sd = qstream(q);
-	__assert(sd);
-	/* spin here if Stream frozen by other than caller */
-	freeze_barrier(q);
-
-	prlock(sd);
-#endif
-
+	/* Check if enable bit cleared first (done in qprocsoff for Stream head that might later
+	   have the stream head removed before the service procedure is fully invoked. */
 	if (likely(test_and_clear_bit(QENAB_BIT, &q->q_flag) != 0)) {
-
 #ifdef CONFIG_SMP
+		struct stdata *sd;
+
+		sd = qstream(q);
+		__assert(sd);
+
+		/* spin here if Stream frozen by other than caller */
+		freeze_barrier(q);
+
+		prlock(sd);
+
 		/* check if procs are turned off */
 		if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
 #endif
@@ -2465,10 +2464,10 @@ srvp_fast(queue_t *q)
 			clear_bit(QSVCBUSY_BIT, &q->q_flag);
 			qwakeup(q);
 		}
-	}
 #ifdef CONFIG_SMP
-	prunlock(sd);
+		prunlock(sd);
 #endif
+	}
 	if (q)
 		_ctrace(qput(&q));	/* cancel qget from qschedule */
 }
@@ -4244,24 +4243,29 @@ scan_timeout_function(unsigned long arg)
 struct timer_list scan_timer;
 
 streams_fastcall __unlikely void
-qscan(queue_t *q)
+qscan(struct stdata *sd)
 {
-	struct strthread *t = this_thread;
+	struct strthread *t;
 
-	prefetchw(q);
+	prefetchw(sd);
+	t = this_thread;
 	prefetchw(t);
 
-	/* put ourselves on scan list */
-	q->q_link = NULL;
-	{
-		unsigned long flags;
+	if (!test_and_set_bit(QHLIST_BIT, &sd->sd_wq->q_flag)) {
+		/* put ourselves on scan list */
+		sd->sd_rtime = jiffies + sysctl_str_rtime;
+		sd->sd_scanq = NULL;
+		{
+			unsigned long flags;
 
-		streams_local_save(flags);
-		*XCHG(&t->scanqtail, &q->q_link) = qget(q);
-		streams_local_restore(flags);
+			streams_local_save(flags);
+			*XCHG(&t->scanqtail, &sd->sd_scanq) = sd_get(sd);
+			streams_local_restore(flags);
+		}
+		/* cannot tell if timer is running */
+		if (!test_and_set_bit(scanqflag, &t->flags))
+			__raise_streams();
 	}
-	if (!test_and_set_bit(scanqflag, &t->flags))
-		__raise_streams();
 }
 
 EXPORT_SYMBOL_GPL(qscan);	/* for stream head in include/sys/streams/strsubr.h */
@@ -4270,50 +4274,56 @@ EXPORT_SYMBOL_GPL(qscan);	/* for stream head in include/sys/streams/strsubr.h */
  *  scanqueues:	- scan held queues
  *  @t:		STREAMS execution thread
  *
- *  Process all outstanding scan queues in the order in which they were listed for service.
+ *  Process all outstanding scan Stream heads in the order in which they were listed for service.
+ *  Note that the only Stream heads on this list are Stream heads with the STRHOLD feature.
  *
- *  Note that the only queues on this list are stream head write queues.
+ *  It works like this: Stream heads are only added to the end of the list, in timed order.  When we
+ *  scan the list, we remove the entire list to process them.  If the head of the list has expired,
+ *  it is removed and its write queue scheduled.  If a Stream head in the list has not expired, then
+ *  all of the 
  */
 streams_noinline streams_fastcall __unlikely void
 scanqueues(struct strthread *t)
 {
 	do {
-		struct queue *q, *q_link;
+		struct stdata *sd, *sd_scanq;
 		unsigned long flags;
 
 		prefetchw(t);
 		streams_local_save(flags);
 		clear_bit(scanqflag, &t->flags);
-		q_link = XCHG(&t->scanqhead, NULL);
+		sd_scanq = XCHG(&t->scanqhead, NULL);
 		t->scanqtail = &t->scanqhead;
 		streams_local_restore(flags);
-		if (likely(q_link != NULL)) {
-			q = q_link;
+		if (likely(sd_scanq != NULL)) {
+			sd = sd_scanq;
 			do {
-				struct stdata *sd = qstream(q);
-				mblk_t *b;
+				long interval;
 
-				/* FIXME: sd_rtime doesn't work this way. */
-				if ((sd->sd_rtime > jiffies)) {
-					mod_timer(&scan_timer, sd->sd_rtime);
+				sd_scanq = XCHG(&sd->sd_scanq, NULL);
+				if (likely((interval = sd->sd_rtime - jiffies) > 0)) {
+					/* more to do in the future */
+					mod_timer(&scan_timer, max(interval, sysctl_str_rtime));
 					break;
+				} else {
+					queue_t *q = sd->sd_wq;
+
+					clear_bit(QHLIST_BIT, &q->q_flag);
+					/* let write service procedure do the right thing */
+					qenable(q);
 				}
-				/* FIXME: what is all this about? */
-				if (&q->q_link == t->scanqtail) {
-					t->scanqtail = &t->scanqhead;
-					q->q_link = NULL;
-					if ((q_link = XCHG(&q->q_link, NULL))) {
-						t->scanqhead = q_link;
-						q_link = NULL;
-					}
-				} else
-					q_link = XCHG(&q->q_link, NULL);
-				/* let the message go */
-				if ((b = getq(q)))
-					putnext(q, b);
-			} while (unlikely((q = q_link) != NULL));
-			if (q)
-				t->scanqhead = q;
+			} while (unlikely((sd = sd_scanq) != NULL));
+			if (sd) {
+				struct stdata **sdp;
+
+				/* add remaining list back to scanlist */
+				sd->sd_scanq = sd_scanq;
+				/* find tail */
+				for (sdp = &sd->sd_scanq; (*sdp); sdp = &(*sdp)->sd_scanq) ;
+				streams_local_save(flags);
+				*(t->scanqtail = sdp) = XCHG(&t->scanqhead, sd);
+				streams_local_restore(flags);
+			}
 		}
 	} while (unlikely(test_bit(scanqflag, &t->flags) != 0));
 }
@@ -4585,8 +4595,7 @@ queuerun(struct strthread *t)
 		if (likely(q_link != NULL)) {
 			q = q_link;
 			do {
-				q_link = q->q_link;
-				q->q_link = NULL;
+				q_link = XCHG(&q->q_link, NULL);
 #ifdef CONFIG_STREAMS_SYNCQS
 				qsrvp(q);
 #else
@@ -4712,7 +4721,7 @@ __runqueues(struct softirq_action *unused)
 
 #if 0
 	/* checked before this function is called */
-	if (unlikely(!((volatile unsigned long)t->flags & (QRUNFLAGS))))	/* PROFILED */
+	if (unlikely(!((volatile unsigned long) t->flags & (QRUNFLAGS))))	/* PROFILED */
 		goto done;
 #endif
 
@@ -4726,16 +4735,17 @@ __runqueues(struct softirq_action *unused)
 		/* run queue service procedures if necessary */
 		if (likely(test_bit(qrunflag, &t->flags) != 0))	/* PROFILED */
 			_ctrace(queuerun(t));
-		if (unlikely(((volatile unsigned long)t->flags & (FLUSHWORK | FREEBLKS | STRMFUNCS | QSYNCFLAG |
-					  STRTIMOUT | SCANQFLAG | STREVENTS | STRBCFLAG |
-					  STRBCWAIT)) != 0))
+		if (unlikely
+		    (((volatile unsigned long) t->
+		      flags & (FLUSHWORK | FREEBLKS | STRMFUNCS | QSYNCFLAG | STRTIMOUT | SCANQFLAG
+			       | STREVENTS | STRBCFLAG | STRBCWAIT)) != 0))
 			__runqueues_slow(t);
 		clear_bit(qwantrun, &t->flags);
-	} while (unlikely(((volatile unsigned long)t->flags & (QRUNFLAGS)) != 0 && runs < 10));
+	} while (unlikely(((volatile unsigned long) t->flags & (QRUNFLAGS)) != 0 && runs < 10));
 
 	if (runs >= 10)
 		printd(("CPU#%d: STREAMS scheduler looping: flags = 0x%08lx\n", smp_processor_id(),
-			(volatile unsigned long)t->flags));
+			(volatile unsigned long) t->flags));
 
 	atomic_dec(&t->lock);
 
@@ -4798,9 +4808,9 @@ clear_shinfo(struct shinfo *sh)
 	sd->sd_wropt = 0;
 	sd->sd_eropt = RERRNORM | WERRNORM;
 	sd->sd_closetime = sysctl_str_cltime;	/* typically 15 seconds (saved in ticks) */
-	sd->sd_rtime = sysctl_str_rtime;	/* typically 10 milliseconds (saved in ticks) */
 	sd->sd_ioctime = sysctl_str_ioctime;	/* default for ioctls, typically 15 seconds (saved
 						   in ticks) */
+	sd->sd_rtime = sysctl_str_rtime;	/* typically 10 milliseconds (saved in ticks) */
 //      init_waitqueue_head(&sd->sd_waitq);     /* waiters */
 	init_waitqueue_head(&sd->sd_rwaitq);	/* waiters on read */
 	init_waitqueue_head(&sd->sd_wwaitq);	/* waiters on write */
@@ -4899,7 +4909,7 @@ sd_free(struct stdata *sd)
 	/* initial qget is balanced in qdetach()/qdelete() */
 	__freestr(sd);
 }
-BIG_STATIC_INLINE_STH streams_fastcall __hot struct stdata *
+BIG_STATIC_STH streams_fastcall __hot struct stdata *
 sd_get(struct stdata *sd)
 {
 	if (sd) {
@@ -5120,7 +5130,7 @@ kstreamd(void *__bind_cpu)
 		preempt_disable();
 		/* Yes, sometimes kstreamd gets woken up for nothing (or, gets woken up and then
 		   the process runs queues in process context. */
-		if (likely(((volatile unsigned long)t->flags & (QRUNFLAGS)) == 0)) {
+		if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0)) {
 		      reschedule:
 			preempt_enable_no_resched();
 			schedule();
@@ -5128,7 +5138,7 @@ kstreamd(void *__bind_cpu)
 			if (unlikely(kthread_should_stop()))
 				break;
 			preempt_disable();
-			if (unlikely(((volatile unsigned long)t->flags & (QRUNFLAGS)) == 0)) {
+			if (unlikely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0)) {
 				printd(("CPU#%d: kstreamd: false wakeup, flags = 0x%08x\n",
 					(int) (long) __bind_cpu, (volatile int) t->flags));
 				set_current_state(TASK_INTERRUPTIBLE);
@@ -5392,14 +5402,14 @@ kstreamd(void *__bind_cpu)
 			do_exit(0);
 		/* Yes, sometimes kstreamd gets woken up for nothing (or, gets woken up and then
 		   the process runs queues in process context. */
-		if (likely(((volatile unsigned long)t->flags & (QRUNFLAGS)) == 0)) {
+		if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0)) {
 		      reschedule:
 			schedule();
 			prefetchw(t);
 			if (unlikely(signal_pending(current)
 				     && sigismember(&current->pending.signal, SIGKILL)))
 				break;
-			if (unlikely(((volatile unsigned long)t->flags & (QRUNFLAGS)) == 0)) {
+			if (unlikely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0)) {
 				printd(("CPU#%d: kstreamd: false wakeup\n",
 					(int) (long) __bind_cpu));
 				set_current_state(TASK_INTERRUPTIBLE);

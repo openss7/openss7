@@ -247,6 +247,8 @@ static char const ident[] =
 
 #include <net/checksum.h>	/* for various checksums */
 
+#include <asm/uaccess.h>
+
 #ifndef __user
 #define __user
 #endif
@@ -720,7 +722,7 @@ strschedule(void)
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
-#if 1
+#if 0
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -744,7 +746,7 @@ strschedule_poll(void)
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
-#if 1
+#if 0
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -768,7 +770,7 @@ strschedule_ioctl(void)
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
-#if 1
+#if 0
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -792,7 +794,7 @@ strschedule_write(void)
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
-#if 1
+#if 0
 	{
 		struct strthread *t = this_thread;
 
@@ -818,7 +820,7 @@ strschedule_read(void)
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
-#if 1
+#if 0
 	{
 		struct strthread *t = this_thread;
 
@@ -841,12 +843,16 @@ strput(struct stdata *sd, mblk_t *mp)
 		_trace();
 		return;
 	}
-	_ctrace(put(sd->sd_wq, mp));
+	_ctrace(put(sd->sd_wq, mp)); /* calls strwput */
 	_trace();
 	return;
 }
 
-STATIC streams_inline streams_fastcall __hot_in int
+#ifndef __must_check
+#define __must_check
+#endif
+
+STATIC streams_inline streams_fastcall __hot_in __must_check int
 strcopyout(const void *from, void __user *to, size_t len)
 {
 #if defined _DEBUG
@@ -867,11 +873,17 @@ strcopyout(const void *from, void __user *to, size_t len)
 	return (err);
 #endif
 #else
-	return copyout(from, to, len);
+#if 0
+	if (likely(access_ok(VERIFY_WRITE, to, len) != 0))
+#endif
+		return copyout(from, to, len);
+#if 0
+	return (-EFAULT);
+#endif
 #endif
 }
 
-STATIC streams_inline streams_fastcall __hot_out int
+STATIC streams_inline streams_fastcall __hot_out __must_check int
 strcopyin(const void __user *from, void *to, size_t len)
 {
 #if defined _DEBUG
@@ -892,7 +904,13 @@ strcopyin(const void __user *from, void *to, size_t len)
 	return (err);
 #endif
 #else
-	return copyin(from, to, len);
+#if 0
+	if (likely(access_ok(VERIFY_READ, from, len) != 0))
+#endif
+		return copyin(from, to, len);
+#if 0
+	return (-EFAULT);
+#endif
 #endif
 }
 
@@ -1362,6 +1380,7 @@ alloc_proto(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *d
 			mp = linkmsg(mp, dp);
 			/* STRHOLD feature in strwput uses this */
 			if (likely(clen < 0))	/* PROFILED */
+				/* do not coallesce M_DATA written with putmsg */
 				dp->b_flag |= MSGDELIM;
 		} else {
 			if (unlikely(mp != NULL))
@@ -5195,56 +5214,77 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
  *
  *  DESCRIPTION:  Performs the message coallescing feature of SVR 4.  If we can fit the write into
  *  an existing buffer on sd_wq, then add it to the end and let it go.  If there is one there and we
- *  can't fit our write into it, we still have to let it go.
+ *  can't fit our write into it, we still have to let it go (but that will by done by strwput()
+ *  later).
+ *
+ *  A little variation on a theme: more like Nagle.  Do not wait for downstream congestion first.
+ *  If, after coallescing the writes, we are downstream flow controlled, there is no reason not to
+ *  coallesce another write into the same block.  That is, the block can be released out of the
+ *  write service procedure as normal (that is, if we had a normal write service procedure).  The
+ *  write service procedure will be invoked when the scanqhead timer goes off (via qschedule()) or
+ *  the write queue is backenabled due to downstream flow control subsiding (via qbackenable()).
  *
  *  RETURN: Returns a (negative) error number, zero (0) when there was nothing written, otherwise a
  *  postive integer indicated the amount of data written (which should always be nbytes).
  *
  *  LOCKING: Called with a Stream head read lock.  Release it before sleeping.
  */
-streams_noinline streams_fastcall __unlikely ssize_t
+streams_noinline streams_fastcall __hot_write ssize_t
 strhold(struct stdata *sd, const int f_flags, const char *buf, ssize_t nbytes)
 {
-	char fastbuf[FASTBUF];
-	ssize_t err;
+	ssize_t rtn = 0;
+	queue_t *q;
 
-	if (!sd->sd_wq->q_first)
-		return (0);
+	if (nbytes != 0 && nbytes <= (FASTBUF >> 1) && (q = sd->sd_wq)->q_first) {
+		char fastbuf[FASTBUF >> 1];
 
-#if 0
-	if (nbytes == 0 || nbytes >= FASTBUF || test_bit(STRDELIM_BIT, &sd->sd_flag)
-	    || sd->sd_wroff > 0 || sd->sd_wrpad > 0)
-#else
-	if (nbytes == 0 || nbytes >= FASTBUF || test_bit(STRDELIM_BIT, &sd->sd_flag))
-#endif
-		nbytes = 0;
+		srunlock(sd);
+		/* copyin can sleep - so do this outside locks */
+		rtn = strcopyin(buf, fastbuf, nbytes);
+		srlock(sd);
 
-	srunlock(sd);
-
-	/* copyin can sleep - so do this outside locks */
-	if (nbytes && (err = strcopyin(buf, fastbuf, nbytes)))
-		return (err);
-
-	srlock(sd);
-
-	if ((err = straccess(sd, FWRITE | FNDELAY)) == 0) {
-
-		if ((err = strwaitband(sd, f_flags, 0, MSG_BAND)) == 0) {
+		if (rtn == 0 && (rtn = straccess(sd, FWRITE | FNDELAY)) == 0) {
+			unsigned long flags;
+			int blocked;
 			mblk_t *b;
 
-			if ((b = getq(sd->sd_wq))) {
-				if (nbytes && b->b_datap->db_lim > b->b_wptr + nbytes) {
+			/* have read lock and acess was ok */
+			blocked = bcanputnext(q, 0);
+
+			qwlock(q, flags);	/* before we mess with b */
+			if ((b = q->q_first) && !(b->b_flag & MSGDELIM)) {
+				if (b->b_datap->db_lim >= b->b_wptr + nbytes) {
 					bcopy(fastbuf, b->b_wptr, nbytes);
 					b->b_wptr += nbytes;
-					err = nbytes;
+					if (unlikely(test_bit(STRDELIM_BIT, &sd->sd_flag)))
+						b->b_flag |= MSGDELIM;
+					rtn = nbytes;
+					if (blocked) {
+						/* leave it on the queue */
+						/* fix up queue counts - from __putq */
+						if ((q->q_count += nbytes) > q->q_hiwat)
+							set_bit(QFULL_BIT, &q->q_flag);
+						b = NULL;
+					} else {
+						/* take it off the queue - from __getq */
+						dassert(b->b_next == NULL);
+						/* optimized for 1 message on queue */
+						q->q_first = NULL;
+						q->q_last = NULL;
+						q->q_msgs = 0;
+						q->q_count = 0;
+						clear_bit(QFULL_BIT, &q->q_flag);
+						clear_bit(QWANTR_BIT, &q->q_flag);
+					}
 				}
-				/* write locked and verified */
-				putnext(sd->sd_wq, b);
 			}
+			qwunlock(q, flags);
+
+			if (b)
+				putnext(q, b);
 		}
 	}
-
-	return (err);
+	return (rtn);
 }
 
 /**
@@ -5301,9 +5341,10 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 	if (unlikely(q_maxpsz == 0 && !(sd->sd_wropt & SNDZERO)))	/* PROFILED */
 		goto error;	/* but err is zero */
 
-	if (unlikely(test_bit(STRHOLD_BIT, &sd->sd_flag) != 0)) {	/* PROFILED */
+	if (unlikely(test_bit(STRHOLD_BIT, &sd->sd_flag) != 0) &&	/* PROFILED */
+	    unlikely(test_bit(QHLIST_BIT, &sd->sd_wq->q_flag) != 0)) {
 		if ((err = strhold(sd, file->f_flags, buf, nbytes)) != 0)
-			goto error;
+			goto error;	/* but not always an error */
 	}
 	/* first access check is with FNDELAY to generate pipe signals */
 	access = (FWRITE) | (FNDELAY);
@@ -6137,6 +6178,7 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 
 			ctl.len = 0;
 			dat.len = 0;
+			err = 0;
 			/* fall through */
 		case 0:
 		{
@@ -6151,7 +6193,8 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 				if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))
 					continue;
 				_ptrace(("Copying out cntl part %d bytes\n", blen));
-				strcopyout(b->b_rptr, ctl.buf + len, blen);
+				if (strcopyout(b->b_rptr, ctl.buf + len, blen))
+					err = -EFAULT;
 				len += blen;
 			}
 			/* copyout data part */
@@ -6162,9 +6205,12 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 				if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))
 					continue;
 				_ptrace(("Copying out data part %d bytes\n", blen));
-				strcopyout(b->b_rptr, dat.buf + len, blen);
+				if (strcopyout(b->b_rptr, dat.buf + len, blen))
+					err = -EFAULT;
 				len += blen;
 			}
+			if (err)
+				return (err);
 			/* copy out return values */
 			if (likely(ctlp != NULL))
 				put_user(ctl.len, &ctlp->len);
@@ -7156,7 +7202,7 @@ str_i_getsig(const struct file *file, struct stdata *sd, unsigned long arg)
 	int flags;
 	int err;
 
-#if 0
+#if 1
 	/* let copyout do the work */
 	if (unlikely(!access_ok(VERIFY_WRITE, (void *) arg, sizeof(flags)))) {
 		_ptrace(("Error path taken!\n"));
@@ -10614,11 +10660,11 @@ EXPORT_SYMBOL(strm_f_ops);
  *  @q: pointer to the queue to which to put the message
  *  @mp: the message to put on the queue
  *
- *  Ala SVR4 se do not have a real write side service procedure and we do not normally put messages
+ *  Ala SVR4 we do not have a real write side service procedure and we do not normally put messages
  *  to the write side queue for the stream head.  The only time that we put a message on the write
  *  side queue is for STRHOLD processing where we want to temporarily defer a message for some short
  *  interval (10ms) while waiting for another.  For all this to work, the write queue needs the
- *  QNOENAB flag set.
+ *  %QNOENAB flag set.
  *
  *  To avoid a bunch of locking work in strwrite(), strputpmsg() and friends, the put procedure on
  *  the STREAM head write queue is called without STREAM head locks, so we need to take locks and
@@ -10636,37 +10682,62 @@ strwput(queue_t *q, mblk_t *mp)
 
 	assert(sd);
 
-	if (unlikely(q->q_next == NULL)) {
+	/* don't ever set STRHOLD and then clear it */
+	if (likely(test_bit(STRHOLD_BIT, &sd->sd_flag) == 0)) {
+		/* fast path */
+		putnext(q, mp);
+	} else if (likely(q->q_next != NULL)) {
+		unsigned long flags;
+		ssize_t blen;
+		mblk_t *bp;
+		int nohold;
+
+		blen = mp->b_wptr - mp->b_rptr;
+		/* Feature not activated, or not M_DATA, or banded, or delimited, or longer than
+		   one block, or a zero-length message, or can't hold another write same size. */
+		nohold = ((mp->b_datap->db_type != M_DATA) || (mp->b_band != 0) ||
+			  (mp->b_flag & MSGDELIM) || (mp->b_cont != NULL) ||
+			  (mp->b_wptr == mp->b_rptr) || (blen > (FASTBUF >> 1)));
+
+		qwlock(q, flags);
+		if ((bp = q->q_first)) {
+			/* remove from the queue - from __getq */
+			dassert(bp->b_next == NULL);
+			/* optimized for 1 message on queue */
+			q->q_first = NULL;
+			q->q_last = NULL;
+			q->q_msgs = 0;
+			q->q_count = 0;
+			clear_bit(QFULL_BIT, &q->q_flag);
+			clear_bit(QWANTR_BIT, &q->q_flag);
+		} else if (!nohold) {
+			/* add to queue - from __putq */
+			/* optimize for empty queue */
+			if (unlikely((q->q_count = blen) > q->q_hiwat))
+				set_bit(QFULL_BIT, &q->q_flag);
+			q->q_last = mp;
+			q->q_first = mp;
+			q->q_msgs = 1;
+			mp->b_next = NULL;
+			mp->b_prev = NULL;
+			mp = NULL;
+		}
+		qwunlock(q, flags);
+		if (bp) {
+			/* delayed one has to go - can't delay the other */
+			putnext(q, bp);
+			putnext(q, mp);
+		} else if (mp) {
+			/* not held - has to go */
+			putnext(q, mp);
+		} else {
+			/* held - add stream head to scan list */
+			qscan(sd);
+		}
+	} else {
 		/* nothing we can do */
 		freemsg(mp);
 		swerr();
-	} else if (likely(test_bit(STRHOLD_BIT, &sd->sd_flag) == 0)) {
-		/* fast path */
-		_ctrace(putnext(q, mp));
-		_trace();
-	} else {
-		mblk_t *bp;
-
-		if ((bp = getq(q))) {
-			/* delayed one has to go - can't delay the other */
-			_ctrace(putnext(q, bp));
-			_ctrace(putnext(q, mp));
-		} else if (test_bit(STRDELIM_BIT, &sd->sd_flag)
-			   || !test_bit(STRHOLD_BIT, &sd->sd_flag)
-			   || mp->b_datap->db_type != M_DATA
-			   || mp->b_flag & MSGDELIM
-			   || mp->b_cont
-			   || mp->b_wptr == mp->b_rptr
-			   || mp->b_wptr > mp->b_rptr + (FASTBUF >> 1)) {
-			/* Feature not activated, or not M_DATA, or delimited, or longer than one
-			   block or a zero-length message, or can't hold another write same size. */
-			_ctrace(putnext(q, mp));
-			_trace();
-		} else {
-			/* new M_DATA message with more room */
-			putq(q, mp);
-			/* TODO: need to handle 10ms timeout */
-		}
 	}
 	return (0);
 }
@@ -10677,18 +10748,22 @@ EXPORT_SYMBOL(strwput);
  *  strwsrv: - STREAM head write queue service procedure
  *  @q: write queue to service
  *
- *  We don't actually ever put a message on the write queue, we just use the service procedure to
- *  wake up any synchronous or asynchronous waiters waiting for flow control to subside.  This
- *  permit back-enabling from the module beneath the stream head to work properly.  So, for example,
- *  when we do a canputnext(sd->sd_wq) it sets the QWANTW on sd->sd_wq->q_next if the module below
- *  the stream head is flow controlled.  When congestion subsides to the low water mark, the queue
- *  will backenable us and we will run and wake up any waiters blocked on flow control.
+ *  We don't actually ever put a message on the write queue (except for the STRHOLD feature), we
+ *  just use the service procedure to wake up any synchronous or asynchronous waiters waiting for
+ *  flow control to subside.  This permit back-enabling from the module beneath the stream head to
+ *  work properly.  So, for example, when we do a canputnext(sd->sd_wq) it sets the QWANTW on
+ *  sd->sd_wq->q_next if the module below the stream head is flow controlled.  When congestion
+ *  subsides to the low water mark, the queue will backenable us and we will run and wake up any
+ *  waiters blocked on flow control.
  *
  *  Note that we must also trigger stream events here.  Two in particular are S_WRNORM and S_WRBAND.
  *  We altered qbackenable to set the QBACK bit on the queue and the QB_BACK bit on a queue band
  *  when it backenables the queue.  This is an indication that flow control has subsided for the
  *  queue or queue band (or that the queue or queue band was just emptied).  We use these flags only
  *  for signalling streams events.
+ *
+ *  For the STRHOLD feature, we coallesce bytes while flow controlled in a message block held on the
+ *  write queue.  Whenever we are enabled or backenabled this message must be released.
  */
 streamscall __hot_out int
 strwsrv(queue_t *q)
@@ -10697,6 +10772,7 @@ strwsrv(queue_t *q)
 	unsigned long pl;
 	struct qband *qb;
 	int band;
+	mblk_t *b;
 	unsigned char be[NBAND] = { 0, };
 
 	assert(q);
@@ -10705,18 +10781,33 @@ strwsrv(queue_t *q)
 
 	assert(sd);
 
-	qrlock(q, pl);
+	qwlock(q, pl);
 	if (test_and_clear_bit(QBACK_BIT, &q->q_flag))
 		be[0] = 1;
 	for (qb = q->q_bandp, band = q->q_nband; qb; qb = qb->qb_next, band--)
 		if (test_and_clear_bit(QB_BACK_BIT, &qb->qb_flag))
 			be[band] = 1;
-	qrunlock(q, pl);
+	band = q->q_nband;
+	if (unlikely((b = q->q_first) != NULL)) {
+		/* remove from the queue - from __getq */
+		dassert(b->b_next == NULL);
+		/* optimized for 1 message on queue */
+		q->q_first = NULL;
+		q->q_last = NULL;
+		q->q_msgs = 0;
+		q->q_count = 0;
+		clear_bit(QFULL_BIT, &q->q_flag);
+		clear_bit(QWANTR_BIT, &q->q_flag);
+	}
+	qwunlock(q, pl);
+
+	if (b)
+		putnext(q, b);
 
 	if (likely(be[0]))	/* PROFILED */
 		strevent(sd, S_WRNORM, 0);
 
-	for (band = q->q_nband; unlikely(band > 0); band--) {	/* PROFILED */
+	for (; unlikely(band > 0); band--) {	/* PROFILED */
 		if (likely(be[band] == 0))
 			continue;
 		strevent(sd, S_WRBAND, band);
