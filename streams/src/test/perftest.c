@@ -154,6 +154,10 @@ int readwrite = 1;
 int native = 0;
 int readwrite = 0;
 #endif
+int sethiwat = 0;
+int setlowat = 0;
+size_t hiwat = 0;
+size_t lowat = 0;
 int fifo = 0;
 int push = 0;
 int blocking = 0;
@@ -690,6 +694,32 @@ do_tests(void)
 		}
 	}
 #endif
+	if (!native) {
+#ifdef I_SET_HIWAT
+		if (sethiwat) {
+			if (verbose > 1) {
+				fprintf(stderr, "Setting hiwat on fd %d\n", fds[0]);
+			}
+			if (ioctl(fds[0], I_SET_HIWAT, hiwat) < 0) {
+				if (verbose)
+					perror("ioctl(I_SET_HIWAT)");
+				goto dead;
+			}
+		}
+#endif
+#ifdef I_SET_LOWAT
+		if (setlowat) {
+			if (verbose > 1) {
+				fprintf(stderr, "Setting lowat on fd %d\n", fds[0]);
+			}
+			if (ioctl(fds[0], I_SET_LOWAT, lowat) < 0) {
+				if (verbose)
+					perror("ioctl(I_SET_LOWAT)");
+				goto dead;
+			}
+		}
+#endif
+	}
 	if (fcntl(fds[0], F_SETFL, blocking ? 0 : O_NONBLOCK) < 0) {
 		if (verbose)
 			perror("fcntl");
@@ -710,12 +740,40 @@ do_tests(void)
 		}
 	}
 #endif
-	if (strhold) {
-		if (ioctl(fds[1], I_SWROPT, (SNDPIPE | SNDHOLD)) < 0) {
-			if (verbose)
-				perror("ioctl(I_SWROPT)");
-			goto dead;
+	if (!native) {
+#ifdef I_SET_HIWAT
+		if (sethiwat) {
+			if (verbose > 1) {
+				fprintf(stderr, "Setting hiwat on fd %d\n", fds[0]);
+			}
+			if (ioctl(fds[1], I_SET_HIWAT, hiwat) < 0) {
+				if (verbose)
+					perror("ioctl(I_SET_HIWAT)");
+				goto dead;
+			}
 		}
+#endif
+#ifdef I_SET_LOWAT
+		if (setlowat) {
+			if (verbose > 1) {
+				fprintf(stderr, "Setting lowat on fd %d\n", fds[0]);
+			}
+			if (ioctl(fds[1], I_SET_LOWAT, lowat) < 0) {
+				if (verbose)
+					perror("ioctl(I_SET_LOWAT)");
+				goto dead;
+			}
+		}
+#endif
+#ifdef SNDHOLD
+		if (strhold) {
+			if (ioctl(fds[1], I_SWROPT, (SNDPIPE | SNDHOLD)) < 0) {
+				if (verbose)
+					perror("ioctl(I_SWROPT)");
+				goto dead;
+			}
+		}
+#endif
 	}
 	if (fcntl(fds[1], F_SETFL, blocking ? 0 : O_NONBLOCK) < 0) {
 		if (verbose)
@@ -867,6 +925,10 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
+    --hiwat=HIWAT\n\
+        Set high water mark on stream head.\n\
+    --lowat=LOWAT\n\
+        Set low water mark on stream head.\n\
     -H, --hold\n\
         Use SNDHOLD message coallescing\n\
     -a, --async\n\
@@ -911,6 +973,8 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"hiwat",	required_argument,	NULL, '\1'},
+			{"lowat",	required_argument,	NULL, '\2'},
 			{"module",	required_argument,	NULL, 'm'},
 			{"hold",	no_argument,		NULL, 'H'},
 			{"async",	no_argument,		NULL, 'a'},
@@ -938,6 +1002,18 @@ main(int argc, char *argv[])
 		if (c == -1)
 			break;
 		switch (c) {
+		case '\1': /* --hiwat=HIWAT */
+			sethiwat = 1;
+			hiwat = strtoul(optarg, NULL, 0);
+			if (setlowat && hiwat < lowat)
+				goto bad_option;
+			break;
+		case '\2': /* --lowat=LOWAT */
+			setlowat = 1;
+			lowat = strtoul(optarg, NULL, 0);
+			if (sethiwat && lowat > hiwat)
+				goto bad_option;
+			break;
 		case 'm':
 			if (verbose > 1)
 				fprintf(stderr, "Processing -m, --module=%s option\n", optarg);

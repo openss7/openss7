@@ -1918,20 +1918,36 @@ strgetq_wakeup(struct stdata *sd, queue_t *q, const int flags, const int band)
 	return strgetq_slow(sd, q, flags, band, pl);
 }
 
+/**
+ * strputbq: - like putbq(), but handles STRMSIG and STRPRI bits
+ * @sd: stream head
+ * @q: queue to place message back onto
+ * @mp: message to place back
+ *
+ * This used to use insq; however, much of putbq() has been copied here for
+ * speed.
+ */
 STATIC streams_fastcall void
 strputbq(struct stdata *sd, queue_t *q, mblk_t *mp)
 {				/* IRQ SUPPRESSED */
 	unsigned long pl;
+	mblk_t *emp;
 
 	zwlock(sd, pl);
 	/* Like putbq() but handles STRPRI bit and under queue locks */
-	if (unlikely(mp->b_datap->db_type >= QPCTL))
-		set_bit(STRPRI_BIT, &sd->sd_flag);
 	if (unlikely(mp->b_datap->db_type == M_SIG))
 		set_bit(STRMSIG_BIT, &sd->sd_flag);
 	else
 		clear_bit(STRMSIG_BIT, &sd->sd_flag);
-	insq(q, q->q_first, mp);
+	if (unlikely(mp->b_datap->db_type >= QPCTL)) {
+		set_bit(STRPRI_BIT, &sd->sd_flag);
+		emp = q->q_first;
+	} else {
+		for (emp = q->q_first;
+		     emp && (emp->b_datap->db_type >= QPCTL ||
+			     emp->b_band > mp->b_band); emp = emp->b_next) ;
+	}
+	insq(q, emp, mp);
 	zwunlock(sd, pl);
 }
 
@@ -3078,7 +3094,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 	cred_t *crp = current_creds;
 #endif
 
-	if (ic->ic_len < 0 || ic->ic_len > sysctl_str_strmsgsz) {
+	if (ic->ic_len < 0 || ic->ic_len > sd->sd_strmsgsz) {
 		/* POSIX less than zero or larger than maximum data part. */
 		_ptrace(("Error path taken!\n"));
 		return (-EINVAL);
@@ -3599,10 +3615,10 @@ strsizecheck(const struct stdata *sd, const msg_type_t type, ssize_t size)
 			else
 				return (-ERANGE);
 		}
-		if (unlikely(size > sysctl_str_strmsgsz))
+		if (unlikely(size > sd->sd_strmsgsz))
 			return (-ERANGE);
 	} else {
-		if (unlikely(size > sysctl_str_strctlsz))
+		if (unlikely(size > sd->sd_strctlsz))
 			return (-ERANGE);
 	}
 	return ((ssize_t) size);
@@ -4298,15 +4314,18 @@ stralloc(dev_t dev)
 		sd->sd_flag |= STRISSOCK;
 		sd->sd_wropt = SNDPIPE;	/* special write ops */
 		setq(sd->sd_rq, cdev->d_str->st_rdinit, cdev->d_str->st_wrinit);
-		/* cache minpsz and maxpsz */
 		break;
 	default:
 	case S_IFCHR:
 		sd->sd_wropt = SNDZERO;	/* default write ops */
 		setq(sd->sd_rq, &str_rinit, &str_winit);
-		/* cache minpsz and maxpsz */
 		break;
 	}
+	/* set sysctl defaults */
+	sd->sd_rq->q_maxpsz = sysctl_str_maxpsz;
+	sd->sd_rq->q_minpsz = sysctl_str_minpsz;
+	sd->sd_rq->q_hiwat = sysctl_str_hiwat;
+	sd->sd_rq->q_lowat = sysctl_str_lowat;
 #ifndef SSIZE_MAX
 #ifdef _POSIX_SSIZE_MAX
 #define SSIZE_MAX _POSIX_SSIZE_MAX
@@ -5033,8 +5052,8 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 					for (position = 0, b = mp; b; b = b->b_cont) {
 						if (unlikely((blen = b->b_wptr - b->b_rptr) <= 0))
 							continue;
-						if (unlikely
-						    (protdis && b->b_datap->db_type != M_DATA))
+						if (unlikely(protdis &&
+							     b->b_datap->db_type != M_DATA))
 							continue;
 						if ((position += blen) >= nbytes) {
 							b->b_rptr += nbytes - (position - blen);
@@ -5221,7 +5240,7 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
  *  If, after coallescing the writes, we are downstream flow controlled, there is no reason not to
  *  coallesce another write into the same block.  That is, the block can be released out of the
  *  write service procedure as normal (that is, if we had a normal write service procedure).  The
- *  write service procedure will be invoked when the scanqhead timer goes off (via qschedule()) or
+ *  write service procedure will be invoked when the scanqhead timer goes off (via qenable()) or
  *  the write queue is backenabled due to downstream flow control subsiding (via qbackenable()).
  *
  *  RETURN: Returns a (negative) error number, zero (0) when there was nothing written, otherwise a
@@ -5267,7 +5286,6 @@ strhold(struct stdata *sd, const int f_flags, const char *buf, ssize_t nbytes)
 						b = NULL;
 					} else {
 						/* take it off the queue - from __getq */
-						dassert(b->b_next == NULL);
 						/* optimized for 1 message on queue */
 						q->q_first = NULL;
 						q->q_last = NULL;
@@ -5280,8 +5298,10 @@ strhold(struct stdata *sd, const int f_flags, const char *buf, ssize_t nbytes)
 			}
 			qwunlock(q, flags);
 
-			if (b)
+			if (b) {
+				__assert(b->b_next == NULL);
 				putnext(q, b);
+			}
 		}
 	}
 	return (rtn);
@@ -5547,7 +5567,7 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 	mblk_t *mp;
 	int err;
 
-	if (unlikely(size > sysctl_str_strmsgsz))
+	if (unlikely(size > sd->sd_strmsgsz))
 		return ERR_PTR(-ERANGE);
 
 	if ((err = straccess_rlock(sd, FWRITE)))
@@ -5634,7 +5654,7 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 	/* FIXME: or we could reassess sd->sd_wq->q_next on each wait loop */
 	if (!(q = sd->sd_wq->q_next))
 		goto espipe;
-	if (q->q_minpsz > size || size > (size_t) q->q_maxpsz || size > sysctl_str_strmsgsz)
+	if (q->q_minpsz > size || size > (size_t) q->q_maxpsz || size > sd->sd_strmsgsz)
 		goto erange;
 	if (ppos == &file->f_pos) {
 		char *base = kmap(page) + offset;
@@ -7409,7 +7429,7 @@ str_i_gwropt(const struct file *file, struct stdata *sd, unsigned long arg)
 	}
 #endif
 	if (!(err = straccess_rlock(sd, FAPPEND))) {
-		wropt = sd->sd_wropt & (SNDZERO | SNDPIPE | SNDHOLD);
+		wropt = sd->sd_wropt & (SNDZERO | SNDPIPE | SNDHOLD | SNDELIM);
 		srunlock(sd);
 		err = strcopyout(&wropt, (void *) arg, sizeof(wropt));
 	}
@@ -7440,10 +7460,10 @@ str_i_swropt(const struct file *file, struct stdata *sd, unsigned long arg)
 	int32_t wropt = arg;
 	int err;
 
-	if (wropt & ~(SNDZERO | SNDPIPE | SNDHOLD))
+	if (wropt & ~(SNDZERO | SNDPIPE | SNDHOLD | SNDELIM))
 		return (-EINVAL);
 
-	wropt &= (SNDZERO | SNDPIPE | SNDHOLD);
+	wropt &= (SNDZERO | SNDPIPE | SNDHOLD | SNDELIM);
 
 	if (!(err = straccess_wlock(sd, (FWRITE | FNDELAY | FEXCL)))) {
 		sd->sd_wropt = (sd->sd_wropt & ~(SNDZERO | SNDPIPE | SNDHOLD)) | wropt;
@@ -7451,6 +7471,8 @@ str_i_swropt(const struct file *file, struct stdata *sd, unsigned long arg)
 			set_bit(STRHOLD_BIT, &sd->sd_flag);
 		else
 			clear_bit(STRHOLD_BIT, &sd->sd_flag);
+		if (wropt & SNDELIM)
+			set_bit(STRDELIM_BIT, &sd->sd_flag);
 		swunlock(sd);
 	}
 	return (err);
@@ -8284,7 +8306,7 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 
 			/* Note sd->sd_pushcnt and sd->sd_file are protected by STWOPEN bit. */
 
-			if (sd->sd_pushcnt < sysctl_str_nstrpush) {
+			if (sd->sd_pushcnt < sd->sd_nstrpush) {
 
 				dev_t dev = sd->sd_dev;
 				int oflag = make_oflag(file);
@@ -8881,7 +8903,7 @@ str_i_anchor(const struct file *file, struct stdata *sd, unsigned long arg)
 streams_noinline streams_fastcall __unlikely int
 str_i_esetsig(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	int err = EOPNOTSUPP;
+	int err = -EOPNOTSUPP;
 
 	return (err);
 }
@@ -8896,7 +8918,7 @@ str_i_esetsig(const struct file *file, struct stdata *sd, unsigned long arg)
 streams_noinline streams_fastcall __unlikely int
 str_i_esetsig32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	int err = EOPNOTSUPP;
+	int err = -EOPNOTSUPP;
 
 	return (err);
 }
@@ -8911,7 +8933,7 @@ str_i_esetsig32(const struct file *file, struct stdata *sd, unsigned long arg)
 streams_noinline streams_fastcall __unlikely int
 str_i_egetsig(const struct file *file, struct stdata *sd, unsigned long arg)
 {
-	int err = EOPNOTSUPP;
+	int err = -EOPNOTSUPP;
 
 	return (err);
 }
@@ -8926,9 +8948,185 @@ str_i_egetsig(const struct file *file, struct stdata *sd, unsigned long arg)
 streams_noinline streams_fastcall __unlikely int
 str_i_egetsig32(const struct file *file, struct stdata *sd, unsigned long arg)
 {
+	int err = -EOPNOTSUPP;
+
+	return (err);
+}
+#endif				/* WITH_32BIT_CONVERSION */
+
+/**
+ *  str_i_get_sth_wroff: - get stream head write offset
+ *  @file: user file pointer for the open stream
+ *  @sd: stream head of the open stream
+ *  @arg: ioctl argument, pointer to integer
+ */
+streams_noinline streams_fastcall __unlikely int
+str_i_get_sth_wroff(const struct file *file, struct stdata *sd, unsigned long arg)
+{
 	int err = EOPNOTSUPP;
 
 	return (err);
+}
+
+#ifdef WITH_32BIT_CONVERSION
+streams_noinline streams_fastcall __unlikely int
+str_i_get_sth_wroff32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	return str_i_get_sth_wroff(file, sd, (unsigned long) compat_ptr(arg));
+}
+#endif				/* WITH_32BIT_CONVERSION */
+
+/**
+ *  str_i_get_strmsgsz: - get stream maximum message size
+ *  @file: user file pointer for the open stream
+ *  @sd: stream head of the open stream
+ *  @arg: ioctl argument, pointer to integer
+ */
+streams_noinline streams_fastcall __unlikely int
+str_i_get_strmsgsz(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	int size = sd->sd_strmsgsz;
+
+	return strcopyout(&size, (void *)arg, sizeof(size));
+}
+
+#ifdef WITH_32BIT_CONVERSION
+streams_noinline streams_fastcall __unlikely int
+str_i_get_strmsgsz32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	return str_i_get_strmsgsz(file, sd, (unsigned long) compat_ptr(arg));
+}
+#endif				/* WITH_32BIT_CONVERSION */
+
+/**
+ *  str_i_get_strctlsz: - get stream maximum control size
+ *  @file: user file pointer for the open stream
+ *  @sd: stream head of the open stream
+ *  @arg: ioctl argument, pointer to integer
+ */
+streams_noinline streams_fastcall __unlikely int
+str_i_get_strctlsz(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	int size = sd->sd_strctlsz;
+
+	return strcopyout(&size, (void *)arg, sizeof(size));
+}
+
+#ifdef WITH_32BIT_CONVERSION
+streams_noinline streams_fastcall __unlikely int
+str_i_get_strctlsz32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	return str_i_get_strctlsz(file, sd, (unsigned long) compat_ptr(arg));
+}
+#endif				/* WITH_32BIT_CONVERSION */
+
+/**
+ *  str_i_get_pushcnt: - get stream push count
+ *  @file: user file pointer for the open stream
+ *  @sd: stream head of the open stream
+ *  @arg: ioctl argument, ignored
+ */
+streams_noinline streams_fastcall __unlikely int
+str_i_get_pushcnt(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	return (sd->sd_pushcnt);
+}
+
+/**
+ *  str_i_set_hiwat: - set stream head high water mark
+ *  @file: user file pointer for the open stream
+ *  @sd: stream head of the open stream
+ *  @arg: ioctl argument, high water mark
+ */
+streams_noinline streams_fastcall __unlikely int
+str_i_set_hiwat(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	int err;
+
+	if (!(err = straccess_wlock(sd, FAPPEND))) {
+		queue_t *q = sd->sd_rq;
+		unsigned long pl;
+
+		zwlock(sd, pl);
+		if (arg >= q->q_lowat) {
+			q->q_hiwat = arg;
+		} else
+			err = -EINVAL;
+		zwunlock(sd, pl);
+
+		swunlock(sd);
+	}
+	return (err);
+}
+
+/**
+ *  str_i_set_lowat: - set stream head low water mark
+ *  @file: user file pointer for the open stream
+ *  @sd: stream head of the open stream
+ *  @arg: ioctl argument, low water mark
+ */
+streams_noinline streams_fastcall __unlikely int
+str_i_set_lowat(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	int err;
+
+	if (!(err = straccess_wlock(sd, FAPPEND))) {
+		queue_t *q = sd->sd_rq;
+		unsigned long pl;
+
+		zwlock(sd, pl);
+		if (arg <= q->q_hiwat) {
+			q->q_lowat = arg;
+		} else
+			err = -EINVAL;
+		zwunlock(sd, pl);
+
+		swunlock(sd);
+	}
+	return (err);
+}
+
+/**
+ *  str_i_get_hiwat: - get stream head high water mark
+ *  @file: user file pointer for the open stream
+ *  @sd: stream head of the open stream
+ *  @arg: ioctl argument, pointer to integer
+ */
+streams_noinline streams_fastcall __unlikely int
+str_i_get_hiwat(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	int size = sd->sd_rq->q_hiwat;
+
+	return strcopyout(&size, (void *)arg, sizeof(size));
+}
+
+#ifdef WITH_32BIT_CONVERSION
+streams_noinline streams_fastcall __unlikely int
+str_i_get_hiwat32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	return str_i_get_hiwat(file, sd, (unsigned long) compat_ptr(arg));
+}
+#endif				/* WITH_32BIT_CONVERSION */
+
+/**
+ *  str_i_get_lowat: - get stream head low water mark
+ *  @file: user file pointer for the open stream
+ *  @sd: stream head of the open stream
+ *  @arg: ioctl argument, pointer to integer
+ */
+streams_noinline streams_fastcall __unlikely int
+str_i_get_lowat(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	int size = sd->sd_rq->q_lowat;
+
+	return strcopyout(&size, (void *)arg, sizeof(size));
+}
+
+#ifdef WITH_32BIT_CONVERSION
+streams_noinline streams_fastcall __unlikely int
+str_i_get_lowat32(const struct file *file, struct stdata *sd, unsigned long arg)
+{
+	return str_i_get_lowat(file, sd, (unsigned long) compat_ptr(arg));
 }
 #endif				/* WITH_32BIT_CONVERSION */
 
@@ -9372,7 +9570,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 			return str_i_anchor(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_ESETSIG):
 			_printd(("%s: got I_ESETSIG\n", __FUNCTION__));
-			return str_i_egetsig(file, sd, arg);
+			return str_i_egetsig32(file, sd, arg);	/* not compatible*/
 		case _IOC_NR(I_EGETSIG):
 			_printd(("%s: got I_EGETSIG\n", __FUNCTION__));
 			return str_i_esetsig(file, sd, arg);
@@ -9395,6 +9593,31 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(I_ISASTREAM):
 			_printd(("%s: got I_ISASTREAM\n", __FUNCTION__));
 			return str_i_isastream(file, sd, arg);	/* compatible */
+			/* some useful HPUX input-output controls */
+		case _IOC_NR(I_GET_STH_WROFF):
+			_printd(("%s: got I_GET_STH_WROFF\n", __FUNCTION__));
+			return str_i_get_sth_wroff32(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_GET_STRMSGSZ):
+			_printd(("%s: got I_GET_STRMSGSZ\n", __FUNCTION__));
+			return str_i_get_strmsgsz32(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_GET_STRCTLSZ):
+			_printd(("%s: got I_GET_STRCTLSZ\n", __FUNCTION__));
+			return str_i_get_strctlsz32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_GET_PUSHCNT):
+			_printd(("%s: got I_GET_PUSHCNT\n", __FUNCTION__));
+			return str_i_get_pushcnt(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_SET_HIWAT):
+			_printd(("%s: got I_SET_HIWAT\n", __FUNCTION__));
+			return str_i_set_hiwat(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_SET_LOWAT):
+			_printd(("%s: got I_SET_LOWAT\n", __FUNCTION__));
+			return str_i_set_lowat(file, sd, arg);	/* compatible */
+		case _IOC_NR(I_GET_HIWAT):
+			_printd(("%s: got I_GET_HIWAT\n", __FUNCTION__));
+			return str_i_get_hiwat32(file, sd, arg);	/* not compatible */
+		case _IOC_NR(I_GET_LOWAT):
+			_printd(("%s: got I_GET_LOWAT\n", __FUNCTION__));
+			return str_i_get_lowat32(file, sd, arg);	/* not compatible */
 #if (_IOC_TYPE(I_STR) != _IOC_TYPE(TCSBRK))
 		}
 		break;
@@ -9876,6 +10099,31 @@ strioctl_slow(struct file *file, unsigned int cmd, unsigned long arg)
 		case _IOC_NR(I_ISASTREAM):
 			_printd(("%s: got I_ISASTREAM\n", __FUNCTION__));
 			return str_i_isastream(file, sd, arg);
+			/* some useful HPUX input-output controls */
+		case _IOC_NR(I_GET_STH_WROFF):
+			_printd(("%s: got I_GET_STH_WROFF\n", __FUNCTION__));
+			return str_i_get_sth_wroff(file, sd, arg);
+		case _IOC_NR(I_GET_STRMSGSZ):
+			_printd(("%s: got I_GET_STRMSGSZ\n", __FUNCTION__));
+			return str_i_get_strmsgsz(file, sd, arg);
+		case _IOC_NR(I_GET_STRCTLSZ):
+			_printd(("%s: got I_GET_STRCTLSZ\n", __FUNCTION__));
+			return str_i_get_strctlsz(file, sd, arg);
+		case _IOC_NR(I_GET_PUSHCNT):
+			_printd(("%s: got I_GET_PUSHCNT\n", __FUNCTION__));
+			return str_i_get_pushcnt(file, sd, arg);
+		case _IOC_NR(I_SET_HIWAT):
+			_printd(("%s: got I_SET_HIWAT\n", __FUNCTION__));
+			return str_i_set_hiwat(file, sd, arg);
+		case _IOC_NR(I_SET_LOWAT):
+			_printd(("%s: got I_SET_LOWAT\n", __FUNCTION__));
+			return str_i_set_lowat(file, sd, arg);
+		case _IOC_NR(I_GET_HIWAT):
+			_printd(("%s: got I_GET_HIWAT\n", __FUNCTION__));
+			return str_i_get_hiwat(file, sd, arg);
+		case _IOC_NR(I_GET_LOWAT):
+			_printd(("%s: got I_GET_LOWAT\n", __FUNCTION__));
+			return str_i_get_lowat(file, sd, arg);
 #if (_IOC_TYPE(I_STR) != _IOC_TYPE(TCSBRK))
 		}
 		break;
@@ -10689,7 +10937,7 @@ strwput(queue_t *q, mblk_t *mp)
 	} else if (likely(q->q_next != NULL)) {
 		unsigned long flags;
 		ssize_t blen;
-		mblk_t *bp;
+		mblk_t *b;
 		int nohold;
 
 		blen = mp->b_wptr - mp->b_rptr;
@@ -10700,9 +10948,8 @@ strwput(queue_t *q, mblk_t *mp)
 			  (mp->b_wptr == mp->b_rptr) || (blen > (FASTBUF >> 1)));
 
 		qwlock(q, flags);
-		if ((bp = q->q_first)) {
+		if ((b = q->q_first)) {
 			/* remove from the queue - from __getq */
-			dassert(bp->b_next == NULL);
 			/* optimized for 1 message on queue */
 			q->q_first = NULL;
 			q->q_last = NULL;
@@ -10723,9 +10970,10 @@ strwput(queue_t *q, mblk_t *mp)
 			mp = NULL;
 		}
 		qwunlock(q, flags);
-		if (bp) {
+		if (b) {
+			__assert(b->b_next == NULL);
 			/* delayed one has to go - can't delay the other */
-			putnext(q, bp);
+			putnext(q, b);
 			putnext(q, mp);
 		} else if (mp) {
 			/* not held - has to go */
@@ -10790,7 +11038,6 @@ strwsrv(queue_t *q)
 	band = q->q_nband;
 	if (unlikely((b = q->q_first) != NULL)) {
 		/* remove from the queue - from __getq */
-		dassert(b->b_next == NULL);
 		/* optimized for 1 message on queue */
 		q->q_first = NULL;
 		q->q_last = NULL;
@@ -10801,8 +11048,10 @@ strwsrv(queue_t *q)
 	}
 	qwunlock(q, pl);
 
-	if (b)
+	if (b) {
+		__assert(b->b_next == NULL);
 		putnext(q, b);
+	}
 
 	if (likely(be[0]))	/* PROFILED */
 		strevent(sd, S_WRNORM, 0);

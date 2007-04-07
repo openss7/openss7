@@ -1022,6 +1022,8 @@ man_MANS = \
 	man7/I_ATMARK.7 \
 	man7/I_CANPUT.7 \
 	man7/I_CKBAND.7 \
+	man7/I_EGETSIG.7 \
+	man7/I_ESETSIG.7 \
 	man7/I_FATTACH.7 \
 	man7/I_FDETACH.7 \
 	man7/I_FDINSERT.7 \
@@ -1031,9 +1033,14 @@ man_MANS = \
 	man7/I_GERROPT.7 \
 	man7/I_GETBAND.7 \
 	man7/I_GETCLTIME.7 \
+	man7/I_GET_HIWAT.7 \
+	man7/I_GET_LOWAT.7 \
 	man7/I_GETPMSG.7 \
+	man7/I_GET_PUSHCNT.7 \
 	man7/I_GETSIG.7 \
-	man7/I_EGETSIG.7 \
+	man7/I_GET_STH_WROFF.7 \
+	man7/I_GET_STRCTLSZ.7 \
+	man7/I_GET_STRMSGSZ.7 \
 	man7/I_GRDOPT.7 \
 	man7/I_GWROPT.7 \
 	man7/I_ISASTREAM.7 \
@@ -1052,8 +1059,9 @@ man_MANS = \
 	man7/I_SENDFD.7 \
 	man7/I_SERROPT.7 \
 	man7/I_SETCLTIME.7 \
+	man7/I_SET_HIWAT.7 \
+	man7/I_SET_LOWAT.7 \
 	man7/I_SETSIG.7 \
-	man7/I_ESETSIG.7 \
 	man7/I_SRDOPT.7 \
 	man7/I_STR.7 \
 	man7/I_SWROPT.7 \
@@ -2149,6 +2157,8 @@ dist_noinst_MANS = \
 	man7/I_ATMARK.7.man \
 	man7/I_CANPUT.7.man \
 	man7/I_CKBAND.7.man \
+	man7/I_EGETSIG.7.man \
+	man7/I_ESETSIG.7.man \
 	man7/I_FATTACH.7.man \
 	man7/I_FDETACH.7.man \
 	man7/I_FDINSERT.7.man \
@@ -2158,9 +2168,14 @@ dist_noinst_MANS = \
 	man7/I_GERROPT.7.man \
 	man7/I_GETBAND.7.man \
 	man7/I_GETCLTIME.7.man \
+	man7/I_GET_HIWAT.7.man \
+	man7/I_GET_LOWAT.7.man \
 	man7/I_GETPMSG.7.man \
+	man7/I_GET_PUSHCNT.7.man \
 	man7/I_GETSIG.7.man \
-	man7/I_EGETSIG.7.man \
+	man7/I_GET_STH_WROFF.7.man \
+	man7/I_GET_STRCTLSZ.7.man \
+	man7/I_GET_STRMSGSZ.7.man \
 	man7/I_GRDOPT.7.man \
 	man7/I_GWROPT.7.man \
 	man7/I_ISASTREAM.7.man \
@@ -2179,8 +2194,9 @@ dist_noinst_MANS = \
 	man7/I_SENDFD.7.man \
 	man7/I_SERROPT.7.man \
 	man7/I_SETCLTIME.7.man \
+	man7/I_SET_HIWAT.7.man \
+	man7/I_SET_LOWAT.7.man \
 	man7/I_SETSIG.7.man \
-	man7/I_ESETSIG.7.man \
 	man7/I_SRDOPT.7.man \
 	man7/I_STR.7.man \
 	man7/I_SWROPT.7.man \

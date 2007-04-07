@@ -267,6 +267,8 @@ struct stdata {
 	unsigned char sd_band;		/* highest blocked band */
 	ssize_t sd_minpsz;		/* cached sd_wq->q_next->q_minpsz */
 	ssize_t sd_maxpsz;		/* cached sd_wq->q_next->q_maxpsz */
+	ssize_t sd_strmsgsz;		/* cached sysctl_str_strmsgsz */
+	ssize_t sd_strctlsz;		/* cached sysctl_str_strctlsz */
 	int sd_rerror;			/* read error */
 	int sd_werror;			/* write error */
 	int sd_opens;			/* number of successful opens */
@@ -274,6 +276,7 @@ struct stdata {
 	int sd_writers;			/* number of streampipe writers */
 //      int sd_rwaiters;                /* number of waiters on read */
 //      int sd_wwaiters;                /* number of waiters on write */
+	int sd_nstrpush;		/* cached sysctl_str_nstrpush */
 	int sd_pushcnt;			/* number of modules pushed */
 	int sd_nanchor;			/* number of modules anchored */
 	unsigned long sd_sigflags;	/* signal flags */
