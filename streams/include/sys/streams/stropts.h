@@ -291,6 +291,8 @@ typedef unsigned long int t_uscalar_t;
 #define I_SETCOPYAVOID		(__SID | 81)	/* HPUX     *//**< */
 #define I_ASYNC_ACK		(__SID | 82)	/* HPUX     *//**< */
 #define I_SET_XTI		(__SID | 84)	/* HPUX     *//**< */
+#endif				/* __NOT_IMPLEMENTED__ */
+
 #define I_GET_STH_WROFF		(__SID | 85)	/* HPUX     *//**< */
 #define I_GET_STRMSGSZ		(__SID | 86)	/* HPUX     *//**< */
 #define I_GET_STRCTLSZ		(__SID | 87)	/* HPUX     *//**< */
@@ -301,7 +303,6 @@ typedef unsigned long int t_uscalar_t;
 
 #define I_GET_HIWAT		(__SID | 97)	/* HPUX     *//**< */
 #define I_GET_LOWAT		(__SID | 98)	/* HPUX     *//**< */
-#endif				/* __NOT_IMPLEMENTED__ */
 /** @} */
 
 /**
@@ -480,6 +481,7 @@ typedef unsigned long int t_uscalar_t;
 #define SNDZERO		(1<<0)	/**< Permit sending of zero length messages. */
 #define SNDPIPE		(1<<1)	/**< Sending on a disconnected pipe send SIGPIPE. */
 #define SNDHOLD		(1<<2)	/**< Coallese small messages. */
+#define SNDELIM		(1<<3)	/**< Delimit writes with MGSDELIM. */
 /** @} */
 
 /**

@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: I_SWROPT.7.man,v 0.9.2.5 2006/10/05 12:17:01 brian Exp $
+.\" @(#) $Id$
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,17 +53,11 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:17:01 $ by $Author: brian $
+.\" Last Modified $Date$ by $Author$
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: I_SWROPT.7.man,v $
-.\" Revision 0.9.2.5  2006/10/05 12:17:01  brian
-.\" - updates for release
-.\"
-.\" Revision 0.9.2.4  2006/04/05 09:43:48  brian
-.\" - moved .so line and updated headers
-.\"
+.\" $Log$
 .\" =========================================================================
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
@@ -80,12 +74,12 @@ sort-adjacent-labels
 .so streams.macros
 .\"
 .\"
-.TH I_SWROPT 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Protocols"
+.TH I_GET_STRMSGSZ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Protocols"
 .\"
 .\"
 .SH NAME
-.B I_SWROPT
-\- set \fISTREAMS\fP write options
+.B I_GET_STRMSGSZ
+\- get Stream maximum message size
 .\"
 .\"
 .SH SYNOPSIS   
@@ -94,7 +88,7 @@ sort-adjacent-labels
 .br
 .B #include <stropts.h>
 .HP
-.BI "int " retval " = ioctl (int " fd ", I_SWROPT, ... /* " arg " */);"
+.BI "int " retval " = ioctl (int " fd ", I_GET_STRMSGSZ, ... /* " arg " */);"
 .\"
 .\"
 .SH ARGUMENTS
@@ -109,67 +103,57 @@ call when the Stream was created.
 .TP
 .I cmd
 always
-.BR I_SWROPT .
+.BR I_GET_STRMSGSZ .
 .TP
 .I arg
-is an integer value containing the write options to set.
+a pointer to an
+.B int
+into which to receive the maximum message size.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
-Sets the
-.BR write (2s)
-options flags for the stream head.
-These flags alter the behaviour of the
-.BR write "(2) and " putmsg (2)
-calls when called for
-.IR fd .
-.I arg
-is an integer value containing the write options flags which may be one or
-more flags from the following:
-.TP \w'\fBSNDZERO\fR\(em'u
-.B SNDZERO
-send a zero-length message downstream when a write of zero bytes occurs.
-.TP
-.B SNDPIPE
-send
-.B SIGPIPE
-on
-.BR write (2s)
-and
-.BR putmsg (2)
-if the stream head has received a write error
-.RB ( M_ERROR (9))
-message.
-.TP
-.B SNDHOLD
-hold messages briefly in an attempt to coalesce smaller transmissions into
-larger ones.  This flag corresponds to the
-.I SO_STRHOLD
-flag to
-.BR M_SETOPTS (9).
-The flag can be set, but cannot subsequently be reset.  This is a
+The
+.B I_GET_STRCTLSZ
+input-output control gets the maximum message size associated with the Stream head upon
+which the input-output control is issued.
+.PP
+This is an
+.IR HP-UX \(rg-specific
+.[
+hpuxspg
+.]
+input-output control also supported by
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH USAGE
+.PP
+Because the value can be altered using the
+.BR sysctl (8)
+interface,
+.B I_GET_STRMSGSZ
+can be used by an application program or library that wishes to known the current value of the Stream
+head maximum message size.
+.PP
+This input-output control is useful for
 .B @PACKAGE_TITLE@
-extension.
-.TP
-.B SNDELIM
-delimit messages.  This flag corresponds to the
-.I SO_DELIM
-flag to
-.BR M_SETOPTS (9).
-The flag can be set or reset.  This is a
-.B @PACKAGE_TITLE@
-extension.
+conformance and performance testing.
 .\"
 .\"
 .SH "RETURN VALUE"
 .PP
 Upon success, the
-.B I_SWROPT
+.B I_GET_STRMSGSZ
 .BR ioctl (2s)
 command returns zero
-.RB ( 0 );
-upon failure, minus one
+.RB ( 0 )
+and the Stream head maximum message size in the integer pointed to by
+.IR arg .
+Upon failure, the
+.B I_GET_STRMSGSZ
+.BR ioctl (2s)
+command returns minus one
 .RB ( -1 )
 and sets
 .IR errno (3)
@@ -179,17 +163,17 @@ to an appropriate error number.
 .SH ERRORS
 .PP
 When the
-.B I_SWROPT
+.B I_GET_STRMSGSZ
 .BR ioctl (2s)
-command fails, it returns minus one
-.RB ( -1 )
+command fails, it returns
+.B -1
 and sets
 .IR errno (3)
 to one of the following errors:
 .TP \w'[EWOULDBLOCK]\(em'u
-.RB [ EINVAL ]
-.IR fd ", " cmd ", " arg " or a member of " arg " or a member of a structure pointed to by " arg
-is invalid.
+.RB [ EFAULT ]
+.I arg
+points outside the caller's valid address space.
 .\"
 .PP
 In general, any
@@ -372,7 +356,7 @@ areas of behaviour.  Not all bugs are bugs and not all features are features.
 .\"
 .SH BUGS
 .PP
-.B I_SWROPT
+.B I_GET_STRMSGSZ
 has no known bugs.
 .PP
 .I STREAMS
@@ -383,23 +367,26 @@ areas of behaviour.  Not all bugs are bugs and not all features are features.
 .\"
 .SH COMPATIBILITY
 .PP
-.B I_SWROPT
+.B I_GET_STRMSGSZ
 is compatible with
-.IR "SVR 4.2" ,
+.IR HP-UX \(rg,
 .[
-svr42
+hpuxspg
 .]
 and implementations based on
-.IR "SVR 4.2" ,
+.IR OSF/1 \(rg,
+.[
+osfspg
+.]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.B I_SWROPT
+.B I_GET_STRMSGSZ
 conforms as closely as possible to the
-.I POSIX/SUSv3
+.I HP-UX
 specifications.
 Where a specific
-.IR "SVR 4.2" -based
-implemntation differs from
+.IR "OSF/1" -based
+implementation differs from
 .IR POSIX/SUSv3 ,
 there will be differences with this
 .I @PACKAGE_TITLE@
@@ -407,8 +394,7 @@ implementation.
 .IP ""
 Portable
 .I STREAMS
-applications programs will expect conformance to
-.IR POSIX/SUSv3 .
+applications programs will not use this input-output control.
 .PP
 For general
 .BR ioctl (2s)
@@ -444,7 +430,11 @@ SUSv3,
 .[
 susv3
 .]
-POSIX.
+POSIX,
+.IR HP-UX \(rg.
+.[
+hpuxspg
+.]
 .PP
 Conformance is tested using the
 .BR test-streams (8)
@@ -462,6 +452,11 @@ for
 first appeared in SVR 3.
 .[
 svr3
+.]
+.B I_GET_STRMSGSZ
+first appeared in HP-UX.
+.[
+hpuxspg
 .]
 .\"
 .\"

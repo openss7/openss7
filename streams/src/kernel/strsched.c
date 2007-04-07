@@ -4811,6 +4811,9 @@ clear_shinfo(struct shinfo *sh)
 	sd->sd_ioctime = sysctl_str_ioctime;	/* default for ioctls, typically 15 seconds (saved
 						   in ticks) */
 	sd->sd_rtime = sysctl_str_rtime;	/* typically 10 milliseconds (saved in ticks) */
+	sd->sd_strmsgsz = sysctl_str_strmsgsz;	/* maximum message size */
+	sd->sd_strctlsz = sysctl_str_strctlsz;	/* maximum control message size */
+	sd->sd_nstrpush = sysctl_str_nstrpush;	/* maximum push count */
 //      init_waitqueue_head(&sd->sd_waitq);     /* waiters */
 	init_waitqueue_head(&sd->sd_rwaitq);	/* waiters on read */
 	init_waitqueue_head(&sd->sd_wwaitq);	/* waiters on write */
