@@ -2,7 +2,7 @@
 
 set -x
 
-interval=20
+interval=10
 testtime=1
 
 perftestn=
@@ -30,10 +30,11 @@ fi
 (
 	set -x
 	$scls -a -c -r pipe pipemod
-	for size in 4 8 16 32 64 128 256 512 1024 2048 4096
+#	for size in 4 8 16 32 64 128 256 512 1024 2048 4096
+	for size in 4 16 64 256 1024 4096
 	do
 		$perftest  -q -r -t $testtime -i $interval -m nullmod -p 0 -s $size ${1+$@}
 		$perftestn -q -r -t $testtime -i $interval -m nullmod -p 0 -s $size ${1+$@}
-		$scls -a -c -r pipe pipemod
+		$scls -a -c -r pipe pipemod bufmod nullmod
 	done
 ) 2>&1 | tee `hostname`.perftest.`date -uIseconds`.log
