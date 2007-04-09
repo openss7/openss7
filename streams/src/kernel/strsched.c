@@ -2332,7 +2332,6 @@ putp_fast(queue_t *q, mblk_t *mp)
 	dassert(q);
 	dassert(q->q_putp);
 
-#ifdef CONFIG_SMP
 	dassert(qstream(q));
 	/* spin here if Stream frozen by other than caller */
 	freeze_barrier(q);
@@ -2340,15 +2339,11 @@ putp_fast(queue_t *q, mblk_t *mp)
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
-	/* Note that this locking is only really required on a Stream end. All other queues are
-	   referenced from within the STREAMS framework. */
 	if (unlikely(backq(q) == NULL))
 		prlock(qstream(q));
 
 	/* procs can't be turned off */
-	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
-#endif
-	{
+	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
 		/* prefetch private structure */
 		prefetch(q->q_ptr);
 		prefetch(mp);
@@ -2368,9 +2363,7 @@ putp_fast(queue_t *q, mblk_t *mp)
 		/* some weirdness in older compilers */
 		(*q->q_putp) (q, mp);
 		qwakeup(q);
-	}
-#ifdef CONFIG_SMP
-	else {
+	} else {
 		freemsg(mp);
 		swerr();
 	}
@@ -2380,7 +2373,6 @@ putp_fast(queue_t *q, mblk_t *mp)
 	dassert(qstream(q));
 	if (unlikely(backq(q) == NULL))
 		prunlock(qstream(q));
-#endif
 }
 
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -2432,11 +2424,10 @@ srvp_fast(queue_t *q)
 	/* Check if enable bit cleared first (done in qprocsoff for Stream head that might later
 	   have the stream head removed before the service procedure is fully invoked. */
 	if (likely(test_and_clear_bit(QENAB_BIT, &q->q_flag) != 0)) {
-#ifdef CONFIG_SMP
 		struct stdata *sd;
 
 		sd = qstream(q);
-		__assert(sd);
+		assert(sd);
 
 		/* spin here if Stream frozen by other than caller */
 		freeze_barrier(q);
@@ -2444,13 +2435,11 @@ srvp_fast(queue_t *q)
 		prlock(sd);
 
 		/* check if procs are turned off */
-		if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
-#endif
-		{
+		if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
 			/* prefetch private structure */
 			prefetch(q->q_ptr);
 
-			__assert(q->q_srvp);
+			assert(q->q_srvp);
 #ifdef CONFIG_STREAMS_DO_STATS
 			dassert(q->q_qinfo);
 			if (unlikely(q->q_qinfo->qi_mstat != NULL))
@@ -2462,12 +2451,10 @@ srvp_fast(queue_t *q)
 			clear_bit(QSVCBUSY_BIT, &q->q_flag);
 			qwakeup(q);
 		}
-#ifdef CONFIG_SMP
 		prunlock(sd);
-#endif
 	}
 	if (q)
-		_ctrace(qput(&q));	/* cancel qget from qschedule */
+		qput(&q);	/* cancel qget from qschedule */
 }
 
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -3282,16 +3269,12 @@ put(queue_t *q, mblk_t *mp)
 	dassert(mp);
 	dassert(q);
 
-#ifdef CONFIG_SMP
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
-	/* Note that this locking is only really required on a Stream end. All other queues are
-	   referenced from within the STREAMS framework. */
 	dassert(qstream(q));
 	if (unlikely(backq(q) == NULL))
 		prlock(qstream(q));
-#endif
 	if (likely(q->q_ftmsg == NULL) || likely(!put_filter(&q, mp))) {
 #ifdef CONFIG_STREAMS_SYNCQS
 		qputp(q, mp);
@@ -3299,14 +3282,12 @@ put(queue_t *q, mblk_t *mp)
 		putp_fast(q, mp);
 #endif
 	}
-#ifdef CONFIG_SMP
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
 	dassert(qstream(q));
 	if (unlikely(backq(q) == NULL))
 		prunlock(qstream(q));
-#endif
 	return;
 }
 
@@ -3355,29 +3336,28 @@ putnext(queue_t *q, mblk_t *mp)
 	dassert(mp);
 	dassert(q);
 	dassert(q->q_next);
-#ifdef CONFIG_SMP
-	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
+
+	/* prlock/unlock doesn't cost much anymore, so it is here so putnext() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
-	/* Note that this locking is only really required on a Stream end. All other queues are
-	   referenced from within the STREAMS framework. */
 	dassert(qstream(q));
-	if (unlikely(backq(q) == NULL))
-		prlock(qstream(q));
-#endif
+	prlock(qstream(q));
+	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
+		__assure(q->q_next != NULL);
 #ifdef CONFIG_STREAMS_SYNCQS
-	qputp(q->q_next, mp);
+		qputp(q->q_next, mp);
 #else
-	putp_fast(q->q_next, mp);
+		putp_fast(q->q_next, mp);
 #endif
-#ifdef CONFIG_SMP
+	} else {
+		freemsg(mp);
+		swerr();
+	}
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
 	dassert(qstream(q));
-	if (unlikely(backq(q) == NULL))
-		prunlock(qstream(q));
-#endif
+	prunlock(qstream(q));
 	_trace();
 }
 
