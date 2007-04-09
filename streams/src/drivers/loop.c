@@ -63,7 +63,8 @@
 
 #ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 19:01:12 $"
 
-static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 19:01:12 $";
+static char const ident[] =
+    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 19:01:12 $";
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
@@ -167,8 +168,8 @@ STATIC struct module_info loop_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-static struct module_stat loop_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat loop_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat loop_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat loop_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 typedef struct loop {
 	struct loop *next;		/* list linkage */
@@ -401,33 +402,25 @@ loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	minor_t cminor = getminor(*devp);
 	unsigned long flags;
 
-	_ptrace(("%s: opening major %hu, minor %hu, sflag %d\n", __FUNCTION__, cmajor, cminor,
-		sflag));
 	if (q->q_ptr != NULL) {
-		_printd(("%s: stream is already open\n", __FUNCTION__));
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		_printd(("%s: cannot open as module\n", __FUNCTION__));
 		return (ENXIO);	/* can't open as module */
 	}
 	if (!(p = kmem_alloc(sizeof(*p), KM_NOSLEEP))) {	/* we could sleep */
-		_printd(("%s: could not allocate private structure\n", __FUNCTION__));
 		return (ENOMEM);	/* no memory */
 	}
 	bzero(p, sizeof(*p));
 	switch (sflag) {
 	case CLONEOPEN:
-		_printd(("%s: clone open\n", __FUNCTION__));
 		if (cminor < 1)
 			cminor = 1;
 	case DRVOPEN:
 	{
 		major_t dmajor = cmajor;
 
-		_printd(("%s: driver open\n", __FUNCTION__));
 		if (cminor < 1) {
-			_printd(("%s: attempt to open minor zero non-clone\n", __FUNCTION__));
 			return (ENXIO);
 		}
 		spin_lock_str(&loop_lock, flags);
@@ -452,7 +445,6 @@ loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		if (getminor(makedevice(cmajor, cminor)) == 0) {	/* no minors left */
 			spin_unlock_str(&loop_lock, flags);
 			kmem_free(p, sizeof(*p));
-			_printd(("%s: no minor devices left\n", __FUNCTION__));
 			return (EBUSY);	/* no minors left */
 		}
 		p->dev = *devp = makedevice(cmajor, cminor);
@@ -466,7 +458,6 @@ loop_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		q->q_ptr = WR(q)->q_ptr = p;
 		spin_unlock_str(&loop_lock, flags);
 		qprocson(q);
-		_printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
 		return (0);
 	}
 	}
@@ -480,7 +471,6 @@ loop_close(queue_t *q, int oflag, cred_t *crp)
 	struct loop *p;
 	unsigned long flags;
 
-	_trace();
 	if ((p = q->q_ptr) == NULL) {
 		pswerr(("%s: already closed\n", __FUNCTION__));
 		return (0);	/* already closed */
@@ -499,7 +489,6 @@ loop_close(queue_t *q, int oflag, cred_t *crp)
 	p->wq = NULL;
 	q->q_ptr = WR(q)->q_ptr = NULL;
 	spin_unlock_str(&loop_lock, flags);
-	_printd(("%s: closed stream with read queue %p\n", __FUNCTION__, q));
 	return (0);
 }
 

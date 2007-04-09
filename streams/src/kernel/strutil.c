@@ -3752,12 +3752,10 @@ setq(queue_t *q, struct qinit *rinit, struct qinit *winit)
 	assert(not_frozen_by_caller(q));
 
 	sd = rqstream(q);
-
 	assert(sd);
 
 	zwlock(sd, pl);
 	__setq(q, rinit, winit);
-	/* unlock in reverse order */
 	zwunlock(sd, pl);
 }
 
@@ -3899,7 +3897,6 @@ setsq(queue_t *q, struct fmodsw *fmod)
 	assert(not_frozen_by_caller(q));
 
 	sd = rqstream(q);
-
 	assert(sd);
 
 	zwlock(sd, pl);

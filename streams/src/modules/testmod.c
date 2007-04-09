@@ -239,9 +239,6 @@ union ioctypes {
 	struct copyresp copyresp;
 };
 
-#define _printd(__x) while (0) { }
-#define _ptrace(__x) while (0) { }
-
 int
 ctlmsg(unsigned char type)
 {
@@ -293,7 +290,6 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			int rwerr;
 
 			rwerr = *(unsigned long *) mp->b_cont->b_rptr;
-			_printd(("%s: error number is %d\n", __FUNCTION__, rwerr));
 			/* Synthesize a M_ERROR message with a read error (equal to the arg) */
 			if (putnextctl2(OTHERQ(q), M_ERROR, rwerr, NOERROR))
 				goto ack;
@@ -305,7 +301,6 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			int rwerr;
 
 			rwerr = *(unsigned long *) mp->b_cont->b_rptr;
-			_printd(("%s: error number is %d\n", __FUNCTION__, rwerr));
 			/* Synthesize a M_ERROR message with a write error (equal to the arg) */
 			if (putnextctl2(OTHERQ(q), M_ERROR, NOERROR, rwerr))
 				goto ack;
@@ -317,7 +312,6 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			int rwerr;
 
 			rwerr = *(unsigned long *) mp->b_cont->b_rptr;
-			_printd(("%s: error number is %d\n", __FUNCTION__, rwerr));
 			/* Synthesize a M_ERROR message with an error (equal to the arg) */
 			if (putnextctl1(OTHERQ(q), M_ERROR, rwerr))
 				goto ack;
@@ -329,7 +323,6 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			int signum;
 
 			signum = *(unsigned long *) mp->b_cont->b_rptr;
-			_printd(("%s: signal number is %d\n", __FUNCTION__, signum));
 			/* Synthesize an M_SIG message with a signal (equal to the arg) */
 			if (putnextctl1(OTHERQ(q), M_PCSIG, signum))
 				goto ack;
@@ -341,7 +334,6 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			int signum;
 
 			signum = *(unsigned long *) mp->b_cont->b_rptr;
-			_printd(("%s: signal number is %d\n", __FUNCTION__, signum));
 			/* Synthesize an M_SIG message with a signal (equal to the arg) */
 			if (putnextctl1(OTHERQ(q), M_SIG, signum))
 				goto ack;
@@ -355,7 +347,6 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			if (ioc->iocblk.ioc_count != TRANSPARENT || mp->b_cont == NULL
 			    || mp->b_cont->b_datap->db_lim - mp->b_cont->b_datap->db_base <
 			    FASTBUF) {
-				_ptrace(("Error path taken!\n"));
 				err = EINVAL;
 				goto nak;
 			}
@@ -384,7 +375,6 @@ testmod_wput(queue_t *q, mblk_t *mp)
 
 			if (ioc->iocblk.ioc_count != TRANSPARENT || mp->b_cont == NULL
 			    || mp->b_cont->b_datap->db_lim - mp->b_cont->b_rptr < FASTBUF) {
-				_ptrace(("Error path taken!\n"));
 				err = EINVAL;
 				goto nak;
 			}
@@ -410,13 +400,11 @@ testmod_wput(queue_t *q, mblk_t *mp)
 		case TM_IOC_IOCTL:
 		{
 			if (ioc->iocblk.ioc_count == TRANSPARENT) {
-				_ptrace(("Error path taken!\n"));
 				err = EINVAL;
 				goto nak;
 			}
 			if (mp->b_cont == NULL
 			    || mp->b_cont->b_wptr - mp->b_cont->b_rptr != ioc->iocblk.ioc_count) {
-				_ptrace(("Error path taken!\n"));
 				err = EINVAL;
 				goto nak;
 			}
@@ -433,7 +421,6 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			if (ioc->iocblk.ioc_count != TRANSPARENT || mp->b_cont == NULL
 			    || mp->b_cont->b_datap->db_lim - mp->b_cont->b_datap->db_base <
 			    FASTBUF) {
-				_ptrace(("Error path taken!\n"));
 				err = EINVAL;
 				goto nak;
 			}
@@ -481,7 +468,6 @@ testmod_wput(queue_t *q, mblk_t *mp)
 				/* abort operations */
 				goto free_it;
 			if (!mp->b_cont || mp->b_cont->b_wptr - mp->b_cont->b_rptr != FASTBUF) {
-				_ptrace(("Error path taken!\n"));
 				err = EINVAL;
 				goto nak;
 			}
@@ -489,7 +475,6 @@ testmod_wput(queue_t *q, mblk_t *mp)
 				if ((unsigned char) mp->b_cont->b_rptr[i] != (unsigned char) 0xa5)
 					break;
 			if (i == FASTBUF) {
-				_ptrace(("Error path taken!\n"));
 				err = EINVAL;
 				goto nak;
 			}
@@ -514,7 +499,6 @@ testmod_wput(queue_t *q, mblk_t *mp)
 			if (ioc->copyresp.cp_private != NULL) {
 				if (!mp->b_cont
 				    || mp->b_cont->b_wptr - mp->b_cont->b_rptr != FASTBUF) {
-					_ptrace(("Error path taken!\n"));
 					err = EINVAL;
 					goto nak;
 				}
@@ -523,7 +507,6 @@ testmod_wput(queue_t *q, mblk_t *mp)
 					    (unsigned char) 0xa5)
 						break;
 				if (i == FASTBUF) {
-					_ptrace(("Error path taken!\n"));
 					err = EINVAL;
 					goto nak;
 				}

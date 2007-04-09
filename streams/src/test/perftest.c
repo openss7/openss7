@@ -703,7 +703,6 @@ do_tests(void)
 			if (ioctl(fds[0], I_SET_HIWAT, hiwat) < 0) {
 				if (verbose)
 					perror("ioctl(I_SET_HIWAT)");
-				goto dead;
 			}
 		}
 #endif
@@ -715,6 +714,18 @@ do_tests(void)
 			if (ioctl(fds[0], I_SET_LOWAT, lowat) < 0) {
 				if (verbose)
 					perror("ioctl(I_SET_LOWAT)");
+				goto dead;
+			}
+		}
+#endif
+#ifdef I_SET_HIWAT
+		if (sethiwat) {
+			if (verbose > 1) {
+				fprintf(stderr, "Setting hiwat on fd %d\n", fds[0]);
+			}
+			if (ioctl(fds[0], I_SET_HIWAT, hiwat) < 0) {
+				if (verbose)
+					perror("ioctl(I_SET_HIWAT)");
 				goto dead;
 			}
 		}
@@ -749,7 +760,6 @@ do_tests(void)
 			if (ioctl(fds[1], I_SET_HIWAT, hiwat) < 0) {
 				if (verbose)
 					perror("ioctl(I_SET_HIWAT)");
-				goto dead;
 			}
 		}
 #endif
@@ -761,6 +771,18 @@ do_tests(void)
 			if (ioctl(fds[1], I_SET_LOWAT, lowat) < 0) {
 				if (verbose)
 					perror("ioctl(I_SET_LOWAT)");
+				goto dead;
+			}
+		}
+#endif
+#ifdef I_SET_HIWAT
+		if (sethiwat) {
+			if (verbose > 1) {
+				fprintf(stderr, "Setting hiwat on fd %d\n", fds[0]);
+			}
+			if (ioctl(fds[1], I_SET_HIWAT, hiwat) < 0) {
+				if (verbose)
+					perror("ioctl(I_SET_HIWAT)");
 				goto dead;
 			}
 		}
