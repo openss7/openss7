@@ -246,7 +246,7 @@ struct stdata {
 	queue_t *sd_wq;			/* wr queue for stream head */
 	dev_t sd_dev;			/* device number of driver */
 	mblk_t *sd_iocblk;		/* message to return for ioctl */
-	struct stdata * volatile sd_other;	/* other stream head for pipes */
+	struct stdata *sd_other;	/* other stream head for pipes */
 //      struct streamtab *sd_strtab;    /* driver streamtab */
 	struct inode *sd_inode;		/* back pointer to inode */
 //      struct dentry *sd_dentry;       /* back pointer to dentry */
