@@ -231,8 +231,10 @@ extern streams_fastcall __unlikely bool __flushq(queue_t *q, int flag, mblk_t **
 #define not_frozen_by_caller(__q)	(bool)({ ((qstream((__q)))->sd_freezer != current); })
 
 #define zlockinit(__sd)			do { rwlock_init(&(__sd)->sd_freeze); } while (0)
-#define zwlock(__sd,__pl)		do { streams_write_lock(&(__sd)->sd_freeze, __pl); (__sd)->sd_freezer = current; } while (0)
-#define zwunlock(__sd,__pl)		do { (__sd)->sd_freezer = NULL; streams_write_unlock(&(__sd)->sd_freeze, (__pl)); } while (0)
+#define zhwlock(__sd)			do { write_lock(&(__sd)->sd_freeze); (__sd)->sd_freezer = current; } while (0)
+#define zhwunlock(__sd)			do { (__sd)->sd_freezer = NULL; write_unlock(&(__sd)->sd_freeze); } while (0)
+#define zwlock(__sd,__pl)		do { streams_local_save((__pl)); zhwlock((__sd)); } while (0)
+#define zwunlock(__sd,__pl)		do { zhwunlock((__sd)); streams_local_restore((__pl)); } while (0)
 #define zrlock(__sd,__pl)		do { streams_local_save(__pl); if ((__sd)->sd_freezer != current) read_lock(&(__sd)->sd_freeze); } while (0)
 #define zrunlock(__sd,__pl)		do { if ((__sd)->sd_freezer != current) read_unlock(&(__sd)->sd_freeze); streams_local_restore((__pl)); } while (0)
 
@@ -254,8 +256,10 @@ extern streams_fastcall __unlikely bool __flushq(queue_t *q, int flag, mblk_t **
  */
 
 #define plockinit(__sd)			do { rwlock_init(&(__sd)->sd_plumb); } while (0)
-#define pwlock(__sd,__pl)		do { zrlock((__sd),__pl); write_lock(&(__sd)->sd_plumb); } while (0)
-#define pwunlock(__sd,__pl)		do { write_unlock(&(__sd)->sd_plumb); zrunlock((__sd),(__pl)); } while (0)
+#define phwlock(__sd)			do { write_lock(&(__sd)->sd_plumb); } while (0)
+#define phwunlock(__sd)			do { write_unlock(&(__sd)->sd_plumb); } while (0)
+#define pwlock(__sd,__pl)		do { zrlock((__sd),(__pl)); phwlock((__sd)); } while (0)
+#define pwunlock(__sd,__pl)		do { phwunlock((__sd)); zrunlock((__sd),(__pl)); } while (0)
 #define prlock(__sd)			do { read_lock_str(&(__sd)->sd_plumb);   } while (0)
 #define prunlock(__sd)			do { read_unlock_str(&(__sd)->sd_plumb); } while (0)
 
