@@ -843,7 +843,7 @@ strput(struct stdata *sd, mblk_t *mp)
 		_trace();
 		return;
 	}
-	_ctrace(put(sd->sd_wq, mp));	/* calls strwput */
+	_ctrace(put(sd->sd_wq, mp)); /* calls strwput */
 	_trace();
 	return;
 }
@@ -855,13 +855,51 @@ strput(struct stdata *sd, mblk_t *mp)
 STATIC streams_inline streams_fastcall __hot_in __must_check int
 strcopyout(const void *from, void __user *to, size_t len)
 {
+#if defined _DEBUG
+#if 0
+	int err = -EFAULT;
+#endif
+#endif
+
+#if defined _DEBUG
+#if 0
+	if (access_ok(VERIFY_WRITE, to, len)) {
+		if ((err = copyout(from, to, len)) < 0)
+			_ptrace(("access_ok succeeded, copyout failed\n"));
+	} else {
+		if ((err = copyout(from, to, len)) == 0)
+			_ptrace(("access_ok failed, copyout succeeded\n"));
+	}
+	return (err);
+#endif
+#else
 	return copyout(from, to, len);
+#endif
 }
 
 STATIC streams_inline streams_fastcall __hot_out __must_check int
 strcopyin(const void __user *from, void *to, size_t len)
 {
+#if defined _DEBUG
+#if 0
+	int err = -EFAULT;
+#endif
+#endif
+
+#if defined _DEBUG
+#if 0
+	if (access_ok(VERIFY_READ, from, len)) {
+		if ((err = copyin(from, to, len)) < 0)
+			_ptrace(("access_ok succeeded, copyin failed\n"));
+	} else {
+		if ((err = copyin(from, to, len)) == 0)
+			_ptrace(("access_ok failed, copyin succeeded\n"));
+	}
+	return (err);
+#endif
+#else
 	return copyin(from, to, len);
+#endif
 }
 
 /* 
@@ -967,10 +1005,9 @@ straccess_slow(struct stdata *sd, const register int access, const register int 
 	/* POSIX semantics for pipes and FIFOs */
 	if (likely(access & (FREAD | FWRITE))) {
 		if (likely((flags & STRISPIPE) != 0)) {
-			if (likely((access & (FREAD | FWRITE)) != 0))
-				if (unlikely(sd->sd_other == NULL
-					     || test_bit(STRCLOSE_BIT, &sd->sd_other->sd_flag)))
-					goto estrpipe;
+			if (unlikely(sd->sd_other == NULL
+				     || test_bit(STRCLOSE_BIT, &sd->sd_other->sd_flag)))
+				goto estrpipe;
 		} else if ((unlikely(flags & STRISFIFO) != 0)) {
 			if (likely((access & FREAD) != 0))
 				if (unlikely(sd->sd_writers == 0))
@@ -1252,8 +1289,7 @@ alloc_data(struct stdata *sd, ssize_t dlen, const void __user *dbuf)
 		if (likely(dlen > 0)) {
 			int err = 0;
 
-			switch (__builtin_expect
-				((volatile int) sd->sd_flag & (STRCSUM | STRCRC32C), 0)) {
+			switch (__builtin_expect((volatile int) sd->sd_flag & (STRCSUM | STRCRC32C), 0)) {
 			case STRCRC32C:
 #if 0
 				/* not doing this just yet */
@@ -1329,8 +1365,7 @@ alloc_proto(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *d
 		if (likely(!IS_ERR((dp = alloc_data(sd, dlen, datp->buf))))) {
 			mp = linkmsg(mp, dp);
 			/* STRHOLD feature in strwput uses this */
-			if (likely(clen < 0))
-				/* PROFILED */
+			if (likely(clen < 0))	/* PROFILED */
 				/* do not coallesce M_DATA written with putmsg */
 				dp->b_flag |= MSGDELIM;
 		} else {
@@ -2605,14 +2640,13 @@ strwaitfifo(struct stdata *sd, const int oflag)
 }
 
 STATIC streams_fastcall __unlikely void
-strwaitqueue(struct stdata *sd, queue_t *q)
+strwaitqueue(queue_t *q, long timeo)
 {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 	DEFINE_WAIT(wait);
 #else
 	DECLARE_WAITQUEUE(wait, current);
 #endif
-	long timeo = sd->sd_closetime;
 	struct queinfo *qu = ((struct queinfo *) _RD(q));
 
 	set_bit(QWCLOSE_BIT, &q->q_flag);
@@ -2657,6 +2691,7 @@ strwaitclose(struct stdata *sd, int oflag)
 {
 	queue_t *q;
 	bool wait;
+	long closetime;
 
 #ifdef CONFIG_STREAMS_LIS_BCM
 	cred_t creds = {.cr_uid = current->euid,.cr_gid = current->egid,.cr_ruid =
@@ -2670,16 +2705,17 @@ strwaitclose(struct stdata *sd, int oflag)
 	q = sd->sd_wq;
 	assert(q);
 
+	closetime = sd->sd_closetime;
 	/* POSIX close() semantics for STREAMS */
-	wait = (!(oflag & FNDELAY) && (sd->sd_closetime != 0) && !signal_pending(current));
+	wait = (!(oflag & FNDELAY) && (closetime != 0) && !signal_pending(current));
 
 	/* STREAM head first */
 	if (wait && q->q_first)
-		_ctrace(strwaitqueue(sd, q));
+		_ctrace(strwaitqueue(q, closetime));
 
 	while ((q = SAMESTR(sd->sd_wq) ? sd->sd_wq->q_next : NULL)) {
 		if (wait && q->q_first)
-			_ctrace(strwaitqueue(sd, q));
+			_ctrace(strwaitqueue(q, closetime));
 		_ctrace(qdetach(_RD(q), oflag, crp));
 		_trace();
 	}
@@ -3050,6 +3086,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 		_ptrace(("Error path taken!\n"));
 		return (-EINVAL);
 	}
+
 #if 0
 	/* let copyout do the work */
 	if (unlikely(!access_ok(VERIFY_WRITE, ic->ic_dp, ic->ic_len)))
@@ -4071,10 +4108,9 @@ strlastclose(struct stdata *sd, int oflag)
 		   same fashion as needs to be done for pipes and master pseudo-terminals, however
 		   rather than generating the message we perform the actions on the other stream
 		   head directly. */
+		swlock(sd_other);
 		strhangup(sd_other);
-		/* we do not free the stream head (or stream head queue pair) until the other
-		   stream head does this too */
-		_ctrace(sd_put((struct stdata **) &sd->sd_other));
+		swunlock(sd_other);
 	}
 
 	/* 1st step: unlink any (temporary) linked streams */
@@ -4091,6 +4127,9 @@ strlastclose(struct stdata *sd, int oflag)
 	/* not last put, but it had better be the next to last if not a pipe */
 	assure(sd_other != NULL || atomic_read(&((struct shinfo *) sd)->sh_refs) == 2);
 
+	/* we do not free the stream head (or stream head queue pair) until the other stream head
+	   does this too */
+	_ctrace(sd_put(&sd->sd_other));	/* could be last put on sd_other */
 	/* this sd_put() balances the original allocation of the stream */
 	_ctrace(sd_put(&sd));	/* not last put */
 }
@@ -4151,9 +4190,8 @@ strpoll_fast(struct file *file, struct poll_table_struct *poll)
 
 		strschedule_poll();
 		poll_wait(file, &sd->sd_polllist, poll);
-		flag = (volatile int) sd->sd_flag;
-		if (unlikely
-		    ((flag & (STRDERR | STWRERR | STRHUP | STRPRI | STRMSIG | STPLEX)) != 0))
+		flag = (volatile int)sd->sd_flag;
+		if (unlikely ((flag & (STRDERR | STWRERR | STRHUP | STRPRI | STRMSIG | STPLEX)) != 0))
 			mask |= strpoll_error(flag);
 		q = sd->sd_rq;
 		dassert(sd->sd_rq != NULL);
@@ -5205,7 +5243,8 @@ strhold(struct stdata *sd, const int f_flags, const char *buf, ssize_t nbytes)
 	ssize_t rtn = 0;
 	queue_t *q;
 
-	if (nbytes != 0 && nbytes <= (FASTBUF >> 1) && (q = sd->sd_wq)->q_first) {
+	if (nbytes != 0 && nbytes <= (FASTBUF >> 1) &&
+	    (mblk_t *volatile) (q = sd->sd_wq)->q_first != NULL) {
 		char fastbuf[FASTBUF >> 1];
 
 		srunlock(sd);
@@ -5214,45 +5253,23 @@ strhold(struct stdata *sd, const int f_flags, const char *buf, ssize_t nbytes)
 		srlock(sd);
 
 		if (rtn == 0 && (rtn = straccess(sd, FWRITE | FNDELAY)) == 0) {
-			unsigned long flags;
-			int blocked;
+			unsigned long pl;
 			mblk_t *b;
 
-			/* have read lock and acess was ok */
-			blocked = bcanputnext(q, 0);
-
-			qwlock(q, flags);	/* before we mess with b */
-			if ((b = q->q_first) && !(b->b_flag & MSGDELIM)) {
-				if (b->b_datap->db_lim >= b->b_wptr + nbytes) {
-					bcopy(fastbuf, b->b_wptr, nbytes);
-					b->b_wptr += nbytes;
-					if (unlikely(test_bit(STRDELIM_BIT, &sd->sd_flag)))
-						b->b_flag |= MSGDELIM;
-					rtn = nbytes;
-					if (blocked) {
-						/* leave it on the queue */
-						/* fix up queue counts - from __putq */
-						if ((q->q_count += nbytes) > q->q_hiwat)
-							set_bit(QFULL_BIT, &q->q_flag);
-						b = NULL;
-					} else {
-						/* take it off the queue - from __getq */
-						/* optimized for 1 message on queue */
-						q->q_first = NULL;
-						q->q_last = NULL;
-						q->q_msgs = 0;
-						q->q_count = 0;
-						clear_bit(QFULL_BIT, &q->q_flag);
-						clear_bit(QWANTR_BIT, &q->q_flag);
-					}
-				}
+			zwlock(sd, pl);	/* before we mess with b */
+			if ((b = (mblk_t *volatile) q->q_first) && !(b->b_flag & MSGDELIM)
+			    && b->b_datap->db_lim >= b->b_wptr + nbytes) {
+				bcopy(fastbuf, b->b_wptr, nbytes);
+				b->b_wptr += nbytes;
+				if (unlikely(test_bit(STRDELIM_BIT, &sd->sd_flag)))
+					b->b_flag |= MSGDELIM;
+				/* leave it on the queue */
+				rtn = nbytes;
+				/* fix up queue counts - from __putq */
+				if ((q->q_count += nbytes) > q->q_hiwat)
+					set_bit(QFULL_BIT, &q->q_flag);
 			}
-			qwunlock(q, flags);
-
-			if (b) {
-				__assert(b->b_next == NULL);
-				putnext(q, b);
-			}
+			zwunlock(sd, pl);
 		}
 	}
 	return (rtn);
@@ -9302,15 +9319,15 @@ str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 						if (test_bit(STRISPIPE_BIT, &sd2->sd_flag)
 						    && sd2->sd_other == NULL
 						    && sd2->sd_wq->q_next == sd2->sd_rq) {
-							unsigned long pl, pl2;
+							unsigned long pl;
 
 							/* always lock 'em in the same order */
 							if (sd < sd2) {
 								pwlock(sd, pl);
-								pwlock(sd2, pl2);
+								phwlock(sd2);
 							} else {
-								pwlock(sd2, pl2);
-								pwlock(sd, pl);
+								pwlock(sd2, pl);
+								phwlock(sd);
 							}
 
 							/* weld 'em together */
@@ -9328,11 +9345,11 @@ str_i_pipe(struct file *file, struct stdata *sd, unsigned long arg)
 
 							/* always unlock 'em in the same order */
 							if (sd < sd2) {
-								pwunlock(sd2, pl2);
+								phwunlock(sd2);
 								pwunlock(sd, pl);
 							} else {
-								pwunlock(sd, pl);
-								pwunlock(sd2, pl2);
+								phwunlock(sd);
+								pwunlock(sd2, pl);
 							}
 							err = 0;
 						}
@@ -10886,43 +10903,32 @@ strwput(queue_t *q, mblk_t *mp)
 		/* fast path */
 		putnext(q, mp);
 	} else if (likely(q->q_next != NULL)) {
-		unsigned long flags;
+		unsigned long pl;
 		ssize_t blen;
 		mblk_t *b;
-		int nohold;
+		int hold;
 
 		blen = mp->b_wptr - mp->b_rptr;
 		/* Feature not activated, or not M_DATA, or banded, or delimited, or longer than
 		   one block, or a zero-length message, or can't hold another write same size. */
-		nohold = ((mp->b_datap->db_type != M_DATA) || (mp->b_band != 0) ||
-			  (mp->b_flag & MSGDELIM) || (mp->b_cont != NULL) ||
-			  (mp->b_wptr == mp->b_rptr) || (blen > (FASTBUF >> 1)));
+		hold = !((mp->b_datap->db_type != M_DATA) || (mp->b_band != 0) ||
+			 (mp->b_flag & MSGDELIM) || (mp->b_cont != NULL) ||
+			 (mp->b_wptr == mp->b_rptr) || (blen > (FASTBUF >> 1)));
 
-		qwlock(q, flags);
+		zwlock(sd, pl);
 		if ((b = q->q_first)) {
-			/* remove from the queue - from __getq */
-			/* optimized for 1 message on queue */
-			q->q_first = NULL;
-			q->q_last = NULL;
-			q->q_msgs = 0;
-			q->q_count = 0;
-			clear_bit(QFULL_BIT, &q->q_flag);
-			clear_bit(QWANTR_BIT, &q->q_flag);
-		} else if (!nohold) {
-			/* add to queue - from __putq */
-			/* optimize for empty queue */
-			if (unlikely((q->q_count = blen) > q->q_hiwat))
-				set_bit(QFULL_BIT, &q->q_flag);
-			q->q_last = mp;
-			q->q_first = mp;
-			q->q_msgs = 1;
-			mp->b_next = NULL;
-			mp->b_prev = NULL;
+			rmvq(q, b);
+			if (mp->b_datap->db_type == M_FLUSH && mp->b_rptr[0] & FLUSHW) {
+				freemsg(b);
+				b = NULL;
+			}
+
+		} else if (hold) {
+			insq(q, NULL, mp);
 			mp = NULL;
 		}
-		qwunlock(q, flags);
+		zwunlock(sd, pl);
 		if (b) {
-			__assert(b->b_next == NULL);
 			/* delayed one has to go - can't delay the other */
 			putnext(q, b);
 			putnext(q, mp);
@@ -10980,7 +10986,7 @@ strwsrv(queue_t *q)
 
 	assert(sd);
 
-	qwlock(q, pl);
+	zwlock(sd, pl);
 	if (test_and_clear_bit(QBACK_BIT, &q->q_flag))
 		be[0] = 1;
 	for (qb = q->q_bandp, band = q->q_nband; qb; qb = qb->qb_next, band--)
@@ -10988,21 +10994,12 @@ strwsrv(queue_t *q)
 			be[band] = 1;
 	band = q->q_nband;
 	if (unlikely((b = q->q_first) != NULL)) {
-		/* remove from the queue - from __getq */
-		/* optimized for 1 message on queue */
-		q->q_first = NULL;
-		q->q_last = NULL;
-		q->q_msgs = 0;
-		q->q_count = 0;
-		clear_bit(QFULL_BIT, &q->q_flag);
-		clear_bit(QWANTR_BIT, &q->q_flag);
+		rmvq(q, b);
 	}
-	qwunlock(q, pl);
+	zwunlock(sd, pl);
 
-	if (b) {
-		__assert(b->b_next == NULL);
+	if (b)
 		putnext(q, b);
-	}
 
 	if (likely(be[0]))	/* PROFILED */
 		strevent(sd, S_WRNORM, 0);
@@ -11229,7 +11226,7 @@ str_m_sig(struct stdata *sd, queue_t *q, mblk_t *mp)
 	   I_SETSIG ioctl.  Other signals are sent to a process only if the stream is associated
 	   with the control terminal (see 7.11.2)." */
 	zwlock(sd, pl);
-	putq(q, mp);		/* ok when frozen - faster than insq */
+	insq(q, NULL, mp);	/* ok when frozen */
 	if (q->q_first->b_datap->db_type == M_SIG)
 		set_bit(STRMSIG_BIT, &sd->sd_flag);
 	zwunlock(sd, pl);
