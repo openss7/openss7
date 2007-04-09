@@ -2339,8 +2339,7 @@ putp_fast(queue_t *q, mblk_t *mp)
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
-	if (unlikely(backq(q) == NULL))
-		prlock(qstream(q));
+	prlock(qstream(q));
 
 	/* procs can't be turned off */
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
@@ -2371,8 +2370,7 @@ putp_fast(queue_t *q, mblk_t *mp)
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
 	dassert(qstream(q));
-	if (unlikely(backq(q) == NULL))
-		prunlock(qstream(q));
+	prunlock(qstream(q));
 }
 
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -2439,7 +2437,7 @@ srvp_fast(queue_t *q)
 			/* prefetch private structure */
 			prefetch(q->q_ptr);
 
-			assert(q->q_srvp);
+			dassert(q->q_srvp);
 #ifdef CONFIG_STREAMS_DO_STATS
 			dassert(q->q_qinfo);
 			if (unlikely(q->q_qinfo->qi_mstat != NULL))
@@ -3273,8 +3271,7 @@ put(queue_t *q, mblk_t *mp)
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
 	dassert(qstream(q));
-	if (unlikely(backq(q) == NULL))
-		prlock(qstream(q));
+	prlock(qstream(q));
 	if (likely(q->q_ftmsg == NULL) || likely(!put_filter(&q, mp))) {
 #ifdef CONFIG_STREAMS_SYNCQS
 		qputp(q, mp);
@@ -3286,8 +3283,7 @@ put(queue_t *q, mblk_t *mp)
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
 	dassert(qstream(q));
-	if (unlikely(backq(q) == NULL))
-		prunlock(qstream(q));
+	prunlock(qstream(q));
 	return;
 }
 
@@ -4302,7 +4298,10 @@ scanqueues(struct strthread *t)
 
 					clear_bit(QHLIST_BIT, &q->q_flag);
 					/* let write service procedure do the right thing */
+					prlock(sd);
 					qenable(q);
+					prunlock(sd);
+					sd_put(&sd);
 				}
 			} while (unlikely((sd = sd_scanq) != NULL));
 			if (sd) {
