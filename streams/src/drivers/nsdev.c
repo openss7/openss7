@@ -197,10 +197,8 @@ nsdevopen(struct inode *inode, struct file *file)
 		dev_t dev = makedevice(major, minor);
 		int sflag = (file->f_flags & O_CLONE) ? CLONEOPEN : DRVOPEN;
 
-		_printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
 		err = spec_open(file, cdev, dev, sflag);
-		_printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-		_ctrace(sdev_put(cdev));
+		sdev_put(cdev);
 	} else
 		err = -ENOENT;
 	return (err);
@@ -275,7 +273,6 @@ nsdev_open(struct inode *inode, struct file *file)
 	err = -ENXIO;
 	if (!(cdev = cdev_match(file->f_dentry->d_name.name)))
 		goto exit;
-	_printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
 	err = -ENXIO;
 	if (cdev == &nsdev_cdev)
 		goto cdev_put_exit;	/* would loop */
@@ -283,8 +280,7 @@ nsdev_open(struct inode *inode, struct file *file)
 	dev = makedevice(modid, instance);
 	err = spec_open(file, cdev, dev, CLONEOPEN);
       cdev_put_exit:
-	_printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	_ctrace(sdev_put(cdev));
+	sdev_put(cdev);
       exit:
 	return (err);
 }

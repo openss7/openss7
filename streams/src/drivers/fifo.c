@@ -219,30 +219,13 @@ fifo_open(struct inode *inode, struct file *file)
 	int err;
 	dev_t dev = makedevice(fifo_cdev.d_modid, 0);
 
-	_printd(("%s: %s: putting file operations\n", __FUNCTION__, file->f_dentry->d_name.name));
-	_printd(("%s: %s: getting file operations\n", __FUNCTION__, fifo_cdev.d_name));
 	{
 		struct file_operations *f_op;
 
 		err = -ENXIO;
 		if (!(f_op = fops_get(fifo_cdev.d_fop))) {
-			_ptrace(("Error path taken!\n"));
 			goto error;
 		}
-#ifdef _DEBUG
-		if (f_op->owner)
-			_printd(("%s: [%s] new f_ops count is now %d\n", __FUNCTION__,
-				 f_op->owner->name, module_refcount(f_op->owner)));
-		else
-			_printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
-#endif
-#ifdef _DEBUG
-		if (file->f_op->owner)
-			_printd(("%s: [%s] old f_ops count is now %d\n", __FUNCTION__,
-				 file->f_op->owner->name, module_refcount(file->f_op->owner) - 1));
-		else
-			_printd(("%s: old f_ops have no owner!\n", __FUNCTION__));
-#endif
 		fops_put(file->f_op);
 		file->f_op = f_op;
 	}

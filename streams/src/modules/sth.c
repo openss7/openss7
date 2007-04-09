@@ -615,7 +615,7 @@ STATIC streams_fastcall __unlikely bool
 strdetached(struct stdata *sd)
 {
 	/* test for detached close needed */
-	if (sd->sd_opens == 0 && !((volatile int)sd->sd_flag & (STWOPEN | STPLEX | STRMOUNT))
+	if (sd->sd_opens == 0 && !((volatile int) sd->sd_flag & (STWOPEN | STPLEX | STRMOUNT))
 	    && !test_and_set_bit(STRCLOSE_BIT, &sd->sd_flag))
 		return (true);
 	return (false);
@@ -648,7 +648,7 @@ strsyscall(void)
 	/* try to avoid context switch */
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	/* before every system call return -- saves a context switch */
-	if (likely(((volatile unsigned long)t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+	if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	runqueues();
 #endif
@@ -667,7 +667,7 @@ strsyscall_ioctl(void)
 	/* try to avoid context switch */
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	/* before every system call return -- saves a context switch */
-	if (likely(((volatile unsigned long)t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+	if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	runqueues();
 #endif
@@ -686,7 +686,7 @@ strsyscall_write(void)
 	/* try to avoid context switch */
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	/* before every system call return -- saves a context switch */
-	if (likely(((volatile unsigned long)t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+	if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	runqueues();
 #endif
@@ -705,7 +705,7 @@ strsyscall_read(void)
 	/* try to avoid context switch */
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	/* before every system call return -- saves a context switch */
-	if (likely(((volatile unsigned long)t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+	if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	runqueues();
 #endif
@@ -728,7 +728,7 @@ strschedule(void)
 	/* try to avoid context switch */
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	/* before every sleep -- saves a context switch */
-	if (likely(((volatile unsigned long)t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+	if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	// set_current_state(TASK_RUNNING);
 	runqueues();
@@ -752,7 +752,7 @@ strschedule_poll(void)
 	/* try to avoid context switch */
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	/* before every sleep -- saves a context switch */
-	if (likely(((volatile unsigned long)t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+	if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	// set_current_state(TASK_RUNNING);
 	runqueues();
@@ -776,7 +776,7 @@ strschedule_ioctl(void)
 	/* try to avoid context switch */
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	/* before every sleep -- saves a context switch */
-	if (likely(((volatile unsigned long)t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+	if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
 	// set_current_state(TASK_RUNNING);
 	runqueues();
@@ -801,7 +801,7 @@ strschedule_write(void)
 		/* try to avoid context switch */
 		set_task_state(t->proc, TASK_INTERRUPTIBLE);
 		/* before every sleep -- saves a context switch */
-		if (likely(((volatile unsigned long)t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+		if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 			return;
 		// set_current_state(TASK_RUNNING);
 		runqueues();
@@ -827,7 +827,7 @@ strschedule_read(void)
 		/* try to avoid context switch */
 		set_task_state(t->proc, TASK_INTERRUPTIBLE);
 		/* before every sleep -- saves a context switch */
-		if (likely(((volatile unsigned long)t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+		if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 			return;
 		// set_current_state(TASK_RUNNING);
 		runqueues();
@@ -843,7 +843,7 @@ strput(struct stdata *sd, mblk_t *mp)
 		_trace();
 		return;
 	}
-	_ctrace(put(sd->sd_wq, mp)); /* calls strwput */
+	_ctrace(put(sd->sd_wq, mp));	/* calls strwput */
 	_trace();
 	return;
 }
@@ -855,63 +855,13 @@ strput(struct stdata *sd, mblk_t *mp)
 STATIC streams_inline streams_fastcall __hot_in __must_check int
 strcopyout(const void *from, void __user *to, size_t len)
 {
-#if defined _DEBUG
-#if 0
-	int err = -EFAULT;
-#endif
-#endif
-
-#if defined _DEBUG
-#if 0
-	if (access_ok(VERIFY_WRITE, to, len)) {
-		if ((err = copyout(from, to, len)) < 0)
-			_ptrace(("access_ok succeeded, copyout failed\n"));
-	} else {
-		if ((err = copyout(from, to, len)) == 0)
-			_ptrace(("access_ok failed, copyout succeeded\n"));
-	}
-	return (err);
-#endif
-#else
-#if 0
-	if (likely(access_ok(VERIFY_WRITE, to, len) != 0))
-#endif
-		return copyout(from, to, len);
-#if 0
-	return (-EFAULT);
-#endif
-#endif
+	return copyout(from, to, len);
 }
 
 STATIC streams_inline streams_fastcall __hot_out __must_check int
 strcopyin(const void __user *from, void *to, size_t len)
 {
-#if defined _DEBUG
-#if 0
-	int err = -EFAULT;
-#endif
-#endif
-
-#if defined _DEBUG
-#if 0
-	if (access_ok(VERIFY_READ, from, len)) {
-		if ((err = copyin(from, to, len)) < 0)
-			_ptrace(("access_ok succeeded, copyin failed\n"));
-	} else {
-		if ((err = copyin(from, to, len)) == 0)
-			_ptrace(("access_ok failed, copyin succeeded\n"));
-	}
-	return (err);
-#endif
-#else
-#if 0
-	if (likely(access_ok(VERIFY_READ, from, len) != 0))
-#endif
-		return copyin(from, to, len);
-#if 0
-	return (-EFAULT);
-#endif
-#endif
+	return copyin(from, to, len);
 }
 
 /* 
@@ -1138,7 +1088,7 @@ straccess_fifo(struct stdata *sd, const register int access, const register int 
 		if (likely(access & (FREAD | FWRITE))) {
 			if (likely((flags & STRISPIPE) != 0)) {
 				if (unlikely(sd->sd_other == NULL
-				     || test_bit(STRCLOSE_BIT, &sd->sd_other->sd_flag)))
+					     || test_bit(STRCLOSE_BIT, &sd->sd_other->sd_flag)))
 					goto go_slow;
 			}
 			if ((likely(flags & STRISFIFO) != 0)) {
@@ -1172,14 +1122,14 @@ straccess(struct stdata *sd, const register int access)
 	/* no errors for close */
 	if (unlikely((access & FTRUNC) != 0))	/* PROFILED */
 		goto read_fifo;
-	flags = (volatile int)sd->sd_flag;
+	flags = (volatile int) sd->sd_flag;
 	if (unlikely((flags & (STRISPIPE | STRISFIFO | STRISTTY)) != 0))
 		goto go_fifo;
 	if (unlikely((flags & (STPLEX | STRCLOSE | STRDERR | STWRERR | STRHUP)) != 0))
 		goto go_fifo;
 	return (0);
       read_fifo:
-	flags = (volatile int)sd->sd_flag;
+	flags = (volatile int) sd->sd_flag;
       go_fifo:
 	return straccess_fifo(sd, access, flags);
 }
@@ -1302,7 +1252,8 @@ alloc_data(struct stdata *sd, ssize_t dlen, const void __user *dbuf)
 		if (likely(dlen > 0)) {
 			int err = 0;
 
-			switch (__builtin_expect((volatile int)sd->sd_flag & (STRCSUM | STRCRC32C), 0)) {
+			switch (__builtin_expect
+				((volatile int) sd->sd_flag & (STRCSUM | STRCRC32C), 0)) {
 			case STRCRC32C:
 #if 0
 				/* not doing this just yet */
@@ -1351,8 +1302,7 @@ alloc_data(struct stdata *sd, ssize_t dlen, const void __user *dbuf)
  *  compatibility package.
  */
 STATIC streams_inline streams_fastcall __hot_put mblk_t *
-alloc_proto(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *datp,
-	    const int type)
+alloc_proto(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *datp, const int type)
 {
 	mblk_t *mp = NULL, *dp = NULL;
 	ssize_t clen, dlen;
@@ -1379,7 +1329,8 @@ alloc_proto(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *d
 		if (likely(!IS_ERR((dp = alloc_data(sd, dlen, datp->buf))))) {
 			mp = linkmsg(mp, dp);
 			/* STRHOLD feature in strwput uses this */
-			if (likely(clen < 0))	/* PROFILED */
+			if (likely(clen < 0))
+				/* PROFILED */
 				/* do not coallesce M_DATA written with putmsg */
 				dp->b_flag |= MSGDELIM;
 		} else {
@@ -3099,7 +3050,6 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 		_ptrace(("Error path taken!\n"));
 		return (-EINVAL);
 	}
-
 #if 0
 	/* let copyout do the work */
 	if (unlikely(!access_ok(VERIFY_WRITE, ic->ic_dp, ic->ic_len)))
@@ -3979,7 +3929,7 @@ strinccounts(struct file *file, struct stdata *sd, int oflag)
 	if (oflag & FWRITE)
 		sd->sd_writers++;
 
-	if (((volatile int)sd->sd_flag & STRISFIFO))
+	if (((volatile int) sd->sd_flag & STRISFIFO))
 		strwakeall(sd);
 
 	sd->sd_file = file;
@@ -4020,9 +3970,9 @@ strdeccounts(struct stdata *sd, int oflag)
 		sd->sd_opens = 0;
 		last = strdetached(sd);
 	}
-	if (((volatile int)sd->sd_flag & STRISFIFO))
+	if (((volatile int) sd->sd_flag & STRISFIFO))
 		strwakeall(sd);
-	if (((volatile int)sd->sd_flag & STRISPIPE) && sd->sd_other != NULL)
+	if (((volatile int) sd->sd_flag & STRISPIPE) && sd->sd_other != NULL)
 		strwakeall(sd->sd_other);
 
 	swunlock(sd);
@@ -4124,7 +4074,7 @@ strlastclose(struct stdata *sd, int oflag)
 		strhangup(sd_other);
 		/* we do not free the stream head (or stream head queue pair) until the other
 		   stream head does this too */
-		_ctrace(sd_put((struct stdata **)&sd->sd_other));
+		_ctrace(sd_put((struct stdata **) &sd->sd_other));
 	}
 
 	/* 1st step: unlink any (temporary) linked streams */
@@ -4201,8 +4151,9 @@ strpoll_fast(struct file *file, struct poll_table_struct *poll)
 
 		strschedule_poll();
 		poll_wait(file, &sd->sd_polllist, poll);
-		flag = (volatile int)sd->sd_flag;
-		if (unlikely ((flag & (STRDERR | STWRERR | STRHUP | STRPRI | STRMSIG | STPLEX)) != 0))
+		flag = (volatile int) sd->sd_flag;
+		if (unlikely
+		    ((flag & (STRDERR | STWRERR | STRHUP | STRPRI | STRMSIG | STPLEX)) != 0))
 			mask |= strpoll_error(flag);
 		q = sd->sd_rq;
 		dassert(sd->sd_rq != NULL);
@@ -4523,7 +4474,7 @@ stropen(struct inode *inode, struct file *file)
 	if (!err) {
 		stri_insert(file, sd);	/* publish to file pointer */
 		/* do this if no error and FIFO *after* releasing open bit */
-		if ((volatile int)sd->sd_flag & STRISFIFO)
+		if ((volatile int) sd->sd_flag & STRISFIFO)
 			/* POSIX blocking semantics for FIFOS */
 			err = strwaitfifo(sd, oflag);
 	}
@@ -7524,7 +7475,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 	int fd = (int) arg;
 
 	err = -EINVAL;
-	if ((volatile int)mux->sd_flag & (STRISFIFO | STRISPIPE)) {
+	if ((volatile int) mux->sd_flag & (STRISFIFO | STRISPIPE)) {
 		_ptrace(("Error path taken!\n"));
 		goto error;
 	}
@@ -7780,7 +7731,7 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
 	const int access = (FREAD | FWRITE | FEXCL | FNDELAY);
 
 	err = -EINVAL;
-	if ((volatile int)mux->sd_flag & (STRISFIFO | STRISPIPE))
+	if ((volatile int) mux->sd_flag & (STRISFIFO | STRISPIPE))
 		goto error;
 
 	if ((err = strwaitopen(mux, access)))
@@ -7935,7 +7886,7 @@ str_i_list(const struct file *file, struct stdata *sd, unsigned long arg)
 		if (!(err = straccess_rlock(sd, FAPPEND))) {
 			int drivers;
 
-			drivers = ((volatile int)sd->sd_flag & (STRISFIFO | STRISPIPE)) ? 0 : 1;
+			drivers = ((volatile int) sd->sd_flag & (STRISFIFO | STRISPIPE)) ? 0 : 1;
 			err = sd->sd_pushcnt + drivers;
 			srunlock(sd);
 		}
@@ -7959,7 +7910,7 @@ str_i_list(const struct file *file, struct stdata *sd, unsigned long arg)
 		struct queue *q;
 		size_t size = 0;
 		int i = 0;
-		int drivers = ((volatile int)sd->sd_flag & (STRISFIFO | STRISPIPE)) ? 0 : 1;
+		int drivers = ((volatile int) sd->sd_flag & (STRISFIFO | STRISPIPE)) ? 0 : 1;
 
 		if ((sl.sl_nmods = min(sd->sd_pushcnt + drivers, sl.sl_nmods))) {
 			struct str_mlist *smp;
@@ -8987,7 +8938,7 @@ str_i_get_strmsgsz(const struct file *file, struct stdata *sd, unsigned long arg
 {
 	int size = sd->sd_strmsgsz;
 
-	return strcopyout(&size, (void *)arg, sizeof(size));
+	return strcopyout(&size, (void *) arg, sizeof(size));
 }
 
 #ifdef WITH_32BIT_CONVERSION
@@ -9009,7 +8960,7 @@ str_i_get_strctlsz(const struct file *file, struct stdata *sd, unsigned long arg
 {
 	int size = sd->sd_strctlsz;
 
-	return strcopyout(&size, (void *)arg, sizeof(size));
+	return strcopyout(&size, (void *) arg, sizeof(size));
 }
 
 #ifdef WITH_32BIT_CONVERSION
@@ -9097,7 +9048,7 @@ str_i_get_hiwat(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int size = sd->sd_rq->q_hiwat;
 
-	return strcopyout(&size, (void *)arg, sizeof(size));
+	return strcopyout(&size, (void *) arg, sizeof(size));
 }
 
 #ifdef WITH_32BIT_CONVERSION
@@ -9119,7 +9070,7 @@ str_i_get_lowat(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	int size = sd->sd_rq->q_lowat;
 
-	return strcopyout(&size, (void *)arg, sizeof(size));
+	return strcopyout(&size, (void *) arg, sizeof(size));
 }
 
 #ifdef WITH_32BIT_CONVERSION
@@ -9570,7 +9521,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 			return str_i_anchor(file, sd, arg);	/* compatible */
 		case _IOC_NR(I_ESETSIG):
 			_printd(("%s: got I_ESETSIG\n", __FUNCTION__));
-			return str_i_egetsig32(file, sd, arg);	/* not compatible*/
+			return str_i_egetsig32(file, sd, arg);	/* not compatible */
 		case _IOC_NR(I_EGETSIG):
 			_printd(("%s: got I_EGETSIG\n", __FUNCTION__));
 			return str_i_esetsig(file, sd, arg);

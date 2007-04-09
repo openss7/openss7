@@ -215,7 +215,7 @@ cloneopen(struct inode *inode, struct file *file)
 
 		dev = makedevice(cdev->d_modid, 0);
 		err = spec_open(file, cdev, dev, CLONEOPEN);
-		_ctrace(sdev_put(cdev));
+		sdev_put(cdev);
 		return (err);
 	}
 	return (-ENOENT);
@@ -304,27 +304,20 @@ cdev_open(struct inode *inode, struct file *file)
 	minor = MINOR(inode->i_rdev);
 	major = MAJOR(inode->i_rdev);
 #endif
-	_ptrace(("%s: major is %d\n", __FUNCTION__, (int) major));
-	_ptrace(("%s: minor is %d\n", __FUNCTION__, (int) minor));
 	if (!(cdev = sdev_get(major))) {
-		_ptrace(("%s: cannot find major device %d\n", __FUNCTION__, (int) major));
 		return (-ENXIO);
 	}
 	minor = cdev_minor(cdev, major, minor);
 	major = cdev->d_major;
 	modid = cdev->d_modid;
-	_ptrace(("%s: final major is %d\n", __FUNCTION__, (int) major));
-	_ptrace(("%s: final minor is %d\n", __FUNCTION__, (int) minor));
-	_ptrace(("%s: final modid is %d\n", __FUNCTION__, (int) modid));
 	dev = makedevice(modid, minor);
 	sflag = DRVOPEN;
 	if (cdev->d_flag & D_CLONE)
 		sflag = CLONEOPEN;
 	else if ((cmin = cmin_get(cdev, minor)) && cmin->n_flag & D_CLONE)
 		sflag = CLONEOPEN;
-	_ptrace(("%s: opening device\n", __FUNCTION__));
 	err = spec_open(file, cdev, dev, sflag);
-	_ctrace(sdev_put(cdev));
+	sdev_put(cdev);
 	return (err);
 }
 
@@ -347,10 +340,8 @@ register_clone(struct cdevsw *cdev)
 	int err;
 	struct devnode *cmin;
 
-	_ptrace(("%s: registering clone minor for %s\n", __FUNCTION__, cdev->d_name));
 	err = -ENOMEM;
 	if (!(cmin = kmalloc(sizeof(*cmin), GFP_ATOMIC))) {
-		_printd(("could not allocate minor devnode structure\n"));
 		goto error;
 	}
 	memset(cmin, 0, sizeof(*cmin));
@@ -369,12 +360,9 @@ register_clone(struct cdevsw *cdev)
 	cmin->n_minor = cdev->d_major;
 	cmin->n_dev = &clone_cdev;
 	if ((err = register_strnod(&clone_cdev, cmin, cdev->d_major)) < 0) {
-		_printd(("%s: could not register minor node for %s, err = %d\n", __FUNCTION__,
-			cdev->d_name, -err));
 		kfree(cmin);
 		goto error;
 	}
-	_printd(("%s: registered clone minor for %s\n", __FUNCTION__, cdev->d_name));
       error:
 	return (err);
 }
@@ -520,7 +508,6 @@ clone_open(struct inode *inode, struct file *file)
 	minor_t minor;
 	modID_t modid, instance;
 
-	_ptrace(("%s: opening clone device\n", __FUNCTION__));
 #if defined HAVE_KFUNC_TO_KDEV_T
 	minor = MINOR(kdev_t_to_nr(inode->i_rdev));
 	major = MAJOR(kdev_t_to_nr(inode->i_rdev));
@@ -528,24 +515,16 @@ clone_open(struct inode *inode, struct file *file)
 	minor = MINOR(inode->i_rdev);
 	major = MAJOR(inode->i_rdev);
 #endif
-	_printd(("%s: external major %hu, minor %hu\n", __FUNCTION__, major, minor));
 	minor = cdev_minor(&clone_cdev, major, minor);
 	major = clone_cdev.d_major;
-	_printd(("%s: base major %hu, extended minor %hu\n", __FUNCTION__, major, minor));
 	modid = clone_cdev.d_modid;
-	_printd(("%s: internal major %hu\n", __FUNCTION__, modid));
 	err = -ENXIO;
-	_printd(("%s: device maps to internal major %hu, minor %hu\n", __FUNCTION__, modid, 0));
 	if (!(cdev = sdev_get(minor))) {
-		_printd(("%s: could not find driver for minor %hu\n", __FUNCTION__, minor));
 		goto exit;
 	}
-	_printd(("%s: %s: got device\n", __FUNCTION__, cdev->d_name));
 	instance = cdev->d_modid;
-	_printd(("%s: opening driver %s\n", __FUNCTION__, cdev->d_name));
 	err = spec_open(file, cdev, makedevice(modid, instance), CLONEOPEN);
-	_printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	_ctrace(sdev_put(cdev));
+	sdev_put(cdev);
       exit:
 	return (err);
 }

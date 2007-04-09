@@ -202,11 +202,6 @@ static struct module_stat mux_lrstat __attribute__((__aligned__(SMP_CACHE_BYTES)
 static struct module_stat mux_lwstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
 
 #ifdef LIS
-#define _trace() while (0) { }
-#define _ptrace(__x) while (0) { }
-#define _printd(__x) while (0) { }
-#define pswerr(__x) while (0) { }
-#define _ctrace(__x) __x
 
 #define QSVCBUSY QRUNNING
 
@@ -290,26 +285,21 @@ mux_uwput(queue_t *q, mblk_t *mp)
 	unsigned long flags;
 	int err;
 
-	_trace();
 	switch (mp->b_datap->db_type) {
 	case M_IOCTL:
 	{
 		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
-		_trace();
 		switch (ioc->iocblk.ioc_cmd) {
 		case I_LINK:
 		case I_PLINK:
 		{
 			struct linkblk *l;
 
-			_trace();
 			if (!mp->b_cont) {
-				_ptrace(("Error path taken!\n"));
 				goto einval;
 			}
 			if (!(bot = kmem_alloc(sizeof(*bot), KM_NOSLEEP))) {
-				_ptrace(("Error path taken!\n"));
 				goto enomem;
 			}
 			l = (typeof(l)) mp->b_cont->b_rptr;
@@ -333,9 +323,7 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		{
 			struct linkblk *l;
 
-			_trace();
 			if (!mp->b_cont) {
-				_ptrace(("Error path taken!\n"));
 				goto einval;
 			}
 			l = (typeof(l)) mp->b_cont->b_rptr;
@@ -379,7 +367,6 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		{
 			int l_index;
 
-			_trace();
 			if (ioc->iocblk.ioc_count != sizeof(int))
 				goto einval;
 			if (!mp->b_cont)
@@ -406,7 +393,6 @@ mux_uwput(queue_t *q, mblk_t *mp)
 		{
 			int l_index;
 
-			_trace();
 			if (ioc->iocblk.ioc_count != sizeof(int))
 				goto einval;
 			if (!mp->b_cont)
@@ -430,7 +416,6 @@ mux_uwput(queue_t *q, mblk_t *mp)
 			goto ack;
 		}
 		default:
-			_ptrace(("Error path taken!\n"));
 			if (mux->other)
 				goto passmsg;
 		      einval:
