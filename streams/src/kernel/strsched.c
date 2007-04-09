@@ -2230,22 +2230,21 @@ qwakeup(queue_t *q)
 STATIC streams_inline streams_fastcall void
 strwrit_fast(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *))
 {
+	struct stdata *sd;
+
 	dassert(func);
 	dassert(q);
-#ifdef CONFIG_SMP
-	dassert(qstream(q));
-	prlock(qstream(q));
+	sd = qstream(q);
+	dassert(sd);
+	prlock(sd);
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
-#endif
-		func(q, mp);
+		(*func)(q, mp);
 		qwakeup(q);
-#ifdef CONFIG_SMP
 	} else {
 		freemsg(mp);
 		swerr();
 	}
-	prunlock(qstream(q));
-#endif
+	prunlock(sd);
 }
 
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -2272,22 +2271,21 @@ strwrit(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t *))
 STATIC streams_inline streams_fastcall void
 strfunc_fast(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg)
 {
+	struct stdata *sd;
+
 	dassert(func);
 	dassert(q);
-#ifdef CONFIG_SMP
-	dassert(qstream(q));
-	prlock(qstream(q));
+	sd = qstream(q);
+	dassert(sd);
+	prlock(sd);
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
-#endif
-		func(arg, mp);
+		(*func)(arg, mp);
 		qwakeup(q);
-#ifdef CONFIG_SMP
 	} else {
 		freemsg(mp);
 		swerr();
 	}
-	prunlock(qstream(q));
-#endif
+	prunlock(sd);
 }
 
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -3651,32 +3649,36 @@ do_stream_synced(struct strevent *se)
 STATIC void
 do_bufcall_synced(struct strevent *se)
 {
-	queue_t *q;
 	void streamscall (*func) (long);
 
-	q = se->x.b.queue;
 	if (likely((func = se->x.b.func) != NULL)) {
-		unsigned long flags = 0;
-		int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
+		queue_t *q;
 
-		if (unlikely(safe))
-			streams_local_save(flags);
-#ifdef CONFIG_SMP
-		if (likely(q != NULL))
-			prlock(qstream(q));
-#endif
-		func(se->x.b.arg);
-		if (likely(q != NULL))
-			qwakeup(q);
-#ifdef CONFIG_SMP
-		if (likely(q != NULL))
-			prunlock(qstream(q));
-#endif
-		if (unlikely(safe))
-			streams_local_restore(flags);
+		if ((q = se->x.b.queue) != NULL) {
+			bool safe = test_bit(QSAFE_BIT, &q->q_flag);
+			unsigned long pl = 0;
+			struct stdata *sd;
+
+			sd = qstream(q);
+			dassert(sd);
+			if (unlikely(safe))
+				zwlock(sd, pl);
+			else
+				prlock(sd);
+			if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
+				(*func)(se->x.b.arg);
+				qwakeup(q);
+			} else {
+				swerr();
+			}
+			if (unlikely(safe))
+				zwunlock(sd, pl);
+			else
+				prunlock(sd);
+			qput(&q);
+		} else
+			(*func)(se->x.b.arg);
 	}
-	if (q)
-		_ctrace(qput(&q));
 }
 
 /**
@@ -3705,32 +3707,42 @@ do_bufcall_synced(struct strevent *se)
 STATIC void
 do_timeout_synced(struct strevent *se)
 {
-	queue_t *q;
 	void streamscall (*func) (caddr_t);
 
-	q = se->x.t.queue;
 	if (likely((func = se->x.t.func) != NULL)) {
-		unsigned long flags = 0;
-		int safe = (se->x.t.pl != 0 || (q && test_bit(QSAFE_BIT, &q->q_flag)));
+		queue_t *q;
 
-		if (unlikely(safe))
-			streams_local_save(flags);
-#ifdef CONFIG_SMP
-		if (likely(q != NULL))
-			prlock(qstream(q));
-#endif
-		func(se->x.t.arg);
-		if (likely(q != NULL))
-			qwakeup(q);
-#ifdef CONFIG_SMP
-		if (likely(q != NULL))
-			prunlock(qstream(q));
-#endif
-		if (unlikely(safe))
-			streams_local_restore(flags);
+		if ((q = se->x.t.queue) != NULL) {
+			int safe = (se->x.t.pl != 0 || test_bit(QSAFE_BIT, &q->q_flag));
+			unsigned long pl = 0;
+			struct stdata *sd;
+
+			sd = qstream(q);
+			dassert(sd);
+			if (unlikely(safe))
+				zwlock(sd, pl);
+			else
+				prlock(sd);
+			if (test_bit(QPROCS_BIT, &q->q_flag) == 0) {
+				(*func) (se->x.t.arg);
+				qwakeup(q);
+			}
+			if (unlikely(safe))
+				zwunlock(sd, pl);
+			else
+				prunlock(sd);
+			qput(&q);
+		} else {
+			int safe = se->x.t.pl != 0;
+			unsigned long pl = 0;
+
+			if (unlikely(safe))
+				streams_local_save(pl);
+			(*func) (se->x.t.arg);
+			if (unlikely(safe))
+				streams_local_restore(pl);
+		}
 	}
-	if (q)
-		_ctrace(qput(&q));
 }
 
 /**
@@ -3852,34 +3864,34 @@ do_weldq_synced(struct strevent *se)
 		_ctrace(qput(&qn3));
 	}
 	{
-		queue_t *q = se->x.w.queue;
+		weld_fcn_t func;
 
-		if (se->x.w.func) {
-			int safe = (q && test_bit(QSAFE_BIT, &q->q_flag));
-			unsigned long flags = 0;
+		if (likely((func = se->x.w.func) != NULL)) {
+			queue_t *q;
 
-			if (safe) {
+			if ((q = se->x.w.queue) != NULL) {
+				int safe = test_bit(QSAFE_BIT, &q->q_flag);
+				unsigned long pl = 0;
 				struct stdata *sd;
 
-				dassert(q);
 				sd = qstream(q);
 				dassert(sd);
-				zwlock(sd, flags);
-			}
-
-			se->x.w.func(se->x.w.arg);
-
-			if (safe) {
-				struct stdata *sd;
-
-				dassert(q);
-				sd = qstream(q);
-				dassert(sd);
-				zwunlock(sd, flags);
-			}
+				if (unlikely(safe))
+					zwlock(sd, pl);
+				else
+					prlock(sd);
+				if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
+					(*func)(se->x.w.arg);
+					qwakeup(q);
+				}
+				if (unlikely(safe))
+					zwunlock(sd, pl);
+				else
+					prunlock(sd);
+				qput(&q);
+			} else
+				(*func)(se->x.w.arg);
 		}
-		if (q)
-			_ctrace(qput(&q));
 	}
 }
 
@@ -4929,7 +4941,7 @@ sd_get(struct stdata *sd)
 #if defined CONFIG_STREAMS_STH_MODULE || !defined CONFIG_STREAMS_STH
 EXPORT_SYMBOL_GPL(sd_get);	/* include/sys/streams/strsubr.h */
 #endif
-BIG_STATIC_INLINE_STH streams_fastcall __hot void
+BIG_STATIC_STH streams_fastcall __hot void
 sd_put(struct stdata **sdp)
 {
 	struct stdata *sd;
@@ -5507,7 +5519,7 @@ open_softirq(int nr, void (*action) (struct softirq_action *), void *data)
 {
 	static void (*func) (int, void (*)(struct softirq_action *), void *) =
 	    (typeof(func)) HAVE_OPEN_SOFTIRQ_ADDR;
-	return func(nr, action, data);
+	return (*func)(nr, action, data);
 }
 #endif
 #endif
