@@ -58,6 +58,21 @@
 @c =========================================================================
 
 @table @code
+@item 011.  2007-04-10T10:56:42+0000
+
+The strbcflag flag was never being cleared, causing infinite looping of the scheduler once the
+maximum number of buffers was reached.  This also revealed a problem that bufcalls were being run
+unncecessarily (when strbcwait was set, instead of only when strbcflag was set).
+
+@emph{*fixed*} in @command{streams-0.9.2.3}
+
+@item 010.  2007-04-10T10:55:29+0000
+
+The stream event sequence number was wrapping and becoming larger than the event mask resulting in
+inability to cancel buffer callbacks and timeouts.
+
+@emph{*fixed*} in @command{streams-0.9.2.3}
+
 @item 009.  2007-04-02T11:57:35+0000
 
 @file{ldl} was using an incorrect MKDEV command, but when the Stream head attempted to redirect the
