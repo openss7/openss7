@@ -498,14 +498,14 @@ enum {
 };
 
 #define QRUNFLAG	(1 << qrunflag	)	/* 0x00000001 */
-#define STRMFUNCS	(1 << strmfuncs )	/* 0x00000002 */
-#define STRBCFLAG	(1 << strbcflag	)	/* 0x00000004 */
-#define STRBCWAIT	(1 << strbcwait	)	/* 0x00000008 */
-#define FLUSHWORK	(1 << flushwork	)	/* 0x00000010 */
-#define FREEBLKS	(1 << freeblks	)	/* 0x00000020 */
-#define STRTIMOUT	(1 << strtimout )	/* 0x00000040 */
-#define SCANQFLAG	(1 << scanqflag )	/* 0x00000080 */
-#define STREVENTS	(1 << strevents )	/* 0x00000100 */
+#define STRBCFLAG	(1 << strbcflag	)	/* 0x00000002 */
+#define STRBCWAIT	(1 << strbcwait	)	/* 0x00000004 */
+#define FLUSHWORK	(1 << flushwork	)	/* 0x00000008 */
+#define FREEBLKS	(1 << freeblks	)	/* 0x00000010 */
+#define STRTIMOUT	(1 << strtimout )	/* 0x00000020 */
+#define SCANQFLAG	(1 << scanqflag )	/* 0x00000040 */
+#define STREVENTS	(1 << strevents )	/* 0x00000080 */
+#define STRMFUNCS	(1 << strmfuncs )	/* 0x00000100 */
 #define QSYNCFLAG	(1 << qsyncflag )	/* 0x00000200 */
 #define QWANTRUN	(1 << qwantrun  )	/* 0x00000400 */
 

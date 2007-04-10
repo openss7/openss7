@@ -1621,6 +1621,7 @@ event_free(struct strevent *se)
 #endif
 	atomic_dec(&si->si_cnt);
 	se->se_seq++;
+	se->se_seq &= EVENT_SEQ_MASK;
 	kmem_cache_free(si->si_cache, se);
 }
 STATIC struct strevent *
@@ -1827,7 +1828,7 @@ timeout_function(unsigned long arg)
 		/* Spin lock here to keep multiple processors from appending to the list at the
 		   same time.  Stealing the list for processing is MP safe. */
 		streams_spin_lock(&timeout_list_lock, flags);
-		*xchg(&t->strtimout_tail, &se->se_next) = se;
+		*XCHG(&t->strtimout_tail, &se->se_next) = se;
 		streams_spin_unlock(&timeout_list_lock, flags);
 	}
 	if (!test_and_set_bit(strtimout, &t->flags))
@@ -4201,11 +4202,14 @@ timeouts(struct strthread *t)
 {
 	do {
 		struct strevent *se, *se_next;
+		unsigned long flags;
 
 		prefetchw(t);
+		streams_spin_lock(&timeout_list_lock, flags);
 		clear_bit(strtimout, &t->flags);
-		if (likely((se_next = xchg(&t->strtimout_head, NULL)) != NULL))
-			t->strtimout_tail = &t->strtimout_head;
+		se_next = XCHG(&t->strtimout_head, null);
+		t->strtimout_tail = &t->strtimout_head;
+		streams_spin_unlock(&timeout_list_lock, flags);
 		if (likely(se_next != NULL)) {
 			se = se_next;
 			do {
@@ -4549,6 +4553,7 @@ bufcalls(struct strthread *t)
 		prefetchw(t);
 		streams_local_save(flags);
 		clear_bit(strbcwait, &t->flags);
+		clear_bit(strbcflag, &t->flags);
 		se_next = XCHG(&t->strbcalls_head, NULL);
 		t->strbcalls_tail = &t->strbcalls_head;
 		streams_local_restore(flags);
@@ -4561,7 +4566,7 @@ bufcalls(struct strthread *t)
 				do_bufcall_event(se);
 			} while (unlikely((se = se_next) != NULL));
 		}
-	} while (unlikely(test_bit(strbcwait, &t->flags) != 0));
+	} while (unlikely(test_bit(strbcflag, &t->flags) != 0));
 }
 
 /**
@@ -4686,7 +4691,7 @@ __runqueues_slow(struct strthread *t)
 	if (unlikely(test_bit(strevents, &t->flags) != 0))
 		_ctrace(doevents(t));
 	/* do buffer calls if necessary */
-	if (unlikely(test_bit(strbcflag, &t->flags) || test_bit(strbcwait, &t->flags)))
+	if (unlikely(test_bit(strbcflag, &t->flags) != 0))
 		_ctrace(bufcalls(t));
 }
 
