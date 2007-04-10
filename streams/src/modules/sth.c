@@ -2719,6 +2719,13 @@ strwaitclose(struct stdata *sd, int oflag)
 		_ctrace(qdetach(_RD(q), oflag, crp));
 		_trace();
 	}
+#if 0
+	/* wait for but don't detach the remainder (past the twist) */
+	/* maybe not: if it is a FIFO, we might wait forever */
+	if (wait && (q = sd->sd_wq))
+		while((q = q->q_next))
+			strwaitqueue(q, closetime);
+#endif
 	/* STREAM head last */
 	_ctrace(qdetach(sd->sd_rq, oflag, crp));
 	/* procs are off for the STREAM head, flush queues now to dump M_PASSFP. */
