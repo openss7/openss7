@@ -1166,20 +1166,14 @@ streams_noinline streams_fastcall __hot_in void
 qbackenable(queue_t *q, const unsigned char band, const char bands[])
 {
 	register queue_t *q_nbsrv;
-
-#ifdef CONFIG_SMP
-	queue_t *q_next;
 	struct stdata *sd;
-#endif
+	int stream_end = (q->q_next == NULL);
 
 	dassert(q);
-#ifdef CONFIG_SMP
-	q_next = q->q_next;
-	dassert(qstream(q));
 	sd = qstream(q);
-	if (unlikely(q_next == NULL))
+	dassert(sd);
+	if (unlikely(stream_end))
 		prlock(sd);
-#endif
 	if (likely((q_nbsrv = q->q_nbsrv) != NULL)) {
 		/* If we are backenabling a Stream end queue then we will be specific about why it
 		   was backenabled, this gives the Stream head or driver information about for
@@ -1210,10 +1204,8 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 		   control */
 		qenable(q_nbsrv);	/* always enable if a service procedure exists */
 	}
-#ifdef CONFIG_SMP
-	if (unlikely(q_next == NULL))
+	if (unlikely(stream_end))
 		prunlock(sd);
-#endif
 }
 
 EXPORT_SYMBOL_GPL(qbackenable);
@@ -1311,7 +1303,7 @@ __bcanputany(queue_t *q)
 }
 
 STATIC streams_inline streams_fastcall __hot int
-__bcanputnextany(queue_t *q)
+__bcanputnextany(struct stdata *sd, queue_t *q)
 {
 	dassert(q->q_nfsrv != NULL);
 	return __bcanputany(q->q_nfsrv);
@@ -1335,7 +1327,7 @@ __bcanputnextany(queue_t *q)
 streams_inline streams_fastcall __hot int
 bcanputnextany(queue_t *q)
 {
-	register int result;
+	register int result = false;
 	struct stdata *sd;
 
 	dassert(q);
@@ -1343,7 +1335,8 @@ bcanputnextany(queue_t *q)
 	dassert(sd);
 
 	prlock(sd);
-	result = __bcanputnextany(q);
+	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
+		result = __bcanputnextany(sd, q);
 	prunlock(sd);
 
 	return (result);
@@ -1362,7 +1355,7 @@ EXPORT_SYMBOL_GPL(bcanputnextany);	/* include/sys/streams/stream.h */
 streams_fastcall int
 bcanputany(queue_t *q)
 {
-	bool result;
+	bool result = false;
 	struct stdata *sd;
 
 	dassert(q);
@@ -1370,10 +1363,12 @@ bcanputany(queue_t *q)
 	dassert(sd);
 
 	prlock(sd);
-	if (likely(test_bit(QSRVP_BIT, &q->q_flag) || q->q_next == NULL))
-		result = __bcanputany(q);
-	else
-		result = __bcanputnextany(q);
+	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
+		if (likely(test_bit(QSRVP_BIT, &q->q_flag) || q->q_next == NULL))
+			result = __bcanputany(q);
+		else
+			result = __bcanputnextany(sd, q);
+	}
 	prunlock(sd);
 
 	return (result);
@@ -1497,7 +1492,7 @@ __bcanput(queue_t *q, unsigned char band)
 }
 
 STATIC streams_inline streams_fastcall __hot_write int
-__bcanputnext(queue_t *q, unsigned char band)
+__bcanputnext(struct stdata *sd, queue_t *q, unsigned char band)
 {
 	dassert(q->q_nfsrv != NULL);
 	return __bcanput(q->q_nfsrv, band);
@@ -1539,27 +1534,21 @@ __bcanputnext(queue_t *q, unsigned char band)
 streams_fastcall __hot int
 bcanputnext(register queue_t *q, unsigned char band)
 {
-	register int result;
-
-#ifdef CONFIG_SMP
+	register int result = false;
+	struct stdata *sd;
 	int stream_end = (backq(q) == NULL);
-#endif
 
 	dassert(q);
 	dassert(q->q_next);
-	dassert(qstream(q));
 
-#ifdef CONFIG_SMP
+	sd = qstream(q);
+	dassert(sd);
 	if (stream_end)
-		prlock(qstream(q));
-#endif
-
-	result = __bcanputnext(q, band);
-
-#ifdef CONFIG_SMP
+		prlock(sd);
+	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
+		result = __bcanputnext(sd, q, band);
 	if (stream_end)
-		prunlock(qstream(q));
-#endif
+		prunlock(sd);
 
 	return (result);
 }
@@ -1610,29 +1599,24 @@ EXPORT_SYMBOL(bcanputnext);
 streams_fastcall __hot_in int
 bcanput(register queue_t *q, unsigned char band)
 {
-	register int result;
-
-#ifdef CONFIG_SMP
+	register int result = false;
+	struct stdata *sd;
 	int stream_end = (backq(q) == NULL);
-#endif
 
 	dassert(q);
-	dassert(qstream(q));
+	sd = qstream(q);
+	dassert(sd);
 
-#ifdef CONFIG_SMP
 	if (unlikely(stream_end))
-		prlock(qstream(q));
-#endif
-
-	if (likely(test_bit(QSRVP_BIT, &q->q_flag) || q->q_next == NULL))
-		result = __bcanput(q, band);
-	else
-		result = __bcanputnext(q, band);
-
-#ifdef CONFIG_SMP
+		prlock(sd);
+	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
+		if (likely(test_bit(QSRVP_BIT, &q->q_flag) || q->q_next == NULL))
+			result = __bcanput(q, band);
+		else
+			result = __bcanputnext(sd, q, band);
+	}
 	if (unlikely(stream_end))
-		prunlock(qstream(q));
-#endif
+		prunlock(sd);
 	return (result);
 }
 
@@ -2709,9 +2693,15 @@ qdelete(queue_t *q)
 	(q + 0)->q_next = NULL;
 	(q + 0)->q_nfsrv = NULL;
 	(q + 0)->q_nbsrv = NULL;
+//	(q + 0)->q_putp = NULL;
+//	(q + 0)->q_srvp = NULL;
+//	(q + 0)->q_ptr = NULL;
 	(q + 1)->q_next = NULL;
 	(q + 1)->q_nfsrv = NULL;
 	(q + 1)->q_nbsrv = NULL;
+//	(q + 1)->q_putp = NULL;
+//	(q + 1)->q_srvp = NULL;
+//	(q + 1)->q_ptr = NULL;
 
 	pwunlock(sd, pl);
 
@@ -2873,7 +2863,7 @@ qprocsoff(queue_t *q)
 
 	/* only one qprocsoff() happens at a time */
 	if (!test_bit(QPROCS_BIT, &rq->q_flag)) {
-		unsigned long pl, pl2 = 0;
+		unsigned long pl;
 		struct stdata *sd2;
 
 		/* spin here waiting for queue procedures to exit */
@@ -2909,27 +2899,61 @@ qprocsoff(queue_t *q)
 		_ptrace(("initial half-delete of stream %p queue pair %p\n", sd, q));
 
 		if ((sd2 = wq->q_next ? qstream(wq->q_next) : NULL) && sd2 > sd)
-			pwlock(sd2, pl2);
+			phwlock(sd2);
 
 		/* bypass service procedures */
+		/* Careful that if a Stream head across a twist is already disconnected that we do
+		   not reconect it when popping a module off of the near side. */
 		if (test_bit(QSRVP_BIT, &rq->q_flag) || rq->q_next == NULL) {
 			for (bq = rq->q_nbsrv; bq && bq != rq; bq = bq->q_next)
+#if 1
 				bq->q_nfsrv = rq->q_nfsrv;
+#else
+				if (bq->q_nfsrv == rq)
+					bq->q_nfsrv = rq->q_nfsrv;
+#endif
 			for (bq = rq->q_nfsrv; bq && bq != rq; bq = backq(bq))
+#if 1
 				bq->q_nbsrv = rq->q_nbsrv;
+#else
+				if (bq->q_nbsrv == rq)
+					bq->q_nbsrv = rq->q_nbsrv;
+#endif
 		}
 		if (test_bit(QSRVP_BIT, &wq->q_flag) || wq->q_next == NULL) {
 			for (bq = wq->q_nbsrv; bq && bq != wq; bq = bq->q_next)
+#if 1
 				bq->q_nfsrv = wq->q_nfsrv;
+#else
+				if (bq->q_nfsrv == wq)
+					bq->q_nfsrv = wq->q_nfsrv;
+#endif
 			for (bq = wq->q_nfsrv; bq && bq != wq; bq = backq(bq))
+#if 1
 				bq->q_nbsrv = wq->q_nbsrv;
+#else
+				if (bq->q_nbsrv == wq)
+					bq->q_nbsrv = wq->q_nbsrv;
+#endif
 		}
 
 		/* bypass this module: works for pipe, FIFO and other Stream heads queues too */
+		/* Careful that if a Stream head across a twist is already disconnected that we do
+		   not reconnect it when popping a module off of the near side. */
 		if ((bq = backq(rq)))
+#if 1
 			bq->q_next = rq->q_next;
+#else
+			if (bq->q_next == rq))
+				bq->q_next = rq->q_next;
+#endif
 		if ((bq = backq(wq)))
+#if 1
 			bq->q_next = wq->q_next;
+#else
+			if (bq->q_next == wq))
+				bq->q_next = wq->q_next;
+#endif
 
 #ifndef SSIZE_MAX
 #ifdef _POSIX_SSIZE_MAX
@@ -2947,7 +2971,7 @@ qprocsoff(queue_t *q)
 		}
 
 		if (sd2 && sd2 > sd)
-			pwunlock(sd2, pl2);
+			phwunlock(sd2);
 
 	      stream_head:
 
@@ -3002,10 +3026,14 @@ qprocson(queue_t *q)
 #if 0
 	assert(current_context() <= CTX_STREAMS);
 #endif
+	dassert(rq);
 	/* only one qprocson() happens at a time */
 	if (test_bit(QPROCS_BIT, &rq->q_flag)) {
-		struct stdata *sd2, *sd = rqstream(rq);
-		unsigned long pl, pl2 = 0;
+		struct stdata *sd, *sd2;
+		unsigned long pl;
+
+		sd = rqstream(rq);
+		dassert(sd);
 
 		/* spin here waiting for queue procedures to exit */
 		pwlock(sd, pl);
@@ -3020,7 +3048,7 @@ qprocson(queue_t *q)
 		set_bit(QWANTR_BIT, &wq->q_flag);
 
 		if ((sd2 = wq->q_next ? qstream(wq->q_next) : NULL) && sd2 > sd)
-			pwlock(sd2, pl2);
+			phwlock(sd2);
 
 		/* join this module: works for FIFOs and PIPEs too */
 		if ((bq = backq(rq)))
@@ -3049,7 +3077,7 @@ qprocson(queue_t *q)
 			sd->sd_maxpsz = SSIZE_MAX;
 
 		if (sd2 && sd2 > sd)
-			pwunlock(sd2, pl2);
+			phwunlock(sd2);
 
 		pwunlock(sd, pl);
 	}
@@ -3093,21 +3121,16 @@ qcountstrm(queue_t *q)
 	ssize_t count = 0;
 
 	if (q) {
-#ifdef CONFIG_SMP
-		int stream_end = (backq(q) == NULL);
+		struct stdata *sd;
 
-		dassert(qstream(q));
-		if (stream_end)
-			prlock(qstream(q));
-#endif
+		sd = qstream(q);
+		dassert(sd);
 
-		for (; q && SAMESTR(q); q = q->q_next)
-			count += q->q_count;
-
-#ifdef CONFIG_SMP
-		if (stream_end)
-			prunlock(qstream(q));
-#endif
+		prlock(sd);
+		if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
+			for (; q && SAMESTR(q); q = q->q_next)
+				count += q->q_count;
+		prunlock(sd);
 	}
 	return (count);
 }
