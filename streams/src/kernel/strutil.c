@@ -1174,6 +1174,12 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 
 	prlock(sd);
 	if (likely((q_nbsrv = q->q_nbsrv) != NULL)) {
+		struct stdata *sd2;
+
+		sd2 = qstream(q_nbsrv);
+		dassert(sd2);
+		if (sd2 != sd)
+			prlock(sd2);
 		/* If we are backenabling a Stream end queue then we will be specific about why it
 		   was backenabled, this gives the Stream head or driver information about for
 		   which specific bands flow control has subsided. */
@@ -1202,6 +1208,8 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 		/* SVR4 SPG - noenable() does not prevent a queue from being back enabled by flow
 		   control */
 		qenable(q_nbsrv);	/* always enable if a service procedure exists */
+		if (sd2 != sd)
+			prunlock(sd2);
 	}
 	prunlock(sd);
 }
