@@ -1,0 +1,49 @@
+#!/bin/bash
+
+path=`echo $0 | sed -e 's|[^/]*$||'`
+
+set -x
+
+${path}configure \
+	--disable-devel \
+	--disable-32bit-libs \
+	--enable-maintainer-mode \
+	--enable-dependency-tracking \
+	--disable-checks \
+	--without-SCTP \
+	--without-IPERF \
+	--without-LIS \
+	--with-STREAMS \
+	--with-STRCOMPAT \
+	--without-STRUTIL \
+	--without-STRBCM \
+	--without-STRTTY \
+	--with-STRXNS \
+	--with-STRXNET \
+	--without-STRNSL \
+	--without-STRSOCK \
+	--with-STRINET \
+	--with-STRSCTP \
+	--without-STRCHAN \
+	--with-STRISO \
+	--with-NETPERF \
+	--without-STRISDN \
+	--without-STACKS \
+	--without-SIGTRAN \
+	--without-STRVOIP \
+	--without-OSR61 \
+	--enable-k-inline \
+	--enable-k-safe \
+	--disable-k-test \
+	--disable-k-debug \
+	--disable-k-none \
+	--enable-streams-irq \
+	--enable-streams-stats \
+	--disable-streams-syncqs \
+	--enable-streams-kthreads \
+	--enable-autotest \
+	--with-optimize=normal \
+	--with-k-optimize=normal \
+	${1+$@}
+
+

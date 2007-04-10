@@ -1,0 +1,60 @@
+#!/bin/bash
+
+set -x
+
+interval=5
+testtime=1
+
+perftestn=
+perftest=
+
+command=`echo "$0" | sed -e 's,.*/,,'`
+
+if [ -x `pwd`/perftestn ] ; then
+	perftestn=`pwd`/perftestn
+	perftest=`pwd`/perftest
+elif [ -x /usr/lib/streams/perftestn ] ; then
+	perftestn=/usr/lib/streams/perftestn
+	perftest=/usr/lib/streams/perftest
+elif [ -x /usr/libexec/streams/perftestn ] ; then
+	perftestn=/usr/libexec/streams/perftestn
+	perftest=/usr/libexec/streams/perftest
+fi
+
+[ -n "$perftestn" ] || exit 1
+
+scls=/usr/sbin/scls
+
+if [ -x `pwd`/scls ] ; then
+	scls=`pwd`/scls
+fi
+
+#options="-m bufmod -p 1 -a"
+options="-m pipemod -p 1 -a"
+
+(
+	set -x
+	$scls -a -c -r pipe pipemod
+#	for size in 4 8 16 32 64 128 256 512 1024 2048 4096
+	for size in 4 16 64 256 1024 4096
+#	for size in 4 64 1024 4096
+	do
+		$perftestn -q -r -t $testtime -i $interval -s $size ${options} ${1+$@}
+		((mult=(size+255+192)/256))
+#		for mult in 1 4 16 32
+#		do
+#			$perftest  -q -r -t $testtime -i $interval -s $size \
+#				--hiwat $((mult*5120)) --lowat $((mult*(5120-size))) ${options} ${1+$@}
+#			$perftest  -q -r -t $testtime -i $interval -s $size \
+#				--hiwat $((mult*5120)) --lowat 0 ${options} ${1+$@}
+#			$perftest  -q -r -t $testtime -i $interval -s $size \
+#				--hiwat $((size*256)) --lowat 0 ${options} ${1+$@}
+			$perftest  -q -r -t $testtime -i $interval -s $size \
+				--hiwat $((65536)) --lowat 5120 ${options} ${1+$@}
+#			$perftest -q -r -t $testtime -i $interval -s $size ${options} ${1+$@}
+			# $scls -a -l pipe pipemod bufmod nullmod
+			$scls -a -c -r pipe pipemod bufmod nullmod
+#		done
+	done
+) 2>&1 | tee `hostname`.$command.`date -uIseconds`.log
+
