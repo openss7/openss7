@@ -1311,20 +1311,21 @@ __bcanputany(queue_t *q)
 STATIC streams_inline streams_fastcall __hot int
 __bcanputnextany(struct stdata *sd, queue_t *q)
 {
-#if 0
+#if 1
 	bool result = false;
 	struct stdata *sd2;
 	queue_t *q_nfsrv;
 
-	q_nfsrv = q->q_nfsrv;
-	dassert(q_nfsrv);
-	sd2 = qstream(q_nfsrv);
-	if (sd2 != sd)
-		prlock(sd2);
-	if (likely(test_bit(QPROCS_BIT, &q_nfsrv->q_flag) == 0))
-		result = __bcanputany(q_nfsrv);
-	if (sd2 != sd)
-		prunlock(sd2);
+	if (likely((q_nfsrv = q->q_nfsrv) != NULL)) {
+		sd2 = qstream(q_nfsrv);
+		dassert(sd2);
+		if (sd2 != sd)
+			prlock(sd2);
+		if (likely(test_bit(QPROCS_BIT, &q_nfsrv->q_flag) == 0))
+			result = __bcanputany(q_nfsrv);
+		if (sd2 != sd)
+			prunlock(sd2);
+	}
 	return (result);
 #else
 	dassert(q->q_nfsrv != NULL);
@@ -1517,21 +1518,21 @@ __bcanput(queue_t *q, unsigned char band)
 STATIC streams_inline streams_fastcall __hot_write int
 __bcanputnext(struct stdata *sd, queue_t *q, unsigned char band)
 {
-#if 0
+#if 1
 	bool result = false;
 	struct stdata *sd2;
 	queue_t *q_nfsrv;
 
-	q_nfsrv = q->q_nfsrv;
-	dassert(q_nfsrv);
-	sd2 = qstream(q_nfsrv);
-	dassert(sd);
-	if (sd2 != sd)
-		prlock(sd2);
-	if (likely(test_bit(QPROCS_BIT, &q_nfsrv->q_flag) == 0))
-		result = __bcanput(q_nfsrv, band);
-	if (sd2 != sd)
-		prunlock(sd);
+	if (likely((q_nfsrv = q->q_nfsrv) != NULL)) {
+		sd2 = qstream(q_nfsrv);
+		dassert(sd2);
+		if (sd2 != sd)
+			prlock(sd2);
+		if (likely(test_bit(QPROCS_BIT, &q_nfsrv->q_flag) == 0))
+			result = __bcanput(q_nfsrv, band);
+		if (sd2 != sd)
+			prunlock(sd2);
+	}
 	return (result);
 #else
 	dassert(q->q_nfsrv != NULL);
