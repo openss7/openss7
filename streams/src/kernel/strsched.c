@@ -1794,6 +1794,8 @@ strsched_bufcall(struct strevent *se)
 	return (id);
 }
 
+static spinlock_t timeout_list_lock = SPIN_LOCK_UNLOCKED;
+
 /*
  *  timeout_function: - execute a linux kernel timer timeout
  *  @arg:	a pointer to the STREAMS event structure
@@ -1822,7 +1824,6 @@ timeout_function(unsigned long arg)
 
 	se->se_next = NULL;
 	{
-		static spinlock_t timeout_list_lock = SPIN_LOCK_UNLOCKED;
 		unsigned long flags;
 
 		/* Spin lock here to keep multiple processors from appending to the list at the
@@ -4207,7 +4208,7 @@ timeouts(struct strthread *t)
 		prefetchw(t);
 		streams_spin_lock(&timeout_list_lock, flags);
 		clear_bit(strtimout, &t->flags);
-		se_next = XCHG(&t->strtimout_head, null);
+		se_next = XCHG(&t->strtimout_head, NULL);
 		t->strtimout_tail = &t->strtimout_head;
 		streams_spin_unlock(&timeout_list_lock, flags);
 		if (likely(se_next != NULL)) {
@@ -4303,7 +4304,8 @@ scanqueues(struct strthread *t)
 					clear_bit(QHLIST_BIT, &q->q_flag);
 					/* let write service procedure do the right thing */
 					prlock(sd);
-					qenable(q);
+					if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
+						qenable(q);
 					prunlock(sd);
 					sd_put(&sd);
 				}

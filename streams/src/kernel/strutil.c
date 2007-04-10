@@ -1172,40 +1172,43 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 	dassert(sd);
 
 	prlock(sd);
-	{
+	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
 		queue_t *q_nbsrv = q->q_nbsrv;
 		struct stdata *sd2 = qstream(q_nbsrv);
 
 		dassert(sd2);
 		prlock(sd2);
-		/* If we are backenabling a Stream end queue then we will be specific about why it
-		   was backenabled, this gives the Stream head or driver information about for
-		   which specific bands flow control has subsided. */
-		/* Well, just the Stream head ... */
-		if (!test_bit(QREADR_BIT, &q_nbsrv->q_flag) && backq(q_nbsrv) == NULL) {
-			unsigned long pl;
-			struct qband *qb;
+		if (likely(test_bit(QPROCS_BIT, &q_nbsrv->q_flag) == 0)) {
+			/* If we are backenabling a Stream end queue then we will be specific about 
+			   why it was backenabled, this gives the Stream head or driver information 
+			   about for which specific bands flow control has subsided. */
+			/* Well, just the Stream head ... */
+			if (!test_bit(QREADR_BIT, &q_nbsrv->q_flag) && backq(q_nbsrv) == NULL) {
+				unsigned long pl;
+				struct qband *qb;
 
-			qwlock(q_nbsrv, pl);
-			if (likely(bands == NULL)) {
-				if (band == 0)
-					set_bit(QBACK_BIT, &q_nbsrv->q_flag);
-				else if ((qb = __get_qband(q_nbsrv, band)))
-					set_bit(QB_BACK_BIT, &qb->qb_flag);
-			} else {
-				int bnum;
-
-				if (bands[0])
-					set_bit(QBACK_BIT, &q_nbsrv->q_flag);
-				for (bnum = band; bnum > 0; bnum--)
-					if (bands[bnum] && (qb = __get_qband(q_nbsrv, bnum)))
+				qwlock(q_nbsrv, pl);
+				if (likely(bands == NULL)) {
+					if (band == 0)
+						set_bit(QBACK_BIT, &q_nbsrv->q_flag);
+					else if ((qb = __get_qband(q_nbsrv, band)))
 						set_bit(QB_BACK_BIT, &qb->qb_flag);
+				} else {
+					int bnum;
+
+					if (bands[0])
+						set_bit(QBACK_BIT, &q_nbsrv->q_flag);
+					for (bnum = band; bnum > 0; bnum--)
+						if (bands[bnum]
+						    && (qb = __get_qband(q_nbsrv, bnum)))
+							set_bit(QB_BACK_BIT, &qb->qb_flag);
+				}
+				qwunlock(q_nbsrv, pl);
 			}
-			qwunlock(q_nbsrv, pl);
+			/* SVR4 SPG - noenable() does not prevent a queue from being back enabled
+			   by flow control */
+			qenable(q_nbsrv);	/* always enable if a service procedure exists */
 		}
-		/* SVR4 SPG - noenable() does not prevent a queue from being back enabled by flow
-		   control */
-		qenable(q_nbsrv);	/* always enable if a service procedure exists */
 		prunlock(sd2);
 	}
 	prunlock(sd);
@@ -1308,13 +1311,14 @@ __bcanputany(queue_t *q)
 STATIC streams_inline streams_fastcall __hot int
 __bcanputnextany(queue_t *q)
 {
-	int result;
+	int result = 0;
 	queue_t *q_nfsrv = q->q_nfsrv;
 	struct stdata *sd = qstream(q_nfsrv);
 
 	dassert(sd);
 	prlock(sd);
-	result = __bcanputany(q_nfsrv);
+	if (likely(test_bit(QPROCS_BIT, &q_nfsrv->q_flag) == 0))
+		result = __bcanputany(q_nfsrv);
 	prunlock(sd);
 	return (result);
 }
@@ -1337,7 +1341,7 @@ __bcanputnextany(queue_t *q)
 streams_inline streams_fastcall __hot int
 bcanputnextany(queue_t *q)
 {
-	register int result = false;
+	int result = 0;
 	struct stdata *sd;
 
 	dassert(q);
@@ -1365,7 +1369,7 @@ EXPORT_SYMBOL_GPL(bcanputnextany);	/* include/sys/streams/stream.h */
 streams_fastcall int
 bcanputany(queue_t *q)
 {
-	bool result = false;
+	int result = 0;
 	struct stdata *sd;
 
 	dassert(q);
@@ -1504,13 +1508,14 @@ __bcanput(queue_t *q, unsigned char band)
 STATIC streams_inline streams_fastcall __hot_write int
 __bcanputnext(queue_t *q, unsigned char band)
 {
-	int result;
+	int result = 0;
 	queue_t *q_nfsrv = q->q_nfsrv;
 	struct stdata *sd = qstream(q_nfsrv);
 
 	dassert(sd);
 	prlock(sd);
-	result = __bcanput(q_nfsrv, band);
+	if (likely(test_bit(QPROCS_BIT, &q_nfsrv->q_flag) == 0))
+		result = __bcanput(q_nfsrv, band);
 	prunlock(sd);
 	return (result);
 }
@@ -1551,7 +1556,7 @@ __bcanputnext(queue_t *q, unsigned char band)
 streams_fastcall __hot int
 bcanputnext(register queue_t *q, unsigned char band)
 {
-	register int result = false;
+	int result = 0;
 	struct stdata *sd;
 
 	dassert(q);
