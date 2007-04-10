@@ -1167,13 +1167,12 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 {
 	register queue_t *q_nbsrv;
 	struct stdata *sd;
-	int stream_end = (q->q_next == NULL);
 
 	dassert(q);
 	sd = qstream(q);
 	dassert(sd);
-	if (unlikely(stream_end))
-		prlock(sd);
+
+	prlock(sd);
 	if (likely((q_nbsrv = q->q_nbsrv) != NULL)) {
 		/* If we are backenabling a Stream end queue then we will be specific about why it
 		   was backenabled, this gives the Stream head or driver information about for
@@ -1204,8 +1203,7 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 		   control */
 		qenable(q_nbsrv);	/* always enable if a service procedure exists */
 	}
-	if (unlikely(stream_end))
-		prunlock(sd);
+	prunlock(sd);
 }
 
 EXPORT_SYMBOL_GPL(qbackenable);
@@ -1536,19 +1534,17 @@ bcanputnext(register queue_t *q, unsigned char band)
 {
 	register int result = false;
 	struct stdata *sd;
-	int stream_end = (backq(q) == NULL);
 
 	dassert(q);
 	dassert(q->q_next);
 
 	sd = qstream(q);
 	dassert(sd);
-	if (stream_end)
-		prlock(sd);
+
+	prlock(sd);
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
 		result = __bcanputnext(sd, q, band);
-	if (stream_end)
-		prunlock(sd);
+	prunlock(sd);
 
 	return (result);
 }
@@ -1601,22 +1597,20 @@ bcanput(register queue_t *q, unsigned char band)
 {
 	register int result = false;
 	struct stdata *sd;
-	int stream_end = (backq(q) == NULL);
 
 	dassert(q);
 	sd = qstream(q);
 	dassert(sd);
 
-	if (unlikely(stream_end))
-		prlock(sd);
+	prlock(sd);
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
 		if (likely(test_bit(QSRVP_BIT, &q->q_flag) || q->q_next == NULL))
 			result = __bcanput(q, band);
 		else
 			result = __bcanputnext(sd, q, band);
 	}
-	if (unlikely(stream_end))
-		prunlock(sd);
+	prunlock(sd);
+
 	return (result);
 }
 
