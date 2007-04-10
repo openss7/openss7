@@ -2709,9 +2709,7 @@ streams_fastcall __unlikely void
 qdelete(queue_t *q)
 {
 	struct stdata *sd;
-#if 0
 	struct stdata *sd2;
-#endif
 	unsigned long pl;
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
@@ -2723,10 +2721,8 @@ qdelete(queue_t *q)
 	_ptrace(("final half-delete of stream %p queue pair %p\n", sd, q));
 
 	pwlock(sd, pl);
-#if 0
 	if ((sd2 = wq->q_next ? qstream(wq->q_next) : NULL) && sd2 > sd)
 		phwlock(sd2);
-#endif
 
 	rq->q_next = NULL;
 	rq->q_nfsrv = NULL;
@@ -2745,10 +2741,8 @@ qdelete(queue_t *q)
 	wq->q_ptr = NULL;
 #endif
 
-#if 0
 	if (sd2 && sd2 > sd)
 		phwunlock(sd2);
-#endif
 	pwunlock(sd, pl);
 
 	_printd(("%s: cancelling initial allocation reference queue pair %p\n", __FUNCTION__, q));
