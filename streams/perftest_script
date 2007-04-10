@@ -5,6 +5,8 @@ set -x
 interval=10
 testtime=1
 
+command=`echo $0 | sed -e 's,.*/,,'`
+
 perftestn=
 perftest=
 
@@ -37,4 +39,4 @@ fi
 		$perftestn -q -r -t $testtime -i $interval -m nullmod -p 0 -s $size ${1+$@}
 		$scls -a -c -r pipe pipemod bufmod nullmod
 	done
-) 2>&1 | tee `hostname`.perftest.`date -uIseconds`.log
+) 2>&1 | tee `hostname`.$command.`date -uIseconds`.log

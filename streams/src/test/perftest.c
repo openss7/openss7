@@ -813,7 +813,7 @@ do_tests(void)
 				fds[0]);
 		}
 		for (i = 0; i < push; i++) {
-			if (ioctl(fds[0], I_PUSH, modname) < 0) {
+			if (ioctl(fds[1], I_PUSH, modname) < 0) {
 				if (verbose)
 					perror("ioctl(I_PUSH)");
 				goto dead;
