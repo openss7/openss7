@@ -5252,6 +5252,7 @@ strhold(struct stdata *sd, const int f_flags, const char *buf, ssize_t nbytes)
 		rtn = strcopyin(buf, fastbuf, nbytes);
 		srlock(sd);
 
+#if 1
 		if (rtn == 0 && (rtn = straccess(sd, FWRITE | FNDELAY)) == 0) {
 			unsigned long pl;
 			mblk_t *b;
@@ -5271,6 +5272,42 @@ strhold(struct stdata *sd, const int f_flags, const char *buf, ssize_t nbytes)
 			}
 			zwunlock(sd, pl);
 		}
+#else
+		if (rtn == 0 && (rtn = straccess(sd, FWRITE | FNDELAY)) == 0) {
+			unsigned long pl;
+			int blocked;
+			mblk_t *b;
+
+			/* have read lock and acess was ok */
+			blocked = !bcanputnext(q, 0);
+
+			zwlock(sd, pl);	/* before we mess with b */
+			if ((b = (mblk_t *volatile) q->q_first) && !(b->b_flag & MSGDELIM)) {
+				if (b->b_datap->db_lim >= b->b_wptr + nbytes) {
+					bcopy(fastbuf, b->b_wptr, nbytes);
+					b->b_wptr += nbytes;
+					if (unlikely(test_bit(STRDELIM_BIT, &sd->sd_flag)))
+						b->b_flag |= MSGDELIM;
+					rtn = nbytes;
+					if (blocked) {
+						/* leave it on the queue */
+						/* fix up queue counts - from __putq */
+						if ((q->q_count += nbytes) > q->q_hiwat)
+							set_bit(QFULL_BIT, &q->q_flag);
+						b = NULL;
+					} else {
+						rmvq(q, b);
+					}
+				} else
+					b = NULL;
+			} else
+				b = NULL;
+			zwunlock(sd, pl);
+
+			if (b)
+				putnext(q, b);
+		}
+#endif
 	}
 	return (rtn);
 }
