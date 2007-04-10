@@ -286,40 +286,6 @@ test_sync(int fds[])
 				goto dead;
 			}
 		}
-		if (tbytcnt <= rbytcnt) {
-			int ret = 0;
-
-			if (readwrite) {
-				while (!timer_timeout && (ret = write(fds[1], my_msg, msgsize)) > 0) {
-					tbytcnt += ret;
-					if (tbytcnt < 0)
-						goto dead;
-					if (blocking)
-						break;
-				}
-			} else {
-				struct strbuf dbuf = { 0, msgsize, my_msg };
-
-				while (!timer_timeout && (ret = putmsg(fds[1], NULL, &dbuf, 0)) != -1) {
-					tbytcnt += msgsize;
-					if (tbytcnt < 0)
-						goto dead;
-					if (blocking)
-						break;
-				}
-			}
-			if (ret < 0) {
-				switch (errno) {
-				case EAGAIN:
-				case EINTR:
-					break;
-				default:
-					if (verbose)
-						perror("write()");
-					goto dead;
-				}
-			}
-		}
 		if (rbytcnt < tbytcnt) {
 			int ret = 0;
 
@@ -353,6 +319,40 @@ test_sync(int fds[])
 				default:
 					if (verbose)
 						perror("read()");
+					goto dead;
+				}
+			}
+		}
+		if (tbytcnt <= rbytcnt) {
+			int ret = 0;
+
+			if (readwrite) {
+				while (!timer_timeout && (ret = write(fds[1], my_msg, msgsize)) > 0) {
+					tbytcnt += ret;
+					if (tbytcnt < 0)
+						goto dead;
+					if (blocking)
+						break;
+				}
+			} else {
+				struct strbuf dbuf = { 0, msgsize, my_msg };
+
+				while (!timer_timeout && (ret = putmsg(fds[1], NULL, &dbuf, 0)) != -1) {
+					tbytcnt += msgsize;
+					if (tbytcnt < 0)
+						goto dead;
+					if (blocking)
+						break;
+				}
+			}
+			if (ret < 0) {
+				switch (errno) {
+				case EAGAIN:
+				case EINTR:
+					break;
+				default:
+					if (verbose)
+						perror("write()");
 					goto dead;
 				}
 			}

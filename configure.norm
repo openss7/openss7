@@ -46,4 +46,3 @@ ${path}configure \
 	--with-k-optimize=normal \
 	${1+$@}
 
-
