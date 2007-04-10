@@ -1,3 +1,13 @@
+2007-04-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/tabold.c: reverified bit patterns in x400p driver
+	* src/modules/tabold.h: reverified bit patterns in x400p driver
+	* src/modules/testboth.c: reverified bit patterns in x400p driver
+	* src/modules/testold.c: reverified bit patterns in x400p driver
+	* src/modules/tab.c: reverified bit patterns in x400p driver
+	* src/modules/tab.h: reverified bit patterns in x400p driver
+	* src/modules/test.c: reverified bit patterns in x400p driver
+
 2007-03-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: support for 2.6.20-1.2307.fc5

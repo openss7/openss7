@@ -65,7 +65,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 	while (len--) {
 		switch (result.state) {
 		case 0:	/* 0 */	/* zero not belonging to shared flag nor stuffing bit deletion */
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				result.state = 1;
 			} else {
 				bit_mask <<= 1;
@@ -74,7 +74,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 			}
 			break;
 		case 1:	/* 01 */
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				result.state = 2;
 			} else {
 				bit_mask <<= 1;
@@ -85,7 +85,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 			}
 			break;
 		case 2:	/* 011 */
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				result.state = 3;
 			} else {
 				bit_mask <<= 1;
@@ -98,7 +98,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 			}
 			break;
 		case 3:	/* 0111 */
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				result.state = 4;
 			} else {
 				bit_mask <<= 1;
@@ -113,7 +113,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 			}
 			break;
 		case 4:	/* 01111 */
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				result.state = 5;
 			} else {
 				bit_mask <<= 1;
@@ -130,7 +130,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 			}
 			break;
 		case 5:	/* 011111 */
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				result.state = 7;
 			} else {
 				bit_mask <<= 1;
@@ -149,7 +149,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 			}
 			break;
 		case 6:	/* [0]11111[0] */ /* bit deletion */
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				result.state = 9;
 			} else {
 				result.state = 0;
@@ -158,7 +158,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 		case 7:	/* 0111111 */
 			result.sync = 0;
 			result.idle = 0;
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				bit_mask <<= 1;
 				result.bit_length += 1;
 				result.flag = 0;
@@ -178,7 +178,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 			result.flag = 1;
 			result.hunt = 0;
 			result.idle = 0;
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				result.state = 9;
 			} else {
 				result.state = 0;
@@ -186,7 +186,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 			break;
 		case 9:	/* [0]1 */ /* zero from end of flag or bit deletion */
 			result.idle = 0;
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				result.state = 10;
 			} else {
 				result.bit_string |= bit_mask;
@@ -197,7 +197,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 			break;
 		case 10:	/* [0]11 */
 			result.idle = 0;
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				result.state = 11;
 			} else {
 				result.bit_string |= bit_mask;
@@ -210,7 +210,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 			break;
 		case 11:	/* [0]111 */
 			result.idle = 0;
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				result.state = 12;
 			} else {
 				result.bit_string |= bit_mask;
@@ -225,7 +225,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 			break;
 		case 12:	/* [0]1111 */
 			result.idle = 0;
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				result.state = 13;
 			} else {
 				result.bit_string |= bit_mask;
@@ -242,7 +242,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 			break;
 		case 13:	/* [0]11111 */
 			result.idle = 0;
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				result.state = 14;
 			} else {
 				result.bit_string |= bit_mask;
@@ -262,7 +262,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 		case 14:	/* [0]111111 */
 			result.sync = 0;
 			result.idle = 0;
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				result.flag = 0;
 				result.hunt = 1;
 				result.state = 15;
@@ -276,7 +276,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 			result.sync = 0;
 			result.flag = 0;
 			result.hunt = 1;
-			if (byte & 0x80) {
+			if (byte & 0x1) {
 				result.idle = 1;
 				result.state = 15;
 			} else {
@@ -285,7 +285,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 			}
 			break;
 		}
-		byte <<= 1;
+		byte >>= 1;
 	}
 	return result;
 }
@@ -347,7 +347,7 @@ static struct _tx_entry
 tx_table_valueN(int state, uint8_t byte, int len)
 {
 	struct _tx_entry result = { 0, };
-	int bit_mask = 0x80;
+	int bit_mask = 1;
 
 	result.state = state;
 	result.bit_length = 0;
@@ -357,11 +357,11 @@ tx_table_valueN(int state, uint8_t byte, int len)
 			if (result.state++ == 4) {
 				result.state = 0;
 				result.bit_length++;
-				result.bit_string <<= 1;
+				bit_mask <<= 1;
 			}
 		} else
 			result.state = 0;
-		bit_mask >>= 1;
+		bit_mask <<= 1;
 		byte >>= 1;
 	}
 	return result;
@@ -390,7 +390,7 @@ bc_table_print(void)
 	int i;
 
 	bc_table_generate();
-	fprintf(stdout, "static const uint16_t bc_table[%d] __attribute__((__aligned__(512))) = {", 256);
+	fprintf(stdout, "static const uint16_t bc_old_table[%d] __attribute__((__aligned__(512))) = {", 256);
 	for (i = 0; i < 256; i++) {
 		if (!(i & 0x7))
 			fprintf(stdout, "\n\t");
@@ -409,7 +409,7 @@ tx_table_print(void)
 	int i;
 
 	tx_table_generate();
-	fprintf(stdout, "static const struct tx_entry tx_table[%d] __attribute__((__aligned__(4096))) = {", TX_STATES * 256);
+	fprintf(stdout, "static const struct tx_old_entry tx_old_table[%d] __attribute__((__aligned__(4096))) = {", TX_STATES * 256);
 	for (i = 0; i < TX_STATES * 256; i++) {
 		if (!(i & 0x3))
 			fprintf(stdout, "\n\t");
@@ -429,7 +429,7 @@ rx_table_print7(void)
 	int i;
 
 	rx_table_generate7();
-	fprintf(stdout, "static const struct rx_entry rx_table7[%d] __attribute__((__aligned__(4096))) = {", RX_STATES * 256);
+	fprintf(stdout, "static const struct rx_old_entry rx_old_table7[%d] __attribute__((__aligned__(4096))) = {", RX_STATES * 256);
 	for (i = 0; i < RX_STATES * 256; i++) {
 		if (!(i & 0x1))
 			fprintf(stdout, "\n\t");
@@ -450,7 +450,7 @@ rx_table_print8(void)
 	int i;
 
 	rx_table_generate8();
-	fprintf(stdout, "static const struct rx_entry rx_table8[%d] __attribute__((__aligned__(4096))) = {", RX_STATES * 256);
+	fprintf(stdout, "static const struct rx_old_entry rx_old_table8[%d] __attribute__((__aligned__(4096))) = {", RX_STATES * 256);
 	for (i = 0; i < RX_STATES * 256; i++) {
 		if (!(i & 0x1))
 			fprintf(stdout, "\n\t");
@@ -468,7 +468,7 @@ rx_table_print8(void)
 static void
 rx_struct_print(void)
 {
-	fprintf(stdout, "\nstruct rx_entry {\n");
+	fprintf(stdout, "\nstruct rx_old_entry {\n");
 	fprintf(stdout, "\tuint bit_string:12  __attribute__ ((packed));\n");
 	fprintf(stdout, "\tuint bit_length:4   __attribute__ ((packed));\n");
 	fprintf(stdout, "\tuint state:4        __attribute__ ((packed));\n");
@@ -482,7 +482,7 @@ rx_struct_print(void)
 static void
 tx_struct_print(void)
 {
-	fprintf(stdout, "\nstruct tx_entry {\n");
+	fprintf(stdout, "\nstruct tx_old_entry {\n");
 	fprintf(stdout, "\tushort bit_string:10\t__attribute__ ((packed));\t/* the output string */\n");
 	fprintf(stdout, "\tushort bit_length:2\t__attribute__ ((packed));\t/* length in excess of 8 bits of output string */\n");
 	fprintf(stdout, "\tushort state:3\t\t__attribute__ ((packed));\t/* new state */\n");
@@ -500,11 +500,11 @@ tx_table_invariant(void)
 		mask |= last ^ *(ushort *) &_tx_table[i];
 		last = *(ushort *) &_tx_table[i];
 	}
-	fprintf(stdout, "/* tx_table size is %d */\n", (int) sizeof(_tx_table));
+	fprintf(stdout, "/* tx_old_table size is %d */\n", (int) sizeof(_tx_table));
 	if (mask != 0xffff) {
 		for (i = 0; i < 16; i++)
 			if (!((mask >> i) & 1))
-				fprintf(stdout, "/* tx_table invariant in bit position %d */\n", i);
+				fprintf(stdout, "/* tx_old_table invariant in bit position %d */\n", i);
 	}
 	fprintf(stdout, "\n");
 }
@@ -535,7 +535,7 @@ rx_table_invariant8(void)
 			max = _rx_table8[i].bit_length;
 		states[i>>8][_rx_table8[i].state]++;
 	}
-	fprintf(stdout, "/* rx_table8 size is %d */\n", (int) sizeof(_rx_table8));
+	fprintf(stdout, "/* rx_old_table8 size is %d */\n", (int) sizeof(_rx_table8));
 #if 0
 	fprintf(stdout, "/* rx_table8 minimum bit length is %u */\n", min);
 	fprintf(stdout, "/* rx_table8 lowest  bit length is %u */\n", mid);
@@ -558,7 +558,7 @@ rx_table_invariant8(void)
 	if (mask != 0x00ffffff) {
 		for (i = 0; i < 24; i++)
 			if (!((mask >> i) & 1))
-				fprintf(stdout, "/* rx_table8 invariant in bit position %d */\n", i);
+				fprintf(stdout, "/* rx_old_table8 invariant in bit position %d */\n", i);
 	}
 	fprintf(stdout, "\n");
 }
@@ -589,7 +589,7 @@ rx_table_invariant7(void)
 			max = _rx_table7[i].bit_length;
 		states[i>>8][_rx_table7[i].state]++;
 	}
-	fprintf(stdout, "/* rx_table7 size is %d */\n", (int) sizeof(_rx_table7));
+	fprintf(stdout, "/* rx_old_table7 size is %d */\n", (int) sizeof(_rx_table7));
 #if 0
 	fprintf(stdout, "/* rx_table7 minimum bit length is %u */\n", min);
 	fprintf(stdout, "/* rx_table7 lowest  bit length is %u */\n", mid);
@@ -605,7 +605,7 @@ rx_table_invariant7(void)
 	if (mask != 0x00ffffff) {
 		for (i = 0; i < 24; i++)
 			if (!((mask >> i) & 1))
-				fprintf(stdout, "/* rx_table7 invariant in bit position %d */\n", i);
+				fprintf(stdout, "/* rx_old_table7 invariant in bit position %d */\n", i);
 	}
 	fprintf(stdout, "\n");
 }

@@ -114,7 +114,7 @@ struct tx_entry {
 	ushort state:3		__attribute__ ((packed));	/* new state */
 };
 
-static const struct tx_entry tx_table[1280] __attribute__((__aligned__(32))) = {
+static const struct tx_entry tx_table[1280] __attribute__((__aligned__(4096))) = {
 	{ 0x000, 0x0, 0x0 }, { 0x080, 0x0, 0x0 }, { 0x040, 0x0, 0x0 }, { 0x0c0, 0x0, 0x0 },
 	{ 0x020, 0x0, 0x0 }, { 0x0a0, 0x0, 0x0 }, { 0x060, 0x0, 0x0 }, { 0x0e0, 0x0, 0x0 },
 	{ 0x010, 0x0, 0x0 }, { 0x090, 0x0, 0x0 }, { 0x050, 0x0, 0x0 }, { 0x0d0, 0x0, 0x0 },
@@ -440,7 +440,7 @@ static const struct tx_entry tx_table[1280] __attribute__((__aligned__(32))) = {
 /* tx_table size is 2560 */
 /* tx_table invariant in bit position 15 */
 
-static const uint16_t bc_table[256] __attribute__((__aligned__(32))) = {
+static const uint16_t bc_table[256] __attribute__((__aligned__(512))) = {
 	0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,
 	0x8c48, 0x9dc1, 0xaf5a, 0xbed3, 0xca6c, 0xdbe5, 0xe97e, 0xf8f7,
 	0x1081, 0x0108, 0x3393, 0x221a, 0x56a5, 0x472c, 0x75b7, 0x643e,
@@ -486,7 +486,7 @@ struct rx_entry {
 	uint idle:1	    __attribute__ ((packed));
 };
 
-static const struct rx_entry rx_table8[4096] __attribute__((__aligned__(32))) = {
+static const struct rx_entry rx_table8[4096] __attribute__((__aligned__(4096))) = {
 	{ 0x000, 0x8, 0x0, 0, 0, 0, 0 }, { 0x000, 0x7, 0x1, 0, 0, 0, 0 },
 	{ 0x080, 0x8, 0x0, 0, 0, 0, 0 }, { 0x000, 0x6, 0x2, 0, 0, 0, 0 },
 	{ 0x040, 0x8, 0x0, 0, 0, 0, 0 }, { 0x040, 0x7, 0x1, 0, 0, 0, 0 },
@@ -2539,7 +2539,7 @@ static const struct rx_entry rx_table8[4096] __attribute__((__aligned__(32))) = 
 
 /* rx_table8 size is 12288 */
 
-static const struct rx_entry rx_table7[4096] __attribute__((__aligned__(32))) = {
+static const struct rx_entry rx_table7[4096] __attribute__((__aligned__(4096))) = {
 	{ 0x000, 0x7, 0x0, 0, 0, 0, 0 }, { 0x000, 0x7, 0x0, 0, 0, 0, 0 },
 	{ 0x000, 0x6, 0x1, 0, 0, 0, 0 }, { 0x000, 0x6, 0x1, 0, 0, 0, 0 },
 	{ 0x040, 0x7, 0x0, 0, 0, 0, 0 }, { 0x040, 0x7, 0x0, 0, 0, 0, 0 },
@@ -4592,5 +4592,6 @@ static const struct rx_entry rx_table7[4096] __attribute__((__aligned__(32))) = 
 
 /* rx_table7 size is 12288 */
 /* rx_table7 invariant in bit position 11 */
+
 
 #endif				/* __LOCAL_TAB_H__ */
