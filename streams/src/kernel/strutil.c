@@ -2946,14 +2946,14 @@ qprocsoff(queue_t *q)
 		   not reconect it when popping a module off of the near side. */
 		if (test_bit(QSRVP_BIT, &rq->q_flag) || rq->q_next == NULL) {
 			for (bq = rq->q_nbsrv; bq && bq != rq; bq = bq->q_next)
-#if 1
+#if 0
 				bq->q_nfsrv = rq->q_nfsrv;
 #else
 				if (bq->q_nfsrv == rq)
 					bq->q_nfsrv = rq->q_nfsrv;
 #endif
 			for (bq = rq->q_nfsrv; bq && bq != rq; bq = backq(bq))
-#if 1
+#if 0
 				bq->q_nbsrv = rq->q_nbsrv;
 #else
 				if (bq->q_nbsrv == rq)
@@ -2962,14 +2962,14 @@ qprocsoff(queue_t *q)
 		}
 		if (test_bit(QSRVP_BIT, &wq->q_flag) || wq->q_next == NULL) {
 			for (bq = wq->q_nbsrv; bq && bq != wq; bq = bq->q_next)
-#if 1
+#if 0
 				bq->q_nfsrv = wq->q_nfsrv;
 #else
 				if (bq->q_nfsrv == wq)
 					bq->q_nfsrv = wq->q_nfsrv;
 #endif
 			for (bq = wq->q_nfsrv; bq && bq != wq; bq = backq(bq))
-#if 1
+#if 0
 				bq->q_nbsrv = wq->q_nbsrv;
 #else
 				if (bq->q_nbsrv == wq)
@@ -2981,17 +2981,17 @@ qprocsoff(queue_t *q)
 		/* Careful that if a Stream head across a twist is already disconnected that we do
 		   not reconnect it when popping a module off of the near side. */
 		if ((bq = backq(rq)))
-#if 1
+#if 0
 			bq->q_next = rq->q_next;
 #else
-			if (bq->q_next == rq))
+			if (bq->q_next == rq)
 				bq->q_next = rq->q_next;
 #endif
 		if ((bq = backq(wq)))
-#if 1
+#if 0
 			bq->q_next = wq->q_next;
 #else
-			if (bq->q_next == wq))
+			if (bq->q_next == wq)
 				bq->q_next = wq->q_next;
 #endif
 
