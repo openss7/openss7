@@ -1165,7 +1165,6 @@ STATIC struct qband *__get_qband(queue_t *q, unsigned char band);
 streams_noinline streams_fastcall __hot_in void
 qbackenable(queue_t *q, const unsigned char band, const char bands[])
 {
-	register queue_t *q_nbsrv;
 	struct stdata *sd;
 
 	dassert(q);
@@ -1173,13 +1172,12 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 	dassert(sd);
 
 	prlock(sd);
-	if (likely((q_nbsrv = q->q_nbsrv) != NULL)) {
-		struct stdata *sd2;
+	{
+		queue_t *q_nbsrv = q->q_nbsrv;
+		struct stdata *sd2 = qstream(q_nbsrv);
 
-		sd2 = qstream(q_nbsrv);
 		dassert(sd2);
-		if (sd2 != sd)
-			prlock(sd2);
+		prlock(sd2);
 		/* If we are backenabling a Stream end queue then we will be specific about why it
 		   was backenabled, this gives the Stream head or driver information about for
 		   which specific bands flow control has subsided. */
@@ -1208,8 +1206,7 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 		/* SVR4 SPG - noenable() does not prevent a queue from being back enabled by flow
 		   control */
 		qenable(q_nbsrv);	/* always enable if a service procedure exists */
-		if (sd2 != sd)
-			prunlock(sd2);
+		prunlock(sd2);
 	}
 	prunlock(sd);
 }
@@ -1309,28 +1306,17 @@ __bcanputany(queue_t *q)
 }
 
 STATIC streams_inline streams_fastcall __hot int
-__bcanputnextany(struct stdata *sd, queue_t *q)
+__bcanputnextany(queue_t *q)
 {
-#if 1
-	bool result = false;
-	struct stdata *sd2;
-	queue_t *q_nfsrv;
+	int result;
+	queue_t *q_nfsrv = q->q_nfsrv;
+	struct stdata *sd = qstream(q_nfsrv);
 
-	if (likely((q_nfsrv = q->q_nfsrv) != NULL)) {
-		sd2 = qstream(q_nfsrv);
-		dassert(sd2);
-		if (sd2 != sd)
-			prlock(sd2);
-		if (likely(test_bit(QPROCS_BIT, &q_nfsrv->q_flag) == 0))
-			result = __bcanputany(q_nfsrv);
-		if (sd2 != sd)
-			prunlock(sd2);
-	}
+	dassert(sd);
+	prlock(sd);
+	result = __bcanputany(q_nfsrv);
+	prunlock(sd);
 	return (result);
-#else
-	dassert(q->q_nfsrv != NULL);
-	return __bcanputany(q->q_nfsrv);
-#endif
 }
 
 /**
@@ -1360,7 +1346,7 @@ bcanputnextany(queue_t *q)
 
 	prlock(sd);
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
-		result = __bcanputnextany(sd, q);
+		result = __bcanputnextany(q);
 	prunlock(sd);
 
 	return (result);
@@ -1391,7 +1377,7 @@ bcanputany(queue_t *q)
 		if (likely(test_bit(QSRVP_BIT, &q->q_flag) || q->q_next == NULL))
 			result = __bcanputany(q);
 		else
-			result = __bcanputnextany(sd, q);
+			result = __bcanputnextany(q);
 	}
 	prunlock(sd);
 
@@ -1516,28 +1502,17 @@ __bcanput(queue_t *q, unsigned char band)
 }
 
 STATIC streams_inline streams_fastcall __hot_write int
-__bcanputnext(struct stdata *sd, queue_t *q, unsigned char band)
+__bcanputnext(queue_t *q, unsigned char band)
 {
-#if 1
-	bool result = false;
-	struct stdata *sd2;
-	queue_t *q_nfsrv;
+	int result;
+	queue_t *q_nfsrv = q->q_nfsrv;
+	struct stdata *sd = qstream(q_nfsrv);
 
-	if (likely((q_nfsrv = q->q_nfsrv) != NULL)) {
-		sd2 = qstream(q_nfsrv);
-		dassert(sd2);
-		if (sd2 != sd)
-			prlock(sd2);
-		if (likely(test_bit(QPROCS_BIT, &q_nfsrv->q_flag) == 0))
-			result = __bcanput(q_nfsrv, band);
-		if (sd2 != sd)
-			prunlock(sd2);
-	}
+	dassert(sd);
+	prlock(sd);
+	result = __bcanput(q_nfsrv, band);
+	prunlock(sd);
 	return (result);
-#else
-	dassert(q->q_nfsrv != NULL);
-	return __bcanput(q->q_nfsrv, band);
-#endif
 }
 
 /**
@@ -1587,7 +1562,7 @@ bcanputnext(register queue_t *q, unsigned char band)
 
 	prlock(sd);
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0))
-		result = __bcanputnext(sd, q, band);
+		result = __bcanputnext(q, band);
 	prunlock(sd);
 
 	return (result);
@@ -1651,7 +1626,7 @@ bcanput(register queue_t *q, unsigned char band)
 		if (likely(test_bit(QSRVP_BIT, &q->q_flag) || q->q_next == NULL))
 			result = __bcanput(q, band);
 		else
-			result = __bcanputnext(sd, q, band);
+			result = __bcanputnext(q, band);
 	}
 	prunlock(sd);
 
