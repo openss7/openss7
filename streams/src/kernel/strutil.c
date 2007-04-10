@@ -1303,8 +1303,25 @@ __bcanputany(queue_t *q)
 STATIC streams_inline streams_fastcall __hot int
 __bcanputnextany(struct stdata *sd, queue_t *q)
 {
+#if 0
+	bool result = false;
+	struct stdata *sd2;
+	queue_t *q_nfsrv;
+
+	q_nfsrv = q->q_nfsrv;
+	dassert(q_nfsrv);
+	sd2 = qstream(q_nfsrv);
+	if (sd2 != sd)
+		prlock(sd2);
+	if (likely(test_bit(QPROCS_BIT, &q_nfsrv->q_flag) == 0))
+		result = __bcanputany(q_nfsrv);
+	if (sd2 != sd)
+		prunlock(sd2);
+	return (result);
+#else
 	dassert(q->q_nfsrv != NULL);
 	return __bcanputany(q->q_nfsrv);
+#endif
 }
 
 /**
@@ -1492,8 +1509,26 @@ __bcanput(queue_t *q, unsigned char band)
 STATIC streams_inline streams_fastcall __hot_write int
 __bcanputnext(struct stdata *sd, queue_t *q, unsigned char band)
 {
+#if 0
+	bool result = false;
+	struct stdata *sd2;
+	queue_t *q_nfsrv;
+
+	q_nfsrv = q->q_nfsrv;
+	dassert(q_nfsrv);
+	sd2 = qstream(q_nfsrv);
+	dassert(sd);
+	if (sd2 != sd)
+		prlock(sd2);
+	if (likely(test_bit(QPROCS_BIT, &q_nfsrv->q_flag) == 0))
+		result = __bcanput(q_nfsrv, band);
+	if (sd2 != sd)
+		prunlock(sd);
+	return (result);
+#else
 	dassert(q->q_nfsrv != NULL);
 	return __bcanput(q->q_nfsrv, band);
+#endif
 }
 
 /**
@@ -2674,29 +2709,46 @@ streams_fastcall __unlikely void
 qdelete(queue_t *q)
 {
 	struct stdata *sd;
+#if 0
+	struct stdata *sd2;
+#endif
 	unsigned long pl;
+	queue_t *rq = (q + 0);
+	queue_t *wq = (q + 1);
 
-	assert(q);
-	sd = rqstream(q);
+	assert(rq);
+	sd = rqstream(rq);
 	assert(sd);
 
 	_ptrace(("final half-delete of stream %p queue pair %p\n", sd, q));
 
 	pwlock(sd, pl);
+#if 0
+	if ((sd2 = wq->q_next ? qstream(wq->q_next) : NULL) && sd2 > sd)
+		phwlock(sd2);
+#endif
 
-	(q + 0)->q_next = NULL;
-	(q + 0)->q_nfsrv = NULL;
-	(q + 0)->q_nbsrv = NULL;
-//	(q + 0)->q_putp = NULL;
-//	(q + 0)->q_srvp = NULL;
-//	(q + 0)->q_ptr = NULL;
-	(q + 1)->q_next = NULL;
-	(q + 1)->q_nfsrv = NULL;
-	(q + 1)->q_nbsrv = NULL;
-//	(q + 1)->q_putp = NULL;
-//	(q + 1)->q_srvp = NULL;
-//	(q + 1)->q_ptr = NULL;
+	rq->q_next = NULL;
+	rq->q_nfsrv = NULL;
+	rq->q_nbsrv = NULL;
+#if 0
+	rq->q_putp = NULL;
+	rq->q_srvp = NULL;
+	rq->q_ptr = NULL;
+#endif
+	wq->q_next = NULL;
+	wq->q_nfsrv = NULL;
+	wq->q_nbsrv = NULL;
+#if 0
+	wq->q_putp = NULL;
+	wq->q_srvp = NULL;
+	wq->q_ptr = NULL;
+#endif
 
+#if 0
+	if (sd2 && sd2 > sd)
+		phwunlock(sd2);
+#endif
 	pwunlock(sd, pl);
 
 	_printd(("%s: cancelling initial allocation reference queue pair %p\n", __FUNCTION__, q));
