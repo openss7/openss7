@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "tab.h"
+#include "tabold.h"
 
 struct cd_path {
 	uint residue;			/* residue bits */
@@ -46,15 +47,15 @@ unsigned long cycles = 0;
 //#undef TABLE
 
 #ifdef TABLE
-static inline const struct tx_entry *tx_lookup(unsigned short i, unsigned char byte)
+static inline const struct tx_old_entry *tx_lookup(unsigned short i, unsigned char byte)
 {
-	return &tx_table[(i << 8) | byte];
+	return &tx_old_table[(i << 8) | byte];
 }
 #else
 /* tests show that the tabular approach is more than two times faster than calculation */
-static inline const struct tx_entry *tx_lookup(unsigned short state, unsigned char byte)
+static inline const struct tx_old_entry *tx_lookup(unsigned short state, unsigned char byte)
 {
-	static struct tx_entry result;
+	static struct tx_old_entry result;
 	int bit_mask = 0x80;
 	int len = 8;
 
@@ -83,11 +84,26 @@ static inline const struct rx_entry *rx_lookup(unsigned short i, unsigned char b
 	return &rx_table8[(i << 8) | byte];
 }
 
+static inline uint8_t
+cd_rev(uint8_t byte)
+{
+	int i;
+	uint8_t output = 0;
+
+	for (i = 0; i < 8; i++) {
+		output <<= 1;
+		if (byte & 0x01)
+			output |= 1;
+		byte >>= 1;
+	}
+	return (output);
+}
+
 int
 cd_tx_block(void)
 {
 	struct cd_path *tx = &cd_tx;
-	const struct tx_entry *t;
+	const struct tx_old_entry *t;
 
 	tx->buf = buf;
 	if (tx->mode == TX_MODE_IDLE || tx->mode == TX_MODE_FLAG) {
@@ -100,7 +116,8 @@ cd_tx_block(void)
 		if (tx->rbits >= 8) {
 		      drain_rbits:
 			//fprintf(stdout, "Draining %d bits\n", tx->rbits);
-			*tx->buf++ = tx->residue >> (tx->rbits - 8);
+			*tx->buf++ = cd_rev(tx->residue);
+			tx->residue >>= 8;
 			tx->rbits -= 8;
 			continue;
 		}
@@ -108,39 +125,19 @@ cd_tx_block(void)
 		case TX_MODE_IDLE:
 			/* mark idle */
 			//fprintf(stdout, "Marking idle\n");
-			tx->residue <<= 8;
-			tx->residue |= 0x0ff;
+			tx->residue |= 0xff << tx->rbits;
 			tx->rbits += 8;
 			goto drain_rbits;
 		case TX_MODE_FLAG:
 			/* idle flags */
 			//fprintf(stdout, "Idling flag\n");
-			tx->residue <<= 8;
-			tx->residue |= 0x07e;
+			tx->residue |= 0x7e << tx->rbits;
 			tx->rbits += 8;
 			goto drain_rbits;
 		case TX_MODE_BOF:
 			//fprintf(stdout, "Starting frame\n");
-#if 0
-			tx->residue <<= 8;
-			tx->residue |= 0x7e;
+			tx->residue |= 0x7e << tx->rbits;
 			tx->rbits += 8;
-#endif
-#if 0
-			tx->residue <<= 15;
-			tx->residue |= 0x3f7e;
-			tx->rbits += 15;
-#endif
-#if 0
-			tx->residue <<= 16;
-			tx->residue |= 0x7e7e;
-			tx->rbits += 16;
-#endif
-#if 1
-			tx->residue <<= 24;
-			tx->residue |= 0x7e7e7e;
-			tx->rbits += 24;
-#endif
 			tx->state = 0;
 			tx_state_count[tx->state]++;
 			tx->bcc = 0xffff;
@@ -152,15 +149,14 @@ cd_tx_block(void)
 
 				//fprintf(stdout, "Transmitting frame byte %d\n", tx->msg - tx_msg);
 				byte = *tx->msg++;
-				tx->bcc = (tx->bcc >> 8) ^ bc_table[(tx->bcc ^ byte) & 0x00ff];
+				tx->bcc = (tx->bcc >> 8) ^ bc_old_table[(tx->bcc ^ byte) & 0x00ff];
 				t = tx_lookup(tx->state, byte);
 				//fprintf(stdout, "t->bit_string = 0x%x\n", t->bit_string);
 				//fprintf(stdout, "t->bit_length = 0x%x\n", 8 + t->bit_length);
 				//fprintf(stdout, "t->state      = 0x%x\n", t->state);
 				tx->state = t->state;
 				tx_state_count[tx->state]++;
-				tx->residue <<= 8 + t->bit_length;
-				tx->residue |= t->bit_string;
+				tx->residue |= t->bit_string << tx->rbits;
 				tx->rbits += 8 + t->bit_length;
 				goto drain_rbits;
 			}
@@ -170,8 +166,7 @@ cd_tx_block(void)
 			t = tx_lookup(tx->state, tx->bcc);
 			tx->state = t->state;
 			tx_state_count[tx->state]++;
-			tx->residue <<= 8 + t->bit_length;
-			tx->residue |= t->bit_string;
+			tx->residue |= t->bit_string << tx->rbits;
 			tx->rbits += 8 + t->bit_length;
 			tx->mode = TX_MODE_BCC;
 			goto drain_rbits;
@@ -180,8 +175,7 @@ cd_tx_block(void)
 			t = tx_lookup(tx->state, tx->bcc >> 8);
 			tx->state = t->state;
 			tx_state_count[tx->state]++;
-			tx->residue <<= 8 + t->bit_length;
-			tx->residue |= t->bit_string;
+			tx->residue |= t->bit_string << tx->rbits;
 			tx->rbits += 8 + t->bit_length;
 			tx->mode = TX_MODE_FLAG;
 			goto drain_rbits;
