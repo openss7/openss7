@@ -1933,12 +1933,13 @@ test_putmsg(int child, struct strbuf *ctrl, struct strbuf *data, int flags)
 int
 test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
+	print_datcall(child, "putpmsg(2)----", data ? data->len : -1);
 	if (flags & MSG_BAND || band) {
 		if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
 			int i;
 
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
+			fprintf(stdout, "putpmsg to %d: [%d,%d] band %d\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1, band);
 			fprintf(stdout, "[");
 			for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
 				fprintf(stdout, "%02X", ctrl->buf[i]);
@@ -16474,6 +16475,9 @@ preamble_test_case_3_5_21(int child)
 	if (i != 19)
 		return (__RESULT_FAILURE);
 	state++;
+	if (test_block(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
 	return (__RESULT_SUCCESS);
 }
 int
@@ -16494,22 +16498,16 @@ test_case_3_5_21(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	i++;
-	for (;;) {
+	do {
 		flags = 0;
-		if (test_getmsg(child, &ctl, &dat, &flags) != __RESULT_SUCCESS) {
-			if (last_errno == EAGAIN)
-				break;
+		if (test_getmsg(child, &ctl, &dat, &flags) != __RESULT_SUCCESS)
 			return (__RESULT_FAILURE);
-		}
 		state++;
 		if (flags != 0)
 			return (__RESULT_FAILURE);
 		state++;
 		i++;
-	}
-	state++;
-	if (i != 19)
-		return (__RESULT_FAILURE);
+	} while (i != 19);
 	state++;
 	return (__RESULT_SUCCESS);
 }
@@ -18000,6 +17998,9 @@ preamble_test_case_3_6_26(int child)
 	if (i != 19)
 		return (__RESULT_FAILURE);
 	state++;
+	if (test_block(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
 	return (__RESULT_SUCCESS);
 }
 int
@@ -18023,6 +18024,8 @@ test_case_3_6_26(int child)
 	state++;
 	for (k = 0; k < 3; k++) {
 		for (i = 0; i < 6; i++) {
+			test_msleep(child, NORMAL_WAIT);
+			state++;
 			band = 0;
 			flags = MSG_ANY;
 			if (test_getpmsg(child, &ctl, &dat, &band, &flags) != __RESULT_SUCCESS)
@@ -18036,6 +18039,9 @@ test_case_3_6_26(int child)
 			state++;
 		}
 	}
+	state++;
+	if (test_nonblock(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
 	state++;
 	band = 0;
 	flags = MSG_ANY;
