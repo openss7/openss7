@@ -3038,7 +3038,7 @@ EXPORT_SYMBOL(qprocsoff);
  *  other side only needs one lock and deadlock is avoided.
  *
  *  In this way, queue procedures on both sides of the weld or pipe-twist can be assured that the
- *  q->q_next pointer will not change while they are running (pluming read lock is held).
+ *  q->q_next pointer will not change while they are running (plumbing read lock is held).
  */
 streams_fastcall __unlikely void
 qprocson(queue_t *q)
@@ -3378,6 +3378,7 @@ __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 					q->q_last = b->b_prev;
 				*mppp = &q->q_last->b_next;
 				**mppp = NULL;
+				b->b_prev = NULL;
 				q->q_count = 0;
 				q->q_msgs = 0;
 				clear_bit(QFULL_BIT, &q->q_flag);
@@ -3405,6 +3406,8 @@ __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 					q->q_last = qb->qb_first->b_prev;
 				*mppp = &qb->qb_last->b_next;
 				**mppp = NULL;
+				qb->qb_first->b_prev = NULL;
+				qb->qb_last->b_next = NULL;
 				qb->qb_count = 0;
 				q->q_msgs -= qb->qb_msgs;
 				assert(q->q_msgs >= 0);
