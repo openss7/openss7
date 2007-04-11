@@ -5122,10 +5122,20 @@ kstreamd(void *__bind_cpu)
 #endif
 #endif
 
-	set_user_nice(current, 19);
 #ifdef PF_NOFREEZE
 	current->flags |= PF_NOFREEZE;
 #endif
+
+#if !defined CONFIG_STREAMS_RT_KTHREADS
+	set_user_nice(current, 19);
+#else				/* !defined CONFIG_STREAMS_RT_KTHREADS */
+#if !defined HAVE___SETSCHEDULER_ADDR && !defined HAVE_SCHED_SETSCHEDULER_EXPORT
+	current->policy = SCHED_FIFO;
+	current->rt_priority = 99;
+	current->need_resched = 1;
+#endif				/* !defined HAVE___SETSCHEDULER_ADDR */
+#endif				/* !defined CONFIG_STREAMS_RT_KTHREADS */
+
 	set_current_state(TASK_INTERRUPTIBLE);
 	while (!kthread_should_stop()) {
 		preempt_disable();
@@ -5279,7 +5289,37 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 			return (NOTIFY_BAD);
 		}
 		t->proc = p;
+#ifdef PF_NOFREEZE
+		p->flags |= PF_NOFREEZE;
+#endif
 		kthread_bind(p, cpu);
+#if defined CONFIG_STREAMS_RT_KTHREADS
+#if defined HAVE___SETSCHEDULER_ADDR
+		{
+			unsigned long flags;
+			spinlock_t *rq;
+			static void (*__setscheduler) (struct task_struct * p, int policy,
+						       int prio) =
+			    (void *) HAVE___SETSCHEDULER_ADDR;
+			/* the lock happens to be first */
+			static spinlock_t *(*task_rq_lock) (struct task_struct * p,
+							    unsigned long *flags) =
+			    (void *) HAVE_TASK_RQ_LOCK_ADDR;
+
+			rq = task_rq_lock(p, &flags);
+			__setscheduler(p, SCHED_FIFO, MAX_RT_PRIO - 1);
+			spin_unlock_irqrestore(rq, flags);
+		}
+#else				/* defined HAVE___SETSCHEDULER_ADDR */
+#if defined HAVE_SCHED_SETSCHEDULER_EXPORT
+		{
+			struct sched_param sp = { MAX_USER_RT_PRIO - 1 };
+
+			sched_setscheduler(p, SCHED_FIFO, &sp);
+		}
+#endif				/* defined HAVE_SCHED_SETSCHEDULER_EXPORT */
+#endif				/* defined HAVE___SETSCHEDULER_ADDR */
+#endif				/* defined CONFIG_STREAMS_RT_KTHREADS */
 		break;
 	case CPU_ONLINE:
 		wake_up_process(p);
@@ -5387,7 +5427,21 @@ kstreamd(void *__bind_cpu)
 	struct strthread *t = &strthreads[cpu];
 
 	daemonize();
+
+#ifdef PF_NOFREEZE
+	current->flags |= PF_NOFREEZE;
+#endif
+
+#if !defined CONFIG_STREAMS_RT_KTHREADS
 	set_user_nice(current, 19);
+#else				/* !defined CONFIG_STREAMS_RT_KTHREADS */
+#if !defined HAVE___SETSCHEDULER_ADDR && !defined HAVE_SCHED_SETSCHEDULER_EXPORT
+	current->policy = SCHED_FIFO;
+	current->rt_priority = 99;
+	current->need_resched = 1;
+#endif				/* !defined HAVE___SETSCHEDULER_ADDR */
+#endif				/* !defined CONFIG_STREAMS_RT_KTHREADS */
+
 	sigfillset(&current->blocked);
 	sigdelset(&current->blocked, SIGKILL);
 	set_cpus_allowed(current, 1UL << cpu);
