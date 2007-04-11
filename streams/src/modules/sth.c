@@ -679,8 +679,7 @@ strsyscall_write(void)
 	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
 	   the way out of a system call.  This allows queues to fill, flow control to function, and
 	   service procedures to run more efficiently. */
-//#ifndef CONFIG_SMP
-#if 0
+#ifndef CONFIG_SMP
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -698,8 +697,7 @@ strsyscall_read(void)
 	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
 	   the way out of a system call.  This allows queues to fill, flow control to function, and
 	   service procedures to run more efficiently. */
-//#ifndef CONFIG_SMP
-#if 0
+#ifndef CONFIG_SMP
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -721,8 +719,7 @@ strschedule(void)
 	   another processor.  This does have a negative impact; however, on SMP kernels running on 
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
-//#ifndef CONFIG_SMP
-#if 0
+#ifndef CONFIG_SMP
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -745,8 +742,7 @@ strschedule_poll(void)
 	   another processor.  This does have a negative impact; however, on SMP kernels running on 
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
-//#ifndef CONFIG_SMP
-#if 0
+#ifndef CONFIG_SMP
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -769,8 +765,7 @@ strschedule_ioctl(void)
 	   another processor.  This does have a negative impact; however, on SMP kernels running on 
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
-//#ifndef CONFIG_SMP
-#if 0
+#ifndef CONFIG_SMP
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -793,8 +788,7 @@ strschedule_write(void)
 	   another processor.  This does have a negative impact; however, on SMP kernels running on 
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
-//#ifndef CONFIG_SMP
-#if 0
+#ifndef CONFIG_SMP
 	{
 		struct strthread *t = this_thread;
 
@@ -819,8 +813,7 @@ strschedule_read(void)
 	   another processor.  This does have a negative impact; however, on SMP kernels running on 
 	   UP machines, so it would be better if we could quickly check the number of processors
 	   running.  We just decide by static kernel configuration for the moment. */
-//#ifndef CONFIG_SMP
-#if 0
+#ifndef CONFIG_SMP
 	{
 		struct strthread *t = this_thread;
 
@@ -2640,7 +2633,7 @@ strwaitfifo(struct stdata *sd, const int oflag)
 }
 
 STATIC streams_fastcall __unlikely void
-strwaitqueue(queue_t *q, long timeo)
+strwaitqueue(struct stdata *sd, queue_t *q, long timeo)
 {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 	DEFINE_WAIT(wait);
@@ -2659,11 +2652,13 @@ strwaitqueue(queue_t *q, long timeo)
 #else
 		set_current_state(TASK_INTERRUPTIBLE);
 #endif
+		if (!q->q_first)
+			break;
 		if (timeo == 0)
 			break;
-		if (signal_pending(current))
+		if (sd->sd_flag & (STRDERR | STWRERR | STRHUP))
 			break;
-		if (!q->q_first)
+		if (signal_pending(current))
 			break;
 		strschedule();	/* save context switch */
 		timeo = schedule_timeout(timeo);
@@ -2685,6 +2680,10 @@ strwaitqueue(queue_t *q, long timeo)
  *  If STRHOLD is set, then be sure to release any messages held on the stream head's write queue,
  *  so, start with the stream head write queue instead of the stream below the stream head write
  *  queue.
+ *
+ *  Had a bit of a problem that hungup pipe ends were waiting for write queues to drain (even though
+ *  the other end was hungup), so added the check for STDERR|STWRERR|STRHUP.  That is, if the Stream
+ *  head was errored or hung up there is no need to wait.
  */
 STATIC streams_fastcall __unlikely void
 strwaitclose(struct stdata *sd, int oflag)
@@ -2707,31 +2706,27 @@ strwaitclose(struct stdata *sd, int oflag)
 
 	closetime = sd->sd_closetime;
 	/* POSIX close() semantics for STREAMS */
-	wait = (!(oflag & FNDELAY) && (closetime != 0) && !signal_pending(current));
+	wait = (!(oflag & FNDELAY) && (closetime != 0)
+		&& !(sd->sd_flag & (STRDERR | STWRERR | STRHUP)) && !signal_pending(current));
 
 	/* STREAM head first */
 	if (wait && q->q_first)
-		_ctrace(strwaitqueue(q, closetime));
+		strwaitqueue(sd, q, closetime);
+	if (q->q_first)
+		flushq(q, FLUSHALL);
 
 	while ((q = SAMESTR(sd->sd_wq) ? sd->sd_wq->q_next : NULL)) {
 		if (wait && q->q_first)
-			_ctrace(strwaitqueue(q, closetime));
-		_ctrace(qdetach(_RD(q), oflag, crp));
-		_trace();
+			strwaitqueue(sd, q, closetime);
+		qdetach(_RD(q), oflag, crp);
+		if (q->q_first)
+			flushq(q, FLUSHALL);
 	}
-#if 0
-	/* wait for but don't detach the remainder (past the twist) */
-	/* maybe not: if it is a FIFO, we might wait forever */
-	if (wait && (q = sd->sd_wq))
-		while((q = q->q_next))
-			strwaitqueue(q, closetime);
-#endif
 	/* STREAM head last */
-	_ctrace(qdetach(sd->sd_rq, oflag, crp));
+	qdetach(sd->sd_rq, oflag, crp);
 	/* procs are off for the STREAM head, flush queues now to dump M_PASSFP. */
 	flushq(sd->sd_rq, FLUSHALL);
 	flushq(sd->sd_wq, FLUSHALL);
-	_trace();
 }
 
 /**
