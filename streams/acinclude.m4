@@ -406,6 +406,24 @@ AC_DEFUN([_LFS_SETUP_KTHREADS], [dnl
 	    ;;
     esac
     AM_CONDITIONAL([CONFIG_STREAMS_KTHREADS], [test :${lfs_streams_kthreads:-yes} = :yes])
+    AC_ARG_ENABLE([streams-rt-kthreads],
+	AS_HELP_STRING([--disable-streams-rt-kthreads],
+	    [disable real-time STREAMS kernel threads.
+	     @<:@default=enabled@:>@]),
+	    [enable_streams_rt_kthreads="$enableval"],
+	    [enable_streams_rt_kthreads='yes'])
+    AC_CACHE_CHECK([for STREAMS real-time kernel threads], [lfs_streams_rt_kthreads], [dnl
+	lfs_streams_rt_kthreads="${enable_streams_rt_kthreads:-yes}"])
+    case ${lfs_streams_rt_kthreads:-yes} in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_RT_KTHREADS], [1], [When
+	    defined] AC_PACKAGE_TITLE [will run kernel threads under
+	    real-time priority (SCHED_FIFO); when undefined,] AC_PACKAGE_TITLE
+	    [will run kernel threads nice 19 (SCHED_NORMAL) at the same
+	    priority as kernel soft irq threads.])
+	    ;;
+    esac
+    AM_CONDITIONAL([CONFIG_STREAMS_RT_KTHREADS], [test :${lfs_streams_rt_kthreads:-yes} = :yes])
 ])# _LFS_SETUP_KTHREADS
 # =============================================================================
 
@@ -1130,6 +1148,11 @@ dnl sneaky tricks in the esballoc() and freeb() functions to do proper module
 dnl reference counting for the free routine callback function.
 dnl
     _LINUX_KERNEL_SYMBOLS([module_text_address])
+dnl
+dnl We want to run kernel threads lately at real-time.  We need several symbols to do this.  These
+dnl are not present on 2.4, but then the task structure can be manipulated directly.
+dnl
+    _LINUX_KERNEL_SYMBOLS([sched_setscheduler, __setscheduler, task_rq_lock, task_rq_unlock])
     _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
 			process_group process_session cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \
