@@ -108,7 +108,7 @@ AT_ARG_OPTION([quiet], AS_HELP_STRING([--quiet],
 	[suppress normal output]))
 
 AT_ARG_OPTION([wait], AS_HELP_STRING([--wait],
-	[run even time consuming tests @<:default: off@:>@]))
+	[run even time consuming tests @<:@default: off@:>@]))
 
 AT_ARG_OPTION([sync], AS_HELP_STRING([--sync],
 	[do a disk sync before running tests @<:@default: off@:>@]))
