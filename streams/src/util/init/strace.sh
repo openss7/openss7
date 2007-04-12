@@ -13,7 +13,7 @@
 # arguments to add and remove links after the the name argument:
 #
 # strace:	start and stop strace facility
-# update-rc.d:	stop 20 0 1 6 .
+# update-rc.d:	start 20 2 3 4 5 . stop 80 0 1 6 .
 # config:	/etc/default/strace
 # processname:	strace
 # pidfile:	/var/run/strace.pid
@@ -34,8 +34,8 @@
 # Required-Stop: streams
 # Should-Start: strerr
 # Should-Stop: strerr
-# Default-Start: 
-# Default-Stop: 0 1 2 3 4 5 6
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
 # X-UnitedLinux-Default-Enabled: no
 # Short-Description: start and stop strace
 # License: GPL
@@ -62,7 +62,7 @@ STRACE_DIRECTORY="/var/log/streams"
 STRACE_BASENAME="trace"
 STRACE_OUTFILE=
 STRACE_ERRFILE=
-STRACE_LOGDEVICE="/dev/streams/log"
+STRACE_LOGDEVICE="/dev/streams/clone/log"
 STRACE_MODULES=
 STRACE_OPTIONS=
 
@@ -83,25 +83,26 @@ fi
 
 build_options() {
     # Build up the options string
-    STRACE_OPTIONS="-p $pidfile"
+    STRACE_OPTIONS="-n -p $pidfile"
     [ -n "$STRACEOPTIONS" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+ }${STRACEOPTIONS}"
+	STRACE_OPTIONS="${STRACE_OPTIONS:+$STRACE_OPTIONS }${STRACEOPTIONS}"
     [ -n "$STRACE_DIRECTORY" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-d ${STRACE_DIRECTORY}"
+	STRACE_OPTIONS="${STRACE_OPTIONS:+$STRACE_OPTIONS }-d ${STRACE_DIRECTORY}"
     [ -n "$STRACE_BASENAME" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-b ${STRACE_BASENAME}"
+	STRACE_OPTIONS="${STRACE_OPTIONS:+$STRACE_OPTIONS }-b ${STRACE_BASENAME}"
     [ -n "$STRACE_OUTFILE" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-o ${STRACE_OUTFILE}"
+	STRACE_OPTIONS="${STRACE_OPTIONS:+$STRACE_OPTIONS }-o ${STRACE_OUTFILE}"
     [ -n "$STRACE_ERRFILE" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-e ${STRACE_ERRFILE}"
+	STRACE_OPTIONS="${STRACE_OPTIONS:+$STRACE_OPTIONS }-e ${STRACE_ERRFILE}"
     [ -n "$STRACE_LOGDEVICE" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+ }-l ${STRACE_LOGDEVICE}"
+	STRACE_OPTIONS="${STRACE_OPTIONS:+$STRACE_OPTIONS }-l ${STRACE_LOGDEVICE}"
     [ -n "$STRACE_MODULES" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+ }${STRACE_MODULES}"
+	STRACE_OPTIONS="${STRACE_OPTIONS:+$STRACE_OPTIONS }${STRACE_MODULES}"
 }
 
 start() {
     echo -n "Starting $desc: $name "
+    [ -d "$STRACE_DIRECTORY" -o -z "$STRACE_DIRECTORY" ] || mkdir -p "$STRACE_DIRECTORY"
     build_options
     start-stop-daemon --start --quiet --pidfile $pidfile \
 	--exec $execfile -- $STRACE_OPTIONS
