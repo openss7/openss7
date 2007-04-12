@@ -1,5 +1,12 @@
 2007-04-04  Brian Bidulock  <bidulock@openss7.org>
 
+	* tests/local.at: correct typo
+	* src/drivers/inet.c: adjust water marks
+	* src/drivers/rawip.c: adjust water marks
+	* src/drivers/udp.c: adjust water marks and flow control
+
+2007-04-04  Brian Bidulock  <bidulock@openss7.org>
+
 	* src/drivers/udp.c: minor locking adjustments and inline and fastcall declarations
 	* src/test/test-inet_raw.c: T_SENDZERO valid for IP and UDP providers
 	* src/test/test-inet_udp.c: T_SENDZERO valid for IP and UDP providers

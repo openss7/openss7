@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/02 09:23:29 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/04/12 20:06:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/02 09:23:29 $ by $Author: brian $
+ Last Modified $Date: 2007/04/12 20:06:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsysctl.c,v $
+ Revision 0.9.2.41  2007/04/12 20:06:11  brian
+ - changes from performance testing and misc bug fixes
+
  Revision 0.9.2.40  2007/03/02 09:23:29  brian
  - build updates and esballoc() feature
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/02 09:23:29 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/04/12 20:06:11 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/02 09:23:29 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/04/12 20:06:11 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>

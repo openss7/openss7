@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/03/25 19:01:57 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2007/04/12 20:06:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:01:57 $ by $Author: brian $
+ Last Modified $Date: 2007/04/12 20:06:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.64  2007/04/12 20:06:41  brian
+ - changes from performance testing and misc bug fixes
+
  Revision 0.9.2.63  2007/03/25 19:01:57  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -124,10 +127,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/03/25 19:01:57 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2007/04/12 20:06:41 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/03/25 19:01:57 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2007/04/12 20:06:41 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -149,7 +152,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/03/25 19:01:57 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2007/04/12 20:06:41 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

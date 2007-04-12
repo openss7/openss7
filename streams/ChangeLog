@@ -1,5 +1,82 @@
 2007-04-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* acinclude.m4: add option for real-time kernel threads
+	  - option called --enable-streams-rt-kthreads and defaults to disabled
+	  - check for __setscheduler and task_rq_lock for rt kthreads
+	* perftest_script: adjust script for profiling
+	* doc/man/Makefile.am: added new HPUX ioctl manual pages
+	* doc/man/man4/sc.4.man: document sc modules extensions for strtune utility
+	* doc/man/man7/I_SWROPT.7.man: new SNDELIM flag to allow user to change write delim behaviour
+	* doc/manual/bugs.texi: documented fixed bugs reported by Jérémy Compostella
+	* include/sys/streams/sc.h: added new flags and ioctl for strtune facility
+	* include/sys/streams/strdebug.h: quiet down _TEST mode
+	* include/sys/streams/stream.h: make queue flags volatile
+
+	* include/sys/streams/stropts.h:
+	  - uncomment HPUX ioctls that are now implemented
+	  - added SNDELIM bit to permit user to delimit written messages
+
+	* include/sys/streams/strsubr.h:
+	  - reorganized stream head structure (stdata)
+	  - added scanq list for STRHOLD feature
+	  - cache strmsgsz, strctlsz and strnpush
+	  - make flags volatile
+	  - scanq list now lists stream heads instead of queues
+	  - fix comments for flags (reported by Jérémy Compostella)
+	  - remove STRBCWAIT from QRUNFLAGS
+
+	* src/drivers/clone.c: removed old traces
+	* src/drivers/echo.c: removed old traces
+	* src/drivers/fifo.c: removed old traces
+	* src/drivers/loop.c: removed old traces
+	* src/drivers/mux.c: removed old traces
+	* src/drivers/nsdev.c: removed old traces
+	* src/drivers/nuls.c: removed old traces
+	* src/kernel/strprocfs.c: some things now int instead of long in stdata
+
+	* src/kernel/strsched.c:
+	  - thread flags are volatile
+	  - clear queue structures before recaching
+	  - handle STRBCFLAG and STRBCWAIT correctly
+	  - keep se_seq from overflowing
+	  - make timeout_list_lock global scope
+	  - non-atomic exchange under interrupt suppression
+	  - test flags instead of just OR'ing them
+	  - cleaned up prlocks()
+	  - always test QPROCS bit after prlock acquired
+	  - queue zwlock (freezestr()) for queue safety instead of just local save flags
+	  - fix up timeout event list handling
+	  - qscan for STRHOLD feature now base on Stream head list instead of
+	    queue list
+	  - fully implement STRHOLD feature
+	  - cache rtime, strmsgsz, strctlsz, nstrpush which creating Stream head
+	  - add capability for running kernel threads high priority real-time
+
+	* src/kernel/strsched.h: treat runflags as volatile
+	* src/kernel/strsysctl.c: boost maximum number of message blocks
+
+	* src/kernel/strutil.c:
+	  - correct qbackenable
+	  - correct bcanget
+	  - clean up prlocking
+	  - always check QPROCS after acquiring prlock
+	  - adjust q_nfsrv and q_nbsrv when queue changes (qprocson, qprocsoff,
+	    qdelete and qinsert)
+	  - do not free stream heads acoss a twist
+
+	* src/kernel/strutil.h: write lock both Stream heads for pipes
+	* src/modules/sc.c: remove extra newline
+	* src/modules/sth.c: tweaks and corrections from  peformance testing
+	* src/modules/testmod.c: remove old traces
+	* src/test/perftest.c: add ability to tune buffers
+	* src/test/test-streams.c: tweak a few test cases
+	* src/util/scls.c: add a debug print
+	* src/util/init/strace: fix init script
+	* src/util/init/strace.sh: fix init script
+	* src/util/init/strerr: fix init script
+	* src/util/init/strerr.sh: fix init script
+	* tests/local.at: correct typo
+
 	* perftest_tune: added pipe performance tuning script
 	* doc/man/man7/I_GET_HIWAT.7.man: added ioctl manual page
 	* doc/man/man7/I_GET_LOWAT.7.man: added ioctl manual page

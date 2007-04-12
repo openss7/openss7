@@ -1,3 +1,7 @@
+2007-04-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/local.at: correct typo
+
 2007-04-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* drivers/str/bufmod.c: corrections to module loading

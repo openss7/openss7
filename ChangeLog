@@ -1,5 +1,7 @@
 2007-04-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* configure.fast: convenience configure script from testing
+	* configure.test: convenience configure script from testing
 	* configure.norm: added convenience configure script
 
 2007-04-04  Brian Bidulock  <bidulock@openss7.org>

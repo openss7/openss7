@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/29 12:10:42 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/04/12 20:06:30 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/29 12:10:42 $ by $Author: brian $
+ Last Modified $Date: 2007/04/12 20:06:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.46  2007/04/12 20:06:30  brian
+ - changes from performance testing and misc bug fixes
+
  Revision 0.9.2.45  2007/03/29 12:10:42  brian
  - add T_SNDZERO for UDP and RAWIP per XNS 5.2
 
@@ -206,10 +209,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/29 12:10:42 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/04/12 20:06:30 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/29 12:10:42 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/04/12 20:06:30 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -290,7 +293,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/29 12:10:42 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/04/12 20:06:30 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"

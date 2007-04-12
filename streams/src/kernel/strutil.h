@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strutil.h,v 0.9.2.53 2007/03/28 13:44:19 brian Exp $
+ @(#) $Id: strutil.h,v 0.9.2.54 2007/04/12 20:06:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/28 13:44:19 $ by $Author: brian $
+ Last Modified $Date: 2007/04/12 20:06:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.h,v $
+ Revision 0.9.2.54  2007/04/12 20:06:12  brian
+ - changes from performance testing and misc bug fixes
+
  Revision 0.9.2.53  2007/03/28 13:44:19  brian
  - updates to syncrhonization, release notes and documentation
 
@@ -64,7 +67,7 @@
 #ifndef __LOCAL_STRUTIL_H__
 #define __LOCAL_STRUTIL_H__
 
-#ident "@(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.53 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.54 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>

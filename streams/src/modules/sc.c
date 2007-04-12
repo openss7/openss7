@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 19:01:18 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/04/12 20:06:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:01:18 $ by $Author: brian $
+ Last Modified $Date: 2007/04/12 20:06:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.c,v $
+ Revision 0.9.2.52  2007/04/12 20:06:13  brian
+ - changes from performance testing and misc bug fixes
+
  Revision 0.9.2.51  2007/03/25 19:01:18  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -80,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 19:01:18 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/04/12 20:06:13 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 19:01:18 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/04/12 20:06:13 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -110,7 +113,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 19:01:18 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/04/12 20:06:13 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"

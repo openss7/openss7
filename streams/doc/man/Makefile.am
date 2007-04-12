@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2007/03/30 14:51:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2007/04/12 20:06:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/30 14:51:39 $ by $Author: brian $
+# Last Modified $Date: 2007/04/12 20:06:03 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.85  2007/04/12 20:06:03  brian
+# - changes from performance testing and misc bug fixes
+#
 # Revision 0.9.2.84  2007/03/30 14:51:39  brian
 # - updated manual pages and missing symbol
 #

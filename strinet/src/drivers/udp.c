@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/04/04 01:15:43 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2007/04/12 20:06:31 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/04/04 01:15:43 $ by $Author: brian $
+ Last Modified $Date: 2007/04/12 20:06:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.58  2007/04/12 20:06:31  brian
+ - changes from performance testing and misc bug fixes
+
  Revision 0.9.2.57  2007/04/04 01:15:43  brian
  - T_SNDZERO ok for rawip and udp, cleanup of udp.c driver
 
@@ -242,10 +245,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/04/04 01:15:43 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2007/04/12 20:06:31 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/04/04 01:15:43 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2007/04/12 20:06:31 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -327,7 +330,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/04/04 01:15:43 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2007/04/12 20:06:31 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"

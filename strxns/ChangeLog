@@ -1,3 +1,8 @@
+2007-04-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/local.at: corrected typo
+	* src/drivers/np_ip.c: adjust packet sizes and water marks
+
 2007-04-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/bugs.texi: documented option handling bug fix in ldltest

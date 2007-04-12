@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/01/15 12:16:42 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/04/12 20:06:21 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/15 12:16:42 $ by $Author: brian $
+ Last Modified $Date: 2007/04/12 20:06:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: scls.c,v $
+ Revision 0.9.2.24  2007/04/12 20:06:21  brian
+ - changes from performance testing and misc bug fixes
+
  Revision 0.9.2.23  2007/01/15 12:16:42  brian
  - updated archive sizes, new development work
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/01/15 12:16:42 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/04/12 20:06:21 $"
 
 static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/01/15 12:16:42 $";
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/04/12 20:06:21 $";
 
 /* 
  *  AIX/HPUX Utility: scls - Produces a list of module and driver names.
