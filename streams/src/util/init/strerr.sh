@@ -13,7 +13,7 @@
 # arguments to add and remove links after the the name argument:
 #
 # strerr:	start and stop strerr facility
-# update-rc.d:	stop 20 0 1 6 .
+# update-rc.d:	start 20 2 3 4 5 . stop 80 0 1 6 .
 # config:	/etc/default/strerr
 # processname:	strerr
 # pidfile:	/var/run/strerr.pid
@@ -32,8 +32,8 @@
 # Provides: strerr
 # Required-Start: streams
 # Required-Stop: streams
-# Default-Start: 
-# Default-Stop: 0 1 2 3 4 5 6
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
 # X-UnitedLinux-Default-Enabled: yes
 # Short-Description: start and stop strerr
 # License: GPL
@@ -61,7 +61,7 @@ STRERR_DIRECTORY="/var/log/streams"
 STRERR_BASENAME="error"
 STRERR_OUTFILE=
 STRERR_ERRFILE=
-STRERR_LOGDEVICE="/dev/streams/log"
+STRERR_LOGDEVICE="/dev/streams/clone/log"
 STRERR_OPTIONS=
 
 # Source config file
@@ -81,28 +81,29 @@ fi
 
 build_options() {
     # Build up the options string
-    STRERR_OPTIONS=
+    STRERR_OPTIONS="-p $pidfile"
     [ -n "$STRERROPTIONS" ] && \
-	STRERR_OPTIONS="${STRERR_OPTIONS:+ }${STRERROPTIONS}"
+	STRERR_OPTIONS="${STRERR_OPTIONS:+$STRERR_OPTIONS }${STRERROPTIONS}"
     [ -n "$STRERR_MAILUID" ] && \
-	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-a ${STRERR_MAILUID}"
+	STRERR_OPTIONS="${STRERR_OPTIONS:+$STRERR_OPTIONS }-a ${STRERR_MAILUID}"
     [ -n "$STRERR_DIRECTORY" ] && \
-	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-d ${STRERR_DIRECTORY}"
+	STRERR_OPTIONS="${STRERR_OPTIONS:+$STRERR_OPTIONS }-d ${STRERR_DIRECTORY}"
     [ -n "$STRERR_BASENAME" ] && \
-	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-b ${STRERR_BASENAME}"
+	STRERR_OPTIONS="${STRERR_OPTIONS:+$STRERR_OPTIONS }-b ${STRERR_BASENAME}"
     [ -n "$STRERR_OUTFILE" ] && \
-	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-o ${STRERR_OUTFILE}"
+	STRERR_OPTIONS="${STRERR_OPTIONS:+$STRERR_OPTIONS }-o ${STRERR_OUTFILE}"
     [ -n "$STRERR_ERRFILE" ] && \
-	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-e ${STRERR_ERRFILE}"
+	STRERR_OPTIONS="${STRERR_OPTIONS:+$STRERR_OPTIONS }-e ${STRERR_ERRFILE}"
     [ -n "$STRERR_LOGDEVICE" ] && \
-	STRERR_OPTIONS="${STRERR_OPTIONS:+ }-l ${STRERR_LOGDEVICE}"
+	STRERR_OPTIONS="${STRERR_OPTIONS:+$STRERR_OPTIONS }-l ${STRERR_LOGDEVICE}"
 }
 
 start() {
     echo -n "Starting $desc: $name "
+    [ -d "$STRERR_DIRECTORY" -o -z "$STRERR_DIRECTORY" ] || mkdir -p "$STRERR_DIRECTORY"
     build_options
     start-stop-daemon --start --quiet --pidfile $pidfile \
-	--exec $execfile -- $STRACE_OPTIONS
+	--exec $execfile -- $STRERR_OPTIONS
     RETVAL=$?
     if [ $RETVAL -eq 0 ] ; then
 	echo "."
