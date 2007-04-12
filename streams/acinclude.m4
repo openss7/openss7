@@ -407,14 +407,14 @@ AC_DEFUN([_LFS_SETUP_KTHREADS], [dnl
     esac
     AM_CONDITIONAL([CONFIG_STREAMS_KTHREADS], [test :${lfs_streams_kthreads:-yes} = :yes])
     AC_ARG_ENABLE([streams-rt-kthreads],
-	AS_HELP_STRING([--disable-streams-rt-kthreads],
+	AS_HELP_STRING([--enable-streams-rt-kthreads],
 	    [disable real-time STREAMS kernel threads.
-	     @<:@default=enabled@:>@]),
+	     @<:@default=disabled@:>@]),
 	    [enable_streams_rt_kthreads="$enableval"],
-	    [enable_streams_rt_kthreads='yes'])
+	    [enable_streams_rt_kthreads='no'])
     AC_CACHE_CHECK([for STREAMS real-time kernel threads], [lfs_streams_rt_kthreads], [dnl
-	lfs_streams_rt_kthreads="${enable_streams_rt_kthreads:-yes}"])
-    case ${lfs_streams_rt_kthreads:-yes} in
+	lfs_streams_rt_kthreads="${enable_streams_rt_kthreads:-no}"])
+    case ${lfs_streams_rt_kthreads:-no} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_RT_KTHREADS], [1], [When
 	    defined] AC_PACKAGE_TITLE [will run kernel threads under
@@ -423,7 +423,7 @@ AC_DEFUN([_LFS_SETUP_KTHREADS], [dnl
 	    priority as kernel soft irq threads.])
 	    ;;
     esac
-    AM_CONDITIONAL([CONFIG_STREAMS_RT_KTHREADS], [test :${lfs_streams_rt_kthreads:-yes} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_RT_KTHREADS], [test :${lfs_streams_rt_kthreads:-no} = :yes])
 ])# _LFS_SETUP_KTHREADS
 # =============================================================================
 
