@@ -705,23 +705,25 @@ modi_put(struct mdlinfo *mi)
  *  -------------------------------------------------------------------------
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
+STATIC void
+queinfo_init(struct queinfo *qu)
+{
+	bzero(qu, sizeof(*qu));
+	/* initialize queue locks */
+	qlockinit(&qu->rq);
+	qlockinit(&qu->wq);
+	qu->rq.q_flag = QREADR;
+	qu->wq.q_flag = 0;
+	init_waitqueue_head(&qu->qu_qwait);
+#if defined _DEBUG
+	INIT_LIST_HEAD(&qu->qu_list);
+#endif
+}
 STATIC __unlikely void
 queinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 {
-	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
-		struct queinfo *qu = obj;
-
-		bzero(qu, sizeof(*qu));
-		/* initialize queue locks */
-		qlockinit(&qu->rq);
-		qlockinit(&qu->wq);
-		qu->rq.q_flag = QREADR;
-		qu->wq.q_flag = 0;
-		init_waitqueue_head(&qu->qu_qwait);
-#if defined _DEBUG
-		INIT_LIST_HEAD(&qu->qu_list);
-#endif
-	}
+	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
+		queinfo_init(obj);
 }
 
 /**
@@ -771,7 +773,6 @@ streams_noinline streams_fastcall void sd_put_slow(struct stdata **sdp);
 STATIC streams_fastcall void
 __freeq(queue_t *rq)
 {
-	queue_t *wq = rq + 1;
 	struct strinfo *si = &Strinfo[DYN_QUEUE];
 	struct queinfo *qu = (struct queinfo *) rq;
 
@@ -784,12 +785,8 @@ __freeq(queue_t *rq)
 	assert(!waitqueue_active(&qu->qu_qwait));
 	/* put STREAM head - if not already */
 	_ctrace(sd_put_slow(&qu->qu_str));
-	/* clear flags */
-	rq->q_flag = QREADR;
-	wq->q_flag = 0;
-	/* break locks */
-	qlockinit(rq);
-	qlockinit(wq);
+	/* clean it good */
+	queinfo_init(qu);
 	/* put back in cache */
 	kmem_cache_free(si->si_cache, rq);
 }
@@ -3348,8 +3345,9 @@ putnext(queue_t *q, mblk_t *mp)
 		putp_fast(q->q_next, mp);
 #endif
 	} else {
-		freemsg(mp);
 		swerr();
+		dump_stack();
+		freemsg(mp);
 	}
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
