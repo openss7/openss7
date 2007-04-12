@@ -185,16 +185,16 @@ default_run=yes
 
 default_netperf=${NETPERF_CMD:=netperf}
 default_calibrate=no
-default_testtime=${NETPERF_TIME:=60}
+default_testtime=${NETPERF_TIME:=10}
 default_port=${NETPERF_PORT:=}
-default_bufsizes=${NETPERF_SKTS:='32768'}
+default_bufsizes=${NETPERF_SKTS:='131071'}
 default_stats=${NETPERF_STATS:='-i 10,2 -I 99,10'}
 default_hostname='localhost'
 default_device='/dev/udp'
 default_xti=no
 default_headers='-P 0'
 default_calibrate=no
-default_rrsizes='1,1 64,64 100,200 1024,1024'
+default_rrsizes='64,64 100,200 1024,1024 4096,8192'
 
 defaults='command debug verbose run netperf calibrate testtime port hostname device xti stats headers calibrate bufsizes rrsizes'
 
