@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: strtune.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/04/12 19:12:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/04/12 19:12:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: strtune.c,v $
+ Revision 0.9.2.1  2007/04/12 19:12:38  brian
+ - added files from testing and strtune utility
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: strtune.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/04/12 19:12:38 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: strtune.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/04/12 19:12:38 $";
 
 /* 
  *  AIX Utility: strtune - Produces a list of module and driver names.

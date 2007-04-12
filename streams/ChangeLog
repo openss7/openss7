@@ -1,3 +1,17 @@
+2007-04-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* perftest_tune: added pipe performance tuning script
+	* doc/man/man7/I_GET_HIWAT.7.man: added ioctl manual page
+	* doc/man/man7/I_GET_LOWAT.7.man: added ioctl manual page
+	* doc/man/man7/I_GET_PUSHCNT.7.man: added ioctl manual page
+	* doc/man/man7/I_GET_STH_WROFF.7.man: added ioctl manual page
+	* doc/man/man7/I_GET_STRCTLSZ.7.man: added ioctl manual page
+	* doc/man/man7/I_GET_STRMSGSZ.7.man: added ioctl manual page
+	* doc/man/man7/I_SET_HIWAT.7.man: added ioctl manual page
+	* doc/man/man7/I_SET_LOWAT.7.man: added ioctl manual page
+	* doc/man/man8/strtune.8.man: added strtune utility manual page
+	* src/util/strtune.c: added strtune utility (incomplete)
+
 2007-04-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* include/sys/streams/strsubr.h: comment corrections
