@@ -1,3 +1,7 @@
+2007-04-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.norm: added convenience configure script
+
 2007-04-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/kernel.m4: provide --enable-k-none configure option to permit

@@ -1,3 +1,10 @@
+2007-04-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/tabold.c: added verification programs
+	* src/modules/tabold.h: added verification programs
+	* src/modules/testboth.c: added verification programs
+	* src/modules/testold.c: added verification programs
+
 2007-04-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/tabold.c: reverified bit patterns in x400p driver

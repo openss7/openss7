@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tabold.h,v 0.9.2.2 2006/12/18 08:59:36 brian Exp $
+ @(#) $Id: tabold.h,v 0.9.2.1 2007/04/12 19:12:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 08:59:36 $ by $Author: brian $
+ Last Modified $Date: 2007/04/12 19:12:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tabold.h,v $
+ Revision 0.9.2.1  2007/04/12 19:12:33  brian
+ - added files from testing and strtune utility
+
  Revision 0.9.2.2  2006/12/18 08:59:36  brian
  - working up strchan package
 
@@ -61,7 +64,7 @@
 #ifndef __LOCAL_TABOLD_H__
 #define __LOCAL_TABOLD_H__
 
-#ident "@(#) $RCSfile: tabold.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tabold.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  * This file contains 4 tables, one for transmit bit-stuffing and bit-reversal: tx_table; one for
