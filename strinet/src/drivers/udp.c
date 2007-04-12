@@ -401,7 +401,7 @@ STATIC struct module_info udp_rinfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
-	.mi_hiwat = SHEADHIWAT << 2,	/* Hi water mark */
+	.mi_hiwat = SHEADHIWAT << 4,	/* Hi water mark */
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
@@ -430,8 +430,8 @@ STATIC struct module_info udp_winfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
-	.mi_hiwat = SHEADHIWAT<<1,	/* Hi water mark */
-	.mi_lowat = 0,			/* Lo water mark */
+	.mi_hiwat = STRHIGH,		/* Hi water mark */
+	.mi_lowat = STRLOW,		/* Lo water mark */
 };
 
 streamscall int tp_wput(queue_t *, mblk_t *);
@@ -4176,7 +4176,7 @@ tp_ip_queue_xmit(struct sk_buff *skb)
 #endif				/* defined HAVE_KFUNC_DST_OUTPUT */
 
 #if 1
-noinline fastcall void
+noinline fastcall __hot void
 tp_skb_destructor_slow(struct tp *tp, struct sk_buff *skb)
 {
 	unsigned long flags;
@@ -4580,9 +4580,11 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 
 	if (unlikely(tp->sndblk != 0))
 		goto ebusy;
+#if 0
 	/* Allows slop over by 1 buffer per processor. */
 	if (unlikely(tp->sndmem > tp->options.xti.sndbuf))
 		goto blocked;
+#endif
 
 	assert(opt != NULL);
 	if (likely((err = tp_route_output(tp, opt, &rt)) == 0)) {
@@ -4664,9 +4666,11 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 	}
 	_rare();
 	return (err);
+#if 0
       blocked:
 	udp_wstat.ms_ocnt++;
 	tp->sndblk = 1;
+#endif
       ebusy:
 	return (-EBUSY);
 }
@@ -7031,6 +7035,10 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 	mblk_t *dp;
 	int err;
 	struct sockaddr_in dst_buf;
+	
+	/* don't work on message if flow controlled */
+	if (tp->sndblk != 0)
+		return (-EBUSY);
 
 	prefetch(tp);
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
@@ -7439,6 +7447,10 @@ te_write_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
 	size_t dlen;
+	
+	/* don't work on message if flow controlled */
+	if (tp->sndblk != 0)
+		return (-EBUSY);
 
 	if (unlikely(tp->info.SERV_type == T_CLTS))
 		goto error;
@@ -7486,6 +7498,10 @@ te_data_req(queue_t *q, mblk_t *mp)
 	size_t dlen;
 	mblk_t *dp;
 	int err;
+	
+	/* don't work on message if flow controlled */
+	if (tp->sndblk != 0)
+		return (-EBUSY);
 
 	err = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
@@ -7543,6 +7559,10 @@ te_exdata_req(queue_t *q, mblk_t *mp)
 	size_t dlen;
 	mblk_t *dp;
 	int err;
+	
+	/* don't work on message if flow controlled */
+	if (tp->sndblk != 0)
+		return (-EBUSY);
 
 	err = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
@@ -7595,6 +7615,10 @@ te_optdata_req(queue_t *q, mblk_t *mp)
 	size_t mlen;
 	mblk_t *dp;
 	int err;
+	
+	/* don't work on message if flow controlled */
+	if (tp->sndblk != 0)
+		return (-EBUSY);
 
 	err = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
@@ -9143,8 +9167,8 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 		tp->options.xti.linger = xti_default_linger;
 		tp->options.xti.rcvbuf = sysctl_rmem_default;
 		tp->options.xti.rcvlowat = xti_default_rcvlowat;
-		tp->options.xti.sndbuf = sysctl_wmem_default;
-		tp->options.xti.sndlowat = 16768;
+		tp->options.xti.sndbuf = xti_default_sndbuf;
+		tp->options.xti.sndlowat = 0; // xti_default_sndlowat;
 		tp->options.xti.priority = xti_default_priority;
 		tp->options.ip.protocol = ip_default_protocol;
 		tp->options.ip.tos = ip_default_tos;
@@ -9338,14 +9362,14 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	so->so_maxpsz = udp_winfo.mi_maxpsz;
 #if 1
 	so->so_flags |= SO_HIWAT;
-	so->so_hiwat = SHEADHIWAT << 2;
+	so->so_hiwat = (SHEADHIWAT << 2) + (STRHIGH << 1);
 	so->so_flags |= SO_LOWAT;
 	so->so_lowat = 0;
 #endif
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
-	putnext(q, mp);
 	qprocson(q);
+	putnext(q, mp);
 	return (0);
 }
 
