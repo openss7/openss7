@@ -753,8 +753,8 @@ STATIC struct module_info ss_rinfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
-	.mi_hiwat = SHEADHIWAT << 2,	/* Hi water mark */
-	.mi_lowat = SHEADLOWAT << 2,	/* Lo water mark */
+	.mi_hiwat = SHEADHIWAT << 4,	/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 STATIC struct module_stat ss_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
@@ -780,8 +780,8 @@ STATIC struct module_info ss_winfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
-	.mi_hiwat = SHEADHIWAT + STRHIGH,	/* Hi water mark */
-	.mi_lowat = SHEADLOWAT - STRLOW,	/* Lo water mark */
+	.mi_hiwat = STRHIGH,		/* Hi water mark */
+	.mi_lowat = STRLOW,		/* Lo water mark */
 };
 
 STATIC streamscall int ss_wput(queue_t *, mblk_t *);
@@ -16165,6 +16165,8 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	int cminor = getminor(*devp);
 	ss_t *ss, **ipp = &ss_opens;
 	const ss_profile_t *prof;
+	mblk_t *mp;
+	struct stroptions *so;
 
 	if (q->q_ptr != NULL) {
 		return (0);	/* already open */
@@ -16189,6 +16191,8 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (sflag == CLONEOPEN)
 #endif
 		cminor = FREE_CMINOR;
+	if (!(mp = allocb(sizeof(*so), BPRI_MED)))
+		return (ENOBUFS);
 	spin_lock_bh(&ss_lock);
 	for (; *ipp; ipp = &(*ipp)->next) {
 		if (cmajor != (*ipp)->cmajor)
@@ -16210,6 +16214,7 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (mindex >= SS__CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
 		spin_unlock_bh(&ss_lock);
+		freeb(mp);
 		return (ENXIO);
 	}
 #if defined LFS
@@ -16222,6 +16227,7 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 				DRV_NAME, err));
 			unfreezestr(q, flags);
 			spin_unlock_bh(&ss_lock);
+			freeb(mp);
 			return (err);
 		}
 		if ((err = strqset(q, QHIWAT, 2, STRHIGH))) {
@@ -16229,6 +16235,7 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 				DRV_NAME, err));
 			unfreezestr(q, flags);
 			spin_unlock_bh(&ss_lock);
+			freeb(mp);
 			return (err);
 		}
 		unfreezestr(q, flags);
@@ -16239,6 +16246,7 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (!(ss = ss_alloc_priv(q, ipp, cmajor, cminor, crp, prof))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
 		spin_unlock_bh(&ss_lock);
+		freeb(mp);
 		return (ENOMEM);
 	}
 	/* Create all but raw sockets at open time.  For raw sockets, we do not know the protocol
@@ -16249,9 +16257,23 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if ((err = ss_sock_init(ss)) < 0) {
 		ptrace(("%s: ERROR: from ss_sock_init %d\n", DRV_NAME, -err));
 		ss_free_priv(q);
+		freeb(mp);
 		return (-err);
 	}
+	so = (typeof(so)) mp->b_wptr;
+	bzero(so, sizeof(*so));
+	so->so_flags |= SO_MINPSZ;
+	so->so_minpsz = ss_winfo.mi_minpsz;
+	so->so_flags |= SO_MAXPSZ;
+	so->so_maxpsz = ss_winfo.mi_maxpsz;
+	so->so_flags |= SO_HIWAT;
+	so->so_hiwat = (SHEADHIWAT << 2) + (STRHIGH << 1);
+	so->so_flags |= SO_LOWAT;
+	so->so_lowat = 0;
+	mp->b_wptr += sizeof(*so);
+	mp->b_datap->db_type = M_SETOPTS;
 	qprocson(q);
+	putnext(q, mp);
 	return (0);
 }
 
