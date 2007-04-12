@@ -1173,43 +1173,51 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 
 	prlock(sd);
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
-		queue_t *q_nbsrv = q->q_nbsrv;
-		struct stdata *sd2 = qstream(q_nbsrv);
+		queue_t *q_nbsrv;
+		struct stdata *sd2;
 
-		dassert(sd2);
-		prlock(sd2);
-		if (likely(test_bit(QPROCS_BIT, &q_nbsrv->q_flag) == 0)) {
-			/* If we are backenabling a Stream end queue then we will be specific about 
-			   why it was backenabled, this gives the Stream head or driver information 
-			   about for which specific bands flow control has subsided. */
-			/* Well, just the Stream head ... */
-			if (!test_bit(QREADR_BIT, &q_nbsrv->q_flag) && backq(q_nbsrv) == NULL) {
-				unsigned long pl;
-				struct qband *qb;
+		/* q_nbsrv can be NULL at a Stream end (head or driver) */
+		if (likely((q_nbsrv = q->q_nbsrv) != NULL)) {
+			sd2 = qstream(q_nbsrv);
+			dassert(sd2);
 
-				qwlock(q_nbsrv, pl);
-				if (likely(bands == NULL)) {
-					if (band == 0)
-						set_bit(QBACK_BIT, &q_nbsrv->q_flag);
-					else if ((qb = __get_qband(q_nbsrv, band)))
-						set_bit(QB_BACK_BIT, &qb->qb_flag);
-				} else {
-					int bnum;
+			prlock(sd2);
+			if (likely(test_bit(QPROCS_BIT, &q_nbsrv->q_flag) == 0)) {
+				/* If we are backenabling a Stream end queue then we will be
+				   specific about why it was backenabled, this gives the Stream
+				   head or driver information about for which specific bands flow
+				   control has subsided. */
+				/* Well, just the Stream head ... */
+				if (!test_bit(QREADR_BIT, &q_nbsrv->q_flag)
+				    && backq(q_nbsrv) == NULL) {
+					unsigned long pl;
+					struct qband *qb;
 
-					if (bands[0])
-						set_bit(QBACK_BIT, &q_nbsrv->q_flag);
-					for (bnum = band; bnum > 0; bnum--)
-						if (bands[bnum]
-						    && (qb = __get_qband(q_nbsrv, bnum)))
+					qwlock(q_nbsrv, pl);
+					if (likely(bands == NULL)) {
+						if (band == 0)
+							set_bit(QBACK_BIT, &q_nbsrv->q_flag);
+						else if ((qb = __get_qband(q_nbsrv, band)))
 							set_bit(QB_BACK_BIT, &qb->qb_flag);
+					} else {
+						int bnum;
+
+						if (bands[0])
+							set_bit(QBACK_BIT, &q_nbsrv->q_flag);
+						for (bnum = band; bnum > 0; bnum--)
+							if (bands[bnum]
+							    && (qb = __get_qband(q_nbsrv, bnum)))
+								set_bit(QB_BACK_BIT, &qb->qb_flag);
+					}
+					qwunlock(q_nbsrv, pl);
 				}
-				qwunlock(q_nbsrv, pl);
+				/* SVR4 SPG - noenable() does not prevent a queue from being back
+				   enabled by flow control */
+				qenable(q_nbsrv);	/* always enable if a service procedure
+							   exists */
 			}
-			/* SVR4 SPG - noenable() does not prevent a queue from being back enabled
-			   by flow control */
-			qenable(q_nbsrv);	/* always enable if a service procedure exists */
+			prunlock(sd2);
 		}
-		prunlock(sd2);
 	}
 	prunlock(sd);
 }
@@ -1312,14 +1320,19 @@ STATIC streams_inline streams_fastcall __hot int
 __bcanputnextany(queue_t *q)
 {
 	int result = 0;
-	queue_t *q_nfsrv = q->q_nfsrv;
-	struct stdata *sd = qstream(q_nfsrv);
+	queue_t *q_nfsrv;
+	struct stdata *sd;
 
-	dassert(sd);
-	prlock(sd);
-	if (likely(test_bit(QPROCS_BIT, &q_nfsrv->q_flag) == 0))
-		result = __bcanputany(q_nfsrv);
-	prunlock(sd);
+	/* driver might be detached */
+	if (likely((q_nfsrv = q->q_nfsrv) != NULL)) {
+		sd = qstream(q_nfsrv);
+		dassert(sd);
+
+		prlock(sd);
+		if (likely(test_bit(QPROCS_BIT, &q_nfsrv->q_flag) == 0))
+			result = __bcanputany(q_nfsrv);
+		prunlock(sd);
+	}
 	return (result);
 }
 
@@ -1509,14 +1522,19 @@ STATIC streams_inline streams_fastcall __hot_write int
 __bcanputnext(queue_t *q, unsigned char band)
 {
 	int result = 0;
-	queue_t *q_nfsrv = q->q_nfsrv;
-	struct stdata *sd = qstream(q_nfsrv);
+	queue_t *q_nfsrv;
+	struct stdata *sd;
 
-	dassert(sd);
-	prlock(sd);
-	if (likely(test_bit(QPROCS_BIT, &q_nfsrv->q_flag) == 0))
-		result = __bcanput(q_nfsrv, band);
-	prunlock(sd);
+	/* driver might be detached */
+	if (likely((q_nfsrv = q->q_nfsrv) != NULL)) {
+		sd = qstream(q_nfsrv);
+		dassert(sd);
+
+		prlock(sd);
+		if (likely(test_bit(QPROCS_BIT, &q_nfsrv->q_flag) == 0))
+			result = __bcanput(q_nfsrv, band);
+		prunlock(sd);
+	}
 	return (result);
 }
 
@@ -2707,6 +2725,12 @@ qdelete(queue_t *q)
 	sd = rqstream(rq);
 	assert(sd);
 
+#if 1
+	if (wq->q_next != NULL && wq == sd->sd_wq && !SAMESTR(wq))
+		/* Never full-delete a Stream head with a twist. */
+		return;
+#endif
+
 	_ptrace(("final half-delete of stream %p queue pair %p\n", sd, q));
 
 	pwlock(sd, pl);
@@ -2716,7 +2740,7 @@ qdelete(queue_t *q)
 	rq->q_next = NULL;
 	rq->q_nfsrv = NULL;
 	rq->q_nbsrv = NULL;
-#if 0
+#if 1
 	rq->q_putp = NULL;
 	rq->q_srvp = NULL;
 	rq->q_ptr = NULL;
@@ -2724,7 +2748,7 @@ qdelete(queue_t *q)
 	wq->q_next = NULL;
 	wq->q_nfsrv = NULL;
 	wq->q_nbsrv = NULL;
-#if 0
+#if 1
 	wq->q_putp = NULL;
 	wq->q_srvp = NULL;
 	wq->q_ptr = NULL;
@@ -2921,9 +2945,11 @@ qprocsoff(queue_t *q)
 				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
 		}
 
-		if (wq == sd->sd_wq)
-			/* Never half-delete a Stream head. */
+#if 1
+		if (wq->q_next != NULL && wq == sd->sd_wq && !SAMESTR(wq))
+			/* Never half-delete a Stream head with a twist. */
 			goto stream_head;
+#endif
 
 		_ptrace(("initial half-delete of stream %p queue pair %p\n", sd, q));
 
@@ -3002,9 +3028,11 @@ qprocsoff(queue_t *q)
 		if (sd2 && sd2 > sd)
 			phwunlock(sd2);
 
+#if 1
 	      stream_head:
 
 		pwunlock(sd, pl);
+#endif
 
 		/* XXX: put procs must check QPROCS bit after acquiring prlock */
 		/* XXX: srv procs must check QPROCS bit after acquiring prlock */
