@@ -1,3 +1,18 @@
+2007-04-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* netperf_arr: display correct modules verbose
+	* netperf_packet_byte: display correct modules verbose
+	* netperf_sctp_rr: display correct modules verbose
+	* netperf_sctp_stream: display correct modules verbose
+	* netperf_snapshot: display correct modules verbose
+	* netperf_tcp_range: display correct modules verbose
+	* netperf_tcp_rr: display correct modules verbose
+	* netperf_tcp_stream: display correct modules verbose
+	* netperf_udp_range: display correct modules verbose
+	* netperf_udp_rr: display correct modules verbose
+	* netperf_udp_stream: display correct modules verbose
+	* nettest_xti.c: use TPI direct for unitdata requests
+
 2007-04-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* netbenchmark: corrections

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sc.h,v 0.9.2.17 2006/09/29 11:50:24 brian Exp $
+ @(#) $Id: sc.h,v 0.9.2.18 2007/04/12 20:06:07 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:50:24 $ by $Author: brian $
+ Last Modified $Date: 2007/04/12 20:06:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.h,v $
+ Revision 0.9.2.18  2007/04/12 20:06:07  brian
+ - changes from performance testing and misc bug fixes
+
  Revision 0.9.2.17  2006/09/29 11:50:24  brian
  - libtool library tweaks in Makefile.am
  - better rpm spec handling in *.spec.in
@@ -77,7 +80,7 @@
 #ifndef __SYS_STREAMS_SC_H__
 #define __SYS_STREAMS_SC_H__
 
-#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sc.h,v $ $Name:  $($Revision: 0.9.2.18 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_SC_H__
 #warning "Do no include sys/streams/sc.h directly, include sys/sc.h instead."

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2007/03/25 19:01:07 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2007/04/12 20:06:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/25 19:01:07 $ by $Author: brian $
+# Last Modified $Date: 2007/04/12 20:06:01 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.142  2007/04/12 20:06:01  brian
+# - changes from performance testing and misc bug fixes
+#
 # Revision 0.9.2.141  2007/03/25 19:01:07  brian
 # - changes to support 2.6.20-1.2307.fc5 kernel
 #

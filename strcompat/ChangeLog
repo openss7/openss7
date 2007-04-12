@@ -1,3 +1,7 @@
+2007-04-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/local.at: corrected typo
+
 2007-03-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/register_strdev.9.man: documentation updates

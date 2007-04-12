@@ -1,5 +1,9 @@
 2007-04-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/modules/tab.c: consistency changes
+	* src/modules/tab.h: alignment change
+	* src/modules/test.c: manipulated flags between frames
+	* tests/local.at: corrected typo
 	* src/modules/tabold.c: added verification programs
 	* src/modules/tabold.h: added verification programs
 	* src/modules/testboth.c: added verification programs

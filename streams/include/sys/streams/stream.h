@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.96 2007/04/04 01:15:17 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.97 2007/04/12 20:06:07 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/04/04 01:15:17 $ by $Author: brian $
+ Last Modified $Date: 2007/04/12 20:06:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.97  2007/04/12 20:06:07  brian
+ - changes from performance testing and misc bug fixes
+
  Revision 0.9.2.96  2007/04/04 01:15:17  brian
  - performance improvements (speeds up put and srv procedures)
 
@@ -107,7 +110,7 @@
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.96 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.97 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."

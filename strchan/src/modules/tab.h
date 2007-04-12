@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tab.h,v 0.9.2.2 2006/12/18 08:59:36 brian Exp $
+ @(#) $Id: tab.h,v 0.9.2.3 2007/04/12 20:05:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 08:59:36 $ by $Author: brian $
+ Last Modified $Date: 2007/04/12 20:05:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tab.h,v $
+ Revision 0.9.2.3  2007/04/12 20:05:47  brian
+ - changes from performance testing and misc bug fixes
+
  Revision 0.9.2.2  2006/12/18 08:59:36  brian
  - working up strchan package
 
@@ -61,7 +64,7 @@
 #ifndef __LOCAL_TAB_H__
 #define __LOCAL_TAB_H__
 
-#ident "@(#) $RCSfile: tab.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tab.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  * This file contains 4 tables, one for transmit bit-stuffing and bit-reversal: tx_table; one for
