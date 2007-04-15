@@ -96,6 +96,11 @@ UNIX@registeredsymbol{} vendors use another.  Namely @cite{HP-UX}, @cite{OSF/1.2
 @cite{Mac OpenTransport} use OSF numbering, whereas @cite{IRIX}, @cite{Solaris}, @cite{UnixWare} and
 others use SVR4 numbering.  So, for HPPA, Alpha, PowerPC, we should use the OSF numbering.
 
+I know that it is a fallback to the SVR4 way of separating achitectural differences by UNIX vendor
+(if it is HPPA, it must be sold by HP and it must be HP-UX running on it, for example), but even the
+Linux kernel is victim to this (many ioctls and some errno numbering is split this way).  It is
+completely entrenched in GNU autoconf's config.guess.
+
 @table @emph
 @item TODO:
 Split @file{include/sys/streams/stropts.h} by processor architecture.

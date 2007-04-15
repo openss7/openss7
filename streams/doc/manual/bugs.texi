@@ -58,6 +58,19 @@
 @c =========================================================================
 
 @table @code
+@item 012.  2007-04-13T01:47:30+0000
+
+It appears that Ubuntu 6.10 has a rather broken implementation of the LSB install_init that has been
+inherited from Debian (a python script, none the less).  This implementation refuses to properly
+install a disabled service (one with an empty or missing Default-Start: tag), but, rather invokes
+updated-rc.d in such a way that the init script is started at runlevels 2 3 4 5 instead.  This was
+causing problems with the strace and strerr services which are normally installed disabled.
+
+This uncovered the fact that the Debian-style init scripts were not working anyway.  The scripts
+have been fixed and the strace and strerr utilities now default to enabled.
+
+@emph{*fixed*} in @command{streams-0.9.2.3}
+
 @item 011.  2007-04-10T10:56:42+0000
 
 The strbcflag flag was never being cleared, causing infinite looping of the scheduler once the

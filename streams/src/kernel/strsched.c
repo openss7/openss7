@@ -190,6 +190,7 @@ static char const ident[] =
 #include <linux/cpu.h>		/* for cpu_online, cpu_is_offline */
 #include <linux/notifier.h>	/* for CPU notifier callbacks */
 #endif
+#include <linux/sched.h>
 #include <linux/delay.h>
 #include <linux/sysctl.h>
 #include <linux/file.h>
@@ -5127,10 +5128,28 @@ kstreamd(void *__bind_cpu)
 	current->flags |= PF_NOFREEZE;
 #endif
 
+#ifndef SCHED_NORMAL
+#define SCHED_NORMAL SCHED_OTHER
+#endif
 #if !defined CONFIG_STREAMS_RT_KTHREADS
+#if defined HAVE_SCHED_SETSCHEDULER_EXPORT
+	{
+		struct sched_param sp = { 0 };
+
+#ifdef SCHED_BATCH
+		sched_setscheduler(current, SCHED_BATCH, &sp);
+#else
+		sched_setscheduler(current, SCHED_NORMAL, &sp);
+#endif
+	}
+#endif
+#if !defined CONFIG_STREAMS_NN_KTHREADS
 	set_user_nice(current, 19);
+#else
+	set_user_nice(current, 0);
+#endif
 #else				/* !defined CONFIG_STREAMS_RT_KTHREADS */
-#if !defined HAVE___SETSCHEDULER_ADDR && !defined HAVE_SCHED_SETSCHEDULER_EXPORT
+#if !(defined HAVE___SETSCHEDULER_ADDR && defined HAVE_TASK_RQ_LOCK_ADDR) && !defined HAVE_SCHED_SETSCHEDULER_EXPORT
 	current->policy = SCHED_FIFO;
 	current->rt_priority = 99;
 	current->need_resched = 1;
@@ -5295,7 +5314,7 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 #endif
 		kthread_bind(p, cpu);
 #if defined CONFIG_STREAMS_RT_KTHREADS
-#if defined HAVE___SETSCHEDULER_ADDR
+#if defined HAVE___SETSCHEDULER_ADDR && defined HAVE_TASK_RQ_LOCK_ADDR
 		{
 			unsigned long flags;
 			spinlock_t *rq;
@@ -5306,6 +5325,7 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 			static spinlock_t *(*task_rq_lock) (struct task_struct * p,
 							    unsigned long *flags) =
 			    (void *) HAVE_TASK_RQ_LOCK_ADDR;
+
 
 			rq = task_rq_lock(p, &flags);
 			__setscheduler(p, SCHED_FIFO, MAX_RT_PRIO - 1);
@@ -5433,10 +5453,30 @@ kstreamd(void *__bind_cpu)
 	current->flags |= PF_NOFREEZE;
 #endif
 
+#ifndef SCHED_NORMAL
+#define SCHED_NORMAL SCHED_OTHER
+#endif
 #if !defined CONFIG_STREAMS_RT_KTHREADS
+#if defined HAVE_SCHED_SETSCHEDULER_EXPORT
+	{
+		struct sched_param sp = { 0 };
+
+#ifdef SCHED_BATCH
+		sched_setscheduler(current, SCHED_BATCH, &sp);
+#else
+		sched_setscheduler(current, SCHED_NORMAL, &sp);
+#endif
+	}
+#else
+	current->policy = SCHED_NORMAL;
+#endif
+#if !defined CONFIG_STREAMS_NN_KTHREADS
 	set_user_nice(current, 19);
+#else
+	set_user_nice(current, 0);
+#endif
 #else				/* !defined CONFIG_STREAMS_RT_KTHREADS */
-#if !defined HAVE___SETSCHEDULER_ADDR && !defined HAVE_SCHED_SETSCHEDULER_EXPORT
+#if !(defined HAVE___SETSCHEDULER_ADDR && defined HAVE_TASK_RQ_LOCK_ADDR) && !defined HAVE_SCHED_SETSCHEDULER_EXPORT
 	current->policy = SCHED_FIFO;
 	current->rt_priority = 99;
 	current->need_resched = 1;

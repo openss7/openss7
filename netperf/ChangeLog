@@ -1,3 +1,11 @@
+2007-04-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* nettest_bsd.c: do no print transaction unless debug > 3
+	* nettest_dlpi.c: do no print transaction unless debug > 3
+	* nettest_ipv6.c: do no print transaction unless debug > 3
+	* nettest_unix.c: do no print transaction unless debug > 3
+	* nettest_xti.c: do no print transaction unless debug > 3
+
 2007-04-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* netperf_arr: display correct modules verbose

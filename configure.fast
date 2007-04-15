@@ -42,7 +42,6 @@ ${path}configure \
 	--enable-streams-stats \
 	--disable-streams-syncqs \
 	--enable-streams-kthreads \
-	--disable-streams-rt-kthreads \
 	--enable-autotest \
 	--with-optimize=speed \
 	--with-k-optimize=speed \

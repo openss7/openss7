@@ -2716,17 +2716,18 @@ strwaitclose(struct stdata *sd, int oflag)
 
 	closetime = sd->sd_closetime;
 	/* POSIX close() semantics for STREAMS */
-	wait = (!(oflag & FNDELAY) && (closetime != 0)
-		&& !(sd->sd_flag & (STRDERR | STWRERR | STRHUP)) && !signal_pending(current));
+	wait = (!(oflag & FNDELAY) && (closetime != 0));
 
 	/* STREAM head first */
-	if (wait && q->q_first)
+	if (wait && q->q_first && !(sd->sd_flag & (STRDERR | STWRERR | STRHUP))
+	    && !signal_pending(current))
 		strwaitqueue(sd, q, closetime);
 	if (q->q_first)
 		flushq(q, FLUSHALL);
 
 	while ((q = SAMESTR(sd->sd_wq) ? sd->sd_wq->q_next : NULL)) {
-		if (wait && q->q_first)
+		if (wait && q->q_first && !(sd->sd_flag & (STRDERR | STWRERR | STRHUP))
+		    && !signal_pending(current))
 			strwaitqueue(sd, q, closetime);
 		qdetach(_RD(q), oflag, crp);
 		if (q->q_first)
@@ -4035,7 +4036,9 @@ strhangup(struct stdata *sd)
 	/* If we are a pipe and are fattached, and the other end of the pipe is closing or has
 	   closed (which is why the M_HANGUP was sent), then the STREAM head is supposed to be
 	   unmounted, and if it is not opened, closed. */
+	swlock(sd);
 	if (!test_and_set_bit(STRHUP_BIT, &sd->sd_flag)) {
+		swunlock(sd);
 		strwakeall(sd);	/* only interruptible */
 		strevent(sd, S_HANGUP, 0);
 		/* If we are a control terminal, we are supposed to send SIGHUP to the session
@@ -4049,7 +4052,8 @@ strhangup(struct stdata *sd)
 			if (test_bit(STRMOUNT_BIT, &sd->sd_flag)) {
 				/* TODO: fdetach the inode and possibly close the stream */
 			}
-	}
+	} else
+		swunlock(sd);
 }
 
 /**
@@ -4115,14 +4119,24 @@ strlastclose(struct stdata *sd, int oflag)
 
 	_trace();
 	if ((sd_other = sd->sd_other)) {
+		mblk_t *b;
+
 		_trace();
-		/* Perhaps strlastclose() should first send a M_HANGUP message downstream in the
-		   same fashion as needs to be done for pipes and master pseudo-terminals, however
-		   rather than generating the message we perform the actions on the other stream
-		   head directly. */
-		swlock(sd_other);
+		/* First send an M_HANGUP message downstream in the same fashion as needs to be
+		   done for pipes and master pseudo-terminals.  One reason for sending this is that 
+		   the other end of the pipe might be linked under a multiplexing driver, in which
+		   case the lower multiplex queue procedures must be informed that the driver has
+		   hung up, also so that modules pushed on the other pipe end are informed.  Note
+		   that the open/close bit is held while sleeping. */
+		while (!(b = allocb(0, BPRI_WAITOK))) ;
+		b->b_datap->db_type = M_HANGUP;
+		strput(sd, b);
+		/* Do not rely on intermediate modules to pass the previous M_HANGUP.  Ensure that
+		   the other end of the pipe has truly hung up. Also, when the other end of the
+		   pipe is linked under a multiplexing driver, the Stream head will not have
+		   received the M_HANGUP message above (it is processed by the lower multiplex
+		   instead). */
 		strhangup(sd_other);
-		swunlock(sd_other);
 	}
 
 	/* 1st step: unlink any (temporary) linked streams */
@@ -11080,7 +11094,8 @@ str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
 		freemsg(mp);
 	} else {
 		putq(q, mp);
-		strwakeread(sd);
+		if (likely(mp == q->q_first))
+			strwakeread(sd);
 		strevent(sd, S_HIPRI, 0);
 	}
 	return (0);
@@ -11098,8 +11113,8 @@ str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 #else
 	putq(q, mp);
 #endif
-
-	strwakeread(sd);
+	if (unlikely(mp == q->q_first))
+		strwakeread(sd);
 	strevent(sd, (S_INPUT | (mp->b_band ? S_RDBAND : S_RDNORM)), mp->b_band);
 	return (0);
 }

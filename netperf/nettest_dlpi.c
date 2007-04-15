@@ -3307,7 +3307,7 @@ else {
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_dlpi_cl_rr: Transaction %d complete.\n",
 	      trans_received);
@@ -3681,7 +3681,7 @@ else {
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_dlpi_co_rr: Transaction %d complete\n",
 	      trans_received);

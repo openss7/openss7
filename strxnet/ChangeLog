@@ -1,3 +1,8 @@
+2007-04-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: add options to ignore TPI servtype and TPI state
+	* src/lib/xnet.c:  add options to ignore TPI servtype and TPI state
+
 2007-04-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: corrected typo

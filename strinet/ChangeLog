@@ -1,3 +1,7 @@
+2007-04-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/udp.c:  final performance tweaks
+
 2007-04-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: correct typo

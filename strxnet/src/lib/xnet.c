@@ -1177,17 +1177,25 @@ __xnet_t_tstuser(int fd, const int expect, const int servtype, const int states)
 		goto tproto;
 	if (unlikely(user->event && user->event != expect && expect != -1))
 		goto tlook;
+#ifndef CONFIG_XTI_IS_TYPELESS
 	if (unlikely(!((1 << user->info.servtype) & servtype)))
 		goto tnotsupport;
+#endif
+#ifndef CONFIG_XTI_IS_STATELESS
 	if (unlikely(!(user->statef & states)))
 		goto toutstate;
+#endif
 	return (user);
+#ifndef CONFIG_XTI_IS_STATELESS
       toutstate:
 	t_errno = TOUTSTATE;
 	goto error;
+#endif
+#ifndef CONFIG_XTI_IS_TYPELESS
       tnotsupport:
 	t_errno = TNOTSUPPORT;
 	goto error;
+#endif
       tlook:
 	t_errno = TLOOK;
 	goto error;
@@ -1662,8 +1670,10 @@ __xnet_t_alloc(int fd, int type, int fields)
 	{
 		struct t_call *call;
 
+#ifndef CONFIG_XTI_IS_TYPELESS
 		if (user->info.servtype == T_CLTS)
 			goto tnostructype;
+#endif
 		if (!(call = (struct t_call *) malloc(sizeof(*call))))
 			goto badalloc;
 		memset(call, 0, sizeof(*call));
@@ -1751,8 +1761,10 @@ __xnet_t_alloc(int fd, int type, int fields)
 	{
 		struct t_discon *discon;
 
+#ifndef CONFIG_XTI_IS_TYPELESS
 		if (user->info.servtype == T_CLTS)
 			goto tnostructype;
+#endif
 		if (!(discon = (struct t_discon *) malloc(sizeof(*discon))))
 			goto badalloc;
 		memset(discon, 0, sizeof(*discon));
@@ -1784,8 +1796,10 @@ __xnet_t_alloc(int fd, int type, int fields)
 	{
 		struct t_unitdata *udata;
 
+#ifndef CONFIG_XTI_IS_TYPELESS
 		if (user->info.servtype != T_CLTS)
 			goto tnostructype;
+#endif
 		if (!(udata = (struct t_unitdata *) malloc(sizeof(*udata))))
 			goto badalloc;
 		memset(udata, 0, sizeof(*udata));
@@ -1873,8 +1887,10 @@ __xnet_t_alloc(int fd, int type, int fields)
 	{
 		struct t_uderr *uderr;
 
+#ifndef CONFIG_XTI_IS_TYPELESS
 		if (user->info.servtype != T_CLTS)
 			goto tnostructype;
+#endif
 		if (!(uderr = (struct t_uderr *) malloc(sizeof(*uderr))))
 			goto badalloc;
 		memset(uderr, 0, sizeof(*uderr));
@@ -2711,6 +2727,7 @@ __xnet_t_look(int fd)
 		user->data.maxlen = user->datmax;
 		user->data.len = 0;
 		user->data.buf = user->datbuf;
+#ifndef CONFIG_XTI_IS_TYPELESS
 		switch (user->info.servtype) {
 		case T_CLTS:
 			if (user->state == T_IDLE)
@@ -2726,6 +2743,11 @@ __xnet_t_look(int fd)
 		default:
 			goto tsync;
 		}
+#else
+		if ((user->state == T_IDLE && user->qlen == 0) ||
+		    (user->state == T_OUTREL) || (user->state == T_DATAXFER))
+			user->data.maxlen = 0;
+#endif
 		if ((ret = __xnet_t_getmsg(fd, &user->ctrl, &user->data, &flag)) < 0)
 			goto error;
 		if ((ret & MORECTL) || ((ret & MOREDATA) && user->data.maxlen > 0))	/* bad */
@@ -2742,6 +2764,7 @@ __xnet_t_look(int fd)
 			   cannot have any events - should have never gotten here */
 			goto tsync;
 		case T_IDLE:
+#ifndef CONFIG_XTI_IS_TYPELESS
 			switch (user->info.servtype) {
 			case T_COTS:
 			case T_COTS_ORD:
@@ -2775,6 +2798,29 @@ __xnet_t_look(int fd)
 			default:
 				goto tsync;
 			}
+#else
+			if (user->qlen > 0)
+				goto tincon;
+			if (user->ctrl.len == 0) {
+				if ((user->gflags = (ret & MOREDATA))) {
+					user->event = T_DATA;
+					return (T_DATA);
+				}
+				return (0);
+			}
+			switch ((user->prim = p->type)) {
+			case T_UNITDATA_IND:
+				user->event = T_DATA;
+				break;
+			case T_UDERROR_IND:
+				user->event = T_UDERR;
+				break;
+			default:
+				goto cleanup;
+			}
+			user->gflags = (ret & MOREDATA);
+			return (user->event);
+#endif
 		case T_OUTCON:
 			/* 
 			   T_CONN_CON or T_DISCON_IND */
@@ -6043,7 +6089,9 @@ __xnet_t_unbind(int fd)
 
 	if (!(user = __xnet_t_tstuser(fd, 0, -1, TSF_IDLE)))
 		goto error;
+#ifndef CONFIG_XTI_IS_TYPELESS
 	if (user->info.servtype == T_CLTS || user->qlen > 0)
+#endif
 		if (__xnet_t_peek(fd) > 0)
 			goto tlook;
 	{

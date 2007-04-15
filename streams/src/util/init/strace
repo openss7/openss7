@@ -99,6 +99,7 @@ case "$init_mode" in
 	    done
 	    ( $* >/dev/null 2>&1 </dev/null & )
 	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && echo -en "\t...SUCCESS\r" || echo -en "\t....FAILED\r"
 	    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$1
 	    return $RETVAL
 	}
@@ -126,14 +127,23 @@ case "$init_mode" in
 	if [ -x /sbin/killproc ] ; then
 	    killproc() {
 		/sbin/killproc $@
+		RETVAL=$?
+		[ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS\r" || echo -e "\t....FAILED\r"
+		return $RETVAL
 	    }
 	elif [ -x /usr/bin/killall ] ; then
 	    killproc() {
 		/usr/bin/killall $@
+		RETVAL=$?
+		[ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS\r" || echo -e "\t....FAILED\r"
+		return $RETVAL
 	    }
 	else
 	    killproc() {
 		[ -r $pidfile ] && kill "$2" `cat $pidfile`
+		RETVAL=$?
+		[ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS\r" || echo -e "\t....FAILED\r"
+		return $RETVAL
 	    }
 	fi
 	;;
@@ -192,21 +202,25 @@ start() {
 	action $"Creating $STRACE_DIRECTORY: " \
 	    mkdir -p "$STRACE_DIRECTORY"
     build_options
-    action $"Starting $processname daemon: " \
-	start_daemon $execfile $STRACE_OPTIONS
+    echo -en "Starting $processname: "
+    start_daemon $processname $STRACE_OPTIONS
     RETVAL=$?
+    echo ""
     [ $RETVAL -eq 0 ] && touch $lockfile
     RETVAL=$?
     return $RETVAL
 }
 
 stop() {
-    action $"Stopping $processname daemon: " \
+    if pidofproc $processname >/dev/null 2>&1 ; then
+	echo -en "Stopping $processname: "
 	killproc $processname
-    RETVAL=$?
-    [ $RETVAL -eq 0 ] && rm -f -- $lockfile
-    RETVAL=$?
-    return $RETVAL
+	RETVAL=$?
+	echo ""
+	[ $RETVAL -eq 0 ] && rm -f -- $lockfile
+	return $RETVAL
+    fi
+    return 0
 }
 
 restart() {
@@ -216,8 +230,9 @@ restart() {
 }
 
 reload() {
-    action $"Reloading the STREAMS trace logger: " \
-	killproc $processname -HUP
+    echo -en "Reloading $processname: "
+    killproc $processname -HUP
+    echo ""
     return $?
 }
 

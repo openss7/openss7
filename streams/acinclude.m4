@@ -391,42 +391,46 @@ AC_DEFUN([_LFS_SETUP_SYNCQS], [dnl
 # =============================================================================
 # _LFS_SETUP_KTHREADS
 # -----------------------------------------------------------------------------
+# Some serious tweaking going on here.  --without-streams-kthread or
+# --with-streams-kthreads=no will result in softirq STREAMS scheduler.
+# --with-streams-kthreads=rt will run kernel threads high-priority real-time.
+# --with-streams-kthreads=normal will run kernel threads with normal
+# scheduling.  --with-streams-kthreads=nice will run kernel threads nice 19,
+# which is also the default.  Everything but the default is primarily for
+# development performance testing.
+# -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP_KTHREADS], [dnl
-    AC_ARG_ENABLE([streams-kthreads],
-	AS_HELP_STRING([--disable-streams-kthreads],
-	    [disable STREAMS kernel threads.
-	    @<:@default=enabled@:>@]),
-	    [enable_streams_kthreads="$enableval"],
-	    [enable_streams_kthreads='yes'])
+    AC_ARG_WITH([streams-kthreads],
+	AS_HELP_STRING([--with-streams-kthreads],
+	    [set STREAMS kernel thread operation to 'nice', 'normal', 'rt' or
+	     'no'. @<:@default=nice@:>@]),
+	    [with_streams_kthreads="$withval"],
+	    [with_streams_kthreads='nice'])
     AC_CACHE_CHECK([for STREAMS kernel threads], [lfs_streams_kthreads], [dnl
-	lfs_streams_kthreads="${enable_streams_kthreads:-yes}"])
-    case ${lfs_streams_kthreads:-yes} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_KTHREADS], [1], [When defined]
-	    AC_PACKAGE_TITLE [will include use kernel threads for the STREAMS
-	    scheduler; when undefined,] AC_PACKAGE_TITLE [will use softirqs
-	    for the STREAMS scheduler.])
-	    ;;
+	lfs_streams_kthreads="${with_streams_kthreads:-nice}"
+	case ${lfs_streams_kthreads:-nice} in
+	    (no|rt|normal) ;;
+	    (*) lfs_streams_kthreads=nice ;;
+	esac])
+    AH_TEMPLATE([CONFIG_STREAMS_KTHREADS], [When defined] AC_PACKAGE_TITLE
+	[will include use kernel threads for the STREAMS scheduler; when
+	undefined,] AC_PACKAGE_TITLE [will use softirqs for the STREAMS
+	scheduler.])
+    AH_TEMPLATE([CONFIG_STREAMS_RT_KTHREADS], [When defined] AC_PACKAGE_TITLE
+	[will run kernel threads under real-time priority (SCHED_FIFO); when
+	undefined,] AC_PACKAGE_TITLE [will run kernel threads (SCHED_NORMAL).])
+    AH_TEMPLATE([CONFIG_STREAMS_NN_KTHREADS], [When defined] AC_PACKAGE_TITLE
+	[will run kernel threads under normal scheduling priority when
+	CONFIG_STREAMS_RT_KTHREADS is not defined instead of at nice level 19.])
+    case ${lfs_streams_kthreads:-nice} in
+	(no) ;;
+	(rt)	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_KTHREADS], [1])
+		    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_RT_KTHREADS], [1]) ;;
+	(normal)    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_KTHREADS], [1])
+		    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NN_KTHREADS], [1]) ;;
+	(nice)	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_KTHREADS], [1]) ;;
     esac
-    AM_CONDITIONAL([CONFIG_STREAMS_KTHREADS], [test :${lfs_streams_kthreads:-yes} = :yes])
-    AC_ARG_ENABLE([streams-rt-kthreads],
-	AS_HELP_STRING([--enable-streams-rt-kthreads],
-	    [disable real-time STREAMS kernel threads.
-	     @<:@default=disabled@:>@]),
-	    [enable_streams_rt_kthreads="$enableval"],
-	    [enable_streams_rt_kthreads='no'])
-    AC_CACHE_CHECK([for STREAMS real-time kernel threads], [lfs_streams_rt_kthreads], [dnl
-	lfs_streams_rt_kthreads="${enable_streams_rt_kthreads:-no}"])
-    case ${lfs_streams_rt_kthreads:-no} in
-	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_RT_KTHREADS], [1], [When
-	    defined] AC_PACKAGE_TITLE [will run kernel threads under
-	    real-time priority (SCHED_FIFO); when undefined,] AC_PACKAGE_TITLE
-	    [will run kernel threads nice 19 (SCHED_NORMAL) at the same
-	    priority as kernel soft irq threads.])
-	    ;;
-    esac
-    AM_CONDITIONAL([CONFIG_STREAMS_RT_KTHREADS], [test :${lfs_streams_rt_kthreads:-no} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_KTHREADS], [test :${lfs_streams_kthreads:-nice} != :no])
 ])# _LFS_SETUP_KTHREADS
 # =============================================================================
 

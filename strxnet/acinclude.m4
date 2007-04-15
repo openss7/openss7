@@ -161,6 +161,38 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
 # _XNET_OPTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNET_OPTIONS], [dnl
+    AC_ARG_ENABLE([xti-servtype],
+	AS_HELP_STRING([--disable-xti-servtype],
+	    [disable xnet library checks for service type.
+	     @<:@default=enabled@:>@]),
+	[enable_xti_servtype="$enableval"],
+	[enable_xti_servtype='yes'])
+    AC_CACHE_CHECK([for XTI service type checks], [xti_servtype], [dnl
+	xti_servtype="${enable_xti_servtype:-yes}"])
+    if test ${xti_servtype:-yes} != yes ; then
+	AC_DEFINE_UNQUOTED([CONFIG_XTI_IS_TYPELESS], [1], [Define when the XTI
+	    library is not to check service types.  This is necessary when
+	    T_COTS semantics are expected to be applied to T_CLTS providers.
+	    When defined, the XTI library lets the underlying TPI driver
+	    determine whether T_COTS/T_COTS_ORD primitives are supported or
+	    not.])
+    fi
+    AC_ARG_ENABLE([xti-states],
+	AS_HELP_STRING([--disable-xti-states],
+	    [disable xnet library checks for state.
+	     @<:@default=enabled@:>@]),
+	[enable_xti_states="$enableval"],
+	[enable_xti_states='yes'])
+    AC_CACHE_CHECK([for XTI state checks], [xti_states], [dnl
+	xti_states="${enable_xti_states:-yes}"])
+    if test ${xti_states:-yes} != yes ; then
+	AC_DEFINE_UNQUOTED([CONFIG_XTI_IS_STATELESS], [1], [Define when the
+	    XTI library is not to check states.  This is necessary when T_COTS
+	    semantics are expected to be applied to T_CLTS providers and
+	    t_connect() is to be called on an unbound T_CLTS Stream.  When
+	    defined, the XTI library lets the underlying TPI driver determine
+	    whether the primitive is issued out of state or not.])
+    fi
 ])# _XNET_OPTIONS
 # =============================================================================
 

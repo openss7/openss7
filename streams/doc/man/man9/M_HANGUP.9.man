@@ -112,8 +112,8 @@ message block.
 .PP
 The
 .B M_HANGUP
-message is generated and sent upstream by a driver or module to report that it can no longer send
-data upstream.  As an example, this might be due to an error, or to a remote line connection being
+message is generated and sent upstream by a driver or module to report that it can no longer accept
+data downstream.  As an example, this might be due to an error, or to a remote line connection being
 dropped.
 .PP
 When the message reaches the

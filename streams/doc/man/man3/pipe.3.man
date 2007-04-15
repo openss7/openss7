@@ -219,8 +219,10 @@ to implement them (see
 Although the interface is identical, the two are quite different
 otherwise.
 .I STREAMS
-provide significant additional capability, but possibly at a lower
-level of performance.
+provide significant additional capability,
+with no loss of performance under
+.BR "@PACKAGE_TITLE@" .
+.\"but possibly at a lower level of performance.
 Notably,
 .I STREAMS
 pipes are full duplex (i.e., both ends support both read and write
@@ -245,37 +247,37 @@ Applications wishing to use the
 version of the
 .I pipe
 function must link with the
-.B LiS
+.B libstreams
 .[
-LiS
+LfS
 .]
-library which provides it; otherwise,
+library that provides it; otherwise,
 the Linux kernel version will be used via the Linux/GNU C library.
 .\"
 .\"
-.SH "FUTURE DIRECTIONS"
-.PP
-Under Linux,
-.BR pipe ()
-is implemented as an
-.I ioctl
-operation on an anonymous
-.I STREAMS
-file.
-An alternative system call implementation may be used in the future,
-and is fact already supported within
-.B LiS\c
-.
-.[
-LiS
-.]
-.sp
-It should be noted that no attention has yet been given to the issue
-of atomic reads and writes in
-.I STREAMS
-pipes and fifos, common to most
-implementations of these mechanisms.  This issue will be addressed
-hopefully in the near future.
+.\".SH "FUTURE DIRECTIONS"
+.\".PP
+.\"Under Linux,
+.\".BR pipe ()
+.\"is implemented as an
+.\".I ioctl
+.\"operation on an anonymous
+.\".I STREAMS
+.\"file.
+.\"An alternative system call implementation may be used in the future,
+.\"and is fact already supported within
+.\".B LiS\c
+.\".
+.\".[
+.\"LiS
+.\".]
+.\".sp
+.\"It should be noted that no attention has yet been given to the issue
+.\"of atomic reads and writes in
+.\".I STREAMS
+.\"pipes and fifos, common to most
+.\"implementations of these mechanisms.  This issue will be addressed
+.\"hopefully in the near future.
 .\"
 .\"
 .SH "SEE ALSO"

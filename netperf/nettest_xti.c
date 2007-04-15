@@ -2351,7 +2351,7 @@ Send   Recv    Send   Recv\n\
 	}
 	if (sigsuspend(&signal_set) == EFAULT) {
 	  fprintf(where,
-		  "send_xti_udp_rr: fault with signal set!\n");
+		  "send_xti_sctp_rr: fault with signal set!\n");
 	  fflush(where);
 	  exit(1);
 	}
@@ -4346,7 +4346,7 @@ Send   Recv    Send   Recv\n\
 	}
 	if (sigsuspend(&signal_set) == EFAULT) {
 	  fprintf(where,
-		  "send_xti_udp_rr: fault with signal set!\n");
+		  "send_xti_tcp_rr: fault with signal set!\n");
 	  fflush(where);
 	  exit(1);
 	}
@@ -8118,7 +8118,7 @@ recv_xti_sctp_conn_rr()
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_xti_sctp_conn_rr: Transaction %d complete\n",
 	      trans_received);
@@ -9500,7 +9500,7 @@ recv_xti_tcp_conn_rr()
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_xti_tcp_conn_rr: Transaction %d complete\n",
 	      trans_received);
