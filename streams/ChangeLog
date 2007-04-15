@@ -1,3 +1,34 @@
+2007-04-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: add more control over kthread priority
+	* doc/man/man3/pipe.3.man: corrections
+	* doc/man/man9/M_HANGUP.9.man: corrections
+	* doc/manual/bugs.texi: added Ubuntu install_initd script bug
+	* doc/manual/todo.texi: more notes
+	* src/kernel/strsched.c: advanced kthread priority supporth
+	* src/kernel/strutil.c: always allocate sk_buff when requested, changed
+	  (bcanputnext): changed behaviour to not release flow control until
+	  q_count drops below low water mark.
+	* src/modules/sth.c: strlastclose corrrections and do not wake read
+	  waiters on each an every message
+	* src/util/init/strace: corrections for poor action implementation on some RH systems
+	* src/util/init/strerr: corrections for poor action implementation on some RH systems
+	* tests/testsuite-clone.at: be smarter about leak checks
+	* tests/testsuite-connld.at: be smarter about leak checks
+	* tests/testsuite-echo.at: be smarter about leak checks
+	* tests/testsuite-fifo.at: be smarter about leak checks
+	* tests/testsuite-log.at: be smarter about leak checks, unload strerr
+	  and strace if possible or necessary
+	* tests/testsuite-loop.at: be smarter about leak checks
+	* tests/testsuite-mux.at: be smarter about leak checks
+	* tests/testsuite-nsdev.at: be smarter about leak checks
+	* tests/testsuite-nuls.at: be smarter about leak checks
+	* tests/testsuite-pipe.at: be smarter about leak checks
+	* tests/testsuite-pipemod.at: be smarter about leak checks
+	* tests/testsuite-sad.at: be smarter about leak checks
+	* tests/testsuite-sc.at: be smarter about leak checks
+	* tests/testsuite-streams.at: be smarter about leak checks
+
 2007-04-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: add option for real-time kernel threads

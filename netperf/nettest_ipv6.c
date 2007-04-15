@@ -3944,7 +3944,7 @@ recv_udpipv6_rr()
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_udpipv6_rr: Transaction %d complete.\n",
 	      trans_received);
@@ -5355,7 +5355,7 @@ recv_tcpipv6_conn_rr()
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_tcpipv6_conn_rr: Transaction %d complete\n",
 	      trans_received);
@@ -6437,7 +6437,7 @@ recv_tcpipv6_tran_rr()
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_tcpipv6_tran_rr: Transaction %d complete\n",
 	      trans_received);

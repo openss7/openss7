@@ -9883,7 +9883,7 @@ recv_udp_rr()
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_udp_rr: Transaction %d complete.\n",
 	      trans_received);
@@ -12340,7 +12340,7 @@ recv_sctp_conn_rr()
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_sctp_conn_rr: Transaction %d complete\n",
 	      trans_received);
@@ -12715,7 +12715,7 @@ recv_tcp_conn_rr()
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_tcp_conn_rr: Transaction %d complete\n",
 	      trans_received);
@@ -13805,7 +13805,7 @@ recv_sctp_tran_rr(void)
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_sctp_tran_rr: Transaction %d complete\n",
 	      trans_received);
@@ -14881,7 +14881,7 @@ recv_tcp_tran_rr(void)
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_tcp_tran_rr: Transaction %d complete\n",
 	      trans_received);
@@ -17993,7 +17993,7 @@ recv_sctp_cc()
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_sctp_cc: Transaction %d complete\n",
 	      trans_received);
@@ -18974,7 +18974,7 @@ recv_tcp_cc()
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_tcp_cc: Transaction %d complete\n",
 	      trans_received);

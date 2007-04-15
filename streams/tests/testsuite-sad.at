@@ -123,6 +123,7 @@ dnl ==========================================================================
 m4_divert_push([DEFAULTS])
 at_SMP=
 at_MP=
+at_LEAKS=
 test_sad() {
     case "$2" in
     (LIS)
@@ -212,6 +213,15 @@ ACEOF
 	fi
 	;;
     esac
+    if test :${at_LEAKS:-notset} = :notset
+    then
+	if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1
+	then
+	    at_LEAKS=no
+	else
+	    at_LEAKS=yes
+	fi
+    fi
     if test $at_verbose = echo ; then options='--verbose=5' ; else options='--again' ; fi
     if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
     if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
@@ -219,7 +229,7 @@ ACEOF
     if test $at_arg_given_sync = : ; then sync || : ; fi
     if test-sad $options -o $1
     then
-	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS
+	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS -a :${at_LEAKS:-yes} != :no
 	then
 	    # check for leaks
 	    if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1

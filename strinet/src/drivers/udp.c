@@ -2416,7 +2416,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVBUF;
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = sysctl_rmem_default;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.xti.rcvbuf;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -2436,7 +2436,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDBUF;
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = sysctl_wmem_default;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.xti.sndbuf;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -2446,7 +2446,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDLOWAT;
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = sysctl_wmem_default >> 1;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.xti.sndlowat >> 1;
 				if (ih->name != T_ALLOPT)
 					continue;
 			}
@@ -3358,7 +3358,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 				oh->status = T_SUCCESS;
 				bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 				if (ih->name == T_ALLOPT) {
-					*valp = sysctl_rmem_default;
+					*valp = t_defaults.xti.rcvbuf;
 				} else {
 					*valp = *((typeof(valp)) T_OPT_DATA(ih));
 					if (*valp > sysctl_rmem_max) {
@@ -3416,7 +3416,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 				oh->status = T_SUCCESS;
 				bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 				if (ih->name == T_ALLOPT) {
-					*valp = sysctl_wmem_default;
+					*valp = t_defaults.xti.sndbuf;
 				} else {
 					*valp = *((typeof(valp)) T_OPT_DATA(ih));
 					if (*valp > sysctl_wmem_max) {
@@ -4125,6 +4125,8 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 	tp->bhash = hp;
 	/* copy into private structure */
 	tp->CONIND_number = CONIND_number;
+	/* Note that if the number of connection indications is greater than zero, and this stream
+	 * was T_CLTS, upgrade to T_COTS and change CONIND_number to zero. */
 	tp->pnum = 1;
 
 	tp->protoids[0] = proto;
@@ -4583,11 +4585,9 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 
 	if (unlikely(tp->sndblk != 0))
 		goto ebusy;
-#if 0
 	/* Allows slop over by 1 buffer per processor. */
 	if (unlikely(tp->sndmem > tp->options.xti.sndbuf))
 		goto blocked;
-#endif
 
 	assert(opt != NULL);
 	if (likely((err = tp_route_output(tp, opt, &rt)) == 0)) {
@@ -4669,11 +4669,9 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 	}
 	_rare();
 	return (err);
-#if 0
       blocked:
 	udp_wstat.ms_ocnt++;
 	tp->sndblk = 1;
-#endif
       ebusy:
 	return (-EBUSY);
 }
@@ -7029,6 +7027,11 @@ te_unitdata_req_slow(queue_t *q, mblk_t *mp)
  *
  * Optimize fast path for no options and correct behaviour.  This should run much faster than the
  * old plodding way of doing things.
+ *
+ * Note that if we are in pseduo-connection-oriented modes we can still support T_UNITDATA_REQ.
+ * This works nicely with sendmsg(2) implementation on connected datagram sockets.  So we should
+ * still allow states that allow T_OPTDATA_REQ and we should support the primitive regardless of
+ * service type.
  */
 STATIC INLINE fastcall __hot_put int
 te_unitdata_req(queue_t *q, mblk_t *mp)
@@ -7114,6 +7117,19 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
  * in the array will be the primary address, unless another primary is specified in the options
  * parameters.  The primary address is used for subsequent TE_DATA_REQ and TE_EXDATA_REQ events
  * until changed with a TE_OPTMGMT_REQ event.
+ *
+ * To support pseudo-connection-oriented use of a basically connectionless protocol, udp should
+ * allow a T_CONN_REQ when the provider is in the TS_UNBND state.  Then the bound address will be
+ * as though a wildcard bind was peformed immediately before the connection.  This keeps the
+ * Stream from receiving packets in the TS_IDLE state while waiting to "connect".  The XTI library,
+ * however, needs to be informed to allow t_connect() in the TS_UNBND state.  This also nicely maps
+ * connect(2) socket call to t_connect(2) and T_CONN_REQ.
+ *
+ * Another approach to this is to permit a non-zero CONIND_number to switch the Stream to T_COTS
+ * (regardless of whether CONIND_number of zero is returned).  The problem with the later approach
+ * is that TPI spec says that CONIND_number is ignored for T_CLTS, but udp does that as well.  The
+ * XTI library, however, needs to recheck service type after t_bind() if it cares about service
+ * type.
  */
 noinline fastcall __hot_put int
 te_conn_req(queue_t *q, mblk_t *mp)
@@ -7138,6 +7154,8 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	err = TOUTSTATE;
 	if (unlikely(tp->info.SERV_type != T_COTS && tp->info.SERV_type != T_COTS_ORD))
 		goto error;
+	/* Note TPI clearly allows connection requests on listening Streams. */
+#if 0
 	/* Connection requests are not allowed on a listening Stream.  Note that there is a
 	   conflict in the NPI specifications here: under the description for N_BIND_REQ, NPI 2.0.0 
 	   says: "If a Stream is bound as a listener Stream, it will not be able to initiate
@@ -7149,6 +7167,7 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	err = TACCES;
 	if (unlikely(tp->CONIND_number > 0))
 		goto error;
+#endif
 	err = TOUTSTATE;
 	if (unlikely(tp_get_state(tp) != TS_IDLE))
 		goto error;
@@ -9168,10 +9187,10 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 		bufq_init(&tp->conq);
 		/* option defaults */
 		tp->options.xti.linger = xti_default_linger;
-		tp->options.xti.rcvbuf = sysctl_rmem_default;
+		tp->options.xti.rcvbuf = xti_default_rcvbuf;
 		tp->options.xti.rcvlowat = xti_default_rcvlowat;
 		tp->options.xti.sndbuf = xti_default_sndbuf;
-		tp->options.xti.sndlowat = 0; // xti_default_sndlowat;
+		tp->options.xti.sndlowat = xti_default_sndlowat;
 		tp->options.xti.priority = xti_default_priority;
 		tp->options.ip.protocol = ip_default_protocol;
 		tp->options.ip.tos = ip_default_tos;

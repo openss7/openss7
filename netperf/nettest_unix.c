@@ -2997,7 +2997,7 @@ recv_dg_rr()
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_dg_rr: Transaction %d complete.\n",
 	      trans_received);
@@ -3330,7 +3330,7 @@ recv_stream_rr()
       trans_remaining--;
     }
     
-    if (debug) {
+    if (debug > 3) {
       fprintf(where,
 	      "recv_stream_rr: Transaction %d complete\n",
 	      trans_received);
