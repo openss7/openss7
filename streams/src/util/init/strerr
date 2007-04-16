@@ -51,17 +51,28 @@ fi
 
 case "$init_mode" in
     (chkconfig)
-	start_daemon() {
-	    local force= nicelevel=
+	daemon_start() {
+	    local force= nicelevel= base=
 	    while [ "$1" != "${1##[-+]}" ] ; do
 		case $1 in
 		    (-f) force="--force" ; shift 1 ;;
 		    (-n) nicelevel="$2"  ; shift 2 ;;
 		esac
 	    done
+	    base=`echo $1 | sed -e 's,.*/,,'`
+	    echo -en "Starting daemon $base: "
 	    daemon $force $nicelevel $*
 	    RETVAL=$?
-	    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$1
+	    echo ""
+	    return $RETVAL
+	}
+	daemon_stop() {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    echo -en "Stopping daemon $base: "
+	    killproc $base $*
+	    RETVAL=$?
+	    echo ""
 	    return $RETVAL
 	}
 	;;
@@ -75,30 +86,56 @@ case "$init_mode" in
 	    rc_status -v
 	    return $RETVAL
 	}
-	;;
-    (lsb)
-	action() {
-	    echo -en "$1"
-	    shift 1
-	    ${1+"$@"} >/dev/null
-	    RETVAL=$?
-	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
-	    return $?
-	}
-	;;
-    (standalone|*)
-	start_daemon() {
-	    local force= nicecmd=
+	daemon_start() {
+	    local force= nicelevel= base=
 	    while [ "$1" != "${1##[-+]}" ] ; do
 		case $1 in
-		    (-f) force="--force"       ; shift 1 ;;
-		    (-n) nicecmd="nice -n $2"  ; shift 2 ;;
+		    (-f) force="-f" ; shift 1 ;;
+		    (-n) nicelevel="-n $2"  ; shift 2 ;;
 		esac
 	    done
-	    ( $* >/dev/null 2>&1 </dev/null & )
+	    base=`echo $1 | sed -e 's,.*/,,'`
+	    echo -en "Starting daemon $base: "
+	    startproc $force $nicelevel $*
 	    RETVAL=$?
-	    [ $RETVAL -eq 0 ] && echo -en "\t...SUCCESS\r" || echo -en "\t....FAILED\r"
-	    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$1
+	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
+	    rc_status -v
+	    return $RETVAL
+	}
+	daemon_stop() {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    echo -en "Stopping daemon $base: "
+	    killproc $base $*
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
+	    rc_status -v
+	    return $RETVAL
+	}
+	;;
+    (lsb)
+	daemon_start() {
+	    local force= nicelevel= base=
+	    while [ "$1" != "${1##[-+]}" ] ; do
+		case $1 in
+		    (-f) force="-f" ; shift 1 ;;
+		    (-n) nicelevel="-n $2"  ; shift 2 ;;
+		esac
+	    done
+	    base=`echo $1 | sed -e 's,.*/,,'`
+	    echo -en "Starting daemon $base: "
+	    start_daemon $force $nicelevel $*
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
+	    return $RETVAL
+	}
+	daemon_stop() {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    echo -en "Stopping daemon $base: "
+	    killproc $base $*
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
 	    return $RETVAL
 	}
 	action() {
@@ -106,8 +143,16 @@ case "$init_mode" in
 	    shift 1
 	    ${1+"$@"} >/dev/null
 	    RETVAL=$?
-	    [ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS" || echo -e "\t....FAILED"
-	    return $?
+	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
+	    return $RETVAL
+	}
+	;;
+    (standalone|*)
+	log_success_msg() {
+	    echo -e "\t...SUCCESS\n"
+	}
+	log_failure_msg() {
+	    echo -e "\t...FAILED\n"
 	}
 	if [ -x /sbin/pidof ] ; then
 	    pidofproc() {
@@ -125,25 +170,52 @@ case "$init_mode" in
 	if [ -x /sbin/killproc ] ; then
 	    killproc() {
 		/sbin/killproc $@
-		RETVAL=$?
-		[ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS\r" || echo -e "\t....FAILED\r"
-		return $RETVAL
 	    }
 	elif [ -x /usr/bin/killall ] ; then
 	    killproc() {
 		/usr/bin/killall $@
-		RETVAL=$?
-		[ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS\r" || echo -e "\t....FAILED\r"
-		return $RETVAL
 	    }
 	else
 	    killproc() {
 		[ -r $pidfile ] && kill "$2" `cat $pidfile`
-		RETVAL=$?
-		[ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS\r" || echo -e "\t....FAILED\r"
-		return $RETVAL
 	    }
 	fi
+	daemon_start() {
+	    local force= nicecmd= base=
+	    while [ "$1" != "${1##[-+]}" ] ; do
+		case $1 in
+		    (-f) force="--force"       ; shift 1 ;;
+		    (-n) nicecmd="nice -n $2"  ; shift 2 ;;
+		esac
+	    done
+	    base=`echo $1 | sed -e 's,.*/,,'`
+	    echo -en "Starting daemon $base: "
+	    ( $* >/dev/null 2>&1 </dev/null & )
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && echo -en "\t...SUCCESS" || echo -en "\t....FAILED"
+	    return $RETVAL
+	}
+	daemon_stop() {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    echo -en "Stopping daemon $base: "
+	    if pidofproc $base >/dev/null 2>&1 ; then
+		RETVAL=0
+	    else
+		killproc $base $*
+		RETVAL=$?
+	    fi
+	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
+	    return $RETVAL
+	}
+	action() {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"} >/dev/null
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS" || echo -e "\t....FAILED"
+	    return $?
+	}
 	;;
 esac
 
@@ -200,26 +272,17 @@ start() {
 	action $"Creating $STRERR_DIRECTORY: " \
 	    mkdir -p "$STRERR_DIRECTORY"
     build_options
-    echo -en "Starting $processname: "
-    start_daemon $processname $STRERR_OPTIONS
+    daemon_start $execfile $STRERR_OPTIONS
     RETVAL=$?
-    echo ""
     [ $RETVAL -eq 0 ] && touch $lockfile
-    RETVAL=$?
     return $RETVAL
 }
 
 stop() {
-    if pidofproc $processname >/dev/null 2>&1 ; then
-	echo -en "Stopping $processname: "
-	killproc $processname
-	RETVAL=$?
-	echo ""
-	[ $RETVAL -eq 0 ] && rm -f -- $lockfile
-	RETVAL=$?
-	return $RETVAL
-    fi
-    return 0
+    daemon_stop $execfile
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && rm -f -- $lockfile
+    return $RETVAL
 }
 
 restart() {

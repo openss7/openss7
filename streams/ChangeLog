@@ -1,3 +1,24 @@
+2007-04-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/util/init/strace: correct for SuSE
+	* src/util/init/strerr: correct for SuSE
+
+	* tests/testsuite-clone.at: factor common functions
+	* tests/testsuite-connld.at: factor common functions
+	* tests/testsuite-echo.at: factor common functions
+	* tests/testsuite-fifo.at: factor common functions
+	* tests/testsuite-log.at: factor common functions
+	* tests/testsuite-loop.at: factor common functions
+	* tests/testsuite-mux.at: factor common functions
+	* tests/testsuite-nsdev.at: factor common functions
+	* tests/testsuite-nuls.at: factor common functions
+	* tests/testsuite-pipe.at: factor common functions
+	* tests/testsuite-pipemod.at: factor common functions
+	* tests/testsuite-sad.at: factor common functions
+	* tests/testsuite-sc.at: factor common functions
+	* tests/testsuite-streams.at: factor common functions
+	* tests/testsuite.at: factor common functions
+
 2007-04-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: add more control over kthread priority
