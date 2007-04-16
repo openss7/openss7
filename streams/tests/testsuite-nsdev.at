@@ -103,50 +103,11 @@ dnl
 dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
-at_LEAKS=
 function test_nsdev() {
-    if test :${at_LEAKS:-notset} = :notset
-    then
-	if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1
-	then
-	    at_LEAKS=no
-	else
-	    at_LEAKS=yes
-	fi
-    fi
-    if test $at_verbose = echo ; then options='--verbose=5' ; else options='--again' ; fi
-    if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
-    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
-    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    if test $at_arg_given_sync = : ; then sync || : ; fi
-    if test-nsdev $options -o $1
-    then
-	if test :${at_LEAKS:-yes} != :no
-	then
-	    # check for leaks
-	    if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1
-	    then
-		sleep 1
-		if (cat /proc/streams/strinfo | grep -v '000000000000') >&2
-		then
-		    return 1
-		else
-		    return 0
-		fi
-	    else
-		return 0
-	    fi
-	else
-	    return 0
-	fi
-    else
-	return $?
-    fi
+    check_smp $2 && test-nsdev `build_options` -o $1 && check_leaks
 }
 function test_nsdev_root() {
-    if test `id -u` -ne 0 ; then return 77 ; fi
-    test_nsdev $1
-    return $?
+    check_root && test_nsdev $1
 }
 m4_divert_pop([DEFAULTS])
 
