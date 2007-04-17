@@ -1470,22 +1470,21 @@ streams_noinline streams_fastcall __unlikely int
 __bcanput_slow(queue_t *q, unsigned char band)
 {
 	unsigned long pl;
-	int result = 0;
+	int result = 1;
 
-	qwlock(q, pl);
-	if (likely(band <= q->q_nband)) {
+	qrlock(q, pl);
+	if (likely(band <= q->q_nband) && unlikely(q->q_blocked > 0)) {
 		struct qband *qb;
 
 		qb = __find_qband(q, band);
 		dassert(qb);
 		if (unlikely(test_bit(QB_FULL_BIT, &qb->qb_flag))) {
-			if (!test_and_set_bit(QB_WANTW_BIT, &qb->qb_flag))
-				q->q_blocked++;
-		} else if (likely(!test_bit(QB_WANTW_BIT, &qb->qb_flag)))
-			result = 1;
-	} else
-		result = 1;	/* Note: a non-existent band is considered empty */
-	qwunlock(q, pl);
+			set_bit(QB_WANTW_BIT, &qb->qb_flag);
+			result = 0;
+		}
+	}
+	/* Note: a non-existent band is considered empty */
+	qrunlock(q, pl);
 	return (result);
 }
 
@@ -1516,13 +1515,13 @@ __bcanput(queue_t *q, unsigned char band)
 	unsigned long pl;
 
 	if (likely(band == 0)) {
-		int result = 0;
+		int result = 1;
 
 		qrlock(q, pl);
-		if (unlikely(test_bit(QFULL_BIT, &q->q_flag)))
+		if (unlikely(test_bit(QFULL_BIT, &q->q_flag))) {
 			set_bit(QWANTW_BIT, &q->q_flag);
-		else if (likely(!test_bit(QWANTW_BIT, &q->q_flag)))
-			result = 1;
+			result = 0;
+		}
 		qrunlock(q, pl);
 		return (result);
 	}
@@ -1980,7 +1979,7 @@ __putbq_pri(queue_t *q, mblk_t *mp)
 	/* SVR 4 SPG says to zero b_band when hipri messages placed on queue */
 	mp->b_band = 0;
 
-	if ((q->q_count += msgsize(mp)) > q->q_hiwat)
+	if (unlikely((q->q_count += msgsize(mp)) > q->q_hiwat))
 		set_bit(QFULL_BIT, &q->q_flag);
 	if (q->q_last == NULL)
 		q->q_last = mp;
@@ -2028,9 +2027,9 @@ __putbq_band(queue_t *q, mblk_t *mp)
 	assert(qb->qb_first != NULL);
 	assert(qb->qb_last != NULL);
 	qb->qb_msgs++;
-	if ((qb->qb_count += msgsize(mp)) > qb->qb_hiwat)
-		set_bit(QB_FULL_BIT, &qb->qb_flag);
-
+	if (unlikely((qb->qb_count += msgsize(mp)) > qb->qb_hiwat))
+		if (likely(!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag)))
+			q->q_blocked++;
 	if (likely(q->q_last == b_prev))
 		q->q_last = mp;
 	if (likely(q->q_first == b_next))
@@ -2070,7 +2069,7 @@ __putbq_norm(queue_t *q, mblk_t *mp)
 			b_next = b_prev->b_next;
 		}
 
-		if ((q->q_count += msgsize(mp)) > q->q_hiwat)
+		if (unlikely((q->q_count += msgsize(mp)) > q->q_hiwat))
 			set_bit(QFULL_BIT, &q->q_flag);
 
 		if (likely(q->q_last == b_prev))
@@ -2351,8 +2350,9 @@ __putq_band(queue_t *q, mblk_t *mp)
 	assert(qb->qb_first != NULL);
 	assert(qb->qb_last != NULL);
 	qb->qb_msgs++;
-	if ((qb->qb_count += msgsize(mp)) > qb->qb_hiwat)
-		set_bit(QB_FULL_BIT, &qb->qb_flag);
+	if (unlikely((qb->qb_count += msgsize(mp)) > qb->qb_hiwat))
+		if (likely(!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag)))
+			q->q_blocked++;
 	if (likely(q->q_last == b_prev))
 		q->q_last = mp;
 	if (likely(q->q_first == b_next))
@@ -2503,12 +2503,13 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	q->q_msgs++;
 	size = msgsize(nmp);
 	if (!qb) {
-		if ((q->q_count += size) > q->q_hiwat)
+		if (unlikely((q->q_count += size) > q->q_hiwat))
 			set_bit(QFULL_BIT, &q->q_flag);
 	} else {
 		qb->qb_msgs++;
-		if ((qb->qb_count += size) > qb->qb_hiwat)
-			set_bit(QB_FULL_BIT, &qb->qb_flag);
+		if (unlikely((qb->qb_count += size) > qb->qb_hiwat))
+			if (likely(!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag)))
+				q->q_blocked++;
 	}
 	/* success - ignore message class for insq() */
 	return (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag)) && test_bit(QWANTR_BIT, &q->q_flag)));
@@ -2732,11 +2733,9 @@ qdelete(queue_t *q)
 	sd = rqstream(rq);
 	assert(sd);
 
-#if 1
-	if (wq->q_next != NULL && wq == sd->sd_wq && !SAMESTR(wq) && wq->q_next != rq)
-		/* Never full-delete a Stream head with a twist (unless its a FIFO). */
-		goto stream_head;
-#endif
+	/* Never delete a Stream head. */
+	if (sd->sd_rq == rq)
+		return;
 
 	_ptrace(("final half-delete of stream %p queue pair %p\n", sd, q));
 
@@ -2765,10 +2764,11 @@ qdelete(queue_t *q)
 		phwunlock(sd2);
 	pwunlock(sd, pl);
 
-#if 1
-      stream_head:
-	/* Do not skip reference cancellation. */
-#endif
+	if (wq->q_first)
+		flushq(wq, FLUSHALL);
+	if (rq->q_first)
+		flushq(rq, FLUSHALL);
+
 	_printd(("%s: cancelling initial allocation reference queue pair %p\n", __FUNCTION__, q));
 	_ctrace(qput(&q));	/* cancel initial allocation reference */
 }
@@ -2812,7 +2812,7 @@ qdetach(queue_t *q, int flags, cred_t *crp)
 
 	err = _ctrace(qclose(q, flags, crp));
 	_ctrace(qprocsoff(q));	/* in case qclose forgot */
-	_ctrace(qdelete(q));	/* half delete */
+	_ctrace(qdelete(q));	/* full delete */
 	return (err);
 }
 
@@ -2938,9 +2938,11 @@ qprocsoff(queue_t *q)
 		/* disable queue enabling */
 		set_bit(QNOENB_BIT, &rq->q_flag);
 		set_bit(QNOENB_BIT, &wq->q_flag);
+#if 0
 		/* cancel queue service calls */
-		clear_bit(QENAB_BIT, &rq->q_flag);
-		clear_bit(QENAB_BIT, &wq->q_flag);
+		clear_bit(QENAB_BIT, &rq->q_flag);	/* XXX: do not do this! */
+		clear_bit(QENAB_BIT, &wq->q_flag);	/* XXX: do not do this! */
+#endif
 		/* clear queue putq enable bit */
 		clear_bit(QWANTR_BIT, &rq->q_flag);
 		clear_bit(QWANTR_BIT, &wq->q_flag);
@@ -2958,11 +2960,9 @@ qprocsoff(queue_t *q)
 					wq->q_blocked--;
 		}
 
-#if 1
-		if (wq->q_next != NULL && wq == sd->sd_wq && !SAMESTR(wq) && wq->q_next != rq)
-			/* Never half-delete a Stream head with a twist (unless its a FIFO). */
+		if (sd->sd_rq == q)
+			/* Never half-delete a Stream head. */
 			goto stream_head;
-#endif
 
 		_ptrace(("initial half-delete of stream %p queue pair %p\n", sd, q));
 
@@ -3041,11 +3041,9 @@ qprocsoff(queue_t *q)
 		if (sd2 && sd2 > sd)
 			phwunlock(sd2);
 
-#if 1
 	      stream_head:
 
 		pwunlock(sd, pl);
-#endif
 
 		/* XXX: put procs must check QPROCS bit after acquiring prlock */
 		/* XXX: srv procs must check QPROCS bit after acquiring prlock */
@@ -3270,14 +3268,12 @@ __rmvq_band(queue_t *q, mblk_t *mp)
 	{
 		bool backenable = false;
 
-		if (likely(qb->qb_count <= qb->qb_lowat)) {
-			clear_bit(QB_FULL_BIT, &qb->qb_flag);
-			if (test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag)) {
+		if (qb->qb_count == 0 || qb->qb_count < qb->qb_lowat) {
+			if (unlikely(test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))) {
 				q->q_blocked--;
-				backenable = true;
+				if (likely(test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag)))
+					backenable = true;
 			}
-		} else if (likely(qb->qb_count < qb->qb_hiwat)) {
-			clear_bit(QB_FULL_BIT, &qb->qb_flag);
 		}
 		return (backenable);
 	}
@@ -3335,12 +3331,10 @@ __rmvq(queue_t *q, mblk_t *mp)
 		{
 			bool backenable = false;
 
-			if (likely(q->q_count <= q->q_lowat)) {
-				clear_bit(QFULL_BIT, &q->q_flag);
-				if (test_and_clear_bit(QWANTW_BIT, &q->q_flag))
-					backenable = true;
-			} else if (likely(q->q_count < q->q_hiwat))
-				clear_bit(QFULL_BIT, &q->q_flag);
+			if (q->q_count == 0 || q->q_count < q->q_lowat)
+				if (unlikely(test_and_clear_bit(QFULL_BIT, &q->q_flag)))
+					if (likely(test_and_clear_bit(QWANTW_BIT, &q->q_flag)))
+						backenable = true;
 			return (backenable);
 		}
 	}
@@ -3459,9 +3453,9 @@ __flushband(queue_t *q, unsigned char band, int flag, mblk_t ***mppp)
 				assert(q->q_msgs >= 0);
 				qb->qb_msgs = 0;
 				qb->qb_first = qb->qb_last = NULL;
-				clear_bit(QB_FULL_BIT, &qb->qb_flag);
-				if (test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag))
+				if (unlikely(test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag)))
 					q->q_blocked--;
+				clear_bit(QB_WANTW_BIT, &qb->qb_flag);
 				backenable = true;	/* always backenable when band empty */
 			}
 		}
@@ -3593,22 +3587,23 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
 			q->q_first = q->q_last = NULL;
 			q->q_count = 0;
 			q->q_msgs = 0;
-			clear_bit(QFULL_BIT, &q->q_flag);
-			if (test_and_clear_bit(QWANTW_BIT, &q->q_flag)) {
-				backenable = true;
-				if (bands)
-					bands[0] = true;
-			}
+			if (test_and_clear_bit(QFULL_BIT, &q->q_flag))
+				if (test_and_clear_bit(QWANTW_BIT, &q->q_flag)) {
+					backenable = true;
+					if (bands)
+						bands[0] = true;
+				}
 			for (q_nband = q->q_nband, qb = q->q_bandp; qb; qb = qb->qb_next, q_nband--) {
 				qb->qb_first = qb->qb_last = NULL;
 				qb->qb_count = 0;
 				qb->qb_msgs = 0;
-				clear_bit(QB_FULL_BIT, &qb->qb_flag);
-				if (test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag)) {
+				if (unlikely(test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))) {
 					q->q_blocked--;
-					backenable = true;
-					if (bands)
-						bands[q_nband] = true;
+					if (likely(test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag))) {
+						backenable = true;
+						if (bands)
+							bands[q_nband] = true;
+					}
 				}
 			}
 			q->q_blocked = 0;
@@ -3706,13 +3701,10 @@ __getq(queue_t *q, bool *be)
 		if (likely(mp->b_band == 0)) {
 			q->q_count -= msgsize(mp);
 			assert(q->q_count >= 0);
-			if (likely(q->q_count <= q->q_lowat)) {
-				clear_bit(QFULL_BIT, &q->q_flag);
-				if (test_and_clear_bit(QWANTW_BIT, &q->q_flag))
-					backenable = true;
-			} else if (likely(q->q_count < q->q_hiwat)) {
-				clear_bit(QFULL_BIT, &q->q_flag);
-			}
+			if (q->q_count == 0 || q->q_count < q->q_lowat)
+				if (unlikely(test_and_clear_bit(QFULL_BIT, &q->q_flag)))
+					if (likely(test_and_clear_bit(QWANTW_BIT, &q->q_flag)))
+						backenable = true;
 		} else {
 			struct qband *qb;
 
@@ -3725,14 +3717,12 @@ __getq(queue_t *q, bool *be)
 			assert(qb->qb_msgs >= 0);
 			qb->qb_count -= msgsize(mp);
 			assert(qb->qb_count >= 0);
-			if (likely(qb->qb_count <= qb->qb_lowat)) {
-				clear_bit(QB_FULL_BIT, &qb->qb_flag);
-				if (test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag)) {
+			if (qb->qb_count == 0 || qb->qb_count < qb->qb_lowat) {
+				if (unlikely(test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))) {
 					q->q_blocked--;
-					backenable = true;
+					if (likely(test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag)))
+						backenable = true;
 				}
-			} else if (likely(qb->qb_count < qb->qb_hiwat)) {
-				clear_bit(QB_FULL_BIT, &qb->qb_flag);
 			}
 		}
 		/* successful read, clear want read bit */

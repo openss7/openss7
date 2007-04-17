@@ -749,7 +749,7 @@ allocq(void)
 		queue_t *wq = rq + 1;
 		struct queinfo *qu = (struct queinfo *) rq;
 
-		atomic_set(&qu->qu_refs, 1);
+		atomic_set(&qu->qu_refs, 1); /* once for queue pair */
 #if defined _DEBUG
 		write_lock(&si->si_rwlock);
 		list_add_tail(&qu->qu_list, &si->si_head);
@@ -766,19 +766,27 @@ allocq(void)
 
 EXPORT_SYMBOL(allocq);		/* include/sys/streams/stream.h */
 
-streams_noinline streams_fastcall void sd_put_slow(struct stdata **sdp);
+streams_noinline streams_fastcall void sd_release(struct stdata **sdp);
+STATIC void __freestr(struct stdata *sd);
 
 /*
  *  __freeq:	- free a queue pair
  *  @rq:	read queue of queue pair
  *
  *  Frees a queue pair allocated with allocq().  Does not flush messages or clear use bits.
+ *
+ *  There are two kinds of queue pairs: those that are embedded in a Stream head and those that are
+ *  not.  Those that are embedded in a Stream head must free the Stream head when completely
+ *  released.  Those that are independent must be freed independently.
  */
 STATIC streams_fastcall void
 __freeq(queue_t *rq)
 {
 	struct strinfo *si = &Strinfo[DYN_QUEUE];
 	struct queinfo *qu = (struct queinfo *) rq;
+
+	if (qu->qu_str && qu->qu_str->sd_rq == rq)
+		return __freestr(qu->qu_str);
 
 #if defined _DEBUG
 	write_lock(&si->si_rwlock);
@@ -787,8 +795,8 @@ __freeq(queue_t *rq)
 #endif
 	atomic_dec(&si->si_cnt);
 	assert(!waitqueue_active(&qu->qu_qwait));
-	/* put STREAM head - if not already */
-	_ctrace(sd_put_slow(&qu->qu_str));
+	/* Put Stream head */
+	_ctrace(sd_release(&qu->qu_str));
 	/* clean it good */
 	queinfo_init(qu);
 	/* put back in cache */
@@ -2366,8 +2374,9 @@ putp_fast(queue_t *q, mblk_t *mp)
 		(*q->q_putp) (q, mp);
 		qwakeup(q);
 	} else {
-		freemsg(mp);
 		swerr();
+		dump_stack();
+		freemsg(mp);
 	}
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
@@ -4798,9 +4807,9 @@ STATIC __unlikely void
 clear_shinfo(struct shinfo *sh)
 {
 	struct stdata *sd = &sh->sh_stdata;
+	struct queinfo *qu = &sh->sh_queinfo;
 
 	bzero(sh, sizeof(*sh));
-	atomic_set(&sh->sh_refs, 0);
 #if defined(_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
 	INIT_LIST_HEAD(&sh->sh_list);
 #endif
@@ -4825,6 +4834,11 @@ clear_shinfo(struct shinfo *sh)
 	zlockinit(sd);		/* stream freeze read/write lock */
 	INIT_LIST_HEAD(&sd->sd_list);	/* doesn't matter really */
 //      init_MUTEX(&sd->sd_mutex);
+	queinfo_init(&sh->sh_queinfo);
+	/* lock these together already */
+	sd->sd_rq = &qu->rq;
+	sd->sd_wq = &qu->wq;
+	qu->qu_str = sd;
 }
 STATIC __unlikely void
 shinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
@@ -4832,41 +4846,54 @@ shinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
 		clear_shinfo(obj);
 }
+/**
+ * allocstr - allocate a Stream head and associated queue pair
+ *
+ * Note that we used to allocate a Stream head and it associated queue pair separately, however, it
+ * became easier to keep the Stream head and associated queue pair together in the same structure.
+ * A single reference count (associated with the queue pair) is used for reference counting.  When
+ * all references to the Stream head and the queue pair are released, the entire structure is
+ * removed.
+ *
+ * Note: we only allocate stream heads in stropen which is called in user context without any locks
+ * held.  This allocation can sleep.  We now use GFP_KERNEL instead of GFP_ATOMIC.
+ */
 streams_fastcall __unlikely struct stdata *
 allocstr(void)
 {
-	/* TODO: this function should take a queue pair (read queue) pointer as an argument.  We
-	   never allocate stream heads without first allocating a queue pair, or, perhaps we should 
-	   embed the queue pair allocation inside the stream head allocation.  Think about this. */
-	struct strinfo *si = &Strinfo[DYN_STREAM];
-	struct stdata *sd = NULL;
-	queue_t *q;
+	struct strinfo *ssi = &Strinfo[DYN_STREAM];
+	struct strinfo *qsi = &Strinfo[DYN_QUEUE];
+	struct stdata *sd;
 
-	if ((q = allocq())) {
-		// strblocking(); /* before we sleep */
-		/* Note: we only allocate stream heads in stropen which is called in user context
-		   without any locks held.  This allocation can sleep.  We now use GFP_KERNEL
-		   instead of GFP_ATOMIC. */
-		if (likely((sd = kmem_cache_alloc(si->si_cache, GFP_KERNEL)) != NULL)) {
-			struct shinfo *sh = (struct shinfo *) sd;
+	// strblocking(); /* before we sleep */
+	if (likely((sd = kmem_cache_alloc(ssi->si_cache, GFP_KERNEL)) != NULL)) {
+		struct shinfo *sh = (struct shinfo *) sd;
+		struct queinfo *qu = &sh->sh_queinfo;
+		queue_t *rq = &qu->rq;
+		queue_t *wq = &qu->wq;
 
-			atomic_set(&sh->sh_refs, 1);
-#if defined(_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
-			write_lock(&si->si_rwlock);
-			list_add_tail(&sh->sh_list, &si->si_head);
-			write_unlock(&si->si_rwlock);
+		atomic_set(&qu->qu_refs, 1); /* once for combination */
+#if defined(_DEBUG)
+		write_lock(&qsi->si_rwlock);
+		list_add_tail(&qu->qu_list, &qsi->si_head);
+		write_unlock(&qsi->si_rwlock);
 #endif
-			atomic_inc(&si->si_cnt);
-			if (atomic_read(&si->si_cnt) > si->si_hwl)
-				si->si_hwl = atomic_read(&si->si_cnt);
-			_ctrace(sd->sd_rq = qget(q + 0));
-			_ctrace(sd->sd_wq = qget(q + 1));
-			qstream(q) = sd;	/* don't do double get */
+		atomic_inc(&qsi->si_cnt);
+		if (atomic_read(&qsi->si_cnt) > qsi->si_hwl)
+			qsi->si_hwl = atomic_read(&qsi->si_cnt);
+		rq->q_flag = QUSE | QREADR;
+		wq->q_flag = QUSE;
+#if defined(_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
+		write_lock(&ssi->si_rwlock);
+		list_add_tail(&sh->sh_list, &ssi->si_head);
+		write_unlock(&ssi->si_rwlock);
+#endif
+		atomic_inc(&ssi->si_cnt);
+		if (atomic_read(&ssi->si_cnt) > ssi->si_hwl)
+			ssi->si_hwl = atomic_read(&ssi->si_cnt);
 
-			_printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
-				 atomic_read(&sh->sh_refs)));
-		} else
-			__freeq(q);
+		_printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
+			 atomic_read(&qu->qu_refs)));
 	}
 	return (sd);
 }
@@ -4876,52 +4903,62 @@ EXPORT_SYMBOL(allocstr);	/* include/sys/streams/strsubr.h */
 STATIC __unlikely void
 __freestr(struct stdata *sd)
 {
-	struct strinfo *si = &Strinfo[DYN_STREAM];
+	struct strinfo *ssi = &Strinfo[DYN_STREAM];
+	struct strinfo *qsi = &Strinfo[DYN_QUEUE];
 	struct shinfo *sh = (struct shinfo *) sd;
+	struct queinfo *qu = &sh->sh_queinfo;
 
+	assert(!waitqueue_active(&qu->qu_qwait));
+#if defined _DEBUG
+	write_lock(&qsi->si_rwlock);
+	list_del_init(&qu->qu_list);
+	write_unlock(&qsi->si_rwlock);
+#endif
 #if defined(_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
-	write_lock(&si->si_rwlock);
+	write_lock(&ssi->si_rwlock);
 	list_del_init(&sh->sh_list);
-	write_unlock(&si->si_rwlock);
+	write_unlock(&ssi->si_rwlock);
 #endif
 	/* clear structure before putting it back */
 	clear_shinfo(sh);
-	atomic_dec(&si->si_cnt);
-	kmem_cache_free(si->si_cache, sh);
+	atomic_dec(&ssi->si_cnt);
+	atomic_dec(&qsi->si_cnt);
+	kmem_cache_free(ssi->si_cache, sh);
 }
-
-EXPORT_SYMBOL(freestr);		/* include/sys/streams/strsubr.h */
 
 STATIC __unlikely void
 sd_free(struct stdata *sd)
 {
+	queue_t *rq = sd->sd_rq;
+	queue_t *wq = sd->sd_wq;
+	mblk_t *mp = NULL, **mpp = &mp;
+
 	/* the last reference is gone, there should be nothing left (but a queue pair) */
 	assert(sd->sd_inode == NULL);
 	assert(sd->sd_clone == NULL);
 	assert(sd->sd_iocblk == NULL);
 	assert(sd->sd_cdevsw == NULL);
-	assert(sd->sd_rq);
-	/* zero stream reference on queue pair to avoid double put on sd */
-	rqstream(sd->sd_rq) = NULL;
-	/* these are left valid until last reference released */
-	assure(atomic_read(&((struct queinfo *) sd->sd_rq)->qu_refs) == 2);
-	_ptrace(("queue references qu_refs = %d\n",
-		 atomic_read(&((struct queinfo *) sd->sd_rq)->qu_refs)));
-	_ctrace(qput(&sd->sd_wq));
-	_ctrace(qput(&sd->sd_rq));	/* should be last put */
-	/* initial qget is balanced in qdetach()/qdelete() */
+
+	clear_bit(QUSE_BIT, &rq->q_flag);
+	clear_bit(QUSE_BIT, &wq->q_flag);
+	__flushq(rq, FLUSHALL, &mpp, NULL);
+	__flushq(wq, FLUSHALL, &mpp, NULL);
+	__freebands(rq);
 	__freestr(sd);
+	if (mp)
+		freechain(mp, mpp);
 }
 BIG_STATIC_STH streams_fastcall __hot struct stdata *
 sd_get(struct stdata *sd)
 {
 	if (sd) {
 		struct shinfo *sh = (struct shinfo *) sd;
+		struct queinfo *qu = &sh->sh_queinfo;
 
-		assert(atomic_read(&sh->sh_refs) > 0);
-		atomic_inc(&sh->sh_refs);
+		assert(atomic_read(&qu->qu_refs) > 0);
+		atomic_inc(&qu->qu_refs);
 		_printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
-			 atomic_read(&sh->sh_refs)));
+			 atomic_read(&qu->qu_refs)));
 	}
 	return (sd);
 }
@@ -4934,19 +4971,16 @@ sd_put(struct stdata **sdp)
 {
 	struct stdata *sd;
 
-#if 0
-	prefetchw(&sh->sh_refs);
-#endif
 	dassert(sdp != NULL);
 	if ((sd = XCHG(sdp, NULL)) != NULL) {
-		struct shinfo *sh;
+		struct shinfo *sh = (struct shinfo *) sd;
+		struct queinfo *qu = &sh->sh_queinfo;
 
-		sh = (struct shinfo *) sd;
 		_printd(("%s: stream head %p count is now %d\n", __FUNCTION__, sd,
-			 atomic_read(&sh->sh_refs) - 1));
+			 atomic_read(&qu->qu_refs) - 1));
 
-		assert(atomic_read(&sh->sh_refs) >= 1);
-		if (likely(atomic_dec_and_test(&sh->sh_refs) == 0))
+		assert(atomic_read(&qu->qu_refs) >= 1);
+		if (likely(atomic_dec_and_test(&qu->qu_refs) == 0))
 			return;
 		sd_free(sd);
 	}
@@ -4958,7 +4992,7 @@ EXPORT_SYMBOL_GPL(sd_put);	/* include/sys/streams/strsubr.h */
 #endif
 
 streams_noinline streams_fastcall void
-sd_put_slow(struct stdata **sdp)
+sd_release(struct stdata **sdp)
 {
 	sd_put(sdp);
 }
@@ -4969,6 +5003,8 @@ freestr(struct stdata *sd)
 	/* FIXME: need to deallocate anything attached to the stream head */
 	_ctrace(sd_put(&sd));
 }
+
+EXPORT_SYMBOL(freestr);		/* include/sys/streams/strsubr.h */
 
 /* 
  *  -------------------------------------------------------------------------

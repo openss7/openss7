@@ -2730,8 +2730,6 @@ strwaitclose(struct stdata *sd, int oflag)
 		    && !signal_pending(current))
 			strwaitqueue(sd, q, closetime);
 		qdetach(_RD(q), oflag, crp);
-		if (q->q_first)
-			flushq(q, FLUSHALL);
 	}
 	/* STREAM head last */
 	qdetach(sd->sd_rq, oflag, crp);
@@ -4036,9 +4034,7 @@ strhangup(struct stdata *sd)
 	/* If we are a pipe and are fattached, and the other end of the pipe is closing or has
 	   closed (which is why the M_HANGUP was sent), then the STREAM head is supposed to be
 	   unmounted, and if it is not opened, closed. */
-	swlock(sd);
 	if (!test_and_set_bit(STRHUP_BIT, &sd->sd_flag)) {
-		swunlock(sd);
 		strwakeall(sd);	/* only interruptible */
 		strevent(sd, S_HANGUP, 0);
 		/* If we are a control terminal, we are supposed to send SIGHUP to the session
@@ -4052,8 +4048,7 @@ strhangup(struct stdata *sd)
 			if (test_bit(STRMOUNT_BIT, &sd->sd_flag)) {
 				/* TODO: fdetach the inode and possibly close the stream */
 			}
-	} else
-		swunlock(sd);
+	}
 }
 
 /**
@@ -4118,27 +4113,32 @@ strlastclose(struct stdata *sd, int oflag)
 	strwakeall(sd);
 
 	_trace();
-	if ((sd_other = sd->sd_other)) {
+	if ((sd_other = xchg(&sd->sd_other, NULL))) {
 		mblk_t *b;
 
 		_trace();
-		/* First send an M_HANGUP message downstream in the same fashion as needs to be
-		   done for pipes and master pseudo-terminals.  One reason for sending this is that 
-		   the other end of the pipe might be linked under a multiplexing driver, in which
-		   case the lower multiplex queue procedures must be informed that the driver has
-		   hung up, also so that modules pushed on the other pipe end are informed.  Note
-		   that the open/close bit is held while sleeping. */
-		while (!(b = allocb(0, BPRI_WAITOK))) ;
-		b->b_datap->db_type = M_HANGUP;
-		strput(sd, b);
-		/* Do not rely on intermediate modules to pass the previous M_HANGUP.  Ensure that
-		   the other end of the pipe has truly hung up. Also, when the other end of the
-		   pipe is linked under a multiplexing driver, the Stream head will not have
-		   received the M_HANGUP message above (it is processed by the lower multiplex
-		   instead). */
-		strhangup(sd_other);
+		/* no need to hangup if the other end of the pipe is already closing */
+		if (!test_bit(STRCLOSE_BIT, &sd_other->sd_flag)) {
+			/* First send an M_HANGUP message downstream in the same fashion as needs
+			   to be done for pipes and master pseudo-terminals.  One reason for
+			   sending this is that the other end of the pipe might be linked under a
+			   multiplexing driver, in which case the lower multiplex queue procedures
+			   must be informed that the driver has hung up, also so that modules
+			   pushed on the other pipe end are informed.  Note that the open/close bit 
+			   is held while sleeping. */
+			while (!(b = allocb(0, BPRI_WAITOK))) ;
+			b->b_datap->db_type = M_HANGUP;
+			strput(sd, b);
+			/* Do not rely on intermediate modules to pass the previous M_HANGUP.
+			   Ensure that the other end of the pipe has truly hung up. Also, when the
+			   other end of the pipe is linked under a multiplexing driver, the Stream
+			   head will not have received the M_HANGUP message above (it is processed
+			   by the lower multiplex instead). */
+			swlock(sd_other);
+			strhangup(sd_other);
+			swunlock(sd_other);
+		}
 	}
-
 	/* 1st step: unlink any (temporary) linked streams */
 	_ctrace(strunlink(sd));
 
@@ -4150,14 +4150,10 @@ strlastclose(struct stdata *sd, int oflag)
 	_ctrace(cdrv_put(sd->sd_cdevsw));
 	sd->sd_cdevsw = NULL;
 
-	/* not last put, but it had better be the next to last if not a pipe */
-	assure(sd_other != NULL || atomic_read(&((struct shinfo *) sd)->sh_refs) == 2);
-
 	/* we do not free the stream head (or stream head queue pair) until the other stream head
 	   does this too */
-	_ctrace(sd_put(&sd->sd_other));	/* could be last put on sd_other */
-	/* this sd_put() balances the original allocation of the stream */
-	_ctrace(sd_put(&sd));	/* not last put */
+	_ctrace(sd_put(&sd_other));	/* could be last put on sd_other */
+	_ctrace(sd_put(&sd));	/* next to last put on sd */
 }
 
 /* 
@@ -4459,8 +4455,9 @@ stropen(struct inode *inode, struct file *file)
 			if (!(cdev = cdrv_get(getmajor(dev)))) {
 				err = -ENODEV;
 				_ptrace(("Error path taken for sd %p\n", sd));
-				/* should be qclose instead */
-				qdetach(sd->sd_rq, oflag, crp);
+				/* should be qclose instead: that is, this should be moved inside
+				   str_close() */
+				strwaitclose(sd, oflag);
 				goto put_error;
 			}
 			/* we need a new snode (inode in the device shadow directory) */
@@ -4468,8 +4465,9 @@ stropen(struct inode *inode, struct file *file)
 			 */
 			if ((err = spec_reparent(file, cdev, dev))) {
 				_ptrace(("Error path taken for sd %p\n", sd));
-				/* should be qclose instead */
-				qdetach(sd->sd_rq, oflag, crp);
+				/* should be qclose instead: that is, this should be moved inside
+				   str_close() */
+				strwaitclose(sd, oflag);
 				_ctrace(cdrv_put(cdev));
 				goto put_error;
 			}
@@ -11090,7 +11088,7 @@ str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
 	   STRPRI flag is set in the stream head, indicating the presence of an M_PCPROTO message.
 	   If this bit is already set, indicating than an M_PCPROTO message is already present, the 
 	   new message is discarded.  The relevant processes are then woken up or signalled. */
-	if (test_and_set_bit(STRPRI_BIT, &sd->sd_flag)) {
+	if (test_bit(STRCLOSE_BIT, &sd->sd_flag) || test_and_set_bit(STRPRI_BIT, &sd->sd_flag)) {
 		freemsg(mp);
 	} else {
 		putq(q, mp);
@@ -11104,18 +11102,22 @@ str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
 STATIC streams_inline streams_fastcall __hot_out int
 str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
+	if (likely(test_bit(STRCLOSE_BIT, &sd->sd_flag) == 0)) {
 #ifdef BIG_COMPILE
-	unsigned long pl;
+		unsigned long pl;
 
-	qwlock(q, pl);
-	__putq_norm(q, mp);	/* just a little quicker */
-	qwunlock(q, pl);
+		qwlock(q, pl);
+		__putq_norm(q, mp);	/* just a little quicker */
+		qwunlock(q, pl);
 #else
-	putq(q, mp);
+		putq(q, mp);
 #endif
-	if (unlikely(mp == q->q_first))
-		strwakeread(sd);
-	strevent(sd, (S_INPUT | (mp->b_band ? S_RDBAND : S_RDNORM)), mp->b_band);
+		if (unlikely(mp == q->q_first))
+			strwakeread(sd);
+		strevent(sd, (S_INPUT | (mp->b_band ? S_RDBAND : S_RDNORM)), mp->b_band);
+		return (0);
+	}
+	freemsg(mp);
 	return (0);
 }
 
