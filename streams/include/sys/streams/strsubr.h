@@ -514,14 +514,6 @@ enum {
 
 #define QRUNFLAGS	(QRUNFLAG|STRMFUNCS|STRBCFLAG|FLUSHWORK|FREEBLKS|STRTIMOUT|SCANQFLAG|STREVENTS)
 
-struct shinfo {
-	struct stdata sh_stdata;
-	atomic_t sh_refs;		/* references to this structure */
-#if defined CONFIG_STREAMS_DEBUG
-	struct list_head sh_list;
-#endif
-};
-
 struct queinfo {
 	queue_t rq;			/* read queue */
 	queue_t wq;			/* write queue */
@@ -530,6 +522,14 @@ struct queinfo {
 	atomic_t qu_refs;		/* references to this structure */
 #if defined CONFIG_STREAMS_DEBUG
 	struct list_head qu_list;
+#endif
+};
+
+struct shinfo {
+	struct stdata sh_stdata;
+	struct queinfo sh_queinfo;	/* queue pair for Stream head */
+#if defined CONFIG_STREAMS_DEBUG
+	struct list_head sh_list;
 #endif
 };
 
