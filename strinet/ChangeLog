@@ -1,3 +1,13 @@
+2007-04-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/testsuite-inet_raw.at: testsuite factoring
+	* tests/testsuite-inet_raw2.at: testsuite factoring
+	* tests/testsuite-inet_sctp.at: testsuite factoring
+	* tests/testsuite-inet_tcp.at: testsuite factoring
+	* tests/testsuite-inet_udp.at: testsuite factoring
+	* tests/testsuite-inet_udp2.at: testsuite factoring
+	* tests/testsuite.at: testsuite factoring
+
 2007-04-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/udp.c:  final performance tweaks

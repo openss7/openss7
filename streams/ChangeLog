@@ -1,3 +1,21 @@
+2007-04-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/testsuite-clone.at: testsuite factoring
+	* tests/testsuite-connld.at: testsuite factoring
+	* tests/testsuite-echo.at: testsuite factoring
+	* tests/testsuite-fifo.at: testsuite factoring
+	* tests/testsuite-log.at: testsuite factoring
+	* tests/testsuite-loop.at: testsuite factoring
+	* tests/testsuite-mux.at: testsuite factoring
+	* tests/testsuite-nsdev.at: testsuite factoring
+	* tests/testsuite-nuls.at: testsuite factoring
+	* tests/testsuite-pipe.at: testsuite factoring
+	* tests/testsuite-pipemod.at: testsuite factoring
+	* tests/testsuite-sad.at: testsuite factoring
+	* tests/testsuite-sc.at: testsuite factoring
+	* tests/testsuite-streams.at: testsuite factoring
+	* tests/testsuite.at: testsuite factoring
+
 2007-04-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/util/init/strace: correct for SuSE

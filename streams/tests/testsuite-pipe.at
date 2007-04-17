@@ -131,10 +131,10 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 test_pipe() {
-    check_smp $2 && test-pipe `build_options` -o $1 && check_leaks
+    test_prog test-pipe "$@"
 }
 test_pipe_root() {
-    check_root && test_pipe $1
+    test_prog_root test-pipe "$@"
 }
 m4_divert_pop([DEFAULTS])
 

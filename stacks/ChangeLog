@@ -1,3 +1,22 @@
+2007-04-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/testsuite-inet_raw.at: testsuite factoring
+	* tests/testsuite-inet_raw2.at: testsuite factoring
+	* tests/testsuite-inet_sctp.at: testsuite factoring
+	* tests/testsuite-inet_tcp.at: testsuite factoring
+	* tests/testsuite-inet_udp.at: testsuite factoring
+	* tests/testsuite-inet_udp2.at: testsuite factoring
+	* tests/testsuite-m2pa.at: testsuite factoring
+	* tests/testsuite-sctp.at: testsuite factoring
+	* tests/testsuite-sctp_n.at: testsuite factoring
+	* tests/testsuite-sctp_n2.at: testsuite factoring
+	* tests/testsuite-sctp_t.at: testsuite factoring
+	* tests/testsuite-timod.at: testsuite factoring
+	* tests/testsuite-tirdwr.at: testsuite factoring
+	* tests/testsuite-x400p-sl.at: testsuite factoring
+	* tests/testsuite-xnet.at: testsuite factoring
+	* tests/testsuite-xnet_thr.at: testsuite factoring
+
 2007-04-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: corrected typo

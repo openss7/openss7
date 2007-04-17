@@ -217,10 +217,10 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_streams() {
-    check_smp $2 && test-streams `build_options` -o $1 && check_leaks
+    test_prog test-streams "$@"
 }
 function test_streams_root() {
-    check_root && test_streams $1
+    test_prog_root test-streams "$@"
 }
 m4_divert_pop([DEFAULTS])
 

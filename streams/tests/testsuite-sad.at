@@ -122,10 +122,10 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 test_sad() {
-    check_smp $2 && test-sad `build_options` -o $1 && check_leaks
+    test_prog test-sad "$@"
 }
 test_sad_root() {
-    check_root && test_sad $1
+    test_prog_root test-sad "$@"
 }
 m4_divert_pop([DEFAULTS])
 

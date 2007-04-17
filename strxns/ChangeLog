@@ -1,3 +1,9 @@
+2007-04-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/testsuite-ip.at: testsuite factoring
+	* tests/testsuite-np_ip.at: testsuite factoring
+	* tests/testsuite.at: testsuite factoring
+
 2007-04-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: corrected typo

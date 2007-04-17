@@ -1,3 +1,9 @@
+2007-04-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/testsuite-m2pa.at: testsuite factoring
+	* tests/testsuite-m2ua_as.at: testsuite factoring
+	* tests/testsuite.at: testsuite factoring
+
 2007-04-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: corrected typo

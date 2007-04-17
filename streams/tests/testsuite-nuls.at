@@ -104,10 +104,10 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_nuls() {
-    check_smp $2 && test-nuls `build_options` -o $1 && check_leaks
+    test_prog test-nuls "$@"
 }
 function test_nuls_root() {
-    check_root && test_nuls $1
+    test_prog_root test-nuls "$@"
 }
 m4_divert_pop([DEFAULTS])
 

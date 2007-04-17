@@ -107,10 +107,10 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_mux() {
-    check_smp $2 && test-mux `build_options` -o $1 && check_leaks
+    test_prog test-mux "$@"
 }
 function test_mux_root() {
-    check_root && test_mux $1
+    test_prog_root test-mux "$@"
 }
 m4_divert_pop([DEFAULTS])
 

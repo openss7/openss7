@@ -1,3 +1,11 @@
+2007-04-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/testsuite-timod.at: testsuite factoring
+	* tests/testsuite-tirdwr.at: testsuite factoring
+	* tests/testsuite-xnet.at: testsuite factoring
+	* tests/testsuite-xnet_thr.at: testsuite factoring
+	* tests/testsuite.at: testsuite factoring
+
 2007-04-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: add options to ignore TPI servtype and TPI state

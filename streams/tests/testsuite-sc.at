@@ -110,10 +110,10 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_sc() {
-    check_smp $2 && test-sc `build_options` -o $1 && check_leaks
+    test_prog test-sc "$@"
 }
 function test_sc_root() {
-    check_root && test_sc $1
+    test_prog_root test-sc "$@"
 }
 m4_divert_pop([DEFAULTS])
 

@@ -104,10 +104,10 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_nsdev() {
-    check_smp $2 && test-nsdev `build_options` -o $1 && check_leaks
+    test_prog test-nsdev "$@"
 }
 function test_nsdev_root() {
-    check_root && test_nsdev $1
+    test_prog_root test-nsdev "$@"
 }
 m4_divert_pop([DEFAULTS])
 

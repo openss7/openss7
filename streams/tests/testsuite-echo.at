@@ -107,10 +107,10 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_echo() {
-    check_smp $2 && test-echo `build_options` -o $1 && check_leaks
+    test_prog test-echo "$@"
 }
 function test_echo_root() {
-    check_root && test_echo $1
+    test_prog_root test-echo "$@"
 }
 m4_divert_pop([DEFAULTS])
 

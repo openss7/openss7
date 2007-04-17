@@ -1,3 +1,7 @@
+2007-04-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/testsuite.at: testsuite factoring
+
 2007-04-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/tab.c: consistency changes

@@ -107,10 +107,10 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_clone() {
-    check_smp $2 && test-clone `build_options` -o $1 && check_leaks
+    test_prog test-clone "$@"
 }
 function test_clone_root() {
-    check_root && test_clone $1
+    test_prog_root test-clone "$@"
 }
 m4_divert_pop([DEFAULTS])
 

@@ -128,10 +128,10 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 test_fifo() {
-    check_smp $2 && test-fifo `build_options` -o $1 && check_leaks
+    test_prog test-fifo "$@"
 }
 test_fifo_root() {
-    check_root && test_fifo $1
+    test_prog_root test-fifo "$@"
 }
 m4_divert_pop([DEFAULTS])
 
