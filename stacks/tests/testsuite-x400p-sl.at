@@ -73,42 +73,32 @@ dnl
 dnl =========================================================================
 
 m4_divert_push([DEFAULTS])
-function test_x400p_sl() {
-    if !(lspci -n -d 0x10b5: | egrep -q ':(9030|3001|d00d|0557|4000|d33d|d44d)' >/dev/null) ; then return 77; fi
-    if test $at_verbose = echo ; then options='--verbose=5' ; else options='--again' ; fi
-    if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
-    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
-    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    if test $at_arg_given_wait = : ; then options="$options --wait" ; fi
-    if test $at_arg_given_sync = : ; then sync || : ; fi
-    if test-x400p $options -d /dev/x400p-sl -o $1
-    then
-	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS
-	then
-	    # check for leaks
-	    if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1
-	    then
-		sleep 1
-		if (cat /proc/streams/strinfo | grep -v '000000000000') >&2
-		then
-		    return 1
-		else
-		    return 0
-		fi
-	    else
-		return 0
-	    fi
-	else
+at_HAVE_X400P=
+function check_x400p() {
+    case ${at_HAVE_X400P:-notset} in
+	(no)
+	    return 77
+	    ;;
+	(yes)
 	    return 0
-	fi
-    else
-	return $?
-    fi
+	    ;;
+	(notset|*)
+	    if (lspci -n -d 0x10b5: | egrep -q ':(9030|3001|d00d|0557|4000|d33d|d44d)' >/dev/null)
+	    then
+		at_HAVE_X400P=yes
+		return 0
+	    else
+		at_HAVE_X400P=no
+		return 77
+	    fi
+	    ;;
+    esac
+}
+function test_x400p_sl() {
+    check_x400p && test_prog test-x400p "$1" "$2" -d /dev/x400p-sl
 }
 function test_x400p_sl_root() {
-    if test `id -u` -ne 0 ; then return 77 ; fi
-    test_x400p_sl $1
-    return $?
+    check_x400p && test_prog_root test-x400p "$1" "$2" -d /dev/x400p-sl
 }
 m4_divert_pop([DEFAULTS])
 

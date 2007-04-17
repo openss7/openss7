@@ -107,10 +107,10 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_connld() {
-    check_smp $2 && test-connld `build_options` -o $1 && check_leaks
+    test_prog test-connld "$@"
 }
 function test_connld_root() {
-    check_root && test_connld $1
+    test_prog_root test-connld "$@"
 }
 m4_divert_pop([DEFAULTS])
 

@@ -104,10 +104,10 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_pipemod() {
-    check_smp $2 && test-pipemod `build_options` -o $1 && check_leaks
+    test_prog test-pipemod "$@"
 }
 function test_pipemod_root() {
-    check_root && test_pipemod $1
+    test_prog_root test-pipemod "$@"
 }
 m4_divert_pop([DEFAULTS])
 

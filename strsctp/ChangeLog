@@ -1,3 +1,11 @@
+2007-04-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/testsuite-sctp.at: testsuite factoring
+	* tests/testsuite-sctp_n.at: testsuite factoring
+	* tests/testsuite-sctp_n2.at: testsuite factoring
+	* tests/testsuite-sctp_t.at: testsuite factoring
+	* tests/testsuite.at: testsuite factoring
+
 2007-04-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/local.at: corrected typo

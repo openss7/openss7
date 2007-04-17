@@ -109,17 +109,11 @@ dnl
 dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
-at_STOPPED=
 function test_log() {
-    check_smp $2 && test-log `build_options` -o $1 && check_leaks
+    test_prog test-log "$@"
 }
 function test_log_root() {
-    if test :${at_STOPPED:-no} != :yes ; then
-	/etc/init.d/strace stop
-	/etc/init.d/strerr stop
-	at_STOPPED=yes
-    fi
-    check_root && test_log $1
+    test_prog_root test-log "$@"
 }
 m4_divert_pop([DEFAULTS])
 

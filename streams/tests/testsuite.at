@@ -214,13 +214,45 @@ ACEOF
 	;;
     esac
 }
+function check_root() {
+    if test `id -u` -ne 0 ; then return 77 ; else return 0 ; fi
+}
+at_STOPPED=
+function stop_traceerr() {
+    if test :${at_STOPPED:-notset} = :notset
+    then
+	if check_root
+	then
+	    # try shutting down loggers
+	    [[ -x /etc/init.d/strace ]] && /etc/init.d/strace stop >/dev/null 2>&1
+	    [[ -x /etc/init.d/strerr ]] && /etc/init.d/strerr stop >/dev/null 2>&1
+	    at_STOPPED=yes
+	    return 0
+	else
+	    at_STOPPED=no
+	    return 1
+	fi
+    fi
+    return 1
+}
 at_LEAKS=
 function check_leaks() {
     if test :${at_LEAKS:-notset} = :notset
     then
 	if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1
 	then
-	    at_LEAKS=no
+	    if stop_traceerr
+	    then
+		sleep 1
+		if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1
+		then
+		    at_LEAKS=no
+		else
+		    at_LEAKS=yes
+		fi
+	    else
+		at_LEAKS=no
+	    fi
 	else
 	    at_LEAKS=yes
 	fi
@@ -258,8 +290,17 @@ function build_options() {
     fi
     echo "${at_OPTIONS}"
 }
-function check_root() {
-    if test `id -u` -ne 0 ; then return 77 ; else return 0 ; fi
+# first argument is test case executable, second argument is test case number,
+# third argment is SMP characteristic to check.
+function test_prog() {
+    local smp= prog= tc=
+    prog="$1" ; shift
+    tc="$1" ; shift
+    smp="$1" ; shift
+    check_smp $smp && check_leaks && $prog `build_options` -o $tc "$@" && check_leaks
+}
+function test_prog_root() {
+    check_root && test_prog "$@"
 }
 m4_divert_pop([DEFAULTS])
 

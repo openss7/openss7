@@ -113,39 +113,10 @@ dnl ==========================================================================
 
 m4_divert_push([DEFAULTS])
 function test_inet_sctp() {
-    if test $at_verbose = echo ; then options='--verbose=5' ; else options='--again' ; fi
-    if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
-    if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
-    if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
-    if test $at_arg_given_sync = : ; then sync || : ; fi
-    if test-inet_sctp $options -o $1
-    then
-	if test :${at_STRCONF_PACKAGE:-LfS} = :LfS
-	then
-	    # check for leaks
-	    if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1
-	    then
-		sleep 1
-		if (cat /proc/streams/strinfo | grep -v '000000000000') >&2
-		then
-		    return 1
-		else
-		    return 0
-		fi
-	    else
-		return 0
-	    fi
-	else
-	    return 0
-	fi
-    else
-	return $?
-    fi
+    test_prog test-inet_sctp "$@"
 }
 function test_inet_sctp_root() {
-    if test `id -u` -ne 0 ; then return 77 ; fi
-    test_inet_sctp $1
-    return $?
+    test_prog_root test-inet_sctp "$@"
 }
 m4_divert_pop([DEFAULTS])
 
