@@ -1157,6 +1157,62 @@ EXPORT_SYMBOL(backq);
 
 STATIC struct qband *__get_qband(queue_t *q, unsigned char band);
 
+streams_noinline streams_fastcall __unlikely void
+__strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
+{
+#if defined HAVE_KILL_PROC_INFO_ADDR
+	static int (*kill_proc_info) (int sig, struct siginfo * sip, pid_t pid) =
+	    (typeof(kill_proc_info)) HAVE_KILL_PROC_INFO_ADDR;
+#endif
+	struct strevent *se;
+	struct siginfo si;
+	int bits, sig;
+	pid_t pid;
+
+	for (se = sd->sd_siglist; se; se = se->se_next) {
+		if (likely((bits = (se->se_events & events)) == 0))
+			continue;
+		prefetch(se->se_next);
+		si.si_signo = sig = SIGPOLL;
+		si.si_code = code;
+		si.si_band = band;
+		si.si_fd = se->se_fd;
+
+		pid = se->se_procp->pid;
+
+		/* kill_proc_info will do the right thing visa vi thread groups */
+		if (likely(kill_proc_info(sig, &si, pid) == 0))
+			continue;
+		kill_proc(pid, sig, 1);	/* force */
+	}
+}
+
+streams_noinline streams_fastcall __unlikely void
+__strwritesig(struct stdata *sd, const unsigned char band, const char bands[])
+{
+	if (likely(bands == NULL)) {
+		if (band == 0) {
+			if (sd->sd_sigflags & S_WRNORM)
+				__strsiglist(sd, S_WRNORM, 0, POLL_OUT);
+		} else {
+			if (sd->sd_sigflags & S_WRBAND)
+				__strsiglist(sd, S_WRBAND, band, POLL_OUT);
+		}
+	} else {
+		int bnum;
+
+		if (bands[0])
+			if (sd->sd_sigflags & S_WRNORM)
+				__strsiglist(sd, S_WRNORM, 0, POLL_OUT);
+		if (sd->sd_sigflags & S_WRBAND)
+			for (bnum = band; bnum > 0; bnum--)
+				if (bands[bnum])
+					__strsiglist(sd, S_WRBAND, bnum, POLL_OUT);
+	}
+	if (unlikely(sd->sd_fasync != NULL))
+		kill_fasync(&sd->sd_fasync, SIGPOLL, POLL_OUT);
+}
+
 /**
  *  qbackenable: - backenable a queue
  *  @q:		the queue to backenable
@@ -1190,38 +1246,23 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 
 			prlock(sd2);
 			if (likely(test_bit(QPROCS_BIT, &q_nbsrv->q_flag) == 0)) {
-				/* If we are backenabling a Stream end queue then we will be
-				   specific about why it was backenabled, this gives the Stream
-				   head or driver information about for which specific bands flow
-				   control has subsided. */
-				/* Well, just the Stream head ... */
-				if (!test_bit(QREADR_BIT, &q_nbsrv->q_flag)
-				    && backq(q_nbsrv) == NULL) {
-					unsigned long pl;
-					struct qband *qb;
+				if (test_bit(QSHEAD_BIT, &q_nbsrv->q_flag)) {
+					/* When backenabling a queue with an active Stream head, do
+					   a little bit more. */
+					if (unlikely(sd2->sd_sigflags & (S_WRBAND | S_WRNORM))
+					    || unlikely(sd2->sd_fasync != NULL))
+						__strwritesig(sd2, band, bands);
+					if (unlikely(waitqueue_active(&sd2->sd_wwaitq) != 0))
+						wake_up_interruptible(&sd2->sd_wwaitq);
+					if (unlikely(waitqueue_active(&sd2->sd_polllist) != 0))
+						wake_up_interruptible(&sd2->sd_polllist);
 
-					qwlock(q_nbsrv, pl);
-					if (likely(bands == NULL)) {
-						if (band == 0)
-							set_bit(QBACK_BIT, &q_nbsrv->q_flag);
-						else if ((qb = __get_qband(q_nbsrv, band)))
-							set_bit(QB_BACK_BIT, &qb->qb_flag);
-					} else {
-						int bnum;
-
-						if (bands[0])
-							set_bit(QBACK_BIT, &q_nbsrv->q_flag);
-						for (bnum = band; bnum > 0; bnum--)
-							if (bands[bnum]
-							    && (qb = __get_qband(q_nbsrv, bnum)))
-								set_bit(QB_BACK_BIT, &qb->qb_flag);
-					}
-					qwunlock(q_nbsrv, pl);
+				} else {
+					/* SVR4 SPG - noenable() does not prevent a queue from
+					   being back enabled by flow control */
+					qenable(q_nbsrv);	/* always enable if a service
+								   procedure exists */
 				}
-				/* SVR4 SPG - noenable() does not prevent a queue from being back
-				   enabled by flow control */
-				qenable(q_nbsrv);	/* always enable if a service procedure
-							   exists */
 			}
 			prunlock(sd2);
 		}
@@ -1472,7 +1513,7 @@ __bcanput_slow(queue_t *q, unsigned char band)
 	unsigned long pl;
 	int result = 1;
 
-	qrlock(q, pl);
+	qwlock(q, pl);
 	if (likely(band <= q->q_nband) && unlikely(q->q_blocked > 0)) {
 		struct qband *qb;
 
@@ -1484,7 +1525,7 @@ __bcanput_slow(queue_t *q, unsigned char band)
 		}
 	}
 	/* Note: a non-existent band is considered empty */
-	qrunlock(q, pl);
+	qwunlock(q, pl);
 	return (result);
 }
 
@@ -1517,12 +1558,12 @@ __bcanput(queue_t *q, unsigned char band)
 	if (likely(band == 0)) {
 		int result = 1;
 
-		qrlock(q, pl);
+		qwlock(q, pl);
 		if (unlikely(test_bit(QFULL_BIT, &q->q_flag))) {
 			set_bit(QWANTW_BIT, &q->q_flag);
 			result = 0;
 		}
-		qrunlock(q, pl);
+		qwunlock(q, pl);
 		return (result);
 	}
 	return __bcanput_slow(q, band);
@@ -1979,7 +2020,7 @@ __putbq_pri(queue_t *q, mblk_t *mp)
 	/* SVR 4 SPG says to zero b_band when hipri messages placed on queue */
 	mp->b_band = 0;
 
-	if (unlikely((q->q_count += msgsize(mp)) > q->q_hiwat))
+	if (unlikely((q->q_count += msgsize(mp)) >= q->q_hiwat))
 		set_bit(QFULL_BIT, &q->q_flag);
 	if (q->q_last == NULL)
 		q->q_last = mp;
@@ -2027,7 +2068,7 @@ __putbq_band(queue_t *q, mblk_t *mp)
 	assert(qb->qb_first != NULL);
 	assert(qb->qb_last != NULL);
 	qb->qb_msgs++;
-	if (unlikely((qb->qb_count += msgsize(mp)) > qb->qb_hiwat))
+	if (unlikely((qb->qb_count += msgsize(mp)) >= qb->qb_hiwat))
 		if (likely(!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag)))
 			q->q_blocked++;
 	if (likely(q->q_last == b_prev))
@@ -2069,7 +2110,7 @@ __putbq_norm(queue_t *q, mblk_t *mp)
 			b_next = b_prev->b_next;
 		}
 
-		if (unlikely((q->q_count += msgsize(mp)) > q->q_hiwat))
+		if (unlikely((q->q_count += msgsize(mp)) >= q->q_hiwat))
 			set_bit(QFULL_BIT, &q->q_flag);
 
 		if (likely(q->q_last == b_prev))
@@ -2299,7 +2340,7 @@ __putq_pri(queue_t *q, mblk_t *mp, bool insq)
 	}
 	/* SVR 4 SPG says to zero b_band when hipri messages placed on queue */
 	mp->b_band = 0;
-	if (unlikely((q->q_count += msgsize(mp)) > q->q_hiwat))
+	if (unlikely((q->q_count += msgsize(mp)) >= q->q_hiwat))
 		set_bit(QFULL_BIT, &q->q_flag);
 	if (likely(q->q_last == b_prev))
 		q->q_last = mp;
@@ -2350,7 +2391,7 @@ __putq_band(queue_t *q, mblk_t *mp)
 	assert(qb->qb_first != NULL);
 	assert(qb->qb_last != NULL);
 	qb->qb_msgs++;
-	if (unlikely((qb->qb_count += msgsize(mp)) > qb->qb_hiwat))
+	if (unlikely((qb->qb_count += msgsize(mp)) >= qb->qb_hiwat))
 		if (likely(!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag)))
 			q->q_blocked++;
 	if (likely(q->q_last == b_prev))
@@ -2374,7 +2415,7 @@ __putq_norm(queue_t *q, mblk_t *mp)
 
 		b_prev = q->q_last;
 		b_next = NULL;
-		if (unlikely((q->q_count += msgsize(mp)) > q->q_hiwat))
+		if (unlikely((q->q_count += msgsize(mp)) >= q->q_hiwat))
 			set_bit(QFULL_BIT, &q->q_flag);
 		if (likely(q->q_last == b_prev))
 			q->q_last = mp;
@@ -2503,11 +2544,11 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	q->q_msgs++;
 	size = msgsize(nmp);
 	if (!qb) {
-		if (unlikely((q->q_count += size) > q->q_hiwat))
+		if (unlikely((q->q_count += size) >= q->q_hiwat))
 			set_bit(QFULL_BIT, &q->q_flag);
 	} else {
 		qb->qb_msgs++;
-		if (unlikely((qb->qb_count += size) > qb->qb_hiwat))
+		if (unlikely((qb->qb_count += size) >= qb->qb_hiwat))
 			if (likely(!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag)))
 				q->q_blocked++;
 	}
@@ -2938,11 +2979,6 @@ qprocsoff(queue_t *q)
 		/* disable queue enabling */
 		set_bit(QNOENB_BIT, &rq->q_flag);
 		set_bit(QNOENB_BIT, &wq->q_flag);
-#if 0
-		/* cancel queue service calls */
-		clear_bit(QENAB_BIT, &rq->q_flag);	/* XXX: do not do this! */
-		clear_bit(QENAB_BIT, &wq->q_flag);	/* XXX: do not do this! */
-#endif
 		/* clear queue putq enable bit */
 		clear_bit(QWANTR_BIT, &rq->q_flag);
 		clear_bit(QWANTR_BIT, &wq->q_flag);
@@ -3587,8 +3623,8 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp, char bands[])
 			q->q_first = q->q_last = NULL;
 			q->q_count = 0;
 			q->q_msgs = 0;
-			if (test_and_clear_bit(QFULL_BIT, &q->q_flag))
-				if (test_and_clear_bit(QWANTW_BIT, &q->q_flag)) {
+			if (unlikely(test_and_clear_bit(QFULL_BIT, &q->q_flag)))
+				if (likely(test_and_clear_bit(QWANTW_BIT, &q->q_flag))) {
 					backenable = true;
 					if (bands)
 						bands[0] = true;

@@ -749,7 +749,7 @@ allocq(void)
 		queue_t *wq = rq + 1;
 		struct queinfo *qu = (struct queinfo *) rq;
 
-		atomic_set(&qu->qu_refs, 1); /* once for queue pair */
+		atomic_set(&qu->qu_refs, 1);
 #if defined _DEBUG
 		write_lock(&si->si_rwlock);
 		list_add_tail(&qu->qu_list, &si->si_head);
@@ -2374,9 +2374,8 @@ putp_fast(queue_t *q, mblk_t *mp)
 		(*q->q_putp) (q, mp);
 		qwakeup(q);
 	} else {
-		swerr();
-		dump_stack();
 		freemsg(mp);
+		swerr();
 	}
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
@@ -4881,8 +4880,8 @@ allocstr(void)
 		atomic_inc(&qsi->si_cnt);
 		if (atomic_read(&qsi->si_cnt) > qsi->si_hwl)
 			qsi->si_hwl = atomic_read(&qsi->si_cnt);
-		rq->q_flag = QUSE | QREADR;
-		wq->q_flag = QUSE;
+		rq->q_flag = QSHEAD | QUSE | QREADR;
+		wq->q_flag = QSHEAD | QUSE;
 #if defined(_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
 		write_lock(&ssi->si_rwlock);
 		list_add_tail(&sh->sh_list, &ssi->si_head);
@@ -4908,6 +4907,7 @@ __freestr(struct stdata *sd)
 	struct shinfo *sh = (struct shinfo *) sd;
 	struct queinfo *qu = &sh->sh_queinfo;
 
+	(void) qu;
 	assert(!waitqueue_active(&qu->qu_qwait));
 #if defined _DEBUG
 	write_lock(&qsi->si_rwlock);
@@ -5122,7 +5122,7 @@ str_init_caches(void)
 	struct cacheinfo *ci = Cacheinfo;
 
 	for (j = 0; j < DYN_SIZE; j++, si++, ci++) {
-#if defined _DEBUG
+#if defined _DEBUG || defined CONFIG_STREAMS_MNTSPECFS
 		INIT_LIST_HEAD(&si->si_head);
 #endif
 		rwlock_init(&si->si_rwlock);
@@ -5361,7 +5361,6 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 			static spinlock_t *(*task_rq_lock) (struct task_struct * p,
 							    unsigned long *flags) =
 			    (void *) HAVE_TASK_RQ_LOCK_ADDR;
-
 
 			rq = task_rq_lock(p, &flags);
 			__setscheduler(p, SCHED_FIFO, MAX_RT_PRIO - 1);

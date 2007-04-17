@@ -168,7 +168,6 @@ static struct qinit fifo_rinit = {
 
 static struct qinit fifo_winit = {
 	.qi_putp = strwput,
-	.qi_srvp = strwsrv,
 	.qi_minfo = &fifo_minfo,
 	.qi_mstat = &fifo_wstat,
 };

@@ -164,7 +164,6 @@ static struct qinit pipe_rinit = {
 
 static struct qinit pipe_winit = {
 	.qi_putp = strwput,
-	.qi_srvp = strwsrv,
 	.qi_minfo = &pipe_minfo,
 	.qi_mstat = &pipe_wstat,
 };

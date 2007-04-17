@@ -163,7 +163,6 @@ static struct qinit sfx_rqinit = {
 
 static struct qinit sfx_wqinit = {
 	.qi_putp = strwput,
-	.qi_srvp = strwsrv,
 	.qi_minfo = &sfx_minfo,
 	.qi_mstat = &sfx_wstat,
 };
