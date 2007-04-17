@@ -395,11 +395,9 @@ static struct qinit str_rinit = {
 };
 
 int streamscall strwput(queue_t *q, mblk_t *mp);
-int streamscall strwsrv(queue_t *q);
 
 static struct qinit str_winit = {
 	.qi_putp = strwput,
-	.qi_srvp = strwsrv,
 	.qi_minfo = &str_minfo,
 	.qi_mstat = &str_wstat,
 };
@@ -2452,7 +2450,7 @@ __strwaitopen(struct stdata *sd, const int access)
 		schedule();
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
-	finish_wait(&sd->sd_rwaitq, &wait);
+	finish_wait(&sd->sd_owaitq, &wait);
 #else
 	set_current_state(TASK_RUNNING);
 	remove_wait_queue(&sd->sd_owaitq, &wait);
@@ -3892,6 +3890,8 @@ strunlink(struct stdata *stp)
 		swlock(sd);
 		setsq(sd->sd_rq, NULL);
 		setq(sd->sd_rq, &str_rinit, &str_winit);
+		set_bit(QSHEAD_BIT, &sd->sd_wq->q_flag);
+		set_bit(QSHEAD_BIT, &sd->sd_rq->q_flag);
 		clear_bit(STPLEX_BIT, &sd->sd_flag);
 		detached = strdetached(sd);
 		swunlock(sd);
@@ -3903,12 +3903,6 @@ strunlink(struct stdata *stp)
 		_ctrace(sd_put(&sd));	/* could be final put */
 	}
 }
-
-#if defined CONFIG_STREAMS_FIFO_MODULE || !defined CONFIG_STREAMS_FIFO \
- || defined CONFIG_STREAMS_PIPE_MODULE || !defined CONFIG_STREAMS_PIPE \
- || defined CONFIG_STREAMS_SOCK_MODULE || !defined CONFIG_STREAMS_SOCK
-EXPORT_SYMBOL(strwsrv);
-#endif
 
 #if !defined HAVE_KILL_SL_EXPORT
 #if defined HAVE_KILL_SL_ADDR
@@ -4139,6 +4133,7 @@ strlastclose(struct stdata *sd, int oflag)
 			swunlock(sd_other);
 		}
 	}
+
 	/* 1st step: unlink any (temporary) linked streams */
 	_ctrace(strunlink(sd));
 
@@ -5606,52 +5601,49 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 	    && (sd->sd_minpsz > size || (size > (size_t) sd->sd_maxpsz && sd->sd_minpsz != 0)))
 		return ERR_PTR(-ERANGE);
 
-	if ((band == -1) || bcanputnext(sd->sd_wq, band))
-
-		if ((band != -1 && !bcanputnext(sd->sd_wq, band))) {
-			/* wait for band to become available */
+	if ((band != -1 && !bcanputnext(sd->sd_wq, band))) {
+		/* wait for band to become available */
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
-			DEFINE_WAIT(wait);
+		DEFINE_WAIT(wait);
 #else
-			DECLARE_WAITQUEUE(wait, current);
+		DECLARE_WAITQUEUE(wait, current);
 #endif
 
-			srunlock(sd);
+		srunlock(sd);
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
-			add_wait_queue(&sd->sd_wwaitq, &wait);	/* exclusive? */
+		add_wait_queue(&sd->sd_wwaitq, &wait);	/* exclusive? */
 #endif
-			for (;;) {
+		for (;;) {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
-				prepare_to_wait(&sd->sd_wwaitq, &wait, TASK_INTERRUPTIBLE);	/* exclusive? 
-												 */
+			prepare_to_wait(&sd->sd_wwaitq, &wait, TASK_INTERRUPTIBLE);	/* exclusive? 
+											 */
 #else
-				set_current_state(TASK_INTERRUPTIBLE);
+			set_current_state(TASK_INTERRUPTIBLE);
 #endif
-				srlock(sd);
-				if (unlikely
-				    ((err = straccess_wakeup(sd, f_flags, timeo, FWRITE)) != 0))
-					break;
-				if (type == M_DATA
-				    && (sd->sd_minpsz > size
-					|| (size > (size_t) sd->sd_maxpsz && sd->sd_minpsz != 0))) {
-					err = -ERANGE;
-					break;
-				}
-				if (likely(bcanputnext(sd->sd_wq, band) != 0))
-					break;
-				// set_bit(WSLEEP_BIT, &sd->sd_flag);
-				srunlock(sd);
-
-				strschedule_write();	/* save context switch */
-				*timeo = schedule_timeout(*timeo);
+			srlock(sd);
+			if (unlikely((err = straccess_wakeup(sd, f_flags, timeo, FWRITE)) != 0))
+				break;
+			if (type == M_DATA
+			    && (sd->sd_minpsz > size
+				|| (size > (size_t) sd->sd_maxpsz && sd->sd_minpsz != 0))) {
+				err = -ERANGE;
+				break;
 			}
-#if defined HAVE_KFUNC_FINISH_WAIT
-			finish_wait(&sd->sd_wwaitq, &wait);
-#else
-			set_current_state(TASK_RUNNING);
-			remove_wait_queue(&sd->sd_wwaitq, &wait);
-#endif
+			if (likely(bcanputnext(sd->sd_wq, band) != 0))
+				break;
+			// set_bit(WSLEEP_BIT, &sd->sd_flag);
+			srunlock(sd);
+
+			strschedule_write();	/* save context switch */
+			*timeo = schedule_timeout(*timeo);
 		}
+#if defined HAVE_KFUNC_FINISH_WAIT
+		finish_wait(&sd->sd_wwaitq, &wait);
+#else
+		set_current_state(TASK_RUNNING);
+		remove_wait_queue(&sd->sd_wwaitq, &wait);
+#endif
+	}
 	srunlock(sd);
 	if (err)
 		return ERR_PTR(err);
@@ -7630,6 +7622,8 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
 
 		swlock(sd);
 		setq(sd->sd_rq, st->st_muxrinit, st->st_muxwinit);
+		clear_bit(QSHEAD_BIT, &sd->sd_wq->q_flag);
+		clear_bit(QSHEAD_BIT, &sd->sd_rq->q_flag);
 		set_bit(STPLEX_BIT, &sd->sd_flag);
 		/* clear open bit and wake waiters */
 		strwakeopen_swunlock(sd);
@@ -7851,6 +7845,8 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
 			swlock(sd);
 			setsq(sd->sd_rq, NULL);
 			setq(sd->sd_rq, &str_rinit, &str_winit);
+			set_bit(QSHEAD_BIT, &sd->sd_wq->q_flag);
+			set_bit(QSHEAD_BIT, &sd->sd_rq->q_flag);
 			clear_bit(STPLEX_BIT, &sd->sd_flag);
 			strwakeopen_swunlock(sd);
 			_ctrace(sd_put(&sd));
@@ -11009,71 +11005,6 @@ strwput(queue_t *q, mblk_t *mp)
 }
 
 EXPORT_SYMBOL(strwput);
-
-/**
- *  strwsrv: - STREAM head write queue service procedure
- *  @q: write queue to service
- *
- *  We don't actually ever put a message on the write queue (except for the STRHOLD feature), we
- *  just use the service procedure to wake up any synchronous or asynchronous waiters waiting for
- *  flow control to subside.  This permit back-enabling from the module beneath the stream head to
- *  work properly.  So, for example, when we do a canputnext(sd->sd_wq) it sets the QWANTW on
- *  sd->sd_wq->q_next if the module below the stream head is flow controlled.  When congestion
- *  subsides to the low water mark, the queue will backenable us and we will run and wake up any
- *  waiters blocked on flow control.
- *
- *  Note that we must also trigger stream events here.  Two in particular are S_WRNORM and S_WRBAND.
- *  We altered qbackenable to set the QBACK bit on the queue and the QB_BACK bit on a queue band
- *  when it backenables the queue.  This is an indication that flow control has subsided for the
- *  queue or queue band (or that the queue or queue band was just emptied).  We use these flags only
- *  for signalling streams events.
- *
- *  For the STRHOLD feature, we coallesce bytes while flow controlled in a message block held on the
- *  write queue.  Whenever we are enabled or backenabled this message must be released.
- */
-streamscall __hot_out int
-strwsrv(queue_t *q)
-{
-	struct stdata *sd;
-	unsigned long pl;
-	struct qband *qb;
-	int band;
-	mblk_t *b;
-	unsigned char be[NBAND] = { 0, };
-
-	assert(q);
-
-	sd = wqstream(q);
-
-	assert(sd);
-
-	zwlock(sd, pl);
-	if (test_and_clear_bit(QBACK_BIT, &q->q_flag))
-		be[0] = 1;
-	for (qb = q->q_bandp, band = q->q_nband; qb; qb = qb->qb_next, band--)
-		if (test_and_clear_bit(QB_BACK_BIT, &qb->qb_flag))
-			be[band] = 1;
-	band = q->q_nband;
-	if (unlikely((b = q->q_first) != NULL)) {
-		rmvq(q, b);
-	}
-	zwunlock(sd, pl);
-
-	if (b)
-		putnext(q, b);
-
-	if (likely(be[0]))	/* PROFILED */
-		strevent(sd, S_WRNORM, 0);
-
-	for (; unlikely(band > 0); band--) {	/* PROFILED */
-		if (likely(be[band] == 0))
-			continue;
-		strevent(sd, S_WRBAND, band);
-	}
-
-	strwakewrite(sd);
-	return (0);
-}
 
 /*
  *  Read Message Handling

@@ -1,5 +1,16 @@
 2007-04-17  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man9/queue.9.man
+	* include/sys/streams/stream.h: mark stream head queues QSHEAD
+	* include/sys/streams/strsubr.h: remove strwsrv
+	* src/drivers/clone.c: remove strwsrv
+	* src/drivers/fifo.c: remove strwsrv
+	* src/drivers/pipe.c: remove strwsrv
+	* src/drivers/sfx.c: remove strwsrv
+	* src/kernel/strsched.c: mark stream head queues QSHEAD
+	* src/kernel/strutil.c: directly backenable write side of stream head
+	* src/modules/sth.c: remove strwsrv
+
 	* tests/testsuite-clone.at: testsuite factoring
 	* tests/testsuite-connld.at: testsuite factoring
 	* tests/testsuite-echo.at: testsuite factoring

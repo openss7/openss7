@@ -182,7 +182,6 @@ static struct qinit clone_rinit = {
 
 static struct qinit clone_winit = {
 	.qi_putp = strwput,
-	.qi_srvp = strwsrv,
 	.qi_minfo = &clone_minfo,
 	.qi_mstat = &clone_wstat,
 };

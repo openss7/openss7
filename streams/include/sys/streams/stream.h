@@ -561,6 +561,7 @@ typedef struct queue {
 #define QPROCS_BIT	17	/* */
 #define QBLKING_BIT	18	/* */
 #define QSRVP_BIT	19	/* */
+#define QSHEAD_BIT	20	/* */
 
 #if 0
 /* paraphenalia */
@@ -612,6 +613,7 @@ typedef struct queue {
 #define QPROCS		(1<<QPROCS_BIT		)	/* putp, srvp disabled */
 #define QBLKING		(1<<QBLKING_BIT		)	/* queue procedure can block */
 #define QSRVP		(1<<QSRVP_BIT		)	/* queue has service procedure */
+#define QSHEAD		(1<<QSHEAD_BIT		)	/* queue actively belongs to a Stream head */
 
 #if 0
 /* different names for the same things */

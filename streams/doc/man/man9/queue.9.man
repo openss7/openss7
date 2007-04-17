@@ -115,9 +115,11 @@ typedef struct queue {
     ssize_t q_msgs;             /* messages on queue */
     rwlock_t q_lock;            /* lock for this queue structure */
     int (*q_ftmsg) (mblk_t *);  /* message filter ala AIX */
-#if defined CONFIG_STREAMS_SYNCQS
-    struct syncq *q_syncq;
-#endif
+    struct syncq *q_syncq;	/* syncrhonization queues */
+    struct queue *q_nfsrv;	/* next forward queue w/ service procedure */
+    struct queue *q_nbsrv;	/* next backward queue w/ service procedure */
+    qi_putp_t q_putp;		/* put procedure cache pointer */
+    qi_srvp_t q_srvp;		/* srv procedure cache pointer */
 } queue_t;
 \s+2\fP
 .fi
@@ -216,6 +218,15 @@ q in close wait;
 .TP
 .B QPROCS
 q has procs turned off;
+.TP
+.B QBLKING
+queue procedures are not to spec and may block;
+.TP
+.B QSRVP
+queue has a service procedure;
+.TP
+.B QSHEAD
+queue actively belongs to a Stream head;
 .PD
 .RE
 .TP
@@ -265,7 +276,19 @@ message filter
 .BR wantmsg (9));
 .TP
 .I q_syncq
-synchronization queue.
+synchronization queue;
+.TP
+.I q_nfsrv
+next foward queue with service procedure (or Stream end);
+.TP
+.I q_nbsrv
+next backward queue with service procedure (or Stream end);
+.TP
+.I q_putp
+cached put procedure function pointer;
+.TP
+.I q_srvp
+cached service procedure function pointer;
 .PD
 .\"
 .\"
@@ -701,7 +724,7 @@ procedure is run by the
 .I STREAMS
 scheduler, the scheduler first sets the
 .B QSVCBUSY
-flag before runing the procedure to indicate that the queue has its
+flag before running the procedure to indicate that the queue has its
 .IR qi_srvp (9)
 procedure executing.
 
@@ -916,7 +939,7 @@ On a read queue,
 and
 .I q_maxpsz
 specify the minimum and maximum packet sizes accepted by the driver or module in the upstream
-driection.  The sizes act as advice to the downstream module.  At the Stream head, the read queue
+direction.  The sizes act as advice to the downstream module.  At the Stream head, the read queue
 packet sizes act as advise to the top of the module stack; however, the Stream head is always
 prepared to accept a data stream message of any size.
 The Stream head read queue packet sizes can be adjusted by any driver or module by sending an
@@ -964,7 +987,7 @@ under
 for details.)
 .TP
 .B QTOENAB
-indicates that the queue needs to be enabled.
+indicates that the queue needs to be enabled (or does TO stand for timeout?).
 .IR UnixWare \(rg
 .[
 uw7doc
@@ -974,10 +997,10 @@ This bit is set while the queue pair is active.
 Its use is not supported by
 .BR "@PACKAGE_TITLE@" .
 .TP
-.B QSYNC
+.B QSYNCH
 set by
 .B @PACKAGE_TITLE@
-when a sycnrhonization queue has been allocated and attached to the
+when a synchronization queue has been allocated and attached to the
 .I q_syncq
 member of the structure.
 This bit is set at initialization of the queue pair.
@@ -985,7 +1008,12 @@ The use of this bit is implementation specific.
 .TP
 .B QSAFE
 indicates that the module requires safe callbacks (that is, interrupts are to
-be suppressed before calling callback functions).
+be suppressed before calling callback functions).  This has the effect of
+freezing the Stream with
+.BR freezestr (9)
+before the callback is invoked and thawing the Stream with
+.BR unfreezestr (9)
+after the callback returns.
 This bit is set at initialization of the queue pair.
 Its use is supported by
 .BR "@PACKAGE_TITLE@" .
@@ -996,6 +1024,26 @@ set when two queue pairs are welded together using the
 utility function.
 Its use is supported by
 .BR "@PACKAGE_TITLE@" .
+.TP
+.B QBLKING
+Used by
+.B @PACKAGE_TITLE@
+to indicate a queue pair for a module or driver that at registration time
+indicated that it was not to specification an might block in its service
+procedure.  See
+.BR str_install_AIX (9).
+.TP
+.B QSRVP
+Use by
+.B @PACKAGE_TITLE@
+to cache the fact that the queue has a service procedure.
+.TP
+.B QSHEAD
+Use by
+.B @PACKAGE_TITLE@
+to indicate that the queue is actively part of a Stream head.  That is, the
+queue belongs to a Stream head and the Stream is not currently linked under a
+multiplexing driver.
 .PP
 Also,
 .BR "@PACKAGE_TITLE@"
@@ -1033,6 +1081,58 @@ used by
 to attach synchronization queues in support of
 .I STREAMS
 synchronization levels.
+.TP
+.I q_nfsrv
+Used by
+.BR "@PACKAGE_TITLE@" ,
+in a fashion similar to
+.IR Solaris \(rg,
+.[
+solspg
+.]
+to store the next forward (fed) queue that either has a service procedure or is the
+last queue (Stream end) in the forward direction.  This cache pointer is used
+to speed execution of
+.BR bcanputnext (9)
+and friends when many modules without service procedures are pushed on a
+Stream.
+.TP
+.I q_nbsrv
+Used by
+.BR "@PACKAGE_TITLE@" ,
+in a fashion similar to
+.IR Solaris \(rg,
+.[
+solspg
+.]
+to store the next backward (feeding) queue that either has a service procedure or is the
+last queue (Stream end) in the backward direction.  This cache pointer is used
+to speed execution of
+.BR qbackenable (9)
+and friends when many modules without service procedures are pushed on a
+Stream.
+.TP
+.I q_putp
+Used by
+.B @PACKAGE_TITLE@
+to cache the put procedure function pointer.  This saves continual
+dereferencing of
+.I q->q_qinfo->qi_putp
+to obtain the procedure pointer.  Because the
+.BR qinit (9)
+structure is statically allocated by the module, better cache efficiency can
+be achieved by storing this function pointer in the queue structure.
+.TP
+.I q_srvp
+Used by
+.B @PACKAGE_TITLE@
+to cache the service procedure function pointer.  This saves continual
+dereferencing of
+.I q->q_qinfo->qi_srvp
+to obtain the procedure pointer.  Because the
+.BR qinit (9)
+structure is statically allocated by the module, better cache efficiency can
+be achieved by storing this function pointer in the queue structure.
 .\"
 .\"
 .SH CONTEXT
@@ -1135,7 +1235,7 @@ performs the following actions:
 .\" -----------
 .IP (1) \w'(0)\(em'u
 .BR qalloc (9)
-is called to allocate and intialized the queue pair.
+is called to allocate and initialize the queue pair.
 .IP ""
 .BR qalloc (9)
 performs the following actions:
@@ -1533,7 +1633,7 @@ member of the
 .B queue
 structure.
 .IP c)
-Finally the peg counts of the number of queue pairs allocated is decrmented, and the cache memory
+Finally the peg counts of the number of queue pairs allocated is decremented, and the cache memory
 associated with the queue pair is released.
 .RE
 .\"
