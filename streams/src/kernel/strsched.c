@@ -896,10 +896,40 @@ mdbblock_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 {				/* IRQ DISABLED? */
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR) {
 		struct mdbblock *md = obj;
+		unsigned char *base;
 
+		_ptrace(("Constructor for mblk %p\n", obj));
 		bzero(md, sizeof(*md));
+#if 1
+		base = md->databuf;
+		/* set up blocks as a fast buffer */
+		md->msgblk.m_mblock.b_next = NULL;
+		md->msgblk.m_mblock.b_prev = NULL;
+		md->msgblk.m_mblock.b_cont = NULL;
+		md->msgblk.m_mblock.b_rptr = base;
+		md->msgblk.m_mblock.b_wptr = base;
+		md->msgblk.m_mblock.b_datap = &md->datablk.d_dblock;
+		md->msgblk.m_mblock.b_band = 0;
+		md->msgblk.m_mblock.b_pad1 = 0;
+		md->msgblk.m_mblock.b_flag = 0;
+		md->msgblk.m_mblock.b_csum = 0;
+		md->msgblk.m_func = NULL;
+		md->msgblk.m_queue = NULL;
+		md->msgblk.m_private = NULL;
+#endif
 #if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD(&md->msgblk.m_list);
+#endif
+#if 1
+		md->datablk.d_dblock.db_frtnp = NULL;
+		md->datablk.d_dblock.db_base = base;
+		md->datablk.d_dblock.db_lim = base + FASTBUF;
+		md->datablk.d_dblock.db_ref = 1;
+		md->datablk.d_dblock.db_type = M_DATA;
+		md->datablk.d_dblock.db_flag = 0;
+		md->datablk.d_dblock.db_size = FASTBUF;
+#endif
+#if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD(&md->datablk.db_list);
 #endif
 	}
@@ -968,6 +998,7 @@ mdbblock_alloc_slow(uint priority, void *func)
 #endif
 		_trace();
 		if (likely((mp = kmem_cache_alloc(sdi->si_cache, slab_flags)) != NULL)) {
+			struct mdbblock *md = (struct mdbblock *) mp;
 #if defined CONFIG_STREAMS_DEBUG
 			struct mdbblock *md = (struct mdbblock *) mp;
 			struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
@@ -995,6 +1026,25 @@ mdbblock_alloc_slow(uint priority, void *func)
 			if (atomic_read(&sdi->si_cnt) > sdi->si_hwl)
 				sdi->si_hwl = atomic_read(&sdi->si_cnt);
 #endif
+			__assure(md->msgblk.m_mblock.b_next == NULL);
+			__assure(md->msgblk.m_mblock.b_prev == NULL);
+			__assure(md->msgblk.m_mblock.b_cont == NULL);
+			__assure(md->msgblk.m_mblock.b_rptr == md->databuf);
+			__assure(md->msgblk.m_mblock.b_wptr == md->databuf);
+			__assure(md->msgblk.m_mblock.b_datap == &md->datablk.d_dblock);
+			__assure(md->msgblk.m_mblock.b_band == 0);
+			__assure(md->msgblk.m_mblock.b_pad1 == 0);
+			__assure(md->msgblk.m_mblock.b_flag == 0);
+			__assure(md->msgblk.m_mblock.b_csum == 0);
+
+			__assure(md->datablk.d_dblock.db_frtnp == NULL);
+			__assure(md->datablk.d_dblock.db_base == md->databuf);
+			__assure(md->datablk.d_dblock.db_lim == md->databuf + FASTBUF);
+			__assure(md->datablk.d_dblock.db_ref == 1);
+			__assure(md->datablk.d_dblock.db_type == M_DATA);
+			__assure(md->datablk.d_dblock.db_flag == 0);
+			__assure(md->datablk.d_dblock.db_size == FASTBUF);
+
 			_ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
 		}
 		goto fail;
@@ -1025,6 +1075,8 @@ mdbblock_alloc(uint priority, void *func)
 		mp = t->freemblk_head;
 		prefetchw(mp);
 		if (likely(mp != NULL)) {
+			struct mdbblock *md = (struct mdbblock *) mp;
+
 			/* free block list normally has more than one block on it */
 			if (likely((t->freemblk_head = mp->b_next) != NULL))
 				mp->b_next = NULL;
@@ -1052,6 +1104,26 @@ mdbblock_alloc(uint priority, void *func)
 					sdi->si_hwl = atomic_read(&sdi->si_cnt);
 #endif
 			}
+
+			__assure(md->msgblk.m_mblock.b_next == NULL);
+			__assure(md->msgblk.m_mblock.b_prev == NULL);
+			__assure(md->msgblk.m_mblock.b_cont == NULL);
+			__assure(md->msgblk.m_mblock.b_rptr == md->databuf);
+			__assure(md->msgblk.m_mblock.b_wptr == md->databuf);
+			__assure(md->msgblk.m_mblock.b_datap == &md->datablk.d_dblock);
+			__assure(md->msgblk.m_mblock.b_band == 0);
+			__assure(md->msgblk.m_mblock.b_pad1 == 0);
+			__assure(md->msgblk.m_mblock.b_flag == 0);
+			__assure(md->msgblk.m_mblock.b_csum == 0);
+
+			__assure(md->datablk.d_dblock.db_frtnp == NULL);
+			__assure(md->datablk.d_dblock.db_base == md->databuf);
+			__assure(md->datablk.d_dblock.db_lim == md->databuf + FASTBUF);
+			__assure(md->datablk.d_dblock.db_ref == 1);
+			__assure(md->datablk.d_dblock.db_type == M_DATA);
+			__assure(md->datablk.d_dblock.db_flag == 0);
+			__assure(md->datablk.d_dblock.db_size == FASTBUF);
+
 			_ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
 			return (mp);
 		}
@@ -1137,7 +1209,7 @@ raise_bufcalls(void)
  *  Also the current msgb and datab counts are not decremented until the blocks are returned to the
  *  memory cache.
  */
-BIG_STATIC_INLINE streams_fastcall __hot_in void
+BIG_STATIC streams_fastcall __hot_in void
 mdbblock_free(mblk_t *mp)
 {
 #if !defined CONFIG_STREAMS_NORECYCLE
@@ -1150,6 +1222,49 @@ mdbblock_free(mblk_t *mp)
 
 	dassert(mp->b_next == NULL);	/* check double free */
 	// mp->b_next = NULL;
+#endif				/* !defined CONFIG_STREAMS_NORECYCLE */
+#if 1
+	{
+		struct mdbblock *md = (struct mdbblock *) mp;
+		unsigned char *base;
+
+		/* clean the state before putting it back, save mutlitple initializations elsewhere 
+		   and reduces code paths.  Optimized for FASTBUFS (all fields completed). */
+		if (mp->b_datap != NULL) {
+			__assure(mp->b_datap == NULL);
+			dump_stack();
+		}
+		/* these are strung on the free list using the b_next pointer */
+#if 1
+		base = md->databuf;
+		//md->msgblk.m_mblock.b_next = NULL;
+		md->msgblk.m_mblock.b_prev = NULL;
+		md->msgblk.m_mblock.b_cont = NULL;
+		md->msgblk.m_mblock.b_rptr = base;
+		md->msgblk.m_mblock.b_wptr = base;
+		md->msgblk.m_mblock.b_datap = &md->datablk.d_dblock;
+		md->msgblk.m_mblock.b_band = 0;
+		md->msgblk.m_mblock.b_pad1 = 0;
+		md->msgblk.m_mblock.b_flag = 0;
+		md->msgblk.m_mblock.b_csum = 0;
+#endif
+
+		if (md->datablk.d_dblock.db_ref != 0) {
+			__assure(md->datablk.d_dblock.db_ref == 0);
+			dump_stack();
+		}
+#if 1
+		md->datablk.d_dblock.db_frtnp = NULL;
+		md->datablk.d_dblock.db_base = base;
+		md->datablk.d_dblock.db_lim = base + FASTBUF;
+		md->datablk.d_dblock.db_ref = 1;
+		md->datablk.d_dblock.db_type = M_DATA;
+		md->datablk.d_dblock.db_flag = 0;
+		md->datablk.d_dblock.db_size = FASTBUF;
+#endif
+	}
+#endif
+#if !defined CONFIG_STREAMS_NORECYCLE
 	{
 		unsigned long flags;
 
