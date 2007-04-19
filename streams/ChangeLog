@@ -1,5 +1,9 @@
 2007-04-19  Brian Bidulock  <bidulock@openss7.org>
 
+	* include/sys/streams/stropts.h: imp of SNDHOLD and SNDMREAD features
+	* include/sys/streams/strsubr.h: imp of SNDHOLD and SNDMREAD features
+	* src/test/perftest.c: imp of SNDHOLD and SNDMREAD features
+
 	* doc/man/man9/M_MI.9.man: added manpage
 
 	* include/sys/streams/strsubr.h: SNDHOLD and RFILL modes

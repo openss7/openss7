@@ -344,7 +344,7 @@ enum {
 	STRDERR_BIT,
 	STWRERR_BIT,
 	STRCLOSE_BIT,
-	SNDMREAD_BIT,
+	STRMREAD_BIT,
 	STRHOLD_BIT,
 	STRNDEL_BIT,
 	STRMSIG_BIT,
@@ -370,7 +370,7 @@ enum {
 #define STRDERR	    (1<<STRDERR_BIT)	/* M_ERROR for read received */
 #define STWRERR	    (1<<STWRERR_BIT)	/* M_ERROR for write received */
 #define STRCLOSE    (1<<STRCLOSE_BIT)	/* wait for strclose to complete */
-#define SNDMREAD    (1<<SNDMREAD_BIT)	/* send M_READ msg when read issued */
+#define STRMREAD    (1<<STRMREAD_BIT)	/* send M_READ msg when read issued */
 #define STRHOLD	    (1<<STRHOLD_BIT)	/* coallese written messages */
 #define STRNDEL	    (1<<STRNDEL_BIT)	/* non-STREAM tty semantic for O_NDELAY */
 #define STRMSIG	    (1<<STRMSIG_BIT)	/* M_SIG at head of queue */
@@ -408,7 +408,7 @@ enum {
 #define F_STH_HANGUP	      STRHUP	/* M_HANGUP received, no more data */
 #define F_STH_NDELON	      0x0000	/* Do TTY semantics for ONDELAY handling. */
 #define F_STH_ISATTY	      STRISTTY	/* The stream acts as a terminal. */
-#define F_STH_MREADON	      SNDMREAD	/* Generate M_READ messages. */
+#define F_STH_MREADON	      STRMREAD	/* Generate M_READ messages. */
 #define F_STH_TOSTOP	      STRTOSTOP	/* Diallow background writes (for job control). */
 #define F_STH_PIPE	      STRISPIPE	/* Stream is one end of pipe or FIFO. */
 #define F_STH_WPIPE	      0x0000	/* Stream is "write" side of pipe. */
