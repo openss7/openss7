@@ -294,6 +294,15 @@ than was requested by
 with
 .IR nbytes ,
 the remainder of the mssage is placed back onto the Stream head read queue.
+.\"
+.TP
+.B RFILL
+Message fill modes is the same as byte-stream mode, with the exception that
+.BR read (2s)
+requests attempt to fill a buffer completely before returning to the
+application.  This mode can be used in conjuction with the
+.B SO_MREADON
+option.
 .PP
 The read control mode determines how the
 .BR read (2s)
