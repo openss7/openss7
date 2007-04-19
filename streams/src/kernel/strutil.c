@@ -2411,21 +2411,15 @@ STATIC streams_inline streams_fastcall __hot_out int
 __putq_norm(queue_t *q, mblk_t *mp)
 {
 	if (likely(mp->b_band == 0)) {
-		mblk_t *b_prev, *b_next;
-
-		b_prev = q->q_last;
-		b_next = NULL;
-		if (unlikely((q->q_count += msgsize(mp)) >= q->q_hiwat))
-			set_bit(QFULL_BIT, &q->q_flag);
-		if (likely(q->q_last == b_prev))
-			q->q_last = mp;
-		if (likely(q->q_first == b_next))
+		mp->b_next = NULL;
+		if (unlikely((mp->b_prev = q->q_last) != NULL))
+			mp->b_prev->b_next = mp;
+		q->q_last = mp;
+		if (likely(q->q_first == NULL))
 			q->q_first = mp;
 		q->q_msgs++;
-		if (unlikely((mp->b_next = b_next) != NULL))
-			b_next->b_prev = mp;
-		if (unlikely((mp->b_prev = b_prev) != NULL))
-			b_prev->b_next = mp;
+		if (unlikely((q->q_count += msgsize(mp)) >= q->q_hiwat))
+			set_bit(QFULL_BIT, &q->q_flag);
 		/* success */
 		return (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag)) && test_bit(QWANTR_BIT, &q->q_flag)));
 	}

@@ -1,5 +1,11 @@
 2007-04-19  Brian Bidulock  <bidulock@openss7.org>
 
+	* include/sys/streams/strsubr.h: SNDHOLD and RFILL modes
+	* src/kernel/strprocfs.c: SNDHOLD and RFILL modes
+	* src/kernel/strsched.c: SNDHOLD and RFILL modes
+	* src/kernel/strutil.c: SNDHOLD and RFILL modes
+	* src/modules/sth.c: SNDHOLD and RFILL modes
+
 	* include/sys/streams/stropts.h: added RFILL mode and RPROTCOMPRESS protocol
 	* include/sys/streams/stream.h: added M_MI message type and subtypes
 	* doc/man/man9/M_SETOPTS.9.man: documented RFILL mode
