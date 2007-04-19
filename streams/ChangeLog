@@ -1,5 +1,7 @@
 2007-04-19  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man9/M_MI.9.man: added manpage
+
 	* include/sys/streams/strsubr.h: SNDHOLD and RFILL modes
 	* src/kernel/strprocfs.c: SNDHOLD and RFILL modes
 	* src/kernel/strsched.c: SNDHOLD and RFILL modes
