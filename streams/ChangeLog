@@ -1,3 +1,7 @@
+2007-04-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/perftest.c: added new features
+
 2007-04-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/queue.9.man
