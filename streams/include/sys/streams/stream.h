@@ -362,7 +362,12 @@ typedef enum msg_type {
 	M_PCTTY = 0x9a,			/* v A */
 	M_CLOSE = 0x9b,			/* v H(0x94) */
 	M_CLOSE_REPL = 0x9c,		/* v H(0x95) */
+	M_MI = 0x9d,			/* ^ A */
 } msg_type_t;
+
+#define M_MI_READ_SEEK	    0
+#define M_MI_READ_RESET	    1
+#define M_MI_READ_END	    2
 
 /* 32 bytes on 32 bit, 64 on 64 bit */
 typedef struct msgb {
