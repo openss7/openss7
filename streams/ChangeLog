@@ -1,5 +1,6 @@
 2007-04-19  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/kernel/strutil.c: set db_lim to real buffer limit
 	* src/modules/sth.c: impl of SNDHOLD and SNDMREAD features
 
 	* include/sys/streams/stropts.h: imp of SNDHOLD and SNDMREAD features
