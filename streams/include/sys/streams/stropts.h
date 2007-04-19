@@ -464,14 +464,16 @@ typedef unsigned long int t_uscalar_t;
 #define RNORM		(0)	/**< Byte-stream mode. */
 #define RMSGD		(1<<0)	/**< Message discard mode. */
 #define RMSGN		(1<<1)	/**< Message non-discard mode. */
+#define RFILL		(1<<5)	/**< Byte-stream fill mode. */
 
-#define RMODEMASK	(RNORM|RMSGD|RMSGN)	/**< Mode mask. */
+#define RMODEMASK	(RNORM|RMSGD|RMSGN|RFILL)	/**< Mode mask. */
 
 #define RPROTDAT	(1<<2)	/**< Proto part as data. */
 #define RPROTDIS	(1<<3)	/**< Proto part discarded. */
 #define RPROTNORM	(1<<4)	/**< Proto part fail read EBADMSG. */
+#define RPROTCOMPRESS	(1<<6)	/**< Proto part compressed. */
 
-#define RPROTMASK	(RPROTDAT|RPROTDIS|RPROTNORM)	/**< Proto bit mask. */
+#define RPROTMASK	(RPROTDAT|RPROTDIS|RPROTNORM|RPROTCOMPRESS)	/**< Proto bit mask. */
 /** @} */
 
 /**
