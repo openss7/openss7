@@ -408,6 +408,7 @@ typedef struct dl {
 
 STATIC kmem_cachep_t dl_priv_cachep;
 
+#if 0
 static INLINE struct dl *
 dl_get(struct dl *dl)
 {
@@ -447,6 +448,7 @@ dl_alloc(void)
 	}
 	return (dl);
 }
+#endif
 
 typedef struct df {
 	rwlock_t lock;			/* structure lock */
