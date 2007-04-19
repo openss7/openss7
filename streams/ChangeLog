@@ -1,5 +1,6 @@
 2007-04-19  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man9/M_SETOPTS.9.man: documented RFILL mode
 	* src/test/perftest.c: added new features
 
 2007-04-17  Brian Bidulock  <bidulock@openss7.org>
