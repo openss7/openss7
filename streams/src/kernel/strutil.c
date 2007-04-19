@@ -526,7 +526,6 @@ allocb_fast(const size_t size, uint priority)
 	mblk_t *mp;
 	unsigned char *base;
 
-	(void) size;
 	if (likely((mp = mdbblock_alloc(priority, &allocb_fast)) != NULL)) {
 		struct mdbblock *md = mb_to_mdb(mp);
 		dblk_t *db = &md->datablk.d_dblock;
@@ -538,7 +537,7 @@ allocb_fast(const size_t size, uint priority)
 		db->db_lim = base + FASTBUF;
 		db->db_ref = 1;
 		db->db_type = M_DATA;
-		db->db_size = FASTBUF;
+		db->db_size = size;
 		db->db_flag = 0;
 		/* set up message block */
 		mp->b_next = mp->b_prev = mp->b_cont = NULL;
@@ -553,6 +552,41 @@ allocb_fast(const size_t size, uint priority)
 	return (NULL);
 }
 
+/* Linux memory allocators always round up to the next power of 2.  We can use the slop. */
+STATIC streams_inline streams_fastcall uint
+nextpower(uint y)
+{
+	uint r = 32;
+	uint x = y;
+
+	if (!(x & 0xffff0000)) {
+		x <<= 16;
+		r -= 16;
+	}
+	if (!(x & 0xff000000)) {
+		x <<= 8;
+		r -= 8;
+	}
+	if (!(x & 0xf0000000)) {
+		x <<= 4;
+		r -= 4;
+	}
+	if (!(x & 0xc0000000)) {
+		x <<= 2;
+		r -= 2;
+	}
+	if (!(x & 0x80000000)) {
+		x <<= 1;
+		r -= 1;
+	}
+	if (!(x & 0x7fffffff)) {
+		r -= 1;
+	}
+	return (1 << r);
+}
+
+/* Note that db_size is always the size that was requested.  db_lim represents the size that was
+ * acrually allocated and is usable. */
 STATIC streams_fastcall __hot_write mblk_t *
 allocb_kmem(const size_t size, uint priority)
 {
@@ -568,7 +602,7 @@ allocb_kmem(const size_t size, uint priority)
 			/* set up data block */
 			db->db_frtnp = NULL;
 			db->db_base = base;
-			db->db_lim = base + size;
+			db->db_lim = base + nextpower(size);
 			db->db_ref = 1;
 			db->db_type = M_DATA;
 			db->db_size = size;
@@ -999,7 +1033,7 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 	dp = &md->datablk.d_dblock;
 	dp->db_frtnp = NULL;
 	dp->db_base = base;
-	dp->db_lim = base + size;
+	dp->db_lim = base + nextpower(size);
 	dp->db_ref = 1;
 	dp->db_type = db->db_type;
 	dp->db_size = size;
@@ -1247,6 +1281,8 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 			prlock(sd2);
 			if (likely(test_bit(QPROCS_BIT, &q_nbsrv->q_flag) == 0)) {
 				if (test_bit(QSHEAD_BIT, &q_nbsrv->q_flag)) {
+					mblk_t *b;
+
 					/* When backenabling a queue with an active Stream head, do
 					   a little bit more. */
 					if (unlikely(sd2->sd_sigflags & (S_WRBAND | S_WRNORM))
@@ -1256,7 +1292,15 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 						wake_up_interruptible(&sd2->sd_wwaitq);
 					if (unlikely(waitqueue_active(&sd2->sd_polllist) != 0))
 						wake_up_interruptible(&sd2->sd_polllist);
-
+					/* release STRHOLD buffer */
+					if (test_bit(QHLIST_BIT, &q_nbsrv->q_flag)) {
+						if ((b = getq(q_nbsrv))) {
+							if (b->b_wptr == b->b_rptr)
+								freemsg(b);
+							else
+								qreply(q_nbsrv, b);
+						}
+					}
 				} else {
 					/* SVR4 SPG - noenable() does not prevent a queue from
 					   being back enabled by flow control */
