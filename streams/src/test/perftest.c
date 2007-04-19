@@ -163,6 +163,7 @@ int sethiwat = 0;
 int setlowat = 0;
 size_t hiwat = 0;
 size_t lowat = 0;
+int sndmread = 0;
 int readfill = 0;
 int fullreads = 0;
 int niceread = 0;
@@ -248,8 +249,8 @@ start_timer(void)
 int
 test_sync(int fds[])
 {
-	size_t tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0;
-	size_t rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0;
+	size_t tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin = PIPE_BUF, tbytmax = 0, tbyttot = 0;
+	size_t rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin = PIPE_BUF, rbytmax = 0, rbyttot = 0;
 	size_t tmsize = msgsize;
 	size_t rmsize = msgsize;
 	size_t report_count = 0;
@@ -270,31 +271,39 @@ test_sync(int fds[])
 			goto dead;
 		if (timer_timeout) {
 			{
-				size_t thrput = rbytcnt / report;
-				size_t msgcnt = rmsgcnt / report;
-				size_t avgsiz = rbytcnt / rmsgcnt;
-
-				tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
-				tavg_tput = (3 * tavg_tput + thrput) / 4;
-				fprintf(stdout, "%zu Msgs sent: %10zu (%10zu), throughput: %10zu (%10zu), size (%10zu)\n",
-					fds[1], msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz);
-				fflush(stdout);
-			}
-			{
 				size_t thrput = tbytcnt / report;
 				size_t msgcnt = tmsgcnt / report;
 				size_t avgsiz = tbytcnt / tmsgcnt;
 
-				ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
-				ravg_tput = (3 * ravg_tput + thrput) / 4;
-				fprintf(stdout, "%zu Msgs read: %10zu (%10zu), throughput: %10zu (%10zu), size (%10zu)\n",
-					fds[0], msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz);
+				tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
+				tavg_tput = (3 * tavg_tput + thrput) / 4;
+				fprintf(stdout,
+					"%zu Msgs sent: %10zu (%10zu), throughput: %10zu (%10zu), size (%4zu) %4zu-%4zu\n",
+					fds[1], msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax);
 				fflush(stdout);
 			}
-			tbytcnt -= rbytcnt;
+			{
+				size_t thrput = rbytcnt / report;
+				size_t msgcnt = rmsgcnt / report;
+				size_t avgsiz = rbytcnt / rmsgcnt;
+
+				ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
+				ravg_tput = (3 * ravg_tput + thrput) / 4;
+				fprintf(stdout,
+					"%zu Msgs read: %10zu (%10zu), throughput: %10zu (%10zu), size (%4zu) %4zu-%4zu\n",
+					fds[0], msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax);
+				fflush(stdout);
+			}
+			tbyttot -= rbyttot;
+			rbyttot = 0;
+			tbytcnt = 0;
 			tmsgcnt = 0;
+			tbytmin = PIPE_BUF;
+			tbytmax = 0;
 			rbytcnt = 0;
 			rmsgcnt = 0;
+			rbytmin = PIPE_BUF;
+			rbytmax = 0;
 			report_count++;
 			if (iterations > 0 && report_count >= iterations) {
 				close(fds[0]);
@@ -307,15 +316,20 @@ test_sync(int fds[])
 				goto dead;
 			}
 		}
-		if (rbytcnt < tbytcnt) {
+		if (tbyttot > rbyttot + PIPE_BUF) {
 			int ret = 0;
 
 			if (readwrite) {
 				while (!timer_timeout && (ret = read(fds[0], my_msg, rmsize)) > 0) {
 					rbytcnt += ret;
+					rbyttot += ret;
 					if (rbytcnt < 0)
 						goto dead;
 					rmsgcnt += 1;
+					if (ret < rbytmin)
+						rbytmin = ret;
+					if (ret > rbytmax)
+						rbytmax = ret;
 					if (blocking)
 						break;
 				}
@@ -327,9 +341,14 @@ test_sync(int fds[])
 				while (!timer_timeout
 				       && (ret = getmsg(fds[0], &cbuf, &dbuf, &flags)) != -1) {
 					rbytcnt += dbuf.len;
+					rbyttot += dbuf.len;
 					if (rbytcnt < 0)
 						goto dead;
 					rmsgcnt += 1;
+					if (ret < rbytmin)
+						rbytmin = ret;
+					if (ret > rbytmax)
+						rbytmax = ret;
 					if (blocking)
 						break;
 				}
@@ -346,26 +365,37 @@ test_sync(int fds[])
 				}
 			}
 		}
-		if (tbytcnt <= rbytcnt) {
+		if (tbyttot <= rbyttot + PIPE_BUF) {
 			int ret = 0;
 
 			if (readwrite) {
 				while (!timer_timeout && (ret = write(fds[1], my_msg, tmsize)) > 0) {
 					tbytcnt += ret;
+					tbyttot += ret;
 					if (tbytcnt < 0)
 						goto dead;
 					tmsgcnt += 1;
+					if (ret < tbytmin)
+						tbytmin = ret;
+					if (ret > tbytmax)
+						tbytmax = ret;
 					if (blocking)
 						break;
 				}
 			} else {
 				struct strbuf dbuf = { 0, tmsize, my_msg };
 
-				while (!timer_timeout && (ret = putmsg(fds[1], NULL, &dbuf, 0)) != -1) {
+				while (!timer_timeout
+				       && (ret = putmsg(fds[1], NULL, &dbuf, 0)) != -1) {
 					tbytcnt += tmsize;
+					tbyttot += tmsize;
 					if (tbytcnt < 0)
 						goto dead;
 					tmsgcnt += 1;
+					if (ret < tbytmin)
+						tbytmin = ret;
+					if (ret > tbytmax)
+						tbytmax = ret;
 					if (blocking)
 						break;
 				}
@@ -395,7 +425,7 @@ test_sync(int fds[])
 int
 read_child(int fd)
 {
-	size_t rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0;
+	size_t rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin = PIPE_BUF, rbytmax = 0;
 	size_t rmsize = msgsize;
 	struct pollfd pfd = { fd, POLLIN | POLLERR | POLLHUP, 0 };
 	int report_count = 0;
@@ -424,11 +454,14 @@ read_child(int fd)
 
 			ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
 			ravg_tput = (3 * ravg_tput + thrput) / 4;
-			fprintf(stdout, "%zu Msgs read: %10zu (%10zu), throughput: %10zu (%10zu), size (%10zu)\n", fd,
-				msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz);
+			fprintf(stdout,
+				"%zu Msgs read: %10zu (%10zu), throughput: %10zu (%10zu), size (%4zu) %4zu-%4zu\n",
+				fd, msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax);
 			fflush(stdout);
 			rbytcnt = 0;
 			rmsgcnt = 0;
+			rbytmin = PIPE_BUF;
+			rbytmax = 0;
 			report_count++;
 			if (iterations > 0 && report_count >= iterations) {
 				close(fd);
@@ -459,6 +492,10 @@ read_child(int fd)
 					if (rbytcnt < 0)
 						goto dead;
 					rmsgcnt += 1;
+					if (ret < rbytmin)
+						rbytmin = ret;
+					if (ret > rbytmax)
+						rbytmax = ret;
 				}
 			} else {
 				int flags = 0;
@@ -471,6 +508,10 @@ read_child(int fd)
 					if (rbytcnt < 0)
 						goto dead;
 					rmsgcnt += 1;
+					if (ret < rbytmin)
+						rbytmin = ret;
+					if (ret > rbytmax)
+						rbytmax = ret;
 				}
 			}
 			if (ret < 0) {
@@ -505,7 +546,7 @@ read_child(int fd)
 int
 write_child(int fd)
 {
-	size_t tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0;
+	size_t tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin = PIPE_BUF, tbytmax = 0;
 	size_t tmsize = msgsize;
 	struct pollfd pfd = { fd, POLLOUT | POLLERR | POLLHUP, 0 };
 	int report_count = 0;
@@ -532,11 +573,14 @@ write_child(int fd)
 
 			tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
 			tavg_tput = (3 * tavg_tput + thrput) / 4;
-			fprintf(stdout, "%zu Msgs sent: %10zu (%10zu), throughput: %10zu (%10zu), size (%10zu)\n", fd,
-				msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz);
+			fprintf(stdout,
+				"%zu Msgs sent: %10zu (%10zu), throughput: %10zu (%10zu), size (%4zu) %4zu-%4zu\n",
+				fd, msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax);
 			fflush(stdout);
 			tbytcnt = 0;
 			tmsgcnt = 0;
+			tbytmin = PIPE_BUF;
+			tbytmax = 0;
 			report_count++;
 			if (iterations > 0 && report_count >= iterations) {
 				close(fd);
@@ -567,6 +611,10 @@ write_child(int fd)
 					if (tbytcnt < 0)
 						goto dead;
 					tmsgcnt += 1;
+					if (ret < tbytmin)
+						tbytmin = ret;
+					if (ret > tbytmax)
+						tbytmax = ret;
 				}
 			} else {
 				struct strbuf dbuf = { 0, tmsize, my_msg };
@@ -576,6 +624,10 @@ write_child(int fd)
 					if (tbytcnt < 0)
 						goto dead;
 					tmsgcnt += 1;
+					if (ret < tbytmin)
+						tbytmin = ret;
+					if (ret > tbytmax)
+						tbytmax = ret;
 				}
 			}
 			if (ret < 0) {
@@ -779,7 +831,7 @@ do_tests(void)
 #endif
 #ifdef RFILL
 		if (readfill) {
-			if (ioctl(fds[0], I_SRDOPT, (RFILL|RPROTNORM)) < 0) {
+			if (ioctl(fds[0], I_SRDOPT, (RFILL | RPROTNORM)) < 0) {
 				if (verbose)
 					perror("ioctl(I_SRDOPT)");
 				goto dead;
@@ -845,7 +897,28 @@ do_tests(void)
 #endif
 #ifdef SNDHOLD
 		if (strhold) {
-			if (ioctl(fds[1], I_SWROPT, (SNDPIPE | SNDHOLD)) < 0) {
+			int wropts = SNDPIPE | SNDHOLD;
+
+#ifdef SNDMREAD
+			if (sndmread)
+				wropts |= SNDMREAD;
+#endif
+			if (ioctl(fds[1], I_SWROPT, wropts) < 0) {
+				if (verbose)
+					perror("ioctl(I_SWROPT)");
+				goto dead;
+			}
+		}
+#endif
+#ifdef SNDMREAD
+		if (sndmread) {
+			int wropts = SNDPIPE | SNDMREAD;
+
+#ifdef SNDHOLD
+			if (strhold)
+				wropts |= SNDHOLD;
+#endif
+			if (ioctl(fds[1], I_SWROPT, wropts) < 0) {
 				if (verbose)
 					perror("ioctl(I_SWROPT)");
 				goto dead;
@@ -1007,8 +1080,14 @@ Options:\n\
         Set high water mark on stream head.\n\
     --lowat=LOWAT\n\
         Set low water mark on stream head.\n\
+    -M, --mread\n\
+        Issue M_READ messages.\n\
     -w, --readfill\n\
         Read fill mode.\n\
+    -R, --niceread\n\
+        Run read child nice 19.\n\
+    -S, --nicesend\n\
+        Run write child nice 19.\n\
     -F, --full\n\
         Perform full size reads.\n\
     -H, --hold\n\
@@ -1057,6 +1136,7 @@ main(int argc, char *argv[])
 		static struct option long_options[] = {
 			{"hiwat",	required_argument,	NULL, '\1'},
 			{"lowat",	required_argument,	NULL, '\2'},
+			{"mread",	no_argument,		NULL, 'M'},
 			{"readfill",	no_argument,		NULL, 'w'},
 			{"niceread",	no_argument,		NULL, 'R'},
 			{"nicesend",	no_argument,		NULL, 'S'},
@@ -1081,24 +1161,28 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "wRSFm:Hafp:bs:rt:i:qvhV?W:", long_options, &option_index);
+		c = getopt_long(argc, argv, "MwRSFm:Hafp:bs:rt:i:qvhV?W:", long_options,
+				&option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "wRSFm:Hafp:bs:rt:i:qvhV?");
+		c = getopt(argc, argv, "MwRSFm:Hafp:bs:rt:i:qvhV?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
-		case '\1': /* --hiwat=HIWAT */
+		case '\1':	/* --hiwat=HIWAT */
 			sethiwat = 1;
 			hiwat = strtoul(optarg, NULL, 0);
 			if (setlowat && hiwat < lowat)
 				goto bad_option;
 			break;
-		case '\2': /* --lowat=LOWAT */
+		case '\2':	/* --lowat=LOWAT */
 			setlowat = 1;
 			lowat = strtoul(optarg, NULL, 0);
 			if (sethiwat && lowat > hiwat)
 				goto bad_option;
+			break;
+		case 'M':
+			sndmread = 1;
 			break;
 		case 'w':
 			readfill = 1;
