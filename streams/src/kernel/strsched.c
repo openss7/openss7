@@ -998,7 +998,6 @@ mdbblock_alloc_slow(uint priority, void *func)
 #endif
 		_trace();
 		if (likely((mp = kmem_cache_alloc(sdi->si_cache, slab_flags)) != NULL)) {
-			struct mdbblock *md = (struct mdbblock *) mp;
 #if defined CONFIG_STREAMS_DEBUG
 			struct mdbblock *md = (struct mdbblock *) mp;
 			struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
@@ -1026,24 +1025,24 @@ mdbblock_alloc_slow(uint priority, void *func)
 			if (atomic_read(&sdi->si_cnt) > sdi->si_hwl)
 				sdi->si_hwl = atomic_read(&sdi->si_cnt);
 #endif
-			__assure(md->msgblk.m_mblock.b_next == NULL);
-			__assure(md->msgblk.m_mblock.b_prev == NULL);
-			__assure(md->msgblk.m_mblock.b_cont == NULL);
-			__assure(md->msgblk.m_mblock.b_rptr == md->databuf);
-			__assure(md->msgblk.m_mblock.b_wptr == md->databuf);
-			__assure(md->msgblk.m_mblock.b_datap == &md->datablk.d_dblock);
-			__assure(md->msgblk.m_mblock.b_band == 0);
-			__assure(md->msgblk.m_mblock.b_pad1 == 0);
-			__assure(md->msgblk.m_mblock.b_flag == 0);
-			__assure(md->msgblk.m_mblock.b_csum == 0);
+			_assure(md->msgblk.m_mblock.b_next == NULL);
+			_assure(md->msgblk.m_mblock.b_prev == NULL);
+			_assure(md->msgblk.m_mblock.b_cont == NULL);
+			_assure(md->msgblk.m_mblock.b_rptr == md->databuf);
+			_assure(md->msgblk.m_mblock.b_wptr == md->databuf);
+			_assure(md->msgblk.m_mblock.b_datap == &md->datablk.d_dblock);
+			_assure(md->msgblk.m_mblock.b_band == 0);
+			_assure(md->msgblk.m_mblock.b_pad1 == 0);
+			_assure(md->msgblk.m_mblock.b_flag == 0);
+			_assure(md->msgblk.m_mblock.b_csum == 0);
 
-			__assure(md->datablk.d_dblock.db_frtnp == NULL);
-			__assure(md->datablk.d_dblock.db_base == md->databuf);
-			__assure(md->datablk.d_dblock.db_lim == md->databuf + FASTBUF);
-			__assure(md->datablk.d_dblock.db_ref == 1);
-			__assure(md->datablk.d_dblock.db_type == M_DATA);
-			__assure(md->datablk.d_dblock.db_flag == 0);
-			__assure(md->datablk.d_dblock.db_size == FASTBUF);
+			_assure(md->datablk.d_dblock.db_frtnp == NULL);
+			_assure(md->datablk.d_dblock.db_base == md->databuf);
+			_assure(md->datablk.d_dblock.db_lim == md->databuf + FASTBUF);
+			_assure(md->datablk.d_dblock.db_ref == 1);
+			_assure(md->datablk.d_dblock.db_type == M_DATA);
+			_assure(md->datablk.d_dblock.db_flag == 0);
+			_assure(md->datablk.d_dblock.db_size == FASTBUF);
 
 			_ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
 		}
@@ -1075,7 +1074,7 @@ mdbblock_alloc(uint priority, void *func)
 		mp = t->freemblk_head;
 		prefetchw(mp);
 		if (likely(mp != NULL)) {
-			struct mdbblock *md = (struct mdbblock *) mp;
+			//struct mdbblock *md = (struct mdbblock *) mp;
 
 			/* free block list normally has more than one block on it */
 			if (likely((t->freemblk_head = mp->b_next) != NULL))
@@ -1105,24 +1104,24 @@ mdbblock_alloc(uint priority, void *func)
 #endif
 			}
 
-			__assure(md->msgblk.m_mblock.b_next == NULL);
-			__assure(md->msgblk.m_mblock.b_prev == NULL);
-			__assure(md->msgblk.m_mblock.b_cont == NULL);
-			__assure(md->msgblk.m_mblock.b_rptr == md->databuf);
-			__assure(md->msgblk.m_mblock.b_wptr == md->databuf);
-			__assure(md->msgblk.m_mblock.b_datap == &md->datablk.d_dblock);
-			__assure(md->msgblk.m_mblock.b_band == 0);
-			__assure(md->msgblk.m_mblock.b_pad1 == 0);
-			__assure(md->msgblk.m_mblock.b_flag == 0);
-			__assure(md->msgblk.m_mblock.b_csum == 0);
+			_assure(md->msgblk.m_mblock.b_next == NULL);
+			_assure(md->msgblk.m_mblock.b_prev == NULL);
+			_assure(md->msgblk.m_mblock.b_cont == NULL);
+			_assure(md->msgblk.m_mblock.b_rptr == md->databuf);
+			_assure(md->msgblk.m_mblock.b_wptr == md->databuf);
+			_assure(md->msgblk.m_mblock.b_datap == &md->datablk.d_dblock);
+			_assure(md->msgblk.m_mblock.b_band == 0);
+			_assure(md->msgblk.m_mblock.b_pad1 == 0);
+			_assure(md->msgblk.m_mblock.b_flag == 0);
+			_assure(md->msgblk.m_mblock.b_csum == 0);
 
-			__assure(md->datablk.d_dblock.db_frtnp == NULL);
-			__assure(md->datablk.d_dblock.db_base == md->databuf);
-			__assure(md->datablk.d_dblock.db_lim == md->databuf + FASTBUF);
-			__assure(md->datablk.d_dblock.db_ref == 1);
-			__assure(md->datablk.d_dblock.db_type == M_DATA);
-			__assure(md->datablk.d_dblock.db_flag == 0);
-			__assure(md->datablk.d_dblock.db_size == FASTBUF);
+			_assure(md->datablk.d_dblock.db_frtnp == NULL);
+			_assure(md->datablk.d_dblock.db_base == md->databuf);
+			_assure(md->datablk.d_dblock.db_lim == md->databuf + FASTBUF);
+			_assure(md->datablk.d_dblock.db_ref == 1);
+			_assure(md->datablk.d_dblock.db_type == M_DATA);
+			_assure(md->datablk.d_dblock.db_flag == 0);
+			_assure(md->datablk.d_dblock.db_size == FASTBUF);
 
 			_ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
 			return (mp);
@@ -1223,47 +1222,33 @@ mdbblock_free(mblk_t *mp)
 	dassert(mp->b_next == NULL);	/* check double free */
 	// mp->b_next = NULL;
 #endif				/* !defined CONFIG_STREAMS_NORECYCLE */
-#if 1
 	{
 		struct mdbblock *md = (struct mdbblock *) mp;
-		unsigned char *base;
+		dblk_t *db = &md->datablk.d_dblock;
+		unsigned char *base = md->databuf;
 
 		/* clean the state before putting it back, save mutlitple initializations elsewhere 
 		   and reduces code paths.  Optimized for FASTBUFS (all fields completed). */
-		if (mp->b_datap != NULL) {
-			__assure(mp->b_datap == NULL);
-			dump_stack();
-		}
 		/* these are strung on the free list using the b_next pointer */
-#if 1
-		base = md->databuf;
-		//md->msgblk.m_mblock.b_next = NULL;
-		md->msgblk.m_mblock.b_prev = NULL;
-		md->msgblk.m_mblock.b_cont = NULL;
-		md->msgblk.m_mblock.b_rptr = base;
-		md->msgblk.m_mblock.b_wptr = base;
-		md->msgblk.m_mblock.b_datap = &md->datablk.d_dblock;
-		md->msgblk.m_mblock.b_band = 0;
-		md->msgblk.m_mblock.b_pad1 = 0;
-		md->msgblk.m_mblock.b_flag = 0;
-		md->msgblk.m_mblock.b_csum = 0;
-#endif
+		mp->b_next = NULL;
+		mp->b_prev = NULL;
+		mp->b_cont = NULL;
+		mp->b_rptr = base;
+		mp->b_wptr = base;
+		mp->b_datap = db;
+		mp->b_band = 0;
+		mp->b_pad1 = 0;
+		mp->b_flag = 0;
+		mp->b_csum = 0;
 
-		if (md->datablk.d_dblock.db_ref != 0) {
-			__assure(md->datablk.d_dblock.db_ref == 0);
-			dump_stack();
-		}
-#if 1
-		md->datablk.d_dblock.db_frtnp = NULL;
-		md->datablk.d_dblock.db_base = base;
-		md->datablk.d_dblock.db_lim = base + FASTBUF;
-		md->datablk.d_dblock.db_ref = 1;
-		md->datablk.d_dblock.db_type = M_DATA;
-		md->datablk.d_dblock.db_flag = 0;
-		md->datablk.d_dblock.db_size = FASTBUF;
-#endif
+		db->db_frtnp = NULL;
+		db->db_base = base;
+		db->db_lim = base + FASTBUF;
+		db->db_ref = 1;
+		db->db_type = M_DATA;
+		db->db_flag = 0;
+		db->db_size = FASTBUF;
 	}
-#endif
 #if !defined CONFIG_STREAMS_NORECYCLE
 	{
 		unsigned long flags;
@@ -3465,7 +3450,7 @@ putnext(queue_t *q, mblk_t *mp)
 	dassert(qstream(q));
 	prlock(qstream(q));
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
-		__assure(q->q_next != NULL);
+		_assure(q->q_next != NULL);
 #ifdef CONFIG_STREAMS_SYNCQS
 		qputp(q->q_next, mp);
 #else
