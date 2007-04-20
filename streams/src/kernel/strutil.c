@@ -241,36 +241,6 @@ db_dec_and_test(register dblk_t *db)
 	return (db_dec_and_test_slow(db));
 }
 
-#if 0
-#define msgblk_offset \
-	(((unsigned char *)&((struct mdbblock *)0)->msgblk) - ((unsigned char *)0))
-#define datablk_offset \
-	(((unsigned char *)&((struct mdbblock *)0)->datablk) - ((unsigned char *)0))
-#define databuf_offset \
-	(((unsigned char *)&((struct mdbblock *)0)->databuf[0]) - ((unsigned char *)0))
-
-STATIC streams_inline streams_fastcall __hot_in mblk_t *
-db_to_mb(dblk_t *db)
-{
-	return ((mblk_t *) ((unsigned char *) db - datablk_offset + msgblk_offset));
-}
-STATIC streams_inline streams_fastcall __hot_in unsigned char *
-db_to_buf(dblk_t *db)
-{
-	return ((unsigned char *) db - datablk_offset + databuf_offset);
-}
-
-STATIC streams_inline streams_fastcall __hot_in dblk_t *
-mb_to_db(mblk_t *mb)
-{
-	return ((dblk_t *) ((unsigned char *) mb - msgblk_offset + datablk_offset));
-}
-STATIC streams_inline streams_fastcall __hot_out struct mdbblock *
-mb_to_mdb(mblk_t *mb)
-{
-	return ((struct mdbblock *) ((unsigned char *) mb - msgblk_offset));
-}
-#else
 STATIC streams_inline streams_fastcall __hot_out struct mdbblock *
 mb_to_mdb(register mblk_t *mb)
 {
@@ -292,7 +262,6 @@ mb_to_db(register mblk_t *mb)
 {
 	return (&mb_to_mdb(mb)->datablk.d_dblock);
 }
-#endif
 
 /**
  *  adjmsg:	- adjust a message
@@ -2828,19 +2797,16 @@ qdelete(queue_t *q)
 	rq->q_next = NULL;
 	rq->q_nfsrv = NULL;
 	rq->q_nbsrv = NULL;
-#if 1
 	rq->q_putp = NULL;
 	rq->q_srvp = NULL;
 	rq->q_ptr = NULL;
-#endif
+
 	wq->q_next = NULL;
 	wq->q_nfsrv = NULL;
 	wq->q_nbsrv = NULL;
-#if 1
 	wq->q_putp = NULL;
 	wq->q_srvp = NULL;
 	wq->q_ptr = NULL;
-#endif
 
 	if (sd2 && sd2 > sd)
 		phwunlock(sd2);
@@ -3002,9 +2968,6 @@ qprocsoff(queue_t *q)
 	queue_t *wq = (q + 1);
 	struct stdata *sd = rqstream(q);
 
-#if 0
-	assert(current_context() <= CTX_STREAMS);
-#endif
 	assert(sd);
 
 	/* only one qprocsoff() happens at a time */
@@ -3051,54 +3014,30 @@ qprocsoff(queue_t *q)
 		   not reconect it when popping a module off of the near side. */
 		if (test_bit(QSRVP_BIT, &rq->q_flag) || rq->q_next == NULL) {
 			for (bq = rq->q_nbsrv; bq && bq != rq; bq = bq->q_next)
-#if 0
-				bq->q_nfsrv = rq->q_nfsrv;
-#else
 				if (bq->q_nfsrv == rq)
 					bq->q_nfsrv = rq->q_nfsrv;
-#endif
 			for (bq = rq->q_nfsrv; bq && bq != rq; bq = backq(bq))
-#if 0
-				bq->q_nbsrv = rq->q_nbsrv;
-#else
 				if (bq->q_nbsrv == rq)
 					bq->q_nbsrv = rq->q_nbsrv;
-#endif
 		}
 		if (test_bit(QSRVP_BIT, &wq->q_flag) || wq->q_next == NULL) {
 			for (bq = wq->q_nbsrv; bq && bq != wq; bq = bq->q_next)
-#if 0
-				bq->q_nfsrv = wq->q_nfsrv;
-#else
 				if (bq->q_nfsrv == wq)
 					bq->q_nfsrv = wq->q_nfsrv;
-#endif
 			for (bq = wq->q_nfsrv; bq && bq != wq; bq = backq(bq))
-#if 0
-				bq->q_nbsrv = wq->q_nbsrv;
-#else
 				if (bq->q_nbsrv == wq)
 					bq->q_nbsrv = wq->q_nbsrv;
-#endif
 		}
 
 		/* bypass this module: works for pipe, FIFO and other Stream heads queues too */
 		/* Careful that if a Stream head across a twist is already disconnected that we do
 		   not reconnect it when popping a module off of the near side. */
 		if ((bq = backq(rq)))
-#if 0
-			bq->q_next = rq->q_next;
-#else
 			if (bq->q_next == rq)
 				bq->q_next = rq->q_next;
-#endif
 		if ((bq = backq(wq)))
-#if 0
-			bq->q_next = wq->q_next;
-#else
 			if (bq->q_next == wq)
 				bq->q_next = wq->q_next;
-#endif
 
 #ifndef SSIZE_MAX
 #ifdef _POSIX_SSIZE_MAX
@@ -3168,9 +3107,6 @@ qprocson(queue_t *q)
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
 
-#if 0
-	assert(current_context() <= CTX_STREAMS);
-#endif
 	dassert(rq);
 	/* only one qprocson() happens at a time */
 	if (test_bit(QPROCS_BIT, &rq->q_flag)) {

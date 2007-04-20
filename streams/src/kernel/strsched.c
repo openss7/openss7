@@ -900,7 +900,6 @@ mdbblock_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 
 		_ptrace(("Constructor for mblk %p\n", obj));
 		bzero(md, sizeof(*md));
-#if 1
 		base = md->databuf;
 		/* set up blocks as a fast buffer */
 		md->msgblk.m_mblock.b_next = NULL;
@@ -916,11 +915,9 @@ mdbblock_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 		md->msgblk.m_func = NULL;
 		md->msgblk.m_queue = NULL;
 		md->msgblk.m_private = NULL;
-#endif
 #if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD(&md->msgblk.m_list);
 #endif
-#if 1
 		md->datablk.d_dblock.db_frtnp = NULL;
 		md->datablk.d_dblock.db_base = base;
 		md->datablk.d_dblock.db_lim = base + FASTBUF;
@@ -928,7 +925,6 @@ mdbblock_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 		md->datablk.d_dblock.db_type = M_DATA;
 		md->datablk.d_dblock.db_flag = 0;
 		md->datablk.d_dblock.db_size = FASTBUF;
-#endif
 #if defined CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD(&md->datablk.db_list);
 #endif
@@ -1256,14 +1252,9 @@ mdbblock_free(mblk_t *mp)
 		/* Originally freed blocks were added to the end of the list but this does not keep 
 		   mblks hot, so now a push-down pop-up stack is used instead. */
 		streams_local_save(flags);
-#if 1
 		if (unlikely((mp->b_next = t->freemblk_head) == NULL))
 			t->freemblk_tail = &mp->b_next;
 		t->freemblk_head = mp;
-#else
-		*(t->freemblk_tail) = mp;
-		t->freemblk_tail = &mp->b_next;
-#endif
 		t->freemblks++;
 		streams_local_restore(flags);
 	}
