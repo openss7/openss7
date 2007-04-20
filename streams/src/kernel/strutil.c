@@ -412,28 +412,24 @@ skballoc(struct sk_buff *skb, uint priority)
 #ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
 		*(struct module **) (frtnp + 1) = NULL;
 #endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+		/* set up message block */
+		//_ensure(mp->b_next == NULL, mp->b_next = NULL);
+		//_ensure(mp->b_prev == NULL, mp->b_prev = NULL);
+		//_ensure(mp->b_cont == NULL, mp->b_cont = NULL);
+		mp->b_rptr = skb->data;
+		mp->b_wptr = skb->tail;
+		//_ensure(mp->b_datap == db, mp->b_datap = db);
+		//_ensure(mp->b_band == 0, mp->b_band = 0);
+		//_ensure(mp->b_flag == 0, mp->b_flag = 0);
+		//_ensure(mp->b_csum == 0, mp->b_csum = 0);
 		/* set up data block */
 		db->db_frtnp = frtnp;
 		db->db_base = skb->head;
 		db->db_lim = skb->end;
-		db->db_ref = 1;
-#if 1
-		db->db_type = M_DATA;
-#endif
+		//_ensure(db->db_ref == 1, db->db_ref = 1);
+		//_ensure(db->db_type == M_DATA, db->db_type = M_DATA);
 		db->db_size = skb->end - skb->head;
 		db->db_flag = DB_SKBUFF;
-		/* set up message block */
-#if 1
-		mp->b_next = mp->b_prev = mp->b_cont = NULL;
-#endif
-		mp->b_rptr = skb->data;
-		mp->b_wptr = skb->tail;
-		mp->b_datap = db;
-#if 1
-		mp->b_band = 0;
-		mp->b_flag = 0;
-		mp->b_csum = 0;
-#endif
 		return (mp);
 	}
 	return (NULL);
@@ -478,30 +474,24 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 				if (try_module_get(kmod))
 					*(struct module **) (frtnp + 1) = kmod;
 #endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+		/* set up message block */
+		//_ensure(mp->b_next == NULL, mp->b_next = NULL);
+		//_ensure(mp->b_prev == NULL, mp->b_prev = NULL);
+		//_ensure(mp->b_cont == NULL, mp->b_cont = NULL);
+		mp->b_rptr = base;
+		mp->b_wptr = base;
+		//_ensure(mp->b_datap == db, mp->b_datap = db);
+		//_ensure(mp->b_band == 0, mp->b_band = 0);
+		//_ensure(mp->b_flag == 0, mp->b_flag = 0);
+		//_ensure(mp->b_csum == 0, mp->b_csum = 0);
 		/* set up data block */
 		db->db_frtnp = frtnp;
 		db->db_base = base;
 		db->db_lim = base + size;
-		db->db_ref = 1;
-#if 1
-		db->db_type = M_DATA;
-#endif
+		//_ensure(db->db_ref == 1, db->db_ref = 1);
+		//_ensure(db->db_type == M_DATA, db->db_type = M_DATA);
 		db->db_size = size;
-#if 1
-		db->db_flag = 0;
-#endif
-		/* set up message block */
-#if 1
-		mp->b_next = mp->b_prev = mp->b_cont = NULL;
-#endif
-		mp->b_rptr = base;
-		mp->b_wptr = base;
-		mp->b_datap = db;
-#if 1
-		mp->b_band = 0;
-		mp->b_flag = 0;
-		mp->b_csum = 0;
-#endif
+		//_ensure(db->db_flag == 0, db->db_flag = 0);
 		return (mp);
 	}
 	return (NULL);
@@ -538,57 +528,32 @@ STATIC streams_fastcall __hot_write mblk_t *
 allocb_fast(const size_t size, uint priority)
 {
 	mblk_t *mp;
-#if 1
-	unsigned char *base;
-#endif
 
 	if (likely((mp = mdbblock_alloc(priority, &allocb_fast)) != NULL)) {
-		struct mdbblock *md = mb_to_mdb(mp);
-		dblk_t *db = &md->datablk.d_dblock;
+		//struct mdbblock *md = mb_to_mdb(mp);
+		//dblk_t *db = &md->datablk.d_dblock;
+		//unsigned char *base = md->databuf;
 
-#if 1
-		base = md->databuf;
-#endif
-		/* set up data block */
-		__assure(db->db_frtnp == NULL);
-		__assure(db->db_base == base);
-		__assure(db->db_lim == base + FASTBUF);
-#if 1
-		db->db_frtnp = NULL;
-		db->db_base = base;
-		db->db_lim = base + FASTBUF;
-#endif
-		__assure(db->db_ref == 1);
-		db->db_ref = 1;
-		__assure(db->db_type == M_DATA);
-		//__assure(db->db_size == size);
-		__assure(db->db_flag == 0);
-#if 1
-		db->db_type = M_DATA;
-		db->db_size = size;
-		db->db_flag = 0;
-#endif
+		//(void) db;
+		//(void) base;
 		/* set up message block */
-		__assure(mp->b_next == NULL);
-		__assure(mp->b_prev == NULL);
-		__assure(mp->b_cont == NULL);
-		__assure(mp->b_rptr == base);
-		__assure(mp->b_wptr == base);
-#if 1
-		mp->b_next = mp->b_prev = mp->b_cont = NULL;
-		mp->b_rptr = base;
-		mp->b_wptr = base;
-#endif
-		__assure(mp->b_datap == db);
-		mp->b_datap = db;
-		__assure(mp->b_band == 0);
-		__assure(mp->b_flag == 0);
-		__assure(mp->b_csum == 0);
-#if 1
-		mp->b_band = 0;
-		mp->b_flag = 0;
-		mp->b_csum = 0;
-#endif
+		//_ensure(mp->b_next == NULL, mp->b_next = NULL);
+		//_ensure(mp->b_prev == NULL, mp->b_prev = NULL);
+		//_ensure(mp->b_cont == NULL, mp->b_cont = NULL);
+		//_ensure(mp->b_rptr == base, mp->b_rptr = base);
+		//_ensure(mp->b_wptr == base, mp->b_wptr = base);
+		//_ensure(mp->b_datap == db, mp->b_datap = db);
+		//_ensure(mp->b_band == 0, mp->b_band = 0);
+		//_ensure(mp->b_flag == 0, mp->b_flag = 0);
+		//_ensure(mp->b_csum == 0, mp->b_csum = 0);
+		/* set up data block */
+		//_ensure(db->db_frtnp == NULL, db->db_frtnp = NULL);
+		//_ensure(db->db_base == base, db->db_base = base);
+		//_ensure(db->db_lim == base + FASTBUF, db->db_lim = base + FASTBUF);
+		//_ensure(db->db_ref == 1, db->db_ref = 1);
+		//_ensure(db->db_type == M_DATA, db->db_type = M_DATA);
+		//_ensure(db->db_size == FASTBUF, db->db_size = FASTBUF);
+		//_ensure(db->db_flag == 0, db->db_flag = 0);
 		return (mp);
 	}
 	return (NULL);
@@ -641,32 +606,24 @@ allocb_kmem(const size_t size, uint priority)
 			struct mdbblock *md = mb_to_mdb(mp);
 			dblk_t *db = &md->datablk.d_dblock;
 
-			/* set up data block */
-#if 1
-			db->db_frtnp = NULL;
-#endif
-			db->db_base = base;
-			db->db_lim = base + nextpower(size);
-			db->db_ref = 1;
-#if 1
-			db->db_type = M_DATA;
-#endif
-			db->db_size = size;
-#if 1
-			db->db_flag = 0;
-#endif
 			/* set up message block */
-#if 1
-			mp->b_next = mp->b_prev = mp->b_cont = NULL;
-#endif
+			//_ensure(mp->b_next == NULL, mp->b_next = NULL);
+			//_ensure(mp->b_prev == NULL, mp->b_prev = NULL);
+			//_ensure(mp->b_cont == NULL, mp->b_cont = NULL);
 			mp->b_rptr = base;
 			mp->b_wptr = base;
-			mp->b_datap = db;
-#if 1
-			mp->b_band = 0;
-			mp->b_flag = 0;
-			mp->b_csum = 0;
-#endif
+			//_ensure(mp->b_datap == db, mp->b_datap = db);
+			//_ensure(mp->b_band == 0, mp->b_band = 0);
+			//_ensure(mp->b_flag == 0, mp->b_flag = 0);
+			//_ensure(mp->b_csum == 0, mp->b_csum = 0);
+			/* set up data block */
+			//_ensure(db->db_frtnp == NULL, db->db_frtnp = NULL);
+			db->db_base = base;
+			db->db_lim = base + nextpower(size);
+			//_ensure(db->db_ref == 1, db->db_ref = 1);
+			//_ensure(db->db_type == M_DATA, db->db_type = M_DATA);
+			db->db_size = size;
+			//_ensure(db->db_flag == 0, db->db_flag = 0);
 			return (mp);
 		}
 		kmem_free(base, size);
@@ -785,23 +742,15 @@ dupb(mblk_t *bp)
 		dblk_t *db = bp->b_datap;
 
 		db_inc(db);
-#if 0
-		*mp = *bp;
-		mp->b_next = mp->b_prev = mp->b_cont = NULL;
-#else
-#if 1
-		mp->b_next = NULL;
-		mp->b_prev = NULL;
-		mp->b_cont = NULL;
-#endif
+		//_ensure(mp->b_next == NULL, mp->b_next = NULL);
+		//_ensure(mp->b_prev == NULL, mp->b_prev = NULL);
+		//_ensure(mp->b_cont == NULL, mp->b_cont = NULL);
 		mp->b_rptr = bp->b_rptr;
 		mp->b_wptr = bp->b_wptr;
 		mp->b_datap = bp->b_datap;
 		mp->b_band = bp->b_band;
 		mp->b_flag = bp->b_flag;
 		mp->b_csum = bp->b_csum;
-
-#endif
 		/* mark datab unused */
 		db = &md->datablk.d_dblock;
 		db->db_ref = 0;
@@ -1085,17 +1034,13 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 	md->msgblk.m_mblock.b_datap = NULL;
 	/* fill out data block */
 	dp = &md->datablk.d_dblock;
-#if 1
-	dp->db_frtnp = NULL;
-#endif
+	//_ensure(dp->db_frtnp == NULL, dp->db_frtnp = NULL);
 	dp->db_base = base;
 	dp->db_lim = base + nextpower(size);
-	dp->db_ref = 1;
+	//_ensure(dp->db_ref == 1, dp->db_ref = 1);
 	dp->db_type = db->db_type;
 	dp->db_size = size;
-#if 1
-	dp->db_flag = 0;
-#endif
+	//_ensure(dp->db_flag == 0, dp->db_flag = 0);
 	/* copy from old initial datab */
 	if ((blen = bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0)) {
 		bcopy(mp->b_rptr, base, blen);
