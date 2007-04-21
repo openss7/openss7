@@ -8,6 +8,8 @@ ${path}configure \
 	--disable-devel \
 	--disable-32bit-libs \
 	--enable-maintainer-mode \
+	--enable-dependency-tracking \
+	--disable-checks \
 	--without-SCTP \
 	--without-IPERF \
 	--without-LIS \

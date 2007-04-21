@@ -382,21 +382,21 @@ skballoc(struct sk_buff *skb, uint priority)
 		*(struct module **) (frtnp + 1) = NULL;
 #endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 		/* set up message block */
-		//_ensure(mp->b_next == NULL, mp->b_next = NULL);
-		//_ensure(mp->b_prev == NULL, mp->b_prev = NULL);
-		//_ensure(mp->b_cont == NULL, mp->b_cont = NULL);
+		// _ensure(mp->b_next == NULL, mp->b_next = NULL);
+		// _ensure(mp->b_prev == NULL, mp->b_prev = NULL);
+		// _ensure(mp->b_cont == NULL, mp->b_cont = NULL);
 		mp->b_rptr = skb->data;
 		mp->b_wptr = skb->tail;
-		//_ensure(mp->b_datap == db, mp->b_datap = db);
-		//_ensure(mp->b_band == 0, mp->b_band = 0);
-		//_ensure(mp->b_flag == 0, mp->b_flag = 0);
-		//_ensure(mp->b_csum == 0, mp->b_csum = 0);
+		// _ensure(mp->b_datap == db, mp->b_datap = db);
+		// _ensure(mp->b_band == 0, mp->b_band = 0);
+		// _ensure(mp->b_flag == 0, mp->b_flag = 0);
+		// _ensure(mp->b_csum == 0, mp->b_csum = 0);
 		/* set up data block */
 		db->db_frtnp = frtnp;
 		db->db_base = skb->head;
 		db->db_lim = skb->end;
-		//_ensure(db->db_ref == 1, db->db_ref = 1);
-		//_ensure(db->db_type == M_DATA, db->db_type = M_DATA);
+		// _ensure(db->db_ref == 1, db->db_ref = 1);
+		// _ensure(db->db_type == M_DATA, db->db_type = M_DATA);
 		db->db_size = skb->end - skb->head;
 		db->db_flag = DB_SKBUFF;
 		return (mp);
@@ -444,23 +444,23 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 					*(struct module **) (frtnp + 1) = kmod;
 #endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 		/* set up message block */
-		//_ensure(mp->b_next == NULL, mp->b_next = NULL);
-		//_ensure(mp->b_prev == NULL, mp->b_prev = NULL);
-		//_ensure(mp->b_cont == NULL, mp->b_cont = NULL);
+		// _ensure(mp->b_next == NULL, mp->b_next = NULL);
+		// _ensure(mp->b_prev == NULL, mp->b_prev = NULL);
+		// _ensure(mp->b_cont == NULL, mp->b_cont = NULL);
 		mp->b_rptr = base;
 		mp->b_wptr = base;
-		//_ensure(mp->b_datap == db, mp->b_datap = db);
-		//_ensure(mp->b_band == 0, mp->b_band = 0);
-		//_ensure(mp->b_flag == 0, mp->b_flag = 0);
-		//_ensure(mp->b_csum == 0, mp->b_csum = 0);
+		// _ensure(mp->b_datap == db, mp->b_datap = db);
+		// _ensure(mp->b_band == 0, mp->b_band = 0);
+		// _ensure(mp->b_flag == 0, mp->b_flag = 0);
+		// _ensure(mp->b_csum == 0, mp->b_csum = 0);
 		/* set up data block */
 		db->db_frtnp = frtnp;
 		db->db_base = base;
 		db->db_lim = base + size;
-		//_ensure(db->db_ref == 1, db->db_ref = 1);
-		//_ensure(db->db_type == M_DATA, db->db_type = M_DATA);
+		// _ensure(db->db_ref == 1, db->db_ref = 1);
+		// _ensure(db->db_type == M_DATA, db->db_type = M_DATA);
 		db->db_size = size;
-		//_ensure(db->db_flag == 0, db->db_flag = 0);
+		// _ensure(db->db_flag == 0, db->db_flag = 0);
 		return (mp);
 	}
 	return (NULL);
@@ -499,30 +499,30 @@ allocb_fast(const size_t size, uint priority)
 	mblk_t *mp;
 
 	if (likely((mp = mdbblock_alloc(priority, &allocb_fast)) != NULL)) {
-		//struct mdbblock *md = mb_to_mdb(mp);
-		//dblk_t *db = &md->datablk.d_dblock;
-		//unsigned char *base = md->databuf;
+		// struct mdbblock *md = mb_to_mdb(mp);
+		// dblk_t *db = &md->datablk.d_dblock;
+		// unsigned char *base = md->databuf;
 
-		//(void) db;
-		//(void) base;
+		// (void) db;
+		// (void) base;
 		/* set up message block */
-		//_ensure(mp->b_next == NULL, mp->b_next = NULL);
-		//_ensure(mp->b_prev == NULL, mp->b_prev = NULL);
-		//_ensure(mp->b_cont == NULL, mp->b_cont = NULL);
-		//_ensure(mp->b_rptr == base, mp->b_rptr = base);
-		//_ensure(mp->b_wptr == base, mp->b_wptr = base);
-		//_ensure(mp->b_datap == db, mp->b_datap = db);
-		//_ensure(mp->b_band == 0, mp->b_band = 0);
-		//_ensure(mp->b_flag == 0, mp->b_flag = 0);
-		//_ensure(mp->b_csum == 0, mp->b_csum = 0);
+		// _ensure(mp->b_next == NULL, mp->b_next = NULL);
+		// _ensure(mp->b_prev == NULL, mp->b_prev = NULL);
+		// _ensure(mp->b_cont == NULL, mp->b_cont = NULL);
+		// _ensure(mp->b_rptr == base, mp->b_rptr = base);
+		// _ensure(mp->b_wptr == base, mp->b_wptr = base);
+		// _ensure(mp->b_datap == db, mp->b_datap = db);
+		// _ensure(mp->b_band == 0, mp->b_band = 0);
+		// _ensure(mp->b_flag == 0, mp->b_flag = 0);
+		// _ensure(mp->b_csum == 0, mp->b_csum = 0);
 		/* set up data block */
-		//_ensure(db->db_frtnp == NULL, db->db_frtnp = NULL);
-		//_ensure(db->db_base == base, db->db_base = base);
-		//_ensure(db->db_lim == base + FASTBUF, db->db_lim = base + FASTBUF);
-		//_ensure(db->db_ref == 1, db->db_ref = 1);
-		//_ensure(db->db_type == M_DATA, db->db_type = M_DATA);
-		//_ensure(db->db_size == FASTBUF, db->db_size = FASTBUF);
-		//_ensure(db->db_flag == 0, db->db_flag = 0);
+		// _ensure(db->db_frtnp == NULL, db->db_frtnp = NULL);
+		// _ensure(db->db_base == base, db->db_base = base);
+		// _ensure(db->db_lim == base + FASTBUF, db->db_lim = base + FASTBUF);
+		// _ensure(db->db_ref == 1, db->db_ref = 1);
+		// _ensure(db->db_type == M_DATA, db->db_type = M_DATA);
+		// _ensure(db->db_size == FASTBUF, db->db_size = FASTBUF);
+		// _ensure(db->db_flag == 0, db->db_flag = 0);
 		return (mp);
 	}
 	return (NULL);
@@ -576,23 +576,23 @@ allocb_kmem(const size_t size, uint priority)
 			dblk_t *db = &md->datablk.d_dblock;
 
 			/* set up message block */
-			//_ensure(mp->b_next == NULL, mp->b_next = NULL);
-			//_ensure(mp->b_prev == NULL, mp->b_prev = NULL);
-			//_ensure(mp->b_cont == NULL, mp->b_cont = NULL);
+			// _ensure(mp->b_next == NULL, mp->b_next = NULL);
+			// _ensure(mp->b_prev == NULL, mp->b_prev = NULL);
+			// _ensure(mp->b_cont == NULL, mp->b_cont = NULL);
 			mp->b_rptr = base;
 			mp->b_wptr = base;
-			//_ensure(mp->b_datap == db, mp->b_datap = db);
-			//_ensure(mp->b_band == 0, mp->b_band = 0);
-			//_ensure(mp->b_flag == 0, mp->b_flag = 0);
-			//_ensure(mp->b_csum == 0, mp->b_csum = 0);
+			// _ensure(mp->b_datap == db, mp->b_datap = db);
+			// _ensure(mp->b_band == 0, mp->b_band = 0);
+			// _ensure(mp->b_flag == 0, mp->b_flag = 0);
+			// _ensure(mp->b_csum == 0, mp->b_csum = 0);
 			/* set up data block */
-			//_ensure(db->db_frtnp == NULL, db->db_frtnp = NULL);
+			// _ensure(db->db_frtnp == NULL, db->db_frtnp = NULL);
 			db->db_base = base;
 			db->db_lim = base + nextpower(size);
-			//_ensure(db->db_ref == 1, db->db_ref = 1);
-			//_ensure(db->db_type == M_DATA, db->db_type = M_DATA);
+			// _ensure(db->db_ref == 1, db->db_ref = 1);
+			// _ensure(db->db_type == M_DATA, db->db_type = M_DATA);
 			db->db_size = size;
-			//_ensure(db->db_flag == 0, db->db_flag = 0);
+			// _ensure(db->db_flag == 0, db->db_flag = 0);
 			return (mp);
 		}
 		kmem_free(base, size);
@@ -711,9 +711,9 @@ dupb(mblk_t *bp)
 		dblk_t *db = bp->b_datap;
 
 		db_inc(db);
-		//_ensure(mp->b_next == NULL, mp->b_next = NULL);
-		//_ensure(mp->b_prev == NULL, mp->b_prev = NULL);
-		//_ensure(mp->b_cont == NULL, mp->b_cont = NULL);
+		// _ensure(mp->b_next == NULL, mp->b_next = NULL);
+		// _ensure(mp->b_prev == NULL, mp->b_prev = NULL);
+		// _ensure(mp->b_cont == NULL, mp->b_cont = NULL);
 		mp->b_rptr = bp->b_rptr;
 		mp->b_wptr = bp->b_wptr;
 		mp->b_datap = bp->b_datap;
@@ -1003,13 +1003,13 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 	md->msgblk.m_mblock.b_datap = NULL;
 	/* fill out data block */
 	dp = &md->datablk.d_dblock;
-	//_ensure(dp->db_frtnp == NULL, dp->db_frtnp = NULL);
+	// _ensure(dp->db_frtnp == NULL, dp->db_frtnp = NULL);
 	dp->db_base = base;
 	dp->db_lim = base + nextpower(size);
-	//_ensure(dp->db_ref == 1, dp->db_ref = 1);
+	// _ensure(dp->db_ref == 1, dp->db_ref = 1);
 	dp->db_type = db->db_type;
 	dp->db_size = size;
-	//_ensure(dp->db_flag == 0, dp->db_flag = 0);
+	// _ensure(dp->db_flag == 0, dp->db_flag = 0);
 	/* copy from old initial datab */
 	if ((blen = bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0)) {
 		bcopy(mp->b_rptr, base, blen);
@@ -1255,15 +1255,6 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 				if (test_bit(QSHEAD_BIT, &q_nbsrv->q_flag)) {
 					mblk_t *b;
 
-					/* When backenabling a queue with an active Stream head, do
-					   a little bit more. */
-					if (unlikely(sd2->sd_sigflags & (S_WRBAND | S_WRNORM))
-					    || unlikely(sd2->sd_fasync != NULL))
-						__strwritesig(sd2, band, bands);
-					if (unlikely(waitqueue_active(&sd2->sd_wwaitq) != 0))
-						wake_up_interruptible(&sd2->sd_wwaitq);
-					if (unlikely(waitqueue_active(&sd2->sd_polllist) != 0))
-						wake_up_interruptible(&sd2->sd_polllist);
 					/* release STRHOLD buffer */
 					if (test_bit(QHLIST_BIT, &q_nbsrv->q_flag)) {
 						if ((b = getq(q_nbsrv))) {
@@ -1273,6 +1264,15 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 								qreply(q_nbsrv, b);
 						}
 					}
+					/* When backenabling a queue with an active Stream head, do
+					   a little bit more. */
+					if (unlikely(waitqueue_active(&sd2->sd_wwaitq) != 0))
+						wake_up_interruptible(&sd2->sd_wwaitq);
+					if (unlikely(waitqueue_active(&sd2->sd_polllist) != 0))
+						wake_up_interruptible(&sd2->sd_polllist);
+					if (unlikely(sd2->sd_sigflags & (S_WRBAND | S_WRNORM))
+					    || unlikely(sd2->sd_fasync != NULL))
+						__strwritesig(sd2, band, bands);
 				} else {
 					/* SVR4 SPG - noenable() does not prevent a queue from
 					   being back enabled by flow control */
@@ -1508,7 +1508,7 @@ __get_qband(queue_t *q, unsigned char band)
 
 	if (band <= q->q_nband) {
 		qb = __find_qband(q, band);
-		assert(qb);
+		dassert(qb);
 	} else {
 		do {
 			if (!(qb = allocqb()))
@@ -1793,9 +1793,9 @@ freezestr(queue_t *q)
 	struct stdata *sd;
 	unsigned long pl = 0;
 
-	assert(q);
+	dassert(q);
 	sd = qstream(q);
-	assert(sd);
+	dassert(sd);
 
 	zwlock(sd, pl);
 	return (pl);
@@ -1982,11 +1982,11 @@ enableok(queue_t *q)
 	struct stdata *sd;
 	unsigned long pl;
 
-	assert(q);
+	dassert(q);
 	assure(not_frozen_by_caller(q));
 
 	sd = qstream(q);
-	assert(sd);
+	dassert(sd);
 
 	/* block on frozen stream unless stream frozen by caller */
 	zrlock(sd, pl);
@@ -2009,11 +2009,11 @@ noenable(queue_t *q)
 	struct stdata *sd;
 	unsigned long pl;
 
-	assert(q);
+	dassert(q);
 	assure(not_frozen_by_caller(q));
 
 	sd = qstream(q);
-	assert(sd);
+	dassert(sd);
 
 	/* block on frozen stream unless stream frozen by caller */
 	zrlock(sd, pl);
@@ -2024,18 +2024,21 @@ noenable(queue_t *q)
 EXPORT_SYMBOL(noenable);	/* include/sys/streams/stream.h */
 
 /*
- *  __putbq_pri: - put a high priority message back onto a queue
+ *  putbq_pri: - put a high priority message back onto a queue
  *  @q:		queue to which to return the message
  *  @mp:	message to return
  *
- *  __putbq_pri() handles the less common case of placing a high priority message on the queue.
+ *  putbq_pri() handles the less common case of placing a high priority message on the queue.
  */
 streams_noinline streams_fastcall int
-__putbq_pri(queue_t *q, mblk_t *mp)
+putbq_pri(queue_t *q, mblk_t *mp)
 {
+	unsigned long pl;
+
 	/* SVR 4 SPG says to zero b_band when hipri messages placed on queue */
 	mp->b_band = 0;
 
+	qwlock(q, pl);
 	if (unlikely((q->q_count += msgsize(mp)) >= q->q_hiwat))
 		set_bit(QFULL_BIT, &q->q_flag);
 	if (q->q_last == NULL)
@@ -2045,23 +2048,27 @@ __putbq_pri(queue_t *q, mblk_t *mp)
 	if ((mp->b_next = q->q_first))
 		mp->b_next->b_prev = mp;
 	mp->b_prev = NULL;
+	qwunlock(q, pl);
 	return (1 + 1);
 }
 
 /*
- *  __putbq_band: - put a priority message back onto a queue
+ *  putbq_band: - put a priority message back onto a queue
  *  @q:		queue to which to return the message
  *  @mp:	message to return
  *
- *  __putbq_band() handles the less common case of placing a priority message on the queue.  This is
+ *  putbq_band() handles the less common case of placing a priority message on the queue.  This is
  *  optimized for placing a message back on and empty queue as should normally be the case.
  */
 streams_noinline streams_fastcall int
-__putbq_band(queue_t *q, mblk_t *mp)
+putbq_band(queue_t *q, mblk_t *mp)
 {
 	mblk_t *b_next, *b_prev;
 	struct qband *qb;
+	unsigned long pl;
+	int result;
 
+	qwlock(q, pl);
 	b_prev = NULL;
 	b_next = q->q_first;
 	/* skip high priority */
@@ -2081,8 +2088,8 @@ __putbq_band(queue_t *q, mblk_t *mp)
 		qb->qb_last = mp;
 	if (likely(qb->qb_first == b_next) || likely(qb->qb_first == NULL))
 		qb->qb_first = mp;
-	assert(qb->qb_first != NULL);
-	assert(qb->qb_last != NULL);
+	dassert(qb->qb_first != NULL);
+	dassert(qb->qb_last != NULL);
 	qb->qb_msgs++;
 	if (unlikely((qb->qb_count += msgsize(mp)) >= qb->qb_hiwat))
 		if (likely(!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag)))
@@ -2096,22 +2103,28 @@ __putbq_band(queue_t *q, mblk_t *mp)
 		b_next->b_prev = mp;
 	if (unlikely((mp->b_prev = b_prev) != NULL))
 		b_prev->b_next = mp;
-	return (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag)) && test_bit(QWANTR_BIT, &q->q_flag)));
+	result =
+	    (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag)) && test_bit(QWANTR_BIT, &q->q_flag)));
+	qwunlock(q, pl);
+	return (result);
 }
 
 /*
- *  __putbq_norm: - put a normal message back onto a queue
+ *  putbq_norm: - put a normal message back onto a queue
  *  @q:		queue to which to return the message
  *  @mp:	message to return
  *
- *  __putbq_norm() handles the less common case of placing a normal message on the queue.
+ *  putbq_norm() handles the less common case of placing a normal message on the queue.
  */
-STATIC streams_inline streams_fastcall __hot_out int
-__putbq_norm(queue_t *q, mblk_t *mp)
+STATIC streams_inline streams_fastcall __hot int
+putbq_norm(queue_t *q, mblk_t *mp)
 {
 	if (likely(mp->b_band == 0)) {
 		mblk_t *b_next, *b_prev;
+		unsigned long pl;
+		int result;
 
+		qwlock(q, pl);
 		b_prev = NULL;
 		b_next = q->q_first;
 
@@ -2141,21 +2154,24 @@ __putbq_norm(queue_t *q, mblk_t *mp)
 		if (unlikely((mp->b_prev = b_prev) != NULL))
 			b_prev->b_next = mp;
 
-		return (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag)) && test_bit(QWANTR_BIT, &q->q_flag)));
+		result = (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag))
+			       && test_bit(QWANTR_BIT, &q->q_flag)));
+		qwunlock(q, pl);
+		return (result);
 	}
-	return __putbq_band(q, mp);
+	return putbq_band(q, mp);
 }
 
 /*
  *  __putbq:
  */
-STATIC streams_inline streams_fastcall int
+STATIC streams_inline streams_fastcall __hot int
 __putbq(queue_t *q, mblk_t *mp)
 {				/* IRQ DISABLED */
 	/* fast path for normal messages */
 	if (likely(mp->b_datap->db_type < QPCTL))
-		return __putbq_norm(q, mp);
-	return __putbq_pri(q, mp);
+		return putbq_norm(q, mp);
+	return putbq_pri(q, mp);
 }
 
 /**
@@ -2163,22 +2179,17 @@ __putbq(queue_t *q, mblk_t *mp)
  *  @q:		queue to place back message
  *  @mp:	message to place back
  */
-streams_fastcall int
+streams_fastcall __hot int
 putbq(register queue_t *q, register mblk_t *mp)
 {
 	int result;
-	unsigned long pl;
 
-	assert(q);
-	assert(mp);
+	dassert(q);
+	dassert(mp);
 
 	assure(not_frozen_by_caller(q));
 
-	qwlock(q, pl);
-	result = __putbq(q, mp);
-	qwunlock(q, pl);
-
-	if (likely(result < 2))
+	if (likely((result = __putbq(q, mp)) < 2))
 		return (result);
 	qenable(q);
 	return (1);
@@ -2196,7 +2207,7 @@ putctl(queue_t *q, int type)
 {
 	mblk_t *mp;
 
-	assert(q);
+	dassert(q);
 	if (ctlmsg(type) && (mp = allocb(0, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		put(q, mp);
@@ -2218,7 +2229,7 @@ putctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
 
-	assert(q);
+	dassert(q);
 	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		mp->b_wptr[0] = (unsigned char) param;
@@ -2243,7 +2254,7 @@ putctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
 
-	assert(q);
+	dassert(q);
 	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		mp->b_wptr[0] = (unsigned char) param1;
@@ -2268,8 +2279,8 @@ putnextctl(queue_t *q, int type)
 {
 	mblk_t *mp;
 
-	assert(q);
-	assert(q->q_next);
+	dassert(q);
+	dassert(q->q_next);
 	if (!datamsg(type) && (mp = allocb(0, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		putnext(q, mp);
@@ -2291,8 +2302,8 @@ putnextctl1(queue_t *q, int type, int param)
 {
 	mblk_t *mp;
 
-	assert(q);
-	assert(q->q_next);
+	dassert(q);
+	dassert(q->q_next);
 	if (ctlmsg(type) && (mp = allocb(1, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		mp->b_wptr[0] = (unsigned char) param;
@@ -2317,8 +2328,8 @@ putnextctl2(queue_t *q, int type, int param1, int param2)
 {
 	mblk_t *mp;
 
-	assert(q);
-	assert(q->q_next);
+	dassert(q);
+	dassert(q->q_next);
 	if (ctlmsg(type) && (mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = type;
 		mp->b_wptr[0] = (unsigned char) param1;
@@ -2334,19 +2345,22 @@ putnextctl2(queue_t *q, int type, int param1, int param2)
 EXPORT_SYMBOL(putnextctl2);
 
 /*
- *  __putq_pri - put a priority message block to a queue
+ *  putq_pri - put a priority message block to a queue
  *  @q:		queue to which to put the message
  *  @mp:	message to put
  *  @insq:	called for insq
  *
- *  __putq_pri() handles the less common case of placing a high priority message on the queue.
+ *  putq_pri() handles the less common case of placing a high priority message on the queue.
  *  Still optimized for arriving at an empty queue.
  */
 streams_noinline streams_fastcall int
-__putq_pri(queue_t *q, mblk_t *mp, bool insq)
+putq_pri(queue_t *q, mblk_t *mp, bool insq)
 {
 	mblk_t *b_prev, *b_next;
+	unsigned long pl;
+	int result;
 
+	qwlock(q, pl);
 	/* find position of priority messages */
 	b_prev = NULL;
 	b_next = q->q_first;
@@ -2368,24 +2382,29 @@ __putq_pri(queue_t *q, mblk_t *mp, bool insq)
 	if (unlikely((mp->b_prev = b_prev) != NULL))
 		b_prev->b_next = mp;
 	/* success - always enable on high priority, except insq */
-	return (1 + (likely(!insq) || likely(!test_bit(QNOENB_BIT, &q->q_flag))));
+	result = (1 + (likely(!insq) || likely(!test_bit(QNOENB_BIT, &q->q_flag))));
+	qwunlock(q, pl);
+	return (result);
 }
 
 /*
- *  __putq_band - put a banded message block to a queue
+ *  putq_band - put a banded message block to a queue
  *  @q:		queue to which to put the message
  *  @mp:	message to put
  *
- *  __putq_band() handles the less common case of placing a banded message on the queue.  Still
+ *  putq_band() handles the less common case of placing a banded message on the queue.  Still
  *  optimized for arriving at an empty queue.  Magic Garden and the SVR4 SPG say that a priority
  *  (banded) message can always enable the queue (when not noenabled).
  */
 streams_noinline streams_fastcall int
-__putq_band(queue_t *q, mblk_t *mp)
+putq_band(queue_t *q, mblk_t *mp)
 {
 	mblk_t *b_prev, *b_next;
 	struct qband *qb;
+	unsigned long pl;
+	int result;
 
+	qwlock(q, pl);
 	/* find position of priority messages */
 	b_prev = NULL;
 	b_next = q->q_first;
@@ -2404,8 +2423,8 @@ __putq_band(queue_t *q, mblk_t *mp)
 		qb->qb_last = mp;
 	if (unlikely(qb->qb_first == b_next || qb->qb_first == NULL))
 		qb->qb_first = mp;
-	assert(qb->qb_first != NULL);
-	assert(qb->qb_last != NULL);
+	dassert(qb->qb_first != NULL);
+	dassert(qb->qb_last != NULL);
 	qb->qb_msgs++;
 	if (unlikely((qb->qb_count += msgsize(mp)) >= qb->qb_hiwat))
 		if (likely(!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag)))
@@ -2420,14 +2439,21 @@ __putq_band(queue_t *q, mblk_t *mp)
 	if (unlikely((mp->b_prev = b_prev) != NULL))
 		b_prev->b_next = mp;
 	/* success - always enable if not noenabled */
-	return (1 + likely(!test_bit(QNOENB_BIT, &q->q_flag)));
+	result = (1 + likely(!test_bit(QNOENB_BIT, &q->q_flag)));
+	qwunlock(q, pl);
+	return (result);
 }
 
-STATIC streams_inline streams_fastcall __hot_out int
-__putq_norm(queue_t *q, mblk_t *mp)
+STATIC streams_inline streams_fastcall __hot int
+putq_norm(queue_t *q, mblk_t *mp)
 {
 	if (likely(mp->b_band == 0)) {
+		unsigned long pl;
+		int result;
+
 		mp->b_next = NULL;
+
+		qwlock(q, pl);
 		if (unlikely((mp->b_prev = q->q_last) != NULL))
 			mp->b_prev->b_next = mp;
 		q->q_last = mp;
@@ -2437,9 +2463,13 @@ __putq_norm(queue_t *q, mblk_t *mp)
 		if (unlikely((q->q_count += msgsize(mp)) >= q->q_hiwat))
 			set_bit(QFULL_BIT, &q->q_flag);
 		/* success */
-		return (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag)) && test_bit(QWANTR_BIT, &q->q_flag)));
+		result = (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag))
+			       && test_bit(QWANTR_BIT, &q->q_flag)));
+		qwunlock(q, pl);
+
+		return (result);
 	}
-	return __putq_band(q, mp);
+	return putq_band(q, mp);
 }
 
 /*
@@ -2461,22 +2491,22 @@ __putq_norm(queue_t *q, mblk_t *mp)
  *  1) When a banded message arrives at an empty queue band, should the queue be enabled?
  *
  */
-STATIC streams_inline streams_fastcall __hot_out int
+STATIC streams_inline streams_fastcall __hot int
 __putq(queue_t *q, mblk_t *mp)
 {
 	/* fast path for normal messages */
 	if (likely(mp->b_datap->db_type < QPCTL))
-		return __putq_norm(q, mp);
-	return __putq_pri(q, mp, false);
+		return putq_norm(q, mp);
+	return putq_pri(q, mp, false);
 }
 
-streams_noinline streams_fastcall int
-__putq_insq(queue_t *q, mblk_t *mp)
+STATIC streams_inline streams_fastcall __hot int
+putq_insq(queue_t *q, mblk_t *mp)
 {
 	/* fast path for normal messages */
 	if (likely(mp->b_datap->db_type < QPCTL))
-		return __putq_norm(q, mp);
-	return __putq_pri(q, mp, true);
+		return putq_norm(q, mp);
+	return putq_pri(q, mp, true);
 }
 
 /**
@@ -2491,17 +2521,13 @@ streams_fastcall __hot int
 putq(register queue_t *q, register mblk_t *mp)
 {
 	register int result;
-	unsigned long pl;
 
-	assert(q);
-	assert(mp);
+	dassert(q);
+	dassert(mp);
 
 	assure(not_frozen_by_caller(q));
 
-	qwlock(q, pl);
-	result = __putq(q, mp);
-	qwunlock(q, pl);
-	if (likely(result < 2))
+	if (likely((result = __putq(q, mp)) < 2))
 		return (result);
 	qenable(q);
 	return (1);
@@ -2510,17 +2536,17 @@ putq(register queue_t *q, register mblk_t *mp)
 EXPORT_SYMBOL(putq);
 
 /*
- *  __insq:
+ *  insq_middle:
  */
-STATIC streams_fastcall int
-__insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
+streams_noinline streams_fastcall __hot int
+insq_middle(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	struct qband *qb = NULL;
+	unsigned long pl;
 	size_t size;
+	int result;
 
-	if (likely(emp == NULL))
-		/* insert at end */
-		return __putq_insq(q, nmp);
+	qwlock(q, pl);
 	/* insert before emp */
 	if (nmp->b_datap->db_type >= QPCTL) {
 		if (emp->b_prev && emp->b_prev->b_datap->db_type < QPCTL)
@@ -2563,7 +2589,11 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 				q->q_blocked++;
 	}
 	/* success - ignore message class for insq() */
-	return (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag)) && test_bit(QWANTR_BIT, &q->q_flag)));
+	result =
+	    (1 + (likely(!test_bit(QNOENB_BIT, &q->q_flag)) && test_bit(QWANTR_BIT, &q->q_flag)));
+      done:
+	qwunlock(q, pl);
+	return (result);
 
       enomem:
 	/* couldn't allocate a band structure! */
@@ -2572,7 +2602,16 @@ __insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 	/* insertion would misorder the queue */
 	goto failure;
       failure:
-	return (0);		/* failure */
+	result = 0;		/* failure */
+	goto done;
+}
+
+STATIC streams_inline streams_fastcall int
+__insq(queue_t *q, mblk_t *emp, mblk_t *nmp)
+{
+	if (likely(emp == NULL))
+		return putq_insq(q, nmp);
+	return insq_middle(q, emp, nmp);
 }
 
 /**
@@ -2589,17 +2628,13 @@ streams_fastcall int
 insq(register queue_t *q, register mblk_t *emp, register mblk_t *nmp)
 {
 	register int result;
-	unsigned long pl;
 
-	assert(q);
-	assert(nmp);
+	dassert(q);
+	dassert(nmp);
 
 	assure(frozen_by_caller(q));
 
-	qwlock(q, pl);
-	result = __insq(q, emp, nmp);
-	qwunlock(q, pl);
-	if (likely(result < 2))
+	if (likely((result = __insq(q, emp, nmp)) < 2))
 		return (result);
 	qenable(q);
 	return (1);
@@ -2624,18 +2659,13 @@ streams_fastcall __unlikely int
 appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 {
 	register int result;
-	unsigned long pl;
 
-	assert(q);
-	assert(nmp);
+	dassert(q);
+	dassert(nmp);
 
 	assure(frozen_by_caller(q));
 
-	qwlock(q, pl);
-	result = __insq(q, emp ? emp->b_next : emp, nmp);
-	qwunlock(q, pl);
-	/* do enabling outside the locks */
-	if (likely(result < 2))
+	if (likely((result = __insq(q, emp ? emp->b_next : emp, nmp)) < 2))
 		return (result);
 	qenable(q);
 	return (1);
@@ -2671,7 +2701,7 @@ qalloc(struct stdata *sd, struct fmodsw *fmod)
 			(q + 0)->q_flag = QUSE | QREADR;
 			(q + 1)->q_flag = QUSE;
 			_ctrace(qput(&q));
-			assert(q == NULL);
+			dassert(q == NULL);
 		}
 	}
 	return (q);
@@ -2780,9 +2810,9 @@ qdelete(queue_t *q)
 	queue_t *rq = (q + 0);
 	queue_t *wq = (q + 1);
 
-	assert(rq);
+	dassert(rq);
 	sd = rqstream(rq);
-	assert(sd);
+	dassert(sd);
 
 	/* Never delete a Stream head. */
 	if (sd->sd_rq == rq)
@@ -3227,18 +3257,21 @@ __STRUTIL_EXTERN_INLINE queue_t *RD(queue_t *q);
 EXPORT_SYMBOL(RD);
 
 /*
- *  __rmvq_band	- remove a banded message from a queue
+ *  rmvq_band	- remove a banded message from a queue
  *  @q:		the queue from which to remove the message
  *  @mp:	the message to removed
  *
- *  __rmvq_band() handles the less common case of removing a banded message from the queue.
+ *  rmvq_band() handles the less common case of removing a banded message from the queue.
  *  Still optimized for the only message on the queue.
  */
 streams_noinline streams_fastcall bool
-__rmvq_band(queue_t *q, mblk_t *mp)
+rmvq_band(queue_t *q, mblk_t *mp)
 {
+	bool backenable = false;
 	struct qband *qb;
+	unsigned long pl;
 
+	qwlock(q, pl);
 	{
 		register mblk_t *b_next, *b_prev;
 
@@ -3257,14 +3290,14 @@ __rmvq_band(queue_t *q, mblk_t *mp)
 		if (likely(q->q_last == mp))
 			q->q_last = b_prev;
 		q->q_msgs--;
-		assert(q->q_msgs >= 0);
+		dassert(q->q_msgs >= 0);
 		{
 			unsigned char q_nband, band;
 
 			for (band = mp->b_band, q_nband = q->q_nband, qb = q->q_bandp;
 			     qb && q_nband > band; qb = qb->qb_next, q_nband--) ;
 		}
-		assert(qb);
+		dassert(qb);
 		if (qb->qb_first == mp && qb->qb_last == mp)
 			qb->qb_first = qb->qb_last = NULL;
 		else {
@@ -3275,29 +3308,26 @@ __rmvq_band(queue_t *q, mblk_t *mp)
 		}
 	}
 	qb->qb_msgs--;
-	assert(qb->qb_msgs >= 0);
+	dassert(qb->qb_msgs >= 0);
 	qb->qb_count -= msgsize(mp);
-	assert(qb->qb_count >= 0);
-	{
-		bool backenable = false;
-
-		if (qb->qb_count == 0 || qb->qb_count < qb->qb_lowat) {
-			if (unlikely(test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))) {
-				q->q_blocked--;
-				if (likely(test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag)))
-					backenable = true;
-			}
+	dassert(qb->qb_count >= 0);
+	if (qb->qb_count == 0 || qb->qb_count < qb->qb_lowat) {
+		if (unlikely(test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))) {
+			q->q_blocked--;
+			if (likely(test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag)))
+				backenable = true;
 		}
-		return (backenable);
 	}
+	qwunlock(q, pl);
+	return (backenable);
 }
 
 /*
- *  __rmvq:	- remove a message from a queue
+ *  rmvq_norm:	- remove a message from a queue
  *  @q:		the queue from which to remove the message
  *  @mp:	the message to removed
  *
- *  __rmvq() is a version of rmvq(9) that takes no locks.
+ *  rmvq_norm() is a version of rmvq(9) that takes no locks.
  *
  *  CONTEXT: This function takes no locks and must be called with the queue write locked, either
  *  explicitly or by calling freezestr().
@@ -3312,46 +3342,52 @@ __rmvq_band(queue_t *q, mblk_t *mp)
  *  with this function.  The Stream head does this instead of getq()/putbq() operations which are
  *  not atomic.
  */
-STATIC streams_inline streams_fastcall __hot_read bool
+STATIC streams_inline streams_fastcall __hot bool
+rmvq_norm(queue_t *q, mblk_t *mp)
+{
+	bool backenable = false;
+	unsigned long pl;
+
+	dassert(q);
+	dassert(mp);
+
+	qwlock(q, pl);
+	{
+		register mblk_t *b_next, *b_prev;
+
+		b_prev = mp->b_prev;
+		b_next = mp->b_next;
+		if (unlikely(b_prev != NULL)) {	/* NULL for getq */
+			b_prev->b_next = b_next;
+			mp->b_prev = NULL;
+		}
+		if (unlikely(b_next != NULL)) {	/* NULL for only message on queue */
+			b_next->b_prev = b_prev;
+			mp->b_next = NULL;
+		}
+		if (likely(q->q_first == mp))
+			q->q_first = b_next;
+		if (likely(q->q_last == mp))
+			q->q_last = b_prev;
+	}
+	q->q_msgs--;
+	dassert(q->q_msgs >= 0);
+	q->q_count -= msgsize(mp);
+	dassert(q->q_count >= 0);
+	if (q->q_count == 0 || q->q_count < q->q_lowat)
+		if (unlikely(test_and_clear_bit(QFULL_BIT, &q->q_flag)))
+			if (likely(test_and_clear_bit(QWANTW_BIT, &q->q_flag)))
+				backenable = true;
+	qwunlock(q, pl);
+	return (backenable);
+}
+
+STATIC streams_inline streams_fastcall __hot bool
 __rmvq(queue_t *q, mblk_t *mp)
 {
-	assert(q);
-	assert(mp);
-
-	if (likely(mp->b_band == 0)) {
-		{
-			register mblk_t *b_next, *b_prev;
-
-			b_prev = mp->b_prev;
-			b_next = mp->b_next;
-			if (unlikely(b_prev != NULL)) {	/* NULL for getq */
-				b_prev->b_next = b_next;
-				mp->b_prev = NULL;
-			}
-			if (unlikely(b_next != NULL)) {	/* NULL for only message on queue */
-				b_next->b_prev = b_prev;
-				mp->b_next = NULL;
-			}
-			if (likely(q->q_first == mp))
-				q->q_first = b_next;
-			if (likely(q->q_last == mp))
-				q->q_last = b_prev;
-		}
-		q->q_msgs--;
-		assert(q->q_msgs >= 0);
-		q->q_count -= msgsize(mp);
-		assert(q->q_count >= 0);
-		{
-			bool backenable = false;
-
-			if (q->q_count == 0 || q->q_count < q->q_lowat)
-				if (unlikely(test_and_clear_bit(QFULL_BIT, &q->q_flag)))
-					if (likely(test_and_clear_bit(QWANTW_BIT, &q->q_flag)))
-						backenable = true;
-			return (backenable);
-		}
-	}
-	return __rmvq_band(q, mp);
+	if (likely(mp->b_band == 0))
+		return rmvq_norm(q, mp);
+	return rmvq_band(q, mp);
 }
 
 /**
@@ -3374,19 +3410,13 @@ streams_fastcall __hot_read void
 rmvq(register queue_t *q, register mblk_t *mp)
 {				/* IRQ DISABLED */
 	bool backenable;
-	unsigned long pl;
 
-	assert(q);
-	assert(mp);
+	dassert(q);
+	dassert(mp);
 
 	assure(frozen_by_caller(q));
 
-	qwlock(q, pl);
-	backenable = __rmvq(q, mp);
-	qwunlock(q, pl);
-
-	/* Backenabling under locks is not so severe when write locks only suppress soft irq. */
-	if (likely(backenable == 0))
+	if (likely((backenable = __rmvq(q, mp)) == 0))
 		return;
 	qbackenable(q, mp->b_band, NULL);
 }
@@ -3700,7 +3730,7 @@ __getq(queue_t *q, bool *be)
 	mblk_t *mp;
 
 	if (likely((mp = q->q_first) != NULL)) {
-		mblk_t *b_next;
+		register mblk_t *b_next;
 
 		/* hand optimized version of above */
 		if ((b_next = mp->b_next))
@@ -3710,10 +3740,10 @@ __getq(queue_t *q, bool *be)
 		if (q->q_last == mp)
 			q->q_last = NULL;
 		q->q_msgs--;
-		assert(q->q_msgs >= 0);
+		dassert(q->q_msgs >= 0);
 		if (likely(mp->b_band == 0)) {
 			q->q_count -= msgsize(mp);
-			assert(q->q_count >= 0);
+			dassert(q->q_count >= 0);
 			if (q->q_count == 0 || q->q_count < q->q_lowat)
 				if (unlikely(test_and_clear_bit(QFULL_BIT, &q->q_flag)))
 					if (likely(test_and_clear_bit(QWANTW_BIT, &q->q_flag)))
@@ -3722,14 +3752,14 @@ __getq(queue_t *q, bool *be)
 			struct qband *qb;
 
 			qb = __find_qband(q, mp->b_band);
-			assert(qb);
+			dassert(qb);
 			qb->qb_first = b_next;
 			if (qb->qb_last == mp)
 				qb->qb_last = NULL;
 			qb->qb_msgs--;
-			assert(qb->qb_msgs >= 0);
+			dassert(qb->qb_msgs >= 0);
 			qb->qb_count -= msgsize(mp);
-			assert(qb->qb_count >= 0);
+			dassert(qb->qb_count >= 0);
 			if (qb->qb_count == 0 || qb->qb_count < qb->qb_lowat) {
 				if (unlikely(test_and_clear_bit(QB_FULL_BIT, &qb->qb_flag))) {
 					q->q_blocked--;
@@ -3763,7 +3793,7 @@ getq(register queue_t *q)
 	bool backenable = false;
 	unsigned long pl;
 
-	assert(q);
+	dassert(q);
 
 	assure(not_frozen_by_caller(q));
 
@@ -4049,7 +4079,7 @@ strqget(register queue_t *q, qfields_t what, register unsigned char band, long *
 			*val = (long) q->q_last;
 			break;
 		case QFLAG:
-			*val = (volatile unsigned long)q->q_flag;
+			*val = (volatile unsigned long) q->q_flag;
 			break;
 		default:
 			err = -EINVAL;
@@ -4084,7 +4114,7 @@ strqget(register queue_t *q, qfields_t what, register unsigned char band, long *
 				*val = (long) qb->qb_last;
 				break;
 			case QFLAG:
-				*val = (volatile unsigned long)q->q_flag;
+				*val = (volatile unsigned long) q->q_flag;
 				break;
 			default:
 				err = -EINVAL;
@@ -4332,9 +4362,9 @@ unfreezestr(queue_t *q, unsigned long flags)
 {
 	struct stdata *sd;
 
-	assert(q);
+	dassert(q);
 	sd = qstream(q);
-	assert(sd);
+	dassert(sd);
 
 	(void) flags;
 	zwunlock(sd, flags);
