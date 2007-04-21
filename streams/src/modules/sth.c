@@ -4003,20 +4003,63 @@ strllseek(struct file *file, loff_t off, int whence)
 	return (-ESPIPE);
 }
 
-streams_noinline streams_fastcall __unlikely unsigned int
-strpoll_error(register const unsigned int flags)
+streams_noinline streams_fastcall __unlikely int
+strpoll_except(struct stdata *sd, unsigned int flag)
 {
 	register unsigned int mask = 0;
+	queue_t *const rq = sd->sd_rq;
+	queue_t *const wq = sd->sd_wq;
+	unsigned long pl;
 
-	if (flags & (STRDERR | STWRERR))
-		mask |= POLLERR;
-	if (flags & (STRHUP))
-		mask |= POLLHUP;
-	if (flags & (STRPRI))
-		mask |= POLLPRI;
-	if (flags & (STRMSIG))
-		mask |= POLLMSG;
-	if (flags & (STPLEX))
+	if (likely(!(flag & STPLEX))) {
+		prlock(sd);
+		if (likely(!(flag & STRDERR))) {
+			qrlock(rq, pl);
+			{
+				register mblk_t *b;
+
+				if ((b = rq->q_first) != NULL) {
+					switch (b->b_datap->db_type) {
+					case M_DATA:
+					case M_PROTO:
+						if (b->b_band == 0)
+							mask |= POLLIN | POLLRDNORM;
+						else
+							mask |= POLLIN | POLLRDBAND;
+						break;
+					case M_PCPROTO:
+						mask |= POLLPRI;
+						break;
+					case M_SIG:
+						mask |= POLLMSG;
+						break;
+					default:
+						mask |= POLLIN;
+						break;
+					}
+				}
+			}
+			qrunlock(rq, pl);
+		} else
+			mask |= POLLERR;
+		if (likely(!(flag & STWRERR))) {
+			if (likely(!(flag & STRHUP))) {
+				register queue_t *sq;
+
+				if ((sq = wq->q_nfsrv) != NULL) {
+					qrlock(sq, pl);
+					if (likely(!test_bit(QFULL_BIT, &sq->q_flag)))
+						mask |= POLLOUT | POLLWRNORM;
+					if (likely(sq->q_blocked < sq->q_nband))
+						mask |= POLLOUT | POLLWRBAND;
+					qrunlock(sq, pl);
+				}
+			} else
+				mask |= POLLHUP;
+		} else
+			mask |= POLLERR;
+		prunlock(sd);
+	} else
 		mask |= POLLNVAL;
 	return (mask);
 }
@@ -4025,35 +4068,64 @@ strpoll_error(register const unsigned int flags)
  *  strpoll: - poll file operation on stream
  *  @file: user file pointer for the open stream
  *  @poll: poll table pointer
+ *
+ *  When polling is used exclusively, this function is very hot on the read side.  Some performance
+ *  advantages could be gained by optimizing the functions that are called by this function such as:
+ *  canget(), bcangetany(), canputnext() and bcanputnextany().
  */
-STATIC streams_inline streams_fastcall __hot_in unsigned int
+STATIC streams_inline streams_fastcall __hot unsigned int
 strpoll_fast(struct file *file, struct poll_table_struct *poll)
 {
-	struct stdata *sd;
+	struct stdata *const sd = stri_lookup(file);
 
-	if (likely((sd = stri_lookup(file)) != NULL)) {	/* PROFILED */
-		unsigned int mask = 0;
-		queue_t *q;
-		unsigned int flag;
+	if (likely(sd != NULL)) {	/* PROFILED */
+		queue_t *const rq = sd->sd_rq;
+		queue_t *const wq = sd->sd_wq;
+		unsigned long pl;
 
 		strschedule_poll();
 		poll_wait(file, &sd->sd_polllist, poll);
-		flag = (volatile int)sd->sd_flag;
-		if (unlikely ((flag & (STRDERR | STWRERR | STRHUP | STRPRI | STRMSIG | STPLEX)) != 0))
-			mask |= strpoll_error(flag);
-		q = sd->sd_rq;
-		dassert(sd->sd_rq != NULL);
-		if (likely(canget(q) != 0))
-			mask |= POLLIN | POLLRDNORM;
-		if (likely(bcangetany(q) != 0))
-			mask |= POLLIN | POLLRDBAND;
-		q = sd->sd_wq;
-		dassert(sd->sd_wq != NULL);
-		if (likely(canputnext(q) != 0))
-			mask |= POLLOUT | POLLWRNORM;
-		if (likely(bcanputnextany(q) != 0))
-			mask |= POLLOUT | POLLWRBAND;
-		return (mask);
+		{
+			register unsigned int mask = 0;
+
+			{
+				register const unsigned int flag = (volatile int) sd->sd_flag;
+				static const unsigned int exceptions =
+				    (STPLEX | STRPRI | STRMSIG | STRDERR | STWRERR);
+
+				if (unlikely(flag & exceptions))
+					return (strpoll_except(sd, flag));
+			}
+			prlock(sd);
+			qrlock(rq, pl);
+			{
+				register mblk_t *b;
+
+				if (likely((b = rq->q_first) != NULL)) {
+					if (likely((b->b_datap->db_type & ~1) == 0)) {
+						if (likely(b->b_band == 0))
+							mask |= POLLIN | POLLRDNORM;
+						else
+							mask |= POLLIN | POLLRDBAND;
+					}
+				}
+			}
+			qrunlock(rq, pl);
+			{
+				register queue_t *sq;
+
+				if (likely((sq = wq->q_nfsrv) != NULL)) {
+					qrlock(sq, pl);
+					if (likely(!test_bit(QFULL_BIT, &sq->q_flag)))
+						mask |= POLLOUT | POLLWRNORM;
+					if (likely(sq->q_blocked < sq->q_nband))
+						mask |= POLLOUT | POLLWRBAND;
+					qrunlock(sq, pl);
+				}
+			}
+			prunlock(sd);
+			return (mask);
+		}
 	}
 	return (POLLNVAL);
 }
@@ -10479,8 +10551,7 @@ str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
 		freemsg(mp);
 	} else {
 		putq(q, mp);
-		if (likely(mp == q->q_first))
-			strwakeread(sd);
+		strwakeread(sd);
 		strevent(sd, S_HIPRI, 0);
 	}
 	return (0);
@@ -10650,7 +10721,7 @@ strputq(queue_t *q, mblk_t *mp)
 STATIC streams_inline streams_fastcall __hot_out int
 str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	if (strputq(q, mp))
+	if (strputq(q, mp) && !test_bit(QHLIST_BIT, &q->q_flag))
 		strwakeread(sd);
 	strevent(sd, (S_INPUT | (mp->b_band ? S_RDBAND : S_RDNORM)), mp->b_band);
 	return (0);
