@@ -499,29 +499,27 @@ allocb_fast(const size_t size, uint priority)
 	mblk_t *mp;
 
 	if (likely((mp = mdbblock_alloc(priority, &allocb_fast)) != NULL)) {
-		// struct mdbblock *md = mb_to_mdb(mp);
-		// dblk_t *db = &md->datablk.d_dblock;
-		// unsigned char *base = md->databuf;
+		struct mdbblock *md = mb_to_mdb(mp);
+		dblk_t *db = &md->datablk.d_dblock;
+		unsigned char *base = md->databuf;
 
-		// (void) db;
-		// (void) base;
 		/* set up message block */
 		// _ensure(mp->b_next == NULL, mp->b_next = NULL);
 		// _ensure(mp->b_prev == NULL, mp->b_prev = NULL);
 		// _ensure(mp->b_cont == NULL, mp->b_cont = NULL);
-		// _ensure(mp->b_rptr == base, mp->b_rptr = base);
-		// _ensure(mp->b_wptr == base, mp->b_wptr = base);
+		mp->b_rptr = base;
+		mp->b_wptr = base;
 		// _ensure(mp->b_datap == db, mp->b_datap = db);
 		// _ensure(mp->b_band == 0, mp->b_band = 0);
 		// _ensure(mp->b_flag == 0, mp->b_flag = 0);
 		// _ensure(mp->b_csum == 0, mp->b_csum = 0);
 		/* set up data block */
 		// _ensure(db->db_frtnp == NULL, db->db_frtnp = NULL);
-		// _ensure(db->db_base == base, db->db_base = base);
-		// _ensure(db->db_lim == base + FASTBUF, db->db_lim = base + FASTBUF);
+		db->db_base = base;
+		db->db_lim = base + FASTBUF;
 		// _ensure(db->db_ref == 1, db->db_ref = 1);
 		// _ensure(db->db_type == M_DATA, db->db_type = M_DATA);
-		// _ensure(db->db_size == FASTBUF, db->db_size = FASTBUF);
+		db->db_size = size;
 		// _ensure(db->db_flag == 0, db->db_flag = 0);
 		return (mp);
 	}
@@ -741,6 +739,39 @@ __STRUTIL_EXTERN_INLINE mblk_t *dupmsg(mblk_t *mp);
 
 EXPORT_SYMBOL(dupmsg);		/* include/sys/streams/stream.h */
 
+static streams_inline streams_fastcall __hot void
+freedb(dblk_t *db)
+{
+	if (likely(db_dec_and_test(db) != 0)) {
+		/* free data block */
+		mblk_t *mb = db_to_mb(db);
+
+		if (unlikely(db->db_base != db_to_buf(db))) {
+			register struct free_rtn *frtnp;
+
+			/* handle external data buffer */
+			if (unlikely((frtnp = db->db_frtnp) != NULL)) {
+				register void streamscall (*free_func) (caddr_t);
+
+				if (likely((free_func = frtnp->free_func) != NULL)) {
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+					struct module *kmod;
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+					free_func(frtnp->free_arg);
+#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
+					if ((kmod = *(struct module **) (frtnp + 1)))
+						module_put(kmod);
+#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
+				}
+			} else
+				kmem_free(db->db_base, db->db_size);
+		}
+		/* the entire mdbblock can go if the associated msgb is also unused */
+		if (likely(mb->b_datap == NULL))
+			mdbblock_free(mb);
+	}
+}
+
 /**
  *  freeb:	- free a message block
  *  @mp:	message block to free
@@ -771,34 +802,7 @@ freeb(mblk_t *mp)
 	dassert(db->db_ref > 0);
 
 	/* message block marked free above */
-	if (likely(db_dec_and_test(db) != 0)) {
-		/* free data block */
-		mblk_t *mb = db_to_mb(db);
-
-		if (likely(db->db_base != db_to_buf(db))) {
-			register struct free_rtn *frtnp;
-
-			/* handle external data buffer */
-			if ((frtnp = db->db_frtnp)) {
-				register void streamscall (*free_func) (caddr_t);
-
-				if ((free_func = frtnp->free_func)) {
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-					struct module *kmod;
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
-					free_func(frtnp->free_arg);
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-					if ((kmod = *(struct module **) (frtnp + 1)))
-						module_put(kmod);
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
-				}
-			} else
-				kmem_free(db->db_base, db->db_size);
-		}
-		/* the entire mdbblock can go if the associated msgb is also unused */
-		if (likely(mb->b_datap == NULL))
-			mdbblock_free(mb);
-	}
+	freedb(db);		/* release data block and possibly associated message block */
 	/* if the message block refers to the associated data block then we have already freed the
 	   mdbblock above when necessary; otherwise the entire mdbblock can go if the datab is also 
 	   unused */
@@ -1020,34 +1024,7 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 	mp->b_wptr += blen;
 	mp->b_datap = dp;
 	/* remove a reference from old initial datab */
-	if (likely(db_dec_and_test(db) != 0)) {
-		/* free data block */
-		mblk_t *mb = db_to_mb(db);
-
-		if (likely(db->db_base != db_to_buf(db))) {
-			register struct free_rtn *frtnp;
-
-			/* handle external data buffer */
-			if ((frtnp = db->db_frtnp)) {
-				register void streamscall (*free_func) (caddr_t);
-
-				if ((free_func = frtnp->free_func)) {
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-					struct module *kmod;
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
-					free_func(frtnp->free_arg);
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-					if ((kmod = *(struct module **) (frtnp + 1)))
-						module_put(kmod);
-#endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
-				}
-			} else
-				kmem_free(db->db_base, db->db_size);
-		}
-		/* the entire mdbblock can go if the associated msgb is also unused */
-		if (likely(mb->b_datap == NULL))
-			mdbblock_free(mb);
-	}
+	freedb(db);		/* release data block and possibly associated message block */
 	for (mpp = &mp->b_cont; (bp = *mpp);) {
 		if ((blen = bp->b_wptr > bp->b_rptr ? bp->b_wptr - bp->b_rptr : 0) > 0
 		    && bp->b_datap->db_type != type)

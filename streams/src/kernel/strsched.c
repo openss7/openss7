@@ -1221,7 +1221,7 @@ mdbblock_free(mblk_t *mp)
 	{
 		struct mdbblock *md = (struct mdbblock *) mp;
 		dblk_t *db = &md->datablk.d_dblock;
-		unsigned char *base = md->databuf;
+		// unsigned char *base = md->databuf;
 
 		/* clean the state before putting it back, save mutlitple initializations elsewhere 
 		   and reduces code paths.  Optimized for FASTBUFS (all fields completed). */
@@ -1229,8 +1229,8 @@ mdbblock_free(mblk_t *mp)
 		mp->b_next = NULL;
 		mp->b_prev = NULL;
 		mp->b_cont = NULL;
-		mp->b_rptr = base;
-		mp->b_wptr = base;
+		// mp->b_rptr = base;
+		// mp->b_wptr = base;
 		mp->b_datap = db;
 		mp->b_band = 0;
 		mp->b_pad1 = 0;
@@ -1238,12 +1238,12 @@ mdbblock_free(mblk_t *mp)
 		mp->b_csum = 0;
 
 		db->db_frtnp = NULL;
-		db->db_base = base;
-		db->db_lim = base + FASTBUF;
+		// db->db_base = base;
+		// db->db_lim = base + FASTBUF;
 		db->db_ref = 1;
 		db->db_type = M_DATA;
 		db->db_flag = 0;
-		db->db_size = FASTBUF;
+		// db->db_size = FASTBUF;
 	}
 #if !defined CONFIG_STREAMS_NORECYCLE
 	{
