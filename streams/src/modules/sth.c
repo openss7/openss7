@@ -522,7 +522,9 @@ strinsert(struct inode *inode, struct stdata *sd)
 		sd->sd_inode = igrab(inode);
 		cdev = sd->sd_cdevsw;
 		assert(cdev);
+		write_lock(&cdevsw_lock);
 		list_add(&sd->sd_list, &cdev->d_stlist);
+		write_unlock(&cdevsw_lock);
 		assert(cdev->d_inode);
 		cdev->d_inode->i_nlink++;
 		/* should always be successful */
@@ -564,9 +566,10 @@ strremove_locked(struct inode *inode, struct stdata *sd)
 		cdev = sd->sd_cdevsw;
 		assert(cdev);
 		assert(cdev->d_inode);
+		write_lock(&cdevsw_lock);
 		cdev->d_inode->i_nlink--;
-		ensure(sd->sd_list.next, INIT_LIST_HEAD(&sd->sd_list));
 		list_del_init(&sd->sd_list);
+		write_unlock(&cdevsw_lock);
 		sd->sd_inode = NULL;
 	}
 }
@@ -780,7 +783,8 @@ strschedule_write(void)
 		/* try to avoid context switch */
 		set_task_state(t->proc, TASK_INTERRUPTIBLE);
 		/* before every sleep -- saves a context switch */
-		if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+		if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED 
+											 */
 			return;
 		// set_current_state(TASK_RUNNING);
 		runqueues();
@@ -806,7 +810,8 @@ strschedule_read(void)
 		/* try to avoid context switch */
 		set_task_state(t->proc, TASK_INTERRUPTIBLE);
 		/* before every sleep -- saves a context switch */
-		if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
+		if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED 
+											 */
 			return;
 		// set_current_state(TASK_RUNNING);
 		runqueues();
@@ -814,16 +819,20 @@ strschedule_read(void)
 #endif
 }
 
-STATIC streams_inline streams_fastcall __hot_out void
+STATIC streams_inline streams_fastcall __hot_write void
 strput(struct stdata *sd, mblk_t *mp)
 {
+#if 0
 	if (likely(test_bit(STRHOLD_BIT, &sd->sd_flag) == 0)) {	/* PROFILED */
 		_ctrace(putnext(sd->sd_wq, mp));
 		_trace();
 		return;
 	}
-	_ctrace(put(sd->sd_wq, mp)); /* calls strwput */
+	_ctrace(put(sd->sd_wq, mp));	/* calls strwput */
 	_trace();
+#else
+	strwput(sd->sd_wq, mp); /* this should be possible now */
+#endif
 	return;
 }
 
@@ -1230,7 +1239,8 @@ alloc_data(struct stdata *sd, ssize_t dlen, const void __user *dbuf)
 		if (likely(dlen > 0)) {
 			int err = 0;
 
-			switch (__builtin_expect((volatile int) sd->sd_flag & (STRCSUM | STRCRC32C), 0)) {
+			switch (__builtin_expect
+				((volatile int) sd->sd_flag & (STRCSUM | STRCRC32C), 0)) {
 			case STRCRC32C:
 #if 0
 				/* not doing this just yet */
@@ -1307,7 +1317,8 @@ alloc_proto(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *d
 			mp = linkmsg(mp, dp);
 #if 1
 			/* STRHOLD feature in strwput uses this */
-			if (likely(clen < 0))	/* PROFILED */
+			if (likely(clen < 0))
+				/* PROFILED */
 				/* do not coallesce M_DATA written with putmsg */
 				dp->b_flag |= MSGDELIM;
 #endif
@@ -1759,61 +1770,91 @@ strwakewrite(struct stdata *sd)
 	strwakepoll(sd);
 }
 
-STATIC streams_inline streams_fastcall __hot_read mblk_t *
-strgetq(struct stdata *sd, const int flags, const int band, unsigned long pl,
-	     const ssize_t mread)
-{				/* IRQ SUPPRESSED */
-	queue_t *q = sd->sd_rq;
-	mblk_t *b = NULL;
+streams_noinline streams_fastcall mblk_t *
+strgetq_exception(struct stdata *sd, const int flags, mblk_t *mp, unsigned long *plp)
+{
+	unsigned long pl = *plp;
 	int err;
 
-	if (mread != 0 && test_bit(QHLIST_BIT, &q->q_flag))
-		goto error;
-	/* like a mini service procedure */
-	while (likely((b = q->q_first) != NULL)) {
-		switch (b->b_datap->db_type) {
-		case M_DATA:
-		case M_PROTO:
-			if (unlikely(flags == MSG_HIPRI || b->b_band < band))
-				goto ebadmsg;
-			break;
-		case M_PCPROTO:
-			if (unlikely(flags == MSG_BAND))
-				goto ebadmsg;
-			clear_bit(STRPRI_BIT, &sd->sd_flag);
-			break;
-		case M_SIG:
-			if (!b->b_next || b->b_next->b_datap->db_type != M_SIG)
-				clear_bit(STRMSIG_BIT, &sd->sd_flag);
-			rmvq(q, b);
-			zwunlock(sd, pl);
-			if (unlikely((err = strsignal_locked(sd, b, FREAD))))
-				return (ERR_PTR(err));
-			zwlock(sd, pl);
-			continue;
-		default:
-		case M_PASSFP:
+	switch (mp->b_datap->db_type) {
+	case M_PCPROTO:
+		if (unlikely(flags == MSG_BAND))
 			goto ebadmsg;
-		}
-		if (b->b_next && unlikely(b->b_next->b_datap->db_type == M_SIG))
-			set_bit(STRMSIG_BIT, &sd->sd_flag);
-		rmvq(q, b);
-		set_bit(QHLIST_BIT, &q->q_flag);
-		break;
+		clear_bit(STRPRI_BIT, &sd->sd_flag);
+		return (mp);
+	case M_SIG:
+		if (!mp->b_next || mp->b_next->b_datap->db_type != M_SIG)
+			clear_bit(STRMSIG_BIT, &sd->sd_flag);
+		rmvq(sd->sd_rq, mp);
+		zwunlock(sd, pl);
+		if (unlikely((err = strsignal_locked(sd, mp, FREAD))))
+			return (ERR_PTR(err));
+		zwlock(sd, pl);
+		*plp = pl;
+		return (NULL);
+	default:
+		swerr();
+	case M_PASSFP:
+	      ebadmsg:
+		return (ERR_PTR(-EBADMSG));
 	}
-      error:
+}
+
+STATIC streams_inline streams_fastcall __hot_read mblk_t *
+strgetq(struct stdata *sd, const int flags, const int band, const ssize_t mread)
+{				/* IRQ SUPPRESSED */
+	queue_t *q = sd->sd_rq;
+	unsigned long pl;
+	bool wake = false;
+	mblk_t *b;
+
+	zwlock(sd, pl);
+	/* if this is the first read attempt (mread != 0) must grab the QHLIST bit first */
+	if (likely(mread != 0) && unlikely(test_and_set_bit(QHLIST_BIT, &q->q_flag))) {
+		set_bit(QTOENAB_BIT, &q->q_flag);
+		b = NULL;
+	} else {
+		if (likely((b = q->q_first) != NULL)) {
+			/* like a mini service procedure */
+			do {
+				if (likely((b->b_datap->db_type & ~1) == 0)) {
+					/* M_DATA or M_PROTO */
+					if (unlikely(flags == MSG_HIPRI || b->b_band < band))
+						goto ebadmsg;
+				} else {
+					if ((b = strgetq_exception(sd, flags, b, &pl)) == NULL)
+						continue;
+					if (IS_ERR(b))
+						goto error;
+				}
+				if (b->b_next && unlikely(b->b_next->b_datap->db_type == M_SIG))
+					set_bit(STRMSIG_BIT, &sd->sd_flag);
+				rmvq(q, b);
+				goto done;
+			} while (unlikely((b = q->q_first) != NULL));
+		}
+		goto error;
+	}
+      done:
 	zwunlock(sd, pl);
+	if (unlikely(wake))
+		strwakeread(sd);	/* wake other readers blocked on QHLIST bit */
 	return (b);
       ebadmsg:
 	b = ERR_PTR(-EBADMSG);
 	goto error;
+      error:
+	/* if unsuccessful and this is the first read, release QHLIST bit */
+	if (likely(mread != 0)) {
+		clear_bit(QHLIST_BIT, &q->q_flag);
+		wake = test_and_clear_bit(QTOENAB_BIT, &q->q_flag);
+	}
+	goto done;
 }
-
 streams_noinline streams_fastcall __unlikely mblk_t *
-strgetq_slow(struct stdata *sd, const int flags, const int band, unsigned long pl,
-	     const ssize_t mread)
+strgetq_slow(struct stdata *sd, const int flags, const int band, const ssize_t mread)
 {				/* IRQ SUPPRESSED */
-	return strgetq(sd, flags, band, pl, mread);
+	return strgetq(sd, flags, band, mread);
 }
 
 /**
@@ -1849,19 +1890,20 @@ strgetq_slow(struct stdata *sd, const int flags, const int band, unsigned long p
 STATIC streams_inline streams_fastcall __hot_read mblk_t *
 strgetq_test(struct stdata *sd, const int flags, const int band, const ssize_t mread)
 {				/* IRQ SUPPRESSED */
+#if 0
 	mblk_t *b = NULL;
-	unsigned long pl = 0;
 
 	/* fast path for data */
-	if (likely((b = sd->sd_rq->q_first) == NULL))
+	if (likely((b = (mblk_t *volatile) sd->sd_rq->q_first) == NULL))
 		return (b);
-	zwlock(sd, pl);
-	return strgetq(sd, flags, band, pl, mread);
+#endif
+	return strgetq(sd, flags, band, mread);
 }
 
 STATIC streams_inline streams_fastcall __hot_read mblk_t *
 strgetq_wakeup(struct stdata *sd, const int flags, const int band, const ssize_t mread)
 {				/* IRQ SUPPRESSED */
+#if 0
 	queue_t *q = sd->sd_rq;
 	mblk_t *b = NULL;
 	unsigned long pl = 0;
@@ -1885,7 +1927,9 @@ strgetq_wakeup(struct stdata *sd, const int flags, const int band, const ssize_t
 	zwunlock(sd, pl);
 	return (b);
       go_slow:
-	return strgetq_slow(sd, flags, band, pl, mread);
+	zwunlock(sd, pl);
+#endif
+	return strgetq_slow(sd, flags, band, mread);
 }
 
 /**
@@ -1898,33 +1942,30 @@ strgetq_wakeup(struct stdata *sd, const int flags, const int band, const ssize_t
  * speed.
  */
 STATIC streams_inline streams_fastcall __hot_read void
-strputbq(struct stdata *sd, mblk_t *mp, const bool release)
+strputbq(struct stdata *sd, mblk_t *const mp, const bool release)
 {				/* IRQ SUPPRESSED */
 	queue_t *q = sd->sd_rq;
+	bool wake = false;
 	unsigned long pl;
-	mblk_t *emp;
 
 	zwlock(sd, pl);
 	/* Like putbq() but handles STRPRI bit and under queue locks */
-	if (mp != NULL) {
+	if (likely(mp != NULL)) {
 		if (unlikely(mp->b_datap->db_type == M_SIG))
 			set_bit(STRMSIG_BIT, &sd->sd_flag);
 		else
 			clear_bit(STRMSIG_BIT, &sd->sd_flag);
-		if (unlikely(mp->b_datap->db_type >= QPCTL)) {
+		if (unlikely(mp->b_datap->db_type >= QPCTL))
 			set_bit(STRPRI_BIT, &sd->sd_flag);
-			emp = q->q_first;
-		} else {
-			for (emp = q->q_first;
-			     emp && (emp->b_datap->db_type >= QPCTL ||
-				     emp->b_band > mp->b_band); emp = emp->b_next) ;
-		}
-		insq(q, emp, mp);
+		putbq(q, mp);
 	}
-	if (release)
+	if (likely(release)) {
 		clear_bit(QHLIST_BIT, &q->q_flag);
+		wake = test_and_clear_bit(QTOENAB_BIT, &q->q_flag);
+	}
 	zwunlock(sd, pl);
-	strwakeread(sd);    /* wake other readers blocked on QHLIST bit */
+	if (unlikely(wake))
+		strwakeread(sd);	/* wake other readers blocked on QHLIST bit */
 }
 
 /**
@@ -1998,7 +2039,7 @@ strwaitgetq(struct stdata *sd, const int flags, const int band, const ssize_t mr
  *
  *  LOCKING: Call this function with the Stream frozen and a Stream head read lock.
  */
-STATIC __unlikely int
+STATIC streams_inline streams_fastcall __hot_read int
 strsendmread(struct stdata *sd, const unsigned long len)
 {
 	mblk_t *b;
@@ -2071,7 +2112,8 @@ strsendmread(struct stdata *sd, const unsigned long len)
  *  satisfying the request, or a delimited message.
  */
 STATIC streams_inline streams_fastcall __hot_read mblk_t *
-strtestgetq(struct stdata *sd, const int f_flags, const int flags, const int band, const ssize_t mread)
+strtestgetq(struct stdata *sd, const int f_flags, const int flags, const int band,
+	    const ssize_t mread)
 {
 	mblk_t *mp;
 	int err;
@@ -3680,7 +3722,8 @@ strputpmsg_common(const struct file *file, const struct strbuf *ctlp, const stru
 
 	if (unlikely((err = strpsizecheck(sd, ctlp, datp, 1)) < -1))	/* PROFILED */
 		goto error;
-	if (unlikely((err = strwaitband(sd, sd->sd_wq, file->f_flags, band, flags))))	/* PROFILED */
+	if (unlikely((err = strwaitband(sd, sd->sd_wq, file->f_flags, band, flags))))	/* PROFILED 
+											 */
 		goto error;
 	return strallocpmsg(sd, ctlp, datp, band, flags);
       error:
@@ -4115,12 +4158,14 @@ strpoll_fast(struct file *file, struct poll_table_struct *poll)
 				register queue_t *sq;
 
 				if (likely((sq = wq->q_nfsrv) != NULL)) {
-					qrlock(sq, pl);
+					qwlock(sq, pl);
 					if (likely(!test_bit(QFULL_BIT, &sq->q_flag)))
 						mask |= POLLOUT | POLLWRNORM;
+					else
+						set_bit(QWANTW_BIT, &sq->q_flag);
 					if (likely(sq->q_blocked < sq->q_nband))
 						mask |= POLLOUT | POLLWRBAND;
-					qrunlock(sq, pl);
+					qwunlock(sq, pl);
 				}
 			}
 			prunlock(sd);
@@ -4672,7 +4717,7 @@ strlinkmsg(mblk_t *first, mblk_t *mp)
 
 		for (bp = &first; (*bp); bp = &(*bp)->b_cont) ;
 		(*bp) = mp;
-		first->b_flag |= mp->b_flag & (MSGDELIM|MSGMARK|MSGATTEN|MSGMARKNEXT);
+		first->b_flag |= mp->b_flag & (MSGDELIM | MSGMARK | MSGATTEN | MSGMARKNEXT);
 		return (first);
 	}
 }
@@ -4944,15 +4989,17 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 
 		srunlock(sd);
 
-		/* transfer the message outside the locks */
-		if (unlikely((xferd = strmcopyout(&first, buf, nbytes, protdis)) < 0))
-			err = xferd;
+		if (likely(first != NULL)) {
+			/* transfer the message outside the locks */
+			if (unlikely((xferd = strmcopyout(&first, buf, nbytes, protdis)) < 0))
+				err = xferd;
 
-		if (xferd > 0 && first != NULL && discard) {
-			freemsg(first);
-			first = NULL;
+			if (xferd > 0 && discard) {
+				freemsg(first);
+				strputbq(sd, NULL, true);	/* clears QHLIST bit */
+			} else
+				strputbq(sd, first, true);	/* clears QHLIST bit */
 		}
-		strputbq(sd, first, true);	/* clears QHLIST bit */
 	}
 
 	/* Per current POSIX specs, only return and error when no read data has been transferred. */
@@ -5813,8 +5860,8 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 		{
 			ssize_t mread = datp ? ((datp->maxlen > 0) ? datp->maxlen : -1) : -1;
 
-			mp = strtestgetq(sd, file->f_flags, flags, band, mread);	/* sets
-											   QHLIST */
+			/* sets QHLIST */
+			mp = strtestgetq(sd, file->f_flags, flags, band, mread);
 			if (IS_ERR(mp) || !mp) {
 				err = PTR_ERR(mp);
 				goto unlock_error;
@@ -7053,7 +7100,7 @@ str_i_srdopt(const struct file *file, struct stdata *sd, unsigned long arg)
 		rdopt |= RPROTNORM;
 		break;
 	default:
-	case RPROTCOMPRESS: /* not supported yet */
+	case RPROTCOMPRESS:	/* not supported yet */
 		return (-EINVAL);
 	}
 
@@ -10480,7 +10527,7 @@ EXPORT_SYMBOL(strm_f_ops);
  *  the STREAM head write queue is called without STREAM head locks, so we need to take locks and
  *  check a bunch of things here, before attempting a putnext().
  */
-streamscall __hot_out int
+streamscall __hot_write int
 strwput(queue_t *q, mblk_t *mp)
 {				/* PROFILED -- never happens any more */
 	assert(q);
@@ -10488,20 +10535,21 @@ strwput(queue_t *q, mblk_t *mp)
 
 	if (unlikely(test_bit(QHLIST_BIT, &q->q_flag)) ||
 	    unlikely(test_bit(STRHOLD_BIT, &wqstream(q)->sd_flag))) {
-		switch (mp->b_datap->db_type) {
+		switch (__builtin_expect(mp->b_datap->db_type, M_DATA)) {
 			mblk_t *b;
+
 		case M_DATA:
 			if ((b = getq(q)) != NULL)
 				goto release;
 			/* Feature not activated, or not M_DATA, or banded, or delimited, or longer 
 			   than one block, or a zero-length message, or can't hold another write
 			   same size. */
-			if (!((mp->b_datap->db_type != M_DATA)
-			      || (mp->b_band != 0)
-			      || (mp->b_flag & MSGDELIM)
-			      || (mp->b_cont != NULL)
-			      || (mp->b_wptr == mp->b_rptr)
-			      || (mp->b_wptr - mp->b_rptr > mp->b_datap->db_lim - mp->b_wptr))) {
+			if (likely(!((mp->b_band != 0) ||
+				     (mp->b_flag & MSGDELIM) ||
+				     (mp->b_cont != NULL) ||
+				     (mp->b_wptr == mp->b_rptr) ||
+				     (mp->b_wptr - mp->b_rptr >
+				      mp->b_datap->db_lim - mp->b_wptr)))) {
 				/* held - add stream head to scan list */
 				qscan(q);
 				putq(q, mp);
@@ -10539,14 +10587,21 @@ EXPORT_SYMBOL(strwput);
  *  =========================================================================
  */
 
+/**
+ *  str_m_pcproto: process M_PCPROTO message at the Stream head
+ *  @sd: stream head
+ *  @q: read queue
+ *  @mp: the M_PCPROTO message
+ *
+ *  MG 7.9.6:- "M_DATA, M_PROTO, M_PCPROTO, M_PASSFP -- after checking the message type, the message
+ *  is placed on the stream head read queue.  If the message is an M_PCPROTO the STRPRI flag is set
+ *  in the stream head, indicating the presence of an M_PCPROTO message.  If this bit is already
+ *  set, indicating than an M_PCPROTO message is already present, the new message is discarded.  The
+ *  relevant processes are then woken up or signalled.
+ */
 streams_noinline streams_fastcall int
 str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	/* MG 7.9.6:- "M_DATA, M_PROTO, M_PCPROTO, M_PASSFP -- after checking the message type, the 
-	   message is placed on the stream head read queue.  If the message is an M_PCPROTO the
-	   STRPRI flag is set in the stream head, indicating the presence of an M_PCPROTO message.
-	   If this bit is already set, indicating than an M_PCPROTO message is already present, the 
-	   new message is discarded.  The relevant processes are then woken up or signalled. */
 	if (test_bit(STRCLOSE_BIT, &sd->sd_flag) || test_and_set_bit(STRPRI_BIT, &sd->sd_flag)) {
 		freemsg(mp);
 	} else {
@@ -10601,25 +10656,29 @@ coallesce(mblk_t *b1, mblk_t *b2, unsigned long size)
 }
 
 /**
- *  __strputq_band: put a banded M_DATA message to a queue with message coallescing
+ *  strputq_band: put a banded M_DATA message to a queue with message coallescing
  *  @q: stream head read queue
  *  @mp: the M_DATA message
  */
 streams_noinline streams_fastcall int
-__strputq_band(queue_t *q, mblk_t *mp)
+strputq_band(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	mblk_t *b_prev, *b_next, *b_this;
 	struct qband *qb;
 	unsigned long size = msgsize(mp);
+	unsigned long pl;
+	int wake;
 
 	b_this = mp;
 	b_prev = NULL;
+	qwlock(q, pl);
 	b_next = q->q_first;
 	while (unlikely(b_next && b_next->b_datap->db_type >= QPCTL)) {
 		b_prev = b_next;
 		b_next = b_prev->b_next;
 	}
 	if (unlikely((qb = __get_qband(q, mp->b_band)) == NULL)) {
+		qwunlock(q, pl);
 		swerr();
 		freemsg(mp);
 		return (0);
@@ -10630,7 +10689,8 @@ __strputq_band(queue_t *q, mblk_t *mp)
 		b_next = b_prev->b_next;
 	}
 	if (unlikely(b_prev != NULL)) {
-		if (size <= (FASTBUF >> 1) && coallesce(b_prev, mp, size)) {
+		if (((sd->sd_rdopt & (RMSGN | RMSGD)) == 0) &&
+		    size <= (FASTBUF >> 1) && coallesce(b_prev, mp, size)) {
 			b_this = b_prev;
 			goto count;
 		}
@@ -10653,7 +10713,9 @@ __strputq_band(queue_t *q, mblk_t *mp)
 	if (unlikely((qb->qb_count += size) >= qb->qb_hiwat))
 		if (likely(!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag)))
 			q->q_blocked++;
-	return (q->q_first == b_this);
+	wake = (q->q_first == b_this);
+	qwunlock(q, pl);
+	return (wake);
 }
 
 /**
@@ -10662,46 +10724,45 @@ __strputq_band(queue_t *q, mblk_t *mp)
  *  @mp: the M_DATA message
  */
 STATIC streams_inline streams_fastcall int
-__strputq(queue_t *q, mblk_t *mp)
+strputq_norm(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	if (likely(mp->b_band == 0)) {
-		mblk_t *b_prev, *b_this;
-		unsigned long size = msgsize(mp);
+	mblk_t *b_prev, *b_this;
+	unsigned long size = msgsize(mp);
+	unsigned long pl;
+	int wake;
 
-		b_this = mp;
-		b_prev = q->q_last;
-		mp->b_next = NULL;
-		mp->b_prev = NULL;
-		if (unlikely(b_prev != NULL)) {
-			if (size <= (FASTBUF >> 1) && coallesce(b_prev, mp, size)) {
-				b_this = b_prev;
-				goto count;
-			}
-			mp->b_prev = b_prev;
-			b_prev->b_next = mp;
+	b_this = mp;
+	qwlock(q, pl);
+	b_prev = q->q_last;
+	mp->b_next = NULL;
+	mp->b_prev = NULL;
+	if (unlikely(b_prev != NULL)) {
+		if (((sd->sd_rdopt & (RMSGN | RMSGD)) == 0) &&
+		    size <= (FASTBUF >> 1) && coallesce(b_prev, mp, size)) {
+			b_this = b_prev;
+			goto count;
 		}
-		q->q_last = mp;
-		if (likely(q->q_first == NULL))
-			q->q_first = mp;
-		q->q_msgs++;
-	      count:
-		if (unlikely((q->q_count += size) >= q->q_hiwat))
-			set_bit(QFULL_BIT, &q->q_flag);
-		return (q->q_first == b_this);
+		mp->b_prev = b_prev;
+		b_prev->b_next = mp;
 	}
-	return __strputq_band(q, mp);
+	q->q_last = mp;
+	if (likely(q->q_first == NULL))
+		q->q_first = mp;
+	q->q_msgs++;
+      count:
+	if (unlikely((q->q_count += size) >= q->q_hiwat))
+		set_bit(QFULL_BIT, &q->q_flag);
+	wake = (q->q_first == b_this);
+	qwunlock(q, pl);
+	return (wake);
 }
 
 STATIC streams_inline streams_fastcall int
-strputq(queue_t *q, mblk_t *mp)
+strputq(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	unsigned long pl;
-	int result;
-
-	qwlock(q, pl);
-	result = __strputq(q, mp);
-	qwunlock(q, pl);
-	return (result);
+	if (likely(mp->b_band == 0))
+		return strputq_norm(sd, q, mp);
+	return strputq_band(sd, q, mp);
 }
 
 /**
@@ -10709,6 +10770,12 @@ strputq(queue_t *q, mblk_t *mp)
  *  @sd: stream head
  *  @q: read queue
  *  @mp: the M_DATA message
+ *
+ *  MG 7.9.6:- "M_DATA, M_PROTO, M_PCPROTO, M_PASSFP -- after checking the message type, the message
+ *  is placed on the stream head read queue.  If the message is an M_PCPROTO the STRPRI flag is set
+ *  in the stream head, indicating the presence of an M_PCPROTO message.  If this bit is already
+ *  set, indicating than an M_PCPROTO message is already present, the new message is discarded.  The
+ *  relevant processes are then woken up or signalled.
  *
  *  Note that it is always possible to coallesce messages on the read queue (similar to the STRHOLD
  *  feature on the write queue).  If there is an existing, non-zero length M_DATA message without
@@ -10721,7 +10788,7 @@ strputq(queue_t *q, mblk_t *mp)
 STATIC streams_inline streams_fastcall __hot_out int
 str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	if (strputq(q, mp) && !test_bit(QHLIST_BIT, &q->q_flag))
+	if (strputq(sd, q, mp))
 		strwakeread(sd);
 	strevent(sd, (S_INPUT | (mp->b_band ? S_RDBAND : S_RDNORM)), mp->b_band);
 	return (0);
@@ -10885,24 +10952,32 @@ str_m_setopts(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
+/**
+ *  str_m_sig: - process M_SIG received at Stream head
+ *  @sd: stream head
+ *  @q: stream head read queue
+ *  @mp: M_SIG message
+ *
+ *  MG 7.9.6:- "M_SIG, M_PCSIG -- these messages send signals to the process group. The first byte
+ *  of the message contains the number of the signal to send.  For an M_PCSIG message the signal is
+ *  sent immediately.  For an M_SIG message it is placed on the read queue and the signal is sent
+ *  when the message is read from the queue by strread().  If the signal is SIGPOLL, it will be sent
+ *  only to the processes that requested it with the I_SETSIG ioctl.  Other signals are sent to a
+ *  process only if the stream is associated with the control terminal (see 7.11.2)."
+ */
 streams_noinline streams_fastcall __unlikely int
 str_m_sig(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	unsigned long pl;
+	bool wake;
 
-	/* MG 7.9.6:- "M_SIG, M_PCSIG -- these messages send signals to the process group. The
-	   first byte of the message contains the number of the signal to send.  For an M_PCSIG
-	   message the signal is sent immediately.  For an M_SIG message it is placed on the read
-	   queue and the signal is sent when the message is read from the queue by strread().  If
-	   the signal is SIGPOLL, it will be sent only to the processes that requested it with the
-	   I_SETSIG ioctl.  Other signals are sent to a process only if the stream is associated
-	   with the control terminal (see 7.11.2)." */
 	zwlock(sd, pl);
 	insq(q, NULL, mp);	/* ok when frozen */
-	if (q->q_first->b_datap->db_type == M_SIG)
+	if ((wake = (q->q_first == mp)))
 		set_bit(STRMSIG_BIT, &sd->sd_flag);
 	zwunlock(sd, pl);
-	strwakeread(sd);
+	if (wake)
+		strwakeread(sd);
 	return (0);
 }
 
@@ -10913,18 +10988,25 @@ str_m_pcsig(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
+/**
+ *  str_m_error: process M_ERROR received at Stream head
+ *  @sd: stream head
+ *  @q: stream head read qeueue
+ *  @mp: M_ERROR message
+ *
+ *  MG 7.9.6:- "M_ERROR -- when this message type is received, the first byte of the message is put
+ *  into the stream head (sd_rerror) and the STRDERR flag is set.  The second byte is placed in
+ *  sd_werror and the STWERR flag is set.  If the error code in the message has the special value
+ *  NOERROR, the corresponding flag is not set. However, if the error flag is set, a read owr write
+ *  will fail, and the value returned to the process in errno is taken from sd_rerror or sd_werror.
+ *  The error condition prevents all further reads and writes to the stream until it is closed, or
+ *  the stream head receives a NOERROR code in an M_ERROR message.  The relevant processes are then
+ *  awoken or signalled.  Finally, an M_FLUSH message is sent downstream to discard all data queued
+ *  in the stream.
+ */
 streams_noinline streams_fastcall __unlikely int
 str_m_error(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	/* MG 7.9.6:- "M_ERROR -- when this message type is received, the first byte of the message 
-	   is put into the stream head (sd_rerror) and the STRDERR flag is set.  The second byte is 
-	   placed in sd_werror and the STWERR flag is set.  If the error code in the message has
-	   the special value NOERROR, the corresponding flag is not set. However, if the error flag 
-	   is set, a read owr write will fail, and the value returned to the process in errno is
-	   taken from sd_rerror or sd_werror.  The error condition prevents all further reads and
-	   writes to the stream until it is closed, or the stream head receives a NOERROR code in
-	   an M_ERROR message.  The relevant processes are then awoken or signalled.  Finally, an
-	   M_FLUSH message is sent downstream to discard all data queued in the stream. */
 	int what = 0;
 
 	if (mp->b_wptr < mp->b_rptr + 2) {
@@ -10984,24 +11066,30 @@ str_m_error(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
+/**
+ *  str_m_hangup: process M_HANGUP received at Stream head
+ *  @sd: stream head
+ *  @q: stream head read qeueue
+ *  @mp: M_HANGUP message
+ *
+ *  MG 7.9.6:- "M_HANGUP -- if this message is received, the stream head is marked hung up.  ANy
+ *  subsequent reads from the stream will return zero, and writes will fail with the EIO error code.
+ *  As with the other message types, the relevant processes are awoken or signalled.
+ *
+ *  POSIX:- "If a modem disconnect is detected by the terminal interface for a controlling terminal,
+ *  and if CLOCAL is not set in the c_cflag field for the terminal (see Control Modes), the SIGHUP
+ *  signal shall be sent to the controlling process for which the terminal is the controlling
+ *  terminal. Unless other arrangements have been made, this shall cause the controlling process to
+ *  terminated (see exit()).  Any subsequent read from the terminal device shall return the value of
+ *  zero, indicating end-of-file; see read(). Then, processes that read a terminal file and test for
+ *  end-of-file can terminate appropriately after a disconnect.  If the EIO condition as specified
+ *  in read() also exists, it is unspecified whether on (sic) EOF condition or [EIO] is returned.
+ *  Any subsequent write() to the terminal device shall return -1, with errno set to [EIO], until
+ *  the device is closed."
+ */
 streams_noinline streams_fastcall __unlikely int
 str_m_hangup(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	/* MG 7.9.6:- "M_HANGUP -- if this message is received, the stream head is marked hung up.
-	   ANy subsequent reads from the stream will return zero, and writes will fail with the EIO 
-	   error code.  As with the other message types, the relevant processes are awoken or
-	   signalled. */
-	/* POSIX:- "If a modem disconnect is detected by the terminal interface for a controlling
-	   terminal, and if CLOCAL is not set in the c_cflag field for the terminal (see Control
-	   Modes), the SIGHUP signal shall be sent to the controlling process for which the
-	   terminal is the controlling terminal. Unless other arrangements have been made, this
-	   shall cause the controlling process to terminated (see exit()).  Any subsequent read
-	   from the terminal device shall return the value of zero, indicating end-of-file; see
-	   read(). Then, processes that read a terminal file and test for end-of-file can terminate 
-	   appropriately after a disconnect.  If the EIO condition as specified in read() also
-	   exists, it is unspecified whether on (sic) EOF condition or [EIO] is returned.  Any
-	   subsequent write() to the terminal device shall return -1, with errno set to [EIO],
-	   until the device is closed." */
 	strhangup(sd);
 	freemsg(mp);
 	return (0);
@@ -11044,16 +11132,22 @@ str_m_ioc(struct stdata *sd, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
+/**
+ *  str_m_ioctl: process M_IOCTL received at Stream head
+ *  @sd: stream head
+ *  @q: stream head read qeueue
+ *  @mp: M_IOCTL message
+ *
+ *  MG 7.9.6:- "M_IOCTL -- It does not make sense to receive on of these messages at the stream
+ *  head, so rather than quietly discarding it, a response is generated by converting it into an
+ *  M_IOCNAK message, which is then sent back up the stream." These messages could arrive here if we
+ *  are a pipe or FIFO and, for example, a I_STR input-output control were to be invoked on the
+ *  stream head at the other side.  This is possibly a common mistake, and responding in this way
+ *  keeps processes from getting hung in the ioctl at the opposite stream head.
+ */
 streams_noinline streams_fastcall int
 str_m_ioctl(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	/* MG 7.9.6:- "M_IOCTL -- It does not make sense to receive on of these messages at the
-	   stream head, so rather than quietly discarding it, a response is generated by converting 
-	   it into an M_IOCNAK message, which is then sent back up the stream." These messages
-	   could arrive here if we are a pipe or FIFO and, for example, a I_STR input-output
-	   control were to be invoked on the stream head at the other side.  This is possibly a
-	   common mistake, and responding in this way keeps processes from getting hung in the
-	   ioctl at the opposite stream head. */
 	if (_WR(q)->q_next) {
 		union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
 
@@ -11257,7 +11351,7 @@ strrput_slow(queue_t *q, mblk_t *mp)
 		_printd(("%s: got M_LETSPLAY\n", __FUNCTION__));
 		err = str_m_letsplay(sd, q, mp);
 		break;
-	case M_MI:		/* up - AIX (OSF?) only  */
+	case M_MI:		/* up - AIX (OSF?) only */
 		_printd(("%s: got M_MI\n", __FUNCTION__));
 		err = str_m_mi(sd, q, mp);
 		break;

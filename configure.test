@@ -34,9 +34,9 @@ ${path}configure \
 	--without-OSR61 \
 	--enable-k-inline \
 	--disable-k-safe \
-	--disable-k-test \
+	--enable-k-test \
 	--disable-k-debug \
-	--enable-k-none \
+	--disable-k-none \
 	--disable-streams-syncqs \
 	--enable-streams-irq \
 	--enable-streams-stats \
