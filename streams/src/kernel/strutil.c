@@ -2032,15 +2032,15 @@ putbq_pri(queue_t *q, mblk_t *mp)
 	mp->b_band = 0;
 
 	qwlock(q, pl);
-	if (unlikely((q->q_count += msgsize(mp)) >= q->q_hiwat))
-		set_bit(QFULL_BIT, &q->q_flag);
-	if (q->q_last == NULL)
-		q->q_last = mp;
-	q->q_first = mp;
-	q->q_msgs++;
 	if ((mp->b_next = q->q_first))
 		mp->b_next->b_prev = mp;
 	mp->b_prev = NULL;
+	q->q_first = mp;
+	if (q->q_last == NULL)
+		q->q_last = mp;
+	q->q_msgs++;
+	if (unlikely((q->q_count += msgsize(mp)) >= q->q_hiwat))
+		set_bit(QFULL_BIT, &q->q_flag);
 	qwunlock(q, pl);
 	return (1 + 1);
 }
@@ -2122,14 +2122,19 @@ putbq_norm(queue_t *q, mblk_t *mp)
 		b_next = q->q_first;
 
 		/* skip high priority */
-		while (unlikely(b_next && b_next->b_datap->db_type >= QPCTL)) {
-			b_prev = b_next;
-			b_next = b_prev->b_next;
+		if (unlikely(b_next != NULL) && unlikely(b_next->b_datap->db_type >= QPCTL)) {
+			do {
+				b_prev = b_next;
+				b_next = b_prev->b_next;
+			} while (unlikely(b_next != NULL)
+				 && unlikely(b_next->b_datap->db_type >= QPCTL));
 		}
 		/* skip higher bands */
-		while (unlikely(b_next && b_next->b_band > mp->b_band)) {
-			b_prev = b_next;
-			b_next = b_prev->b_next;
+		if (unlikely(b_next != NULL) && unlikely(b_next->b_band > 0)) {
+			do {
+				b_prev = b_next;
+				b_next = b_prev->b_next;
+			} while (unlikely(b_next != NULL) && unlikely(b_next->b_band > 0));
 		}
 
 		if (unlikely((q->q_count += msgsize(mp)) >= q->q_hiwat))
@@ -3723,13 +3728,11 @@ __getq(queue_t *q, bool *be)
 	mblk_t *mp;
 
 	if (likely((mp = q->q_first) != NULL)) {
-		register mblk_t *b_next;
-
 		/* hand optimized version of above */
-		if ((b_next = mp->b_next))
-			b_next->b_prev = NULL;
-		mp->b_next = NULL;
-		q->q_first = b_next;
+		if ((q->q_first = mp->b_next)) {
+			mp->b_next->b_prev = NULL;
+			mp->b_next = NULL;
+		}
 		if (q->q_last == mp)
 			q->q_last = NULL;
 		q->q_msgs--;
@@ -3746,8 +3749,8 @@ __getq(queue_t *q, bool *be)
 
 			qb = __find_qband(q, mp->b_band);
 			dassert(qb);
-			qb->qb_first = b_next;
-			if (qb->qb_last == mp)
+			qb->qb_first = q->q_first;
+			if (likely(qb->qb_last == mp))
 				qb->qb_last = NULL;
 			qb->qb_msgs--;
 			dassert(qb->qb_msgs >= 0);
