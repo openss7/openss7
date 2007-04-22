@@ -1934,25 +1934,18 @@ __strwaitgetfp(struct stdata *sd, queue_t *q)
 	DECLARE_WAITQUEUE(wait, current);
 #endif
 	mblk_t *mp;
-	int err;
+	int err, error = -ERESTARTSYS;
 
-	srunlock(sd);
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+	set_current_state(TASK_INTERRUPTIBLE);
 	add_wait_queue(&sd->sd_rwaitq, &wait);
 #endif
 	for (;;) {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 		prepare_to_wait(&sd->sd_rwaitq, &wait, TASK_INTERRUPTIBLE);
-#else
-		set_current_state(TASK_INTERRUPTIBLE);
 #endif
-		srlock(sd);
-		if (unlikely((err = straccess(sd, FREAD)) != 0)) {
-			mp = ERR_PTR(err);
-			break;
-		}
 		if (unlikely(signal_pending(current) != 0)) {
-			mp = ERR_PTR(-EINTR);
+			mp = ERR_PTR(error);
 			break;
 		}
 		if (likely((mp = strgetfp_slow(sd, q)) != NULL))
@@ -1960,8 +1953,19 @@ __strwaitgetfp(struct stdata *sd, queue_t *q)
 		// set_bit(RSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
 
+		error = -EINTR;
 		strschedule_read();	/* save context switch */
 		schedule();
+
+		prefetchw(sd);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+		set_current_state(TASK_INTERRUPTIBLE);
+#endif
+		srlock(sd);
+		if (unlikely((err = straccess(sd, FREAD)) != 0)) {
+			mp = ERR_PTR(err);
+			break;
+		}
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
 	finish_wait(&sd->sd_rwaitq, &wait);
@@ -1992,18 +1996,19 @@ strwaitgetfp(struct stdata *sd, queue_t *q, const int f_flags)
 	if ((f_flags & FNDELAY))
 		return ERR_PTR(-EAGAIN);
 
+#if 0
 	if (signal_pending(current))
 		return ERR_PTR(-ERESTARTSYS);
+#endif
 
 	return __strwaitgetfp(sd, q);
 }
 
 /**
- *  __strwaitband: - timed wait to perform write on a flow controlled band
+ *  __strwaitband: - wait to perform write on a flow controlled band
  *  @sd: stream head
- *  @f_flags: file flags
+ *  @q: stream head write queue
  *  @band: band number
- *  @flags: message flags
  *
  *  DESCRIPTION: Wait for the specified band to pass flow control restrictions.  Test for flow
  *  control before calling this function.  Call it with the STREAM head at least read locked and
@@ -2011,8 +2016,8 @@ strwaitgetfp(struct stdata *sd, queue_t *q, const int f_flags)
  *
  *  LOCKING: Must be called with a single read lock held on the STREAM head.
  */
-streams_noinline streams_fastcall int
-__strwaitband(struct stdata *sd, queue_t *q, const int f_flags, int band, const int flags)
+STATIC streams_fastcall __hot_write int
+__strwaitband(struct stdata *sd, queue_t *q, int band)
 {
 	/* wait for band to become available */
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
@@ -2020,32 +2025,18 @@ __strwaitband(struct stdata *sd, queue_t *q, const int f_flags, int band, const 
 #else
 	DECLARE_WAITQUEUE(wait, current);
 #endif
-	int err = 0;
+	int err = 0, error = -ERESTARTSYS;
 
-	if (unlikely(flags == MSG_HIPRI))	/* PROFILED */
-		return (0);
-
-	if (unlikely((f_flags & FNDELAY) && test_bit(STRNDEL_BIT, &sd->sd_flag) == 0))
-		return (-EAGAIN);
-
-	if (likely(signal_pending(current)))	/* PROFILED */
-		return (-ERESTARTSYS);
-
-	srunlock(sd);
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+	set_current_state(TASK_INTERRUPTIBLE);
 	add_wait_queue(&sd->sd_wwaitq, &wait);	/* exclusive? */
 #endif
 	for (;;) {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 		prepare_to_wait(&sd->sd_wwaitq, &wait, TASK_INTERRUPTIBLE);	/* exclusive? */
-#else
-		set_current_state(TASK_INTERRUPTIBLE);
 #endif
-		srlock(sd);
-		if (unlikely((err = straccess(sd, FWRITE)) != 0))
-			break;
 		if (unlikely(signal_pending(current)) != 0) {
-			err = -EINTR;
+			err = error;
 			break;
 		}
 		/* have read lock and access is ok */
@@ -2054,8 +2045,17 @@ __strwaitband(struct stdata *sd, queue_t *q, const int f_flags, int band, const 
 		// set_bit(WSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
 
+		error = -EINTR;
 		strschedule_write();	/* save context switch */
 		schedule();
+
+		prefetchw(sd);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+		set_current_state(TASK_INTERRUPTIBLE);
+#endif
+		srlock(sd);
+		if (unlikely((err = straccess(sd, FWRITE)) != 0))
+			break;
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
 	finish_wait(&sd->sd_wwaitq, &wait);
@@ -2064,44 +2064,6 @@ __strwaitband(struct stdata *sd, queue_t *q, const int f_flags, int band, const 
 	remove_wait_queue(&sd->sd_wwaitq, &wait);
 #endif
 	return (err);
-}
-
-/**
- *  strwaitband: - check whether we have to sleep waiting for a band
- *  @sd: stream head
- *  @f_flags: file flags
- *  @band: band number
- *  @flags: message flags
- *
- *  DESCRIPTION:  Inline checks leading up to blocking.  POSIX blocking semantics for write(),
- *  putmsg(), putpmsg() and %I_FDINSERT ioctl().
- *
- *  POSIX putmsg(2)/putpmsg(2) says "The putmsg() function shall block if the STREAM write queue is
- *  full due to internal flow control conditions, with the following exceptions: - For high-priority
- *  messages, putmsg() shall not block on this condition and continues processing the message. - For
- *  other messages, putmsg() shall not block but shall fail when the write queue is full and
- *  O_NONBLOCK is set.
- *
- *  POSIX ioctl(2) says "For non-priority messages, I_FDINSERT shall block if the STREAM write queue
- *  is full due to internal flow control conditions.  For priority messages, I_FDINSERT does not
- *  block on this condition.  For non-priority messages, I_FDINSERT does not block when the write
- *  queue is full and O_NONBLOCK is set.  Instead, it fails and sets errno to [EAGAIN].
- *
- *  Never check flow control or block for high priority messages.  For normal messages, check the
- *  band.  Do not sleep if FNDELAY is set unless we are doing old TTY semantics (that always blocks
- *  on write regardless of the setting of FNDELAY).
- *
- *  LOCKING: must hold a read lock on the stream head.
- */
-STATIC streams_fastcall __hot_out int
-strwaitband(struct stdata *sd, queue_t *q, const int f_flags, const int band, const int flags)
-{
-	/* have read lock and access was ok */
-	if (likely(flags != MSG_HIPRI))	/* PROFILED */
-		if (likely(bcanputnext(q, band) != 0))	/* PROFILED */
-			return (0);
-
-	return __strwaitband(sd, q, f_flags, band, flags);
 }
 
 /*
@@ -2119,10 +2081,10 @@ __strwaitopen(struct stdata *sd, const int access)
 #else
 	DECLARE_WAITQUEUE(wait, current);
 #endif
-	int err;
+	int err = 0, error = -ERESTARTSYS;
 
-	swunlock(sd);
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
+	set_current_state(TASK_INTERRUPTIBLE);
 	add_wait_queue_exclusive(&sd->sd_owaitq, &wait);
 #endif
 
@@ -2131,22 +2093,26 @@ __strwaitopen(struct stdata *sd, const int access)
 	for (;;) {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
 		prepare_to_wait_exclusive(&sd->sd_owaitq, &wait, TASK_INTERRUPTIBLE);
-#else
-		set_current_state(TASK_INTERRUPTIBLE);
 #endif
-		swlock(sd);
-		if ((err = straccess_noinline(sd, access)))
-			break;
 		if (signal_pending(current)) {
-			err = -EINTR;
+			err = error;
 			break;
 		}
 		if (!test_and_set_bit(STWOPEN_BIT, &sd->sd_flag))
 			break;
 		swunlock(sd);
 
+		error = -EINTR;
 		strschedule();	/* save context switch */
 		schedule();
+
+		prefetchw(sd);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
+		set_current_state(TASK_INTERRUPTIBLE);
+#endif
+		swlock(sd);
+		if ((err = straccess_noinline(sd, access)))
+			break;
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
 	finish_wait(&sd->sd_owaitq, &wait);
@@ -2168,8 +2134,10 @@ strwaitopen(struct stdata *sd, const int access)
 {
 	int err;
 
+#if 0
 	if (signal_pending(current))
 		return (-ERESTARTSYS);
+#endif
 	if (!(err = straccess_wlock(sd, access))) {
 		if (!test_and_set_bit(STWOPEN_BIT, &sd->sd_flag))
 			return (0);
@@ -2254,35 +2222,41 @@ __strwaitfifo(struct stdata *sd, const int oflag)
 #else
 	DECLARE_WAITQUEUE(wait, current);
 #endif
-	int err = 0;
+	int err = 0, error = -ERESTARTSYS;
 	wait_queue_head_t *waitq;
 
 	waitq = (oflag & FREAD) ? &sd->sd_rwaitq : &sd->sd_wwaitq;
 
+	if (unlikely((err = straccess_rlock(sd, FCREAT)) != 0))
+		return (err);
+
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+	set_current_state(TASK_INTERRUPTIBLE);
 	add_wait_queue(waitq, &wait);
 #endif
 	for (;;) {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 		prepare_to_wait(waitq, &wait, TASK_INTERRUPTIBLE);
-#else
-		set_current_state(TASK_INTERRUPTIBLE);
 #endif
-		if (unlikely((err = straccess_rlock(sd, FCREAT)) != 0))
-			break;
 		if (signal_pending(current)) {
-			err = -EINTR;
-			srunlock(sd);
+			err = error;
 			break;
 		}
-		if (likely(sd->sd_readers >= 1 && sd->sd_writers >= 1)) {
-			srunlock(sd);
+		if (likely(sd->sd_readers >= 1 && sd->sd_writers >= 1))
 			break;
-		}
 		srunlock(sd);
 
+		error = -EINTR;
 		strschedule();	/* save context switch */
 		schedule();
+
+		prefetchw(sd);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+		set_current_state(TASK_INTERRUPTIBLE);
+#endif
+		srlock(sd);
+		if (unlikely((err = straccess(sd, FCREAT)) != 0))
+			break;
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
 	finish_wait(waitq, &wait);
@@ -2290,6 +2264,7 @@ __strwaitfifo(struct stdata *sd, const int oflag)
 	set_current_state(TASK_RUNNING);
 	remove_wait_queue(waitq, &wait);
 #endif
+	srunlock(sd);
 	return (err);
 }
 
@@ -2324,15 +2299,14 @@ strwaitqueue(struct stdata *sd, queue_t *q, long timeo)
 
 	set_bit(QWCLOSE_BIT, &q->q_flag);
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+	set_current_state(TASK_INTERRUPTIBLE);
 	add_wait_queue(&qu->qu_qwait, &wait);
 #endif
 	for (;;) {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 		prepare_to_wait(&qu->qu_qwait, &wait, TASK_INTERRUPTIBLE);
-#else
-		set_current_state(TASK_INTERRUPTIBLE);
 #endif
-		if (!q->q_first)
+		if (!(mblk_t *volatile) q->q_first)
 			break;
 		if (timeo == 0)
 			break;
@@ -2342,6 +2316,10 @@ strwaitqueue(struct stdata *sd, queue_t *q, long timeo)
 			break;
 		strschedule();	/* save context switch */
 		timeo = schedule_timeout(timeo);
+		prefetch(sd);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+		set_current_state(TASK_INTERRUPTIBLE);
+#endif
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
 	finish_wait(&qu->qu_qwait, &wait);
@@ -2425,8 +2403,8 @@ __strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 #endif
 	int err = 0;
 
-	srunlock(sd);
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+	set_current_state(TASK_INTERRUPTIBLE);
 	add_wait_queue(&sd->sd_iwaitq, &wait);
 #endif
 	/* Wait for the IOCWAIT bit.  Only one ioctl can be performed on a stream at a time. See
@@ -2436,33 +2414,39 @@ __strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 		for (;;) {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 			prepare_to_wait(&sd->sd_iwaitq, &wait, TASK_INTERRUPTIBLE);
-#else
-			set_current_state(TASK_INTERRUPTIBLE);
 #endif
-			srlock(sd);
-			if (unlikely((err = straccess_wakeup(sd, 0, timeo, access)) != 0))
-				break;
 			if (!test_and_set_bit(IOCWAIT_BIT, &sd->sd_flag))
 				break;
 			srunlock(sd);
 
 			strschedule_ioctl();	/* save context switch */
 			*timeo = schedule_timeout(*timeo);
+
+			prefetchw(sd);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+			set_current_state(TASK_INTERRUPTIBLE);
+#endif
+			srlock(sd);
+			if (unlikely((err = straccess_wakeup(sd, 0, timeo, access)) != 0))
+				break;
 		}
 	} else {
 		for (;;) {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 			prepare_to_wait(&sd->sd_iwaitq, &wait, TASK_UNINTERRUPTIBLE);
-#else
-			set_current_state(TASK_UNINTERRUPTIBLE);
 #endif
-			srlock(sd);
 			if (!test_and_set_bit(IOCWAIT_BIT, &sd->sd_flag))
 				break;
 			srunlock(sd);
 
 			strschedule_ioctl();	/* save context switch */
 			schedule();
+
+			prefetchw(sd);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+			set_current_state(TASK_UNINTERRUPTIBLE);
+#endif
+			srlock(sd);
 		}
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
@@ -2520,24 +2504,17 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 	mblk_t *mp;
 	int err;
 
-	srunlock(sd);
 	/* We are waiting for a response to our downwards ioctl message.  Wait until the message
 	   arrives or the io check fails. */
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
+	set_current_state(TASK_INTERRUPTIBLE);
 	add_wait_queue_exclusive(&sd->sd_iwaitq, &wait);
 #endif
 	if (timeo) {
 		do {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
 			prepare_to_wait_exclusive(&sd->sd_iwaitq, &wait, TASK_INTERRUPTIBLE);
-#else
-			set_current_state(TASK_INTERRUPTIBLE);
 #endif
-			srlock(sd);
-			if (unlikely((err = straccess_wakeup(sd, 0, timeo, access)) != 0)) {
-				mp = ERR_PTR(err);
-				break;
-			}
 			mp = sd->sd_iocblk;
 			prefetchw(mp);
 			if (likely(mp != NULL)) {
@@ -2550,16 +2527,21 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 			strschedule_ioctl();	/* save context switch */
 			*timeo = schedule_timeout(*timeo);
 			prefetchw(sd);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
+			set_current_state(TASK_INTERRUPTIBLE);
+#endif
+			srlock(sd);
+			if (unlikely((err = straccess_wakeup(sd, 0, timeo, access)) != 0)) {
+				mp = ERR_PTR(err);
+				break;
+			}
 		} while (1);
 	} else {
 		/* timeo is NULL for no timeout no signals */
 		do {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
 			prepare_to_wait_exclusive(&sd->sd_iwaitq, &wait, TASK_UNINTERRUPTIBLE);
-#else
-			set_current_state(TASK_UNINTERRUPTIBLE);
 #endif
-			srlock(sd);
 			mp = sd->sd_iocblk;
 			prefetchw(mp);
 			if (likely(mp != NULL)) {
@@ -2572,6 +2554,10 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 			strschedule_ioctl();	/* save context switch */
 			schedule();
 			prefetchw(sd);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT_EXCLUSIVE
+			set_current_state(TASK_UNINTERRUPTIBLE);
+#endif
+			srlock(sd);
 		} while (1);
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
@@ -3373,28 +3359,56 @@ strallocpmsg(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *
 
 /**
  *  strputpmsg_common: - like strputpmsg with a few exceptions
- *  @file: file pointer for stream
+ *  @sd: stream head
+ *  @f_flags: file flags
  *  @ctlp: valid ctl part (could be NULL)
  *  @datp: valid dat part (could be NULL)
  *  @band: proper band number
  *  @flags: proper putpmsg flags
  *
  *  Except for breaking large data buffers into q_maxpsz chunks when q_minpsz is zero and delimiting
- *  messages, strputpmst_common() with no control part should function the same as the initial
+ *  messages, strputpmsg_common() with no control part should function the same as the initial
  *  checks for write().
+ *
+ *  DESCRIPTION:  Inline checks leading up to blocking.  POSIX blocking semantics for write(),
+ *  putmsg(), putpmsg() and %I_FDINSERT ioctl().
+ *
+ *  POSIX putmsg(2)/putpmsg(2) says "The putmsg() function shall block if the STREAM write queue is
+ *  full due to internal flow control conditions, with the following exceptions: - For high-priority
+ *  messages, putmsg() shall not block on this condition and continues processing the message. - For
+ *  other messages, putmsg() shall not block but shall fail when the write queue is full and
+ *  O_NONBLOCK is set.
+ *
+ *  POSIX ioctl(2) says "For non-priority messages, I_FDINSERT shall block if the STREAM write queue
+ *  is full due to internal flow control conditions.  For priority messages, I_FDINSERT does not
+ *  block on this condition.  For non-priority messages, I_FDINSERT does not block when the write
+ *  queue is full and O_NONBLOCK is set.  Instead, it fails and sets errno to [EAGAIN].
+ *
+ *  Never check flow control or block for high priority messages.  For normal messages, check the
+ *  band.  Do not sleep if FNDELAY is set unless we are doing old TTY semantics (that always blocks
+ *  on write regardless of the setting of FNDELAY).
+ *
+ *  LOCKING: must hold a read lock on the stream head.
  */
 STATIC streams_inline streams_fastcall __hot_put mblk_t *
-strputpmsg_common(const struct file *file, const struct strbuf *ctlp, const struct strbuf *datp,
-		  const int band, const int flags)
+strputpmsg_common(struct stdata *sd, const int f_flags, const struct strbuf *ctlp,
+		  const struct strbuf *datp, const int band, const int flags)
 {
-	struct stdata *sd = stri_lookup(file);
-	int err = 0;
+	queue_t *q = sd->sd_wq;
+	int err;
 
 	if (unlikely((err = strpsizecheck(sd, ctlp, datp, 1)) < -1))	/* PROFILED */
 		goto error;
-	if (unlikely((err = strwaitband(sd, sd->sd_wq, file->f_flags, band, flags))))	/* PROFILED 
-											 */
-		goto error;
+
+	if (unlikely(flags == MSG_HIPRI) || likely(bcanputnext(q, band))) {
+
+		err = -EAGAIN;
+		if (unlikely((f_flags & FNDELAY) && !test_bit(STRNDEL_BIT, &sd->sd_flag)))
+			goto error;
+
+		if (unlikely((err = __strwaitband(sd, q, band))))
+			goto error;
+	}
 	return strallocpmsg(sd, ctlp, datp, band, flags);
       error:
 	return ERR_PTR(err);
@@ -4525,7 +4539,6 @@ strgetq_read(struct stdata *sd, const ssize_t mread)
 	goto done;
 }
 
-
 STATIC streams_inline streams_fastcall __hot_read mblk_t *
 strwaitgetq_read(struct stdata *sd, const ssize_t mread)
 {
@@ -4535,7 +4548,7 @@ strwaitgetq_read(struct stdata *sd, const ssize_t mread)
 	DECLARE_WAITQUEUE(wait, current);
 #endif
 	mblk_t *mp;
-	int err;
+	int err, error = -ERESTARTSYS;
 
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 	set_current_state(TASK_INTERRUPTIBLE);
@@ -4546,7 +4559,7 @@ strwaitgetq_read(struct stdata *sd, const ssize_t mread)
 		prepare_to_wait(&sd->sd_rwaitq, &wait, TASK_INTERRUPTIBLE);
 #endif
 		if (unlikely(signal_pending(current) != 0)) {
-			mp = ERR_PTR(-EINTR);
+			mp = ERR_PTR(error);
 			break;
 		}
 		if ((mp = strgetq_read(sd, mread)) != NULL)
@@ -4554,17 +4567,19 @@ strwaitgetq_read(struct stdata *sd, const ssize_t mread)
 		// set_bit(RSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
 
+		error = -EINTR;
 		strschedule_read();	/* save context switch */
 		schedule();
 
+		prefetchw(sd);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+		set_current_state(TASK_INTERRUPTIBLE);
+#endif
 		srlock(sd);
 		if (unlikely((err = straccess(sd, FREAD)) != 0)) {
 			mp = ERR_PTR(err);
 			break;
 		}
-#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
-		set_current_state(TASK_INTERRUPTIBLE);
-#endif
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
 	finish_wait(&sd->sd_rwaitq, &wait);
@@ -4988,7 +5003,7 @@ strhold(struct stdata *sd, queue_t *q, const int f_flags, const char *buf, ssize
 	mblk_t *b;
 	ssize_t rtn = 0;
 
-	if ((mblk_t *volatile)q->q_first && (b = getq(q))) {
+	if ((mblk_t *volatile) q->q_first && (b = getq(q))) {
 		int blocked;
 
 		blocked = !bcanputnext(q, 0);
@@ -5055,7 +5070,7 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 	struct stdata *sd = stri_lookup(file);
 	ssize_t err, q_maxpsz, written = 0;
 	queue_t *q;
-	int access;
+	int access, f_flags, sd_flag;
 
 	_printd(("%s: buf = %p, nbytes = %lu\n", __FUNCTION__, buf, (ulong) nbytes));
 	/* gotos to try to get into the loop faster */
@@ -5067,11 +5082,13 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 		goto error;	/* but err is zero */
 
 	q = sd->sd_wq;
+	f_flags = file->f_flags;
 
 	if (unlikely(test_bit(QHLIST_BIT, &q->q_flag) != 0))
-		if ((err = strhold(sd, q, file->f_flags, buf, nbytes)) != 0)
+		if ((err = strhold(sd, q, f_flags, buf, nbytes)) != 0)
 			goto error;	/* but not always an error */
 
+	sd_flag = sd->sd_flag;
 	/* first access check is with FNDELAY to generate pipe signals */
 	access = (FWRITE) | (FNDELAY);
 
@@ -5097,16 +5114,20 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 		/* locks on */
 		if (likely((err = straccess_rlock(sd, access)) == 0)) {
 
-			if (likely(written + block >= nbytes)
-			    && unlikely(test_bit(STRDELIM_BIT, &sd->sd_flag)))
+			if (likely(written + block >= nbytes) && unlikely((sd_flag & STRDELIM)))
 				/* If we performed a full write of the requested number of bytes,
 				   we set the MSGDELIM flag to indicate that a full write was
 				   performed.  If we perform a partial write this flag will not be
 				   set. */
 				b->b_flag |= MSGDELIM;
 
-			/* possibly wait for message band */
-			err = strwaitband(sd, q, file->f_flags, 0, MSG_BAND);
+			/* possibly wait for flow control */
+			if (unlikely(!canputnext(q))) {
+				if (unlikely(f_flags & FNDELAY) && likely(!(sd_flag & STRNDEL)))
+					err = -EAGAIN;
+				else
+					err = __strwaitband(sd, q, 0);
+			}
 			srunlock(sd);
 		}
 
@@ -5281,20 +5302,15 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 		DECLARE_WAITQUEUE(wait, current);
 #endif
 
-		srunlock(sd);
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+		set_current_state(TASK_INTERRUPTIBLE);
 		add_wait_queue(&sd->sd_wwaitq, &wait);	/* exclusive? */
 #endif
 		for (;;) {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 			prepare_to_wait(&sd->sd_wwaitq, &wait, TASK_INTERRUPTIBLE);	/* exclusive? 
 											 */
-#else
-			set_current_state(TASK_INTERRUPTIBLE);
 #endif
-			srlock(sd);
-			if (unlikely((err = straccess_wakeup(sd, f_flags, timeo, FWRITE)) != 0))
-				break;
 			if (type == M_DATA
 			    && (sd->sd_minpsz > size
 				|| (size > (size_t) sd->sd_maxpsz && sd->sd_minpsz != 0))) {
@@ -5308,6 +5324,13 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 
 			strschedule_write();	/* save context switch */
 			*timeo = schedule_timeout(*timeo);
+			prefetchw(sd);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+			set_current_state(TASK_INTERRUPTIBLE);
+#endif
+			srlock(sd);
+			if (unlikely((err = straccess_wakeup(sd, f_flags, timeo, FWRITE)) != 0))
+				break;
 		}
 #if defined HAVE_KFUNC_FINISH_WAIT
 		finish_wait(&sd->sd_wwaitq, &wait);
@@ -5398,13 +5421,13 @@ _strsendpage(struct file *file, struct page *page, int offset, size_t size, loff
 }
 
 STATIC streams_inline streams_fastcall __hot_put int
-strcopyin_pstrbuf(struct file *file, struct strbuf __user *from, struct strbuf *to, const bool user)
+strcopyin_pstrbuf(const int f_flags, struct strbuf __user *from, struct strbuf *to, const bool user)
 {
 	int err;
 
 	if (likely(from != NULL)) {
 #ifdef WITH_32BIT_CONVERSION
-		if (unlikely((file->f_flags & FILP32) == FILP32)) {
+		if (unlikely((f_flags & FILP32) == FILP32)) {
 			struct strbuf32 *from32 = (typeof(from32)) from;
 
 			if (likely(user)) {
@@ -5464,7 +5487,7 @@ strputpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 	struct stdata *sd = stri_lookup(file);
 	mblk_t *mp;
 	struct strbuf ctl, dat;
-	int err = 0;
+	int err = 0, f_flags = file->f_flags;
 
 	if (likely(band == -1)) {
 		if (unlikely(flags != RS_HIPRI && flags != 0))	/* RS_NORM */
@@ -5485,10 +5508,10 @@ strputpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 	}
 	/* Now band and flags are both correct according to putpmsg() */
 
-	if (unlikely((err = strcopyin_pstrbuf(file, ctlp, &ctl, true)) < 0))
+	if (unlikely((err = strcopyin_pstrbuf(f_flags, ctlp, &ctl, true)) < 0))
 		goto error;
 
-	if (unlikely((err = strcopyin_pstrbuf(file, datp, &dat, true)) < 0))
+	if (unlikely((err = strcopyin_pstrbuf(f_flags, datp, &dat, true)) < 0))
 		goto error;
 
 	if (likely(flags != MSG_HIPRI)) {
@@ -5512,7 +5535,7 @@ strputpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 			goto einval;
 	}
 	if (likely((err = straccess_rlock(sd, (FWRITE | FNDELAY))) == 0)) {
-		mp = strputpmsg_common(file, &ctl, &dat, band, flags);
+		mp = strputpmsg_common(sd, f_flags, &ctl, &dat, band, flags);
 		srunlock(sd);
 		if (likely(!IS_ERR(mp))) {
 			/* use put instead of putnext because of STRHOLD feature */
@@ -5632,7 +5655,8 @@ strcopyin_gstrbuf(struct file *file, struct strbuf __user *from, struct strbuf *
 	return (err);
 }
 
-streams_noinline streams_fastcall __hot_read mblk_t *strgetq(struct stdata *sd, const int flags, const int band, const ssize_t mread);
+streams_noinline streams_fastcall __hot_read mblk_t *strgetq(struct stdata *sd, const int flags,
+							     const int band, const ssize_t mread);
 
 /**
  *  strwaitgetq: - wait to get a message from a stream ala getpmsg
@@ -5660,25 +5684,18 @@ strwaitgetq(struct stdata *sd, const int flags, const int band, const ssize_t mr
 	DECLARE_WAITQUEUE(wait, current);
 #endif
 	mblk_t *mp;
-	int err;
+	int err, error = -ERESTARTSYS;
 
-	srunlock(sd);
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+	set_current_state(TASK_INTERRUPTIBLE);
 	add_wait_queue(&sd->sd_rwaitq, &wait);
 #endif
 	for (;;) {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 		prepare_to_wait(&sd->sd_rwaitq, &wait, TASK_INTERRUPTIBLE);
-#else
-		set_current_state(TASK_INTERRUPTIBLE);
 #endif
-		srlock(sd);
-		if (unlikely((err = straccess(sd, FREAD)) != 0)) {
-			mp = ERR_PTR(err);
-			break;
-		}
 		if (unlikely(signal_pending(current) != 0)) {
-			mp = ERR_PTR(-EINTR);
+			mp = ERR_PTR(error);
 			break;
 		}
 		if (likely((mp = strgetq(sd, flags, band, mread)) != NULL))
@@ -5686,8 +5703,18 @@ strwaitgetq(struct stdata *sd, const int flags, const int band, const ssize_t mr
 		// set_bit(RSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
 
+		error = -EINTR;
 		strschedule_read();	/* save context switch */
 		schedule();
+		prefetchw(sd);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+		set_current_state(TASK_INTERRUPTIBLE);
+#endif
+		srlock(sd);
+		if (unlikely((err = straccess(sd, FREAD)) != 0)) {
+			mp = ERR_PTR(err);
+			break;
+		}
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
 	finish_wait(&sd->sd_rwaitq, &wait);
@@ -6532,7 +6559,7 @@ streams_noinline int
 __str_i_fdinsert(const struct file *file, struct stdata *sd, struct strfdinsert *fdi)
 {
 	t_uscalar_t token = 0;
-	int err;
+	int err, f_flags = file->f_flags;
 
 	/* POSIX ioctl(2) manpage says that the offset must also be properly aligned in the buffer
 	   to hold a t_uscalar_t, but we don't really care, we use a bcopy to move in the pointer.
@@ -6584,7 +6611,8 @@ __str_i_fdinsert(const struct file *file, struct stdata *sd, struct strfdinsert 
 		if (!err) {
 			mblk_t *mp;
 
-			mp = strputpmsg_common(file, &fdi->ctlbuf, &fdi->databuf, 0, fdi->flags);
+			mp = strputpmsg_common(sd, f_flags, &fdi->ctlbuf, &fdi->databuf, 0,
+					       fdi->flags);
 			if (!IS_ERR(mp)) {
 				bcopy(&token, mp->b_rptr + fdi->offset, sizeof(token));
 				srunlock(sd);
@@ -10542,7 +10570,7 @@ strwput(queue_t *q, mblk_t *mp)
 			mblk_t *b;
 
 		case M_DATA:
-			if ((b = (mblk_t *volatile)q->q_first) && (b = getq(q)) != NULL)
+			if ((b = (mblk_t *volatile) q->q_first) && (b = getq(q)) != NULL)
 				goto release;
 			/* Feature not activated, or not M_DATA, or banded, or delimited, or longer 
 			   than one block, or a zero-length message, or can't hold another write
@@ -10561,7 +10589,7 @@ strwput(queue_t *q, mblk_t *mp)
 			/* not held - has to go */
 			break;
 		case M_PROTO:
-			if ((b = (mblk_t *volatile)q->q_first) && (b = getq(q)) == NULL)
+			if ((b = (mblk_t *volatile) q->q_first) && (b = getq(q)) == NULL)
 				break;
 		      release:
 			/* delayed one has to go - can't delay the other */
@@ -11247,7 +11275,7 @@ str_m_read(struct stdata *sd, queue_t *rq, mblk_t *mp)
 	mp->b_datap->db_type = M_DATA;
 	mp->b_wptr = mp->b_rptr = mp->b_datap->db_base;
 
-	if ((mblk_t *volatile)q->q_first && (b = getq(q))) {
+	if ((mblk_t *volatile) q->q_first && (b = getq(q))) {
 		if (b->b_wptr == b->b_rptr)
 			b->b_flag |= MSGDELIM;
 		putq(q, mp);
