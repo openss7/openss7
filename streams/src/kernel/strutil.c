@@ -1233,12 +1233,28 @@ qbackenable(queue_t *q, const unsigned char band, const char bands[])
 					mblk_t *b;
 
 					/* release STRHOLD buffer */
-					if (test_bit(QHLIST_BIT, &q_nbsrv->q_flag)) {
-						if ((b = getq(q_nbsrv))) {
-							if (b->b_wptr == b->b_rptr)
-								freemsg(b);
-							else
+					/* do not call getq unnecessarily */
+					if ((mblk_t *volatile) q_nbsrv->q_first) {
+						unsigned long pl;
+
+						/* fast getq */
+						qwlock(q, pl);
+						if (likely((b = q->q_first) != NULL)) {
+							if (unlikely(b->b_next != NULL))
+								b->b_next->b_prev = NULL;
+							b->b_next = NULL;
+							q->q_first = NULL;
+							if (likely(q->q_last == b))
+								q->q_last = NULL;
+							q->q_msgs--;
+							q->q_count -= b->b_wptr - b->b_rptr;
+						}
+						qwunlock(q, pl);
+						if (likely(b != NULL)) {
+							if (likely(b->b_wptr > b->b_rptr))
 								qreply(q_nbsrv, b);
+							else
+								freemsg(b);
 						}
 					}
 					/* When backenabling a queue with an active Stream head, do
