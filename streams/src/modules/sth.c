@@ -5000,36 +5000,56 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
 streams_noinline streams_fastcall __hot_write ssize_t
 strhold(struct stdata *sd, queue_t *q, const int f_flags, const char *buf, ssize_t nbytes)
 {
-	mblk_t *b;
+	unsigned long pl;
 	ssize_t rtn = 0;
+	mblk_t *b;
 
-	if ((mblk_t *volatile) q->q_first && (b = getq(q))) {
-		int blocked;
+	qwlock(q, pl);
+	if (likely((b = q->q_first) != NULL)
+	    && likely(!(b->b_flag & MSGDELIM))
+	    && likely(b->b_wptr + nbytes <= b->b_datap->db_lim)) {
+		/* quick getq */
+		if (unlikely(b->b_next != NULL))
+			b->b_next->b_prev = NULL;
+		b->b_next = NULL;
+		q->q_first = NULL;
+		if (likely(q->q_last == b))
+			q->q_last = NULL;
+		q->q_msgs--;
+		q->q_count -= b->b_wptr - b->b_rptr;
+		qwunlock(q, pl);
+		srunlock(sd);
 
-		blocked = !bcanputnext(q, 0);
-
-		if (!(b->b_flag & MSGDELIM) && (b->b_wptr + nbytes <= b->b_datap->db_lim)) {
-			srunlock(sd);
-
-			if ((rtn = strcopyin(buf, b->b_wptr, nbytes)) == 0) {
-				b->b_wptr += nbytes;
-				rtn = nbytes;
-				if (test_bit(STRDELIM_BIT, &sd->sd_flag))
-					b->b_flag |= MSGDELIM;
-				if (!blocked && ((b->b_flag & MSGDELIM)
-						 || b->b_wptr >= b->b_datap->db_lim)) {
-					putnext(q, b);
-					b = NULL;
-				}
+		if (likely((rtn = strcopyin(buf, b->b_wptr, nbytes)) == 0)) {
+			b->b_wptr += nbytes;
+			rtn = nbytes;
+			if (unlikely(test_bit(STRDELIM_BIT, &sd->sd_flag)))
+				b->b_flag |= MSGDELIM;
+			if (unlikely((b->b_flag & MSGDELIM) || b->b_wptr >= b->b_datap->db_lim)
+			    && likely(bcanputnext(q, 0))) {
+				putnext(q, b);
+				b = NULL;
 			}
-
-			srlock(sd);
-			if ((nbytes = straccess(sd, (FWRITE | FNDELAY))) != 0)
-				rtn = nbytes;
 		}
-		if (b)
-			putbq(q, b);
-	}
+
+		srlock(sd);
+		if (unlikely((nbytes = straccess(sd, (FWRITE | FNDELAY))) != 0))
+			rtn = nbytes;
+		if (likely(b != NULL)) {
+			/* quick putbq */
+			qwlock(q, pl);
+			if (unlikely((b->b_next = q->q_first) != NULL))
+				b->b_next->b_prev = b;
+			b->b_prev = NULL;
+			if (likely(q->q_last == NULL))
+				q->q_last = b;
+			q->q_first = b;
+			q->q_msgs++;
+			q->q_count += b->b_wptr - b->b_rptr;
+			qwunlock(q, pl);
+		}
+	} else
+		qwunlock(q, pl);
 	return (rtn);
 }
 
@@ -5084,7 +5104,7 @@ strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *
 	q = sd->sd_wq;
 	f_flags = file->f_flags;
 
-	if (unlikely(test_bit(QHLIST_BIT, &q->q_flag) != 0))
+	if ((mblk_t *volatile) q->q_first != NULL)
 		if ((err = strhold(sd, q, f_flags, buf, nbytes)) != 0)
 			goto error;	/* but not always an error */
 
@@ -10560,53 +10580,75 @@ EXPORT_SYMBOL(strm_f_ops);
  */
 streamscall __hot_write int
 strwput(queue_t *q, mblk_t *mp)
-{				/* PROFILED -- never happens any more */
-	assert(q);
-	assert(mp);
+{
+	dassert(q);
+	dassert(mp);
 
-	if (unlikely(test_bit(QHLIST_BIT, &q->q_flag)) ||
-	    unlikely(test_bit(STRHOLD_BIT, &wqstream(q)->sd_flag))) {
-		switch (__builtin_expect(mp->b_datap->db_type, M_DATA)) {
-			mblk_t *b;
+	switch (__builtin_expect(mp->b_datap->db_type, M_DATA)) {
+		mblk_t *b;
 
-		case M_DATA:
-			if ((b = (mblk_t *volatile) q->q_first) && (b = getq(q)) != NULL)
-				goto release;
-			/* Feature not activated, or not M_DATA, or banded, or delimited, or longer 
-			   than one block, or a zero-length message, or can't hold another write
-			   same size. */
-			if (likely(!((mp->b_band != 0) ||
-				     (mp->b_flag & MSGDELIM) ||
-				     (mp->b_cont != NULL) ||
-				     (mp->b_wptr == mp->b_rptr) ||
-				     (mp->b_wptr - mp->b_rptr >
-				      mp->b_datap->db_lim - mp->b_wptr)))) {
-				/* held - add stream head to scan list */
-				qscan(q);
-				putq(q, mp);
+	case M_DATA:
+		if ((b = (mblk_t *volatile) q->q_first) != NULL) {
+			unsigned long pl;
+
+			/* fast getq */
+			qwlock(q, pl);
+			if (likely((b = q->q_first) != NULL)) {
+				if (unlikely(b->b_next != NULL))
+					b->b_next->b_prev = NULL;
+				b->b_next = NULL;
+				q->q_first = NULL;
+				if (likely(q->q_last == b))
+					q->q_last = NULL;
+				q->q_msgs--;
+				q->q_count -= b->b_wptr - b->b_rptr;
+			}
+			qwunlock(q, pl);
+
+			if (likely(b != NULL)) {
+			      release:
+				/* delayed one has to go - can't delay the other */
+				if (likely(b->b_wptr > b->b_rptr))
+					putnext(q, b);
+				else
+					freemsg(b);
+				putnext(q, mp);
 				return (0);
 			}
-			/* not held - has to go */
-			break;
-		case M_PROTO:
-			if ((b = (mblk_t *volatile) q->q_first) && (b = getq(q)) == NULL)
-				break;
-		      release:
-			/* delayed one has to go - can't delay the other */
-			if (b->b_wptr == b->b_rptr)
-				freemsg(b);
-			else
-				putnext(q, b);
-			break;
-		case M_FLUSH:
-			if (mp->b_rptr[0] & FLUSHW)
-				flushq(q, FLUSHALL);
-			break;
-		default:
-			break;
 		}
+		if ((mp->b_wptr - mp->b_rptr <= mp->b_datap->db_lim - mp->b_wptr)
+		    && !(mp->b_flag & MSGDELIM)
+		    && (wqstream(q)->sd_flag & STRHOLD)
+		    && (mp->b_cont == NULL)
+		    && (mp->b_band == 0)
+		    && (mp->b_wptr > mp->b_rptr)) {
+			/* M_DATA, will hold another write of the same size, not delimited, feature 
+			   activated, single message block, band zero, non-zero-length message. */
+			/* held - add stream head to scan list */
+			qscan(q);
+			putq(q, mp);
+			return (0);
+		} else {
+			/* not held - has to go */
+			putnext(q, mp);
+			return (0);
+		}
+		break;
+	case M_PROTO:
+		if ((b = (mblk_t *volatile) q->q_first) != NULL && likely((b = getq(q)) != NULL))
+			goto release;
+		break;
+	case M_FLUSH:
+		if (mp->b_rptr[0] & FLUSHW) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(q, mp->b_rptr[1], FLUSHALL);
+			else
+				flushq(q, FLUSHALL);
+		}
+		break;
+	default:
+		break;
 	}
-	/* fast path */
 	putnext(q, mp);
 	return (0);
 }
