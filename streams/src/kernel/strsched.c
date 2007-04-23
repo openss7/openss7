@@ -4899,6 +4899,7 @@ clear_shinfo(struct shinfo *sh)
 //      init_waitqueue_head(&sd->sd_waitq);     /* waiters */
 	init_waitqueue_head(&sd->sd_rwaitq);	/* waiters on read */
 	init_waitqueue_head(&sd->sd_wwaitq);	/* waiters on write */
+	init_waitqueue_head(&sd->sd_hwaitq);	/* waiters on hlist */
 	init_waitqueue_head(&sd->sd_iwaitq);	/* waiters on ioctl */
 	init_waitqueue_head(&sd->sd_owaitq);	/* waiters on open */
 	init_waitqueue_head(&sd->sd_polllist);	/* waiters on poll */

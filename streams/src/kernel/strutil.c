@@ -1138,8 +1138,6 @@ __STRUTIL_EXTERN_INLINE queue_t *backq(register queue_t *q);
 
 EXPORT_SYMBOL(backq);
 
-STATIC struct qband *__get_qband(queue_t *q, unsigned char band);
-
 streams_noinline streams_fastcall __unlikely void
 __strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
 {
@@ -1170,30 +1168,110 @@ __strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
 	}
 }
 
-streams_noinline streams_fastcall __unlikely void
-__strwritesig(struct stdata *sd, const unsigned char band, const char bands[])
+streams_noinline streams_fastcall __hot_in void
+__strevent_slow(struct stdata *sd, const int events, const unsigned char band)
 {
-	if (likely(bands == NULL)) {
-		if (band == 0) {
-			if (sd->sd_sigflags & S_WRNORM)
-				__strsiglist(sd, S_WRNORM, 0, POLL_OUT);
-		} else {
-			if (sd->sd_sigflags & S_WRBAND)
-				__strsiglist(sd, S_WRBAND, band, POLL_OUT);
-		}
-	} else {
-		int bnum;
-
-		if (bands[0])
-			if (sd->sd_sigflags & S_WRNORM)
-				__strsiglist(sd, S_WRNORM, 0, POLL_OUT);
-		if (sd->sd_sigflags & S_WRBAND)
-			for (bnum = band; bnum > 0; bnum--)
-				if (bands[bnum])
-					__strsiglist(sd, S_WRBAND, bnum, POLL_OUT);
-	}
+	/* check cache */
+	if (likely((sd->sd_sigflags & events) != 0))	/* PROFILED */
+		__strsiglist(sd, events, band, POLL_OUT);
+	/* do the BSD O_ASYNC list too */
 	if (unlikely(sd->sd_fasync != NULL))
 		kill_fasync(&sd->sd_fasync, SIGPOLL, POLL_OUT);
+}
+
+STATIC streams_inline streams_fastcall __hot_in void
+__strevent(struct stdata *sd, const int events, const unsigned char band)
+{
+	if (unlikely((sd->sd_sigflags & events) != 0) || unlikely(sd->sd_fasync != NULL))
+		return __strevent_slow(sd, events, band);
+}
+
+STATIC streams_inline streams_fastcall __hot_in void
+__strwakewrite(struct stdata *sd)
+{
+	if (test_and_clear_bit(WSLEEP_BIT, &sd->sd_flag)) {
+		wake_up_interruptible(&sd->sd_wwaitq);
+		wake_up_interruptible(&sd->sd_polllist);
+	}
+}
+
+STATIC struct qband *__find_qband(queue_t *q, unsigned char band);
+
+streams_noinline streams_fastcall void
+__strsignalwrite_bands(struct stdata *sd, queue_t *q, const unsigned char band, const char bands[])
+{
+	struct qband *qb;
+	int bnum;
+	int wake = 0;
+
+	if (bands[0]) {
+		if ((wake |= test_and_clear_bit(QWANTW_BIT, &q->q_flag)))
+			__strevent(sd, S_OUTPUT | S_WRNORM, 0);
+	}
+	for (bnum = band; bnum > 0; bnum--)
+		if (bands[bnum] && (qb = __find_qband(q, band)) != NULL)
+			if ((wake |= test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag)))
+				__strevent(sd, S_OUTPUT | S_WRBAND, bnum);
+	if (wake)
+		__strwakewrite(sd);
+}
+
+streams_noinline streams_fastcall void
+__strsignalwrite_band(struct stdata *sd, queue_t *q, const unsigned char band, const char bands[])
+{
+	struct qband *qb;
+
+	if ((qb = __find_qband(q, band)) != NULL) {
+		if (test_and_clear_bit(QB_WANTW_BIT, &qb->qb_flag)) {
+			__strevent(sd, S_OUTPUT | S_WRBAND, band);
+			__strwakewrite(sd);
+		}
+	}
+}
+
+STATIC streams_inline streams_fastcall __hot_in void
+__strsignalwrite(struct stdata *sd, queue_t *q, const unsigned char band, const char bands[])
+{
+	if (likely(bands == NULL)) {
+		if (likely(band == 0)) {
+			if (test_and_clear_bit(QWANTW_BIT, &q->q_flag)) {
+				__strevent(sd, S_OUTPUT | S_WRNORM, 0);
+				__strwakewrite(sd);
+			}
+		} else
+			__strsignalwrite_band(sd, q, band, bands);
+	} else
+		__strsignalwrite_bands(sd, q, band, bands);
+}
+
+STATIC streams_inline streams_fastcall void
+__strreleasehold(queue_t *q)
+{
+	/* do not call getq unnecessarily */
+	if ((mblk_t *volatile) q->q_first) {
+		unsigned long pl;
+		mblk_t *b;
+
+		/* fast getq */
+		qwlock(q, pl);
+		if (likely((b = q->q_first) != NULL)) {
+			if (unlikely(b->b_next != NULL))
+				b->b_next->b_prev = NULL;
+			b->b_next = NULL;
+			q->q_first = NULL;
+			if (likely(q->q_last == b))
+				q->q_last = NULL;
+			q->q_msgs--;
+			q->q_count -= b->b_wptr - b->b_rptr;
+		}
+		qwunlock(q, pl);
+		if (likely(b != NULL)) {
+			if (likely(b->b_wptr > b->b_rptr))
+				putnext(q, b);
+			else
+				freemsg(b);
+		}
+	}
 }
 
 /**
@@ -1211,70 +1289,35 @@ __strwritesig(struct stdata *sd, const unsigned char band, const char bands[])
 streams_noinline streams_fastcall __hot_in void
 qbackenable(queue_t *q, const unsigned char band, const char bands[])
 {
-	struct stdata *sd;
+	struct stdata *sd, *sd2;
+	queue_t *q2;
 
 	dassert(q);
 	sd = qstream(q);
 	dassert(sd);
 
 	prlock(sd);
-	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
-		queue_t *q_nbsrv;
-		struct stdata *sd2;
+	if (likely(!test_bit(QPROCS_BIT, &q->q_flag)) && likely((q2 = q->q_nbsrv) != NULL)) {
 
-		/* q_nbsrv can be NULL at a Stream end (head or driver) */
-		if (likely((q_nbsrv = q->q_nbsrv) != NULL)) {
-			sd2 = qstream(q_nbsrv);
-			dassert(sd2);
+		sd2 = qstream(q2);
+		dassert(sd2);
 
-			prlock(sd2);
-			if (likely(test_bit(QPROCS_BIT, &q_nbsrv->q_flag) == 0)) {
-				if (test_bit(QSHEAD_BIT, &q_nbsrv->q_flag)) {
-					mblk_t *b;
-
-					/* release STRHOLD buffer */
-					/* do not call getq unnecessarily */
-					if ((mblk_t *volatile) q_nbsrv->q_first) {
-						unsigned long pl;
-
-						/* fast getq */
-						qwlock(q, pl);
-						if (likely((b = q->q_first) != NULL)) {
-							if (unlikely(b->b_next != NULL))
-								b->b_next->b_prev = NULL;
-							b->b_next = NULL;
-							q->q_first = NULL;
-							if (likely(q->q_last == b))
-								q->q_last = NULL;
-							q->q_msgs--;
-							q->q_count -= b->b_wptr - b->b_rptr;
-						}
-						qwunlock(q, pl);
-						if (likely(b != NULL)) {
-							if (likely(b->b_wptr > b->b_rptr))
-								qreply(q_nbsrv, b);
-							else
-								freemsg(b);
-						}
-					}
-					/* When backenabling a queue with an active Stream head, do
-					   a little bit more. */
-					if (unlikely(waitqueue_active(&sd2->sd_wwaitq) != 0))
-						wake_up_interruptible(&sd2->sd_wwaitq);
-					if (unlikely(waitqueue_active(&sd2->sd_polllist) != 0))
-						wake_up_interruptible(&sd2->sd_polllist);
-					if (unlikely(sd2->sd_sigflags & (S_WRBAND | S_WRNORM))
-					    || unlikely(sd2->sd_fasync != NULL))
-						__strwritesig(sd2, band, bands);
-				} else {
-					/* SVR4 SPG - noenable() does not prevent a queue from
-					   being back enabled by flow control */
-					qenable(q_nbsrv);	/* always enable if a service
-								   procedure exists */
-				}
+		prlock(sd2);
+		if (likely(!test_bit(QPROCS_BIT, &q2->q_flag))) {
+			if (!test_bit(QSHEAD_BIT, &q2->q_flag)) {
+				/* SVR4 SPG - noenable() does not prevent a queue from being back
+				   enabled by flow control */
+				qenable(q2);	/* always enable if a service procedure exists */
+			} else {
+				/* When backenabling a queue with an active Stream head, do a
+				   little bit more. */
+				/* release STRHOLD buffer */
+				__strreleasehold(q2);
+				/* signal writers */
+				__strsignalwrite(sd2, q2, band, bands);
 			}
-			prunlock(sd2);
 		}
+		prunlock(sd2);
 	}
 	prunlock(sd);
 }
