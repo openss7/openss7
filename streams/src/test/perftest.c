@@ -249,11 +249,11 @@ start_timer(void)
 int
 test_sync(int fds[])
 {
-	size_t tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin = PIPE_BUF, tbytmax = 0, tbyttot = 0;
-	size_t rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin = PIPE_BUF, rbytmax = 0, rbyttot = 0;
-	size_t tmsize = msgsize;
-	size_t rmsize = msgsize;
-	size_t report_count = 0;
+	long long tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin = PIPE_BUF, tbytmax = 0, tbyttot = 0;
+	long long rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin = PIPE_BUF, rbytmax = 0, rbyttot = 0;
+	long long tmsize = msgsize;
+	long long rmsize = msgsize;
+	long long report_count = 0;
 
 	if (fullreads)
 		rmsize = PIPE_BUF;
@@ -271,26 +271,26 @@ test_sync(int fds[])
 			goto dead;
 		if (timer_timeout) {
 			{
-				size_t thrput = tbytcnt / report;
-				size_t msgcnt = tmsgcnt / report;
-				size_t avgsiz = tbytcnt / tmsgcnt;
+				long long thrput = tbytcnt / report;
+				long long msgcnt = tmsgcnt / report;
+				long long avgsiz = tbytcnt / tmsgcnt;
 
 				tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
 				tavg_tput = (3 * tavg_tput + thrput) / 4;
 				fprintf(stdout,
-					"%zu Msgs sent: %10zu (%10zu), throughput: %10zu (%10zu), size (%4zu) %4zu-%4zu\n",
+					"%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n",
 					fds[1], msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax);
 				fflush(stdout);
 			}
 			{
-				size_t thrput = rbytcnt / report;
-				size_t msgcnt = rmsgcnt / report;
-				size_t avgsiz = rbytcnt / rmsgcnt;
+				long long thrput = rbytcnt / report;
+				long long msgcnt = rmsgcnt / report;
+				long long avgsiz = rbytcnt / rmsgcnt;
 
 				ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
 				ravg_tput = (3 * ravg_tput + thrput) / 4;
 				fprintf(stdout,
-					"%zu Msgs read: %10zu (%10zu), throughput: %10zu (%10zu), size (%4zu) %4zu-%4zu\n",
+					"%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n",
 					fds[0], msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax);
 				fflush(stdout);
 			}
@@ -316,7 +316,7 @@ test_sync(int fds[])
 				goto dead;
 			}
 		}
-		if (tbyttot > rbyttot + PIPE_BUF) {
+		if (tbyttot >= rbyttot + rmsize) {
 			int ret = 0;
 
 			if (readwrite) {
@@ -365,7 +365,7 @@ test_sync(int fds[])
 				}
 			}
 		}
-		if (tbyttot <= rbyttot + PIPE_BUF) {
+		if (tbyttot < rbyttot + rmsize) {
 			int ret = 0;
 
 			if (readwrite) {
@@ -425,10 +425,11 @@ test_sync(int fds[])
 int
 read_child(int fd)
 {
-	size_t rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin = PIPE_BUF, rbytmax = 0;
-	size_t rmsize = msgsize;
-	struct pollfd pfd = { fd, POLLIN | POLLERR | POLLHUP, 0 };
-	int report_count = 0;
+	long long rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin = PIPE_BUF, rbytmax = 0;
+	long long reintr = 0, reagain = 0, rerestart = 0;
+	long long rmsize = msgsize;
+	struct pollfd pfd = { fd, (POLLIN | POLLRDNORM), 0 };
+	int rtn, report_count = 0;
 
 	if (niceread)
 		if (setpriority(PRIO_PROCESS, 0, 19) != 0) {
@@ -448,20 +449,24 @@ read_child(int fd)
 		fprintf(stderr, "--> Timer started\n");
 	for (;;) {
 		if (timer_timeout) {
-			size_t thrput = rbytcnt / report;
-			size_t msgcnt = rmsgcnt / report;
-			size_t avgsiz = rbytcnt / rmsgcnt;
+			long long thrput = rbytcnt / report;
+			long long msgcnt = rmsgcnt / report;
+			long long errcnt = reagain / report;
+			long long avgsiz = rbytcnt / rmsgcnt;
 
 			ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
 			ravg_tput = (3 * ravg_tput + thrput) / 4;
 			fprintf(stdout,
-				"%zu Msgs read: %10zu (%10zu), throughput: %10zu (%10zu), size (%4zu) %4zu-%4zu\n",
-				fd, msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax);
+				"%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n",
+				fd, msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax, errcnt, reintr, rerestart);
 			fflush(stdout);
 			rbytcnt = 0;
 			rmsgcnt = 0;
 			rbytmin = PIPE_BUF;
 			rbytmax = 0;
+			reintr = 0;
+			reagain = 0;
+			rerestart = 0;
 			report_count++;
 			if (iterations > 0 && report_count >= iterations) {
 				close(fd);
@@ -473,17 +478,24 @@ read_child(int fd)
 				goto dead;
 			}
 		}
-		if (poll(&pfd, 1, -1) < 0) {
+		if ((rtn = poll(&pfd, 1, -1)) < 0) {
 			switch (errno) {
 			case EINTR:
+				reintr++;
+				continue;
 			case ERESTART:
+				rerestart++;
 				continue;
 			}
 			if (verbose)
 				perror("poll()");
 			goto dead;
 		}
-		if (pfd.revents & POLLIN) {
+		if (rtn == 0) {
+			rerestart++;
+			continue;
+		}
+		if (pfd.revents & (POLLIN|POLLRDNORM)) {
 			int ret = 0;
 
 			if (readwrite) {
@@ -517,7 +529,10 @@ read_child(int fd)
 			if (ret < 0) {
 				switch (errno) {
 				case EAGAIN:
+					reagain++;
+					break;
 				case EINTR:
+					reintr++;
 					break;
 				default:
 					if (verbose)
@@ -525,11 +540,11 @@ read_child(int fd)
 					goto dead;
 				}
 			}
-			pfd.revents &= ~POLLIN;
+			pfd.revents &= ~(POLLIN|POLLRDNORM);
 		}
 		if (pfd.revents & POLLHUP)
 			goto done;
-		if (pfd.revents & POLLERR)
+		if (pfd.revents & (POLLERR|POLLNVAL|POLLMSG))
 			goto dead;
 	}
       dead:
@@ -546,10 +561,11 @@ read_child(int fd)
 int
 write_child(int fd)
 {
-	size_t tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin = PIPE_BUF, tbytmax = 0;
-	size_t tmsize = msgsize;
-	struct pollfd pfd = { fd, POLLOUT | POLLERR | POLLHUP, 0 };
-	int report_count = 0;
+	long long tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin = PIPE_BUF, tbytmax = 0;
+	long long teintr = 0, teagain = 0, terestart = 0;
+	long long tmsize = msgsize;
+	struct pollfd pfd = { fd, (POLLOUT | POLLWRNORM), 0 };
+	int rtn, report_count = 0;
 
 	if (nicesend)
 		if (setpriority(PRIO_PROCESS, 0, 19) != 0) {
@@ -567,20 +583,24 @@ write_child(int fd)
 		fprintf(stderr, "--> Timer started\n");
 	for (;;) {
 		if (timer_timeout) {
-			size_t thrput = tbytcnt / report;
-			size_t msgcnt = tmsgcnt / report;
-			size_t avgsiz = tbytcnt / tmsgcnt;
+			long long thrput = tbytcnt / report;
+			long long msgcnt = tmsgcnt / report;
+			long long errcnt = teagain / report;
+			long long avgsiz = tbytcnt / tmsgcnt;
 
 			tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
 			tavg_tput = (3 * tavg_tput + thrput) / 4;
 			fprintf(stdout,
-				"%zu Msgs sent: %10zu (%10zu), throughput: %10zu (%10zu), size (%4zu) %4zu-%4zu\n",
-				fd, msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax);
+				"%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n",
+				fd, msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax, errcnt, teintr, terestart);
 			fflush(stdout);
 			tbytcnt = 0;
 			tmsgcnt = 0;
 			tbytmin = PIPE_BUF;
 			tbytmax = 0;
+			teintr = 0;
+			teagain = 0;
+			terestart = 0;
 			report_count++;
 			if (iterations > 0 && report_count >= iterations) {
 				close(fd);
@@ -592,17 +612,24 @@ write_child(int fd)
 				goto dead;
 			}
 		}
-		if (poll(&pfd, 1, -1) < 0) {
+		if ((rtn = poll(&pfd, 1, -1)) < 0) {
 			switch (errno) {
 			case EINTR:
+				teintr++;
+				continue;
 			case ERESTART:
+				terestart++;
 				continue;
 			}
 			if (verbose)
 				perror("poll()");
 			goto dead;
 		}
-		if (pfd.revents & POLLOUT) {
+		if (rtn == 0) {
+			terestart++;
+			continue;
+		}
+		if (pfd.revents & (POLLOUT|POLLWRNORM)) {
 			int ret = 0;
 
 			if (readwrite) {
@@ -633,7 +660,10 @@ write_child(int fd)
 			if (ret < 0) {
 				switch (errno) {
 				case EAGAIN:
+					teagain++;
+					break;
 				case EINTR:
+					teintr++;
 					break;
 				default:
 					if (verbose)
@@ -641,11 +671,11 @@ write_child(int fd)
 					goto dead;
 				}
 			}
-			pfd.revents &= ~POLLOUT;
+			pfd.revents &= ~(POLLOUT|POLLWRNORM);
 		}
 		if (pfd.revents & POLLHUP)
 			goto done;
-		if (pfd.revents & POLLERR)
+		if (pfd.revents & (POLLERR|POLLNVAL|POLLMSG))
 			goto dead;
 	}
       dead:

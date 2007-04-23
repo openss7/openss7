@@ -290,6 +290,7 @@ struct stdata {
 //      wait_queue_head_t sd_waitq;     /* waiters */
 	wait_queue_head_t sd_rwaitq;	/* waiters on read/getmsg/getpmsg/I_RECVFD */
 	wait_queue_head_t sd_wwaitq;	/* waiters on write/putmsg/putpmsg/I_SENDFD */
+	wait_queue_head_t sd_hwaitq;	/* waiters on hlist bit */
 	wait_queue_head_t sd_iwaitq;	/* waiters on ioctl */
 	wait_queue_head_t sd_owaitq;	/* waiters on open bit */
 //      mblk_t *sd_mark;                /* pointer to marked message */

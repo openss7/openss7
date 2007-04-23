@@ -842,13 +842,15 @@ strput(struct stdata *sd, mblk_t *mp)
 STATIC streams_inline streams_fastcall __hot_in __must_check int
 strcopyout(const void *from, void __user *to, size_t len)
 {
-	return copyout(from, to, len);
+//	return copyout(from, to, len);
+	return (unlikely(copy_to_user(to, from, len)) ? -EFAULT : 0);
 }
 
 STATIC streams_inline streams_fastcall __hot_out __must_check int
 strcopyin(const void __user *from, void *to, size_t len)
 {
-	return copyin(from, to, len);
+//	return copyin(from, to, len);
+	return (unlikely(copy_from_user(to, from, len)) ? -EFAULT : 0);
 }
 
 /* 
@@ -1599,7 +1601,7 @@ strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
  *  be correct.
  */
 streams_noinline streams_fastcall __hot void
-strevent_slow(struct stdata *sd, const int events, unsigned char band)
+strevent_slow(struct stdata *sd, const int events, const unsigned char band)
 {
 	int code;
 
@@ -1624,7 +1626,7 @@ strevent_slow(struct stdata *sd, const int events, unsigned char band)
 	if (likely((sd->sd_sigflags & events) != 0))	/* PROFILED */
 		strsiglist(sd, events, band, code);
 	/* do the BSD O_ASYNC list too */
-	if (sd->sd_fasync != NULL)
+	if (unlikely(sd->sd_fasync != NULL))
 		kill_fasync(&sd->sd_fasync, SIGPOLL, code);
 }
 
@@ -1640,7 +1642,7 @@ strevent_slow(struct stdata *sd, const int events, unsigned char band)
  *  capability deserves to run a bit slower.
  */
 STATIC streams_inline streams_fastcall __hot void
-strevent(struct stdata *sd, const int events, unsigned char band)
+strevent(struct stdata *sd, const int events, const unsigned char band)
 {
 	if (unlikely((sd->sd_sigflags & events) != 0) || unlikely(sd->sd_fasync != NULL))
 		return strevent_slow(sd, events, band);
@@ -1743,58 +1745,73 @@ strsignal_locked(struct stdata *sd, mblk_t *mp, const int access)
 STATIC streams_inline streams_fastcall __hot void
 strwakepoll(struct stdata *sd)
 {
-	if (unlikely(waitqueue_active(&sd->sd_polllist) != 0))	/* PROFILED */
-		wake_up_interruptible(&sd->sd_polllist);
+	wake_up_interruptible(&sd->sd_polllist);
 }
 
 STATIC streams_inline streams_fastcall __hot_out void
 strwakeread(struct stdata *sd)
 {
-	if (likely(waitqueue_active(&sd->sd_rwaitq) != 0)) {	/* PROFILED */
-		// clear_bit(RSLEEP_BIT, &sd->sd_flag);
+	if (test_and_clear_bit(RSLEEP_BIT, &sd->sd_flag)) {
 		wake_up_interruptible(&sd->sd_rwaitq);
+		strwakepoll(sd);
 	}
-	strwakepoll(sd);
 }
 
 STATIC streams_inline streams_fastcall __hot_in void
 strwakewrite(struct stdata *sd)
 {
-	if (unlikely(waitqueue_active(&sd->sd_wwaitq) != 0)) {	/* PROFILED */
-		// clear_bit(WSLEEP_BIT, &sd->sd_flag);
+	if (test_and_clear_bit(WSLEEP_BIT, &sd->sd_flag)) {
 		wake_up_interruptible(&sd->sd_wwaitq);
+		strwakepoll(sd);
 	}
-	strwakepoll(sd);
+}
+
+STATIC streams_inline streams_fastcall __hot_read void
+strwakehlist(struct stdata *sd, queue_t *q)
+{
+	clear_bit(QHLIST_BIT, &q->q_flag);
+	if (test_and_clear_bit(QTOENAB_BIT, &q->q_flag))
+		wake_up_interruptible(&sd->sd_hwaitq);
 }
 
 streams_noinline streams_fastcall mblk_t *
-strgetq_exception(struct stdata *sd, const int flags, mblk_t *mp, unsigned long *plp)
+strgetq_exception(struct stdata *sd, queue_t *q, const int flags, const int band, mblk_t *mp,
+		  unsigned long *plp)
 {
 	unsigned long pl = *plp;
 	int err;
 
-	switch (mp->b_datap->db_type) {
-	case M_PCPROTO:
-		if (unlikely(flags == MSG_BAND))
-			goto ebadmsg;
-		clear_bit(STRPRI_BIT, &sd->sd_flag);
-		return (mp);
-	case M_SIG:
-		if (!mp->b_next || mp->b_next->b_datap->db_type != M_SIG)
-			clear_bit(STRMSIG_BIT, &sd->sd_flag);
-		rmvq(sd->sd_rq, mp);
-		zwunlock(sd, pl);
-		if (unlikely((err = strsignal_locked(sd, mp, FREAD))))
-			return (ERR_PTR(err));
-		zwlock(sd, pl);
-		*plp = pl;
-		return (NULL);
-	default:
-		swerr();
-	case M_PASSFP:
-	      ebadmsg:
-		return (ERR_PTR(-EBADMSG));
-	}
+	do {
+		switch (mp->b_datap->db_type) {
+		case M_DATA:
+		case M_PROTO:
+			if (unlikely(flags == MSG_HIPRI || mp->b_band < band))
+				goto ebadmsg;
+			return (mp);
+		case M_PCPROTO:
+			if (unlikely(flags == MSG_BAND))
+				goto ebadmsg;
+			clear_bit(STRPRI_BIT, &sd->sd_flag);
+			return (mp);
+		case M_SIG:
+			if (!mp->b_next || mp->b_next->b_datap->db_type != M_SIG)
+				clear_bit(STRMSIG_BIT, &sd->sd_flag);
+			rmvq(sd->sd_rq, mp);
+			qwunlock(q, pl);
+			err = strsignal_locked(sd, mp, FREAD);
+			qwlock(q, pl);
+			*plp = pl;
+			if (err != 0)
+				return (ERR_PTR(err));
+			continue;
+		default:
+			swerr();
+		case M_PASSFP:
+		      ebadmsg:
+			return (ERR_PTR(-EBADMSG));
+		}
+	} while (likely((mp = q->q_first) != NULL));
+	return (mp);
 }
 
 streams_noinline void
@@ -1811,7 +1828,6 @@ __strputbq_band(struct stdata *sd, queue_t *q, mblk_t *mp)
 	if ((qb->qb_count += msgsize(mp)) >= qb->qb_hiwat)
 		if (likely(!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag)))
 			q->q_blocked++;
-	clear_bit(STRPRI_BIT, &sd->sd_flag);
 }
 
 streams_noinline void
@@ -1835,69 +1851,69 @@ __strputbq_pri(struct stdata *sd, queue_t *q, mblk_t *mp)
  * @sd: stream head
  * @q: stream head read queue
  * @mp: message to place back
- * @release: release the QHLIST bit
  *
  * This used to use insq; however, much of putbq() has been copied here for
  * speed.
  */
-STATIC streams_inline streams_fastcall __hot_read void
-strputbq(struct stdata *sd, queue_t *q, mblk_t *const mp, const bool release)
+STATIC streams_fastcall __hot_read void
+strputbq(struct stdata *sd, queue_t *q, mblk_t *const mp)
 {				/* IRQ SUPPRESSED */
-	bool wake = false;
 	unsigned long pl;
 
-	qwlock(q, pl);
+	dassert(mp);
+
 	/* Like putbq() but handles STRPRI bit and under queue locks */
-	if (likely(mp != NULL)) {
+	if (likely(mp->b_datap->db_type < QPCTL)) {
+		mblk_t *b_next, *b_prev;
+
+		b_prev = NULL;
+		qwlock(q, pl);
+		b_next = q->q_first;
+#if 0
+		/* I don't think that we ever place an M_SIG message back on the queue. */
 		if (unlikely(mp->b_datap->db_type == M_SIG))
 			set_bit(STRMSIG_BIT, &sd->sd_flag);
 		else
 			clear_bit(STRMSIG_BIT, &sd->sd_flag);
-		/* fast putbq */
-		if (likely(mp->b_datap->db_type < QPCTL)) {
-			mblk_t *b_next = q->q_first, *b_prev = NULL;
-
-			/* skip high priority */
-			if (unlikely(b_next != NULL) && unlikely(b_next->b_datap->db_type >= QPCTL)) {
-				do {
-					b_prev = b_next;
-					b_next = b_prev->b_next;
-				} while (unlikely(b_next != NULL)
-					 && unlikely(b_next->b_datap->db_type >= QPCTL));
-			}
-			/* skip higher bands */
-			if (unlikely(b_next != NULL) && unlikely(b_next->b_band > mp->b_band)) {
-				do {
-					b_prev = b_next;
-					b_next = b_prev->b_next;
-				} while (unlikely(b_next != NULL)
-					 && unlikely(b_next->b_band > mp->b_band));
-			}
-			if (unlikely((mp->b_next = b_next) != NULL))
-				b_next->b_prev = mp;
-			if (unlikely((mp->b_prev = b_prev) != NULL))
-				b_prev->b_next = mp;
-			if (likely(q->q_last == b_prev))
-				q->q_last = mp;
-			if (likely(q->q_first == b_next))
-				q->q_first = mp;
-			q->q_msgs++;
-			if (likely(mp->b_band == 0)) {
-				if ((q->q_count += msgsize(mp)) >= q->q_hiwat)
-					set_bit(QFULL_BIT, &q->q_flag);
-				clear_bit(STRPRI_BIT, &sd->sd_flag);
-			} else
-				__strputbq_band(sd, q, mp);
-		} else
-			__strputbq_pri(sd, q, mp);
-	}
-	if (likely(release)) {
-		clear_bit(QHLIST_BIT, &q->q_flag);
-		wake = test_and_clear_bit(QTOENAB_BIT, &q->q_flag);
+#endif
+		/* skip high priority */
+		if (unlikely(b_next != NULL) && unlikely(b_next->b_datap->db_type >= QPCTL)) {
+			do {
+				b_prev = b_next;
+				b_next = b_prev->b_next;
+			} while (unlikely(b_next != NULL)
+				 && unlikely(b_next->b_datap->db_type >= QPCTL));
+		}
+		/* skip higher bands */
+		if (unlikely(b_next != NULL) && unlikely(b_next->b_band > mp->b_band)) {
+			do {
+				b_prev = b_next;
+				b_next = b_prev->b_next;
+			} while (unlikely(b_next != NULL) && unlikely(b_next->b_band > mp->b_band));
+		}
+		if (unlikely((mp->b_next = b_next) != NULL))
+			b_next->b_prev = mp;
+		if (unlikely((mp->b_prev = b_prev) != NULL))
+			b_prev->b_next = mp;
+		if (likely(q->q_last == b_prev))
+			q->q_last = mp;
+		if (likely(q->q_first == b_next))
+			q->q_first = mp;
+		q->q_msgs++;
+		if (likely(mp->b_band == 0)) {
+			if ((q->q_count += msgsize(mp)) >= q->q_hiwat)
+				set_bit(QFULL_BIT, &q->q_flag);
+		} else {
+			__strputbq_band(sd, q, mp);
+		}
+		clear_bit(STRPRI_BIT, &sd->sd_flag);
+		clear_bit(QWANTR_BIT, &q->q_flag);
+	} else {
+		qwlock(q, pl);
+		__strputbq_pri(sd, q, mp);
 	}
 	qwunlock(q, pl);
-	if (unlikely(wake))
-		strwakeread(sd);	/* wake other readers blocked on QHLIST bit */
+	return;
 }
 
 /**
@@ -2015,9 +2031,9 @@ __strwaitgetfp(struct stdata *sd, queue_t *q)
 			mp = ERR_PTR(error);
 			break;
 		}
+		set_bit(RSLEEP_BIT, &sd->sd_flag);
 		if (likely((mp = strgetfp_slow(sd, q)) != NULL))
 			break;
-		// set_bit(RSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
 
 		error = -EINTR;
@@ -2071,6 +2087,80 @@ strwaitgetfp(struct stdata *sd, queue_t *q, const int f_flags)
 	return __strwaitgetfp(sd, q);
 }
 
+streams_noinline streams_fastcall int
+strbcanputnext_band(struct stdata *sd, queue_t *q, const int band)
+{
+	int result = 1;
+
+	{
+		struct qband *qb;
+
+		if ((qb = __get_qband(q, band)) != NULL) {
+			if (likely(!test_bit(QB_WANTW_BIT, &qb->qb_flag))) {
+				queue_t *q_nfsrv;
+
+				prlock(sd);
+				if (likely((q_nfsrv = q->q_nfsrv) != NULL)) {
+					unsigned long pl;
+
+					qwlock(q_nfsrv, pl);
+					if (likely(band <= q_nfsrv->q_nband)
+					    && unlikely(q_nfsrv->q_blocked > 0)) {
+						struct qband *qb_nfsrv;
+
+						qb_nfsrv = __find_qband(q_nfsrv, band);
+						if (unlikely
+						    (test_bit(QB_FULL_BIT, &qb_nfsrv->qb_flag))) {
+							set_bit(QB_WANTW_BIT, &qb_nfsrv->qb_flag);
+							set_bit(QB_WANTW_BIT, &qb->qb_flag);
+							result = 0;
+						}
+					}
+					qwunlock(q_nfsrv, pl);
+				}
+				prunlock(sd);
+			} else
+				result = 0;
+		} else
+			result = 0;
+	}
+	return (result);
+}
+STATIC streams_fastcall __hot_write int
+strbcanputnext_norm(struct stdata *sd, queue_t *q)
+{
+	int result = 1;
+
+	{
+		queue_t *q_nfsrv;
+
+		prlock(sd);
+		if (likely((q_nfsrv = q->q_nfsrv) != NULL)) {
+			unsigned long pl;
+
+			qwlock(q_nfsrv, pl);
+			if (unlikely(test_bit(QFULL_BIT, &q_nfsrv->q_flag))) {
+				set_bit(QWANTW_BIT, &q_nfsrv->q_flag);
+				set_bit(QWANTW_BIT, &q->q_flag);
+				result = 0;
+			}
+			qwunlock(q_nfsrv, pl);
+		}
+		prunlock(sd);
+	}
+	return (result);
+}
+STATIC streams_inline streams_fastcall __hot_write int
+strbcanputnext(struct stdata *sd, queue_t *q, const int band)
+{
+	if (likely(band == 0)) {
+		if (likely(!test_bit(QWANTW_BIT, &q->q_flag)))
+			return strbcanputnext_norm(sd, q);
+		return (0);
+	}
+	return strbcanputnext_band(sd, q, band);
+}
+
 /**
  *  __strwaitband: - wait to perform write on a flow controlled band
  *  @sd: stream head
@@ -2084,7 +2174,7 @@ strwaitgetfp(struct stdata *sd, queue_t *q, const int f_flags)
  *  LOCKING: Must be called with a single read lock held on the STREAM head.
  */
 STATIC streams_fastcall __hot_write int
-__strwaitband(struct stdata *sd, queue_t *q, int band)
+__strwaitband(struct stdata *sd, queue_t *q, const int band)
 {
 	/* wait for band to become available */
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
@@ -2106,10 +2196,10 @@ __strwaitband(struct stdata *sd, queue_t *q, int band)
 			err = error;
 			break;
 		}
+		set_bit(WSLEEP_BIT, &sd->sd_flag);
 		/* have read lock and access is ok */
-		if (likely(bcanputnext(q, band)))
+		if (likely(strbcanputnext(sd, q, band)))
 			break;
-		// set_bit(WSLEEP_BIT, &sd->sd_flag);
 		srunlock(sd);
 
 		error = -EINTR;
@@ -2224,8 +2314,7 @@ strwakeopen_swunlock(struct stdata *sd)
 	/* release open bit */
 	clear_bit(STWOPEN_BIT, &sd->sd_flag);
 	if (!(detached = strdetached(sd)))
-		if (waitqueue_active(&sd->sd_owaitq) != 0)
-			wake_up_interruptible(&sd->sd_owaitq);
+		wake_up_interruptible(&sd->sd_owaitq);
 	swunlock(sd);
 	if (detached) {
 		strremove(sd);
@@ -2249,27 +2338,18 @@ STATIC streams_fastcall void
 strwakeiocwait(struct stdata *sd)
 {
 	if (likely(test_bit(IOCWAIT_BIT, &sd->sd_flag)))
-		if (likely(waitqueue_active(&sd->sd_iwaitq) != 0))
-			wake_up_interruptible_all(&sd->sd_iwaitq);
+		wake_up_interruptible_all(&sd->sd_iwaitq);
 }
 
 STATIC streams_fastcall void
 strwakeall(struct stdata *sd)
 {
-	if (unlikely(waitqueue_active(&sd->sd_rwaitq) != 0)) {
-		// clear_bit(RSLEEP_BIT, &sd->sd_flag);
-		wake_up_interruptible_all(&sd->sd_rwaitq);
-	}
-	if (unlikely(waitqueue_active(&sd->sd_wwaitq) != 0)) {
-		// clear_bit(WSLEEP_BIT, &sd->sd_flag);
-		wake_up_interruptible_all(&sd->sd_wwaitq);
-	}
-	if (unlikely(waitqueue_active(&sd->sd_iwaitq) != 0))
-		wake_up_interruptible_all(&sd->sd_iwaitq);
-	if (unlikely(waitqueue_active(&sd->sd_polllist) != 0))
-		wake_up_interruptible_all(&sd->sd_polllist);
-	if (unlikely(waitqueue_active(&sd->sd_owaitq) != 0))
-		wake_up_interruptible_all(&sd->sd_owaitq);
+	wake_up_interruptible_all(&sd->sd_rwaitq);
+	wake_up_interruptible_all(&sd->sd_wwaitq);
+	wake_up_interruptible_all(&sd->sd_hwaitq);
+	wake_up_interruptible_all(&sd->sd_iwaitq);
+	wake_up_interruptible_all(&sd->sd_polllist);
+	wake_up_interruptible_all(&sd->sd_owaitq);
 }
 
 /**
@@ -2291,8 +2371,10 @@ __strwaitfifo(struct stdata *sd, const int oflag)
 #endif
 	int err = 0, error = -ERESTARTSYS;
 	wait_queue_head_t *waitq;
+	int bit;
 
 	waitq = (oflag & FREAD) ? &sd->sd_rwaitq : &sd->sd_wwaitq;
+	bit = (oflag & FREAD) ? RSLEEP_BIT : WSLEEP_BIT;
 
 	if (unlikely((err = straccess_rlock(sd, FCREAT)) != 0))
 		return (err);
@@ -2309,6 +2391,7 @@ __strwaitfifo(struct stdata *sd, const int oflag)
 			err = error;
 			break;
 		}
+		set_bit(bit, &sd->sd_flag);
 		if (likely(sd->sd_readers >= 1 && sd->sd_writers >= 1))
 			break;
 		srunlock(sd);
@@ -2555,8 +2638,7 @@ strwakeioctl(struct stdata *sd)
 		_ctrace(freemsg(mp));
 	}
 	clear_bit(IOCWAIT_BIT, &sd->sd_flag);
-	if (waitqueue_active(&sd->sd_iwaitq) != 0)
-		wake_up(&sd->sd_iwaitq);
+	wake_up(&sd->sd_iwaitq);
 	srunlock(sd);		/* to balance strwaitioctl */
 }
 
@@ -2671,8 +2753,7 @@ strwakeiocack(struct stdata *sd, mblk_t *mp)
 				_ctrace(freemsg(db));
 			}
 			/* might not be sleeping yet */
-			if (waitqueue_active(&sd->sd_iwaitq) != 0)
-				wake_up(&sd->sd_iwaitq);
+			wake_up(&sd->sd_iwaitq);
 			return (true);
 		} else
 			_ptrace(("%s: ioctl response has wrong iocid\n", __FUNCTION__));
@@ -3462,18 +3543,29 @@ strputpmsg_common(struct stdata *sd, const int f_flags, const struct strbuf *ctl
 		  const struct strbuf *datp, const int band, const int flags)
 {
 	queue_t *q = sd->sd_wq;
+	struct qband *qb;
 	int err;
 
 	if (unlikely((err = strpsizecheck(sd, ctlp, datp, 1)) < -1))	/* PROFILED */
 		goto error;
 
-	if (unlikely(flags == MSG_HIPRI) || likely(bcanputnext(q, band))) {
-
-		err = -EAGAIN;
-		if (unlikely((f_flags & FNDELAY) && !test_bit(STRNDEL_BIT, &sd->sd_flag)))
+	if (likely(flags != MSG_HIPRI)) {
+	      oops:
+		if (likely(band == 0)) {
+			if (likely(!test_bit(QWANTW_BIT, &q->q_flag)))
+				if (unlikely(!strbcanputnext(sd, q, 0)))
+					goto oops;
+		} else {
+			if ((qb = __find_qband(q, band)) == NULL
+			    || !test_bit(QB_WANTW_BIT, &qb->qb_flag))
+				if (unlikely(!strbcanputnext(sd, q, band)))
+					goto oops;
+		}
+		if (unlikely(f_flags & FNDELAY) && likely(!test_bit(STRNDEL_BIT, &sd->sd_flag))) {
+			err = -EAGAIN;
 			goto error;
-
-		if (unlikely((err = __strwaitband(sd, q, band))))
+		}
+		if (unlikely((err = __strwaitband(sd, q, band)) != 0))
 			goto error;
 	}
 	return strallocpmsg(sd, ctlp, datp, band, flags);
@@ -3890,36 +3982,30 @@ strpoll_fast(struct file *file, struct poll_table_struct *poll)
 				if (unlikely(flag & exceptions))
 					return (strpoll_except(sd, flag));
 			}
-			prlock(sd);
 			qrlock(rq, pl);
-			{
+			if (!test_bit(QWANTR_BIT, &rq->q_flag)) {
 				register mblk_t *b;
 
 				if (likely((b = rq->q_first) != NULL)) {
-					if (likely((b->b_datap->db_type & ~1) == 0)) {
-						if (likely(b->b_band == 0))
-							mask |= POLLIN | POLLRDNORM;
-						else
-							mask |= POLLIN | POLLRDBAND;
-					}
-				}
+					if (likely(b->b_band == 0))
+						mask |= POLLIN | POLLRDNORM;
+					else
+						mask |= POLLIN | POLLRDBAND;
+				} else
+					set_bit(QWANTR_BIT, &rq->q_flag);
 			}
 			qrunlock(rq, pl);
-			{
-				register queue_t *sq;
-
-				if (likely((sq = wq->q_nfsrv) != NULL)) {
-					qwlock(sq, pl);
-					if (likely(!test_bit(QFULL_BIT, &sq->q_flag)))
-						mask |= POLLOUT | POLLWRNORM;
-					else
-						set_bit(QWANTW_BIT, &sq->q_flag);
-					if (likely(sq->q_blocked < sq->q_nband))
-						mask |= POLLOUT | POLLWRBAND;
-					qwunlock(sq, pl);
-				}
-			}
-			prunlock(sd);
+			if (!(mask & POLLIN))
+				set_bit(RSLEEP_BIT, &sd->sd_flag);
+			qrlock(wq, pl);
+			if (!test_bit(QWANTW_BIT, &wq->q_flag))
+				mask |= POLLOUT | POLLWRNORM;
+			if (wq->q_blocked < wq->q_nband)
+				mask |= POLLOUT | POLLWRBAND;
+			qrunlock(wq, pl);
+			if ((mask & (POLLOUT | POLLWRNORM | POLLWRBAND)) !=
+			    (POLLOUT | POLLWRNORM | POLLWRBAND))
+				set_bit(WSLEEP_BIT, &sd->sd_flag);
 			return (mask);
 		}
 	}
@@ -4498,17 +4584,20 @@ strsendmread(struct stdata *sd, const unsigned long len)
 	   can be easily transformed into an M_DATA message */
 	/* Need to drop the locks while sleeping for a buffer. */
 	srunlock(sd);
-	if ((b = allocb(len, BPRI_WAITOK))) {
+	if (likely((b = allocb(len, BPRI_WAITOK)) != NULL)) {
 		b->b_datap->db_type = M_READ;
 		*((unsigned long *) b->b_rptr) = len;
 		b->b_wptr = b->b_rptr + sizeof(len);
-		if (!(err = straccess(sd, FREAD))) {
+		if (likely((err = straccess(sd, FREAD)) == 0)) {
 			_ctrace(strput(sd, b));
 			_trace();
-		} else
+		} else {
 			freemsg(b);
-	} else if (!(err = straccess_rlock(sd, FNDELAY)))	/* XXX: why FNDELAY? */
-		err = -ENOSR;
+		}
+	} else {
+		if (likely((err = straccess_rlock(sd, FNDELAY)) == 0))	/* XXX: why FNDELAY? */
+			err = -ENOSR;
+	}
 	return (err);
 }
 
@@ -4532,6 +4621,54 @@ __strgetq_band(struct stdata *sd, queue_t *q, mblk_t *b)
 		}
 	}
 	return (backenable);
+}
+
+streams_noinline streams_fastcall __unlikely int
+strwaithlist(struct stdata *sd, queue_t *q)
+{
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+	DEFINE_WAIT(wait);
+#else
+	DECLARE_WAITQUEUE(wait, current);
+#endif
+	int err = 0, error = -ERESTARTSYS;
+
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+	set_current_state(TASK_INTERRUPTIBLE);
+	add_wait_queue(&sd->sd_hwaitq, &wait);
+#endif
+	for (;;) {
+#if defined HAVE_KFUNC_PREPARE_TO_WAIT
+		prepare_to_wait(&sd->sd_hwaitq, &wait, TASK_INTERRUPTIBLE);
+#endif
+		if (unlikely(signal_pending(current) != 0)) {
+			err = error;
+			break;
+		}
+		set_bit(QTOENAB_BIT, &q->q_flag);
+		if (!test_and_set_bit(QHLIST_BIT, &q->q_flag))
+			break;
+		srunlock(sd);
+
+		error = -EINTR;
+		strschedule_read();	/* save context switch */
+		schedule();
+
+		prefetchw(sd);
+#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
+		set_current_state(TASK_INTERRUPTIBLE);
+#endif
+		srlock(sd);
+		if (unlikely((err = straccess(sd, FREAD)) != 0))
+			break;
+	}
+#if defined HAVE_KFUNC_FINISH_WAIT
+	finish_wait(&sd->sd_hwaitq, &wait);
+#else
+	set_current_state(TASK_RUNNING);
+	remove_wait_queue(&sd->sd_hwaitq, &wait);
+#endif
+	return (err);
 }
 
 /**
@@ -4582,75 +4719,107 @@ __strgetq_band(struct stdata *sd, queue_t *q, mblk_t *b)
  *  Note that in %RFILL read mode, we always block awaiting a zero length message, a message fully
  *  satisfying the request, or a delimited message.
  */
-STATIC streams_fastcall __hot_read mblk_t *
-strgetq_read(struct stdata *sd, queue_t *q, const ssize_t mread)
+/**
+ *  strgetq: - get a message from a stream ala getpmsg
+ *  @sd: stream head
+ *  @q: stream head read queue
+ *  @flags: flags from getpmsg (%MSG_HIPRI or zero)
+ *  @band: band from which to retrieve message
+ *
+ *  LOCKING: This function must be called with the Stream head read locked.
+ *
+ *  We freeze the Stream so that we can do getq() in one place and put it back with putbq() in
+ *  another (or search the queue and use rmvq()) without races with other procedures acting on the
+ *  queue.  Also there needs to be atomicity between setting or clearing the STRPRI bit and placing
+ *  or removing an M_PCPROTO from the queue.  The write lock acheives that atomicity too.  Perhaps
+ *  we should not even use the STRPRI bit, because we could always check
+ *  q->q_first->b_datap->db_type with the queue locked, but that is 3 pointer dereferences.  But,
+ *  perhaps we don't need to use atomic bit operations on the STRPRI bit inside the locks.
+ *
+ *  strgetq() is almost identical to sgtgetfp().  The only difference is that strgetq() will
+ *  retrieve an M_PROTO, M_PCPROTO or M_DATA message and return EBADMSG on M_PASSFP, and for
+ *  strgetfp() the situation is reversed.  Both procedures handle M_SIG messages the same.
+ *
+ *  NOTICES: Note that M_PCPROTO is the only priority message that we place on the stream head read
+ *  queue, so if the STRPRI bit is set, there is one (and only one) there.  We leave the STRPRI bit
+ *  set because we need to release locks between taking the message off and putting it back.
+ *  strread() and strgetpmsg() will clear the bit if necessary after the final disposition of the
+ *  message is known.
+ *
+ *  PROFILING NOTES: This function didn't event take a hit, but it is done under locks and we only
+ *  used timer interrupts.  The rest are guesses.
+ */
+STATIC streams_inline streams_fastcall __hot_read mblk_t *
+strgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 {				/* IRQ SUPPRESSED */
 	unsigned long pl;
-	bool wake = false, backenable = false;
+	bool backenable = false;
 	mblk_t *b;
 
+	/* like a mini service procedure */
 	qwlock(q, pl);
-	/* if this is the first read attempt (mread != 0) must grab the QHLIST bit first */
-	if (likely(mread != 0) && unlikely(test_and_set_bit(QHLIST_BIT, &q->q_flag))) {
-		set_bit(QTOENAB_BIT, &q->q_flag);
-		b = NULL;
-	} else {
-		if (likely((b = q->q_first) != NULL)) {
-			/* like a mini service procedure */
-			do {
-				/* M_DATA or M_PROTO */
-				if (unlikely((b->b_datap->db_type & ~1) != 0)) {
-					if ((b = strgetq_exception(sd, MSG_BAND, b, &pl)) == NULL)
-						continue;
-					if (IS_ERR(b))
-						goto error;
-				}
-				if (b->b_next && unlikely(b->b_next->b_datap->db_type == M_SIG))
-					set_bit(STRMSIG_BIT, &sd->sd_flag);
-				/* fast getq */
-				if (unlikely((q->q_first = b->b_next) != NULL)) {
-					b->b_next->b_prev = NULL;
-					b->b_next = NULL;
-				}
-				if (likely(q->q_last == b))
-					q->q_last = NULL;
-				q->q_msgs--;
-				if (likely(b->b_band == 0)) {
-					q->q_count -= msgsize(b);
-					if (q->q_count == 0 || q->q_count < q->q_lowat)
-						if (unlikely
-						    (test_and_clear_bit(QFULL_BIT, &q->q_flag)))
-							if (likely
-							    (test_and_clear_bit
-							     (QWANTW_BIT, &q->q_flag)))
-								backenable = true;
-				} else
-					backenable = __strgetq_band(sd, q, b);
-				clear_bit(QWANTR_BIT, &q->q_flag);
-				goto done;
-			} while (unlikely((b = q->q_first) != NULL));
-			set_bit(QWANTR_BIT, &q->q_flag);
-		}
-		goto error;
+	if (unlikely((b = q->q_first) == NULL) ||
+	    (unlikely((b->b_datap->db_type & ~1) != 0) &&
+	     unlikely((b = strgetq_exception(sd, q, flags, band, b, &pl)) == NULL))) {
+		set_bit(QWANTR_BIT, &q->q_flag);
+		goto done;
 	}
+	if (unlikely(IS_ERR(b))
+	    || (unlikely(flags == MSG_HIPRI || b->b_band < band) && (b = ERR_PTR(-EBADMSG))))
+		goto done;
+	/* fast getq */
+	if (unlikely((q->q_first = b->b_next) != NULL)) {
+		if (unlikely(b->b_next->b_datap->db_type == M_SIG))
+			set_bit(STRMSIG_BIT, &sd->sd_flag);
+		b->b_next->b_prev = NULL;
+		b->b_next = NULL;
+		clear_bit(QWANTR_BIT, &q->q_flag);
+	} else
+		set_bit(QWANTR_BIT, &q->q_flag);
+	if (likely(q->q_last == b))
+		q->q_last = NULL;
+	q->q_msgs--;
+	if (likely(b->b_band == 0)) {
+		q->q_count -= msgsize(b);
+		if (q->q_count == 0 || q->q_count < q->q_lowat)
+			if (unlikely(test_and_clear_bit(QFULL_BIT, &q->q_flag)))
+				if (likely(test_and_clear_bit(QWANTW_BIT, &q->q_flag)))
+					backenable = true;
+	} else
+		backenable = __strgetq_band(sd, q, b);
       done:
 	qwunlock(q, pl);
-	if (unlikely(wake))
-		strwakeread(sd);	/* wake other readers blocked on QHLIST bit */
 	if (unlikely(backenable))
-		qbackenable(q, b ? b->b_band : 0, NULL);
+		qbackenable(q, b->b_band, NULL);
 	return (b);
-      error:
-	/* if unsuccessful and this is the first read, release QHLIST bit */
-	if (likely(mread != 0)) {
-		clear_bit(QHLIST_BIT, &q->q_flag);
-		wake = test_and_clear_bit(QTOENAB_BIT, &q->q_flag);
-	}
-	goto done;
 }
 
-STATIC streams_inline streams_fastcall __hot_read mblk_t *
-strwaitgetq_read(struct stdata *sd, queue_t *q, const ssize_t mread)
+streams_noinline streams_fastcall __hot_read mblk_t *
+strgetq_slow(struct stdata *sd, queue_t *q, const int flags, const int band)
+{
+	return strgetq(sd, q, flags, band);
+}
+
+/**
+ *  strwaitgetq: - wait to get a message from a stream ala getpmsg
+ *  @sd: Stream head
+ *  @q: stream head read queue
+ *  @flags: flags from getpmsg (%MSG_HIPRI or zero)
+ *  @band: priority band from which to get message
+ *
+ *  This function is almost identical to strwaitgetfp().
+ *
+ *  LOCKING: This function must be called with the Stream head read locked.
+ *
+ *  NOTICES: The call to this function can be pig slow: we are going to block anyway.
+ *
+ *  Unfortunately now there are two different approaches to wait queue handling, one for 2.4 and one
+ *  for 2.6, and the 2.4 approach will not work for 2.6.  Also, there is no generic macro that does
+ *  what we need to do here, so we have to expose the internals of the wait queue implementation
+ *  here.
+ */
+STATIC streams_fastcall __hot_read mblk_t *
+strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band)
 {
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 	DEFINE_WAIT(wait);
@@ -4672,15 +4841,15 @@ strwaitgetq_read(struct stdata *sd, queue_t *q, const ssize_t mread)
 			mp = ERR_PTR(error);
 			break;
 		}
-		if ((mp = strgetq_read(sd, q, mread)) != NULL)
-			break;
-		// set_bit(RSLEEP_BIT, &sd->sd_flag);
+		set_bit(RSLEEP_BIT, &sd->sd_flag);
+		if (likely(!test_bit(QWANTR_BIT, &q->q_flag)))
+			if (likely((mp = strgetq_slow(sd, q, flags, band)) != NULL))
+				break;
 		srunlock(sd);
 
 		error = -EINTR;
 		strschedule_read();	/* save context switch */
 		schedule();
-
 		prefetchw(sd);
 #if !defined HAVE_KFUNC_PREPARE_TO_WAIT
 		set_current_state(TASK_INTERRUPTIBLE);
@@ -4869,7 +5038,7 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 		/* ensure that compiler sees these as loop invariant */
 		const int sd_rdopt = sd->sd_rdopt;
 		const int sd_flag = sd->sd_flag;
-		mblk_t *mp, *first = NULL;
+		mblk_t *mp = NULL, *first = NULL;
 		queue_t *q = sd->sd_rq;
 		bool stop = false;
 		ssize_t mread = nbytes;
@@ -4882,27 +5051,39 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 			/* remember first block flag and band */
 			msg_type_t type;
 
-			/* Block if there is no data to be read (and generate M_READ if required). */
-			/* sets QHLIST when successful. */
-			if (likely((mp = strgetq_read(sd, q, mread)) == NULL)) {
-				/* check nodelay - always block in read fill mode */
-				if (unlikely(file->f_flags & FNDELAY))
-					if (likely(!(sd_rdopt & RFILL))) {
-						err = -EAGAIN;
-						break;
-					}
-				/* about to block, generate M_READ(9) if required */
-				if (unlikely((sd_flag & STRMREAD)) && mread > 0) {
-					if ((err = strsendmread(sd, mread)))
-						break;
-					/* could already have a response */
-					mp = strgetq_read(sd, q, mread);
+			/* First acquire QHLIST bit if necessary. */
+			if (likely(mread > 0)
+			    && unlikely(test_and_set_bit(QHLIST_BIT, &q->q_flag))) {
+				if (likely(file->f_flags & FNDELAY)) {
+					err = -EAGAIN;
+					break;
 				}
-				if (mp == NULL)
-					mp = strwaitgetq_read(sd, q, mread);
-				if (unlikely(IS_ERR(mp)))
+				if (unlikely((err = strwaithlist(sd, q)) != 0))
 					break;
 			}
+
+		      oops:
+			/* Next see if we have to block. */
+			if (likely(!test_bit(QWANTR_BIT, &q->q_flag))) {
+				mp = strgetq(sd, q, MSG_BAND, 0);
+			} else {
+				/* about to block, generate M_READ(9) if required */
+				if (likely(mread > 0) && likely(sd_flag & STRMREAD)) {
+					if (unlikely((err = strsendmread(sd, mread)) != 0))
+						goto wake;
+					/* could already have a response */
+					mread = 0;
+					goto oops;
+				}
+				/* about to block, check nodelay - always block in read fill mode */
+				if (likely(file->f_flags & FNDELAY))
+					if (unlikely(!(sd_rdopt & RFILL)))
+						goto eagain;
+				mp = strwaitgetq(sd, q, MSG_BAND, 0);
+			}
+			dassert(mp);
+			if (unlikely(IS_ERR(mp)))
+				goto errptr;
 
 			type = mp->b_datap->db_type;
 
@@ -4946,14 +5127,27 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 			err = -EBADMSG;
 			goto putback;
 		      putback:
-			strputbq(sd, q, mp, false);	/* does not clear QHLIST bit */
+			strputbq(sd, q, mp);
+			if (unlikely(first == NULL))
+				goto wake;
+			break;
+		      eagain:
+			err = -EAGAIN;
+			goto wake;
+		      errptr:
+			err = PTR_ERR(mp);
+			goto wake;
+		      wake:
+			strwakehlist(sd, q);
 			break;
 		}
 
+#if 0
 		if (unlikely(IS_ERR(mp) != 0)) {
 			err = PTR_ERR(mp);
 			_ptrace(("error is %d\n", err));
 		}
+#endif
 
 		/* Ok, now everything is ready to copyout() the message, but because copyout() can
 		   sleep (page-fault and vm-wait) we need to release the locks on the Stream */
@@ -4970,11 +5164,13 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 			      strmcopyout(&first, buf, nbytes, ((sd_rdopt & RPROTDIS) != 0))) < 0))
 				err = xferd;
 
-			if (xferd > 0 && (sd_rdopt & RMSGD)) {
-				freemsg(first);
-				first = NULL;
+			if (first != NULL) {
+				if (xferd > 0 && (sd_rdopt & RMSGD))
+					freemsg(first);
+				else
+					strputbq(sd, q, first);
 			}
-			strputbq(sd, q, first, true);	/* clears QHLIST bit */
+			strwakehlist(sd, q);	/* clears QHLIST bit */
 		}
 	}
 
@@ -5108,7 +5304,7 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
  *
  *  LOCKING: Called with a Stream head read lock.  Release it before sleeping.
  */
-streams_noinline streams_fastcall __hot_write ssize_t
+STATIC streams_inline streams_fastcall __hot_write ssize_t
 strhold(struct stdata *sd, queue_t *q, const int f_flags, const char *buf, ssize_t nbytes)
 {
 	unsigned long pl;
@@ -5199,89 +5395,97 @@ STATIC streams_inline streams_fastcall __hot_write ssize_t
 strwrite_fast(struct file *file, const char __user *buf, size_t nbytes, loff_t *ppos)
 {
 	struct stdata *sd = stri_lookup(file);
-	ssize_t err, q_maxpsz, written = 0;
+	ssize_t err, q_maxpsz;
 	queue_t *q;
-	int access, f_flags, sd_flag;
 
 	_printd(("%s: buf = %p, nbytes = %lu\n", __FUNCTION__, buf, (ulong) nbytes));
 	/* gotos to try to get into the loop faster */
 
-	if (unlikely((q_maxpsz = err = strsizecheck(sd, M_DATA, nbytes)) < 0))	/* PROFILED */
+	if (unlikely((q_maxpsz = err = strsizecheck(sd, M_DATA, nbytes)) < 0)
+	    || unlikely(q_maxpsz == 0 && !(sd->sd_wropt & SNDZERO)))	/* PROFILED */
 		goto error;
 
-	if (unlikely(q_maxpsz == 0 && !(sd->sd_wropt & SNDZERO)))	/* PROFILED */
-		goto error;	/* but err is zero */
-
 	q = sd->sd_wq;
-	f_flags = file->f_flags;
 
-	if ((mblk_t *volatile) q->q_first != NULL)
-		if ((err = strhold(sd, q, f_flags, buf, nbytes)) != 0)
+	/* check message coallescing once before flow control */
+	if (likely((mblk_t *volatile) q->q_first != NULL))
+		if ((err = strhold(sd, q, file->f_flags, buf, nbytes)) != 0)
 			goto error;	/* but not always an error */
 
-	sd_flag = sd->sd_flag;
-	/* first access check is with FNDELAY to generate pipe signals */
-	access = (FWRITE) | (FNDELAY);
+	{
+		int access = (FWRITE) | (FNDELAY);
+		int sd_flag = sd->sd_flag;
+		ssize_t written = 0;
 
-	do {
-		mblk_t *b;
-		size_t block;
-		const void __user *where;
+		/* first access check is with FNDELAY to generate pipe signals */
 
-		/* Note: if q_minpsz is zero and the nbytes length is greater than q_maxpsz, we are 
-		   supposed to break the message down into separate q_maxpsz segments. */
+		do {
+			mblk_t *b;
+			size_t block;
+			const void __user *where;
 
-		/* the following can sleep */
+			/* locks on */
+			if (unlikely((err = straccess_rlock(sd, access)) != 0))
+				goto error_out;
 
-		block = min(nbytes - written, q_maxpsz);
-		where = buf + written;
+			/* possibly wait for flow control */
+		      oops:
+			if (likely(!test_bit(QWANTW_BIT, &q->q_flag))) {
+				if (unlikely(!strbcanputnext(sd, q, 0)))
+					goto oops;
+			} else {
+				/* about to block, check nodelay */
+				if (unlikely(file->f_flags & FNDELAY)
+				    && likely(!(sd_flag & STRNDEL)))
+					goto eagain;
+				if (unlikely((err = __strwaitband(sd, q, 0)) != 0))
+					goto unlock_error;
+			}
+			srunlock(sd);
 
-		/* POSIX says always blocks awaiting message blocks */
-		if (unlikely(IS_ERR((b = alloc_data(sd, block, where))))) {
-			err = PTR_ERR(b);
-			break;
-		}
+			/* send off the message block */
 
-		/* locks on */
-		if (likely((err = straccess_rlock(sd, access)) == 0)) {
+			/* Note: if q_minpsz is zero and the nbytes length is greater than
+			   q_maxpsz, we are supposed to break the message down into separate
+			   q_maxpsz segments. */
 
-			if (likely(written + block >= nbytes) && unlikely((sd_flag & STRDELIM)))
+			/* the following can sleep */
+			block = min(nbytes - written, q_maxpsz);
+			where = buf + written;
+
+			/* POSIX says always blocks awaiting message blocks */
+			if (unlikely(IS_ERR((b = alloc_data(sd, block, where))))) {
+				err = PTR_ERR(b);
+				break;
+			}
+			if (likely((written += block) >= nbytes) && unlikely((sd_flag & STRDELIM)))
 				/* If we performed a full write of the requested number of bytes,
 				   we set the MSGDELIM flag to indicate that a full write was
 				   performed.  If we perform a partial write this flag will not be
 				   set. */
 				b->b_flag |= MSGDELIM;
-
-			/* possibly wait for flow control */
-			if (unlikely(!canputnext(q))) {
-				if (unlikely(f_flags & FNDELAY) && likely(!(sd_flag & STRNDEL)))
-					err = -EAGAIN;
-				else
-					err = __strwaitband(sd, q, 0);
-			}
-			srunlock(sd);
-		}
-
-		/* send off the message block */
-		if (likely(err == 0)) {
-			/* We don't really queue these, see strwput(). */
-			_ctrace(strput(sd, b));
-			_trace();
-			written += block;
 			/* subsequent access checks should return -ESTRPIPE instead of generating
 			   signals so that we can simply return the amount written. */
 			access = FWRITE;
-		} else {
-			freeb(b);
-			break;
-		}
+			/* We don't really queue these, see strwput(). */
+			_ctrace(strput(sd, b));
+			_trace();
 
-	} while (unlikely(written < nbytes));
+		} while (unlikely(written < nbytes));
 
+	      error_out:
+		if (unlikely(written <= 0) && unlikely(err < 0))
+			goto error;
+		return (written);
+	      eagain:
+		err = -EAGAIN;
+		goto unlock_error;
+	      unlock_error:
+		srunlock(sd);
+		goto error_out;
+	}
       error:
-	if (written <= 0 && err < 0)
-		_ptrace(("error is %ld\n", (long) err));
-	return ((written > 0) ? written : err);
+	return (err);
 }
 
 streams_noinline streams_fastcall ssize_t
@@ -5448,9 +5652,9 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 				err = -ERANGE;
 				break;
 			}
+			set_bit(WSLEEP_BIT, &sd->sd_flag);
 			if (likely(bcanputnext(sd->sd_wq, band) != 0))
 				break;
-			// set_bit(WSLEEP_BIT, &sd->sd_flag);
 			srunlock(sd);
 
 			strschedule_write();	/* save context switch */
@@ -5786,180 +5990,6 @@ strcopyin_gstrbuf(struct file *file, struct strbuf __user *from, struct strbuf *
 	return (err);
 }
 
-STATIC streams_fastcall __hot_get mblk_t *
-strgetq(struct stdata *sd, queue_t *q, const int flags, const int band, const ssize_t mread);
-
-/**
- *  strwaitgetq: - wait to get a message from a stream ala getpmsg
- *  @sd: Stream head
- *  @q: stream head read queue
- *  @flags: flags from getpmsg (%MSG_HIPRI or zero)
- *  @band: priority band from which to get message
- *
- *  This function is almost identical to strwaitgetfp().
- *
- *  LOCKING: This function must be called with the Stream head read locked.
- *
- *  NOTICES: The call to this function can be pig slow: we are going to block anyway.
- *
- *  Unfortunately now there are two different approaches to wait queue handling, one for 2.4 and one
- *  for 2.6, and the 2.4 approach will not work for 2.6.  Also, there is no generic macro that does
- *  what we need to do here, so we have to expose the internals of the wait queue implementation
- *  here.
- */
-STATIC streams_fastcall __hot_get mblk_t *
-strwaitgetq(struct stdata *sd, queue_t *q, const int flags, const int band, const ssize_t mread)
-{
-#if defined HAVE_KFUNC_PREPARE_TO_WAIT
-	DEFINE_WAIT(wait);
-#else
-	DECLARE_WAITQUEUE(wait, current);
-#endif
-	mblk_t *mp;
-	int err, error = -ERESTARTSYS;
-
-#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
-	set_current_state(TASK_INTERRUPTIBLE);
-	add_wait_queue(&sd->sd_rwaitq, &wait);
-#endif
-	for (;;) {
-#if defined HAVE_KFUNC_PREPARE_TO_WAIT
-		prepare_to_wait(&sd->sd_rwaitq, &wait, TASK_INTERRUPTIBLE);
-#endif
-		if (unlikely(signal_pending(current) != 0)) {
-			mp = ERR_PTR(error);
-			break;
-		}
-		if (likely((mp = strgetq(sd, q, flags, band, mread)) != NULL))
-			break;
-		// set_bit(RSLEEP_BIT, &sd->sd_flag);
-		srunlock(sd);
-
-		error = -EINTR;
-		strschedule_read();	/* save context switch */
-		schedule();
-		prefetchw(sd);
-#if !defined HAVE_KFUNC_PREPARE_TO_WAIT
-		set_current_state(TASK_INTERRUPTIBLE);
-#endif
-		srlock(sd);
-		if (unlikely((err = straccess(sd, FREAD)) != 0)) {
-			mp = ERR_PTR(err);
-			break;
-		}
-	}
-#if defined HAVE_KFUNC_FINISH_WAIT
-	finish_wait(&sd->sd_rwaitq, &wait);
-#else
-	set_current_state(TASK_RUNNING);
-	remove_wait_queue(&sd->sd_rwaitq, &wait);
-#endif
-	return (mp);
-}
-
-/**
- *  strgetq: - get a message from a stream ala getpmsg
- *  @sd: stream head
- *  @q: stream head read queue
- *  @flags: flags from getpmsg (%MSG_HIPRI or zero)
- *  @band: band from which to retrieve message
- *
- *  LOCKING: This function must be called with the Stream head read locked.
- *
- *  We freeze the Stream so that we can do getq() in one place and put it back with putbq() in
- *  another (or search the queue and use rmvq()) without races with other procedures acting on the
- *  queue.  Also there needs to be atomicity between setting or clearing the STRPRI bit and placing
- *  or removing an M_PCPROTO from the queue.  The write lock acheives that atomicity too.  Perhaps
- *  we should not even use the STRPRI bit, because we could always check
- *  q->q_first->b_datap->db_type with the queue locked, but that is 3 pointer dereferences.  But,
- *  perhaps we don't need to use atomic bit operations on the STRPRI bit inside the locks.
- *
- *  strgetq() is almost identical to sgtgetfp().  The only difference is that strgetq() will
- *  retrieve an M_PROTO, M_PCPROTO or M_DATA message and return EBADMSG on M_PASSFP, and for
- *  strgetfp() the situation is reversed.  Both procedures handle M_SIG messages the same.
- *
- *  NOTICES: Note that M_PCPROTO is the only priority message that we place on the stream head read
- *  queue, so if the STRPRI bit is set, there is one (and only one) there.  We leave the STRPRI bit
- *  set because we need to release locks between taking the message off and putting it back.
- *  strread() and strgetpmsg() will clear the bit if necessary after the final disposition of the
- *  message is known.
- *
- *  PROFILING NOTES: This function didn't event take a hit, but it is done under locks and we only
- *  used timer interrupts.  The rest are guesses.
- */
-STATIC streams_fastcall __hot_get mblk_t *
-strgetq(struct stdata *sd, queue_t *q, const int flags, const int band, const ssize_t mread)
-{				/* IRQ SUPPRESSED */
-	unsigned long pl;
-	bool wake = false, backenable = false;
-	mblk_t *b;
-
-	qwlock(q, pl);
-	/* if this is the first read attempt (mread != 0) must grab the QHLIST bit first */
-	if (likely(mread != 0) && unlikely(test_and_set_bit(QHLIST_BIT, &q->q_flag))) {
-		set_bit(QTOENAB_BIT, &q->q_flag);
-		b = NULL;
-	} else {
-		if (likely((b = q->q_first) != NULL)) {
-			/* like a mini service procedure */
-			do {
-				if (likely((b->b_datap->db_type & ~1) == 0)) {
-					/* M_DATA or M_PROTO */
-					if (unlikely(flags == MSG_HIPRI || b->b_band < band))
-						goto ebadmsg;
-				} else {
-					if ((b = strgetq_exception(sd, flags, b, &pl)) == NULL)
-						continue;
-					if (IS_ERR(b))
-						goto error;
-				}
-				if (b->b_next && unlikely(b->b_next->b_datap->db_type == M_SIG))
-					set_bit(STRMSIG_BIT, &sd->sd_flag);
-				/* fast getq */
-				if (unlikely((q->q_first = b->b_next) != NULL)) {
-					b->b_next->b_prev = NULL;
-					b->b_next = NULL;
-				}
-				if (likely(q->q_last == b))
-					q->q_last = NULL;
-				q->q_msgs--;
-				if (likely(b->b_band == 0)) {
-					q->q_count -= msgsize(b);
-					if (q->q_count == 0 || q->q_count < q->q_lowat)
-						if (unlikely
-						    (test_and_clear_bit(QFULL_BIT, &q->q_flag)))
-							if (likely
-							    (test_and_clear_bit
-							     (QWANTW_BIT, &q->q_flag)))
-								backenable = true;
-				} else
-					backenable = __strgetq_band(sd, q, b);
-				clear_bit(QWANTR_BIT, &q->q_flag);
-				goto done;
-			} while (unlikely((b = q->q_first) != NULL));
-			set_bit(QWANTR_BIT, &q->q_flag);
-		}
-		goto error;
-	}
-      done:
-	qwunlock(q, pl);
-	if (unlikely(wake))
-		strwakeread(sd);	/* wake other readers blocked on QHLIST bit */
-	if (unlikely(backenable))
-		qbackenable(q, b ? b->b_band : 0, NULL);
-	return (b);
-      ebadmsg:
-	b = ERR_PTR(-EBADMSG);
-	goto error;
-      error:
-	/* if unsuccessful and this is the first read, release QHLIST bit */
-	if (likely(mread != 0)) {
-		clear_bit(QHLIST_BIT, &q->q_flag);
-		wake = test_and_clear_bit(QTOENAB_BIT, &q->q_flag);
-	}
-	goto done;
-}
-
 /**
  *  strgetpmsg: - getpmsg file operation for a stream
  *  @file: file pointer for the stream
@@ -6039,22 +6069,57 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 		dassert(q != NULL);
 
 		do {
-			if (likely((mp = strgetq(sd, q, flags, band, mread)) == NULL)) {
-				/* check nodelay */
-				if (unlikely(file->f_flags & FNDELAY)) {
+			/* First acquire QHLIST bit if necessary. */
+			if (likely(mread > 0)
+			    && unlikely(test_and_set_bit(QHLIST_BIT, &q->q_flag))) {
+				if (likely(file->f_flags & FNDELAY)) {
 					err = -EAGAIN;
 					break;
 				}
-				mp = strwaitgetq(sd, q, flags, band, mread);
-				if (unlikely(IS_ERR(mp) != 0)) {
-					err = PTR_ERR(mp);
+				if (unlikely((err = strwaithlist(sd, q)) != 0))
 					break;
-				}
 			}
+
+#if 0
+		      oops:
+#endif
+			/* Next see if we have to block. */
+			if (likely(!test_bit(QWANTR_BIT, &q->q_flag))) {
+				mp = strgetq(sd, q, flags, band);
+			} else {
+#if 0
+				/* about to block, generate M_READ(9) if required */
+				if (likely(mread > 0) && likely(sd_flag & STRMREAD)) {
+					if (unlikely((err = strsendmread(sd, mread)) != 0))
+						goto wake;
+					/* could already have a response */
+					mread = 0;
+					goto oops;
+				}
+#endif
+				/* about to block, check nodelay */
+				if (likely(file->f_flags & FNDELAY))
+					goto eagain;
+				mp = strwaitgetq(sd, q, flags, band);
+			}
+			dassert(mp);
+			if (unlikely(IS_ERR(mp)))
+				goto errptr;
+
 			/* got something - set return flags */
-			flags = (mp->b_datap->db_type < QPCTL) ?
-			    ((bandp) ? MSG_BAND : 0) : MSG_HIPRI;
+			flags =
+			    (mp->b_datap->db_type < QPCTL) ? ((bandp) ? MSG_BAND : 0) : MSG_HIPRI;
 			band = mp->b_band;
+			break;
+		      eagain:
+			err = -EAGAIN;
+			goto wake;
+		      wake:
+			strwakehlist(sd, q);
+			break;
+		      errptr:
+			err = PTR_ERR(mp);
+			break;
 		} while (0);
 
 		srunlock(sd);
@@ -6134,7 +6199,9 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 				retval |= MOREDATA;
 			}
 		}
-		strputbq(sd, q, mp, true);	/* clears QHLIST bit */
+		if (mp != NULL)
+			strputbq(sd, q, mp);
+		strwakehlist(sd, q);	/* clears QHLIST bit */
 	      done:
 		/* copy out return values */
 		if (likely(ctlp != NULL))
@@ -10722,16 +10789,17 @@ strwput(queue_t *q, mblk_t *mp)
 		mblk_t *b;
 
 	case M_DATA:
+	case M_PROTO:
 		if ((b = (mblk_t *volatile) q->q_first) != NULL) {
 			unsigned long pl;
 
 			/* fast getq */
 			qwlock(q, pl);
 			if (likely((b = q->q_first) != NULL)) {
-				if (unlikely(b->b_next != NULL))
+				if (unlikely((q->q_first = b->b_next) != NULL)) {
 					b->b_next->b_prev = NULL;
-				b->b_next = NULL;
-				q->q_first = NULL;
+					b->b_next = NULL;
+				}
 				if (likely(q->q_last == b))
 					q->q_last = NULL;
 				q->q_msgs--;
@@ -10740,37 +10808,46 @@ strwput(queue_t *q, mblk_t *mp)
 			qwunlock(q, pl);
 
 			if (likely(b != NULL)) {
-			      release:
 				/* delayed one has to go - can't delay the other */
 				if (likely(b->b_wptr > b->b_rptr))
 					putnext(q, b);
 				else
-					freemsg(b);
+					freeb(b);
 				putnext(q, mp);
 				return (0);
 			}
 		}
-		if ((mp->b_wptr - mp->b_rptr <= mp->b_datap->db_lim - mp->b_wptr)
+		if ((mp->b_datap->db_type == M_DATA)
+		    && (mp->b_wptr - mp->b_rptr <= mp->b_datap->db_lim - mp->b_wptr)
 		    && !(mp->b_flag & MSGDELIM)
 		    && (wqstream(q)->sd_flag & STRHOLD)
 		    && (mp->b_cont == NULL)
 		    && (mp->b_band == 0)
 		    && (mp->b_wptr > mp->b_rptr)) {
+			unsigned long pl;
+
 			/* M_DATA, will hold another write of the same size, not delimited, feature 
 			   activated, single message block, band zero, non-zero-length message. */
 			/* held - add stream head to scan list */
 			qscan(q);
-			putq(q, mp);
+			/* fast putq */
+			mp->b_next = NULL;
+			qwlock(q, pl);
+			if (unlikely((mp->b_prev = q->q_last) != NULL))
+				mp->b_prev->b_next = mp;
+			if (likely(q->q_first == NULL))
+				q->q_first = mp;
+			q->q_last = mp;
+			q->q_msgs++;
+			q->q_count += mp->b_wptr - mp->b_rptr;
+			/* don't care about flags */
+			qwunlock(q, pl);
 			return (0);
 		} else {
 			/* not held - has to go */
 			putnext(q, mp);
 			return (0);
 		}
-		break;
-	case M_PROTO:
-		if ((b = (mblk_t *volatile) q->q_first) != NULL && likely((b = getq(q)) != NULL))
-			goto release;
 		break;
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHW) {
@@ -10794,6 +10871,28 @@ EXPORT_SYMBOL(strwput);
  *  =========================================================================
  */
 
+streams_noinline streams_fastcall void
+strputq_pri(struct stdata *sd, queue_t *q, mblk_t *mp)
+{
+	unsigned long size = msgsize(mp);
+	unsigned long pl;
+
+	mp->b_band = 0;
+
+	qwlock(q, pl);
+	if ((mp->b_next = q->q_first))
+		mp->b_next->b_prev = mp;
+	mp->b_prev = NULL;
+	q->q_first = mp;
+	if (q->q_last == NULL)
+		q->q_last = mp;
+	q->q_msgs++;
+	if (unlikely((q->q_count += size) >= q->q_hiwat))
+		set_bit(QFULL_BIT, &q->q_flag);
+	clear_bit(QWANTR_BIT, &q->q_flag);
+	qwunlock(q, pl);
+}
+
 /**
  *  str_m_pcproto: process M_PCPROTO message at the Stream head
  *  @sd: stream head
@@ -10812,9 +10911,9 @@ str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
 	if (test_bit(STRCLOSE_BIT, &sd->sd_flag) || test_and_set_bit(STRPRI_BIT, &sd->sd_flag)) {
 		freemsg(mp);
 	} else {
-		putq(q, mp);
-		strwakeread(sd);
+		strputq_pri(sd, q, mp);
 		strevent(sd, S_HIPRI, 0);
+		strwakeread(sd);
 	}
 	return (0);
 }
@@ -10867,16 +10966,15 @@ coallesce(mblk_t *b1, mblk_t *b2, unsigned long size)
  *  @q: stream head read queue
  *  @mp: the M_DATA message
  */
-streams_noinline streams_fastcall int
+streams_noinline streams_fastcall bool
 strputq_band(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	mblk_t *b_prev, *b_next, *b_this;
+	mblk_t *b_prev, *b_next;
 	struct qband *qb;
 	unsigned long size = msgsize(mp);
 	unsigned long pl;
-	int wake;
+	bool wake = false;
 
-	b_this = mp;
 	b_prev = NULL;
 	qwlock(q, pl);
 	b_next = q->q_first;
@@ -10890,7 +10988,7 @@ strputq_band(struct stdata *sd, queue_t *q, mblk_t *mp)
 		qwunlock(q, pl);
 		swerr();
 		freemsg(mp);
-		return (0);
+		return (false);
 	}
 	/* find position for our message */
 	if (unlikely(b_next != NULL) && unlikely(b_next->b_band >= mp->b_band)) {
@@ -10900,11 +10998,9 @@ strputq_band(struct stdata *sd, queue_t *q, mblk_t *mp)
 		} while (unlikely(b_next != NULL) && unlikely(b_next->b_band >= mp->b_band));
 	}
 	if (unlikely(b_prev != NULL)) {
-		if (((sd->sd_rdopt & (RMSGN | RMSGD)) == 0) &&
-		    size <= (FASTBUF >> 1) && coallesce(b_prev, mp, size)) {
-			b_this = b_prev;
+		if (size <= (FASTBUF >> 1) && ((sd->sd_rdopt & (RMSGN | RMSGD)) == 0)
+		    && coallesce(b_prev, mp, size))
 			goto count;
-		}
 		mp->b_prev = b_prev;
 		b_prev->b_next = mp;
 	}
@@ -10917,14 +11013,16 @@ strputq_band(struct stdata *sd, queue_t *q, mblk_t *mp)
 	qb->qb_msgs++;
 	if (likely(q->q_last == b_prev))
 		q->q_last = mp;
-	if (likely(q->q_first == b_next))
+	if (likely(q->q_first == b_next)) {
 		q->q_first = mp;
+		if (test_and_clear_bit(QWANTR_BIT, &q->q_flag))
+			wake = true;
+	}
 	q->q_msgs++;
       count:
 	if (unlikely((qb->qb_count += size) >= qb->qb_hiwat))
 		if (likely(!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag)))
 			q->q_blocked++;
-	wake = (q->q_first == b_this);
 	qwunlock(q, pl);
 	return (wake);
 }
@@ -10934,41 +11032,40 @@ strputq_band(struct stdata *sd, queue_t *q, mblk_t *mp)
  *  @q: stream head read queue
  *  @mp: the M_DATA message
  */
-STATIC streams_inline streams_fastcall int
+STATIC streams_inline streams_fastcall bool
 strputq_norm(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	mblk_t *b_prev, *b_this;
+	mblk_t *b_prev;
 	unsigned long size = msgsize(mp);
 	unsigned long pl;
-	int wake;
+	bool wake = false;
 
-	b_this = mp;
 	qwlock(q, pl);
 	b_prev = q->q_last;
 	mp->b_next = NULL;
 	mp->b_prev = NULL;
 	if (unlikely(b_prev != NULL)) {
-		if (((sd->sd_rdopt & (RMSGN | RMSGD)) == 0) &&
-		    size <= (FASTBUF >> 1) && coallesce(b_prev, mp, size)) {
-			b_this = b_prev;
+		if (size <= (FASTBUF >> 1) && ((sd->sd_rdopt & (RMSGN | RMSGD)) == 0)
+		    && coallesce(b_prev, mp, size))
 			goto count;
-		}
 		mp->b_prev = b_prev;
 		b_prev->b_next = mp;
 	}
 	q->q_last = mp;
-	if (likely(q->q_first == NULL))
+	if (likely(q->q_first == NULL)) {
 		q->q_first = mp;
+		if (test_and_clear_bit(QWANTR_BIT, &q->q_flag))
+			wake = true;
+	}
 	q->q_msgs++;
       count:
 	if (unlikely((q->q_count += size) >= q->q_hiwat))
 		set_bit(QFULL_BIT, &q->q_flag);
-	wake = (q->q_first == b_this);
 	qwunlock(q, pl);
 	return (wake);
 }
 
-STATIC streams_inline streams_fastcall int
+STATIC streams_inline streams_fastcall bool
 strputq(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	if (likely(mp->b_band == 0))
@@ -10999,9 +11096,10 @@ strputq(struct stdata *sd, queue_t *q, mblk_t *mp)
 STATIC streams_inline streams_fastcall __hot_out int
 str_m_data(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
-	if (strputq(sd, q, mp))
+	if (strputq(sd, q, mp)) {
+		strevent(sd, S_INPUT | (mp->b_band ? S_RDBAND : S_RDNORM), mp->b_band);
 		strwakeread(sd);
-	strevent(sd, (S_INPUT | (mp->b_band ? S_RDBAND : S_RDNORM)), mp->b_band);
+	}
 	return (0);
 }
 
@@ -11180,15 +11278,14 @@ streams_noinline streams_fastcall __unlikely int
 str_m_sig(struct stdata *sd, queue_t *q, mblk_t *mp)
 {
 	unsigned long pl;
-	bool wake;
 
 	zwlock(sd, pl);
 	insq(q, NULL, mp);	/* ok when frozen */
-	if ((wake = (q->q_first == mp)))
+	if (q->q_first == mp)
 		set_bit(STRMSIG_BIT, &sd->sd_flag);
+	clear_bit(QWANTR_BIT, &q->q_flag);
 	zwunlock(sd, pl);
-	if (wake)
-		strwakeread(sd);
+	strwakeread(sd);
 	return (0);
 }
 
@@ -11444,6 +11541,7 @@ streams_noinline streams_fastcall int
 str_m_read(struct stdata *sd, queue_t *rq, mblk_t *mp)
 {
 	queue_t *q = _WR(rq);
+	unsigned long pl;
 	size_t size;
 	mblk_t *b;
 
@@ -11455,14 +11553,39 @@ str_m_read(struct stdata *sd, queue_t *rq, mblk_t *mp)
 	mp->b_datap->db_type = M_DATA;
 	mp->b_wptr = mp->b_rptr = mp->b_datap->db_base;
 
-	if ((mblk_t *volatile) q->q_first && (b = getq(q))) {
-		if (b->b_wptr == b->b_rptr)
-			b->b_flag |= MSGDELIM;
-		putq(q, mp);
-		putnext(q, b);
+	if ((b = (mblk_t *volatile) q->q_first) != NULL) {
+		/* fast getq */
+		qwlock(q, pl);
+		if (likely((b = q->q_first) != NULL)) {
+			if (unlikely((q->q_first = b->b_next) != NULL)) {
+				b->b_next->b_prev = NULL;
+				b->b_next = NULL;
+			}
+			if (likely(q->q_last == b))
+				q->q_last = NULL;
+			q->q_msgs--;
+			q->q_count -= b->b_wptr - b->b_rptr;
+		}
+	} else {
+		qwlock(q, pl);
+	}
+	/* fast putq */
+	mp->b_next = NULL;
+	if (unlikely((mp->b_prev = q->q_last) != NULL))
+		mp->b_prev->b_next = mp;
+	if (likely(q->q_first == NULL))
+		q->q_first = mp;
+	q->q_last = mp;
+	q->q_msgs++;
+	q->q_count += mp->b_wptr - mp->b_rptr;
+	qwunlock(q, pl);
+	if (likely(b != NULL)) {
+		if (likely(b->b_wptr > b->b_rptr))
+			putnext(q, b);
+		else
+			freeb(b);
 	} else {
 		qscan(q);
-		putq(q, mp);
 	}
 	return (0);
 }
