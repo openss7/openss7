@@ -1797,6 +1797,39 @@ strgetq_exception(struct stdata *sd, const int flags, mblk_t *mp, unsigned long 
 	}
 }
 
+streams_noinline void
+__strputbq_band(struct stdata *sd, queue_t *q, mblk_t *mp)
+{
+	struct qband *qb;
+
+	qb = __find_qband(q, mp->b_band);
+	if (likely(qb->qb_last == mp->b_prev) || likely(qb->qb_last == NULL))
+		qb->qb_last = mp;
+	if (likely(qb->qb_first == mp->b_next) || likely(qb->qb_first == NULL))
+		qb->qb_first = mp;
+	qb->qb_msgs++;
+	if ((qb->qb_count += msgsize(mp)) >= qb->qb_hiwat)
+		if (likely(!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag)))
+			q->q_blocked++;
+	clear_bit(STRPRI_BIT, &sd->sd_flag);
+}
+
+streams_noinline void
+__strputbq_pri(struct stdata *sd, queue_t *q, mblk_t *mp)
+{
+	mp->b_band = 0;
+	if ((mp->b_next = q->q_first))
+		mp->b_next->b_prev = mp;
+	mp->b_prev = NULL;
+	q->q_first = mp;
+	if (q->q_last == NULL)
+		q->q_last = mp;
+	q->q_msgs++;
+	if ((q->q_count += msgsize(mp)) >= q->q_hiwat)
+		set_bit(QFULL_BIT, &q->q_flag);
+	set_bit(STRPRI_BIT, &sd->sd_flag);
+}
+
 /**
  * strputbq: - like putbq(), but handles STRMSIG and STRPRI bits
  * @sd: stream head
@@ -1852,33 +1885,11 @@ strputbq(struct stdata *sd, queue_t *q, mblk_t *const mp, const bool release)
 			if (likely(mp->b_band == 0)) {
 				if ((q->q_count += msgsize(mp)) >= q->q_hiwat)
 					set_bit(QFULL_BIT, &q->q_flag);
-			} else {
-				struct qband *qb;
-
-				qb = __find_qband(q, mp->b_band);
-				if (likely(qb->qb_last == b_prev) || likely(qb->qb_last == NULL))
-					qb->qb_last = mp;
-				if (likely(qb->qb_first == b_next) || likely(qb->qb_first == NULL))
-					qb->qb_first = mp;
-				qb->qb_msgs++;
-				if ((qb->qb_count += msgsize(mp)) >= qb->qb_hiwat)
-					if (likely(!test_and_set_bit(QB_FULL_BIT, &qb->qb_flag)))
-						q->q_blocked++;
-			}
-			clear_bit(STRPRI_BIT, &sd->sd_flag);
-		} else {
-			mp->b_band = 0;
-			if ((mp->b_next = q->q_first))
-				mp->b_next->b_prev = mp;
-			mp->b_prev = NULL;
-			q->q_first = mp;
-			if (q->q_last == NULL)
-				q->q_last = mp;
-			q->q_msgs++;
-			if ((q->q_count += msgsize(mp)) >= q->q_hiwat)
-				set_bit(QFULL_BIT, &q->q_flag);
-			set_bit(STRPRI_BIT, &sd->sd_flag);
-		}
+				clear_bit(STRPRI_BIT, &sd->sd_flag);
+			} else
+				__strputbq_band(sd, q, mp);
+		} else
+			__strputbq_pri(sd, q, mp);
 	}
 	if (likely(release)) {
 		clear_bit(QHLIST_BIT, &q->q_flag);
@@ -4859,7 +4870,7 @@ strread_fast(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
 		const int sd_rdopt = sd->sd_rdopt;
 		const int sd_flag = sd->sd_flag;
 		mblk_t *mp, *first = NULL;
-		queue_t *q = sd->sd_wq;
+		queue_t *q = sd->sd_rq;
 		bool stop = false;
 		ssize_t mread = nbytes;
 
@@ -5973,6 +5984,7 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 	struct strbuf ctl, dat;
 	int flags, band = 0;
 	int err, retval = 0;
+	queue_t *q = sd->sd_rq;
 	mblk_t *mp;
 
 	if (unlikely(flagsp == NULL))
@@ -6023,7 +6035,6 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 
 	if (likely(!(err = straccess_rlock(sd, FREAD)))) {
 		ssize_t mread = datp ? ((datp->maxlen > 0) ? datp->maxlen : -1) : -1;
-		queue_t *q = sd->sd_rq;
 
 		dassert(q != NULL);
 
@@ -6123,7 +6134,7 @@ strgetpmsg_fast(struct file *file, struct strbuf __user *ctlp, struct strbuf __u
 				retval |= MOREDATA;
 			}
 		}
-		strputbq(sd, sd->sd_rq, mp, true);	/* clears QHLIST bit */
+		strputbq(sd, q, mp, true);	/* clears QHLIST bit */
 	      done:
 		/* copy out return values */
 		if (likely(ctlp != NULL))
