@@ -1070,7 +1070,7 @@ mdbblock_alloc(uint priority, void *func)
 		mp = t->freemblk_head;
 		prefetchw(mp);
 		if (likely(mp != NULL)) {
-			//struct mdbblock *md = (struct mdbblock *) mp;
+			// struct mdbblock *md = (struct mdbblock *) mp;
 
 			/* free block list normally has more than one block on it */
 			if (likely((t->freemblk_head = mp->b_next) != NULL))
@@ -1221,6 +1221,7 @@ mdbblock_free(mblk_t *mp)
 	{
 		struct mdbblock *md = (struct mdbblock *) mp;
 		dblk_t *db = &md->datablk.d_dblock;
+
 		// unsigned char *base = md->databuf;
 
 		/* clean the state before putting it back, save mutlitple initializations elsewhere 
@@ -2340,7 +2341,7 @@ strwrit_fast(queue_t *q, mblk_t *mp, void streamscall (*func) (queue_t *, mblk_t
 	dassert(sd);
 	prlock(sd);
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
-		(*func)(q, mp);
+		(*func) (q, mp);
 		qwakeup(q);
 	} else {
 		freemsg(mp);
@@ -2381,7 +2382,7 @@ strfunc_fast(void streamscall (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp
 	dassert(sd);
 	prlock(sd);
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
-		(*func)(arg, mp);
+		(*func) (arg, mp);
 		qwakeup(q);
 	} else {
 		freemsg(mp);
@@ -3745,7 +3746,7 @@ do_bufcall_synced(struct strevent *se)
 			else
 				prlock(sd);
 			if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
-				(*func)(se->x.b.arg);
+				(*func) (se->x.b.arg);
 				qwakeup(q);
 			} else {
 				swerr();
@@ -3756,7 +3757,7 @@ do_bufcall_synced(struct strevent *se)
 				prunlock(sd);
 			qput(&q);
 		} else
-			(*func)(se->x.b.arg);
+			(*func) (se->x.b.arg);
 	}
 }
 
@@ -3960,7 +3961,7 @@ do_weldq_synced(struct strevent *se)
 				else
 					prlock(sd);
 				if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
-					(*func)(se->x.w.arg);
+					(*func) (se->x.w.arg);
 					qwakeup(q);
 				}
 				if (unlikely(safe))
@@ -3969,7 +3970,7 @@ do_weldq_synced(struct strevent *se)
 					prunlock(sd);
 				qput(&q);
 			} else
-				(*func)(se->x.w.arg);
+				(*func) (se->x.w.arg);
 		}
 	}
 }
@@ -4336,6 +4337,16 @@ scan_timeout_function(unsigned long arg)
 
 struct timer_list scan_timer;
 
+/**
+ *  qscan:  - place queue on the scan list
+ *  @q: queue to list
+ *
+ *  This is somewhat different than before as we now have a write service procedure again.  The
+ *  q_link pointer is shared between scanqueues and runqueues, so the QENAB bit is also shared.  If
+ *  the queue is already scheduled for runqueues, the held message block will be released once the
+ *  service procedure runs; otherwise, if an attempt is being made to qenable the queue, the service
+ *  procedure will run when the held message is released.
+ */
 streams_fastcall __unlikely void
 qscan(queue_t *q)
 {
@@ -4344,9 +4355,10 @@ qscan(queue_t *q)
 	t = this_thread;
 	prefetchw(t);
 
-	if (!test_and_set_bit(QHLIST_BIT, &q->q_flag)) {
+	if (!test_and_set_bit(QENAB_BIT, &q->q_flag)) {
 		int start;
 
+		set_bit(QHLIST_BIT, &q->q_flag);
 		/* put ourselves on scan list */
 		q->q_link = NULL;
 		{
@@ -4372,15 +4384,15 @@ EXPORT_SYMBOL_GPL(qscan);	/* for stream head in include/sys/streams/strsubr.h */
  *  Process all outstanding scan Stream heads in the order in which they were listed for service.
  *  Note that the only Stream heads on this list are Stream heads with the STRHOLD feature.
  *
- *  It works like this: Stream heads are only added to the end of the list, in timed order.  When we
- *  scan the list, we remove the entire list to process them.  If the head of the list has expired,
- *  it is removed and its write queue scheduled.  If a Stream head in the list has not expired, then
- *  all of the 
+ *  The write side service procedure is responsible for releasing the held buffer.  Queues on this
+ *  list are simply moved from this list to the runqueues list and have their QHLIST bit cancelled.
+ *  The runqueues flag is marked and they will likely be processed on the next loop of the
+ *  scheduler.
  */
 streams_noinline streams_fastcall __unlikely void
 scanqueues(struct strthread *t)
 {
-	queue_t *q, *q_link;
+	queue_t **qp, *q_link;
 	unsigned long flags;
 
 	do {
@@ -4391,20 +4403,14 @@ scanqueues(struct strthread *t)
 		t->scanqtail = &t->scanqhead;
 		streams_local_restore(flags);
 		if (likely(q_link != NULL)) {
-			q = q_link;
-			do {
-				q_link = XCHG(&q->q_link, NULL);
-				if (test_bit(QHLIST_BIT, &q->q_flag) && (q->q_first != NULL)) {
-					mblk_t *mp;
-
-					if ((mp = getq(q)))
-						putnext(q, mp);
-					clear_bit(QHLIST_BIT, &q->q_flag);
-				}
-				qput(&q);
-				prefetchw(q_link);
-			} while (unlikely((q = q_link) != NULL));
-			prefetch(t->scanqhead);
+			/* clear all QHLIST bits and find end of list */
+			for (qp = &q_link; (*qp); qp = &(*qp)->q_link)
+				clear_bit(QHLIST_BIT, &(*qp)->q_flag);
+			/* append list to runqueues list */
+			streams_local_save(flags);
+			*XCHG(&t->qtail, qp) = q_link;
+			streams_local_restore(flags);
+			set_bit(qrunflag, &t->flags);
 		}
 	} while (unlikely(test_bit(scanqflag, &t->flags) != 0));
 }
@@ -4892,7 +4898,7 @@ clear_shinfo(struct shinfo *sh)
 	sd->sd_closetime = sysctl_str_cltime;	/* typically 15 seconds (saved in ticks) */
 	sd->sd_ioctime = sysctl_str_ioctime;	/* default for ioctls, typically 15 seconds (saved
 						   in ticks) */
-//	sd->sd_rtime = sysctl_str_rtime;	/* typically 10 milliseconds (saved in ticks) */
+//      sd->sd_rtime = sysctl_str_rtime;        /* typically 10 milliseconds (saved in ticks) */
 	sd->sd_strmsgsz = sysctl_str_strmsgsz;	/* maximum message size */
 	sd->sd_strctlsz = sysctl_str_strctlsz;	/* maximum control message size */
 	sd->sd_nstrpush = sysctl_str_nstrpush;	/* maximum push count */
@@ -4920,6 +4926,7 @@ shinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
 		clear_shinfo(obj);
 }
+
 /**
  * allocstr - allocate a Stream head and associated queue pair
  *
@@ -4946,7 +4953,7 @@ allocstr(void)
 		queue_t *rq = &qu->rq;
 		queue_t *wq = &qu->wq;
 
-		atomic_set(&qu->qu_refs, 1); /* once for combination */
+		atomic_set(&qu->qu_refs, 1);	/* once for combination */
 #if defined(CONFIG_STREAMS_DEBUG)
 		write_lock(&qsi->si_rwlock);
 		list_add_tail(&qu->qu_list, &qsi->si_head);
@@ -5710,7 +5717,7 @@ open_softirq(int nr, void (*action) (struct softirq_action *), void *data)
 {
 	static void (*func) (int, void (*)(struct softirq_action *), void *) =
 	    (typeof(func)) HAVE_OPEN_SOFTIRQ_ADDR;
-	return (*func)(nr, action, data);
+	return (*func) (nr, action, data);
 }
 #endif
 #endif

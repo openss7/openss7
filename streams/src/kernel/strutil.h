@@ -88,8 +88,8 @@ extern struct syncq *global_outer_syncq;
 #if 0
 extern bool __rmvq(queue_t *q, mblk_t *mp);
 #endif
-extern streams_fastcall __unlikely bool __flushq(queue_t *q, int flag, mblk_t ***mppp,
-						 char bands[]);
+extern streams_fastcall __unlikely bool
+__flushq(queue_t *q, int flag, mblk_t ***mppp, unsigned long bands[]);
 
 /*
  *  An interesting locking issue: if STREAMS is invoke from ISRs it needs irq protection on locks;
@@ -231,6 +231,9 @@ extern streams_fastcall __unlikely bool __flushq(queue_t *q, int flag, mblk_t **
  *
  * Note the additional perambulations for freeze locks for pipes and other twists.
  */
+
+#define stream_frozen(__sd)		(bool)({ (__sd)->sd_freezer == current; })
+#define stream_thawed(__sd)		(bool)({ (__sd)->sd_freezer != current; })
 
 #define frozen_by_caller(__q)		(bool)({ ((qstream((__q)))->sd_freezer == current); })
 #define not_frozen_by_caller(__q)	(bool)({ ((qstream((__q)))->sd_freezer != current); })

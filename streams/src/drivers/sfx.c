@@ -155,6 +155,7 @@ static struct module_stat sfx_wstat __attribute__((__aligned__(SMP_CACHE_BYTES))
 
 static struct qinit sfx_rqinit = {
 	.qi_putp = strrput,
+	.qi_srvp = strrsrv,
 	.qi_qopen = str_open,
 	.qi_qclose = str_close,
 	.qi_minfo = &sfx_minfo,
@@ -163,6 +164,7 @@ static struct qinit sfx_rqinit = {
 
 static struct qinit sfx_wqinit = {
 	.qi_putp = strwput,
+	.qi_srvp = strwsrv,
 	.qi_minfo = &sfx_minfo,
 	.qi_mstat = &sfx_wstat,
 };
