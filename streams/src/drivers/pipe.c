@@ -156,6 +156,7 @@ static struct module_stat pipe_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)
 
 static struct qinit pipe_rinit = {
 	.qi_putp = strrput,
+	.qi_srvp = strrsrv,
 	.qi_qopen = str_open,
 	.qi_qclose = str_close,
 	.qi_minfo = &pipe_minfo,
@@ -164,6 +165,7 @@ static struct qinit pipe_rinit = {
 
 static struct qinit pipe_winit = {
 	.qi_putp = strwput,
+	.qi_srvp = strwsrv,
 	.qi_minfo = &pipe_minfo,
 	.qi_mstat = &pipe_wstat,
 };

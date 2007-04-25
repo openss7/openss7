@@ -1132,7 +1132,7 @@ __STREAMS_EXTERN void flushq(register queue_t *q, int flag);
 __STREAMS_EXTERN void freeq(queue_t *q);
 __STREAMS_EXTERN void put(queue_t *q, mblk_t *mp);
 __STREAMS_EXTERN void putnext(queue_t *q, mblk_t *mp);
-__STREAMS_EXTERN void qbackenable(queue_t *q, const unsigned char band, const char bands[]);
+__STREAMS_EXTERN void qbackenable(queue_t *q, const unsigned char band, unsigned long bands[]);
 __STREAMS_EXTERN void qdelete(queue_t *rq);
 __STREAMS_EXTERN void qenable(register queue_t *q);
 __STREAMS_EXTERN void qinsert(struct stdata *sd, queue_t *rq);

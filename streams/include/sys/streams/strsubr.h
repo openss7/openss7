@@ -789,7 +789,9 @@ __STREAMS_EXTERN int strioctl(struct file *file, unsigned int cmd, unsigned long
 /* stream head read put and write service procedures, and open/close for use by replacement stream
  * heads */
 __STREAMS_ENTRYP int strrput(queue_t *q, mblk_t *mp);
+__STREAMS_ENTRYP int strrsrv(queue_t *q);
 __STREAMS_ENTRYP int strwput(queue_t *q, mblk_t *mp);
+__STREAMS_ENTRYP int strwsrv(queue_t *q);
 __STREAMS_ENTRYP int str_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp);
 __STREAMS_ENTRYP int str_close(queue_t *q, int oflag, cred_t *crp);
 
