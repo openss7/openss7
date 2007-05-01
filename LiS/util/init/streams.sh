@@ -44,7 +44,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 name='streams'
 config="/etc/default/$name"
 desc="the STREAMS subsystem"
-mknod="strmaknodes"
+mknod="strmakenodes"
 
 [ -e /proc/modules ] || exit 0
 
