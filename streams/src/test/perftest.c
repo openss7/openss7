@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -167,7 +167,9 @@ int sndmread = 0;
 int readfill = 0;
 int fullreads = 0;
 int niceread = 0;
+int nicerval = 19;
 int nicesend = 0;
+int nicesval = 19;
 int fifo = 0;
 int push = 0;
 int blocking = 0;
@@ -432,7 +434,7 @@ read_child(int fd)
 	int rtn, report_count = 0;
 
 	if (niceread)
-		if (setpriority(PRIO_PROCESS, 0, 19) != 0) {
+		if (setpriority(PRIO_PROCESS, 0, nicerval) != 0) {
 			perror("setpriority()");
 			goto dead;
 		}
@@ -568,7 +570,7 @@ write_child(int fd)
 	int rtn, report_count = 0;
 
 	if (nicesend)
-		if (setpriority(PRIO_PROCESS, 0, 19) != 0) {
+		if (setpriority(PRIO_PROCESS, 0, nicesval) != 0) {
 			perror("setpriority()");
 			goto dead;
 		}
@@ -1012,7 +1014,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -1068,7 +1070,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -1114,9 +1116,9 @@ Options:\n\
         Issue M_READ messages.\n\
     -w, --readfill\n\
         Read fill mode.\n\
-    -R, --niceread\n\
+    -R, --niceread [NICE]\n\
         Run read child nice 19.\n\
-    -S, --nicesend\n\
+    -S, --nicesend [NICE]\n\
         Run write child nice 19.\n\
     -F, --full\n\
         Perform full size reads.\n\
@@ -1168,8 +1170,8 @@ main(int argc, char *argv[])
 			{"lowat",	required_argument,	NULL, '\2'},
 			{"mread",	no_argument,		NULL, 'M'},
 			{"readfill",	no_argument,		NULL, 'w'},
-			{"niceread",	no_argument,		NULL, 'R'},
-			{"nicesend",	no_argument,		NULL, 'S'},
+			{"niceread",	optional_argument,	NULL, 'R'},
+			{"nicesend",	optional_argument,	NULL, 'S'},
 			{"full",	no_argument,		NULL, 'F'},
 			{"module",	required_argument,	NULL, 'm'},
 			{"hold",	no_argument,		NULL, 'H'},
@@ -1191,10 +1193,10 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "MwRSFm:Hafp:bs:rt:i:qvhV?W:", long_options,
+		c = getopt_long(argc, argv, "MwR::S::Fm:Hafp:bs:rt:i:qvhV?W:", long_options,
 				&option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "MwRSFm:Hafp:bs:rt:i:qvhV?");
+		c = getopt(argc, argv, "MwR::S::Fm:Hafp:bs:rt:i:qvhV?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -1219,9 +1221,17 @@ main(int argc, char *argv[])
 			break;
 		case 'R':
 			niceread = 1;
+			if (optarg != NULL)
+				nicerval = strtoul(optarg, NULL, 0);
+			else
+				nicerval = 19;
 			break;
 		case 'S':
 			nicesend = 1;
+			if (optarg != NULL)
+				nicesval = strtoul(optarg, NULL, 0);
+			else
+				nicesval = 19;
 			break;
 		case 'F':
 			fullreads = 1;

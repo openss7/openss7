@@ -223,8 +223,8 @@ static int show_timeout = 0;
 
 //static int show_data = 1;
 
-static int last_prim = 0;
-static int last_event = 0;
+int last_prim = 0;
+int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;
 
@@ -406,7 +406,7 @@ check_time(const char *t, long i, long lo, long hi)
 }
 #endif
 
-static int
+int
 time_event(int child, int event)
 {
 	static const char *msgs[] = {
@@ -2157,7 +2157,7 @@ test_close(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int
+int
 stream_start(int child, int index)
 {
 	switch (child) {
@@ -2184,7 +2184,7 @@ stream_start(int child, int index)
 	}
 }
 
-static int
+int
 stream_stop(int child)
 {
 	switch (child) {

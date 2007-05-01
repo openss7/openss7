@@ -343,8 +343,8 @@ static int show_timeout = 0;
 
 //static int show_data = 1;
 
-static int last_prim = 0;
-static int last_event = 0;
+int last_prim = 0;
+int last_event = 0;
 static int last_errno = 0;
 static int last_retval = 0;
 
@@ -362,7 +362,11 @@ int test_fd[3] = { 0, 0, 0 };
 
 static int test_duration = TEST_DURATION;	/* wait on other side */
 
+#if 1
 #define INVALID_ADDRESS ((void *)(long)(-1))
+#else
+#define INVALID_ADDRESS ((void *)((char *)sbrk(0) + 4096))
+#endif
 
 char cbuf[BUFSIZE];
 char dbuf[BUFSIZE];
@@ -526,7 +530,7 @@ check_time(const char *t, long i, long lo, long hi)
 }
 #endif
 
-static int
+int
 time_event(int child, int event)
 {
 	static const char *msgs[] = {
@@ -1934,12 +1938,13 @@ test_putmsg(int child, struct strbuf *ctrl, struct strbuf *data, int flags)
 int
 test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int flags)
 {
+	print_datcall(child, "putpmsg(2)----", data ? data->len : -1);
 	if (flags & MSG_BAND || band) {
 		if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
 			int i;
 
 			dummy = lockf(fileno(stdout), F_LOCK, 0);
-			fprintf(stdout, "putpmsg to %d: [%d,%d]\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1);
+			fprintf(stdout, "putpmsg to %d: [%d,%d] band %d\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1, band);
 			fprintf(stdout, "[");
 			for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
 				fprintf(stdout, "%02X", ctrl->buf[i]);
@@ -1952,7 +1957,7 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		if (ctrl == NULL || data != NULL)
-			print_datcall(child, "M_DATA----------", data ? data->len : 0);
+			print_datcall(child, "M_DATA--------", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
 				if (last_errno == ERESTART)
@@ -1972,7 +1977,7 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 			fflush(stdout);
 		}
 		if (ctrl == NULL || data != NULL)
-			print_datcall(child, "M_DATA----------", data ? data->len : 0);
+			print_datcall(child, "M_DATA--------", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
 				if (last_errno == ERESTART)
@@ -2048,6 +2053,22 @@ test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, in
 				continue;
 			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
+		}
+		if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
+			int i;
+
+			dummy = lockf(fileno(stdout), F_LOCK, 0);
+			fprintf(stdout, "getpmsg from %d: [%d,%d] band %d\n", child, ctrl ? ctrl->len : -1, data ? data->len : -1, bandp ? *bandp : -1);
+			fprintf(stdout, "[");
+			for (i = 0; i < (ctrl ? ctrl->len : 0); i++)
+				fprintf(stdout, "%02X", ctrl->buf[i]);
+			fprintf(stdout, "]\n");
+			fprintf(stdout, "[");
+			for (i = 0; i < (data ? data->len : 0); i++)
+				fprintf(stdout, "%02X", data->buf[i]);
+			fprintf(stdout, "]\n");
+			fflush(stdout);
+			dummy = lockf(fileno(stdout), F_ULOCK, 0);
 		}
 		print_success_value(child, last_retval);
 		break;
@@ -2277,7 +2298,7 @@ test_close(int child)
  *  -------------------------------------------------------------------------
  */
 
-static int
+int
 stream_start(int child, int index)
 {
 	switch (child) {
@@ -2304,7 +2325,7 @@ stream_start(int child, int index)
 	}
 }
 
-static int
+int
 stream_stop(int child)
 {
 	switch (child) {
@@ -9829,7 +9850,7 @@ test_case_2_24_15(int child)
 {
 	struct bandinfo bi = { 1, FLUSHRW };
 
-	char buf[32] = { 0, };
+	static char buf[32] = { 0, };
 	struct strbuf ctl = { sizeof(buf), sizeof(buf), buf };
 	struct strbuf dat = { sizeof(buf), sizeof(buf), buf };
 	int band = 0;
@@ -9843,33 +9864,68 @@ test_case_2_24_15(int child)
 	if (test_getpmsg(child, &ctl, &dat, &band, &flags) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (flags != MSG_BAND || band != 2)
-		return (__RESULT_FAILURE);
+	if (flags != MSG_BAND) {
+		snprintf(buf, sizeof(buf), "Expected MSG_BAND got %d", flags);
+		failure_string = buf;
+		goto failure;
+	}
+	state++;
+	if (band != 2) {
+		snprintf(buf, sizeof(buf), "Expected band 2 got %d", band);
+		failure_string = buf;
+		goto failure;
+	}
 	state++;
 	band = 0;
 	flags = MSG_ANY;
 	if (test_getpmsg(child, &ctl, &dat, &band, &flags) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	if (flags != MSG_BAND || band != 2)
-		return (__RESULT_FAILURE);
+	if (flags != MSG_BAND) {
+		snprintf(buf, sizeof(buf), "Expected MSG_BAND got %d", flags);
+		failure_string = buf;
+		goto failure;
+	}
+	state++;
+	if (band != 2) {
+		snprintf(buf, sizeof(buf), "Expected band 2 got %d", band);
+		failure_string = buf;
+		goto failure;
+	}
 	state++;
 	band = 0;
 	flags = MSG_ANY;
 	if (test_getpmsg(child, &ctl, &dat, &band, &flags) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	if (flags != MSG_BAND || band != 0)
-		return (__RESULT_FAILURE);
+	if (flags != MSG_BAND) {
+		snprintf(buf, sizeof(buf), "Expected MSG_BAND got %d", flags);
+		failure_string = buf;
+		goto failure;
+	}
+	state++;
+	if (band != 0) {
+		snprintf(buf, sizeof(buf), "Expected band 0 got %d", band);
+		failure_string = buf;
+		goto failure;
+	}
 	state++;
 	band = 0;
 	flags = MSG_ANY;
 	if (test_getpmsg(child, &ctl, &dat, &band, &flags) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		goto failure;
 	state++;
-	if (flags != MSG_BAND || band != 0)
-		return (__RESULT_FAILURE);
+	if (flags != MSG_BAND) {
+		snprintf(buf, sizeof(buf), "Expected MSG_BAND got %d", flags);
+		failure_string = buf;
+		goto failure;
+	}
 	state++;
+	if (band != 0) {
+		snprintf(buf, sizeof(buf), "Expected band 0 got %d", band);
+		failure_string = buf;
+		goto failure;
+	}
 	state++;
 	band = 0;
 	flags = MSG_ANY;
@@ -9877,6 +9933,12 @@ test_case_2_24_15(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
+failure:
+	do {
+		band = 0;
+		flags = MSG_ANY;
+	} while (test_getpmsg(child, &ctl, &dat, &band, &flags) == __RESULT_SUCCESS);
+	return (__RESULT_FAILURE);
 }
 struct test_stream test_2_24_15 = { &preamble_test_case_2_24_15, &test_case_2_24_15, &postamble_0 };
 
@@ -16475,6 +16537,9 @@ preamble_test_case_3_5_21(int child)
 	if (i != 19)
 		return (__RESULT_FAILURE);
 	state++;
+	if (test_block(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
 	return (__RESULT_SUCCESS);
 }
 int
@@ -16495,22 +16560,16 @@ test_case_3_5_21(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	i++;
-	for (;;) {
+	do {
 		flags = 0;
-		if (test_getmsg(child, &ctl, &dat, &flags) != __RESULT_SUCCESS) {
-			if (last_errno == EAGAIN)
-				break;
+		if (test_getmsg(child, &ctl, &dat, &flags) != __RESULT_SUCCESS)
 			return (__RESULT_FAILURE);
-		}
 		state++;
 		if (flags != 0)
 			return (__RESULT_FAILURE);
 		state++;
 		i++;
-	}
-	state++;
-	if (i != 19)
-		return (__RESULT_FAILURE);
+	} while (i != 19);
 	state++;
 	return (__RESULT_SUCCESS);
 }
@@ -18001,6 +18060,9 @@ preamble_test_case_3_6_26(int child)
 	if (i != 19)
 		return (__RESULT_FAILURE);
 	state++;
+	if (test_block(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
 	return (__RESULT_SUCCESS);
 }
 int
@@ -18024,6 +18086,8 @@ test_case_3_6_26(int child)
 	state++;
 	for (k = 0; k < 3; k++) {
 		for (i = 0; i < 6; i++) {
+			test_msleep(child, NORMAL_WAIT);
+			state++;
 			band = 0;
 			flags = MSG_ANY;
 			if (test_getpmsg(child, &ctl, &dat, &band, &flags) != __RESULT_SUCCESS)
@@ -18037,6 +18101,9 @@ test_case_3_6_26(int child)
 			state++;
 		}
 	}
+	state++;
+	if (test_nonblock(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
 	state++;
 	band = 0;
 	flags = MSG_ANY;

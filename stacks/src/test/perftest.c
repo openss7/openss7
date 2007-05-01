@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -33,8 +33,7 @@
 
  As an exception to the above, this software may be distributed under the GNU
  General Public License (GPL) Version 2, so long as the software is distributed
- with, and only used for the testing of, OpenSS7 modules, drivers, and
- libraries.
+ with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.
 
  -----------------------------------------------------------------------------
 
@@ -98,6 +97,8 @@ static char const ident[] =
 #include <string.h>
 #include <signal.h>
 #include <sys/uio.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
@@ -111,6 +112,7 @@ static char const ident[] =
 int verbose = 1;
 int msgsize = 64;
 int report = 1;
+int iterations = -1;
 
 #ifdef NATIVE_PIPES
 int native = 1;
@@ -119,9 +121,19 @@ int readwrite = 1;
 int native = 0;
 int readwrite = 0;
 #endif
+int sethiwat = 0;
+int setlowat = 0;
+size_t hiwat = 0;
+size_t lowat = 0;
+int sndmread = 0;
+int readfill = 0;
+int fullreads = 0;
+int niceread = 0;
+int nicesend = 0;
 int fifo = 0;
 int push = 0;
 int blocking = 0;
+int strhold = 0;
 int asynchronous = 0;
 char my_msg[MAXMSGSIZE] = { 0, };
 char modname[256] = "pipemod";
@@ -129,12 +141,17 @@ char modname[256] = "pipemod";
 int dummy = 0;
 
 volatile int timer_timeout = 0;
+volatile int alarm_signal = 0;
 
 void
 timer_handler(int signum)
 {
 	if (signum == SIGALRM)
 		timer_timeout = 1;
+	if (signum == SIGPIPE || signum == SIGHUP) {
+		alarm_signal = 1;
+		timer_timeout = 1;
+	}
 	return;
 }
 
@@ -150,9 +167,26 @@ timer_sethandler(void)
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
 		return -1;
+	if (sigaction(SIGPOLL, &act, NULL))
+		return -1;
+	if (sigaction(SIGURG, &act, NULL))
+		return -1;
+	if (sigaction(SIGPIPE, &act, NULL))
+		return -1;
+	if (sigaction(SIGHUP, &act, NULL))
+		return -1;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGPOLL);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGHUP);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
+	siginterrupt(SIGALRM, 1);
+	siginterrupt(SIGPOLL, 1);
+	siginterrupt(SIGURG, 1);
+	siginterrupt(SIGPIPE, 1);
+	siginterrupt(SIGHUP, 1);
 	return (0);
 }
 
@@ -163,18 +197,28 @@ start_timer(void)
 
 	if (timer_sethandler())
 		return (-1);
+	timer_timeout = 0;
+	alarm_signal = 0;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
 		return (-1);
-	timer_timeout = 0;
 	return 0;
 }
+
+#ifndef PIPE_BUF
+#define PIPE_BUF 4096
+#endif
 
 int
 test_sync(int fds[])
 {
-	int tbytcnt = 0, tavg_msgs = 0, tavg_tput = 0;
-	int rbytcnt = 0, ravg_msgs = 0, ravg_tput = 0;
+	long long tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin = PIPE_BUF, tbytmax = 0, tbyttot = 0;
+	long long rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin = PIPE_BUF, rbytmax = 0, rbyttot = 0;
+	long long tmsize = msgsize;
+	long long rmsize = msgsize;
+	long long report_count = 0;
 
+	if (fullreads)
+		rmsize = PIPE_BUF;
 	if (verbose > 1)
 		fprintf(stderr, "Starting timer\n");
 	if (start_timer()) {
@@ -185,92 +229,88 @@ test_sync(int fds[])
 	if (verbose > 1)
 		fprintf(stderr, "--> Timer started\n");
 	for (;;) {
+		if (alarm_signal)
+			goto dead;
 		if (timer_timeout) {
 			{
-				int thrput = rbytcnt / report;
-				int msgcnt = thrput / msgsize;
+				long long thrput = tbytcnt / report;
+				long long msgcnt = tmsgcnt / report;
+				long long avgsiz = tbytcnt / tmsgcnt;
 
-				tavg_msgs = (2 * tavg_msgs + msgcnt) / 3;
-				tavg_tput = (2 * tavg_tput + thrput) / 3;
-				fprintf(stdout, "%d Msgs sent: %ld (%ld), throughput: %ld (%ld)\n",
-					fds[1], (long) msgcnt, (long) tavg_msgs, (long) thrput,
-					(long) tavg_tput);
+				tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
+				tavg_tput = (3 * tavg_tput + thrput) / 4;
+				fprintf(stdout,
+					"%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n",
+					fds[1], msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax);
 				fflush(stdout);
 			}
 			{
-				int thrput = rbytcnt / report;
-				int msgcnt = thrput / msgsize;
+				long long thrput = rbytcnt / report;
+				long long msgcnt = rmsgcnt / report;
+				long long avgsiz = rbytcnt / rmsgcnt;
 
-				ravg_msgs = (2 * ravg_msgs + msgcnt) / 3;
-				ravg_tput = (2 * ravg_tput + thrput) / 3;
-				fprintf(stdout, "%d Msgs read: %ld (%ld), throughput: %ld (%ld)\n",
-					fds[0], (long) msgcnt, (long) ravg_msgs, (long) thrput,
-					(long) ravg_tput);
+				ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
+				ravg_tput = (3 * ravg_tput + thrput) / 4;
+				fprintf(stdout,
+					"%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n",
+					fds[0], msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax);
 				fflush(stdout);
 			}
-			tbytcnt -= rbytcnt;
+			tbyttot -= rbyttot;
+			rbyttot = 0;
+			tbytcnt = 0;
+			tmsgcnt = 0;
+			tbytmin = PIPE_BUF;
+			tbytmax = 0;
 			rbytcnt = 0;
+			rmsgcnt = 0;
+			rbytmin = PIPE_BUF;
+			rbytmax = 0;
+			report_count++;
+			if (iterations > 0 && report_count >= iterations) {
+				close(fds[0]);
+				close(fds[1]);
+				return (0);
+			}
 			if (start_timer()) {
 				if (verbose)
 					perror("start_timer()");
 				goto dead;
 			}
 		}
-		if (tbytcnt <= rbytcnt) {
+		if (tbyttot >= rbyttot + rmsize) {
 			int ret = 0;
 
 			if (readwrite) {
-				while (!timer_timeout && (ret = write(fds[1], my_msg, msgsize)) > 0) {
-					tbytcnt += ret;
-					if (tbytcnt < 0)
-						goto dead;
-					if (blocking)
-						break;
-				}
-			} else {
-				struct strbuf dbuf = { 0, msgsize, my_msg };
-
-				while (!timer_timeout && (ret = putmsg(fds[1], NULL, &dbuf, 0)) != -1) {
-					tbytcnt += msgsize;
-					if (tbytcnt < 0)
-						goto dead;
-					if (blocking)
-						break;
-				}
-			}
-			if (ret < 0) {
-				switch (errno) {
-				case EAGAIN:
-				case EINTR:
-					break;
-				default:
-					if (verbose)
-						perror("write()");
-					goto dead;
-				}
-			}
-		}
-		if (rbytcnt < tbytcnt) {
-			int ret = 0;
-
-			if (readwrite) {
-				while (!timer_timeout && (ret = read(fds[0], my_msg, msgsize)) > 0) {
+				while (!timer_timeout && (ret = read(fds[0], my_msg, rmsize)) > 0) {
 					rbytcnt += ret;
+					rbyttot += ret;
 					if (rbytcnt < 0)
 						goto dead;
+					rmsgcnt += 1;
+					if (ret < rbytmin)
+						rbytmin = ret;
+					if (ret > rbytmax)
+						rbytmax = ret;
 					if (blocking)
 						break;
 				}
 			} else {
 				int flags = 0;
 				struct strbuf cbuf = { -1, 0, my_msg };
-				struct strbuf dbuf = { msgsize, 0, my_msg };
+				struct strbuf dbuf = { rmsize, 0, my_msg };
 
 				while (!timer_timeout
 				       && (ret = getmsg(fds[0], &cbuf, &dbuf, &flags)) != -1) {
 					rbytcnt += dbuf.len;
+					rbyttot += dbuf.len;
 					if (rbytcnt < 0)
 						goto dead;
+					rmsgcnt += 1;
+					if (ret < rbytmin)
+						rbytmin = ret;
+					if (ret > rbytmax)
+						rbytmax = ret;
 					if (blocking)
 						break;
 				}
@@ -283,6 +323,53 @@ test_sync(int fds[])
 				default:
 					if (verbose)
 						perror("read()");
+					goto dead;
+				}
+			}
+		}
+		if (tbyttot < rbyttot + rmsize) {
+			int ret = 0;
+
+			if (readwrite) {
+				while (!timer_timeout && (ret = write(fds[1], my_msg, tmsize)) > 0) {
+					tbytcnt += ret;
+					tbyttot += ret;
+					if (tbytcnt < 0)
+						goto dead;
+					tmsgcnt += 1;
+					if (ret < tbytmin)
+						tbytmin = ret;
+					if (ret > tbytmax)
+						tbytmax = ret;
+					if (blocking)
+						break;
+				}
+			} else {
+				struct strbuf dbuf = { 0, tmsize, my_msg };
+
+				while (!timer_timeout
+				       && (ret = putmsg(fds[1], NULL, &dbuf, 0)) != -1) {
+					tbytcnt += tmsize;
+					tbyttot += tmsize;
+					if (tbytcnt < 0)
+						goto dead;
+					tmsgcnt += 1;
+					if (ret < tbytmin)
+						tbytmin = ret;
+					if (ret > tbytmax)
+						tbytmax = ret;
+					if (blocking)
+						break;
+				}
+			}
+			if (ret < 0) {
+				switch (errno) {
+				case EAGAIN:
+				case EINTR:
+					break;
+				default:
+					if (verbose)
+						perror("write()");
 					goto dead;
 				}
 			}
@@ -300,9 +387,19 @@ test_sync(int fds[])
 int
 read_child(int fd)
 {
-	int bytcnt = 0, avg_msgs = 0, avg_tput = 0;
-	struct pollfd pfd = { fd, POLLIN | POLLERR | POLLHUP, 0 };
+	long long rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin = PIPE_BUF, rbytmax = 0;
+	long long reintr = 0, reagain = 0, rerestart = 0;
+	long long rmsize = msgsize;
+	struct pollfd pfd = { fd, (POLLIN | POLLRDNORM), 0 };
+	int rtn, report_count = 0;
 
+	if (niceread)
+		if (setpriority(PRIO_PROCESS, 0, 19) != 0) {
+			perror("setpriority()");
+			goto dead;
+		}
+	if (fullreads)
+		rmsize = PIPE_BUF;
 	if (verbose > 1)
 		fprintf(stderr, "Starting timer\n");
 	if (start_timer()) {
@@ -314,56 +411,90 @@ read_child(int fd)
 		fprintf(stderr, "--> Timer started\n");
 	for (;;) {
 		if (timer_timeout) {
-			int thrput = bytcnt / report;
-			int msgcnt = thrput / msgsize;
+			long long thrput = rbytcnt / report;
+			long long msgcnt = rmsgcnt / report;
+			long long errcnt = reagain / report;
+			long long avgsiz = rbytcnt / rmsgcnt;
 
-			avg_msgs = (2 * avg_msgs + msgcnt) / 3;
-			avg_tput = (2 * avg_tput + thrput) / 3;
-			fprintf(stdout, "%d Msgs read: %ld (%ld), throughput: %ld (%ld)\n", fd,
-				(long) msgcnt, (long) avg_msgs, (long) thrput, (long) avg_tput);
+			ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
+			ravg_tput = (3 * ravg_tput + thrput) / 4;
+			fprintf(stdout,
+				"%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n",
+				fd, msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax, errcnt, reintr, rerestart);
 			fflush(stdout);
-			bytcnt = 0;
+			rbytcnt = 0;
+			rmsgcnt = 0;
+			rbytmin = PIPE_BUF;
+			rbytmax = 0;
+			reintr = 0;
+			reagain = 0;
+			rerestart = 0;
+			report_count++;
+			if (iterations > 0 && report_count >= iterations) {
+				close(fd);
+				return (0);
+			}
 			if (start_timer()) {
 				if (verbose)
 					perror("start_timer()");
 				goto dead;
 			}
 		}
-		if (poll(&pfd, 1, -1) < 0) {
+		if ((rtn = poll(&pfd, 1, -1)) < 0) {
 			switch (errno) {
 			case EINTR:
+				reintr++;
+				continue;
 			case ERESTART:
+				rerestart++;
 				continue;
 			}
 			if (verbose)
 				perror("poll()");
 			goto dead;
 		}
-		if (pfd.revents & POLLIN) {
+		if (rtn == 0) {
+			rerestart++;
+			continue;
+		}
+		if (pfd.revents & (POLLIN|POLLRDNORM)) {
 			int ret = 0;
 
 			if (readwrite) {
-				while (!timer_timeout && (ret = read(fd, my_msg, msgsize)) > 0) {
-					bytcnt += ret;
-					if (bytcnt < 0)
+				while (!timer_timeout && (ret = read(fd, my_msg, rmsize)) > 0) {
+					rbytcnt += ret;
+					if (rbytcnt < 0)
 						goto dead;
+					rmsgcnt += 1;
+					if (ret < rbytmin)
+						rbytmin = ret;
+					if (ret > rbytmax)
+						rbytmax = ret;
 				}
 			} else {
 				int flags = 0;
 				struct strbuf cbuf = { -1, 0, my_msg };
-				struct strbuf dbuf = { msgsize, 0, my_msg };
+				struct strbuf dbuf = { rmsize, 0, my_msg };
 
 				while (!timer_timeout
 				       && (ret = getmsg(fd, &cbuf, &dbuf, &flags)) != -1) {
-					bytcnt += dbuf.len;
-					if (bytcnt < 0)
+					rbytcnt += dbuf.len;
+					if (rbytcnt < 0)
 						goto dead;
+					rmsgcnt += 1;
+					if (ret < rbytmin)
+						rbytmin = ret;
+					if (ret > rbytmax)
+						rbytmax = ret;
 				}
 			}
 			if (ret < 0) {
 				switch (errno) {
 				case EAGAIN:
+					reagain++;
+					break;
 				case EINTR:
+					reintr++;
 					break;
 				default:
 					if (verbose)
@@ -371,11 +502,11 @@ read_child(int fd)
 					goto dead;
 				}
 			}
-			pfd.revents &= ~POLLIN;
+			pfd.revents &= ~(POLLIN|POLLRDNORM);
 		}
 		if (pfd.revents & POLLHUP)
 			goto done;
-		if (pfd.revents & POLLERR)
+		if (pfd.revents & (POLLERR|POLLNVAL|POLLMSG))
 			goto dead;
 	}
       dead:
@@ -392,9 +523,17 @@ read_child(int fd)
 int
 write_child(int fd)
 {
-	int bytcnt = 0, avg_msgs = 0, avg_tput = 0;
-	struct pollfd pfd = { fd, POLLOUT | POLLERR | POLLHUP, 0 };
+	long long tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin = PIPE_BUF, tbytmax = 0;
+	long long teintr = 0, teagain = 0, terestart = 0;
+	long long tmsize = msgsize;
+	struct pollfd pfd = { fd, (POLLOUT | POLLWRNORM), 0 };
+	int rtn, report_count = 0;
 
+	if (nicesend)
+		if (setpriority(PRIO_PROCESS, 0, 19) != 0) {
+			perror("setpriority()");
+			goto dead;
+		}
 	if (verbose > 1)
 		fprintf(stderr, "Starting timer\n");
 	if (start_timer()) {
@@ -406,53 +545,87 @@ write_child(int fd)
 		fprintf(stderr, "--> Timer started\n");
 	for (;;) {
 		if (timer_timeout) {
-			int thrput = bytcnt / report;
-			int msgcnt = thrput / msgsize;
+			long long thrput = tbytcnt / report;
+			long long msgcnt = tmsgcnt / report;
+			long long errcnt = teagain / report;
+			long long avgsiz = tbytcnt / tmsgcnt;
 
-			avg_msgs = (2 * avg_msgs + msgcnt) / 3;
-			avg_tput = (2 * avg_tput + thrput) / 3;
-			fprintf(stdout, "%d Msgs sent: %ld (%ld), throughput: %ld (%ld)\n", fd,
-				(long) msgcnt, (long) avg_msgs, (long) thrput, (long) avg_tput);
+			tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
+			tavg_tput = (3 * tavg_tput + thrput) / 4;
+			fprintf(stdout,
+				"%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n",
+				fd, msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax, errcnt, teintr, terestart);
 			fflush(stdout);
-			bytcnt = 0;
+			tbytcnt = 0;
+			tmsgcnt = 0;
+			tbytmin = PIPE_BUF;
+			tbytmax = 0;
+			teintr = 0;
+			teagain = 0;
+			terestart = 0;
+			report_count++;
+			if (iterations > 0 && report_count >= iterations) {
+				close(fd);
+				return (0);
+			}
 			if (start_timer()) {
 				if (verbose)
 					perror("start_timer()");
 				goto dead;
 			}
 		}
-		if (poll(&pfd, 1, -1) < 0) {
+		if ((rtn = poll(&pfd, 1, -1)) < 0) {
 			switch (errno) {
 			case EINTR:
+				teintr++;
+				continue;
 			case ERESTART:
+				terestart++;
 				continue;
 			}
 			if (verbose)
 				perror("poll()");
 			goto dead;
 		}
-		if (pfd.revents & POLLOUT) {
+		if (rtn == 0) {
+			terestart++;
+			continue;
+		}
+		if (pfd.revents & (POLLOUT|POLLWRNORM)) {
 			int ret = 0;
 
 			if (readwrite) {
-				while (!timer_timeout && (ret = write(fd, my_msg, msgsize)) > 0) {
-					bytcnt += ret;
-					if (bytcnt < 0)
+				while (!timer_timeout && (ret = write(fd, my_msg, tmsize)) > 0) {
+					tbytcnt += ret;
+					if (tbytcnt < 0)
 						goto dead;
+					tmsgcnt += 1;
+					if (ret < tbytmin)
+						tbytmin = ret;
+					if (ret > tbytmax)
+						tbytmax = ret;
 				}
 			} else {
-				struct strbuf dbuf = { 0, msgsize, my_msg };
+				struct strbuf dbuf = { 0, tmsize, my_msg };
 
 				while (!timer_timeout && (ret = putmsg(fd, NULL, &dbuf, 0)) != -1) {
-					bytcnt += msgsize;
-					if (bytcnt < 0)
+					tbytcnt += tmsize;
+					if (tbytcnt < 0)
 						goto dead;
+					tmsgcnt += 1;
+					if (ret < tbytmin)
+						tbytmin = ret;
+					if (ret > tbytmax)
+						tbytmax = ret;
 				}
 			}
 			if (ret < 0) {
 				switch (errno) {
 				case EAGAIN:
+					teagain++;
+					break;
 				case EINTR:
+					teintr++;
 					break;
 				default:
 					if (verbose)
@@ -460,11 +633,11 @@ write_child(int fd)
 					goto dead;
 				}
 			}
-			pfd.revents &= ~POLLOUT;
+			pfd.revents &= ~(POLLOUT|POLLWRNORM);
 		}
 		if (pfd.revents & POLLHUP)
 			goto done;
-		if (pfd.revents & POLLERR)
+		if (pfd.revents & (POLLERR|POLLNVAL|POLLMSG))
 			goto dead;
 	}
       dead:
@@ -478,12 +651,13 @@ write_child(int fd)
 int
 test_async(int fds[])
 {
-	int children[2] = { 0, 0 };
+	int child[2] = { 0, 0 };
+	int children = 2;
 
 	if (verbose > 1) {
 		fprintf(stderr, "Starting read child on fd %d\n", fds[0]);
 	}
-	switch ((children[0] = fork())) {
+	switch ((child[0] = fork())) {
 	case 0:		/* child */
 		exit(read_child(fds[0]));
 	case -1:
@@ -495,7 +669,7 @@ test_async(int fds[])
 		fprintf(stderr, "--> Read child started.\n");
 		fprintf(stderr, "Starting write child on fd %d\n", fds[1]);
 	}
-	switch ((children[1] = fork())) {
+	switch ((child[1] = fork())) {
 	case 0:		/* child */
 		exit(write_child(fds[1]));
 	case -1:
@@ -507,44 +681,45 @@ test_async(int fds[])
 		fprintf(stderr, "--> Write child started.\n");
 	close(fds[0]);
 	close(fds[1]);
-	for (;;) {
-		int child;
-		int status;
+	for (; children; children--) {
+		int this_child;
+		int this_status;
 
-		if ((child = wait(&status)) > 0) {
-			if (WIFEXITED(status)) {
-				if (children[0] == child)
-					children[0] = 0;
-				if (children[1] == child)
-					children[1] = 0;
-				if (WEXITSTATUS(status) != 0)
+		if ((this_child = wait(&this_status)) > 0) {
+			if (WIFEXITED(this_status)) {
+				if (child[0] == this_child)
+					child[0] = 0;
+				if (child[1] == this_child)
+					child[1] = 0;
+				if (WEXITSTATUS(this_status) != 0)
 					goto dead;
-			} else if (WIFSIGNALED(status)) {
-				if (children[0] == child)
-					children[0] = 0;
-				if (children[1] == child)
-					children[1] = 0;
-				switch (WTERMSIG(status)) {
+			} else if (WIFSIGNALED(this_status)) {
+				if (child[0] == this_child)
+					child[0] = 0;
+				if (child[1] == this_child)
+					child[1] = 0;
+				switch (WTERMSIG(this_status)) {
 				default:
 					goto dead;
 				}
-			} else if (WIFSTOPPED(status)) {
-				if (children[0] == child)
-					children[0] = 0;
-				if (children[1] == child)
-					children[1] = 0;
-				switch (WSTOPSIG(status)) {
+			} else if (WIFSTOPPED(this_status)) {
+				if (child[0] == this_child)
+					child[0] = 0;
+				if (child[1] == this_child)
+					child[1] = 0;
+				switch (WSTOPSIG(this_status)) {
 				default:
 					goto dead;
 				}
-			}
+			} else
+				goto dead;
 		}
 	}
       dead:
-	if (children[0] > 0)
-		kill(children[0], SIGTERM);
-	if (children[1] > 0)
-		kill(children[1], SIGTERM);
+	if (child[0] > 0)
+		kill(child[0], SIGKILL);
+	if (child[1] > 0)
+		kill(child[1], SIGKILL);
 	close(fds[0]);
 	close(fds[1]);
 	return (0);
@@ -579,12 +754,12 @@ do_tests(void)
 			fprintf(stderr, "Opening fifo\n");
 			fflush(stderr);
 		}
-		if ((fds[0] = open(fifoname, O_RDONLY | O_NONBLOCK)) < 0) {
+		if ((fds[0] = open(fifoname, O_RDONLY | (blocking ? 0 : O_NONBLOCK))) < 0) {
 			if (verbose)
 				perror("open()");
 			goto dead;
 		}
-		if ((fds[1] = open(fifoname, O_WRONLY | O_NONBLOCK)) < 0) {
+		if ((fds[1] = open(fifoname, O_WRONLY | (blocking ? 0 : O_NONBLOCK))) < 0) {
 			if (verbose)
 				perror("open()");
 			goto dead;
@@ -603,8 +778,59 @@ do_tests(void)
 				perror("ioctl(I_SRDOPT)");
 			goto dead;
 		}
+		if (ioctl(fds[0], I_SWROPT, (SNDPIPE | SNDHOLD)) < 0) {
+			if (verbose)
+				perror("ioctl(I_SWROPT)");
+			goto dead;
+		}
 	}
 #endif
+	if (!native) {
+#ifdef I_SET_HIWAT
+		if (sethiwat) {
+			if (verbose > 1) {
+				fprintf(stderr, "Setting hiwat on fd %d\n", fds[0]);
+			}
+			if (ioctl(fds[0], I_SET_HIWAT, hiwat) < 0) {
+				if (verbose)
+					perror("ioctl(I_SET_HIWAT)");
+			}
+		}
+#endif
+#ifdef I_SET_LOWAT
+		if (setlowat) {
+			if (verbose > 1) {
+				fprintf(stderr, "Setting lowat on fd %d\n", fds[0]);
+			}
+			if (ioctl(fds[0], I_SET_LOWAT, lowat) < 0) {
+				if (verbose)
+					perror("ioctl(I_SET_LOWAT)");
+				goto dead;
+			}
+		}
+#endif
+#ifdef I_SET_HIWAT
+		if (sethiwat) {
+			if (verbose > 1) {
+				fprintf(stderr, "Setting hiwat on fd %d\n", fds[0]);
+			}
+			if (ioctl(fds[0], I_SET_HIWAT, hiwat) < 0) {
+				if (verbose)
+					perror("ioctl(I_SET_HIWAT)");
+				goto dead;
+			}
+		}
+#endif
+#ifdef RFILL
+		if (readfill) {
+			if (ioctl(fds[0], I_SRDOPT, (RFILL | RPROTNORM)) < 0) {
+				if (verbose)
+					perror("ioctl(I_SRDOPT)");
+				goto dead;
+			}
+		}
+#endif
+	}
 	if (fcntl(fds[0], F_SETFL, blocking ? 0 : O_NONBLOCK) < 0) {
 		if (verbose)
 			perror("fcntl");
@@ -625,6 +851,73 @@ do_tests(void)
 		}
 	}
 #endif
+	if (!native) {
+#ifdef I_SET_HIWAT
+		if (sethiwat) {
+			if (verbose > 1) {
+				fprintf(stderr, "Setting hiwat on fd %d\n", fds[0]);
+			}
+			if (ioctl(fds[1], I_SET_HIWAT, hiwat) < 0) {
+				if (verbose)
+					perror("ioctl(I_SET_HIWAT)");
+			}
+		}
+#endif
+#ifdef I_SET_LOWAT
+		if (setlowat) {
+			if (verbose > 1) {
+				fprintf(stderr, "Setting lowat on fd %d\n", fds[0]);
+			}
+			if (ioctl(fds[1], I_SET_LOWAT, lowat) < 0) {
+				if (verbose)
+					perror("ioctl(I_SET_LOWAT)");
+				goto dead;
+			}
+		}
+#endif
+#ifdef I_SET_HIWAT
+		if (sethiwat) {
+			if (verbose > 1) {
+				fprintf(stderr, "Setting hiwat on fd %d\n", fds[0]);
+			}
+			if (ioctl(fds[1], I_SET_HIWAT, hiwat) < 0) {
+				if (verbose)
+					perror("ioctl(I_SET_HIWAT)");
+				goto dead;
+			}
+		}
+#endif
+#ifdef SNDHOLD
+		if (strhold) {
+			int wropts = SNDPIPE | SNDHOLD;
+
+#ifdef SNDMREAD
+			if (sndmread)
+				wropts |= SNDMREAD;
+#endif
+			if (ioctl(fds[1], I_SWROPT, wropts) < 0) {
+				if (verbose)
+					perror("ioctl(I_SWROPT)");
+				goto dead;
+			}
+		}
+#endif
+#ifdef SNDMREAD
+		if (sndmread) {
+			int wropts = SNDPIPE | SNDMREAD;
+
+#ifdef SNDHOLD
+			if (strhold)
+				wropts |= SNDHOLD;
+#endif
+			if (ioctl(fds[1], I_SWROPT, wropts) < 0) {
+				if (verbose)
+					perror("ioctl(I_SWROPT)");
+				goto dead;
+			}
+		}
+#endif
+	}
 	if (fcntl(fds[1], F_SETFL, blocking ? 0 : O_NONBLOCK) < 0) {
 		if (verbose)
 			perror("fcntl");
@@ -641,7 +934,7 @@ do_tests(void)
 				fds[0]);
 		}
 		for (i = 0; i < push; i++) {
-			if (ioctl(fds[0], I_PUSH, modname) < 0) {
+			if (ioctl(fds[1], I_PUSH, modname) < 0) {
 				if (verbose)
 					perror("ioctl(I_PUSH)");
 				goto dead;
@@ -681,7 +974,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -737,7 +1030,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 2,\n\
     incorporated here by reference.\n\
@@ -775,6 +1068,22 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 Options:\n\
+    --hiwat=HIWAT\n\
+        Set high water mark on stream head.\n\
+    --lowat=LOWAT\n\
+        Set low water mark on stream head.\n\
+    -M, --mread\n\
+        Issue M_READ messages.\n\
+    -w, --readfill\n\
+        Read fill mode.\n\
+    -R, --niceread\n\
+        Run read child nice 19.\n\
+    -S, --nicesend\n\
+        Run write child nice 19.\n\
+    -F, --full\n\
+        Perform full size reads.\n\
+    -H, --hold\n\
+        Use SNDHOLD message coallescing\n\
     -a, --async\n\
         Perform asynchronous testing\n\
     -f, --fifo\n\
@@ -791,6 +1100,8 @@ Options:\n\
         Use read/write instead of putmsg/getmsg\n\
     -t, --time=[REPORT]\n\
         Report time in seconds [default: %3$d]\n\
+    -i, --iterations=ITERATIONS\n\
+        Stop after INTERATIONS number of reports [default: none]\n\
     -q, --quiet\n\
         Suppress normal output (equivalent to --verbose=0)\n\
     -v, --verbose=[LEVEL]\n\
@@ -815,7 +1126,15 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"hiwat",	required_argument,	NULL, '\1'},
+			{"lowat",	required_argument,	NULL, '\2'},
+			{"mread",	no_argument,		NULL, 'M'},
+			{"readfill",	no_argument,		NULL, 'w'},
+			{"niceread",	no_argument,		NULL, 'R'},
+			{"nicesend",	no_argument,		NULL, 'S'},
+			{"full",	no_argument,		NULL, 'F'},
 			{"module",	required_argument,	NULL, 'm'},
+			{"hold",	no_argument,		NULL, 'H'},
 			{"async",	no_argument,		NULL, 'a'},
 			{"fifo",	no_argument,		NULL, 'f'},
 			{"push",	required_argument,	NULL, 'p'},
@@ -823,6 +1142,7 @@ main(int argc, char *argv[])
 			{"size",	required_argument,	NULL, 's'},
 			{"readwrite",	no_argument,		NULL, 'r'},
 			{"time",	required_argument,	NULL, 't'},
+			{"iterations",	required_argument,	NULL, 'i'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
@@ -833,13 +1153,41 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "m:afp:bs:rt:qvhV?W:", long_options, &option_index);
+		c = getopt_long(argc, argv, "MwRSFm:Hafp:bs:rt:i:qvhV?W:", long_options,
+				&option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "m:afp:bs:rt:qvhV?");
+		c = getopt(argc, argv, "MwRSFm:Hafp:bs:rt:i:qvhV?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
 		switch (c) {
+		case '\1':	/* --hiwat=HIWAT */
+			sethiwat = 1;
+			hiwat = strtoul(optarg, NULL, 0);
+			if (setlowat && hiwat < lowat)
+				goto bad_option;
+			break;
+		case '\2':	/* --lowat=LOWAT */
+			setlowat = 1;
+			lowat = strtoul(optarg, NULL, 0);
+			if (sethiwat && lowat > hiwat)
+				goto bad_option;
+			break;
+		case 'M':
+			sndmread = 1;
+			break;
+		case 'w':
+			readfill = 1;
+			break;
+		case 'R':
+			niceread = 1;
+			break;
+		case 'S':
+			nicesend = 1;
+			break;
+		case 'F':
+			fullreads = 1;
+			break;
 		case 'm':
 			if (verbose > 1)
 				fprintf(stderr, "Processing -m, --module=%s option\n", optarg);
@@ -848,6 +1196,9 @@ main(int argc, char *argv[])
 			if (strnlen(optarg, FMNAMESZ + 1) > FMNAMESZ)
 				goto bad_option;
 			strncpy(modname, optarg, FMNAMESZ + 1);
+			break;
+		case 'H':
+			strhold = 1;
 			break;
 		case 'a':
 			asynchronous = 1;
@@ -881,6 +1232,11 @@ main(int argc, char *argv[])
 			if (1 > report)
 				goto bad_option;
 			break;
+		case 'i':
+			iterations = strtol(optarg, NULL, 0);
+			if (1 > iterations)
+				goto bad_option;
+			break;
 		case 'q':
 			verbose = 0;
 			break;
@@ -893,7 +1249,6 @@ main(int argc, char *argv[])
 				goto bad_option;
 			verbose = val;
 			break;
-		case 'H':	/* -H */
 		case 'h':	/* -h, --help */
 			help(argc, argv);
 			exit(0);
