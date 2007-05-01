@@ -5,7 +5,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -212,6 +212,63 @@ The following options are only applicable if a benchmark run is in effect.
 That is, these options are only effective if the benchmark run is executed and are used to modify
 the manner in which benchmark is executed or results reported.
 .TP
+\fB--hiwat\fP[=]\fIHIWAT\fP
+By default the read high water mark on the Stream head is
+.RI { STRHIGH }
+which is typically 5120 bytes.  This option sets the Stream head read-side
+high water mark to
+.IR HIWAT .
+.IP ""
+This option is only applicable to STREAMS-based pipes and FIFOs and is only
+supported by
+.BR "Linux Fast-STREAMS" .
+.TP
+\fB--lowat\fP[=]\fILOWAT\fP
+By default the read low water mark on the Stream head is
+.RI { STRLOW }
+which is typically 1024 bytes.  This option sets the Stream head read-side
+low water mark to
+.IR LOWAT .
+.IP ""
+This option is only applicable to STREAMS-based pipes and FIFOs and is only
+supported by
+.BR "Linux Fast-STREAMS" .
+.TP
+\fB-M\fP, \fB--mread\fP
+Normally read notification on the Stream head is disabled.  This option
+enables read notifications on the Stream head.
+This option is only applicable to STREAMS-based pipes and FIFOs and is only
+supported by
+.BR "Linux Fast-STREAMS" .
+.TP
+\fB-w\fP, \fB--readfill\fP
+Normally pipes and FIFOs have read mode set to normal (byte-mode).  This
+option sets the Stream head to read-fill mode (the reader always blocks
+awaiting a full buffer regardless of the blocking setting of the file
+descriptor).
+.IP ""
+This option is only applicable to STREAMS-based pipes and FIFOs and is only
+supported by
+.BR "Linux Fast-STREAMS" .
+.TP
+\fB-R\fP, \fB--niceread\fP
+When performing asynchronous testing, the read child will be set nice 19.
+.TP
+\fB-S\fP, \fB--nicesend\fP
+When performing asynchronous testing, the write child will be set nice 19.
+.TP
+\fB-F\fP, \fB--full\fP
+Normally the same number of bytes written per write operation will also be
+specified to the read operation.  This option causes the read operation to
+request a full
+.IR { PIPE_BUF }
+read.
+.TP
+\fB-H\fP, \fB--hold\fP
+This option is only applicable to STREAMS-based pipes and FIFOs and is only
+supported by
+.BR "Linux Fast-STREAMS" .
+.TP
 \fB-a\fP, \fB--async\fP
 By default, the benchmark testing will use a single process to write to the write-side of the
 .I pipe
@@ -230,6 +287,9 @@ using asyncrhonous processes in this fashion, it is sometimes more a test of the
 scheduler than the underlying
 .I pipe
 implementation.
+.TP
+\fB-f\fP, \fB--fifo\fP
+Use a STREAMS-based FIFO for testing instead of a STREAMS-based pipe.
 .TP
 \fB-m\fP, \fB--module\fP[=]\fIMODNAME\fP
 Specifies the name of a module to push on the write-side of the pipe.  The default is
@@ -313,6 +373,12 @@ system calls.)
 Specifies the reporting interval.  The default is
 .B 1
 second.
+.TP
+\fB-i\fP, \fB--iterations\fP[=]\fIITERATIONS\fP
+Normally the program will continue to operate, reporting each interval, until
+terminated by the controlling terminal.  This option causes the program to
+terminate after
+.IR ITERATIONS .
 .\"
 .\"
 .SH DIAGNOSTICS
