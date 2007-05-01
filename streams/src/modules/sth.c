@@ -10530,32 +10530,21 @@ strwput(queue_t *q, mblk_t *mp)
 
 	switch (__builtin_expect((type = mp->b_datap->db_type), M_DATA)) {
 	case M_DATA:
-	case M_PROTO:
-		if (test_bit(STRHOLD_BIT, &sd->sd_flag)) {
-			if (likely((b = getq(q)) != NULL)) {
-				/* delayed one has to go - can't delay the other */
-				if (likely(b->b_wptr > b->b_rptr))
-					putnext(q, b);
-				else
-					freeb(b);
-				putnext(q, mp);
-				return (0);
-			}
-			if ((type == M_DATA)
-			    && (mp->b_wptr - mp->b_rptr <= mp->b_datap->db_lim - mp->b_wptr)
-			    && !(mp->b_flag & MSGDELIM)
-#if 0
-			    && (mp->b_cont == NULL)	/* stream head only writes single data
-							   blocks */
-			    &&(mp->b_band == 0)	/* putpmsg delimits its data */
-#endif
-			    && (mp->b_wptr > mp->b_rptr)
-			    ) {
-				/* M_DATA, will hold another write of the same size, not delimited, 
-				   feature activated, single message block, band zero,
-				   non-zero-length message. */
-				/* held - add stream head to scan list */
-				// if (test_bit(STRHOLD_BIT, &sd->sd_flag))
+		if (likely((b = getq(q)) != NULL)) {
+			/* delayed one has to go - can't delay the other */
+			if (likely(b->b_wptr > b->b_rptr))
+				putnext(q, b);
+			else
+				freeb(b);
+		} else if (!(mp->b_flag & MSGDELIM)
+			   && (mp->b_wptr > mp->b_rptr)
+			   && (mp->b_wptr - mp->b_rptr <= mp->b_datap->db_lim - mp->b_wptr)
+		    ) {
+			/* M_DATA, will hold another write of the same size, not delimited,
+			   feature activated, single message block, band zero, non-zero-length
+			   message. */
+			/* held - add stream head to scan list */
+			if (test_bit(STRHOLD_BIT, &sd->sd_flag))
 				/* Actually, this qscan() is a little redundant now. Because we
 				   only putq() here when getq() above fails, if we enableok() the
 				   write service procedure, this would schedule the service
@@ -10566,22 +10555,19 @@ strwput(queue_t *q, mblk_t *mp)
 				   schedule the service procedure, and the service procedure will
 				   wait for the timer to expire. */
 				qscan(q);
-				putq(q, mp);
-				return (0);
-			}
+			putq(q, mp);
+			return (0);
+		}
+	case M_PROTO:
+		if (likely((b = getq(q)) != NULL)) {
+			/* delayed one has to go - can't delay the other */
+			if (likely(b->b_wptr > b->b_rptr))
+				putnext(q, b);
+			else
+				freeb(b);
 		}
 		/* not held - has to go */
 		break;
-#if 0				/* M_FLUSH never comes here... */
-	case M_FLUSH:
-		if (mp->b_rptr[0] & FLUSHW) {
-			if (mp->b_rptr[0] & FLUSHBAND)
-				flushband(q, mp->b_rptr[1], FLUSHALL);
-			else
-				flushq(q, FLUSHALL);
-		}
-		break;
-#endif
 	default:
 		break;
 	}
