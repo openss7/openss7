@@ -756,7 +756,7 @@ STATIC struct module_info ss_rinfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
-	.mi_hiwat = SHEADHIWAT << 4,	/* Hi water mark */
+	.mi_hiwat = SHEADHIWAT << 5,	/* Hi water mark */
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
@@ -783,8 +783,8 @@ STATIC struct module_info ss_winfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
-	.mi_hiwat = STRHIGH,		/* Hi water mark */
-	.mi_lowat = STRLOW,		/* Lo water mark */
+	.mi_hiwat = (SHEADHIWAT >> 1),		/* Hi water mark */
+	.mi_lowat = 0,		/* Lo water mark */
 };
 
 STATIC streamscall int ss_wput(queue_t *, mblk_t *);
@@ -15740,6 +15740,7 @@ ss_r_wakeup(queue_t *q)
 		ss_sock_recvmsg(q);
 }
 
+#define PRELOAD (FASTBUF<<2)
 /*
  *  =========================================================================
  *
@@ -15756,6 +15757,7 @@ ss_putq(queue_t *q, mblk_t *mp, streams_fastcall int (*proc) (queue_t *, mblk_t 
 	int rtn = 0, locked;
 
 	if (mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY))) {
+		mp->b_wptr += PRELOAD; /* preload */
 		if (!putq(q, mp))
 			freemsg(mp);	/* FIXME */
 		return (0);
@@ -15773,9 +15775,11 @@ ss_putq(queue_t *q, mblk_t *mp, streams_fastcall int (*proc) (queue_t *, mblk_t 
 			case QR_ABSORBED:
 				break;
 			case QR_STRIP:
-				if (mp->b_cont)
+				if (mp->b_cont) {
+					mp->b_wptr += PRELOAD; /* preload */
 					if (!putq(q, mp->b_cont))
 						freemsg(mp->b_cont);	/* FIXME */
+				}
 			case QR_TRIMMED:
 				freeb(mp);
 				break;
@@ -15794,6 +15798,7 @@ ss_putq(queue_t *q, mblk_t *mp, streams_fastcall int (*proc) (queue_t *, mblk_t 
 				freemsg(mp);
 				break;
 			case QR_DISABLE:
+				mp->b_wptr += PRELOAD; /* preload */
 				if (!putq(q, mp))
 					freemsg(mp);	/* FIXME */
 				rtn = 0;
@@ -15807,6 +15812,7 @@ ss_putq(queue_t *q, mblk_t *mp, streams_fastcall int (*proc) (queue_t *, mblk_t 
 			case -EBUSY:
 			case -EAGAIN:
 			case -ENOMEM:
+				mp->b_wptr += PRELOAD; /* preload */
 				if (!putq(q, mp))
 					freemsg(mp);	/* FIXME */
 				break;
@@ -15816,6 +15822,7 @@ ss_putq(queue_t *q, mblk_t *mp, streams_fastcall int (*proc) (queue_t *, mblk_t 
 		if (locked)
 			ss_unlockq(q);
 	} else {
+		mp->b_wptr += PRELOAD; /* preload */
 		if (!putq(q, mp))
 			freemsg(mp);	/* FIXME */
 	}
@@ -15836,6 +15843,7 @@ ss_srvq(queue_t *q, streams_fastcall int (*proc) (queue_t *, mblk_t *),
 		mblk_t *mp;
 
 		while ((mp = getq(q))) {
+			mp->b_wptr -= PRELOAD; /* preload */
 			/* Fast Path */
 			if ((rtn = proc(q, mp)) == QR_DONE) {
 				freemsg(mp);
@@ -15847,9 +15855,11 @@ ss_srvq(queue_t *q, streams_fastcall int (*proc) (queue_t *, mblk_t *),
 			case QR_ABSORBED:
 				continue;
 			case QR_STRIP:
-				if (mp->b_cont)
+				if (mp->b_cont) {
+					mp->b_wptr += PRELOAD; /* preload */
 					if (!putbq(q, mp->b_cont))
 						freemsg(mp->b_cont);
+				}
 			case QR_TRIMMED:
 				freeb(mp);
 				continue;
@@ -15871,6 +15881,7 @@ ss_srvq(queue_t *q, streams_fastcall int (*proc) (queue_t *, mblk_t *),
 			case QR_DISABLE:
 				ptrace(("%s: ERROR: (q disabling)\n", DRV_NAME));
 				noenable(q);
+				mp->b_wptr += PRELOAD; /* preload */
 				if (!putbq(q, mp))
 					freemsg(mp);	/* FIXME */
 				rtn = 0;
@@ -15886,6 +15897,7 @@ ss_srvq(queue_t *q, streams_fastcall int (*proc) (queue_t *, mblk_t *),
 			case -ENOMEM:	/* caller must re-enable queue */
 				if (mp->b_datap->db_type < QPCTL) {
 					ptrace(("%s: ERROR: (q stalled) %d\n", DRV_NAME, rtn));
+					mp->b_wptr += PRELOAD; /* preload */
 					if (!putbq(q, mp))
 						freemsg(mp);	/* FIXME */
 					break;
@@ -15907,6 +15919,7 @@ ss_srvq(queue_t *q, streams_fastcall int (*proc) (queue_t *, mblk_t *),
 					continue;
 				}
 				mp->b_band = 255;
+				mp->b_wptr += PRELOAD; /* preload */
 				if (!putq(q, mp))
 					freemsg(mp);	/* FIXME */
 				break;
@@ -15926,6 +15939,7 @@ ss_rput(queue_t *q, mblk_t *mp)
 #if 0
 	return ss_putq(q, mp, &ss_r_prim);
 #else
+	mp->b_wptr += PRELOAD; /* preload */
 	if (unlikely(!putq(q, mp))) {
 		mp->b_band = 0;
 		putq(q, mp);
@@ -15946,6 +15960,7 @@ ss_wput(queue_t *q, mblk_t *mp)
 #if 0
 	return ss_putq(q, mp, &ss_w_prim);
 #else
+	mp->b_wptr += PRELOAD; /* preload */
 	if (unlikely(!putq(q, mp))) {
 		mp->b_band = 0;
 		putq(q, mp);
@@ -16269,10 +16284,17 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	so->so_minpsz = ss_winfo.mi_minpsz;
 	so->so_flags |= SO_MAXPSZ;
 	so->so_maxpsz = ss_winfo.mi_maxpsz;
+#if 0
 	so->so_flags |= SO_HIWAT;
-	so->so_hiwat = (SHEADHIWAT << 2) + (STRHIGH << 1);
+	so->so_hiwat = (SHEADHIWAT << 3) + (STRHIGH << 1);
 	so->so_flags |= SO_LOWAT;
 	so->so_lowat = 0;
+#else
+	so->so_flags |= SO_HIWAT;
+	so->so_hiwat = (SHEADHIWAT >> 1);
+	so->so_flags |= SO_LOWAT;
+	so->so_lowat = 0;
+#endif
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
 	qprocson(q);
