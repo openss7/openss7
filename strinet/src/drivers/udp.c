@@ -404,7 +404,7 @@ STATIC struct module_info udp_rinfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
-	.mi_hiwat = SHEADHIWAT << 4,	/* Hi water mark */
+	.mi_hiwat = SHEADHIWAT << 5,	/* Hi water mark */
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
@@ -433,8 +433,8 @@ STATIC struct module_info udp_winfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
-	.mi_hiwat = STRHIGH,		/* Hi water mark */
-	.mi_lowat = STRLOW,		/* Lo water mark */
+	.mi_hiwat = SHEADHIWAT,		/* Hi water mark */
+	.mi_lowat = 0,		/* Lo water mark */
 };
 
 streamscall int tp_wput(queue_t *, mblk_t *);
@@ -8329,6 +8329,8 @@ tp_w_prim(queue_t *q, mblk_t *mp)
 	return tp_w_prim_slow(q, mp);
 }
 
+#define PRELOAD (FASTBUF<<2)
+
 noinline fastcall void
 tp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 {
@@ -8338,9 +8340,11 @@ tp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 	case QR_ABSORBED:
 		break;
 	case QR_STRIP:
-		if (mp->b_cont)
+		if (mp->b_cont) {
+			mp->b_wptr += PRELOAD;
 			if (unlikely(putq(q, mp->b_cont) == 0))
 				freemsg(mp->b_cont);
+		}
 	case QR_TRIMMED:
 		freeb(mp);
 		break;
@@ -8361,6 +8365,7 @@ tp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 		freemsg(mp);
 		break;
 	case QR_DISABLE:
+		mp->b_wptr += PRELOAD;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 		break;
@@ -8374,6 +8379,7 @@ tp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 	case -ENOMEM:
 	case -EAGAIN:
 	case QR_RETRY:
+		mp->b_wptr += PRELOAD;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 		break;
@@ -8390,9 +8396,11 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 	case QR_ABSORBED:
 		return (1);
 	case QR_STRIP:
-		if (mp->b_cont)
+		if (mp->b_cont) {
+			mp->b_wptr += PRELOAD;
 			if (!putbq(q, mp->b_cont))
 				freemsg(mp->b_cont);
+		}
 	case QR_TRIMMED:
 		freeb(mp);
 		return (1);
@@ -8416,6 +8424,7 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 		printd(("%s: %p: ERROR: (q disabling) %d\n", q->q_qinfo->qi_minfo->mi_idname,
 			q->q_ptr, rtn));
 		noenable(q);
+		mp->b_wptr += PRELOAD;
 		if (!putbq(q, mp))
 			freemsg(mp);
 		rtn = 0;
@@ -8432,6 +8441,7 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 		if (mp->b_datap->db_type < QPCTL) {
 			printd(("%s: %p: ERROR: (q stalled) %d\n", q->q_qinfo->qi_minfo->mi_idname,
 				q->q_ptr, rtn));
+			mp->b_wptr += PRELOAD;
 			if (!putbq(q, mp))
 				freemsg(mp);
 			return (0);
@@ -8456,10 +8466,12 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 			return (1);
 		}
 		mp->b_band = 255;
+		mp->b_wptr += PRELOAD;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 		return (0);
 	case QR_RETRY:
+		mp->b_wptr += PRELOAD;
 		if (!putbq(q, mp))
 			freemsg(mp);
 		return (1);
@@ -8469,9 +8481,10 @@ tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
-#if 0
+#if 1
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
 		udp_rstat.ms_acnt++;
+		mp->b_wptr += PRELOAD;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	} else {
@@ -8488,6 +8501,7 @@ tp_rput(queue_t *q, mblk_t *mp)
 	/* Here's the theory why this works: if we stuff it all there, the stream head can
 	   backenable and backfill as required, allowing another processor to service the
 	   queue. */
+	mp->b_wptr += PRELOAD;
 	putq(q, mp);
 #endif
 	return (0);
@@ -8501,6 +8515,8 @@ tp_rsrv(queue_t *q)
 	while (likely((mp = getq(q)) != NULL)) {
 		int rtn;
 
+		/* remove backpressure */
+		mp->b_wptr -= PRELOAD;
 		rtn = tp_r_prim(q, mp);
 		/* Fast Path */
 		if (likely(rtn == QR_ABSORBED)) {
@@ -8517,6 +8533,7 @@ tp_wput(queue_t *q, mblk_t *mp)
 #if 0
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
 		udp_wstat.ms_acnt++;
+		mp->b_wptr += PRELOAD;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	} else {
@@ -8533,6 +8550,8 @@ tp_wput(queue_t *q, mblk_t *mp)
 #else
 	/* Here's the theory why this works: if we stuff it all there, the service procedure can
 	   backenable the stream head as required. */
+	/* add backpressure */
+	mp->b_wptr += PRELOAD;
 	putq(q, mp);
 #endif
 	return (0);
@@ -8546,6 +8565,7 @@ tp_wsrv(queue_t *q)
 	while (likely((mp = getq(q)) != NULL)) {
 		register int rtn;
 
+		mp->b_wptr -= PRELOAD;
 		rtn = tp_w_prim(q, mp);
 		/* Fast Path */
 		if (likely(rtn == QR_TRIMMED)) {
@@ -9382,9 +9402,14 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	so->so_minpsz = udp_winfo.mi_minpsz;
 	so->so_flags |= SO_MAXPSZ;
 	so->so_maxpsz = udp_winfo.mi_maxpsz;
-#if 1
+#if 0
 	so->so_flags |= SO_HIWAT;
-	so->so_hiwat = (SHEADHIWAT << 2) + (STRHIGH << 1);
+	so->so_hiwat = (SHEADHIWAT << 3) + (STRHIGH << 1);
+	so->so_flags |= SO_LOWAT;
+	so->so_lowat = 0;
+#else
+	so->so_flags |= SO_HIWAT;
+	so->so_hiwat = SHEADHIWAT;
 	so->so_flags |= SO_LOWAT;
 	so->so_lowat = 0;
 #endif

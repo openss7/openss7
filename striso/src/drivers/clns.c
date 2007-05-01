@@ -406,9 +406,9 @@ typedef struct dl {
 #define PRIV(__q) (((__q)->q_ptr))
 #define DL_PRIV(__q) ((struct dl *)((__q)->q_ptr))
 
+#if 0
 STATIC kmem_cachep_t dl_priv_cachep;
 
-#if 0
 static INLINE struct dl *
 dl_get(struct dl *dl)
 {
