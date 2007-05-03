@@ -118,7 +118,7 @@ MODULE_SUPPORTED_DEVICE(TI_DEVICE);
 MODULE_LICENSE(TI_LICENSE);
 #endif				/* MODULE_LICENSE */
 #ifdef MODULE_ALIAS
-MODULE_ALIAS("streams-ti");
+MODULE_ALIAS("streams-tl");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
 
@@ -134,19 +134,19 @@ MODULE_ALIAS("streams-ti");
 #ifdef MODULE_ALIAS
 #ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_UDP_MODID));
-MODULE_ALIAS("streams-driver-ti");
+MODULE_ALIAS("streams-driver-tl");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_UDP_MAJOR));
-MODULE_ALIAS("/dev/streams/ti");
-MODULE_ALIAS("/dev/streams/ti/ticlts");
-MODULE_ALIAS("/dev/streams/ti/ticots");
-MODULE_ALIAS("/dev/streams/ti/ticotsord");
-MODULE_ALIAS("/dev/streams/ti/*");
-MODULE_ALIAS("/dev/streams/clone/ti");
+MODULE_ALIAS("/dev/streams/tl");
+MODULE_ALIAS("/dev/streams/tl/ticlts");
+MODULE_ALIAS("/dev/streams/tl/ticots");
+MODULE_ALIAS("/dev/streams/tl/ticotsord");
+MODULE_ALIAS("/dev/streams/tl/*");
+MODULE_ALIAS("/dev/streams/clone/tl");
 #endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(UDP_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(UDP_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(UDP_CMAJOR_0) "-0");
-MODULE_ALIAS("/dev/ti");
+MODULE_ALIAS("/dev/tl");
 MODULE_ALIAS("/dev/ticlts");
 MODULE_ALIAS("/dev/ticots");
 MODULE_ALIAS("/dev/ticotsord");
@@ -172,7 +172,7 @@ MODULE_ALIAS("/dev/ticotsord");
 #define DRV_BANNER	TI_SPLASH
 #endif				/* MODULE */
 
-STATIC struct module_info ti_rinfo = {
+STATIC struct module_info tl_rinfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
@@ -181,27 +181,27 @@ STATIC struct module_info ti_rinfo = {
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
-STATIC struct module_stat ti_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
-STATIC struct module_stat ti_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat tl_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat tl_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 /* Upper multiplex is a T provider following the TPI. */
 
-STATIC streamscall int ti_qopen(queue_t *, dev_t *, int, int, cred_t *);
-STATIC streamscall int ti_qclose(queue_t *, int, cred_t *);
+STATIC streamscall int tl_qopen(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int tl_qclose(queue_t *, int, cred_t *);
 
 streamscall int tp_rput(queue_t *, mblk_t *);
 streamscall int tp_rsrv(queue_t *);
 
-STATIC struct qinit ti_rinit = {
+STATIC struct qinit tl_rinit = {
 	.qi_putp = tp_rput,		/* Read put procedure (message from below) */
 	.qi_srvp = tp_rsrv,		/* Read service procedure */
-	.qi_qopen = ti_qopen,		/* Each open */
-	.qi_qclose = ti_qclose,		/* Last close */
-	.qi_minfo = &ti_rinfo,		/* Module information */
-	.qi_mstat = &ti_rstat,		/* Module statistics */
+	.qi_qopen = tl_qopen,		/* Each open */
+	.qi_qclose = tl_qclose,		/* Last close */
+	.qi_minfo = &tl_rinfo,		/* Module information */
+	.qi_mstat = &tl_rstat,		/* Module statistics */
 };
 
-STATIC struct module_info ti_winfo = {
+STATIC struct module_info tl_winfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
@@ -213,16 +213,16 @@ STATIC struct module_info ti_winfo = {
 streamscall int tp_wput(queue_t *, mblk_t *);
 streamscall int tp_wsrv(queue_t *);
 
-STATIC struct qinit ti_winit = {
+STATIC struct qinit tl_winit = {
 	.qi_putp = tp_wput,		/* Write put procedure (message from above) */
 	.qi_srvp = tp_wsrv,		/* Write service procedure */
-	.qi_minfo = &ti_winfo,		/* Module information */
-	.qi_mstat = &ti_wstat,		/* Module statistics */
+	.qi_minfo = &tl_winfo,		/* Module information */
+	.qi_mstat = &tl_wstat,		/* Module statistics */
 };
 
-MODULE_STATIC struct streamtab ti_info = {
-	.st_rdinit = &ti_rinit,		/* Upper read queue */
-	.st_wrinit = &ti_winit,		/* Upper write queue */
+MODULE_STATIC struct streamtab tl_info = {
+	.st_rdinit = &tl_rinit,		/* Upper read queue */
+	.st_wrinit = &tl_winit,		/* Upper write queue */
 };
 
 /*
@@ -280,8 +280,8 @@ enum {
 #define t_set_bit(nr,addr) tp_set_bit(nr,addr)
 #define t_clr_bit(nr,addr) tp_clr_bit(nr,addr)
 
-static kmem_cachep_t ti_prot_cachep;
-static kmem_cachep_t ti_priv_cachep;
+static kmem_cachep_t tl_prot_cachep;
+static kmem_cachep_t tl_priv_cachep;
 
 static inline struct tp *
 tp_get(struct tp *tp)
@@ -295,7 +295,7 @@ tp_put(struct tp *tp)
 {
 	dassert(tp != NULL);
 	if (atomic_dec_and_test(&tp->refcnt)) {
-		kmem_cache_free(ti_priv_cachep, tp);
+		kmem_cache_free(tl_priv_cachep, tp);
 	}
 }
 static inline fastcall __hot void
@@ -310,7 +310,7 @@ static inline struct tp *
 tp_alloc(void)
 {
 	struct tp *tp;
-	if ((tp = kmem_cache_alloc(ti_priv_cachep, GFP_ATOMIC))) {
+	if ((tp = kmem_cache_alloc(tl_priv_cachep, GFP_ATOMIC))) {
 		bzero(tp, sizeof(*tp));
 		atomic_set(&tp->refcnt, 1);
 		spin_lock_init(&tp->lock);
