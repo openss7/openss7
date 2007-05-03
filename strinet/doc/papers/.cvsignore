@@ -86,7 +86,6 @@ netperf_ubuntu_thrput.eps
 netperf_ubuntu_thrput.fig
 netperf_ubuntu_thrput.pdf
 sockets.eps
-sockets.fig
 sockets.pdf
 testresults.aux
 testresults.bbl
@@ -98,9 +97,7 @@ testresults.html
 testresults.pdf
 testresults.ps
 udp.eps
-udp.fig
 udp.pdf
 WARNINGS
 xtios.eps
-xtios.fig
 xtios.pdf
