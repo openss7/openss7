@@ -1,3 +1,49 @@
+2007-05-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/papers/legacypipe.fig: added performance results paper
+	* doc/papers/Makefile: added performance results paper
+	* doc/papers/org.css: added performance results paper
+	* doc/papers/perftest_centos_comp.plot: added performance results paper
+	* doc/papers/perftest_centos.dat: added performance results paper
+	* doc/papers/perftest_centos_delay.plot: added performance results paper
+	* doc/papers/perftest_centos_perf.plot: added performance results paper
+	* doc/papers/perftest_centos_thrput.plot: added performance results paper
+	* doc/papers/perftest_fc6_comp.plot: added performance results paper
+	* doc/papers/perftest_fc6.dat: added performance results paper
+	* doc/papers/perftest_fc6_delay.plot: added performance results paper
+	* doc/papers/perftest_fc6_perf.plot: added performance results paper
+	* doc/papers/perftest_fc6_thrput.plot: added performance results paper
+	* doc/papers/perftest_nb_comp.plot: added performance results paper
+	* doc/papers/perftest_nb.dat: added performance results paper
+	* doc/papers/perftest_nb_delay.plot: added performance results paper
+	* doc/papers/perftest_nb_perf.plot: added performance results paper
+	* doc/papers/perftest_nb_thrput.plot: added performance results paper
+	* doc/papers/perftest_rh7_comp.plot: added performance results paper
+	* doc/papers/perftest_rh7.dat: added performance results paper
+	* doc/papers/perftest_rh7_delay.plot: added performance results paper
+	* doc/papers/perftest_rh7_perf.plot: added performance results paper
+	* doc/papers/perftest_rh7_thrput.plot: added performance results paper
+	* doc/papers/perftest_smp_comp.plot: added performance results paper
+	* doc/papers/perftest_smp.dat: added performance results paper
+	* doc/papers/perftest_smp_delay.plot: added performance results paper
+	* doc/papers/perftest_smp_perf.plot: added performance results paper
+	* doc/papers/perftest_smp_thrput.plot: added performance results paper
+	* doc/papers/perftest_suse_comp.plot: added performance results paper
+	* doc/papers/perftest_suse.dat: added performance results paper
+	* doc/papers/perftest_suse_delay.plot: added performance results paper
+	* doc/papers/perftest_suse_perf.plot: added performance results paper
+	* doc/papers/perftest_suse_thrput.plot: added performance results paper
+	* doc/papers/perftest_ubuntu_comp.plot: added performance results paper
+	* doc/papers/perftest_ubuntu.dat: added performance results paper
+	* doc/papers/perftest_ubuntu_delay.plot: added performance results paper
+	* doc/papers/perftest_ubuntu_perf.plot: added performance results paper
+	* doc/papers/perftest_ubuntu_thrput.plot: added performance results paper
+	* doc/papers/piperesults.bib: added performance results paper
+	* doc/papers/piperesults.tex: added performance results paper
+	* doc/papers/socketpipe.fig: added performance results paper
+	* doc/papers/streamspipe.fig: added performance results paper
+
+
 2007-04-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/kernel/strutil.c: set db_lim to real buffer limit
