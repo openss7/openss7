@@ -1,0 +1,701 @@
+%% -*- tex -*- vim: ft=tex tw=78 nocin nosi
+%% =========================================================================
+%%
+%% @(#) $Id$
+%%
+%% =========================================================================
+%%
+%% Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+%%
+%% All Rights Reserved.
+%%
+%% Permission is granted to make and distribute verbatim copies of this
+%% manual provided the copyright notice and this permission notice are
+%% preserved on all copies.
+%%
+%% Permission is granted to copy and distribute modified versions of this
+%% manual under the conditions for verbatim copying, provided that the
+%% entire resulting derived work is distributed under the terms of a
+%% permission notice identical to this one.
+%% 
+%% Since the Linux kernel and libraries are constantly changing, this
+%% manual page may be incorrect or out-of-date.  The author(s) assume no
+%% responsibility for errors or omissions, or for damages resulting from
+%% the use of the information contained herein.  The author(s) may not
+%% have taken the same level of care in the production of this manual,
+%% which is licensed free of charge, as they might when working
+%% professionally.
+%% 
+%% Formatted or processed versions of this manual, if unaccompanied by
+%% the source, must acknowledge the copyright and authors of this work.
+%%
+%% -------------------------------------------------------------------------
+%%
+%% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+%% on behalf of the U.S. Government ("Government"), the following
+%% provisions apply to you.  If the Software is supplied by the Department
+%% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+%% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+%% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+%% Government is acquiring only the license rights granted herein (the
+%% license rights customarily provided to non-Government users).  If the
+%% Software is supplied to any unit or agency of the Government other than
+%% DoD, it is classified as "Restricted Computer Software" and the
+%% Government's rights in the Software are defined in paragraph 52.227-19
+%% of the Federal Acquisition Regulations ("FAR") (or any successor
+%% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+%% NASA Supplement to the FAR (or any successor regulations).
+%%
+%% =========================================================================
+%% 
+%% Commercial licensing and support of this software is available from
+%% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+%% 
+%% =========================================================================
+%%
+%% Last Modified $Date$ by $Author$
+%%
+%% =========================================================================
+
+\documentclass[letterpaper,final,notitlepage,twocolumn,10pt,twoside]{article}
+\usepackage{ftnright}
+\usepackage{makeidx}
+\usepackage{pictex}
+%\usepackage{psfig}
+%\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{eepic}
+%\usepackage{epsfig}
+%\usepackage[dvips]{graphicx,epsfig}
+%\usepackage[dvips]{epsfig}
+%\usepackage{epsf}
+\usepackage{natbib}
+\usepackage{placeins}
+%\usepackage{placeins}
+
+\setlength{\voffset}{-1.2in}
+\setlength{\topmargin}{0.2in}
+\setlength{\headheight}{0.2in}
+\setlength{\headsep}{0.3in}
+\setlength{\topskip}{0.0in}
+\setlength{\footskip}{0.3in}
+\setlength{\textheight}{10.0in}
+
+\setlength{\hoffset}{-1.0in}
+\setlength{\oddsidemargin}{0.5in}
+\setlength{\evensidemargin}{0.5in}
+\setlength{\textwidth}{7.5in}
+
+\setlength{\marginparwidth}{0.0in}
+\setlength{\marginparsep}{0.0in}
+
+\setlength{\columnsep}{0.3in}
+\setlength{\columnwidth}{3.6in}
+%\setlength{\columnseprule}{0.25pt}
+
+\setlength{\paperheight}{11in}
+\setlength{\paperwidth}{8.5in}
+
+%\let\Huge = \huge
+%\let\huge = \LARGE
+%\let\LARGE = \Large
+%\let\Large = \large
+%\let\large = \normalsize
+%\let\normalsize = \small
+%\let\small = \footnotesize
+%\let\footnotesize = \scriptsize
+%\let\scriptsize = \tiny
+
+\makeatletter
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+                                   {-2ex \@plus -1ex \@minus -.2ex}%
+                                   {1ex \@plus .2ex}%
+                                   {\normalfont\large\bfseries}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                                     {-1.5ex \@plus -.5ex \@minus -.2ex}%
+                                     {1ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                                     {-1.25ex\@plus -.5ex \@minus -.2ex}%
+                                     {1ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+                                    {1.5ex \@plus .5ex \@minus .2ex}%
+                                    {-1em}%
+                                    {\normalfont\normalsize\bfseries\slshape}}
+\renewcommand\subparagraph{\@startsection{subparagraph}{5}{\parindent}%
+                                       {0ex \@plus 0ex \@minus 0ex}%
+                                       {-1em}%
+                                      {\normalfont\normalsize\bfseries\slshape}}
+\makeatother
+
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{6}
+
+\pagestyle{plain}
+%\pagestyle{myheadings}
+%\markboth{B. Bidulock}{B. Bidulock}
+
+\makeglossary
+
+\newcommand{\topfigrule}{\vspace{0.5ex}\rule{\columnwidth}{0.4pt}\vspace{0.5ex} }
+\newcommand{\botfigrule}{\vspace{0.5ex}\rule{\columnwidth}{0.4pt}\vspace{0.5ex} }
+\newcommand{\dblfigrule}{\vspace{0.5ex}\rule{\textwidth}{0.4pt}\vspace{0.5ex} }
+
+%\bibliographystyle{unsrtnat}
+%\bibliographystyle{plainnat}
+%\bibliographystyle{ieeetr}
+%\bibliographystyle{abbrvnat}
+%\bibliographystyle{acm}
+%\bibliographystyle{plainnat}
+\bibliographystyle{alpha}
+
+\begin{document}
+
+%\begin{titlepage}
+%\begin{center}
+%    STREAMS vs. Sockets Performance Comparison\\
+%    Experimental Test Results
+%\end{center}
+%\end{titlepage}
+
+\title{Implementing POSIX Sockets for Linux Fast-STREAMS\\[0.5ex]
+	{\large \textsl{Design for Linux}}}
+\author{Brian F. G. Bidulock\thanks{bidulock@openss7.org}\\
+	OpenSS7 Corporation}
+\date{May 1, 2007}
+\maketitle
+
+\begin{abstract}
+\addcontentsline{toc}{section}{Abstract}
+\end{abstract}
+
+%\tableofcontents
+
+\section[Background]{Background}
+
+UNIX networking has a rich history.  The TCP/IP protocol suite was first
+implemented by BBN using Sockets under a DARPA research project on 4.1aBSD and
+then incorporated by the CSRG into 4.2BSD \cite[]{bsd}.  Lachmann and
+Associates subsequently implemented the first TCP/IP protocol suite based on
+the Transport Layer Interface (TLI) \cite[]{tli} and STREAMS \cite[]{magic}.
+
+\subsection[STREAMS]{STREAMS}
+
+STREAMS is a facility first presented in a paper by Dennis M. Ritchie in 1984
+\cite{Ritchie84}, originally implemented on 4.1BSD and later part of the
+\textsl{Bell Laboratories Eighth Edition UNIX}, incorporated into \textsl{UNIX
+System V Release 3} and enhanced in \textsl{UNIX System V Release 4} and
+further in \textsl{UNIX System V Release 4.2}.  STREAMS was used in SVR4 for
+terminal input/output, pseudo-terminals, pipes named pipes (FIFOs),
+interprocess communication and networking.  STREAMS was used in SVR3 for
+networking (in the NSU package).  Since its release in \textsl{System V
+Release 3}, STREAMS has been implemented across a wide range of UNIX,
+UNIX-like and UNIX-based systems, making its implementation and use an ipso
+facto standard.
+
+STREAMS is a facility that allows for a reconfigurable full duplex
+communications path, \textit{Stream}, between a user process and a driver in
+the kernel.  Kernel protocol modules can be pushed onto and popped from the
+\textit{Stream} between the user process and driver.  The \textit{Stream} can
+be reconfigured in this way by a user process.  The user process, neighbouring
+protocol modules and the driver communicate with each other using a message
+passing scheme.  This permits a loose coupling between protocol modules,
+drivers and user processes, allowing a third-party and loadable kernel module
+approach to be taken toward the provisioning of protocol modules on platforms
+supporting STREAMS.
+
+On \textsl{UNIX System V Release 4.2}, STREAMS was used for terminal
+input-output, pipes, FIFOs (named pipes), and network communications.  Modern
+UNIX, UNIX-like and UNIX-based system providing STREAMS normally support some
+degree of network communications using STREAMS; however, many do not support
+STREAMS-based pipe and FIFOs\footnote{AIX, for example.} or terminal
+input-output\footnote{HP-UX for example.} without system reconfiguration.
+
+\textsl{UNIX System V Release 4.2} supported four Application Programming
+Interfaces (APIs) for accessing the network communications facilities of the
+kernel:
+
+\begin{description}
+
+\item[{\it Transport Layer Interface (TLI).}]
+
+TLI is an acronym for the \textit{Transport Layer Interface (TLI)}
+\cite[]{tli}.  The TLI was the non-standard interface provided by SVR3 and
+SVR4, later standardized by X/Open as the XTI described below.  This interface
+operated differently than the XTI in subtle ways, and is now deprecated.
+
+\item[{\it X/Open Transport Interface (XTI).}]
+
+XTI is an acronym for the \textit{X/Open Transport Interface} \cite[]{xti}.
+The XTI is a standarization of the SVR3 and SVR4 TLI.  The interface consists
+of an Application Programming Interface implemented as a shared object
+library.  The shared object library communicates with a transport provider
+\textit{Stream} using a service primitive interface called the
+\textit{Transport Provider Interface} \cite[]{tpi}.
+
+While XTI was implemented directly over STREAMS devices supporting the TPI
+\cite[]{tpi} under SVR4, several non-traditional approaches exist in
+some implementations.
+
+\item[{\it Berkeley Sockets.}]
+
+Sockets uses the BSD interface that was developed by BBN for the TCP/IP
+protocol suite under DARPA contract on 4.1aBSD and released in 4.2BSD.  BSD
+Sockets provides a set of primary API functions that are typically implemented
+as system calls.  The BSD Sockets interface is non-standard, operated
+differently from the POSIX interface in subtle ways, and is now deprecated in
+favour of the POSIX/SUS standard Sockets interface.
+
+\item[{\it POSIX Sockets.}]
+
+Sockets were standardized by X/Open, later the
+OpenGroup,\footnote{\textit{http://www.opengroup.org/}} and IEEE in the POSIX
+standardization process.  They appear in XNS 5.2 \cite[]{xns}, SUSv1
+\cite[]{susv1}, SUSv2 \cite[]{susv2} and SUSv3 \cite[]{susv3}.   POSIX/SUS
+Sockets is now the common application environment for accessing networking,
+deprecating the XTI for TCP/IP networking applications.
+
+\end{description}
+
+One systems supporting STREAMS, but not traditionally supporting Sockets (such
+as SVR4), there are a number of approaches toward supporting BSD and POSIX
+Sockets:
+
+\begin{description}
+
+\item[{\it Compatibility Library.}]
+
+Under this approach, the oldest of approaches for STREAMS, a compatibility
+library (\texttt{libsocket.o}) contains the socket calls as library functions
+that internally invoke the TLI or TPI interface to an underlying STREAMS
+transport provider.  This is the approach originally taken by SVR4
+\cite[]{magic}, but this approach has subsequently been abandonned due to the
+difficulties regarding fork(2) and fundamental incompatibilities deriving from
+a library only approach.
+
+\item[{\it Library and Cooperating STREAMS Module.}]
+
+Under this approach, a cooperating module (\texttt{sockmod}) is pushed on a
+Transport Provider Interface (TPI) stream.  The library (\texttt{socklib}) and
+cooperating module (\texttt{sockmod}) provide the BBN or POSIX Socket
+API \cite[]{impbsd} \cite[]{socklib}.  This is the intermediate implementation
+approach taken by SVR4 and earlier releases of Solaris.
+
+\item[{\it Library and System Calls.}]
+
+Under this approach, the BSD or POSIX Sockets API is implemented as system
+calls with the sole exception of the socket(3) call.  The underlying transport
+provider is still a TPI-based STREAMS transport provider, it is just that
+system calls instead of library calls are used to implement the interface
+\cite[]{socklib}.  This is another intermediate implementation approach taken
+by later releases of Solaris.
+
+\item[{\it System Calls.}]
+
+Under this approach, even the socket(3) call is moved into the kernel.
+Conversion between POSIX/BSD Sockets and TPI service primitives is performed
+completely within the kernel.  The sock2path(5) configuration file is used to
+configure the mapping between STREAMS devices and socket types, domains and
+protocols \cite[]{socklib}.
+
+\end{description}
+
+\subsection[Sockets]{Sockets}
+
+Sockets were originally developed as part of the BBN DARPA contract for
+providing TCP/IP networking for 4BSD UNIX.  The TCP/IP networking stack was
+first implemented on 4.1aBSD and included in 4.2BSD by the CSRG \cite[]{bsd}.
+The Sockets interface had the objective of being a general purpose, network
+agnostic, interprocess communications system.  The first networking components
+implemented using Sockets were TCP/IP (released in 4.2BSD), XNS (released in
+4.3BSD) and ISO (released in 4.4BSD).
+
+Although the networking subsystems for BSD Sockets were intended to be general
+purpose, only the TCP/IP networking components have received wide use.
+
+Systems that take the BSD approach to networking seldom support
+STREAMS.\footnote{Perhaps an exception is early versions of Digital UNIX.}
+For systems traditionally supporting Sockets and then retrofitted to support
+the XTI interface, there is one approach toward supporting XTI without
+retrofitting the entire networking stack to support STREAMS:\footnote{This is
+the approach initially taken by Digital UNIX.}
+
+\begin{description}
+
+\item[{\it XTI Compatibility Library.}]
+
+Several implementations of XTI on UNIX utilize the concept of an XTI
+compatibility library.\footnote{One was even available for Linux at one
+point.}  This is purely a shared object library approach to providing XTI.
+Under this approach it is possible to use the XTI application programming
+interface, but it is not possible to utilize any of the STREAMS capabilities
+of an underlying Transport Provider Interface (TPI) stream.  This approach is,
+unfortunately, also not ABI compliant to the SVID.
+
+\item[{\it TPI over Sockets.}]
+
+An alternate approach taken by the Linux iBCS package was to provide a
+pseudo-transport provider using a legacy character device to present the
+appearance of a STREAMS transport provider.  While being ABI compliant to
+SVID, under this approach it is still not possible to utilize any of the
+STREAMS capabilities of an underlying Transport Provider Interface (TPI)
+stream.
+
+\item[{\it XTI over Sockets.}]
+
+Several implementations of XTI on BSD-style UNIX utilize the concept of XTI
+over Sockets (or TPI over Sockets).  Following this approach, a STREAMS
+pseudo-device driver is provided that hooks directly into internal socket
+system calls to implement the driver, and yet the networking stack remains
+fundamentally BSD in style.  This approach is ABI compliant to the SVID and
+also allows the STREAMS capabilities of the resulting Transport Provider
+Interface (TPI) to be used (such as pushing and popping modules).  This
+approach requires a rather complete STREAMS implementation, however, it does
+not require replacement of the BSD-style networking stack with an SVR4 style
+stack.
+
+\end{description}
+
+\subsection[Standardization]{Standardization}
+
+It is interesting that both Sockets and STREAMS were implemented on the same
+operating system base (4.1BSD) at about the same time.  Also, Dennis Ritchie
+implemented STREAMS and was a significant contributor to the initial BSD
+releases.  BBN implemented the TCP/IP networking stack on 4.1aBSD using
+sockets, both released by the CSRG in 4.2BSD.  At about the same time STREAMS
+went into System V Release 3 and the Network Services Utility (NSU) provided
+the first TLI implementations of TCP/IP networking for TLI.  Perhaps it is not
+surprising that both interfaces provide similar functions:
+
+\begin{center}
+\begin{tabular}{ll}
+TLI & Sockets\\
+\hline
+t\_open() & socket()\\
+t\_bind() & bind()\\
+t\_listen() & listen()\\
+t\_connect() & connect()\\
+t\_rcvconnect() & select()\\
+t\_accept() & accept()\\
+t\_unbind() & bind()\\
+t\_close() & close()\\
+t\_snddis() & close()\\
+t\_sndrel() & shutdown()\\
+t\_sndreldata() & \\
+t\_rcvrel() & select()\\
+t\_rcvreldata() & \\
+t\_rcvuderr() & \\
+t\_snd() & send()\\
+t\_sndv() & writev()\\
+t\_sndudata() & sendto()\\
+t\_sndudata() & sendmsg()\\
+t\_rcv() & recv()\\
+t\_rcvv() & readv()\\
+t\_rcvudata() & recvfrom()\\
+t\_rcvudata() & recvmsg()\\
+t\_optmgmt() & getsockopt()\\
+t\_optmgmt() & setsockopt()\\
+\hline
+\end{tabular}
+\end{center}
+
+During the POSIX standarization process, networking and the Sockets interface
+were given special treatment to ensure that both the BSD and STREAMS
+networking approaches were compatible in the common application
+environment.\footnote{For example, when a transport connection indication has
+been received with t\_listen(3) the transport connection may have already been
+established before t\_accept(3) or t\_snddis(3) are issued.  This permits
+t\_listen(3) to be implemented using accept(3) and also permits the BSD
+networking stack to be used (a TPI implementation is capable of deferring
+accepting a connection at the protocol level and either accepting the
+connection (\texttt{T\_CONN\_RES}) or refusing the connection attempt
+(\texttt{T\_DISCON\_REQ})).  As another example, binding a socket with bind(3)
+to an address containing an address family of \texttt{AF\_UNSPEC} has the same
+effect as t\_unbind(3).} POSIX has standardized both the XTI and Sockets
+programmatic interfaces to networking.  STREAMS networking has been POSIX
+compliant for many years, BSD Sockets, POSIX Sockets, TLI and XTI interfaces,
+and were compliant in the SVR4 release.  The STREAMS networking provided by
+\textsl{Linux Fast-STREAMS} package provides POSIX compliant networking.
+Therefore, any application using a Socket or Stream in a POSIX compliant
+manner will be compatible with both BSD and STREAMS networking.
+
+\subsection[Linux]{Linux}
+
+
+\section[Objective]{Objective}
+
+\section[Description]{Description}
+
+\subsection[STREAMS Networking]{STREAMS Networking}
+
+\textit{Figure \ref{figure:streamsnet}} illustrates the organization of the
+classical STREAMS networking stack.
+
+\begin{figure}[hbtp]
+\begin{center}
+\includegraphics[width=1.8in]{streamsnet}
+\end{center}
+\caption[STREAMS Networking]{STREAMS Networking}
+\label{figure:streamsnet}
+\end{figure}
+
+\begin{description}
+
+\item[User to Transport Interface.]
+
+The interface between the Stream head and the uppermost module (transport) is
+a well-defined Transport Provider Interface (TPI).  This is primarily a
+service primitive (message passing) interface.
+
+\item[Transport to Network Interface.]
+
+The interface between the transport provider and the network provider is a
+well-defined Network Provider Interface (NPI).  This is primarily a service
+primitive (message passing) interface.
+
+\item[Network to Data Link Interface.]
+
+The interface between the network provider and the data link provider is a
+well-defined Data Link Provider Interface (DLPI).  This is primarily a service
+primitive (message passing) interface.
+
+\end{description}
+
+\subsection[BSD Networking]{BSD Networking}
+
+\textit{Figure \ref{figure:bsdnet}} illustrates the organization of the
+classical BSD networking stack.
+
+\begin{figure}[hbtp]
+\begin{center}
+\includegraphics[width=1.8in]{bsdnet}
+\end{center}
+\caption[BSD Networking]{BSD Networking}
+\label{figure:bsdnet}
+\end{figure}
+
+\begin{description}
+
+\item[User to Transport Interface.]
+
+The interface between the Socket layer and the uppermost (transport) protocol
+layer is a well-defined BSD socket-to-protocol interface.
+This is primarily a function pointer call interface.
+
+\item[Transport to Network Interface.]
+
+The interface between protocol layers (transport and network) is a
+well-defined BSD protocol-to-protocol interface.
+This is primarily a function pointer call interface.
+
+\item[Network to Data Link Interface.]
+
+The interface between the protocol layer and the device layer (network and
+interface) is a well-defined BSD protocol-to-iface interface.
+This is primarily a function pointer call interface.
+
+\end{description}
+
+\subsection[Hybrid Approaches]{Hybrid Approaches}
+
+\subsection[Linux Networking]{Linux Networking}
+
+\subsection[Linux Fast-STREAMS Networking]{Linux Fast-STREAMS Networking}
+
+\section[Method]{Method}
+
+\subsection[Compatibility Library]{Compatibility Library}
+
+\subsubsection*{XTI Compatibility Library}
+
+This approach builds a library of socket functions that are implemented
+internally as calls to the XTI library.
+To maintain compatibilty with existing Linux sockets, the library
+distinguishes between XTI streams and native sockets.  Underlying system calls
+(or input-output controls) are utilized on native sockets.
+
+\subsubsection*{TPI Compatibility Library}
+
+This approach builds a library of socket functions that are implemented
+internally as service primitives passed to the TPI transport provider.
+To maintain compatibilty with existing Linux sockets, the library
+distinguishes between TPI streams and native sockets.  Underlying system calls
+(or input-output controls) are utilized on native sockets.
+
+\subsection[Library and Cooperating Module]{Library and Cooperating Module}
+
+These approaches all invole pushing a module, named \texttt{sockmod} onto an
+open transport provider stream as illustrated in \textit{Figure
+\ref{figure:sockmod}}.
+
+\begin{figure}[hbtp]
+\begin{center}
+\includegraphics[width=1.25in]{sockmod}
+\end{center}
+\caption[Socket Module]{Socket Module}
+\label{figure:sockmod}
+\end{figure}
+
+\subsubsection*{Sockmod Approach 1}
+
+This approach pushes the \texttt{sockmod} STREAMS module onto the transport
+provider STREAM.  A library of socket functions are implemented internally as
+calls to the cooperating module \cite[]{impbsd}.
+To maintain compatibilty with existing Linux sockets, the library
+distinguishes between Sockmod streams and native sockets.  Underlying system calls
+(or input-output controls) are utilized on native sockets.
+
+This is the approach of earlier Solaris releases \cite[]{impbsd}.
+
+\subsubsection*{Sockmod Approach 2}
+
+This approach pushes the \texttt{sockmod} STREAMS module onto the transport
+provider STREAM.  A library of socket functions are implemented internally as
+calls to the cooperating module.  Where this approach differs from the Sockmod
+approach above is that system calls are implemented directly as input-output
+controls issued to the socket module to emulate system calls.
+To maintain compatibilty with existing Linux sockets, the library
+does not need to distinguish between Sockmod streams and native sockets as
+both support the same set of underlying input-output controls (i.e. socksys
+input-output control calls available for iBCS compatiblity).  Sockets opened
+in this fashion appear as STREAMS devices.
+
+This is an intermediate approach that takes advantage of the socketsys
+input-output control calls available in the Linux kernel.
+The library can be made compatible with native sockets by passing the socket
+call to the normal glibc socket(3) function whenever the domain, type and
+protocol are not in the table.
+
+\subsection[Library and System Calls]{Library and System Calls}
+
+These approaches all either transforms the inode associated with the Stream
+head into a socket, or attach a Stream head onto a socket.  The objective in
+these approaches is to perhaps alter the socket(3) system call into a more
+specialized library call, but to keep all other socket system calls consistent
+with Linux and no need of replacing the other Linux socket system calls.  This
+approach to system calls is problematic from the standpoint that both a
+\texttt{struct socket} and \texttt{struct sock} structure must be allocated.
+Linux socket calls expect both structures to be present and complete.
+
+Perhaps the most straighforward way of doing this is to create both a
+\texttt{socket} and \texttt{sock} structure in the regular way for the Linux
+socket layer and provide a more specialized Stream head that is part of (or
+associated with) the \texttt{sock} structure.
+
+\begin{figure}[hbtp]
+\begin{center}
+\includegraphics[width=3.0in]{sock}
+\end{center}
+\caption[Socket Structures]{Socket Structures}
+\label{figure:sock}
+\end{figure}
+
+\textit{Figure \ref{figure:sock}} illustrates the hybrid Stream head/Socket
+structure arrangement.  Some of the particulars of the structures vary from
+kernel to kernel.  For example, many kernels combine the \texttt{inode} and
+\texttt{socket} structures into a single structure.  Some kernels will also
+combine the \texttt{sock} and \texttt{stdata} structures into a single
+structure.  Other kernels separate these structures and provide pointers
+between the two.  Also, \textsl{Linux Fast-STREAMS} currently allocates the
+\texttt{stdata} structure and its associated read and write queues as a single
+structure.
+
+\subsubsection*{Sockmod Approach 3}
+
+This approach pushes the \texttt{sockmod} STREAMS module onto the transport
+provider stream.  The \texttt{sockmod} module transforms the Stream head into
+a socket (from the viewpoint of the kernel), by establishing the arrangement
+shown in \textit{Figure \ref{figure:sock}}.
+
+A library implements the socket(3) system call as a library function to create
+sockets in this fashion.  The library looks up the socket domain, type and
+protocol in a table and determines which transport provider device to open and
+then pushes the \texttt{sockmod} module onto the transport provider stream to
+transform it into a socket (from the viewpoint of the kernel).  All other
+socket calls are performed as native sockets system calls.
+
+This approach requires a thin library that implements the socket(3) system
+call.  The library can be made compatible with native sockets by passing the
+socket call to the normal glibc socket(3) function whenever the domain, type
+and protocol are not in the table.  This is the approach of later Solaris
+releases \cite[]{socklib}.
+
+\subsubsection*{Socksys Approach}
+
+This approach uses the soconfig(8) utility and sock2path(5) file (or the
+initsock(8) utility and the netconfig(5) file) to configure the system at boot
+time.  The utility opens the \texttt{/dev/socksys} driver (or an anonymous
+device such as \texttt{/dev/ticlts}) and configures the system using
+input-output controls.  Entries are added to an internal table containing
+socket domain, type, protocol and device path.  The driver stores internally
+the identity of the transport provider (i.e. major device number).
+
+The approach uses a thin library that re-implements the socket(3) system call.
+When the socket(3) system call is called, the library opens the
+\texttt{/dev/socksys} driver and issues an input-output control passing the
+arguments to the socket(3) system call (domain, type, protocol).  The
+\texttt{/dev/socksys} driver creates a socket inode and a Stream head
+according to \textit{Figure \ref{figure:sock}}, and attaches the driver of the
+type included in the configuration table.  This STREAMS file is attached to an
+available file descriptor, which is returned from the input-output control.
+This file descriptor appears as a real socket to the reset of the system.
+
+Another approach is to have the \texttt{/dev/socksys} driver detach its own
+driver queue pair and susbstitute the transport driver.  The
+\texttt{/dev/socksys} driver also transforms it Stream head into a socket per
+\textit{Figure \ref{figure:sock}} and returns its own file descriptor in
+the from the input-output control call.
+
+All other socket calls are compatible with kernel system calls.  If the
+domain, type and protocol are not present in the configuration table, the
+input-output control call can be passed to the sys\_socket() call inside the
+kernel and a native socket of the requested type returned.  The
+\texttt{/dev/socksys} driver itself implements the socket calls and converts
+them to TPI and other calls to the driver via the associated Stream head.
+
+This approach requires only a thin library that implements the socket(3)
+system call and that is completely compatible with native sockets.
+
+\subsection[System Calls]{System Calls}
+
+This approach uses the soconfig(8) utility and sock2path(5) file (or the
+initsock(8) utility and the netconfig(5) file) to configure the system at boot
+time.  The utility opens the \texttt{/dev/socksys} driver (or an anonymous
+device such as \texttt{/dev/ticlts}) and configures the system using
+input-output controls.  Entries are added to a table containing socket domain,
+type, protocol and device path.  The driver register a socket of the
+corresponding domain, type and protocol with the Linux socket system.  To
+allow conflicting domains, if an existing domain is registered, a hack is used
+(bit added to the domain, e.g. \texttt{AF\_INET | AF\_HACK}).  The driver
+stores internally the identity of the transport provider (i.e. major device
+number).  When the Linux kernel sys\_socket() system call is invoked, a socket
+structure is established and passed to the registered create function.  The
+create function uses the socket domain, type and protocol to determine the
+STREAMS device to create.  A Stream head is created and the transport provider
+driver attached in the same fashion as the open of a character device, except
+that the Stream head is attached to the socket inode.  The
+\texttt{/dev/socksys} driver implements the remainder of the system calls.
+
+This approach does not required a library: the existing C library socket
+functions are sufficient.
+
+\section[Results]{Results}
+
+\section[Analysis]{Analysis}
+
+\section[Conclusions]{Conclusions}
+
+\section[Future Work]{Future Work}
+
+\section[Related Work]{Related Work}
+
+\FloatBarrier
+\addcontentsline{toc}{section}{References}
+\bibliography{sockimp}
+
+\clearpage
+\begin{appendix}
+\end{appendix}
+
+\end{document}
