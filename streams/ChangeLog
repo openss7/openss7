@@ -1,5 +1,41 @@
 2007-05-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/modules/sth.c: far reaching performance changes and tuning
+	* src/kernel/strutil.c: far reaching performance changes and tuning
+	* src/kernel/strsched.c: far reaching performance changes and tuning
+
+	* doc/man/man3/pipe.3.man: correct documentation visa vi performance
+	* doc/man/man9/M_HANGUP.9.man: correction
+	* doc/man/man9/M_SETOPTS.9.man: added RFILL mode
+	* doc/man/man9/queue.9.man: new structure elements
+
+	* doc/manual/bugs.texi: updated docs
+	* doc/manual/todo.texi: updated docs
+
+	* include/sys/streams/stream.h: add M_MI message type, different
+	  prototype for qbackenable()
+	* include/sys/streams/stropts.h: added RFILL mode and RPROTCOMPRESS
+	  protocol
+	* include/sys/streams/strsubr.h: remove unused members from stdata
+	* src/kernel/strprocfs.c: remove unused members from stdata
+
+	* src/drivers/clone.c: add read service procedure
+	* src/drivers/fifo.c: add read service procedure
+	* src/drivers/pipe.c: add read service procedure
+	* src/drivers/sfx.c: add read service procedure
+
+	* src/kernel/strutil.h: different prototype for __flushq()
+
+	* src/test/test-fifo.c: correct static warnings and headers
+	* src/test/test-pipe.c: correct static warnings and headers
+	* src/test/test-sad.c: correct static warnings and headers
+	* src/test/test-streams.c: correct static warnings and headers, one test case
+
+	* src/util/init/strace: correct init script (default to on)
+	* src/util/init/strerr: correct init script (default to on)
+
+	* acinclude.m4: add configuration options for kernel thread priority
+
 	* doc/man/man8/perftest.8.man: updated perftest program
 	* src/test/perftest.c: updated perftest program
 

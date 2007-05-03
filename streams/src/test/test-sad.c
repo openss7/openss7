@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/03 22:40:52 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/05/03 22:40:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sad.c,v $
+ Revision 0.9.2.29  2007/05/03 22:40:52  brian
+ - significant performance improvements, some bug corrections
+
  Revision 0.9.2.28  2007/03/15 10:22:17  brian
  - test case reporting and pushed release date one day
 
@@ -159,9 +162,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/15 10:22:17 $"
+#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/03 22:40:52 $"
 
-static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/15 10:22:17 $";
+static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/03 22:40:52 $";
 
 #include <sys/types.h>
 #include <stropts.h>

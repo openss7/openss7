@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/03/15 10:22:15 $
+ @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/05/03 22:40:51 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:22:15 $ by $Author: brian $
+ Last Modified $Date: 2007/05/03 22:40:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-fifo.c,v $
+ Revision 0.9.2.31  2007/05/03 22:40:51  brian
+ - significant performance improvements, some bug corrections
+
  Revision 0.9.2.30  2007/03/15 10:22:15  brian
  - test case reporting and pushed release date one day
 
@@ -168,9 +171,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/03/15 10:22:15 $"
+#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/05/03 22:40:51 $"
 
-static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/03/15 10:22:15 $";
+static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/05/03 22:40:51 $";
 
 #include <sys/types.h>
 #include <stropts.h>
