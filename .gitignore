@@ -1608,7 +1608,6 @@ strinet/doc/papers/netperf_ubuntu_thrput.eps
 strinet/doc/papers/netperf_ubuntu_thrput.fig
 strinet/doc/papers/netperf_ubuntu_thrput.pdf
 strinet/doc/papers/sockets.eps
-strinet/doc/papers/sockets.fig
 strinet/doc/papers/sockets.pdf
 strinet/doc/papers/testresults.aux
 strinet/doc/papers/testresults.bbl
@@ -1620,11 +1619,9 @@ strinet/doc/papers/testresults.html
 strinet/doc/papers/testresults.pdf
 strinet/doc/papers/testresults.ps
 strinet/doc/papers/udp.eps
-strinet/doc/papers/udp.fig
 strinet/doc/papers/udp.pdf
 strinet/doc/papers/WARNINGS
 strinet/doc/papers/xtios.eps
-strinet/doc/papers/xtios.fig
 strinet/doc/papers/xtios.pdf
 strsock/doc/papers/WARNINGS
 strsock/doc/papers/bsdnet.eps
