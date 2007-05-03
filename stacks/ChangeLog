@@ -1,3 +1,8 @@
+2007-05-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-ig-02.me: added next
+	  version of M2PA IG
+
 2007-04-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/testsuite-inet_raw.at: testsuite factoring
