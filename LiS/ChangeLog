@@ -1,5 +1,11 @@
 2007-05-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* util/test-fifo.c: rationalized to streams test programs
+	* util/test-pipe.c: rationalized to streams test programs
+	* util/test-sad.c: rationalized to streams test programs
+	* util/test-streams.c: rationalized to streams test programs
+	* util/init/streams.sh: typo correction
+
 	* man/man8/perftest.8.man: updated perftest program
 	* util/perftest.c: updated perftest program
 
