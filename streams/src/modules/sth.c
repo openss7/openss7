@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.185 $) $Date: 2007/04/12 20:06:13 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.186 $) $Date: 2007/05/03 22:40:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/04/12 20:06:13 $ by $Author: brian $
+ Last Modified $Date: 2007/05/03 22:40:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.186  2007/05/03 22:40:47  brian
+ - significant performance improvements, some bug corrections
+
  Revision 0.9.2.185  2007/04/12 20:06:13  brian
  - changes from performance testing and misc bug fixes
 
@@ -214,10 +217,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.185 $) $Date: 2007/04/12 20:06:13 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.186 $) $Date: 2007/05/03 22:40:47 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.185 $) $Date: 2007/04/12 20:06:13 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.186 $) $Date: 2007/05/03 22:40:47 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -319,7 +322,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.185 $) $Date: 2007/04/12 20:06:13 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.186 $) $Date: 2007/05/03 22:40:47 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
