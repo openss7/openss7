@@ -1,3 +1,15 @@
+2007-05-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/papers/bsdnet.fig: added paper
+	* doc/papers/Makefile: added paper
+	* doc/papers/org.css: added paper
+	* doc/papers/sockets.fig: added paper
+	* doc/papers/sock.fig: added paper
+	* doc/papers/sockimp.bib: added paper
+	* doc/papers/sockimp.tex: added paper
+	* doc/papers/sockmod.fig: added paper
+	* doc/papers/streamsnet.fig: added paper
+
 2007-04-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/testsuite.at: testsuite factoring
