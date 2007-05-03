@@ -1,5 +1,8 @@
 2007-05-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man8/perftest.8.man: updated perftest program
+	* src/test/perftest.c: updated perftest program
+
 	* doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-ig-02.me: added next
 	  version of M2PA IG
 

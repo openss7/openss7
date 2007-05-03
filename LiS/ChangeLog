@@ -1,3 +1,8 @@
+2007-05-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* man/man8/perftest.8.man: updated perftest program
+	* util/perftest.c: updated perftest program
+
 2007-04-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/testsuite-fifo.at: testsuite factoring
