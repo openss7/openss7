@@ -52,90 +52,165 @@
 # $Log$
 # =============================================================================
 
-PLOTS = \
-	perftest_centos_comp.plot \
-	perftest_centos_delay.plot \
-	perftest_centos_perf.plot \
-	perftest_centos_thrput.plot \
-	perftest_fc6_comp.plot \
-	perftest_fc6_delay.plot \
-	perftest_fc6_perf.plot \
-	perftest_fc6_thrput.plot \
-	perftest_nb_comp.plot \
-	perftest_nb_delay.plot \
-	perftest_nb_perf.plot \
-	perftest_nb_thrput.plot \
-	perftest_rh7_comp.plot \
-	perftest_rh7_delay.plot \
-	perftest_rh7_perf.plot \
-	perftest_rh7_thrput.plot \
-	perftest_smp_comp.plot \
-	perftest_smp_delay.plot \
-	perftest_smp_perf.plot \
-	perftest_smp_thrput.plot \
-	perftest_suse_comp.plot \
-	perftest_suse_delay.plot \
-	perftest_suse_perf.plot \
-	perftest_suse_thrput.plot \
-	perftest_ubuntu_comp.plot \
-	perftest_ubuntu_delay.plot \
-	perftest_ubuntu_perf.plot \
-	perftest_ubuntu_thrput.plot
+PREFIX = perftest
 
-EPSFIGS = $(PLOTS:.plot=.eps) \
+PLOTS = \
+	$(PREFIX)_centos_comp.plot \
+	$(PREFIX)_centos_delay.plot \
+	$(PREFIX)_centos_perf.plot \
+	$(PREFIX)_centos_thrput.plot \
+	$(PREFIX)_fc6_comp.plot \
+	$(PREFIX)_fc6_delay.plot \
+	$(PREFIX)_fc6_perf.plot \
+	$(PREFIX)_fc6_thrput.plot \
+	$(PREFIX)_nb_comp.plot \
+	$(PREFIX)_nb_delay.plot \
+	$(PREFIX)_nb_perf.plot \
+	$(PREFIX)_nb_thrput.plot \
+	$(PREFIX)_rh7_comp.plot \
+	$(PREFIX)_rh7_delay.plot \
+	$(PREFIX)_rh7_perf.plot \
+	$(PREFIX)_rh7_thrput.plot \
+	$(PREFIX)_smp_comp.plot \
+	$(PREFIX)_smp_delay.plot \
+	$(PREFIX)_smp_perf.plot \
+	$(PREFIX)_smp_thrput.plot \
+	$(PREFIX)_suse_comp.plot \
+	$(PREFIX)_suse_delay.plot \
+	$(PREFIX)_suse_perf.plot \
+	$(PREFIX)_suse_thrput.plot \
+	$(PREFIX)_ubuntu_comp.plot \
+	$(PREFIX)_ubuntu_delay.plot \
+	$(PREFIX)_ubuntu_perf.plot \
+	$(PREFIX)_ubuntu_thrput.plot
+
+EPSFIGS = \
 	legacypipe.eps \
 	streamspipe.eps \
 	socketpipe.eps
 
-PDFFIGS = $(PLOTS:.plot=.pdf) \
+PDFFIGS = \
 	legacypipe.pdf \
 	streamspipe.pdf \
 	socketpipe.pdf
 
+GIFFIGS = \
+	legacypipe.gif \
+	streamspipe.gif \
+	socketpipe.gif
+
+PNGFIGS = \
+	legacypipe.png \
+	streamspipe.png \
+	socketpipe.png
+
 PLOTFIGS = $(PLOTS:.plot=.fig)
 
+NAME = piperesults
+
 .PHONY: all
-all: piperesults.bbl piperesults.ps piperesults.pdf
+all: $(NAME).bbl $(NAME).ps $(NAME).pdf $(NAME).html
 
 $(PLOTFIGS): %.fig: %.plot
 	gnuplot $<
 	touch $@
 
 $(EPSFIGS): %.eps: %.fig
-	fig2dev -L eps $< > $@
+	fig2dev -L eps -e -g '#ffffff' -b 0 $< > $@
+
+$(PLOTS:.plot=.eps): %.eps: %.fig
+	fig2dev -L eps -e -g '#f7f7f7' -b 0 $< > $@
 
 $(PDFFIGS): %.pdf: %.fig
-	fig2dev -L pdf -p dummy $< > $@
+	fig2dev -L pdf -e -p dummy -g '#ffffff' -b 0 $< > $@
 
-perftest_fc6_comp.fig perftest_fc6_delay.fig perftest_fc6_perf.fig perftest_fc6_thrput.fig: perftest_fc6.dat
-perftest_nb_comp.fig perftest_nb_delay.fig perftest_nb_perf.fig perftest_nb_thrput.fig: perftest_nb.dat
-perftest_smp_comp.fig perftest_smp_delay.fig perftest_smp_perf.fig perftest_smp_thrput.fig: perftest_smp.dat
-perftest_rh7_comp.fig perftest_rh7_delay.fig perftest_rh7_perf.fig perftest_rh7_thrput.fig: perftest_rh7.dat
-perftest_centos_comp.fig perftest_centos_delay.fig perftest_centos_perf.fig perftest_centos_thrput.fig: perftest_centos.dat
-perftest_suse_comp.fig perftest_suse_delay.fig perftest_suse_perf.fig perftest_suse_thrput.fig: perftest_suse.dat
-perftest_ubuntu_comp.fig perftest_ubuntu_delay.fig perftest_ubuntu_perf.fig perftest_ubuntu_thrput.fig: perftest_ubuntu.dat
+$(PLOTS:.plot=.pdf): %.pdf: %.fig
+	fig2dev -L pdf -e -p dummy -g '#f7f7f7' -b 0 $< > $@
 
-piperesults.aux: piperesults.tex $(EPSFIGS)
-	latex piperesults.tex
+$(GIFFIGS): %.gif: %.fig
+	fig2dev -L gif -g '#c0d0f0' -t '#c0d0f0' -b 0 -S 2 $< > $@
 
-piperesults.bbl: piperesults.bib piperesults.tex $(EPSFIGS)
-	if test -f piperesults.aux ; then :; else make piperesults.aux ; fi
-	bibtex piperesults
+$(PLOTS:.plot=.gif): %.gif: %.fig
+	fig2dev -L gif -g 'white' -b 15 -S 2 $< > $@
 
-piperesults.dvi: piperesults.tex piperesults.bbl $(EPSFIGS)
-	latex piperesults.tex
-	latex piperesults.tex
+#$(PNGFIGS): %.png: %.fig
+#	fig2dev -L png -b 0 -S 4 $< > $@
 
-piperesults.ps: piperesults.tex piperesults.bbl $(EPSFIGS)
-	pslatex piperesults.tex
-	pslatex piperesults.tex
-	dvips -t letter -f -o $@ piperesults.dvi
+$(PNGFIGS): %.png: %.gif
+	convert -background '#c0d0f0' -transparent '#ffffff' -interlace Line $< $@
 
-piperesults.pdf: piperesults.tex piperesults.bbl $(PDFFIGS)
+$(PLOTS:.plot=.png): %.png: %.gif
+	convert -background 'white' -interlace Line $< $@
+
+.PHONY: gif png eps pdf
+gif: $(GIFFIGS) $(PLOTS:.plot=.gif)
+png: $(PNGFIGS) $(PLOTS:.plot=.png)
+eps: $(EPSFIGS) $(PLOTS:.plot=.eps)
+pdf: $(PDFFIGS) $(PLOTS:.plot=.pdf)
+
+$(PREFIX)_centos_comp.fig $(PREFIX)_centos_delay.fig $(PREFIX)_centos_perf.fig $(PREFIX)_centos_thrput.fig: $(PREFIX)_centos.dat
+$(PREFIX)_fc6_comp.fig $(PREFIX)_fc6_delay.fig $(PREFIX)_fc6_perf.fig $(PREFIX)_fc6_thrput.fig: $(PREFIX)_fc6.dat
+$(PREFIX)_nb_comp.fig $(PREFIX)_nb_delay.fig $(PREFIX)_nb_perf.fig $(PREFIX)_nb_thrput.fig: $(PREFIX)_nb.dat
+$(PREFIX)_rh7_comp.fig $(PREFIX)_rh7_delay.fig $(PREFIX)_rh7_perf.fig $(PREFIX)_rh7_thrput.fig: $(PREFIX)_rh7.dat
+$(PREFIX)_smp_comp.fig $(PREFIX)_smp_delay.fig $(PREFIX)_smp_perf.fig $(PREFIX)_smp_thrput.fig: $(PREFIX)_smp.dat
+$(PREFIX)_suse_comp.fig $(PREFIX)_suse_delay.fig $(PREFIX)_suse_perf.fig $(PREFIX)_suse_thrput.fig: $(PREFIX)_suse.dat
+$(PREFIX)_ubuntu_comp.fig $(PREFIX)_ubuntu_delay.fig $(PREFIX)_ubuntu_perf.fig $(PREFIX)_ubuntu_thrput.fig: $(PREFIX)_ubuntu.dat
+
+$(NAME).aux: $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
+	latex $(NAME).tex
+	latex $(NAME).tex
+
+$(NAME).bbl: $(NAME).bib $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
+	if test -f $(NAME).aux ; then :; else make $(NAME).aux ; fi
+	bibtex $(NAME)
+
+$(NAME).dvi: $(NAME).tex $(NAME).bbl $(EPSFIGS) $(PLOTS:.plot=.eps)
+	rm -f $(GIFFIGS) $(PLOTS:.plot=.gif)
+	rm -f $(PNGFIGS) $(PLOTS:.plot=.png)
+	latex $(NAME).tex
+	latex $(NAME).tex
+
+$(NAME).ps: $(NAME).tex $(NAME).bbl $(EPSFIGS) $(PLOTS:.plot=.eps)
+	rm -f $(GIFFIGS) $(PLOTS:.plot=.gif)
+	rm -f $(PNGFIGS) $(PLOTS:.plot=.png)
+	pslatex $(NAME).tex
+	pslatex $(NAME).tex
+	dvips -t letter -f -o $@ $(NAME).dvi
+
+$(NAME).pdf: $(NAME).tex $(NAME).bbl $(PDFFIGS) $(PLOTS:.plot=.pdf)
+	rm -f $(GIFFIGS) $(PLOTS:.plot=.gif)
+	rm -f $(PNGFIGS) $(PLOTS:.plot=.png)
 	pdflatex $<
 	pdflatex $<
 
-clean:
-	rm -f $(EPSFIGS) $(PDFFIGS) $(PLOTFIGS) \
-	piperesults.ps piperesults.pdf piperesults.dvi \
-	piperesults.bbl piperesults.aux piperesults.blg piperesults.glo piperesults.log
+$(NAME).html: $(NAME).tex $(NAME).bbl $(PNGFIGS) $(PLOTS:.plot=.png)
+	/usr/bin/latex2html -split 0 -noexternal_images -noascii_mode -font_size 12pt \
+		-nonavigation -numbered_footnotes -nosubdir -rooted -noinfo \
+		-norooted -antialias_text -antialias -white -image_type png \
+		-scalable_fonts $(NAME).tex
+	cat org.css >> $(NAME).css
+
+clean-gif:
+	rm -f $(GIFFIGS) $(PLOTS:.plot=.gif)
+
+clean-png:
+	rm -f $(PNGFIGS) $(PLOTS:.plot=.png)
+
+clean-eps:
+	rm -f $(EPSFIGS) $(PLOTS:.plot=.eps)
+
+clean-pdf:
+	rm -f $(PDFFIGS) $(PLOTS:.plot=.pdf)
+
+clean-figs: clean-gif clean-png clean-eps clean-pdf
+	rm -f $(PLOTFIGS)
+
+clean: clean-figs
+	rm -f *.bak $(NAME).ps $(NAME).pdf $(NAME).dvi \
+	$(NAME).bbl $(NAME).aux $(NAME).blg $(NAME).glo \
+	$(NAME).log \
+	index.html internals.pl labels.pl \
+	$(NAME).css $(NAME).html WARNINGS
+
+.PHONY: clean clean-figs clean-gif clean-png clean-eps clean-pdf
+

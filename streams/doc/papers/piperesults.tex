@@ -14,38 +14,38 @@
 \usepackage{placeins}
 %\usepackage{placeins}
 
-\setlength{\voffset}{-1.0in}
+\setlength{\voffset}{-1.2in}
 \setlength{\topmargin}{0.2in}
 \setlength{\headheight}{0.2in}
-\setlength{\headsep}{0.2in}
+\setlength{\headsep}{0.3in}
 \setlength{\topskip}{0.0in}
-\setlength{\footskip}{0.4in}
-\setlength{\textheight}{9.8in}
+\setlength{\footskip}{0.3in}
+\setlength{\textheight}{10.0in}
 
 \setlength{\hoffset}{-1.0in}
-\setlength{\oddsidemargin}{0.6in}
-\setlength{\evensidemargin}{0.4in}
+\setlength{\oddsidemargin}{0.5in}
+\setlength{\evensidemargin}{0.5in}
 \setlength{\textwidth}{7.5in}
 
 \setlength{\marginparwidth}{0.0in}
 \setlength{\marginparsep}{0.0in}
 
-\setlength{\columnsep}{0.2in}
-\setlength{\columnwidth}{3.65in}
+\setlength{\columnsep}{0.3in}
+\setlength{\columnwidth}{3.6in}
 %\setlength{\columnseprule}{0.25pt}
 
 \setlength{\paperheight}{11in}
 \setlength{\paperwidth}{8.5in}
 
-\let\Huge\huge
-\let\huge\LARGE
-\let\LARGE\Large
-\let\Large\large
-\let\large\normalsize
-\let\normalsize\small
-\let\small\footnotesize
-\let\footnotesize\scriptsize
-\let\scriptsize\tiny
+%\let\Huge = \huge
+%\let\huge = \LARGE
+%\let\LARGE = \Large
+%\let\Large = \large
+%\let\large = \normalsize
+%\let\normalsize = \small
+%\let\small = \footnotesize
+%\let\footnotesize = \scriptsize
+%\let\scriptsize = \tiny
 
 \makeatletter
 \renewcommand\section{\@startsection {section}{1}{\z@}%
@@ -101,15 +101,17 @@
 %\end{titlepage}
 
 \title{STREAMS-based vs. Legacy Pipe Performance Comparison\\[0.5ex]
-	{\large \textsl{Experimental Test Results for Linux}}}
+	{\large \textsl{Experiment Test Results for Linux}}}
 \author{Brian F. G. Bidulock\thanks{bidulock@openss7.org}\\
 	OpenSS7 Corporation}
+\date{May 1, 2007}
 \maketitle
 
 \begin{abstract}
-With the objective of constrasting performance between STREAMS and legacy approaches to system
-facilities, comparison is made between the tested performance of the Linux legacy pipe
-implementation and the STREAMS-based pipes using \textsl{Linux
+With the objective of contrasting performance between STREAMS and legacy
+approaches to system facilities, comparison is made between the tested
+performance of the Linux legacy pipe implementation and the STREAMS-based
+pipes using \textsl{Linux
 Fast-STREAMS}.\footnote{\textit{http://www.openss7.org/download.html}}
 \end{abstract}
 
@@ -117,14 +119,19 @@ Fast-STREAMS}.\footnote{\textit{http://www.openss7.org/download.html}}
 
 \section[Background]{Background}
 
+Pipes have a rich history in the UNIX operating system.  Present on early Bell
+Laboratories UNIX Versions, pipes found their way into both BSD and System V
+releases.  Finally, in 4.4BSD pipes are implemented with Sockets and in System
+V Release 4 pipes are implemented with STREAMS.
+
 \subsection[STREAMS]{STREAMS}
 
 STREAMS is a facility first presented in a paper by Dennis M. Ritchie in 1984
-\cite[]{Ritchie84}, originalling implemented on 4.1BSD and later part of Bell
+\cite[]{Ritchie84}, originally implemented on 4.1BSD and later part of Bell
 Laboratories Eighth and Ninth Edition UNIX, incorporated into UNIX System V
-Release 3.0, and enhanced in UNIX Sysvem V Release 4 and 4.2.  STREAMS was
-used in SVR4 for terminal intput/output, pseudo-terminals, pipes, named pipes
-(FIFOs), interprocess communication and networking.  Sinces it release in UNIX
+Release 3.0, and enhanced in UNIX System V Release 4 and 4.2.  STREAMS was
+used in SVR4 for terminal input/output, pseudo-terminals, pipes, named pipes
+(FIFOs), interprocess communication and networking.  Since it release in UNIX
 System V Release 3, STREAMS has been implemented across a wide range of UNIX,
 UNIX-like and UNIX-based systems, making its implementation and use an ipso
 facto standard.
@@ -133,7 +140,7 @@ STREAMS is a facility that allows for a reconfigurable full duplex
 communications path, \textit{Stream}, between a user process and a driver in
 the kernel.   Kernel protocol modules can be pushed onto and popped from the
 \textit{Stream} between the user process and driver.  The \textit{Stream} can
-be reconfigured in this way be a user process.  The user process, neighbouring
+be reconfigured in this way by a user process.  The user process, neighbouring
 protocol modules and the driver communicate with each other using a message
 passing scheme.  This permits a loose coupling between protocol modules,
 drivers and user processes, allowing a third-party and loadable kernel module
@@ -155,65 +162,67 @@ named pipes (FIFOs):
 
 \subsubsection*{Legacy Approach to Pipes.}
 
-Under the 4.2BSD or SVR3 approach, pipes were implemented using anonymous
+Under the 4.1BSD or SVR3 approach, pipes were implemented using anonymous
 FIFOs.  That is, when a pipe was opened, a new instance of a FIFO was
-obtained, but which was not attached to a node in the filesystem and which had
-two file descriptors: one open for writing and the other opened for reading.
-As FIFOs are a fundamentally unidirectional concept, legacy pipes can only
-pass data in one direction.  Also, legacy pipes do not support the concept of
-record boundaries and only support a byte stream.  Each end of the pipe uses a
-the legacy interface and they do not provide any of the advanced capabilities
-provided by STREAMS.
+obtained, but which was not attached to a node in the file system and which
+had two file descriptors: one open for writing and the other opened for
+reading.  As FIFOs are a fundamentally unidirectional concept, legacy pipes
+can only pass data in one direction.  Also, legacy pipes do not support the
+concept of record boundaries and only support a byte stream.  Each end of the
+pipe uses a the legacy interface and they do not provide any of the advanced
+capabilities provided by STREAMS.
 
 \subsubsection*{SVR4 Approach to Pipes.}
 
-Under the SVR4 approach, both pipes and FIFOs are implemented using STREAMS.
-When a pipe is opened, a new instance of a STREAMS-based pipe is obtained, but
-which is attached to a non-accessible node in the \texttt{pipefs} file system
-instead of the normal STREAMS \texttt{specfs} file system.  Although one file
-desriptor was opened for read and the other for write, with a STREAMS-based
-pipe it is possible to reopen both for reading and writing.
+Under the SVR4 approach, both pipes and FIFOs are implemented using STREAMS
+\cite[]{magic}.  When a pipe is opened, a new instance of a STREAMS-based pipe
+is obtained, but which is attached to a non-accessible node in the
+\texttt{fifofs} file system instead of the normal STREAMS \texttt{specfs} file
+system.  Although one file descriptor was opened for read and the other for
+write, with a STREAMS-based pipe it is possible to reopen both for reading and
+writing.
 
 \begin{figure}[htp]
-\center\includegraphics[width=2.5in]{streamspipe}
+\center\includegraphics[width=3.0in]{streamspipe}
 \caption[STREAMS-Based Pipes]{STREAMS-Based Pipes}
 \label{figure:streamspipe}
 \end{figure}
 
 The STREAMS-based pipes provide the same rich set of facilities that are also
-available for other STREAMS devices such as pseduo-terminals and network
+available for other STREAMS devices such as pseudo-terminals and network
 interfaces.  As a result, STREAMS-based pipes provide a number of capabilities
 that are not provided by legacy pipes:
 
 \begin{description}
 
-\item \textit{Full Duplex.}
+\item[\textit{Full Duplex.}]
 
 STREAMS-based pipes are full duplex pipes.  That is, each end of the pipe can
-be used for reading and writing.  To accompish the same effect with legacy
+be used for reading and writing.  To accomplish the same effect with legacy
 pipes requires that two legacy pipes be opened.
 
-\item \textit{Pushable Modules.}
+\item[\textit{Pushable Modules.}]
 
 STREAMS-based pipes can have STREAMS modules pushed an popped from either end
 of the pipe, just as any other STREAMS device.
 
-\item \textit{File Attachment.}
+\item[\textit{File Attachment.}]
 
 STREAMS-based pipes can have either end (or both ends) attached to a node in
-the filesystem using fattach(3).
+the file system using fattach(3) \cite[]{advprog}.
 
-\item \textit{File Descriptor Passing.}
+\item[\textit{File Descriptor Passing.}]
 
 STREAMS-based pipes can pass file descriptors across the pipe using the
-\texttt{I\_SENDFD} and \texttt{I\_RECVFD} input-output controls.
+\texttt{I\_SENDFD} and \texttt{I\_RECVFD} input-output controls
+\cite[]{advprog}.
 
-\item \textit{Record Boundary Preservation.}
+\item[\textit{Record Boundary Preservation.}]
 
 STREAMS-based pipes can preserve record boundaries and can pass messages
 atomically using the getmsg(2) and putmsg(2) system calls.
 
-\item \textit{Prioritization of Messages.}
+\item[\textit{Prioritization of Messages.}]
 
 STREAMS-based pipes can pass messages in priority bands using the getpmsg(2)
 and putpmsg(2) system calls.
@@ -222,34 +231,34 @@ and putpmsg(2) system calls.
 
 \subsubsection*{BSD Approach to Pipes.}
 
-As of 4.3BSD, pipes were implemented using the networking subsystem (UNIX
-domain sockets) for what was cited as \textit{"performance reasons"}
-\cite[]{bsd}.  The pipe(2) library call effectively calls sockpair(3) and
-obtains a pair of connected sockets in the UNIX domain as illustrated in
-\textit{Figure \ref{figure:socketpipe}}.
+As of 4.2BSD, with the introduction of Sockets, pipes were implemented using
+the networking subsystem (UNIX domain sockets) for what was cited as
+\textit{"performance reasons"} \cite[]{bsd}.  The pipe(2) library call
+effectively calls sockpair(3) and obtains a pair of connected sockets in the
+UNIX domain as illustrated in \textit{Figure \ref{figure:socketpipe}}.
 
 \begin{figure}[htp]
-\center\includegraphics[width=2.0in]{socketpipe}
-\caption[4.3BSD Pipes]{4.3BSD Pipes}
+\center\includegraphics[width=2.5in]{socketpipe}
+\caption[4.2BSD Pipes]{4.2BSD Pipes}
 \label{figure:socketpipe}
 \end{figure}
 
 Knowing the result of this testing, I can only imagine that the
-\textit{"performance reasons"} had to do with the lack of a proper flow
+\textit{"performance reasons"} had to do with the lack of a full flow
 control mechanism in the legacy file system based pipes.
 
 \subsubsection*{Linux Approach to Pipes.}
 
-Linux adopts the legacy (4.2BSD or SVR3 pre-STREAMS) approach to pipes.  Pipes
-are file system based, and obtain an inode from the \texttt{pipefs} file
-system as illustrated in \textit{Figure \ref{figure:legacypipe}}.  Pipes are
-unnamed FIFOs, unidirectional byte streams, and do not provide any of the
+Linux adopts the legacy (4.1BSD or SVR3 pre-STREAMS) approach to pipes.  Pipes
+are file system based, and obtain an \texttt{inode} from the \texttt{pipefs}
+file system as illustrated in \textit{Figure \ref{figure:legacypipe}}.  Pipes
+are unnamed FIFOs, unidirectional byte streams, and do not provide any of the
 capabilities of STREAMS-based pipes or socket pairs in the UNIX
 domain.\footnote{It has been said of Linux that, without STREAMS, it is just
 another BSD... ...and not a very good one.}
 
 \begin{figure}[htp]
-\center\includegraphics[width=2.5in]{legacypipe}
+\center\includegraphics[width=3.0in]{legacypipe}
 \caption[Linux Legacy Pipes]{Linux Legacy Pipes}
 \label{figure:legacypipe}
 \end{figure}
@@ -257,9 +266,9 @@ another BSD... ...and not a very good one.}
 \subsubsection*{Standardization.}
 
 During the POSIX standardization process, pipes and FIFOs were given special
-treatment to ensure that both the legacy approach to pipes, 4.3BSD approach
+treatment to ensure that both the legacy approach to pipes, 4.2BSD approach
 and the STREAMS-based approach to pipes were compatible.  POSIX has
-standarized the programmatic interface to pipes.  STREAMS-based pipes have
+standardized the programmatic interface to pipes.  STREAMS-based pipes have
 been POSIX compliant for many years and were POSIX compliant in the
 \textsl{SVR4.2} release.  The STREAMS-based pipes provided by the
 \textsl{Linux Fast-STREAMS} package provides POSIX compliant STREAMS-based
@@ -274,12 +283,12 @@ implementation or use.}
 \section[Objective]{Objective}
 
 The objective of the current study is to determine whether, for the Linux
-operating system, the newer STREAMS-based pipe approach is viable as a
-replacement of the legacy 4.2BSD/SVR3-style pipes provided by Linux.  As a
-side objective, a comparison is also made to STREAMS-based pipes implemented
-on the deprecated LiS (Linux STREAMS) package.  This comparison will
-demonstrate one reason why \textsl{Linux Fast-STREAMS} was written in the
-first place.
+operating system, the newer STREAMS-based pipe approach is (from the
+perspective of performance) a viable replacement for the legacy
+4.1BSD/SVR3-style pipes provided by Linux.  As a side objective, a comparison
+is also made to STREAMS-based pipes implemented on the deprecated LiS (Linux
+STREAMS) package.  This comparison will demonstrate one reason why
+\textsl{Linux Fast-STREAMS} was written in the first place.
 
 \paragraph*{Misconceptions}
 
@@ -294,7 +303,7 @@ STREAMS-based pipes, as follows:
 \item STREAMS is more flexible, but less efficient.\footnote{For example, see
 \textit{http://www.kernel.org/pub/linux/docs/lkml/\#s9-9} .}
 
-\item STREAMS performs poorly on uniprocessor and ever poorer on SMP.
+\item STREAMS performs poorly on uniprocessor and even poorer on SMP.
 
 \item STREAMS-based pipes are slow.
 
@@ -303,7 +312,7 @@ STREAMS-based pipes, as follows:
 \end{itemize}
 
 It is possible that the proponents of these statements have worked in the past
-with an improper or underperforming STREAMS implementation (such as
+with an improper or under-performing STREAMS implementation (such as
 \textsl{LiS}); however, the current study aims to prove that none of these
 statements are correct for the STREAMS-based pipes provided by \textsl{Linux
 Fast-STREAMS}.
@@ -357,15 +366,16 @@ implementation details are described below.
 \subsection[Linux Pipes]{Linux Pipes}
 
 Linux pipes are implemented using a file-system approach similar to that of
-4.2BSD or that of SVR3 and SVR2 releases, as illustrated in \textit{Figure
-\ref{figure:legacypipe}}.  It should be noted that 4.4BSD implements pipes
-using Sockets and the networking subsystem \cite[]{bsd}.  Also, note that SVR3
+4.1BSD, or that of SVR3 and SVR2 releases, or their common Bell Laboratories
+predecessors, as illustrated in \textit{Figure \ref{figure:legacypipe}}.  It
+should be noted that 4.4BSD (and releases after 4.2BSD) implements pipes using
+Sockets and the networking subsystem \cite[]{bsd}.  Also, note that SVR4
 implemented pipes using STREAMS.  As such, the Linux pipe implementation is
 both archaic and deprecated.
 
 \paragraph*{Write side processing.}
 
-In reponse to a write(2) system call, message bytes are copied from user space
+In response to a write(2) system call, message bytes are copied from user space
 to kernel directly into a preallocated buffer.  The tail pointer is pushed on
 the buffer.  If the buffer is full at the time of the system call, the calling
 process blocks, or the system call fails and returns an error number
@@ -375,7 +385,7 @@ process blocks, or the system call fails and returns an error number
 
 In response to a read(2) system call, message bytes are copied from the
 preallocated buffer to user space.  The head pointer is pushed on the buffer.
-If the buffy is empty at the time of the system call, the calling process
+If the buffer is empty at the time of the system call, the calling process
 blocks, or the system call fails and returns an error number (\texttt{EAGAIN}
 or \texttt{EWOULDBLOCK}).
 
@@ -397,7 +407,7 @@ buffer.
 
 \subsection[STREAMS-based Pipes]{STREAMS-based Pipes}
 
-STREAMS-based pipes are implemented using a specialzed STREAMS driver that
+STREAMS-based pipes are implemented using a specialized STREAMS driver that
 connects the read and write queues of two \textit{Stream heads} in a twisted
 pair configuration as illustrated in \textit{Figure \ref{figure:streamspipe}}.
 Aside from a few specialized settings particular to pipes, each \textit{Stream
@@ -406,25 +416,25 @@ STREAMS device or pseudo-device.
 
 \paragraph*{Write side processing.}
 
-In reponse to a write(2) system call, message bytes are copied from user space
+In response to a write(2) system call, message bytes are copied from user space
 into allocated message blocks.  Message blocks are passed downstream to the
 next module (read \textit{Stream head}) in the \textit{Stream}.  If flow
-control is in effect on the write queue at the time fo the system call, the
+control is in effect on the write queue at the time of the system call, the
 calling process blocks, or the system call fails and returns an error number
 (\texttt{EAGAIN}).
-Also, STREAMS has a write message coallescing feature that allows message
+Also, STREAMS has a write message coalescing feature that allows message
 blocks to be held temporarily on the write queue awaiting execution of the
 write queue service procedure (invoked by the STREAMS scheduler) or the
-occurence of another write operation.
+occurrence of another write operation.
 
 \paragraph*{Read side processing.}
 
-In reponse to a read(2) system call, message blocks are removed from the read
+In response to a read(2) system call, message blocks are removed from the read
 queue and message bytes copied from kernel to user space.  If there are no
 message blocks in the read queue at the time of the system call, the calling
 process blocks, or the system call fails and returns and error number
 (\texttt{EAGAIN}).
-Also, STREAMS has a read notification feature that causes a read notificaiton
+Also, STREAMS has a read notification feature that causes a read notification
 message (\texttt{M\_READ}) containing the requested number of bytes to be
 issued  and passed downstream before blocking.
 STREAMS has an additional read-fill mode feature which causes the read side to
@@ -435,7 +445,7 @@ attempt to satisfy the entire read request before returning to the user.
 If a writer goes to write and the write queue is flow controlled, the writer
 blocks or the system call is failed (\texttt{EAGAIN}).  If a reader goes to
 read and there are no message blocks available, the reader blocks or the
-system call is failed (\texttt{EAGAIN}).  If there are fewer bytes availale in
+system call is failed (\texttt{EAGAIN}).  If there are fewer bytes available in
 message blocks on the read queue than requested by the read operation, the
 available bytes are returned.  Normal STREAMS queueing and flow control is
 performed as message blocks are passed along the write side or removed from
@@ -446,7 +456,7 @@ the read queue.
 When a write is blocked or polling for write, the writer is awoken once flow
 control subsides on the write side.  Flow control subsides when the downstream
 module's queue on the write side falls below its low water mark, the
-\textit{Stream} is backenabled, and the write queue service procedure runs.
+\textit{Stream} is back-enabled, and the write queue service procedure runs.
 When a reader is blocked or polling for read, the reader is awoken once the
 read queue service procedure runs.  The read queue service procedure is
 scheduled when the first message block is placed on the read queue after an
@@ -456,7 +466,8 @@ procedure runs when the STREAMS scheduler runs.
 \section[Method]{Method}
 
 To test the performance of STREAMS-based pipes, the \textsl{Linux
-Fast-STREAMS} package was used from \textit{http://www.openss7.org/}.  The
+Fast-STREAMS} package was
+used.\footnote{\textit{http://www.openss7.org/download.html}}  The
 \textsl{Linux Fast-STREAMS} package builds and install Linux loadable kernel
 modules and includes the \texttt{perftest} program used for testing.  For
 comparison, the \textsl{LiS} package from \textit{http://www.openss7.org/} was
@@ -475,31 +486,36 @@ actions:
 
 \item Opens either a legacy pipe or a STREAMS-based pipe.
 
-\item Forks two child processes: a writer child process and a reader child process.
+\item Forks two child processes: a writer child process and a reader child
+process.
 
 \item The writer child process closes the reading end of the pipe.
 
 \item The writer child process starts an interval timer.
 
-\item The writer child process begins writing data to the pipe end with the write(2) system
-call.
+\item The writer child process begins writing data to the pipe end with the
+write(2) system call.
 
-\item As the writer child process writes to the pipe end, it tallies the amount of data written.
-When the interval timer expires, the tally is output and the interval timer restarted.
+\item As the writer child process writes to the pipe end, it tallies the
+amount of data written.  When the interval timer expires, the tally is output
+and the interval timer restarted.
 
 \item The reader child process closes the writing end of the pipe.
 
 \item The reader child process starts an interval timer.
 
-\item The reader child process begins reading data from the pipe end with the read(2)
-system call.
+\item The reader child process begins reading data from the pipe end with the
+read(2) system call.
 
-\item As the reader child process reads from the pipe end, it tallies the amount of data written.
-When the interval timer expires, the tally is output and the interval timer restarted.
+\item As the reader child process reads from the pipe end, it tallies the
+amount of data written.  When the interval timer expires, the tally is output
+and the interval timer restarted.
 
 \end{enumerate}
 
-The test program thus simulates a typical use of pipes in a Linux system.
+The test program thus simulates a typical use of pipes in a Linux system.  The
+\texttt{perftest\_script} performance testing script was used to obtain
+repeatable results (see \textit{Appendix \ref{section:script}}).
 
 \subsection[Disributions Tested]{Distrbutions Tested}
 
@@ -522,6 +538,7 @@ Fedora Core 6 & 2.6.20-1.2933.fc6
 To remove the dependence of test results on a particular machine, various
 machines were used for testing as follows:
 
+\footnotesize
 \begin{tabular}{llll}\\
 Hostname & Processor & Memory & Architecture\\
 \hline
@@ -530,20 +547,21 @@ pumbah & 2.57GHz PIV & 1Gb (333MHz) & i686 UP\\
 daisy & 3.0GHz i630 HT & 1Gb (400MHz) & x86\_64 SMP\\
 mspiggy & 1.7GHz PIV & 1Gb (333MHz) & i686 UP\\
 \end{tabular}\\
+\normalsize
 
 \section[Results]{Results}
 
 The results for the various distributions and machines is tabulated in
 \textit{Appendix \ref{section:rawdata}}.  The data is tabulated as follows:
 
-\begin{itemize}
+\begin{description}
 
-\item \textit{Performance.}
+\item[{\it Performance.}]
 
 Performance is charted by graphing the number of writes per second against the
 logarithm of the write size.
 
-\item \textit{Delay.}
+\item[{\it Delay.}]
 
 Delay is charted by graphing the number of second per write against the write
 size.  The delay can be modelled as a fixed write overhead per write operation
@@ -554,7 +572,7 @@ implementations use the same primary mechanisms for copying bytes to and from
 user space, it is expected that the slope of each graph will be similar and
 that the intercept will reflect most implementation differences.
 
-\item \textit{Throughput.}
+\item[{\it Throughput.}]
 
 Throughput is charted by graphing the logarithm of the product of the number
 of writes per second and the message size against the logarithm of the message
@@ -562,15 +580,15 @@ size.  It is expected that these graphs will exhibit strong log-log-linear
 (power function) characteristics.  Any curvature in these graphs represent
 throughput saturation.
 
-\item \textit{Improvement.}
+\item[{\it Improvement.}]
 
 Improvement is charted by graphing the quotient of the writes per second of
 the implementation and the writes per second of the Linux legacy pipe
-implementation as a percentage against the write size.  Values over 100\%
-represent an improvement over Linux legacy pipes, whereas values under 100\%
+implementation as a percentage against the write size.  Values over 0\%
+represent an improvement over Linux legacy pipes, whereas values under 0\%
 represent the lack of an improvement.
 
-\end{itemize}
+\end{description}
 
 The results are organized in the section that follow in order of the machine
 tested.
@@ -595,21 +613,47 @@ Fedora Core 6 is the most recent full release Fedora distribution.  This
 distribution sports a 2.6.20-1.2933.fc6 kernel with the latest patches.  This
 is the \texttt{x86} distribution with recent updates.
 
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_fc6_perf}
+\caption[FC6 on Porky Performance]{FC6 on Porky Performance}
+\label{figure:fc6perf}
+\end{figure}
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_fc6_delay}
+\caption[FC6 on Porky Delay]{FC6 on Porky Delay}
+\label{figure:fc6delay}
+\end{figure}
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_fc6_thrput}
+\caption[FC6 on Porky Throughput]{FC6 on Porky Throughput}
+\label{figure:fc6thrput}
+\end{figure}
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_fc6_comp}
+\caption[FC6 on Porky Comparison]{FC6 on Porky Comparison}
+\label{figure:fc6comp}
+\end{figure}
+
 \begin{description}
 
 \item[Performance.]
 
-\textit{Figure \ref{figure:fc6perf} (p. \pageref{figure:fc6perf})} illustrates
+\textit{Figure \ref{figure:fc6perf}} illustrates
 the performance of \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy
 pipes across a range of write sizes.  As can be see from \textit{Figure
 \ref{figure:fc6perf}}, the performance of \textsl{LiS} is dismal across the
 entire range of write sizes.  The performance of \textsl{Linux Fast-STREAMS}
 STREAMS-based pipes, on the other hand, is superior across the entire range of
 write sizes.
+Performance of \textsl{Linux Fast-STREAMS} is a full order of magnitude better
+than \textsl{LiS}.
 
 \item[Delay.]
 
-\textit{Figure \ref{figure:fc6delay} (p. \pageref{figure:fc6delay})}
+\textit{Figure \ref{figure:fc6delay}}
 illustrates the average write delay for \textsl{LiS}, \textsl{Linux
 Fast-STREAMS} and Linux legacy pipes across a range of write sizes.  The slope
 of all three curves is comparable and about the same.  This indicates that
@@ -623,7 +667,7 @@ of the Linux legacy pipes, and a sixth of \textsl{LiS} pipes).
 
 \item[Throughput.]
 
-\textit{Figure \ref{figure:fc6thrput} (p. \pageref{figure:fc6thrput})}
+\textit{Figure \ref{figure:fc6thrput}}
 illustrates the throughput experienced by \textsl{LiS}, \textsl{Linux
 Fast-STREAMS} and Linux legacy pipes across a range of write sizes.  As can be
 seen from \textit{Figure \ref{figure:fc6thrput}}, all implementations exhibit
@@ -632,7 +676,7 @@ each implementation (regardless of performance).
 
 \item[Improvement.]
 
-\textit{Figure \ref{figure:fc6comp} (p. \pageref{figure:fc6comp})} illustrates
+\textit{Figure \ref{figure:fc6comp}} illustrates
 the improvement over Linux legacy pipes of \textsl{Linux Fast-STREAMS}
 STREAMS-based pipes.  The improvement of \textsl{Linux Fast-STREAMS} over
 Linux legacy pipes is marked: improvements range from a significant 75\%
@@ -641,106 +685,84 @@ in performance at lower write sizes.
 
 \end{description}
 
-\begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_fc6_perf}
-\caption[FC6 on Porky Performance]{FC6 on Porky Performance}
-\label{figure:fc6perf}
-\end{figure}
-
-\begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_fc6_delay}
-\caption[FC6 on Porky Delay]{FC6 on Porky Delay}
-\label{figure:fc6delay}
-\end{figure}
-
-\begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_fc6_thrput}
-\caption[FC6 on Porky Throughput]{FC6 on Porky Throughput}
-\label{figure:fc6thrput}
-\end{figure}
-
-\begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_fc6_comp}
-\caption[FC6 on Porky Comparison]{FC6 on Porky Comparison}
-\label{figure:fc6comp}
-\end{figure}
-
 \subsubsection[CentOS 4.0]{CentOS 4.0}
 
 CentOS 4.0 is a clone of the RedHat Enterprise 4 distribution.  This is the
 \texttt{x86} version of the distribution.  The distribution sports a
 2.6.9-5.0.3.EL kernel.
 
-\begin{description}
-
-\item[Performance.]
-
-\textit{Figure \ref{figure:centosperf} (p. \pageref{figure:centosperf})}
-illustrates the performance of \textsl{LiS}, \textsl{Linux Fast-STREAMS} and
-Linux legacy pipes across a range of write sizes.  As can be see from
-\textit{Figure \ref{figure:centosperf}}, the performance of \textsl{LiS} is
-dismal across the entire range of write sizes.  The performance of
-\textsl{Linux Fast-STREAMS} STREAMS-based pipes, on the other hand, is
-superior across the entire range of write sizes.
-
-\item[Delay.]
-
-\textit{Figure \ref{figure:centosdelay} (p. \pageref{figure:centosdelay})}
-illustrates the average write delay for \textsl{LiS}, \textsl{Linux
-Fast-STREAMS} and Linux legacy pipes across a range of write sizes.  The slope
-of all three curves is comparable and about the same.  This indicates that
-each implementation is only slightly dependent upon the size of the message
-and each implementation has a low per-byte processing overhead.  This is as
-expected as pipes primarily copy data from user space to the kernel just to
-copy it back to user space on the other end.  Note that the intercepts, on the
-other hand, differ to a significant extent.  \textsl{Linux Fast-STREAMS}
-STREAMS-based pipes have by far the lowest per-write overhead (about half that
-of the Linux legacy pipes, and a sixth of \textsl{LiS} pipes).
-
-\item[Throughput.]
-
-\textit{Figure \ref{figure:centosthrput} (p. \pageref{figure:centosthrput})}
-illustrates the throughput experienced by \textsl{LiS}, \textsl{Linux
-Fast-STREAMS} and Linux legacy pipes across a range of write sizes.  As can be
-seen from \textit{Figure \ref{figure:centosthrput}}, all implementations
-exhibit strong power function characteristics, indicating structure and
-robustness for each implementation (regardless of performance).
-
-\item[Improvement.]
-
-\textit{Figure \ref{figure:centoscomp} (p. \pageref{figure:centoscomp})}
-illustrates the improvement over Linux legacy pipes of \textsl{Linux
-Fast-STREAMS} STREAMS-based pipes.  The improvement of \textsl{Linux
-Fast-STREAMS} over Linux legacy pipes is marked: improvements range from a
-significant 75\% increase in performance at large write sizes, to a staggering
-200\% increase in performance at lower write sizes.
-
-\end{description}
-
-
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_centos_perf}
+\includegraphics[width=\columnwidth]{perftest_centos_perf}
 \caption[CentOS 4.0 on Porky Performance]{CentOS 4.0 on Porky Performance}
 \label{figure:centosperf}
 \end{figure}
 
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_centos_delay}
+\includegraphics[width=\columnwidth]{perftest_centos_delay}
 \caption[CentOS 4.0 on Porky Delay]{CentOS 4.0 on Porky Delay}
 \label{figure:centosdelay}
 \end{figure}
 
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_centos_thrput}
+\includegraphics[width=\columnwidth]{perftest_centos_thrput}
 \caption[CentOS 4.0 on Porky Throughput]{CentOS 4.0 on Porky Throughput}
 \label{figure:centosthrput}
 \end{figure}
 
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_centos_comp}
+\includegraphics[width=\columnwidth]{perftest_centos_comp}
 \caption[CentOS 4.0 on Porky Comparison]{CentOS 4.0 on Porky Comparison}
 \label{figure:centoscomp}
 \end{figure}
+
+\begin{description}
+
+\item[Performance.]
+
+\textit{Figure \ref{figure:centosperf}} illustrates the performance of
+\textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  As can be see from \textit{Figure
+\ref{figure:centosperf}}, the performance of \textsl{LiS} is dismal across the
+entire range of write sizes.  The performance of \textsl{Linux Fast-STREAMS}
+STREAMS-based pipes, on the other hand, is superior across the entire range of
+write sizes.
+Performance of \textsl{Linux Fast-STREAMS} is a full order of magnitude better
+than \textsl{LiS}.
+
+\item[Delay.]
+
+\textit{Figure \ref{figure:centosdelay}} illustrates the average write delay
+for \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  The slope of all three curves is comparable and about
+the same.  This indicates that each implementation is only slightly dependent
+upon the size of the message and each implementation has a low per-byte
+processing overhead.  This is as expected as pipes primarily copy data from
+user space to the kernel just to copy it back to user space on the other end.
+Note that the intercepts, on the other hand, differ to a significant extent.
+\textsl{Linux Fast-STREAMS} STREAMS-based pipes have by far the lowest
+per-write overhead (about half that of the Linux legacy pipes, and a sixth of
+\textsl{LiS} pipes).
+
+\item[Throughput.]
+
+\textit{Figure \ref{figure:centosthrput}} illustrates the throughput
+experienced by \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy
+pipes across a range of write sizes.  As can be seen from \textit{Figure
+\ref{figure:centosthrput}}, all implementations exhibit strong power function
+characteristics, indicating structure and robustness for each implementation
+(regardless of performance).
+
+\item[Improvement.]
+
+\textit{Figure \ref{figure:centoscomp}} illustrates the improvement over Linux
+legacy pipes of \textsl{Linux Fast-STREAMS} STREAMS-based pipes.  The
+improvement of \textsl{Linux Fast-STREAMS} over Linux legacy pipes is marked:
+improvements range from a significant 100\% increase in performance at large
+write sizes, to a staggering 275\% increase in performance at lower write
+sizes.
+
+\end{description}
+
 
 \subsubsection[SuSE 10.0 OSS]{SuSE 10.0 OSS}
 
@@ -749,67 +771,73 @@ There have been two releases subsequent to this one: the 10.1 and recent 10.2
 releases.  The SuSE 10 release sports a 2.6.13 kernel and the
 2.6.13-15-default kernel was the tested kernel.
 
-\begin{description}
-
-\item[Performance.]
-
-\textit{Figure \ref{figure:suseperf} (p. \pageref{figure:suseperf})}
-illustrates the performance of \textsl{LiS}, \textsl{Linux Fast-STREAMS} and
-Linux legacy pipes across a range of write sizes.  As can be see from
-\textit{Figure \ref{figure:suseperf}}, the performance of \textsl{LiS} is
-dismal across the entire range of write sizes.  The performance of
-\textsl{Linux Fast-STREAMS} STREAMS-based pipes, on the other hand, is
-superior across the entire range of write sizes.
-
-\item[Delay.]
-
-\textit{Figure \ref{figure:susedelay} (p. \pageref{figure:susedelay})}
-illustrates the average write delay for \textsl{LiS}, \textsl{Linux
-Fast-STREAMS} and Linux legacy pipes across a range of write sizes.
-
-\item[Throughput.]
-
-\textit{Figure \ref{figure:susethrput} (p. \pageref{figure:susethrput})}
-illustrates the throughput experienced by \textsl{LiS}, \textsl{Linux
-Fast-STREAMS} and Linux legacy pipes across a range of write sizes.  As can be
-seen from \textit{Figure \ref{figure:susethrput}}, all implementations exhibit
-strong power function characteristics, indicating structure and robustness for
-each implementation.
-
-\item[Improvement.]
-
-\textit{Figure \ref{figure:susecomp} (p. \pageref{figure:susecomp})}
-illustrates the improvement over Linux legacy pipes of \textsl{Linux
-Fast-STREAMS} STREAMS-based pipes.  The improvement of \textsl{Linux
-Fast-STREAMS} over Linux legacy pipes is significant: improvements range from
-a 75\% increase in performance at large write sizes, to a 200\% increase in
-performance at lower write sizes.
-
-\end{description}
-
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_suse_perf}
+\includegraphics[width=\columnwidth]{perftest_suse_perf}
 \caption[SuSE 10.0 OSS on Porky Performance]{SuSE 10.0 OSS on Porky Performance}
 \label{figure:suseperf}
 \end{figure}
 
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_suse_delay}
+\includegraphics[width=\columnwidth]{perftest_suse_delay}
 \caption[SuSE 10.0 OSS on Porky Delay]{SuSE 10.0 OSS on Porky Delay}
 \label{figure:susedelay}
 \end{figure}
 
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_suse_thrput}
+\includegraphics[width=\columnwidth]{perftest_suse_thrput}
 \caption[SuSE 10.0 OSS on Porky Throughput]{SuSE 10.0 OSS on Porky Throughput}
 \label{figure:susethrput}
 \end{figure}
 
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_suse_comp}
+\includegraphics[width=\columnwidth]{perftest_suse_comp}
 \caption[SuSE 10.0 OSS on Porky Comparison]{SuSE 10.0 OSS on Porky Comparison}
 \label{figure:susecomp}
 \end{figure}
+
+\begin{description}
+
+\item[Performance.]
+
+\textit{Figure \ref{figure:suseperf}} illustrates the performance of
+\textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  As can be see from \textit{Figure
+\ref{figure:suseperf}}, the performance of \textsl{LiS} is dismal across the
+entire range of write sizes.  The performance of \textsl{Linux Fast-STREAMS}
+STREAMS-based pipes, on the other hand, is superior across the entire range of
+write sizes.
+Performance of \textsl{Linux Fast-STREAMS} is a full order of magnitude better
+than \textsl{LiS}.
+
+\item[Delay.]
+
+\textit{Figure \ref{figure:susedelay}} illustrates the average write delay for
+\textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  The slope of the delay curves are similar for all
+implementations, as expected.  The zero intercept of \textsl{Linux
+Fast-STREAMS} is, however, far superior to that of legacy Linux and a full
+order of magnitude better than the underpeforming \textsl{LiS}.
+
+\item[Throughput.]
+
+\textit{Figure \ref{figure:susethrput}} illustrates the throughput experienced
+by \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  As can be seen from \textit{Figure
+\ref{figure:susethrput}}, all implementations exhibit strong power function
+characteristics, indicating structure and robustness for each implementation.
+The \textsl{Linux Fast-STREAMS} curve exhibits a downward concave
+characteristic at large message sizes indicating that the memory bus saturates
+at about 10Gbps.
+
+\item[Improvement.]
+
+\textit{Figure \ref{figure:susecomp}} illustrates the improvement over Linux
+legacy pipes of \textsl{Linux Fast-STREAMS} STREAMS-based pipes.  The
+improvement of \textsl{Linux Fast-STREAMS} over Linux legacy pipes is
+significant: improvements range from a 100\% increase in performance at large
+write sizes, to a 475\% increase in performance at lower write sizes.
+
+\end{description}
 
 \subsubsection[Ubuntu 6.06]{Ubuntu 6.06}
 
@@ -817,67 +845,70 @@ Ubuntu 6.06 is the current release of the Ubuntu distribution.  The Ubuntu
 6.06 release sports a 2.6.15 kernel.  The tested distribution had current
 updates applied.
 
-\begin{description}
-
-\item[Performance.]
-
-\textit{Figure \ref{figure:ubuntuperf} (p. \pageref{figure:ubuntuperf})}
-illustrates the performance of \textsl{LiS}, \textsl{Linux Fast-STREAMS} and
-Linux legacy pipes across a range of write sizes.  As can be see from
-\textit{Figure \ref{figure:ubuntuperf}}, the performance of \textsl{LiS} is
-dismal across the entire range of write sizes.  The performance of
-\textsl{Linux Fast-STREAMS} STREAMS-based pipes, on the other hand, is
-superior across the entire range of write sizes.
-
-\item[Delay.]
-
-\textit{Figure \ref{figure:ubuntudelay} (p. \pageref{figure:ubuntudelay})}
-illustrates the average write delay for \textsl{LiS}, \textsl{Linux
-Fast-STREAMS} and Linux legacy pipes across a range of write sizes.
-
-\item[Throughput.]
-
-\textit{Figure \ref{figure:ubuntuthrput} (p.  \pageref{figure:ubuntuthrput})}
-illustrates the throughput experienced by \textsl{LiS}, \textsl{Linux
-Fast-STREAMS} and Linux legacy pipes across a range of write sizes.  As can be
-seen from \textit{Figure \ref{figure:ubuntuthrput}}, all implementations
-exhibit strong power function characteristics, indicating structure and
-robustness for each implementation.
-
-\item[Improvement.]
-
-\textit{Figure \ref{figure:ubuntucomp} (p. \pageref{figure:ubuntucomp})}
-illustrates the improvement over Linux legacy pipes of \textsl{Linux
-Fast-STREAMS} STREAMS-based pipes.  The improvement of \textsl{Linux
-Fast-STREAMS} over Linux legacy pipes is significant: improvements range from
-a 75\% increase in performance at large write sizes, to a 200\% increase in
-performance at lower write sizes.
-
-\end{description}
-
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_ubuntu_perf}
+\includegraphics[width=\columnwidth]{perftest_ubuntu_perf}
 \caption[Ubuntu 6.06 on Porky Performance]{Ubuntu 6.06 on Porky Performance}
 \label{figure:ubuntuperf}
 \end{figure}
 
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_ubuntu_delay}
+\includegraphics[width=\columnwidth]{perftest_ubuntu_delay}
 \caption[Ubuntu 6.06 on Porky Delay]{Ubuntu 6.06 on Porky Delay}
 \label{figure:ubuntudelay}
 \end{figure}
 
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_ubuntu_thrput}
+\includegraphics[width=\columnwidth]{perftest_ubuntu_thrput}
 \caption[Ubuntu 6.06 on Porky Throughput]{Ubuntu 6.06 on Porky Throughput}
 \label{figure:ubuntuthrput}
 \end{figure}
 
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_ubuntu_comp}
+\includegraphics[width=\columnwidth]{perftest_ubuntu_comp}
 \caption[Ubuntu 6.06 on Porky Comparison]{Ubuntu 6.06 on Porky Comparison}
 \label{figure:ubuntucomp}
 \end{figure}
+
+\begin{description}
+
+\item[Performance.]
+
+\textit{Figure \ref{figure:ubuntuperf}} illustrates the performance of
+\textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  As can be see from \textit{Figure
+\ref{figure:ubuntuperf}}, the performance of \textsl{LiS} is dismal across the
+entire range of write sizes.  The performance of \textsl{Linux Fast-STREAMS}
+STREAMS-based pipes, on the other hand, is superior across the entire range of
+write sizes.  Performance of \textsl{Linux Fast-STREAMS} is a full order of
+magnitude better than \textsl{LiS}.
+
+\item[Delay.]
+
+\textit{Figure \ref{figure:ubuntudelay}} illustrates the average write delay
+for \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  Again, the slope of the delay curves is similar, but
+\textsl{Linux Fast-STREAMS} exhibits a greatly reduced intercept indicating
+superior per-message overheads.
+
+\item[Throughput.]
+
+\textit{Figure \ref{figure:ubuntuthrput}} illustrates the throughput
+experienced by \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy
+pipes across a range of write sizes.  As can be seen from \textit{Figure
+\ref{figure:ubuntuthrput}}, all implementations exhibit strong power function
+characteristics, indicating structure and robustness for each implementation.
+Again \textsl{Linux Fast-STREAMS} appears to saturate the memory bus
+approaching 10Gbps.
+
+\item[Improvement.]
+
+\textit{Figure \ref{figure:ubuntucomp}} illustrates the improvement over Linux
+legacy pipes of \textsl{Linux Fast-STREAMS} STREAMS-based pipes.  The
+improvement of \textsl{Linux Fast-STREAMS} over Linux legacy pipes is
+significant: improvements range from a 75\% increase in performance at large
+write sizes, to a 200\% increase in performance at lower write sizes.
+
+\end{description}
 
 \subsection[Pumbah]{Pumbah}
 
@@ -901,13 +932,37 @@ RedHat 7.2 is one of the oldest (and arguably the most stable) glibc2 based
 releases of the RedHat distribution.  This distribution sports a 2.4.20-28.7
 kernel.  The distribution has all available updates applied.
 
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_rh7_perf}
+\caption[RH7.2 on Pumbah Performance]{RH7.2 on Pumbah Performance}
+\label{figure:rh7perf}
+\end{figure}
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_rh7_delay}
+\caption[RH7.2 on Pumbah Delay]{RH7.2 on Pumbah Delay}
+\label{figure:rh7delay}
+\end{figure}
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_rh7_thrput}
+\caption[RH7.2 on Pumbah Throughput]{RH7.2 on Pumbah Throughput}
+\label{figure:rh7thrput}
+\end{figure}
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_rh7_comp}
+\caption[RH7.2 on Pumbah Comparison]{RH7.2 on Pumbah Comparison}
+\label{figure:rh7comp}
+\end{figure}
+
 \begin{description}
 
 \item[Performance.]
 
-\textit{Figure \ref{figure:rh7perf} (p. \pageref{figure:rh7perf})} illustrates
-the performance of \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy
-pipes across a range of write sizes.  As can be see from \textit{Figure
+\textit{Figure \ref{figure:rh7perf}} illustrates the performance of
+\textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  As can be see from \textit{Figure
 \ref{figure:rh7perf}}, the performance of \textsl{LiS} is dismal across the
 entire range of write sizes.  The performance of \textsl{Linux Fast-STREAMS}
 STREAMS-based pipes, on the other hand, is superior across the entire range of
@@ -916,60 +971,35 @@ Fast-STREAMS} is an order of magnitude greater than \textsl{LiS}.
 
 \item[Delay.]
 
-\textit{Figure \ref{figure:rh7delay} (p. \pageref{figure:rh7delay})}
-illustrates the average write delay for \textsl{LiS}, \textsl{Linux
-Fast-STREAMS} and Linux legacy pipes across a range of write sizes.  The slope
-of all three graphs is similar, indicating that memory caching and copy to and
-from user performance on a byte-by-byte basis is similar.  The intercepts, on
-the other hand, are drastically different.  \textsl{LiS} per-message overheads
-are massive.  \textsl{Linux Fast-STREAMS} and Linux legacy pipes are far
-better.  STREAMS-based pipes have about one third of the per-message overhead
-of legacy pipes.
+\textit{Figure \ref{figure:rh7delay}} illustrates the average write delay for
+\textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  The slope of all three graphs is similar, indicating
+that memory caching and copy to and from user performance on a byte-by-byte
+basis is similar.  The intercepts, on the other hand, are drastically
+different.  \textsl{LiS} per-message overheads are massive.  \textsl{Linux
+Fast-STREAMS} and Linux legacy pipes are far better.  STREAMS-based pipes have
+about one third of the per-message overhead of legacy pipes.
 
 \item[Throughput.]
 
-\textit{Figure \ref{figure:rh7thrput} (p.  \pageref{figure:rh7thrput})}
-illustrates the throughput experienced by \textsl{LiS}, \textsl{Linux
-Fast-STREAMS} and Linux legacy pipes across a range of write sizes.  As can be
-seen from \textit{Figure \ref{figure:rh7thrput}}, all implementations exhibit
-strong power function characteristics, indicating structure and robustness for
-each implementation (despite performance differences).
+\textit{Figure \ref{figure:rh7thrput}} illustrates the throughput experienced
+by \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  As can be seen from \textit{Figure
+\ref{figure:rh7thrput}}, all implementations exhibit strong power function
+characteristics, indicating structure and robustness for each implementation
+(despite performance differences).  On Pumbah, as was experienced on Porky,
+\textsl{Linux Fast-STREAMS} is beginning to saturate the memory bus at 10Gbps.
 
 \item[Improvement.]
 
-\textit{Figure \ref{figure:rh7comp} (p. \pageref{figure:rh7comp})} illustrates
-the improvement over Linux legacy pipes of \textsl{Linux Fast-STREAMS}
-STREAMS-based pipes.  The improvement of \textsl{Linux Fast-STREAMS} over
-Linux legacy pipes is significant: improvements range from a 75\% increase in
-performance at large write sizes, to a 175\% increase in performance at lower
-write sizes.  \textsl{LiS} pipes waddle in at a 75\% {\em decrease} in
-performance.
+\textit{Figure \ref{figure:rh7comp}} illustrates the improvement over Linux
+legacy pipes of \textsl{Linux Fast-STREAMS} STREAMS-based pipes.  The
+improvement of \textsl{Linux Fast-STREAMS} over Linux legacy pipes is
+significant: improvements range from a 75\% increase in performance at large
+write sizes, to a 175\% increase in performance at lower write sizes.
+\textsl{LiS} pipes waddle in at a 75\% {\em decrease} in performance.
 
 \end{description}
-
-\begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_rh7_perf}
-\caption[RH7.2 on Pumbah Performance]{RH7.2 on Pumbah Performance}
-\label{figure:rh7perf}
-\end{figure}
-
-\begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_rh7_delay}
-\caption[RH7.2 on Pumbah Delay]{RH7.2 on Pumbah Delay}
-\label{figure:rh7delay}
-\end{figure}
-
-\begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_rh7_thrput}
-\caption[RH7.2 on Pumbah Throughput]{RH7.2 on Pumbah Throughput}
-\label{figure:rh7thrput}
-\end{figure}
-
-\begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_rh7_comp}
-\caption[RH7.2 on Pumbah Comparison]{RH7.2 on Pumbah Comparison}
-\label{figure:rh7comp}
-\end{figure}
 
 \subsection[Daisy]{Daisy}
 Daisy is a 3.0GHz i630 (x86\_64) hyperthreaded machine with 1Gb of memory.
@@ -993,67 +1023,70 @@ Fedora Core 6 is the most recent full release Fedora distribution.  This
 distribution sports a 2.6.20-1.2933.fc6 kernel with the latest patches.  This
 is the \texttt{x86\_64} distribution with recent updates.
 
-\begin{description}
-
-\item[Performance.]
-
-\textit{Figure \ref{figure:smpperf} (p. \pageref{figure:smpperf})} illustrates
-the performance of \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy
-pipes across a range of write sizes.  As can be see from \textit{Figure
-\ref{figure:smpperf}}, the performance of \textsl{LiS} is dismal across the
-entire range of write sizes.  The performance of \textsl{Linux Fast-STREAMS}
-STREAMS-based pipes, on the other hand, is superior across the entire range of
-write sizes.
-
-\item[Delay.]
-
-\textit{Figure \ref{figure:smpdelay} (p. \pageref{figure:smpdelay})}
-illustrates the average write delay for \textsl{LiS}, \textsl{Linux
-Fast-STREAMS} and Linux legacy pipes across a range of write sizes.
-
-\item[Throughput.]
-
-\textit{Figure \ref{figure:smpthrput} (p. \pageref{figure:smpthrput})}
-illustrates the throughput experienced by \textsl{LiS}, \textsl{Linux
-Fast-STREAMS} and Linux legacy pipes across a range of write sizes.  As can be
-seen from \textit{Figure \ref{figure:smpthrput}}, all implementations exhibit
-strong power function characteristics, indicating structure and robustness for
-each implementation.
-
-\item[Improvement.]
-
-\textit{Figure \ref{figure:smpcomp} (p. \pageref{figure:smpcomp})} illustrates
-the improvement over Linux legacy pipes of \textsl{Linux Fast-STREAMS}
-STREAMS-based pipes.  The improvement of \textsl{Linux Fast-STREAMS} over
-Linux legacy pipes is significant: improvements range from a 75\% increase in
-performance at large write sizes, to a 175\% increase in performance at lower
-write sizes.
-
-\end{description}
-
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_smp_perf}
+\includegraphics[width=\columnwidth]{perftest_smp_perf}
 \caption[FC6 on Daisy Performance]{FC6 on Daisy Performance}
 \label{figure:smpperf}
 \end{figure}
 
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_smp_delay}
+\includegraphics[width=\columnwidth]{perftest_smp_delay}
 \caption[FC6 on Daisy Delay]{FC6 on Daisy Delay}
 \label{figure:smpdelay}
 \end{figure}
 
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_smp_thrput}
+\includegraphics[width=\columnwidth]{perftest_smp_thrput}
 \caption[FC6 on Daisy Throughput]{FC6 on Daisy Throughput}
 \label{figure:smpthrput}
 \end{figure}
 
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_smp_comp}
+\includegraphics[width=\columnwidth]{perftest_smp_comp}
 \caption[FC6 on Daisy Comparison]{FC6 on Daisy Comparison}
 \label{figure:smpcomp}
 \end{figure}
+
+\begin{description}
+
+\item[Performance.]
+
+\textit{Figure \ref{figure:smpperf}} illustrates the performance of
+\textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  As can be see from \textit{Figure
+\ref{figure:smpperf}}, the performance of \textsl{LiS} is dismal across the
+entire range of write sizes.  The performance of \textsl{Linux Fast-STREAMS}
+STREAMS-based pipes, on the other hand, is superior across the entire range of
+write sizes.  The performance of \textsl{Linux Fast-STREAMS} is almost an
+order of magnitude greater than that of \textsl{LiS}.
+
+\item[Delay.]
+
+\textit{Figure \ref{figure:smpdelay}} illustrates the average write delay for
+\textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  Again the slope appears to be the same for all
+implementations, except Linux legacy pipes which exhibit some annomallies
+below 1024 byte write sizes.  The intercept for \textsl{Linux Fast-STREAMS} is
+again much superior to the other two implementations.
+
+\item[Throughput.]
+
+\textit{Figure \ref{figure:smpthrput}} illustrates the throughput experienced
+by \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  As can be seen from \textit{Figure
+\ref{figure:smpthrput}}, all implementations exhibit strong power function
+characteristics, indicating structure and robustness for each implementation.
+
+\item[Improvement.]
+
+\textit{Figure \ref{figure:smpcomp}} illustrates the improvement over Linux
+legacy pipes of \textsl{Linux Fast-STREAMS} STREAMS-based pipes.  The
+improvement of \textsl{Linux Fast-STREAMS} over Linux legacy pipes is
+significant: improvements range from a 100\% increase in performance at large
+write sizes, to a 175\% increase in performance at lower write sizes.
+\textsl{LiS} again drags in at -75\%.
+
+\end{description}
 
 \subsection[Mspiggy]{Mspiggy}
 Mspiggy is a 1.7Ghz Pentium IV (M-processor) uniprocessor notebook (Toshiba
@@ -1072,131 +1105,142 @@ machine architectures on the test results.  Tests performed on this machine
 are control tests.
 
 \subsubsection[SuSE 10.0 OSS]{SuSE 10.0 OSS}
+
 SuSE 10.0 OSS is the public release version of the SuSE/Novell distribution.
 There have been two releases subsequent to this one: the 10.1 and recent 10.2
 releases.  The SuSE 10 release sports a 2.6.13 kernel and the
 2.6.13-15-default kernel was the tested kernel.
 
-\begin{description}
-
-\item[Performance.]
-\textit{Figure \ref{figure:nbperf} (p. \pageref{figure:nbperf})} illustrates
-the performance of \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy
-pipes across a range of write sizes.
-As can be see from \textit{Figure \ref{figure:nbperf}}, the performance of
-\textsl{LiS} is dismal across the entire range of write sizes.  The
-performance of \textsl{Linux Fast-STREAMS} STREAMS-based pipes, on the other
-hand, is superior across the entire range of write sizes.
-
-\item[Delay.]
-\textit{Figure \ref{figure:nbdelay} (p. \pageref{figure:nbdelay})} illustrates
-the average write delay for \textsl{LiS}, \textsl{Linux Fast-STREAMS} and
-Linux legacy pipes across a range of write sizes.
-
-\item[Throughput.]
-\textit{Figure \ref{figure:nbthrput} (p. \pageref{figure:nbthrput})}
-illustrates the throughput experienced by \textsl{LiS}, \textsl{Linux
-Fast-STREAMS} and Linux legacy pipes across a range of write sizes.
-As can be seen from \textit{Figure \ref{figure:nbthrput}}, all implementations
-exhibit strong power function characteristics, indicating structure and
-robustness for each implementation.
-
-\item[Improvement.]
-\textit{Figure \ref{figure:nbcomp} (p. \pageref{figure:nbcomp})} illustrates
-the improvement over Linux legacy pipes of \textsl{Linux Fast-STREAMS}
-STREAMS-based pipes.
-The improvement of \textsl{Linux Fast-STREAMS} over Linux legacy pipes is
-significant: improvements range from a 75\% increase in performance at large
-write sizes, to a 175\% increase in performance at lower write sizes.
-
-\end{description}
-
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_nb_perf}
+\includegraphics[width=\columnwidth]{perftest_nb_perf}
 \caption[SuSE 10.0 OSS on Mspiggy Performance]{SuSE 10.0 OSS on Mspiggy Performance}
 \label{figure:nbperf}
 \end{figure}
 
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_nb_delay}
+\includegraphics[width=\columnwidth]{perftest_nb_delay}
 \caption[SuSE 10.0 OSS on Mspiggy Delay]{SuSE 10.0 OSS on Mspiggy Delay}
 \label{figure:nbdelay}
 \end{figure}
 
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_nb_thrput}
+\includegraphics[width=\columnwidth]{perftest_nb_thrput}
 \caption[SuSE 10.0 OSS on Mspiggy Throughput]{SuSE 10.0 OSS on Mspiggy Throughput}
 \label{figure:nbthrput}
 \end{figure}
 
 \begin{figure}[p]
-\includegraphics[width=3.3in]{perftest_nb_comp}
+\includegraphics[width=\columnwidth]{perftest_nb_comp}
 \caption[SuSE 10.0 OSS on Mspiggy Comparison]{SuSE 10.0 OSS on Mspiggy Comparison}
 \label{figure:nbcomp}
 \end{figure}
 
+\begin{description}
+
+\item[Performance.]
+
+\textit{Figure \ref{figure:nbperf}} illustrates the performance of
+\textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  As can be see from \textit{Figure \ref{figure:nbperf}},
+the performance of \textsl{LiS} is dismal across the entire range of write
+sizes.  The performance of \textsl{Linux Fast-STREAMS} STREAMS-based pipes, on
+the other hand, is superior across the entire range of write sizes.
+\textsl{Linux Fast-STREAMS} again performs a full order of magnitude better
+than \textsl{LiS}.
+
+\item[Delay.]
+
+\textit{Figure \ref{figure:nbdelay}} illustrates the average write delay for
+\textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  The slope of the delay curves is, again, similar, but
+the intercept for \textsl{Linux Fast-STREAMS} is far superior.
+
+\item[Throughput.]
+
+\textit{Figure \ref{figure:nbthrput}} illustrates the throughput experienced
+by \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  As can be seen from \textit{Figure
+\ref{figure:nbthrput}}, all implementations exhibit strong power function
+characteristics, indicating structure and robustness for each implementation.
+\textsl{Linux Fast-STREAMS} again begins to saturate the memory bus at 10Gbps.
+
+\item[Improvement.]
+
+\textit{Figure \ref{figure:nbcomp}} illustrates the improvement over Linux
+legacy pipes of \textsl{Linux Fast-STREAMS} STREAMS-based pipes.  The
+improvement of \textsl{Linux Fast-STREAMS} over Linux legacy pipes is
+significant: improvements range from a 100\% increase in performance at large
+write sizes, to a staggering 400\% increase in performance at lower write
+sizes.
+
+\end{description}
+
 \section[Analysis]{Analysis}
+
+The results across the various distributions and machines tested are
+consistent enough to draw some conclusions from the test results.
 
 \subsection[Discussion]{Discussion}
 
 The test results reveal that the maximum throughput performance, as tested by
-the \texttt{perftest} program, of STREAMS-based pipes is superior to that of
-legacy pipes, regardless of write or read sizes.  In fact, STREAMS-based pipe
-performance at smaller write/read sizes is significanly (as much as 200\%)
-greater than that of legacy pipes.
+the \texttt{perftest} program, of STREAMS-based pipes (as implemented by
+\textsl{Linux Fast-STREAMS}) is remarkably superior to that of legacy Linux
+pipes, regardless of write or read sizes.  In fact, STREAMS-based pipe
+performance at smaller write/read sizes is significantly greater (as much as
+200-400\%) than that of legacy pipes.  The performance of \textsl{LiS} is
+dismal (approx. 75\% {\em decrease}) compared to legacy Linux pipes.
 
-As the common belief is that the increased complexity of STREAMS-based pipes
-would make their performance poorer, this is perhaps a startling result to
-some.
-
-Looking at both implementations, the difference can be described by
-implementation similarities and differences.
+Looking at the only the legacy Linux and \textsl{Linux Fast-STREAMS}
+implementations, the difference can be described by analyzing the
+implementations.
 
 \paragraph*{Write side processing.}
 
-On the write side of the pipe, the legacy approach copies bytes from the user
-into a preallocated page, but pushing a tail pointer.  If there is a sleeping
-reader process, the process is awoken.  If there is no more room in the
-buffer, the write process sleeps or fails.  One would expect this to be
-particularly fast.
+Linux legacy pipes use a simple method on the write side of the pipe.  The
+pipe copies bytes from the user into a preallocated page, by pushing a tail
+pointer.  If there is a sleeping reader process, the process is awoken.  If
+there is no more room in the buffer, the write process sleeps or fails.
 
-On the write side of the STREAMS-based pipe, the \textit{Stream head}
-allocates a message block and copies the bytes from the user to the message
-block and places the message block onto the \textit{Stream}.  This results in
-placing the message on the opposite \textit{Stream head}.  If a reader is
-sleeping on the opposite \textit{Stream head}, the \textit{Stream head}'s read
-queue service procedure is scheduled.  If the \textit{Stream} is flow
-controlled, the writing process sleeps or fails.
+STREAMS, on the other hand, uses full flow control.  On the write side of the
+STREAMS-based pipe, the \textit{Stream head} allocates a message block and
+copies the bytes from the user to the message block and places the message
+block onto the \textit{Stream}.  This results in placing the message on the
+opposite \textit{Stream head}.  If a reader is sleeping on the opposite
+\textit{Stream head}, the \textit{Stream head}'s read queue service procedure
+is scheduled.  If the \textit{Stream} is flow controlled, the writing process
+sleeps or fails.
 
-STREAMS also has the feature that when flow control is exerted, it saves the
-message buffer and a subsequent write of the same size is added to the same
-buffer.  STREAMS also has the feature that when a reader finds insufficient
-bytes available to satisfy the read, it issues an \texttt{M\_READ} message
-downstream requesting a specific number of bytes.  When the writing
-\textit{Stream head} receives this message, it attempts to satisfy the full
-read request before sending data downstream.
+STREAMS has the feature that when a reader finds insufficient bytes available
+to satisfy the read, it issues an \texttt{M\_READ} message downstream
+requesting a specific number of bytes.  When the writing \textit{Stream head}
+receives this message, it attempts to satisfy the full read request before
+sending data downstream.
+
+\textsl{Linux Fast-STREAMS} also has the feature that when flow control is
+exerted, it saves the message buffer and a subsequent write of the same size
+is added to the same buffer.
 
 \paragraph*{Read side processing.}
 
-On the read side of the pipe, the legacy approach copies bytes from the
-preallocated page buffer to the user, pulling a head pointer.  If there are no
-bytes available to be read in the buffer, the reading process sleeps or fails.
-When bytes have been read from the buffer and a process is sleeping waiting to
+On the read side of the legacy pipe, bytes are copied from the preallocated
+page buffer to the user, pulling a head pointer.  If there are no bytes
+available to be read in the buffer, the reading process sleeps or fails.  When
+bytes have been read from the buffer and a process is sleeping waiting to
 write, the sleeping process is awoken.
 
-On the read side of the pipe, the STREAMS-based pipe, messages are removed
-from the \textit{Stream head} read queue, copied to the user, and then the
-message is either freed (when all the bytes contained are consumed) or placed
-back on the \textit{Stream head} read queue.  If the read queue was previously
-full and falls beneath the low water mark for the read queue, the
-\textit{Stream} is backenabled.  Back enabling results in the service
-procedure of the write side queue of the other \textit{Stream head} to be
-scheduled for service.
+STREAMS again uses full flow control.  On the read side of the STREAMS-based
+pipe, messages are removed from the \textit{Stream head} read queue, copied to
+the user, and then the message is either freed (when all the bytes contained
+are consumed) or placed back on the \textit{Stream head} read queue.  If the
+read queue was previously full and falls beneath the low water mark for the
+read queue, the \textit{Stream} is back-enabled.  Back-enabling results in the
+service procedure of the write side queue of the other \textit{Stream head} to
+be scheduled for service.  If there are no bytes available to be read, the
+reading process sleeps or fails.
 
-If there are no bytes available to be read, the reading process sleeps or
-fails.  STREAMS has the additional feature that if there are no bytes to be
-read, it can issue an \texttt{M\_READ} message downstream requesting the
-number of bytes that were issued to the read(2) system call.
+STREAMS has the additional feature that if there are no bytes to be read, it
+can issue an \texttt{M\_READ} message downstream requesting the number of
+bytes that were issued to the read(2) system call.
 
 \paragraph*{Buffering.}
 
@@ -1205,79 +1249,94 @@ and STREAMS-based pipes:
 
 \begin{enumerate}
 
-\item Legacy pipes use preallocated pinned kernel pages to store data.
+\item Legacy pipes use preallocated pinned kernel pages to store data using a
+simply head and tail pointer approach.
 
-\item STREAMS-based pipes use message queues.
+\item STREAMS-based pipes use full flow control with STREAMS message blocks
+and message queues.
 
 \end{enumerate}
 
 One would expect that the STREAMS-based approach would present significant
-overheads in comparison to the legacy approach.
+overheads in comparison to the legacy approach; however, the lack of flow
+control in the Linux approach is problematic.
 
 \paragraph*{Scheduling.}
 
 Legacy pipes schedule by waking a reading process whenever data is available
 in the buffer to be read, and waking a writing process whenever there is room
-available in the buffer to write.
+available in the buffer to write.  While accomplishing buffering, this does
+not provide flow control or scheduling.  By not providing even the hysteresis
+afforded by Sockets, the write and read side thrash the scheduler as bytes are
+written to and removed from the pipe.
 
 STREAMS-based pipes, on the other hand, use the scheduling mechanisms of
 STREAMS.  When messages are written to the reading \textit{Stream head} and a
-reader is sleeping, the service procedure for the reading \textit{Stream head}
-read queue is scheduled.  Once the STREAMS scheduler runs, the reading process
-is awoken.  When message are read from the reading \textit{Stream head} read
-queue and the queue was previously flow controlled, and the byte count falls
-below the low water mark defined for the queue, the writing \textit{Stream
-head} write queue service procedure is scheduled.  Once the STREAMS scheduler
-runs, the writing process is awoken.
+reader is sleeping, the service procedure for the reading \textit{Stream
+head}'s read queue is scheduled for later execution.  When the STREAMS
+scheduler later runs, the reading process is awoken.  When message are read
+from the reading \textit{Stream head} read queue and the queue was previously
+flow controlled, and the byte count falls below the low water mark defined for
+the queue, the writing \textit{Stream head} write queue service procedure is
+scheduled.  Once the STREAMS scheduler later runs, the writing process is
+awoken.
 
-The STREAMS-based pipe approach results in fewer wakeups being generated.
-Also, the reading process is permitted to consume more messages before the
-writing process is awoken.
+\textsl{Linux Fast-STREAMS} is designed to run tasks queued to the STREAMS
+scheduler on the same processor as the queuing process or task.  This avoids
+unnecessary context switches.
+
+The STREAMS-based pipe approach results in fewer wakeup events being
+generated.  Because there are fewer wakeup events, there are fewer context
+switches.  The reading process is permitted to consume more messages before
+the writing process is awoken; and the writing process is permitted to write
+more messages before the reading process is awoken.
 
 \paragraph*{Result.}
 
 The result of the differences between the legacy and the STREAMS based
-approach is that writing processes are allowed to write more messages before a
-blocked reader is awoken and the reading process is allowed to read more
-messages before a blocked writer is awoken.  This results in greater code path
-and data cache efficiency.
+approach is that fewer context switches result: writing processes are allowed
+to write more messages before a blocked reader is awoken and the reading
+process is allowed to read more messages before a blocked writer is awoken.
+This results in greater code path and data cache efficiency and significantly
+less scheduler thrashing between the reading and writing process.
 
 The increased performance of the STREAMS-based pipes can be explained as
 follows:
 
 \begin{itemize}
 
-\item The STREAMS message coallescing features allows the complexity of the
-write side process to approach that of the legacy approach.  This feature
-provides a significant boost to performance at message sizes smaller than a
-\texttt{FASTBUF}.  The size of a \texttt{FASTBUF} on 32-bit systems is 64
-bytes; on 64-bit systems, 128 bytes.
+\item
 
-However, this STREAMS feature is not sufficient to explain the performance
-gains, as close to the same performance is exhibited with the feature
-disabled.
+The STREAMS message coalescing features allows the complexity of the write
+side process to approach that of the legacy approach.  This feature provides a
+boost to performance at message sizes smaller than a \texttt{FASTBUF}.  The
+size of a \texttt{FASTBUF} on 32-bit systems is 64 bytes; on 64-bit systems,
+128 bytes.  (However, this STREAMS feature is not sufficient to explain the
+dramatic performance gains, as close to the same performance is exhibited with
+the feature disabled.)
 
-\item The STREAMS read notification feature allows the write side to exploit
+\item
+
+The STREAMS read notification feature allows the write side to exploit
 efficiencies from the knowledge of the amount of data that was requested by
-the read side.
+the read side.  (However, this STREAMS feature is also not sufficient to
+explain the performance gains, as close to the same performance is exhibited
+with the feature disabled.)
 
-However, this STREAMS feature is not sufficient to explain the performance
-gains, as close to the same performance is exhibited with the feature
-disabled.
+\item
 
-\item The STREAMS read fill mode feature permits the read side to block until
-the full read request is satisfied, regardless of the \texttt{O\_NONBLOCK}
-flags setting associated with the read side of the pipe.
+The STREAMS read fill mode feature permits the read side to block until the
+full read request is satisfied, regardless of the \texttt{O\_NONBLOCK} flags
+setting associated with the read side of the pipe.  (Again, this STREAMS
+feature is not sufficient to explain the performance gains, as close to the
+same performance is exhibited with the feature disabled.)
 
-However, this STREAMS feature is not sufficient to explain the performance
-gains, as close to the same performance is exhibited with the feature
-disabled.
+\item
 
-\item The STREAMS flow control and scheduling mechanisms permits the read side
-to read more messages between blocking events; and also permits the write side
-to write more messages between blocking events.  This results in superior code
-and data cacheing efficiencies.
-
+The STREAMS flow control and scheduling mechanisms permits the read side to
+read more messages between wakeup events; and also permits the write side to
+write more messages between wakeup events.  This results in superior code and
+data caching efficiencies and a greatly reduced number of context switches.
 This is the only difference that explains the full performance increase in
 STREAMS-based pipes over legacy pipes.
 
@@ -1287,63 +1346,106 @@ STREAMS-based pipes over legacy pipes.
 
 These experiments have shown that the \textsl{Linux Fast-STREAMS}
 implementation of STREAMS-based pipes outperform the legacy Linux pipe
-implementation by a significant amount.  All of the misconceptions with regard
-to STREAMS and STREAMS-based pipes is dispelled by these test results.
+implementation by a significant amount (up to a factor of 5) and outperform
+the \textsl{LiS} implementation by a staggering amount (up to a factor of 25).
+
+\begin{quote}
+\textit{The \textsl{Linux Fast-STREAMS} implementation of STREAMS-based pipes
+is superior by a significant factor across all systems and kernels tested.}
+\end{quote}
+
+All of the misconceptions with regard to STREAMS and STREAMS-based pipes are
+dispelled by these test results.
 
 \begin{itemize}
 
-\item STREAMS is not slow.
+\item \textit{STREAMS is fast.}
 
 Contrary to the misconception that STREAMS must be slower because it is more
 complex, in fact the reverse has been shown to be true in these experiments.
 The STREAMS flow control and scheduling mechanisms serve to adapt well and
-increase both code and data cache efficiency.
+increase both code and data cache as well as scheduler efficiency.
 
-\item STREAMS is more flexixble {\em and} more efficient.
+\item \textit{STREAMS is more flexible {\em and} more efficient.}
 
 Contrary to the misconception that STREAMS trades flexibility for efficiency
 (that is, that STREAMS is somehow less efficient because it is more flexible),
 in fact has shown to be untrue.  STREAMS is {\em both} more flexible {\em and}
-more efficient.  Indeed, the performance gains acheived by STREAMS appear to
+more efficient.  Indeed, the performance gains achieved by STREAMS appear to
 derive from its more sophisticated queueing, scheduling and flow control
-model.
+model. (Note that this is in fitting with the statements made about 4.2BSD
+pipes being implemented with UNIX domain sockets for \textit{"performance
+reasons"} \cite[]{bsd}.)
 
-\item STREAMS better exploits parallelisms on SMP better than other approaches.
+\item \textit{STREAMS adequately exploits parallelisms on SMP.}
 
-Contrary to the misconception
+Contrary to the misconception that STREAMS must be slower due to complex
+locking and synchronization mechanisms, STREAMS performed as well on SMP
+(hyperthreaded) machines as on UP machines and still outperformed legacy Linux
+pipes with over 100\% improvements at all write sizes.
 
-\item STREAMS-based pipes are not slow.
+\item \textit{STREAMS-based pipes are fast.}
 
-Contrary to the erroneous convetional wisdom that STREAMS-based pipes must be
-slower because STREAMS-based pipes provide such a rich set of features as well
-as providing full duplex operation where legacy pipes only half duplex
-operation, the reverse has been shown in these experiments.  By utilizing
-STREAMS flow control and scheduling, STREAMS-based pipes indeed perform better
-than legacy pipes.
+Contrary to the misconception that STREAMS-based pipes must be slower because
+STREAMS-based pipes provide such a rich set of features as well as providing
+full duplex operation where legacy pipes only unidirectional operation, the
+reverse has been shown in these experiments.  By utilizing STREAMS flow
+control and scheduling, STREAMS-based pipes indeed perform better than legacy
+pipes.
 
-\item STREAMS-based pipes are neither unnecessarily complex nor cumbersome.
+\item \textit{STREAMS-based pipes are neither unnecessarily complex nor cumbersome.}
 
 Contrary to the misconception that STREAMS-based pipes must be poorer due to
 their increased implementation complexity, the reverse has shown to be true in
-these experiments.
+these experiments.  Also, the fact that legacy, STREAMS and 4.2BSD pipes
+conform to the same standard (POSIX), means that they are no more cumbersome
+from a programming perspective.  Indeed a POSIX conforming application will
+not know the difference between the implementation (with the exception that
+superior performance will be experienced on STREAMS-based pipes).
+
+\item \textit{\textsl{LiS} performs poorly.}
+
+Despite claiming to be an adequate implementation of SVR4 STREAMS,
+\textsl{LiS} performance is dismal enough to make it unusable.  Due to
+conformance and implementation errors, \textsl{LiS} was already deprecated by
+\textsl{Linux Fast-STREAMS}, and these tests exemplify why a replacement for
+\textsl{LiS} was necessary.
 
 \end{itemize}
 
 \section[Future Work]{Future Work}
 
+There are two future work items that immediately come to mind:
+
+\begin{enumerate}
+
+\item
+
+It is fairly straighforward to replace the pipe implementation of an
+application that uses shared libraries from underneath it using preloaded
+libraries.  The \textsl{Linux Fast-STREAMS} \texttt{libstreams.so} library can
+be preloaded, replacing the pipe(2) library call with the STREAMS-based pipe
+equivalent.  A suitable application that uses pipes extensively could be
+benchmarked both on legacy Linux pipes and STREAMS-based pipes to determine
+the efficiencies acheived over a less narrowly defined workload.
+
+\item
+
 Because STREAMS-based pipes exhibit superior performance in these respects, it
 can be expected that STREAMS pseudo-terminals will also exhibit superior
-performance over the Linux pseudo-terminal implementation.  STREAMS
+performance over the legacy Linux pseudo-terminal implementation.  STREAMS
 pseudo-terminals utilize the STREAMS mechanisms for flow control and
-scheduling, whereas the Linux pseudo-terminal implementation uses the mundane
-approach taken by legacy pipes.
+scheduling, whereas the Linux pseudo-terminal implementation uses the
+over-simplified approach taken by legacy pipes.
+
+\end{enumerate}
 
 \section[Related Work]{Related Work}
 
 A separate paper comparing a TPI STREAMS implementation of \textsl{UDP} with
 the Linux BSD Sockets implementation has also been prepared.  That paper also
 shows significant performance improvements for STREAMS attributable to the
-same causes.
+similar causes.
 
 \FloatBarrier
 \addcontentsline{toc}{section}{References}
@@ -1355,8 +1457,295 @@ same causes.
 \section{Performance Testing Script}
 \label{section:script}
 
+A performance testing script (\texttt{perftest\_sctipt}) was used to obtain
+repeatable results.  The script was executed as:
+
+\begin{quote}
+\footnotesize
+\begin{verbatim}
+$#> ./perftest_script -a -S10 --hiwat=$((1<<16)) --lowat=$((1<<13))
+\end{verbatim}
+\normalsize
+\end{quote}
+
+The script is as follows:
+
+\footnotesize
+\begin{verbatim}
+#!/bin/bash
+set -x
+interval=5
+testtime=2
+command=`echo $0 | sed -e 's,.*/,,'`
+perftestn=
+perftest=
+if [ -x `pwd`/perftest ] ; then
+  perftest=`pwd`/perftest
+elif [ -x /usr/lib/streams/perftest ] ; then
+  perftest=/usr/lib/streams/perftest
+elif [ -x /usr/libexec/streams/perftest ] ; then
+  perftest=/usr/libexec/streams/perftest
+elif [ -x /usr/lib/LiS/perftest ] ; then
+  perftest=/usr/lib/LiS/perftest
+elif [ -x /usr/libexec/LiS/perftest ] ; then
+  perftest=/usr/libexec/LiS/perftest
+fi
+if [ -x `pwd`/perftestn ] ; then
+  perftestn=`pwd`/perftestn
+elif [ -x /usr/lib/streams/perftestn ] ; then
+  perftestn=/usr/lib/streams/perftestn
+elif [ -x /usr/libexec/streams/perftestn ] ; then
+  perftestn=/usr/libexec/streams/perftestn
+elif [ -x /usr/lib/LiS/perftestn ] ; then
+  perftestn=/usr/lib/LiS/perftestn
+elif [ -x /usr/libexec/LiS/perftestn ] ; then
+  perftestn=/usr/libexec/LiS/perftestn
+fi
+[ -n "$perftestn" ] || [ -n "$perftest" ] || exit 1
+scls=
+if [ -x `pwd`/scls ] ; then
+        scls=`pwd`/scls
+elif [ -x /usr/sbin/scls ] ; then
+        scls=/usr/sbin/scls
+fi
+(
+  set -x
+  [ -n "$scls" ] && $scls -a -c -r pipe pipemod
+  for size in 4096 2048 1024 512 256 128 64 32 16 8 4 2 1
+  do
+    [ -n "$perftest"  ] && $perftest  -q \
+      -r -t $testtime -i $interval -m nullmod -p 0 -s $size ${1+$@}
+    [ -n "$perftestn" ] && $perftestn -q \
+      -r -t $testtime -i $interval -m nullmod -p 0 -s $size ${1+$@}
+    [ -n "$scls"      ] && $scls -a -c -r pipe pipemod bufmod nullmod
+  done
+) 2>&1 | tee `hostname`.$command.`date -uIseconds`.log
+\end{verbatim}
+\normalsize
+
+
 \section{Raw Data}
 \label{section:rawdata}
+
+Following are the raw data points captured using the \textsl{perftest\_script}
+benchmarking script:
+
+\textit{Table \ref{table:fc6data}} lists the raw data from the
+\texttt{perftest} program that was used in preparing graphs for Fedora Core 6
+(i386) on Porky.
+
+\textit{Table \ref{table:centosdata}} lists the raw data from the
+\texttt{perftest} program that was used in preparing graphs for CentOS 4 on
+Porky.
+
+\textit{Table \ref{table:susedata}} lists the raw data from the
+\texttt{perftest} program that was used in preparing graphs for SuSE OSS 10 on
+Porky.
+
+\textit{Table \ref{table:ubuntudata}} lists the raw data from the
+\texttt{perftest} program that was used in preparing graphs for Ubuntu 6.06 on
+Porky.
+
+\textit{Table \ref{table:rh7data}} lists the raw data from the
+\texttt{perftest} program that was used in preparing graphs for RedHat 7.2 on
+Pumbah.
+
+\textit{Table \ref{table:smpdata}} lists the raw data from the
+\texttt{perftest} program that was used in preparing graphs for Fedora Core 6
+(x86\_64) HT on Daisy.
+
+\textit{Table \ref{table:nbdata}} lists the raw data from the
+\texttt{perftest} program that was used in preparing graphs for SuSE 10.0 OSS
+on Mspiggy.
+
+\begin{table}[hp]
+\footnotesize
+\center\begin{tabular}{rrrr}\\
+\hline
+Size & LiS & STREAMS & Linux\\
+\hline
+\hline
+1 & 37188 & 344307 & 116966\\
+2 & 37284 & 351804 & 117820\\
+4 & 37179 & 347164 & 116381\\
+8 & 37030 & 338055 & 117887\\
+16 & 37225 & 329919 & 117822\\
+32 & 36999 & 317133 & 116595\\
+64 & 36809 & 302554 & 116686\\
+128 & 35127 & 283041 & 117284\\
+256 & 34828 & 271630 & 114657\\
+512 & 34807 & 263021 & 114821\\
+1024 & 34607 & 247080 & 111825\\
+2048 & 34204 & 214279 & 106369\\
+4096 & 33139 & 176842 & 100510\\
+\hline
+\end{tabular}
+\caption{Raw data for Fedora Core 6 on Porky}
+\label{table:fc6data}
+\normalsize
+\end{table}
+
+\begin{table}[hp]
+\footnotesize
+\center\begin{tabular}{rrrr}\\
+\hline
+Size & LiS & STREAMS & Linux\\
+\hline
+\hline
+1 & 53119 & 479434 & 132195\\
+2 & 53066 & 505597 & 132293\\
+4 & 53289 & 501230 & 131201\\
+8 & 53216 & 475951 & 132182\\
+16 & 53254 & 464013 & 131688\\
+32 & 52952 & 438519 & 131697\\
+64 & 52499 & 407751 & 129409\\
+128 & 50065 & 379356 & 130188\\
+256 & 49348 & 372393 & 126861\\
+512 & 49297 & 360773 & 125318\\
+1024 & 48598 & 336727 & 123318\\
+2048 & 48274 & 290614 & 117809\\
+4096 & 47004 & 227778 & 110875\\
+\hline
+\end{tabular}
+\caption{Raw data for CentOS 4.0 on Porky}
+\label{table:centosdata}
+\normalsize
+\end{table}
+
+\begin{table}[hp]
+\footnotesize
+\center\begin{tabular}{rrrr}\\
+\hline
+Size & LiS & STREAMS & Linux\\
+\hline
+\hline
+1 & 53119 & 961820 & 168049\\
+2 & 53066 & 933673 & 176267\\
+4 & 53289 & 942865 & 172912\\
+8 & 53216 & 837034 & 168898\\
+16 & 53254 & 827399 & 166427\\
+32 & 52952 & 740263 & 172185\\
+64 & 52499 & 659878 & 169231\\
+128 & 50065 & 582512 & 174005\\
+256 & 49348 & 580011 & 166646\\
+512 & 49297 & 547149 & 167829\\
+1024 & 48598 & 512452 & 152447\\
+2048 & 48274 & 413858 & 154813\\
+4096 & 47004 & 307174 & 138756\\
+\hline
+\end{tabular}
+\caption{Raw data for SuSE 10.0 OSS on Porky}
+\label{table:susedata}
+\normalsize
+\end{table}
+
+\begin{table}[hp]
+\footnotesize
+\center\begin{tabular}{rrrr}\\
+\hline
+Size & LiS & STREAMS & Linux\\
+\hline
+\hline
+1 & 53119 & 430184 & 144855\\
+2 & 53066 & 433274 & 143835\\
+4 & 53289 & 425094 & 145879\\
+8 & 53216 & 407647 & 143399\\
+16 & 53254 & 394244 & 141268\\
+32 & 52952 & 372063 & 144056\\
+64 & 52499 & 354598 & 139854\\
+128 & 50065 & 339602 & 141793\\
+256 & 49348 & 324405 & 140269\\
+512 & 49297 & 311610 & 134445\\
+1024 & 48598 & 292892 & 136385\\
+2048 & 48274 & 255374 & 127651\\
+4096 & 47004 & 202755 & 116218\\
+\hline
+\end{tabular}
+\caption{Raw data for Ubuntu 6.06 on Porky}
+\label{table:ubuntudata}
+\normalsize
+\end{table}
+
+\begin{table}[hp]
+\footnotesize
+\center\begin{tabular}{rrrr}\\
+\hline
+Size & LiS & STREAMS & Linux\\
+\hline
+\hline
+1 & 53160 & 497439 & 209223\\
+2 & 53440 & 499519 & 199566\\
+4 & 53252 & 496272 & 187440\\
+8 & 53097 & 489615 & 188829\\
+16 & 53179 & 485036 & 182148\\
+32 & 52926 & 469102 & 185174\\
+64 & 53535 & 457550 & 182383\\
+128 & 49452 & 416632 & 178087\\
+256 & 49584 & 396356 & 177204\\
+512 & 49169 & 381209 & 165517\\
+1024 & 48992 & 355111 & 173222\\
+2048 & 47970 & 303334 & 163572\\
+4096 & 46598 & 240386 & 136522\\
+\hline
+\end{tabular}
+\caption{Raw data for RedHat 7.2 on Pumbah}
+\label{table:rh7data}
+\normalsize
+\end{table}
+
+\begin{table}[hp]
+\footnotesize
+\center\begin{tabular}{rrrr}\\
+\hline
+Size & LiS & STREAMS & Linux\\
+\hline
+\hline
+1 & 37188 & 334896 & 146553\\
+2 & 37284 & 334796 & 122048\\
+4 & 37179 & 329476 & 140025\\
+8 & 37030 & 341612 & 160396\\
+16 & 37225 & 333520 & 125678\\
+32 & 36999 & 325169 & 125124\\
+64 & 36809 & 302603 & 109340\\
+128 & 35127 & 278490 & 128133\\
+256 & 34828 & 247379 & 122689\\
+512 & 34807 & 235190 & 104739\\
+1024 & 34607 & 215718 & 83447\\
+2048 & 34204 & 187982 & 81301\\
+4096 & 33139 & 150392 & 77118\\
+\hline
+\end{tabular}
+\caption{Raw data for Fedora Core 6 on Daisy}
+\label{table:smpdata}
+\normalsize
+\end{table}
+
+\begin{table}[hp]
+\footnotesize
+\center\begin{tabular}{rrrr}\\
+\hline
+Size & LiS & STREAMS & Linux\\
+\hline
+\hline
+1 & 53119 & 614186 & 120757\\
+2 & 53066 & 611735 & 119166\\
+4 & 53289 & 603726 & 121366\\
+8 & 53216 & 547847 & 120595\\
+16 & 53254 & 528422 & 118542\\
+32 & 52952 & 468888 & 117535\\
+64 & 52499 & 441368 & 116674\\
+128 & 50065 & 400486 & 115725\\
+256 & 49348 & 392344 & 114541\\
+512 & 49297 & 380014 & 113128\\
+1024 & 48598 & 345346 & 104937\\
+2048 & 48274 & 275962 & 104450\\
+4096 & 47004 & 203886 & 94279\\
+\hline
+\end{tabular}
+\caption{Raw data for SuSE 10.0 OSS on Mspiggy}
+\label{table:nbdata}
+\normalsize
+\end{table}
 
 \end{appendix}
 
