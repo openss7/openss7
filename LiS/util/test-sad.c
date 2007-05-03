@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/15 02:33:22 $
+ @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/03 22:23:04 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 02:33:22 $ by $Author: brian $
+ Last Modified $Date: 2007/05/03 22:23:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sad.c,v $
+ Revision 0.9.2.6  2007/05/03 22:23:04  brian
+ - minor updates
+
  Revision 0.9.2.5  2007/03/15 02:33:22  brian
  - report failed expectations on test cases
 
@@ -150,9 +153,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/15 02:33:22 $"
+#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/03 22:23:04 $"
 
-static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/15 02:33:22 $";
+static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/03 22:23:04 $";
 
 #include <sys/types.h>
 #include <stropts.h>
