@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite.at,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/09/18 00:48:46 $
+dnl @(#) $RCSfile: testsuite.at,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/03 22:08:49 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,11 +61,14 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/09/18 00:48:46 $ by $Author: brian $
+dnl Last Modified $Date: 2007/05/03 22:08:49 $ by $Author: brian $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl $Log: testsuite.at,v $
+dnl Revision 0.9.2.9  2007/05/03 22:08:49  brian
+dnl - testsuite factoring
+dnl
 dnl Revision 0.9.2.8  2006/09/18 00:48:46  brian
 dnl - updated testsuite headers
 dnl
