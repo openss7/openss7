@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.spec.in,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/07 11:35:42 $
+# @(#) $RCSfile: sigtran.spec.in,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/06 07:47:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 11:35:42 $ by $Author: brian $
+# Last Modified $Date: 2007/05/06 07:47:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -404,7 +404,7 @@ Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
 Version:        @VERSION@
 Release:        @PACKAGE_RPMRELEASE@
-License:        GPL
+License:        GPLv2
 Group:          System Environment/Kernel
 %{?url:URL:            %{url}}
 %{?_xpm_icon:Icon:           %{_xpm_icon}}
@@ -1912,9 +1912,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sigtran.spec.in,v $
-# Revision 0.9.2.8  2007/03/07 11:35:42  brian
-# - make source package optional
+# Revision 0.9.2.9  2007/05/06 07:47:25  brian
+# - make GPL version obvious
 #
+
+* Wed Mar  7 2007 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.8  2007/03/07 11:35:42  brian
+- make source package optional
 
 * Mon Mar  5 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.7  2007/03/05 23:01:39  brian
