@@ -1,3 +1,7 @@
+2007-05-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* strsock.spec.in: make GPL version more obvious
+
 2007-05-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/papers/bsdnet.fig: added paper

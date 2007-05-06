@@ -1,3 +1,7 @@
+2007-05-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* striso.spec.in: make GPL version more obvious
+
 2007-04-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/clns.c: corrections for test compile

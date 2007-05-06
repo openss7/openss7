@@ -1,3 +1,7 @@
+2007-05-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* sigtran.spec.in: make GPL version more obvious
+
 2007-04-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/testsuite-m2pa.at: testsuite factoring

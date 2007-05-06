@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.69 $) $Date: 2007/03/07 11:35:29 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.70 $) $Date: 2007/05/06 07:47:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 11:35:29 $ by $Author: brian $
+# Last Modified $Date: 2007/05/06 07:47:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -404,7 +404,7 @@ Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
 Version:        @VERSION@
 Release:        @PACKAGE_RPMRELEASE@
-License:        GPL
+License:        GPLv2
 Group:          System Environment/Kernel
 %{?url:URL:            %{url}}
 %{?_xpm_icon:Icon:           %{_xpm_icon}}
@@ -1981,9 +1981,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.69  2007/03/07 11:35:29  brian
-# - make source package optional
+# Revision 1.1.6.70  2007/05/06 07:47:20  brian
+# - make GPL version obvious
 #
+
+* Wed Mar  7 2007 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.69  2007/03/07 11:35:29  brian
+- make source package optional
 
 * Mon Mar  5 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.68  2007/03/05 23:01:28  brian
