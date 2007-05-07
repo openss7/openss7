@@ -1,5 +1,15 @@
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* AUTHORS: updated release files
+	* NEWS: updated release files
+	* doc/manual/news.texi: updated release files
+	* README: updated release files
+	* README-cvs: updated release files
+	* scripts/texi/compat.texi: updated release files
+	* THANKS: updated release files
+
+2007-05-07  Brian Bidulock  <bidulock@openss7.org>
+
 	* m4/dist.m4: corrections for better Ubunutu detection
 
 2007-05-06  Brian Bidulock  <bidulock@openss7.org>
