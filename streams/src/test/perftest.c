@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/05/03 22:18:35 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/05/07 18:51:43 $
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +58,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/03 22:18:35 $ by $Author: brian $
+ Last Modified $Date: 2007/05/07 18:51:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 0.9.2.16  2007/05/07 18:51:43  brian
+ - changes from release testing
+
  Revision 0.9.2.15  2007/05/03 22:18:35  brian
  - updated perftest program and docuemntation
 
@@ -115,10 +118,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/05/03 22:18:35 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/05/07 18:51:43 $"
 
 static char const ident[] =
-    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/05/03 22:18:35 $";
+    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/05/07 18:51:43 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -248,8 +251,10 @@ start_timer(void)
 }
 
 #ifndef PIPE_BUF
-#define PIPE_BUF 4096
+#define PIPE_BUF 8192
 #endif
+
+#define RECENT_WEIGHT 2
 
 int
 test_sync(int fds[])
@@ -280,8 +285,13 @@ test_sync(int fds[])
 				long long msgcnt = tmsgcnt / report;
 				long long avgsiz = tbytcnt / tmsgcnt;
 
+#if 0
 				tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
 				tavg_tput = (3 * tavg_tput + thrput) / 4;
+#else
+				tavg_msgs = (tavg_msgs * report_count + msgcnt * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+				tavg_tput = (tavg_tput * report_count + thrput * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+#endif
 				fprintf(stdout,
 					"%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n",
 					fds[1], msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax);
@@ -292,8 +302,13 @@ test_sync(int fds[])
 				long long msgcnt = rmsgcnt / report;
 				long long avgsiz = rbytcnt / rmsgcnt;
 
+#if 0
 				ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
 				ravg_tput = (3 * ravg_tput + thrput) / 4;
+#else
+				ravg_msgs = (ravg_msgs * report_count + msgcnt * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+				ravg_tput = (ravg_tput * report_count + thrput * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+#endif
 				fprintf(stdout,
 					"%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n",
 					fds[0], msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax);
@@ -459,8 +474,13 @@ read_child(int fd)
 			long long errcnt = reagain / report;
 			long long avgsiz = rbytcnt / rmsgcnt;
 
+#if 0
 			ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
 			ravg_tput = (3 * ravg_tput + thrput) / 4;
+#else
+			ravg_msgs = (ravg_msgs * report_count + msgcnt * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+			ravg_tput = (ravg_tput * report_count + thrput * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+#endif
 			fprintf(stdout,
 				"%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n",
 				fd, msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax, errcnt, reintr, rerestart);
@@ -593,8 +613,13 @@ write_child(int fd)
 			long long errcnt = teagain / report;
 			long long avgsiz = tbytcnt / tmsgcnt;
 
+#if 0
 			tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
 			tavg_tput = (3 * tavg_tput + thrput) / 4;
+#else
+			tavg_msgs = (tavg_msgs * report_count + msgcnt * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+			tavg_tput = (tavg_tput * report_count + thrput * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+#endif
 			fprintf(stdout,
 				"%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n",
 				fd, msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax, errcnt, teintr, terestart);

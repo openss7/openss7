@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/04/12 20:06:22 $
+# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/05/07 18:51:44 $
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -13,7 +13,7 @@
 # arguments to add and remove links after the the name argument:
 #
 # strerr:	start and stop strerr facility
-# update-rc.d:	start 20 2 3 4 5 . stop 80 0 1 6 .
+# update-rc.d:	stop 80 0 1 6 .
 # config:	/etc/default/strerr
 # processname:	strerr
 # pidfile:	/var/run/strerr.pid
@@ -32,8 +32,8 @@
 # Provides: strerr
 # Required-Start: streams
 # Required-Stop: streams
-# Default-Start: 2 3 4 5
-# Default-Stop: 0 1 6
+# Default-Start: 4
+# Default-Stop: 0 1 2 3 4 5 6
 # X-UnitedLinux-Default-Enabled: yes
 # Short-Description: start and stop strerr
 # License: GPL
@@ -171,7 +171,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/04/12 20:06:22 $
+# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/05/07 18:51:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -216,7 +216,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/04/12 20:06:22 $ by $Author: brian $
+# Last Modified $Date: 2007/05/07 18:51:44 $ by $Author: brian $
 #
 # =============================================================================
 

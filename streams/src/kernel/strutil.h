@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strutil.h,v 0.9.2.55 2007/05/03 22:40:46 brian Exp $
+ @(#) $Id: strutil.h,v 0.9.2.56 2007/05/07 18:51:38 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/03 22:40:46 $ by $Author: brian $
+ Last Modified $Date: 2007/05/07 18:51:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.h,v $
+ Revision 0.9.2.56  2007/05/07 18:51:38  brian
+ - changes from release testing
+
  Revision 0.9.2.55  2007/05/03 22:40:46  brian
  - significant performance improvements, some bug corrections
 
@@ -70,7 +73,7 @@
 #ifndef __LOCAL_STRUTIL_H__
 #define __LOCAL_STRUTIL_H__
 
-#ident "@(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.55 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.56 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -266,7 +269,7 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp, unsigned long bands[]);
 						} \
 					     } else \
 						     zhwunlock((__sd)); \
-					     streams_local_restore((__pl)) ; \
+					     streams_local_restore((__pl)); \
 					   } while (0)
 #define zrlock(__sd,__pl)		do { streams_local_save(__pl); if ((__sd)->sd_freezer != current) read_lock(&(__sd)->sd_freeze); } while (0)
 #define zrunlock(__sd,__pl)		do { if ((__sd)->sd_freezer != current) read_unlock(&(__sd)->sd_freeze); streams_local_restore((__pl)); } while (0)
@@ -289,11 +292,11 @@ __flushq(queue_t *q, int flag, mblk_t ***mppp, unsigned long bands[]);
  */
 
 #define plockinit(__sd)			do { rwlock_init(&(__sd)->sd_plumb); } while (0)
-#define phwlock(__sd)			do { write_lock(&(__sd)->sd_plumb); } while (0)
-#define phwunlock(__sd)			do { write_unlock(&(__sd)->sd_plumb); } while (0)
-#define pwlock(__sd,__pl)		do { zrlock((__sd),(__pl)); phwlock((__sd)); } while (0)
-#define pwunlock(__sd,__pl)		do { phwunlock((__sd)); zrunlock((__sd),(__pl)); } while (0)
-#define prlock(__sd)			do { read_lock_str(&(__sd)->sd_plumb);   } while (0)
+#define phwlock(__sd)			do { write_lock(&(__sd)->sd_plumb); if ((__sd)->sd_freezer != current) read_lock(&(__sd)->sd_freeze); } while (0)
+#define phwunlock(__sd)			do { if ((__sd)->sd_freezer != current) read_unlock(&(__sd)->sd_freeze); write_unlock(&(__sd)->sd_plumb); } while (0)
+#define pwlock(__sd,__pl)		do { streams_local_save((__pl)); phwlock((__sd)); } while (0)
+#define pwunlock(__sd,__pl)		do { phwunlock((__sd)); streams_local_restore((__pl)); } while (0)
+#define prlock(__sd)			do { read_lock_str(&(__sd)->sd_plumb); } while (0)
 #define prunlock(__sd)			do { read_unlock_str(&(__sd)->sd_plumb); } while (0)
 
 /* stream head structure locks */

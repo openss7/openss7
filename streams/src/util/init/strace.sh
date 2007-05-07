@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/04/12 20:06:22 $
+# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/05/07 18:51:44 $
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -13,7 +13,7 @@
 # arguments to add and remove links after the the name argument:
 #
 # strace:	start and stop strace facility
-# update-rc.d:	start 20 2 3 4 5 . stop 80 0 1 6 .
+# update-rc.d:	stop 80 0 1 6 .
 # config:	/etc/default/strace
 # processname:	strace
 # pidfile:	/var/run/strace.pid
@@ -34,8 +34,8 @@
 # Required-Stop: streams
 # Should-Start: strerr
 # Should-Stop: strerr
-# Default-Start: 2 3 4 5
-# Default-Stop: 0 1 6
+# Default-Start: 4
+# Default-Stop: 0 1 2 3 4 5 6
 # X-UnitedLinux-Default-Enabled: no
 # Short-Description: start and stop strace
 # License: GPL
@@ -173,7 +173,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/04/12 20:06:22 $
+# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/05/07 18:51:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -218,7 +218,7 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/04/12 20:06:22 $ by $Author: brian $
+# Last Modified $Date: 2007/05/07 18:51:44 $ by $Author: brian $
 #
 # =============================================================================
 

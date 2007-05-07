@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.161 $) $Date: 2007/05/03 22:40:44 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.162 $) $Date: 2007/05/07 18:51:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/03 22:40:44 $ by $Author: brian $
+ Last Modified $Date: 2007/05/07 18:51:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.162  2007/05/07 18:51:37  brian
+ - changes from release testing
+
  Revision 0.9.2.161  2007/05/03 22:40:44  brian
  - significant performance improvements, some bug corrections
 
@@ -167,10 +170,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.161 $) $Date: 2007/05/03 22:40:44 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.162 $) $Date: 2007/05/07 18:51:37 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.161 $) $Date: 2007/05/03 22:40:44 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.162 $) $Date: 2007/05/07 18:51:37 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -2435,17 +2438,21 @@ freezechk(queue_t *q)
 STATIC streams_inline streams_fastcall __hot_out void
 putp_fast(queue_t *q, mblk_t *mp)
 {
+	struct stdata *sd;
+
 	dassert(q);
 	dassert(q->q_putp);
 
-	dassert(qstream(q));
+	sd = qstream(q);
+
+	dassert(sd);
 	/* spin here if Stream frozen by other than caller */
-	freeze_barrier(q);
+	stream_barrier(sd);
 
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
-	prlock(qstream(q));
+	prlock(sd);
 
 	/* procs can't be turned off */
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
@@ -2475,8 +2482,7 @@ putp_fast(queue_t *q, mblk_t *mp)
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
-	dassert(qstream(q));
-	prunlock(qstream(q));
+	prunlock(sd);
 }
 
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -3367,6 +3373,8 @@ put_filter(queue_t **qp, mblk_t *mp)
 streams_fastcall __hot void
 put(queue_t *q, mblk_t *mp)
 {				/* PROFILED */
+	struct stdata *sd;
+
 	prefetch(q);
 	prefetch(mp);
 
@@ -3376,8 +3384,10 @@ put(queue_t *q, mblk_t *mp)
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
-	dassert(qstream(q));
-	prlock(qstream(q));
+	sd = qstream(q);
+
+	dassert(sd);
+	prlock(sd);
 	if (likely(q->q_ftmsg == NULL) || likely(!put_filter(&q, mp))) {
 #ifdef CONFIG_STREAMS_SYNCQS
 		qputp(q, mp);
@@ -3388,8 +3398,7 @@ put(queue_t *q, mblk_t *mp)
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
-	dassert(qstream(q));
-	prunlock(qstream(q));
+	prunlock(sd);
 	return;
 }
 
@@ -3429,6 +3438,8 @@ EXPORT_SYMBOL(put);
 streams_fastcall __hot void
 putnext(queue_t *q, mblk_t *mp)
 {
+	struct stdata *sd;
+
 	prefetch(q);
 	prefetch(mp);
 #if 0
@@ -3442,8 +3453,9 @@ putnext(queue_t *q, mblk_t *mp)
 	/* prlock/unlock doesn't cost much anymore, so it is here so putnext() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
-	dassert(qstream(q));
-	prlock(qstream(q));
+	sd = qstream(q);
+	dassert(sd);
+	prlock(sd);
 	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
 		_assure(q->q_next != NULL);
 #ifdef CONFIG_STREAMS_SYNCQS
@@ -3459,8 +3471,7 @@ putnext(queue_t *q, mblk_t *mp)
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
 	   matter) on the stack.  Note that these are a no-op on UP. */
-	dassert(qstream(q));
-	prunlock(qstream(q));
+	prunlock(sd);
 	_trace();
 }
 
@@ -3538,7 +3549,7 @@ qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			q->q_qinfo->qi_mstat->ms_ocnt++;
 #endif
 		this_thread->syncq_cookie = sc;
-		err = q_open(q, devp, oflag, sflag, crp);
+		err = (*q_open)(q, devp, oflag, sflag, crp);
 		this_thread->syncq_cookie = NULL;
 		leave_syncq(sc->sc_sq);
 	} else
@@ -3548,7 +3559,7 @@ qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		if (unlikely(q->q_qinfo->qi_mstat != NULL))
 			q->q_qinfo->qi_mstat->ms_ocnt++;
 #endif
-		err = q_open(q, devp, oflag, sflag, crp);
+		err = (*q_open)(q, devp, oflag, sflag, crp);
 	}
 	/* SVR 3.2 compatibility of return codes and handle broken LiS modules */
 	err = (err == OPENFAIL) ? -ENXIO : (err > 0 ? -err : err);
@@ -3591,7 +3602,7 @@ qclose(queue_t *q, int oflag, cred_t *crp)
 			q->q_qinfo->qi_mstat->ms_ccnt++;
 #endif
 		this_thread->syncq_cookie = sc;
-		err = q_close(q, oflag, crp);
+		err = (*q_close)(q, oflag, crp);
 		this_thread->syncq_cookie = NULL;
 		leave_syncq(sc->sc_sq);
 	} else
@@ -3601,7 +3612,7 @@ qclose(queue_t *q, int oflag, cred_t *crp)
 		if (unlikely(q->q_qinfo->qi_mstat != NULL))
 			q->q_qinfo->qi_mstat->ms_ccnt++;
 #endif
-		err = q_close(q, oflag, crp);
+		err = (*q_close)(q, oflag, crp);
 	}
 	/* handle broken LiS modujles */
 	err = err > 0 ? -err : err;
@@ -5257,8 +5268,12 @@ kstreamd(void *__bind_cpu)
 	{
 		struct sched_param sp = { 0 };
 
+#if 1
 #ifdef SCHED_BATCH
 		sched_setscheduler(current, SCHED_BATCH, &sp);
+#else
+		sched_setscheduler(current, SCHED_NORMAL, &sp);
+#endif
 #else
 		sched_setscheduler(current, SCHED_NORMAL, &sp);
 #endif
@@ -5581,8 +5596,12 @@ kstreamd(void *__bind_cpu)
 	{
 		struct sched_param sp = { 0 };
 
+#if 1
 #ifdef SCHED_BATCH
 		sched_setscheduler(current, SCHED_BATCH, &sp);
+#else
+		sched_setscheduler(current, SCHED_NORMAL, &sp);
+#endif
 #else
 		sched_setscheduler(current, SCHED_NORMAL, &sp);
 #endif
