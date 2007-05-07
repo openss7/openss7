@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 19:02:46 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/05/07 18:55:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:02:46 $ by $Author: brian $
+ Last Modified $Date: 2007/05/07 18:55:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.36  2007/05/07 18:55:13  brian
+ - corrections from release testing
+
  Revision 0.9.2.35  2007/03/25 19:02:46  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -158,10 +161,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 19:02:46 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/05/07 18:55:13 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 19:02:46 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/05/07 18:55:13 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -214,7 +217,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/03/25 19:02:46 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/05/07 18:55:13 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -5164,8 +5167,8 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	mp->b_wptr += sizeof(*so);
 	so->so_flags = SO_WROFF | SO_DELIM;
 	so->so_wroff = 20;
-	putnext(q, mp);
 	qprocson(q);
+	putnext(q, mp);
 	return (0);
 }
 
