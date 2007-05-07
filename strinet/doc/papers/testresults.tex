@@ -1,7 +1,7 @@
 %% -*- tex -*- vim: ft=tex tw=78 nocin nosi
 %% =========================================================================
 %%
-%% @(#) $Id: testresults.tex,v 0.9.2.1 2007/05/03 21:28:27 brian Exp $
+%% @(#) $Id: testresults.tex,v 0.9.2.2 2007/05/07 18:41:39 brian Exp $
 %%
 %% =========================================================================
 %%
@@ -53,7 +53,7 @@
 %% 
 %% =========================================================================
 %%
-%% Last Modified $Date: 2007/05/03 21:28:27 $ by $Author: brian $
+%% Last Modified $Date: 2007/05/07 18:41:39 $ by $Author: brian $
 %%
 %% =========================================================================
 
@@ -172,7 +172,7 @@ With the objective of contrasting performance between STREAMS and legacy
 approaches to system facilities, a comparison is made between the tested
 performance of the \textsl{Linux NET4} UDP implementation and STREAMS UDP
 implementations using the \textsl{Linux Fast-STREAMS}
-package.\footnote{\textit{http://www.openss7.org/download.html}}
+package \cite[]{LfS}.
 \end{abstract}
 
 %\tableofcontents
@@ -182,9 +182,10 @@ package.\footnote{\textit{http://www.openss7.org/download.html}}
 UNIX networking has a rich history.  The TCP/IP protocol suite was first
 implemented by BBN using Sockets under a DARPA research project on 4.1aBSD and
 then incorporated bt the CSRG into 4.2BSD \cite[]{bsd}.  Lachmann and
-Associates subsequently implemented the first TCP/IP protocol suite based on
-the Transport Provider Interface (TPI) \cite[]{tli} and STREAMS
-\cite[]{magic}.
+Associates (Legent) subsequently implemented one of the first TCP/IP protocol
+suite based on the Transport Provider Interface (TPI) \cite[]{tli} and STREAMS
+\cite[]{magic}.  Two other predominant TCP/IP implementations on STREAMS
+surfaced at about the same time: Wollongong and Mentat.
 
 \subsection[STREAMS]{STREAMS}
 STREAMS is a facility first presented in a paper by Dennis M. Ritchie in 1984
@@ -254,10 +255,10 @@ deprecated in favor of the POSIX/SUS standard Sockets interface.
 
 \item[{\it POSIX Sockets.}]
 
-Sockets were standardized by the \textit{OpenGroup}\footnote{\it
-http://www.opengroup.org/} and \textit{IEEE} in the POSIX standardization
-process.  They appear in XNS 5.2 \cite[]{xns}, SUSv1 \cite[]{susv1}, SUSv2
-\cite[]{susv2} and SUSv3 \cite[]{susv3}.
+Sockets were standardized by the \textit{OpenGroup} \cite[]{opengroup} and
+\textit{IEEE} in the POSIX standardization process.  They appear in XNS 5.2
+\cite[]{xns}, SUSv1 \cite[]{susv1}, SUSv2 \cite[]{susv2} and SUSv3
+\cite[]{susv3}.
 
 \end{description}
 
@@ -358,6 +359,23 @@ compatibility is exemplified by the \texttt{netperf} program which does not
 distinguish between BSD or STREAMS based networking in their implementation or
 use.}
 
+\subsection[Linux Fast-STREAMS]{Linux Fast-STREAMS}
+
+The first STREAMS package for Linux that provided SVR4 STREAMS capabilities
+was the \textsl{Linux STREAMS (LiS)} package originally available from GCOM
+\cite[]{LiS}.  This package exhibited incompatibilities with SVR 4.2 STREAMS
+and other STREAMS implementations, was bugger and performed very poorly on
+Linux.  These difficulties prompted the OpenSS7 Project \cite[]{openss7} to
+implement an SVR 4.2 STREAMS package from scratch, with the objective of
+production quality and high-performance, named \textsl{Linux Fast-STREAMS}
+\cite[]{LfS}.
+
+The OpenSS7 Porject also maintains public and internal version of the
+\textsl{LiS} package.  The last public release was \textit{LiS-2.18.3}; the
+current internal release version is \textit{LiS-2.18.6}.  The current
+production public release of \textsl{Linux Fast-STREAMS} is
+\textit{streams-0.9.3}.
+
 \section[Objective]{Objective}
 
 The question has been asked whether there are performance differences between
@@ -371,15 +389,14 @@ approach to TCP/IP networking is a viable for a replacement for the BSD-style
 sockets approach provided by Linux, termed NET4.
 
 When developing STREAMS, the authors oft times found that there were a number
-of unsupported preconceptions espoused by Linux advocates about both STREAMS
-and STREAMS-based networking, as follows:
+of preconceptions espoused by Linux advocates about both STREAMS and
+STREAMS-based networking, as follows:
 
 \begin{itemize}
 
 \item STREAMS is slow.
 
-\item STREAMS is more flexible, but less efficient.\footnote{For example, see
-\textit{http://www.kernel.org/pub/linux/docs/lkml/\#s9-9} .}
+\item STREAMS is more flexible, but less efficient \cite{lkmlfaq}.
 
 \item STREAMS performs poorly on uniprocessor and ever poorer on SMP.
 
@@ -611,23 +628,22 @@ invoked.
 \subsection[Linux Fast-STREAMS]{Linux Fast-STREAMS}
 
 \textsl{Linux Fast-STREAMS} is an implementation of \textsl{SVR4.2 STREAMS}
-for the \textsl{GNU/Linux} system developed by the \textsl{OpenSS7
-Project}\footnote{\it http://www.openss7.org/} as a replacement for the
-buggy, under-performing and now deprecated \textsl{Linux STREAMS (LiS)}
-package.  \textsl{Linux Fast-STREAMS} provides the STREAMS executive and
-interprocess communication facilities (pipes and FIFOs).  Add-on packages
-provide compatibility between \textsl{Linux Fast-STREAMS} and other STREAMS
-implementations, a complete \textsl{XTI} shared object library, and transport
-providers.  Transport providers for the TCP/IP suite consist of an
-\texttt{inet} driver that uses the \textit{XTI over Sockets} approach as well
-as a full STREAMS implementation of SCTP (Stream Control Transmission
-Protocol), UDP (User Datagram Protocol) and RAWIP (Raw Internet Protocol).
+for the \textsl{GNU/Linux} system developed by the \textsl{OpenSS7 Project}
+\cite[]{openss7} as a replacement for the buggy, under-performing and now
+deprecated \textsl{Linux STREAMS (LiS)} package.  \textsl{Linux Fast-STREAMS}
+provides the STREAMS executive and interprocess communication facilities
+(pipes and FIFOs).  Add-on packages provide compatibility between
+\textsl{Linux Fast-STREAMS} and other STREAMS implementations, a complete
+\textsl{XTI} shared object library, and transport providers.  Transport
+providers for the TCP/IP suite consist of an \texttt{inet} driver that uses
+the \textit{XTI over Sockets} approach as well as a full STREAMS
+implementation of SCTP (Stream Control Transmission Protocol), UDP (User
+Datagram Protocol) and RAWIP (Raw Internet Protocol).
 
 \subsubsection[XTI over Sockets]{XTI over Sockets}
 
 The XTI over Sockets implementation is the \texttt{inet} STREAMS driver
-developed by the \textsl{OpenSS7
-Project}.\footnote{\textit{http://www.openss7.org/}}  As illustrated in
+developed by the \textsl{OpenSS7 Project} \cite[]{openss7}. As illustrated in
 \textit{Figure \ref{figure:xtios}}, this driver is implemented as a STREAMS
 pseudo-device driver and uses STREAMS for passing TPI service primitives to
 and from upstream modules or the \textit{Stream head}.  Within the driver,
@@ -681,14 +697,13 @@ immediately at the receiving socket or is discarded.
 \subsubsection[STREAMS TPI]{STREAMS TPI}
 
 The STREAMS TPI implementation of UDP is a direct STREAMS implementation that
-uses the \texttt{udp} driver developed by the \textsl{OpenSS7
-Project}.\footnote{\textit{http://www.openss7.org/}} As illustrated in
-\textit{Figure \ref{figure:udp}}, this driver interfaces to Linux at the
-network layer, but provides a complete STREAMS implementation of the transport
-layer.  Interfacing with Linux at the network layer provides for
-de-multiplexed STREAMS architecture \cite[]{demux}.  The driver presents the
-Transport Provider Interface (TPI) \cite[]{tpi} for use by upper level modules
-and the XTI library \cite[]{xti}.
+uses the \texttt{udp} driver developed by the \textsl{OpenSS7 Project}
+\cite[]{openss7}.  As illustrated in \textit{Figure \ref{figure:udp}}, this
+driver interfaces to Linux at the network layer, but provides a complete
+STREAMS implementation of the transport layer.  Interfacing with Linux at the
+network layer provides for de-multiplexed STREAMS architecture \cite[]{demux}.
+The driver presents the Transport Provider Interface (TPI) \cite[]{tpi} for
+use by upper level modules and the XTI library \cite[]{xti}.
 
 \begin{figure}[htp]
 \center\includegraphics[height=3.5in]{udp}
@@ -762,27 +777,26 @@ blocked awaiting messages get awoken.
 \section[Method]{Method}
 
 To test the performance of STREAMS networking, the \textsl{Linux Fast-STREAMS}
-package was used.\footnote{\textit{http://www.openss7.org/download.html}}  The
-\textsl{Linux Fast-STREAMS} package builds and installs Linux loadable kernel
-module and includes the modified \texttt{netperf} program used for testing.
+package was used \cite[]{LfS}.  The \textsl{Linux Fast-STREAMS} package builds
+and installs Linux loadable kernel module and includes the modified
+\texttt{netperf} program used for testing.
 
 \paragraph*{Test Program.}
 
 The program used is a version of the \texttt{netperf} network performance
 measurement tool developed and maintained by Rick Jones for
 \textit{Hewlett-Packard}.  This modified version is available from the
-\textit{OpenSS7
-Project}.\footnote{\textit{http://www.openss7.org/download.html}} While the
-program is able test using both POSIX Sockets and XTI STREAMS interfaces,
-modifications were required to the package to allow it to compile for
-\textsl{Linux Fast-STREAMS}.
+\textit{OpenSS7 Project} \cite[]{netperf}.  While the program is able test
+using both POSIX Sockets and XTI STREAMS interfaces, modifications were
+required to the package to allow it to compile for \textsl{Linux
+Fast-STREAMS}.
 
 The \texttt{netperf} program has many options.  Therefore, a benchmark script
 (called \texttt{netperf\_benchmark}) was used to obtain repeatable raw data
 for the various machines and distributions tested.  This benchmark script is
 included in the \texttt{netperf} distribution available from the
-\textit{OpenSS7 Project}.  A listing of this script is provided in
-\textit{Appendix \ref{section:script}}.
+\textit{OpenSS7 Project} \cite[]{netperf}.  A listing of this script is
+provided in \textit{Appendix \ref{section:script}}.
 
 \subsection[Distributions Tested]{Distrbutions Tested}
 
@@ -797,7 +811,7 @@ RedHat 7.2 & 2.4.20-28.7\\
 WhiteBox 3 & 2.4.27\\
 CentOS 4 & 2.6.9-5.0.3.EL\\
 SuSE 10.0 OSS & 2.6.13-15-default\\
-Ubuntu 6.06 & 2.6.17-11-generic\\
+Ubuntu 6.10 & 2.6.17-11-generic\\
 Fedora Core 6 & 2.6.20-1.2933.fc6\\
 \end{tabular}\\
 
@@ -873,7 +887,7 @@ Distribution & Kernel\\
 Fedora Core 6 & 2.6.20-1.2933.fc6\\
 CentOS 4 & 2.6.9-5.0.3.EL\\
 SuSE 10.0 OSS & 2.6.13-15-default\\
-Ubuntu 6.06 & 2.6.17-11-generic\\
+Ubuntu 6.10 & 2.6.17-11-generic\\
 \end{tabular}
 
 \subsubsection[Fedora Core 6]{Fedora Core 6} Fedora Core 6 is the most recent
@@ -1105,9 +1119,9 @@ STREAMS demonstrates significant improvements (25-30\%) at all message sizes.
 \label{figure:susecomp}
 \end{figure}
 
-\subsubsection[Ubuntu 6.06]{Ubuntu 6.06}
-Ubuntu 6.06 is the current release of the Ubuntu distribution.  The Ubuntu
-6.06 release sports a 2.6.15 kernel.  The tested distribution had current
+\subsubsection[Ubuntu 6.10]{Ubuntu 6.10}
+Ubuntu 6.10 is the current release of the Ubuntu distribution.  The Ubuntu
+6.10 release sports a 2.6.15 kernel.  The tested distribution had current
 updates applied.
 
 \begin{description}
@@ -1158,25 +1172,25 @@ Sockets at all message sizes.
 
 \begin{figure}[p]
 \center\includegraphics[width=\columnwidth]{netperf_ubuntu_perf}
-\caption[Ubuntu 6.06 on Porky Performance]{Ubuntu 6.06 on Porky Performance}
+\caption[Ubuntu 6.10 on Porky Performance]{Ubuntu 6.10 on Porky Performance}
 \label{figure:ubuntuperf}
 \end{figure}
 
 \begin{figure}[p]
 \center\includegraphics[width=\columnwidth]{netperf_ubuntu_delay}
-\caption[Ubuntu 6.06 on Porky Delay]{Ubuntu 6.06 on Porky Delay}
+\caption[Ubuntu 6.10 on Porky Delay]{Ubuntu 6.10 on Porky Delay}
 \label{figure:ubuntudly}
 \end{figure}
 
 \begin{figure}[p]
 \center\includegraphics[width=\columnwidth]{netperf_ubuntu_thrput}
-\caption[Ubuntu 6.06 on Porky Throughput]{Ubuntu 6.06 on Porky Throughput}
+\caption[Ubuntu 6.10 on Porky Throughput]{Ubuntu 6.10 on Porky Throughput}
 \label{figure:ubuntuthrput}
 \end{figure}
 
 \begin{figure}[p]
 \center\includegraphics[width=\columnwidth]{netperf_ubuntu_comp}
-\caption[Ubuntu 6.06 on Porky Comparison]{Ubuntu 6.06 on Porky Comparison}
+\caption[Ubuntu 6.10 on Porky Comparison]{Ubuntu 6.10 on Porky Comparison}
 \label{figure:ubuntucomp}
 \end{figure}
 
@@ -1700,53 +1714,55 @@ tested.}
 \end{quote}
 
 All of the conventional wisdom with regard to STREAMS and STREAMS networking
-is undermined by these test results.
+is undermined by these test results for \textsl{Linux Fast-STREAMS}.
 
 \begin{itemize}
 
 \item \textit{STREAMS is fast.}
 
-Contrary to the misconception that STREAMS must be slower because it is more
+Contrary to the preconception that STREAMS must be slower because it is more
 general purpose, in fact the reverse has been shown to be true in these
-experiments.  The STREAMS flow control and scheduling mechanisms serve to
-adapt well and increase both code and data cache as well as scheduler
-efficiency.
+experiments for \textsl{Linux Fast-STREAMS}.  The STREAMS flow control and
+scheduling mechanisms serve to adapt well and increase both code and data
+cache as well as scheduler efficiency.
 
 \item \textit{STREAMS is more flexible {\em and} more efficient.}
 
-Contrary to the misconception that STREAMS trades flexibility or general
+Contrary to the preconception that STREAMS trades flexibility or general
 purpose architecture for efficiency (that is, that STREAMS is somehow less
 efficient because it is more flexible and general purpse), in fact has shown
-to be untrue.  STREAMS is {\em both} more flexible {\em and} more efficient.
-Indeed, the performance gains achieved by  STREAMS appear to derive from its
-more sophisticated queueing, scheduling and flow control model.
+to be untrue.  \textsl{Linux Fast-STREAMS} is {\em both} more flexible {\em
+and} more efficient.  Indeed, the performance gains achieved by  STREAMS
+appear to derive from its more sophisticated queueing, scheduling and flow
+control model.
 
 \item \textit{STREAMS better exploits parallelisms on SMP better than other approaches.}
 
-Contrary to the misconception that STREAMS must be slower due to complex
-locking and synchronization mechanisms, STREAMS performed better on SMP
-(hyperthreaded) machines than on UP machines and outperformed Linux NET4 UDP
-by and even more significant factor (about 40\% improvement at most message
-sizes).  Indeed, STREAMS appears to be able to exploit inherent parallelisms
-that Linux NET4 is unable to exploit.
+Contrary to the preconception that STREAMS must be slower due to complex
+locking and synchronization mechanisms, \textsl{Linux Fast-STREAMS} performed
+better on SMP (hyperthreaded) machines than on UP machines and outperformed
+Linux NET4 UDP by and even more significant factor (about 40\% improvement at
+most message sizes).  Indeed, STREAMS appears to be able to exploit inherent
+parallelisms that Linux NET4 is unable to exploit.
 
 \item \textit{STREAMS networking is fast.}
 
-Contrary to the misconception that STREAMS networking must be slower because
+Contrary to the preconception that STREAMS networking must be slower because
 STREAMS is more general purpose and has a rich set of features, the reverse
-has been shown in these experiments.  By utilizing STREAMS queueing, flow
-control and scheduling, STREAMS UDP indeed performs better than Linux NET4
-UDP.
+has been shown in these experiments for \textsl{Linux Fast-STREAMS}.  By
+utilizing STREAMS queueing, flow control and scheduling, STREAMS UDP indeed
+performs better than Linux NET4 UDP.
 
 \item \textit{STREAMS networking is neither unnecessarily complex nor cumbersome.}
 
-Contrary to the misconception that STREAMS networking must be poorer because
+Contrary to the preconception that STREAMS networking must be poorer because
 of use of a complex yet general purpose framework has shown to be untrue in
-these experiments.  Also, the fact that STREAMS and Linux conform to the same
-standard (POSIX), means that they are no more cumbersome from a programming
-perspective.  Indeed a POSIX conforming application will not known the
-difference between the implementation (with the exception that superior
-performance will be experienced on STREAMS networking).
+these experiments for \textsl{Linux Fast-STREAMS}.  Also, the fact that
+STREAMS and Linux conform to the same standard (POSIX), means that they are no
+more cumbersome from a programming perspective.  Indeed a POSIX conforming
+application will not known the difference between the implementation (with the
+exception that superior performance will be experienced on STREAMS
+networking).
 
 \end{itemize}
 
@@ -1767,24 +1783,22 @@ BSD claims that in 4.4BSD pipes were implemented using sockets (UNIX domain
 sockets) instead of using the file system as they were in 4.1BSD \cite[]{bsd}.
 One of the reasons cited for implementing pipes on Sockets and UNIX domain
 sockets using the networking subsystems was performance.  Another paper
-released by the \textsl{OpenSS7
-Project}\footnote{\textit{http://www.openss7.org/}} shows that experimental
-results on Linux file-system based pipes (using the SVR3 or 4.1BSD approaches)
-perform poorly when compared to STREAMS-based pipes.  Because Linux uses a
-similar approach to file-system based pipes in implementation of UNIX domain
-sockets, it can be expected that UNIX domain sockets under Linux will also
-perform poorly when compared to loop-back transport providers under STREAMS.
+released by the \textsl{OpenSS7 Project} \cite[]{openss7} shows that
+experimental results on Linux file-system based pipes (using the SVR3 or
+4.1BSD approaches) perform poorly when compared to STREAMS-based pipes.
+Because Linux uses a similar approach to file-system based pipes in
+implementation of UNIX domain sockets, it can be expected that UNIX domain
+sockets under Linux will also perform poorly when compared to loop-back
+transport providers under STREAMS.
 
 \subsection*{Sockets interface to STREAMS}
 
 There are several mechanisms to providing BSD/POSIX Sockets interfaces to
 STREAMS networking \cite[]{impbsd} \cite[]{socklib}.  The experiments in this
 report indicate that it could be worthwhile to complete one of these
-implementations for \textsl{Linux Fast-STREAMS}\footnote{A package that
-provides these approaches is the \texttt{strsock} package from the OpenSS7
-Project at \textit{http://www.openss7.org/download.html}} and test whether
-STREAMS networking using the Sockets interface is also superior to Linux NET4,
-just as it has been shown to be with the XTI/TPI interface.
+implementations for \textsl{Linux Fast-STREAMS} \cite[]{strsock} and test
+whether STREAMS networking using the Sockets interface is also superior to
+Linux NET4, just as it has been shown to be with the XTI/TPI interface.
 
 \section[Related Work]{Related Work}
 
@@ -1843,7 +1857,7 @@ Porky.
 Porky.
 
 \textit{Table \ref{table:ubuntudata}} lists the raw data from the
-\texttt{netperf} program that was used in preparing graphs for Ubuntu 6.06 on
+\texttt{netperf} program that was used in preparing graphs for Ubuntu 6.10 on
 Porky.
 
 \textit{Table \ref{table:rh7data}} lists the raw data from the
@@ -1985,7 +1999,7 @@ Size & Tx & Rx & Tx & Rx & Tx & Rx\\
 \end{tabular}
 \end{center}
 \normalsize
-\caption[Ubuntu 6.06 on Porky Raw Data]{Ubuntu 6.06 on Porky Raw Data}
+\caption[Ubuntu 6.10 on Porky Raw Data]{Ubuntu 6.10 on Porky Raw Data}
 \label{table:ubuntudata}
 \end{table}
 

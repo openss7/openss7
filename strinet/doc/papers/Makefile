@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/05/03 21:28:27 $
+# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/05/07 18:41:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/05/03 21:28:27 $ by $Author: brian $
+# Last Modified $Date: 2007/05/07 18:41:39 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile,v $
+# Revision 0.9.2.2  2007/05/07 18:41:39  brian
+# - updated papers
+#
 # Revision 0.9.2.1  2007/05/03 21:28:27  brian
 # - added paper
 #
@@ -112,7 +115,7 @@ PLOTFIGS = $(PLOTS:.plot=.fig)
 NAME = testresults
 
 .PHONY: all
-all: $(NAME).bbl $(NAME).ps $(NAME).pdf $(NAME).html
+all: $(NAME).bbl $(NAME).ps $(NAME).pdf
 
 $(PLOTFIGS): %.fig: %.plot
 	gnuplot $<

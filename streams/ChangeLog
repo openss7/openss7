@@ -1,5 +1,8 @@
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/papers/Makefile: updated papers
+	* doc/papers/piperesults.bib: updated papers
+	* doc/papers/piperesults.tex: updated papers
 	* doc/man/man9/strrsrv.9.man: updated manual pages
 	* doc/man/Makefile.am: updated manual pages
 	* doc/man/man9/str_open.9.man: updated manual pages
