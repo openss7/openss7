@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: str_open.9.man,v 0.9.2.3 2006/04/05 09:44:18 brian Exp $
+.\" @(#) $Id: str_open.9.man,v 0.9.2.4 2007/05/07 18:38:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:18 $ by $Author: brian $
+.\" Last Modified $Date: 2007/05/07 18:38:43 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: str_open.9.man,v $
+.\" Revision 0.9.2.4  2007/05/07 18:38:43  brian
+.\" - updated manual pages
+.\"
 .\" Revision 0.9.2.3  2006/04/05 09:44:18  brian
 .\" - moved .so line and updated headers
 .\"
@@ -81,7 +84,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B str_open, str_close, strrput, strwput, strwsrv
+.B str_open, str_close, strrput, strrsrv, strwput, strwsrv
 \- Stream head module procedures
 .\"
 .\"
@@ -97,6 +100,8 @@ sort-adjacent-labels
 .BI "int str_close(queue_t *" q ", int " oflag ", cred_t *" crp ");
 .HP
 .BI "int strrput(queue_t *" q ", mblk_t *" mp ");
+.HP
+.BI "int strrsrv(queue_t *" q ");
 .HP
 .BI "int strwput(queue_t *" q ", mblk_t *" mp ");
 .HP
@@ -125,10 +130,78 @@ implementation specific.
 .BR str_open (),
 .BR str_close (),
 .BR strrput (),
+.BR strrsrv (),
 .BR strwput (),
 .BR strwsrv (),
 specify the operation of the Stream head module,
 .BR sth (4).
+.BR str_open (),
+.BR str_close ()
+provide the STREAMS open and close routes for the Stream head;
+.BR strrput (),
+.BR strrsrv (),
+put and service procedure for the read side; and,
+.BR strwput (),
+.BR strwsrv (),
+put and service procedure for the write side.
+.PP
+Each time that the Stream is opened, the
+.BR str_open ()
+routine is called.  On the last close (resulting the subsequent destruction of
+the Stream), the
+.BR str_close ()
+routine is called.
+.PP
+When the Stream head is written, the message is dispatched with
+.BR put (9);
+.BR put (9)
+results in calling
+.BR strwput ();
+.BR strwput ()
+results in the dispatch of any queued message (for the write coalescing
+feature) and the current message,
+.IR mp ,
+using
+.BR putnext (9).
+Before dispatching a held normal message downstream, flow control is checked
+with
+.BR bcanputnext (9).
+During the write process, the Stream head also checks for downstream flow
+control with
+.BR bcanputnext (9)
+before allocating message blocks for the written data.  When flow controlled,
+the calling process either blocks or the system all returns an error
+.RB [ EAGAIN ].
+When flow control subsides, the queue that is no longer flow controlled
+back-enables the Stream head write queue which will directly invoke the
+.BR strwsrv ()
+service procedure when the STREAMS scheduler runs runqueues().  It is the
+responsibility of the
+.BR strwsrv ()
+procedure to wake writers sleeping on flow control, as well as waking polling
+processes sleeping on one or more message bands, and signalling STREAMS events
+to registered processes.  If a queue message exists on the queue (for the
+write coalescing feature), it is displatched downstream with
+.BR putnext (9).
+.PP
+When the Stream head is read, messages of the appropriate type are taken of of
+the Stream head read queue and copied to the user.  If there are no messages
+of the appropriate type on the read queue at the time of the read, the calling
+process blocks or the system call returns with an error
+.RB ([ EAGAIN "], [" EBADMSG }).
+When a message arrives at the read queue and no other message was queued, or
+the message become the message at the head of the queue, the queue's service
+procedure,
+.BR strrsrv (),
+is scheduled for execution by the STREAMS scheduler.  It is the
+repsonsibiiloty of the
+.BR strrsrv ()
+procedure to wake readers sleeping awaiting messages, as well a waking polling
+processes sleeping on input, and signalling STREAMS events to registered
+precesses.  If the read queue becomes full and the reading process results in
+the count on the queue falling beneath the queue's low water mark, the
+next backward queue with a service procedure will have it service procedure
+scheduled.
 .\"
 .\"
 .SH USAGE
@@ -136,6 +209,7 @@ specify the operation of the Stream head module,
 .BR str_open (),
 .BR str_close (),
 .BR strrput (),
+.BR strrsrv (),
 .BR strwput (),
 .BR strwsrv (),
 are internal
@@ -213,6 +287,7 @@ See
 .BR str_open (),
 .BR str_close (),
 .BR strrput (),
+.BR strrsrv (),
 .BR strwput (),
 .BR strwsrv ()
 have no known bugs.
@@ -222,7 +297,7 @@ have no known bugs.
 .PP
 .BR str_open (),
 .BR str_close (),
-.BR strrput (),
+.BR strrsrv (),
 .BR strwput (),
 .BR strwsrv ()
 are compatible with
@@ -252,6 +327,7 @@ usldk
 .BR stropen (),
 .BR strclose (),
 .BR strrput (),
+.BR strrsrv (),
 .BR strwput (),
 .BR strwsrv ()
 appear as part of
@@ -263,6 +339,7 @@ svr4spg
 .BR stropen (),
 .BR strclose (),
 .BR strrput (),
+.BR strrsrv (),
 .BR strwput (),
 .BR strwsrv ()
 first appeared in 

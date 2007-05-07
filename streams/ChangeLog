@@ -1,5 +1,9 @@
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man9/strrsrv.9.man: updated manual pages
+	* doc/man/Makefile.am: updated manual pages
+	* doc/man/man9/str_open.9.man: updated manual pages
+	* doc/man/man9/strwput.9.man: updated manual pages
 	* tests/kernel.at: correction to module test for new distros
 	* doc/papers/perftest_cos5.dat: added new data plots
 	* doc/papers/perftest_cos5_comp.plot: added new data plots
