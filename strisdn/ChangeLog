@@ -1,3 +1,12 @@
+2007-05-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updated release files
+	* doc/manual/news.texi: updated release files
+	* NEWS: updated release files
+	* README: updated release files
+	* README-cvs: updated release files
+	* THANKS: updated release files
+
 2007-05-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* strisdn.spec.in: make GPL version more obvious

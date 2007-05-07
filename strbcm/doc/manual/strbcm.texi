@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strbcm.texi,v 0.9.2.11 2007/02/28 06:30:38 brian Exp $
+% @(#) $Id: strbcm.texi,v 0.9.2.12 2007/05/07 18:20:59 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/02/28 06:30:38 $ by $Author: brian $
+% Last Modified $Date: 2007/05/07 18:20:59 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -403,6 +403,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strbcm.texi,v $
+Revision 0.9.2.12  2007/05/07 18:20:59  brian
+ updated release files
+
 Revision 0.9.2.11  2007/02/28 06:30:38  brian
 - updates and corrections, #ifdef instead of #if
 
@@ -697,6 +700,60 @@ This manual uses @cite{texinfo} typographic conventions.
 @node Development
 @section Development
 @cindex developing
+
+@subsection Precompiled Drivers
+
+The @value{PACKAGE_TITLE} package make provision for you to add your own @emph{STREAMS} driver to
+the build of the @file{@value{PACKAGE}} package.  Your drivers are built outside the
+@file{@value{PACKAGE}} source code tree.  The object code and configuration information pertaining
+to your driver must be copied into the @file{@value{PACKAGE}} source code tree to be incorporated
+into @file{@value{PACKAGE}}.
+
+@subsubsection The @file{@value{PACKAGE}} @file{pkg} Directory
+
+The directory, @file{strbcm/pkg} is the directory where pre-compiled drivers are to be copied.  This
+directory contains subdirectories, one for each driver to be linked in with @file{@value{PACKAGE}}
+when @file{@value{PACKAGE}} is built.
+
+If you have a driver named @file{foo} then you neeed to do a @command{mkdir} @file{strbcm/pkg/foo}
+to create the directory that will contain the components of your driver.
+
+Driver Components
+
+You need a copy of the following files into your package directory (@file{strbcm/pkg/foo}):
+
+@ftable @file
+
+@item Makefile
+
+A make file to do anything that needs to be done just prior to linking your driver's object code
+file into @file{@value{PACKAGE}}.  If there is nothing to be done then just provide a dummy default
+target.  The make file has to be present for the @file{@value{PACKAGE}} build procedure to function
+properly.
+
+@item Driver.o
+
+Any number of object files with suffix @samp{.o} will do.  These files can be copied into this
+directory from elsewhere, they do not have to be built by the make file.  Alternately, the make file
+can copy in updated driver object files as needed.  Which style you use is entirely up to you.
+
+@item Space.c
+
+This is optional.  If you want to incorporate configuraiton information from your configuration file
+into your driver at link time, then place a file by this name in your driver's package directory.
+Your make file should contain an @samp{#include ../proto/Makefile} to incorporate a rule to make
+this file into an object file.  Your @file{Space.c} file should include the file @file{config.h} in
+it.  See the section on configuration ofr more details about @file{Space.c} and @file{config.h}.
+
+@item Config
+
+This is the @emph{STREAMS} configuration file for your driver.  It is combined with other
+@file{Config} files for other drivers to produce a master @file{Config} file.  This master
+@file{Config} file is then processed by the @file{@value{PACKAGE}} @manref{strconf(8)} utility to
+produce, amoung other things, the file @file{config.h}.  See the section on configuration for more
+information about the @file{Config} file.
+
+@end ftable
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
