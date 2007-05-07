@@ -1,5 +1,16 @@
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/papers/perftest_cos5.dat: added new data plots
+	* doc/papers/perftest_cos5_comp.plot: added new data plots
+	* doc/papers/perftest_cos5_delay.plot: added new data plots
+	* doc/papers/perftest_cos5_perf.plot: added new data plots
+	* doc/papers/perftest_cos5_thrput.plot: added new data plots
+	* doc/papers/perftest_u704.dat: added new data plots
+	* doc/papers/perftest_u704_comp.plot: added new data plots
+	* doc/papers/perftest_u704_delay.plot: added new data plots
+	* doc/papers/perftest_u704_perf.plot: added new data plots
+	* doc/papers/perftest_u704_thrput.plot: added new data plots
+
 	* AUTHORS: updated release files
 	* doc/manual/news.texi: updated release files
 	* NEWS: updated release files
