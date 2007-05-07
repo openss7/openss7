@@ -1,5 +1,6 @@
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* acinclude.m4: add strbcm package by default
 	* AUTHORS: updated release files
 	* NEWS: updated release files
 	* doc/manual/news.texi: updated release files
