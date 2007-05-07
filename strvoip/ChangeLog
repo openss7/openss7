@@ -1,5 +1,6 @@
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man7/cci_sipt.7.man: updated manual page
 	* tests/kernel.at: correction to module test for new distros
 	* AUTHORS: updated release files
 	* doc/manual/news.texi: updated release files
