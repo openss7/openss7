@@ -111,8 +111,7 @@
 With the objective of contrasting performance between STREAMS and legacy
 approaches to system facilities, comparison is made between the tested
 performance of the Linux legacy pipe implementation and the STREAMS-based
-pipes using \textsl{Linux
-Fast-STREAMS}.\footnote{\textit{http://www.openss7.org/download.html}}
+pipes using \textsl{Linux Fast-STREAMS} \cite[]{LfS}.
 \end{abstract}
 
 %\tableofcontents
@@ -182,7 +181,7 @@ system.  Although one file descriptor was opened for read and the other for
 write, with a STREAMS-based pipe it is possible to reopen both for reading and
 writing.
 
-\begin{figure}[htp]
+\begin{figure}[htbp]
 \center\includegraphics[width=3.0in]{streamspipe}
 \caption[STREAMS-Based Pipes]{STREAMS-Based Pipes}
 \label{figure:streamspipe}
@@ -237,7 +236,7 @@ the networking subsystem (UNIX domain sockets) for what was cited as
 effectively calls sockpair(3) and obtains a pair of connected sockets in the
 UNIX domain as illustrated in \textit{Figure \ref{figure:socketpipe}}.
 
-\begin{figure}[htp]
+\begin{figure}[htbp]
 \center\includegraphics[width=2.5in]{socketpipe}
 \caption[4.2BSD Pipes]{4.2BSD Pipes}
 \label{figure:socketpipe}
@@ -257,7 +256,7 @@ capabilities of STREAMS-based pipes or socket pairs in the UNIX
 domain.\footnote{It has been said of Linux that, without STREAMS, it is just
 another BSD... ...and not a very good one.}
 
-\begin{figure}[htp]
+\begin{figure}[htbp]
 \center\includegraphics[width=3.0in]{legacypipe}
 \caption[Linux Legacy Pipes]{Linux Legacy Pipes}
 \label{figure:legacypipe}
@@ -280,6 +279,22 @@ pipes.\footnote{This compatibility is exemplified by the perftest(8) program
 which does not distinguish between legacy and STREAMS-based pipes in their
 implementation or use.}
 
+\subsection[Linux Fast-STREAMS]{Linux Fast-STREAMS}
+
+The first STREAMS package for Linux that provided SVR4 STREAMS capabilities
+was the \textsl{Linux STREAMS (LiS)} package originally available from GCOM.
+This package exhibited incompatibilities with SVR 4.2 STREAMS and other
+STREAMS implementations, was buggy and performed very poorly on Linux.  These
+difficulties prompted the OpenSS7 Project \cite[]{openss7} to implement an SVR
+4.2 STREAMS package from scratch, with the objective of production quality and
+high-performance, named \textsl{Linux Fast-STREAMS}.
+
+The OpenSS7 Project \cite[]{openss7} also maintains public and internal
+versions of the \textsl{LiS} package.  The last public release was
+\textit{LiS-2.18.3}; the current internal release version is
+\textit{LiS-2.18.6}.  The current production public rlease of \textsl{Linux
+Fast-STREAMS} is \textit{streams-0.9.3}.
+
 \section[Objective]{Objective}
 
 The objective of the current study is to determine whether, for the Linux
@@ -293,15 +308,14 @@ STREAMS) package.  This comparison will demonstrate one reason why
 \paragraph*{Misconceptions}
 
 When developing STREAMS, the authors oft times found that there were a number
-of unsupportable preconceptions from Linux advocates about both STREAMS and
-STREAMS-based pipes, as follows:
+of preconceptions from Linux advocates about both STREAMS and STREAMS-based
+pipes, as follows:
 
 \begin{itemize}
 
 \item STREAMS is slow.
 
-\item STREAMS is more flexible, but less efficient.\footnote{For example, see
-\textit{http://www.kernel.org/pub/linux/docs/lkml/\#s9-9} .}
+\item STREAMS is more flexible, but less efficient \cite[]{lkmlfaq}.
 
 \item STREAMS performs poorly on uniprocessor and even poorer on SMP.
 
@@ -314,8 +328,8 @@ STREAMS-based pipes, as follows:
 It is possible that the proponents of these statements have worked in the past
 with an improper or under-performing STREAMS implementation (such as
 \textsl{LiS}); however, the current study aims to prove that none of these
-statements are correct for the STREAMS-based pipes provided by \textsl{Linux
-Fast-STREAMS}.
+statements are correct for the STREAMS-based pipes provided by the
+high-performance \textsl{Linux Fast-STREAMS}.
 
 %The Linux kernel mailing list has this to say about STREAMS:
 %
@@ -466,21 +480,17 @@ procedure runs when the STREAMS scheduler runs.
 \section[Method]{Method}
 
 To test the performance of STREAMS-based pipes, the \textsl{Linux
-Fast-STREAMS} package was
-used.\footnote{\textit{http://www.openss7.org/download.html}}  The
-\textsl{Linux Fast-STREAMS} package builds and install Linux loadable kernel
-modules and includes the \texttt{perftest} program used for testing.  For
-comparison, the \textsl{LiS} package from \textit{http://www.openss7.org/} was
-used for comparison.
+Fast-STREAMS} package was used \cite[]{LfS}.  The \textsl{Linux Fast-STREAMS}
+package builds and install Linux loadable kernel modules and includes the
+\texttt{perftest} program used for testing.  For comparison, the \textsl{LiS}
+package \cite[]{LiS} was used for comparison.
 
 \subsection[Test Program]{Test Program}
 
 To test the maximum throughput performance of both legacy pipes and
-STREAMS-based pipes, a test program was written, called
-\texttt{perftest}.\footnote{The \texttt{perftest} program is part of the
-\textsl{Linux Fast-STREAMS} distribution available from
-\textit{http://www.openss7.org/}.} The test program performs the following
-actions:
+STREAMS-based pipes, a test program was written, called \texttt{perftest}.
+The \texttt{perftest} program is part of the \textsl{Linux Fast-STREAMS}
+distribution \cite[]{LfS}.  The test program performs the following actions:
 
 \begin{enumerate}
 
@@ -528,8 +538,10 @@ Distribution & Kernel\\
 \hline
 RedHat 7.2 & 2.4.20-28.7\\
 CentOS 4 & 2.6.9-5.0.3.EL\\
+CentOS 5 & 2.6.18-8-el5\\
 SuSE 10.0 OSS & 2.6.13-15-default\\
-Ubuntu 6.06 & 2.6.17-11-generic\\
+Ubuntu 6.10 & 2.6.17-11-generic\\
+Ubuntu 7.04 & 2.6.20-15-generic\\
 Fedora Core 6 & 2.6.20-1.2933.fc6
 \end{tabular}\\
 
@@ -604,7 +616,8 @@ Distribution & Kernel\\
 Fedora Core 6 & 2.6.20-1.2933.fc6\\
 CentOS 4 & 2.6.9-5.0.3.EL\\
 SuSE 10.0 OSS & 2.6.13-15-default\\
-Ubuntu 6.06 & 2.6.17-11-generic\\
+Ubuntu 6.10 & 2.6.17-11-generic\\
+Ubuntu 7.04 & 2.6.20-15-generic\\
 \end{tabular}
 
 \subsubsection[Fedora Core 6]{Fedora Core 6}
@@ -839,33 +852,104 @@ write sizes, to a 475\% increase in performance at lower write sizes.
 
 \end{description}
 
-\subsubsection[Ubuntu 6.06]{Ubuntu 6.06}
+\subsubsection[Ubuntu 6.10]{Ubuntu 6.10}
 
-Ubuntu 6.06 is the current release of the Ubuntu distribution.  The Ubuntu
-6.06 release sports a 2.6.15 kernel.  The tested distribution had current
+Ubuntu 6.10 is the current release of the Ubuntu distribution.  The Ubuntu
+6.10 release sports a 2.6.15 kernel.  The tested distribution had current
 updates applied.
 
 \begin{figure}[p]
 \includegraphics[width=\columnwidth]{perftest_ubuntu_perf}
-\caption[Ubuntu 6.06 on Porky Performance]{Ubuntu 6.06 on Porky Performance}
+\caption[Ubuntu 6.10 on Porky Performance]{Ubuntu 6.10 on Porky Performance}
 \label{figure:ubuntuperf}
 \end{figure}
 
 \begin{figure}[p]
 \includegraphics[width=\columnwidth]{perftest_ubuntu_delay}
-\caption[Ubuntu 6.06 on Porky Delay]{Ubuntu 6.06 on Porky Delay}
+\caption[Ubuntu 6.10 on Porky Delay]{Ubuntu 6.10 on Porky Delay}
 \label{figure:ubuntudelay}
 \end{figure}
 
 \begin{figure}[p]
 \includegraphics[width=\columnwidth]{perftest_ubuntu_thrput}
-\caption[Ubuntu 6.06 on Porky Throughput]{Ubuntu 6.06 on Porky Throughput}
+\caption[Ubuntu 6.10 on Porky Throughput]{Ubuntu 6.10 on Porky Throughput}
 \label{figure:ubuntuthrput}
 \end{figure}
 
 \begin{figure}[p]
 \includegraphics[width=\columnwidth]{perftest_ubuntu_comp}
-\caption[Ubuntu 6.06 on Porky Comparison]{Ubuntu 6.06 on Porky Comparison}
+\caption[Ubuntu 6.10 on Porky Comparison]{Ubuntu 6.10 on Porky Comparison}
+\label{figure:ubuntucomp}
+\end{figure}
+
+\begin{description}
+
+\item[Performance.]
+
+\textit{Figure \ref{figure:ubuntuperf}} illustrates the performance of
+\textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  As can be see from \textit{Figure
+\ref{figure:ubuntuperf}}, the performance of \textsl{LiS} is dismal across the
+entire range of write sizes.  The performance of \textsl{Linux Fast-STREAMS}
+STREAMS-based pipes, on the other hand, is superior across the entire range of
+write sizes.  Performance of \textsl{Linux Fast-STREAMS} is a full order of
+magnitude better than \textsl{LiS}.
+
+\item[Delay.]
+
+\textit{Figure \ref{figure:ubuntudelay}} illustrates the average write delay
+for \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  Again, the slope of the delay curves is similar, but
+\textsl{Linux Fast-STREAMS} exhibits a greatly reduced intercept indicating
+superior per-message overheads.
+
+\item[Throughput.]
+
+\textit{Figure \ref{figure:ubuntuthrput}} illustrates the throughput
+experienced by \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy
+pipes across a range of write sizes.  As can be seen from \textit{Figure
+\ref{figure:ubuntuthrput}}, all implementations exhibit strong power function
+characteristics, indicating structure and robustness for each implementation.
+Again \textsl{Linux Fast-STREAMS} appears to saturate the memory bus
+approaching 10Gbps.
+
+\item[Improvement.]
+
+\textit{Figure \ref{figure:ubuntucomp}} illustrates the improvement over Linux
+legacy pipes of \textsl{Linux Fast-STREAMS} STREAMS-based pipes.  The
+improvement of \textsl{Linux Fast-STREAMS} over Linux legacy pipes is
+significant: improvements range from a 75\% increase in performance at large
+write sizes, to a 200\% increase in performance at lower write sizes.
+
+\end{description}
+
+\subsubsection[Ubuntu 7.04]{Ubuntu 7.04}
+
+Ubuntu 7.04 is the current release of the Ubuntu distribution.  The Ubuntu
+7.04 release sports a 2.6.20 kernel.  The tested distribution had current
+updates applied.
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_u704_perf}
+\caption[Ubuntu 7.04 on Porky Performance]{Ubuntu 7.04 on Porky Performance}
+\label{figure:ubuntuperf}
+\end{figure}
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_u704_delay}
+\caption[Ubuntu 7.04 on Porky Delay]{Ubuntu 7.04 on Porky Delay}
+\label{figure:ubuntudelay}
+\end{figure}
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_u704_thrput}
+\caption[Ubuntu 7.04 on Porky Throughput]{Ubuntu 7.04 on Porky Throughput}
+\label{figure:ubuntuthrput}
+\end{figure}
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_u704_comp}
+\caption[Ubuntu 7.04 on Porky Comparison]{Ubuntu 7.04 on Porky Comparison}
 \label{figure:ubuntucomp}
 \end{figure}
 
@@ -1009,6 +1093,7 @@ Linux distributions tested on this machine are as follows:
 Distribution & Kernel\\
 \hline
 Fedora Core 6 & 2.6.20-1.2933.fc6\\
+CentOS 5 & 2.6.18-8-el5\\
 \end{tabular}\\[1.0ex]
 
 This machine is used as an SMP control machine.  Most of the test were
@@ -1080,6 +1165,77 @@ characteristics, indicating structure and robustness for each implementation.
 \item[Improvement.]
 
 \textit{Figure \ref{figure:smpcomp}} illustrates the improvement over Linux
+legacy pipes of \textsl{Linux Fast-STREAMS} STREAMS-based pipes.  The
+improvement of \textsl{Linux Fast-STREAMS} over Linux legacy pipes is
+significant: improvements range from a 100\% increase in performance at large
+write sizes, to a 175\% increase in performance at lower write sizes.
+\textsl{LiS} again drags in at -75\%.
+
+\end{description}
+
+\subsubsection[CentOS 5 (x86\_64)]{CentOS 5 (x86\_64)}
+
+CentOS 5 is the most recent full release CentOS distribution.  This
+distribution sports a 2.6.18-8-el5 kernel with the latest patches.  This
+is the \texttt{x86\_64} distribution with recent updates.
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_cos5_perf}
+\caption[CentOS 5 on Daisy Performance]{CentOS 5 on Daisy Performance}
+\label{figure:cos5perf}
+\end{figure}
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_cos5_delay}
+\caption[CentOS 5 on Daisy Delay]{CentOS 5 on Daisy Delay}
+\label{figure:cos5delay}
+\end{figure}
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_cos5_thrput}
+\caption[CentOS 5 on Daisy Throughput]{CentOS 5 on Daisy Throughput}
+\label{figure:cos5thrput}
+\end{figure}
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_cos5_comp}
+\caption[CentOS 5 on Daisy Comparison]{CentOS 5 on Daisy Comparison}
+\label{figure:cos5comp}
+\end{figure}
+
+\begin{description}
+
+\item[Performance.]
+
+\textit{Figure \ref{figure:cos5perf}} illustrates the performance of
+\textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  As can be see from \textit{Figure
+\ref{figure:cos5perf}}, the performance of \textsl{LiS} is dismal across the
+entire range of write sizes.  The performance of \textsl{Linux Fast-STREAMS}
+STREAMS-based pipes, on the other hand, is superior across the entire range of
+write sizes.  The performance of \textsl{Linux Fast-STREAMS} is almost an
+order of magnitude greater than that of \textsl{LiS}.
+
+\item[Delay.]
+
+\textit{Figure \ref{figure:cos5delay}} illustrates the average write delay for
+\textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  Again the slope appears to be the same for all
+implementations, except Linux legacy pipes which exhibit some annomallies
+below 1024 byte write sizes.  The intercept for \textsl{Linux Fast-STREAMS} is
+again much superior to the other two implementations.
+
+\item[Throughput.]
+
+\textit{Figure \ref{figure:cos5thrput}} illustrates the throughput experienced
+by \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  As can be seen from \textit{Figure
+\ref{figure:cos5thrput}}, all implementations exhibit strong power function
+characteristics, indicating structure and robustness for each implementation.
+
+\item[Improvement.]
+
+\textit{Figure \ref{figure:cos5comp}} illustrates the improvement over Linux
 legacy pipes of \textsl{Linux Fast-STREAMS} STREAMS-based pipes.  The
 improvement of \textsl{Linux Fast-STREAMS} over Linux legacy pipes is
 significant: improvements range from a 100\% increase in performance at large
@@ -1345,7 +1501,7 @@ STREAMS-based pipes over legacy pipes.
 \section[Conclusions]{Conclusions}
 
 These experiments have shown that the \textsl{Linux Fast-STREAMS}
-implementation of STREAMS-based pipes outperform the legacy Linux pipe
+implementation of STREAMS-based pipes outperforms the legacy Linux pipe
 implementation by a significant amount (up to a factor of 5) and outperform
 the \textsl{LiS} implementation by a staggering amount (up to a factor of 25).
 
@@ -1354,54 +1510,60 @@ the \textsl{LiS} implementation by a staggering amount (up to a factor of 25).
 is superior by a significant factor across all systems and kernels tested.}
 \end{quote}
 
-All of the misconceptions with regard to STREAMS and STREAMS-based pipes are
-dispelled by these test results.
+While it can be said that all of the preconceptions regarding STREAMS and
+STREAMS-based pipes are applicable to the under-performing \textsl{LiS}, and
+may very well be applicable to historical implementations of STREAMS, these
+preconceptions with regard to STREAMS and STREAMS-based pipes are dispelled
+for the high-performance \textsl{Linux Fast-STREAMS} by these test results.
 
 \begin{itemize}
 
 \item \textit{STREAMS is fast.}
 
-Contrary to the misconception that STREAMS must be slower because it is more
-complex, in fact the reverse has been shown to be true in these experiments.
-The STREAMS flow control and scheduling mechanisms serve to adapt well and
-increase both code and data cache as well as scheduler efficiency.
+Contrary to the preconception that STREAMS must be slower because it is more
+complex, in fact the reverse has been shown to be true for \textsl{Linux
+Fast-STREAMS} in these experiments.  The STREAMS flow control and scheduling
+mechanisms serve to adapt well and increase both code and data cache as well
+as scheduler efficiency.
 
 \item \textit{STREAMS is more flexible {\em and} more efficient.}
 
-Contrary to the misconception that STREAMS trades flexibility for efficiency
+Contrary to the preconception that STREAMS trades flexibility for efficiency
 (that is, that STREAMS is somehow less efficient because it is more flexible),
-in fact has shown to be untrue.  STREAMS is {\em both} more flexible {\em and}
-more efficient.  Indeed, the performance gains achieved by STREAMS appear to
-derive from its more sophisticated queueing, scheduling and flow control
-model. (Note that this is in fitting with the statements made about 4.2BSD
-pipes being implemented with UNIX domain sockets for \textit{"performance
-reasons"} \cite[]{bsd}.)
+in fact has shown to be untrue for \textsl{Linux Fast-STREAMS}, which is {\em
+both} more flexible {\em and} more efficient.  Indeed, the performance gains
+achieved by STREAMS appear to derive from its more sophisticated queueing,
+scheduling and flow control model. (Note that this is in fitting with the
+statements made about 4.2BSD pipes being implemented with UNIX domain sockets
+for \textit{"performance reasons"} \cite[]{bsd}.)
 
-\item \textit{STREAMS adequately exploits parallelisms on SMP.}
+\item \textit{Linux Fast-STREAMS adequately exploits parallelisms on SMP.}
 
-Contrary to the misconception that STREAMS must be slower due to complex
-locking and synchronization mechanisms, STREAMS performed as well on SMP
-(hyperthreaded) machines as on UP machines and still outperformed legacy Linux
-pipes with over 100\% improvements at all write sizes.
+Contrary to the preconception that STREAMS must be slower due to complex
+locking and synchronization mechanisms, \textsl{Linux Fast-STREAMS} performed
+as well on SMP (hyperthreaded) machines as on UP machines and still
+outperformed legacy Linux pipes with over 100\% improvements at all write
+sizes.
 
 \item \textit{STREAMS-based pipes are fast.}
 
-Contrary to the misconception that STREAMS-based pipes must be slower because
+Contrary to the preconception that STREAMS-based pipes must be slower because
 STREAMS-based pipes provide such a rich set of features as well as providing
 full duplex operation where legacy pipes only unidirectional operation, the
-reverse has been shown in these experiments.  By utilizing STREAMS flow
-control and scheduling, STREAMS-based pipes indeed perform better than legacy
-pipes.
+reverse has been shown in these experiments for \textsl{Linux Fast-STREAMS}.
+By utilizing STREAMS flow control and scheduling, STREAMS-based pipes indeed
+perform better than legacy pipes.
 
 \item \textit{STREAMS-based pipes are neither unnecessarily complex nor cumbersome.}
 
-Contrary to the misconception that STREAMS-based pipes must be poorer due to
+Contrary to the preconception that STREAMS-based pipes must be poorer due to
 their increased implementation complexity, the reverse has shown to be true in
-these experiments.  Also, the fact that legacy, STREAMS and 4.2BSD pipes
-conform to the same standard (POSIX), means that they are no more cumbersome
-from a programming perspective.  Indeed a POSIX conforming application will
-not know the difference between the implementation (with the exception that
-superior performance will be experienced on STREAMS-based pipes).
+these experiments for \textsl{Linux Fast-STREAMS}.  Also, the fact that
+legacy, STREAMS and 4.2BSD pipes conform to the same standard (POSIX), means
+that they are no more cumbersome from a programming perspective.  Indeed a
+POSIX conforming application will not know the difference between the
+implementation (with the exception that superior performance will be
+experienced on STREAMS-based pipes).
 
 \item \textit{\textsl{LiS} performs poorly.}
 
@@ -1409,7 +1571,10 @@ Despite claiming to be an adequate implementation of SVR4 STREAMS,
 \textsl{LiS} performance is dismal enough to make it unusable.  Due to
 conformance and implementation errors, \textsl{LiS} was already deprecated by
 \textsl{Linux Fast-STREAMS}, and these tests exemplify why a replacement for
-\textsl{LiS} was necessary.
+\textsl{LiS} was necessary and why support for \textsl{LiS} was abandonned by
+the OpenSS7 Project \cite[]{openss7}.  \textsl{LiS} pipe performance tested
+about half that of legacy Linux pipes and a full order of magnitude slower
+than \textsl{Linux Fast-STREAMS}.
 
 \end{itemize}
 
@@ -1543,7 +1708,7 @@ Porky.
 Porky.
 
 \textit{Table \ref{table:ubuntudata}} lists the raw data from the
-\texttt{perftest} program that was used in preparing graphs for Ubuntu 6.06 on
+\texttt{perftest} program that was used in preparing graphs for Ubuntu 6.10 on
 Porky.
 
 \textit{Table \ref{table:rh7data}} lists the raw data from the
@@ -1661,7 +1826,7 @@ Size & LiS & STREAMS & Linux\\
 4096 & 47004 & 202755 & 116218\\
 \hline
 \end{tabular}
-\caption{Raw data for Ubuntu 6.06 on Porky}
+\caption{Raw data for Ubuntu 6.10 on Porky}
 \label{table:ubuntudata}
 \normalsize
 \end{table}
