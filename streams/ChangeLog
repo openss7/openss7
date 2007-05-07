@@ -1,5 +1,16 @@
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* include/sys/streams/strdebug.h: changes from release testing
+	* src/kernel/strsched.c: changes from release testing
+	* src/kernel/strutil.c: changes from release testing
+	* src/kernel/strutil.h: changes from release testing
+	* src/modules/sth.c: changes from release testing
+	* src/test/perftest.c: changes from release testing
+	* src/util/init/strace: changes from release testing
+	* src/util/init/strace.sh: changes from release testing
+	* src/util/init/strerr: changes from release testing
+	* src/util/init/strerr.sh: changes from release testing
+
 	* doc/papers/Makefile: updated papers
 	* doc/papers/piperesults.bib: updated papers
 	* doc/papers/piperesults.tex: updated papers

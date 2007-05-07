@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.42 2007/04/12 20:06:07 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.43 2007/05/07 18:51:36 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/04/12 20:06:07 $ by $Author: brian $
+ Last Modified $Date: 2007/05/07 18:51:36 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/04/12 20:06:07 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/05/07 18:51:36 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -297,11 +297,11 @@ __ensure(!(__exp),__sta)
 
 #undef  __trace
 #define __trace() \
-	do { printk(KERN_INFO "%s: trace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
+	do { printk(KERN_NOTICE "%s: trace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
 #undef  __ptrace
 #define __ptrace(__pkspec) \
-	do { printk(KERN_INFO "%s: ptrace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
+	do { printk(KERN_NOTICE "%s: ptrace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
 #undef  __fixme
 #define __fixme(__pkspec) \
@@ -313,7 +313,7 @@ __ensure(!(__exp),__sta)
 
 #undef  __ctrace
 #define __ctrace(__fnc) \
-	({ printk(KERN_INFO "%s: calling " #__fnc " at " __FILE__ "+%d\n", __FUNCTION__, __LINE__); __fnc; })
+	({ printk(KERN_NOTICE "%s: calling " #__fnc " at " __FILE__ "+%d\n", __FUNCTION__, __LINE__); __fnc; })
 
 #undef  __printd
 #define __printd(__pkspec) \

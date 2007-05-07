@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.186 $) $Date: 2007/05/03 22:40:47 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.187 $) $Date: 2007/05/07 18:51:39 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/03 22:40:47 $ by $Author: brian $
+ Last Modified $Date: 2007/05/07 18:51:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.187  2007/05/07 18:51:39  brian
+ - changes from release testing
+
  Revision 0.9.2.186  2007/05/03 22:40:47  brian
  - significant performance improvements, some bug corrections
 
@@ -217,10 +220,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.186 $) $Date: 2007/05/03 22:40:47 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.187 $) $Date: 2007/05/07 18:51:39 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.186 $) $Date: 2007/05/03 22:40:47 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.187 $) $Date: 2007/05/07 18:51:39 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -322,7 +325,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.186 $) $Date: 2007/05/03 22:40:47 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.187 $) $Date: 2007/05/07 18:51:39 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -633,14 +636,20 @@ strdetached(struct stdata *sd)
  *  This way, the kernel thread should stay asleep until we run the queues ourselves, even if a soft
  *  or hard interrupt attempts to schedule.
  */
+
+/**
+ * strsyscall - exit a system call
+ *
+ * NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on the way
+ * out of a system call.  This allows queues to fill, flow control to function, and service
+ * procedures to run more efficiently.
+ */
 STATIC streams_inline streams_fastcall __hot void
 strsyscall(void)
 {
-	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
-	   the way out of a system call.  This allows queues to fill, flow control to function, and
-	   service procedures to run more efficiently. */
 //#ifndef CONFIG_SMP
 #ifdef CONFIG_STREAMS_RT_KTHREADS
+//#ifdef CONFIG_SMP
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -652,14 +661,19 @@ strsyscall(void)
 #endif
 }
 
+/**
+ * strsyscall_ioctl - exit an ioctl system call
+ *
+ * NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on the way
+ * out of a system call.  This allows queues to fill, flow control to function, and service
+ * procedures to run more efficiently.
+ */
 STATIC streams_inline streams_fastcall __hot void
 strsyscall_ioctl(void)
 {
-	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
-	   the way out of a system call.  This allows queues to fill, flow control to function, and
-	   service procedures to run more efficiently. */
 //#ifndef CONFIG_SMP
 #ifdef CONFIG_STREAMS_RT_KTHREADS
+//#ifdef CONFIG_SMP
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -671,14 +685,19 @@ strsyscall_ioctl(void)
 #endif
 }
 
+/**
+ * strsyscall_write - exit a write system call
+ *
+ * NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on the way
+ * out of a system call.  This allows queues to fill, flow control to function, and service
+ * procedures to run more efficiently.
+ */
 STATIC streams_inline streams_fastcall __hot void
 strsyscall_write(void)
 {
-	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
-	   the way out of a system call.  This allows queues to fill, flow control to function, and
-	   service procedures to run more efficiently. */
 //#ifndef CONFIG_SMP
 #ifdef CONFIG_STREAMS_RT_KTHREADS
+//#ifdef CONFIG_SMP
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -690,14 +709,19 @@ strsyscall_write(void)
 #endif
 }
 
+/**
+ * strsyscall_read - exit a read system call
+ *
+ * NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on the way
+ * out of a system call.  This allows queues to fill, flow control to function, and service
+ * procedures to run more efficiently.
+ */
 STATIC streams_inline streams_fastcall __hot void
 strsyscall_read(void)
 {
-	/* NOTE:- Better peformance on both UP and SMP can be acheived by not scheduling STREAMS on
-	   the way out of a system call.  This allows queues to fill, flow control to function, and
-	   service procedures to run more efficiently. */
 //#ifndef CONFIG_SMP
 #ifdef CONFIG_STREAMS_RT_KTHREADS
+//#ifdef CONFIG_SMP
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -709,18 +733,23 @@ strsyscall_read(void)
 #endif
 }
 
+/**
+ * strschedule - before blocking
+ *
+ * NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run the STREAMS
+ * scheduler in process context here.  The reason is that if we avoid scheduling, the current
+ * process is blocked off other processors while it is running the STREAMS scheduler.  If we do the
+ * task switch, the process can run concurrently on another processor.  This does have a negative
+ * impact; however, on SMP kernels running on UP machines, so it would be better if we could quickly
+ * check the number of processors running.  We just decide by static kernel configuration for the
+ * moment.
+ */
 STATIC streams_inline streams_fastcall __hot_in void
 strschedule(void)
 {
-	/* NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run
-	   the STREAMS scheduler in process context here.  The reason is that if we avoid
-	   scheduling, the current process is blocked off other processors while it is running the
-	   STREAMS scheduler.  If we do the task switch, the process can run concurrently on
-	   another processor.  This does have a negative impact; however, on SMP kernels running on 
-	   UP machines, so it would be better if we could quickly check the number of processors
-	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
 #ifdef CONFIG_STREAMS_RT_KTHREADS
+//#ifdef CONFIG_SMP
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -728,23 +757,28 @@ strschedule(void)
 	/* before every sleep -- saves a context switch */
 	if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
-	// set_current_state(TASK_RUNNING);
+	set_current_state(TASK_RUNNING);
 	runqueues();
 #endif
 }
 
+/**
+ * strschedule_poll - before blocking on poll
+ *
+ * NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run the STREAMS
+ * scheduler in process context here.  The reason is that if we avoid scheduling, the current
+ * process is blocked off other processors while it is running the STREAMS scheduler.  If we do the
+ * task switch, the process can run concurrently on another processor.  This does have a negative
+ * impact; however, on SMP kernels running on UP machines, so it would be better if we could quickly
+ * check the number of processors running.  We just decide by static kernel configuration for the
+ * moment.
+ */
 STATIC streams_inline streams_fastcall __hot void
 strschedule_poll(void)
 {
-	/* NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run
-	   the STREAMS scheduler in process context here.  The reason is that if we avoid
-	   scheduling, the current process is blocked off other processors while it is running the
-	   STREAMS scheduler.  If we do the task switch, the process can run concurrently on
-	   another processor.  This does have a negative impact; however, on SMP kernels running on 
-	   UP machines, so it would be better if we could quickly check the number of processors
-	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
 #ifdef CONFIG_STREAMS_RT_KTHREADS
+//#ifdef CONFIG_SMP
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -752,23 +786,28 @@ strschedule_poll(void)
 	/* before every sleep -- saves a context switch */
 	if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
-	// set_current_state(TASK_RUNNING);
+	set_current_state(TASK_RUNNING);
 	runqueues();
 #endif
 }
 
+/**
+ * strschedule_ioctl - before blocking in ioctl
+ *
+ * NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run the STREAMS
+ * scheduler in process context here.  The reason is that if we avoid scheduling, the current
+ * process is blocked off other processors while it is running the STREAMS scheduler.  If we do the
+ * task switch, the process can run concurrently on another processor.  This does have a negative
+ * impact; however, on SMP kernels running on UP machines, so it would be better if we could quickly
+ * check the number of processors running.  We just decide by static kernel configuration for the
+ * moment.
+ */
 STATIC streams_inline streams_fastcall __hot_in void
 strschedule_ioctl(void)
 {
-	/* NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run
-	   the STREAMS scheduler in process context here.  The reason is that if we avoid
-	   scheduling, the current process is blocked off other processors while it is running the
-	   STREAMS scheduler.  If we do the task switch, the process can run concurrently on
-	   another processor.  This does have a negative impact; however, on SMP kernels running on 
-	   UP machines, so it would be better if we could quickly check the number of processors
-	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
 #ifdef CONFIG_STREAMS_RT_KTHREADS
+//#ifdef CONFIG_SMP
 	struct strthread *t = this_thread;
 
 	/* try to avoid context switch */
@@ -776,23 +815,102 @@ strschedule_ioctl(void)
 	/* before every sleep -- saves a context switch */
 	if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED */
 		return;
-	// set_current_state(TASK_RUNNING);
+	set_current_state(TASK_RUNNING);
 	runqueues();
 #endif
 }
 
+/**
+ * strschedule_write - before blocking on write
+ *
+ * NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run the STREAMS
+ * scheduler in process context here.  The reason is that if we avoid scheduling, the current
+ * process is blocked off other processors while it is running the STREAMS scheduler.  If we do the
+ * task switch, the process can run concurrently on another processor.  This does have a negative
+ * impact; however, on SMP kernels running on UP machines, so it would be better if we could quickly
+ * check the number of processors running.  We just decide by static kernel configuration for the
+ * moment.
+ */
 STATIC streams_inline streams_fastcall __hot_in void
 strschedule_write(void)
 {
-	/* NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run
-	   the STREAMS scheduler in process context here.  The reason is that if we avoid
-	   scheduling, the current process is blocked off other processors while it is running the
-	   STREAMS scheduler.  If we do the task switch, the process can run concurrently on
-	   another processor.  This does have a negative impact; however, on SMP kernels running on 
-	   UP machines, so it would be better if we could quickly check the number of processors
-	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
 #ifdef CONFIG_STREAMS_RT_KTHREADS
+//#ifdef CONFIG_SMP
+	{
+		struct strthread *t = this_thread;
+
+		/* try to avoid context switch */
+		set_task_state(t->proc, TASK_INTERRUPTIBLE);
+		/* before every sleep -- saves a context switch */
+		if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED 
+											 */
+			return;
+		set_current_state(TASK_RUNNING);
+		runqueues();
+	}
+#endif
+}
+
+/**
+ * strschedule_read - before blocking on read
+ *
+ * NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run the STREAMS
+ * scheduler in process context here.  The reason is that if we avoid scheduling, the current
+ * process is blocked off other processors while it is running the STREAMS scheduler.  If we do the
+ * task switch, the process can run concurrently on another processor.  This does have a negative
+ * impact; however, on SMP kernels running on UP machines, so it would be better if we could quickly
+ * check the number of processors running.  We just decide by static kernel configuration for the
+ * moment.
+ */
+STATIC streams_inline streams_fastcall __hot_out void
+strschedule_read(void)
+{
+//#ifndef CONFIG_SMP
+#ifdef CONFIG_STREAMS_RT_KTHREADS
+//#ifdef CONFIG_SMP
+	{
+		struct strthread *t = this_thread;
+
+		/* try to avoid context switch */
+		set_task_state(t->proc, TASK_INTERRUPTIBLE);
+		/* before every sleep -- saves a context switch */
+		if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED 
+											 */
+			return;
+		set_current_state(TASK_RUNNING);
+		runqueues();
+	}
+#endif
+}
+
+/**
+ * strfailure_write - failure to write immediately
+ *
+ * This function is called when a failure to write immediately has occured and the calling process
+ * is about to return EAGAIN or block.  It executes the STREAMS scheduler in the calling process'
+ * context if there is work scheduled.  This is a good policy.  The reason is that the STREAMS
+ * scheduler runs at a low priority and executing now effectively raises the priority of the STREAMS
+ * scheduler running on the current processor to the priority of the process that failed to write
+ * immediately.  Note that if the STREAMS scheduler is running at a higher priority than the current
+ * process, the only work that could be scheduled is work that was scheduled by the current process
+ * anyway.
+ *
+ * Consider that a typical write performs a number of write operations and some intermediate queue
+ * fills, resulting in flow controls being exherted on the Stream, which cause the writing process
+ * to eventually fail and call this function.  Because there is no other process with higher
+ * priority (otherwise it would be executing), it is expedient to run the scheduler now and see if
+ * the write process becomes unblocked and can continue.
+ *
+ * This differs from strschedule_write() above that is called just before a blocking process
+ * schedules, even if it has awoken and found the blocking condition to be remaining.
+ */
+STATIC streams_inline streams_fastcall __hot_in void
+strfailure_write(void)
+{
+//#ifndef CONFIG_SMP
+//#ifdef CONFIG_STREAMS_RT_KTHREADS
+#if 1
 	{
 		struct strthread *t = this_thread;
 
@@ -808,18 +926,32 @@ strschedule_write(void)
 #endif
 }
 
+/**
+ * strfailure_read - failure to read immediately
+ *
+ * This function is called when a failure to read immediately has occured and the calling process is
+ * about to return EAGAIN or block.  It executes the STREAMS scheduler in the calling process'
+ * context if there is work scheduled.  This is a good policy.  The reason is that the STREAMS
+ * scheduler runs at low priority and executing now effectively raises the priority of the STREAMS
+ * scheduler running on the current processor to the priority of the process that failed to read
+ * immediately.  Note that if the STREAMS scheduler is running at a higher priority than the current
+ * process the only work that could be scheduled is work that was scheduled by the current process
+ * anyway.
+ *
+ * Consider that a typical reader performs a number of read operations and the Stream head read
+ * queue empties.  Because there is no other process with higher priority (otherwise it would be
+ * executing), it is expedient to run the scheduler now and see if feeding queues acn deliver more
+ * data and allow the reader to continue.
+ *
+ * This differs from strschedule_read() above that is called just before a blocking process
+ * schedules, even if it has awoken and found the blocking condition to be remaining.
+ */
 STATIC streams_inline streams_fastcall __hot_out void
-strschedule_read(void)
+strfailure_read(void)
 {
-	/* NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run
-	   the STREAMS scheduler in process context here.  The reason is that if we avoid
-	   scheduling, the current process is blocked off other processors while it is running the
-	   STREAMS scheduler.  If we do the task switch, the process can run concurrently on
-	   another processor.  This does have a negative impact; however, on SMP kernels running on 
-	   UP machines, so it would be better if we could quickly check the number of processors
-	   running.  We just decide by static kernel configuration for the moment. */
 //#ifndef CONFIG_SMP
-#ifdef CONFIG_STREAMS_RT_KTHREADS
+//#ifdef CONFIG_STREAMS_RT_KTHREADS
+#if 1
 	{
 		struct strthread *t = this_thread;
 
@@ -2243,7 +2375,7 @@ strwaitqueue(struct stdata *sd, queue_t *q, long timeo)
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 		prepare_to_wait(&qu->qu_qwait, &wait, TASK_INTERRUPTIBLE);
 #endif
-		if ((mblk_t *volatile) q->q_first == NULL)
+		if (((mblk_t *volatile) q->q_first == NULL && !test_bit(QSVCBUSY_BIT, &q->q_flag)))
 			break;
 		set_bit(QWANTR_BIT, &q->q_flag);
 		if (timeo == 0)
@@ -2305,14 +2437,15 @@ strwaitclose(struct stdata *sd, int oflag)
 	wait = (!(oflag & FNDELAY) && (closetime != 0));
 
 	/* STREAM head first */
-	if (wait && (mblk_t *volatile) q->q_first && !(sd->sd_flag & (STRDERR | STWRERR | STRHUP))
+	if (wait && ((mblk_t *volatile) q->q_first || test_bit(QSVCBUSY_BIT, &q->q_flag))
+	    && !(sd->sd_flag & (STRDERR | STWRERR | STRHUP))
 	    && !signal_pending(current))
 		strwaitqueue(sd, q, closetime);
 	if ((mblk_t *volatile) q->q_first)
 		flushq(q, FLUSHALL);
 
 	while ((q = SAMESTR(sd->sd_wq) ? sd->sd_wq->q_next : NULL)) {
-		if (wait && (mblk_t *volatile) q->q_first
+		if (wait && ((mblk_t *volatile) q->q_first || test_bit(QSVCBUSY_BIT, &q->q_flag))
 		    && !(sd->sd_flag & (STRDERR | STWRERR | STRHUP))
 		    && !signal_pending(current))
 			strwaitqueue(sd, q, closetime);
@@ -3341,6 +3474,10 @@ strputpmsg_common(struct stdata *sd, const int f_flags, const struct strbuf *ctl
 		if (likely(bcanputnext(q, band)))
 			goto done;
 		if (unlikely(f_flags & FNDELAY) && likely(!test_bit(STRNDEL_BIT, &sd->sd_flag))) {
+			/* avoid context switch */
+			strfailure_write();
+			if (likely(bcanputnext(q, band)))
+				goto done;
 			err = -EAGAIN;
 			goto error;
 		}
@@ -4716,8 +4853,15 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
 		}
 		/* about to block, check nodelay - always block in read fill mode. */
 		if (likely(f_flags & FNDELAY))
-			if (unlikely(!(sd->sd_rdopt & RFILL)))
+			if (unlikely(!(sd->sd_rdopt & RFILL))) {
+				if (mread > 0) {
+					strfailure_read();
+					/* could already have messages */
+					mread = 0;
+					goto restart;
+				}
 				return ERR_PTR(-EAGAIN);
+			}
 
 		mp = __strwaitgetq(sd, q, flags, band, error);
 

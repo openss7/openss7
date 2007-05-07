@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2007/05/03 22:40:45 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2007/05/07 18:51:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/03 22:40:45 $ by $Author: brian $
+ Last Modified $Date: 2007/05/07 18:51:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.150  2007/05/07 18:51:37  brian
+ - changes from release testing
+
  Revision 0.9.2.149  2007/05/03 22:40:45  brian
  - significant performance improvements, some bug corrections
 
@@ -134,10 +137,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2007/05/03 22:40:45 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2007/05/07 18:51:37 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2007/05/03 22:40:45 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2007/05/07 18:51:37 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */
@@ -1175,36 +1178,38 @@ streams_noinline streams_fastcall __hot_in void
 qbackenable(queue_t *q, const unsigned char band, unsigned long bands[])
 {
 	struct stdata *sd, *sd2;
+	queue_t *q_nbsrv;
 
 	dassert(q);
 	sd = qstream(q);
 	dassert(sd);
 
 	prlock(sd);
-	if (likely(!test_bit(QPROCS_BIT, &q->q_flag)) && likely((q = q->q_nbsrv) != NULL)) {
+	if (likely(!test_bit(QPROCS_BIT, &q->q_flag)) && likely((q_nbsrv = q->q_nbsrv) != NULL)) {
 
-		sd2 = qstream(q);
+		sd2 = qstream(q_nbsrv);
 		dassert(sd2);
 
 		prlock(sd2);
-		if (likely(!test_bit(QPROCS_BIT, &q->q_flag))) {
-			if (likely(test_bit(QSRVP_BIT, &q->q_flag))) {
+		if (likely(!test_bit(QPROCS_BIT, &q_nbsrv->q_flag))) {
+			if (likely(test_bit(QSRVP_BIT, &q_nbsrv->q_flag))) {
 				if (likely(bands == NULL)) {
 					unsigned long pl;
 					qband_t *qb;
 
-					qwlock(q, pl);
+					qwlock(q_nbsrv, pl);
 					if (likely(band == 0))
-						set_bit(QBACK_BIT, &q->q_flag);
-					else if (likely((qb = __get_qband(q, band)) != NULL))
+						set_bit(QBACK_BIT, &q_nbsrv->q_flag);
+					else if (likely((qb = __get_qband(q_nbsrv, band)) != NULL))
 						set_bit(QB_BACK_BIT, &qb->qb_flag);
-					qwunlock(q, pl);
+					qwunlock(q_nbsrv, pl);
 				} else
 					/* only when flushing */
-					__qbackenable_bands(q, band, bands);
+					__qbackenable_bands(q_nbsrv, band, bands);
 				/* SVR4 SPG - noenable() does not prevent a queue from being back
 				   enabled by flow control */
-				qenable(q);	/* always enable if a service procedure exists */
+				qenable(q_nbsrv);	/* always enable if a service procedure
+							   exists */
 			}
 		}
 		prunlock(sd2);
@@ -2827,10 +2832,11 @@ streams_fastcall __unlikely void
 qinsert(struct stdata *sd, queue_t *irq)
 {
 	queue_t *iwq, *srq, *swq;
+	unsigned long pl;
 
 	_ptrace(("initial  half-insert of stream %p queue pair %p\n", sd, irq));
 
-	prlock(sd);
+	pwlock(sd, pl);
 	srq = sd->sd_rq;
 	iwq = _WR(irq);
 	swq = _WR(srq);
@@ -2846,7 +2852,7 @@ qinsert(struct stdata *sd, queue_t *irq)
 		iwq->q_nfsrv = test_bit(QSRVP_BIT, &irq->q_flag) ? irq : srq;
 		irq->q_nbsrv = test_bit(QSRVP_BIT, &iwq->q_flag) ? iwq : swq;
 	}
-	prunlock(sd);
+	pwunlock(sd, pl);
 }
 
 EXPORT_SYMBOL(qinsert);
