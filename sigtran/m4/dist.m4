@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/02/22 08:36:38 $
+# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/05/07 06:16:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/02/22 08:36:38 $ by $Author: brian $
+# Last Modified $Date: 2007/05/07 06:16:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -282,14 +282,14 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    unset DISTRIB_CODENAME
 	    unset DISTRIB_DESCRIPTION
 	fi
-	# do debian after lsb for Ubuntu
+	if test -z "$dist_cv_build_flavor" -a ":${dist_cv_build_issue_file:-no}" != :no ; then
+	    dist_cv_build_flavor=$(dist_get_flavor "$(cat $dist_cv_build_issue_file | grep 'Linux\|Fedora\|Ubuntu' | head -1)")
+	fi
+	# do debian after lsb and issue for Ubuntu
 	if test -z "$dist_cv_build_flavor" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
 	    if test `echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` = 'debian_version' ; then
 		dist_cv_build_flavor='debian'
 	    fi
-	fi
-	if test -z "$dist_cv_build_flavor" -a ":${dist_cv_build_issue_file:-no}" != :no ; then
-	    dist_cv_build_flavor=$(dist_get_flavor "$(cat $dist_cv_build_issue_file | grep 'Linux\|Fedora' | head -1)")
 	fi
 	if test -z "$dist_cv_build_flavor" ; then
 	    dist_cv_build_flavor=$(dist_get_flavor "$(${CC-cc} $CFLAGS -v 2>&1 | grep 'gcc version')")
@@ -301,7 +301,14 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     ])
     AC_CACHE_CHECK([for dist build release], [dist_cv_build_release], [dnl
 	if test -z "$dist_cv_build_release" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
-	    dist_cv_build_release=$(dist_get_release "$(cat $dist_cv_build_rel_file)")
+	    case :`echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` in
+		(:debian_version)
+		    : # do debian version after lsb and issue for Ubuntu
+		    ;;
+		(:*)
+		    dist_cv_build_release=$(dist_get_release "$(cat $dist_cv_build_rel_file)")
+		    ;;
+	    esac
 	fi
 	if test -z "$dist_cv_build_release" -a ":${dist_cv_build_lsb_file:-no}" != :no ; then
 	    . "$dist_cv_build_lsb_file"
@@ -314,7 +321,15 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    unset DISTRIB_DESCRIPTION
 	fi
 	if test -z "$dist_cv_build_release" -a ":${dist_cv_build_issue_file:-no}" != :no ; then
-	    dist_cv_build_release=$(dist_get_release "$(cat $dist_cv_build_issue_file | grep 'Linux\|Fedora' | head -1)")
+	    dist_cv_build_release=$(dist_get_release "$(cat $dist_cv_build_issue_file | grep 'Linux\|Fedora\|Ubuntu' | head -1)")
+	fi
+	if test -z "$dist_cv_build_release" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
+	    case :`echo "$dist_cv_build_rel_file" | sed -e 's|.*/||'` in
+		# do debian version after lsb and issue for Ubuntu
+		(:debian_version)
+		    dist_cv_build_release=$(dist_get_release "$(cat $dist_cv_build_rel_file)")
+		    ;;
+	    esac
 	fi
 	if test -z "$dist_cv_build_release" ; then
 	    dist_cv_build_release=$(dist_get_release "$(${CC-cc} $CFLAGS -v 2>&1 | grep 'gcc version' | sed -e 's|.*(||;s|).*||;s| [[^ ]]*$||')")
@@ -462,14 +477,14 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    unset DISTRIB_CODENAME
 	    unset DISTRIB_DESCRIPTION
 	fi
+	if test -z "$dist_cv_host_flavor" -a ":${dist_cv_host_issue_file:-no}" != :no ; then
+	    dist_cv_host_flavor=$(dist_get_flavor "$(cat $dist_cv_host_issue_file | grep 'Linux\|Fedora\|Ubuntu' | head -1)")
+	fi
 	if test -z "$dist_cv_host_flavor" -a ":${dist_cv_host_rel_file:-no}" != :no ; then
-	    # do debian after lsb for Ubuntu
+	    # do debian after lsb and issue for Ubuntu
 	    if test `echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` = 'debian_version' ; then
 		dist_cv_host_flavor='debian'
 	    fi
-	fi
-	if test -z "$dist_cv_host_flavor" -a ":${dist_cv_host_issue_file:-no}" != :no ; then
-	    dist_cv_host_flavor=$(dist_get_flavor "$(cat $dist_cv_host_issue_file | grep 'Linux\|Fedora' | head -1)")
 	fi
 	# cannot get host flavor using build system compiler
     ])
@@ -478,7 +493,14 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     ])
     AC_CACHE_CHECK([for dist host release], [dist_cv_host_release], [dnl
 	if test -z "$dist_cv_host_release" -a ":${dist_cv_host_rel_file:-no}" != :no ; then
-	    dist_cv_host_release=$(dist_get_release "$(cat $dist_cv_host_rel_file)")
+	    case :`echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` in
+		(:debian_version)
+		    : # do debian version after lsb and issue for Ubuntu
+		    ;;
+		(:*)
+		    dist_cv_host_release=$(dist_get_release "$(cat $dist_cv_host_rel_file)")
+		    ;;
+	    esac
 	fi
 	if test -z "$dist_cv_host_release" -a ":${dist_cv_host_lsb_file:-no}" != :no ; then
 	    . "$dist_cv_host_lsb_file"
@@ -491,7 +513,15 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    unset DISTRIB_DESCRIPTION
 	fi
 	if test -z "$dist_cv_host_release" -a ":${dist_cv_host_issue_file:-no}" != :no ; then
-	    dist_cv_host_release=$(dist_get_release "$(cat $dist_cv_host_issue_file | grep 'Linux\|Fedora' | head -1)")
+	    dist_cv_host_release=$(dist_get_release "$(cat $dist_cv_host_issue_file | grep 'Linux\|Fedora\|Ubuntu' | head -1)")
+	fi
+	if test -z "$dist_cv_host_release" -a ":${dist_cv_host_rel_file:-no}" != :no ; then
+	    case :`echo "$dist_cv_host_rel_file" | sed -e 's|.*/||'` in
+		# do debian version after lsb and issue for Ubuntu
+		(:debian_version)
+		    dist_cv_host_release=$(dist_get_release "$(cat $dist_cv_host_rel_file)")
+		    ;;
+	    esac
 	fi
 	# cannot get host release using build system compiler
 	if test -z "$dist_cv_host_vendor" ; then dist_cv_host_vendor=$host_vendor ; fi

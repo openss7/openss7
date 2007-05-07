@@ -1,3 +1,7 @@
+2007-05-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/dist.m4: corrections for better Ubunutu detection
+
 2007-05-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* openss7.spec.in: make GPL version more obvious
