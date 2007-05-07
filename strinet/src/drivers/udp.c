@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/05/03 22:26:50 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/05/07 20:04:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/03 22:26:50 $ by $Author: brian $
+ Last Modified $Date: 2007/05/07 20:04:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.60  2007/05/07 20:04:19  brian
+ - locking, return code, testing changes
+
  Revision 0.9.2.59  2007/05/03 22:26:50  brian
  - final preloading and buffer sizing
 
@@ -248,10 +251,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/05/03 22:26:50 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/05/07 20:04:19 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/05/03 22:26:50 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/05/07 20:04:19 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -333,7 +336,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/05/03 22:26:50 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/05/07 20:04:19 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -342,7 +345,7 @@ static char const ident[] =
 			UDP_REVISION	"\n" \
 			UDP_COPYRIGHT	"\n" \
 			UDP_DEVICE	"\n" \
-			UDP_CONTACT	"\n"
+			UDP_CONTACT
 #define UDP_SPLASH	UDP_DESCRIP	" - " \
 			UDP_REVISION
 
@@ -437,7 +440,7 @@ STATIC struct module_info udp_winfo = {
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
 	.mi_hiwat = SHEADHIWAT,		/* Hi water mark */
-	.mi_lowat = 0,		/* Lo water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 streamscall int tp_wput(queue_t *, mblk_t *);
@@ -728,7 +731,7 @@ tp_alloc(void)
  * different names to avoid conflict with generic definitions.  */
 
 //#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
-#if 1
+#if 0
 
 #define spin_lock_str2(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
@@ -4129,7 +4132,7 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 	/* copy into private structure */
 	tp->CONIND_number = CONIND_number;
 	/* Note that if the number of connection indications is greater than zero, and this stream
-	 * was T_CLTS, upgrade to T_COTS and change CONIND_number to zero. */
+	   was T_CLTS, upgrade to T_COTS and change CONIND_number to zero. */
 	tp->pnum = 1;
 
 	tp->protoids[0] = proto;
@@ -4572,12 +4575,14 @@ tp_route_output(struct tp *tp, const struct tp_options *opt, struct rtable **rtp
 /**
  * tp_senddata - process a unit data request
  * @tp: Stream private structure
+ * @db: data block to free upon success (or NULL)
  * @dport: destination port
  * @opt: options to use
  * @mp: message payload
  */
 STATIC INLINE fastcall __hot_out int
-tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *opt, mblk_t *mp)
+tp_senddata(struct tp *tp, mblk_t *db, const unsigned short dport, const struct tp_options *opt,
+	    mblk_t *mp)
 {
 	struct rtable *rt;
 	int err;
@@ -4592,7 +4597,7 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 	if (unlikely(tp->sndmem > tp->options.xti.sndbuf))
 		goto blocked;
 
-	assert(opt != NULL);
+	dassert(opt != NULL);
 	if (likely((err = tp_route_output(tp, opt, &rt)) == 0)) {
 		struct sk_buff *skb;
 		struct net_device *dev = rt->u.dst.dev;
@@ -4665,6 +4670,8 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 #else
 			tp_ip_queue_xmit(skb);
 #endif
+			if (db != NULL)
+				freeb(db);
 			return (QR_ABSORBED);
 		}
 		_rare();
@@ -5003,7 +5010,7 @@ np_reset_loc(struct np *np, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *
 {
 	fixme(("Write this function.\n"));
 	/* should send ICMP, but don't discard it because send function will not abosorb it. */
-	return (QR_DONE);
+	return (0);
 }
 
 /**
@@ -5322,7 +5329,7 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 		goto recover;
 
 	if (dp != NULL)
-		if (unlikely((err = tp_senddata(tp, tp->dport, OPT_buffer, dp)) != QR_ABSORBED))
+		if (unlikely((err = tp_senddata(tp, NULL, tp->dport, OPT_buffer, dp)) != QR_ABSORBED))
 			goto recover;
 	if (SEQ_number != NULL) {
 		bufq_unlink(&tp->conq, SEQ_number);
@@ -5373,7 +5380,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
 	unsigned long flags;
 
 	if (dp != NULL) {
-		err = tp_senddata(tp, tp->dport, &tp->options, dp);
+		err = tp_senddata(tp, NULL, tp->dport, &tp->options, dp);
 		if (unlikely(err != QR_ABSORBED))
 			goto error;
 	}
@@ -5460,7 +5467,7 @@ m_flush(queue_t *q, const int how, const int band)
 	*mp->b_wptr++ = how;
 	*mp->b_wptr++ = band;
 	putnext(tp->oq, mp);
-	return (QR_DONE);
+	return (0);
       enobufs:
 	return (-ENOBUFS);
 }
@@ -5468,10 +5475,11 @@ m_flush(queue_t *q, const int how, const int band)
 /**
  * m_error: deliver an M_ERROR message upstream
  * @q: a queue in the queue pair (write queue)
+ * @msg: message to free upon success
  * @error: the error to deliver
  */
 noinline fastcall __unlikely int
-m_error(queue_t *q, const int error)
+m_error(queue_t *q, mblk_t *msg, const int error)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -5484,9 +5492,10 @@ m_error(queue_t *q, const int error)
 		tp_disconnect(tp, NULL, NULL, N_REASON_UNDEFINED, NULL);
 		/* make sure the stream is unbound */
 		tp_unbind(tp);
+		freemsg(msg);
 		_printd(("%s: %p: <- M_ERROR %d\n", DRV_NAME, tp, error));
 		qreply(q, mp);
-		return (QR_DONE);
+		return (QR_ABSORBED);
 	}
 	return (-ENOBUFS);
 }
@@ -5494,9 +5503,10 @@ m_error(queue_t *q, const int error)
 /**
  * m_hangup: deliver an M_HANGUP message upstream
  * @q: a queue in the queue pair (write queue)
+ * @msg: message to free upon success
  */
 noinline fastcall __unlikely int
-m_hangup(queue_t *q)
+m_hangup(queue_t *q, mblk_t *msg)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -5507,9 +5517,10 @@ m_hangup(queue_t *q)
 		tp_disconnect(tp, NULL, NULL, N_REASON_UNDEFINED, NULL);
 		/* make sure the stream is unbound */
 		tp_unbind(tp);
+		freemsg(msg);
 		_printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, tp));
 		qreply(q, mp);
-		return (QR_DONE);
+		return (QR_ABSORBED);
 
 	}
 	return (-ENOBUFS);
@@ -5518,17 +5529,19 @@ m_hangup(queue_t *q)
 /**
  * te_error_reply - reply to a message with an M_ERROR message
  * @q: active queue in queue pair (write queue)
+ * @msg: message to free upon success
  * @error: error number
  */
 noinline fastcall __unlikely int
-te_error_reply(queue_t *q, const long error)
+te_error_reply(queue_t *q, mblk_t *msg, const long error)
 {
 	switch (error) {
 	case 0:
 	case 1:
 	case 2:
 		__seldom();
-		return (error);
+		freemsg(msg);
+		return (QR_ABSORBED);
 	case -EBUSY:
 	case -EAGAIN:
 	case -ENOMEM:
@@ -5537,18 +5550,19 @@ te_error_reply(queue_t *q, const long error)
 	case -EPIPE:
 	case -ENETDOWN:
 	case -EHOSTUNREACH:
-		return m_hangup(q);
+		return m_hangup(q, msg);
 	default:
-		return m_error(q, EPROTO);
+		return m_error(q, msg, EPROTO);
 	}
 }
 
 /**
  * te_info_ack - generate a T_INFO_ACK and pass it upstream
  * @q: active queue in queue pair (write queue)
+ * @msg: message to free upon success
  */
 noinline fastcall int
-te_info_ack(queue_t *q)
+te_info_ack(queue_t *q, mblk_t *msg)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -5572,9 +5586,10 @@ te_info_ack(queue_t *q)
 	p->CURRENT_state = tp->info.CURRENT_state;
 	p->PROVIDER_flag = tp->info.PROVIDER_flag;
 	mp->b_wptr += sizeof(*p);
+	freemsg(msg);
 	_printd(("%s: %p: <- T_INFO_ACK\n", DRV_NAME, tp));
 	qreply(q, mp);
-	return (QR_DONE);
+	return (QR_ABSORBED);
 
       enobufs:
 	return (-ENOBUFS);
@@ -5583,6 +5598,7 @@ te_info_ack(queue_t *q)
 /**
  * te_bind_ack - TE_BIND_ACK event
  * @q: active queue in queue pair (write queue)
+ * @msg: message to free upon success
  * @ADDR_buffer: addresses to bind
  * @ADDR_length: length of addresses
  * @CONIND_number: maximum number of connection indications
@@ -5590,7 +5606,7 @@ te_info_ack(queue_t *q)
  * Generate an T_BIND_ACK and pass it upstream.
  */
 noinline fastcall int
-te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_length,
+te_bind_ack(queue_t *q, mblk_t *msg, struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_length,
 	    const t_uscalar_t CONIND_number)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5626,9 +5642,10 @@ te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_le
 	}
 	/* all ready, complete the bind */
 	tp_set_state(tp, TS_IDLE);
+	freemsg(msg);
 	_printd(("%s: %p: <- T_BIND_ACK\n", DRV_NAME, tp));
 	qreply(q, mp);
-	return (QR_DONE);
+	return (QR_ABSORBED);
 
       error:
 	return (err);
@@ -5637,6 +5654,7 @@ te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_le
 /**
  * te_error_ack: deliver a T_ERROR_ACK upstream with state changes
  * @q: active queue (write queue)
+ * @msg: message to free upon success
  * @prim: primitive in error
  * @err: TLI or UNIX error number
  *
@@ -5653,7 +5671,7 @@ te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_le
  * specification, Revision 2.0.0.
  */
 noinline fastcall __unlikely int
-te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
+te_error_ack(queue_t *q, mblk_t *msg, const t_scalar_t ERROR_prim, t_scalar_t error)
 {
 	struct tp *tp = TP_PRIV(q);
 	struct T_error_ack *p;
@@ -5672,6 +5690,8 @@ te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
 	case -ENOBUFS:
 		goto error;
 	case 0:
+		freemsg(msg);
+		err = QR_ABSORBED;
 		goto error;
 	case -EADDRINUSE:
 		error = TADDRBUSY;
@@ -5700,9 +5720,10 @@ te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
 	p->TLI_error = (error < 0) ? TSYSERR : error;
 	p->UNIX_error = (error < 0) ? -error : 0;
 	mp->b_wptr += sizeof(*p);
+	freemsg(msg);
 	_printd(("%s: %p: <- T_ERROR_ACK\n", DRV_NAME, tp));
 	qreply(q, mp);
-	return (0);
+	return (QR_ABSORBED);
       error:
 	return (err);
 }
@@ -5710,6 +5731,7 @@ te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
 /**
  * te_ok_ack: deliver a T_OK_ACK upstream with state changes
  * @q: a queue in the queue pair
+ * @db: data block to free upon success (or NULL)
  * @CORRECT_prim: correct primitive
  * @ADDR_buffer: destination or responding address
  * @ADDR_length: length of destination or responding addresses
@@ -5720,15 +5742,15 @@ te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
  * @dp: user data
  */
 STATIC fastcall __hot_put int
-te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *ADDR_buffer,
-	  const socklen_t ADDR_length, void *OPT_buffer, mblk_t *SEQ_number, struct tp *ACCEPTOR_id,
-	  const t_uscalar_t flags, mblk_t *dp)
+te_ok_ack(queue_t *q, mblk_t *db, const t_scalar_t CORRECT_prim,
+	  const struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_length, void *OPT_buffer,
+	  mblk_t *SEQ_number, struct tp *ACCEPTOR_id, const t_uscalar_t flags, mblk_t *dp)
 {
 	struct tp *tp = TP_PRIV(q);
 	struct T_ok_ack *p;
 	mblk_t *mp;
 	const size_t size = sizeof(*p);
-	int err = QR_DONE;
+	int err;
 	pl_t pl;
 
 	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
@@ -5748,6 +5770,8 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		pl = bufq_lock(&tp->conq);
 		tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
 		bufq_unlock(&tp->conq, pl);
+		freemsg(db ? : dp);
+		err = QR_ABSORBED;
 		break;
 #endif
 	case TS_WACK_UREQ:
@@ -5761,6 +5785,8 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		if (unlikely(err != 0))
 			goto free_error;
 		tp_set_state(tp, TS_UNBND);
+		freemsg(db ? : dp);
+		err = QR_ABSORBED;
 		break;
 #if 0
 	case TS_WACK_CREQ:
@@ -5768,10 +5794,12 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		if ((err = tp_connect(tp, ADDR_buffer, ADDR_length, OPT_buffer, 0)))
 			goto error;
 		tp_set_state(tp, TS_WCON_CREQ);
-		if ((err = tp_senddata(tp, tp->dport, &tp->options, NULL))) {
+		if ((err = tp_senddata(tp, NULL, tp->dport, &tp->options, NULL))) {
 			tp_disconnect(tp, ADDR_buffer, SEQ_number, flags, dp);
 			goto error;
 		}
+		freemsg(db ? : dp);
+		err = QR_ABSORBED;
 		break;
 #endif
 	case TS_WACK_CRES:
@@ -5790,6 +5818,8 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 			tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
 			bufq_unlock(&tp->conq, pl);
 		}
+		if (db)
+			freeb(db);
 		break;
 #if 0
 	case NS_WACK_RRES:
@@ -5812,6 +5842,8 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		pl = bufq_lock(&tp->conq);
 		tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
 		bufq_unlock(&tp->conq, pl);
+		if (db)
+			freeb(db);
 		break;
 	default:
 		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
@@ -5825,6 +5857,8 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 			break;
 		}
 #endif
+		freemsg(db ? : dp);
+		err = QR_ABSORBED;
 		break;
 	}
 	_printd(("%s: %p: <- T_OK_ACK\n", DRV_NAME, tp));
@@ -5906,7 +5940,7 @@ te_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 
 	_printd(("%s: %p: <- T_CONN_CON\n", DRV_NAME, tp));
 	qreply(q, mp);
-	return (QR_DONE);
+	return (0);
 
       free_error:
 	freeb(mp);
@@ -5923,6 +5957,7 @@ te_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 /**
  * ne_reset_con - generate a N_RESET_CON message
  * @q: active queue in queue pair (write queue)
+ * @msg: message to free upon success
  * @RESET_orig: origin of the reset
  * @RESET_reason: reason for the reset
  * @dp: message containing IP packet
@@ -5930,7 +5965,7 @@ te_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
  * An N_RESET_CON message is sent only when the reset completes successfully.
  */
 STATIC fastcall int
-ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
+ne_reset_con(queue_t *q, mblk_t *msg, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 {
 	struct np *np = NP_PRIV(q);
 	mblk_t *mp = NULL;
@@ -5951,9 +5986,10 @@ ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 	pl = bufq_lock(&np->resq);
 	np_set_state(np, bufq_length(&np->resq) > 0 ? NS_WRES_RIND : NS_DATA_XFER);
 	bufq_unlock(&np->resq, pl);
+	freemsg(msg);
 	_printd(("%s: <- N_RESET_CON\n", DRV_NAME));
 	qreply(q, mp);
-	return (QR_DONE);
+	return (QR_ABSORBED);
 
       free_error:
 	freeb(mp);
@@ -6077,7 +6113,8 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
       eagain:
 	return (-EAGAIN);
       discard:
-	return (QR_DONE);
+	freemsg(SEQ_number);
+	return (QR_ABSORBED);
 }
 
 /**
@@ -6120,7 +6157,8 @@ te_discon_ind(queue_t *q, const struct sockaddr_in *RES_buffer, const socklen_t 
       enobufs:
 	return (-ENOBUFS);
       discard:
-	return (QR_DONE);
+	freemsg(dp);
+	return (QR_ABSORBED);
 }
 
 /**
@@ -6324,7 +6362,8 @@ te_unitdata_ind(queue_t *q, mblk_t *dp)
       enobufs:
 	return (-ENOBUFS);
       discard:
-	return (QR_DONE);
+	freemsg(dp);
+	return (QR_ABSORBED);
 }
 
 #if 1
@@ -6373,13 +6412,15 @@ te_optdata_ind(queue_t *q, mblk_t *dp)
       enobufs:
 	return (-ENOBUFS);
       discard:
-	return (QR_DONE);
+	freemsg(dp);
+	return (QR_ABSORBED);
 }
 #endif
 
 /**
  * te_uderror_ind - generate a T_UDERROR_IND message
  * @q: active queue in queue pair (read or write queue)
+ * @db: data block to free on success (or NULL)
  * @DEST_buffer: pointer to destination address
  * @OPT_buffer: pointer to options buffer
  * @OPT_length: length of options in buffer
@@ -6387,8 +6428,9 @@ te_optdata_ind(queue_t *q, mblk_t *dp)
  * @dp: message containing user data of errored packet
  */
 noinline __unlikely int
-te_uderror_ind(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsigned char *OPT_buffer,
-	       const size_t OPT_length, const t_uscalar_t ERROR_type, mblk_t *dp)
+te_uderror_ind(queue_t *q, mblk_t *db, const struct sockaddr_in *DEST_buffer,
+	       const unsigned char *OPT_buffer, const size_t OPT_length,
+	       const t_uscalar_t ERROR_type, mblk_t *dp)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -6424,6 +6466,8 @@ te_uderror_ind(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsigned
 		mp->b_cont = dp;
 		dp->b_datap->db_type = M_DATA;	/* was M_ERROR in some cases */
 	}
+	if (db)
+		freeb(db);
 	_printd(("%s: %p: <- T_UDERROR_IND\n", DRV_NAME, tp));
 	putnext(tp->oq, mp);
 	return (QR_ABSORBED);
@@ -6435,7 +6479,8 @@ te_uderror_ind(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsigned
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
       discard:
-	return (QR_DONE);
+	freemsg(db ? : dp);
+	return (QR_ABSORBED);
 }
 
 /**
@@ -6476,14 +6521,15 @@ te_uderror_ind_icmp(queue_t *q, mblk_t *mp)
 	mp->b_rptr = (unsigned char *) iph;
 	OPT_length = t_errs_size(tp, mp);
 	t_errs_build(tp, mp, OPT_buffer, OPT_length);
-	if ((err = te_uderror_ind(q, DEST_buffer, OPT_buffer, OPT_length, ERROR_type, mp)) < 0)
+	if ((err = te_uderror_ind(q, NULL, DEST_buffer, OPT_buffer, OPT_length, ERROR_type, mp)) < 0)
 		mp->b_rptr = hidden;
 	return (err);
 }
 
 noinline fastcall __unlikely int
-te_uderror_reply(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsigned char *OPT_buffer,
-		 const size_t OPT_length, t_scalar_t ERROR_type, mblk_t *db)
+te_uderror_reply(queue_t *q, mblk_t *db, const struct sockaddr_in *DEST_buffer,
+		 const unsigned char *OPT_buffer, const size_t OPT_length, t_scalar_t ERROR_type,
+		 mblk_t *dp)
 {
 	switch (ERROR_type) {
 	case -EBUSY:
@@ -6515,9 +6561,9 @@ te_uderror_reply(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsign
 	case -EINVAL:
 	case -EFAULT:
 	case -EMSGSIZE:
-		return te_error_reply(q, -EPROTO);
+		return te_error_reply(q, db ? : dp, -EPROTO);
 	}
-	return te_uderror_ind(q, DEST_buffer, OPT_buffer, OPT_length, ERROR_type, db);
+	return te_uderror_ind(q, db, DEST_buffer, OPT_buffer, OPT_length, ERROR_type, dp);
 }
 
 #if 0
@@ -6645,7 +6691,8 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 	_printd(("%s: <- N_RESET_IND\n", DRV_NAME));
 	putnext(q, mp);
       discard:
-	return (QR_DONE);
+	freemsg(dp);
+	return (QR_ABSORBED);
       enobufs:
 	if (bp)
 		freemsg(bp);
@@ -6657,6 +6704,7 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 /**
  * t_optmgmt_ack - send a T_OPTMGMT_ACK upstream
  * @q: a queue in the queue pair
+ * @msg: message to free upon success
  * @flags: result flags
  * @req: requested options pointer from T_OPTMGMT_REQ
  * @req_len: length of requested options
@@ -6666,8 +6714,8 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
  * adjusted when the option buffer is built.
  */
 noinline int
-t_optmgmt_ack(queue_t *q, t_scalar_t flags, const unsigned char *req, const size_t req_len,
-	      size_t opt_len)
+t_optmgmt_ack(queue_t *q, mblk_t *msg, t_scalar_t flags, const unsigned char *req,
+	      const size_t req_len, size_t opt_len)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -6693,9 +6741,10 @@ t_optmgmt_ack(queue_t *q, t_scalar_t flags, const unsigned char *req, const size
 	if (tp_get_state(tp) == TS_WACK_OPTREQ)
 		tp_set_state(tp, TS_IDLE);
 #endif
+	freemsg(msg);
 	_printd(("%s: %p: <- T_OPTMGMT_ACK\n", DRV_NAME, tp));
 	putnext(tp->oq, mp);
-	return (0);
+	return (QR_ABSORBED);
       enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
@@ -6706,14 +6755,16 @@ t_optmgmt_ack(queue_t *q, t_scalar_t flags, const unsigned char *req, const size
 /**
  * t_addr_ack - send a T_ADDR_ACK upstream
  * @q: a queue in the queue pair
+ * @msg: message to free upon success
  * @LOCADDR_buffer: local address
  * @LOCADDR_length: local address length
  * @REMADDR_buffer: remote address
  * @REMADDR_length: remote address length
  */
 noinline int
-t_addr_ack(queue_t *q, const struct sockaddr_in *LOCADDR_buffer, const t_uscalar_t LOCADDR_length,
-	   const struct sockaddr_in *REMADDR_buffer, const t_uscalar_t REMADDR_length)
+t_addr_ack(queue_t *q, mblk_t *msg, const struct sockaddr_in *LOCADDR_buffer,
+	   const t_uscalar_t LOCADDR_length, const struct sockaddr_in *REMADDR_buffer,
+	   const t_uscalar_t REMADDR_length)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -6738,9 +6789,10 @@ t_addr_ack(queue_t *q, const struct sockaddr_in *LOCADDR_buffer, const t_uscalar
 		bcopy(REMADDR_buffer, mp->b_wptr, REMADDR_length);
 		mp->b_wptr += REMADDR_length;
 	}
+	freemsg(msg);
 	_printd(("%s: %p: <- T_ADDR_ACK\n", DRV_NAME, tp));
 	putnext(tp->oq, mp);
-	return (0);
+	return (QR_ABSORBED);
       enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
@@ -6751,11 +6803,12 @@ t_addr_ack(queue_t *q, const struct sockaddr_in *LOCADDR_buffer, const t_uscalar
 /**
  * t_capability_ack - send a T_CAPABILITY_ACK upstream
  * @q: a queue in the queue pair
+ * @msg: message to free upon success
  * @caps: capability bits
  * @type: STREAMS message type M_PROTO or M_PCPROTO
  */
 noinline int
-t_capability_ack(queue_t *q, const t_uscalar_t caps, const int type)
+t_capability_ack(queue_t *q, mblk_t *msg, const t_uscalar_t caps, const int type)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -6773,9 +6826,10 @@ t_capability_ack(queue_t *q, const t_uscalar_t caps, const int type)
 		p->INFO_ack = tp->info;
 	} else
 		bzero(&p->INFO_ack, sizeof(p->INFO_ack));
+	freemsg(msg);
 	_printd(("%s: %p: <- T_CAPABILITY_ACK\n", DRV_NAME, tp));
 	putnext(tp->oq, mp);
-	return (0);
+	return (QR_ABSORBED);
       enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
@@ -6802,16 +6856,13 @@ noinline int
 te_info_req(queue_t *q, mblk_t *mp)
 {
 	struct T_info_req *p;
-	int err;
 
-	err = -EINVAL;
-	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
-		goto error;
-	p = (typeof(p)) mp->b_rptr;
-	dassert(p->PRIM_type == T_INFO_REQ);
-	return te_info_ack(q);
-      error:
-	return (err);
+	if (likely(mp->b_wptr >= mp->b_rptr + sizeof(*p))) {
+		p = (typeof(p)) mp->b_rptr;
+		dassert(p->PRIM_type == T_INFO_REQ);
+		return te_info_ack(q, mp);
+	}
+	return (-EINVAL);
 }
 
 /*
@@ -6901,11 +6952,11 @@ te_bind_req(queue_t *q, mblk_t *mp)
 	err = TACCES;
 	if (tp->bport && tp->bport < PROT_SOCK && !capable(CAP_NET_BIND_SERVICE))
 		goto error;
-	if (unlikely((err = te_bind_ack(q, ADDR_buffer, ADDR_length, p->CONIND_number)) != 0))
+	if (unlikely((err = te_bind_ack(q, mp, ADDR_buffer, ADDR_length, p->CONIND_number)) != QR_ABSORBED))
 		goto error;
-	return (QR_DONE);
+	return (QR_ABSORBED);
       error:
-	return te_error_ack(q, T_BIND_REQ, err);
+	return te_error_ack(q, mp, T_BIND_REQ, err);
 }
 
 /**
@@ -6923,11 +6974,11 @@ te_unbind_req(queue_t *q, mblk_t *mp)
 	if (unlikely(tp_get_state(tp) != TS_IDLE))
 		goto error;
 	tp_set_state(tp, TS_WACK_UREQ);
-	if (unlikely((err = te_ok_ack(q, T_UNBIND_REQ, NULL, 0, NULL, NULL, NULL, 0, NULL)) != 0))
+	if (unlikely((err = te_ok_ack(q, mp, T_UNBIND_REQ, NULL, 0, NULL, NULL, NULL, 0, NULL)) != QR_ABSORBED))
 		goto error;
-	return (QR_DONE);
+	return (QR_ABSORBED);
       error:
-	return te_error_ack(q, T_UNBIND_REQ, err);
+	return te_error_ack(q, mp, T_UNBIND_REQ, err);
 }
 
 /**
@@ -7013,14 +7064,11 @@ te_unitdata_req_slow(queue_t *q, mblk_t *mp)
 			goto error;
 	tp->options.ip.daddr = daddr;
 	tp->dport = dport;
-	if (unlikely((err = tp_senddata(tp, dport, &opts, dp)) != QR_ABSORBED))
+	if (unlikely((err = tp_senddata(tp, mp, dport, &opts, dp)) != QR_ABSORBED))
 		goto error;
-	return (QR_TRIMMED);
+	return (QR_ABSORBED);
       error:
-	err = te_uderror_reply(q, DEST_buffer, OPT_buffer, OPT_length, err, dp);
-	if (likely(err == QR_ABSORBED))
-		return (QR_TRIMMED);
-	return (err);
+	return te_uderror_reply(q, mp, DEST_buffer, OPT_buffer, OPT_length, err, dp);
 }
 
 /**
@@ -7044,7 +7092,7 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 	mblk_t *dp;
 	int err;
 	struct sockaddr_in dst_buf;
-	
+
 	/* don't work on message if flow controlled */
 	if (tp->sndblk != 0)
 		return (-EBUSY);
@@ -7088,14 +7136,11 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 	}
 	tp->options.ip.daddr = dst_buf.sin_addr.s_addr;
 	tp->dport = dst_buf.sin_port;
-	if (unlikely((err = tp_senddata(tp, tp->dport, &tp->options, dp)) != QR_ABSORBED))
+	if (unlikely((err = tp_senddata(tp, mp, tp->dport, &tp->options, dp)) != QR_ABSORBED))
 		goto error;
-	return (QR_TRIMMED);
+	return (QR_ABSORBED);
       error:
-	err = te_uderror_reply(q, &dst_buf, NULL, 0, err, dp);
-	if (likely(err == QR_ABSORBED))
-		return (QR_TRIMMED);
-	return (err);
+	return te_uderror_reply(q, mp, &dst_buf, NULL, 0, err, dp);
       go_slow:
 	return te_unitdata_req_slow(q, mp);
 }
@@ -7222,15 +7267,18 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	if (unlikely(err != 0))
 		goto error;
 	/* send data only after connection complete */
-	if (dp == NULL)
-		return (QR_DONE);
-	if (tp_senddata(tp, tp->dport, &tp->options, dp) != QR_ABSORBED) {
-		pswerr(("Discarding data on T_CONN_REQ\n"));
-		return (QR_DONE);	/* discard the data */
+	if (dp == NULL) {
+		freemsg(mp);
+		return (QR_ABSORBED);
 	}
-	return (QR_TRIMMED);	/* tp_senddata() consumed message blocks */
+	if (tp_senddata(tp, mp, tp->dport, &tp->options, dp) != QR_ABSORBED) {
+		pswerr(("Discarding data on T_CONN_REQ\n"));
+		freemsg(mp);
+		return (QR_ABSORBED);	/* discard the data */
+	}
+	return (QR_ABSORBED);	/* tp_senddata() consumed message blocks */
       error:
-	return te_error_ack(q, T_CONN_REQ, err);
+	return te_error_ack(q, mp, T_CONN_REQ, err);
 }
 
 STATIC INLINE fastcall mblk_t *
@@ -7363,12 +7411,12 @@ te_conn_res(queue_t *q, mblk_t *mp)
 	}
 	/* Ok, all checking done.  Now we need to connect the new address. */
 	tp_set_state(tp, TS_WACK_CRES);
-	err = te_ok_ack(q, T_CONN_RES, NULL, 0, OPT_buffer, SEQ_number, ACCEPTOR_id, 0, dp);
+	err = te_ok_ack(q, mp, T_CONN_RES, NULL, 0, OPT_buffer, SEQ_number, ACCEPTOR_id, 0, dp);
 	if (unlikely(err != QR_ABSORBED))
 		goto error;
-	return (QR_TRIMMED);	/* user data is absorbed */
+	return (QR_ABSORBED);	/* user data is absorbed */
       error:
-	return te_error_ack(q, T_CONN_RES, err);
+	return te_error_ack(q, mp, T_CONN_RES, err);
 }
 
 /**
@@ -7450,12 +7498,12 @@ te_discon_req(queue_t *q, mblk_t *mp)
 		goto error;
 	}
 	/* Ok, all checking done.  Now we need to disconnect the address. */
-	err = te_ok_ack(q, T_DISCON_REQ, RES_buffer, RES_length, NULL, SEQ_number, NULL, 0, dp);
+	err = te_ok_ack(q, mp, T_DISCON_REQ, RES_buffer, RES_length, NULL, SEQ_number, NULL, 0, dp);
 	if (unlikely(err != QR_ABSORBED))
 		goto error;
-	return (QR_TRIMMED);	/* user data is absorbed */
+	return (QR_ABSORBED);	/* user data is absorbed */
       error:
-	return te_error_ack(q, T_DISCON_REQ, err);
+	return te_error_ack(q, mp, T_DISCON_REQ, err);
 }
 
 /**
@@ -7472,13 +7520,15 @@ te_write_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
 	size_t dlen;
-	
+	int err;
+
 	/* don't work on message if flow controlled */
 	if (tp->sndblk != 0)
 		return (-EBUSY);
-
+	err = TNOTSUPPORT;
 	if (unlikely(tp->info.SERV_type == T_CLTS))
 		goto error;
+	err = TOUTSTATE;
 	if (unlikely(tp->info.SERV_type != T_COTS && tp->info.SERV_type != T_COTS_ORD))
 		goto error;
 	/* Note: If the interface is in the TS_IDLE state when the provider receives the T_DATA_REQ 
@@ -7494,16 +7544,18 @@ te_write_req(queue_t *q, mblk_t *mp)
 	/* If we are writing we must include the IP header, which is at least 20 bytes, and, if the 
 	   Stream is bound to a port, at least the size of a UDP header.  The length of the entire
 	   TSDU must not exceed 65535 bytes. */
+	err = TBADDATA;
 	if (unlikely((dlen = msgsize(mp)) == 0
 		     || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
-	if (unlikely(tp_senddata(tp, tp->dport, &tp->options, mp) != QR_ABSORBED))
+	if (unlikely(tp_senddata(tp, NULL, tp->dport, &tp->options, mp) != QR_ABSORBED))
 		goto error;
 	return (QR_ABSORBED);	/* tp_senddata() consumed message block */
       discard:
-	return (QR_DONE);	/* tp_senddata() did not consume message blocks */
+	freemsg(mp);
+	return (QR_ABSORBED);	/* tp_senddata() did not consume message blocks */
       error:
-	return te_error_reply(q, -EPROTO);
+	return te_error_reply(q, mp, -EPROTO);
 }
 
 /**
@@ -7523,7 +7575,7 @@ te_data_req(queue_t *q, mblk_t *mp)
 	size_t dlen;
 	mblk_t *dp;
 	int err;
-	
+
 	/* don't work on message if flow controlled */
 	if (tp->sndblk != 0)
 		return (-EBUSY);
@@ -7562,13 +7614,14 @@ te_data_req(queue_t *q, mblk_t *mp)
 	if (unlikely
 	    ((dlen = msgsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
-	if (unlikely((err = tp_senddata(tp, tp->dport, &tp->options, dp)) != QR_ABSORBED))
+	if (unlikely((err = tp_senddata(tp, mp, tp->dport, &tp->options, dp)) != QR_ABSORBED))
 		goto error;
-	return (QR_TRIMMED);	/* tp_senddata() consumed message blocks */
+	return (QR_ABSORBED);	/* tp_senddata() consumed message blocks */
       discard:
-	return (QR_DONE);	/* tp_senddata() does not consume message blocks */
+	freemsg(mp);
+	return (QR_ABSORBED);	/* tp_senddata() does not consume message blocks */
       error:
-	return te_error_reply(q, -EPROTO);
+	return te_error_reply(q, mp, -EPROTO);
 }
 
 /**
@@ -7584,7 +7637,7 @@ te_exdata_req(queue_t *q, mblk_t *mp)
 	size_t dlen;
 	mblk_t *dp;
 	int err;
-	
+
 	/* don't work on message if flow controlled */
 	if (tp->sndblk != 0)
 		return (-EBUSY);
@@ -7616,14 +7669,15 @@ te_exdata_req(queue_t *q, mblk_t *mp)
 	dlen = msgsize(dp);
 	if (unlikely(dlen == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.ETSDU_size))
 		goto error;
-	err = tp_senddata(tp, tp->dport, &tp->options, dp);
+	err = tp_senddata(tp, mp, tp->dport, &tp->options, dp);
 	if (unlikely(err != QR_ABSORBED))
 		goto error;
-	return (QR_TRIMMED);
+	return (QR_ABSORBED);
       discard:
-	return (QR_DONE);
+	freemsg(mp);
+	return (QR_ABSORBED);
       error:
-	return te_error_reply(q, -EPROTO);
+	return te_error_reply(q, mp, -EPROTO);
 }
 
 /**
@@ -7640,7 +7694,7 @@ te_optdata_req(queue_t *q, mblk_t *mp)
 	size_t mlen;
 	mblk_t *dp;
 	int err;
-	
+
 	/* don't work on message if flow controlled */
 	if (tp->sndblk != 0)
 		return (-EBUSY);
@@ -7677,13 +7731,14 @@ te_optdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(p->OPT_length != 0))
 		if ((err = t_opts_parse(mp->b_wptr + p->OPT_offset, p->OPT_length, &opts)))
 			goto error;
-	if ((err = tp_senddata(tp, tp->dport, &opts, dp)) != QR_ABSORBED)
+	if ((err = tp_senddata(tp, mp, tp->dport, &opts, dp)) != QR_ABSORBED)
 		goto error;
-	return (QR_TRIMMED);
+	return (QR_ABSORBED);
       discard:
-	return (QR_DONE);
+	freemsg(mp);
+	return (QR_ABSORBED);
       error:
-	return te_error_reply(q, err);
+	return te_error_reply(q, mp, err);
 }
 
 /**
@@ -7757,7 +7812,7 @@ te_optmgmt_req(queue_t *q, mblk_t *mp)
 			goto error;
 		}
 	}
-	err = t_optmgmt_ack(q, p->MGMT_flags, mp->b_rptr + p->OPT_offset, p->OPT_length, opt_len);
+	err = t_optmgmt_ack(q, mp, p->MGMT_flags, mp->b_rptr + p->OPT_offset, p->OPT_length, opt_len);
 	if (unlikely(err < 0)) {
 		switch (-err) {
 		case EINVAL:
@@ -7775,7 +7830,7 @@ te_optmgmt_req(queue_t *q, mblk_t *mp)
 	}
 	return (err);
       error:
-	return te_error_ack(q, T_OPTMGMT_REQ, err);
+	return te_error_ack(q, mp, T_OPTMGMT_REQ, err);
 }
 
 #ifdef T_ADDR_REQ
@@ -7844,11 +7899,11 @@ te_addr_req(queue_t *q, mblk_t *mp)
 		default:
 			goto error;
 		}
-		return t_addr_ack(q, LOCADDR_buffer, LOCADDR_length, REMADDR_buffer,
+		return t_addr_ack(q, mp, LOCADDR_buffer, LOCADDR_length, REMADDR_buffer,
 				  REMADDR_length);
 	}
       error:
-	return te_error_ack(q, T_ADDR_REQ, err);
+	return te_error_ack(q, mp, T_ADDR_REQ, err);
 }
 #endif				/* T_ADDR_REQ */
 
@@ -7869,9 +7924,11 @@ te_capability_req(queue_t *q, mblk_t *mp)
 		goto error;
 	p = (typeof(p)) mp->b_rptr;
 	dassert(p->PRIM_type == T_CAPABILITY_REQ);
-	return t_capability_ack(q, p->CAP_bits1, mp->b_datap->db_type);
+	if ((err = t_capability_ack(q, mp, p->CAP_bits1, mp->b_datap->db_type)) != QR_ABSORBED)
+		goto error;
+	return (QR_ABSORBED);
       error:
-	return te_error_ack(q, T_CAPABILITY_REQ, err);
+	return te_error_ack(q, mp, T_CAPABILITY_REQ, err);
 }
 #endif				/* T_CAPABILITY_REQ */
 
@@ -7996,12 +8053,15 @@ tp_w_proto(queue_t *q, mblk_t *mp)
 		case -ENOMEM:	/* could not allocate memory */
 		case -ENOBUFS:	/* could not allocate an mblk */
 		case -EOPNOTSUPP:	/* primitive not supported */
-			return te_error_ack(q, prim, rtn);
+			rtn = te_error_ack(q, mp, prim, rtn);
+			break;
 		case -EPROTO:
-			return te_error_reply(q, -EPROTO);
+			rtn = te_error_reply(q, mp, -EPROTO);
+			break;
 		default:
 			/* ignore all other errors */
-			rtn = 0;
+			freemsg(mp);
+			rtn = QR_ABSORBED;
 			break;
 		}
 	}
@@ -8074,7 +8134,8 @@ tp_w_flush(queue_t *q, mblk_t *mp)
 		qreply(q, mp);
 		return (QR_ABSORBED);
 	}
-	return (QR_DONE);
+	freemsg(mp);
+	return (QR_ABSORBED);
 }
 
 /**
@@ -8120,7 +8181,8 @@ tp_r_data(queue_t *q, mblk_t *mp)
 			rtn = te_unitdata_ind(q, mp);
 			break;
 		default:
-			rtn = QR_DONE;
+			freemsg(mp);
+			rtn = QR_ABSORBED;
 			break;
 		}
 		break;
@@ -8141,7 +8203,8 @@ tp_r_data(queue_t *q, mblk_t *mp)
 			break;
 		case TS_IDLE:
 			if (tp->CONIND_number == 0) {
-				rtn = QR_DONE;
+				freemsg(mp);
+				rtn = QR_ABSORBED;
 				break;
 			}
 			/* fall through */
@@ -8151,13 +8214,15 @@ tp_r_data(queue_t *q, mblk_t *mp)
 			break;
 		default:
 			/* ignore it now */
-			rtn = QR_DONE;
+			freemsg(mp);
+			rtn = QR_ABSORBED;
 			break;
 		}
 		break;
 	default:
 		swerr();
-		rtn = QR_DONE;
+		freemsg(mp);
+		rtn = QR_ABSORBED;
 		break;
 	}
 	return (rtn);
@@ -8185,7 +8250,8 @@ tp_r_ctl(queue_t *q, mblk_t *mp)
 			rtn = te_uderror_ind_icmp(q, mp);
 			break;
 		default:
-			rtn = QR_DONE;
+			freemsg(mp);
+			rtn = QR_ABSORBED;
 			break;
 		}
 		break;
@@ -8209,13 +8275,15 @@ tp_r_ctl(queue_t *q, mblk_t *mp)
 			break;
 		default:
 			/* ignore it now */
-			rtn = QR_DONE;
+			freemsg(mp);
+			rtn = QR_ABSORBED;
 			break;
 		}
 		break;
 	default:
 		swerr();
-		rtn = QR_DONE;
+		freemsg(mp);
+		rtn = QR_ABSORBED;
 		break;
 	}
 	return (rtn);
@@ -8236,7 +8304,8 @@ tp_r_flush(queue_t *q, mblk_t *mp)
 		putnext(q, mp);
 		return (QR_ABSORBED);
 	}
-	return (QR_DONE);
+	freemsg(mp);
+	return (QR_ABSORBED);
 }
 
 noinline fastcall __unlikely int
@@ -8287,223 +8356,58 @@ tp_w_prim_slow(queue_t *q, mblk_t *mp)
 	}
 }
 
-noinline fastcall __unlikely int
-tp_w_prim_error(queue_t *q, const int rtn)
-{
-	switch (rtn) {
-	case -EBUSY:		/* flow controlled */
-	case -EAGAIN:		/* try again */
-	case -ENOMEM:		/* could not allocate memory */
-	case -ENOBUFS:		/* could not allocate an mblk */
-		return (rtn);
-	case -EOPNOTSUPP:	/* primitive not supported */
-		return te_error_ack(q, T_UNITDATA_REQ, rtn);
-	case -EPROTO:
-		return te_error_reply(q, -EPROTO);
-	default:
-		return (0);
-	}
-}
-
 /**
- * tp_w_prim - process primitive on write queue
+ * tp_w_prim_put - process primitive on write queue
  * @q: active queue in queue pair (write queue)
  * @mp: the message
  */
 STATIC INLINE streamscall __hot_put int
-tp_w_prim(queue_t *q, mblk_t *mp)
+tp_w_prim_put(queue_t *q, mblk_t *mp)
 {
-	int rtn;
+	/* fast path for data */
+	if (likely(mp->b_datap->db_type == M_DATA))
+		return (-EAGAIN); /* want to queue these */
+	if (likely(mp->b_datap->db_type == M_PROTO) &&
+	    likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t)) &&
+	    likely(*((t_scalar_t *) mp->b_rptr) == T_UNITDATA_REQ))
+		return (-EAGAIN); /* want to queue these */
+	return tp_w_prim_slow(q, mp);
+}
 
-	if (likely(mp->b_datap->db_type == M_DATA)) {
-		if (likely((rtn = te_write_req(q, mp)) >= 0))
-			return (rtn);
-		return tp_w_prim_error(q, rtn);
-	} else if (likely(mp->b_datap->db_type == M_PROTO)) {
-		/* fast path for data */
-		if (likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t))) {
-			if (likely(*((t_scalar_t *) mp->b_rptr) == T_UNITDATA_REQ)) {
-				if (likely((rtn = te_unitdata_req(q, mp)) >= 0))
-					return (rtn);
-				return tp_w_prim_error(q, rtn);
-			}
-		}
-	}
+/**
+ * tp_w_prim_srv - process primitive on write queue
+ * @q: active queue in queue pair (write queue)
+ * @mp: the message
+ */
+STATIC INLINE streamscall __hot_put int
+tp_w_prim_srv(queue_t *q, mblk_t *mp)
+{
+	/* fast path for data */
+	if (likely(mp->b_datap->db_type == M_DATA))
+		return te_write_req(q, mp);
+	if (likely(mp->b_datap->db_type == M_PROTO) &&
+	    likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t)) &&
+	    likely(*((t_scalar_t *) mp->b_rptr) == T_UNITDATA_REQ))
+		return te_unitdata_req(q, mp);
 	return tp_w_prim_slow(q, mp);
 }
 
 #define PRELOAD (FASTBUF<<2)
 
-noinline fastcall void
-tp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
-{
-	switch (rtn) {
-	case QR_DONE:
-		freemsg(mp);
-	case QR_ABSORBED:
-		break;
-	case QR_STRIP:
-		if (mp->b_cont) {
-			mp->b_wptr += PRELOAD;
-			if (unlikely(putq(q, mp->b_cont) == 0))
-				freemsg(mp->b_cont);
-		}
-	case QR_TRIMMED:
-		freeb(mp);
-		break;
-	case QR_LOOP:
-		if (!q->q_next) {
-			qreply(q, mp);
-			break;
-		}
-	case QR_PASSALONG:
-		if (q->q_next) {
-			putnext(q, mp);
-			break;
-		}
-		rtn = -EOPNOTSUPP;
-	default:
-		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
-			q->q_ptr, rtn));
-		freemsg(mp);
-		break;
-	case QR_DISABLE:
-		mp->b_wptr += PRELOAD;
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
-		break;
-	case QR_PASSFLOW:
-		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
-			putnext(q, mp);
-			break;
-		}
-	case -ENOBUFS:
-	case -EBUSY:
-	case -ENOMEM:
-	case -EAGAIN:
-	case QR_RETRY:
-		mp->b_wptr += PRELOAD;
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
-		break;
-	}
-	return;
-}
-
-noinline fastcall int
-tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
-{
-	switch (rtn) {
-	case QR_DONE:
-		freemsg(mp);
-	case QR_ABSORBED:
-		return (1);
-	case QR_STRIP:
-		if (mp->b_cont) {
-			mp->b_wptr += PRELOAD;
-			if (!putbq(q, mp->b_cont))
-				freemsg(mp->b_cont);
-		}
-	case QR_TRIMMED:
-		freeb(mp);
-		return (1);
-	case QR_LOOP:
-		if (!q->q_next) {
-			qreply(q, mp);
-			return (1);
-		}
-	case QR_PASSALONG:
-		if (q->q_next) {
-			putnext(q, mp);
-			return (1);
-		}
-		rtn = -EOPNOTSUPP;
-	default:
-		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
-			q->q_ptr, rtn));
-		freemsg(mp);
-		return (1);
-	case QR_DISABLE:
-		printd(("%s: %p: ERROR: (q disabling) %d\n", q->q_qinfo->qi_minfo->mi_idname,
-			q->q_ptr, rtn));
-		noenable(q);
-		mp->b_wptr += PRELOAD;
-		if (!putbq(q, mp))
-			freemsg(mp);
-		rtn = 0;
-		return (0);
-	case QR_PASSFLOW:
-		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
-			putnext(q, mp);
-			return (1);
-		}
-	case -ENOBUFS:		/* proc must have scheduled bufcall */
-	case -EBUSY:		/* proc must have failed canput */
-	case -ENOMEM:		/* proc must have scheduled bufcall */
-	case -EAGAIN:		/* proc must re-enable on some event */
-		if (mp->b_datap->db_type < QPCTL) {
-			printd(("%s: %p: ERROR: (q stalled) %d\n", q->q_qinfo->qi_minfo->mi_idname,
-				q->q_ptr, rtn));
-			mp->b_wptr += PRELOAD;
-			if (!putbq(q, mp))
-				freemsg(mp);
-			return (0);
-		}
-		/* 
-		 *  Be careful not to put a priority message back on the queue.
-		 */
-		switch (mp->b_datap->db_type) {
-		case M_PCPROTO:
-			mp->b_datap->db_type = M_PROTO;
-			break;
-		case M_PCRSE:
-			mp->b_datap->db_type = M_RSE;
-			break;
-		case M_PCCTL:
-			mp->b_datap->db_type = M_CTL;
-			break;
-		default:
-			printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
-				q->q_ptr, rtn));
-			freemsg(mp);
-			return (1);
-		}
-		mp->b_band = 255;
-		mp->b_wptr += PRELOAD;
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
-		return (0);
-	case QR_RETRY:
-		mp->b_wptr += PRELOAD;
-		if (!putbq(q, mp))
-			freemsg(mp);
-		return (1);
-	}
-}
-
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
 #if 1
-	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
+	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
+	    || tp_r_prim(q, mp) != QR_ABSORBED) {
 		udp_rstat.ms_acnt++;
 		mp->b_wptr += PRELOAD;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
-	} else {
-		int rtn;
-
-		rtn = tp_r_prim(q, mp);
-		/* Fast Path */
-		if (likely(rtn == QR_ABSORBED)) {
-			return (0);
-		} else
-			tp_putq_slow(q, mp, rtn);
 	}
 #else
 	/* Here's the theory why this works: if we stuff it all there, the stream head can
-	   backenable and backfill as required, allowing another processor to service the
-	   queue. */
+	   backenable and backfill as required, allowing another processor to service the queue. */
 	mp->b_wptr += PRELOAD;
 	putq(q, mp);
 #endif
@@ -8516,16 +8420,13 @@ tp_rsrv(queue_t *q)
 	mblk_t *mp;
 
 	while (likely((mp = getq(q)) != NULL)) {
-		int rtn;
-
 		/* remove backpressure */
 		mp->b_wptr -= PRELOAD;
-		rtn = tp_r_prim(q, mp);
-		/* Fast Path */
-		if (likely(rtn == QR_ABSORBED)) {
-			continue;
-		} else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
-			break;
+		if (unlikely(tp_r_prim(q, mp) != QR_ABSORBED)) {
+			if (putbq(q, mp))
+				break;
+			freemsg(mp);
+		}
 	}
 	return (0);
 }
@@ -8533,29 +8434,31 @@ tp_rsrv(queue_t *q)
 streamscall __hot_in int
 tp_wput(queue_t *q, mblk_t *mp)
 {
-#if 0
-	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
+#if 1
+	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
+	    || tp_w_prim_put(q, mp) != QR_ABSORBED) {
 		udp_wstat.ms_acnt++;
 		mp->b_wptr += PRELOAD;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
-	} else {
-		int rtn;
-
-		rtn = tp_w_prim(q, mp);
-		/* Fast Path */
-		if (likely(rtn == QR_TRIMMED)) {
-			freeb(mp);
-			return (0);
-		} else
-			tp_putq_slow(q, mp, rtn);
 	}
 #else
 	/* Here's the theory why this works: if we stuff it all there, the service procedure can
 	   backenable the stream head as required. */
 	/* add backpressure */
+#if 0
 	mp->b_wptr += PRELOAD;
 	putq(q, mp);
+#else
+	/* don't queue priority messages */
+	if (likely(mp->b_datap->db_type < QPCTL)
+	    || tp_w_prim_put(q, mp) != QR_ABSORBED) {
+		udp_wstat.ms_acnt++;
+		mp->b_wptr += PRELOAD;
+		if (unlikely(putq(q, mp) == 0))
+			freemsg(mp);
+	}
+#endif
 #endif
 	return (0);
 }
@@ -8566,16 +8469,12 @@ tp_wsrv(queue_t *q)
 	mblk_t *mp;
 
 	while (likely((mp = getq(q)) != NULL)) {
-		register int rtn;
-
 		mp->b_wptr -= PRELOAD;
-		rtn = tp_w_prim(q, mp);
-		/* Fast Path */
-		if (likely(rtn == QR_TRIMMED)) {
-			freeb(mp);
-			continue;
-		} else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
-			break;
+		if (unlikely(tp_w_prim_srv(q, mp) != QR_ABSORBED)) {
+			if (putbq(q, mp))
+				break;
+			freemsg(mp);
+		}
 	}
 	return (0);
 }
@@ -9454,6 +9353,8 @@ udp_qclose(queue_t *q, int oflag, cred_t *crp)
 	goto skip_pop;
       skip_pop:
 	/* make sure procedures are off */
+	flushq(WR(q), FLUSHALL);
+	flushq(RD(q), FLUSHALL);
 	qprocsoff(q);
 	tp_free_priv(q);	/* free and unlink the structure */
 	goto quit;
