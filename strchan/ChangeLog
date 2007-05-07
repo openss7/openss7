@@ -1,5 +1,6 @@
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* tests/kernel.at: correction to module test for new distros
 	* AUTHORS: update release files
 	* doc/manual/news.texi: update release files
 	* NEWS: update release files
