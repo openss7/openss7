@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/03/16 10:30:16 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/05/07 18:45:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/16 10:30:16 $ by $Author: brian $
+# Last Modified $Date: 2007/05/07 18:45:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -350,7 +350,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-STRBCM],
 			       [include STRBCM in master pack @<:@detected@:>@]),
 		[with_STRBCM="$withval"],
-		[with_STRBCM='no'])
+		[with_STRBCM='yes'])
     AC_CACHE_CHECK([for sub-package strbcm],[os7_cv_strbcm_dir],[dnl
 	    os7_cv_strbcm_dir=''
 	    for dir in $srcdir/strbcm $srcdir/strbcm-* ; do

@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Config,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 00:52:27 $
+# @(#) $RCSfile: Config,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/05/07 18:45:53 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -45,11 +45,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/03/25 00:52:27 $ by $Author: brian $
+## Last Modified $Date: 2007/05/07 18:45:53 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Config,v $
+## Revision 0.9.2.4  2007/05/07 18:45:53  brian
+## - working up bcm package
+##
 ## Revision 0.9.2.3  2007/03/25 00:52:27  brian
 ## - synchronization updates
 ##
@@ -89,27 +92,27 @@
 ## not all drivers do.  It is only known to work for 'fifo' at this time.
 ##
 ##	name		prefix	major	n-minors  n-majors
-driver	socksys		socksys	*
-driver	unix		unix	*
+#driver	socksys		socksys	*
+#driver	unix		unix	*
 #driver	xnet		xnet	*
 ##
 ## this must be 30 for iBCS compatibility
 ##
 #driver	inet		inet	30
 
-module timod timod
-module tirdwr tirdwr
+#module timod timod
+#module tirdwr tirdwr
 
 ##
 ## Object name specifications
 ##
 ##	type	name		object name
-objname	driver	socksys		socksys
-objname	driver	unix		unix
+#objname	driver	socksys		socksys
+#objname	driver	unix		unix
 #objname	driver	xnet		xnet
 #objname	driver	inet		inet
-objname	module	timod timod
-objname	module	tirdwr tirdwr
+#objname	module	timod timod
+#objname	module	tirdwr tirdwr
 
 ##
 ## Autopush specifications
@@ -130,12 +133,12 @@ objname	module	tirdwr tirdwr
 ##loadable unix
 #loadable xnet
 #loadable inet
-loadable tirdwr
+#loadable tirdwr
 
-qlock driver unix QPAIR
-qlock driver socksys GLOBAL
-qlock module timod QPAIR
-qlock module tirdwr QPAIR
+#qlock driver unix QPAIR
+#qlock driver socksys GLOBAL
+#qlock module timod QPAIR
+#qlock module tirdwr QPAIR
 
 ##
 ## Initialization specifications
@@ -158,8 +161,8 @@ qlock module tirdwr QPAIR
 ## example of how to use lis_mknod.
 ##
 ##	name	          type	perm	major		minor
-node	/dev/socksys	     c	*	socksys		0
-node	/dev/unix	     c	*	unix		0
+#node	/dev/socksys	     c	*	socksys		0
+#node	/dev/unix	     c	*	unix		0
 #node	/dev/xnet	     c	*	xnet		0
 ##
 ## These are iBCS devices that should already be installed on a
