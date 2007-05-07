@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/15 10:24:31 $
+ @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/05/07 18:55:15 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:24:31 $ by $Author: brian $
+ Last Modified $Date: 2007/05/07 18:55:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-np_ip.c,v $
+ Revision 0.9.2.20  2007/05/07 18:55:15  brian
+ - corrections from release testing
+
  Revision 0.9.2.19  2007/03/15 10:24:31  brian
  - test case reporting and pushed release date one day
 
@@ -129,9 +132,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/15 10:24:31 $"
+#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/05/07 18:55:15 $"
 
-static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/15 10:24:31 $";
+static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/05/07 18:55:15 $";
 
 /*
  *  Simple test program for NPI-IP streams.
@@ -9626,7 +9629,7 @@ test_case_3_4_12(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000001) } };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
 		char buf[70000] = "Test data";
 
 		ADDR_buffer = &sin;
@@ -9637,14 +9640,18 @@ test_case_3_4_12(int child)
 		DATA_buffer = buf;
 		DATA_length = 70000;
 
-		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
-			goto failure;
+		if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS) {
+			if (last_errno != ERANGE)
+				goto failure;
+			goto success;
+		}
 		state++;
 		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
 			goto failure;
 		state++;
 		if (NPI_error != NBADDATA)
 			goto failure;
+	      success:
 		state++;
 	}
 	return (__RESULT_SUCCESS);

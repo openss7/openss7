@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/04/12 20:07:17 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/05/07 18:55:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/04/12 20:07:17 $ by $Author: brian $
+ Last Modified $Date: 2007/05/07 18:55:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.41  2007/05/07 18:55:13  brian
+ - corrections from release testing
+
  Revision 0.9.2.40  2007/04/12 20:07:17  brian
  - changes from performance testing and misc bug fixes
 
@@ -190,10 +193,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/04/12 20:07:17 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/05/07 18:55:13 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/04/12 20:07:17 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/05/07 18:55:13 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -254,7 +257,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.40 $) $Date: 2007/04/12 20:07:17 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.41 $) $Date: 2007/05/07 18:55:13 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -6695,8 +6698,8 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	so->so_lowat = np_minfo.mi_lowat;
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
-	putnext(q, mp);
 	qprocson(q);
+	putnext(q, mp);
 	return (0);
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/15 10:24:21 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/05/07 18:55:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:24:21 $ by $Author: brian $
+ Last Modified $Date: 2007/05/07 18:55:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tirdwr.c,v $
+ Revision 0.9.2.30  2007/05/07 18:55:10  brian
+ - corrections from release testing
+
  Revision 0.9.2.29  2007/03/15 10:24:21  brian
  - test case reporting and pushed release date one day
 
@@ -125,9 +128,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/15 10:24:21 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/05/07 18:55:10 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/15 10:24:21 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/05/07 18:55:10 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
@@ -6405,12 +6408,14 @@ test_case_1_3_top(int child)
 	if (expect(child, INFINITE_WAIT, __TEST_DATA) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+#if 0
 	if (expect(child, INFINITE_WAIT, __TEST_DATA) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (expect(child, INFINITE_WAIT, __TEST_DATA) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+#endif
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -6886,6 +6891,8 @@ test_case_3_1_top(int child)
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -6940,6 +6947,8 @@ test_case_3_2_top(int child)
 	state++;
 	if (do_signal(child, __TEST_WRITEV) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -6996,6 +7005,8 @@ test_case_3_3_top(int child)
 	if (do_signal(child, __TEST_PUTMSG_DATA) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -7050,6 +7061,8 @@ test_case_3_4_top(int child)
 	state++;
 	if (do_signal(child, __TEST_PUTPMSG_DATA) == __RESULT_SUCCESS || last_errno != EPROTO)
 		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7106,6 +7119,8 @@ test_case_3_5_top(int child)
 	state++;
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7170,6 +7185,8 @@ test_case_3_6_top(int child)
 	if (do_signal(child, __TEST_WRITE) == __RESULT_SUCCESS || last_errno != ENXIO)
 		goto failure;
 	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -7228,6 +7245,8 @@ test_case_3_7_top(int child)
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7291,6 +7310,8 @@ test_case_3_8_top(int child)
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) == __RESULT_SUCCESS || last_errno != ENXIO)
 		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
