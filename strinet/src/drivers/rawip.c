@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/05/07 20:04:18 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/05/08 12:17:49 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/07 20:04:18 $ by $Author: brian $
+ Last Modified $Date: 2007/05/08 12:17:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.48  2007/05/08 12:17:49  brian
+ - locking updates, changes from validation testing
+
  Revision 0.9.2.47  2007/05/07 20:04:18  brian
  - locking, return code, testing changes
 
@@ -212,10 +215,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/05/07 20:04:18 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/05/08 12:17:49 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/05/07 20:04:18 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/05/08 12:17:49 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -296,7 +299,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/05/07 20:04:18 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/05/08 12:17:49 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -6172,7 +6175,8 @@ te_uderror_ind_icmp(queue_t *q, mblk_t *mp)
 	mp->b_rptr = (unsigned char *) iph;
 	OPT_length = t_errs_size(tp, mp);
 	t_errs_build(tp, mp, OPT_buffer, OPT_length);
-	if ((err = te_uderror_ind(q, NULL, DEST_buffer, OPT_buffer, OPT_length, ERROR_type, mp)) < 0)
+	if ((err =
+	     te_uderror_ind(q, NULL, DEST_buffer, OPT_buffer, OPT_length, ERROR_type, mp)) < 0)
 		mp->b_rptr = hidden;
 	return (err);
 }
@@ -6606,7 +6610,8 @@ te_bind_req(queue_t *q, mblk_t *mp)
 	if (tp->options.ip.protocol && tp->options.ip.protocol < 255
 	    && !capable(CAP_NET_BIND_SERVICE))
 		goto error;
-	if (unlikely((err = te_bind_ack(q, mp, ADDR_buffer, ADDR_length, p->CONIND_number)) != QR_ABSORBED))
+	if (unlikely
+	    ((err = te_bind_ack(q, mp, ADDR_buffer, ADDR_length, p->CONIND_number)) != QR_ABSORBED))
 		goto error;
 	return (QR_ABSORBED);
       error:
@@ -6628,7 +6633,9 @@ te_unbind_req(queue_t *q, mblk_t *mp)
 	if (unlikely(tp_get_state(tp) != TS_IDLE))
 		goto error;
 	tp_set_state(tp, TS_WACK_UREQ);
-	if (unlikely((err = te_ok_ack(q, mp, T_UNBIND_REQ, NULL, 0, NULL, NULL, NULL, 0, NULL)) != QR_ABSORBED))
+	if (unlikely
+	    ((err =
+	      te_ok_ack(q, mp, T_UNBIND_REQ, NULL, 0, NULL, NULL, NULL, 0, NULL)) != QR_ABSORBED))
 		goto error;
 	return (QR_ABSORBED);
       error:
@@ -7450,7 +7457,8 @@ te_optmgmt_req(queue_t *q, mblk_t *mp)
 			goto error;
 		}
 	}
-	err = t_optmgmt_ack(q, mp, p->MGMT_flags, mp->b_rptr + p->OPT_offset, p->OPT_length, opt_len);
+	err =
+	    t_optmgmt_ack(q, mp, p->MGMT_flags, mp->b_rptr + p->OPT_offset, p->OPT_length, opt_len);
 	if (unlikely(err < 0)) {
 		switch (-err) {
 		case EINVAL:
@@ -7588,6 +7596,9 @@ tp_w_proto(queue_t *q, mblk_t *mp)
 	t_scalar_t prim = 0;
 	struct tp *tp = TP_PRIV(q);
 
+	if (unlikely(!ss7_trylockq(q)))
+		goto eagain;
+
 	tp->i_oldstate = tp_get_state(tp);	/* checkpoint */
 
 	if (mp->b_wptr >= mp->b_rptr + sizeof(prim)) {
@@ -7703,7 +7714,10 @@ tp_w_proto(queue_t *q, mblk_t *mp)
 			break;
 		}
 	}
+	ss7_unlockq(q);
 	return (rtn);
+      eagain:
+	return (-EAGAIN);
 }
 
 /**
@@ -7714,7 +7728,13 @@ tp_w_proto(queue_t *q, mblk_t *mp)
 noinline fastcall __unlikely int
 tp_w_data(queue_t *q, mblk_t *mp)
 {
-	return te_write_req(q, mp);
+	int rtn;
+
+	if (likely(ss7_trylockq(q))) {
+		rtn = te_write_req(q, mp);
+		ss7_unlockq(q);
+	}
+	return (-EAGAIN);
 }
 
 /**
@@ -7730,7 +7750,8 @@ tp_w_other(queue_t *q, mblk_t *mp)
 	rare();
 	cmn_err(CE_WARN, "Unsupported block type %d on WR(q) %d\n", mp->b_datap->db_type,
 		tp->u.dev.cminor);
-	return (-EOPNOTSUPP);
+	freemsg(mp);
+	return (QR_ABSORBED);
 }
 
 /**
@@ -7789,12 +7810,8 @@ tp_r_other(queue_t *q, mblk_t *mp)
 	rare();
 	cmn_err(CE_WARN, "Unsupported block type %d on RD(q) %d\n", mp->b_datap->db_type,
 		tp->u.dev.cminor);
-#if 0
-	putnext(q, mp);
+	freemsg(mp);
 	return (QR_ABSORBED);
-#else
-	return (-EOPNOTSUPP);
-#endif
 }
 
 /**
@@ -7811,6 +7828,9 @@ tp_r_data(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
 	int rtn;
+
+	if (unlikely(!ss7_trylockq(q)))
+		goto eagain;
 
 	switch (tp->info.SERV_type) {
 	case T_CLTS:
@@ -7863,7 +7883,10 @@ tp_r_data(queue_t *q, mblk_t *mp)
 		rtn = QR_ABSORBED;
 		break;
 	}
+	ss7_unlockq(q);
 	return (rtn);
+      eagain:
+	return (-EAGAIN);
 }
 
 /**
@@ -7880,6 +7903,9 @@ tp_r_ctl(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
 	int rtn;
+
+	if (unlikely(!ss7_trylockq(q)))
+		goto eagain;
 
 	switch (tp->info.SERV_type) {
 	case T_CLTS:
@@ -7924,7 +7950,10 @@ tp_r_ctl(queue_t *q, mblk_t *mp)
 		rtn = QR_ABSORBED;
 		break;
 	}
+	ss7_unlockq(q);
 	return (rtn);
+      eagain:
+	return (-EAGAIN);
 }
 
 noinline streamscall int
@@ -7971,8 +8000,15 @@ tp_r_prim(queue_t *q, mblk_t *mp)
 {
 	if (likely(mp->b_datap->db_type == M_DATA))
 		/* fast path for data */
-		if (likely(TP_PRIV(q)->info.SERV_type == T_CLTS))
-			return te_unitdata_ind(q, mp);
+		if (likely(TP_PRIV(q)->info.SERV_type == T_CLTS)) {
+			int rtn = -EAGAIN;
+
+			if (likely(ss7_trylockq(q))) {
+				rtn = te_unitdata_ind(q, mp);
+				ss7_unlockq(q);
+			}
+			return (rtn);
+		}
 	return tp_r_prim_slow(q, mp);
 }
 
@@ -8004,11 +8040,11 @@ tp_w_prim_put(queue_t *q, mblk_t *mp)
 {
 	/* fast path for data */
 	if (likely(mp->b_datap->db_type == M_DATA))
-		return (-EAGAIN);
+		return (-EAGAIN);	/* want to queue these */
 	if (likely(mp->b_datap->db_type == M_PROTO) &&
 	    likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t)) &&
 	    likely(*((t_scalar_t *) mp->b_rptr) == T_UNITDATA_REQ))
-		return (-EAGAIN);
+		return (-EAGAIN);	/* want to queue these */
 	return tp_w_prim_slow(q, mp);
 }
 
@@ -8022,11 +8058,18 @@ tp_w_prim_srv(queue_t *q, mblk_t *mp)
 {
 	/* fast path for data */
 	if (likely(mp->b_datap->db_type == M_DATA))
-		return te_write_req(q, mp);
+		return tp_w_data(q, mp);
 	if (likely(mp->b_datap->db_type == M_PROTO) &&
 	    likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t)) &&
-	    likely(*((t_scalar_t *) mp->b_rptr) == T_UNITDATA_REQ))
-		return te_unitdata_req(q, mp);
+	    likely(*((t_scalar_t *) mp->b_rptr) == T_UNITDATA_REQ)) {
+		int rtn = -EAGAIN;
+
+		if (likely(ss7_trylockq(q))) {
+			rtn = te_unitdata_req(q, mp);
+			ss7_unlockq(q);
+		}
+		return (rtn);
+	}
 	return tp_w_prim_slow(q, mp);
 }
 
@@ -8035,7 +8078,6 @@ tp_w_prim_srv(queue_t *q, mblk_t *mp)
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
-#if 1
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
 	    || tp_r_prim(q, mp) != QR_ABSORBED) {
 		raw_rstat.ms_acnt++;
@@ -8043,12 +8085,6 @@ tp_rput(queue_t *q, mblk_t *mp)
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	}
-#else
-	/* Here's the theory why this works: if we stuff it all there, the stream head can
-	   backenable and backfill as required, allowing another processor to service the queue. */
-	mp->b_wptr += PRELOAD;
-	putq(q, mp);
-#endif
 	return (0);
 }
 
@@ -8072,7 +8108,6 @@ tp_rsrv(queue_t *q)
 streamscall __hot_in int
 tp_wput(queue_t *q, mblk_t *mp)
 {
-#if 1
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
 	    || tp_w_prim_put(q, mp) != QR_ABSORBED) {
 		raw_wstat.ms_acnt++;
@@ -8080,24 +8115,6 @@ tp_wput(queue_t *q, mblk_t *mp)
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
 	}
-#else
-	/* Here's the theory why this works: if we stuff it all there, the service procedure can
-	   backenable the stream head as required. */
-	/* add backpressure */
-#if 0
-	mp->b_wptr += PRELOAD;
-	putq(q, mp);
-#else
-	/* don't queue priority messages */
-	if (likely(mp->b_datap->db_type < QPCTL)
-	    || tp_w_prim_put(q, mp) != QR_ABSORBED) {
-		raw_wstat.ms_acnt++;
-		mp->b_wptr += PRELOAD;
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
-	}
-#endif
-#endif
 	return (0);
 }
 
