@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_mpprintf.9.man,v 0.9.2.6 2006/10/10 10:40:50 brian Exp $
+.\" @(#) $Id: mi_mpprintf.9.man,v 0.9.2.7 2007/05/17 22:50:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/10 10:40:50 $ by $Author: brian $
+.\" Last Modified $Date: 2007/05/17 22:50:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_mpprintf.9.man,v $
+.\" Revision 0.9.2.7  2007/05/17 22:50:30  brian
+.\" - extensive rework of mi_timer functions
+.\"
 .\" Revision 0.9.2.6  2006/10/10 10:40:50  brian
 .\" - updates for release
 .\"
@@ -181,6 +184,9 @@ functions or
 .BR strlog (9)-like
 functions.  However, asside from these two situations, there is very little
 use for printing formatted strings to message blocks.
+(Let me take that back: these functions in fact turn out to be useful for
+formatting messages for text-based protocols such as SIP and MGCP from within
+STREAMS kernel modules.)
 .\"
 .\"
 .SH RETURN

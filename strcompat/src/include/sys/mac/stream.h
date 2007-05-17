@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.9 2007/02/21 01:09:14 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.10 2007/05/17 22:50:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/21 01:09:14 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:50:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.10  2007/05/17 22:50:32  brian
+ - extensive rework of mi_timer functions
+
  Revision 0.9.2.9  2007/02/21 01:09:14  brian
  - updating mtp.c driver, better mi_open allocators
 
@@ -82,7 +85,7 @@
 #ifndef __SYS_MAC_STREAM_H__
 #define __SYS_MAC_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mac/stream.h directly, include sys/stream.h instead."
@@ -116,11 +119,15 @@
 
 extern mblk_t *mi_timer_alloc_MAC(queue_t *q, size_t size);
 extern void mi_timer_MAC(mblk_t *mp, clock_t msec);
+extern void mi_timer_ticks(mblk_t *mp, clock_t ticks);
 extern int mi_timer_cancel(mblk_t *mp);
 extern mblk_t *mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp);
 extern int mi_timer_valid(mblk_t *mp);
+extern int mi_timer_requeue(mblk_t *mp);
 extern void mi_timer_free(mblk_t *mp);
 extern unsigned long mi_timer_remain(mblk_t *mp);
+extern int mi_timer_running(mblk_t *mp);
+extern int mi_timer_cond(mblk_t *mp, clock_t msec);
 
 extern queue_t *mi_allocq(struct streamtab *st);
 

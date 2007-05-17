@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_timer_cancel.9.man,v 0.9.2.7 2006/10/06 12:13:04 brian Exp $
+.\" @(#) $Id: mi_timer_cancel.9.man,v 0.9.2.8 2007/05/17 22:50:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:13:04 $ by $Author: brian $
+.\" Last Modified $Date: 2007/05/17 22:50:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_timer_cancel.9.man,v $
+.\" Revision 0.9.2.8  2007/05/17 22:50:30  brian
+.\" - extensive rework of mi_timer functions
+.\"
 .\" Revision 0.9.2.7  2006/10/06 12:13:04  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -103,7 +106,7 @@ sort-adjacent-labels
 .br
 .B #include <sys/mpsddi.h>
 .HP
-.BI "void mi_timer_cancel(mblk_t *" mp );
+.BI "int mi_timer_cancel(mblk_t *" mp );
 .HP
 .BI "void mi_timer_stop(mblk_t *" mp );
 .\"
@@ -183,11 +186,15 @@ for more detailed usage information.
 .\"
 .SH RETURN
 .PP
-.BR mi_timer_cancel ()
-and
 .BR mi_timer_stop ()
-return
+returns
 .BR void .
+.BR mi_timer_cancel ()
+returns true (1) when the timer is guaranteed to not be on a queue at the time
+of the cancel and can be reused; and false (0) when the timer message cannot
+be reused (because it may be on a queue).  This return value is used by
+.BR mi_timer_q_switch (9)
+internally.
 .\"
 .\"
 .SH ERRORS

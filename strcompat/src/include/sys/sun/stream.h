@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.13 2007/02/21 01:09:16 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.14 2007/05/17 22:50:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/21 01:09:16 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:50:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.14  2007/05/17 22:50:33  brian
+ - extensive rework of mi_timer functions
+
  Revision 0.9.2.13  2007/02/21 01:09:16  brian
  - updating mtp.c driver, better mi_open allocators
 
@@ -96,7 +99,7 @@
 #ifndef __SYS_SUN_STREAM_H__
 #define __SYS_SUN_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/sun/stream.h directly, include sys/stream.h instead."
@@ -212,11 +215,15 @@ mkiocb(unsigned int command)
 /* These are MPS definitions exposed by OpenSolaris, but implemented in mpscompat.c */
 extern mblk_t *mi_timer_alloc_SUN(size_t size);
 extern void mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec);
+extern void mi_timer_ticks(mblk_t *mp, clock_t ticks);
 extern void mi_timer_stop(mblk_t *mp);
 extern void mi_timer_move(queue_t *q, mblk_t *mp);
 extern int mi_timer_valid(mblk_t *mp);
+extern int mi_timer_requeue(mblk_t *mp);
 extern void mi_timer_free(mblk_t *mp);
 extern unsigned long mi_timer_remain(mblk_t *mp);
+extern int mi_timer_running(mblk_t *mp);
+extern int mi_timer_cond(mblk_t *mp, clock_t msec);
 
 #define mi_timer_alloc(_size)		mi_timer_alloc_SUN(_size)
 #define mi_timer(_q,_mp,_msec)		mi_timer_SUN(_q,_mp,_msec)

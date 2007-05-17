@@ -1,3 +1,20 @@
+2007-05-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man9/mi_mpprintf.9.man: documentation update
+	* doc/man/man9/mi_timer_cancel.9.man: documentation update
+	* doc/man/man9/mi_timer_q_switch.9.man: documentation update
+	* doc/man/man9/mi_timer_remain.9.man: documentation update
+	* doc/man/man9/mi_timer_valid.9.man: documentation update
+	* src/include/sys/os7/bufq.h: made unlocked access to head and tail volatile
+
+	* src/include/sys/mac/stream.h: added new timer functions
+	* src/include/sys/mps/stream.h: added new timer functions
+	* src/include/sys/sun/stream.h: added new timer functions
+
+	* src/kernel/mpscompat.c:
+	  - inline documentation updates
+	  - heavy rework of mi_timer functions
+
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/kernel.at: correction to module test for new distros

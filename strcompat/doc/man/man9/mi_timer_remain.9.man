@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_timer_remain.9.man,v 0.9.2.1 2007/03/04 18:51:43 brian Exp $
+.\" @(#) $Id: mi_timer_remain.9.man,v 0.9.2.2 2007/05/17 22:50:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/04 18:51:43 $ by $Author: brian $
+.\" Last Modified $Date: 2007/05/17 22:50:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_timer_remain.9.man,v $
+.\" Revision 0.9.2.2  2007/05/17 22:50:30  brian
+.\" - extensive rework of mi_timer functions
+.\"
 .\" Revision 0.9.2.1  2007/03/04 18:51:43  brian
 .\" - added manpage
 .\"
@@ -265,7 +268,10 @@ flavor of the functions have a race condition only in
 .PP
 Note that the timer could exprire immediately after the
 .BR mi_timer_remain ()
-function returns with a non-zero (!0) value.
+function returns with a non-zero (!0) value, or could be started immediately
+after the
+.BR mi_timer_remain ()
+function returns with a zero (0) value.
 .\"
 .\"
 .SH NOTICES
