@@ -1,3 +1,27 @@
+2007-05-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: check for nf_reset
+	* src/drivers/inet.c: use nf_reset when available
+	* src/drivers/rawip.c: use nf_reset when available
+	* src/drivers/tcp.c: use nf_reset when available
+	* src/drivers/udp.c: use nf_reset when available
+
+	* doc/papers/Makefile: performance report updates
+	* doc/papers/netperf_rh7.dat: performance report updates
+	* doc/papers/netperf_ubuntu.dat: performance report updates
+	* doc/papers/testresults.tex: performance report updates
+
+	* doc/papers/netperf_cos5.dat: added new data plots
+	* doc/papers/netperf_cos5_comp.plot: added new data plots
+	* doc/papers/netperf_cos5_delay.plot: added new data plots
+	* doc/papers/netperf_cos5_perf.plot: added new data plots
+	* doc/papers/netperf_cos5_thrput.plot: added new data plots
+	* doc/papers/netperf_u704.dat: added new data plots
+	* doc/papers/netperf_u704_comp.plot: added new data plots
+	* doc/papers/netperf_u704_delay.plot: added new data plots
+	* doc/papers/netperf_u704_perf.plot: added new data plots
+	* doc/papers/netperf_u704_thrput.plot: added new data plots
+
 2007-05-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/inet.c: locking updates, validation testing

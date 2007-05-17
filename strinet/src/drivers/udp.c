@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/05/08 12:17:51 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/05/17 22:33:06 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/08 12:17:51 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:33:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.62  2007/05/17 22:33:06  brian
+ - perform nf_reset when available
+
  Revision 0.9.2.61  2007/05/08 12:17:51  brian
  - locking updates, changes from validation testing
 
@@ -254,10 +257,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/05/08 12:17:51 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/05/17 22:33:06 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/05/08 12:17:51 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/05/17 22:33:06 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -339,7 +342,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/05/08 12:17:51 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/05/17 22:33:06 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -721,7 +724,7 @@ tp_alloc(void)
 		// tp->type = 0;
 		// tp->id = 0;
 		// tp->state = 0;
-		// tp->flags = 0;
+		tp->flags = 0;
 	}
 	return (tp);
 }
@@ -785,6 +788,22 @@ tp_alloc(void)
 #define __unlikely
 #endif
 #endif
+
+/*
+ *  Locking
+ */
+
+STATIC inline fastcall int
+tp_trylockq(queue_t *q)
+{
+	return (!test_and_set_bit(0, &STR_PRIV(q)->flags));
+}
+
+STATIC inline fastcall void
+tp_unlockq(queue_t *q)
+{
+	clear_bit(0, &STR_PRIV(q)->flags);
+}
 
 /*
  *  Buffer allocation
@@ -7959,7 +7978,7 @@ tp_w_proto(queue_t *q, mblk_t *mp)
 	t_scalar_t prim = 0;
 	struct tp *tp = TP_PRIV(q);
 
-	if (unlikely(!ss7_trylockq(q)))
+	if (unlikely(!tp_trylockq(q)))
 		goto eagain;
 
 	tp->i_oldstate = tp_get_state(tp);	/* checkpoint */
@@ -8077,7 +8096,7 @@ tp_w_proto(queue_t *q, mblk_t *mp)
 			break;
 		}
 	}
-	ss7_unlockq(q);
+	tp_unlockq(q);
 	return (rtn);
       eagain:
 	return (-EAGAIN);
@@ -8093,9 +8112,9 @@ tp_w_data(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 
-	if (likely(ss7_trylockq(q))) {
+	if (likely(tp_trylockq(q))) {
 		rtn = te_write_req(q, mp);
-		ss7_unlockq(q);
+		tp_unlockq(q);
 	}
 	return (-EAGAIN);
 }
@@ -8192,7 +8211,7 @@ tp_r_data(queue_t *q, mblk_t *mp)
 	struct tp *tp = TP_PRIV(q);
 	int rtn;
 
-	if (unlikely(!ss7_trylockq(q)))
+	if (unlikely(!tp_trylockq(q)))
 		goto eagain;
 
 	switch (tp->info.SERV_type) {
@@ -8246,7 +8265,7 @@ tp_r_data(queue_t *q, mblk_t *mp)
 		rtn = QR_ABSORBED;
 		break;
 	}
-	ss7_unlockq(q);
+	tp_unlockq(q);
 	return (rtn);
       eagain:
 	return (-EAGAIN);
@@ -8267,7 +8286,7 @@ tp_r_ctl(queue_t *q, mblk_t *mp)
 	struct tp *tp = TP_PRIV(q);
 	int rtn;
 
-	if (unlikely(!ss7_trylockq(q)))
+	if (unlikely(!tp_trylockq(q)))
 		goto eagain;
 
 	switch (tp->info.SERV_type) {
@@ -8313,7 +8332,7 @@ tp_r_ctl(queue_t *q, mblk_t *mp)
 		rtn = QR_ABSORBED;
 		break;
 	}
-	ss7_unlockq(q);
+	tp_unlockq(q);
 	return (rtn);
       eagain:
 	return (-EAGAIN);
@@ -8353,22 +8372,34 @@ tp_r_prim_slow(queue_t *q, mblk_t *mp)
 	}
 }
 
+#if 0
+STATIC INLINE streamscall __hot_in int
+tp_r_prim_put(queue_t *q, mblk_t *mp)
+{
+	if (likely(mp->b_datap->db_type == M_DATA))
+		/* fast path for data */
+		if (likely(TP_PRIV(q)->info.SERV_type == T_CLTS))
+			return (-EAGAIN);
+	return tp_r_prim_slow(q, mp);
+}
+#endif
+
 /**
- * tp_r_prim - process primitive on read queue
+ * tp_r_prim_srv - process primitive on read queue
  * @q: active queue in queue pair (read queue)
  * @mp: the message
  */
 STATIC INLINE streamscall __hot_in int
-tp_r_prim(queue_t *q, mblk_t *mp)
+tp_r_prim_srv(queue_t *q, mblk_t *mp)
 {
 	if (likely(mp->b_datap->db_type == M_DATA))
 		/* fast path for data */
 		if (likely(TP_PRIV(q)->info.SERV_type == T_CLTS)) {
 			int rtn = -EAGAIN;
 
-			if (likely(ss7_trylockq(q))) {
+			if (likely(tp_trylockq(q))) {
 				rtn = te_unitdata_ind(q, mp);
-				ss7_unlockq(q);
+				tp_unlockq(q);
 			}
 			return (rtn);
 		}
@@ -8402,8 +8433,10 @@ STATIC INLINE streamscall __hot_put int
 tp_w_prim_put(queue_t *q, mblk_t *mp)
 {
 	/* fast path for data */
+#if 0
 	if (likely(mp->b_datap->db_type == M_DATA))
 		return (-EAGAIN);	/* want to queue these */
+#endif
 	if (likely(mp->b_datap->db_type == M_PROTO) &&
 	    likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t)) &&
 	    likely(*((t_scalar_t *) mp->b_rptr) == T_UNITDATA_REQ))
@@ -8420,16 +8453,18 @@ STATIC INLINE streamscall __hot_put int
 tp_w_prim_srv(queue_t *q, mblk_t *mp)
 {
 	/* fast path for data */
+#if 0
 	if (likely(mp->b_datap->db_type == M_DATA))
 		return tp_w_data(q, mp);
+#endif
 	if (likely(mp->b_datap->db_type == M_PROTO) &&
 	    likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t)) &&
 	    likely(*((t_scalar_t *) mp->b_rptr) == T_UNITDATA_REQ)) {
 		int rtn = -EAGAIN;
 
-		if (likely(ss7_trylockq(q))) {
+		if (likely(tp_trylockq(q))) {
 			rtn = te_unitdata_req(q, mp);
-			ss7_unlockq(q);
+			tp_unlockq(q);
 		}
 		return (rtn);
 	}
@@ -8442,8 +8477,8 @@ streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
-	    || tp_r_prim(q, mp) != QR_ABSORBED) {
-		udp_rstat.ms_acnt++;
+	    || tp_r_prim_srv(q, mp) != QR_ABSORBED) {
+		//udp_rstat.ms_acnt++;
 		mp->b_wptr += PRELOAD;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
@@ -8459,7 +8494,7 @@ tp_rsrv(queue_t *q)
 	while (likely((mp = getq(q)) != NULL)) {
 		/* remove backpressure */
 		mp->b_wptr -= PRELOAD;
-		if (unlikely(tp_r_prim(q, mp) != QR_ABSORBED)) {
+		if (unlikely(tp_r_prim_srv(q, mp) != QR_ABSORBED)) {
 			if (putbq(q, mp))
 				break;
 			freemsg(mp);
@@ -8473,7 +8508,7 @@ tp_wput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
 	    || tp_w_prim_put(q, mp) != QR_ABSORBED) {
-		udp_wstat.ms_acnt++;
+		//udp_wstat.ms_acnt++;
 		mp->b_wptr += PRELOAD;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
@@ -8828,6 +8863,10 @@ tp_v4_rcv(struct sk_buff *skb)
 	struct udphdr *uh = (struct udphdr *) (skb->nh.raw + (iph->ihl << 2));
 	struct rtable *rt;
 	ushort ulen;
+
+#ifdef HAVE_KFUNC_NF_RESET
+	nf_reset(skb);
+#endif
 
 //      IP_INC_STATS_BH(IpInDelivers);  /* should wait... */
 
