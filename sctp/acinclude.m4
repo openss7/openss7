@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/03/25 18:58:24 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/05/17 23:02:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/25 18:58:24 $ by $Author: brian $
+# Last Modified $Date: 2007/05/17 23:02:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -290,7 +290,7 @@ AC_DEFUN([_SCTP_CHECK_KERNEL], [dnl
 #include <net/udp.h>
 #include <net/tcp.h>
     ])
-    _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu ip_dst_output \
+    _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu nf_reset ip_dst_output \
 			ip_route_output_key __in_dev_get_rcu synchronize_net], [], [], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
