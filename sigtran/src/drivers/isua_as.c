@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:58:33 $
+ @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/05/17 22:55:08 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:58:33 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:55:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isua_as.c,v $
+ Revision 0.9.2.5  2007/05/17 22:55:08  brian
+ - use mi_timer requeue to requeue mi timers
+
  Revision 0.9.2.4  2007/03/25 18:58:33  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:58:33 $"
+#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/05/17 22:55:08 $"
 
 static char const ident[] =
-    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:58:33 $";
+    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/05/17 22:55:08 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -141,7 +144,7 @@ static char const ident[] =
 /* ============================== */
 
 #define ISUA_AS_DESCRIP	"ISUA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:58:33 $"
+#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2007/05/17 22:55:08 $"
 #define ISUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -17551,7 +17554,7 @@ tp_r_sig(queue_t *q, mblk_t *mp)
 	int rtn = 0;
 
 	if (!(tp = tp_acquire(q)))
-		return (-EDEADLK);
+		return (mi_timer_requeue(mp) ? -EDEADLK : 0);
 
 	if (likely(mi_timer_valid(mp))) {
 		switch (t->timer) {
@@ -17589,6 +17592,8 @@ tp_r_sig(queue_t *q, mblk_t *mp)
 			rtn = 0;
 			break;
 		}
+		if (rtn && !mi_timer_requeue(mp))
+			rtn = 0;
 	}
 
 	tp_release(tp);

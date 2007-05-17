@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:53 $
+ @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/05/17 22:55:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:58:53 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:55:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua_as.c,v $
+ Revision 0.9.2.8  2007/05/17 22:55:33  brian
+ - use mi_timer requeue to requeue mi timers
+
  Revision 0.9.2.7  2007/03/25 18:58:53  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:53 $"
+#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/05/17 22:55:33 $"
 
 static char const ident[] =
-    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:53 $";
+    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/05/17 22:55:33 $";
 
 /*
  *  This is an UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -181,7 +184,7 @@ static char const ident[] =
 /* ============================== */
 
 #define UA_AS_DESCRIP	"UA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2007/03/25 18:58:53 $"
+#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2007/05/17 22:55:33 $"
 #define UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define UA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -17592,7 +17595,7 @@ tp_r_sig(queue_t *q, mblk_t *mp)
 	int rtn = 0;
 
 	if (!(tp = tp_acquire(q)))
-		return (-EDEADLK);
+		return (mi_timer_requeue(mp) ? -EDEADLK : 0);
 
 	if (likely(mi_timer_valid(mp))) {
 		switch (t->timer) {
@@ -17630,6 +17633,8 @@ tp_r_sig(queue_t *q, mblk_t *mp)
 			rtn = 0;
 			break;
 		}
+		if (rtn && !mi_timer_requeue(mp))
+			rtn = 0;
 	}
 
 	tp_release(tp);
