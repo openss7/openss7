@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/03/25 19:01:12 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/05/17 22:01:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:01:12 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:01:15 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/03/25 19:01:12 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/05/17 22:01:15 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/03/25 19:01:12 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/05/17 22:01:15 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -95,7 +95,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/03/25 19:01:12 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/05/17 22:01:15 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -272,7 +272,7 @@ log_rput(queue_t *q, mblk_t *mp)
 		putnext(q, mp);
 		return (1);
 	}
-	if (putq(q, mp))
+	if (bcanput(q, mp->b_band) && putq(q, mp))
 		return (1);
 	freemsg(mp);
 	return (0);
@@ -818,6 +818,7 @@ log_alloc_data(char *fmt, va_list args)
 			break;
 		}
 		*bp->b_wptr++ = '\0'; /* terminate format string */
+		bp->b_wptr = bp->b_rptr + plen;
 		va_end(args2);
 		/* pass through once more with arguments */
 		if ((dp = allocb(alen, BPRI_MED))) {

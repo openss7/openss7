@@ -1,3 +1,29 @@
+2007-05-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* streams/include/sys/streams/stream.h:
+	  - converted datab to an anonymous union
+	* streams/include/sys/streams/strsubr.h:
+	  - removed incorrect prefetch
+	* streams/src/drivers/log.c:
+	  - corrected log behaviour
+	  - strace and strerr work just fine now
+	* streams/src/kernel/strsched.c:
+	  - added some strapped out debugging behaviour
+	* streams/src/kernel/strutil.c:
+	  - fail dupb at max reference count of 255
+	  - added some strapped out debugging behaviour
+	  - datablock reference changes always take lock now
+	* streams/src/util/strace.c:
+	  - some corrections and extra debugging
+	  - strace runs very well now
+	* streams/src/util/strclean:
+	  - corrections, now removes correct files
+	* streams/src/util/strerr.c:
+	  - some corrections and extra debugging
+	  - strerr runs very well now
+	* streams/doc/manual/bugs.texi:
+	  - documented bugs
+
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* include/sys/streams/strdebug.h: changes from release testing

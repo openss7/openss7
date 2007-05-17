@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.162 $) $Date: 2007/05/07 18:51:37 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.163 $) $Date: 2007/05/17 22:01:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/07 18:51:37 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:01:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.163  2007/05/17 22:01:16  brian
+ - corrections from strsctp performance testing
+
  Revision 0.9.2.162  2007/05/07 18:51:37  brian
  - changes from release testing
 
@@ -170,10 +173,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.162 $) $Date: 2007/05/07 18:51:37 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.163 $) $Date: 2007/05/17 22:01:16 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.162 $) $Date: 2007/05/07 18:51:37 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.163 $) $Date: 2007/05/17 22:01:16 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -913,7 +916,11 @@ mdbblock_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 		md->msgblk.m_mblock.b_cont = NULL;
 		md->msgblk.m_mblock.b_rptr = base;
 		md->msgblk.m_mblock.b_wptr = base;
+#if 0
+		md->msgblk.m_mblock.b_datap = NULL;
+#else
 		md->msgblk.m_mblock.b_datap = &md->datablk.d_dblock;
+#endif
 		md->msgblk.m_mblock.b_band = 0;
 		md->msgblk.m_mblock.b_pad1 = 0;
 		md->msgblk.m_mblock.b_flag = 0;
@@ -927,7 +934,11 @@ mdbblock_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 		md->datablk.d_dblock.db_frtnp = NULL;
 		md->datablk.d_dblock.db_base = base;
 		md->datablk.d_dblock.db_lim = base + FASTBUF;
+#if 0
+		md->datablk.d_dblock.db_ref = 0;
+#else
 		md->datablk.d_dblock.db_ref = 1;
+#endif
 		md->datablk.d_dblock.db_type = M_DATA;
 		md->datablk.d_dblock.db_flag = 0;
 		md->datablk.d_dblock.db_size = FASTBUF;
@@ -1000,6 +1011,9 @@ mdbblock_alloc_slow(uint priority, void *func)
 #endif
 		_trace();
 		if (likely((mp = kmem_cache_alloc(sdi->si_cache, slab_flags)) != NULL)) {
+#if 0
+			struct mdbblock *md = (struct mdbblock *) mp;
+#endif
 #if defined CONFIG_STREAMS_DEBUG
 			struct mdbblock *md = (struct mdbblock *) mp;
 			struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
@@ -1027,24 +1041,46 @@ mdbblock_alloc_slow(uint priority, void *func)
 			if (atomic_read(&sdi->si_cnt) > sdi->si_hwl)
 				sdi->si_hwl = atomic_read(&sdi->si_cnt);
 #endif
-			_assure(md->msgblk.m_mblock.b_next == NULL);
-			_assure(md->msgblk.m_mblock.b_prev == NULL);
-			_assure(md->msgblk.m_mblock.b_cont == NULL);
-			_assure(md->msgblk.m_mblock.b_rptr == md->databuf);
-			_assure(md->msgblk.m_mblock.b_wptr == md->databuf);
-			_assure(md->msgblk.m_mblock.b_datap == &md->datablk.d_dblock);
-			_assure(md->msgblk.m_mblock.b_band == 0);
-			_assure(md->msgblk.m_mblock.b_pad1 == 0);
-			_assure(md->msgblk.m_mblock.b_flag == 0);
-			_assure(md->msgblk.m_mblock.b_csum == 0);
 
-			_assure(md->datablk.d_dblock.db_frtnp == NULL);
-			_assure(md->datablk.d_dblock.db_base == md->databuf);
-			_assure(md->datablk.d_dblock.db_lim == md->databuf + FASTBUF);
-			_assure(md->datablk.d_dblock.db_ref == 1);
-			_assure(md->datablk.d_dblock.db_type == M_DATA);
-			_assure(md->datablk.d_dblock.db_flag == 0);
-			_assure(md->datablk.d_dblock.db_size == FASTBUF);
+#if 0
+			__ensure(md->msgblk.m_mblock.b_next == NULL,
+				 md->msgblk.m_mblock.b_next = NULL);
+			__ensure(md->msgblk.m_mblock.b_prev == NULL,
+				 md->msgblk.m_mblock.b_prev = NULL);
+			__ensure(md->msgblk.m_mblock.b_cont == NULL,
+				 md->msgblk.m_mblock.b_cont = NULL);
+			_ensure(md->msgblk.m_mblock.b_rptr == md->databuf,
+				 md->msgblk.m_mblock.b_rptr = md->databuf);
+			_ensure(md->msgblk.m_mblock.b_wptr == md->databuf,
+				 md->msgblk.m_mblock.b_wptr = md->databuf);
+			__ensure(md->msgblk.m_mblock.b_datap == NULL,
+				 md->msgblk.m_mblock.b_datap = NULL);
+			 md->msgblk.m_mblock.b_datap = &md->datablk.d_dblock;
+			__ensure(md->msgblk.m_mblock.b_band == 0,
+				 md->msgblk.m_mblock.b_band = 0);
+			__ensure(md->msgblk.m_mblock.b_pad1 == 0,
+				 md->msgblk.m_mblock.b_pad1 = 0);
+			__ensure(md->msgblk.m_mblock.b_flag == 0,
+				 md->msgblk.m_mblock.b_flag = 0);
+			__ensure(md->msgblk.m_mblock.b_csum == 0,
+				 md->msgblk.m_mblock.b_csum = 0);
+
+			__ensure(md->datablk.d_dblock.db_frtnp == NULL,
+				 md->datablk.d_dblock.db_frtnp = NULL);
+			_ensure(md->datablk.d_dblock.db_base == md->databuf,
+				 md->datablk.d_dblock.db_base = md->databuf);
+			_ensure(md->datablk.d_dblock.db_lim == md->databuf + FASTBUF,
+				 md->datablk.d_dblock.db_lim = md->databuf + FASTBUF);
+			__ensure(md->datablk.d_dblock.db_ref == 0,
+				 md->datablk.d_dblock.db_ref = 0);
+			md->datablk.d_dblock.db_ref = 1;
+			__ensure(md->datablk.d_dblock.db_type == M_DATA,
+				 md->datablk.d_dblock.db_type = M_DATA);
+			__ensure(md->datablk.d_dblock.db_flag == 0,
+				 md->datablk.d_dblock.db_flag = 0);
+			_ensure(md->datablk.d_dblock.db_size == FASTBUF,
+				 md->datablk.d_dblock.db_size = FASTBUF);
+#endif
 
 			_ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
 		}
@@ -1106,24 +1142,45 @@ mdbblock_alloc(uint priority, void *func)
 #endif
 			}
 
-			_assure(md->msgblk.m_mblock.b_next == NULL);
-			_assure(md->msgblk.m_mblock.b_prev == NULL);
-			_assure(md->msgblk.m_mblock.b_cont == NULL);
-			_assure(md->msgblk.m_mblock.b_rptr == md->databuf);
-			_assure(md->msgblk.m_mblock.b_wptr == md->databuf);
-			_assure(md->msgblk.m_mblock.b_datap == &md->datablk.d_dblock);
-			_assure(md->msgblk.m_mblock.b_band == 0);
-			_assure(md->msgblk.m_mblock.b_pad1 == 0);
-			_assure(md->msgblk.m_mblock.b_flag == 0);
-			_assure(md->msgblk.m_mblock.b_csum == 0);
+#if 0
+			__ensure(md->msgblk.m_mblock.b_next == NULL,
+				 md->msgblk.m_mblock.b_next = NULL);
+			__ensure(md->msgblk.m_mblock.b_prev == NULL,
+				 md->msgblk.m_mblock.b_prev = NULL);
+			__ensure(md->msgblk.m_mblock.b_cont == NULL,
+				 md->msgblk.m_mblock.b_cont = NULL);
+			_ensure(md->msgblk.m_mblock.b_rptr == md->databuf,
+				 md->msgblk.m_mblock.b_rptr = md->databuf);
+			_ensure(md->msgblk.m_mblock.b_wptr == md->databuf,
+				 md->msgblk.m_mblock.b_wptr = md->databuf);
+			__ensure(md->msgblk.m_mblock.b_datap == NULL,
+				 md->msgblk.m_mblock.b_datap = NULL);
+			 md->msgblk.m_mblock.b_datap = &md->datablk.d_dblock;
+			__ensure(md->msgblk.m_mblock.b_band == 0,
+				 md->msgblk.m_mblock.b_band = 0);
+			__ensure(md->msgblk.m_mblock.b_pad1 == 0,
+				 md->msgblk.m_mblock.b_pad1 = 0);
+			__ensure(md->msgblk.m_mblock.b_flag == 0,
+				 md->msgblk.m_mblock.b_flag = 0);
+			__ensure(md->msgblk.m_mblock.b_csum == 0,
+				 md->msgblk.m_mblock.b_csum = 0);
 
-			_assure(md->datablk.d_dblock.db_frtnp == NULL);
-			_assure(md->datablk.d_dblock.db_base == md->databuf);
-			_assure(md->datablk.d_dblock.db_lim == md->databuf + FASTBUF);
-			_assure(md->datablk.d_dblock.db_ref == 1);
-			_assure(md->datablk.d_dblock.db_type == M_DATA);
-			_assure(md->datablk.d_dblock.db_flag == 0);
-			_assure(md->datablk.d_dblock.db_size == FASTBUF);
+			__ensure(md->datablk.d_dblock.db_frtnp == NULL,
+				 md->datablk.d_dblock.db_frtnp = NULL);
+			_ensure(md->datablk.d_dblock.db_base == md->databuf,
+				 md->datablk.d_dblock.db_base = md->databuf);
+			_ensure(md->datablk.d_dblock.db_lim == md->databuf + FASTBUF,
+				 md->datablk.d_dblock.db_lim = md->databuf + FASTBUF);
+			__ensure(md->datablk.d_dblock.db_ref == 0,
+				 md->datablk.d_dblock.db_ref = 0);
+			md->datablk.d_dblock.db_ref = 1;
+			__ensure(md->datablk.d_dblock.db_type == M_DATA,
+				 md->datablk.d_dblock.db_type = M_DATA);
+			__ensure(md->datablk.d_dblock.db_flag == 0,
+				 md->datablk.d_dblock.db_flag = 0);
+			_ensure(md->datablk.d_dblock.db_size == FASTBUF,
+				 md->datablk.d_dblock.db_size = FASTBUF);
+#endif
 
 			_ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
 			return (mp);
@@ -1238,7 +1295,11 @@ mdbblock_free(mblk_t *mp)
 		mp->b_cont = NULL;
 		// mp->b_rptr = base;
 		// mp->b_wptr = base;
+#if 0
+		__assure(mp->b_datap == NULL);
+#else
 		mp->b_datap = db;
+#endif
 		mp->b_band = 0;
 		mp->b_pad1 = 0;
 		mp->b_flag = 0;
@@ -1247,7 +1308,11 @@ mdbblock_free(mblk_t *mp)
 		db->db_frtnp = NULL;
 		// db->db_base = base;
 		// db->db_lim = base + FASTBUF;
+#if 0
+		__assure(db->db_ref == 0);
+#else
 		db->db_ref = 1;
+#endif
 		db->db_type = M_DATA;
 		db->db_flag = 0;
 		// db->db_size = FASTBUF;
