@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufq.h,v 0.9.2.11 2006/12/08 05:08:15 brian Exp $
+ @(#) $Id: bufq.h,v 0.9.2.12 2007/05/17 22:50:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:08:15 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:50:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufq.h,v $
+ Revision 0.9.2.12  2007/05/17 22:50:31  brian
+ - extensive rework of mi_timer functions
+
  Revision 0.9.2.11  2006/12/08 05:08:15  brian
  - some rework resulting from testing and inspection
 
@@ -61,7 +64,7 @@
 #ifndef __BUFQ_H__
 #define __BUFQ_H__
 
-#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef psw_t
 #ifdef INT_PSW
@@ -117,13 +120,13 @@ bufq_size(bufq_t * q)
 __OS7_EXTERN_INLINE streamscall mblk_t *
 bufq_head(bufq_t * q)
 {
-	return q->q_head;
+	return (mblk_t *volatile) q->q_head;
 }
 
 __OS7_EXTERN_INLINE streamscall mblk_t *
 bufq_tail(bufq_t * q)
 {
-	return q->q_tail;
+	return (mblk_t *volatile) q->q_tail;
 }
 
 __OS7_EXTERN_INLINE void

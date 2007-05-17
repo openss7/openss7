@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_timer_valid.9.man,v 0.9.2.8 2006/10/06 12:13:05 brian Exp $
+.\" @(#) $Id: mi_timer_valid.9.man,v 0.9.2.9 2007/05/17 22:50:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:13:05 $ by $Author: brian $
+.\" Last Modified $Date: 2007/05/17 22:50:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_timer_valid.9.man,v $
+.\" Revision 0.9.2.9  2007/05/17 22:50:30  brian
+.\" - extensive rework of mi_timer functions
+.\"
 .\" Revision 0.9.2.8  2006/10/06 12:13:05  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -244,7 +247,22 @@ In this case, the correct course of action is to ignore the message (i.e. do not
 .PP
 .B Warning:
 .\"This function may not be called at interrupt time, and it may not be called twice on the same timer.
-This function may not be called twice on the same timer.
+.IR MacOT \(rg
+docmentation stats that this function may not be called twice on the same timer.
+.B @PACKAGE_TITLE@
+relaxes this restriction, but the relaxed restriction is non-portable.  The
+proper way to requeue a message is to use
+.BR mi_timer (9)
+with a zero (0)
+.I msec
+argument.
+.PP
+Care must be taken when flushing queues that can possibly contain timer
+messages.  A form of the
+.BR flushq (9)
+arguments should be chosen that will not flush
+.BR M_PCSIG (9)
+messages, or the queue should be frozen and messages flushed manually.
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -252,19 +270,23 @@ This function may not be called twice on the same timer.
 Depending on the state of the timer message, it will be treated as follows:
 .IP \(bu \w'\(bu\(em'u
 If the timer is in the
-.B TB_ACTIVE
-state it is moved to the
 .B TB_IDLE
+state,
+.I false
+is returned.
+.IP \(bu
+If the timer is in the
+.B TB_ACTIVE
+state, it is moved to the
+.B TB_TRANSIENT
 state and
 .I true
 is returned.
 .IP \(bu
 If the timer is in the
-.B TB_ZOMBIE
-state, the timer message is freed using
-.BR freemsg (9),
-and
-.I false
+.B TB_TRANSIENT
+state,
+.I true
 is returned.
 .IP \(bu
 If the timer is in the
@@ -277,7 +299,16 @@ is returned.
 .IP \(bu
 If the timer is in the
 .B TB_RESCHEDULED
-state, it is rescheduled
+state, it is rescheduled, moved to the
+.B TB_ACTIVE
+state and
+.I false
+is returned.
+.IP \(bu
+If the timer is in the
+.B TB_ZOMBIE
+state, the timer message is freed using
+.BR freemsg (9),
 and
 .I false
 is returned.

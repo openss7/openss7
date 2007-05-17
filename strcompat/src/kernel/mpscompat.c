@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:01:05 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/05/17 22:50:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:01:05 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:50:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.41  2007/05/17 22:50:34  brian
+ - extensive rework of mi_timer functions
+
  Revision 0.9.2.40  2007/03/25 19:01:05  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -175,20 +178,19 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:01:05 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/05/17 22:50:34 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:01:05 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/05/17 22:50:34 $";
 
 /* 
- *  This is my solution for those who don't want to inline GPL'ed functions or
- *  who don't use optimizations when compiling or specifies
- *  -fnoinline-functions or something of the like.  This file implements all
- *  of the extern inlines from the header files by just including the header
+ *  This is my solution for those who don't want to inline GPL'ed functions or who don't use
+ *  optimizations when compiling or specifies -fnoinline-functions or something of the like.  This
+ *  file implements all of the extern inlines from the header files by just including the header
  *  files with the functions declared 'inline' instead of 'extern inline'.
  *
- *  There are implemented here in a separate object, out of the way of the
- *  modules that don't use them.
+ *  There are implemented here in a separate object, out of the way of the modules that don't use
+ *  them.
  */
 
 #define __MPS_EXTERN_INLINE __inline__ streamscall __unlikely
@@ -206,7 +208,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:01:05 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/05/17 22:50:34 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -228,53 +230,57 @@ MODULE_ALIAS("streams-mpscompat");
 #endif
 #endif
 
-/*
- *  MI_BCMP
- *  -------------------------------------------------------------------------
+/**
+ * mi_bcmp: - bcmp() replacement
+ * @s1: first byte string
+ * @s2: second byte string
+ * @len: length to compare
  */
 __MPS_EXTERN_INLINE int mi_bcmp(const void *s1, const void *s2, size_t len);
 
 EXPORT_SYMBOL(mi_bcmp);
 
-/*
- *  MI_ALLOC
- *  -------------------------------------------------------------------------
+/**
+ * mi_alloc: - kmem_alloc() replacement
+ * @size: size of memory extent to allocate
+ * @pri: priority
  */
 __MPS_EXTERN_INLINE void *mi_alloc(size_t size, unsigned int pri);
 
 EXPORT_SYMBOL(mi_alloc);	/* mps/ddi.h */
 
-/*
- *  MI_ALLOC_SLEEP
- *  -------------------------------------------------------------------------
+/**
+ * mi_alloc_sleep: - kmem_alloc() replacement
+ * @size: size of memory extent to allocate
+ * @pri: priority
  */
 __MPS_EXTERN_INLINE void *mi_alloc_sleep(size_t size, unsigned int pri);
 
 EXPORT_SYMBOL(mi_alloc_sleep);	/* mps/ddi.h */
 
-/*
- *  MI_ZALLOC
- *  -------------------------------------------------------------------------
+/**
+ * mi_zalloc: - kmem_zalloc() replacement
+ * @size: size of memory extent to allocate and zero
  */
 __MPS_EXTERN_INLINE caddr_t mi_zalloc(size_t size);
 
 EXPORT_SYMBOL(mi_zalloc);	/* mps/ddi.h */
 
 /*
- *  MI_ZALLOC_SLEEP
- *  -------------------------------------------------------------------------
+ * mi_zalloc_sleep: - kmem_zalloc() replacement
+ * @size: size of memory extent to allocate and zero
  */
 __MPS_EXTERN_INLINE caddr_t mi_zalloc_sleep(size_t size);
 
 EXPORT_SYMBOL(mi_zalloc_sleep);	/* mps/ddi.h */
 
-/*
- *  MI_FREE
- *  -------------------------------------------------------------------------
+/**
+ * mi_free: - kmem_free() replacement
+ * @ptr: pointer to memory extent to free
  */
 __MPS_EXTERN_INLINE void mi_free(void *ptr);
 
-EXPORT_SYMBOL(mi_free);	/* mps/ddi.h */
+EXPORT_SYMBOL(mi_free);		/* mps/ddi.h */
 
 /*
  *  =========================================================================
@@ -292,9 +298,8 @@ struct mi_comm {
 	unsigned short mi_sid;		/* stream identifier */
 	bcid_t mi_rbid;			/* rd queue bufcall */
 	bcid_t mi_wbid;			/* wr queue bufcall */
-	spinlock_t mi_lock;		/* structure lock */
-	uint mi_users;			/* number of users */
-	queue_t *mi_qwait;		/* queue waiting on lock */
+	long mi_users;			/* users and waiters */
+	queue_t *mi_q;			/* attached read queue */
 	wait_queue_head_t mi_waitq;	/* processes waiting on lock */
 	union {
 		dev_t dev;		/* device number (or NODEV for modules) */
@@ -313,9 +318,9 @@ struct mi_comm {
  * mi_open_size: - obtain size of open structure
  * @size: size of user portion
  * 
- * Calculates and returns the size of the structure necessary for the user to
- * allocate to use the mi_open procedures with the structure.  The allocated
- * structure must be initialized using mi_open_obj.
+ * Calculates and returns the size of the structure necessary for the user to allocate to use the
+ * mi_open procedures with the structure.  The allocated structure must be initialized using
+ * mi_open_obj.
  */
 size_t
 mi_open_size(size_t size)
@@ -330,11 +335,10 @@ EXPORT_SYMBOL(mi_open_size);
  * @obj: pointer to allocated memory extent
  * @size: size of user portion
  *
- * Initializes a user allocated structure for use by the mi_open routines and
- * returns a pointer to the user portion.  The structure allocated should be
- * of the size returned by mi_open_size().  The pointer returned points to the
- * user portion of the structure.  The object pointer can be obtained using
- * the mi_close_obj() function.
+ * Initializes a user allocated structure for use by the mi_open routines and returns a pointer to
+ * the user portion.  The structure allocated should be of the size returned by mi_open_size().  The
+ * pointer returned points to the user portion of the structure.  The object pointer can be obtained
+ * using the mi_close_obj() function.
  *
  * Note that this function will return NULL if passed NULL.
  */
@@ -342,12 +346,11 @@ caddr_t
 mi_open_obj(void *obj, size_t size)
 {
 	struct mi_comm *mi;
-	
+
 	if ((mi = (typeof(mi)) obj)) {
 		bzero(mi, sizeof(*mi));
 		mi->mi_prev = mi->mi_head = &mi->mi_next;
 		mi->mi_size = size;
-		spin_lock_init(&mi->mi_lock);
 		init_waitqueue_head(&mi->mi_waitq);
 	}
 	return (mi_to_ptr(mi));
@@ -359,10 +362,9 @@ EXPORT_SYMBOL(mi_open_obj);
  * mi_close_obj: - obtain an pointer to the object to free
  * @ptr: a pointer to the user portion of the structure
  *
- * Returns a pointer to the memory extent to free when deallocating a user
- * allocated structure for use with mi_open routines.  The purpose of these
- * functions are to permit the user to provide their own allocation schemes
- * (such as memory caches).
+ * Returns a pointer to the memory extent to free when deallocating a user allocated structure for
+ * use with mi_open routines.  The purpose of these functions are to permit the user to provide
+ * their own allocation schemes (such as memory caches).
  * 
  */
 void *
@@ -377,13 +379,13 @@ EXPORT_SYMBOL(mi_close_obj);
  * mi_close_size: - obtain size of close structure
  * @ptr: a pointer to the user portion of the structure
  *
- * Calculates and returns the size of the structure necessary for the user to
- * deallocate.
+ * Calculates and returns the size of the structure necessary for the user to deallocate.
  */
 size_t
 mi_close_size(caddr_t ptr)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
+
 	return (mi_open_size(mi->mi_size));
 }
 
@@ -446,12 +448,12 @@ mi_open_alloc_sleep(size_t size)
 
 EXPORT_SYMBOL(mi_open_alloc_sleep);	/* mps/ddi.h */
 
-/*
- * MI_FIRST_PTR
- * -------------------------------------------------------------------------
- * OpenSolaris uses a head structure, we don't, primarily because the
- * documentation for mi_open_comm for both AIX and MacOT says that we use a
- * "static pointer" initialized to NULL.
+/**
+ * mi_first_ptr: - get the first pointer from a head list
+ * @mi_head: head list
+ *
+ * OpenSolaris uses a head structure, we don't, primarily because the documentation for mi_open_comm
+ * for both AIX and MacOT says that we use a "static pointer" initialized to NULL.
  */
 caddr_t
 mi_first_ptr(caddr_t *mi_head)
@@ -463,12 +465,13 @@ mi_first_ptr(caddr_t *mi_head)
 
 EXPORT_SYMBOL(mi_first_ptr);	/* mps/ddi.h */
 
-/*
- *  MI_FIRST_DEV_PTR
- *  -------------------------------------------------------------------------
- *  OpenSolaris tracks modules and drivers on the same list.  We don't,
- *  primarily because AIX and MacOT don't document it that way.  If you have a
- *  STREAMS driver that can also be pushed as a module, use two separate lists.
+/**
+ * mi_first_dev_ptr: - get first device pointer from a head list
+ * @mi_head: head list
+ *
+ * OpenSolaris tracks modules and drivers on the same list.  We don't, primarily because AIX and
+ * MacOT don't document it that way.  If you have a STREAMS driver that can also be pushed as a
+ * module, use two separate lists.
  */
 caddr_t
 mi_first_dev_ptr(caddr_t *mi_head)
@@ -481,9 +484,9 @@ mi_first_dev_ptr(caddr_t *mi_head)
 
 EXPORT_SYMBOL(mi_first_dev_ptr);	/* mps/ddi.h */
 
-/*
- *  MI_NEXT_PTR
- *  -------------------------------------------------------------------------
+/**
+ * mi_next_ptr: - get the next pointer in head list
+ * @ptr: previous pointer
  */
 caddr_t
 mi_next_ptr(caddr_t ptr)
@@ -497,12 +500,14 @@ mi_next_ptr(caddr_t ptr)
 
 EXPORT_SYMBOL(mi_next_ptr);	/* mps/ddi.h, aix/ddi.h */
 
-/*
- *  MI_NEXT_DEV_PTR
- *  -------------------------------------------------------------------------
- *  OpenSolaris tracks modules and drivers on the same list.  We don't,
- *  primarily because AIX and MacOT don't document it that way.  If you have a
- *  STREAMS driver that can also be pushed as a module, use two separate lists.
+/**
+ * mi_next_dev_ptr: - get the next device pointer in head list
+ * @mi_head: - head list
+ * @ptr: previous pointer
+ *
+ * OpenSolaris tracks modules and drivers on the same list.  We don't, primarily because AIX and
+ * MacOT don't document it that way.  If you have a STREAMS driver that can also be pushed as a
+ * module, use two separate lists.
  */
 caddr_t
 mi_next_dev_ptr(caddr_t *mi_head, caddr_t ptr)
@@ -515,10 +520,11 @@ mi_next_dev_ptr(caddr_t *mi_head, caddr_t ptr)
 
 EXPORT_SYMBOL(mi_next_dev_ptr);	/* mps/ddi.h */
 
-/* 
- *  MI_PREV_PTR
- *  -------------------------------------------------------------------------
- *  Linux Fast-STREAMS embellishment.
+/**
+ * mi_prev_ptr: - get the previous element in head list
+ * @ptr: current pointer
+ *
+ * Linux Fast-STREAMS embellishment.
  */
 caddr_t
 mi_prev_ptr(caddr_t ptr)
@@ -534,9 +540,14 @@ EXPORT_SYMBOL(mi_prev_ptr);	/* mps/ddi.h, aix/ddi.h */
 
 static spinlock_t mi_list_lock = SPIN_LOCK_UNLOCKED;
 
-/*
- *  MI_OPEN_LINK
- *  -------------------------------------------------------------------------
+/**
+ * mi_open_link: - link a private structure into head list
+ * @mi_head: head list
+ * @ptr: pointer to private structure
+ * @devp: device pointer from qi_qopen()
+ * @flag: open flags from qi_qopen()
+ * @sflag: STREAMS flag from qi_qopen()
+ * @credp: credentials pointer from qi_qopen()
  */
 int
 mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cred_t *credp)
@@ -594,17 +605,20 @@ mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cr
 
 EXPORT_SYMBOL(mi_open_link);	/* mps/ddi.h */
 
-/*
- *  MI_OPEN_DETACHED
- *  -------------------------------------------------------------------------
+/**
+ * mi_open_detached: - detached open
+ * @mi_head: private structure head
+ * @size: size of private structure to allocate
+ * @devp: device pointer from qi_qopen()
  */
 __MPS_EXTERN_INLINE caddr_t mi_open_detached(caddr_t *mi_head, size_t size, dev_t *devp);
 
 EXPORT_SYMBOL(mi_open_detached);	/* mps/ddi.h */
 
-/*
- *  MI_ATTACH
- *  -------------------------------------------------------------------------
+/**
+ * mi_attach: - attach a private structure to a queue
+ * @q: queue to which to attach
+ * @ptr: private structure
  */
 void
 mi_attach(queue_t *q, caddr_t ptr)
@@ -612,22 +626,30 @@ mi_attach(queue_t *q, caddr_t ptr)
 	struct mi_comm *mi = ptr_to_mi(ptr);
 
 	mi->mi_mid = q->q_qinfo->qi_minfo->mi_idnum;
+	mi->mi_q = q;
 	q->q_ptr = WR(q)->q_ptr = ptr;
 }
 
 EXPORT_SYMBOL(mi_attach);	/* mps/ddi.h, mac/ddi.h */
 
-/* 
- *  MI_OPEN_COMM
- *  -------------------------------------------------------------------------
+/**
+ * mi_open_comm: - perform qi_qopen() housekeeping
+ * @mi_head: private structure list head
+ * @size: size of private structure to allocate
+ * @q: queue pointer from qi_qopen()
+ * @devp: device pointer from qi_qopen()
+ * @flag: open flags from qi_qopen()
+ * @sflag: STREAMS flag from qi_qopen()
+ * @credp: credentials pointer from qi_qopen()
  */
 __MPS_EXTERN_INLINE int mi_open_comm(caddr_t *mi_head, size_t size, queue_t *q, dev_t *devp,
 				     int flag, int sflag, cred_t *credp);
 EXPORT_SYMBOL(mi_open_comm);	/* mps/ddi.h, aix/ddi.h */
 
-/*
- *  MI_CLOSE_UNLINK
- *  -------------------------------------------------------------------------
+/**
+ * mi_close_unlink: - unlink a private structure
+ * @mi_head: private structure list head
+ * @ptr: private structure to unlink
  */
 void
 mi_close_unlink(caddr_t *mi_head, caddr_t ptr)
@@ -647,9 +669,9 @@ mi_close_unlink(caddr_t *mi_head, caddr_t ptr)
 
 EXPORT_SYMBOL(mi_close_unlink);	/* mps/ddi.h */
 
-/*
- *  MI_CLOSE_FREE
- *  -------------------------------------------------------------------------
+/**
+ * mi_close_free: - free a private structure
+ * @ptr: private structure to free
  */
 void
 mi_close_free(caddr_t ptr)
@@ -662,9 +684,10 @@ mi_close_free(caddr_t ptr)
 
 EXPORT_SYMBOL(mi_close_free);	/* mps/ddi.h */
 
-/*
- *  MI_DETACH
- *  -------------------------------------------------------------------------
+/**
+ * mi_detach: - detach a private structure from a queue pair
+ * @q: read queue of queue pair
+ * @ptr: private structure to detach
  */
 void
 mi_detach(queue_t *q, caddr_t ptr)
@@ -677,23 +700,26 @@ mi_detach(queue_t *q, caddr_t ptr)
 			unbufcall(bid);
 		if ((bid = xchg(&mi->mi_wbid, 0)))
 			unbufcall(bid);
+		mi->mi_q = NULL;
 	}
 	q->q_ptr = WR(q)->q_ptr = NULL;
 }
 
 EXPORT_SYMBOL(mi_detach);	/* mps/ddi.h */
 
-/*
- *  MI_CLOSE_DETACHED
- *  -------------------------------------------------------------------------
+/**
+ * mi_close_detached: - close a detached private structure
+ * @mi_head: private structure list head
+ * @ptr: private structure to unlink and free
  */
 __MPS_EXTERN_INLINE void mi_close_detached(caddr_t *mi_head, caddr_t ptr);
 
 EXPORT_SYMBOL(mi_close_detached);	/* mps/ddi.h */
 
-/* 
- *  MI_CLOSE_COMM
- *  -------------------------------------------------------------------------
+/**
+ * mi_close_comm: - perform common qi_qclose() housekeeping
+ * @mi_head: private structure list head
+ * @q: read queue of queue pair
  */
 __MPS_EXTERN_INLINE int mi_close_comm(caddr_t *mi_head, queue_t *q);
 
@@ -714,56 +740,70 @@ struct mi_iocblk {
  *
  *  =========================================================================
  */
+
+#define MI_WAIT_LOCKED_BIT	0
+#define MI_WAIT_RQ_BIT		0
+#define MI_WAIT_WQ_BIT		0
+#define MI_WAIT_SLEEP_BIT	0
+
+#define MI_WAIT_LOCKED		(1<<MI_WAIT_LOCKED_BIT)
+#define MI_WAIT_RQ		(1<<MI_WAIT_RQ_BIT)
+#define MI_WAIT_WQ		(1<<MI_WAIT_WQ_BIT)
+#define MI_WAIT_SLEEP		(1<<MI_WAIT_SLEEP_BIT)
+
+/**
+ * mi_trylock: - try to lock a private structure
+ * @q: queue pair associated with private structure
+ *
+ * Returns a pointer to the locked private structure or NULL if the private structure could not be
+ * locked or does not exist.
+ */
 caddr_t
 mi_trylock(queue_t *q)
 {
 	caddr_t ptr = q->q_ptr;
 	struct mi_comm *mi = ptr_to_mi(ptr);
-	unsigned long flags;
 
-	if (mi) {
-		spin_lock_irqsave(&mi->mi_lock, flags);
-		if (mi->mi_users != 0)
-			ptr = NULL;
+	if (mi && unlikely(test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))) {
+		if (q->q_flag & QREADR)
+			set_bit(MI_WAIT_RQ_BIT, &mi->mi_users);
 		else
-			mi->mi_users = 1;
-		spin_unlock_irqrestore(&mi->mi_lock, flags);
+			set_bit(MI_WAIT_WQ_BIT, &mi->mi_users);
+		if (test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))
+			ptr = NULL;
 	}
 	return (ptr);
 }
 
 EXPORT_SYMBOL(mi_trylock);
 
+/**
+ * mi_sleeplock: - lock a private structure or sleep
+ * @q: queue pair associated wtih private structure
+ *
+ * Returns a pointer to the locked private structure or NULL if the private structure could not be
+ * locked because a signal was caught or does not exist.
+ */
 caddr_t
 mi_sleeplock(queue_t *q)
 {
 	caddr_t ptr = q->q_ptr;
 	struct mi_comm *mi = ptr_to_mi(ptr);
-	unsigned long flags;
 
-	DECLARE_WAITQUEUE(wait, current);
-
-	if (mi) {
+	if (mi && unlikely(test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))) {
+		DECLARE_WAITQUEUE(wait, current);
 		add_wait_queue(&mi->mi_waitq, &wait);
-		spin_lock_irqsave(&mi->mi_lock, flags);
-		if (mi->mi_users != 0) {
-			for (;;) {
-				set_current_state(TASK_INTERRUPTIBLE);
-				if (signal_pending(current)) {
-					ptr = NULL;
-					break;
-				}
-				if (mi->mi_users == 0) {
-					mi->mi_users = 1;
-					break;
-				}
-				spin_unlock_irqrestore(&mi->mi_lock, flags);
-				schedule();
-				spin_lock_irqsave(&mi->mi_lock, flags);
+		for (;;) {
+			if (signal_pending(current)) {
+				ptr = NULL;
+				break;
 			}
-		} else
-			mi->mi_users = 1;
-		spin_unlock_irqrestore(&mi->mi_lock, flags);
+			set_current_state(TASK_INTERRUPTIBLE);
+			set_bit(MI_WAIT_SLEEP_BIT, &mi->mi_users);
+			if (!test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))
+				break;
+			schedule();
+		}
 		set_current_state(TASK_RUNNING);
 		remove_wait_queue(&mi->mi_waitq, &wait);
 	}
@@ -773,25 +813,27 @@ mi_sleeplock(queue_t *q)
 
 EXPORT_SYMBOL(mi_sleeplock);
 
+/**
+ * mi_unlock: - unlock a private structure
+ * @ptr: private structure to unlock
+ *
+ * Unlock a private structure and wake waiters and schedule blocked queues.
+ */
 void
 mi_unlock(caddr_t ptr)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
-	unsigned long flags;
-	queue_t *newq;
+	long users;
 
-	if (mi) {
-		spin_lock_irqsave(&mi->mi_lock, flags);
-		mi->mi_users = 0;
-		if ((newq = mi->mi_qwait))
-			mi->mi_qwait = NULL;
-		spin_unlock_irqrestore(&mi->mi_lock, flags);
+	users = xchg(&mi->mi_users, 0);
+
+	if (users & MI_WAIT_SLEEP)
 		if (waitqueue_active(&mi->mi_waitq))
 			wake_up_all(&mi->mi_waitq);
-		if (newq)
-			qenable(newq);
-	}
-	return;
+	if (users & MI_WAIT_RQ)
+		enableq(RD(mi->mi_q));
+	if (users & MI_WAIT_WQ)
+		enableq(WR(mi->mi_q));
 }
 
 EXPORT_SYMBOL(mi_unlock);
@@ -926,7 +968,6 @@ EXPORT_SYMBOL(mi_allocb);	/* mps/stream.h */
  * signal (SIGKILL, SIGTERM), possibly indefinitely when an M_IOCDATA error is sent.  Even if LiS is
  * fixed, this code will still work, it will just send an extraneous M_IOCNAK to the Stream head
  * that will be discarded because no M_IOCTL will be in progress anymore.
- *
  */
 void
 mi_copy_done(queue_t *q, mblk_t *mp, int err)
@@ -1344,42 +1385,152 @@ EXPORT_SYMBOL(mi_copy_set_rval);
  *  =========================================================================
  */
 
+/*
+ * States are as follows:
+ *
+ * TB_IDLE:		The timer is idle and has either never been set or has been cancelled at
+ *			some point and found not to have been expired yet.  The timer is not on any
+ *			queue.
+ *
+ * TB_ACTIVE:		The timer has been armed and the clock is running.  There are two transient
+ *			situations here: tb->tb_tid == 0, where the timer has fired but the timeout
+ *			routine has not yet placed the timer on a mesage queue (but will shortly
+ *			unless the state is changed); and, tb->tb_tid != 0, where the timer has not
+ *			yet fired.  In this state the timer is not on any queue (yet), and changing
+ *			the state can prevent the timer from being placed on any queue.
+ *
+ * TB_EXPIRED:		The timer has fired, and the timer message has been placed on the message
+ *			queue.  There is one transient situation where the timer has been removed
+ *			from the queue but has not yet been passed to mi_timer_valid().  In this
+ *			state, the timer is normally on the target queue (but may exist in the
+ *			transient state).  If the message is removed from the target queue should it
+ *			be found there, the message will not be processed by the queue service
+ *			procedure.
+ *
+ * TB_TRANSIENT:	The timer has been taken off of the target queue and passed through
+ *			mi_timer_valid() and the timeout was found to be valid.  The timer can only
+ *			exist on the queue in this state under the condition that the timer was
+ *			returned to the queue after mi_timer_valid() was called.  If the timer is
+ *			removed from the target queue, it can be guaranteed that the timeout
+ *			function will never run for this timer.  Otherwise, it is not possible to
+ *			determine whether the timeout function has run or not.  I wish the designers
+ *			of this interface had the foresight to call a function, say, mi_timer_done()
+ *			once the timeout function was complete.
+ */
 #define TB_ZOMBIE	-2	/* tb is a zombie, waiting to be freed, but may be on queue */
 #define TB_CANCELLED	-1	/* tb has been cancelled, but may be on queue */
 #define TB_IDLE		 0	/* tb is idle, not on queue */
-#define TB_ACTIVE	 1	/* tb has timer actively running, but may be on queue */
-#define TB_RESCHEDULED	 2	/* tb is being rescheduled, but may be on queue */
-#define TB_TRANSIENT	 3	/* tb is in a transient state (unused) */
+#define TB_ACTIVE	 1	/* tb has timer actively running, but is not on queue */
+#define TB_EXPIRED	 2	/* tb has expired and may be on queue */
+#define TB_RESCHEDULED	 3	/* tb is being rescheduled, but may be on queue */
+#define TB_TRANSIENT	 4	/* tb is in a transient state, i.e. it has fired */
 
 typedef struct mi_timeb {
 	spinlock_t tb_lock;
-	long tb_state;			/* the state of the timer */
-	toid_t tb_tid;			/* the timeout id when a timeout is running */
-	clock_t tb_time;		/* the time of expiry */
-	queue_t *tb_q;			/* where to queue the timer message on timeout */
+	long tb_state;		/* the state of the timer */
+	toid_t tb_tid;		/* the timeout id when a timeout is running */
+	clock_t tb_time;	/* the time of expiry */
+	queue_t *tb_q;		/* where to queue the timer message on timeout */
 } tblk_t;
 
 #undef mi_timer_alloc
 #undef mi_timer
 
+/*
+ * mi_timer_stop() or mi_timer_cancel() stops a running timer.  If the timer is on the target queue,
+ * it is removed.
+ *
+ * mi_timer() stops a running timer and starts a new timer.  The timer is not removed from any queue
+ * upon which it exists.
+ *
+ * mi_timer_expiry() checks for timer cancellation: if cancelled, does nothing.  If not cancelled,
+ * the timer is removed from to target queue if it is on the queue and queued against the target
+ * queue again.
+ *
+ * mi_timer_move() removes the timer from the old target queue if it exists there and places it on
+ * the new target queue if it existed on the old target queue.
+ */
+
+/**
+ * mi_timer_remove: - attempt to remove timer from queue
+ * @q: the queue to which mp would be queued
+ * @mp: the message to remove.
+ *
+ * Returns a pointer to the removed message when the message was removed from the queue or NULL if
+ * the message was not on the queue (and therefore not removed).  The return value, therefore,
+ * represents the removed message.
+ */
+STATIC mblk_t *
+mi_timer_remove(queue_t *q, mblk_t *mp)
+{
+	unsigned long pl;
+	mblk_t *b = mp;
+
+	if (q != NULL) {
+		pl = freezestr(q);
+		for (b = q->q_first; b && b != mp; b = b->b_next) ;
+		if (b)
+			rmvq(q, b);
+		unfreezestr(q, pl);
+	}
+	return (b);
+}
+
+STATIC void
+mi_timer_putq(queue_t *q, mblk_t *mp)
+{
+	unsigned long pl;
+	mblk_t *b = mp;
+
+	if (q != NULL) {
+		pl = freezestr(q);
+		for (b = q->q_first; b && b != mp; b = b->b_next) ;
+		if (b)
+			rmvq(q, b);
+		insq(q, NULL, mp);
+		unfreezestr(q, pl);
+	}
+	return;
+}
+
+/**
+ * mi_timer_expiry: - process timer expiry
+ * @data: pointer to timer message
+ *
+ * When the timeout expires (and was not cancelled by swaping tb_tid to zero), if the timer is in
+ * the TB_ACTIVE state, move it to the TB_IDLE state and place it on the queue.  If the timer is
+ * already in the TB_IDLE state.
+ * 
+ */
 static streamscall void
 mi_timer_expiry(caddr_t data)
 {
 	mblk_t *mp = (typeof(mp)) data;
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+	unsigned long flags;
 
-	if (xchg(&tb->tb_tid, 0)) {
-		dassert(tb->tb_q != NULL);
-		put(tb->tb_q, mp);
+	spin_lock_irqsave(&tb->tb_lock, flags);
+	if (XCHG(&tb->tb_tid, 0)) {
+		if (tb->tb_state == TB_ACTIVE) {
+			tb->tb_state = TB_EXPIRED;
+			mp->b_datap->db_type = M_PCSIG;
+		}
+		mi_timer_putq(tb->tb_q, mp);
 	}
+	spin_unlock_irqrestore(&tb->tb_lock, flags);
 }
 
 /*
  *  MacOT variety
  */
-/*
- *  MI_TIMER_ALLOC (MacOT variety)
- *  -------------------------------------------------------------------------
+
+/**
+ * mi_timer_alloc: - allocate a timer message (MacOT variety)
+ * @q: queue onto which to put message upon expiry
+ * @size: size of message block to allocate
+ *
+ * Allocates and returns a timer message block for use in other helper functions.  Note that we
+ * allocate a duplicate message block as protection against being freed.
  */
 mblk_t *
 mi_timer_alloc_MAC(queue_t *q, size_t size)
@@ -1403,75 +1554,123 @@ mi_timer_alloc_MAC(queue_t *q, size_t size)
 
 EXPORT_SYMBOL(mi_timer_alloc_MAC);
 
-/*
- *  MI_TIMER (MacOT variety)
- *  -------------------------------------------------------------------------
+/**
+ * mi_timer: - start or restart a timer (MacOT variety)
+ * @mp: timer message
+ * @msec: milliseconds to expiry
+ *
+ * Start or restart a timer.
  */
-void mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec);
 void
 mi_timer_MAC(mblk_t *mp, clock_t msec)
 {
-	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
-
-	return mi_timer_SUN(tb->tb_q, mp, msec);
+	mi_timer_ticks(mp, drv_msectohz(msec));
 }
 
 EXPORT_SYMBOL(mi_timer_MAC);
 
-/*
- *  MI_TIMER_CANCEL (MacOT variety)
- *  -------------------------------------------------------------------------
+int
+mi_timer_requeue(mblk_t *mp)
+{
+	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+	unsigned long flags;
+	int rval;
+
+	spin_lock_irqsave(&tb->tb_lock, flags);
+	switch (__builtin_expect(tb->tb_state, TB_IDLE)) {
+	case TB_RESCHEDULED:
+		/* Timer was rescheduled while in user's hands. */
+		if (tb->tb_time > jiffies) {
+			tb->tb_state = TB_ACTIVE;
+			tb->tb_tid = timeout(mi_timer_expiry, (caddr_t) mp, tb->tb_time - jiffies);
+			rval = (0);
+			if (tb->tb_tid)
+				break;
+			tb->tb_state = TB_RESCHEDULED;
+			mp->b_datap->db_type = M_PCSIG;
+			mi_timer_putq(tb->tb_q, mp);
+			break;
+		}
+		/* Timer has already expired. */
+		/* fall through */
+	case TB_EXPIRED:
+		/* Timer expired, mi_timer_valid not called yet. */
+	case TB_TRANSIENT:
+		/* Timer is transient. */
+	case TB_IDLE:
+		tb->tb_state = TB_EXPIRED;
+		mp->b_datap->db_type = M_SIG;
+		rval = (1); /* caller must putq or putbq back */
+		break;
+	case TB_CANCELLED:
+		/* Timer was cancelled while in user's hands. */
+		tb->tb_state = TB_IDLE;
+		rval = (0);
+		break;
+	default:
+	case TB_ACTIVE:
+		/* Timers in the active state are never in the user's hands. */
+		swerr();
+		rval = (0);
+		break;
+	}
+	spin_unlock_irqrestore(&tb->tb_lock, flags);
+	return (rval);
+}
+
+EXPORT_SYMBOL(mi_timer_requeue);
+
+/**
+ * mi_timer_cancel: - cancel a timer message (MacOT variety)
+ * @mp: the timer message
+ *
+ * This function attempts to cancel execution of the timer's timeout function.  When it can be
+ * guaranteed that the timer is not already on a queue and not about to be queued, true (1) is
+ * returned.  When the queue state is unknown or the message is unusable, false (0) is returned.
+ * This return value is for use by mi_timer_q_switch() only.  mi_timer_cancel() can be called in any
+ * context at any point in time.
  */
 int
 mi_timer_cancel(mblk_t *mp)
 {
-	tblk_t *tb;
+	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 	unsigned long flags;
 	toid_t tid;
 	int rval;
-
-	if (mp == NULL)
-		/* successful cancel, does not exist */
-		return (0);
-
-	tb = (typeof(tb)) mp->b_datap->db_base;
 
 	if ((tid = xchg(&tb->tb_tid, 0)))
 		untimeout(tid);
 
 	spin_lock_irqsave(&tb->tb_lock, flags);
-	switch (tb->tb_state) {
-	case TB_ACTIVE:
-		if (tid) {
-			/* sucessful cancel, not on queue */
-			tb->tb_state = TB_IDLE;
-			rval = 0;
-			break;
-		} else {
-			/* unsuccessful cancel, will be queued */
-			tb->tb_state = TB_CANCELLED;
-			rval = -1;
-			break;
-		}
-	case TB_RESCHEDULED:
-		/* unsuccessful cancel, will be queued */
-		tb->tb_state = TB_CANCELLED;
-		rval = -1;
-		break;
-	case TB_IDLE:
-		/* already successfully cancelled, not on queue */
-		mp->b_datap->db_type = M_PCSIG;
-		rval = 0;
-		break;
-	case TB_CANCELLED:
-	case TB_ZOMBIE:
-		/* already unsuccessfully cancelled, will be queued */
-		rval = -1;
-		break;
-	case TB_TRANSIENT:
+	switch (__builtin_expect(tb->tb_state, TB_ACTIVE)) {
 	default:
 		swerr();
-		rval = -1;
+	case TB_EXPIRED:
+		/* Expired, could be on queue. */
+	case TB_TRANSIENT:
+		/* Transient, could be on queue. */
+	case TB_RESCHEDULED:
+		/* Recheduled, could be on queue. */
+	case TB_CANCELLED:
+		/* Cancelled, could be on queue. */
+		tb->tb_state = TB_CANCELLED;
+		rval = (0);
+		break;
+	case TB_ACTIVE:
+		/* Active, not on queue. */
+		if (tid == (toid_t) 0) {
+			tb->tb_state = TB_CANCELLED;
+			rval = (0);
+			break;
+		}
+	case TB_IDLE:
+		/* Idle, not on queue */
+		tb->tb_state = TB_IDLE;
+		rval = (1);
+		break;
+	case TB_ZOMBIE:
+		/* Zombie, could be on queue. */
+		rval = (0);
 		break;
 	}
 	spin_unlock_irqrestore(&tb->tb_lock, flags);
@@ -1480,22 +1679,28 @@ mi_timer_cancel(mblk_t *mp)
 
 EXPORT_SYMBOL(mi_timer_cancel);
 
-/*
- *  MI_TIMER_Q_SWITCH (MacOT variety)
- *  -------------------------------------------------------------------------
+/**
+ * mi_timer_q_switch: - switch target queues for a timer (MacOT variety)
+ * @mp: existing timer message
+ * @q: queue for new timer
+ * @new_mp: new timer message to use if necessary
+ *
+ * Returns the timer message that was used.
  */
 mblk_t *
 mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 
-	if (!mi_timer_cancel(mp)) {
+	if (mi_timer_cancel(mp)) {
 		/* not on queue, can be rescheduled on new queue */
-		mi_timer_SUN(q, mp, drv_hztomsec(tb->tb_time - jiffies));
+		mi_timer_move(q, mp);
+		mi_timer_ticks(mp, tb->tb_time - jiffies);
 		return (mp);
 	} else {
 		/* possibly on queue, use new timer block */
-		mi_timer_SUN(q, new_mp, drv_hztomsec(tb->tb_time - jiffies));
+		mi_timer_move(q, new_mp);
+		mi_timer_ticks(new_mp, tb->tb_time - jiffies);
 		return (new_mp);
 	}
 }
@@ -1505,9 +1710,12 @@ EXPORT_SYMBOL(mi_timer_q_switch);
 /*
  *  OpenSolaris variety
  */
-/*
- *  MI_TIMER_ALLOC (OpenSolaris variety)
- *  -------------------------------------------------------------------------
+
+/**
+ * mi_timer_alloc_SUN: - allocate a timer (OpenSolaris variety)
+ * @size: size of the timer message to allocate
+ *
+ * Solaris style mi_timer_alloc() does not assign a queue at the time of allocation.
  */
 mblk_t *
 mi_timer_alloc_SUN(size_t size)
@@ -1517,9 +1725,75 @@ mi_timer_alloc_SUN(size_t size)
 
 EXPORT_SYMBOL(mi_timer_alloc_SUN);
 
-/*
- *  MI_TIMER (OpenSolaris variety)
- *  -------------------------------------------------------------------------
+/**
+ *  mi_timer_ticks: - start a timer -- OpenSS7 variety
+ *  @mp: the timer message
+ *  @ticks: the time in HZ
+ */
+void
+mi_timer_ticks(mblk_t *mp, clock_t ticks)
+{
+	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+	unsigned long flags;
+	toid_t tid;
+
+	if ((tid = xchg(&tb->tb_tid, 0)))
+		untimeout(tid);
+
+	spin_lock_irqsave(&tb->tb_lock, flags);
+	tb->tb_time = jiffies + ticks;
+	switch (__builtin_expect(tb->tb_state, TB_IDLE)) {
+	case TB_EXPIRED:
+		/* Timer has expired, can be rescheduled and may be on queue. */
+	case TB_TRANSIENT:
+		/* Timer is transient, can be rescheduled and may be on queue. */
+	case TB_CANCELLED:
+		/* Timer was cancelled, can be rescheduled and may be on queue. */
+	case TB_RESCHEDULED:
+		/* Timer was rescheduled, can be rescheduled and may be on queue. */
+		tb->tb_time = jiffies + ticks;
+		tb->tb_state = TB_RESCHEDULED;
+		break;
+	case TB_ACTIVE:
+		/* Timer is actively running, can be rescheduled and is not on queue. */
+		if (tid == (toid_t) 0) {
+			tb->tb_time = jiffies + ticks;
+			tb->tb_state = TB_RESCHEDULED;
+			break;
+		}
+	case TB_IDLE:
+		/* Timer is idle (not running), can be rescheduled and is not on queue. */
+		if (ticks <= 0)
+			ticks = 2;
+		tb->tb_state = TB_ACTIVE;
+		tb->tb_tid = timeout(mi_timer_expiry, (caddr_t) mp, ticks);
+		if (tb->tb_tid)
+			break;
+		tb->tb_time = jiffies + ticks;
+		tb->tb_state = TB_RESCHEDULED;
+		mi_timer_putq(tb->tb_q, mp);
+		break;
+	case TB_ZOMBIE:
+		/* Timer is a zombie waiting to be freed, and may be on queue. */
+		break;
+	default:
+		swerr();
+		break;
+	}
+	spin_unlock_irqrestore(&tb->tb_lock, flags);
+}
+
+EXPORT_SYMBOL(mi_timer_ticks);
+
+/**
+ *  mi_timer_SUN: - start a timer -- OpenSolaris variety
+ *  @q: queue to which to ultimately timer message on expiry
+ *  @mp: the timer message
+ *  @msec: the time in milliseconds
+ *
+ *  Accepts several special values for @msec.  When msec is (clock_t)(-1), then stop the timer.
+ *  When msec is (clock_t)(-2) move the timer to the new @q specified.  When msec is (clock_t)(0),
+ *  requeue the message.
  */
 void
 mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec)
@@ -1527,62 +1801,8 @@ mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec)
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 
 	if (msec >= 0) {
-		unsigned long flags;
-		toid_t tid;
-
-		/* tb has timer actively running */
-		if ((tid = xchg(&tb->tb_tid, 0)))
-			untimeout(tid);
-
-		if (xchg(&mp->b_datap->db_type, M_PCSIG) == M_SIG)
-			if (mp->b_next || tb->tb_q->q_first == mp)
-				rmvq(tb->tb_q, mp);
-
-		spin_lock_irqsave(&tb->tb_lock, flags);
-		switch (tb->tb_state) {
-		case TB_ACTIVE:
-			/* tb is running */
-			if (!tid)
-				/* unsuccessful cancel, will be queued */
-				goto reschedule;
-			/* fall through */
-		case TB_IDLE:
-			/* tb is idle, not on queue */
-			tb->tb_q = q;
-			tb->tb_state = TB_ACTIVE;
-			tb->tb_time = jiffies + drv_msectohz(msec);
-			if (tb->tb_time > jiffies &&
-			    !(tb->tb_tid = timeout(mi_timer_expiry, (caddr_t) mp,
-						   tb->tb_time - jiffies)))
-				tb->tb_state = TB_RESCHEDULED;
-			if (!tb->tb_tid) {
-				/* expired or needs reschedule */
-				spin_unlock_irqrestore(&tb->tb_lock, flags);
-				put(tb->tb_q, mp);
-				return;
-			}
-			break;
-		case TB_CANCELLED:
-			/* tb has been cancelled, but will be queued */
-		      reschedule:
-			/* fall through */
-		case TB_RESCHEDULED:
-			/* tb is being rescheduled, and will be queued */
-			tb->tb_q = q;
-			tb->tb_state = TB_RESCHEDULED;
-			tb->tb_time = jiffies + drv_msectohz(msec);
-			break;
-#if 0
-		case TB_TRANSIENT:
-			/* tb is in a transient state */
-#endif
-		case TB_ZOMBIE:
-			/* tb is a zombie, waiting to be freed */
-		default:
-			swerr();
-			break;
-		}
-		spin_unlock_irqrestore(&tb->tb_lock, flags);
+		mi_timer_move(q, mp);
+		mi_timer_ticks(mp, drv_msectohz(msec));
 	} else {
 		switch (msec) {
 		case ((clock_t) (-1)):
@@ -1600,9 +1820,12 @@ mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec)
 
 EXPORT_SYMBOL(mi_timer_SUN);
 
-/*
- *  MI_TIMER_STOP (OpenSolaris variety)
- *  -------------------------------------------------------------------------
+/**
+ * mi_timer_stop: - stop a timer (OpenSolaris variety)
+ * @mp: timer message to stop
+ *
+ * We want mi_timer_stop() to be way faster than mi_timer_cancel() which is plodding and always
+ * attempts to remove the message from the queue if it finds it there.
  */
 void
 mi_timer_stop(mblk_t *mp)
@@ -1612,55 +1835,79 @@ mi_timer_stop(mblk_t *mp)
 
 EXPORT_SYMBOL(mi_timer_stop);
 
-/*
- *  MI_TIMER_MOVE (OpenSolaris variety)
- *  -------------------------------------------------------------------------
+/**
+ * mi_timer_move: - move a timer message to different queue (OpenSolaris variety)
+ * @q: queue to which to move the message
+ * @mp: the timer message
+ *
+ * Moves the timer message, @mp, from the currently active target queue to the specified target
+ * queue, @q.  If the timer is in some temporary state and was sitting on the old target queue, it
+ * is removed from that queue and its disposition made permanent, which may involve being requeued
+ * to the new target queue.
  */
 void
 mi_timer_move(queue_t *q, mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 	unsigned long flags;
-	toid_t tid;
-
-	if ((tid = xchg(&tb->tb_tid, 0)))
-		untimeout(tid);
+	queue_t *oldq;
 
 	spin_lock_irqsave(&tb->tb_lock, flags);
-	switch (tb->tb_state) {
-	case TB_ACTIVE:
-		/* tb is running */
-		if (tid) {
-			/* sucessful cancel, not on queue, simply start */
-			tb->tb_q = q;
-			tb->tb_state = TB_ACTIVE;
-			if (tb->tb_time > jiffies &&
-			    !(tb->tb_tid = timeout(mi_timer_expiry, (caddr_t) mp,
-						   tb->tb_time - jiffies)))
-				tb->tb_state = TB_RESCHEDULED;
-			if (!tb->tb_tid) {
-				/* expired or needs reschedule */
-				spin_unlock_irqrestore(&tb->tb_lock, flags);
-				put(tb->tb_q, mp);
-				return;
+	if ((oldq = XCHG(&tb->tb_q, q)) != q) {
+		switch (tb->tb_state) {
+		default:
+			/* Do no know, illegal state. */
+			swerr();
+		case TB_TRANSIENT:
+			/* Timer is transient, could be on a queue. */
+		case TB_EXPIRED:
+			/* Timer is expired, could be on a queue. */
+		case TB_RESCHEDULED:
+			/* Timer is recheduled, could be on a queue. */
+		case TB_CANCELLED:
+			/* Timer is cancelled, could be on a queue. */
+		case TB_ZOMBIE:
+			/* Timer is zombie waiting to be free, could be on a queue */
+			if (mi_timer_remove(oldq, mp)) {
+				/* was queued, cannot be in user's hands */
+				/* do similar to mi_timer_valid here */
+				switch (tb->tb_state) {
+				case TB_RESCHEDULED:
+					if (tb->tb_time > jiffies) {
+						tb->tb_state = TB_ACTIVE;
+						tb->tb_tid =
+						    timeout(mi_timer_expiry, (caddr_t) mp,
+								    tb->tb_time - jiffies);
+						if (tb->tb_tid)
+							break;
+						tb->tb_state = TB_RESCHEDULED;
+						mi_timer_putq(tb->tb_q, mp);
+						break;
+					}
+					/* fall through */
+				case TB_TRANSIENT:
+				case TB_EXPIRED:
+					tb->tb_state = TB_EXPIRED;
+					mi_timer_putq(tb->tb_q, mp);
+					break;
+				case TB_CANCELLED:
+					tb->tb_state = TB_IDLE;
+					break;
+				case TB_ZOMBIE:
+					tb->tb_state = TB_IDLE;
+					spin_unlock_irqrestore(&tb->tb_lock, flags);
+					freemsg(mp);
+					return;
+				}
+				break;
 			}
-		} else {
-			/* unsuccessful cancel, will be queued */
-			/* ask for reschedule on new queue */
-			tb->tb_q = q;
-			tb->tb_state = TB_RESCHEDULED;
+			/* fall through */
+		case TB_ACTIVE:
+			/* Timer is running and is not on any queue. */
+		case TB_IDLE:
+			/* Timer is idle and is not on any queue. */
+			break;
 		}
-		break;
-	case TB_IDLE:
-		/* tb is idle, not on queue */
-	case TB_CANCELLED:
-	case TB_RESCHEDULED:
-		tb->tb_q = q;
-		break;
-	case TB_ZOMBIE:
-	default:
-		swerr();
-		break;
 	}
 	spin_unlock_irqrestore(&tb->tb_lock, flags);
 }
@@ -1670,66 +1917,82 @@ EXPORT_SYMBOL(mi_timer_move);
 /*
  *  Common
  */
-/*
- *  MI_TIMER_VALID (Common)
- *  -------------------------------------------------------------------------
- *  Slight variation on a theme here.  We allow the message to be requeued and
- *  processed later.  We mark the message type to M_SIG when valid is returned
- *  so that the message will be requeued as a normal priority message.  When
- *  mi_timer_valid is called for the second time on the message, this function
- *  returns true again if no other action has been taken on the timer while it
- *  was waiting on queue.  If any other action was taken, the second pass
- *  will return false.
+
+/**
+ * mi_timer_valid: - check validity of timer message (Common)
+ * @mp: timer message
+ *
+ * See mi_timer(9) for user documentation.  Slight variation on a theme here.  We allow the message
+ * to be requeued and processed later.  (MacOT documentation says that this function must not be
+ * called twice in a row on the same message.)  The user may mark the message type to M_SIG when
+ * valid is returned so that the message will be requeued as a normal priority message.  When
+ * mi_timer_valid() is called for the second time on the message, this function returns true again if
+ * no other action has been taken on the timer while it was waiting on queue.  If any other action
+ * was taken, the second pass will return false.
+ *
+ * Timer message states are as follows (for messages taken off the queue):
+ *
+ * TB_ZOMBIE:					- freed timer
+ * TB_CANCELLED:				- cancelled timer
+ * TB_IDLE:					- fired timer processed again
+ * TB_ACTIVE:	    tb_tid == (toid_t) 0	- timer fired
+ * TB_ACTIVE:	    tb_tid != (toid_t) 0	- timer running, will be requeued on expiry
+ * TB_RESCHEDULED:				- timer needs rescheduling
+ * TB_TRANSIENT					- timer in transient state (fired)
+ *
+ * In implementation it is just easier if messages are not simply placed onto queues after having
+ * mi_timer_valid() called on them.  Try mi_timer_MAC(tp, 0) or mi_timer_SUN(q, tp, 0) as a more
+ * portable way of accomplishing this.  These functions have been adjusted to simply queue the
+ * message immediately when the timeout is zero.  On other implementation it should have a similar
+ * effect (even if timeout is called with a zero argument).
  */
 int
 mi_timer_valid(mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
 	unsigned long flags;
-	int rval;
+	int rval = (0);
 
 	spin_lock_irqsave(&tb->tb_lock, flags);
-	switch (tb->tb_state) {
-	case TB_ACTIVE:
-		if (tb->tb_tid == (toid_t) 0) {
-			/* queued as a result of a timeout */
-			tb->tb_state = TB_IDLE;
-			mp->b_datap->db_type = M_SIG;
-			rval = (1);
-			break;
-		} else {
-			/* timer still running, will be requeued */
-			rval = (0);
+	switch (__builtin_expect(tb->tb_state, TB_EXPIRED)) {
+	case TB_RESCHEDULED:
+		/* Timer was rescheduled while in user's hands. */
+		if (tb->tb_time > jiffies) {
+			tb->tb_state = TB_ACTIVE;
+			tb->tb_tid = timeout(mi_timer_expiry, (caddr_t) mp, tb->tb_time - jiffies);
+			if (tb->tb_tid)
+				break;
+			tb->tb_state = TB_RESCHEDULED;
+			mi_timer_putq(tb->tb_q, mp);
 			break;
 		}
+		/* Timer has already expired. */
+		/* fall through */
+	case TB_EXPIRED:
+		/* Timer is expired and was queued as the result of a timer timeout */
+	case TB_TRANSIENT:
+		/* Timer is transient and was requeued by the put or service procedure. */
+		tb->tb_state = TB_IDLE;
+		mp->b_datap->db_type = M_PCSIG;
+		rval = (1);
+		break;
 	case TB_CANCELLED:
-		/* were cancelled, now we are idle (off queue) */
+		/* Timer was cancelled while in user's hands. */
+	case TB_IDLE:
+		/* Timer was cancelled while in the user's hands. */
 		tb->tb_state = TB_IDLE;
 		rval = (0);
 		break;
-	case TB_IDLE:
-		rval = (mp->b_datap->db_type != M_PCSIG);
-		break;
 	case TB_ZOMBIE:
-		/* were zombied, now we can be freed (off queue) */
-		local_irq_restore(flags);
+		/* Timer was freed while in user's hands. */
+		tb->tb_state = TB_IDLE;
+		spin_unlock_irqrestore(&tb->tb_lock, flags);
 		freemsg(mp);
 		return (0);
-	case TB_RESCHEDULED:
-		tb->tb_state = TB_ACTIVE;
-		if (tb->tb_time > jiffies &&
-		    !(tb->tb_tid = timeout(mi_timer_expiry, (caddr_t) mp, tb->tb_time - jiffies)))
-			tb->tb_state = TB_RESCHEDULED;
-		if (!tb->tb_tid) {
-			spin_unlock_irqrestore(&tb->tb_lock, flags);
-			put(tb->tb_q, mp);
-			return (0);
-		}
-		rval = (0);
-		break;
 	default:
+	case TB_ACTIVE:
+		/* Timers in the active state are never in the user's hands. */
 		swerr();
-		rval = (0);
 		break;
 	}
 	spin_unlock_irqrestore(&tb->tb_lock, flags);
@@ -1738,6 +2001,86 @@ mi_timer_valid(mblk_t *mp)
 
 EXPORT_SYMBOL(mi_timer_valid);
 
+/**
+ * mi_timer_running: - is the timer running
+ * @mp: timer message
+ */
+int
+mi_timer_running(mblk_t *mp)
+{
+	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+	int state = (volatile int) tb->tb_state;
+
+	return (state == TB_ACTIVE || state == TB_RESCHEDULED);
+}
+
+EXPORT_SYMBOL(mi_timer_running);
+
+/**
+ * mi_timer_cond: - start timer if not already running
+ * @mp: timer message
+ * @msec: milliseconds to expiry
+ *
+ * Return is true (1) if the timer was restarted, or false (0) if it was just left running.
+ */
+int
+mi_timer_cond(mblk_t *mp, clock_t ticks)
+{
+	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
+	unsigned long flags;
+	int rtn;
+
+	spin_lock_irqsave(&tb->tb_lock, flags);
+	switch (tb->tb_state) {
+	case TB_ACTIVE:
+		/* Timer is running. */
+	case TB_EXPIRED:
+		/* Timer has expired and will be queued. */
+	case TB_RESCHEDULED:
+		/* Timer is running. */
+		rtn = (0);	/* already running */
+		break;
+	case TB_IDLE:
+		/* Timer is idle, not on queue. */
+	case TB_TRANSIENT:
+		/* Timer is transient, not on queue. */
+		rtn = (1);
+		if (ticks <= 0)
+			ticks = 2;
+		tb->tb_state = TB_ACTIVE;
+		tb->tb_tid = timeout(mi_timer_expiry, (caddr_t) mp, ticks);
+		if (tb->tb_tid)
+			break;
+		tb->tb_time = jiffies + ticks;
+		tb->tb_state = TB_RESCHEDULED;
+		mi_timer_putq(tb->tb_q, mp);
+		break;
+	case TB_CANCELLED:
+		/* Timer has been cancelled, but will be queued */
+		tb->tb_time = jiffies + ticks;
+		tb->tb_state = TB_RESCHEDULED;
+		rtn = (1);
+		break;
+	default:
+		swerr();
+	case TB_ZOMBIE:
+		/* Timer is a zombie, waiting to be freed */
+		rtn = (0);
+		break;
+	}
+	spin_unlock_irqrestore(&tb->tb_lock, flags);
+	return (rtn);
+}
+
+EXPORT_SYMBOL(mi_timer_cond);
+
+/**
+ * mi_timer_remain: - return remaining time on timer
+ * @mp: timer message
+ *
+ * Returns the remaining time (in milliseconds) on a timer if running or rescheduled, zero
+ * otherwise.
+ */
 unsigned long
 mi_timer_remain(mblk_t *mp)
 {
@@ -1746,7 +2089,7 @@ mi_timer_remain(mblk_t *mp)
 	unsigned long rval = 0;
 
 	spin_lock_irqsave(&tb->tb_lock, flags);
-	switch(tb->tb_state) {
+	switch (__builtin_expect(tb->tb_state, TB_ACTIVE)) {
 	case TB_ACTIVE:
 	case TB_RESCHEDULED:
 		if (tb->tb_time > jiffies)
@@ -1761,11 +2104,14 @@ mi_timer_remain(mblk_t *mp)
 		rval = drv_hztomsec(rval);
 	return (rval);
 }
+
 EXPORT_SYMBOL(mi_timer_remain);
 
-/*
- *  MI_TIMER_FREE (Common)
- *  -------------------------------------------------------------------------
+/**
+ * mi_timer_free: - free a timer message (Common)
+ * @mp: timer message to free
+ *
+ * Cancels and frees (or marks to be freed) a timer message.
  */
 void
 mi_timer_free(mblk_t *mp)
@@ -1791,8 +2137,7 @@ mi_timer_free(mblk_t *mp)
 		/* fall through */
 	case TB_IDLE:
 		/* not on queue */
-		mp->b_datap->db_type = M_PCSIG;
-		local_irq_restore(flags);
+		spin_unlock_irqrestore(&tb->tb_lock, flags);
 		freemsg(mp);
 		return;
 	default:
@@ -1841,7 +2186,7 @@ mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
 	int result = 0;
 
 	if (vstrlog != NULL) {
-		struct mi_comm *mi = (struct mi_comm *) q->q_ptr + 1;
+		struct mi_comm *mi = ptr_to_mi(q->q_ptr);
 		modID_t mid = mi->mi_mid;
 		minor_t sid = mi->mi_sid;
 		va_list args;
@@ -2241,6 +2586,17 @@ mi_vmpprintf(mblk_t *mp, char *fmt, va_list args)
 	return (rval);
 }
 
+/**
+ *  mi_mpprintf: - print a formatted string to a message block
+ *  @mp: message block into which to print
+ *  @fmt: printf-style format string
+ *  @...: arguments to format string
+ *
+ *  This function is similar to snprintf() with the exception that the message string is printed
+ *  into the message block, with new message blocks being created on demand as required, instead of
+ *  to a linear buffer of fixed size.  A newline character will always be written to terminate the
+ *  string.
+ */
 int
 mi_mpprintf(mblk_t *mp, char *fmt, ...)
 {
@@ -2256,6 +2612,16 @@ mi_mpprintf(mblk_t *mp, char *fmt, ...)
 
 EXPORT_SYMBOL(mi_mpprintf);
 
+/**
+ * mi_mpprintf_nr: - printf to a message block removing previous newline
+ * @mp: message block to which to print
+ * @fmt: printf style format string
+ * @...: arguments to format string
+ *
+ * mi_mpprintf_nr() is identical to mi_mpprintf() with the exception that it strips the trailing
+ * newline character from the previous string written to the message block with either mi_mpprintf()
+ * or a previous call to mi_mpprintf_nr().
+ */
 int
 mi_mpprintf_nr(mblk_t *mp, char *fmt, ...)
 {
