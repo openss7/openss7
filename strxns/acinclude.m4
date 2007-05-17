@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2007/03/25 19:02:41 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/05/17 22:21:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/25 19:02:41 $ by $Author: brian $
+# Last Modified $Date: 2007/05/17 22:21:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -344,7 +344,7 @@ AC_DEFUN([_XNS_CONFIG_KERNEL], [dnl
 #include <net/udp.h>
 #include <net/tcp.h>
     ])
-    _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu ip_dst_output \
+    _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu nf_reset ip_dst_output \
 			ip_route_output_key __in_dev_get_rcu synchronize_net], [], [], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>

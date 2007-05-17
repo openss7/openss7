@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:02:47 $
+ @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/05/17 22:21:30 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:02:47 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:21:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np.c,v $
+ Revision 0.9.2.12  2007/05/17 22:21:30  brian
+ - perform nf_reset if available
+
  Revision 0.9.2.11  2007/03/25 19:02:47  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:02:47 $"
+#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/05/17 22:21:30 $"
 
 static char const ident[] =
-    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:02:47 $";
+    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/05/17 22:21:30 $";
 
 /*
  *  This multiplexing driver is a master device driver for Network Provider streams presenting a
@@ -127,7 +130,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:02:47 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2007/05/17 22:21:30 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -2655,6 +2658,9 @@ np_ip_v4_rcv(struct sk_buff *skb)
 	struct iphdr *iph;
 	struct udphdr *uh;		/* just for lookups */
 
+#ifdef HAVE_KFUNC_NF_RESET
+	nf_reset(skb);
+#endif
 	if (unlikely(!pskb_may_pull(skb, sizeof(struct updhdr))))
 		goto too_small;
 	if (unlikely(skb->pkt_type != PACKET_HOST))
