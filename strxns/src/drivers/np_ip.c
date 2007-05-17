@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/05/07 18:55:13 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/05/17 22:21:30 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/07 18:55:13 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:21:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.42  2007/05/17 22:21:30  brian
+ - perform nf_reset if available
+
  Revision 0.9.2.41  2007/05/07 18:55:13  brian
  - corrections from release testing
 
@@ -193,10 +196,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/05/07 18:55:13 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/05/17 22:21:30 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/05/07 18:55:13 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/05/17 22:21:30 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -257,7 +260,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.41 $) $Date: 2007/05/07 18:55:13 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.42 $) $Date: 2007/05/17 22:21:30 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -6264,6 +6267,10 @@ np_v4_rcv(struct sk_buff *skb)
 	struct iphdr *iph = skb->nh.iph;
 	struct udphdr *uh = (struct udphdr *) (skb->nh.raw + (iph->ihl << 2));
 	struct rtable *rt;
+
+#ifdef HAVE_KFUNC_NF_RESET
+	nf_reset(skb);
+#endif
 
 //      IP_INC_STATS_BH(IpInDelivers);  /* should wait... */
 

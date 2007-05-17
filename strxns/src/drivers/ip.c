@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/05/07 18:55:13 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/05/17 22:21:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/07 18:55:13 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:21:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.37  2007/05/17 22:21:29  brian
+ - perform nf_reset if available
+
  Revision 0.9.2.36  2007/05/07 18:55:13  brian
  - corrections from release testing
 
@@ -161,10 +164,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/05/07 18:55:13 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/05/17 22:21:29 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/05/07 18:55:13 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/05/17 22:21:29 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -217,7 +220,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/05/07 18:55:13 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/05/17 22:21:29 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -660,6 +663,9 @@ STATIC void npi_v4_err(struct sk_buff *skb, u32 info);
 STATIC INLINE fastcall __hot_in void
 npi_v4_steal(struct sk_buff *skb)
 {
+#ifdef HAVE_KFUNC_NF_RESET
+	nf_reset(skb);
+#endif
 #ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
 	skb->nh.iph->protocol = 255;
 	skb->protocol = 255;

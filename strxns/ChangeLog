@@ -1,3 +1,10 @@
+2007-05-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* strxns/acinclude.m4: added check for nf_reset
+	* strxns/src/drivers/ip.c: perform nf_reset if available
+	* strxns/src/drivers/np.c: perform nf_reset if available
+	* strxns/src/drivers/np_ip.c: perform nf_reset if available
+
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/ip.c: corrections from release testing
