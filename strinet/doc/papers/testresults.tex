@@ -1,7 +1,7 @@
 %% -*- tex -*- vim: ft=tex tw=78 nocin nosi
 %% =========================================================================
 %%
-%% @(#) $Id: testresults.tex,v 0.9.2.2 2007/05/07 18:41:39 brian Exp $
+%% @(#) $Id: testresults.tex,v 0.9.2.3 2007/05/17 22:38:16 brian Exp $
 %%
 %% =========================================================================
 %%
@@ -53,7 +53,7 @@
 %% 
 %% =========================================================================
 %%
-%% Last Modified $Date: 2007/05/07 18:41:39 $ by $Author: brian $
+%% Last Modified $Date: 2007/05/17 22:38:16 $ by $Author: brian $
 %%
 %% =========================================================================
 
@@ -812,6 +812,7 @@ WhiteBox 3 & 2.4.27\\
 CentOS 4 & 2.6.9-5.0.3.EL\\
 SuSE 10.0 OSS & 2.6.13-15-default\\
 Ubuntu 6.10 & 2.6.17-11-generic\\
+Ubuntu 7.04 & 2.6.20-15-server\\
 Fedora Core 6 & 2.6.20-1.2933.fc6\\
 \end{tabular}\\
 
@@ -888,6 +889,7 @@ Fedora Core 6 & 2.6.20-1.2933.fc6\\
 CentOS 4 & 2.6.9-5.0.3.EL\\
 SuSE 10.0 OSS & 2.6.13-15-default\\
 Ubuntu 6.10 & 2.6.17-11-generic\\
+Ubuntu 7.04 & 2.6.20-15-server\\
 \end{tabular}
 
 \subsubsection[Fedora Core 6]{Fedora Core 6} Fedora Core 6 is the most recent
@@ -1130,7 +1132,7 @@ updates applied.
 
 \textit{Figure \ref{figure:ubuntuperf}}
 illustrates the performance of Sockets compared to XTI over Socket and XTI
-approaches.  STREAMS demonstrates marginal improvements (~5\%) at all message
+approaches.  STREAMS demonstrates marginal improvements (approx. 5\%) at all message
 sizes.
 
 \item[Delay.]
@@ -1161,11 +1163,11 @@ implementation.
 
 \textit{Figure \ref{figure:ubuntucomp}}
 illustrates the comparison of Sockets to XTI over Socket and XTI approaches.
-STREAMS demonstrates marginal improvements (~5\%) at all message sizes.
+STREAMS demonstrates marginal improvements (approx. 5\%) at all message sizes.
 
 Unbuntu is the only distribution tested where STREAMS does not show
 significant improvements over Sockets.  Nevertheless, STREAMS does show
-marginal improvement (~5\%) over all message sizes and performed better than
+marginal improvement (approx. 5\%) over all message sizes and performed better than
 Sockets at all message sizes.
 
 \end{description}
@@ -1192,6 +1194,78 @@ Sockets at all message sizes.
 \center\includegraphics[width=\columnwidth]{netperf_ubuntu_comp}
 \caption[Ubuntu 6.10 on Porky Comparison]{Ubuntu 6.10 on Porky Comparison}
 \label{figure:ubuntucomp}
+\end{figure}
+
+\subsubsection[Ubuntu 7.04]{Ubuntu 7.04}
+Ubuntu 7.04 is the current release of the Ubuntu distribution.  The Ubuntu
+7.04 release sports a 2.6.20 kernel.  The tested distribution had current
+updates applied.
+
+\begin{description}
+
+\item[Performance.]
+
+\textit{Figure \ref{figure:u704perf}}
+illustrates the performance of Sockets compared to XTI over Socket and XTI
+approaches.  STREAMS demonstrates significant improvements (approx. 20-60\%)
+at all message sizes.
+
+\item[Delay.]
+
+\textit{Figure \ref{figure:u704dly}}
+illustrates the message delay of Sockets compared to XTI over Socket and XTI
+approaches.  STREAMS demonstrates significant improvements at all message
+sizes.
+
+STREAMS and SOckets exhibit the slope, and XTI over Sockets more than twice
+the slope.  STREAMS, however, has a significantly lower intercept and XTI over
+Sockets and Sockets intercepts are similar, indicating that STREAMS has a
+smaller per-message overhead, despite copying destination addresses with each
+message.
+
+\item[Throughput.]
+
+\textit{Figure \ref{figure:u704thrput}}
+illustrates the throughput of Sockets compared to XTI over Socket and XTI
+approaches.  STREAMS demonstrates significant improvements at all message
+sizes.
+
+As can be seen from \textit{Figure \ref{figure:u704thrput}}, all
+implementations exhibit strong power function characteristics (at least at
+lower write sizes), indicating structure and robustness for each
+implementation.
+
+\item[Improvement.]
+
+\textit{Figure \ref{figure:u704comp}}
+illustrates the comparison of Sockets to XTI over Socket and XTI approaches.
+STREAMS demonstrates significant improvements (approx. 20-60\%) at all message
+sizes.
+
+\end{description}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_u704_perf}
+\caption[Ubuntu 7.04 on Porky Performance]{Ubuntu 7.04 on Porky Performance}
+\label{figure:u704perf}
+\end{figure}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_u704_delay}
+\caption[Ubuntu 7.04 on Porky Delay]{Ubuntu 7.04 on Porky Delay}
+\label{figure:u704dly}
+\end{figure}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_u704_thrput}
+\caption[Ubuntu 7.04 on Porky Throughput]{Ubuntu 7.04 on Porky Throughput}
+\label{figure:u704thrput}
+\end{figure}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_u704_comp}
+\caption[Ubuntu 7.04 on Porky Comparison]{Ubuntu 7.04 on Porky Comparison}
+\label{figure:u704comp}
 \end{figure}
 
 \subsection[Pumbah]{Pumbah}
@@ -1312,6 +1386,7 @@ Linux distributions tested on this machine are as follows:
 Distribution & Kernel\\
 \hline
 Fedora Core 6 & 2.6.20-1.2933.fc6\\
+CentOS 5.0 & 2.6.18-8.1.3.el5\\
 \end{tabular}\\[1.0ex]
 
 This machine is used as an SMP control machine.  Most of the test were
@@ -1396,6 +1471,84 @@ with regard to \textsl{Linux Fast-STREAMS}.
 \center\includegraphics[width=\columnwidth]{netperf_smp_comp}
 \caption[Fedora Core 6 (x86\_64) Daisy Comparison]{Fedora Core 6 (x86\_64) Daisy Comparison}
 \label{figure:smpcomp}
+\end{figure}
+
+\subsubsection[CentOS 5.0 (x86\_64)]{CentOS 5.0 (x86\_64)}
+CentOS 5.0 is the most recent full release CentOS distribution.  This
+distribution sports a 2.6.18-8.1.3.el5 kernel with the latest patches.  This is the
+\texttt{x86\_64} distribution with recent updates.
+
+\begin{description}
+
+\item[Performance.]
+
+\textit{Figure \ref{figure:cos5perf}}
+illustrates
+the performance of Sockets compared to XTI over Socket and XTI approaches.
+STREAMS demonstrates significant improvements at message sizes of less than
+1024 bytes.
+
+\item[Delay.]
+
+\textit{Figure \ref{figure:cos5dly}}
+illustrates
+the message delay of Sockets compared to XTI over Socket and XTI approaches.
+STREAMS demonstrates significant improvements at message sizes of less than
+1024 bytes.
+
+The slope of the delay curve either indicates that Sockets is using slightly
+larger buffers than STREAMS, or that Sockets is somehow exploiting some
+per-byte efficiencies at larger message sizes not acheived by STREAMS.
+Nevertheless, the STREAMS intercept is so low that the delay curve for STREAMS
+is everywhere beneath that of Sockets.
+
+\item[Throughput.]
+
+\textit{Figure \ref{figure:cos5thrput}}
+illustrates the throughput of Sockets compared to XTI over Socket and XTI
+approaches.  STREAMS demonstrates significant improvements at all message
+sizes.
+
+As can be seen from \textit{Figure \ref{figure:cos5thrput}}, all
+implementations exhibit strong power function characteristics (at least at
+lower write sizes), indicating structure and robustness for each
+implementation.
+
+\item[Improvement.]
+
+\textit{Figure \ref{figure:cos5comp}}
+illustrates
+the comparison of Sockets to XTI over Socket and XTI approaches.  STREAMS
+demonstrates significant improvements (approx. 40\% improvement) at message
+sizes below 1024 bytes.  That STREAMS UDP gives a 40\% improvement over a wide
+range of message sizes on SMP is a dramatic improvement.  Statements regarding
+STREAMS networking running poorer on SMP than on UP are quite wrong, at least
+with regard to \textsl{Linux Fast-STREAMS}.
+
+\end{description}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_cos5_perf}
+\caption[CentOS 5.0 (x86\_64) Daisy Performance]{CentOS 5.0 (x86\_64) Daisy Performance}
+\label{figure:cos5perf}
+\end{figure}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_cos5_delay}
+\caption[CentOS 5.0 (x86\_64) Daisy Delay]{CentOS 5.0 (x86\_64) Daisy Delay}
+\label{figure:cos5dly}
+\end{figure}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_cos5_thrput}
+\caption[CentOS 5.0 (x86\_64) Daisy Throughput]{CentOS 5.0 (x86\_64) Daisy Throughput}
+\label{figure:cos5thrput}
+\end{figure}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_cos5_comp}
+\caption[CentOS 5.0 (x86\_64) Daisy Comparison]{CentOS 5.0 (x86\_64) Daisy Comparison}
+\label{figure:cos5comp}
 \end{figure}
 
 \subsection[Mspiggy]{Mspiggy}
@@ -1858,6 +2011,10 @@ Porky.
 
 \textit{Table \ref{table:ubuntudata}} lists the raw data from the
 \texttt{netperf} program that was used in preparing graphs for Ubuntu 6.10 on
+Porky.
+
+\textit{Table \ref{table:ubuntudata}} lists the raw data from the
+\texttt{netperf} program that was used in preparing graphs for Ubuntu 7.04 on
 Porky.
 
 \textit{Table \ref{table:rh7data}} lists the raw data from the
