@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.98 2007/05/03 22:40:42 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.99 2007/05/17 22:01:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/03 22:40:42 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:01:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.99  2007/05/17 22:01:13  brian
+ - corrections from strsctp performance testing
+
  Revision 0.9.2.98  2007/05/03 22:40:42  brian
  - significant performance improvements, some bug corrections
 
@@ -113,7 +116,7 @@
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.98 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.99 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -252,12 +255,20 @@ typedef struct free_rtn {
 
 /* 20 bytes on 32 bit, 32 on 64 bit */
 typedef struct datab {
+#if 0
 	union {
 		struct datab *freep;
 		struct free_rtn *frtnp;
 	} db_f;
 #define		db_freep db_f.freep
 #define		db_frtnp db_f.frtnp
+#else
+	/* anonymous union instead */
+	union {
+		struct datab *db_freep;
+		struct free_rtn *db_frtnp;
+	};
+#endif
 	unsigned char *db_base;
 	unsigned char *db_lim;
 	unsigned char db_ref;		/* shadow reference count */

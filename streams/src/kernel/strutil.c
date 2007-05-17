@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2007/05/07 18:51:37 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2007/05/17 22:01:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/07 18:51:37 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:01:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.151  2007/05/17 22:01:17  brian
+ - corrections from strsctp performance testing
+
  Revision 0.9.2.150  2007/05/07 18:51:37  brian
  - changes from release testing
 
@@ -137,10 +140,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2007/05/07 18:51:37 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2007/05/17 22:01:17 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2007/05/07 18:51:37 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2007/05/17 22:01:17 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */
@@ -205,33 +208,59 @@ static char const ident[] =
 
 STATIC spinlock_t db_ref_lock = SPIN_LOCK_UNLOCKED;
 
-streams_noinline streams_fastcall __unlikely void
+//streams_noinline streams_fastcall __unlikely int
+STATIC streams_inline streams_fastcall __hot_get int
 db_inc_slow(register dblk_t *db)
 {
 	unsigned long flags;
+	int rval;
 
 	streams_spin_lock(&db_ref_lock, flags);
-	db->db_ref++;
+	/* Need to fail when the count has hit 255! */
+	if (likely((rval = (db->db_ref != 255)))) {
+#if 0
+		if (likely((rval = (db->db_ref != 0))))
+			db->db_ref++;
+		else
+			swerr();
+#endif
+		db->db_ref++;
+	}
 	streams_spin_unlock(&db_ref_lock, flags);
+	return (rval);
 }
 
-STATIC streams_inline streams_fastcall __hot_get void
+STATIC streams_inline streams_fastcall __hot_get int
 db_inc(register dblk_t *db)
 {
+#if 0
+	/* XXX: think about this */
 	/* When the number of references is 1 the buffer is exclusive to the caller and locking is
 	   not required. */
-	if (likely(db->db_ref == 1))
-		return (void) (db->db_ref = 2);
+	if (likely(db->db_ref == 1)) {
+		db->db_ref = 2;
+		return (1);
+	}
+	mb();
+#endif
 	return db_inc_slow(db);
 }
 
-streams_noinline streams_fastcall __unlikely int
+//streams_noinline streams_fastcall __unlikely int
+STATIC streams_inline streams_fastcall __hot_in int
 db_dec_and_test_slow(register dblk_t *db)
 {
 	unsigned long flags;
 	register bool ret;
 
 	streams_spin_lock(&db_ref_lock, flags);
+#if 0
+	if (db->db_ref == 0) {
+		ret = 1;
+		swerr();
+	} else
+		ret = (--db->db_ref == 0);
+#endif
 	ret = (--db->db_ref == 0);
 	streams_spin_unlock(&db_ref_lock, flags);
 	return ret;
@@ -240,10 +269,14 @@ db_dec_and_test_slow(register dblk_t *db)
 STATIC streams_inline streams_fastcall __hot_in int
 db_dec_and_test(register dblk_t *db)
 {
+#if 0
+	/* XXX: think about this */
 	/* When the number of references is 1 the buffer is exclusive to the caller and locking is
 	   not required. */
 	if (likely(db->db_ref == 1))
 		return ((db->db_ref = 0) == 0);
+	mb();
+#endif
 	return (db_dec_and_test_slow(db));
 }
 
@@ -704,6 +737,9 @@ EXPORT_SYMBOL(datamsg);
 /**
  *  dupb:	- duplicates a message block
  *  @bp:	message block to duplicate
+ *
+ *  Note that dubp must fail if the reference count associated with the data block has already hit
+ *  255.  Unfortunately, the reference count is only an unsigned char.
  */
 streams_fastcall __hot mblk_t *
 dupb(mblk_t *bp)
@@ -714,20 +750,22 @@ dupb(mblk_t *bp)
 		struct mdbblock *md = (struct mdbblock *) mp;
 		dblk_t *db = bp->b_datap;
 
-		db_inc(db);
-		// _ensure(mp->b_next == NULL, mp->b_next = NULL);
-		// _ensure(mp->b_prev == NULL, mp->b_prev = NULL);
-		// _ensure(mp->b_cont == NULL, mp->b_cont = NULL);
-		mp->b_rptr = bp->b_rptr;
-		mp->b_wptr = bp->b_wptr;
-		mp->b_datap = bp->b_datap;
-		mp->b_band = bp->b_band;
-		mp->b_flag = bp->b_flag;
-		mp->b_csum = bp->b_csum;
-		/* mark datab unused */
-		db = &md->datablk.d_dblock;
-		db->db_ref = 0;
-		return (mp);
+		if (likely(db_inc(db))) {
+			// _ensure(mp->b_next == NULL, mp->b_next = NULL);
+			// _ensure(mp->b_prev == NULL, mp->b_prev = NULL);
+			// _ensure(mp->b_cont == NULL, mp->b_cont = NULL);
+			mp->b_rptr = bp->b_rptr;
+			mp->b_wptr = bp->b_wptr;
+			mp->b_datap = bp->b_datap;
+			mp->b_band = bp->b_band;
+			mp->b_flag = bp->b_flag;
+			mp->b_csum = bp->b_csum;
+			/* mark datab unused */
+			db = &md->datablk.d_dblock;
+			db->db_ref = 0;
+			return (mp);
+		}
+		freeb(mp);
 	}
 	return (NULL);
 }
@@ -803,6 +841,9 @@ freeb(mblk_t *mp)
 
 	_printd(("%s: freeing mblk %p, refs %d\n", __FUNCTION__, mp, (int) (db ? db->db_ref : 0)));
 
+#if 0
+	__ensure(db != NULL, dump_stack(); return);
+#endif
 	/* check double free */
 	dassert(db != NULL);
 	dassert(db->db_ref > 0);

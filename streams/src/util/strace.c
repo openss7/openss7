@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/11/26 15:27:45 $
+ @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/05/17 22:01:20 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/26 15:27:45 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:01:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strace.c,v $
+ Revision 0.9.2.18  2007/05/17 22:01:20  brian
+ - corrections from strsctp performance testing
+
  Revision 0.9.2.17  2006/11/26 15:27:45  brian
  - testing and corrections to strlog capabilities
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/11/26 15:27:45 $"
+#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/05/17 22:01:20 $"
 
 static char const ident[] =
-    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/11/26 15:27:45 $";
+    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/05/17 22:01:20 $";
 
 /*
  *  SVR 4.2 Utility: strace - Prints STREAMS trace messages.
@@ -302,11 +305,25 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 
 	if (slen == 0)
 		return (0);
+	if (output > 2)
+		fprintf(stderr, "format string and arguments contain %d bytes\n", len);
 	fmt = buf;
+	if (output > 2)
+		fprintf(stderr, "format string at %p\n", fmt);
 	flen = strnlen(fmt, len);
+	if (output > 2)
+		fprintf(stderr, "format string of length %zu\n", flen);
 	plen = PROMOTE_ALIGN(flen + 1);
+	if (output > 2)
+		fprintf(stderr, "format string of promoted length %zu\n", plen);
 	args = &buf[plen];
+	if (output > 2)
+		fprintf(stderr, "arguments start at %p\n", args);
 	aend = buf + len;
+	if (output > 2) {
+		fprintf(stderr, "arguments end at %p\n", aend);
+		fprintf(stderr, "arguments contain %zu bytes\n", (size_t)(aend - args));
+	}
 	str = sbuf;
 	end = str + slen - 1;	/* room for null */
 	for (; *fmt; ++fmt) {
@@ -609,6 +626,58 @@ snprintf_text(char *sbuf, size_t slen, const char *buf, int len)
 	return (str - sbuf);
 }
 
+int
+strace_pstrlog(FILE * file, struct strbuf *ctrl, struct strbuf *data)
+{
+	char sbuf[LOGMSGSZ << 2];
+	char fchar[] = "          ";
+	char *fstr = fchar, *tp;
+	struct log_ctl lc;
+	time_t ltime;
+	char timebuf[26];
+	int len;
+
+	if (!ctrl || !data || !ctrl->buf || !data->buf || ctrl->len < sizeof(lc)) {
+		errno = -EINVAL;
+		return (-1);
+	}
+	memcpy(&lc, ctrl->buf, sizeof(lc));
+
+	snprintf_text(sbuf, sizeof(sbuf), (char *) data->buf, data->len);
+	len = fprintf(file, "%d", lc.seq_no);
+	if (len != -1) {
+		ctime_r(&ltime, timebuf);
+		for (tp = timebuf;; tp++) {
+			if (*tp == '\n') {
+				*tp = '\0';
+				break;
+			}
+			if (tp == '\0')
+				break;
+			if (tp > timebuf + sizeof(timebuf) - 1) {
+				*tp = '\0';
+				break;
+			}
+		}
+		len += fprintf(file, " %s", timebuf);
+		len += fprintf(file, " %lu", (unsigned long) lc.ttime);
+		len += fprintf(file, " %3d", lc.level);
+		if (lc.flags & SL_ERROR)
+			*fstr++ = 'E';
+		if (lc.flags & SL_FATAL)
+			*fstr++ = 'F';
+		if (lc.flags & SL_NOTIFY)
+			*fstr++ = 'N';
+		*fstr++ = '\0';
+		len += fprintf(file, " %s", fchar);
+		len += fprintf(file, " %d", lc.mid);
+		len += fprintf(file, " %d", lc.sid);
+		len += fprintf(file, " %s", sbuf);
+		len += fprintf(file, "\n");
+	}
+	return (len);
+}
+
 static void
 version(int argc, char **argv)
 {
@@ -616,7 +685,7 @@ version(int argc, char **argv)
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 Distributed under GPL Version 2, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
@@ -696,7 +765,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -1030,7 +1099,7 @@ strlog_open(int argc, char *argv[], struct trace_ids *tids, size_t count)
 		for (dev = logdevices; (*dev); dev++) {
 			if (debug)
 				fprintf(stderr, "%s: trying device %s\n", argv[0], (*dev));
-			if ((strlog_fd = open((*dev), O_RDWR)) == 0)
+			if ((strlog_fd = open((*dev), O_RDWR)) != -1)
 				break;
 		}
 		if ((*dev) == NULL) {
@@ -1272,6 +1341,8 @@ main(int argc, char *argv[])
 			fprintf(stderr, "entering poll loop\n");
 		switch (poll(pfd, 1, -1)) {
 		case -1:
+			if (output > 2)
+				fprintf(stderr, "got -1 from poll\n");
 			if (errno == EAGAIN || errno == EINTR || errno == ERESTART)
 				continue;
 			syslog(MY_FACILITY(LOG_ERR), "%s: %m", program);
@@ -1279,8 +1350,12 @@ main(int argc, char *argv[])
 			strlog_exit(1);
 			return STRLOG_FAILURE;
 		case 0:
+			if (output > 2)
+				fprintf(stderr, "got 0 from poll\n");
 			return STRLOG_NONE;
 		case 1:
+			if (output > 2)
+				fprintf(stderr, "got 1 from poll\n");
 			if (pfd[0].revents & (POLLIN | POLLPRI)) {
 				int ret, flags;
 				char cbuf[1024];
@@ -1288,10 +1363,14 @@ main(int argc, char *argv[])
 				struct strbuf ctl = { 1024, 1024, cbuf };
 				struct strbuf dat = { 2048, 2048, dbuf };
 				struct log_ctl *lc;
+#if 0
 				char sbuf[1024];
 				char fchar[] = "          ";
 				char *fstr = fchar;
+#endif
 
+				if (output > 2)
+					fprintf(stderr, "got POLLIN|POLLPRI from poll\n");
 				if ((ret = getmsg(strlog_fd, &ctl, &dat, &flags)) < 0) {
 					perror(argv[0]);
 					exit(1);
@@ -1302,18 +1381,30 @@ main(int argc, char *argv[])
 					exit(1);
 				}
 				lc = (struct log_ctl *) cbuf;
-				if (ctl.len < sizeof(*lc))
+				if (ctl.len < sizeof(*lc)) {
+					if (output > 2)
+						fprintf(stderr, "ctl.len = %d, skipping\n", ctl.len);
 					continue;
-				if (dat.len <= 0)
+				}
+				if (dat.len <= 0) {
+					if (output > 2)
+						fprintf(stderr, "dat.len = %d, skipping\n", dat.len);
 					continue;
-				if (nomead && outfile[0] != '\0') {
+				}
+				if (!nomead || outfile[0] == '\0') {
+#if 1
+					strace_pstrlog(stdout, &ctl, &dat);
+#else
 					time_t ltime = lc->ltime;
+					char tbuf[64];
 
 					snprintf_text(sbuf, sizeof(sbuf), dbuf, dat.len);
 					fprintf(stdout, "%d", lc->seq_no);
-					fprintf(stdout, " %s", ctime(&ltime));
-					fprintf(stdout, "%lu", (unsigned long) lc->ttime);
-					fprintf(stdout, "%3d", lc->level);
+					snprintf(tbuf, sizeof(tbuf), ctime(&ltime));
+					tbuf[strnlen(tbuf, sizeof(tbuf))-1] = '\0';
+					fprintf(stdout, " %s", tbuf);
+					fprintf(stdout, " %lu", (unsigned long) lc->ttime);
+					fprintf(stdout, " %3d", lc->level);
 					if (lc->flags & SL_ERROR)
 						*fstr++ = 'E';
 					if (lc->flags & SL_FATAL)
@@ -1321,31 +1412,40 @@ main(int argc, char *argv[])
 					if (lc->flags & SL_NOTIFY)
 						*fstr++ = 'N';
 					*fstr++ = '\0';
-					fprintf(stdout, "%s", fchar);
-					fprintf(stdout, "%d", lc->mid);
-					fprintf(stdout, "%d", lc->sid);
-					fprintf(stdout, "%s", sbuf);
+					fprintf(stdout, " %3s", fchar);
+					fprintf(stdout, " %d", lc->mid);
+					fprintf(stdout, " %d", lc->sid);
+					fprintf(stdout, " %s", sbuf);
 					fprintf(stdout, "\n");
+#endif
 					fflush(stdout);
 				}
 			}
 			if (pfd[0].revents & POLLNVAL) {
+				if (output > 2)
+					fprintf(stderr, "got POLLNVAL from poll\n");
 				syslog(MY_FACILITY(LOG_ERR), "%s: device invalid", program);
 				strlog_exit(1);
 				return STRLOG_FAILURE;
 			}
 			if (pfd[0].revents & POLLHUP) {
+				if (output > 2)
+					fprintf(stderr, "got POLLHUP from poll\n");
 				syslog(MY_FACILITY(LOG_ERR), "%s: device hangup", program);
 				strlog_exit(1);
 				return STRLOG_FAILURE;
 			}
 			if (pfd[0].revents & POLLERR) {
+				if (output > 2)
+					fprintf(stderr, "got POLLERR from poll\n");
 				syslog(MY_FACILITY(LOG_ERR), "%s: device error", program);
 				strlog_exit(1);
 				return STRLOG_FAILURE;
 			}
 			break;
 		default:
+			if (output > 2)
+				fprintf(stderr, "poll error\n");
 			syslog(MY_FACILITY(LOG_ERR), "%s: poll error", program);
 			strlog_exit(1);
 			return STRLOG_FAILURE;

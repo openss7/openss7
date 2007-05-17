@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dupmsg.9.man,v 0.9.2.20 2006/04/05 09:44:10 brian Exp $
+.\" @(#) $Id: dupmsg.9.man,v 0.9.2.21 2007/05/17 22:01:11 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:10 $ by $Author: brian $
+.\" Last Modified $Date: 2007/05/17 22:01:11 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dupmsg.9.man,v $
+.\" Revision 0.9.2.21  2007/05/17 22:01:11  brian
+.\" - corrections from strsctp performance testing
+.\"
 .\" Revision 0.9.2.20  2006/04/05 09:44:10  brian
 .\" - moved .so line and updated headers
 .\"
@@ -136,7 +139,10 @@ fails when the passed in message pointer
 .I mp
 is
 .BR NULL ;
-or an allocation failure occurs on a message block while duplicating.
+an allocation failure occurs on a message block while duplicating; or, the
+reference count of a data block in the message has reached the maximum of 255.
+See
+.BR dupb (9).
 .PP
 Normally, if
 .BR dupmsg ()
@@ -147,7 +153,12 @@ is not
 .BR esbbcall(9) 
 should be called with the
 .I priority
-associated with the message for which duplication failed.
+associated with the message for which duplication failed.  However, if the
+reference count,
+.IR db_ref ,
+of a data block in the message has reached the maximum of 255,
+.BR copymsg (9)
+might succeed and a buffer callback is not appropriate.
 .\"
 .\"
 .SH CONTEXT
@@ -191,6 +202,13 @@ See notices under
 .PP
 .BR dupmsg ()
 has no known bugs.
+.PP
+Versions of
+.B @PACKAGE_TITLE@
+previous to
+.B 0.9.2.3
+had the bug that the reference count on data blocks was be permitted to
+wrap to zero.
 .\"
 .\"
 .SH COMPATIBILITY
