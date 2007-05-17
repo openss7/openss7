@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2007/05/08 12:17:44 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2007/05/17 22:33:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/08 12:17:44 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:33:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.85  2007/05/17 22:33:00  brian
+ - perform nf_reset when available
+
  Revision 0.9.2.84  2007/05/08 12:17:44  brian
  - locking updates, changes from validation testing
 
@@ -130,10 +133,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2007/05/08 12:17:44 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2007/05/17 22:33:00 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2007/05/08 12:17:44 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2007/05/17 22:33:00 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -621,7 +624,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2007/05/08 12:17:44 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2007/05/17 22:33:00 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -1016,7 +1019,7 @@ typedef struct inet {
 	spinlock_t qlock;		/* queue lock */
 	queue_t *rwait;			/* RD queue waiting on lock */
 	queue_t *wwait;			/* WR queue waiting on lock */
-	int users;			/* lock holders */
+	long users;			/* lock holders */
 	uint rbid;			/* RD buffer call id */
 	uint wbid;			/* WR buffer call id */
 	ushort port;			/* port/protocol number */
@@ -1037,7 +1040,7 @@ typedef struct inet {
 	struct socket *sock;		/* socket pointer */
 } ss_t;
 
-#define PRIV(__q) (((__q)->q_ptr))
+#define PRIV(__q) ((ss_t *)((__q)->q_ptr))
 #define SOCK_PRIV(__sk) ((__sk)->sk_user_data)
 
 #define xti_default_debug		{ 0, }
@@ -1292,11 +1295,13 @@ ss_socket_get(struct socket *sock, ss_t *ss)
  *
  *  =========================================================================
  */
+#if 0
 STATIC int
-ss_trylockq(ss_t *ss, queue_t *q)
+ss_trylockq(queue_t *q)
 {
 	unsigned long flags;
 	int res;
+	ss_t *ss = PRIV(q);
 
 	spin_lock_irqsave(&ss->qlock, flags);
 	if (!(res = !ss->users++)) {
@@ -1310,9 +1315,10 @@ ss_trylockq(ss_t *ss, queue_t *q)
 	return (res);
 }
 STATIC void
-ss_unlockq(ss_t *ss, queue_t *q)
+ss_unlockq(queue_t *q)
 {
 	unsigned long flags;
+	ss_t *ss = PRIV(q);
 
 	spin_lock_irqsave(&ss->qlock, flags);
 	if (ss->rwait)
@@ -1322,6 +1328,18 @@ ss_unlockq(ss_t *ss, queue_t *q)
 	ss->users = 0;
 	spin_unlock_irqrestore(&ss->qlock, flags);
 }
+#else
+STATIC inline fastcall int
+ss_trylockq(queue_t *q)
+{
+	return (!test_and_set_bit(0, &PRIV(q)->users));
+}
+STATIC inline fastcall void
+ss_unlockq(queue_t *q)
+{
+	clear_bit(0, &PRIV(q)->users);
+}
+#endif
 
 /*
  *  =========================================================================
@@ -12804,6 +12822,7 @@ m_error(queue_t *q, mblk_t *msg, int error)
 	case EPIPE:
 	case ENETDOWN:
 	case EHOSTUNREACH:
+	case ECONNRESET:
 		hangup = 1;
 	}
 	if ((mp = ss_allocb(q, 2, BPRI_HI))) {
@@ -14468,7 +14487,7 @@ ss_w_data(queue_t *q, mblk_t *mp)
 	ss_t *ss = PRIV(q);
 	int rtn;
 
-	if (unlikely(!ss_trylockq(ss, q)))
+	if (unlikely(!ss_trylockq(q)))
 		goto eagain;
 	if (ss->p.info.SERV_type == T_CLTS)
 		goto notsupport;
@@ -14486,7 +14505,7 @@ ss_w_data(queue_t *q, mblk_t *mp)
 	msg.msg_controllen = 0;
 	msg.msg_flags = (ss->p.prot.type == SOCK_SEQPACKET) ? MSG_EOR : 0;
 	rtn = ss_sock_sendmsg(ss, mp, &msg);
-	ss_unlockq(ss, q);
+	ss_unlockq(q);
 	return (rtn);
       emsgsize:
 	ptrace(("%s: ERROR: message too large %ld > %ld\n", DRV_NAME, mlen, mmax));
@@ -14495,7 +14514,7 @@ ss_w_data(queue_t *q, mblk_t *mp)
 	ptrace(("%s: ERROR: would place i/f out of state\n", DRV_NAME));
 	goto error;
       discard:
-	ss_unlockq(ss, q);
+	ss_unlockq(q);
 	freemsg(mp);
 	ptrace(("%s: ERROR: ignore in idle state\n", DRV_NAME));
 	return (QR_ABSORBED);
@@ -14503,7 +14522,7 @@ ss_w_data(queue_t *q, mblk_t *mp)
 	ptrace(("%s: ERROR: primitive not supported for T_CLTS\n", DRV_NAME));
 	goto error;
       error:
-	ss_unlockq(ss, q);
+	ss_unlockq(q);
 	return m_error(q, mp, EPROTO);
       eagain:
 	return (-EAGAIN);
@@ -15191,7 +15210,7 @@ ss_w_proto(queue_t *q, mblk_t *mp)
 	ss_t *ss = PRIV(q);
 	t_uscalar_t oldstate;
 
-	if (unlikely(!ss_trylockq(ss, q)))
+	if (unlikely(!ss_trylockq(q)))
 		return (-EAGAIN);
 
 	oldstate = ss_get_state(ss);
@@ -15304,7 +15323,7 @@ ss_w_proto(queue_t *q, mblk_t *mp)
 			break;
 		}
 	}
-	ss_unlockq(ss, q);
+	ss_unlockq(q);
 	return (rtn);
 }
 
@@ -15363,7 +15382,7 @@ ss_r_pcrse(queue_t *q, mblk_t *mp)
 	ss_event_t *p = (typeof(p)) mp->b_rptr;
 	int oldstate, rtn;
 
-	if (unlikely(!ss_trylockq(ss, q)))
+	if (unlikely(!ss_trylockq(q)))
 		goto eagain;
 
 	oldstate = xchg(&ss->tcp_state, p->state);
@@ -15491,13 +15510,13 @@ ss_r_pcrse(queue_t *q, mblk_t *mp)
 		goto absorb;
 	}
       done:
-	ss_unlockq(ss, q);
+	ss_unlockq(q);
 	return (rtn);
       discard:
 	printd(("%s: ERROR: lingering event, ignoring\n", DRV_NAME));
 	goto absorb;
       absorb:
-	ss_unlockq(ss, q);
+	ss_unlockq(q);
 	freemsg(mp);
 	return (QR_ABSORBED);
       eagain:
@@ -15575,7 +15594,7 @@ ss_r_read(queue_t *q, mblk_t *mp)
 	int rtn;
 
 	mp->b_datap->db_type = M_CTL; /* in case it needs to be placed back */
-	if (unlikely(!ss_trylockq(ss, q)))
+	if (unlikely(!ss_trylockq(q)))
 		goto eagain;
 	if (!ss->sock)
 		goto discard;
@@ -15616,13 +15635,13 @@ ss_r_read(queue_t *q, mblk_t *mp)
 	printd(("%s: SWERR: unsupported socket type %d\n", DRV_NAME, ss->p.prot.type));
 	goto absorb;
       done:
-	ss_unlockq(ss, q);
+	ss_unlockq(q);
 	return (rtn);
       discard:
 	printd(("%s: ERROR: lingering event, ignoring\n", DRV_NAME));
 	goto absorb;
       absorb:
-	ss_unlockq(ss, q);
+	ss_unlockq(q);
 	freemsg(mp);
 	return (QR_ABSORBED);
       eagain:
@@ -15654,7 +15673,7 @@ ss_w_read(queue_t *q, mblk_t *mp)
 	ss_t *ss = PRIV(q);
 	ss_event_t *p = (typeof(p)) mp->b_rptr;
 
-	if (unlikely(!ss_trylockq(ss, q)))
+	if (unlikely(!ss_trylockq(q)))
 		goto eagain;
 
 	if (!ss->sock)
@@ -15692,7 +15711,7 @@ ss_w_read(queue_t *q, mblk_t *mp)
 	printd(("%s: ERROR: lingering event, ignoring\n", DRV_NAME));
 	goto absorb;
       absorb:
-	ss_unlockq(ss, q);
+	ss_unlockq(q);
 	freemsg(mp);
 	return (QR_ABSORBED);
       eagain:
@@ -15725,7 +15744,7 @@ ss_r_error(queue_t *q, mblk_t *mp)
 	ss_event_t *p = (typeof(p)) mp->b_rptr;
 	int rtn;
 
-	if (unlikely(!ss_trylockq(ss, q)))
+	if (unlikely(!ss_trylockq(q)))
 		goto eagain;
 
 	err = sock_error(p->sk);
@@ -15781,13 +15800,13 @@ ss_r_error(queue_t *q, mblk_t *mp)
 	printd(("%s: SWERR: unsupported socket type %d\n", DRV_NAME, ss->p.prot.type));
 	goto absorb;
       done:
-	ss_unlockq(ss, q);
+	ss_unlockq(q);
 	return (rtn);
       discard:
 	printd(("%s: ERROR: lingering event, ignoring\n", DRV_NAME));
 	goto absorb;
       absorb:
-	ss_unlockq(ss, q);
+	ss_unlockq(q);
 	freemsg(mp);
 	return (QR_ABSORBED);
       eagain:
@@ -15856,34 +15875,33 @@ ss_w_prim_srv(queue_t *q, mblk_t *mp)
 		return ss_w_data(q, mp);
 	if (likely(mp->b_datap->db_type == M_PROTO) &&
 	    likely(mp->b_wptr > mp->b_rptr + sizeof(t_scalar_t))) {
-		ss_t *ss = PRIV(q);
 		int rtn = -EAGAIN;
 
 		if (*((t_scalar_t *) mp->b_rptr) == T_UNITDATA_REQ) {
-			if (likely(ss_trylockq(ss, q))) {
+			if (likely(ss_trylockq(q))) {
 				rtn = t_unitdata_req(q, mp);
-				ss_unlockq(ss, q);
+				ss_unlockq(q);
 			}
 			return (rtn);
 		}
 		if (*((t_scalar_t *) mp->b_rptr) == T_DATA_REQ) {
-			if (likely(ss_trylockq(ss, q))) {
+			if (likely(ss_trylockq(q))) {
 				rtn = t_data_req(q, mp);
-				ss_unlockq(ss, q);
+				ss_unlockq(q);
 			}
 			return (rtn);
 		}
 		if (*((t_scalar_t *) mp->b_rptr) == T_OPTDATA_REQ) {
-			if (likely(ss_trylockq(ss, q))) {
+			if (likely(ss_trylockq(q))) {
 				rtn = t_optdata_req(q, mp);
-				ss_unlockq(ss, q);
+				ss_unlockq(q);
 			}
 			return (rtn);
 		}
 		if (*((t_scalar_t *) mp->b_rptr) == T_EXDATA_REQ) {
-			if (likely(ss_trylockq(ss, q))) {
+			if (likely(ss_trylockq(q))) {
 				rtn = t_exdata_req(q, mp);
-				ss_unlockq(ss, q);
+				ss_unlockq(q);
 			}
 			return (rtn);
 		}
@@ -15894,12 +15912,11 @@ ss_w_prim_srv(queue_t *q, mblk_t *mp)
 STATIC inline fastcall __hot_in int
 ss_r_data_lock(queue_t *q, mblk_t *mp)
 {
-	ss_t *ss = PRIV(q);
 	int rtn = -EAGAIN;
 
-	if (likely(ss_trylockq(ss, q))) {
+	if (likely(ss_trylockq(q))) {
 		rtn = ss_r_data(q, mp);
-		ss_unlockq(ss, q);
+		ss_unlockq(q);
 	}
 	return (rtn);
 }
@@ -15954,10 +15971,10 @@ ss_r_wakeup(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
 
-	if (likely(ss_trylockq(ss, q))) {
+	if (likely(ss_trylockq(q))) {
 		if (ss->sock != NULL)
 			ss_sock_recvmsg(q, NULL);
-		ss_unlockq(ss, q);
+		ss_unlockq(q);
 	}
 }
 #endif
