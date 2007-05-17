@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:58:44 $
+ @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:58:44 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:55:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_as.c,v $
+ Revision 0.9.2.6  2007/05/17 22:55:28  brian
+ - use mi_timer requeue to requeue mi timers
+
  Revision 0.9.2.5  2007/03/25 18:58:44  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:58:44 $"
+#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:28 $"
 
 static char const ident[] =
-    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:58:44 $";
+    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:28 $";
 
 /*
  *  This is an SUA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -175,7 +178,7 @@ static char const ident[] =
 /* ============================== */
 
 #define SUA_AS_DESCRIP		"SUA/SCTP AS SCCP STREAMS MULTIPLEXING DRIVER."
-#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:58:44 $"
+#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:28 $"
 #define SUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -17585,7 +17588,7 @@ tp_r_sig(queue_t *q, mblk_t *mp)
 	int rtn = 0;
 
 	if (!(tp = tp_acquire(q)))
-		return (-EDEADLK);
+		return (mi_timer_requeue(mp) ? -EDEADLK : 0);
 
 	if (likely(mi_timer_valid(mp))) {
 		switch (t->timer) {
@@ -17623,6 +17626,8 @@ tp_r_sig(queue_t *q, mblk_t *mp)
 			rtn = 0;
 			break;
 		}
+		if (rtn && !mi_timer_requeue(mp))
+			rtn = 0;
 	}
 
 	tp_release(tp);

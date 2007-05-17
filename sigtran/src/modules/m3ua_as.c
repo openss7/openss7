@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:59:07 $
+ @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:07 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:55:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.6  2007/05/17 22:55:37  brian
+ - use mi_timer requeue to requeue mi timers
+
  Revision 0.9.2.5  2007/03/25 18:59:07  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:59:07 $"
+#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:37 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:59:07 $";
+    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:37 $";
 
 /*
  *  This is the AS side of M3UA implemented as a pushable module that pushes over an SCTP NPI
@@ -151,7 +154,7 @@ static char const ident[] =
 /* ======================= */
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP MESSAGE TRANSFER PART (MTP) STREAMS MODULE."
-#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:59:07 $"
+#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:37 $"
 #define M3UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -3339,7 +3342,7 @@ mtp_r_sig(queue_t *q, mblk_t *mp)
 		return (0);
 
 	if (unlikely(!mtp_trylock(mtp, q)))
-		return (-EDEADLK);
+		return (mi_timer_requeue(mp) ? -EDEADLK : 0);
 
 	switch (*(int *) mp->b_rptr) {
 	case 1:
@@ -3368,6 +3371,8 @@ mtp_r_sig(queue_t *q, mblk_t *mp)
 		break;
 	}
 	mtp_unlock(mtp);
+	if (rtn && !mi_timer_requeue(mp))
+		rtn = 0;
 	return (rtn);
 }
 static int

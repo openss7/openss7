@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 18:58:36 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/05/17 22:55:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:58:36 $ by $Author: brian $
+ Last Modified $Date: 2007/05/17 22:55:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 0.9.2.13  2007/05/17 22:55:09  brian
+ - use mi_timer requeue to requeue mi timers
+
  Revision 0.9.2.12  2007/03/25 18:58:36  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -88,10 +91,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 18:58:36 $"
+#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/05/17 22:55:09 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 18:58:36 $";
+    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/05/17 22:55:09 $";
 
 /*
  *  This is an M2UA multiplexing driver.  It is necessary to use a multiplexing driver because most
@@ -221,7 +224,7 @@ static char const ident[] =
 /* ============================== */
 
 #define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 18:58:36 $"
+#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/05/17 22:55:09 $"
 #define M2UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -17644,7 +17647,7 @@ tp_r_sig(queue_t *q, mblk_t *mp)
 	int rtn = 0;
 
 	if (!(tp = tp_acquire(q)))
-		return (-EDEADLK);
+		return (mi_timer_requeue(mp) ? -EDEADLK : 0);
 
 	if (likely(mi_timer_valid(mp))) {
 		switch (t->timer) {
@@ -17682,6 +17685,8 @@ tp_r_sig(queue_t *q, mblk_t *mp)
 			rtn = 0;
 			break;
 		}
+		if (rtn && !mi_timer_requeue(mp))
+			rtn = 0;
 	}
 
 	tp_release(tp);
