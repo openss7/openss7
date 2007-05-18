@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dupb.9.man,v 0.9.2.20 2007/05/17 22:01:11 brian Exp $
+.\" @(#) $Id: dupb.9.man,v 0.9.2.21 2007/05/18 12:03:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/05/17 22:01:11 $ by $Author: brian $
+.\" Last Modified $Date: 2007/05/18 12:03:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dupb.9.man,v $
+.\" Revision 0.9.2.21  2007/05/18 12:03:34  brian
+.\" - doc updates and trace argument corrections
+.\"
 .\" Revision 0.9.2.20  2007/05/17 22:01:11  brian
 .\" - corrections from strsctp performance testing
 .\"
@@ -213,6 +216,9 @@ is source-level compatible with
 usldk
 .]
 .IR Solaris \(rg
+.[
+solspg
+.]
 and LiS
 .[
 LiS
@@ -231,6 +237,14 @@ is passed a
 .I bp
 pointer, it returns
 .BR NULL .
+.IP \(em
+.IR Solaris \(rg
+.[
+soldoc
+.]
+is the only other implementation that documents that the call fails when the
+.I db_ref
+member has reached the maximum of 255.
 .\".IP \(em
 .\"Symbol
 .\".BR lis_dupb ()
