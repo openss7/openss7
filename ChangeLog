@@ -1,3 +1,9 @@
+2007-05-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.norm: added strisdn, stacks and sigtran to test configuration
+	* configure.fast: added strisdn, stacks and sigtran to test configuration
+	* configure.test: added strisdn, stacks and sigtran to test configuration
+
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/compat.texi: more compatible distributions
