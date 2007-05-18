@@ -1,5 +1,13 @@
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+
+2007-05-18  Brian Bidulock  <bidulock@openss7.org>
+
 	* src/modules/sctp/sctp2.c: final mods
 	* src/modules/m2pa/m2pa_sl.c: final mods
 
