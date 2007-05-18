@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_timer.9.man,v 0.9.2.9 2007/03/04 19:13:02 brian Exp $
+.\" @(#) $Id: mi_timer.9.man,v 0.9.2.10 2007/05/18 21:17:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/04 19:13:02 $ by $Author: brian $
+.\" Last Modified $Date: 2007/05/18 21:17:57 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_timer.9.man,v $
+.\" Revision 0.9.2.10  2007/05/18 21:17:57  brian
+.\" - updated manual pages for check target
+.\"
 .\" Revision 0.9.2.9  2007/03/04 19:13:02  brian
 .\" - corrections
 .\"
@@ -127,7 +130,7 @@ queue onto which to place the
 .BR M_PCSIG (9)
 message when the timer expires.
 This pointer will be used as the argument to a
-.BR put (9)
+.BR putq (9)
 command when the timer expires.
 In the
 .IR MacOT \(rg
@@ -143,10 +146,10 @@ a pointer to the
 .BR M_PCSIG (9)
 message block that was allocated with
 .BR mi_timer_alloc (9).
+This message block can also contain additional user data.
 .TP
 .I msec
 the duration in milliseconds before timer expiry.
-This message block can also contain additional user data.
 The
 .IR Solaris \(rg
 form of
@@ -245,7 +248,7 @@ When the timer is set, see
 .BR mi_timer (),
 normal kernel timeout functions are called.  When the timeout occurs, the
 message block associated with the timer is placed on a specified queue with
-.BR put (9)
+.BR putq (9)
 as a
 .BR M_PCSIG (9)
 message type.
@@ -306,7 +309,7 @@ always succeeds.  If
 is passed a
 .B NULL
 or invalid message pointer, or a pointer that points to an invalid structure,
-the kernel may destablize and a kernel panic may ensue.
+the kernel may destabilize and a kernel panic may ensue.
 .\"
 .\"
 .SH EXAMPLE
@@ -510,11 +513,9 @@ The
 .B @PACKAGE_TITLE@
 implementation of
 .BR mi_timer ()
-uses
-.BR put (9)
-to place the message block on the target queue, thus invoking the target queue's put procedure.  (All
-.I STREAMS
-queues require put procedures, but not all require service procedures.)
+also uses
+.BR putq (9)
+to place the message block on the target queue, thus the queue requires a service procedure.
 .\"
 .\"
 .SH "SEE ALSO"
