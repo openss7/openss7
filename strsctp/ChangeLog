@@ -1,5 +1,9 @@
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/bugs.texi: document db_ref bug
+	* src/drivers/sctp2.c: compiler warnings
+	* src/test/test-sctp_n.c: send more messages in tests
+
 	* acinclude.m4: check for nf_reset
 	* src/test/test-sctp_n.c: use PPI 0, adjust timings
 	* src/test/test-sctp_t.c: adjust a few timings

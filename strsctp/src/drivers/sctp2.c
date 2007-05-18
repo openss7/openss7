@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2007/05/18 05:02:01 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2007/05/18 12:05:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 05:02:01 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 12:05:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.66  2007/05/18 12:05:25  brian
+ - wrap up of sctp testing
+
  Revision 0.9.2.65  2007/05/18 05:02:01  brian
  - final sctp performance rework
 
@@ -130,10 +133,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2007/05/18 05:02:01 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2007/05/18 12:05:25 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2007/05/18 05:02:01 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2007/05/18 12:05:25 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -151,7 +154,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2007/05/18 05:02:01 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2007/05/18 12:05:25 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -506,7 +509,7 @@ struct sctp_daddr {
 	size_t dups;			/* number of duplicates */
 	size_t cwnd;			/* congestion window */
 	size_t ssthresh;		/* slow start threshold */
-	uint timers;			/* deferred timer flags */
+	long timers;			/* deferred timer flags */
 	volatile toid_t timer_heartbeat;/* heartbeat timer (for acks) */
 	volatile toid_t timer_retrans;	/* retrans (RTO) timer */
 	volatile toid_t timer_idle;	/* idle timer */
@@ -834,7 +837,7 @@ struct sctp {
 	/* ------------------------------------------------------------------ */
 	struct inet_opt inet;		/* inet options */
 	uint cmsg_flags;		/* flags */
-	uint timers;			/* deferred timer flags */
+	long timers;			/* deferred timer flags */
 	volatile toid_t timer_init;	/* init timer */
 	volatile toid_t timer_cookie;	/* cookie timer */
 	volatile toid_t timer_shutdown;	/* shutdown timer */
@@ -2575,7 +2578,7 @@ sctp_dupb(struct sctp *sp, mblk_t *bp, size_t size)
 	mblk_t *mp = NULL;
 
 #if 1
-	if (bp->b_datap->db_ref >= 127)
+	if (bp->b_datap->db_ref >= 247)
 		goto trycopy;
 	if (!(mp = dupb(bp)) && sp) {
 #if 0
@@ -2588,7 +2591,7 @@ sctp_dupb(struct sctp *sp, mblk_t *bp, size_t size)
 			return (NULL);
 		}
 #endif
-		if (bp->b_datap->db_ref >= 127) {
+		if (bp->b_datap->db_ref >= 247) {
 		      trycopy:
 			/* do not do a deep copy, just the requested length */
 			if (size > 0 && (mp = sctp_allocb(sp, size, BPRI_MED))) {
