@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.5 2007/03/15 02:01:47 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.6 2007/05/18 12:05:25 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,19 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/15 02:01:47 $ by $Author: brian $
+@c Last Modified $Date: 2007/05/18 12:05:25 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 005.  2007-05-18T07:06:33+0000
+
+Found the most obnoxious of bugs.  When testing on loopback, more than 255 calls
+were being made to @manref{dupb(9)} causing the @var{db_ref} field of the data
+block to wrap to zero, causing an incorrect reference count.
+
+@emph{*fixed*} in @command{strsctp-0.9.2.7}
+
 @item 004.  2007-03-14T17:36:31-0600
 
 Another bug found, a double buffer free in sctp_recv_msg() when calling

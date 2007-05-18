@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/05/18 05:02:28 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/18 12:05:42 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 05:02:28 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 12:05:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n.c,v $
+ Revision 0.9.2.29  2007/05/18 12:05:42  brian
+ - wrap up of sctp testing
+
  Revision 0.9.2.28  2007/05/18 05:02:28  brian
  - final sctp performance rework
 
@@ -114,9 +117,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/05/18 05:02:28 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/18 12:05:42 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/05/18 05:02:28 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/18 12:05:42 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -7457,7 +7460,7 @@ struct test_stream test_8_2_list = { &preamble_8_2_list, &test_case_8_2_list, &p
 #define sref_case_9_1 "NPI Rev 2.0.0"
 #define desc_case_9_1 "\
 Delivery of ordered data under noise with acknowledgement."
-#if 0
+#if 1
 #define TEST_PACKETS 300
 #else
 #define TEST_PACKETS 30
@@ -7493,7 +7496,7 @@ test_case_9_1_conn(int child)
 		}
 		state++;
 	}
-	test_msleep(child, LONG_WAIT);
+	test_msleep(child, LONGER_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7543,7 +7546,7 @@ test_case_9_1_list(int child)
 		}
 		state++;
 	}
-	test_msleep(child, LONG_WAIT);
+	test_msleep(child, LONGER_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7578,7 +7581,7 @@ struct test_stream test_9_1_list = { &preamble_9_1_list, &test_case_9_1_list, &p
 #define sref_case_9_2 "NPI Rev 2.0.0"
 #define desc_case_9_2 "\
 Delivery of un-ordered data under noise."
-#if 0
+#if 1
 #define TEST_PACKETS 300
 #else
 #define TEST_PACKETS 30
@@ -7699,7 +7702,7 @@ struct test_stream test_9_2_list = { &preamble_9_2_list, &test_case_9_2_list, &p
 #define sref_case_9_3 "NPI Rev 2.0.0"
 #define desc_case_9_3 "\
 Delivery of ordered data in multiple streams under noise."
-#define TEST_PACKETS 10
+#define TEST_PACKETS 32
 #define TEST_STREAMS 32
 #define TEST_TOTAL (TEST_PACKETS*TEST_STREAMS)
 int
@@ -7862,7 +7865,7 @@ struct test_stream test_9_3_list = { &preamble_9_3_list, &test_case_9_3_list, &p
 #define sref_case_9_4 "NPI Rev 2.0.0"
 #define desc_case_9_4 "\
 Delivery of ordered and un-ordered data in multiple streams under noise."
-#define TEST_PACKETS 10
+#define TEST_PACKETS 32
 #define TEST_STREAMS 32
 #define TEST_TOTAL (TEST_PACKETS*TEST_STREAMS)
 int
