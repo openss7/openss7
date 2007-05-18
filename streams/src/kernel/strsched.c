@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.163 $) $Date: 2007/05/17 22:01:16 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.164 $) $Date: 2007/05/18 05:02:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/17 22:01:16 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 05:02:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.164  2007/05/18 05:02:53  brian
+ - final sctp performance rework
+
  Revision 0.9.2.163  2007/05/17 22:01:16  brian
  - corrections from strsctp performance testing
 
@@ -173,10 +176,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.163 $) $Date: 2007/05/17 22:01:16 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.164 $) $Date: 2007/05/18 05:02:53 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.163 $) $Date: 2007/05/17 22:01:16 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.164 $) $Date: 2007/05/18 05:02:53 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -892,6 +895,9 @@ qput(queue_t **qp)
 	assure(q != NULL);
 }
 
+#define DOUBLE_CHECK_MBLKS 1
+#undef DOUBLE_CHECK_MBLKS
+
 /* 
  *  -------------------------------------------------------------------------
  *
@@ -916,7 +922,7 @@ mdbblock_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 		md->msgblk.m_mblock.b_cont = NULL;
 		md->msgblk.m_mblock.b_rptr = base;
 		md->msgblk.m_mblock.b_wptr = base;
-#if 0
+#ifdef DOUBLE_CHECK_MBLKS
 		md->msgblk.m_mblock.b_datap = NULL;
 #else
 		md->msgblk.m_mblock.b_datap = &md->datablk.d_dblock;
@@ -934,7 +940,7 @@ mdbblock_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 		md->datablk.d_dblock.db_frtnp = NULL;
 		md->datablk.d_dblock.db_base = base;
 		md->datablk.d_dblock.db_lim = base + FASTBUF;
-#if 0
+#ifdef DOUBLE_CHECK_MBLKS
 		md->datablk.d_dblock.db_ref = 0;
 #else
 		md->datablk.d_dblock.db_ref = 1;
@@ -1011,11 +1017,13 @@ mdbblock_alloc_slow(uint priority, void *func)
 #endif
 		_trace();
 		if (likely((mp = kmem_cache_alloc(sdi->si_cache, slab_flags)) != NULL)) {
-#if 0
+#ifdef DOUBLE_CHECK_MBLKS
 			struct mdbblock *md = (struct mdbblock *) mp;
 #endif
 #if defined CONFIG_STREAMS_DEBUG
+#ifndef DOUBLE_CHECK_MBLKS
 			struct mdbblock *md = (struct mdbblock *) mp;
+#endif
 			struct strinfo *smi = &Strinfo[DYN_MSGBLOCK];
 			unsigned long flags;
 #endif
@@ -1042,7 +1050,7 @@ mdbblock_alloc_slow(uint priority, void *func)
 				sdi->si_hwl = atomic_read(&sdi->si_cnt);
 #endif
 
-#if 0
+#ifdef DOUBLE_CHECK_MBLKS
 			__ensure(md->msgblk.m_mblock.b_next == NULL,
 				 md->msgblk.m_mblock.b_next = NULL);
 			__ensure(md->msgblk.m_mblock.b_prev == NULL,
@@ -1142,7 +1150,7 @@ mdbblock_alloc(uint priority, void *func)
 #endif
 			}
 
-#if 0
+#ifdef DOUBLE_CHECK_MBLKS
 			__ensure(md->msgblk.m_mblock.b_next == NULL,
 				 md->msgblk.m_mblock.b_next = NULL);
 			__ensure(md->msgblk.m_mblock.b_prev == NULL,
@@ -1295,7 +1303,7 @@ mdbblock_free(mblk_t *mp)
 		mp->b_cont = NULL;
 		// mp->b_rptr = base;
 		// mp->b_wptr = base;
-#if 0
+#ifdef DOUBLE_CHECK_MBLKS
 		__assure(mp->b_datap == NULL);
 #else
 		mp->b_datap = db;
@@ -1308,7 +1316,7 @@ mdbblock_free(mblk_t *mp)
 		db->db_frtnp = NULL;
 		// db->db_base = base;
 		// db->db_lim = base + FASTBUF;
-#if 0
+#ifdef DOUBLE_CHECK_MBLKS
 		__assure(db->db_ref == 0);
 #else
 		db->db_ref = 1;

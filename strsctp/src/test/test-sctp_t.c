@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/15 10:23:34 $
+ @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/18 05:02:29 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:23:34 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 05:02:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_t.c,v $
+ Revision 0.9.2.29  2007/05/18 05:02:29  brian
+ - final sctp performance rework
+
  Revision 0.9.2.28  2007/03/15 10:23:34  brian
  - test case reporting and pushed release date one day
 
@@ -129,9 +132,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/15 10:23:34 $"
+#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/18 05:02:29 $"
 
-static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/15 10:23:34 $";
+static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/18 05:02:29 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -7237,6 +7240,8 @@ test_case_1_4_3_conn(int child)
 	}
 	if (test_case_1_4_3(child) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -23071,6 +23076,8 @@ test_case_3_2_conn(int child)
 		goto failure;
 	}
 	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	test_data = NULL;
 	last_sequence = 0;
 	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
@@ -25078,9 +25085,7 @@ test_case_4_2_1_conn(int child)
 			goto failure;
 		}
 		state++;
-		test_sleep(child, 2);
-		state++;
-		if (expect(child, LONG_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS) {
+		if (expect(child, LONGER_WAIT, __TEST_CONN_CON) != __RESULT_SUCCESS) {
 			failure_string = "Did not get T_CONN_CON.";
 			goto failure;
 		}
@@ -25113,9 +25118,7 @@ test_case_4_2_1_resp(int child)
 		state++;
 		break;
 	case T_INET_SCTP:
-		test_sleep(child, 2);
-		state++;
-		if (expect(child, LONGER_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
+		if (expect(child, LONGEST_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS) {
 			failure_string = "Did not get T_EXDATA_IND.";
 			goto failure;
 		}
@@ -25146,8 +25149,6 @@ test_case_4_2_1_list(int child)
 			failure_string = "Did not get T_CONN_IND.";
 			goto failure;
 		}
-		state++;
-		test_sleep(child, 2);
 		state++;
 		test_resfd = test_fd[1];
 		test_data = "Connection Response Data!\n";
