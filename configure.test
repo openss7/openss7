@@ -27,9 +27,9 @@ ${path}configure \
 	--without-STRCHAN \
 	--with-STRISO \
 	--with-NETPERF \
-	--without-STRISDN \
-	--without-STACKS \
-	--without-SIGTRAN \
+	--with-STRISDN \
+	--with-STACKS \
+	--with-SIGTRAN \
 	--without-STRVOIP \
 	--without-OSR61 \
 	--enable-k-inline \
