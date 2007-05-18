@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/05/18 12:02:06 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/05/18 12:15:35 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 12:02:06 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 12:15:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.25  2007/05/18 12:15:35  brian
+ - careful not to flush timers
+
  Revision 0.9.2.24  2007/05/18 12:02:06  brian
  - trace logging and service procedures for m2pa
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/05/18 12:02:06 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/05/18 12:15:35 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/05/18 12:02:06 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/05/18 12:15:35 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -107,7 +110,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/05/18 12:02:06 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/05/18 12:15:35 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -8161,8 +8164,8 @@ sl_free_priv(queue_t *q)
 		sl->prev = &sl->next;
 		ensure(atomic_read(&sl->refcnt) > 1, sl_get(sl));
 		sl_put(sl);
-		flushq(sl->oq, FLUSHALL);
-		flushq(sl->iq, FLUSHALL);
+		flushq(sl->oq, FLUSHDATA);
+		flushq(sl->iq, FLUSHDATA);
 		sl->oq->q_ptr = NULL;
 		sl->oq = NULL;
 		ensure(atomic_read(&sl->refcnt) > 1, sl_get(sl));

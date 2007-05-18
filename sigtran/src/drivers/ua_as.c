@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/05/17 22:55:33 $
+ @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/18 12:15:30 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/17 22:55:33 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 12:15:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua_as.c,v $
+ Revision 0.9.2.9  2007/05/18 12:15:30  brian
+ - careful not to flush timers
+
  Revision 0.9.2.8  2007/05/17 22:55:33  brian
  - use mi_timer requeue to requeue mi timers
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/05/17 22:55:33 $"
+#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/18 12:15:30 $"
 
 static char const ident[] =
-    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/05/17 22:55:33 $";
+    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/18 12:15:30 $";
 
 /*
  *  This is an UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -184,7 +187,7 @@ static char const ident[] =
 /* ============================== */
 
 #define UA_AS_DESCRIP	"UA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2007/05/17 22:55:33 $"
+#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2007/05/18 12:15:30 $"
 #define UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define UA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -14047,7 +14050,7 @@ lm_i_unlink(struct up *lm, queue_t *q, mblk_t *mp)
 	ua_unlink_free(tp);
 
 	/* Should probably flush queues in case a Stream head is reattached. */
-	flushq(RD(l->l_qtop), FLUSHALL);
+	flushq(RD(l->l_qtop), FLUSHDATA);
 	mi_copy_done(q, mp, 0);
 	return (0);
 }
@@ -14214,7 +14217,7 @@ lm_i_punlink(struct up *lm, queue_t *q, mblk_t *mp)
 	ua_unlink_free(tp);
 
 	/* Should probably flush queues in case a Stream head is reattached. */
-	flushq(RD(l->l_qtop), FLUSHALL);
+	flushq(RD(l->l_qtop), FLUSHDATA);
 	mi_copy_done(q, mp, 0);
 	return (0);
 }

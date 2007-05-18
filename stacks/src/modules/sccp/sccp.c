@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/05/18 00:00:53 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/05/18 12:15:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 00:00:53 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 12:15:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp.c,v $
+ Revision 0.9.2.21  2007/05/18 12:15:37  brian
+ - careful not to flush timers
+
  Revision 0.9.2.20  2007/05/18 00:00:53  brian
  - check for nf_reset
 
@@ -70,9 +73,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/05/18 00:00:53 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/05/18 12:15:37 $"
 
-static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/05/18 00:00:53 $";
+static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/05/18 12:15:37 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver which can have MTP
@@ -109,7 +112,7 @@ static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.20 
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/05/18 00:00:53 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/05/18 12:15:37 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -20245,11 +20248,11 @@ sccp_free_priv(struct sc *sc)
 			sccp_put(sc);
 		}
 		sc->oq->q_ptr = NULL;
-		flushq(sc->oq, FLUSHALL);
+		flushq(sc->oq, FLUSHDATA);
 		sc->oq = NULL;
 		sccp_put(sc);
 		sc->iq->q_ptr = NULL;
-		flushq(sc->iq, FLUSHALL);
+		flushq(sc->iq, FLUSHDATA);
 		sc->iq = NULL;
 	}
 	spin_unlock_irqrestore(&sc->lock, flags);
@@ -21094,8 +21097,8 @@ sccp_free_link(struct mt *mt)
 	{
 		/* flushing buffers */
 		ss7_unbufcall((str_t *) mt);
-		flushq(mt->iq, FLUSHALL);
-		flushq(mt->oq, FLUSHALL);
+		flushq(mt->iq, FLUSHDATA);
+		flushq(mt->oq, FLUSHDATA);
 		/* unlink from signalling relation */
 		if (mt->sr) {
 			struct sr *sr = mt->sr;
