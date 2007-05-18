@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/05/18 00:01:00 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/05/18 05:02:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 00:01:00 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 05:02:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.25  2007/05/18 05:02:43  brian
+ - final sctp performance rework
+
  Revision 0.9.2.24  2007/05/18 00:01:00  brian
  - check for nf_reset
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/05/18 00:01:00 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/05/18 05:02:43 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/05/18 00:01:00 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/05/18 05:02:43 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -88,7 +91,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/05/18 00:01:00 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/05/18 05:02:43 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2507,17 +2510,38 @@ sctp_allocb(struct sctp *sp, size_t size, int prior)
 	return (mp);
 }
 STATIC INLINE fastcall __unlikely mblk_t *
-sctp_dupb(struct sctp *sp, mblk_t *bp)
+sctp_dupb(struct sctp *sp, mblk_t *bp, size_t size)
 {
-	mblk_t *mp;
+	mblk_t *mp = NULL;
 
 #if 1
+	if (bp->b_datap->db_ref >= 127)
+		goto trycopy;
 	if (!(mp = dupb(bp)) && sp) {
 #if 0
 		if (bp->b_datap->db_ref == 255)
 			sctplogerr(sp, "%s() db_ref is 255", __FUNCTION__);
 #endif
-#if 1
+#if 0
+		if (bp->b_datap->db_ref == 255) {
+			// dump_stack();
+			return (NULL);
+		}
+#endif
+		if (bp->b_datap->db_ref >= 127) {
+		      trycopy:
+			/* do not do a deep copy, just the requested length */
+			if (size > 0 && (mp = sctp_allocb(sp, size, BPRI_MED))) {
+				mp->b_datap->db_type = bp->b_datap->db_type;
+				mp->b_band = bp->b_band;
+				mp->b_flag = bp->b_flag;
+				mp->b_csum = bp->b_csum;
+				bcopy(bp->b_rptr, mp->b_rptr, size);
+				mp->b_wptr = mp->b_rptr + size;
+				return (mp);
+			}
+		}
+#if 0
 		if (bp->b_datap->db_ref == 255) {
 			int size = bp->b_datap->db_lim - bp->b_datap->db_base;
 
@@ -2547,10 +2571,8 @@ sctp_dupb(struct sctp *sp, mblk_t *bp)
 		mp->b_band = bp->b_band;
 		mp->b_flag = bp->b_flag;
 		mp->b_csum = bp->b_csum;
-		mp->b_rptr = bp->b_rptr +
-		    (mp->b_datap->db_base - bp->b_datap->db_base);
-		mp->b_wptr = bp->b_wptr +
-		    (mp->b_datap->db_base - bp->b_datap->db_base);
+		mp->b_rptr = bp->b_rptr + (mp->b_datap->db_base - bp->b_datap->db_base);
+		mp->b_wptr = bp->b_wptr + (mp->b_datap->db_base - bp->b_datap->db_base);
 		return (mp);
 	}
 	if (sp)
@@ -2629,7 +2651,7 @@ STATIC streamscall void sctp_retrans_timeout(void *arg);
 STATIC streamscall void sctp_idle_timeout(void *arg);
 
 STATIC inline int
-sctp_timeout_pending(toid_t *tidp)
+sctp_timeout_pending(volatile toid_t *tidp)
 {
 	return (*tidp != (toid_t) 0);
 }
@@ -2639,10 +2661,6 @@ sp_timer(struct sctp *sp, volatile toid_t *tidp, void streamscall (*fcn)(void *)
 {
 	toid_t tid_new, tid_old;
 
-	if (unlikely(ticks < 2)) {
-		sctplogerr(sp, "%s() ticks is %d, setting to 2", __FUNCTION__, (int) ticks);
-		ticks = 2;
-	}
 	tid_new = qtimeout(sp->rq, fcn, sp, ticks);
 	if ((tid_old = xchg(tidp, tid_new)))
 		quntimeout(sp->rq, tid_old);
@@ -2669,60 +2687,100 @@ STATIC inline toid_t
 sp_timer_init(struct sctp *sp, clock_t ticks)
 {
 	sctplogte(sp, "starting timer T1-init, %d ticks", (int) ticks);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sp_timer(sp, &sp->timer_init, &sctp_init_timeout, ticks);
 }
 STATIC inline toid_t
 sp_timer_cookie(struct sctp *sp, clock_t ticks)
 {
 	sctplogte(sp, "starting timer T1-cookie, %d ticks", (int) ticks);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sp_timer(sp, &sp->timer_cookie, &sctp_cookie_timeout, ticks);
 }
 STATIC inline toid_t
 sp_timer_shutdown(struct sctp *sp, clock_t ticks)
 {
 	sctplogte(sp, "starting timer T4-shutdown, %d ticks", (int) ticks);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sp_timer(sp, &sp->timer_shutdown, &sctp_shutdown_timeout, ticks);
 }
 STATIC inline toid_t
 sp_timer_guard(struct sctp *sp, clock_t ticks)
 {
 	sctplogte(sp, "starting timer T5-guard, %d ticks", (int) ticks);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sp_timer(sp, &sp->timer_guard, &sctp_guard_timeout, ticks);
 }
 STATIC inline toid_t
 sp_timer_sack(struct sctp *sp, clock_t ticks)
 {
 	sctplogte(sp, "starting timer T2-sack, %d ticks", (int) ticks);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sp_timer(sp, &sp->timer_sack, &sctp_sack_timeout, ticks);
 }
 STATIC inline toid_t
 sp_timer_asconf(struct sctp *sp, clock_t ticks)
 {
 	sctplogte(sp, "starting timer T-asconf, %d ticks", (int) ticks);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sp_timer(sp, &sp->timer_asconf, &sctp_asconf_timeout, ticks);
 }
 STATIC inline toid_t
 sp_timer_life(struct sctp *sp, clock_t ticks)
 {
 	sctplogte(sp, "starting timer T-life, %d ticks", (int) ticks);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sp_timer(sp, &sp->timer_life, &sctp_life_timeout, ticks);
 }
 STATIC inline toid_t
 sd_timer_heartbeat(struct sctp_daddr *sd, clock_t ticks)
 {
 	sctplogte(sd->sp, "starting timer T-heartbeat, %d ticks, %p", (int) ticks, sd);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sd->sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sd_timer(sd, &sd->timer_heartbeat, &sctp_heartbeat_timeout, ticks);
 }
 STATIC inline toid_t
 sd_timer_retrans(struct sctp_daddr *sd, clock_t ticks)
 {
 	sctplogte(sd->sp, "starting timer T3-retrans, %d ticks, %p", (int) ticks, sd);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sd->sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sd_timer(sd, &sd->timer_retrans, &sctp_retrans_timeout, ticks);
 }
 STATIC inline toid_t
 sd_timer_idle(struct sctp_daddr *sd, clock_t ticks)
 {
 	sctplogte(sd->sp, "starting timer T-idle, %d ticks, %p", (int) ticks, sd);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sd->sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sd_timer(sd, &sd->timer_idle, &sctp_idle_timeout, ticks);
 }
 
@@ -2741,60 +2799,100 @@ STATIC inline toid_t
 sp_timer_cond_init(struct sctp *sp, clock_t ticks)
 {
 	sctplogte(sp, "conditional start timer T1-init, %d ticks", (int) ticks);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sp_timer_cond(sp, &sp->timer_init, &sctp_init_timeout, ticks);
 }
 STATIC inline toid_t
 sp_timer_cond_cookie(struct sctp *sp, clock_t ticks)
 {
 	sctplogte(sp, "conditional start timer T1-cookie, %d ticks", (int) ticks);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sp_timer_cond(sp, &sp->timer_cookie, &sctp_cookie_timeout, ticks);
 }
 STATIC inline toid_t
 sp_timer_cond_shutdown(struct sctp *sp, clock_t ticks)
 {
 	sctplogte(sp, "conditional start timer T4-shutdown, %d ticks", (int) ticks);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sp_timer_cond(sp, &sp->timer_shutdown, &sctp_shutdown_timeout, ticks);
 }
 STATIC inline toid_t
 sp_timer_cond_guard(struct sctp *sp, clock_t ticks)
 {
 	sctplogte(sp, "conditional start timer T5-guard, %d ticks", (int) ticks);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sp_timer_cond(sp, &sp->timer_guard, &sctp_guard_timeout, ticks);
 }
 STATIC inline toid_t
 sp_timer_cond_sack(struct sctp *sp, clock_t ticks)
 {
 	sctplogte(sp, "conditional start timer T2-sack, %d ticks", (int) ticks);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sp_timer_cond(sp, &sp->timer_sack, &sctp_sack_timeout, ticks);
 }
 STATIC inline toid_t
 sp_timer_cond_asconf(struct sctp *sp, clock_t ticks)
 {
 	sctplogte(sp, "conditional start timer T-asconf, %d ticks", (int) ticks);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sp_timer_cond(sp, &sp->timer_asconf, &sctp_asconf_timeout, ticks);
 }
 STATIC inline toid_t
 sp_timer_cond_life(struct sctp *sp, clock_t ticks)
 {
 	sctplogte(sp, "conditional start timer T-life, %d ticks", (int) ticks);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sp_timer_cond(sp, &sp->timer_life, &sctp_life_timeout, ticks);
 }
 STATIC inline toid_t
 sd_timer_cond_heartbeat(struct sctp_daddr *sd, clock_t ticks)
 {
 	sctplogte(sd->sp, "conditional start timer T-heartbeat, %d ticks, %p", (int) ticks, sd);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sd->sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sd_timer_cond(sd, &sd->timer_heartbeat, &sctp_heartbeat_timeout, ticks);
 }
 STATIC inline toid_t
 sd_timer_cond_retrans(struct sctp_daddr *sd, clock_t ticks)
 {
 	sctplogte(sd->sp, "conditional start timer T3-retrans, %d ticks, %p", (int) ticks, sd);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sd->sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sd_timer_cond(sd, &sd->timer_retrans, &sctp_retrans_timeout, ticks);
 }
 STATIC inline toid_t
 sd_timer_cond_idle(struct sctp_daddr *sd, clock_t ticks)
 {
 	sctplogte(sd->sp, "conditional start timer T-idle, %d ticks, %p", (int) ticks, sd);
+	if (unlikely(ticks < 1)) {
+		sctplogte(sd->sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		ticks = 1;
+	}
 	return sd_timer_cond(sd, &sd->timer_idle, &sctp_idle_timeout, ticks);
 }
 
@@ -9297,7 +9395,7 @@ sctp_deliver_data(struct sctp *sp)
 						continue;
 				}
 			}
-			if ((db = sctp_dupb(sp, mp))) {
+			if ((db = sctp_dupb(sp, mp, 0))) { /* must be a dup, not a copy */
 				pl_t pl;
 
 				pl = bufq_lock(&sp->oooq);
@@ -9481,7 +9579,7 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 			goto flowcontrol;
 		if (!(st = sctp_istrm_find(sp, sid, &err)))
 			goto enomem;
-		if (!(dp = sctp_dupb(sp, mp)))
+		if (!(dp = sctp_dupb(sp, mp, sizeof(*m) + dlen)))
 			goto enobufs;
 		data++;
 		/* pull copy to data only */
@@ -28979,6 +29077,9 @@ sctp_free(caddr_t data)
 }
 #endif
 
+#define COPY_INSTEAD_OF_ESBALLOC 1
+#undef COPY_INSTEAD_OF_ESBALLOC
+
 /**
  * sctp_v4_rcv: - receive message from IP layer
  * @skb: the message
@@ -29032,7 +29133,20 @@ sctp_v4_rcv(struct sk_buff *skb)
 		if (skb->len < PADC(clen))
 			goto bad_chunk_len;
 	}
-#if 1
+#ifdef COPY_INSTEAD_OF_ESBALLOC
+	/* There seems to be some problem with skbuff corruption, so we will
+	 * try this: allocate a full STREAMS message block and copy the data
+	 * into the STREAMS message block and free the SKBUFF. */
+	{
+		size_t plen = skb->len + (skb->data - skb->nh.raw);
+		
+		if (!(mp = allocb(plen, BPRI_MED)))
+			goto no_buffers;
+		bcopy(skb->nh.raw, mp->b_wptr, plen);
+		mp->b_wptr += plen;
+		mp->b_rptr += (skb->data - skb->nh.raw);
+	}
+#else
 #ifdef LIS
 	if (!(mp = esballoc(skb->nh.raw, skb->len + (skb->data - skb->nh.raw), BPRI_MED, &fr)))
 		goto no_buffers;
@@ -29058,19 +29172,6 @@ sctp_v4_rcv(struct sk_buff *skb)
 	mp->b_datap->db_lim = mp->b_wptr;
 	mp->b_datap->db_size = mp->b_datap->db_lim - mp->b_datap->db_base;
 #endif
-#else
-	/* There seems to be some problem with skbuff corruption, so we will
-	 * try this: allocate a full STREAMS message block and copy the data
-	 * into the STREAMS message block and free the SKBUFF. */
-	{
-		size_t plen = skb->len + (skb->data - skb->nh.raw);
-		
-		if (!(mp = allocb(plen, BPRI_MED)))
-			goto no_buffers;
-		bcopy(skb->nh.raw, mp->b_wptr, plen);
-		mp->b_wptr += plen;
-		mp->b_rptr += (skb->data - skb->nh.raw);
-	}
 #endif
 	/* we do the lookup before the checksum */
 	{
@@ -29098,7 +29199,7 @@ sctp_v4_rcv(struct sk_buff *skb)
 	/* all done */
 	printd(("%s: mp %p put to stream %p\n", __FUNCTION__, mp, sp));
 	sctp_put(sp);
-#if 0
+#ifdef COPY_INSTEAD_OF_ESBALLOC
 	kfree_skb(skb);
 #endif
 	return (0);
@@ -29125,7 +29226,7 @@ sctp_v4_rcv(struct sk_buff *skb)
 	/* RFC 2960 Section 8.4 */
 	sctp_rcv_ootb(mp);
 	freemsg(mp);
-#if 0
+#ifdef COPY_INSTEAD_OF_ESBALLOC
 	kfree_skb(skb);
 #endif
 	return (0);
@@ -29135,7 +29236,7 @@ sctp_v4_rcv(struct sk_buff *skb)
 	ptrace(("ERROR: Discarding message\n"));
 	/* free skb in sockets, free mp in streams */
 	freemsg(mp);
-#if 0
+#ifdef COPY_INSTEAD_OF_ESBALLOC
 	kfree_skb(skb);
 #endif
 	return (0);

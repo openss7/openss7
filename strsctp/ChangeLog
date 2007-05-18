@@ -1,3 +1,15 @@
+2007-05-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: check for nf_reset
+	* src/test/test-sctp_n.c: use PPI 0, adjust timings
+	* src/test/test-sctp_t.c: adjust a few timings
+	* tests/testsuite-sctp_n.at: test 7.2 passes now
+	* src/drivers/sctp2.c:
+	  - extensive rework of STREAMS bottom half queueing
+	  - extensive rework of STREAMS locking
+	  - extensive rework of timers
+	  - extensive rework of logging (now uses strlog)
+
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/kernel.at: correction to module test for new distros
