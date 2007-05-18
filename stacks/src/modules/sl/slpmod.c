@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:15 $
+ @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/05/18 00:01:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:15 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 00:01:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slpmod.c,v $
+ Revision 0.9.2.4  2007/05/18 00:01:17  brian
+ - check for nf_reset
+
  Revision 0.9.2.3  2007/03/25 19:00:15  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:15 $"
+#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/05/18 00:01:17 $"
 
-static char const ident[] = "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:15 $";
+static char const ident[] = "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/05/18 00:01:17 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -100,7 +103,7 @@ static char const ident[] = "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.3
 #include <ss7/sli_ioctl.h>
 
 #define SLPMOD_DESCRIP		"Signalling Link (SL) Pipe Module (SLPMOD) STREAMS MODULE."
-#define SLPMOD_REVISION		"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:15 $"
+#define SLPMOD_REVISION		"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/05/18 00:01:17 $"
 #define SLPMOD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SLPMOD_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SLPMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1487,7 +1490,7 @@ sl_sig(queue_t *q, mblk_t *mp)
 	int rtn;
 
 	if (!sl_trylock(q))
-		return (-EDEADLK);
+		return (mi_timer_requeue(mp) ? -EDEADLK : 0);
 
 	if (!mi_timer_valid(mp))
 		return (0);
@@ -1508,6 +1511,7 @@ sl_sig(queue_t *q, mblk_t *mp)
 	if (rtn != 0) {
 		loc->state = loc->oldstate;
 		rem->state = rem->oldstate;
+		rtn = mi_timer_requeue(mp) ? rtn : 0;
 	}
 	sl_unlock(q);
 	return (rtn);

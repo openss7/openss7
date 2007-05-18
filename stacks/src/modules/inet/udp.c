@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:59:23 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/18 00:00:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:23 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 00:00:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.6  2007/05/18 00:00:38  brian
+ - check for nf_reset
+
  Revision 0.9.2.5  2007/03/25 18:59:23  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -212,10 +215,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:59:23 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/18 00:00:38 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:59:23 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/18 00:00:38 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -237,6 +240,9 @@ static char const ident[] =
  *  these approaches is to determine the relative merits (performance and
  *  otherwise) of each approach.
  */
+
+#define _SVR4_SOURCE
+#define _LFS_SOURCE
 
 #include <sys/os7/compat.h>
 
@@ -294,7 +300,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:59:23 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/18 00:00:38 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -303,7 +309,7 @@ static char const ident[] =
 			UDP_REVISION	"\n" \
 			UDP_COPYRIGHT	"\n" \
 			UDP_DEVICE	"\n" \
-			UDP_CONTACT	"\n"
+			UDP_CONTACT
 #define UDP_SPLASH	UDP_DESCRIP	" - " \
 			UDP_REVISION
 
@@ -363,17 +369,17 @@ MODULE_ALIAS("/dev/udp2");
 #define DRV_BANNER	UDP_SPLASH
 #endif				/* MODULE */
 
-STATIC struct module_info udp_minfo = {
+STATIC struct module_info udp_rinfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = (1 << 18),		/* Hi water mark */
+	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
+	.mi_hiwat = SHEADHIWAT << 5,	/* Hi water mark */
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
-STATIC struct module_stat udp_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-STATIC struct module_stat udp_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat udp_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat udp_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 /* Upper multiplex is a T provider following the TPI. */
 
@@ -388,8 +394,17 @@ STATIC struct qinit udp_rinit = {
 	.qi_srvp = tp_rsrv,		/* Read service procedure */
 	.qi_qopen = udp_qopen,		/* Each open */
 	.qi_qclose = udp_qclose,	/* Last close */
-	.qi_minfo = &udp_minfo,		/* Module information */
+	.qi_minfo = &udp_rinfo,		/* Module information */
 	.qi_mstat = &udp_rstat,		/* Module statistics */
+};
+
+STATIC struct module_info udp_winfo = {
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = (1 << 16),		/* Max packet size accepted */
+	.mi_hiwat = SHEADHIWAT,		/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 streamscall int tp_wput(queue_t *, mblk_t *);
@@ -398,7 +413,7 @@ streamscall int tp_wsrv(queue_t *);
 STATIC struct qinit udp_winit = {
 	.qi_putp = tp_wput,		/* Write put procedure (message from above) */
 	.qi_srvp = tp_wsrv,		/* Write service procedure */
-	.qi_minfo = &udp_minfo,		/* Module information */
+	.qi_minfo = &udp_winfo,		/* Module information */
 	.qi_mstat = &udp_wstat,		/* Module statistics */
 };
 
@@ -591,13 +606,13 @@ STATIC struct tp_chash_bucket *tp_chash;
 STATIC size_t tp_chash_size = 0;
 STATIC size_t tp_chash_order = 0;
 
-STATIC INLINE streams_fastcall __hot_in int
+STATIC INLINE fastcall __hot_in int
 tp_bhashfn(unsigned char proto, unsigned short bport)
 {
 	return ((tp_bhash_size - 1) & (proto + bport));
 }
 
-STATIC INLINE streams_fastcall __unlikely int
+STATIC INLINE fastcall __unlikely int
 tp_chashfn(unsigned char proto, unsigned short sport, unsigned short dport)
 {
 	return ((tp_chash_size - 1) & (proto + sport + dport));
@@ -644,7 +659,7 @@ tp_put(struct tp *tp)
 		kmem_cache_free(udp_priv_cachep, tp);
 	}
 }
-static INLINE streams_fastcall __hot void
+static INLINE fastcall __hot void
 tp_release(struct tp **tpp)
 {
 	struct tp *tp;
@@ -667,7 +682,7 @@ tp_alloc(void)
 		// tp->type = 0;
 		// tp->id = 0;
 		// tp->state = 0;
-		// tp->flags = 0;
+		tp->flags = 0;
 	}
 	return (tp);
 }
@@ -680,7 +695,7 @@ tp_alloc(void)
  * different names to avoid conflict with generic definitions.  */
 
 //#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
-#if 1
+#if 0
 
 #define spin_lock_str2(__lkp, __flags) \
 	do { (void)__flags; spin_lock_bh(__lkp); } while (0)
@@ -720,6 +735,34 @@ tp_alloc(void)
 
 #endif
 
+#ifdef LIS
+#ifndef noinline
+#define noinline
+#endif
+#ifndef fastcall
+#define fastcall
+#endif
+#ifndef __unlikely
+#define __unlikely
+#endif
+#endif
+
+/*
+ *  Locking
+ */
+
+STATIC inline fastcall int
+tp_trylockq(queue_t *q)
+{
+	return (!test_and_set_bit(0, &STR_PRIV(q)->flags));
+}
+
+STATIC inline fastcall void
+tp_unlockq(queue_t *q)
+{
+	clear_bit(0, &STR_PRIV(q)->flags);
+}
+
 /*
  *  Buffer allocation
  */
@@ -750,7 +793,7 @@ tp_bufsrv(long data)
 	return;
 }
 
-STATIC noinline fastcall __unlikely void
+noinline fastcall __unlikely void
 tp_unbufcall(str_t * s)
 {
 	bufcall_id_t bid;
@@ -765,7 +808,7 @@ tp_unbufcall(str_t * s)
 	}
 }
 
-STATIC noinline fastcall __unlikely void
+noinline fastcall __unlikely void
 tp_bufcall(queue_t *q, size_t size, int prior)
 {
 	if (q) {
@@ -919,7 +962,7 @@ tp_state_name(t_scalar_t state)
 
 /* State functions */
 
-STATIC INLINE streams_fastcall __unlikely void
+STATIC INLINE fastcall __unlikely void
 tp_set_state(struct tp *tp, const t_uscalar_t state)
 {
 	_printd(("%s: %p: %s <- %s\n", DRV_NAME, tp, tp_state_name(state),
@@ -927,25 +970,25 @@ tp_set_state(struct tp *tp, const t_uscalar_t state)
 	tp->info.CURRENT_state = state;
 }
 
-STATIC INLINE streams_fastcall __hot t_uscalar_t
+STATIC INLINE fastcall __hot t_uscalar_t
 tp_get_state(const struct tp *tp)
 {
 	return (tp->info.CURRENT_state);
 }
 
-STATIC INLINE streams_fastcall __unlikely t_uscalar_t
+STATIC INLINE fastcall __unlikely t_uscalar_t
 tp_chk_state(const struct tp *tp, const t_uscalar_t mask)
 {
 	return (((1 << tp->info.CURRENT_state) & (mask)) != 0);
 }
 
-STATIC INLINE streams_fastcall __unlikely t_uscalar_t
+STATIC INLINE fastcall __unlikely t_uscalar_t
 tp_not_state(const struct tp *tp, const t_uscalar_t mask)
 {
 	return (((1 << tp->info.CURRENT_state) & (mask)) == 0);
 }
 
-STATIC INLINE streams_fastcall __unlikely long
+STATIC INLINE fastcall __unlikely long
 tp_get_statef(const struct tp *tp)
 {
 	return (1 << tp_get_state(tp));
@@ -1002,7 +1045,7 @@ STATIC struct tp_options tp_defaults = {
  * @t: private structure
  * @mp: message pointer for message
  */
-STATIC INLINE streams_fastcall __hot_in int
+STATIC INLINE fastcall __hot_in int
 t_opts_size_ud(const struct tp *t, const mblk_t *mp)
 {
 	if (likely(t->bnum == 1))
@@ -1020,7 +1063,7 @@ t_opts_size_ud(const struct tp *t, const mblk_t *mp)
  * @op: output pointer
  * @olen: output length
  */
-static INLINE streams_fastcall __hot_in int
+static INLINE fastcall __hot_in int
 t_opts_build_ud(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t olen)
 {
 	struct iphdr *iph;
@@ -1053,7 +1096,7 @@ t_opts_build_ud(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t 
  * @t: private structure
  * @mp: message pointer for message
  */
-STATIC INLINE streams_fastcall __hot_in int
+STATIC INLINE fastcall __hot_in int
 t_opts_size(const struct tp *t, const mblk_t *mp)
 {
 	int size = 0;
@@ -1078,7 +1121,7 @@ t_opts_size(const struct tp *t, const mblk_t *mp)
  * @op: output pointer
  * @olen: output length
  */
-static INLINE streams_fastcall __hot_in int
+static INLINE fastcall __hot_in int
 t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t olen)
 {
 	struct iphdr *iph;
@@ -1161,7 +1204,7 @@ t_opts_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
  * Note that mp->b_rptr points to the encapsulated IP header.  mp->b_datap->db_base points to the IP
  * header of the ICMP message itself.
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 t_errs_size(const struct tp *t, const mblk_t *mp)
 {
 	int size = 0;
@@ -1192,7 +1235,7 @@ t_errs_size(const struct tp *t, const mblk_t *mp)
  * Note that mp->b_rptr points to the encapsulated IP header.  mp->b_datap->db_base points to the IP
  * header of the ICMP message.
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t olen)
 {
 	struct iphdr *iph;
@@ -1275,7 +1318,7 @@ t_errs_build(const struct tp *t, mblk_t *mp, unsigned char *op, const size_t ole
  *
  * T_UNITDATA_REQ ignores unrecognized options or option levels.
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 t_opts_parse_ud(const unsigned char *ip, const size_t ilen, struct tp_options *op)
 {
 	const struct t_opthdr *ih;
@@ -1676,7 +1719,7 @@ t_opts_parse(const unsigned char *ip, const size_t ilen, struct tp_options *op)
  * Check the validity of the option structure, check for correct size of each supplied option given
  * the option management flag, and return the size required of the acknowledgement options field.
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -1803,7 +1846,7 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
  * @ip: input pointer
  * @ilen: input length
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 t_size_current_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -1930,7 +1973,7 @@ t_size_current_options(const struct tp *t, const unsigned char *ip, size_t ilen)
  * @ip: input pointer
  * @ilen: input length
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -2087,7 +2130,7 @@ t_size_check_options(const struct tp *t, const unsigned char *ip, size_t ilen)
  * @ip: input pointer
  * @ilen: input length
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -2291,7 +2334,7 @@ t_overall_result(uint * overall, const uint result)
  *
  * Perform the actions required of T_DEFAULT placing the output in the provided buffer.
  */
-STATIC noinline streams_fastcall t_scalar_t
+noinline fastcall t_scalar_t
 t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen,
 			unsigned char *op, size_t *olen)
 {
@@ -2359,7 +2402,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVBUF;
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = sysctl_rmem_default;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.xti.rcvbuf;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -2379,7 +2422,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDBUF;
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = sysctl_wmem_default;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.xti.sndbuf;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -2389,7 +2432,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDLOWAT;
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = sysctl_wmem_default >> 1;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.xti.sndlowat >> 1;
 				if (ih->name != T_ALLOPT)
 					continue;
 			}
@@ -2525,7 +2568,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
  *
  * Perform the actions required of T_CURRENT placing the output in the provided buffer.
  */
-STATIC noinline streams_fastcall t_scalar_t
+noinline fastcall t_scalar_t
 t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen,
 			unsigned char *op, size_t *olen)
 {
@@ -2776,7 +2819,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
  *
  * Perform the actions required of T_CHECK placing the output in the provided buffer.
  */
-STATIC noinline streams_fastcall t_scalar_t
+noinline fastcall t_scalar_t
 t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, unsigned char *op,
 		      size_t *olen)
 {
@@ -3182,7 +3225,7 @@ t_build_check_options(const struct tp *t, const unsigned char *ip, size_t ilen, 
  *
  * Perform the actions required of T_NEGOTIATE placing the output in the provided buffer.
  */
-STATIC noinline streams_fastcall t_scalar_t
+noinline fastcall t_scalar_t
 t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, unsigned char *op,
 			  size_t *olen)
 {
@@ -3301,7 +3344,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 				oh->status = T_SUCCESS;
 				bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 				if (ih->name == T_ALLOPT) {
-					*valp = sysctl_rmem_default;
+					*valp = t_defaults.xti.rcvbuf;
 				} else {
 					*valp = *((typeof(valp)) T_OPT_DATA(ih));
 					if (*valp > sysctl_rmem_max) {
@@ -3359,7 +3402,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
 				oh->status = T_SUCCESS;
 				bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 				if (ih->name == T_ALLOPT) {
-					*valp = sysctl_wmem_default;
+					*valp = t_defaults.xti.sndbuf;
 				} else {
 					*valp = *((typeof(valp)) T_OPT_DATA(ih));
 					if (*valp > sysctl_wmem_max) {
@@ -3647,7 +3690,7 @@ t_build_negotiate_options(struct tp *t, const unsigned char *ip, size_t ilen, un
  * Perform the actions required of T_DEFAULT, T_CURRENT, T_CHECK and T_NEGOTIARE, placing the output
  * in the provided buffer.
  */
-STATIC noinline streams_fastcall t_scalar_t
+noinline fastcall t_scalar_t
 t_build_options(struct tp *t, const unsigned char *ip, const size_t ilen, unsigned char *op,
 		size_t *olen, const t_scalar_t flag)
 {
@@ -3690,7 +3733,7 @@ STATIC void tp_v4_err(struct sk_buff *skb, u32 info);
  * and one (1) if the packet has or will be seen by another packet handler.  This return value is
  * used to determine whether to generate ICMP errors or not.
  */
-STATIC INLINE streams_fastcall __hot_in int
+STATIC INLINE fastcall __hot_in int
 tp_v4_rcv_next(struct sk_buff *skb)
 {
 	struct tp_prot_bucket *pb;
@@ -3713,7 +3756,7 @@ tp_v4_rcv_next(struct sk_buff *skb)
  * In the Linux packet error handler, if the packet is not for us, pass it to the next error
  * handler.  If there is no next error handler, simply return.
  */
-STATIC INLINE streams_fastcall __hot_in void
+STATIC INLINE fastcall __hot_in void
 tp_v4_err_next(struct sk_buff *skb, __u32 info)
 {
 	struct tp_prot_bucket *pb;
@@ -3726,6 +3769,10 @@ tp_v4_err_next(struct sk_buff *skb, __u32 info)
 	return;
 }
 
+#ifndef CONFIG_SMP
+#define net_protocol_lock() local_bh_disable()
+#define net_protocol_unlock() local_bh_enable()
+#else				/* CONFIG_SMP */
 #ifdef HAVE_INET_PROTO_LOCK_ADDR
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
 
@@ -3735,6 +3782,7 @@ STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO
 #define net_protocol_lock() br_write_lock_bh(BR_NETPROTO_LOCK)
 #define net_protocol_unlock() br_write_unlock_bh(BR_NETPROTO_LOCK)
 #endif
+#endif				/* CONFIG_SMP */
 #ifdef HAVE_INET_PROTOS_ADDR
 STATIC struct mynet_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
 #endif
@@ -3757,7 +3805,7 @@ STATIC struct mynet_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_P
  * unloading the module after protocol override would break things horribly.  Taking the reference
  * keeps the module from unloading (this works for OpenSS7 SCTP as well as lksctp).
  */
-STATIC INLINE streams_fastcall __unlikely struct tp_prot_bucket *
+STATIC INLINE fastcall __unlikely struct tp_prot_bucket *
 tp_init_nproto(unsigned char proto, unsigned int type)
 {
 	struct tp_prot_bucket *pb;
@@ -3866,7 +3914,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
  * owning kernel module.  If there was no protocol previously registered, this reduces to
  * inet_del_protocol().
  */
-STATIC INLINE streams_fastcall __unlikely void
+STATIC INLINE fastcall __unlikely void
 tp_term_nproto(unsigned char proto, unsigned int type)
 {
 	struct tp_prot_bucket *pb;
@@ -3937,7 +3985,7 @@ tp_term_nproto(unsigned char proto, unsigned int type)
  *  only one function.  We don't want that either.  If the message is not for us, we want to pass it
  *  to the next protocol module.
  */
-STATIC INLINE streams_fastcall __unlikely int
+STATIC INLINE fastcall __unlikely int
 tp_bind_prot(unsigned char proto, unsigned int type)
 {
 	struct tp_prot_bucket *pb;
@@ -3951,7 +3999,7 @@ tp_bind_prot(unsigned char proto, unsigned int type)
  *  tp_unbind_prot - unbind a protocol
  *  @proto:	    protocol number to unbind
  */
-STATIC INLINE streams_fastcall __unlikely void
+STATIC INLINE fastcall __unlikely void
 tp_unbind_prot(unsigned char proto, unsigned int type)
 {
 	tp_term_nproto(proto, type);
@@ -3982,7 +4030,7 @@ tp_unbind_prot(unsigned char proto, unsigned int type)
  * a conflict.
  *
  */
-STATIC INLINE streams_fastcall __unlikely int
+STATIC INLINE fastcall __unlikely int
 tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_length,
 	const t_uscalar_t CONIND_number)
 {
@@ -4063,6 +4111,8 @@ tp_bind(struct tp *tp, struct sockaddr_in *ADDR_buffer, const t_uscalar_t ADDR_l
 	tp->bhash = hp;
 	/* copy into private structure */
 	tp->CONIND_number = CONIND_number;
+	/* Note that if the number of connection indications is greater than zero, and this stream
+	   was T_CLTS, upgrade to T_COTS and change CONIND_number to zero. */
 	tp->pnum = 1;
 
 	tp->protoids[0] = proto;
@@ -4117,21 +4167,21 @@ tp_ip_queue_xmit(struct sk_buff *skb)
 #endif				/* defined HAVE_KFUNC_DST_OUTPUT */
 
 #if 1
-STATIC noinline streams_fastcall void
+noinline fastcall __hot void
 tp_skb_destructor_slow(struct tp *tp, struct sk_buff *skb)
 {
 	unsigned long flags;
 
-	spin_lock_str2(&tp->qlock, flags);
+	spin_lock_irqsave(&tp->qlock, flags);
 	// ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
 	tp->sndmem -= skb->truesize;
 	if (unlikely((tp->sndmem < tp->options.xti.sndlowat || tp->sndmem == 0))) {
 		tp->sndblk = 0;	/* no longer blocked */
-		spin_unlock_str2(&tp->qlock, flags);
+		spin_unlock_irqrestore(&tp->qlock, flags);
 		if (tp->iq != NULL && tp->iq->q_first != NULL)
 			qenable(tp->iq);
 	} else {
-		spin_unlock_str2(&tp->qlock, flags);
+		spin_unlock_irqrestore(&tp->qlock, flags);
 	}
 #if 0				/* destructor is nulled by skb_orphan */
 	skb_shinfo(skb)->frags[0].page = NULL;
@@ -4165,10 +4215,10 @@ tp_skb_destructor(struct sk_buff *skb)
 	dassert(tp != NULL);
 	if (likely(tp->sndblk == 0)) {
 		/* technically we could have multiple processors freeing sk_buffs at the same time */
-		spin_lock_str2(&tp->qlock, flags);
+		spin_lock_irqsave(&tp->qlock, flags);
 		// ensure(tp->sndmem >= skb->truesize, tp->sndmem = skb->truesize);
 		tp->sndmem -= skb->truesize;
-		spin_unlock_str2(&tp->qlock, flags);
+		spin_unlock_irqrestore(&tp->qlock, flags);
 #if 0				/* destructor is nulled by skb_orphan */
 		skb_shinfo(skb)->frags[0].page = NULL;
 		skb->destructor = NULL;
@@ -4197,7 +4247,7 @@ tp_skb_destructor(struct sk_buff *skb)
  * slow.  This is the only way that LiS can do things (because it has unworkable message block
  * allocation).
  */
-STATIC noinline streams_fastcall __unlikely struct sk_buff *
+noinline fastcall __unlikely struct sk_buff *
 tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
@@ -4228,9 +4278,9 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 		assert(skb_shinfo(skb)->nr_frags == 0);
 		skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
 		skb->destructor = tp_skb_destructor;
-		spin_lock_str2(&tp->qlock, flags);
+		spin_lock_irqsave(&tp->qlock, flags);
 		tp->sndmem += skb->truesize;
-		spin_unlock_str2(&tp->qlock, flags);
+		spin_unlock_irqrestore(&tp->qlock, flags);
 #if 0
 		/* keep track of high water mark */
 		if (udp_wstat.ms_acnt < tp->sndmem)
@@ -4293,7 +4343,7 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
  * through the data to generate the checksum.
  */
 #if defined LFS
-STATIC noinline streams_fastcall __unlikely struct sk_buff *
+noinline fastcall __unlikely struct sk_buff *
 tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
@@ -4387,9 +4437,9 @@ tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	assert(skb_shinfo(skb)->nr_frags == 0);
 	skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
 	skb->destructor = tp_skb_destructor;
-	spin_lock_str2(&tp->qlock, flags);
+	spin_lock_irqsave(&tp->qlock, flags);
 	tp->sndmem += skb->truesize;
-	spin_unlock_str2(&tp->qlock, flags);
+	spin_unlock_irqrestore(&tp->qlock, flags);
 #endif
 
 #if 0
@@ -4434,7 +4484,7 @@ tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }
 
-STATIC INLINE streams_fastcall __hot_out struct sk_buff *
+STATIC INLINE fastcall __hot_out struct sk_buff *
 tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
@@ -4455,9 +4505,9 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	assert(skb_shinfo(skb)->nr_frags == 0);
 	skb_shinfo(skb)->frags[0].page = (struct page *) tp_get(tp);
 	skb->destructor = tp_skb_destructor;
-	spin_lock_str2(&tp->qlock, flags);
+	spin_lock_irqsave(&tp->qlock, flags);
 	tp->sndmem += skb->truesize;
-	spin_unlock_str2(&tp->qlock, flags);
+	spin_unlock_irqrestore(&tp->qlock, flags);
 #endif
 	freemsg(mp);
 	return (skb);
@@ -4467,14 +4517,14 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }
 #else				/* !defined LFS */
-STATIC INLINE streams_fastcall __hot_out struct sk_buff *
+STATIC INLINE fastcall __hot_out struct sk_buff *
 tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }
 #endif				/* !defined LFS */
 
-STATIC noinline streams_fastcall int
+noinline fastcall int
 tp_route_output_slow(struct tp *tp, const struct tp_options *opt, struct rtable **rtp)
 {
 	int err;
@@ -4488,7 +4538,7 @@ tp_route_output_slow(struct tp *tp, const struct tp_options *opt, struct rtable 
 	return (err);
 }
 
-STATIC INLINE streams_fastcall __hot_out int
+STATIC INLINE fastcall __hot_out int
 tp_route_output(struct tp *tp, const struct tp_options *opt, struct rtable **rtp)
 {
 	register struct rtable *rt;
@@ -4505,12 +4555,14 @@ tp_route_output(struct tp *tp, const struct tp_options *opt, struct rtable **rtp
 /**
  * tp_senddata - process a unit data request
  * @tp: Stream private structure
+ * @db: data block to free upon success (or NULL)
  * @dport: destination port
  * @opt: options to use
  * @mp: message payload
  */
-STATIC INLINE streams_fastcall __hot_out int
-tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *opt, mblk_t *mp)
+STATIC INLINE fastcall __hot_out int
+tp_senddata(struct tp *tp, mblk_t *db, const unsigned short dport, const struct tp_options *opt,
+	    mblk_t *mp)
 {
 	struct rtable *rt;
 	int err;
@@ -4525,7 +4577,7 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 	if (unlikely(tp->sndmem > tp->options.xti.sndbuf))
 		goto blocked;
 
-	assert(opt != NULL);
+	dassert(opt != NULL);
 	if (likely((err = tp_route_output(tp, opt, &rt)) == 0)) {
 		struct sk_buff *skb;
 		struct net_device *dev = rt->u.dst.dev;
@@ -4598,6 +4650,8 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 #else
 			tp_ip_queue_xmit(skb);
 #endif
+			if (db != NULL)
+				freeb(db);
 			return (QR_ABSORBED);
 		}
 		_rare();
@@ -4606,14 +4660,14 @@ tp_senddata(struct tp *tp, const unsigned short dport, const struct tp_options *
 	_rare();
 	return (err);
       blocked:
-	udp_wstat.ms_ccnt++;
+	udp_wstat.ms_ocnt++;
 	tp->sndblk = 1;
       ebusy:
 	return (-EBUSY);
 }
 
 #if 0
-STATIC INLINE streams_fastcall int
+STATIC INLINE fastcall int
 np_datack(queue_t *q)
 {
 	/* not supported */
@@ -4626,7 +4680,7 @@ np_datack(queue_t *q)
  * @tp: private structure
  * @proto: protocol to which to connect
  */
-STATIC streams_fastcall int
+STATIC fastcall int
 tp_conn_check(struct tp *tp, const unsigned char proto)
 {
 	unsigned short sport = tp->sport;
@@ -4638,7 +4692,7 @@ tp_conn_check(struct tp *tp, const unsigned char proto)
 	hp1 = &tp_chash[tp_chashfn(proto, dport, sport)];
 	hp2 = &tp_chash[tp_chashfn(proto, 0, 0)];
 
-	write_lock_str2(&hp1->lock, flags);
+	write_lock_irqsave(&hp1->lock, flags);
 	if (hp1 != hp2)
 		write_lock(&hp2->lock);
 
@@ -4674,7 +4728,7 @@ tp_conn_check(struct tp *tp, const unsigned char proto)
 	if (conflict != NULL) {
 		if (hp1 != hp2)
 			write_unlock(&hp2->lock);
-		write_unlock_str2(&hp1->lock, flags);
+		write_unlock_irqrestore(&hp1->lock, flags);
 		/* how do we say already connected? (-EISCONN) */
 		return (TADDRBUSY);
 	}
@@ -4686,7 +4740,7 @@ tp_conn_check(struct tp *tp, const unsigned char proto)
 	tp->chash = hp1;
 	if (hp1 != hp2)
 		write_unlock(&hp2->lock);
-	write_unlock_str2(&hp1->lock, flags);
+	write_unlock_irqrestore(&hp1->lock, flags);
 	return (0);
 }
 
@@ -4706,7 +4760,7 @@ tp_conn_check(struct tp *tp, const unsigned char proto)
  * is an error in the connection request.  When any primitive containing options fails and returns
  * and error, it is the caller's responsibility to set again the values of the options.
  */
-STATIC streams_fastcall int
+STATIC fastcall int
 tp_connect(struct tp *tp, const struct sockaddr_in *DEST_buffer, const socklen_t DEST_length,
 	   struct tp_options *OPT_buffer, const t_uscalar_t CONN_flags)
 {
@@ -4936,7 +4990,7 @@ np_reset_loc(struct np *np, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *
 {
 	fixme(("Write this function.\n"));
 	/* should send ICMP, but don't discard it because send function will not abosorb it. */
-	return (QR_DONE);
+	return (0);
 }
 
 /**
@@ -5008,7 +5062,7 @@ tp_unbind(struct tp *tp)
  * @CONN_flags: connection flags
  * @dp: user connect data
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t RES_length,
 	   struct tp_options *OPT_buffer, mblk_t *SEQ_number, struct tp *ACCEPTOR_id,
 	   const t_uscalar_t CONN_flags, mblk_t *dp)
@@ -5108,7 +5162,7 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 		if ((t_scalar_t) (signed char) OPT_buffer->ip.ttl < 1)
 			goto error;
 #if 0
-		if ((t_scalar_t) (signed char)OPT_buffer->ip.ttl > 127)
+		if ((t_scalar_t) (signed char) OPT_buffer->ip.ttl > 127)
 			goto error;
 #endif
 	} else {
@@ -5255,7 +5309,8 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 		goto recover;
 
 	if (dp != NULL)
-		if (unlikely((err = tp_senddata(tp, tp->dport, OPT_buffer, dp)) != QR_ABSORBED))
+		if (unlikely
+		    ((err = tp_senddata(tp, NULL, tp->dport, OPT_buffer, dp)) != QR_ABSORBED))
 			goto recover;
 	if (SEQ_number != NULL) {
 		bufq_unlink(&tp->conq, SEQ_number);
@@ -5306,7 +5361,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
 	unsigned long flags;
 
 	if (dp != NULL) {
-		err = tp_senddata(tp, tp->dport, &tp->options, dp);
+		err = tp_senddata(tp, NULL, tp->dport, &tp->options, dp);
 		if (unlikely(err != QR_ABSORBED))
 			goto error;
 	}
@@ -5315,7 +5370,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
 		freemsg(SEQ_number);
 	}
 	if ((hp = tp->chash) != NULL) {
-		write_lock_str2(&hp->lock, flags);
+		write_lock_irqsave(&hp->lock, flags);
 		if ((*tp->cprev = tp->cnext))
 			tp->cnext->cprev = tp->cprev;
 		tp->cnext = NULL;
@@ -5325,7 +5380,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
 		tp->dnum = tp->snum = 0;
 		tp_set_state(tp, TS_IDLE);
 		tp_put(tp);
-		write_unlock_str2(&hp->lock, flags);
+		write_unlock_irqrestore(&hp->lock, flags);
 	}
 	return (QR_ABSORBED);
       error:
@@ -5381,7 +5436,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
  * @how: FLUSHBAND or FLUSHALL
  * @band: band to flush if how is FLUSHBAND
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 m_flush(queue_t *q, const int how, const int band)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5393,7 +5448,7 @@ m_flush(queue_t *q, const int how, const int band)
 	*mp->b_wptr++ = how;
 	*mp->b_wptr++ = band;
 	putnext(tp->oq, mp);
-	return (QR_DONE);
+	return (0);
       enobufs:
 	return (-ENOBUFS);
 }
@@ -5401,10 +5456,11 @@ m_flush(queue_t *q, const int how, const int band)
 /**
  * m_error: deliver an M_ERROR message upstream
  * @q: a queue in the queue pair (write queue)
+ * @msg: message to free upon success
  * @error: the error to deliver
  */
-STATIC noinline streams_fastcall __unlikely int
-m_error(queue_t *q, const int error)
+noinline fastcall __unlikely int
+m_error(queue_t *q, mblk_t *msg, const int error)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -5417,9 +5473,10 @@ m_error(queue_t *q, const int error)
 		tp_disconnect(tp, NULL, NULL, N_REASON_UNDEFINED, NULL);
 		/* make sure the stream is unbound */
 		tp_unbind(tp);
+		freemsg(msg);
 		_printd(("%s: %p: <- M_ERROR %d\n", DRV_NAME, tp, error));
 		qreply(q, mp);
-		return (QR_DONE);
+		return (QR_ABSORBED);
 	}
 	return (-ENOBUFS);
 }
@@ -5427,9 +5484,10 @@ m_error(queue_t *q, const int error)
 /**
  * m_hangup: deliver an M_HANGUP message upstream
  * @q: a queue in the queue pair (write queue)
+ * @msg: message to free upon success
  */
-STATIC noinline streams_fastcall __unlikely int
-m_hangup(queue_t *q)
+noinline fastcall __unlikely int
+m_hangup(queue_t *q, mblk_t *msg)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -5440,9 +5498,10 @@ m_hangup(queue_t *q)
 		tp_disconnect(tp, NULL, NULL, N_REASON_UNDEFINED, NULL);
 		/* make sure the stream is unbound */
 		tp_unbind(tp);
+		freemsg(msg);
 		_printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, tp));
 		qreply(q, mp);
-		return (QR_DONE);
+		return (QR_ABSORBED);
 
 	}
 	return (-ENOBUFS);
@@ -5451,17 +5510,19 @@ m_hangup(queue_t *q)
 /**
  * te_error_reply - reply to a message with an M_ERROR message
  * @q: active queue in queue pair (write queue)
+ * @msg: message to free upon success
  * @error: error number
  */
-STATIC noinline streams_fastcall __unlikely int
-te_error_reply(queue_t *q, const long error)
+noinline fastcall __unlikely int
+te_error_reply(queue_t *q, mblk_t *msg, const long error)
 {
 	switch (error) {
 	case 0:
 	case 1:
 	case 2:
 		__seldom();
-		return (error);
+		freemsg(msg);
+		return (QR_ABSORBED);
 	case -EBUSY:
 	case -EAGAIN:
 	case -ENOMEM:
@@ -5470,18 +5531,19 @@ te_error_reply(queue_t *q, const long error)
 	case -EPIPE:
 	case -ENETDOWN:
 	case -EHOSTUNREACH:
-		return m_hangup(q);
+		return m_hangup(q, msg);
 	default:
-		return m_error(q, EPROTO);
+		return m_error(q, msg, EPROTO);
 	}
 }
 
 /**
  * te_info_ack - generate a T_INFO_ACK and pass it upstream
  * @q: active queue in queue pair (write queue)
+ * @msg: message to free upon success
  */
-STATIC noinline streams_fastcall int
-te_info_ack(queue_t *q)
+noinline fastcall int
+te_info_ack(queue_t *q, mblk_t *msg)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -5505,9 +5567,10 @@ te_info_ack(queue_t *q)
 	p->CURRENT_state = tp->info.CURRENT_state;
 	p->PROVIDER_flag = tp->info.PROVIDER_flag;
 	mp->b_wptr += sizeof(*p);
+	freemsg(msg);
 	_printd(("%s: %p: <- T_INFO_ACK\n", DRV_NAME, tp));
 	qreply(q, mp);
-	return (QR_DONE);
+	return (QR_ABSORBED);
 
       enobufs:
 	return (-ENOBUFS);
@@ -5516,14 +5579,15 @@ te_info_ack(queue_t *q)
 /**
  * te_bind_ack - TE_BIND_ACK event
  * @q: active queue in queue pair (write queue)
+ * @msg: message to free upon success
  * @ADDR_buffer: addresses to bind
  * @ADDR_length: length of addresses
  * @CONIND_number: maximum number of connection indications
  *
  * Generate an T_BIND_ACK and pass it upstream.
  */
-STATIC noinline streams_fastcall int
-te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_length,
+noinline fastcall int
+te_bind_ack(queue_t *q, mblk_t *msg, struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_length,
 	    const t_uscalar_t CONIND_number)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5559,9 +5623,10 @@ te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_le
 	}
 	/* all ready, complete the bind */
 	tp_set_state(tp, TS_IDLE);
+	freemsg(msg);
 	_printd(("%s: %p: <- T_BIND_ACK\n", DRV_NAME, tp));
 	qreply(q, mp);
-	return (QR_DONE);
+	return (QR_ABSORBED);
 
       error:
 	return (err);
@@ -5570,6 +5635,7 @@ te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_le
 /**
  * te_error_ack: deliver a T_ERROR_ACK upstream with state changes
  * @q: active queue (write queue)
+ * @msg: message to free upon success
  * @prim: primitive in error
  * @err: TLI or UNIX error number
  *
@@ -5585,8 +5651,8 @@ te_bind_ack(queue_t *q, struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_le
  * issuing the T_ERROR_ACK according to the Sequence of Primities of the Transport Provider Interface
  * specification, Revision 2.0.0.
  */
-STATIC noinline streams_fastcall __unlikely int
-te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
+noinline fastcall __unlikely int
+te_error_ack(queue_t *q, mblk_t *msg, const t_scalar_t ERROR_prim, t_scalar_t error)
 {
 	struct tp *tp = TP_PRIV(q);
 	struct T_error_ack *p;
@@ -5605,6 +5671,8 @@ te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
 	case -ENOBUFS:
 		goto error;
 	case 0:
+		freemsg(msg);
+		err = QR_ABSORBED;
 		goto error;
 	case -EADDRINUSE:
 		error = TADDRBUSY;
@@ -5633,9 +5701,10 @@ te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
 	p->TLI_error = (error < 0) ? TSYSERR : error;
 	p->UNIX_error = (error < 0) ? -error : 0;
 	mp->b_wptr += sizeof(*p);
+	freemsg(msg);
 	_printd(("%s: %p: <- T_ERROR_ACK\n", DRV_NAME, tp));
 	qreply(q, mp);
-	return (0);
+	return (QR_ABSORBED);
       error:
 	return (err);
 }
@@ -5643,6 +5712,7 @@ te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
 /**
  * te_ok_ack: deliver a T_OK_ACK upstream with state changes
  * @q: a queue in the queue pair
+ * @db: data block to free upon success (or NULL)
  * @CORRECT_prim: correct primitive
  * @ADDR_buffer: destination or responding address
  * @ADDR_length: length of destination or responding addresses
@@ -5652,16 +5722,17 @@ te_error_ack(queue_t *q, const t_scalar_t ERROR_prim, t_scalar_t error)
  * @flags: mangement flags, connection flags, disconnect reason, etc.
  * @dp: user data
  */
-STATIC streams_fastcall __hot_put int
-te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *ADDR_buffer,
-	  const socklen_t ADDR_length, void *OPT_buffer, mblk_t *SEQ_number, struct tp *ACCEPTOR_id,
-	  const t_uscalar_t flags, mblk_t *dp)
+STATIC fastcall __hot_put int
+te_ok_ack(queue_t *q, mblk_t *db, const t_scalar_t CORRECT_prim,
+	  const struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_length, void *OPT_buffer,
+	  mblk_t *SEQ_number, struct tp *ACCEPTOR_id, const t_uscalar_t flags, mblk_t *dp)
 {
 	struct tp *tp = TP_PRIV(q);
 	struct T_ok_ack *p;
 	mblk_t *mp;
 	const size_t size = sizeof(*p);
-	int err = QR_DONE;
+	int err;
+	pl_t pl;
 
 	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
@@ -5677,9 +5748,11 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		err = tp_optmgmt(tp, OPT_buffer, flags);
 		if (unlikely(err != 0))
 			goto free_error;
-		bufq_lock(&tp->conq);
+		pl = bufq_lock(&tp->conq);
 		tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
-		bufq_unlock(&tp->conq);
+		bufq_unlock(&tp->conq, pl);
+		freemsg(db ? : dp);
+		err = QR_ABSORBED;
 		break;
 #endif
 	case TS_WACK_UREQ:
@@ -5693,6 +5766,8 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		if (unlikely(err != 0))
 			goto free_error;
 		tp_set_state(tp, TS_UNBND);
+		freemsg(db ? : dp);
+		err = QR_ABSORBED;
 		break;
 #if 0
 	case TS_WACK_CREQ:
@@ -5700,10 +5775,12 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		if ((err = tp_connect(tp, ADDR_buffer, ADDR_length, OPT_buffer, 0)))
 			goto error;
 		tp_set_state(tp, TS_WCON_CREQ);
-		if ((err = tp_senddata(tp, tp->dport, &tp->options, NULL))) {
+		if ((err = tp_senddata(tp, NULL, tp->dport, &tp->options, NULL))) {
 			tp_disconnect(tp, ADDR_buffer, SEQ_number, flags, dp);
 			goto error;
 		}
+		freemsg(db ? : dp);
+		err = QR_ABSORBED;
 		break;
 #endif
 	case TS_WACK_CRES:
@@ -5718,19 +5795,21 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 			goto error;
 		}
 		if (tp != ACCEPTOR_id) {
-			bufq_lock(&tp->conq);
+			pl = bufq_lock(&tp->conq);
 			tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
-			bufq_unlock(&tp->conq);
+			bufq_unlock(&tp->conq, pl);
 		}
+		if (db)
+			freeb(db);
 		break;
 #if 0
 	case NS_WACK_RRES:
 		err = np_reset_rem(np, N_USER, N_REASON_UNDEFINED);
 		if (unlikely(err != 0))
 			goto free_error;
-		bufq_lock(&np->resq);
+		pl = bufq_lock(&np->resq);
 		np_set_state(np, bufq_length(&np->resq) > 0 ? NS_WRES_RIND : NS_DATA_XFER);
-		bufq_unlock(&np->resq);
+		bufq_unlock(&np->resq, pl);
 		break;
 #endif
 	case TS_WACK_DREQ6:
@@ -5741,9 +5820,11 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 		err = tp_disconnect(tp, ADDR_buffer, SEQ_number, flags, dp);
 		if (unlikely(err != QR_ABSORBED))
 			goto error;
-		bufq_lock(&tp->conq);
+		pl = bufq_lock(&tp->conq);
 		tp_set_state(tp, bufq_length(&tp->conq) > 0 ? TS_WRES_CIND : TS_IDLE);
-		bufq_unlock(&tp->conq);
+		bufq_unlock(&tp->conq, pl);
+		if (db)
+			freeb(db);
 		break;
 	default:
 		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
@@ -5757,6 +5838,8 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
 			break;
 		}
 #endif
+		freemsg(db ? : dp);
+		err = QR_ABSORBED;
 		break;
 	}
 	_printd(("%s: %p: <- T_OK_ACK\n", DRV_NAME, tp));
@@ -5796,7 +5879,7 @@ te_ok_ack(queue_t *q, const t_scalar_t CORRECT_prim, const struct sockaddr_in *A
  * value for the destinations.  These values are set in the private structure by the tp_connect()
  * function.
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 te_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	    struct tp_options *OPT_buffer, t_uscalar_t CONN_flags)
 {
@@ -5838,7 +5921,7 @@ te_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 
 	_printd(("%s: %p: <- T_CONN_CON\n", DRV_NAME, tp));
 	qreply(q, mp);
-	return (QR_DONE);
+	return (0);
 
       free_error:
 	freeb(mp);
@@ -5855,20 +5938,22 @@ te_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 /**
  * ne_reset_con - generate a N_RESET_CON message
  * @q: active queue in queue pair (write queue)
+ * @msg: message to free upon success
  * @RESET_orig: origin of the reset
  * @RESET_reason: reason for the reset
  * @dp: message containing IP packet
  *
  * An N_RESET_CON message is sent only when the reset completes successfully.
  */
-STATIC streams_fastcall int
-ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
+STATIC fastcall int
+ne_reset_con(queue_t *q, mblk_t *msg, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 {
 	struct np *np = NP_PRIV(q);
 	mblk_t *mp = NULL;
 	N_reset_con_t *p;
 	size_t size = sizeof(*p);
 	int err;
+	pl_t pl;
 
 	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
@@ -5879,12 +5964,13 @@ ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = N_RESET_CON;
 	mp->b_wptr += sizeof(*p);
-	bufq_lock(&np->resq);
+	pl = bufq_lock(&np->resq);
 	np_set_state(np, bufq_length(&np->resq) > 0 ? NS_WRES_RIND : NS_DATA_XFER);
-	bufq_unlock(&np->resq);
+	bufq_unlock(&np->resq, pl);
+	freemsg(msg);
 	_printd(("%s: <- N_RESET_CON\n", DRV_NAME));
 	qreply(q, mp);
-	return (QR_DONE);
+	return (QR_ABSORBED);
 
       free_error:
 	freeb(mp);
@@ -5906,7 +5992,7 @@ ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
  * the destination address of the IP packet, where no connection exists for the source address of
  * the IP packet.
  */
-STATIC noinline streams_fastcall __hot_get int
+noinline fastcall __hot_get int
 te_conn_ind(queue_t *q, mblk_t *SEQ_number)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -5923,7 +6009,7 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
 		goto discard;
 
 	/* Make sure we don't already have a connection indication */
-	spin_lock_str2(&tp->conq.q_lock, flags);
+	spin_lock_irqsave(&tp->conq.q_lock, flags);
 	for (cp = bufq_head(&tp->conq); cp; cp = cp->b_next) {
 		struct iphdr *iph2 = (struct iphdr *) cp->b_rptr;
 		struct udphdr *uh2 = (struct udphdr *) (cp->b_rptr + (iph->ihl << 2));
@@ -5933,11 +6019,11 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
 		    && uh->source == uh2->source && uh->dest == uh2->dest) {
 			/* already have a connection indication, link the data */
 			linkb(cp, SEQ_number);
-			spin_unlock_str2(&tp->conq.q_lock, flags);
+			spin_unlock_irqrestore(&tp->conq.q_lock, flags);
 			goto absorbed;
 		}
 	}
-	spin_unlock_str2(&tp->conq.q_lock, flags);
+	spin_unlock_irqrestore(&tp->conq.q_lock, flags);
 
 	if (unlikely(bufq_length(&tp->conq) >= tp->CONIND_number))
 		/* If there are already too many connection indications outstanding, discard
@@ -6008,7 +6094,8 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
       eagain:
 	return (-EAGAIN);
       discard:
-	return (QR_DONE);
+	freemsg(SEQ_number);
+	return (QR_ABSORBED);
 }
 
 /**
@@ -6020,7 +6107,7 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
  * result of receiving an ICMP error.  For multihomed hosts, we only do this if all destination
  * addresses have errors, otherwise, we just perform a reset for the affected destination.
  */
-STATIC noinline streams_fastcall __hot_get int
+noinline fastcall __hot_get int
 te_discon_ind(queue_t *q, const struct sockaddr_in *RES_buffer, const socklen_t RES_length,
 	      const t_uscalar_t DISCON_reason, const mblk_t *SEQ_number, mblk_t *dp)
 {
@@ -6051,7 +6138,8 @@ te_discon_ind(queue_t *q, const struct sockaddr_in *RES_buffer, const socklen_t 
       enobufs:
 	return (-ENOBUFS);
       discard:
-	return (QR_DONE);
+	freemsg(dp);
+	return (QR_ABSORBED);
 }
 
 /**
@@ -6059,7 +6147,7 @@ te_discon_ind(queue_t *q, const struct sockaddr_in *RES_buffer, const socklen_t 
  * @q: active queue in queue pair
  * @mp: the ICMP message
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 te_discon_ind_icmp(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6119,7 +6207,7 @@ te_discon_ind_icmp(queue_t *q, mblk_t *mp)
  * Very fast.  In fact, we could just pass the raw M_DATA blocks upstream.  We leave the IP header
  * in the block.
  */
-STATIC INLINE streams_fastcall __hot_get int
+STATIC INLINE fastcall __hot_get int
 te_data_ind(queue_t *q, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -6158,7 +6246,7 @@ te_data_ind(queue_t *q, mblk_t *dp)
  * @q: active queue in queue pair (read queue)
  * @dp: message containing IP packet
  */
-STATIC INLINE streams_fastcall __hot_get int
+STATIC INLINE fastcall __hot_get int
 te_exdata_ind(queue_t *q, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -6198,7 +6286,7 @@ te_exdata_ind(queue_t *q, mblk_t *dp)
  * dp->b_datap->db_base.  The message payload starts at dp->b_rptr.  This function extracts IP
  * header information and uses it to create options.
  */
-STATIC INLINE streams_fastcall __hot_get int
+STATIC INLINE fastcall __hot_get int
 te_unitdata_ind(queue_t *q, mblk_t *dp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6255,7 +6343,8 @@ te_unitdata_ind(queue_t *q, mblk_t *dp)
       enobufs:
 	return (-ENOBUFS);
       discard:
-	return (QR_DONE);
+	freemsg(dp);
+	return (QR_ABSORBED);
 }
 
 #if 1
@@ -6268,7 +6357,7 @@ te_unitdata_ind(queue_t *q, mblk_t *dp)
  * dp->b_datap->db_base.  The IP message payload starts at dp->b_rptr.  This function extracts IP
  * header information and uses it to create options.
  */
-STATIC noinline streams_fastcall __hot_get int
+noinline fastcall __hot_get int
 te_optdata_ind(queue_t *q, mblk_t *dp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6304,22 +6393,25 @@ te_optdata_ind(queue_t *q, mblk_t *dp)
       enobufs:
 	return (-ENOBUFS);
       discard:
-	return (QR_DONE);
+	freemsg(dp);
+	return (QR_ABSORBED);
 }
 #endif
 
 /**
  * te_uderror_ind - generate a T_UDERROR_IND message
  * @q: active queue in queue pair (read or write queue)
+ * @db: data block to free on success (or NULL)
  * @DEST_buffer: pointer to destination address
  * @OPT_buffer: pointer to options buffer
  * @OPT_length: length of options in buffer
  * @ERROR_type: error number
  * @dp: message containing user data of errored packet
  */
-STATIC noinline __unlikely int
-te_uderror_ind(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsigned char *OPT_buffer,
-	       const size_t OPT_length, const t_uscalar_t ERROR_type, mblk_t *dp)
+noinline __unlikely int
+te_uderror_ind(queue_t *q, mblk_t *db, const struct sockaddr_in *DEST_buffer,
+	       const unsigned char *OPT_buffer, const size_t OPT_length,
+	       const t_uscalar_t ERROR_type, mblk_t *dp)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -6355,6 +6447,8 @@ te_uderror_ind(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsigned
 		mp->b_cont = dp;
 		dp->b_datap->db_type = M_DATA;	/* was M_ERROR in some cases */
 	}
+	if (db)
+		freeb(db);
 	_printd(("%s: %p: <- T_UDERROR_IND\n", DRV_NAME, tp));
 	putnext(tp->oq, mp);
 	return (QR_ABSORBED);
@@ -6366,7 +6460,8 @@ te_uderror_ind(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsigned
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
       discard:
-	return (QR_DONE);
+	freemsg(db ? : dp);
+	return (QR_ABSORBED);
 }
 
 /**
@@ -6378,7 +6473,7 @@ te_uderror_ind(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsigned
  * Notification, but there is no ICMP message associated with that and it has not yet been coded:
  * probably need an ne_uderror_ind_ecn() function.
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 te_uderror_ind_icmp(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6407,14 +6502,16 @@ te_uderror_ind_icmp(queue_t *q, mblk_t *mp)
 	mp->b_rptr = (unsigned char *) iph;
 	OPT_length = t_errs_size(tp, mp);
 	t_errs_build(tp, mp, OPT_buffer, OPT_length);
-	if ((err = te_uderror_ind(q, DEST_buffer, OPT_buffer, OPT_length, ERROR_type, mp)) < 0)
+	if ((err =
+	     te_uderror_ind(q, NULL, DEST_buffer, OPT_buffer, OPT_length, ERROR_type, mp)) < 0)
 		mp->b_rptr = hidden;
 	return (err);
 }
 
-STATIC noinline streams_fastcall __unlikely int
-te_uderror_reply(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsigned char *OPT_buffer,
-		 const size_t OPT_length, t_scalar_t ERROR_type, mblk_t *db)
+noinline fastcall __unlikely int
+te_uderror_reply(queue_t *q, mblk_t *db, const struct sockaddr_in *DEST_buffer,
+		 const unsigned char *OPT_buffer, const size_t OPT_length, t_scalar_t ERROR_type,
+		 mblk_t *dp)
 {
 	switch (ERROR_type) {
 	case -EBUSY:
@@ -6446,9 +6543,9 @@ te_uderror_reply(queue_t *q, const struct sockaddr_in *DEST_buffer, const unsign
 	case -EINVAL:
 	case -EFAULT:
 	case -EMSGSIZE:
-		return te_error_reply(q, -EPROTO);
+		return te_error_reply(q, db ? : dp, -EPROTO);
 	}
-	return te_uderror_ind(q, DEST_buffer, OPT_buffer, OPT_length, ERROR_type, db);
+	return te_uderror_ind(q, db, DEST_buffer, OPT_buffer, OPT_length, ERROR_type, dp);
 }
 
 #if 0
@@ -6576,7 +6673,8 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 	_printd(("%s: <- N_RESET_IND\n", DRV_NAME));
 	putnext(q, mp);
       discard:
-	return (QR_DONE);
+	freemsg(dp);
+	return (QR_ABSORBED);
       enobufs:
 	if (bp)
 		freemsg(bp);
@@ -6588,6 +6686,7 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 /**
  * t_optmgmt_ack - send a T_OPTMGMT_ACK upstream
  * @q: a queue in the queue pair
+ * @msg: message to free upon success
  * @flags: result flags
  * @req: requested options pointer from T_OPTMGMT_REQ
  * @req_len: length of requested options
@@ -6596,9 +6695,9 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
  * Note: opt_len is conservative but might not be actual size of the output options.  This will be
  * adjusted when the option buffer is built.
  */
-STATIC noinline int
-t_optmgmt_ack(queue_t *q, t_scalar_t flags, const unsigned char *req, const size_t req_len,
-	      size_t opt_len)
+noinline int
+t_optmgmt_ack(queue_t *q, mblk_t *msg, t_scalar_t flags, const unsigned char *req,
+	      const size_t req_len, size_t opt_len)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -6624,9 +6723,10 @@ t_optmgmt_ack(queue_t *q, t_scalar_t flags, const unsigned char *req, const size
 	if (tp_get_state(tp) == TS_WACK_OPTREQ)
 		tp_set_state(tp, TS_IDLE);
 #endif
+	freemsg(msg);
 	_printd(("%s: %p: <- T_OPTMGMT_ACK\n", DRV_NAME, tp));
 	putnext(tp->oq, mp);
-	return (0);
+	return (QR_ABSORBED);
       enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
@@ -6637,14 +6737,16 @@ t_optmgmt_ack(queue_t *q, t_scalar_t flags, const unsigned char *req, const size
 /**
  * t_addr_ack - send a T_ADDR_ACK upstream
  * @q: a queue in the queue pair
+ * @msg: message to free upon success
  * @LOCADDR_buffer: local address
  * @LOCADDR_length: local address length
  * @REMADDR_buffer: remote address
  * @REMADDR_length: remote address length
  */
-STATIC noinline int
-t_addr_ack(queue_t *q, const struct sockaddr_in *LOCADDR_buffer, const t_uscalar_t LOCADDR_length,
-	   const struct sockaddr_in *REMADDR_buffer, const t_uscalar_t REMADDR_length)
+noinline int
+t_addr_ack(queue_t *q, mblk_t *msg, const struct sockaddr_in *LOCADDR_buffer,
+	   const t_uscalar_t LOCADDR_length, const struct sockaddr_in *REMADDR_buffer,
+	   const t_uscalar_t REMADDR_length)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -6669,9 +6771,10 @@ t_addr_ack(queue_t *q, const struct sockaddr_in *LOCADDR_buffer, const t_uscalar
 		bcopy(REMADDR_buffer, mp->b_wptr, REMADDR_length);
 		mp->b_wptr += REMADDR_length;
 	}
+	freemsg(msg);
 	_printd(("%s: %p: <- T_ADDR_ACK\n", DRV_NAME, tp));
 	putnext(tp->oq, mp);
-	return (0);
+	return (QR_ABSORBED);
       enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
@@ -6682,11 +6785,12 @@ t_addr_ack(queue_t *q, const struct sockaddr_in *LOCADDR_buffer, const t_uscalar
 /**
  * t_capability_ack - send a T_CAPABILITY_ACK upstream
  * @q: a queue in the queue pair
+ * @msg: message to free upon success
  * @caps: capability bits
  * @type: STREAMS message type M_PROTO or M_PCPROTO
  */
-STATIC noinline int
-t_capability_ack(queue_t *q, const t_uscalar_t caps, const int type)
+noinline int
+t_capability_ack(queue_t *q, mblk_t *msg, const t_uscalar_t caps, const int type)
 {
 	struct tp *tp = TP_PRIV(q);
 	mblk_t *mp;
@@ -6704,9 +6808,10 @@ t_capability_ack(queue_t *q, const t_uscalar_t caps, const int type)
 		p->INFO_ack = tp->info;
 	} else
 		bzero(&p->INFO_ack, sizeof(p->INFO_ack));
+	freemsg(msg);
 	_printd(("%s: %p: <- T_CAPABILITY_ACK\n", DRV_NAME, tp));
 	putnext(tp->oq, mp);
-	return (0);
+	return (QR_ABSORBED);
       enobufs:
 	ptrace(("%s: ERROR: No buffers\n", DRV_NAME));
 	return (-ENOBUFS);
@@ -6729,20 +6834,17 @@ t_capability_ack(queue_t *q, const t_uscalar_t caps, const int type)
  * @q: active queue in pair (write queue)
  * @mp: T_INFO_REQ message
  */
-STATIC noinline int
+noinline int
 te_info_req(queue_t *q, mblk_t *mp)
 {
 	struct T_info_req *p;
-	int err;
 
-	err = -EINVAL;
-	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
-		goto error;
-	p = (typeof(p)) mp->b_rptr;
-	dassert(p->PRIM_type == T_INFO_REQ);
-	return te_info_ack(q);
-      error:
-	return (err);
+	if (likely(mp->b_wptr >= mp->b_rptr + sizeof(*p))) {
+		p = (typeof(p)) mp->b_rptr;
+		dassert(p->PRIM_type == T_INFO_REQ);
+		return te_info_ack(q, mp);
+	}
+	return (-EINVAL);
 }
 
 /*
@@ -6772,7 +6874,7 @@ te_info_req(queue_t *q, mblk_t *mp)
  * protocol id, but, instead of generating an error, we simply bind to the first protocol id
  * specified and ignore the reset.  We will only return the first protocol id in the bind ack.
  */
-STATIC noinline int
+noinline int
 te_bind_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6832,11 +6934,12 @@ te_bind_req(queue_t *q, mblk_t *mp)
 	err = TACCES;
 	if (tp->bport && tp->bport < PROT_SOCK && !capable(CAP_NET_BIND_SERVICE))
 		goto error;
-	if (unlikely((err = te_bind_ack(q, ADDR_buffer, ADDR_length, p->CONIND_number)) != 0))
+	if (unlikely
+	    ((err = te_bind_ack(q, mp, ADDR_buffer, ADDR_length, p->CONIND_number)) != QR_ABSORBED))
 		goto error;
-	return (QR_DONE);
+	return (QR_ABSORBED);
       error:
-	return te_error_ack(q, T_BIND_REQ, err);
+	return te_error_ack(q, mp, T_BIND_REQ, err);
 }
 
 /**
@@ -6844,7 +6947,7 @@ te_bind_req(queue_t *q, mblk_t *mp)
  * @q: active queue in queue pair
  * @mp: the primitive
  */
-STATIC noinline int
+noinline int
 te_unbind_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6854,11 +6957,13 @@ te_unbind_req(queue_t *q, mblk_t *mp)
 	if (unlikely(tp_get_state(tp) != TS_IDLE))
 		goto error;
 	tp_set_state(tp, TS_WACK_UREQ);
-	if (unlikely((err = te_ok_ack(q, T_UNBIND_REQ, NULL, 0, NULL, NULL, NULL, 0, NULL)) != 0))
+	if (unlikely
+	    ((err =
+	      te_ok_ack(q, mp, T_UNBIND_REQ, NULL, 0, NULL, NULL, NULL, 0, NULL)) != QR_ABSORBED))
 		goto error;
-	return (QR_DONE);
+	return (QR_ABSORBED);
       error:
-	return te_error_ack(q, T_UNBIND_REQ, err);
+	return te_error_ack(q, mp, T_UNBIND_REQ, err);
 }
 
 /**
@@ -6873,7 +6978,7 @@ te_unbind_req(queue_t *q, mblk_t *mp)
  * for all packets sent.  The TPI-IP provider will request that the Stream head provide an
  * additional write offset of 20 bytes to accomodate the IP header.
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 te_unitdata_req_slow(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6902,22 +7007,27 @@ te_unitdata_req_slow(queue_t *q, mblk_t *mp)
 	if (unlikely(tp_get_state(tp) != TS_IDLE))
 		goto error;
 	err = TNOADDR;
-	if (unlikely(p->DEST_length == 0))
-		goto error;
-	err = TBADADDR;
-	if (unlikely((mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)))
-		goto error;
-	if (unlikely(p->DEST_length != sizeof(struct sockaddr_in)))
-		goto error;
-	/* avoid alignment problems */
-	DEST_buffer = &dst_buf;
-	bcopy(mp->b_rptr + p->DEST_offset, DEST_buffer, p->DEST_length);
-	if (unlikely(DEST_buffer->sin_family != AF_INET))
-		goto error;
-	if (unlikely((daddr = DEST_buffer->sin_addr.s_addr) == INADDR_ANY))
-		goto error;
-	if (unlikely((dport = DEST_buffer->sin_port) == 0))
-		goto error;
+	if (likely(p->DEST_length != 0)) {
+		err = TBADADDR;
+		if (unlikely((mp->b_wptr < mp->b_rptr + p->DEST_offset + p->DEST_length)))
+			goto error;
+		if (unlikely(p->DEST_length != sizeof(struct sockaddr_in)))
+			goto error;
+		/* avoid alignment problems */
+		DEST_buffer = &dst_buf;
+		bcopy(mp->b_rptr + p->DEST_offset, DEST_buffer, p->DEST_length);
+		if (unlikely(DEST_buffer->sin_family != AF_INET))
+			goto error;
+		if (unlikely((daddr = DEST_buffer->sin_addr.s_addr) == INADDR_ANY))
+			goto error;
+		if (unlikely((dport = DEST_buffer->sin_port) == 0))
+			goto error;
+	} else {
+		if (unlikely((daddr = tp->options.ip.daddr) == INADDR_ANY))
+			goto error;
+		if (unlikely((dport = tp->dport) == 0))
+			goto error;
+	}
 	err = TBADDATA;
 	if (unlikely(dp == NULL))
 		goto error;
@@ -6937,14 +7047,13 @@ te_unitdata_req_slow(queue_t *q, mblk_t *mp)
 	if (unlikely(OPT_length != 0))
 		if (unlikely((err = t_opts_parse_ud(OPT_buffer, OPT_length, &opts)) != 0))
 			goto error;
-	if (unlikely((err = tp_senddata(tp, dport, &opts, dp)) != QR_ABSORBED))
+	tp->options.ip.daddr = daddr;
+	tp->dport = dport;
+	if (unlikely((err = tp_senddata(tp, mp, dport, &opts, dp)) != QR_ABSORBED))
 		goto error;
-	return (QR_TRIMMED);
+	return (QR_ABSORBED);
       error:
-	err = te_uderror_reply(q, DEST_buffer, OPT_buffer, OPT_length, err, dp);
-	if (likely(err == QR_ABSORBED))
-		return (QR_TRIMMED);
-	return (err);
+	return te_uderror_reply(q, mp, DEST_buffer, OPT_buffer, OPT_length, err, dp);
 }
 
 /**
@@ -6954,8 +7063,13 @@ te_unitdata_req_slow(queue_t *q, mblk_t *mp)
  *
  * Optimize fast path for no options and correct behaviour.  This should run much faster than the
  * old plodding way of doing things.
+ *
+ * Note that if we are in pseduo-connection-oriented modes we can still support T_UNITDATA_REQ.
+ * This works nicely with sendmsg(2) implementation on connected datagram sockets.  So we should
+ * still allow states that allow T_OPTDATA_REQ and we should support the primitive regardless of
+ * service type.
  */
-STATIC INLINE streams_fastcall __hot_put int
+STATIC INLINE fastcall __hot_put int
 te_unitdata_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -6963,6 +7077,10 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 	mblk_t *dp;
 	int err;
 	struct sockaddr_in dst_buf;
+
+	/* don't work on message if flow controlled */
+	if (tp->sndblk != 0)
+		return (-EBUSY);
 
 	prefetch(tp);
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
@@ -7002,14 +7120,12 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 			goto go_slow;
 	}
 	tp->options.ip.daddr = dst_buf.sin_addr.s_addr;
-	if (unlikely((err = tp_senddata(tp, dst_buf.sin_port, &tp->options, dp)) != QR_ABSORBED))
+	tp->dport = dst_buf.sin_port;
+	if (unlikely((err = tp_senddata(tp, mp, tp->dport, &tp->options, dp)) != QR_ABSORBED))
 		goto error;
-	return (QR_TRIMMED);
+	return (QR_ABSORBED);
       error:
-	err = te_uderror_reply(q, &dst_buf, NULL, 0, err, dp);
-	if (likely(err == QR_ABSORBED))
-		return (QR_TRIMMED);
-	return (err);
+	return te_uderror_reply(q, mp, &dst_buf, NULL, 0, err, dp);
       go_slow:
 	return te_unitdata_req_slow(q, mp);
 }
@@ -7034,8 +7150,21 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
  * in the array will be the primary address, unless another primary is specified in the options
  * parameters.  The primary address is used for subsequent TE_DATA_REQ and TE_EXDATA_REQ events
  * until changed with a TE_OPTMGMT_REQ event.
+ *
+ * To support pseudo-connection-oriented use of a basically connectionless protocol, udp should
+ * allow a T_CONN_REQ when the provider is in the TS_UNBND state.  Then the bound address will be
+ * as though a wildcard bind was peformed immediately before the connection.  This keeps the
+ * Stream from receiving packets in the TS_IDLE state while waiting to "connect".  The XTI library,
+ * however, needs to be informed to allow t_connect() in the TS_UNBND state.  This also nicely maps
+ * connect(2) socket call to t_connect(2) and T_CONN_REQ.
+ *
+ * Another approach to this is to permit a non-zero CONIND_number to switch the Stream to T_COTS
+ * (regardless of whether CONIND_number of zero is returned).  The problem with the later approach
+ * is that TPI spec says that CONIND_number is ignored for T_CLTS, but udp does that as well.  The
+ * XTI library, however, needs to recheck service type after t_bind() if it cares about service
+ * type.
  */
-STATIC noinline streams_fastcall __hot_put int
+noinline fastcall __hot_put int
 te_conn_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7058,6 +7187,8 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	err = TOUTSTATE;
 	if (unlikely(tp->info.SERV_type != T_COTS && tp->info.SERV_type != T_COTS_ORD))
 		goto error;
+	/* Note TPI clearly allows connection requests on listening Streams. */
+#if 0
 	/* Connection requests are not allowed on a listening Stream.  Note that there is a
 	   conflict in the NPI specifications here: under the description for N_BIND_REQ, NPI 2.0.0 
 	   says: "If a Stream is bound as a listener Stream, it will not be able to initiate
@@ -7069,6 +7200,7 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	err = TACCES;
 	if (unlikely(tp->CONIND_number > 0))
 		goto error;
+#endif
 	err = TOUTSTATE;
 	if (unlikely(tp_get_state(tp) != TS_IDLE))
 		goto error;
@@ -7120,39 +7252,42 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	if (unlikely(err != 0))
 		goto error;
 	/* send data only after connection complete */
-	if (dp == NULL)
-		return (QR_DONE);
-	if (tp_senddata(tp, tp->dport, &tp->options, dp) != QR_ABSORBED) {
-		pswerr(("Discarding data on T_CONN_REQ\n"));
-		return (QR_DONE);	/* discard the data */
+	if (dp == NULL) {
+		freemsg(mp);
+		return (QR_ABSORBED);
 	}
-	return (QR_TRIMMED);	/* tp_senddata() consumed message blocks */
+	if (tp_senddata(tp, mp, tp->dport, &tp->options, dp) != QR_ABSORBED) {
+		pswerr(("Discarding data on T_CONN_REQ\n"));
+		freemsg(mp);
+		return (QR_ABSORBED);	/* discard the data */
+	}
+	return (QR_ABSORBED);	/* tp_senddata() consumed message blocks */
       error:
-	return te_error_ack(q, T_CONN_REQ, err);
+	return te_error_ack(q, mp, T_CONN_REQ, err);
 }
 
-STATIC INLINE streams_fastcall mblk_t *
+STATIC INLINE fastcall mblk_t *
 t_seq_check(struct tp *tp, const t_uscalar_t SEQ_number)
 {
 	mblk_t *cp;
 	unsigned long flags;
 
-	spin_lock_str2(&tp->conq.q_lock, flags);
+	spin_lock_irqsave(&tp->conq.q_lock, flags);
 	for (cp = bufq_head(&tp->conq); cp && (t_uscalar_t) (long) cp != SEQ_number;
 	     cp = cp->b_next) ;
-	spin_unlock_str2(&tp->conq.q_lock, flags);
+	spin_unlock_irqrestore(&tp->conq.q_lock, flags);
 	usual(cp);
 	return (cp);
 }
-STATIC INLINE streams_fastcall struct tp *
+STATIC INLINE fastcall struct tp *
 t_tok_check(const t_uscalar_t ACCEPTOR_id)
 {
 	struct tp *ap;
 	unsigned long flags;
 
-	read_lock_str2(&master.lock, flags);
+	read_lock_irqsave(&master.lock, flags);
 	for (ap = master.tp.list; ap && (t_uscalar_t) (long) ap->oq != ACCEPTOR_id; ap = ap->next) ;
-	read_unlock_str2(&master.lock, flags);
+	read_unlock_irqrestore(&master.lock, flags);
 	usual(ap);
 	return (ap);
 }
@@ -7176,7 +7311,7 @@ t_tok_check(const t_uscalar_t ACCEPTOR_id)
  * connection.  If no responding addresses are provided, then the destination address is the source
  * address from the connection indication.
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 te_conn_res(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q), *ACCEPTOR_id = tp;
@@ -7261,12 +7396,12 @@ te_conn_res(queue_t *q, mblk_t *mp)
 	}
 	/* Ok, all checking done.  Now we need to connect the new address. */
 	tp_set_state(tp, TS_WACK_CRES);
-	err = te_ok_ack(q, T_CONN_RES, NULL, 0, OPT_buffer, SEQ_number, ACCEPTOR_id, 0, dp);
+	err = te_ok_ack(q, mp, T_CONN_RES, NULL, 0, OPT_buffer, SEQ_number, ACCEPTOR_id, 0, dp);
 	if (unlikely(err != QR_ABSORBED))
 		goto error;
-	return (QR_TRIMMED);	/* user data is absorbed */
+	return (QR_ABSORBED);	/* user data is absorbed */
       error:
-	return te_error_ack(q, T_CONN_RES, err);
+	return te_error_ack(q, mp, T_CONN_RES, err);
 }
 
 /**
@@ -7274,7 +7409,7 @@ te_conn_res(queue_t *q, mblk_t *mp)
  * @q: active queue (write queue)
  * @mp: the T_DISCON_REQ message
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 te_discon_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7348,12 +7483,12 @@ te_discon_req(queue_t *q, mblk_t *mp)
 		goto error;
 	}
 	/* Ok, all checking done.  Now we need to disconnect the address. */
-	err = te_ok_ack(q, T_DISCON_REQ, RES_buffer, RES_length, NULL, SEQ_number, NULL, 0, dp);
+	err = te_ok_ack(q, mp, T_DISCON_REQ, RES_buffer, RES_length, NULL, SEQ_number, NULL, 0, dp);
 	if (unlikely(err != QR_ABSORBED))
 		goto error;
-	return (QR_TRIMMED);	/* user data is absorbed */
+	return (QR_ABSORBED);	/* user data is absorbed */
       error:
-	return te_error_ack(q, T_DISCON_REQ, err);
+	return te_error_ack(q, mp, T_DISCON_REQ, err);
 }
 
 /**
@@ -7365,13 +7500,16 @@ te_discon_req(queue_t *q, mblk_t *mp)
  * not, we should accumulate the M_DATA block in a buffer waiting for a delimited message or final
  * N_DATA_REQ.
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 te_write_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
 	size_t dlen;
 	int err;
 
+	/* don't work on message if flow controlled */
+	if (tp->sndblk != 0)
+		return (-EBUSY);
 	err = TNOTSUPPORT;
 	if (unlikely(tp->info.SERV_type == T_CLTS))
 		goto error;
@@ -7395,13 +7533,14 @@ te_write_req(queue_t *q, mblk_t *mp)
 	if (unlikely((dlen = msgsize(mp)) == 0
 		     || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
-	if (unlikely((err = tp_senddata(tp, tp->dport, &tp->options, mp)) != QR_ABSORBED))
+	if (unlikely(tp_senddata(tp, NULL, tp->dport, &tp->options, mp) != QR_ABSORBED))
 		goto error;
 	return (QR_ABSORBED);	/* tp_senddata() consumed message block */
       discard:
-	return (QR_DONE);	/* tp_senddata() did not consume message blocks */
+	freemsg(mp);
+	return (QR_ABSORBED);	/* tp_senddata() did not consume message blocks */
       error:
-	return te_error_reply(q, -EPROTO);
+	return te_error_reply(q, mp, -EPROTO);
 }
 
 /**
@@ -7413,7 +7552,7 @@ te_write_req(queue_t *q, mblk_t *mp)
  * multihomed hosts.  We use T_OPTMGMT_REQ to change the primary destination address, source address
  * and options.
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 te_data_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7421,6 +7560,10 @@ te_data_req(queue_t *q, mblk_t *mp)
 	size_t dlen;
 	mblk_t *dp;
 	int err;
+
+	/* don't work on message if flow controlled */
+	if (tp->sndblk != 0)
+		return (-EBUSY);
 
 	err = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
@@ -7456,13 +7599,14 @@ te_data_req(queue_t *q, mblk_t *mp)
 	if (unlikely
 	    ((dlen = msgsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
 		goto error;
-	if (unlikely((err = tp_senddata(tp, tp->dport, &tp->options, dp)) != QR_ABSORBED))
+	if (unlikely((err = tp_senddata(tp, mp, tp->dport, &tp->options, dp)) != QR_ABSORBED))
 		goto error;
-	return (QR_TRIMMED);	/* tp_senddata() consumed message blocks */
+	return (QR_ABSORBED);	/* tp_senddata() consumed message blocks */
       discard:
-	return (QR_DONE);	/* tp_senddata() does not consume message blocks */
+	freemsg(mp);
+	return (QR_ABSORBED);	/* tp_senddata() does not consume message blocks */
       error:
-	return te_error_reply(q, -EPROTO);
+	return te_error_reply(q, mp, -EPROTO);
 }
 
 /**
@@ -7470,7 +7614,7 @@ te_data_req(queue_t *q, mblk_t *mp)
  * @q: write queue
  * @mp: the primitive
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 te_exdata_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7478,6 +7622,10 @@ te_exdata_req(queue_t *q, mblk_t *mp)
 	size_t dlen;
 	mblk_t *dp;
 	int err;
+
+	/* don't work on message if flow controlled */
+	if (tp->sndblk != 0)
+		return (-EBUSY);
 
 	err = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
@@ -7506,14 +7654,15 @@ te_exdata_req(queue_t *q, mblk_t *mp)
 	dlen = msgsize(dp);
 	if (unlikely(dlen == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.ETSDU_size))
 		goto error;
-	err = tp_senddata(tp, tp->dport, &tp->options, dp);
+	err = tp_senddata(tp, mp, tp->dport, &tp->options, dp);
 	if (unlikely(err != QR_ABSORBED))
 		goto error;
-	return (QR_TRIMMED);
+	return (QR_ABSORBED);
       discard:
-	return (QR_DONE);
+	freemsg(mp);
+	return (QR_ABSORBED);
       error:
-	return te_error_reply(q, -EPROTO);
+	return te_error_reply(q, mp, -EPROTO);
 }
 
 /**
@@ -7521,7 +7670,7 @@ te_exdata_req(queue_t *q, mblk_t *mp)
  * @q: write queue
  * @mp: the primitive
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 te_optdata_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7530,6 +7679,10 @@ te_optdata_req(queue_t *q, mblk_t *mp)
 	size_t mlen;
 	mblk_t *dp;
 	int err;
+
+	/* don't work on message if flow controlled */
+	if (tp->sndblk != 0)
+		return (-EBUSY);
 
 	err = -EINVAL;
 	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(*p)))
@@ -7563,13 +7716,14 @@ te_optdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(p->OPT_length != 0))
 		if ((err = t_opts_parse(mp->b_wptr + p->OPT_offset, p->OPT_length, &opts)))
 			goto error;
-	if ((err = tp_senddata(tp, tp->dport, &opts, dp)) != QR_ABSORBED)
+	if ((err = tp_senddata(tp, mp, tp->dport, &opts, dp)) != QR_ABSORBED)
 		goto error;
-	return (QR_TRIMMED);
+	return (QR_ABSORBED);
       discard:
-	return (QR_DONE);
+	freemsg(mp);
+	return (QR_ABSORBED);
       error:
-	return te_error_reply(q, err);
+	return te_error_reply(q, mp, err);
 }
 
 /**
@@ -7592,7 +7746,7 @@ te_optdata_req(queue_t *q, mblk_t *mp)
  * [TNOTSUPPORT] this prmitive is not supported;
  * [TSYSERR] a system error has occured and the UNIX system error is indicated in the primitive.
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 te_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7643,7 +7797,8 @@ te_optmgmt_req(queue_t *q, mblk_t *mp)
 			goto error;
 		}
 	}
-	err = t_optmgmt_ack(q, p->MGMT_flags, mp->b_rptr + p->OPT_offset, p->OPT_length, opt_len);
+	err =
+	    t_optmgmt_ack(q, mp, p->MGMT_flags, mp->b_rptr + p->OPT_offset, p->OPT_length, opt_len);
 	if (unlikely(err < 0)) {
 		switch (-err) {
 		case EINVAL:
@@ -7661,7 +7816,7 @@ te_optmgmt_req(queue_t *q, mblk_t *mp)
 	}
 	return (err);
       error:
-	return te_error_ack(q, T_OPTMGMT_REQ, err);
+	return te_error_ack(q, mp, T_OPTMGMT_REQ, err);
 }
 
 #ifdef T_ADDR_REQ
@@ -7670,7 +7825,7 @@ te_optmgmt_req(queue_t *q, mblk_t *mp)
  * @q: active queue in queue pair
  * @mp: the primitive
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 te_addr_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7730,11 +7885,11 @@ te_addr_req(queue_t *q, mblk_t *mp)
 		default:
 			goto error;
 		}
-		return t_addr_ack(q, LOCADDR_buffer, LOCADDR_length, REMADDR_buffer,
+		return t_addr_ack(q, mp, LOCADDR_buffer, LOCADDR_length, REMADDR_buffer,
 				  REMADDR_length);
 	}
       error:
-	return te_error_ack(q, T_ADDR_REQ, err);
+	return te_error_ack(q, mp, T_ADDR_REQ, err);
 }
 #endif				/* T_ADDR_REQ */
 
@@ -7744,7 +7899,7 @@ te_addr_req(queue_t *q, mblk_t *mp)
  * @q: active queue in queue pair
  * @mp: the primitive
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 te_capability_req(queue_t *q, mblk_t *mp)
 {
 	struct T_capability_req *p;
@@ -7755,9 +7910,11 @@ te_capability_req(queue_t *q, mblk_t *mp)
 		goto error;
 	p = (typeof(p)) mp->b_rptr;
 	dassert(p->PRIM_type == T_CAPABILITY_REQ);
-	return t_capability_ack(q, p->CAP_bits1, mp->b_datap->db_type);
+	if ((err = t_capability_ack(q, mp, p->CAP_bits1, mp->b_datap->db_type)) != QR_ABSORBED)
+		goto error;
+	return (QR_ABSORBED);
       error:
-	return te_error_ack(q, T_CAPABILITY_REQ, err);
+	return te_error_ack(q, mp, T_CAPABILITY_REQ, err);
 }
 #endif				/* T_CAPABILITY_REQ */
 
@@ -7772,12 +7929,15 @@ te_capability_req(queue_t *q, mblk_t *mp)
  *
  * These are normal T-primitives written from the upper layer protocol.
  */
-STATIC INLINE streams_fastcall __hot_put int
+STATIC INLINE fastcall __hot_put int
 tp_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn = -EPROTO;
 	t_scalar_t prim = 0;
 	struct tp *tp = TP_PRIV(q);
+
+	if (unlikely(!tp_trylockq(q)))
+		goto eagain;
 
 	tp->i_oldstate = tp_get_state(tp);	/* checkpoint */
 
@@ -7882,16 +8042,22 @@ tp_w_proto(queue_t *q, mblk_t *mp)
 		case -ENOMEM:	/* could not allocate memory */
 		case -ENOBUFS:	/* could not allocate an mblk */
 		case -EOPNOTSUPP:	/* primitive not supported */
-			return te_error_ack(q, prim, rtn);
+			rtn = te_error_ack(q, mp, prim, rtn);
+			break;
 		case -EPROTO:
-			return te_error_reply(q, -EPROTO);
+			rtn = te_error_reply(q, mp, -EPROTO);
+			break;
 		default:
 			/* ignore all other errors */
-			rtn = 0;
+			freemsg(mp);
+			rtn = QR_ABSORBED;
 			break;
 		}
 	}
+	tp_unlockq(q);
 	return (rtn);
+      eagain:
+	return (-EAGAIN);
 }
 
 /**
@@ -7899,10 +8065,16 @@ tp_w_proto(queue_t *q, mblk_t *mp)
  * @q: active queue in pair (write queue)
  * @mp: the M_DATA message
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 tp_w_data(queue_t *q, mblk_t *mp)
 {
-	return te_write_req(q, mp);
+	int rtn;
+
+	if (likely(tp_trylockq(q))) {
+		rtn = te_write_req(q, mp);
+		tp_unlockq(q);
+	}
+	return (-EAGAIN);
 }
 
 /**
@@ -7910,7 +8082,7 @@ tp_w_data(queue_t *q, mblk_t *mp)
  * @q: active queue in pair (write queue)
  * @mp: the message
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 tp_w_other(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7918,7 +8090,8 @@ tp_w_other(queue_t *q, mblk_t *mp)
 	rare();
 	cmn_err(CE_WARN, "Unsupported block type %d on WR(q) %d\n", mp->b_datap->db_type,
 		tp->u.dev.cminor);
-	return (-EOPNOTSUPP);
+	freemsg(mp);
+	return (QR_ABSORBED);
 }
 
 /**
@@ -7929,7 +8102,7 @@ tp_w_other(queue_t *q, mblk_t *mp)
  * This TPI-UDP provider does not support any input-output controls and, therefore, all input-output
  * controls are negatively acknowledged.
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 tp_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
@@ -7942,7 +8115,7 @@ tp_w_ioctl(queue_t *q, mblk_t *mp)
 	return (QR_ABSORBED);
 }
 
-STATIC noinline streamscall int
+noinline streamscall int
 tp_w_flush(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_rptr[0] & FLUSHW) {
@@ -7960,7 +8133,8 @@ tp_w_flush(queue_t *q, mblk_t *mp)
 		qreply(q, mp);
 		return (QR_ABSORBED);
 	}
-	return (QR_DONE);
+	freemsg(mp);
+	return (QR_ABSORBED);
 }
 
 /**
@@ -7968,7 +8142,7 @@ tp_w_flush(queue_t *q, mblk_t *mp)
  * @q: active queue in pair (read queue)
  * @mp: the message
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 tp_r_other(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -7976,12 +8150,8 @@ tp_r_other(queue_t *q, mblk_t *mp)
 	rare();
 	cmn_err(CE_WARN, "Unsupported block type %d on RD(q) %d\n", mp->b_datap->db_type,
 		tp->u.dev.cminor);
-#if 0
-	putnext(q, mp);
+	freemsg(mp);
 	return (QR_ABSORBED);
-#else
-	return (-EOPNOTSUPP);
-#endif
 }
 
 /**
@@ -7993,11 +8163,14 @@ tp_r_other(queue_t *q, mblk_t *mp)
  * contains a complete IP datagram starting with the IP header.  What needs to be done is to convert
  * this to an upper layer indication and deliver it upstream.
  */
-STATIC INLINE streams_fastcall __hot_in int
+STATIC INLINE fastcall __hot_in int
 tp_r_data(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
 	int rtn;
+
+	if (unlikely(!tp_trylockq(q)))
+		goto eagain;
 
 	switch (tp->info.SERV_type) {
 	case T_CLTS:
@@ -8006,7 +8179,8 @@ tp_r_data(queue_t *q, mblk_t *mp)
 			rtn = te_unitdata_ind(q, mp);
 			break;
 		default:
-			rtn = QR_DONE;
+			freemsg(mp);
+			rtn = QR_ABSORBED;
 			break;
 		}
 		break;
@@ -8027,7 +8201,8 @@ tp_r_data(queue_t *q, mblk_t *mp)
 			break;
 		case TS_IDLE:
 			if (tp->CONIND_number == 0) {
-				rtn = QR_DONE;
+				freemsg(mp);
+				rtn = QR_ABSORBED;
 				break;
 			}
 			/* fall through */
@@ -8037,16 +8212,21 @@ tp_r_data(queue_t *q, mblk_t *mp)
 			break;
 		default:
 			/* ignore it now */
-			rtn = QR_DONE;
+			freemsg(mp);
+			rtn = QR_ABSORBED;
 			break;
 		}
 		break;
 	default:
 		swerr();
-		rtn = QR_DONE;
+		freemsg(mp);
+		rtn = QR_ABSORBED;
 		break;
 	}
+	tp_unlockq(q);
 	return (rtn);
+      eagain:
+	return (-EAGAIN);
 }
 
 /**
@@ -8058,11 +8238,14 @@ tp_r_data(queue_t *q, mblk_t *mp)
  * contains a complete ICMP datagram starting with the IP header.  What needs to be done is to
  * convert this to an upper layer indication and deliver it upstream.
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 tp_r_ctl(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
 	int rtn;
+
+	if (unlikely(!tp_trylockq(q)))
+		goto eagain;
 
 	switch (tp->info.SERV_type) {
 	case T_CLTS:
@@ -8071,7 +8254,8 @@ tp_r_ctl(queue_t *q, mblk_t *mp)
 			rtn = te_uderror_ind_icmp(q, mp);
 			break;
 		default:
-			rtn = QR_DONE;
+			freemsg(mp);
+			rtn = QR_ABSORBED;
 			break;
 		}
 		break;
@@ -8095,19 +8279,24 @@ tp_r_ctl(queue_t *q, mblk_t *mp)
 			break;
 		default:
 			/* ignore it now */
-			rtn = QR_DONE;
+			freemsg(mp);
+			rtn = QR_ABSORBED;
 			break;
 		}
 		break;
 	default:
 		swerr();
-		rtn = QR_DONE;
+		freemsg(mp);
+		rtn = QR_ABSORBED;
 		break;
 	}
+	tp_unlockq(q);
 	return (rtn);
+      eagain:
+	return (-EAGAIN);
 }
 
-STATIC noinline streamscall int
+noinline streamscall int
 tp_r_flush(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_rptr[0] & FLUSHR) {
@@ -8122,10 +8311,11 @@ tp_r_flush(queue_t *q, mblk_t *mp)
 		putnext(q, mp);
 		return (QR_ABSORBED);
 	}
-	return (QR_DONE);
+	freemsg(mp);
+	return (QR_ABSORBED);
 }
 
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 tp_r_prim_slow(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -8140,22 +8330,41 @@ tp_r_prim_slow(queue_t *q, mblk_t *mp)
 	}
 }
 
-/**
- * tp_r_prim - process primitive on read queue
- * @q: active queue in queue pair (read queue)
- * @mp: the message
- */
+#if 0
 STATIC INLINE streamscall __hot_in int
-tp_r_prim(queue_t *q, mblk_t *mp)
+tp_r_prim_put(queue_t *q, mblk_t *mp)
 {
 	if (likely(mp->b_datap->db_type == M_DATA))
 		/* fast path for data */
 		if (likely(TP_PRIV(q)->info.SERV_type == T_CLTS))
-			return te_unitdata_ind(q, mp);
+			return (-EAGAIN);
+	return tp_r_prim_slow(q, mp);
+}
+#endif
+
+/**
+ * tp_r_prim_srv - process primitive on read queue
+ * @q: active queue in queue pair (read queue)
+ * @mp: the message
+ */
+STATIC INLINE streamscall __hot_in int
+tp_r_prim_srv(queue_t *q, mblk_t *mp)
+{
+	if (likely(mp->b_datap->db_type == M_DATA))
+		/* fast path for data */
+		if (likely(TP_PRIV(q)->info.SERV_type == T_CLTS)) {
+			int rtn = -EAGAIN;
+
+			if (likely(tp_trylockq(q))) {
+				rtn = te_unitdata_ind(q, mp);
+				tp_unlockq(q);
+			}
+			return (rtn);
+		}
 	return tp_r_prim_slow(q, mp);
 }
 
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 tp_w_prim_slow(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -8173,200 +8382,64 @@ tp_w_prim_slow(queue_t *q, mblk_t *mp)
 	}
 }
 
-STATIC noinline streams_fastcall __unlikely int
-tp_w_prim_error(queue_t *q, const int rtn)
-{
-	switch (rtn) {
-	case -EBUSY:		/* flow controlled */
-	case -EAGAIN:		/* try again */
-	case -ENOMEM:		/* could not allocate memory */
-	case -ENOBUFS:		/* could not allocate an mblk */
-		return (rtn);
-	case -EOPNOTSUPP:	/* primitive not supported */
-		return te_error_ack(q, T_UNITDATA_REQ, rtn);
-	case -EPROTO:
-		return te_error_reply(q, -EPROTO);
-	default:
-		return (0);
-	}
-}
-
 /**
- * tp_w_prim - process primitive on write queue
+ * tp_w_prim_put - process primitive on write queue
  * @q: active queue in queue pair (write queue)
  * @mp: the message
  */
 STATIC INLINE streamscall __hot_put int
-tp_w_prim(queue_t *q, mblk_t *mp)
+tp_w_prim_put(queue_t *q, mblk_t *mp)
 {
-	if (likely(mp->b_datap->db_type == M_PROTO)) {
-		/* fast path for data */
-		if (likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t))) {
-			if (likely(*((t_scalar_t *) mp->b_rptr) == T_UNITDATA_REQ)) {
-				int rtn;
+	/* fast path for data */
+#if 0
+	if (likely(mp->b_datap->db_type == M_DATA))
+		return (-EAGAIN);	/* want to queue these */
+#endif
+	if (likely(mp->b_datap->db_type == M_PROTO) &&
+	    likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t)) &&
+	    likely(*((t_scalar_t *) mp->b_rptr) == T_UNITDATA_REQ))
+		return (-EAGAIN);	/* want to queue these */
+	return tp_w_prim_slow(q, mp);
+}
 
-				if (likely((rtn = te_unitdata_req(q, mp)) >= 0))
-					return (rtn);
-				return tp_w_prim_error(q, rtn);
-			}
+/**
+ * tp_w_prim_srv - process primitive on write queue
+ * @q: active queue in queue pair (write queue)
+ * @mp: the message
+ */
+STATIC INLINE streamscall __hot_put int
+tp_w_prim_srv(queue_t *q, mblk_t *mp)
+{
+	/* fast path for data */
+#if 0
+	if (likely(mp->b_datap->db_type == M_DATA))
+		return tp_w_data(q, mp);
+#endif
+	if (likely(mp->b_datap->db_type == M_PROTO) &&
+	    likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t)) &&
+	    likely(*((t_scalar_t *) mp->b_rptr) == T_UNITDATA_REQ)) {
+		int rtn = -EAGAIN;
+
+		if (likely(tp_trylockq(q))) {
+			rtn = te_unitdata_req(q, mp);
+			tp_unlockq(q);
 		}
+		return (rtn);
 	}
 	return tp_w_prim_slow(q, mp);
 }
 
-STATIC noinline streams_fastcall void
-tp_putq_slow(queue_t *q, mblk_t *mp, int rtn)
-{
-	switch (rtn) {
-	case QR_DONE:
-		freemsg(mp);
-	case QR_ABSORBED:
-		break;
-	case QR_STRIP:
-		if (mp->b_cont)
-			if (unlikely(putq(q, mp->b_cont) == 0))
-				freemsg(mp->b_cont);
-	case QR_TRIMMED:
-		freeb(mp);
-		break;
-	case QR_LOOP:
-		if (!q->q_next) {
-			qreply(q, mp);
-			break;
-		}
-	case QR_PASSALONG:
-		if (q->q_next) {
-			putnext(q, mp);
-			break;
-		}
-		rtn = -EOPNOTSUPP;
-	default:
-		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
-			q->q_ptr, rtn));
-		freemsg(mp);
-		break;
-	case QR_DISABLE:
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
-		break;
-	case QR_PASSFLOW:
-		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
-			putnext(q, mp);
-			break;
-		}
-	case -ENOBUFS:
-	case -EBUSY:
-	case -ENOMEM:
-	case -EAGAIN:
-	case QR_RETRY:
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
-		break;
-	}
-	return;
-}
-
-static noinline streams_fastcall int
-tp_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
-{
-	switch (rtn) {
-	case QR_DONE:
-		freemsg(mp);
-	case QR_ABSORBED:
-		return (1);
-	case QR_STRIP:
-		if (mp->b_cont)
-			if (!putbq(q, mp->b_cont))
-				freemsg(mp->b_cont);
-	case QR_TRIMMED:
-		freeb(mp);
-		return (1);
-	case QR_LOOP:
-		if (!q->q_next) {
-			qreply(q, mp);
-			return (1);
-		}
-	case QR_PASSALONG:
-		if (q->q_next) {
-			putnext(q, mp);
-			return (1);
-		}
-		rtn = -EOPNOTSUPP;
-	default:
-		printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
-			q->q_ptr, rtn));
-		freemsg(mp);
-		return (1);
-	case QR_DISABLE:
-		printd(("%s: %p: ERROR: (q disabling) %d\n", q->q_qinfo->qi_minfo->mi_idname,
-			q->q_ptr, rtn));
-		noenable(q);
-		if (!putbq(q, mp))
-			freemsg(mp);
-		rtn = 0;
-		return (0);
-	case QR_PASSFLOW:
-		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
-			putnext(q, mp);
-			return (1);
-		}
-	case -ENOBUFS:		/* proc must have scheduled bufcall */
-	case -EBUSY:		/* proc must have failed canput */
-	case -ENOMEM:		/* proc must have scheduled bufcall */
-	case -EAGAIN:		/* proc must re-enable on some event */
-		if (mp->b_datap->db_type < QPCTL) {
-			printd(("%s: %p: ERROR: (q stalled) %d\n", q->q_qinfo->qi_minfo->mi_idname,
-				q->q_ptr, rtn));
-			if (!putbq(q, mp))
-				freemsg(mp);
-			return (0);
-		}
-		/* 
-		 *  Be careful not to put a priority message back on the queue.
-		 */
-		switch (mp->b_datap->db_type) {
-		case M_PCPROTO:
-			mp->b_datap->db_type = M_PROTO;
-			break;
-		case M_PCRSE:
-			mp->b_datap->db_type = M_RSE;
-			break;
-		case M_PCCTL:
-			mp->b_datap->db_type = M_CTL;
-			break;
-		default:
-			printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
-				q->q_ptr, rtn));
-			freemsg(mp);
-			return (1);
-		}
-		mp->b_band = 255;
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
-		return (0);
-	case QR_RETRY:
-		if (!putbq(q, mp))
-			freemsg(mp);
-		return (1);
-	}
-}
+#define PRELOAD (FASTBUF<<2)
 
 streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
-	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
-		udp_rstat.ms_acnt++;
+	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
+	    || tp_r_prim_srv(q, mp) != QR_ABSORBED) {
+		//udp_rstat.ms_acnt++;
+		mp->b_wptr += PRELOAD;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
-	} else {
-		int rtn;
-
-		rtn = tp_r_prim(q, mp);
-		/* Fast Path */
-		if (likely(rtn == QR_ABSORBED)) {
-			return (0);
-		} else
-			tp_putq_slow(q, mp, rtn);
 	}
 	return (0);
 }
@@ -8377,14 +8450,13 @@ tp_rsrv(queue_t *q)
 	mblk_t *mp;
 
 	while (likely((mp = getq(q)) != NULL)) {
-		int rtn;
-
-		rtn = tp_r_prim(q, mp);
-		/* Fast Path */
-		if (likely(rtn == QR_ABSORBED)) {
-			continue;
-		} else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
-			break;
+		/* remove backpressure */
+		mp->b_wptr -= PRELOAD;
+		if (unlikely(tp_r_prim_srv(q, mp) != QR_ABSORBED)) {
+			if (putbq(q, mp))
+				break;
+			freemsg(mp);
+		}
 	}
 	return (0);
 }
@@ -8392,20 +8464,12 @@ tp_rsrv(queue_t *q)
 streamscall __hot_in int
 tp_wput(queue_t *q, mblk_t *mp)
 {
-	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))) {
-		udp_wstat.ms_acnt++;
+	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
+	    || tp_w_prim_put(q, mp) != QR_ABSORBED) {
+		//udp_wstat.ms_acnt++;
+		mp->b_wptr += PRELOAD;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
-	} else {
-		int rtn;
-
-		rtn = tp_w_prim(q, mp);
-		/* Fast Path */
-		if (likely(rtn == QR_TRIMMED)) {
-			freeb(mp);
-			return (0);
-		} else
-			tp_putq_slow(q, mp, rtn);
 	}
 	return (0);
 }
@@ -8416,15 +8480,12 @@ tp_wsrv(queue_t *q)
 	mblk_t *mp;
 
 	while (likely((mp = getq(q)) != NULL)) {
-		register int rtn;
-
-		rtn = tp_w_prim(q, mp);
-		/* Fast Path */
-		if (likely(rtn == QR_TRIMMED)) {
-			freeb(mp);
-			continue;
-		} else if (unlikely(tp_srvq_slow(q, mp, rtn) == 0))
-			break;
+		mp->b_wptr -= PRELOAD;
+		if (unlikely(tp_w_prim_srv(q, mp) != QR_ABSORBED)) {
+			if (putbq(q, mp))
+				break;
+			freemsg(mp);
+		}
 	}
 	return (0);
 }
@@ -8450,7 +8511,7 @@ tp_wsrv(queue_t *q)
  * combination (but possibly different IP adresses).  These Streams that are "owners" of the
  * connection bucket must be traversed and checked for address matches.
  */
-STATIC noinline streams_fastcall __unlikely struct tp *
+noinline fastcall __unlikely struct tp *
 tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t saddr, uint16_t sport)
 {
 	struct tp *result = NULL;
@@ -8463,7 +8524,7 @@ tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
 
 	hp = hp1;
 	do {
-		read_lock_str2(&hp->lock, flags);
+		read_lock_irqsave(&hp->lock, flags);
 		{
 			register struct tp *tp;
 
@@ -8523,7 +8584,7 @@ tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
 					break;
 			}
 		}
-		read_unlock_str2(&hp->lock, flags);
+		read_unlock_irqrestore(&hp->lock, flags);
 	} while (hiscore < 4 && hp != hp2 && (hp = hp2));
 	usual(result);
 	return (result);
@@ -8547,7 +8608,7 @@ tp_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
  * a Stream for a received packet, we are interested in any T_CLTS Stream that matches or any T_COTS
  * stream that is in the listening state that matches.
  */
-STATIC INLINE streams_fastcall __hot_in struct tp *
+STATIC INLINE fastcall __hot_in struct tp *
 tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 {
 	struct tp *result = NULL;
@@ -8562,7 +8623,7 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 	_ptrace(("%s: %s: proto = %d, dport = %d\n", DRV_NAME, __FUNCTION__, (int) proto,
 		 (int) ntohs(dport)));
 	do {
-		read_lock_str2(&hp->lock, flags);
+		read_lock_irqsave(&hp->lock, flags);
 		{
 			register struct tp *tp;
 
@@ -8610,13 +8671,13 @@ tp_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 					break;
 			}
 		}
-		read_unlock_str2(&hp->lock, flags);
+		read_unlock_irqrestore(&hp->lock, flags);
 	} while (hiscore < 2 && hp != hp2 && (hp = hp2));
 	usual(result);
 	return (result);
 }
 
-STATIC noinline streams_fastcall __unlikely struct tp *
+noinline fastcall __unlikely struct tp *
 tp_lookup_common_slow(struct tp_prot_bucket *pp, uint8_t proto, uint32_t daddr, uint16_t dport,
 		      uint32_t saddr, uint16_t sport)
 {
@@ -8631,7 +8692,7 @@ tp_lookup_common_slow(struct tp_prot_bucket *pp, uint8_t proto, uint32_t daddr, 
 	return (result);
 }
 
-STATIC INLINE streams_fastcall __hot_in struct tp *
+STATIC INLINE fastcall __hot_in struct tp *
 tp_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, uint16_t sport)
 {
 	struct tp_prot_bucket *pp, **ppp;
@@ -8640,13 +8701,13 @@ tp_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, 
 
 	ppp = &tp_prots[proto];
 
-	read_lock_str2(&tp_prot_lock, flags);
+	read_lock_irqsave(&tp_prot_lock, flags);
 	if (likely((pp = *ppp) != NULL)) {
 		if (likely(pp->corefs == 0)) {
 			if (likely(pp->clrefs > 0)) {
 				result = tp_lookup_bind(proto, daddr, dport);
 			      done:
-				read_unlock_str2(&tp_prot_lock, flags);
+				read_unlock_irqrestore(&tp_prot_lock, flags);
 				return (result);
 			}
 		}
@@ -8669,7 +8730,7 @@ tp_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, 
  * to the protocol id.  Bind hashes are only searched for connectionless Streams if there is a
  * connectionless Stream bound to the protocol id.
  */
-STATIC INLINE streams_fastcall __hot_in struct tp *
+STATIC INLINE fastcall __hot_in struct tp *
 tp_lookup(struct iphdr *iph, struct udphdr *uh)
 {
 	return tp_lookup_common(iph->protocol, iph->daddr, uh->dest, iph->saddr, uh->source);
@@ -8683,7 +8744,7 @@ tp_lookup(struct iphdr *iph, struct udphdr *uh)
  * This needs to do a reverse lookup (where destination address and port are compared to source
  * address and port, and visa versa).
  */
-STATIC noinline streams_fastcall __unlikely struct tp *
+noinline fastcall __unlikely struct tp *
 tp_lookup_icmp(struct iphdr *iph, unsigned int len)
 {
 	struct udphdr *uh = (struct udphdr *) ((unsigned char *) iph + (iph->ihl << 2));
@@ -8710,10 +8771,10 @@ tp_free(caddr_t data)
 
 	dassert(skb != NULL);
 	if (likely((tp = *(struct tp **) skb->cb) != NULL)) {
-		spin_lock_str2(&tp->qlock, flags);
+		spin_lock_irqsave(&tp->qlock, flags);
 		// ensure(tp->rcvmem >= skb->truesize, tp->rcvmem = skb->truesize);
 		tp->rcvmem -= skb->truesize;
-		spin_unlock_str2(&tp->qlock, flags);
+		spin_unlock_irqrestore(&tp->qlock, flags);
 #if 0
 		/* put this back to null before freeing it */
 		*(struct tp **) skb->cb = NULL;
@@ -8732,6 +8793,10 @@ tp_free(caddr_t data)
 	return;
 #endif
 }
+#endif
+
+#ifndef CHECKSUM_HW
+#define CHECKSUM_HW CHECKSUM_COMPLETE
 #endif
 
 /**
@@ -8756,6 +8821,10 @@ tp_v4_rcv(struct sk_buff *skb)
 	struct udphdr *uh = (struct udphdr *) (skb->nh.raw + (iph->ihl << 2));
 	struct rtable *rt;
 	ushort ulen;
+
+#ifdef HAVE_KFUNC_NF_RESET
+	nf_reset(skb);
+#endif
 
 //      IP_INC_STATS_BH(IpInDelivers);  /* should wait... */
 
@@ -8842,6 +8911,7 @@ tp_v4_rcv(struct sk_buff *skb)
 #else
 	{
 		mblk_t *mp;
+
 #if 1
 		frtn_t fr = { &tp_free, (caddr_t) skb };
 		size_t plen = skb->len + (skb->data - skb->nh.raw);
@@ -9013,7 +9083,7 @@ tp_v4_err(struct sk_buff *skb, u32 info)
  * Allocates a new private structure, initializes it to appropriate values, and then inserts it into
  * the private structure list.
  */
-STATIC noinline struct tp *
+noinline struct tp *
 tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 {
 	struct tp *tp;
@@ -9050,14 +9120,14 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 		tp->info.TIDU_size = 65535 - sizeof(struct iphdr) - sizeof(struct udphdr);
 		tp->info.SERV_type = type ? : T_CLTS;
 		tp->info.CURRENT_state = TS_UNBND;
-		tp->info.PROVIDER_flag = T_XPG4_1 & ~T_SNDZERO;
+		tp->info.PROVIDER_flag = T_XPG4_1 | T_SNDZERO;
 		bufq_init(&tp->conq);
 		/* option defaults */
 		tp->options.xti.linger = xti_default_linger;
-		tp->options.xti.rcvbuf = sysctl_rmem_default;
+		tp->options.xti.rcvbuf = xti_default_rcvbuf;
 		tp->options.xti.rcvlowat = xti_default_rcvlowat;
-		tp->options.xti.sndbuf = sysctl_wmem_default;
-		tp->options.xti.sndlowat = 16768;
+		tp->options.xti.sndbuf = xti_default_sndbuf;
+		tp->options.xti.sndlowat = xti_default_sndlowat;
 		tp->options.xti.priority = xti_default_priority;
 		tp->options.ip.protocol = ip_default_protocol;
 		tp->options.ip.tos = ip_default_tos;
@@ -9090,7 +9160,7 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
  * tp_free_priv - deallocate a private structure for the close routine
  * @q: read queue of closing Stream
  */
-STATIC noinline void
+noinline void
 tp_free_priv(queue_t *q)
 {
 	struct tp *tp;
@@ -9205,7 +9275,7 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		cminor = FREE_CMINOR;
 	if (!(mp = allocb(sizeof(*so), BPRI_MED)))
 		return (ENOBUFS);
-	write_lock_str2(&master.lock, flags);
+	write_lock_irqsave(&master.lock, flags);
 	for (; *tpp; tpp = &(*tpp)->next) {
 		if (cmajor != (*tpp)->u.dev.cmajor)
 			break;
@@ -9224,7 +9294,7 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	}
 	if (mindex >= CMAJORS || !cmajor) {
 		ptrace(("%s: ERROR: no device numbers available\n", DRV_NAME));
-		write_unlock_str2(&master.lock, flags);
+		write_unlock_irqrestore(&master.lock, flags);
 		freeb(mp);
 		return (ENXIO);
 	}
@@ -9232,11 +9302,11 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	*devp = makedevice(cmajor, cminor);
 	if (!(tp = tp_alloc_priv(q, tpp, type, devp, crp))) {
 		ptrace(("%s: ERROR: No memory\n", DRV_NAME));
-		write_unlock_str2(&master.lock, flags);
+		write_unlock_irqrestore(&master.lock, flags);
 		freeb(mp);
 		return (ENOMEM);
 	}
-	write_unlock_str2(&master.lock, flags);
+	write_unlock_irqrestore(&master.lock, flags);
 	so = (typeof(so)) mp->b_wptr;
 	bzero(so, sizeof(*so));
 #if defined LFS
@@ -9246,17 +9316,24 @@ udp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	so->so_flags |= SO_WROFF;
 	so->so_wroff = MAX_HEADER;	/* this is too big */
 	so->so_flags |= SO_MINPSZ;
-	so->so_minpsz = udp_minfo.mi_minpsz;
+	so->so_minpsz = udp_winfo.mi_minpsz;
 	so->so_flags |= SO_MAXPSZ;
-	so->so_maxpsz = udp_minfo.mi_maxpsz;
+	so->so_maxpsz = udp_winfo.mi_maxpsz;
+#if 0
 	so->so_flags |= SO_HIWAT;
-	so->so_hiwat = udp_minfo.mi_hiwat;
+	so->so_hiwat = (SHEADHIWAT << 3) + (STRHIGH << 1);
 	so->so_flags |= SO_LOWAT;
-	so->so_lowat = udp_minfo.mi_lowat;
+	so->so_lowat = 0;
+#else
+	so->so_flags |= SO_HIWAT;
+	so->so_hiwat = SHEADHIWAT;
+	so->so_flags |= SO_LOWAT;
+	so->so_lowat = 0;
+#endif
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
-	putnext(q, mp);
 	qprocson(q);
+	putnext(q, mp);
 	return (0);
 }
 
@@ -9291,6 +9368,8 @@ udp_qclose(queue_t *q, int oflag, cred_t *crp)
 	goto skip_pop;
       skip_pop:
 	/* make sure procedures are off */
+	flushq(WR(q), FLUSHALL);
+	flushq(RD(q), FLUSHALL);
 	qprocsoff(q);
 	tp_free_priv(q);	/* free and unlink the structure */
 	goto quit;

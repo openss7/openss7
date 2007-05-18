@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 18:59:32 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/05/18 00:00:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:32 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 00:00:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.23  2007/05/18 00:00:41  brian
+ - check for nf_reset
+
  Revision 0.9.2.22  2007/03/25 18:59:32  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 18:59:32 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/05/18 00:00:41 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 18:59:32 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/05/18 00:00:41 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -98,7 +101,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 18:59:32 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/05/18 00:00:41 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -7894,7 +7897,9 @@ sl_r_sig(queue_t *q, mblk_t *mp)
 			case -ENOMEM:
 			case -EBUSY:
 			case -EAGAIN:
-				break;
+				if (mi_timer_requeue(mp))
+					break;
+				/* fall through */
 			default:
 				rtn = QR_ABSORBED;
 			}

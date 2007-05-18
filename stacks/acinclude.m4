@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2007/03/25 18:59:09 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2007/05/18 00:00:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/25 18:59:09 $ by $Author: brian $
+# Last Modified $Date: 2007/05/18 00:00:33 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.67  2007/05/18 00:00:33  brian
+# - check for nf_reset
+#
 # Revision 0.9.2.66  2007/03/25 18:59:09  brian
 # - changes to support 2.6.20-1.2307.fc5 kernel
 #
@@ -603,7 +606,7 @@ AC_DEFUN([_SS7_CONFIG_KERNEL], [dnl
 #include <net/udp.h>
 #include <net/tcp.h>
     ])
-    _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu ip_dst_output \
+    _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu nf_reset ip_dst_output \
 			ip_route_output_key __in_dev_get_rcu synchronize_net], [], [], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
