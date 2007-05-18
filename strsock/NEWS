@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Sockets -- history of user visible changes.  2007-05-03
-$Id: NEWS,v 0.9.2.23 2007/05/07 18:21:18 brian Exp $
+OpenSS7 STREAMS Sockets -- history of user visible changes.  2007-05-18
+$Id: NEWS,v 0.9.2.24 2007/05/18 22:14:15 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -23,10 +23,16 @@ release supporting recent distributions and tool chains.
 
 Major features since the last public release are as follows:
 
+   - Support build on CentOS 5.0 (RHEL5).
+
+   - Supports build on Ubuntu 7.04.
+
    - Updated to gettext 0.16.1.
 
    - Changes to support build on 2.6.20-1.2307.fc5 and
      2.6.20-1.2933.fc6 kernel.
+
+   - Supports build on Fedora Core 6.
 
    - Support for recent distributions and tool chains.
 

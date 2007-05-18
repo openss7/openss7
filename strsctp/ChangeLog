@@ -1,5 +1,13 @@
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+
+2007-05-18  Brian Bidulock  <bidulock@openss7.org>
+
 	* doc/manual/bugs.texi: document db_ref bug
 	* src/drivers/sctp2.c: compiler warnings
 	* src/test/test-sctp_n.c: send more messages in tests
