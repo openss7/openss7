@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:31 $
+ @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/05/18 12:15:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/17 22:55:31 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 12:15:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua_as.c,v $
+ Revision 0.9.2.7  2007/05/18 12:15:27  brian
+ - careful not to flush timers
+
  Revision 0.9.2.6  2007/05/17 22:55:31  brian
  - use mi_timer requeue to requeue mi timers
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:31 $"
+#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/05/18 12:15:27 $"
 
 static char const ident[] =
-    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:31 $";
+    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/05/18 12:15:27 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -147,7 +150,7 @@ static char const ident[] =
 /* ============================== */
 
 #define TUA_AS_DESCRIP		"TUA/SCTP AS TCAP STREAMS MULTIPLEXING DRIVER."
-#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:31 $"
+#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2007/05/18 12:15:27 $"
 #define TUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -14009,7 +14012,7 @@ lm_i_unlink(struct up *lm, queue_t *q, mblk_t *mp)
 	ua_unlink_free(tp);
 
 	/* Should probably flush queues in case a Stream head is reattached. */
-	flushq(RD(l->l_qtop), FLUSHALL);
+	flushq(RD(l->l_qtop), FLUSHDATA);
 	mi_copy_done(q, mp, 0);
 	return (0);
 }
@@ -14176,7 +14179,7 @@ lm_i_punlink(struct up *lm, queue_t *q, mblk_t *mp)
 	ua_unlink_free(tp);
 
 	/* Should probably flush queues in case a Stream head is reattached. */
-	flushq(RD(l->l_qtop), FLUSHALL);
+	flushq(RD(l->l_qtop), FLUSHDATA);
 	mi_copy_done(q, mp, 0);
 	return (0);
 }

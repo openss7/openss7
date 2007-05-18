@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/05/17 22:55:09 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/05/18 12:15:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/17 22:55:09 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 12:15:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 0.9.2.14  2007/05/18 12:15:17  brian
+ - careful not to flush timers
+
  Revision 0.9.2.13  2007/05/17 22:55:09  brian
  - use mi_timer requeue to requeue mi timers
 
@@ -91,10 +94,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/05/17 22:55:09 $"
+#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/05/18 12:15:17 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/05/17 22:55:09 $";
+    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/05/18 12:15:17 $";
 
 /*
  *  This is an M2UA multiplexing driver.  It is necessary to use a multiplexing driver because most
@@ -224,7 +227,7 @@ static char const ident[] =
 /* ============================== */
 
 #define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/05/17 22:55:09 $"
+#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/05/18 12:15:17 $"
 #define M2UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -14099,7 +14102,7 @@ lm_i_unlink(struct up *lm, queue_t *q, mblk_t *mp)
 	ua_unlink_free(tp);
 
 	/* Should probably flush queues in case a Stream head is reattached. */
-	flushq(RD(l->l_qtop), FLUSHALL);
+	flushq(RD(l->l_qtop), FLUSHDATA);
 	mi_copy_done(q, mp, 0);
 	return (0);
 }
@@ -14266,7 +14269,7 @@ lm_i_punlink(struct up *lm, queue_t *q, mblk_t *mp)
 	ua_unlink_free(tp);
 
 	/* Should probably flush queues in case a Stream head is reattached. */
-	flushq(RD(l->l_qtop), FLUSHALL);
+	flushq(RD(l->l_qtop), FLUSHDATA);
 	mi_copy_done(q, mp, 0);
 	return (0);
 }
