@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/25 06:00:15 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/18 12:02:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:00:15 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 12:02:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.29  2007/05/18 12:02:51  brian
+ - timer message handling, do not delete messages
+
  Revision 0.9.2.28  2007/03/25 06:00:15  brian
  - flush corrections
 
@@ -140,10 +143,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/25 06:00:15 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/18 12:02:51 $"
 
 static char const ident[] =
-    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/25 06:00:15 $";
+    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/18 12:02:51 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -164,7 +167,7 @@ static char const ident[] =
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/03/25 06:00:15 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/18 12:02:51 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL"
@@ -529,8 +532,10 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 		break;
 	case QR_STRIP:
 		if (mp->b_cont)
-			if (unlikely(putq(q, mp->b_cont) == 0))
-				freemsg(mp->b_cont);
+			if (unlikely(putq(q, mp->b_cont) == 0)) {
+				mp->b_cont->b_band = 0;
+				putq(q, mp->b_cont); /* must succeed */
+			}
 	case QR_TRIMMED:
 		freeb(mp);
 		break;
@@ -551,8 +556,10 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 		freemsg(mp);
 		break;
 	case QR_DISABLE:
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
+		if (unlikely(putq(q, mp) == 0)) {
+			mp->b_band = 0;
+			putq(q, mp); /* must succeed */
+		}
 		break;
 	case QR_PASSFLOW:
 		if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
@@ -564,8 +571,10 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 	case -ENOMEM:
 	case -EAGAIN:
 	case QR_RETRY:
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
+		if (unlikely(putq(q, mp) == 0)) {
+			mp->b_band = 0;
+			putq(q, mp); /* must succeed */
+		}
 		break;
 	}
 	return;
@@ -602,8 +611,10 @@ ss7_putq(queue_t *q, mblk_t *mp, int streamscall (*proc) (queue_t *, mblk_t *),
 	ensure(mp, return (-EFAULT));
 
 	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || (q->q_flag & QSVCBUSY))) {
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
+		if (unlikely(putq(q, mp) == 0)) {
+			mp->b_band = 0;
+			putq(q, mp); /* must succeed */
+		}
 		return (0);
 	}
 	if (likely((locked = ss7_trylockq(q))) || unlikely(mp->b_datap->db_type == M_FLUSH)) {
@@ -630,8 +641,10 @@ ss7_putq(queue_t *q, mblk_t *mp, int streamscall (*proc) (queue_t *, mblk_t *),
 		goto unlock_exit;
 	} else {
 		seldom();
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
+		if (unlikely(putq(q, mp) == 0)) {
+			mp->b_band = 0;
+			putq(q, mp); /* must succeed */
+		}
 	}
 	return (0);
 }
@@ -648,8 +661,10 @@ ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 		return (1);
 	case QR_STRIP:
 		if (mp->b_cont)
-			if (!putbq(q, mp->b_cont))
-				freemsg(mp->b_cont);
+			if (!putbq(q, mp->b_cont)) {
+				mp->b_cont->b_band = 0;
+				putbq(q, mp->b_cont); /* must succeed */
+			}
 	case QR_TRIMMED:
 		freeb(mp);
 		return (1);
@@ -673,8 +688,10 @@ ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 		printd(("%s: %p: ERROR: (q disabling) %d\n", q->q_qinfo->qi_minfo->mi_idname,
 			q->q_ptr, rtn));
 		noenable(q);
-		if (!putbq(q, mp))
-			freemsg(mp);
+		if (!putbq(q, mp)) {
+			mp->b_band = 0;
+			putbq(q, mp); /* must succeed */
+		}
 		rtn = 0;
 		return (0);
 	case QR_PASSFLOW:
@@ -689,8 +706,10 @@ ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 		if (mp->b_datap->db_type < QPCTL) {
 			printd(("%s: %p: ERROR: (q stalled) %d\n", q->q_qinfo->qi_minfo->mi_idname,
 				q->q_ptr, rtn));
-			if (!putbq(q, mp))
-				freemsg(mp);
+			if (!putbq(q, mp)) {
+				mp->b_band = 0;
+				putbq(q, mp); /* must succeed */
+			}
 			return (0);
 		}
 		/* 
@@ -706,6 +725,18 @@ ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 		case M_PCCTL:
 			mp->b_datap->db_type = M_CTL;
 			break;
+		case M_PCSIG:
+			mp->b_datap->db_type = M_SIG;
+			break;
+		case M_PCEVENT:
+			mp->b_datap->db_type = M_EVENT;
+			break;
+		case M_PCSETOPTS:
+			mp->b_datap->db_type = M_SETOPTS;
+			break;
+		case M_HPDATA:
+			mp->b_datap->db_type = M_DATA;
+			break;
 		default:
 			printd(("%s: %p: ERROR: (q dropping) %d\n", q->q_qinfo->qi_minfo->mi_idname,
 				q->q_ptr, rtn));
@@ -713,12 +744,16 @@ ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 			return (1);
 		}
 		mp->b_band = 255;
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
+		if (unlikely(putq(q, mp) == 0)) {
+			mp->b_band = 0;
+			putq(q, mp); /* must succeed */
+		}
 		return (0);
 	case QR_RETRY:
-		if (!putbq(q, mp))
-			freemsg(mp);
+		if (!putbq(q, mp)) {
+			mp->b_band = 0;
+			putbq(q, mp); /* must succeed */
+		}
 		return (1);
 	}
 }
