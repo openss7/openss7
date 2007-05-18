@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/05/17 22:01:20 $
+ @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/05/18 12:03:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/17 22:01:20 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 12:03:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strace.c,v $
+ Revision 0.9.2.19  2007/05/18 12:03:36  brian
+ - doc updates and trace argument corrections
+
  Revision 0.9.2.18  2007/05/17 22:01:20  brian
  - corrections from strsctp performance testing
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/05/17 22:01:20 $"
+#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/05/18 12:03:36 $"
 
 static char const ident[] =
-    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/05/17 22:01:20 $";
+    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/05/18 12:03:36 $";
 
 /*
  *  SVR 4.2 Utility: strace - Prints STREAMS trace messages.
@@ -1280,6 +1283,10 @@ main(int argc, char *argv[])
 			exit(2);
 		}
 	}
+	if (debug) {
+		fprintf(stderr, "%s: option index = %d\n", argv[0], optind);
+		fprintf(stderr, "%s: option count = %d\n", argv[0], argc);
+	}
 	{
 		int count = 0;
 		struct trace_ids *tids = NULL;
@@ -1298,24 +1305,41 @@ main(int argc, char *argv[])
 			int i;
 
 			count = (argc - optind) / 3;
+			if (debug)
+				fprintf(stderr, "%s: allocating %d trace id structures\n", argv[0], count);
 			if ((tids = calloc(count, sizeof(struct trace_ids))) == NULL) {
 				perror(argv[0]);
 				exit(1);
 			}
 			for (i = 0; i < count; i++) {
-				if (strncmp(argv[optind], "all", 4)) {
+				if (strncmp(argv[optind], "all", 4) == 0) {
 					tids[i].ti_mid = -1;
+					if (debug)
+						fprintf(stderr, "%s: mid: all\n", argv[0]);
 				} else {
+					tids[i].ti_mid = strtol(argv[optind], NULL, 0);
+					if (debug)
+						fprintf(stderr, "%s: mid: %d\n", argv[0], (int) tids[i].ti_mid);
 				}
 				optind++;
-				if (strncmp(argv[optind], "all", 4)) {
+				if (strncmp(argv[optind], "all", 4) == 0) {
 					tids[i].ti_sid = -1;
+					if (debug)
+						fprintf(stderr, "%s: sid: all\n", argv[0]);
 				} else {
+					tids[i].ti_sid = strtol(argv[optind], NULL, 0);
+					if (debug)
+						fprintf(stderr, "%s: sid: %d\n", argv[0], (int) tids[i].ti_sid);
 				}
 				optind++;
-				if (strncmp(argv[optind], "all", 4)) {
+				if (strncmp(argv[optind], "all", 4) == 0) {
 					tids[i].ti_level = -1;
+					if (debug)
+						fprintf(stderr, "%s: lev: all\n", argv[0]);
 				} else {
+					tids[i].ti_level = strtol(argv[optind], NULL, 0);
+					if (debug)
+						fprintf(stderr, "%s: lev: %d\n", argv[0], (int) tids[i].ti_level);
 				}
 				optind++;
 				tids[i].ti_flags = -1;

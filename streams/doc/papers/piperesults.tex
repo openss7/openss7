@@ -292,7 +292,7 @@ high-performance, named \textsl{Linux Fast-STREAMS}.
 The OpenSS7 Project \cite[]{openss7} also maintains public and internal
 versions of the \textsl{LiS} package.  The last public release was
 \textit{LiS-2.18.3}; the current internal release version is
-\textit{LiS-2.18.6}.  The current production public rlease of \textsl{Linux
+\textit{LiS-2.18.6}.  The current production public release of \textsl{Linux
 Fast-STREAMS} is \textit{streams-0.9.3}.
 
 \section[Objective]{Objective}
@@ -829,7 +829,7 @@ than \textsl{LiS}.
 range of write sizes.  The slope of the delay curves are similar for all
 implementations, as expected.  The zero intercept of \textsl{Linux
 Fast-STREAMS} is, however, far superior to that of legacy Linux and a full
-order of magnitude better than the underpeforming \textsl{LiS}.
+order of magnitude better than the under-performing \textsl{LiS}.
 
 \item[Throughput.]
 
@@ -1086,7 +1086,7 @@ write sizes, to a 175\% increase in performance at lower write sizes.
 \end{description}
 
 \subsection[Daisy]{Daisy}
-Daisy is a 3.0GHz i630 (x86\_64) hyperthreaded machine with 1Gb of memory.
+Daisy is a 3.0GHz i630 (x86\_64) hyper-threaded machine with 1Gb of memory.
 Linux distributions tested on this machine are as follows:
 
 \begin{tabular}{ll}\\
@@ -1097,8 +1097,8 @@ CentOS 5 & 2.6.18-8-el5\\
 \end{tabular}\\[1.0ex]
 
 This machine is used as an SMP control machine.  Most of the test were
-performed on uniprocessor non-hyperthreaded machines.  This machine is
-hyperthreaded and runs full SMP kernels.  This machine also supports EMT64 and
+performed on uniprocessor non-hyper-threaded machines.  This machine is
+hyper-threaded and runs full SMP kernels.  This machine also supports EMT64 and
 runs \texttt{x86\_64} kernels.  It is used to rule out both SMP differences as
 well as 64-bit architecture differences.
 
@@ -1150,7 +1150,7 @@ order of magnitude greater than that of \textsl{LiS}.
 \textit{Figure \ref{figure:smpdelay}} illustrates the average write delay for
 \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
 range of write sizes.  Again the slope appears to be the same for all
-implementations, except Linux legacy pipes which exhibit some annomallies
+implementations, except Linux legacy pipes which exhibit some anomalies
 below 1024 byte write sizes.  The intercept for \textsl{Linux Fast-STREAMS} is
 again much superior to the other two implementations.
 
@@ -1221,7 +1221,7 @@ order of magnitude greater than that of \textsl{LiS}.
 \textit{Figure \ref{figure:cos5delay}} illustrates the average write delay for
 \textsl{LiS}, \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
 range of write sizes.  Again the slope appears to be the same for all
-implementations, except Linux legacy pipes which exhibit some annomallies
+implementations, except Linux legacy pipes which exhibit some anomalies
 below 1024 byte write sizes.  The intercept for \textsl{Linux Fast-STREAMS} is
 again much superior to the other two implementations.
 
@@ -1346,7 +1346,7 @@ performance at smaller write/read sizes is significantly greater (as much as
 200-400\%) than that of legacy pipes.  The performance of \textsl{LiS} is
 dismal (approx. 75\% {\em decrease}) compared to legacy Linux pipes.
 
-Looking at the only the legacy Linux and \textsl{Linux Fast-STREAMS}
+Looking at only the legacy Linux and \textsl{Linux Fast-STREAMS}
 implementations, the difference can be described by analyzing the
 implementations.
 
@@ -1438,7 +1438,7 @@ scheduled.  Once the STREAMS scheduler later runs, the writing process is
 awoken.
 
 \textsl{Linux Fast-STREAMS} is designed to run tasks queued to the STREAMS
-scheduler on the same processor as the queuing process or task.  This avoids
+scheduler on the same processor as the queueing process or task.  This avoids
 unnecessary context switches.
 
 The STREAMS-based pipe approach results in fewer wakeup events being
@@ -1571,7 +1571,7 @@ Despite claiming to be an adequate implementation of SVR4 STREAMS,
 \textsl{LiS} performance is dismal enough to make it unusable.  Due to
 conformance and implementation errors, \textsl{LiS} was already deprecated by
 \textsl{Linux Fast-STREAMS}, and these tests exemplify why a replacement for
-\textsl{LiS} was necessary and why support for \textsl{LiS} was abandonned by
+\textsl{LiS} was necessary and why support for \textsl{LiS} was abandoned by
 the OpenSS7 Project \cite[]{openss7}.  \textsl{LiS} pipe performance tested
 about half that of legacy Linux pipes and a full order of magnitude slower
 than \textsl{Linux Fast-STREAMS}.
@@ -1586,13 +1586,13 @@ There are two future work items that immediately come to mind:
 
 \item
 
-It is fairly straighforward to replace the pipe implementation of an
+It is fairly straightforward to replace the pipe implementation of an
 application that uses shared libraries from underneath it using preloaded
 libraries.  The \textsl{Linux Fast-STREAMS} \texttt{libstreams.so} library can
 be preloaded, replacing the pipe(2) library call with the STREAMS-based pipe
 equivalent.  A suitable application that uses pipes extensively could be
 benchmarked both on legacy Linux pipes and STREAMS-based pipes to determine
-the efficiencies acheived over a less narrowly defined workload.
+the efficiencies achieved over a less narrowly defined workload.
 
 \item
 
