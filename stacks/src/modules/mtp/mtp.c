@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:40 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/05/18 00:00:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:40 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 00:00:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 0.9.2.19  2007/05/18 00:00:44  brian
+ - check for nf_reset
+
  Revision 0.9.2.18  2007/03/25 18:59:40  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:40 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/05/18 00:00:44 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:40 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/05/18 00:00:44 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -120,7 +123,7 @@ static char const ident[] =
 #define STRLOGDA	6	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:40 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/05/18 00:00:44 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -21382,18 +21385,21 @@ mtp_w_sig(queue_t *q, mblk_t *mp)
 {
 	struct mtp *mtp;
 	uint oldstate;
-	int err = 0;
+	int err;
 
 	if (!(mtp = mtp_acquire(q)))
-		return (-EAGAIN);
+		return (mi_timer_requeue(mp) ? -EAGAIN : 0);
 
 	oldstate = mtp_get_state(mtp);
 
-	if (likely(mi_timer_valid(mp)))
+	if (likely(mi_timer_valid(mp))) {
 		err = do_timeout(q, mp);
 
-	if (err)
-		mtp_set_state(mtp, oldstate);
+		if (err) {
+			mtp_set_state(mtp, oldstate);
+			err = mi_timer_requeue(mp) ? err : 0;
+		}
+	}
 	mtp_release(mtp);
 	return (err < 0 ? err : 0);
 }
@@ -21406,15 +21412,18 @@ sl_r_sig(queue_t *q, mblk_t *mp)
 	int err = 0;
 
 	if (!(sl = sl_acquire(q)))
-		return (-EAGAIN);
+		return (mi_timer_requeue(mp) ? -EAGAIN : 0);
 
 	oldstate = sl_get_l_state(sl);
 
-	if (likely(mi_timer_valid(mp)))
+	if (likely(mi_timer_valid(mp))) {
 		err = do_timeout(q, mp);
 
-	if (err)
-		sl_set_state(q, sl, oldstate);
+		if (err) {
+			sl_set_state(q, sl, oldstate);
+			err = mi_timer_requeue(mp) ? err : 0;
+		}
+	}
 	sl_release(sl);
 	return (err < 0 ? err : 0);
 }

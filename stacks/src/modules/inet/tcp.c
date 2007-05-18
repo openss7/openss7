@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:23 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/05/18 00:00:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:23 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 00:00:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.4  2007/05/18 00:00:38  brian
+ - check for nf_reset
+
  Revision 0.9.2.3  2007/03/25 18:59:23  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -104,9 +107,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:23 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/05/18 00:00:38 $"
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:23 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/05/18 00:00:38 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -185,7 +188,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $)
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:23 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/05/18 00:00:38 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -194,7 +197,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.3 $)
 			TCP_REVISION	"\n" \
 			TCP_COPYRIGHT	"\n" \
 			TCP_DEVICE	"\n" \
-			TCP_CONTACT	"\n"
+			TCP_CONTACT
 #define TCP_SPLASH	TCP_DESCRIP	" - " \
 			TCP_REVISION
 
@@ -4050,7 +4053,13 @@ tpi_v4_err_next(struct sk_buff *skb, __u32 info)
 		ip->next->err_handler(skb, info);
 	return (0);
 }
+#ifdef CONFIG_SMP
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
+#else				/* CONFIG_SMP */
+static spinlock_t inet_proto_lock_ = SPIN_LOCK_UNLOCKED;
+
+#define inet_proto_lockp (&inet_proto_lock_)
+#endif				/* CONFIG_SMP */
 
 #ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
 #define module_text_address(__arg) ((typeof(&module_text_address))HAVE_MODULE_TEXT_ADDRESS_ADDR)((__arg))
@@ -6380,6 +6389,10 @@ tpi_free(caddr_t data)
 	return;
 }
 
+#ifndef CHECKSUM_HW
+#define CHECKSUM_HW CHECKSUM_COMPLETE
+#endif
+
 /**
  * tpi_v4_rcv - receive IPv4 protocol packets
  */
@@ -6392,6 +6405,10 @@ tpi_v4_rcv(struct sk_buff *skb)
 	struct rtable *rt;
 	struct tcphdr *th, *th2;
 	frtn_t fr = { &tpi_free, (char *) skb };
+
+#ifdef HAVE_KFUNC_NF_RESET
+	nf_reset(skb);
+#endif
 
 //      IP_INC_STATS_BH(IpInDelivers);  /* should wait... */
 

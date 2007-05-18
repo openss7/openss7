@@ -1,3 +1,18 @@
+2007-05-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: check for nf_reset
+	* src/modules/inet/inet.c: raiontalize to strinet package
+	* src/modules/inet/rawip.c: raiontalize to strinet package
+	* src/modules/inet/tcp.c: raiontalize to strinet package
+	* src/modules/inet/udp.c: raiontalize to strinet package
+	* src/modules/m2pa/m2pa_sl.c: use mi_timer_requeue to requeue mi timers
+	* src/modules/mtp/mtp.c: use mi_timer_requeue to requeue mi timers
+	* src/modules/mtp/mtp_min.c: use mi_timer_requeue to requeue mi timers
+	* src/modules/sccp/sccp.c: use mi_timer_requeue to requeue mi timers
+	* src/modules/sctp/sctp2.c: rationalize to strsctp package
+	* src/modules/sl/slpmod.c: use mi_timer_requeue to requeue mi timers
+	* src/modules/x400p-ss7/sl_x400p.c: use mi_timer_requeue to requeue mi timers
+
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man7/cci_sipt.7.man: updated manual page

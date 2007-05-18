@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 18:59:54 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/05/18 00:00:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:54 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 00:00:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp.c,v $
+ Revision 0.9.2.20  2007/05/18 00:00:53  brian
+ - check for nf_reset
+
  Revision 0.9.2.19  2007/03/25 18:59:54  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -67,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 18:59:54 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/05/18 00:00:53 $"
 
-static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 18:59:54 $";
+static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/05/18 00:00:53 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver which can have MTP
@@ -106,7 +109,7 @@ static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.19 
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/25 18:59:54 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/05/18 00:00:53 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -19508,15 +19511,18 @@ sccp_w_sig(queue_t *q, mblk_t *mp)
 	int err = 0;
 
 	if (!(sc = sccp_acquire(q)))
-		return (-EAGAIN);
+		return (mi_timer_requeue(mp) ? -EAGAIN : 0);
 
 	oldstate = sccp_get_state(sc);
 
-	if (likely(mi_timer_valid(mp)))
+	if (likely(mi_timer_valid(mp))) {
 		err = do_timeout(q, mp);
 
-	if (err)
-		sccp_set_state(sc, oldstate);
+		if (err) {
+			sccp_set_state(sc, oldstate);
+			err = mi_timer_requeue(mp) ? err : 0;
+		}
+	}
 
 	sccp_release(sc);
 	return (err);
@@ -19529,15 +19535,18 @@ mtp_r_sig(queue_t *q, mblk_t *mp)
 	int err = 0;
 
 	if (!(mt = mtp_acquire(q)))
-		return (-EAGAIN);
+		return (mi_timer_requeue(mp) ? -EAGAIN : 0);
 
 	oldstate = mtp_get_state(mt);
 
-	if (likely(mi_timer_valid(mp)))
+	if (likely(mi_timer_valid(mp))) {
 		err = do_timeout(q, mp);
 
-	if (err)
-		mtp_set_state(mt, oldstate);
+		if (err) {
+			mtp_set_state(mt, oldstate);
+			err = mi_timer_requeue(mp) ? err : 0;
+		}
+	}
 
 	mtp_release(mt);
 	return (err);
