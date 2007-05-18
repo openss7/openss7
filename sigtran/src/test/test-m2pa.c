@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/15 10:08:53 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/05/18 12:01:59 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:08:53 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 12:01:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.17  2007/05/18 12:01:59  brian
+ - trace logging and service procedures for m2pa
+
  Revision 0.9.2.16  2007/03/15 10:08:53  brian
  - updates for release
 
@@ -118,9 +121,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/15 10:08:53 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/05/18 12:01:59 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/15 10:08:53 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/05/18 12:01:59 $";
 
 #define TEST_M2PA   1
 #define TEST_X400   0
@@ -6667,6 +6670,7 @@ do_signal(int child, int action)
 
 	case __TEST_POWER_ON:
 		if (child == CHILD_PTU) {
+#ifndef TEST_M2PA
 			ctrl->len = sizeof(p->sdt.daedt_start_req);
 			p->sdt.daedt_start_req.sdt_primitive = SDT_DAEDT_START_REQ;
 			data = NULL;
@@ -6674,6 +6678,7 @@ do_signal(int child, int action)
 			ctrl->len = sizeof(p->sdt.daedr_start_req);
 			p->sdt.daedr_start_req.sdt_primitive = SDT_DAEDR_START_REQ;
 			data = NULL;
+#endif
 		} else {
 			ctrl->len = sizeof(p->sl.power_on_req);
 			p->sl.power_on_req.sl_primitive = SL_POWER_ON_REQ;
@@ -6682,7 +6687,13 @@ do_signal(int child, int action)
 			test_pband = 0;
 		}
 		print_command_state(child, ":power on");
+#ifdef TEST_M2PA
+		if (child != CHILD_PTU)
+			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+		return __RESULT_SUCCESS;
+#else
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+#endif
 	case __TEST_START:
 		ctrl->len = sizeof(p->sl.start_req);
 		p->sl.start_req.sl_primitive = SL_START_REQ;
