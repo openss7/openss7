@@ -1,7 +1,7 @@
 %% -*- tex -*- vim: ft=tex tw=78 nocin nosi
 %% =========================================================================
 %%
-%% @(#) $Id: testresults.tex,v 0.9.2.3 2007/05/17 22:38:16 brian Exp $
+%% @(#) $Id: testresults.tex,v 0.9.2.4 2007/05/18 12:04:24 brian Exp $
 %%
 %% =========================================================================
 %%
@@ -53,7 +53,7 @@
 %% 
 %% =========================================================================
 %%
-%% Last Modified $Date: 2007/05/17 22:38:16 $ by $Author: brian $
+%% Last Modified $Date: 2007/05/18 12:04:24 $ by $Author: brian $
 %%
 %% =========================================================================
 
@@ -181,7 +181,7 @@ package \cite[]{LfS}.
 
 UNIX networking has a rich history.  The TCP/IP protocol suite was first
 implemented by BBN using Sockets under a DARPA research project on 4.1aBSD and
-then incorporated bt the CSRG into 4.2BSD \cite[]{bsd}.  Lachmann and
+then incorporated by the CSRG into 4.2BSD \cite[]{bsd}.  Lachmann and
 Associates (Legent) subsequently implemented one of the first TCP/IP protocol
 suite based on the Transport Provider Interface (TPI) \cite[]{tli} and STREAMS
 \cite[]{magic}.  Two other predominant TCP/IP implementations on STREAMS
@@ -193,7 +193,7 @@ STREAMS is a facility first presented in a paper by Dennis M. Ritchie in 1984
 \textsl{Bell Laboratories Eighth Edition UNIX}, incorporated into \textsl{UNIX
 System V Release 3} and enhanced in \textsl{UNIX Sysvem V Release 4} and
 further in \textsl{UNIX System V Release 4.2}.  STREAMS was used in SVR4 for
-terminal intput/output, pseudo-terminals, pipes, named pipes (FIFOs),
+terminal input-output, pseudo-terminals, pipes, named pipes (FIFOs),
 interprocess communication and networking.  STREAMS was used in SVR3 for
 networking (with the NSU package).  Since its release in \textsl{System V
 Release 3}, STREAMS has been implemented across a wide range of UNIX,
@@ -251,7 +251,7 @@ Sockets uses the BSD interface that was developed by BBN for TCP/IP protocol
 suite under DARPA contract on 4.1aBSD and released in 4.2BSD.  BSD Sockets
 provides a set of primary API functions that are typically implemented as
 system calls.  The BSD Sockets interface is non-standard and is now
-deprecated in favor of the POSIX/SUS standard Sockets interface.
+deprecated in favour of the POSIX/SUS standard Sockets interface.
 
 \item[{\it POSIX Sockets.}]
 
@@ -309,11 +309,11 @@ POSIX Sockets based on STREAMS:
 
 \item[{\it Compatibility Library}]
 
-Under this approach, a compatibilty library (\texttt{libsocket.o}) contains
+Under this approach, a compatibility library (\texttt{libsocket.o}) contains
 the socket calls as library functions that internally invoke the TLI or TPI
 interface to an underlying STREAMS transport provider.  This is the approach
-originally taken by SVR4 \cite[]{magic}, but this approach has susbsequently
-been abadonned due to the difficulties regarding fork(2) and fundamental
+originally taken by SVR4 \cite[]{magic}, but this approach has subsequently
+been abandoned due to the difficulties regarding fork(2) and fundamental
 incompatibilities deriving from a library only approach.
 
 \item[{\it Library and cooperating \sl STREAMS module.}]
@@ -370,7 +370,7 @@ implement an SVR 4.2 STREAMS package from scratch, with the objective of
 production quality and high-performance, named \textsl{Linux Fast-STREAMS}
 \cite[]{LfS}.
 
-The OpenSS7 Porject also maintains public and internal version of the
+The OpenSS7 Project also maintains public and internal version of the
 \textsl{LiS} package.  The last public release was \textit{LiS-2.18.3}; the
 current internal release version is \textit{LiS-2.18.6}.  The current
 production public release of \textsl{Linux Fast-STREAMS} is
@@ -941,7 +941,7 @@ of the graphs at large message sizes indicates some degree of saturation.
 \textit{Figure \ref{figure:fc6comp}}
 illustrates the comparison of Sockets to XTI over Socket and XTI approaches.
 STREAMS demonstrates significant improvements (approx. 30\% improvement) at
-message sizes below 1024 btyes.  Perhaps surprising is that the XTI over
+message sizes below 1024 bytes.  Perhaps surprising is that the XTI over
 Sockets approach rivals (95\%) Sockets alone at small message sizes (where
 multiple copies are not controlling).
 
@@ -1379,7 +1379,7 @@ differences from other tested behaviour obvious.
 \end{figure}
 
 \subsection[Daisy]{Daisy}
-Daisy is a 3.0GHz i630 (x86\_64) hyperthreaded machine with 1Gb of memory.
+Daisy is a 3.0GHz i630 (x86\_64) hyper-threaded machine with 1Gb of memory.
 Linux distributions tested on this machine are as follows:
 
 \begin{tabular}{ll}\\
@@ -1390,8 +1390,8 @@ CentOS 5.0 & 2.6.18-8.1.3.el5\\
 \end{tabular}\\[1.0ex]
 
 This machine is used as an SMP control machine.  Most of the test were
-performed on uniprocessor non-hyperthreaded machines.  This machine is
-hyperthreaded and runs full SMP kernels.  This machine also supports EMT64 and
+performed on uniprocessor non-hyper-threaded machines.  This machine is
+hyper-threaded and runs full SMP kernels.  This machine also supports EMT64 and
 runs \texttt{x86\_64} kernels.  It is used to rule out both SMP differences as
 well as 64-bit architecture differences.
 
@@ -1420,7 +1420,7 @@ STREAMS demonstrates significant improvements at message sizes of less than
 
 The slope of the delay curve either indicates that Sockets is using slightly
 larger buffers than STREAMS, or that Sockets is somehow exploiting some
-per-byte efficiencies at larger message sizes not acheived by STREAMS.
+per-byte efficiencies at larger message sizes not achieved by STREAMS.
 Nevertheless, the STREAMS intercept is so low that the delay curve for STREAMS
 is everywhere beneath that of Sockets.
 
@@ -1498,7 +1498,7 @@ STREAMS demonstrates significant improvements at message sizes of less than
 
 The slope of the delay curve either indicates that Sockets is using slightly
 larger buffers than STREAMS, or that Sockets is somehow exploiting some
-per-byte efficiencies at larger message sizes not acheived by STREAMS.
+per-byte efficiencies at larger message sizes not achieved by STREAMS.
 Nevertheless, the STREAMS intercept is so low that the delay curve for STREAMS
 is everywhere beneath that of Sockets.
 
@@ -1683,15 +1683,14 @@ the send buffer maximum, either the calling process blocks awaiting available
 buffer, or the system call returns with an error (\texttt{ENOBUFS}).  If the
 current send request will fit into the send buffer, a socket buffer
 (\texttt{skbuff}) is allocated, data is copied from user space to the buffer,
-and the socket buffer is dispatched ot the IP layer for transmission.
+and the socket buffer is dispatched to the IP layer for transmission.
 
 Linux 2.6 kernels have an amazing amount of special case code that gets
-executed for even a simply UDP send operation.  Linux 2.4 kernels are far more
-direct.  The result is the same, they are different, however, in the depths to
-which the 2.6 kernel must delve before discovering that a send is just a
-simple send.  This might explain part of the rather striking differences
-between the performance comparison between STREAMS and NET4 on 2.6 and 2.4
-kernels.
+executed for even a simple UDP send operation.  Linux 2.4 kernels are far more
+direct.  The result is the same, even though they are different in the depths
+to which they must delve before discovering that a send is just a simple send.
+This might explain part of the rather striking differences between the
+performance comparison between STREAMS and NET4 on 2.6 and 2.4 kernels.
 
 When the STREAMS Stream head receives a putmsg(2) request, it checks
 downstream flow control.  If the Stream is flow controlled downstream, either
