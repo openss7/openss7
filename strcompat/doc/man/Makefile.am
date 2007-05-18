@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/03/30 15:15:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/05/18 21:17:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/30 15:15:38 $ by $Author: brian $
+# Last Modified $Date: 2007/05/18 21:17:56 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.28  2007/05/18 21:17:56  brian
+# - updated manual pages for check target
+#
 # Revision 0.9.2.27  2007/03/30 15:15:38  brian
 # - added missing manpages
 #
@@ -230,6 +233,10 @@ mps_compat_pages = \
 	man9/mi_strlog.9 \
 	man9/mi_strtol.9 \
 	man9/mi_timer.9 \
+	man9/mi_timer_running.9 \
+	man9/mi_timer_cond.9 \
+	man9/mi_timer_ticks.9 \
+	man9/mi_timer_requeue.9 \
 	man9/mi_timer_alloc.9 \
 	man9/mi_timer_alloc_MAC.9 \
 	man9/mi_timer_alloc_SUN.9 \
@@ -1307,6 +1314,10 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_strlog.9.man \
 	man9/mi_strtol.9.man \
 	man9/mi_timer.9.man \
+	man9/mi_timer_running.9.man \
+	man9/mi_timer_cond.9.man \
+	man9/mi_timer_ticks.9.man \
+	man9/mi_timer_requeue.9.man \
 	man9/mi_timer_alloc.9.man \
 	man9/mi_timer_alloc_MAC.9.man \
 	man9/mi_timer_alloc_SUN.9.man \

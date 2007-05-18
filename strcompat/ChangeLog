@@ -4,6 +4,17 @@
 	  - do not delete messages
 	  - handle mi_timer messages correctly
 
+	* doc/man/man9/mi_timer_cond.9.man: added new manpages
+	* doc/man/man9/mi_timer_requeue.9.man: added new manpages
+	* doc/man/man9/mi_timer_running.9.man: added new manpages
+	* doc/man/man9/mi_timer_ticks.9.man: added new manpages
+
+	* doc/man/Makefile.am: update for release
+	* doc/man/man9/mi_timer.9.man: update for release
+	* doc/man/man9/mi_timer_move.9.man: update for release
+	* doc/man/man9/mi_timer_remain.9.man: update for release
+	* doc/manual/news.texi: update for release
+
 2007-05-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man9/mi_mpprintf.9.man: documentation update
