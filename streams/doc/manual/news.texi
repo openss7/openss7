@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.30 2007/05/07 18:21:06 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.31 2007/05/18 21:20:18 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/05/07 18:21:06 $ by $Author: brian $
+@c Last Modified $Date: 2007/05/18 21:20:18 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -97,6 +97,11 @@ Major features since the last public release are as follows:
 
 @itemize -
 @item
+The @manref{strace(8)}, @manref{strerr(8)} utilities and @manref{log(4)} driver have had some
+corrections.  The STREAMS trace logger is now an excellent way for trace logging of fielded
+production drivers.  A number of OpenSS7 drivers have already been converted to use this facility.
+
+@item
 Support build on CentOS 5.0 (RHEL5).
 
 @item
@@ -110,6 +115,10 @@ significant performance improvements (like it wasn't fast enough already).
 
 STREAMS-based pipes in this package now perform 2 to 5 times (yes %200 to %500) faster than the
 old legacy 4.1BSD/SVR4 Linux pipes currently in the kernel: perhaps we should shout the "Fast" too.
+
+The impact of these performance changes is that @cite{Linux Fast-STREAMS} now runs faster and looser
+on SMP systems: if your drivers have race conditions they will likely be exacerbated by this
+version.
 
 @item
 Corrected a few bugs.  See BUGS in the release for more information.
