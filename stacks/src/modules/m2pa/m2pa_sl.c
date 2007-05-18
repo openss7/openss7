@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/05/18 12:15:35 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/05/18 12:24:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 12:15:35 $ by $Author: brian $
+ Last Modified $Date: 2007/05/18 12:24:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.26  2007/05/18 12:24:04  brian
+ - indentation
+
  Revision 0.9.2.25  2007/05/18 12:15:35  brian
  - careful not to flush timers
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/05/18 12:15:35 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/05/18 12:24:04 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/05/18 12:15:35 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/05/18 12:24:04 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -110,7 +113,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/05/18 12:15:35 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/05/18 12:24:04 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -187,13 +190,13 @@ struct streamtab m2pa_slinfo = {
 	.st_wrinit = &sl_winit,		/* Upper write queue */
 };
 
-#define M2PALOGST	1		/* log M2PA state transitions */
-#define M2PALOGTO	2		/* log M2PA timeouts */
-#define M2PALOGRX	3		/* log M2PA primitives received */
-#define M2PALOGTX	4		/* log M2PA primitives issued */
-#define M2PALOGTE	5		/* log M2PA timer events */
-#define M2PALOGNO	6		/* log M2PA additional data */
-#define M2PALOGDA	7		/* log M2PA data */
+#define M2PALOGST	1	/* log M2PA state transitions */
+#define M2PALOGTO	2	/* log M2PA timeouts */
+#define M2PALOGRX	3	/* log M2PA primitives received */
+#define M2PALOGTX	4	/* log M2PA primitives issued */
+#define M2PALOGTE	5	/* log M2PA timer events */
+#define M2PALOGNO	6	/* log M2PA additional data */
+#define M2PALOGDA	7	/* log M2PA data */
 
 #if 0
 #define m2palog(sl, level, flags, fmt, ...) \
@@ -271,7 +274,8 @@ typedef struct sl {
 
 #define SL_PRIV(__q) ((struct sl *)(__q)->q_ptr)
 
-STATIC struct sl *sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp, int mid, int sid);
+STATIC struct sl *sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp, int mid,
+				int sid);
 STATIC void sl_free_priv(queue_t *q);
 STATIC struct sl *sl_get(struct sl *sl);
 STATIC void sl_put(struct sl *sl);
@@ -690,7 +694,8 @@ lmi_error_ack(struct sl *sl, queue_t *q, lmi_long prim, lmi_long err)
 				break;
 			default:
 				/* Default is not to change state. */
-				m2paloger(sl, "%s() called in incorrect state %d", __FUNCTION__, (int) sl_get_n_state(sl));
+				m2paloger(sl, "%s() called in incorrect state %d", __FUNCTION__,
+					  (int) sl_get_n_state(sl));
 				break;
 			}
 			break;
@@ -1451,7 +1456,7 @@ n_exdata_req(struct sl *sl, queue_t *q, void *qos_ptr, size_t qos_len, mblk_t *d
 	mblk_t *mp;
 
 	if (likely((mp = ss7_allocb(q, sizeof(*p) + qos_len, BPRI_MED)) != NULL)) {
-		mp->b_band = 1; /* expedite */
+		mp->b_band = 1;	/* expedite */
 		if (likely(bcanputnext(sl->iq, mp->b_band))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2203,10 +2208,12 @@ sl_stop_timer_t4(struct sl *sl)
 static noinline fastcall void
 sl_start_timer_t4(struct sl *sl)
 {
-	sl_ulong t4v = (sl->flags & (MF_LOC_EMERG | MF_REM_EMERG)) ? sl->sl.config.t4e : sl->sl.config.t4n;
+	sl_ulong t4v =
+	    (sl->flags & (MF_LOC_EMERG | MF_REM_EMERG)) ? sl->sl.config.t4e : sl->sl.config.t4n;
 	m2palogte(sl, "-> T4 START <- (%d msec)", (int) t4v);
 	mi_timer(sl->sl.timers.t4, t4v);
 }
+
 #if 0
 static noinline fastcall void
 sl_stop_timer_t5(struct sl *sl)
@@ -2245,6 +2252,7 @@ sl_start_timer_t7(struct sl *sl)
 	m2palogte(sl, "-> T7 START <- (%d msec)", (int) sl->sl.config.t7);
 	mi_timer(sl->sl.timers.t7, sl->sl.config.t7);
 }
+
 #if 0
 static noinline fastcall void
 sl_stop_timer_t8(struct sl *sl)
@@ -2545,7 +2553,8 @@ sl_iac_abort_proving(struct sl *sl, queue_t *q)
 		sl_aerm_start(sl, q);
 		return (0);
 	}
-	m2paloger(sl, "Received signal iac-abort-proving in unexpected state %d", (int) sl_get_state(sl)));
+	m2paloger(sl, "Received signal iac-abort-proving in unexpected state %d",
+		  (int) sl_get_state(sl));
 	return (-EFAULT);
 }
 #endif
@@ -2683,7 +2692,8 @@ sl_lsc_power_on(struct sl *sl, queue_t *q)
 		sl_set_state(sl, MS_OUT_OF_SERVICE);
 		return (0);
 	}
-	m2paloger(sl, "Received primitive SL_POWER_ON_REQ in unexpected state %d", (int) sl_get_state(sl));
+	m2paloger(sl, "Received primitive SL_POWER_ON_REQ in unexpected state %d",
+		  (int) sl_get_state(sl));
 	return (-EPROTO);
 }
 STATIC int sl_ready(struct sl *sl, queue_t *q);
@@ -2727,7 +2737,8 @@ sl_lsc_start(struct sl *sl, queue_t *q)
 			return sl_ready(sl, q);
 		}
 	}
-	m2paloger(sl, "Received primitive SL_START_REQ in unexpected state %d", (int) sl_get_state(sl));
+	m2paloger(sl, "Received primitive SL_START_REQ in unexpected state %d",
+		  (int) sl_get_state(sl));
 	return (-EPROTO);
 }
 STATIC int
@@ -2891,7 +2902,8 @@ sl_lsc_emergency(struct sl *sl, queue_t *q)
 			return (0);
 		}
 	}
-	m2paloger(sl, "Received primitive SL_EMERGENCY_REQ in unexpected state %d", (int) sl_get_state(sl));
+	m2paloger(sl, "Received primitive SL_EMERGENCY_REQ in unexpected state %d",
+		  (int) sl_get_state(sl));
 	return (-EPROTO);
 }
 
@@ -2944,7 +2956,8 @@ sl_lsc_status_proving_normal(struct sl *sl, queue_t *q)
 		m2palogst(sl, "Link failed: Received SIN");
 		return (QR_DONE);
 	}
-	m2paloger(sl, "Received status PROVING_NORMAL in unexpected state %d", (int) sl_get_state(sl));
+	m2paloger(sl, "Received status PROVING_NORMAL in unexpected state %d",
+		  (int) sl_get_state(sl));
 	return (-EPROTO);
 }
 
@@ -3004,7 +3017,8 @@ sl_lsc_status_proving_emergency(struct sl *sl, queue_t *q)
 		m2palogst(sl, "Link failed: Received SIE");
 		return (QR_DONE);
 	}
-	m2paloger(sl, "Received status PROVING_EMERGENCY in unexpected state %d", (int) sl_get_state(sl));
+	m2paloger(sl, "Received status PROVING_EMERGENCY in unexpected state %d",
+		  (int) sl_get_state(sl));
 	return (-EPROTO);
 }
 
@@ -3109,7 +3123,8 @@ sl_lsc_status_in_service(struct sl *sl, queue_t *q, mblk_t *mp)
 		}
 	case MS_POWER_OFF:
 	case MS_OUT_OF_SERVICE:
-		m2paloger(sl, "Received status IN_SERVICE in unusual state %d", (int) sl_get_state(sl));
+		m2paloger(sl, "Received status IN_SERVICE in unusual state %d",
+			  (int) sl_get_state(sl));
 		return (QR_DONE);
 	}
 	m2paloger(sl, "Received status IN_SERVICE in unexpected state %d", (int) sl_get_state(sl));
@@ -3164,9 +3179,12 @@ sl_rb_congestion_function(struct sl *sl, queue_t *q)
 					if ((err = sl_send_status(sl, q, M2PA_STATUS_BUSY)) < 0)
 						return (err);
 					m2palogda(sl, "Receive congestion: congestion discard");
-					m2palogda(sl, "  sl->rb.q_msgs            = %12d", (int) sl->rb.q_msgs);
-					m2palogda(sl, "  sl->sl.config.rb_discard = %12d", (int) sl->sl.config.rb_discard);
-					m2palogda(sl, "  canput                   = %12s", canput(sl->oq) ? "YES" : "NO");
+					m2palogda(sl, "  sl->rb.q_msgs            = %12d",
+						  (int) sl->rb.q_msgs);
+					m2palogda(sl, "  sl->sl.config.rb_discard = %12d",
+						  (int) sl->sl.config.rb_discard);
+					m2palogda(sl, "  canput                   = %12s",
+						  canput(sl->oq) ? "YES" : "NO");
 					sl->sl.stats.sl_sibs_sent++;
 					sl->flags |= MF_LOC_BUSY;
 				}
@@ -3178,10 +3196,14 @@ sl_rb_congestion_function(struct sl *sl, queue_t *q)
 						if ((err =
 						     sl_send_status(sl, q, M2PA_STATUS_BUSY)) < 0)
 							return (err);
-						m2palogda(sl, "Receive congestion: congestion accept");
-						m2palogda(sl, "  sl->rb.q_msgs            = %12d", (int) sl->rb.q_msgs);
-						m2palogda(sl, "  sl->sl.config.rb_accept  = %12d", (int) sl->sl.config.rb_accept);
-						m2palogda(sl, "  cantputnext?             = %12s", canputnext(sl->oq) ? "YES" : "NO");
+						m2palogda(sl,
+							  "Receive congestion: congestion accept");
+						m2palogda(sl, "  sl->rb.q_msgs            = %12d",
+							  (int) sl->rb.q_msgs);
+						m2palogda(sl, "  sl->sl.config.rb_accept  = %12d",
+							  (int) sl->sl.config.rb_accept);
+						m2palogda(sl, "  cantputnext?             = %12s",
+							  canputnext(sl->oq) ? "YES" : "NO");
 						sl->sl.stats.sl_sibs_sent++;
 						sl->flags |= MF_LOC_BUSY;
 					}
@@ -3297,7 +3319,8 @@ sl_txc_datack(struct sl *sl, queue_t *q, uint count)
 					m2palogst(sl, "Link failed: Abnormal BSNR");
 					return (0);
 				}
-				m2palogno(sl, "Received bad acknowledgement acks = %d", (int) (count + 1));
+				m2palogno(sl, "Received bad acknowledgement acks = %d",
+					  (int) (count + 1));
 				sl->back++;
 				return (0);
 			}
@@ -3356,7 +3379,8 @@ sl_rc_sn_check(struct sl *sl, queue_t *q, mblk_t *mp)
 					m2palogst(sl, "Link failed: Abnormal FIBR");
 					return (-EPROTO);
 				}
-				m2palogno(sl, "Received bad fsn = %d, expecting %d", (int) fsnr, (int) (sl->fsnx - msu));
+				m2palogno(sl, "Received bad fsn = %d, expecting %d", (int) fsnr,
+					  (int) (sl->fsnx - msu));
 				sl->bfsn++;
 				return (-EPROTO);
 			} else
@@ -3375,7 +3399,8 @@ sl_rc_sn_check(struct sl *sl, queue_t *q, mblk_t *mp)
 					m2palogst(sl, "Link failed: Abnormal BSNR");
 					return (-EPROTO);
 				}
-				m2palogno(sl, "Received bad bsn = %d, expecting %d", (int) bsnr, (int) sl->fsnt);
+				m2palogno(sl, "Received bad bsn = %d, expecting %d", (int) bsnr,
+					  (int) sl->fsnt);
 				sl->bbsn++;
 			} else {
 				if (sl->bsnr != bsnr) {
@@ -3423,7 +3448,8 @@ sl_rc_sn_check(struct sl *sl, queue_t *q, mblk_t *mp)
 					m2palogst(sl, "Link failed: Abnormal FIBR");
 					return (-EPROTO);
 				}
-				m2palogno(sl, "Received bad fsn = %d, expecting %d", (int) fsnr, (int) ((sl->fsnx - msu) & 0xffffff));
+				m2palogno(sl, "Received bad fsn = %d, expecting %d", (int) fsnr,
+					  (int) ((sl->fsnx - msu) & 0xffffff));
 				sl->bfsn++;
 				sl->bfsn &= 0xffffff;
 				return (-EPROTO);
@@ -3443,7 +3469,8 @@ sl_rc_sn_check(struct sl *sl, queue_t *q, mblk_t *mp)
 					m2palogst(sl, "Link failed: Abnormal BSNR");
 					return (-EPROTO);
 				}
-				m2palogno(sl, "Received bad bsn = %d, expecting %d", (int) bsnr, (int) sl->fsnt);
+				m2palogno(sl, "Received bad bsn = %d, expecting %d", (int) bsnr,
+					  (int) sl->fsnt);
 				sl->bbsn++;
 				sl->bbsn &= 0xffffff;
 			} else {
@@ -3487,7 +3514,8 @@ sl_rc_sn_check(struct sl *sl, queue_t *q, mblk_t *mp)
 					m2palogst(sl, "Link failed: Abnormal FIBR");
 					return (-EPROTO);
 				}
-				m2palogno(sl, "Received bad fsn = %d, expecting %d", (int) fsnr, (int) ((sl->fsnx - msu) & 0xffffff));
+				m2palogno(sl, "Received bad fsn = %d, expecting %d", (int) fsnr,
+					  (int) ((sl->fsnx - msu) & 0xffffff));
 				sl->bfsn++;
 				sl->bfsn &= 0xffffff;
 				return (-EPROTO);
@@ -3507,7 +3535,8 @@ sl_rc_sn_check(struct sl *sl, queue_t *q, mblk_t *mp)
 					m2palogst(sl, "Link failed: Abnormal BSNR");
 					return (-EPROTO);
 				}
-				m2palogno(sl, "Received bad bsn = %d, expecting %d", (int) bsnr, (int) sl->fsnt);
+				m2palogno(sl, "Received bad bsn = %d, expecting %d", (int) bsnr,
+					  (int) sl->fsnt);
 				sl->bbsn++;
 				sl->bbsn &= 0xffffff;
 			} else {
@@ -3545,7 +3574,8 @@ sl_rc_sn_check(struct sl *sl, queue_t *q, mblk_t *mp)
 			/* In the final we discard out of sequence FSNs but do two out of three on
 			   BSNs */
 			if ((uint32_t) fsnr != (uint32_t) ((sl->fsnx - msu) & 0xffffff)) {
-				m2palogno(sl, "discarding, fsnr = %x, fsnx = %x, msu = %d", fsnr, sl->fsnx, msu);
+				m2palogno(sl, "discarding, fsnr = %x, fsnx = %x, msu = %d", fsnr,
+					  sl->fsnx, msu);
 				return (-EPROTO);
 			}
 			if (!between24(bsnr, sl->bsnr, sl->fsnt)) {
@@ -3562,7 +3592,8 @@ sl_rc_sn_check(struct sl *sl, queue_t *q, mblk_t *mp)
 					m2palogst(sl, "Link failed: Abnormal BSNR");
 					return (-EPROTO);
 				}
-				m2palogno(sl, "Received bad bsn = %d, expecting %d", (int) bsnr, (int) sl->fsnt);
+				m2palogno(sl, "Received bad bsn = %d, expecting %d", (int) bsnr,
+					  (int) sl->fsnt);
 				sl->bbsn++;
 				sl->bbsn &= 0xffffff;
 			} else {
@@ -3634,7 +3665,8 @@ sl_rc_signal_unit(struct sl *sl, queue_t *q, mblk_t *mp)
 		return (-EPROTO);
 	case MS_POWER_OFF:
 	case MS_OUT_OF_SERVICE:
-		m2paloger(sl, "Received SIGNAL UNIT in unexpected state %d", (int) sl_get_state(sl));
+		m2paloger(sl, "Received SIGNAL UNIT in unexpected state %d",
+			  (int) sl_get_state(sl));
 		return (QR_DONE);
 	}
 }
@@ -3763,7 +3795,8 @@ sl_lsc_status_busy_ended(struct sl *sl, queue_t *q)
 	sl->flags &= ~MF_REM_ALN;
 	switch (sl_get_state(sl)) {
 	default:
-		m2paloger(sl, "Received status BUSY_ENDED in unexpected state %d", (int) sl_get_state(sl));
+		m2paloger(sl, "Received status BUSY_ENDED in unexpected state %d",
+			  (int) sl_get_state(sl));
 	case MS_IN_SERVICE:
 		sl->flags &= ~MF_REM_BUSY;
 		sl_timer_stop(sl, t6);
@@ -3899,7 +3932,8 @@ sl_lsc_status_processor_outage(struct sl *sl, queue_t *q)
 		}
 		return (QR_DONE);
 	}
-	m2paloger(sl, "Received status PROCESSOR_OUTAGE in unexpected state %d", (int) sl_get_state(sl));
+	m2paloger(sl, "Received status PROCESSOR_OUTAGE in unexpected state %d",
+		  (int) sl_get_state(sl));
 	return (-EPROTO);
 }
 
@@ -3964,7 +3998,8 @@ sl_lsc_local_processor_outage(struct sl *sl, queue_t *q)
 		sl_timer_stop(sl, t6);	/* ??? */
 		return (0);
 	}
-	m2paloger(sl, "Received primitive SL_LOCAL_PROCESSOR_OUTAGE_REQ in unexpected state %d", (int) sl_get_state(sl));
+	m2paloger(sl, "Received primitive SL_LOCAL_PROCESSOR_OUTAGE_REQ in unexpected state %d",
+		  (int) sl_get_state(sl));
 	return (-EPROTO);
 }
 STATIC INLINE int
@@ -4001,7 +4036,8 @@ sl_lsc_clear_rtb(struct sl *sl, queue_t *q)
 		sl_set_state(sl, MS_IN_SERVICE);
 		return (0);
 	}
-	m2paloger(sl, "Received primitive SL_CLEAR_RTB_REQ in unexpected state %d", (int) sl_get_state(sl));
+	m2paloger(sl, "Received primitive SL_CLEAR_RTB_REQ in unexpected state %d",
+		  (int) sl_get_state(sl));
 	return (-EPROTO);
 }
 STATIC INLINE int
@@ -4091,7 +4127,8 @@ sl_lsc_clear_buffers(struct sl *sl, queue_t *q)
 		sl_set_state(sl, MS_IN_SERVICE);
 		return (0);
 	}
-	m2paloger(sl, "Received primitive SL_CLEAR_BUFFERS_REQ in unexpected state %d", (int) sl_get_state(sl));
+	m2paloger(sl, "Received primitive SL_CLEAR_BUFFERS_REQ in unexpected state %d",
+		  (int) sl_get_state(sl));
 	return (-EPROTO);
 }
 STATIC void
@@ -4144,7 +4181,8 @@ sl_lsc_continue(struct sl *sl, queue_t *q, mblk_t *mp)
 		}
 		return (0);
 	}
-	m2paloger(sl, "Received primitive SL_CONTINUE_REQ in unexpected state %d", (int) sl_get_state(sl)));
+	m2paloger(sl, "Received primitive SL_CONTINUE_REQ in unexpected state %d",
+		  (int) sl_get_state(sl));
 	return (-EPROTO);
 }
 #endif
@@ -4197,7 +4235,8 @@ sl_lsc_status_processor_outage_ended(struct sl *sl, queue_t *q, mblk_t *mp)
 		}
 		return (QR_DONE);
 	}
-	m2paloger(sl, "Received status PROCESSOR_OUTAGE_ENDED in unexpected state %d", (int) sl_get_state(sl));
+	m2paloger(sl, "Received status PROCESSOR_OUTAGE_ENDED in unexpected state %d",
+		  (int) sl_get_state(sl));
 	return (-EPROTO);
 }
 
@@ -4298,7 +4337,8 @@ sl_lsc_resume(struct sl *sl, queue_t *q)
 		sl_set_state(sl, MS_IN_SERVICE);
 		return (0);
 	}
-	m2paloger(sl, "Received primitive SL_RESUME_REQ in unexpected state %d", (int) sl_get_state(sl));
+	m2paloger(sl, "Received primitive SL_RESUME_REQ in unexpected state %d",
+		  (int) sl_get_state(sl));
 	return (-EPROTO);
 }
 
@@ -4337,7 +4377,8 @@ sl_lsc_status_out_of_service(struct sl *sl, queue_t *q)
 	case MS_NOT_ALIGNED:
 		return (QR_DONE);
 	}
-	m2paloger(sl, "Received status OUT_OF_SERVICE in unexpected state %d", (int) sl_get_state(sl));
+	m2paloger(sl, "Received status OUT_OF_SERVICE in unexpected state %d",
+		  (int) sl_get_state(sl));
 	return (-EPROTO);
 }
 
@@ -4351,7 +4392,8 @@ sl_lsc_retrieve_bsnt(struct sl *sl, queue_t *q)
 		sl_bsnt_ind(sl, q, sl->fsnr);
 		return (0);
 	}
-	m2paloger(sl, "Received primitive SL_RETRIEVE_BSNT_REQ in unexpected state %d", (int) sl_get_state(sl));
+	m2paloger(sl, "Received primitive SL_RETRIEVE_BSNT_REQ in unexpected state %d",
+		  (int) sl_get_state(sl));
 	return (-EPROTO);
 }
 
@@ -4402,7 +4444,8 @@ sl_lsc_retrieval_request_and_fsnc(struct sl *sl, queue_t *q, uint fsnc)
 			return (err);
 		return (0);
 	}
-	m2paloger(sl, "Received primitive SL_RETRIEVAL_REQUEST_AND_FSNC_REQ in unexpected state %d", (int) sl_get_state(sl));
+	m2paloger(sl, "Received primitive SL_RETRIEVAL_REQUEST_AND_FSNC_REQ in unexpected state %d",
+		  (int) sl_get_state(sl));
 	if ((err = sl_retrieval_not_possible_ind(sl, q)) < 0)
 		return (err);
 	return (-EPROTO);
@@ -4533,7 +4576,8 @@ sl_check_congestion(struct sl *sl, queue_t *q)
 							   &sl->sl.statem.cong_status,
 							   sizeof(sl->sl.statem.cong_status))) < 0)
 						return (err);
-				m2palogda(sl, "Congestion onset: level %d", (int) sl->sl.statem.cong_status);
+				m2palogda(sl, "Congestion onset: level %d",
+					  (int) sl->sl.statem.cong_status);
 			} else {
 				if (sl->sl.notify.events & SL_EVT_CONGEST_DISCD_IND
 				    && !sl->sl.stats.sl_cong_discd_ind[sl->sl.statem.disc_status]++)
@@ -4542,7 +4586,8 @@ sl_check_congestion(struct sl *sl, queue_t *q)
 							   &sl->sl.statem.disc_status,
 							   sizeof(sl->sl.statem.disc_status))) < 0)
 						return (err);
-				m2palogda(sl, "Congestion discard: level %d", (int) sl->sl.statem.cong_status);
+				m2palogda(sl, "Congestion discard: level %d",
+					  (int) sl->sl.statem.cong_status);
 			}
 			sl_link_congested_ind(sl, q, sl->sl.statem.cong_status,
 					      sl->sl.statem.disc_status);
@@ -4854,7 +4899,8 @@ sl_recv_msg(struct sl *sl, queue_t *q, mblk_t *mp)
 			mp->b_rptr = oldp;
 		return (err);
 	      emsgsize:
-		m2paloger(sl, "Bad message size %d != %d", (int) (mp->b_wptr - oldp), (int) PAD4(mlen));
+		m2paloger(sl, "Bad message size %d != %d", (int) (mp->b_wptr - oldp),
+			  (int) PAD4(mlen));
 		return (-EMSGSIZE);
 	}
       eproto:
@@ -5112,7 +5158,7 @@ ne_reset_res(struct sl *sl, queue_t *q, mblk_t *mp)
  * @mp: the LMI_INFO_REQ primitive
  */
 static int
-lmi_info_req(struct sl * sl, queue_t *q, mblk_t *mp)
+lmi_info_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	return lmi_info_ack(sl, q);
 }
@@ -5722,7 +5768,8 @@ ne_ok_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 				goto outstate;
 			return n_pass_along(sl, q, mp, NS_DATA_XFER, LMI_ENABLED);
 		default:
-			m2paloger(sl, "%s() with invalid primitive %d", __FUNCTION__, (int) p->CORRECT_prim);
+			m2paloger(sl, "%s() with invalid primitive %d", __FUNCTION__,
+				  (int) p->CORRECT_prim);
 			return n_pass_along(sl, q, mp, sl_get_n_state(sl), sl_get_i_state(sl));
 		}
 	} else {
@@ -5740,7 +5787,8 @@ ne_ok_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 		case N_CONN_RES:
 		case N_RESET_RES:
 		default:
-			m2paloger(sl, "%s() with invalid primitive %d", __FUNCTION__, (int) p->CORRECT_prim);
+			m2paloger(sl, "%s() with invalid primitive %d", __FUNCTION__,
+				  (int) p->CORRECT_prim);
 			return (0);
 		}
 	}
@@ -5901,7 +5949,8 @@ ne_error_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 				goto outstate;
 			}
 		default:
-			m2paloger(sl, "ne_error_ack() called with invalid primitive %d", (int) p->ERROR_prim);
+			m2paloger(sl, "ne_error_ack() called with invalid primitive %d",
+				  (int) p->ERROR_prim);
 			return n_pass_along(sl, q, mp, sl_get_n_state(sl), sl_get_i_state(sl));
 		}
 	} else {
@@ -5927,7 +5976,8 @@ ne_error_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 		case N_INFO_REQ:
 			return (-EFAULT);
 		default:
-			m2paloger(sl, "ne_error_ack() called with invalid primitive %d", (int) p->ERROR_prim);
+			m2paloger(sl, "ne_error_ack() called with invalid primitive %d",
+				  (int) p->ERROR_prim);
 			return (QR_DONE);
 		}
 	}
@@ -7349,7 +7399,8 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 	case SL_IOC_MAGIC:
 	{
 		if (count < size || sl_get_i_state(sl) == LMI_UNUSABLE) {
-			m2paloger(sl, "ioctl count = %d, size = %d, state = %d", count, size, sl_get_i_state(sl));
+			m2paloger(sl, "ioctl count = %d, size = %d, state = %d", count, size,
+				  sl_get_i_state(sl));
 			ret = -EINVAL;
 			break;
 		}
@@ -7409,7 +7460,8 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 	case SDT_IOC_MAGIC:
 	{
 		if (count < size || sl_get_i_state(sl) == LMI_UNUSABLE) {
-			m2paloger(sl, "ioctl count = %d, size = %d, state = %d", count, size, sl_get_i_state(sl));
+			m2paloger(sl, "ioctl count = %d, size = %d, state = %d", count, size,
+				  sl_get_i_state(sl));
 			ret = -EINVAL;
 			break;
 		}
@@ -7472,7 +7524,8 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 	case SDL_IOC_MAGIC:
 	{
 		if (count < size || sl_get_i_state(sl) == LMI_UNUSABLE) {
-			m2paloger(sl, "ioctl count = %d, size = %d, state = %d", count, size, sl_get_i_state(sl));
+			m2paloger(sl, "ioctl count = %d, size = %d, state = %d", count, size,
+				  sl_get_i_state(sl));
 			ret = -EINVAL;
 			break;
 		}
@@ -7850,7 +7903,8 @@ sl_r_sig(queue_t *q, mblk_t *mp)
 			rtn = sl_t9_timeout(sl, q);
 			break;
 		default:
-			m2paloger(sl, "sl_r_sig() called with invalid timer %d", *(int *)mp->b_rptr);
+			m2paloger(sl, "sl_r_sig() called with invalid timer %d",
+				  *(int *) mp->b_rptr);
 			break;
 		}
 		if (rtn >= 0)
@@ -8176,7 +8230,8 @@ sl_free_priv(queue_t *q)
 		sl_put(sl);
 		/* done, check final count */
 		if (atomic_read(&sl->refcnt) != 1) {
-			m2paloger(sl, "sl lingering reference count = %d", (int) atomic_read(&sl->refcnt));
+			m2paloger(sl, "sl lingering reference count = %d",
+				  (int) atomic_read(&sl->refcnt));
 			atomic_set(&sl->refcnt, 1);
 		}
 	}
@@ -8246,11 +8301,11 @@ sl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		spin_unlock_irqrestore(&sl_lock, flags);
 
 		mp->b_datap->db_type = M_PCPROTO;
-		((N_info_req_t *)mp->b_wptr)->PRIM_type = N_INFO_REQ;
+		((N_info_req_t *) mp->b_wptr)->PRIM_type = N_INFO_REQ;
 		mp->b_wptr += sizeof(N_info_req_t);
 
 		qprocson(q);
-		putnext(WR(q), mp); /* immediate info request */
+		putnext(WR(q), mp);	/* immediate info request */
 		return (0);
 	}
 	return (EIO);
@@ -8259,6 +8314,7 @@ STATIC streamscall int
 sl_close(queue_t *q, int flag, cred_t *crp)
 {
 	unsigned long flags;
+
 	(void) flag;
 	(void) crp;
 
