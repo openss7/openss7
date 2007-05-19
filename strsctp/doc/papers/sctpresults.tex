@@ -1,0 +1,1275 @@
+%% -*- tex -*- vim: ft=tex tw=78 nocin nosi
+%% =========================================================================
+%%
+%% @(#) $Id: testresults.tex,v 0.9.2.4 2007/05/18 12:04:24 brian Exp $
+%%
+%% =========================================================================
+%%
+%% Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+%%
+%% All Rights Reserved.
+%%
+%% Permission is granted to make and distribute verbatim copies of this
+%% manual provided the copyright notice and this permission notice are
+%% preserved on all copies.
+%%
+%% Permission is granted to copy and distribute modified versions of this
+%% manual under the conditions for verbatim copying, provided that the
+%% entire resulting derived work is distributed under the terms of a
+%% permission notice identical to this one.
+%% 
+%% Since the Linux kernel and libraries are constantly changing, this
+%% manual page may be incorrect or out-of-date.  The author(s) assume no
+%% responsibility for errors or omissions, or for damages resulting from
+%% the use of the information contained herein.  The author(s) may not
+%% have taken the same level of care in the production of this manual,
+%% which is licensed free of charge, as they might when working
+%% professionally.
+%% 
+%% Formatted or processed versions of this manual, if unaccompanied by
+%% the source, must acknowledge the copyright and authors of this work.
+%%
+%% -------------------------------------------------------------------------
+%%
+%% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+%% on behalf of the U.S. Government ("Government"), the following
+%% provisions apply to you.  If the Software is supplied by the Department
+%% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+%% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+%% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+%% Government is acquiring only the license rights granted herein (the
+%% license rights customarily provided to non-Government users).  If the
+%% Software is supplied to any unit or agency of the Government other than
+%% DoD, it is classified as "Restricted Computer Software" and the
+%% Government's rights in the Software are defined in paragraph 52.227-19
+%% of the Federal Acquisition Regulations ("FAR") (or any successor
+%% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+%% NASA Supplement to the FAR (or any successor regulations).
+%%
+%% =========================================================================
+%% 
+%% Commercial licensing and support of this software is available from
+%% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+%% 
+%% =========================================================================
+%%
+%% Last Modified $Date: 2007/05/18 12:04:24 $ by $Author: brian $
+%%
+%% =========================================================================
+
+\documentclass[letterpaper,final,notitlepage,twocolumn,10pt,twoside]{article}
+\usepackage{ftnright}
+\usepackage{makeidx}
+\usepackage{pictex}
+%\usepackage{psfig}
+%\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{eepic}
+%\usepackage{epsfig}
+%\usepackage[dvips]{graphicx,epsfig}
+%\usepackage[dvips]{epsfig}
+%\usepackage{epsf}
+\usepackage{natbib}
+\usepackage{placeins}
+%\usepackage{placeins}
+
+\setlength{\voffset}{-1.2in}
+\setlength{\topmargin}{0.2in}
+\setlength{\headheight}{0.2in}
+\setlength{\headsep}{0.3in}
+\setlength{\topskip}{0.0in}
+\setlength{\footskip}{0.3in}
+\setlength{\textheight}{10.0in}
+
+\setlength{\hoffset}{-1.0in}
+\setlength{\oddsidemargin}{0.5in}
+\setlength{\evensidemargin}{0.5in}
+\setlength{\textwidth}{7.5in}
+
+\setlength{\marginparwidth}{0.0in}
+\setlength{\marginparsep}{0.0in}
+
+\setlength{\columnsep}{0.3in}
+\setlength{\columnwidth}{3.6in}
+%\setlength{\columnseprule}{0.25pt}
+
+\setlength{\paperheight}{11in}
+\setlength{\paperwidth}{8.5in}
+
+%\let\Huge = \huge
+%\let\huge = \LARGE
+%\let\LARGE = \Large
+%\let\Large = \large
+%\let\large = \normalsize
+%\let\normalsize = \small
+%\let\small = \footnotesize
+%\let\footnotesize = \scriptsize
+%\let\scriptsize = \tiny
+
+\makeatletter
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+                                   {-2ex \@plus -1ex \@minus -.2ex}%
+                                   {1ex \@plus .2ex}%
+                                   {\normalfont\large\bfseries}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                                     {-1.5ex \@plus -.5ex \@minus -.2ex}%
+                                     {1ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                                     {-1.25ex\@plus -.5ex \@minus -.2ex}%
+                                     {1ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+                                    {1.5ex \@plus .5ex \@minus .2ex}%
+                                    {-1em}%
+                                    {\normalfont\normalsize\bfseries\slshape}}
+\renewcommand\subparagraph{\@startsection{subparagraph}{5}{\parindent}%
+                                       {0ex \@plus 0ex \@minus 0ex}%
+                                       {-1em}%
+                                      {\normalfont\normalsize\bfseries\slshape}}
+\makeatother
+
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{6}
+
+\pagestyle{plain}
+%\pagestyle{myheadings}
+%\markboth{B. Bidulock}{B. Bidulock}
+
+\makeglossary
+
+\newcommand{\topfigrule}{\vspace{0.5ex}\rule{\columnwidth}{0.4pt}\vspace{0.5ex} }
+\newcommand{\botfigrule}{\vspace{0.5ex}\rule{\columnwidth}{0.4pt}\vspace{0.5ex} }
+\newcommand{\dblfigrule}{\vspace{0.5ex}\rule{\textwidth}{0.4pt}\vspace{0.5ex} }
+
+%\bibliographystyle{unsrtnat}
+%\bibliographystyle{plainnat}
+%\bibliographystyle{ieeetr}
+%\bibliographystyle{abbrvnat}
+%\bibliographystyle{acm}
+%\bibliographystyle{plainnat}
+\bibliographystyle{alpha}
+
+\begin{document}
+
+%\begin{titlepage}
+%\begin{center}
+%    STREAMS vs. Sockets Performance Comparison\\
+%    Experimental Test Results
+%\end{center}
+%\end{titlepage}
+
+\title{STREAMS vs. Sockets Performance Comparison for SCTP\\[0.5ex]
+	{\large \textsl{Experimental Test Results for Linux}}}
+\author{Brian F. G. Bidulock\thanks{bidulock@openss7.org}\\
+	OpenSS7 Corporation}
+\date{May 1, 2007}
+\maketitle
+
+\begin{abstract}
+\addcontentsline{toc}{section}{Abstract}
+With the objective of contrasting performance between STREAMS and legacy
+approaches to system facilities, a comparison is made between the tested
+performance of the \textsl{Linux Native Sockets} SCTP implementations and STREAMS SCTP
+implementations using the \textsl{Linux Fast-STREAMS}
+package \cite[]{LfS}.
+\end{abstract}
+
+%\tableofcontents
+
+\section[Background]{Background}
+
+UNIX networking has a rich history.  The TCP/IP protocol suite was first
+implemented by BBN using Sockets under a DARPA research project on 4.1aBSD and
+then incorporated by the CSRG into 4.2BSD \cite[]{bsd}.  Lachmann and
+Associates (Legent) subsequently implemented one of the first TCP/IP protocol
+suite based on the Transport Provider Interface (TPI) \cite[]{tli} and STREAMS
+\cite[]{magic}.  Two other predominant TCP/IP implementations on STREAMS
+surfaced at about the same time: Wollongong and Mentat.
+
+\subsection[STREAMS]{STREAMS}
+STREAMS is a facility first presented in a paper by Dennis M. Ritchie in 1984
+\cite[]{Ritchie84}, originally implemented on 4.1BSD and later part of
+\textsl{Bell Laboratories Eighth Edition UNIX}, incorporated into \textsl{UNIX
+System V Release 3} and enhanced in \textsl{UNIX Sysvem V Release 4} and
+further in \textsl{UNIX System V Release 4.2}.  STREAMS was used in SVR4 for
+terminal input-output, pseudo-terminals, pipes, named pipes (FIFOs),
+interprocess communication and networking.  STREAMS was used in SVR3 for
+networking (with the NSU package).  Since its release in \textsl{System V
+Release 3}, STREAMS has been implemented across a wide range of UNIX,
+UNIX-like and UNIX-based systems, making its implementation and use an ipso
+facto standard.
+
+STREAMS is a facility that allows for a reconfigurable full duplex
+communications path, \textit{Stream}, between a user process and a driver in
+the kernel.   Kernel protocol modules can be pushed onto and popped from the
+\textit{Stream} between the user process and driver.  The \textit{Stream} can
+be reconfigured in this way by a user process.  The user process, neighbouring
+protocol modules and the driver communicate with each other using a message
+passing scheme.  This permits a loose coupling between protocol modules,
+drivers and user processes, allowing a third-party and loadable kernel module
+approach to be taken toward the provisioning of protocol modules on platforms
+supporting STREAMS.
+
+On \textsl{UNIX System V Release 4.2}, STREAMS was used for terminal
+input-output, pipes, FIFOs (named pipes), and network communications.  Modern
+UNIX, UNIX-like and UNIX-based systems providing STREAMS normally support some
+degree of network communications using STREAMS; however, many do not support
+STREAMS-based pipe and FIFOs\footnote{For example, AIX.} or terminal
+input-output.\footnote{For example, HP-UX.}
+
+\textsl{UNIX System V Release 4.2} supported four Application Programmer
+Interfaces (APIs) for accessing the network communications facilities of the
+kernel:
+
+\begin{description}
+
+\item[{\it Transport Layer Interface (TLI).}]
+
+\textsl{TLI} is an acronym for the \textit{Transport Layer Interface}
+\cite[]{tli}.  The \textsl{TLI} was the non-standard interface provided by
+SVR4, later standardized by \textit{X/Open} as the \textsl{XTI} described
+below.  This interface is now deprecated.
+
+\item[{\it X/Open Transport Interface (XTI).}]
+
+\textsl{XTI} is an acronym for the \textsl{X/Open Transport Interface}
+\cite[]{xti}.  The \textsl{X/Open Transport Interface} is a standardization of
+the \textsl{UNIX System V Release 4}, \textsl{Transport Layer Interface}.  The
+interface consists of an Application Programming Interface implemented as a
+shared object library.  The shared object library communicates with a
+transport provider Stream using a service primitive interface called the
+\textsl{Transport Provider Interface}.
+
+While \textsl{XTI} was implemented directly over STREAMS devices supporting
+the \textit{Transport Provider Interface (TPI)} \cite[]{tpi} under SVR4,
+several non-traditional approaches exist in implementation:
+
+\item[{\it Berkeley Sockets.}]
+
+Sockets uses the BSD interface that was developed by BBN for TCP/IP protocol
+suite under DARPA contract on 4.1aBSD and released in 4.2BSD.  BSD Sockets
+provides a set of primary API functions that are typically implemented as
+system calls.  The BSD Sockets interface is non-standard and is now
+deprecated in favour of the POSIX/SUS standard Sockets interface.
+
+\item[{\it POSIX Sockets.}]
+
+Sockets were standardized by the \textit{OpenGroup} \cite[]{opengroup} and
+\textit{IEEE} in the POSIX standardization process.  They appear in XNS 5.2
+\cite[]{xns}, SUSv1 \cite[]{susv1}, SUSv2 \cite[]{susv2} and SUSv3
+\cite[]{susv3}.
+
+\end{description}
+
+On systems traditionally supporting Sockets and then retrofitted to support
+STREAMS, there is one approach toward supporting \textsl{XTI} without
+refitting the entire networking stack:\footnote{This approach is taken by
+True64 (Digital) UNIX.}
+
+\begin{description}
+
+\item[{\it XTI over Sockets.}]
+
+Several implementations of STREAMS on UNIX utilize the concept of \textsl{TPI}
+over Sockets.  Following this approach, a STREAMS pseudo-device driver is
+provided that hooks directly into internal socket system calls to implement
+the driver, and yet the networking stack remains fundamentally BSD in style.
+
+\end{description}
+
+Typically there are two approaches to implementing XTI on systems not
+supporting STREAMS:
+
+\begin{description}
+
+\item[{\it XTI Compatibility Library.}]
+
+Several implementations of XTI on UNIX utilize the concept of an XTI
+compatibility library.\footnote{One was even available for Linux at one
+point.}  This is purely a shared object library approach to providing
+\textsl{XTI}.  Under this approach it is possible to use the \textsl{XTI}
+application programming interface, but it is not possible to utilize any of
+the STREAMS capabilities of an underlying \textit{Transport Provider Interface
+(TPI)} stream.
+
+\item[{\it TPI over Sockets.}]
+
+An alternate approach, taken by the \textsl{Linux iBCS} package was to provide
+a pseudo-transport provider using a legacy character device to present the
+appearance of a STREAMS transport provider.
+
+\end{description}
+
+Conversely, on systems supporting STREAMS, but not traditionally supporting
+Sockets (such as SVR4), there are four approaches toward supporting BSD and
+POSIX Sockets based on STREAMS:
+
+\begin{description}
+
+\item[{\it Compatibility Library}]
+
+Under this approach, a compatibility library (\texttt{libsocket.o}) contains
+the socket calls as library functions that internally invoke the TLI or TPI
+interface to an underlying STREAMS transport provider.  This is the approach
+originally taken by SVR4 \cite[]{magic}, but this approach has subsequently
+been abandoned due to the difficulties regarding fork(2) and fundamental
+incompatibilities deriving from a library only approach.
+
+\item[{\it Library and cooperating \sl STREAMS module.}]
+
+Under this approach, a cooperating module, normally called \texttt{sockmod},
+is pushed on a Transport Provider Interface (TPI) Stream.  The library,
+normally called \texttt{socklib} or simply \texttt{socket}, and cooperating
+\texttt{sockmod} module provide the BBN or POSIX Socket API.  \cite[]{impbsd}
+\cite[]{socklib}
+
+\item[{\it Library and System Calls.}]
+
+Under this approach, the BSD or POSIX Sockets API is implemented as system
+calls with the sole exception of the \textbf{\texttt{socket}}(3) call.  The
+underlying transport provider is still an \textsl{TPI}-based STREAMS transport
+provider, it is just that system calls instead of library calls are used to
+implement the interface.  \cite[]{socklib}
+
+\item[{\it System Calls.}]
+
+Under this approach, even the socket(3) call is moved into the kernel.
+Conversion between POSIX/BSD Sockets calls and TPI service primitives is
+performed completely within the kernel.  The sock2path(5) configuration file
+is used to configure the mapping between STREAMS devices and socket types and
+domains \cite[]{socklib}.
+
+\end{description}
+
+\subsubsection[Standardization]{Standardization.}
+
+During the POSIX standardization process, networking and Sockets interfaces
+were given special treatment to ensure that both the legacy Sockets approach
+and the STREAMS approach to networking were compatible. POSIX has standardized
+both the XTI and Sockets programmatic interface to networking.  STREAMS
+networking has been POSIX compliant for many years, BSD Sockets, POSIX
+Sockets, TLI and XTI interfaces, and were compliant in the \textsl{SVR4.2}
+release.  The STREAMS networking provided by \textsl{Linux Fast-STREAMS}
+package provides POSIX compliant networking.
+
+Therefore, any application utilizing a Socket or Stream in a POSIX compliant
+manner will also be compatible with STREAMS networking.\footnote{This
+compatibility is exemplified by the \texttt{netperf} program which does not
+distinguish between BSD or STREAMS based networking in their implementation or
+use.}
+
+\subsection[Linux Fast-STREAMS]{Linux Fast-STREAMS}
+
+The first STREAMS package for Linux that provided SVR4 STREAMS capabilities
+was the \textsl{Linux STREAMS (LiS)} package originally available from GCOM
+\cite[]{LiS}.  This package exhibited incompatibilities with SVR 4.2 STREAMS
+and other STREAMS implementations, was bugger and performed very poorly on
+Linux.  These difficulties prompted the OpenSS7 Project \cite[]{openss7} to
+implement an SVR 4.2 STREAMS package from scratch, with the objective of
+production quality and high-performance, named \textsl{Linux Fast-STREAMS}
+\cite[]{LfS}.
+
+The OpenSS7 Project also maintains public and internal version of the
+\textsl{LiS} package.  The last public release was \textit{LiS-2.18.3}; the
+current internal release version is \textit{LiS-2.18.6}.  The current
+production public release of \textsl{Linux Fast-STREAMS} is
+\textit{streams-0.9.3}.
+
+\section[Objective]{Objective}
+
+The question has been asked whether there are performance differences between
+a purely BSD-style approach and a STREAMS approach to TCP/IP networking, cf.
+\cite[]{demux}.  However, there did not exist a system which permitted both
+approaches to be tested on the same operating system.  \textsl{Linux
+Fast-STREAMS} running on the GNU/Linux operating system now permits this
+comparison to be made.  The objective of the current study, therefore, was to
+determine whether, for the Linux operating system, the a STREAMS-based pipe
+approach to TCP/IP networking is a viable for a replacement for the BSD-style
+sockets approach provided by Linux, termed NET4.
+
+When developing STREAMS, the authors oft times found that there were a number
+of preconceptions espoused by Linux advocates about both STREAMS and
+STREAMS-based networking, as follows:
+
+\begin{itemize}
+
+\item STREAMS is slow.
+
+\item STREAMS is more flexible, but less efficient \cite{lkmlfaq}.
+
+\item STREAMS performs poorly on uniprocessor and ever poorer on SMP.
+
+\item STREAMS networking is slow.
+
+\item STREAMS networking is unnecessarily complex and cumbersome.
+
+\end{itemize}
+
+The current study attempts to determine the validity of these preconceptions.
+
+%% For example, the Linux kernel mailing list has this to say about STREAMS:
+%% 
+%% \begin{quote}
+%% \begin{description}
+%% \item[(REG)] STREAMS allow you to "push" filters onto a network stack.
+%% The idea is that you can have a very primitive network stream of data, and
+%% then "push" a filter ("module") that implements TCP/IP or whatever on top of
+%% that.  Conceptually, this is very nice, as it allows clean separation of your
+%% protocol layers.  Unfortunately, implementing STREAMS poses many performance
+%% problems.  Some Unix STREAMS based server telnet implementations even ran the
+%% data up to user space and back down again to a pseudo-tty driver, which is
+%% very inefficient.
+%% 
+%% STREAMS will \textbf{never} be available in the standard Linux kernel, it will
+%% remain a separate implementation with some add-on kernel support (that come
+%% with the STREAMS package).  Linux and his networking gurus are unanimous in
+%% their decision to keep STREAMS out of the kernel.  They have stated several
+%% times on the kernel list when this topic comes up that even optional support
+%% will not be included.
+%% 
+%% \item[(REW, quoting Larry McVoy)] "It's too bad, I can see why some
+%% people think they are cool, but the performance cost - both on uniprocessors
+%% and even more so on SMP boxes - is way too high for STREAMS to ever get added
+%% to the Linux kernel."
+%% 
+%% Please stop asking for them, we have agreement amoungst the head guy, the
+%% networking guys, and the fringe folks like myself that they aren't going in.
+%% 
+%% \item[(REG, quoting Dave Grothe, the STREAMS guy)] STREAMS is a good
+%% framework for implementing complex and/or deep protocol stacks having nothing
+%% to do with TCP/IP, such as SNA.  It trades some efficiency for flexibility.
+%% You may find the Linux STREAMS package (LiS) to be quite useful if you need to
+%% port protocol drivers from Solaris or UnixWare, as Caldera did.
+%% \end{description}
+%% 
+%% The Linux STREAMS (LiS) package is available for download if you want to use
+%% STREAMS for Linux.  The following site also contains a dissenting view, which
+%% supports STREAMS.
+%% \end{quote}
+
+\section[Description]{Description}
+
+Three implementations are tested:
+
+\begin{description}
+
+\item {\it Linux Kernel SCTP ({\tt lksctp}).}
+
+The native Linux socket and networking system.
+
+\item {\it OpenSS7 Linux Native SCTP ({\tt sctp}).}
+
+The OpenSS7 implementation of native Sockets SCTP.
+
+\item {\it OpenSS7 STREAMS {\tt sctp} Driver.}
+
+A STREAMS pseudo-device driver that fully implements SCTP and communicates with the IP layer in the
+kernel.  Both the OpenSS7 native sockets version and the STREAMS version are based on the same
+protocol engine core.
+
+\end{description}
+
+The three implementations tested vary in their implementation details.  These
+implementation details are described below.
+
+\subsection[Linux Kernel SCTP]{Linux Kernel SCTP}
+
+Normally, in BSD-style implementations of Sockets, Sockets is not merely the
+Application Programmer Interface, but also consists of a more general purpose
+network protocol stack implementation \cite[]{bsd}, even though the mechanism
+is not used for more than TCP/IP networking.  \cite[]{magic}
+
+Although BSD networking implementations consist of a number of networking
+layers with soft interrupts used for each layer of the networking stack
+\cite[]{bsd}, the Linux implementation, although based on the the BSD
+approach, tightly integrates the socket, protocol, IP and interface layers
+using specialized interfaces.  Although roughly corresponding to the BSD stack
+as illustrated in \textit{Figure \ref{figure:sockets}}, the socket, protocol
+and interface layers in the BSD stack have well defined, general purpose
+interfaces applicable to a wider range of networking protocols.
+
+\begin{figure}[htp]
+\center\includegraphics[height=3.5in]{sockets}
+\caption[Sockets: BSD and Linux]{Sockets: BSD and Linux}
+\label{figure:sockets}
+\end{figure}
+
+Both Linux SCTP implementations are a good example of the tight integration
+between the components of the Linux networking stack.
+
+\paragraph*{Write side processing.}
+
+On the write side of the Socket, bytes are copied from the user into allocated
+socket buffers.  Write side socket buffers are charged against the send
+buffer.  Socket buffers are immediately dispatched to the IP layer for
+processing.  When the IP layer (or a driver) consumes the socket buffer, it
+releases the amount of send buffer space that was charged for the send buffer.
+If there is insufficient space in the send buffer to accommodate the write,
+the calling processed is either blocked or the system call returns an error
+(\texttt{ENOBUFS}).
+
+For loop-back operation, immediately sending the socket buffer to the IP layer
+has the additional ramification that the socket buffer is immediately struck
+from the send buffer and immediately added to the receive buffer on the
+receiving socket.  Therefore, the size of the send buffer or the send low
+water mark, have no effect.
+
+%Primarily where Linux differs from BSD and STREAMS approaches is in
+%dispatching socket buffers to the protocol and the network layers.  Under BSD,
+%the \texttt{mbuf} is queued against the SCTP protocol layer and the SCTP layer
+%software interrupt is raised \cite[]{bsd}.  When the buffer is later
+%processed, it is queued against the IP protocol layer and the IP layer
+%software interrupt is raised.  When the buffer is later processed, it is
+%delivered to the driver.
+
+%Linux, on the other hand, passes the socket buffer to the device driver in
+%user context without intermediate queueing.
+
+%Because of this fundamental difference, it is expected that comparisons
+%between the Linux Socket implementation and STREAMS will differ radically from
+%any such comparison between a true \textsl{BSD} Socket implementation and
+%STREAMS.
+
+\paragraph*{Read side processing.}
+
+On the read side of the Socket, the network layer calls the protocol's receive
+function.  The receive function checks if socket is locked (by a reading or
+writing user).  If the socket is locked the socket buffer placed in the
+socket's backlog queue.  The backlog queue can hold a maximum number of socket
+buffers.  If this maximum is exceeded, the packet is dropped.  If the socket
+is unlocked, and the socket buffer will fit in the socket's receive buffer,
+the socket buffer is charged against the receive buffer.  If the socket buffer
+will not fit in the receive buffer, the socket buffer is dropped.
+
+Read side processing under Linux does not differ from BSD, except for
+loop-back devices.  Normally, for non-loop-back devices, \texttt{skbuff}s
+received by the device are queued against the IP layer and the IP layer
+software interrupt is raised.  When the software interrupt runs,
+\texttt{skbuffs}s are delivered directly to the transport protocol layer
+without intermediate queueing \cite[]{bsd}.
+
+For loop-back operation, however, Linux skips queueing at the IP protocol
+layer (which does not exist as it does in BSD) and, instead, delivers
+\texttt{skbuff}s directly to the transport protocol.
+
+Due to this difference between Linux and \textsl{BSD} on the read side, it is
+expected that performance results for Linux would vary from that of
+\textsl{BSD}, and the results of this testing would therefore not be
+directly applicable to \textsl{BSD}.
+
+\paragraph*{Buffering.}
+
+Buffering at the Socket consist of a send buffer and low water mark and a
+receive buffer and low water mark.  When the send buffer is consumed with
+outstanding messages, writing processes will either block or the system call
+will fail with an error (\texttt{ENOBUFS}).   When the send buffer is full
+higher than the low water mark, a blocked writing process will not be awoken
+(regardless of whether the process is blocked in write or blocked in
+poll/select).  The send low water mark for Linux is fixed at one-half
+of the send buffer.
+
+It should be noted that for loop-back operation under Linux, the send
+buffering mechanism is effectively defeated.
+
+When the receive buffer is consumed with outstanding messages, received
+messages will be discarded.  This is in rather stark contrast to BSD where
+messages are effectively returned to the network layer when the socket receive
+buffer is full and the network layer can determine whether messages should be
+discarded or queued further \cite[]{bsd}.
+
+When there is no data in the receive buffer, the reading process will either
+block or return from the system call with an error (\texttt{ENOBUFS} again).
+When the receive buffer has fewer bytes of data in it than the low water mark,
+a blocked reading process will not be awoken (regardless of whether the
+process is blocked in write or blocked in poll/select).  The receive low water
+mark for Linux is typically set to BSD default of 1 byte.\footnote{The fact
+that Linux sets the receive low water mark to 1 byte is an indication that the
+buffering mechanism on the read side simply does not work.}
+
+It should be noted that the Linux buffering mechanism does not have hysteresis
+like that of STREAMS.  When the amount of data in the send buffer exceeds the
+low water mark, poll will cease to return \texttt{POLLOUT}; when the receive
+buffer is less than the low water mark, poll will cease to return
+\texttt{POLLIN}.
+
+\paragraph*{Scheduling.}
+
+Scheduling of processes and the buffering mechanism are closely related.
+
+Writing processes for loop-back operation under SCTP are allowed to spin
+wildly.  Written data charged against the send buffer is immediately released
+when the loop-back interface is encountered and immediately delivered to the
+receiving socket (or discarded).  If the writing process is writing data
+faster that the reading process is consuming it, the excess will simply be
+discarded, and no back-pressure signalled to the sending socket.
+
+If receive buffer sizes are sufficiently large, the writing process will lose
+the processor on uniprocessor systems and the reading process scheduled before
+the buffer overflows; if they are not, the excess will be discarded.  On
+multiprocessor systems, provided that the read operation takes less time than
+the write operation, the reading process will be able to keep pace with the
+writing process.  If the receiving process is run with a very low priority,
+the writing process will always have the processor and a large percentage of
+the written messages will be discarded.
+
+It should be noted that this is likely a Linux-specific deficiency as the BSD
+system introduces queueing, even on loop-back.
+
+Reading processes for loop-back operation under SCTP are awoken whenever a
+single byte is received (due to the default receive low water mark).  If the
+reading process has higher priority than the writing process on uniprocessors,
+the reading process will be awoken for each message sent and the reading
+process will read that message before the writing process is permitted to
+write another.  On SMP systems, because reading processes will likely have the
+socket locked while reading each message, backlog processing will likely be
+invoked.
+
+\subsection[Linux Fast-STREAMS]{Linux Fast-STREAMS}
+
+\textsl{Linux Fast-STREAMS} is an implementation of \textsl{SVR4.2 STREAMS}
+for the \textsl{GNU/Linux} system developed by the \textsl{OpenSS7 Project}
+\cite[]{openss7} as a replacement for the buggy, under-performing and now
+deprecated \textsl{Linux STREAMS (LiS)} package.  \textsl{Linux Fast-STREAMS}
+provides the STREAMS executive and interprocess communication facilities
+(pipes and FIFOs).  Add-on packages provide compatibility between
+\textsl{Linux Fast-STREAMS} and other STREAMS implementations, a complete
+\textsl{XTI} shared object library, and transport providers.  Transport
+providers for the TCP/IP suite consist of an \texttt{inet} driver that uses
+the \textit{XTI over Sockets} approach as well as a full STREAMS
+implementation of SCTP (Stream Control Transmission Protocol), UDP (User
+Datagram Protocol) and RAWIP (Raw Internet Protocol).
+
+%%\subsubsection[XTI over Sockets]{XTI over Sockets}
+%%
+%%The XTI over Sockets implementation is the \texttt{inet} STREAMS driver
+%%developed by the \textsl{OpenSS7 Project} \cite[]{openss7}. As illustrated in
+%%\textit{Figure \ref{figure:xtios}}, this driver is implemented as a STREAMS
+%%pseudo-device driver and uses STREAMS for passing TPI service primitives to
+%%and from upstream modules or the \textit{Stream head}.  Within the driver,
+%%data and other TPI service primitives are translated into kernel socket calls
+%%to a socket that was opened by the driver corresponding to the transport
+%%provider instance.  Events received from this internal socket are also
+%%translated into transport provider service primitives and passed upstream.
+%%
+%%\begin{figure}[htp]
+%%\center\includegraphics[height=3.5in]{xtios}
+%%\caption[XTI over Sockets \texttt{inet} Driver]{XTI over Sockets \texttt{inet} Driver}
+%%\label{figure:xtios}
+%%\end{figure}
+%%
+%%\paragraph*{Write side processing.}
+%%
+%%Write side processing uses standard STREAMS flow control mechanisms as are
+%%described for TPI, below, with the exception that once the message blocks
+%%arrive at the driver they are passed to the internal socket.  Therefore, a
+%%unique characteristic of the write side processing for the XTI over Sockets
+%%driver is that data is first copied from user space into STREAMS message
+%%blocks and then copied again from the STREAMS message blocks to the socket.
+%%This constitutes two copies per byte versus one copy per byte and has a
+%%significant impact on the performance of the driver at large message
+%%sizes.\footnote{This expectation of peformance impact is held up by the test
+%%results.}
+%%
+%%\paragraph*{Read side processing.}
+%%
+%%Read side processing uses standard STREAMS flow control mechanisms as are
+%%described for TPI, below.  A unique characteristic of the read side processing
+%%fro the XTI over Sockets driver is that data is first copied from the internal
+%%socket to a STREAMS message block and then copied again from the STREAMS
+%%message block to user space.  This constitutes two copies per byte versus one
+%%copy per byte and has a significant impact on the performance of the driver at
+%%large message sizes.\footnote{This expectation of peformance impact is held up
+%%by the test results.}
+%%
+%%\paragraph*{Buffering.}
+%%
+%%Buffering uses standard STREAMS queueing and flow control mechanisms as are
+%%described for TPI, below.
+%%
+%%\paragraph*{Scheduling.}
+%%
+%%Scheduling resulting from queueing and flow control are the same as described
+%%for TPI below.  Considering that the internal socket used by the driver is on
+%%the loop-back interface, data written on the sending socket appears
+%%immediately at the receiving socket or is discarded.
+
+\subsubsection[STREAMS TPI]{STREAMS TPI}
+
+The STREAMS TPI implementation of SCTP is a direct STREAMS implementation that
+uses the \texttt{sctp} driver developed by the \textsl{OpenSS7 Project}
+\cite[]{openss7}.  As illustrated in \textit{Figure \ref{figure:sctp}}, this
+driver interfaces to Linux at the network layer, but provides a complete
+STREAMS implementation of the transport layer.  Interfacing with Linux at the
+network layer provides for de-multiplexed STREAMS architecture \cite[]{demux}.
+The driver presents the Transport Provider Interface (TPI) \cite[]{tpi} for
+use by upper level modules and the XTI library \cite[]{xti}.
+
+\begin{figure}[htp]
+\center\includegraphics[height=3.5in]{sctp}
+\caption[STREAMS \texttt{sctp} Driver]{STREAMS \texttt{sctp} Driver}
+\label{figure:sctp}
+\end{figure}
+
+\textsl{Linux Fast-STREAMS} also provides a raw IP driver (\texttt{raw}) and
+an SCTP driver (\texttt{sctp}) that operate in the same fashion as the
+\texttt{sctp} driver.  That is, performing all transport protocol functions
+within the driver and interfacing to the Linux NET4 IP layer.  One of the
+project objectives of performing the current testing was to determine whether
+it would be worth the effort to write a STREAMS transport implementation of
+TCP, the only missing component in the TCP/IP suite that necessitates the
+continued support of the XTI over Sockets (\texttt{inet}) driver.
+
+\paragraph*{Write side processing.}
+
+Write side processing follows standard STREAMS flow control.  When a write
+occurs at the \textit{Stream head}, the \textit{Stream head} checks for
+downstream flow control on the write queue.  If the \textit{Stream} is flow
+controlled, the calling process is blocked or the write system call fails
+(\texttt{EAGAIN}).  When the \textit{Stream} is not flow controlled, user data
+is transferred to allocated message blocks and passed downstream.  When the
+message blocks arrive at a downstream queue, the count of the data in the
+message blocks is added to to the queue count.  If the queue count exceeds the
+high water mark defined for the queue, the queue is marked full and subsequent
+upstream flow control tests will fail.
+
+\paragraph*{Read side processing.}
+
+Read side processing follows standard STREAMS flow control.  When a read
+occurs at the \textit{Stream head}, the \textit{Stream head} checks the read
+queue for messages.  If the read queue has no messages queued, the queue is
+marked to be enabled when messages arrive and the calling process is either
+blocked or the system call returns an error (\texttt{EAGAIN}).  If messages
+exist on the read queue, they are dequeued and data copied from the message
+blocks to the user supplied buffer.  If the message block is completely
+consumed, it is freed; otherwise, the message block is placed back on the read
+queue with the remaining data.
+
+\paragraph*{Buffering.}
+
+Buffering follows the standard STREAMS queueing and flow control mechanisms.
+When a queue is found empty by a reading process, the fact that the queue
+requires service is recorded.  Once the first message arrives at the queue
+following a process finding the queue empty, the queue's service procedure
+will be scheduled with the STREAMS scheduler.  When a queue is tested for flow
+control and the queue is found to be full, the fact that a process wishes to
+write the to queue is recorded.  When the count of the data on the queue falls
+beneath the low water mark, previous queues will be back enabled (that is,
+their service procedures will be scheduled with the STREAMS scheduler).
+
+\paragraph*{Scheduling.}
+
+When a queue downstream from the \textit{stream head} write queue is full,
+writing processes either block or fail with an error (\texttt{EAGAIN}).  When
+the forward queue's count falls below its \textit{low water mark}, the
+\textit{stream head} write queue is back-enabled.  Back-enabling consists of
+scheduling the queue's service procedure for execution by the STREAMS
+scheduler.  Only later, when the STREAMS scheduler runs pending tasks, does
+any writing process blocked on flow control get woken.
+
+When a \textit{stream head} read queue is empty and a reading processes either
+block or fail with an error (\textit{EAGAIN}).  When a message arrives at the
+\textit{stream head} read queue, the service procedure associated with the
+queue is scheduled for later execution by the STREAMS scheduler.  Only later,
+when the STREAMS scheduler runs pending tasks, does any reading process
+blocked awaiting messages get awoken.
+
+\section[Method]{Method}
+
+To test the performance of STREAMS networking, the \textsl{Linux Fast-STREAMS}
+package was used \cite[]{LfS}.  The \textsl{Linux Fast-STREAMS} package builds
+and installs Linux loadable kernel modules and includes the modified
+\texttt{netperf} and \texttt{iperf} programs used for testing.
+
+\paragraph*{Test Program.}
+
+One program used is a version of the \texttt{netperf} network performance
+measurement tool developed and maintained by Rick Jones for
+\textit{Hewlett-Packard}.  This modified version is available from the
+\textit{OpenSS7 Project} \cite[]{netperf}.  While the program is able to test
+using both POSIX Sockets and XTI STREAMS interfaces, modifications were
+required to the package to allow it to compile for \textsl{Linux
+Fast-STREAMS}.
+
+The \texttt{netperf} program has many options.  Therefore, a benchmark script
+(called \texttt{netperf\_benchmark}) was used to obtain repeatable raw data
+for the various machines and distributions tested.  This benchmark script is
+included in the \texttt{netperf} distribution available from the
+\textit{OpenSS7 Project} \cite[]{netperf}.  A listing of this script is
+provided in \textit{Appendix \ref{section:script}}.
+
+\subsection[Distributions Tested]{Distributions Tested}
+
+To remove the dependence of test results on a particular Linux kernel or
+machine, various Linux distributions were used for testing.  The distributions
+tested are as follows:
+
+\begin{tabular}{ll}\\
+Distribution & Kernel\\
+\hline
+RedHat 7.2 & 2.4.20-28.7\\
+WhiteBox 3 & 2.4.27\\
+CentOS 4 & 2.6.9-5.0.3.EL\\
+SuSE 10.0 OSS & 2.6.13-15-default\\
+Ubuntu 6.10 & 2.6.17-11-generic\\
+Ubuntu 7.04 & 2.6.20-15-server\\
+Fedora Core 6 & 2.6.20-1.2933.fc6\\
+\end{tabular}\\
+
+\subsection[Test Machines]{Test Machines}
+
+To remove the dependence of test results on a particular machine, various
+machines were used for testing as follows:
+
+\footnotesize
+\begin{tabular}{llll}\\
+Hostname & Processor & Memory & Architecture\\
+\hline
+porky & 2.57GHz PIV & 1Gb (333MHz) & i686 UP\\
+pumbah & 2.57GHz PIV & 1Gb (333MHz) & i686 UP\\
+daisy & 3.0GHz i630 HT & 1Gb (400MHz) & x86\_64 SMP\\
+mspiggy & 1.7GHz PIV & 1Gb (333MHz) & i686 UP\\
+\end{tabular}
+\normalsize
+
+\section[Results]{Results}
+
+The results for the various distributions and machines is tabulated in
+\textit{Appendix \ref{section:rawdata}}.  The data is tabulated as follows:
+
+\begin{description}
+
+\item[{\it Performance.}]
+
+Performance is charged by graphing the number of messages sent and received
+per second against the logarithm of the message send size.
+
+\item[{\it Delay.}]
+
+Delay is charted by graphing the number of seconds per send and receive
+against the sent message size.  The delay can be modelled as a fixed
+overhead per send or receive operation and a fixed overhead per byte sent.
+This model results in a linear graph with the zero x-intercept representing
+the fixed per-message overhead, and the slope of the line representing the
+per-byte cost.  As all implementations use the same primary mechanism for
+copying bytes to and from user space, it is expected that the slope of each
+graph will be similar and that the intercept will reflect most implementation
+differences.
+
+\item[{\it Throughput.}]
+
+Throughput is charted by graphing the logarithm of the product of the number
+of messages per second and the message size against the logarithm of the
+message size.  It is expected that these graphs will exhibit strong
+log-log-linear (power function) characteristics.  Any curvature in these
+graphs represents throughput saturation.
+
+\item[{\it Improvement.}]
+
+Improvement is charted by graphing the quotient of the bytes per second of
+the implementation and the bytes per second of the Linux sockets
+implementation as a percentage against the message size.  Values over 0\%
+represent an improvement over Linux sockets, whereas values under 0\%
+represent the lack of an improvement.
+
+\end{description}
+
+The results are organized in the sections that follow in order of the machine
+tested.
+
+\subsection[Porky]{Porky}
+
+Porky is a 2.57GHz Pentium IV (i686) uniprocessor machine with 1Gb of memory.
+Linux distributions tested on this machine are as follows:
+
+\begin{tabular}{ll}\\
+Distribution & Kernel\\
+\hline
+Fedora Core 6 & 2.6.20-1.2933.fc6\\
+CentOS 4 & 2.6.9-5.0.3.EL\\
+SuSE 10.0 OSS & 2.6.13-15-default\\
+Ubuntu 6.10 & 2.6.17-11-generic\\
+Ubuntu 7.04 & 2.6.20-15-server\\
+\end{tabular}
+
+\subsection[Pumbah]{Pumbah}
+Pumbah is a 2.57GHz Pentium IV (i686) uniprocessor machine with 1Gb of memory.
+This machine differs from Porky in memory type only (Pumbah has somewhat
+faster memory than Porky.) Linux distributions tested on this machine are as
+follows:
+
+\begin{tabular}{ll}\\
+Distribution & Kernel\\
+\hline
+RedHat 7.2 & 2.4.20-28.7\\
+\end{tabular}\\[1.0ex]
+
+Pumbah is a control machine and is used to rule out differences between recent
+2.6 kernels and one of the oldest and most stable 2.4 kernels.
+
+\subsection[Daisy]{Daisy}
+Daisy is a 3.0GHz i630 (x86\_64) hyper-threaded machine with 1Gb of memory.
+Linux distributions tested on this machine are as follows:
+
+\begin{tabular}{ll}\\
+Distribution & Kernel\\
+\hline
+Fedora Core 6 & 2.6.20-1.2933.fc6\\
+CentOS 5.0 & 2.6.18-8.1.3.el5\\
+\end{tabular}\\[1.0ex]
+
+This machine is used as an SMP control machine.  Most of the test were
+performed on uniprocessor non-hyper-threaded machines.  This machine is
+hyper-threaded and runs full SMP kernels.  This machine also supports EMT64 and
+runs \texttt{x86\_64} kernels.  It is used to rule out both SMP differences as
+well as 64-bit architecture differences.
+
+\subsection[Mspiggy]{Mspiggy}
+Mspiggy is a 1.7Ghz Pentium IV (M-processor) uniprocessor notebook (Toshiba
+Satellite 5100) with 1Gb of memory.  Linux distributions tested on this
+machine are as follows:
+
+\begin{tabular}{ll}\\
+Distribution & Kernel\\
+\hline
+SuSE 10.0 OSS & 2.6.13-15-default\\
+\end{tabular}\\[1.0ex]
+
+Note that this is the same distribution that was also tested on Porky.  The
+purpose of testing on this notebook is to rule out the differences between
+machine architectures on the test results.  Tests performed on this machine
+are control tests.
+
+
+\section[Analysis]{Analysis}
+
+The results are consistent enough across the various distributions and
+machines tested to draw some conclusions regarding the efficiency of the
+implementations tested.
+
+\subsection[Discussion]{Discussion}
+
+The test results reveal that the maximum throughput performance, as tested by
+the \texttt{netperf} program, of the STREAMS implementation of SCTP is superior
+to that of the Linux Kernel Sockets implementation of SCTP.  In fact, STREAMS
+implementation performance at smaller message sizes is significantly (as must
+as 30-40\%) greater than that of Linux Kernel SCTP.
+As the common belief is that STREAMS would exhibit poorer performance, this is
+perhaps a startling result to some.
+
+Looking at both implementations, the differences can be described by
+implementation similarities and differences:
+
+\paragraph*{Send processing.}
+
+When Linux Sockets SCTP receives a send request, the available send buffer space
+is checked.  If the current data would cause the send buffer fill to exceed
+the send buffer maximum, either the calling process blocks awaiting available
+buffer, or the system call returns with an error (\texttt{ENOBUFS}).  If the
+current send request will fit into the send buffer, a socket buffer
+(\texttt{skbuff}) is allocated, data is copied from user space to the buffer,
+and the socket buffer is dispatched to the IP layer for transmission.
+
+Linux 2.6 kernels have an amazing amount of special case code that gets
+executed for even a simple SCTP send operation.  Linux 2.4 kernels are far more
+direct.  The result is the same, even though they are different in the depths
+to which they must delve before discovering that a send is just a simple send.
+This might explain part of the rather striking differences between the
+performance comparison between STREAMS and Sockets on 2.6 and 2.4 kernels.
+
+When the STREAMS Stream head receives a putmsg(2) request, it checks
+downstream flow control.  If the Stream is flow controlled downstream, either
+the calling process blocks awaiting succession of flow control, or the
+putmsg(2) system call returns with an error (\texttt{EAGAIN}).  if the Stream
+is not flow controlled on the write side, message blocks are allocated to hold
+the control and data portions of the request and the message blocks are passed
+downstream to the driver.  When the driver receives an \texttt{M\_DATA} or
+\texttt{M\_PROTO} message block from the Stream head, in its put procedure, it
+simply queues it to the driver write queue with putq(9).  putq(9) will result
+in the enabling of the service procedure for the driver write queue under the
+proper circumstances.  When the service procedure runs, messages will be
+dequeued from the driver write queue transformed into IP datagrams and send to
+the IP layer for transmission on the network interface.
+
+\textsl{Linux Fast-STREAMS} has a feature whereby the driver can request that
+the Stream head allocate a Linux socket buffer (\texttt{skbuff}) to hold the
+data buffer associated with an allocated message block.  The STREAMS SCTP
+driver utilizes this feature.  STREAMS also has the feature that a write
+offset can be applied to all data block allocated and passed downstream.  The
+STREAMS SCTP driver uses this capability also.  The write offset set by the
+tested driver was a maximum hard header length.
+
+\paragraph*{Network processing.}
+
+Network processing (that is the bottom end under the transport protocol) for
+both implementations is effectively the same, with only minor differences.  In
+the STREAMS SCTP implementation, no \texttt{sock} structure exists, so issuing
+socket buffers to the network layer is performed in a slightly more direct
+fashion.
+
+Loop-back processing is identical as this is performed by the Linux NET4 IP
+layer in both cases.
+
+For Linux Sockets SCTP, when the IP layer frees or orphans the socket buffer, the
+amount of data associated with the socket buffer is subtracted from the
+current send buffer fill.  If the current buffer fill is less than 1/2 of the
+maximum, all processes blocked on write or blocked on poll are are woken.
+
+For STREAMS SCTP, when the IP layer frees or orphans the socket buffer, the
+amount of data associated with the socket buffer is subtracted from the
+current send buffer fill.  If the current send buffer fill is less than the
+send buffer low water mark (\texttt{SO\_SNDLOWAT} or \texttt{XTI\_SNDLOWAT}),
+and the write queue is blocked on flow control, the write queue is enabled.
+
+One disadvantage that it is expected would slow STREAMS SCTP performance is the
+fact that on the sending side, a STREAMS buffer is allocated along with a
+\texttt{skbuff} and the \texttt{skbuff} is passed to Linux NET4 IP and the
+loop-back device.  For Linux Sockets SCTP, the same \texttt{skbuff} is reused on
+both sides of the interface.  For STREAMS SCTP, there is (currently) no
+mechanism for passing through the original STREAMS message block and a new
+message block must be allocated.  This results in two message block
+allocations per \texttt{skbuff}.
+
+\paragraph*{Receive processing.}
+
+Under Linux Sockets SCTP, when a socket buffer is received from the network layer,
+a check is performed whether the associated socket is locked by a user process
+or not.  If the associated socket is locked, the socket buffer is placed on a
+backlog queue awaiting later processing by the user process when it goes to
+release the lock.  A maximum number of socket buffers are permitted to be
+queued against the backlog queue per socket (approx. 300).
+
+If the socket is not locked, or if the user process is processing a backlog
+before releasing the lock, the message is processed: the receive socket buffer
+is checked and if the received message would cause the buffer to exceed its
+maximum size, the message is discarded and the socket buffer freed.  If the
+received message fits into the buffer, its size is added to the current send
+buffer fill and the message is queued on the socket receive queue.  If a
+process is sleeping on read or in poll, an immediate wakeup is generated.
+
+In the STREAMS SCTP implementation on the receive side, again there is no
+\texttt{sock} structure, so the socket locking and backlog techniques
+performed by SCTP at the lower layer do not apply.  When the STREAMS SCTP
+implementation receives a socket buffer from the network layer, it tests the
+receive side of the Stream for flow control and, when not flow controlled,
+allocates a STREAMS buffer using esballoc(9) and passes the buffer directly to
+the upstream queue using putnext(9).  When flow control is in effect and the
+read queue of the driver is not full, a STREAMS message block is still
+allocated and placed on the driver read queue.  When the driver read queue is
+full, the received socket buffer is freed and the contents discarded.  While
+different in mechanism from the socket buffer and backlog approach taken by
+Linux Sockets SCTP, this bottom end receive mechanism is similar in both
+complexity and behaviour.
+
+\paragraph*{Buffering.}
+
+For Linux Sockets, when a send side socket buffer is allocated, the true size of
+the socket buffer is added to the current send buffer fill.  After the socket
+buffer has been passed to the IP layer, and the IP layer consumes (frees or
+orphans) the socket buffer, the true size of the socket buffer is subtracted
+from the current send buffer fill.  When the resulting fill is less than 1/2
+the send buffer maximum, sending processes blocked on send or poll are woken
+up.  When a send will not fit within the maximum send buffer size considering
+the size of the transmission and the current send buffer fill, the calling
+process blocks or is returned an error (\texttt{ENOBUFS}).  Processes that are
+blocked or subsequently block on poll(2) will not be woken up until the send
+buffer fill drops beneath 1/2 of the maximum; however, any process that
+subsequently attempts to send and has data that will fit in the buffer will be
+permitted to proceed.
+
+STREAMS networking, on the other hand, performs queueing, flow control and
+scheduling on both the sender and the receiver.  Sent messages are queued
+before delivery to the IP subsystem.  Received messages from the IP subsystem
+are queued before delivery to the receiver.  Both side implement full
+hysteresis high and low water marks.  Queues are deemed full when they reach
+the \textit{high water mark} and do not enable feeding processes or subsystems
+until the queue subsides to the \textit{low water mark}.
+
+\paragraph*{Scheduling.}
+
+Linux Sockets schedule by waking a receiving process whenever data is
+available in the receive buffer to be read, and waking a sending process
+whenever there is one-half of the send buffer available to be written.  While
+accomplishing buffering on the receive side, full hysteresis flow control is
+only performed on the sending side.  Due to the way that Linux handles the
+loop-back interface, the full hysteresis flow control on the sending side is
+defeated.
+
+STREAMS networking, on the other hand, uses the queueing, flow control and
+scheduling mechanism of STREAMS.  When messages are delivered from the IP
+layer to the receiving \textit{stream head} and a receiving process is
+sleeping, the service procedure for the reading \textit{stream head}'s read
+queue is scheduled for later execution.  When the STREAMS scheduler later
+runs, the receiving process is awoken.  When messages are sent on the sending
+side they are queued in the driver's write queue and the service procedure for
+the driver's write queue is scheduled for later execution.  When the STREAMS
+scheduler later runs, the messages are delivered to the IP layer.  When
+sending processes are blocked on a full driver write queue, and the count
+drops to the \textit{low water mark} defined for the queue, the service
+procedure of the sending \textit{stream head} is scheduled for later
+execution.  When the STREAMS scheduler later runs, the sending process is
+awoken.
+
+\textsl{Linux Fast-STREAMS} is designed to run tasks queued to the STREAMS
+scheduler on the same processor as the queueing processor or task.  This avoid
+unnecessary context switches.
+
+The STREAMS networking approach results in fewer blocking and wakeup events
+being generated on both the sending and receiving side.  Because there are
+fewer blocking and wakeup events, there are fewer context switches.  The
+receiving process is permitted to consume more messages before the sending
+process is awoken; and the sending process is permitted to generate more
+messages before the reading process is awoken.
+
+\paragraph*{Result}
+
+The result of the differences between the Linux NET and the STREAMS approach
+is that better flow control is being exerted on the sending side because of
+intermediate queueing toward the IP layer.  This intermediate queueing on the
+sending side, not present in BSD-style networking, is in fact responsible for
+reducing the number of blocking and wakeup events on the sender, and permits
+the sender, when running, to send more messages in a quantum.
+
+One the receiving side, the STREAMS queueing, flow control and scheduling
+mechanisms are similar to the BSD-style software interrupt approach.  However,
+Linux does not use software interrupts on loop-back (messages are passed
+directly to the socket with possible backlogging due to locking).  The STREAMS
+approach is more sophisticated as it performs backlogging, queueing and flow
+control simultaneously on the read side (at the \textit{stream head}).
+
+
+\section[Conclusions]{Conclusions}
+
+These experiments have shown that the \textsl{Linux Fast-STREAMS}
+implementation of STREAMS SCTP networking outperforms the Linux Sockets
+implementation by a significant amount.
+
+\begin{quote}
+\textit{The \textsl{Linux Fast-STREAMS} implementation of STREAMS SCTP
+networking is superior by a significant factor across all systems and kernels
+tested.}
+\end{quote}
+
+All of the conventional wisdom with regard to STREAMS and STREAMS networking
+is undermined by these test results for \textsl{Linux Fast-STREAMS}.
+
+\begin{itemize}
+
+\item \textit{STREAMS is fast.}
+
+Contrary to the preconception that STREAMS must be slower because it is more
+general purpose, in fact the reverse has been shown to be true in these
+experiments for \textsl{Linux Fast-STREAMS}.  The STREAMS flow control and
+scheduling mechanisms serve to adapt well and increase both code and data
+cache as well as scheduler efficiency.
+
+\item \textit{STREAMS is more flexible {\em and} more efficient.}
+
+Contrary to the preconception that STREAMS trades flexibility or general
+purpose architecture for efficiency (that is, that STREAMS is somehow less
+efficient because it is more flexible and general purpse), in fact has shown
+to be untrue.  \textsl{Linux Fast-STREAMS} is {\em both} more flexible {\em
+and} more efficient.  Indeed, the performance gains achieved by  STREAMS
+appear to derive from its more sophisticated queueing, scheduling and flow
+control model.
+
+\item \textit{STREAMS better exploits parallelisms on SMP better than other approaches.}
+
+Contrary to the preconception that STREAMS must be slower due to complex
+locking and synchronization mechanisms, \textsl{Linux Fast-STREAMS} performed
+better on SMP (hyperthreaded) machines than on UP machines and outperformed
+Linux Sockets SCTP by and even more significant factor (about 40\% improvement at
+most message sizes).  Indeed, STREAMS appears to be able to exploit inherent
+parallelisms that Linux Sockets is unable to exploit.
+
+\item \textit{STREAMS networking is fast.}
+
+Contrary to the preconception that STREAMS networking must be slower because
+STREAMS is more general purpose and has a rich set of features, the reverse
+has been shown in these experiments for \textsl{Linux Fast-STREAMS}.  By
+utilizing STREAMS queueing, flow control and scheduling, STREAMS SCTP indeed
+performs better than Linux Sockets SCTP.
+
+\item \textit{STREAMS networking is neither unnecessarily complex nor cumbersome.}
+
+Contrary to the preconception that STREAMS networking must be poorer because
+of use of a complex yet general purpose framework has shown to be untrue in
+these experiments for \textsl{Linux Fast-STREAMS}.  Also, the fact that
+STREAMS and Linux conform to the same standard (POSIX), means that they are no
+more cumbersome from a programming perspective.  Indeed a POSIX conforming
+application will not known the difference between the implementation (with the
+exception that superior performance will be experienced on STREAMS
+networking).
+
+\end{itemize}
+
+\section[Future Work]{Future Work}
+
+\subsection*{Local Transport Loop-back}
+
+UNIX domain sockets are the advocated primary interprocess communications
+mechanism in the 4.4BSD system: 4.4BSD even implements pipes using UNIX domain
+sockets \cite[]{bsd}.  Linux also implements UNIX domain sockets, but uses the
+4.1BSD/SVR3 legacy approach to pipes.  XTI has an equivalent to the UNIX
+domain socket.  This consists of connectionless, connection oriented, and
+connection oriented with orderly release loop-back transport providers.  The
+\texttt{netperf} program has the ability to test UNIX domain sockets, but does
+not currently have the ability to test the XTI equivalents.
+
+BSD claims that in 4.4BSD pipes were implemented using sockets (UNIX domain
+sockets) instead of using the file system as they were in 4.1BSD \cite[]{bsd}.
+One of the reasons cited for implementing pipes on Sockets and UNIX domain
+sockets using the networking subsystems was performance.  Another paper
+released by the \textsl{OpenSS7 Project} \cite[]{openss7} shows that
+experimental results on Linux file-system based pipes (using the SVR3 or
+4.1BSD approaches) perform poorly when compared to STREAMS-based pipes.
+Because Linux uses a similar approach to file-system based pipes in
+implementation of UNIX domain sockets, it can be expected that UNIX domain
+sockets under Linux will also perform poorly when compared to loop-back
+transport providers under STREAMS.
+
+\subsection*{Sockets interface to STREAMS}
+
+There are several mechanisms to providing BSD/POSIX Sockets interfaces to
+STREAMS networking \cite[]{impbsd} \cite[]{socklib}.  The experiments in this
+report indicate that it could be worthwhile to complete one of these
+implementations for \textsl{Linux Fast-STREAMS} \cite[]{strsock} and test
+whether STREAMS networking using the Sockets interface is also superior to
+Linux Sockets, just as it has been shown to be with the XTI/TPI interface.
+
+\section[Related Work]{Related Work}
+
+A separate paper comparing the STREAMS-based pipe implementation of
+\textsl{Linux Fast-STREAMS} to the legacy 4.1BSD/SVR3-style Linux pipe
+implementation has also been prepared.  That paper also shows significant
+performance improvements for STREAMS attributable to similar causes.
+
+A separate paper comparing a STREAMS-based UDP implementation of \textsl{Linux
+Fast-STREAMS} to the Linux NET4 Sockets approach has also been prepared.  That
+paper also shows significant performance improvements for STREAMS attributable
+to similar causes.
+
+\FloatBarrier
+\addcontentsline{toc}{section}{References}
+\bibliography{sctpresults}
+
+\clearpage
+\begin{appendix}
+
+\section[Netperf Benchmark Script]{Netperf Benchmark Script}
+\label{section:script}
+
+Following is a listing of the \texttt{netperf\_benchmark} script used to
+generate raw data points for analysis:
+
+
+\section[Raw Data]{Raw Data}
+\label{section:rawdata}
+
+Following are the raw data points captured using the
+\texttt{netperf\_benchmark} script:
+
+
+\end{appendix}
+
+\end{document}
