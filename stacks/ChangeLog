@@ -6,6 +6,10 @@
 	* README-cvs: updates for release
 	* THANKS: updates for release
 
+	* debian/strss7-core.preinst.in: corrected array subscript syntax error
+	* debian/strss7-core.prerm.in: corrected array subscript syntax error
+	* strss7.spec.in: corrected array subscript syntax error
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/sctp/sctp2.c: final mods

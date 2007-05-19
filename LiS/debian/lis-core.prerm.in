@@ -2,11 +2,11 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: lis-core.prerm.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/12/18 09:50:44 $
+# @(#) $RCSfile: lis-core.prerm.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/19 02:26:55 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/12/18 09:50:44 $ by $Author: brian $
+# Last Modified $Date: 2007/05/19 02:26:55 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -69,10 +69,10 @@ function prerm_modules() {
 		    /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
 		    if ( /sbin/lsmod | grep -q "^$m" ) ; then
 			/usr/sbin/lsof | while read -a tokens; do
-			    if [ :"$tokens[4]" = :"CHR" ]; then
-				major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+			    if [ :"${tokens[4]}" = :"CHR" ]; then
+				major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
 				if [ $major -eq $STRCONF_MAJBASE ]; then
-				    eval "kill -HUP $tokens[1]"
+				    eval "kill -HUP ${tokens[1]}"
 				fi
 			    fi
 			done
@@ -143,6 +143,9 @@ subpkg=core
 # =============================================================================
 #
 # $Log: lis-core.prerm.in,v $
+# Revision 0.9.2.6  2007/05/19 02:26:55  brian
+# - corrected array subscripting syntax error
+#
 # Revision 0.9.2.5  2006/12/18 09:50:44  brian
 # - updated headers for release
 #

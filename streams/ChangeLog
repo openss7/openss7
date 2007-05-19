@@ -6,6 +6,10 @@
 	* README-cvs: updates for release
 	* THANKS: updates for release
 
+	* debian/streams-core.preinst.in: corrected array subscript syntax error
+	* debian/streams-core.prerm.in: corrected array subscript syntax error
+	* streams.spec.in: corrected array subscript syntax error
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/kernel/strsched.c: ifdefs for debugging

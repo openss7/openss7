@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strisdn.spec.in,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/05/06 07:47:33 $
+# @(#) $RCSfile: strisdn.spec.in,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/19 02:27:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/05/06 07:47:33 $ by $Author: brian $
+# Last Modified $Date: 2007/05/19 02:27:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -810,10 +810,10 @@ if [ $arg = 1 -o $arg = 2 ] ; then : # fresh install or upgrade
                     modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
                     if ( lsmod | grep -q "^$m" ) ; then
                         lsof | while read -a tokens; do
-                            if [ :"$tokens[4]" = :"CHR" ]; then
-                                major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+                            if [ :"${tokens[4]}" = :"CHR" ]; then
+                                major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
                                 if [ $major -eq %{majbase} ]; then
-                                    eval "kill -HUP $tokens[1]"
+                                    eval "kill -HUP ${tokens[1]}"
                                 fi
                             fi
                         done
@@ -880,10 +880,10 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
                     modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
                     if ( lsmod | grep -q "^$m" ) ; then
                         lsof | while read -a tokens; do
-                            if [ :"$tokens[4]" = :"CHR" ]; then
-                                major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+                            if [ :"${tokens[4]}" = :"CHR" ]; then
+                                major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
                                 if [ $major -eq %{majbase} ]; then
-                                    eval "kill -KILL $tokens[1]"
+                                    eval "kill -KILL ${tokens[1]}"
                                 fi
                             fi
                         done
@@ -925,15 +925,15 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
                     if ( lsmod | grep -q "^$m" ) ; then
                         insmod -ar "$m"
                         lsof | while read -a tokens; do
-                            if [ :"$tokens[4]" = :"CHR" ]; then
-                                major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+                            if [ :"${tokens[4]}" = :"CHR" ]; then
+                                major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
                                 if [ $major -eq %{majbase} ]; then
                                     if [ $1 = 0 ] ; then
                                         # Extreme prejudice for removal.
-                                        eval "kill -KILL $tokens[1]"
+                                        eval "kill -KILL ${tokens[1]}"
                                     else
                                         # Try to get them to reload for upgrade.
-                                        eval "kill -HUP $tokens[1]"
+                                        eval "kill -HUP ${tokens[1]}"
                                     fi
                                 fi
                             fi
@@ -1912,9 +1912,13 @@ fi
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: strisdn.spec.in,v $
-# Revision 0.9.2.8  2007/05/06 07:47:33  brian
-# - make GPL version obvious
+# Revision 0.9.2.9  2007/05/19 02:27:33  brian
+# - corrected array subscripting syntax error
 #
+
+* Sun May  6 2007 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.8  2007/05/06 07:47:33  brian
+- make GPL version obvious
 
 * Wed Mar  7 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.7  2007/03/07 11:36:04  brian

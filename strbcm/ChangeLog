@@ -6,6 +6,10 @@
 	* README-cvs: updates for release
 	* THANKS: updates for release
 
+	* debian/strbcm-core.preinst.in: corrected array subscript syntax error
+	* debian/strbcm-core.prerm.in: corrected array subscript syntax error
+	* strbcm.spec.in: corrected array subscript syntax error
+
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* pkg/Config: strap out test entries

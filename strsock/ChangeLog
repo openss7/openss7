@@ -6,6 +6,10 @@
 	* README-cvs: updates for release
 	* THANKS: updates for release
 
+	* debian/strsock-core.preinst.in: corrected array subscript syntax error
+	* debian/strsock-core.prerm.in: corrected array subscript syntax error
+	* strsock.spec.in: corrected array subscript syntax error
+
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/papers/sockimp.bib: updated papers

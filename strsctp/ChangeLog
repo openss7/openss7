@@ -6,6 +6,10 @@
 	* README-cvs: updates for release
 	* THANKS: updates for release
 
+	* debian/strsctp-core.preinst.in: corrected array subscript syntax error
+	* debian/strsctp-core.prerm.in: corrected array subscript syntax error
+	* strsctp.spec.in: corrected array subscript syntax error
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/bugs.texi: document db_ref bug

@@ -6,6 +6,10 @@
 	* README-cvs: updates for release
 	* THANKS: updates for release
 
+	* debian/strvoip-core.preinst.in: corrected array subscript syntax error
+	* debian/strvoip-core.prerm.in: corrected array subscript syntax error
+	* strvoip.spec.in: corrected array subscript syntax error
+
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man7/cci_sipt.7.man: updated manual page
