@@ -3,6 +3,10 @@
 	* tests/kernel.at: correction to module test for new distros
 	* manual/news.texi: updated release files
 
+	* debian/lis-core.preinst.in: corrected array subscript syntax error
+	* debian/lis-core.prerm.in: corrected array subscript syntax error
+	* LiS.spec.in: corrected array subscript syntax error
+
 2007-05-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* LiS.spec.in: make GPL version more obvious

@@ -1,7 +1,7 @@
 %% -*- tex -*- vim: ft=tex tw=78 nocin nosi
 %% =========================================================================
 %%
-%% @(#) $Id: testresults.tex,v 0.9.2.4 2007/05/18 12:04:24 brian Exp $
+%% @(#) $Id: testresults.tex,v 0.9.2.5 2007/05/19 02:27:31 brian Exp $
 %%
 %% =========================================================================
 %%
@@ -53,7 +53,7 @@
 %% 
 %% =========================================================================
 %%
-%% Last Modified $Date: 2007/05/18 12:04:24 $ by $Author: brian $
+%% Last Modified $Date: 2007/05/19 02:27:31 $ by $Author: brian $
 %%
 %% =========================================================================
 
@@ -778,7 +778,7 @@ blocked awaiting messages get awoken.
 
 To test the performance of STREAMS networking, the \textsl{Linux Fast-STREAMS}
 package was used \cite[]{LfS}.  The \textsl{Linux Fast-STREAMS} package builds
-and installs Linux loadable kernel module and includes the modified
+and installs Linux loadable kernel modules and includes the modified
 \texttt{netperf} program used for testing.
 
 \paragraph*{Test Program.}
@@ -786,7 +786,7 @@ and installs Linux loadable kernel module and includes the modified
 The program used is a version of the \texttt{netperf} network performance
 measurement tool developed and maintained by Rick Jones for
 \textit{Hewlett-Packard}.  This modified version is available from the
-\textit{OpenSS7 Project} \cite[]{netperf}.  While the program is able test
+\textit{OpenSS7 Project} \cite[]{netperf}.  While the program is able to test
 using both POSIX Sockets and XTI STREAMS interfaces, modifications were
 required to the package to allow it to compile for \textsl{Linux
 Fast-STREAMS}.
@@ -798,7 +798,7 @@ included in the \texttt{netperf} distribution available from the
 \textit{OpenSS7 Project} \cite[]{netperf}.  A listing of this script is
 provided in \textit{Appendix \ref{section:script}}.
 
-\subsection[Distributions Tested]{Distrbutions Tested}
+\subsection[Distributions Tested]{Distributions Tested}
 
 To remove the dependence of test results on a particular Linux kernel or
 machine, various Linux distributions were used for testing.  The distributions
@@ -1857,7 +1857,7 @@ control simultaneously on the read side (at the \textit{stream head}).
 
 These experiments have shown that the \textsl{Linux Fast-STREAMS}
 implementation of STREAMS UDP networking outperforms the Linux NET4
-implementation by a significant amount (upt to 40\% improvement).
+implementation by a significant amount (up to 40\% improvement).
 
 \begin{quote}
 \textit{The \textsl{Linux Fast-STREAMS} implementation of STREAMS UDP

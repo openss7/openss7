@@ -6,6 +6,10 @@
 	* README-cvs: updates for release
 	* THANKS: updates for release
 
+	* debian/strxnet-core.preinst.in: corrected array subscript syntax error
+	* debian/strxnet-core.prerm.in: corrected array subscript syntax error
+	* strxnet.spec.in: corrected array subscript syntax error
+
 2007-05-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/test/test-tirdwr.c: corrections from release testing

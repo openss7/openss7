@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2007/05/06 07:47:23 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2007/05/19 02:26:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/05/06 07:47:23 $ by $Author: brian $
+# Last Modified $Date: 2007/05/19 02:26:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1732,9 +1732,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.99  2007/05/06 07:47:23  brian
-# - make GPL version obvious
+# Revision 0.9.2.100  2007/05/19 02:26:59  brian
+# - corrected array subscripting syntax error
 #
+
+* Sun May  6 2007 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.99  2007/05/06 07:47:23  brian
+- make GPL version obvious
 
 * Wed Mar  7 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.98  2007/03/07 11:35:38  brian

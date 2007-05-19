@@ -6,6 +6,10 @@
 	* README-cvs: updates for release
 	* THANKS: updates for release
 
+	* debian/strcompat-core.preinst.in: corrected array subscript syntax error
+	* debian/strcompat-core.prerm.in: corrected array subscript syntax error
+	* strcompat.spec.in: corrected array subscript syntax error
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/kernel/os7compat.c:

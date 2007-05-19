@@ -6,6 +6,10 @@
 	* README-cvs: updates for release
 	* THANKS: updates for release
 
+	* debian/sctp-core.preinst.in: corrected array subscript syntax error
+	* debian/sctp-core.prerm.in: corrected array subscript syntax error
+	* sctp.spec.in: corrected array subscript syntax error
+
 2007-05-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: check for nf_reset

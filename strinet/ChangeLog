@@ -6,6 +6,11 @@
 	* README-cvs: updates for release
 	* THANKS: updates for release
 
+	* debian/strinet-core.preinst.in: corrected array subscript syntax error
+	* debian/strinet-core.prerm.in: corrected array subscript syntax error
+	* doc/papers/testresults.tex: corrected array subscript syntax error
+	* strinet.spec.in: corrected array subscript syntax error
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/papers/testresults.tex: spelling

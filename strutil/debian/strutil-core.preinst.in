@@ -2,11 +2,11 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: strutil-core.preinst.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:16 $
+# @(#) $RCSfile: strutil-core.preinst.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/05/19 02:27:47 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/10/02 11:32:16 $ by $Author: brian $
+# Last Modified $Date: 2007/05/19 02:27:47 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -94,10 +94,10 @@ function upgrade_core_preinst() {
 		    /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
 		    if ( /sbin/lsmod | grep -q "^$m" ) ; then
 			/usr/sbin/lsof | while read -a tokens; do
-			    if [ :"$tokens[4]" = :"CHR" ]; then
-				major=`echo "$tokens[5]" | sed -e 's|,.*||'`
+			    if [ :"${tokens[4]}" = :"CHR" ]; then
+				major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
 				if [ $major -eq $STRCONF_MAJBASE ]; then
-				    eval "kill -HUP $tokens[1]"
+				    eval "kill -HUP ${tokens[1]}"
 				fi
 			    fi
 			done
@@ -136,6 +136,9 @@ subpkg=core
 # =============================================================================
 #
 # $Log: strutil-core.preinst.in,v $
+# Revision 0.9.2.3  2007/05/19 02:27:47  brian
+# - corrected array subscripting syntax error
+#
 # Revision 0.9.2.2  2006/10/02 11:32:16  brian
 # - changes to get master builds working for RPM and DEB
 # - added outside licenses to package documentation

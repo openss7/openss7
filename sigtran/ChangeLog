@@ -6,6 +6,10 @@
 	* README-cvs: updates for release
 	* THANKS: updates for release
 
+	* debian/sigtran-core.preinst.in: corrected array subscript syntax error
+	* debian/sigtran-core.prerm.in: corrected array subscript syntax error
+	* sigtran.spec.in: corrected array subscript syntax error
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/m2pa_sl.c: convert for log tracing, add service procedures
