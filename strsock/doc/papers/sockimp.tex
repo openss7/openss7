@@ -1,7 +1,7 @@
 %% -*- tex -*- vim: ft=tex tw=78 nocin nosi
 %% =========================================================================
 %%
-%% @(#) $Id: sockimp.tex,v 0.9.2.1 2007/05/03 21:24:21 brian Exp $
+%% @(#) $Id: sockimp.tex,v 0.9.2.2 2007/05/22 02:10:37 brian Exp $
 %%
 %% =========================================================================
 %%
@@ -53,7 +53,7 @@
 %% 
 %% =========================================================================
 %%
-%% Last Modified $Date: 2007/05/03 21:24:21 $ by $Author: brian $
+%% Last Modified $Date: 2007/05/22 02:10:37 $ by $Author: brian $
 %%
 %% =========================================================================
 
@@ -177,17 +177,19 @@
 UNIX networking has a rich history.  The TCP/IP protocol suite was first
 implemented by BBN using Sockets under a DARPA research project on 4.1aBSD and
 then incorporated by the CSRG into 4.2BSD \cite[]{bsd}.  Lachmann and
-Associates subsequently implemented the first TCP/IP protocol suite based on
-the Transport Layer Interface (TLI) \cite[]{tli} and STREAMS \cite[]{magic}.
+Associates (Legent) subsequently implemented one of the first TCP/IP protocol
+suite based on the Transport Layer Interface (TLI) \cite[]{tli} and STREAMS
+\cite[]{magic}.  Two other predominant TCP/IP implementations on STREAMS
+surfaced at about the same time: Wollongong and Mentat.
 
 \subsection[STREAMS]{STREAMS}
 
 STREAMS is a facility first presented in a paper by Dennis M. Ritchie in 1984
-\cite{Ritchie84}, originally implemented on 4.1BSD and later part of the
+\cite[]{Ritchie84}, originally implemented on 4.1BSD and later part of the
 \textsl{Bell Laboratories Eighth Edition UNIX}, incorporated into \textsl{UNIX
 System V Release 3} and enhanced in \textsl{UNIX System V Release 4} and
 further in \textsl{UNIX System V Release 4.2}.  STREAMS was used in SVR4 for
-terminal input/output, pseudo-terminals, pipes named pipes (FIFOs),
+terminal input-output, pseudo-terminals, pipes, named pipes (FIFOs),
 interprocess communication and networking.  STREAMS was used in SVR3 for
 networking (in the NSU package).  Since its release in \textsl{System V
 Release 3}, STREAMS has been implemented across a wide range of UNIX,
@@ -207,10 +209,10 @@ supporting STREAMS.
 
 On \textsl{UNIX System V Release 4.2}, STREAMS was used for terminal
 input-output, pipes, FIFOs (named pipes), and network communications.  Modern
-UNIX, UNIX-like and UNIX-based system providing STREAMS normally support some
+UNIX, UNIX-like and UNIX-based systems providing STREAMS normally support some
 degree of network communications using STREAMS; however, many do not support
 STREAMS-based pipe and FIFOs\footnote{AIX, for example.} or terminal
-input-output\footnote{HP-UX for example.} without system reconfiguration.
+input-output\footnote{HP-UX, for example.} without system reconfiguration.
 
 \textsl{UNIX System V Release 4.2} supported four Application Programming
 Interfaces (APIs) for accessing the network communications facilities of the
@@ -220,23 +222,25 @@ kernel:
 
 \item[{\it Transport Layer Interface (TLI).}]
 
-TLI is an acronym for the \textit{Transport Layer Interface (TLI)}
-\cite[]{tli}.  The TLI was the non-standard interface provided by SVR3 and
-SVR4, later standardized by X/Open as the XTI described below.  This interface
-operated differently than the XTI in subtle ways, and is now deprecated.
+\textsl{TLI} is an acronym for the \textit{Transport Layer Interface}
+\cite[]{tli}.  The \textsl{TLI} was the non-standard interface provided by
+SVR3 and SVR4, later standardized by \textit{X/Open} as the \textsl{XTI}
+described below.  This interface operated differently than the XTI in subtle
+ways, and is now deprecated.
 
 \item[{\it X/Open Transport Interface (XTI).}]
 
-XTI is an acronym for the \textit{X/Open Transport Interface} \cite[]{xti}.
-The XTI is a standarization of the SVR3 and SVR4 TLI.  The interface consists
-of an Application Programming Interface implemented as a shared object
-library.  The shared object library communicates with a transport provider
-\textit{Stream} using a service primitive interface called the
-\textit{Transport Provider Interface} \cite[]{tpi}.
+\textsl{XTI} is an acronym for the \textsl{X/Open Transport Interface}
+\cite[]{xti}.  The \textsl{X/Open Transport Interface} is a standardization of
+the \textsl{UNIX System V Release 4}, \textsl{Transport Layer Interface}.  The
+interface consists of an Application Programming Interface implemented as a
+shared object library.  The shared object library communicates with a
+transport provider \textit{Stream} using a service primitive interface called
+the \textit{Transport Provider Interface}\cite[]{tpi}.
 
-While XTI was implemented directly over STREAMS devices supporting the TPI
-\cite[]{tpi} under SVR4, several non-traditional approaches exist in
-some implementations.
+While \textsl{XTI} was implemented directly over STREAMS devices supporting
+the \textit{Transport Provider Interface (TPI)} \cite[]{tpi} under SVR4,
+several non-traditional approaches exist in implementation:
 
 \item[{\it Berkeley Sockets.}]
 

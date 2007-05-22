@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2007/05/18 12:05:25 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2007/05/22 02:10:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 12:05:25 $ by $Author: brian $
+ Last Modified $Date: 2007/05/22 02:10:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.67  2007/05/22 02:10:20  brian
+ - SCTP performance testing updates
+
  Revision 0.9.2.66  2007/05/18 12:05:25  brian
  - wrap up of sctp testing
 
@@ -133,10 +136,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2007/05/18 12:05:25 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2007/05/22 02:10:20 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2007/05/18 12:05:25 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2007/05/22 02:10:20 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -154,7 +157,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2007/05/18 12:05:25 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2007/05/22 02:10:20 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -193,7 +196,7 @@ MODULE_ALIAS("streams-driver-sctp");
 #define SCTPLOGNO	6	/* log SCTP additional data */
 #define SCTPLOGDA	7	/* log SCTP data */
 
-#if 0
+#ifdef _OPTIMIZE_SPEED
 #define sctplog(sp, level, flags, fmt, ...) \
 	do { } while (0)
 #else
@@ -1165,6 +1168,7 @@ struct sctp_mib {
 				  SCTPF_SHUTDOWN_RECEIVED| \
 				  SCTPF_SHUTDOWN_SENT)
 
+#ifndef _OPTIMIZE_SPEED
 STATIC char *sctp_state_name[] = {
 	"(Uninitialized)",
 	"ESTABLISHED",
@@ -1181,106 +1185,49 @@ STATIC char *sctp_state_name[] = {
 	"(Max-State)"
 };
 
+STATIC const char *
+sctp_statename(int state)
+{
+	switch (state) {
+	case 0:
+	case SCTP_ESTABLISHED:
+	case SCTP_COOKIE_WAIT:
+	case SCTP_COOKIE_ECHOED:
+	case SCTP_SHUTDOWN_PENDING:
+	case SCTP_SHUTDOWN_SENT:
+	case SCTP_CLOSED:
+	case SCTP_SHUTDOWN_RECEIVED:
+	case SCTP_SHUTDOWN_RECVWAIT:
+	case SCTP_LISTEN:
+	case SCTP_SHUTDOWN_ACK_SENT:
+	case SCTP_UNREACHABLE:
+	case SCTP_MAX_STATES:
+		return (sctp_state_name[state]);
+	default:
+		return ("(Invalid)");
+
+	}
+}
+
 STATIC INLINE int
-sctp_change_state(struct sctp *sp, int newstate)
+sctp_change_state(struct sctp *sp, int newstate, const char *file, int line)
 {
 	int oldstate;
 
-	if ((oldstate = xchg(&sp->state, newstate)) != newstate) {
-		char *oldname, *newname;
-
-		switch (oldstate) {
-		case 0:
-			oldname = sctp_state_name[oldstate];
-			break;
-		case SCTP_ESTABLISHED:
-			oldname = sctp_state_name[oldstate];
-			break;
-		case SCTP_COOKIE_WAIT:
-			oldname = sctp_state_name[oldstate];
-			break;
-		case SCTP_COOKIE_ECHOED:
-			oldname = sctp_state_name[oldstate];
-			break;
-		case SCTP_SHUTDOWN_PENDING:
-			oldname = sctp_state_name[oldstate];
-			break;
-		case SCTP_SHUTDOWN_SENT:
-			oldname = sctp_state_name[oldstate];
-			break;
-		case SCTP_CLOSED:
-			oldname = sctp_state_name[oldstate];
-			break;
-		case SCTP_SHUTDOWN_RECEIVED:
-			oldname = sctp_state_name[oldstate];
-			break;
-		case SCTP_SHUTDOWN_RECVWAIT:
-			oldname = sctp_state_name[oldstate];
-			break;
-		case SCTP_LISTEN:
-			oldname = sctp_state_name[oldstate];
-			break;
-		case SCTP_SHUTDOWN_ACK_SENT:
-			oldname = sctp_state_name[oldstate];
-			break;
-		case SCTP_UNREACHABLE:
-			oldname = sctp_state_name[oldstate];
-			break;
-		case SCTP_MAX_STATES:
-			oldname = sctp_state_name[oldstate];
-			break;
-		default:
-			oldname = "(Invalid)";
-			break;
-		}
-		switch (newstate) {
-		case 0:
-			newname = sctp_state_name[newstate];
-			break;
-		case SCTP_ESTABLISHED:
-			newname = sctp_state_name[newstate];
-			break;
-		case SCTP_COOKIE_WAIT:
-			newname = sctp_state_name[newstate];
-			break;
-		case SCTP_COOKIE_ECHOED:
-			newname = sctp_state_name[newstate];
-			break;
-		case SCTP_SHUTDOWN_PENDING:
-			newname = sctp_state_name[newstate];
-			break;
-		case SCTP_SHUTDOWN_SENT:
-			newname = sctp_state_name[newstate];
-			break;
-		case SCTP_CLOSED:
-			newname = sctp_state_name[newstate];
-			break;
-		case SCTP_SHUTDOWN_RECEIVED:
-			newname = sctp_state_name[newstate];
-			break;
-		case SCTP_SHUTDOWN_RECVWAIT:
-			newname = sctp_state_name[newstate];
-			break;
-		case SCTP_LISTEN:
-			newname = sctp_state_name[newstate];
-			break;
-		case SCTP_SHUTDOWN_ACK_SENT:
-			newname = sctp_state_name[newstate];
-			break;
-		case SCTP_UNREACHABLE:
-			newname = sctp_state_name[newstate];
-			break;
-		case SCTP_MAX_STATES:
-			newname = sctp_state_name[newstate];
-			break;
-		default:
-			newname = "(Invalid)";
-			break;
-		}
-		sctplogst(sp, "%s <- %s", newname, oldname);
-	}
+	if ((oldstate = xchg(&sp->state, newstate)) != newstate)
+		sctplogst(sp, "%s <- %s (%s +%d)", sctp_statename(newstate), sctp_statename(oldstate), file, line);
 	return (oldstate);
 }
+
+#define sctp_change_state(sp, newstate) \
+	sctp_change_state(sp, newstate, __FILE__, __LINE__)
+#else
+STATIC INLINE int
+sctp_change_state(struct sctp *sp, int newstate)
+{
+	return xchg(&sp->state, newstate);
+}
+#endif
 
 /*
  *  =========================================================================
@@ -2901,9 +2848,9 @@ sp_timer_cond_guard(struct sctp *sp, clock_t ticks)
 STATIC inline toid_t
 sp_timer_cond_sack(struct sctp *sp, clock_t ticks)
 {
-	sctplogte(sp, "conditional start timer T2-sack, %d ticks", (int) ticks);
+	sctplogda(sp, "conditional start timer T2-sack, %d ticks", (int) ticks);
 	if (unlikely(ticks < 1)) {
-		sctplogte(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		sctplogda(sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
 		ticks = 1;
 	}
 	return sp_timer_cond(sp, &sp->timer_sack, &sctp_sack_timeout, ticks);
@@ -2941,9 +2888,9 @@ sd_timer_cond_heartbeat(struct sctp_daddr *sd, clock_t ticks)
 STATIC inline toid_t
 sd_timer_cond_retrans(struct sctp_daddr *sd, clock_t ticks)
 {
-	sctplogte(sd->sp, "conditional start timer T3-retrans, %d ticks, %p", (int) ticks, sd);
+	sctplogda(sd->sp, "conditional start timer T3-retrans, %d ticks, %p", (int) ticks, sd);
 	if (unlikely(ticks < 1)) {
-		sctplogte(sd->sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
+		sctplogda(sd->sp, "%s() ticks is %d, setting to 1", __FUNCTION__, (int) ticks);
 		ticks = 1;
 	}
 	return sd_timer_cond(sd, &sd->timer_retrans, &sctp_retrans_timeout, ticks);
@@ -5880,7 +5827,7 @@ sctp_bundle_sack(struct sctp *sp,	/* association */
       wait_for_next_packet:
 	return (1);
       outstate:
-	sctplogerr(sp, "%s() in wrong SCTP state %d", __FUNCTION__, (int) sp->state);
+	sctplogerr(sp, "%s() in wrong SCTP state %s", __FUNCTION__, sctp_statename(sp->state));
 	sp->sackf &= ~SCTP_SACKF_ANY;
 #ifdef ETSI
 	sp->sackcnt = 0;
@@ -5983,7 +5930,7 @@ sctp_bundle_fsn(struct sctp *sp,	/* association */
       wait_for_next_packet:
 	return (1);
       outstate:
-	sctplogerr(sp, "%s() in wrong SCTP state %d", __FUNCTION__, (int) sp->state);
+	sctplogerr(sp, "%s() in wrong SCTP state %s", __FUNCTION__, sctp_statename(sp->state));
 	sp->sackf &= ~SCTP_SACKF_FSN;
 	if (!(sp->sackf & SCTP_SACKF_ANY))
 		sp_timer_cancel_sack(sp);
@@ -6035,7 +5982,7 @@ sctp_bundle_cwr(struct sctp *sp,	/* association */
       wait_for_next_packet:
 	return (1);
       outstate:
-	sctplogerr(sp, "%s() in wrong SCTP state %d", __FUNCTION__, (int) sp->state);
+	sctplogerr(sp, "%s() in wrong SCTP state %s", __FUNCTION__, sctp_statename(sp->state));
 	sp->sackf &= ~SCTP_SACKF_CWR;
 	return (0);
 }
@@ -6078,7 +6025,7 @@ sctp_bundle_error(struct sctp *sp,	/* association */
 	bufq_unlock(&sp->errq, pl);
 	return (1);
       outstate:
-	sctplogerr(sp, "%s() in wrong SCTP state %d", __FUNCTION__, (int) sp->state);
+	sctplogerr(sp, "%s() in wrong SCTP state %s", __FUNCTION__, sctp_statename(sp->state));
 	return (0);
 }
 
@@ -6775,7 +6722,7 @@ ___sctp_transmit_wakeup(struct sctp *sp)
 	struct sctp_daddr *sd;
 	int loop_max = 1000;
 
-	sctplogno(sp, "performing transmitter wakeup");
+	sctplogda(sp, "performing transmitter wakeup");
 	ensure(sp, return);
 	if ((1 << sp->state) & ~(SCTPF_CONNECTED))
 		goto skip;
@@ -10003,6 +9950,9 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 		sctp_cumm_ack(sp, ack);
 		/* if we have cummulatively acked something, we will skip FR analysis for this
 		   SACK. */
+		/* XXX: for now just assume that if something is cummulatively
+		 * acked that the write queue needs to be enabled. */
+		qenable(sp->wq);
 		goto skip_rtx_analysis;
 	}
 	if (ndups) {
@@ -10228,8 +10178,8 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 			sctp_send_shutdown_ack(sp);
 			break;
 		default:
-			sctplogerr(sp, "%s() SACK received in wrong SCTP state %d", __FUNCTION__,
-				   (int) sp->state);
+			sctplogerr(sp, "%s() SACK received in wrong SCTP state %s", __FUNCTION__,
+				   sctp_statename(sp->state));
 			return (-EFAULT);
 		}
 	}
@@ -10527,8 +10477,8 @@ sctp_recv_abort(struct sctp *sp, mblk_t *mp)
 		reason = -ECONNRESET;
 		break;
 	default:
-		sctplogerr(sp, "%s() ABORT received in wrong SCTP state %d", __FUNCTION__,
-			   (int) sp->state);
+		sctplogerr(sp, "%s() ABORT received in wrong SCTP state %s", __FUNCTION__,
+			   sctp_statename(sp->state));
 		return sctp_return_stop(mp);
 	}
 	/* FIXME: the reasons set above are only if there is no cause value in the abort message.
@@ -12265,8 +12215,8 @@ sctp_recv_forward_tsn(struct sctp *sp, mblk_t *mp)
 	   SACK.  Receiving duplicate FSNs is a weak indication that our SACKs might not be getting 
 	   through. */
       outstate:
-	sctplogerr(sp, "%s() FORWARD TSN received in wrong SCTP state %d", __FUNCTION__,
-		   (int) sp->state);
+	sctplogerr(sp, "%s() FORWARD TSN received in wrong SCTP state %s", __FUNCTION__,
+		   sctp_statename(sp->state));
 	return sctp_return_more(mp);
       emsgsize:
 	sctplogerr(sp, "%s() invalid message size", __FUNCTION__);
@@ -12982,7 +12932,7 @@ sctp_abort(struct sctp *sp, t_uscalar_t origin, t_scalar_t reason)
 	}
 	return (0);
       outstate:
-	sctplogerr(sp, "%s() in wrong SCTP state %d", __FUNCTION__, (int) sp->state);
+	sctplogerr(sp, "%s() in wrong SCTP state %s", __FUNCTION__, sctp_statename(sp->state));
 	return (-EFAULT);
 }
 
@@ -13913,6 +13863,7 @@ sctp_free_priv(queue_t *q)
 	struct sctp *sp;
 
 	sp = sctp_sleeplock(q);	/* wait to lock queue */
+	sctplogno(sp, "freeing private structure");
 #if 0
 	/* This causes really big problems on SMP for some reason: just drop the Stream and let the 
 	   protocol module respond with an abort. */
@@ -14179,7 +14130,7 @@ sctp_r_data(queue_t *q, mblk_t *mp)
 
 		rtn = sctp_recv_msg(sp, mp);
 		___sctp_cleanup_read(sp);
-		// ___sctp_transmit_wakeup(sp);
+		___sctp_transmit_wakeup(sp);
 		sctp_unlockq(sp);
 		return (rtn);
 	}
@@ -14205,7 +14156,7 @@ sctp_r_ctl(queue_t *q, mblk_t *mp)
 
 		rtn = sctp_recv_err(sp, mp);
 		___sctp_cleanup_read(sp);
-		// ___sctp_transmit_wakeup(sp);
+		___sctp_transmit_wakeup(sp);
 		sctp_unlockq(sp);
 		return (rtn);
 	}
@@ -14380,20 +14331,23 @@ sctp_rsrv(queue_t *q)
 
 	if (likely((sp = sctp_trylockq(q)) != NULL)) {
 		mblk_t *mp;
+		int rtn;
 
 		___sctp_deferred_timers(sp);
 
 		while (likely((mp = getq(q)) != NULL)) {
-			if (unlikely(sctp_r_prim_srv(sp, q, mp) != QR_ABSORBED)) {
+			if (unlikely((rtn = sctp_r_prim_srv(sp, q, mp)) != QR_ABSORBED)) {
 				if (unlikely(!putbq(q, mp))) {
 					mp->b_band = 0;
 					putbq(q, mp);	/* must succeed */
 				}
+				sctplogno(sp, "read queue stalled %d", rtn);
 				break;
 			}
+			___sctp_transmit_wakeup(sp);
 		}
 		___sctp_cleanup_read(sp);
-		// ___sctp_transmit_wakeup(sp);
+		___sctp_transmit_wakeup(sp);
 		sctp_unlockq(sp);
 	}
 	return (0);
@@ -14599,6 +14553,62 @@ m_error_reply(struct sctp *sp, mblk_t *msg, int err)
  *  This driver defines two user interfaces: one NPI, the other TPI.
  */
 
+#ifndef _OPTIMIZE_SPEED
+STATIC const char *
+sctp_n_statename(t_scalar_t state)
+{
+	switch (state) {
+	case NS_UNBND:
+		return ("NS_UNBND");
+	case NS_WACK_BREQ:
+		return ("NS_WACK_BREQ");
+	case NS_WACK_UREQ:
+		return ("NS_WACK_UREQ");
+	case NS_IDLE:
+		return ("NS_IDLE");
+	case NS_WACK_OPTREQ:
+		return ("NS_WACK_OPTREQ");
+	case NS_WACK_RRES:
+		return ("NS_WACK_RRES");
+	case NS_WCON_CREQ:
+		return ("NS_WCON_CREQ");
+	case NS_WRES_CIND:
+		return ("NS_WRES_CIND");
+	case NS_WACK_CRES:
+		return ("NS_WACK_CRES");
+	case NS_DATA_XFER:
+		return ("NS_DATA_XFER");
+	case NS_WCON_RREQ:
+		return ("NS_WCON_RREQ");
+	case NS_WRES_RIND:
+		return ("NS_WRES_RIND");
+	case NS_WACK_DREQ6:
+		return ("NS_WACK_DREQ6");
+	case NS_WACK_DREQ7:
+		return ("NS_WACK_DREQ7");
+	case NS_WACK_DREQ9:
+		return ("NS_WACK_DREQ9");
+	case NS_WACK_DREQ10:
+		return ("NS_WACK_DREQ10");
+	case NS_WACK_DREQ11:
+		return ("NS_WACK_DREQ11");
+	default:
+		return ("????");
+	}
+}
+
+STATIC inline void
+sctp_n_setstate(struct sctp *sp, t_scalar_t newstate)
+{
+	t_scalar_t oldstate;
+	
+	if ((oldstate = XCHG(&sp->i_state, newstate)) != newstate)
+		sctplogst(sp, "%s <- %s", sctp_n_statename(newstate), sctp_n_statename(oldstate));
+}
+#else
+#define sctp_n_setstate(sp, newstate) do { sp->i_state = newstate; } while (0)
+#endif
+
 #ifdef LFS
 #define SCTP_N_DRV_ID	    CONFIG_STREAMS_SCTP_N_MODID
 #define SCTP_N_DRV_NAME	    CONFIG_STREAMS_SCTP_N_NAME
@@ -14619,13 +14629,22 @@ m_error_reply(struct sctp *sp, mblk_t *msg, int err)
 #define CMAJOR_0	SCTP_N_CMAJOR_0
 #define UNITS		SCTP_N_UNITS
 
-STATIC struct module_info sctp_n_minfo = {
+STATIC struct module_info sctp_n_rinfo = {
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = SHEADHIWAT << 5,	/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
+};
+
+STATIC struct module_info sctp_n_winfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
 	.mi_hiwat = SHEADHIWAT,		/* Hi water mark */
-	.mi_lowat = SHEADLOWAT,		/* Lo water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 STATIC struct module_stat sctp_n_rstat __attribute__ ((aligned(SMP_CACHE_BYTES)));
@@ -14642,7 +14661,7 @@ STATIC struct qinit sctp_n_rinit = {
 	.qi_srvp = sctp_rsrv,		/* Read queue service */
 	.qi_qopen = sctp_n_open,	/* Each open */
 	.qi_qclose = sctp_n_close,	/* Last close */
-	.qi_minfo = &sctp_n_minfo,	/* Information */
+	.qi_minfo = &sctp_n_rinfo,	/* Information */
 	.qi_mstat = &sctp_n_rstat,	/* Statistics */
 };
 
@@ -14652,7 +14671,7 @@ STATIC streamscall int sctp_n_wsrv(queue_t *);
 STATIC struct qinit sctp_n_winit = {
 	.qi_putp = sctp_n_wput,		/* Write put (msg from above) */
 	.qi_srvp = sctp_n_wsrv,		/* Write queue service */
-	.qi_minfo = &sctp_n_minfo,	/* Information */
+	.qi_minfo = &sctp_n_winfo,	/* Information */
 	.qi_mstat = &sctp_n_wstat,	/* Statistics */
 };
 
@@ -14742,7 +14761,7 @@ n_conn_ind(struct sctp *sp, mblk_t *cp)
 	q->o_streams = ck->n_ostr;
 	mp->b_wptr += sizeof(*q);
 	bufq_queue(&sp->conq, bp);
-	sp->i_state = NS_WRES_CIND;
+	sctp_n_setstate(sp, NS_WRES_CIND);
 	sctplogtx(sp, "<- N_CONN_IND");
 	putnext(sp->rq, mp);
 	return (0);
@@ -14804,7 +14823,7 @@ n_conn_con(struct sctp *sp)
 	q->i_streams = sp->n_istr;
 	q->o_streams = sp->n_ostr;
 	mp->b_wptr += sizeof(*q);
-	sp->i_state = NS_DATA_XFER;
+	sctp_n_setstate(sp, NS_DATA_XFER);
 	sctplogtx(sp, "<- N_CONN_CON");
 	putnext(sp->rq, mp);
 	return (0);
@@ -14862,9 +14881,9 @@ n_discon_ind(struct sctp *sp, t_uscalar_t orig, t_scalar_t reason, mblk_t *seq)
 	if (seq)
 		freemsg(seq);
 	if (!bufq_length(&sp->conq))
-		sp->i_state = NS_IDLE;
+		sctp_n_setstate(sp, NS_IDLE);
 	else
-		sp->i_state = NS_WRES_CIND;
+		sctp_n_setstate(sp, NS_WRES_CIND);
 	sctplogtx(sp, "<- N_DISCON_IND");
 	putnext(sp->rq, mp);
 	return (0);
@@ -14876,7 +14895,7 @@ n_discon_ind(struct sctp *sp, t_uscalar_t orig, t_scalar_t reason, mblk_t *seq)
       outstate:
 	/* Sometimes this function is called in the idle state. */
 	if (sp->i_state != NS_IDLE)
-		sctplogerr(sp, "%s() in NPI state %d", __FUNCTION__, (int) sp->i_state);
+		sctplogerr(sp, "%s() in NPI state %s", __FUNCTION__, sctp_n_statename(sp->i_state));
 	return (0);
 }
 
@@ -14990,7 +15009,7 @@ n_exdata_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_t
 	sctplogtx(sp, "%s() flow controlled", __FUNCTION__);
 	return (-EBUSY);
       outstate:
-	sctplogerr(sp, "%s() in NPI state %d", __FUNCTION__, (int) sp->i_state);
+	sctplogerr(sp, "%s() in NPI state %s", __FUNCTION__, sctp_n_statename(sp->i_state));
 	freemsg(dp);
 	return (0);
 }
@@ -15141,7 +15160,7 @@ n_bind_ack(struct sctp *sp)
 		add->sin_addr.s_addr = INADDR_ANY;
 		mp->b_wptr += sizeof(*add);
 	}
-	sp->i_state = NS_IDLE;
+	sctp_n_setstate(sp, NS_IDLE);
 	sctplogtx(sp, "<- N_BIND_ACK");
 	putnext(sp->rq, mp);
 	return (0);
@@ -15205,31 +15224,31 @@ n_error_ack(struct sctp *sp, mblk_t *msg, int prim, int err)
 	case NS_WACK_OPTREQ:
 	case NS_WACK_UREQ:
 	case NS_WCON_CREQ:
-		sp->i_state = NS_IDLE;
+		sctp_n_setstate(sp, NS_IDLE);
 		break;
 	case NS_WCON_RREQ:
-		sp->i_state = NS_DATA_XFER;
+		sctp_n_setstate(sp, NS_DATA_XFER);
 		break;
 	case NS_WACK_BREQ:
-		sp->i_state = NS_UNBND;
+		sctp_n_setstate(sp, NS_UNBND);
 		break;
 	case NS_WACK_CRES:
-		sp->i_state = NS_WRES_CIND;
+		sctp_n_setstate(sp, NS_WRES_CIND);
 		break;
 	case NS_WACK_DREQ6:
-		sp->i_state = NS_WCON_CREQ;
+		sctp_n_setstate(sp, NS_WCON_CREQ);
 		break;
 	case NS_WACK_DREQ7:
-		sp->i_state = NS_WRES_CIND;
+		sctp_n_setstate(sp, NS_WRES_CIND);
 		break;
 	case NS_WACK_DREQ9:
-		sp->i_state = NS_DATA_XFER;
+		sctp_n_setstate(sp, NS_DATA_XFER);
 		break;
 	case NS_WACK_DREQ10:
-		sp->i_state = NS_WCON_RREQ;
+		sctp_n_setstate(sp, NS_WCON_RREQ);
 		break;
 	case NS_WACK_DREQ11:
-		sp->i_state = NS_WRES_RIND;
+		sctp_n_setstate(sp, NS_WRES_RIND);
 		break;
 		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
 		   normally when we send NOUTSTATE or NNOTSUPPORT or are responding to an
@@ -15264,24 +15283,24 @@ n_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 	switch (prim) {
 	case N_OPTMGMT_REQ:
 		if (sp->i_state == NS_WACK_OPTREQ)
-			sp->i_state = NS_IDLE;
+			sctp_n_setstate(sp, NS_IDLE);
 		break;
 	case N_RESET_RES:
-		sp->i_state = NS_DATA_XFER;
+		sctp_n_setstate(sp, NS_DATA_XFER);
 		break;
 	case N_UNBIND_REQ:
-		sp->i_state = NS_UNBND;
+		sctp_n_setstate(sp, NS_UNBND);
 		break;
 	case N_CONN_RES:
 		if (ap != NULL)
-			ap->i_state = NS_DATA_XFER;
+			sctp_n_setstate(ap, NS_DATA_XFER);
 		if (cp != NULL)
 			freemsg(cp);
 		if (ap == NULL || ap->rq != sp->rq) {
 			if (bufq_length(&sp->conq))
-				sp->i_state = NS_WRES_CIND;
+				sctp_n_setstate(sp, NS_WRES_CIND);
 			else
-				sp->i_state = NS_IDLE;
+				sctp_n_setstate(sp, NS_IDLE);
 		}
 		break;
 	case N_DISCON_REQ:
@@ -15291,9 +15310,9 @@ n_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 				freemsg(cp);
 		case NS_WACK_DREQ6:
 			if (bufq_length(&sp->conq))
-				sp->i_state = NS_WRES_CIND;
+				sctp_n_setstate(sp, NS_WRES_CIND);
 			else
-				sp->i_state = NS_IDLE;
+				sctp_n_setstate(sp, NS_IDLE);
 			break;
 		case NS_WACK_DREQ9:
 		case NS_WACK_DREQ10:
@@ -15304,9 +15323,9 @@ n_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 			if (m_flush(sp, NULL, FLUSHRW, 0) == -ENOBUFS)
 				goto enobufs;
 			if (bufq_length(&sp->conq))
-				sp->i_state = NS_WRES_CIND;
+				sctp_n_setstate(sp, NS_WRES_CIND);
 			else
-				sp->i_state = NS_IDLE;
+				sctp_n_setstate(sp, NS_IDLE);
 			break;
 		}
 		break;
@@ -15388,7 +15407,7 @@ n_reset_ind(struct sctp *sp, t_uscalar_t orig, t_scalar_t reason, mblk_t *cp)
 	   negative reasons are UNIX error codes, all positive reasons are SCTP cause values. */
 	mp->b_wptr += sizeof(*p);
 	bufq_queue(&sp->conq, bp);
-	sp->i_state = NS_WRES_RIND;
+	sctp_n_setstate(sp, NS_WRES_RIND);
 	sctplogtx(sp, "<- N_RESET_IND");
 	putnext(sp->rq, mp);
 	return (0);
@@ -15423,7 +15442,7 @@ n_reset_con(struct sctp *sp)
 	p = (N_reset_con_t *) mp->b_wptr;
 	p->PRIM_type = N_RESET_CON;
 	mp->b_wptr += sizeof(*p);
-	sp->i_state = NS_DATA_XFER;
+	sctp_n_setstate(sp, NS_DATA_XFER);
 	sctplogtx(sp, "<- N_RESET_CON");
 	putnext(sp->rq, mp);
 	return (0);
@@ -15455,7 +15474,7 @@ n_recover_ind(void)
 	p = (N_recover_ind_t *) mp->b_wptr;
 	p->PRIM_type = N_RECOVER_IND;
 	mp->b_wptr += sizeof(*p);
-	sp->i_state = NS_DATA_XFER;
+	sctp_n_setstate(sp, NS_DATA_XFER);
 	sctplogtx(sp, "<- N_RECOVER_IND");
 	putnext(sp->rq, mp);
 	return (0);
@@ -15486,7 +15505,7 @@ n_retrieve_ind(mblk_t *dp)
 	p->PRIM_type = N_RETRIEVE_IND;
 	mp->b_wptr += sizeof(*p);
 	mp->b_cont = dp;
-	sp->i_state = NS_IDLE;
+	sctp_n_setstate(sp, NS_IDLE);
 	sctplogtx(sp, "<- N_RETRIEVE_IND");
 	putnext(sp->rq, mp);
 	return (0);
@@ -15519,7 +15538,7 @@ n_retrieve_con(void)
 	p = (N_retrieve_con_t *) mp->b_wptr;
 	p->PRIM_type = N_RETREIVE_CON;
 	mp->b_wptr += sizeof(*p);
-	sp->i_state = NS_IDLE;
+	sctp_n_setstate(sp, NS_IDLE);
 	sctplogtx(sp, "<- N_RETRIEVE_CON");
 	putnext(sp->rq, mp);
 	return (0);
@@ -15618,7 +15637,7 @@ n_conn_req(struct sctp *sp, mblk_t *mp)
 			goto access;
 		goto outstate;
 	}
-	sp->i_state = NS_WCON_CREQ;
+	sctp_n_setstate(sp, NS_WCON_CREQ);
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
 	if (p->CONN_flags & ~(REC_CONF_OPT | EX_DATA_OPT))
@@ -15769,7 +15788,7 @@ n_conn_res(struct sctp *sp, mblk_t *mp)
 
 	if (sp->i_state != NS_WRES_CIND)
 		goto outstate;
-	sp->i_state = NS_WACK_CRES;
+	sctp_n_setstate(sp, NS_WACK_CRES);
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
 	if (p->RES_length) {
@@ -15799,20 +15818,20 @@ n_conn_res(struct sctp *sp, mblk_t *mp)
 		uint ap_oldstate = ap->i_state;
 		uint ap_oldflags = ap->flags;
 
-		ap->i_state = NS_DATA_XFER;
+		sctp_n_setstate(sp, NS_DATA_XFER);
 		ap->flags &= ~(SCTP_FLAG_REC_CONF_OPT | SCTP_FLAG_EX_DATA_OPT);
 		if (p->CONN_flags & REC_CONF_OPT)
 			ap->flags |= SCTP_FLAG_REC_CONF_OPT;
 		if (p->CONN_flags & EX_DATA_OPT)
 			ap->flags |= SCTP_FLAG_EX_DATA_OPT;
 		if ((err = sctp_conn_res(sp, cp, ap, mp->b_cont))) {
-			ap->i_state = ap_oldstate;
+			sctp_n_setstate(ap, ap_oldstate);
 			ap->flags = ap_oldflags;
 			goto error;
 		}
 		mp->b_cont = NULL;	/* absorbed mp->b_cont */
 		if ((err = n_ok_ack(sp, N_CONN_RES, cp, ap))) {
-			ap->i_state = ap_oldstate;
+			sctp_n_setstate(ap, ap_oldstate);
 			ap->flags = ap_oldflags;
 			goto error;
 		}
@@ -15882,19 +15901,19 @@ n_discon_req(struct sctp *sp, mblk_t *mp)
 		goto outstate;
 	switch (sp->i_state) {
 	case NS_WCON_CREQ:
-		sp->i_state = NS_WACK_DREQ6;
+		sctp_n_setstate(sp, NS_WACK_DREQ6);
 		break;
 	case NS_WRES_CIND:
-		sp->i_state = NS_WACK_DREQ7;
+		sctp_n_setstate(sp, NS_WACK_DREQ7);
 		break;
 	case NS_DATA_XFER:
-		sp->i_state = NS_WACK_DREQ9;
+		sctp_n_setstate(sp, NS_WACK_DREQ9);
 		break;
 	case NS_WCON_RREQ:
-		sp->i_state = NS_WACK_DREQ10;
+		sctp_n_setstate(sp, NS_WACK_DREQ10);
 		break;
 	case NS_WRES_RIND:
-		sp->i_state = NS_WACK_DREQ11;
+		sctp_n_setstate(sp, NS_WACK_DREQ11);
 		break;
 	default:
 		goto outstate;
@@ -15982,7 +16001,7 @@ n_write(struct sctp *sp, mblk_t *mp)
 	err = 0;
 	goto error;		/* ignore in idle state */
       error:
-	seldom();
+	sctplogrx(sp, "%s() replying with error %d", __FUNCTION__, err);
 	return m_error_reply(sp, mp, err);
 }
 
@@ -16044,7 +16063,7 @@ n_data_req(struct sctp *sp, mblk_t *mp)
 	err = 0;
 	goto error;		/* ignore in idle state */
       error:
-	seldom();
+	sctplogrx(sp, "%s() replying with error %d", __FUNCTION__, err);
 	return m_error_reply(sp, mp, err);
 }
 
@@ -16106,7 +16125,7 @@ n_exdata_req(struct sctp *sp, mblk_t *mp)
 	err = 0;
 	goto error;		/* ignore in idle state */
       error:
-	seldom();
+	sctplogrx(sp, "%s() replying with error %d", __FUNCTION__, err);
 	return m_error_reply(sp, mp, err);
 }
 
@@ -16133,7 +16152,7 @@ n_bind_req(struct sctp *sp, mblk_t *mp)
 
 	if (sp->i_state != NS_UNBND)
 		goto outstate;
-	sp->i_state = NS_WACK_BREQ;
+	sctp_n_setstate(sp, NS_WACK_BREQ);
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
 	if ((p->BIND_flags & ~(TOKEN_REQUEST | DEFAULT_DEST | DEFAULT_LISTENER)))
@@ -16226,7 +16245,7 @@ n_unbind_req(struct sctp *sp, mblk_t *mp)
 	(void) p;
 	if (sp->i_state != NS_IDLE)
 		goto outstate;
-	sp->i_state = NS_WACK_UREQ;
+	sctp_n_setstate(sp, NS_WACK_UREQ);
 	if ((err = sctp_unbind_req(sp)))
 		goto error;
 	return n_ok_ack(sp, N_UNBIND_REQ, NULL, NULL);
@@ -16257,7 +16276,7 @@ n_optmgmt_req(struct sctp *sp, mblk_t *mp)
 #endif
 
 	if (sp->i_state == NS_IDLE)
-		sp->i_state = NS_WACK_OPTREQ;
+		sctp_n_setstate(sp, NS_WACK_OPTREQ);
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
 	if (p->QOS_length) {
@@ -16483,7 +16502,7 @@ n_reset_req(struct sctp *sp, mblk_t *mp)
 		goto discard;
 	if (sp->i_state != NS_DATA_XFER)
 		goto outstate;
-	sp->i_state = NS_WCON_RREQ;
+	sctp_n_setstate(sp, NS_WCON_RREQ);
 	if ((err = sctp_reset_req(sp)))
 		goto error;
 	return (0);
@@ -16521,7 +16540,7 @@ n_reset_res(struct sctp *sp, mblk_t *mp)
 		goto discard;
 	if (sp->i_state != NS_WRES_RIND)
 		goto outstate;
-	sp->i_state = NS_WACK_RRES;
+	sctp_n_setstate(sp, NS_WACK_RRES);
 	if ((err = sctp_reset_res(sp)))
 		goto error;
 	return n_ok_ack(sp, N_RESET_RES, NULL, NULL);
@@ -16586,6 +16605,7 @@ n_datack_req(struct sctp *sp, mblk_t *mp)
 	err = 0;
 	goto error;
       error:
+	sctplogrx(sp, "%s() replying with error %d", __FUNCTION__, err);
 	return m_error_reply(sp, mp, err ? -EPROTO : 0);
 }
 
@@ -16712,7 +16732,7 @@ sctp_n_w_proto_slow(struct sctp *sp, mblk_t *mp, np_long prim)
 		break;
 	}
 	if (rtn < 0)
-		sp->i_state = oldstate;
+		sctp_n_setstate(sp, oldstate);
 	/* The put and srv procedures do not recognize all errors.  Sometimes we return an error to 
 	   here just to restore the previous state.  */
 	return sctp_n_w_proto_return(mp, rtn);
@@ -16744,9 +16764,10 @@ __sctp_n_w_proto(struct sctp *sp, mblk_t *mp)
 			return sctp_n_w_proto_slow(sp, mp, prim);
 
 		if (rtn < 0)
-			sp->i_state = oldstate;
+			sctp_n_setstate(sp, oldstate);
 		return sctp_n_w_proto_return(mp, rtn);
 	}
+	sctplogrx(sp, "%s() replying with error %d", __FUNCTION__, -EPROTO);
 	return m_error_reply(sp, mp, -EPROTO);
 }
 
@@ -16779,6 +16800,7 @@ sctp_n_w_proto(queue_t *q, mblk_t *mp)
 		}
 		return (-EDEADLK);
 	}
+	sctplogrx(SCTP_PRIV(q), "%s() replying with error %d", __FUNCTION__, -EPROTO);
 	return m_error_reply(SCTP_PRIV(q), mp, -EPROTO);
 }
 
@@ -16897,6 +16919,8 @@ sctp_n_w_prim_put(queue_t *q, mblk_t *mp)
 	}
 }
 
+#define PRELOAD (FASTBUF<<2)
+
 /**
  * sctp_n_wput: - NPI write put procedure
  * @q: active queue (write queue)
@@ -16911,6 +16935,8 @@ sctp_n_wput(queue_t *q, mblk_t *mp)
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
 	    || unlikely(sctp_n_w_prim_put(q, mp) != QR_ABSORBED)) {
 		// q->q_qinfo->qi_minfo->mi_mstat->ms_acnt++;
+		/* apply backpressure */
+		mp->b_wptr += PRELOAD;
 		if (unlikely(!putq(q, mp))) {
 			mp->b_band = 0;
 			putq(q, mp);	/* must succeed */
@@ -16961,14 +16987,19 @@ sctp_n_wsrv(queue_t *q)
 	if (likely((sp = sctp_trylockq(q)) != NULL)) {
 		mblk_t *mp;
 
-		while (likely((mp = getq(q)) != NULL))
+		while (likely((mp = getq(q)) != NULL)) {
+			/* remove backpressure */
+			mp->b_wptr -= PRELOAD;
 			if (unlikely(sctp_n_w_prim_srv(sp, q, mp) != QR_ABSORBED)) {
+				/* reapply backpressure */
+				mp->b_wptr += PRELOAD;
 				if (unlikely(!putbq(q, mp))) {
 					mp->b_band = 0;
 					putbq(q, mp);	/* must succeed */
 				}
 				break;
 			}
+		}
 		___sctp_transmit_wakeup(sp);
 		sctp_unlockq(sp);
 	}
@@ -16989,6 +17020,8 @@ sctp_n_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	int cminor = getminor(*devp);
 	struct sctp *sp, **spp = &sctp_protolist;
 	int err = 0;
+	mblk_t *mp;
+	struct stroptions *so;
 
 	(void) crp;
 	if (q->q_ptr != NULL)
@@ -17001,6 +17034,8 @@ sctp_n_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		sflag = CLONEOPEN;
 	if (sflag == CLONEOPEN)
 		cminor = 1;
+	if (!(mp = allocb(sizeof(*so), BPRI_WAITOK)))
+		return (ENOBUFS);
 	spin_lock_bh(&sctp_protolock);
 	for (; *spp && (*spp)->cmajor < cmajor; spp = &(*spp)->next) ;
 	for (; *spp && cminor <= NMINORS; spp = &(*spp)->next) {
@@ -17022,6 +17057,19 @@ sctp_n_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	sctplogno(sp, "opened tpi device");
       unlock_exit:
 	spin_unlock_bh(&sctp_protolock);
+	if (err == 0) {
+		so = (typeof(so)) mp->b_wptr;
+		bzero(so, sizeof(*so));
+		so->so_flags |= SO_HIWAT;
+		so->so_hiwat = SHEADHIWAT;
+		so->so_flags |= SO_LOWAT;
+		so->so_lowat = 0;
+		mp->b_wptr += sizeof(*so);
+		mp->b_datap->db_type = M_SETOPTS;
+		putnext(q, mp);
+	} else {
+		freemsg(mp);
+	}
 	return (err);
       enxio:
 	rare();
@@ -17199,6 +17247,62 @@ sctp_n_term(void)
  *  This driver defines two user interfaces: one NPI, the other TPI.
  */
 
+#ifndef _OPTIMIZE_SPEED
+STATIC const char *
+sctp_t_statename(t_scalar_t state)
+{
+	switch (state) {
+	case TS_UNBND:
+		return ("TS_UNBND");
+	case TS_WACK_BREQ:
+		return ("TS_WACK_BREQ");
+	case TS_WACK_UREQ:
+		return ("TS_WACK_UREQ");
+	case TS_IDLE:
+		return ("TS_IDLE");
+	case TS_WACK_OPTREQ:
+		return ("TS_WACK_OPTREQ");
+	case TS_WACK_CREQ:
+		return ("TS_WACK_CREQ");
+	case TS_WCON_CREQ:
+		return ("TS_WCON_CREQ");
+	case TS_WRES_CIND:
+		return ("TS_WRES_CIND");
+	case TS_WACK_CRES:
+		return ("TS_WACK_CRES");
+	case TS_DATA_XFER:
+		return ("TS_DATA_XFER");
+	case TS_WIND_ORDREL:
+		return ("TS_WIND_ORDREL");
+	case TS_WREQ_ORDREL:
+		return ("TS_WREQ_ORDREL");
+	case TS_WACK_DREQ6:
+		return ("TS_WACK_DREQ6");
+	case TS_WACK_DREQ7:
+		return ("TS_WACK_DREQ7");
+	case TS_WACK_DREQ9:
+		return ("TS_WACK_DREQ9");
+	case TS_WACK_DREQ10:
+		return ("TS_WACK_DREQ10");
+	case TS_WACK_DREQ11:
+		return ("TS_WACK_DREQ11");
+	default:
+		return ("????");
+	}
+}
+
+STATIC inline void
+sctp_t_setstate(struct sctp *sp, t_scalar_t newstate)
+{
+	t_scalar_t oldstate;
+	
+	if ((oldstate = XCHG(&sp->i_state, newstate)) != newstate)
+		sctplogst(sp, "%s <- %s", sctp_t_statename(newstate), sctp_t_statename(oldstate));
+}
+#else
+#define sctp_t_setstate(sp, newstate) do { sp->i_state = newstate; } while (0)
+#endif
+
 #undef DRV_ID
 #undef DRV_NAME
 #undef CMAJORS
@@ -17211,13 +17315,22 @@ sctp_n_term(void)
 #define CMAJOR_0	SCTP_T_CMAJOR_0
 #define UNITS		SCTP_T_UNITS
 
-STATIC struct module_info sctp_t_minfo = {
+STATIC struct module_info sctp_t_rinfo = {
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = SHEADHIWAT << 5,	/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
+};
+
+STATIC struct module_info sctp_t_winfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
 	.mi_hiwat = SHEADHIWAT,		/* Hi water mark */
-	.mi_lowat = SHEADLOWAT,		/* Lo water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 STATIC struct module_stat sctp_t_rstat __attribute__ ((aligned(SMP_CACHE_BYTES)));
@@ -17234,7 +17347,7 @@ STATIC struct qinit sctp_t_rinit = {
 	.qi_srvp = sctp_rsrv,		/* Read queue service */
 	.qi_qopen = sctp_t_open,	/* Each open */
 	.qi_qclose = sctp_t_close,	/* Last close */
-	.qi_minfo = &sctp_t_minfo,	/* Information */
+	.qi_minfo = &sctp_t_rinfo,	/* Information */
 	.qi_mstat = &sctp_t_rstat,	/* Statistics */
 };
 
@@ -17244,7 +17357,7 @@ STATIC streamscall int sctp_t_wsrv(queue_t *);
 STATIC struct qinit sctp_t_winit = {
 	.qi_putp = sctp_t_wput,		/* Write put (msg from above) */
 	.qi_srvp = sctp_t_wsrv,		/* Write queue service */
-	.qi_minfo = &sctp_t_minfo,	/* Information */
+	.qi_minfo = &sctp_t_winfo,	/* Information */
 	.qi_mstat = &sctp_t_wstat,	/* Statistics */
 };
 
@@ -26056,7 +26169,7 @@ t_conn_ind(struct sctp *sp, mblk_t *cp)
 		mp->b_wptr += opt_len;
 	}
 	bufq_queue(&sp->conq, bp);
-	sp->i_state = TS_WRES_CIND;
+	sctp_t_setstate(sp, TS_WRES_CIND);
 	sctplogtx(sp, "<- T_CONN_IND");
 	putnext(sp->rq, mp);
 	return (0);
@@ -26118,7 +26231,7 @@ t_conn_con(struct sctp *sp)
 			goto efault;
 		mp->b_wptr += opt_len;
 	}
-	sp->i_state = TS_DATA_XFER;
+	sctp_t_setstate(sp, TS_DATA_XFER);
 	sctplogtx(sp, "<- T_CONN_CON");
 	putnext(sp->rq, mp);
 	return (0);
@@ -26183,9 +26296,9 @@ t_discon_ind(struct sctp *sp, t_uscalar_t orig, t_scalar_t reason, mblk_t *seq)
 	if (seq)
 		freemsg(seq);
 	if (!bufq_length(&sp->conq))
-		sp->i_state = TS_IDLE;
+		sctp_t_setstate(sp, TS_IDLE);
 	else
-		sp->i_state = TS_WRES_CIND;
+		sctp_t_setstate(sp, TS_WRES_CIND);
 	sctplogtx(sp, "<- T_DISCON_IND");
 	putnext(sp->rq, mp);
 	return (0);
@@ -26197,7 +26310,7 @@ t_discon_ind(struct sctp *sp, t_uscalar_t orig, t_scalar_t reason, mblk_t *seq)
       outstate:
 	/* Sometimes this function is called in the idle state. */
 	if (sp->i_state != TS_IDLE)
-		sctplogerr(sp, "%s() in TPI state %d", __FUNCTION__, (int) sp->i_state);
+		sctplogerr(sp, "%s() in TPI state %s", __FUNCTION__, sctp_t_statename(sp->i_state));
 	return (0);
 }
 
@@ -26238,7 +26351,7 @@ t_data_ind(struct sctp *sp, t_uscalar_t more, mblk_t *dp)
 	sctplogtx(sp, "%s() flow controlled", __FUNCTION__);
 	return (-EBUSY);
       outstate:
-	sctplogerr(sp, "%s() in TPI state %d", __FUNCTION__, (int) sp->i_state);
+	sctplogerr(sp, "%s() in TPI state %s", __FUNCTION__, sctp_t_statename(sp->i_state));
 	freemsg(dp);
 	return (0);
 }
@@ -26278,7 +26391,7 @@ t_exdata_ind(struct sctp *sp, t_uscalar_t more, mblk_t *dp)
 	sctplogtx(sp, "%s() flow controlled", __FUNCTION__);
 	return (-EBUSY);
       outstate:
-	sctplogerr(sp, "%s() in TPI state %d", __FUNCTION__, (int) sp->i_state);
+	sctplogerr(sp, "%s() in TPI state %s", __FUNCTION__, sctp_t_statename(sp->i_state));
 	freemsg(dp);
 	return (0);
 }
@@ -26329,7 +26442,7 @@ t_bind_ack(struct sctp *sp)
 	struct T_bind_ack *p;
 	struct sctp_saddr *ss = sp->saddr;
 	struct sockaddr_in *add;
-	size_t add_len = sp->sanum * sizeof(*add);
+	size_t add_len = sp->sanum ? sp->sanum * sizeof(*add) : sizeof(*add);
 
 	if (sp->i_state != TS_WACK_BREQ)
 		goto outstate;
@@ -26342,21 +26455,29 @@ t_bind_ack(struct sctp *sp)
 	p->ADDR_offset = add_len ? sizeof(*p) : 0;
 	p->CONIND_number = sp->conind;
 	mp->b_wptr += sizeof(*p);
-	for (; ss; ss = ss->next) {
+	if (sp->sanum) {
+		for (; ss; ss = ss->next) {
+			add = (typeof(add)) mp->b_wptr;
+			add->sin_family = AF_INET;
+			add->sin_port = sp->sport;
+			add->sin_addr.s_addr = ss->saddr;
+			mp->b_wptr += sizeof(*add);
+		}
+	} else {
 		add = (typeof(add)) mp->b_wptr;
 		add->sin_family = AF_INET;
 		add->sin_port = sp->sport;
-		add->sin_addr.s_addr = ss->saddr;
+		add->sin_addr.s_addr = INADDR_ANY;
 		mp->b_wptr += sizeof(*add);
 	}
-	sp->i_state = TS_IDLE;
+	sctp_t_setstate(sp, TS_IDLE);
 	sctplogtx(sp, "<- T_BIND_ACK");
 	putnext(sp->rq, mp);
 	return (0);
       enobufs:
 	return (-ENOBUFS);
       outstate:
-	sctplogerr(sp, "%s() in TPI state %d", __FUNCTION__, (int) sp->i_state);
+	sctplogerr(sp, "%s() in TPI state %s", __FUNCTION__, sctp_t_statename(sp->i_state));
 	return (0);
 }
 
@@ -26420,28 +26541,28 @@ t_error_ack(struct sctp *sp, mblk_t *msg, t_uscalar_t prim, t_scalar_t err)
 #endif
 	case TS_WACK_UREQ:
 	case TS_WACK_CREQ:
-		sp->i_state = TS_IDLE;
+		sctp_t_setstate(sp, TS_IDLE);
 		break;
 	case TS_WACK_BREQ:
-		sp->i_state = TS_UNBND;
+		sctp_t_setstate(sp, TS_UNBND);
 		break;
 	case TS_WACK_CRES:
-		sp->i_state = TS_WRES_CIND;
+		sctp_t_setstate(sp, TS_WRES_CIND);
 		break;
 	case TS_WACK_DREQ6:
-		sp->i_state = TS_WCON_CREQ;
+		sctp_t_setstate(sp, TS_WCON_CREQ);
 		break;
 	case TS_WACK_DREQ7:
-		sp->i_state = TS_WRES_CIND;
+		sctp_t_setstate(sp, TS_WRES_CIND);
 		break;
 	case TS_WACK_DREQ9:
-		sp->i_state = TS_DATA_XFER;
+		sctp_t_setstate(sp, TS_DATA_XFER);
 		break;
 	case TS_WACK_DREQ10:
-		sp->i_state = TS_WIND_ORDREL;
+		sctp_t_setstate(sp, TS_WIND_ORDREL);
 		break;
 	case TS_WACK_DREQ11:
-		sp->i_state = TS_WREQ_ORDREL;
+		sctp_t_setstate(sp, TS_WREQ_ORDREL);
 		break;
 		/* Note: if we are not in a WACK state we simply do not change state.  This occurs
 		   normally when we send TOUTSTATE or TNOTSUPPORT or are responding to a
@@ -26475,21 +26596,21 @@ t_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 	/* switch by prim not by state */
 	switch (prim) {
 	case T_CONN_REQ:
-		sp->i_state = TS_WCON_CREQ;
+		sctp_t_setstate(sp, TS_WCON_CREQ);
 		break;
 	case T_UNBIND_REQ:
-		sp->i_state = TS_UNBND;
+		sctp_t_setstate(sp, TS_UNBND);
 		break;
 	case T_CONN_RES:
 		if (ap != NULL)
-			ap->i_state = TS_DATA_XFER;
+			sctp_t_setstate(ap, TS_DATA_XFER);
 		if (cp != NULL)
 			freemsg(cp);
 		if (ap == NULL || ap->rq != sp->rq) {
 			if (bufq_length(&sp->conq))
-				sp->i_state = TS_WRES_CIND;
+				sctp_t_setstate(sp, TS_WRES_CIND);
 			else
-				sp->i_state = TS_IDLE;
+				sctp_t_setstate(sp, TS_IDLE);
 		}
 		break;
 	case T_DISCON_REQ:
@@ -26499,9 +26620,9 @@ t_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 				freemsg(cp);
 		case TS_WACK_DREQ6:
 			if (bufq_length(&sp->conq))
-				sp->i_state = TS_WRES_CIND;
+				sctp_t_setstate(sp, TS_WRES_CIND);
 			else
-				sp->i_state = TS_IDLE;
+				sctp_t_setstate(sp, TS_IDLE);
 			break;
 		case TS_WACK_DREQ9:
 		case TS_WACK_DREQ10:
@@ -26512,9 +26633,9 @@ t_ok_ack(struct sctp *sp, t_uscalar_t prim, mblk_t *cp, struct sctp *ap)
 			if (m_flush(sp, NULL, FLUSHRW, 0) == -ENOBUFS)
 				goto enobufs;
 			if (bufq_length(&sp->conq))
-				sp->i_state = TS_WRES_CIND;
+				sctp_t_setstate(sp, TS_WRES_CIND);
 			else
-				sp->i_state = TS_IDLE;
+				sctp_t_setstate(sp, TS_IDLE);
 			break;
 		}
 		break;
@@ -26558,7 +26679,7 @@ t_optmgmt_ack(struct sctp *sp, long flags, unsigned char *req, size_t req_len, s
 	}
 #ifdef TS_WACK_OPTREQ
 	if (sp->i_state == TS_WACK_OPTREQ)
-		sp->i_state = TS_IDLE;
+		sctp_t_setstate(sp, TS_IDLE);
 #endif
 	sctplogtx(sp, "<- T_OPTMGMT_ACK");
 	putnext(sp->rq, mp);
@@ -26590,10 +26711,10 @@ t_ordrel_ind(struct sctp *sp)
 	mp->b_wptr += sizeof(*p);
 	switch (sp->i_state) {
 	case TS_DATA_XFER:
-		sp->i_state = TS_WREQ_ORDREL;
+		sctp_t_setstate(sp, TS_WREQ_ORDREL);
 		break;
 	case TS_WIND_ORDREL:
-		sp->i_state = TS_IDLE;
+		sctp_t_setstate(sp, TS_IDLE);
 		break;
 	}
 	sctplogtx(sp, "<- T_ORDREL_IND");
@@ -26605,7 +26726,7 @@ t_ordrel_ind(struct sctp *sp)
 	sctplogtx(sp, "flow controlled");
 	return (-EBUSY);
       outstate:
-	sctplogerr(sp, "%s() in TPI state %d", __FUNCTION__, (int) sp->i_state);
+	sctplogerr(sp, "%s() in TPI state %s", __FUNCTION__, sctp_t_statename(sp->i_state));
 	return (0);
 }
 
@@ -26684,7 +26805,7 @@ t_optdata_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_
 	sctplogtx(sp, "flow controlled");
 	return (-EBUSY);
       outstate:
-	sctplogerr(sp, "%s() in TPI state %d", __FUNCTION__, (int) sp->i_state);
+	sctplogerr(sp, "%s() in TPI state %s", __FUNCTION__, sctp_t_statename(sp->i_state));
 	freemsg(dp);
 	return (0);
 }
@@ -26896,7 +27017,7 @@ t_conn_req(struct sctp *sp, mblk_t *mp)
 		goto einval;
 	if (sp->i_state != TS_IDLE)
 		goto outstate;
-	sp->i_state = TS_WACK_CREQ;
+	sctp_t_setstate(sp, TS_WACK_CREQ);
 	if (mp->b_cont && !msgdsize(mp->b_cont))
 		goto baddata;
 	if ((dlen = p->DEST_length)) {
@@ -27061,7 +27182,7 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 		goto einval;
 	if (sp->i_state != TS_WRES_CIND)
 		goto outstate;
-	sp->i_state = TS_WACK_CRES;
+	sctp_t_setstate(sp, TS_WACK_CRES);
 	if (mp->b_cont) {
 		long mlen, mmax;
 
@@ -27141,14 +27262,14 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 				goto error;
 		}
 #endif
-		ap->i_state = TS_DATA_XFER;
+		sctp_t_setstate(ap, TS_DATA_XFER);
 		if ((err = sctp_conn_res(sp, cp, ap, mp->b_cont))) {
-			ap->i_state = ap_oldstate;
+			sctp_t_setstate(ap, ap_oldstate);
 			goto error;
 		}
 		mp->b_cont = NULL;	/* absorbed mp->b_cont */
 		if ((err = t_ok_ack(sp, T_CONN_RES, cp, ap))) {
-			ap->i_state = ap_oldstate;
+			sctp_t_setstate(ap, ap_oldstate);
 			goto error;
 		}
 		if (ap != sp)
@@ -27267,19 +27388,19 @@ t_discon_req(struct sctp *sp, mblk_t *mp)
 		goto outstate;
 	switch (sp->i_state) {
 	case TS_WCON_CREQ:
-		sp->i_state = TS_WACK_DREQ6;
+		sctp_t_setstate(sp, TS_WACK_DREQ6);
 		break;
 	case TS_WRES_CIND:
-		sp->i_state = TS_WACK_DREQ7;
+		sctp_t_setstate(sp, TS_WACK_DREQ7);
 		break;
 	case TS_DATA_XFER:
-		sp->i_state = TS_WACK_DREQ9;
+		sctp_t_setstate(sp, TS_WACK_DREQ9);
 		break;
 	case TS_WIND_ORDREL:
-		sp->i_state = TS_WACK_DREQ10;
+		sctp_t_setstate(sp, TS_WACK_DREQ10);
 		break;
 	case TS_WREQ_ORDREL:
-		sp->i_state = TS_WACK_DREQ11;
+		sctp_t_setstate(sp, TS_WACK_DREQ11);
 		break;
 	default:
 		goto outstate;
@@ -27364,6 +27485,7 @@ t_write(struct sctp *sp, mblk_t *mp)
 	sctplogrx(sp, "%s() ignored in idle state", __FUNCTION__);
 	goto error;
       error:
+	sctplogrx(sp, "%s() replying with error %d", __FUNCTION__, err);
 	return m_error_reply(sp, mp, err);
 }
 
@@ -27423,6 +27545,7 @@ t_data_req(struct sctp *sp, mblk_t *mp)
 	sctplogrx(sp, "%s() ignore in idle state", __FUNCTION__);
 	goto error;
       error:
+	sctplogrx(sp, "%s() replying with error %d", __FUNCTION__, err);
 	return m_error_reply(sp, mp, err);
 }
 
@@ -27482,6 +27605,7 @@ t_exdata_req(struct sctp *sp, mblk_t *mp)
 	sctplogrx(sp, "%s() ignored in idle state", __FUNCTION__);
 	goto error;
       error:
+	sctplogrx(sp, "%s() replying with error %d", __FUNCTION__, err);
 	return m_error_reply(sp, mp, err);
 }
 
@@ -27516,7 +27640,7 @@ t_bind_req(struct sctp *sp, mblk_t *mp)
 	}
 	if (sp->i_state != TS_UNBND)
 		goto outstate;
-	sp->i_state = TS_WACK_BREQ;
+	sctp_t_setstate(sp, TS_WACK_BREQ);
 	{
 		struct sockaddr_storage sa;
 		struct sockaddr_in *bsin = (struct sockaddr_in *) &sa;
@@ -27594,7 +27718,7 @@ t_unbind_req(struct sctp *sp, mblk_t *mp)
 	(void) p;
 	if (sp->i_state != TS_IDLE)
 		goto outstate;
-	sp->i_state = TS_WACK_UREQ;
+	sctp_t_setstate(sp, TS_WACK_UREQ);
 	if ((err = sctp_unbind_req(sp)))
 		goto provspec;
 	return t_ok_ack(sp, T_UNBIND_REQ, NULL, NULL);
@@ -27649,7 +27773,7 @@ t_optmgmt_req(struct sctp *sp, mblk_t *mp)
 		goto badopt;
 #ifdef TS_WACK_OPTREQ
 	if (sp->i_state == TS_IDLE)
-		sp->i_state = TS_WACK_OPTREQ;
+		sctp_t_setstate(sp, TS_WACK_OPTREQ);
 #endif
 	switch (p->MGMT_flags) {
 	case T_DEFAULT:
@@ -27789,10 +27913,10 @@ t_ordrel_req(struct sctp *sp, mblk_t *mp)
 		goto outstate;
 	switch (sp->i_state) {
 	case TS_DATA_XFER:
-		sp->i_state = TS_WIND_ORDREL;
+		sctp_t_setstate(sp, TS_WIND_ORDREL);
 		break;
 	case TS_WREQ_ORDREL:
-		sp->i_state = TS_IDLE;
+		sctp_t_setstate(sp, TS_IDLE);
 		break;
 	}
 	if (mp->b_cont)
@@ -27818,6 +27942,7 @@ t_ordrel_req(struct sctp *sp, mblk_t *mp)
 		  __FUNCTION__, (int) sp->i_state);
 	goto error;
       error:
+	sctplogrx(sp, "%s() replying with error %d", __FUNCTION__, err);
 	return m_error_reply(sp, mp, err);
 }
 
@@ -27919,6 +28044,7 @@ t_optdata_req(struct sctp *sp, mblk_t *mp)
 	goto error;
 #endif
       error:
+	sctplogrx(sp, "%s() replying with error %d", __FUNCTION__, err);
 	return m_error_reply(sp, mp, err);
 }
 
@@ -28081,6 +28207,7 @@ sctp_t_w_proto_slow(struct sctp *sp, mblk_t *mp, t_scalar_t prim)
 #endif
 	case T_UNITDATA_REQ:
 		sctplogda(sp, "-> T_UNITDATA_REQ");
+		sctplogrx(sp, "%s() replying with error %d", __FUNCTION__, -EPROTO);
 		rtn = m_error_reply(sp, mp, -EPROTO);
 		/* FIXME: we should really handle T_UNITDATA_REQ even though we are a
 		   connection-oriented protocol. */
@@ -28103,6 +28230,7 @@ sctp_t_w_proto_slow(struct sctp *sp, mblk_t *mp, t_scalar_t prim)
 #ifdef T_CAPABILITY_ACK
 	case T_CAPABILITY_ACK:
 #endif
+		sctplogrx(sp, "%s() replying with error %d", __FUNCTION__, -EPROTO);
 		rtn = m_error_reply(sp, mp, -EPROTO);
 		break;
 	default:
@@ -28111,7 +28239,7 @@ sctp_t_w_proto_slow(struct sctp *sp, mblk_t *mp, t_scalar_t prim)
 		break;
 	}
 	if (rtn < 0)
-		sp->i_state = oldstate;
+		sctp_t_setstate(sp, oldstate);
 	/* The put and srv procedures do not recognize all errors.  Sometimes we return an error to 
 	   here just to restore the previous state. */
 	return sctp_t_w_proto_return(mp, rtn);
@@ -28146,9 +28274,10 @@ __sctp_t_w_proto(struct sctp *sp, mblk_t *mp)
 			return sctp_t_w_proto_slow(sp, mp, prim);
 
 		if (rtn < 0)
-			sp->i_state = oldstate;
+			sctp_t_setstate(sp, oldstate);
 		return sctp_t_w_proto_return(mp, rtn);
 	}
+	sctplogrx(sp, "%s() replying with error %d", __FUNCTION__, -EPROTO);
 	return m_error_reply(sp, mp, -EPROTO);
 }
 
@@ -28183,6 +28312,7 @@ sctp_t_w_proto(queue_t *q, mblk_t *mp)
 		}
 		return (-EDEADLK);
 	}
+	sctplogrx(SCTP_PRIV(q), "%s() replying with error %d", __FUNCTION__, -EPROTO);
 	return m_error_reply(SCTP_PRIV(q), mp, -EPROTO);
 }
 
@@ -28314,6 +28444,8 @@ sctp_t_wput(queue_t *q, mblk_t *mp)
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
 	    || unlikely(sctp_t_w_prim_put(q, mp) != QR_ABSORBED)) {
 		// q->q_qinfo->qi_minfo->mi_mstat->ms_acnt++;
+		/* apply backpressure */
+		mp->b_wptr += PRELOAD;
 		if (unlikely(!putq(q, mp))) {
 			mp->b_band = 0;
 			putq(q, mp);	/* must succeed */
@@ -28363,15 +28495,22 @@ sctp_t_wsrv(queue_t *q)
 
 	if (likely((sp = sctp_trylockq(q)) != NULL)) {
 		mblk_t *mp;
+		int rtn;
 
-		while (likely((mp = getq(q)) != NULL))
-			if (unlikely(sctp_t_w_prim_srv(sp, q, mp) != QR_ABSORBED)) {
+		while (likely((mp = getq(q)) != NULL)) {
+			/* remove backpressure */
+			mp->b_wptr -= PRELOAD;
+			if (unlikely((rtn = sctp_t_w_prim_srv(sp, q, mp)) != QR_ABSORBED)) {
+				/* reapply backpressure */
+				mp->b_wptr += PRELOAD;
 				if (unlikely(!putbq(q, mp))) {
 					mp->b_band = 0;	/* must succeed */
 					putbq(q, mp);
 				}
+				sctplogno(sp, "write queue stalled %d", rtn);
 				break;
 			}
+		}
 		___sctp_transmit_wakeup(sp);
 		sctp_unlockq(sp);
 	}
@@ -28392,6 +28531,8 @@ sctp_t_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	int cminor = getminor(*devp);
 	struct sctp *sp, **spp = &sctp_protolist;
 	int err = 0;
+	mblk_t *mp;
+	struct stroptions *so;
 
 	(void) crp;
 	if (q->q_ptr != NULL)
@@ -28402,6 +28543,8 @@ sctp_t_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		sflag = CLONEOPEN;
 	if (sflag == CLONEOPEN)
 		cminor = 1;
+	if (!(mp = allocb(sizeof(*so), BPRI_WAITOK)))
+		return (ENOBUFS);
 	spin_lock_bh(&sctp_protolock);
 	for (; *spp && (*spp)->cmajor < cmajor; spp = &(*spp)->next) ;
 	for (; *spp && cminor <= NMINORS; spp = &(*spp)->next) {
@@ -28422,6 +28565,19 @@ sctp_t_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		goto enomem;
       unlock_exit:
 	spin_unlock_bh(&sctp_protolock);
+	if (err == 0) {
+		so = (typeof(so)) mp->b_wptr;
+		bzero(so, sizeof(*so));
+		so->so_flags |= SO_HIWAT;
+		so->so_hiwat = SHEADHIWAT;
+		so->so_flags |= SO_LOWAT;
+		so->so_lowat = 0;
+		mp->b_wptr += sizeof(*so);
+		mp->b_datap->db_type = M_SETOPTS;
+		putnext(q, mp);
+	} else {
+		freemsg(mp);
+	}
 	return (err);
       enxio:
 	rare();

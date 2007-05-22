@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.14 2007/05/17 22:50:33 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.15 2007/05/22 02:10:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/17 22:50:33 $ by $Author: brian $
+ Last Modified $Date: 2007/05/22 02:10:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.15  2007/05/22 02:10:17  brian
+ - SCTP performance testing updates
+
  Revision 0.9.2.14  2007/05/17 22:50:33  brian
  - extensive rework of mi_timer functions
 
@@ -99,7 +102,7 @@
 #ifndef __SYS_SUN_STREAM_H__
 #define __SYS_SUN_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/sun/stream.h directly, include sys/stream.h instead."
@@ -172,7 +175,7 @@ queclass(mblk_t *mp)
 #endif
 
 #ifdef LFS
-__SUN_EXTERN_INLINE void qwriter(queue_t *qp, mblk_t *mp, void streamscall (*func) (queue_t *qp, mblk_t *mp), int perimeter);
+extern void qwriter(queue_t *qp, mblk_t *mp, void streamscall (*func) (queue_t *qp, mblk_t *mp), int perimeter);
 #endif
 
 #define straln (caddr_t)((intptr_t)(a) & ~(sizeof(int)-1))

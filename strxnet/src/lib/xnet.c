@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/05/03 22:24:40 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/05/22 02:10:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/03 22:24:40 $ by $Author: brian $
+ Last Modified $Date: 2007/05/22 02:10:38 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/05/03 22:24:40 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/05/22 02:10:38 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/05/03 22:24:40 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/05/22 02:10:38 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -610,7 +610,6 @@ static int __xnet_t_putmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int
 static int __xnet_t_putpmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int band, int flags);
 static int __xnet_t_ioctl(int fd, int cmd, void *arg);
 static int __xnet_t_strioctl(int fd, int cmd, void *arg, size_t arglen);
-int __xnet_t_peek(int fd);
 
 #if 0
 int __xnet_t_accept(int fd, int resfd, const struct t_call *call);
@@ -1296,9 +1295,9 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 	    if (!(resuser = __xnet_t_tstuser(resfd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
 					     TSF_UNBND | TSF_IDLE)))
 		goto error;
-	if (__xnet_t_peek(fd) > 0)
+	if (__xnet_t_look(fd) > 0)
 		goto tlook;
-	if (__xnet_t_peek(resfd) > 0)
+	if (__xnet_t_look(resfd) > 0)
 		goto tlook;
 #ifdef DEBUG
 	if (!call)
@@ -1367,7 +1366,8 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 			goto error;
 		__xnet_u_setstate_const(resuser, TS_DATA_XFER);
 		if (user->ocnt && !--user->ocnt)
-			__xnet_u_setstate_const(user, TS_IDLE);
+			if (user != resuser)
+				__xnet_u_setstate_const(user, TS_IDLE);
 	}
 	return (0);
 #ifdef DEBUG
@@ -1397,7 +1397,7 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 	t_errno = TINDOUT;
 	goto error;
       error:
-	if (t_errno != TLOOK && (__xnet_t_peek(fd) > 0 || __xnet_t_peek(resfd) > 0))
+	if (t_errno != TLOOK && (__xnet_t_look(fd) > 0 || __xnet_t_look(resfd) > 0))
 		goto tlook;
 	return (-1);
 }
@@ -2171,7 +2171,7 @@ __xnet_t_connect(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
 
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD), TSF_IDLE)))
 		goto error;
-	if (__xnet_t_peek(fd) > 0)
+	if (__xnet_t_look(fd) > 0)
 		goto tlook;
 #ifdef DEBUG
 	if (!sndcall)
@@ -2245,7 +2245,7 @@ __xnet_t_connect(int fd, const struct t_call *sndcall, struct t_call *rcvcall)
 	t_errno = TBADDATA;
 	goto error;
       error:
-	if (t_errno != TLOOK && __xnet_t_peek(fd) > 0)
+	if (t_errno != TLOOK && __xnet_t_look(fd) > 0)
 		goto tlook;
 	return (-1);
 }
@@ -2679,7 +2679,7 @@ __xnet_t_listen(int fd, struct t_call *call)
 	t_errno = TBADQLEN;
 	goto error;
       error:
-	if (t_errno != TLOOK && __xnet_t_peek(fd) > 0)
+	if (t_errno != TLOOK && __xnet_t_look(fd) > 0)
 		goto tlook;
 	return (-1);
 }
@@ -2707,6 +2707,10 @@ __asm__(".symver __xnet_t_listen_r,t_listen@@XNET_1.0");
   * @param fd the transport endpoint upon which to look for events.
   *
   * This function is NOT a thread cancellation point.
+  *
+  * Note that HP netperf code expects t_look() to never block, so __xnet_t_look() now does what
+  * __xnet_t_peek() used to do.  __xnet_t_peek() has been removed and previous calls directed to
+  * __xnet_t_look().
   */
 int
 __xnet_t_look(int fd)
@@ -2716,8 +2720,28 @@ __xnet_t_look(int fd)
 	if (!(user = __xnet_t_tstuser(fd, -1, -1, -1)))
 		goto error;
 	if (user->event == 0) {
-		/* 
-		   we are after normal messages only. */
+		struct pollfd pfd;
+
+		pfd.fd = fd;
+		pfd.events =
+		    (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP);
+		pfd.revents = 0;
+		switch (poll(&pfd, 1, 0)) {
+		case 1:
+			if (pfd.revents & (POLLMSG | POLLERR | POLLHUP))
+				break;
+			if (pfd.revents & (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND))
+				break;
+		case 0:
+			return (0);	/* nothing to report */
+		case -1:
+			goto tsyserr;
+		default:
+			goto tproto;
+		}
+	}
+	if (user->event == 0) {
+		/* we are after normal messages only. */
 		int ret, flag = 0;
 		union T_primitives *p = (typeof(p)) user->ctlbuf;
 
@@ -2744,8 +2768,8 @@ __xnet_t_look(int fd)
 			goto tsync;
 		}
 #else
-		if ((user->state == T_IDLE && user->qlen == 0) ||
-		    (user->state == T_OUTREL) || (user->state == T_DATAXFER))
+		if ((user->state == T_IDLE && user->qlen == 0) || (user->state == T_OUTREL)
+		    || (user->state == T_DATAXFER))
 			user->data.maxlen = 0;
 #endif
 		if ((ret = __xnet_t_getmsg(fd, &user->ctrl, &user->data, &flag)) < 0)
@@ -2937,6 +2961,13 @@ __xnet_t_look(int fd)
 	return (user->event);
       tsync:
 	user->flags |= TUF_SYNC_REQUIRED;
+	goto error;
+      tproto:
+	t_errno = TPROTO;
+	goto error;
+      tsyserr:
+	t_errno = TSYSERR;
+	goto error;
       error:
 	return (-1);
 }
@@ -2957,51 +2988,6 @@ __xnet_t_look_r(int fd)
 }
 
 __asm__(".symver __xnet_t_look_r,t_look@@XNET_1.0");
-
-/*
-   look for an event, but do not block 
- */
-__hot int
-__xnet_t_peek(int fd)
-{
-	struct _t_user *user;
-
-	if (!(user = __xnet_t_tstuser(fd, -1, -1, -1)))
-		goto error;
-	if (user->event == 0) {
-		struct pollfd pfd;
-
-		pfd.fd = fd;
-		pfd.events =
-		    (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP);
-		pfd.revents = 0;
-		switch (poll(&pfd, 1, 0)) {
-		case 1:
-			if (pfd.revents & (POLLMSG | POLLERR | POLLHUP))
-				goto tlook;
-			if (pfd.revents & (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND))
-				return __xnet_t_look(fd);
-		case 0:
-			break;
-		case -1:
-			goto tsyserr;
-		default:
-			goto tproto;
-		}
-	}
-	return (user->event);
-      tlook:
-	t_errno = TLOOK;
-	goto error;
-      tproto:
-	t_errno = TPROTO;
-	goto error;
-      tsyserr:
-	t_errno = TSYSERR;
-	goto error;
-      error:
-	return (-1);
-}
 
 /** @brief Open a transport endpoint.
   * @param path a character string specifying the pat to the device to open.
@@ -3481,10 +3467,25 @@ __xnet_t_rcvdis(int fd, struct t_discon *discon)
 	{
 		union T_primitives *p = (typeof(p)) user->ctrl.buf;
 
-		if (user->ocnt && --user->ocnt)
-			__xnet_u_setstate_const(user, TS_WRES_CIND);
-		else
-			__xnet_u_setstate_const(user, TS_IDLE);
+		switch (user->state) {
+		case T_DATAXFER:
+		case T_OUTCON:
+		case T_OUTREL:
+		case T_INREL:
+			if (user->ocnt)
+				__xnet_u_setstate_const(user, TS_WRES_CIND);
+			else
+				__xnet_u_setstate_const(user, TS_IDLE);
+			break;
+		case T_INCON:
+			if (user->ocnt && --user->ocnt)
+				__xnet_u_setstate_const(user, TS_WRES_CIND);
+			else
+				__xnet_u_setstate_const(user, TS_IDLE);
+			break;
+		default:
+			goto toutstate;
+		}
 		if (discon) {
 			discon->reason = p->discon_ind.DISCON_reason;
 			discon->sequence = p->discon_ind.SEQ_number;
@@ -3673,9 +3674,14 @@ __xnet_t_rcvrel(int fd)
 	{
 		user->event = 0;
 		if (user->state == T_DATAXFER)
-			__xnet_u_setstate(user, TS_WREQ_ORDREL);
-		if (user->state == T_OUTREL)
-			__xnet_u_setstate(user, TS_IDLE);
+			__xnet_u_setstate_const(user, TS_WREQ_ORDREL);
+		if (user->state == T_OUTREL) {
+			/* Releasing endpoint might have been a listening endpoint. */
+			if (user->ocnt)
+				__xnet_u_setstate_const(user, TS_WRES_CIND);
+			else
+				__xnet_u_setstate_const(user, TS_IDLE);
+		}
 		return (0);
 	}
 	case 0:
@@ -3739,9 +3745,14 @@ __xnet_t_rcvreldata(int fd, struct t_discon *discon)
 		union T_primitives *p = (typeof(p)) user->ctrl.buf;
 
 		if (user->state == T_DATAXFER)
-			__xnet_u_setstate(user, TS_WREQ_ORDREL);
-		if (user->state == T_OUTREL)
-			__xnet_u_setstate(user, TS_IDLE);
+			__xnet_u_setstate_const(user, TS_WREQ_ORDREL);
+		if (user->state == T_OUTREL) {
+			/* Releaseing endpoint might have been a listening endpoint. */
+			if (user->ocnt)
+				__xnet_u_setstate_const(user, TS_WRES_CIND);
+			else
+				__xnet_u_setstate_const(user, TS_IDLE);
+		}
 		if (discon) {
 			discon->reason = 0;
 			discon->sequence = 0;
@@ -4594,7 +4605,7 @@ __xnet_t_snd(int fd, char *buf, unsigned int nbytes, int flags)
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
 				      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
-	if (__xnet_t_peek(fd) > 0)
+	if (__xnet_t_look(fd) > 0)
 		goto tlook;
 #ifdef DEBUG
 	if (!buf)
@@ -4644,7 +4655,7 @@ __xnet_t_snd(int fd, char *buf, unsigned int nbytes, int flags)
 	goto error;
       error:
 	if (!written) {
-		if (t_errno != TLOOK && __xnet_t_peek(fd))
+		if (t_errno != TLOOK && __xnet_t_look(fd))
 			goto tlook;
 		return (-1);
 	}
@@ -4686,7 +4697,7 @@ __xnet_t_snddis(int fd, const struct t_call *call)
 				      TSF_WCON_CREQ | TSF_WRES_CIND | TSF_DATA_XFER |
 				      TSF_WIND_ORDREL | TSF_WREQ_ORDREL)))
 		goto error;
-	if (__xnet_t_peek(fd) > 0)
+	if (__xnet_t_look(fd) > 0)
 		goto tlook;
 	if (user->state == T_INREL && (!call || (user->ocnt > 1 && !call->sequence)))
 		goto tbadseq;
@@ -4714,7 +4725,10 @@ __xnet_t_snddis(int fd, const struct t_call *call)
 		case T_INREL:
 			if (__xnet_t_strioctl(fd, TI_SETPEERNAME, &req, sizeof(req)) != 0)
 				goto error;
-			__xnet_u_setstate_const(user, TS_IDLE);
+			if (user->ocnt)
+				__xnet_u_setstate_const(user, TS_WRES_CIND);
+			else
+				__xnet_u_setstate_const(user, TS_IDLE);
 			return (0);
 		case T_INCON:
 			if (__xnet_t_strioctl(fd, TI_SETMYNAME, &req, sizeof(req)) != 0)
@@ -4749,7 +4763,7 @@ __xnet_t_snddis(int fd, const struct t_call *call)
 	t_errno = TLOOK;
 	goto error;
       error:
-	if (t_errno != TLOOK && __xnet_t_peek(fd) > 0)
+	if (t_errno != TLOOK && __xnet_t_look(fd) > 0)
 		goto tlook;
 	return (-1);
 }
@@ -4788,7 +4802,7 @@ __xnet_t_sndrel(int fd)
 
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
-	if (__xnet_t_peek(fd) > 0)
+	if (__xnet_t_look(fd) > 0)
 		goto tlook;
 	{
 		struct T_ordrel_req prim;
@@ -4805,7 +4819,10 @@ __xnet_t_sndrel(int fd)
 			__xnet_u_setstate_const(user, TS_WIND_ORDREL);
 			break;
 		case T_INREL:
-			__xnet_u_setstate_const(user, TS_IDLE);
+			if (user->ocnt)
+				__xnet_u_setstate_const(user, TS_WRES_CIND);
+			else
+				__xnet_u_setstate_const(user, TS_IDLE);
 			break;
 		}
 		return (0);
@@ -4814,7 +4831,7 @@ __xnet_t_sndrel(int fd)
 	t_errno = TLOOK;
 	goto error;
       error:
-	if (t_errno != TLOOK && __xnet_t_peek(fd) > 0)
+	if (t_errno != TLOOK && __xnet_t_look(fd) > 0)
 		goto tlook;
 	return (-1);
 }
@@ -4856,7 +4873,7 @@ __xnet_t_sndreldata(int fd, struct t_discon *discon)
 
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS_ORD), TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
-	if (__xnet_t_peek(fd) > 0)
+	if (__xnet_t_look(fd) > 0)
 		goto tlook;
 	if (!(user->info.flags & T_ORDRELDATA))
 		goto tnotsupport;
@@ -4884,7 +4901,10 @@ __xnet_t_sndreldata(int fd, struct t_discon *discon)
 			__xnet_u_setstate_const(user, TS_WIND_ORDREL);
 			break;
 		case T_INREL:
-			__xnet_u_setstate_const(user, TS_IDLE);
+			if (user->ocnt)
+				__xnet_u_setstate_const(user, TS_WRES_CIND);
+			else
+				__xnet_u_setstate_const(user, TS_IDLE);
 			break;
 		}
 		return (0);
@@ -4907,7 +4927,7 @@ __xnet_t_sndreldata(int fd, struct t_discon *discon)
 	t_errno = TLOOK;
 	goto error;
       error:
-	if (t_errno != TLOOK && __xnet_t_peek(fd) > 0)
+	if (t_errno != TLOOK && __xnet_t_look(fd) > 0)
 		goto tlook;
 	return (-1);
 }
@@ -5159,7 +5179,7 @@ __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 	if (!(user = __xnet_t_tstuser(fd, T_DATA, (1 << T_CLTS), TSF_IDLE)))
 		goto error;
 #if 1
-	if ((__xnet_t_peek(fd) & ~T_DATA) > 0)
+	if ((__xnet_t_look(fd) & ~T_DATA) > 0)
 		goto tlook;
 #endif
 #ifdef DEBUG
@@ -5245,7 +5265,7 @@ __xnet_t_sndudata(int fd, const struct t_unitdata *unitdata)
 	t_errno = TLOOK;
 	goto error;
       error:
-	if (t_errno != TLOOK && (__xnet_t_peek(fd) & ~T_DATA) > 0)
+	if (t_errno != TLOOK && (__xnet_t_look(fd) & ~T_DATA) > 0)
 		goto tlook;
 	return (-1);
 }
@@ -5291,7 +5311,7 @@ __xnet_t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flag
 	if (!(user = __xnet_t_tstuser(fd, 0, (1 << T_COTS) | (1 << T_COTS_ORD),
 				      TSF_DATA_XFER | TSF_WREQ_ORDREL)))
 		goto error;
-	if (__xnet_t_peek(fd) > 0)
+	if (__xnet_t_look(fd) > 0)
 		goto tlook;
 #ifdef DEBUG
 	if (!iov)
@@ -5348,7 +5368,7 @@ __xnet_t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flag
 	goto error;
       error:
 	if (!written) {
-		if (t_errno != TLOOK && __xnet_t_peek(fd))
+		if (t_errno != TLOOK && __xnet_t_look(fd))
 			goto tlook;
 		return (-1);
 	}
@@ -5515,7 +5535,7 @@ __xnet_t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 
 	if (!(user = __xnet_t_tstuser(fd, T_DATA, (1 << T_CLTS), TSF_IDLE)))
 		goto error;
-	if ((__xnet_t_peek(fd) & ~T_DATA) > 0)
+	if ((__xnet_t_look(fd) & ~T_DATA) > 0)
 		goto tlook;
 #ifdef DEBUG
 	if (!unitdata || !iov)
@@ -5592,7 +5612,7 @@ __xnet_t_sndvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 	t_errno = TLOOK;
 	goto error;
       error:
-	if (t_errno != TLOOK && (__xnet_t_peek(fd) & ~T_DATA) > 0)
+	if (t_errno != TLOOK && (__xnet_t_look(fd) & ~T_DATA) > 0)
 		goto tlook;
 	return (-1);
 }
@@ -6092,7 +6112,7 @@ __xnet_t_unbind(int fd)
 #ifndef CONFIG_XTI_IS_TYPELESS
 	if (user->info.servtype == T_CLTS || user->qlen > 0)
 #endif
-		if (__xnet_t_peek(fd) > 0)
+		if (__xnet_t_look(fd) > 0)
 			goto tlook;
 	{
 		union {
@@ -6111,7 +6131,7 @@ __xnet_t_unbind(int fd)
 	t_errno = TLOOK;
 	goto error;
       error:
-	if (t_errno != TLOOK && __xnet_t_peek(fd) > 0)
+	if (t_errno != TLOOK && __xnet_t_look(fd) > 0)
 		goto tlook;
 	return (-1);
 }
@@ -6135,10 +6155,10 @@ __asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
   * @section Identification
-  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.27 $).
+  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.28 $).
   * @author Brian F. G. Bidulock
-  * @version \$Name:  $(\$Revision: 0.9.2.27 $)
-  * @date \$Date: 2007/05/03 22:24:40 $
+  * @version \$Name:  $(\$Revision: 0.9.2.28 $)
+  * @date \$Date: 2007/05/22 02:10:38 $
   */
 
 /** @} */

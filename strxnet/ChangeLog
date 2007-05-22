@@ -1,3 +1,9 @@
+2007-05-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* strxnet/src/lib/xnet.c:
+	  - t_look() does not sleep
+	  - corrections for accepting connections on listening stream
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

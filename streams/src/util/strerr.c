@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/05/17 22:01:20 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/05/22 02:10:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/17 22:01:20 $ by $Author: brian $
+ Last Modified $Date: 2007/05/22 02:10:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strerr.c,v $
+ Revision 0.9.2.24  2007/05/22 02:10:19  brian
+ - SCTP performance testing updates
+
  Revision 0.9.2.23  2007/05/17 22:01:20  brian
  - corrections from strsctp performance testing
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/05/17 22:01:20 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/05/22 02:10:19 $"
 
 static char const ident[] =
-    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/05/17 22:01:20 $";
+    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/05/22 02:10:19 $";
 
 /*
  *  SVR 4.2 Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -1300,7 +1303,7 @@ main(int argc, char *argv[])
 			if (output > 2)
 				fprintf(stderr, "got 1 from poll\n");
 			if (pfd[0].revents & (POLLIN | POLLPRI)) {
-				int ret, flags;
+				int ret, flags = 0;
 				char cbuf[1024];
 				char dbuf[2048];
 				struct strbuf ctl = { 1024, 1024, cbuf };

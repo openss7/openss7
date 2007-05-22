@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.21 $) $Date: 2007/05/03 22:29:08 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.22 $) $Date: 2007/05/22 02:10:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/03 22:29:08 $ by $Author: brian $
+ Last Modified $Date: 2007/05/22 02:10:13 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.21 $) $Date: 2007/05/03 22:29:08 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.22 $) $Date: 2007/05/22 02:10:13 $"
 
-static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.21 $) $Date: 2007/05/03 22:29:08 $";
+static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.22 $) $Date: 2007/05/22 02:10:13 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -1003,6 +1003,17 @@ Size (bytes)\n\
     server_call.addr.len    = sizeof(struct sockaddr_in);
     server_call.addr.buf    = (char *)&server;
 
+    if (debug) {
+      fprintf(where,"Address family: %d (AF_INET = %d)\n", (int) server.sin_family, (int) AF_INET);
+      fprintf(where,"Address port:   %d\n", (int) ntohs(server.sin_port));
+      fprintf(where,"Address:        %d.%d.%d.%d\n",
+		      (int) ((server.sin_addr.s_addr >>  0) & 0xff),
+		      (int) ((server.sin_addr.s_addr >>  8) & 0xff),
+		      (int) ((server.sin_addr.s_addr >> 16) & 0xff),
+		      (int) ((server.sin_addr.s_addr >> 24) & 0xff));
+      fflush(where);
+    }
+
     if (t_connect(send_socket, 
 		  &server_call,
 		  NULL) == INVALID_SOCKET){
@@ -1117,6 +1128,10 @@ Size (bytes)\n\
 		t_look(send_socket));
 	fflush(where);
         exit(1);
+      }
+      if (debug && verbosity > 9) {
+	fprintf(where,"send_xti_sctp_stream: sent %d bytes\n",send_size);
+	fflush(where);
       }
 
 #ifdef HISTOGRAM
@@ -1591,6 +1606,13 @@ recv_xti_sctp_stream()
     fprintf(where,
 	    "recv_xti_sctp_stream: t_bind complete port %d\n",
 	    ntohs(myaddr_in.sin_port));
+    fprintf(where,"  Address family = %d\n", (int) myaddr_in.sin_family);
+    fprintf(where,"  Address port   = %d\n", (int) ntohs(myaddr_in.sin_port));
+    fprintf(where,"  Address        = %d.%d.%d.%d\n",
+		    (int) ((myaddr_in.sin_addr.s_addr >>  0) & 0xff),
+		    (int) ((myaddr_in.sin_addr.s_addr >>  8) & 0xff),
+		    (int) ((myaddr_in.sin_addr.s_addr >> 16) & 0xff),
+		    (int) ((myaddr_in.sin_addr.s_addr >> 24) & 0xff));
     fflush(where);
   }
   
@@ -1662,6 +1684,11 @@ recv_xti_sctp_stream()
   xti_sctp_stream_response->so_sndavoid = loc_sndavoid;
   xti_sctp_stream_response->receive_size = recv_size;
 
+  if (debug) {
+    fprintf(where,"recv_xti_sctp_stream: sending response\n");
+    fflush(where);
+  }
+  
   send_response();
   
   /* Now, let's set-up the socket to listen for connections. for xti, */
@@ -1678,6 +1705,11 @@ recv_xti_sctp_stream()
   call_req.udata.len   = 0;
   call_req.udata.buf   = 0;
 
+  if (debug) {
+    fprintf(where,"recv_xti_sctp_stream: calling t_listen()\n");
+    fflush(where);
+  }
+  
   if (t_listen(s_listen, &call_req) == -1) {
     fprintf(where,
 	    "recv_xti_sctp_stream: t_listen: errno %d t_errno %d\n",
@@ -1689,11 +1721,22 @@ recv_xti_sctp_stream()
     send_response();
     exit(1);
   }
+
+  if (debug) {
+    fprintf(where,"recv_xti_sctp_stream: done calling t_listen()\n");
+    fflush(where);
+  }
+  
   
   if (debug) {
     fprintf(where,
 	    "recv_xti_sctp_stream: t_listen complete t_look 0x%.4x\n",
 	    t_look(s_listen));
+    fflush(where);
+  }
+  
+  if (debug) {
+    fprintf(where,"recv_xti_sctp_stream: calling t_accept()\n");
     fflush(where);
   }
   
@@ -1724,6 +1767,11 @@ recv_xti_sctp_stream()
     fflush(where);
   }
 
+  if (debug) {
+    fprintf(where,"recv_xti_sctp_stream: done setting up stream\n");
+    fflush(where);
+  }
+  
   /* Now it's time to start receiving data on the connection. We will */
   /* first grab the apropriate counters and then start grabbing. */
   
@@ -1758,6 +1806,11 @@ recv_xti_sctp_stream()
 		      recv_ring->buffer_ptr,
 		      recv_size,
 		      &xti_flags)) != -1) {
+
+    if (debug && verbosity > 9) {
+	    fprintf(where,"recv_xti_sctp_stream: t_rcv received %d bytes\n",len);
+	    fflush(where);
+    }
     bytes_received += len;
     receive_calls++;
     
@@ -1793,7 +1846,7 @@ recv_xti_sctp_stream()
 	    t_errno,
 	    len);
     fprintf(where,
-	    " t_look 0x%.4x",
+	    " t_look 0x%.4x\n",
 	    t_look(s_data));
     fflush(where);
     netperf_response.content.serv_errno = t_errno;

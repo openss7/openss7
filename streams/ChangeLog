@@ -1,3 +1,9 @@
+2007-05-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* NEWS: updates for release
+	* src/util/strace.c: initialize flags for getmsg
+	* src/util/strerr.c: initialize flags for getmsg
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release
