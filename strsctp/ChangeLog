@@ -1,3 +1,7 @@
+2007-05-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/sctp2.c: better state trace logging and performance tweaks
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

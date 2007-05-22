@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/05/18 12:03:36 $
+ @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/05/22 02:10:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 12:03:36 $ by $Author: brian $
+ Last Modified $Date: 2007/05/22 02:10:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strace.c,v $
+ Revision 0.9.2.20  2007/05/22 02:10:19  brian
+ - SCTP performance testing updates
+
  Revision 0.9.2.19  2007/05/18 12:03:36  brian
  - doc updates and trace argument corrections
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/05/18 12:03:36 $"
+#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/05/22 02:10:19 $"
 
 static char const ident[] =
-    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/05/18 12:03:36 $";
+    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/05/22 02:10:19 $";
 
 /*
  *  SVR 4.2 Utility: strace - Prints STREAMS trace messages.
@@ -1381,7 +1384,7 @@ main(int argc, char *argv[])
 			if (output > 2)
 				fprintf(stderr, "got 1 from poll\n");
 			if (pfd[0].revents & (POLLIN | POLLPRI)) {
-				int ret, flags;
+				int ret, flags = 0;
 				char cbuf[1024];
 				char dbuf[2048];
 				struct strbuf ctl = { 1024, 1024, cbuf };

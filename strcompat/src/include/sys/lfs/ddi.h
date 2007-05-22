@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.14 2006/12/08 05:08:10 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.15 2007/05/22 02:10:16 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:08:10 $ by $Author: brian $
+ Last Modified $Date: 2007/05/22 02:10:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.15  2007/05/22 02:10:16  brian
+ - SCTP performance testing updates
+
  Revision 0.9.2.14  2006/12/08 05:08:10  brian
  - some rework resulting from testing and inspection
 
@@ -97,7 +100,7 @@
 #ifndef __SYS_LFS_DDI_H__
 #define __SYS_LFS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -190,12 +193,12 @@ drv_hztousec(unsigned long hz)
 __LFS_EXTERN_INLINE unsigned long
 drv_msectohz(unsigned long msec)
 {
-	return (((msec + 999) * HZ) / 1000);
+	return (((msec * HZ) + 999) / 1000);
 }
 __LFS_EXTERN_INLINE unsigned long
 drv_usectohz(unsigned long usec)
 {
-	return (((usec + 999999) * HZ) / 1000000);
+	return (((usec * HZ) + 999999) / 1000000);
 }
 
 __LFS_EXTERN_INLINE void
