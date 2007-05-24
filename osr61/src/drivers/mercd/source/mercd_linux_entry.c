@@ -69,6 +69,9 @@ static int mercd_probe(struct pci_dev *pdev, const struct pci_device_id *ent);
 static void mercd_release(struct pci_dev *pdev);
 int mercd_resume(struct pci_dev *pdev);
 #ifdef LFS
+#ifndef HAVE_KTYPE_PM_MESSAGE_T
+typedef u32 pm_message_t;
+#endif
 #ifdef LINUX24
 int mercd_suspend(struct pci_dev *pdev, u32 state);
 #else

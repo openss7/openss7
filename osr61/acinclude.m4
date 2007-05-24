@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 18:58:16 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/05/24 09:29:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/25 18:58:16 $ by $Author: brian $
+# Last Modified $Date: 2007/05/24 09:29:45 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.12  2007/05/24 09:29:45  brian
+# - add check for pm_message_t
+#
 # Revision 0.9.2.11  2007/03/25 18:58:16  brian
 # - changes to support 2.6.20-1.2307.fc5 kernel
 #
@@ -570,7 +573,8 @@ AC_DEFUN([_OSR61_CHECKS], [dnl
 #include <linux/fs.h>
 #include <linux/sched.h>
 ])
-    _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *], [:], [:], [
+    _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *,
+			pm_message_t], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>

@@ -99,6 +99,9 @@ static struct file_operations pmacd_fops =
 static int pmacd_init(struct pci_dev *pcidev, const struct pci_device_id *ent);
 static void pmacd_remove(struct pci_dev *pcidev);
 static int pmacd_resume(struct pci_dev *pdev);
+#ifndef HAVE_KTYPE_PM_MESSAGE_T
+typedef u32 pm_message_t;
+#endif
 #ifdef LINUX24
 static int pmacd_suspend(struct pci_dev *pdev, u32 status);
 #else
