@@ -1,3 +1,9 @@
+2007-05-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: add check for pm_message_t
+	* src/drivers/mercd/source/mercd_linux_entry.c: add check for pm_message_t
+	* src/drivers/pmacd/source/pmacd_linux_entry.c: add check for pm_message_t
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release
