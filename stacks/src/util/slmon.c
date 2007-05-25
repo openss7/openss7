@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $
+ @(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/05/25 12:19:08 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/21 20:22:41 $ by $Author: brian $
+ Last Modified $Date: 2007/05/25 12:19:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slmon.c,v $
+ Revision 0.9.2.3  2007/05/25 12:19:08  brian
+ - check for pm_message_t
+
  Revision 0.9.2.2  2007/01/21 20:22:41  brian
  - working up drivers
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $"
+#ident "@(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/05/25 12:19:08 $"
 
-static char const ident[] = "$RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $";
+static char const ident[] = "$RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/05/25 12:19:08 $";
 
 /*
  * This is a signalling link monitoring utiltiy for the SL-MUX multiplexing driver.  It purpose is
@@ -248,7 +251,7 @@ sig_block(void)
 
 int mon_stop(void);
 
-int
+void
 mon_exit(int retval)
 {
 	syslog(LOG_NOTICE, "Exiting %d", retval);
@@ -293,7 +296,7 @@ output_header(void)
 
 	ftimestamp();
 	fprint_time(stdout);
-	fprintf(stdout, " # SS7MON $Id: slmon.c,v 0.9.2.2 2007/01/21 20:22:41 brian Exp $ Output File Header\n");
+	fprintf(stdout, " # SS7MON $Id: slmon.c,v 0.9.2.3 2007/05/25 12:19:08 brian Exp $ Output File Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,
