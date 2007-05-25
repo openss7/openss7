@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.164 $) $Date: 2007/05/18 05:02:53 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.165 $) $Date: 2007/05/25 12:21:22 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 05:02:53 $ by $Author: brian $
+ Last Modified $Date: 2007/05/25 12:21:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.165  2007/05/25 12:21:22  brian
+ - check for looping
+
  Revision 0.9.2.164  2007/05/18 05:02:53  brian
  - final sctp performance rework
 
@@ -176,10 +179,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.164 $) $Date: 2007/05/18 05:02:53 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.165 $) $Date: 2007/05/25 12:21:22 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.164 $) $Date: 2007/05/18 05:02:53 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.165 $) $Date: 2007/05/25 12:21:22 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -4357,10 +4360,11 @@ EXPORT_SYMBOL(kmem_zalloc_node);	/* include/sys/streams/kmem.h */
 streams_noinline streams_fastcall __unlikely void
 domfuncs(struct strthread *t)
 {
-	do {
-		mblk_t *b, *b_next;
-		unsigned long flags;
+	mblk_t *b, *b_next;
+	unsigned long flags;
+	int runs = 0;
 
+	do {
 		prefetchw(t);
 		streams_local_save(flags);
 		clear_bit(strmfuncs, &t->flags);
@@ -4377,7 +4381,7 @@ domfuncs(struct strthread *t)
 				prefetchw(b_next);
 			} while (unlikely((b = b_next) != NULL));
 		}
-	} while (unlikely(test_bit(strmfuncs, &t->flags) != 0));
+	} while (unlikely(test_bit(strmfuncs, &t->flags) != 0) && ++runs < 10);
 }
 #endif				/* CONFIG_STREAMS_SYNCQS */
 
@@ -4390,10 +4394,11 @@ domfuncs(struct strthread *t)
 streams_noinline streams_fastcall __unlikely void
 timeouts(struct strthread *t)
 {
-	do {
-		struct strevent *se, *se_next;
-		unsigned long flags;
+	struct strevent *se, *se_next;
+	unsigned long flags;
+	int runs = 0;
 
+	do {
 		prefetchw(t);
 		streams_spin_lock(&timeout_list_lock, flags);
 		clear_bit(strtimout, &t->flags);
@@ -4410,7 +4415,7 @@ timeouts(struct strthread *t)
 				prefetchw(se_next);
 			} while (unlikely((se = se_next) != NULL));
 		}
-	} while (unlikely(test_bit(strtimout, &t->flags) != 0));
+	} while (unlikely(test_bit(strtimout, &t->flags) != 0) && ++runs < 10);
 }
 
 STATIC __unlikely void
@@ -4481,6 +4486,7 @@ scanqueues(struct strthread *t)
 {
 	queue_t **qp, *q_link;
 	unsigned long flags;
+	int runs = 0;
 
 	do {
 		prefetchw(t);
@@ -4499,7 +4505,7 @@ scanqueues(struct strthread *t)
 			streams_local_restore(flags);
 			set_bit(qrunflag, &t->flags);
 		}
-	} while (unlikely(test_bit(scanqflag, &t->flags) != 0));
+	} while (unlikely(test_bit(scanqflag, &t->flags) != 0) && ++runs < 10);
 }
 
 /*
@@ -4511,6 +4517,7 @@ doevents(struct strthread *t)
 {
 	struct strevent *se, *se_next;
 	unsigned long flags;
+	int runs = 0;
 
 	do {
 		prefetchw(t);
@@ -4553,7 +4560,7 @@ doevents(struct strthread *t)
 				}
 			} while (unlikely((se = se_next) != NULL));
 		}
-	} while (unlikely(test_bit(strevents, &t->flags) != 0));
+	} while (unlikely(test_bit(strevents, &t->flags) != 0) && ++runs < 10);
 }
 
 #if defined CONFIG_STREAMS_SYNCQS
@@ -4727,6 +4734,7 @@ bufcalls(struct strthread *t)
 {
 	struct strevent *se, *se_next;
 	unsigned long flags;
+	int runs = 0;
 
 	do {
 		prefetchw(t);
@@ -4745,7 +4753,7 @@ bufcalls(struct strthread *t)
 				do_bufcall_event(se);
 			} while (unlikely((se = se_next) != NULL));
 		}
-	} while (unlikely(test_bit(strbcflag, &t->flags) != 0));
+	} while (unlikely(test_bit(strbcflag, &t->flags) != 0) && ++runs < 10);
 }
 
 /**
@@ -4759,6 +4767,7 @@ queuerun(struct strthread *t)
 {
 	queue_t *q, *q_link;
 	unsigned long flags;
+	int runs = 0;
 
 	do {
 		prefetchw(t);
@@ -4780,7 +4789,7 @@ queuerun(struct strthread *t)
 			} while (unlikely((q = q_link) != NULL));
 			prefetchw(t->qhead);
 		}
-	} while (unlikely(test_bit(qrunflag, &t->flags) != 0));
+	} while (unlikely(test_bit(qrunflag, &t->flags) != 0) && ++runs < 10);
 }
 
 /*
@@ -4919,8 +4928,8 @@ __runqueues(struct softirq_action *unused)
 	} while (unlikely(((volatile unsigned long) t->flags & (QRUNFLAGS)) != 0 && runs < 10));
 
 	if (runs >= 10)
-		printd(("CPU#%d: STREAMS scheduler looping: flags = 0x%08lx\n", smp_processor_id(),
-			(volatile unsigned long) t->flags));
+		printk(KERN_WARNING "CPU#%d: STREAMS scheduler looping: flags = 0x%08lx\n", smp_processor_id(),
+			(volatile unsigned long) t->flags);
 
 	atomic_dec(&t->lock);
 
