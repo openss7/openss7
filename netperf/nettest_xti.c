@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.22 $) $Date: 2007/05/22 02:10:13 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.23 $) $Date: 2007/05/25 12:18:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/22 02:10:13 $ by $Author: brian $
+ Last Modified $Date: 2007/05/25 12:18:10 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.22 $) $Date: 2007/05/22 02:10:13 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.23 $) $Date: 2007/05/25 12:18:10 $"
 
-static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.22 $) $Date: 2007/05/22 02:10:13 $";
+static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.23 $) $Date: 2007/05/25 12:18:10 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -516,8 +516,8 @@ create_xti_endpoint(char *name, int level)
 
   switch (level) {
 #ifdef DO_XTI_SCTP
-#ifdef T_SCTP_NODELAY
     case T_INET_SCTP:
+#ifdef T_SCTP_NODELAY
       if (!loc_nodelay) {
 	/* we want to "negotiate" the option */
 	opt_req->flags = T_NEGOTIATE;
@@ -560,11 +560,26 @@ create_xti_endpoint(char *name, int level)
 	exit(1);
       }
       loc_nodelay = sock_option->value;
-      break;
 #endif				/* T_SCTP_NODELAY */
+      opt_req->flags = T_NEGOTIATE;
+      sock_option = (struct sock_option *)opt_req->opt.buf;
+      sock_option->myopthdr.level = T_INET_IP;
+      sock_option->myopthdr.name  = T_IP_REUSEADDR;
+      sock_option->myopthdr.len   = sizeof(struct t_opthdr) + sizeof(t_scalar_t);
+      sock_option->value          = T_YES;
+      opt_req->opt.len            = sizeof(struct t_opthdr) + sizeof(t_scalar_t);
+      if (t_optmgmt(temp_socket,opt_req,opt_ret) == -1) {
+	fprintf(where,
+		"create_xti_endpoint: T_IP_REUSEADDR option: errno %d t_errno %d\n",
+		errno,
+		t_errno);
+	fflush(where);
+	exit(1);
+      }
+      break;
 #endif				/* DO_XTI_SCTP */
-#ifdef T_TCP_NODELAY
     case T_INET_TCP:
+#ifdef T_TCP_NODELAY
       if (loc_nodelay) {
 	/* we want to "negotiate" the option */
 	opt_req->flags = T_NEGOTIATE;
@@ -607,8 +622,23 @@ create_xti_endpoint(char *name, int level)
 	exit(1);
       }
       loc_nodelay = sock_option->value;
-      break;
 #endif				/* T_TCP_NODELAY */
+      opt_req->flags = T_NEGOTIATE;
+      sock_option = (struct sock_option *)opt_req->opt.buf;
+      sock_option->myopthdr.level = T_INET_IP;
+      sock_option->myopthdr.name  = T_IP_REUSEADDR;
+      sock_option->myopthdr.len   = sizeof(struct t_opthdr) + sizeof(t_scalar_t);
+      sock_option->value          = T_YES;
+      opt_req->opt.len            = sizeof(struct t_opthdr) + sizeof(t_scalar_t);
+      if (t_optmgmt(temp_socket,opt_req,opt_ret) == -1) {
+	fprintf(where,
+		"create_xti_endpoint: T_IP_REUSEADDR option: errno %d t_errno %d\n",
+		errno,
+		t_errno);
+	fflush(where);
+	exit(1);
+      }
+      break;
     default:
     case T_INET_UDP:
       loc_nodelay = 0;
@@ -907,7 +937,11 @@ Size (bytes)\n\
     netperf_request.content.request_type          = DO_XTI_SCTP_STREAM;
     xti_sctp_stream_request->send_buf_size  = rss_size;
     xti_sctp_stream_request->recv_buf_size  = rsr_size;
+#if 0
     xti_sctp_stream_request->receive_size   = recv_size;
+#else
+    xti_sctp_stream_request->receive_size   = send_size;
+#endif
     xti_sctp_stream_request->no_delay       = rem_nodelay;
     xti_sctp_stream_request->recv_alignment = remote_recv_align;
     xti_sctp_stream_request->recv_offset    = remote_recv_offset;
@@ -1447,7 +1481,7 @@ void
 recv_xti_sctp_stream()
 {
   
-  struct sockaddr_in myaddr_in, peeraddr_in;
+  struct sockaddr_in myaddr_in, peeraddr_in[8];
   struct t_bind      bind_req, bind_resp;
   struct t_call      call_req;
 
@@ -1628,6 +1662,11 @@ recv_xti_sctp_stream()
   else {
     recv_size = xti_sctp_stream_request->receive_size;
   }
+
+  if (debug) {
+    fprintf(where,"recv_xti_sctp_stream: recv_size = %d\n",(int)recv_size);
+    fflush(where);
+  }
   
   /* we want to set-up our recv_ring in a manner analagous to what we */
   /* do on the sending side. this is more for the sake of symmetry */
@@ -1695,8 +1734,8 @@ recv_xti_sctp_stream()
   /* the t_listen call is blocking by default - this is different */
   /* semantics from BSD - probably has to do with being able to reject */
   /* a call before an accept */
-  call_req.addr.maxlen = sizeof(struct sockaddr_in);
-  call_req.addr.len    = sizeof(struct sockaddr_in);
+  call_req.addr.maxlen = 8 * sizeof(struct sockaddr_in);
+  call_req.addr.len    = 8 * sizeof(struct sockaddr_in);
   call_req.addr.buf    = (char *)&peeraddr_in;
   call_req.opt.maxlen  = 0;
   call_req.opt.len     = 0;
@@ -1743,7 +1782,24 @@ recv_xti_sctp_stream()
   /* now just rubber stamp the thing. we want to use the same fd? so */
   /* we will just equate s_data with s_listen. this seems a little */
   /* hokey to me, but then I'm a BSD biggot still. raj 2/95 */
+
+#define SEPARATE_STREAM 1
+
+#ifdef SEPARATE_STREAM
+  s_data = create_xti_endpoint(xti_sctp_stream_request->xti_device, T_INET_SCTP);
+
+  if (s_data == INVALID_SOCKET) {
+    fprintf(where,
+	    "recv_xti_sctp_stream: t_open: errno %d t_errno %d\n",
+	    errno,
+	    t_errno);
+    t_close(s_listen);
+    exit(1);
+  }
+#else
   s_data = s_listen;
+#endif
+
   if (t_accept(s_listen,
 	       s_data,
 	       &call_req) == -1) {
@@ -1752,9 +1808,16 @@ recv_xti_sctp_stream()
 	    errno,
 	    t_errno);
     fflush(where);
+    t_close(s_data);
+#ifdef SEPARATE_STREAM
     t_close(s_listen);
+#endif
     exit(1);
   }
+
+#ifdef SEPARATE_STREAM
+  t_close(s_listen);
+#endif
   
   if (debug) {
     fprintf(where,
@@ -1762,8 +1825,8 @@ recv_xti_sctp_stream()
 	    t_look(s_data));
     fprintf(where,
 	    "                     remote is %s port %d\n",
-	    inet_ntoa(*(struct in_addr *)&peeraddr_in.sin_addr),
-	    ntohs(peeraddr_in.sin_port));
+	    inet_ntoa(*(struct in_addr *)&peeraddr_in[0].sin_addr),
+	    ntohs(peeraddr_in[0].sin_port));
     fflush(where);
   }
 
@@ -2148,7 +2211,7 @@ Send   Recv    Send   Recv\n\
     /* than better" :) raj 2/95 */
 
     if (t_bind(send_socket, NULL, NULL) == SOCKET_ERROR) {
-      t_error("send_xti_sctp_stream: t_bind");
+      t_error("send_xti_sctp_rr: t_bind");
       exit(1);
     }
   
@@ -2941,7 +3004,11 @@ Size (bytes)\n\
     netperf_request.content.request_type          = DO_XTI_TCP_STREAM;
     xti_tcp_stream_request->send_buf_size  = rss_size;
     xti_tcp_stream_request->recv_buf_size  = rsr_size;
+#if 0
     xti_tcp_stream_request->receive_size   = recv_size;
+#else
+    xti_tcp_stream_request->receive_size   = send_size;
+#endif
     xti_tcp_stream_request->no_delay       = rem_nodelay;
     xti_tcp_stream_request->recv_alignment = remote_recv_align;
     xti_tcp_stream_request->recv_offset    = remote_recv_offset;
@@ -3625,6 +3692,13 @@ recv_xti_tcp_stream()
     fprintf(where,
 	    "recv_xti_tcp_stream: t_bind complete port %d\n",
 	    ntohs(myaddr_in.sin_port));
+    fprintf(where,"  Address family = %d\n", (int) myaddr_in.sin_family);
+    fprintf(where,"  Address port   = %d\n", (int) ntohs(myaddr_in.sin_port));
+    fprintf(where,"  Address        = %d.%d.%d.%d\n",
+		    (int) ((myaddr_in.sin_addr.s_addr >>  0) & 0xff),
+		    (int) ((myaddr_in.sin_addr.s_addr >>  8) & 0xff),
+		    (int) ((myaddr_in.sin_addr.s_addr >> 16) & 0xff),
+		    (int) ((myaddr_in.sin_addr.s_addr >> 24) & 0xff));
     fflush(where);
   }
   
@@ -3639,6 +3713,11 @@ recv_xti_tcp_stream()
   }
   else {
     recv_size = xti_tcp_stream_request->receive_size;
+  }
+
+  if (debug) {
+    fprintf(where,"recv_xti_tcp_stream: recv_size = %d\n",(int)recv_size);
+    fflush(where);
   }
   
   /* we want to set-up our recv_ring in a manner analagous to what we */
@@ -3696,6 +3775,11 @@ recv_xti_tcp_stream()
   xti_tcp_stream_response->so_sndavoid = loc_sndavoid;
   xti_tcp_stream_response->receive_size = recv_size;
 
+  if (debug) {
+    fprintf(where,"recv_xti_tcp_stream: sending response\n");
+    fflush(where);
+  }
+
   send_response();
   
   /* Now, let's set-up the socket to listen for connections. for xti, */
@@ -3712,6 +3796,11 @@ recv_xti_tcp_stream()
   call_req.udata.len   = 0;
   call_req.udata.buf   = 0;
 
+  if (debug) {
+    fprintf(where,"recv_xti_tcp_stream: calling t_listen()\n");
+    fflush(where);
+  }
+
   if (t_listen(s_listen, &call_req) == -1) {
     fprintf(where,
 	    "recv_xti_tcp_stream: t_listen: errno %d t_errno %d\n",
@@ -3723,7 +3812,13 @@ recv_xti_tcp_stream()
     send_response();
     exit(1);
   }
+
+  if (debug) {
+    fprintf(where,"recv_xti_tcp_stream: done calling t_listen()\n");
+    fflush(where);
+  }
   
+
   if (debug) {
     fprintf(where,
 	    "recv_xti_tcp_stream: t_listen complete t_look 0x%.4x\n",
@@ -3731,10 +3826,18 @@ recv_xti_tcp_stream()
     fflush(where);
   }
   
+  if (debug) {
+    fprintf(where,"recv_xti_tcp_stream: calling t_accept()\n");
+    fflush(where);
+  }
+  
   /* now just rubber stamp the thing. we want to use the same fd? so */
   /* we will just equate s_data with s_listen. this seems a little */
   /* hokey to me, but then I'm a BSD biggot still. raj 2/95 */
 
+#define SEPARATE_STREAM 1
+
+#ifdef SEPARATE_STREAM
   s_data = create_xti_endpoint(xti_tcp_stream_request->xti_device, T_INET_TCP);
 
   if (s_data == INVALID_SOCKET) {
@@ -3745,6 +3848,9 @@ recv_xti_tcp_stream()
     t_close(s_listen);
     exit(1);
   }
+#else
+  s_data = s_listen;
+#endif
 
   if (t_accept(s_listen,
 	       s_data,
@@ -3755,11 +3861,15 @@ recv_xti_tcp_stream()
 	    t_errno);
     fflush(where);
     t_close(s_data);
+#ifdef SEPARATE_STREAM
     t_close(s_listen);
+#endif
     exit(1);
   }
 
+#ifdef SEPARATE_STREAM
   t_close(s_listen);
+#endif
   
   if (debug) {
     fprintf(where,
@@ -3769,6 +3879,11 @@ recv_xti_tcp_stream()
 	    "                     remote is %s port %d\n",
 	    inet_ntoa(*(struct in_addr *)&peeraddr_in.sin_addr),
 	    ntohs(peeraddr_in.sin_port));
+    fflush(where);
+  }
+
+  if (debug) {
+    fprintf(where,"recv_xti_tcp_stream: done setting up stream\n");
     fflush(where);
   }
 
@@ -3806,6 +3921,11 @@ recv_xti_tcp_stream()
 		      recv_ring->buffer_ptr,
 		      recv_size,
 		      &xti_flags)) != -1) {
+
+    if (debug && verbosity > 9) {
+	    fprintf(where,"recv_xti_tcp_stream: t_rcv received %d bytes\n",len);
+	    fflush(where);
+    }
     bytes_received += len;
     receive_calls++;
     
@@ -3841,7 +3961,7 @@ recv_xti_tcp_stream()
 	    t_errno,
 	    len);
     fprintf(where,
-	    " t_look 0x%.4x",
+	    " t_look 0x%.4x\n",
 	    t_look(s_data));
     fflush(where);
     netperf_response.content.serv_errno = t_errno;

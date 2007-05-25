@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.16 $) $Date: 2007/05/03 22:29:06 $
+ @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.17 $) $Date: 2007/05/25 12:18:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/03 22:29:06 $ by $Author: brian $
+ Last Modified $Date: 2007/05/25 12:18:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.16 $) $Date: 2007/05/03 22:29:06 $"
+#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.17 $) $Date: 2007/05/25 12:18:09 $"
 
-static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.16 $) $Date: 2007/05/03 22:29:06 $";
+static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.17 $) $Date: 2007/05/25 12:18:09 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -941,7 +941,11 @@ Size (bytes)\n\
     netperf_request.content.request_type	=	DO_SCTP_STREAM;
     sctp_stream_request->send_buf_size	=	rss_size;
     sctp_stream_request->recv_buf_size	=	rsr_size;
+#if 0
     sctp_stream_request->receive_size	=	recv_size;
+#else
+    sctp_stream_request->receive_size	=	send_size;
+#endif
     sctp_stream_request->no_delay	=	rem_nodelay;
     sctp_stream_request->recv_alignment	=	remote_recv_align;
     sctp_stream_request->recv_offset	=	remote_recv_offset;
@@ -1680,7 +1684,11 @@ Size (bytes)\n\
     netperf_request.content.request_type	=	DO_TCP_STREAM;
     tcp_stream_request->send_buf_size	=	rss_size;
     tcp_stream_request->recv_buf_size	=	rsr_size;
+#if 0
     tcp_stream_request->receive_size	=	recv_size;
+#else
+    tcp_stream_request->receive_size	=	send_size;
+#endif
     tcp_stream_request->no_delay	=	rem_nodelay;
     tcp_stream_request->recv_alignment	=	remote_recv_align;
     tcp_stream_request->recv_offset	=	remote_recv_offset;
