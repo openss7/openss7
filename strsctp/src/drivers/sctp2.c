@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2007/05/24 23:51:48 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2007/05/25 12:04:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/24 23:51:48 $ by $Author: brian $
+ Last Modified $Date: 2007/05/25 12:04:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.69  2007/05/25 12:04:56  brian
+ - final performance tweaks
+
  Revision 0.9.2.68  2007/05/24 23:51:48  brian
  - nice stable performance test runs
 
@@ -139,10 +142,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2007/05/24 23:51:48 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2007/05/25 12:04:56 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2007/05/24 23:51:48 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2007/05/25 12:04:56 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -160,7 +163,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2007/05/24 23:51:48 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2007/05/25 12:04:56 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -6739,7 +6742,7 @@ STATIC void sctp_send_asconf(struct sctp *sp);
  * selecting the destination and calling sctp_bundle_more.  This looks like it will have a
  * performance impact so we will leave it for now.
  */
-STATIC streamscall void
+STATIC inline streamscall __hot_out void
 ___sctp_transmit_wakeup(struct sctp *sp)
 {
 	int i, n, reroute = 0;
@@ -9773,6 +9776,7 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 		ptrace(("ERROR: could not allocate stream\n"));
 		break;
 	      flowcontrol:
+#if 0
 		sctplogerr(sp, "%s() teardrop protection", __FUNCTION__);
 		sctplogerr(sp, "oooq size is %d", (int) bufq_size(&sp->oooq));
 		sctplogerr(sp, "dupq size is %d", (int) bufq_size(&sp->dupq));
@@ -9795,6 +9799,7 @@ sctp_recv_data(struct sctp *sp, mblk_t *mp)
 			sctp_abort(sp, SCTP_ORIG_PROVIDER, err);
 			break;
 		}
+#endif
 		/* If we have data that the user has not read yet, then we keep all our gaps,
 		   because the user reading data will make some room to process things later.  We
 		   must send an immediate SACK regardless, per the IG requirements. */
@@ -13999,7 +14004,7 @@ ___sctp_deferred_timers_slow(struct sctp *sp, uint timers)
  * ___sctp_deferred_timers: - process deferred timeouts
  * @sp: private structure (locked)
  */
-STATIC inline fastcall void
+STATIC inline fastcall __hot_in void
 ___sctp_deferred_timers(struct sctp *sp)
 {
 	uint timers;
@@ -14028,7 +14033,7 @@ _sctp_deferred_timers(queue_t *q)
  * This is called to clean up the read queue by the STREAMS read service routine.  This permits
  * backenabling to work.
  */
-STATIC streamscall void
+STATIC inline streamscall __hot_in void
 ___sctp_cleanup_read(struct sctp *sp)
 {
 	mblk_t *mp;
@@ -14051,7 +14056,7 @@ ___sctp_cleanup_read(struct sctp *sp)
 		break;		/* error on delivery (ENOBUFS, EBUSY) */
 	}
 	if (bufq_head(&sp->rcvq) || bufq_head(&sp->expq)) {
-		int need_sack = ((sp->a_rwnd >> 1) <= bufq_size(&sp->oooq)
+		int need_sack = ((sp->a_rwnd << 1) <= bufq_size(&sp->oooq)
 				 + bufq_size(&sp->dupq)
 				 + bufq_size(&sp->rcvq)
 				 + bufq_size(&sp->expq));
@@ -14358,17 +14363,19 @@ sctp_rsrv(queue_t *q)
 
 		___sctp_deferred_timers(sp);
 
-		while (likely((mp = getq(q)) != NULL)) {
-			if (unlikely((rtn = sctp_r_prim_srv(sp, q, mp)) != QR_ABSORBED)) {
-				if (unlikely(!putbq(q, mp))) {
-					mp->b_band = 0;
-					putbq(q, mp);	/* must succeed */
+		if (likely((mp = getq(q)) != NULL)) {
+			___sctp_cleanup_read(sp);
+			do {
+				if (unlikely((rtn = sctp_r_prim_srv(sp, q, mp)) != QR_ABSORBED)) {
+					if (unlikely(!putbq(q, mp))) {
+						mp->b_band = 0;
+						putbq(q, mp);	/* must succeed */
+					}
+					sctplogrx(sp, "read queue stalled %d", rtn);
+					___sctp_transmit_wakeup(sp);
+					break;
 				}
-				___sctp_transmit_wakeup(sp);
-				sctplogrx(sp, "read queue stalled %d", rtn);
-				break;
-			}
-			// ___sctp_transmit_wakeup(sp);
+			} while (likely((mp = getq(q)) != NULL));
 		}
 		___sctp_cleanup_read(sp);
 		___sctp_transmit_wakeup(sp);
@@ -14659,7 +14666,7 @@ STATIC struct module_info sctp_n_rinfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = SHEADHIWAT << 1,	/* Hi water mark */
+	.mi_hiwat = SHEADHIWAT << 3,	/* Hi water mark */
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
@@ -14669,7 +14676,7 @@ STATIC struct module_info sctp_n_winfo = {
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
 	.mi_hiwat = SHEADHIWAT,		/* Hi water mark */
-	.mi_lowat = 0,			/* Lo water mark */
+	.mi_lowat = SHEADLOWAT,		/* Lo water mark */
 };
 
 STATIC struct module_stat sctp_n_rstat __attribute__ ((aligned(SMP_CACHE_BYTES)));
@@ -16771,7 +16778,7 @@ sctp_n_w_proto_slow(struct sctp *sp, mblk_t *mp, np_long prim)
  * This locked version is for use by the service procedure which takes private structure locks once
  * for the entire service procedure run.
  */
-STATIC inline fastcall __hot_write int
+STATIC inline fastcall __hot_out int
 __sctp_n_w_proto(struct sctp *sp, mblk_t *mp)
 {
 	if (likely(mp->b_wptr >= mp->b_rptr + sizeof(np_ulong))) {
@@ -16954,7 +16961,7 @@ sctp_n_w_prim_put(queue_t *q, mblk_t *mp)
  * This is a canonical put procedure for NPI  write.  Locking is performed by the individual message
  * handling procedures.
  */
-STATIC streamscall __hot int
+STATIC streamscall __hot_write int
 sctp_n_wput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
@@ -17087,9 +17094,9 @@ sctp_n_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		so = (typeof(so)) mp->b_wptr;
 		bzero(so, sizeof(*so));
 		so->so_flags |= SO_HIWAT;
-		so->so_hiwat = SHEADHIWAT;
+		so->so_hiwat = SHEADHIWAT << 1;
 		so->so_flags |= SO_LOWAT;
-		so->so_lowat = 0;
+		so->so_lowat = SHEADLOWAT << 1;
 		mp->b_wptr += sizeof(*so);
 		mp->b_datap->db_type = M_SETOPTS;
 		putnext(q, mp);
@@ -17346,7 +17353,7 @@ STATIC struct module_info sctp_t_rinfo = {
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = SHEADHIWAT,		/* Hi water mark */
+	.mi_hiwat = SHEADHIWAT << 3,	/* Hi water mark */
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
@@ -17356,7 +17363,7 @@ STATIC struct module_info sctp_t_winfo = {
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
 	.mi_hiwat = SHEADHIWAT,		/* Hi water mark */
-	.mi_lowat = 0,			/* Lo water mark */
+	.mi_lowat = SHEADLOWAT,		/* Lo water mark */
 };
 
 STATIC struct module_stat sctp_t_rstat __attribute__ ((aligned(SMP_CACHE_BYTES)));
@@ -28167,7 +28174,7 @@ sctp_t_w_proto_return(mblk_t *mp, int rtn)
  * number when the message is to be (re)queued.  This function must be called with the private
  * structure locked.
  */
-STATIC int
+noinline fastcall int
 sctp_t_w_proto_slow(struct sctp *sp, mblk_t *mp, t_scalar_t prim)
 {
 	t_uscalar_t oldstate = sp->i_state;
@@ -28463,7 +28470,7 @@ sctp_t_w_prim_put(queue_t *q, mblk_t *mp)
  * This is a canonical put procedure for TPI  write.  Locking is performed by the individual message
  * handling procedures.
  */
-STATIC streamscall __hot int
+STATIC streamscall __hot_write int
 sctp_t_wput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
@@ -28489,7 +28496,7 @@ sctp_t_wput(queue_t *q, mblk_t *mp)
  * from the write service prcedure provides better flow control and scheduling for maximum
  * throughput.  Note that out-of-order SCTP data is issued as N_EXDATA_REQ.
  */
-STATIC inline fastcall __hot_write int
+STATIC inline fastcall __hot_out int
 sctp_t_w_prim_srv(struct sctp *sp, queue_t *q, mblk_t *mp)
 {
 	switch (__builtin_expect(mp->b_datap->db_type, M_PROTO)) {
@@ -28520,7 +28527,7 @@ sctp_t_wsrv(queue_t *q)
 
 	if (likely((sp = sctp_trylockq(q)) != NULL)) {
 		mblk_t *mp;
-		int rtn, failed = 0;
+		int rtn;
 
 		while (likely((mp = getq(q)) != NULL)) {
 			/* remove backpressure */
@@ -28532,15 +28539,9 @@ sctp_t_wsrv(queue_t *q)
 					mp->b_band = 0;	/* must succeed */
 					putbq(q, mp);
 				}
-				if (!failed) {
-					___sctp_transmit_wakeup(sp);
-					failed = 1;
-					continue;
-				}
 				sctplogtx(sp, "write queue stalled %d", rtn);
 				break;
-			} else
-				failed = 0;
+			}
 		}
 		___sctp_transmit_wakeup(sp);
 		sctp_unlockq(sp);
@@ -28601,9 +28602,9 @@ sctp_t_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		so = (typeof(so)) mp->b_wptr;
 		bzero(so, sizeof(*so));
 		so->so_flags |= SO_HIWAT;
-		so->so_hiwat = SHEADHIWAT;
+		so->so_hiwat = SHEADHIWAT << 1;
 		so->so_flags |= SO_LOWAT;
-		so->so_lowat = 0;
+		so->so_lowat = SHEADLOWAT << 1;
 		mp->b_wptr += sizeof(*so);
 		mp->b_datap->db_type = M_SETOPTS;
 		putnext(q, mp);
