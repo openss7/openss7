@@ -1,3 +1,7 @@
+2007-05-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/v401p.c: check for pm_message_t
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release
