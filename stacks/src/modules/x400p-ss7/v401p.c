@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 19:00:43 $
+ @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/05/25 12:19:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:43 $ by $Author: brian $
+ Last Modified $Date: 2007/05/25 12:19:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: v401p.c,v $
+ Revision 0.9.2.5  2007/05/25 12:19:07  brian
+ - check for pm_message_t
+
  Revision 0.9.2.4  2007/03/25 19:00:43  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 19:00:43 $"
+#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/05/25 12:19:07 $"
 
 static char const ident[] =
-    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 19:00:43 $";
+    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/05/25 12:19:07 $";
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
@@ -2392,6 +2395,9 @@ vp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 }
 
 #ifdef CONFIG_PM
+#ifndef HAVE_KTYPE_PM_MESSAGE_T
+typedef u32 pm_message_t;
+#endif
 static int
 vp_suspend(struct pci_dev *pdev, pm_message_t state)
 {
