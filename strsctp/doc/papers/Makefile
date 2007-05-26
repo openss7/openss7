@@ -75,24 +75,24 @@ PLOTS = \
 	$(PREFIX)_fc6_comp.plot \
 	$(PREFIX)_fc6_delay.plot \
 	$(PREFIX)_fc6_perf.plot \
-	$(PREFIX)_fc6_thrput.plot
+	$(PREFIX)_fc6_thrput.plot\
+	$(PREFIX)_suse_comp.plot \
+	$(PREFIX)_suse_delay.plot \
+	$(PREFIX)_suse_perf.plot \
+	$(PREFIX)_suse_thrput.plot\
+	$(PREFIX)_smp_comp.plot \
+	$(PREFIX)_smp_delay.plot \
+	$(PREFIX)_smp_perf.plot \
+	$(PREFIX)_smp_thrput.plot
 
 #	$(PREFIX)_nb_comp.plot \
 #	$(PREFIX)_nb_delay.plot \
 #	$(PREFIX)_nb_perf.plot \
 #	$(PREFIX)_nb_thrput.plot \
-#	$(PREFIX)_smp_comp.plot \
-#	$(PREFIX)_smp_delay.plot \
-#	$(PREFIX)_smp_perf.plot \
-#	$(PREFIX)_smp_thrput.plot \
 #	$(PREFIX)_cos5_comp.plot \
 #	$(PREFIX)_cos5_delay.plot \
 #	$(PREFIX)_cos5_perf.plot \
 #	$(PREFIX)_cos5_thrput.plot \
-#	$(PREFIX)_suse_comp.plot \
-#	$(PREFIX)_suse_delay.plot \
-#	$(PREFIX)_suse_perf.plot \
-#	$(PREFIX)_suse_thrput.plot \
 #	$(PREFIX)_ubuntu_comp.plot \
 #	$(PREFIX)_ubuntu_delay.plot \
 #	$(PREFIX)_ubuntu_perf.plot \
@@ -170,9 +170,9 @@ $(PREFIX)_centos_comp.fig $(PREFIX)_centos_delay.fig $(PREFIX)_centos_perf.fig $
 $(PREFIX)_fc6_comp.fig $(PREFIX)_fc6_delay.fig $(PREFIX)_fc6_perf.fig $(PREFIX)_fc6_thrput.fig: $(PREFIX)_fc6.dat
 #$(PREFIX)_nb_comp.fig $(PREFIX)_nb_delay.fig $(PREFIX)_nb_perf.fig $(PREFIX)_nb_thrput.fig: $(PREFIX)_nb.dat
 $(PREFIX)_rh7_comp.fig $(PREFIX)_rh7_delay.fig $(PREFIX)_rh7_perf.fig $(PREFIX)_rh7_thrput.fig: $(PREFIX)_rh7.dat
-#$(PREFIX)_smp_comp.fig $(PREFIX)_smp_delay.fig $(PREFIX)_smp_perf.fig $(PREFIX)_smp_thrput.fig: $(PREFIX)_smp.dat
+$(PREFIX)_smp_comp.fig $(PREFIX)_smp_delay.fig $(PREFIX)_smp_perf.fig $(PREFIX)_smp_thrput.fig: $(PREFIX)_smp.dat
 #$(PREFIX)_cos5_comp.fig $(PREFIX)_cos5_delay.fig $(PREFIX)_cos5_perf.fig $(PREFIX)_cos5_thrput.fig: $(PREFIX)_cos5.dat
-#$(PREFIX)_suse_comp.fig $(PREFIX)_suse_delay.fig $(PREFIX)_suse_perf.fig $(PREFIX)_suse_thrput.fig: $(PREFIX)_suse.dat
+$(PREFIX)_suse_comp.fig $(PREFIX)_suse_delay.fig $(PREFIX)_suse_perf.fig $(PREFIX)_suse_thrput.fig: $(PREFIX)_suse.dat
 #$(PREFIX)_ubuntu_comp.fig $(PREFIX)_ubuntu_delay.fig $(PREFIX)_ubuntu_perf.fig $(PREFIX)_ubuntu_thrput.fig: $(PREFIX)_ubuntu.dat
 #$(PREFIX)_u704_comp.fig $(PREFIX)_u704_delay.fig $(PREFIX)_u704_perf.fig $(PREFIX)_u704_thrput.fig: $(PREFIX)_u704.dat
 

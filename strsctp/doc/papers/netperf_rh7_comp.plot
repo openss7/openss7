@@ -6,7 +6,7 @@ set ylabel 'Percentage Improvement (over Sockets)'
 set y2label '|'
 set xlabel 'Message Size (Bytes)'
 set grid x y
-set key bottom left Right noreverse
+set key top left Right noreverse
 set xtics nomirror (1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192)
 set ytics nomirror
 set border 3 lw 1
