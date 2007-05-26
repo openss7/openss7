@@ -916,6 +916,30 @@ Ubuntu 7.04 & 2.6.20-15-server\\
 \label{figure:centoscomp}
 \end{figure}
 
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_suse_perf}
+\caption[SuSE on Porky Performance]{SuSE on Porky Performance}
+\label{figure:suseperf}
+\end{figure}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_suse_delay}
+\caption[SuSE on Porky Delay]{SuSE on Porky Delay}
+\label{figure:susedly}
+\end{figure}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_suse_thrput}
+\caption[SuSE on Porky Throughput]{SuSE on Porky Throughput}
+\label{figure:susethrput}
+\end{figure}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_suse_comp}
+\caption[SuSE on Porky Comparison]{SuSE on Porky Comparison}
+\label{figure:susecomp}
+\end{figure}
+
 \subsection[Pumbah]{Pumbah}
 Pumbah is a 2.57GHz Pentium IV (i686) uniprocessor machine with 1Gb of memory.
 This machine differs from Porky in memory type only (Pumbah has somewhat
@@ -930,6 +954,37 @@ RedHat 7.2 & 2.4.20-28.7\\
 
 Pumbah is a control machine and is used to rule out differences between recent
 2.6 kernels and one of the oldest and most stable 2.4 kernels.
+
+\subsubsection[RedHat 7.2]{RedHat 7.2}
+RedHat 7.2 is one of the oldest (and arguably the most stable) glibc2 based
+releases of the RedHat distribution.  This distribution sports a 2.4.20-28.7
+kernel.  The distribution has all available updates applied.
+
+\begin{description}
+
+\item[Performance.]
+
+\textit{Figure \ref{figure:rh7perf}}
+illustrates the performance of TCP Sockets compared to XTI over Sockets for
+TCP and XTI SCTP approaches.  STREAMS demonstrates significant improvements at
+smaller message sizes and comparable performace at larger message sizes.
+
+\item[Delay.]
+
+\textit{Figure \ref{figure:rh7dly}}
+illustrates the delay of TCP Sockets compared to XTI over Sockets and XTI
+approachs.  STREAMS demonstrates significant improvements at smaller message
+sizes and comparable performance at larger message sizes.
+
+\item[Throughput.]
+
+\textit{Figure \ref{figure:rh7thrput}}
+
+\item[Improvement.]
+
+\textit{Figure \ref{figure:rh7comp}}
+
+\end{description}
 
 \begin{figure}[p]
 \center\includegraphics[width=\columnwidth]{netperf_rh7_perf}
@@ -966,34 +1021,77 @@ Fedora Core 6 & 2.6.20-1.2933.fc6\\
 CentOS 5.0 & 2.6.18-8.1.3.el5\\
 \end{tabular}\\[1.0ex]
 
-This machine is used as an SMP control machine.  Most of the test were
-performed on uniprocessor non-hyper-threaded machines.  This machine is
-hyper-threaded and runs full SMP kernels.  This machine also supports EMT64 and
-runs \texttt{x86\_64} kernels.  It is used to rule out both SMP differences as
-well as 64-bit architecture differences.
+This machine is used as an SMP control machine.  Most of the test were performed on uniprocessor
+non-hyper-threaded machines.  This machine is hyper-threaded and runs full SMP kernels.  This
+machine also supports EMT64 and runs \texttt{x86\_64} kernels.  It is used to rule out both SMP
+differences as well as 64-bit architecture differences.
+
+\subsubsection[Fedora Core 6 (x86\_64)]{Fedora Core 6 (x86\_64)} Fedora Core 6 is the most recent
+full release Fedora distribution.  This distribution sports a 2.6.20-1.2933.fc6 kernel with the
+latest patches.  This is the \texttt{x86\_64} distribution with recent updates.
+
+\begin{description}
+
+\item[Performance.]
+
+\textit{Figure \ref{figure:smpperf}} illustrates the performance of TCP Sockets compared to TCP XTI
+over Socket and SCTP XTI approaches.  STREAMS demonstrates significant improvements at message sizes
+of less than 1024 bytes.
+
+\item[Delay.]
+
+\textit{Figure \ref{figure:smpdly}} illustrates the message delay of TCP Sockets compared to TCP XTI
+over Socket and SCTP XTI approaches.  STREAMS demonstrates significant improvements at message sizes
+of less than 1024 bytes.
+
+The slope of the delay curve either indicates that Sockets is using slightly larger buffers than
+STREAMS, or that Sockets is somehow exploiting some per-byte efficiencies at larger message sizes
+not achieved by STREAMS.  Nevertheless, the STREAMS intercept is so low that the delay curve for
+STREAMS is everywhere beneath that of Sockets.
+
+\item[Throughput.]
+
+\textit{Figure \ref{figure:smpthrput}} illustrates the throughput of TCP Sockets compared to TCP XTI
+over Socket and SCTP XTI approaches.  STREAMS demonstrates significant improvements at all message
+sizes.
+
+As can be seen from \textit{Figure \ref{figure:smpthrput}}, all implementations exhibit strong power
+function characteristics (at least at lower write sizes), indicating structure and robustness for
+each implementation.
+
+\item[Improvement.]
+
+\textit{Figure \ref{figure:smpcomp}} illustrates the comparison of TCP Sockets to TCP XTI over
+Socket and SCTP XTI approaches.  STREAMS demonstrates significant improvements (approx. 40\%
+improvement) at message sizes below 1024 bytes.  That STREAMS UDP gives a 40\% improvement over a
+wide range of message sizes on SMP is a dramatic improvement.  Statements regarding STREAMS
+networking running poorer on SMP than on UP are quite wrong, at least with regard to \textsl{Linux
+Fast-STREAMS}.
+
+\end{description}
 
 \begin{figure}[p]
-\center\includegraphics[width=\columnwidth]{netperf_fc6_perf}
+\center\includegraphics[width=\columnwidth]{netperf_smp_perf}
 \caption[Fedora Core 6 on Daisy Performance]{Fedora Core 6 on Daisy Performance}
-\label{figure:fc6perf}
+\label{figure:smpperf}
 \end{figure}
 
 \begin{figure}[p]
-\center\includegraphics[width=\columnwidth]{netperf_fc6_delay}
+\center\includegraphics[width=\columnwidth]{netperf_smp_delay}
 \caption[Fedora Core 6 on Daisy Delay]{Fedora Core 6 on Daisy Delay}
-\label{figure:fc6dly}
+\label{figure:smpdly}
 \end{figure}
 
 \begin{figure}[p]
-\center\includegraphics[width=\columnwidth]{netperf_fc6_thrput}
+\center\includegraphics[width=\columnwidth]{netperf_smp_thrput}
 \caption[Fedora Core 6 on Daisy Throughput]{Fedora Core 6 on Daisy Throughput}
-\label{figure:fc6thrput}
+\label{figure:smpthrput}
 \end{figure}
 
 \begin{figure}[p]
-\center\includegraphics[width=\columnwidth]{netperf_fc6_comp}
+\center\includegraphics[width=\columnwidth]{netperf_smp_comp}
 \caption[Fedora Core 6 on Daisy Comparison]{Fedora Core 6 on Daisy Comparison}
-\label{figure:fc6comp}
+\label{figure:smpcomp}
 \end{figure}
 
 \subsection[Mspiggy]{Mspiggy}
