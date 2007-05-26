@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.23 $) $Date: 2007/05/25 12:18:10 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.24 $) $Date: 2007/05/26 06:51:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/25 12:18:10 $ by $Author: brian $
+ Last Modified $Date: 2007/05/26 06:51:43 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.23 $) $Date: 2007/05/25 12:18:10 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.24 $) $Date: 2007/05/26 06:51:43 $"
 
-static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.23 $) $Date: 2007/05/25 12:18:10 $";
+static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.24 $) $Date: 2007/05/26 06:51:43 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -1150,7 +1150,7 @@ Size (bytes)\n\
       if((len=t_snd(send_socket,
 		    send_ring->buffer_ptr,
 		    send_size,
-		    0)) != send_size) {
+		    T_MORE)) != send_size) {
         if ((len >=0) || (t_errno == TSYSERR && errno == EINTR)) {
           /* the test was interrupted, must be the end of test */
           break;
