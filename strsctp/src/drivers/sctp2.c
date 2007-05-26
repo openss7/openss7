@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2007/05/25 12:04:56 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2007/05/26 06:52:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/25 12:04:56 $ by $Author: brian $
+ Last Modified $Date: 2007/05/26 06:52:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.70  2007/05/26 06:52:56  brian
+ - get rid of compiler warning
+
  Revision 0.9.2.69  2007/05/25 12:04:56  brian
  - final performance tweaks
 
@@ -142,10 +145,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2007/05/25 12:04:56 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2007/05/26 06:52:56 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2007/05/25 12:04:56 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2007/05/26 06:52:56 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -163,7 +166,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2007/05/25 12:04:56 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2007/05/26 06:52:56 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -13476,7 +13479,7 @@ STATIC int
 sctp_get_port(struct sctp *sp, uint16_t port)
 {
 	struct sctp_bind_bucket *sb = NULL;
-	unsigned long flags;
+	unsigned long flags = 0;
 
 	if (port == 0) {
 		/* This approach to selecting an available port number is identical to that used

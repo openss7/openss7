@@ -1,3 +1,25 @@
+2007-05-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/sctp2.c: compiler warning
+
+	* doc/papers/Makefile: updated plots
+	* doc/papers/netperf_centos.dat: updated plots
+	* doc/papers/netperf_fc6.dat: updated plots
+	* doc/papers/netperf_rh7.dat: updated plots
+	* doc/papers/netperf_rh7_comp.plot: updated plots
+	* doc/papers/sctpresults.tex: updated plots
+
+	* doc/papers/netperf_smp_comp.plot: added plots
+	* doc/papers/netperf_smp_delay.plot: added plots
+	* doc/papers/netperf_smp_perf.plot: added plots
+	* doc/papers/netperf_smp_thrput.plot: added plots
+	* doc/papers/netperf_suse_comp.plot: added plots
+	* doc/papers/netperf_suse_delay.plot: added plots
+	* doc/papers/netperf_suse_perf.plot: added plots
+	* doc/papers/netperf_suse_thrput.plot: added plots
+	* doc/papers/netperf_smp.dat: added plots
+	* doc/papers/netperf_suse.dat: added plots
+
 2007-05-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/sctp2.c: final performance tweaks
