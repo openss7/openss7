@@ -1,7 +1,7 @@
 %% -*- tex -*- vim: ft=tex tw=78 nocin nosi
 %% =========================================================================
 %%
-%% @(#) $Id: testresults.tex,v 0.9.2.4 2007/05/18 12:04:24 brian Exp $
+%% @(#) $Id: sctpresults.tex,v 0.9.2.1 2007/05/28 11:13:36 brian Exp $
 %%
 %% =========================================================================
 %%
@@ -53,7 +53,7 @@
 %% 
 %% =========================================================================
 %%
-%% Last Modified $Date: 2007/05/18 12:04:24 $ by $Author: brian $
+%% Last Modified $Date: 2007/05/28 11:13:36 $ by $Author: brian $
 %%
 %% =========================================================================
 
@@ -940,6 +940,30 @@ Ubuntu 7.04 & 2.6.20-15-server\\
 \label{figure:susecomp}
 \end{figure}
 
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_u704_perf}
+\caption[Ubuntu 7.04 on Porky Performance]{Ubuntu 7.04 on Porky Performance}
+\label{figure:u704perf}
+\end{figure}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_u704_delay}
+\caption[Ubuntu 7.04 on Porky Delay]{Ubuntu 7.04 on Porky Delay}
+\label{figure:u704dly}
+\end{figure}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_u704_thrput}
+\caption[Ubuntu 7.04 on Porky Throughput]{Ubuntu 7.04 on Porky Throughput}
+\label{figure:u704thrput}
+\end{figure}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_u704_comp}
+\caption[Ubuntu 7.04 on Porky Comparison]{Ubuntu 7.04 on Porky Comparison}
+\label{figure:u704comp}
+\end{figure}
+
 \subsection[Pumbah]{Pumbah}
 Pumbah is a 2.57GHz Pentium IV (i686) uniprocessor machine with 1Gb of memory.
 This machine differs from Porky in memory type only (Pumbah has somewhat
@@ -1109,6 +1133,78 @@ Note that this is the same distribution that was also tested on Porky.  The
 purpose of testing on this notebook is to rule out the differences between
 machine architectures on the test results.  Tests performed on this machine
 are control tests.
+
+\begin{description}
+
+\item[Performance.]
+
+\textit{Figure \ref{figure:nbperf}} illustrates the performance of TCP Sockets compared to TCP XTI
+over Socket and SCTP XTI approaches.  STREAMS demonstrates significant improvements at message sizes
+of less than 1024 bytes, and improvements at all message sizes.
+
+A significant result is that the TCP XTI over Socket approach indeed provided improvements over TCP
+Sockets itself at message sizes beneath 1024 bytes.  This improvement can only be accounted for by
+buffering differences, and when the receiving process was given a lower scheduling priority than the
+sending process, TCP Sockets performed much better.
+
+\item[Delay.]
+
+\textit{Figure \ref{figure:nbdly}} illustrates the message delay of TCP Sockets compared to TCP XTI
+over Socket and SCTP XTI approaches.  STREAMS demonstrates significant improvements at message sizes
+of less than 1024 bytes, an improvements at all message sizes.
+
+The slope of the delay curve is best for SCTP XTI, then TCP Sockets (for message sizes greater than
+or equal to 1024 bytes), then TCP XTI over Sockets, then TCP Sockets (with low priority receiver).
+
+The slope of the delay curve either indicates that Sockets is using slightly larger buffers than
+STREAMS, or that Sockets is somehow exploiting some per-byte efficiencies at larger message sizes
+not achieved by STREAMS.  Nevertheless, the STREAMS intercept is so low that the delay curve for
+STREAMS is everywhere beneath that of Sockets.
+
+\item[Throughput.]
+
+\textit{Figure \ref{figure:nbthrput}} illustrates the throughput of TCP Sockets compared to TCP XTI
+over Socket and SCTP XTI approaches.  STREAMS demonstrates significant improvements at all message
+sizes.
+
+As can be seen from \textit{Figure \ref{figure:nbthrput}}, all implementations exhibit strong power
+function characteristics (at least at lower write sizes), indicating structure and robustness for
+each implementation.
+
+\item[Improvement.]
+
+\textit{Figure \ref{figure:nbcomp}} illustrates the comparison of TCP Sockets to TCP XTI over
+Socket and SCTP XTI approaches.  STREAMS demonstrates significant improvements (approx. 40\%
+improvement) at message sizes below 1024 bytes.  That STREAMS UDP gives a 40\% improvement over a
+wide range of message sizes on SMP is a dramatic improvement.  Statements regarding STREAMS
+networking running poorer on SMP than on UP are quite wrong, at least with regard to \textsl{Linux
+Fast-STREAMS}.
+
+\end{description}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_nb_perf}
+\caption[SuSE 10.0 OSS Mspiggy Performance]{SuSE 10.0 OSS Mspiggy Performance}
+\label{figure:nbperf}
+\end{figure}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_nb_delay}
+\caption[SuSE 10.0 OSS Mspiggy Delay]{SuSE 10.0 OSS Mspiggy Delay}
+\label{figure:nbdly}
+\end{figure}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_nb_thrput}
+\caption[SuSE 10.0 OSS Mspiggy Throughput]{SuSE 10.0 OSS Mspiggy Throughput}
+\label{figure:nbthrput}
+\end{figure}
+
+\begin{figure}[p]
+\center\includegraphics[width=\columnwidth]{netperf_nb_comp}
+\caption[SuSE 10.0 OSS Mspiggy Comparison]{SuSE 10.0 OSS Mspiggy Comparison}
+\label{figure:nbcomp}
+\end{figure}
 
 
 \section[Analysis]{Analysis}
