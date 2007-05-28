@@ -14,5 +14,7 @@ plot \
      'netperf_smp.dat' using 1:($1*$5*8/10) smooth unique title "SCTP Streams Rx" with linespoints lt 5,\
      'netperf_smp.dat' using 1:($1*$6*8/10) smooth unique title "TCP Sockets Tx" with linespoints lt 4,\
      'netperf_smp.dat' using 1:($1*$7*8/10) smooth unique title "TCP Sockets Rx" with linespoints lt 3,\
+     'netperf_smp.dat' using 1:($1*$8*8/10) smooth unique title "TCP Sockets Tx" with linespoints lt 11,\
+     'netperf_smp.dat' using 1:($1*$9*8/10) smooth unique title "TCP Sockets Rx" with linespoints lt 10,\
      'netperf_smp.dat' using 1:($1*$2*8/10) smooth unique title "TCP XTIoS Tx"   with linespoints lt 1,\
      'netperf_smp.dat' using 1:($1*$3*8/10) smooth unique title "TCP XTIoS Rx"   with linespoints lt 2
