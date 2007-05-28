@@ -1,3 +1,29 @@
+2007-05-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/papers/Makefile: updated for release
+	* doc/papers/netperf_rh7.dat: updated for release
+	* doc/papers/netperf_rh7_comp.plot: updated for release
+	* doc/papers/netperf_rh7_delay.plot: updated for release
+	* doc/papers/netperf_rh7_perf.plot: updated for release
+	* doc/papers/netperf_rh7_thrput.plot: updated for release
+	* doc/papers/netperf_smp.dat: updated for release
+	* doc/papers/netperf_smp_comp.plot: updated for release
+	* doc/papers/netperf_smp_delay.plot: updated for release
+	* doc/papers/netperf_smp_perf.plot: updated for release
+	* doc/papers/netperf_smp_thrput.plot: updated for release
+	* doc/papers/sctpresults.tex: updated for release
+
+	* doc/papers/netperf_nb.dat: added plots
+	* doc/papers/netperf_u704.dat: added plots
+	* doc/papers/netperf_nb_comp.plot: added plots
+	* doc/papers/netperf_nb_delay.plot: added plots
+	* doc/papers/netperf_nb_perf.plot: added plots
+	* doc/papers/netperf_nb_thrput.plot: added plots
+	* doc/papers/netperf_u704_comp.plot: added plots
+	* doc/papers/netperf_u704_delay.plot: added plots
+	* doc/papers/netperf_u704_perf.plot: added plots
+	* doc/papers/netperf_u704_thrput.plot: added plots
+
 2007-05-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/sctp2.c: compiler warning
