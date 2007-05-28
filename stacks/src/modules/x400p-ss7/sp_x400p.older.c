@@ -11133,6 +11133,8 @@ xp_r_sig(queue_t *q, mblk_t *mp)
 		}
 		if (rtn == QR_DONE)
 			rtn = QR_ABSORBED;
+		if (rtn != QR_ABSORBED)
+			rtn = mi_timer_requeue(mp) ? rtn : QR_ABSORBED;
 	}
 	return (rtn);
 }
@@ -11179,9 +11181,9 @@ xp_w_flush(queue_t *q, mblk_t *mp)
 			spin_unlock_irqrestore(&xp->lock, flags);
 		}
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(q, mp->b_rptr[1], FLUSHALL);
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(q, FLUSHALL);
+			flushq(q, FLUSHDATA);
 		*mp->b_rptr &= ~FLUSHW;
 	}
 	if (*mp->b_rptr & FLUSHR) {
@@ -11197,9 +11199,9 @@ xp_w_flush(queue_t *q, mblk_t *mp)
 			spin_unlock_irqrestore(&xp->lock, flags);
 		}
 		if (*mp->b_rptr & FLUSHBAND)
-			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHALL);
+			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHDATA);
 		else
-			flushq(OTHERQ(q), FLUSHALL);
+			flushq(OTHERQ(q), FLUSHDATA);
 		qreply(q, mp);
 		return (QR_ABSORBED);
 	}
