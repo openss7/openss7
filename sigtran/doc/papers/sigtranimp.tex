@@ -1,0 +1,406 @@
+%% -*- tex -*- vim: ft=tex tw=78 nocin nosi
+%% =========================================================================
+%%
+%% @(#) $Id: sigtranimp.tex,v 0.9.2.1 2007/05/28 11:34:38 brian Exp $
+%%
+%% =========================================================================
+%%
+%% Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+%%
+%% All Rights Reserved.
+%%
+%% Permission is granted to make and distribute verbatim copies of this
+%% manual provided the copyright notice and this permission notice are
+%% preserved on all copies.
+%%
+%% Permission is granted to copy and distribute modified versions of this
+%% manual under the conditions for verbatim copying, provided that the
+%% entire resulting derived work is distributed under the terms of a
+%% permission notice identical to this one.
+%% 
+%% Since the Linux kernel and libraries are constantly changing, this
+%% manual page may be incorrect or out-of-date.  The author(s) assume no
+%% responsibility for errors or omissions, or for damages resulting from
+%% the use of the information contained herein.  The author(s) may not
+%% have taken the same level of care in the production of this manual,
+%% which is licensed free of charge, as they might when working
+%% professionally.
+%% 
+%% Formatted or processed versions of this manual, if unaccompanied by
+%% the source, must acknowledge the copyright and authors of this work.
+%%
+%% -------------------------------------------------------------------------
+%%
+%% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+%% on behalf of the U.S. Government ("Government"), the following
+%% provisions apply to you.  If the Software is supplied by the Department
+%% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+%% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+%% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+%% Government is acquiring only the license rights granted herein (the
+%% license rights customarily provided to non-Government users).  If the
+%% Software is supplied to any unit or agency of the Government other than
+%% DoD, it is classified as "Restricted Computer Software" and the
+%% Government's rights in the Software are defined in paragraph 52.227-19
+%% of the Federal Acquisition Regulations ("FAR") (or any successor
+%% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+%% NASA Supplement to the FAR (or any successor regulations).
+%%
+%% =========================================================================
+%% 
+%% Commercial licensing and support of this software is available from
+%% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+%% 
+%% =========================================================================
+%%
+%% Last Modified $Date: 2007/05/28 11:34:38 $ by $Author: brian $
+%%
+%% =========================================================================
+
+\documentclass[letterpaper,final,notitlepage,twocolumn,10pt,twoside]{article}
+\usepackage{ftnright}
+\usepackage{makeidx}
+\usepackage{pictex}
+%\usepackage{psfig}
+%\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{eepic}
+%\usepackage{epsfig}
+%\usepackage[dvips]{graphicx,epsfig}
+%\usepackage[dvips]{epsfig}
+%\usepackage{epsf}
+\usepackage{natbib}
+\usepackage{placeins}
+%\usepackage{placeins}
+
+\setlength{\voffset}{-1.2in}
+\setlength{\topmargin}{0.2in}
+\setlength{\headheight}{0.2in}
+\setlength{\headsep}{0.3in}
+\setlength{\topskip}{0.0in}
+\setlength{\footskip}{0.3in}
+\setlength{\textheight}{10.0in}
+
+\setlength{\hoffset}{-1.0in}
+\setlength{\oddsidemargin}{0.5in}
+\setlength{\evensidemargin}{0.5in}
+\setlength{\textwidth}{7.5in}
+
+\setlength{\marginparwidth}{0.0in}
+\setlength{\marginparsep}{0.0in}
+
+\setlength{\columnsep}{0.3in}
+\setlength{\columnwidth}{3.6in}
+%\setlength{\columnseprule}{0.25pt}
+
+\setlength{\paperheight}{11in}
+\setlength{\paperwidth}{8.5in}
+
+%\let\Huge = \huge
+%\let\huge = \LARGE
+%\let\LARGE = \Large
+%\let\Large = \large
+%\let\large = \normalsize
+%\let\normalsize = \small
+%\let\small = \footnotesize
+%\let\footnotesize = \scriptsize
+%\let\scriptsize = \tiny
+
+\makeatletter
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+                                   {-2ex \@plus -1ex \@minus -.2ex}%
+                                   {1ex \@plus .2ex}%
+                                   {\normalfont\large\bfseries}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                                     {-1.5ex \@plus -.5ex \@minus -.2ex}%
+                                     {1ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                                     {-1.25ex\@plus -.5ex \@minus -.2ex}%
+                                     {1ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+                                    {1.5ex \@plus .5ex \@minus .2ex}%
+                                    {-1em}%
+                                    {\normalfont\normalsize\bfseries\slshape}}
+\renewcommand\subparagraph{\@startsection{subparagraph}{5}{\parindent}%
+                                       {0ex \@plus 0ex \@minus 0ex}%
+                                       {-1em}%
+                                      {\normalfont\normalsize\bfseries\slshape}}
+\makeatother
+
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{6}
+
+\pagestyle{plain}
+%\pagestyle{myheadings}
+%\markboth{B. Bidulock}{B. Bidulock}
+
+\makeglossary
+
+\newcommand{\topfigrule}{\vspace{0.5ex}\rule{\columnwidth}{0.4pt}\vspace{0.5ex} }
+\newcommand{\botfigrule}{\vspace{0.5ex}\rule{\columnwidth}{0.4pt}\vspace{0.5ex} }
+\newcommand{\dblfigrule}{\vspace{0.5ex}\rule{\textwidth}{0.4pt}\vspace{0.5ex} }
+
+%\bibliographystyle{unsrtnat}
+%\bibliographystyle{plainnat}
+%\bibliographystyle{ieeetr}
+%\bibliographystyle{abbrvnat}
+%\bibliographystyle{acm}
+%\bibliographystyle{plainnat}
+\bibliographystyle{alpha}
+
+\begin{document}
+
+%\begin{titlepage}
+%\begin{center}
+%    STREAMS vs. Sockets Performance Comparison\\
+%    Experimental Test Results
+%\end{center}
+%\end{titlepage}
+
+\title{Implementing SIGTRAN for Linux Fast-STREAMS\\[0.5ex]
+	{\large \textsl{Design for Linux}}}
+\author{Brian F. G. Bidulock\thanks{bidulock@openss7.org}\\
+	OpenSS7 Corporation}
+\date{May 1, 2007}
+\maketitle
+
+\begin{abstract}
+\addcontentsline{toc}{section}{Abstract}
+\end{abstract}
+
+%\tableofcontents
+
+\section[Background]{Background}
+
+UNIX networking has a rich history.  The TCP/IP protocol suite was first
+implemented by BBN using Sockets under a DARPA research project on 4.1aBSD and
+then incorporated by the CSRG into 4.2BSD \cite[]{bsd}.  Lachmann and
+Associates (Legent) subsequently implemented one of the first TCP/IP protocol
+suite based on the Transport Layer Interface (TLI) \cite[]{tli} and STREAMS
+\cite[]{magic}.  Two other predominant TCP/IP implementations on STREAMS
+surfaced at about the same time: Wollongong and Mentat.
+
+\subsection[STREAMS]{STREAMS}
+
+STREAMS is a facility first presented in a paper by Dennis M. Ritchie in 1984
+\cite[]{Ritchie84}, originally implemented on 4.1BSD and later part of the
+\textsl{Bell Laboratories Eighth Edition UNIX}, incorporated into \textsl{UNIX
+System V Release 3} and enhanced in \textsl{UNIX System V Release 4} and
+further in \textsl{UNIX System V Release 4.2}.  STREAMS was used in SVR4 for
+terminal input-output, pseudo-terminals, pipes, named pipes (FIFOs),
+interprocess communication and networking.  STREAMS was used in SVR3 for
+networking (in the NSU package).  Since its release in \textsl{System V
+Release 3}, STREAMS has been implemented across a wide range of UNIX,
+UNIX-like and UNIX-based systems, making its implementation and use an ipso
+facto standard.
+
+STREAMS is a facility that allows for a reconfigurable full duplex
+communications path, \textit{Stream}, between a user process and a driver in
+the kernel.  Kernel protocol modules can be pushed onto and popped from the
+\textit{Stream} between the user process and driver.  The \textit{Stream} can
+be reconfigured in this way by a user process.  The user process, neighbouring
+protocol modules and the driver communicate with each other using a message
+passing scheme.  This permits a loose coupling between protocol modules,
+drivers and user processes, allowing a third-party and loadable kernel module
+approach to be taken toward the provisioning of protocol modules on platforms
+supporting STREAMS.
+
+On \textsl{UNIX System V Release 4.2}, STREAMS was used for terminal
+input-output, pipes, FIFOs (named pipes), and network communications.  Modern
+UNIX, UNIX-like and UNIX-based systems providing STREAMS normally support some
+degree of network communications using STREAMS; however, many do not support
+STREAMS-based pipe and FIFOs\footnote{AIX, for example.} or terminal
+input-output\footnote{HP-UX, for example.} without system reconfiguration.
+
+\textsl{UNIX System V Release 4.2} supported four Application Programming
+Interfaces (APIs) for accessing the network communications facilities of the
+kernel:
+
+\begin{description}
+
+\item[{\it Transport Layer Interface (TLI).}]
+
+\textsl{TLI} is an acronym for the \textit{Transport Layer Interface}
+\cite[]{tli}.  The \textsl{TLI} was the non-standard interface provided by
+SVR3 and SVR4, later standardized by \textit{X/Open} as the \textsl{XTI}
+described below.  This interface operated differently than the XTI in subtle
+ways, and is now deprecated.
+
+\item[{\it X/Open Transport Interface (XTI).}]
+
+\textsl{XTI} is an acronym for the \textsl{X/Open Transport Interface}
+\cite[]{xti}.  The \textsl{X/Open Transport Interface} is a standardization of
+the \textsl{UNIX System V Release 4}, \textsl{Transport Layer Interface}.  The
+interface consists of an Application Programming Interface implemented as a
+shared object library.  The shared object library communicates with a
+transport provider \textit{Stream} using a service primitive interface called
+the \textit{Transport Provider Interface}\cite[]{tpi}.
+
+While \textsl{XTI} was implemented directly over STREAMS devices supporting
+the \textit{Transport Provider Interface (TPI)} \cite[]{tpi} under SVR4,
+several non-traditional approaches exist in implementation:
+
+\item[{\it Berkeley Sockets.}]
+
+Sockets uses the BSD interface that was developed by BBN for the TCP/IP
+protocol suite under DARPA contract on 4.1aBSD and released in 4.2BSD.  BSD
+Sockets provides a set of primary API functions that are typically implemented
+as system calls.  The BSD Sockets interface is non-standard, operated
+differently from the POSIX interface in subtle ways, and is now deprecated in
+favour of the POSIX/SUS standard Sockets interface.
+
+\item[{\it POSIX Sockets.}]
+
+Sockets were standardized by X/Open, later the
+OpenGroup,\footnote{\textit{http://www.opengroup.org/}} and IEEE in the POSIX
+standardization process.  They appear in XNS 5.2 \cite[]{xns}, SUSv1
+\cite[]{susv1}, SUSv2 \cite[]{susv2} and SUSv3 \cite[]{susv3}.   POSIX/SUS
+Sockets is now the common application environment for accessing networking,
+deprecating the XTI for TCP/IP networking applications.
+
+\end{description}
+
+On systems traditionally supporting Sockets and then retrofitted to support
+STREAMS, there is one approach toward supporting \textsl{XTI} without
+refitting the entire networking stack:\footnote{This approach is taken by
+True64 (Digital) UNIX.}
+
+\begin{description}
+
+\item[{\it XTI over Sockets.}]
+
+Several implementations of STREAMS on UNIX utilize the concept of \textsl{TPI}
+over Sockets.  Following this approach, a STREAMS pseudo-device driver is
+provided that hooks directly into internal socket system calls to implement
+the driver, and yet the networking stack remains fundamentally BSD in style.
+
+\end{description}
+
+Typically there are two approaches to implementing XTI on systems not
+supporting STREAMS:
+
+\begin{description}
+
+\item[{\it XTI Compatibility Library.}]
+
+Several implementations of XTI on UNIX utilize the concept of an XTI
+compatibility library.\footnote{One was even available for Linux at one
+point.}  This is purely a shared object library approach to providing
+\textsl{XTI}.  Under this approach it is possible to use the \textsl{XTI}
+application programming interface, but it is not possible to utilize any of
+the STREAMS capabilities of an underlying \textit{Transport Provider Interface
+(TPI)} stream.
+
+\item[{\it TPI over Sockets.}]
+
+An alternate approach, taken by the \textsl{Linux iBCS} package was to provide
+a pseudo-transport provider using a legacy character device to present the
+appearance of a STREAMS transport provider.
+
+\end{description}
+
+Conversely, on systems supporting STREAMS, but not traditionally supporting
+Sockets (such as SVR4), there are four approaches toward supporting BSD and
+POSIX Sockets based on STREAMS:
+
+\begin{description}
+
+\item[{\it Compatibility Library}]
+
+Under this approach, a compatibility library (\texttt{libsocket.o}) contains
+the socket calls as library functions that internally invoke the TLI or TPI
+interface to an underlying STREAMS transport provider.  This is the approach
+originally taken by SVR4 \cite[]{magic}, but this approach has subsequently
+been abandoned due to the difficulties regarding fork(2) and fundamental
+incompatibilities deriving from a library only approach.
+
+\item[{\it Library and cooperating \sl STREAMS module.}]
+
+Under this approach, a cooperating module, normally called \texttt{sockmod},
+is pushed on a Transport Provider Interface (TPI) Stream.  The library,
+normally called \texttt{socklib} or simply \texttt{socket}, and cooperating
+\texttt{sockmod} module provide the BBN or POSIX Socket API.  \cite[]{impbsd}
+\cite[]{socklib}
+
+\item[{\it Library and System Calls.}]
+
+Under this approach, the BSD or POSIX Sockets API is implemented as system
+calls with the sole exception of the \textbf{\texttt{socket}}(3) call.  The
+underlying transport provider is still an \textsl{TPI}-based STREAMS transport
+provider, it is just that system calls instead of library calls are used to
+implement the interface.  \cite[]{socklib}
+
+\item[{\it System Calls.}]
+
+Under this approach, even the socket(3) call is moved into the kernel.
+Conversion between POSIX/BSD Sockets calls and TPI service primitives is
+performed completely within the kernel.  The sock2path(5) configuration file
+is used to configure the mapping between STREAMS devices and socket types and
+domains \cite[]{socklib}.
+
+\end{description}
+
+\subsubsection[Standardization]{Standardization.}
+
+During the POSIX standardization process, networking and Sockets interfaces
+were given special treatment to ensure that both the legacy Sockets approach
+and the STREAMS approach to networking were compatible. POSIX has standardized
+both the XTI and Sockets programmatic interface to networking.  STREAMS
+networking has been POSIX compliant for many years, BSD Sockets, POSIX
+Sockets, TLI and XTI interfaces, and were compliant in the \textsl{SVR4.2}
+release.  The STREAMS networking provided by \textsl{Linux Fast-STREAMS}
+package provides POSIX compliant networking.
+
+Therefore, any application utilizing a Socket or Stream in a POSIX compliant
+manner will also be compatible with STREAMS networking.\footnote{This
+compatibility is exemplified by the \texttt{netperf} program which does not
+distinguish between BSD or STREAMS based networking in their implementation or
+use.}
+
+\subsection[Linux Fast-STREAMS]{Linux Fast-STREAMS}
+
+The first STREAMS package for Linux that provided SVR4 STREAMS capabilities
+was the \textsl{Linux STREAMS (LiS)} package originally available from GCOM
+\cite[]{LiS}.  This package exhibited incompatibilities with SVR 4.2 STREAMS
+and other STREAMS implementations, was bugger and performed very poorly on
+Linux.  These difficulties prompted the OpenSS7 Project \cite[]{openss7} to
+implement an SVR 4.2 STREAMS package from scratch, with the objective of
+production quality and high-performance, named \textsl{Linux Fast-STREAMS}
+\cite[]{LfS}.
+
+The OpenSS7 Project also maintains public and internal version of the
+\textsl{LiS} package.  The last public release was \textit{LiS-2.18.3}; the
+current internal release version is \textit{LiS-2.18.6}.  The current
+production public release of \textsl{Linux Fast-STREAMS} is
+\textit{streams-0.9.3}.
+
+\section[Objective]{Objective}
+
+
+\section[Description]{Description}
+
+
+\section[Method]{Method}
+
+
+\section[Results]{Results}
+
+\section[Analysis]{Analysis}
+
+\section[Conclusions]{Conclusions}
+
+\section[Future Work]{Future Work}
+
+\section[Related Work]{Related Work}
+
+\FloatBarrier
+\addcontentsline{toc}{section}{References}
+\bibliography{sigtranimp}
+
+\clearpage
+\begin{appendix}
+\end{appendix}
+
+\end{document}
