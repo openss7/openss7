@@ -175,6 +175,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
 		 doc/manual/texi/args.texi
+		 doc/papers/Makefile
 		 lib32/Makefile
 		 src/modules/Config
 		 src/drivers/Config])
