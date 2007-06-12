@@ -207,8 +207,6 @@ all-dat:
 				$(ECHO) "touch $$f" ; \
 				touch $$f ; \
 			fi ; \
-		else \
-			$(ECHO) "nothing to do for $$f" ; \
 		fi ; \
 	done
 
