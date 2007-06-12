@@ -53,7 +53,7 @@
 ## $Log$
 ## =============================================================================
 
-MY_PHONY =
+include ../../am/openss7.am
 
 if DEVELOPMENT
 ## DEVELOPMENT
@@ -118,13 +118,18 @@ PNGFIGS = \
 	streamspipe.png \
 	socketpipe.png
 
+FIGFIGS = \
+	legacypipe.fig \
+	streamspipe.fig \
+	socketpipe.fig
+
 PLOTFIGS = $(PLOTS:.plot=.fig)
 
 NAME = piperesults
 
 MY_PHONY += all all-dat
 
-all: all-dat $(NAME).bbl $(NAME).ps $(NAME).pdf $(NAME).html
+all: all-dat $(NAME).bbl $(NAME).pdf
 
 $(PLOTFIGS): %.fig: %.plot
 	gnuplot $<
@@ -203,8 +208,6 @@ all-dat:
 				$(ECHO) "touch $$f" ; \
 				touch $$f ; \
 			fi ; \
-		else \
-			$(ECHO) "nothing to do for $$f" ; \
 		fi ; \
 	done
 
@@ -274,8 +277,8 @@ clean: clean-fig clean-dat
 
 MY_PHONY += clean clean-fig clean-gif clean-png clean-eps clean-pdf clean-dat
 
+EXTRA_DIST += $(NAME).pdf $(NAME).tex $(NAME).bib $(FIGFIGS) $(PLOT_DATS) $(PLOTS) org.css
 
 ## DEVELOPMENT
 endif
 
-.PHONY: $(MY_PHONY)
