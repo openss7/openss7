@@ -223,6 +223,7 @@ debian/$(PACKAGE_LCNAME)-doc.docs:
 	  echo "TODO" ; \
 	  [ ! -d manual ] || echo "manual" ; \
 	  [ ! -d doc/manual ] || echo "doc/manual" ; \
+	  [ ! -d doc/papers ] || echo "doc/papers" ; \
 	  [ ! -d doc/projects ] || echo "doc/projects" ; \
 	  [ ! -d doc/drafts ] || echo "doc/drafts" ; \
 	  [ ! -d doc/specs ] || echo "doc/specs" ; \

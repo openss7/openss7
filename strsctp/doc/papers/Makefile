@@ -64,46 +64,50 @@
 #
 # =============================================================================
 
-PREFIX = netperf
+srcdir = .
+ECHO = echo
+MY_PHONY =
+
+PAPER_PREFIX = netperf
 
 PLOTS = \
-	$(PREFIX)_centos_comp.plot \
-	$(PREFIX)_centos_delay.plot \
-	$(PREFIX)_centos_perf.plot \
-	$(PREFIX)_centos_thrput.plot \
-	$(PREFIX)_rh7_comp.plot \
-	$(PREFIX)_rh7_delay.plot \
-	$(PREFIX)_rh7_perf.plot \
-	$(PREFIX)_rh7_thrput.plot \
-	$(PREFIX)_fc6_comp.plot \
-	$(PREFIX)_fc6_delay.plot \
-	$(PREFIX)_fc6_perf.plot \
-	$(PREFIX)_fc6_thrput.plot\
-	$(PREFIX)_suse_comp.plot \
-	$(PREFIX)_suse_delay.plot \
-	$(PREFIX)_suse_perf.plot \
-	$(PREFIX)_suse_thrput.plot\
-	$(PREFIX)_smp_comp.plot \
-	$(PREFIX)_smp_delay.plot \
-	$(PREFIX)_smp_perf.plot \
-	$(PREFIX)_smp_thrput.plot \
-	$(PREFIX)_u704_comp.plot \
-	$(PREFIX)_u704_delay.plot \
-	$(PREFIX)_u704_perf.plot \
-	$(PREFIX)_u704_thrput.plot \
-	$(PREFIX)_nb_comp.plot \
-	$(PREFIX)_nb_delay.plot \
-	$(PREFIX)_nb_perf.plot \
-	$(PREFIX)_nb_thrput.plot
+	$(PAPER_PREFIX)_centos_comp.plot \
+	$(PAPER_PREFIX)_centos_delay.plot \
+	$(PAPER_PREFIX)_centos_perf.plot \
+	$(PAPER_PREFIX)_centos_thrput.plot \
+	$(PAPER_PREFIX)_fc6_comp.plot \
+	$(PAPER_PREFIX)_fc6_delay.plot \
+	$(PAPER_PREFIX)_fc6_perf.plot \
+	$(PAPER_PREFIX)_fc6_thrput.plot \
+	$(PAPER_PREFIX)_nb_comp.plot \
+	$(PAPER_PREFIX)_nb_delay.plot \
+	$(PAPER_PREFIX)_nb_perf.plot \
+	$(PAPER_PREFIX)_nb_thrput.plot \
+	$(PAPER_PREFIX)_rh7_comp.plot \
+	$(PAPER_PREFIX)_rh7_delay.plot \
+	$(PAPER_PREFIX)_rh7_perf.plot \
+	$(PAPER_PREFIX)_rh7_thrput.plot \
+	$(PAPER_PREFIX)_smp_comp.plot \
+	$(PAPER_PREFIX)_smp_delay.plot \
+	$(PAPER_PREFIX)_smp_perf.plot \
+	$(PAPER_PREFIX)_smp_thrput.plot \
+	$(PAPER_PREFIX)_suse_comp.plot \
+	$(PAPER_PREFIX)_suse_delay.plot \
+	$(PAPER_PREFIX)_suse_perf.plot \
+	$(PAPER_PREFIX)_suse_thrput.plot \
+	$(PAPER_PREFIX)_u704_comp.plot \
+	$(PAPER_PREFIX)_u704_delay.plot \
+	$(PAPER_PREFIX)_u704_perf.plot \
+	$(PAPER_PREFIX)_u704_thrput.plot
 
-#	$(PREFIX)_cos5_comp.plot \
-#	$(PREFIX)_cos5_delay.plot \
-#	$(PREFIX)_cos5_perf.plot \
-#	$(PREFIX)_cos5_thrput.plot \
-#	$(PREFIX)_ubuntu_comp.plot \
-#	$(PREFIX)_ubuntu_delay.plot \
-#	$(PREFIX)_ubuntu_perf.plot \
-#	$(PREFIX)_ubuntu_thrput.plot \
+#	$(PAPER_PREFIX)_cos5_comp.plot \
+#	$(PAPER_PREFIX)_cos5_delay.plot \
+#	$(PAPER_PREFIX)_cos5_perf.plot \
+#	$(PAPER_PREFIX)_cos5_thrput.plot \
+#	$(PAPER_PREFIX)_ubuntu_comp.plot \
+#	$(PAPER_PREFIX)_ubuntu_delay.plot \
+#	$(PAPER_PREFIX)_ubuntu_perf.plot \
+#	$(PAPER_PREFIX)_ubuntu_thrput.plot
 
 EPSFIGS = \
 	sockets.eps \
@@ -129,12 +133,12 @@ PLOTFIGS = $(PLOTS:.plot=.fig)
 
 NAME = sctpresults
 
-.PHONY: all
-all: $(NAME).bbl $(NAME).ps $(NAME).pdf
+MY_PHONY += all all-dat
+
+all: all-dat $(NAME).bbl $(NAME).ps $(NAME).pdf $(NAME).html
 
 $(PLOTFIGS): %.fig: %.plot
 	gnuplot $<
-	touch $@
 
 $(EPSFIGS): %.eps: %.fig
 	fig2dev -L eps -e -g '#ffffff' -b 0 $< > $@
@@ -163,23 +167,65 @@ $(PNGFIGS): %.png: %.gif
 $(PLOTS:.plot=.png): %.png: %.gif
 	convert -background 'white' -interlace Line $< $@
 
-.PHONY: gif png eps pdf
+MY_PHONY += gif png eps pdf
+
 gif: $(GIFFIGS) $(PLOTS:.plot=.gif)
 png: $(PNGFIGS) $(PLOTS:.plot=.png)
 eps: $(EPSFIGS) $(PLOTS:.plot=.eps)
 pdf: $(PDFFIGS) $(PLOTS:.plot=.pdf)
 
-$(PREFIX)_centos_comp.fig $(PREFIX)_centos_delay.fig $(PREFIX)_centos_perf.fig $(PREFIX)_centos_thrput.fig: $(PREFIX)_centos.dat
-$(PREFIX)_fc6_comp.fig $(PREFIX)_fc6_delay.fig $(PREFIX)_fc6_perf.fig $(PREFIX)_fc6_thrput.fig: $(PREFIX)_fc6.dat
-$(PREFIX)_nb_comp.fig $(PREFIX)_nb_delay.fig $(PREFIX)_nb_perf.fig $(PREFIX)_nb_thrput.fig: $(PREFIX)_nb.dat
-$(PREFIX)_rh7_comp.fig $(PREFIX)_rh7_delay.fig $(PREFIX)_rh7_perf.fig $(PREFIX)_rh7_thrput.fig: $(PREFIX)_rh7.dat
-$(PREFIX)_smp_comp.fig $(PREFIX)_smp_delay.fig $(PREFIX)_smp_perf.fig $(PREFIX)_smp_thrput.fig: $(PREFIX)_smp.dat
-#$(PREFIX)_cos5_comp.fig $(PREFIX)_cos5_delay.fig $(PREFIX)_cos5_perf.fig $(PREFIX)_cos5_thrput.fig: $(PREFIX)_cos5.dat
-$(PREFIX)_suse_comp.fig $(PREFIX)_suse_delay.fig $(PREFIX)_suse_perf.fig $(PREFIX)_suse_thrput.fig: $(PREFIX)_suse.dat
-#$(PREFIX)_ubuntu_comp.fig $(PREFIX)_ubuntu_delay.fig $(PREFIX)_ubuntu_perf.fig $(PREFIX)_ubuntu_thrput.fig: $(PREFIX)_ubuntu.dat
-$(PREFIX)_u704_comp.fig $(PREFIX)_u704_delay.fig $(PREFIX)_u704_perf.fig $(PREFIX)_u704_thrput.fig: $(PREFIX)_u704.dat
+$(PAPER_PREFIX)_centos_comp.fig $(PAPER_PREFIX)_centos_delay.fig $(PAPER_PREFIX)_centos_perf.fig $(PAPER_PREFIX)_centos_thrput.fig: $(PAPER_PREFIX)_centos.dat
+$(PAPER_PREFIX)_fc6_comp.fig $(PAPER_PREFIX)_fc6_delay.fig $(PAPER_PREFIX)_fc6_perf.fig $(PAPER_PREFIX)_fc6_thrput.fig: $(PAPER_PREFIX)_fc6.dat
+$(PAPER_PREFIX)_nb_comp.fig $(PAPER_PREFIX)_nb_delay.fig $(PAPER_PREFIX)_nb_perf.fig $(PAPER_PREFIX)_nb_thrput.fig: $(PAPER_PREFIX)_nb.dat
+$(PAPER_PREFIX)_rh7_comp.fig $(PAPER_PREFIX)_rh7_delay.fig $(PAPER_PREFIX)_rh7_perf.fig $(PAPER_PREFIX)_rh7_thrput.fig: $(PAPER_PREFIX)_rh7.dat
+$(PAPER_PREFIX)_smp_comp.fig $(PAPER_PREFIX)_smp_delay.fig $(PAPER_PREFIX)_smp_perf.fig $(PAPER_PREFIX)_smp_thrput.fig: $(PAPER_PREFIX)_smp.dat
+#$(PAPER_PREFIX)_cos5_comp.fig $(PAPER_PREFIX)_cos5_delay.fig $(PAPER_PREFIX)_cos5_perf.fig $(PAPER_PREFIX)_cos5_thrput.fig: $(PAPER_PREFIX)_cos5.dat
+$(PAPER_PREFIX)_suse_comp.fig $(PAPER_PREFIX)_suse_delay.fig $(PAPER_PREFIX)_suse_perf.fig $(PAPER_PREFIX)_suse_thrput.fig: $(PAPER_PREFIX)_suse.dat
+$(PAPER_PREFIX)_u704_comp.fig $(PAPER_PREFIX)_u704_delay.fig $(PAPER_PREFIX)_u704_perf.fig $(PAPER_PREFIX)_u704_thrput.fig: $(PAPER_PREFIX)_u704.dat
+#$(PAPER_PREFIX)_ubuntu_comp.fig $(PAPER_PREFIX)_ubuntu_delay.fig $(PAPER_PREFIX)_ubuntu_perf.fig $(PAPER_PREFIX)_ubuntu_thrput.fig: $(PAPER_PREFIX)_ubuntu.dat
 
-$(NAME).aux: $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
+PLOT_DATS = \
+	$(PAPER_PREFIX)_centos.dat \
+	$(PAPER_PREFIX)_fc6.dat \
+	$(PAPER_PREFIX)_nb.dat \
+	$(PAPER_PREFIX)_rh7.dat \
+	$(PAPER_PREFIX)_smp.dat \
+	$(PAPER_PREFIX)_cos5.dat \
+	$(PAPER_PREFIX)_suse.dat \
+	$(PAPER_PREFIX)_u704.dat \
+	$(PAPER_PREFIX)_ubuntu.dat
+
+PAPER_BIBS = \
+	$(NAME).bib
+
+PAPER_TEXS = \
+     $(NAME).tex
+
+PAPER_CSSS = \
+     org.css
+
+all-dat:
+	@ files="$(PLOT_DATS) $(PAPER_BIBS) $(PAPER_CSSS) $(PAPER_TEXS)" ; for f in $$files ; do \
+		if test ! -f $$f -o $(srcdir)/$$f -nt $$f ; then \
+			if test -f $(srcdir)/$$f ; then \
+				$(ECHO) "cp -pf $(srcdir)/$$f $$f" ; \
+				cp -pf $(srcdir)/$$f $$f ; \
+			else \
+				$(ECHO) "touch $$f" ; \
+				touch $$f ; \
+			fi ; \
+		fi ; \
+	done
+
+clean-dat:
+	@ files="$(PLOT_DATS) $(PAPER_BIBS) $(PAPER_CSSS) $(PAPER_TEXS)" ; for f in $$files ; do \
+		if test ! $$f -ef $(srcdir)/$$f ; then \
+			$(ECHO) "rm -f $$f" ; \
+			rm -f $$f ; \
+		fi ; \
+	done
+
+$(NAME).aux: all-dat $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
 	latex $(NAME).tex
 	latex $(NAME).tex
 
@@ -203,8 +249,8 @@ $(NAME).ps: $(NAME).tex $(NAME).bbl $(EPSFIGS) $(PLOTS:.plot=.eps)
 $(NAME).pdf: $(NAME).tex $(NAME).bbl $(PDFFIGS) $(PLOTS:.plot=.pdf)
 	rm -f $(GIFFIGS) $(PLOTS:.plot=.gif)
 	rm -f $(PNGFIGS) $(PLOTS:.plot=.png)
-	pdflatex $<
-	pdflatex $<
+	pdflatex $(NAME).tex
+	pdflatex $(NAME).tex
 
 $(NAME).html: $(NAME).tex $(NAME).bbl $(PNGFIGS) $(PLOTS:.plot=.png)
 	/usr/bin/latex2html -split 0 -noexternal_images -noascii_mode -font_size 12pt \
@@ -225,15 +271,16 @@ clean-eps:
 clean-pdf:
 	rm -f $(PDFFIGS) $(PLOTS:.plot=.pdf)
 
-clean-figs: clean-gif clean-png clean-eps clean-pdf
+clean-fig: clean-gif clean-png clean-eps clean-pdf
 	rm -f $(PLOTFIGS)
 
-clean: clean-figs
+clean: clean-fig clean-dat
 	rm -f *.bak $(NAME).ps $(NAME).pdf $(NAME).dvi \
 	$(NAME).bbl $(NAME).aux $(NAME).blg $(NAME).glo \
 	$(NAME).log \
 	index.html internals.pl labels.pl \
 	$(NAME).css $(NAME).html WARNINGS
 
-.PHONY: clean clean-figs clean-gif clean-png clean-eps clean-pdf
+MY_PHONY += clean clean-fig clean-gif clean-png clean-eps clean-pdf clean-dat
 
+.PHONY: $(MY_PHONY)

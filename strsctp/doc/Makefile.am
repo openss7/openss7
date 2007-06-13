@@ -60,7 +60,7 @@ include ../am/openss7.am
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-SUBDIRS = . man manual
+SUBDIRS = . man manual papers
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS

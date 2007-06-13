@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: strxnet 0.9.2.9.rc3\n"
 "Report-Msgid-Bugs-To: bugs@openss7.org\n"
-"POT-Creation-Date: 2007-05-18 16:02-0600\n"
+"POT-Creation-Date: 2007-06-13 03:04-0600\n"
 "PO-Revision-Date: 2004-01-06 18:11-0700\n"
 "Last-Translator: Brian Bidulock <bidulock@openss7.org>\n"
 "Language-Team: German <de@li.org>\n"
@@ -23,7 +23,7 @@ msgstr ""
 #. TRANS are even permitted to change t_errno to some other value, when the call
 #. TRANS is actually successful.
 #.
-#: src/lib/xnet.c:5631
+#: src/lib/xnet.c:5651
 msgid "No error"
 msgstr "Erfolgreich"
 
@@ -31,7 +31,7 @@ msgstr "Erfolgreich"
 #. TRANS format.  This is not used to provide protocol errors but merely indicate
 #. TRANS an error in the syntactic formatting of the address.
 #.
-#: src/lib/xnet.c:5637
+#: src/lib/xnet.c:5657
 msgid "Bad address format"
 msgstr "Ungültige Adresse"
 
@@ -39,7 +39,7 @@ msgstr "Ungültige Adresse"
 #. TRANS This is not used to provide protocol errors but merely indicate an error
 #. TRANS in the the syntactic formatting of the options.
 #.
-#: src/lib/xnet.c:5643
+#: src/lib/xnet.c:5663
 msgid "Bad options format"
 msgstr "Ungültige Option"
 
@@ -47,13 +47,13 @@ msgstr "Ungültige Option"
 #. TRANS the XTI library call, or to use the specified address, or to use the
 #. TRANS specified options.
 #.
-#: src/lib/xnet.c:5649
+#: src/lib/xnet.c:5669
 msgid "Bad permissions"
 msgstr "Keine Berechtigung"
 
 #. TRANS The file descriptor is not known to the XTI library.
 #.
-#: src/lib/xnet.c:5653
+#: src/lib/xnet.c:5673
 msgid "Bad file descriptor"
 msgstr "Ungültiger Dateideskriptor"
 
@@ -61,7 +61,7 @@ msgstr "Ungültiger Dateideskriptor"
 #. TRANS underlying transport service provider is unable to choose and assign an
 #. TRANS address on the user's behalf.
 #.
-#: src/lib/xnet.c:5659
+#: src/lib/xnet.c:5679
 msgid "Unable to allocate an address"
 msgstr "Kann keinen Adresse anlegen"
 
@@ -70,7 +70,7 @@ msgstr "Kann keinen Adresse anlegen"
 #. TRANS state in which the XTI library call is not permitted.  The C-Locale text
 #. TRANS is traditional and does not really reflect the situation very well.
 #.
-#: src/lib/xnet.c:5666
+#: src/lib/xnet.c:5686
 msgid "Would place interface out of state"
 msgstr "Fehler im (intern verwendeten) endlichen Automaten"
 
@@ -80,14 +80,14 @@ msgstr "Fehler im (intern verwendeten) endlichen Automaten"
 #. TRANS is invalid (does not correspond to an outstanding connection
 #. TRANS indication).
 #.
-#: src/lib/xnet.c:5674
+#: src/lib/xnet.c:5694
 msgid "Bad call sequence number"
 msgstr ""
 
 #. TRANS A UNIX system error has occured and the errno variable indicates the
 #. TRANS UNIX system error.
 #.
-#: src/lib/xnet.c:5679
+#: src/lib/xnet.c:5699
 msgid "System error"
 msgstr ""
 
@@ -95,7 +95,7 @@ msgstr ""
 #. TRANS has occured requiring the user to call the t_look() XTI library call to
 #. TRANS process the asychronous event before proceeding.
 #.
-#: src/lib/xnet.c:5685
+#: src/lib/xnet.c:5705
 msgid "Has to t_look() for event"
 msgstr ""
 
@@ -107,7 +107,7 @@ msgstr ""
 #. TRANS limits provided by the transport service provider in response to a a
 #. TRANS t_getinfo() XTI library call.
 #.
-#: src/lib/xnet.c:5695
+#: src/lib/xnet.c:5715
 msgid "Bad amount of data"
 msgstr ""
 
@@ -116,7 +116,7 @@ msgstr ""
 #. TRANS accept the addresses or options that were received.  In the C-locale
 #. TRANS this is termed a buffer overflow.
 #.
-#: src/lib/xnet.c:5702
+#: src/lib/xnet.c:5722
 msgid "Buffer was too small"
 msgstr ""
 
@@ -126,7 +126,7 @@ msgstr ""
 #. TRANS conditions.  If O_NONBLOCK had not been set, the call would have blocked
 #. TRANS due to flow control.
 #.
-#: src/lib/xnet.c:5710
+#: src/lib/xnet.c:5730
 msgid "Would block due to flow control"
 msgstr ""
 
@@ -135,7 +135,7 @@ msgstr ""
 #. TRANS indictation and no such indication was present.  If O_NONBLOCK had not
 #. TRANS been set, the call would have blocked awaiting the indication.
 #.
-#: src/lib/xnet.c:5717
+#: src/lib/xnet.c:5737
 msgid "No data indication"
 msgstr ""
 
@@ -144,7 +144,7 @@ msgstr ""
 #. TRANS disconnect indication and no such indication was present.  If O_NONBLOCK
 #. TRANS had not been set, the call would have blocked awaiting the indication.
 #.
-#: src/lib/xnet.c:5724
+#: src/lib/xnet.c:5744
 msgid "No disconnect indication"
 msgstr ""
 
@@ -153,7 +153,7 @@ msgstr ""
 #. TRANS unit data indication and no such indication was present.  If O_NONBLOCK
 #. TRANS had not been set, the call would have blocked awaiting the indication.
 #.
-#: src/lib/xnet.c:5731
+#: src/lib/xnet.c:5751
 msgid "No unitdata error indication"
 msgstr ""
 
@@ -161,7 +161,7 @@ msgstr ""
 #. TRANS contained illegal information considerting the transport service or
 #. TRANS transport service provider type.
 #.
-#: src/lib/xnet.c:5737
+#: src/lib/xnet.c:5757
 msgid "Bad flags"
 msgstr ""
 
@@ -171,7 +171,7 @@ msgstr ""
 #. TRANS O_NONBLOCK had not been set, the call would have blocked awaiting the
 #. TRANS indication.
 #.
-#: src/lib/xnet.c:5745
+#: src/lib/xnet.c:5765
 msgid "No orderly release indication"
 msgstr ""
 
@@ -185,7 +185,7 @@ msgstr ""
 #. TRANS or that the underlying transport provider does not support the TPI
 #. TRANS primitives supplied by the XTI library.
 #.
-#: src/lib/xnet.c:5757
+#: src/lib/xnet.c:5777
 msgid "Not supported"
 msgstr ""
 
@@ -196,7 +196,7 @@ msgstr ""
 #. TRANS was changing state at the time that the call as generated and that the
 #. TRANS call failed for that reason.
 #.
-#: src/lib/xnet.c:5766
+#: src/lib/xnet.c:5786
 msgid "State is currently changing"
 msgstr ""
 
@@ -204,7 +204,7 @@ msgstr ""
 #. TRANS argument.  This error indicates that the structure type provided to
 #. TRANS these calls is either invalid or not supported by the XTI library.
 #.
-#: src/lib/xnet.c:5772
+#: src/lib/xnet.c:5792
 msgid "Structure type not supported"
 msgstr ""
 
@@ -212,7 +212,7 @@ msgstr ""
 #. TRANS correspond to a transport service provider or did not exist in the
 #. TRANS filesystem.
 #.
-#: src/lib/xnet.c:5778
+#: src/lib/xnet.c:5798
 msgid "Bad transport provider name"
 msgstr ""
 
@@ -220,7 +220,7 @@ msgstr ""
 #. TRANS of oustanding connection indications negotiated as zero (that is, a
 #. TRANS non-listening stream).
 #.
-#: src/lib/xnet.c:5784
+#: src/lib/xnet.c:5804
 msgid "Listener queue length limit is zero"
 msgstr ""
 
@@ -230,7 +230,7 @@ msgstr ""
 #. TRANS multiple transport endpoints to be bound to the same address.  The
 #. TRANS address is considered "busy".
 #.
-#: src/lib/xnet.c:5792
+#: src/lib/xnet.c:5812
 msgid "Address already in use"
 msgstr ""
 
@@ -239,7 +239,7 @@ msgstr ""
 #. TRANS endpoint has outstanding transport connection indications that have not
 #. TRANS been satisfied by accepting or refusing the connection indication.
 #.
-#: src/lib/xnet.c:5799
+#: src/lib/xnet.c:5819
 msgid "Outstanding connect indications"
 msgstr ""
 
@@ -250,7 +250,7 @@ msgstr ""
 #. TRANS service provider other than the transport service provider from which
 #. TRANS the connection indication was received.
 #.
-#: src/lib/xnet.c:5808
+#: src/lib/xnet.c:5828
 msgid "Not same transport provider"
 msgstr ""
 
@@ -259,7 +259,7 @@ msgstr ""
 #. TRANS indication on a listening stream for which outstanding connection
 #. TRANS indications exist (qlen > 0).
 #.
-#: src/lib/xnet.c:5815
+#: src/lib/xnet.c:5835
 msgid "Connection acceptor has qlen > 0"
 msgstr ""
 
@@ -269,7 +269,7 @@ msgstr ""
 #. TRANS same transport address as that for which the connection indication was
 #. TRANS provided.
 #.
-#: src/lib/xnet.c:5823
+#: src/lib/xnet.c:5843
 msgid "Connection acceptor bound to different address"
 msgstr ""
 
@@ -280,7 +280,7 @@ msgstr ""
 #. TRANS already has the maximum number of outstanding connection indications
 #. TRANS will receive this error.
 #.
-#: src/lib/xnet.c:5832
+#: src/lib/xnet.c:5852
 msgid "Connection indicator queue is full"
 msgstr ""
 
@@ -290,7 +290,7 @@ msgstr ""
 #. TRANS catch-all error code and thus has the vague C-locale "protocol error"
 #. TRANS description.
 #.
-#: src/lib/xnet.c:5840
+#: src/lib/xnet.c:5860
 msgid "Protocol error"
 msgstr ""
 
@@ -298,7 +298,7 @@ msgstr ""
 #. TRANS not known to the XTI library.  This message is used to describe all
 #. TRANS error codes not known to the XTI library.
 #.
-#: src/lib/xnet.c:5846
+#: src/lib/xnet.c:5866
 msgid "Unknown"
 msgstr ""
 

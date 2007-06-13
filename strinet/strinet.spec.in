@@ -1451,6 +1451,7 @@ fi
 %doc README README-alpha README-cvs README-make README-nexusware THANKS TODO
 %doc %{name}-%{version}.lsm
 %doc doc/manual
+%doc doc/papers
 #doc doc/specs doc/projects doc/drafts
 %{_infodir}/*
 %{manrefs}
@@ -1466,6 +1467,7 @@ fi
 %doc README README-alpha README-cvs README-make README-nexusware THANKS TODO
 %doc %{name}-%{version}.lsm
 %doc doc/manual
+%doc doc/papers
 #doc doc/specs doc/projects doc/drafts
 %{_infodir}/*
 %{manrefs}
@@ -2034,9 +2036,10 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
-# Revision 0.9.2.129  2007/05/19 02:27:29  brian
-# - corrected array subscripting syntax error
-#
+
+* Sat May 19 2007 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.129  2007/05/19 02:27:29  brian
+- corrected array subscripting syntax error
 
 * Sun May  6 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.128  2007/05/06 07:47:31  brian

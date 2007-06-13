@@ -1,3 +1,7 @@
+2007-06-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/papers/Makefile: new style makefile for papers
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release
