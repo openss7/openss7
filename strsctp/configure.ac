@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/26 08:26:23 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/06/13 20:31:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/26 08:26:23 $ by $Author: brian $
+# Last Modified $Date: 2007/06/13 20:31:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([strsctp],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/26 08:26:23 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.27 $) $Date: 2007/06/13 20:31:42 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -188,6 +188,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.27  2007/06/13 20:31:42  brian
+# - added papers to release
+#
 # Revision 0.9.2.26  2007/03/26 08:26:23  brian
 # - need gnu gettext version 0.16.1 for autoconf 2.61
 #
