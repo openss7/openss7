@@ -1,3 +1,7 @@
+2007-06-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* po/de.po: updates
+
 2007-05-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* strxnet/src/lib/xnet.c:

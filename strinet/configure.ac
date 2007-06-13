@@ -181,6 +181,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
 		 doc/manual/texi/args.texi
+		 doc/papers/Makefile
 		 src/drivers/lis.conf])
 
 AC_OUTPUT

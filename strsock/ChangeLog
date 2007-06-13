@@ -1,3 +1,7 @@
+2007-06-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/papers/Makefile: update to new style makefile
+
 2007-05-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/papers/sockimp.tex: spelling

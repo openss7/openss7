@@ -1,3 +1,17 @@
+2007-06-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+
+	* configure.ac: added papers to release
+	* debian/rules.in: added papers to release
+	* doc/Makefile.am: added papers to release
+	* doc/papers/Makefile: added papers to release
+	* strinet.spec.in: added papers to release
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

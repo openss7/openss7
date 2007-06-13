@@ -129,9 +129,9 @@ NAME = piperesults
 
 MY_PHONY += all all-dat
 
-all: all-dat $(NAME).bbl $(NAME).pdf
+all: $(NAME).bbl $(NAME).pdf
 
-$(PLOTFIGS): %.fig: %.plot
+$(PLOTFIGS): %.fig: %.plot all-dat
 	gnuplot $<
 
 $(EPSFIGS): %.eps: %.fig

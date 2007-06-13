@@ -218,7 +218,7 @@ clean-dat:
 		fi ; \
 	done
 
-$(NAME).aux: $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
+$(NAME).aux: all-dat $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
 	latex $(NAME).tex
 	latex $(NAME).tex
 

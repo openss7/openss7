@@ -139,7 +139,7 @@ $(PREFIX)_smp_comp.fig $(PREFIX)_smp_delay.fig $(PREFIX)_smp_perf.fig $(PREFIX)_
 $(PREFIX)_suse_comp.fig $(PREFIX)_suse_delay.fig $(PREFIX)_suse_perf.fig $(PREFIX)_suse_thrput.fig: $(PREFIX)_suse.dat
 $(PREFIX)_ubuntu_comp.fig $(PREFIX)_ubuntu_delay.fig $(PREFIX)_ubuntu_perf.fig $(PREFIX)_ubuntu_thrput.fig: $(PREFIX)_ubuntu.dat
 
-$(NAME).aux: $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
+$(NAME).aux: all-dat $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
 	latex $(NAME).tex
 	latex $(NAME).tex
 

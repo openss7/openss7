@@ -178,7 +178,7 @@ pdf: $(PDFFIGS) $(PLOTS:.plot=.pdf)
 #$(PREFIX)_ubuntu_comp.fig $(PREFIX)_ubuntu_delay.fig $(PREFIX)_ubuntu_perf.fig $(PREFIX)_ubuntu_thrput.fig: $(PREFIX)_ubuntu.dat
 #$(PREFIX)_u704_comp.fig $(PREFIX)_u704_delay.fig $(PREFIX)_u704_perf.fig $(PREFIX)_u704_thrput.fig: $(PREFIX)_u704.dat
 
-$(NAME).aux: $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
+$(NAME).aux: all-dat $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
 	latex $(NAME).tex
 	latex $(NAME).tex
 
