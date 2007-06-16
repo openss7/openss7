@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/24 01:06:40 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/06/16 22:35:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/24 01:06:40 $ by $Author: brian $
+# Last Modified $Date: 2007/06/16 22:35:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,7 +81,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/24 01:06:40 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/06/16 22:35:34 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -247,8 +247,7 @@ All Rights Reserved.
 --------------------------------------------------------------------------------
 This program is free software; you can  redistribute  it and/or modify  it under
 the terms  of the GNU General Public License  as  published by the Free Software
-Foundation; either  version  2  of  the  License, or (at  your option) any later
-version.
+Foundation; version 2 of the License.
 
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A

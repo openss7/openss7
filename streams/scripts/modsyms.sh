@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 10:39:13 $
+# @(#) $RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/06/16 22:35:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/11/03 10:39:13 $ by $Author: brian $
+# Last Modified $Date: 2007/06/16 22:35:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,7 +77,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/11/03 10:39:13 $'
+ident='$RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/06/16 22:35:35 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -211,8 +211,7 @@ All Rights Reserved.
 --------------------------------------------------------------------------------
 This program is free software; you can  redistribute  it and/or modify  it under
 the terms  of the GNU General Public License  as  published by the Free Software
-Foundation; either  version  2  of  the  License, or (at  your option) any later
-version.
+Foundation; version 2 of the License.
 
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A
