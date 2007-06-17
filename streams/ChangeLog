@@ -1,3 +1,12 @@
+2007-06-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+	* doc/papers/piperesults.tex: updates for release
+
 2007-06-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/papers/Makefile: updates for release
