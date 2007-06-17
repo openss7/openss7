@@ -1,3 +1,35 @@
+2007-06-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/papers/Makefile: updates for release
+	* doc/papers/Makefile.am: updates for release
+	* doc/papers/testresults.tex: updates for release
+
+	* configure.nexusware: remove any later language
+	* debian/mscript_postinst.in: remove any later language
+	* debian/mscript_postrm.in: remove any later language
+	* debian/mscript_preinst.in: remove any later language
+	* debian/mscript_prerm.in: remove any later language
+	* debian/strinet-doc.preinst.in: remove any later language
+	* debian/strinet-doc.prerm.in: remove any later language
+	* debian/strinet-init.postinst.in: remove any later language
+	* debian/strinet-init.postrm.in: remove any later language
+	* debian/strinet-init.preinst.in: remove any later language
+	* debian/strinet-init.prerm.in: remove any later language
+	* debian/strinet-lib.preinst.in: remove any later language
+	* debian/strinet-source.preinst.in: remove any later language
+	* debian/strinet-util.preinst.in: remove any later language
+	* src/drivers/tl.c: remove any later language
+	* src/include/sys/ticlts.h: remove any later language
+	* src/include/sys/ticots.h: remove any later language
+	* src/include/sys/ticotsord.h: remove any later language
+	* src/include/ticlts.h: remove any later language
+	* src/include/ticots.h: remove any later language
+	* src/include/ticotsord.h: remove any later language
+	* tests/dummy1.m4: remove any later language
+	* tests/dummy2.m4: remove any later language
+	* tests/dummy3.m4: remove any later language
+	* tests/dummy4.m4: remove any later language
+
 2007-06-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

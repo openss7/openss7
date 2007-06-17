@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_output.h,v 0.9.2.3 2006/09/26 00:52:32 brian Exp $
+ @(#) $Id: sctp_output.h,v 0.9.2.4 2007/06/17 01:56:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/26 00:52:32 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:56:20 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sctp_output.h,v $
+ Revision 0.9.2.4  2007/06/17 01:56:20  brian
+ - updates for release, remove any later language
 
  *****************************************************************************/
 
 #ifndef __SCTP_OUTPUT_H__
 #define __SCTP_OUTPUT_H__
 
-#ident "@(#) $RCSfile: sctp_output.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/26 00:52:32 $"
+#ident "@(#) $RCSfile: sctp_output.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 extern void sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp);
 extern void sctp_xmit_msg(uint32_t daddr, mblk_t *mp, sctp_t * sp);

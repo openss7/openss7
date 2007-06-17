@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 10:51:44 $
+ @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/06/17 01:56:37 $
 
  -----------------------------------------------------------------------------
 
@@ -11,8 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 10:51:44 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:56:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 10:51:44 $"
+#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/06/17 01:56:37 $"
 
 static char const ident[] =
-    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/12/18 10:51:44 $";
+    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/06/17 01:56:37 $";
 
 #include <stropts.h>
 #include <stdlib.h>

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: sctpi.h,v 0.9.2.3 2005/07/18 12:53:09 brian Exp $
+ @(#) $Id: sctpi.h,v 0.9.2.4 2007/06/17 01:57:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 12:53:09 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:57:13 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sctpi.h,v $
+ Revision 0.9.2.4  2007/06/17 01:57:13  brian
+ - updates for release, remove any later language
 
  *****************************************************************************/
 
 #ifndef __SCTPI_H__
 #define __SCTPI_H__
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctpi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  *  This is a STREAMS-based definition of the SCTP (Stream Control

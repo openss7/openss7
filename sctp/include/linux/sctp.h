@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) sctp.h,v 1.1.6.2 2004/01/26 12:58:54 brian Exp
+ @(#) $Id: sctp.h,v 0.9.2.7 2007/06/17 01:55:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified 2004/01/26 12:58:54 by brian
+ Last Modified $Date: 2007/06/17 01:55:25 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sctp.h,v $
+ Revision 0.9.2.7  2007/06/17 01:55:25  brian
+ - updates for release, remove any later language
 
  *****************************************************************************/
 
 #ifndef __OS7_LINUX_LINUX_SCTP_H__
 #define __OS7_LINUX_LINUX_SCTP_H__
 
-#ident "@(#) sctp.h,v LINUX-2-4-20-SCTP(1.1.6.2) 2004/01/26 12:58:54"
+#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #include <linux/types.h>
 #include <asm/byteorder.h>

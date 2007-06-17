@@ -1,3 +1,24 @@
+2007-06-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.nexusware: remove any later language
+	* debian/mscript_postinst.in: remove any later language
+	* debian/mscript_postrm.in: remove any later language
+	* debian/mscript_preinst.in: remove any later language
+	* debian/mscript_prerm.in: remove any later language
+	* debian/strnsl-doc.preinst.in: remove any later language
+	* debian/strnsl-doc.prerm.in: remove any later language
+	* debian/strnsl-init.postinst.in: remove any later language
+	* debian/strnsl-init.postrm.in: remove any later language
+	* debian/strnsl-init.preinst.in: remove any later language
+	* debian/strnsl-init.prerm.in: remove any later language
+	* debian/strnsl-lib.preinst.in: remove any later language
+	* debian/strnsl-source.preinst.in: remove any later language
+	* debian/strnsl-util.preinst.in: remove any later language
+	* tests/dummy1.m4: remove any later language
+	* tests/dummy2.m4: remove any later language
+	* tests/dummy3.m4: remove any later language
+	* tests/dummy4.m4: remove any later language
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

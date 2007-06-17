@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/06/13 20:18:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 01:57:09 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/06/13 20:18:52 $ by $Author: brian $
+## Last Modified $Date: 2007/06/17 01:57:09 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.2  2007/06/17 01:57:09  brian
+## - updates for release, remove any later language
+##
 ## Revision 0.9.2.1  2007/06/13 20:18:52  brian
 ## - added papers to release
 ##
@@ -135,7 +138,8 @@ MY_PHONY += all all-dat
 
 all: $(NAME).bbl $(NAME).pdf
 
-$(PLOTFIGS): %.fig: %.plot all-dat
+$(PLOTFIGS): %.fig: %.plot
+	@make all-dat
 	gnuplot $<
 
 $(EPSFIGS): %.eps: %.fig

@@ -1,6 +1,6 @@
 //  ==========================================================================
 //
-//  @(#) $RCSfile: sua_data.hh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:31:12 $
+//  @(#) $RCSfile: sua_data.hh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 01:56:31 $
 //
 //  --------------------------------------------------------------------------
 //
@@ -11,8 +11,7 @@
 //
 //  This program is free software; you can redistribute it and/or modify it
 //  under the terms of the GNU General Public License as published by the Free
-//  Software Foundation; either version 2 of the License, or (at your option)
-//  any later version.
+//  Software Foundation; version 2 of the License.
 //
 //  This program is distributed in the hope that it will be useful, but
 //  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
@@ -47,14 +46,14 @@
 //
 //  --------------------------------------------------------------------------
 //
-//  Last Modified $Date: 2005/05/14 08:31:12 $ by $Author: brian $
+//  Last Modified $Date: 2007/06/17 01:56:31 $ by $Author: brian $
 //
 //  ==========================================================================
 
 #ifndef __SUA_DATA_HH__
 #define __SUA_DATA_HH__
 
-#ident "@(#) $RCSfile: sua_data.hh,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:31:12 $"
+#ident "@(#) $RCSfile: sua_data.hh,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 01:56:31 $"
 
 #include "../ua/ua_data.hh"
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlogd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 10:56:35 $
+ @(#) $RCSfile: strlogd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/06/17 01:57:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 10:56:35 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:57:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlogd.c,v $
+ Revision 0.9.2.4  2007/06/17 01:57:19  brian
+ - updates for release, remove any later language
+
  Revision 0.9.2.3  2006/12/18 10:56:35  brian
  - updated headers for release
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlogd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 10:56:35 $"
+#ident "@(#) $RCSfile: strlogd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/06/17 01:57:19 $"
 
-static char const ident[] = "$RCSfile: strlogd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 10:56:35 $";
+static char const ident[] = "$RCSfile: strlogd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/06/17 01:57:19 $";
 
 /*
  *  SVR 4.2 Daemon: strlogd - (Daemon) Receives console log messages from the
@@ -668,8 +671,7 @@ All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; either  version  2  of  the  License, or (at  your option) any later\n\
-version.\n\
+Foundation; version 2 of the License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\

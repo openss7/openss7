@@ -1,3 +1,32 @@
+2007-06-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.nexusware: remove any later language
+	* debian/mscript_postinst.in: remove any later language
+	* debian/mscript_postrm.in: remove any later language
+	* debian/mscript_preinst.in: remove any later language
+	* debian/mscript_prerm.in: remove any later language
+	* debian/strxns-doc.preinst.in: remove any later language
+	* debian/strxns-doc.prerm.in: remove any later language
+	* debian/strxns-init.postinst.in: remove any later language
+	* debian/strxns-init.postrm.in: remove any later language
+	* debian/strxns-init.preinst.in: remove any later language
+	* debian/strxns-init.prerm.in: remove any later language
+	* debian/strxns-lib.preinst.in: remove any later language
+	* debian/strxns-source.preinst.in: remove any later language
+	* debian/strxns-util.preinst.in: remove any later language
+	* src/drivers/debug.h: remove any later language
+	* src/drivers/dlp.c: remove any later language
+	* src/drivers/ip.c: remove any later language
+	* src/drivers/ip_to_dlpi.c: remove any later language
+	* src/drivers/lis.conf: remove any later language
+	* src/modules/debug.h: remove any later language
+	* src/modules/ip_strm_mod.h: remove any later language
+	* src/modules/lis.conf: remove any later language
+	* tests/dummy1.m4: remove any later language
+	* tests/dummy2.m4: remove any later language
+	* tests/dummy3.m4: remove any later language
+	* tests/dummy4.m4: remove any later language
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

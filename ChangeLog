@@ -1,3 +1,14 @@
+2007-06-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/modpost.sh: remove any later language
+	* scripts/modsyms.sh: remove any later language
+	* configure.nexusware: remove any later language
+	* debian/mscript_postinst.in: remove any later language
+	* debian/mscript_postrm.in: remove any later language
+	* debian/mscript_preinst.in: remove any later language
+	* debian/mscript_prerm.in: remove any later language
+	* doc/Makefile.am: remove any later language
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.norm: added strisdn, stacks and sigtran to test configuration

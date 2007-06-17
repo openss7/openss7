@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9.2.10 2005/07/18 11:56:32 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.11 2007/06/17 01:55:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/18 11:56:32 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:55:27 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sctp.h,v $
+ Revision 0.9.2.11  2007/06/17 01:55:27  brian
+ - updates for release, remove any later language
 
  *****************************************************************************/
 
 #ifndef _NETINET_SCTP_H
 #define _NETINET_SCTP_H 1
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 1997-2002 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #include <features.h>

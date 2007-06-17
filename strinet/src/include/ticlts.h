@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: ticlts.h,v 0.9.2.2 2005/05/14 08:28:52 brian Exp $
+ @(#) $Id: ticlts.h,v 0.9.2.3 2007/06/17 01:56:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:28:52 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:56:58 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: ticlts.h,v $
+ Revision 0.9.2.3  2007/06/17 01:56:58  brian
+ - updates for release, remove any later language
 
  *****************************************************************************/
 
 #ifndef _TICLTS_H
 #define _TICLTS_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 1997-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ticlts.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */

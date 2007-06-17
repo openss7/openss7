@@ -1,3 +1,30 @@
+2007-06-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.nexusware: remove any later language
+	* debian/mscript_postinst.in: remove any later language
+	* debian/mscript_postrm.in: remove any later language
+	* debian/mscript_preinst.in: remove any later language
+	* debian/mscript_prerm.in: remove any later language
+	* debian/strutil-core.postinst.in: remove any later language
+	* debian/strutil-doc.preinst.in: remove any later language
+	* debian/strutil-doc.prerm.in: remove any later language
+	* debian/strutil-init.postinst.in: remove any later language
+	* debian/strutil-init.postrm.in: remove any later language
+	* debian/strutil-init.preinst.in: remove any later language
+	* debian/strutil-init.prerm.in: remove any later language
+	* debian/strutil-lib.preinst.in: remove any later language
+	* debian/strutil-source.preinst.in: remove any later language
+	* debian/strutil-util.preinst.in: remove any later language
+	* src/util/strclean: remove any later language
+	* src/util/strload.conf: remove any later language
+	* src/util/strlogd.c: remove any later language
+	* src/util/strsetup: remove any later language
+	* src/util/strsetup.conf: remove any later language
+	* tests/dummy1.m4: remove any later language
+	* tests/dummy2.m4: remove any later language
+	* tests/dummy3.m4: remove any later language
+	* tests/dummy4.m4: remove any later language
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/strutil-core.preinst.in: corrected array subscript syntax error

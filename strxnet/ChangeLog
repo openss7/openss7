@@ -1,3 +1,25 @@
+2007-06-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.nexusware: remove any later language
+	* debian/mscript_postinst.in: remove any later language
+	* debian/mscript_postrm.in: remove any later language
+	* debian/mscript_preinst.in: remove any later language
+	* debian/mscript_prerm.in: remove any later language
+	* debian/strxnet-doc.preinst.in: remove any later language
+	* debian/strxnet-doc.prerm.in: remove any later language
+	* debian/strxnet-init.postinst.in: remove any later language
+	* debian/strxnet-init.postrm.in: remove any later language
+	* debian/strxnet-init.preinst.in: remove any later language
+	* debian/strxnet-init.prerm.in: remove any later language
+	* debian/strxnet-lib.preinst.in: remove any later language
+	* debian/strxnet-source.preinst.in: remove any later language
+	* debian/strxnet-util.preinst.in: remove any later language
+	* src/modules/lis.conf: remove any later language
+	* tests/dummy1.m4: remove any later language
+	* tests/dummy2.m4: remove any later language
+	* tests/dummy3.m4: remove any later language
+	* tests/dummy4.m4: remove any later language
+
 2007-06-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* po/de.po: updates

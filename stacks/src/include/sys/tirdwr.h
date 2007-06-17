@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: tirdwr.h,v 0.9.2.3 2006/09/18 13:52:37 brian Exp $
+ @(#) $Id: tirdwr.h,v 0.9.2.4 2007/06/17 01:56:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:56:06 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tirdwr.h,v $
+ Revision 0.9.2.4  2007/06/17 01:56:06  brian
+ - updates for release, remove any later language
 
  *****************************************************************************/
 
 #ifndef _SYS_TIRDWR_H
 #define _SYS_TIRDWR_H
 
-#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/18 13:52:37 $"
+#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

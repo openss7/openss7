@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:30:50 $
+ @(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/06/17 01:56:09 $
 
  -----------------------------------------------------------------------------
 
@@ -11,8 +11,8 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,13 +46,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:30:50 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:56:09 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:30:50 $"
+#ident "@(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/06/17 01:56:09 $"
 
-static char const ident[] = "$RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/05/14 08:30:50 $";
+static char const ident[] = "$RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/06/17 01:56:09 $";
 
 /*
  *  This is an implementation of the Signalling Data Link for the SeaLevel

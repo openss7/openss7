@@ -1,3 +1,22 @@
+2007-06-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/capi.h: remove any later language
+	* src/include/sys/capi_ioctl.h: remove any later language
+	* src/include/sys/cci.h: remove any later language
+	* src/include/sys/dlpi_gr303.h: remove any later language
+	* src/include/sys/dlpi_isdn.h: remove any later language
+	* src/include/sys/dlpi_lapd.h: remove any later language
+	* src/include/sys/dlpi_v52.h: remove any later language
+	* src/include/sys/dua_ioctl.h: remove any later language
+	* src/include/sys/gr303_ioctl.h: remove any later language
+	* src/include/sys/isdni.h: remove any later language
+	* src/include/sys/isdni_ioctl.h: remove any later language
+	* src/include/sys/lapd_ioctl.h: remove any later language
+	* src/include/sys/lapf_ioctl.h: remove any later language
+	* src/include/sys/ph.h: remove any later language
+	* src/include/sys/q920.h: remove any later language
+	* src/include/sys/v52_ioctl.h: remove any later language
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

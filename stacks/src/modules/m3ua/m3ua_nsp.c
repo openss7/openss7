@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_nsp.c,v 0.9.2.1 2004/08/21 10:14:44 brian Exp $
+ @(#) $Id: m3ua_nsp.c,v 0.9.2.2 2007/06/17 01:56:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -10,8 +10,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -24,9 +23,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2004/08/21 10:14:44 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:56:18 $ by $Author: brian $
 
  $Log: m3ua_nsp.c,v $
+ Revision 0.9.2.2  2007/06/17 01:56:18  brian
+ - updates for release, remove any later language
+
  Revision 0.9.2.1  2004/08/21 10:14:44  brian
  - Force checkin on branch.
 
@@ -44,7 +46,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.1 $) $Date: 2004/08/21 10:14:44 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 01:56:18 $";
 
 /*
  *  =========================================================================

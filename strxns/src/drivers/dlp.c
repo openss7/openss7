@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:46 $
+ @(#) $RCSfile: dlp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/06/17 01:57:36 $
 
  -----------------------------------------------------------------------------
 
@@ -11,8 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:02:46 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:57:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlp.c,v $
+ Revision 0.9.2.4  2007/06/17 01:57:36  brian
+ - updates for release, remove any later language
+
  Revision 0.9.2.3  2007/03/25 19:02:46  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -62,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dlp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:46 $"
+#ident "@(#) $RCSfile: dlp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/06/17 01:57:36 $"
 
-static char const ident[] = "$RCSfile: dlp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:46 $";
+static char const ident[] = "$RCSfile: dlp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/06/17 01:57:36 $";
 
 /*
  *  This module is a master device driver for Data Link Provider Streams presenting a Data Link
