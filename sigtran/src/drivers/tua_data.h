@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: tua_data.h,v 0.9.2.2 2007/06/17 02:00:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/06/17 02:00:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: tua_data.h,v $
+ Revision 0.9.2.2  2007/06/17 02:00:51  brian
+ - updates for release, remove any later language
+
  *****************************************************************************/
 
 #ifndef __TUA_DATA_H__
 #define __TUA_DATA_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tua_data.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #include "../ua/ua_data.h"
 /*

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 05:59:16 $
+ @(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 02:00:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 05:59:16 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 05:59:16 $"
+#ident "@(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 02:00:50 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 05:59:16 $";
+    "$RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 02:00:50 $";
 
 #define __NO_VERSION__
 

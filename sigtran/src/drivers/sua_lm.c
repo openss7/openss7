@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sua_lm.c,v 0.9.2.1 2006/10/17 11:55:42 brian Exp $
+ @(#) $Id: sua_lm.c,v 0.9.2.2 2007/06/17 02:00:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -23,9 +23,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/17 11:55:42 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
 
  $Log: sua_lm.c,v $
+ Revision 0.9.2.2  2007/06/17 02:00:50  brian
+ - updates for release, remove any later language
+
  Revision 0.9.2.1  2006/10/17 11:55:42  brian
  - copied files into new packages from strss7 package
 
@@ -46,4 +49,4 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:42 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $";

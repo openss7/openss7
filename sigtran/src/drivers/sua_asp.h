@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: sua_asp.h,v 0.9.2.2 2007/06/17 02:00:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sua_asp.h,v $
+ Revision 0.9.2.2  2007/06/17 02:00:50  brian
+ - updates for release, remove any later language
+
  *****************************************************************************/
 
 #ifndef __SUA_ASP_H__
 #define __SUA_ASP_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sua_asp.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #include "../ua/ua_asp.h"	/* UA --> UA Common Messages */
 #include "sua_msg.h"		/* SUA specific messages */

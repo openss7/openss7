@@ -1,6 +1,6 @@
 //  ==========================================================================
 //
-//  @(#) $RCSfile: sua_data.cpp,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:42 $
+//  @(#) $RCSfile: sua_data.cpp,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $
 //
 //  --------------------------------------------------------------------------
 //
@@ -46,13 +46,13 @@
 //
 //  --------------------------------------------------------------------------
 //
-//  Last Modified $Date: 2006/10/17 11:55:42 $ by $Author: brian $
+//  Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
 //
 //  ==========================================================================
 
-#ident "@(#) $RCSfile: sua_data.cpp,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:42 $"
+#ident "@(#) $RCSfile: sua_data.cpp,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $"
 
-static char const ident[] = "$RCSfile: sua_data.cpp,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:42 $";
+static char const ident[] = "$RCSfile: sua_data.cpp,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $";
 
 #pragma implementation
 #include "sua_data.hh"

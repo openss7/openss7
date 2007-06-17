@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2uaasd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:58:43 $
+ @(#) $RCSfile: m2uaasd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:55 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/15 11:58:43 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 02:00:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2uaasd.c,v $
+ Revision 0.9.2.2  2007/06/17 02:00:55  brian
+ - updates for release, remove any later language
+
  Revision 0.9.2.1  2007/01/15 11:58:43  brian
  - added new m2ua-as mux files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2uaasd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:58:43 $"
+#ident "@(#) $RCSfile: m2uaasd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:55 $"
 
-static char const ident[] = "$RCSfile: m2uaasd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:58:43 $";
+static char const ident[] = "$RCSfile: m2uaasd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:55 $";
 
 /*
  *  This is a configuration daemon for the M2UA-AS multiplexing driver.  Its purpose is to open a

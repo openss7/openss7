@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_sg.c,v 0.9.2.5 2007/03/25 18:58:44 brian Exp $
+ @(#) $Id: m3ua_sg.c,v 0.9.2.6 2007/06/17 02:00:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -21,11 +21,14 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2007/03/25 18:58:44 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_sg.c,v $
+ Revision 0.9.2.6  2007/06/17 02:00:50  brian
+ - updates for release, remove any later language
+
  Revision 0.9.2.5  2007/03/25 18:58:44  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -88,7 +91,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:58:44 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.6 $) $Date: 2007/06/17 02:00:50 $";
 
 #include <sys/os7/compat.h>
 

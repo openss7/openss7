@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: m3ua_lm.h,v 0.9.2.2 2007/06/17 02:00:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_lm.h,v $
+ Revision 0.9.2.2  2007/06/17 02:00:50  brian
+ - updates for release, remove any later language
+
  Revision 0.9.2.1  2006/10/17 11:55:42  brian
  - copied files into new packages from strss7 package
 
@@ -73,7 +76,7 @@
 #ifndef __M3UA_LM_H__
 #define __M3UA_LM_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: m3ua_lm.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  *  =========================================================================
