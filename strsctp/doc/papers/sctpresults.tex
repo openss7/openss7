@@ -1,7 +1,7 @@
 %% -*- tex -*- vim: ft=tex tw=78 nocin nosi
 %% =========================================================================
 %%
-%% @(#) $Id: sctpresults.tex,v 0.9.2.2 2007/06/17 01:57:09 brian Exp $
+%% @(#) $Id: sctpresults.tex,v 0.9.2.3 2007/06/17 10:38:10 brian Exp $
 %%
 %% =========================================================================
 %%
@@ -53,7 +53,7 @@
 %% 
 %% =========================================================================
 %%
-%% Last Modified $Date: 2007/06/17 01:57:09 $ by $Author: brian $
+%% Last Modified $Date: 2007/06/17 10:38:10 $ by $Author: brian $
 %%
 %% =========================================================================
 
@@ -163,15 +163,15 @@
 	{\large \textsl{Experimental Test Results for Linux}}}
 \author{Brian F. G. Bidulock\thanks{bidulock@openss7.org}\\
 	OpenSS7 Corporation}
-\date{May 1, 2007}
+\date{June 16, 2007}
 \maketitle
 
 \begin{abstract}
 \addcontentsline{toc}{section}{Abstract}
 With the objective of contrasting performance between STREAMS and legacy approaches to system
-facilities, a comparison is made between the tested performance of the \textsl{Linux Native Sockets}
-TCP implementation and STREAMS XTI SCTP and XTIoS TCP implementations using the \textsl{Linux
-Fast-STREAMS} package \cite[]{LfS}.
+facilities, a comparison is made between the tested performance of the \textsl{Linux Native Sockets} TCP
+implementation and STREAMS TPI SCTP and XTIoS TCP
+implementations using the \textsl{Linux Fast-STREAMS} package \cite[]{LfS}.
 \end{abstract}
 
 %\tableofcontents
@@ -189,7 +189,7 @@ time: Wollongong and Mentat.
 
 STREAMS is a facility first presented in a paper by Dennis M. Ritchie in 1984 \cite[]{Ritchie84},
 originally implemented on 4.1BSD and later part of \textsl{Bell Laboratories Eighth Edition UNIX},
-incorporated into \textsl{UNIX System V Release 3} and enhanced in \textsl{UNIX Sysvem V Release 4}
+incorporated into \textsl{UNIX System V Release 3} and enhanced in \textsl{UNIX System V Release 4}
 and further in \textsl{UNIX System V Release 4.2}.  STREAMS was used in SVR4 for terminal
 input-output, pseudo-terminals, pipes, named pipes (FIFOs), interprocess communication and
 networking.  STREAMS was used in SVR3 for networking (with the NSU package).  Since its release in
@@ -209,7 +209,7 @@ On \textsl{UNIX System V Release 4.2}, STREAMS was used for terminal input-outpu
 (named pipes), and network communications.  Modern UNIX, UNIX-like and UNIX-based systems providing
 STREAMS normally support some degree of network communications using STREAMS; however, many do not
 support STREAMS-based pipe and FIFOs\footnote{For example, AIX.} or terminal
-input-output.\footnote{For example, HP-UX.}
+input-output\footnote{For example, HP-UX.} directly or without reconfiguration.
 
 \textsl{UNIX System V Release 4.2} supported four Application Programmer Interfaces (APIs) for
 accessing the network communications facilities of the kernel:
@@ -427,13 +427,15 @@ Three implementations are tested:
 
 The native Linux socket and networking system.
 
-\item {\it OpenSS7 STREAMS XTIoS TCP ({\tt tcp}).}
+\item {\it OpenSS7 STREAMS XTIoS {\tt inet} Driver.}
+
+A STREAMS pseudo-device driver that communicates with a socket internal to the kernel.
 
 The OpenSS7 implementation of STREAMS XTI over Sockets implementation of TCP.  While the
 implementation uses the Transport Provider Interface and STREAMS to communicate with the driver,
 internal to the driver a TCP Socket is opened and conversion between STREAMS and Sockets performed.
 
-\item {\it OpenSS7 STREAMS XTI SCTP Driver ({\tt sctp}).}
+\item {\it OpenSS7 STREAMS TPI SCTP Driver ({\tt sctp}).}
 
 A STREAMS pseudo-device driver that fully implements SCTP and communicates with the IP layer in the
 kernel.  Both the OpenSS7 native sockets version and the STREAMS version are based on the same
@@ -464,8 +466,8 @@ have well defined, general purpose interfaces applicable to a wider range of net
 \label{figure:sockets}
 \end{figure}
 
-Both Linux TCP implementations are a good example of the tight integration between the components
-of the Linux networking stack.
+Both Linux TCP implementations are
+a good example of the tight integration between the components of the Linux networking stack.
 
 \paragraph*{Write side processing.}
 
@@ -717,11 +719,11 @@ the \textit{OpenSS7 Project} \cite[]{netperf}.  While the program is able to tes
 Sockets and XTI STREAMS interfaces, modifications were required to the package to allow it to
 compile for \textsl{Linux Fast-STREAMS}.
 
-The \texttt{netperf} program has many options.  Therefore, a benchmark script (called
-\texttt{netperf\_benchmark}) was used to obtain repeatable raw data for the various machines and
-distributions tested.  This benchmark script is included in the \texttt{netperf} distribution
-available from the \textit{OpenSS7 Project} \cite[]{netperf}.  A listing of this script is provided
-in \textit{Appendix \ref{section:script}}.
+The \texttt{netperf} program has many options.  Therefore, two benchmark scripts (called
+\texttt{netperf\_benchmark} and \texttt{netperf\_nice2}) were used to obtain repeatable raw data for
+the various machines and distributions tested.  This benchmark script is included in the
+\texttt{netperf} distribution available from the \textit{OpenSS7 Project} \cite[]{netperf}.  A
+listing of these scripts are provided in \textit{Appendix \ref{section:script}}.
 
 \subsection[Implementations Tested]{Implementations Tested}
 
@@ -729,19 +731,15 @@ The following implementations were tested:
 
 \paragraph*{TCP Sockets.}
 
-This is the Linux NET4 Sockets implementation of TCP, described in
-\textsl{Section \ref{section:lktcp}},
-with normal scheduling priorities.
-Normal scheduling priority means invoking the sending and receiving processes without altering their
-run-time scheduling priority.
+This is the Linux NET4 Sockets implementation of TCP, described in \textsl{Section
+\ref{section:lktcp}}, with normal scheduling priorities.  Normal scheduling priority means invoking
+the sending and receiving processes without altering their run-time scheduling priority.
 
 \paragraph*{TCP Sockets with artificial process priorities.}
 
-This is the Linux NET4 Sockets implementation of TCP, described in
-\textsl{Section \ref{section:lktcp}},
-with artificial scheduling priorities.
-Artificial scheduling priority means invoking the sending and receiving processes with extreme
-run-timer scheduling priority alterations.
+This is the Linux NET4 Sockets implementation of TCP, described in \textsl{Section
+\ref{section:lktcp}}, with artificial scheduling priorities.  Artificial scheduling priority means
+invoking the sending and receiving processes with extreme run-timer scheduling priority alterations.
 
 Early on in the testing it was discovered that Sockets exhibits remarkably poor performance on UP
 machines when the process priority of the sender and the receiver are the same.  This is largely due
@@ -761,15 +759,14 @@ the loop-back interface.
 
 \paragraph*{STREAMS XTIoS TCP.}
 
-This is the OpenSS7 STREAMS implementation of XTI over Sockets for TCP, described in
-\textsl{Section \ref{section:xtios}}.
-This implementation is tested using normal run-time scheduling priorities.
+This is the OpenSS7 STREAMS implementation of XTI over Sockets for TCP, described in \textsl{Section
+\ref{section:xtios}}.  This implementation is tested using normal run-time scheduling priorities.
 
 \paragraph*{STREAMS TPI SCTP.}
 
 This is the OpenSS7 STREAMS implementation of SCTP using XTI/TPI directly, described in
-\textsl{Section \ref{section:tpisctp}}.
-This implementation is tested using normal run-time scheduling priorities.
+\textsl{Section \ref{section:tpisctp}}.  This implementation is tested using normal run-time
+scheduling priorities.
 
 \subsection[Distributions Tested]{Distributions Tested}
 
@@ -790,6 +787,7 @@ Ubuntu 6.10 & 2.6.17-11-generic\\
 Ubuntu 7.04 & 2.6.20-15-server\\
 Fedora Core 6 & 2.6.20-1.2933.fc6\\
 \end{tabular}\\
+\normalsize
 
 \subsection[Test Machines]{Test Machines}
 
@@ -866,6 +864,7 @@ SuSE 10.0 OSS & 2.6.13-15-default\\
 Ubuntu 6.10 & 2.6.17-11-generic\\
 Ubuntu 7.04 & 2.6.20-15-server\\
 \end{tabular}
+\normalsize
 
 \subsubsection[Fedora Core 6]{Fedora Core 6}
 
@@ -880,14 +879,15 @@ updates.
 \textit{Figure \ref{figure:fc6perf}}
 plots the measured performance of TCP Sockets (both normal and artificial scheduling priorities),
 TCP XTIoS STREAMS and SCTP XTI STREAMS implementations.
-The higher performing TCP Sockets graph (with dashed lines) is the artifical scheduling priority
-plot.  The under performing TCP Sockets graph (with the solid lines) is the normal scheduling plot.
+The higher performing TCP Sockets graph (with dashed lines and designated with `(A)') is the
+artifical scheduling priority plot.  The under performing TCP Sockets graph (with the solid lines
+and designated with `(N)') is the normal scheduling plot.
 
 TCP Sockets with normal scheduling shows dismal performance in comparison to both STREAMS -- TCP
 XTIoS and SCTP XTI -- approaches at all message sizes beneath 4096 bytes.  It is necessary to
-artificially reduce the receiver priority to minimum and artificially increase the sender priority
-to maximum to acheive better results on TCP Sockets beneath 4096 bytes, at the cost of poorer
-performance above 4096 bytes.
+artificially reduce the receiver priority to a minimum (\texttt{nice -n 19}) and artificially
+increase the sender priority to a maximum (\texttt{nice -n -20}) to acheive better results on TCP
+Sockets beneath 4096 bytes, at the cost of poorer performance above 4096 bytes.
 
 The slightly different performance between TCP XTIoS and SCTP XTI can be explained by the
 significant overheads that the SCTP protocol introduces on small message sizes.
@@ -895,8 +895,8 @@ significant overheads that the SCTP protocol introduces on small message sizes.
 \item[Delay.]
 
 \textit{Figure \ref{figure:fc6dly}}
-plots the average delay of TCP Sockets (both normal and artificial), TCP XTIoS STREAMS and SCTP XTI
-STREAMS implementations.
+plots the average message delay of TCP Sockets (both normal and artificial), TCP XTIoS STREAMS and
+SCTP XTI STREAMS implementations.
 
 The average delay of TCP XTIoS STREAMS and SCTP XTI STREAMS approaches is similar and comparable
 with TCP Sockets with artificial scheduling and message sizes beneath 4096.  With normal scheduling,
@@ -908,8 +908,9 @@ however, TCP Sockets has poor per message delays (intercept) but superior per-by
 plots the effective throughput of TCP Sockets, TCP XTIoS STREAMS and SCTP XTI STREAMS
 implementations.
 
-All curves exhibit good power function characteristics beneath 1024 byte  message sizes but exhibit
-saturation characteristics above 1024 bytes.
+All curves exhibit good power function characteristics beneath 1024 byte message sizes, indicating
+structure and robustness for each implementation, but each implementation exhibits saturation
+characteristics above 1024 bytes.
 
 \item[Improvement.]
 
@@ -918,13 +919,17 @@ plots the relative percentage of throughput of TCP Sockets, TCP XTIoS STREAMS an
 implementations.
 
 For the normal case, TCP XTIoS STREAMS and SCTP XTI STREAMS exhibit significant improvements over
-TCP Sockets for message sizes less than 1024 bytes and are comparable  at message sizes greater than
-1024 bytes.  Forcing TCP Sockets into a specific behaviour by artificially maximizing the sender
-priority and minimizing the receive priority results in improved behaviour below 1024 bytes for TCP
-Sockets but is worse than normal scheduling priority TCP Sockets for message sizes of 1024 bytes or
-more.
+TCP Sockets for message sizes less than 4096 bytes and are superior or comparable  at message sizes
+greater than 4096 bytes.  Forcing TCP Sockets into a specific behaviour by artificially maximizing
+the sender priority and minimizing the receive priority results in improved behaviour below 4096
+bytes for TCP Sockets but is worse than normal scheduling priority TCP Sockets for message sizes of
+4096 bytes or more.
 
 \end{description}
+
+The results for Fedora Core 6 on Porky are, for the most part, similar to the results from other
+distributions on the same host and also similar to the results for other distributions on other
+hosts.
 
 \begin{figure}[p]
 \center\includegraphics[width=\columnwidth]{netperf_fc6_perf}
@@ -944,7 +949,7 @@ more.
 \label{figure:fc6thrput}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}[pt]
 \center\includegraphics[width=\columnwidth]{netperf_fc6_comp}
 \caption[Fedora Core 6 on Porky Comparison]{Fedora Core 6 on Porky Comparison}
 \label{figure:fc6comp}
@@ -962,14 +967,15 @@ CentOS 4.0 is a clone of the RedHat Enterprise 4 distribution.  This is the
 \textit{Figure \ref{figure:centosperf}}
 plots the measured performance of TCP Sockets (both normal and artificial scheduling priorities),
 TCP XTIoS STREAMS and SCTP XTI STREAMS implementations.
-The higher performing TCP Sockets graph (with dashed lines) is the artifical scheduling priority
-plot.  The under performing TCP Sockets graph (with the solid lines) is the normal scheduling plot.
+The higher performing TCP Sockets graph (with dashed lines and designated with `(A)') is the
+artifical scheduling priority plot.  The under performing TCP Sockets graph (with the solid lines
+and designated with `(N)') is the normal scheduling plot.
 
 TCP Sockets with normal scheduling shows dismal performance in comparison to both STREAMS -- TCP
 XTIoS and SCTP XTI -- approaches at all message sizes beneath 4096 bytes.  It is necessary to
-artificially reduce the receiver priority to minimum and artificially increase the sender priority
-to maximum to acheive better results on TCP Sockets beneath 4096 bytes, at the cost of poorer
-performance above 4096 bytes.
+artificially reduce the receiver priority to a minimum (\texttt{nice -n 19}) and artificially
+increase the sender priority to a maximum (\texttt{nice -n -20}) to acheive better results on TCP
+Sockets beneath 4096 bytes, at the cost of poorer performance above 4096 bytes.
 
 The slightly different performance between TCP XTIoS and SCTP XTI can be explained by the
 significant overheads that the SCTP protocol introduces on small message sizes.
@@ -977,8 +983,8 @@ significant overheads that the SCTP protocol introduces on small message sizes.
 \item[Delay.]
 
 \textit{Figure \ref{figure:centosdly}}
-plots the average delay of TCP Sockets (both normal and artificial), TCP XTIoS STREAMS and SCTP XTI
-STREAMS implementations.
+plots the average message delay of TCP Sockets (both normal and artificial), TCP XTIoS STREAMS and
+SCTP XTI STREAMS implementations.
 
 The average delay of TCP XTIoS STREAMS and SCTP XTI STREAMS approaches is similar and comparable
 with TCP Sockets with artificial scheduling and message sizes beneath 4096.  With normal scheduling,
@@ -990,8 +996,9 @@ however, TCP Sockets has poor per message delays (intercept) but superior per-by
 plots the effective throughput of TCP Sockets, TCP XTIoS STREAMS and SCTP XTI STREAMS
 implementations.
 
-All curves exhibit good power function characteristics beneath 1024 byte  message sizes but exhibit
-saturation characteristics above 1024 bytes.
+All curves exhibit good power function characteristics beneath 1024 byte message sizes, indicating
+structure and robustness for each implementation, but each implementation exhibits saturation
+characteristics above 1024 bytes.
 
 \item[Improvement.]
 
@@ -1000,13 +1007,17 @@ plots the relative percentage of throughput of TCP Sockets, TCP XTIoS STREAMS an
 implementations.
 
 For the normal case, TCP XTIoS STREAMS and SCTP XTI STREAMS exhibit significant improvements over
-TCP Sockets for message sizes less than 1024 bytes and are comparable  at message sizes greater than
-1024 bytes.  Forcing TCP Sockets into a specific behaviour by artificially maximizing the sender
-priority and minimizing the receive priority results in improved behaviour below 1024 bytes for TCP
-Sockets but is worse than normal scheduling priority TCP Sockets for message sizes of 1024 bytes or
-more.
+TCP Sockets for message sizes less than 4096 bytes and are superior or comparable  at message sizes
+greater than 4096 bytes.  Forcing TCP Sockets into a specific behaviour by artificially maximizing
+the sender priority and minimizing the receive priority results in improved behaviour below 4096
+bytes for TCP Sockets but is worse than normal scheduling priority TCP Sockets for message sizes of
+4096 bytes or more.
 
 \end{description}
+
+The results for CentOS on Porky are, for the most part, similar to the results from other
+distributions on the same host and also similar to the results for other distributions on other
+hosts.
 
 \begin{figure}[p]
 \center\includegraphics[width=\columnwidth]{netperf_centos_perf}
@@ -1026,7 +1037,7 @@ more.
 \label{figure:centosthrput}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}[pt]
 \center\includegraphics[width=\columnwidth]{netperf_centos_comp}
 \caption[CentOS on Porky Comparison]{CentOS on Porky Comparison}
 \label{figure:centoscomp}
@@ -1045,14 +1056,15 @@ releases subsequent to this one: the 10.1 and recent 10.2 releases.  The SuSE 10
 \textit{Figure \ref{figure:suseperf}}
 plots the measured performance of TCP Sockets (both normal and artificial scheduling priorities),
 TCP XTIoS STREAMS and SCTP XTI STREAMS implementations.
-The higher performing TCP Sockets graph (with dashed lines) is the artifical scheduling priority
-plot.  The under performing TCP Sockets graph (with the solid lines) is the normal scheduling plot.
+The higher performing TCP Sockets graph (with dashed lines and designated with `(A)') is the
+artifical scheduling priority plot.  The under performing TCP Sockets graph (with the solid lines
+and designated with `(N)') is the normal scheduling plot.
 
 TCP Sockets with normal scheduling shows dismal performance in comparison to both STREAMS -- TCP
 XTIoS and SCTP XTI -- approaches at all message sizes beneath 4096 bytes.  It is necessary to
-artificially reduce the receiver priority to minimum and artificially increase the sender priority
-to maximum to acheive better results on TCP Sockets beneath 4096 bytes, at the cost of poorer
-performance above 4096 bytes.
+artificially reduce the receiver priority to a minimum (\texttt{nice -n 19}) and artificially
+increase the sender priority to a maximum (\texttt{nice -n -20}) to acheive better results on TCP
+Sockets beneath 4096 bytes, at the cost of poorer performance above 4096 bytes.
 
 The slightly different performance between TCP XTIoS and SCTP XTI can be explained by the
 significant overheads that the SCTP protocol introduces on small message sizes.
@@ -1060,8 +1072,8 @@ significant overheads that the SCTP protocol introduces on small message sizes.
 \item[Delay.]
 
 \textit{Figure \ref{figure:susedly}}
-plots the average delay of TCP Sockets (both normal and artificial), TCP XTIoS STREAMS and SCTP XTI
-STREAMS implementations.
+plots the average message delay of TCP Sockets (both normal and artificial), TCP XTIoS STREAMS and
+SCTP XTI STREAMS implementations.
 
 The average delay of TCP XTIoS STREAMS and SCTP XTI STREAMS approaches is similar and comparable
 with TCP Sockets with artificial scheduling and message sizes beneath 4096.  With normal scheduling,
@@ -1073,8 +1085,9 @@ however, TCP Sockets has poor per message delays (intercept) but superior per-by
 plots the effective throughput of TCP Sockets, TCP XTIoS STREAMS and SCTP XTI STREAMS
 implementations.
 
-All curves exhibit good power function characteristics beneath 1024 byte  message sizes but exhibit
-saturation characteristics above 1024 bytes.
+All curves exhibit good power function characteristics beneath 1024 byte message sizes, indicating
+structure and robustness for each implementation, but each implementation exhibits saturation
+characteristics above 1024 bytes.
 
 \item[Improvement.]
 
@@ -1083,13 +1096,17 @@ plots the relative percentage of throughput of TCP Sockets, TCP XTIoS STREAMS an
 implementations.
 
 For the normal case, TCP XTIoS STREAMS and SCTP XTI STREAMS exhibit significant improvements over
-TCP Sockets for message sizes less than 1024 bytes and are comparable  at message sizes greater than
-1024 bytes.  Forcing TCP Sockets into a specific behaviour by artificially maximizing the sender
-priority and minimizing the receive priority results in improved behaviour below 1024 bytes for TCP
-Sockets but is worse than normal scheduling priority TCP Sockets for message sizes of 1024 bytes or
-more.
+TCP Sockets for message sizes less than 4096 bytes and are superior or comparable  at message sizes
+greater than 4096 bytes.  Forcing TCP Sockets into a specific behaviour by artificially maximizing
+the sender priority and minimizing the receive priority results in improved behaviour below 4096
+bytes for TCP Sockets but is worse than normal scheduling priority TCP Sockets for message sizes of
+4096 bytes or more.
 
 \end{description}
+
+The results for SuSE 10 OSS on Porky are, for the most part, similar to the results from other
+distributions on the same host and also similar to the results for other distributions on other
+hosts.
 
 \begin{figure}[p]
 \center\includegraphics[width=\columnwidth]{netperf_suse_perf}
@@ -1109,16 +1126,16 @@ more.
 \label{figure:susethrput}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}[pt]
 \center\includegraphics[width=\columnwidth]{netperf_suse_comp}
 \caption[SuSE on Porky Comparison]{SuSE on Porky Comparison}
 \label{figure:susecomp}
 \end{figure}
 
 \subsubsection[Ubuntu 7.04]{Ubuntu 7.04}
-Ubuntu 7.04 is the current release of the Ubuntu distribution.  The Ubuntu
-7.04 release sports a 2.6.20 kernel.  The tested distribution had current
-updates applied.
+
+Ubuntu 7.04 is the current release of the Ubuntu distribution.  The Ubuntu 7.04 release sports a
+2.6.20 kernel.  The tested distribution had current updates applied.
 
 \begin{description}
 
@@ -1126,15 +1143,16 @@ updates applied.
 
 \textit{Figure \ref{figure:u704perf}}
 plots the measured performance of TCP Sockets (both normal and artificial scheduling priorities),
-TCP XTIoS STREAMS and SCTP XTI STREAMS implementations.  The higher performing TCP Sockets graph
-(with the dashed lines) is the artificial scheduling priority plot.  The under performing TCP
-Sockets graph (with the solid lines) is the normal scheduling priority plot.
+TCP XTIoS STREAMS and SCTP XTI STREAMS implementations.
+The higher performing TCP Sockets graph (with dashed lines and designated with `(A)') is the
+artifical scheduling priority plot.  The under performing TCP Sockets graph (with the solid lines
+and designated with `(N)') is the normal scheduling plot.
 
 TCP Sockets with normal scheduling shows dismal performance in comparison to both STREAMS -- TCP
-XTIoS and SCTP XTI -- approaches at all message sizes beneath 1024 bytes.  It is necessary to
-artifically reduce the receiver priority to minimum and artifically increase the sender priority to
-maximum to acheive better results on TCP Sockets beneath 4096 bytes, at the cost of poorer
-performance above 4096 bytes.
+XTIoS and SCTP XTI -- approaches at all message sizes beneath 4096 bytes.  It is necessary to
+artificially reduce the receiver priority to a minimum (\texttt{nice -n 19}) and artificially
+increase the sender priority to a maximum (\texttt{nice -n -20}) to acheive better results on TCP
+Sockets beneath 4096 bytes, at the cost of poorer performance above 4096 bytes.
 
 The slightly different performance between TCP XTIoS and SCTP XTI can be explained by the
 significant overheads that the SCTP protocol introduces on small message sizes.
@@ -1142,8 +1160,8 @@ significant overheads that the SCTP protocol introduces on small message sizes.
 \item[Delay.]
 
 \textit{Figure \ref{figure:u704dly}}
-plots the average delay of TCP Sockets (both normal and artificial), TCP XTIoS STREAMS and SCTP XTI
-STREAMS implementations.
+plots the average message delay of TCP Sockets (both normal and artificial), TCP XTIoS STREAMS and
+SCTP XTI STREAMS implementations.
 
 The average delay of TCP XTIoS STREAMS and SCTP XTI STREAMS approaches is similar and comparable
 with TCP Sockets with artificial scheduling and message sizes beneath 4096.  With normal scheduling,
@@ -1155,8 +1173,9 @@ however, TCP Sockets has poor per message delays (intercept) but superior per-by
 plots the effective throughput of TCP Sockets, TCP XTIoS STREAMS and SCTP XTI STREAMS
 implementations.
 
-All curves exhibit good power function characteristics beneath 1024 byte  message sizes but exhibit
-saturation characteristics above 1024 bytes.
+All curves exhibit good power function characteristics beneath 1024 byte message sizes, indicating
+structure and robustness for each implementation, but each implementation exhibits saturation
+characteristics above 1024 bytes.
 
 \item[Improvement.]
 
@@ -1165,13 +1184,17 @@ plots the relative percentage of throughput of TCP Sockets, TCP XTIoS STREAMS an
 implementations.
 
 For the normal case, TCP XTIoS STREAMS and SCTP XTI STREAMS exhibit significant improvements over
-TCP Sockets for message sizes less than 1024 bytes and are comparable  at message sizes greater than
-1024 bytes.  Forcing TCP Sockets into a specific behaviour by artificially maximizing the sender
-priority and minimizing the receive priority results in improved behaviour below 1024 bytes for TCP
-Sockets but is worse than normal scheduling priority TCP Sockets for message sizes of 1024 bytes or
-more.
+TCP Sockets for message sizes less than 4096 bytes and are superior or comparable  at message sizes
+greater than 4096 bytes.  Forcing TCP Sockets into a specific behaviour by artificially maximizing
+the sender priority and minimizing the receive priority results in improved behaviour below 4096
+bytes for TCP Sockets but is worse than normal scheduling priority TCP Sockets for message sizes of
+4096 bytes or more.
 
 \end{description}
+
+The results for Ubuntu 7.04 on Porky are, for the most part, similar to the results from other
+distributions on the same host and also similar to the results for other distributions on other
+hosts.
 
 \begin{figure}[p]
 \center\includegraphics[width=\columnwidth]{netperf_u704_perf}
@@ -1191,7 +1214,7 @@ more.
 \label{figure:u704thrput}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}[pt]
 \center\includegraphics[width=\columnwidth]{netperf_u704_comp}
 \caption[Ubuntu 7.04 on Porky Comparison]{Ubuntu 7.04 on Porky Comparison}
 \label{figure:u704comp}
@@ -1211,6 +1234,7 @@ Distribution & Kernel\\
 \hline
 RedHat 7.2 & 2.4.20-28.7\\
 \end{tabular}\\[1.0ex]
+\normalsize
 
 Pumbah is a control machine and is used to rule out differences between recent 2.6 kernels and one
 of the oldest and most stable 2.4 kernels.
@@ -1228,6 +1252,18 @@ updates applied.
 \textit{Figure \ref{figure:rh7perf}}
 plots the measured performance of TCP Sockets (both normal and artificial scheduling priorities),
 TCP XTIoS STREAMS and SCTP XTI STREAMS implementations.
+The higher performing TCP Sockets graph (with dashed lines and designated with `(A)') is the
+artifical scheduling priority plot.  The under performing TCP Sockets graph (with the solid lines
+and designated with `(N)') is the normal scheduling plot.
+
+TCP Sockets with normal scheduling shows dismal performance in comparison to both STREAMS -- TCP
+XTIoS and SCTP XTI -- approaches at all message sizes beneath 4096 bytes.  It is necessary to
+artificially reduce the receiver priority to a minimum (\texttt{nice -n 19}) and artificially
+increase the sender priority to a maximum (\texttt{nice -n -20}) to acheive better results on TCP
+Sockets beneath 4096 bytes, at the cost of poorer performance above 4096 bytes.
+
+The slightly different performance between TCP XTIoS and SCTP XTI can be explained by the
+significant overheads that the SCTP protocol introduces on small message sizes.
 
 STREAMS demonstrates significant improvements at mssage sizes of less than 1024 bytes, and
 comparable performace at larger message sizes.
@@ -1240,8 +1276,12 @@ priority than the sending process, TCP Sockets performed much better.
 \item[Delay.]
 
 \textit{Figure \ref{figure:rh7dly}}
-plots the average delay of TCP Sockets (both normal and artificial), TCP XTIoS STREAMS and SCTP XTI
-STREAMS implementations.
+plots the average message delay of TCP Sockets (both normal and artificial), TCP XTIoS STREAMS and
+SCTP XTI STREAMS implementations.
+
+The average delay of TCP XTIoS STREAMS and SCTP XTI STREAMS approaches is similar and comparable
+with TCP Sockets with artificial scheduling and message sizes beneath 4096.  With normal scheduling,
+however, TCP Sockets has poor per message delays (intercept) but superior per-byte delays (slope).
 
 STREAMS demonstrates significant improvements at message sizes of less than 1024 bytes, and
 comparable performance at larger message sizes.
@@ -1257,6 +1297,10 @@ handling performance.
 \textit{Figure \ref{figure:rh7thrput}}
 plots the effective throughput of TCP Sockets, TCP XTIoS STREAMS and SCTP XTI STREAMS
 implementations.
+
+All curves exhibit good power function characteristics beneath 1024 byte message sizes, indicating
+structure and robustness for each implementation, but each implementation exhibits saturation
+characteristics above 1024 bytes.
 
 STREAMS demonstrates significant improvements at most message sizes.
 
@@ -1278,6 +1322,13 @@ scheduling.
 \textit{Figure \ref{figure:rh7comp}}
 plots the relative percentage of throughput of TCP Sockets, TCP XTIoS STREAMS and SCTP XTI STREAMS
 implementations.
+
+For the normal case, TCP XTIoS STREAMS and SCTP XTI STREAMS exhibit significant improvements over
+TCP Sockets for message sizes less than 4096 bytes and are superior or comparable  at message sizes
+greater than 4096 bytes.  Forcing TCP Sockets into a specific behaviour by artificially maximizing
+the sender priority and minimizing the receive priority results in improved behaviour below 4096
+bytes for TCP Sockets but is worse than normal scheduling priority TCP Sockets for message sizes of
+4096 bytes or more.
 
 STREAMS demonstrates significant improvements (approx. 150-180\% improvement) at message sizes below
 1024 bytes.  That STREAMS SCTP and TCP give such an improvement over a wide range of message sizes
@@ -1305,7 +1356,7 @@ Sockets' poor scheduling and flow control characteristics.
 \label{figure:rh7thrput}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}[pt]
 \center\includegraphics[width=\columnwidth]{netperf_rh7_comp}
 \caption[RedHat 7.2 on Pumbah Comparison]{RedHat 7.2 on Pumbah Comparison}
 \label{figure:rh7comp}
@@ -1324,15 +1375,18 @@ Distribution & Kernel\\
 Fedora Core 6 & 2.6.20-1.2933.fc6\\
 CentOS 5.0 & 2.6.18-8.1.3.el5\\
 \end{tabular}\\[1.0ex]
+\normalsize
 
-This machine is used as an SMP control machine.  Most of the test were performed on uniprocessor
+This machine is used as an SMP control machine.  Most of the tests were performed on uniprocessor
 non-hyper-threaded machines.  This machine is hyper-threaded and runs full SMP kernels.  This
 machine also supports EMT64 and runs \texttt{x86\_64} kernels.  It is used to rule out both SMP
 differences as well as 64-bit architecture differences.
 
-\subsubsection[Fedora Core 6 (x86\_64)]{Fedora Core 6 (x86\_64)} Fedora Core 6 is the most recent
-full release Fedora distribution.  This distribution sports a 2.6.20-1.2933.fc6 kernel with the
-latest patches.  This is the \texttt{x86\_64} distribution with recent updates.
+\subsubsection[Fedora Core 6 (x86\_64)]{Fedora Core 6 (x86\_64)}
+
+Fedora Core 6 is the most recent full release Fedora distribution.  This distribution sports a
+2.6.20-1.2933.fc6 kernel with the latest patches.  This is the \texttt{x86\_64} distribution with
+recent updates.
 
 \begin{description}
 
@@ -1341,14 +1395,15 @@ latest patches.  This is the \texttt{x86\_64} distribution with recent updates.
 \textit{Figure \ref{figure:smpperf}}
 plots the measured performance of TCP Sockets (both normal and artificial scheduling priorities),
 TCP XTIoS STREAMS and SCTP XTI STREAMS implementations.
-The higher performing TCP Sockets graph (with dashed lines) is the artifical scheduling priority
-plot.  The under performing TCP Sockets graph (with the solid lines) is the normal scheduling plot.
+The higher performing TCP Sockets graph (with dashed lines and designated with `(A)') is the
+artifical scheduling priority plot.  The under performing TCP Sockets graph (with the solid lines
+and designated with `(N)') is the normal scheduling plot.
 
 TCP Sockets with normal scheduling shows dismal performance in comparison to both STREAMS -- TCP
 XTIoS and SCTP XTI -- approaches at all message sizes beneath 4096 bytes.  It is necessary to
-artificially reduce the receiver priority to minimum and artificially increase the sender priority
-to maximum to acheive better results on TCP Sockets beneath 4096 bytes, at the cost of poorer
-performance above 4096 bytes.
+artificially reduce the receiver priority to a minimum (\texttt{nice -n 19}) and artificially
+increase the sender priority to a maximum (\texttt{nice -n -20}) to acheive better results on TCP
+Sockets beneath 4096 bytes, at the cost of poorer performance above 4096 bytes.
 
 The slightly different performance between TCP XTIoS and SCTP XTI can be explained by the
 significant overheads that the SCTP protocol introduces on small message sizes.
@@ -1356,8 +1411,8 @@ significant overheads that the SCTP protocol introduces on small message sizes.
 \item[Delay.]
 
 \textit{Figure \ref{figure:smpdly}}
-plots the average delay of TCP Sockets (both normal and artificial), TCP XTIoS STREAMS and SCTP XTI
-STREAMS implementations.
+plots the average message delay of TCP Sockets (both normal and artificial), TCP XTIoS STREAMS and
+SCTP XTI STREAMS implementations.
 
 The average delay of TCP XTIoS STREAMS and SCTP XTI STREAMS approaches is similar and comparable
 with TCP Sockets with artificial scheduling and message sizes beneath 4096.  With normal scheduling,
@@ -1369,8 +1424,9 @@ however, TCP Sockets has poor per message delays (intercept) but superior per-by
 plots the effective throughput of TCP Sockets, TCP XTIoS STREAMS and SCTP XTI STREAMS
 implementations.
 
-All curves exhibit good power function characteristics beneath 1024 byte  message sizes but exhibit
-saturation characteristics above 1024 bytes.
+All curves exhibit good power function characteristics beneath 1024 byte message sizes, indicating
+structure and robustness for each implementation, but each implementation exhibits saturation
+characteristics above 1024 bytes.
 
 \item[Improvement.]
 
@@ -1379,11 +1435,11 @@ plots the relative percentage of throughput of TCP Sockets, TCP XTIoS STREAMS an
 implementations.
 
 For the normal case, TCP XTIoS STREAMS and SCTP XTI STREAMS exhibit significant improvements over
-TCP Sockets for message sizes less than 1024 bytes and are comparable  at message sizes greater than
-1024 bytes.  Forcing TCP Sockets into a specific behaviour by artificially maximizing the sender
-priority and minimizing the receive priority results in improved behaviour below 1024 bytes for TCP
-Sockets but is worse than normal scheduling priority TCP Sockets for message sizes of 1024 bytes or
-more.
+TCP Sockets for message sizes less than 4096 bytes and are superior or comparable  at message sizes
+greater than 4096 bytes.  Forcing TCP Sockets into a specific behaviour by artificially maximizing
+the sender priority and minimizing the receive priority results in improved behaviour below 4096
+bytes for TCP Sockets but is worse than normal scheduling priority TCP Sockets for message sizes of
+4096 bytes or more.
 
 \end{description}
 
@@ -1405,7 +1461,7 @@ more.
 \label{figure:smpthrput}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}[pt]
 \center\includegraphics[width=\columnwidth]{netperf_smp_comp}
 \caption[Fedora Core 6 on Daisy Comparison]{Fedora Core 6 on Daisy Comparison}
 \label{figure:smpcomp}
@@ -1424,6 +1480,7 @@ Distribution & Kernel\\
 \hline
 SuSE 10.0 OSS & 2.6.13-15-default\\
 \end{tabular}\\[1.0ex]
+\normalsize
 
 Note that this is the same distribution that was also tested on Porky.  The purpose of testing on
 this notebook is to rule out the differences between machine architectures on the test results.
@@ -1436,14 +1493,27 @@ Tests performed on this machine are control tests.
 \textit{Figure \ref{figure:nbperf}}
 plots the measured performance of TCP Sockets (both normal and artificial scheduling priorities),
 TCP XTIoS STREAMS and SCTP XTI STREAMS implementations.
+The higher performing TCP Sockets graph (with dashed lines and designated with `(A)') is the
+artifical scheduling priority plot.  The under performing TCP Sockets graph (with the solid lines
+and designated with `(N)') is the normal scheduling plot.
 
-STREAMS demonstrates significant improvements at message sizes of less than 1024 bytes, and
+TCP Sockets with normal scheduling shows dismal performance in comparison to both STREAMS -- TCP
+XTIoS and SCTP XTI -- approaches at all message sizes beneath 4096 bytes.  It is necessary to
+artificially reduce the receiver priority to a minimum (\texttt{nice -n 19}) and artificially
+increase the sender priority to a maximum (\texttt{nice -n -20}) to acheive better results on TCP
+Sockets beneath 4096 bytes, at the cost of poorer performance above 4096 bytes.
+
+The slightly different performance between TCP XTIoS and SCTP XTI can be explained by the
+significant overheads that the SCTP protocol introduces on small message sizes.
+
+STREAMS demonstrates significant improvements at message sizes of less than 4096 bytes, and
 improvements at all message sizes.
 
 A significant result is that the TCP XTI over Socket approach indeed provided improvements over TCP
-Sockets itself at message sizes beneath 1024 bytes.  This improvement can only be accounted for by
-buffering differences, and when the receiving process was given a lower scheduling priority than the
-sending process, TCP Sockets performed much better.
+Sockets itself at message sizes beneath 4096 bytes.  This improvement can only be accounted for by
+buffering differences.  When the receiving process was given a lower scheduling priority
+(\texttt{nice -n 19}) than the sending process (\texttt{nice -n -20}), forcing the implementation
+into a tight corner, TCP Sockets performed better; however, only for smaller message sizes.
 
 \item[Delay.]
 
@@ -1451,16 +1521,9 @@ sending process, TCP Sockets performed much better.
 plots the average delay of TCP Sockets (both normal and artificial), TCP XTIoS STREAMS and SCTP XTI
 STREAMS implementations.
 
-STREAMS demonstrates significant improvements at message sizes of less than 1024 bytes, and
-improvements at all message sizes.
-
-The slope of the delay curve is best for SCTP XTI, then TCP Sockets (for message sizes greater than
-or equal to 1024 bytes), then TCP XTI over Sockets, then TCP Sockets (with low priority receiver).
-
-The slope of the delay curve either indicates that Sockets is using slightly larger buffers than
-STREAMS, or that Sockets is somehow exploiting some per-byte efficiencies at larger message sizes
-not achieved by STREAMS.  Nevertheless, the STREAMS intercept is so low that the delay curve for
-STREAMS is everywhere beneath that of Sockets.
+The average delay of TCP XTIoS STREAMS and SCTP XTI STREAMS approaches is similar and comparable
+with TCP Sockets with artificial scheduling and message sizes beneath 4096.  With normal scheduling,
+however, TCP Sockets has poor per message delays (intercept) but superior per-byte delays (slope).
 
 \item[Throughput.]
 
@@ -1468,11 +1531,9 @@ STREAMS is everywhere beneath that of Sockets.
 plots the effective throughput of TCP Sockets, TCP XTIoS STREAMS and SCTP XTI STREAMS
 implementations.
 
-STREAMS demonstrates significant improvements at all message sizes.
-
-As can be seen from \textit{Figure \ref{figure:nbthrput}}, all implementations exhibit strong power
-function characteristics (at least at lower write sizes), indicating structure and robustness for
-each implementation.
+All curves exhibit good power function characteristics beneath 1024 byte message sizes, indicating
+structure and robustness for each implementation, but each implementation exhibits saturation
+characteristics above 1024 bytes.
 
 \item[Improvement.]
 
@@ -1480,10 +1541,16 @@ each implementation.
 plots the relative percentage of throughput of TCP Sockets, TCP XTIoS STREAMS and SCTP XTI STREAMS
 implementations.
 
-STREAMS demonstrates significant improvements (approx. 40\% improvement) at message sizes below 1024
-bytes.  That STREAMS SCTP gives a 40\% improvement over a wide range of message sizes on SMP is a
-dramatic improvement.  Statements regarding STREAMS networking running poorer on SMP than on UP are
-quite wrong, at least with regard to \textsl{Linux Fast-STREAMS}.
+For the normal case, TCP XTIoS STREAMS and SCTP XTI STREAMS exhibit significant improvements over
+TCP Sockets for message sizes less than 4096 bytes and are superior or comparable  at message sizes
+greater than 4096 bytes.  Forcing TCP Sockets into a specific behaviour by artificially maximizing
+the sender priority and minimizing the receive priority results in improved behaviour below 4096
+bytes for TCP Sockets but is worse than normal scheduling priority TCP Sockets for message sizes of
+4096 bytes or more.
+
+STREAMS demonstrates significant improvements (approx. 250\% improvement) at message sizes below
+1024 bytes.  That STREAMS SCTP gives a 200\% improvement over a wide range of message sizes is a
+dramatic improvement.
 
 \end{description}
 
@@ -1505,17 +1572,18 @@ quite wrong, at least with regard to \textsl{Linux Fast-STREAMS}.
 \label{figure:nbthrput}
 \end{figure}
 
-\begin{figure}[p]
+\begin{figure}[pt]
 \center\includegraphics[width=\columnwidth]{netperf_nb_comp}
 \caption[SuSE 10.0 OSS Mspiggy Comparison]{SuSE 10.0 OSS Mspiggy Comparison}
 \label{figure:nbcomp}
 \end{figure}
 
-
 \section[Analysis]{Analysis}
 
-The results are consistent enough across the various distributions and machines tested to draw some
-conclusions regarding the efficiency of the implementations tested.
+With some caveats as described at the end of this section, the results are consistent enough across
+the various distributions and machines tested to draw some conclusions regarding the efficiency of
+the implementations tested.  This section is responsible for providing an analysis of the results
+and drawing conclusions consistent with the experimental results.
 
 \subsection[Discussion]{Discussion}
 
@@ -1676,7 +1744,7 @@ This intermediate queueing on the sending side, not present in BSD-style network
 responsible for reducing the number of blocking and wakeup events on the sender, and permits the
 sender, when running, to send more messages in a quantum.
 
-One the receiving side, the STREAMS queueing, flow control and scheduling mechanisms are similar to
+On the receiving side, the STREAMS queueing, flow control and scheduling mechanisms are similar to
 the BSD-style software interrupt approach.  However, Linux does not use software interrupts on
 loop-back (messages are passed directly to the socket with possible backlogging due to locking).
 The STREAMS approach is more sophisticated as it performs backlogging, queueing and flow control
@@ -1685,7 +1753,6 @@ simultaneously on the read side (at the \textit{stream head}).
 \subsection[Caveats]{Caveats}
 
 The following limitations in the test results and analysis must be considered:
-
 
 \subsubsection[Loop-back Interface]{Loop-back Interface}
 
@@ -1899,6 +1966,30 @@ set -x
 \label{section:rawdata}
 
 Following are the raw data points captured using the \texttt{netperf\_benchmark} script:
+
+\textit{Table \ref{table:fc6data}} lists the raw data from the \texttt{netperf} program that was
+used in preparing graphs for Fedora Core 6 (i386) on Porky.
+
+\textit{Table \ref{table:centosdata}} lists the raw data from the \texttt{netperf} program that was
+used in preparing graphs for CentOS 4 on Porky.
+
+\textit{Table \ref{table:susedata}} lists the raw data from the \texttt{netperf} program that was
+used in preparing graphs for SuSE OSS 10 on Porky.
+
+%\textit{Table \ref{table:ubuntudata}} lists the raw data from the \texttt{netperf} program that was
+%used in preparing graphs for Ubuntu 6.10 on Porky.
+
+\textit{Table \ref{table:u704data}} lists the raw data from the \texttt{netperf} program that was
+used in preparing graphs for Ubuntu 7.04 on Porky.
+
+\textit{Table \ref{table:rh7data}} lists the raw data from the \texttt{netperf} program that was
+used in preparing graphs for RedHat 7.2 on Pumbah.
+
+\textit{Table \ref{table:smpdata}} lists the raw data from the \texttt{netperf} program that was
+used in preparing graphs for Fedora Core 6 (x86\_64) HT on Daisy.
+
+\textit{Table \ref{table:nbdata}} lists the raw data from the \texttt{netperf} program that was used
+in preparing graphs for SuSE 10.0 OSS on Mspiggy.
 
 \begin{table}[hbp]
 \footnotesize
@@ -2130,7 +2221,6 @@ Size & Tx & Rx & Tx & Rx & Tx & Rx & Tx & Rx\\
 \caption[SuSE 10.0 OSS on Mspiggy Raw Data]{SuSE 10.0 OSS on Mspiggy Raw Data}
 \label{table:nbdata}
 \end{table}
-
 
 \end{appendix}
 
