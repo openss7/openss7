@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_data.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:42 $
+ @(#) $Id$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/17 11:55:42 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
+ -----------------------------------------------------------------------------
+
+ $Log$
  *****************************************************************************/
 
 #ifndef __SUA_DATA_H__
 #define __SUA_DATA_H__
 
-#ident "@(#) $RCSfile: sua_data.h,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/17 11:55:42 $"
+#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #include "../ua/ua_data.h"
 /*
