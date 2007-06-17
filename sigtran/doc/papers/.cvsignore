@@ -1,3 +1,4 @@
+Makefile.in
 index.html
 internals.pl
 labels.pl
@@ -15,3 +16,11 @@ sockets.pdf
 WARNINGS
 xtios.eps
 xtios.pdf
+sctp.gif
+sctp.png
+sigtranimp.css
+sigtranimp.html
+sockets.gif
+sockets.png
+xtios.gif
+xtios.png
