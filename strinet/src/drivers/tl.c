@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/05/03 21:47:19 $
+ @(#) $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 01:56:56 $
 
  -----------------------------------------------------------------------------
 
@@ -11,8 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/03 21:47:19 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:56:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tl.c,v $
+ Revision 0.9.2.2  2007/06/17 01:56:56  brian
+ - updates for release, remove any later language
+
  Revision 0.9.2.1  2007/05/03 21:47:19  brian
  - added transport loopback driver
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/05/03 21:47:19 $"
+#ident "@(#) $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 01:56:56 $"
 
-static char const ident[] = "$RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/05/03 21:47:19 $";
+static char const ident[] = "$RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 01:56:56 $";
 
 /*
  *  This driver provides transport interface loopback streams TICLTS, TICOTS
@@ -100,7 +102,7 @@ static char const ident[] = "$RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.1 $) 
 #define TI_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TI_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TI_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
-#define TI_REVISION	"OpenSS7 $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/05/03 21:47:19 $"
+#define TI_REVISION	"OpenSS7 $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 01:56:56 $"
 #define TI_DEVICE	"SVR 4.2 STREAMS TI Driver"
 #define TI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TI_LICENSE	"GPL"

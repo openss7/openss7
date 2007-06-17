@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/09/18 13:52:37 $
+ @(#) $Id: tpi.h,v 0.9.2.6 2007/06/17 01:56:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,9 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:37 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:56:06 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
 
  $Log: tpi.h,v $
+ Revision 0.9.2.6  2007/06/17 01:56:06  brian
+ - updates for release, remove any later language
+
  Revision 0.9.2.5  2006/09/18 13:52:37  brian
  - added doxygen markers to sources
 
@@ -72,7 +76,7 @@
 #ifndef _SYS_TPI_H
 #define _SYS_TPI_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

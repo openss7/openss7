@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 19:00:15 $
+ @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/06/17 01:56:25 $
 
  -----------------------------------------------------------------------------
 
@@ -11,8 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:15 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:56:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 19:00:15 $"
+#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/06/17 01:56:25 $"
 
 static char const ident[] =
-    "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 19:00:15 $";
+    "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/06/17 01:56:25 $";
 
 /*
  *  This is an SLM (Signalling Link Management) multiplexing driver which also
@@ -97,7 +96,7 @@ static char const ident[] =
 #include <ss7/ua_lm_ioctl.h>
 
 #define SLM_DESCRIP	"SLM: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 19:00:15 $"
+#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/06/17 01:56:25 $"
 #define SLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SLM_DEVICE	"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

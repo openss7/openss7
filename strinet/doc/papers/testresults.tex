@@ -1,7 +1,7 @@
 %% -*- tex -*- vim: ft=tex tw=78 nocin nosi
 %% =========================================================================
 %%
-%% @(#) $Id: testresults.tex,v 0.9.2.5 2007/05/19 02:27:31 brian Exp $
+%% @(#) $Id: testresults.tex,v 0.9.2.6 2007/06/17 01:56:55 brian Exp $
 %%
 %% =========================================================================
 %%
@@ -53,7 +53,7 @@
 %% 
 %% =========================================================================
 %%
-%% Last Modified $Date: 2007/05/19 02:27:31 $ by $Author: brian $
+%% Last Modified $Date: 2007/06/17 01:56:55 $ by $Author: brian $
 %%
 %% =========================================================================
 
@@ -804,6 +804,9 @@ To remove the dependence of test results on a particular Linux kernel or
 machine, various Linux distributions were used for testing.  The distributions
 tested are as follows:
 
+\small
+\setlength{\tabcolsep}{0.4em}
+\setlength{\arraycolsep}{0.4em}
 \begin{tabular}{ll}\\
 Distribution & Kernel\\
 \hline
@@ -821,7 +824,9 @@ Fedora Core 6 & 2.6.20-1.2933.fc6\\
 To remove the dependence of test results on a particular machine, various
 machines were used for testing as follows:
 
-\footnotesize
+\small
+\setlength{\tabcolsep}{0.4em}
+\setlength{\arraycolsep}{0.4em}
 \begin{tabular}{llll}\\
 Hostname & Processor & Memory & Architecture\\
 \hline
@@ -882,6 +887,9 @@ tested.
 Porky is a 2.57GHz Pentium IV (i686) uniprocessor machine with 1Gb of memory.
 Linux distributions tested on this machine are as follows:
 
+\small
+\setlength{\tabcolsep}{0.4em}
+\setlength{\arraycolsep}{0.4em}
 \begin{tabular}{ll}\\
 Distribution & Kernel\\
 \hline
@@ -1274,6 +1282,9 @@ This machine differs from Porky in memory type only (Pumbah has somewhat
 faster memory than Porky.) Linux distributions tested on this machine are as
 follows:
 
+\small
+\setlength{\tabcolsep}{0.4em}
+\setlength{\arraycolsep}{0.4em}
 \begin{tabular}{ll}\\
 Distribution & Kernel\\
 \hline
@@ -1382,6 +1393,9 @@ differences from other tested behaviour obvious.
 Daisy is a 3.0GHz i630 (x86\_64) hyper-threaded machine with 1Gb of memory.
 Linux distributions tested on this machine are as follows:
 
+\small
+\setlength{\tabcolsep}{0.4em}
+\setlength{\arraycolsep}{0.4em}
 \begin{tabular}{ll}\\
 Distribution & Kernel\\
 \hline
@@ -1556,6 +1570,9 @@ Mspiggy is a 1.7Ghz Pentium IV (M-processor) uniprocessor notebook (Toshiba
 Satellite 5100) with 1Gb of memory.  Linux distributions tested on this
 machine are as follows:
 
+\small
+\setlength{\tabcolsep}{0.4em}
+\setlength{\arraycolsep}{0.4em}
 \begin{tabular}{ll}\\
 Distribution & Kernel\\
 \hline
@@ -1972,7 +1989,7 @@ performance improvements for STREAMS attributable to similar causes.
 Following is a listing of the \texttt{netperf\_benchmark} script used to
 generate raw data points for analysis:
 
-\small
+\footnotesize
 \begin{verbatim}
 #!/bin/bash
 set -x

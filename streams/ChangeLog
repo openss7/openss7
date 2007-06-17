@@ -1,3 +1,15 @@
+2007-06-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/papers/Makefile: updates for release
+	* doc/papers/Makefile.am: updates for release
+
+	* configure.nexusware: remove any later language
+	* src/util/init/specfs: remove any later language
+	* src/util/strclean: remove any later language
+	* src/util/strload.conf: remove any later language
+	* src/util/strsetup: remove any later language
+	* src/util/strsetup.conf: remove any later language
+
 2007-06-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

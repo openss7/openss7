@@ -1,3 +1,61 @@
+2007-06-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* iperf/compat/Thread.c: remove any later language
+	* iperf/compat/delay.cpp: remove any later language
+	* iperf/compat/error.c: remove any later language
+	* iperf/compat/gettimeofday.c: remove any later language
+	* iperf/compat/inet_ntop.c: remove any later language
+	* iperf/compat/inet_pton.c: remove any later language
+	* iperf/compat/signal.c: remove any later language
+	* iperf/compat/snprintf.c: remove any later language
+	* iperf/compat/string.c: remove any later language
+	* iperf/debian/mscript_postinst.in: remove any later language
+	* iperf/debian/mscript_postrm.in: remove any later language
+	* iperf/debian/mscript_preinst.in: remove any later language
+	* iperf/debian/mscript_prerm.in: remove any later language
+	* iperf/include/Client.hpp: remove any later language
+	* iperf/include/Condition.h: remove any later language
+	* iperf/include/Extractor.h: remove any later language
+	* iperf/include/List.h: remove any later language
+	* iperf/include/Listener.hpp: remove any later language
+	* iperf/include/Locale.h: remove any later language
+	* iperf/include/Mutex.h: remove any later language
+	* iperf/include/PerfSocket.hpp: remove any later language
+	* iperf/include/Reporter.h: remove any later language
+	* iperf/include/Server.hpp: remove any later language
+	* iperf/include/Settings.hpp: remove any later language
+	* iperf/include/SocketAddr.h: remove any later language
+	* iperf/include/Thread.h: remove any later language
+	* iperf/include/Timestamp.hpp: remove any later language
+	* iperf/include/config.win32.h: remove any later language
+	* iperf/include/delay.hpp: remove any later language
+	* iperf/include/gettimeofday.h: remove any later language
+	* iperf/include/headers.h: remove any later language
+	* iperf/include/inet_aton.h: remove any later language
+	* iperf/include/report_CSV.h: remove any later language
+	* iperf/include/report_default.h: remove any later language
+	* iperf/include/util.h: remove any later language
+	* iperf/include/version.h: remove any later language
+	* iperf/iperf.xpm: remove any later language
+	* iperf/src/Client.cpp: remove any later language
+	* iperf/src/Extractor.c: remove any later language
+	* iperf/src/Launch.cpp: remove any later language
+	* iperf/src/List.cpp: remove any later language
+	* iperf/src/Listener.cpp: remove any later language
+	* iperf/src/Locale.c: remove any later language
+	* iperf/src/PerfSocket.cpp: remove any later language
+	* iperf/src/ReportCSV.c: remove any later language
+	* iperf/src/ReportDefault.c: remove any later language
+	* iperf/src/Reporter.c: remove any later language
+	* iperf/src/Server.cpp: remove any later language
+	* iperf/src/Settings.cpp: remove any later language
+	* iperf/src/SocketAddr.c: remove any later language
+	* iperf/src/main.cpp: remove any later language
+	* iperf/src/sockets.c: remove any later language
+	* iperf/src/stdio.c: remove any later language
+	* iperf/src/tcp_window_size.c: remove any later language
+
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

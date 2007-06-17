@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:25 $
+ @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/06/17 01:56:33 $
 
  -----------------------------------------------------------------------------
 
@@ -11,8 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:25 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:56:33 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:25 $"
+#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/06/17 01:56:33 $"
 
 static char const ident[] =
-    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:25 $";
+    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/06/17 01:56:33 $";
 
 #include <sys/os7/compat.h>
 
@@ -71,7 +70,7 @@ static char const ident[] =
 
 #define TALI_DESCRIP	"TALI STREAMS MULTIPLEXING DRIVER." "\n" \
 			"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:25 $"
+#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2007/06/17 01:56:33 $"
 #define TALI_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TALI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TALI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

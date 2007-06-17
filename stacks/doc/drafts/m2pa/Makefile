@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:33:12 $
+# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 01:55:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -11,8 +11,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -41,7 +40,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/05/14 08:33:12 $ by $Author: brian $
+# Last Modified $Date: 2007/06/17 01:55:51 $ by $Author: brian $
 #
 # =============================================================================
 

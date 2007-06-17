@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_cookie.h,v 0.9.2.2 2005/05/14 08:31:05 brian Exp $
+ @(#) $Id: sctp_cookie.h,v 0.9.2.3 2007/06/17 01:56:19 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:31:05 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:56:19 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sctp_cookie.h,v $
+ Revision 0.9.2.3  2007/06/17 01:56:19  brian
+ - updates for release, remove any later language
 
  *****************************************************************************/
 
 #ifndef __SCTP_COOKIE_H__
 #define __SCTP_COOKIE_H__
 
-#ident "@(#) $RCSfile: sctp_cookie.h,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2005/05/14 08:31:05 $"
+#ident "@(#) $RCSfile: sctp_cookie.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #define HMAC_SIZE (160/8)
 #define raw_cookie_size(__ck) \

@@ -1,3 +1,101 @@
+2007-06-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/papers/Makefile: updates for release
+	* doc/papers/Makefile.am: updates for release
+	* doc/papers/netperf_centos.dat: updates for release
+	* doc/papers/netperf_centos_comp.plot: updates for release
+	* doc/papers/netperf_centos_delay.plot: updates for release
+	* doc/papers/netperf_centos_perf.plot: updates for release
+	* doc/papers/netperf_centos_thrput.plot: updates for release
+	* doc/papers/netperf_fc6.dat: updates for release
+	* doc/papers/netperf_fc6_comp.plot: updates for release
+	* doc/papers/netperf_fc6_delay.plot: updates for release
+	* doc/papers/netperf_fc6_perf.plot: updates for release
+	* doc/papers/netperf_fc6_thrput.plot: updates for release
+	* doc/papers/netperf_nb.dat: updates for release
+	* doc/papers/netperf_nb_comp.plot: updates for release
+	* doc/papers/netperf_nb_delay.plot: updates for release
+	* doc/papers/netperf_nb_perf.plot: updates for release
+	* doc/papers/netperf_nb_thrput.plot: updates for release
+	* doc/papers/netperf_rh7.dat: updates for release
+	* doc/papers/netperf_rh7_comp.plot: updates for release
+	* doc/papers/netperf_rh7_delay.plot: updates for release
+	* doc/papers/netperf_rh7_perf.plot: updates for release
+	* doc/papers/netperf_rh7_thrput.plot: updates for release
+	* doc/papers/netperf_smp.dat: updates for release
+	* doc/papers/netperf_smp_comp.plot: updates for release
+	* doc/papers/netperf_smp_delay.plot: updates for release
+	* doc/papers/netperf_smp_perf.plot: updates for release
+	* doc/papers/netperf_smp_thrput.plot: updates for release
+	* doc/papers/netperf_suse.dat: updates for release
+	* doc/papers/netperf_suse_comp.plot: updates for release
+	* doc/papers/netperf_suse_delay.plot: updates for release
+	* doc/papers/netperf_suse_perf.plot: updates for release
+	* doc/papers/netperf_suse_thrput.plot: updates for release
+	* doc/papers/netperf_u704.dat: updates for release
+	* doc/papers/netperf_u704_comp.plot: updates for release
+	* doc/papers/netperf_u704_delay.plot: updates for release
+	* doc/papers/netperf_u704_perf.plot: updates for release
+	* doc/papers/netperf_u704_thrput.plot: updates for release
+	* doc/papers/sctpresults.tex: updates for release
+
+	* configure.nexusware: remove any later language
+	* debian/mscript_postinst.in: remove any later language
+	* debian/mscript_postrm.in: remove any later language
+	* debian/mscript_preinst.in: remove any later language
+	* debian/mscript_prerm.in: remove any later language
+	* debian/strsctp-doc.preinst.in: remove any later language
+	* debian/strsctp-doc.prerm.in: remove any later language
+	* debian/strsctp-init.postinst.in: remove any later language
+	* debian/strsctp-init.postrm.in: remove any later language
+	* debian/strsctp-init.preinst.in: remove any later language
+	* debian/strsctp-init.prerm.in: remove any later language
+	* debian/strsctp-lib.preinst.in: remove any later language
+	* debian/strsctp-source.preinst.in: remove any later language
+	* debian/strsctp-util.preinst.in: remove any later language
+	* src/drivers/lis.conf: remove any later language
+	* src/drivers/sctp.h: remove any later language
+	* src/drivers/sctp_adler32.c: remove any later language
+	* src/drivers/sctp_adler32.h: remove any later language
+	* src/drivers/sctp_cache.c: remove any later language
+	* src/drivers/sctp_cache.h: remove any later language
+	* src/drivers/sctp_cookie.c: remove any later language
+	* src/drivers/sctp_cookie.h: remove any later language
+	* src/drivers/sctp_crc32c.c: remove any later language
+	* src/drivers/sctp_crc32c.h: remove any later language
+	* src/drivers/sctp_defs.h: remove any later language
+	* src/drivers/sctp_hash.c: remove any later language
+	* src/drivers/sctp_hash.h: remove any later language
+	* src/drivers/sctp_hmac_md5.c: remove any later language
+	* src/drivers/sctp_hmac_md5.h: remove any later language
+	* src/drivers/sctp_hmac_sha1.c: remove any later language
+	* src/drivers/sctp_hmac_sha1.h: remove any later language
+	* src/drivers/sctp_hooks.h.in: remove any later language
+	* src/drivers/sctp_input.c: remove any later language
+	* src/drivers/sctp_input.h: remove any later language
+	* src/drivers/sctp_md5.c: remove any later language
+	* src/drivers/sctp_md5.h: remove any later language
+	* src/drivers/sctp_msg.c: remove any later language
+	* src/drivers/sctp_msg.h: remove any later language
+	* src/drivers/sctp_n.c: remove any later language
+	* src/drivers/sctp_n.h: remove any later language
+	* src/drivers/sctp_namespace.h: remove any later language
+	* src/drivers/sctp_output.c: remove any later language
+	* src/drivers/sctp_output.h: remove any later language
+	* src/drivers/sctp_route.c: remove any later language
+	* src/drivers/sctp_route.h: remove any later language
+	* src/drivers/sctp_sha1.c: remove any later language
+	* src/drivers/sctp_sha1.h: remove any later language
+	* src/drivers/sctp_t.c: remove any later language
+	* src/drivers/sctp_t.h: remove any later language
+	* src/include/ss7/sctp.h: remove any later language
+	* src/include/ss7/sctpi.h: remove any later language
+	* src/include/ss7/sctpi_ioctl.h: remove any later language
+	* tests/dummy1.m4: remove any later language
+	* tests/dummy2.m4: remove any later language
+	* tests/dummy3.m4: remove any later language
+	* tests/dummy4.m4: remove any later language
+
 2007-06-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

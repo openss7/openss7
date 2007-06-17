@@ -1,3 +1,54 @@
+2007-06-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* sctp/RELEASE-NOTES: remove any later language
+	* sctp/configure.nexusware: remove any later language
+	* sctp/debian/mscript_postinst.in: remove any later language
+	* sctp/debian/mscript_postrm.in: remove any later language
+	* sctp/debian/mscript_preinst.in: remove any later language
+	* sctp/debian/mscript_prerm.in: remove any later language
+	* sctp/debian/sctp-core.postinst.in: remove any later language
+	* sctp/debian/sctp-core.postrm.in: remove any later language
+	* sctp/debian/sctp-devel.preinst.in: remove any later language
+	* sctp/debian/sctp-doc.postinst.in: remove any later language
+	* sctp/debian/sctp-doc.preinst.in: remove any later language
+	* sctp/debian/sctp-doc.prerm.in: remove any later language
+	* sctp/debian/sctp-init.postinst.in: remove any later language
+	* sctp/debian/sctp-init.postrm.in: remove any later language
+	* sctp/debian/sctp-init.preinst.in: remove any later language
+	* sctp/debian/sctp-init.prerm.in: remove any later language
+	* sctp/debian/sctp-lib.preinst.in: remove any later language
+	* sctp/debian/sctp-source.preinst.in: remove any later language
+	* sctp/debian/sctp-util.preinst.in: remove any later language
+	* sctp/include/linux/hooks.h.in: remove any later language
+	* sctp/include/linux/sctp.h: remove any later language
+	* sctp/include/linux/sysctl.h: remove any later language
+	* sctp/include/net/sctp.h: remove any later language
+	* sctp/include/net/snmp.h: remove any later language
+	* sctp/include/net/sock.h: remove any later language
+	* sctp/include/netinet/sctp.h: remove any later language
+	* sctp/include/os7_namespace.h: remove any later language
+	* sctp/man/Makefile: remove any later language
+	* sctp/src/sctp.c: remove any later language
+	* sctp/src/sctp_adler32.c: remove any later language
+	* sctp/src/sctp_adler32.h: remove any later language
+	* sctp/src/sctp_crc32c.c: remove any later language
+	* sctp/src/sctp_crc32c.h: remove any later language
+	* sctp/src/sctp_debug.h: remove any later language
+	* sctp/src/sctp_glue.c: remove any later language
+	* sctp/src/sctp_hmac_md5.c: remove any later language
+	* sctp/src/sctp_hmac_md5.h: remove any later language
+	* sctp/src/sctp_hmac_sha1.c: remove any later language
+	* sctp/src/sctp_hmac_sha1.h: remove any later language
+	* sctp/src/sctp_md5.c: remove any later language
+	* sctp/src/sctp_md5.h: remove any later language
+	* sctp/src/sctp_namespace.h: remove any later language
+	* sctp/src/sctp_sha1.c: remove any later language
+	* sctp/src/sctp_sha1.h: remove any later language
+	* sctp/tests/dummy1.m4: remove any later language
+	* sctp/tests/dummy2.m4: remove any later language
+	* sctp/tests/dummy3.m4: remove any later language
+	* sctp/tests/dummy4.m4: remove any later language
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

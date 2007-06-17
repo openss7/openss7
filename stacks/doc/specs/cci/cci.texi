@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: cci.texi,v 0.9.2.6 2006/08/26 09:17:03 brian Exp $
+% @(#) $Id: cci.texi,v 0.9.2.7 2007/06/17 01:55:58 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/26 09:17:03 $ by $Author: brian $
+% Last Modified $Date: 2007/06/17 01:55:58 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -341,6 +341,9 @@ A printed (or postscript) version of this document is an UNCONTROLLED version.
 @smallexample
 
 $Log: cci.texi,v $
+Revision 0.9.2.7  2007/06/17 01:55:58  brian
+- updates for release, remove any later language
+
 Revision 0.9.2.6  2006/08/26 09:17:03  brian
 - better release file generation
 
@@ -11921,7 +11924,7 @@ Indicates the offset of the address from the start of the block.
 @smallexample
 /*****************************************************************************
 
- @@(#) $Id: cci.texi,v 0.9.2.6 2006/08/26 09:17:03 brian Exp $
+ @@(#) $Id: cci.texi,v 0.9.2.7 2007/06/17 01:55:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11932,8 +11935,7 @@ Indicates the offset of the address from the start of the block.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -11967,14 +11969,14 @@ Indicates the offset of the address from the start of the block.
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/08/26 09:17:03 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:55:58 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_ISUPI_H__
 #define __SS7_ISUPI_H__
 
-#ident "@@(#) $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 1997-2006 OpenSS7 Corporation."
+#ident "@@(#) $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 1997-2006 OpenSS7 Corporation."
 
 /*
  *  ISUP addresss
@@ -12582,8 +12584,7 @@ assign a stream and correspond to the first backward message (i.e, @emph{Process
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS

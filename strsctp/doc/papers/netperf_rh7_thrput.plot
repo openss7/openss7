@@ -12,9 +12,9 @@ set border 3 lw 1
 plot \
      'netperf_rh7.dat' using 1:($1*$4*8/10) smooth unique title "SCTP Streams Tx" with linespoints lt 6,\
      'netperf_rh7.dat' using 1:($1*$5*8/10) smooth unique title "SCTP Streams Rx" with linespoints lt 5,\
-     'netperf_rh7.dat' using 1:($1*$6*8/10) smooth unique title "TCP Sockets Tx" with linespoints lt 4,\
-     'netperf_rh7.dat' using 1:($1*$7*8/10) smooth unique title "TCP Sockets Rx" with linespoints lt 3,\
-     'netperf_rh7.dat' using 1:($1*$8*8/10) smooth unique title "TCP Sockets Tx" with linespoints lt 11,\
-     'netperf_rh7.dat' using 1:($1*$9*8/10) smooth unique title "TCP Sockets Rx" with linespoints lt 10,\
+     'netperf_rh7.dat' using 1:($1*$6*8/10) smooth unique title "TCP Sockets Tx (N)" with linespoints lt 4,\
+     'netperf_rh7.dat' using 1:($1*$7*8/10) smooth unique title "TCP Sockets Rx (N)" with linespoints lt 3,\
+     'netperf_rh7.dat' using 1:($1*$8*8/10) smooth unique title "TCP Sockets Tx (A)" with linespoints lt 11,\
+     'netperf_rh7.dat' using 1:($1*$9*8/10) smooth unique title "TCP Sockets Rx (A)" with linespoints lt 10,\
      'netperf_rh7.dat' using 1:($1*$2*8/10) smooth unique title "TCP XTIoS Tx"   with linespoints lt 1,\
      'netperf_rh7.dat' using 1:($1*$3*8/10) smooth unique title "TCP XTIoS Rx"   with linespoints lt 2

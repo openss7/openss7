@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 18:58:27 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/06/17 01:55:40 $
 
  -----------------------------------------------------------------------------
 
@@ -11,8 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:58:27 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:55:40 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 18:58:27 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/06/17 01:55:40 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 18:58:27 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/06/17 01:55:40 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -164,9 +163,9 @@ static char const ident[] =
 #include "include/linux/hooks.h"
 #include "include/netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.39 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.40 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/03/25 18:58:27 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/06/17 01:55:40 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

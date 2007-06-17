@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/06/13 20:31:40 $
+# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/06/17 01:56:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/13 20:31:40 $ by $Author: brian $
+# Last Modified $Date: 2007/06/17 01:56:54 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile,v $
+# Revision 0.9.2.5  2007/06/17 01:56:54  brian
+# - updates for release, remove any later language
+#
 # Revision 0.9.2.4  2007/06/13 20:31:40  brian
 # - added papers to release
 #
@@ -128,15 +131,21 @@ PNGFIGS = \
 	xtios.png \
 	udp.png
 
+FIGFIGS = \
+	sockets.fig \
+	xtios.fig \
+	udp.fig
+
 PLOTFIGS = $(PLOTS:.plot=.fig)
 
 NAME = testresults
 
 MY_PHONY += all all-dat
 
-all: all-dat $(NAME).bbl $(NAME).ps $(NAME).pdf $(NAME).html
+all: $(NAME).bbl $(NAME).ps $(NAME).pdf $(NAME).html
 
 $(PLOTFIGS): %.fig: %.plot
+	@make all-dat
 	gnuplot $<
 
 $(EPSFIGS): %.eps: %.fig
@@ -224,7 +233,7 @@ clean-dat:
 		fi ; \
 	done
 
-$(NAME).aux: all-dat $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
+$(NAME).aux: $(NAME).tex $(EPSFIGS) $(PLOTS:.plot=.eps)
 	latex $(NAME).tex
 	latex $(NAME).tex
 
@@ -275,8 +284,8 @@ clean-fig: clean-gif clean-png clean-eps clean-pdf
 
 clean: clean-fig clean-dat
 	rm -f *.bak $(NAME).ps $(NAME).pdf $(NAME).dvi \
-	$(NAME).bbl $(NAME).aux $(NAME).blg $(NAME).glo \
-	$(NAME).log \
+	$(NAME).aux $(NAME).bbl $(NAME).blg $(NAME).glo $(NAME).log $(NAME).pl \
+	images.aux images.bbl images.glo images.log images.pl images.tex img*.png \
 	index.html internals.pl labels.pl \
 	$(NAME).css $(NAME).html WARNINGS
 

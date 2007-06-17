@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sua_lower.c,v 0.9.2.6 2005/07/13 12:01:40 brian Exp $
+ @(#) $Id: sua_lower.c,v 0.9.2.7 2007/06/17 01:56:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -10,8 +10,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -24,9 +23,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/07/13 12:01:40 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:56:31 $ by $Author: brian $
 
  $Log: sua_lower.c,v $
+ Revision 0.9.2.7  2007/06/17 01:56:31  brian
+ - updates for release, remove any later language
+
  Revision 0.9.2.6  2005/07/13 12:01:40  brian
  - working up compat and check pass (finally lindented LiS)
 
@@ -62,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $Id: sua_lower.c,v 0.9.2.6 2005/07/13 12:01:40 brian Exp $"
+#ident "@(#) $Id: sua_lower.c,v 0.9.2.7 2007/06/17 01:56:31 brian Exp $"
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.6 $) $Date: 2005/07/13 12:01:40 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.7 $) $Date: 2007/06/17 01:56:31 $";
 
 #include <sys/os7/compat.h>
 

@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: dummy3.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2005/07/04 20:08:42 $
+# @(#) $RCSfile: dummy3.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/06/17 01:55:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -13,8 +13,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; either version 2 of the License, or (at your option) any later
-# version.
+# Foundation; version 2 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -48,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2005/07/04 20:08:42 $ by $Author: brian $
+# Last Modified $Date: 2007/06/17 01:55:46 $ by $Author: brian $
 #
 # =============================================================================
 

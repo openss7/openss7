@@ -1,3 +1,8 @@
+2007-06-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/dlpi_h225.h: remove any later language
+	* src/include/sys/h225_ioctl.h: remove any later language
+
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

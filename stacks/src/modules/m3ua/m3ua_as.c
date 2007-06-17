@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_as.c,v 0.9.2.13 2007/03/25 18:59:38 brian Exp $
+ @(#) $Id: m3ua_as.c,v 0.9.2.14 2007/06/17 01:56:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -10,8 +10,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation; version 2 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -22,11 +21,14 @@
  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2007/03/25 18:59:38 $ by $Author: brian $
+ Last Modified $Date: 2007/06/17 01:56:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.14  2007/06/17 01:56:17  brian
+ - updates for release, remove any later language
+
  Revision 0.9.2.13  2007/03/25 18:59:38  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -86,7 +88,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 18:59:38 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.14 $) $Date: 2007/06/17 01:56:17 $";
 
 #include <sys/os7/compat.h>
 
