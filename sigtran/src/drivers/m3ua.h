@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: m3ua.h,v 0.9.2.2 2007/06/17 02:00:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: m3ua.h,v $
+ Revision 0.9.2.2  2007/06/17 02:00:50  brian
+ - updates for release, remove any later language
+
  *****************************************************************************/
 
 #ifndef __M3UA_H__
 #define __M3UA_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: m3ua.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #include "../ua/ua.h"
 #include "../../include/ss7/mtp.h"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: sua_sccp.h,v 0.9.2.2 2007/06/17 02:00:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/06/17 02:00:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_sccp.h,v $
+ Revision 0.9.2.2  2007/06/17 02:00:51  brian
+ - updates for release, remove any later language
+
  Revision 0.9.2.1  2006/10/17 11:55:43  brian
  - copied files into new packages from strss7 package
 
@@ -73,7 +76,7 @@
 #ifndef __SUA_SCCP_H__
 #define __SUA_SCCP_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sua_sccp.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  *  =========================================================================

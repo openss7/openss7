@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: tali.h,v 0.9.2.3 2007/06/17 02:00:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/06/17 02:00:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: tali.h,v $
+ Revision 0.9.2.3  2007/06/17 02:00:51  brian
+ - updates for release, remove any later language
+
  *****************************************************************************/
 
 #ifndef __TALI_H__
 #define __TALI_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tali.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 extern int tali_reuseb(tali_t *, size_t, int, mblk_t *);
 

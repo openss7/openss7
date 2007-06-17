@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: tali_msgs.h,v 0.9.2.2 2007/06/17 02:00:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/06/17 02:00:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: tali_msgs.h,v $
+ Revision 0.9.2.2  2007/06/17 02:00:51  brian
+ - updates for release, remove any later language
+
  *****************************************************************************/
 
 #ifndef __TALI_MSGS_H__
 #define __TALI_MSGS_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tali_msgs.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #endif				/* __TALI_MSGS_H__ */
