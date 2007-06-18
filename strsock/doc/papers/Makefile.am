@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/18 09:17:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/18 09:20:51 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/06/18 09:17:18 $ by $Author: brian $
+## Last Modified $Date: 2007/06/18 09:20:51 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.3  2007/06/18 09:20:51  brian
+## - updates to pass distcheck target
+##
 ## Revision 0.9.2.2  2007/06/18 09:17:18  brian
 ## - updates to pass distcheck target
 ##
@@ -110,11 +113,11 @@ PLOTFIGS = $(PLOTS:.plot=.fig)
 
 NAME = sockimp
 
-MY_PHONY += all-local all-dat
+MY_PHONY += all-papers all-dat
 
-all-local: $(NAME).bbl $(NAME).pdf
+all-papers: $(NAME).bbl $(NAME).pdf
 
-ALL_LOCAL += all-local
+ALL_LOCAL += all-papers
 
 $(PLOTFIGS): %.fig: %.plot
 	@make all-dat
@@ -245,16 +248,16 @@ clean-pdf:
 clean-fig: clean-gif clean-png clean-eps clean-pdf
 	rm -f $(PLOTFIGS)
 
-clean-local: clean-fig clean-dat
+clean-papers: clean-fig clean-dat
 	rm -f *.bak $(NAME).ps $(NAME).pdf $(NAME).dvi \
 	$(NAME).aux $(NAME).bbl $(NAME).blg $(NAME).glo $(NAME).log $(NAME).pl \
 	images.aux images.bbl images.glo images.log images.pl images.tex img*.png \
 	index.html internals.pl labels.pl \
 	$(NAME).css $(NAME).html WARNINGS
 
-CLEAN_LOCAL += clean-local
+CLEAN_LOCAL += clean-papers
 
-MY_PHONY += clean-local clean-fig clean-gif clean-png clean-eps clean-pdf clean-dat
+MY_PHONY += clean-papers clean-fig clean-gif clean-png clean-eps clean-pdf clean-dat
 
 EXTRA_DIST += $(NAME).pdf $(NAME).tex $(NAME).bib $(FIGFIGS) $(PLOT_DATS) $(PLOTS) org.css
 
