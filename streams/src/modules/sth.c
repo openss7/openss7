@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.187 $) $Date: 2007/05/07 18:51:39 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.188 $) $Date: 2007/06/18 21:31:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/07 18:51:39 $ by $Author: brian $
+ Last Modified $Date: 2007/06/18 21:31:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.188  2007/06/18 21:31:34  brian
+ - pass 32-bit checks
+
  Revision 0.9.2.187  2007/05/07 18:51:39  brian
  - changes from release testing
 
@@ -220,10 +223,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.187 $) $Date: 2007/05/07 18:51:39 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.188 $) $Date: 2007/06/18 21:31:34 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.187 $) $Date: 2007/05/07 18:51:39 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.188 $) $Date: 2007/06/18 21:31:34 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -325,7 +328,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.187 $) $Date: 2007/05/07 18:51:39 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.188 $) $Date: 2007/06/18 21:31:34 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -7080,24 +7083,21 @@ str_i_getsig(const struct file *file, struct stdata *sd, unsigned long arg)
 	int flags;
 	int err;
 
-	if (unlikely(!access_ok(VERIFY_WRITE, (void *) arg, sizeof(flags)))) {
-		_ptrace(("Error path taken!\n"));
-		return (-EFAULT);
-	}
-	_ptrace(("**** Access ok!\n"));
-	if (!(err = straccess_rlock(sd, FAPPEND))) {
-		struct strevent *se;
+	if (likely((err = strcopyin((void *) arg, &flags, sizeof(flags))) == 0)) {
+		if (!(err = straccess_rlock(sd, FAPPEND))) {
+			struct strevent *se;
 
-		if ((se = __strevent_find(sd)))
-			flags = se->se_events;
-		else {
-			_ptrace(("Error path taken!\n"));
-			err = -EINVAL;
+			if ((se = __strevent_find(sd)))
+				flags = se->se_events;
+			else {
+				_ptrace(("Error path taken!\n"));
+				err = -EINVAL;
+			}
+			srunlock(sd);
 		}
-		srunlock(sd);
+		if (!err)
+			err = strcopyout(&flags, (void *) arg, sizeof(flags));
 	}
-	if (!err)
-		err = strcopyout(&flags, (void *) arg, sizeof(flags));
 	return (err);
 }
 

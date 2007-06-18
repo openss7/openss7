@@ -1,6 +1,7 @@
 2007-06-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/papers/Makefile.am: updates to pass distcheck target
+	* src/modules/sth.c: pass 32-bit checks
 
 2007-06-17  Brian Bidulock  <bidulock@openss7.org>
 
