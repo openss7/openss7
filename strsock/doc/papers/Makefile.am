@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/06/17 02:13:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/18 09:17:18 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/06/17 02:13:20 $ by $Author: brian $
+## Last Modified $Date: 2007/06/18 09:17:18 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.2  2007/06/18 09:17:18  brian
+## - updates to pass distcheck target
+##
 ## Revision 0.9.2.1  2007/06/17 02:13:20  brian
 ## - add automake files for papers
 ##
@@ -107,9 +110,11 @@ PLOTFIGS = $(PLOTS:.plot=.fig)
 
 NAME = sockimp
 
-MY_PHONY += all all-dat
+MY_PHONY += all-local all-dat
 
-all: $(NAME).bbl $(NAME).pdf
+all-local: $(NAME).bbl $(NAME).pdf
+
+ALL_LOCAL += all-local
 
 $(PLOTFIGS): %.fig: %.plot
 	@make all-dat
@@ -240,14 +245,16 @@ clean-pdf:
 clean-fig: clean-gif clean-png clean-eps clean-pdf
 	rm -f $(PLOTFIGS)
 
-clean: clean-fig clean-dat
+clean-local: clean-fig clean-dat
 	rm -f *.bak $(NAME).ps $(NAME).pdf $(NAME).dvi \
 	$(NAME).aux $(NAME).bbl $(NAME).blg $(NAME).glo $(NAME).log $(NAME).pl \
 	images.aux images.bbl images.glo images.log images.pl images.tex img*.png \
 	index.html internals.pl labels.pl \
 	$(NAME).css $(NAME).html WARNINGS
 
-MY_PHONY += clean clean-fig clean-gif clean-png clean-eps clean-pdf clean-dat
+CLEAN_LOCAL += clean-local
+
+MY_PHONY += clean-local clean-fig clean-gif clean-png clean-eps clean-pdf clean-dat
 
 EXTRA_DIST += $(NAME).pdf $(NAME).tex $(NAME).bib $(FIGFIGS) $(PLOT_DATS) $(PLOTS) org.css
 
