@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2007/04/04 01:16:32 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.158 $) $Date: 2007/06/19 14:04:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/04/04 01:16:32 $ by $Author: brian $
+# Last Modified $Date: 2007/06/19 14:04:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -95,7 +95,7 @@ dnl We need safe versions of these flags without warnings or strange optimizatio
 dnl but with module flags included
 dnl But we need to skip -DMODVERSIONS and -include /blah/blah/modversion.h on rh systems.
     BLDFLAGS=`echo "$KERNEL_BLDFLAGS" | sed -e "s|'||g;s|.#s|#s|;s|-DKBUILD_BASENAME.*|-DKBUILD_BASENAME=KBUILD_STR(phony)|"`
-    MODFLAGS=`echo " $KERNEL_MODFLAGS " | sed -e 's| -DMOVERSIONS||g;s| -include [[^ ]]*||g'`
+    MODFLAGS=`echo " $KERNEL_MODFLAGS -DKBUILD_MODNAME=\"phony\" " | sed -e 's| -DMOVERSIONS||g;s| -include [[^ ]]*||g'`
     CPPFLAGS=`echo " $BLDFLAGS $MODFLAGS $KERNEL_CPPFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
     CFLAGS=`echo " $KERNEL_CFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
     LDFLAGS=`echo " $KERNEL_LDFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
