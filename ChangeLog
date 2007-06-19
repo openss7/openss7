@@ -3,6 +3,8 @@
 	* m4/rpm.m4: changes for FC7
 	* m4/kernel.m4: changes for FC7 and 2.6.21 kernel
 	* m4/dist.m4: changes for FC7
+	* scripts/modpost.sh: fix grep quirk
+	* scripts/modsyms.sh: fix grep quirk
 
 2007-06-16  Brian Bidulock  <bidulock@openss7.org>
 
