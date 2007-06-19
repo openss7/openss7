@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/06/16 22:35:34 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/06/19 20:35:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/16 22:35:34 $ by $Author: brian $
+# Last Modified $Date: 2007/06/19 20:35:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,7 +81,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/06/16 22:35:34 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/06/19 20:35:57 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -963,7 +963,7 @@ read_module() {
     test :"filename" != : -a -f "$filename" || return 1
     name=`echo "$filename" | $modpost_fnameize`
     test :"$name" != : || return 1
-    if $ECHO "$filename" | grep -qc1 '\.gz$' ; then
+    if $ECHO "$filename" | grep -qcm1 '\.gz$' ; then
 	# shoot, we have a .gz ending
 	file=".tmp.$$.$name.ko"
 	remv="$file"
@@ -1011,10 +1011,10 @@ read_kobject() {
     filename="$1"
     test -n "$filename" -a -f "$filename" || return 1
     # not all files have appropriate syms
-    zgrep -E -qc1 '\<(_)?__crc_' $filename || return 0
+    zgrep -E -qcm1 '\<(_)?__crc_' $filename || return 0
     name=`echo "$filename" | $modpost_fnameize`
     test -n "$name" || return 1
-    if $ECHO "$filename" | grep -qc1 '\.gz$' ; then
+    if $ECHO "$filename" | grep -qcm1 '\.gz$' ; then
 	# shoot, we have a .gz ending
 	file=".tmp.$$.$name.ko"
 	remv="$file"

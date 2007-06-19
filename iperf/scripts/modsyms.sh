@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/06/16 22:35:35 $
+# @(#) $RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/06/19 20:35:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/16 22:35:35 $ by $Author: brian $
+# Last Modified $Date: 2007/06/19 20:35:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,7 +77,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/06/16 22:35:35 $'
+ident='$RCSfile: modsyms.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/06/19 20:35:57 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -453,7 +453,7 @@ process_kobject() {
 	shift
 	test -n "$filename" -a -f "$filename" || return 1
 	# not all files have appropriate symbols
-	zgrep -E -qc1 '\<(_)?__crc_' $filename || return 0
+	zgrep -E -qcm1 '\<(_)?__crc_' $filename || return 0
 	basename=`basename $filename`
 	koname=`basename $basename .gz`
 	modname=`basename $koname .ko`
