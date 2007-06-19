@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/03/08 04:28:49 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/06/19 12:36:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 04:28:49 $ by $Author: brian $
+# Last Modified $Date: 2007/06/19 12:36:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -181,6 +181,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (4)		rpm_cv_dist_extra=".FC4"	;;
 			    (5)		rpm_cv_dist_extra=".FC5"	;;
 			    (6)		rpm_cv_dist_extra=".FC6"	;;
+			    (7)		rpm_cv_dist_extra=".fc7"	;;
 			esac
 			;;
 		    (redhat)
@@ -261,7 +262,8 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (4)		rpm_cv_dist_extra2=".FC4"	;;
 			    (5)		rpm_cv_dist_extra2=".FC5"	;;
 			    (6)		rpm_cv_dist_extra2=".FC6"	;;
-			    (*)		rpm_cv_dist_extra2=".FC${dist_cvs_host_release}" ;;
+			    (7)		rpm_cv_dist_extra2=".fc7"	;;
+			    (*)		rpm_cv_dist_extra2=".fc${dist_cvs_host_release}" ;;
 			esac
 			;;
 		    (redhat)
