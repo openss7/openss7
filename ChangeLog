@@ -1,6 +1,7 @@
 2007-06-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/rpm.m4: changes for FC7
+	* m4/kernel.m4: changes for FC7 and 2.6.21 kernel
 
 2007-06-16  Brian Bidulock  <bidulock@openss7.org>
 
