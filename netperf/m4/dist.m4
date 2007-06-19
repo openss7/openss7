@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/05/07 06:16:14 $
+# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/06/19 20:18:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/05/07 06:16:14 $ by $Author: brian $
+# Last Modified $Date: 2007/06/19 20:18:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -135,7 +135,7 @@ dnl AC_MSG_WARN([checking for flavor in $[1]])
 	(*CentOS*|*CENTOS*)				echo 'centos'	;;
 	(*Lineox*|*LINEOX*)				echo 'lineox'	;;
 	(*White?Box*|*WHITE?BOX*)			echo 'whitebox'	;;
-	(*Fedora?Core*|*FEDORA?CORE*)			echo 'fedora'	;;
+	(*Fedora*|*FEDORA*)				echo 'fedora'	;;
 	(*Mandrake*|*Mandriva*|*MANDRAKE*|*MANDRIVA*)	echo 'mandrake'	;;
 	(*Red?Hat*|*RED?HAT*)				echo 'redhat'	;;
 	(*SuSE*|*SUSE*|*Novell*|*NOVELL*)		echo 'suse'	;;
@@ -169,7 +169,7 @@ dnl AC_MSG_WARN([checking for distrib in $[1]])
 	(centos)	echo 'CentOS Enterprise Linux' ;;
 	(lineox)	echo 'Lineox Enterprise Linux' ;;
 	(whitebox)	echo 'White Box Enterprise Linux' ;;
-	(fedora)	echo 'Fedora Core' ;;
+	(fedora)	echo 'Fedora' ;;
 	(mandrake)	echo 'Mandrake Linux' ;;
 	(redhat)	echo 'Red Hat Linux' ;;
 	(suse)		echo 'SuSE Linux' ;;
