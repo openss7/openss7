@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nosi nocin
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.18 2007/05/07 18:21:09 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.19 2007/06/20 06:07:12 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/05/07 18:21:09 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/20 06:07:12 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -96,10 +96,13 @@ Major features since the last public release are as follows:
 
 @itemize -
 @item
+Support build on Fedora 7 with 2.6.21 kernel.
+
+@item
 Support build on CentOS 5.0 (RHEL5).
 
 @item
-Supports build on Ubuntu 7.04.
+Support build on Ubuntu 7.04.
 
 @item
 Updated to gettext 0.16.1.

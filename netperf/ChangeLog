@@ -1,3 +1,8 @@
+2007-06-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* manual/news.texi: new distro/kernel support
+	* manual/prerequisites.texi: new distro/kernel support
+
 2007-06-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* netperf_sctp_range: remove any later language
