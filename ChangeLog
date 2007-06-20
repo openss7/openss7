@@ -1,3 +1,7 @@
+2007-06-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/texi/compat.texi: update newly supported distros and kernels
+
 2007-06-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/rpm.m4: changes for FC7
@@ -5,6 +9,8 @@
 	* m4/dist.m4: changes for FC7
 	* scripts/modpost.sh: fix grep quirk
 	* scripts/modsyms.sh: fix grep quirk
+	* scripts/texi/install.texi: more CVS instructions
+	* texi/install.texi: more CVS instructions
 
 2007-06-16  Brian Bidulock  <bidulock@openss7.org>
 
