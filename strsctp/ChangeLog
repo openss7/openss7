@@ -2,6 +2,8 @@
 
 	* doc/manual/news.texi: new distro/kernel support
 	* doc/manual/prerequisites.texi: new distro/kernel support
+	* acinclude.m4: updates for Fedora 7 and 2.6.21 kernel
+	* src/drivers/sctp2.c: updates for Fedora 7 and 2.6.21 kernel
 
 2007-06-18  Brian Bidulock  <bidulock@openss7.org>
 
