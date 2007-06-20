@@ -1,3 +1,8 @@
+2007-06-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/news.texi: updates for Fedora 7 and 2.6.21 kernel
+	* src/kernel/liscompat.c: updates for Fedora 7 and 2.6.21 kernel
+
 2007-05-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* NEWS: updates for release

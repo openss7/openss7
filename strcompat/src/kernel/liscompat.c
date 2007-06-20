@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/28 13:44:02 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/06/20 05:39:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/28 13:44:02 $ by $Author: brian $
+ Last Modified $Date: 2007/06/20 05:39:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: liscompat.c,v $
+ Revision 0.9.2.46  2007/06/20 05:39:09  brian
+ - updates for Fedora 7 and 2.6.21 kernel
+
  Revision 0.9.2.45  2007/03/28 13:44:02  brian
  - updates to syncrhonization, release notes and documentation
 
@@ -67,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/28 13:44:02 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/06/20 05:39:09 $"
 
-static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/28 13:44:02 $";
+static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/06/20 05:39:09 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -88,13 +91,17 @@ static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define _LIS_SOURCE
 
+#ifndef KBUILD_MODNAME
+#define KBUILD_MODNAME "liscompat"
+#endif
+
 #include "sys/os7/compat.h"
 
 #include <asm/dma.h>		/* for request_dma and friends */
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/03/28 13:44:02 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/06/20 05:39:09 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -1495,6 +1502,7 @@ lis_osif_pci_find_class(unsigned int class, struct pci_dev *from)
 
 EXPORT_SYMBOL(lis_osif_pci_find_class);
 #endif
+#ifdef LIS_DEPRECARTED_FUNCTIONS
 _RP struct pci_dev *
 lis_osif_pci_find_device(unsigned int vendor, unsigned int device, struct pci_dev *from)
 {
@@ -1502,6 +1510,7 @@ lis_osif_pci_find_device(unsigned int vendor, unsigned int device, struct pci_de
 }
 
 EXPORT_SYMBOL(lis_osif_pci_find_device);
+#endif
 _RP struct pci_dev *
 lis_osif_pci_find_slot(unsigned int bus, unsigned int devfn)
 {
