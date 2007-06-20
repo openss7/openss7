@@ -4,6 +4,8 @@
 	* scripts/texi/versions.texi: update versions
 	* doc/manual/news.texi: new distro/kernel support
 	* doc/manual/prerequisites.texi: new distro/kernel support
+	* texi/install.texi: update needed packages
+	* scripts/texi/install.texi: update needed packages
 
 2007-06-19  Brian Bidulock  <bidulock@openss7.org>
 

@@ -5,6 +5,7 @@
 	* src/modules/sth.c: updates for Fedora 7 and 2.6.21 kernel
 	* doc/manual/news.texi: new distro/kernel support
 	* doc/manual/prerequisites.texi: new distro/kernel support
+	* scripts/texi/install.texi: change LiS to LfS in example
 
 2007-06-18  Brian Bidulock  <bidulock@openss7.org>
 
