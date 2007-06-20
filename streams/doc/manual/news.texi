@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.31 2007/05/18 21:20:18 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.32 2007/06/20 05:16:57 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/05/18 21:20:18 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/20 05:16:57 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -97,6 +97,9 @@ Major features since the last public release are as follows:
 
 @itemize -
 @item
+Support build on Fedora 7 and 2.6.21 kernel.
+
+@item
 The @manref{strace(8)}, @manref{strerr(8)} utilities and @manref{log(4)} driver have had some
 corrections.  The STREAMS trace logger is now an excellent way for trace logging of fielded
 production drivers.  A number of OpenSS7 drivers have already been converted to use this facility.
@@ -105,7 +108,7 @@ production drivers.  A number of OpenSS7 drivers have already been converted to 
 Support build on CentOS 5.0 (RHEL5).
 
 @item
-Supports build on Ubuntu 7.04.
+Support build on Ubuntu 7.04.
 
 @item
 Significant rework of the Stream head and both enabling and backenabling utilities.  Handling of

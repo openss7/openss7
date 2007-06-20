@@ -1,3 +1,9 @@
+2007-06-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: updates for Fedora 7 and 2.6.21 kernel
+	* src/kernel/strsysctl.c: updates for Fedora 7 and 2.6.21 kernel
+	* src/modules/sth.c: updates for Fedora 7 and 2.6.21 kernel
+
 2007-06-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/papers/Makefile.am: updates to pass distcheck target
