@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: striso.spec.in,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/05/19 02:27:35 $
+# @(#) $RCSfile: striso.spec.in,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/06/20 09:27:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/05/19 02:27:35 $ by $Author: brian $
+# Last Modified $Date: 2007/06/20 09:27:48 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,8 +82,8 @@
 %global kernel_source %(echo %{_kversion} | sed -r -e 's|BOOT$||;s|-?smp$||;s|bigmem$||;s|debug$||;s|enterprise$||;s|hugemem$||;s|secure$||;s|-i686-up-4GB$||;s|-p3-smp-64GB$||;s|-64GB-SMP|.SuSE|;s|-default$||')
 %global kernel_number %(echo %{_kversion} | sed -e 's|-.*$||')
 %global kernel_release %(echo %{_kversion} | sed -e 's|-|.|g')
-%global kernel_fedora %(echo %{_kversion} | sed -e 's|.*FC[456].*$|1|;s|[^1].*$|0|')
-%global kernel_others %(echo %{_kversion} | sed -e 's|.*FC[456].*$|0|;s|[^0].*$|1|')
+%global kernel_fedora %(echo %{_kversion} | sed -e 's|.*FC[456].*$|1|;s|.*\.fc7.*$|1|;s|[^1].*$|0|')
+%global kernel_others %(echo %{_kversion} | sed -e 's|.*FC[456].*$|0|;s|.*\.fc7.*$|0|;s|[^0].*$|1|')
 %global core_name   core-%{_kversion}
 %global info_name   info-%{_kversion}
 %global majbase     @STRCONF_MAJBASE@
@@ -2027,9 +2027,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: striso.spec.in,v $
-# Revision 0.9.2.15  2007/05/19 02:27:35  brian
-# - corrected array subscripting syntax error
+# Revision 0.9.2.16  2007/06/20 09:27:48  brian
+# - recognize Fedora 7 kernels
 #
+
+* Sat May 19 2007 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.15  2007/05/19 02:27:35  brian
+- corrected array subscripting syntax error
 
 * Sun May  6 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.14  2007/05/06 07:47:34  brian

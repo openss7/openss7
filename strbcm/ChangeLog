@@ -2,6 +2,7 @@
 
 	* doc/manual/news.texi: new distro/kernel support
 	* doc/manual/prerequisites.texi: new distro/kernel support
+	* strbcm.spec.in: recognize Fedora 7 kernels
 
 2007-05-18  Brian Bidulock  <bidulock@openss7.org>
 
