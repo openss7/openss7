@@ -1,12 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.38 2007/03/26 08:45:57 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.39 2007/06/20 09:17:46 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2006  OpenSS7 Corporation <www.openss7.com>
-@c Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -54,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/26 08:45:57 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/20 09:17:46 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -1824,7 +1823,7 @@ command line.  For example:
 @noindent
 will rebuild binary RPM
 for the @samp{@value{_kversion}} kernel
-for the @samp{athlon} architecture against the @cite{LiS} @dfn{STREAMS} package.
+for the @samp{athlon} architecture.
 @footnote{Note that the @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
 @subsubheading Installation
@@ -1872,7 +1871,7 @@ binaries, @xrefman{Configuring the Debian DSC}.  These options are provided in t
 @noindent
 will rebuild binary DEB
 for the @samp{@value{_kversion}} kernel
-for the @samp{athlon} architecture against the @cite{LiS} @dfn{STREAMS} package.
+for the @samp{athlon} architecture.
 @footnote{Note that the @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
 @subsubheading Installation
