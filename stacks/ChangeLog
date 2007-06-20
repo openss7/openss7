@@ -7,6 +7,7 @@
 	* src/modules/x400p-ss7/x100p-ss7.c: updates for Fedora 7 and 2.6.21
 	* src/modules/x400p-ss7/x400p-ss7.c: updates for Fedora 7 and 2.6.21
 	* Makefile.am: updates for Fedora 7 and 2.6.21
+	* strss7.spec.in: recognize Fedora 7 kernels
 
 2007-06-16  Brian Bidulock  <bidulock@openss7.org>
 

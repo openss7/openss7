@@ -2,6 +2,7 @@
 
 	* manual/news.texi: new distro/kernel support
 	* manual/prerequisites.texi: new distro/kernel support
+	* netperf.spec.in: recognize Fedora 7 kernels
 
 2007-06-16  Brian Bidulock  <bidulock@openss7.org>
 
