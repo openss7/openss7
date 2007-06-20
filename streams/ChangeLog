@@ -3,6 +3,8 @@
 	* acinclude.m4: updates for Fedora 7 and 2.6.21 kernel
 	* src/kernel/strsysctl.c: updates for Fedora 7 and 2.6.21 kernel
 	* src/modules/sth.c: updates for Fedora 7 and 2.6.21 kernel
+	* doc/manual/news.texi: new distro/kernel support
+	* doc/manual/prerequisites.texi: new distro/kernel support
 
 2007-06-18  Brian Bidulock  <bidulock@openss7.org>
 

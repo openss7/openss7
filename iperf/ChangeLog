@@ -1,3 +1,8 @@
+2007-06-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/news.texi: new distro/kernel support
+	* doc/manual/prerequisites.texi: new distro/kernel support
+
 2007-06-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* iperf/compat/Thread.c: remove any later language
