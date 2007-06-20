@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.188 $) $Date: 2007/06/18 21:31:34 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.189 $) $Date: 2007/06/20 05:16:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/18 21:31:34 $ by $Author: brian $
+ Last Modified $Date: 2007/06/20 05:16:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.189  2007/06/20 05:16:52  brian
+ - updates for Fedora 7 and 2.6.21 kernel
+
  Revision 0.9.2.188  2007/06/18 21:31:34  brian
  - pass 32-bit checks
 
@@ -223,10 +226,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.188 $) $Date: 2007/06/18 21:31:34 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.189 $) $Date: 2007/06/20 05:16:52 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.188 $) $Date: 2007/06/18 21:31:34 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.189 $) $Date: 2007/06/20 05:16:52 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -328,7 +331,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.188 $) $Date: 2007/06/18 21:31:34 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.189 $) $Date: 2007/06/20 05:16:52 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1094,6 +1097,10 @@ straccess_slow(struct stdata *sd, const register int access, const register int 
 	static int (*is_orphaned_pgrp) (int pgrp) =
 	    (typeof(is_orphaned_pgrp)) HAVE_IS_ORPHANED_PGRP_ADDR;
 #endif
+#if defined HAVE_IS_CURRENT_PGRP_ORPHANED_ADDR
+	static int (*is_current_pgrp_orphaned) (void) =
+	    (typeof(is_current_pgrp_orphaned)) HAVE_IS_CURRENT_PGRP_ORPHANED_ADDR;
+#endif
 
 	/* POSIX semantics for pipes and FIFOs */
 	if (likely(access & (FREAD | FWRITE))) {
@@ -1126,18 +1133,38 @@ straccess_slow(struct stdata *sd, const register int access, const register int 
 		if (access & FREAD) {
 			if (is_ignored(SIGTTIN))
 				return (-EIO);
+#ifdef HAVE_IS_ORPHANED_PGRP_SYMBOL
 			if (is_orphaned_pgrp(pgrp))
 				return (-EIO);
+#endif
+#ifdef HAVE_IS_CURRENT_PGRP_ORPHANED_SYMBOL
+			if (is_current_pgrp_orphaned())
+				return (-EIO);
+#endif
+#ifdef HAVE_KILL_PGRP_SYMBOL
+			kill_pgrp(task_pgrp(current), SIGTTIN, 1);
+#else
 			kill_pg(pgrp, SIGTTIN, 1);
+#endif
 			return (-ERESTARTSYS);
 		}
 		if ((access & (FWRITE | FEXCL))
 		    && ((access & FEXCL) || (flags & STRTOSTOP))) {
 			if (is_ignored(SIGTTOU))
 				return (0);
+#ifdef HAVE_IS_ORPHANED_PGRP_SYMBOL
 			if (is_orphaned_pgrp(pgrp))
 				return (-EIO);
+#endif
+#ifdef HAVE_IS_CURRENT_PGRP_ORPHANED_SYMBOL
+			if (is_current_pgrp_orphaned())
+				return (-EIO);
+#endif
+#ifdef HAVE_KILL_PGRP_SYMBOL
+			kill_pgrp(task_pgrp(current), SIGTTOU, 1);
+#else
 			kill_pg(pgrp, SIGTTOU, 1);
+#endif
 			return (-ERESTARTSYS);
 		}
 	}
@@ -1850,7 +1877,11 @@ strsignal(struct stdata *sd, mblk_t *mp)
 		strevent(sd, S_MSG, band);
 	else if (test_bit(STRISTTY_BIT, &sd->sd_flag) || sd->sd_pgrp > 0)
 		/* Note: to send SIGHUP to the session leader, use M_HANGUP. */
+#if HAVE_KILL_PGRP_SYMBOL
+		kill_pgrp(task_pgrp(current), sig, 1);
+#else
 		kill_pg(sd->sd_pgrp, sig, 1);
+#endif
 	freemsg(mp);
 }
 
@@ -3557,7 +3588,21 @@ __kill_sl_info(int sig, struct siginfo *info, pid_t sess)
 #endif
 	struct task_struct *p;
 	int retval = -ESRCH;
+#ifdef HAVE_KMACRO_DO_EACH_PID_TASK
+	struct pid *pid;
 
+	if ((pid = find_pid(sess))) {
+		do_each_pid_task(pid, PIDTYPE_SID, p) {
+			int err;
+
+			if (!p->signal->leader)
+				continue;
+			err = send_group_sig_info(sig, info, p);
+			if (retval)
+				retval = err;
+		} while_each_pid_task(pid, PIDTYPE_SID, p);
+	}
+#else
 	do_each_task_pid(sess, PIDTYPE_SID, p) {
 		int err;
 
@@ -3568,6 +3613,7 @@ __kill_sl_info(int sig, struct siginfo *info, pid_t sess)
 			retval = err;
 	}
 	while_each_task_pid(sess, PIDTYPE_SID, p);
+#endif
 	return (retval);
 }
 

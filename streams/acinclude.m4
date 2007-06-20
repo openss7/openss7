@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2007/05/03 22:40:37 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2007/06/20 05:16:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/05/03 22:40:37 $ by $Author: brian $
+# Last Modified $Date: 2007/06/20 05:16:49 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.144  2007/06/20 05:16:49  brian
+# - updates for Fedora 7 and 2.6.21 kernel
+#
 # Revision 0.9.2.143  2007/05/03 22:40:37  brian
 # - significant performance improvements, some bug corrections
 #
@@ -1243,7 +1246,7 @@ dnl
 ])
     _LINUX_CHECK_MACROS([MOD_DEC_USE_COUNT MOD_INC_USE_COUNT \
 			 read_trylock write_trylock num_online_cpus \
-			 cpumask_scnprintf access_ok], [:], [:], [
+			 cpumask_scnprintf access_ok do_each_pid_task], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -1347,7 +1350,9 @@ dnl
 			  struct files_struct.fdtab,
 			  struct inode.i_private,
 			  struct inode.i_blksize,
-			  struct fown_struct.pid_type], [:], [:], [
+			  struct fown_struct.pid_type,
+			  struct ctl_table.proc_dir_entry,
+			  struct ctl_table.parent], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -1370,12 +1375,16 @@ dnl
 #ifdef HAVE_KINC_LINUX_NAMESPACE_H
 #include <linux/namespace.h>
 #endif
+#ifdef CONFIG_PROC_FS
+#include <linux/proc_fs.h>
+#endif
+#include <linux/sysctl.h>
 ])
     at_ioctl_getmsg="$linux_cv_member_struct_file_operations_unlocked_ioctl"
     AC_SUBST([at_ioctl_getmsg])dnl
     AM_CONDITIONAL(USING_IOCTL_GETPMSG_PUTPMSG, test :$at_ioctl_getmsg = :yes)dnl
 	_LINUX_KERNEL_SYMBOLS([ioctl32_hash_table, ioctl32_sem, compat_ptr])
-	_LINUX_KERNEL_SYMBOLS([is_ignored, is_orphaned_pgrp, kill_sl, kill_proc_info, send_group_sig_info, session_of_pgrp])
+	_LINUX_KERNEL_SYMBOLS([is_ignored, is_orphaned_pgrp, is_current_pgrp_orphaned, kill_sl, kill_proc_info, kill_pgrp, send_group_sig_info, session_of_pgrp])
 	_LINUX_KERNEL_SYMBOL_EXPORT([cdev_put])
 	_LINUX_KERNEL_EXPORT_ONLY([path_lookup])
 	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq])
