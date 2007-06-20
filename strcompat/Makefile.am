@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/03/13 06:17:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/06/20 07:53:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/13 06:17:05 $ by $Author: brian $
+# Last Modified $Date: 2007/06/20 07:53:35 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.27  2007/06/20 07:53:35  brian
+# - updates for Fedora 7 and 2.6.21
+#
 # Revision 0.9.2.26  2007/03/13 06:17:05  brian
 # - suppress errors when building 32-bit libs
 #
@@ -339,7 +342,7 @@ libCOMPATmods_a_SOURCES		+= src/include/sys/mac/ddi.h src/include/sys/mac/strcon
 endif
 
 libCOMPATmods_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
-libCOMPATmods_a_CFLAGS		= $(KERNEL_CFLAGS)
+libCOMPATmods_a_CFLAGS		= $(KERNEL_CFLAGS) -Wno-deprecated-declarations -DKBUILD_MODNAME=\"$(kpre)`echo $@ | sed -e 's,lib.*_a-,,;s,\.o,,;s,-,_,g'`\"
 
 EXTRA_KERNEL_MODULES		+=
 

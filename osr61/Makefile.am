@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/13 06:16:55 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/06/20 07:53:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/13 06:16:55 $ by $Author: brian $
+# Last Modified $Date: 2007/06/20 07:53:20 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2007/06/20 07:53:20  brian
+# - updates for Fedora 7 and 2.6.21
+#
 # Revision 0.9.2.7  2007/03/13 06:16:55  brian
 # - suppress errors when building 32-bit libs
 #
@@ -271,12 +274,13 @@ endif
 libOSRdlgn_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libOSRdlgn_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME_STR=\"dlgn\" \
+				  -DKBUILD_MODNAME=\"dlgn\" \
 				  -I./src/drivers/dlgn/include -I$(srcdir)/src/drivers/dlgn/include \
 				  -I./src/drivers/dvbm/include -I$(srcdir)/src/drivers/dvbm/include \
 				  -I./src/drivers/gncfd/include -I$(srcdir)/src/drivers/gncfd/include \
 				  -I./src/drivers/gpio/include -I$(srcdir)/src/drivers/gpio/include \
 				  -I./src/drivers/sctmr/include -I$(srcdir)/src/drivers/sctmr/include
-libOSRdlgn_a_CFLAGS		= $(KERNEL_CFLAGS)
+libOSRdlgn_a_CFLAGS		= $(KERNEL_CFLAGS) -Wno-deprecated-declarations
 
 $(libOSRdlgn_a_OBJECTS):	$(libOSRdlgn_a_DEPENDENCIES)
 
@@ -300,6 +304,7 @@ endif
 libOSRdvbm_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libOSRdvbm_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME_STR=\"dvbm\" \
+				  -DKBUILD_MODNAME=\"dvbm\" \
 				  -I./src/drivers/dlgn/include -I$(srcdir)/src/drivers/dlgn/include \
 				  -I./src/drivers/dvbm/include -I$(srcdir)/src/drivers/dvbm/include \
 				  -I./src/drivers/gncfd/include -I$(srcdir)/src/drivers/gncfd/include \
@@ -332,6 +337,7 @@ endif
 libOSRgncfd_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libOSRgncfd_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME_STR=\"gncfd\" \
+				  -DKBUILD_MODNAME=\"gncfd\" \
 				  -I./src/drivers/dlgn/include -I$(srcdir)/src/drivers/dlgn/include \
 				  -I./src/drivers/dvbm/include -I$(srcdir)/src/drivers/dvbm/include \
 				  -I./src/drivers/gncfd/include -I$(srcdir)/src/drivers/gncfd/include \
@@ -355,6 +361,7 @@ libOSRgpio_a_SOURCES		= \
 libOSRgpio_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libOSRgpio_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME_STR=\"gpio\" \
+				  -DKBUILD_MODNAME=\"gpio\" \
 				  -I./src/drivers/dlgn/include -I$(srcdir)/src/drivers/dlgn/include \
 				  -I./src/drivers/dvbm/include -I$(srcdir)/src/drivers/dvbm/include \
 				  -I./src/drivers/gncfd/include -I$(srcdir)/src/drivers/gncfd/include \
@@ -386,6 +393,7 @@ endif
 libOSRsctmr_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libOSRsctmr_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME_STR=\"sctmr\" \
+				  -DKBUILD_MODNAME=\"sctmr\" \
 				  -I./src/drivers/dlgn/include -I$(srcdir)/src/drivers/dlgn/include \
 				  -I./src/drivers/dvbm/include -I$(srcdir)/src/drivers/dvbm/include \
 				  -I./src/drivers/gncfd/include -I$(srcdir)/src/drivers/gncfd/include \
@@ -412,12 +420,13 @@ libOSRctimod_a_SOURCES		= \
 libOSRctimod_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libOSRctimod_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME_STR=\"ctimod\" \
+				  -DKBUILD_MODNAME=\"ctimod\" \
 				  -I./src/drivers/dlgn/include -I$(srcdir)/src/drivers/dlgn/include \
 				  -I./src/drivers/dvbm/include -I$(srcdir)/src/drivers/dvbm/include \
 				  -I./src/drivers/gncfd/include -I$(srcdir)/src/drivers/gncfd/include \
 				  -I./src/drivers/gpio/include -I$(srcdir)/src/drivers/gpio/include \
 				  -I./src/drivers/sctmr/include -I$(srcdir)/src/drivers/sctmr/include
-libOSRctimod_a_CFLAGS		= $(KERNEL_CFLAGS)
+libOSRctimod_a_CFLAGS		= $(KERNEL_CFLAGS) -Wno-deprecated-declarations
 
 $(libOSRctimod_a_OBJECTS): $(libOSRctimod_a_DEPENDENCIES)
 
@@ -514,6 +523,7 @@ libOSRmercd_a_SOURCES		= \
 libOSRmercd_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libOSRmercd_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME_STR=\"mercd\" \
+				  -DKBUILD_MODNAME=\"mercd\" \
 				  -I./src/drivers/dlgn/include -I$(srcdir)/src/drivers/dlgn/include \
 				  -I./src/drivers/dvbm/include -I$(srcdir)/src/drivers/dvbm/include \
 				  -I./src/drivers/gncfd/include -I$(srcdir)/src/drivers/gncfd/include \
@@ -567,6 +577,7 @@ libOSRpmacd_a_SOURCES		= \
 libOSRpmacd_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libOSRpmacd_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB) \
 				  -DLIS_OBJNAME_STR=\"pmacd\" \
+				  -DKBUILD_MODNAME=\"pmacd\" \
 				  -I./src/drivers/dlgn/include -I$(srcdir)/src/drivers/dlgn/include \
 				  -I./src/drivers/dvbm/include -I$(srcdir)/src/drivers/dvbm/include \
 				  -I./src/drivers/gncfd/include -I$(srcdir)/src/drivers/gncfd/include \
