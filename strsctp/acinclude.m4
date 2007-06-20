@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2007/05/18 05:02:00 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2007/06/20 06:36:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/05/18 05:02:00 $ by $Author: brian $
+# Last Modified $Date: 2007/06/20 06:36:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -567,6 +567,58 @@ dnl 	])
 		AC_DEFINE([HAVE_XFRM_POLICY_DELETE_RETURNS_INT], [1], [Define if function
 			   xfrm_policy_delete returns int.])
 	    fi
+	fi
+	AC_CACHE_CHECK([for kernel ip_route_connect with 9 arguments], [linux_cv_have_ip_route_connect_9_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/ip.h>]],
+		[[int (*my_autoconf_function_pointer)(struct rtable **, __be32, __be32, u32, int, u8, __be16, __be16, struct sock *) = &ip_route_connect;]]) ],
+		[linux_cv_have_ip_route_connect_9_args='yes'],
+		[linux_cv_have_ip_route_connect_9_args='no'])
+	])
+	if test :$linux_cv_have_ip_route_connect_9_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_CONNECT_9_ARGS], [1], [Define if
+		       function ip_route_connect takes 9 arguments which was
+		       normally the case up to 2.6.20.])
+	fi
+	AC_CACHE_CHECK([for kernel ip_route_connect with 10 arguments], [linux_cv_have_ip_route_connect_10_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/ip.h>]],
+		[[int (*my_autoconf_function_pointer)(struct rtable **, __be32, __be32, u32, int, u8, __be16, __be16, struct sock *, int) = &ip_route_connect;]]) ],
+		[linux_cv_have_ip_route_connect_10_args='yes'],
+		[linux_cv_have_ip_route_connect_10_args='no'])
+	])
+	if test :$linux_cv_have_ip_route_connect_10_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS], [1], [Define if
+		       function ip_route_connect takes 10 arguments which is
+		       the case from 2.6.21.])
 	fi
 	AC_CACHE_CHECK([for kernel __ip_select_ident with 2 arguments], [linux_cv_have___ip_select_ident_2_args], [dnl
 	    AC_COMPILE_IFELSE([
