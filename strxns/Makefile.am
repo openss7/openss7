@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/03/13 06:17:31 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/06/20 07:53:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/13 06:17:31 $ by $Author: brian $
+# Last Modified $Date: 2007/06/20 07:53:39 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.61  2007/06/20 07:53:39  brian
+# - updates for Fedora 7 and 2.6.21
+#
 # Revision 0.9.2.60  2007/03/13 06:17:31  brian
 # - suppress errors when building 32-bit libs
 #
@@ -255,7 +258,7 @@ nodist_libXNSdrvs_a_SOURCES	= $(drvs_source_FILES)
 
 libXNSdrvs_a_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG) src/drivers/ip_hooks.h
 libXNSdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS)
-libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
+libXNSdrvs_a_CFLAGS		= $(KERNEL_CFLAGS) -DKBUILD_MODNAME=\"$(kpre)`echo $@ | sed -e 's,lib.*_a-,,;s,\.o,,;s,-,_,g'`\"
 libXNSdrvs_a_OBJECTS:		$(libXNSdrvs_a_DEPENDENCIES)
 
 EXTRA_KERNEL_MODULES		+= 

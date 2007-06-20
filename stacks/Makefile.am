@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2007/03/16 10:30:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2007/06/20 07:53:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/16 10:30:27 $ by $Author: brian $
+# Last Modified $Date: 2007/06/20 07:53:22 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.91  2007/06/20 07:53:22  brian
+# - updates for Fedora 7 and 2.6.21
+#
 # Revision 0.9.2.90  2007/03/16 10:30:27  brian
 # - final changes from release
 #
@@ -475,7 +478,7 @@ nodist_libSS7mods_a_SOURCES	= $(mods_source_FILES)
 
 libSS7mods_a_DEPENDENCIES	= config.h strconf.h
 libSS7mods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) -I$(srcdir)/src/modules
-libSS7mods_a_CFLAGS		= $(KERNEL_CFLAGS)
+libSS7mods_a_CFLAGS		= $(KERNEL_CFLAGS) -DKBUILD_MODNAME=\"$(kpre)`echo $@ | sed -e 's,lib.*_a-,,;s,\.o,,;s,-,_,g'`\"
 libSS7mods_a_OBJECTS:		$(libSS7mods_a_DEPENDENCIES)
 
 EXTRA_KERNEL_MODULES		+= 
