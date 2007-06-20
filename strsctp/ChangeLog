@@ -5,6 +5,7 @@
 	* acinclude.m4: updates for Fedora 7 and 2.6.21 kernel
 	* src/drivers/sctp2.c: updates for Fedora 7 and 2.6.21 kernel
 	* strsctp.spec.in: recognize Fedora 7 kernels
+	* strsctp.lsm.in: update file sizes for release
 
 2007-06-18  Brian Bidulock  <bidulock@openss7.org>
 
