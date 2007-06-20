@@ -4,6 +4,7 @@
 	* doc/manual/prerequisites.texi: new distro/kernel support
 	* Makefile.am: updates for Fedora 7 and 2.6.21 kernel
 	* strxns.spec.in: recognize Fedora 7 kernels
+	* strxns.lsm.in: update file sizes for release
 
 2007-06-16  Brian Bidulock  <bidulock@openss7.org>
 

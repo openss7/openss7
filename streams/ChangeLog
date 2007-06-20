@@ -7,6 +7,7 @@
 	* doc/manual/prerequisites.texi: new distro/kernel support
 	* scripts/texi/install.texi: change LiS to LfS in example
 	* streams.spec.in: recognize Fedora 7 kernels
+	* streams.lsm.in: update file sizes for release
 
 2007-06-18  Brian Bidulock  <bidulock@openss7.org>
 
