@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: testsuite.texi,v 0.9.2.15 2007/06/21 22:46:49 brian Exp $
+@c @(#) $Id: testsuite.texi,v 0.9.2.16 2007/06/21 23:08:21 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/21 22:46:49 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/21 23:08:21 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -514,10 +514,10 @@ generation that meets the problem report submission guidelines detailed in the p
 Whenever a logging makefile target (@pxrefman{Logging Targets}) is invoked, if the primary target
 fails, the @command{send-pr} shell script is invoked to automatically generate a problem report
 file suitable for the corresponding target (as described above under @pxrefman{Problem Report
-Guidelines}).  An example is shown in @ref{autopr:ex2}.
+Guidelines}).  An example is shown in @ref{autopr:ex1}.
 
 @cartouche
-@float Example,autopr:ex2
+@float Example,autopr:ex1
 @caption{@emph{Problem Report from Failed Logging Target}}
 @example
 % make compile.log
@@ -568,10 +568,10 @@ file @file{send-pr.config} in @file{$@{libexecdir@}/@value{PACKAGE}} along with 
 not have a build directory.
 
 An example of invoking the package @command{testsuite} and then generating a problem report for
-failed cases is shown in @ref{autopr:ex3}.
+failed cases is shown in @ref{autopr:ex2}.
 
 @cartouche
-@float Example,autopr:ex3
+@float Example,autopr:ex2
 @caption{@emph{Invoking @command{send-pr} Directly}}
 @example
 % [sudo] @value{_libexecdir}/@value{PACKAGE}/testsuite
