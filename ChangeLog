@@ -1,3 +1,7 @@
+2007-06-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/netconfig.am: fix up problems with libtirpc
+
 2007-06-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/compat.texi: update newly supported distros and kernels
