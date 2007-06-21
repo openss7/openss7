@@ -1,6 +1,7 @@
 2007-06-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/netconfig.am: fix up problems with libtirpc
+	* scripts/texi/testsuite.texi: fix double named example
 
 2007-06-20  Brian Bidulock  <bidulock@openss7.org>
 
