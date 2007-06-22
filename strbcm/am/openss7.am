@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2007/06/22 06:58:17 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2007/06/22 07:35:06 $
 #
 #! -----------------------------------------------------------------------------
 #!
@@ -46,11 +46,14 @@
 #!
 #! -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/06/22 06:58:17 $ by $Author: brian $
+## Last Modified $Date: 2007/06/22 07:35:06 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.115  2007/06/22 07:35:06  brian
+## - try making remove reversive
+##
 ## Revision 0.9.2.114  2007/06/22 06:58:17  brian
 ## - add uninstall-am to remove target
 ##
@@ -605,9 +608,13 @@ retest-am: $(RETEST_AM)
 MY_RECURSIVE_TARGETS	+= retest-recursive
 MY_PHONY		+= retest retest-am
 
-remove: all-uninstall uninstall-am
+remove-am: uninstall-am
 
-MY_PHONY		+= remove
+remove: remove-recursive remove-am
+
+MY_REVERSIVE_TARGETS	+= remove-recursive
+MY_PHONY		+= remove remove-am
+
 
 #!
 #! Release Targets:
