@@ -1,5 +1,5 @@
 ##
-# @(#) $RCSfile: netconfig,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 06:06:21 $
+# @(#) $RCSfile: netconfig,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/22 00:18:51 $
 ##
 ## Network Configuration Database
 ## for the Network Selection Facility and the Name-to-Address Directory
@@ -9,17 +9,21 @@
 ##
 # <netid> <semantics>   <flag> <family>  <proto> <device>       <n2alibs>
 # ------- ------------- ------ --------- ------- -------------- ----------------
+udp6      tpi_clts      v      inet6     udp     -              -
+tcp6      tpi_cots_ord  v      inet6     tcp     -              -
 udp       tpi_clts      vbm    inet      udp     /dev/udp2      -
-rawip     tpi_clts      vbm    inet      rawip   /dev/rawip2    -
 tcp       tpi_cots_ord  v      inet      tcp     /dev/tcp       -
-ticlts    tpi_clts      v      loopback  -       /dev/ticlts    /usr/lib/straddr.so
-ticots    tpi_cots      v      loopback  -       /dev/ticots    /usr/lib/straddr.so
-ticotsord tpi_cots_ord  v      loopback  -       /dev/ticotsord /usr/lib/straddr.so
+rawip     tpi_clts      bm     inet      -       /dev/rawip2    -
+ticlts    tpi_clts      -      loopback  -       /dev/ticlts    /usr/lib/straddr.so
+ticots    tpi_cots      -      loopback  -       /dev/ticots    /usr/lib/straddr.so
+ticotsord tpi_cots_ord  -      loopback  -       /dev/ticotsord /usr/lib/straddr.so
+local     tpi_cots_ord  -      loopback  -       /dev/ticotsord /usr/lib/straddr.so
+unix      tpi_cots_ord  -      loopback  -       /dev/ticotsord /usr/lib/straddr.so
 # ------- ------------- ------ --------- ------- -------------- ----------------
 
 ## =============================================================================
 ## 
-# @(#) $RCSfile: netconfig,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 06:06:21 $
+# @(#) $RCSfile: netconfig,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/22 00:18:51 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -64,11 +68,14 @@ ticotsord tpi_cots_ord  v      loopback  -       /dev/ticotsord /usr/lib/straddr
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/16 06:06:21 $ by $Author: brian $
+## Last Modified $Date: 2007/06/22 00:18:51 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: netconfig,v $
+## Revision 0.9.2.2  2007/06/22 00:18:51  brian
+## - mostly documentation updates for release, some netconfig workaround
+##
 ## Revision 0.9.2.1  2006/10/16 06:06:21  brian
 ## - added config files
 ##

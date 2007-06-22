@@ -1,11 +1,11 @@
-@c -*- texinfo -*- vim: ft=texinfo tw=78 nocin nosi
+@c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.2 2006/08/29 11:48:59 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.3 2007/06/22 00:18:23 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -53,13 +53,26 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/29 11:48:59 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/22 00:18:23 $ by $Author: brian $
 @c
 @c =========================================================================
 
-Things to do:
+@subsubheading Current Plan
+
+There is no current plan for the @file{iperf} package beyond minor distribution maintenance.  The
+package tests the OpenSS7 Linux Native Sockets version of sctp (@samp{sctp} package) nicely, but
+that package only runs on 2.4 kernels.  When the @file{strsock} package is complete for Linux
+Fast-STREAMS, the OpenSS7 Project will likely haul this back out and use it for testing the STREAMS
+versions of UDP, TCP and SCTP using the socklib interface.  But, the @file{strsock} package
+completion itself is not planned, so you can only likely expect maintenance releases of this
+package.  The package could be extended to test lksctp as well, however, comparisons between lksctp
+and sctp can only be done on 2.4 kernels for now.  This type of work has been mooted by the current
+popularity of 2.6 kernels.
+
+@subsubheading Things to Do
 
 @itemize @minus
+
 @item
 Write a texinfo manual for Iperf.
 
@@ -68,15 +81,15 @@ Write a texinfo manual for Iperf.
 You are reading it.
 
 @item
-Merge upstream changes from the latest @cite{University of Illinois} release
-of the @cite{Iperf} package into the @cite{OpenSS7 Modified} version.  It
-would really like to do this but don't have the time for it right now.  If
-someone is willing to dive in and give this a try, send me the patches.
+Merge upstream changes from the latest @cite{University of Illinois} release of the @cite{Iperf}
+package into the @cite{OpenSS7 Modified} version.  It would really like to do this but don't have
+the time for it right now.  If someone is willing to dive in and give this a try, send me the
+patches.
 
 @item
-@cite{Iperf} is capable of performing performance testing on @cite{lksctp} as
-well.  I would like to modify the @cite{OpenSS7} version of @cite{Iperf} to
-support both so that performance comparison testing can be done between
-@cite{lkstcp} (which sucks of course) and @cite{OpenSS7}.
+@cite{Iperf} is capable of performing performance testing on @cite{lksctp} as well.  I would like to
+modify the @cite{OpenSS7} version of @cite{Iperf} to support both so that performance comparison
+testing can be done between @cite{lkstcp} (which sucks of course) and @cite{OpenSS7}.
+
 @end itemize
 

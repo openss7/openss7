@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2007/06/20 05:16:49 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2007/06/22 00:18:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/20 05:16:49 $ by $Author: brian $
+# Last Modified $Date: 2007/06/22 00:18:38 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.145  2007/06/22 00:18:38  brian
+# - mostly documentation updates for release, some netconfig workaround
+#
 # Revision 0.9.2.144  2007/06/20 05:16:49  brian
 # - updates for Fedora 7 and 2.6.21 kernel
 #
@@ -1351,7 +1354,7 @@ dnl
 			  struct inode.i_private,
 			  struct inode.i_blksize,
 			  struct fown_struct.pid_type,
-			  struct ctl_table.proc_dir_entry,
+			  struct ctl_table.de,
 			  struct ctl_table.parent], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>

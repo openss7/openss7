@@ -1,11 +1,11 @@
-@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
+@c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.4 2007/03/28 13:44:01 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.5 2007/06/22 00:18:36 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -53,11 +53,24 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/03/28 13:44:01 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/22 00:18:36 $ by $Author: brian $
 @c
 @c =========================================================================
 
-Things to do:
+@subsubheading Current Plan
+
+There are not many things left to be done on the production OpenSS7 STREAMS Compatibility Modules
+package.  The current plan for the package is largely a maintenance plan including support for
+current distributions and kernels.
+
+There are currently a large array of Solaris DDI compatibility functions that are not implemented;
+however, there have not been many requests for this capability.  Perhaps the advent of OpenSolaris
+has forstalled porting of many drivers to Linux, but, regardless of the cause, there is just not a
+demand.  If there are any functions that you need the OpenSS7 Project to support that are not
+currently supported in one of the compatibility modules, please request support for them on the
+openss7-develop mailing list.
+
+@subsubheading Things to Do
 
 @itemize @minus
 

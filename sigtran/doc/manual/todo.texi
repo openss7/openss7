@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.1 2006/10/16 10:42:45 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.2 2007/06/22 00:18:29 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -16,7 +16,7 @@
 @c Permission is granted to copy and distribute modified versions of this
 @c manual under the conditions for verbatim copying, provided that the
 @c entire resulting derived work is distributed under the terms of a
-@c permission notice identical to this one
+@c permission notice identical to this one.
 @c 
 @c Since the Linux kernel and libraries are constantly changing, this
 @c manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -53,17 +53,49 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/16 10:42:45 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/22 00:18:29 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: todo.texi,v $
+@c Revision 0.9.2.2  2007/06/22 00:18:29  brian
+@c - mostly documentation updates for release, some netconfig workaround
+@c
 @c Revision 0.9.2.1  2006/10/16 10:42:45  brian
 @c - added new package files
 @c
 @c =========================================================================
 
-Things to do:
+@subsubheading Current Plan
+
+The current plan of the next several months (over the summer of 2007) is to actively move this
+package forward.  This consists of the following:
+
+@itemize @bullet
+
+@item
+Move SIGTRAN modules and drivers that have not yet been publicly released into the public release.
+
+@item
+Write test cases for complete AS-side implementations of all of the UAs (including ISUA and TUA).
+
+@item
+Perform production testing of the UAs against Tekelec Eagle and Cisco ITP equipment.
+
+@item
+Rigorous lab and limited field testing of AS-side components.
+
+@item
+Production deployment in customer's network for 1Q2008.
+
+@end itemize
+
+Note that M2PA is complete.  Aside from that, the order of testing and implementation will be M3UA
+followed by M2UA or SUA and then TUA, IUA (including V5UA and GR303UA) and ISUA.
+
+Production public releases of the AS side of M3UA can be expected by the end of July 2007.
+
+@subsubheading Things to Do
 
 @itemize @minus
 
@@ -76,9 +108,11 @@ This remains to be done.
 Actually implement all of the package.
 
 @item
-Copy all of the SIGTRAN drivers, multiplexers and modules as well as the test
-programs from the strss7 package and place them here.
+Copy all of the SIGTRAN drivers, multiplexers and modules as well as the test programs from the
+strss7 package and place them here.
 
 Note that this package should load after strss7 but before strvoip.
+
+@emph{*done*}
 
 @end itemize

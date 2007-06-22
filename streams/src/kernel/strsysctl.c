@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/06/20 05:16:51 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/06/22 00:18:48 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/20 05:16:51 $ by $Author: brian $
+ Last Modified $Date: 2007/06/22 00:18:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsysctl.c,v $
+ Revision 0.9.2.43  2007/06/22 00:18:48  brian
+ - mostly documentation updates for release, some netconfig workaround
+
  Revision 0.9.2.42  2007/06/20 05:16:51  brian
  - updates for Fedora 7 and 2.6.21 kernel
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/06/20 05:16:51 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/06/22 00:18:48 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/06/20 05:16:51 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/06/22 00:18:48 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -135,7 +138,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 &sysctl_str_minpsz, NULL},
@@ -146,7 +149,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, &sysctl_str_maxpsz},
@@ -157,7 +160,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 &sysctl_str_lowat, NULL},
@@ -168,7 +171,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, &sysctl_str_hiwat},
@@ -179,7 +182,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_ms_jiffies_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -190,7 +193,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_ms_jiffies_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -201,7 +204,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_ms_jiffies_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -212,7 +215,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -223,7 +226,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -234,7 +237,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_ms_jiffies_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -245,7 +248,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -256,7 +259,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -266,7 +269,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -277,7 +280,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -287,7 +290,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_dointvec, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -298,7 +301,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -308,7 +311,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -319,7 +322,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -330,7 +333,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -341,7 +344,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_doulongvec_minmax, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
@@ -351,7 +354,7 @@ STATIC ctl_table streams_table[] = {
 	 NULL,
 #endif
 	 &proc_dointvec, NULL,
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PROC_DIR_ENTRY
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},

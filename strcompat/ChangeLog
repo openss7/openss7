@@ -1,3 +1,13 @@
+2007-06-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/bugs.texi: doc updates for release
+	* doc/manual/configure.texi: doc updates for release
+	* doc/manual/descrip.texi: doc updates for release
+	* doc/manual/releases.texi: doc updates for release
+	* doc/manual/rpm.texi: doc updates for release
+	* doc/manual/todo.texi: doc updates for release
+	* doc/manual/tree.texi: doc updates for release
+
 2007-06-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: updates for Fedora 7 and 2.6.21 kernel

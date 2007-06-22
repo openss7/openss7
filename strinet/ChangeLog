@@ -1,3 +1,8 @@
+2007-06-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/todo.texi: doc updates for release
+	* src/util/sysconfig/netconfig: closer to libtiprc
+
 2007-06-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: new distro/kernel support
