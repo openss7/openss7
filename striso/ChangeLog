@@ -1,3 +1,7 @@
+2007-06-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* striso.spec.in: netconfig respects libtirpc
+
 2007-06-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/todo.texi: doc updates for release
