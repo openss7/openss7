@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: netconfig.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/06/22 05:00:48 $
+# @(#) $RCSfile: netconfig.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/06/22 06:46:10 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,11 +46,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/06/22 05:00:48 $ by $Author: brian $
+## Last Modified $Date: 2007/06/22 06:46:10 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: netconfig.am,v $
+## Revision 0.9.2.7  2007/06/22 06:46:10  brian
+## - another stab
+##
 ## Revision 0.9.2.6  2007/06/22 05:00:48  brian
 ## - one more try
 ##
@@ -95,10 +98,10 @@ install-netconfig: src/util/sysconfig/netconfig
 ##
 # If the /etc/netconfig file exists after we have place the /etc/netconfig.d subdirectory entry,
 # then check if it is one we built.  If it is, simply empty it a start again, otherwise if it is not
-# one we built it likely belongs to the libtirpc package so we move it out of the before calculating
-# the new one.  If there are no entries in the /etc/netconfig.d subdirectory, assume that we are
-# being removed and return any /etc/netconfig.tirpc file back to place.  Note that if nothing really
-# gets installed in the /etc/netconfig.d subdirectory, calling this has no overall effect.
+# one we built it likely belongs to the libtirpc package so do not calculate a new one.  If there
+# are no entries in the /etc/netconfig.d subdirectory, assume that we are being removed.
+# any /etc/netconfig.tirpc file back to place.  Note that if nothing really gets installed in the
+# /etc/netconfig.d subdirectory, calling this has no overall effect.
 ##
 
 post-netconfig:
@@ -106,23 +109,19 @@ post-netconfig:
 	@t="$(DESTDIR)$(sysconfdir)/netconfig" ; \
 	d="$(DESTDIR)$(sysconfdir)/netconfig.d" ; \
 	if test -e $$t ; then \
-		if grep '^# Generated from netconfig.d' $$t >/dev/null 2>&1 ; then \
-			$(ECHO) "cp -f -- /dev/null $$t" ; \
-			cp -f -- /dev/null $$t ; \
-		else \
-			$(ECHO) "cp -f -b --suffix=.tirpc -- /dev/null $$t" ; \
-			cp -f -b --suffix=.tirpc -- /dev/null $$t ; \
+		if !grep '^# Generated from netconfig.d' $$t >/dev/null 2>&1 ; then \
+			exit 0 ; \
 		fi ; \
 	fi ; \
-	$(ECHO) "$(ECHO) '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` >> $$t" ; \
-	$(ECHO) '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` >> $$t ; \
+	$(ECHO) "$(ECHO) '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $$t.tmp" ; \
+	$(ECHO) '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $$t.tmp ; \
 	found='no' ; files="$$d/*" ; \
 	for f in $$files ; do \
 		if test -f $$f -a "$$f" = "$$d/strnsl" ; then \
 			case $$f in \
 				(*.rpmsave|*.rpmnew|*.rpmorig) ;; \
-				(*) $(ECHO) "sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t" ; \
-				    sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t ; \
+				(*) $(ECHO) "sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp" ; \
+				    sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp ; \
 				    found='yes' ;; \
 			esac ; \
 		fi ; \
@@ -131,20 +130,18 @@ post-netconfig:
 		if test -f $$f -a "$$f" != "$$d/strnsl" ; then \
 			case $$f in \
 				(*.rpmsave|*.rpmnew|*.rpmorig) ;; \
-				(*) $(ECHO) "sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t" ; \
-				    sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t ; \
+				(*) $(ECHO) "sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp" ; \
+				    sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp ; \
 				    found='yes' ;; \
 			esac ; \
 		fi ; \
 	done ; \
 	if test :$$found = :no ; then \
-		if test -e $$t.tirpc ; then \
-			$(ECHO) "mv -f $$t.tirpc $$t" ; \
-			mv -f $$t.tirpc $$t ; \
-		else \
-			$(ECHO) "rm -f $$t" ; \
-			rm -f $$t ; \
-		fi ; \
+		$(ECHO) "rm -f $$t $$t.tmp" ; \
+		rm -f $$t $$t.tmp ; \
+	else \
+		$(ECHO) "mv -f $$t.tmp $$t" ; \
+		mv -f $$t.tmp $$t ; \
 	fi
 
 uninstall-netconfig:
