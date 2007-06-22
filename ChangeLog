@@ -2,6 +2,14 @@
 
 	* am/netconfig.am: fix up problems with libtirpc
 	* texi/testsuite.texi: fix double named example
+	* doc/manual/bugs.texi: doc updates for release
+	* doc/manual/configure.texi: doc updates for release
+	* doc/manual/descrip.texi: doc updates for release
+	* doc/manual/openss7.texi: doc updates for release
+	* doc/manual/releases.texi: doc updates for release
+	* doc/manual/rpm.texi: doc updates for release
+	* doc/manual/todo.texi: doc updates for release
+	* doc/manual/tree.texi: doc updates for release
 	* scripts/texi/testsuite.texi: fix double named example
 
 2007-06-20  Brian Bidulock  <bidulock@openss7.org>

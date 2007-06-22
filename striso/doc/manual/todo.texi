@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.3 2007/01/05 06:26:20 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.4 2007/06/22 00:18:54 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,27 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/05 06:26:20 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/22 00:18:54 $ by $Author: brian $
 @c
 @c =========================================================================
 
-Things to do:
+@subsubheading Current Plan
+
+This package was initially started to provide managment interfaces to platforms using the OpenSS7
+protocol stacks (CMIP and CMOT interfaces) using SS7 GDMO and other GDMO.  It was considered pulling
+some of the old @file{isode} package into this package to provide some GDMO facilities.
+
+Since then, it was discovered that these ISO protocols are still very important to a number of
+industries on Linux and Linux Fast-STREAMS.  These industries are the Aviation and Financial
+industries.  Closer to the heard of telecommunications is the applications of aircraft to ground
+communications for the Aviation industry.
+
+While the OpenSS7 Project's focus over the Summer of 2007 is going to be soft-switch enabling
+protocols, that may change if the Aviation industry steps up to this package with some funding to
+complete the work or by contributing changes, improvements or development to this package.
+Otherwise, expect this package to receive only maintenance releases over the next 8 months or so.
+
+@subsubheading Things to Do
 
 @itemize @minus
 @item

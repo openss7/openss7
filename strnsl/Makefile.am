@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 00:53:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/06/22 00:18:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/25 00:53:14 $ by $Author: brian $
+# Last Modified $Date: 2007/06/22 00:18:55 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.10  2007/06/22 00:18:55  brian
+# - mostly documentation updates for release, some netconfig workaround
+#
 # Revision 0.9.2.9  2007/03/25 00:53:14  brian
 # - synchronization updates
 #
@@ -375,6 +378,12 @@ endif
 
 ## RPM_BUILD_USER
 endif
+
+##
+## Rules for net config files
+##
+include am/netconfig.am
+#include am/sock2path.am
 
 ##
 ## Rules for init scripts

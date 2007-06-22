@@ -1,11 +1,11 @@
-@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
+@c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.3 2007/01/21 20:22:40 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.4 2007/06/22 00:18:31 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -53,12 +53,26 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/21 20:22:40 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/22 00:18:31 $ by $Author: brian $
 @c
 @c =========================================================================
 
-Things to do (there is a great long list of these, but here is a crack
-at the first ones):
+
+@subsubheading Current Plan
+
+The current plan includes the public production release of SCCP, ISUP and TCAP components.  MTP3 has
+not yet been publicly released and is not currently scheduled. (Implementing the AS-side of M3UA is
+taking precedence.)  The first public production releases of SCCP, ISUP and TCAP are planned for the
+end of July 2007.  This will be followed by lab and limitied field trial testing with a lead
+customer in August and production deployment in the lead customer's network in 1Q2008.  Expect that
+over the next 8 months releases of this package will include major new development and validation
+testing as well as including SCCP, ISUP and TCAP components that have nor heretofore been publicly
+released.
+
+@subsubheading Things to Do
+
+There is a great long list of these, but here is a crack
+at the first ones:
 
 @itemize @minus
 @item

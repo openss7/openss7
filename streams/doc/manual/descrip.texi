@@ -1,11 +1,11 @@
-@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi tw=100
+@c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.7 2007/01/08 16:23:31 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.8 2007/06/22 00:18:46 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/08 16:23:31 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/22 00:18:46 $ by $Author: brian $
 @c
 @c =========================================================================
 

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: osr61.texi,v 0.9.2.4 2007/03/04 10:00:31 brian Exp $
+% @(#) $Id: osr61.texi,v 0.9.2.5 2007/06/22 00:18:25 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/03/04 10:00:31 $ by $Author: brian $
+% Last Modified $Date: 2007/06/22 00:18:25 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -67,7 +67,7 @@
 
 @dircategory STREAMS
 @direntry
-* OpenSS7 TTY: (@value{PACKAGE_TARNAME}).	An Open STREAMS Terminals Package.
+* OpenSS7 OSR: (@value{PACKAGE_TARNAME}).	An Open STREAMS OSR Package.
 @end direntry
 
 @include texi/args.texi
@@ -407,6 +407,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: osr61.texi,v $
+Revision 0.9.2.5  2007/06/22 00:18:25  brian
+- mostly documentation updates for release, some netconfig workaround
+
 Revision 0.9.2.4  2007/03/04 10:00:31  brian
 - updates for release, do not propagate empty flags, build improvements
 

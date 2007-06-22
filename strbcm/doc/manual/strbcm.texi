@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strbcm.texi,v 0.9.2.12 2007/05/07 18:20:59 brian Exp $
+% @(#) $Id: strbcm.texi,v 0.9.2.13 2007/06/22 00:18:32 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2007  OpenSS7 Corporation <www.openss7.com>
 % Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/05/07 18:20:59 $ by $Author: brian $
+% Last Modified $Date: 2007/06/22 00:18:32 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -403,6 +403,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strbcm.texi,v $
+Revision 0.9.2.13  2007/06/22 00:18:32  brian
+- mostly documentation updates for release, some netconfig workaround
+
 Revision 0.9.2.12  2007/05/07 18:20:59  brian
  updated release files
 
