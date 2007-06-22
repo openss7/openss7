@@ -5,6 +5,7 @@
 	* doc/manual/strnsl.texi: doc updates for release
 	* doc/manual/todo.texi: doc updates for release
 	* src/util/sysconfig/netconfig: make same as libtirpc
+	* strnsl.spec.in: add netconfig installation to strnsl
 
 2007-06-20  Brian Bidulock  <bidulock@openss7.org>
 
