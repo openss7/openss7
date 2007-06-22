@@ -1,3 +1,7 @@
+2007-06-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/openss7.am: add uninstall-am to remove target
+
 2007-06-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/netconfig.am: fix up problems with libtirpc
