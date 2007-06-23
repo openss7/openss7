@@ -1,6 +1,7 @@
 2007-06-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/kernel.m4: fix up cflagcheck for openSUSE 10.2
+	* m4/dist.m4: handle openSUSE codename
 
 2007-06-22  Brian Bidulock  <bidulock@openss7.org>
 
