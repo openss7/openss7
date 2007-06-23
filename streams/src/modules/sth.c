@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.189 $) $Date: 2007/06/20 05:16:52 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.190 $) $Date: 2007/06/23 23:56:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/20 05:16:52 $ by $Author: brian $
+ Last Modified $Date: 2007/06/23 23:56:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.190  2007/06/23 23:56:52  brian
+ - minor correction of compiler warning
+
  Revision 0.9.2.189  2007/06/20 05:16:52  brian
  - updates for Fedora 7 and 2.6.21 kernel
 
@@ -226,10 +229,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.189 $) $Date: 2007/06/20 05:16:52 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.190 $) $Date: 2007/06/23 23:56:52 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.189 $) $Date: 2007/06/20 05:16:52 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.190 $) $Date: 2007/06/23 23:56:52 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -331,7 +334,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.189 $) $Date: 2007/06/20 05:16:52 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.190 $) $Date: 2007/06/23 23:56:52 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1877,7 +1880,7 @@ strsignal(struct stdata *sd, mblk_t *mp)
 		strevent(sd, S_MSG, band);
 	else if (test_bit(STRISTTY_BIT, &sd->sd_flag) || sd->sd_pgrp > 0)
 		/* Note: to send SIGHUP to the session leader, use M_HANGUP. */
-#if HAVE_KILL_PGRP_SYMBOL
+#ifdef HAVE_KILL_PGRP_SYMBOL
 		kill_pgrp(task_pgrp(current), sig, 1);
 #else
 		kill_pg(sd->sd_pgrp, sig, 1);
