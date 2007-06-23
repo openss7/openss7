@@ -1,6 +1,7 @@
 2007-06-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: updates for release
+	* src/modules/sth.c: minor correction of compiler warning
 
 2007-06-21  Brian Bidulock  <bidulock@openss7.org>
 
