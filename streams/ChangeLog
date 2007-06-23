@@ -1,3 +1,7 @@
+2007-06-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/news.texi: updates for release
+
 2007-06-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: doc updates for release

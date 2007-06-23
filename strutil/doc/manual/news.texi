@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.24 2007/06/20 06:06:36 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.25 2007/06/23 23:17:53 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/20 06:06:36 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/23 23:17:53 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -85,6 +85,9 @@ This is an internal alpha release of the package.
 Major features since the last internal release are as follows:
 
 @itemize -
+@item
+Support build on openSUSE 10.2.
+
 @item
 Support build on Fedora 7 with 2.6.21 kernel.
 
