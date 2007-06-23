@@ -1,3 +1,8 @@
+2007-06-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/news.texi: updates for release
+	* doc/papers/testresults.tex: spelling
+
 2007-06-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* strinet.spec.in: netconfig respects libtirpc

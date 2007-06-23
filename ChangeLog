@@ -1,6 +1,7 @@
 2007-06-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/kernel.m4: fix up cflagcheck for openSUSE 10.2
+	* doc/manual/news.texi: updates fore release
 	* m4/dist.m4: handle openSUSE codename
 	* scripts/texi/compat.texi: spelling s/Edge/Etch/
 
