@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/06/19 20:18:09 $
+# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/06/23 10:13:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/19 20:18:09 $ by $Author: brian $
+# Last Modified $Date: 2007/06/23 10:13:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -346,7 +346,9 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 		    ;;
 		(:SuSE-release)
 		    # SuSE never really had a codename, but now they put OSS on OpenSuSE
-		    dist_cv_build_codename="`head -1 $dist_cv_build_rel_file | sed -e 's|^.*\<OSS\>.*|OSS|'`"
+		    dist_cv_build_codename=`head -1 $dist_cv_build_rel_file | sed -e 's|^.*\<OSS\>.*|OSS|'`
+		    # Now they put openSUSE
+		    dist_cv_build_codename=`echo "$dist_cv_build_codename" | sed -e 's|^.*\<openSUSE\>|openSUSE|'`
 		    ;;
 		(:*)
 		    dist_cv_build_codename=$(dist_get_codename "$(cat $dist_cv_build_rel_file)")
@@ -371,6 +373,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 		    case "$dist_cv_build_release" in
 			(3.0) dist_cv_build_codename='Woody' ;;
 			(3.1) dist_cv_build_codename='Sarge' ;;
+			(4.0) dist_cv_build_codename='Etch' ;;
 			(*)   dist_cv_build_codename='unknown' ;;
 		    esac
 		    ;;
@@ -537,7 +540,9 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 		    ;;
 		(:SuSE-release)
 		    # SuSE never really had a codename, but now they put OSS on OpenSuSE
-		    dist_cv_host_codename="`head -1 $dist_cv_host_rel_file | sed -e 's|^.*\<OSS\>.*|OSS|'`"
+		    dist_cv_host_codename=`head -1 $dist_cv_host_rel_file | sed -e 's|^.*\<OSS\>.*|OSS|'`
+		    # Now they put openSUSE
+		    dist_cv_host_codename=`echo "$dist_cv_host_codename" | sed -e 's|^.*\<openSUSE\>|openSUSE|'`
 		    ;;
 		(:*)
 		    dist_cv_host_codename=$(dist_get_codename "$(cat $dist_cv_host_rel_file)")
@@ -562,6 +567,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 		    case "$dist_cv_host_release" in
 			(3.0) dist_cv_host_codename='Woody' ;;
 			(3.1) dist_cv_host_codename='Sarge' ;;
+			(4.0) dist_cv_host_codename='Etch' ;;
 			(*)   dist_cv_host_codename='unknown' ;;
 		    esac
 		    ;;
