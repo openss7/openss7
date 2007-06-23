@@ -1,6 +1,16 @@
 2007-06-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* strnsl.spec.in: netconfig respects libtirpc
+	* Makefile.am: netconfig respects libtiprc
+
+	* doc/manual/bugs.texi: doc updates for release
+	* doc/manual/configure.texi: doc updates for release
+	* doc/manual/descrip.texi: doc updates for release
+	* doc/manual/news.texi: doc updates for release
+	* doc/manual/prerequisites.texi: doc updates for release
+	* doc/manual/releases.texi: doc updates for release
+	* doc/manual/rpm.texi: doc updates for release
+	* doc/manual/todo.texi: doc updates for release
 
 2007-06-21  Brian Bidulock  <bidulock@openss7.org>
 

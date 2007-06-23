@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/06/22 00:18:55 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/06/23 01:38:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/22 00:18:55 $ by $Author: brian $
+# Last Modified $Date: 2007/06/23 01:38:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.11  2007/06/23 01:38:21  brian
+# - updates for release
+#
 # Revision 0.9.2.10  2007/06/22 00:18:55  brian
 # - mostly documentation updates for release, some netconfig workaround
 #
@@ -366,7 +369,8 @@ dist_initrd_SCRIPTS		=
 ## ! WITH_RCSD_DIRECTORY
 endif
 
-dist_sysconf_DATA		= src/util/sysconfig/netconfig
+##dist_sysconf_DATA		= src/util/sysconfig/netconfig
+dist_sysconf_DATA		=
 
 dist_config_DATA		=
 
