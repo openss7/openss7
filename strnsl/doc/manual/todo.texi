@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.6 2007/06/22 00:18:56 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.7 2007/06/23 01:38:22 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,15 +53,38 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/22 00:18:56 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/23 01:38:22 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @subsubheading Current Plan
 
+Current plans are to just maintain this package for recent distributions, kernels and tool chains.
+Although at some point the relation of this package to TI-RPC 2.8 needs to be worked out, when that
+will happen is not currently on a schedule.  I do not really know how much of a requirement there is
+for ONC RPC running over other transports such as ISO transports and SCTP transports, although it
+would surely be interesting to run NFS4 over SCTP.
+
+This package is not currently a priority for the OpenSS7 Project, which is focussed on more
+telecom-specific protocol stacks and capabilities.  Nevertheless, if completion of this package is
+important in your industry and your organization is able to fund further development or contribute
+the missing items, contact us on the openss7-develop mailing list.  Until funding or a mandate
+surfaces, this package will likely continue as a proof-of-concept only.  It will be maintained in a
+compilable and installable package (that is, it will be updated for current Linux distributions and
+kernels) on the same basis as other packages in the OpenSS7 master package.
+
 @subsubheading Things to Do
 
 @itemize @bullet
+@item
+Fedora 7 has a libtirpc library that uses the /etc/netconfig files.  To avoid conflicts, the
+installation scripts now avoid overwriting this file.  An interesting thing is that the libtirpc
+implementation is taken from TI-RPC 2.3 when there is a TI-RPC 2.8 available.  In generating an
+strrpc package, it should replace this broken libtirpc library with a TI-RPC 2.8 library supporting
+STREAMS using this strnsl package.
+
+@emph{*todo*}
+
 @item
 The package still needs to be internationalized.
 
@@ -87,7 +110,7 @@ Fortunately, most of the definitions are part of the transport provider implemen
 Provide a mechanism for implementations of transport protocols to add their definitions into the
 @manref{netconfig(5)} database files.
 
-@emph{*todo*}
+@emph{*done*}
 
 @item
 The texinfo manual, @file{libxnsl.texi}, is incomplete.  For the time being, the manual pages,

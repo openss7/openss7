@@ -1,11 +1,11 @@
-@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
+@c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.4 2007/06/22 00:18:56 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.5 2007/06/23 01:38:22 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/22 00:18:56 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/23 01:38:22 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -65,6 +65,10 @@ importantly the strinet package installs its /etc/netconfig entries, the libtirp
 To avoid this problem, I think that the best approach is to install a libtirpc entry (or a copy
 of the broken /etc/netconfig) into the /etc/netconfig.d subdirectory when strnsl installs and
 restore it to /etc/netconfig when strnsls removes.
+
+Fixed in the current release: the actual fix involves not calculating the /etc/netconfig file from
+the /etc/netconfig.d subdirectory entries when an /etc/netconfig file exists that we have not
+generated.
 
 @item 2007-03-05T01:21:21-0700
 RPMs built on 2.4 kernels install the @samp{include strnsl} line to @file{modules.conf} when there

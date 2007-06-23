@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.19 2007/06/20 06:06:49 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.20 2007/06/23 01:38:22 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/20 06:06:49 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/23 01:38:22 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -89,6 +89,10 @@ recent distributions and tool chains.
 Major features since the last public release are as follows:
 
 @itemize -
+@item
+Fixed problems with conflicting /etc/netconfig file definitions between libtirpc and this
+implementation of the network configuration utilities.
+
 @item
 Support build on Fedora 7 with 2.6.21 kernel.
 

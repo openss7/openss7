@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.2 2007/06/22 00:19:15 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.3 2007/06/23 01:38:29 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,21 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/22 00:19:15 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/23 01:38:29 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @subsubheading Current Plan
+
+The strutil package is currently incomplete.  The purpose of the package was to move STREAMS utility
+programs and modules outside of the STREAMS release package so as to allow them to be used with both
+LiS and Linux Fast-STREAMS.  As Linux Fast-STREAMS has already shown superior to LiS in terms of
+both performance and conformance, it is no longer necessary to keep these packages separate and they
+can be combined once again (or still) with Linux Fast-STREAMS.
+
+The current plan is to maintain this package for current distributions, kernels and tool chains
+utill such time as LiS is kicked out of the CVS archive tree completely.  It is not necessary for
+Linux Fast-STREAMS as all of its facilities are includes in the base Linux Fast-STREAMS package.
 
 @subsubheading Things to Do
 

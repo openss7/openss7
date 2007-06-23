@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 0.9.2.5 2007/06/22 00:18:59 brian Exp $
+@c @(#) $Id: todo.texi,v 0.9.2.6 2007/06/23 01:38:25 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,15 +53,24 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/22 00:18:59 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/23 01:38:25 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @subsubheading Current Plan
 
+This package is mature and complete and in production release.  The current plan is to provide only
+maintenance releases supporting more recent Linux distributions, kernels and tool chains as they
+evolve.  Expect public maintenance releases on a 3 to 6 month cycle.
+
+This package will not be maintained for use with LiS.  LiS support is deprecated and has been
+discontinued (but still exists on the CVS archive for sponsors of the OpenSS7 Project).  Use Linux
+Fast-STREAMS instead, please.
+
 @subsubheading Things to Do
 
 @itemize @minus
+
 @item
 The strsctp package is quite stable and mature as of strsctp-0.9.2.2 and most of the things that
 remain to be done are rigorous conformance and performance testing.
@@ -91,7 +100,7 @@ and t_rcvvudata(3) handle T_OPTDATA_REQ(7) and T_OPTDATA_IND(7) primitives when 
 
 @item
 Work recent SCTP I-G changes into the code.  Many of the I-G changes over the years have been
-implemented int the code, however, some of the more recent changes that made it into RFC 4460 have
+implemented in the code, however, some of the more recent changes that made it into RFC 4460 have
 not yet been added.  This is an ongoing process.
 
 @emph{*todo*}
@@ -111,19 +120,31 @@ only perform the IP packet-level testing later.
 
 @emph{*todo*}
 
+@end itemize
+
+@itemize @bullet
+
 @item
 Retest performance using the OpenSS7 Modified Netperf package.
 
-@emph{*todo*}
+@table @emph
+@item *done*
+
+Performance testing on loopback using the @file{netperf} package has been completed.  A performance
+results paper is included in the distribution.
+@end table
 
 @item
 Perform profiling and use the hot text techniques from Linux Fast-STREAMS to make the package run
 even faster.
 
-@emph{*todo*}
-@end itemize
+@table @emph
+@item *done*
 
-@itemize @bullet
+Common performance profiling and text sections have been incorporated into the code as a part of
+performance testing.
+@end table
+
 @item
 SCTP Interoperability testing.  Take the STREAMS package to the SCTP Interop tests at UBC and
 perform interoperability testing.

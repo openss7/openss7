@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: osr61.spec.in,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/06/22 09:35:52 $
+# @(#) $RCSfile: osr61.spec.in,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/06/23 01:38:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/22 09:35:52 $ by $Author: brian $
+# Last Modified $Date: 2007/06/23 01:38:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2112,6 +2112,7 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig}
 %{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
 %{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %config(noreplace) %{_configdir}/*
@@ -2124,6 +2125,7 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig}
 %{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
 %{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %config(noreplace) %{_configdir}/*
@@ -2135,6 +2137,7 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig}
 %{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
 %{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %{?modules:%config(noreplace) %{_modutildir}/*}
@@ -2145,6 +2148,7 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig}
 %{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
 %{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %endif
@@ -2153,9 +2157,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: osr61.spec.in,v $
-# Revision 0.9.2.9  2007/06/22 09:35:52  brian
-# - fix libtirpc problem with netconfig
+# Revision 0.9.2.10  2007/06/23 01:38:17  brian
+# - updates for release
 #
+
+* Fri Jun 22 2007 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.9  2007/06/22 09:35:52  brian
+- fix libtirpc problem with netconfig
 
 * Wed Jun 20 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.8  2007/06/20 09:27:19  brian

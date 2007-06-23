@@ -1,5 +1,14 @@
 2007-06-21  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/bugs.texi: doc updates for release
+	* doc/manual/configure.texi: doc updates for release
+	* doc/manual/descrip.texi: doc updates for release
+	* doc/manual/libsocket.texi: doc updates for release
+	* doc/manual/libsocklib.texi: doc updates for release
+	* doc/manual/prerequisites.texi: doc updates for release
+	* doc/manual/releases.texi: doc updates for release
+	* doc/manual/rpm.texi: doc updates for release
+	* doc/manual/strsock.texi: doc updates for release
 	* doc/manual/todo.texi: doc updates for release
 
 2007-06-20  Brian Bidulock  <bidulock@openss7.org>
