@@ -1,3 +1,7 @@
+2007-06-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* strisdn.spec.in: recognize EL4 and EL5 for kernel-develop
+
 2007-06-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: updates for release
