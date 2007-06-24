@@ -1,5 +1,5 @@
-OpenSS7 STREAMS SCTP -- read me first file.  2007-06-13
-$Id: README,v 0.9.2.31 2007/06/13 20:31:42 brian Exp $
+OpenSS7 STREAMS SCTP -- read me first file.  2007-06-24
+$Id: README,v 0.9.2.32 2007/06/24 09:21:32 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS SCTP
 =====================
 
-Package strsctp-0.9.2.8 was released under GPLv2 2007-06-13.
+Package strsctp-0.9.2.8 was released under GPLv2 2007-06-24.
 
 `OpenSS7 STREAMS SCTP' (`strsctp') is an `OpenSS7 Project'
 implementation of Stream Control Transmission Protocol (SCTP - RFC
@@ -22,7 +22,7 @@ networking driver, `sctp(4)', is provided, as well as NPI, TPI and XTI
 header files for SCTP operation.  The package contains the necessary
 manual pages and other documentation for SCTP components in a separate
 autoconf tarball.  This release is also part of the OpenSS7 Master
-Package (`openss7-0.9.2.E').
+Package (`openss7-0.9.2.F').
 
 The package currently includes the following "STREAMS" kernel modules
 and drivers:
@@ -55,7 +55,7 @@ well.
  Release
 --------
 
-This is the `strsctp-0.9.2.8' package, released 2007-06-13.  This
+This is the `strsctp-0.9.2.8' package, released 2007-06-24.  This
 `0.9.2.8' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -95,7 +95,7 @@ See `README-alpha' (if it exists) for alpha release information.
 
 The quickest and easiest way to ensure that all prerequisites are met
 is to download and install this package from within the `OpenSS7 Master
-Package', `openss7-0.9.2.E', instead of separately.
+Package', `openss7-0.9.2.F', instead of separately.
 
 Prerequisites for the OpenSS7 STREAMS SCTP package are as follows:
 
@@ -108,7 +108,7 @@ Prerequisites for the OpenSS7 STREAMS SCTP package are as follows:
 
          - A fairly LSB compliant GNU/Linux distribution.(1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
-         - Linux 2.6 kernel (2.6.3 - 2.6.18);
+         - Linux 2.6 kernel (2.6.3 - 2.6.21);
          - glibc2 or better.
          - GNU info (for info files).
          - GNU groff (for man pages).(2)
@@ -117,18 +117,18 @@ Prerequisites for the OpenSS7 STREAMS SCTP package are as follows:
 Package', then the dependencies listed below will already have been met
 by unpacking the master package.)
 
-  2. `OpenSS7 Linux Fast-STREAMS', streams-0.9.2.2
-     (http://www.openss7.org/tarballs/streams-0.9.2.2.tar.bz2).  (3)
+  2. `OpenSS7 Linux Fast-STREAMS', streams-0.9.2.3
+     (http://www.openss7.org/tarballs/streams-0.9.2.3.tar.bz2).  (3)
 
   3. `OpenSS7 STREAMS Compatibility Modules',
-     strcompat-0.9.2.5
-     (http://www.openss7.org/tarballs/strcompat-0.9.2.5.tar.bz2).
+     strcompat-0.9.2.6
+     (http://www.openss7.org/tarballs/strcompat-0.9.2.6.tar.bz2).
 
-  4. `OpenSS7 STREAMS XNS', strxns-0.9.2.5
-     (http://www.openss7.org/tarballs/strxns-0.9.2.5.tar.bz2).
+  4. `OpenSS7 STREAMS XNS', strxns-0.9.2.6
+     (http://www.openss7.org/tarballs/strxns-0.9.2.6.tar.bz2).
 
-  5. `OpenSS7 STREAMS XTI/TLI', strxnet-0.9.2.10
-     (http://www.openss7.org/tarballs/strxnet-0.9.2.10.tar.bz2).
+  5. `OpenSS7 STREAMS XTI/TLI', strxnet-0.9.2.11
+     (http://www.openss7.org/tarballs/strxnet-0.9.2.11.tar.bz2).
 
 
 When configuring and building multiple `OpenSS7 Project' release

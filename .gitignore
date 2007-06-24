@@ -30,6 +30,7 @@ iperf/include/Makefile.in
 iperf/INSTALL
 iperf/libltdl/*
 iperf/LICENSES
+iperf/LSM
 iperf/m4/Makefile.in
 iperf/Makefile.in
 iperf/MANUAL
@@ -71,6 +72,7 @@ LiS/LICENSES
 LiS/LiS-2.18.0-A.patch.gz
 LiS/LiS-2.18.0-B.patch.gz
 LiS/LiS-2.18.0-C.patch.gz
+LiS/LSM
 LiS/m4/Makefile.in
 LiS/Makefile.in
 LiS/man/Makefile.in
@@ -100,6 +102,7 @@ LiS/testsuite/wrapper/Makefile.in
 LiS/TODO
 LiS/util/strtst.c.orig
 *.log
+LSM
 m4/Makefile.in
 Makefile.in
 MANUAL
@@ -113,6 +116,7 @@ netperf/COPYING
 netperf/INSTALL
 netperf/libltdl/*
 netperf/LICENSES
+netperf/LSM
 netperf/m4/Makefile.in
 netperf/Makefile.in
 netperf/MANUAL
@@ -141,10 +145,12 @@ NEWS
 NOTES
 *.old
 osr61/doc/manual/osr61.info*
+osr61/LSM
 osr61/scripts/config.guess
 osr61/scripts/config.sub
 osr61/scripts/depcomp
 osr61/scripts/install-sh
+osr61/scripts/ltmain.sh
 osr61/scripts/missing
 osr61/scripts/texinfo.tex
 PROBLEMS
@@ -177,6 +183,7 @@ sctp/include/Makefile.in
 sctp/INSTALL
 sctp/libltdl/*
 sctp/LICENSES
+sctp/LSM
 sctp/m4/Makefile.in
 sctp/#Makefile.am#
 sctp/Makefile.in
@@ -311,10 +318,12 @@ sigtran/doc/papers/xtios.gif
 sigtran/doc/papers/xtios.pdf
 sigtran/doc/papers/xtios.png
 sigtran/libltdl/*
+sigtran/LSM
 sigtran/scripts/config.guess
 sigtran/scripts/config.sub
 sigtran/scripts/depcomp
 sigtran/scripts/install-sh
+sigtran/scripts/ltmain.sh
 sigtran/scripts/missing
 sigtran/scripts/texinfo.tex
 stacks/ABOUT-NLS
@@ -608,6 +617,7 @@ stacks/INSTALL
 stacks/intl
 stacks/libltdl/*
 stacks/LICENSES
+stacks/LSM
 stacks/m4/codeset.m4
 stacks/m4/gettext.m4
 stacks/m4/glibc21.m4
@@ -692,6 +702,7 @@ strbcm/doc/manual/strbcm.info-2
 strbcm/INSTALL
 strbcm/libltdl/*
 strbcm/LICENSES
+strbcm/LSM
 strbcm/m4/Makefile.in
 strbcm/Makefile.in
 strbcm/MANUAL
@@ -716,10 +727,12 @@ strbcm/TODO
 strchan/doc/manual/strchan.info
 strchan/doc/manual/strchan.info-1
 strchan/libltdl/*
+strchan/LSM
 strchan/scripts/config.guess
 strchan/scripts/config.sub
 strchan/scripts/depcomp
 strchan/scripts/install-sh
+strchan/scripts/ltmain.sh
 strchan/scripts/missing
 strchan/scripts/texinfo.tex
 strcompat/aclocal.m4
@@ -738,6 +751,7 @@ strcompat/doc/manual/strcompat.info-2
 strcompat/INSTALL
 strcompat/libltdl/*
 strcompat/LICENSES
+strcompat/LSM
 strcompat/m4/Makefile.in
 strcompat/Makefile.in
 strcompat/MANUAL
@@ -1001,6 +1015,7 @@ streams/INSTALL
 streams/INSTALL.streams
 streams/libltdl/*
 streams/LICENSES
+streams/LSM
 streams/m4/Makefile.in
 streams/Makefile.in
 streams/MANUAL
@@ -1244,6 +1259,7 @@ strinet/doc/papers/xtios.png
 strinet/INSTALL
 strinet/libltdl/*
 strinet/LICENSES
+strinet/LSM
 strinet/m4/Makefile.in
 strinet/Makefile.in
 strinet/MANUAL
@@ -1269,10 +1285,12 @@ strinet/TODO
 strisdn/doc/manual/strisdn.info
 strisdn/doc/manual/strisdn.info-1
 strisdn/libltdl/*
+strisdn/LSM
 strisdn/scripts/config.guess
 strisdn/scripts/config.sub
 strisdn/scripts/depcomp
 strisdn/scripts/install-sh
+strisdn/scripts/ltmain.sh
 strisdn/scripts/missing
 strisdn/scripts/texinfo.tex
 striso/ABOUT-NLS
@@ -1294,6 +1312,7 @@ striso/intl
 striso/intl/
 striso/libltdl/*
 striso/LICENSES
+striso/LSM
 striso/m4/codeset.m4
 striso/m4/gettext.m4
 striso/m4/glibc21.m4
@@ -1365,6 +1384,7 @@ strnsl/doc/manual/strnsl.info-2
 strnsl/intl
 strnsl/libltdl/*
 strnsl/LICENSES
+strnsl/LSM
 strnsl/m4/codeset.m4
 strnsl/m4/gettext.m4
 strnsl/m4/glibc21.m4
@@ -1607,6 +1627,7 @@ strsctp/doc/papers/xtios.png
 strsctp/INSTALL
 strsctp/libltdl/*
 strsctp/LICENSES
+strsctp/LSM
 strsctp/m4/Makefile.in
 strsctp/Makefile.in
 strsctp/MANUAL
@@ -1684,6 +1705,7 @@ strsock/INSTALL
 strsock/intl
 strsock/libltdl/*
 strsock/LICENSES
+strsock/LSM
 strsock/m4/codeset.m4
 strsock/m4/gettext.m4
 strsock/m4/glibc21.m4
@@ -1766,6 +1788,7 @@ strtty/doc/manual/strtty.info-2
 strtty/INSTALL
 strtty/libltdl/*
 strtty/LICENSES
+strtty/LSM
 strtty/m4/Makefile.in
 strtty/Makefile.in
 strtty/MANUAL
@@ -1803,6 +1826,7 @@ strutil/doc/manual/strutil.info-2
 strutil/INSTALL
 strutil/libltdl/*
 strutil/LICENSES
+strutil/LSM
 strutil/m4/Makefile.in
 strutil/Makefile.in
 strutil/MANUAL
@@ -1827,10 +1851,12 @@ strutil/TODO
 strvoip/doc/manual/strvoip.info
 strvoip/doc/manual/strvoip.info-1
 strvoip/libltdl/*
+strvoip/LSM
 strvoip/scripts/config.guess
 strvoip/scripts/config.sub
 strvoip/scripts/depcomp
 strvoip/scripts/install-sh
+strvoip/scripts/ltmain.sh
 strvoip/scripts/missing
 strvoip/scripts/texinfo.tex
 strxnet/ABOUT-NLS
@@ -1864,6 +1890,7 @@ strxnet/INSTALL
 strxnet/intl
 strxnet/libltdl/*
 strxnet/LICENSES
+strxnet/LSM
 strxnet/m4/codeset.m4
 strxnet/m4/gettext.m4
 strxnet/m4/glibc21.m4
@@ -1964,6 +1991,7 @@ strxns/doc/specs/tpi/tpi_tcap.info
 strxns/INSTALL
 strxns/libltdl/*
 strxns/LICENSES
+strxns/LSM
 strxns/m4/Makefile.in
 strxns/Makefile.in
 strxns/MANUAL

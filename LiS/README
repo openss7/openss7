@@ -1,5 +1,5 @@
-Linux STREAMS (LiS) -- read me first file.  2007-03-15
-$Id: README,v 1.1.1.2.12.19 2007/03/15 20:10:06 brian Exp $
+Linux STREAMS (LiS) -- read me first file.  2007-06-24
+$Id: README,v 1.1.1.2.12.20 2007/06/24 09:21:15 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  Linux STREAMS (LiS)
 ====================
 
-Package LiS-2.18.5 was released under GPLv2 2007-03-15.
+Package LiS-2.18.6 was released under GPLv2 2007-06-24.
 
 The `OpenSS7 Linux STREAMS (LiS)' package is an OpenSS7 modified
 version of the `LiS-2.18' package formerly from `GCOM', and formerly
@@ -60,12 +60,12 @@ well.
  Release
 --------
 
-This is the `LiS-2.18.5' package, released 2007-03-15.  This `2.18.5'
+This is the `LiS-2.18.6' package, released 2007-06-24.  This `2.18.6'
 release, and the latest version, can be obtained from the download area
 (http://www.openss7.org/download.html) of The OpenSS7 Project website
 using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/LiS-2.18.5.tar.bz2
+     $> wget http://www.openss7.org/tarballs/LiS-2.18.6.tar.bz2
 
 The release is available as an `autoconf(1)' tarball, `src.rpm' or
 `dsc', or as a set of binary `rpm's or `deb's.  See the download page
@@ -100,7 +100,7 @@ See `README-alpha' (if it exists) for alpha release information.
 
 The quickest and easiest way to ensure that all prerequisites are met
 is to download and install this package from within the `OpenSS7 Master
-Package', `openss7-0.9.2.E', instead of separately.
+Package', `openss7-0.9.2.F', instead of separately.
 
 Prerequisites for the Linux STREAMS (LiS) package are as follows:
 
@@ -111,12 +111,12 @@ Prerequisites for the Linux STREAMS (LiS) package are as follows:
      packages must be installed.  For more information, see
      `Compatibility', in the manual.
 
-         - A fairly LSB compliant GNU/Linux distribution.  (1)
+         - A fairly LSB compliant GNU/Linux distribution.(1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
-         - Linux 2.6 kernel (2.6.3 - 2.6.18);
+         - Linux 2.6 kernel (2.6.3 - 2.6.21);
          - glibc2 or better.
          - GNU info (for info files).
-         - GNU groff (for man pages).  (2)
+         - GNU groff (for man pages).(2)
 
 When configuring and building multiple `OpenSS7 Project' release
 packages, place all of the source packages (unpacked tarballs) at the
@@ -135,7 +135,7 @@ You also need the same version of `gcc(1)' compiler with which the
 kernel was built.  If it is not the default, add `CC=kgcc' on the line
 after `./configure', for example:
 
-     $> ../LiS-2.18.5/configure CC='gcc-3.4'
+     $> ../LiS-2.18.6/configure CC='gcc-3.4'
 
  Installation
 -------------
@@ -143,11 +143,11 @@ after `./configure', for example:
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
 
-     $> wget http://www.openss7.org/tarballs/LiS-2.18.5.tar.bz2
-     $> tar -xjvf LiS-2.18.5.tar.bz2
+     $> wget http://www.openss7.org/tarballs/LiS-2.18.6.tar.bz2
+     $> tar -xjvf LiS-2.18.6.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../LiS-2.18.5/configure --enable-autotest
+     $> ../LiS-2.18.6/configure --enable-autotest
      $> make
      $> make check
      $> sudo make install
@@ -155,8 +155,8 @@ validate, uninstall and remove the package:
      $> sudo make uninstall
      $> popd
      $> sudo rm -rf build
-     $> rm -rf LiS-2.18.5
-     $> rm -f LiS-2.18.5.tar.bz2
+     $> rm -rf LiS-2.18.6
+     $> rm -f LiS-2.18.6.tar.bz2
 
 If you have problems, try building with the logging targets instead.
 If the make of a logging target fails, an automatic problem report will
@@ -164,11 +164,11 @@ be generated that can be mailed to The OpenSS7 Project
 <bugs@openss7.org>.(3) Installation steps using the logging targets
 proceed as follows:
 
-     $> wget http://www.openss7.org/tarballs/LiS-2.18.5.tar.bz2
-     $> tar -xjvf LiS-2.18.5.tar.bz2
+     $> wget http://www.openss7.org/tarballs/LiS-2.18.6.tar.bz2
+     $> tar -xjvf LiS-2.18.6.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../LiS-2.18.5/configure --enable-autotest
+     $> ../LiS-2.18.6/configure --enable-autotest
      $> make compile.log
      $> make check.log
      $> sudo make install.log
@@ -176,8 +176,8 @@ proceed as follows:
      $> sudo make uninstall.log
      $> popd
      $> sudo rm -rf build
-     $> rm -rf LiS-2.18.5
-     $> rm -f LiS-2.18.5.tar.bz2
+     $> rm -rf LiS-2.18.6
+     $> rm -f LiS-2.18.6.tar.bz2
 
 See `README-make' for additional specialized make targets.
 
@@ -193,14 +193,14 @@ The Linux STREAMS (LiS) package is available from the downloads area of
 The OpenSS7 Project website (http://www.openss7.org/download.html)
 using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/LiS-2.18.5.tar.bz2
+     $> wget http://www.openss7.org/tarballs/LiS-2.18.6.tar.bz2
 
 Unpack the tarball using a command such as:
 
-     $> tar -xjvf LiS-2.18.5.tar.bz2
+     $> tar -xjvf LiS-2.18.6.tar.bz2
 
 The tarball will unpack into the relative subdirectory named after the
-package name: LiS-2.18.5.
+package name: LiS-2.18.6.
 
 The package builds using the GNU `autoconf' utilities and the
 `configure' script.  To build the package, we recommend using a
@@ -208,19 +208,19 @@ separate `build' directory as follows:
 
      $> mkdir build
      $> cd build
-     $> ../LiS-2.18.5/configure
+     $> ../LiS-2.18.6/configure
 
 In general, the package configures and builds without adding any
 special options to the `configure' script.  For general options to the
 `configure' script, see the GNU `INSTALL' file in the distribution:
 
-     $> less ../LiS-2.18.5/INSTALL
+     $> less ../LiS-2.18.6/INSTALL
 
 For specific options to the `configure' script, see the `INSTALL-LiS'
 file in the distribution, or simply execute the configure script with
 the `--help' option like so:
 
-     $> ../LiS-2.18.5/configure --help
+     $> ../LiS-2.18.6/configure --help
 
 After configuring the package, the package can be compiled simply by
 issuing the `make' command:
@@ -260,8 +260,8 @@ Then the build directory and tarball can be simply removed:
 
      $> cd ..
      $> rm -rf build
-     $> rm -rf LiS-2.18.5
-     $> rm -f LiS-2.18.5.tar.bz2
+     $> rm -rf LiS-2.18.6
+     $> rm -f LiS-2.18.6.tar.bz2
 
  Detailed Installation Instructions
 -----------------------------------
@@ -270,7 +270,7 @@ More detailed installation instructions can be found in the
 `Installation', in the manual, contained in the distribution in `text',
 `info', `html' and `pdf' formats:
 
-     $> cd ../LiS-2.18.5
+     $> cd ../LiS-2.18.6
      $> less doc/manual/LiS.txt
      $> lynx doc/manual/LiS.html
      $> info doc/manual/LiS.info
