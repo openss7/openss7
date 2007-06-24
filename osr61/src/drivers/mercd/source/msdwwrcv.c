@@ -3229,6 +3229,7 @@ rcv_ww_process_stream_session_close(pmercd_ww_get_mfAddress_sT pmfAddrSt)
   merc_int_t			 i, prevSize = 0;
 
 
+  BindBlock = NULL;
   Status = MD_SUCCESS;
   pwwDev = ((pmercd_ww_dev_info_sT)(pmfAddrSt->pwwDevi));
   padapter = (pmercd_adapter_block_sT)(pwwDev->padapter);
@@ -3435,7 +3436,8 @@ rcv_ww_process_stream_session_close(pmercd_ww_get_mfAddress_sT pmfAddrSt)
   if ((StreamBlock->flags & STREAM_OPEN_F_SEND_ONLY) && (StreamBlock->SendStreamQueue)) {
        strm_free_only_data_msgs(StreamBlock);
   }
-  MSD_EXIT_MUTEX(&BindBlock->bind_block_mutex);
+  if (BindBlock != NULL)
+       MSD_EXIT_MUTEX(&BindBlock->bind_block_mutex);
 
   return(MD_SUCCESS);
 }
