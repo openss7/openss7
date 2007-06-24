@@ -1,3 +1,7 @@
+2007-06-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: update revision numbers for warnings
+
 2007-06-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/kernel.m4: fix up cflagcheck for openSUSE 10.2
