@@ -1,11 +1,43 @@
-Linux STREAMS (LiS) -- history of user visible changes.  2007-03-15
-$Id: NEWS,v 1.1.6.32 2007/03/15 20:10:06 brian Exp $
+Linux STREAMS (LiS) -- history of user visible changes.  2007-06-24
+$Id: NEWS,v 1.1.6.33 2007/06/24 09:21:15 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The sections that follow provide information on OpenSS7 releases of the
 Linux STREAMS (LiS) package.
+
+ Major changes for release LiS-2.18.6
+-------------------------------------
+
+This is an internal release of LiS.  It is only available for download
+by subscribers and sponsors of the OpenSS7 Project.  There are too many
+packages that cannot build against LiS due to its implementation
+deficiencies.
+
+Do not use this release (even if you are a subscriber or sponsor).
+Port to Linux Fast-STREAMS.  Do not report bugs on this release.  The
+OpenSS7 Project no longer actively maintains LiS.
+
+Major features since the last public release are as follows:
+
+   - Support build on openSUSE 10.2.
+
+   - Support build on Fedora 7 with 2.6.21 kernel.
+
+   - Support build on CentOS 5.0 (RHEL5).
+
+   - Support build on Ubuntu 7.04.
+
+   - Updated to gettext 0.16.1.
+
+   - Changes to support build on 2.6.20-1.2307.fc5 and
+     2.6.20-1.2933.fc6 kernel.
+
+   - Supports build on Fedora Core 6.
+
+   - Support for recent distributions and tool chains.
+
 
  Major changes for release LiS-2.18.5
 -------------------------------------
@@ -29,28 +61,6 @@ Major features since the last public release are as follows:
 
    - Support for Ubuntu 6.10 distribution and bug fixes for i386 kenels.
 
-
-_This is an unstable release: do not report bugs for this release.
-Please see `README-alpha' in the release or `Maturity', in the manual._
-
-As with other OpenSS7 releases, this release configures, compiles,
-installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
-RPM- and DPKG-based distributions, and can be used on production
-kernels without patching or recompiling the kernel.
-
-This package is publicly released under the `GNU General Public License
-Version 2'.  The release is available as an `autoconf' tarball, SRPM,
-DSC, and set of binary RPMs and DEBs.  See the downloads page
-(http://www.openss7.org/download.html) for the `autoconf' tarballs,
-SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
-see the LiS package page (http://www.openss7.org/LiS_pkg.html).
-
-See `http://www.openss7.org/codefiles/LiS-2.18.5/ChangeLog' and
-`http://www.openss7.org/codefiles/LiS-2.18.5/NEWS' in the release for
-more information.  Also, see the `LiS.pdf' manual in the release (also
-in html `http://www.openss7.org/LiS_manual.html').
-
-For the news release, see `http://www.openss7.org/rel20070315_0.html'.
 
  Major changes for release LiS-2.18.4
 -------------------------------------

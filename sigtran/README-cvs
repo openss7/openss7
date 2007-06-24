@@ -1,5 +1,5 @@
-OpenSS7 STREAMS SIGTRAN -- read me CVS file.  2007-05-18
-$Id: README-cvs,v 0.9.2.12 2007/05/18 22:14:00 brian Exp $
+OpenSS7 STREAMS SIGTRAN -- read me CVS file.  2007-06-24
+$Id: README-cvs,v 0.9.2.13 2007/06/24 09:21:20 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -85,9 +85,11 @@ documentation tools:
 
    * `groff 1.17.2'
 
+   * `gnuplot 3.7'
+
 Most desktop GNU/Linux distributions will have these tools; however,
-some server-style installations (e.g. `Ubuntu'-server or `SLES 9') will
-not and they must be installed separately.
+some server-style installations (e.g. `Ubuntu'-server, `SLES 9' or
+`Fedora 6 or 7') will not and they must be installed separately.(2)
 
 For uncooked manual pages, the entire `groff(1)' package is required on
 `Debian' and `Ubuntu' systems (the base package does not include `grefer(1)'
@@ -153,7 +155,11 @@ under the `/usr/src' directory.
 
 ---------- Footnotes ----------
 
-(1) A notable exception is Debian.
+(1) A notable exception is Debian and Fedora 7.  Note that on Fedora 7
+the `gettext-devel' package must be installed.
+
+(2) In particular, for `Fedora 6 or 7', the `tetex-latex' package must
+be loaded as well.
 
 -----
 
