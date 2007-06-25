@@ -271,3 +271,133 @@ Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@qqx.org>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:			iperf
+Version:		2.0.7
+Entered-date:		2007-06-24
+Description:		OpenSS7 IPERF Utility.
+			OpenSS7 Modified Iperf.
+			iperf is an OpenSS7 release of the DAST iperf
+			package configured to run with OpenSS7 Linux Native
+			Stream Control Transmission Protocol (SCTP).
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		SCTP, Iperf
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			1M iperf-2.0.7.tar.gz
+			1M iperf-2.0.7.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			1M iperf-2.0.7-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4,
+			sctp-0.2.24
+Copying-policy:		GPL
+End
+
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>
+Subject: iperf 2.0.7 Released - OpenSS7 SCTP Internet Performance Tool
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package iperf-2.0.7 was released 2007-06-24.
+
+Iperf is a general purpose tool for measuring bandwidth and performance
+of the Internet Protocol suite. The OpenSS7 Modified OpenSS7 IPERF
+Utility package is an OpenSS7 Project release of the DAST iperf package
+configured to run with OpenSS7 Linux Native Stream Control Transmission
+Protocol (SCTP).
+
+The OpenSS7 IPERF Utility package provides primarily the iperf(1) C++
+Language program that acts as either an Iperf server or client for
+testing connections and networking. The iperf(1) program is executed on
+one host in server mode and then executed on another (or the same) host
+in client mode. Characteristics of the connection or association can be
+altered when formed. Reporting formats and sample intervals can also be
+altered when the connection or association is formed.
+
+This is a fork of the "Iperf" package released by the University of
+Illinois modified by the OpenSS7 Project for use with OpenSS7 SCTP
+(Stream Control Transmission Protocol). This OpenSS7 release of the
+package is based on the Iperf-2.0.0 release from the University of
+Illinois.
+
+Modifications to the package are derived from the OpenSS7 SCTP
+implementation and are released under the GNU General Public License
+(GPL) Version 2. The Iperf tool itself is licensed under specific terms
+by the University of Illinois. Please see LICENSES for the University of
+Illinois Iperf copyright notices and licensing restrictions.
+
+This is the OpenSS7 Project's seventh release of the University of
+Illinois iperf package, modified to work with the OpenSS7 Linux Native
+(Sockets) implementation of SCTP (Stream Control Transmission Protocol
+- RFC 2960). This package contains all of the necessary manual pages and
+files, and configures and installs against almost any 2.4 kernel, even
+production kernels.
+
+This is the OpenSS7 Project's seventh release of the iperf package
+modified for OpenSS7 SCTP. This is the package that was used to perform
+the performance tests shown here <http://www.openss7.org/sctp_perf.html>.
+
+This release is largely a maintenance release that provides support for
+more distributions an architectures as well as tracking feature updates
+on related packages (i.e. sctp-0.2.26).
+
+Major features since the last public release are as follows:
+
+  - Support build on openSUSE 10.2.
+  - Support build on Fedora 7 with 2.6.21 kernel.
+  - Support build on CentOS 5.0 (RHEL5).
+  - Support build on Ubuntu 7.04.
+  - Updated to gettext 0.16.1.
+  - Supports build on Fedora Core 6.
+  - Support for recent distributions and tool chains.
+
+This is a public stable production grade release of the package: it
+deprecates previous releases. Please upgrade to the current release
+before reporting bugs.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 RPM- and
+DPKG-based distributions, and can be used on production kernels without
+patching or recompiling the kernel.
+
+This package is publicly released under the GNU Public License Version 2
+as well as the University of Illinois license (see LICENSE in the
+release for more information). The release is available as an autoconf
+tarball, SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads
+page <http://www.openss7.org/download.html> for the autoconf tarballs,
+SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see
+the iperf package page <http://www.openss7.org/iperf_pkg.html>.
+
+See <http://www.openss7.org/codefiles/iperf-2.0.7/ChangeLog> and
+<http://www.openss7.org/codefiles/iperf-2.0.7/NEWS> in the release for
+more information.  Also, see the `iperf.pdf' manual in the release, also
+in html <http://www.openss7.org/iperf_manual.html>.
+
+For the news release, see <http://www.openss7.org/rel20070624_1.html>.
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+

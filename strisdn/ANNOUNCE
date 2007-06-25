@@ -278,3 +278,153 @@ Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@qqx.org>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:			strisdn
+Version:		0.9.2.3
+Entered-date:		2007-06-24
+Description:		OpenSS7 STREAMS ISDN.
+			OpenSS7 STREAMS ISDN for Linux
+			Fast-STREAMS.
+			The strisdn package includes kernel modules, SVR 4.2
+			STREAMS drivers, modules, libraries, utilities, test
+			programs, daemons, and development environment for the
+			development and execution of STREAMS modules and
+			drivers.
+			This package provides the ability to build and install
+			STREAMS modules distributed in binary form.
+			This distribution is currently applicable to 2.4 and 2.6
+			kernels and was targetted at ix86, x86_64, pcc and ppc64
+			architectures, but should build and install for other
+			architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		STREAMS, SVR 4.2 MP, LiS, LfS
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			2M strisdn-0.9.2.3.tar.gz
+			2M strisdn-0.9.2.3.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			2M strisdn-0.9.2.3-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4 or 2.6,
+			streams 0.9.2.3 SVR 4.2 STREAMS,
+			strcompat 0:0.9.2.6-1.
+Copying-policy:		GPL
+End
+
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@openss7.org>
+Subject: strisdn 0.9.2.3 Released - STREAMS ISDN stack for Linux Fast-STREAMS
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package strisdn-0.9.2.3 was released under GPLv2 2007-06-24.
+
+OpenSS7 STREAMS ISDN (strisdn) is an OpenSS7 Project implementation of
+a number of ISDN related components, including Q.920, Q.921, Q.931,
+GR-303, V5.2, DPNSS/DASS. The package includes kernel modules, SVR 4.2
+STREAMS drivers, modules, libraries, utilities, test programs,
+daemons, and development environment for the development and execution
+of OpenSS7 STREAMS ISDN applications for the SVR 4.2 STREAMS
+environment.
+
+This release is the third separate release of the OpenSS7 STREAMS ISDN
+package. Some of the components in this package were formerly present
+in the strss7 package. Various networking drivers are provided as well
+as CDI, DLPI, NPI, TPI and CCI header files for ISDN operation. The
+package contains the necessary manual pages and other documentation
+for ISDN components in a separate autoconf tarball.
+
+The OpenSS7 STREAMS ISDN package includes kernel modules, SVR 4.2
+STREAMS drivers, modules, libraries, utilities, test programs,
+daemons, and development environment for the development and execution
+of OpenSS7 STREAMS ISDN applications for the SVR 4.2 STREAMS
+environment.
+
+This is the third open source release of the OpenSS7 STREAMS ISDN
+package. This release contains modules and drivers formerly only
+available with Commercial releases of the strss7 package and which are
+only recently available as open source with the release of this
+package.
+
+With OpenSS7 Master Package release openss7-0.9.2.D, the ISDN
+components were separated from the strss7 package and placed in this
+package. Not all of the ISDN components previously part of the strss7
+package have been strapped into this release. Components will be
+re-validated against Linux Fast-STREAMS on a module-by-module and
+driver-by-driver basis. See TODO in the release, or Schedule, in the
+manual, for information about the release schedule.
+
+The major component first available is LAPD. lapd(4) is a pushable
+STREAMS module that is pushed over a cdi(4) HDLC channel to form an
+ISDN Q.931 link providing the Data Link Provider Interface (dlpi(7)).
+A complete test suite will be available in a further release.
+
+Subsequent releases in 4Q 2007 will include the additional full ISDN
+Q.931, Q.933, GR-303 and V5.2 drivers with conformance test suites.
+
+This package is currently incomplete. It is being released as a
+reference point for the community. If you are interested in completion
+of this package, contact <mailto:info@openss7.com>. This is a
+maintenance release providing support for additional distributions and
+tool chains.
+
+Major features since the last public release are as follows:
+
+  - Dramatic performance improvements enabled by Linux Fast-STREAMS.
+  - Support build on openSUSE 10.2.
+  - Support build on Fedora 7 with 2.6.21 kernel.
+  - Support build on CentOS 5.0 (RHEL5).
+  - Support build on Ubuntu 7.04.
+  - Updated to gettext 0.16.1.
+  - Changes to support build on 2.6.20-1.2307.fc5 and
+    2.6.20-1.2933.fc6 kernel.
+  - Supports build on Fedora Core 6.
+  - Support for recent distributions and tool chains.
+
+This is a public alpha release of the package. Please see README-alpha
+in the release.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and
+2.6 RPM- and DPKG-based distributions, and can be used on production
+kernels without patching or recompiling the kernel.
+
+This package is publicly released under the `GNU General Public
+License Version 2'.  The release is available as an autoconf tarball,
+SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
+<http://www.openss7.org/download.html> for the autoconf tarballs,
+SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
+see the strisdn package page <http://www.openss7.org/strisdn_pkg.html>.
+
+See <http://www.openss7.org/codefiles/strisdn-0.9.2.3/ChangeLog> and
+<http://www.openss7.org/codefiles/strisdn-0.9.2.3/NEWS> in the release
+for more information.  Also, see the `strisdn.pdf' manual in the
+release, also in html <http://www.openss7.org/strisdn_manual.html>.
+
+For the news release, see <http://www.openss7.org/rel20070624_6.html>.
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+

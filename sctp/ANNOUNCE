@@ -257,3 +257,112 @@ Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@qqx.org>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:			sctp
+Version:		0.2.26
+Entered-date:		2007-06-24
+Description:		OpenSS7 Linux Native SCTP.
+			OpenSS7 Linux Native SCTP (Stream Control Transmission
+			Protocol).
+			sctp is the OpenSS7 Linux Native (Sockets) Kernel
+			implementation of Stream Control Transmission Protocol
+			(SCTP).
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		SCTP, SIGTRAN, OpenSS7, Sockets, Telecommunications
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			3M sctp-0.2.26.tar.gz
+			2M sctp-0.2.26.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			2M sctp-0.2.26-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4
+Copying-policy:		GPL
+End
+
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>
+Subject: sctp 0.2.26 Released - Linux Native SCTP
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package sctp-0.2.26 was released under GPLv2 2007-06-24.
+
+The OpenSS7 Linux Native SCTP package is the OpenSS7 Linux Native
+(Sockets) Kernel implementation of Stream Control Transmission
+Protocol (SCTP). For information on using the implementation see
+sctp(7) Linux manual page and look at the test programs in
+sctp-0.2.26/test/.
+
+This is the twenty-sixth release of the Linux Native (Sockets) SCTP
+from the OpenSS7 Project. This release, as with other releases, on
+builds and installs on 2.4 kernels. This package is not as important
+to the OpenSS7 Project as the STREAMS version of SCTP, which provides
+the basis for all of the SIGTRAN components for the OpenSS7 stacks.
+Also, the STREAMS version runs on both 2.4 and 2.6 kernels.
+
+This is a stable production release: it deprecates previous releases.
+Please upgrade to the current release before reporting bugs.
+
+This is primarily a maintenance release correcting reported bugs, but
+also includes the latest packaging improvements.
+
+Major features since the last public release are as follows:
+
+  - Support build on openSUSE 10.2.
+  - Support build on Fedora 7 with 2.6.21 kernel.
+  - Support build on CentOS 5.0 (RHEL5).
+  - Support build on Ubuntu 7.04.
+  - Updated to gettext 0.16.1.
+  - Changes to support build on 2.6.20-1.2307.fc5 and
+    2.6.20-1.2933.fc6 kernel.
+  - Supports build on Fedora Core 6.
+  - Support for recent distributions and tool chains.
+
+This is a public stable production grade release of the package: it
+deprecates previous releases. Please upgrade to the current release
+before reporting bugs.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 RPM-
+and DPKG-based distributions, and can be used on production kernels
+without patching or recompiling the kernel.
+
+This package is publicly released under the `GNU General Public
+License Version 2'.  The release is available as an autoconf tarball,
+SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
+<http://www.openss7.org/download.html> for the autoconf tarballs,
+SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
+see the sctp package page <http://www.openss7.org/sctp_pkg.html>.
+
+See <http://www.openss7.org/codefiles/sctp-0.2.26/ChangeLog> and
+<http://www.openss7.org/codefiles/sctp-0.2.26/NEWS> in the release for
+more information.  Also, see the `sctp.pdf' manual in the release,
+also in html <http://www.openss7.org/sctp_manual.html>.
+
+For the news release, see <http://www.openss7.org/rel20070624_2.html>.
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+
