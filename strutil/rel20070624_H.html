@@ -1,0 +1,67 @@
+% # vim: ft=mason sw=4
+<%flags>
+    inherit	=> 'whatsnew.html'
+    package	=> 'strutil'
+    date	=> 'Jun 24, 2007'
+    rel		=> '0.9.2 Release 6'
+    file	=> 'strutil-0.9.2.6'
+    approved	=> 'Approved for Immediate Release'
+    where	=> 'Edmonton, Alberta'
+    headline	=> 'strutil 0.9.2.6 Released'
+</%flags><%attr>
+    revision	=> '$Id: rel20070624_H.html,v 0.9.2.1 2007/06/25 12:08:24 brian Exp $'
+    label	=> 'Jun 24, 2007'
+    heading	=> 'strutil 0.9.2.6 Released'
+</%attr><%method description>
+This is an internal alpha release of the package.
+</p><p style="margin-bottom:0in">
+Major features since the last internal release are as follows:
+</p><ul style="margin-bottom:0in">
+<li>Dramatic performance improvements enabled by Linux Fast-STREAMS.<bdo/></li>
+<li>Support build on openSUSE 10.2.<bdo/></li>
+<li>Support build on Fedora 7 with 2.6.21 kernel.<bdo/></li>
+<li>Support build on CentOS 5.0 (RHEL5).<bdo/></li>
+<li>Support build on Ubuntu 7.04.<bdo/></li>
+<li>Updated to gettext 0.16.1.<bdo/></li>
+<li>Changes to support build on 2.6.20-1.2307.fc5 and 2.6.20-1.2933.fc6 kernel.<bdo/></li>
+<li>Supports build on Fedora Core 6.<bdo/></li>
+<li>Support for recent distributions and tool chains.<bdo/></li>
+</ul><p style="margin-bottom:0in">
+<em>This is a public stable production grade release of the package: it deprecates previous
+    releases.  Please upgrade to the current release before reporting bugs.</em>
+</p><p style="margin-bottom:0in">
+</%method><%method abstract>
+OpenSS7 today announced Release 0.9.2.6 of the STREAMS Utilities <em>strutil</em> package.
+</%method><%method news>
+<& SELF:abstract &>
+The <cite>OpenSS7 STREAMS Utilities</cite> package provides STREAMS modules and drivers, programs
+and daemons for administration and handling of the STREAMS subsystem.
+</p><p style="margin-bottom:0in">
+The strutil package is currently incomplete.  The purpose of the package was to move STREAMS utility
+programs and modules outside of the STREAMS release package so as to allow them to be used with both
+LiS and Linux Fast-STREAMS.  As Linux Fast-STREAMS has already shown superior to LiS in terms of
+both performance and conformance, it is no longer necessary to keep these packages separate and they
+can be combined once again with Linux Fast-STREAMS.
+</p><p style="margin-bottom:0in">
+<& SELF:description &>
+</p><p style="margin-bottom:0in">
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based distributions,
+and can be used on production kernels without patching or recompiling the kernel.
+</p><p style="margin-bottom:0in">
+This package is publicly released under the
+<a href="license_gpl.html">GNU Public License Version 2</a>.<bdo/>
+The release is available as an autoconf tarball, SRPM, DSC, and set of binary RPMs and DEBs.
+See the <a href="download.html">downloads page</a> for the autoconf tarballs, SRPMs and DSCs.
+See the <a href="strutil_pkg.html"><em>strutil</em> package page</a> for tarballs, SRPMs, DSCs, and
+binary RPMs and DEBs.
+</p><p style="margin-bottom:0in">
+See <a href="codefiles/strutil-0.9.2.6/ChangeLog">ChangeLog</a> and
+<a href="codefiles/strutil-0.9.2.6/NEWS">NEWS</a> in the release for
+more information.  Also, see the
+<a href="manuals/strutil.pdf">strutil.pdf</a>
+manual in the release (also in html <a href="strutil_manual.html">here</a>).<bdo/>
+</p>
+</%method><%method body>
+<& SELF:newsitem, comp => $m->base_comp &>
+</%method>

@@ -1,0 +1,75 @@
+% # vim: ft=mason sw=4
+<%flags>
+    inherit	=> 'whatsnew.html'
+    package	=> 'osr61'
+    date	=> 'Jun 24, 2007'
+    rel		=> '0.9.2 Release 2'
+    file	=> 'osr61-0.9.2.2'
+    approved	=> 'Approved for Immediate Release'
+    where	=> 'Edmonton, Alberta'
+    headline	=> 'osr61 0.9.2.2 Released'
+</%flags><%attr>
+    revision	=> '$Id: rel20070624_M.html,v 0.9.2.1 2007/06/25 12:08:10 brian Exp $'
+    label	=> 'Jun 24, 2007'
+    heading	=> 'osr61 0.9.2.2 Released'
+</%attr><%method description>
+This is the second release from The OpenSS7 Project of the <cite>Dialogic Open Systems Release
+6.1</cite> package and is now part of the OpenSS7 Master Package (openss7-0.9.2.F).
+This package provides <tt>dlgn</tt>, <tt>mercd</tt> and <tt>pmacd</tt> device drivers, as well as a
+<tt>dvbm</tt> and <tt>sctmr</tt> module.  Additional drivers are the <tt>gncfd</tt> and
+<tt>gpio</tt> modules.  The package contains all the necessary manual pages and other documentation
+for components in an autoconf tarball.
+</p><p style="margin-bottom:0in">
+This release is the second public release.
+</p><p style="margin-bottom:0in">
+Major features are as follows:
+</p><ul style="margin-bottom:0in">
+<li>Dramatic performance improvements enabled by Linux Fast-STREAMS.<bdo/></li>
+<li>Support build on openSUSE 10.2.<bdo/></li>
+<li>Support build on Fedora 7 with 2.6.21 kernel.<bdo/></li>
+<li>Support build on CentOS 5.0 (RHEL5).<bdo/></li>
+<li>Support build on Ubuntu 7.04.<bdo/></li>
+<li>Changes to support build on 2.6.20-1.2307.fc5 and 2.6.20-1.2933.fc6 kernel.<bdo/></li>
+<li>Supports build on Fedora Core 6.<bdo/></li>
+<li>Support for recent distributions and tool chains.<bdo/></li>
+</ul><p style="margin-bottom:0in">
+<em>This is another public alpha release of the package.  Please see README-alpha in the
+    release, or Maturity, in the manual.</em>
+</p><p style="margin-bottom:0in">
+</%method><%method abstract>
+OpenSS7 today announced Release 0.9.2.2 of the OpenSS7-modified <em>osr61</em> package.
+</%method><%method news>
+<& SELF:abstract &>
+The <cite>Dialogic Open Systems Release 6.1</cite> package provides STREAMS modules and drivers,
+libraries, programs, init scripts, and daemons that implement the Dialogic(R) Open System Release
+6.1 drivers for Linux Fast-STREAMS.
+</p><p style="margin-bottom:0in">
+This is an OpenSS7 Project modified release of the GPL Dialogic(R) OSR 6.1 Release 239 drivers
+modified for use with Linux Fast-STREAMS.
+</p><p style="margin-bottom:0in">
+The <cite>Dialogic Open Systems Release 6.1</cite> package includes kernel modules, SVR 4.2 STREAMS
+drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
+development and execution of Dialogic Open Systems Release 6.1 components and applications for the
+SVR 4.2 STREAMS environment.  It provides true STREAMS-based Dialogic(R) OSR 6.1 drivers for Linux.
+<& SELF:description &>
+</p><p style="margin-bottom:0in">
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based distributions,
+and can be used on production kernels without patching or recompiling the kernel.
+</p><p style="margin-bottom:0in">
+This package is publicly released under the
+<a href="license_gpl.html">GNU Public License Version 2</a>.<bdo/>
+The release is available as an autoconf tarball, SRPM, DSC, and set of binary RPMs and DEBs.
+See the <a href="download.html">downloads page</a> for the autoconf tarballs, SRPMs and DSCs.
+See the <a href="osr61_pkg.html"><em>osr61</em> package page</a> for tarballs, SRPMs, DSCs, and
+binary RPMs and DEBs.
+</p><p style="margin-bottom:0in">
+See <a href="codefiles/osr61-0.9.2.2/ChangeLog">ChangeLog</a> and
+<a href="codefiles/osr61-0.9.2.2/NEWS">NEWS</a> in the release for
+more information.  Also, see the
+<a href="manuals/osr61.pdf">osr61.pdf</a>
+manual in the release (also in html <a href="osr61_manual.html">here</a>).<bdo/>
+</p>
+</%method><%method body>
+<& SELF:newsitem, comp => $m->base_comp &>
+</%method>

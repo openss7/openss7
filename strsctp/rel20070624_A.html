@@ -1,0 +1,75 @@
+% # vim: ft=mason sw=4
+<%flags>
+    inherit	=> 'whatsnew.html'
+    package	=> 'strsctp'
+    date	=> 'Jun 24, 2007'
+    rel		=> '0.9.2 Release 8'
+    file	=> 'strsctp-0.9.2.8'
+    approved	=> 'Approved for Immediate Release'
+    where	=> 'Edmonton, Alberta'
+    headline	=> 'strsctp 0.9.2.8 Released'
+</%flags><%attr>
+    revision	=> '$Id: rel20070624_A.html,v 0.9.2.1 2007/06/25 12:08:21 brian Exp $'
+    label	=> 'Jun 24, 2007'
+    heading	=> 'strsctp 0.9.2.8 Released'
+</%attr><%method description>
+This release is the eighth separate release of the OpenSS7 STREAMS SCTP driver that was formerly
+present in the OpenSS7 SS7/SIGTRAN/ISDN/VoIP <a href="strss7_pkg.html">strss7</a> package.  The
+networking driver (<code>streams-sctp</code>) is provided, as well as NPI, TPI and XTI header files
+for SCTP operation.  The package contains the necessary manual pages and other documentation for
+SCTP components in a separate autoconf tarball.
+</p><p style="margin-bottom:0in">
+This release is a stable production release for Linux Fast-STREAMS.
+This release is primarily a maintenance release to support recent
+distributions and tool chains.
+</p><p style="margin-bottom:0in">
+Major features since the last public release are as follows:
+</p><ul style="margin-bottom:0in">
+<li>Staggering performance improvements.  The performance improvements/correction provided in the
+<tt>streams-0.9.2.3</tt> Linux Fast-STREAMS package and a little bit of performance tuning of the
+<code>streams-sctp</code> driver has resulted in staggering performance improvements.<bdo/></li>
+<li>STREAMS SCTP now runs up to 300% faster than Linux TCP in tests.  See the <a
+href="strsctp_perf.html">STREAMS SCTP Performance</a> page for more information.<bdo/></li>
+<li>Support build on openSUSE 10.2.<bdo/></li>
+<li>Support build on Fedora 7 with 2.6.21 kernel.<bdo/></li>
+<li>Support build on CentOS 5.0 (RHEL5).<bdo/></li>
+<li>Support build on Ubuntu 7.04.<bdo/></li>
+<li>Updated to gettext 0.16.1.<bdo/></li>
+<li>Changes to support build on 2.6.20-1.2307.fc5 and 2.6.20-1.2933.fc6 kernel.<bdo/></li>
+<li>Supports build on Fedora Core 6.<bdo/></li>
+<li>Support for recent distributions and tool chains.<bdo/></li>
+</ul><p style="margin-bottom:0in">
+<em>This is a public stable production grade release of the package: it deprecates previous
+    releases.  Please upgrade to the current release before reporting bugs.</em>
+</p><p style="margin-bottom:0in">
+</%method><%method abstract>
+OpenSS7 today announced Release 0.9.2.8 of the STREAMS SCTP <em>strsctp</em> package.
+</%method><%method news>
+<& SELF:abstract &>
+OpenSS7 STREAMS SCTP (`strsctp') is an OpenSS7 Project implementation of Stream Control
+Transmission Protocol (SCTP - RFC 2960) for Linux Fast-STREAMS.  It is based on the same protocol
+engine core as the OpenSS7 Linux Native (Sockets) version of OpenSS7 SCTP.  The package provides a
+STREAMS SCTP driver for use with SIGTRAN components of the OpenSS7 stack.
+</p><p style="margin-bottom:0in">
+<& SELF:description &>
+</p><p style="margin-bottom:0in">
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based distributions,
+and can be used on production kernels without patching or recompiling the kernel.
+</p><p style="margin-bottom:0in">
+This package is publicly released under the
+<a href="license_gpl.html">GNU Public License Version 2</a>.<bdo/>
+The release is available as an autoconf tarball, SRPM, DSC, and set of binary RPMs and DEBs.
+See the <a href="download.html">downloads page</a> for the autoconf tarballs, SRPMs and DSCs.
+See the <a href="strsctp_pkg.html"><em>strsctp</em> package page</a> for tarballs, SRPMs, DSCs, and
+binary RPMs and DEBs.
+</p><p style="margin-bottom:0in">
+See <a href="codefiles/strsctp-0.9.2.8/ChangeLog">ChangeLog</a> and
+<a href="codefiles/strsctp-0.9.2.8/NEWS">NEWS</a> in the release for
+more information.  Also, see the
+<a href="manuals/strsctp.pdf">strsctp.pdf</a>
+manual in the release (also in html <a href="strsctp_manual.html">here</a>).<bdo/>
+</p>
+</%method><%method body>
+<& SELF:newsitem, comp => $m->base_comp &>
+</%method>
