@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.30 2007/06/23 23:17:27 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.31 2007/06/25 19:48:21 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/23 23:17:27 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/25 19:48:21 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -64,6 +64,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release strcompat-0.9.2.6::		Release strcompat-0.9.2.6
 * Release strcompat-0.9.2.5::		Release strcompat-0.9.2.5
 * Release strcompat-0.9.2.4::		Release strcompat-0.9.2.4
 * Release strcompat-0.9.2.3::		Release strcompat-0.9.2.3
@@ -79,7 +80,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This is the sixth separate @cite{OpenSS7 Project} release of the
+This is the seventh separate @cite{OpenSS7 Project} release of the
 @cite{@value{PACKAGE_TITLE}} package.  The package was originally present in the
 @cite{Linux Fast-STREAMS} @file{streams-0.7a.2} release package, but has been
 separated for five releases.
@@ -87,6 +88,31 @@ separated for five releases.
 This release is a stable, production grade release for @cite{Linux Fast-STREAMS}
 and is part of the OpenSS7 Master Package
 (@file{openss7-@value{VERSION_OPENSS7}}).  It deprecates previous releases.
+Please upgrade before reporting bugs on previous releases.
+
+This release is primarily a maintenance release.
+
+Major features since the last public release are as follows:
+
+@itemize -
+@item
+
+@end itemize
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-0.9.2.6
+@unnumberedsubsec Major changes for release @value{PACKAGE}-0.9.2.6
+@cindex release @value{PACKAGE}-0.9.2.6
+
+This is the sixth separate @cite{OpenSS7 Project} release of the
+@cite{@value{PACKAGE_TITLE}} package.  The package was originally present in the
+@cite{Linux Fast-STREAMS} @file{streams-0.7a.2} release package, but has been
+separated for five releases.
+
+This release is a stable, production grade release for @cite{Linux Fast-STREAMS}
+and is part of the OpenSS7 Master Package
+(@file{openss7-0.9.2.F}).  It deprecates previous releases.
 Please upgrade before reporting bugs on previous releases.
 
 This release is primarily a maintenance release.
@@ -138,7 +164,7 @@ separated for five releases.
 
 This release is a stable, production grade release for @cite{Linux Fast-STREAMS}
 and is part of the OpenSS7 Master Package
-(@file{openss7-@value{VERSION_OPENSS7}}).  It deprecates previous releases.
+(@file{openss7-0.9.2.E}).  It deprecates previous releases.
 Please upgrade before reporting bugs on previous releases.
 
 This release is primarily a maintenance release.  Some functionality of the

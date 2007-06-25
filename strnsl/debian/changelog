@@ -1,3 +1,9 @@
+strnsl (0.9.2.4-0) experimental; urgency=low
+
+  * Fourth public release.
+
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Mon, 25 Jun 2007 13:24:22 -0600
+
 strnsl (0.9.2.3-0) experimental; urgency=low
 
   * Third public release.

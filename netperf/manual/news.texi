@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.19 2007/06/23 23:17:14 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.20 2007/06/25 19:47:43 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/23 23:17:14 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/25 19:47:43 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -67,6 +67,7 @@ The sections that follow provide information on
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release netperf-2.3.6::		Release 6
 * Release netperf-2.3.5::		Release 5
 * Release netperf-2.3.4::		Release 4
 * Release netperf-2.3.4.rc3::		Release 4 Candidate 3
@@ -85,7 +86,26 @@ The sections that follow provide information on
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This is the fifth full release of the @cite{@value{PACKAGE_TITLE}} package.
+This is the seventh full release of the @cite{@value{PACKAGE_TITLE}} package.
+
+This release is largely a maintenance release that provides support for more
+distributions an architectures as well as tracking feature updates on related
+packages.
+
+Major features since the last public release are as follows:
+
+@itemize -
+@item
+
+@end itemize
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-2.3.6
+@unnumberedsubsec Major changes for release @value{PACKAGE}-2.3.6
+@cindex release @value{PACKAGE}-2.3.6
+
+This is the sixth full release of the @cite{@value{PACKAGE_TITLE}} package.
 
 This release is largely a maintenance release that provides support for more
 distributions an architectures as well as tracking feature updates on related
