@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: versions.texi,v 0.9.2.9 2007/06/20 05:49:49 brian Exp $
+@c @(#) $Id: versions.texi,v 0.9.2.10 2007/06/25 19:35:49 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/20 05:49:49 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/25 19:35:49 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -85,27 +85,27 @@
 @c @set VERSION_NETPERF	2.3.4@value{VERSION_EXTRA}
 @c @set VERSION_LIS	2.18.4@value{VERSION_EXTRA}
 
-@set VERSION_OPENSS7	0.9.2.F
-@set VERSION_SCTP	0.2.26
-@set VERSION_IPERF	2.0.7
-@set VERSION_STREAMS	0.9.2.3
-@set VERSION_STRCOMPAT	0.9.2.6
-@set VERSION_STRUTIL	0.9.2.6
-@set VERSION_STRBCM	0.9.2.4
-@set VERSION_STRTTY	0.9.2.3
-@set VERSION_STRXNS	0.9.2.6
-@set VERSION_STRXNET	0.9.2.11
-@set VERSION_STRNSL	0.9.2.3
-@set VERSION_STRSOCK	0.9.2.3
-@set VERSION_STRINET	0.9.2.6
-@set VERSION_STRSCTP	0.9.2.8
-@set VERSION_STRISO	0.9.2.3
-@set VERSION_STRCHAN	0.9.2.3
-@set VERSION_STRISDN	0.9.2.3
-@set VERSION_STRSS7	0.9a.7
-@set VERSION_SIGTRAN	0.9.2.3
-@set VERSION_STRVOIP	0.9.2.3
-@set VERSION_NETPERF	2.3.6
-@set VERSION_OSR	0.9.2.2
-@set VERSION_LIS	2.18.6
+@set VERSION_OPENSS7	0.9.2.G
+@set VERSION_SCTP	0.2.27
+@set VERSION_IPERF	2.0.8
+@set VERSION_STREAMS	0.9.2.4
+@set VERSION_STRCOMPAT	0.9.2.7
+@set VERSION_STRUTIL	0.9.2.7
+@set VERSION_STRBCM	0.9.2.5
+@set VERSION_STRTTY	0.9.2.4
+@set VERSION_STRXNS	0.9.2.7
+@set VERSION_STRXNET	0.9.2.12
+@set VERSION_STRNSL	0.9.2.4
+@set VERSION_STRSOCK	0.9.2.4
+@set VERSION_STRINET	0.9.2.7
+@set VERSION_STRSCTP	0.9.2.9
+@set VERSION_STRISO	0.9.2.4
+@set VERSION_STRCHAN	0.9.2.4
+@set VERSION_STRISDN	0.9.2.4
+@set VERSION_STRSS7	0.9a.8
+@set VERSION_SIGTRAN	0.9.2.4
+@set VERSION_STRVOIP	0.9.2.4
+@set VERSION_NETPERF	2.3.7
+@set VERSION_OSR	0.9.2.3
+@set VERSION_LIS	2.18.7
 
