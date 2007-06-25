@@ -1,0 +1,100 @@
+% # vim: ft=mason sw=4
+<%flags>
+    inherit	=> 'whatsnew.html'
+    package	=> 'sigtran'
+    date	=> 'Jun 24, 2007'
+    rel		=> '0.9.2 Release 3'
+    file	=> 'sigtran-0.9.2.3'
+    approved	=> 'Approved for Immediate Release'
+    where	=> 'Edmonton, Alberta'
+    headline	=> 'sigtran 0.9.2.3 Released'
+</%flags><%attr>
+    revision	=> '$Id: rel20070624_4.html,v 0.9.2.1 2007/06/25 12:08:13 brian Exp $'
+    label	=> 'Jun 24, 2007'
+    heading	=> 'sigtran 0.9.2.3 Released'
+</%attr><%method description>
+This is the third open source release of the <cite>OpenSS7 STREAMS SIGTRAN</cite> package.  This
+release contains modules and drivers formerly only available with Commercial releases of the
+<tt>strss7</tt> package and which are only recently available as open source with the release of
+this package.
+</p><p style="margin-bottom:0in">
+With OpenSS7 Master Package release openss7-0.9.2.D, the SIGTRAN and SS7 over IP components were
+separated from the <tt>strss7</tt> package and placed in this package.  Not all of the SIGTRAN
+components previously part of the <tt>strss7</tt> package have been strapped into this release.
+Components will be re-validated against Linux Fast-STREAMS on a module-by-module and
+driver-by-driver basis.  See <a href="codefiles/sigtran-0.9.2.3/TODO">TODO</a> in the release, or
+<em>Schedule,</em> in the manual, for information about the release schedule.
+</p><p style="margin-bottom:0in">
+The major component first available is M2PA.  <a href="man2html?m2pa_sl(4)"><b>m2pa_sl</b>(4)</a> is
+a pushable STREAMS module that is pushed over a <a href="man2html?sctp_n(4)"><b>sctp_n</b>(4)</a>
+SCTP driver Stream to form an M2PA signalling link providing the Signalling Link service interface
+(<a href="man2html?sli(7)"><b>sli</b>(7)</a>).  A complete test suite that tests to
+draft-bidulock-sigtran-m2pa-07.txt is included in the release.  The historical SS7 over IP
+implementations are provided, but without conformance test suites.  The release also contains
+simplified AS modules for M2UA (<a href="man2html?m2ua_as(4)"><b>m2ua_as</b>(4)</a>), M3UA
+(<a href="man2html?m3ua_as(4)"><b>m3ua_as</b>(4)</a>) that as yet do not have a conformance test
+suite.
+</p><p style="margin-bottom:0in">
+Subsequent releases in 3Q 2007 will include the additional full M3UA, SUA and TUA multiplexing
+drivers with conformance test suites.
+</p><p style="margin-bottom:0in">
+Major features since the last public release are as follows:
+</p><ul style="margin-bottom:0in">
+<li>Dramatic performance improvements enabled by Linux Fast-STREAMS and STREAMS SCTP.<bdo/></li>
+<li>Support build on openSUSE 10.2.<bdo/></li>
+<li>Support build on Fedora 7 with 2.6.21 kernel.<bdo/></li>
+<li>Support build on CentOS 5.0 (RHEL5).<bdo/></li>
+<li>Support build on Ubuntu 7.04.<bdo/></li>
+<li>Updated to gettext 0.16.1.<bdo/></li>
+<li>Changes to support build on 2.6.20-1.2307.fc5 and 2.6.20-1.2933.fc6 kernel.<bdo/></li>
+<li>Supports build on Fedora Core 6.<bdo/></li>
+<li>Support for recent distributions and tool chains.<bdo/></li>
+</ul><p style="margin-bottom:0in">
+<em>This is a stable, production grade release of M2PA for Linux Fast-STREAMS.  It deprecates
+    previous SIGTRAN component releases from the <tt>strss7</tt> package.  Please upgrade to the
+    most current release of these components before reporting bugs.</em>
+</p><p style="margin-bottom:0in">
+</%method><%method abstract>
+OpenSS7 today announced Release 0.9.2.3 of the OpenSS7 SIGTRAN Stack <em>sigtran</em> package.
+</%method><%method news>
+<& SELF:abstract &>
+The OpenSS7 STREAMS SIGTRAN package includes kernel modules, SVR 4.2 STREAMS drivers, modules,
+libraries, utilities, test programs, daemons, and development environment for the development and
+execution of OpenSS7 STREAMS SIGTRAN applications for the SVR 4.2 STREAMS environment.
+</p><p style="margin-bottom:0in">
+This package contains modules and drivers formerly only part of the Commercial releases of the
+<tt>strss7</tt> package.  These are commercial grade implementations that have only recently been
+released as open source.
+</p><p style="margin-bottom:0in">
+The public release currently contains the following STREAMS drivers and modules:
+</p><ul style="margin-bottom:0in">
+<li><tt>streams-m2pa_sl</tt> <a href="man2html?m2pa_sl(4)"><b>m2pa_sl</b>(4)</a><bdo/></li>
+<li><tt>streams-m2ua_as</tt> <a href="man2html?m2ua_as(4)"><b>m2ua_as</b>(4)</a><bdo/></li>
+<li><tt>streams-m3ua_as</tt> <a href="man2html?m3ua_as(4)"><b>m3ua_as</b>(4)</a><bdo/></li>
+<li><tt>streams-sdl_sctp</tt> <a href="man2html?sdl_sctp(4)"><b>sdl_sctp</b>(4)</a><bdo/></li>
+<li><tt>streams-sdt_sctp</tt> <a href="man2html?sdt_sctp(4)"><b>sdt_sctp</b>(4)</a><bdo/></li>
+<li><tt>streams-sdt_tpi</tt> <a href="man2html?sdt_tpi(4)"><b>sdt_tpi</b>(4)</a><bdo/></li>
+<li><tt>streams-sl_tpi</tt> <a href="man2html?sl_tpi(4)"><b>sl_tpi</b>(4)</a><bdo/></li>
+</ul><p style="margin-bottom:0in">
+<& SELF:description &>
+</p><p style="margin-bottom:0in">
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based distributions,
+and can be used on production kernels without patching or recompiling the kernel.
+</p><p style="margin-bottom:0in">
+This package is publicly released under the
+<a href="license_gpl.html">GNU Public License Version 2</a>.<bdo/>
+The release is available as an autoconf tarball, SRPM, DSC, and set of binary RPMs and DEBs.
+See the <a href="download.html">downloads page</a> for the autoconf tarballs, SRPMs and DSCs.
+See the <a href="sigtran_pkg.html"><em>sigtran</em> package page</a> for tarballs, SRPMs, DSCs, and
+binary RPMs and DEBs.
+</p><p style="margin-bottom:0in">
+See <a href="codefiles/sigtran-0.9.2.3/ChangeLog">ChangeLog</a> and
+<a href="codefiles/sigtran-0.9.2.3/NEWS">NEWS</a> in the release for
+more information.  Also, see the
+<a href="manuals/sigtran.pdf">sigtran.pdf</a>
+manual in the release (also in html <a href="sigtran_manual.html">here</a>).<bdo/>
+</p>
+</%method><%method body>
+<& SELF:newsitem, comp => $m->base_comp &>
+</%method>

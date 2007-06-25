@@ -1,0 +1,72 @@
+% # vim: ft=mason sw=4
+<%flags>
+    inherit	=> 'whatsnew.html'
+    package	=> 'strxns'
+    date	=> 'Jun 24, 2007'
+    rel		=> '0.9.2 Release 6'
+    file	=> 'strxns-0.9.2.6'
+    approved	=> 'Approved for Immediate Release'
+    where	=> 'Edmonton, Alberta'
+    headline	=> 'strxns 0.9.2.6 Released'
+</%flags><%attr>
+    revision	=> '$Id: rel20070624_F.html,v 0.9.2.1 2007/06/25 12:08:26 brian Exp $'
+    label	=> 'Jun 24, 2007'
+    heading	=> 'strxns 0.9.2.6 Released'
+</%attr><%method description>
+This is another separate release from the OpenSS7 Project of the OpenSS7 XNS Networking package,
+formerly part of the (now deprecated) Linux STREAMS (LiS) package.  These networking modules provide
+DLPI, NPI and Linux IP drivers, as well as providing CDI, DLPI and NPI header files.  The package
+contains all the necessary manual pages and other documentation for XNS components in a separate
+autoconf tarball.
+</p><p style="margin-bottom:0in">
+This release is primarily a maintenance release supporting recent distributions and tool chains.
+This release is a stable production release for Linux Fast-STREAMS.
+</p><p style="margin-bottom:0in">
+Major features since the last public release are as follows:
+</p><ul style="margin-bottom:0in">
+<li>Dramatic performance improvements enabled by Linux Fast-STREAMS.<bdo/></li>
+<li>Support build on openSUSE 10.2.<bdo/></li>
+<li>Support build on Fedora 7 with 2.6.21 kernel.<bdo/></li>
+<li>Support build on CentOS 5.0 (RHEL5).<bdo/></li>
+<li>Support build on Ubuntu 7.04.<bdo/></li>
+<li>Updated to gettext 0.16.1.<bdo/></li>
+<li>Changes to support build on 2.6.20-1.2307.fc5 and 2.6.20-1.2933.fc6 kernel.<bdo/></li>
+<li>Supports build on Fedora Core 6.<bdo/></li>
+<li>Support for recent distributions and tool chains.<bdo/></li>
+</ul><p style="margin-bottom:0in">
+<em>This is a public stable production grade release of the package: it deprecates previous
+    releases.  Please upgrade to the current release before reporting bugs.</em>
+</p><p style="margin-bottom:0in">
+</%method><%method abstract>
+OpenSS7 today announced Release 0.9.2.6 of the STREAMS X/Open Networking Services (XNS) <em>strxns</em> package.
+</%method><%method news>
+<& SELF:abstract &>
+The OpenSS7 XNS Networking package is an implementation of X/Open Network Services (XNS 5.2) for
+Linux Fast-STREAMS and provides OSI conforming CDI, DLPI and NPI header files as well as several
+DLPI and NPI modules and drivers that convert between Linux Native IP interface and the STREAMS DLPI
+and NPI interface.  One allows DLPI drivers to be added to Linux as IP interfaces, another provides
+DLPI access to native Linux IP interfaces, and a third provides NPI access to the Linux IP
+subsystem.
+</p><p style="margin-bottom:0in">
+<& SELF:description &>
+</p><p style="margin-bottom:0in">
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based distributions,
+and can be used on production kernels without patching or recompiling the kernel.
+</p><p style="margin-bottom:0in">
+This package is publicly released under the
+<a href="license_gpl.html">GNU Public License Version 2</a>.<bdo/>
+The release is available as an autoconf tarball, SRPM, DSC, and set of binary RPMs and DEBs.
+See the <a href="download.html">downloads page</a> for the autoconf tarballs, SRPMs and DSCs.
+See the <a href="strxns_pkg.html"><em>strxns</em> package page</a> for tarballs, SRPMs, DSCs, and
+binary RPMs and DEBs.
+</p><p style="margin-bottom:0in">
+See <a href="codefiles/strxns-0.9.2.6/ChangeLog">ChangeLog</a> and
+<a href="codefiles/strxns-0.9.2.6/NEWS">NEWS</a> in the release for
+more information.  Also, see the
+<a href="manuals/strxns.pdf">strxns.pdf</a>
+manual in the release (also in html <a href="strxns_manual.html">here</a>).<bdo/>
+</p>
+</%method><%method body>
+<& SELF:newsitem, comp => $m->base_comp &>
+</%method>

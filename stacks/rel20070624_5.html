@@ -1,0 +1,77 @@
+% # vim: ft=mason sw=4
+<%flags>
+    inherit	=> 'whatsnew.html'
+    package	=> 'strss7'
+    date	=> 'Jun 24, 2007'
+    rel		=> '0.9a Release 7'
+    file	=> 'strss7-0.9a.7'
+    approved	=> 'Approved for Immediate Release'
+    where	=> 'Edmonton, Alberta'
+    headline	=> 'strss7 0.9a.7 Released'
+</%flags><%attr>
+    revision	=> '$Id: rel20070624_5.html,v 0.9.2.1 2007/06/25 12:08:13 brian Exp $'
+    label	=> 'Jun 24, 2007'
+    heading	=> 'strss7 0.9a.7 Released'
+</%attr><%method description>
+The OpenSS7 SS7 Stack package contains a wide array of SS7 drivers and components for Linux
+Fast-STREAMS.  This is the public release package which has most of the components removed.
+Subscribers and sponsors of the OpenSS7 Project have access to the full array of components.
+</p><p style="margin-bottom:0in">
+This is the sixth release of the OpenSS7 SS7 Stack strss7 package that contains SS7 (Signalling
+System No. 7) signalling stack components for Linux Fast-STREAMS.  The package contains the
+necessary header files, manual pages and other documentation for SS7 components in a separate
+autoconf tarball.
+</p><p style="margin-bottom:0in">
+This release is primarily to support recent compilers, kernels and distributions.
+</p><p style="margin-bottom:0in">
+Major features since the last public release are as follows:
+</p><ul style="margin-bottom:0in">
+<li>Dramatic performance improvements enabled by Linux Fast-STREAMS.<bdo/></li>
+<li>Support build on openSUSE 10.2.<bdo/></li>
+<li>Support build on Fedora 7 with 2.6.21 kernel.<bdo/></li>
+<li>Support build on CentOS 5.0 (RHEL5).<bdo/></li>
+<li>Support build on Ubuntu 7.04.<bdo/></li>
+<li>Updated to gettext 0.16.1.<bdo/></li>
+<li>Changes to support build on 2.6.20-1.2307.fc5 and 2.6.20-1.2933.fc6 kernel.<bdo/></li>
+<li>Supports build on Fedora Core 6.<bdo/></li>
+<li>Support for recent distributions and tool chains.<bdo/></li>
+</ul><p style="margin-bottom:0in">
+<em>This is a public stable production grade release of the package: it deprecates previous
+    releases.  Please upgrade to the current release before reporting bugs.</em>
+</p><p style="margin-bottom:0in">
+</%method><%method abstract>
+OpenSS7 today announced Release 0.9a.7 of the OpenSS7 SS7/SIGTRAN/ISDN/VoIP <em>strss7</em> package.
+</%method><%method news>
+<& SELF:abstract &>
+The OpenSS7 SS7 Stack package includes a wide array of kernel modules, SVR 4.2 STREAMS drivers,
+modules, libraries, utilities, test programs, daemons, and development environment for the
+development and execution of Signalling System Number 7 (SS7), Signalling Transport (SIGTRAN),
+Integrated Services Digital Network (ISDN) and Voice over IP (VoIP) protocol stack components and
+applications for the Linux Fast-STREAMS environment.
+</p><p style="margin-bottom:0in">
+However, the current package has had ISDN components moved to the <tt>strisdn</tt> package, SIGTRAN
+components moved to the <tt>sigtran</tt> package, and VoIP components moved to the <tt>strvoip</tt>
+package.  Only SS7 components remain in the <tt>strss7</tt> package.
+</p><p style="margin-bottom:0in">
+<& SELF:description &>
+</p><p style="margin-bottom:0in">
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based distributions,
+and can be used on production kernels without patching or recompiling the kernel.
+</p><p style="margin-bottom:0in">
+This package is publicly released under the
+<a href="license_gpl.html">GNU Public License Version 2</a>.<bdo/>
+The release is available as an autoconf tarball, SRPM, DSC, and set of binary RPMs and DEBs.
+See the <a href="download.html">downloads page</a> for the autoconf tarballs, SRPMs and DSCs.
+See the <a href="strss7_pkg.html"><em>strss7</em> package page</a> for tarballs, SRPMs, DSCs, and
+binary RPMs and DEBs.
+</p><p style="margin-bottom:0in">
+See <a href="codefiles/strss7-0.9a.7/ChangeLog">ChangeLog</a> and
+<a href="codefiles/strss7-0.9a.7/NEWS">NEWS</a> in the release for
+more information.  Also, see the
+<a href="manuals/strss7.pdf">strss7.pdf</a>
+manual in the release (also in html <a href="strss7_manual.html">here</a>).<bdo/>
+</p>
+</%method><%method body>
+<& SELF:newsitem, comp => $m->base_comp &>
+</%method>
